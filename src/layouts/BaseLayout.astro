@@ -1,5 +1,5 @@
 ---
-import '@fontsource-variable/fraunces/opsz.css';
+import '@fontsource-variable/fraunces/full.css';
 import '@fontsource/public-sans/400.css';
 import '@fontsource/public-sans/500.css';
 import '@fontsource/public-sans/600.css';
@@ -60,10 +60,33 @@ const navItems = [
 const currentPath = Astro.url.pathname;
 const isActive = (href: string) => {
   const full = withBasePath(href);
-  return href === '/' ? currentPath === full : currentPath.startsWith(full);
+  return href === '/' ? currentPath === full : (currentPath === full || currentPath.startsWith(`${full}/`));
 };
 
 const cspNonce = Astro.locals.cspNonce ?? '';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'logo': 'https://pixelatedempathy.com/favicon.svg',
+  'description': 'Clinical simulation and transcript-based review for therapist training and supervision teams.',
+  'foundingDate': '2025',
+  'address': {
+    '@type': 'PostalAddress',
+    'addressCountry': 'US',
+  },
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
+  },
+  'sameAs': [
+    'https://x.com/pixelatedempathy',
+    'https://github.com/nochadisfaction/pixelated',
+  ],
+};
 ---
 
 <!doctype html>
@@ -97,6 +120,7 @@ const cspNonce = Astro.locals.cspNonce ?? '';
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.dataset.theme = storedTheme || (prefersDark ? 'dark' : 'light');
     </script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')} />
   </head>
   <body>
     <header class="site-header">

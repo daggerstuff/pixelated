@@ -200,7 +200,7 @@ export async function rateLimitMiddleware(
   const rateLimitKey = `rate_limit:${endpoint}:${clientIp}`
   const windowSeconds = windowMinutes * 60
 
-  const { getFromCache, setInCache } = { getFromCache, setInCache }
+
 
   interface RateLimitData {
     count: number
@@ -228,7 +228,6 @@ export async function rateLimitMiddleware(
 
   // Check if limit exceeded
   if (currentCount >= limit) {
-    const { logSecurityEvent, SecurityEventType } = { logSecurityEvent, SecurityEventType }
     logSecurityEvent(SecurityEventType.RATE_LIMIT_EXCEEDED, null, {
       endpoint,
       currentCount,
@@ -305,7 +304,6 @@ export async function csrfProtection(request: Request): Promise<{
     ]) as string | undefined
 
   if (!csrfToken) {
-    const { logSecurityEvent, SecurityEventType } = { logSecurityEvent, SecurityEventType }
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'missing_token',
       endpoint: new URL(request.url).pathname,
@@ -336,12 +334,11 @@ export async function csrfProtection(request: Request): Promise<{
   }
 
   // Validate the token against stored tokens
-  const { getFromCache } = { getFromCache, setInCache }
+
   const tokenKey = `csrf:${csrfToken}`
   const storedToken = await getFromCache<CSRFTokenData>(tokenKey)
 
   if (!storedToken) {
-    const { logSecurityEvent, SecurityEventType } = { logSecurityEvent, SecurityEventType }
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'invalid_token',
       endpoint: new URL(request.url).pathname,
@@ -368,7 +365,6 @@ export async function csrfProtection(request: Request): Promise<{
 
   // Check if token matches stored token
   if (storedToken.token && storedToken.token !== csrfToken) {
-    const { logSecurityEvent, SecurityEventType } = { logSecurityEvent, SecurityEventType }
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'invalid_token',
       endpoint: new URL(request.url).pathname,
@@ -395,7 +391,6 @@ export async function csrfProtection(request: Request): Promise<{
 
   // Check if token has expired
   if (storedToken.expiresAt && storedToken.expiresAt < Date.now()) {
-    const { logSecurityEvent, SecurityEventType } = { logSecurityEvent, SecurityEventType }
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'expired_token',
       endpoint: new URL(request.url).pathname,
@@ -592,8 +587,6 @@ export async function authenticateRequest(
         }
 
         // Log successful API key authentication
-        const { logSecurityEvent, SecurityEventType } =
-          { logSecurityEvent, SecurityEventType }
         logSecurityEvent(
           SecurityEventType.AUTHENTICATION_SUCCESS,
           keyRecord.user_id,
@@ -648,8 +641,6 @@ export async function authenticateRequest(
       )?.get?.('Authorization')) as string | undefined
 
     if (!authHeader) {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'No authorization header',
         endpoint: new URL(request.url).pathname,
@@ -670,8 +661,6 @@ export async function authenticateRequest(
 
     // Check authorization header format
     if (!authHeader.startsWith('Bearer ')) {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'Invalid authorization header format',
         endpoint: new URL(request.url).pathname,
@@ -697,8 +686,6 @@ export async function authenticateRequest(
     const validation = await validateToken(token, 'access')
 
     if (!validation.valid) {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: validation.error ?? 'Invalid token',
         endpoint: new URL(request.url).pathname,
@@ -782,8 +769,6 @@ export async function authenticateRequest(
         role: validation.role as string | undefined,
       })
     } catch (resolveError) {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'Failed to resolve internal user identity',
         auth0Sub,
@@ -807,8 +792,6 @@ export async function authenticateRequest(
     }
 
     if (!identity.internalId) {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'User not found',
         endpoint: new URL(request.url).pathname,
@@ -825,8 +808,6 @@ export async function authenticateRequest(
     }
 
     if ((identity as { isActive?: boolean }).isActive === false) {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(
         SecurityEventType.AUTHENTICATION_FAILED,
         identity.internalId,
@@ -854,15 +835,13 @@ export async function authenticateRequest(
 
     // Device/Session Binding Check
     if (sid) {
-      const { getFromCache, setInCache } = { getFromCache, setInCache }
+
       const bindingKey = `session_binding:${identity.internalId}:${sid}`
       const clientInfo = getClientInfo(request)
       const storedBinding = await getFromCache(bindingKey)
 
       if (storedBinding) {
         if ((storedBinding as { ip?: string }).ip !== clientInfo.ip) {
-          const { logSecurityEvent, SecurityEventType } =
-            { logSecurityEvent, SecurityEventType }
           logSecurityEvent(
             SecurityEventType.AUTHENTICATION_FAILED,
             identity.internalId,
@@ -913,8 +892,6 @@ export async function authenticateRequest(
           await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
 
         if (requiresMFA) {
-          const { logSecurityEvent, SecurityEventType } =
-            { logSecurityEvent, SecurityEventType }
           logSecurityEvent(
             SecurityEventType.MFA_REQUIRED,
             identity.internalId,
@@ -945,7 +922,6 @@ export async function authenticateRequest(
     }
 
     // Log successful authentication using internal UUID
-    const { logSecurityEvent, SecurityEventType } = { logSecurityEvent, SecurityEventType }
     logSecurityEvent(
       SecurityEventType.AUTHENTICATION_SUCCESS,
       identity.internalId,
@@ -1051,8 +1027,6 @@ export async function requireRole(
   if (!hasAccess) {
     // Log authorization failure
     try {
-      const { logSecurityEvent, SecurityEventType } =
-        { logSecurityEvent, SecurityEventType }
       logSecurityEvent(
         SecurityEventType.AUTHORIZATION_FAILED,
         request.user.id,

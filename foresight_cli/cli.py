@@ -16,7 +16,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-_project_root = Path(__file__).resolve().parent.parent.parent
+_project_root = Path(__file__).resolve().parent.parent
 for _candidate in [Path(".env"), _project_root / ".env", Path.home() / ".env"]:
     if _candidate.exists():
         load_dotenv(_candidate)
@@ -24,7 +24,7 @@ for _candidate in [Path(".env"), _project_root / ".env", Path.home() / ".env"]:
 
 import typer
 
-from .commands import analysis, blocks, curate, eval as eval_cmd, memory, system
+from .commands import memory
 from .utils import config as cfg, output as out
 
 
@@ -48,11 +48,6 @@ app = typer.Typer(
 
 # Register command groups
 app.add_typer(memory.app, name="memory", help="Store, retrieve, search memories.")
-app.add_typer(analysis.app, name="analysis", help="Synthesize, reflect, profile, diff, rollback.")
-app.add_typer(blocks.app, name="blocks", help="Manage context blocks.")
-app.add_typer(curate.app, name="curate", help="Manage curation runs.")
-app.add_typer(eval_cmd.app, name="eval", help="Run evaluation harness (PIX-3953).")
-app.add_typer(system.app, name="system", help="System status, init, doctor, config, stats, history.")
 
 # Top-level shorthand aliases (most common operations)
 app.command(name="store", rich_help_panel="Quick Commands")(memory.store)
@@ -64,20 +59,12 @@ app.command(name="reinforce", rich_help_panel="Quick Commands")(memory.reinforce
 app.command(name="search", rich_help_panel="Quick Commands")(memory.search)
 app.command(name="export", rich_help_panel="Quick Commands")(memory.export)
 app.command(name="import", rich_help_panel="Quick Commands")(memory.import_memories)
-app.command(name="status", rich_help_panel="Quick Commands")(system.status)
-app.command(name="init", rich_help_panel="Quick Commands")(system.init)
-app.command(name="doctor", rich_help_panel="Quick Commands")(system.doctor)
-app.command(name="stats", rich_help_panel="Quick Commands")(system.stats)
-app.command(name="config", rich_help_panel="Quick Commands")(system.config)
-app.command(name="synthesize", rich_help_panel="Quick Commands")(analysis.synthesize)
-app.command(name="reflect", rich_help_panel="Quick Commands")(analysis.reflect)
-app.command(name="profile", rich_help_panel="Quick Commands")(analysis.profile)
 
 
 @app.callback()
-def callback(  # noqa: PLR0913
+def callback(
     ctx: typer.Context,
-    output: OutputMode | None = typer.Option(  # noqa: B008
+    output: OutputMode | None = typer.Option(
         None,
         "--output",
         "-o",
@@ -89,12 +76,6 @@ def callback(  # noqa: PLR0913
     user_id: str | None = typer.Option(None, "--user-id", "-u", help="User ID override", hidden=True),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Verbose output"),
 ):
-    if agent:
-        output = OutputMode.agent
-    elif json_mode:
-        output = OutputMode.json
-    elif output is None:
-        output = _DEFAULT_OUTPUT
     """Foresight Memory Management CLI — TUI, agent tools, and memory operations.
 
     [bold]Quick start:[/bold]
@@ -111,6 +92,12 @@ def callback(  # noqa: PLR0913
       -o agent   Machine-parseable tagged lines, no ANSI, pipe-safe
       -o json    Pure JSON output
     """
+    if agent:
+        output = OutputMode.agent
+    elif json_mode:
+        output = OutputMode.json
+    elif output is None:
+        output = _DEFAULT_OUTPUT
     agent = output == OutputMode.agent
     json_mode = output == OutputMode.json
     out.configure(
@@ -147,11 +134,6 @@ try:
     from .tui.app import ForesightTUI
 except ImportError:
     ForesightTUI = None
-
-_tui_err = (
-    "Cannot launch TUI — missing dependency: {e}\n"
-    "Install with: pip install 'foresight-mcp[tui]' or: uv pip install 'foresight-mcp[tui]'"
-)
 
 
 @app.command()
