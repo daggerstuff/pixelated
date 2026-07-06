@@ -6,10 +6,27 @@ import { withBasePath } from '@/utils/path'
 const { hero, intro } = homepageContent
 ---
 
+import { SITE } from "@/config";
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": SITE.name,
+  "url": SITE.website,
+  "description": SITE.description,
+  "foundingDate": "2024",
+  "sameAs": [
+    "https://github.com/nochadisfaction",
+    "https://twitter.com/empathypixel",
+  ],
+};
+
+
 <BaseLayout
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
 >
+<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
   <section class="hero section">
     <p class="eyebrow">{hero.kicker}</p>
     <h1>{hero.title}</h1>
