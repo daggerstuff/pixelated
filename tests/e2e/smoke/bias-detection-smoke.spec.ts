@@ -37,6 +37,25 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
   })
 
   test('Dashboard page loads without errors', async ({ page }) => {
+    // Mock summary API so smoke tests don't require PostgreSQL in CI preview.
+    await page.route('**/api/dashboard/bias-detection/summary', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          metrics: {
+            'total-sessions': 0,
+            'avg-bias-score': '0.0%',
+            'active-alerts': 0,
+            'system-uptime': '99.7%',
+          },
+          recentAnalyses: [],
+          activeAlerts: [],
+          timestamp: new Date().toISOString(),
+        }),
+      })
+    })
+
     // Set up console error tracking before navigation
     const errors: string[] = []
     page.on('console', (msg) => {
