@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { getCurrentUser } from '@/lib/auth'
 
-import { parsePagination, requireMemoryUser } from '../_shared'
+import { parsePagination, requireMemoryUser, toMemoryScope } from '../_shared'
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(),
@@ -233,6 +233,28 @@ describe('parsePagination', () => {
     expect(parsePagination(url)).toEqual({
       limit: 100,
       offset: 0,
+    })
+  })
+})
+
+describe('toMemoryScope', () => {
+  it('maps user, account, and workspace correctly with includeShared true', async () => {
+    const scope = toMemoryScope('user-1', 'account-1', 'workspace-1')
+    expect(scope).toEqual({
+      userId: 'user-1',
+      accountId: 'account-1',
+      workspaceId: 'workspace-1',
+      includeShared: true,
+    })
+  })
+
+  it('handles optional parameters', async () => {
+    const scope = toMemoryScope('user-1')
+    expect(scope).toEqual({
+      userId: 'user-1',
+      accountId: undefined,
+      workspaceId: undefined,
+      includeShared: true,
     })
   })
 })
