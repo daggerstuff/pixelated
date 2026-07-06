@@ -2,25 +2,23 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { homepageContent } from '@/lib/content'
 import { withBasePath } from '@/utils/path'
+import { SITE } from '@/config'
 
 const { hero, intro } = homepageContent
----
-
-import { SITE } from "@/config";
 
 const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": SITE.name,
-  "url": SITE.website,
-  "description": SITE.description,
-  "foundingDate": "2024",
-  "sameAs": [
-    "https://github.com/nochadisfaction",
-    "https://twitter.com/empathypixel",
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.website,
+  description: SITE.description,
+  foundingDate: '2024',
+  sameAs: [
+    'https://github.com/nochadisfaction',
+    'https://twitter.com/empathypixel',
   ],
-};
-
+}
+---
 
 <BaseLayout
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
