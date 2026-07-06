@@ -7,18 +7,17 @@
 #   * session-agent-mc    (model-context sidecar, optional — pulls from
 #                          FORESIGHT_MCP_URL via local stdio->http bridge)
 #
-# Replace the placeholder image tag with the release pipeline's output.
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: session-agent
-  namespace: pixelated
+  namespace: pixelated-empathy
   labels:
     app: session-agent
     eve-version: "0.11"
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: session-agent
@@ -27,9 +26,11 @@ spec:
       labels:
         app: session-agent
     spec:
+      imagePullSecrets:
+        - name: dockerhub-registry-credentials
       containers:
         - name: agent
-          image: ghcr.io/pixelated/session-agent:PLACEHOLDER
+          image: docker.io/pixelatedempathy/session-agent:latest
           ports:
             - containerPort: 2000
               name: http
@@ -38,11 +39,18 @@ spec:
               value: "2000"
             - name: NODE_ENV
               value: production
-            - name: AI_GATEWAY_API_KEY
+            - name: CLOUDFLARE_ACCOUNT_ID
               valueFrom:
                 secretKeyRef:
-                  name: vercel-ai-gateway
+                  name: cloudflare-workers-ai
+                  key: account-id
+            - name: CLOUDFLARE_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-workers-ai
                   key: api-key
+            - name: WORKERS_AI_AGENT_MODEL
+              value: "@cf/moonshotai/kimi-k2.7-code"
             - name: FORESIGHT_MCP_URL
               value: http://foresight-mcp:8765
             - name: PIXELATED_SESSION_MCP_URL
@@ -59,17 +67,17 @@ spec:
             periodSeconds: 30
           resources:
             requests:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 100m
+              memory: 256Mi
             limits:
-              cpu: "2"
-              memory: 2Gi
+              cpu: "1"
+              memory: 1Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: session-agent
-  namespace: pixelated
+  namespace: pixelated-empathy
 spec:
   selector:
     app: session-agent
@@ -82,7 +90,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: session-agent
-  namespace: pixelated
+  namespace: pixelated-empathy
   annotations:
     # Auth is handled inside the agent; the ingress passes through.
     nginx.ingress.kubernetes.io/proxy-body-size: 4m
