@@ -45,6 +45,26 @@ const STUB_MODELS: Array<AIModel & { available: boolean }> = [
     temperature: 0.7,
     available: true,
   },
+  {
+    id: 'minimaxai/minimax-m3',
+    name: 'MiniMax-M3',
+    provider: 'nvidia',
+    capabilities: ['text-generation', 'conversation', 'analysis', 'reasoning'],
+    maxTokens: 128000,
+    contextWindow: 128000,
+    temperature: 0.7,
+    available: true,
+  },
+  {
+    id: 'z-ai/glm-5.2',
+    name: 'GLM-5.2',
+    provider: 'nvidia',
+    capabilities: ['text-generation', 'conversation', 'analysis'],
+    maxTokens: 128000,
+    contextWindow: 128000,
+    temperature: 0.7,
+    available: true,
+  },
 ]
 
 export function getAllModels(): AIModel[] {
