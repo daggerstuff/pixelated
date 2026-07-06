@@ -1,5 +1,9 @@
 import { defineAgent } from 'eve'
 import { z } from 'zod'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from '../../lib/workers-ai.js'
 
 export default defineAgent({
   description:
@@ -8,7 +12,8 @@ export default defineAgent({
     'intensity, valence, risk flags) that the parent agent attaches to its reply ' +
     "before the tool writes the turn to Foresight. Use this whenever the trainee's " +
     "or participant's most recent turn has not yet been analyzed.",
-  model: 'anthropic/claude-opus-4.8',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   outputSchema: z.object({
     primary_emotion: z.string(),
     intensity: z.number().min(0).max(1),

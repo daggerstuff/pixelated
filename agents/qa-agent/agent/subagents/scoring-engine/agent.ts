@@ -1,5 +1,9 @@
 import { defineAgent } from 'eve'
 import { z } from 'zod'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from '../../lib/workers-ai.js'
 
 export default defineAgent({
   description:
@@ -7,7 +11,8 @@ export default defineAgent({
     'the cohort rubric. Emits one row per dimension plus an overall ' +
     'verdict. Use this whenever the QA agent is processing a session in ' +
     'batch.',
-  model: 'anthropic/claude-sonnet-4.6',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   outputSchema: z.object({
     dimensions: z.array(
       z.object({
