@@ -151,12 +151,12 @@ install_node_stack() {
         nvm alias default 24.16.0
     "
 
-  # Install pnpm 11.9.0 globally
-    log_info "Installing pnpm 11.9.0..."
+  # Install pnpm 11.10.0 globally
+    log_info "Installing pnpm 11.10.0..."
     sudo -u "$REAL_USER" bash -c "
         export NVM_DIR=\"\$HOME/.nvm\"
         [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"
-        npm install -g pnpm@11.9.0
+        npm install -g pnpm@11.10.0
     "
 
     # Install Bun
