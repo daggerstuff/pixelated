@@ -161,7 +161,7 @@ const child = spawn(vitestBin, args, {
     ...process.env,
     NODE_ENV:
       process.env.NODE_ENV && process.env.NODE_ENV !== "production" ? process.env.NODE_ENV : "test",
-    NODE_OPTIONS: `${process.env.NODE_OPTIONS || ""} --max-old-space-size=8192`.trim(),
+    NODE_OPTIONS: `${process.env.NODE_OPTIONS || ""} --max-old-space-size=4096`.trim(),
   },
 });
 
