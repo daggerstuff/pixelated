@@ -6,18 +6,6 @@ import { SITE } from '@/config'
 
 const { hero, intro } = homepageContent
 
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: SITE.name,
-  url: SITE.website,
-  description: SITE.description,
-  foundingDate: '2024',
-  sameAs: [
-    'https://github.com/nochadisfaction',
-    'https://twitter.com/empathypixel',
-  ],
-}
 ---
 
 <BaseLayout
@@ -27,7 +15,18 @@ const organizationSchema = {
   <script
     is:inline
     type="application/ld+json"
-    set:html={JSON.stringify(organizationSchema)
+    set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: SITE.name,
+      url: SITE.website,
+      description: SITE.description,
+      foundingDate: '2024',
+      sameAs: [
+        'https://github.com/nochadisfaction',
+        'https://twitter.com/empathypixel',
+      ],
+    })
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e')}
   />
