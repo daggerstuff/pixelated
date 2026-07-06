@@ -36,7 +36,7 @@ try {
 }
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './tests/e2e',
   fullyParallel: true,
   forbidOnly: isCi,
   retries: isCi ? 2 : 0,

@@ -11,6 +11,8 @@ describe('memory-transport-factory', () => {
 
   beforeEach(() => {
     process.env = { ...ORIGINAL_ENV }
+    process.env['MEMORY_SERVICE_ACTOR_ID'] = 'test-actor'
+    process.env['MEMORY_SERVICE_ACTOR_SECRET'] = 'test-secret'
     vi.clearAllMocks()
   })
 

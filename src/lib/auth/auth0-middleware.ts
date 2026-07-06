@@ -12,6 +12,8 @@ import {
   AUTH0_ROLE_DEFINITIONS as ROLE_DEFINITIONS,
   UserRole,
 } from './auth0-rbac-service'
+import { getFromCache, setInCache } from '../redis'
+import { logSecurityEvent, SecurityEventType } from '../security'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
 const logger = createBuildSafeLogger('auth0-middleware')
@@ -198,7 +200,7 @@ export async function rateLimitMiddleware(
   const rateLimitKey = `rate_limit:${endpoint}:${clientIp}`
   const windowSeconds = windowMinutes * 60
 
-  const { getFromCache, setInCache } = await import('../redis')
+
 
   interface RateLimitData {
     count: number
@@ -226,7 +228,6 @@ export async function rateLimitMiddleware(
 
   // Check if limit exceeded
   if (currentCount >= limit) {
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
     logSecurityEvent(SecurityEventType.RATE_LIMIT_EXCEEDED, null, {
       endpoint,
       currentCount,
@@ -303,7 +304,6 @@ export async function csrfProtection(request: Request): Promise<{
     ]) as string | undefined
 
   if (!csrfToken) {
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'missing_token',
       endpoint: new URL(request.url).pathname,
@@ -334,12 +334,11 @@ export async function csrfProtection(request: Request): Promise<{
   }
 
   // Validate the token against stored tokens
-  const { getFromCache } = await import('../redis')
+
   const tokenKey = `csrf:${csrfToken}`
   const storedToken = await getFromCache<CSRFTokenData>(tokenKey)
 
   if (!storedToken) {
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'invalid_token',
       endpoint: new URL(request.url).pathname,
@@ -366,7 +365,6 @@ export async function csrfProtection(request: Request): Promise<{
 
   // Check if token matches stored token
   if (storedToken.token && storedToken.token !== csrfToken) {
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'invalid_token',
       endpoint: new URL(request.url).pathname,
@@ -393,7 +391,6 @@ export async function csrfProtection(request: Request): Promise<{
 
   // Check if token has expired
   if (storedToken.expiresAt && storedToken.expiresAt < Date.now()) {
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
     logSecurityEvent(SecurityEventType.CSRF_VIOLATION, null, {
       reason: 'expired_token',
       endpoint: new URL(request.url).pathname,
@@ -590,8 +587,6 @@ export async function authenticateRequest(
         }
 
         // Log successful API key authentication
-        const { logSecurityEvent, SecurityEventType } =
-          await import('../security')
         logSecurityEvent(
           SecurityEventType.AUTHENTICATION_SUCCESS,
           keyRecord.user_id,
@@ -646,8 +641,6 @@ export async function authenticateRequest(
       )?.get?.('Authorization')) as string | undefined
 
     if (!authHeader) {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'No authorization header',
         endpoint: new URL(request.url).pathname,
@@ -668,8 +661,6 @@ export async function authenticateRequest(
 
     // Check authorization header format
     if (!authHeader.startsWith('Bearer ')) {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'Invalid authorization header format',
         endpoint: new URL(request.url).pathname,
@@ -695,8 +686,6 @@ export async function authenticateRequest(
     const validation = await validateToken(token, 'access')
 
     if (!validation.valid) {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: validation.error ?? 'Invalid token',
         endpoint: new URL(request.url).pathname,
@@ -780,8 +769,6 @@ export async function authenticateRequest(
         role: validation.role as string | undefined,
       })
     } catch (resolveError) {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'Failed to resolve internal user identity',
         auth0Sub,
@@ -805,8 +792,6 @@ export async function authenticateRequest(
     }
 
     if (!identity.internalId) {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         error: 'User not found',
         endpoint: new URL(request.url).pathname,
@@ -823,8 +808,6 @@ export async function authenticateRequest(
     }
 
     if ((identity as { isActive?: boolean }).isActive === false) {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(
         SecurityEventType.AUTHENTICATION_FAILED,
         identity.internalId,
@@ -852,15 +835,13 @@ export async function authenticateRequest(
 
     // Device/Session Binding Check
     if (sid) {
-      const { getFromCache, setInCache } = await import('../redis')
+
       const bindingKey = `session_binding:${identity.internalId}:${sid}`
       const clientInfo = getClientInfo(request)
       const storedBinding = await getFromCache(bindingKey)
 
       if (storedBinding) {
         if ((storedBinding as { ip?: string }).ip !== clientInfo.ip) {
-          const { logSecurityEvent, SecurityEventType } =
-            await import('../security')
           logSecurityEvent(
             SecurityEventType.AUTHENTICATION_FAILED,
             identity.internalId,
@@ -911,8 +892,6 @@ export async function authenticateRequest(
           await auth0AdaptiveMFAService.shouldRequireMFA(loginContext)
 
         if (requiresMFA) {
-          const { logSecurityEvent, SecurityEventType } =
-            await import('../security')
           logSecurityEvent(
             SecurityEventType.MFA_REQUIRED,
             identity.internalId,
@@ -943,7 +922,6 @@ export async function authenticateRequest(
     }
 
     // Log successful authentication using internal UUID
-    const { logSecurityEvent, SecurityEventType } = await import('../security')
     logSecurityEvent(
       SecurityEventType.AUTHENTICATION_SUCCESS,
       identity.internalId,
@@ -1049,8 +1027,6 @@ export async function requireRole(
   if (!hasAccess) {
     // Log authorization failure
     try {
-      const { logSecurityEvent, SecurityEventType } =
-        await import('../security')
       logSecurityEvent(
         SecurityEventType.AUTHORIZATION_FAILED,
         request.user.id,
