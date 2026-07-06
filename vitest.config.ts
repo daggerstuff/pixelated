@@ -122,6 +122,9 @@ export default defineConfig({
   },
   test: {
     pool: 'forks',
+    forks: {
+      memoryLimit: process.env['CI'] ? 1024 * 1024 * 1024 : undefined,
+    },
     maxWorkers: process.env['CI'] ? 2 : 8,
     globals: true,
     environment: 'jsdom',
