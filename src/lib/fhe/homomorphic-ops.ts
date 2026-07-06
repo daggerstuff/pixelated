@@ -249,7 +249,7 @@ export class HomomorphicOperations {
 
       // In client environment, initialize SEAL operations if client-side processing is enabled
       if (!isServer && this.enableClientSideProcessing) {
-        const { SealService } = await import('./seal-service')
+        // use statically imported SealService
         const { SealOperations } = await import('./seal-operations')
 
         const sealService = SealService.getInstance()
@@ -264,7 +264,7 @@ export class HomomorphicOperations {
 
       // In server environment, initialize SEAL operations if server-side processing is enabled
       if (isServer && this.enableServerSideProcessing) {
-        const { SealService } = await import('./seal-service')
+        // use statically imported SealService
         const { SealOperations } = await import('./seal-operations')
 
         const sealService = SealService.getInstance()
