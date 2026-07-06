@@ -1,22 +1,22 @@
 /* ================================================
-PROFESSIONAL HEALTHCARE SaaS DESIGN SYSTEM
-Dark-first enterprise clinical training platform
-=============================================== */
+KEEL DESIGN SYSTEM — PIXELATED EMPATHY
+Warm neutral palette with amber accent
+================================================ */
 
 :root {
-  /* === THE CANVAS (Dark Metal - DESIGN.md) === */
-  --bg-primary: #1a1a1e; /* Dark metal background */
-  --bg-secondary: #24242a; /* Elevated gunmetal panel */
-  --bg-glass: rgba(36, 36, 42, 0.8); /* Glassmorphic Base */
-  --text-primary: #f5f5f0; /* Warm off-white */
-  --text-secondary: #a1a1aa; /* Muted pale steel */
-  --text-muted: #71717a; /* Subdued dark-silver grey */
+  /* === THE CANVAS (keel light mode) === */
+  --bg-primary: oklch(0.99 0.003 100);
+  --bg-secondary: oklch(0.965 0.004 100);
+  --bg-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
+  --text-primary: oklch(0.25 0.01 250);
+  --text-secondary: oklch(0.5 0.012 250);
+  --text-muted: oklch(0.6 0.01 250);
 
-  /* === TRUST ACCENTS (Sunset Orange - DESIGN.md) === */
-  --accent-primary: #f97316; /* Sunset orange - vivid and warm */
-  --accent-primary-rgb: 249, 115, 22;
-  --accent-secondary: #fb923c; /* Brighter mandarin orange hover */
-  --accent-success: #10b981; /* Clinical success/green */
+  /* === ACCENT (Amber / Terracotta — keel) === */
+  --accent-primary: oklch(0.54 0.14 35);
+  --accent-primary-rgb: 164, 79, 51;
+  --accent-secondary: color-mix(in oklch, oklch(0.54 0.14 35), black 12%);
+  --accent-success: #10b981;
 
   /* === SEMANTIC COLORS (Accessible) === */
   --success: #10b981;
@@ -24,29 +24,28 @@ Dark-first enterprise clinical training platform
   --danger: #ef4444;
 
   /* === STRUCTURAL === */
-  --border-subtle: rgba(255, 255, 255, 0.08); /* Hairline */
-  --border-primary: rgba(255, 255, 255, 0.12);
-  --border-primary-rgb: 255, 255, 255;
-  --divider-dotted: rgba(255, 255, 255, 0.15); /* Dotted lines */
-  --divider-weak: rgba(255, 255, 255, 0.08); /* Very weak divider */
-  --bg-surface-ghost: rgba(255, 255, 255, 0.03); /* Ghostly background */
-  --radius-sm: 6px; /* Standard components */
-  --radius-md: 8px; /* Inputs */
-  --radius-lg: 12px; /* Cards */
-  --radius-xl: 16px; /* Large containers */
-  --radius-button: 8px; /* Buttons */
-  --radius-card: 12px; /* Cards */
+  --border-subtle: oklch(0.86 0.008 100);
+  --border-primary: oklch(0.72 0.012 120);
+  --border-primary-rgb: 100, 100, 100;
+  --divider-dotted: oklch(0.86 0.008 100);
+  --divider-weak: oklch(0.94 0.006 100);
+  --bg-surface-ghost: oklch(0.94 0.006 100);
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-button: 0px;
+  --radius-card: 0px;
 
   /* === ANIMATION === */
   --duration-fast: 0.15s;
   --duration-normal: 0.2s;
   --duration-slow: 0.3s;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* Apple-style ease-out */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Legacy/Composite Transitions for Compatibility */
   --transition-fast: var(--duration-fast) var(--ease-out);
   --transition-normal: var(--duration-normal) var(--ease-out);
   --transition-slow: var(--duration-slow) var(--ease-out);
@@ -56,9 +55,8 @@ Dark-first enterprise clinical training platform
   --max-content-width: 76rem;
   --max-editorial-width: 55rem;
   --grid-unit: 8px;
-  --section-padding-y: 5rem; /* Mapping to var(--spacing-20) / 80px */
+  --section-padding-y: 5rem;
 
-  /* Additional Spacing */
   --spacing-5: 20px;
   --spacing-20: 80px;
 
@@ -68,4 +66,57 @@ Dark-first enterprise clinical training platform
   --z-sticky: 50;
   --z-overlay: 200;
   --z-modal: 300;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: oklch(0.18 0.009 250);
+    --bg-secondary: oklch(0.22 0.01 250);
+    --bg-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
+    --text-primary: oklch(0.93 0.006 95);
+    --text-secondary: oklch(0.69 0.012 250);
+    --text-muted: oklch(0.6 0.01 250);
+    --accent-primary: oklch(0.72 0.13 42);
+    --accent-primary-rgb: 204, 152, 89;
+    --accent-secondary: color-mix(in oklch, oklch(0.72 0.13 42), white 10%);
+    --border-subtle: oklch(0.34 0.012 250);
+    --border-primary: oklch(0.44 0.016 230);
+    --divider-dotted: oklch(0.34 0.012 250);
+    --divider-weak: oklch(0.26 0.01 250);
+    --bg-surface-ghost: oklch(0.26 0.01 250);
+  }
+}
+
+:root[data-theme='light'] {
+  --bg-primary: oklch(0.99 0.003 100);
+  --bg-secondary: oklch(0.965 0.004 100);
+  --bg-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
+  --text-primary: oklch(0.25 0.01 250);
+  --text-secondary: oklch(0.5 0.012 250);
+  --text-muted: oklch(0.6 0.01 250);
+  --accent-primary: oklch(0.54 0.14 35);
+  --accent-primary-rgb: 164, 79, 51;
+  --accent-secondary: color-mix(in oklch, oklch(0.54 0.14 35), black 12%);
+  --border-subtle: oklch(0.86 0.008 100);
+  --border-primary: oklch(0.72 0.012 120);
+  --divider-dotted: oklch(0.86 0.008 100);
+  --divider-weak: oklch(0.94 0.006 100);
+  --bg-surface-ghost: oklch(0.94 0.006 100);
+}
+
+:root[data-theme='dark'] {
+  --bg-primary: oklch(0.18 0.009 250);
+  --bg-secondary: oklch(0.22 0.01 250);
+  --bg-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
+  --text-primary: oklch(0.93 0.006 95);
+  --text-secondary: oklch(0.69 0.012 250);
+  --text-muted: oklch(0.6 0.01 250);
+  --accent-primary: oklch(0.72 0.13 42);
+  --accent-primary-rgb: 204, 152, 89;
+  --accent-secondary: color-mix(in oklch, oklch(0.72 0.13 42), white 10%);
+  --border-subtle: oklch(0.34 0.012 250);
+  --border-primary: oklch(0.44 0.016 230);
+  --divider-dotted: oklch(0.34 0.012 250);
+  --divider-weak: oklch(0.26 0.01 250);
+  --bg-surface-ghost: oklch(0.26 0.01 250);
 }
