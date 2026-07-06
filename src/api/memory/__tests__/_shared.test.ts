@@ -236,3 +236,27 @@ describe('parsePagination', () => {
     })
   })
 })
+
+describe('toMemoryScope', () => {
+  it('maps user, account, and workspace correctly with includeShared true', async () => {
+    const { toMemoryScope } = await import('../_shared')
+    const scope = toMemoryScope('user-1', 'account-1', 'workspace-1')
+    expect(scope).toEqual({
+      userId: 'user-1',
+      accountId: 'account-1',
+      workspaceId: 'workspace-1',
+      includeShared: true,
+    })
+  })
+
+  it('handles optional parameters', async () => {
+    const { toMemoryScope } = await import('../_shared')
+    const scope = toMemoryScope('user-1')
+    expect(scope).toEqual({
+      userId: 'user-1',
+      accountId: undefined,
+      workspaceId: undefined,
+      includeShared: true,
+    })
+  })
+})
