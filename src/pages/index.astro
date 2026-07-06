@@ -24,7 +24,13 @@ const organizationSchema = {
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
 >
-<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')}
+  />
   <section class="hero section">
     <p class="eyebrow">{hero.kicker}</p>
     <h1>{hero.title}</h1>
