@@ -10,6 +10,9 @@ on:
 env:
   REGISTRY: docker.io
   IMAGE_NAME: pixelatedempathy/api
+  SESSION_AGENT_IMAGE_NAME: pixelatedempathy/session-agent
+  QA_AGENT_IMAGE_NAME: pixelatedempathy/qa-agent
+  PIPELINE_AGENT_IMAGE_NAME: pixelatedempathy/pipeline-agent
 
 jobs:
   build-and-push:
@@ -45,6 +48,7 @@ jobs:
           echo "Built image tag: $IMAGE_TAG (branch: ${{ github.ref_name }})"
 
       - name: Build and push
+        id: build-app
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -55,8 +59,47 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
 
+      - name: Build and push session agent
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./agents/Dockerfile
+          build-args: |
+            AGENT_DIR=agents/session-agent
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=session-agent
+          cache-to: type=gha,mode=max,scope=session-agent
+          platforms: linux/amd64
+
+      - name: Build and push QA agent
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./agents/Dockerfile
+          build-args: |
+            AGENT_DIR=agents/qa-agent
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=qa-agent
+          cache-to: type=gha,mode=max,scope=qa-agent
+          platforms: linux/amd64
+
+      - name: Build and push pipeline agent
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./agents/Dockerfile
+          build-args: |
+            AGENT_DIR=agents/pipeline-agent
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=pipeline-agent
+          cache-to: type=gha,mode=max,scope=pipeline-agent
+          platforms: linux/amd64
+
       - name: Image digest
-        run: echo ${{ steps.build.outputs.digest }}
+        run: echo ${{ steps.build-app.outputs.digest }}
 
   deploy-civo:
     needs: [build-and-push]
@@ -125,12 +168,44 @@ jobs:
           rm "${KUSTOMIZE_ARCHIVE}"
 
       - name: Deploy to Civo
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_AI_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          LINEAR_AGENT_ACCESS_TOKEN: ${{ secrets.LINEAR_AGENT_ACCESS_TOKEN }}
+          LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
         run: |
           kubectl apply -f k8s/civo/namespace.yaml
+          kubectl create secret generic cloudflare-workers-ai \
+            --from-literal=account-id="${CLOUDFLARE_ACCOUNT_ID:-}" \
+            --from-literal=api-key="${CLOUDFLARE_AI_API_KEY:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic slack-agent \
+            --from-literal=bot-token="${SLACK_BOT_TOKEN:-}" \
+            --from-literal=signing-secret="${SLACK_SIGNING_SECRET:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic linear-agent \
+            --from-literal=access-token="${LINEAR_AGENT_ACCESS_TOKEN:-}" \
+            --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -k k8s/civo
+          kubectl apply -f agents/session-agent/k8s/deployment.yaml
+          kubectl apply -f agents/qa-agent/k8s/deployment.yaml
+          kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
           kubectl set image deployment/pixelated-empathy pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
+          kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
+          kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
+          kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
 
           echo "Waiting for rollout..."
           kubectl rollout status deployment/pixelated-empathy -n pixelated-empathy --timeout=300s
+          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=300s
+          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=300s
+          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=300s
 
       - name: Verify deployment
         run: |

@@ -1,5 +1,9 @@
 import { defineAgent } from 'eve'
 import { z } from 'zod'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from '../../lib/workers-ai.js'
 
 export default defineAgent({
   description:
@@ -7,7 +11,8 @@ export default defineAgent({
     'emits dimension-level pass/fail, an overall verdict, and a recommendation ' +
     'for the human reviewer at Gate 3. Workers AI pre-evaluation scoring lives ' +
     'in the `run_evaluation` tool, not at the model layer.',
-  model: 'anthropic/claude-sonnet-4.6',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   outputSchema: z.object({
     verdict: z.enum(['pass', 'conditional_pass', 'fail']),
     dimensions: z.array(

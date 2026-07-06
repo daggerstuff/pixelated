@@ -1,5 +1,9 @@
 import { defineAgent } from 'eve'
 import { z } from 'zod'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from '../../lib/workers-ai.js'
 
 export default defineAgent({
   description:
@@ -7,7 +11,8 @@ export default defineAgent({
     'trainer-facing report. Emits headline, strengths, gaps, rubric items, ' +
     'and an optional next-session hint. Use this whenever the QA agent has ' +
     'produced scores and is ready to summarize.',
-  model: 'anthropic/claude-sonnet-4.6',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   outputSchema: z.object({
     headline: z.string().max(280),
     strengths: z.array(z.string().max(160)).min(1).max(3),

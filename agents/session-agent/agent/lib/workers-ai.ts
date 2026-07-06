@@ -14,6 +14,7 @@ import { createWorkersAI } from 'workers-ai-provider'
 
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
 const apiKey = process.env.CLOUDFLARE_AI_API_KEY
+const hasCredentials = Boolean(accountId && apiKey)
 
 if (!accountId || !apiKey) {
   console.warn(
@@ -22,13 +23,20 @@ if (!accountId || !apiKey) {
   )
 }
 
-const workersai =
-  accountId && apiKey ? createWorkersAI({ accountId, apiKey }) : null
+const workersai = createWorkersAI({
+  accountId: accountId ?? 'missing-cloudflare-account-id',
+  apiKey: apiKey ?? 'missing-cloudflare-api-key',
+})
 
-/** The default classification/inference model slug. */
 export const MODEL = '@cf/meta/llama-3.2-3b-instruct'
 
-/** Get a Workers AI model instance, or null if credentials are missing. */
+export const AGENT_MODEL =
+  process.env.WORKERS_AI_AGENT_MODEL ?? '@cf/moonshotai/kimi-k2.7-code'
+
+export const AGENT_MODEL_CONTEXT_WINDOW_TOKENS = 256_000
+
+export const agentModel = workersai(AGENT_MODEL)
+
 export function getModel() {
-  return workersai ? workersai(MODEL) : null
+  return hasCredentials ? workersai(MODEL) : null
 }
