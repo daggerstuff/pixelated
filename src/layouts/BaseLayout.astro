@@ -1,184 +1,168 @@
 ---
-import '@unocss/reset/tailwind.css'
-import '@/styles/main.css'
-import '@/styles/prose.css'
-import '@/styles/markdown.css'
-import '@/styles/page.css'
-import SpeedInsights from '@vercel/speed-insights/astro'
-import Analytics from '@vercel/analytics/astro'
-
-import Head from '@/components/base/Head.astro'
-import Background from '@/components/backgrounds/Background.astro'
-import Link from '@/components/base/Link.astro'
-import Navbar from '@/components/mizu/Navbar.astro'
-import BackLink from '@/components/widgets/BackLink.astro'
-import Footer from '@/components/mizu/Footer.astro'
-import ToTopButton from '@/components/widgets/ToTopButton.astro'
-import Backdrop from '@/components/base/Backdrop.astro'
-
-import { SITE, UI, FEATURES } from '@/config'
-import { withBasePath } from '@/utils/path'
-
-import type { BgType } from '@/types'
+import '@fontsource-variable/fraunces/full.css';
+import '@fontsource/public-sans/400.css';
+import '@fontsource/public-sans/500.css';
+import '@fontsource/public-sans/600.css';
+import '@fontsource/public-sans/700.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@/styles/keel-theme.css';
+import { withBasePath } from '@/utils/path';
+import { SITE } from '@/config';
 
 interface Props {
-  title?: string
-  description?: string
-  keywords?: string
-  themeMode?: 'light' | 'dark' | 'system'
-  ogImage?: string | boolean
-  bgType?: BgType | false | string
-  pubDate?: string
-  lastModDate?: string
-  pathname?: string
-  showNavBar?: boolean
-  showFooter?: boolean
-  showBackLink?: boolean
-  fullWidthMain?: boolean
-  centered?: boolean
-  contentClass?: string
-  transitionMode?: string
-  isLoginPage?: boolean
-  showSettingsPanel?: boolean
-  showAnalysisPanel?: boolean
-  initialTab?: string
+  title?: string;
+  description?: string;
+  keywords?: string;
+  themeMode?: 'light' | 'dark' | 'system';
+  ogType?: 'website' | 'article';
+  image?: string;
+  bgType?: string | boolean;
+  pubDate?: string;
+  lastModDate?: string;
+  pathname?: string;
+  showNavBar?: boolean;
+  showFooter?: boolean;
+  showBackLink?: boolean;
+  fullWidthMain?: boolean;
+  centered?: boolean;
+  contentClass?: string;
+  transitionMode?: string;
+  isLoginPage?: boolean;
+  showSettingsPanel?: boolean;
+  showAnalysisPanel?: boolean;
+  initialTab?: string;
+  [key: string]: any;
 }
 
-const {
-  title,
-  description,
-  keywords,
-  ogImage,
-  bgType,
-  pubDate,
-  lastModDate,
-  pathname,
-  showNavBar = true,
-  showFooter = true,
-  showBackLink = true,
-  fullWidthMain = false,
-  centered = false,
-  contentClass = '',
-} = Astro.props
-
-// Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
-const currentPathname = pathname || Astro.url.pathname
-
-const cspNonce = Astro.locals.cspNonce ?? ''
-
-let style: Record<string, string> = {}
-
-const { slideEnterAnim, nprogress, mediumZoom } = FEATURES
-const enableSlideEnterAnim = Array.isArray(slideEnterAnim) && slideEnterAnim[0]
-if (enableSlideEnterAnim)
-  style['--enter-step'] = `${slideEnterAnim[1].enterStep}ms`
+const siteName = SITE.title || 'Pixelated Empathy';
+const defaultDescription = SITE.description || 'Clinical simulation for therapist training and supervision';
 
 const {
-  externalLink: { newTab, cursorType },
-} = UI
-const hasCustomCursor =
-  newTab && cursorType.length > 0 && cursorType !== 'pointer'
-if (hasCustomCursor) style['--external-link-cursor'] = cursorType
+  title = siteName,
+  description = defaultDescription,
+  ogType = 'website',
+  image,
+} = Astro.props;
 
-const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
+const siteBase = Astro.site ?? new URL(Astro.url.origin);
+const canonicalURL = new URL(Astro.url.pathname, siteBase);
+const imageURL = image ? new URL(image, siteBase) : new URL(withBasePath('/og.jpg'), siteBase);
+const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
+
+const navItems = [
+  { href: '/', label: 'Home' },
+  { href: '/features', label: 'Features' },
+  { href: '/trust', label: 'Trust' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const currentPath = Astro.url.pathname;
+const isActive = (href: string) => {
+  const full = withBasePath(href);
+  return href === '/' ? currentPath === full : (currentPath === full || currentPath.startsWith(`${full}/`));
+};
+
+const cspNonce = Astro.locals.cspNonce ?? '';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'logo': 'https://pixelatedempathy.com/favicon.svg',
+  'description': 'Clinical simulation and transcript-based review for therapist training and supervision teams.',
+  'foundingDate': '2025',
+  'address': {
+    '@type': 'PostalAddress',
+    'addressCountry': 'US',
+  },
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
+  },
+  'sameAs': [
+    'https://x.com/pixelatedempathy',
+    'https://github.com/nochadisfaction/pixelated',
+  ],
+};
 ---
 
 <!doctype html>
-<html
-  lang={SITE.lang}
-  class="dark scroll-smooth"
-  style="--bg-primary:#201d1d; --bg-secondary:#302c2c; --bg-glass:rgba(48,44,44,0.74); --text-primary:#f7f3eb; --text-secondary:#c7bfb7; --text-muted:#a1958b; --accent-primary:#0d9488; --accent-primary-rgb:13,148,136; --accent-secondary:#007aff; --border-subtle:rgba(253,252,252,0.08); --divider-dotted:rgba(253,252,252,0.11); --divider-weak:rgba(253,252,252,0.05); --bg-surface-ghost:rgba(253,252,252,0.02); --radius-sm:8px; --radius-md:10px;"
->
+<html lang={SITE.lang || 'en'}>
   <head>
-    <Head
-      {title}
-      {description}
-      {keywords}
-      {ogImage}
-      {pubDate}
-      {lastModDate}
-      {cspNonce}
-    />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
+    <link rel="icon" href={withBasePath('/favicon.ico')} />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
+    <title>{fullTitle}</title>
 
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#201D1D" />
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    {imageURL && <meta property="og:image" content={imageURL} />}
 
-    <script src="/js/polyfill-detector.js" is:inline></script>
-    <script src="/js/module-loader.js" defer is:inline></script>
-    <script src="/js/background-loader.js" defer is:inline></script>
-    {
-      (nprogress || mediumZoom) && (
-        <script src="/js/nprogress-and-zoom.js" type="module" is:inline />
-      )
-    }
+    <!-- Twitter -->
+    <meta name="twitter:card" content={imageURL ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {imageURL && <meta name="twitter:image" content={imageURL} />}
+    <script is:inline nonce={cspNonce}>
+      const storedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.dataset.theme = storedTheme || (prefersDark ? 'dark' : 'light');
+    </script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')} />
   </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href={withBasePath('/')} aria-label={`${siteName} home`}>
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>{siteName}</span>
+      </a>
+      <nav class="site-nav" aria-label="Main navigation">
+        {
+          navItems.map((item) => (
+            <a href={withBasePath(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+      <button class="theme-toggle" type="button" aria-label="Toggle color theme" data-theme-toggle>
+        <span aria-hidden="true"></span>
+      </button>
+    </header>
 
-  <body
-    class="min-h-screen flex flex-col selection:bg-[var(--accent-primary)] selection:bg-opacity-30"
-    style={Object.keys(style).length !== 0 ? style : undefined}
-    data-no-sliding={enableSlideEnterAnim ? undefined : ''}
-  >
-    <!-- Background -->
-    {bgType && <Background type={bgType} />}
-
-    <!-- Skip Link -->
-    <Link
-      href="#main"
-      class="sr-only focus:(not-sr-only fixed start-1 top-1.5 op-20)"
-    >
-      Skip to content
-    </Link>
-
-    <!-- Nav Bar -->
-    {showNavBar && <Navbar />}
-
-    <!-- Main -->
-    <main
-      id="main"
-      class:list={[
-        'flex-grow w-full pt-24',
-        centered && 'mx-auto max-w-7xl',
-        fullWidthMain && 'main--full-width',
-        contentClass,
-      ]}
-    >
-      <!-- Content -->
+    <main>
       <slot />
-      <!-- Share -->
-      {
-        currentPathname !== withBasePath('/') && showBackLink && (
-          <footer class="container slide-enter animate-delay-1000! prose mx-auto mt-8 print:hidden">
-            <slot name="share" />
-            <br />
-            <BackLink />
-          </footer>
-        )
-      }
-      <!-- Comments -->
-      <slot name="giscus" />
     </main>
 
-    <!-- Footer -->
-    {
-      showFooter && (
-        <>
-          <Footer showTopCTA={currentPathname !== withBasePath('/')} />
-          <ToTopButton />
-        </>
-      )
-    }
+    <footer class="site-footer">
+      <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+      <div style="display:flex;gap:1.5rem;">
+        <a href={withBasePath('/about')}>About</a>
+        <a href={withBasePath('/privacy')}>Privacy</a>
+        <a href={withBasePath('/contact')}>Contact</a>
+      </div>
+    </footer>
 
-    <!-- Panel Backdrop (on mobile) -->
-    <Backdrop />
-
-    <!-- Vercel Speed Insights and Analytics -->
-    {
-      shouldRenderAnalytics && (
-        <>
-          <SpeedInsights />
-          <Analytics />
-        </>
-      )
-    }
+    <script>
+      const toggle = document.querySelector('[data-theme-toggle]');
+      toggle?.addEventListener('click', () => {
+        const current = document.documentElement.dataset.theme;
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset.theme = next;
+        localStorage.setItem('theme', next);
+      });
+    </script>
   </body>
 </html>
