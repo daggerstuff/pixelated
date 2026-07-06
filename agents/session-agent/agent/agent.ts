@@ -1,8 +1,13 @@
 import { defineAgent } from 'eve'
 import { z } from 'zod'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from './lib/workers-ai.js'
 
 export default defineAgent({
-  model: 'anthropic/claude-opus-4.8',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   compaction: {
     // Rehearsal sessions routinely exceed 30 minutes. Compact framing (state
     // transitions, tool summaries) earlier than the framework default so the

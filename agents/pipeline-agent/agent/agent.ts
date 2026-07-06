@@ -1,5 +1,10 @@
 import { defineAgent } from 'eve'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from './lib/workers-ai.js'
 
 export default defineAgent({
-  model: 'anthropic/claude-opus-4.8',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
 })

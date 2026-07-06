@@ -12,11 +12,23 @@ import {
   AUTH0_ROLE_DEFINITIONS as ROLE_DEFINITIONS,
   UserRole,
 } from './auth0-rbac-service'
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { getFromCache, setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
 const logger = createBuildSafeLogger('auth0-middleware')
+
+async function notifyPhase6AuthProgress(
+  userId: string | null,
+  event: Parameters<typeof updatePhase6AuthenticationProgress>[1],
+): Promise<void> {
+  try {
+    await updatePhase6AuthenticationProgress(userId, event)
+  } catch {
+    // Phase 6 integration not available in test environment
+  }
+}
 
 export type { AuthStrategy }
 
@@ -235,14 +247,7 @@ export async function rateLimitMiddleware(
       resetTime,
     })
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(null, 'rate_limit_exceeded')
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(null, 'rate_limit_exceeded')
 
     return {
       success: false,
@@ -309,14 +314,7 @@ export async function csrfProtection(request: Request): Promise<{
       endpoint: new URL(request.url).pathname,
     })
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(null, 'csrf_violation')
 
     return {
       success: false,
@@ -344,14 +342,7 @@ export async function csrfProtection(request: Request): Promise<{
       endpoint: new URL(request.url).pathname,
     })
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(null, 'csrf_violation')
 
     return {
       success: false,
@@ -370,14 +361,7 @@ export async function csrfProtection(request: Request): Promise<{
       endpoint: new URL(request.url).pathname,
     })
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(null, 'csrf_violation')
 
     return {
       success: false,
@@ -396,14 +380,7 @@ export async function csrfProtection(request: Request): Promise<{
       endpoint: new URL(request.url).pathname,
     })
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(null, 'csrf_violation')
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(null, 'csrf_violation')
 
     return {
       success: false,
@@ -933,17 +910,10 @@ export async function authenticateRequest(
       },
     )
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(
-        identity.internalId,
-        'authentication_success',
-      )
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(
+      identity.internalId,
+      'authentication_success',
+    )
 
     // Attach user to request — ALL fields use the internal UUID as `id`
     const authenticatedRequest = request as AuthenticatedRequest
@@ -1039,17 +1009,10 @@ export async function requireRole(
       // Security module not available in test environment
     }
 
-    // Update Phase 6 MCP server
-    try {
-      const { updatePhase6AuthenticationProgress } =
-        await import('../mcp/phase6-integration')
-      await updatePhase6AuthenticationProgress(
-        request.user.id,
-        'authorization_failed',
-      )
-    } catch {
-      // Phase 6 integration not available in test environment
-    }
+    await notifyPhase6AuthProgress(
+      request.user.id,
+      'authorization_failed',
+    )
 
     return {
       success: false,

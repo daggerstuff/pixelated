@@ -5,6 +5,7 @@ import node from '@astrojs/node'
 import react from '@astrojs/react'
 import vercel from '@astrojs/vercel'
 import sentry from '@sentry/astro'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
@@ -36,6 +37,49 @@ const hasSentryDSN =
   !!process.env.VITE_SENTRY_DSN
 const sentryRelease =
   process.env.SENTRY_RELEASE ?? process.env.npm_package_version ?? undefined
+
+/**
+ * @typedef {{ ssr: boolean, assets: string[], filesToDeleteAfterUpload: string[] }} SentryPluginOptions
+ */
+
+/**
+ * Scope Sentry sourcemap uploads to client/SSR build phases only.
+ * Without this, the prerender Vite environment triggers
+ * "Didn't find any matching sources for debug ID upload".
+ * @param {SentryPluginOptions} opts
+ * @returns {Array<import('vite').Plugin>}
+ */
+function createScopedSentryVitePlugins({
+  ssr,
+  assets,
+  filesToDeleteAfterUpload,
+}) {
+  return sentryVitePlugin({
+    org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
+    project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    telemetry: false,
+    release: sentryRelease ? { name: sentryRelease } : undefined,
+    sourcemaps: {
+      assets,
+      ignore: ['**/node_modules/**'],
+      filesToDeleteAfterUpload,
+    },
+  }).map((plugin) => ({
+    ...plugin,
+    /**
+     * @param {{build?: { ssr?: boolean }}} config
+     * @param {{ command: string }} env
+     * @returns {boolean}
+     */
+    apply(config, env) {
+      if (env.command !== 'build') {
+        return false
+      }
+      return Boolean(config.build?.ssr) === ssr
+    },
+  }))
+}
 
 /**
  * Astro's `site` config must be a valid absolute URL.
@@ -328,6 +372,23 @@ export default defineConfig({
         : {},
     },
     plugins: [
+      ...(hasSentryDSN
+        ? [
+            ...createScopedSentryVitePlugins({
+              ssr: false,
+              assets: [
+                './dist/client/_astro/**/*.js',
+                './dist/client/_astro/**/*.js.map',
+              ],
+              filesToDeleteAfterUpload: ['./dist/client/_astro/**/*.map'],
+            }),
+            ...createScopedSentryVitePlugins({
+              ssr: true,
+              assets: ['./dist/server/**/*.mjs', './dist/server/**/*.mjs.map'],
+              filesToDeleteAfterUpload: ['./dist/server/**/*.map'],
+            }),
+          ]
+        : []),
       {
         name: 'fix-vite-client-input',
         buildApp: {
@@ -370,6 +431,19 @@ export default defineConfig({
             const ASTRO_MANAGED_ENVS = new Set(['client', 'server', 'ssr'])
 
             for (const [name, env] of Object.entries(config.environments)) {
+              // Propagate top-level build.sourcemap to all environments.
+              // Astro 7 only forwards build.sourcemap to the
+              // "client" environment (see
+              // vite-build-config.js line 127), leaving
+              // ssr/server/prerender with sourcemap=false.
+              // This causes the Sentry Vite plugin to warn about
+              // "no sourcemap found" for every SSR/prerender JS chunk.
+              // Fix: inherit the top-level setting unless an environment
+              // explicitly overrides it.
+              if (env.build && config.build?.sourcemap != null) {
+                env.build.sourcemap ??= config.build.sourcemap
+              }
+
               if (env.build?.rolldownOptions) {
                 // Ensure rollupOptions exists
                 env.build.rollupOptions = env.build.rollupOptions || {}
@@ -703,14 +777,10 @@ export default defineConfig({
               org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
               project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
               authToken: process.env.SENTRY_AUTH_TOKEN,
+              // Upload sourcemaps through scoped Vite plugins so each Astro
+              // build phase only uploads the files it actually emitted.
               sourcemaps: {
-                // Delete .map files after uploading to Sentry so they are
-                // never served to users. The Astro SDK's internal Vite plugin
-                // handles both client and SSR sourcemap uploads automatically.
-                filesToDeleteAfterUpload: [
-                  './dist/client/**/*.map',
-                  './dist/server/**/*.map',
-                ],
+                disable: true,
               },
             }),
           ]

@@ -6,13 +6,12 @@
 #   * qa-agent          : daily-review scheduler entry
 #   * qa-agent-worker   : ephemeral worker (set replicas to 0 if not used)
 #
-# Replace the placeholder image tag at deploy time.
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: qa-agent
-  namespace: pixelated
+  namespace: pixelated-empathy
 spec:
   replicas: 1
   selector:
@@ -23,9 +22,11 @@ spec:
       labels:
         app: qa-agent
     spec:
+      imagePullSecrets:
+        - name: dockerhub-registry-credentials
       containers:
         - name: agent
-          image: ghcr.io/pixelated/qa-agent:PLACEHOLDER
+          image: docker.io/pixelatedempathy/qa-agent:latest
           ports:
             - containerPort: 2000
               name: http
@@ -34,22 +35,29 @@ spec:
               value: "2000"
             - name: NODE_ENV
               value: production
-            - name: AI_GATEWAY_API_KEY
+            - name: CLOUDFLARE_ACCOUNT_ID
               valueFrom:
                 secretKeyRef:
-                  name: vercel-ai-gateway
+                  name: cloudflare-workers-ai
+                  key: account-id
+            - name: CLOUDFLARE_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-workers-ai
                   key: api-key
+            - name: WORKERS_AI_AGENT_MODEL
+              value: "@cf/moonshotai/kimi-k2.7-code"
             - name: FORESIGHT_MCP_URL
               value: http://foresight-mcp:8765
             - name: SLACK_BOT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: slack-bot
+                  name: slack-agent
                   key: bot-token
             - name: SLACK_SIGNING_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: slack-bot
+                  name: slack-agent
                   key: signing-secret
             - name: LINEAR_AGENT_ACCESS_TOKEN
               valueFrom:
@@ -73,7 +81,7 @@ spec:
             periodSeconds: 30
           resources:
             requests:
-              cpu: 250m
+              cpu: 100m
               memory: 256Mi
             limits:
               cpu: "1"
@@ -83,7 +91,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: qa-agent
-  namespace: pixelated
+  namespace: pixelated-empathy
 spec:
   selector:
     app: qa-agent

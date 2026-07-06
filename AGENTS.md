@@ -290,3 +290,10 @@ Before ending turn and finishing task, perform following checks:
 2. **Review Diffs**: Ensure edits are minimal, clean, safe, and do not contain suppression comments.
 3. **Execute Verification Command**: Run target check (e.g. `pnpm lint` `pnpm typecheck`or targeted tests).
 4. **Report Outcome & Risk**: Detail test results, highlight any residual risks or assumptions made, and propose next steps.
+
+---
+
+## Aesthetic Judgment
+
+When doing design, creative, or artistic work — anything requiring aesthetic judgment such as UI design, visual assets, layouts, color choices, typography, animation,
+branding, or creative direction — read `TASTES.md` if it exists and apply its constraints to your output.
