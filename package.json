@@ -280,7 +280,7 @@
     "es-module-lexer": "latest",
     "events": "latest",
     "express": "^5.2.1",
-    "express-openid-connect": "^3.1.0",
+    "express-openid-connect": "^3.2.0",
     "express-rate-limit": "^8.5.2",
     "flexsearch": "latest",
     "framer-motion": "^12.42.2",
