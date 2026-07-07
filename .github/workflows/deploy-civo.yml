@@ -202,10 +202,10 @@ jobs:
           kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
 
           echo "Waiting for rollout..."
-          kubectl rollout status deployment/pixelated-empathy -n pixelated-empathy --timeout=300s
-          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=300s
-          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=300s
-          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=300s
+          kubectl rollout status deployment/pixelated-empathy -n pixelated-empathy --timeout=5m
+          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=5m
+          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=5m
+          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=5m
 
       - name: Verify deployment
         run: |
