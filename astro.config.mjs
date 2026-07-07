@@ -795,7 +795,7 @@ export default defineConfig({
   },
   security: {
     checkOrigin: true,
-    inlineScriptNonce: true,
+    inlineScriptNonce: false,
   },
   server: {
     port: preferredPort,
