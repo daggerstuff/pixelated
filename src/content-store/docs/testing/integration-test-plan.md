@@ -376,7 +376,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:17
         env:
           POSTGRES_PASSWORD: test
         options: >-
@@ -384,7 +384,7 @@ jobs:
           --health-retries 5
 
       redis:
-        image: redis:6
+        image: redis:latest
         options: >-
           --health-cmd "redis-cli ping" --health-interval 10s --health-timeout
           5s --health-retries 5

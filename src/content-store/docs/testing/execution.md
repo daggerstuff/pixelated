@@ -127,7 +127,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:14
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -136,7 +136,7 @@ jobs:
           - 5432:5432
 
       redis:
-        image: redis:6
+        image: redis:latest
         ports:
           - 6379:6379
 

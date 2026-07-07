@@ -1,6 +1,6 @@
 services:
   mongo:
-    image: mongo:6
+    image: mongo:latest
     container_name: pixelated-mongo
     restart: always
     ports:

@@ -39,7 +39,7 @@ services:
       - nemo-network
 
   nemo-postgres:
-    image: postgres:16.1
+    image: postgres:17
     container_name: nemo-postgres
     environment:
       POSTGRES_USER: ${NEMO_POSTGRES_USER:?NEMO_POSTGRES_USER is required}

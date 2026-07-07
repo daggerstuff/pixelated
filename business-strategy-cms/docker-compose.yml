@@ -24,7 +24,7 @@ services:
       - business-strategy-network
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     ports:
       - '5432:5432'
     environment:
@@ -38,7 +38,7 @@ services:
       - business-strategy-network
 
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     command:
