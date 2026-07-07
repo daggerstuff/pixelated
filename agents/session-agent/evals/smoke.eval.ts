@@ -6,7 +6,7 @@ export default defineEval({
     'accepts a turn, and exercises the start_session tool.',
   async test(t) {
     await t.send("Hi, I'd like to start a practice session, please.")
-    t.completed()
+    t.succeeded()
     t.calledTool('start_session')
   },
 })

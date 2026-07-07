@@ -6,6 +6,8 @@ import {
   presetWebFonts,
 } from 'unocss'
 
+import { shouldDisableRemoteWebFonts } from './src/lib/styles/uno-web-fonts'
+
 export default defineConfig({
   content: {
     pipeline: {
@@ -50,7 +52,7 @@ export default defineConfig({
       scale: 1.2,
       warn: false,
     }),
-    ...(process.env['CI'] === 'true' || process.env['NODE_ENV'] === 'test'
+    ...(shouldDisableRemoteWebFonts(process.env)
       ? []
       : [
           presetWebFonts({
