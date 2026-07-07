@@ -46,7 +46,7 @@ describe('memory-transport-factory', () => {
 
     it('should use custom launcher path when provided', () => {
       process.env['MEMORY_SERVICE_TRANSPORT'] = 'mcp'
-      process.env['FORESIGHT_MCP_LAUNCHER'] = '/custom/path/to/launcher.sh'
+      process.env['FORESIGHT_LAUNCHER'] = '/custom/path/to/launcher.sh'
 
       const transport = createMemoryTransport() as McpMemoryTransport
 
