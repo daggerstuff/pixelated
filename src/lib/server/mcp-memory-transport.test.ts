@@ -17,7 +17,7 @@ import { InternalMemoryServiceError } from './internal-memory-service-client'
 import { McpMemoryTransport } from './mcp-memory-transport'
 
 const mockUserId = 'test-user'
-const mockLauncherPath = 'scripts/memory/foresight-mcp-server.sh'
+const mockLauncherPath = 'scripts/memory/foresight-server.sh'
 
 function makeMockClient() {
   return {
