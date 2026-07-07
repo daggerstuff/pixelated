@@ -52,7 +52,7 @@ spec:
             - name: WORKERS_AI_AGENT_MODEL
               value: "@cf/moonshotai/kimi-k2.7-code"
             - name: FORESIGHT_MCP_URL
-              value: http://foresight-mcp:8765
+              value: http://foresight:8765
             - name: PIXELATED_SESSION_MCP_URL
               value: http://session-mcp:8766
           startupProbe:

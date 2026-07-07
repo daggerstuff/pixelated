@@ -60,7 +60,7 @@ done < <(
     -path "${REPO_ROOT}/.venv"                   -prune -o \
     -path "${REPO_ROOT}/.pytest_cache"           -prune -o \
     -path "${REPO_ROOT}/.vercel"                 -prune -o \
-    -path "${REPO_ROOT}/foresight-mcp/.venv"     -prune -o \
+    -path "${REPO_ROOT}/foresight/.venv"     -prune -o \
     -path "${ARCHIVE_DIR}"                       -prune -o \
     -path "${REPO_ROOT}/.agents/skills"          -prune -o \
     -path "*/node_modules"                       -prune -o \

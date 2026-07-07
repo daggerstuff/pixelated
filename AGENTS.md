@@ -183,21 +183,21 @@ foresight profile              # Build user profile from memories
 
 ### Infrastructure
 
-- **Service**: systemd user service `foresight-mcp` on port `8764` (SSE)
+- **Service**: systemd user service `foresight` on port `8764` (SSE)
 - **Storage**: Ghost Postgres — all machines read/write the same DB
 - **Config**: `.env` vars auto-loaded via `python-dotenv` — no `export` needed
 
 ```bash
-systemctl --user status foresight-mcp     # Check if running
-systemctl --user restart foresight-mcp    # Restart after code update
-journalctl --user -u foresight-mcp -f     # Live logs
+systemctl --user status foresight     # Check if running
+systemctl --user restart foresight    # Restart after code update
+journalctl --user -u foresight -f     # Live logs
 curl -s http://127.0.0.1:8764/health      # Health check + memory count
 ```
 
 ### Troubleshooting
 
 - **CLI writes to SQLite instead of Postgres**: Check `FORESIGHT_DB_URL` is in `.env` — `foresight doctor` shows active env overrides
-- **SSE server down**: `systemctl --user restart foresight-mcp`
+- **SSE server down**: `systemctl --user restart foresight`
 - **MCP client can't connect**: Verify port 8764 (`curl http://127.0.0.1:8764/health`)
 
 ---
