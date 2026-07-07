@@ -43,15 +43,21 @@ async function findHandlerEntryPath(serverDir) {
     return null;
   }
 
+  const normalizedServerDir = path.resolve(serverDir);
   const candidates = readdirSync(serverDir).filter(
     (file) => file.endsWith(".mjs") || file.endsWith(".js"),
   );
 
   for (const file of candidates) {
-    const moduleUrl = pathToFileURL(path.join(serverDir, file)).href;
+    const resolved = path.resolve(normalizedServerDir, file);
+    // Guard against symlink-based escapes: entry must stay within serverDir
+    if (!resolved.startsWith(normalizedServerDir + path.sep) && resolved !== normalizedServerDir) {
+      continue;
+    }
+    const moduleUrl = pathToFileURL(resolved).href;
     const exports = await import(moduleUrl);
     if (typeof exports.handler === "function") {
-      return path.join(serverDir, file);
+      return resolved;
     }
   }
 
@@ -60,7 +66,14 @@ async function findHandlerEntryPath(serverDir) {
 
 export async function resolveSsrEntryModuleUrl({ cwd = process.cwd(), env = process.env } = {}) {
   if (hasConfiguredValue(env.SSR_ENTRY_FILE)) {
-    return pathToFileURL(path.resolve(String(env.SSR_ENTRY_FILE))).href;
+    const rawEntry = String(env.SSR_ENTRY_FILE);
+    // Validate SSR_ENTRY_FILE is within cwd to prevent path traversal
+    const resolvedEntry = path.resolve(cwd, rawEntry);
+    const normalizedCwd = path.resolve(cwd);
+    if (!resolvedEntry.startsWith(normalizedCwd + path.sep) && resolvedEntry !== normalizedCwd) {
+      throw new Error(`SSR_ENTRY_FILE resolves outside the project directory: ${rawEntry}`);
+    }
+    return pathToFileURL(resolvedEntry).href;
   }
 
   const serverDir = path.resolve(cwd, 'dist/server')
