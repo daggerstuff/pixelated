@@ -76,15 +76,22 @@ export function getProjectRoot(): string {
 export function validatePath(
   filePath: string,
   allowedDir: string,
+  options: { allowAbsolutePath?: boolean } = {},
 ): string {
-  // Reject unsafe path input before resolution (absolute paths and .. are always blocked)
-  validateUntrustedPathInput(filePath, { allowAbsolute: false })
+  const { allowAbsolutePath = false } = options
+
+  // Reject unsafe path input before resolution (.. is always blocked)
+  validateUntrustedPathInput(filePath, { allowAbsolute: allowAbsolutePath })
 
   // Normalize the allowed directory to absolute path
   const normalizedAllowedDir = path.resolve(allowedDir)
 
-  // Resolve the file path anchored to the allowed directory
-  const resolvedPath = path.resolve(normalizedAllowedDir, filePath)
+  // Resolve the file path
+  // If absolute paths are allowed, we let path.resolve use the absolute path directly
+  // Otherwise we anchor it to the allowed directory
+  const resolvedPath = allowAbsolutePath && path.isAbsolute(filePath)
+    ? path.resolve(filePath)
+    : path.resolve(normalizedAllowedDir, filePath)
 
   const escapesBase = isPathEscapingBase(normalizedAllowedDir, resolvedPath)
 

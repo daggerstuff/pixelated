@@ -662,6 +662,7 @@ describe('createCryptoSystem', () => {
       keyRotationManager: new KeyRotationManager(90),
       scheduledRotation: scheduledRotationEnabled
         ? new ScheduledKeyRotation({
+            namespace: options.namespace ?? 'default',
             checkIntervalMs: 1000,
             onRotation: () => {},
             onError: () => {},
@@ -695,10 +696,10 @@ describe('createCryptoSystem', () => {
   // Setup mocks before each test
   beforeEach(() => {
     vi.spyOn(cryptoModule, 'createCryptoSystem').mockImplementation(
-      (options?: CryptoSystemOptions) =>
+      (options: any) =>
         createCryptoSystemMock(
           options ?? { namespace: 'test' },
-        ) as unknown as CryptoSystem,
+        ) as any,
     )
   })
 

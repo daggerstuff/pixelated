@@ -81,6 +81,7 @@ export interface LegacyRedisClient {
   hget(key: string, field: string): Promise<string | null>
   hgetall(key: string): Promise<Record<string, string>>
   hdel(key: string, field: string): Promise<number>
+  hincrby(key: string, field: string, increment: number): Promise<number>
   hlen(key: string): Promise<number>
   incr(key: string): Promise<number>
   sadd(key: string, member: string): Promise<number>
@@ -261,6 +262,19 @@ const redisClient: LegacyRedisClient = {
     try {
       await ensureConnected()
       return await service.hdel(key, field)
+    } catch {
+      return 0
+    }
+  },
+
+  hincrby: async (key: string, field: string, increment: number) => {
+    try {
+      await ensureConnected()
+      // Fallback if RedisService doesn't have hincrby
+      const val = await service.hget(key, field)
+      const num = parseInt(val || '0', 10) + increment
+      await service.hset(key, field, num.toString())
+      return num
     } catch {
       return 0
     }
