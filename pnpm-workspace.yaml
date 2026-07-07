@@ -205,9 +205,14 @@ peerDependencyRules:
     - eslint-plugin-jsx-a11y
     - tsconfck
   allowedVersions:
+    '@ai-sdk/anthropic': '4'
+    '@ai-sdk/provider': '4'
+    '@babel/core': '7'
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'
     '@types/pg': 8.16.0
+    ai: '7'
+    astro: '7'
     drizzle-orm: ^0.45.2
     eslint: ^10.4.1
     mongodb: ^6.14.0

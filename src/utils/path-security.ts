@@ -40,8 +40,10 @@ function validateUntrustedPathInput(
 }
 
 function isPathEscapingBase(basePath: string, targetPath: string): boolean {
+  // Anchor both paths to the same absolute base so relative inputs are
+  // resolved against basePath rather than process.cwd().
   const normalizedBase = path.resolve(basePath)
-  const normalizedTarget = path.resolve(targetPath)
+  const normalizedTarget = path.resolve(normalizedBase, targetPath)
 
   const baseWithSeparator = normalizedBase.endsWith(PATH_SEPARATOR)
     ? normalizedBase
@@ -74,20 +76,15 @@ export function getProjectRoot(): string {
 export function validatePath(
   filePath: string,
   allowedDir: string,
-  options: { allowAbsolutePath?: boolean } = {},
 ): string {
-  const { allowAbsolutePath = false } = options
-
-  // Reject unsafe path input before resolution
-  validateUntrustedPathInput(filePath, { allowAbsolute: allowAbsolutePath })
+  // Reject unsafe path input before resolution (absolute paths and .. are always blocked)
+  validateUntrustedPathInput(filePath, { allowAbsolute: false })
 
   // Normalize the allowed directory to absolute path
   const normalizedAllowedDir = path.resolve(allowedDir)
 
-  // Resolve the file path to absolute using the same base policy
-  const resolvedPath = allowAbsolutePath
-    ? path.resolve(filePath)
-    : path.resolve(normalizedAllowedDir, filePath)
+  // Resolve the file path anchored to the allowed directory
+  const resolvedPath = path.resolve(normalizedAllowedDir, filePath)
 
   const escapesBase = isPathEscapingBase(normalizedAllowedDir, resolvedPath)
 
@@ -110,20 +107,13 @@ export function safeJoin(
   allowedDir: string,
   ...pathSegments: string[]
 ): string {
-  const hasAbsoluteSegment = pathSegments.some((segment) =>
-    path.isAbsolute(segment),
-  )
-
+  // Absolute segments and .. are always rejected to prevent base-directory escape
   for (const segment of pathSegments) {
-    validateUntrustedPathInput(segment, { allowAbsolute: hasAbsoluteSegment })
+    validateUntrustedPathInput(segment, { allowAbsolute: false })
   }
 
-  const joinedPath = hasAbsoluteSegment
-    ? path.resolve(...pathSegments)
-    : path.join(...pathSegments)
-  return validatePath(joinedPath, allowedDir, {
-    allowAbsolutePath: hasAbsoluteSegment,
-  })
+  const joinedPath = path.join(...pathSegments)
+  return validatePath(joinedPath, allowedDir)
 }
 
 /**
