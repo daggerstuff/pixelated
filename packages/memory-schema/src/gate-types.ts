@@ -2,7 +2,7 @@
  * Socratic Gate contract — canonical Zod schemas and TypeScript types.
  *
  * The Socratic Gate is the pre-ingestion middleman for memory writes. TypeScript
- * consumers use camelCase field names; Foresight MCP (`foresight_mcp.memory_types`)
+ * consumers use camelCase field names; Foresight MCP (`foresight.memory_types`)
  * serialises the same shape in snake_case on the wire.
  *
  * Python drift (documented, not auto-generated):
@@ -46,7 +46,7 @@ export const GateResultSchema = z.object({
 export type GateResult = z.infer<typeof GateResultSchema>
 
 // ---------------------------------------------------------------------------
-// Wire format (snake_case) — matches foresight_mcp.memory_types.GateResult
+// Wire format (snake_case) — matches foresight.memory_types.GateResult
 // ---------------------------------------------------------------------------
 
 export const GateResultWireSchema = z.object({

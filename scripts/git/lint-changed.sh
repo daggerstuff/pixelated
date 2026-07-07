@@ -183,18 +183,18 @@ section "Pixelated Lint & Format — Changed Files"
 declare -A REPOS=(
   ["ai"]="${ROOT}/ai"
   ["docs"]="${ROOT}/docs"
-  ["foresight-mcp"]="${ROOT}/foresight-mcp"
+  ["foresight"]="${ROOT}/foresight"
   ["main"]="${ROOT}"
 )
 
 if [[ -n "$TARGET_REPO" ]]; then
   if [[ -z "${REPOS[$TARGET_REPO]+x}" ]]; then
-    error "Unknown --repo: '${TARGET_REPO}'. Valid: ai docs foresight-mcp main"
+    error "Unknown --repo: '${TARGET_REPO}'. Valid: ai docs foresight main"
     exit 1
   fi
   process_repo "${REPOS[$TARGET_REPO]}" "$TARGET_REPO"
 else
-  for repo_name in ai docs foresight-mcp main; do
+  for repo_name in ai docs foresight main; do
     process_repo "${REPOS[$repo_name]}" "$repo_name"
   done
 fi

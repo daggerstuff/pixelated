@@ -3,7 +3,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-FORESIGHT_ROOT="${REPO_ROOT}/foresight-mcp"
+FORESIGHT_ROOT="${REPO_ROOT}/foresight"
 
 load_env() {
   local -A _pre
@@ -65,7 +65,7 @@ fi
 
 export UV_CACHE_DIR="/home/vivi/.gemini/tmp/uv-cache"
 
-# Force the project-local venv (foresight-mcp/.venv) regardless of any
+# Force the project-local venv (foresight/.venv) regardless of any
 # ambient VIRTUAL_ENV — agent transports frequently run with the workspace
 # .venv exported, which lacks the full fastmcp.server package and causes
 # ImportError on lazy task-routing imports. --no-active guarantees uv creates
@@ -80,4 +80,4 @@ if [[ -n "${FORESIGHT_MCP_PORT:-}" ]]; then
   set -- "--port" "${FORESIGHT_MCP_PORT}" "$@"
 fi
 
-exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight_mcp "$@"
+exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight "$@"
