@@ -36,7 +36,7 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
   switch (transportType) {
     case 'mcp': {
       const launcherPath =
-        process.env['FORESIGHT_MCP_LAUNCHER'] ??
+        process.env['FORESIGHT_LAUNCHER'] ??
         'scripts/memory/foresight-server.sh'
       const timeoutMs = Number(process.env['MEMORY_SERVICE_TIMEOUT_MS'] ?? 5000)
       return new McpMemoryTransport({ launcherPath, timeoutMs })

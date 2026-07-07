@@ -75,9 +75,9 @@ unset VIRTUAL_ENV_DIR
 
 cd "${FORESIGHT_ROOT}"
 
-# Switch to SSE transport when FORESIGHT_MCP_PORT is set (default: stdio)
-if [[ -n "${FORESIGHT_MCP_PORT:-}" ]]; then
-  set -- "--port" "${FORESIGHT_MCP_PORT}" "$@"
+# Switch to SSE transport when FORESIGHT_PORT is set (default: stdio)
+if [[ -n "${FORESIGHT_PORT:-}" ]]; then
+  set -- "--port" "${FORESIGHT_PORT}" "$@"
 fi
 
 exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight "$@"

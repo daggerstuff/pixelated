@@ -68,7 +68,7 @@ spec:
               value: http://training-infra-mcp:8766
             - name: K8S_MCP_URL
               value: http://k8s-mcp:8767
-            - name: FORESIGHT_MCP_URL
+            - name: FORESIGHT_URL
               value: http://foresight:8765
           startupProbe:
             httpGet:
