@@ -10,7 +10,7 @@ services:
       - web
 
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: pixelated-redis
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}

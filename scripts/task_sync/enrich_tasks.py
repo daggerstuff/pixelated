@@ -44,7 +44,7 @@ Establish the foundational microservice baseline with enterprise-grade distribut
   - Mutual exclusion is guaranteed under a spike load of 100 concurrent threads.
   - Expired locks are released automatically after their TTL.
   - Lock renewal heartbeats keep the lock held for long-running operations.
-- [ ] **Integration Verification**: Boot local Docker containers (`mongo:6` and `redis:7`) and verify that connection logs report successful pool initialization.
+- [ ] **Integration Verification**: Boot local Docker containers (`mongo:latest` and `redis:latest`) and verify that connection logs report successful pool initialization.
 - [ ] **Performance Audit**: Run a load test simulating 50 concurrent sessions and assert liveness check latency is `< 50ms` under CPU stress.
 """,
     },
