@@ -30,7 +30,7 @@ services:
       - business-strategy-network
 
   postgres:
-    image: postgres:15-alpine
+    image: postgres:17-alpine
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
@@ -44,7 +44,7 @@ services:
       - business-strategy-network
 
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}
     command:

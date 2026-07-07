@@ -14,7 +14,7 @@ x-common-env: &common-env
 services:
   # ── PostgreSQL ──────────────────────────────────────────────────
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     container_name: pe-postgres
     environment:
       POSTGRES_USER: pe
@@ -34,7 +34,7 @@ services:
 
   # ── Redis ───────────────────────────────────────────────────────
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: pe-redis
     ports:
       - '6379:6379'
