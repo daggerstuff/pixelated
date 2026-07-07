@@ -15,7 +15,7 @@ metadata:
   namespace: pixelated-empathy
   labels:
     app: session-agent
-    eve-version: "0.11"
+    eve-version: "0.18"
 spec:
   replicas: 1
   selector:
@@ -55,16 +55,32 @@ spec:
               value: http://foresight-mcp:8765
             - name: PIXELATED_SESSION_MCP_URL
               value: http://session-mcp:8766
+          startupProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            # Gives the server up to 90 s to complete its cold start
+            # (30 attempts × 3 s period). The readiness/liveness probes
+            # don't start running until startupProbe succeeds.
+            periodSeconds: 3
+            failureThreshold: 30
+            timeoutSeconds: 3
           readinessProbe:
             httpGet:
               path: /eve/v1/health
               port: 2000
+            initialDelaySeconds: 5
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           livenessProbe:
             httpGet:
               path: /eve/v1/health
               port: 2000
+            initialDelaySeconds: 10
             periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m
