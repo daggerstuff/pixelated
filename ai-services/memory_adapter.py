@@ -17,12 +17,12 @@ import sys
 from datetime import datetime, timezone
 from typing import Any
 
-# Import UnifiedMemory from the foresight_mcp package.
-# We rely on foresight_mcp being installed in the same Python environment,
+# Import UnifiedMemory from the foresight package.
+# We rely on foresight being installed in the same Python environment,
 # or available via PYTHONPATH (set in docker-compose / Procfile).
 try:
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "foresight-mcp"))
-    from foresight_mcp.schema import (
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "foresight"))
+    from foresight.schema import (
         CreateMemoryInput,
         EmotionalContext,
         EmpathyMetrics,
@@ -53,9 +53,9 @@ def _require_schema() -> None:
     """
     if _SCHEMA_IMPORT_ERR is not None:
         raise RuntimeError(
-            "foresight_mcp package not available — cannot use UnifiedMemoryAdapter. "
+            "foresight package not available — cannot use UnifiedMemoryAdapter. "
             f"Underlying import error: {_SCHEMA_IMPORT_ERR}. "
-            "Ensure foresight-mcp is in PYTHONPATH."
+            "Ensure foresight is in PYTHONPATH."
         )
 
 

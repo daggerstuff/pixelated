@@ -27,7 +27,7 @@
 #   Out:       vendored deps — node_modules, .venv/* (the in-tree Python
 #               site-packages at src/lib/ai/.../python-service/.venv/lib/…),
 #               dist, build, .next, .pnpm-store, .turbo, coverage, .astro
-#   Out:       git submodules — `foresight-mcp` has its own quality rules
+#   Out:       git submodules — `foresight` has its own quality rules
 #   In:        tests — no test is exempt; suppression in a test still
 #               hides a real defect and CLAUDE.md is unambiguous about
 #               "never".
@@ -94,7 +94,7 @@ EXCLUDE_GLOBS=(
     '*/.astro/*'
     '*/.git/*'
     # Git submodules have their own quality rules.
-    '*/foresight-mcp/*'
+    '*/foresight/*'
 )
 
 # Source roots scanned when no CLI files are passed. Missing directories

@@ -6,30 +6,30 @@ Foresight is now a standalone package. Install it separately:
 
 ```bash
 # Clone the standalone repo
-git clone https://github.com/vectorize-ai/foresight-mcp.git
-cd foresight-mcp
+git clone https://github.com/daggerstuff/foresight.git
+cd foresight
 
 # Install with uv
 uv sync
 
 # Run the server
-uv run foresight-mcp
+uv run foresight-server
 
 # Or use the workspace wrapper script
-/home/vivi/pixelated/scripts/memory/foresight-mcp-server.sh
+/home/vivi/pixelated/scripts/memory/foresight-server.sh
 ```
 
 ## Add to Claude Code
 
-After installing foresight-mcp package:
+After installing foresight package:
 
 ```json
 {
   "mcpServers": {
     "foresight": {
-      "command": "/home/vivi/pixelated/scripts/memory/foresight-mcp-server.sh",
+      "command": "/home/vivi/pixelated/scripts/memory/foresight-server.sh",
       "args": [],
-      "cwd": "/path/to/foresight-mcp",
+      "cwd": "/path/to/foresight",
       "env": {
         "FORESIGHT_DB_PATH": "/home/user/.foresight/memory.db",
         "FORESIGHT_USER_ID": "username"
@@ -57,5 +57,5 @@ After installing foresight-mcp package:
 - `query_memories_temporal` - Query memory trends by time window
 - `get_system_status` - System status
 
-Use the nested `foresight-mcp` CLI or Python API for expert and maintenance
+Use the nested `foresight-server` CLI or Python API for expert and maintenance
 workflows that are not exposed through MCP.

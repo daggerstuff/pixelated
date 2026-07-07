@@ -160,7 +160,7 @@ For active work and cross-session context, use **Foresight MCP**.
 
 ### 6.1) Foresight MCP
 
-- Launcher: `scripts/memory/foresight-mcp-server.sh`
+- Launcher: `scripts/memory/foresight-server.sh`
 - Config: `scripts/memory/mcp-config.json`
 - Core tools:
   - `manage_memories`
@@ -172,7 +172,7 @@ For active work and cross-session context, use **Foresight MCP**.
   - `query_memories_temporal`
   - `get_system_status`
 
-Expert and maintenance workflows belong in nested `foresight-mcp` CLI Python
+Expert and maintenance workflows belong in nested `foresight-server` CLI Python
 API, not MCP tool surface.
 
 Orientation flow:

@@ -26,7 +26,7 @@ export type InternalMemoryServiceClientLike = {
  * based on the MEMORY_SERVICE_TRANSPORT environment variable.
  *
  * Valid values:
- * - 'mcp': Use MCP transport to foresight-mcp server
+ * - 'mcp': Use MCP transport to foresight-server
  * - 'http-loopback': Use HTTP self-loopback (default)
  */
 export function createMemoryTransport(): InternalMemoryServiceClientLike {
@@ -37,7 +37,7 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
     case 'mcp': {
       const launcherPath =
         process.env['FORESIGHT_MCP_LAUNCHER'] ??
-        'scripts/memory/foresight-mcp-server.sh'
+        'scripts/memory/foresight-server.sh'
       const timeoutMs = Number(process.env['MEMORY_SERVICE_TIMEOUT_MS'] ?? 5000)
       return new McpMemoryTransport({ launcherPath, timeoutMs })
     }

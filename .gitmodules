@@ -6,7 +6,7 @@
 	path = docs
 	url = https://github.com/daggerstuff/docs.git
 	branch = master
-[submodule "foresight-mcp"]
-	path = foresight-mcp
-	url = https://github.com/daggerstuff/foresight-mcp.git
+[submodule "foresight"]
+	path = foresight
+	url = https://github.com/daggerstuff/foresight.git
 	branch = master

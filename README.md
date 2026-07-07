@@ -68,7 +68,7 @@ Together, they form the secure, intelligent backbone of our clinical AI engine:
   environment. This submodule handles inference, emotional signal analysis, and
   the clinical validity pipelines that ensure our interactions remain safe and
   effective.
-- **[foresight-mcp](foresight-mcp/) (Continuity & Memory):** The persistent
+- **[foresight](foresight/) (Continuity & Memory):** The persistent
   "brain" of our AI agents. This submodule manages contextual memory, allowing
   the system to learn, adapt, and maintain continuity across complex,
   longitudinal therapeutic simulations.

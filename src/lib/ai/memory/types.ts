@@ -12,9 +12,9 @@
  *
  * The Zod validation schemas that previously lived here were dead code
  * in this directory (consumers used the TypeScript types, not the
- * schemas) and have been removed. The foresight-mcp submodule keeps
+ * schemas) and have been removed. The foresight submodule keeps
  * its own copy of equivalent Zod schemas under
- * `foresight-mcp/packages/foresight-core/src/types.ts`.
+ * `foresight/packages/foresight-core/src/types.ts`.
  *
  * As of PIX-3905, `StanceShift` and `SynthesisResult` are also
  * re-exported from the package. This file is a pure re-export barrel
