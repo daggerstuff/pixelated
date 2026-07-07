@@ -94,6 +94,61 @@ function requiresExternalServices(testPath) {
 }
 
 /**
+ * Bucket definitions for advisory sharding. Each bucket targets a disjoint set
+ * of test paths so CI matrices can run them in parallel without overlap.
+ *
+ * Globs are relative to repo root and use forward-slash paths.
+ * @type {Record<string, string[]>}
+ */
+const ADVISORY_BUCKETS = {
+  // Bucket 1: backend-heavy unit tests (lib services, ai, api routes, simulator)
+  core: [
+    "src/lib/**/*.test.ts",
+    "src/lib/**/*.test.tsx",
+    "src/api/**/*.test.ts",
+    "src/api/**/*.test.tsx",
+    "src/simulator/**/*.test.ts",
+    "src/test/**/*.test.ts",
+    "tests/api/**/*.test.ts",
+    "tests/unit/**/*.test.ts",
+  ],
+  // Bucket 2: frontend + auxiliary (components, pages, hooks, plus auxiliary suites)
+  frontend: [
+    "src/components/**/*.test.ts",
+    "src/components/**/*.test.tsx",
+    "src/pages/**/*.test.ts",
+    "src/pages/**/*.test.tsx",
+    "src/hooks/**/*.test.ts",
+    "src/workers/**/*.test.ts",
+    "src/middleware/**/*.test.ts",
+    "src/utils/**/*.test.ts",
+    "src/tests/**/*.test.ts",
+    "tests/bias-detection/**/*.test.ts",
+    "tests/crisis-detection/**/*.test.ts",
+    "tests/memory/**/*.test.ts",
+    "tests/usability/**/*.test.ts",
+  ],
+  // Bucket 3: agent unit tests + everything else (small tail)
+  agents: [
+    "agents/session-agent/tests/*.test.ts",
+    "agents/qa-agent/tests/*.test.ts",
+    "agents/**/*.test.ts",
+  ],
+};
+
+/**
+ * Get include globs for a bucket.
+ * @param {string | undefined} bucket
+ * @returns {string[]}
+ */
+function bucketIncludeGlobs(bucket) {
+  if (!bucket) return [];
+  const patterns = ADVISORY_BUCKETS[bucket];
+  if (!patterns) return [];
+  return patterns.map((p) => resolve(process.cwd(), p));
+}
+
+/**
  * Build vitest arguments based on VITEST_SUITE.
  * @param {string | undefined} suite
  * @param {string[]} passedArgs - args passed directly to the script
@@ -119,13 +174,29 @@ function buildVitestArgs(suite, passedArgs) {
     console.log(
       "Running advisory test suite (unit tests only, excluding integration tests needing external services)",
     );
+    const bucket = process.env.VITEST_BUCKET;
+    /** @type {string[]} */
+    const extraArgs = [];
+    if (bucket) {
+      const globs = bucketIncludeGlobs(bucket);
+      if (globs.length === 0) {
+        console.error(
+          `Unknown VITEST_BUCKET="${bucket}". Known buckets: ${Object.keys(ADVISORY_BUCKETS).join(", ")}`,
+        );
+        process.exit(2);
+      }
+      console.log(`Advisory bucket: ${bucket} (${globs.length} glob patterns)`);
+      // Filter vitest --include by bucket paths. Repeat --include for each glob.
+      for (const g of globs) {
+        extraArgs.push("--include", g);
+      }
+    }
     // Exclude integration tests that need external services
     const excludeArgs = [];
     for (const test of EXTERNAL_SERVICE_TESTS) {
-      excludeArgs.push("--exclude");
-      excludeArgs.push(resolve(baseDir, test));
+      excludeArgs.push("--exclude", resolve(process.cwd(), test));
     }
-    return [...passedArgs, ...excludeArgs];
+    return [...passedArgs, ...extraArgs, ...excludeArgs];
   }
 
   if (suite === "blocking") {
