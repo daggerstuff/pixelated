@@ -221,7 +221,11 @@ export default defineConfig({
                   'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                 ],
           environment: 'jsdom',
-          isolate: !process.env['CI'],
+          // PIX-223/OOM: keep per-file isolation in CI. With isolate:false the
+          // jsdom worker fork accumulates module/jsdom state across hundreds of
+          // files and exhausts the V8 heap (crash at ~4 GB). Isolation bounds
+          // memory per file; forks.memoryLimit recycles workers as a net.
+          isolate: true,
           exclude: [
             '**/node_modules/**',
             ...nodeTestGlobs,
@@ -282,7 +286,7 @@ export default defineConfig({
                 ],
           exclude: [...cpuBoundNodeTestExcludes],
           environment: 'node',
-          isolate: !process.env['CI'],
+          isolate: true,
         },
       },
     ],
@@ -327,7 +331,7 @@ export default defineConfig({
     teardownTimeout: 60_000,
     fileParallelism: true,
     maxConcurrency: process.env['CI'] ? 2 : 8,
-    isolate: !process.env['CI'],
+    isolate: true,
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
   },
