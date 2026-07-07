@@ -23,11 +23,12 @@ export const securityHeaders: MiddlewareHandler = async (
   const scriptSourceList = [
     "'self'",
     "'unsafe-inline'",
-    !isRelaxedScriptEnv && nonce ? `'nonce-${nonce}'` : null,
     'https://*.sentry.io',
     'https://cdn.jsdelivr.net',
     'https://giscus.app',
     'https://app.rybbit.io',
+    'https://ajax.cloudflare.com',
+    'https://cdnjs.cloudflare.com',
   ].filter(Boolean)
 
   let csp = [
@@ -69,14 +70,14 @@ export const securityHeaders: MiddlewareHandler = async (
       ),
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       'connect-src *', // Allow any connection in dev
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io https://ajax.cloudflare.com https://cdnjs.cloudflare.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://ajax.cloudflare.com https://cdnjs.cloudflare.com",
     ]
   } else {
     // Production CSP
     csp.push(
       `script-src-elem ${scriptSourceList.join(' ')}`,
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://ajax.cloudflare.com https://cdnjs.cloudflare.com",
       "frame-src 'self' https://giscus.app",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
