@@ -41,13 +41,13 @@ export const UI: Ui = {
   ],
   socialLinks: [
     {
-      link: 'https://github.com/nochadisfaction',
-      title: 'Cant Get No, Chadisfaction, on GitHub',
+      link: 'https://github.com/daggerstuff',
+      title: 'Its the house of the rising sun.',
       displayMode: 'alwaysIcon',
       icon: 'i-uil-github-alt',
     },
     {
-      link: 'https://twitter.com/empathypixel',
+      link: 'https://twitter.com/juggledaggers',
       title: 'Pixelated Empathy on Twitter',
       displayMode: 'alwaysIcon',
       icon: 'i-ri-twitter-x-fill',
