@@ -2,7 +2,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 
 const FORESIGHT_URL =
-  process.env.FORESIGHT_MCP_URL ?? 'http://127.0.0.1:8764/sse'
+  process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'
 
 let client: Client | null = null
 let connecting: Promise<Client> | null = null

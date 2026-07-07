@@ -20,7 +20,7 @@ Pixelated Empathy's Eve workflow.
 
 Vertical slice. Both connection slots ship as `defineMcpClientConnection` with
 either a placeholder URL or an env-gated URL. They build cleanly but only the
-`FORESIGHT_MCP_URL`-prefixed branch will attempt to resolve.
+`FORESIGHT_URL`-prefixed branch will attempt to resolve.
 
 ## Not yet wired
 
