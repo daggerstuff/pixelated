@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:15
+    image: postgres:17
     container_name: pixelated-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-pixelated_empathy}
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7-alpine
+    image: redis:latest
     container_name: pixelated-redis
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required}

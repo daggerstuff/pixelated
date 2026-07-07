@@ -120,7 +120,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:14
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -131,7 +131,7 @@ jobs:
           --health-cmd pg_isready --health-interval 10s --health-timeout 5s
           --health-retries 5
       redis:
-        image: redis:7
+        image: redis:latest
         ports:
           - 6379:6379
         options: >-
@@ -196,7 +196,7 @@ services:
     command: pnpm test
 
   postgres:
-    image: postgres:14
+    image: postgres:17
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -207,7 +207,7 @@ services:
       - postgres-test-data:/var/lib/postgresql/data
 
   redis:
-    image: redis:7
+    image: redis:latest
     ports:
       - '6379:6379'
     volumes:
