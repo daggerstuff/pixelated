@@ -71,12 +71,11 @@ await loadSentryModule();
 
 function createStubSentry() {
   /** @type {SentryInstance} */
-  const stub = {
-    captureException: () => {},
-    init: () => {},
-    close: async () => {},
-  };
-  return stub;
+  return {
+      captureException: () => {},
+      init: () => {},
+      close: async () => {},
+    };
 }
 
 import { getPortFallbackPolicy, resolveSsrEntryModuleUrl } from "./start-server-config.mjs";
@@ -103,8 +102,9 @@ const ssrHandler = ssrModule.handler;
 // SSR handler — it does NOT serve dist/client/ static files.  We need to
 // check dist/client/ for matching files before falling through to SSR.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, "../..");
-const clientDist = path.resolve(repoRoot, "dist/client");
+const clientDist = existsSync(path.join(__dirname, "dist/client"))
+  ? path.join(__dirname, "dist/client")
+  : path.resolve(__dirname, "../../dist/client");
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
