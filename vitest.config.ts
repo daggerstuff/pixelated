@@ -67,7 +67,7 @@ const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
   : []
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
-    (entry.includes('/api/') || entry.includes('/lib/')) &&
+    (entry.includes('/api/') || entry.includes('/lib/') || entry.startsWith('agents/')) &&
     !entry.includes('__tests__/AIChat'),
 )
 const targetedJsdomTestGlobs = targetedTestGlobs.filter(

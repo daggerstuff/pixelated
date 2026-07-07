@@ -26,73 +26,6 @@ if (skip === "true" || skip === "1") {
   process.exit(0);
 }
 
-// Tests that require external services (Redis, Auth0, MongoDB, etc.) and should be excluded from "advisory" suite
-const EXTERNAL_SERVICE_TESTS = new Set([
-  // Auth0 integration tests
-  "tests/integration/auth0/auth0-integration.test.ts",
-  // System integration tests that need full stack
-  "tests/integration/complete-system.integration.test.ts",
-  // Patient crisis integration tests
-  "tests/integration/patient-psi-crisis.test.ts",
-  // Journal research integration tests
-  "tests/integration/journal-research/api.integration.test.ts",
-  // Bias detection API integration tests
-  "tests/integration/bias-detection-api.integration.test.ts",
-  // Session agent integration tests that need MongoDB/Redis
-  "agents/session-agent/tests/session-lifecycle.integration.test.ts",
-  // QA agent integration tests
-  "agents/qa-agent/tests/qa-review-lifecycle.integration.test.ts",
-]);
-
-/**
- * Get test files for the "advisory" suite.
- * Advisory suite = unit tests that don't need external services.
- * @returns {string[]}
- */
-function getAdvisoryTests() {
-  const baseDir = resolve(process.cwd());
-  // All src/ tests are unit tests (no external services needed)
-  const srcTests = [
-    "src/lib/api/",
-    "src/lib/audit/",
-    "src/lib/browser/",
-    "src/lib/metaaligner/",
-    "src/lib/server/",
-    "src/lib/threat-detection/",
-    "src/api/",
-    "src/simulator/",
-  ];
-  // Unit tests in tests/ directory
-  const unitTests = ["tests/unit/", "tests/bias-detection/", "tests/api/", "tests/memory/"];
-  // Tests in agents/ that are unit tests (not integration)
-  const agentUnitTests = [
-    "agents/session-agent/tests/*.test.ts",
-    "agents/qa-agent/tests/*.test.ts",
-  ];
-
-  // Build list of test files to include
-  const includePatterns = [
-    ...srcTests.map((d) => resolve(baseDir, d, "**/*.test.ts")),
-    ...srcTests.map((d) => resolve(baseDir, d, "**/*.test.tsx")),
-    ...unitTests.map((d) => resolve(baseDir, d, "**/*.test.ts")),
-    ...agentUnitTests.map((p) => resolve(baseDir, p)),
-  ];
-
-  // Return empty array - we'll use vitest's --grep and --exclude instead
-  // The actual filtering is done via vitest CLI args
-  return [];
-}
-
-/**
- * Check if a test file path requires external services.
- * @param {string} testPath
- * @returns {boolean}
- */
-function requiresExternalServices(testPath) {
-  const normalized = testPath.replace(/\\/g, "/");
-  return EXTERNAL_SERVICE_TESTS.has(normalized);
-}
-
 /**
  * Bucket definitions for advisory sharding. Each bucket targets a disjoint set
  * of test paths so CI matrices can run them in parallel without overlap.
@@ -207,7 +140,9 @@ function buildVitestArgs(suite, passedArgs) {
       // selection is communicated via VITEST_TARGET_TESTS env (read by the
       // project's vitest.config.ts) which sets include under the hood.
       // Each entry must be a glob; bare dirs don't expand.
-      process.env["VITEST_TARGET_TESTS"] = dirs.map((dir) => `${dir}/**/*.test.ts`).join(",");
+      process.env["VITEST_TARGET_TESTS"] = dirs
+        .map((dir) => `${dir}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}`)
+        .join(",");
     }
     return passedArgs;
   }
