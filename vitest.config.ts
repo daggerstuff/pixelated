@@ -122,9 +122,10 @@ export default defineConfig({
   },
   test: {
     pool: 'forks',
-    forks: {
-      memoryLimit: process.env['CI'] ? 1024 * 1024 * 1024 : undefined,
-    },
+    // Vitest 4 removed `poolOptions.forks.memoryLimit`. The forks pool ignores
+    // memory limits entirely; for vm pools it's `vmMemoryLimit` instead. To keep
+    // the PIX-223 OOM guard, cap each worker's V8 heap directly via execArgv.
+    execArgv: process.env['CI'] ? ['--max-old-space-size=1024'] : undefined,
     maxWorkers: process.env['CI'] ? 2 : 8,
     globals: true,
     environment: 'jsdom',
@@ -224,7 +225,9 @@ export default defineConfig({
           // PIX-223/OOM: keep per-file isolation in CI. With isolate:false the
           // jsdom worker fork accumulates module/jsdom state across hundreds of
           // files and exhausts the V8 heap (crash at ~4 GB). Isolation bounds
-          // memory per file; forks.memoryLimit recycles workers as a net.
+          // memory per file; execArgv(--max-old-space-size) caps each worker at
+          // the top-level test config to recycle OOM-prone workers (forks pool
+          // has no memoryLimit in Vitest 4).
           isolate: true,
           exclude: [
             '**/node_modules/**',
