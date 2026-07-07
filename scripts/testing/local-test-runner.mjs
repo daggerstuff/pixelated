@@ -100,53 +100,72 @@ function requiresExternalServices(testPath) {
  * Globs are relative to repo root and use forward-slash paths.
  * @type {Record<string, string[]>}
  */
-const ADVISORY_BUCKETS = {
-  // Bucket 1: backend-heavy unit tests (lib services, ai, api routes, simulator)
+// Advisory buckets split the test corpus into disjoint top-level directories
+// so CI matrices can run them in parallel with no overlap. Each bucket owns
+// specific top-level dirs; vitest's --include is additive across flags so we
+// must pin disjoint segments (no overlapping dir may appear in two buckets).
+const ADVISORY_BUCKET_DIRS = {
+  // Bucket 1: api/simulator + small/medium lib dirs (~64 files)
   core: [
-    "src/lib/**/*.test.ts",
-    "src/lib/**/*.test.tsx",
-    "src/api/**/*.test.ts",
-    "src/api/**/*.test.tsx",
-    "src/simulator/**/*.test.ts",
-    "src/test/**/*.test.ts",
-    "tests/api/**/*.test.ts",
-    "tests/unit/**/*.test.ts",
+    "src/lib/api",
+    "src/lib/auth",
+    "src/lib/server",
+    "src/lib/stores",
+    "src/lib/utils",
+    "src/lib/governance",
+    "src/lib/__tests__",
+    "src/lib/audit",
+    "src/lib/browser",
+    "src/api",
+    "src/simulator",
+    "src/test",
+    "tests/api",
+    "tests/unit",
+    // singletons
+    "src/lib/agent-note-collab",
+    "src/lib/db",
+    "src/lib/evidence-assistant",
+    "src/lib/logging",
+    "src/lib/mental-health",
+    "src/lib/providers",
+    "src/lib/rate-limiting",
+    "src/lib/sdk",
+    "src/lib/sentry",
+    "src/lib/styles",
+    "src/lib/threat-intelligence",
+    "src/lib/websocket",
+    "src/lib/crypto",
   ],
-  // Bucket 2: frontend + auxiliary (components, pages, hooks, plus auxiliary suites)
+  // Bucket 2: heaviest lib subdirs + auxiliary top-level suites (~170 files)
+  lib: [
+    "src/lib/ai",
+    "src/lib/services",
+    "src/lib/memory",
+    "src/lib/metaaligner",
+    "src/lib/threat-detection",
+    "src/lib/security",
+    "src/lib/hooks",
+    "src/lib/fhe",
+    "src/lib/ehr",
+    "tests/bias-detection",
+    "tests/crisis-detection",
+    "tests/memory",
+    "tests/usability",
+    "tests/hooks",
+  ],
+  // Bucket 3: frontend (~120 files)
   frontend: [
-    "src/components/**/*.test.ts",
-    "src/components/**/*.test.tsx",
-    "src/pages/**/*.test.ts",
-    "src/pages/**/*.test.tsx",
-    "src/hooks/**/*.test.ts",
-    "src/workers/**/*.test.ts",
-    "src/middleware/**/*.test.ts",
-    "src/utils/**/*.test.ts",
-    "src/tests/**/*.test.ts",
-    "tests/bias-detection/**/*.test.ts",
-    "tests/crisis-detection/**/*.test.ts",
-    "tests/memory/**/*.test.ts",
-    "tests/usability/**/*.test.ts",
+    "src/components",
+    "src/pages",
+    "src/hooks",
+    "src/workers",
+    "src/middleware",
+    "src/utils",
+    "src/tests",
   ],
-  // Bucket 3: agent unit tests + everything else (small tail)
-  agents: [
-    "agents/session-agent/tests/*.test.ts",
-    "agents/qa-agent/tests/*.test.ts",
-    "agents/**/*.test.ts",
-  ],
+  // Bucket 4: agents (~17 files)
+  agents: ["agents"],
 };
-
-/**
- * Get include globs for a bucket.
- * @param {string | undefined} bucket
- * @returns {string[]}
- */
-function bucketIncludeGlobs(bucket) {
-  if (!bucket) return [];
-  const patterns = ADVISORY_BUCKETS[bucket];
-  if (!patterns) return [];
-  return patterns.map((p) => resolve(process.cwd(), p));
-}
 
 /**
  * Build vitest arguments based on VITEST_SUITE.
@@ -155,10 +174,10 @@ function bucketIncludeGlobs(bucket) {
  * @returns {string[]}
  */
 function buildVitestArgs(suite, passedArgs) {
-  // If specific test files are passed as positional args, use those directly
+  // If specific test files/dirs are passed as positional args, use those directly
   const positionalArgs = passedArgs.filter((arg) => !arg.startsWith("-"));
   if (positionalArgs.length > 0) {
-    // When specific files are passed, don't filter by suite - run those files
+    // When specific paths are passed, don't filter by suite - run those files
     console.log(`Running specific test files: ${positionalArgs.join(", ")}`);
     return passedArgs;
   }
@@ -175,28 +194,22 @@ function buildVitestArgs(suite, passedArgs) {
       "Running advisory test suite (unit tests only, excluding integration tests needing external services)",
     );
     const bucket = process.env.VITEST_BUCKET;
-    /** @type {string[]} */
-    const extraArgs = [];
     if (bucket) {
-      const globs = bucketIncludeGlobs(bucket);
-      if (globs.length === 0) {
+      const dirs = ADVISORY_BUCKET_DIRS[bucket];
+      if (!dirs || dirs.length === 0) {
         console.error(
-          `Unknown VITEST_BUCKET="${bucket}". Known buckets: ${Object.keys(ADVISORY_BUCKETS).join(", ")}`,
+          `Unknown VITEST_BUCKET="${bucket}". Known buckets: ${Object.keys(ADVISORY_BUCKET_DIRS).join(", ")}`,
         );
         process.exit(2);
       }
-      console.log(`Advisory bucket: ${bucket} (${globs.length} glob patterns)`);
-      // Filter vitest --include by bucket paths. Repeat --include for each glob.
-      for (const g of globs) {
-        extraArgs.push("--include", g);
-      }
+      console.log(`Advisory bucket: ${bucket} (${dirs.length} top-level dirs)`);
+      // Vitest 4 lacks --include/exclude CLI flags at the top level; bucket
+      // selection is communicated via VITEST_TARGET_TESTS env (read by the
+      // project's vitest.config.ts) which sets include under the hood.
+      // Each entry must be a glob; bare dirs don't expand.
+      process.env["VITEST_TARGET_TESTS"] = dirs.map((dir) => `${dir}/**/*.test.ts`).join(",");
     }
-    // Exclude integration tests that need external services
-    const excludeArgs = [];
-    for (const test of EXTERNAL_SERVICE_TESTS) {
-      excludeArgs.push("--exclude", resolve(process.cwd(), test));
-    }
-    return [...passedArgs, ...extraArgs, ...excludeArgs];
+    return passedArgs;
   }
 
   if (suite === "blocking") {
