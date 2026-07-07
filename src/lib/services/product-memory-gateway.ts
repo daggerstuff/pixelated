@@ -536,7 +536,7 @@ export function getProductMemoryGateway(): ProductMemoryGateway {
  * Build a per-request gateway bound to the authenticated caller.
  *
  * The transport is selected at call time via MEMORY_SERVICE_TRANSPORT so
- * operators can switch from the HTTP self-loopback to the foresight-mcp
+ * operators can switch from the HTTP self-loopback to the foresight-server
  * transport without code changes.
  */
 export function getProductMemoryGatewayFor(

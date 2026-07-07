@@ -72,8 +72,8 @@ start_dbs() {
 }
 
 setup_foresight() {
-  [ ! -d "$WS_DIR/foresight-mcp" ] && return
-  cd "$WS_DIR/foresight-mcp"
+  [ ! -d "$WS_DIR/foresight" ] && return
+  cd "$WS_DIR/foresight"
   su "$R_USER" -c 'export PATH="$HOME/.local/bin:$PATH"; uv sync' 2>/dev/null || true
   cd "$WS_DIR"
   mkdir -p .foresight .cursor/memory/{short_term,long_term} 2>/dev/null || true
@@ -82,7 +82,7 @@ setup_foresight() {
 {
   "mcpServers": {
     "foresight": {
-      "command": "$WS_DIR/scripts/memory/foresight-mcp-server.sh",
+      "command": "$WS_DIR/scripts/memory/foresight-server.sh",
       "args": [],
       "env": {
         "FORESIGHT_DB_PATH": "$WS_DIR/.foresight/memory.db",
