@@ -207,6 +207,30 @@ jobs:
           kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=5m
           kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=5m
 
+          echo "Waiting for old pods to fully terminate before smoke test..."
+          # kubectl rollout status exits when new pods are Ready, but Terminating old
+          # pods may still be in the LB rotation. Terminating pods remain phase=Running
+          # in k8s, so we must grep the STATUS column directly.
+          for i in $(seq 1 18); do
+            TERMINATING=$(kubectl get pods -n pixelated-empathy --no-headers 2>/dev/null | grep -c Terminating || true)
+            if [[ "${TERMINATING}" == "0" ]]; then
+              echo "All pods healthy, no Terminating pods remaining."
+              break
+            fi
+            echo "  ${TERMINATING} pod(s) still Terminating, waiting... (${i}/18)"
+            sleep 5
+          done
+
+          echo "Verifying new image is running on at least one pod..."
+          EXPECTED_TAG="${{ needs.build-and-push.outputs.image_tag }}"
+          RUNNING_IMAGE=$(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy -o jsonpath='{.items[*].spec.containers[0].image}' | tr ' ' '\n' | head -n 1)
+          if [[ "${RUNNING_IMAGE}" != *"${EXPECTED_TAG}"* ]]; then
+            echo "❌ Image mismatch: expected tag '${EXPECTED_TAG}' but running '${RUNNING_IMAGE}'"
+            kubectl get pods -n pixelated-empathy -o wide
+            exit 1
+          fi
+          echo "✅ New image tag '${EXPECTED_TAG}' confirmed running."
+
       - name: Verify deployment
         run: |
           echo "=== Pod status ==="
