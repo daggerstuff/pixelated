@@ -258,3 +258,30 @@ describe('toMemoryScope', () => {
     })
   })
 })
+
+describe('assertRequestedUser', () => {
+  it('returns null if requestedUserId is undefined or null', async () => {
+    const { assertRequestedUser } = await import('../_shared')
+    expect(assertRequestedUser('user-1', undefined)).toBeNull()
+    expect(assertRequestedUser('user-1', null)).toBeNull()
+  })
+
+  it('returns null if actualUserId matches requestedUserId', async () => {
+    const { assertRequestedUser } = await import('../_shared')
+    expect(assertRequestedUser('user-1', 'user-1')).toBeNull()
+  })
+
+  it('returns a 400 error response if actualUserId does not match requestedUserId', async () => {
+    const { assertRequestedUser } = await import('../_shared')
+    const response = assertRequestedUser('user-1', 'user-2')
+
+    expect(response).toBeInstanceOf(Response)
+    expect(response?.status).toBe(400)
+
+    const data = await response?.json()
+    expect(data).toEqual({
+      error: 'Bad Request',
+      message: 'userId must match the authenticated user',
+    })
+  })
+})
