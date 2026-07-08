@@ -26,72 +26,79 @@ if (skip === "true" || skip === "1") {
   process.exit(0);
 }
 
-// Tests that require external services (Redis, Auth0, MongoDB, etc.) and should be excluded from "advisory" suite
-const EXTERNAL_SERVICE_TESTS = new Set([
-  // Auth0 integration tests
-  "tests/integration/auth0/auth0-integration.test.ts",
-  // System integration tests that need full stack
-  "tests/integration/complete-system.integration.test.ts",
-  // Patient crisis integration tests
-  "tests/integration/patient-psi-crisis.test.ts",
-  // Journal research integration tests
-  "tests/integration/journal-research/api.integration.test.ts",
-  // Bias detection API integration tests
-  "tests/integration/bias-detection-api.integration.test.ts",
-  // Session agent integration tests that need MongoDB/Redis
-  "agents/session-agent/tests/session-lifecycle.integration.test.ts",
-  // QA agent integration tests
-  "agents/qa-agent/tests/qa-review-lifecycle.integration.test.ts",
-]);
-
 /**
- * Get test files for the "advisory" suite.
- * Advisory suite = unit tests that don't need external services.
- * @returns {string[]}
+ * Bucket definitions for advisory sharding. Each bucket targets a disjoint set
+ * of test paths so CI matrices can run them in parallel without overlap.
+ *
+ * Globs are relative to repo root and use forward-slash paths.
+ * @type {Record<string, string[]>}
  */
-function getAdvisoryTests() {
-  const baseDir = resolve(process.cwd());
-  // All src/ tests are unit tests (no external services needed)
-  const srcTests = [
-    "src/lib/api/",
-    "src/lib/audit/",
-    "src/lib/browser/",
-    "src/lib/metaaligner/",
-    "src/lib/server/",
-    "src/lib/threat-detection/",
-    "src/api/",
-    "src/simulator/",
-  ];
-  // Unit tests in tests/ directory
-  const unitTests = ["tests/unit/", "tests/bias-detection/", "tests/api/", "tests/memory/"];
-  // Tests in agents/ that are unit tests (not integration)
-  const agentUnitTests = [
-    "agents/session-agent/tests/*.test.ts",
-    "agents/qa-agent/tests/*.test.ts",
-  ];
-
-  // Build list of test files to include
-  const includePatterns = [
-    ...srcTests.map((d) => resolve(baseDir, d, "**/*.test.ts")),
-    ...srcTests.map((d) => resolve(baseDir, d, "**/*.test.tsx")),
-    ...unitTests.map((d) => resolve(baseDir, d, "**/*.test.ts")),
-    ...agentUnitTests.map((p) => resolve(baseDir, p)),
-  ];
-
-  // Return empty array - we'll use vitest's --grep and --exclude instead
-  // The actual filtering is done via vitest CLI args
-  return [];
-}
-
-/**
- * Check if a test file path requires external services.
- * @param {string} testPath
- * @returns {boolean}
- */
-function requiresExternalServices(testPath) {
-  const normalized = testPath.replace(/\\/g, "/");
-  return EXTERNAL_SERVICE_TESTS.has(normalized);
-}
+// Advisory buckets split the test corpus into disjoint top-level directories
+// so CI matrices can run them in parallel with no overlap. Each bucket owns
+// specific top-level dirs; vitest's --include is additive across flags so we
+// must pin disjoint segments (no overlapping dir may appear in two buckets).
+const ADVISORY_BUCKET_DIRS = {
+  // Bucket 1: api/simulator + small/medium lib dirs (~64 files)
+  core: [
+    "src/lib/api",
+    "src/lib/auth",
+    "src/lib/server",
+    "src/lib/stores",
+    "src/lib/utils",
+    "src/lib/governance",
+    "src/lib/__tests__",
+    "src/lib/audit",
+    "src/lib/browser",
+    "src/api",
+    "src/simulator",
+    "src/test",
+    "tests/api",
+    "tests/unit",
+    // singletons
+    "src/lib/agent-note-collab",
+    "src/lib/db",
+    "src/lib/evidence-assistant",
+    "src/lib/logging",
+    "src/lib/mental-health",
+    "src/lib/providers",
+    "src/lib/rate-limiting",
+    "src/lib/sdk",
+    "src/lib/sentry",
+    "src/lib/styles",
+    "src/lib/threat-intelligence",
+    "src/lib/websocket",
+    "src/lib/crypto",
+  ],
+  // Bucket 2: heaviest lib subdirs + auxiliary top-level suites (~170 files)
+  lib: [
+    "src/lib/ai",
+    "src/lib/services",
+    "src/lib/memory",
+    "src/lib/metaaligner",
+    "src/lib/threat-detection",
+    "src/lib/security",
+    "src/lib/hooks",
+    "src/lib/fhe",
+    "src/lib/ehr",
+    "tests/bias-detection",
+    "tests/crisis-detection",
+    "tests/memory",
+    "tests/usability",
+    "tests/hooks",
+  ],
+  // Bucket 3: frontend (~120 files)
+  frontend: [
+    "src/components",
+    "src/pages",
+    "src/hooks",
+    "src/workers",
+    "src/middleware",
+    "src/utils",
+    "src/tests",
+  ],
+  // Bucket 4: agents (~17 files)
+  agents: ["agents"],
+};
 
 /**
  * Build vitest arguments based on VITEST_SUITE.
@@ -100,10 +107,10 @@ function requiresExternalServices(testPath) {
  * @returns {string[]}
  */
 function buildVitestArgs(suite, passedArgs) {
-  // If specific test files are passed as positional args, use those directly
+  // If specific test files/dirs are passed as positional args, use those directly
   const positionalArgs = passedArgs.filter((arg) => !arg.startsWith("-"));
   if (positionalArgs.length > 0) {
-    // When specific files are passed, don't filter by suite - run those files
+    // When specific paths are passed, don't filter by suite - run those files
     console.log(`Running specific test files: ${positionalArgs.join(", ")}`);
     return passedArgs;
   }
@@ -119,13 +126,25 @@ function buildVitestArgs(suite, passedArgs) {
     console.log(
       "Running advisory test suite (unit tests only, excluding integration tests needing external services)",
     );
-    // Exclude integration tests that need external services
-    const excludeArgs = [];
-    for (const test of EXTERNAL_SERVICE_TESTS) {
-      excludeArgs.push("--exclude");
-      excludeArgs.push(resolve(baseDir, test));
+    const bucket = process.env.VITEST_BUCKET;
+    if (bucket) {
+      const dirs = ADVISORY_BUCKET_DIRS[bucket];
+      if (!dirs || dirs.length === 0) {
+        console.error(
+          `Unknown VITEST_BUCKET="${bucket}". Known buckets: ${Object.keys(ADVISORY_BUCKET_DIRS).join(", ")}`,
+        );
+        process.exit(2);
+      }
+      console.log(`Advisory bucket: ${bucket} (${dirs.length} top-level dirs)`);
+      // Vitest 4 lacks --include/exclude CLI flags at the top level; bucket
+      // selection is communicated via VITEST_TARGET_TESTS env (read by the
+      // project's vitest.config.ts) which sets include under the hood.
+      // Each entry must be a glob; bare dirs don't expand.
+      process.env["VITEST_TARGET_TESTS"] = dirs
+        .map((dir) => `${dir}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}`)
+        .join(",");
     }
-    return [...passedArgs, ...excludeArgs];
+    return passedArgs;
   }
 
   if (suite === "blocking") {
