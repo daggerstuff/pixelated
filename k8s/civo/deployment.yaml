@@ -7,6 +7,16 @@ metadata:
     app: pixelated-empathy
 spec:
   replicas: 2
+  # Atomic rollout: keep old pods until new ones (with the new full dist/)
+  # are Ready. Without this, the default RollingUpdate briefly serves a mix of
+  # old and new dist/ trees behind the Service, so HTML from one pod can
+  # reference a _astro/* asset that only exists in the other pod's image
+  # (causes 404s on CSS/JS during/after a deploy).
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: pixelated-empathy
@@ -25,8 +35,13 @@ spec:
         fsGroup: 1001
       containers:
         - name: pixelated-empathy
+          # Pin to an IMMUTABLE reference (digest or semver), not :latest.
+          # :latest + imagePullPolicy: Always lets two pods pull different
+          # builds, so each bakes a different dist/ _astro hash and the Service
+          # round-robins requests between inconsistent asset sets (404s).
+          # The deploy pipeline MUST substitute the built image digest here.
           image: pixelatedempathy/api:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 4321
