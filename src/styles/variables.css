@@ -1,52 +1,52 @@
 /* ================================================
    PIXELATED EMPATHY — Single :root source
-   Dark-first. Emerald brand. Terracotta accent.
+   Light-first (per keel reference). Red accent. Emerald brand kept for clinical surfaces.
    ================================================ */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
   /* === FONTS (keel) === */
   --font-display: "Fraunces Variable", Georgia, serif;
   --font-body: "Public Sans", system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
-  /* === BRAND (Emerald) === */
-  --color-brand: #10B981;
+  /* === BRAND (Emerald) — retained for clinical/non-homepage surfaces === */
+  --color-brand: #10b981;
   --color-brand-hover: #059669;
   --color-brand-soft: rgba(16, 185, 129, 0.16);
 
-  /* === ACCENT (Terracotta) === */
-  --color-accent: #A44F33;
-  --color-accent-rgb: 164, 79, 51;
-  --color-accent-hover: #8B3F26;
-  --color-accent-soft: rgba(164, 79, 51, 0.16);
+  /* === ACCENT (Red — matches keel reference identity) === */
+  --color-accent: oklch(0.54 0.14 35);
+  --color-accent-rgb: 224, 68, 51;
+  --color-accent-hover: color-mix(in oklch, var(--color-accent), black 12%);
+  --color-accent-soft: color-mix(in oklch, var(--color-accent), transparent 84%);
 
-  /* === DARK CANVAS (default) === */
-  --color-bg: #050505;
-  --color-surface: #0B0B0B;
-  --color-elevated: #0F0F0F;
-  --color-glass: color-mix(in oklch, #0B0B0B 80%, transparent);
-  --color-text: #FFFFFF;
-  --color-muted: #D1FAE5;
-  --color-line: rgba(255, 255, 255, 0.06);
-  --color-line-strong: rgba(255, 255, 255, 0.12);
-  --color-soft: rgba(255, 255, 255, 0.04);
-  --color-overlay: rgba(0, 0, 0, 0.75);
+  /* === LIGHT CANVAS (default — per keel reference) === */
+  --color-bg: oklch(0.99 0.003 100);
+  --color-surface: oklch(0.965 0.004 100);
+  --color-elevated: #ffffff;
+  --color-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
+  --color-text: oklch(0.25 0.01 250);
+  --color-muted: oklch(0.5 0.012 250);
+  --color-line: oklch(0.86 0.008 100);
+  --color-line-strong: oklch(0.72 0.012 120);
+  --color-soft: oklch(0.94 0.006 100);
+  --color-overlay: rgba(0, 0, 0, 0.5);
 
   /* === KEEP keel --color-* aliases (for component compat) === */
-  --bg-primary: #050505;
-  --bg-secondary: #0B0B0B;
-  --bg-glass: color-mix(in oklch, #0B0B0B 80%, transparent);
-  --text-primary: #FFFFFF;
-  --text-secondary: #D1FAE5;
-  --text-muted: #86EFAC;
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-primary: rgba(255, 255, 255, 0.12);
-  --border-primary-rgb: 255, 255, 255;
-  --divider-dotted: rgba(255, 255, 255, 0.06);
-  --divider-weak: rgba(255, 255, 255, 0.04);
-  --bg-surface-ghost: rgba(255, 255, 255, 0.04);
+  --bg-primary: oklch(0.99 0.003 100);
+  --bg-secondary: oklch(0.965 0.004 100);
+  --bg-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
+  --text-primary: oklch(0.25 0.01 250);
+  --text-secondary: oklch(0.5 0.012 250);
+  --text-muted: oklch(0.6 0.01 250);
+  --border-subtle: oklch(0.86 0.008 100);
+  --border-primary: oklch(0.72 0.012 120);
+  --border-primary-rgb: 38, 38, 38;
+  --divider-dotted: oklch(0.86 0.008 100);
+  --divider-weak: oklch(0.94 0.006 100);
+  --bg-surface-ghost: oklch(0.94 0.006 100);
 
   /* === ANIMATION (keel tokens) === */
   --duration-fast: 0.15s;
@@ -92,32 +92,38 @@
   --z-modal: 300;
 }
 
-/* === LIGHT THEME OVERRIDE === */
-:root[data-theme='light'] {
-  color-scheme: light;
+/* === DARK THEME OVERRIDE (opt-in, per keel reference) === */
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
-  --color-bg: oklch(0.99 0.003 100);
-  --color-surface: oklch(0.965 0.004 100);
-  --color-elevated: #FFFFFF;
-  --color-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
-  --color-text: oklch(0.25 0.01 250);
-  --color-muted: oklch(0.5 0.012 250);
-  --color-line: oklch(0.86 0.008 100);
-  --color-line-strong: oklch(0.72 0.012 120);
-  --color-soft: oklch(0.94 0.006 100);
-  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-accent: oklch(0.72 0.13 42);
+  --color-accent-rgb: 233, 122, 86;
+  --color-accent-hover: color-mix(in oklch, var(--color-accent), white 10%);
+  --color-accent-soft: color-mix(in oklch, var(--color-accent), transparent 78%);
 
-  --bg-primary: oklch(0.99 0.003 100);
-  --bg-secondary: oklch(0.965 0.004 100);
-  --bg-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
-  --text-primary: oklch(0.25 0.01 250);
-  --text-secondary: oklch(0.5 0.012 250);
-  --text-muted: oklch(0.6 0.01 250);
-  --border-subtle: oklch(0.86 0.008 100);
-  --border-primary: oklch(0.72 0.012 120);
-  --divider-dotted: oklch(0.86 0.008 100);
-  --divider-weak: oklch(0.94 0.006 100);
-  --bg-surface-ghost: oklch(0.94 0.006 100);
+  --color-bg: oklch(0.18 0.009 250);
+  --color-surface: oklch(0.22 0.01 250);
+  --color-elevated: oklch(0.24 0.01 250);
+  --color-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
+  --color-text: oklch(0.93 0.006 95);
+  --color-muted: oklch(0.69 0.012 250);
+  --color-line: oklch(0.34 0.012 250);
+  --color-line-strong: oklch(0.44 0.016 230);
+  --color-soft: oklch(0.26 0.01 250);
+  --color-overlay: rgba(0, 0, 0, 0.75);
+
+  --bg-primary: oklch(0.18 0.009 250);
+  --bg-secondary: oklch(0.22 0.01 250);
+  --bg-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
+  --text-primary: oklch(0.93 0.006 95);
+  --text-secondary: oklch(0.69 0.012 250);
+  --text-muted: oklch(0.79 0.01 250);
+  --border-subtle: oklch(0.34 0.012 250);
+  --border-primary: oklch(0.44 0.016 230);
+  --border-primary-rgb: 66, 66, 70;
+  --divider-dotted: oklch(0.34 0.012 250);
+  --divider-weak: oklch(0.26 0.01 250);
+  --bg-surface-ghost: oklch(0.26 0.01 250);
 }
 
 /* === BASE ELEMENT RESETS === */
@@ -162,7 +168,9 @@ a:not(.brand, .button) {
   background-position: 0 100%;
   background-repeat: no-repeat;
   background-size: 0 1px;
-  transition: background-size 180ms ease, color 180ms ease;
+  transition:
+    background-size 180ms ease,
+    color 180ms ease;
 }
 
 a:not(.brand, .button):hover {
