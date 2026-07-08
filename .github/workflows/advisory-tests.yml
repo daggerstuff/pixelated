@@ -86,7 +86,7 @@ jobs:
           pnpm test:advisory 2>&1 | tee "advisory-test-${{ matrix.bucket }}.log"
 
       - name: Upload advisory test log (${{ matrix.bucket }})
-        if: always() && hashFiles('advisory-test-${{ matrix.bucket }}.log') != ''
+        if: always() && hashFiles(format('advisory-test-{0}.log', matrix.bucket)) != ''
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: advisory-test-log-${{ matrix.bucket }}

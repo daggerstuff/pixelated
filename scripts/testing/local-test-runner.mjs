@@ -142,7 +142,7 @@ function buildVitestArgs(suite, passedArgs) {
       // Each entry must be a glob; bare dirs don't expand.
       process.env["VITEST_TARGET_TESTS"] = dirs
         .map((dir) => `${dir}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}`)
-        .join(",");
+        .join(";");
     }
     return passedArgs;
   }
