@@ -39,49 +39,89 @@ warn() {
   printf '%sWARN:%s %s\n' "$YELLOW" "$NC" "$1"
 }
 
+if command -v rg >/dev/null 2>&1; then
+  SEARCH_TOOL="rg"
+else
+  SEARCH_TOOL="grep"
+  warn "rg not found; falling back to grep for Redis hardening checks."
+fi
+
+search_regex() {
+  local pattern="$1"
+  local file="$2"
+
+  if [ "$SEARCH_TOOL" = "rg" ]; then
+    rg -q -- "$pattern" "$file"
+  else
+    grep -Eq -- "$pattern" "$file"
+  fi
+}
+
+search_fixed() {
+  local pattern="$1"
+  local file="$2"
+
+  if [ "$SEARCH_TOOL" = "rg" ]; then
+    rg -q --fixed-strings -- "$pattern" "$file"
+  else
+    grep -Fq -- "$pattern" "$file"
+  fi
+}
+
+search_pcre() {
+  local pattern="$1"
+  local file="$2"
+
+  if [ "$SEARCH_TOOL" = "rg" ]; then
+    rg -q --pcre2 -- "$pattern" "$file"
+  else
+    grep -Pq -- "$pattern" "$file"
+  fi
+}
+
 check_file() {
   local file="$1"
   local rel="${file#$ROOT_DIR/}"
 
   echo -e "\nChecking: $rel"
 
-  if ! rg -q "redis-server" "$file"; then
+  if ! search_regex "redis-server" "$file"; then
     warn "No redis-server invocation found; skipping hardening pattern checks."
     return
   fi
 
   # Accept either inline --requirepass or Docker secrets-based password (more secure)
-  if rg -q --fixed-strings -- "--requirepass" "$file" || \
-     rg -q --fixed-strings -- "REDIS_PASSWORD_FILE" "$file" || \
-     rg -q --fixed-strings -- "/run/secrets/redis-password" "$file"; then
+  if search_fixed "--requirepass" "$file" || \
+     search_fixed "REDIS_PASSWORD_FILE" "$file" || \
+     search_fixed "/run/secrets/redis-password" "$file"; then
     ok "$rel has requirepass"
   else
     fail "$rel missing --requirepass in redis command"
   fi
 
-  if ! rg -q --fixed-strings -- "--protected-mode yes" "$file"; then
+  if ! search_fixed "--protected-mode yes" "$file"; then
     fail "$rel missing protected-mode yes"
   else
     ok "$rel has protected-mode yes"
   fi
 
-  if ! rg -q --fixed-strings -- "--bind 0.0.0.0" "$file"; then
+  if ! search_fixed "--bind 0.0.0.0" "$file"; then
     fail "$rel missing explicit bind 0.0.0.0 in redis-server command"
   else
     ok "$rel has explicit bind 0.0.0.0"
   fi
 
-  if rg -q --pcre2 -- "[\"']?[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+:[0-9]+:6379[\"']?" "$file"; then
-    if ! rg -q --pcre2 -- "['\"]?127\\.0\\.0\\.1:[0-9]+:6379['\"]?" "$file" && \
-       ! rg -q --pcre2 -- "\\[::1\\]:[0-9]+:6379" "$file"; then
+  if search_pcre "[\"']?[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+:[0-9]+:6379[\"']?" "$file"; then
+    if ! search_pcre "['\"]?127\\.0\\.0\\.1:[0-9]+:6379['\"]?" "$file" && \
+       ! search_pcre "\\[::1\\]:[0-9]+:6379" "$file"; then
       fail "$rel exposes Redis port mapping to non-loopback host interface (e.g. 0.0.0.0)"
     else
       ok "$rel redis host mapping (if present) remains loopback-only"
     fi
   fi
 
-  if rg -q --pcre2 -- "\$\{REDIS_PASSWORD:[^}]+\}" "$file" && \
-     ! rg -q --fixed-strings -- '${REDIS_PASSWORD:?REDIS_PASSWORD is required}' "$file"; then
+  if search_pcre "\$\{REDIS_PASSWORD:[^}]+\}" "$file" && \
+     ! search_fixed '${REDIS_PASSWORD:?REDIS_PASSWORD is required}' "$file"; then
     fail "$rel uses a non-strict REDIS_PASSWORD interpolation"
   fi
 }
