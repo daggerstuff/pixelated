@@ -83,8 +83,8 @@ const organizationSchema = {
     'contactType': 'Customer Service',
   },
   'sameAs': [
-    'https://x.com/pixelatedempathy',
-    'https://github.com/nochadisfaction/pixelated',
+    'https://x.com/juggledaggers',
+    'https://github.com/daggerstuff/pixelated',
   ],
 };
 ---
@@ -118,9 +118,9 @@ const organizationSchema = {
     <script is:inline nonce={cspNonce}>
       const storedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.dataset.theme = storedTheme || (prefersDark ? 'dark' : 'light');
+      document.documentElement.dataset['theme'] = storedTheme || (prefersDark ? 'dark' : 'light');
     </script>
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replace(/</g, '\\u003c').replace(/>/g, '\\u003e')} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replaceAll(String.fromCharCode(60), '\\u003c').replaceAll(String.fromCharCode(62), '\\u003e')}></script>
   </head>
   <body>
     <header class="site-header">
@@ -158,9 +158,9 @@ const organizationSchema = {
     <script>
       const toggle = document.querySelector('[data-theme-toggle]');
       toggle?.addEventListener('click', () => {
-        const current = document.documentElement.dataset.theme;
+        const current = document.documentElement.dataset['theme'];
         const next = current === 'dark' ? 'light' : 'dark';
-        document.documentElement.dataset.theme = next;
+        document.documentElement.dataset['theme'] = next;
         localStorage.setItem('theme', next);
       });
     </script>
