@@ -24,7 +24,8 @@ html {
   overscroll-behavior: none;
 }
 
-body, html {
+body,
+html {
   overflow-x: hidden !important;
 }
 
@@ -32,14 +33,19 @@ body, html {
   height: var(--viewport-height);
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-size: 16px; /* prevent mobile zoom */
 }
 
 /* ==========================================
    TOUCH INTERACTIONS
    ========================================== */
-button, a, .touch-target, .touch-focus {
+button,
+a,
+.touch-target,
+.touch-focus {
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -54,7 +60,7 @@ button, a, .touch-target, .touch-focus {
 }
 
 .touch-focus:focus-visible {
-  outline: 2px solid var(--color-accent, #A44F33);
+  outline: 2px solid var(--color-accent, oklch(0.54 0.14 35));
   outline-offset: 2px;
 }
 
@@ -68,9 +74,15 @@ button, a, .touch-target, .touch-focus {
   padding-right: env(safe-area-inset-right, 0);
 }
 
-.has-safe-top { padding-top: env(safe-area-inset-top); }
-.has-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-.bottom-nav { padding-bottom: calc(1rem + env(safe-area-inset-bottom)); }
+.has-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.has-safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.bottom-nav {
+  padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+}
 
 /* ==========================================
    SMOOTH SCROLLING / FIXED ELEMENTS
@@ -103,10 +115,14 @@ button, a, .touch-target, .touch-focus {
    HOVER STATES (avoid sticky hover on mobile)
    ========================================== */
 @media (hover: hover) {
-  .button:hover { background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.1)); }
+  .button:hover {
+    background-color: var(--hover-bg-color, rgba(0, 0, 0, 0.1));
+  }
 }
 @media (hover: none) {
-  .button:active { background-color: var(--active-bg-color, rgba(0, 0, 0, 0.2)); }
+  .button:active {
+    background-color: var(--active-bg-color, rgba(0, 0, 0, 0.2));
+  }
 }
 
 /* ==========================================
@@ -154,7 +170,9 @@ button, a, .touch-target, .touch-focus {
   .note-row {
     grid-template-columns: 1fr;
   }
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     max-width: 100%;
   }
 }
@@ -163,7 +181,8 @@ button, a, .touch-target, .touch-focus {
    GENERAL MOBILE LAYOUT (768px)
    ========================================== */
 @media (max-width: 768px) {
-  main, #main-content {
+  main,
+  #main-content {
     width: 100% !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
@@ -184,7 +203,8 @@ button, a, .touch-target, .touch-focus {
     padding-right: var(--spacing-4, 1rem) !important;
   }
 
-  .grid, .grid-brutalist {
+  .grid,
+  .grid-brutalist {
     gap: var(--spacing-4, 1rem) !important;
   }
 
@@ -195,52 +215,92 @@ button, a, .touch-target, .touch-focus {
     grid-template-columns: 1fr !important;
   }
 
-  .flex-col, .flex-row {
+  .flex-col,
+  .flex-row {
     gap: var(--spacing-4, 1rem) !important;
   }
 
   /* Cards */
-  .card, [class*='card'] {
+  .card,
+  [class*="card"] {
     margin-bottom: var(--spacing-4, 1rem) !important;
     padding: var(--spacing-4, 1rem) !important;
   }
 
   /* Buttons */
-  button, .button, [class*='btn'] {
+  button,
+  .button,
+  [class*="btn"] {
     min-height: 44px;
     padding: 0.75rem 1rem !important;
   }
 
   /* Typography */
-  h1 { font-size: 1.75rem !important; line-height: 1.2 !important; }
-  h2 { font-size: 1.5rem !important; line-height: 1.3 !important; }
-  h3 { font-size: 1.25rem !important; line-height: 1.4 !important; }
+  h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.2 !important;
+  }
+  h2 {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+  }
+  h3 {
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
+  }
 
-  .text-5xl, .text-4xl { font-size: 1.875rem !important; line-height: 1.2 !important; }
-  .text-3xl { font-size: 1.5rem !important; line-height: 1.3 !important; }
-  .text-2xl { font-size: 1.25rem !important; line-height: 1.4 !important; }
-  .text-xl { font-size: 1.125rem !important; line-height: 1.4 !important; }
-  .text-lg { font-size: 1rem !important; line-height: 1.5 !important; }
+  .text-5xl,
+  .text-4xl {
+    font-size: 1.875rem !important;
+    line-height: 1.2 !important;
+  }
+  .text-3xl {
+    font-size: 1.5rem !important;
+    line-height: 1.3 !important;
+  }
+  .text-2xl {
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
+  }
+  .text-xl {
+    font-size: 1.125rem !important;
+    line-height: 1.4 !important;
+  }
+  .text-lg {
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+  }
 
   /* Override */
-  .max-w-6xl, .max-w-5xl, .max-w-4xl, .max-w-3xl, .max-w-2xl {
+  .max-w-6xl,
+  .max-w-5xl,
+  .max-w-4xl,
+  .max-w-3xl,
+  .max-w-2xl {
     max-width: 100% !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
 
   /* Form */
-  input, textarea, select {
+  input,
+  textarea,
+  select {
     width: 100% !important;
     padding: 0.75rem !important;
     font-size: 1rem !important;
   }
 
   /* Prose */
-  .prose { max-width: 100% !important; padding: 0 1rem !important; }
+  .prose {
+    max-width: 100% !important;
+    padding: 0 1rem !important;
+  }
 
   /* Navigation */
-  nav { padding: 1rem !important; }
+  nav {
+    padding: 1rem !important;
+  }
 
   /* Background enhancements */
   body {
@@ -252,11 +312,18 @@ button, a, .touch-target, .touch-focus {
   }
 
   /* Particles hidden */
-  .particle, .particles-container { display: none !important; }
+  .particle,
+  .particles-container {
+    display: none !important;
+  }
 
   /* Rounded corner simplification */
-  .rounded-3xl { border-radius: 1rem !important; }
-  .rounded-2xl { border-radius: 0.75rem !important; }
+  .rounded-3xl {
+    border-radius: 1rem !important;
+  }
+  .rounded-2xl {
+    border-radius: 0.75rem !important;
+  }
 
   /* Stats grid preserve 2-col */
   .grid-cols-2.lg\\:grid-cols-4 {
@@ -265,13 +332,18 @@ button, a, .touch-target, .touch-focus {
   }
 
   /* Ensure touch targets */
-  button, .button, a[role='button'], input[type='submit'] {
+  button,
+  .button,
+  a[role="button"],
+  input[type="submit"] {
     min-height: 44px !important;
     min-width: 44px !important;
   }
 
   /* Form group spacing */
-  .form-group { margin-bottom: 16px; }
+  .form-group {
+    margin-bottom: 16px;
+  }
 
   /* Validation */
   .validation-error-summary {
@@ -279,33 +351,69 @@ button, a, .touch-target, .touch-focus {
     border-radius: 0;
   }
 
-  * { max-width: 100vw; }
-  img { max-width: 100% !important; height: auto !important; }
-  .min-h-screen { min-height: 100vh !important; min-height: 100dvh !important; }
+  * {
+    max-width: 100vw;
+  }
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  .min-h-screen {
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+  }
 
-  .particle { display: none !important; }
-  .animate-pulse, .animate-bounce { animation: none !important; }
+  .particle {
+    display: none !important;
+  }
+  .animate-pulse,
+  .animate-bounce {
+    animation: none !important;
+  }
 }
 
 /* ==========================================
    EXTRA SMALL (480px)
    ========================================== */
 @media (max-width: 480px) {
-  .container { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
-  section { padding-left: 0.75rem !important; padding-right: 0.75rem !important; }
-  h1 { font-size: 1.5rem !important; }
-  h2 { font-size: 1.25rem !important; }
-  .flex-row { flex-direction: column !important; }
-  .text-base { font-size: 0.875rem !important; }
-  .text-sm { font-size: 0.75rem !important; }
-  .gap-4, .gap-6 { gap: 0.75rem !important; }
-  .mb-8, .mb-6 { margin-bottom: 1rem !important; }
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  section {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  h1 {
+    font-size: 1.5rem !important;
+  }
+  h2 {
+    font-size: 1.25rem !important;
+  }
+  .flex-row {
+    flex-direction: column !important;
+  }
+  .text-base {
+    font-size: 0.875rem !important;
+  }
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+  .gap-4,
+  .gap-6 {
+    gap: 0.75rem !important;
+  }
+  .mb-8,
+  .mb-6 {
+    margin-bottom: 1rem !important;
+  }
 
   /* Background */
   body {
     background-size: cover;
   }
-  .card, [class*='card'] {
+  .card,
+  [class*="card"] {
     border-width: 1px;
   }
 }
@@ -318,10 +426,15 @@ button, a, .touch-target, .touch-focus {
     height: auto;
     min-height: var(--spacing-16, 4rem);
   }
-  .container-refined { padding: 0 var(--spacing-4, 1rem); }
+  .container-refined {
+    padding: 0 var(--spacing-4, 1rem);
+  }
 }
 @media (min-width: 640px) and (max-width: 767px) {
-  .container-refined { padding: 0 var(--spacing-6, 1.5rem); max-width: 640px; }
+  .container-refined {
+    padding: 0 var(--spacing-6, 1.5rem);
+    max-width: 640px;
+  }
 }
 
 /* ==========================================
@@ -335,15 +448,22 @@ button, a, .touch-target, .touch-focus {
     min-height: 44px;
     padding: var(--spacing-2, 0.5rem);
   }
-  .theme-toggle-unified svg { width: 16px; height: 16px; }
-  .theme-tooltip { font-size: var(--text-xs, 0.75rem); bottom: -2rem; }
+  .theme-toggle-unified svg {
+    width: 16px;
+    height: 16px;
+  }
+  .theme-tooltip {
+    font-size: var(--text-xs, 0.75rem);
+    bottom: -2rem;
+  }
 }
 
 /* ==========================================
    INDEX / HERO RESPONSIVE
    ========================================== */
 @media (max-width: 768px) {
-  .hero-section, section:first-child {
+  .hero-section,
+  section:first-child {
     padding-top: 6rem !important;
     text-align: center !important;
   }
@@ -366,7 +486,9 @@ button, a, .touch-target, .touch-focus {
   .footer-container {
     padding: var(--spacing-10, 2.5rem) var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
   }
-  .footer-grid { gap: var(--spacing-8, 2rem); }
+  .footer-grid {
+    gap: var(--spacing-8, 2rem);
+  }
 }
 
 /* ==========================================
@@ -382,7 +504,9 @@ button, a, .touch-target, .touch-focus {
     padding: var(--spacing-4, 1rem);
     margin-top: var(--spacing-8, 2rem);
   }
-  .form-responsive { max-width: 100%; }
+  .form-responsive {
+    max-width: 100%;
+  }
 }
 
 /* ==========================================
@@ -394,19 +518,21 @@ button, a, .touch-target, .touch-focus {
     font-size: 16px;
     padding: 12px;
   }
-  input[aria-invalid='true'],
-  textarea[aria-invalid='true'],
-  select[aria-invalid='true'] {
+  input[aria-invalid="true"],
+  textarea[aria-invalid="true"],
+  select[aria-invalid="true"] {
     border: 2px solid #e53e3e;
     box-shadow: 0 0 0 1px #e53e3e;
     background-color: #fff5f5;
   }
-  input:focus, textarea:focus, select:focus {
+  input:focus,
+  textarea:focus,
+  select:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
     border-color: #4299e1;
   }
-  [id$='-error'] {
+  [id$="-error"] {
     color: #e53e3e;
     font-size: 14px;
     margin-top: 4px;
