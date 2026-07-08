@@ -40,43 +40,67 @@ echo "🔍 Verifying static assets at ${SITE_URL}..."
 
 HOMEPAGE_HTML="$(mktemp)"
 CSS_HEADERS="$(mktemp)"
+LAST_ASSET_ERROR=""
 
 cleanup() {
     rm -f "${HOMEPAGE_HTML}" "${CSS_HEADERS}"
 }
 trap cleanup EXIT
 
-if ! curl -f -s "${SITE_URL}/" > "${HOMEPAGE_HTML}"; then
-    echo "❌ Deployment verification failed: Homepage unreachable at ${SITE_URL}/"
-    exit 1
-fi
+verify_static_assets_once() {
+    : > "${HOMEPAGE_HTML}"
+    : > "${CSS_HEADERS}"
 
-CSS_PATH="$(grep -oE '/_astro/[^"]+\.css' "${HOMEPAGE_HTML}" | head -n 1 || true)"
-if [[ -z "${CSS_PATH}" ]]; then
-    echo "❌ Deployment verification failed: no Astro stylesheet reference found on homepage"
-    exit 1
-fi
+    if ! curl -f -s "${SITE_URL}/" > "${HOMEPAGE_HTML}"; then
+        LAST_ASSET_ERROR="Homepage unreachable at ${SITE_URL}/"
+        return 1
+    fi
 
-if ! curl -sS -D "${CSS_HEADERS}" -o /dev/null "${SITE_URL}${CSS_PATH}"; then
-    echo "❌ Deployment verification failed: stylesheet request failed at ${SITE_URL}${CSS_PATH}"
-    exit 1
-fi
+    CSS_PATH="$(grep -oE '/_astro/[^"]+\.css' "${HOMEPAGE_HTML}" | head -n 1 || true)"
+    if [[ -z "${CSS_PATH}" ]]; then
+        LAST_ASSET_ERROR="No Astro stylesheet reference found on homepage"
+        return 1
+    fi
 
-if ! grep -qE '^HTTP/.* 200' "${CSS_HEADERS}"; then
-    echo "❌ Deployment verification failed: stylesheet returned non-200 at ${SITE_URL}${CSS_PATH}"
-    exit 1
-fi
+    if ! curl -sS -D "${CSS_HEADERS}" -o /dev/null "${SITE_URL}${CSS_PATH}"; then
+        LAST_ASSET_ERROR="Stylesheet request failed at ${SITE_URL}${CSS_PATH}"
+        return 1
+    fi
 
-if ! grep -qi '^content-type: text/css' "${CSS_HEADERS}"; then
-    echo "❌ Deployment verification failed: stylesheet content-type was not text/css at ${SITE_URL}${CSS_PATH}"
-    exit 1
-fi
+    if ! grep -qE '^HTTP/.* 200' "${CSS_HEADERS}"; then
+        LAST_ASSET_ERROR="Stylesheet returned non-200 at ${SITE_URL}${CSS_PATH}"
+        return 1
+    fi
 
-if ! curl -f -s "${SITE_URL}/favicon.svg" > /dev/null; then
-    echo "❌ Deployment verification failed: favicon missing at ${SITE_URL}/favicon.svg"
-    exit 1
-fi
+    if ! grep -qi '^content-type: text/css' "${CSS_HEADERS}"; then
+        LAST_ASSET_ERROR="Stylesheet content-type was not text/css at ${SITE_URL}${CSS_PATH}"
+        return 1
+    fi
 
-echo "✅ Static asset verification passed."
+    if ! curl -f -s "${SITE_URL}/favicon.svg" > /dev/null; then
+        LAST_ASSET_ERROR="Favicon missing at ${SITE_URL}/favicon.svg"
+        return 1
+    fi
 
-exit 0
+    return 0
+}
+
+MAX_ASSET_RETRIES="${MAX_ASSET_RETRIES:-12}"
+ASSET_RETRY_DELAY_SECONDS="${ASSET_RETRY_DELAY_SECONDS:-10}"
+ASSET_RETRY_COUNT=0
+
+while [[ ${ASSET_RETRY_COUNT} -lt ${MAX_ASSET_RETRIES} ]]; do
+    if verify_static_assets_once; then
+        echo "✅ Static asset verification passed."
+        exit 0
+    fi
+
+    ASSET_RETRY_COUNT=$((ASSET_RETRY_COUNT + 1))
+    if [[ ${ASSET_RETRY_COUNT} -lt ${MAX_ASSET_RETRIES} ]]; then
+        echo "⏳ Static assets not consistent yet (${ASSET_RETRY_COUNT}/${MAX_ASSET_RETRIES}): ${LAST_ASSET_ERROR}"
+        sleep "${ASSET_RETRY_DELAY_SECONDS}"
+    fi
+done
+
+echo "❌ Deployment verification failed: ${LAST_ASSET_ERROR}"
+exit 1
