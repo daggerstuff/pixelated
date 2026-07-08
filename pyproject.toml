@@ -100,7 +100,7 @@ dependencies = [
   "rich>=13.7.0",
   "ngcsdk>=4.16.0",
   # Security: Fixes GHSA-hqmj-h5c6-369m, GHSA-p433-9wv8-28xj, GHSA-cmw6-hcpp-c6jp
-  "onnx>=1.21.0",
+  "onnx>=1.22.0",
   "onnxscript>=0.6.2",
   "fastapi>=0.124.4",
   "uvicorn>=0.44.0",
