@@ -60,8 +60,9 @@ const coverageEnabled =
       : !process.env['CI']
 
 const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
-  ? process.env['VITEST_TARGET_TESTS']
-      .split(',')
+  ? (process.env['VITEST_TARGET_TESTS'].includes(';') || process.env['VITEST_TARGET_TESTS'].includes('{')
+      ? process.env['VITEST_TARGET_TESTS'].split(';')
+      : process.env['VITEST_TARGET_TESTS'].split(','))
       .map((entry) => entry.trim())
       .filter(Boolean)
   : []
@@ -160,6 +161,7 @@ export default defineConfig({
       'backups/**',
       'backups/**/*',
       'worktrees/**',
+      'ai/.venv/**',
       ...nodeTestGlobs,
     ],
     projects: [
@@ -258,6 +260,7 @@ export default defineConfig({
             'backups/**',
             'backups/**/*',
             'worktrees/**',
+            'ai/.venv/**',
           ],
         },
       },
@@ -287,7 +290,7 @@ export default defineConfig({
                   'src/tests/auth.test.ts',
                   'src/tests/integration/dream-consolidation.integration.test.ts',
                 ],
-          exclude: [...cpuBoundNodeTestExcludes],
+          exclude: ['**/node_modules/**', '**/dist/**', '.idea/**', '.git/**', '.cache/**', 'backups/**', 'worktrees/**', 'ai/.venv/**', ...cpuBoundNodeTestExcludes],
           environment: 'node',
           isolate: true,
         },
