@@ -124,6 +124,10 @@ const organizationSchema = {
       const storedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.dataset['theme'] = storedTheme || (prefersDark ? 'dark' : 'light');
+      // Keel reference is light-first: when no stored preference and system is light, render light.
+      if (!storedTheme && !prefersDark) {
+        document.documentElement.dataset['theme'] = 'light';
+      }
     </script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replaceAll(String.fromCharCode(60), '\\u003c').replaceAll(String.fromCharCode(62), '\\u003e')}></script>
   </head>
