@@ -1,46 +1,58 @@
 /* ================================================
-KEEL DESIGN SYSTEM — PIXELATED EMPATHY
-Warm neutral palette with amber accent
-================================================ */
+   PIXELATED EMPATHY — Single :root source
+   Dark-first. Emerald brand. Terracotta accent.
+   ================================================ */
 
 :root {
-  /* === THE CANVAS (keel light mode) === */
-  --bg-primary: oklch(0.99 0.003 100);
-  --bg-secondary: oklch(0.965 0.004 100);
-  --bg-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
-  --text-primary: oklch(0.25 0.01 250);
-  --text-secondary: oklch(0.5 0.012 250);
-  --text-muted: oklch(0.6 0.01 250);
+  color-scheme: dark;
 
-  /* === ACCENT (Amber / Terracotta — keel) === */
-  --accent-primary: oklch(0.54 0.14 35);
-  --accent-primary-rgb: 164, 79, 51;
-  --accent-secondary: color-mix(in oklch, oklch(0.54 0.14 35), black 12%);
-  --accent-success: #10b981;
+  /* === FONTS (keel) === */
+  --font-display: "Fraunces Variable", Georgia, serif;
+  --font-body: "Public Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
-  /* === SEMANTIC COLORS (Accessible) === */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  /* === BRAND (Emerald) === */
+  --color-brand: #10B981;
+  --color-brand-hover: #059669;
+  --color-brand-soft: rgba(16, 185, 129, 0.16);
 
-  /* === STRUCTURAL === */
-  --border-subtle: oklch(0.86 0.008 100);
-  --border-primary: oklch(0.72 0.012 120);
-  --border-primary-rgb: 100, 100, 100;
-  --divider-dotted: oklch(0.86 0.008 100);
-  --divider-weak: oklch(0.94 0.006 100);
-  --bg-surface-ghost: oklch(0.94 0.006 100);
-  --radius-sm: 0px;
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-button: 0px;
-  --radius-card: 0px;
+  /* === ACCENT (Terracotta) === */
+  --color-accent: #A44F33;
+  --color-accent-rgb: 164, 79, 51;
+  --color-accent-hover: #8B3F26;
+  --color-accent-soft: rgba(164, 79, 51, 0.16);
 
-  /* === ANIMATION === */
+  /* === DARK CANVAS (default) === */
+  --color-bg: #050505;
+  --color-surface: #0B0B0B;
+  --color-elevated: #0F0F0F;
+  --color-glass: color-mix(in oklch, #0B0B0B 80%, transparent);
+  --color-text: #FFFFFF;
+  --color-muted: #D1FAE5;
+  --color-line: rgba(255, 255, 255, 0.06);
+  --color-line-strong: rgba(255, 255, 255, 0.12);
+  --color-soft: rgba(255, 255, 255, 0.04);
+  --color-overlay: rgba(0, 0, 0, 0.75);
+
+  /* === KEEP keel --color-* aliases (for component compat) === */
+  --bg-primary: #050505;
+  --bg-secondary: #0B0B0B;
+  --bg-glass: color-mix(in oklch, #0B0B0B 80%, transparent);
+  --text-primary: #FFFFFF;
+  --text-secondary: #D1FAE5;
+  --text-muted: #86EFAC;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-primary: rgba(255, 255, 255, 0.12);
+  --border-primary-rgb: 255, 255, 255;
+  --divider-dotted: rgba(255, 255, 255, 0.06);
+  --divider-weak: rgba(255, 255, 255, 0.04);
+  --bg-surface-ghost: rgba(255, 255, 255, 0.04);
+
+  /* === ANIMATION (keel tokens) === */
   --duration-fast: 0.15s;
-  --duration-normal: 0.2s;
+  --duration-normal: 0.18s;
   --duration-slow: 0.3s;
+  --duration-cascade: 0.56s;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
@@ -51,14 +63,26 @@ Warm neutral palette with amber accent
   --transition-slow: var(--duration-slow) var(--ease-out);
   --transition-spring: var(--duration-normal) var(--ease-spring);
 
-  /* === LAYOUT === */
+  /* === KEEL CSS custom property aliases (for keel-theme.css compat) === */
+  --focus-ring: 0 0 0 3px var(--color-accent-soft);
+  --content-width: 1160px;
+  --prose-width: 68ch;
+  --page-pad: clamp(1rem, 3vw, 2rem);
+  --baseline: 1.5rem;
+  --hairline: 1px solid var(--border-subtle);
+
+  /* === STRUCTURAL === */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-button: 0px;
+  --radius-card: 0px;
+
   --max-content-width: 76rem;
   --max-editorial-width: 55rem;
   --grid-unit: 8px;
-  --section-padding-y: 5rem;
-
-  --spacing-5: 20px;
-  --spacing-20: 80px;
+  --section-padding-y: clamp(3.5rem, 5.5vw, 5.5rem);
 
   /* === Z-INDEX === */
   --z-base: 1;
@@ -68,35 +92,27 @@ Warm neutral palette with amber accent
   --z-modal: 300;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-primary: oklch(0.18 0.009 250);
-    --bg-secondary: oklch(0.22 0.01 250);
-    --bg-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
-    --text-primary: oklch(0.93 0.006 95);
-    --text-secondary: oklch(0.69 0.012 250);
-    --text-muted: oklch(0.6 0.01 250);
-    --accent-primary: oklch(0.72 0.13 42);
-    --accent-primary-rgb: 204, 152, 89;
-    --accent-secondary: color-mix(in oklch, oklch(0.72 0.13 42), white 10%);
-    --border-subtle: oklch(0.34 0.012 250);
-    --border-primary: oklch(0.44 0.016 230);
-    --divider-dotted: oklch(0.34 0.012 250);
-    --divider-weak: oklch(0.26 0.01 250);
-    --bg-surface-ghost: oklch(0.26 0.01 250);
-  }
-}
-
+/* === LIGHT THEME OVERRIDE === */
 :root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: oklch(0.99 0.003 100);
+  --color-surface: oklch(0.965 0.004 100);
+  --color-elevated: #FFFFFF;
+  --color-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
+  --color-text: oklch(0.25 0.01 250);
+  --color-muted: oklch(0.5 0.012 250);
+  --color-line: oklch(0.86 0.008 100);
+  --color-line-strong: oklch(0.72 0.012 120);
+  --color-soft: oklch(0.94 0.006 100);
+  --color-overlay: rgba(0, 0, 0, 0.5);
+
   --bg-primary: oklch(0.99 0.003 100);
   --bg-secondary: oklch(0.965 0.004 100);
   --bg-glass: color-mix(in oklch, oklch(0.965 0.004 100) 80%, transparent);
   --text-primary: oklch(0.25 0.01 250);
   --text-secondary: oklch(0.5 0.012 250);
   --text-muted: oklch(0.6 0.01 250);
-  --accent-primary: oklch(0.54 0.14 35);
-  --accent-primary-rgb: 164, 79, 51;
-  --accent-secondary: color-mix(in oklch, oklch(0.54 0.14 35), black 12%);
   --border-subtle: oklch(0.86 0.008 100);
   --border-primary: oklch(0.72 0.012 120);
   --divider-dotted: oklch(0.86 0.008 100);
@@ -104,19 +120,58 @@ Warm neutral palette with amber accent
   --bg-surface-ghost: oklch(0.94 0.006 100);
 }
 
-:root[data-theme='dark'] {
-  --bg-primary: oklch(0.18 0.009 250);
-  --bg-secondary: oklch(0.22 0.01 250);
-  --bg-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
-  --text-primary: oklch(0.93 0.006 95);
-  --text-secondary: oklch(0.69 0.012 250);
-  --text-muted: oklch(0.6 0.01 250);
-  --accent-primary: oklch(0.72 0.13 42);
-  --accent-primary-rgb: 204, 152, 89;
-  --accent-secondary: color-mix(in oklch, oklch(0.72 0.13 42), white 10%);
-  --border-subtle: oklch(0.34 0.012 250);
-  --border-primary: oklch(0.44 0.016 230);
-  --divider-dotted: oklch(0.34 0.012 250);
-  --divider-weak: oklch(0.26 0.01 250);
-  --bg-surface-ghost: oklch(0.26 0.01 250);
+/* === BASE ELEMENT RESETS === */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background-color: var(--color-bg) !important;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background-color: var(--color-bg) !important;
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-text);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:not(.brand, .button) {
+  background-image: linear-gradient(var(--color-accent), var(--color-accent));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0 1px;
+  transition: background-size 180ms ease, color 180ms ease;
+}
+
+a:not(.brand, .button):hover {
+  color: var(--color-accent-hover);
+  background-size: 100% 1px;
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 3px;
+  box-shadow: var(--focus-ring);
 }
