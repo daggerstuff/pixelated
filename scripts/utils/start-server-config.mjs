@@ -67,17 +67,24 @@ async function findHandlerEntryPath(serverDir) {
 export async function resolveSsrEntryModuleUrl({ cwd = process.cwd(), env = process.env } = {}) {
   if (hasConfiguredValue(env.SSR_ENTRY_FILE)) {
     const rawEntry = String(env.SSR_ENTRY_FILE);
-    // Validate SSR_ENTRY_FILE is within cwd to prevent path traversal
-    const resolvedEntry = path.resolve(cwd, rawEntry);
     const normalizedCwd = path.resolve(cwd);
-    if (!resolvedEntry.startsWith(normalizedCwd + path.sep) && resolvedEntry !== normalizedCwd) {
+    // Absolute paths (e.g. staged release entries like /tmp/releases/current/dist/server/entry.mjs)
+    // are accepted as-is. Relative paths must resolve inside cwd to prevent traversal.
+    const resolvedEntry = path.isAbsolute(rawEntry)
+      ? path.resolve(rawEntry)
+      : path.resolve(normalizedCwd, rawEntry);
+    if (
+      !path.isAbsolute(rawEntry) &&
+      !resolvedEntry.startsWith(normalizedCwd + path.sep) &&
+      resolvedEntry !== normalizedCwd
+    ) {
       throw new Error(`SSR_ENTRY_FILE resolves outside the project directory: ${rawEntry}`);
     }
     return pathToFileURL(resolvedEntry).href;
   }
 
-  const serverDir = path.resolve(cwd, 'dist/server')
-  const defaultEntry = path.join(serverDir, 'entry2.mjs')
+  const serverDir = path.resolve(cwd, "dist/server");
+  const defaultEntry = path.join(serverDir, "entry2.mjs");
 
   if (existsSync(defaultEntry)) {
     try {
