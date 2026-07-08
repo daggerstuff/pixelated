@@ -102,27 +102,6 @@ class ProductionManager {
         },
       },
       {
-        name: 'staging',
-        type: 'staging',
-        url: 'https://staging.pixelatedempathy.com',
-        apiUrl: 'https://staging-api.pixelatedempathy.com',
-        database: {
-          host: 'staging-db.pixelatedempathy.com',
-          name: 'pixelated_staging',
-          ssl: true,
-        },
-        redis: {
-          host: 'staging-redis.pixelatedempathy.com',
-          port: 6379,
-        },
-        features: {
-          enableRealTimeSync: true,
-          enableAdvancedAnalytics: true,
-          enableExperimentalFeatures: false,
-          enablePerformanceMonitoring: true,
-        },
-      },
-      {
         name: 'production',
         type: 'production',
         url: 'https://pixelatedempathy.com',

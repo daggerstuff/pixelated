@@ -219,9 +219,5 @@ jobs:
           kubectl get ingress -n pixelated-empathy
 
           echo "=== Live site smoke test ==="
-          if [[ "${{ github.ref_name }}" == "main" ]]; then
-            SITE_URL="https://pixelatedempathy.com"
-          else
-            SITE_URL="https://staging.pixelatedempathy.com"
-          fi
+          SITE_URL="https://pixelatedempathy.com"
           bash scripts/deploy/verify-deployment.sh "${SITE_URL}/api/health" "${SITE_URL}"

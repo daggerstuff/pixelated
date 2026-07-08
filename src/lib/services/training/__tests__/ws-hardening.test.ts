@@ -38,11 +38,11 @@ describe('PIX-3935: origin.ts — parseAllowedOrigins', () => {
   it('parses multiple origins and strips trailing slashes', async () => {
     const { parseAllowedOrigins } = await import('../origin')
     const result = parseAllowedOrigins(
-      'https://app.pixelatedempathy.com,https://staging.pixelatedempathy.com/',
+      'https://app.pixelatedempathy.com,https://www.pixelatedempathy.com/',
     )
     expect(result.size).toBe(2)
     expect(result.has('https://app.pixelatedempathy.com')).toBe(true)
-    expect(result.has('https://staging.pixelatedempathy.com')).toBe(true)
+    expect(result.has('https://www.pixelatedempathy.com')).toBe(true)
   })
 })
 

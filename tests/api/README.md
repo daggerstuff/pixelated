@@ -111,9 +111,6 @@ pnpm dlx playwright test tests/api --grep "Security"
 ### Run with Different Environments
 
 ```bash
-# Test against staging
-API_BASE_URL=https://staging.pixelatedempathy.com pnpm dlx playwright test tests/api
-
 # Test against production (read-only tests)
 API_BASE_URL=https://pixelatedempathy.com pnpm dlx playwright test tests/api --grep "GET"
 ```
