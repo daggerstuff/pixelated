@@ -7,11 +7,13 @@ metadata:
     app: pixelated-empathy
 spec:
   replicas: 2
-  # Atomic rollout: keep old pods until new ones (with the new full dist/)
-  # are Ready. Without this, the default RollingUpdate briefly serves a mix of
-  # old and new dist/ trees behind the Service, so HTML from one pod can
-  # reference a _astro/* asset that only exists in the other pod's image
-  # (causes 404s on CSS/JS during/after a deploy).
+  # Atomic rollout: keep ALL old pods serving until new ones (with the new
+  # full dist/) are Ready before any old pod is terminated. This prevents the
+  # default RollingUpdate from briefly serving a mix of old and new dist/
+  # trees behind the Service, where HTML from one pod references a _astro/*
+  # asset that only exists in the other pod's image (404s on CSS/JS during/after
+  # a deploy). maxUnavailable=0 guarantees no pod goes down pre-swap; maxSurge=1
+  # brings the new pod up first (within the 2-replica budget) on a small node.
   strategy:
     type: RollingUpdate
     rollingUpdate:
