@@ -7,6 +7,15 @@ metadata:
     app: pixelated-empathy
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # maxSurge=0: never create more than 2 pods simultaneously.
+      # Without this, k8s tries to schedule a 3rd pod during rollout,
+      # which can fail on a small node and cause the new pod to Terminate.
+      maxSurge: 0
+      # maxUnavailable=1: tolerate 1 pod down during the swap.
+      maxUnavailable: 1
   selector:
     matchLabels:
       app: pixelated-empathy
