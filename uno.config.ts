@@ -1,12 +1,4 @@
-import {
-  defineConfig,
-  presetUno,
-  presetAttributify,
-  presetIcons,
-  presetWebFonts,
-} from 'unocss'
-
-import { shouldDisableRemoteWebFonts } from './src/lib/styles/uno-web-fonts'
+import { defineConfig, presetUno, presetAttributify, presetIcons } from "unocss";
 
 export default defineConfig({
   content: {
@@ -26,18 +18,18 @@ export default defineConfig({
   theme: {
     colors: {
       primary: {
-        500: '#cc7a52',
-        600: '#a44f33',
-        700: '#7d3a25',
+        500: "#cc7a52",
+        600: "#a44f33",
+        700: "#7d3a25",
       },
       secondary: {
-        500: '#007aff',
-        600: '#0056b3',
-        700: '#004080',
-        800: '#002f66',
+        500: "#007aff",
+        600: "#0056b3",
+        700: "#004080",
+        800: "#002f66",
       },
-      foreground: 'oklch(0.93 0.006 95)',
-      background: 'oklch(0.18 0.009 250)',
+      foreground: "oklch(0.93 0.006 95)",
+      background: "oklch(0.18 0.009 250)",
     },
     fontFamily: {
       sans: '"Public Sans", system-ui, sans-serif',
@@ -46,28 +38,16 @@ export default defineConfig({
     },
   },
   presets: [
-    presetUno({ dark: 'class' }),
+    presetUno({ dark: "class" }),
     presetAttributify(),
     presetIcons({
       scale: 1.2,
       warn: false,
     }),
-    ...(shouldDisableRemoteWebFonts(process.env)
-      ? []
-      : [
-          presetWebFonts({
-            fonts: {
-              sans: 'Public Sans:400,600,700',
-              mono: 'JetBrains Mono Variable',
-              display: 'Fraunces Variable',
-            },
-          }),
-        ]),
   ],
   shortcuts: {
-    'btn':
-      'px-4 py-2 inline-block bg-primary-500 text-white cursor-pointer hover:bg-primary-600',
-    'btn-primary': 'btn bg-primary-600 hover:bg-primary-700',
-    'btn-secondary': 'btn bg-secondary-700 hover:bg-secondary-800',
+    btn: "px-4 py-2 inline-block bg-primary-500 text-white cursor-pointer hover:bg-primary-600",
+    "btn-primary": "btn bg-primary-600 hover:bg-primary-700",
+    "btn-secondary": "btn bg-secondary-700 hover:bg-secondary-800",
   },
-})
+});
