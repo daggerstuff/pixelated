@@ -1,0 +1,88 @@
+/* ================================================
+   DESIGN TOKENS — CSS custom properties bridge
+   Source: tokens/design-tokens.json + design-tokens.dark.json
+   ================================================ */
+
+:root {
+  /* === BRAND (Emerald) === */
+  --token-brand-50: #ECFDF5;
+  --token-brand-100: #D1FAE5;
+  --token-brand-200: #A7F3D0;
+  --token-brand-300: #6EE7B7;
+  --token-brand-400: #34D399;
+  --token-brand-500: #10B981;
+  --token-brand-600: #059669;
+  --token-brand-700: #047857;
+  --token-brand-800: #065F46;
+  --token-brand-900: #064E3B;
+  --token-brand: #10B981;
+
+  /* === ACCENT (Terracotta) === */
+  --token-accent-50: #F8E8E2;
+  --token-accent-100: #F0D1C5;
+  --token-accent-200: #DFA28D;
+  --token-accent-300: #CE7758;
+  --token-accent-400: #B65F3D;
+  --token-accent-500: #A44F33;
+  --token-accent-600: #8B3F26;
+  --token-accent-700: #6F2F1B;
+  --token-accent-800: #522112;
+  --token-accent-900: #37170B;
+  --token-accent: #A44F33;
+  --token-accent-hover: #8B3F26;
+  --token-accent-soft: rgba(164, 79, 51, 0.16);
+
+  /* === NEUTRAL SCALE === */
+  --token-neutral-50: #F9FAFB;
+  --token-neutral-100: #F3F4F6;
+  --token-neutral-200: #E5E7EB;
+  --token-neutral-300: #D1D5DB;
+  --token-neutral-400: #9CA3AF;
+  --token-neutral-500: #6B7280;
+  --token-neutral-600: #4B5563;
+  --token-neutral-700: #374151;
+  --token-neutral-800: #1F2937;
+  --token-neutral-900: #111827;
+
+  /* === SPACING (8pt grid) === */
+  --token-space-0: 0px;
+  --token-space-1: 4px;
+  --token-space-2: 8px;
+  --token-space-3: 12px;
+  --token-space-4: 16px;
+  --token-space-5: 20px;
+  --token-space-6: 24px;
+  --token-space-8: 32px;
+  --token-space-10: 40px;
+  --token-space-12: 48px;
+  --token-space-16: 64px;
+  --token-space-20: 80px;
+  --token-space-24: 96px;
+
+  /* === BORDER RADIUS === */
+  --token-radius-none: 0;
+  --token-radius-sm: 0;
+  --token-radius-md: 0;
+  --token-radius-lg: 0;
+  --token-radius-xl: 0;
+  --token-radius-full: 9999px;
+
+  /* === SHADOWS === */
+  --token-shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --token-shadow-2: 0 1px 0 rgba(255, 255, 255, 0.04), 0 4px 12px rgba(0, 0, 0, 0.5);
+  --token-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --token-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  /* === LAYOUT === */
+  --token-max-content: 76rem;
+  --token-max-editorial: 55rem;
+  --token-page-pad: clamp(1rem, 3vw, 2rem);
+  --token-section-pad-y: clamp(3.5rem, 5.5vw, 5.5rem);
+
+  /* === BREAKPOINTS === */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1536px;
+}
