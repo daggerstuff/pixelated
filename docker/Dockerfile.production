@@ -91,6 +91,10 @@ RUN groupadd -g 1001 nodejs && useradd -u 1001 -g nodejs -s /bin/sh -m pixelated
 # production pruning of packages that still resolve at runtime in SSR output.
 COPY --from=prod-deps --chown=pixelated:nodejs /app/node_modules ./node_modules
 COPY --from=build --chown=pixelated:nodejs /app/dist ./dist
+COPY --from=build --chown=pixelated:nodejs /app/scripts/utils/start-server.mjs ./start-server.mjs
+COPY --from=build --chown=pixelated:nodejs /app/scripts/utils/start-server-config.mjs ./start-server-config.mjs
+COPY --from=build --chown=pixelated:nodejs /app/config/instrument.mjs ./instrument.mjs
+COPY --from=build --chown=pixelated:nodejs /app/config/sentry-event-filter.mjs ./sentry-event-filter.mjs
 COPY --chown=pixelated:nodejs package.json ./
 COPY --chown=pixelated:nodejs scripts/ci/docker-entrypoint.js ./docker-entrypoint.js
 
@@ -113,4 +117,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD curl -f http://localhost:${PORT}/api/health || exit 1
 
 # Start application
-CMD ["node", "./docker-entrypoint.js", "node", "./dist/server/entry.mjs"]
+CMD ["node", "./docker-entrypoint.js", "node", "./start-server.mjs"]
