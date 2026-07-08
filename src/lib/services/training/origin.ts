@@ -5,7 +5,7 @@
  * a checker function that rejects handshakes from non-listed origins.
  *
  * Env format: comma-separated list of origins (no trailing slash):
- *   ALLOWED_ORIGINS=https://app.pixelatedempathy.com,https://staging.pixelatedempathy.com
+ *   ALLOWED_ORIGINS=https://app.pixelatedempathy.com
  *
  * A missing or empty variable allows ALL origins (backward compat).
  */

@@ -92,8 +92,8 @@ https://mcp.pixelatedempathy.tech {
     }
 }
 
-# Main Application & Staging Subdomain
-https://staging.pixelatedempathy.tech, https://pixelatedempathy.tech, https://pixelatedempathy.com {
+# Main Application
+https://pixelatedempathy.tech, https://pixelatedempathy.com {
     # Proxy to the main Astro/React application
     reverse_proxy app:4321 {
         header_up Host {host}
