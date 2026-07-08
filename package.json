@@ -298,7 +298,7 @@
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "latest",
     "medium-zoom": "latest",
-    "mongodb": "7.4.0",
+    "mongodb": "7.5.0",
     "mongoose": "^9.7.4",
     "morgan": "^1.11.0",
     "multer": "^2.2.0",
