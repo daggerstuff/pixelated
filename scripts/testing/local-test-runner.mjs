@@ -86,11 +86,18 @@ const ADVISORY_BUCKET_DIRS = {
     "tests/usability",
     "tests/hooks",
   ],
-  // Bucket 3: frontend (~120 files)
-  frontend: [
+  // Bucket 3: frontend split into sub-buckets to reduce per-process memory pressure.
+  // src/components (React/JSX) is the heaviest and gets its own bucket.
+  // src/hooks is moderate but has many small files that benefit from isolation.
+  // Everything else (utils, tests, middleware, workers, pages) is lightweight.
+  frontend-components: [
     "src/components",
-    "src/pages",
+  ],
+  frontend-hooks: [
     "src/hooks",
+  ],
+  frontend-utils: [
+    "src/pages",
     "src/workers",
     "src/middleware",
     "src/utils",
@@ -135,7 +142,7 @@ function buildVitestArgs(suite, passedArgs) {
         );
         process.exit(2);
       }
-      console.log(`Advisory bucket: ${bucket} (${dirs.length} top-level dirs)`);
+      console.log(`Advisory bucket: ${bucket} (${dirs.length} ${dirs.length === 1 ? 'dir' : 'dirs'})`);
       // Vitest 4 lacks --include/exclude CLI flags at the top level; bucket
       // selection is communicated via VITEST_TARGET_TESTS env (read by the
       // project's vitest.config.ts) which sets include under the hood.
