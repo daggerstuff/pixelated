@@ -10,7 +10,3 @@
 	path = foresight
 	url = https://github.com/daggerstuff/foresight.git
 	branch = master
-[submodule "hackathon"]
-	path = hackathon
-	url = https://github.com/daggerstuff/hackathon.git
-	branch = master

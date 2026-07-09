@@ -34,15 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        bucket:
-          [
-            core,
-            lib,
-            frontend-components,
-            frontend-hooks,
-            frontend-utils,
-            agents,
-          ]
+        bucket: [core, lib, frontend-components, frontend-hooks, frontend-utils, agents]
 
     env:
       VITEST_SUITE: advisory
@@ -56,8 +48,6 @@ jobs:
           submodules: false
 
       - name: Initialize submodules
-        env:
-          GITHUB_PAT: ${{ secrets.SUBMODULE_PAT }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
