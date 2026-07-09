@@ -56,25 +56,38 @@ verify_static_assets_once() {
         return 1
     fi
 
-    CSS_PATH="$(grep -oE '/_astro/[^"]+\.css' "${HOMEPAGE_HTML}" | head -n 1 || true)"
-    if [[ -z "${CSS_PATH}" ]]; then
-        LAST_ASSET_ERROR="No Astro stylesheet reference found on homepage"
+    # Collect EVERY /_astro/* asset the homepage references (CSS AND JS).
+    # A page can reference multiple UnoCSS/JS bundles; checking only the
+    # first one (as before) let a 404 on a *later* bundle slip through CI
+    # while prod served broken pages. We must verify all of them.
+    mapfile -t ASSET_PATHS < <(grep -oE '/_astro/[^"]+\.(css|js)' "${HOMEPAGE_HTML}" | sort -u)
+    if [[ ${#ASSET_PATHS[@]} -eq 0 ]]; then
+        LAST_ASSET_ERROR="No /_astro/ asset references found on homepage"
         return 1
     fi
 
-    if ! curl -sS -D "${CSS_HEADERS}" -o /dev/null "${SITE_URL}${CSS_PATH}"; then
-        LAST_ASSET_ERROR="Stylesheet request failed at ${SITE_URL}${CSS_PATH}"
-        return 1
-    fi
+    for ASSET_PATH in "${ASSET_PATHS[@]}"; do
+        : > "${CSS_HEADERS}"
+        if ! curl -sS -D "${CSS_HEADERS}" -o /dev/null "${SITE_URL}${ASSET_PATH}"; then
+            LAST_ASSET_ERROR="Asset request failed at ${SITE_URL}${ASSET_PATH}"
+            return 1
+        fi
 
-    if ! grep -qE '^HTTP/.* 200' "${CSS_HEADERS}"; then
-        LAST_ASSET_ERROR="Stylesheet returned non-200 at ${SITE_URL}${CSS_PATH}"
-        return 1
-    fi
+        if ! grep -qE '^HTTP/.* 200' "${CSS_HEADERS}"; then
+            LAST_ASSET_ERROR="Asset returned non-200 at ${SITE_URL}${ASSET_PATH}"
+            return 1
+        fi
+    done
 
-    if ! grep -qi '^content-type: text/css' "${CSS_HEADERS}"; then
-        LAST_ASSET_ERROR="Stylesheet content-type was not text/css at ${SITE_URL}${CSS_PATH}"
-        return 1
+    # Content-type sanity check on the first stylesheet we found.
+    FIRST_CSS="$(grep -oE '/_astro/[^"]+\.css' "${HOMEPAGE_HTML}" | head -n 1)"
+    if [[ -n "${FIRST_CSS}" ]]; then
+        : > "${CSS_HEADERS}"
+        curl -sS -D "${CSS_HEADERS}" -o /dev/null "${SITE_URL}${FIRST_CSS}"
+        if ! grep -qi '^content-type: text/css' "${CSS_HEADERS}"; then
+            LAST_ASSET_ERROR="Stylesheet content-type was not text/css at ${SITE_URL}${FIRST_CSS}"
+            return 1
+        fi
     fi
 
     if ! curl -f -s "${SITE_URL}/favicon.svg" > /dev/null; then
