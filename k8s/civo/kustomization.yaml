@@ -9,6 +9,13 @@ resources:
   - service.yaml
   - ingress.yaml
 
+# Rewrite `pixelatedempathy/api:latest` placeholder in deployment.yaml.
+# Tag must match the deployed build (see CI IMAGE_TAG).
+images:
+  - name: pixelatedempathy/api
+    newName: pixelatedempathy/api
+    newTag: staging
+
 # Secrets are managed separately via CI/CD or kustomize secrets generator
 # secrets:
 #   - secrets.yaml
