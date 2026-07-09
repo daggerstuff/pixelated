@@ -6,9 +6,8 @@ const rawTargets = process.argv.slice(2)
 const targets = rawTargets.filter((target) => target.trim().length > 0)
 
 if (targets.length === 0) {
-  console.error('Usage: pnpm lint:markdown <file.md> [more.md|dir|glob ...]')
-  console.error('Refusing to lint the entire repo by default. Pass explicit markdown paths.')
-  process.exit(1)
+  console.log('No explicit targets provided; linting all markdown files in repo.')
+  targets.push('**/*.md', '**/*.mdx')
 }
 
 const result = spawnSync(
