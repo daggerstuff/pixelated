@@ -21,7 +21,7 @@ export default defineTool({
     candidate_model_id: z.string().min(1),
     benchmark_suite_version: z.string().min(1),
   }),
-  approval: always() as unknown as () => unknown,
+  approval: always<RunEvaluationInput>(),
   async execute(input: RunEvaluationInput) {
     const model = getModel()
     let preEvalScore: number | null = null
