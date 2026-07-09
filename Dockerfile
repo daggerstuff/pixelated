@@ -1,6 +1,9 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.16.0-bookworm-slim AS base
+FROM node:24.18.0-bookworm-slim AS base
+
+# Apply OS-level security updates to patch known vulnerabilities
+RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
@@ -9,8 +12,8 @@ ARG PNPM_VERSION=11.10.0
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
-# Update all packages first to patch known vulnerabilities
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Upgrade existing packages, then install required ones
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends \
     bash \
     git \
     python3 \
@@ -79,7 +82,7 @@ FROM base AS runtime
 WORKDIR /app
 
 # Install only curl (needed for healthcheck)
-RUN apt-get update && apt-get install -y --no-install-recommends curl && \
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
 # Create non-root user

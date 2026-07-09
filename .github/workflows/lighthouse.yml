@@ -73,6 +73,8 @@ jobs:
 
       - name: Build Astro site
         run: pnpm run build
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
 
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.15.x

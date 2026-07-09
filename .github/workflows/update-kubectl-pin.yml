@@ -1,0 +1,82 @@
+name: Update Kubectl Fallback Version
+
+on:
+  schedule:
+    # Weekly: Tuesday 3:00 AM UTC (stagger from Civo CLI on Monday)
+    - cron: '0 3 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get latest kubectl stable version
+        id: latest
+        run: |
+          LATEST=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null)
+
+          # stable.txt returns something like "v1.33.2"
+          if [[ -z "$LATEST" || "$LATEST" != v* ]]; then
+            echo "❌ Could not resolve a valid version from dl.k8s.io. Got: '$LATEST'"
+            exit 1
+          fi
+
+          echo "Latest stable kubectl: $LATEST"
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Get current pinned version
+        id: current
+        run: |
+          # Grep the KUBE_STABLE= assignment directly (unambiguous — there are two
+          # "falling back to" lines in deploy-civo.yml and the Civo CLI one comes first)
+          CURRENT=$(grep -oP 'KUBE_STABLE="\Kv[\d]+\.[\d]+\.[\d]+' .github/workflows/deploy-civo.yml)
+          echo "Current pin: $CURRENT"
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+
+      - name: Update pin if newer
+        id: update
+        if: steps.latest.outputs.version != steps.current.outputs.version
+        run: |
+          OLD="${{ steps.current.outputs.version }}"
+          NEW="${{ steps.latest.outputs.version }}"
+          echo "Updating pin from $OLD to $NEW"
+
+          # Update both occurrences: the echo message and the variable assignment
+          sed -i "s/falling back to ${OLD}/falling back to ${NEW}/g" .github/workflows/deploy-civo.yml
+          sed -i "s/KUBE_STABLE=\"${OLD}\"/KUBE_STABLE=\"${NEW}\"/g" .github/workflows/deploy-civo.yml
+
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "old=$OLD" >> $GITHUB_OUTPUT
+          echo "new=$NEW" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump kubectl fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}"
+          title: "chore: update kubectl pinned fallback version to ${{ steps.update.outputs.new }}"
+          body: |
+            A new kubectl stable version has been released: **${{ steps.update.outputs.new }}**
+
+            This PR updates the pinned fallback version in `deploy-civo.yml` from `${{ steps.update.outputs.old }}` to `${{ steps.update.outputs.new }}`.
+
+            The fallback is used when `dl.k8s.io` is unreachable during CI deployments.
+
+            Triggered by `update-kubectl-pin` workflow.
+          branch: update-kubectl-pin
+          base: staging
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
