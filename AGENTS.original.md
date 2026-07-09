@@ -86,7 +86,7 @@ Refer to `~/.factory/memories.md` for personal coding preferences and past decis
 
 ## SkillRoute — Skill Discovery & Routing
 
-This workspace uses **SkillRoute** (`erichare/skill-route`) for semantic skill routing when right skill for task is not obvious.
+This workspace uses **SkillRoute** (`erichare/skill-route`) for semantic skill routing when the right skill for a task is not obvious.
 
 ### Installation & Setup
 
@@ -97,8 +97,8 @@ This workspace uses **SkillRoute** (`erichare/skill-route`) for semantic skill r
 
 ### When to Use
 
-- When agent needs to identify best skill for ambiguous or multi-domain task.
-- When task description matches multiple possible skills.
+- When an agent needs to identify the best skill for an ambiguous or multi-domain task.
+- When the task description matches multiple possible skills.
 
 ### Key Commands
 
@@ -112,16 +112,16 @@ skillroute search "<query>"
 
 ### Agent Workflow
 
-1. If next step is unclear, run `skillroute route "<task>"`.
-2. Read returned skill(s) and their confidence scores.
-3. Load recommended skill(s) via Skill tool.
-4. Proceed w/ recommended workflow.
+1. If the next step is unclear, run `skillroute route "<task>"`.
+2. Read the returned skill(s) and their confidence scores.
+3. Load the recommended skill(s) via the Skill tool.
+4. Proceed with the recommended workflow.
 
 ---
 
 ## Foresight Memory & Continuity System
 
-Foresight is persistent memory layer for AI agents — shared across all machines via Ghost Postgres.
+Foresight is the persistent memory layer for AI agents — shared across all machines via Ghost Postgres.
 
 ### When to Use Foresight
 
@@ -141,7 +141,7 @@ Foresight is persistent memory layer for AI agents — shared across all machine
 Every session doing real work should start here:
 
 1. `manage_context_blocks` → get `project_context` + `pending_items`
-2. `search_memories` w/ keywords related to your task
+2. `search_memories` with keywords related to your task
 3. Use findings to inform your approach
 4. `manage_memories` to store lessons or update durable memory when needed
 
@@ -176,7 +176,7 @@ foresight profile              # Build user profile from memories
 ### Best Practices
 
 - **Store decisions, not transcripts** — "Chose streamable-http over stdio for MCP transport" beats 40 lines of deliberation
-- **Tag by category** — `preference` `decision` `lesson` `fact` — makes search precise
+- **Tag by category** — `preference`, `decision`, `lesson`, `fact` — makes search precise
 - **Update context blocks when scope changes** — `pending_items` should reflect reality, not history
 - **Don't hoard** — Foresight is for durable context, not session scratch. One-liners > paragraphs
 - **Search before storing** — avoids duplicates; `search_memories` catches near-matches
@@ -184,7 +184,7 @@ foresight profile              # Build user profile from memories
 ### Infrastructure
 
 - **Service**: systemd user service `foresight-mcp` on port `8764` (streamable-http, endpoint `/mcp`), launched via `scripts/memory/foresight-server.sh`
-- **Storage**: Ghost Postgres — all machines read/write same DB
+- **Storage**: Ghost Postgres — all machines read/write the same DB
 - **Config**: `.env` vars auto-loaded via `python-dotenv` — no `export` needed
 
 ```bash
