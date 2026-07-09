@@ -7,15 +7,18 @@ metadata:
     app: pixelated-empathy
 spec:
   replicas: 2
+  # Atomic rollout: keep ALL old pods serving until new ones (with the new
+  # full dist/) are Ready before any old pod is terminated. This prevents the
+  # default RollingUpdate from briefly serving a mix of old and new dist/
+  # trees behind the Service, where HTML from one pod references a _astro/*
+  # asset that only exists in the other pod's image (404s on CSS/JS during/after
+  # a deploy). maxUnavailable=0 guarantees no pod goes down pre-swap; maxSurge=1
+  # brings the new pod up first (within the 2-replica budget) on a small node.
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      # maxSurge=0: never create more than 2 pods simultaneously.
-      # Without this, k8s tries to schedule a 3rd pod during rollout,
-      # which can fail on a small node and cause the new pod to Terminate.
-      maxSurge: 0
-      # maxUnavailable=1: tolerate 1 pod down during the swap.
-      maxUnavailable: 1
+      maxUnavailable: 0
+      maxSurge: 1
   selector:
     matchLabels:
       app: pixelated-empathy
@@ -34,8 +37,13 @@ spec:
         fsGroup: 1001
       containers:
         - name: pixelated-empathy
+          # Pin to an IMMUTABLE reference (digest or semver), not :latest.
+          # :latest + imagePullPolicy: Always lets two pods pull different
+          # builds, so each bakes a different dist/ _astro hash and the Service
+          # round-robins requests between inconsistent asset sets (404s).
+          # The deploy pipeline MUST substitute the built image digest here.
           image: pixelatedempathy/api:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 4321
