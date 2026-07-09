@@ -57,7 +57,7 @@ jobs:
 
       - name: Initialize submodules
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PAT: ${{ secrets.SUBMODULE_PAT }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
