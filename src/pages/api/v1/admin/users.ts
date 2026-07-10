@@ -4,7 +4,6 @@ import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { query, initializeDatabase } from '../../../../lib/db'
 
 export const prerender = false
-
 const logger = createBuildSafeLogger('admin-users-api')
 
 /**
