@@ -6,15 +6,15 @@
 import { auth0UserService } from '../../services/auth0.service'
 import { developerApiKeyManager } from '../db/developer-api-keys'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
+import { getFromCache, setInCache } from '../redis'
+import { logSecurityEvent, SecurityEventType } from '../security'
 import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
 import { validateToken } from './auth0-jwt-service'
 import {
   AUTH0_ROLE_DEFINITIONS as ROLE_DEFINITIONS,
   UserRole,
 } from './auth0-rbac-service'
-import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { getFromCache, setInCache } from '../redis'
-import { logSecurityEvent, SecurityEventType } from '../security'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
 const logger = createBuildSafeLogger('auth0-middleware')
@@ -211,8 +211,6 @@ export async function rateLimitMiddleware(
   const clientIp = getClientIp(request)
   const rateLimitKey = `rate_limit:${endpoint}:${clientIp}`
   const windowSeconds = windowMinutes * 60
-
-
 
   interface RateLimitData {
     count: number
@@ -812,7 +810,6 @@ export async function authenticateRequest(
 
     // Device/Session Binding Check
     if (sid) {
-
       const bindingKey = `session_binding:${identity.internalId}:${sid}`
       const clientInfo = getClientInfo(request)
       const storedBinding = await getFromCache(bindingKey)
@@ -1009,10 +1006,7 @@ export async function requireRole(
       // Security module not available in test environment
     }
 
-    await notifyPhase6AuthProgress(
-      request.user.id,
-      'authorization_failed',
-    )
+    await notifyPhase6AuthProgress(request.user.id, 'authorization_failed')
 
     return {
       success: false,
