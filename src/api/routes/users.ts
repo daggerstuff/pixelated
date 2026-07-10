@@ -3,7 +3,7 @@ import express, { Router, Request, Response } from 'express'
 
 import { getPostgresPool } from '../../lib/database/connection'
 import { authMiddleware, requireRoles } from '../middleware/auth'
-import { rateLimitByUser } from '../middleware/rate-limiter'
+import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
 import {
   asyncHandler,
   NotFoundError,
@@ -198,20 +198,24 @@ router.post(
  */
 router.delete(
   '/:userId/permissions/:permissionId',
+  rateLimiter,
   rateLimitByUser(20, 60000),
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
-    const userId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
-    const permissionId = String(req.params.permissionId || '').replace(/[^0-9a-fA-F-]/g, '')
-
     // Basic sanitization/validation for UUIDs to prevent FHIR search operation errors
+    const rawUserId = String(req.params.userId || '')
+    const rawPermissionId = String(req.params.permissionId || '')
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-    if (!uuidRegex.test(userId) || !uuidRegex.test(permissionId)) {
+
+    if (!uuidRegex.test(rawUserId) || !uuidRegex.test(rawPermissionId)) {
       throw new ValidationError('Invalid ID format', {
         error: 'Both userId and permissionId must be valid UUIDs'
       })
     }
+
+    // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
+    const userId = rawUserId.replace(/[^0-9a-fA-F-]/g, '')
+    const permissionId = rawPermissionId.replace(/[^0-9a-fA-F-]/g, '')
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -237,19 +241,21 @@ router.delete(
  */
 router.delete(
   '/:userId',
+  rateLimiter,
   rateLimitByUser(10, 60000),
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
-    const userId = String(req.params['userId'] || '').replace(/[^0-9a-fA-F-]/g, '')
-
     // Validate UUID format to prevent injection/FHIR search errors
+    const rawUserId = String(req.params['userId'] || '')
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
-    if (!uuidRegex.test(userId)) {
+    if (!uuidRegex.test(rawUserId)) {
       throw new ValidationError('Invalid ID format', {
         error: 'userId must be a valid UUID'
       })
     }
+
+    // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
+    const userId = rawUserId.replace(/[^0-9a-fA-F-]/g, '')
 
     const pool = getPostgresPool()
     const result = await pool.query(
