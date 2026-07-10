@@ -22,9 +22,11 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-# sharded advisory run: 4 buckets split by directory so each runner finishes
+# sharded advisory run: 6 buckets split by directory so each runner finishes
 # well under the original 45-min single-job timeout (run 28896985143 hit it on
-# staging). Bucket selection handled by VITEST_BUCKET env var → local-test-runner.mjs.
+# staging). The frontend bucket was split into components/hooks/utils to reduce
+# per-process memory pressure (OOM at ~7.3 GB / 8.2 GB heap limit).
+# Bucket selection handled by VITEST_BUCKET env var → local-test-runner.mjs.
 jobs:
   advisory-test-suite:
     runs-on: ubuntu-latest
@@ -32,7 +34,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        bucket: [core, lib, frontend, agents]
+        bucket:
+          [
+            core,
+            lib,
+            frontend-components,
+            frontend-hooks,
+            frontend-utils,
+            agents,
+          ]
 
     env:
       VITEST_SUITE: advisory
@@ -46,6 +56,8 @@ jobs:
           submodules: false
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js

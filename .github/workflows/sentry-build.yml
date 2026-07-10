@@ -20,12 +20,14 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      NODE_OPTIONS: '--max-old-space-size=4096'
+      NODE_OPTIONS: '--max-old-space-size=8192'
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
@@ -92,6 +94,5 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags:
-            ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false
