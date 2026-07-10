@@ -848,12 +848,14 @@ export class BackupSecurityManager {
   }
 
   private async getDataForBackup(type: BackupType): Promise<Uint8Array> {
-    let appDataJson =
+    const chunks: string[] = []
+    chunks.push(
       '{"timestamp":"' +
       new Date().toISOString() +
       '","type":"' +
       type +
       '","data":{'
+    )
 
     try {
       const mongooseModule = 'mongoose'
@@ -881,26 +883,23 @@ export class BackupSecurityManager {
         }
 
         if (!isFirstModel) {
-          appDataJson += ','
+          chunks.push(',')
         }
-        appDataJson += '"' + modelName + '":['
+        chunks.push('"' + modelName + '":[')
         isFirstModel = false
 
         const cursor = Model.find(query).lean().cursor()
-        let isFirstDoc = true
+        const docChunks: string[] = []
 
         for await (const doc of cursor) {
-          if (!isFirstDoc) {
-            appDataJson += ','
-          }
-          appDataJson += JSON.stringify(doc)
-          isFirstDoc = false
+          docChunks.push(JSON.stringify(doc))
         }
 
-        appDataJson += ']'
+        chunks.push(docChunks.join(','))
+        chunks.push(']')
       }
 
-      appDataJson += '}}'
+      chunks.push('}}')
     } catch (error: unknown) {
       logger.error(
         `Failed to collect data for backup: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
@@ -908,7 +907,7 @@ export class BackupSecurityManager {
       throw error // Fail loudly to prevent silent data corruption
     }
 
-    return new TextEncoder().encode(appDataJson)
+    return new TextEncoder().encode(chunks.join(''))
   }
 
   /**
