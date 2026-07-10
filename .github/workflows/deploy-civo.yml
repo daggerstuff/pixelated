@@ -54,7 +54,10 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -67,7 +70,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
           cache-to: type=gha,mode=max,scope=session-agent
           platforms: linux/amd64
@@ -80,7 +86,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
           cache-to: type=gha,mode=max,scope=qa-agent
           platforms: linux/amd64
@@ -93,7 +102,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent
           cache-to: type=gha,mode=max,scope=pipeline-agent
           platforms: linux/amd64
@@ -126,7 +138,7 @@ jobs:
           fi
           echo "Civo CLI version: $CIVO_VERSION"
 
-          DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[] | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
+          DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[]? | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
           if [ -z "$DOWNLOAD_URL" ]; then
             echo "Could not resolve asset URL from API; falling back to constructed URL"
             DOWNLOAD_URL="https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
