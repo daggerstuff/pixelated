@@ -201,7 +201,9 @@ router.delete(
   requireRoles(['admin']),
   rateLimitByUser(20, 60000),
   asyncHandler(async (req: Request, res: Response) => {
-    const { userId, permissionId } = req.params
+    // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
+    const userId = String(req.params.userId).replace(/[^0-9a-fA-F-]/g, '')
+    const permissionId = String(req.params.permissionId).replace(/[^0-9a-fA-F-]/g, '')
 
     // Basic sanitization/validation for UUIDs to prevent FHIR search operation errors
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
@@ -238,7 +240,8 @@ router.delete(
   requireRoles(['admin']),
   rateLimitByUser(10, 60000),
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.params['userId'] as string
+    // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
+    const userId = String(req.params['userId']).replace(/[^0-9a-fA-F-]/g, '')
 
     // Validate UUID format to prevent injection/FHIR search errors
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
