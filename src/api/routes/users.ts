@@ -236,8 +236,17 @@ router.delete(
 router.delete(
   '/:userId',
   requireRoles(['admin']),
+  rateLimitByUser(10, 60000),
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
+
+    // Validate UUID format to prevent injection/FHIR search errors
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(userId)) {
+      throw new ValidationError('Invalid ID format', {
+        error: 'userId must be a valid UUID'
+      })
+    }
 
     const pool = getPostgresPool()
     const result = await pool.query(
