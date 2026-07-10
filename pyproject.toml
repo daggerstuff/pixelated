@@ -50,7 +50,7 @@ dependencies = [
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
   "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
-  "torch==2.12.1", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
+  "torch==2.13.0", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
@@ -258,12 +258,7 @@ ignore = ["E501", "UP017", "PLR2004"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
 "hackathon/colab/notebooks/*.ipynb" = ["T201", "F404", "PLW1510"]
-"foresight/foresight/server.py" = [
-  "PLR0911",
-  "PLR0912",
-  "PLR0913",
-  "PLR0915",
-]
+"foresight/foresight/server.py" = ["PLR0911", "PLR0912", "PLR0913", "PLR0915"]
 "foresight/tests/test_*.py" = [
   "PLC0415",
   "ARG001",

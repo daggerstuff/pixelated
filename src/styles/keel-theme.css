@@ -95,7 +95,7 @@
 }
 
 .hero::before {
-  content: "";
+  content: '';
   position: absolute;
   top: clamp(1.5rem, 3vw, 2.5rem);
   left: 0;
@@ -131,7 +131,7 @@
 
 .page-head::after,
 .split-overview > div:first-child::after {
-  content: "";
+  content: '';
   display: block;
   width: 4.5rem;
   height: 1px;
@@ -153,7 +153,7 @@
 }
 
 .eyebrow::before {
-  content: "";
+  content: '';
   width: 2.25rem;
   height: 1px;
   background: currentColor;
@@ -173,7 +173,10 @@ h2,
 h3 {
   max-width: 12.5ch;
   font-family: var(--font-display);
-  font-variation-settings: "opsz" 72, "SOFT" 20, "WONK" 1;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 20,
+    'WONK' 1;
   font-weight: 650;
   letter-spacing: 0;
 }
@@ -262,7 +265,7 @@ p {
 }
 
 .feature-list article::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: clamp(1.5rem, 3vw, 2.25rem);
@@ -366,7 +369,10 @@ pre code {
 
 .work-card {
   display: grid;
-  grid-template-columns: minmax(10rem, 0.38fr) minmax(0, 0.82fr) minmax(16rem, 1fr);
+  grid-template-columns: minmax(10rem, 0.38fr) minmax(0, 0.82fr) minmax(
+      16rem,
+      1fr
+    );
   gap: clamp(1.25rem, 4vw, 3rem);
   align-items: start;
 }
@@ -603,7 +609,7 @@ pre code {
 }
 
 .about-ledger article::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: clamp(1.5rem, 3vw, 2.25rem);
@@ -642,4 +648,3 @@ pre code {
 .site-footer p {
   margin: 0;
 }
-

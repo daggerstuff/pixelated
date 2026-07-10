@@ -264,16 +264,15 @@ droid exec --help | grep -A 20 "Examples"
 
 ## Quick Reference
 
-| Task             | Command                                            |
-| ---------------- | -------------------------------------------------- | --- |
-| Install          | `curl -fsSL https://app.factory.ai/cli             | sh` |
-| Verify           | `droid --version`                                  |
-| Analyze code     | `droid exec "review code for issues"`              |
-| Fix typos        | `droid exec --auto low "fix typos in docs"`        |
-| Run tests        | `droid exec --auto medium "install deps and test"` |
-| Deploy           | `droid exec --auto high "build and deploy"`        |
-| Continue session | `droid exec -s <id> "continue task"`               |
-| List tools       | `droid exec --list-tools`                          |
+| Task | Command | | ---------------- |
+-------------------------------------------------- | --- | | Install |
+`curl -fsSL https://app.factory.ai/cli             | sh` | | Verify |
+`droid --version` | | Analyze code | `droid exec "review code for issues"` | |
+Fix typos | `droid exec --auto low "fix typos in docs"` | | Run tests |
+`droid exec --auto medium "install deps and test"` | | Deploy |
+`droid exec --auto high "build and deploy"` | | Continue session |
+`droid exec -s <id> "continue task"` | | List tools | `droid exec --list-tools`
+|
 
 This agent focuses on practical, actionable guidance for integrating Droid CLI
 into development workflows, with emphasis on security and best practices.
