@@ -4,10 +4,11 @@ import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { query, initializeDatabase } from '../../../../lib/db'
 
 export const prerender = false
+
 const logger = createBuildSafeLogger('admin-users-api')
 
-/**
- * Get all users (admin only)
+/** 
+ * Get all users (admin only) 
  */
 export const GET = protectRoute({
   requiredRole: 'admin',
@@ -44,11 +45,9 @@ export const GET = protectRoute({
       )
     }
     const offset = (page - 1) * limit
-
     // Parse filter parameters
     const role = params.get('role')
     const search = params.get('search')
-
     logger.info('Admin fetching users', { adminId: admin.id, page, limit, role, search })
 
     // Sanitize input parameters
@@ -99,12 +98,7 @@ export const GET = protectRoute({
     return new Response(
       JSON.stringify({
         data,
-        pagination: {
-          page,
-          limit,
-          total: count,
-          totalPages: Math.ceil((count || 0) / limit),
-        },
+        pagination: { page, limit, total: count, totalPages: Math.ceil((count || 0) / limit) },
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     )
@@ -120,8 +114,8 @@ export const GET = protectRoute({
   }
 })
 
-/**
- * Update user (admin only)
+/** 
+ * Update user (admin only) 
  */
 export const PATCH = protectRoute({
   requiredRole: 'admin',
@@ -135,11 +129,11 @@ export const PATCH = protectRoute({
     const body = await request.json()
     const { userId, updates } = body
 
-    if (!userId || !updates) {
+    if (!userId || !updates || Object.keys(updates).length === 0) {
       return new Response(
         JSON.stringify({
           error: 'Missing required fields',
-          message: 'userId and updates are required',
+          message: 'userId and updates are required, and updates must not be empty',
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
@@ -147,15 +141,22 @@ export const PATCH = protectRoute({
 
     logger.info('Admin updating user', { adminId: admin.id, userId, updates })
 
-    // Sanitize input parameters
-    const sanitizedUpdates: { [key: string]: string } = {}
-    for (const key in updates) {
-      sanitizedUpdates[key] = updates[key]
-    }
+    // Define an allowlist of permitted column names
+    const allowedColumns = ['email', 'first_name', 'last_name', 'role']
+
+    // Initialize an empty array to store the allowed updates
+    const allowedUpdates: { [key: string]: string } = {}
+
+    // Iterate over the allowed columns and check if the key exists in the updates object
+    allowedColumns.forEach((column) => {
+      if (column in updates) {
+        allowedUpdates[column] = updates[column]
+      }
+    })
 
     // Update user in database
-    const updateQuery = `UPDATE users SET ${Object.keys(sanitizedUpdates).map((key) => `${key} = $${Object.keys(sanitizedUpdates).indexOf(key) + 1}`).join(', ')} WHERE id = $${Object.keys(sanitizedUpdates).length + 1}`
-    const updateResult = await query(updateQuery, [...Object.values(sanitizedUpdates), userId])
+    const updateQuery = `UPDATE users SET ${Object.keys(allowedUpdates).map((key) => `${key} = $${Object.keys(allowedUpdates).indexOf(key) + 1}`).join(', ')} WHERE id = $${Object.keys(allowedUpdates).length + 1}`
+    const updateResult = await query(updateQuery, [...Object.values(allowedUpdates), userId])
 
     // Check if update was successful
     if (updateResult.rowCount === 0) {
@@ -172,12 +173,12 @@ export const PATCH = protectRoute({
       AuditEventType.MODIFY,
       admin.id,
       { id: userId, type: 'user' },
-      { updates, updatedBy: admin.id },
+      { updates: allowedUpdates, updatedBy: admin.id },
     )
 
     return new Response(
       JSON.stringify({
-        data: { id: userId, ...updates },
+        data: { id: userId, ...allowedUpdates },
         message: 'User updated successfully',
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
