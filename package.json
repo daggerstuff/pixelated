@@ -357,7 +357,7 @@
     "@eslint/json": "latest",
     "@eslint/markdown": "latest",
     "@fontsource/inter": "latest",
-    "@github/copilot-sdk": "1.0.5",
+    "@github/copilot-sdk": "1.0.6",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
     "@playwright/test": "1.61.1",
