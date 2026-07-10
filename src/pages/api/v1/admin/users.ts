@@ -2,7 +2,6 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { query, initializeDatabase } from '../../../../lib/db'
-import { escape } from 'pg-escape'
 
 export const prerender = false
 
@@ -46,14 +45,16 @@ export const GET = protectRoute({
       )
     }
     const offset = (page - 1) * limit
+
     // Parse filter parameters
     const role = params.get('role')
     const search = params.get('search')
+
     logger.info('Admin fetching users', { adminId: admin.id, page, limit, role, search })
 
     // Sanitize input parameters
-    const sanitizedRole = role ? escape(role) : null
-    const sanitizedSearch = search ? escape(`%${search}%`) : null
+    const sanitizedRole = role
+    const sanitizedSearch = search
 
     // Construct WHERE clauses
     const whereConditions: string[] = []
@@ -66,7 +67,7 @@ export const GET = protectRoute({
     }
     if (sanitizedSearch) {
       whereConditions.push(`(email ILIKE $${paramIndex} OR first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex})`)
-      queryParams.push(sanitizedSearch)
+      queryParams.push(`%${sanitizedSearch}%`)
       paramIndex++
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
@@ -81,18 +82,21 @@ export const GET = protectRoute({
     const offsetIndex = queryParams.length + 2
     const usersQuery = ` SELECT id, email, role, created_at FROM users ${whereClause} ORDER BY created_at DESC LIMIT $${limitIndex} OFFSET $${offsetIndex} `
     const usersResult = await query(usersQuery, [...queryParams, limit, offset])
+
     const data: Array<{ id: string; email: string; role: string; createdAt: string }> = usersResult.rows.map((row) => ({
       id: row['id'],
       email: row['email'],
       role: row['role'],
       createdAt: row['created_at'] instanceof Date ? row['created_at'].toISOString() : String(row['created_at']),
     }))
+
     await createResourceAuditLog(
       AuditEventType.SYSTEM,
       admin.id,
       { id: 'users', type: 'admin' },
       { page, limit, role, search, count, offset },
     )
+
     return new Response(
       JSON.stringify({
         data,
@@ -131,6 +135,7 @@ export const PATCH = protectRoute({
     const admin = locals.user
     const body = await request.json()
     const { userId, updates } = body
+
     if (!userId || !updates) {
       return new Response(
         JSON.stringify({
@@ -140,12 +145,13 @@ export const PATCH = protectRoute({
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
+
     logger.info('Admin updating user', { adminId: admin.id, userId, updates })
 
     // Sanitize input parameters
     const sanitizedUpdates: { [key: string]: string } = {}
     for (const key in updates) {
-      sanitizedUpdates[key] = escape(updates[key])
+      sanitizedUpdates[key] = updates[key]
     }
 
     // Update user in database
@@ -162,12 +168,14 @@ export const PATCH = protectRoute({
         { status: 404, headers: { 'Content-Type': 'application/json' } }
       )
     }
+
     await createResourceAuditLog(
       AuditEventType.MODIFY,
       admin.id,
       { id: userId, type: 'user' },
       { updates, updatedBy: admin.id },
     )
+
     return new Response(
       JSON.stringify({
         data: { id: userId, ...updates },
