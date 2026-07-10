@@ -28,9 +28,11 @@ marketing, and customer success teams **Total Annual Cost**: $54,000-$72,000
 
 #### Marketing Automation Platform
 
-**Platform**: HubSpot Marketing Hub Professional **Cost**: $800/month for
+**Platform**: HubSpot Marketing Hub Professional **Cost**:
+$800/month for
 Professional edition (up to 2,000 contacts) **Scaling**: Enterprise edition at
-$3,200/month for 10,000+ contacts **Total Annual Cost**: $9,600-$38,400
+$3,200/month
+for 10,000+ contacts **Total Annual Cost**: $9,600-$38,400
 
 **Key Features:**
 
@@ -43,9 +45,10 @@ $3,200/month for 10,000+ contacts **Total Annual Cost**: $9,600-$38,400
 
 #### Customer Success Platform
 
-**Platform**: Gainsight Customer Success Platform **Cost**: $1,200/month for up
-to 500 customers **Scaling**: $2,500/month for up to 2,500 customers **Total
-Annual Cost**: $14,400-$30,000
+**Platform**: Gainsight Customer Success Platform **Cost**:
+$1,200/month for up
+to 500 customers **Scaling**: $2,500/month for up to 2,500
+customers **Total Annual Cost**: $14,400-$30,000
 
 **Key Features:**
 

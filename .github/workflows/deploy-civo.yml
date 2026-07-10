@@ -54,7 +54,10 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -67,7 +70,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
           cache-to: type=gha,mode=max,scope=session-agent
           platforms: linux/amd64
@@ -80,7 +86,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
           cache-to: type=gha,mode=max,scope=qa-agent
           platforms: linux/amd64
@@ -93,7 +102,10 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+          tags:
+            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
+            env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent
           cache-to: type=gha,mode=max,scope=pipeline-agent
           platforms: linux/amd64
@@ -117,8 +129,32 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          CIVO_VERSION=$(curl -sL https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // "v1.1.14"')
-          curl -sL "https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz" -o /tmp/civo.tar.gz
+          # Resolve the latest release tag from GitHub API (authenticated — 5,000 req/hr vs 60)
+          AUTH_HEADER="Authorization: Bearer ${GITHUB_TOKEN}"
+          CIVO_VERSION=$(curl -sL -H "${AUTH_HEADER}" https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
+          if [ -z "$CIVO_VERSION" ]; then
+            echo "GitHub API rate limited or unreachable; falling back to v1.5.4"
+            CIVO_VERSION="v1.5.4"
+          fi
+          echo "Civo CLI version: $CIVO_VERSION"
+
+          DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[]? | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
+          if [ -z "$DOWNLOAD_URL" ]; then
+            echo "Could not resolve asset URL from API; falling back to constructed URL"
+            DOWNLOAD_URL="https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
+          fi
+          echo "Download URL: $DOWNLOAD_URL"
+
+          # Download with -f to fail on HTTP errors
+          curl -sSfL "$DOWNLOAD_URL" -o /tmp/civo.tar.gz
+
+          # Validate the file is actually gzip before extraction
+          if ! file /tmp/civo.tar.gz | grep -q 'gzip compressed'; then
+            echo "❌ Downloaded file is not gzip. Contents:"
+            head -c 500 /tmp/civo.tar.gz
+            exit 1
+          fi
+
           tar xzf /tmp/civo.tar.gz -C /usr/local/bin/ civo
           civo --version
 
@@ -148,9 +184,24 @@ jobs:
 
       - name: Install kubectl and kustomize
         run: |
-          curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
+          # Resolve stable kubectl version with fallback
+          KUBE_STABLE=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null) || {
+            echo "⚠️  Could not resolve stable kubectl version from CDN; falling back to v1.32.0"
+            KUBE_STABLE="v1.32.0"
+          }
+          echo "Kubectl version: $KUBE_STABLE"
+
+          curl -sSfL "https://dl.k8s.io/release/${KUBE_STABLE}/bin/linux/amd64/kubectl" -o /tmp/kubectl
+
+          # Validate the file is an ELF binary (not an HTML error page)
+          if ! file /tmp/kubectl | grep -q 'ELF.*x86-64'; then
+            echo "❌ Downloaded kubectl is not an ELF binary. Contents:"
+            head -c 500 /tmp/kubectl
+            exit 1
+          fi
+
+          chmod +x /tmp/kubectl
+          sudo mv /tmp/kubectl /usr/local/bin/kubectl
 
           KUSTOMIZE_VERSION=5.6.0
           KUSTOMIZE_BASE_URL="https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}"
@@ -162,6 +213,13 @@ jobs:
           curl -sSfL "${KUSTOMIZE_BASE_URL}/${KUSTOMIZE_ARCHIVE}" -o "${KUSTOMIZE_ARCHIVE}"
 
           echo "${EXPECTED_KUSTOMIZE_SHA256}  ${KUSTOMIZE_ARCHIVE}" | sha256sum -c -
+
+          # Validate the file is gzip before extraction
+          if ! file "${KUSTOMIZE_ARCHIVE}" | grep -q 'gzip compressed'; then
+            echo "❌ Downloaded kustomize archive is not gzip. Contents:"
+            head -c 500 "${KUSTOMIZE_ARCHIVE}"
+            exit 1
+          fi
 
           tar xzf "${KUSTOMIZE_ARCHIVE}"
           sudo mv kustomize /usr/local/bin/

@@ -1,0 +1,86 @@
+name: Update Civo CLI Fallback Version
+
+on:
+  schedule:
+    # Weekly: Monday 3:00 AM UTC
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-and-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Get latest Civo CLI version
+        id: latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST=$(curl -sSfL -H "Authorization: Bearer $GITHUB_TOKEN" \
+            https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
+
+          if [[ -z "$LATEST" || "$LATEST" != v* ]]; then
+            echo "❌ Could not resolve a valid version from GitHub API. Got: '$LATEST'"
+            exit 1
+          fi
+
+          echo "Latest release: $LATEST"
+          echo "version=$LATEST" >> $GITHUB_OUTPUT
+
+      - name: Get current pinned version
+        id: current
+        run: |
+          CURRENT=$(grep -oP 'falling back to \Kv[\d]+\.[\d]+\.[\d]+' .github/workflows/deploy-civo.yml)
+          echo "Current pin: $CURRENT"
+          echo "version=$CURRENT" >> $GITHUB_OUTPUT
+
+      - name: Update pin if newer
+        id: update
+        if: steps.latest.outputs.version != steps.current.outputs.version
+        run: |
+          OLD="${{ steps.current.outputs.version }}"
+          NEW="${{ steps.latest.outputs.version }}"
+          echo "Updating pin from $OLD to $NEW"
+
+          # Update both occurrences: the echo message and the variable assignment
+          sed -i "s/falling back to ${OLD}/falling back to ${NEW}/g" .github/workflows/deploy-civo.yml
+          sed -i "s/CIVO_VERSION=\"${OLD}\"/CIVO_VERSION=\"${NEW}\"/g" .github/workflows/deploy-civo.yml
+
+          echo "changed=true" >> $GITHUB_OUTPUT
+          echo "old=$OLD" >> $GITHUB_OUTPUT
+          echo "new=$NEW" >> $GITHUB_OUTPUT
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message:
+            'chore: bump Civo CLI fallback version from ${{
+            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+          title:
+            'chore: update Civo CLI pinned fallback version to ${{
+            steps.update.outputs.new }}'
+          body: |
+            The Civo CLI has released a new version: **${{ steps.update.outputs.new }}**
+
+            This PR updates the pinned fallback version in `deploy-civo.yml` from `${{ steps.update.outputs.old }}` to `${{ steps.update.outputs.new }}`.
+
+            The fallback is used when the GitHub API is rate-limited or unreachable during CI deployments.
+
+            Triggered by `update-civo-cli-pin` workflow.
+          branch: update-civo-cli-pin
+          base: staging
+          delete-branch: true
+          labels: |
+            dependencies
+            automated
