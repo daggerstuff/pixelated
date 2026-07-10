@@ -199,14 +199,22 @@ router.delete(
   '/:userId/permissions/:permissionId',
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    const { userId: _userId, permissionId: _permissionId } = req.params
+    const { userId, permissionId } = req.params
 
-    // TODO: Implement permission revocation
-    // TODO: Update PostgreSQL permissions table
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      'DELETE FROM permissions WHERE id = $1 AND user_id = $2 RETURNING *',
+      [permissionId, userId]
+    )
+
+    if (result.rowCount === 0) {
+      throw new NotFoundError('Permission not found')
+    }
 
     res.json({
       success: true,
-      message: 'Permission revoked - coming soon',
+      message: 'Permission revoked successfully',
+      permission: result.rows[0],
     })
   }),
 )
