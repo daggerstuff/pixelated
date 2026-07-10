@@ -4,12 +4,9 @@ import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { query, initializeDatabase } from '../../../../lib/db'
 
 export const prerender = false
-
 const logger = createBuildSafeLogger('admin-users-api')
 
-/** 
- * Get all users (admin only) 
- */
+/** Get all users (admin only) */
 export const GET = protectRoute({
   requiredRole: 'admin',
   validateIPMatch: true,
@@ -24,7 +21,6 @@ export const GET = protectRoute({
     const page = Math.max(1, parseInt(params.get('page') ?? '1', 10))
     const limit = Math.min(parseInt(params.get('limit') ?? '20', 10), 100)
     // Cap limit to 100
-
     // Validate pagination parameters
     if (!Number.isFinite(page) || page <= 0) {
       return new Response(
@@ -49,11 +45,9 @@ export const GET = protectRoute({
     const role = params.get('role')
     const search = params.get('search')
     logger.info('Admin fetching users', { adminId: admin.id, page, limit, role, search })
-
     // Sanitize input parameters
     const sanitizedRole = role
     const sanitizedSearch = search
-
     // Construct WHERE clauses
     const whereConditions: string[] = []
     const queryParams: unknown[] = []
@@ -69,32 +63,27 @@ export const GET = protectRoute({
       paramIndex++
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
-
     // Fetch total count
     const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`
     const countResult = await query(countQuery, queryParams)
     const count = parseInt(countResult.rows[0]?.['total'] || '0', 10)
-
     // Fetch users
     const limitIndex = queryParams.length + 1
     const offsetIndex = queryParams.length + 2
     const usersQuery = ` SELECT id, email, role, created_at FROM users ${whereClause} ORDER BY created_at DESC LIMIT $${limitIndex} OFFSET $${offsetIndex} `
     const usersResult = await query(usersQuery, [...queryParams, limit, offset])
-
     const data: Array<{ id: string; email: string; role: string; createdAt: string }> = usersResult.rows.map((row) => ({
       id: row['id'],
       email: row['email'],
       role: row['role'],
       createdAt: row['created_at'] instanceof Date ? row['created_at'].toISOString() : String(row['created_at']),
     }))
-
     await createResourceAuditLog(
       AuditEventType.SYSTEM,
       admin.id,
       { id: 'users', type: 'admin' },
       { page, limit, role, search, count, offset },
     )
-
     return new Response(
       JSON.stringify({
         data,
@@ -114,9 +103,7 @@ export const GET = protectRoute({
   }
 })
 
-/** 
- * Update user (admin only) 
- */
+/** Update user (admin only) */
 export const PATCH = protectRoute({
   requiredRole: 'admin',
   validateIPMatch: true,
@@ -128,8 +115,7 @@ export const PATCH = protectRoute({
     const admin = locals.user
     const body = await request.json()
     const { userId, updates } = body
-
-    if (!userId || !updates || Object.keys(updates).length === 0) {
+    if (!userId || !updates || typeof updates !== 'object' || Object.keys(updates).length === 0) {
       return new Response(
         JSON.stringify({
           error: 'Missing required fields',
@@ -138,51 +124,63 @@ export const PATCH = protectRoute({
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
-
     logger.info('Admin updating user', { adminId: admin.id, userId, updates })
-
     // Define an allowlist of permitted column names
     const allowedColumns = ['email', 'first_name', 'last_name', 'role']
-
     // Initialize an empty array to store the allowed updates
-    const allowedUpdates: { [key: string]: string } = {}
-
+    const sanitizedUpdates: { [key: string]: string } = {}
     // Iterate over the allowed columns and check if the key exists in the updates object
     allowedColumns.forEach((column) => {
       if (column in updates) {
-        allowedUpdates[column] = updates[column]
+        sanitizedUpdates[column] = updates[column]
       }
     })
-
-    // Update user in database
-    const updateQuery = `UPDATE users SET ${Object.keys(allowedUpdates).map((key) => `${key} = $${Object.keys(allowedUpdates).indexOf(key) + 1}`).join(', ')} WHERE id = $${Object.keys(allowedUpdates).length + 1}`
-    const updateResult = await query(updateQuery, [...Object.values(allowedUpdates), userId])
-
-    // Check if update was successful
-    if (updateResult.rowCount === 0) {
+    // Check if any updates were sanitized
+    if (Object.keys(sanitizedUpdates).length === 0) {
       return new Response(
         JSON.stringify({
-          error: 'User not found',
-          message: 'The user you are trying to update does not exist',
+          error: 'No valid updates provided',
+          message: 'Only the following columns can be updated: ' + allowedColumns.join(', '),
         }),
-        { status: 404, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
-
-    await createResourceAuditLog(
-      AuditEventType.MODIFY,
-      admin.id,
-      { id: userId, type: 'user' },
-      { updates: allowedUpdates, updatedBy: admin.id },
-    )
-
-    return new Response(
-      JSON.stringify({
-        data: { id: userId, ...allowedUpdates },
-        message: 'User updated successfully',
-      }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
-    )
+    // Update user in database
+    if (Object.keys(sanitizedUpdates).length > 0) {
+      const updateQuery = `UPDATE users SET ${Object.keys(sanitizedUpdates).map((key) => `${key} = $${Object.keys(sanitizedUpdates).indexOf(key) + 1}`).join(', ')} WHERE id = $${Object.keys(sanitizedUpdates).length + 1}`
+      const updateResult = await query(updateQuery, [...Object.values(sanitizedUpdates), userId])
+      // Check if update was successful
+      if ((updateResult.rowCount ?? 0) === 0) {
+        return new Response(
+          JSON.stringify({
+            error: 'User not found',
+            message: 'The user you are trying to update does not exist',
+          }),
+          { status: 404, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+      await createResourceAuditLog(
+        AuditEventType.MODIFY,
+        admin.id,
+        { id: userId, type: 'user' },
+        { updates: sanitizedUpdates, updatedBy: admin.id },
+      )
+      return new Response(
+        JSON.stringify({
+          data: { id: userId, ...sanitizedUpdates },
+          message: 'User updated successfully',
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } }
+      )
+    } else {
+      return new Response(
+        JSON.stringify({
+          error: 'No updates provided',
+          message: 'No updates were provided to update the user',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
   } catch (error: unknown) {
     logger.error('Error updating user:', error)
     return new Response(
