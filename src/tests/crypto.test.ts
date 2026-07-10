@@ -697,9 +697,7 @@ describe('createCryptoSystem', () => {
   beforeEach(() => {
     vi.spyOn(cryptoModule, 'createCryptoSystem').mockImplementation(
       (options: any) =>
-        createCryptoSystemMock(
-          options ?? { namespace: 'test' },
-        ) as any,
+        createCryptoSystemMock(options ?? { namespace: 'test' }) as any,
     )
   })
 
