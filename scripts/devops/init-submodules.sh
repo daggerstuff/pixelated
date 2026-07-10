@@ -45,6 +45,7 @@ configure_credentials() {
       -c "http.https://github.com/.extraHeader=AUTHORIZATION: basic ${auth_header}"
       -c "credential.helper="
       -c "url.https://x-access-token:${github_token}@github.com/.insteadOf=https://github.com/"
+      -c "url.https://x-access-token:${github_token}@github.com/.insteadOf=git@github.com:"
     )
     echo "✅ GitHub credentials configured"
   fi
