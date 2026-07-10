@@ -36,6 +36,15 @@ describe('jsonResponse', () => {
     const data = await response.json()
     expect(data).toEqual(payload)
   })
+
+  it('creates a Response with a custom status code', async () => {
+    const payload = { key: 'value' }
+    const { jsonResponse } = await import('../_shared')
+    const response = jsonResponse(payload, 201)
+
+    expect(response.status).toBe(201)
+    expect(response.headers.get('Content-Type')).toBe('application/json')
+  })
 })
 
 describe('successResponse', () => {
