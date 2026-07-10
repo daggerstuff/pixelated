@@ -27,6 +27,8 @@ jobs:
           fetch-depth: 0
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Set up Python
@@ -212,6 +214,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
