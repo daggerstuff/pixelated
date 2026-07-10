@@ -64,8 +64,12 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: bump Civo CLI fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}"
-          title: "chore: update Civo CLI pinned fallback version to ${{ steps.update.outputs.new }}"
+          commit-message:
+            'chore: bump Civo CLI fallback version from ${{
+            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+          title:
+            'chore: update Civo CLI pinned fallback version to ${{
+            steps.update.outputs.new }}'
           body: |
             The Civo CLI has released a new version: **${{ steps.update.outputs.new }}**
 

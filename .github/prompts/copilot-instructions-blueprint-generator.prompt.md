@@ -317,7 +317,8 @@ To create the copilot-instructions.md file, first analyze the codebase to:
 1. **Identify Exact Technology Versions**:
    - ${PROJECT_TYPE == "Auto-detect" ? "Detect all programming languages,
      frameworks, and libraries by scanning file extensions and configuration
-     files" : `Focus on ${PROJECT_TYPE} technologies`}
+     files" : `Focus on ${PROJECT_TYPE}
+     technologies`}
    - Extract precise version information from project files, package.json,
      .csproj, etc.
    - Document version constraints and compatibility requirements

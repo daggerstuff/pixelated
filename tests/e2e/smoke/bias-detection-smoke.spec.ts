@@ -199,7 +199,9 @@ test.describe('Bias Detection Engine - Smoke Tests', () => {
     })
 
     // Should not return 404 (might return 401/403 if auth required, 500/504 if DB is degraded)
-    expect([200, 201, 400, 401, 403, 500, 504]).toContain(analyzeResponse.status())
+    expect([200, 201, 400, 401, 403, 500, 504]).toContain(
+      analyzeResponse.status(),
+    )
   })
 
   test('Database connectivity', async ({ request }) => {
