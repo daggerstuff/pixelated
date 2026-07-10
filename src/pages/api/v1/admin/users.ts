@@ -22,7 +22,7 @@ export const GET = protectRoute({
     const admin = locals.user
     const params = new URL(request.url).searchParams
     // Parse pagination parameters
-    const page = parseInt(params.get('page') ?? '1', 10)
+    const page = Math.max(1, parseInt(params.get('page') ?? '1', 10))
     const limit = Math.min(parseInt(params.get('limit') ?? '20', 10), 100)
     // Cap limit to 100
 
@@ -36,7 +36,6 @@ export const GET = protectRoute({
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
-
     if (!Number.isFinite(limit) || limit <= 0) {
       return new Response(
         JSON.stringify({
@@ -46,15 +45,16 @@ export const GET = protectRoute({
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       )
     }
-
     const offset = (page - 1) * limit
     // Parse filter parameters
     const role = params.get('role')
     const search = params.get('search')
     logger.info('Admin fetching users', { adminId: admin.id, page, limit, role, search })
+
     // Sanitize input parameters
     const sanitizedRole = role ? escape(role) : null
     const sanitizedSearch = search ? escape(`%${search}%`) : null
+
     // Construct WHERE clauses
     const whereConditions: string[] = []
     const queryParams: unknown[] = []
@@ -70,10 +70,12 @@ export const GET = protectRoute({
       paramIndex++
     }
     const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+
     // Fetch total count
     const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`
     const countResult = await query(countQuery, queryParams)
     const count = parseInt(countResult.rows[0]?.['total'] || '0', 10)
+
     // Fetch users
     const limitIndex = queryParams.length + 1
     const offsetIndex = queryParams.length + 2
@@ -139,9 +141,27 @@ export const PATCH = protectRoute({
       )
     }
     logger.info('Admin updating user', { adminId: admin.id, userId, updates })
-    // TODO: Replace with actual database implementation
-    // For now, return success to prevent build errors
-    const updatedUser = { id: userId, ...updates }
+
+    // Sanitize input parameters
+    const sanitizedUpdates: { [key: string]: string } = {}
+    for (const key in updates) {
+      sanitizedUpdates[key] = escape(updates[key])
+    }
+
+    // Update user in database
+    const updateQuery = `UPDATE users SET ${Object.keys(sanitizedUpdates).map((key) => `${key} = $${Object.keys(sanitizedUpdates).indexOf(key) + 1}`).join(', ')} WHERE id = $${Object.keys(sanitizedUpdates).length + 1}`
+    const updateResult = await query(updateQuery, [...Object.values(sanitizedUpdates), userId])
+
+    // Check if update was successful
+    if (updateResult.rowCount === 0) {
+      return new Response(
+        JSON.stringify({
+          error: 'User not found',
+          message: 'The user you are trying to update does not exist',
+        }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
     await createResourceAuditLog(
       AuditEventType.MODIFY,
       admin.id,
@@ -150,7 +170,7 @@ export const PATCH = protectRoute({
     )
     return new Response(
       JSON.stringify({
-        data: updatedUser,
+        data: { id: userId, ...updates },
         message: 'User updated successfully',
       }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
