@@ -3,6 +3,7 @@ import express, { Router, Request, Response } from 'express'
 
 import { getPostgresPool } from '../../lib/database/connection'
 import { authMiddleware, requireRoles } from '../middleware/auth'
+import { rateLimitByUser } from '../middleware/rate-limiter'
 import {
   asyncHandler,
   NotFoundError,
@@ -198,8 +199,17 @@ router.post(
 router.delete(
   '/:userId/permissions/:permissionId',
   requireRoles(['admin']),
+  rateLimitByUser(20, 60000),
   asyncHandler(async (req: Request, res: Response) => {
     const { userId, permissionId } = req.params
+
+    // Basic sanitization/validation for UUIDs to prevent FHIR search operation errors
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidRegex.test(userId) || !uuidRegex.test(permissionId)) {
+      throw new ValidationError('Invalid ID format', {
+        error: 'Both userId and permissionId must be valid UUIDs'
+      })
+    }
 
     const pool = getPostgresPool()
     const result = await pool.query(
