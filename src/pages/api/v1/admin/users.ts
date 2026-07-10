@@ -2,6 +2,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
+import { query } from '../../../../lib/db'
 
 export const prerender = false
 
@@ -36,15 +37,53 @@ export const GET = protectRoute({
       search,
     })
 
-    // TODO: Replace with actual database implementation
-    // For now, return empty result to prevent build errors
+    // Construct WHERE clauses
+    const whereConditions: string[] = []
+    const queryParams: unknown[] = []
+    let paramIndex = 1
+
+    if (role) {
+      whereConditions.push(`role = $${paramIndex}`)
+      queryParams.push(role)
+      paramIndex++
+    }
+
+    if (search) {
+      whereConditions.push(`(email ILIKE $${paramIndex} OR first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex})`)
+      queryParams.push(`%${search}%`)
+      paramIndex++
+    }
+
+    const whereClause = whereConditions.length > 0
+      ? `WHERE ${whereConditions.join(' AND ')}`
+      : ''
+
+    // Fetch total count
+    const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`
+    const countResult = await query(countQuery, queryParams)
+    const count = parseInt(countResult.rows[0]?.['total'] || '0', 10)
+
+    // Fetch users
+    const usersQuery = `
+      SELECT id, email, role, created_at
+      FROM users
+      ${whereClause}
+      ORDER BY created_at DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `
+    const usersResult = await query(usersQuery, [...queryParams, limit, offset])
+
     const data: Array<{
       id: string
       email: string
       role: string
       createdAt: string
-    }> = []
-    const count = 0
+    }> = usersResult.rows.map(row => ({
+      id: row['id'],
+      email: row['email'],
+      role: row['role'],
+      createdAt: row['created_at'] instanceof Date ? row['created_at'].toISOString() : String(row['created_at'])
+    }))
 
     await createResourceAuditLog(
       AuditEventType.SYSTEM,
