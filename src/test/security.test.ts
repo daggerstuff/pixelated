@@ -13,6 +13,7 @@
 
 import { describe, it, expect } from 'vitest'
 
+import { InputValidator } from "../middleware/security"
 // Mock implementations for testing
 interface EncryptedData {
   ciphertext: string
@@ -294,5 +295,34 @@ describe('Rate Limiting', () => {
     const windowStart = now - windowMs - 1000 // 1 second before window
 
     expect(now - windowStart).toBeGreaterThan(windowMs)
+  })
+})
+
+describe('Session ID Validation', () => {
+  it('validates correct UUID v4 session IDs', () => {
+    const validSessionIds = [
+      '123e4567-e89b-12d3-a456-426614174000',
+      '550e8400-e29b-41d4-a716-446655440000',
+      'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+    ]
+    validSessionIds.forEach(id => {
+      expect(InputValidator.validateSessionId(id)).toBe(true)
+    })
+  })
+
+  it('invalidates incorrect session IDs', () => {
+    const invalidSessionIds = [
+      '123e4567-e89b-12d3-a456-42661417400',
+      '123e4567-e89b-12d3-a456-4266141740000',
+      '123e4567-e89b-12d3-a456-42661417400g',
+      '123e4567-e89b-02d3-a456-426614174000',
+      '123e4567-e89b-62d3-a456-426614174000',
+      '123e4567-e89b-12d3-7456-426614174000',
+      '',
+      'not-a-uuid',
+    ]
+    invalidSessionIds.forEach(id => {
+      expect(InputValidator.validateSessionId(id)).toBe(false)
+    })
   })
 })
