@@ -126,7 +126,7 @@ jobs:
           fi
           echo "Civo CLI version: $CIVO_VERSION"
 
-          DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[] | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
+          DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[]? | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
           if [ -z "$DOWNLOAD_URL" ]; then
             echo "Could not resolve asset URL from API; falling back to constructed URL"
             DOWNLOAD_URL="https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
