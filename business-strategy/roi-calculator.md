@@ -50,15 +50,17 @@
 
 ### Medical School ROI
 
-**Year 1 Savings**: $325,000 - $60,000 = $265,000 **Year 1 ROI**: 442% return on
-investment **3-Year Total Savings**: $795,000 - $150,000 = $645,000 **3-Year
-ROI**: 430% cumulative return
+**Year 1 Savings**: $325,000 - $60,000 =
+$265,000 **Year 1 ROI**: 442% return on
+investment **3-Year Total Savings**: $795,000 -
+$150,000 = $645,000 **3-Year ROI**: 430% cumulative return
 
 ### Psychology Program ROI
 
-**Year 1 Savings**: $185,000 - $36,000 = $149,000 **Year 1 ROI**: 414% return on
-investment **3-Year Total Savings**: $555,000 - $86,000 = $469,000 **3-Year
-ROI**: 545% cumulative return
+**Year 1 Savings**: $185,000 - $36,000 =
+$149,000 **Year 1 ROI**: 414% return on
+investment **3-Year Total Savings**: $555,000 -
+$86,000 = $469,000 **3-Year ROI**: 545% cumulative return
 
 ## Additional Value Propositions
 

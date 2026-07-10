@@ -68,10 +68,10 @@ Together, they form the secure, intelligent backbone of our clinical AI engine:
   environment. This submodule handles inference, emotional signal analysis, and
   the clinical validity pipelines that ensure our interactions remain safe and
   effective.
-- **[foresight](foresight/) (Continuity & Memory):** The persistent
-  "brain" of our AI agents. This submodule manages contextual memory, allowing
-  the system to learn, adapt, and maintain continuity across complex,
-  longitudinal therapeutic simulations.
+- **[foresight](foresight/) (Continuity & Memory):** The persistent "brain" of
+  our AI agents. This submodule manages contextual memory, allowing the system
+  to learn, adapt, and maintain continuity across complex, longitudinal
+  therapeutic simulations.
 - **[docs](docs/) (Knowledge Base):** The central nervous system for all our
   system documentation. Because we operate in a highly regulated space,
   maintaining strict, transparent records of our HIPAA compliance, security
@@ -95,7 +95,6 @@ codified within our **Knowledge Base**.
   <a href="https://pixelatedempathy.com/contact">Enterprise Access</a> •
   <a href="https://pixelatedempathy.com/case-studies">Case Studies</a> •
   <a href="https://pixelatedempathy.com/team">Our Team</a>
-  
-  <br><br>
-  <code>© 2026 Pixelated Empathy. All rights reserved.</code>
+
+<br><br> <code>© 2026 Pixelated Empathy. All rights reserved.</code>
 </div>
