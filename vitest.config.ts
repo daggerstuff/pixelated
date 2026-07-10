@@ -60,15 +60,19 @@ const coverageEnabled =
       : !process.env['CI']
 
 const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
-  ? (process.env['VITEST_TARGET_TESTS'].includes(';') || process.env['VITEST_TARGET_TESTS'].includes('{')
+  ? (process.env['VITEST_TARGET_TESTS'].includes(';') ||
+    process.env['VITEST_TARGET_TESTS'].includes('{')
       ? process.env['VITEST_TARGET_TESTS'].split(';')
-      : process.env['VITEST_TARGET_TESTS'].split(','))
+      : process.env['VITEST_TARGET_TESTS'].split(',')
+    )
       .map((entry) => entry.trim())
       .filter(Boolean)
   : []
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
-    (entry.includes('/api/') || entry.includes('/lib/') || entry.startsWith('agents/')) &&
+    (entry.includes('/api/') ||
+      entry.includes('/lib/') ||
+      entry.startsWith('agents/')) &&
     !entry.includes('__tests__/AIChat'),
 )
 const targetedJsdomTestGlobs = targetedTestGlobs.filter(
@@ -290,7 +294,17 @@ export default defineConfig({
                   'src/tests/auth.test.ts',
                   'src/tests/integration/dream-consolidation.integration.test.ts',
                 ],
-          exclude: ['**/node_modules/**', '**/dist/**', '.idea/**', '.git/**', '.cache/**', 'backups/**', 'worktrees/**', 'ai/.venv/**', ...cpuBoundNodeTestExcludes],
+          exclude: [
+            '**/node_modules/**',
+            '**/dist/**',
+            '.idea/**',
+            '.git/**',
+            '.cache/**',
+            'backups/**',
+            'worktrees/**',
+            'ai/.venv/**',
+            ...cpuBoundNodeTestExcludes,
+          ],
           environment: 'node',
           isolate: true,
         },

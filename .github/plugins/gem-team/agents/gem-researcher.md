@@ -90,6 +90,7 @@ tldr:
   | # 3-5 bullet summary: key findings, architecture patterns, tech stack, critical files, open questions
 
 
+
 research_metadata:
   methodology: string # How research was conducted (hybrid retrieval: semantic_search + grep_search, relationship discovery: direct queries, sequential thinking for complex analysis, file_search, read_file, tavily_search, fetch_webpage fallback for external web content)
   scope: string # breadth and depth of exploration
