@@ -203,8 +203,8 @@ router.delete(
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     // Basic sanitization/validation for UUIDs to prevent FHIR search operation errors
-    const rawUserId = String(req.params.userId || '')
-    const rawPermissionId = String(req.params.permissionId || '')
+    const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
+    const rawPermissionId = String(req.params.permissionId || '').replace(/[^0-9a-fA-F-]/g, '')
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 
     if (!uuidRegex.test(rawUserId) || !uuidRegex.test(rawPermissionId)) {
@@ -214,8 +214,8 @@ router.delete(
     }
 
     // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
-    const userId = rawUserId.replace(/[^0-9a-fA-F-]/g, '')
-    const permissionId = rawPermissionId.replace(/[^0-9a-fA-F-]/g, '')
+    const userId = encodeURIComponent(rawUserId)
+    const permissionId = encodeURIComponent(rawPermissionId)
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -246,7 +246,7 @@ router.delete(
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     // Validate UUID format to prevent injection/FHIR search errors
-    const rawUserId = String(req.params['userId'] || '')
+    const rawUserId = String(req.params['userId'] || '').replace(/[^0-9a-fA-F-]/g, '')
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
     if (!uuidRegex.test(rawUserId)) {
       throw new ValidationError('Invalid ID format', {
@@ -255,7 +255,7 @@ router.delete(
     }
 
     // Sanitize input to fix CodeQL FHIR search operation unsanitized input error
-    const userId = rawUserId.replace(/[^0-9a-fA-F-]/g, '')
+    const userId = encodeURIComponent(rawUserId)
 
     const pool = getPostgresPool()
     const result = await pool.query(
