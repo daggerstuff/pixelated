@@ -1,5 +1,8 @@
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { getFromCache } from '../redis'
+import { authenticator } from '@otplib/preset-default'
+import * as qrcode from 'qrcode'
+import { randomBytes } from 'crypto'
 
 export interface DeviceInfo {
   deviceId: string
@@ -31,12 +34,21 @@ export const setupTwoFactorAuth = async (
     throw new Error('2FA is already enabled')
   }
 
-  // In a real implementation this would use otplib to generate a secret
-  const secret = 'test-secret'
-  const qrCode = 'data:image/png;base64,test'
+  // Dynamically generate a secure secret
+  const secret = authenticator.generateSecret()
+  // Generate otpauth URL
+
+  const otpauthUrl = authenticator.keyuri(
+    _email || 'user',
+    'BusinessStrategyCMS',
+    secret,
+  )
+  // Generate QR code data URL
+  const qrCode = await qrcode.toDataURL(otpauthUrl)
+  // Generate 10 secure backup codes
   const backupCodes = Array(10)
     .fill(0)
-    .map((_, i) => `code-${i}`)
+    .map(() => randomBytes(4).toString('hex'))
 
   try {
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_initiated')
