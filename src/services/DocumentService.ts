@@ -79,6 +79,7 @@ export class DocumentService {
   private get redisClient() {
     return this.redis as unknown as {
       get(key: string): Promise<string | null>
+      mget(...keys: string[]): Promise<(string | null)[]>
       setex(key: string, seconds: number, value: string): Promise<string>
       sadd(key: string, ...members: string[]): Promise<number>
       srem(key: string, ...members: string[]): Promise<number>
@@ -269,17 +270,24 @@ export class DocumentService {
     )
     const sessions: CollaborationSession[] = []
 
-    for (const sessionId of sessionIds) {
-      const sessionData = await this.redisClient.get(`session:${sessionId}`)
-      if (sessionData) {
-        const session = parseSession(sessionData)
-        if (session) {
-          sessions.push(session)
+    if (sessionIds.length > 0) {
+      const sessionKeys = sessionIds.map(id => `session:${id}`)
+      const sessionDataArray = await this.redisClient.mget(...sessionKeys)
+
+      for (let i = 0; i < sessionIds.length; i++) {
+        const sessionId = sessionIds[i]
+        const sessionData = sessionDataArray[i]
+
+        if (sessionData) {
+          const session = parseSession(sessionData)
+          if (session) {
+            sessions.push(session)
+          } else {
+            await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
+          }
         } else {
-          await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
+          await this.redisClient.srem(`doc:${documentId}:sessions`, sessionId)
         }
-      } else {
-        await this.redisClient.srem(`doc:${documentId}:sessions`, sessionId)
       }
     }
 
