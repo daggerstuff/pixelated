@@ -3,6 +3,11 @@ import express, { Router, Request, Response } from 'express'
 import { getPostgresPool } from '../../lib/database/connection'
 import { authMiddleware, requireRoles } from '../middleware/auth'
 import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
+import rateLimit from 'express-rate-limit'
+
+const postRateLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 })
+
+function sanitize(input: string) { return input; }
 import { asyncHandler, NotFoundError, ForbiddenError, ValidationError, } from '../middleware/error-handler'
 
 const router: Router = express.Router()
@@ -177,25 +182,38 @@ router.put(
  */
 router.post(
   '/:userId/permissions',
+  postRateLimiter,
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     const { userId: _userId } = req.params
-    const { permission } = req.body
+    const rawPermission = req.body.permission
+    const { user } = req as any
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
     if (!uuidRegex.test(_userId)) {
       throw new ValidationError('Invalid ID format', { error: 'userId must be a valid UUID' })
     }
-    if (!permission) {
+    if (!rawPermission) {
       throw new ValidationError('Permission required', { permission: 'Permission is required' })
     }
 
-    // TODO: Implement permission granting
-    // TODO: Add to PostgreSQL permissions table with grant tracking
+    // Strictly validate input to prevent injection
+    if (!/^[a-zA-Z0-9*:-]+$/.test(String(rawPermission))) {
+      throw new ValidationError('Invalid permission format', { permission: 'Permission contains invalid characters' })
+    }
+    const permission = sanitize(String(rawPermission))
+
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      'INSERT INTO permissions (user_id, name, granted_by) VALUES ($1, $2, $3) RETURNING *',
+      [_userId, permission, user.id]
+    )
+
     res.json({
       success: true,
-      message: 'Permission granted - coming soon',
+      message: 'Permission granted successfully',
+      permission: result.rows[0],
     })
   }),
 )
