@@ -1,40 +1,49 @@
 import { describe, it, expect } from 'vitest'
-import { isSuccess, isFailure, type Result } from '../utility'
+import { assertDefined, assertType, createTypePredicate } from '../utility'
 
-describe('utility', () => {
-  describe('isSuccess', () => {
-    it('returns true for a successful result', () => {
-      const result: Result<string, Error> = {
-        success: true,
-        data: 'test data'
-      }
-      expect(isSuccess(result)).toBe(true)
+describe('Utility Types and Assertion Helpers', () => {
+  describe('assertDefined', () => {
+    it('should not throw for defined values', () => {
+      expect(() => assertDefined('string')).not.toThrow()
+      expect(() => assertDefined(0)).not.toThrow()
+      expect(() => assertDefined(false)).not.toThrow()
+      expect(() => assertDefined({})).not.toThrow()
+      expect(() => assertDefined([])).not.toThrow()
     })
 
-    it('returns false for a failure result', () => {
-      const result: Result<string, Error> = {
-        success: false,
-        error: new Error('test error')
-      }
-      expect(isSuccess(result)).toBe(false)
+    it('should throw for null', () => {
+      expect(() => assertDefined(null)).toThrowError('Value is null or undefined')
+    })
+
+    it('should throw for undefined', () => {
+      expect(() => assertDefined(undefined)).toThrowError('Value is null or undefined')
+    })
+
+    it('should throw with custom message', () => {
+      expect(() => assertDefined(null, 'Custom error')).toThrowError('Custom error')
     })
   })
 
-  describe('isFailure', () => {
-    it('returns true for a failure result', () => {
-      const result: Result<string, Error> = {
-        success: false,
-        error: new Error('test error')
-      }
-      expect(isFailure(result)).toBe(true)
+  describe('assertType', () => {
+    it('should not throw when predicate returns true', () => {
+      const isString = (val: unknown): val is string => typeof val === 'string'
+      expect(() => assertType('hello', isString)).not.toThrow()
     })
 
-    it('returns false for a successful result', () => {
-      const result: Result<string, Error> = {
-        success: true,
-        data: 'test data'
-      }
-      expect(isFailure(result)).toBe(false)
+    it('should throw when predicate returns false', () => {
+      const isString = (val: unknown): val is string => typeof val === 'string'
+      expect(() => assertType(123, isString)).toThrowError('Type assertion failed')
+    })
+  })
+
+  describe('createTypePredicate', () => {
+    it('should return a function that returns the same boolean as the predicate', () => {
+      const isEven = (val: unknown) => typeof val === 'number' && val % 2 === 0
+      const predicate = createTypePredicate(isEven)
+
+      expect(predicate(2)).toBe(true)
+      expect(predicate(3)).toBe(false)
+      expect(predicate('2')).toBe(false)
     })
   })
 })
