@@ -1,0 +1,12 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="#0a0a0a"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  <!-- Sine wave -->
+  <polyline fill="none" stroke="#22d3ee" stroke-width="2"
+            points="0,300 20,331 40,359 60,380 80,391 100,392 120,383 140,365 160,340 180,311 200,280 220,250 240,223 260,202 280,189 300,185 320,190 340,203 360,222 380,246 400,270 420,291 440,310 460,324 480,332 500,333 520,327 540,315 560,298 580,279 600,260 620,243 640,230 660,223 680,223 700,230 720,243 740,260 760,280 780,300 800,320"/>
+</svg>
