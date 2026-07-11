@@ -191,11 +191,15 @@ router.post(
       throw new ValidationError('Permission required', { permission: 'Permission is required' })
     }
 
-    // TODO: Implement permission granting
-    // TODO: Add to PostgreSQL permissions table with grant tracking
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      'INSERT INTO permissions (user_id, name) VALUES ($1, $2) RETURNING id, user_id, name',
+      [_userId, permission]
+    )
     res.json({
       success: true,
-      message: 'Permission granted - coming soon',
+      message: 'Permission granted successfully',
+      permission: result.rows[0],
     })
   }),
 )
