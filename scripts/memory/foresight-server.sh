@@ -9,7 +9,11 @@ load_env() {
   local -A _pre
   while IFS=$'\n' read -r line; do
     [[ -z "$line" ]] && continue
-    _pre["${line%%=*}"]="${line#*=}"
+    local key="${line%%=*}"
+    if [[ "${key}" == "FORESIGHT_DB_URL" ]]; then
+      continue
+    fi
+    _pre["${key}"]="${line#*=}"
   done < <(env | grep '^FORESIGHT_' || true)
 
   set -a

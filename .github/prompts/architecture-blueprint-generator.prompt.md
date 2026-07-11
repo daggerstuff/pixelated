@@ -169,7 +169,8 @@ Document implementation patterns for cross-cutting concerns:
 
 ${PROJECT_TYPE == "Auto-detect" ? "For each detected technology stack, document
 specific architectural patterns:" :
-`Document ${PROJECT_TYPE}-specific architectural patterns:`}
+`Document ${PROJECT_TYPE}-specific
+architectural patterns:`}
 
 ${(PROJECT_TYPE == ".NET" || PROJECT_TYPE == "Auto-detect") ? "#### .NET
 Architectural Patterns (if detected)

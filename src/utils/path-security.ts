@@ -89,9 +89,10 @@ export function validatePath(
   // Resolve the file path
   // If absolute paths are allowed, we let path.resolve use the absolute path directly
   // Otherwise we anchor it to the allowed directory
-  const resolvedPath = allowAbsolutePath && path.isAbsolute(filePath)
-    ? path.resolve(filePath)
-    : path.resolve(normalizedAllowedDir, filePath)
+  const resolvedPath =
+    allowAbsolutePath && path.isAbsolute(filePath)
+      ? path.resolve(filePath)
+      : path.resolve(normalizedAllowedDir, filePath)
 
   const escapesBase = isPathEscapingBase(normalizedAllowedDir, resolvedPath)
 

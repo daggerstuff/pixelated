@@ -185,7 +185,8 @@ tasks:
     security_sensitive: boolean
 
     # gem-documentation-writer:
-    task_type: string # walkthrough | documentation | update
+    task_type:
+      string # walkthrough | documentation | update
       # walkthrough: End-of-project documentation (requires overview, tasks_completed, outcomes, next_steps)
       # documentation: New feature/component documentation (requires audience, coverage_matrix)
       # update: Existing documentation update (requires delta identification)

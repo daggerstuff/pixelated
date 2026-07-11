@@ -16,7 +16,8 @@
 @media (prefers-reduced-motion: no-preference) {
   /* Organic drift animations from pixelated-theme.css */
   @keyframes float-organic {
-    0%, 100% {
+    0%,
+    100% {
       transform: translateY(0px) translateX(0px) scale(1);
       opacity: 0.6;
     }
@@ -35,12 +36,18 @@
   }
 
   @keyframes shimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
   }
 
   @keyframes organic-pulse {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(0) rotate(0deg);
       opacity: 0;
     }
@@ -51,7 +58,8 @@
   }
 
   @keyframes breathe {
-    0%, 100% {
+    0%,
+    100% {
       transform: scale(1);
       opacity: 1;
     }

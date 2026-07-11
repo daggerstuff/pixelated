@@ -222,7 +222,7 @@ a,
 
   /* Cards */
   .card,
-  [class*="card"] {
+  [class*='card'] {
     margin-bottom: var(--spacing-4, 1rem) !important;
     padding: var(--spacing-4, 1rem) !important;
   }
@@ -230,7 +230,7 @@ a,
   /* Buttons */
   button,
   .button,
-  [class*="btn"] {
+  [class*='btn'] {
     min-height: 44px;
     padding: 0.75rem 1rem !important;
   }
@@ -334,8 +334,8 @@ a,
   /* Ensure touch targets */
   button,
   .button,
-  a[role="button"],
-  input[type="submit"] {
+  a[role='button'],
+  input[type='submit'] {
     min-height: 44px !important;
     min-width: 44px !important;
   }
@@ -413,7 +413,7 @@ a,
     background-size: cover;
   }
   .card,
-  [class*="card"] {
+  [class*='card'] {
     border-width: 1px;
   }
 }
@@ -484,7 +484,8 @@ a,
 }
 @media (max-width: 639px) {
   .footer-container {
-    padding: var(--spacing-10, 2.5rem) var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
+    padding: var(--spacing-10, 2.5rem) var(--spacing-4, 1rem)
+      var(--spacing-6, 1.5rem);
   }
   .footer-grid {
     gap: var(--spacing-8, 2rem);
@@ -518,9 +519,9 @@ a,
     font-size: 16px;
     padding: 12px;
   }
-  input[aria-invalid="true"],
-  textarea[aria-invalid="true"],
-  select[aria-invalid="true"] {
+  input[aria-invalid='true'],
+  textarea[aria-invalid='true'],
+  select[aria-invalid='true'] {
     border: 2px solid #e53e3e;
     box-shadow: 0 0 0 1px #e53e3e;
     background-color: #fff5f5;
@@ -532,7 +533,7 @@ a,
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
     border-color: #4299e1;
   }
-  [id$="-error"] {
+  [id$='-error'] {
     color: #e53e3e;
     font-size: 14px;
     margin-top: 4px;

@@ -64,8 +64,12 @@ jobs:
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: bump kubectl fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}"
-          title: "chore: update kubectl pinned fallback version to ${{ steps.update.outputs.new }}"
+          commit-message:
+            'chore: bump kubectl fallback version from ${{
+            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+          title:
+            'chore: update kubectl pinned fallback version to ${{
+            steps.update.outputs.new }}'
           body: |
             A new kubectl stable version has been released: **${{ steps.update.outputs.new }}**
 

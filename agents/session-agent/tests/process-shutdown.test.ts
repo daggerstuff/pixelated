@@ -5,18 +5,19 @@ import { registerProcessShutdown } from '../agent/lib/process-shutdown.js'
 describe('registerProcessShutdown', () => {
   it('runs cleanup once and exits on SIGTERM', async () => {
     const listeners = new Map<NodeJS.Signals, () => void>()
-    const onceSpy = vi
-      .spyOn(process, 'once')
-      .mockImplementation(((signal: NodeJS.Signals, listener: () => void) => {
-        listeners.set(signal, listener)
-        return process
-      }) as typeof process.once)
-    const offSpy = vi
-      .spyOn(process, 'off')
-      .mockImplementation(((signal: NodeJS.Signals) => {
-        listeners.delete(signal)
-        return process
-      }) as typeof process.off)
+    const onceSpy = vi.spyOn(process, 'once').mockImplementation(((
+      signal: NodeJS.Signals,
+      listener: () => void,
+    ) => {
+      listeners.set(signal, listener)
+      return process
+    }) as typeof process.once)
+    const offSpy = vi.spyOn(process, 'off').mockImplementation(((
+      signal: NodeJS.Signals,
+    ) => {
+      listeners.delete(signal)
+      return process
+    }) as typeof process.off)
     const exitSpy = vi
       .spyOn(process, 'exit')
       .mockImplementation((() => undefined) as typeof process.exit)
