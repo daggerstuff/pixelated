@@ -150,12 +150,12 @@ const { class: className = '' } = Astro.props
     transform: rotate(15deg);
   }
 
-  .dark #theme-toggle {
+  :global(.dark) #theme-toggle {
     color: #84cc16;
   }
 
   /* Fix SVG rendering in dark mode */
-  .dark svg {
+  :global(.dark) #theme-toggle svg {
     color: #84cc16;
   }
 </style>
