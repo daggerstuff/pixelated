@@ -16,6 +16,8 @@ router.use(authMiddleware)
  */
 router.get(
   '/',
+  rateLimiter,
+  rateLimitByUser(20, 60000),
   requireRoles(['admin', 'manager']),
   asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 50, role, status } = req.query
@@ -60,6 +62,8 @@ router.get(
  */
 router.get(
   '/:userId',
+  rateLimiter,
+  rateLimitByUser(20, 60000),
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { user } = req as any
@@ -96,6 +100,8 @@ router.get(
  */
 router.put(
   '/:userId',
+  rateLimiter,
+  rateLimitByUser(20, 60000),
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { name, email, status, role } = req.body
