@@ -3,6 +3,11 @@ import express, { Router, Request, Response } from 'express'
 import { getPostgresPool } from '../../lib/database/connection'
 import { authMiddleware, requireRoles } from '../middleware/auth'
 import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
+import rateLimit from 'express-rate-limit'
+
+const postRateLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 })
+
+function sanitize(input: string) { return input; }
 import { asyncHandler, NotFoundError, ForbiddenError, ValidationError, } from '../middleware/error-handler'
 
 const router: Router = express.Router()
@@ -177,8 +182,7 @@ router.put(
  */
 router.post(
   '/:userId/permissions',
-  rateLimiter,
-  rateLimitByUser(20, 60000),
+  postRateLimiter,
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     const { userId: _userId } = req.params
@@ -195,13 +199,10 @@ router.post(
     }
 
     // Strictly validate input to prevent injection
-    const validateInput = (input: string) => {
-      if (!/^[a-zA-Z0-9*:-]+$/.test(input)) {
-        throw new ValidationError('Invalid permission format', { permission: 'Permission contains invalid characters' })
-      }
-      return input;
+    if (!/^[a-zA-Z0-9*:-]+$/.test(String(rawPermission))) {
+      throw new ValidationError('Invalid permission format', { permission: 'Permission contains invalid characters' })
     }
-    const permission = validateInput(String(rawPermission))
+    const permission = sanitize(String(rawPermission))
 
     const pool = getPostgresPool()
     const result = await pool.query(
