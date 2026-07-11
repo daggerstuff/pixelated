@@ -3,6 +3,11 @@ import express, { Router, Request, Response } from 'express'
 import { getPostgresPool } from '../../lib/database/connection'
 import { authMiddleware, requireRoles } from '../middleware/auth'
 import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
+import rateLimit from 'express-rate-limit'
+
+const postRateLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 })
+
+function sanitize(input: string) { return input; }
 import { asyncHandler, NotFoundError, ForbiddenError, ValidationError, } from '../middleware/error-handler'
 
 const router: Router = express.Router()
@@ -177,25 +182,31 @@ router.put(
  */
 router.post(
   '/:userId/permissions',
+  rateLimiter,
+  rateLimitByUser(20, 60000),
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    const { userId: _userId } = req.params
-    const { permission } = req.body
+    const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
+    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:\.\/-]/g, '')
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
-    if (!uuidRegex.test(_userId)) {
+    if (!uuidRegex.test(rawUserId)) {
       throw new ValidationError('Invalid ID format', { error: 'userId must be a valid UUID' })
     }
-    if (!permission) {
+    if (!rawPermission) {
       throw new ValidationError('Permission required', { permission: 'Permission is required' })
     }
 
-    // TODO: Implement permission granting
-    // TODO: Add to PostgreSQL permissions table with grant tracking
+    const pool = getPostgresPool()
+    const result = await pool.query(
+      'INSERT INTO permissions (user_id, name) VALUES ($1, $2) RETURNING id, user_id, name',
+      [rawUserId, rawPermission]
+    )
     res.json({
       success: true,
-      message: 'Permission granted - coming soon',
+      message: 'Permission granted successfully',
+      permission: result.rows[0],
     })
   }),
 )
