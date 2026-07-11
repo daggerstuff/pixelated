@@ -223,7 +223,7 @@ router.delete(
     const permissionId = rawPermissionId
     const pool = getPostgresPool()
     const result = await pool.query(
-      'DELETE FROM permissions WHERE id = $1 AND user_id = $2 RETURNING id, user_id, name',
+      'DELETE FROM permissions WHERE id = $1 AND user_id = $2 RETURNING id, user_id, resource_type, resource_id, permission_level',
       [permissionId, userId],
     )
     if ((result.rowCount ?? 0) === 0) {
