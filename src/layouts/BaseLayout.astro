@@ -96,7 +96,7 @@ const organizationSchema = {
 ---
 
 <!doctype html>
-<html lang={SITE.lang || 'en'}>
+<html lang={SITE.lang || 'en'} data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
@@ -123,12 +123,7 @@ const organizationSchema = {
     {imageURL && <meta name="twitter:image" content={imageURL} />}
     <script is:inline nonce={cspNonce}>
       const storedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.dataset['theme'] = storedTheme || (prefersDark ? 'dark' : 'light');
-      // Keel reference is light-first: when no stored preference and system is light, render light.
-      if (!storedTheme && !prefersDark) {
-        document.documentElement.dataset['theme'] = 'light';
-      }
+      document.documentElement.dataset['theme'] = storedTheme || 'dark';
     </script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replaceAll(String.fromCharCode(60), '\\u003c').replaceAll(String.fromCharCode(62), '\\u003e')}></script>
     <style>

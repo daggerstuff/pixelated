@@ -1,28 +1,28 @@
 /* ==========================================================================
-   fm-fusion.css — Design Fusion Layer
-   --------------------------------------------------------------------------
-   Additive stylesheet merging the BEST structural/typographic principles of
-   fm-solo-starter (Frontmatter CMS solo starter) into OUR Dark Metal system
-   (TASTES.md). Nothing here overrides existing classes — every selector is
-   namespaced `fm-` and built on self-contained tokens so it renders correctly
-   regardless of drift in variables.css / design-system.css.
+    fm-fusion.css — Design Fusion Layer
+    --------------------------------------------------------------------------
+    Additive stylesheet merging the BEST structural/typographic principles of
+    fm-solo-starter (Frontmatter CMS solo starter) into OUR Dark Metal system
+    (TASTES.md). Nothing here overrides existing classes — every selector is
+    namespaced `fm-` and built on self-contained tokens so it renders correctly
+    regardless of drift in variables.css / design-system.css.
 
-   Borrowed & re-themed from fm-solo-starter:
-     1. Hero eyebrow w/ leading line (kicker)
-     2. Mono section label / kicker
-     3. Hairline-grid (gap:1px wireframe → our "grid exposure" principle)
-     4. .chip mono tags
-     5. Code-as-decoration (prop-badge / annotation aside) — THE signature motif,
-        remapped: orange keys, cyan types, clinical-green vals, muted comments
-     6. Sticky annotation aside (prose + code panel)
-     7. CTA block (title/text + actions)
-     8. Button hover translateY(-1px) + restrained accent glow
+    Borrowed & re-themed from fm-solo-starter:
+      1. Hero eyebrow w/ leading line (kicker)
+      2. Mono section label / kicker
+      3. Hairline-grid (gap:1px wireframe → our "grid exposure" principle)
+      4. .chip mono tags
+      5. Code-as-decoration (prop-badge / annotation aside) — THE signature motif,
+         remapped: orange keys, cyan types, clinical-green vals, muted comments
+      6. Sticky annotation aside (prose + code panel)
+      7. CTA block (title/text + actions)
+      8. Button hover translateY(-1px) + restrained accent glow
 
-   Rejected from fm-solo-starter (conflicts w/ our TASTES):
-     - rounded radii 6–10px  → we cap at 4px (flat > round)
-     - green-primary accent  → we keep orange primary + clinical-green secondary
-     - heavy soft shadows     → restrained accent glow only
-   ========================================================================== */
+    Rejected from fm-solo-starter (conflicts w/ our TASTES):
+      - rounded radii 6–10px  → we cap at 4px (flat > round)
+      - green-primary accent  → we keep orange primary + clinical-green secondary
+      - heavy soft shadows     → restrained accent glow only
+    ========================================================================== */
 
 :root {
   /* Self-contained Dark Metal tokens (TASTES.md source of truth) */
@@ -49,8 +49,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   1. Eyebrow / kicker with leading line (fm-solo-starter hero eyebrow)
-   -------------------------------------------------------------------------- */
+    1. Eyebrow / kicker with leading line (fm-solo-starter hero eyebrow)
+    -------------------------------------------------------------------------- */
 .fm-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -79,8 +79,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Section label (small mono uppercase kicker)
-   -------------------------------------------------------------------------- */
+    2. Section label (small mono uppercase kicker)
+    -------------------------------------------------------------------------- */
 .fm-section-label {
   display: inline-block;
   margin-bottom: 1rem;
@@ -110,8 +110,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   3. Hairline grid (fm-solo-starter wireframe technique → our grid exposure)
-   -------------------------------------------------------------------------- */
+    3. Hairline grid (fm-solo-starter wireframe technique → our grid exposure)
+    -------------------------------------------------------------------------- */
 .fm-hairline-grid {
   display: grid;
   gap: 1px;
@@ -155,8 +155,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. Chip (mono bordered tag)
-   -------------------------------------------------------------------------- */
+    4. Chip (mono bordered tag)
+    -------------------------------------------------------------------------- */
 .fm-chip {
   display: inline-flex;
   align-items: center;
@@ -172,10 +172,10 @@
 }
 
 /* --------------------------------------------------------------------------
-   5. Code-as-decoration — THE signature motif (recolored to our palette)
-      prop-key = orange, prop-type = cyan, prop-val = clinical green,
-      prop-comment = muted italic
-   -------------------------------------------------------------------------- */
+    5. Code-as-decoration — THE signature motif (recolored to our palette)
+       prop-key = orange, prop-type = cyan, prop-val = clinical green,
+       prop-comment = muted italic
+    -------------------------------------------------------------------------- */
 .fm-code-deco {
   font-family: var(--fm-mono);
   font-size: 0.72rem;
@@ -216,8 +216,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   6. Annotation aside (prose + sticky code panel)
-   -------------------------------------------------------------------------- */
+    6. Annotation aside (prose + sticky code panel)
+    -------------------------------------------------------------------------- */
 .fm-annotation {
   display: grid;
   grid-template-columns: 1fr 320px;
@@ -239,8 +239,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   7. CTA block (title/text + actions)
-   -------------------------------------------------------------------------- */
+    7. CTA block (title/text + actions)
+    -------------------------------------------------------------------------- */
 .fm-cta-block {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -266,8 +266,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   8. Button glow (translateY(-1px) + restrained accent glow)
-   -------------------------------------------------------------------------- */
+    8. Button glow (translateY(-1px) + restrained accent glow)
+    -------------------------------------------------------------------------- */
 .fm-btn-glow {
   display: inline-flex;
   align-items: center;
@@ -307,8 +307,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   Container helper for fusion sections
-   -------------------------------------------------------------------------- */
+    Container helper for fusion sections
+    -------------------------------------------------------------------------- */
 .fm-container {
   width: 100%;
   max-width: var(--fm-container);
@@ -317,8 +317,8 @@
 }
 
 /* --------------------------------------------------------------------------
-   Respect reduced-motion (Dark Metal / a11y parity with brutalist-minimal)
-   -------------------------------------------------------------------------- */
+    Respect reduced-motion (Dark Metal / a11y parity with brutalist-minimal)
+    -------------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .fm-btn-glow,
   .fm-hairline-cell {
@@ -327,4 +327,66 @@
   .fm-btn-glow:hover {
     transform: none;
   }
+}
+
+/* Dark Metal fusion — overrides keel's dark theme across the whole site */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-bg: #0a0a0a;
+  --color-surface: #121212;
+  --color-elevated: #1a1a1a;
+  --color-glass: rgba(18, 18, 18, 0.8);
+  --color-text: #f6f1e8;
+  --color-text-strong: #ffffff;
+  --color-muted: #b0b0b0;
+  --color-soft: #1a1a1a;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+  --color-overlay: rgba(0, 0, 0, 0.75);
+  --color-accent: #ff8533;
+  --color-accent-rgb: 255, 133, 51;
+  --color-accent-hover: #ff7300;
+  --color-accent-soft: rgba(255, 133, 51, 0.16);
+  --color-brand: #10b981; /* keep clinical emerald for clinical surfaces */
+  --focus-ring: 0 0 0 3px rgba(255, 133, 51, 0.3);
+  /* keel alias tokens used by keel components */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
+  --bg-glass: rgba(18, 18, 18, 0.8);
+  --text-primary: #f6f1e8;
+  --text-secondary: #b0b0b0;
+  --text-muted: rgba(176, 176, 176, 0.7);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-primary: rgba(255, 255, 255, 0.14);
+  --border-primary-rgb: 38, 38, 38;
+  --divider-dotted: rgba(255, 255, 255, 0.08);
+  --divider-weak: #1a1a1a;
+  --bg-surface-ghost: #1a1a1a;
+}
+
+/* Built records section */
+.fm-built-records {
+  padding: 4rem 0;
+}
+.fm-built-records__title {
+  margin: 1.5rem 0 1rem;
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.2;
+}
+.fm-built-records__thumb {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  object-fit: cover;
+  border: 1px solid var(--fm-border);
+  border-radius: var(--fm-radius);
+  display: block;
+}
+.fm-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }

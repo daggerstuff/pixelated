@@ -1,0 +1,12 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="#0a0a0a"/>
+  <rect width="100%" height="100%" fill="url(#grid)"/>
+  <!-- EKG line -->
+  <polyline fill="none" stroke="#ff8533" stroke-width="2"
+            points="0,300 50,300 55,280 60,300 90,300 100,200 110,400 120,300 140,300 150,250 160,300 200,300 250,300 255,280 260,300 290,300 300,200 310,400 320,300 340,300 350,250 360,300 400,300 450,300 455,280 460,300 490,300 500,200 510,400 520,300 540,300 550,250 560,300 600,300 650,300 655,280 660,300 690,300 700,200 710,400 720,300 740,300 750,250 760,300 800,300"/>
+</svg>
