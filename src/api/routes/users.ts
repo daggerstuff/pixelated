@@ -177,24 +177,30 @@ router.put(
  */
 router.post(
   '/:userId/permissions',
+  rateLimiter,
+  rateLimitByUser(20, 60000),
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     const { userId: _userId } = req.params
-    const { permission } = req.body
+    const rawPermission = req.body.permission
+    const { user } = req as any
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
     if (!uuidRegex.test(_userId)) {
       throw new ValidationError('Invalid ID format', { error: 'userId must be a valid UUID' })
     }
-    if (!permission) {
+    if (!rawPermission) {
       throw new ValidationError('Permission required', { permission: 'Permission is required' })
     }
 
+    // Sanitize input to prevent injection
+    const permission = String(rawPermission).replace(/[^a-zA-Z0-9*:-]/g, '')
+
     const pool = getPostgresPool()
     const result = await pool.query(
-      'INSERT INTO permissions (user_id, name) VALUES ($1, $2) RETURNING *',
-      [_userId, permission]
+      'INSERT INTO permissions (user_id, name, granted_by) VALUES ($1, $2, $3) RETURNING *',
+      [_userId, permission, user.id]
     )
 
     res.json({
