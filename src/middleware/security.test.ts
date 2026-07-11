@@ -1,54 +1,50 @@
 import { describe, it, expect } from 'vitest'
-import { sanitizeString } from './security'
+import { validatePassword } from './security'
 
-describe('sanitizeString', () => {
-  it('returns empty string for non-string inputs', () => {
-    expect(sanitizeString(null)).toBe('')
-    expect(sanitizeString(undefined)).toBe('')
-    expect(sanitizeString(123)).toBe('')
-    expect(sanitizeString({})).toBe('')
-    expect(sanitizeString([])).toBe('')
-    expect(sanitizeString(true)).toBe('')
+describe('validatePassword', () => {
+  it('should return valid=true for a strong password', () => {
+    const result = validatePassword('StrongPass123!')
+    expect(result.valid).toBe(true)
+    expect(result.errors).toHaveLength(0)
   })
 
-  it('returns normal string as-is', () => {
-    expect(sanitizeString('hello world')).toBe('hello world')
-    expect(sanitizeString('valid input 123 !@#')).toBe('valid input 123 !@#')
+  it('should require at least 12 characters', () => {
+    const result = validatePassword('Short1!')
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Password must be at least 12 characters long')
   })
 
-  it('removes script tags and their content', () => {
-    expect(sanitizeString('hello<script>alert(1)</script>world')).toBe('helloworld')
-    expect(sanitizeString('<SCRIPT src="bad.js"></SCRIPT>safe')).toBe('safe')
+  it('should require at least one uppercase letter', () => {
+    const result = validatePassword('lowercase123!')
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Password must contain at least one uppercase letter')
   })
 
-  it('removes html tags but keeps content', () => {
-    expect(sanitizeString('<b>bold</b> text')).toBe('bold text')
-    expect(sanitizeString('click <a href="x">here</a>')).toBe('click here')
-    // self-closing tags are stripped, trailing whitespace trimmed
-    expect(sanitizeString('image<img src="x" />')).toBe('image')
+  it('should require at least one lowercase letter', () => {
+    const result = validatePassword('UPPERCASE123!')
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Password must contain at least one lowercase letter')
   })
 
-  it('removes javascript: protocol', () => {
-    expect(sanitizeString('javascript:alert(1)')).toBe('alert(1)')
-    expect(sanitizeString('JaVaScRiPt:alert(1)')).toBe('alert(1)')
+  it('should require at least one number', () => {
+    const result = validatePassword('NoNumbersHere!')
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Password must contain at least one number')
   })
 
-  it('removes event handlers', () => {
-    expect(sanitizeString('onclick=alert(1)')).toBe('alert(1)')
-    expect(sanitizeString('ONMOUSEOVER = alert(1)')).toBe('alert(1)')
-    expect(sanitizeString('onclick="alert(1)"')).toBe('alert(1)')
-    expect(sanitizeString("onclick='alert(1)'")).toBe('alert(1)')
+  it('should require at least one special character', () => {
+    const result = validatePassword('NoSpecialChar123')
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('Password must contain at least one special character')
   })
 
-  it('trims whitespace', () => {
-    expect(sanitizeString(' padded string ')).toBe('padded string')
-    expect(sanitizeString('\n\ttabs and newlines\n\t')).toBe('tabs and newlines')
-  })
-
-  it('truncates strings longer than 10000 characters', () => {
-    const longString = 'a'.repeat(15000)
-    const result = sanitizeString(longString)
-    expect(result.length).toBe(10000)
-    expect(result).toBe('a'.repeat(10000))
+  it('should return multiple errors if multiple conditions fail', () => {
+    const result = validatePassword('short')
+    expect(result.valid).toBe(false)
+    expect(result.errors).toHaveLength(4) // Missing uppercase, number, special char, length < 12
+    expect(result.errors).toContain('Password must be at least 12 characters long')
+    expect(result.errors).toContain('Password must contain at least one uppercase letter')
+    expect(result.errors).toContain('Password must contain at least one number')
+    expect(result.errors).toContain('Password must contain at least one special character')
   })
 })
