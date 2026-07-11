@@ -131,7 +131,12 @@ export default defineConfig({
     // memory limits entirely; for vm pools it's `vmMemoryLimit` instead. To keep
     // the PIX-223 OOM guard, cap each worker's V8 heap directly via execArgv.
     execArgv: process.env['CI'] ? ['--max-old-space-size=1024'] : undefined,
-    maxWorkers: process.env['CI'] ? 2 : 8,
+    // PIX-223/OOM: In CI the forks pool runs `maxWorkers` parallel child
+    // processes, each accumulating native jsdom/Astro/MSW allocations beyond
+    // V8's heap cap.  The 8 GB GitHub Actions runner cannot safely run 2 workers
+    // (parent + 2 × worker + OS overhead ≈ 8 GB peak).  Set to 1 to run one
+    // test file at a time, leaving ~5-6 GB for native memory per worker.
+    maxWorkers: process.env['CI'] ? 1 : 8,
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
@@ -350,7 +355,7 @@ export default defineConfig({
     // PIX-223: Timeout guard — force-kill hanging tests after 2× timeout
     teardownTimeout: 60_000,
     fileParallelism: true,
-    maxConcurrency: process.env['CI'] ? 2 : 8,
+    maxConcurrency: process.env['CI'] ? 1 : 8,
     isolate: true,
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
