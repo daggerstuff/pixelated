@@ -90,13 +90,13 @@ const ADVISORY_BUCKET_DIRS = {
   // src/components (React/JSX) is the heaviest and gets its own bucket.
   // src/hooks is moderate but has many small files that benefit from isolation.
   // Everything else (utils, tests, middleware, workers, pages) is lightweight.
-  frontend-components: [
+  "frontend-components": [
     "src/components",
   ],
-  frontend-hooks: [
+  "frontend-hooks": [
     "src/hooks",
   ],
-  frontend-utils: [
+  "frontend-utils": [
     "src/pages",
     "src/workers",
     "src/middleware",
