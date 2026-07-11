@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validatePassword } from './security'
+import { validatePassword, validateEmail } from './security'
 
 describe('validatePassword', () => {
   it('should return valid=true for a strong password', () => {
@@ -46,5 +46,37 @@ describe('validatePassword', () => {
     expect(result.errors).toContain('Password must contain at least one uppercase letter')
     expect(result.errors).toContain('Password must contain at least one number')
     expect(result.errors).toContain('Password must contain at least one special character')
+  })
+})
+
+describe('validateEmail', () => {
+  it('should return true for valid emails', () => {
+    expect(validateEmail('test@example.com')).toBe(true)
+    expect(validateEmail('user.name+tag@example.co.uk')).toBe(true)
+  })
+
+  it('should return false for emails without @', () => {
+    expect(validateEmail('testexample.com')).toBe(false)
+  })
+
+  it('should return false for emails without domain', () => {
+    expect(validateEmail('test@')).toBe(false)
+  })
+
+  it('should return false for emails with spaces', () => {
+    expect(validateEmail('test @example.com')).toBe(false)
+    expect(validateEmail('test@ example.com')).toBe(false)
+  })
+
+  it('should return true for emails with exactly 254 characters', () => {
+    const longName = 'a'.repeat(254 - 12)
+    const email = `${longName}@example.com`
+    expect(validateEmail(email)).toBe(true)
+  })
+
+  it('should return false for emails longer than 254 characters', () => {
+    const longName = 'a'.repeat(254 - 11)
+    const email = `${longName}@example.com`
+    expect(validateEmail(email)).toBe(false)
   })
 })
