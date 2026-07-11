@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
-import { existsSync } from 'fs'
+import { existsSync } from 'node:fs'
+import process from 'node:process'
 
 import { Command } from 'commander'
 
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
-
-import process from 'process'
 
 import { validatePath, ALLOWED_DIRECTORIES } from '../utils/path-security'
 import OllamaCheckInService from '../lib/services/OllamaCheckInService'
@@ -83,7 +82,6 @@ interface InitOptions {
       console.log(`   Progress: ${taskSummary.progress}%`)
 
       console.log('\n🔄 Performing Ollama check-in...')
-      // oxlint-disable no-unsafe-assignment
       const result: any = await taskManager.performTaskCheckIn(
         taskList,
         taskId,
@@ -150,8 +148,7 @@ program
         logger.info('Testing with', { summary, model })
       }
 
-      // oxlint-disable no-unsafe-assignment
-      const result: any = await ollamaService.performCheckIn(summary)
+      const result: any = await ollamaService.performCheckIn(summary, 'test-ollama CLI invocation')
 
       console.log('\n✅ Ollama test completed!')
       console.log(`Decision: ${result.decision.toUpperCase()}`)
