@@ -13,7 +13,7 @@ export const GET = protectRoute({
   validateUserAgent: true,
 })(async ({ locals, request }) => {
   try {
-    await initializeDatabase()
+    initializeDatabase()
     // Initialize database pool before queries
     const admin = locals.user
     const params = new URL(request.url).searchParams
@@ -110,7 +110,7 @@ export const PATCH = protectRoute({
   validateUserAgent: true,
 })(async ({ locals, request }) => {
   try {
-    await initializeDatabase()
+    initializeDatabase()
     // Initialize database pool before queries
     const admin = locals.user
     const body = await request.json()
