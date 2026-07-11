@@ -6,9 +6,15 @@ import fs from 'fs'
 import path from 'path'
 
 import express, { Router, Request, Response } from 'express'
-import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
+import rateLimit from 'express-rate-limit'
 
 const router: Router = express.Router()
+
+const readinessLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: 'Too many readiness checks from this IP, please try again after a minute'
+})
 
 // ============================================================================
 // READINESS AGGREGATOR ENDPOINT
@@ -18,7 +24,7 @@ const router: Router = express.Router()
  * Aggregate validation lane statuses and return readiness report
  * Combines results from lint, typecheck, tests, and format validation lanes
  */
-router.get('/', rateLimiter as any, rateLimitByUser(20, 60000) as any, async (_req: Request, res: Response): Promise<Response> => {
+router.get('/', readinessLimiter, async (_req: Request, res: Response): Promise<Response> => {
   try {
     // Get the project root directory
     const projectRoot = process.cwd()
@@ -116,8 +122,7 @@ router.get('/', rateLimiter as any, rateLimitByUser(20, 60000) as any, async (_r
  */
 router.get(
   '/dry-run',
-  rateLimiter as any,
-  rateLimitByUser(20, 60000) as any,
+  readinessLimiter,
   async (_req: Request, res: Response): Promise<Response> => {
     try {
       // Get the project root directory
