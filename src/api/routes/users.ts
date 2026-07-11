@@ -194,8 +194,11 @@ router.post(
       throw new ValidationError('Permission required', { permission: 'Permission is required' })
     }
 
-    // Sanitize input to prevent injection
-    const permission = String(rawPermission).replace(/[^a-zA-Z0-9*:-]/g, '')
+    // Strictly validate input to prevent injection
+    if (!/^[a-zA-Z0-9*:-]+$/.test(String(rawPermission))) {
+      throw new ValidationError('Invalid permission format', { permission: 'Permission contains invalid characters' })
+    }
+    const permission = String(rawPermission)
 
     const pool = getPostgresPool()
     const result = await pool.query(
