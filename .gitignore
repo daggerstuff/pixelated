@@ -412,3 +412,6 @@ notebooks
 foresight_cli
 .skillroute
 .kilocode
+.codebase-memory
+.baselines
+.kimiflare
