@@ -1,7 +1,8 @@
 // Readiness Aggregator Route
 // Aggregates validation lane statuses into a consolidated readiness report
 
-import { execSync, spawn } from 'child_process'
+import { spawn } from 'child_process'
+import fs from 'fs'
 import path from 'path'
 
 import express, { Router, Request, Response } from 'express'
@@ -30,13 +31,11 @@ router.get('/', async (_req: Request, res: Response): Promise<Response> => {
     )
 
     // Check if the script exists
-    try {
-      execSync(`test -f ${scriptPath}`, { cwd: projectRoot })
-    } catch (error) {
+    if (!fs.existsSync(scriptPath)) {
       return res.status(500).json({
         error: 'Readiness aggregator script not found',
         scriptPath: scriptPath,
-        details: (error as Error).message,
+        details: 'Script file does not exist',
       })
     }
 
@@ -67,20 +66,17 @@ router.get('/', async (_req: Request, res: Response): Promise<Response> => {
     })
 
     // Check if the output file was created
-    try {
-      execSync('test -f /tmp/readiness-report.json', { cwd: projectRoot })
-    } catch (error) {
+    if (!fs.existsSync('/tmp/readiness-report.json')) {
       return res.status(500).json({
         error: 'Readiness report file was not generated',
         exitCode: exitCode,
         stdout: stdout,
         stderr: stderr,
-        details: (error as Error).message,
+        details: 'Report file does not exist',
       })
     }
 
     // Read the generated report
-    const fs = await import('fs')
     const reportContent = fs.readFileSync('/tmp/readiness-report.json', 'utf8')
     const report = JSON.parse(reportContent) as {
       readiness?: { status?: string }
@@ -133,13 +129,11 @@ router.get(
       )
 
       // Check if the script exists
-      try {
-        execSync(`test -f ${scriptPath}`, { cwd: projectRoot })
-      } catch (error) {
+      if (!fs.existsSync(scriptPath)) {
         return res.status(500).json({
           error: 'Readiness aggregator script not found',
           scriptPath: scriptPath,
-          details: (error as Error).message,
+          details: 'Script file does not exist',
         })
       }
 
@@ -170,20 +164,17 @@ router.get(
       })
 
       // Check if the output file was created
-      try {
-        execSync('test -f /tmp/readiness-report-dry.json', { cwd: projectRoot })
-      } catch (error) {
+      if (!fs.existsSync('/tmp/readiness-report-dry.json')) {
         return res.status(500).json({
           error: 'Readiness report file was not generated',
           exitCode: exitCode,
           stdout: stdout,
           stderr: stderr,
-          details: (error as Error).message,
+          details: 'Report file does not exist',
         })
       }
 
       // Read the generated report
-      const fs = await import('fs')
       const reportContent = fs.readFileSync(
         '/tmp/readiness-report-dry.json',
         'utf8',
