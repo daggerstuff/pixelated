@@ -45,6 +45,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Prepare Helm dependencies for Trivy scan
@@ -145,6 +147,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
@@ -240,6 +244,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
@@ -336,6 +342,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Python ${{ env.PYTHON_VERSION }}
@@ -483,6 +491,8 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
