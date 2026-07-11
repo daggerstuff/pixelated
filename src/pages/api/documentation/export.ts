@@ -6,6 +6,7 @@
 import { isAuthenticated } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
+import { getAIService } from '../../../lib/ai'
 import { AIRepository } from '../../../lib/db/ai/repository'
 import { DocumentationSystem } from '../../../lib/documentation/DocumentationSystem'
 
@@ -13,20 +14,7 @@ const logger = createBuildSafeLogger('documentation-api')
 
 // Dependency injection for DocumentationSystem
 const repository = new AIRepository()
-// TODO: Replace with real API keys/config in production
-const aiService = {
-  // Minimal stub to satisfy AIService interface for documentation export (not used for read-only export)
-  getModelInfo: () => {
-    throw new Error('Not implemented')
-  },
-  createChatCompletion: () => {
-    throw new Error('Not implemented')
-  },
-  createStreamingChatCompletion: () => {
-    throw new Error('Not implemented')
-  },
-  dispose: () => {},
-}
+const aiService = getAIService()
 const documentationSystem = new DocumentationSystem(repository, aiService)
 
 export const GET = async ({ request }) => {
