@@ -393,9 +393,9 @@ describe('allscripts Provider', () => {
 
       // Assert that _summary or similar minimization parameter was potentially used
       // This requires knowing how minimization SHOULD be implemented.
-      // For now, just assert the mock was called.
-      expect(mockFhirClient.searchResources).toHaveBeenCalled()
-      // TODO: Add specific assertions about parameters or returned data fields.
+      expect(mockFhirClient.searchResources).toHaveBeenCalledWith('Patient', {
+        _summary: 'true',
+      })
     })
   })
 
