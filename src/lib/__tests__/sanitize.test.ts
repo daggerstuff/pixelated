@@ -22,7 +22,7 @@ describe('sanitizeUrl', () => {
   })
 
   it('rejects dangerous and invalid URLs', () => {
-    expect(sanitizeUrl('javascript:alert("XSS")')).toBe('#') // oxlint-disable-next-line
+    expect(sanitizeUrl('javascript:alert("XSS")')).toBe('#')
     expect(sanitizeUrl('data:text/html,<script>alert("XSS")</script>')).toBe(
       '#',
     )

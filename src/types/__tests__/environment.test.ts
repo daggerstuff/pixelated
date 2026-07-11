@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { getEnvironmentVariable, isNodeEnvironment } from '../environment'
+import { getEnvironmentVariable, isNodeEnvironment, requireEnvironmentVariable, EnvironmentValidationError } from '../environment'
 
 describe('getEnvironmentVariable', () => {
   const originalEnv = process.env
@@ -59,5 +59,43 @@ describe('Environment Validation', () => {
       // @ts-expect-error - testing invalid type
       expect(isNodeEnvironment(null)).toBe(false)
     })
+  })
+})
+
+describe('requireEnvironmentVariable', () => {
+  const originalEnv = process.env
+
+  beforeEach(() => {
+    vi.resetModules()
+    process.env = { ...originalEnv }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  it('should return the environment variable value when it exists', () => {
+    process.env['PUBLIC_SITE_URL'] = 'https://example.com'
+    const result = requireEnvironmentVariable('PUBLIC_SITE_URL')
+    expect(result).toBe('https://example.com')
+  })
+
+  it('should throw EnvironmentValidationError when the environment variable does not exist', () => {
+    delete process.env['PUBLIC_SITE_URL']
+    expect(() => requireEnvironmentVariable('PUBLIC_SITE_URL')).toThrow(EnvironmentValidationError)
+  })
+
+  it('should throw EnvironmentValidationError when the validator fails', () => {
+    process.env['PORT'] = 'invalid_port'
+    // A dummy validator to test validation failure
+    const isNumber = (val: string) => !isNaN(Number(val))
+    expect(() => requireEnvironmentVariable('PORT', isNumber)).toThrow(EnvironmentValidationError)
+  })
+
+  it('should return the environment variable value when it passes the validator', () => {
+    process.env['PORT'] = '3000'
+    const isNumber = (val: string) => !isNaN(Number(val))
+    const result = requireEnvironmentVariable('PORT', isNumber)
+    expect(result).toBe('3000')
   })
 })

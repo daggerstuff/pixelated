@@ -325,6 +325,7 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
                           onClick={() => setSelectedFlag(flag)}
                           disabled={updating === flag.id}
                           className="bg-blue-600 text-white hover:bg-blue-700 rounded px-3 py-1 text-sm disabled:opacity-50"
+                          aria-label={`Manage flag: ${flag.reason}`}
                         >
                           {updating === flag.id ? 'Updating...' : 'Manage'}
                         </button>

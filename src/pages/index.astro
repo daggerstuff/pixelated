@@ -53,12 +53,12 @@ const { hero, intro } = homepageContent
      </div>
      {/* Signature code-as-decoration hero motif */}
      <FmCodeDeco variant="badge">
-       <span class="fm-prop-comment">// session: config {</span><br />
+       <span class="fm-prop-comment">// session: config &#123;</span><br />
        <span class="fm-prop-key">mode:</span> <span class="fm-prop-val">'practice'</span>,<br />
        <span class="fm-prop-key">tone:</span> <span class="fm-prop-val">empathetic</span>,<br />
        <span class="fm-prop-key">guardrails:</span> <span class="fm-prop-val">active</span>,<br />
        <span class="fm-prop-comment">// HIPAA-isolated </span><br />
-       <span class="fm-prop-comment">}</span>
+       <span class="fm-prop-comment">&#125;</span>
      </FmCodeDeco>
    </section>
 
@@ -88,7 +88,7 @@ const { hero, intro } = homepageContent
          <FmHairlineCell>
            <p class="fm-section-label">{card.title}</p>
            <h3 class="fm-hairline-cell__title">{card.title}</h3>
-           <div class="tag-list" style="display: flex; flex-wrap: gap-2 gap-x-2">
+           <div class="tag-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
              {card.items.map((item) => (
                <span class="fm-chip">{item}</span>
              ))}
