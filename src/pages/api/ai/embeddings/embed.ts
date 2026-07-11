@@ -17,6 +17,10 @@ import {
   EmbeddingRequestSchema,
 } from "@/lib/ai/embedding-agent";
 import type { EmbeddingRequest, EmbeddingResponse } from "@/lib/ai/embedding-agent";
+import {
+  embedTextCompat,
+  isCompatEmbeddingsEnabled,
+} from "@/lib/ai/cloudflare-compat-embeddings";
 import { getSession } from "@/lib/auth/session";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
@@ -42,13 +46,15 @@ const logger = createBuildSafeLogger("embeddings-embed");
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
     // Verify session for security
-    const session: Session | null = await (getSession as any)();
+    const session: Session | null = await getSession(request);
     if (!session?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    const compatEnabled = isCompatEmbeddingsEnabled();
 
     return new Response(
       JSON.stringify({
@@ -58,6 +64,14 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
         version: "1.0.0",
         status: "active",
         authentication: "required",
+        compatEndpoint: compatEnabled
+          ? {
+              enabled: true,
+              gatewayId: import.meta.env["KIMIFLARE_AI_GATEWAY_ID"] ?? process.env["KIMIFLARE_AI_GATEWAY_ID"],
+              provider: "cloudflare-ai-gateway",
+              path: "/openai/compat/embeddings",
+            }
+          : { enabled: false },
         supportedModels: [
           "all-MiniLM-L6-v2",
           "all-MiniLM-L12-v2",
@@ -65,6 +79,7 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
           "BAAI/bge-small-en-v1.5",
           "BAAI/bge-base-en-v1.5",
           "emilyalsentzer/Bio_ClinicalBERT",
+          ...(compatEnabled ? ["@cf/baai/bge-small-en-v1.5", "@cf/baai/bge-base-en-v1.5"] : []),
         ],
         parameters: {
           required: ["text"],
@@ -75,8 +90,9 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
           "Multiple embedding models",
           "Caching support",
           "Clinical knowledge optimization",
+          ...(compatEnabled ? ["Cloudflare AI Gateway compat endpoint"] : []),
         ],
-        defaultModel: "all-MiniLM-L6-v2",
+        defaultModel: compatEnabled ? "@cf/baai/bge-small-en-v1.5" : "all-MiniLM-L6-v2",
         defaultDimension: 384,
       }),
       {
@@ -112,7 +128,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
   try {
     // Verify session
-    const session: Session | null = await (getSession as any)();
+    const session: Session | null = await getSession(request);
     if (!session?.user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -154,6 +170,49 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     const embeddingRequest: EmbeddingRequest = validation.data;
+
+    // -----------------------------------------------------------------
+    // Local bypass: use Cloudflare AI Gateway OpenAI-compatible endpoint
+    // when KIMIFLARE_AI_GATEWAY_ID is set. This avoids the buggy
+    // workers-ai-provider code that puts the model in the URL path.
+    // -----------------------------------------------------------------
+    if (isCompatEmbeddingsEnabled()) {
+      try {
+        const vector = await embedTextCompat(
+          embeddingRequest.text,
+          embeddingRequest.model,
+        );
+        const response: EmbeddingResponse = {
+          embedding: vector,
+          embeddingId: `cf_compat_${Date.now()}`,
+          modelUsed: embeddingRequest.model ?? "@cf/baai/bge-small-en-v1.5",
+          dimension: vector.length,
+          textHash: "",
+          cached: false,
+          processingTimeMs: Date.now() - startTime,
+          createdAt: new Date().toISOString(),
+        };
+        logger.info("Generated embedding via Cloudflare compat endpoint", {
+          userId: session.user.id,
+          textLength: embeddingRequest.text.length,
+          model: response.modelUsed,
+          dimension: response.dimension,
+        });
+        return new Response(JSON.stringify(response), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "X-Processing-Time-Ms": String(Date.now() - startTime),
+            "X-Model-Used": response.modelUsed,
+            "X-Cached": "false",
+            "X-Compat-Endpoint": "cloudflare-ai-gateway",
+          },
+        });
+      } catch (error: unknown) {
+        logger.error("Cloudflare compat embeddings failed, falling back to agent service", error);
+        // Fall through to the Python embedding agent service
+      }
+    }
 
     // Try to use the Python embedding agent service
     const agentUrl = import.meta.env["EMBEDDING_AGENT_URL"] ?? "http://localhost:8001";
