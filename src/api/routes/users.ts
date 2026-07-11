@@ -16,8 +16,6 @@ router.use(authMiddleware)
  */
 router.get(
   '/',
-  rateLimiter,
-  rateLimitByUser(20, 60000),
   requireRoles(['admin', 'manager']),
   asyncHandler(async (req: Request, res: Response) => {
     const { page = 1, limit = 50, role, status } = req.query
@@ -62,8 +60,6 @@ router.get(
  */
 router.get(
   '/:userId',
-  rateLimiter,
-  rateLimitByUser(20, 60000),
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { user } = req as any
@@ -100,8 +96,6 @@ router.get(
  */
 router.put(
   '/:userId',
-  rateLimiter,
-  rateLimitByUser(20, 60000),
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { name, email, status, role } = req.body
@@ -188,7 +182,7 @@ router.post(
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
-    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:-]/g, '')
+    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:\.\/-]/g, '')
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
