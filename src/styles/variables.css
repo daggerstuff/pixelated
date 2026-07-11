@@ -7,9 +7,9 @@
   color-scheme: light;
 
   /* === FONTS (keel) === */
-  --font-display: "Fraunces Variable", Georgia, serif;
-  --font-body: "Public Sans", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-body: 'Public Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   /* === BRAND (Emerald) — retained for clinical/non-homepage surfaces === */
   --color-brand: #10b981;
@@ -20,7 +20,11 @@
   --color-accent: oklch(0.54 0.14 35);
   --color-accent-rgb: 224, 68, 51;
   --color-accent-hover: color-mix(in oklch, var(--color-accent), black 12%);
-  --color-accent-soft: color-mix(in oklch, var(--color-accent), transparent 84%);
+  --color-accent-soft: color-mix(
+    in oklch,
+    var(--color-accent),
+    transparent 84%
+  );
 
   /* === LIGHT CANVAS (default — per keel reference) === */
   --color-bg: oklch(0.99 0.003 100);
@@ -93,13 +97,17 @@
 }
 
 /* === DARK THEME OVERRIDE (opt-in, per keel reference) === */
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   color-scheme: dark;
 
   --color-accent: oklch(0.72 0.13 42);
   --color-accent-rgb: 233, 122, 86;
   --color-accent-hover: color-mix(in oklch, var(--color-accent), white 10%);
-  --color-accent-soft: color-mix(in oklch, var(--color-accent), transparent 78%);
+  --color-accent-soft: color-mix(
+    in oklch,
+    var(--color-accent),
+    transparent 78%
+  );
 
   --color-bg: oklch(0.18 0.009 250);
   --color-surface: oklch(0.22 0.01 250);
