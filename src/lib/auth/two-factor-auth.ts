@@ -1,5 +1,8 @@
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { getFromCache } from '../redis'
+import { getFromCache, setToCache } from '../redis'
+import { generateSecret, generateURI } from 'otplib'
+import * as qrcode from 'qrcode'
+import { randomBytes } from 'crypto'
 
 export interface DeviceInfo {
   deviceId: string
@@ -31,12 +34,31 @@ export const setupTwoFactorAuth = async (
     throw new Error('2FA is already enabled')
   }
 
-  // In a real implementation this would use otplib to generate a secret
-  const secret = 'test-secret'
-  const qrCode = 'data:image/png;base64,test'
+  // Dynamically generate a secure secret
+  const secret = generateSecret()
+
+  // Store the secret as pending
+  await setToCache(`2fa:pending-secret:${userId}`, secret)
+
+  // Generate otpauth URL
+  const otpauthUrl = generateURI({
+    secret,
+    label: _email || 'user',
+    issuer: 'BusinessStrategyCMS',
+  })
+
+  // Generate QR code data URL
+  const qrCode = await qrcode.toDataURL(otpauthUrl)
+
+  // Generate 10 secure backup codes with higher entropy (10 bytes => 80 bits)
+  const BACKUP_CODE_BYTES = 10
   const backupCodes = Array(10)
     .fill(0)
-    .map((_, i) => `code-${i}`)
+    .map(() => {
+      const hex = randomBytes(BACKUP_CODE_BYTES).toString('hex')
+      // Group into chunks of 4 characters for readability, e.g. "abcd-ef12-3456-7890-..."
+      return hex.match(/.{1,4}/g)?.join('-') ?? hex
+    })
 
   try {
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_initiated')
@@ -57,6 +79,22 @@ export const completeTwoFactorSetup = async (
   _token: string,
   _deviceInfo: DeviceInfo,
 ) => {
+  // Load the pending secret
+  const pendingSecret = await getFromCache<string>(
+    `2fa:pending-secret:${userId}`,
+  )
+
+  // Verify the token against the pending secret
+  if (!generateURI(pendingSecret).verify(_token)) {
+    throw new Error('Invalid token')
+  }
+
+  // Store the secret as enabled
+  await setToCache(`2fa:secret:${userId}`, pendingSecret)
+
+  // Remove the pending secret
+  await setToCache(`2fa:pending-secret:${userId}`, null)
+
   try {
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_completed')
   } catch {
@@ -75,6 +113,17 @@ export const verifyTwoFactorToken = async (
   if (attemptCount >= 3) {
     throw new Error('Account is locked')
   }
+
+  // Load the enabled secret
+  const secret = await getFromCache<string>(
+    `2fa:secret:${verification.userId}`,
+  )
+
+  // Verify the token against the enabled secret
+  if (!generateURI(secret).verify(verification.token)) {
+    throw new Error('Invalid token')
+  }
+
   return true
 }
 
