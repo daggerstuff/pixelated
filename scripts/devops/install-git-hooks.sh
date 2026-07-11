@@ -39,6 +39,13 @@ if [ -n "$HOOKS_PATH" ]; then
   esac
 fi
 TEMPLATES_DIR="$(dirname "${BASH_SOURCE[0]}")/hooks/templates"
+
+if [ ! -d "$TEMPLATES_DIR" ]; then
+  echo "Git hook templates directory not found."
+  echo "Skipping git hook installation."
+  exit 0
+fi
+
 mkdir -p "$HOOKS_DIR"
 
 PROTECTED_BRANCHES="main master production staging"
