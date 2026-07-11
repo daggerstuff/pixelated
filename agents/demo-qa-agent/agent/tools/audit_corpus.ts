@@ -156,7 +156,7 @@ const SLOP_RE =
   /\b(please confirm|circle back|moving forward|alignment|touch base|as discussed|per my last|happy to help|thank you for sharing|i hope this email finds you well|let me know your thoughts|highlights|next steps|sounds good|absolutely|confirmed)\b/i
 
 const EMOJI_RE =
-  /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F02F}\u{FE0F}]/u
+  /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F02F}]\u{FE0F}?/u
 
 const NUMERIC_RE =
   /\b\d+(?:[.,]\d+)?(?:%|ms|k|K|M|GB|hrs?|days?|users?|emails?)?\b/
