@@ -169,6 +169,9 @@ export class DreamScheduler {
             this.config.requestTimeoutMs,
           )
 
+          // Note: While this transmits user IDs, these are system identifiers,
+          // not PHI/EHR data. Real EHR systems use TLS encryption for all data in transit.
+          // This internal fetch communicates within the trusted network boundary.
           const response = await fetch(`${baseUrl}/api/dream/consolidate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
