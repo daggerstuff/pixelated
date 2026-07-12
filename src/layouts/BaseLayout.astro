@@ -11,6 +11,7 @@ import '@/styles/fonts.css';
 import '@/styles/keel-theme.css';
 import '@/styles/motion.css';
 import '@/styles/responsive.css';
+import '@/styles/fm-fusion.css'; // design fusion layer (fm-solo-starter × Dark Metal)
 import { withBasePath } from '@/utils/path';
 import { SITE } from '@/config';
 
@@ -95,7 +96,7 @@ const organizationSchema = {
 ---
 
 <!doctype html>
-<html lang={SITE.lang || 'en'}>
+<html lang={SITE.lang || 'en'} data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
@@ -122,45 +123,99 @@ const organizationSchema = {
     {imageURL && <meta name="twitter:image" content={imageURL} />}
     <script is:inline nonce={cspNonce}>
       const storedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.dataset['theme'] = storedTheme || (prefersDark ? 'dark' : 'light');
-      // Keel reference is light-first: when no stored preference and system is light, render light.
-      if (!storedTheme && !prefersDark) {
-        document.documentElement.dataset['theme'] = 'light';
-      }
+      document.documentElement.dataset['theme'] = storedTheme || 'dark';
     </script>
     <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replaceAll(String.fromCharCode(60), '\\u003c').replaceAll(String.fromCharCode(62), '\\u003e')}></script>
+    <style>
+      .fm-nav-active {
+        position: relative;
+        padding-left: 0.5rem;
+      }
+      .fm-nav-active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 16px;
+        background: var(--fm-accent);
+      }
+      .fm-footer-inner {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.25rem;
+        padding: 3rem 0;
+        border-top: 1px solid var(--fm-border);
+      }
+      .fm-footer-copy {
+        margin: 0.6rem 0 0;
+        color: var(--fm-muted);
+        font-family: var(--fm-sans);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+      .fm-footer-links {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+      .fm-footer-links .fm-chip {
+        color: var(--fm-muted);
+        text-decoration: none;
+        transition: color 0.15s ease-out, border-color 0.15s ease-out;
+      }
+      .fm-footer-links .fm-chip:hover {
+        color: var(--fm-accent-2);
+        border-color: var(--fm-accent-2);
+      }
+    </style>
   </head>
   <body>
-    <header class="site-header">
-      <a class="brand" href={withBasePath('/')} aria-label={`${siteName} home`}>
-        <span class="brand-mark" aria-hidden="true"></span>
-        <span>{siteName}</span>
-      </a>
-      <nav class="site-nav" aria-label="Main navigation">
-        {
-          navItems.map((item) => (
-            <a href={withBasePath(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
-              {item.label}
-            </a>
-          ))
-        }
-      </nav>
-      <button class="theme-toggle" type="button" aria-label="Toggle color theme" data-theme-toggle>
-        <span aria-hidden="true"></span>
-      </button>
-    </header>
+<header class="site-header">
+  <div class="fm-container">
+    <a class="brand" href={withBasePath('/')} aria-label={`${siteName} home`}>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>{siteName}</span>
+    </a>
+    <nav class="site-nav" aria-label="Main navigation">
+      {
+        navItems.map((item) => (
+          <a 
+            class={isActive(item.href) ? 'fm-nav-active' : undefined} 
+            href={withBasePath(item.href)} 
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle color theme" data-theme-toggle>
+      <span aria-hidden="true"></span>
+    </button>
+  </div>
+</header>
 
     <main>
       <slot />
     </main>
 
     <footer class="site-footer">
-      <p>&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
-      <div style="display:flex;gap:1.5rem;">
-        <a href={withBasePath('/about')}>About</a>
-        <a href={withBasePath('/privacy')}>Privacy</a>
-        <a href={withBasePath('/contact')}>Contact</a>
+      <div class="fm-container">
+        <div class="fm-footer-inner">
+          <div>
+            <span class="fm-section-label">{siteName} — Clinical AI Platform</span>
+            <p class="fm-footer-copy">&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+          </div>
+          <div class="fm-footer-links">
+            <a class="fm-chip" href={withBasePath('/about')}>About</a>
+            <a class="fm-chip" href={withBasePath('/privacy')}>Privacy</a>
+            <a class="fm-chip" href={withBasePath('/contact')}>Contact</a>
+          </div>
+        </div>
       </div>
     </footer>
 

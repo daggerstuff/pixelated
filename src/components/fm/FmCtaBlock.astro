@@ -1,0 +1,23 @@
+---
+interface Props {
+  title: string;
+  text?: string;
+  primaryHref: string;
+  primaryText: string;
+  secondaryHref?: string;
+  secondaryText?: string;
+}
+const { title, text, primaryHref, primaryText, secondaryHref, secondaryText } = Astro.props;
+---
+<div class="fm-cta-block">
+  <div>
+    <h2>{title}</h2>
+    {text && <p>{text}</p>}
+  </div>
+  <div class="fm-cta-block__side">
+    <a href={primaryHref} class="fm-btn-glow">{primaryText}</a>
+    {secondaryHref && secondaryText && (
+      <a href={secondaryHref} class="fm-btn-glow--ghost">{secondaryText}</a>
+    )}
+  </div>
+</div>

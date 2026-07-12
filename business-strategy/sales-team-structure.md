@@ -24,16 +24,20 @@ Responsibilities:**
 #### VP of Sales - Institutional Markets
 
 **Reporting**: CRO **Team Size**: 12-15 institutional sales professionals
-**Compensation**: $180,000 base + 35% bonus + 0.3% equity **Market Focus**:
+**Compensation**:
+$180,000 base + 35% bonus + 0.3% equity **Market Focus**:
 Academic institutions, healthcare systems, large organizations **Revenue
-Target**: $8M ARR by Year 4
+Target**: $8M
+ARR by Year 4
 
 #### VP of Sales - Individual & SMB Markets
 
 **Reporting**: CRO **Team Size**: 8-10 individual/SMB sales professionals
-**Compensation**: $150,000 base + 30% bonus + 0.2% equity **Market Focus**:
+**Compensation**:
+$150,000 base + 30% bonus + 0.2% equity **Market Focus**:
 Individual practitioners, small practices, group practices **Revenue Target**:
-$2M ARR by Year 4
+$2M
+ARR by Year 4
 
 ### Sales Team Structure by Market Segment
 
@@ -41,7 +45,8 @@ $2M ARR by Year 4
 
 ##### Enterprise Account Executives (4 positions)
 
-**Territory**: Major accounts $100K+ potential **Base Salary**:
+**Territory**: Major accounts
+$100K+ potential **Base Salary**:
 $120,000-$150,000 **On-Target Earnings**: $240,000-$300,000 **Quota**: $1.5M-$2M
 annual recurring revenue **Territory Assignment**: Geographic or vertical market
 focus
@@ -461,27 +466,34 @@ Certification**: Advanced sales certification and competency assessment
 
 #### Year 1: Foundation Building
 
-**Team Size**: 8-10 sales professionals **Budget**: $800,000 total sales
+**Team Size**: 8-10 sales professionals **Budget**:
+$800,000 total sales
 investment **Focus**: Market validation and early customer acquisition **Revenue
-Target**: $500K ARR
+Target**: $500K
+ARR
 
 #### Year 2: Market Expansion
 
-**Team Size**: 15-18 sales professionals **Budget**: $1.2M total sales
+**Team Size**: 15-18 sales professionals **Budget**:
+$1.2M total sales
 investment **Focus**: Market expansion and team scaling **Revenue Target**: $2M
 ARR
 
 #### Year 3: Market Leadership
 
-**Team Size**: 20-25 sales professionals **Budget**: $1.8M total sales
+**Team Size**: 20-25 sales professionals **Budget**:
+$1.8M total sales
 investment **Focus**: Market leadership and strategic accounts **Revenue
-Target**: $5M ARR
+Target**: $5M
+ARR
 
 #### Year 4: Global Expansion
 
-**Team Size**: 25-30 sales professionals **Budget**: $2.5M total sales
+**Team Size**: 25-30 sales professionals **Budget**:
+$2.5M total sales
 investment **Focus**: Global expansion and enterprise sales **Revenue Target**:
-$10M ARR
+$10M
+ARR
 
 This comprehensive sales team structure and compensation framework provides the
 foundation for achieving $10M ARR by Year 4 through systematic market

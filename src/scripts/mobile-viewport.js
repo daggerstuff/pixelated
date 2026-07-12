@@ -7,15 +7,22 @@
 // Fix for iOS Safari dynamic viewport height (address bar appearance/disappearance)
 function setupViewportHeight() {
   const updateViewportHeight = () => {
+    // Use visualViewport if available for better accuracy, else fallback to innerHeight
+    const height = window.visualViewport ? window.visualViewport.height : window.innerHeight
     // Set CSS variable to current viewport height
     document.documentElement.style.setProperty(
       '--viewport-height',
-      `${window.innerHeight}px`,
+      `${height}px`,
     )
   }
 
   // Update on resize
   window.addEventListener('resize', updateViewportHeight)
+
+  // Listen to visualViewport resize if available (especially useful for iOS keyboard)
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', updateViewportHeight)
+  }
 
   // Update on orientation change
   window.addEventListener('orientationchange', () => {

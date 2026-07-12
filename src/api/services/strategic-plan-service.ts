@@ -227,13 +227,13 @@ export async function submitForApproval(
   )
 
   // Create approval steps for each approver
-  for (const approverId of approvers) {
-    const stepId = uuid()
+  if (approvers.length > 0) {
+    const stepIds = approvers.map(() => uuid())
 
     await pool.query(
       `INSERT INTO approval_steps (id, approval_request_id, approver_id, status, created_at)
-       VALUES ($1, $2, $3, $4, NOW())`,
-      [stepId, approvalRequestId, approverId, 'pending'],
+       SELECT unnest($1::uuid[]), $2::uuid, unnest($3::uuid[]), 'pending', NOW()`,
+      [stepIds, approvalRequestId, approvers],
     )
   }
 

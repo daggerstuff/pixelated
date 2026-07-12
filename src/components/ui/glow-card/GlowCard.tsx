@@ -136,7 +136,7 @@ export const GlowCard: React.FC<GlowCardProps> = ({
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: beforeAfterStyles }} />
+      <style>{beforeAfterStyles}</style>
       <div
         ref={cardRef}
         data-glow

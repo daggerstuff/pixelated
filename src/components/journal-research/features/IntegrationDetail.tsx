@@ -187,9 +187,16 @@ def transform_data(source_data: Dict[str, Any]) -> Dict[str, Any]:
     """
     Transform source data to target format: ${plan.targetFormat}
     """
-    # TODO: Implement transformations
     # Required transformations:
 ${plan.requiredTransformations.map((t) => `    # - ${t}`).join('\n')}
+
+    transformed_data = {}
+
+    # Apply schema mapping
+${Object.entries(plan.schemaMapping)
+  .map(([k, v]) => `    if "${k}" in source_data:
+        transformed_data["${v}"] = source_data["${k}"]`)
+  .join('\n')}
     
     return transformed_data
 

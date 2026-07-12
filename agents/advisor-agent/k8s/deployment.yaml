@@ -1,0 +1,118 @@
+# pipeline-agent (PIX-3959) K8s manifest.
+#
+# Deploys the pipeline orchestrator as a long-running Node service with a
+# cron-scheduled entry (weekly-train.ts). Outside Vercel, point the host
+# scheduler at POST /eve/v1/dev/schedules/weekly-train.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-agent
+  namespace: pixelated-empathy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipeline-agent
+  template:
+    metadata:
+      labels:
+        app: pipeline-agent
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-registry-credentials
+      containers:
+        - name: agent
+          image: docker.io/pixelatedempathy/pipeline-agent:latest
+          ports:
+            - containerPort: 2000
+              name: http
+          env:
+            - name: PORT
+              value: "2000"
+            - name: NODE_ENV
+              value: production
+            - name: CLOUDFLARE_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-workers-ai
+                  key: account-id
+            - name: CLOUDFLARE_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-workers-ai
+                  key: api-key
+            - name: WORKERS_AI_AGENT_MODEL
+              value: "@cf/moonshotai/kimi-k2.7-code"
+            - name: SLACK_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-agent
+                  key: bot-token
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-agent
+                  key: signing-secret
+            - name: LINEAR_AGENT_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: linear-agent
+                  key: access-token
+            - name: LINEAR_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: linear-agent
+                  key: webhook-secret
+            - name: TRAINING_INFRA_MCP_URL
+              value: http://training-infra-mcp:8766
+            - name: K8S_MCP_URL
+              value: http://k8s-mcp:8767
+            - name: FORESIGHT_URL
+              value: http://foresight:8765
+          startupProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            # Gives the server up to 90 s to complete its cold start
+            # (30 attempts × 3 s period). The readiness/liveness probes
+            # don't start running until startupProbe succeeds.
+            periodSeconds: 3
+            failureThreshold: 30
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipeline-agent
+  namespace: pixelated-empathy
+spec:
+  selector:
+    app: pipeline-agent
+  ports:
+    - name: http
+      port: 80
+      targetPort: 2000

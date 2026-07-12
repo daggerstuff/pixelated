@@ -10,7 +10,8 @@ export const SITE: Site = {
   website: 'https://pixelatedempathy.com',
   base: '/',
   title: 'Pixelated Empathy',
-  description: 'Clinical simulation and transcript-based review for therapist training and supervision teams.',
+  description:
+    'Clinical simulation and transcript-based review for therapist training and supervision teams.',
   author: 'Pixelated Empathy',
   lang: 'en',
   ogLocale: 'en_US',
