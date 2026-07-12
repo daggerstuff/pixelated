@@ -132,7 +132,9 @@ test('login page has proper transitions', async ({ page }) => {
     ignoreCase: true,
   })
   // Verify password field is hidden in reset mode
-  await expect(page.locator('input[type="password"]')).not.toBeVisible({ timeout: 5000, })
+  await expect(page.locator('input[type="password"]')).not.toBeVisible({
+    timeout: 5000,
+  })
 })
 
 // Visual regression test for login page
@@ -158,7 +160,7 @@ test('login page visual comparison', async ({ page }) => {
   // Take screenshot for visual comparison
   // Increased tolerance for browser differences, especially WebKit
   await expect(page).toHaveScreenshot('login-page.png', {
-    maxDiffPixelRatio: 0.1, // Increased tolerance for cross-browser rendering differences
+    maxDiffPixelRatio: 0.01, // Tighter tolerance for cross-browser rendering differences
     threshold: 0.02, // Additional threshold for pixel comparison
   })
 })
