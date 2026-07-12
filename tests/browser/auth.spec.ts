@@ -161,6 +161,5 @@ test('login page visual comparison', async ({ page }) => {
   // Increased tolerance for browser differences, especially WebKit
   await expect(page).toHaveScreenshot('login-page.png', {
     maxDiffPixelRatio: 0.02, // Changed from 1.0 to 0.02
-    threshold: 0.2,
-  })
+    threshold: 0.2,  })
 })
