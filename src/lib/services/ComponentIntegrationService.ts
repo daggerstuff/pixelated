@@ -495,16 +495,16 @@ export class ComponentIntegrationService {
       ]
 
       const healthChecks = await Promise.allSettled(
-        endpoints.map(async (endpoint) => {
-          const response = await fetch(
-            `${this.baseUrl}${endpoint}?healthCheck=true`,
-            {
-              method: 'HEAD',
-              headers: this.authHeaders,
-            },
-          )
-          return { endpoint, status: response.status, ok: response.ok }
-        }),
+        endpoints.map((endpoint) =>
+          fetch(`${this.baseUrl}${endpoint}?healthCheck=true`, {
+            method: 'HEAD',
+            headers: this.authHeaders,
+          }).then((response) => ({
+            endpoint,
+            status: response.status,
+            ok: response.ok,
+          })),
+        ),
       )
 
       const health = {
