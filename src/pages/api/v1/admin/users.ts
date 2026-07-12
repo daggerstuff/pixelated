@@ -210,12 +210,12 @@ export const PATCH = protectRoute({
           { status: 404, headers: { 'Content-Type': 'application/json' } },
         )
       }
-      await createResourceAuditLog(
+      createResourceAuditLog(
         AuditEventType.MODIFY,
         admin.id,
         { id: userId, type: 'user' },
         { updates: sanitizedUpdates, updatedBy: admin.id },
-      )
+      ).catch((err) => logger.error('Failed to create audit log:', err))
       return new Response(
         JSON.stringify({
           data: { id: userId, ...sanitizedUpdates },
