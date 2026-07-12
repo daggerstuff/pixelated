@@ -198,7 +198,7 @@ foresight doctor                          # Health check + memory count + DB sta
 
 - **CLI writes to SQLite instead of Postgres**: Check `FORESIGHT_DB_URL` is in `.env` — `foresight doctor` shows active env overrides
 - **MCP server down**: `systemctl --user restart foresight-mcp`
-- **MCP client can't connect**: Verify port `8764` is listening (`ss -ltn | grep 8764`) and the client URL is `http://127.0.0.1:8764/mcp`
+- **MCP client can't connect**: Verify port `8764` is listening (`ss -ltn | grep 8764`) and client URL is `http://127.0.0.1:8764/mcp`
 
 ---
 
