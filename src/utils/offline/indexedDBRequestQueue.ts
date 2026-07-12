@@ -241,65 +241,90 @@ class IndexedDBRequestQueue {
     if (this.isProcessing || this.queue.length === 0) return
 
     this.isProcessing = true
+    const processingIds = new Set<string>()
 
     try {
-      while (this.queue.length > 0) {
-        const request = this.queue[0] // Get the highest priority request
-
+      const processRequest = async (request: QueuedRequest) => {
         try {
-          const response = await fetch(request.url, {
-            method: request.method,
-            headers: request.headers,
-            body: request.body
-              ? typeof request.body === 'string'
-                ? request.body
-                : JSON.stringify(request.body)
-              : undefined,
-          })
-
-          if (response.ok) {
-            // Request succeeded, remove from queue
-            this.queue.shift()
-            // Persist asynchronously
-            if (this.options.enablePersistence) {
-              this.saveToStorage().catch((err) => {
-                console.warn(
-                  'Failed to persist request queue after processing:',
-                  err,
-                )
+          while (request.retryCount <= request.maxRetries) {
+            try {
+              const response = await fetch(request.url, {
+                method: request.method,
+                headers: request.headers,
+                body: request.body
+                  ? typeof request.body === 'string'
+                    ? request.body
+                    : JSON.stringify(request.body)
+                  : undefined,
               })
-            }
-            onRequestSuccess?.(request)
-          } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-          }
-        } catch {
-          // Request failed, increment retry count
-          request.retryCount++
 
-          if (request.retryCount > request.maxRetries) {
-            // Max retries reached, remove from queue
-            console.warn(
-              `Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`,
-            )
-            this.queue.shift()
-            // Persist asynchronously
-            if (this.options.enablePersistence) {
-              this.saveToStorage().catch((err) => {
+              if (response.ok) {
+                // Request succeeded, remove from queue
+                this.queue = this.queue.filter((req) => req.id !== request.id)
+                if (this.options.enablePersistence) {
+                  this.saveToStorage().catch((err) => {
+                    console.warn(
+                      'Failed to persist request queue after processing:',
+                      err,
+                    )
+                  })
+                }
+                onRequestSuccess?.(request)
+                return
+              } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+              }
+            } catch {
+              // Request failed, increment retry count
+              request.retryCount++
+
+              if (request.retryCount > request.maxRetries) {
+                // Max retries reached, remove from queue
                 console.warn(
-                  'Failed to persist request queue after max retries:',
-                  err,
+                  `Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`,
                 )
-              })
+                this.queue = this.queue.filter((req) => req.id !== request.id)
+                if (this.options.enablePersistence) {
+                  this.saveToStorage().catch((err) => {
+                    console.warn(
+                      'Failed to persist request queue after max retries:',
+                      err,
+                    )
+                  })
+                }
+                return
+              } else {
+                // Wait before retrying
+                await new Promise((resolve) =>
+                  setTimeout(resolve, this.options.retryDelay * request.retryCount),
+                )
+                // Continue to retry the same request
+              }
             }
-          } else {
-            // Wait before retrying
-            await new Promise((resolve) =>
-              setTimeout(resolve, this.options.retryDelay * request.retryCount),
-            )
-            // Continue to retry the same request (do not shift the queue)
-            continue
           }
+        } finally {
+          processingIds.delete(request.id)
+        }
+      }
+
+      // Process queue continuously to handle dynamically added requests
+      // We check if there are any items in the queue that are not currently being processed.
+      let hasUnprocessedRequests = true
+      while (hasUnprocessedRequests) {
+        hasUnprocessedRequests = false
+
+        // Find items that aren't processing
+        const requestsToProcess = this.queue.filter(req => !processingIds.has(req.id))
+
+        if (requestsToProcess.length > 0) {
+          hasUnprocessedRequests = true
+
+          for (const req of requestsToProcess) {
+            processingIds.add(req.id)
+          }
+
+          // Process current batch concurrently
+          await Promise.all(requestsToProcess.map(processRequest))
         }
       }
     } finally {
