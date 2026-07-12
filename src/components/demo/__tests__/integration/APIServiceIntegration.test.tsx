@@ -51,9 +51,13 @@ const safeFetch = async (
 describe('APIService Integration Tests', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Use fake timers so the 30s abort timeout in safeFetch becomes a no-op
+    // and the exponential-backoff retry test does not burn real wall-clock time.
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
+    vi.useRealTimers()
     vi.restoreAllMocks()
   })
 
@@ -503,7 +507,12 @@ describe('APIService Integration Tests', () => {
         throw new Error('All retries failed')
       }
 
-      const response = await retryFetch('/api/knowledge-balancer/status', {})
+      // Start the retry loop (it will suspend on the fake setTimeout inside the catch)
+      const retryPromise = retryFetch('/api/knowledge-balancer/status', {})
+      // Advance time past the 1st retry delay (2^0 = 1s) and the 2nd (2^1 = 2s)
+      await vi.advanceTimersByTimeAsync(1_000)
+      await vi.advanceTimersByTimeAsync(2_000)
+      const response = await retryPromise
       const data = await response.json()
       expect(mockFetch).toHaveBeenCalledTimes(3)
       expect(data.success).toBe(true)
