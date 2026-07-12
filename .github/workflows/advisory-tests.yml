@@ -30,10 +30,7 @@ env:
 jobs:
   advisory-test-suite:
     runs-on: ubuntu-latest
-    # bumped from 30 to 45 because the frontend-components bucket (52 files,
-    # sequential in CI, heavy jsdom/Astro per-file overhead, real-timer tests)
-    # consistently hits the 30-minute wall.
-    timeout-minutes: 45
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
