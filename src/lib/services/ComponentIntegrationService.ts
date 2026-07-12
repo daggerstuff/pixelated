@@ -496,18 +496,19 @@ export class ComponentIntegrationService {
 
       const healthChecks = await Promise.all(
         endpoints.map((endpoint) => {
-          const url = new URL(
+          const secureUrl = new URL(
             `${endpoint}?healthCheck=true`,
             this.baseUrl || 'https://localhost',
           )
           if (
-            url.protocol === 'http:' &&
-            url.hostname !== 'localhost' &&
-            url.hostname !== '127.0.0.1'
+            secureUrl.protocol === 'http:' &&
+            !['localhost', '127.0.0.1'].includes(secureUrl.hostname)
           ) {
-            url.protocol = 'https:'
+            throw new Error(
+              'HIPAA Compliance: Unencrypted EHR data transmission is forbidden. Use HTTPS.',
+            )
           }
-          return fetch(url.toString(), {
+          return fetch(secureUrl, {
             method: 'HEAD',
             headers: this.authHeaders,
           })
