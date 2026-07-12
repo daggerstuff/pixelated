@@ -1,12 +1,12 @@
 [submodule "ai"]
 	path = ai
-	url = git@github.com:daggerstuff/ai.git
+	url = https://github.com/daggerstuff/ai.git
 	branch = staging
 [submodule "docs"]
 	path = docs
-	url = git@github.com:daggerstuff/docs.git
+	url = https://github.com/daggerstuff/docs.git
 	branch = master
 [submodule "foresight"]
 	path = foresight
-	url = git@github.com:daggerstuff/foresight.git
+	url = https://github.com/daggerstuff/foresight.git
 	branch = master
