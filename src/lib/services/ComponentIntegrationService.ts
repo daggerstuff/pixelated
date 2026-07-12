@@ -494,8 +494,8 @@ export class ComponentIntegrationService {
         '/api/components/ui/carousel-content',
       ]
 
-      const healthChecks = await Promise.all(
-        endpoints.map((endpoint) => {
+      const services = await Promise.all(
+        endpoints.map(async (endpoint) => {
           const secureUrl = new URL(
             `${endpoint}?healthCheck=true`,
             this.baseUrl || 'https://localhost',
@@ -504,45 +504,39 @@ export class ComponentIntegrationService {
             secureUrl.protocol === 'http:' &&
             !['localhost', '127.0.0.1', '[::1]'].includes(secureUrl.hostname)
           ) {
-            return Promise.resolve({
-              status: 'rejected' as const,
-              reason: new Error(
+            return {
+              endpoint,
+              status: 'error' as const,
+              error: new Error(
                 'HIPAA Compliance: Unencrypted EHR data transmission is forbidden. Use HTTPS.',
               ),
-            })
+            }
           }
-          return fetch(secureUrl, {
-            method: 'HEAD',
-            headers: this.authHeaders,
-          })
-            .then((response) => ({
-              status: 'fulfilled' as const,
-              value: { endpoint, status: response.status, ok: response.ok },
-            }))
-            .catch((error) => ({
-              status: 'rejected' as const,
-              reason: error,
-            }))
-        }),
+          try {
+            const response = await fetch(secureUrl, {
+              method: 'HEAD',
+              headers: this.authHeaders,
+            })
+            return {
+              endpoint,
+              status: response.ok ? 'healthy' : 'unhealthy',
+              error: null,
+            }
+          } catch (error) {
+            return {
+              endpoint,
+              status: 'error',
+              error,
+            }
+          }
+        }),        }),
       )
 
       const health = {
-        overall: healthChecks.every(
-          (check) => check.status === 'fulfilled' && check.value.ok,
-        )
+        overall: services.every((s) => s.status === 'healthy')
           ? 'healthy'
           : 'degraded',
-        services: healthChecks.map((check) => ({
-          endpoint:
-            check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
-          status:
-            check.status === 'fulfilled'
-              ? check.value.ok
-                ? 'healthy'
-                : 'unhealthy'
-              : 'error',
-          error: check.status === 'rejected' ? check.reason : null,
-        })),
+        services,
         timestamp: new Date().toISOString(),
       }
 
