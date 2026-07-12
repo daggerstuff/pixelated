@@ -262,9 +262,11 @@ export function generateSecureRandomString(length: number = 32): string {
   const chars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
   let result = ''
+  const randomValues = new Uint32Array(length)
+  crypto.getRandomValues(randomValues)
 
   for (let i = 0; i < length; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length))
+    result += chars.charAt(randomValues[i] % chars.length)
   }
 
   return result
