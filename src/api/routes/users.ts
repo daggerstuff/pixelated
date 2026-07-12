@@ -29,6 +29,16 @@ router.get(
     const params: any[] = []
 
     // Validate and sanitize inputs
+    const parsedLimit = parseInt(limit as string, 10)
+    const parsedPage = parseInt(page as string, 10)
+
+    if (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 1000) {
+      throw new ValidationError('Invalid limit', { limit: 'limit must be a positive integer' })
+    }
+    if (isNaN(parsedPage) || parsedPage <= 0) {
+      throw new ValidationError('Invalid page', { page: 'page must be a positive integer' })
+    }
+
     if (role) {
       if (typeof role !== 'string' || !['admin', 'manager', 'user'].includes(role)) {
         throw new ValidationError('Invalid role', { role: 'Invalid role' })
@@ -44,15 +54,15 @@ router.get(
       params.push(status)
     }
     query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2)
-    params.push(limit, (parseInt(page as string) - 1) * parseInt(limit as string))
+    params.push(parsedLimit, (parsedPage - 1) * parsedLimit)
 
     const result = await pool.query(query, params)
     res.json({
       success: true,
       data: result.rows,
       pagination: {
-        page,
-        limit,
+        page: parsedPage,
+        limit: parsedLimit,
         total: result.rows.length,
       },
     })
@@ -187,7 +197,7 @@ router.post(
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
-    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:\.\/-]/g, '')
+    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:./-]/g, '')
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
