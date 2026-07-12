@@ -100,38 +100,37 @@
 :root[data-theme='dark'] {
   color-scheme: dark;
 
-  --color-accent: oklch(0.72 0.13 42);
-  --color-accent-rgb: 233, 122, 86;
-  --color-accent-hover: color-mix(in oklch, var(--color-accent), white 10%);
-  --color-accent-soft: color-mix(
-    in oklch,
-    var(--color-accent),
-    transparent 78%
-  );
+  --color-accent: #ff8533;
+  --color-accent-rgb: 255, 133, 51;
+  --color-accent-hover: #ff7300;
+  --color-accent-soft: rgba(255, 133, 51, 0.16);
 
-  --color-bg: oklch(0.18 0.009 250);
-  --color-surface: oklch(0.22 0.01 250);
-  --color-elevated: oklch(0.24 0.01 250);
-  --color-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
-  --color-text: oklch(0.93 0.006 95);
-  --color-muted: oklch(0.69 0.012 250);
-  --color-line: oklch(0.34 0.012 250);
-  --color-line-strong: oklch(0.44 0.016 230);
-  --color-soft: oklch(0.26 0.01 250);
+  --color-bg: #0a0a0a;
+  --color-surface: #121212;
+  --color-elevated: #1a1a1a;
+  --color-glass: rgba(18, 18, 18, 0.8);
+  --color-text: #f6f1e8;
+  --color-text-strong: #ffffff;
+  --color-muted: #b0b0b0;
+  --color-line: rgba(255, 255, 255, 0.08);
+  --color-line-strong: rgba(255, 255, 255, 0.14);
+  --color-soft: #1a1a1a;
   --color-overlay: rgba(0, 0, 0, 0.75);
 
-  --bg-primary: oklch(0.18 0.009 250);
-  --bg-secondary: oklch(0.22 0.01 250);
-  --bg-glass: color-mix(in oklch, oklch(0.22 0.01 250) 80%, transparent);
-  --text-primary: oklch(0.93 0.006 95);
-  --text-secondary: oklch(0.69 0.012 250);
-  --text-muted: oklch(0.79 0.01 250);
-  --border-subtle: oklch(0.34 0.012 250);
-  --border-primary: oklch(0.44 0.016 230);
-  --border-primary-rgb: 66, 66, 70;
-  --divider-dotted: oklch(0.34 0.012 250);
-  --divider-weak: oklch(0.26 0.01 250);
-  --bg-surface-ghost: oklch(0.26 0.01 250);
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
+  --bg-glass: rgba(18, 18, 18, 0.8);
+  --text-primary: #f6f1e8;
+  --text-secondary: #b0b0b0;
+  --text-muted: rgba(176, 176, 176, 0.7);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-primary: rgba(255, 255, 255, 0.14);
+  --border-primary-rgb: 38, 38, 38;
+  --divider-dotted: rgba(255, 255, 255, 0.08);
+  --divider-weak: #1a1a1a;
+  --bg-surface-ghost: #1a1a1a;
+
+  --focus-ring: 0 0 0 3px rgba(255, 133, 51, 0.3);
 }
 
 /* === BASE ELEMENT RESETS === */
