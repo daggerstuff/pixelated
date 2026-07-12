@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { mongoClient } from '../db/mongoClient'
 
 const logger = createBuildSafeLogger('default')
 
@@ -263,17 +264,45 @@ export class SecurityMonitoringService {
   /**
    * Get security events for a user
    */
-  public async getUserSecurityEvents(): Promise<SecurityEvent[]> {
-    // TODO: Implement MongoDB query for user security events
-    return []
+  public async getUserSecurityEvents(userId: string): Promise<SecurityEvent[]> {
+    try {
+      const db = mongoClient.db
+      const events = await db
+        .collection<SecurityEvent>('security_events')
+        .find({ userId })
+        .sort({ timestamp: -1 })
+        .toArray()
+      return events
+    } catch (error) {
+      logger.error('Failed to get user security events', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+      })
+      return []
+    }
   }
 
   /**
    * Get security events by type
    */
-  public async getSecurityEventsByType(): Promise<SecurityEvent[]> {
-    // TODO: Implement MongoDB query for security events by type
-    return []
+  public async getSecurityEventsByType(
+    type: SecurityEventType,
+  ): Promise<SecurityEvent[]> {
+    try {
+      const db = mongoClient.db
+      const events = await db
+        .collection<SecurityEvent>('security_events')
+        .find({ type })
+        .sort({ timestamp: -1 })
+        .toArray()
+      return events
+    } catch (error) {
+      logger.error('Failed to get security events by type', {
+        error: error instanceof Error ? error.message : String(error),
+        type,
+      })
+      return []
+    }
   }
 
   /**
