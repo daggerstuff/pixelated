@@ -495,8 +495,19 @@ export class ComponentIntegrationService {
       ]
 
       const healthChecks = await Promise.all(
-        endpoints.map((endpoint) =>
-          fetch(`${this.baseUrl}${endpoint}?healthCheck=true`, {
+        endpoints.map((endpoint) => {
+          const url = new URL(
+            `${endpoint}?healthCheck=true`,
+            this.baseUrl || 'https://localhost',
+          )
+          if (
+            url.protocol === 'http:' &&
+            url.hostname !== 'localhost' &&
+            url.hostname !== '127.0.0.1'
+          ) {
+            url.protocol = 'https:'
+          }
+          return fetch(url.toString(), {
             method: 'HEAD',
             headers: this.authHeaders,
           })
@@ -507,8 +518,8 @@ export class ComponentIntegrationService {
             .catch((error) => ({
               status: 'rejected' as const,
               reason: error,
-            })),
-        ),
+            }))
+        }),
       )
 
       const health = {
