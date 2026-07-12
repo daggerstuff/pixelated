@@ -3,6 +3,9 @@ import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 import { readinessEnhancements } from '@/data/readiness-enhancements'
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import FmEyebrow from '@/components/fm/FmEyebrow.astro'
+import FmHairlineGrid from '@/components/fm/FmHairlineGrid.astro'
+import FmHairlineCell from '@/components/fm/FmHairlineCell.astro'
 
 const coreCapabilities = [
   {
@@ -122,7 +125,7 @@ const foundations = [
     <div class="marketing-shell">
       <div class="marketing-proof-band">
         <div>
-          <span class="marketing-eyebrow">Signals in the first week</span>
+          <span class="marketing-eyebrow fm-eyebrow fm-eyebrow--muted">Signals in the first week</span>
           <h2 class="marketing-title marketing-title--medium">
             This should feel clearer quickly.
           </h2>
@@ -149,7 +152,7 @@ const foundations = [
   <section class="marketing-section marketing-section--soft">
     <div class="marketing-shell">
       <div class="marketing-section-header">
-        <span class="marketing-eyebrow">What the shift looks like</span>
+          <span class="marketing-eyebrow fm-eyebrow fm-eyebrow--muted">What the shift looks like</span>
         <h2 class="marketing-title marketing-title--medium">
           Better features create better supervision language.
         </h2>
@@ -173,81 +176,82 @@ const foundations = [
     </div>
   </section>
 
-  <section class="marketing-section">
-    <div class="marketing-shell">
-      <div class="marketing-section-header">
-        <span class="marketing-eyebrow">Capability map</span>
-        <h2 class="marketing-title marketing-title--medium">
-          The platform is built around four practical jobs.
-        </h2>
-      </div>
+<section class="marketing-section">
+     <div class="marketing-shell">
+       <div class="marketing-section-header">
+           <span class="marketing-eyebrow fm-eyebrow fm-eyebrow--muted">Capability map</span>
+         <h2 class="marketing-title marketing-title--medium">
+           The platform is built around four practical jobs.
+         </h2>
+       </div>
 
-      <div class="marketing-grid marketing-grid--2">
-        {
-          coreCapabilities.map((capability) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{capability.label}</span>
-              <h3>{capability.title}</h3>
-              <ul class="marketing-list">
-                {capability.items.map((item) => (
-                  <li>{item}</li>
-                ))}
-              </ul>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+       <FmHairlineGrid columns={2}>
+         {
+           coreCapabilities.map((capability) => (
+             <FmHairlineCell>
+               <span class="fm-hairline-cell__icon fm-section-label">{capability.label}</span>
+               <h3 class="fm-hairline-cell__title">{capability.title}</h3>
+               <div class="tag-list" style="display: flex; flex-wrap: gap-2">
+                 {capability.items.map((item) => (
+                   <span class="fm-chip">{item}</span>
+                 ))}
+               </div>
+             </FmHairlineCell>
+           ))
+         }
+       </FmHairlineGrid>
+     </div>
+   </section>
 
-  <section class="marketing-section marketing-section--soft">
-    <div class="marketing-shell">
-      <div class="marketing-section-header">
-        <span class="marketing-eyebrow">Readiness and governance</span>
-        <h2 class="marketing-title marketing-title--medium">
-          Make audit, safety, and vendor readiness part of the training loop.
-        </h2>
-        <p class="marketing-section-copy">
-          These enhancements extend the training workflow into evidence capture,
-          clinical safety stress testing, and executive-ready reporting.
-        </p>
-      </div>
+<section class="marketing-section marketing-section--soft">
+     <div class="marketing-shell">
+       <div class="marketing-section-header">
+           <span class="marketing-eyebrow fm-eyebrow fm-eyebrow--muted">Readiness and governance</span>
+         <h2 class="marketing-title marketing-title--medium">
+           Make audit, safety, and vendor readiness part of the training loop.
+         </h2>
+         <p class="marketing-section-copy">
+           These enhancements extend the training workflow into evidence capture,
+           clinical safety stress testing, and executive-ready reporting.
+         </p>
+       </div>
 
-      <div class="marketing-grid marketing-grid--2">
-        {
-          readinessEnhancements.map((enhancement, index) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">
-                Readiness {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3>{enhancement.title}</h3>
-              <p>{enhancement.summary}</p>
-              <ul class="marketing-list">
-                {enhancement.outcomes.map((outcome) => (
-                  <li>{outcome}</li>
-                ))}
-              </ul>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+       <FmHairlineGrid columns={2}>
+         {
+           readinessEnhancements.map((enhancement, index) => (
+             <FmHairlineCell>
+               <span class="fm-hairline-cell__icon fm-section-label">
+                 Readiness {String(index + 1).padStart(2, '0')}
+               </span>
+               <h3 class="fm-hairline-cell__title">{enhancement.title}</h3>
+               <p class="fm-hairline-cell__text">{enhancement.summary}</p>
+               <div class="tag-list" style="display: flex; flex-wrap: gap-2">
+                 {enhancement.outcomes.map((outcome) => (
+                   <span class="fm-chip">{outcome}</span>
+                 ))}
+               </div>
+             </FmHairlineCell>
+           ))
+         }
+       </FmHairlineGrid>
+     </div>
+   </section>
 
-  <section class="marketing-section marketing-section--soft">
-    <div class="marketing-shell">
-      <div class="marketing-grid marketing-grid--3">
-        {
-          foundations.map((item) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{item.label}</span>
-              <p>{item.body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+<section class="marketing-section marketing-section--soft">
+     <div class="marketing-shell">
+       <FmHairlineGrid columns={3}>
+         {
+           foundations.map((item) => (
+             <FmHairlineCell>
+               <span class="fm-hairline-cell__icon fm-section-label">{item.label}</span>
+               <h3 class="fm-hairline-cell__title">{item.label}</h3>
+               <p class="fm-hairline-cell__text">{item.body}</p>
+             </FmHairlineCell>
+           ))
+         }
+       </FmHairlineGrid>
+     </div>
+   </section>
 
   <MarketingCTA
     eyebrow="Use one case to evaluate the features"

@@ -447,7 +447,7 @@ networkx==3.6.1
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   scikit-image
     #   torch
-nltk==3.9.4
+nltk==3.10.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   textblob
