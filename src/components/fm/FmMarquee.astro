@@ -1,0 +1,28 @@
+---
+/**
+ * FmMarquee — monolume-merged infinite scrolling band.
+ * Seamless loop via duplicated track halves (translateX -50%).
+ * Re-themed to Dark Metal (orange dot on near-black, flat, mono voice).
+ */
+interface Props {
+  word?: string;
+  repeat?: number;
+  class?: string;
+}
+const { word = 'work', repeat = 6, class: className = '' } = Astro.props;
+const items = Array.from({ length: repeat });
+---
+<section class={`fm-marquee ${className}`} aria-label={`${word} archive`}>
+  <div class="fm-marquee__track">
+    <div class="fm-marquee__group" aria-hidden="true">
+      {items.map(() => (
+        <h2 class="fm-marquee__word">{word}<span class="fm-dot">.</span></h2>
+      ))}
+    </div>
+    <div class="fm-marquee__group" aria-hidden="true">
+      {items.map(() => (
+        <h2 class="fm-marquee__word">{word}<span class="fm-dot">.</span></h2>
+      ))}
+    </div>
+  </div>
+</section>

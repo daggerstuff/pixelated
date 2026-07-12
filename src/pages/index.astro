@@ -6,11 +6,13 @@ import { SITE } from '@/config'
 import FmEyebrow from '@/components/fm/FmEyebrow.astro'
 import FmHairlineGrid from '@/components/fm/FmHairlineGrid.astro'
 import FmHairlineCell from '@/components/fm/FmHairlineCell.astro'
-import FmCodeDeco from '@/components/fm/FmCodeDeco.astro'
 import FmCtaBlock from '@/components/fm/FmCtaBlock.astro'
+import FmMarquee from '@/components/fm/FmMarquee.astro'
+import FmChip from '@/components/fm/FmChip.astro'
 
 const { hero, intro } = homepageContent
 ---
+
 <BaseLayout
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
@@ -33,134 +35,129 @@ const { hero, intro } = homepageContent
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e')}
   />
-  <section class="hero section fm-container">
+
+  {/* Nameplate: brand wordmark + live session artifact (the real domain object) */}
+  <section class="fm-nameplate fm-container" aria-label="Pixelated Empathy overview">
+    <div class="fm-nameplate__mark">
       <FmEyebrow text={hero.kicker} />
-      <h1 style="font-family:var(--fm-display)">{hero.title}</h1>
-      <p class="lead">
-        {hero.subtitle}
-      </p>
-      <div class="action-row" aria-label="Primary links">
-        <a
-          class="button fm-btn-glow"
-          href={withBasePath(hero.primaryCTA.href)}
-        >{hero.primaryCTA.text}</a>
-        <a
-          class="text-link fm-btn-glow--ghost"
-          href={withBasePath(hero.secondaryCTA.href)}
-        >{hero.secondaryCTA.text}</a>
+      <h1 class="fm-nameplate__title">
+        Pixelated<br /><span class="fm-accent">Empathy</span>
+      </h1>
+      <p class="fm-nameplate__lede">{hero.subtitle}</p>
+      <div class="fm-nameplate__actions" aria-label="Primary links">
+        <a class="button fm-btn-glow" href={withBasePath(hero.primaryCTA.href)}>
+          {hero.primaryCTA.text}
+        </a>
+        <a class="text-link fm-btn-glow--ghost" href={withBasePath(hero.secondaryCTA.href)}>
+          {hero.secondaryCTA.text}
+        </a>
       </div>
-      {/* Signature code-as-decoration hero motif */}
-      <FmCodeDeco variant="badge">
-        <span class="fm-prop-comment">// session: config &#123;</span><br />
-        <span class="fm-prop-key">mode:</span> <span class="fm-prop-val">'practice'</span>,<br />
-        <span class="fm-prop-key">tone:</span> <span class="fm-prop-val">empathetic</span>,<br />
-        <span class="fm-prop-key">guardrails:</span> <span class="fm-prop-val">active</span>,<br />
-        <span class="fm-prop-comment">// HIPAA-isolated </span><br />
-        <span class="fm-prop-comment">&#125;</span>
-      </FmCodeDeco>
-    </section>
-  <section class="section split-overview fm-container" aria-label="Theme overview">
-      <FmEyebrow text={intro.label} muted />
-      <h2>{intro.title}</h2>
-      <FmHairlineGrid columns={3}>
-        {intro.panelItems.map((item) => (
-          <FmHairlineCell>
-            <p class="fm-section-label">{item.label}</p>
-            <h3 class="fm-hairline-cell__title">{item.label}</h3>
-            <p class="fm-hairline-cell__text">{item.body}</p>
-          </FmHairlineCell>
+    </div>
+
+    <aside class="fm-artifact" aria-label="Inside the product">
+      <header class="fm-artifact__bar">
+        <span class="fm-mono fm-muted">{hero.artifact.eyebrow}</span>
+        <span class="fm-artifact__status fm-chip">{hero.artifact.status}</span>
+      </header>
+      <dl class="fm-artifact__grid">
+        {hero.artifact.context.map((row) => (
+          <div class="fm-artifact__cell">
+            <dt class="fm-mono fm-muted">{row.label}</dt>
+            <dd>{row.value}</dd>
+          </div>
         ))}
-      </FmHairlineGrid>
-    </section>
-  <section class="section index-feed fm-container" aria-labelledby="latest-works">
-      <div class="section-heading">
-        <FmEyebrow text="The Problem vs The Solution" />
-        <h2 id="latest-works">Before & After.</h2>
-        <a class="text-link" href={withBasePath('/features')}>All features</a>
+      </dl>
+      <div class="fm-artifact__readout">
+        {hero.artifact.readout.map((r) => (
+          <div class="fm-artifact__metric">
+            <span class="fm-mono fm-muted">{r.label}</span>
+            <span class="fm-artifact__value">{r.value}</span>
+          </div>
+        ))}
       </div>
-      <FmHairlineGrid columns={3}>
-        {intro.evidenceCards.map((card) => (
-          <FmHairlineCell>
-            <p class="fm-section-label">{card.title}</p>
-            <h3 class="fm-hairline-cell__title">{card.title}</h3>
-            <div class="tag-list" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-              {card.items.map((item: string) => (
-                <span class="fm-chip">{item}</span>
-              ))}
-            </div>
-          </FmHairlineCell>
-        ))}
-      </FmHairlineGrid>
-    </section>
-    <section class="section fm-built-records fm-container">
-      <FmEyebrow text="Selected work" />
-      <h2 class="fm-built-records__title">Built for the records that matter</h2>
-      <p class="fm-section-text">A sample of the clinical simulations, evaluations, and infrastructure we ship.</p>
-      <FmHairlineGrid columns={3}>
-        {[
-          {
-            img: '/images/fm-built/record-1.svg',
-            meta: '2026 · Case study',
-            title: 'Crisis de-escalation sim',
-            desc: 'A realistic simulation for practicing de-escalation techniques in high-stress situations.',
-            tags: ['FHE', 'HIPAA']
-          },
-          {
-            img: '/images/fm-built/record-2.svg',
-            meta: '2026 · Case study',
-            title: 'Bias audit pipeline',
-            desc: 'Automated tools to detect and mitigate bias in AI models.',
-            tags: ['Bias', 'Eval']
-          },
-          {
-            img: '/images/fm-built/record-3.svg',
-            meta: '2026 · Case study',
-            title: 'Longitudinal memory',
-            desc: 'Persistent context tracking across multiple therapy sessions.',
-            tags: ['FHE', 'Memory']
-          },
-          {
-            img: '/images/fm-built/record-4.svg',
-            meta: '2026 · Case study',
-            title: 'FHE session replay',
-            desc: 'Securely replay sessions for supervision without decrypting patient data.',
-            tags: ['FHE', 'Privacy']
-          },
-          {
-            img: '/images/fm-built/record-5.svg',
-            meta: '2026 · Case study',
-            title: 'Supervision review',
-            desc: 'Tools for supervisors to review and provide feedback on trainee sessions.',
-            tags: ['Supervision', 'Feedback']
-          },
-          {
-            img: '/images/fm-built/record-6.svg',
-            meta: '2026 · Case study',
-            title: 'Edge-case library',
-            desc: 'A curated set of challenging scenarios for advanced training.',
-            tags: ['Edge-case', 'Training']
-          }
-        ].map((r) => (
-          <FmHairlineCell>
-            <img src={r.img} alt="" class="fm-built-records__thumb" width="800" height="600" loading="lazy" />
+    </aside>
+  </section>
+
+  {/* Capability ticker — motion band, reduced-motion safe */}
+  <FmMarquee word="work" />
+
+  {/* Editorial overview — why it matters, led by a labeled split */}
+  <section class="section fm-overview fm-container" aria-labelledby="overview">
+    <FmEyebrow text={intro.label} muted />
+    <h2 id="overview" class="fm-overview__title">{intro.title}</h2>
+    <div class="fm-overview__body">
+      {intro.paragraphs.map((p) => <p class="fm-section-text">{p}</p>)}
+    </div>
+    <FmHairlineGrid columns={3} class="fm-overview__panels">
+      {intro.panelItems.map((item) => (
+        <FmHairlineCell>
+          <p class="fm-section-label">{item.label}</p>
+          <h3 class="fm-hairline-cell__title">{item.label}</h3>
+          <p class="fm-hairline-cell__text">{item.body}</p>
+        </FmHairlineCell>
+      ))}
+    </FmHairlineGrid>
+  </section>
+
+  {/* Before / After — a true compare, not a chip list */}
+  <section class="section fm-compare fm-container" aria-labelledby="compare">
+    <div class="section-heading">
+      <FmEyebrow text="The problem vs the solution" />
+      <h2 id="compare">Before & After.</h2>
+      <a class="text-link" href={withBasePath('/features')}>All features</a>
+    </div>
+    <div class="fm-compare__split">
+      {intro.evidenceCards.map((card, i) => (
+        <article class={`fm-compare__col fm-compare__col--${i === 0 ? 'before' : 'after'}`}>
+          <span class="fm-compare__tag">{card.title}</span>
+          <ul class="fm-compare__list">
+            {card.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  {/* Built records — the keel "Latest works" conversion, now a numbered ledger */}
+  <section class="section fm-built-records fm-container" aria-labelledby="records">
+    <FmEyebrow text="Selected work" />
+    <h2 class="fm-built-records__title">Built for the records that matter</h2>
+    <p class="fm-section-text">A sample of the clinical simulations, evaluations, and infrastructure we ship.</p>
+    <ol class="fm-ledger">
+      {[
+        { img: '/images/fm-built/record-1.svg', meta: '2026 · Case study', title: 'Crisis de-escalation sim', desc: 'A realistic simulation for practicing de-escalation techniques in high-stress situations.', tags: ['FHE', 'HIPAA'] },
+        { img: '/images/fm-built/record-2.svg', meta: '2026 · Case study', title: 'Bias audit pipeline', desc: 'Automated tools to detect and mitigate bias in AI models.', tags: ['Bias', 'Eval'] },
+        { img: '/images/fm-built/record-3.svg', meta: '2026 · Case study', title: 'Longitudinal memory', desc: 'Persistent context tracking across multiple therapy sessions.', tags: ['FHE', 'Memory'] },
+        { img: '/images/fm-built/record-4.svg', meta: '2026 · Case study', title: 'FHE session replay', desc: 'Securely replay sessions for supervision without decrypting patient data.', tags: ['FHE', 'Privacy'] },
+        { img: '/images/fm-built/record-5.svg', meta: '2026 · Case study', title: 'Supervision review', desc: 'Tools for supervisors to review and provide feedback on trainee sessions.', tags: ['Supervision', 'Feedback'] },
+        { img: '/images/fm-built/record-6.svg', meta: '2026 · Case study', title: 'Edge-case library', desc: 'A curated set of challenging scenarios for advanced training.', tags: ['Edge-case', 'Training'] },
+      ].map((r, i) => (
+        <li class="fm-ledger__row">
+          <span class="fm-ledger__num fm-mono">{String(i + 1).padStart(2, '0')}</span>
+          <img src={r.img} alt="" class="fm-built-records__thumb" width="800" height="600" loading="lazy" />
+          <div class="fm-ledger__body">
             <span class="fm-mono fm-muted">{r.meta}</span>
             <h3 class="fm-hairline-cell__title">{r.title}</h3>
             <p class="fm-hairline-cell__text">{r.desc}</p>
             <div class="fm-chip-row">
-              {r.tags.map((t) => <span class="fm-chip\">{t}</span>)}
+              {r.tags.map((t) => <FmChip text={t} />)}
             </div>
-          </FmHairlineCell>
-        ))}
-      </FmHairlineGrid>
-    </section>
-   <div class="fm-container" style="padding-bottom: 4rem;">
-     <FmCtaBlock
-       title="Ready to sharpen your supervision?"
-       text={hero.subtitle}
-       primaryHref={withBasePath(hero.primaryCTA.href)}
-       primaryText={hero.primaryCTA.text}
-       secondaryHref={withBasePath(hero.secondaryCTA.href)}
-       secondaryText={hero.secondaryCTA.text}
-     />
-   </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <div class="fm-container" style="padding-bottom: 4rem;">
+    <FmCtaBlock
+      title="Ready to sharpen your supervision?"
+      text={hero.subtitle}
+      primaryHref={withBasePath(hero.primaryCTA.href)}
+      primaryText={hero.primaryCTA.text}
+      secondaryHref={withBasePath(hero.secondaryCTA.href)}
+      secondaryText={hero.secondaryCTA.text}
+    />
+  </div>
 </BaseLayout>
