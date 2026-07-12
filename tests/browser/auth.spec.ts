@@ -183,7 +183,18 @@ test('login page has proper transitions', async ({ page }) => {
 
 // Visual regression test for login page
 test('login page visual comparison', async ({ page }) => {
-  await page.goto('/login')
+  // Mock the auth profile endpoint to avoid rate limiting in CI
+  // This ensures the page renders consistently
+  await page.route('/api/auth/auth0-profile', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ user: null }),
+    })
+  })
+
+  // Navigate with a redirect param to match snapshot conditions
+  await page.goto('/login?redirect=/home')
 
   // Wait for any animations to complete and page to be fully loaded
   await page.waitForLoadState('networkidle')
