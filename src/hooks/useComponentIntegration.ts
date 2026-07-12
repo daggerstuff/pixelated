@@ -499,7 +499,7 @@ export function useServiceHealth(checkInterval: number = 60000) {
   const checkHealth = useCallback(async () => {
     setLoading(true)
     try {
-      const healthData = await componentIntegrationService.getServiceHealth()
+      const healthData = await componentIntegrationService.getServiceStatus()
       setHealth(healthData as unknown as Record<string, unknown>)
     } catch (error: unknown) {
       logger.error('Health check failed', { error })

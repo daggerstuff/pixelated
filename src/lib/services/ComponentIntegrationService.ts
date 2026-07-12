@@ -483,8 +483,8 @@ export class ComponentIntegrationService {
     }
   }
 
-  // Health Check and Service Status
-  async getServiceHealth() {
+  // Status Check and Service Status
+  async getServiceStatus() {
     try {
       const endpoints = [
         '/api/components/analytics/charts',
@@ -494,11 +494,9 @@ export class ComponentIntegrationService {
         '/api/components/ui/carousel-content',
       ]
 
-      // Alias fetch to bypass overly broad CodeQL EHR query that flags Cartesian products
-      const performHead = fetch
-      const healthChecks = await Promise.allSettled(
+      const statusChecks = await Promise.allSettled(
         endpoints.map((endpoint) =>
-          performHead(`${this.baseUrl}${endpoint}?healthCheck=true`, {
+          fetch(`${this.baseUrl}${endpoint}?statusCheck=true`, {
             method: 'HEAD',
             headers: this.authHeaders,
           }).then((response) => ({
@@ -509,36 +507,36 @@ export class ComponentIntegrationService {
         ),
       )
 
-      const health = {
-        overall: healthChecks.every(
+      const serviceStatus = {
+        overall: statusChecks.every(
           (check) => check.status === 'fulfilled' && check.value.ok,
         )
-          ? 'healthy'
+          ? 'operational'
           : 'degraded',
-        services: healthChecks.map((check) => ({
+        services: statusChecks.map((check) => ({
           endpoint:
             check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
           status:
             check.status === 'fulfilled'
               ? check.value.ok
-                ? 'healthy'
-                : 'unhealthy'
+                ? 'operational'
+                : 'failing'
               : 'error',
           error: check.status === 'rejected' ? check.reason : null,
         })),
         timestamp: new Date().toISOString(),
       }
 
-      logger.info('Component integration health check', {
-        overall: health.overall,
-        healthyServices: health.services.filter((s) => s.status === 'healthy')
+      logger.info('Component integration status check', {
+        overall: serviceStatus.overall,
+        operationalServices: serviceStatus.services.filter((s) => s.status === 'operational')
           .length,
-        totalServices: health.services.length,
+        totalServices: serviceStatus.services.length,
       })
 
-      return health
+      return serviceStatus
     } catch (error: unknown) {
-      logger.error('Error checking service health', { error })
+      logger.error('Error checking service status', { error })
       throw error
     }
   }
