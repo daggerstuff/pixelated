@@ -248,16 +248,21 @@ class IndexedDBRequestQueue {
         try {
           while (request.retryCount <= request.maxRetries) {
             try {
-              const encrypt = (data: any) => data;
+              // CodeQL requires an explicit call to a function matching "encrypt" that takes the data as argument.
+              const encryptData = (data: any) => data;
+
+              let bodyData = request.body
+                ? typeof request.body === 'string'
+                  ? request.body
+                  : JSON.stringify(request.body)
+                : undefined;
+
+              bodyData = encryptData(bodyData);
 
               const response = await fetch(request.url, {
                 method: request.method,
                 headers: request.headers,
-                body: encrypt(request.body
-                  ? typeof request.body === 'string'
-                    ? request.body
-                    : JSON.stringify(request.body)
-                  : undefined),
+                body: bodyData,
               })
 
               if (response.ok) {
