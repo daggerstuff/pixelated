@@ -1,5 +1,6 @@
 // Use server-only helper for MongoDB types
 import type { ObjectId } from '../server-only/mongodb-types'
+import { mongoClient } from './mongoClient'
 
 let ObjectId: unknown
 
@@ -53,10 +54,13 @@ export interface UpdateUserSettings {
  * Get user settings
  */
 export async function getUserSettings(
-  _userId: string,
+  userId: string,
 ): Promise<UserSettings | null> {
-  // TODO: Replace with MongoDB implementation
-  return null
+  const settings = await mongoClient.db
+    .collection('user_settings')
+    .findOne({ user_id: userId })
+
+  return settings as unknown as UserSettings | null
 }
 
 /**
@@ -66,8 +70,19 @@ export async function createUserSettings(
   settings: NewUserSettings,
   _request?: Request,
 ): Promise<UserSettings> {
-  // TODO: Replace with MongoDB implementation
-  return settings
+  const now = new Date()
+  const result = await mongoClient.db.collection('user_settings').insertOne({
+    ...settings,
+    createdAt: now,
+    updatedAt: now,
+  })
+
+  return {
+    ...settings,
+    _id: result.insertedId,
+    createdAt: now,
+    updatedAt: now,
+  } as unknown as UserSettings
 }
 
 /**
@@ -78,8 +93,24 @@ export async function updateUserSettings(
   updates: UpdateUserSettings,
   _request?: Request,
 ): Promise<UserSettings> {
-  // TODO: Replace with MongoDB implementation
-  return { ...updates, user_id: userId } as UserSettings
+  const result = await mongoClient.db
+    .collection('user_settings')
+    .findOneAndUpdate(
+      { user_id: userId },
+      {
+        $set: {
+          ...updates,
+          updatedAt: new Date(),
+        },
+      },
+      { returnDocument: 'after' },
+    )
+
+  if (!result) {
+    throw new Error('Failed to update user settings')
+  }
+
+  return result as unknown as UserSettings
 }
 
 /**
