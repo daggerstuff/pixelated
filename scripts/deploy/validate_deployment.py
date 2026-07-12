@@ -38,7 +38,9 @@ class DeploymentValidator:
         try:
             logger.info(f"Validating {service_name} health at {service_url}")
 
-            async with self.session.get(f"{service_url}/health", timeout=10, headers={"Content-Type": "application/json"}) as response:
+            async with self.session.get(
+                f"{service_url}/health", timeout=10, headers={"Content-Type": "application/json"}
+            ) as response:
                 if response.status == 200:
                     health_data = await response.json()
                     logger.info(f"{service_name} health: {health_data}")
@@ -284,7 +286,9 @@ class DeploymentValidator:
                 },
             }
 
-            async with self.session.post(f"{self.services['memory_service']}/memory/update", json=memory_update, timeout=30) as response:
+            async with self.session.post(
+                f"{self.services['memory_service']}/memory/update", json=memory_update, timeout=30
+            ) as response:
                 return response.status == 200
 
         except Exception as e:
@@ -355,7 +359,11 @@ class DeploymentValidator:
         """Run complete validation suite"""
         logger.info("Starting deployment validation suite")
 
-        validation_results = {"timestamp": datetime.now(timezone.utc).isoformat(), "overall_status": "pending", "tests": {}}
+        validation_results = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "overall_status": "pending",
+            "tests": {},
+        }
 
         async with aiohttp.ClientSession() as session:
             self.session = session
