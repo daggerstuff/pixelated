@@ -297,13 +297,14 @@
 .fm-btn-glow--ghost {
   background: transparent;
   border-color: var(--fm-border-strong);
-  color: var(--fm-muted);
+  color: var(--fm-text);
 }
 .fm-btn-glow--ghost:hover {
-  border-color: var(--fm-muted);
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--fm-text);
-  box-shadow: none;
+  background: var(--fm-accent);
+  border-color: var(--fm-accent);
+  color: #0a0a0a;
+  transform: translateY(-1px);
+  box-shadow: var(--fm-glow);
 }
 
 /* --------------------------------------------------------------------------
@@ -327,41 +328,6 @@
   .fm-btn-glow:hover {
     transform: none;
   }
-}
-
-/* Dark Metal fusion — overrides keel's dark theme across the whole site */
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --color-bg: #0a0a0a;
-  --color-surface: #121212;
-  --color-elevated: #1a1a1a;
-  --color-glass: rgba(18, 18, 18, 0.8);
-  --color-text: #f6f1e8;
-  --color-text-strong: #ffffff;
-  --color-muted: #b0b0b0;
-  --color-soft: #1a1a1a;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.14);
-  --color-overlay: rgba(0, 0, 0, 0.75);
-  --color-accent: #ff8533;
-  --color-accent-rgb: 255, 133, 51;
-  --color-accent-hover: #ff7300;
-  --color-accent-soft: rgba(255, 133, 51, 0.16);
-  --color-brand: #10b981; /* keep clinical emerald for clinical surfaces */
-  --focus-ring: 0 0 0 3px rgba(255, 133, 51, 0.3);
-  /* keel alias tokens used by keel components */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #121212;
-  --bg-glass: rgba(18, 18, 18, 0.8);
-  --text-primary: #f6f1e8;
-  --text-secondary: #b0b0b0;
-  --text-muted: rgba(176, 176, 176, 0.7);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-primary: rgba(255, 255, 255, 0.14);
-  --border-primary-rgb: 38, 38, 38;
-  --divider-dotted: rgba(255, 255, 255, 0.08);
-  --divider-weak: #1a1a1a;
-  --bg-surface-ghost: #1a1a1a;
 }
 
 /* Built records section */
@@ -389,4 +355,356 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+
+/* ==========================================================================
+    CLINICAL INSTRUMENT — redesign of the home surface.
+    Replaces the borrowed keel/monolume section-list with a labeled
+    supervision console: nameplate + live session artifact, capability
+    ticker (marquee, kept), editorial overview, a true Before/After
+    COMPARE, and a numbered records LEDGER. One Dark Metal world:
+    orange #ff8533 on #0a0a0a, JetBrains Mono voice, 4px edge,
+    hairline grid exposure, restrained glow. No neon, no glitch.
+    ========================================================================== */
+
+/* --- 1. Nameplate: wordmark + live session artifact -------------------- */
+.fm-nameplate {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  align-items: stretch;
+  gap: clamp(2rem, 5vw, 4rem);
+  min-height: 78vh;
+  padding-block: clamp(3rem, 8vw, 6rem);
+  border-bottom: 1px solid var(--fm-border);
+}
+.fm-nameplate__mark {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+}
+.fm-nameplate__title {
+  margin: 0;
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-weight: 600;
+  font-size: clamp(3.5rem, 13vw, 9.5rem);
+  line-height: 0.88;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.fm-nameplate__title .fm-accent {
+  color: var(--fm-accent);
+}
+.fm-nameplate__lede {
+  margin: 0;
+  max-width: 44ch;
+  color: var(--fm-muted);
+  font-family: var(--fm-sans);
+  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  line-height: 1.7;
+}
+.fm-nameplate__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+/* --- 1b. Live session artifact (the real domain object) ----------------- */
+.fm-artifact {
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border: 1px solid var(--fm-border-strong);
+  border-radius: var(--fm-radius-lg);
+  background: var(--fm-bg-2);
+  position: relative;
+}
+.fm-artifact::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: clamp(1.5rem, 2.5vw, 2rem);
+  width: 1px;
+  height: 1.75rem;
+  background: var(--fm-accent);
+}
+.fm-artifact__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.fm-artifact__status {
+  color: var(--fm-accent-3);
+  border-color: color-mix(in oklch, var(--fm-accent-3), transparent 70%);
+}
+.fm-artifact__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 0;
+  background: var(--fm-border);
+  border: 1px solid var(--fm-border);
+}
+.fm-artifact__cell {
+  background: var(--fm-bg-2);
+  padding: 1rem 1.1rem;
+}
+.fm-artifact__cell dt {
+  margin: 0 0 0.4rem;
+  font-family: var(--fm-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.fm-artifact__cell dd {
+  margin: 0;
+  color: var(--fm-text);
+  font-family: var(--fm-sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.fm-artifact__readout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  border-top: 1px solid var(--fm-border);
+  padding-top: 1.1rem;
+}
+.fm-artifact__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.fm-artifact__metric .fm-mono {
+  font-size: 0.66rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.fm-artifact__value {
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+/* --- 2. Infinite "WORK" marquee band (capability ticker) ------------ */
+.fm-marquee {
+  overflow: hidden;
+  border-bottom: 1px solid var(--fm-border);
+  padding-block: clamp(1rem, 2.5vw, 1.75rem);
+  background: var(--fm-bg);
+}
+.fm-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: fm-scroll 22s linear infinite;
+}
+.fm-marquee__group {
+  display: flex;
+  flex: none;
+  white-space: nowrap;
+}
+.fm-marquee__word {
+  margin: 0;
+  padding-inline: clamp(1.5rem, 3vw, 3rem);
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 7vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+.fm-marquee__word .fm-dot {
+  color: var(--fm-accent);
+}
+@keyframes fm-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* --- 3. Editorial overview (led split, not a card grid) ------------- */
+.fm-overview {
+  padding: clamp(3.5rem, 5.5vw, 5.5rem) 0;
+  border-bottom: 1px solid var(--fm-border);
+}
+.fm-overview__title {
+  margin: 1.25rem 0 1.5rem;
+  max-width: 18ch;
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-weight: 600;
+  font-size: clamp(1.9rem, 4.5vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.fm-overview__body {
+  max-width: 60ch;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+.fm-overview__body .fm-section-text {
+  margin: 0 0 1rem;
+}
+.fm-overview__panels {
+  margin-top: 0;
+}
+
+/* --- 4. Before / After — a true COMPARE -------------------------- */
+.fm-compare {
+  padding: clamp(3.5rem, 5.5vw, 5.5rem) 0;
+  border-bottom: 1px solid var(--fm-border);
+}
+.fm-compare__split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--fm-border);
+  border: 1px solid var(--fm-border);
+}
+.fm-compare__col {
+  background: var(--fm-bg-2);
+  padding: clamp(1.5rem, 3.5vw, 2.75rem);
+  position: relative;
+}
+.fm-compare__col--before {
+  border-left: 2px solid var(--fm-muted-soft);
+}
+.fm-compare__col--after {
+  border-left: 2px solid var(--fm-accent);
+}
+.fm-compare__tag {
+  display: inline-block;
+  margin-bottom: 1.1rem;
+  font-family: var(--fm-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.fm-compare__col--before .fm-compare__tag {
+  color: var(--fm-muted);
+}
+.fm-compare__col--after .fm-compare__tag {
+  color: var(--fm-accent);
+}
+.fm-compare__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.85rem;
+}
+.fm-compare__list li {
+  position: relative;
+  padding-left: 1.5rem;
+  color: var(--fm-muted);
+  font-family: var(--fm-sans);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.fm-compare__col--before .fm-compare__list li::before {
+  content: "×";
+  position: absolute;
+  left: 0;
+  color: var(--fm-muted-soft);
+  font-family: var(--fm-mono);
+}
+.fm-compare__col--after .fm-compare__list li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--fm-accent);
+  font-family: var(--fm-mono);
+}
+
+/* --- 5. Built records — numbered LEDGER (keel "Latest works") ---- */
+.fm-ledger {
+  list-style: none;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+  padding: 0;
+  border-top: 1px solid var(--fm-border);
+}
+.fm-ledger__row {
+  display: grid;
+  grid-template-columns: 3rem 12rem 1fr;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  align-items: center;
+  padding: clamp(1.5rem, 3vw, 2.25rem) 0;
+  border-bottom: 1px solid var(--fm-border);
+  transition: background 0.18s ease-out;
+}
+.fm-ledger__row:hover {
+  background: var(--fm-bg-2);
+}
+.fm-ledger__num {
+  color: var(--fm-accent);
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+}
+.fm-ledger__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.fm-ledger__body .fm-hairline-cell__title {
+  margin: 0.2rem 0 0.3rem;
+}
+.fm-ledger__body .fm-hairline-cell__text {
+  max-width: 62ch;
+}
+
+@media (max-width: 820px) {
+  .fm-nameplate {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 2.5rem;
+  }
+  .fm-nameplate__title {
+    font-size: clamp(3rem, 21vw, 7rem);
+  }
+  .fm-artifact__readout {
+    grid-template-columns: 1fr;
+  }
+  .fm-compare__split {
+    grid-template-columns: 1fr;
+  }
+  .fm-ledger__row {
+    grid-template-columns: 2.5rem 1fr;
+    grid-template-areas:
+      "num img"
+      "body body";
+    row-gap: 1rem;
+  }
+  .fm-ledger__num {
+    grid-area: num;
+  }
+  .fm-ledger__thumb {
+    grid-area: img;
+    max-width: 10rem;
+  }
+  .fm-ledger__body {
+    grid-area: body;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fm-marquee__track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .fm-ledger__row,
+  .fm-btn-glow {
+    transition: none;
+  }
 }
