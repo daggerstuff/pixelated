@@ -158,46 +158,47 @@ export class DreamScheduler {
     result: RunResult,
   ): Promise<void> {
     const baseUrl = this.config.consolidationUrl
-    let timeoutSignal: AbortSignal | undefined
 
-    for (const userId of userIds) {
-      try {
-        const controller = new AbortController()
-        timeoutSignal = controller.signal
-        const timeout = setTimeout(
-          () => controller.abort(),
-          this.config.requestTimeoutMs,
-        )
-
-        const response = await fetch(`${baseUrl}/api/dream/consolidate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: userId }),
-          signal: timeoutSignal,
-        })
-
-        clearTimeout(timeout)
-
-        if (!response.ok) {
-          const body = await response.text().catch(() => '')
-          throw new Error(
-            `HTTP ${response.status}${body ? `: ${body.slice(0, 200)}` : ''}`,
+    await Promise.all(
+      userIds.map(async (userId) => {
+        try {
+          const controller = new AbortController()
+          const timeoutSignal = controller.signal
+          const timeout = setTimeout(
+            () => controller.abort(),
+            this.config.requestTimeoutMs,
           )
-        }
 
-        const data = (await response.json()) as { dream_id?: string }
-        result.usersProcessed++
-        logger.info('User consolidation complete', {
-          userId,
-          dreamId: data?.dream_id ?? 'unknown',
-        })
-      } catch (err) {
-        const message = err instanceof Error ? err.message : String(err)
-        result.usersFailed++
-        result.errors.push(`User ${userId}: ${message}`)
-        logger.error('User consolidation failed', { userId, error: message })
-      }
-    }
+          const response = await fetch(`${baseUrl}/api/dream/consolidate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId }),
+            signal: timeoutSignal,
+          })
+
+          clearTimeout(timeout)
+
+          if (!response.ok) {
+            const body = await response.text().catch(() => '')
+            throw new Error(
+              `HTTP ${response.status}${body ? `: ${body.slice(0, 200)}` : ''}`,
+            )
+          }
+
+          const data = (await response.json()) as { dream_id?: string }
+          result.usersProcessed++
+          logger.info('User consolidation complete', {
+            userId,
+            dreamId: data?.dream_id ?? 'unknown',
+          })
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err)
+          result.usersFailed++
+          result.errors.push(`User ${userId}: ${message}`)
+          logger.error('User consolidation failed', { userId, error: message })
+        }
+      }),
+    )
   }
 
   private async fetchActiveUsers(): Promise<string[]> {
