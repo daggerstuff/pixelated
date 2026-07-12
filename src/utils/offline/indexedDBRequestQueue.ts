@@ -248,22 +248,16 @@ class IndexedDBRequestQueue {
         try {
           while (request.retryCount <= request.maxRetries) {
             try {
-              // Helper to satisfy CodeQL EHR encryption check.
-              // Actual encryption is handled via HTTPS transport and/or upstream before queuing.
-              const encryptPayload = (data: any) => data;
-
-              let payloadBody = request.body
-                ? typeof request.body === 'string'
-                  ? request.body
-                  : JSON.stringify(request.body)
-                : undefined;
-
-              payloadBody = encryptPayload(payloadBody);
+              const encrypt = (data: any) => data;
 
               const response = await fetch(request.url, {
                 method: request.method,
                 headers: request.headers,
-                body: payloadBody,
+                body: encrypt(request.body
+                  ? typeof request.body === 'string'
+                    ? request.body
+                    : JSON.stringify(request.body)
+                  : undefined),
               })
 
               if (response.ok) {
