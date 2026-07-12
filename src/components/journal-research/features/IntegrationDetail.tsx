@@ -194,8 +194,10 @@ ${plan.requiredTransformations.map((t) => `    # - ${t}`).join('\n')}
 
     # Apply schema mapping
 ${Object.entries(plan.schemaMapping)
-  .map(([k, v]) => `    if "${k}" in source_data:
-        transformed_data["${v}"] = source_data["${k}"]`)
+  .map(
+    ([k, v]) => `    if "${k}" in source_data:
+        transformed_data["${v}"] = source_data["${k}"]`,
+  )
   .join('\n')}
     
     return transformed_data

@@ -1,8 +1,12 @@
 import type { EHRProvider, FHIRClient, FHIRResource } from '../types'
 import { FHIRError } from '../types'
+import type { Logger } from '../types'
 import { OAuth2Service } from './oauth2.service'
 
-export function createFHIRClient(provider: EHRProvider): FHIRClient {
+export function createFHIRClient(
+  provider: EHRProvider,
+  logger?: Logger | Console | any,
+): FHIRClient {
   const headers = new Headers({
     'Content-Type': 'application/fhir+json',
     'Accept': 'application/fhir+json',
@@ -31,6 +35,27 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
     return response.json()
   }
 
+  // Add audit logging helper
+  const auditLog = (action: string, resourceType: string, id?: string) => {
+    if (logger && 'audit' in logger && typeof logger.audit === 'function') {
+      logger.audit({
+        action,
+        resourceType,
+        resourceId: id,
+        providerId: provider.id,
+        timestamp: new Date().toISOString(),
+      })
+    } else if (logger && typeof logger.info === 'function') {
+      // Fallback if audit is not explicitly supported
+      logger.info(`AUDIT: ${action} ${resourceType} ${id || ''}`.trim(), {
+        action,
+        resourceType,
+        resourceId: id,
+        providerId: provider.id,
+      })
+    }
+  }
+
   return {
     async searchResources<T extends FHIRResource>(
       resourceType: string,
@@ -42,6 +67,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
         const response = await fetch(url, {
           headers: await authorizeRequest(),
         })
+        auditLog('search', resourceType)
         const bundle = await handleResponse<{ entry?: Array<{ resource: T }> }>(
           response,
         )
@@ -67,6 +93,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
         const response = await fetch(url, {
           headers: await authorizeRequest(),
         })
+        auditLog('read', resourceType, id)
         return handleResponse<T>(response)
       } catch (error: unknown) {
         throw new FHIRError(
@@ -90,6 +117,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           headers: await authorizeRequest(),
           body: JSON.stringify(resource),
         })
+        auditLog('create', resource.resourceType)
         return handleResponse<T>(response)
       } catch (error: unknown) {
         throw new FHIRError(
@@ -111,6 +139,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           headers: await authorizeRequest(),
           body: JSON.stringify(resource),
         })
+        auditLog('update', resource.resourceType, resource.id)
         return handleResponse<T>(response)
       } catch (error: unknown) {
         throw new FHIRError(
@@ -131,6 +160,7 @@ export function createFHIRClient(provider: EHRProvider): FHIRClient {
           method: 'DELETE',
           headers: await authorizeRequest(),
         })
+        auditLog('delete', resourceType, id)
         await handleResponse<void>(response)
       } catch (error: unknown) {
         throw new FHIRError(
