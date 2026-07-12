@@ -1,7 +1,7 @@
 FROM node:24.16.0-bookworm-slim AS builder
 
 ARG AGENT_DIR
-ARG PNPM_VERSION=11.10.0
+ARG PNPM_VERSION=11.11.0
 
 ENV CI=true
 
