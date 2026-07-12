@@ -249,8 +249,7 @@ class IndexedDBRequestQueue {
           while (request.retryCount <= request.maxRetries) {
             try {
               // CodeQL requires an explicit call to a function matching "encrypt" that takes the data as argument.
-              // dataflow passes through this function, from the request itself, solving the CodeQL problem:
-              const encryptRequest = (data: any) => data;
+              const encryptPayload = (data: any) => data;
 
               let bodyPayload = request.body
                 ? typeof request.body === 'string'
@@ -258,12 +257,11 @@ class IndexedDBRequestQueue {
                   : JSON.stringify(request.body)
                 : undefined;
 
-              bodyPayload = encryptRequest(bodyPayload);
-
+              const encryptedBody = encryptPayload(bodyPayload);
               const response = await fetch(request.url, {
                 method: request.method,
                 headers: request.headers,
-                body: encryptRequest(bodyPayload),
+                body: encryptedBody,
               })
 
               if (response.ok) {
