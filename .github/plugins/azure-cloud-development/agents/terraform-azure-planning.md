@@ -180,13 +180,13 @@ variables:
       default: <value>
 
 outputs:
-- name: <output_name>
-  type: <type>
-  description: <short>
+  - name: <output_name>
+    type: <type>
+    description: <short>
 
 references:
-docs: {URL to Microsoft Docs}
-avm: {module repo URL or commit} # if applicable
+docs: { URL to Microsoft Docs }
+avm: { module repo URL or commit } # if applicable
 ```
 
 # Implementation Plan

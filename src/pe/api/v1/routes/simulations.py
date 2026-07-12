@@ -178,22 +178,28 @@ async def create_simulation(
     )
 
     # Create persona instances for each persona in the config
+    persona_params = []
     for _i, persona_ref in enumerate(persona_config):
         persona_def_id = persona_ref.get("persona_definition_id") if isinstance(persona_ref, dict) else persona_ref
         if persona_def_id:
-            await session.execute(
-                text("""
-                    INSERT INTO pe.persona_instances
-                        (session_id, persona_definition_id, institution_id, current_state,
-                         conversation_history, turn_count, tokens_consumed)
-                    VALUES (:session_id, :persona_def_id, :tenant_id, '{}', '[]', 0, 0)
-                """),
+            persona_params.append(
                 {
                     "session_id": sim_id,
                     "persona_def_id": persona_def_id,
                     "tenant_id": tenant_id,
-                },
+                }
             )
+
+    if persona_params:
+        await session.execute(
+            text("""
+                INSERT INTO pe.persona_instances
+                    (session_id, persona_definition_id, institution_id, current_state,
+                     conversation_history, turn_count, tokens_consumed)
+                VALUES (:session_id, :persona_def_id, :tenant_id, '{}', '[]', 0, 0)
+            """),
+            persona_params,
+        )
 
     # Fetch the created session
     result = await session.execute(
