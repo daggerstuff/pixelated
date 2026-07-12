@@ -4,9 +4,9 @@ import { validateQuery } from 'mongodb-query-validator'
 import { sanitize } from 'mongo-sanitize'
 
 const logger = createBuildSafeLogger('default')
-
 const allowedProperties = ['userId', 'type']
 const allowedCharacters = /^[a-zA-Z0-9_-]+$/
+const defaultLimit = 100
 
 const validateInput = (input: string, property: string) => {
   if (!allowedProperties.includes(property)) {
@@ -20,7 +20,12 @@ const validateInput = (input: string, property: string) => {
 export class SecurityMonitoringService {
   // ...
 
-  public async getUserSecurityEvents(userId: string, limit: number = 100, skip: number = 0): Promise<SecurityEvent[]> {
+  public async getUserSecurityEvents(
+    userId: string,
+    limit: number = defaultLimit,
+    skip: number = 0,
+    sort: { [key: string]: 1 | -1 } = { timestamp: -1 }
+  ): Promise<SecurityEvent[]> {
     try {
       validateInput(userId, 'userId')
       const db = mongoClient.db
@@ -30,18 +35,26 @@ export class SecurityMonitoringService {
       const events = await db
         .collection<SecurityEvent>('security_events')
         .find(query)
-        .sort({ timestamp: -1 })
+        .sort(sort)
         .skip(skip)
         .limit(limit)
         .toArray()
       return events
     } catch (error) {
-      logger.error('Failed to get user security events', { error: error instanceof Error ? error.message : String(error), userId, })
+      logger.error('Failed to get user security events', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
+      })
       return []
     }
   }
 
-  public async getSecurityEventsByType(type: SecurityEventType, limit: number = 100, skip: number = 0): Promise<SecurityEvent[]> {
+  public async getSecurityEventsByType(
+    type: SecurityEventType,
+    limit: number = defaultLimit,
+    skip: number = 0,
+    sort: { [key: string]: 1 | -1 } = { timestamp: -1 }
+  ): Promise<SecurityEvent[]> {
     try {
       validateInput(type, 'type')
       const db = mongoClient.db
@@ -51,13 +64,16 @@ export class SecurityMonitoringService {
       const events = await db
         .collection<SecurityEvent>('security_events')
         .find(query)
-        .sort({ timestamp: -1 })
+        .sort(sort)
         .skip(skip)
         .limit(limit)
         .toArray()
       return events
     } catch (error) {
-      logger.error('Failed to get security events by type', { error: error instanceof Error ? error.message : String(error), type, })
+      logger.error('Failed to get security events by type', {
+        error: error instanceof Error ? error.message : String(error),
+        type,
+      })
       return []
     }
   }
