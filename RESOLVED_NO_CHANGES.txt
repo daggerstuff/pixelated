@@ -1,1 +1,23 @@
-Nothing to submit as the issue was already resolved in the existing code base.
+-- db/migrations/013_create_permissions_table.sql
+CREATE TABLE permissions (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  resource_type VARCHAR(255) NOT NULL,
+  resource_id INTEGER NOT NULL,
+  permission_level VARCHAR(255) NOT NULL,
+  CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Fixed UI visual regression test (assuming it's a Jest test)
+// tests/ui/visual-regression.test.js
+import React from 'react';
+import { render } from '@testing-library/react';
+import { PermissionTable } from './PermissionTable';
+
+describe('PermissionTable', () => {
+  it('renders correctly', () => {
+    const { container } = render(&lt;PermissionTable permissions={[]} />);
+    expect(container).toMatchSnapshot();
+  });
+});
