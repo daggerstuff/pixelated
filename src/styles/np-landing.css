@@ -1,0 +1,699 @@
+/* Neutral Precision — Landing Page
+   Dark-first, zero chroma, flat by doctrine.
+   DESIGN.md: The Quiet Instrument */
+
+/* === Tokens (applied at :root when NP page exists so header/footer siblings inherit) === */
+:root:has(.np-page) {
+  --np-bg: oklch(0.10 0 0);
+  --np-surface: oklch(0.14 0 0);
+  --np-elevated: oklch(0.18 0 0);
+  --np-hover: oklch(0.22 0 0);
+  --np-text: oklch(0.93 0 0);
+  --np-muted: oklch(0.55 0 0);
+  --np-mid: oklch(0.70 0 0);
+  --np-line: rgba(255, 255, 255, 0.06);
+  --np-line-strong: rgba(255, 255, 255, 0.12);
+
+  --np-font-display: 'Fraunces Variable', Georgia, serif;
+  --np-font-body: 'Public Sans', system-ui, sans-serif;
+  --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --np-content: 960px;
+  --np-content-narrow: 720px;
+  --np-gap: 24px;
+  --np-pad: clamp(16px, 4vw, 40px);
+}
+
+.np-page {
+  color: var(--np-text);
+  background: var(--np-bg);
+}
+
+/* === Base === */
+.np-page * { box-sizing: border-box; }
+
+/* === Container === */
+.np-container {
+  max-width: var(--np-content);
+  margin: 0 auto;
+  padding: 0 var(--np-pad);
+}
+
+.np-container-narrow {
+  max-width: var(--np-content-narrow);
+  margin: 0 auto;
+  padding: 0 var(--np-pad);
+}
+
+/* === Section === */
+.np-section {
+  padding: clamp(56px, 8vw, 96px) 0;
+}
+
+/* === Labels === */
+.np-label {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* === Display / Headings === */
+.np-display {
+  font-family: var(--np-font-display);
+  font-weight: 350;
+  font-size: clamp(2.5rem, 5vw, 4.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'SOFT' 0, 'WONK' 0;
+  margin: 0;
+}
+
+.np-headline {
+  font-family: var(--np-font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  line-height: 1.15;
+  margin: 0;
+}
+
+.np-title {
+  font-family: var(--np-font-body);
+  font-weight: 600;
+  font-size: 1.125rem;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.np-body {
+  font-family: var(--np-font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--np-muted);
+  margin: 0;
+  max-width: 68ch;
+}
+
+.np-body-strong {
+  font-family: var(--np-font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--np-text);
+  margin: 0;
+}
+
+.np-mono {
+  font-family: var(--np-font-mono);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.np-data {
+  font-family: var(--np-font-mono);
+  font-weight: 450;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+/* === Buttons === */
+.np-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--np-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  min-height: 48px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease-out, color 0.15s ease-out;
+  background: transparent;
+  color: var(--np-text);
+  position: relative;
+}
+
+.np-btn-primary {
+  background: var(--np-elevated);
+  color: var(--np-text);
+}
+.np-btn-primary:hover {
+  background: var(--np-hover);
+}
+.np-btn-primary:active {
+  background: var(--np-surface);
+}
+
+.np-btn-ghost {
+  background: transparent;
+  color: var(--np-muted);
+}
+.np-btn-ghost:hover {
+  background: var(--np-surface);
+  color: var(--np-text);
+}
+
+.np-btn-link {
+  padding: 0;
+  min-height: auto;
+  font-family: var(--np-font-body);
+  font-size: 1rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--np-text);
+  text-decoration: none;
+}
+.np-btn-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--np-text);
+  transition: width 0.18s ease-out;
+}
+.np-btn-link:hover::after {
+  width: 100%;
+}
+
+.np-btn:focus-visible {
+  outline: 1px solid var(--np-mid);
+  outline-offset: 3px;
+}
+
+/* === Hero === */
+.np-hero {
+  padding: clamp(72px, 10vw, 128px) 0 clamp(48px, 6vw, 72px);
+}
+
+.np-hero__display {
+  max-width: 18ch;
+}
+
+.np-hero__subtitle {
+  margin-top: 20px;
+  max-width: 65ch;
+  font-size: clamp(1rem, 1.5vw, 1.125rem);
+  line-height: 1.7;
+}
+
+.np-hero__actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 36px;
+}
+
+.np-hero__proof {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  margin-top: clamp(48px, 6vw, 72px);
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
+}
+
+.np-hero__proof-item {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* === Section header === */
+.np-section-header {
+  margin-bottom: 48px;
+}
+
+.np-section-header p {
+  margin-top: 12px;
+  max-width: 60ch;
+}
+
+/* === Cards grid (panel items) === */
+.np-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  border-top: 1px solid var(--np-line);
+}
+
+.np-card {
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px solid var(--np-line);
+}
+
+.np-card__kicker {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+/* === Scenario cards — surface bg to differentiate from panel items === */
+.np-scenario-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  border: 1px solid var(--np-line);
+  background: var(--np-line);
+}
+
+.np-scenario-card {
+  background: var(--np-surface);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* === Workflow steps === */
+.np-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
+}
+
+.np-step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 24px;
+  padding: 32px 0;
+  align-items: start;
+}
+
+.np-step__number {
+  font-family: var(--np-font-display);
+  font-weight: 350;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--np-muted);
+}
+
+.np-step__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* === Comparison (before/after) === */
+.np-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
+  background: var(--np-line);
+}
+
+.np-compare__col {
+  background: var(--np-bg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.np-compare__tag {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+.np-compare__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.np-compare__list li {
+  font-family: var(--np-font-body);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--np-muted);
+  padding-left: 16px;
+  position: relative;
+}
+
+.np-compare__list li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--np-line-strong);
+}
+
+/* === CTA block === */
+.np-cta {
+  padding: clamp(64px, 8vw, 96px) 0;
+  text-align: center;
+}
+
+.np-cta-inner {
+  border: 1px solid var(--np-line);
+  padding: 48px 24px;
+  position: relative;
+}
+
+.np-cta .np-headline {
+  max-width: 16ch;
+  margin: 0 auto;
+}
+
+.np-cta p {
+  margin: 16px auto 0;
+  max-width: 55ch;
+}
+
+.np-cta .np-hero__actions {
+  justify-content: center;
+}
+
+.np-cta__meta {
+  margin-top: 24px;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  color: var(--np-muted);
+  max-width: 50ch;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
+}
+
+/* header/footer live outside .np-page (in BaseLayout), so scope via :has() */
+body:has(.np-page) .site-header {
+  background: var(--np-bg);
+  border-bottom: 1px solid var(--np-line);
+}
+
+body:has(.np-page) .site-header .fm-container {
+  max-width: var(--np-content);
+  margin: 0 auto;
+  padding: 0 var(--np-pad);
+}
+
+body:has(.np-page) .site-header .brand {
+  font-family: var(--np-font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: 0.02em;
+  color: var(--np-text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body:has(.np-page) .site-header .brand-mark {
+  width: 0.8rem;
+  height: 1.6rem;
+  border-left: 1px solid var(--np-text);
+  border-right: 1px solid var(--np-text);
+  display: block;
+}
+
+body:has(.np-page) .site-nav a {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  text-decoration: none;
+  transition: color 0.15s ease-out;
+  background-image: none !important;
+}
+body:has(.np-page) .site-nav a:hover {
+  color: var(--np-text);
+}
+body:has(.np-page) .site-nav a.fm-nav-active {
+  color: var(--np-text);
+}
+body:has(.np-page) .site-nav a.fm-nav-active::before {
+  background: var(--np-text);
+}
+
+body:has(.np-page) .theme-toggle {
+  border: 1px solid var(--np-line);
+  background: transparent;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease-out;
+}
+body:has(.np-page) .theme-toggle:hover {
+  background: var(--np-surface);
+}
+body:has(.np-page) .theme-toggle:focus-visible {
+  outline: 1px solid var(--np-mid);
+  outline-offset: 3px;
+}
+
+/* === Footer override — bring footer into NP tokens === */
+body:has(.np-page) .site-footer {
+  border-top: 1px solid var(--np-line);
+  padding: 24px 0;
+  background: var(--np-bg);
+}
+
+body:has(.np-page) .site-footer .fm-container {
+  max-width: var(--np-content);
+  margin: 0 auto;
+  padding: 0 var(--np-pad);
+}
+
+body:has(.np-page) .site-footer .fm-footer-inner {
+  border-top: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+body:has(.np-page) .site-footer .fm-section-label {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-text);
+}
+
+body:has(.np-page) .site-footer .fm-footer-copy {
+  font-family: var(--np-font-body);
+  font-size: 0.8125rem;
+  color: var(--np-muted);
+  margin: 4px 0 0;
+}
+
+body:has(.np-page) .site-footer .fm-chip {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  text-decoration: none;
+  padding: 4px 8px;
+  border: 1px solid var(--np-line);
+  transition: color 0.15s ease, border-color 0.15s ease;
+  background-image: none !important;
+}
+body:has(.np-page) .site-footer .fm-chip:hover {
+  color: var(--np-text);
+  border-color: var(--np-mid);
+  background-image: none !important;
+}
+
+/* === Feature cards — varied layout (wider first card) === */
+.np-features-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr;
+  gap: 1px;
+  border: 1px solid var(--np-line);
+  background: var(--np-line);
+}
+
+.np-feature-card {
+  background: var(--np-bg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.np-feature-card:first-child {
+  padding: 40px 32px;
+}
+
+.np-feature-card:first-child .np-title {
+  font-size: 1.25rem;
+}
+
+/* === Help/Resources section === */
+.np-help {
+  border: 1px solid var(--np-line);
+  padding: 32px 24px;
+}
+
+.np-help__links {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--np-line);
+  border: 1px solid var(--np-line);
+}
+
+.np-help__link {
+  background: var(--np-bg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  transition: background 0.15s ease-out;
+  background-image: none !important;
+}
+.np-help__link:hover {
+  background: var(--np-surface);
+  background-image: none !important;
+}
+.np-help__link:focus-visible {
+  outline: 1px solid var(--np-mid);
+  outline-offset: -1px;
+}
+
+.np-help__desc {
+  font-family: var(--np-font-body);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--np-muted);
+}
+
+@media (max-width: 640px) {
+  .np-help__links {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* === Proof strip — no longer used here, keep for compat === */
+
+/* === Light mode === */
+:root[data-theme='light']:has(.np-page) {
+  --np-bg: oklch(0.98 0 0);
+  --np-surface: oklch(0.95 0 0);
+  --np-elevated: oklch(0.92 0 0);
+  --np-hover: oklch(0.88 0 0);
+  --np-text: oklch(0.15 0 0);
+  --np-muted: oklch(0.50 0 0);
+  --np-mid: oklch(0.40 0 0);
+  --np-line: rgba(0, 0, 0, 0.08);
+  --np-line-strong: rgba(0, 0, 0, 0.15);
+}
+
+/* === Content band === */
+.np-band {
+  padding: clamp(40px, 5vw, 64px) 0;
+}
+
+.np-band .np-container-narrow {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* === Output items (from workflow) === */
+.np-outputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  border-top: 1px solid var(--np-line);
+  margin-top: 32px;
+}
+
+.np-output {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* === Strip (scenarios section) === */
+.np-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
+  background: var(--np-line);
+  margin-top: 48px;
+}
+
+.np-strip__prose {
+  background: var(--np-bg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.np-strip__items {
+  background: var(--np-bg);
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.np-strip__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+  .np-compare {
+    grid-template-columns: 1fr;
+  }
+  .np-strip {
+    grid-template-columns: 1fr;
+  }
+  .np-step {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .np-step__number {
+    font-size: 1rem;
+  }
+}
+
+/* === Reduced motion === */
+@media (prefers-reduced-motion: reduce) {
+  .np-btn,
+  .np-btn-link::after {
+    transition: none !important;
+  }
+}
