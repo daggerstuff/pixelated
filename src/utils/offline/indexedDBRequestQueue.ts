@@ -248,11 +248,12 @@ class IndexedDBRequestQueue {
         try {
           while (request.retryCount <= request.maxRetries) {
             try {
-              let bodyPayload = request.body
-                ? typeof request.body === 'string'
-                  ? request.body
-                  : JSON.stringify(request.body)
-                : undefined;
+              const bodyPayload =
+                request.body === undefined
+                  ? undefined
+                  : typeof request.body === 'string'
+                    ? request.body
+                    : JSON.stringify(request.body)
 
               // To satisfy CodeQL the fetch URL or args must visibly flow from an encryptCall.
               const encryptRequest = (data: any) => data;
