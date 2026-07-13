@@ -271,7 +271,7 @@ export class DocumentService {
     const sessions: CollaborationSession[] = []
 
     if (sessionIds.length > 0) {
-      const sessionKeys = sessionIds.map(id => `session:${id}`)
+      const sessionKeys = sessionIds.map((id) => `session:${id}`)
       const sessionDataArray = await this.redisClient.mget(...sessionKeys)
 
       for (let i = 0; i < sessionIds.length; i++) {

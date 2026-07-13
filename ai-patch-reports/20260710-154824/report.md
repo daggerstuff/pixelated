@@ -1,8 +1,6 @@
 # AI Patch Report
 
-**Generated:** 2026-07-10T15:48:24.039Z
-**Target:** all
-**Provider:** anthropic
+**Generated:** 2026-07-10T15:48:24.039Z **Target:** all **Provider:** anthropic
 **Base URL:** http://localhost:8082
 
 ## Summary
@@ -23,8 +21,7 @@ No explicit checks for absent items
 
 ### Note
 
-Here's exactly what I can see from the provider probe.
-Here's what I cannot see without real traffic.
+Here's exactly what I can see from the provider probe. Here's what I cannot see without real traffic.
 
 ---
 

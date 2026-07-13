@@ -4,6 +4,8 @@ import { dirname, join } from 'node:path'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { WORD_RE, jaccard, tokenize } from './audit_text'
+
 /**
  * Hardened fragility audit for the demo corpus.
  *
@@ -161,8 +163,6 @@ const EMOJI_RE =
 const NUMERIC_RE =
   /\b\d+(?:[.,]\d+)?(?:%|ms|k|K|M|GB|hrs?|days?|users?|emails?)?\b/
 
-const WORD_RE = /[a-zA-Z0-9']+/g
-
 const ADJACENT_REPLY_JACCARD_LIMIT = 0.35
 const EMAIL_THREAD_SCORE_GATE = 58
 const FREQUENCY_3GRAM_LIMIT = 0.03 // >3% of artifacts => flag (lastcall §4)
@@ -172,23 +172,6 @@ function cleanSubject(subject: string): string {
     .replace(/^((re|fwd|fw):\s*)+/i, '')
     .trim()
     .toLowerCase()
-}
-
-function tokenize(text: string): Set<string> {
-  const m = text.toLowerCase().match(WORD_RE)
-  return new Set(m ?? [])
-}
-
-function jaccard(a: string, b: string): number {
-  // Mirrors pipeline/monthly_pipeline.py _reply_jaccard: intersect / union,
-  // and Python filters tokens len(word) > 2 before the set comparison.
-  const ta = new Set([...tokenize(a)].filter((w) => w.length > 2))
-  const tb = new Set([...tokenize(b)].filter((w) => w.length > 2))
-  if (ta.size === 0 || tb.size === 0) return 0
-  let inter = 0
-  for (const w of ta) if (tb.has(w)) inter++
-  const union = ta.size + tb.size - inter
-  return union === 0 ? 0 : inter / union
 }
 
 /** Emit the first 3-gram in a body that exceeds the frequency ceiling. */

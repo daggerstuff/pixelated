@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import { createResourceAuditLog, AuditEventType } from '../../../../lib/audit'
 import { protectRoute } from '../../../../lib/auth/serverAuth'
 import { query, initializeDatabase } from '../../../../lib/db'
@@ -28,7 +29,7 @@ export const GET = protectRoute({
           error: 'Invalid page parameter',
           message: 'Page must be a positive integer',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
     if (!Number.isFinite(limit) || limit <= 0) {
@@ -37,17 +38,35 @@ export const GET = protectRoute({
           error: 'Invalid limit parameter',
           message: 'Limit must be a positive integer',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
     const offset = (page - 1) * limit
     // Parse filter parameters
     const role = params.get('role')
     const search = params.get('search')
-    logger.info('Admin fetching users', { adminId: admin.id, page, limit, role, search })
-    // Sanitize input parameters
-    const sanitizedRole = role
-    const sanitizedSearch = search
+    logger.info('Admin fetching users', {
+      adminId: admin.id,
+      page,
+      limit,
+      role,
+      search,
+    })
+    // Sanitize and validate input parameters before they reach the query.
+    const allowedRoles = [
+      'admin',
+      'manager',
+      'user',
+      'patient',
+      'therapist',
+      'staff',
+    ]
+    const sanitizedRole =
+      role && typeof role === 'string' && allowedRoles.includes(role)
+        ? role
+        : null
+    const sanitizedSearch =
+      search && typeof search === 'string' ? search.slice(0, 100) : null
     // Construct WHERE clauses
     const whereConditions: string[] = []
     const queryParams: unknown[] = []
@@ -58,11 +77,14 @@ export const GET = protectRoute({
       paramIndex++
     }
     if (sanitizedSearch) {
-      whereConditions.push(`(email ILIKE $${paramIndex} OR first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex})`)
+      whereConditions.push(
+        `(email ILIKE $${paramIndex} OR first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex})`,
+      )
       queryParams.push(`%${sanitizedSearch}%`)
       paramIndex++
     }
-    const whereClause = whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
+    const whereClause =
+      whereConditions.length > 0 ? `WHERE ${whereConditions.join(' AND ')}` : ''
     // Fetch total count
     const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`
     const countResult = await query(countQuery, queryParams)
@@ -72,11 +94,19 @@ export const GET = protectRoute({
     const offsetIndex = queryParams.length + 2
     const usersQuery = ` SELECT id, email, role, created_at FROM users ${whereClause} ORDER BY created_at DESC LIMIT $${limitIndex} OFFSET $${offsetIndex} `
     const usersResult = await query(usersQuery, [...queryParams, limit, offset])
-    const data: Array<{ id: string; email: string; role: string; createdAt: string }> = usersResult.rows.map((row) => ({
+    const data: Array<{
+      id: string
+      email: string
+      role: string
+      createdAt: string
+    }> = usersResult.rows.map((row) => ({
       id: row['id'],
       email: row['email'],
       role: row['role'],
-      createdAt: row['created_at'] instanceof Date ? row['created_at'].toISOString() : String(row['created_at']),
+      createdAt:
+        row['created_at'] instanceof Date
+          ? row['created_at'].toISOString()
+          : String(row['created_at']),
     }))
     await createResourceAuditLog(
       AuditEventType.SYSTEM,
@@ -87,9 +117,14 @@ export const GET = protectRoute({
     return new Response(
       JSON.stringify({
         data,
-        pagination: { page, limit, total: count, totalPages: Math.ceil((count || 0) / limit) },
+        pagination: {
+          page,
+          limit,
+          total: count,
+          totalPages: Math.ceil((count || 0) / limit),
+        },
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } }
+      { status: 200, headers: { 'Content-Type': 'application/json' } },
     )
   } catch (error: unknown) {
     logger.error('Error fetching users:', error)
@@ -98,7 +133,7 @@ export const GET = protectRoute({
         error: 'Failed to fetch users',
         message: 'An error occurred while fetching users',
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
     )
   }
 })
@@ -115,13 +150,19 @@ export const PATCH = protectRoute({
     const admin = locals.user
     const body = await request.json()
     const { userId, updates } = body
-    if (!userId || !updates || typeof updates !== 'object' || Object.keys(updates).length === 0) {
+    if (
+      !userId ||
+      !updates ||
+      typeof updates !== 'object' ||
+      Object.keys(updates).length === 0
+    ) {
       return new Response(
         JSON.stringify({
           error: 'Missing required fields',
-          message: 'userId and updates are required, and updates must not be empty',
+          message:
+            'userId and updates are required, and updates must not be empty',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
     logger.info('Admin updating user', { adminId: admin.id, userId, updates })
@@ -140,15 +181,25 @@ export const PATCH = protectRoute({
       return new Response(
         JSON.stringify({
           error: 'No valid updates provided',
-          message: 'Only the following columns can be updated: ' + allowedColumns.join(', '),
+          message:
+            'Only the following columns can be updated: ' +
+            allowedColumns.join(', '),
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
     // Update user in database
     if (Object.keys(sanitizedUpdates).length > 0) {
-      const updateQuery = `UPDATE users SET ${Object.keys(sanitizedUpdates).map((key) => `${key} = $${Object.keys(sanitizedUpdates).indexOf(key) + 1}`).join(', ')} WHERE id = $${Object.keys(sanitizedUpdates).length + 1}`
-      const updateResult = await query(updateQuery, [...Object.values(sanitizedUpdates), userId])
+      const updateQuery = `UPDATE users SET ${Object.keys(sanitizedUpdates)
+        .map(
+          (key) =>
+            `${key} = $${Object.keys(sanitizedUpdates).indexOf(key) + 1}`,
+        )
+        .join(', ')} WHERE id = $${Object.keys(sanitizedUpdates).length + 1}`
+      const updateResult = await query(updateQuery, [
+        ...Object.values(sanitizedUpdates),
+        userId,
+      ])
       // Check if update was successful
       if ((updateResult.rowCount ?? 0) === 0) {
         return new Response(
@@ -156,7 +207,7 @@ export const PATCH = protectRoute({
             error: 'User not found',
             message: 'The user you are trying to update does not exist',
           }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
+          { status: 404, headers: { 'Content-Type': 'application/json' } },
         )
       }
       await createResourceAuditLog(
@@ -170,7 +221,7 @@ export const PATCH = protectRoute({
           data: { id: userId, ...sanitizedUpdates },
           message: 'User updated successfully',
         }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
       )
     } else {
       return new Response(
@@ -178,7 +229,7 @@ export const PATCH = protectRoute({
           error: 'No updates provided',
           message: 'No updates were provided to update the user',
         }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
   } catch (error: unknown) {
@@ -188,7 +239,7 @@ export const PATCH = protectRoute({
         error: 'Failed to update user',
         message: 'An error occurred while updating the user',
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
+      { status: 500, headers: { 'Content-Type': 'application/json' } },
     )
   }
 })
