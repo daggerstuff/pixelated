@@ -294,3 +294,23 @@ describe('assertRequestedUser', () => {
     })
   })
 })
+
+describe('withAuthenticatedMemoryRoute', () => {
+  it('returns a 401 error if user is not authenticated', async () => {
+    const { withAuthenticatedMemoryRoute } = await import('../_shared')
+    const { getCurrentUser } = await import('@/lib/auth')
+
+    vi.mocked(getCurrentUser).mockResolvedValueOnce(null)
+
+    const handler = vi.fn()
+    const route = withAuthenticatedMemoryRoute('testAction', handler)
+
+    const request = new Request('http://localhost')
+    const response = await route({ request })
+
+    expect(response.status).toBe(401)
+    const data = await response.json()
+    expect(data.error).toBe('Unauthorized')
+    expect(handler).not.toHaveBeenCalled()
+  })
+})
