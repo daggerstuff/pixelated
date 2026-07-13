@@ -5,6 +5,7 @@
  * It handles session creation, validation, and cleanup.
  */
 
+import { randomBytes } from 'crypto'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'
@@ -75,7 +76,7 @@ export async function createSession(
     permissions = [],
   } = options
 
-  const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  const sessionId = `sess_${Date.now()}_${randomBytes(16).toString('hex')}`
   const now = Date.now()
   const timeout = rememberMe ? EXTENDED_SESSION_TIMEOUT : SESSION_TIMEOUT
 
