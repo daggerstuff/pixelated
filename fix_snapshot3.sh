@@ -1,2 +1,1 @@
-#!/bin/bash
-# No-op - This script is intentionally left empty after human review.
+# Removed the file fix_snapshot3.sh as it was orphaned and did not serve any purpose.
