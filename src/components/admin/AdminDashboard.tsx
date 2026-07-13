@@ -261,12 +261,13 @@ export const AdminDashboard: FC = () => {
 
           {/* Navigation Tabs */}
           <div className="px-6">
-            <nav className="flex space-x-8" aria-label="Dashboard views">
+            <nav className="flex space-x-8" aria-label="Dashboard views" role="tablist">
               {dashboardTabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setDashboardView(tab.id)}
-                  aria-current={dashboardView === tab.id ? 'page' : undefined}
+                  role="tab"
+                  aria-selected={dashboardView === tab.id}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
                       ? 'border-blue-500 text-blue-600 dark:text-blue-400'
