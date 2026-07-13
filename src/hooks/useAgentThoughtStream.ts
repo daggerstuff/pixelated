@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react'
 
 import type { AgentActivity, Message } from '@/types/chat'
 
-interface StreamOptions {
+export interface StreamOptions {
   onActivity?: (activity: AgentActivity) => void
   onFinalResponse?: (response: any) => void
   onError?: (error: Error) => void
