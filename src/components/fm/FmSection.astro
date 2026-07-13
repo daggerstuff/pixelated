@@ -1,13 +1,14 @@
 ---
 interface Props {
-  label?: string;
-  title?: string;
-  id?: string;
-  class?: string;
+  label?: string
+  title?: string
+  id?: string
+  class?: string
 }
-const { label, title, id, class: className = '' } = Astro.props;
+const { label, title, id, class: className = '' } = Astro.props
 ---
-<section id={id} class={`section fm-container ${className}`}>
+
+<section {id} class={`section fm-container ${className}`}>
   {label && <p class="fm-section-label">{label}</p>}
   {title && <h2 class="fm-section-title">{title}</h2>}
   <slot />

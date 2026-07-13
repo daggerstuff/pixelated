@@ -356,18 +356,13 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const moveUpBtn = sectionElement.querySelector('.move-up-section')
         const moveDownBtn = sectionElement.querySelector('.move-down-section')
         const removeBtn = sectionElement.querySelector('.remove-section')
-        const titleInput = sectionElement.querySelector(
-          '.section-title',
-        )
+        const titleInput = sectionElement.querySelector('.section-title')
         const descriptionInput = sectionElement.querySelector(
           '.section-description',
         )
-        const contentTextarea = sectionElement.querySelector(
-          '.section-content',
-        )
-        const requiredCheckbox = sectionElement.querySelector(
-          '.section-required',
-        )
+        const contentTextarea = sectionElement.querySelector('.section-content')
+        const requiredCheckbox =
+          sectionElement.querySelector('.section-required')
 
         moveUpBtn?.addEventListener('click', () => {
           if (index > 0) {
@@ -497,12 +492,9 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
         const removeBtn = placeholderElement.querySelector(
           '.remove-placeholder',
         )
-        const keyInput = placeholderElement.querySelector(
-          '.placeholder-key',
-        )
-        const labelInput = placeholderElement.querySelector(
-          '.placeholder-label',
-        )
+        const keyInput = placeholderElement.querySelector('.placeholder-key')
+        const labelInput =
+          placeholderElement.querySelector('.placeholder-label')
         const descriptionInput = placeholderElement.querySelector(
           '.placeholder-description',
         )
