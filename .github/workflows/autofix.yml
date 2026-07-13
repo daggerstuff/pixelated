@@ -38,7 +38,7 @@ jobs:
         with:
           version: '0.4.20'
       # Fix lint errors, then format code
-      - run: uv tool install "ruff>=0.15.17"
+      - run: uv tool install "ruff==0.15.17"
       - run: ruff check --fix-only .
       - run: ruff format .
 
