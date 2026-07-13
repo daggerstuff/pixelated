@@ -89,7 +89,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     type IOCType = 'ip' | 'domain' | 'hash' | 'url'
     const results = await (
       threatDetectionSystem.intelligenceService.lookupIOC as any
-    )(sanitizedIndicator, sanitizedType as IOCType, refresh)
+    )(sanitizedIndicator, sanitizedType, refresh)
 
     return new Response(
       JSON.stringify({
@@ -211,8 +211,8 @@ export const POST: APIRoute = async ({ request }) => {
           type IOCType = 'ip' | 'domain' | 'hash' | 'url'
           const validatedType = (
             ['ip', 'domain', 'hash', 'url'] as IOCType[]
-          ).includes(type as IOCType)
-            ? (type as IOCType)
+          ).includes(type)
+            ? (type)
             : 'domain'
 
           const result = await (

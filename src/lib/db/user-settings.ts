@@ -67,7 +67,7 @@ export async function createUserSettings(
   _request?: Request,
 ): Promise<UserSettings> {
   // TODO: Replace with MongoDB implementation
-  return settings as UserSettings
+  return settings
 }
 
 /**

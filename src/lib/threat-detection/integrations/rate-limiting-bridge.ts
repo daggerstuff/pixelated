@@ -102,7 +102,7 @@ export class RateLimitingBridge {
       const rateLimitResult = await this.rateLimiter.checkLimit(
         identifier,
         rule,
-        context as unknown as Record<string, unknown>,
+        context,
       )
 
       // If rate limited, trigger threat detection

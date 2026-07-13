@@ -184,7 +184,7 @@ export class WebSocketServer {
       return
     }
 
-    this.notificationService.registerClient(userId, ws as unknown as WebSocket)
+    this.notificationService.registerClient(userId, ws)
     logger
       .createBuildSafeLogger('websocket')
       .info('WebSocket client connected', { userId })

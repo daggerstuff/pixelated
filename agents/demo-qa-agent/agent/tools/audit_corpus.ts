@@ -260,7 +260,7 @@ function loadArtifact(path: string): CorpusArtifact {
     else {
       for (const v of Object.values(obj)) {
         const l = asList(v)
-        if (l && l.length && typeof l[0] === 'object') {
+        if (l?.length && typeof l[0] === 'object') {
           emails = l
           break
         }

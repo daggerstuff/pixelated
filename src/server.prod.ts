@@ -47,7 +47,7 @@ const redis = new Redis(productionConfig.redis.url, {
   tls: productionConfig.redis.url.startsWith('rediss://')
     ? productionConfig.redis.tls
     : undefined,
-} as RedisOptions)
+})
 setRedisClient(redis)
 
 // Security middleware

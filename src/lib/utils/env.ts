@@ -10,10 +10,10 @@ function getEnvSource(): EnvSource {
     typeof import.meta !== 'undefined' &&
     typeof import.meta.env === 'object'
   ) {
-    return import.meta.env as EnvSource
+    return import.meta.env
   }
   if (typeof process !== 'undefined' && typeof process.env === 'object') {
-    return process.env as EnvSource
+    return process.env
   }
   return {}
 }

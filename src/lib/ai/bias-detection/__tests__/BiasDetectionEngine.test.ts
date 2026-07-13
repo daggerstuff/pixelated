@@ -469,7 +469,7 @@ describe("BiasDetectionEngine", () => {
 
       await expect(
         biasEngine.analyzeSession(
-          sessionDataToTherapeuticSession(invalidSessionData as SessionData),
+          sessionDataToTherapeuticSession(invalidSessionData),
         ),
       ).rejects.toThrow("Session ID is required");
     });
@@ -1032,7 +1032,7 @@ describe("BiasDetectionEngine", () => {
             aiResponses: Array(1000).fill("Large response"),
             userInputs: Array(1000).fill("Large input"),
           },
-        } as SessionData),
+        }),
       );
       // Should handle without memory errors
       for (const session of largeSessions) {
@@ -1188,10 +1188,10 @@ describe("BiasDetectionEngine", () => {
           critical: 0.8,
         },
         evaluationMetrics: ["demographic_parity"],
-        metricsConfig: {} as Partial<BiasMetricsConfig>,
-        alertConfig: {} as Partial<BiasAlertConfig>,
-        reportConfig: {} as Partial<BiasReportConfig>,
-        explanationConfig: {} as Partial<BiasExplanationConfig>,
+        metricsConfig: {},
+        alertConfig: {},
+        reportConfig: {},
+        explanationConfig: {},
         hipaaCompliant: false,
         dataMaskingEnabled: false,
         auditLogging: false,
@@ -1305,10 +1305,10 @@ describe("BiasDetectionEngine", () => {
       } = await import("./fixtures");
 
       fixtureScenarios = {
-        baseline: baselineAnxietyScenario as SessionData,
-        youngPatient: ageBiasYoungPatient as SessionData,
-        elderlyPatient: ageBiasElderlyPatient as SessionData,
-        comparativePairs: getComparativeBiasScenarios() as [SessionData, SessionData][],
+        baseline: baselineAnxietyScenario,
+        youngPatient: ageBiasYoungPatient,
+        elderlyPatient: ageBiasElderlyPatient,
+        comparativePairs: getComparativeBiasScenarios(),
       };
     });
 
