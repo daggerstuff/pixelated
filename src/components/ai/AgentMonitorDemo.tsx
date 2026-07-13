@@ -183,7 +183,6 @@ export const AgentMonitorDemo: React.FC = () => {
       // Auto-Correction Loop: Re-run inference with the directive
       if (feedback === 'correction' && comment && mode === 'backend') {
         await streamInference(query, [], { 
-          // @ts-ignore - The hook actually uses options.gestaltDirective even though it's not in the StreamOptions interface
           gestaltDirective: comment
         });
       }
