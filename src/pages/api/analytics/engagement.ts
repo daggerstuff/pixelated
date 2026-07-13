@@ -15,15 +15,20 @@ export const prerender = false
 
 export const GET = async ({ request }: { request: Request }) => {
   try {
-    // Enforce authentication (throws if not authenticated)
-    await requirePageAuth({
+    // Enforce authentication. requirePageAuth RETURNS a redirect Response on
+    // failure (it does NOT throw), so we must short-circuit on the result.
+    const authRes = await requirePageAuth({
       request,
     })
+    if (authRes) return authRes
 
     const analyticsService = new AnalyticsService()
     const endTime = Date.now()
-    const timeRangeMs = 7 * 24 * 60 * 60 * 1000
-    const startTime = endTime - timeRangeMs
+    const startOfToday = new Date()
+    startOfToday.setUTCHours(0, 0, 0, 0)
+    // Align the window start to UTC midnight so the first (previously
+    // partial) day is included in full.
+    const startTime = startOfToday.getTime() - 6 * 24 * 60 * 60 * 1000
 
     // Fetch real data
     const [therapySessions, userActions, pageViews] = await Promise.all([
@@ -49,7 +54,7 @@ export const GET = async ({ request }: { request: Request }) => {
 
     // Initialize 7 days data structure (ordered chronologically ending today)
     const dailyData = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date(endTime - (6 - i) * 24 * 60 * 60 * 1000)
+      const d = new Date(startOfToday.getTime() - (6 - i) * 24 * 60 * 60 * 1000)
       const dateString = d.toISOString().split('T')[0]
       return {
         dateString,
@@ -113,7 +118,7 @@ export const GET = async ({ request }: { request: Request }) => {
               d.sessions > 0
                 ? Math.min(
                     100,
-                    Math.round((d.actions / Math.max(1, d.sessions)) * 10),
+                    Math.round((d.actions / Math.max(1, d.sessions)) * 100),
                   )
                 : 0
             return rate
@@ -176,9 +181,15 @@ export const GET = async ({ request }: { request: Request }) => {
         action: isSession
           ? 'Session Completed'
           : String(event.properties?.actionType || 'Action Performed'),
-        duration: Number(event.properties?.duration) || (isSession ? 15 : 0), // fallback duration
+        duration:
+          typeof event.properties?.duration === 'number'
+            ? event.properties.duration
+            : 0,
         timestamp: event.timestamp,
-        sessionScore: Number(event.properties?.score) || (isSession ? 85 : 0),
+        sessionScore:
+          typeof event.properties?.score === 'number'
+            ? event.properties.score
+            : 0,
       }
     })
 
@@ -192,8 +203,8 @@ export const GET = async ({ request }: { request: Request }) => {
 
     // Average duration across all sessions
     const allDurations = therapySessions
-      .map((s) => Number(s.properties?.duration))
-      .filter((d) => !isNaN(d))
+      .map((s) => s.properties?.duration)
+      .filter((d): d is number => typeof d === 'number')
 
     const avgSessionDuration =
       allDurations.length > 0
@@ -207,7 +218,7 @@ export const GET = async ({ request }: { request: Request }) => {
       totalSessions > 0
         ? Math.min(
             100,
-            Math.round((userActions.length / Math.max(1, totalSessions)) * 10),
+            Math.round((userActions.length / Math.max(1, totalSessions)) * 100),
           )
         : 0
 
