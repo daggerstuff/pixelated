@@ -4,16 +4,17 @@ import { getPostgresPool } from '../../lib/database/connection'
 import { authMiddleware, requireRoles } from '../middleware/auth'
 import { rateLimiter, rateLimitByUser } from '../middleware/rate-limiter'
 import rateLimit from 'express-rate-limit'
-
-const postRateLimiter = rateLimit({ windowMs: 60 * 1000, max: 20 })
-
-function sanitize(input: string) { return input; }
 import { asyncHandler, NotFoundError, ForbiddenError, ValidationError, } from '../middleware/error-handler'
 
 const router: Router = express.Router()
 
 // All user routes require authentication
 router.use(authMiddleware)
+
+const parsePositiveInteger = (value: unknown): number | undefined => {
+  const n = typeof value === 'string' || typeof value === 'number' ? Number(value) : NaN
+  return Number.isSafeInteger(n) && n > 0 ? n : undefined
+}
 
 /** 
  * GET /users 
@@ -27,8 +28,15 @@ router.get(
     const pool = getPostgresPool()
     let query = 'SELECT id, email, name, role, status, created_at FROM users WHERE 1=1'
     const params: any[] = []
+    const parsedLimit = parsePositiveInteger(limit)
+    const parsedPage = parsePositiveInteger(page)
 
-    // Validate and sanitize inputs
+    if (!parsedLimit || parsedLimit > 1000) {
+      throw new ValidationError('Invalid limit', { limit: 'limit must be a positive integer up to 1000' })
+    }
+    if (!parsedPage) {
+      throw new ValidationError('Invalid page', { page: 'page must be a positive integer' })
+    }
     if (role) {
       if (typeof role !== 'string' || !['admin', 'manager', 'user'].includes(role)) {
         throw new ValidationError('Invalid role', { role: 'Invalid role' })
@@ -44,15 +52,14 @@ router.get(
       params.push(status)
     }
     query += ' ORDER BY created_at DESC LIMIT $' + (params.length + 1) + ' OFFSET $' + (params.length + 2)
-    params.push(limit, (parseInt(page as string) - 1) * parseInt(limit as string))
-
+    params.push(parsedLimit, (parsedPage - 1) * parsedLimit)
     const result = await pool.query(query, params)
     res.json({
       success: true,
       data: result.rows,
       pagination: {
-        page,
-        limit,
+        page: parsedPage,
+        limit: parsedLimit,
         total: result.rows.length,
       },
     })
@@ -187,7 +194,7 @@ router.post(
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
     const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
-    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:\.\/-]/g, '')
+    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:/.-]/g, '')
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -238,7 +245,7 @@ router.delete(
       [permissionId, userId],
     )
     if ((result.rowCount ?? 0) === 0) {
-      throw new NotFoundError('Permission') // Fix: Pass 'Permission' instead of 'Permission not found'
+      throw new NotFoundError('Permission')
     }
     const permission = result.rows[0]
     res.json({
