@@ -24,7 +24,7 @@ router.get(
   '/',
   requireRoles(['admin', 'manager']),
   asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, role, status } = req.query
+    const { page = 1, limit = 50, role, status } = req.query
     const pool = getPostgresPool()
     let query = 'SELECT id, email, name, role, status, created_at FROM users WHERE 1=1'
     const params: any[] = []
