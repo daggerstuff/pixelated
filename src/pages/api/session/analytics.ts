@@ -201,41 +201,49 @@ export const POST: APIRoute = async ({ request }) => {
         ) VALUES ($1, $2, $3, $4, $5, $6)
       `
 
+      const insertPromises: Promise<any>[] = []
+
       // Insert session metrics
       for (const metric of analyticsData.sessionMetrics) {
         const metricName = asString(metric.metricName) ?? 'session_duration'
         const metricValue =
           asNumber(metric.metricValue) ?? asNumber(metric.averageDuration) ?? 0
-        await client.query(query, [
-          sessionId,
-          metricName,
-          metricValue,
-          asString(metric.category) ?? 'session',
-          asIsoDate(metric.recordedAt ?? metric.date, new Date().toISOString()),
-          JSON.stringify({
-            sessions: asNumber(metric.sessions),
-            newUsers: asNumber(metric.newUsers),
-            returningUsers: asNumber(metric.returningUsers),
-          }),
-        ])
+        insertPromises.push(
+          client.query(query, [
+            sessionId,
+            metricName,
+            metricValue,
+            asString(metric.category) ?? 'session',
+            asIsoDate(metric.recordedAt ?? metric.date, new Date().toISOString()),
+            JSON.stringify({
+              sessions: asNumber(metric.sessions),
+              newUsers: asNumber(metric.newUsers),
+              returningUsers: asNumber(metric.returningUsers),
+            }),
+          ]),
+        )
       }
 
       // Insert skill progress data
       for (const skill of analyticsData.skillProgress) {
-        await client.query(query, [
-          sessionId,
-          `skill_${asString(skill.skill) ?? 'unknown'}`,
-          asNumber(skill.score) ?? 0,
-          asString(skill.category) ?? 'skill',
-          new Date().toISOString(),
-          JSON.stringify({
-            trend: asString(skill.trend),
-            previousScore: asNumber(skill.previousScore),
-            sessionsPracticed: asNumber(skill.sessionsPracticed),
-            averageImprovement: asNumber(skill.averageImprovement),
-          }),
-        ])
+        insertPromises.push(
+          client.query(query, [
+            sessionId,
+            `skill_${asString(skill.skill) ?? 'unknown'}`,
+            asNumber(skill.score) ?? 0,
+            asString(skill.category) ?? 'skill',
+            new Date().toISOString(),
+            JSON.stringify({
+              trend: asString(skill.trend),
+              previousScore: asNumber(skill.previousScore),
+              sessionsPracticed: asNumber(skill.sessionsPracticed),
+              averageImprovement: asNumber(skill.averageImprovement),
+            }),
+          ]),
+        )
       }
+
+      await Promise.all(insertPromises)
 
       return new Response(JSON.stringify({ success: true, sessionId }), {
         status: 200,
