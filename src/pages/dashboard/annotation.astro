@@ -3,11 +3,7 @@ export const prerender = false
 
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
 import Card from '@/components/ui/Card.astro'
-import { 
-  ClipboardList, 
-  XCircle,
-  TrendingUp
-} from 'lucide-react'
+import { ClipboardList, XCircle, TrendingUp } from 'lucide-react'
 
 // Types for queue items
 interface QueueItem {
@@ -27,13 +23,15 @@ let error: string | null = null
 
 try {
   const response = await fetch('http://localhost:3102/queue/pending', {
-    headers: { 'Accept': 'application/json' }
+    headers: { Accept: 'application/json' },
   })
-  
+
   if (response.ok) {
     const items: QueueItem[] = await response.json()
-    pendingItems = items.filter(item => item.status === 'pending' || item.status === 'pending_review')
-    reviewedItems = items.filter(item => item.status === 'reviewed')
+    pendingItems = items.filter(
+      (item) => item.status === 'pending' || item.status === 'pending_review',
+    )
+    reviewedItems = items.filter((item) => item.status === 'reviewed')
   } else {
     error = `Failed to fetch queue: ${response.status} ${response.statusText}`
   }
@@ -112,12 +110,14 @@ const handlePromote = `
       </p>
     </div>
 
-    {error ? (
-      <div class="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
-        <p class="font-medium">Error</p>
-        <p class="text-sm">{error}</p>
-      </div>
-    ) : null}
+    {
+      error ? (
+        <div class="bg-red-900/20 border border-red-500 text-red-400 px-4 py-3 rounded-lg mb-6">
+          <p class="font-medium">Error</p>
+          <p class="text-sm">{error}</p>
+        </div>
+      ) : null
+    }
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Left column: Pending items list -->
@@ -126,63 +126,77 @@ const handlePromote = `
         <Card class="p-6">
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-xl font-semibold">Pending Items</h2>
-            <span class="px-3 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent"
+            >
               {pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''}
             </span>
           </div>
 
-          {pendingItems.length > 0 ? (
-            <div class="space-y-4" data-pending-list>
-              {pendingItems.map((item) => (
-                <div 
-                  class="p-4 border rounded-lg border-border"
-                  data-queue-card
-                >
-                  <div class="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 class="font-medium">Sample #{item.id}</h3>
-                      <p class="text-xs text-muted-foreground mt-1">
-                        Added {new Date(item.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div class="text-right">
-                      <div class="text-lg font-semibold">
-                        {(item.original_score * 100).toFixed(1)}%
+          {
+            pendingItems.length > 0 ? (
+              <div class="space-y-4" data-pending-list>
+                {pendingItems.map((item) => (
+                  <div
+                    class="p-4 border rounded-lg border-border"
+                    data-queue-card
+                  >
+                    <div class="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 class="font-medium">Sample #{item.id}</h3>
+                        <p class="text-xs text-muted-foreground mt-1">
+                          Added {new Date(item.created_at).toLocaleDateString()}
+                        </p>
                       </div>
-                      <div class="text-xs text-muted-foreground">Original Score</div>
+                      <div class="text-right">
+                        <div class="text-lg font-semibold">
+                          {(item.original_score * 100).toFixed(1)}%
+                        </div>
+                        <div class="text-xs text-muted-foreground">
+                          Original Score
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div class="mb-3">
-                    <p class="text-sm line-clamp-3">{item.sample_text}</p>
-                  </div>
 
-                  {item.routing_reason && (
                     <div class="mb-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
-                        {item.routing_reason}
-                      </span>
+                      <p class="text-sm line-clamp-3">{item.sample_text}</p>
                     </div>
-                  )}
 
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                    {Object.entries(item.per_dimension_scores).map(([dimension, score]) => (
-                      <div class="flex items-center justify-between">
-                        <span class="text-muted-foreground capitalize">{dimension}:</span>
-                        <span class="font-medium">{(score * 100).toFixed(0)}%</span>
+                    {item.routing_reason && (
+                      <div class="mb-3">
+                        <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
+                          {item.routing_reason}
+                        </span>
                       </div>
-                    ))}
+                    )}
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                      {Object.entries(item.per_dimension_scores).map(
+                        ([dimension, score]) => (
+                          <div class="flex items-center justify-between">
+                            <span class="text-muted-foreground capitalize">
+                              {dimension}:
+                            </span>
+                            <span class="font-medium">
+                              {(score * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="text-center py-12" data-empty-pending>
-              <XCircle class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 class="text-lg font-medium mb-2">No pending items</h3>
-              <p class="text-muted-foreground">All annotation queue items have been reviewed.</p>
-            </div>
-          )}
+                ))}
+              </div>
+            ) : (
+              <div class="text-center py-12" data-empty-pending>
+                <XCircle class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 class="text-lg font-medium mb-2">No pending items</h3>
+                <p class="text-muted-foreground">
+                  All annotation queue items have been reviewed.
+                </p>
+              </div>
+            )
+          }
         </Card>
 
         <!-- Reviewed Items (eligible for promotion) -->
@@ -192,75 +206,91 @@ const handlePromote = `
               <TrendingUp class="w-5 h-5 text-accent" />
               <h2 class="text-xl font-semibold">Reviewed Items</h2>
             </div>
-            <span class="px-3 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-400">
+            <span
+              class="px-3 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-400"
+            >
               {reviewedItems.length} ready for promotion
             </span>
           </div>
 
-          {reviewedItems.length > 0 ? (
-            <div class="space-y-4" data-reviewed-list>
-              {reviewedItems.map((item) => (
-                <div 
-                  class="p-4 border rounded-lg border-green-500/30 bg-green-500/5"
-                  data-queue-card
-                >
-                  <div class="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 class="font-medium">Sample #{item.id}</h3>
-                      <p class="text-xs text-muted-foreground mt-1">
-                        Added {new Date(item.created_at).toLocaleDateString()}
-                      </p>
-                      <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded bg-green-500/20 text-green-400">
-                        Reviewed
-                      </span>
-                    </div>
-                    <div class="text-right">
-                      <div class="text-lg font-semibold">
-                        {(item.original_score * 100).toFixed(1)}%
-                      </div>
-                      <div class="text-xs text-muted-foreground">Original Score</div>
-                    </div>
-                  </div>
-                  
-                  <div class="mb-3">
-                    <p class="text-sm line-clamp-3">{item.sample_text}</p>
-                  </div>
-
-                  {item.routing_reason && (
-                    <div class="mb-3">
-                      <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
-                        {item.routing_reason}
-                      </span>
-                    </div>
-                  )}
-
-                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs mb-4">
-                    {Object.entries(item.per_dimension_scores).map(([dimension, score]) => (
-                      <div class="flex items-center justify-between">
-                        <span class="text-muted-foreground capitalize">{dimension}:</span>
-                        <span class="font-medium">{(score * 100).toFixed(0)}%</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    data-promote-btn
-                    onclick={`handlePromote(${item.id}, 'validated')`}
-                    class="w-full sm:w-auto px-4 py-2 bg-accent hover:bg-accentHover text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          {
+            reviewedItems.length > 0 ? (
+              <div class="space-y-4" data-reviewed-list>
+                {reviewedItems.map((item) => (
+                  <div
+                    class="p-4 border rounded-lg border-green-500/30 bg-green-500/5"
+                    data-queue-card
                   >
-                    Promote to Validated
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div class="text-center py-12" data-empty-reviewed>
-              <TrendingUp class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-              <h3 class="text-lg font-medium mb-2">No items ready for promotion</h3>
-              <p class="text-muted-foreground">Reviewed items will appear here for promotion.</p>
-            </div>
-          )}
+                    <div class="flex justify-between items-start mb-3">
+                      <div>
+                        <h3 class="font-medium">Sample #{item.id}</h3>
+                        <p class="text-xs text-muted-foreground mt-1">
+                          Added {new Date(item.created_at).toLocaleDateString()}
+                        </p>
+                        <span class="inline-block mt-1 px-2 py-0.5 text-xs font-medium rounded bg-green-500/20 text-green-400">
+                          Reviewed
+                        </span>
+                      </div>
+                      <div class="text-right">
+                        <div class="text-lg font-semibold">
+                          {(item.original_score * 100).toFixed(1)}%
+                        </div>
+                        <div class="text-xs text-muted-foreground">
+                          Original Score
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <p class="text-sm line-clamp-3">{item.sample_text}</p>
+                    </div>
+
+                    {item.routing_reason && (
+                      <div class="mb-3">
+                        <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
+                          {item.routing_reason}
+                        </span>
+                      </div>
+                    )}
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs mb-4">
+                      {Object.entries(item.per_dimension_scores).map(
+                        ([dimension, score]) => (
+                          <div class="flex items-center justify-between">
+                            <span class="text-muted-foreground capitalize">
+                              {dimension}:
+                            </span>
+                            <span class="font-medium">
+                              {(score * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        ),
+                      )}
+                    </div>
+
+                    <button
+                      type="button"
+                      data-promote-btn
+                      onclick={`handlePromote(${item.id}, 'validated')`}
+                      class="w-full sm:w-auto px-4 py-2 bg-accent hover:bg-accentHover text-white text-sm font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Promote to Validated
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div class="text-center py-12" data-empty-reviewed>
+                <TrendingUp class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <h3 class="text-lg font-medium mb-2">
+                  No items ready for promotion
+                </h3>
+                <p class="text-muted-foreground">
+                  Reviewed items will appear here for promotion.
+                </p>
+              </div>
+            )
+          }
         </Card>
       </div>
 
@@ -268,7 +298,7 @@ const handlePromote = `
       <div>
         <Card class="p-6">
           <h2 class="text-xl font-semibold mb-6">Queue Statistics</h2>
-          
+
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="text-center p-3 rounded-lg bg-surface/50">
               <div class="text-2xl font-bold">{pendingItems.length}</div>
@@ -281,7 +311,11 @@ const handlePromote = `
           </div>
 
           <div class="text-sm text-muted-foreground">
-            <p>Annotation API: <span class="font-medium text-accent">Running on port 3102</span></p>
+            <p>
+              Annotation API: <span class="font-medium text-accent"
+                >Running on port 3102</span
+              >
+            </p>
             <p class="mt-2">Use POST /queue/submit to submit reviews</p>
           </div>
         </Card>
@@ -292,7 +326,9 @@ const handlePromote = `
           <ul class="space-y-3 text-sm">
             <li class="flex items-start gap-2">
               <span class="text-accent font-medium">•</span>
-              <span>Borderline samples (0.4-0.6 score) require expert review</span>
+              <span
+                >Borderline samples (0.4-0.6 score) require expert review</span
+              >
             </li>
             <li class="flex items-start gap-2">
               <span class="text-accent font-medium">•</span>
@@ -311,7 +347,9 @@ const handlePromote = `
 
         {/* Promotion Workflow Info */}
         <Card class="p-6 mt-6 border-green-500/20">
-          <h3 class="text-lg font-semibold mb-4 text-green-400">Promotion Workflow</h3>
+          <h3 class="text-lg font-semibold mb-4 text-green-400">
+            Promotion Workflow
+          </h3>
           <div class="space-y-2 text-sm">
             <div class="flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
@@ -331,7 +369,8 @@ const handlePromote = `
             </div>
           </div>
           <p class="text-xs text-muted-foreground mt-4">
-            Items must be reviewed before they can be promoted through the workflow stages.
+            Items must be reviewed before they can be promoted through the
+            workflow stages.
           </p>
         </Card>
       </div>

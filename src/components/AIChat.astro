@@ -27,9 +27,7 @@ const {
 >
   {
     title && (
-      <h2
-        class="text-2xl font-bold mb-4 text-gray-900 dark:text-white"
-      >
+      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
         {title}
       </h2>
     )
@@ -40,7 +38,9 @@ const {
     )
   }
 
-  {/* ⚡ Bolt: Changed client:load to client:visible to defer hydration until the component enters the viewport, improving initial page load performance. */}
+  {
+    /* ⚡ Bolt: Changed client:load to client:visible to defer hydration until the component enters the viewport, improving initial page load performance. */
+  }
   <AIChatReact
     client:visible
     availableModels={availableModels as import('../lib/ai/models/types').AIModel[]}
@@ -49,11 +49,18 @@ const {
     <div
       slot="fallback"
       class="border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex h-[500px] items-center justify-center rounded-lg border shadow-lg"
-      role="status" aria-busy="true"
+      role="status"
+      aria-busy="true"
     >
       <div class="flex flex-col items-center gap-3">
-        <div class="border-blue-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" aria-hidden="true"></div>
-        <p class="text-gray-500 dark:text-gray-400 font-medium">Loading chat interface...</p>
+        <div
+          class="border-blue-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"
+          aria-hidden="true"
+        >
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 font-medium">
+          Loading chat interface...
+        </p>
       </div>
     </div>
   </AIChatReact>
