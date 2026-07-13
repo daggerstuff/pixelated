@@ -19,7 +19,7 @@ export abstract class BaseEHRProvider implements EHRProvider {
 
   protected getClient(): FHIRClient {
     if (!this.client) {
-      this.client = createFHIRClient(this)
+      this.client = createFHIRClient(this, this.logger)
       this.logger.info(`Created FHIR client for provider ${this.id}`)
     }
     return this.client
