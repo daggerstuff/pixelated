@@ -51,7 +51,7 @@ export class ThreatQueryProvider {
           ? query['patternMatch']
           : 'rate_limit:*'
       const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
-      const cleanSuffix = sanitizedSuffix.replace(/^rate_limit:/, '')
+      const cleanSuffix = sanitizedSuffix.replace(/^(?:rate_limit:)+/i, '')
       const pattern = `rate_limit:${cleanSuffix}`
 
       if (query['patternMatch'] || query['scanEnabled']) {
@@ -121,7 +121,7 @@ export class ThreatQueryProvider {
         ? searchData['patternMatch']
         : '*'
     const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
-    const cleanSuffix = sanitizedSuffix.replace(/^threat:/, '')
+    const cleanSuffix = sanitizedSuffix.replace(/^(?:threat:)+/i, '')
     const pattern = `threat:${cleanSuffix}`
 
     this.pruneCache()

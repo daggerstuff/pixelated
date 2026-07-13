@@ -10,7 +10,7 @@ test('login page has correct form elements', async ({ page }) => {
   await expect(page.locator('input[type="password"]')).toBeVisible()
   await expect(page.locator('button[type="submit"]')).toBeVisible()
   // Check for "Remember me" checkbox
-  await expect(page.locator('input[type="checkbox"]')).toBeVisible()
+  await expect(page.locator('input#rememberMeCheckbox')).toBeVisible()
   await expect(
     page.locator('label').filter({ hasText: /remember me/i }),
   ).toBeVisible()
