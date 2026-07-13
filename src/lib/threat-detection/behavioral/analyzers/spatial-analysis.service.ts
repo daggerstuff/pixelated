@@ -4,18 +4,12 @@
  */
 
 import geoip from 'geoip-lite'
-// geoip-lite's bundled GeoIP database goes stale over time; refresh it via
-// `updatedb` so IP→coordinate mappings stay accurate for threat detection.
 import { generateAnomalyId } from './analyzer-utils'
-
 import type {
   SecurityEvent,
   SpatialFeatures,
   NetworkCharacteristics,
 } from './types'
-
-// Half Earth circumference (km); ceiling for normalizing spread/mobility to 0–1.
-const MAX_GREAT_CIRCLE_KM = 20015
 
 interface GeoLocation {
   lat: number
@@ -29,21 +23,13 @@ export class SpatialAnalysisService {
   async extractSpatialFeatures(
     events: SecurityEvent[],
   ): Promise<SpatialFeatures> {
-    // Sort events by timestamp so mobility metrics reflect true chronological order.
-    const sortedEvents = [...events].sort(
-      (a, b) => a.timestamp.getTime() - b.timestamp.getTime(),
-    )
-    const ipAddresses = sortedEvents.map((e) => e.sourceIp)
-    // Filter out unresolved IPs (private/loopback/unmapped) so they are excluded
-    // from distance calculations instead of being treated as a real coordinate.
-    const resolved = (await this.geolocateIPs(ipAddresses)).filter(
-      (l): l is GeoLocation => l !== null,
-    )
+    const ipAddresses = events.map((e) => e.sourceIp)
+    const locations = await this.geolocateIPs(ipAddresses)
 
     return {
       ipDiversity: this.calculateIPDiversity(ipAddresses),
-      geographicSpread: this.calculateGeographicSpread(resolved),
-      mobilityPattern: this.calculateMobilityPattern(resolved),
+      geographicSpread: this.calculateGeographicSpread(locations),
+      mobilityPattern: this.calculateMobilityPattern(locations),
       networkCharacteristics: this.analyzeNetworkCharacteristics(events),
     }
   }
@@ -103,17 +89,13 @@ export class SpatialAnalysisService {
     return anomalies
   }
 
-  private async geolocateIPs(
-    ips: string[],
-  ): Promise<Array<GeoLocation | null>> {
+  private async geolocateIPs(ips: string[]): Promise<GeoLocation[]> {
     return ips.map((ip) => {
       const geo = geoip.lookup(ip)
-      if (!geo) {
-        // No database entry (private/loopback/unmapped IP); represent as
-        // unresolved so callers can exclude it from distance math.
-        return null
+      if (geo) {
+        return { lat: geo.ll[0], lon: geo.ll[1] }
       }
-      return { lat: geo.ll[0], lon: geo.ll[1] }
+      return { lat: 0, lon: 0 }
     })
   }
 
@@ -122,34 +104,17 @@ export class SpatialAnalysisService {
   }
 
   private calculateGeographicSpread(locations: GeoLocation[]): number {
-    // Deduplicate coordinates so repeated IPs don't inflate the O(n^2) scan.
-    const unique = this.dedupeLocations(locations)
-    if (unique.length < 2) return 0
+    if (locations.length < 2) return 0
     let maxDistance = 0
-    for (let i = 0; i < unique.length; i++) {
-      for (let j = i + 1; j < unique.length; j++) {
-        const d = this.haversineDistance(unique[i]!, unique[j]!)
+    for (let i = 0; i < locations.length; i++) {
+      for (let j = i + 1; j < locations.length; j++) {
+        const d = this.haversineDistance(locations[i]!, locations[j]!)
         if (d > maxDistance) {
           maxDistance = d
         }
       }
     }
-    // Normalize kilometres to a 0–1 dimensionless score (see MAX_GREAT_CIRCLE_KM)
-    // so thresholds/ML features calibrated to the prior scale remain valid.
-    return maxDistance / MAX_GREAT_CIRCLE_KM
-  }
-
-  private dedupeLocations(locations: GeoLocation[]): GeoLocation[] {
-    const seen = new Set<string>()
-    const result: GeoLocation[] = []
-    for (const loc of locations) {
-      const key = `${loc.lat.toFixed(4)},${loc.lon.toFixed(4)}`
-      if (!seen.has(key)) {
-        seen.add(key)
-        result.push(loc)
-      }
-    }
-    return result
+    return maxDistance
   }
 
   private calculateMobilityPattern(locations: GeoLocation[]): number {
@@ -160,9 +125,7 @@ export class SpatialAnalysisService {
       totalDistance += this.haversineDistance(locations[i]!, locations[i + 1]!)
       validPairs++
     }
-    const avgKm = validPairs > 0 ? totalDistance / validPairs : 0
-    // Normalize to a 0–1 dimensionless score for consistency with geographicSpread.
-    return avgKm / MAX_GREAT_CIRCLE_KM
+    return validPairs > 0 ? totalDistance / validPairs : 0
   }
 
   private haversineDistance(loc1: GeoLocation, loc2: GeoLocation): number {
@@ -175,8 +138,7 @@ export class SpatialAnalysisService {
         Math.cos(loc2.lat * (Math.PI / 180)) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2)
-    // Clamp `a` to [0, 1] to avoid NaN from floating-point drift on antipodal points.
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(Math.max(0, 1 - a)))
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     return R * c
   }
 

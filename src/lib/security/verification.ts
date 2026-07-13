@@ -19,10 +19,7 @@ const logger = createBuildSafeLogger('default')
 export function createSignedVerificationToken(payload: unknown): string {
   try {
     const timestamp = Date.now()
-    const tokenPayload = JSON.parse(JSON.stringify(payload)) as Record<
-      string,
-      unknown
-    >
+    const tokenPayload = JSON.parse(JSON.stringify(payload)) as Record<string, unknown>
     const token = {
       ...tokenPayload,
       iat: timestamp,
@@ -59,10 +56,8 @@ export function verifyToken(token: string): Record<string, unknown> | null {
       return null
     }
 
-    // Own-property lookup preserves defense in depth against prototype pollution
-    // (an empty {} with Object.prototype.exp/iat polluted could otherwise pass).
-    const exp = Object.getOwnPropertyDescriptor(parsed, 'exp')?.value
-    const iat = Object.getOwnPropertyDescriptor(parsed, 'iat')?.value
+    const exp = parsed.exp
+    const iat = parsed.iat
 
     if (typeof exp !== 'number' || typeof iat !== 'number') {
       logger.warn('Token payload invalid', { token })

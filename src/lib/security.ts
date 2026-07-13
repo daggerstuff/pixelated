@@ -8,8 +8,7 @@
  * in the security/ directory while maintaining backwards compatibility.
  */
 
-import Base64 from 'crypto-js/enc-base64'
-import HmacSHA256 from 'crypto-js/hmac-sha256'
+import CryptoJS from 'crypto-js'
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
@@ -141,7 +140,7 @@ export function createSignature(payload: unknown): string {
   const key = requireSecretKey()
   const message =
     typeof payload === 'string' ? payload : JSON.stringify(payload)
-  return HmacSHA256(message, key).toString(Base64)
+  return CryptoJS.HmacSHA256(message, key).toString(CryptoJS.enc.Base64)
 }
 
 /**
