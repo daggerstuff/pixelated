@@ -32,12 +32,15 @@ export class ConsentService {
     try {
       const data = await mongoClient.db
         .collection(CONSENT_TABLES.CONSENT_TYPES)
+        // Static filter: this query receives no external input, so there is no
+        // injection surface to sanitize.
         .find({ is_active: true })
         .toArray()
 
       return data.map((type: unknown) => {
         const t = type as {
-          id: string
+          _id?: { toString(): string }
+          id?: string
           name: string
           description: string
           scope: string
@@ -46,7 +49,7 @@ export class ConsentService {
           updated_at: string
         }
         return {
-          id: t['id'],
+          id: t._id?.toString() ?? (t['id'] as string),
           name: t['name'],
           description: t['description'],
           scope: t['scope'],
@@ -147,11 +150,14 @@ export class ConsentService {
     try {
       const pipeline = [
         { $match: { user_id: userId, is_active: true } },
+        // Deterministic ordering: when a user holds active consents for several
+        // versions of the same type, select the most recently granted one.
+        { $sort: { granted_at: -1 } },
         {
           $lookup: {
             from: CONSENT_TABLES.CONSENT_VERSIONS,
             localField: 'consent_version_id',
-            foreignField: 'id',
+            foreignField: '_id',
             as: 'version',
           },
         },
@@ -170,7 +176,7 @@ export class ConsentService {
       }
 
       return {
-        id: doc.id as string,
+        id: doc._id?.toString() ?? (doc.id as string),
         userId: doc.user_id as string,
         consentVersionId: doc.consent_version_id as string,
         grantedAt: doc.granted_at as string,
