@@ -21,7 +21,7 @@ export interface DreamSchedulerConfig {
 
 const DEFAULT_CONFIG: DreamSchedulerConfig = {
   cronExpression: '0 2 * * *',
-  consolidationUrl: process.env['DREAM_CONSOLIDATION_URL'] ?? 'https://localhost:5000',
+  consolidationUrl: process.env['DREAM_CONSOLIDATION_URL'] ?? 'http://localhost:5000',
   requestTimeoutMs: 300_000,
   userWhitelist: [],
   autoStart: true,
