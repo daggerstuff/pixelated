@@ -367,13 +367,26 @@ describe('allscripts Provider', () => {
         mockFhirClient,
       )
 
-      // Simulate data access - HOW data is accessed depends on actual provider usage.
-      // Assuming direct client usage for now.
-      await mockFhirClient.read('Patient', '123')
+      // Restore getClient to use the actual fhir client factory so we can test the audit
+      vi.restoreAllMocks()
 
-      // TODO: Implement audit logging in the provider
-      // For now, just verify the operation was performed
-      expect(mockFhirClient.read).toHaveBeenCalledWith('Patient', '123')
+      // Mock fetch
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: vi.fn().mockResolvedValue({ resourceType: 'Patient', id: '123' }),
+      } as any)
+
+      // Simulate data access
+      const fhirClient = (allscriptsProvider as any).getClient()
+      await fhirClient.getResource('Patient', '123')
+
+      expect(mockLogger.audit).toHaveBeenCalledWith({
+        action: 'read',
+        resourceType: 'Patient',
+        resourceId: '123',
+        providerId: 'test-allscripts',
+        timestamp: expect.any(String),
+      })
     })
 
     it('should implement data minimization', async () => {
