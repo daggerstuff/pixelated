@@ -3,26 +3,11 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { WORD_RE, jaccard, tokenize } from './audit_text'
+
 // Therapy-specific slop patterns that the LLM was instructed NOT to use
 const THERAPY_SLOP_RE =
   /\b(it sounds like|i hear that|that must be|i can see that|let's explore that|that sounds difficult)\b/i
-
-const WORD_RE = /[a-zA-Z0-9']+/g
-
-function tokenize(text: string): Set<string> {
-  const m = text.toLowerCase().match(WORD_RE)
-  return new Set(m ?? [])
-}
-
-function jaccard(a: string, b: string): number {
-  const ta = new Set([...tokenize(a)].filter((w) => w.length > 2))
-  const tb = new Set([...tokenize(b)].filter((w) => w.length > 2))
-  if (ta.size === 0 || tb.size === 0) return 0
-  let inter = 0
-  for (const w of ta) if (tb.has(w)) inter++
-  const union = ta.size + tb.size - inter
-  return union === 0 ? 0 : inter / union
-}
 
 export default defineTool({
   description:

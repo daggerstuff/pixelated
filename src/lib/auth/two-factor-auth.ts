@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto'
 
-import { generateSecret, generateURI } from 'otplib'
+import { generateSecret, generateURI, authenticator } from 'otplib'
 import * as qrcode from 'qrcode'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -87,7 +87,7 @@ export const completeTwoFactorSetup = async (
   )
 
   // Verify the token against the pending secret
-  if (!generateURI(pendingSecret).verify(_token)) {
+  if (!authenticator.verify({ token: _token, secret: pendingSecret })) {
     throw new Error('Invalid token')
   }
 
@@ -120,7 +120,7 @@ export const verifyTwoFactorToken = async (
   const secret = await getFromCache<string>(`2fa:secret:${verification.userId}`)
 
   // Verify the token against the enabled secret
-  if (!generateURI(secret).verify(verification.token)) {
+  if (!authenticator.verify({ token: verification.token, secret })) {
     throw new Error('Invalid token')
   }
 

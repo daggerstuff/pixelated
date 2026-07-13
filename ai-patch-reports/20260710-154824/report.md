@@ -5,14 +5,15 @@
 
 ## Summary
 
-**Status:** • ERROR **Duration:** 0.03s
+**Status:** • ERROR
+**Duration:** 0.03s
 
 ## Detected
 
-• [streaming] Streaming check failed: HTTP 404: Not Found • [retries] Retry
-check failed: HTTP 404: Not Found • [cost] Model pricing:
-$0.5/1M input tokens, $1.5/1M output tokens • [trace] Trace check failed: HTTP
-404
+• [streaming] Streaming check failed: HTTP 404: Not Found
+• [retries] Retry check failed: HTTP 404: Not Found
+• [cost] Model pricing: $0.5/1M input tokens, $1.5/1M output tokens
+• [trace] Trace check failed: HTTP 404
 
 ## Not detected
 
@@ -20,8 +21,7 @@ No explicit checks for absent items
 
 ### Note
 
-Here's exactly what I can see from the provider probe. Here's what I cannot see
-without real traffic.
+Here's exactly what I can see from the provider probe. Here's what I cannot see without real traffic.
 
 ---
 

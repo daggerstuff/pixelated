@@ -52,9 +52,21 @@ export const GET = protectRoute({
       role,
       search,
     })
-    // Sanitize input parameters
-    const sanitizedRole = role
-    const sanitizedSearch = search
+    // Sanitize and validate input parameters before they reach the query.
+    const allowedRoles = [
+      'admin',
+      'manager',
+      'user',
+      'patient',
+      'therapist',
+      'staff',
+    ]
+    const sanitizedRole =
+      role && typeof role === 'string' && allowedRoles.includes(role)
+        ? role
+        : null
+    const sanitizedSearch =
+      search && typeof search === 'string' ? search.slice(0, 100) : null
     // Construct WHERE clauses
     const whereConditions: string[] = []
     const queryParams: unknown[] = []
