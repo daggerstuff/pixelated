@@ -186,8 +186,11 @@ export class DreamScheduler {
 
   private validateConsolidationUrl(): void {
     const url = new URL(this.config.consolidationUrl)
-    if (url.protocol !== 'https:' && url.hostname !== 'localhost') {
-      throw new Error('Consolidation URL must use HTTPS or be localhost')
+    if (url.protocol !== 'https:' && url.protocol !== 'http:') {
+      throw new Error('Consolidation URL must use HTTP or HTTPS')
+    }
+    if (url.protocol === 'http:' && url.hostname !== 'localhost') {
+      throw new Error('HTTP consolidation URL is only allowed for localhost')
     }
   }
 }
