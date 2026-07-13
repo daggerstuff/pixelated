@@ -83,7 +83,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
   description="Monitor clinical validity pass rates, per-dimension score distributions, annotation queue depth, and 7-day trends"
 >
   <div class="container mx-auto py-6 px-4">
-    <!-- Header -->
+    {/* Header */}
     <div class="mb-8">
       <h1 class="text-3xl font-bold tracking-tight mb-2">Clinical Validity Dashboard</h1>
       <p class="text-muted-foreground">
@@ -91,7 +91,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       </p>
     </div>
 
-    <!-- Degradation Alert -->
+    {/* Degradation Alert */}
     {showDegradationAlert && (
       <div 
         class="mb-6 p-4 border rounded-lg bg-gradient-to-r from-orange-950/30 to-orange-900/20 border-orange-800 relative"
@@ -146,7 +146,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       </div>
     )}
 
-    <!-- Error State -->
+    {/* Error State */}
     {error && (
       <div class="mb-6 p-4 bg-red-950/20 border border-red-800 rounded-lg">
         <p class="text-red-300 font-medium">Unable to load dashboard data</p>
@@ -157,16 +157,16 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       </div>
     )}
 
-    <!-- Loading State -->
+    {/* Loading State */}
     {isLoading && (
       <div class="mb-6 p-4 bg-blue-950/20 border border-blue-800 rounded-lg">
         <p class="text-blue-300 font-medium">Loading dashboard data...</p>
       </div>
     )}
 
-    <!-- Key Metrics Grid -->
+    {/* Key Metrics Grid */}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <!-- Current Pass Rate -->
+      {/* Current Pass Rate */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 bg-green-500/20 rounded-lg">
@@ -181,7 +181,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         </div>
       </Card>
 
-      <!-- Queue Depth -->
+      {/* Queue Depth */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 bg-blue-500/20 rounded-lg">
@@ -196,7 +196,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         </div>
       </Card>
 
-      <!-- 7-Day Avg -->
+      {/* 7-Day Avg */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 bg-purple-500/20 rounded-lg">
@@ -213,7 +213,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         </div>
       </Card>
 
-      <!-- Total Scored -->
+      {/* Total Scored */}
       <Card class="p-6">
         <div class="flex items-center gap-3 mb-4">
           <div class="p-2 bg-orange-500/20 rounded-lg">
@@ -229,9 +229,9 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       </Card>
     </div>
 
-    <!-- Main Content Grid -->
+    {/* Main Content Grid */}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-      <!-- Score Distribution -->
+      {/* Score Distribution */}
       <Card class="lg:col-span-2">
         <div class="p-6">
           <div class="flex items-center justify-between mb-4">
@@ -269,7 +269,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         </div>
       </Card>
 
-      <!-- Queue Status -->
+      {/* Queue Status */}
       <Card>
         <div class="p-6">
           <div class="flex items-center justify-between mb-4">
@@ -304,7 +304,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       </Card>
     </div>
 
-    <!-- 7-Day Trend -->
+    {/* 7-Day Trend */}
     <Card class="mb-8">
       <div class="p-6">
         <div class="flex items-center justify-between mb-4">
@@ -355,7 +355,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
       </div>
     </Card>
 
-    <!-- Info Panel -->
+    {/* Info Panel */}
     <Card class="bg-surface/50">
       <div class="p-6">
         <h3 class="text-lg font-semibold mb-3">About Clinical Validity Scoring</h3>
