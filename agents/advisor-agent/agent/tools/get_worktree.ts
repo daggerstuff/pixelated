@@ -1,6 +1,7 @@
+import { execSync } from 'child_process'
+
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
-import { execSync } from 'child_process'
 
 export default defineTool({
   description: 'Gets the current git status and diff for the workspace.',
