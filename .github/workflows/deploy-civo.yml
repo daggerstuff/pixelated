@@ -19,6 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.image_tag }}
+      app_digest: ${{ steps.build-app.outputs.digest }}
+      session_digest: ${{ steps.build-session.outputs.digest }}
+      qa_digest: ${{ steps.build-qa.outputs.digest }}
+      pipeline_digest: ${{ steps.build-pipeline.outputs.digest }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -54,8 +58,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.IMAGE_NAME }}:latest
           cache-from: type=gha
@@ -63,6 +66,7 @@ jobs:
           platforms: linux/amd64
 
       - name: Build and push session agent
+        id: build-session
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -70,8 +74,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
@@ -79,6 +82,7 @@ jobs:
           platforms: linux/amd64
 
       - name: Build and push QA agent
+        id: build-qa
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -86,8 +90,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
@@ -95,6 +98,7 @@ jobs:
           platforms: linux/amd64
 
       - name: Build and push pipeline agent
+        id: build-pipeline
         uses: docker/build-push-action@v7
         with:
           context: .
@@ -102,8 +106,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent
@@ -111,7 +114,11 @@ jobs:
           platforms: linux/amd64
 
       - name: Image digest
-        run: echo ${{ steps.build-app.outputs.digest }}
+        run: |
+          echo "app:      ${{ steps.build-app.outputs.digest }}"
+          echo "session:  ${{ steps.build-session.outputs.digest }}"
+          echo "qa:       ${{ steps.build-qa.outputs.digest }}"
+          echo "pipeline: ${{ steps.build-pipeline.outputs.digest }}"
 
   deploy-civo:
     needs: [build-and-push]
@@ -254,10 +261,10 @@ jobs:
           kubectl apply -f agents/session-agent/k8s/deployment.yaml
           kubectl apply -f agents/qa-agent/k8s/deployment.yaml
           kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
-          kubectl set image deployment/pixelated-empathy pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
-          kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
-          kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
-          kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
+          kubectl set image deployment/pixelated-empathy pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
+          kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
+          kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
+          kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
           echo "Waiting for rollout..."
           kubectl rollout status deployment/pixelated-empathy -n pixelated-empathy --timeout=5m
@@ -280,14 +287,14 @@ jobs:
           done
 
           echo "Verifying new image is running on at least one pod..."
-          EXPECTED_TAG="${{ needs.build-and-push.outputs.image_tag }}"
+          EXPECTED_DIGEST="${{ needs.build-and-push.outputs.app_digest }}"
           RUNNING_IMAGE=$(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy -o jsonpath='{.items[*].spec.containers[0].image}' | tr ' ' '\n' | head -n 1)
-          if [[ "${RUNNING_IMAGE}" != *"${EXPECTED_TAG}"* ]]; then
-            echo "❌ Image mismatch: expected tag '${EXPECTED_TAG}' but running '${RUNNING_IMAGE}'"
+          if [[ "${RUNNING_IMAGE}" != *"${EXPECTED_DIGEST}"* ]]; then
+            echo "❌ Image mismatch: expected digest '${EXPECTED_DIGEST}' but running '${RUNNING_IMAGE}'"
             kubectl get pods -n pixelated-empathy -o wide
             exit 1
           fi
-          echo "✅ New image tag '${EXPECTED_TAG}' confirmed running."
+          echo "✅ New image digest '${EXPECTED_DIGEST}' confirmed running."
 
       - name: Verify deployment
         run: |
