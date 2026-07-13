@@ -144,7 +144,7 @@ export const AgentMonitorDemo: React.FC = () => {
     try {
       const response = await fetch('/api/ai/pixel/stats');
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as Record<string, AgentMetric>;
         setStats(data);
       }
     } catch (err) {
@@ -184,7 +184,7 @@ export const AgentMonitorDemo: React.FC = () => {
       if (feedback === 'correction' && comment && mode === 'backend') {
         await streamInference(query, [], { 
           gestaltDirective: comment
-        } as any);
+        });
       }
       
       console.log(`Feedback ${feedback} saved for ${activityId}`);

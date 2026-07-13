@@ -6,6 +6,7 @@ interface StreamOptions {
   onActivity?: (activity: AgentActivity) => void
   onFinalResponse?: (response: any) => void
   onError?: (error: Error) => void
+  gestaltDirective?: string
 }
 
 export function useAgentThoughtStream() {
