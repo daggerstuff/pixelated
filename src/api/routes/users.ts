@@ -245,7 +245,7 @@ router.delete(
       [permissionId, userId],
     )
     if ((result.rowCount ?? 0) === 0) {
-      throw new NotFoundError('Permission') // Fix: Pass 'Permission' instead of 'Permission not found'
+      throw new NotFoundError('Permission')
     }
     const permission = result.rows[0]
     res.json({
