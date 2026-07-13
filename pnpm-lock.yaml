@@ -1044,8 +1044,8 @@ importers:
         specifier: ^4.0.3
         version: 4.0.3
       helmet:
-        specifier: ^8.1.0
-        version: 8.2.0
+        specifier: ^8.3.0
+        version: 8.3.0
       joi:
         specifier: 17.13.4
         version: 17.13.4
@@ -9766,10 +9766,6 @@ packages:
         optional: true
       openai:
         optional: true
-
-  helmet@8.2.0:
-    resolution: {integrity: sha512-DRgTIUgnWcJ62KyarxxziuqYxKGnR6Rgg19BlbucN/dpmJbl1XOit6qvoOX0ZT+HhWe5OUVhU/a1zpGyc1xA0Q==}
-    engines: {node: '>=18.0.0'}
 
   helmet@8.3.0:
     resolution: {integrity: sha512-Qgpiaws3Sm30Av8Eah6sjMCZZwjlBu+E68rhpCWBshY1lb09HtLwj5GviX0OyQIn+ulUS0iX0AxN5n3tLZzz1w==}
@@ -23667,8 +23663,6 @@ snapshots:
       '@ai-sdk/provider': 4.0.3
       ai: 7.0.22(zod@4.4.3)
       openai: 6.37.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3)
-
-  helmet@8.2.0: {}
 
   helmet@8.3.0: {}
 
