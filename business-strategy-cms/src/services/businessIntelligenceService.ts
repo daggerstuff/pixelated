@@ -1,6 +1,7 @@
 import {
   MarketData,
   CompetitorAnalysis,
+  Competitor,
   BusinessInsight,
 } from '../types/business-intelligence'
 import { Logger } from '../utils/logger'
