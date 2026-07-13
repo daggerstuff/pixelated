@@ -131,6 +131,13 @@ export interface Logger {
   ) => void
   warn: (message: string, meta?: Record<string, unknown>) => void
   debug: (message: string, meta?: Record<string, unknown>) => void
+  audit?: (entry: {
+    action: string
+    resourceType: string
+    resourceId?: string
+    providerId: string
+    timestamp: string
+  }) => void | Promise<void>
 }
 
 // Validation Schemas

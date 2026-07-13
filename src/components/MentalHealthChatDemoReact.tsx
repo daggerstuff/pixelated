@@ -288,13 +288,13 @@ export default function MentalHealthChatDemoReact({
                 >
                   <div className="bg-muted max-w-[80%] rounded-lg px-4 py-3">
                     <div className="flex h-4 items-center space-x-1.5">
-                      <div className="h-2 w-2 animate-bounce rounded-full bg-foreground/50"></div>
+                      <div className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"></div>
                       <div
-                        className="h-2 w-2 animate-bounce rounded-full bg-foreground/50"
+                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
                         style={{ animationDelay: '0.2s' }}
                       ></div>
                       <div
-                        className="h-2 w-2 animate-bounce rounded-full bg-foreground/50"
+                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
                         style={{ animationDelay: '0.4s' }}
                       ></div>
                       <span className="sr-only">Assistant is typing...</span>
