@@ -261,12 +261,22 @@ export function isStrongPassword(password: string): boolean {
 export function generateSecureRandomString(length: number = 32): string {
   const chars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const alphabetSize = chars.length
+  // Largest multiple of alphabetSize that fits in a uint32. Values at or above
+  // this cutoff would skew the distribution, so we discard them (rejection sampling).
+  const limit = Math.floor(0x100000000 / alphabetSize) * alphabetSize
   let result = ''
-  const randomValues = new Uint32Array(length)
-  crypto.getRandomValues(randomValues)
+  let index = 0
+  let buffer = new Uint32Array(0)
 
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(randomValues[i] % chars.length)
+  while (result.length < length) {
+    if (index >= buffer.length) {
+      buffer = crypto.getRandomValues(new Uint32Array(Math.max(length, 16)))
+      index = 0
+    }
+    const value = buffer[index++]
+    if (value >= limit) continue
+    result += chars.charAt(value % alphabetSize)
   }
 
   return result
