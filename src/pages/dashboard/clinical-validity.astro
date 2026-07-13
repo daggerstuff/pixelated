@@ -100,7 +100,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
         aria-describedby="degradation-alert-description"
       >
         <div class="flex items-start gap-3">
-          <!-- Icon -->
+          {/* Icon */}
           <div class="flex-shrink-0 p-2 bg-orange-500/20 rounded-lg">
             <svg 
               class="w-5 h-5 text-orange-400" 
@@ -113,7 +113,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </svg>
           </div>
           
-          <!-- Content -->
+          {/* Content */}
           <div class="flex-1">
             <h3 id="degradation-alert-title" class="text-lg font-semibold text-orange-200 mb-1">
               Performance Degradation Detected
@@ -139,7 +139,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
           </div>
         </div>
         
-        <!-- Accessibility: hidden live region for screen readers -->
+        {/* Accessibility: hidden live region for screen readers */}
         <div aria-live="assertive" class="sr-only">
           Alert: Performance degradation detected. Clinical validity pass rate has dropped {degradationDetails.degradationPercentage.toFixed(1)} percentage points below the 7-day rolling average.
         </div>
