@@ -72,7 +72,7 @@ async function main() {
     noopToolContext,
   );
   console.log(
-    `\nGATE   state=${gate.state} authorized=${gate.authorized} ` + `reason="${gate.reason}"`,
+    `\nGATE   state=${gate.state} authorized=${gate.authorized} reason="${gate.reason}"`,
   );
 
   const summary =

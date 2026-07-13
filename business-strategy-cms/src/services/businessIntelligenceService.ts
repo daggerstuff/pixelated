@@ -37,7 +37,7 @@ export class BusinessIntelligenceService {
         error,
         industry,
       })
-      throw new Error(`Competitive analysis failed: ${String(error)}`)
+      throw new Error(`Competitive analysis failed: ${String(error)}`, { cause: error })
     }
   }
 
@@ -84,17 +84,17 @@ export class BusinessIntelligenceService {
   /**
    * Pricing intelligence analysis
    */
-  async analyzePricingStrategy(competitorData: any[]): Promise<{
+  async analyzePricingStrategy(competitorData: { price: number }[]): Promise<{
     recommendedPrice: number
     priceRange: { min: number; max: number }
     marketPosition: 'premium' | 'competitive' | 'budget'
     justification: string[]
   }> {
-    const prices = competitorData.map((c) => c.price).filter((p) => p > 0)
+    const prices = competitorData.map((c) => c.price).filter((p) => typeof p === 'number' && p > 0)
     const avgPrice =
-      prices.reduce((sum, price) => sum + price, 0) / prices.length
-    const minPrice = Math.min(...prices)
-    const maxPrice = Math.max(...prices)
+      prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0
+    const minPrice = prices.length > 0 ? Math.min(...prices) : 0
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : 0
 
     // Determine market position
     let marketPosition: 'premium' | 'competitive' | 'budget'
@@ -312,15 +312,15 @@ export class BusinessIntelligenceService {
    * Perform competitive analysis
    */
   private async performCompetitiveAnalysis(
-    competitors: any[],
+    competitors: { name: string; marketShare: number; pricing: { basic: number; premium: number; enterprise: number } }[],
   ): Promise<CompetitorAnalysis> {
     const avgPricing =
-      competitors.reduce(
+      competitors.length > 0 ? competitors.reduce(
         (sum, c) =>
           sum +
           (c.pricing.basic + c.pricing.premium + c.pricing.enterprise) / 3,
         0,
-      ) / competitors.length
+      ) / competitors.length : 0
 
     const marketShareDistribution = competitors.reduce<Record<string, number>>(
       (acc, c) => {
