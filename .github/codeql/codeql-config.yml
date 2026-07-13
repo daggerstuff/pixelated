@@ -42,6 +42,14 @@ paths-ignore:
   - '**/playwright-report'
   - '**/test-results'
 
+# Skip the JS/TS autobuild step: codeql-action@v4's bundled pnpm
+# self-installer crashes on this repo's newer pnpm lockfile
+# ("Cannot use 'in' operator to search for 'integrity' in undefined").
+# Source is extracted directly instead.
+languages:
+  javascript:
+    build-mode: none
+
 # Include custom queries for HIPAA/FHIR/EHR security
 queries:
   - name: FHIR Security Checks
