@@ -8,7 +8,7 @@ RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 # Builder stage: install deps and run the static build
 FROM base AS builder
 ENV NODE_ENV=production
-ARG PNPM_VERSION=11.11.0
+ARG PNPM_VERSION=11.12.0
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
