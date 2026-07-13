@@ -5,6 +5,7 @@ import { AgentPerformanceHeatmap, type AgentMetric } from './AgentPerformanceHea
 import { Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import { useAgentThoughtStream } from '@/hooks/useAgentThoughtStream';
+import type { StreamOptions } from '@/hooks/useAgentThoughtStream';
 import type { AgentActivity, AgentActivityType } from '@/types/chat';
 
 const SAMPLE_AGENTS = [
