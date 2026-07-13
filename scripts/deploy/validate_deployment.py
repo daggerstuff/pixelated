@@ -6,11 +6,16 @@ Validates all components are properly deployed and functioning
 
 import asyncio
 import logging
+import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
-import requests
+import aiofiles
+import aiohttp
+import psutil
+import psycopg2
+import redis
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -33,14 +38,15 @@ class DeploymentValidator:
         try:
             logger.info(f"Validating {service_name} health at {service_url}")
 
-            response = requests.get(f"{service_url}/health", timeout=10, headers={"Content-Type": "application/json"})
-
-            if response.status_code == 200:
-                health_data = response.json()
-                logger.info(f"{service_name} health: {health_data}")
-                return health_data.get("status") == "healthy"
-            logger.error(f"{service_name} health check failed: {response.status_code}")
-            return False
+            async with self.session.get(
+                f"{service_url}/health", timeout=10, headers={"Content-Type": "application/json"}
+            ) as response:
+                if response.status == 200:
+                    health_data = await response.json()
+                    logger.info(f"{service_name} health: {health_data}")
+                    return health_data.get("status") == "healthy"
+                logger.error(f"{service_name} health check failed: {response.status}")
+                return False
 
         except Exception as e:
             logger.error(f"Error validating {service_name}: {e!s}")
@@ -58,33 +64,32 @@ class DeploymentValidator:
                     {
                         "role": "user",
                         "content": "As a woman in tech, I face unique challenges",
-                        "timestamp": datetime.now().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                     },
                     {
                         "role": "assistant",
                         "content": "I understand. Women in tech often face specific challenges",
-                        "timestamp": datetime.now().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                     },
                 ],
                 "metadata": {"context": "career_advice", "user_id": "test_user_123"},
             }
 
-            response = requests.post(
+            async with self.session.post(
                 f"{self.services['bias_detection']}/analyze/conversation",
                 json=test_conversation,
                 timeout=30,
                 headers={"Content-Type": "application/json"},
-            )
+            ) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    logger.info(f"Bias detection result: {result}")
 
-            if response.status_code == 200:
-                result = response.json()
-                logger.info(f"Bias detection result: {result}")
-
-                # Validate result structure
-                required_fields = ["bias_scores", "recommendations", "confidence"]
-                return all(field in result for field in required_fields)
-            logger.error(f"Bias detection test failed: {response.status_code}")
-            return False
+                    # Validate result structure
+                    required_fields = ["bias_scores", "recommendations", "confidence"]
+                    return all(field in result for field in required_fields)
+                logger.error(f"Bias detection test failed: {response.status}")
+                return False
 
         except Exception as e:
             logger.error(f"Error validating bias detection integration: {e!s}")
@@ -102,24 +107,23 @@ class DeploymentValidator:
                 "difficulty_level": "intermediate",
             }
 
-            response = requests.post(
+            async with self.session.post(
                 f"{self.services['training_service']}/training/cultural/scenarios",
                 json=training_params,
                 timeout=30,
                 headers={"Content-Type": "application/json"},
-            )
+            ) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    logger.info(f"Training scenarios generated: {len(result.get('scenarios', []))}")
 
-            if response.status_code == 200:
-                result = response.json()
-                logger.info(f"Training scenarios generated: {len(result.get('scenarios', []))}")
-
-                # Validate scenarios
-                scenarios = result.get("scenarios", [])
-                return len(scenarios) > 0 and all(
-                    "cultural_context" in scenario and "learning_objectives" in scenario for scenario in scenarios
-                )
-            logger.error(f"Training integration test failed: {response.status_code}")
-            return False
+                    # Validate scenarios
+                    scenarios = result.get("scenarios", [])
+                    return len(scenarios) > 0 and all(
+                        "cultural_context" in scenario and "learning_objectives" in scenario for scenario in scenarios
+                    )
+                logger.error(f"Training integration test failed: {response.status}")
+                return False
 
         except Exception as e:
             logger.error(f"Error validating training integration: {e!s}")
@@ -137,37 +141,35 @@ class DeploymentValidator:
                     "pattern": "test_pattern_validation",
                     "confidence": 0.85,
                     "source": "validation_test",
-                    "timestamp": datetime.now().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 },
                 "priority": "high",
             }
 
-            response = requests.post(
+            async with self.session.post(
                 f"{self.services['memory_service']}/memory/update",
                 json=memory_update,
                 timeout=30,
                 headers={"Content-Type": "application/json"},
-            )
+            ) as post_response:
+                if post_response.status == 200:
+                    result = await post_response.json()
+                    logger.info(f"Memory update result: {result}")
 
-            if response.status_code == 200:
-                result = response.json()
-                logger.info(f"Memory update result: {result}")
-
-                # Test memory retrieval
-                response = requests.get(
-                    f"{self.services['memory_service']}/memory/state",
-                    timeout=10,
-                    headers={"Content-Type": "application/json"},
-                )
-
-                if response.status_code == 200:
-                    state = response.json()
-                    logger.info("Memory state retrieved successfully")
-                    return "update_history" in state
-                logger.error(f"Memory state retrieval failed: {response.status_code}")
+                    # Test memory retrieval
+                    async with self.session.get(
+                        f"{self.services['memory_service']}/memory/state",
+                        timeout=10,
+                        headers={"Content-Type": "application/json"},
+                    ) as get_response:
+                        if get_response.status == 200:
+                            state = await get_response.json()
+                            logger.info("Memory state retrieved successfully")
+                            return "update_history" in state
+                        logger.error(f"Memory state retrieval failed: {get_response.status}")
+                        return False
+                logger.error(f"Memory update test failed: {post_response.status}")
                 return False
-            logger.error(f"Memory update test failed: {response.status_code}")
-            return False
 
         except Exception as e:
             logger.error(f"Error validating memory integration: {e!s}")
@@ -179,24 +181,23 @@ class DeploymentValidator:
             logger.info("Validating performance metrics")
 
             # Test performance endpoint
-            response = requests.get(
+            async with self.session.get(
                 f"{self.services['bias_detection']}/metrics", timeout=10, headers={"Content-Type": "application/json"}
-            )
+            ) as response:
+                if response.status == 200:
+                    metrics = await response.json()
+                    logger.info(f"Performance metrics: {list(metrics.keys())}")
 
-            if response.status_code == 200:
-                metrics = response.json()
-                logger.info(f"Performance metrics: {list(metrics.keys())}")
+                    # Validate key metrics
+                    required_metrics = [
+                        "bias_detection_requests_total",
+                        "bias_detection_duration_seconds",
+                        "bias_detection_errors_total",
+                    ]
 
-                # Validate key metrics
-                required_metrics = [
-                    "bias_detection_requests_total",
-                    "bias_detection_duration_seconds",
-                    "bias_detection_errors_total",
-                ]
-
-                return all(metric in metrics for metric in required_metrics)
-            logger.error(f"Performance metrics test failed: {response.status_code}")
-            return False
+                    return all(metric in metrics for metric in required_metrics)
+                logger.error(f"Performance metrics test failed: {response.status}")
+                return False
 
         except Exception as e:
             logger.error(f"Error validating performance metrics: {e!s}")
@@ -210,22 +211,21 @@ class DeploymentValidator:
             # Test IEEE search (with mock data in test mode)
             search_query = {"query": "bias detection machine learning", "max_results": 5, "publication_year": 2023}
 
-            response = requests.post(
+            async with self.session.post(
                 f"{self.services['bias_detection']}/research/ieee/search",
                 json=search_query,
                 timeout=30,
                 headers={"Content-Type": "application/json"},
-            )
+            ) as response:
+                if response.status == 200:
+                    result = await response.json()
+                    logger.info(f"IEEE search result: {result}")
 
-            if response.status_code == 200:
-                result = response.json()
-                logger.info(f"IEEE search result: {result}")
-
-                # Validate result structure
-                return "articles" in result and "total_records" in result
-            logger.warning(f"IEEE integration test returned: {response.status_code}")
-            # This might fail in test mode without real API key
-            return True  # Allow this to pass in validation
+                    # Validate result structure
+                    return "articles" in result and "total_records" in result
+                logger.warning(f"IEEE integration test returned: {response.status}")
+                # This might fail in test mode without real API key
+                return True  # Allow this to pass in validation
 
         except Exception as e:
             logger.error(f"Error validating IEEE integration: {e!s}")
@@ -243,15 +243,14 @@ class DeploymentValidator:
                 "difficulty_level": "beginner",
             }
 
-            response = requests.post(
+            async with self.session.post(
                 f"{self.services['training_service']}/training/cultural/scenarios", json=training_params, timeout=30
-            )
-
-            if response.status_code != 200:
-                logger.error("Failed to generate training scenarios")
-                return False
-
-            scenarios = response.json().get("scenarios", [])
+            ) as response:
+                if response.status != 200:
+                    logger.error("Failed to generate training scenarios")
+                    return False
+                scenarios_data = await response.json()
+                scenarios = scenarios_data.get("scenarios", [])
 
             # Step 2: Use scenarios for bias detection
             test_conversation = {
@@ -260,7 +259,7 @@ class DeploymentValidator:
                     {
                         "role": "user",
                         "content": scenarios[0]["scenario_description"] if scenarios else "Test scenario",
-                        "timestamp": datetime.now().isoformat(),
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
                     }
                 ],
                 "metadata": {
@@ -269,28 +268,28 @@ class DeploymentValidator:
                 },
             }
 
-            response = requests.post(
+            async with self.session.post(
                 f"{self.services['bias_detection']}/analyze/conversation", json=test_conversation, timeout=30
-            )
-
-            if response.status_code != 200:
-                logger.error("Failed to analyze conversation")
-                return False
+            ) as response:
+                if response.status != 200:
+                    logger.error("Failed to analyze conversation")
+                    return False
+                detection_result = await response.json()
 
             # Step 3: Update memory with results
-            detection_result = response.json()
             memory_update = {
                 "update_type": "training_result",
                 "content": {
                     "detection_result": detection_result,
                     "training_scenario": scenarios[0] if scenarios else {},
-                    "timestamp": datetime.now().isoformat(),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 },
             }
 
-            response = requests.post(f"{self.services['memory_service']}/memory/update", json=memory_update, timeout=30)
-
-            return response.status_code == 200
+            async with self.session.post(
+                f"{self.services['memory_service']}/memory/update", json=memory_update, timeout=30
+            ) as response:
+                return response.status == 200
 
         except Exception as e:
             logger.error(f"Error validating end-to-end workflow: {e!s}")
@@ -303,9 +302,6 @@ class DeploymentValidator:
 
             # Test PostgreSQL connection
             # Get database URL from environment
-            import os
-
-            import psycopg2
 
             db_url = os.getenv("DATABASE_URL", "postgresql://localhost:5432/pixelated_bias_detection")
 
@@ -321,7 +317,6 @@ class DeploymentValidator:
             conn.close()
 
             # Test Redis connection
-            import redis
 
             redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
             r = redis.from_url(redis_url)
@@ -338,8 +333,6 @@ class DeploymentValidator:
         """Validate system resources"""
         try:
             logger.info("Validating system resources")
-
-            import psutil
 
             # Check CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
@@ -366,42 +359,48 @@ class DeploymentValidator:
         """Run complete validation suite"""
         logger.info("Starting deployment validation suite")
 
-        validation_results = {"timestamp": datetime.now().isoformat(), "overall_status": "pending", "tests": {}}
+        validation_results = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "overall_status": "pending",
+            "tests": {},
+        }
 
-        # Service health checks
-        for service_name, service_url in self.services.items():
-            result = await self.validate_service_health(service_name, service_url)
-            validation_results["tests"][f"{service_name}_health"] = {
-                "status": "pass" if result else "fail",
-                "description": f"{service_name} service health check",
-            }
-
-        # Integration tests
-        tests = [
-            ("bias_detection_integration", self.validate_bias_detection_integration),
-            ("training_integration", self.validate_training_integration),
-            ("memory_integration", self.validate_memory_integration),
-            ("performance_metrics", self.validate_performance_metrics),
-            ("ieee_integration", self.validate_ieee_integration),
-            ("end_to_end_workflow", self.validate_end_to_end_workflow),
-            ("database_connections", self.validate_database_connections),
-            ("system_resources", self.validate_system_resources),
-        ]
-
-        for test_name, test_func in tests:
-            try:
-                result = await test_func()
-                validation_results["tests"][test_name] = {
+        async with aiohttp.ClientSession() as session:
+            self.session = session
+            # Service health checks
+            for service_name, service_url in self.services.items():
+                result = await self.validate_service_health(service_name, service_url)
+                validation_results["tests"][f"{service_name}_health"] = {
                     "status": "pass" if result else "fail",
-                    "description": test_name.replace("_", " ").title(),
+                    "description": f"{service_name} service health check",
                 }
-            except Exception as e:
-                logger.error(f"Test {test_name} failed with exception: {e!s}")
-                validation_results["tests"][test_name] = {
-                    "status": "error",
-                    "description": test_name.replace("_", " ").title(),
-                    "error": str(e),
-                }
+
+            # Integration tests
+            tests = [
+                ("bias_detection_integration", self.validate_bias_detection_integration),
+                ("training_integration", self.validate_training_integration),
+                ("memory_integration", self.validate_memory_integration),
+                ("performance_metrics", self.validate_performance_metrics),
+                ("ieee_integration", self.validate_ieee_integration),
+                ("end_to_end_workflow", self.validate_end_to_end_workflow),
+                ("database_connections", self.validate_database_connections),
+                ("system_resources", self.validate_system_resources),
+            ]
+
+            for test_name, test_func in tests:
+                try:
+                    result = await test_func()
+                    validation_results["tests"][test_name] = {
+                        "status": "pass" if result else "fail",
+                        "description": test_name.replace("_", " ").title(),
+                    }
+                except Exception as e:
+                    logger.error(f"Test {test_name} failed with exception: {e!s}")
+                    validation_results["tests"][test_name] = {
+                        "status": "error",
+                        "description": test_name.replace("_", " ").title(),
+                        "error": str(e),
+                    }
 
         # Calculate overall status
         failed_tests = sum(1 for test in validation_results["tests"].values() if test["status"] != "pass")
@@ -476,9 +475,9 @@ async def main():
     report = validator.generate_validation_report(results)
 
     # Save report to file
-    report_file = f"deployment_validation_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
-    with open(report_file, "w") as f:
-        f.write(report)
+    report_file = f"deployment_validation_report_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.md"
+    async with aiofiles.open(report_file, "w") as f:
+        await f.write(report)
 
     if results["overall_status"] == "fail":
         return 1
