@@ -160,7 +160,7 @@ test('login page visual comparison', async ({ page }) => {
   // Take screenshot for visual comparison
   // Increased tolerance for browser differences, especially WebKit
   await expect(page).toHaveScreenshot('login-page.png', {
-    maxDiffPixelRatio: 0.05, // Increased tolerance for cross-browser rendering differences
+    maxDiffPixelRatio: 0.05, // Reduced tolerance for stricter visual comparison
     threshold: 0.02, // Additional threshold for pixel comparison
   })
 })
