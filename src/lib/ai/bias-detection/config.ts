@@ -274,7 +274,7 @@ export function mergeWithDefaults(
   const mergedConfig: BiasDetectionConfig = deepMergeConfigs(
     DEFAULT_CONFIG,
     userConfig,
-  ) as BiasDetectionConfig
+  )
   return mergedConfig
 }
 
@@ -403,7 +403,7 @@ export function loadConfigFromEnv(): Partial<BiasDetectionConfig> {
     )
   }
   if (Object.keys(alertConfig).length > 0) {
-    envConfig.alertConfig = alertConfig as BiasDetectionConfig['alertConfig']
+    envConfig.alertConfig = alertConfig
   }
 
   // Load metrics configuration
@@ -424,7 +424,7 @@ export function loadConfigFromEnv(): Partial<BiasDetectionConfig> {
   }
   if (Object.keys(metricsConfig).length > 0) {
     envConfig.metricsConfig =
-      metricsConfig as BiasDetectionConfig['metricsConfig']
+      metricsConfig
   }
 
   return envConfig
@@ -549,7 +549,7 @@ export function createConfigWithEnvOverrides(
     userConfig ?? {},
   )
 
-  return combinedConfig as BiasDetectionConfig
+  return combinedConfig
 }
 
 /**
@@ -560,7 +560,7 @@ export function updateConfiguration(
   updates: Partial<BiasDetectionConfig>,
 ): BiasDetectionConfig {
   validateConfig(updates)
-  return deepMergeConfigs(currentConfig, updates) as BiasDetectionConfig
+  return deepMergeConfigs(currentConfig, updates)
 }
 
 /**

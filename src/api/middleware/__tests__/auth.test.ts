@@ -58,7 +58,7 @@ describe('Authentication Middleware', () => {
       })
 
       authMiddleware(
-        mockRequest as unknown as Request,
+        mockRequest,
         mockResponse as unknown as Response,
         mockNext,
       )
@@ -81,7 +81,7 @@ describe('Authentication Middleware', () => {
       })
 
       authMiddleware(
-        mockRequest as unknown as Request,
+        mockRequest,
         mockResponse as unknown as Response,
         mockNext,
       )
@@ -99,7 +99,7 @@ describe('Authentication Middleware', () => {
       mockAuthenticateRequest.mockRejectedValue(new Error('Auth service error'))
 
       authMiddleware(
-        mockRequest as unknown as Request,
+        mockRequest,
         mockResponse as unknown as Response,
         mockNext,
       )
@@ -121,7 +121,7 @@ describe('Authentication Middleware', () => {
       })
 
       authMiddleware(
-        mockRequest as unknown as Request,
+        mockRequest,
         mockResponse as unknown as Response,
         mockNext,
       )

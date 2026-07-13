@@ -229,7 +229,7 @@ export class AnalyticsService {
               logger.warn('Invalid event JSON in storage:', json)
               return null
             }
-            return JSON.parse(json) as unknown as Event
+            return JSON.parse(json)
           } catch (error: unknown) {
             logger.error('Error parsing event JSON:', error)
             return null
@@ -300,7 +300,7 @@ export class AnalyticsService {
               logger.warn('Invalid metric JSON in storage:', json)
               return null
             }
-            return JSON.parse(json) as unknown as Metric
+            return JSON.parse(json)
           } catch (error: unknown) {
             logger.error('Error parsing metric JSON:', error)
             return null

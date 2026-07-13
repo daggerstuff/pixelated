@@ -116,7 +116,7 @@ const isBiasAnalysis = (value: unknown): value is BiasAnalysis => {
 
     return (
       isBiasSeverity(item['severity']) &&
-      biasSeverityValues.includes(item['severity'] as any)
+      biasSeverityValues.includes(item['severity'])
     )
   })
 }

@@ -108,7 +108,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
           ({
             ...e,
             timestamp: e.timestamp,
-          }) as TypesEmotionAnalysis,
+          }),
       )
       emotionData.push(...emotionsForDTO)
     }

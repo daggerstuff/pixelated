@@ -559,7 +559,7 @@ class PIIDetectionService {
           )
         }
       } else if (result.result && typeof result.result === 'object') {
-        resultData = result.result as PIIFHEResultData
+        resultData = result.result
       } else {
         throw new Error('Unexpected FHE operation result type')
       }
