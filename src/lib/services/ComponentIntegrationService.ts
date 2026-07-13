@@ -1,7 +1,7 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('component-integration-service')
 
-/** 
+/**
  * Central service for managing component data integration
  * Provides a unified interface for all enterprise components to access backend data
  */
@@ -18,7 +18,14 @@ export class ComponentIntegrationService {
   }
 
   // Analytics Dashboard Integration
-  async getChartData(params: { type: 'line' | 'bar' | 'pie' | 'scatter' category?: 'progress' | 'emotions' | 'sessions' | 'outcomes' timeRange?: number clientId?: string sessionId?: string dataPoints?: number }) {
+  async getChartData(params: {
+    type: 'line' | 'bar' | 'pie' | 'scatter'
+    category?: 'progress' | 'emotions' | 'sessions' | 'outcomes'
+    timeRange?: number
+    clientId?: string
+    sessionId?: string
+    dataPoints?: number
+  }) {
     try {
       const queryParams = new URLSearchParams()
       for (const [key, value] of Object.entries(params)) {
@@ -37,7 +44,10 @@ export class ComponentIntegrationService {
         throw new Error(`Analytics API error: ${response.status}`)
       }
       const data = await response.json()
-      logger.info('Retrieved chart data', { type: params.type, category: params.category, })
+      logger.info('Retrieved chart data', {
+        type: params.type,
+        category: params.category,
+      })
       return data
     } catch (error: unknown) {
       logger.error('Error fetching chart data', { error, params })
@@ -46,7 +56,13 @@ export class ComponentIntegrationService {
   }
 
   // 3D Emotion Visualization Integration
-  async get3DEmotionData(params: { clientId?: string sessionId?: string timeRange?: number maxPoints?: number includeTrajectory?: boolean }) {
+  async get3DEmotionData(params: {
+    clientId?: string
+    sessionId?: string
+    timeRange?: number
+    maxPoints?: number
+    includeTrajectory?: boolean
+  }) {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -65,7 +81,10 @@ export class ComponentIntegrationService {
         throw new Error(`3D Emotion API error: ${response.status}`)
       }
       const data = await response.json()
-      logger.info('Retrieved 3D emotion data', { pointCount: data.emotionPoints?.length, sessionId: params.sessionId, })
+      logger.info('Retrieved 3D emotion data', {
+        pointCount: data.emotionPoints?.length,
+        sessionId: params.sessionId,
+      })
       return data
     } catch (error: unknown) {
       logger.error('Error fetching 3D emotion data', { error, params })
@@ -73,7 +92,14 @@ export class ComponentIntegrationService {
     }
   }
 
-  async addEmotionPoint(emotionData: { emotion: string valence: number arousal: number dominance: number intensity?: number sessionId?: string }) {
+  async addEmotionPoint(emotionData: {
+    emotion: string
+    valence: number
+    arousal: number
+    dominance: number
+    intensity?: number
+    sessionId?: string
+  }) {
     try {
       const response = await fetch(
         `https://${this.baseUrl}/api/components/emotions/3d-visualization`, // Use HTTPS protocol
@@ -97,7 +123,12 @@ export class ComponentIntegrationService {
 
   // Treatment Plan Management Integration
   async getTreatmentPlans(
-    params: { clientId?: string planId?: string status?: string includeMetrics?: boolean } = {},
+    params: {
+      clientId?: string
+      planId?: string
+      status?: string
+      includeMetrics?: boolean
+    } = {},
   ) {
     try {
       const queryParams = new URLSearchParams()
@@ -117,7 +148,10 @@ export class ComponentIntegrationService {
         throw new Error(`Treatment plans API error: ${response.status}`)
       }
       const plans = await response.json()
-      logger.info('Retrieved treatment plans', { planCount: plans.length, clientId: params.clientId, })
+      logger.info('Retrieved treatment plans', {
+        planCount: plans.length,
+        clientId: params.clientId,
+      })
       return plans
     } catch (error: unknown) {
       logger.error('Error fetching treatment plans', { error, params })
@@ -147,7 +181,12 @@ export class ComponentIntegrationService {
     }
   }
 
-  async updateTreatmentPlan(updates: { planId: string goalId?: string milestoneId?: string updates: Record<string, any> }) {
+  async updateTreatmentPlan(updates: {
+    planId: string
+    goalId?: string
+    milestoneId?: string
+    updates: Record<string, any>
+  }) {
     try {
       const response = await fetch(
         `https://${this.baseUrl}/api/components/treatment-plans/enhanced`, // Use HTTPS protocol
@@ -171,7 +210,14 @@ export class ComponentIntegrationService {
 
   // Particle System Integration
   async getParticleSystem(
-    params: { emotion?: string particleCount?: number intensity?: number sessionId?: string useSessionData?: boolean complexity?: 'low' | 'medium' | 'high' } = {},
+    params: {
+      emotion?: string
+      particleCount?: number
+      intensity?: number
+      sessionId?: string
+      useSessionData?: boolean
+      complexity?: 'low' | 'medium' | 'high'
+    } = {},
   ) {
     try {
       const queryParams = new URLSearchParams()
@@ -191,7 +237,10 @@ export class ComponentIntegrationService {
         throw new Error(`Particle system API error: ${response.status}`)
       }
       const data = await response.json()
-      logger.info('Retrieved particle system', { particleCount: data.particles?.length, emotion: params.emotion, })
+      logger.info('Retrieved particle system', {
+        particleCount: data.particles?.length,
+        emotion: params.emotion,
+      })
       return data
     } catch (error: unknown) {
       logger.error('Error fetching particle system', { error, params })
@@ -199,7 +248,12 @@ export class ComponentIntegrationService {
     }
   }
 
-  async updateParticleSystem(updates: { emotion: string intensity: number sessionId?: string particleUpdates?: any[] }) {
+  async updateParticleSystem(updates: {
+    emotion: string
+    intensity: number
+    sessionId?: string
+    particleUpdates?: any[]
+  }) {
     try {
       const response = await fetch(
         `https://${this.baseUrl}/api/components/particles/emotion-system`, // Use HTTPS protocol
@@ -223,7 +277,12 @@ export class ComponentIntegrationService {
 
   // UI Carousel Content Integration
   async getCarouselContent(
-    params: { configId?: string category?: string audience?: string includeExpired?: boolean } = {},
+    params: {
+      configId?: string
+      category?: string
+      audience?: string
+      includeExpired?: boolean
+    } = {},
   ) {
     try {
       const queryParams = new URLSearchParams()
@@ -243,7 +302,10 @@ export class ComponentIntegrationService {
         throw new Error(`Carousel content API error: ${response.status}`)
       }
       const data = await response.json()
-      logger.info('Retrieved carousel content', { configCount: data.configurations?.length, audience: params.audience, })
+      logger.info('Retrieved carousel content', {
+        configCount: data.configurations?.length,
+        audience: params.audience,
+      })
       return data
     } catch (error: unknown) {
       logger.error('Error fetching carousel content', { error, params })
@@ -268,7 +330,9 @@ export class ComponentIntegrationService {
         throw new Error(`Save carousel config API error: ${response.status}`)
       }
       const result = await response.json()
-      logger.info('Saved carousel configuration', { configId: result.configuration?.id, })
+      logger.info('Saved carousel configuration', {
+        configId: result.configuration?.id,
+      })
       return result
     } catch (error: unknown) {
       logger.error('Error saving carousel configuration', { error, configData })
@@ -278,48 +342,107 @@ export class ComponentIntegrationService {
 
   // Cross-Component Integration Methods
   async getIntegratedDashboardData(
-    params: { clientId?: string sessionId?: string timeRange?: number includeMetrics?: boolean } = {},
+    params: {
+      clientId?: string
+      sessionId?: string
+      timeRange?: number
+      includeMetrics?: boolean
+    } = {},
   ) {
     try {
       // Fetch data from multiple endpoints simultaneously
-      const [chartData, emotionData, treatmentPlans, particleSystem] = await Promise.allSettled([
-        this.getChartData({ type: 'line', category: 'progress', clientId: params.clientId, sessionId: params.sessionId, timeRange: params.timeRange, }),
-        this.get3DEmotionData({ clientId: params.clientId, sessionId: params.sessionId, timeRange: params.timeRange, includeTrajectory: true, }),
-        this.getTreatmentPlans({ clientId: params.clientId, includeMetrics: params.includeMetrics, }),
-        this.getParticleSystem({ emotion: 'neutral', sessionId: params.sessionId, useSessionData: true, }),
-      ])
+      const [chartData, emotionData, treatmentPlans, particleSystem] =
+        await Promise.allSettled([
+          this.getChartData({
+            type: 'line',
+            category: 'progress',
+            clientId: params.clientId,
+            sessionId: params.sessionId,
+            timeRange: params.timeRange,
+          }),
+          this.get3DEmotionData({
+            clientId: params.clientId,
+            sessionId: params.sessionId,
+            timeRange: params.timeRange,
+            includeTrajectory: true,
+          }),
+          this.getTreatmentPlans({
+            clientId: params.clientId,
+            includeMetrics: params.includeMetrics,
+          }),
+          this.getParticleSystem({
+            emotion: 'neutral',
+            sessionId: params.sessionId,
+            useSessionData: true,
+          }),
+        ])
       const dashboardData = {
         charts: chartData.status === 'fulfilled' ? chartData.value : null,
         emotions: emotionData.status === 'fulfilled' ? emotionData.value : null,
-        treatmentPlans: treatmentPlans.status === 'fulfilled' ? treatmentPlans.value : null,
-        particles: particleSystem.status === 'fulfilled' ? particleSystem.value : null,
+        treatmentPlans:
+          treatmentPlans.status === 'fulfilled' ? treatmentPlans.value : null,
+        particles:
+          particleSystem.status === 'fulfilled' ? particleSystem.value : null,
         metadata: {
           timestamp: new Date().toISOString(),
           errors: [
-            ...(chartData.status === 'rejected' ? [{ component: 'charts', error: chartData.reason }] : []),
-            ...(emotionData.status === 'rejected' ? [{ component: 'emotions', error: emotionData.reason }] : []),
-            ...(treatmentPlans.status === 'rejected' ? [{ component: 'treatmentPlans', error: treatmentPlans.reason }] : []),
-            ...(particleSystem.status === 'rejected' ? [{ component: 'particles', error: particleSystem.reason }] : []),
+            ...(chartData.status === 'rejected'
+              ? [{ component: 'charts', error: chartData.reason }]
+              : []),
+            ...(emotionData.status === 'rejected'
+              ? [{ component: 'emotions', error: emotionData.reason }]
+              : []),
+            ...(treatmentPlans.status === 'rejected'
+              ? [{ component: 'treatmentPlans', error: treatmentPlans.reason }]
+              : []),
+            ...(particleSystem.status === 'rejected'
+              ? [{ component: 'particles', error: particleSystem.reason }]
+              : []),
           ],
         },
       }
-      logger.info('Retrieved integrated dashboard data', { clientId: params.clientId, hasCharts: !!dashboardData.charts, hasEmotions: !!dashboardData.emotions, hasTreatmentPlans: !!dashboardData.treatmentPlans, hasParticles: !!dashboardData.particles, errorCount: dashboardData.metadata.errors.length, })
+      logger.info('Retrieved integrated dashboard data', {
+        clientId: params.clientId,
+        hasCharts: !!dashboardData.charts,
+        hasEmotions: !!dashboardData.emotions,
+        hasTreatmentPlans: !!dashboardData.treatmentPlans,
+        hasParticles: !!dashboardData.particles,
+        errorCount: dashboardData.metadata.errors.length,
+      })
       return dashboardData
     } catch (error: unknown) {
-      logger.error('Error fetching integrated dashboard data', { error, params, })
+      logger.error('Error fetching integrated dashboard data', {
+        error,
+        params,
+      })
       throw error
     }
   }
 
   // Real-time Updates and WebSocket Integration
-  async subscribeToRealTimeUpdates(params: { sessionId: string components: ('emotions' | 'particles' | 'charts' | 'treatment')[] onUpdate: (data: any) => void onError: (error: any) => void }) {
+  async subscribeToRealTimeUpdates(params: {
+    sessionId: string
+    components: ('emotions' | 'particles' | 'charts' | 'treatment')[]
+    onUpdate: (data: any) => void
+    onError: (error: any) => void
+  }) {
     try {
       // TODO: Implement WebSocket connection for real-time updates
-      logger.info('Subscribing to real-time updates', { sessionId: params.sessionId, components: params.components, })
+      logger.info('Subscribing to real-time updates', {
+        sessionId: params.sessionId,
+        components: params.components,
+      })
       // Mock implementation - replace with actual WebSocket
       const mockUpdates = setInterval(() => {
         if (params.components.includes('emotions')) {
-          params.onUpdate({ type: 'emotion', data: { emotion: 'joy', intensity: Math.random(), timestamp: new Date().toISOString(), }, })
+          params.onUpdate({
+            type: 'emotion',
+            data: {
+              emotion: 'joy',
+              intensity: Math.random(),
+              timestamp: new Date().toISOString(),
+            },
+          })
         }
       }, 5000)
       return () => clearInterval(mockUpdates)
@@ -341,23 +464,44 @@ export class ComponentIntegrationService {
         '/api/components/ui/carousel-content',
       ]
       const statusChecks = await Promise.allSettled(
-        endpoints.map((endpoint) => fetch(`https://${this.baseUrl}${endpoint}?statusCheck=true`, { // Use HTTPS protocol
-          method: 'HEAD',
-          headers: this.authHeaders,
-        }).then((response) => ({ endpoint, status: response.status, ok: response.ok, })), ),
+        endpoints.map((endpoint) =>
+          fetch(`https://${this.baseUrl}${endpoint}?statusCheck=true`, {
+            // Use HTTPS protocol
+            method: 'HEAD',
+            headers: this.authHeaders,
+          }).then((response) => ({
+            endpoint,
+            status: response.status,
+            ok: response.ok,
+          })),
+        ),
       )
       const serviceStatus = {
         overall: statusChecks.every(
           (check) => check.status === 'fulfilled' && check.value.ok,
-        ) ? 'operational' : 'degraded',
+        )
+          ? 'operational'
+          : 'degraded',
         services: statusChecks.map((check) => ({
-          endpoint: check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
-          status: check.status === 'fulfilled' ? check.value.ok ? 'operational' : 'failing' : 'error',
+          endpoint:
+            check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
+          status:
+            check.status === 'fulfilled'
+              ? check.value.ok
+                ? 'operational'
+                : 'failing'
+              : 'error',
           error: check.status === 'rejected' ? check.reason : null,
         })),
         timestamp: new Date().toISOString(),
       }
-      logger.info('Component integration status check', { overall: serviceStatus.overall, operationalServices: serviceStatus.services.filter((s) => s.status === 'operational') .length, totalServices: serviceStatus.services.length, })
+      logger.info('Component integration status check', {
+        overall: serviceStatus.overall,
+        operationalServices: serviceStatus.services.filter(
+          (s) => s.status === 'operational',
+        ).length,
+        totalServices: serviceStatus.services.length,
+      })
       return serviceStatus
     } catch (error: unknown) {
       logger.error('Error checking service status', { error })
