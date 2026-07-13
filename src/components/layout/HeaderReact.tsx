@@ -152,7 +152,7 @@ export function Header({
       {/* Search Modal with FlexSearch */}
       {isSearchOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 px-4 pt-16 backdrop-blur-sm"
+          className="bg-background/80 fixed inset-0 z-50 flex items-start justify-center px-4 pt-16 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="search-modal-title"

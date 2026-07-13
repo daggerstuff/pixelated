@@ -1,6 +1,7 @@
+import { readFileSync, existsSync } from 'fs'
+
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
-import { readFileSync, existsSync } from 'fs'
 
 export default defineTool({
   description: 'Reads the contents of a file.',
