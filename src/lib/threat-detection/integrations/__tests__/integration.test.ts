@@ -817,7 +817,7 @@ describe('Threat Detection Integration', () => {
         status: 'pending',
       }
 
-      const params = extractRateLimitParams(response as any)
+      const params = extractRateLimitParams(response)
 
       expect(params.maxRequests).toBe(10)
       expect(params.windowMs).toBe(60000)
@@ -838,7 +838,7 @@ describe('Threat Detection Integration', () => {
         status: 'completed',
       }
 
-      const params = extractRateLimitParams(response as any)
+      const params = extractRateLimitParams(response)
 
       expect(params.maxRequests).toBe(100)
       expect(params.windowMs).toBe(60000)

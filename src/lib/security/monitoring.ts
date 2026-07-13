@@ -1,6 +1,8 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { mongoClient } from '../db/mongoClient'
+// @ts-expect-error mongodb-query-validator has no type declarations
 import { validateQuery } from 'mongodb-query-validator'
+// @ts-expect-error mongo-sanitize has no type declarations
 import { sanitize } from 'mongo-sanitize'
 
 const logger = createBuildSafeLogger('default')
@@ -23,7 +25,7 @@ const validateInput = (input: string, property: string): void => {
 }
 
 const coerceLimit = (value: number): number => {
-  const n = Number(value)
+  const n = value
   if (!Number.isInteger(n) || n <= 0) {
     return defaultLimit
   }
@@ -31,7 +33,7 @@ const coerceLimit = (value: number): number => {
 }
 
 const coerceSkip = (value: number): number => {
-  const n = Number(value)
+  const n = value
   if (!Number.isInteger(n) || n < 0) {
     return 0
   }
@@ -229,7 +231,7 @@ export class SecurityMonitoringService {
       const db = mongoClient.db
       const doc = {
         userId: event.userId ? sanitize(event.userId) : undefined,
-        type: sanitize(String(event.type)),
+        type: sanitize(event.type),
         severity: event.severity ?? SecurityEventSeverity.MEDIUM,
         metadata: event.metadata ?? {},
         timestamp: event.timestamp ?? new Date(),
@@ -287,13 +289,13 @@ export class SecurityMonitoringService {
     skip: number = 0,
     sort: { [key: string]: 1 | -1 } = { timestamp: -1 },
   ): Promise<SecurityEvent[]> {
-    validateInput(String(type), 'type')
+    validateInput(type, 'type')
     const safeLimit = coerceLimit(limit)
     const safeSkip = coerceSkip(skip)
     validateSort(sort)
     try {
       const db = mongoClient.db
-      const sanitizedType = sanitize(String(type))
+      const sanitizedType = sanitize(type)
       const query = { type: sanitizedType }
       validateQuery(query)
       const events = await db

@@ -153,7 +153,7 @@ export class SemanticDeduplicator {
   }
 
   private mergeCluster(cluster: DedupCluster): MemoryBlock {
-    const rep = { ...cluster.representative } as MemoryBlock
+    const rep = { ...cluster.representative }
     const maxArousal = Math.max(
       ...cluster.members.map((m) => m.emotions.arousal),
     )

@@ -91,7 +91,7 @@ export function validateParticipantDemographics(
     throw new Error("Invalid participant demographics data");
   }
   // Additional validation can be added as needed
-  return demographics as unknown as ParticipantDemographics;
+  return demographics;
 }
 
 // Validate Therapeutic Session with basic checks used in tests
@@ -389,10 +389,10 @@ export function handleBiasDetectionError(
   if (isBiasDetectionError(error)) {
     return {
       shouldRetry: error.retryable,
-      alertLevel: "medium" as AlertLevel,
+      alertLevel: "medium",
     };
   }
-  return { shouldRetry: false, alertLevel: "critical" as AlertLevel };
+  return { shouldRetry: false, alertLevel: "critical" };
 }
 
 // Data transformation to/from Python

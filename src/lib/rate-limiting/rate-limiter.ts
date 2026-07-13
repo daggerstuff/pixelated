@@ -67,7 +67,7 @@ export class DistributedRateLimiter {
       }
 
       // Increment counter
-      const pipeline = this._redis.pipeline!()
+      const pipeline = this._redis.pipeline()
       pipeline.incr(windowKey)
       pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
       await pipeline.exec()
@@ -298,7 +298,7 @@ export class DistributedRateLimiter {
         details,
       }
 
-      await this._redis.lpush!(eventKey, JSON.stringify(event))
+      await this._redis.lpush(eventKey, JSON.stringify(event))
       await this._redis.expire(eventKey, 86400 * 7) // Keep for 7 days
     } catch (error: unknown) {
       logger.error('Failed to log security event:', {
@@ -334,8 +334,8 @@ export class DistributedRateLimiter {
       const blockedKey = `${this.analyticsPrefix}blocked:${ruleName}:${dateStr}`
 
       const [usage, blocked] = await Promise.all([
-        this._redis.hgetall!(usageKey),
-        this._redis.hgetall!(blockedKey),
+        this._redis.hgetall(usageKey),
+        this._redis.hgetall(blockedKey),
       ])
 
       analytics[dateStr] = {
@@ -392,7 +392,7 @@ export class DistributedRateLimiter {
   ): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
-    const pipeline = this._redis.pipeline!()
+    const pipeline = this._redis.pipeline()
     pipeline.incr(windowKey)
     pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
     await pipeline.exec()

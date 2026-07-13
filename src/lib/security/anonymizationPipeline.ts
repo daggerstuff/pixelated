@@ -103,7 +103,7 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
           ? Object.keys(processed).filter((k) => processed[k] === '[REDACTED]')
           : []
         return {
-          anonymized: processed as T,
+          anonymized: processed,
           summary,
         }
       } else {

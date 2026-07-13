@@ -37,7 +37,7 @@ export async function registerPIIDetection(
   } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection service',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }
@@ -131,7 +131,7 @@ export function registerPIIMiddleware(
   } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection middleware',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }
@@ -156,7 +156,7 @@ export async function registerPIIDetectionSystem(
   } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection system',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }

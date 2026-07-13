@@ -127,7 +127,7 @@ export class FineTuningAIService {
 
     const result = await provider.createChatCompletion([{ role: "user", content: text }], {
       ...options,
-    } as Record<string, unknown>);
+    });
 
     return result;
   }
