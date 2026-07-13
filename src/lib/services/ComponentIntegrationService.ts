@@ -529,7 +529,7 @@ export class ComponentIntegrationService {
               error,
             }
           }
-        }),        }),
+        }),
       )
 
       const health = {
