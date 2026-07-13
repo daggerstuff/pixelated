@@ -23,10 +23,16 @@ test('login form shows validation errors', async ({ page }) => {
   // Wait for React component to hydrate (LoginForm uses client:load)
   // Wait for form to be visible and interactive
   await expect(getLoginFormLocator(page)).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('button[type="submit"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('button[type="submit"]')).toBeVisible({
+    timeout: 10000,
+  })
   // Wait for form inputs to be ready
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('input[type="password"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({
+    timeout: 10000,
+  })
+  await expect(page.locator('input[type="password"]')).toBeVisible({
+    timeout: 10000,
+  })
   // Additional wait to ensure React hydration is complete
   await page.waitForTimeout(1000)
   // Wait for error elements to exist (they should be in DOM even if hidden)
@@ -50,8 +56,12 @@ test('login form shows validation errors', async ({ page }) => {
     await submitButton.click({ force: true, timeout: 5000 })
   }
   // Wait for React state update - toContainText retries automatically
-  await expect(emailError).toContainText(/required|email/i, { timeout: 15000 })
-  await expect(passwordError).toContainText(/required|password/i, { timeout: 15000 })
+  await expect(emailError).toContainText(/required|email/i, {
+    timeout: 15000,
+  })
+  await expect(passwordError).toContainText(/required|password/i, {
+    timeout: 15000,
+  })
   // Now check visibility - errors should be visible when they have content
   await expect(emailError).toBeVisible({ timeout: 10000 })
   await expect(passwordError).toBeVisible({ timeout: 10000 })
@@ -91,7 +101,9 @@ test('login page has proper transitions', async ({ page }) => {
   // Wait for React components to hydrate (LoginForm uses client:load)
   // Wait for form to be visible and interactive
   await expect(getLoginFormLocator(page)).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({
+    timeout: 10000,
+  })
   // Additional wait to ensure React hydration is complete
   await page.waitForTimeout(1000)
   // Look for the forgot password button using data-testid or text matching
@@ -154,12 +166,15 @@ test('login page visual comparison', async ({ page }) => {
   await page.waitForLoadState('networkidle')
   // Wait for React component to hydrate
   await expect(getLoginFormLocator(page)).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 })
+  await expect(page.locator('input[type="email"]')).toBeVisible({
+    timeout: 10000,
+  })
   // Additional wait to ensure React hydration is complete and any animations settle
   await page.waitForTimeout(2000)
   // Take screenshot for visual comparison
   // Increased tolerance for browser differences, especially WebKit
   await expect(page).toHaveScreenshot('login-page.png', {
-    maxDiffPixelRatio: 0.02, // Changed from 1.0 to 0.02
-    threshold: 0.2,  })
+    maxDiffPixelRatio: 0.02, // Reduced tolerance for stricter visual regression checks
+    threshold: 0.02, // Additional threshold for pixel comparison
+  })
 })
