@@ -124,7 +124,7 @@ const getEHRServiceInstance = async (): Promise<EHRService> => {
 
     ehrServiceInstance = {
       connect: async () => {},
-      getFHIRClient: () => createFHIRClient(mockProvider),
+      getFHIRClient: () => createFHIRClient(mockProvider, console),
       disconnect: () => {},
     }
   }

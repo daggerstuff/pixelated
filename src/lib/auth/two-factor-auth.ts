@@ -1,8 +1,10 @@
-import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { getFromCache, setToCache } from '../redis'
+import { randomBytes } from 'crypto'
+
 import { generateSecret, generateURI } from 'otplib'
 import * as qrcode from 'qrcode'
-import { randomBytes } from 'crypto'
+
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
+import { getFromCache, setToCache } from '../redis'
 
 export interface DeviceInfo {
   deviceId: string
@@ -115,9 +117,7 @@ export const verifyTwoFactorToken = async (
   }
 
   // Load the enabled secret
-  const secret = await getFromCache<string>(
-    `2fa:secret:${verification.userId}`,
-  )
+  const secret = await getFromCache<string>(`2fa:secret:${verification.userId}`)
 
   // Verify the token against the enabled secret
   if (!generateURI(secret).verify(verification.token)) {

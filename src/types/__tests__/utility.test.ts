@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { assertDefined, assertType, createTypePredicate } from '../utility'
 
 describe('Utility Types and Assertion Helpers', () => {
@@ -12,15 +13,21 @@ describe('Utility Types and Assertion Helpers', () => {
     })
 
     it('should throw for null', () => {
-      expect(() => assertDefined(null)).toThrowError('Value is null or undefined')
+      expect(() => assertDefined(null)).toThrowError(
+        'Value is null or undefined',
+      )
     })
 
     it('should throw for undefined', () => {
-      expect(() => assertDefined(undefined)).toThrowError('Value is null or undefined')
+      expect(() => assertDefined(undefined)).toThrowError(
+        'Value is null or undefined',
+      )
     })
 
     it('should throw with custom message', () => {
-      expect(() => assertDefined(null, 'Custom error')).toThrowError('Custom error')
+      expect(() => assertDefined(null, 'Custom error')).toThrowError(
+        'Custom error',
+      )
     })
   })
 
@@ -32,7 +39,9 @@ describe('Utility Types and Assertion Helpers', () => {
 
     it('should throw when predicate returns false', () => {
       const isString = (val: unknown): val is string => typeof val === 'string'
-      expect(() => assertType(123, isString)).toThrowError('Type assertion failed')
+      expect(() => assertType(123, isString)).toThrowError(
+        'Type assertion failed',
+      )
     })
   })
 
