@@ -261,12 +261,25 @@ export function isStrongPassword(password: string): boolean {
 export function generateSecureRandomString(length: number = 32): string {
   const chars =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~'
+  const size = chars.length
+  const count = Number.isFinite(length) && length > 0 ? Math.floor(length) : 0
+  if (count === 0) return ''
+
+  // Rejection sampling removes modulo bias across the 2^32 range.
+  const limit = Math.floor(0x100000000 / size) * size
+
   let result = ''
-  const randomValues = new Uint32Array(length)
+  const randomValues = new Uint32Array(count)
   crypto.getRandomValues(randomValues)
 
-  for (let i = 0; i < length; i++) {
-    result += chars.charAt(randomValues[i] % chars.length)
+  for (let i = 0; i < count; i++) {
+    let value = randomValues[i]
+    while (value >= limit) {
+      const replacement = new Uint32Array(1)
+      crypto.getRandomValues(replacement)
+      value = replacement[0]
+    }
+    result += chars.charAt(value % size)
   }
 
   return result
