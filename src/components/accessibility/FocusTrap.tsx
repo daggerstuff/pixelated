@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 
 interface FocusTrapProps {
   /**
@@ -51,7 +51,8 @@ export function FocusTrap({
   const previousFocusRef = useRef(returnFocusTo ?? null)
 
   // Find all focusable elements within the container
-  const getFocusableElements = () => {
+  // Performance: use useCallback to prevent recreating this function on every render
+  const getFocusableElements = useCallback(() => {
     if (!containerRef.current) {
       return []
     }
@@ -78,7 +79,7 @@ export function FocusTrap({
         el.offsetHeight > 0 &&
         window.getComputedStyle(el).visibility !== 'hidden',
     )
-  }
+  }, [])
 
   // Save previous active element and set focus when trap is activated
   useEffect(() => {
@@ -119,7 +120,8 @@ export function FocusTrap({
   }, [])
 
   // Handle tab key to trap focus within the container
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Performance: use useCallback to maintain stable function reference
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!active || e.key !== 'Tab') {
       return
     }
@@ -150,7 +152,7 @@ export function FocusTrap({
         onEscape()
       }
     }
-  }
+  }, [active, getFocusableElements, onEscape])
 
   // Don't render anything if not active
   if (!active) {
