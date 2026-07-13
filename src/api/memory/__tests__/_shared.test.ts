@@ -7,6 +7,17 @@ import { getCurrentUser } from '@/lib/auth'
 
 import { parsePagination, requireMemoryUser, toMemoryScope } from '../_shared'
 
+vi.mock('@/lib/services/product-memory-gateway', () => ({
+  getProductMemoryGateway: vi.fn().mockReturnValue('mock-gateway'),
+  ProductMemoryGatewayError: class ProductMemoryGatewayError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+      super(message);
+      this.status = status;
+    }
+  }
+}))
+
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(),
 }))
@@ -314,3 +325,15 @@ describe('withAuthenticatedMemoryRoute', () => {
     expect(handler).not.toHaveBeenCalled()
   })
 })
+
+describe('getGateway', () => {
+  it('calls getProductMemoryGateway and returns its result', async () => {
+    const { getGateway } = await import('../_shared');
+    const { getProductMemoryGateway } = await import('@/lib/services/product-memory-gateway');
+
+    const result = getGateway();
+
+    expect(getProductMemoryGateway).toHaveBeenCalled();
+    expect(result).toBe('mock-gateway');
+  });
+});

@@ -255,7 +255,7 @@ export class PixelatedClient {
         const errorText = await response.text().catch(() => '')
         let errorData: { error?: string; code?: string; details?: unknown } = {}
         try {
-          errorData = errorText ? JSON.parse(errorText) : {}
+          errorData = errorText ? (JSON.parse(errorText) as unknown) : {}
         } catch {
           /* leave errorData as {} */
         }
