@@ -90,13 +90,14 @@ export class SpatialAnalysisService {
   }
 
   private async geolocateIPs(ips: string[]): Promise<GeoLocation[]> {
-    return ips.map((ip) => {
+    const locations: GeoLocation[] = []
+    for (const ip of ips) {
       const geo = geoip.lookup(ip)
       if (geo) {
-        return { lat: geo.ll[0], lon: geo.ll[1] }
+        locations.push({ lat: geo.ll[0], lon: geo.ll[1] })
       }
-      return { lat: 0, lon: 0 }
-    })
+    }
+    return locations
   }
 
   private calculateIPDiversity(ips: string[]): number {
