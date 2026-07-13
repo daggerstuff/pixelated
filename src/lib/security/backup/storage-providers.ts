@@ -369,7 +369,7 @@ export class MockCloudStorageProvider implements StorageProvider {
       bucket: this.config.bucket,
       contentType: 'application/octet-stream',
       contentLength: data.length,
-      etag: crypto.createHash('md5').update(data).digest('hex'),
+      etag: crypto.createHash('sha256').update(data).digest('hex'),
       lastModified: new Date().toISOString(),
     }
 

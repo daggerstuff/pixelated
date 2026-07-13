@@ -107,7 +107,7 @@ export class EHRServiceImpl implements EHRService {
       const provider = this.validateProvider(providerId)
 
       // Create FHIR client for the provider
-      const client = createFHIRClient(provider)
+      const client = createFHIRClient(provider, this.logger)
       this.clients.set(providerId, client)
 
       this.logger.info(`Connected to EHR provider: ${providerId}`)
