@@ -39,7 +39,8 @@ test('login form shows validation errors', async ({ page }) => {
   // Click the submit button normally (without force) to ensure form submit event fires
   const submitButton = page.locator('button[type="submit"]')
   await submitButton.scrollIntoViewIfNeeded()
-  await page.waitForTimeout(300) // Brief pause before interaction
+  await page.waitForTimeout(300)
+  // Brief pause before interaction
   // Click the submit button - this should trigger form onSubmit handler
   // Try normal click first; only use force if needed for mobile/interception issues
   try {
@@ -56,8 +57,10 @@ test('login form shows validation errors', async ({ page }) => {
   await expect(passwordError).toBeVisible({ timeout: 10000 })
   // Fill email but not password
   await page.fill('input[type="email"]', 'test@example.com')
-  await page.keyboard.press('Tab') // Tab away to trigger validation
-  await page.waitForTimeout(500) // Give React time to update
+  await page.keyboard.press('Tab')
+  // Tab away to trigger validation
+  await page.waitForTimeout(500)
+  // Give React time to update
   // Check that only password error is shown
   await expect(passwordError).toBeVisible({ timeout: 10000 })
   // Email error should be gone since we filled a valid email
@@ -101,7 +104,8 @@ test('login page has proper transitions', async ({ page }) => {
   // Click to switch to reset mode
   // Scroll into view and click normally to ensure onClick handler fires
   await passwordResetButton.scrollIntoViewIfNeeded()
-  await page.waitForTimeout(300) // Brief pause before interaction
+  await page.waitForTimeout(300)
+  // Brief pause before interaction
   // Click the button - this should trigger the onClick handler that sets mode to 'reset'
   await passwordResetButton.click({ timeout: 10000 })
   // Wait for React to process the state update and render the reset password heading
@@ -156,7 +160,7 @@ test('login page visual comparison', async ({ page }) => {
   // Take screenshot for visual comparison
   // Increased tolerance for browser differences, especially WebKit
   await expect(page).toHaveScreenshot('login-page.png', {
-    maxDiffPixelRatio: 0.02,
+    maxDiffPixelRatio: 0.02, // Changed from 1.0 to 0.02
     threshold: 0.2,
   })
 })
