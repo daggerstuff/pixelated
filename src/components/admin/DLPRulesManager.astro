@@ -21,8 +21,7 @@ interface DLPActivityLog {
   userId: string
   action: string
   eventType:
-    | typeof AuditEventType.DLP_ALLOWED
-    | typeof AuditEventType.DLP_BLOCKED
+    typeof AuditEventType.DLP_ALLOWED | typeof AuditEventType.DLP_BLOCKED
   triggeredRules: string[]
   destination?: string
   reason?: string
