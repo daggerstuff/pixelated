@@ -156,13 +156,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
             <slot />
           </div>
 
-          {
-            showFooter && (
-              <Footer
-                showSocialLinks={showSocialLinks}
-              />
-            )
-          }
+          {showFooter && <Footer showSocialLinks={showSocialLinks} />}
         </main>
       </div>
     </ErrorBoundary>
