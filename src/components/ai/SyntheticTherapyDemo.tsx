@@ -370,7 +370,7 @@ export default function SyntheticTherapyDemo() {
                         const disorders = config.disorders.includes(
                           disorder as DisorderCategory,
                         )
-                          ? config.disorders.filter((d) => d !== disorder)
+                          ? config.disorders.filter((d) => d !== disorder as DisorderCategory)
                           : [...config.disorders, disorder as DisorderCategory]
                         setConfig({ ...config, disorders })
                       }}
