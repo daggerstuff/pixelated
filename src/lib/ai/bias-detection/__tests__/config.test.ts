@@ -304,7 +304,7 @@ describe("BiasDetectionConfigManager", () => {
       };
 
       expect(() => {
-        configManager.updateConfig(invalidConfig as unknown as Partial<Record<string, unknown>>);
+        configManager.updateConfig(invalidConfig);
       }).toThrow("Configuration validation failed");
     });
   });

@@ -112,7 +112,7 @@ export function createEnhancedRateLimiter(
         reset: now + ttl * 1000,
       }
     } catch (error: unknown) {
-      logger.error('Redis rate limit error:', error as Record<string, unknown>)
+      logger.error('Redis rate limit error:', error)
       // Fail open - allow request in case of Redis errors
       return {
         allowed: true,

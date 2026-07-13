@@ -32,7 +32,7 @@ export const POST = async ({
     }
 
     // Apply CSRF protection
-    const csrfResult = await csrfProtection(request as any)
+    const csrfResult = await csrfProtection(request)
     if (!csrfResult.success) {
       return csrfResult.response!
     }

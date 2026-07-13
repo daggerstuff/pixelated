@@ -493,12 +493,6 @@ export class BiasPerformanceTimeoutError extends BiasPerformanceError {
         operation,
         duration,
         threshold,
-      } as {
-        context?: Record<string, unknown>
-        operation: string
-        duration?: number
-        threshold?: number
-        userMessage?: string
       },
     )
   }
@@ -522,12 +516,6 @@ export class BiasResourceExhaustionError extends BiasPerformanceError {
         resource,
       },
       operation: options.operation,
-    } as {
-      context?: Record<string, unknown>
-      operation: string
-      duration?: number
-      threshold?: number
-      userMessage?: string
     })
   }
 }
@@ -628,7 +616,7 @@ export function getErrorMessage(error: unknown): string {
     return error
   }
   if (error && typeof error === 'object' && 'message' in error) {
-    return String((error as { message: unknown }).message)
+    return String((error).message)
   }
   return 'Unknown error occurred'
 }

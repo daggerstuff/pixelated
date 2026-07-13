@@ -504,12 +504,12 @@ export class ComponentIntegrationService {
             secureUrl.protocol === 'http:' &&
             !['localhost', '127.0.0.1', '[::1]'].includes(secureUrl.hostname)
           ) {
-            return {
+            return Promise.resolve({
               status: 'rejected' as const,
               reason: new Error(
                 'HIPAA Compliance: Unencrypted EHR data transmission is forbidden. Use HTTPS.',
               ),
-            }
+            })
           }
           return fetch(secureUrl, {
             method: 'HEAD',

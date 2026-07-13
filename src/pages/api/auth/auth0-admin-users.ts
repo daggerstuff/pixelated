@@ -21,7 +21,7 @@ const logger = createBuildSafeLogger('auth0-admin-users-api')
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -192,7 +192,7 @@ export const GET: APIRoute = async ({ request }) => {
 export const PATCH: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(

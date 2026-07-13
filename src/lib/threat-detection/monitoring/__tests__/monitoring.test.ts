@@ -190,7 +190,7 @@ describe('Enhanced Monitoring Service', () => {
       }
 
       const customService = new EnhancedMonitoringService(
-        customConfig as any,
+        customConfig,
         mockRedis,
         { db: () => ({}) } as any,
         mockOrchestrator,
@@ -493,7 +493,7 @@ describe('Enhanced Monitoring Service', () => {
           timeRange: '24h',
           includeMetrics: true,
           includeRecommendations: true,
-        } as any,
+        },
       )
 
       expect(report).toBeDefined()
@@ -568,7 +568,7 @@ describe('Enhanced Monitoring Service', () => {
         },
       ]
 
-      const summary = await calculateMetricsSummary(metrics as any)
+      const summary = await calculateMetricsSummary(metrics)
 
       expect(summary).toBeDefined()
       expect(summary.average).toBe(150)

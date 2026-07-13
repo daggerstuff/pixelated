@@ -475,7 +475,7 @@ export class Auth0ActivityTrackingService {
       }
 
       if (filter.startDate || filter.endDate) {
-        query['timestamp'] = {} as Record<string, unknown>
+        query['timestamp'] = {}
         if (filter.startDate) {
           ;(query['timestamp'] as Record<string, unknown>)['$gte'] =
             filter.startDate

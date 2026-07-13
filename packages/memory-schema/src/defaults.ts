@@ -41,7 +41,7 @@ export function memoryInputDefaults(
     emotionalContext: undefined as unknown as EmotionalContext,
     empathyMetrics: undefined as unknown as never,
     ...overrides,
-  } as Required<CreateMemoryInput>
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -240,7 +240,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
               requiredRatio,
               hasValidContrast: contrastRatio >= requiredRatio,
               skip: false,
-            } as ContrastInfo
+            }
           }, element)
 
           // Skip elements we couldn't analyze
@@ -389,7 +389,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
             states: {},
             color: style.color,
             bgColor: style.backgroundColor,
-          } as HoverContrastInfo
+          }
         }
 
         const contrastRatio = calculateContrastRatio(bgRgb, fgRgb)
@@ -402,7 +402,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
           hasValidContrast: contrastRatio >= requiredRatio,
           skip: false,
           states: {},
-        } as HoverContrastInfo
+        }
       }, link)
 
       // If the colors changed, check if the contrast is still sufficient
@@ -534,7 +534,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
             hasFocusOutline: false,
             focusOutlineColor: null,
             outlineHasValidContrast: true,
-          } as FocusContrastInfo
+          }
         }
 
         const contrastRatio = calculateContrastRatio(bgRgb, fgRgb)
@@ -571,7 +571,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
           outlineHasValidContrast,
           skip: false,
           states: {},
-        } as FocusContrastInfo
+        }
       }, button)
 
       // Check focus outline contrast

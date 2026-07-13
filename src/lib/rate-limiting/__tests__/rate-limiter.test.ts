@@ -143,7 +143,7 @@ describe('DistributedRateLimiter', () => {
 
     it('should fail open on Redis errors', async () => {
       // Mock pipeline to throw error ONCE
-      const pipeline = redis.pipeline!()
+      const pipeline = redis.pipeline()
       vi.mocked(pipeline.exec).mockRejectedValueOnce(
         new Error('Redis connection failed'),
       )

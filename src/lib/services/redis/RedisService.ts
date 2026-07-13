@@ -1419,7 +1419,7 @@ export class RedisService extends EventEmitter implements IRedisService {
       // ioredis returns [member, score] or [] if empty
       const result = await client.zpopmin(key)
       if (Array.isArray(result)) {
-        return result as RedisZSetMember[]
+        return result
       }
       return []
     } catch (error: unknown) {

@@ -1,10 +1,10 @@
 import { randomBytes } from 'crypto'
 
-import { generateSecret, generateURI, authenticator } from 'otplib'
+import { generateSecret, generateURI, verify } from 'otplib'
 import * as qrcode from 'qrcode'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { getFromCache, setToCache } from '../redis'
+import { getFromCache, setInCache } from '../redis'
 
 export interface DeviceInfo {
   deviceId: string
@@ -40,7 +40,7 @@ export const setupTwoFactorAuth = async (
   const secret = generateSecret()
 
   // Store the secret as pending
-  await setToCache(`2fa:pending-secret:${userId}`, secret)
+  await setInCache(`2fa:pending-secret:${userId}`, secret)
 
   // Generate otpauth URL
   const otpauthUrl = generateURI({
@@ -87,15 +87,19 @@ export const completeTwoFactorSetup = async (
   )
 
   // Verify the token against the pending secret
-  if (!authenticator.verify({ token: _token, secret: pendingSecret })) {
+  if (!pendingSecret) {
+    throw new Error('No pending secret found')
+  }
+  const verifyResult = await verify({ token: _token, secret: pendingSecret })
+  if (!verifyResult.valid) {
     throw new Error('Invalid token')
   }
 
   // Store the secret as enabled
-  await setToCache(`2fa:secret:${userId}`, pendingSecret)
+  await setInCache(`2fa:secret:${userId}`, pendingSecret)
 
   // Remove the pending secret
-  await setToCache(`2fa:pending-secret:${userId}`, null)
+  await setInCache(`2fa:pending-secret:${userId}`, null)
 
   try {
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_completed')
@@ -120,7 +124,11 @@ export const verifyTwoFactorToken = async (
   const secret = await getFromCache<string>(`2fa:secret:${verification.userId}`)
 
   // Verify the token against the enabled secret
-  if (!authenticator.verify({ token: verification.token, secret })) {
+  if (!secret) {
+    throw new Error('No secret found')
+  }
+  const verifyResult = await verify({ token: verification.token, secret })
+  if (!verifyResult.valid) {
     throw new Error('Invalid token')
   }
 

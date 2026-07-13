@@ -708,7 +708,7 @@ void this.trainAdvancedClassificationModel()
       timing:
         Math.random() > 0.5
           ? 'during'
-          : ('after' as 'before' | 'during' | 'after'),
+          : ('after'),
     }))
   }
 

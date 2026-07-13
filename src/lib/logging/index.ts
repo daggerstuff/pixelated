@@ -178,7 +178,7 @@ export class Logger {
     if (Array.isArray(data)) {
       return data.map((item) =>
         this.sanitizeData(item, currentPatterns, currentSensitiveKeys),
-      ) as LogMetadataArray
+      )
     }
 
     if (typeof data === 'object' && data !== null) {

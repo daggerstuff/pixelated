@@ -128,7 +128,7 @@ async function redisGet(token: string): Promise<TokenCacheEntry | null> {
     `${REDIS_SESSION_KEY_PREFIX}${token}`,
   )
   if (!raw || typeof raw.evictAt !== 'number') return null
-  return raw as TokenCacheEntry
+  return raw
 }
 
 async function redisSet(token: string, entry: TokenCacheEntry): Promise<void> {

@@ -450,7 +450,7 @@ export class IntelligentCache {
       const memoryResult = this.getFromMemory(key) as T | null;
       if (memoryResult !== null) {
         this.analytics.hits.memory++;
-        return memoryResult as any;
+        return memoryResult;
       }
     }
 
@@ -616,7 +616,7 @@ export class IntelligentCache {
         const serialized = JSON.stringify(value);
         if (serialized.length > this.config.compressionThreshold) {
           const compressedData = zlib.gzipSync(Buffer.from(serialized));
-          serializedValue = compressedData.toString("base64") as unknown;
+          serializedValue = compressedData.toString("base64");
           compressed = true;
         }
       }

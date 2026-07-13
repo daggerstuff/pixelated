@@ -346,7 +346,7 @@ export class ContextDetector {
 
       return result
     } catch (error: unknown) {
-      logger.error('Error detecting context:', error as Record<string, unknown>)
+      logger.error('Error detecting context:', error)
 
       // Fallback to general context with low confidence
       return {
@@ -457,7 +457,7 @@ export class ContextDetector {
       if (typeof value === 'string') {
         const v = value.toUpperCase()
         if (v in ContextType) {
-          return ContextType[v as keyof typeof ContextType] as ContextType
+          return ContextType[v as keyof typeof ContextType]
         }
       }
       return ContextType.GENERAL

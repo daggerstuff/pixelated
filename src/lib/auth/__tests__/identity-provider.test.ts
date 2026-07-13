@@ -224,7 +224,7 @@ describe('Auth0IdentityProvider.findInternalIdBySub', () => {
     const result = await provider.findInternalIdBySub('auth0|tx', {
       query: mockClientQuery,
       release: mockRelease,
-    } as never)
+    })
     expect(mockClientQuery).toHaveBeenCalledTimes(1)
     expect(mockQuery).not.toHaveBeenCalled()
     const [sql, params] = mockClientQuery.mock.calls[0] as [string, unknown[]]
@@ -270,7 +270,7 @@ describe('Auth0IdentityProvider.linkSubToInternalId', () => {
     await provider.linkSubToInternalId(
       'auth0|in-tx',
       '00000000-0000-0000-0000-000000000777',
-      { query: mockClientQuery, release: mockRelease } as never,
+      { query: mockClientQuery, release: mockRelease },
     )
     expect(mockClientQuery).toHaveBeenCalledTimes(1)
     expect(mockQuery).not.toHaveBeenCalled()

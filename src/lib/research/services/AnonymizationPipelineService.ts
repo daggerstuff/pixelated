@@ -378,7 +378,7 @@ export class AnonymizationPipelineService {
                 | undefined
             )?.['epsilon_used'] as number) ?? 0,
         },
-      } as AnonymizedRecord
+      }
     })
   }
 
