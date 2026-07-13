@@ -114,7 +114,7 @@ export function ImprovedBiasInterface({
           gender: 'diverse',
           ethnicity: 'varied',
           primaryLanguage: 'English',
-        } as Demographics,
+        },
         timestamp: new Date(),
       }
 

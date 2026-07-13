@@ -242,7 +242,7 @@ const createPaginatedSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
       items: z.array(itemSchema),
     }),
   ).transform((data) => ({
-    items: data.items as Array<z.infer<T>>,
+    items: data.items,
     total: data.total,
     page: data.page,
     pageSize: data.page_size,

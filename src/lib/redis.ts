@@ -272,7 +272,7 @@ const redisClient: LegacyRedisClient = {
       await ensureConnected()
       // Fallback if RedisService doesn't have hincrby
       const val = await service.hget(key, field)
-      const num = parseInt(val || '0', 10) + increment
+      const num = parseInt(val ?? '0', 10) + increment
       await service.hset(key, field, num.toString())
       return num
     } catch {

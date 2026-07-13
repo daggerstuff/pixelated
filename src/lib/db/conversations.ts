@@ -111,7 +111,7 @@ export async function updateConversation(
     },
   )
 
-  return result['value'] as unknown as Conversation
+  return result['value']
 }
 
 /**
