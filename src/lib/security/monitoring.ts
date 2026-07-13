@@ -1,6 +1,57 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { mongoClient } from '../db/mongoClient'
+import { validateQuery } from 'mongodb-query-validator'
+import { sanitize } from 'mongo-sanitize'
 
 const logger = createBuildSafeLogger('default')
+
+const allowedProperties = ['userId', 'type']
+const allowedCharacters = /^[a-zA-Z0-9_.@|-]+$/
+const defaultLimit = 100
+const maxLimit = 1000
+const maxSkip = 10000
+const allowedSortFields = ['timestamp', 'userId', 'type']
+const allowedSortDirections: Array<1 | -1> = [-1, 1]
+
+const validateInput = (input: string, property: string): void => {
+  if (!allowedProperties.includes(property)) {
+    throw new Error(`Invalid property: ${property}`)
+  }
+  if (!allowedCharacters.test(input)) {
+    throw new Error(`Invalid input: ${input}`)
+  }
+}
+
+const coerceLimit = (value: number): number => {
+  const n = Number(value)
+  if (!Number.isInteger(n) || n <= 0) {
+    return defaultLimit
+  }
+  return Math.min(n, maxLimit)
+}
+
+const coerceSkip = (value: number): number => {
+  const n = Number(value)
+  if (!Number.isInteger(n) || n < 0) {
+    return 0
+  }
+  return Math.min(n, maxSkip)
+}
+
+const validateSort = (sort: { [key: string]: 1 | -1 }): void => {
+  const entries = Object.entries(sort)
+  if (entries.length === 0) {
+    throw new Error('Sort must not be empty')
+  }
+  for (const [field, direction] of entries) {
+    if (!allowedSortFields.includes(field)) {
+      throw new Error(`Invalid sort field: ${field}`)
+    }
+    if (!allowedSortDirections.includes(direction)) {
+      throw new Error(`Invalid sort direction for field ${field}`)
+    }
+  }
+}
 
 /**
  * Security event types
@@ -171,71 +222,94 @@ export class SecurityMonitoringService {
   }
 
   /**
-   * Track a security even
+   * Track a security event by writing it to the security_events collection.
    */
   public async trackSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
-      logger.info(`Security event: ${event.type} (${event.severity})`, {
-        ...event.metadata,
-        timestamp: event.timestamp,
-      })
-
-      // TODO: Implement MongoDB insert for security events
-      // If this fails, store in Redis as a fallback
-      await this.storeEventInRedis(event)
-      return Promise.resolve()
+      const db = mongoClient.db
+      const doc = {
+        userId: event.userId ? sanitize(event.userId) : undefined,
+        type: sanitize(String(event.type)),
+        severity: event.severity ?? SecurityEventSeverity.MEDIUM,
+        metadata: event.metadata ?? {},
+        timestamp: event.timestamp ?? new Date(),
+      }
+      await db.collection('security_events').insertOne(doc)
     } catch (error: unknown) {
       logger.error('Failed to track security event', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: error instanceof Error ? error.message : String(error),
+      })
+      // Non-fatal: security event logging must not break the caller
+    }
+  }
+
+  /**
+   * Get security events for a user with bounded, validated pagination.
+   */
+  public async getUserSecurityEvents(
+    userId: string,
+    limit: number = defaultLimit,
+    skip: number = 0,
+    sort: { [key: string]: 1 | -1 } = { timestamp: -1 },
+  ): Promise<SecurityEvent[]> {
+    validateInput(userId, 'userId')
+    const safeLimit = coerceLimit(limit)
+    const safeSkip = coerceSkip(skip)
+    validateSort(sort)
+    try {
+      const db = mongoClient.db
+      const sanitizedUserId = sanitize(userId)
+      const query = { userId: sanitizedUserId }
+      validateQuery(query)
+      const events = await db
+        .collection<SecurityEvent>('security_events')
+        .find(query)
+        .sort(sort)
+        .skip(safeSkip)
+        .limit(safeLimit)
+        .toArray()
+      return events
+    } catch (error) {
+      logger.error('Failed to get user security events', {
+        error: error instanceof Error ? error.message : String(error),
+        userId,
       })
       throw error
     }
   }
 
   /**
-   * Fallback method to store security events in Redis if database storage fails
+   * Get security events by type with bounded, validated pagination.
    */
-  private async storeEventInRedis(event: SecurityEvent): Promise<void> {
+  public async getSecurityEventsByType(
+    type: SecurityEventType,
+    limit: number = defaultLimit,
+    skip: number = 0,
+    sort: { [key: string]: 1 | -1 } = { timestamp: -1 },
+  ): Promise<SecurityEvent[]> {
+    validateInput(String(type), 'type')
+    const safeLimit = coerceLimit(limit)
+    const safeSkip = coerceSkip(skip)
+    validateSort(sort)
     try {
-      const { redis } = await import('../services/redis')
-
-      // Create a unique key for the event
-      const crypto = await import('crypto')
-      const randomStr = crypto.randomBytes(12).toString('hex')
-      const eventKey = `security:event:${Date.now()}:${randomStr}`
-
-      // Store the event as JSON
-      await redis.set(
-        eventKey,
-        JSON.stringify({
-          type: event.type,
-          severity: event.severity,
-          userId: event.userId,
-          ip: event.ip,
-          userAgent: event.userAgent,
-          metadata: event.metadata,
-          timestamp: event.timestamp.toISOString(),
-        }),
-        // Keep for 7 days
-        7 * 24 * 60 * 60,
-      )
-
-      // Add to a list of events that need to be processed later
-      // Use set method instead of sadd since it may not be available
-      await redis.set(
-        `security:pending_events:${eventKey}`,
-        '1',
-        7 * 24 * 60 * 60,
-      )
-
-      logger.info('Stored security event in Redis as fallback', { eventKey })
-    } catch (fallbackError) {
-      logger.error('Failed to store security event in Redis fallback', {
-        error:
-          fallbackError instanceof Error
-            ? fallbackError.message
-            : String(fallbackError),
+      const db = mongoClient.db
+      const sanitizedType = sanitize(String(type))
+      const query = { type: sanitizedType }
+      validateQuery(query)
+      const events = await db
+        .collection<SecurityEvent>('security_events')
+        .find(query)
+        .sort(sort)
+        .skip(safeSkip)
+        .limit(safeLimit)
+        .toArray()
+      return events
+    } catch (error) {
+      logger.error('Failed to get security events by type', {
+        error: error instanceof Error ? error.message : String(error),
+        type,
       })
+      throw error
     }
   }
 
@@ -251,29 +325,12 @@ export class SecurityMonitoringService {
     const now = new Date()
     const elapsedSeconds = (now.getTime() - lockTime.getTime()) / 1000
 
-    // If lock duration has passed, unlock the account
     if (elapsedSeconds >= this.config.accountLockoutDuration) {
       this.lockedAccounts.delete(userId)
       return false
     }
 
     return true
-  }
-
-  /**
-   * Get security events for a user
-   */
-  public async getUserSecurityEvents(): Promise<SecurityEvent[]> {
-    // TODO: Implement MongoDB query for user security events
-    return []
-  }
-
-  /**
-   * Get security events by type
-   */
-  public async getSecurityEventsByType(): Promise<SecurityEvent[]> {
-    // TODO: Implement MongoDB query for security events by type
-    return []
   }
 
   /**
@@ -285,7 +342,6 @@ export class SecurityMonitoringService {
       now.getTime() - this.config.failedLoginWindow,
     )
 
-    // Clean up failed login attempts
     const failedLoginEntries = Array.from(this.failedLogins.entries())
     for (const [key, record] of failedLoginEntries) {
       if (record.firstAttempt < staleLoginThreshold) {
@@ -293,7 +349,6 @@ export class SecurityMonitoringService {
       }
     }
 
-    // Clean up locked accounts
     const lockedAccountEntries = Array.from(this.lockedAccounts.entries())
     for (const [key, lockTime] of lockedAccountEntries) {
       const lockExpiry = new Date(
