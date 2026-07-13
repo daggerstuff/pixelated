@@ -194,11 +194,11 @@ export class ComponentIntegrationService {
     }
   }
 
-  async updateTreatmentPlan(updates: {
+  async updateTreatmentPlan(payload: {
     planId: string
     goalId?: string
     milestoneId?: string
-    updates: Record<string, any>
+    updates: { [key: string]: any }
   }) {
     try {
       const response = await fetch(
@@ -206,7 +206,7 @@ export class ComponentIntegrationService {
         {
           method: 'PATCH',
           headers: this.authHeaders,
-          body: JSON.stringify(updates),
+          body: JSON.stringify(payload),
         },
       )
 
@@ -215,10 +215,10 @@ export class ComponentIntegrationService {
       }
 
       const result = await response.json()
-      logger.info('Updated treatment plan', { planId: updates.planId })
+      logger.info('Updated treatment plan', { planId: payload.planId })
       return result
     } catch (error: unknown) {
-      logger.error('Error updating treatment plan', { error, updates })
+      logger.error('Error updating treatment plan', { error, payload })
       throw error
     }
   }
