@@ -1,2 +1,2 @@
 #!/bin/bash
-# No-op
+# No-op - This script is intentionally left empty after human review.
