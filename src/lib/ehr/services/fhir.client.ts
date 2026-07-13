@@ -5,7 +5,7 @@ import { OAuth2Service } from './oauth2.service'
 
 export function createFHIRClient(
   provider: EHRProvider,
-  logger?: Logger | Console | any,
+  logger: Logger | Console,
 ): FHIRClient {
   const headers = new Headers({
     'Content-Type': 'application/fhir+json',
@@ -35,24 +35,30 @@ export function createFHIRClient(
     return response.json()
   }
 
-  // Add audit logging helper
+  // Audit logging must never affect the underlying FHIR operation.
   const auditLog = (action: string, resourceType: string, id?: string) => {
-    if (logger && 'audit' in logger && typeof logger.audit === 'function') {
-      logger.audit({
-        action,
-        resourceType,
-        resourceId: id,
-        providerId: provider.id,
-        timestamp: new Date().toISOString(),
-      })
-    } else if (logger && typeof logger.info === 'function') {
-      // Fallback if audit is not explicitly supported
-      logger.info(`AUDIT: ${action} ${resourceType} ${id || ''}`.trim(), {
-        action,
-        resourceType,
-        resourceId: id,
-        providerId: provider.id,
-      })
+    try {
+      if (logger && 'audit' in logger && typeof logger.audit === 'function') {
+        const result = logger.audit({
+          action,
+          resourceType,
+          resourceId: id,
+          providerId: provider.id,
+          timestamp: new Date().toISOString(),
+        })
+        if (result && typeof (result as Promise<void>).catch === 'function') {
+          ;(result as Promise<void>).catch(() => {})
+        }
+      } else if (logger && typeof logger.info === 'function') {
+        logger.info(`AUDIT: ${action} ${resourceType} ${id || ''}`.trim(), {
+          action,
+          resourceType,
+          resourceId: id,
+          providerId: provider.id,
+        })
+      }
+    } catch {
+      // Audit failures must not affect the underlying FHIR operation
     }
   }
 
@@ -67,10 +73,10 @@ export function createFHIRClient(
         const response = await fetch(url, {
           headers: await authorizeRequest(),
         })
+        const bundle = await handleResponse<{
+          entry?: Array<{ resource: T }>
+        }>(response)
         auditLog('search', resourceType)
-        const bundle = await handleResponse<{ entry?: Array<{ resource: T }> }>(
-          response,
-        )
         return bundle.entry?.map((e) => e.resource) ?? []
       } catch (error: unknown) {
         throw new FHIRError(
@@ -93,8 +99,9 @@ export function createFHIRClient(
         const response = await fetch(url, {
           headers: await authorizeRequest(),
         })
+        const result = await handleResponse<T>(response)
         auditLog('read', resourceType, id)
-        return handleResponse<T>(response)
+        return result
       } catch (error: unknown) {
         throw new FHIRError(
           'Failed to get resource',
@@ -117,8 +124,9 @@ export function createFHIRClient(
           headers: await authorizeRequest(),
           body: JSON.stringify(resource),
         })
+        const result = await handleResponse<T>(response)
         auditLog('create', resource.resourceType)
-        return handleResponse<T>(response)
+        return result
       } catch (error: unknown) {
         throw new FHIRError(
           'Failed to create resource',
@@ -139,8 +147,9 @@ export function createFHIRClient(
           headers: await authorizeRequest(),
           body: JSON.stringify(resource),
         })
+        const result = await handleResponse<T>(response)
         auditLog('update', resource.resourceType, resource.id)
-        return handleResponse<T>(response)
+        return result
       } catch (error: unknown) {
         throw new FHIRError(
           'Failed to update resource',
@@ -160,8 +169,8 @@ export function createFHIRClient(
           method: 'DELETE',
           headers: await authorizeRequest(),
         })
-        auditLog('delete', resourceType, id)
         await handleResponse<void>(response)
+        auditLog('delete', resourceType, id)
       } catch (error: unknown) {
         throw new FHIRError(
           'Failed to delete resource',
