@@ -438,7 +438,7 @@
     "oxlint": "latest",
     "oxlint-tsgolint": "0.24.0",
     "path-to-regexp": "6.3.0",
-    "postcss": "^8.5.17",
+    "postcss": "^8.5.18",
     "postcss-import": "latest",
     "postinstall-postinstall": "latest",
     "prettier": "latest",
