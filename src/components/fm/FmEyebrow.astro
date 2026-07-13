@@ -1,8 +1,9 @@
 ---
 interface Props {
-  text: string;
-  muted?: boolean;
+  text: string
+  muted?: boolean
 }
-const { text, muted = false } = Astro.props;
+const { text, muted = false } = Astro.props
 ---
+
 <p class="fm-eyebrow{muted ? ' fm-eyebrow--muted' : ''}">{text}</p>
