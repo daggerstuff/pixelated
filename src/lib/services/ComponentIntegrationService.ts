@@ -206,7 +206,7 @@ export class ComponentIntegrationService {
         {
           method: 'PATCH',
           headers: this.authHeaders,
-          body: JSON.stringify(payload),
+          body: JSON.stringify(updates),
         },
       )
 
@@ -215,10 +215,10 @@ export class ComponentIntegrationService {
       }
 
       const result = await response.json()
-      logger.info('Updated treatment plan', { planId: payload.planId })
+      logger.info('Updated treatment plan', { planId: updates.planId })
       return result
     } catch (error: unknown) {
-      logger.error('Error updating treatment plan', { error, payload })
+      logger.error('Error updating treatment plan', { error, updates })
       throw error
     }
   }
