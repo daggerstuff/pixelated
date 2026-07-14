@@ -492,25 +492,25 @@ export class BiasDetectionEngine {
     // Build layerResults while capturing failure reasons for observability
     const layerResults: LayerResults = {
       preprocessing: this.handleSettledPromise(
-        results[0] as PromiseSettledResult<PreprocessingAnalysisResult>,
+        results[0],
         () => this.getPreprocessingFallback(),
         "Preprocessing",
         recs,
       ),
       modelLevel: this.handleSettledPromise(
-        results[1] as PromiseSettledResult<ModelLevelAnalysisResult>,
+        results[1],
         () => this.getModelLevelFallback(),
         "Model-level",
         recs,
       ),
       interactive: this.handleSettledPromise(
-        results[2] as PromiseSettledResult<InteractiveAnalysisResult>,
+        results[2],
         () => this.getInteractiveFallback(),
         "Interactive",
         recs,
       ),
       evaluation: this.handleSettledPromise(
-        results[3] as PromiseSettledResult<EvaluationAnalysisResult>,
+        results[3],
         () => this.getEvaluationFallback(),
         "Evaluation",
         recs,

@@ -956,7 +956,7 @@ export class ConfigurationManager extends EventEmitter {
       await this.validateConfiguration({
         ...this.config,
         ...updates,
-      } as MultiRegionConfig)
+      })
 
       // Apply updates
       this.config = this.mergeConfigurations(this.config, updates)

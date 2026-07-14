@@ -122,14 +122,11 @@ interface UserConsentWithDetails {
 
 // Type assertions for the data
 const typedConsentVersions = consentVersions as unknown as
-  | ConsentVersionWithTypeName[]
-  | null
+  ConsentVersionWithTypeName[] | null
 const typedActiveConsents = activeConsents as unknown as
-  | UserConsentWithDetails[]
-  | null
+  UserConsentWithDetails[] | null
 const typedWithdrawnConsents = withdrawnConsents as unknown as
-  | UserConsentWithDetails[]
-  | null
+  UserConsentWithDetails[] | null
 
 // Calculate overall stats
 const totalActiveConsents = (typedActiveConsents || []).length

@@ -95,7 +95,7 @@ jobs:
         continue-on-error: true
         run: |
           set -o pipefail
-          pnpm test:advisory 2>&1 | tee "advisory-test-${{ matrix.bucket }}.log"
+          timeout 20m pnpm test:advisory 2>&1 | tee "advisory-test-${{ matrix.bucket }}.log"
 
       - name: Upload advisory test log (${{ matrix.bucket }})
         if:
