@@ -38,7 +38,7 @@ export function getPersonaContext(
   // Always return deep copy to avoid accidental mutation
   return JSON.parse(
     JSON.stringify(config?.personaPreset ?? DEFAULT_PERSONA_CONTEXT),
-  )
+  ) as PersonaContext
 }
 
 // Generate a ChatMessage (client, therapist, or system) with persona injection

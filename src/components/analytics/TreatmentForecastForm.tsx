@@ -83,13 +83,15 @@ const TreatmentForecastForm: FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
-      const data = await res.json()
+      const data = (await res.json()) as { success: boolean; error?: string; data?: { forecasts: ForecastResult[] } }
       if (!res.ok || !data.success) {
         setError(data.error ?? 'Failed to fetch forecast')
         setLoading(false)
         return
       }
-      setResults(data.data.forecasts)
+      if (data.data?.forecasts) {
+        setResults(data.data.forecasts)
+      }
     } catch (err: unknown) {
       setError(
         err instanceof Error ? err?.message || String(err) : 'Unknown error',
