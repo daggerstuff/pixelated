@@ -488,7 +488,7 @@ export function detectAndRedactPHI(text: string): string {
     // For simplicity, we'll fall back to regex-based detection in the sync version
     const detector = PresidioPHIDetector.getInstance()
     const entities = (
-      detector['fallbackDetection'] as (text: string) => PHIEntity[]
+      detector['fallbackDetection']
     )(text)
 
     if (entities.length === 0) {

@@ -86,7 +86,7 @@ export class AIMonitoringService extends EventEmitter {
         void this.handleMetricUpdate(JSON.parse(message))
       }
     }
-    this.redis.on('message', messageHandler as (...args: unknown[]) => void)
+    this.redis.on('message', messageHandler)
   }
 
   async stop(): Promise<void> {

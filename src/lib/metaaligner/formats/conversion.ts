@@ -34,5 +34,5 @@ export async function toUnifiedProcessingRequest(
 export async function toUnifiedProcessingResponse(
   data: unknown,
 ): Promise<UnifiedProcessingResponse> {
-  return validateData(UnifiedProcessingResponseSchema, data) as any
+  return validateData(UnifiedProcessingResponseSchema, data)
 }

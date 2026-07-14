@@ -486,10 +486,7 @@ function generateInsights(
         anomalies.length > 1 ? 's' : ''
       } found that deviate significantly from the norm`,
       confidence: 0.85,
-      data: { anomalies: anomalies.length, threshold: 2 * stdDev } as Record<
-        string,
-        unknown
-      >,
+      data: { anomalies: anomalies.length, threshold: 2 * stdDev },
       recommendations: [
         'Review anomalous sessions for clinical significance',
         'Check for data collection errors',

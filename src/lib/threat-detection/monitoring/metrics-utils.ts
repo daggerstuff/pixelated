@@ -184,9 +184,9 @@ function detectAnomaliesStatistical(metrics: MetricData[]): AnomalyResult[] {
         value: metric.value,
         isAnomaly,
         confidence: Math.min(zScore / 4, 1), // Normalize confidence
-        severity: zScore > 3.5 ? 'high' : zScore > 2.5 ? 'medium' : 'low',
+        severity: (zScore > 3.5 ? 'high' : zScore > 2.5 ? 'medium' : 'low') as AnomalyResult['severity'],
         reason: isAnomaly ? `Z-score: ${zScore.toFixed(2)}` : undefined,
-      } as AnomalyResult
+      }
     })
     .filter((result) => result.isAnomaly)
 }
