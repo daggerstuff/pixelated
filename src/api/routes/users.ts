@@ -240,8 +240,10 @@ router.post(
       '',
     )
     const rawPermission = String(
-      req.body?.['name'] ?? req.body?.['permission'] ?? '',
-    ).trim()
+      req.body?.['permission'] ?? req.body?.['name'] ?? '',
+    )
+      .trim()
+      .replace(/[^a-zA-Z0-9_:/.-]/g, '')
 
     // Validate UUID format
     const uuidRegex =
