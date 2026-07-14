@@ -320,7 +320,7 @@ export function TableWidget({
                       <TableCell key={`${rowIndex}-${column.key}`}>
                         {column.render
                           ? column.render(row[column.key], row)
-                          : String(row[column.key] ?? '')}
+                          : typeof row[column.key] === 'string' || typeof row[column.key] === 'number' || typeof row[column.key] === 'boolean' ? String(row[column.key]) : ''}
                       </TableCell>
                     ))}
                   </TableRow>
