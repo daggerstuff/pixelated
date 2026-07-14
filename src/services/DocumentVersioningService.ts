@@ -91,7 +91,7 @@ export class DocumentVersioningService {
       `)
 
       const versionRecord = await this.getFileVersionInternal(
-        tx as unknown as SqlExecutor,
+        tx,
         fileId,
         newVersion,
       )
@@ -148,7 +148,7 @@ export class DocumentVersioningService {
     version: number,
   ): Promise<DocumentVersion | null> {
     return this.getFileVersionInternal(
-      drizzle(this.db) as unknown as SqlExecutor,
+      drizzle(this.db),
       fileId,
       version,
     )
@@ -258,7 +258,7 @@ export class DocumentVersioningService {
 
       // Create new version based on the target version
       return await this.createFileVersionFromExisting(
-        tx as unknown as SqlExecutor,
+        tx,
         fileId,
         targetVersionRow['s3_key'] as string,
         userId,
@@ -271,9 +271,9 @@ export class DocumentVersioningService {
     const db = drizzle(this.db) as unknown as SqlExecutor
 
     await db.transaction(async (tx) => {
-      const result = (await tx.execute(
+      const result = await tx.execute(
         sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
-      )) as unknown as { rows: Record<string, unknown>[] }
+      )
       const versionRow = result.rows[0]
 
       if (!versionRow) {
@@ -318,13 +318,13 @@ export class DocumentVersioningService {
     const db = drizzle(this.db) as unknown as SqlExecutor
 
     // Get files in folder
-    const filesResult = (await db.execute(sql`
+    const filesResult = await db.execute(sql`
       SELECT f.*, fp.permission_type
       FROM files f
       LEFT JOIN file_permissions fp ON f.id = fp.file_id AND fp.user_id = ${userId}
       WHERE f.folder_id = ${folderId} AND (f.is_public = TRUE OR f.uploaded_by = ${userId} OR fp.permission_type IS NOT NULL)
       ORDER BY f.uploaded_at DESC
-    `)) as unknown as { rows: Record<string, unknown>[] }
+    `)
 
     const files: FileMetadata[] = filesResult.rows.map(
       (r: Record<string, unknown>) => ({
@@ -346,14 +346,14 @@ export class DocumentVersioningService {
     )
 
     // Get subfolders
-    const foldersResult = (await db.execute(sql`
+    const foldersResult = await db.execute(sql`
       SELECT f.id, f.name, COUNT(files.id) as file_count
       FROM folders f
       LEFT JOIN files ON files.folder_id = f.id
       WHERE f.parent_id = ${folderId} AND f.owner_id = ${userId}
       GROUP BY f.id, f.name
       ORDER BY f.name
-    `)) as unknown as { rows: Record<string, unknown>[] }
+    `)
 
     const folders = foldersResult.rows.map((row: Record<string, unknown>) => ({
       id: row['id'] as string,

@@ -403,7 +403,7 @@ export default defineConfig({
                   const { checks: _checks, ...rollupCompatibleOptions } =
                     rolldownOptions
                   environment.config.build.rollupOptions = {
-                    ...(environment.config.build.rollupOptions || {}),
+                    ...(environment.config.build.rollupOptions ?? {}),
                     ...rollupCompatibleOptions,
                   }
                 }
@@ -446,14 +446,14 @@ export default defineConfig({
 
               if (env.build?.rolldownOptions) {
                 // Ensure rollupOptions exists
-                env.build.rollupOptions = env.build.rollupOptions || {}
+                env.build.rollupOptions = env.build.rollupOptions ?? {}
 
                 // Copy rolldown input into rollupOptions for SSR/server builds.
                 // Do not override entryFileNames — Astro names the adapter bundle
                 // serverEntry (entry.mjs) and keeps middleware in a separate chunk.
                 if (name === 'ssr' || name === 'server') {
                   // Ensure rollupOptions exists
-                  env.build.rollupOptions = env.build.rollupOptions || {}
+                  env.build.rollupOptions = env.build.rollupOptions ?? {}
 
                   // Copy properties
                   if (env.build.rolldownOptions.input) {
@@ -509,7 +509,7 @@ export default defineConfig({
                   Object.keys(input).length === 0)
 
               if (inputIsEmpty && env.build) {
-                env.build.rollupOptions = env.build.rollupOptions || {}
+                env.build.rollupOptions = env.build.rollupOptions ?? {}
                 env.build.rollupOptions.input = 'virtual:dummy-ssr-entry'
               }
             }

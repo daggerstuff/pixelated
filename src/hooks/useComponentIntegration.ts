@@ -91,8 +91,8 @@ export function useServiceHealth(checkInterval: number = 60000) {
   const checkHealth = useCallback(async () => {
     setLoading(true)
     try {
-      const healthData = await componentIntegrationService.getServiceStatus()
-      setHealth(healthData as unknown as Record<string, unknown>)
+      const healthData = await componentIntegrationService.getServiceHealth()
+      setHealth(healthData)
     } catch (error: unknown) {
       logger.error('Health check failed', { error })
       setHealth({
@@ -127,3 +127,41 @@ export function useServiceHealth(checkInterval: number = 60000) {
     hasError: health?.['overall'] === 'error',
   }
 }
+
+interface UseChartDataOptions {
+  type?: string
+  category?: string
+  timeRange?: number
+  clientId?: string
+  sessionId?: string
+  dataPoints?: number
+  autoRefresh?: boolean
+  refreshInterval?: number
+}
+
+interface UseChartDataResult {
+  chartData: unknown
+  loading: boolean
+  error: Error | null
+  refresh: () => void
+}
+
+export function useChartData(_options: UseChartDataOptions): UseChartDataResult {
+  const [chartData, setChartData] = useState<unknown>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const refresh = useCallback(() => {
+    setChartData(null)
+    setLoading(false)
+    setError(null)
+  }, [])
+
+  return {
+    chartData,
+    loading,
+    error,
+    refresh,
+  }
+}
+

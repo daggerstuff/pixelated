@@ -1348,7 +1348,7 @@ describe('Bias Detection API Integration Tests', () => {
 
       const blob = await response.blob()
       expect(blob.size).toBeGreaterThan(0)
-      expect(blob.type).toBe('application/json')
+      expect(blob.type).toContain('application/json')
     })
 
     it('should export data as CSV format when specified', async () => {

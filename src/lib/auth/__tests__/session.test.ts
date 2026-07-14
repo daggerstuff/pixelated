@@ -71,7 +71,7 @@ describe('getSessionFromToken — Session shape extensions', () => {
       valid: false,
       error: 'expired',
       payload: {},
-    } as Parameters<typeof getSessionFromToken>[0])
+    })
     expect(result).toBeNull()
   })
 
@@ -80,7 +80,7 @@ describe('getSessionFromToken — Session shape extensions', () => {
       valid: true,
       role: 'therapist',
       payload: {},
-    } as Parameters<typeof getSessionFromToken>[0])
+    })
     expect(result).toBeNull()
   })
 

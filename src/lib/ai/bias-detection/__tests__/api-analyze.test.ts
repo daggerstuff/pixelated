@@ -136,7 +136,7 @@ const isAnalysisData = (value: unknown): value is { sessionId: string } => {
     typeof value === "object" &&
     value !== null &&
     "sessionId" in value &&
-    typeof (value as { sessionId: unknown }).sessionId === "string"
+    typeof (value).sessionId === "string"
   );
 };
 

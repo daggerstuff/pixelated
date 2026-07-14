@@ -245,7 +245,7 @@ export function SecurityProvider({
       try {
         const parsed = JSON.parse(data) as unknown
         if (parsed && typeof parsed === 'object' && 'data' in parsed) {
-          const parsedData = (parsed as { data: unknown }).data
+          const parsedData = (parsed).data
           if (typeof parsedData === 'string') {
             return JSON.parse(parsedData) as unknown
           }

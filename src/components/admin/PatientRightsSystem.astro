@@ -8,11 +8,7 @@ interface AccessRequest {
   patientId: string
   patientName: string
   type:
-    | 'data-access'
-    | 'data-export'
-    | 'correction'
-    | 'deletion'
-    | 'portability'
+    'data-access' | 'data-export' | 'correction' | 'deletion' | 'portability'
   dateRequested: string
   status: 'pending' | 'fulfilled' | 'overdue' | 'rejected' | 'escalated'
   dateProcessed: string | null

@@ -50,7 +50,7 @@ const createMockAIService = (enhancedResponse?: string): AIService => {
         usage: { promptTokens: 100, completionTokens: 50, totalTokens: 150 },
         provider: 'test',
         content: enhancedResponse ?? 'Enhanced response...',
-      } as AICompletion),
+      }),
     createStreamingChatCompletion: vi.fn(),
     getModelInfo: vi.fn(),
     dispose: vi.fn(),
@@ -573,7 +573,7 @@ describe('AdaptiveSelector Workflow Integration Tests', () => {
       usage: { promptTokens: 10, completionTokens: 10, totalTokens: 20 },
       provider: 'test',
       content: generalContextResponse,
-    } as AICompletion)
+    })
 
     const result1 = await adaptiveSelector.selectObjectives(userInput)
     expect(result1.contextDetectionResult.detectedContext).toBe(
@@ -629,7 +629,7 @@ describe('AdaptiveSelector Workflow Integration Tests', () => {
       usage: { promptTokens: 10, completionTokens: 10, totalTokens: 20 },
       provider: 'test',
       content: generalContextResponse,
-    } as AICompletion)
+    })
     await adaptiveSelector.selectObjectives(firstInput)
     const secondInput = "I'm feeling very sad and hopeless."
     const crisisContextResponse = JSON.stringify({
@@ -659,7 +659,7 @@ describe('AdaptiveSelector Workflow Integration Tests', () => {
       usage: { promptTokens: 10, completionTokens: 10, totalTokens: 20 },
       provider: 'test',
       content: crisisContextResponse,
-    } as AICompletion)
+    })
     const result = await adaptiveSelector.selectObjectives(secondInput)
     expect(result.contextDetectionResult.detectedContext).toBe(
       ContextType.CRISIS,
@@ -718,7 +718,7 @@ describe('AdaptiveSelector Workflow Integration Tests', () => {
       usage: { promptTokens: 10, completionTokens: 10, totalTokens: 20 },
       provider: 'test',
       content: generalContextResponse,
-    } as AICompletion)
+    })
     const userProfile: UserProfile = {
       preferences: {
         objectiveWeightAdjustments: { empathy: 2.0 },

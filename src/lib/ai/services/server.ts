@@ -153,7 +153,7 @@ class AIServer {
     if (!value || typeof value !== 'object' || Array.isArray(value)) {
       return {}
     }
-    return value as AIServiceOptions
+    return value
   }
 
   private parseChatRequest(
