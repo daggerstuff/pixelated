@@ -22,10 +22,7 @@ const { hero, intro, workflow, scenarios, features, cta } = {
 }
 ---
 
-<BaseLayout
-  title={hero.title}
-  description={hero.subtitle}
->
+<BaseLayout title={hero.title} description={hero.subtitle}>
   <div class="np-page">
     <script
       is:inline
@@ -33,11 +30,11 @@ const { hero, intro, workflow, scenarios, features, cta } = {
       set:html={JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        name: SITE.name,
-        url: SITE.website,
-        description: SITE.description,
-        foundingDate: '2024',
-        sameAs: [
+        'name': SITE.name,
+        'url': SITE.website,
+        'description': SITE.description,
+        'foundingDate': '2024',
+        'sameAs': [
           'https://github.com/nochadisfaction',
           'https://twitter.com/empathypixel',
         ],
@@ -53,23 +50,34 @@ const { hero, intro, workflow, scenarios, features, cta } = {
         <h1 class="np-display np-hero__display">{hero.title}</h1>
         <p class="np-body np-hero__subtitle">{hero.subtitle}</p>
         <div class="np-hero__actions">
-          <a class="np-btn np-btn-primary" href={withBasePath(hero.primaryCTA.href)}>
+          <a
+            class="np-btn np-btn-primary"
+            href={withBasePath(hero.primaryCTA.href)}
+          >
             {hero.primaryCTA.text}
           </a>
-          <a class="np-btn np-btn-ghost" href={withBasePath(hero.secondaryCTA.href)}>
+          <a
+            class="np-btn np-btn-ghost"
+            href={withBasePath(hero.secondaryCTA.href)}
+          >
             {hero.secondaryCTA.text}
           </a>
         </div>
 
         <div class="np-hero__proof">
-          {hero.proofPoints.map((point) => (
-            <div class="np-hero__proof-item">
-              <span class="np-data">{point.label}</span>
-              <p class="np-mono" style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);">
-                {point.text}
-              </p>
-            </div>
-          ))}
+          {
+            hero.proofPoints.map((point) => (
+              <div class="np-hero__proof-item">
+                <span class="np-data">{point.label}</span>
+                <p
+                  class="np-mono"
+                  style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);"
+                >
+                  {point.text}
+                </p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -80,21 +88,31 @@ const { hero, intro, workflow, scenarios, features, cta } = {
         <div class="np-section-header">
           <span class="np-label">{intro.label}</span>
           <h2 class="np-headline">{intro.title}</h2>
-          {intro.paragraphs.map((p) => (
-            <p class="np-body" style="margin-top:12px;">{p}</p>
-          ))}
+          {
+            intro.paragraphs.map((p) => (
+              <p class="np-body" style="margin-top:12px;">
+                {p}
+              </p>
+            ))
+          }
         </div>
       </div>
 
       <div class="np-container">
-        <span class="np-label" style="margin:0 0 12px var(--np-pad);">{intro.panelLabel}</span>
+        <span class="np-label" style="margin:0 0 12px var(--np-pad);"
+          >{intro.panelLabel}</span
+        >
         <div class="np-card-grid">
-          {intro.panelItems.map((item) => (
-            <div class="np-card">
-              <span class="np-data">{item.label}</span>
-              <p class="np-body" style="font-size:0.9375rem;">{item.body}</p>
-            </div>
-          ))}
+          {
+            intro.panelItems.map((item) => (
+              <div class="np-card">
+                <span class="np-data">{item.label}</span>
+                <p class="np-body" style="font-size:0.9375rem;">
+                  {item.body}
+                </p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -103,14 +121,18 @@ const { hero, intro, workflow, scenarios, features, cta } = {
     <section class="np-section" style="padding-top:0;">
       <div class="np-container">
         <div class="np-compare">
-          {intro.evidenceCards.map((card) => (
-            <div class="np-compare__col">
-              <span class="np-compare__tag">{card.title}</span>
-              <ul class="np-compare__list">
-                {card.items.map((item) => <li>{item}</li>)}
-              </ul>
-            </div>
-          ))}
+          {
+            intro.evidenceCards.map((card) => (
+              <div class="np-compare__col">
+                <span class="np-compare__tag">{card.title}</span>
+                <ul class="np-compare__list">
+                  {card.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -124,15 +146,17 @@ const { hero, intro, workflow, scenarios, features, cta } = {
         </div>
 
         <div class="np-steps">
-          {workflow.steps.map((step) => (
-            <div class="np-step">
-              <span class="np-step__number">{step.number}</span>
-              <div class="np-step__body">
-                <h3 class="np-title">{step.title}</h3>
-                <p class="np-body">{step.body}</p>
+          {
+            workflow.steps.map((step) => (
+              <div class="np-step">
+                <span class="np-step__number">{step.number}</span>
+                <div class="np-step__body">
+                  <h3 class="np-title">{step.title}</h3>
+                  <p class="np-body">{step.body}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          }
         </div>
       </div>
     </section>
@@ -146,14 +170,19 @@ const { hero, intro, workflow, scenarios, features, cta } = {
       </div>
       <div class="np-container">
         <div class="np-outputs">
-          {workflow.outputs.map((output) => (
-            <div class="np-output">
-              <span class="np-data">{output.label}</span>
-              <p class="np-mono" style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);">
-                {output.value}
-              </p>
-            </div>
-          ))}
+          {
+            workflow.outputs.map((output) => (
+              <div class="np-output">
+                <span class="np-data">{output.label}</span>
+                <p
+                  class="np-mono"
+                  style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);"
+                >
+                  {output.value}
+                </p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -167,13 +196,17 @@ const { hero, intro, workflow, scenarios, features, cta } = {
         </div>
 
         <div class="np-scenario-grid">
-          {scenarios.cards.map((card) => (
-            <div class="np-scenario-card">
-              <span class="np-card__kicker">{card.kicker}</span>
-              <h3 class="np-title">{card.title}</h3>
-              <p class="np-body" style="font-size:0.9375rem;">{card.body}</p>
-            </div>
-          ))}
+          {
+            scenarios.cards.map((card) => (
+              <div class="np-scenario-card">
+                <span class="np-card__kicker">{card.kicker}</span>
+                <h3 class="np-title">{card.title}</h3>
+                <p class="np-body" style="font-size:0.9375rem;">
+                  {card.body}
+                </p>
+              </div>
+            ))
+          }
         </div>
 
         <!-- Strip: who it's for -->
@@ -184,12 +217,19 @@ const { hero, intro, workflow, scenarios, features, cta } = {
             <p class="np-body">{scenarios.strip.body}</p>
           </div>
           <div class="np-strip__items">
-            {scenarios.strip.items.map((item) => (
-              <div class="np-strip__item">
-                <span class="np-data">{item.label}</span>
-                <p class="np-mono" style="font-size:0.8125rem;color:var(--np-text);">{item.value}</p>
-              </div>
-            ))}
+            {
+              scenarios.strip.items.map((item) => (
+                <div class="np-strip__item">
+                  <span class="np-data">{item.label}</span>
+                  <p
+                    class="np-mono"
+                    style="font-size:0.8125rem;color:var(--np-text);"
+                  >
+                    {item.value}
+                  </p>
+                </div>
+              ))
+            }
           </div>
         </div>
       </div>
@@ -205,22 +245,31 @@ const { hero, intro, workflow, scenarios, features, cta } = {
         </div>
 
         <div class="np-features-grid">
-          {features.cards.map((card) => (
-            <div class="np-feature-card">
-              <span class="np-data">{card.title}</span>
-              <p class="np-body" style="font-size:0.9375rem;">{card.body}</p>
-            </div>
-          ))}
+          {
+            features.cards.map((card) => (
+              <div class="np-feature-card">
+                <span class="np-data">{card.title}</span>
+                <p class="np-body" style="font-size:0.9375rem;">
+                  {card.description}
+                </p>
+              </div>
+            ))
+          }
         </div>
 
         <div class="np-hero__proof" style="margin-top:32px;">
-          {features.proofItems.map((item) => (
-            <div class="np-hero__proof-item">
-              <p class="np-mono" style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);">
-                {item}
-              </p>
-            </div>
-          ))}
+          {
+            features.proofItems.map((item) => (
+              <div class="np-hero__proof-item">
+                <p
+                  class="np-mono"
+                  style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);"
+                >
+                  {item}
+                </p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
@@ -233,10 +282,16 @@ const { hero, intro, workflow, scenarios, features, cta } = {
           <h2 class="np-headline">{cta.title}</h2>
           <p class="np-body">{cta.intro}</p>
           <div class="np-hero__actions">
-            <a class="np-btn np-btn-primary" href={withBasePath(cta.primaryCTA.href)}>
+            <a
+              class="np-btn np-btn-primary"
+              href={withBasePath(cta.primaryCTA.href)}
+            >
               {cta.primaryCTA.text}
             </a>
-            <a class="np-btn np-btn-ghost" href={withBasePath(cta.secondaryCTA.href)}>
+            <a
+              class="np-btn np-btn-ghost"
+              href={withBasePath(cta.secondaryCTA.href)}
+            >
               {cta.secondaryCTA.text}
             </a>
           </div>
@@ -268,8 +323,12 @@ const { hero, intro, workflow, scenarios, features, cta } = {
               <span class="np-help__desc">Talk to the team</span>
             </a>
           </div>
-          <p class="np-mono" style="font-size:0.6875rem;color:var(--np-muted);margin-top:12px;">
-            Book a pilot and try it with one cohort, one supervisor, and two scenarios.
+          <p
+            class="np-mono"
+            style="font-size:0.6875rem;color:var(--np-muted);margin-top:12px;"
+          >
+            Book a pilot and try it with one cohort, one supervisor, and two
+            scenarios.
           </p>
         </div>
       </div>

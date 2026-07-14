@@ -568,7 +568,7 @@ export class MockFHEService implements FHEService {
       typeof globalThis.crypto?.subtle !== 'undefined'
         ? globalThis.crypto
         : await import('node:crypto').then((m) => m.webcrypto)
-    const data = new TextEncoder().encode(jsonStr)
+    const data = new TextEncoder().encode(jsonStr).buffer as ArrayBuffer
     const hashBuffer = await subtle.subtle.digest('SHA-256', data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')

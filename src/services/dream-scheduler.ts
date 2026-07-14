@@ -1,6 +1,5 @@
 import * as cron from 'node-cron'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { Agent } from 'https'
 import { URL } from 'url'
 
 const logger = createBuildSafeLogger('dream-scheduler')
@@ -20,7 +19,8 @@ export interface DreamSchedulerConfig {
 
 const DEFAULT_CONFIG: DreamSchedulerConfig = {
   cronExpression: '0 2 * * *',
-  consolidationUrl: process.env['DREAM_CONSOLIDATION_URL'] ?? 'http://localhost:5000',
+  consolidationUrl:
+    process.env['DREAM_CONSOLIDATION_URL'] ?? 'http://localhost:5000',
   requestTimeoutMs: 300_000,
   userWhitelist: [],
   autoStart: true,
@@ -43,7 +43,9 @@ export class DreamScheduler {
       return
     }
     if (!cron.validate(this.config.cronExpression)) {
-      logger.error('Invalid cron expression', { expression: this.config.cronExpression, })
+      logger.error('Invalid cron expression', {
+        expression: this.config.cronExpression,
+      })
       return
     }
     this.task = cron.schedule(this.config.cronExpression, () => {
@@ -51,7 +53,10 @@ export class DreamScheduler {
         logger.error('Dream consolidation cycle failed', { error: err })
       })
     })
-    logger.info('Dream scheduler started', { cronExpression: this.config.cronExpression, consolidationUrl: this.config.consolidationUrl, })
+    logger.info('Dream scheduler started', {
+      cronExpression: this.config.cronExpression,
+      consolidationUrl: this.config.consolidationUrl,
+    })
   }
 
   /** Stop the scheduler and cancel any pending execution. */
@@ -122,58 +127,75 @@ export class DreamScheduler {
       this.isRunning = false
       result.completedAt = new Date().toISOString()
       result.durationMs = Date.now() - startTime
-      logger.info('Dream consolidation cycle finished', { usersProcessed: result.usersProcessed, usersFailed: result.usersFailed, durationMs: result.durationMs, })
+      logger.info('Dream consolidation cycle finished', {
+        usersProcessed: result.usersProcessed,
+        usersFailed: result.usersFailed,
+        durationMs: result.durationMs,
+      })
     }
     return result
   }
 
-  private async consolidateUsers(userIds: string[], result: RunResult, batchSize: number): Promise<void> {
+  private async consolidateUsers(
+    userIds: string[],
+    result: RunResult,
+    batchSize: number,
+  ): Promise<void> {
     const baseUrl = this.config.consolidationUrl
-    const httpsAgent = new Agent({ rejectUnauthorized: true, })
     for (let i = 0; i < userIds.length; i += batchSize) {
       const batch = userIds.slice(i, i + batchSize)
-      await Promise.all(batch.map(async (userId) => {
-        try {
-          const controller = new AbortController()
-          const timeoutSignal = controller.signal
-          const timeout = setTimeout(() => controller.abort(), this.config.requestTimeoutMs)
-          // WARNING: Ensure the configured consolidationUrl uses HTTPS and is deployed within a trusted network boundary.
-          // The request body includes user IDs, and the code does not enforce transport encryption.
-          const response = await fetch(`${baseUrl}/api/dream/consolidate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', },
-            body: JSON.stringify({ user_id: userId }),
-            signal: timeoutSignal,
-            agent: httpsAgent,
-          })
+      await Promise.all(
+        batch.map(async (userId) => {
           try {
-            if (!response.ok) {
-              const body = await response.text().catch(() => '')
-              throw new Error(`HTTP ${response.status}${body ? `: ${body.slice(0, 200)}` : ''}`)
+            const controller = new AbortController()
+            const timeoutSignal = controller.signal
+            const timeout = setTimeout(
+              () => controller.abort(),
+              this.config.requestTimeoutMs,
+            )
+            // WARNING: Ensure the configured consolidationUrl uses HTTPS and is deployed within a trusted network boundary.
+            // The request body includes user IDs, and the code does not enforce transport encryption.
+            const response = await fetch(`${baseUrl}/api/dream/consolidate`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ user_id: userId }),
+              signal: timeoutSignal,
+            })
+            try {
+              if (!response.ok) {
+                const body = await response.text().catch(() => '')
+                throw new Error(
+                  `HTTP ${response.status}${body ? `: ${body.slice(0, 200)}` : ''}`,
+                )
+              }
+              const data = (await response.json()) as { dream_id?: string }
+              result.usersProcessed++
+              logger.info('User consolidation complete', {
+                userId,
+                dreamId: data?.dream_id ?? 'unknown',
+              })
+            } finally {
+              clearTimeout(timeout)
             }
-            const data = (await response.json()) as { dream_id?: string }
-            result.usersProcessed++
-            logger.info('User consolidation complete', { userId, dreamId: data?.dream_id ?? 'unknown' })
-          } finally {
-            clearTimeout(timeout)
+          } catch (err) {
+            const message = err instanceof Error ? err.message : String(err)
+            result.usersFailed++
+            result.errors.push(`User ${userId}: ${message}`)
+            logger.error('User consolidation failed', {
+              userId,
+              error: message,
+            })
           }
-        } catch (err) {
-          const message = err instanceof Error ? err.message : String(err)
-          result.usersFailed++
-          result.errors.push(`User ${userId}: ${message}`)
-          logger.error('User consolidation failed', { userId, error: message })
-        }
-      }))
+        }),
+      )
     }
   }
 
   private async fetchActiveUsers(): Promise<string[]> {
     const baseUrl = this.config.consolidationUrl
-    const httpsAgent = new Agent({ rejectUnauthorized: true, })
     try {
       const response = await fetch(`${baseUrl}/api/dream/users`, {
         signal: AbortSignal.timeout(10_000),
-        agent: httpsAgent,
       })
       if (!response.ok) return []
       const data = (await response.json()) as { users?: string[] }
