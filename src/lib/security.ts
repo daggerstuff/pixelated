@@ -14,6 +14,19 @@ import { atomWithStorage } from 'jotai/utils'
 
 import { secureRandomHex } from './security/random'
 
+/**
+ * Minimal typed view of the crypto-js surface used by this module. The ambient
+ * `declare module 'crypto-js'` in src/types/crypto-js.d.ts leaves every export
+ * typed as `any`, which makes `no-unsafe-call`/`no-unsafe-return` fire on every
+ * chained `.toString(...)`. Asserting into this adapter gives `createSignature`
+ * a real signature so the result is `string` rather than `any`.
+ */
+interface CryptoJsAdapter {
+  HmacSHA256: (message: string, key: string) => { toString: (encoder: unknown) => string }
+  enc: { Base64: unknown }
+}
+const crypto = CryptoJS as unknown as CryptoJsAdapter
+
 // Re-export all event constants so existing consumers can keep importing from this module
 export {
   AuthEvents,
@@ -140,7 +153,7 @@ export function createSignature(payload: unknown): string {
   const key = requireSecretKey()
   const message =
     typeof payload === 'string' ? payload : JSON.stringify(payload)
-  return CryptoJS.HmacSHA256(message, key).toString(CryptoJS.enc.Base64)
+  return crypto.HmacSHA256(message, key).toString(crypto.enc.Base64)
 }
 
 /**
@@ -208,7 +221,7 @@ export function createSecureToken(
 /**
  * Verify and decode a secure token.
  */
-export function verifySecureToken(token: string): unknown | null {
+export function verifySecureToken(token: string): unknown {
   try {
     const parts = token.split('.')
     if (parts.length !== 2) return null
@@ -229,7 +242,8 @@ export function verifySecureToken(token: string): unknown | null {
 
     // Check expiration
     const now = Math.floor(Date.now() / 1000)
-    if (typeof payload.exp === 'number' && payload.exp < now) {
+    const exp = payload['exp']
+    if (typeof exp === 'number' && exp < now) {
       return null
     }
 

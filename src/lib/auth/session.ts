@@ -278,11 +278,11 @@ export async function getUserProfile(userId: string) {
     }
 
     return {
-      id: user.id as string,
-      email: user.email as string,
-      fullName: `${user.first_name as string} ${user.last_name as string}`,
-      avatarUrl: user.avatar_url as string,
-      role: user.role as string,
+      id: user['id'] as string,
+      email: user['email'] as string,
+      fullName: `${user['first_name'] as string} ${user['last_name'] as string}`,
+      avatarUrl: user['avatar_url'] as string,
+      role: user['role'] as string,
     }
   } catch (error: unknown) {
     logger.error('Error in getUserProfile:', error)

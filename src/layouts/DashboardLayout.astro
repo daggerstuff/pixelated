@@ -1,11 +1,7 @@
 ---
-// Grouped imports for better organization
 // Style imports
 import '@unocss/reset/tailwind.css'
-import '@/styles/main.css'
-import '@/styles/prose.css'
-import '@/styles/markdown.css'
-import '@/styles/page.css'
+import '@/styles/np-tokens.css'
 
 // Astro components
 import Head from '@/components/base/Head.astro'
@@ -19,23 +15,16 @@ import Footer from '@/components/mizu/Footer.astro'
 import Sidebar from '@/components/layout/Sidebar.astro'
 import { FEATURES } from '@/config'
 
-// Define a more robust props interface with JSDoc comments
 interface Props {
-  /** Page title - displayed in browser tab */
   title?: string
-  /** Meta description for SEO */
   description?: string
-  /** URL for the Open Graph image (social sharing) */
   metaImage?: string
-  /** Control visibility of layout elements */
   showHeader?: boolean
   showFooter?: boolean
   showSidebar?: boolean
-  /** Control features of layout elements */
   showThemeToggle?: boolean
   showUserMenu?: boolean
   showSocialLinks?: boolean
-  /** Additional class names for the content container */
   contentClassName?: string
 }
 
@@ -58,61 +47,27 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <!doctype html>
-<html lang="en" class="dark scroll-smooth">
+<html lang="en" data-theme="dark" class="scroll-smooth">
   <Head {title} {description} ogImage={metaImage} {cspNonce} />
   <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#0f172a" />
-
-  <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
-  <link rel="stylesheet" href="/css/design-system.css" />
-  <link rel="stylesheet" href="/css/unified-blended-theme.css" />
-
-  <link rel="stylesheet" href="/css/fonts.css" />
-  <link rel="stylesheet" href="/css/font-fix.css" />
-
-  <link rel="stylesheet" href="/css/background-fixes.css" />
+  <meta name="theme-color" content="#1a1a1a" />
 
   <script src="/js/polyfill-detector.js" is:inline></script>
   <script src="/js/module-loader.js" defer is:inline></script>
-  <script src="/js/background-loader.js" defer is:inline></script>
   {
     (nprogress || mediumZoom) && (
       <script src="/js/nprogress-and-zoom.js" type="module" />
     )
   }
-  <style is:global>
-    /* Mizu theme dark colors - default for all pages */
-    :root {
-      --c-bg: #0f172a;
-      --c-text: #f8fafc;
-      --c-scrollbar: #181818;
-      --c-scrollbar-hover: #1f1f1f;
-    }
-
-    html {
-      background-color: #0f172a;
-      color: #f8fafc;
-    }
-
-    body {
-      background-color: #0f172a;
-      color: #f8fafc;
-    }
-
-    /* Ensure dark mode is applied */
-    html.dark {
-      --c-bg: #0f172a;
-      --c-text: #f8fafc;
-    }
-  </style>
   <body
-    class="bg-slate-950 text-slate-50 font-sans min-h-screen flex flex-col overflow-x-hidden selection:bg-indigo-500/30"
-    style="background: var(--mesh-1), var(--color-primary); background-attachment: fixed; background-size: cover;"
+    style="background: var(--np-bg); color: var(--np-text);"
+    class="font-sans min-h-screen flex flex-col overflow-x-hidden"
   >
     <!-- Skip to content link for accessibility -->
     <a
       href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-purple-600 focus:text-white focus:rounded-md focus:shadow-lg transition-transform"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2"
+      style="background:var(--np-elevated);color:var(--np-text);"
     >
       Skip to content
     </a>
@@ -132,10 +87,10 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
         {
           showSidebar && (
             <aside
-              class="sidebar dashboard-sidebar fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
+              class="sidebar fixed inset-y-0 z-20 flex-shrink-0 w-64 pt-16
             transform transition-transform duration-300 lg:translate-x-0 lg:static lg:h-auto"
               id="sidebar"
-              style="background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-right: 1px solid var(--border-primary);"
+              style="background: var(--np-bg); border-right: 1px solid var(--np-line);"
             >
               <Sidebar />
             </aside>
@@ -144,14 +99,14 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
         <main
           class:list={[
-            'relative flex-grow pt-16 transition-all duration-300 ease-in-out slide-enter',
+            'relative flex-grow pt-16 transition-all duration-300 ease-in-out',
             showSidebar ? 'lg:ml-64' : 'w-full',
             contentClassName,
           ]}
           id="main-content"
         >
           <div
-            class="container mx-auto px-4 py-6 min-h-[calc(100vh-4rem)] flex flex-col slide-enter-content"
+            class="max-w-[var(--np-content)] mx-auto px-4 py-6 min-h-[calc(100vh-4rem)] flex flex-col"
           >
             <slot />
           </div>
@@ -161,9 +116,8 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
       </div>
     </ErrorBoundary>
 
-    <!-- Theme handling script with improved performance -->
+    <!-- Theme handling script — uses NP tokens via data-theme on html -->
     <script is:inline nonce={cspNonce}>
-      // Get saved theme or use system default
       const getTheme = () => {
         const savedTheme = localStorage?.getItem('theme')
         if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
@@ -172,31 +126,25 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
         return 'system'
       }
 
-      // Apply theme
       const applyTheme = (theme) => {
         const isDark =
           theme === 'dark' ||
           (theme === 'system' &&
             window.matchMedia('(prefers-color-scheme: dark)').matches)
 
-        document.documentElement.classList.toggle('dark', isDark)
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
       }
 
-      // Initialize theme
       applyTheme(getTheme())
 
-      // Listen for OS theme changes
       window
         .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (event) => {
+        .addEventListener('change', () => {
           const theme = getTheme()
-          if (theme === 'system') {
-            applyTheme('system')
-          }
+          if (theme === 'system') applyTheme('system')
         })
     </script>
 
-    <!-- Vercel Speed Insights and Analytics -->
     {
       shouldRenderAnalytics && (
         <>
@@ -209,48 +157,91 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 </html>
 
 <style>
-  /* Custom scrollbar that matches antfu style */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--c-scrollbar, #eee);
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--c-scrollbar-hover, #bbb);
-  }
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--np-muted); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--np-mid); }
 
-  /* Selection styling */
-  ::selection {
-    background: var(--c-selection, rgba(125, 125, 255, 0.2));
-  }
+  ::selection { background: var(--np-selection); color: var(--np-selection-text); }
 
-  /* Mobile sidebar handling with improved transitions */
+  /* === SIDEBAR RESPONSIVE === */
   @media (max-width: 1024px) {
     #sidebar {
-      @apply -translate-x-full;
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateX(-100%);
+      transition: transform 0.3s var(--np-ease);
+      visibility: hidden;
     }
     #sidebar.active {
-      @apply translate-x-0;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      transform: translateX(0);
+      visibility: visible;
     }
   }
 
-  /* Clean fade in animation for content */
-  main {
-    opacity: 0;
-    animation: fade-in 0.4s forwards;
+  @media (max-width: 640px) {
+    .sidebar { width: 100% !important; max-width: 280px; }
   }
 
-  @keyframes fade-in {
+  /* === MAIN CONTENT FADE-IN === */
+  main { opacity: 0; animation: np-fade-in 0.4s var(--np-ease-enter) forwards; }
+  @keyframes np-fade-in { to { opacity: 1; } }
+
+  /* === SIDEBAR SECTION EXPAND/COLLAPSE === */
+  .sidebar ul {
+    overflow: hidden;
+  }
+
+  .sidebar ul[style*="margin-top"] {
+    animation: np-slide-down 0.2s var(--np-ease) both;
+  }
+
+  @keyframes np-slide-down {
+    from {
+      opacity: 0;
+      max-height: 0;
+    }
     to {
       opacity: 1;
+      max-height: 2000px;
     }
+  }
+
+  /* === GLOBAL FOCUS BASELINE (dashboard) === */
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 1px solid var(--np-mid);
+    outline-offset: 2px;
+  }
+
+  .sidebar a:focus-visible,
+  .sidebar button:focus-visible,
+  .sidebar [tabindex]:focus-visible {
+    outline: 1px solid var(--np-mid) !important;
+    outline-offset: 2px !important;
+  }
+
+  /* === SIDEBAR HOVER FALLBACKS (CSS layer — works even if JS fails) === */
+  .sidebar a:hover,
+  .sidebar button:hover {
+    background: var(--np-hover) !important;
+    color: var(--np-text) !important;
+  }
+
+  .sidebar [style*="background: var(--np-elevated)"]:hover {
+    background: var(--np-hover) !important;
+  }
+
+  /* === SIDEBAR ACTIVE/PRESSED — tactile scale === */
+  .sidebar a:active,
+  .sidebar button:active {
+    background: var(--np-active) !important;
+    color: var(--np-text) !important;
+    transform: scale(0.98) !important;
+  }
+
+  /* === ACCESSIBILITY: reduce-motion removes main content animation === */
+  @media (prefers-reduced-motion: reduce) {
+    main { animation: none; opacity: 1; }
   }
 </style>
