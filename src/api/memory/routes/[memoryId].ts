@@ -52,11 +52,18 @@ const UpdateMemoryRequestSchema = z
 
 export type UpdateMemoryRequest = z.infer<typeof UpdateMemoryRequestSchema>
 
+// Top-level sanitization function to satisfy CodeQL rules
+function sanitize(input: string): string {
+  // Allow alphanumeric, hyphen, and underscore characters
+  return input.replace(/[^a-zA-Z0-9_-]/g, '')
+}
+
 // Helper function to extract memory ID from params
 function resolveMemoryId(
   params: Record<string, string | undefined>,
 ): string | undefined {
-  return params['memoryId']
+  const memoryId = params['memoryId']
+  return memoryId ? sanitize(memoryId) : undefined
 }
 
 export const GET = withAuthenticatedMemoryRoute(
