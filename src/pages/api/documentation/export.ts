@@ -7,6 +7,7 @@ import { isAuthenticated } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { getAIService } from '../../../lib/ai'
+import type { AIService } from '../../../lib/ai/AIService'
 import { AIRepository } from '../../../lib/db/ai/repository'
 import { DocumentationSystem } from '../../../lib/documentation/DocumentationSystem'
 
@@ -15,7 +16,10 @@ const logger = createBuildSafeLogger('documentation-api')
 // Dependency injection for DocumentationSystem
 const repository = new AIRepository()
 const aiService = getAIService()
-const documentationSystem = new DocumentationSystem(repository, aiService)
+const documentationSystem = new DocumentationSystem(
+  repository,
+  aiService as unknown as AIService,
+)
 
 export const GET = async ({ request }) => {
   try {
