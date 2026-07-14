@@ -261,7 +261,7 @@ describe('notificationService', () => {
       // Mock redis.rpoplpush to return one item then null
       vi.mocked(redis['rpoplpush'])
         .mockResolvedValueOnce(JSON.stringify(queueItem))
-        .mockResolvedValueOnce(null as unknown as string)
+        .mockResolvedValueOnce(null)
 
       await notificationService.processQueue()
 

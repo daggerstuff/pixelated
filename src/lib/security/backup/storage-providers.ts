@@ -884,7 +884,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       let Storage: GCSConstructor | undefined = undefined
       try {
         // Using dynamic import with type assertion to avoid TypeScript errors
-        const gcsModule = await import('@google-cloud/storage' as string)
+        const gcsModule = await import('@google-cloud/storage')
         Storage = (gcsModule as { Storage?: GCSConstructor }).Storage
       } catch (importError) {
         logger.error(
@@ -912,7 +912,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         })
       }
 
-      this.storage = new Storage(options) as unknown as GCSStorage
+      this.storage = new Storage(options)
       this.bucket = this.storage.bucket(this.config.bucketName)
 
       logger.info(
@@ -1126,7 +1126,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
       if (this.config.connectionString) {
         this.blobServiceClient = BlobServiceClient.fromConnectionString(
           this.config.connectionString,
-        ) as unknown as AzureBlobServiceClient
+        )
       } else {
         const credential = new StorageSharedKeyCredential(
           this.config.accountName!,
@@ -1137,9 +1137,12 @@ export class AzureBlobStorageProvider implements StorageProvider {
         this.blobServiceClient = new BlobServiceClient(
           url,
           credential,
-        ) as unknown as AzureBlobServiceClient
+        )
       }
 
+      if (!this.blobServiceClient) {
+        throw new Error('BlobServiceClient is not initialized')
+      }
       this.containerClient = this.blobServiceClient.getContainerClient(
         this.config.containerName,
       )

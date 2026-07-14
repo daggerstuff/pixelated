@@ -37,7 +37,7 @@ export async function registerPIIDetection(
   } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection service',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }
@@ -119,8 +119,8 @@ export function registerPIIMiddleware(
 
     // Register the middleware with the app
     // Note: This is an example - the actual implementation will depend on your framework
-    if (app && typeof (app as any).use === 'function') {
-      ;(app as any).use(middleware)
+    if (app && typeof (app as { use?: Function }).use === 'function') {
+      ;(app as { use: (m: unknown) => void }).use(middleware)
     } else {
       logger.warn(
         'Could not register PII middleware: app object lacks .use() method',
@@ -131,7 +131,7 @@ export function registerPIIMiddleware(
   } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection middleware',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }
@@ -156,7 +156,7 @@ export async function registerPIIDetectionSystem(
   } catch (error: unknown) {
     logger.error(
       'Failed to register PII detection system',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }

@@ -27,6 +27,10 @@ fi
 
 HOOKS_DIR="$GIT_DIR/hooks"
 HOOKS_PATH=$(git config --get core.hooksPath || true)
+if [ "$HOOKS_PATH" = "/dev/null" ]; then
+  echo "Hooks disabled via /dev/null; skipping git hook installation."
+  exit 0
+fi
 if [[ "$HOOKS_PATH" == *".beads"* ]]; then
   echo "Clean up legacy beads configuration: unsetting core.hooksPath"
   git config --unset core.hooksPath || true

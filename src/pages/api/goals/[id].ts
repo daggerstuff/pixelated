@@ -62,7 +62,7 @@ export const PUT = async ({
       id,
       createdAt: existingGoal.createdAt,
       updatedAt: Date.now(),
-    } as TherapeuticGoal
+    }
     goals[idx] = updatedGoal
     return new Response(JSON.stringify(updatedGoal), {
       status: 200,

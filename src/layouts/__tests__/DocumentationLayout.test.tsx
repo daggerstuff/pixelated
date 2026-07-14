@@ -106,7 +106,7 @@ test('DocumentationLayout uses frontmatter props when available', async () => {
 
   // Render the component
   // const result = await DocumentationLayout.render(props) // Use .render()
-  const renderedHtml = DocumentationLayout(props as any)
+  const renderedHtml = DocumentationLayout(props)
 
   // Check that frontmatter props are used in head and potentially body
   expect(renderedHtml).toContain(

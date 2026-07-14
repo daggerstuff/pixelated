@@ -45,7 +45,7 @@ describe('POST /api/ai/pixel/infer-multimodal - Unit Tests', () => {
 
       // In a real test, we'd call the endpoint or test its logic
       // For now, verify the mock was called
-      await mockGetSession({} as Request)
+      await mockGetSession({})
     })
 
     it('should extract user from session', async () => {

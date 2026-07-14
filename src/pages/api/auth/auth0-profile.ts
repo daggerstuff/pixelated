@@ -11,7 +11,7 @@ import { getUserById, updateUser } from '@/services/auth0.service'
 export const GET = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -83,7 +83,7 @@ export const GET = async ({ request }) => {
 export const PATCH = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(

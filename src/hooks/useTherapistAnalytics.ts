@@ -430,7 +430,7 @@ export function useTherapistAnalytics(
           loadError,
         )
 
-        setError(analyticsError as unknown as AnalyticsErrorType)
+        setError(analyticsError)
         logger.error('Failed to generate therapist analytics data', {
           error: analyticsError,
         })
