@@ -1,63 +1,53 @@
 ---
-import '@fontsource-variable/fraunces/full.css'
-import '@fontsource/public-sans/400.css'
-import '@fontsource/public-sans/500.css'
-import '@fontsource/public-sans/600.css'
-import '@fontsource/public-sans/700.css'
-import '@fontsource-variable/jetbrains-mono/wght.css'
-import '@/styles/tokens.css'
-import '@/styles/variables.css'
-import '@/styles/fonts.css'
-import '@/styles/keel-theme.css'
-import '@/styles/motion.css'
-import '@/styles/responsive.css'
-import '@/styles/fm-fusion.css' // design fusion layer (fm-solo-starter × Dark Metal)
-import { withBasePath } from '@/utils/path'
-import { SITE } from '@/config'
+import '@fontsource-variable/fraunces/full.css';
+import '@fontsource/public-sans/400.css';
+import '@fontsource/public-sans/500.css';
+import '@fontsource/public-sans/600.css';
+import '@fontsource/public-sans/700.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '@/styles/np-tokens.css';
+import { withBasePath } from '@/utils/path';
+import { SITE } from '@/config';
 
 interface Props {
-  title?: string
-  description?: string
-  keywords?: string
-  themeMode?: 'light' | 'dark' | 'system'
-  ogType?: 'website' | 'article'
-  image?: string
-  bgType?: string | boolean
-  pubDate?: string
-  lastModDate?: string
-  pathname?: string
-  showNavBar?: boolean
-  showFooter?: boolean
-  showBackLink?: boolean
-  fullWidthMain?: boolean
-  centered?: boolean
-  contentClass?: string
-  transitionMode?: string
-  isLoginPage?: boolean
-  showSettingsPanel?: boolean
-  showAnalysisPanel?: boolean
-  initialTab?: string
-  [key: string]: any
+  title?: string;
+  description?: string;
+  keywords?: string;
+  themeMode?: 'light' | 'dark' | 'system';
+  ogType?: 'website' | 'article';
+  image?: string;
+  bgType?: string | boolean;
+  pubDate?: string;
+  lastModDate?: string;
+  pathname?: string;
+  showNavBar?: boolean;
+  showFooter?: boolean;
+  showBackLink?: boolean;
+  fullWidthMain?: boolean;
+  centered?: boolean;
+  contentClass?: string;
+  transitionMode?: string;
+  isLoginPage?: boolean;
+  showSettingsPanel?: boolean;
+  showAnalysisPanel?: boolean;
+  initialTab?: string;
+  [key: string]: any;
 }
 
-const siteName = SITE.title || 'Pixelated Empathy'
-const defaultDescription =
-  SITE.description ||
-  'Clinical simulation for therapist training and supervision'
+const siteName = SITE.title || 'Pixelated Empathy';
+const defaultDescription = SITE.description || 'Clinical simulation for therapist training and supervision';
 
 const {
   title = siteName,
   description = defaultDescription,
   ogType = 'website',
   image,
-} = Astro.props
+} = Astro.props;
 
-const siteBase = Astro.site ?? new URL(Astro.url.origin)
-const canonicalURL = new URL(Astro.url.pathname, siteBase)
-const imageURL = image
-  ? new URL(image, siteBase)
-  : new URL(withBasePath('/og.jpg'), siteBase)
-const fullTitle = title === siteName ? title : `${title} — ${siteName}`
+const siteBase = Astro.site ?? new URL(Astro.url.origin);
+const canonicalURL = new URL(Astro.url.pathname, siteBase);
+const imageURL = image ? new URL(image, siteBase) : new URL(withBasePath('/og.jpg'), siteBase);
+const fullTitle = title === siteName ? title : `${title} — ${siteName}`;
 
 const navItems = [
   { href: '/', label: 'Home' },
@@ -65,17 +55,15 @@ const navItems = [
   { href: '/trust', label: 'Trust' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
-]
+];
 
-const currentPath = Astro.url.pathname
+const currentPath = Astro.url.pathname;
 const isActive = (href: string) => {
-  const full = withBasePath(href)
-  return href === '/'
-    ? currentPath === full
-    : currentPath === full || currentPath.startsWith(`${full}/`)
-}
+  const full = withBasePath(href);
+  return href === '/' ? currentPath === full : (currentPath === full || currentPath.startsWith(`${full}/`));
+};
 
-const cspNonce = Astro.locals.cspNonce ?? ''
+const cspNonce = Astro.locals.cspNonce ?? '';
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -83,35 +71,19 @@ const organizationSchema = {
   'name': 'Pixelated Empathy',
   'url': 'https://pixelatedempathy.com',
   'logo': 'https://pixelatedempathy.com/favicon.svg',
-  'description':
-    'Clinical simulation and transcript-based review for therapist training and supervision teams.',
+  'description': 'Clinical simulation and transcript-based review for therapist training and supervision teams.',
   'foundingDate': '2025',
-  'address': {
-    '@type': 'PostalAddress',
-    'addressCountry': 'US',
-  },
-  'contactPoint': {
-    '@type': 'ContactPoint',
-    'email': 'info@pixelatedempathy.com',
-    'contactType': 'Customer Service',
-  },
-  'sameAs': [
-    'https://x.com/juggledaggers',
-    'https://github.com/daggerstuff/pixelated',
-  ],
-}
+  'address': { '@type': 'PostalAddress', 'addressCountry': 'US' },
+  'contactPoint': { '@type': 'ContactPoint', 'email': 'info@pixelatedempathy.com', 'contactType': 'Customer Service' },
+  'sameAs': ['https://x.com/juggledaggers', 'https://github.com/daggerstuff/pixelated'],
+};
 
-const mixpanelToken = import.meta.env['PUBLIC_MIXPANEL_TOKEN']
+const mixpanelToken = import.meta.env['PUBLIC_MIXPANEL_TOKEN'];
 
-const mixpanelScript = mixpanelToken
-  ? `
+const mixpanelScript = mixpanelToken ? `
 (function(e,c){if(!c.__SV){var l,h;window.mixpanel=c;c._i=[];c.init=function(q,r,f){function t(d,a){var g=a.split(".");2==g.length&&(d=d[g[0]],a=g[1]);d[a]=function(){d.push([a].concat(Array.prototype.slice.call(arguments,0)))}}var b=c;"undefined"!==typeof f?b=c[f]=[]:f="mixpanel";b.people=b.people||[];b.toString=function(d){var a="mixpanel";"mixpanel"!==f&&(a+="."+f);d||(a+=" (stub)");return a};b.people.toString=function(){return b.toString(1)+".people (stub)"};l="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders start_session_recording stop_session_recording people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");for(h=0;h<l.length;h++)t(b,l[h]);var n="set set_once union unset remove delete".split(" ");b.get_group=function(){function d(p){a[p]=function(){b.push([g,[p].concat(Array.prototype.slice.call(arguments,0)))}}for(var a={},g=["get_group"].concat(Array.prototype.slice.call(arguments,0)),m=0;m<n.length;m++)d(n[m]);return a};c._i.push([q,r,f])};c.__SV=1.2;var k=e.createElement("script");k.type="text/javascript";k.async=!0;k.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?MIXPANEL_CUSTOM_LIB_URL:"file:"===e.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";e=e.getElementsByTagName("script")[0];e.parentNode.insertBefore(k,e)}})(document,window.mixpanel||[]);
-mixpanel.init('${mixpanelToken}', {
-  autocapture: true,
-  record_sessions_percent: 100,
-});
-`
-  : ''
+mixpanel.init('${mixpanelToken}', { autocapture: true, record_sessions_percent: 100 });
+` : '';
 ---
 
 <!doctype html>
@@ -127,7 +99,6 @@ mixpanel.init('${mixpanelToken}', {
     <link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
     <title>{fullTitle}</title>
 
-    <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
@@ -135,95 +106,36 @@ mixpanel.init('${mixpanelToken}', {
     <meta property="og:url" content={canonicalURL} />
     {imageURL && <meta property="og:image" content={imageURL} />}
 
-    <!-- Twitter -->
-    <meta
-      name="twitter:card"
-      content={imageURL ? 'summary_large_image' : 'summary'}
-    />
+    <meta name="twitter:card" content={imageURL ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     {imageURL && <meta name="twitter:image" content={imageURL} />}
+
     <script is:inline nonce={cspNonce}>
-      const storedTheme = localStorage.getItem('theme')
-      document.documentElement.dataset['theme'] = storedTheme || 'dark'
+      const storedTheme = localStorage.getItem('theme');
+      document.documentElement.dataset['theme'] = storedTheme || 'dark';
     </script>
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify(organizationSchema)
-        .replaceAll(String.fromCharCode(60), '\\u003c')
-        .replaceAll(String.fromCharCode(62), '\\u003e')}
-    />
-    {
-      mixpanelToken && (
-        <script type="text/javascript" set:html={mixpanelScript} />
-      )
-    }
-    <style>
-      .fm-nav-active {
-        position: relative;
-        padding-left: 0.5rem;
-      }
-      .fm-nav-active::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 2px;
-        height: 16px;
-        background: var(--fm-accent);
-      }
-      .fm-footer-inner {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 1.25rem;
-        padding: 3rem 0;
-        border-top: 1px solid var(--fm-border);
-      }
-      .fm-footer-copy {
-        margin: 0.6rem 0 0;
-        color: var(--fm-muted);
-        font-family: var(--fm-sans);
-        font-size: 0.85rem;
-        line-height: 1.5;
-      }
-      .fm-footer-links {
-        display: flex;
-        gap: 0.6rem;
-        flex-wrap: wrap;
-      }
-      .fm-footer-links .fm-chip {
-        color: var(--fm-muted);
-        text-decoration: none;
-        transition:
-          color 0.15s ease-out,
-          border-color 0.15s ease-out;
-      }
-      .fm-footer-links .fm-chip:hover {
-        color: var(--fm-accent-2);
-        border-color: var(--fm-accent-2);
-      }
-    </style>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema).replaceAll(String.fromCharCode(60), '\\u003c').replaceAll(String.fromCharCode(62), '\\u003e')}></script>
+    {mixpanelToken && <script type="text/javascript" set:html={mixpanelScript}></script>}
   </head>
   <body>
-    <header class="site-header">
-      <div class="fm-container">
-        <a
-          class="brand"
-          href={withBasePath('/')}
-          aria-label={`${siteName} home`}
-        >
-          <span class="brand-mark" aria-hidden="true"></span>
-          <span>{siteName}</span>
+    <!-- NP Shared Header — The Quiet Instrument -->
+    <header class="np-shared-header">
+      <div class="np-shared-header-inner">
+        <a class="np-shared-brand" href={withBasePath('/')}>
+          <div class="np-shared-brand-icon">
+            <img src="/apple-touch-icon.png" alt="" width="28" height="28" />
+          </div>
+          <div class="np-shared-brand-text">
+            <span class="np-shared-brand-name">Pixelated</span>
+            <span class="np-shared-brand-sub">Empathy</span>
+          </div>
         </a>
-        <nav class="site-nav" aria-label="Main navigation">
+        <nav class="np-shared-nav" aria-label="Main navigation">
           {
             navItems.map((item) => (
               <a
-                class={isActive(item.href) ? 'fm-nav-active' : undefined}
+                class={isActive(item.href) ? 'np-shared-active' : ''}
                 href={withBasePath(item.href)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
@@ -232,13 +144,8 @@ mixpanel.init('${mixpanelToken}', {
             ))
           }
         </nav>
-        <button
-          class="theme-toggle"
-          type="button"
-          aria-label="Toggle color theme"
-          data-theme-toggle
-        >
-          <span aria-hidden="true"></span>
+        <button class="np-shared-toggle" type="button" aria-label="Toggle color theme" data-theme-toggle>
+          <span class="np-shared-toggle-icon"></span>
         </button>
       </div>
     </header>
@@ -247,35 +154,232 @@ mixpanel.init('${mixpanelToken}', {
       <slot />
     </main>
 
-    <footer class="site-footer">
-      <div class="fm-container">
-        <div class="fm-footer-inner">
-          <div>
-            <span class="fm-section-label"
-              >{siteName} — Clinical AI Platform</span
-            >
-            <p class="fm-footer-copy">
-              &copy; {new Date().getFullYear()}
-              {siteName}. All rights reserved.
-            </p>
-          </div>
-          <div class="fm-footer-links">
-            <a class="fm-chip" href={withBasePath('/about')}>About</a>
-            <a class="fm-chip" href={withBasePath('/privacy')}>Privacy</a>
-            <a class="fm-chip" href={withBasePath('/contact')}>Contact</a>
-          </div>
+    <!-- NP Shared Footer -->
+    <footer class="np-shared-footer">
+      <div class="np-shared-footer-inner">
+        <div>
+          <span class="np-shared-footer-brand">{siteName}</span>
+          <p class="np-shared-footer-copy">&copy; {new Date().getFullYear()} {siteName}. All rights reserved.</p>
+        </div>
+        <div class="np-shared-footer-links">
+          <a class="np-shared-footer-link" href={withBasePath('/about')}>About</a>
+          <a class="np-shared-footer-link" href={withBasePath('/privacy')}>Privacy</a>
+          <a class="np-shared-footer-link" href={withBasePath('/contact')}>Contact</a>
         </div>
       </div>
     </footer>
 
     <script>
-      const toggle = document.querySelector('[data-theme-toggle]')
+      const toggle = document.querySelector('[data-theme-toggle]');
       toggle?.addEventListener('click', () => {
-        const current = document.documentElement.dataset['theme']
-        const next = current === 'dark' ? 'light' : 'dark'
-        document.documentElement.dataset['theme'] = next
-        localStorage.setItem('theme', next)
-      })
+        const current = document.documentElement.dataset['theme'];
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.dataset['theme'] = next;
+        localStorage.setItem('theme', next);
+        window.dispatchEvent(new CustomEvent('theme-changed', { detail: { theme: next } }));
+      });
     </script>
   </body>
 </html>
+
+<style is:global>
+/* NP Shared Header — The Quiet Instrument, public pages variant */
+
+.np-shared-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--np-z-sticky, 50);
+  background: var(--np-bg);
+  border-bottom: 1px solid var(--np-line);
+}
+
+.np-shared-header-inner {
+  max-width: var(--np-content, 76rem);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--np-pad, clamp(1rem, 3vw, 2rem));
+  height: 56px;
+}
+
+.np-shared-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.np-shared-brand-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--np-elevated);
+}
+
+.np-shared-brand-icon img { display: block; }
+
+.np-shared-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.np-shared-brand-name {
+  font-family: var(--np-font-display);
+  font-size: 1rem;
+  font-weight: 350;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--np-text);
+}
+
+.np-shared-brand-sub {
+  font-family: var(--np-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  line-height: 1.2;
+}
+
+.np-shared-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.np-shared-nav a {
+  padding: 6px 12px;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  text-decoration: none;
+  transition: color 0.15s var(--np-ease), background 0.15s var(--np-ease), transform 0.15s var(--np-ease);
+}
+
+.np-shared-nav a:hover {
+  color: var(--np-text);
+  background: var(--np-surface);
+}
+
+.np-shared-nav a:active {
+  background: var(--np-active);
+  transform: scale(0.97);
+}
+
+.np-shared-nav a.np-shared-active {
+  color: var(--np-text);
+}
+
+.np-shared-nav a:focus-visible {
+  outline: 1px solid var(--np-mid);
+  outline-offset: 2px;
+}
+
+.np-shared-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: 1px solid var(--np-line);
+  cursor: pointer;
+  padding: 0;
+  color: var(--np-muted);
+  transition: color 0.15s var(--np-ease), border-color 0.15s var(--np-ease), transform 0.15s var(--np-ease);
+}
+
+.np-shared-toggle:hover {
+  color: var(--np-text);
+  border-color: var(--np-mid);
+}
+
+.np-shared-toggle:active {
+  transform: scale(0.97);
+}
+
+.np-shared-toggle:focus-visible {
+  outline: 1px solid var(--np-mid);
+  outline-offset: 2px;
+}
+
+.np-shared-toggle-icon {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+/* NP Shared Footer */
+.np-shared-footer {
+  border-top: 1px solid var(--np-line);
+  background: var(--np-bg);
+}
+
+.np-shared-footer-inner {
+  max-width: var(--np-content, 76rem);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 3rem var(--np-pad, clamp(1rem, 3vw, 2rem));
+}
+
+.np-shared-footer-brand {
+  font-family: var(--np-font-display);
+  font-size: 0.875rem;
+  font-weight: 350;
+  color: var(--np-text);
+}
+
+.np-shared-footer-copy {
+  margin: 0.5rem 0 0;
+  font-family: var(--np-font-body);
+  font-size: 0.8125rem;
+  color: var(--np-muted);
+}
+
+.np-shared-footer-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.np-shared-footer-link {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  text-decoration: none;
+  transition: color 0.15s var(--np-ease);
+}
+
+.np-shared-footer-link:hover {
+  color: var(--np-text);
+}
+
+@media (max-width: 640px) {
+  .np-shared-footer-inner { flex-direction: column; text-align: center; }
+  .np-shared-header-inner { height: auto; flex-wrap: wrap; padding: 8px var(--np-pad); gap: 4px; }
+  .np-shared-nav { order: 3; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 0; }
+  .np-shared-nav::-webkit-scrollbar { display: none; }
+  .np-shared-nav a { white-space: nowrap; padding: 6px 10px; font-size: 0.625rem; flex-shrink: 0; }
+  .np-shared-nav a:first-child { padding-left: 0; }
+  .np-shared-brand { flex-shrink: 0; }
+  .np-shared-toggle { width: 36px; height: 36px; }
+}
+
+/* === REDUCED MOTION === */
+@media (prefers-reduced-motion: reduce) {
+  .np-shared-nav a { transition-duration: 0.01ms; }
+  .np-shared-toggle { transition-duration: 0.01ms; }
+  .np-shared-footer-link { transition-duration: 0.01ms; }
+}
+</style>
