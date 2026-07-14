@@ -358,7 +358,7 @@ ddescribe("BiasDetectionEngine Performance Benchmarks", () => {
         interactive: 0.25,
         evaluation: 0.25,
       },
-    } as BiasDetectionConfig;
+    };
 
     mockSessionData = {
       sessionId: `perf-test-session-${Date.now()}`,

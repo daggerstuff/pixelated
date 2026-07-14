@@ -18,7 +18,7 @@ export const POST = async ({
 
   try {
     // Authenticate the request
-    const authResult = await isAuthenticated(request as any)
+    const authResult = await isAuthenticated(request)
     if (!authResult || !authResult['authenticated']) {
       return new Response(
         JSON.stringify({

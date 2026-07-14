@@ -13,14 +13,9 @@ import { EvidenceAssistantPanel } from './EvidenceAssistantPanel'
 const { mockedHookState, useEvidenceAssistantMock } = vi.hoisted(() => ({
   mockedHookState: {
     loading: false,
-    error: null,
-    response: null,
+    error: null as Error | null,
+    response: null as EvidenceAssistantResponse | null,
     groundedAnswerAvailable: true,
-  } as {
-    loading: boolean
-    error: Error | null
-    response: EvidenceAssistantResponse | null
-    groundedAnswerAvailable: boolean | null
   },
   useEvidenceAssistantMock: vi.fn(),
 }))

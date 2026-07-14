@@ -173,7 +173,7 @@ describe("MentalLLaMAAdapter (Consolidated)", () => {
       isCrisis: false,
       timestamp: new Date().toISOString(),
       expertGuided: true,
-    } as ExpertGuidedAnalysisResult);
+    });
 
     adapterOptions = {
       modelProvider: mockModelProvider,

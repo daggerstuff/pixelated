@@ -193,8 +193,8 @@ router.post(
   rateLimitByUser(20, 60000),
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
-    const rawPermission = String(req.body.permission || '').replace(/[^a-zA-Z0-9_:/.-]/g, '')
+    const rawUserId = String(req.params['userId'] || '').replace(/[^0-9a-fA-F-]/g, '')
+    const rawPermission = String(req.body.permission ?? '').replace(/[^a-zA-Z0-9_:/.-]/g, '')
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/
@@ -228,8 +228,8 @@ router.delete(
   rateLimitByUser(20, 60000),
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    const rawUserId = String(req.params.userId || '').replace(/[^0-9a-fA-F-]/g, '')
-    const rawPermissionId = String(req.params.permissionId || '').replace(/[^0-9a-fA-F-]/g, '')
+    const rawUserId = String(req.params['userId'] || '').replace(/[^0-9a-fA-F-]/g, '')
+    const rawPermissionId = String(req.params['permissionId'] || '').replace(/[^0-9a-fA-F-]/g, '')
 
     // Validate UUID format
     const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/

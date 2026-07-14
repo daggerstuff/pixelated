@@ -72,14 +72,10 @@ async function main() {
     noopToolContext,
   );
   console.log(
-    `\nGATE   state=${gate.state} authorized=${gate.authorized} ` + `reason="${gate.reason}"`,
+    `\nGATE   state=${gate.state} authorized=${gate.authorized} reason="${gate.reason}"`,
   );
 
-  const summary =
-    `demo-qa-agent batch run ${new Date().toISOString()}: ` +
-    `audit pass=${audit.pass}, blocking=${audit.blocking_count}, ` +
-    `threads picked=${curate.picked_count}. ` +
-    `injection gate=${gate.state}.`;
+  const summary = `demo-qa-agent batch run ${new Date().toISOString()}: audit pass=${audit.pass}, blocking=${audit.blocking_count}, threads picked=${curate.picked_count}. injection gate=${gate.state}.`;
 
   try {
     const stored = await storeMemory({

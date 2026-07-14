@@ -67,7 +67,7 @@ function makeMemoryFixture(overrides: Partial<MemoryObject>): MemoryObject {
       isGhost: false,
     },
   );
-  return { ...base, ...overrides } as MemoryObject;
+  return { ...base, ...overrides };
 }
 
 describe('MemorySystem', () => {
@@ -78,7 +78,7 @@ describe('MemorySystem', () => {
     mockCrisisService = {
       detect: vi.fn(),
     };
-    memorySystem = new MemorySystem(mockCrisisService as unknown as CrisisDetectionService);
+    memorySystem = new MemorySystem(mockCrisisService);
   });
 
   it('should ingest normal content and return "auto" decision', async () => {

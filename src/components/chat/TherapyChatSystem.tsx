@@ -160,7 +160,7 @@ function ProfessionalTherapistWorkspace() {
         role: 'system',
         content: `New client case selected: ${scenario.name}. ${scenario.description}`,
         name: '',
-      } as ExtendedMessage,
+      },
     ])
   }
 
@@ -177,7 +177,7 @@ function ProfessionalTherapistWorkspace() {
       role: 'user',
       content: input,
       name: '',
-    } as ExtendedMessage
+    }
 
     setMessages((prev) => [...prev, userMessage])
     setInput('')
@@ -256,7 +256,7 @@ function ProfessionalTherapistWorkspace() {
               role: 'system',
               content: `🚨 High Risk Alert: This client may require immediate professional intervention. ${intervention}`,
               name: '',
-            } as ExtendedMessage,
+            },
           ])
         }
       }
@@ -290,7 +290,7 @@ function ProfessionalTherapistWorkspace() {
           role: 'assistant',
           content: aiResponse,
           name: '',
-        } as ExtendedMessage,
+        },
       ])
     } catch (err: unknown) {
       setError(
