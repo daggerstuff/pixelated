@@ -99,7 +99,9 @@
   .scroll-animate {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
   }
   .scroll-animate.animate {
     opacity: 1;
@@ -182,7 +184,9 @@
   }
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -199,7 +203,12 @@
   }
   /* Loading skeleton animations */
   .skeleton-loading {
-    background: linear-gradient(90deg, var(--color-neutral-800) 25%, var(--color-neutral-700) 50%, var(--color-neutral-800) 75%);
+    background: linear-gradient(
+      90deg,
+      var(--color-neutral-800) 25%,
+      var(--color-neutral-700) 50%,
+      var(--color-neutral-800) 75%
+    );
     background-size: 200% 100%;
     animation: skeleton 1.5s infinite;
   }
@@ -217,16 +226,24 @@
   }
   /* Hover effects for cards and buttons */
   .interactive-element {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
   }
   .interactive-element:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
   /* Dark mode specific adjustments */
   @media (prefers-color-scheme: dark) {
     .dark\:bg-contrast {
-      background: linear-gradient(135deg, var(--color-neutral-950) 0%, var(--color-neutral-900) 100%);
+      background: linear-gradient(
+        135deg,
+        var(--color-neutral-950) 0%,
+        var(--color-neutral-900) 100%
+      );
     }
     .dark\:border-contrast {
       border-color: var(--color-neutral-800);
@@ -256,15 +273,20 @@
   }
   // Initialize staggered animations
   const initStaggeredAnimations = () => {
-    const staggeredContainers = document.querySelectorAll('.staggered-animation')
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('animate')
-          observer.unobserve(entry.target)
-        }
-      })
-    }, { threshold: 0.1 })
+    const staggeredContainers = document.querySelectorAll(
+      '.staggered-animation',
+    )
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate')
+            observer.unobserve(entry.target)
+          }
+        })
+      },
+      { threshold: 0.1 },
+    )
     staggeredContainers.forEach((container) => {
       observer.observe(container)
     })

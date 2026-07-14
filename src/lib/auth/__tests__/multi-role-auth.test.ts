@@ -229,6 +229,9 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       const { getFromCache, setInCache } = await import('../../redis')
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
+        if (key.startsWith('2fa:pending-secret:')) {
+          return 'test-secret'
+        }
         if (key.startsWith('2fa:setup:')) {
           return {
             secret: 'test-secret',

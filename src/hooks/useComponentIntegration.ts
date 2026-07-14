@@ -22,46 +22,62 @@ export function useChartData(params: UseChartDataParams) {
   )
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const paramsRef = useRef(params)
-  paramsRef.current = params
+  const abortControllerRef = useRef<AbortController | null>(null)
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (signal?: AbortSignal) => {
     setLoading(true)
     setError(null)
     try {
       const data = await componentIntegrationService.getChartData({
-        type: paramsRef.current.type,
-        category: paramsRef.current.category,
-        timeRange: paramsRef.current.timeRange,
-        clientId: paramsRef.current.clientId,
-        sessionId: paramsRef.current.sessionId,
-        dataPoints: paramsRef.current.dataPoints,
+        type: params.type,
+        category: params.category,
+        timeRange: params.timeRange,
+        clientId: params.clientId,
+        sessionId: params.sessionId,
+        dataPoints: params.dataPoints,
       })
+      if (signal?.aborted) return
       setChartData(data as unknown as Record<string, unknown>)
     } catch (err: unknown) {
+      if (signal?.aborted) return
       const message =
         err instanceof Error ? err.message : 'Failed to load chart data'
       logger.error('Chart data fetch failed', {
         error: err,
-        params: paramsRef.current,
+        params,
       })
       setError(message)
+      setChartData(null)
     } finally {
-      setLoading(false)
+      if (!signal?.aborted) {
+        setLoading(false)
+      }
     }
-  }, [])
+  }, [params.type, params.category, params.timeRange, params.clientId, params.sessionId, params.dataPoints])
 
   useEffect(() => {
-    void fetchData()
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+    void fetchData(controller.signal)
+
     if (
       params.autoRefresh &&
       params.refreshInterval &&
       params.refreshInterval > 0
     ) {
-      const id = setInterval(() => void fetchData(), params.refreshInterval)
-      return () => clearInterval(id)
+      const id = setInterval(() => {
+        const ctrl = new AbortController()
+        abortControllerRef.current = ctrl
+        void fetchData(ctrl.signal)
+      }, params.refreshInterval)
+      return () => {
+        clearInterval(id)
+        controller.abort()
+      }
     }
-    return undefined
+    return () => {
+      controller.abort()
+    }
   }, [
     fetchData,
     params.autoRefresh,
@@ -78,7 +94,11 @@ export function useChartData(params: UseChartDataParams) {
     chartData,
     loading,
     error,
-    refresh: fetchData,
+    refresh: () => {
+      const controller = new AbortController()
+      abortControllerRef.current = controller
+      void fetchData(controller.signal)
+    },
   }
 }
 
@@ -91,8 +111,8 @@ export function useServiceHealth(checkInterval: number = 60000) {
   const checkHealth = useCallback(async () => {
     setLoading(true)
     try {
-      const healthData = await componentIntegrationService.getServiceStatus()
-      setHealth(healthData as unknown as Record<string, unknown>)
+      const healthData = await componentIntegrationService.getServiceHealth()
+      setHealth(healthData)
     } catch (error: unknown) {
       logger.error('Health check failed', { error })
       setHealth({
@@ -127,3 +147,41 @@ export function useServiceHealth(checkInterval: number = 60000) {
     hasError: health?.['overall'] === 'error',
   }
 }
+
+interface UseChartDataOptions {
+  type?: string
+  category?: string
+  timeRange?: number
+  clientId?: string
+  sessionId?: string
+  dataPoints?: number
+  autoRefresh?: boolean
+  refreshInterval?: number
+}
+
+interface UseChartDataResult {
+  chartData: unknown
+  loading: boolean
+  error: Error | null
+  refresh: () => void
+}
+
+export function useChartData(_options: UseChartDataOptions): UseChartDataResult {
+  const [chartData, setChartData] = useState<unknown>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const refresh = useCallback(() => {
+    setChartData(null)
+    setLoading(false)
+    setError(null)
+  }, [])
+
+  return {
+    chartData,
+    loading,
+    error,
+    refresh,
+  }
+}
+

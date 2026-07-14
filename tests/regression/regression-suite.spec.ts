@@ -313,7 +313,7 @@ test.describe('Regression Test Suite', () => {
         name: maliciousFile.name,
         mimeType: maliciousFile.mimeType,
         buffer: maliciousFile.buffer,
-      } as any)
+      })
 
       // Should show error for invalid file type
       await expect(page.locator('.error-message')).toContainText(

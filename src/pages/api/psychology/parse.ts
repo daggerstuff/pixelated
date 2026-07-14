@@ -208,7 +208,7 @@ const isParseRequest = (value: unknown): value is ParseRequest => {
     typeof value === 'object' &&
     value !== null &&
     'content' in value &&
-    typeof (value as { content: unknown }).content === 'string'
+    typeof (value).content === 'string'
   )
 }
 

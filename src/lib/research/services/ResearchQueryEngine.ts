@@ -678,14 +678,10 @@ export class ResearchQueryEngine {
 
     // Apply anonymization based on level
     const anonymizedData =
-      (await this.anonymizationService.anonymizeResearchData(
+      await this.anonymizationService.anonymizeResearchData(
         result.data as any,
         consentLevel,
-      )) as unknown as {
-        anonymizedData: any
-        privacyMetrics: any
-        auditLog: any
-      }
+      )
 
     return {
       ...result,
@@ -693,7 +689,7 @@ export class ResearchQueryEngine {
       metadata: {
         ...result.metadata,
         anonymizationMetrics: anonymizedData.privacyMetrics,
-        anonymizationAudit: anonymizedData.auditLog,
+        anonymizationAudit: anonymizedData.auditLog as unknown as { kAnonymity: number; differentialPrivacyEpsilon: number; noiseLevel: number; suppressionRate: number },
       },
     }
   }

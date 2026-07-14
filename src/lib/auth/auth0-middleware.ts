@@ -741,7 +741,7 @@ export async function authenticateRequest(
         emailVerified,
         name,
         picture,
-        role: validation.role as string | undefined,
+        role: validation.role,
       })
     } catch (resolveError) {
       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
@@ -921,7 +921,7 @@ export async function authenticateRequest(
       emailVerified: identity.emailVerified,
       fullName: identity.name,
       avatarUrl: identity.picture,
-    } as AuthenticatedRequest['user']
+    }
     authenticatedRequest.tokenId = validation.tokenId
     authenticatedRequest.sessionId = sid
     authenticatedRequest.authMode = 'jwt'

@@ -114,10 +114,10 @@ export class ThreatDetectionMiddleware {
 
         // Check rate limit with threat detection
         const result =
-          (await this.config.bridge.checkRateLimitWithThreatDetection(
+          await this.config.bridge.checkRateLimitWithThreatDetection(
             identifier,
             context,
-          )) as unknown as RateLimitCheckResult
+          )
 
         // Log the check if enabled
         if (this.config.enableLogging) {

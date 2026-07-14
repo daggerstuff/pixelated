@@ -27,7 +27,7 @@ describe('Memory ID Endpoints', () => {
       accountId: 'test-account-id',
       workspaceId: 'test-workspace-id',
       role: 'user',
-    } as any)
+    })
   })
 
   describe('GET', () => {

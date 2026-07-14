@@ -107,10 +107,7 @@ export const GET: APIRoute = async (context) => {
         }
       }
     }
-  ).Astro.getWebSocket(context) as {
-    socket: WebSocket
-    response: Response
-  }
+  ).Astro.getWebSocket(context)
   const connectionId = crypto.randomUUID()
   const sessionId =
     context.url.searchParams.get('sessionId') ?? crypto.randomUUID()

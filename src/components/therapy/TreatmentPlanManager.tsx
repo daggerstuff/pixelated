@@ -232,10 +232,7 @@ const TreatmentPlanManager: FC = () => {
     >,
     isEdit = false,
   ) => {
-    const target = e.target as
-      | HTMLInputElement
-      | HTMLTextAreaElement
-      | HTMLSelectElement
+    const target = e.target
     const { name, value } = target
     if (isEdit) {
       setEditingPlanData((prev) => (prev ? { ...prev, [name]: value } : null))

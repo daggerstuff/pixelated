@@ -58,7 +58,7 @@ router.post(
       methodology,
       budget,
       ownerId: user.id,
-    } as Parameters<typeof createMarketResearch>[0])
+    })
 
     res.status(201).json({ success: true, data: research as unknown })
   }),

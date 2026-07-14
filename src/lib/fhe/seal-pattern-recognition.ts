@@ -203,7 +203,7 @@ export class SealPatternRecognitionService implements FHEService {
             endDate: new Date(now - 1000 * 60 * 60 * 24 * i),
             indicators: ['mood', 'anxiety'],
             description: 'Synthetic trend pattern',
-          } as TrendPattern)
+          })
         }
         allPatterns.push(...decodedPatterns)
       }
@@ -326,7 +326,7 @@ export class SealPatternRecognitionService implements FHEService {
           significance: Math.random() > 0.5 ? 1 : 0.5,
           strength: 0.65 + Math.random() * 0.3,
           categories: ['emotional', 'behavioral'],
-        } as CrossSessionPattern)
+        })
       }
 
       return patterns
@@ -430,7 +430,7 @@ export class SealPatternRecognitionService implements FHEService {
             confidence: 0.7 + Math.random() * 0.25,
             significance: 'medium',
             severityScore: 0.3 + Math.random() * 0.4,
-          } as RiskCorrelation)
+          })
         }
       }
       return correlations

@@ -479,7 +479,7 @@ export class BiasDetectionAuditLogger {
       // Mask PII in high-sensitivity logs
       if (sanitized['demographics']) {
         sanitized['demographics'] = this.anonymizeDemographics(
-          sanitized['demographics'] as ParticipantDemographics,
+          sanitized['demographics'],
         )
       }
 

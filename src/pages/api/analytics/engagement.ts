@@ -156,7 +156,7 @@ export const GET = async ({ request }: { request: Request }) => {
     let interactionBreakdown: InteractionMetric[] = Object.entries(
       interactionCounts,
     )
-      .map(([label, value]) => ({ label: String(label), value: Number(value) }))
+      .map(([label, value]) => ({ label: label, value: value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5)
 
@@ -177,10 +177,10 @@ export const GET = async ({ request }: { request: Request }) => {
     const recentActivity: ActivityEntry[] = allRecentEvents.map((event) => {
       const isSession = event.type === EventType.THERAPY_SESSION
       return {
-        user: event.userId || 'Anonymous',
+        user: event.userId ?? 'Anonymous',
         action: isSession
           ? 'Session Completed'
-          : String(event.properties?.['actionType'] || 'Action Performed'),
+          : String(event.properties?.['actionType'] ?? 'Action Performed'),
         duration:
           typeof event.properties?.['duration'] === 'number'
             ? event.properties['duration']

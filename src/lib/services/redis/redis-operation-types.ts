@@ -26,7 +26,7 @@ export interface RedisInfo {
 export type RedisEventHandler = (
   event: string,
   callback: (...args: unknown[]) => void,
-) => RedisMockClient | unknown
+) => RedisMockClient | void
 
 export interface RedisMockClient {
   [key: string]: unknown

@@ -55,7 +55,7 @@ export class DocumentationSystem extends EventEmitter {
    * @param repository The repository to use for session data
    * @param aiService The AI service to use for NLP-based summary generation
    */
-  constructor(repository: AIRepository, _aiService: AIService) {
+  constructor(repository: AIRepository, _aiService: unknown) {
     super()
     this.repository = repository
     void this.initializeRealTimeUpdates()
@@ -285,7 +285,7 @@ export class DocumentationSystem extends EventEmitter {
         startTime: session.startTime || new Date(),
         endTime: session.endTime,
         notes: 'Auto-generated documentation',
-        interventions: interventions.map((i) => i.content) as readonly string[],
+        interventions: interventions.map((i) => i.content),
         outcomes: [],
         nextSteps: [],
         riskAssessment: {
@@ -528,7 +528,7 @@ export class DocumentationSystem extends EventEmitter {
 // Export a factory function to create the documentation system
 export function createDocumentationSystem(
   repository: AIRepository,
-  aiService: AIService,
+  aiService: unknown,
 ): DocumentationSystem {
   return new DocumentationSystem(repository, aiService)
 }

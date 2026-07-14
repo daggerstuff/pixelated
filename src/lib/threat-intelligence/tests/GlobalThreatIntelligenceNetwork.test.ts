@@ -151,7 +151,7 @@ const mockEdgeDetectionSystem = vi.hoisted(() => ({
     aiModel: 'threat-model-v1',
     processingTime: 50,
     timestamp: new Date(),
-  } as EdgeDetectionResult),
+  }),
   getEdgeNodeStatus: vi.fn<() => Promise<unknown>>().mockResolvedValue({
     healthy: true,
     statusMessage: 'ok',
@@ -189,7 +189,7 @@ const mockThreatCorrelationEngine = vi.hoisted(() => ({
     confidence: 0.85,
     analysisMethod: 'unit-test',
     timestamp: new Date(),
-  } as CorrelationData),
+  }),
   correlateThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
   findSimilarThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
   getCorrelationPatterns: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
@@ -369,7 +369,7 @@ const mockValidationSystem = vi.hoisted(() => ({
     averageValidationTime: 5,
     falsePositives: 0,
     falseNegatives: 0,
-  } as ValidationMetrics),
+  }),
   getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
     healthy: true,
     message: 'healthy',

@@ -73,12 +73,9 @@ const escapeJsonForScriptTag = (value: unknown): string => {
 // Get session data from API
 let sessionData: TrainingSessionResponse | undefined
 try {
-  const response = await fetch(
-    `/api/training/sessions/${sessionId}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  )
+  const response = await fetch(`/api/training/sessions/${sessionId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
   const rawSessionData = await response.json()
   if (isTrainingSessionResponse(rawSessionData)) {
     sessionData = rawSessionData

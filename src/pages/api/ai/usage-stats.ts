@@ -96,7 +96,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
 
     // Get usage statistics
     const stats = await getAIUsageStats({
-      period: period as 'daily' | 'weekly' | 'monthly',
+      period: period,
       userId,
     })
 

@@ -302,7 +302,7 @@ function createAnthropicServiceAdapter(config: AIProviderConfig): AIService {
     createStreamingChatCompletion: async (_messages, _options) =>
       Promise.reject(
         new Error('Anthropic streaming not implemented'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
+      ),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
@@ -326,7 +326,7 @@ function createOpenAIServiceAdapter(config: AIProviderConfig): AIService {
     createStreamingChatCompletion: async (_messages, _options) =>
       Promise.reject(
         new Error('OpenAI streaming not implemented'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
+      ),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
@@ -350,7 +350,7 @@ function createHuggingFaceServiceAdapter(config: AIProviderConfig): AIService {
     createStreamingChatCompletion: async (_messages, _options) =>
       Promise.reject(
         new Error('Hugging Face streaming not implemented'),
-      ) as unknown as Promise<AsyncGenerator<AIStreamChunk, void, void>>,
+      ),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,

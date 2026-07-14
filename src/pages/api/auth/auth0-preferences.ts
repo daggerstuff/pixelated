@@ -102,7 +102,7 @@ function validateAIPreferences(input: unknown): asserts input is AIPreferences {
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -191,7 +191,7 @@ export const GET: APIRoute = async ({ request }) => {
 export const PUT: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -301,7 +301,7 @@ export const PUT: APIRoute = async ({ request }) => {
 export const DELETE: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(

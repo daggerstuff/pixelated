@@ -118,7 +118,7 @@ describe('ReprioritizationEngine TS', () => {
           },
         ],
       }
-      const points = acc.ingestFeedbackDict(report as Record<string, unknown>)
+      const points = acc.ingestFeedbackDict(report)
       expect(points).toHaveLength(1)
       expect(points[0].patternId).toBe('fp1')
       expect(points[0].domain).toBe(UpstreamDomain.CURATION)

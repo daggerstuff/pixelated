@@ -542,7 +542,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       return {
         ...threat,
         data: { encrypted: encryptedData },
-      } as ThreatIntelligence
+      }
     } catch (error: unknown) {
       logger.error('Failed to encrypt threat', {
         error: error instanceof Error ? error.message : 'Unknown error',

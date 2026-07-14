@@ -21,7 +21,7 @@ if (!userSession) {
   return Astro.redirect('/auth/login')
 }
 
-const reviewerId = userSession.id || (userSession as any).email || 'anonymous'
+const reviewerId = userSession.id || (userSession as { email?: string }).email || 'anonymous'
 
 // Define the type for pending items
 interface QueueItem {

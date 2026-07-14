@@ -73,7 +73,7 @@ describe("crisisDetectionService", () => {
         created: Date.now(),
         choices: [],
         provider: "test",
-      } as AICompletion);
+      });
 
       const result: CrisisDetectionResult = await crisisService.detectCrisis(text, options);
 
@@ -105,7 +105,7 @@ describe("crisisDetectionService", () => {
         created: Date.now(),
         choices: [],
         provider: "test",
-      } as AICompletion);
+      });
 
       const result = await crisisService.detectCrisis(text, options);
 
@@ -148,7 +148,7 @@ describe("crisisDetectionService", () => {
         created: Date.now(),
         choices: [],
         provider: "test",
-      } as AICompletion);
+      });
 
       const result = await crisisService.detectCrisis(text, options);
 
@@ -199,7 +199,7 @@ describe("crisisDetectionService", () => {
         created: Date.now(),
         choices: [],
         provider: "test",
-      } as AICompletion);
+      });
 
       const results = await crisisService.detectBatch(texts, options);
 

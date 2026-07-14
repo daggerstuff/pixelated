@@ -68,7 +68,7 @@ export class PolicyStore {
     const doc = await collection.findOne({ _id: policyId } as any)
 
     if (doc) {
-      const { _id, ...rest } = doc as any
+      const { _id, ...rest } = doc
       return {
         id: typeof _id === 'string' ? _id : (_id as ObjectId)?.toString(),
         ...rest,
@@ -92,7 +92,7 @@ export class PolicyStore {
 
     const versionsCollection = this.db.collection(POLICY_VERSIONS_COLLECTION)
     const docs = await versionsCollection
-      .find({ policyId } as any)
+      .find({ policyId })
       .sort({ savedAt: -1 })
       .toArray()
 

@@ -160,9 +160,9 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
         : new Date().toISOString(),
     duration: plan.duration ?? 0,
     status: plan.status,
-    goals: (plan.goals as TreatmentPlanEnhanced['goals']) ?? [],
+    goals: (plan.goals) ?? [],
     notes: plan.notes ?? '',
-    metadata: plan.metadata as TreatmentPlanEnhanced['metadata'] | undefined,
+    metadata: plan.metadata,
   }
 }
 
@@ -175,7 +175,7 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -320,7 +320,7 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -467,7 +467,7 @@ export const POST: APIRoute = async ({ request }) => {
 export const PATCH: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
