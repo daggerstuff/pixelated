@@ -202,7 +202,7 @@
     "@azure/storage-blob": "latest",
     "@cloudflare/ai-chat": "^0.9.3",
     "@cloudflare/shell": "^0.4.1",
-    "@cloudflare/think": "^0.12.1",
+    "@cloudflare/think": "^0.13.0",
     "@cloudflare/workers-types": "4.20260611.1",
     "@composio/core": "latest",
     "@composio/vercel": "latest",
