@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import { cn } from '@/lib/utils'
+// Minimal style helper — inline styles only, no UnoCSS/tailwind dependency
+function np(classes: string): string {
+  return classes
+}
 
 interface NavigationItem {
   name: string
@@ -16,15 +19,94 @@ interface NavigationSection {
   items: NavigationItem[]
 }
 
+// Shared style objects (zero-chroma NP tokens)
+const styles = {
+  sectionBtn: {
+    display: 'flex',
+    width: '100%',
+    alignItems: 'center',
+    padding: '8px 12px',
+    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontSize: '0.6875rem',
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase' as const,
+    color: 'var(--np-muted)',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    transition: 'color 0.15s var(--np-ease)',
+  },
+  navLink: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 12px',
+    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontSize: '0.75rem',
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase' as const,
+    textDecoration: 'none',
+    color: 'var(--np-muted)',
+    background: 'transparent',
+    transition: 'background 0.15s var(--np-ease), color 0.15s var(--np-ease)',
+    border: 'none',
+    cursor: 'pointer',
+    width: '100%',
+    textAlign: 'left' as const,
+  },
+  navLinkActive: {
+    color: 'var(--np-text)',
+    background: 'var(--np-elevated)',
+  },
+  childLink: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '6px 12px',
+    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontSize: '0.6875rem',
+    letterSpacing: '0.03em',
+    textTransform: 'uppercase' as const,
+    textDecoration: 'none',
+    color: 'var(--np-muted)',
+    transition: 'background 0.15s var(--np-ease), color 0.15s var(--np-ease)',
+  },
+  childLinkActive: {
+    color: 'var(--np-text)',
+    background: 'var(--np-elevated)',
+  },
+  badge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '18px',
+    height: '18px',
+    fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+    fontSize: '0.625rem',
+    color: 'var(--np-bg)',
+    background: 'var(--np-text)',
+  },
+  icon: {
+    width: '14px',
+    height: '14px',
+    flexShrink: 0,
+    color: 'inherit',
+  } as React.CSSProperties,
+  iconWrapper: {
+    width: '14px',
+    height: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.5,
+  } as React.CSSProperties,
+}
+
 export function Sidebar() {
   const [pathname, setPathname] = useState<string>('')
 
-  // Update pathname on client side
   useEffect(() => {
     setPathname(window.location.pathname)
   }, [])
 
-  // Default to closed on mobile, only open by default on dashboard pages
   const isDashboardPage =
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/admin') ||
@@ -46,7 +128,6 @@ export function Sidebar() {
     {},
   )
 
-  // Update isOpen when pathname changes
   useEffect(() => {
     setIsOpen(isDashboardPage)
   }, [pathname, isDashboardPage])
@@ -402,7 +483,6 @@ export function Sidebar() {
     },
   ]
 
-  // Don't render at all on non-dashboard pages on mobile
   if (
     !isDashboardPage &&
     typeof window !== 'undefined' &&
@@ -412,160 +492,166 @@ export function Sidebar() {
   }
 
   return (
-    <aside
-      className={cn(
-        'fixed top-0 left-0 z-20 w-64 h-full pt-16 pb-4 overflow-y-auto transition-transform bg-card border-r border-border',
-        !isOpen ? '-translate-x-full' : '',
-        'lg:translate-x-0',
-      )}
+    <div
+      className={np('w-full h-full overflow-y-auto')}
+      style={{
+        background: 'transparent',
+        opacity: isOpen ? 1 : 0,
+        pointerEvents: isOpen ? 'auto' : 'none',
+      }}
     >
-      <div className="px-3 py-4">
-        <div className="mb-4">
+      <div style={{ padding: '16px 12px' }}>
+        <div style={{ marginBottom: '16px', padding: '0 4px' }}>
           <button
             type="button"
-            className="hover:bg-accent hover:text-accent-foreground group flex w-full items-center rounded-lg p-2 text-sm transition duration-200"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              padding: '8px 12px',
+              background: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontFamily: '"JetBrains Mono Variable", ui-monospace, monospace',
+              fontSize: '0.75rem',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase' as const,
+              color: 'var(--np-muted)',
+              transition: 'color 0.15s var(--np-ease)',
+            }}
             onClick={() => setIsOpen(!isOpen)}
+            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--np-text)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--np-muted)' }}
           >
-            <svg
-              className="text-muted-foreground h-5 w-5 transition duration-75 group-hover:text-foreground"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d={
-                  isOpen
-                    ? 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'
-                    : 'M4 6h16M4 12h16M4 18h16'
-                }
-                clipRule="evenodd"
-              />
+            <svg style={{ width: '14px', height: '14px', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d={isOpen ? 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z' : 'M4 6h16M4 12h16M4 18h16'} clipRule="evenodd" />
             </svg>
-            <span className="ml-3">Toggle Menu</span>
+            <span style={{ marginLeft: '10px' }}>Toggle Menu</span>
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {navigationSections.map((section) => (
-            <div key={section.title} className="space-y-2">
+            <div key={section.title}>
               <button
                 onClick={() => toggleSection(section.title.toLowerCase())}
-                className="text-muted-foreground flex w-full items-center px-2 py-1 text-sm font-medium transition hover:text-foreground"
+                style={styles.sectionBtn}
+                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--np-text)' }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--np-muted)' }}
               >
-                <span className="flex-1 text-left">{section.title}</span>
+                <span style={{ flex: 1, textAlign: 'left' }}>{section.title}</span>
                 <svg
-                  className={`h-4 w-4 transition-transform ${
-                    expandedSections[section.title.toLowerCase()]
-                      ? 'rotate-180'
-                      : ''
-                  }`}
+                  style={{
+                    width: '12px',
+                    height: '12px',
+                    transition: 'transform 0.15s var(--np-ease)',
+                    transform: expandedSections[section.title.toLowerCase()] ? 'rotate(180deg)' : 'rotate(0deg)',
+                  }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {expandedSections[section.title.toLowerCase()] && (
-                <ul className="space-y-1 pl-2">
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
                   {section.items.map((item) => {
                     const isActive =
                       pathname === item.href ||
-                      (item.children &&
-                        item.children.some((child) => pathname === child.href))
-                    const hasChildren =
-                      item.children && item.children.length > 0
+                      (item.children?.some((child) => pathname === child.href))
+                    const hasChildren = item.children && item.children.length > 0
                     const itemKey = `${section.title}-${item.name}`
-                    const isExpanded =
-                      expandedItems[itemKey] ?? (isActive && hasChildren)
+                    const isExpanded = expandedItems[itemKey] ?? (isActive && hasChildren)
 
                     return (
                       <li key={item.name}>
-                        <div>
-                          <a
-                            href={item.href}
-                            className={cn(
-                              'flex items-center p-2 text-sm rounded-lg transition-colors duration-200',
-                              isActive
-                                ? 'bg-primary text-primary-foreground'
-                                : 'text-foreground hover:bg-accent hover:text-accent-foreground',
-                            )}
-                            onClick={(e) => {
-                              if (hasChildren) {
-                                e.preventDefault()
-                                setExpandedItems({
-                                  ...expandedItems,
-                                  [itemKey]: !isExpanded,
-                                })
-                              }
-                            }}
-                          >
-                            <span
-                              className={cn(
-                                isActive
-                                  ? 'text-primary-foreground'
-                                  : 'text-muted-foreground',
-                              )}
-                            >
-                              {item.icon}
-                            </span>
-                            <span className="ml-3 flex-1">{item.name}</span>
-                            {item.badge && (
-                              <span className="text-primary-foreground bg-primary ml-auto inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-semibold">
-                                {item.badge}
-                              </span>
-                            )}
-                            {hasChildren && (
-                              <svg
-                                className={cn(
-                                  'w-4 h-4 ml-2 transition-transform',
-                                  isExpanded ? 'rotate-90' : '',
-                                )}
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 5l7 7-7 7"
-                                />
-                              </svg>
-                            )}
-                          </a>
-                          {hasChildren && isExpanded && (
-                            <ul className="border-border ml-4 mt-1 space-y-1 border-l pl-2">
-                              {item.children!.map((child) => {
-                                const isChildActive = pathname === child.href
-                                return (
-                                  <li key={child.name}>
-                                    <a
-                                      href={child.href}
-                                      className={cn(
-                                        'flex items-center p-2 text-xs rounded-lg transition-colors duration-200',
-                                        isChildActive
-                                          ? 'bg-primary/20 text-primary-foreground font-medium'
-                                          : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                                      )}
-                                    >
-                                      <span className="text-muted-foreground">
-                                        {child.icon}
-                                      </span>
-                                      <span className="ml-2">{child.name}</span>
-                                    </a>
-                                  </li>
-                                )
-                              })}
-                            </ul>
+                        <a
+                          href={item.href}
+                          style={{
+                            ...styles.navLink,
+                            ...(isActive ? styles.navLinkActive : {}),
+                          }}
+                          onClick={(e) => {
+                            if (hasChildren) {
+                              e.preventDefault()
+                              setExpandedItems({ ...expandedItems, [itemKey]: !isExpanded })
+                            }
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background = 'var(--np-hover)'
+                              e.currentTarget.style.color = 'var(--np-text)'
+                            }
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive) {
+                              e.currentTarget.style.background = 'transparent'
+                              e.currentTarget.style.color = 'var(--np-muted)'
+                            }
+                          }}
+                        >
+                          <span style={styles.iconWrapper}>{item.icon}</span>
+                          <span style={{ marginLeft: '10px', flex: 1 }}>{item.name}</span>
+                          {item.badge && (
+                            <span style={styles.badge}>{item.badge}</span>
                           )}
-                        </div>
+                          {hasChildren && (
+                            <svg
+                              style={{
+                                width: '12px',
+                                height: '12px',
+                                marginLeft: 'auto',
+                                transition: 'transform 0.15s var(--np-ease)',
+                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                              }}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                          )}
+                        </a>
+                        {hasChildren && isExpanded && (
+                          <ul style={{
+                            listStyle: 'none',
+                            margin: '2px 0 2px 16px',
+                            padding: 0,
+                            borderLeft: '1px solid var(--np-line)',
+                          }}>
+                            {item.children!.map((child) => {
+                              const isChildActive = pathname === child.href
+                              return (
+                                <li key={child.name}>
+                                  <a
+                                    href={child.href}
+                                    style={{
+                                      ...styles.childLink,
+                                      ...(isChildActive ? styles.childLinkActive : {}),
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      if (!isChildActive) {
+                                        e.currentTarget.style.background = 'var(--np-hover)'
+                                        e.currentTarget.style.color = 'var(--np-text)'
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (!isChildActive) {
+                                        e.currentTarget.style.background = 'transparent'
+                                        e.currentTarget.style.color = 'var(--np-muted)'
+                                      }
+                                    }}
+                                  >
+                                    <span style={styles.iconWrapper}>{child.icon}</span>
+                                    <span style={{ marginLeft: '8px' }}>{child.name}</span>
+                                  </a>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                        )}
                       </li>
                     )
                   })}
@@ -575,6 +661,6 @@ export function Sidebar() {
           ))}
         </div>
       </div>
-    </aside>
+    </div>
   )
 }
