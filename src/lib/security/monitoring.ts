@@ -3,9 +3,8 @@ import { mongoClient } from '../db/mongoClient'
 // @ts-expect-error mongodb-query-validator has no type declarations
 import mongoQueryValidator from 'mongodb-query-validator'
 const { validateQuery } = mongoQueryValidator as { validateQuery: (query: unknown) => boolean }
-// @ts-expect-error mongo-sanitize has no type declarations
 import mongoSanitize from 'mongo-sanitize'
-const { sanitize } = mongoSanitize as { sanitize: (v: unknown) => unknown }
+const { sanitize } = mongoSanitize
 
 const logger = createBuildSafeLogger('default')
 
