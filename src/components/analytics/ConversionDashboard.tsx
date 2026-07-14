@@ -73,7 +73,11 @@ export function ConversionDashboard() {
       const filtered =
         filter === 'all'
           ? conversions
-          : conversions.filter((c) => String(c.conversionId) === filter)
+          : conversions.filter((c) => {
+              const val = c.conversionId
+              const strVal = typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean' ? String(val) : ''
+              return strVal === filter
+            })
 
       setConversionEvents(filtered as ConversionEvent[])
     } catch (error: unknown) {

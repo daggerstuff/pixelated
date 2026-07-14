@@ -4,7 +4,7 @@ import { generateSecret, generateURI, verify } from 'otplib'
 import * as qrcode from 'qrcode'
 
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
-import { getFromCache, setInCache } from '../redis'
+import { getFromCache, setInCache, removeFromCache } from '../redis'
 
 export interface DeviceInfo {
   deviceId: string
@@ -85,11 +85,11 @@ export const completeTwoFactorSetup = async (
   const pendingSecret = await getFromCache<string>(
     `2fa:pending-secret:${userId}`,
   )
+  if (!pendingSecret) {
+    throw new Error('2FA setup not initiated')
+  }
 
   // Verify the token against the pending secret
-  if (!pendingSecret) {
-    throw new Error('No pending secret found')
-  }
   const verifyResult = await verify({ token: _token, secret: pendingSecret })
   if (!verifyResult.valid) {
     throw new Error('Invalid token')
@@ -99,7 +99,7 @@ export const completeTwoFactorSetup = async (
   await setInCache(`2fa:secret:${userId}`, pendingSecret)
 
   // Remove the pending secret
-  await setInCache(`2fa:pending-secret:${userId}`, null)
+  await removeFromCache(`2fa:pending-secret:${userId}`)
 
   try {
     await updatePhase6AuthenticationProgress(userId, '2fa_setup_completed')
@@ -122,11 +122,11 @@ export const verifyTwoFactorToken = async (
 
   // Load the enabled secret
   const secret = await getFromCache<string>(`2fa:secret:${verification.userId}`)
+  if (!secret) {
+    throw new Error('2FA is not enabled')
+  }
 
   // Verify the token against the enabled secret
-  if (!secret) {
-    throw new Error('No secret found')
-  }
   const verifyResult = await verify({ token: verification.token, secret })
   if (!verifyResult.valid) {
     throw new Error('Invalid token')
