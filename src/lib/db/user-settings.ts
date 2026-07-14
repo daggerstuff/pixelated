@@ -1,5 +1,6 @@
 // Use server-only helper for MongoDB types
 import type { ObjectId } from '../server-only/mongodb-types'
+import { mongoClient } from './mongoClient'
 
 let ObjectId: unknown
 
@@ -53,10 +54,13 @@ export interface UpdateUserSettings {
  * Get user settings
  */
 export async function getUserSettings(
-  _userId: string,
+  userId: string,
 ): Promise<UserSettings | null> {
-  // TODO: Replace with MongoDB implementation
-  return null
+  const settings = await mongoClient.db
+    .collection('user_settings')
+    .findOne({ user_id: userId })
+
+  return settings as unknown as UserSettings | null
 }
 
 /**
@@ -66,8 +70,23 @@ export async function createUserSettings(
   settings: NewUserSettings,
   _request?: Request,
 ): Promise<UserSettings> {
-  // TODO: Replace with MongoDB implementation
-  return settings
+  await ensureUserSettingsIndex()
+  const now = new Date()
+  const result = await mongoClient.db
+    .collection('user_settings')
+    .findOneAndUpdate(
+      { user_id: settings.user_id },
+      {
+        $setOnInsert: {
+          ...settings,
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      { upsert: true, returnDocument: 'after' },
+    )
+
+  return result as unknown as UserSettings
 }
 
 /**
@@ -78,40 +97,86 @@ export async function updateUserSettings(
   updates: UpdateUserSettings,
   _request?: Request,
 ): Promise<UserSettings> {
-  // TODO: Replace with MongoDB implementation
-  return { ...updates, user_id: userId } as UserSettings
+  const set: Record<string, unknown> = { updatedAt: new Date() }
+  for (const [key, value] of Object.entries(updates)) {
+    if (key === 'preferences' && value && typeof value === 'object') {
+      for (const [pkey, pval] of Object.entries(
+        value as Record<string, unknown>,
+      )) {
+        set[`preferences.${pkey}`] = pval
+      }
+    } else {
+      set[key] = value
+    }
+  }
+
+  const result = await mongoClient.db
+    .collection('user_settings')
+    .findOneAndUpdate(
+      { user_id: userId },
+      { $set: set },
+      { returnDocument: 'after' },
+    )
+
+  if (!result) {
+    throw new Error('Failed to update user settings')
+  }
+
+  return result as unknown as UserSettings
+}
+
+let userSettingsIndexEnsured = false
+
+async function ensureUserSettingsIndex(): Promise<void> {
+  if (userSettingsIndexEnsured) return
+  await mongoClient.db
+    .collection('user_settings')
+    .createIndex({ user_id: 1 }, { unique: true })
+  userSettingsIndexEnsured = true
 }
 
 /**
  * Get or create user settings
+ *
+ * Uses an atomic findOneAndUpdate with upsert so concurrent callers cannot
+ * create duplicate documents for the same user. A unique index on `user_id`
+ * enforces the invariant at the database level.
  */
 export async function getOrCreateUserSettings(
   userId: string,
-  request?: Request,
+  _request?: Request,
 ): Promise<UserSettings> {
-  // Try to get existing settings
-  const settings = await getUserSettings(userId)
+  await ensureUserSettingsIndex()
 
-  // If settings exist, return them
-  if (settings) {
-    return settings
+  const now = new Date()
+  const result = await mongoClient.db
+    .collection('user_settings')
+    .findOneAndUpdate(
+      { user_id: userId },
+      {
+        $setOnInsert: {
+          user_id: userId,
+          theme: 'system',
+          notifications_enabled: true,
+          email_notifications: true,
+          language: 'en',
+          preferences: {
+            showWelcomeScreen: true,
+            autoSave: true,
+            fontSize: 'medium',
+          },
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      { upsert: true, returnDocument: 'after' },
+    )
+
+  if (!result) {
+    throw new Error('Failed to get or create user settings')
   }
 
-  // Otherwise, create default settings
-  const defaultSettings: NewUserSettings = {
-    user_id: userId,
-    theme: 'system',
-    notifications_enabled: true,
-    email_notifications: true,
-    language: 'en',
-    preferences: {
-      showWelcomeScreen: true,
-      autoSave: true,
-      fontSize: 'medium',
-    },
-  }
-
-  return createUserSettings(defaultSettings, request)
+  return result as unknown as UserSettings
 }
 
 /**
