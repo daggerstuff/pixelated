@@ -70,19 +70,23 @@ export async function createUserSettings(
   settings: NewUserSettings,
   _request?: Request,
 ): Promise<UserSettings> {
+  await ensureUserSettingsIndex()
   const now = new Date()
-  const result = await mongoClient.db.collection('user_settings').insertOne({
-    ...settings,
-    createdAt: now,
-    updatedAt: now,
-  })
+  const result = await mongoClient.db
+    .collection('user_settings')
+    .findOneAndUpdate(
+      { user_id: settings.user_id },
+      {
+        $setOnInsert: {
+          ...settings,
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      { upsert: true, returnDocument: 'after' },
+    )
 
-  return {
-    ...settings,
-    _id: result.insertedId,
-    createdAt: now,
-    updatedAt: now,
-  } as unknown as UserSettings
+  return result as unknown as UserSettings
 }
 
 /**
@@ -93,16 +97,24 @@ export async function updateUserSettings(
   updates: UpdateUserSettings,
   _request?: Request,
 ): Promise<UserSettings> {
+  const set: Record<string, unknown> = { updatedAt: new Date() }
+  for (const [key, value] of Object.entries(updates)) {
+    if (key === 'preferences' && value && typeof value === 'object') {
+      for (const [pkey, pval] of Object.entries(
+        value as Record<string, unknown>,
+      )) {
+        set[`preferences.${pkey}`] = pval
+      }
+    } else {
+      set[key] = value
+    }
+  }
+
   const result = await mongoClient.db
     .collection('user_settings')
     .findOneAndUpdate(
       { user_id: userId },
-      {
-        $set: {
-          ...updates,
-          updatedAt: new Date(),
-        },
-      },
+      { $set: set },
       { returnDocument: 'after' },
     )
 
