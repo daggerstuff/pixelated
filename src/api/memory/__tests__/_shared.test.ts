@@ -324,6 +324,25 @@ describe('withAuthenticatedMemoryRoute', () => {
     expect(data.error).toBe('Unauthorized')
     expect(handler).not.toHaveBeenCalled()
   })
+
+  it('calls handler if user is authenticated and returns the response', async () => {
+    const { withAuthenticatedMemoryRoute } = await import('../_shared')
+    const { getCurrentUser } = await import('@/lib/auth')
+
+    const mockUser = { id: 'user-1' }
+    vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser as any)
+
+    const mockResponse = new Response(JSON.stringify({ success: true }), { status: 200 })
+    const handler = vi.fn().mockResolvedValueOnce(mockResponse)
+    const route = withAuthenticatedMemoryRoute('testAction', handler)
+
+    const request = new Request('http://localhost')
+    const context = { request, params: { memoryId: 'test-id' } }
+    const response = await route(context)
+
+    expect(handler).toHaveBeenCalledWith(context, mockUser)
+    expect(response).toBe(mockResponse)
+  })
 })
 
 describe('getGateway', () => {
