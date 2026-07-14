@@ -124,7 +124,7 @@ export function createThreatDetectionIntegration(
   const threatDetectionService = createThreatDetectionService(
     orchestrator,
     rateLimiter,
-    config as any,
+    config,
   )
 
   const middleware = threatDetectionService.getMiddleware()

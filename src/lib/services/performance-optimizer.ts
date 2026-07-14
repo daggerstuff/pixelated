@@ -413,7 +413,7 @@ export class PerformanceOptimizer {
     }
 
     // stored items are any[]; cast to T[] for the processor
-    const items = [...batch.items] as unknown as unknown[]
+    const items = [...batch.items]
     batch.items = []
 
     if (batch.timer) {

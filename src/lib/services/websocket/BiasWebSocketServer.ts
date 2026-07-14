@@ -624,7 +624,7 @@ export class BiasWebSocketServer {
         },
         version: '1.0.0',
         uptime: 0,
-      } as unknown as SystemStatusWebSocketEvent['data'],
+      },
     }
 
     await this.broadcastToSubscribers('system_status', statusEvent)

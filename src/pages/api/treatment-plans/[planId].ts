@@ -100,7 +100,7 @@ export const GET: APIRoute = protectRoute()(async ({
           ? 'Draft'
           : dbPlan.status === 'active'
             ? 'Active'
-            : 'Completed') as TreatmentPlan['status'],
+            : 'Completed'),
       generalNotes: dbPlan.notes,
       createdAt:
         dbPlan.createdAt instanceof Date

@@ -162,7 +162,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       metricsRetention: config.metricsRetention ?? 86400000,
       enableRealTimeAlerting: config.enableRealTimeAlerting ?? true,
       enableAIInsights: config.enableAIInsights ?? true,
-    } as MonitoringConfig
+    }
 
     this.redis = redis as Redis
     this.mongoClient = mongoClient!
@@ -1373,7 +1373,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         createdAt: new Date(),
         updatedAt: new Date(),
         errors,
-      } as Alert
+      }
     }
 
     try {
@@ -1435,7 +1435,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         createdAt: new Date(),
         updatedAt: new Date(),
         errors: [(error as Error).message],
-      } as Alert
+      }
     }
   }
 
@@ -1501,11 +1501,11 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   public async getActiveAlerts(): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = (await asRedisOps(this.redis).lrange(
+        const cached = await asRedisOps(this.redis).lrange(
           'alerts:active',
           0,
           -1,
-        )) as unknown as string[]
+        )
         if (cached && cached.length > 0)
           return cached.map((s: string) => JSON.parse(s) as Alert)
       }
@@ -1522,11 +1522,11 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   public async getAlertsBySeverity(severity: string): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = (await asRedisOps(this.redis).lrange(
+        const cached = await asRedisOps(this.redis).lrange(
           `alerts:${severity}`,
           0,
           -1,
-        )) as unknown as string[]
+        )
         if (cached && cached.length > 0)
           return cached.map((s: string) => JSON.parse(s) as Alert)
       }
@@ -1570,11 +1570,11 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     try {
       if (this.redis) {
         // Simplified: ignore timeRange for stub/test satisfaction, just return list
-        const cached = (await asRedisOps(this.redis).lrange(
+        const cached = await asRedisOps(this.redis).lrange(
           `metrics:${name}`,
           0,
           -1,
-        )) as unknown as string[]
+        )
         if (cached) return cached.map((s: string) => JSON.parse(s))
       }
       return []

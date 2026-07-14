@@ -101,7 +101,7 @@ export function useValidatedForm<T extends FieldValues>({
     isSubmitting,
     fieldErrors,
     clearErrors,
-  } as any
+  }
 }
 
 /**

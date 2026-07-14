@@ -92,13 +92,13 @@ export class RateLimitAnalyticsService {
       }
 
       // Record hash fields directly (no pipeline — avoids INCR/HINCRBY type conflict on same key)
-      await redis.hincrby!(analyticsKey, `${eventType}_total`, 1)
-      await redis.hincrby!(analyticsKey, 'total_events', 1)
-      await redis.hset!(analyticsKey, 'last_updated', String(timestamp))
+      await redis.hincrby(analyticsKey, `${eventType}_total`, 1)
+      await redis.hincrby(analyticsKey, 'total_events', 1)
+      await redis.hset(analyticsKey, 'last_updated', String(timestamp))
       await redis.expire(analyticsKey, 86400 * 30)
-      await redis.hincrby!(hourlyKey, `${eventType}_total`, 1)
-      await redis.hincrby!(hourlyKey, 'total_events', 1)
-      await redis.hset!(hourlyKey, 'last_updated', String(timestamp))
+      await redis.hincrby(hourlyKey, `${eventType}_total`, 1)
+      await redis.hincrby(hourlyKey, 'total_events', 1)
+      await redis.hset(hourlyKey, 'last_updated', String(timestamp))
       await redis.expire(hourlyKey, 86400 * 7)
 
       // Check for alert conditions
@@ -136,7 +136,7 @@ export class RateLimitAnalyticsService {
         if (!redis) {
           continue
         }
-        const dailyData = (await redis.hgetall!(dailyKey)) ?? {}
+        const dailyData = (await redis.hgetall(dailyKey)) ?? {}
 
         if (Object.keys(dailyData).length > 0) {
           const analyticsEntry: RateLimitAnalytics = {
@@ -197,7 +197,7 @@ export class RateLimitAnalyticsService {
       if (!redis) {
         continue
       }
-      const data = (await redis.hgetall!(hourlyKey)) ?? {}
+      const data = (await redis.hgetall(hourlyKey)) ?? {}
 
       if (Object.keys(data).length > 0) {
         hourlyData.push({
@@ -232,7 +232,7 @@ export class RateLimitAnalyticsService {
       if (!redis) {
         throw new Error('Redis not available')
       }
-      const ruleKeys = await redis.keys!(`${this.analyticsPrefix}*:${today}`)
+      const ruleKeys = await redis.keys(`${this.analyticsPrefix}*:${today}`)
       let totalRequests = 0
       let blockedRequests = 0
       let attackDetections = 0
@@ -241,7 +241,7 @@ export class RateLimitAnalyticsService {
       const identifierStats: Record<string, number> = {}
 
       for (const key of ruleKeys) {
-        const data = (await redis.hgetall!(key)) ?? {}
+        const data = (await redis.hgetall(key)) ?? {}
         const ruleName = key.split(':')[1] ?? 'unknown'
 
         const requests = parseInt(data['request_total'] ?? '0')
@@ -469,7 +469,7 @@ export class RateLimitAnalyticsService {
       if (!redis) {
         return []
       }
-      const alertKeys = await redis.keys!(`${this.alertPrefix}*`)
+      const alertKeys = await redis.keys(`${this.alertPrefix}*`)
       const recentKeys = alertKeys
         .map((key: string) => ({
           key,
@@ -655,7 +655,7 @@ export class RateLimitAnalyticsService {
       if (!redis) {
         return
       }
-      const keys = await redis.keys!(`${this.analyticsPrefix}*`)
+      const keys = await redis.keys(`${this.analyticsPrefix}*`)
       const keysToDelete = keys.filter((key: string) => {
         const keyDate = key.split(':').pop()
         return keyDate && keyDate < cutoffStr
