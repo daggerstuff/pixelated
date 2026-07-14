@@ -16,7 +16,7 @@ jobs:
       # ----------------------------------------------------------------------
       # TypeScript / JavaScript / Astro (pnpm + oxlint / oxfmt / prettier)
       # ----------------------------------------------------------------------
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         with:
           version: 11.11.0
       - uses: actions/setup-node@v6
@@ -38,7 +38,7 @@ jobs:
         with:
           version: '0.4.20'
       # Fix lint errors, then format code
-      - run: uv tool install "ruff==0.15.17"
+      - run: uv tool install "ruff>=0.15.17"
       - run: ruff check --fix-only .
       - run: ruff format .
 

@@ -185,7 +185,7 @@ export async function decryptSensitiveData(
  * Useful for state that needs to be passed between client and server.
  */
 export function createSecureToken(
-  payload: any,
+  payload: Record<string, unknown>,
   expiresIn: number = 3600,
 ): string {
   const tokenData = {
@@ -225,15 +225,15 @@ export function verifySecureToken(token: string): unknown | null {
         ? Buffer.from(encodedData, 'base64').toString('utf-8')
         : atob(encodedData)
 
-    const payload = JSON.parse(dataString)
+    const payload = JSON.parse(dataString) as Record<string, unknown>
 
     // Check expiration
     const now = Math.floor(Date.now() / 1000)
-    if (payload.exp && payload.exp < now) {
+    if (typeof payload.exp === 'number' && payload.exp < now) {
       return null
     }
 
-    return payload as unknown
+    return payload
   } catch {
     return null
   }

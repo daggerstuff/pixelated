@@ -270,7 +270,7 @@ export function isSessionValid(session: Session): boolean {
  */
 export async function getUserProfile(userId: string) {
   try {
-    const user = await userManager.getUserById(userId)
+    const user = await userManager.getUserById(userId) as Record<string, unknown> | null
 
     if (!user) {
       logger.error('User not found:', userId)
@@ -278,11 +278,11 @@ export async function getUserProfile(userId: string) {
     }
 
     return {
-      id: user.id,
-      email: user['email'],
-      fullName: `${user.first_name} ${user.last_name}`,
-      avatarUrl: user.avatar_url,
-      role: user.role,
+      id: user.id as string,
+      email: user.email as string,
+      fullName: `${user.first_name as string} ${user.last_name as string}`,
+      avatarUrl: user.avatar_url as string,
+      role: user.role as string,
     }
   } catch (error: unknown) {
     logger.error('Error in getUserProfile:', error)
