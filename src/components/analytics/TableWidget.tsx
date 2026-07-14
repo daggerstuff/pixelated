@@ -124,7 +124,9 @@ export function TableWidget({
     // Set up refresh interval if provided
     let intervalId: NodeJS.Timeout | null = null
     if (refreshInterval && refreshInterval > 0) {
-      intervalId = setInterval(loadData, refreshInterval)
+      intervalId = setInterval(() => {
+        void loadData()
+      }, refreshInterval)
     }
 
     return () => {
@@ -158,7 +160,10 @@ export function TableWidget({
       const searchLower = debouncedSearchTerm.toLowerCase()
       result = result.filter((row) =>
         columns.some((column) => {
-          const value = String(row[column.key] ?? '').toLowerCase()
+          const rawVal = row[column.key]
+          const value = typeof rawVal === 'string' || typeof rawVal === 'number' || typeof rawVal === 'boolean'
+            ? String(rawVal).toLowerCase()
+            : ''
           return value.includes(searchLower)
         }),
       )
@@ -181,7 +186,10 @@ export function TableWidget({
           return direction === 'asc' ? 1 : -1
         }
 
-        const comparison = String(aValue).localeCompare(String(bValue))
+        const aStr = typeof aValue === 'string' || typeof aValue === 'number' || typeof aValue === 'boolean' ? String(aValue) : ''
+        const bStr = typeof bValue === 'string' || typeof bValue === 'number' || typeof bValue === 'boolean' ? String(bValue) : ''
+
+        const comparison = aStr.localeCompare(bStr)
         return direction === 'asc' ? comparison : -comparison
       })
     }
@@ -202,8 +210,9 @@ export function TableWidget({
           columns
             .map((col) => {
               const value = row[col.key]
+              const strVal = typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
               // Escape quotes and wrap in quotes
-              const escaped = String(value ?? '').replace(/"/g, '""')
+              const escaped = strVal.replace(/"/g, '""')
               return `"${escaped}"`
             })
             .join(','),
@@ -311,7 +320,7 @@ export function TableWidget({
                       <TableCell key={`${rowIndex}-${column.key}`}>
                         {column.render
                           ? column.render(row[column.key], row)
-                          : String(row[column.key] ?? '')}
+                          : typeof row[column.key] === 'string' || typeof row[column.key] === 'number' || typeof row[column.key] === 'boolean' ? String(row[column.key]) : ''}
                       </TableCell>
                     ))}
                   </TableRow>
