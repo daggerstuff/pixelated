@@ -90,7 +90,7 @@ export async function getDataDeletionRequest(
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     const request = await collection.findOne({ id })
 
-    return request as DataDeletionRequest | null
+    return request
   } catch (error: unknown) {
     logger.error('Error in getDataDeletionRequest', {
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -128,7 +128,7 @@ export async function getAllDataDeletionRequests(filters?: {
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     const requests = await collection.find(query).toArray()
 
-    return requests as DataDeletionRequest[]
+    return requests
   } catch (error: unknown) {
     logger.error('Error in getAllDataDeletionRequests', {
       error: error instanceof Error ? error.message : 'Unknown error',

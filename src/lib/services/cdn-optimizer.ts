@@ -361,7 +361,7 @@ export class CDNEdgeOptimizer {
         .map((bp) => {
           const url = this.optimizeAssetUrl(imagePath, {
             width: bp,
-            format: format as any,
+            format: format,
             quality: format === 'avif' ? 80 : 85,
           })
           return `${url} ${bp}w`

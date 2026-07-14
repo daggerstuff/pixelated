@@ -140,7 +140,7 @@ export async function updateMessage(
     },
   )
 
-  return result['value'] as unknown as Message
+  return result['value']
 }
 
 /**

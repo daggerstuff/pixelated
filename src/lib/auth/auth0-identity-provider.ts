@@ -27,7 +27,7 @@ export class Auth0IdentityProvider implements IdentityProvider {
     tokenType: 'access' | 'refresh',
   ): Promise<TokenValidationResult> {
     const result = await validateToken(token, tokenType)
-    return result as TokenValidationResult
+    return result
   }
 
   async getUserById(userId: string): Promise<IdentityProviderUser | null> {

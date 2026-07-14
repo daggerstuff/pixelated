@@ -33,7 +33,7 @@ const logger = createBuildSafeLogger('auth0-multidimensional-emotions-api')
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
@@ -139,7 +139,7 @@ export const GET: APIRoute = async ({ request }) => {
           ({
             ...e,
             timestamp: e.timestamp,
-          }) as TypesEmotionAnalysis,
+          }),
       )
       emotionData.push(...emotionsForDTO)
     }

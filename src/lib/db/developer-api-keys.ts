@@ -109,7 +109,7 @@ export class DeveloperApiKeyManager {
 
     if (
       apiKey['expires_at'] &&
-      new Date() > new Date(apiKey['expires_at'] as unknown as string)
+      new Date() > new Date(apiKey['expires_at'])
     ) {
       await this.recordFailedAttempt(apiKey['id'], 'expired')
       return { valid: false, error: 'API key has expired' }
@@ -134,7 +134,7 @@ export class DeveloperApiKeyManager {
 
     return {
       valid: true,
-      api_key: apiKey as unknown as DeveloperApiKey,
+      api_key: apiKey,
       remainingRequests: rateLimitResult.remaining,
       resetTimeMs: rateLimitResult.resetTimeMs,
     }

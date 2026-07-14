@@ -258,10 +258,10 @@ class ProductionThreatDetectionService {
       const db = mongoClient.db
       await db.collection('threat_detections').insertOne({
         timestamp: new Date(),
-        ip: request['ip'] as string,
-        userAgent: request['userAgent'] as string,
-        endpoint: request['path'] as string,
-        method: request['method'] as string,
+        ip: request['ip'],
+        userAgent: request['userAgent'],
+        endpoint: request['path'],
+        method: request['method'],
         riskScore,
         threatLevel,
         action,

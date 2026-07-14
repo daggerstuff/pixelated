@@ -6,12 +6,7 @@
 
 ### Runtime Versions
 
-| Tool    | Version | Config                   |
-| ------- | ------- | ------------------------ |
-| Node.js | 24.16.0 | `.nvmrc`                 |
-| pnpm    | 11.11.0 | `package.json`           |
-| Python  | 3.13    | `.python-version`        |
-| uv      | latest  | preferred Python manager |
+See manifests: `.nvmrc` (Node), `package.json` (pnpm), `.python-version` (Python).
 
 ### Required Services
 
@@ -136,14 +131,20 @@ Foresight is persistent memory layer for AI agents — shared across all machine
 | Reviewing work over a time window          | `query_memories_temporal`    | Pull memories from last 7 days for weekly reflection                     |
 | Processing a session transcript            | `process_session_transcript` | Extract memories from a completed agent session                          |
 
-### Session Startup Workflow
+### Session Startup Workflow (GATE — do not skip)
 
-Every session doing real work should start here:
+This is a hard gate, not a suggestion. Every session touching real work MUST run the foresight continuity read as its **first action** — before any code edit,
+exploration, or planning prose.
 
-1. `manage_context_blocks` → get `project_context` + `pending_items`
-2. `search_memories` w/ keywords related to your task
-3. Use findings to inform your approach
-4. `manage_memories` to store lessons or update durable memory when needed
+1. **GATE read (mandatory first action):** call `manage_context_blocks` with action `get` for `project_context` AND `pending_items`.
+   No exceptions for "I already know", "quick task", or "I'll check after". Treat it like `git status` — first, always.
+2. **Show your work (no silent skip):** in your first reply, state what the blocks returned — quote the entry count and a one-line summary per block.
+   Example: "project_context: 3 entries — <one-line>; pending_items: 2 — <one-line>." A skip that isn't named is one the human can't audit.
+3. **`search_memories`** w/ keywords related to your task — prior decisions live in memories; confirm or contradict what the blocks said.
+4. **Use findings to inform your approach** — if a memory contradicts your plan, say so before editing.
+5. **`manage_memories` to store** durable lessons/decisions when work completes; `manage_context_blocks` `update` on `pending_items` when scope shifts.
+
+**Skipping the gate is not permitted without naming it.** If you decide it doesn't apply (pure conversation, no code), say so explicitly in the first reply and why.
 
 ### CLI Quick Reference
 

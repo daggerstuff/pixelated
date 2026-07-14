@@ -83,7 +83,7 @@ function initializeAuth0Clients() {
       clientId: auth0Config.managementClientId,
       clientSecret: auth0Config.managementClientSecret,
       audience: `https://${auth0Config.domain}/api/v2/`,
-    }) as ExtendedManagementClient
+    })
   }
 }
 
@@ -584,7 +584,7 @@ export class Auth0MFAService {
     }
 
     const getGuardianEnrollments = auth0Management.users
-      .getGuardianEnrollments as (params: { id: string }) => Promise<unknown>
+      .getGuardianEnrollments
 
     return await getGuardianEnrollments({ id: userId })
   }

@@ -19,7 +19,7 @@ const logger = createBuildSafeLogger('default')
 export function createSignedVerificationToken(payload: unknown): string {
   try {
     const timestamp = Date.now()
-    const tokenPayload = JSON.parse(JSON.stringify(payload))
+    const tokenPayload = JSON.parse(JSON.stringify(payload)) as Record<string, unknown>
     const token = {
       ...tokenPayload,
       iat: timestamp,
@@ -41,10 +41,10 @@ export function createSignedVerificationToken(payload: unknown): string {
  * @param token - The token to verify
  * @returns The decoded payload if valid, null otherwise
  */
-export function verifyToken(token: string): unknown | null {
+export function verifyToken(token: string): Record<string, unknown> | null {
   try {
     // Use atob for browser compatibility instead of Buffer
-    const parsed = JSON.parse(atob(token))
+    const parsed = JSON.parse(atob(token)) as Record<string, unknown>
 
     if (
       typeof parsed !== 'object' ||
@@ -56,8 +56,8 @@ export function verifyToken(token: string): unknown | null {
       return null
     }
 
-    const exp = Object.getOwnPropertyDescriptor(parsed, 'exp')?.value
-    const iat = Object.getOwnPropertyDescriptor(parsed, 'iat')?.value
+    const exp = parsed.exp
+    const iat = parsed.iat
 
     if (typeof exp !== 'number' || typeof iat !== 'number') {
       logger.warn('Token payload invalid', { token })

@@ -88,7 +88,7 @@ export const GET = protectRoute({
     // Fetch total count
     const countQuery = `SELECT COUNT(*) as total FROM users ${whereClause}`
     const countResult = await query(countQuery, queryParams)
-    const count = parseInt(countResult.rows[0]?.['total'] || '0', 10)
+    const count = parseInt(countResult.rows[0]?.['total'] ?? '0', 10)
     // Fetch users
     const limitIndex = queryParams.length + 1
     const offsetIndex = queryParams.length + 2

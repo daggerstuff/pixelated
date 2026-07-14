@@ -1,10 +1,11 @@
 ---
 interface Props {
-  columns?: 2 | 3;
-  class?: string;
+  columns?: 2 | 3
+  class?: string
 }
-const { columns = 3, class: className = '' } = Astro.props;
+const { columns = 3, class: className = '' } = Astro.props
 ---
+
 <div class={`fm-hairline-grid fm-hairline-grid--${columns} ${className}`}>
   <slot />
 </div>

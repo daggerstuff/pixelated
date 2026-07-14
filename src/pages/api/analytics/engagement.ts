@@ -77,8 +77,8 @@ export const GET = async ({ request }: { request: Request }) => {
         const dd = dailyData[idx]
         dd.sessions++
         if (session.userId) dd.uniqueUsers.add(session.userId)
-        if (typeof session.properties?.duration === 'number') {
-          dd.durations.push(session.properties.duration)
+        if (typeof session.properties?.['duration'] === 'number') {
+          dd.durations.push(session.properties['duration'])
         }
       }
     })
@@ -147,8 +147,8 @@ export const GET = async ({ request }: { request: Request }) => {
     const interactionCounts: Record<string, number> = {}
     userActions.forEach((action) => {
       const type =
-        (action.properties?.actionType as string) ||
-        (action.properties?.type as string) ||
+        (action.properties?.['actionType'] as string) ||
+        (action.properties?.['type'] as string) ||
         'General Action'
       interactionCounts[type] = (interactionCounts[type] || 0) + 1
     })
@@ -156,7 +156,7 @@ export const GET = async ({ request }: { request: Request }) => {
     let interactionBreakdown: InteractionMetric[] = Object.entries(
       interactionCounts,
     )
-      .map(([label, value]) => ({ label: String(label), value: Number(value) }))
+      .map(([label, value]) => ({ label: label, value: value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5)
 
@@ -177,18 +177,18 @@ export const GET = async ({ request }: { request: Request }) => {
     const recentActivity: ActivityEntry[] = allRecentEvents.map((event) => {
       const isSession = event.type === EventType.THERAPY_SESSION
       return {
-        user: event.userId || 'Anonymous',
+        user: event.userId ?? 'Anonymous',
         action: isSession
           ? 'Session Completed'
-          : String(event.properties?.actionType || 'Action Performed'),
+          : String(event.properties?.['actionType'] ?? 'Action Performed'),
         duration:
-          typeof event.properties?.duration === 'number'
-            ? event.properties.duration
+          typeof event.properties?.['duration'] === 'number'
+            ? event.properties['duration']
             : 0,
         timestamp: event.timestamp,
         sessionScore:
-          typeof event.properties?.score === 'number'
-            ? event.properties.score
+          typeof event.properties?.['score'] === 'number'
+            ? event.properties['score']
             : 0,
       }
     })
@@ -203,7 +203,7 @@ export const GET = async ({ request }: { request: Request }) => {
 
     // Average duration across all sessions
     const allDurations = therapySessions
-      .map((s) => s.properties?.duration)
+      .map((s) => s.properties?.['duration'])
       .filter((d): d is number => typeof d === 'number')
 
     const avgSessionDuration =

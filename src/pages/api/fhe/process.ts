@@ -73,7 +73,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     // Process the encrypted data
     const result = await fheService.processEncrypted(
       encryptedData,
-      operation as unknown as FHEOperation,
+      operation,
       params,
     )
 

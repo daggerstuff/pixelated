@@ -1,17 +1,20 @@
 ---
 interface Props {
-  variant?: 'badge' | 'panel';
+  variant?: 'badge' | 'panel'
 }
-const { variant = 'panel' } = Astro.props;
+const { variant = 'panel' } = Astro.props
 ---
+
 <div class={`fm-code-deco fm-code-deco--${variant}`}>
-  {/* 
+  {
+    /*
     Code-as-decoration motif classes:
     .fm-prop-key   -> orange (--fm-accent)
     .fm-prop-type  -> cyan   (--fm-accent-2)
     .fm-prop-val   -> clinical green (--fm-accent-3)
     .fm-prop-comment -> muted italic (--fm-muted-soft)
     .fm-prop-tag   -> muted (--fm-muted)
-  */}
+  */
+  }
   <slot />
 </div>

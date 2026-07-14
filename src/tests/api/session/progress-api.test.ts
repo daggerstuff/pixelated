@@ -290,7 +290,7 @@ describe('Session Progress API', () => {
         ]),
       )
 
-      const response = await GET(mockRequest as any)
+      const response = await GET(mockRequest)
       const responseBody = await parseResponseBody(response, hasSuccessGetShape)
 
       expect(response.status).toBe(200)
@@ -304,7 +304,7 @@ describe('Session Progress API', () => {
         'http://localhost:3000/api/session/progress',
       )
 
-      const response = await GET(mockRequest as any)
+      const response = await GET(mockRequest)
       const responseBody = await parseResponseBody(
         response,
         hasErrorResponseShape,
@@ -322,7 +322,7 @@ describe('Session Progress API', () => {
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(0))
 
-      const response = await GET(mockRequest as any)
+      const response = await GET(mockRequest)
       const responseBody = await parseResponseBody(
         response,
         hasErrorResponseShape,
@@ -340,7 +340,7 @@ describe('Session Progress API', () => {
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockRejectedValueOnce(new Error('Database error'))
 
-      const response = await GET(mockRequest as any)
+      const response = await GET(mockRequest)
       const responseBody = await parseResponseBody(
         response,
         hasErrorResponseShape,

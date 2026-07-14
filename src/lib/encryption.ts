@@ -41,7 +41,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
 
   // Convert password to key material
   const encoder = new TextEncoder()
-  const keyMaterial = await webcrypto.subtle.importKey(
+  const keyMaterial = await (webcrypto.subtle as SubtleCrypto).importKey(
     'raw',
     encoder.encode(encryptionKey),
     'PBKDF2',
@@ -50,7 +50,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   )
 
   // Derive the actual encryption key
-  return webcrypto.subtle.deriveKey(
+  return (webcrypto.subtle as SubtleCrypto).deriveKey(
     {
       name: 'PBKDF2',
       salt: Buffer.from(salt),

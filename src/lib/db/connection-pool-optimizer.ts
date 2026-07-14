@@ -12,7 +12,7 @@ import { getLogger, type LoggerOptions } from '../logging'
 
 // Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
 
-const logger = getLogger({ prefix: 'connection-pool' } as LoggerOptions)
+const logger = getLogger({ prefix: 'connection-pool' })
 
 // Connection pool configuration
 interface OptimizedPoolConfig extends PoolConfig {
@@ -121,7 +121,7 @@ export class OptimizedConnectionPool extends EventEmitter {
    */
   private initializePool(): void {
     try {
-      this.pool = new Pool(this.config as import('pg').PoolConfig)
+      this.pool = new Pool(this.config)
 
       // Set up event listeners
       ;(this.pool as unknown as EventEmitter).on(
@@ -130,7 +130,7 @@ export class OptimizedConnectionPool extends EventEmitter {
           logger.debug('New client connected to database')
           this.metrics.totalConnections++
           this.updateMetrics()
-          this.emit('connection-acquired' as string, client)
+          this.emit('connection-acquired', client)
         },
       )
       ;(this.pool as unknown as EventEmitter).on(
@@ -142,7 +142,7 @@ export class OptimizedConnectionPool extends EventEmitter {
             this.metrics.totalConnections - 1,
           )
           this.updateMetrics()
-          this.emit('connection-released' as string, client)
+          this.emit('connection-released', client)
         },
       )
       ;(this.pool as unknown as EventEmitter).on(

@@ -145,7 +145,7 @@ export class DreamScheduler {
             body: JSON.stringify({ user_id: userId }),
             signal: timeoutSignal,
             agent: httpsAgent,
-          })
+          } as unknown as RequestInit)
           try {
             if (!response.ok) {
               const body = await response.text().catch(() => '')
@@ -174,7 +174,7 @@ export class DreamScheduler {
       const response = await fetch(`${baseUrl}/api/dream/users`, {
         signal: AbortSignal.timeout(10_000),
         agent: httpsAgent,
-      })
+      } as unknown as RequestInit)
       if (!response.ok) return []
       const data = (await response.json()) as { users?: string[] }
       return data?.users ?? []

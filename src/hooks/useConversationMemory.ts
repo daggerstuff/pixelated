@@ -187,7 +187,7 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
           role === 'client'
             ? (prevMetrics.clientMessages ?? 0) + 1
             : (prevMetrics.clientMessages ?? 0),
-      } as SessionProgressMetrics
+      }
 
       if (responseTime !== null) {
         const newResponses = prevResponses + 1

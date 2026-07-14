@@ -108,7 +108,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Generate enhanced recommendations
     const recommendations = await recommendationService.generateEnhancedRecommendations(clientId, {
-      ...(includePersonalization ? { personalizationOptions: {} as Record<string, unknown> } : {}),
+      ...(includePersonalization ? { personalizationOptions: {} } : {}),
       includeEfficacyStats,
       includeAlternatives: includeAlternativeApproaches,
       maxMediaRecommendations,

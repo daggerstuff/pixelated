@@ -4,20 +4,9 @@
 
 - Governs Claude Code sessions for `Pixelated Empathy`.
 - Main source of truth: root `AGENTS.md`.
-- Stack: Astro, React 19, TypeScript, Express, Python AI pipelines (`pnpm`
-  `uv`).
+- Python via `uv run` (non-default choice), JS via `pnpm`. Full script list
+  in `package.json` + `pyproject.toml` — run `pnpm run` to enumerate.
 - Keep this file concise and high-signal (shorter files improve adherence).
-
-## Commands (run first)
-
-- `pnpm dev` `pnpm dev:all-services` `pnpm dev:ai-service`
-- `pnpm dev:training-server` `pnpm dev:websocket` `pnpm dev:bias-detection`
-- `uv run pytest` `uv run python -m ...`
-- `pnpm test` `pnpm test:unit` `pnpm test:integration`
-- `pnpm test:evals` `pnpm test:bias-detection`
-- `pnpm e2e` `pnpm e2e:ui` `pnpm e2e:debug`
-- `pnpm lint` `pnpm lint:fix` `pnpm format` `pnpm typecheck`
-- `pnpm build` `pnpm build:analyze` `pnpm deploy` `pnpm deploy:prod`
 
 ## Rules
 

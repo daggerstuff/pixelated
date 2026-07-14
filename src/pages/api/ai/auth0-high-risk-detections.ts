@@ -14,7 +14,7 @@ export const GET = async ({ request, url }) => {
 
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(
