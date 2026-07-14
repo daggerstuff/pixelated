@@ -39,7 +39,9 @@ export function ChatShell({ children, autoScrollDeps }: ChatShellProps) {
     }
 
     container.addEventListener('scroll', handleScroll)
-    return () => container.removeEventListener('scroll', handleScroll)
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
   return (
