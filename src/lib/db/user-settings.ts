@@ -71,13 +71,11 @@ export async function createUserSettings(
   _request?: Request,
 ): Promise<UserSettings> {
   const now = new Date()
-  const result = await mongoClient.db
-    .collection('user_settings')
-    .insertOne({
-      ...settings,
-      createdAt: now,
-      updatedAt: now,
-    })
+  const result = await mongoClient.db.collection('user_settings').insertOne({
+    ...settings,
+    createdAt: now,
+    updatedAt: now,
+  })
 
   return {
     ...settings,
@@ -103,9 +101,9 @@ export async function updateUserSettings(
         $set: {
           ...updates,
           updatedAt: new Date(),
-        }
+        },
       },
-      { returnDocument: 'after' }
+      { returnDocument: 'after' },
     )
 
   if (!result) {
@@ -115,36 +113,58 @@ export async function updateUserSettings(
   return result as unknown as UserSettings
 }
 
+let userSettingsIndexEnsured = false
+
+async function ensureUserSettingsIndex(): Promise<void> {
+  if (userSettingsIndexEnsured) return
+  await mongoClient.db
+    .collection('user_settings')
+    .createIndex({ user_id: 1 }, { unique: true })
+  userSettingsIndexEnsured = true
+}
+
 /**
  * Get or create user settings
+ *
+ * Uses an atomic findOneAndUpdate with upsert so concurrent callers cannot
+ * create duplicate documents for the same user. A unique index on `user_id`
+ * enforces the invariant at the database level.
  */
 export async function getOrCreateUserSettings(
   userId: string,
-  request?: Request,
+  _request?: Request,
 ): Promise<UserSettings> {
-  // Try to get existing settings
-  const settings = await getUserSettings(userId)
+  await ensureUserSettingsIndex()
 
-  // If settings exist, return them
-  if (settings) {
-    return settings
+  const now = new Date()
+  const result = await mongoClient.db
+    .collection('user_settings')
+    .findOneAndUpdate(
+      { user_id: userId },
+      {
+        $setOnInsert: {
+          user_id: userId,
+          theme: 'system',
+          notifications_enabled: true,
+          email_notifications: true,
+          language: 'en',
+          preferences: {
+            showWelcomeScreen: true,
+            autoSave: true,
+            fontSize: 'medium',
+          },
+          createdAt: now,
+          updatedAt: now,
+        },
+      },
+      { upsert: true, returnDocument: 'after' },
+    )
+
+  if (!result) {
+    throw new Error('Failed to get or create user settings')
   }
 
-  // Otherwise, create default settings
-  const defaultSettings: NewUserSettings = {
-    user_id: userId,
-    theme: 'system',
-    notifications_enabled: true,
-    email_notifications: true,
-    language: 'en',
-    preferences: {
-      showWelcomeScreen: true,
-      autoSave: true,
-      fontSize: 'medium',
-    },
-  }
-
-  return createUserSettings(defaultSettings, request)
+  return result as unknown as UserSettings
 }
 
 /**
