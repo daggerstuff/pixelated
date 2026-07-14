@@ -90,9 +90,6 @@ export const completeTwoFactorSetup = async (
   }
 
   // Verify the token against the pending secret
-  if (!pendingSecret) {
-    throw new Error('No pending secret found')
-  }
   const verifyResult = await verify({ token: _token, secret: pendingSecret })
   if (!verifyResult.valid) {
     throw new Error('Invalid token')
@@ -130,12 +127,6 @@ export const verifyTwoFactorToken = async (
   }
 
   // Verify the token against the enabled secret
-<<<<<<< HEAD
-=======
-  if (!secret) {
-    throw new Error('No secret found')
-  }
->>>>>>> origin/staging
   const verifyResult = await verify({ token: verification.token, secret })
   if (!verifyResult.valid) {
     throw new Error('Invalid token')

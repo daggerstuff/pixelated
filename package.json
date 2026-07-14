@@ -387,6 +387,7 @@
     "@types/pdfkit": "^0.17.6",
     "@types/pg": "latest",
     "@types/qrcode": "^1.5.6",
+    "@types/mongo-sanitize": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/slug": "latest",
