@@ -257,7 +257,7 @@ async function main() {
       environment: values.environment,
       notify: values.notify,
       version: values.version,
-      fallbackBranch: values.fallbackBranch as string | undefined,
+      fallbackBranch: values.fallbackBranch,
     };
 
     const success = await performRollback(options);
