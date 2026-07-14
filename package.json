@@ -250,6 +250,7 @@
     "@tarquinen/opencode-dcp": "latest",
     "@tensorflow/tfjs": "latest",
     "@tensorflow/tfjs-layers": "latest",
+    "@types/geoip-lite": "^1.4.4",
     "@types/jsonwebtoken": "latest",
     "@types/multer": "latest",
     "@types/nodemailer": "latest",
@@ -288,6 +289,7 @@
     "express-rate-limit": "^8.5.2",
     "flexsearch": "latest",
     "framer-motion": "^12.42.2",
+    "geoip-lite": "^2.0.3",
     "helmet": "^8.3.0",
     "html-escaper": "latest",
     "i18next": "^26.3.6",
@@ -300,6 +302,7 @@
     "lucide-react": "latest",
     "medium-zoom": "latest",
     "mixpanel-browser": "^2.81.0",
+    "mongo-sanitize": "latest",
     "mongodb": "7.5.0",
     "mongodb-query-validator": "^1.4.0",
     "mongoose": "^9.7.4",
@@ -343,7 +346,7 @@
     "standardwebhooks": "^1.0.0",
     "stream-browserify": "latest",
     "tailwind-merge": "latest",
-    "tar": "^7.5.19",
+    "tar": "^7.5.20",
     "twilio": "latest",
     "uuid": "^14.0.1",
     "vue": "latest",
@@ -374,6 +377,7 @@
     "@types/bcrypt": "latest",
     "@types/compression": "latest",
     "@types/cors": "latest",
+    "@types/crypto-js": "^4.2.2",
     "@types/express": "latest",
     "@types/mdast": "latest",
     "@types/morgan": "latest",
@@ -383,6 +387,7 @@
     "@types/pdfkit": "^0.17.6",
     "@types/pg": "latest",
     "@types/qrcode": "^1.5.6",
+    "@types/mongo-sanitize": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "@types/slug": "latest",
@@ -480,7 +485,7 @@
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
     "wrangler": "^4.110.0",
-    "yaml": "2.8.4"
+    "yaml": "2.9.0"
   },
   "peerDependencies": {
     "hono": "^4.12.14"

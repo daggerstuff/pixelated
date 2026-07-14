@@ -27,7 +27,7 @@ const logger = createBuildSafeLogger('auth0-session-analysis-api')
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request as unknown as Request)
+    const token = extractTokenFromRequest(request)
 
     if (!token) {
       return new Response(

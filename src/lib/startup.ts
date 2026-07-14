@@ -29,7 +29,7 @@ export async function initializeApplication(): Promise<void> {
   } catch (error: unknown) {
     logger.error(
       'Failed to initialize application',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }
@@ -56,7 +56,7 @@ export async function shutdownApplication(): Promise<void> {
   } catch (error: unknown) {
     logger.error(
       'Error during application shutdown',
-      error as Record<string, unknown>,
+      error,
     )
     throw error
   }

@@ -1,7 +1,11 @@
 #!/usr/bin/env ts-node
 import { DreamScheduler } from './src/services/dream-scheduler';
 
-const consolidationUrl = process.env.CONSOLIDATION_URL || 'http://localhost:5000';
+const envConsolidationUrl = process.env.CONSOLIDATION_URL;
+const consolidationUrl =
+  envConsolidationUrl && envConsolidationUrl.length > 0
+    ? envConsolidationUrl
+    : 'http://localhost:5000';
 
 async function run() {
   const scheduler = new DreamScheduler({
@@ -31,4 +35,4 @@ async function run() {
   console.log(result);
 }
 
-run();
+void run();
