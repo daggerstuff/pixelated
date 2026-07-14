@@ -232,7 +232,9 @@ export default function AnalyticsDashboard({
       }
     }, refreshInterval)
 
-    return () => clearInterval(intervalId)
+    return () => {
+      clearInterval(intervalId)
+    }
   }, [refreshInterval, messages, fheInitialized, loadAnalytics])
 
   // Get the current analytics data based on active tab
