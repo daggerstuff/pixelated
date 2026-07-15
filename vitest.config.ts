@@ -330,13 +330,14 @@ export default defineConfig({
       reporter: ['text', 'json', 'html', 'cobertura', 'lcov'],
       reportsDirectory: './coverage',
       thresholds: {
-        // PIX-223+: Thresholds raised after boosting BiasDetectionEngine (57%→88%),
-        // performance-optimizer (81%→91%), connection-pool (27%→97%), python-bridge 85%,
-        // alerts-system ~84%, metrics-collector ~80%. Overall project ~58% stmts.
-        lines: 45,
-        functions: 40,
-        branches: 32,
-        statements: 45,
+        // PIX-223: thresholds lifted toward the security-baseline.json 70% target
+        // as coverage improves. Measured full-run coverage (green): lines 60.7%,
+        // statements 61.1%, functions 61.6%, branches 51.4%. Kept ~6pts
+        // below actual so the gate stays green while enforcing real progress.
+        lines: 55,
+        functions: 55,
+        branches: 45,
+        statements: 55,
       },
       exclude: [
         'node_modules/**',
