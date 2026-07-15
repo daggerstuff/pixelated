@@ -181,9 +181,7 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
   }
 
   const renderChart = () => {
-    // Ignore TS/lint rules here as the dynamic chart typing is very complex
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
-    const chartProps: any = { data: chartData, options: mergedOptions }
+    const chartProps = { data: chartData, options: mergedOptions }
     switch (type) {
       case 'bar':
         return <Bar {...chartProps} />
@@ -197,7 +195,6 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       default:
         return <Line {...chartProps} />
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
   }
 
   return <div className={`h-64 w-full ${className}`}>{renderChart()}</div>
