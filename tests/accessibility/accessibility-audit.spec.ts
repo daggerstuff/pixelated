@@ -24,7 +24,7 @@ test.describe('Accessibility Audit and Compliance', () => {
         accessibilityScanResults.violations.forEach((violation: Result) => {
           console.log(`- ${violation.id}: ${violation.description}`)
           violation.nodes.forEach((node: NodeResult) => {
-            console.log(`  Target: ${node.target}`)
+            console.log(`  Target: ${String(node.target)}`)
             console.log(`  HTML: ${node.html}`)
           })
         })
