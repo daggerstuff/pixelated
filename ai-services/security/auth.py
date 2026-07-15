@@ -4,6 +4,7 @@ Implements 401-Triggered JWKS cache invalidation.
 """
 
 import logging
+import os
 import time
 from dataclasses import dataclass
 from functools import wraps
@@ -60,6 +61,11 @@ class JWKSCache:
 jwks_cache = JWKSCache()
 
 
+# Expected shared secret for internal microservice calls.
+# In production this should be injected via env/secrets manager.
+_EXPECTED_API_KEY = os.environ.get("AI_SERVICE_API_KEY")
+
+
 def authenticate(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -75,7 +81,11 @@ def authenticate(f):
 
         try:
             if api_key:
-                # Developer path
+                # Developer path — validate against configured shared secret.
+                if _EXPECTED_API_KEY and api_key != _EXPECTED_API_KEY:
+                    logger.warning("Invalid X-API-Key received")
+                    jwks_cache.invalidate()
+                    return jsonify({"error": "Unauthorized"}), 401
                 context = DeveloperContext(developer_id="dev_123", api_key=api_key)
             elif auth_header:
                 # User path
