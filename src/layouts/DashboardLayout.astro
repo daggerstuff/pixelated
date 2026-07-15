@@ -132,7 +132,10 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
           (theme === 'system' &&
             window.matchMedia('(prefers-color-scheme: dark)').matches)
 
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light')
+        document.documentElement.setAttribute(
+          'data-theme',
+          isDark ? 'dark' : 'light',
+        )
       }
 
       applyTheme(getTheme())
@@ -158,12 +161,24 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
 <style>
   /* === SCROLLBAR === */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--np-muted); }
-  ::-webkit-scrollbar-thumb:hover { background: var(--np-mid); }
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--np-muted);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--np-mid);
+  }
 
-  ::selection { background: var(--np-selection); color: var(--np-selection-text); }
+  ::selection {
+    background: var(--np-selection);
+    color: var(--np-selection-text);
+  }
 
   /* === SIDEBAR RESPONSIVE === */
   @media (max-width: 1024px) {
@@ -179,19 +194,29 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
   }
 
   @media (max-width: 640px) {
-    .sidebar { width: 100% !important; max-width: 280px; }
+    .sidebar {
+      width: 100% !important;
+      max-width: 280px;
+    }
   }
 
   /* === MAIN CONTENT FADE-IN === */
-  main { opacity: 0; animation: np-fade-in 0.4s var(--np-ease-enter) forwards; }
-  @keyframes np-fade-in { to { opacity: 1; } }
+  main {
+    opacity: 0;
+    animation: np-fade-in 0.4s var(--np-ease-enter) forwards;
+  }
+  @keyframes np-fade-in {
+    to {
+      opacity: 1;
+    }
+  }
 
   /* === SIDEBAR SECTION EXPAND/COLLAPSE === */
   .sidebar ul {
     overflow: hidden;
   }
 
-  .sidebar ul[style*="margin-top"] {
+  .sidebar ul[style*='margin-top'] {
     animation: np-slide-down 0.2s var(--np-ease) both;
   }
 
@@ -228,7 +253,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     color: var(--np-text) !important;
   }
 
-  .sidebar [style*="background: var(--np-elevated)"]:hover {
+  .sidebar [style*='background: var(--np-elevated)']:hover {
     background: var(--np-hover) !important;
   }
 
@@ -242,6 +267,9 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 
   /* === ACCESSIBILITY: reduce-motion removes main content animation === */
   @media (prefers-reduced-motion: reduce) {
-    main { animation: none; opacity: 1; }
+    main {
+      animation: none;
+      opacity: 1;
+    }
   }
 </style>
