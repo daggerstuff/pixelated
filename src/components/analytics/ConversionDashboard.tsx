@@ -75,7 +75,12 @@ export function ConversionDashboard() {
           ? conversions
           : conversions.filter((c) => {
               const val = c.conversionId
-              const strVal = typeof val === 'string' || typeof val === 'number' || typeof val === 'boolean' ? String(val) : ''
+              const strVal =
+                typeof val === 'string' ||
+                typeof val === 'number' ||
+                typeof val === 'boolean'
+                  ? String(val)
+                  : ''
               return strVal === filter
             })
 

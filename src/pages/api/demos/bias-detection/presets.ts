@@ -82,9 +82,7 @@ export const GET = async ({ url }) => {
 
     // Filter by risk level
     if (riskLevel) {
-      const scenarios = getPresetScenariosByRiskLevel(
-        riskLevel,
-      )
+      const scenarios = getPresetScenariosByRiskLevel(riskLevel)
       if (scenarios.length === 0) {
         return new Response(
           JSON.stringify({

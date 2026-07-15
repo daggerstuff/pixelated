@@ -79,9 +79,7 @@ export function useWebSocket({
 
       ws.onmessage = (event) => {
         try {
-          const message: WebSocketMessage = JSON.parse(
-            event.data,
-          )
+          const message: WebSocketMessage = JSON.parse(event.data)
           let wsError: Error
 
           switch (message.type) {

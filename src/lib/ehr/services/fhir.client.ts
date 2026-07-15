@@ -46,8 +46,8 @@ export function createFHIRClient(
           providerId: provider.id,
           timestamp: new Date().toISOString(),
         })
-        if (result && typeof (result).catch === 'function') {
-          ;(result).catch(() => {})
+        if (result && typeof result.catch === 'function') {
+          result.catch(() => {})
         }
       } else if (logger && typeof logger.info === 'function') {
         logger.info(`AUDIT: ${action} ${resourceType} ${id ?? ''}`.trim(), {
