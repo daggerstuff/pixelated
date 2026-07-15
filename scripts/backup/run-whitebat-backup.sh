@@ -3,7 +3,9 @@ export BACKUP_SKIP_SECTIONS=".cache .cargo .claude .claude-mem .codeql .cursor .
 export BACKUP_RCLONE_EXCLUDE_EXTRA="node_modules/**,.git/**,.venv/**,venv/**,__pycache__/**,.nvm/**,.vscode-server/**,.avm/**,.bun/**,.docker/**,google-cloud-sdk/**,Downloads/**,Music/**,Videos/**,Pictures/**,Desktop/**,rclone-current-linux-amd64.zip,Terax_0.8.2_amd64.deb,.npm/**,.local/share/pnpm/**,.rustup/**,.cargo/**,.cache/**,.casino-postgres/**,.payram-core/**,.gemini/**,.local/share/opencode/**"
 export RCLONE_TARGET="whitebat:training"
 export BACKUP_RCLONE_FAST_LIST=false
-export BACKUP_RUN_PREFIX="home-$(hostname)-run"
+# Use a stable prefix so retention cleanup works regardless of the host
+# that created the backup. Hostname is logged separately for traceability.
+export BACKUP_RUN_PREFIX="home-pixelated-run"
 export BACKUP_RCLONE_TRANSFERS=2
 export BACKUP_RCLONE_CHECKERS=2
 export BACKUP_RCLONE_EXTRA_ARGS="--tpslimit 4 --tpslimit-burst 4"

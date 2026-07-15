@@ -52,6 +52,17 @@ else:
 
 _training_jobs: dict[str, dict] = {}
 _training_lock = threading.Lock()
+_JOB_TTL_SECONDS = 24 * 60 * 60  # 24 hours
+
+
+def _cleanup_old_jobs() -> None:
+    """Evict training jobs older than _JOB_TTL_SECONDS to prevent unbounded growth."""
+    cutoff = time.time() - _JOB_TTL_SECONDS
+    with _training_lock:
+        expired = [jid for jid, job in _training_jobs.items() if job.get("created_at", 0) < cutoff]
+        for jid in expired:
+            del _training_jobs[jid]
+            logger.info(f"[training] evicted expired job {jid}")
 
 
 def _training_script_path() -> str:
@@ -61,11 +72,36 @@ def _training_script_path() -> str:
     return str(script.resolve())
 
 
+def _sanitize_dataset_dir(dataset_path: str) -> str:
+    """Validate dataset path and return a safe directory, preventing path traversal."""
+    allowed_bases = ["./data/finetuning", "./data/training", "/tmp"]
+    if not dataset_path:
+        return "./data/finetuning"
+    path = Path(dataset_path).resolve()
+    for base in allowed_bases:
+        base_resolved = Path(base).resolve()
+        try:
+            path.relative_to(base_resolved)
+            return str(path.parent)
+        except ValueError:
+            continue
+    logger.warning(f"[training] dataset path {dataset_path} outside allowed bases; falling back to default")
+    return "./data/finetuning"
+
+
+def _drain_stream(stream, buffer: list):
+    """Continuously read from a stream into a buffer list to prevent pipe blocking."""
+    try:
+        for line in stream:
+            buffer.append(line)
+    except Exception:
+        pass
+
+
 def _spawn_training_job(job_id: str, payload: dict) -> subprocess.Popen:
     """Spawn the fine-tuning subprocess and return the Popen handle."""
     script = _training_script_path()
-    dataset_path = payload.get("dataset", "")
-    dataset_dir = str(Path(dataset_path).parent) if dataset_path else "./data/finetuning"
+    dataset_dir = _sanitize_dataset_dir(payload.get("dataset", ""))
 
     args = [
         sys.executable,
@@ -110,7 +146,9 @@ def _update_job_status(job_id: str) -> None:
             job["status"] = "running"
         elif ret == 0:
             job["status"] = "succeeded"
-            stdout = proc.stdout.read() if proc.stdout else ""
+            # Use buffered output (drained by background threads) instead of
+            # reading directly from the pipe, which could block.
+            stdout = "".join(job.get("stdout_buffer", []))
             job["stdout"] = stdout
             # Try to parse final JSON line for fine_tuned_model
             for line in reversed(stdout.splitlines()):
@@ -126,7 +164,7 @@ def _update_job_status(job_id: str) -> None:
                 job["fine_tuned_model"] = f"{job['model']}:trained:{job_id[:8]}"
         else:
             job["status"] = "failed"
-            stderr = proc.stderr.read() if proc.stderr else ""
+            stderr = "".join(job.get("stderr_buffer", []))
             job["stderr"] = stderr
             job["error"] = f"Subprocess exited with code {ret}"
 
@@ -142,6 +180,8 @@ def create_training_job():
         data = request.json or {}
         job_id = f"hf-{int(time.time() * 1000)}-{uuid.uuid4().hex[:6]}"
 
+        _cleanup_old_jobs()
+
         proc = _spawn_training_job(job_id, data)
 
         with _training_lock:
@@ -152,7 +192,17 @@ def create_training_job():
                 "created_at": time.time(),
                 "proc": proc,
                 "fine_tuned_model": None,
+                "stdout_buffer": [],
+                "stderr_buffer": [],
             }
+            # Start background threads to drain stdout/stderr so the OS pipe
+            # buffer never fills up and blocks the subprocess (PIX-3926).
+            threading.Thread(
+                target=_drain_stream, args=(proc.stdout, _training_jobs[job_id]["stdout_buffer"]), daemon=True
+            ).start()
+            threading.Thread(
+                target=_drain_stream, args=(proc.stderr, _training_jobs[job_id]["stderr_buffer"]), daemon=True
+            ).start()
 
         # Immediate status update so it reflects running if already started
         _update_job_status(job_id)
@@ -188,6 +238,16 @@ def get_training_job(job_id):
     return jsonify({"success": True, "job": job})
 
 
+def _cancel_proc(proc: subprocess.Popen) -> None:
+    """Terminate and wait for a subprocess without holding any locks."""
+    proc.terminate()
+    try:
+        proc.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        proc.kill()
+        proc.wait()
+
+
 @app.route("/api/training/jobs/<job_id>/cancel", methods=["POST"])
 @authenticate
 def cancel_training_job(job_id):
@@ -197,18 +257,21 @@ def cancel_training_job(job_id):
         if not job:
             return jsonify({"success": False, "error": "Job not found"}), 404
 
+        # Don't overwrite terminal states (succeeded/failed) with cancelled.
+        if job.get("status") in ("succeeded", "failed"):
+            return jsonify({"success": False, "error": "Job already finished"}), 409
+
         proc = job.get("proc")
-        if proc and proc.poll() is None:
-            proc.terminate()
-            try:
-                proc.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                proc.kill()
-                proc.wait()
-            job["status"] = "cancelled"
-            logger.info(f"[training] cancelled job {job_id}")
-        else:
-            job["status"] = "cancelled"
+        should_cancel = proc is not None and proc.poll() is None
+
+    if should_cancel:
+        _cancel_proc(proc)
+        with _training_lock:
+            _training_jobs[job_id]["status"] = "cancelled"
+        logger.info(f"[training] cancelled job {job_id}")
+    else:
+        with _training_lock:
+            _training_jobs[job_id]["status"] = "cancelled"
 
     return jsonify({"success": True, "job": {"id": job_id, "status": "cancelled"}})
 

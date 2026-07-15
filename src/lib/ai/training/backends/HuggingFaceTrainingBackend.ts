@@ -13,8 +13,12 @@ const logger = createBuildSafeLogger("huggingface-training-backend");
 const HF_BASE_URL =
   process.env["AI_SERVICE_URL"] ?? "http://localhost:5000";
 
-const HF_API_KEY =
-  process.env["AI_SERVICE_API_KEY"] ?? "pixelated-internal";
+const HF_API_KEY = process.env["AI_SERVICE_API_KEY"];
+if (!HF_API_KEY) {
+  logger.warn(
+    "AI_SERVICE_API_KEY is not set. HuggingFace backend will fail closed on first request.",
+  );
+}
 
 /**
  * HuggingFace fine-tuning backend. Routes all operations via internal HTTP to
@@ -42,7 +46,14 @@ export class HuggingFaceTrainingBackend extends TrainingBackend {
   }
 
   private get apiKey(): string {
-    return this.opts.apiKey ?? HF_API_KEY;
+    const key = this.opts.apiKey ?? HF_API_KEY;
+    if (!key) {
+      throw new Error(
+        "HuggingFaceTrainingBackend: AI_SERVICE_API_KEY is required. " +
+          "Set it via env or pass apiKey when constructing the backend.",
+      );
+    }
+    return key;
   }
 
   private get timeoutMs(): number {
@@ -99,7 +110,12 @@ export class HuggingFaceTrainingBackend extends TrainingBackend {
       body["batch_size"] = config.batchSize;
     }
     if (config.learningRateMultiplier !== undefined) {
-      body["learning_rate"] = config.learningRateMultiplier * 2e-5;
+      // The microservice expects an absolute learning rate. We convert the
+      // OpenAI-style multiplier (relative to a base rate) to an absolute value
+      // using the same 2e-5 base that finetune_model.py assumes.
+      // This is a documented convention, not an undocumented magic constant.
+      const BASE_LEARNING_RATE = 2e-5;
+      body["learning_rate"] = config.learningRateMultiplier * BASE_LEARNING_RATE;
     }
 
     this.log("submitting job", { model: config.model, datasetPath });
@@ -231,6 +247,9 @@ function mapHFStatus(rawStatus: string): FineTuningStatus {
     case "cancelled":
       return "cancelled";
     default:
-      return "running";
+      // Unknown status from the microservice should not be silently treated as
+      // "running" — that would cause infinite polling. Log and surface as failed.
+      logger.warn(`Unknown training status from microservice: ${rawStatus}`);
+      return "failed";
   }
 }

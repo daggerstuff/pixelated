@@ -174,7 +174,10 @@ describe("HuggingFaceTrainingBackend", () => {
       ),
     );
 
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     const result = await backend.submitJob("/tmp/ds.jsonl", {
       model: "mistralai/Mistral-7B-v0.1",
       nEpochs: 1,
@@ -211,7 +214,10 @@ describe("HuggingFaceTrainingBackend", () => {
       ),
     );
 
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     const result = await backend.getJobStatus("hf-123");
 
     expect(result).not.toBeNull();
@@ -221,7 +227,10 @@ describe("HuggingFaceTrainingBackend", () => {
 
   test("getJobStatus returns null on network error", async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"));
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     expect(await backend.getJobStatus("hf-123")).toBeNull();
   });
 
@@ -236,7 +245,10 @@ describe("HuggingFaceTrainingBackend", () => {
       ),
     );
 
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     const result = await backend.cancelJob("hf-123");
 
     expect(result).not.toBeNull();
@@ -249,7 +261,10 @@ describe("HuggingFaceTrainingBackend", () => {
 
   test("cancelJob returns null on network error", async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"));
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     expect(await backend.cancelJob("hf-123")).toBeNull();
   });
 
@@ -266,7 +281,10 @@ describe("HuggingFaceTrainingBackend", () => {
       ),
     );
 
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     const models = await backend.listModels();
     expect(models).toEqual([
       { id: "meta-llama/Llama-2-7b-hf", ownedBy: "meta", fineTunable: true },
@@ -275,7 +293,10 @@ describe("HuggingFaceTrainingBackend", () => {
 
   test("listModels falls back to static list on network error", async () => {
     vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"));
-    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const backend = new HuggingFaceTrainingBackend({
+      baseUrl: "http://ai-svc",
+      apiKey: "test-key",
+    });
     const models = await backend.listModels();
     const ids = models.map((m) => m.id);
     expect(ids).toContain("meta-llama/Llama-2-7b-hf");
