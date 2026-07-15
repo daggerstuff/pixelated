@@ -22,6 +22,12 @@ const LOCAL_MODEL = process.env["LOCAL_OLLAMA_MODEL"] ?? "llama3";
 const LOCAL_API_KEY =
   process.env["LOCAL_OLLAMA_API_KEY"] ?? "ollama";
 
+const MICROSERVICE_BASE_URL =
+  process.env["AI_SERVICE_URL"] ?? "http://localhost:5000";
+
+const MICROSERVICE_API_KEY =
+  process.env["AI_SERVICE_API_KEY"] ?? "pixelated-internal";
+
 /**
  * Local backend for fine-tuning using a local model serving stack.
  *
@@ -29,10 +35,10 @@ const LOCAL_API_KEY =
  *   1. **OpenAI-compatible API** (`LOCAL_OLLAMA_BASE_URL`) — submits a job
  *      to `/v1/fine_tuning/jobs`. Works with Ollama >=0.5, LocalAI, or any
  *      server implementing the OpenAI fine-tuning API.
- *   2. **Python script fallback** (`LOCAL_TRAINING_SCRIPT_PATH`) — runs
- *      `ai/training/finetune_model.py` as a subprocess, mirroring the
- *      HuggingFace backend pattern. Used when no OpenAI-compatible server
- *      is available.
+ *   2. **Microservice script fallback** (`LOCAL_TRAINING_SCRIPT_PATH`) — routes
+ *      to the AI microservice (`ai-services/api.py`) which spawns
+ *      `ai/training/finetune_model.py` in isolation. This eliminates direct
+ *      Python subprocess execution from the main application (PIX-3926).
  *
  * Env vars:
  *   - `LOCAL_OLLAMA_BASE_URL` — base URL of the local server
@@ -40,10 +46,15 @@ const LOCAL_API_KEY =
  *   - `LOCAL_OLLAMA_MODEL` — model to fine-tune (default: llama3)
  *   - `LOCAL_OLLAMA_API_KEY` — API key for the local server
  *     (default: "ollama" — works for open Ollama instances)
- *   - `LOCAL_TRAINING_SCRIPT_PATH` — path to Python fine-tuning script
- *     (optional; falls back to Ollama API if unset)
+ *   - `LOCAL_TRAINING_SCRIPT_PATH` — deprecated; kept for backwards compat.
+ *     When set, the backend routes through the AI microservice instead of
+ *     spawning Python directly.
+ *   - `AI_SERVICE_URL` — URL of the AI microservice
+ *     (default: http://localhost:5000)
+ *   - `AI_SERVICE_API_KEY` — API key for the microservice
  *
  * PIX-3863 §15 (Local backend implementation).
+ * PIX-3926 (AI Microservice Isolation).
  */
 export class LocalTrainingBackend extends TrainingBackend {
   readonly name: TrainingBackendName = "local";
@@ -51,29 +62,28 @@ export class LocalTrainingBackend extends TrainingBackend {
   private readonly baseUrl: string;
   private readonly apiKey: string;
   private readonly model: string;
-  private readonly scriptPath: string | null;
+  private readonly useMicroservice: boolean;
+  private readonly microserviceUrl: string;
+  private readonly microserviceKey: string;
 
   constructor(opts?: {
     baseUrl?: string;
     apiKey?: string;
     model?: string;
     scriptPath?: string;
+    microserviceUrl?: string;
+    microserviceKey?: string;
   }) {
     super();
-    this.baseUrl =
-      opts?.baseUrl ?? LOCAL_BASE_URL;
-    this.apiKey =
-      opts?.apiKey ?? LOCAL_API_KEY;
-    this.model =
-      opts?.model ?? LOCAL_MODEL;
-    this.scriptPath =
-      opts?.scriptPath ??
-      process.env["LOCAL_TRAINING_SCRIPT_PATH"] ??
-      null;
-  }
-
-  private get useScript(): boolean {
-    return !!this.scriptPath;
+    this.baseUrl = opts?.baseUrl ?? LOCAL_BASE_URL;
+    this.apiKey = opts?.apiKey ?? LOCAL_API_KEY;
+    this.model = opts?.model ?? LOCAL_MODEL;
+    this.useMicroservice = !!(
+      opts?.scriptPath ?? process.env["LOCAL_TRAINING_SCRIPT_PATH"]
+    );
+    this.microserviceUrl =
+      (opts?.microserviceUrl ?? MICROSERVICE_BASE_URL).replace(/\/$/, "");
+    this.microserviceKey = opts?.microserviceKey ?? MICROSERVICE_API_KEY;
   }
 
   private async fetchJSON<T>(path: string, init?: RequestInit): Promise<T> {
@@ -100,10 +110,39 @@ export class LocalTrainingBackend extends TrainingBackend {
     return res.json() as Promise<T>;
   }
 
+  private async fetchMicroservice<T>(
+    path: string,
+    init?: RequestInit,
+  ): Promise<T> {
+    const url = `${this.microserviceUrl}${path}`;
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      "X-Pixelated-Client": "internal",
+      "X-API-Key": this.microserviceKey,
+    };
+    if (init?.headers) {
+      Object.assign(headers, init.headers as Record<string, string>);
+    }
+
+    const res = await fetch(url, {
+      ...init,
+      headers,
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => "(no body)");
+      throw new Error(
+        `Local microservice ${path} returned ${res.status}: ${body}`,
+      );
+    }
+
+    return res.json() as Promise<T>;
+  }
+
   /**
    * Submit a local fine-tuning job.
    * Uses the OpenAI-compatible fine-tuning API if the server is reachable,
-   * otherwise falls back to the Python subprocess.
+   * otherwise routes through the AI microservice for script-based execution.
    */
   async submitJob(
     datasetPath: string,
@@ -113,12 +152,12 @@ export class LocalTrainingBackend extends TrainingBackend {
     this.log(`submitting job ${jobId}`, {
       model: config.model,
       datasetPath,
-      useScript: this.useScript,
+      useMicroservice: this.useMicroservice,
     });
 
     try {
-      if (this.useScript) {
-        return await this.submitViaScript(datasetPath, config, jobId);
+      if (this.useMicroservice) {
+        return await this.submitViaMicroservice(datasetPath, config, jobId);
       }
       return await this.submitViaAPI(datasetPath, config, jobId);
     } catch (err) {
@@ -155,7 +194,6 @@ export class LocalTrainingBackend extends TrainingBackend {
       training_file: datasetPath,
     };
 
-    // OpenAI fine-tune-specific params; local servers may ignore extras.
     if (config.nEpochs !== undefined) {
       body["hyperparameters"] = { num_epochs: config.nEpochs };
     }
@@ -179,90 +217,80 @@ export class LocalTrainingBackend extends TrainingBackend {
     };
   }
 
-  /** Submit via Python subprocess script (mirrors HuggingFace backend pattern). */
-  private async submitViaScript(
+  /** Submit via AI microservice (isolates Python subprocess execution). */
+  private async submitViaMicroservice(
     datasetPath: string,
     config: FineTuningConfig,
     jobId: string,
   ): Promise<FineTuningJob> {
-    const { spawn } = await import("node:child_process");
-
-    const args = [
-      this.scriptPath!,
-      "--dataset", datasetPath,
-      "--base-model", config.model ?? this.model,
-      "--job-id", jobId,
-      "--epochs", String(config.nEpochs ?? 3),
-    ];
-
-    if (config.suffix) {
-      args.push("--suffix", config.suffix);
+    const body: Record<string, unknown> = {
+      model: config.model ?? this.model,
+      dataset: datasetPath,
+      epochs: config.nEpochs ?? 3,
+    };
+    if (config.batchSize !== undefined) {
+      body["batch_size"] = config.batchSize;
+    }
+    if (config.learningRateMultiplier !== undefined) {
+      body["learning_rate"] = config.learningRateMultiplier * 2e-5;
     }
 
-    return new Promise<FineTuningJob>((resolve) => {
-      const proc = spawn(process.env["PYTHON_BIN"] ?? "python3", args, {
-        stdio: ["ignore", "pipe", "pipe"],
-      });
-
-      let stdout = "";
-      let stderr = "";
-
-      if (proc.stdout) {
-        proc.stdout.on("data", (chunk: Buffer) => {
-          stdout += chunk.toString();
-        });
-      }
-
-      if (proc.stderr) {
-        proc.stderr.on("data", (chunk: Buffer) => {
-          stderr += chunk.toString();
-        });
-      }
-
-      proc.on("close", (code) => {
-        const scriptOutput = parseLocalScriptOutput(stdout);
-        if (code === 0) {
-          const fineTunedModel =
-            scriptOutput?.fineTunedModel ??
-            `${config.model}:local:${jobId.slice(0, 8)}`;
-          resolve({
-            id: jobId,
-            remoteId: jobId,
-            model: config.model,
-            status: "succeeded",
-            createdAt: new Date(),
-            fineTunedModel,
-          });
-        } else {
-          this.log(`script exited with code ${code}`, { stderr });
-          resolve({
-            id: jobId,
-            remoteId: jobId,
-            model: config.model,
-            status: "failed",
-            createdAt: new Date(),
-            error: `Script exited with code ${code}: ${stderr.slice(0, 500)}`,
-          });
-        }
-      });
-
-      proc.on("error", (err) => {
-        resolve({
-          id: jobId,
-          remoteId: jobId,
-          model: config.model,
-          status: "failed",
-          createdAt: new Date(),
-          error: `Failed to spawn script: ${err.message}`,
-        });
-      });
+    const data = await this.fetchMicroservice<{
+      success: boolean;
+      job: {
+        id: string;
+        model: string;
+        status: string;
+        created_at: number;
+        fine_tuned_model?: string | null;
+      };
+    }>("/api/training/jobs", {
+      method: "POST",
+      body: JSON.stringify(body),
     });
+
+    const job = data.job;
+    return {
+      id: jobId,
+      remoteId: job.id,
+      model: job.model,
+      status: mapLocalStatus(job.status),
+      createdAt: new Date(job.created_at * 1000),
+      fineTunedModel: job.fine_tuned_model ?? undefined,
+    };
   }
 
   async getJobStatus(remoteId: string): Promise<FineTuningJob | null> {
-    if (this.useScript) {
-      // Subprocess-based; status is final after submit.
-      return null;
+    if (this.useMicroservice) {
+      try {
+        const data = await this.fetchMicroservice<{
+          success: boolean;
+          job: {
+            id: string;
+            model: string;
+            status: string;
+            created_at: number;
+            fine_tuned_model?: string | null;
+            error?: string;
+          };
+        }>(`/api/training/jobs/${remoteId}`);
+
+        const job = data.job;
+        return {
+          id: job.id,
+          remoteId: job.id,
+          model: job.model,
+          status: mapLocalStatus(job.status),
+          createdAt: new Date(job.created_at * 1000),
+          fineTunedModel: job.fine_tuned_model ?? undefined,
+          error: job.error,
+        };
+      } catch (err) {
+        this.log(`getJobStatus(${remoteId}) failed`, {
+          error: (err as Error).message,
+        });
+        return null;
+      }
     }
 
     try {
@@ -293,8 +321,28 @@ export class LocalTrainingBackend extends TrainingBackend {
   }
 
   async cancelJob(remoteId: string): Promise<FineTuningJob | null> {
-    if (this.useScript) {
-      return null;
+    if (this.useMicroservice) {
+      try {
+        const data = await this.fetchMicroservice<{
+          success: boolean;
+          job: { id: string; status: string; model?: string };
+        }>(`/api/training/jobs/${remoteId}/cancel`, {
+          method: "POST",
+        });
+
+        return {
+          id: data.job.id,
+          remoteId: data.job.id,
+          model: data.job.model ?? this.model,
+          status: mapLocalStatus(data.job.status),
+          createdAt: new Date(),
+        };
+      } catch (err) {
+        this.log(`cancelJob(${remoteId}) failed`, {
+          error: (err as Error).message,
+        });
+        return null;
+      }
     }
 
     try {
@@ -369,31 +417,20 @@ export class LocalTrainingBackend extends TrainingBackend {
   }
 }
 
-/**
- * Parse the final JSON line emitted by the local fine-tuning subprocess.
- *
- * The script convention is to print `{"fine_tuned_model": "...", "status": "..."}`
- * on success. If we cannot extract the model identifier, return `null` so the
- * caller can synthesise a fallback id.
- */
-function parseLocalScriptOutput(stdout: string): { fineTunedModel: string } | null {
-  const lines = stdout.split(/\r?\n/);
-  for (let i = lines.length - 1; i >= 0; i--) {
-    const line = lines[i];
-    if (!line) continue;
-    const trimmed = line.trim();
-    if (!trimmed.startsWith("{")) continue;
-    try {
-      const payload = JSON.parse(trimmed) as { fine_tuned_model?: unknown };
-      if (
-        typeof payload.fine_tuned_model === "string" &&
-        payload.fine_tuned_model.trim().length > 0
-      ) {
-        return { fineTunedModel: payload.fine_tuned_model };
-      }
-    } catch {
-      continue;
-    }
+/** Map microservice status strings to canonical FineTuningStatus. */
+function mapLocalStatus(rawStatus: string): FineTuningStatus {
+  switch (rawStatus) {
+    case "queued":
+      return "queued";
+    case "running":
+      return "running";
+    case "succeeded":
+      return "succeeded";
+    case "failed":
+      return "failed";
+    case "cancelled":
+      return "cancelled";
+    default:
+      return "running";
   }
-  return null;
 }
