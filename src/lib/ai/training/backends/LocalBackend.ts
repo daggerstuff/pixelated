@@ -78,7 +78,9 @@ export class LocalTrainingBackend extends TrainingBackend {
     this.baseUrl = opts?.baseUrl ?? LOCAL_BASE_URL;
     this.apiKey = opts?.apiKey ?? LOCAL_API_KEY;
     this.model = opts?.model ?? LOCAL_MODEL;
-    this.useMicroservice = !!opts?.scriptPath;
+    this.useMicroservice = !!(
+      opts?.scriptPath ?? process.env["LOCAL_TRAINING_SCRIPT_PATH"]
+    );
     this.microserviceUrl =
       (opts?.microserviceUrl ?? MICROSERVICE_BASE_URL).replace(/\/$/, "");
     this.microserviceKey = opts?.microserviceKey ?? MICROSERVICE_API_KEY;
@@ -323,7 +325,7 @@ export class LocalTrainingBackend extends TrainingBackend {
       try {
         const data = await this.fetchMicroservice<{
           success: boolean;
-          job: { id: string; status: string };
+          job: { id: string; status: string; model?: string };
         }>(`/api/training/jobs/${remoteId}/cancel`, {
           method: "POST",
         });
@@ -331,7 +333,7 @@ export class LocalTrainingBackend extends TrainingBackend {
         return {
           id: data.job.id,
           remoteId: data.job.id,
-          model: "local",
+          model: data.job.model ?? this.model,
           status: mapLocalStatus(data.job.status),
           createdAt: new Date(),
         };

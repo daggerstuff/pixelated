@@ -286,7 +286,11 @@ def cancel_training_job(job_id):
         with _training_lock:
             _training_jobs[job_id]["status"] = "cancelled"
 
-    return jsonify({"success": True, "job": {"id": job_id, "status": "cancelled"}})
+    with _training_lock:
+        job = _training_jobs.get(job_id)
+        model = job.get("model", "local") if job else "local"
+
+    return jsonify({"success": True, "job": {"id": job_id, "status": "cancelled", "model": model}})
 
 
 @app.route("/api/training/models", methods=["GET"])
