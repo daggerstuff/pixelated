@@ -1,4 +1,5 @@
 ---
+import '@/styles/np-tokens.css'
 import BaseHead from '@components/tailus/BaseHead.astro'
 import AppFooter from '@components/tailus/AppFooter.astro'
 import AppHeader from '@components/tailus/AppHeader.astro'
@@ -24,16 +25,7 @@ const { nprogress, mediumZoom } = FEATURES
   <head>
     <BaseHead {title} {description} {cspNonce} />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0f172a" />
-
-    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
-    <link rel="stylesheet" href="/css/design-system.css" />
-    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
-
-    <link rel="stylesheet" href="/css/fonts.css" />
-    <link rel="stylesheet" href="/css/font-fix.css" />
-
-    <link rel="stylesheet" href="/css/background-fixes.css" />
+    <meta name="theme-color" content="#1a1a1a" />
 
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>

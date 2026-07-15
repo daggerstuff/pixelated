@@ -11,6 +11,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js'
+import type { ChartData, ChartOptions } from 'chart.js'
 import React, { useState, useEffect } from 'react'
 import { Line, Bar, Pie, Scatter } from 'react-chartjs-2'
 
@@ -181,23 +182,22 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
   }
 
   const renderChart = () => {
-    // Ignore TS/lint rules here as the dynamic chart typing is very complex
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
-    const chartProps: any = { data: chartData, options: mergedOptions }
+    // chartData stored as unknown (default + incoming data flow); narrow to chart.js types here.
+    const data = chartData as ChartData
+    const options = mergedOptions as ChartOptions
     switch (type) {
       case 'bar':
-        return <Bar {...chartProps} />
+        return <Bar data={data} options={options} />
       case 'pie':
-        return <Pie {...chartProps} />
+        return <Pie data={data} options={options} />
       case 'scatter':
-        return <Scatter {...chartProps} />
+        return <Scatter data={data} options={options} />
       case 'heatmap':
-        return <Line {...chartProps} />
+        return <Line data={data} options={options} />
       case 'line':
       default:
-        return <Line {...chartProps} />
+        return <Line data={data} options={options} />
     }
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
   }
 
   return <div className={`h-64 w-full ${className}`}>{renderChart()}</div>
