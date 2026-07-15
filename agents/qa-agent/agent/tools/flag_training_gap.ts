@@ -45,6 +45,7 @@ export default defineTool({
       }),
       category: 'qa_review',
       scope: 'cohort',
+      retention: 'long_term',
       importance: 0.7 + input.priority * 0.075,
       tags: ['training_gap', `cohort:${input.cohort_id}`, `session:${input.session_id}`],
     })
