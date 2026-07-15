@@ -18,6 +18,9 @@ RUN uv pip install --no-cache --system -r requirements.txt --index-url https://d
 COPY ai-services/ ./
 COPY ai-services/security/ ./security/
 
+# Copy training script from ai submodule (must be initialized before build)
+COPY ai/training/finetune_model.py /app/ai/training/finetune_model.py
+
 RUN groupadd -g 42420 appuser && \
     useradd -u 42420 -g appuser -m -s /bin/bash appuser && \
     chown -R appuser:appuser /app
