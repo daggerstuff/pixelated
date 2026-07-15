@@ -114,6 +114,28 @@ data, client profiles, charts, evidence). If a surface needs emphasis, use value
 darker surface, a heavier weight, a thicker rule. If it still needs color, something is wrong
 with the information architecture.
 
+### Data-viz earns hue (scoped)
+
+The zero-chroma rule governs **UI chrome**. Chart *marks* are the one sanctioned exception:
+series fills and strokes, heatmap cells, and isolated data glyphs may use a bounded palette so
+that multi-series data stays legible. Dense multi-series charts encode nothing without hue —
+series collapse into an undifferentiated gray stack, which defeats the data. Hue here serves
+**data semantics**, not decoration.
+
+The scope is strict and is the entire point of the exception:
+
+- **Marks earn hue.** Bars, lines, points, area fills, heatmap cells, donut wedges, and any
+  single data element whose identity across categories must read at a glance.
+- **Chrome stays zero-chroma.** Axes, gridlines, tick labels, axis titles, legends, tooltips,
+  the chart container's border/background, heading, and caption — all on the neutral ramp
+  (`np-text`, `np-muted`, `np-line`). Hue never leaks from a data mark into the frame around it.
+- **No hue for UI state.** Sim/live/stop, active/inactive, success/error — these stay zero-chroma,
+  encoded by filled-vs-hollow glyph, weight, and value contrast (`np-elevated` lift). Hue is the
+  data's, not the interface's.
+- **Bounded palette, not ad-hoc.** Chart palettes are defined once and referenced, never
+  scattered as Tailwind `emerald-500` literals inline. Reuse an existing series-palette util if
+  one exists; otherwise define a small scoped palette where the chart lives.
+
 ## 3. Typography
 
 **Display Font:** Fraunces Variable (with Georgia, serif fallback)
@@ -237,8 +259,15 @@ vocabulary.
   inputs. Not 2px, not 4px, not "barely rounded."
 - **Don't** use the old "Dark Metal" orange accent (`#ff8533`). Its energy is wrong for
   this platform.
-- **Don't** use the old emerald brand tokens (`#10b981`) as accent. The system has no
-  accent.
+- **Don't** use the old emerald brand tokens (`#10b981`, `#34d399`,
+  `rgba(16,185,129,0.3)`) as accent. The system has no accent. In the present codebase
+  these survive in ~30 components (hover borders, status dots, marketing tiles); see the
+  Drift Appendix — removing them is open work, not permission to add more.
+- **Don't** reach for a cream / sand / paper body background or gradient-text headings. The
+  warm-neutral AI default reads as machine-generated, not clinical.
+- **Don't** build the SaaS dark-dashboard pastiche — metric-stack hero, identical
+  icon-card grids, glass cards, button gradients. Familiarity is fine; the undifferentiated
+  template is the anti-reference.
 - **Don't** use glass effects, backdrop-filter, gradients, or any decorative surface
   treatment.
 - **Don't** use uppercase tracking on Public Sans body text — it reduces readability.
@@ -246,3 +275,98 @@ vocabulary.
 - **Don't** animate layout properties. Only `opacity` and `transform` transitions.
 - **Don't** use icons as decoration. Every icon should carry information — a status, an
   action, a signal.
+
+## 7. Drift Appendix (code vs doctrine)
+
+This section records where the present codebase diverges from the system above. It is
+**tech-debt triage, not doctrine**: the doctrine in §§2–6 is what new and refactored work
+must target. Nothing here grants permission to extend the drift.
+
+**Migration status** (tracked by the drift-closure plan; update after each phase lands):
+
+- [x] **Phase 1 — doctrine amended.** §2.1 "Data-viz earns hue (scoped)" added; chart marks may
+  use bounded hue, chart chrome and all UI state stay zero-chroma. The emerald clause below is
+  now partially superseded for **chart marks only** — chrome still bans it.
+- [x] **Phase 2 — layouts consolidated onto `src/styles/np-tokens.css`.** BlogLayout,
+  DocumentationLayout, ChatLayout, TailusLayout, BrutalistLayout swapped off the legacy 6-file
+  bundle onto np-tokens; slate `theme-color #0f172a` → neutral `#1a1a1a`. ResearchLayout already
+  inherits np-tokens via BaseLayout (its `research.css` is component styling, deferred to
+  Phase 3). Build green (exit 0).
+- [ ] **Phase 3 — surgical strip (in progress).** Scope narrowed from ~150 chrome-hue files to a
+  surgical set: demo/, marketing/, mizu/, showcase surfaces + the ~10 token-source CSS files
+  (shadows/radius/emerald definitions). Admin/crisis/auth/consent/session chrome hue remains as
+  **standing debt** tracked below — not permission to extend it; it is deferred work, not
+  abandoned doctrine.
+- [x] **Phase 4 — legacy CSS files retired.** 18 dead legacy token/style sheets deleted
+  (grep-verified zero importers post-Phase-2): `public/css/{unified-dark-theme-v3,
+  unified-blended-theme,design-system,brutalist-minimal,button-fixes,background-fixes,font-fix,
+  variables,borders,shadows,gradients,mesh}.css`, `public/styles/global.css`,
+  `src/styles/{brutalist-minimal,shadows,pixelated-theme,unified-dark-theme-v3,enhanced-theme}.css`.
+  `uno.config.ts` is clean; `public/css/index.css` kept (live `.container`/`.sr-only` utilities).
+  None reached the DOM post-Phase-2 (UnoCSS preset provides the `bg-emerald-500`/`shadow-*`/
+  `rounded-2xl` utilities that actually render — those live inline in components and belong to
+  Phase 3, not here). `pnpm build` green (exit 0); lint errors = 0.
+
+### Standing debt (deferred from Phase 3, tracked not forgotten)
+
+Chrome-hue utilities (Tailwind `emerald/indigo/red -*`) survive in ~120 patient-adjacent and
+admin surfaces: `admin/PatientRightsSystem`, `admin/*` dashboards, `auth/*`, `consent/*`,
+`crisis/*`, `session/*`, `training/session/*`, `chat/*`, `memory/*`, `professional/*`,
+`therapy/*`, `treatment/*`, `journal-research/*`, `security/*`, `simulator/*`, plus many
+`pages/admin/*` and `pages/dashboard/*` routes. These encode state (sim/live/stop,
+active/inactive, success/error) ad-hoc as inline utilities. Migration to value-contrast +
+icon + weight (the doctrine) is per-component design work deferred to a dedicated `harden` pass.
+New and refactored work in these areas must target the doctrine, not the surrounding drift.
+
+### A. Competing theme files (no single source of truth)
+
+Five CSS files each define a partial palette and behave as peers, not layers:
+
+- `uno.config.ts` — header reads "Combining: Brutalist + Minimalist Dark + Corporate
+  Sleek + Enterprise + Antfu Elegance". Fonts correct (Public Sans / JetBrains Mono
+  Variable / Fraunces Variable). But `:root` redefines `--accent-primary: #10b981`
+  (emerald) — banned.
+- `public/css/variables.css` — **true to doctrine**: `oklch(0.10 0 0)` bg, `oklch(0.93 0 0)`
+  text. This is the file to treat as canonical; the others should collapse into it.
+- `public/css/borders.css` — `--border-accent: 1px solid rgba(16,185,129,0.3)` (emerald),
+  used by `.card:hover`. Defines `border-radius: var(--radius-lg)` on `.card`.
+- `public/css/brutalist-minimal.css` — an explicit radius scale (`sm 2px / md 4px / lg 8px`)
+  used across ~20 rules. Doctrine is 0px everywhere.
+- `public/css/button-fixes.css` — `border-radius: 8px !important`. Hard override, bans
+  contravene via `!important`.
+- `public/css/design-system.css` — `--card-radius`, `--button-radius` tokens (value-set
+  elsewhere; non-zero).
+
+**Fix direction:** consolidate to one token file (`variables.css`-equivalent), delete the
+radius scale (set all radius tokens to `0`), remove `--border-accent` and every emerald
+literal. Replace `!important` radius overrides by deleting the rules.
+
+### B. Emerald accent surviving in ~30 components
+
+`grep` for `10b981 | 34d399 | rgba(16,185,129)` hits: status indicators
+(`StatusIndicator.astro`, `MindMirrorDashboard.tsx`, `MentalHealthHistoryChart.tsx`),
+agent/monitoring dashboards (`AgentMonitorDemo`, `AgentPerformanceHeatmap`,
+`WebPerformanceDashboard`), marketing/showcase surfaces (`mizu/Hero`, `marketing/HowItWorks`,
+`GradientAnimation.astro`, `ConversionTrackingExample`), and several demo/gallery pages.
+
+**Treatment:** value-contrast is the replacement vocabulary (see §2, "The Zero-Chroma
+Rule" and §4). A status dot that was emerald becomes a filled-vs-hollow token glyph; a
+selected-state border goes from accent to `oklch(0.70 0 0)` focus neutral. Status
+*semantics* (success / error / warning) must encode through icon + weight + surface, not
+hue — see the contrast-verify mandate in PRODUCT.md Accessibility. This is real design
+work per component, not a global find-replace, and belongs to a dedicated `harden` /
+`colorize`-inverse pass, not this init.
+
+### C. Shadows present
+
+`public/styles/global.css` and related define `--box-shadow-elevated` (e.g.
+`0 4px 6px -1px rgba(0,0,0,0.1)`). Doctrine: tonal layer only, no shadows (§4).
+
+**Fix direction:** delete the shadow tokens; replace every `box-shadow:` elevation with a
+`surface` → `elevated` background shift.
+
+### What this init did NOT do
+
+This init refreshed the *documents* to match the confirmed brand decisions. It did not touch
+the codebase. Closing the three gaps above (A consolidation, B emerald removal, C shadow
+removal) is follow-up implementation work — see Step 7 for the commands that own it.
