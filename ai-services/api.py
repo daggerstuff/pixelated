@@ -66,10 +66,23 @@ def _cleanup_old_jobs() -> None:
 
 
 def _training_script_path() -> str:
-    """Resolve the path to the fine-tuning script."""
-    project_root = Path(__file__).parent.parent
-    script = project_root / "ai" / "training" / "finetune_model.py"
-    return str(script.resolve())
+    """Resolve the path to the fine-tuning script.
+
+    Tries multiple locations to accommodate both local dev and container layouts.
+    """
+    candidates = [
+        # Local dev: project root / ai / training / finetune_model.py
+        Path(__file__).parent.parent / "ai" / "training" / "finetune_model.py",
+        # Container layout: script may be copied to /app/ai/training/
+        Path("/app/ai/training/finetune_model.py"),
+        # Alternative container layout
+        Path("/opt/pixelated/ai/training/finetune_model.py"),
+    ]
+    for script in candidates:
+        if script.exists():
+            return str(script.resolve())
+    # Fallback to the first candidate; the spawn will fail with a clear FileNotFoundError
+    return str(candidates[0])
 
 
 def _sanitize_dataset_dir(dataset_path: str) -> str:
