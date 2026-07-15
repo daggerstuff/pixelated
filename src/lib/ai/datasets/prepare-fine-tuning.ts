@@ -164,7 +164,11 @@ export async function prepareForOpenAI(
       }
     }
 
-    writeStream.end();
+    await new Promise<void>((resolve, reject) => {
+      writeStream.once("error", reject);
+      writeStream.once("finish", () => resolve());
+      writeStream.end();
+    });
 
     logger.info(`OpenAI dataset prepared: ${recordCount} records, ${skippedCount} skipped`);
     return outputPath;
@@ -234,7 +238,11 @@ export async function prepareForHuggingFace(
       }
     }
 
-    writeStream.end();
+    await new Promise<void>((resolve, reject) => {
+      writeStream.once("error", reject);
+      writeStream.once("finish", () => resolve());
+      writeStream.end();
+    });
 
     logger.info(`HuggingFace dataset prepared: ${recordCount} records, ${skippedCount} skipped`);
     return outputPath;
