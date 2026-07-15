@@ -236,7 +236,7 @@ export class MentalHealthAnalyzer {
 
     indicators.forEach((indicator) => {
       categories.push({
-        name: indicator.type as MentalHealthCategory,
+        name: indicator.type,
         score: indicator.severity,
         confidence: Math.min(1.0, indicator.evidence.length * 0.2 + 0.5),
         keywords: indicator.evidence,

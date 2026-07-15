@@ -10,7 +10,7 @@ frontend/SSR; Express/FastAPI/Flask backend.
 | Tool    | Version | Config                   |
 | ------- | ------- | ------------------------ |
 | Node.js | 24.16.0 | `.nvmrc`                 |
-| pnpm    | 11.11.0 | `package.json`           |
+| pnpm    | 11.12.0 | `package.json`           |
 | Python  | 3.13    | `.python-version`        |
 | uv      | latest  | preferred Python manager |
 

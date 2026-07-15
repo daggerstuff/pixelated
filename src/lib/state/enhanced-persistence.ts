@@ -55,7 +55,7 @@ function hasTimestamp(v: unknown): v is Timestamped {
 
 // Application state atoms with persistence
 export const userPreferencesAtom = atomWithStorage('user_preferences', {
-  theme: 'dark' as 'light' | 'dark' | 'system',
+  theme: 'dark',
   language: 'en',
   notifications: {
     email: true,
@@ -65,7 +65,7 @@ export const userPreferencesAtom = atomWithStorage('user_preferences', {
   accessibility: {
     reducedMotion: false,
     highContrast: false,
-    fontSize: 'medium' as 'small' | 'medium' | 'large',
+    fontSize: 'medium',
   },
   privacy: {
     analytics: true,
@@ -78,11 +78,11 @@ export const userPreferencesAtom = atomWithStorage('user_preferences', {
 export const uiStateAtom = atomWithStorage('ui_state', {
   sidebarOpen: true,
   activeTab: 'dashboard',
-  layout: 'default' as 'default' | 'compact' | 'expanded',
-  viewMode: 'list' as 'list' | 'grid' | 'card',
+  layout: 'default',
+  viewMode: 'list',
   filters: {},
   sortBy: 'date',
-  sortOrder: 'desc' as 'asc' | 'desc',
+  sortOrder: 'desc',
 })
 
 // Session state atoms (temporary persistence)
@@ -110,14 +110,14 @@ export const offlineDataAtom = atomWithStorage('offline_data', {
     retryCount: number
   }>,
   lastSync: null as number | null,
-  conflictResolution: 'manual' as 'auto' | 'manual',
+  conflictResolution: 'manual',
 })
 
 // Analytics and usage tracking atoms
 export const usageStatsAtom = atomWithStorage('usage_stats', {
   sessionCount: 0,
   totalTimeSpent: 0,
-  featureUsage: {} as Record<string, number>,
+  featureUsage: {},
   lastSessionEnd: null as number | null,
   performanceMetrics: {
     averageLoadTime: 0,

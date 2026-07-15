@@ -212,13 +212,7 @@ export function AdvancedFilteringComponent({
                   handleChange(
                     'timeRange',
                     'presetRange',
-                    value as
-                      | 'day'
-                      | 'week'
-                      | 'month'
-                      | 'quarter'
-                      | 'year'
-                      | 'custom',
+                    value,
                   )
                 }
                 placeholder="Select time range"
@@ -671,7 +665,7 @@ export function AdvancedFilteringComponent({
                   handleChange(
                     'visualization',
                     'groupBy',
-                    value as 'day' | 'week' | 'month' | 'session',
+                    value,
                   )
                 }
                 placeholder="Select grouping"

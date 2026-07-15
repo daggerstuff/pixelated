@@ -11,7 +11,7 @@ const notificationService = new NotificationService()
 export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate request
-    const user = await getCurrentUser(request as never)
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -60,7 +60,7 @@ export const GET = async ({ request }: APIContext) => {
 export const PUT: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
-    const user = await getCurrentUser(request as never)
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -103,7 +103,7 @@ export const PUT: APIRoute = async ({ request }) => {
       ) => Promise<unknown>
     }
     const result = await service.updatePreferences?.(
-      user.id as never,
+      user.id,
       preferences,
     )
 

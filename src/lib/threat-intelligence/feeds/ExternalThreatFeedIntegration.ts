@@ -929,7 +929,7 @@ export class ExternalThreatFeedIntegrationCore
       } as FeedConfig & FeedSubscriptionRequestConfig
 
       // Validate updated configuration (requires required fields to be present)
-      this.validateFeedConfig(updatedConfig as FeedConfig)
+      this.validateFeedConfig(updatedConfig)
 
       subscription.config = updatedConfig
 
@@ -1419,7 +1419,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
               metadata: {
                 taxiiVersion: data['spec_version'] as string,
                 objectType: o['type'],
-                labels: (o['labels'] as string[]) ?? [],
+                labels: (o['labels']) ?? [],
               },
             })
           }
@@ -1700,7 +1700,7 @@ class OTXFeedProcessor implements FeedProcessor {
                   pulseName: pulse['name'] as string,
                   pulseAuthor: pulse['author_name'] as string,
                   tlp: pulse['tlp'],
-                  tags: (pulse['tags'] as string[]) ?? [],
+                  tags: (pulse['tags']) ?? [],
                 },
               })
             }

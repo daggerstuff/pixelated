@@ -49,7 +49,7 @@ describe('SessionList', () => {
               targetSources: ['Different Source'],
             },
           ]
-        : []) as (typeof mockSessionList)['items'],
+        : []),
       total: 2,
     }
 
@@ -77,7 +77,7 @@ describe('SessionList', () => {
               currentPhase: 'evaluation',
             },
           ]
-        : []) as (typeof mockSessionList)['items'],
+        : []),
       total: 2,
     }
 

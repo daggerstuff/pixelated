@@ -266,7 +266,7 @@ export class FHEAnalyticsService {
       const finalResult: AnalyticsResult = {
         type: AnalyticsType.SENTIMENT_TREND,
         timestamp: Date.now(),
-        data: analyticsData as Record<string, unknown>,
+        data: analyticsData,
         encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
@@ -276,10 +276,7 @@ export class FHEAnalyticsService {
         const encryptedDataString = await this.fheService.encryptData(
           JSON.stringify(analyticsData),
         )
-        finalResult.data = { encrypted: encryptedDataString } as Record<
-          string,
-          unknown
-        >
+        finalResult.data = { encrypted: encryptedDataString }
         finalResult.isEncrypted = true
       }
 
@@ -375,7 +372,7 @@ export class FHEAnalyticsService {
       const finalResult: AnalyticsResult = {
         type: AnalyticsType.TOPIC_CLUSTERING,
         timestamp: Date.now(),
-        data: analyticsData as Record<string, unknown>,
+        data: analyticsData,
         encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
@@ -385,10 +382,7 @@ export class FHEAnalyticsService {
         const encryptedDataString = await this.fheService.encryptData(
           JSON.stringify(analyticsData),
         )
-        finalResult.data = { encrypted: encryptedDataString } as Record<
-          string,
-          unknown
-        >
+        finalResult.data = { encrypted: encryptedDataString }
         finalResult.isEncrypted = true
       }
 
@@ -481,7 +475,7 @@ export class FHEAnalyticsService {
       const finalResult: AnalyticsResult = {
         type: AnalyticsType.RISK_ASSESSMENT,
         timestamp: Date.now(),
-        data: analyticsData as Record<string, unknown>,
+        data: analyticsData,
         encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
@@ -491,10 +485,7 @@ export class FHEAnalyticsService {
         const encryptedDataString = await this.fheService.encryptData(
           JSON.stringify(analyticsData),
         )
-        finalResult.data = { encrypted: encryptedDataString } as Record<
-          string,
-          unknown
-        >
+        finalResult.data = { encrypted: encryptedDataString }
         finalResult.isEncrypted = true
       }
 
@@ -608,7 +599,7 @@ export class FHEAnalyticsService {
       const finalResult: AnalyticsResult = {
         type: AnalyticsType.INTERVENTION_EFFECTIVENESS,
         timestamp: Date.now(),
-        data: analyticsData as Record<string, unknown>,
+        data: analyticsData,
         encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
@@ -618,10 +609,7 @@ export class FHEAnalyticsService {
         const encryptedDataString = await this.fheService.encryptData(
           JSON.stringify(analyticsData),
         )
-        finalResult.data = { encrypted: encryptedDataString } as Record<
-          string,
-          unknown
-        >
+        finalResult.data = { encrypted: encryptedDataString }
         finalResult.isEncrypted = true
       }
 
@@ -754,7 +742,7 @@ export class FHEAnalyticsService {
       const finalResult: AnalyticsResult = {
         type: AnalyticsType.EMOTIONAL_PATTERNS,
         timestamp: Date.now(),
-        data: analyticsData as Record<string, unknown>,
+        data: analyticsData,
         encryptionMode: this.fheService.getMode(),
         isEncrypted: false,
       }
@@ -764,10 +752,7 @@ export class FHEAnalyticsService {
         const encryptedDataString = await this.fheService.encryptData(
           JSON.stringify(analyticsData),
         )
-        finalResult.data = { encrypted: encryptedDataString } as Record<
-          string,
-          unknown
-        >
+        finalResult.data = { encrypted: encryptedDataString }
         finalResult.isEncrypted = true
       }
 

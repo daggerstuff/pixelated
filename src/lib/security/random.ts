@@ -9,7 +9,7 @@
 import { secureRandomInt } from '../crypto/secure-random'
 
 export function getRandomBytes(length: number): Uint8Array {
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+  if (crypto?.getRandomValues) {
     return crypto.getRandomValues(new Uint8Array(length))
   }
   const bytes = new Uint8Array(length)

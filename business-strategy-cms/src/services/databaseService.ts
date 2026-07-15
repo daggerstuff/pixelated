@@ -84,7 +84,7 @@ export class DatabaseService {
       }
     }
 
-    return doc.toObject() as unknown as BusinessMetrics
+    return doc.toObject()
   }
 
   /**
