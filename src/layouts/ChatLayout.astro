@@ -1,4 +1,5 @@
 ---
+import '@/styles/np-tokens.css'
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
 import SpeedInsights from '@vercel/speed-insights/astro'
 import Analytics from '@vercel/analytics/astro'
@@ -20,15 +21,6 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#0f172a" />
     <title>{title} | Pixelated Empathy</title>
-
-    <link rel="stylesheet" href="/css/unified-dark-theme-v3.css" />
-    <link rel="stylesheet" href="/css/design-system.css" />
-    <link rel="stylesheet" href="/css/unified-blended-theme.css" />
-
-    <link rel="stylesheet" href="/css/fonts.css" />
-    <link rel="stylesheet" href="/css/font-fix.css" />
-
-    <link rel="stylesheet" href="/css/background-fixes.css" />
 
     <script src="/js/polyfill-detector.js" is:inline></script>
     <script src="/js/module-loader.js" defer is:inline></script>
