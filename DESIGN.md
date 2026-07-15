@@ -103,7 +103,7 @@ contrast, not hue.
 | Surface | `oklch(0.95 0 0)` / `#f2f2f2` | Cards, containers |
 | Elevated | `oklch(0.92 0 0)` / `#ebebeb` | Modals, dropdowns |
 | Text | `oklch(0.15 0 0)` / `#262626` | Body copy, headings |
-| Muted | `oklch(0.55 0 0)` / `#8c8c8c` | Labels, captions |
+| Muted | `oklch(0.42 0 0)` / `#6b6b6b` | Labels, captions, placeholder text |
 | Line | `rgba(0, 0, 0, 0.08)` | Borders, dividers |
 
 ### The Zero-Chroma Rule
