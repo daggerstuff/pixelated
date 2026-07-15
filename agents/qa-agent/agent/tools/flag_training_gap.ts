@@ -41,7 +41,10 @@ export default defineTool({
       category: 'qa_review',
       scope: 'cohort',
       retention: 'long_term',
-      importance: 0.7 + input.priority * 0.075,
+      // Clamp to 1.0: at priority 4 the float sum can exceed the Foresight
+      // schema max (1.0), causing the memory to be silently dropped while the
+      // tool still reports success.
+      importance: Math.min(1, 0.7 + input.priority * 0.075),
       tags: [
         'training_gap',
         `cohort:${input.cohort_id}`,

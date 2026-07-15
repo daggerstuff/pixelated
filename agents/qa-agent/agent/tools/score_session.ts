@@ -70,6 +70,27 @@ export default defineTool({
     const transcript = (memories ?? [])
       .map((m) => m.content)
       .filter(Boolean)
+      // Exclude previously persisted score records: they share the session_id
+      // tag and are stored as JSON score objects, so a naive session_id fetch
+      // pulls them back in and biases the new score. Keep only transcript prose.
+      .filter((c) => {
+        try {
+          const parsed = JSON.parse(c)
+          if (
+            parsed &&
+            typeof parsed === 'object' &&
+            'state' in parsed &&
+            ['REVIEWED', 'UNAVAILABLE', 'NO_EVIDENCE'].includes(
+              (parsed as { state?: string }).state ?? '',
+            )
+          ) {
+            return false
+          }
+        } catch {
+          // Not JSON -> genuine transcript text, keep it.
+        }
+        return true
+      })
       .join('\n---\n')
 
     if (!model) {
