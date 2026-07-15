@@ -56,8 +56,23 @@
   for `pending_items` + `project_context`), `search_memories` (`active tasks`
   `upcoming work` owner/team scope), then `manage_memories` as needed.
 - MCP server exposes only reduced core surface documented in
-  `.agents/skills/foresight/SKILL.md`use `foresight` CLI for expert maintenance
+  `.agents/skills/foresight/SKILL.md`. Use `foresight` CLI for expert maintenance
   commands.
 - Root `AGENTS.md` is main source of truth.
 - For scoped rules, prefer nested instruction files (`AGENTS.md` under touched
   directories).
+
+## Design Context
+
+- **Design is documented**: `PRODUCT.md` (strategic: register, users, purpose, brand
+  personality, anti-references, principles, a11y) and `DESIGN.md` (visual: the Quiet
+  Instrument — dark-first, zero-chroma grayscale, 0px radius, no shadows, Fraunces /
+  Public Sans / JetBrains Mono). Read both before any UI work.
+- **Doctrine**: zero-chroma (no accent, no hue in tokens), 0px radius everywhere, tonal
+  layering not shadows, motion conveys state only. Emphasis via value contrast.
+- **Known code drift** (open tech-debt, see DESIGN.md §7): emerald `#10b981` accent lives
+  in ~30 components, a non-zero radius scale (2/4/8px) across 5 competing theme files,
+  and shadow tokens. New/refactored work targets the doctrine; the drift is follow-up
+  work, not permission to extend it.
+- **A11y mandate**: every text/surface pair must be measured against WCAG AA (4.5:1 body,
+  3:1 large). The neutral ramp gives no contrast guarantee — measure, don't assume.
