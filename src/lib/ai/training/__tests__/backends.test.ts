@@ -4,7 +4,7 @@ import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import { HuggingFaceTrainingBackend } from "../backends/HuggingFaceTrainingBackend";
 import { LocalTrainingBackend } from "../backends/LocalBackend";
 
-describe("LocalTrainingBackend", () => {
+describe("LocalTrainingBackend (API path)", () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn())
   })
@@ -43,6 +43,109 @@ describe("LocalTrainingBackend", () => {
     expect(models).toEqual([
       { id: "local-gguf-base", ownedBy: "local", fineTunable: true },
     ]);
+  });
+});
+
+describe("LocalTrainingBackend (microservice path)", () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  test("submitJob routes through microservice when scriptPath is set", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          job: {
+            id: "local-123",
+            model: "llama3",
+            status: "queued",
+            created_at: 1_700_000_000,
+            fine_tuned_model: null,
+          },
+        }),
+        { status: 202 },
+      ),
+    );
+
+    const backend = new LocalTrainingBackend({
+      scriptPath: "/some/path.py",
+      microserviceUrl: "http://ai-svc",
+    });
+    const result = await backend.submitJob("/tmp/ds.jsonl", {
+      model: "llama3",
+      nEpochs: 2,
+      backend: "local",
+    });
+
+    expect(result.remoteId).toBe("local-123");
+    expect(result.status).toBe("queued");
+
+    const call = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(call[0]).toBe("http://ai-svc/api/training/jobs");
+    expect(call[1].method).toBe("POST");
+    const body = JSON.parse(call[1].body as string);
+    expect(body.model).toBe("llama3");
+    expect(body.epochs).toBe(2);
+  });
+
+  test("getJobStatus routes through microservice when scriptPath is set", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          job: {
+            id: "local-123",
+            model: "llama3",
+            status: "succeeded",
+            created_at: 1_700_000_000,
+            fine_tuned_model: "my-local-model",
+          },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const backend = new LocalTrainingBackend({
+      scriptPath: "/some/path.py",
+      microserviceUrl: "http://ai-svc",
+    });
+    const result = await backend.getJobStatus("local-123");
+
+    expect(result).not.toBeNull();
+    expect(result!.status).toBe("succeeded");
+    expect(result!.fineTunedModel).toBe("my-local-model");
+
+    const call = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(call[0]).toBe("http://ai-svc/api/training/jobs/local-123");
+  });
+
+  test("cancelJob routes through microservice when scriptPath is set", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          job: { id: "local-123", status: "cancelled" },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const backend = new LocalTrainingBackend({
+      scriptPath: "/some/path.py",
+      microserviceUrl: "http://ai-svc",
+    });
+    const result = await backend.cancelJob("local-123");
+
+    expect(result).not.toBeNull();
+    expect(result!.status).toBe("cancelled");
+
+    const call = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(call[0]).toBe("http://ai-svc/api/training/jobs/local-123/cancel");
+    expect(call[1].method).toBe("POST");
   });
 });
 
