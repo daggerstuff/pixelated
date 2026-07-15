@@ -65,14 +65,14 @@
 ## Design Context
 
 - **Design is documented**: `PRODUCT.md` (strategic: register, users, purpose, brand
-  personality, anti-references, principles, a11y) and `DESIGN.md` (visual: the Quiet
+  personality, anti-references, principles, a11y) `DESIGN.md` (visual: Quiet
   Instrument — dark-first, zero-chroma grayscale, 0px radius, no shadows, Fraunces /
   Public Sans / JetBrains Mono). Read both before any UI work.
 - **Doctrine**: zero-chroma (no accent, no hue in tokens), 0px radius everywhere, tonal
   layering not shadows, motion conveys state only. Emphasis via value contrast.
 - **Known code drift** (open tech-debt, see DESIGN.md §7): emerald `#10b981` accent lives
-  in ~30 components, a non-zero radius scale (2/4/8px) across 5 competing theme files,
-  and shadow tokens. New/refactored work targets the doctrine; the drift is follow-up
+  in ~30 components, non-zero radius scale (2/4/8px) across 5 competing theme files,
+  and shadow tokens. New/refactored work targets doctrine; drift is follow-up
   work, not permission to extend it.
 - **A11y mandate**: every text/surface pair must be measured against WCAG AA (4.5:1 body,
-  3:1 large). The neutral ramp gives no contrast guarantee — measure, don't assume.
+  3:1 large). neutral ramp gives no contrast guarantee — measure, don't assume.

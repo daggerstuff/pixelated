@@ -133,18 +133,18 @@ Foresight is persistent memory layer for AI agents — shared across all machine
 
 ### Session Startup Workflow (GATE — do not skip)
 
-This is a hard gate, not a suggestion. Every session touching real work MUST run the foresight continuity read as its **first action** — before any code edit,
+This is hard gate, not suggestion. Every session touching real work MUST run foresight continuity read as its **first action** — before any code edit,
 exploration, or planning prose.
 
-1. **GATE read (mandatory first action):** call `manage_context_blocks` with action `get` for `project_context` AND `pending_items`.
+1. **GATE read (mandatory first action):** call `manage_context_blocks` w/ action `get` for `project_context`  `pending_items`.
    No exceptions for "I already know", "quick task", or "I'll check after". Treat it like `git status` — first, always.
-2. **Show your work (no silent skip):** in your first reply, state what the blocks returned — quote the entry count and a one-line summary per block.
-   Example: "project_context: 3 entries — <one-line>; pending_items: 2 — <one-line>." A skip that isn't named is one the human can't audit.
-3. **`search_memories`** w/ keywords related to your task — prior decisions live in memories; confirm or contradict what the blocks said.
-4. **Use findings to inform your approach** — if a memory contradicts your plan, say so before editing.
+2. **Show your work (no silent skip):** in your first reply, state what blocks returned — quote entry count and one-line summary per block.
+   Example: "project_context: 3 entries — <one-line>; pending_items: 2 — <one-line>." skip that isn't named is one human can't audit.
+3. **`search_memories`** w/ keywords related to your task — prior decisions live in memories; confirm or contradict what blocks said.
+4. **Use findings to inform your approach** — if memory contradicts your plan, say so before editing.
 5. **`manage_memories` to store** durable lessons/decisions when work completes; `manage_context_blocks` `update` on `pending_items` when scope shifts.
 
-**Skipping the gate is not permitted without naming it.** If you decide it doesn't apply (pure conversation, no code), say so explicitly in the first reply and why.
+**Skipping gate is not permitted w/o naming it.** If you decide it doesn't apply (pure conversation, no code), say so explicitly in first reply and why.
 
 ### CLI Quick Reference
 
