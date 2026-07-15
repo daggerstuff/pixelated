@@ -8,7 +8,7 @@ export BACKUP_RCLONE_FAST_LIST=false
 export BACKUP_RUN_PREFIX="home-pixelated-run"
 export BACKUP_RCLONE_TRANSFERS=2
 export BACKUP_RCLONE_CHECKERS=2
-export BACKUP_RCLONE_EXTRA_ARGS="--tpslimit 4 --tpslimit-burst 4 --copy-dest whitebat:training/home-vivi-run-20260715-014847"
+export BACKUP_RCLONE_EXTRA_ARGS="--tpslimit 4 --tpslimit-burst 4"
 export GODEBUG=http2client=0
 
 bash /home/vivi/pixelated/scripts/backup/backup-home-vivi.sh

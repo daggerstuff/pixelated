@@ -112,6 +112,52 @@ def _sanitize_dataset_dir(dataset_path: str) -> str:
     return "./data/finetuning"
 
 
+# Allowed models for fine-tuning (allowlist)
+_ALLOWED_MODELS = {
+    "meta-llama/Llama-2-7b-hf",
+    "meta-llama/Llama-2-13b-hf",
+    "mistralai/Mistral-7B-v0.1",
+    "google/gemma-2b",
+}
+
+# Hyperparameter bounds
+_MAX_EPOCHS = 100
+_MAX_BATCH_SIZE = 128
+_MIN_LEARNING_RATE = 1e-7
+_MAX_LEARNING_RATE = 1e-2
+
+
+def _validate_training_payload(payload: dict) -> None:
+    """Validate training job payload before spawning subprocess.
+
+    Raises ValueError with a descriptive message if any field is invalid.
+    """
+    model = payload.get("model", "meta-llama/Llama-2-7b-hf")
+    if model not in _ALLOWED_MODELS:
+        raise ValueError(f"Model '{model}' is not in the allowed allowlist.")
+
+    dataset = payload.get("dataset", "")
+    if dataset:
+        safe_dir = _sanitize_dataset_dir(dataset)
+        if safe_dir != dataset:
+            logger.warning(f"[training] dataset path sanitized from {dataset!r} to {safe_dir!r}")
+
+    epochs = payload.get("epochs", 3)
+    if not isinstance(epochs, (int, float)) or epochs < 1 or epochs > _MAX_EPOCHS:
+        raise ValueError(f"epochs must be an integer between 1 and {_MAX_EPOCHS}, got {epochs}")
+
+    batch_size = payload.get("batch_size", 8)
+    if not isinstance(batch_size, (int, float)) or batch_size < 1 or batch_size > _MAX_BATCH_SIZE:
+        raise ValueError(f"batch_size must be an integer between 1 and {_MAX_BATCH_SIZE}, got {batch_size}")
+
+    lr = payload.get("learning_rate")
+    if lr is not None:
+        if not isinstance(lr, (int, float)) or lr < _MIN_LEARNING_RATE or lr > _MAX_LEARNING_RATE:
+            raise ValueError(
+                f"learning_rate must be a number between {_MIN_LEARNING_RATE} and {_MAX_LEARNING_RATE}, got {lr}"
+            )
+
+
 def _drain_stream(stream, buffer: list):
     """Continuously read from a stream into a buffer list to prevent pipe blocking."""
     try:
@@ -201,6 +247,8 @@ def create_training_job():
     """Submit a new fine-tuning job."""
     try:
         data = request.json or {}
+        _validate_training_payload(data)
+
         job_id = f"hf-{int(time.time() * 1000)}-{uuid.uuid4().hex[:6]}"
 
         _cleanup_old_jobs()
@@ -296,8 +344,14 @@ def cancel_training_job(job_id):
             _training_jobs[job_id]["status"] = "cancelled"
         logger.info(f"[training] cancelled job {job_id}")
     else:
+        # Proc may have just finished; reconcile status before overwriting.
+        _update_job_status(job_id)
         with _training_lock:
-            _training_jobs[job_id]["status"] = "cancelled"
+            job = _training_jobs.get(job_id)
+            if job and job.get("status") in ("succeeded", "failed"):
+                return jsonify({"success": False, "error": f"Job already finished with status {job['status']}"}), 409
+            if job:
+                _training_jobs[job_id]["status"] = "cancelled"
 
     with _training_lock:
         job = _training_jobs.get(job_id)
