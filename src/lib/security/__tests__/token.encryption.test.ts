@@ -1,6 +1,7 @@
 /* @vitest-environment node */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
+import { SecurityError } from '../errors/security.error'
 import {
   TokenEncryptionService,
   type TokenEncryptionConfig,
@@ -221,3 +222,112 @@ describe('token Encryption Service', () => {
     })
   })
 })
+
+// ---------------------------------------------------------------------------
+// Real implementation tests: exercise the actual node:crypto AES-256-GCM provider
+// (no mocked crypto). These verify genuine encrypt/decrypt round-trips,
+// tamper detection, and object serialization — the behavior the mocks above
+// cannot prove.
+// ---------------------------------------------------------------------------
+describe('TokenEncryptionService (real node:crypto AES-256-GCM)', () => {
+  const realConfig: TokenEncryptionConfig = {
+    algorithm: 'aes-256-gcm',
+    keyLength: 32,
+    ivLength: 16,
+    salt: 'a-long-enough-real-salt-for-tests-1234567890',
+    password: 'real-test-password',
+  }
+
+  const realLogger = {
+    info: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    debug: vi.fn(),
+  }
+
+  let realService: TokenEncryptionService
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // No cryptoProvider passed -> uses the real defaultCryptoProvider (node:crypto)
+    realService = new TokenEncryptionService(
+      realConfig,
+      realLogger as unknown as Console,
+    )
+  })
+
+  afterEach(() => {
+    realService.cleanup()
+    vi.restoreAllMocks()
+  })
+
+  it('auto-initializes from the configured password', async () => {
+    // Construction already triggered initialization via password; calling
+    // encrypt proves the derived key is present and usable.
+    const { encryptedToken, iv, authTag } = await realService.encrypt('payload')
+    expect(encryptedToken).toBeDefined()
+    expect(iv).toBeDefined()
+    expect(authTag).toBeDefined()
+    expect(realLogger.info).toHaveBeenCalledWith(
+      'Token encryption service initialized successfully',
+    )
+  })
+
+  it('round-trips a string with real AES-256-GCM', async () => {
+    const original = 'super-secret-token-value'
+    const enc = await realService.encrypt(original)
+    const dec = await realService.decrypt<string>(enc)
+    expect(dec).toBe(original)
+  })
+
+  it('round-trips structured objects via JSON serialization', async () => {
+    const payload = { userId: 'u_1', scope: ['read', 'write'], n: 42 }
+    const enc = await realService.encrypt(payload)
+    const dec = await realService.decrypt<typeof payload>(enc)
+    expect(dec).toEqual(payload)
+  })
+
+  it('produces a different ciphertext each time (random IV)', async () => {
+    const a = await realService.encrypt('same-input')
+    const b = await realService.encrypt('same-input')
+    expect(a.encryptedToken).not.toBe(b.encryptedToken)
+    expect(a.iv).not.toBe(b.iv)
+    // but both decrypt back to the same value
+    expect(await realService.decrypt<string>(a)).toBe('same-input')
+    expect(await realService.decrypt<string>(b)).toBe('same-input')
+  })
+
+  it('throws a SecurityError when the auth tag is tampered', async () => {
+    const enc = await realService.encrypt('do-not-tamper')
+    const tamperedAuthTag = enc.authTag.split('').reverse().join('')
+    await expect(
+      realService.decrypt({ ...enc, authTag: tamperedAuthTag }),
+    ).rejects.toThrow(SecurityError)
+  })
+
+  it('throws a SecurityError when the ciphertext is tampered', async () => {
+    const enc = await realService.encrypt('integrity-check')
+    const buf = Buffer.from(enc.encryptedToken, 'base64')
+    buf[0] ^= 0xff
+    await expect(
+      realService.decrypt({
+        ...enc,
+        encryptedToken: buf.toString('base64'),
+      }),
+    ).rejects.toThrow(SecurityError)
+  })
+
+  it('supports key rotation and re-encryption with the new key', async () => {
+    const before = await realService.encrypt('before-rotation')
+    expect(await realService.decrypt<string>(before)).toBe('before-rotation')
+
+    await realService.rotateKey('new-real-password')
+    expect(realLogger.info).toHaveBeenCalledWith(
+      'Encryption key rotated successfully',
+    )
+
+    const after = await realService.encrypt('after-rotation')
+    expect(await realService.decrypt<string>(after)).toBe('after-rotation')
+  })
+})
+
