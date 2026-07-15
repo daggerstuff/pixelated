@@ -689,7 +689,12 @@ export class ResearchQueryEngine {
       metadata: {
         ...result.metadata,
         anonymizationMetrics: anonymizedData.privacyMetrics,
-        anonymizationAudit: anonymizedData.auditLog as unknown as { kAnonymity: number; differentialPrivacyEpsilon: number; noiseLevel: number; suppressionRate: number },
+        anonymizationAudit: anonymizedData.auditLog as unknown as {
+          kAnonymity: number
+          differentialPrivacyEpsilon: number
+          noiseLevel: number
+          suppressionRate: number
+        },
       },
     }
   }

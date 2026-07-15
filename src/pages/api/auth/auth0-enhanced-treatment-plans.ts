@@ -160,7 +160,7 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
         : new Date().toISOString(),
     duration: plan.duration ?? 0,
     status: plan.status,
-    goals: (plan.goals) ?? [],
+    goals: plan.goals ?? [],
     notes: plan.notes ?? '',
     metadata: plan.metadata,
   }

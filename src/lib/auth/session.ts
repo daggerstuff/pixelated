@@ -270,7 +270,10 @@ export function isSessionValid(session: Session): boolean {
  */
 export async function getUserProfile(userId: string) {
   try {
-    const user = await userManager.getUserById(userId) as Record<string, unknown> | null
+    const user = (await userManager.getUserById(userId)) as Record<
+      string,
+      unknown
+    > | null
 
     if (!user) {
       logger.error('User not found:', userId)
