@@ -246,7 +246,7 @@ export const auditLoggingMiddleware = defineMiddleware(
       method,
       path,
       query: Object.fromEntries(url.searchParams),
-      headers: {} as Record<string, string>,
+      headers: {},
       userAgent: request.headers.get('user-agent') ?? 'unknown',
       referer: request.headers.get('referer') ?? 'direct',
       ipAddress:

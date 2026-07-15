@@ -234,7 +234,7 @@ export class MockFHEService implements FHEService {
     // Parse the encrypted data
     let data: MockEncryptedData
     try {
-      data = JSON.parse(encryptedData) as unknown as MockEncryptedData
+      data = JSON.parse(encryptedData)
     } catch {
       throw new Error('Invalid encrypted data format')
     }
@@ -564,12 +564,18 @@ export class MockFHEService implements FHEService {
   private async hashPlaintext(value: unknown): Promise<string> {
     const jsonStr = JSON.stringify(value)
     // Prefer Web Crypto API (browser/jsdom compatible) over Node crypto
-    const subtle =
-      typeof globalThis.crypto?.subtle !== 'undefined'
-        ? globalThis.crypto
-        : await import('node:crypto').then((m) => m.webcrypto)
-    const data = new TextEncoder().encode(jsonStr).buffer as ArrayBuffer
-    const hashBuffer = await subtle.subtle.digest('SHA-256', data)
+    let cryptoSubtle: SubtleCrypto | any
+    if (typeof globalThis.crypto?.subtle !== 'undefined') {
+      cryptoSubtle = globalThis.crypto.subtle
+    } else {
+      const nodeCrypto = await import('node:crypto')
+      if (!nodeCrypto.webcrypto.subtle) {
+        throw new Error('Web Crypto API not available')
+      }
+      cryptoSubtle = nodeCrypto.webcrypto.subtle
+    }
+    const data = new TextEncoder().encode(jsonStr)
+    const hashBuffer = await cryptoSubtle.digest('SHA-256', data)
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
   }

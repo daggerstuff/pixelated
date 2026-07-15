@@ -78,11 +78,7 @@ export async function fetchWithRetry(
         const shouldRetry = Array.isArray(retryOn)
           ? retryOn.includes(response.status)
           : await (
-              retryOn as (
-                response: Response | null,
-                error: unknown | null,
-                attempt: number,
-              ) => boolean | Promise<boolean>
+              retryOn
             )(response, null, attempt)
 
         if (shouldRetry) {
@@ -108,11 +104,7 @@ export async function fetchWithRetry(
         const shouldRetry = Array.isArray(retryOn)
           ? true // if error occurred, we retry regardless of status list
           : await (
-              retryOn as (
-                response: Response | null,
-                error: unknown | null,
-                attempt: number,
-              ) => boolean | Promise<boolean>
+              retryOn
             )(null, err, attempt)
 
         if (shouldRetry) {

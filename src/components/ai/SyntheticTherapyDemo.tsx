@@ -361,16 +361,16 @@ export default function SyntheticTherapyDemo() {
                     <Badge
                       key={disorder}
                       variant={
-                        config.disorders.includes(disorder as DisorderCategory)
+                        (config.disorders as DisorderCategory[]).includes(disorder as DisorderCategory)
                           ? 'default'
                           : 'outline'
                       }
                       className='cursor-pointer'
                       onClick={() => {
-                        const disorders = config.disorders.includes(
+                        const disorders = (config.disorders as DisorderCategory[]).includes(
                           disorder as DisorderCategory,
                         )
-                          ? config.disorders.filter((d) => d !== disorder)
+                          ? config.disorders.filter((d) => d !== disorder as DisorderCategory)
                           : [...config.disorders, disorder as DisorderCategory]
                         setConfig({ ...config, disorders })
                       }}

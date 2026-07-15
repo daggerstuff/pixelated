@@ -136,7 +136,7 @@ class PrivacyEngine {
     this.privacyBudgets.set(clientId, currentBudget - usedBudget)
 
     // Store client model for aggregation
-    this.clientModels.set(clientId, privateUpdate as unknown as ModelUpdate)
+    this.clientModels.set(clientId, privateUpdate)
 
     // Check if we have enough updates for aggregation
     if (this.clientModels.size >= this.federatedConfig.minClients) {

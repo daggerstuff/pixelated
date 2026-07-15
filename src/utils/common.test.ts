@@ -53,8 +53,8 @@ describe('common utilities - unescapeHTML', () => {
     const node: VNode = {
       type: 'div',
       children: [
-        { type: 'span', children: '&amp;' } as VNode,
-        { type: 'p', children: '&lt;inside&gt;' } as VNode,
+        { type: 'span', children: '&amp;' },
+        { type: 'p', children: '&lt;inside&gt;' },
       ],
     }
     const result: VNode = toVNode(unescapeHTML(node))

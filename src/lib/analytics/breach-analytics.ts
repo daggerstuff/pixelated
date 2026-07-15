@@ -56,7 +56,7 @@ function convertToBreach(
     notificationStatus:
       breach.notificationStatus === 'in_progress'
         ? 'in-progress'
-        : (breach.notificationStatus as 'pending' | 'completed' | 'failed'),
+        : (breach.notificationStatus),
     notifications: {
       total: 1,
       delivered: 1,
