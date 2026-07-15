@@ -30,7 +30,7 @@ beforeEach(() => {
 
 describe("unresolved IP behavior", () => {
   it("skips unresolved IPs instead of mapping them to (0,0)", async () => {
-    vi.mocked(geoip.lookup).mockImplementation((ip: string) => {
+    vi.mocked(geoip.lookup).mockImplementation((ip: string | number) => {
       if (ip === "203.0.113.4") return { ll: [40.0, -75.0] } as any;
       return null;
     });
@@ -43,7 +43,7 @@ describe("unresolved IP behavior", () => {
   });
 
   it("does not distort spread when an IP is unresolved", async () => {
-    vi.mocked(geoip.lookup).mockImplementation((ip: string) => {
+    vi.mocked(geoip.lookup).mockImplementation((ip: string | number) => {
       if (ip === "198.51.100.1") return { ll: [34.0, -118.0] } as any;
       if (ip === "198.51.100.2") return { ll: [40.7, -74.0] } as any;
       return null;
@@ -59,7 +59,7 @@ describe("unresolved IP behavior", () => {
 
 describe("metric contract", () => {
   it("returns deterministic spread and mobility for known IPs", async () => {
-    vi.mocked(geoip.lookup).mockImplementation((ip: string) => {
+    vi.mocked(geoip.lookup).mockImplementation((ip: string | number) => {
       if (ip === "198.51.100.1") return { ll: [34.0, -118.0] } as any;
       if (ip === "198.51.100.2") return { ll: [40.7, -74.0] } as any;
       return null;

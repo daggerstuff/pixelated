@@ -158,7 +158,11 @@ def create_training_job():
         _update_job_status(job_id)
 
         logger.info(f"[training] created job {job_id}")
-        return jsonify({"success": True, "job": _training_jobs[job_id]}), 202
+        job = _training_jobs[job_id].copy()
+        job.pop("proc", None)
+        job.pop("stdout", None)
+        job.pop("stderr", None)
+        return jsonify({"success": True, "job": job}), 202
     except Exception as e:
         logger.error(f"Training job creation error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500

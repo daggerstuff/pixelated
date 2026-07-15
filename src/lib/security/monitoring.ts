@@ -1,10 +1,13 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { mongoClient } from '../db/mongoClient'
-// @ts-expect-error mongodb-query-validator has no type declarations
 import mongoQueryValidator from 'mongodb-query-validator'
-const { validateQuery } = mongoQueryValidator as { validateQuery: (query: unknown) => boolean }
+const validateQuery = (query: unknown) => {
+  const result = mongoQueryValidator(query as Record<string, unknown>)
+  if (!result.isValidQuery) throw new Error('Invalid query fields: ' + result.invalidFields.join(', '))
+  return true
+}
 import mongoSanitize from 'mongo-sanitize'
-const { sanitize } = mongoSanitize
+const sanitize = mongoSanitize
 
 const logger = createBuildSafeLogger('default')
 

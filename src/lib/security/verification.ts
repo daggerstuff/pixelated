@@ -50,14 +50,14 @@ export function verifyToken(token: string): Record<string, unknown> | null {
       typeof parsed !== 'object' ||
       parsed === null ||
       !('exp' in parsed) ||
-      typeof parsed.exp !== 'number'
+      typeof parsed['exp'] !== 'number'
     ) {
       logger.warn('Token payload invalid', { token })
       return null
     }
 
-    const exp = parsed.exp
-    const iat = parsed.iat
+    const exp = parsed['exp']
+    const iat = parsed['iat']
 
     if (typeof exp !== 'number' || typeof iat !== 'number') {
       logger.warn('Token payload invalid', { token })
