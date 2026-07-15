@@ -64,11 +64,11 @@ function createLogger(name: string): {
   error: (message: string, meta?: unknown) => void
 } {
   return {
-    info: (message: string) => logger.info(`[INFO] ${name}: ${message}`),
+    info: (message: string) => console.info(`[INFO] ${name}: ${message}`),
     warn: (message: string, meta?: unknown) =>
-      logger.warn(`[WARN] ${name}: ${message}`, meta),
+      console.warn(`[WARN] ${name}: ${message}`, meta),
     error: (message: string, meta?: unknown) =>
-      logger.error(`[ERROR] ${name}: ${message}`, meta),
+      console.error(`[ERROR] ${name}: ${message}`, meta),
   }
 }
 
