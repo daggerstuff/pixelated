@@ -356,3 +356,39 @@ describe('getGateway', () => {
     expect(result).toBe('mock-gateway');
   });
 });
+
+describe('handleMemoryApiError', () => {
+  it('handles ProductMemoryGatewayError with 404 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } = await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Not found', 404)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(404)
+    const data = await response.json()
+    expect(data.error).toBe('Not Found')
+  })
+
+  it('handles standard Error', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+
+    const error = new Error('Some unexpected error')
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.error).toBe('Internal Server Error')
+  })
+
+  it('handles unknown error types', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+
+    const error = 'Just a string error'
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.error).toBe('Internal Server Error')
+  })
+})
