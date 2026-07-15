@@ -5,6 +5,29 @@ import Card from '@/components/ui/Card.astro'
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
 import { Auth0UserProfile } from '@/components/auth/Auth0UserProfile'
+import { requirePageAuth } from '@/lib/auth/serverAuth'
+import { PolicyEngine } from '@/lib/governance/policy-engine'
+import type { AstroGlobal } from 'astro'
+
+const authResponse = await requirePageAuth(Astro as AstroGlobal)
+if (authResponse) {
+  return authResponse
+}
+
+// Enforce Data Governance policies
+const policyEngine = new PolicyEngine()
+const evalResult = await policyEngine.evaluate({
+  action: 'view_profile',
+  context: {
+    userId: Astro.locals.user?.id,
+    auditEnabled: true,
+    consentVerified: true,
+  }
+})
+
+if (!evalResult.allowed) {
+  return Astro.redirect(`/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`)
+}
 ---
 
 <DashboardLayout

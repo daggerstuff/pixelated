@@ -17,7 +17,7 @@ beforeEach(() => {
   vi.stubEnv("TRAINING_INFRA_MCP_URL", "http://training-infra.local");
   vi.stubEnv("K8S_MCP_URL", "http://k8s.local");
   vi.stubEnv("SLACK_BOT_TOKEN", "xoxb-test");
-  vi.stubEnv("LINEAR_API_KEY", "lin-test");
+  vi.stubEnv("LINEAR_AGENT_ACCESS_TOKEN", "lin-test");
 });
 
 afterEach(() => {
