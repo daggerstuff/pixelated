@@ -167,7 +167,7 @@ export function requireEnvironmentVariable<
   const value = process.env[name as string]
 
   if (!value) {
-    throw new EnvironmentValidationError([name as string], [])
+    throw new EnvironmentValidationError([name], [])
   }
 
   if (validator && !validator(value)) {
@@ -175,7 +175,7 @@ export function requireEnvironmentVariable<
       [],
       [
         {
-          name: name as string,
+          name: name,
           value,
           expected: 'valid format',
         },

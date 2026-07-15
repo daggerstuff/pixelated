@@ -7,7 +7,7 @@ export const GET: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
     const authResult = await authenticateRequest(
-      request as unknown as Parameters<typeof authenticateRequest>[0],
+      request,
     )
     if (!authResult.success) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {

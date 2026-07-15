@@ -8,12 +8,24 @@
  * in the security/ directory while maintaining backwards compatibility.
  */
 
-import Base64 from 'crypto-js/enc-base64'
-import HmacSHA256 from 'crypto-js/hmac-sha256'
+import CryptoJS from 'crypto-js'
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
 import { secureRandomHex } from './security/random'
+
+/**
+ * Minimal typed view of the crypto-js surface used by this module. The ambient
+ * `declare module 'crypto-js'` in src/types/crypto-js.d.ts leaves every export
+ * typed as `any`, which makes `no-unsafe-call`/`no-unsafe-return` fire on every
+ * chained `.toString(...)`. Asserting into this adapter gives `createSignature`
+ * a real signature so the result is `string` rather than `any`.
+ */
+interface CryptoJsAdapter {
+  HmacSHA256: (message: string, key: string) => { toString: (encoder: unknown) => string }
+  enc: { Base64: unknown }
+}
+const crypto = CryptoJS as unknown as CryptoJsAdapter
 
 // Re-export all event constants so existing consumers can keep importing from this module
 export {
@@ -137,17 +149,17 @@ export function requireSecretKey(): string {
  * Create a cryptographic signature for a payload.
  * Useful for ensuring data integrity of client-provided state.
  */
-export function createSignature(payload: any): string {
+export function createSignature(payload: unknown): string {
   const key = requireSecretKey()
   const message =
     typeof payload === 'string' ? payload : JSON.stringify(payload)
-  return HmacSHA256(message, key).toString(Base64)
+  return crypto.HmacSHA256(message, key).toString(crypto.enc.Base64)
 }
 
 /**
  * Verify a signature for a given payload.
  */
-export function verifySignature(payload: any, signature: string): boolean {
+export function verifySignature(payload: unknown, signature: string): boolean {
   try {
     const expected = createSignature(payload)
     return signature === expected
@@ -186,7 +198,7 @@ export async function decryptSensitiveData(
  * Useful for state that needs to be passed between client and server.
  */
 export function createSecureToken(
-  payload: any,
+  payload: Record<string, unknown>,
   expiresIn: number = 3600,
 ): string {
   const tokenData = {
@@ -209,7 +221,7 @@ export function createSecureToken(
 /**
  * Verify and decode a secure token.
  */
-export function verifySecureToken(token: string): unknown | null {
+export function verifySecureToken(token: string): unknown {
   try {
     const parts = token.split('.')
     if (parts.length !== 2) return null
@@ -226,15 +238,16 @@ export function verifySecureToken(token: string): unknown | null {
         ? Buffer.from(encodedData, 'base64').toString('utf-8')
         : atob(encodedData)
 
-    const payload = JSON.parse(dataString)
+    const payload = JSON.parse(dataString) as Record<string, unknown>
 
     // Check expiration
     const now = Math.floor(Date.now() / 1000)
-    if (payload.exp && payload.exp < now) {
+    const exp = payload['exp']
+    if (typeof exp === 'number' && exp < now) {
       return null
     }
 
-    return payload as unknown
+    return payload
   } catch {
     return null
   }

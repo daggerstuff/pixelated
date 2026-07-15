@@ -724,7 +724,7 @@ export class IntegratedAIService {
               processingTimeMs: 0,
             }
           : undefined,
-      } as IntegratedResponse
+      }
     }
 
     const responseContent = baseResponse.choices[0].message.content
@@ -743,7 +743,7 @@ export class IntegratedAIService {
           totalTokens: baseResponse.usage?.totalTokens ?? 0,
           processingTimeMs: 0,
         },
-      } as IntegratedResponse
+      }
     }
 
     const context = this.metaAligner.detectContext(

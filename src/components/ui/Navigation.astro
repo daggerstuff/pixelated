@@ -25,12 +25,10 @@ interface MenuItem {
 const position = UI.nav.position as NavPosition
 const navClasses = `${navPositionClasses[position]} ${UI.nav.glassmorphism ? 'backdrop-blur-md bg-white/80 dark:bg-gray-900/80' : 'bg-white dark:bg-gray-900'} ${className}`
 
-const menuItems = Object.entries(SITE.menu).map(
-  ([key, value]): MenuItem => ({
-    link: `/${key === 'home' ? '' : key}`,
-    text: value,
-  }),
-)
+const menuItems = Object.entries(SITE.menu).map(([key, value]): MenuItem => ({
+  link: `/${key === 'home' ? '' : key}`,
+  text: value,
+}))
 
 // Get the current page path to determine active link
 const currentPath = Astro.url.pathname

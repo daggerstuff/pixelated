@@ -63,7 +63,7 @@ class TenantManager {
         ? { keySize: resourceLimits.maxKeySize }
         : {}),
       tenantConfig: tenant,
-    } as Record<string, unknown> & { tenantConfig: TenantConfig }
+    }
   }
 
   getTenantKeyPrefix(tenantId: string, basePrefix: string): string {

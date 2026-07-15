@@ -117,7 +117,7 @@ export class JobQueueService {
 
     let job: Job
     try {
-      job = JSON.parse(jobString[0].value) as unknown as Job
+      job = JSON.parse(jobString[0].value)
     } catch {
       logger.error('Failed to parse dequeued job, discarding', {
         value: jobString[0].value.substring(0, 200),
@@ -175,7 +175,7 @@ export class JobQueueService {
         createdAt: updates.createdAt ?? new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         ...updates,
-      } as Job
+      }
     } else {
       logger.warn(
         'Attempted to update status for non-existent job without full details',
