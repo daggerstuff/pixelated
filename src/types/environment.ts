@@ -70,6 +70,8 @@ export interface AIEnvironmentVariables {
   readonly JIGSAWSTACK_API_KEY?: ApiKey | undefined
   readonly GOOGLE_AI_API_KEY?: ApiKey | undefined
   readonly HUGGING_FACE_API_KEY?: ApiKey | undefined
+  readonly AI_SERVICE_URL?: Url | undefined
+  readonly AI_SERVICE_API_KEY?: ApiKey | undefined
 }
 
 /** Analytics and monitoring environment variables */

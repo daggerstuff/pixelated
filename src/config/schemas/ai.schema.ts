@@ -28,4 +28,8 @@ export const aiEnvSchema = z.object({
     .transform((val: string) => val === 'true')
     .optional(),
   MENTALLAMA_PYTHON_BRIDGE_SCRIPT_PATH: z.string().optional(),
+
+  // AI Microservice (PIX-3926)
+  AI_SERVICE_URL: z.url().optional(),
+  AI_SERVICE_API_KEY: z.string().optional(),
 })
