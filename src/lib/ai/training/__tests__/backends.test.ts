@@ -47,29 +47,132 @@ describe("LocalTrainingBackend", () => {
 });
 
 describe("HuggingFaceTrainingBackend", () => {
-  test("cancelJob throws until microservice wiring lands", async () => {
-    const backend = new HuggingFaceTrainingBackend({});
-    await expect(backend.cancelJob("hf-1")).rejects.toThrow(
-      /HuggingFaceTrainingBackend does not support cancel/,
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  test("submitJob posts to microservice and returns job", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          job: {
+            id: "hf-123",
+            model: "mistralai/Mistral-7B-v0.1",
+            status: "queued",
+            created_at: 1_700_000_000,
+            fine_tuned_model: null,
+          },
+        }),
+        { status: 202 },
+      ),
     );
-  });
 
-  test("submitJob throws when finetune_model.py is missing", async () => {
-    const backend = new HuggingFaceTrainingBackend({
-      scriptPath: "/tmp/non-existent-script.py",
-      timeoutMs: 1000,
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const result = await backend.submitJob("/tmp/ds.jsonl", {
+      model: "mistralai/Mistral-7B-v0.1",
+      nEpochs: 1,
+      backend: "huggingface",
     });
-    await expect(
-      backend.submitJob("/tmp/missing.jsonl", {
-        model: "mistralai/Mistral-7B-v0.1",
-        nEpochs: 1,
-        backend: "huggingface",
-      }),
-    ).rejects.toThrow(/HuggingFace backend script not found/);
+
+    expect(result.id).toBe("hf-123");
+    expect(result.status).toBe("queued");
+    expect(result.model).toBe("mistralai/Mistral-7B-v0.1");
+
+    const call = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(call[0]).toBe("http://ai-svc/api/training/jobs");
+    expect(call[1].method).toBe("POST");
+    const body = JSON.parse(call[1].body as string);
+    expect(body.model).toBe("mistralai/Mistral-7B-v0.1");
+    expect(body.dataset).toBe("/tmp/ds.jsonl");
+    expect(body.epochs).toBe(1);
   });
 
-  test("listModels includes mistral and llama entries", async () => {
-    const backend = new HuggingFaceTrainingBackend({});
+  test("getJobStatus returns job from microservice", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          job: {
+            id: "hf-123",
+            model: "meta-llama/Llama-2-7b-hf",
+            status: "succeeded",
+            created_at: 1_700_000_000,
+            fine_tuned_model: "my-model",
+          },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const result = await backend.getJobStatus("hf-123");
+
+    expect(result).not.toBeNull();
+    expect(result!.status).toBe("succeeded");
+    expect(result!.fineTunedModel).toBe("my-model");
+  });
+
+  test("getJobStatus returns null on network error", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"));
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    expect(await backend.getJobStatus("hf-123")).toBeNull();
+  });
+
+  test("cancelJob posts to microservice cancel endpoint", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          job: { id: "hf-123", status: "cancelled" },
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const result = await backend.cancelJob("hf-123");
+
+    expect(result).not.toBeNull();
+    expect(result!.status).toBe("cancelled");
+
+    const call = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(call[0]).toBe("http://ai-svc/api/training/jobs/hf-123/cancel");
+    expect(call[1].method).toBe("POST");
+  });
+
+  test("cancelJob returns null on network error", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"));
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    expect(await backend.cancelJob("hf-123")).toBeNull();
+  });
+
+  test("listModels fetches from microservice", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          success: true,
+          models: [
+            { id: "meta-llama/Llama-2-7b-hf", owned_by: "meta", fine_tunable: true },
+          ],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
+    const models = await backend.listModels();
+    expect(models).toEqual([
+      { id: "meta-llama/Llama-2-7b-hf", ownedBy: "meta", fineTunable: true },
+    ]);
+  });
+
+  test("listModels falls back to static list on network error", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"));
+    const backend = new HuggingFaceTrainingBackend({ baseUrl: "http://ai-svc" });
     const models = await backend.listModels();
     const ids = models.map((m) => m.id);
     expect(ids).toContain("meta-llama/Llama-2-7b-hf");

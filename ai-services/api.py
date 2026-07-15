@@ -1,11 +1,18 @@
 """
 Therapeutic AI API - Flask Application
-Exposes PII scrubbing, crisis detection, emotion validation, and bias detection services
+Exposes PII scrubbing, crisis detection, emotion validation, bias detection,
+and fine-tuning job management services.
 """
 
+import json
 import logging
 import os
+import subprocess
 import sys
+import threading
+import time
+import uuid
+from pathlib import Path
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -39,6 +46,180 @@ if db_service:
     db_service.connect()
 else:
     logger.warning("MONGODB_URI not set. Database storage disabled.")
+
+# ─── In-Memory Fine-Tuning Job Store (PIX-3926) ───────────────────────────────
+# Production rollout will replace this with Redis + Mongo persistence.
+
+_training_jobs: dict[str, dict] = {}
+_training_lock = threading.Lock()
+
+
+def _training_script_path() -> str:
+    """Resolve the path to the fine-tuning script."""
+    project_root = Path(__file__).parent.parent
+    script = project_root / "ai" / "training" / "finetune_model.py"
+    return str(script.resolve())
+
+
+def _spawn_training_job(job_id: str, payload: dict) -> subprocess.Popen:
+    """Spawn the fine-tuning subprocess and return the Popen handle."""
+    script = _training_script_path()
+    dataset_path = payload.get("dataset", "")
+    dataset_dir = str(Path(dataset_path).parent) if dataset_path else "./data/finetuning"
+
+    args = [
+        sys.executable,
+        script,
+        "--dataset-dir",
+        dataset_dir,
+        "--output-dir",
+        f"./models/fine-tuned/{job_id}",
+        "--base-model",
+        payload.get("model", "meta-llama/Llama-2-7b-hf"),
+        "--epochs",
+        str(payload.get("epochs", 3)),
+        "--batch-size",
+        str(payload.get("batch_size", 8)),
+    ]
+
+    if payload.get("learning_rate") is not None:
+        args.extend(["--learning-rate", str(payload["learning_rate"])])
+
+    logger.info(f"[training {job_id}] spawning: {' '.join(args)}")
+
+    return subprocess.Popen(
+        args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+
+def _update_job_status(job_id: str) -> None:
+    """Poll the subprocess and update the job record."""
+    with _training_lock:
+        job = _training_jobs.get(job_id)
+        if not job:
+            return
+        proc = job.get("proc")
+        if not proc:
+            return
+
+        ret = proc.poll()
+        if ret is None:
+            job["status"] = "running"
+        elif ret == 0:
+            job["status"] = "succeeded"
+            stdout = proc.stdout.read() if proc.stdout else ""
+            job["stdout"] = stdout
+            # Try to parse final JSON line for fine_tuned_model
+            for line in reversed(stdout.splitlines()):
+                line = line.strip()
+                if line.startswith("{"):
+                    try:
+                        parsed = json.loads(line)
+                        if isinstance(parsed.get("fine_tuned_model"), str):
+                            job["fine_tuned_model"] = parsed["fine_tuned_model"]
+                    except json.JSONDecodeError:
+                        continue
+            if not job.get("fine_tuned_model"):
+                job["fine_tuned_model"] = f"{job['model']}:trained:{job_id[:8]}"
+        else:
+            job["status"] = "failed"
+            stderr = proc.stderr.read() if proc.stderr else ""
+            job["stderr"] = stderr
+            job["error"] = f"Subprocess exited with code {ret}"
+
+
+# ─── Training Routes ──────────────────────────────────────────────────────────
+
+
+@app.route("/api/training/jobs", methods=["POST"])
+@authenticate
+def create_training_job():
+    """Submit a new fine-tuning job."""
+    try:
+        data = request.json or {}
+        job_id = f"hf-{int(time.time() * 1000)}-{uuid.uuid4().hex[:6]}"
+
+        proc = _spawn_training_job(job_id, data)
+
+        with _training_lock:
+            _training_jobs[job_id] = {
+                "id": job_id,
+                "model": data.get("model", "meta-llama/Llama-2-7b-hf"),
+                "status": "queued",
+                "created_at": time.time(),
+                "proc": proc,
+                "fine_tuned_model": None,
+            }
+
+        # Immediate status update so it reflects running if already started
+        _update_job_status(job_id)
+
+        logger.info(f"[training] created job {job_id}")
+        return jsonify({"success": True, "job": _training_jobs[job_id]}), 202
+    except Exception as e:
+        logger.error(f"Training job creation error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+@app.route("/api/training/jobs/<job_id>", methods=["GET"])
+@authenticate
+def get_training_job(job_id):
+    """Get the status of a fine-tuning job."""
+    with _training_lock:
+        job = _training_jobs.get(job_id)
+        if not job:
+            return jsonify({"success": False, "error": "Job not found"}), 404
+
+    _update_job_status(job_id)
+
+    with _training_lock:
+        job = _training_jobs[job_id].copy()
+        job.pop("proc", None)
+        job.pop("stdout", None)
+        job.pop("stderr", None)
+
+    return jsonify({"success": True, "job": job})
+
+
+@app.route("/api/training/jobs/<job_id>/cancel", methods=["POST"])
+@authenticate
+def cancel_training_job(job_id):
+    """Cancel a running fine-tuning job."""
+    with _training_lock:
+        job = _training_jobs.get(job_id)
+        if not job:
+            return jsonify({"success": False, "error": "Job not found"}), 404
+
+        proc = job.get("proc")
+        if proc and proc.poll() is None:
+            proc.terminate()
+            try:
+                proc.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                proc.kill()
+                proc.wait()
+            job["status"] = "cancelled"
+            logger.info(f"[training] cancelled job {job_id}")
+        else:
+            job["status"] = "cancelled"
+
+    return jsonify({"success": True, "job": {"id": job_id, "status": "cancelled"}})
+
+
+@app.route("/api/training/models", methods=["GET"])
+@authenticate
+def list_training_models():
+    """List available fine-tunable models."""
+    models = [
+        {"id": "meta-llama/Llama-2-7b-hf", "owned_by": "meta", "fine_tunable": True},
+        {"id": "meta-llama/Llama-2-13b-hf", "owned_by": "meta", "fine_tunable": True},
+        {"id": "mistralai/Mistral-7B-v0.1", "owned_by": "mistralai", "fine_tunable": True},
+        {"id": "google/gemma-2b", "owned_by": "google", "fine_tunable": True},
+    ]
+    return jsonify({"success": True, "models": models})
 
 
 @app.route("/health", methods=["GET"])
