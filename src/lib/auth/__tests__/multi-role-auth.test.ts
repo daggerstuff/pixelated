@@ -77,9 +77,17 @@ vi.mock('../jwt-service', () => ({
 }))
 
 vi.mock('otplib', () => ({
+  // Source imports these as NAMED exports from 'otplib'
+  generateSecret: vi.fn(() => 'test-secret'),
+  generateURI: vi.fn(
+    (opts?: { label?: string; secret?: string }) =>
+      `otpauth://totp/${opts?.label ?? 'user'}?secret=${opts?.secret}`,
+  ),
+  verify: vi.fn(() => ({ valid: true })),
+  // Keep authenticator shape for backward compatibility
   authenticator: {
     generateSecret: vi.fn(() => 'test-secret'),
-    verify: vi.fn(() => true),
+    verify: vi.fn(() => ({ valid: true })),
     keyuri: vi.fn(() => 'otpauth://test'),
   },
 }))
@@ -260,15 +268,9 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       const { getFromCache } = await import('../../redis')
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
-        if (key.startsWith('2fa:config:')) {
-          return {
-            enabled: true,
-            secret: 'test-secret',
-            backupCodes: ['hashed-code-1', 'hashed-code-2'],
-            setupComplete: true,
-            createdAt: Date.now(),
-            lastUsed: null,
-          }
+        // verifyTwoFactorToken reads the secret from `2fa:secret:${userId}`
+        if (key.startsWith('2fa:secret:')) {
+          return 'test-secret'
         }
         return null
       })
@@ -488,6 +490,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
         }
+        if (key.startsWith('2fa:secret:')) {
+          // verifyTwoFactorToken reads the secret from `2fa:secret:${userId}`
+          return 'test-secret'
+        }
         if (key.startsWith('user:pending_requests:')) {
           return [] // No pending requests
         }
@@ -536,6 +542,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
+        }
+        if (key.startsWith('2fa:secret:')) {
+          // verifyTwoFactorToken reads the secret from `2fa:secret:${userId}`
+          return 'test-secret'
         }
         if (key === `user_auth:${mockUserId}`) {
           return { role: 'patient', permissions: ['read:own_profile'] }
@@ -587,6 +597,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
         }
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
+        }
+        if (key.startsWith('2fa:secret:')) {
+          // verifyTwoFactorToken reads the secret from `2fa:secret:${userId}`
+          return 'test-secret'
         }
         return null
       })
@@ -739,6 +753,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
+        }
+        if (key.startsWith('2fa:secret:')) {
+          // verifyTwoFactorToken reads the secret from `2fa:secret:${userId}`
+          return 'test-secret'
         }
         if (key.startsWith('user:pending_requests:')) {
           return []
@@ -950,6 +968,10 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('2fa:config:')) {
           return { enabled: true, setupComplete: true }
+        }
+        if (key.startsWith('2fa:secret:')) {
+          // verifyTwoFactorToken reads the secret from `2fa:secret:${userId}`
+          return 'test-secret'
         }
         if (key.startsWith('user:pending_requests:')) {
           return []
