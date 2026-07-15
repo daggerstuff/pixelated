@@ -6,6 +6,7 @@
  */
 
 import { randomBytes } from 'crypto'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'

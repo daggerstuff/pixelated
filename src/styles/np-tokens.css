@@ -10,15 +10,15 @@
      ZERO-CHROMA GRAYSCALE PALETTE (Dark — Primary)
      All colors at oklch C = 0 (zero chroma)
      ============================================= */
-  --np-bg: oklch(0.10 0 0);        /* #1a1a1a — Primary canvas */
-  --np-surface: oklch(0.14 0 0);   /* #242424 — Cards, containers */
-  --np-elevated: oklch(0.18 0 0);  /* #2e2e2e — Modals, dropdowns */
-  --np-hover: oklch(0.22 0 0);     /* #383838 — Hover states */
-  --np-active: oklch(0.16 0 0);    /* #292929 — Active/pressed */
-  --np-text: oklch(0.93 0 0);      /* #ededed — Body, headings */
-  --np-muted: oklch(0.55 0 0);     /* #8c8c8c — Labels, captions */
-  --np-mid: oklch(0.70 0 0);       /* #b3b3b3 — Enhanced muted */
-  --np-line: rgba(255, 255, 255, 0.06);  /* Borders, dividers */
+  --np-bg: oklch(0.1 0 0); /* #1a1a1a — Primary canvas */
+  --np-surface: oklch(0.14 0 0); /* #242424 — Cards, containers */
+  --np-elevated: oklch(0.18 0 0); /* #2e2e2e — Modals, dropdowns */
+  --np-hover: oklch(0.22 0 0); /* #383838 — Hover states */
+  --np-active: oklch(0.16 0 0); /* #292929 — Active/pressed */
+  --np-text: oklch(0.93 0 0); /* #ededed — Body, headings */
+  --np-muted: oklch(0.55 0 0); /* #8c8c8c — Labels, captions */
+  --np-mid: oklch(0.7 0 0); /* #b3b3b3 — Enhanced muted */
+  --np-line: rgba(255, 255, 255, 0.06); /* Borders, dividers */
   --np-line-strong: rgba(255, 255, 255, 0.12);
   --np-overlay: rgba(0, 0, 0, 0.75);
   --np-selection: rgba(255, 255, 255, 0.08);
@@ -132,13 +132,13 @@
 :root[data-theme='light'] {
   color-scheme: light;
 
-  --np-bg: oklch(0.98 0 0);         /* #fafafa */
-  --np-surface: oklch(0.95 0 0);    /* #f2f2f2 */
-  --np-elevated: oklch(0.92 0 0);   /* #ebebeb */
+  --np-bg: oklch(0.98 0 0); /* #fafafa */
+  --np-surface: oklch(0.95 0 0); /* #f2f2f2 */
+  --np-elevated: oklch(0.92 0 0); /* #ebebeb */
   --np-hover: oklch(0.89 0 0);
   --np-active: oklch(0.93 0 0);
-  --np-text: oklch(0.15 0 0);       /* #262626 */
-  --np-muted: oklch(0.55 0 0);      /* #8c8c8c */
+  --np-text: oklch(0.15 0 0); /* #262626 */
+  --np-muted: oklch(0.55 0 0); /* #8c8c8c */
   --np-mid: oklch(0.45 0 0);
   --np-line: rgba(0, 0, 0, 0.08);
   --np-line-strong: rgba(0, 0, 0, 0.16);

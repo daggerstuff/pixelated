@@ -4,42 +4,24 @@ type RehypePlugin = unknown
 type RemarkPlugins = Array<RemarkPlugin | [RemarkPlugin, unknown]>
 type RehypePlugins = Array<RehypePlugin | [RehypePlugin, unknown]>
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
-import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeCallouts from 'rehype-callouts'
 import type { CreateProperties } from 'rehype-external-links'
 import rehypeExternalLinks from 'rehype-external-links'
-import rehypeKatex from 'rehype-katex'
-import remarkDirective from 'remark-directive'
 import remarkImgattr from 'remark-imgattr'
-import remarkMath from 'remark-math'
 import { visit } from 'unist-util-visit'
 
 import { UI } from '../src/config'
-import remarkDirectiveSugar from './remark-directive-sugar'
-import remarkImageContainer from './remark-image-container'
 import remarkReadingTime from './remark-reading-time'
 
 export const remarkPlugins: RemarkPlugins = [
-  // https://github.com/remarkjs/remark-directive
-  remarkDirective,
-  remarkDirectiveSugar,
-  remarkImageContainer,
   // https://github.com/OliverSpeir/remark-imgattr
   remarkImgattr,
-  // https://github.com/remarkjs/remark-math/tree/main/packages/remark-math
-  remarkMath,
   remarkReadingTime,
-  // Temporarily disabled OG image generation plugin - causing build hangs
-  // ...(Array.isArray(FEATURES.ogImage) && FEATURES.ogImage[0]
-  //   ? [remarkGenerateOgImage()].filter(Boolean)
-  //   : []),
 ]
 
 export const rehypePlugins: RehypePlugins = [
   // https://docs.astro.build/en/guides/markdown-content/#heading-ids-and-plugins
   rehypeHeadingIds,
-  // https://github.com/remarkjs/remark-math/tree/main/packages/rehype-katex
-  rehypeKatex,
   // https://github.com/lin-stephanie/rehype-callouts
   [
     rehypeCallouts,
@@ -113,39 +95,12 @@ export const rehypePlugins: RehypePlugins = [
             UI.externalLink.cursorType !== 'pointer'
           ) {
             props['className'] = Array.isArray(el.properties?.['className'])
-              ? [
-                  ...(el.properties['className']),
-                  'external-link-cursor',
-                ]
+              ? [...el.properties['className'], 'external-link-cursor']
               : ['external-link-cursor']
           }
         }
 
         return props
-      },
-    },
-  ],
-  // https://github.com/rehypejs/rehype-autolink-headings
-  [
-    rehypeAutolinkHeadings,
-    {
-      behavior: 'append',
-      properties: (el: Parameters<CreateProperties>[0]) => {
-        let content = ''
-        visit(el, 'text', (textNode) => {
-          content += textNode['value']
-        })
-        return {
-          'class': 'header-anchor',
-          'tab-index': 0,
-          'aria-hidden': 'false',
-          'aria-label': content ? `Link to ${content}` : undefined,
-          'data-pagefind-ignore': true,
-        }
-      },
-      content: {
-        type: 'text',
-        value: '#',
       },
     },
   ],

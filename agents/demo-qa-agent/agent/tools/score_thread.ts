@@ -128,7 +128,7 @@ function loadThread(path: string, threadId: string): EmailRecord[] {
           | EmailRecord[]
           | undefined) ?? [])
       : []
-  return (list).filter((e) => e.thread_id === threadId)
+  return list.filter((e) => e.thread_id === threadId)
 }
 
 function parseScore(raw: string): {

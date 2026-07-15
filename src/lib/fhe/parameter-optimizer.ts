@@ -547,12 +547,12 @@ export class FHEParameterOptimizer {
     // Start with CKKS default or an appropriate preset
     const baseParams: SealEncryptionParamsOptions =
       scheme === SealSchemeType.CKKS
-        ? ({
+        ? {
             ...SEAL_PARAMETER_PRESETS['ckks-default'],
-          })
-        : ({
+          }
+        : {
             ...SEAL_PARAMETER_PRESETS[basePreset],
-          })
+          }
 
     if (scheme === SealSchemeType.CKKS) {
       // For CKKS, increase precision by using larger scale and coefficient modulus

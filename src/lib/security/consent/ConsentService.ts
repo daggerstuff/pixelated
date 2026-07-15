@@ -170,21 +170,21 @@ export class ConsentService {
       }
 
       return {
-        id: doc.id as string,
-        userId: doc.user_id as string,
-        consentVersionId: doc.consent_version_id as string,
-        grantedAt: doc.granted_at as string,
-        ipAddress: doc.ip_address as string | undefined,
-        userAgent: doc.user_agent as string | undefined,
-        isActive: doc.is_active as boolean,
-        withdrawalDate: doc.withdrawal_date as string | undefined,
-        withdrawalReason: doc.withdrawal_reason as string | undefined,
-        granularOptions: doc.granular_options as
+        id: doc['id'] as string,
+        userId: doc['user_id'] as string,
+        consentVersionId: doc['consent_version_id'] as string,
+        grantedAt: doc['granted_at'] as string,
+        ipAddress: doc['ip_address'] as string | undefined,
+        userAgent: doc['user_agent'] as string | undefined,
+        isActive: doc['is_active'] as boolean,
+        withdrawalDate: doc['withdrawal_date'] as string | undefined,
+        withdrawalReason: doc['withdrawal_reason'] as string | undefined,
+        granularOptions: doc['granular_options'] as
           | Record<string, boolean>
           | undefined,
-        proofOfConsent: doc.proof_of_consent as string | undefined,
-        createdAt: doc.created_at as string,
-        updatedAt: doc.updated_at as string,
+        proofOfConsent: doc['proof_of_consent'] as string | undefined,
+        createdAt: doc['created_at'] as string,
+        updatedAt: doc['updated_at'] as string,
       }
     } catch (error: unknown) {
       logger.error('Unexpected error in getUserConsent', error)
