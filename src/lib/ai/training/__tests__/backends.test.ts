@@ -147,6 +147,15 @@ describe("LocalTrainingBackend (microservice path)", () => {
     expect(call[0]).toBe("http://ai-svc/api/training/jobs/local-123/cancel");
     expect(call[1].method).toBe("POST");
   });
+  test("useMicroservice falls back to LOCAL_TRAINING_SCRIPT_PATH env var", () => {
+    vi.stubEnv("LOCAL_TRAINING_SCRIPT_PATH", "/env/path.py");
+    const backendWithEnv = new LocalTrainingBackend();
+    expect((backendWithEnv as any).useMicroservice).toBe(true);
+
+    vi.unstubAllEnvs();
+    const backendWithoutEnv = new LocalTrainingBackend();
+    expect((backendWithoutEnv as any).useMicroservice).toBe(false);
+  });
 });
 
 describe("HuggingFaceTrainingBackend", () => {

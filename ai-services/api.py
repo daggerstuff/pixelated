@@ -61,6 +61,14 @@ def _cleanup_old_jobs() -> None:
     with _training_lock:
         expired = [jid for jid, job in _training_jobs.items() if job.get("created_at", 0) < cutoff]
         for jid in expired:
+            job = _training_jobs[jid]
+            proc = job.get("proc")
+            if proc and proc.poll() is None:
+                try:
+                    proc.terminate()
+                    proc.wait(timeout=2)
+                except Exception:
+                    proc.kill()
             del _training_jobs[jid]
             logger.info(f"[training] evicted expired job {jid}")
 
@@ -95,6 +103,8 @@ def _sanitize_dataset_dir(dataset_path: str) -> str:
         base_resolved = Path(base).resolve()
         try:
             path.relative_to(base_resolved)
+            if path == base_resolved:
+                return str(base_resolved)
             return str(path.parent)
         except ValueError:
             continue
@@ -107,8 +117,8 @@ def _drain_stream(stream, buffer: list):
     try:
         for line in stream:
             buffer.append(line)
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"[training] stream read error: {e}")
 
 
 def _spawn_training_job(job_id: str, payload: dict) -> subprocess.Popen:
@@ -165,10 +175,10 @@ def _update_job_status(job_id: str) -> None:
             job["stdout"] = stdout
             # Try to parse final JSON line for fine_tuned_model
             for line in reversed(stdout.splitlines()):
-                line = line.strip()
-                if line.startswith("{"):
+                stripped_line = line.strip()
+                if stripped_line.startswith("{"):
                     try:
-                        parsed = json.loads(line)
+                        parsed = json.loads(stripped_line)
                         if isinstance(parsed.get("fine_tuned_model"), str):
                             job["fine_tuned_model"] = parsed["fine_tuned_model"]
                     except json.JSONDecodeError:
@@ -225,6 +235,8 @@ def create_training_job():
         job.pop("proc", None)
         job.pop("stdout", None)
         job.pop("stderr", None)
+        job.pop("stdout_buffer", None)
+        job.pop("stderr_buffer", None)
         return jsonify({"success": True, "job": job}), 202
     except Exception as e:
         logger.error(f"Training job creation error: {e}")
@@ -235,20 +247,21 @@ def create_training_job():
 @authenticate
 def get_training_job(job_id):
     """Get the status of a fine-tuning job."""
+    _update_job_status(job_id)
+
     with _training_lock:
         job = _training_jobs.get(job_id)
         if not job:
             return jsonify({"success": False, "error": "Job not found"}), 404
 
-    _update_job_status(job_id)
+        job_copy = job.copy()
+        job_copy.pop("proc", None)
+        job_copy.pop("stdout", None)
+        job_copy.pop("stderr", None)
+        job_copy.pop("stdout_buffer", None)
+        job_copy.pop("stderr_buffer", None)
 
-    with _training_lock:
-        job = _training_jobs[job_id].copy()
-        job.pop("proc", None)
-        job.pop("stdout", None)
-        job.pop("stderr", None)
-
-    return jsonify({"success": True, "job": job})
+    return jsonify({"success": True, "job": job_copy})
 
 
 def _cancel_proc(proc: subprocess.Popen) -> None:

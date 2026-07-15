@@ -3,12 +3,13 @@ Discriminated Union Auth Middleware for User and Developer contexts.
 Implements 401-Triggered JWKS cache invalidation.
 """
 
+import hmac
 import logging
 import os
 import time
 from dataclasses import dataclass
 from functools import wraps
-from typing import Literal, Union
+from typing import Literal
 
 from flask import jsonify, request
 
@@ -30,7 +31,7 @@ class DeveloperContext:
     scopes: tuple[str, ...] = ()
 
 
-AuthContext = Union[UserContext, DeveloperContext]
+AuthContext = UserContext | DeveloperContext
 
 
 class JWKSCache:
@@ -82,7 +83,7 @@ def authenticate(f):
         try:
             if api_key:
                 # Developer path — validate against configured shared secret.
-                if _EXPECTED_API_KEY and api_key != _EXPECTED_API_KEY:
+                if not _EXPECTED_API_KEY or not hmac.compare_digest(api_key, _EXPECTED_API_KEY):
                     logger.warning("Invalid X-API-Key received")
                     jwks_cache.invalidate()
                     return jsonify({"error": "Unauthorized"}), 401
