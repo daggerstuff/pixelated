@@ -52,6 +52,7 @@ describe("LocalTrainingBackend (microservice path)", () => {
   })
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
   })
 
   test("submitJob routes through microservice when scriptPath is set", async () => {

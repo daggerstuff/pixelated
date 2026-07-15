@@ -60,17 +60,24 @@ def _cleanup_old_jobs() -> None:
     cutoff = time.time() - _JOB_TTL_SECONDS
     with _training_lock:
         expired = [jid for jid, job in _training_jobs.items() if job.get("created_at", 0) < cutoff]
+        expired_procs: list[tuple[str, subprocess.Popen]] = []
         for jid in expired:
             job = _training_jobs[jid]
             proc = job.get("proc")
             if proc and proc.poll() is None:
-                try:
-                    proc.terminate()
-                    proc.wait(timeout=2)
-                except Exception:
-                    proc.kill()
+                expired_procs.append((jid, proc))
             del _training_jobs[jid]
             logger.info(f"[training] evicted expired job {jid}")
+
+    # Terminate procs outside the lock so status/cancel/list aren't blocked.
+    for jid, proc in expired_procs:
+        try:
+            proc.terminate()
+            proc.wait(timeout=2)
+        except Exception:
+            proc.kill()
+            proc.wait()
+        logger.info(f"[training] terminated expired proc for job {jid}")
 
 
 def _training_script_path() -> str:
