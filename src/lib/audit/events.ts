@@ -16,6 +16,8 @@ export enum AuditEventType {
   SECURITY = 'security',
   THERAPEUTIC = 'therapeutic',
   SYSTEM = 'system',
+  GOVERNANCE_ALLOW = 'governance_allow',
+  GOVERNANCE_DENY = 'governance_deny',
 }
 
 /**
