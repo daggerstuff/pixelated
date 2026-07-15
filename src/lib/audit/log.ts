@@ -93,6 +93,39 @@ export async function createResourceAuditLog(
   return logAuditEvent(userId, action, resourceId, resourceType, metadata)
 }
 
+/**
+ * Log a governance compliance decision (allow/deny) as an audit event.
+ *
+ * This makes the data-governance -> audit trail integration real (previously
+ * it only existed as a pattern inside the audit-integration test mock). The
+ * decision is recorded with an explicit `GOVERNANCE_ALLOW` / `GOVERNANCE_DENY`
+ * event type so governance outcomes are distinguishable in the audit log.
+ */
+export async function logGovernanceDecision(
+  userId: string,
+  resourceId: string,
+  allowed: boolean,
+  options?: {
+    operation?: string
+    reasons?: string[]
+    resourceType?: string
+  },
+): Promise<void> {
+  await AuditLogger.getInstance().logEvent({
+    userId,
+    type: allowed ? AuditEventType.GOVERNANCE_ALLOW : AuditEventType.GOVERNANCE_DENY,
+    action: 'governance_validation',
+    severity: AuditSeverity.INFO,
+    resourceId,
+    resourceType: options?.resourceType ?? 'governance',
+    status: allowed ? 'success' : 'failure',
+    metadata: {
+      operation: options?.operation,
+      reasons: options?.reasons ?? [],
+    },
+  })
+}
+
 function toLegacyAuditEvent(
   userId: string,
   action: string,

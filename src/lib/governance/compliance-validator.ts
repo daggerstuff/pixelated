@@ -1,4 +1,5 @@
 import { getLogger } from '../logging'
+import { logGovernanceDecision } from '@/lib/audit/log'
 
 const logger = getLogger({ module: 'compliance-validator' } as any)
 
@@ -7,6 +8,10 @@ export interface ComplianceContext {
   fheActive: boolean
   auditEnabled: boolean
   consentVerified: boolean
+  /** Actor performing the operation; when present, the decision is audited. */
+  userId?: string
+  /** Resource the operation targets; defaults to `operation` when omitted. */
+  resourceId?: string
   [key: string]: unknown
 }
 
@@ -38,6 +43,22 @@ export class ComplianceValidator {
     )
     if (!compliant) {
       logger.warn(`Compliance failures: ${reasons.join(', ')}`)
+    }
+
+    // Emit the governance decision to the audit trail. The audit call is
+    // fire-and-forget and failures are swallowed so they never break the
+    // validation result. Only emit when we know the actor (userId).
+    if (ctx.userId) {
+      try {
+        await logGovernanceDecision(
+          ctx.userId,
+          ctx.resourceId ?? ctx.operation,
+          compliant,
+          { operation: ctx.operation, reasons },
+        )
+      } catch (err) {
+        logger.warn('Failed to emit governance audit event', { error: err })
+      }
     }
 
     return {
