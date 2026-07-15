@@ -20,7 +20,7 @@ export const GET: APIRoute = async ({ request }) => {
 
   try {
     // Authenticate the request
-    const authResult = await isAuthenticated(request as any)
+    const authResult = await isAuthenticated(request)
     if (!authResult) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -134,7 +134,7 @@ export const GET: APIRoute = async ({ request }) => {
       'validation-api',
       {
         error: errorMessage,
-      } as any,
+      },
       AuditEventStatus.FAILURE,
     )
 

@@ -4,13 +4,13 @@ import { Page, expect } from '@playwright/test'
 export class AccessibilityUtils {
   static async runAxeAnalysis(page: Page, _options?: any) {
     // Fix: Use AxeBuilder(page) to avoid Playwright type mismatch between packages
-    return await new AxeBuilder({ page: page as any })
+    return await new AxeBuilder({ page: page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze()
   }
 
   static async checkColorContrast(page: Page) {
-    const results = await new AxeBuilder({ page: page as any })
+    const results = await new AxeBuilder({ page: page })
       .include('body')
       .withRules(['color-contrast'])
       .analyze()
@@ -35,7 +35,7 @@ export class AccessibilityUtils {
   }
 
   static async checkAriaLabels(page: Page) {
-    const results = await new AxeBuilder({ page: page as any })
+    const results = await new AxeBuilder({ page: page })
       .withRules(['aria-labels', 'button-name', 'link-name', 'label'])
       .analyze()
 

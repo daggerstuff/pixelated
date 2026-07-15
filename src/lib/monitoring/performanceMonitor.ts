@@ -234,7 +234,7 @@ class PerformanceMonitor {
       cpuUsage: sums.cpuUsage / count,
       errorRate: sums.errorRate / count,
       throughput: sums.throughput / count,
-    } as unknown as PerformanceMetrics
+    }
   }
 
   private generateOptimizationRecommendations(

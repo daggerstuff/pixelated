@@ -75,7 +75,7 @@ export async function resolveUserIdFromRequest(
 ): Promise<string | null> {
   const session = await getSessionFromRequest(request)
   if (session?.user) {
-    return userIdFromSessionUser(session.user as SessionUserWithLegacyId)
+    return userIdFromSessionUser(session.user)
   }
 
   const authHeader = request.headers.get('Authorization')

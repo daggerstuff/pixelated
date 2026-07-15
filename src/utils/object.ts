@@ -239,13 +239,13 @@ export function deepEqual<T>(a: T, b: T, _visited?: WeakSet<object>): boolean {
     const visited = _visited ?? new WeakSet<object>()
 
     // Circular reference check - if we've seen this object before, compare by reference
-    if (visited.has(a as object) || visited.has(b as object)) {
+    if (visited.has(a) || visited.has(b)) {
       return a === b
     }
 
     // Mark both objects as visited
-    visited.add(a as object)
-    visited.add(b as object)
+    visited.add(a)
+    visited.add(b)
 
     // Handle arrays
     if (Array.isArray(a) && Array.isArray(b)) {
@@ -257,14 +257,14 @@ export function deepEqual<T>(a: T, b: T, _visited?: WeakSet<object>): boolean {
     }
 
     // Handle objects
-    const keysA = Object.keys(a as object)
-    const keysB = Object.keys(b as object)
+    const keysA = Object.keys(a)
+    const keysB = Object.keys(b)
 
     if (keysA.length !== keysB.length) return false
 
     // Handle objects - use hasOwnProperty for O(1) key lookups without Set allocation overhead
     for (const key of keysA) {
-      if (!Object.prototype.hasOwnProperty.call(b as object, key)) return false
+      if (!Object.prototype.hasOwnProperty.call(b, key)) return false
       if (!deepEqual((a as any)[key], (b as any)[key], visited)) return false
     }
     return true

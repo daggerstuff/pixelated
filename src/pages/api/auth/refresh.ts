@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   try {
     // Apply rate limiting
     const rateLimitResult = await rateLimitMiddleware(
-      request as any,
+      request,
       'refresh',
       20,
       60,

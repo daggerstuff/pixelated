@@ -50,7 +50,7 @@ vi.mock('../NotificationService', () => ({
       markAsRead: vi.fn(),
       getNotifications: vi.fn<() => Promise<never[]>>().mockResolvedValue([]),
       getUnreadCount: vi.fn<() => Promise<number>>().mockResolvedValue(3),
-    } as unknown
+    }
   }),
 }))
 vi.mock('@/lib/logging/build-safe-logger', () => ({

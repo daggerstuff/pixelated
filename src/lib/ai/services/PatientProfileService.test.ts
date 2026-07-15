@@ -33,14 +33,14 @@ const createTestCognitiveModel = (
     occupation: 'artist',
     familyStatus: 'single',
     culturalFactors: [],
-  } as DemographicInfo,
+  },
   presentingIssues: ['anxiety', 'low self-esteem'],
   diagnosisInfo: {
     primaryDiagnosis: 'Generalized Anxiety Disorder',
     secondaryDiagnoses: [],
     durationOfSymptoms: '2 years',
     severity: 'moderate',
-  } as DiagnosisInfo,
+  },
   coreBeliefs,
   distortionPatterns: [],
   behavioralPatterns: [],
@@ -61,7 +61,7 @@ const createTestCognitiveModel = (
     resistance: 3,
     insightLevel: 4,
     preferredCommunicationModes: ['verbal'],
-  } as ConversationalStyle,
+  },
   goalsForTherapy: ['reduce anxiety', 'improve self-esteem'],
   therapeuticProgress: {
     insights: [],
@@ -73,13 +73,13 @@ const createTestCognitiveModel = (
         skillName: 'basic coping skills',
         dateAchieved: new Date().toISOString(),
         proficiency: 0.5,
-      } as SkillAcquired,
+      },
     ],
     trustLevel: 5,
     rapportScore: 5,
     therapistPerception: 'neutral',
     transferenceState: 'none',
-  } as TherapeuticProgress,
+  },
 })
 
 // Helper to create a basic PatientProfile

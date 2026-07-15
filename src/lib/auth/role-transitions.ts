@@ -752,7 +752,7 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
       roleFrom: request.currentRole,
       roleTo: request.requestedRole,
       actorId: 'system',
-      actorRole: 'admin' as UserRole, // system actor
+      actorRole: 'admin', // system actor
       reason: 'Request expired',
       timestamp: Date.now(),
       ipAddress: 'system',

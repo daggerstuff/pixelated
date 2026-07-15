@@ -488,7 +488,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
                   ? 'stop'
                   : choice.finish_reason === 'length'
                     ? 'length'
-                    : 'stop') as 'stop' | 'length' | 'content_filter',
+                    : 'stop'),
               })) || [
                 {
                   message: {

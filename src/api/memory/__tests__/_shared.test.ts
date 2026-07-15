@@ -7,6 +7,17 @@ import { getCurrentUser } from '@/lib/auth'
 
 import { parsePagination, requireMemoryUser, toMemoryScope } from '../_shared'
 
+vi.mock('@/lib/services/product-memory-gateway', () => ({
+  getProductMemoryGateway: vi.fn().mockReturnValue('mock-gateway'),
+  ProductMemoryGatewayError: class ProductMemoryGatewayError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+      super(message);
+      this.status = status;
+    }
+  }
+}))
+
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(),
 }))
@@ -313,4 +324,35 @@ describe('withAuthenticatedMemoryRoute', () => {
     expect(data.error).toBe('Unauthorized')
     expect(handler).not.toHaveBeenCalled()
   })
+
+  it('calls handler if user is authenticated and returns the response', async () => {
+    const { withAuthenticatedMemoryRoute } = await import('../_shared')
+    const { getCurrentUser } = await import('@/lib/auth')
+
+    const mockUser = { id: 'user-1' }
+    vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser as any)
+
+    const mockResponse = new Response(JSON.stringify({ success: true }), { status: 200 })
+    const handler = vi.fn().mockResolvedValueOnce(mockResponse)
+    const route = withAuthenticatedMemoryRoute('testAction', handler)
+
+    const request = new Request('http://localhost')
+    const context = { request, params: { memoryId: 'test-id' } }
+    const response = await route(context)
+
+    expect(handler).toHaveBeenCalledWith(context, mockUser)
+    expect(response).toBe(mockResponse)
+  })
 })
+
+describe('getGateway', () => {
+  it('calls getProductMemoryGateway and returns its result', async () => {
+    const { getGateway } = await import('../_shared');
+    const { getProductMemoryGateway } = await import('@/lib/services/product-memory-gateway');
+
+    const result = getGateway();
+
+    expect(getProductMemoryGateway).toHaveBeenCalled();
+    expect(result).toBe('mock-gateway');
+  });
+});

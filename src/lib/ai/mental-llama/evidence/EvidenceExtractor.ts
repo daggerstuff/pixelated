@@ -665,7 +665,7 @@ export class EvidenceExtractor {
           }
         } else if (typeof item.clinicalRelevance === 'string') {
           // Parser may emit 'supportive' default; preserve valid string
-          clinical = item.clinicalRelevance as EvidenceItem['clinicalRelevance']
+          clinical = item.clinicalRelevance
         } else {
           // Default when missing
           clinical = 'supportive'

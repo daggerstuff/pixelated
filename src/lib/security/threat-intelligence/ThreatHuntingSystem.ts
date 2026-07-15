@@ -1305,7 +1305,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       const relevantHunts = await this.huntsCollection
         .find({
           'status': 'active',
-          'scope.data_sources': dataInfo['data_source'] as string,
+          'scope.data_sources': dataInfo['data_source'],
         })
         .toArray()
 

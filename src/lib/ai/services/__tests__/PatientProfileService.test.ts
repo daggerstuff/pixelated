@@ -45,7 +45,7 @@ describe('PatientProfileService', () => {
           skillName: 'basic coping skills',
           dateAchieved: new Date().toISOString(),
           proficiency: 0.5,
-        } as SkillAcquired,
+        },
       ], // Required property
     }
 

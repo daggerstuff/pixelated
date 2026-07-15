@@ -141,7 +141,7 @@ export class AuthService {
     )
 
     const { password: _password, ...userWithoutPassword } = user
-    return { user: userWithoutPassword as User, tokens }
+    return { user: userWithoutPassword, tokens }
   }
 
   static async login(
@@ -189,7 +189,7 @@ export class AuthService {
     )
 
     const { password: _password, ...userWithoutPassword } = user
-    return { user: userWithoutPassword as User, tokens }
+    return { user: userWithoutPassword, tokens }
   }
 
   static async refreshToken(refreshToken: string): Promise<AuthTokens> {

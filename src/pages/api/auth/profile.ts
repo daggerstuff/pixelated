@@ -160,7 +160,7 @@ export const PUT = async ({
     }
 
     // Apply CSRF protection for updates
-    const csrfResult = await csrfProtection(request as any)
+    const csrfResult = await csrfProtection(request)
     if (!csrfResult.success) {
       return csrfResult.response!
     }

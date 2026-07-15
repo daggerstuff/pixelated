@@ -318,7 +318,7 @@ function DialogModal<TData>({
           className={cn(
             'w-full rounded-lg bg-white shadow-lg dark:bg-gray-800',
             'overflow-hidden flex flex-col',
-            maxWidthClasses[maxWidth as DialogMaxWidth],
+            maxWidthClasses[maxWidth],
             className,
           )}
           onClick={(e) => e.stopPropagation()}

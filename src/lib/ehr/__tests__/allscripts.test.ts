@@ -73,14 +73,14 @@ describe('allscripts Provider', () => {
     it('should successfully initialize provider', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
-        true as never,
+        true,
       )
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
         allscriptsProvider as any,
         'verifyAllscriptsEndpoints',
-      ).mockResolvedValue(undefined as never)
+      ).mockResolvedValue(undefined)
 
       // Mock the FHIR client's searchResources method
       const mockCapabilityStatement = {
@@ -128,7 +128,7 @@ describe('allscripts Provider', () => {
     it('should throw error when endpoint validation fails', async () => {
       // Mock the validateEndpoint method to return false
       vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
-        false as never,
+        false,
       )
 
       await expect(allscriptsProvider.initialize()).rejects.toThrow()
@@ -137,7 +137,7 @@ describe('allscripts Provider', () => {
     it('should throw error when CapabilityStatement is not found', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
-        true as never,
+        true,
       )
 
       // Mock the FHIR client's searchResources method to return empty array
@@ -154,7 +154,7 @@ describe('allscripts Provider', () => {
     it('should throw error when required endpoints are not available', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
-        true as never,
+        true,
       )
 
       // Mock the FHIR client's searchResources method to succeed for CapabilityStatement
@@ -206,14 +206,14 @@ describe('allscripts Provider', () => {
     it('should throw error when OAuth2 configuration is missing', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
-        true as never,
+        true,
       )
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
         allscriptsProvider as any,
         'verifyAllscriptsEndpoints',
-      ).mockResolvedValue(undefined as never)
+      ).mockResolvedValue(undefined)
 
       // Mock the FHIR client's searchResources method with invalid capability statement
       const mockSearchResources = vi.fn().mockResolvedValue([
@@ -241,14 +241,14 @@ describe('allscripts Provider', () => {
     it('should throw error when SMART on FHIR endpoints are missing', async () => {
       // Mock the validateEndpoint method to return true
       vi.spyOn(allscriptsProvider as any, 'validateEndpoint').mockResolvedValue(
-        true as never,
+        true,
       )
 
       // Mock verifyAllscriptsEndpoints to succeed
       vi.spyOn(
         allscriptsProvider as any,
         'verifyAllscriptsEndpoints',
-      ).mockResolvedValue(undefined as never)
+      ).mockResolvedValue(undefined)
 
       // Mock the FHIR client's searchResources method with missing SMART endpoints
       const mockSearchResources = vi.fn().mockResolvedValue([

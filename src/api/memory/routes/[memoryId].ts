@@ -52,11 +52,24 @@ const UpdateMemoryRequestSchema = z
 
 export type UpdateMemoryRequest = z.infer<typeof UpdateMemoryRequestSchema>
 
-// Helper function to extract memory ID from params
+// Memory IDs are constrained to alphanumeric, hyphen, and underscore characters
+// (per the system's ID contract). We VALIDATE rather than sanitize: silently
+// stripping characters would let a malformed request (e.g. "mem-123!") resolve to a
+// DIFFERENT record on GET/PATCH/DELETE. Invalid IDs are rejected with 400 instead.
+const MEMORY_ID_PATTERN = /^[a-zA-Z0-9_-]+$/
+
+function isValidMemoryId(id: string): boolean {
+  return MEMORY_ID_PATTERN.test(id)
+}
+
+// Helper function to extract and validate the memory ID from params.
+// Returns: `undefined` if missing, `null` if present but malformed, else the valid id.
 function resolveMemoryId(
   params: Record<string, string | undefined>,
-): string | undefined {
-  return params['memoryId']
+): string | null | undefined {
+  const memoryId = params['memoryId']
+  if (!memoryId) return undefined
+  return isValidMemoryId(memoryId) ? memoryId : null
 }
 
 export const GET = withAuthenticatedMemoryRoute(
@@ -64,8 +77,11 @@ export const GET = withAuthenticatedMemoryRoute(
   async ({ params, request }, user) => {
     try {
       const memoryId = resolveMemoryId(params ?? {})
-      if (!memoryId) {
+      if (memoryId === undefined) {
         return jsonError(400, 'Bad Request', 'memoryId parameter is required')
+      }
+      if (memoryId === null) {
+        return jsonError(400, 'Bad Request', 'Invalid memoryId format')
       }
 
       const memory = await getGateway().getMemory({
@@ -107,8 +123,11 @@ export const PATCH = withAuthenticatedMemoryRoute(
   async ({ params, request }, user) => {
     try {
       const memoryId = resolveMemoryId(params ?? {})
-      if (!memoryId) {
+      if (memoryId === undefined) {
         return jsonError(400, 'Bad Request', 'memoryId parameter is required')
+      }
+      if (memoryId === null) {
+        return jsonError(400, 'Bad Request', 'Invalid memoryId format')
       }
 
       // Parse and validate the request body
@@ -178,8 +197,11 @@ export const DELETE = withAuthenticatedMemoryRoute(
   async ({ params, request }, user) => {
     try {
       const memoryId = resolveMemoryId(params ?? {})
-      if (!memoryId) {
+      if (memoryId === undefined) {
         return jsonError(400, 'Bad Request', 'memoryId parameter is required')
+      }
+      if (memoryId === null) {
+        return jsonError(400, 'Bad Request', 'Invalid memoryId format')
       }
 
       await getGateway().deleteMemory({

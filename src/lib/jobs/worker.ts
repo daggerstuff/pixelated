@@ -190,7 +190,7 @@ const jobsWorker = {
           })
           // restrict options.format to allowed values
           const allowedFormats: ReadonlyArray<unknown> = ['json', 'csv', 'pdf']
-          const safeFormat = allowedFormats.includes(options?.format as unknown)
+          const safeFormat = allowedFormats.includes(options?.format)
             ? (options.format as 'json' | 'csv' | 'pdf')
             : undefined
           const safeOptions = { ...options, format: safeFormat }

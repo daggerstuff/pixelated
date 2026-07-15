@@ -55,7 +55,7 @@ export class AuditLog {
       await this.collection.insertOne({
         ...entry,
         ts: entry.ts ?? new Date().toISOString(),
-      } as unknown as AuditLogEntry)
+      })
     } catch (err) {
       logger.error('Audit log write failed', {
         error: err instanceof Error ? err.message : String(err),

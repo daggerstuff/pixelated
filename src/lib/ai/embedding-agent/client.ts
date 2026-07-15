@@ -50,11 +50,11 @@ const DEFAULT_CONFIG: Partial<EmbeddingAgentClientConfig> = {
  */
 function toCamelCase(obj: unknown): unknown {
   if (obj === null || obj === undefined) {
-    return obj as unknown;
+    return obj;
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => toCamelCase(item)) as unknown;
+    return obj.map((item) => toCamelCase(item));
   }
 
   if (typeof obj === "object") {
@@ -65,10 +65,10 @@ function toCamelCase(obj: unknown): unknown {
       );
       newObj[camelKey] = toCamelCase(value);
     }
-    return newObj as unknown;
+    return newObj;
   }
 
-  return obj as unknown;
+  return obj;
 }
 
 /**
@@ -76,11 +76,11 @@ function toCamelCase(obj: unknown): unknown {
  */
 function toSnakeCase(obj: unknown): unknown {
   if (obj === null || obj === undefined) {
-    return obj as unknown;
+    return obj;
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => toSnakeCase(item)) as unknown;
+    return obj.map((item) => toSnakeCase(item));
   }
 
   if (typeof obj === "object") {
@@ -89,10 +89,10 @@ function toSnakeCase(obj: unknown): unknown {
       const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
       newObj[snakeKey] = toSnakeCase(value);
     }
-    return newObj as unknown;
+    return newObj;
   }
 
-  return obj as unknown;
+  return obj;
 }
 
 /**

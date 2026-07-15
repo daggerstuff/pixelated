@@ -54,7 +54,7 @@ function fakeCache(): CacheClient & { _store: Map<string, { value: unknown; expi
       del(key);
     },
     clearByPrefix: async () => {},
-    mget: async <T = string>() => ({} as Record<string, T | null>),
+    mget: async <T = string>() => ({}),
     keys: async () => [],
     _store: store,
   };

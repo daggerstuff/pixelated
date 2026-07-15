@@ -1,0 +1,179 @@
+/* ================================================
+   NP TOKENS — Neutral Precision Design Token System
+   Source: DESIGN.md ("The Quiet Instrument")
+   ================================================ */
+
+:root {
+  color-scheme: dark;
+
+  /* =============================================
+     ZERO-CHROMA GRAYSCALE PALETTE (Dark — Primary)
+     All colors at oklch C = 0 (zero chroma)
+     ============================================= */
+  --np-bg: oklch(0.10 0 0);        /* #1a1a1a — Primary canvas */
+  --np-surface: oklch(0.14 0 0);   /* #242424 — Cards, containers */
+  --np-elevated: oklch(0.18 0 0);  /* #2e2e2e — Modals, dropdowns */
+  --np-hover: oklch(0.22 0 0);     /* #383838 — Hover states */
+  --np-active: oklch(0.16 0 0);    /* #292929 — Active/pressed */
+  --np-text: oklch(0.93 0 0);      /* #ededed — Body, headings */
+  --np-muted: oklch(0.55 0 0);     /* #8c8c8c — Labels, captions */
+  --np-mid: oklch(0.70 0 0);       /* #b3b3b3 — Enhanced muted */
+  --np-line: rgba(255, 255, 255, 0.06);  /* Borders, dividers */
+  --np-line-strong: rgba(255, 255, 255, 0.12);
+  --np-overlay: rgba(0, 0, 0, 0.75);
+  --np-selection: rgba(255, 255, 255, 0.08);
+  --np-selection-text: oklch(0.93 0 0);
+
+  /* =============================================
+     TYPOGRAPHY
+     ============================================= */
+  --np-font-display: 'Fraunces Variable', Georgia, serif;
+  --np-font-body: 'Public Sans', system-ui, sans-serif;
+  --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  /* Widths & weights for Fraunces */
+  --np-weight-display: 350;
+  --np-weight-headline: 400;
+  --np-weight-title: 600;
+  --np-weight-body: 400;
+  --np-weight-label: 450;
+  --np-weight-data: 400;
+
+  /* Scale (clamped) */
+  --np-text-display: clamp(2.5rem, 5vw, 4.5rem);
+  --np-text-headline: clamp(1.75rem, 3.5vw, 2.75rem);
+  --np-text-title: 1.125rem;
+  --np-text-body: 1rem;
+  --np-text-small: 0.875rem;
+  --np-text-label: 0.75rem;
+  --np-text-data: 0.875rem;
+  --np-text-caption: 0.6875rem;
+
+  /* Line heights */
+  --np-leading-display: 1.05;
+  --np-leading-headline: 1.15;
+  --np-leading-title: 1.3;
+  --np-leading-body: 1.6;
+  --np-leading-data: 1.5;
+  --np-leading-label: 1.3;
+
+  /* Letter spacing */
+  --np-tracking-display: -0.02em;
+  --np-tracking-label: 0.04em;
+
+  /* =============================================
+     FLAT BY DESIGN
+     ============================================= */
+  --np-radius: 0px;
+  --np-radius-button: 0px;
+  --np-radius-card: 0px;
+  --np-radius-input: 0px;
+
+  /* No shadows — tonal layering is the depth system */
+  --np-shadow: none;
+  --np-shadow-elevated: none;
+
+  /* =============================================
+     LAYOUT
+     ============================================= */
+  --np-content: 76rem;
+  --np-content-narrow: 55rem;
+  --np-gap: 24px;
+  --np-gap-sm: 16px;
+  --np-gap-lg: 40px;
+  --np-pad: clamp(1rem, 3vw, 2rem);
+  --np-section-y: clamp(3.5rem, 5.5vw, 5.5rem);
+
+  /* Spacing scale (4px / 16px / 36px unit roots) */
+  --np-space-1: 4px;
+  --np-space-2: 8px;
+  --np-space-3: 12px;
+  --np-space-4: 16px;
+  --np-space-5: 20px;
+  --np-space-6: 24px;
+  --np-space-8: 32px;
+  --np-space-10: 40px;
+  --np-space-12: 48px;
+  --np-space-16: 64px;
+  --np-space-20: 80px;
+
+  /* =============================================
+     TRANSITIONS — The Quiet Instrument motion language
+     State changes only, no choreography.
+     Tactile: 150ms.   Layout: 300ms.   Arrival: 400ms.
+     ============================================= */
+  --np-duration-fast: 0.15s;
+  --np-duration-normal: 0.2s;
+  --np-duration-slow: 0.3s;
+  --np-duration-arrive: 0.4s;
+  --np-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --np-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --np-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --np-transition: var(--np-duration-normal) var(--np-ease);
+  --np-transition-slow: var(--np-duration-slow) var(--np-ease);
+
+  /* Entrance curve — slow start, fast finish */
+  --np-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* =============================================
+     Z-INDEX
+     ============================================= */
+  --np-z-base: 1;
+  --np-z-elevated: 10;
+  --np-z-sticky: 50;
+  --np-z-overlay: 200;
+  --np-z-modal: 300;
+}
+
+/* =============================================
+   LIGHT MODE — Accessibility fallback
+   Flatter, cooler, designed to be less interesting
+   ============================================= */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --np-bg: oklch(0.98 0 0);         /* #fafafa */
+  --np-surface: oklch(0.95 0 0);    /* #f2f2f2 */
+  --np-elevated: oklch(0.92 0 0);   /* #ebebeb */
+  --np-hover: oklch(0.89 0 0);
+  --np-active: oklch(0.93 0 0);
+  --np-text: oklch(0.15 0 0);       /* #262626 */
+  --np-muted: oklch(0.55 0 0);      /* #8c8c8c */
+  --np-mid: oklch(0.45 0 0);
+  --np-line: rgba(0, 0, 0, 0.08);
+  --np-line-strong: rgba(0, 0, 0, 0.16);
+  --np-overlay: rgba(0, 0, 0, 0.4);
+  --np-selection: rgba(0, 0, 0, 0.08);
+  --np-selection-text: oklch(0.15 0 0);
+}
+
+/* =============================================
+   BASE RESETS (apply tokens to document)
+   ============================================= */
+html {
+  background-color: var(--np-bg) !important;
+  color: var(--np-text);
+  font-family: var(--np-font-body);
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--np-bg) !important;
+}
+
+::selection {
+  background: var(--np-selection);
+  color: var(--np-selection-text);
+}
+
+/* =============================================
+   THE ZERO-CHROMA RULE — Enforced at token level
+   =============================================
+   No color enters the system through design tokens.
+   Not as an accent, not as a background tint, not as a hover state.
+   The only color in the interface is the content.
+   ============================================= */

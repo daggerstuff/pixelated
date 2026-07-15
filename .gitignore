@@ -414,3 +414,4 @@ foresight_cli
 .codebase-memory
 .baselines
 .kimiflare
+run_training.sh

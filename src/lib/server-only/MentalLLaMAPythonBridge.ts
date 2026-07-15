@@ -71,7 +71,7 @@ export class MentalLLaMAPythonBridge {
     try {
       this.pythonProcess = spawn('python3', [this.pythonScriptPath], {
         stdio: ['pipe', 'pipe', 'pipe'] as const,
-      }) as unknown as ChildProcessWithoutNullStreams
+      })
       this.pythonProcess.stdout.setEncoding('utf-8')
       this.pythonProcess.stderr.setEncoding('utf-8')
 
@@ -190,7 +190,7 @@ export class MentalLLaMAPythonBridge {
     return this.sendRequest(
       'run_imhi_evaluation',
       params as unknown as Record<string, unknown>,
-    ) as unknown
+    )
   }
 
   /**

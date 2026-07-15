@@ -318,7 +318,7 @@ export function TherapeuticGoalsTracker({
   async function handleFormSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (editGoal) {
-      await updateGoal({ ...editGoal, ...form } as TherapeuticGoal)
+      await updateGoal({ ...editGoal, ...form })
     } else {
       await createGoal(
         form as Omit<TherapeuticGoal, 'id' | 'createdAt' | 'updatedAt'>,
@@ -398,7 +398,7 @@ export function TherapeuticGoalsTracker({
             onClick={() => handleCategoryClick(category)}
             className="whitespace-nowrap text-xs"
           >
-            {CATEGORY_LABELS[category as GoalCategory] || category}
+            {CATEGORY_LABELS[category] || category}
           </Button>
         ))}
       </div>
@@ -458,7 +458,7 @@ export function TherapeuticGoalsTracker({
               >
                 {GOAL_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {CATEGORY_LABELS[cat as GoalCategory] || cat}
+                    {CATEGORY_LABELS[cat] || cat}
                   </option>
                 ))}
               </select>

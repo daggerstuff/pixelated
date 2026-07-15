@@ -27,7 +27,7 @@ const logger = createBuildSafeLogger("PythonBiasDetectionBridge");
 function describeError(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (error && typeof error === "object") return JSON.stringify(error);
-  if (error) return String(error as string | number | boolean);
+  if (error) return String(error);
   return "Python service unavailable";
 }
 
@@ -147,7 +147,7 @@ export class PythonBiasDetectionBridge {
       const id = `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       this.requestQueue.push({
         id,
-        request: requestFn as () => Promise<unknown>,
+        request: requestFn,
         resolve: resolve as (value: unknown) => void,
         reject,
         priority,
