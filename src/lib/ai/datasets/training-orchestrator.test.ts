@@ -153,14 +153,14 @@ describe("FineTuningOrchestrator", () => {
   });
 
   describe("error backends", () => {
-    test("huggingface backend throws when script missing", async () => {
+    test("huggingface backend throws when microservice unreachable", async () => {
       const orch = new FineTuningOrchestrator();
       await expect(
         orch.startFromPrepared(
           { openai: openaiPath, huggingface: huggingfacePath },
           { model: "meta-llama/Llama-2-7b", nEpochs: 3, backend: "huggingface" },
         ),
-      ).rejects.toThrow(/HuggingFace backend script not found/);
+      ).rejects.toThrow(/fetch failed|Connection refused|ECONNREFUSED/);
     });
 
     test("local backend returns failed job when unreachable", async () => {
