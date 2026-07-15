@@ -3,11 +3,6 @@ import { z } from 'zod'
 
 import { storeMemory } from '../foresight-client.js'
 
-// Promote a concerning QA finding into a tracked review item for human
-// review. Stores the flag in Foresight memory for longitudinal tracking
-// and returns a ticket identifier. When the Linear channel is wired,
-// this also creates a real Linear issue.
-
 interface FlagGapInput {
   session_id: string
   cohort_id: string
@@ -19,8 +14,9 @@ interface FlagGapInput {
 export default defineTool({
   description:
     'Create or update a review ticket for a session that needs ' +
-    'human attention. Persists the flag in Foresight memory and returns ' +
-    'a ticket identifier with a back-link to the originating session.',
+    'human attention. Persists the flag in Foresight memory (long-term) ' +
+    'and returns a ticket identifier with a back-link to the originating ' +
+    'session. Reports actual persistence status.',
   inputSchema: z.object({
     session_id: z.string().uuid(),
     cohort_id: z.string().min(1),
@@ -31,8 +27,7 @@ export default defineTool({
   async execute(input: FlagGapInput) {
     const identifier = `QA-${Date.now().toString(36).toUpperCase()}`
 
-    // Persist the flag in Foresight for longitudinal tracking
-    await storeMemory({
+    const stored = await storeMemory({
       content: JSON.stringify({
         type: 'training_gap_flag',
         ticket_identifier: identifier,
@@ -47,7 +42,11 @@ export default defineTool({
       scope: 'cohort',
       retention: 'long_term',
       importance: 0.7 + input.priority * 0.075,
-      tags: ['training_gap', `cohort:${input.cohort_id}`, `session:${input.session_id}`],
+      tags: [
+        'training_gap',
+        `cohort:${input.cohort_id}`,
+        `session:${input.session_id}`,
+      ],
     })
 
     return {
@@ -57,7 +56,8 @@ export default defineTool({
       priority: input.priority,
       labels: input.labels,
       created_at: new Date().toISOString(),
-      persisted_to_foresight: true,
+      persisted_to_foresight: stored !== null,
+      memory_id: stored?.memory_id ?? null,
     }
   },
 })

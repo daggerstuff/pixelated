@@ -9,36 +9,62 @@ interface SummarizeCohortInput {
   since: string
 }
 
+interface ParsedScore {
+  session_id?: string
+  cohort_id?: string
+  rubric_version?: string
+  state?: string
+  scored_at?: string
+  dimensions?: Array<{ name: string; score: number }>
+  total_score?: number
+  trainee_id?: string
+}
+
 export default defineTool({
   description:
     'Aggregate per-cohort scores over the QA review window. Returns the ' +
     'cohort rollup (mean, p10, p90 per rubric dimension) and the top-N ' +
-    'trainees by gap-count.',
+    'trainees by gap-count. Only REVIEWED score records matching the exact ' +
+    'cohort, rubric version, and scoring window are counted.',
   inputSchema: z.object({
     cohort_id: z.string().min(1),
     rubric_version: z.string().min(1),
     since: z.string().datetime(),
   }),
   async execute(input: SummarizeCohortInput) {
+    const sinceMs = new Date(input.since).getTime()
+
     const memories = await searchMemories({
       query: `cohort:${input.cohort_id} state:REVIEWED`,
       limit: 200,
-      tag_filter: [`cohort_id:${input.cohort_id}`],
+      tag_filter: [
+        `cohort_id:${input.cohort_id}`,
+        `rubric_version:${input.rubric_version}`,
+        'state:REVIEWED',
+      ],
     })
 
     const scoredSessions = (memories ?? [])
-      .map((m) => {
+      .map((m): ParsedScore | null => {
         try {
-          return JSON.parse(m.content) as {
-            dimensions?: Array<{ name: string; score: number }>
-            total_score?: number
-            trainee_id?: string
+          const parsed = JSON.parse(m.content) as ParsedScore
+          if (parsed.state !== 'REVIEWED') return null
+          if (parsed.cohort_id && parsed.cohort_id !== input.cohort_id) {
+            return null
           }
+          if (parsed.rubric_version && parsed.rubric_version !== input.rubric_version) {
+            return null
+          }
+          const scoredAtMs = parsed.scored_at
+            ? new Date(parsed.scored_at).getTime()
+            : NaN
+          if (!isNaN(scoredAtMs) && scoredAtMs < sinceMs) return null
+          return parsed
         } catch {
           return null
         }
       })
-      .filter(Boolean)
+      .filter((s): s is ParsedScore => s !== null)
 
     const dimensionNames = [
       'rapport',
@@ -55,7 +81,7 @@ export default defineTool({
 
     for (const dim of dimensionNames) {
       const scores = scoredSessions
-        .flatMap((s) => s?.dimensions ?? [])
+        .flatMap((s) => s.dimensions ?? [])
         .filter((d) => d.name === dim)
         .map((d) => d.score)
         .sort((a, b) => a - b)
