@@ -66,4 +66,11 @@ export interface AuditEvent {
   userAgent?: string
   status: 'success' | 'failure'
   errorMessage?: string
+  /**
+   * SHA-256 hash-chain linkage. `previousHash` is the `hash` of the
+   * immediately preceding audit event; `hash` is the SHA-256 over
+   * `previousHash || canonicalPayload`. Absent for pre-chain legacy events.
+   */
+  previousHash?: string
+  hash?: string
 }

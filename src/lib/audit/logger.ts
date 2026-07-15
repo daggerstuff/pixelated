@@ -6,6 +6,7 @@
  */
 
 import type { Db } from 'mongodb'
+import { createHash } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
 import { mongodb } from '../../config/mongodb.config'
@@ -19,6 +20,99 @@ import {
 } from './events'
 
 const logger = createBuildSafeLogger('audit-logger')
+
+/**
+ * Tamper-evident audit trail (HIPAA).
+ *
+ * Every persisted audit event is linked into a SHA-256 hash chain: each
+ * event's `hash` is SHA-256(previousHash || canonicalPayload), where
+ * `previousHash` is the `hash` of the immediately preceding event. Any
+ * modification, deletion, or reordering of historical events breaks the
+ * chain from that point forward, which `verifyAuditChain` detects.
+ */
+const AUDIT_CHAIN_GENESIS = '0'.repeat(64)
+
+/** The immutable, meaningful subset of an event used for chain hashing. */
+export function chainPayload(event: AuditEvent): Record<string, unknown> {
+  return {
+    id: event.id,
+    timestamp:
+      event.timestamp instanceof Date
+        ? event.timestamp.toISOString()
+        : event.timestamp,
+    userId: event.userId,
+    type: event.type,
+    action: event.action,
+    severity: event.severity,
+    resourceId: event.resourceId ?? null,
+    resourceType: event.resourceType ?? null,
+    status: event.status,
+    metadata: event.metadata ?? null,
+    ipAddress: event.ipAddress ?? null,
+    userAgent: event.userAgent ?? null,
+    errorMessage: event.errorMessage ?? null,
+  }
+}
+
+/** SHA-256 over `previousHash || canonicalPayload`. */
+export function computeChainHash(
+  previousHash: string,
+  payload: Record<string, unknown>,
+): string {
+  return createHash('sha256')
+    .update(`${previousHash}|${JSON.stringify(payload)}`)
+    .digest('hex')
+}
+
+export interface AuditChainVerification {
+  valid: boolean
+  brokenAtIndex?: number
+  brokenAtId?: string
+  reason?: string
+}
+
+/**
+ * Verify an ordered sequence of audit events forms an unbroken hash chain.
+ * Pure function — pass events already sorted by insertion order.
+ */
+export function verifyAuditChain(events: AuditEvent[]): AuditChainVerification {
+  let previousHash = AUDIT_CHAIN_GENESIS
+
+  for (let i = 0; i < events.length; i += 1) {
+    const event = events[i] as AuditEvent
+
+    if (!event.hash) {
+      return {
+        valid: false,
+        brokenAtIndex: i,
+        brokenAtId: event.id,
+        reason: 'missing hash',
+      }
+    }
+    if (event.previousHash !== previousHash) {
+      return {
+        valid: false,
+        brokenAtIndex: i,
+        brokenAtId: event.id,
+        reason: 'previousHash mismatch',
+      }
+    }
+
+    const expected = computeChainHash(previousHash, chainPayload(event))
+    if (expected !== event.hash) {
+      return {
+        valid: false,
+        brokenAtIndex: i,
+        brokenAtId: event.id,
+        reason: 'hash mismatch',
+      }
+    }
+
+    previousHash = event.hash
+  }
+
+  return { valid: true }
+}
 
 function emitVolatileFallback(auditEvent: AuditEvent, reason: string): void {
   logger.warn('Audit Event using volatile fallback', {
@@ -254,24 +348,55 @@ export class AuditLogger {
   }
 
   /**
+   * Link an event into the SHA-256 hash chain: read the most recent event's
+   * `hash` as `previousHash`, then compute this event's `hash`. Wrapped so a
+   * failure to compute the chain (e.g. DB unavailable) degrades gracefully to
+   * an un-chained event rather than dropping the audit record.
+   */
+  private async withChainHash(auditEvent: AuditEvent): Promise<AuditEvent> {
+    try {
+      const db = await this.ensureConnected()
+      const last = await db
+        .collection<AuditEvent>('audit_logs')
+        .find({})
+        .sort({ _id: -1 })
+        .limit(1)
+        .toArray()
+      const previousHash = last[0]?.hash ?? AUDIT_CHAIN_GENESIS
+      const hash = computeChainHash(previousHash, chainPayload(auditEvent))
+      return { ...auditEvent, previousHash, hash }
+    } catch (err: unknown) {
+      logger.warn('Audit chain link failed; storing event without chain hash', {
+        auditId: auditEvent.id,
+        error: err instanceof Error ? err.message : String(err),
+      })
+      return auditEvent
+    }
+  }
+
+  /**
    * Persist the event to the database with a simple retry mechanism
    */
   private async persistEventWithRetry(
     auditEvent: AuditEvent,
     attempt = 1,
   ): Promise<void> {
+    // Compute the chain hash once (first attempt) and reuse it across retries
+    // so the event keeps a stable hash even if persistence is retried.
+    const chained =
+      attempt === 1 ? await this.withChainHash(auditEvent) : auditEvent
     try {
       const db = await this.ensureConnected()
       await db.collection('audit_logs').insertOne({
-        ...auditEvent,
+        ...chained,
         timestamp:
-          auditEvent.timestamp instanceof Date
-            ? auditEvent.timestamp
-            : new Date(auditEvent.timestamp),
+          chained.timestamp instanceof Date
+            ? chained.timestamp
+            : new Date(chained.timestamp),
       })
 
       logger.info('Audit Event Persisted to Database', {
-        auditId: auditEvent.id,
+        auditId: chained.id,
         attempt,
       })
     } catch (error: unknown) {
@@ -280,7 +405,7 @@ export class AuditLogger {
         logger.warn(
           `Audit Log Persistence Attempt ${attempt} Failed. Retrying in ${delay}ms...`,
           {
-            auditId: auditEvent.id,
+            auditId: chained.id,
             error:
               error instanceof Error
                 ? error instanceof Error
@@ -291,12 +416,27 @@ export class AuditLogger {
         )
 
         await new Promise((resolve) => setTimeout(resolve, delay))
-        return this.persistEventWithRetry(auditEvent, attempt + 1)
+        return this.persistEventWithRetry(chained, attempt + 1)
       }
 
       // If we reach here, retries are exhausted
       throw error
     }
+  }
+
+  /**
+   * Read the full audit collection (in insertion order) and verify the hash
+   * chain is intact. Intended for compliance/administrator verification; for
+   * very large collections prefer verifying a bounded window.
+   */
+  public async verifyChain(): Promise<AuditChainVerification> {
+    const db = await this.ensureConnected()
+    const events = await db
+      .collection<AuditEvent>('audit_logs')
+      .find({})
+      .sort({ _id: 1 })
+      .toArray()
+    return verifyAuditChain(events)
   }
 }
 
