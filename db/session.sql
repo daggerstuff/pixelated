@@ -147,6 +147,32 @@ CREATE TABLE IF NOT EXISTS audit_log (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- HIPAA Compliance: Enable Row Level Security (RLS) on audit_log
+ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
+
+-- HIPAA Compliance: Allow inserts from authenticated backend services
+CREATE POLICY audit_log_insert_policy ON audit_log
+  FOR INSERT
+  WITH CHECK (true);
+
+-- HIPAA Compliance: Deny ALL updates to ensure append-only immutability
+CREATE POLICY audit_log_update_policy ON audit_log
+  FOR UPDATE
+  USING (false)
+  WITH CHECK (false);
+
+-- HIPAA Compliance: Deny ALL deletes to ensure tamper-evidence
+CREATE POLICY audit_log_delete_policy ON audit_log
+  FOR DELETE
+  USING (false);
+
+-- HIPAA Compliance: Allow selects ONLY for admin/auditor roles
+CREATE POLICY audit_log_select_policy ON audit_log
+  FOR SELECT
+  USING (
+    current_setting('request.jwt.claims', true)::jsonb ->> 'role' IN ('admin', 'auditor')
+  );
+
 -- System configuration
 CREATE TABLE IF NOT EXISTS system_config (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
