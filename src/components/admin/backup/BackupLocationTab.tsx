@@ -181,7 +181,7 @@ export default function BackupLocationTab() {
             type="button"
             onClick={handleAddLocation}
             disabled={isAddingLocation}
-            className="border-transparent text-white inline-flex items-center rounded-md border bg-primary-600 px-4 py-2 text-sm font-medium shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+            className="border-transparent text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
           >
             Add Location
           </button>
@@ -274,7 +274,7 @@ export default function BackupLocationTab() {
                   </td>
                   <td className="text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm">
                     {location.isDefault ? (
-                      <span className="dark:text-primary-400 font-medium text-primary-600">
+                      <span className="dark:text-primary-400 text-primary-600 font-medium">
                         Default
                       </span>
                     ) : (
@@ -282,7 +282,7 @@ export default function BackupLocationTab() {
                         onClick={function () {
                           return setDefaultLocation(location.id)
                         }}
-                        className="text-gray-600 dark:text-gray-400 dark:hover:text-primary-400 font-medium hover:text-primary-600"
+                        className="text-gray-600 dark:text-gray-400 dark:hover:text-primary-400 hover:text-primary-600 font-medium"
                       >
                         Set as default
                       </button>
@@ -342,7 +342,7 @@ export default function BackupLocationTab() {
                   value={newLocation.name}
                   onChange={handleInputChange}
                   required
-                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 sm:text-sm"
+                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
                 />
               </div>
 
@@ -358,7 +358,7 @@ export default function BackupLocationTab() {
                   name="type"
                   value={newLocation.type}
                   onChange={handleInputChange}
-                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 mt-1 block w-full rounded-md py-2 pl-3 pr-10 text-base focus:border-primary-500 focus:outline-none focus:ring-primary-500 sm:text-sm"
+                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md py-2 pl-3 pr-10 text-base focus:outline-none sm:text-sm"
                 >
                   <option value="local">Local Storage</option>
                   <option value="s3">AWS S3</option>
@@ -383,7 +383,7 @@ export default function BackupLocationTab() {
                     onChange={handleInputChange}
                     required
                     placeholder="/path/to/backup/directory"
-                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 sm:text-sm"
+                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
                   />
                 </div>
               )}
@@ -406,7 +406,7 @@ export default function BackupLocationTab() {
                       value={newLocation.bucket}
                       onChange={handleInputChange}
                       required
-                      className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 sm:text-sm"
+                      className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
                     />
                   </div>
 
@@ -425,7 +425,7 @@ export default function BackupLocationTab() {
                         value={newLocation.region}
                         onChange={handleInputChange}
                         placeholder="us-west-2"
-                        className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:border-primary-500 focus:outline-none focus:ring-primary-500 sm:text-sm"
+                        className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
                       />
                     </div>
                   )}
@@ -441,7 +441,7 @@ export default function BackupLocationTab() {
                       type="checkbox"
                       checked={newLocation.isDefault}
                       onChange={handleInputChange}
-                      className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 h-4 w-4 rounded text-primary-600 focus:ring-primary-500"
+                      className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
@@ -464,7 +464,7 @@ export default function BackupLocationTab() {
               <button
                 type="button"
                 onClick={handleCancelAdd}
-                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-650 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-650 focus:ring-primary-500 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
               >
                 Cancel
               </button>
@@ -475,7 +475,7 @@ export default function BackupLocationTab() {
                   isFormLoading
                     ? 'bg-gray-400'
                     : 'bg-primary-600 hover:bg-primary-700'
-                } focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2`}
+                } focus:ring-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2`}
               >
                 {isFormLoading ? (
                   <>

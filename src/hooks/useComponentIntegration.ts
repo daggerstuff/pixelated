@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { componentIntegrationService } from '@/lib/services/ComponentIntegrationService'
 
@@ -24,36 +25,46 @@ export function useChartData(params: UseChartDataParams) {
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
-  const fetchData = useCallback(async (signal?: AbortSignal) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const data = await componentIntegrationService.getChartData({
-        type: params.type,
-        category: params.category,
-        timeRange: params.timeRange,
-        clientId: params.clientId,
-        sessionId: params.sessionId,
-        dataPoints: params.dataPoints,
-      })
-      if (signal?.aborted) return
-      setChartData(data as unknown as Record<string, unknown>)
-    } catch (err: unknown) {
-      if (signal?.aborted) return
-      const message =
-        err instanceof Error ? err.message : 'Failed to load chart data'
-      logger.error('Chart data fetch failed', {
-        error: err,
-        params,
-      })
-      setError(message)
-      setChartData(null)
-    } finally {
-      if (!signal?.aborted) {
-        setLoading(false)
+  const fetchData = useCallback(
+    async (signal?: AbortSignal) => {
+      setLoading(true)
+      setError(null)
+      try {
+        const data = await componentIntegrationService.getChartData({
+          type: params.type,
+          category: params.category,
+          timeRange: params.timeRange,
+          clientId: params.clientId,
+          sessionId: params.sessionId,
+          dataPoints: params.dataPoints,
+        })
+        if (signal?.aborted) return
+        setChartData(data as unknown as Record<string, unknown>)
+      } catch (err: unknown) {
+        if (signal?.aborted) return
+        const message =
+          err instanceof Error ? err.message : 'Failed to load chart data'
+        logger.error('Chart data fetch failed', {
+          error: err,
+          params,
+        })
+        setError(message)
+        setChartData(null)
+      } finally {
+        if (!signal?.aborted) {
+          setLoading(false)
+        }
       }
-    }
-  }, [params.type, params.category, params.timeRange, params.clientId, params.sessionId, params.dataPoints])
+    },
+    [
+      params.type,
+      params.category,
+      params.timeRange,
+      params.clientId,
+      params.sessionId,
+      params.dataPoints,
+    ],
+  )
 
   useEffect(() => {
     const controller = new AbortController()
@@ -147,4 +158,3 @@ export function useServiceHealth(checkInterval: number = 60000) {
     hasError: health?.['overall'] === 'error',
   }
 }
-

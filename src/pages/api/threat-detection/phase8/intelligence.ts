@@ -212,7 +212,7 @@ export const POST: APIRoute = async ({ request }) => {
           const validatedType = (
             ['ip', 'domain', 'hash', 'url'] as IOCType[]
           ).includes(type)
-            ? (type)
+            ? type
             : 'domain'
 
           const result = await (

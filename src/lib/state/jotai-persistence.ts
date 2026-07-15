@@ -129,9 +129,7 @@ class EncryptedJotaiStorage<Value> {
         }
       }
 
-      const storedState: StoredState<Value> = JSON.parse(
-        decrypted,
-      )
+      const storedState: StoredState<Value> = JSON.parse(decrypted)
 
       // Check TTL
       if (storedState.metadata.ttl) {

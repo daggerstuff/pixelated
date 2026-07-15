@@ -3,22 +3,14 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "@/lib/*": [
-        "../../src/lib/*"
-      ]
+      "@/lib/*": ["../../src/lib/*"]
     }
   },
-  "include": [
-    "agent/**/*.ts",
-    "evals/**/*.ts",
-    ".eve/**/*.d.ts"
-  ]
+  "include": ["agent/**/*.ts", "evals/**/*.ts", ".eve/**/*.d.ts"]
 }

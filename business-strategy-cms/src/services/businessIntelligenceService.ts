@@ -37,7 +37,9 @@ export class BusinessIntelligenceService {
         error,
         industry,
       })
-      throw new Error(`Competitive analysis failed: ${String(error)}`, { cause: error })
+      throw new Error(`Competitive analysis failed: ${String(error)}`, {
+        cause: error,
+      })
     }
   }
 
@@ -90,9 +92,13 @@ export class BusinessIntelligenceService {
     marketPosition: 'premium' | 'competitive' | 'budget'
     justification: string[]
   }> {
-    const prices = competitorData.map((c) => c.price).filter((p) => typeof p === 'number' && p > 0)
+    const prices = competitorData
+      .map((c) => c.price)
+      .filter((p) => typeof p === 'number' && p > 0)
     const avgPrice =
-      prices.length > 0 ? prices.reduce((sum, price) => sum + price, 0) / prices.length : 0
+      prices.length > 0
+        ? prices.reduce((sum, price) => sum + price, 0) / prices.length
+        : 0
     const minPrice = prices.length > 0 ? Math.min(...prices) : 0
     const maxPrice = prices.length > 0 ? Math.max(...prices) : 0
 
@@ -312,15 +318,21 @@ export class BusinessIntelligenceService {
    * Perform competitive analysis
    */
   private async performCompetitiveAnalysis(
-    competitors: { name: string; marketShare: number; pricing: { basic: number; premium: number; enterprise: number } }[],
+    competitors: {
+      name: string
+      marketShare: number
+      pricing: { basic: number; premium: number; enterprise: number }
+    }[],
   ): Promise<CompetitorAnalysis> {
     const avgPricing =
-      competitors.length > 0 ? competitors.reduce(
-        (sum, c) =>
-          sum +
-          (c.pricing.basic + c.pricing.premium + c.pricing.enterprise) / 3,
-        0,
-      ) / competitors.length : 0
+      competitors.length > 0
+        ? competitors.reduce(
+            (sum, c) =>
+              sum +
+              (c.pricing.basic + c.pricing.premium + c.pricing.enterprise) / 3,
+            0,
+          ) / competitors.length
+        : 0
 
     const marketShareDistribution = competitors.reduce<Record<string, number>>(
       (acc, c) => {

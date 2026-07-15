@@ -4,6 +4,7 @@
  */
 
 import geoip from 'geoip-lite'
+
 import { generateAnomalyId } from './analyzer-utils'
 import type {
   SecurityEvent,

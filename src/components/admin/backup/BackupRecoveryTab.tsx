@@ -157,7 +157,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
         error instanceof Error
           ? String(error)
           : typeof error === 'object' && error !== null && 'message' in error
-            ? String((error).message)
+            ? String(error.message)
             : 'An unexpected error occurred.'
 
       toast.error(errorMessage)

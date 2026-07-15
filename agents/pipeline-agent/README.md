@@ -24,10 +24,9 @@ every stage transition. Status: **Done** (PIX-3959).
 ## Foresight wiring (live)
 
 - `promote_to_staging.ts` derives a `model_card_hash` (sha256 of
-  `model_uri:image_tag`), reads rehearsal + QA provenance via
-  `searchMemories`, and writes a `training_provenance` record with
-  `storeMemory` (category `training_provenance`, importance `0.9`). Returns
-  `_provenance_stored`.
+  `model_uri:image_tag`), reads rehearsal + QA provenance via `searchMemories`,
+  and writes a `training_provenance` record with `storeMemory` (category
+  `training_provenance`, importance `0.9`). Returns `_provenance_stored`.
 - `check_pipeline_health.ts` reads live system status via `getSystemStatus()`.
 
 ## How to develop

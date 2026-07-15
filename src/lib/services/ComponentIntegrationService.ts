@@ -402,7 +402,6 @@ export class ComponentIntegrationService {
           }),
         ])
 
-
       const dashboardData = {
         charts: chartData.status === 'fulfilled' ? chartData.value : null,
         emotions: emotionData.status === 'fulfilled' ? emotionData.value : null,
@@ -429,7 +428,6 @@ export class ComponentIntegrationService {
         },
       }
 
-
       logger.info('Retrieved integrated dashboard data', {
         clientId: params.clientId,
         hasCharts: !!dashboardData.charts,
@@ -438,7 +436,6 @@ export class ComponentIntegrationService {
         hasParticles: !!dashboardData.particles,
         errorCount: dashboardData.metadata.errors.length,
       })
-
 
       return dashboardData
     } catch (error: unknown) {
@@ -463,7 +460,6 @@ export class ComponentIntegrationService {
         sessionId: params.sessionId,
         components: params.components,
       })
-
 
       // Mock implementation - replace with actual WebSocket
       const mockUpdates = setInterval(() => {
@@ -497,7 +493,7 @@ export class ComponentIntegrationService {
         '/api/components/particles/emotion-system',
         '/api/components/ui/carousel-content',
       ]
-const services = await Promise.all(
+      const services = await Promise.all(
         endpoints.map(async (endpoint) => {
           const secureUrl = new URL(
             `${endpoint}?healthCheck=true`,
@@ -550,7 +546,8 @@ const services = await Promise.all(
         totalServices: health.services.length,
       })
 
-      return health   } catch (error: unknown) {
+      return health
+    } catch (error: unknown) {
       logger.error('Error checking service health', { error })
       throw error
     }

@@ -6,6 +6,7 @@ export interface StreamOptions {
   onActivity?: (activity: AgentActivity) => void
   onFinalResponse?: (response: any) => void
   onError?: (error: Error) => void
+  gestaltDirective?: string
 }
 
 export function useAgentThoughtStream() {
@@ -42,7 +43,7 @@ export function useAgentThoughtStream() {
             conversation_history: history,
             include_metrics: true,
             use_eq_awareness: true,
-            gestalt_directive: (options as any).gestaltDirective,
+            gestalt_directive: options.gestaltDirective,
           }),
           signal: abortControllerRef.current.signal,
         })

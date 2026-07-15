@@ -247,7 +247,7 @@ export default function SearchBox({
             placeholder={placeholder}
             aria-label="Search"
             aria-keyshortcuts={shortcutSymbol === '⌘' ? 'Meta+K' : 'Control+K'}
-            className={`border-gray-300 dark:border-gray-700 dark:bg-gray-800 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 ${className}`}
+            className={`border-gray-300 dark:border-gray-700 dark:bg-gray-800 focus:ring-primary-500 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 ${className}`}
             aria-autocomplete="list"
             aria-controls="search-results"
             aria-activedescendant={

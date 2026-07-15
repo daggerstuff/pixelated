@@ -103,13 +103,10 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       const emotionsFromRepo = await repository.getEmotionsForSession(
         session.sessionId,
       )
-      const emotionsForDTO = emotionsFromRepo.map(
-        (e) =>
-          ({
-            ...e,
-            timestamp: e.timestamp,
-          }),
-      )
+      const emotionsForDTO = emotionsFromRepo.map((e) => ({
+        ...e,
+        timestamp: e.timestamp,
+      }))
       emotionData.push(...emotionsForDTO)
     }
 

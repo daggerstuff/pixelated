@@ -214,7 +214,10 @@ export const POST: APIRoute = async ({ request }) => {
             metricName,
             metricValue,
             asString(metric.category) ?? 'session',
-            asIsoDate(metric.recordedAt ?? metric.date, new Date().toISOString()),
+            asIsoDate(
+              metric.recordedAt ?? metric.date,
+              new Date().toISOString(),
+            ),
             JSON.stringify({
               sessions: asNumber(metric.sessions),
               newUsers: asNumber(metric.newUsers),

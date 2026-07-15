@@ -6,9 +6,7 @@ import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-dete
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
-    const authResult = await authenticateRequest(
-      request,
-    )
+    const authResult = await authenticateRequest(request)
     if (!authResult.success) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

@@ -4,13 +4,13 @@
 
 /* === Tokens (applied at :root when NP page exists so header/footer siblings inherit) === */
 :root:has(.np-page) {
-  --np-bg: oklch(0.10 0 0);
+  --np-bg: oklch(0.1 0 0);
   --np-surface: oklch(0.14 0 0);
   --np-elevated: oklch(0.18 0 0);
   --np-hover: oklch(0.22 0 0);
   --np-text: oklch(0.93 0 0);
   --np-muted: oklch(0.55 0 0);
-  --np-mid: oklch(0.70 0 0);
+  --np-mid: oklch(0.7 0 0);
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
 
@@ -30,7 +30,9 @@
 }
 
 /* === Base === */
-.np-page * { box-sizing: border-box; }
+.np-page * {
+  box-sizing: border-box;
+}
 
 /* === Container === */
 .np-container {
@@ -68,7 +70,9 @@
   font-size: clamp(2.5rem, 5vw, 4.25rem);
   line-height: 1.05;
   letter-spacing: -0.02em;
-  font-variation-settings: 'SOFT' 0, 'WONK' 0;
+  font-variation-settings:
+    'SOFT' 0,
+    'WONK' 0;
   margin: 0;
 }
 
@@ -138,7 +142,9 @@
   border: none;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.15s ease-out, color 0.15s ease-out;
+  transition:
+    background 0.15s ease-out,
+    color 0.15s ease-out;
   background: transparent;
   color: var(--np-text);
   position: relative;
@@ -518,7 +524,9 @@ body:has(.np-page) .site-footer .fm-chip {
   text-decoration: none;
   padding: 4px 8px;
   border: 1px solid var(--np-line);
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
   background-image: none !important;
 }
 body:has(.np-page) .site-footer .fm-chip:hover {
@@ -607,8 +615,8 @@ body:has(.np-page) .site-footer .fm-chip:hover {
   --np-elevated: oklch(0.92 0 0);
   --np-hover: oklch(0.88 0 0);
   --np-text: oklch(0.15 0 0);
-  --np-muted: oklch(0.50 0 0);
-  --np-mid: oklch(0.40 0 0);
+  --np-muted: oklch(0.5 0 0);
+  --np-mid: oklch(0.4 0 0);
   --np-line: rgba(0, 0, 0, 0.08);
   --np-line-strong: rgba(0, 0, 0, 0.15);
 }

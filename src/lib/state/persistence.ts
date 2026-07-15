@@ -157,7 +157,7 @@ export class StatePersistence {
 
       return this.config.merge
         ? this.config.merge(persistedState, currentState)
-        : { ...(currentState as object), ...(persistedState) }
+        : { ...(currentState as object), ...persistedState }
     } catch (error: unknown) {
       logger.error('Failed to merge state:', error)
       throw error

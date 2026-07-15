@@ -120,10 +120,8 @@ export function mockURLMethods(): { restore: () => void } {
     .mockReturnValue('blob:test-url')
   const revokeObjectURL = vi.fn<(url: string) => void>()
 
-  URL.createObjectURL = ((obj) =>
-    createObjectURL(obj))
-  URL.revokeObjectURL = ((url) =>
-    revokeObjectURL(url))
+  URL.createObjectURL = (obj) => createObjectURL(obj)
+  URL.revokeObjectURL = (url) => revokeObjectURL(url)
 
   return {
     restore: () => {

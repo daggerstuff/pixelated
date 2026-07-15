@@ -11,10 +11,7 @@ const navLinks = [
 ]
 ---
 
-<header
-  id="np-header"
-  class="np-header"
->
+<header id="np-header" class="np-header">
   <div class="np-header-inner">
     <div class="np-header-left">
       <a class="np-brand" href="/">
@@ -58,9 +55,7 @@ const navLinks = [
       <div class="np-header-actions">
         <ThemeToggle />
 
-        <a href="/contact" class="np-btn-primary">
-          Get Started
-        </a>
+        <a href="/contact" class="np-btn-primary"> Get Started </a>
       </div>
     </nav>
 
@@ -73,11 +68,34 @@ const navLinks = [
         aria-label="Open menu"
         aria-expanded="false"
       >
-        <svg id="np-menu-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        <svg
+          id="np-menu-icon"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
         </svg>
-        <svg id="np-close-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display:none">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <svg
+          id="np-close-icon"
+          width="20"
+          height="20"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          style="display:none"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"></path>
         </svg>
       </button>
     </div>
@@ -86,9 +104,14 @@ const navLinks = [
   <!-- Mobile menu -->
   <div id="np-mobile-menu" class="np-mobile-menu" aria-hidden="true">
     <div class="np-mobile-menu-inner">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--np-line);">
+      <div
+        style="display:flex;align-items:center;gap:12px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--np-line);"
+      >
         <img src="/apple-touch-icon.png" alt="PE" width="28" height="28" />
-        <span style="font-family:var(--np-font-display);font-size:1.25rem;font-weight:350;letter-spacing:-0.02em;color:var(--np-text)">Pixelated Empathy</span>
+        <span
+          style="font-family:var(--np-font-display);font-size:1.25rem;font-weight:350;letter-spacing:-0.02em;color:var(--np-text)"
+          >Pixelated Empathy</span
+        >
       </div>
 
       <nav>
@@ -106,275 +129,302 @@ const navLinks = [
         }
       </nav>
 
-      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--np-line);">
-        <a href="/contact" class="np-btn-primary" style="display:block;text-align:center"
+      <div
+        style="margin-top:24px;padding-top:16px;border-top:1px solid var(--np-line);"
+      >
+        <a
+          href="/contact"
+          class="np-btn-primary"
+          style="display:block;text-align:center"
           onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
-        >Get Started</a>
+          >Get Started</a
+        >
       </div>
     </div>
   </div>
 </header>
 
 <style is:global>
-/* NP Header — The Quiet Instrument
+  /* NP Header — The Quiet Instrument
    Flat, zero-chroma, Fraunces brand, JetBrains Mono nav, no glass/gradients */
 
-.np-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: var(--np-z-sticky, 50);
-  background: var(--np-bg);
-  border-bottom: 1px solid var(--np-line);
-}
-
-.np-header-inner {
-  max-width: var(--np-content, 76rem);
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--np-pad, clamp(1rem, 3vw, 2rem));
-  height: 56px;
-}
-
-@supports (padding-top: env(safe-area-inset-top)) {
-  .np-header { padding-top: env(safe-area-inset-top); }
-  .np-header-inner { height: calc(56px + env(safe-area-inset-top)); }
-  .np-mobile-menu { top: calc(56px + env(safe-area-inset-top)); }
-}
-
-.np-header-left {
-  flex-shrink: 0;
-}
-
-.np-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-}
-
-.np-brand-icon {
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--np-elevated);
-}
-
-.np-brand-icon img {
-  display: block;
-}
-
-.np-brand-text {
-  display: flex;
-  flex-direction: column;
-}
-
-.np-brand-name {
-  font-family: var(--np-font-display);
-  font-size: 1rem;
-  font-weight: 350;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
-  color: var(--np-text);
-}
-
-.np-brand-sub {
-  font-family: var(--np-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--np-muted);
-  line-height: 1.2;
-}
-
-.np-nav {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-
-.np-nav-list {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.np-nav-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-muted);
-  text-decoration: none;
-  transition: color 0.15s var(--np-ease), background 0.15s var(--np-ease);
-}
-
-.np-nav-link:hover {
-  color: var(--np-text);
-  background: var(--np-surface);
-}
-
-.np-nav-link--hl {
-  color: var(--np-mid);
-}
-
-.np-header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.np-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  padding: 8px 20px;
-  font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-bg);
-  background: var(--np-text);
-  text-decoration: none;
-  transition: opacity 0.15s var(--np-ease);
-}
-
-.np-btn-primary:hover {
-  opacity: 0.85;
-}
-
-.np-btn-primary:active {
-  opacity: 0.7;
-}
-
-.np-btn-primary:disabled,
-.np-btn-primary[aria-disabled="true"] {
-  opacity: 0.35;
-  pointer-events: none;
-}
-
-.np-nav-link:active {
-  color: var(--np-text);
-  background: var(--np-active);
-}
-
-.np-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 1px 5px;
-  font-family: var(--np-font-mono);
-  font-size: 0.5625rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-bg);
-  background: var(--np-mid);
-  line-height: 1.3;
-}
-
-/* Mobile */
-.np-mobile-trigger {
-  display: none;
-  align-items: center;
-  gap: 8px;
-}
-
-.np-mobile-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background: transparent;
-  border: none;
-  color: var(--np-text);
-  cursor: pointer;
-  padding: 0;
-}
-
-.np-mobile-btn:focus-visible {
-  outline: 1px solid var(--np-mid);
-  outline-offset: 2px;
-}
-
-.np-mobile-menu {
-  display: none;
-  position: fixed;
-  top: 56px;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: var(--np-z-modal, 300);
-  background: var(--np-bg);
-  border-top: 1px solid var(--np-line);
-  overflow-y: auto;
-}
-
-.np-mobile-menu--open {
-  display: block;
-}
-
-.np-mobile-menu-inner {
-  padding: 24px var(--np-pad, clamp(1rem, 3vw, 2rem));
-  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-}
-
-.np-mobile-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 0;
-  font-family: var(--np-font-mono);
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-text);
-  text-decoration: none;
-  border-bottom: 1px solid var(--np-line);
-  transition: color 0.15s var(--np-ease);
-}
-
-.np-mobile-link:hover {
-  color: var(--np-mid);
-}
-
-@media (max-width: 768px) {
-  .np-nav {
-    display: none;
+  .np-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--np-z-sticky, 50);
+    background: var(--np-bg);
+    border-bottom: 1px solid var(--np-line);
   }
-  .np-mobile-trigger {
+
+  .np-header-inner {
+    max-width: var(--np-content, 76rem);
+    margin: 0 auto;
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--np-pad, clamp(1rem, 3vw, 2rem));
+    height: 56px;
   }
-}
 
-/* Focus styles */
-.np-header a:focus-visible,
-.np-mobile-btn:focus-visible {
-  outline: 1px solid var(--np-mid);
-  outline-offset: 2px;
-}
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .np-header {
+      padding-top: env(safe-area-inset-top);
+    }
+    .np-header-inner {
+      height: calc(56px + env(safe-area-inset-top));
+    }
+    .np-mobile-menu {
+      top: calc(56px + env(safe-area-inset-top));
+    }
+  }
 
-@media (max-width: 375px) {
-  .np-brand-text { display: none; }
-  .np-nav .np-btn-primary { padding: 8px 12px; font-size: 0.625rem; }
-}
+  .np-header-left {
+    flex-shrink: 0;
+  }
 
-@media (prefers-reduced-motion: reduce) {
-  .np-header { transition-duration: 0.01ms; }
-  .np-nav-link { transition-duration: 0.01ms; }
-  .np-btn-primary { transition-duration: 0.01ms; }
-  .np-theme-toggle { transition-duration: 0.01ms; }
-}
+  .np-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .np-brand-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--np-elevated);
+  }
+
+  .np-brand-icon img {
+    display: block;
+  }
+
+  .np-brand-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .np-brand-name {
+    font-family: var(--np-font-display);
+    font-size: 1rem;
+    font-weight: 350;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    color: var(--np-text);
+  }
+
+  .np-brand-sub {
+    font-family: var(--np-font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--np-muted);
+    line-height: 1.2;
+  }
+
+  .np-nav {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .np-nav-list {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .np-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    font-family: var(--np-font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--np-muted);
+    text-decoration: none;
+    transition:
+      color 0.15s var(--np-ease),
+      background 0.15s var(--np-ease);
+  }
+
+  .np-nav-link:hover {
+    color: var(--np-text);
+    background: var(--np-surface);
+  }
+
+  .np-nav-link--hl {
+    color: var(--np-mid);
+  }
+
+  .np-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .np-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 20px;
+    font-family: var(--np-font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--np-bg);
+    background: var(--np-text);
+    text-decoration: none;
+    transition: opacity 0.15s var(--np-ease);
+  }
+
+  .np-btn-primary:hover {
+    opacity: 0.85;
+  }
+
+  .np-btn-primary:active {
+    opacity: 0.7;
+  }
+
+  .np-btn-primary:disabled,
+  .np-btn-primary[aria-disabled='true'] {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .np-nav-link:active {
+    color: var(--np-text);
+    background: var(--np-active);
+  }
+
+  .np-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 5px;
+    font-family: var(--np-font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--np-bg);
+    background: var(--np-mid);
+    line-height: 1.3;
+  }
+
+  /* Mobile */
+  .np-mobile-trigger {
+    display: none;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .np-mobile-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    color: var(--np-text);
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .np-mobile-btn:focus-visible {
+    outline: 1px solid var(--np-mid);
+    outline-offset: 2px;
+  }
+
+  .np-mobile-menu {
+    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--np-z-modal, 300);
+    background: var(--np-bg);
+    border-top: 1px solid var(--np-line);
+    overflow-y: auto;
+  }
+
+  .np-mobile-menu--open {
+    display: block;
+  }
+
+  .np-mobile-menu-inner {
+    padding: 24px var(--np-pad, clamp(1rem, 3vw, 2rem));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .np-mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    font-family: var(--np-font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--np-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--np-line);
+    transition: color 0.15s var(--np-ease);
+  }
+
+  .np-mobile-link:hover {
+    color: var(--np-mid);
+  }
+
+  @media (max-width: 768px) {
+    .np-nav {
+      display: none;
+    }
+    .np-mobile-trigger {
+      display: flex;
+    }
+  }
+
+  /* Focus styles */
+  .np-header a:focus-visible,
+  .np-mobile-btn:focus-visible {
+    outline: 1px solid var(--np-mid);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 375px) {
+    .np-brand-text {
+      display: none;
+    }
+    .np-nav .np-btn-primary {
+      padding: 8px 12px;
+      font-size: 0.625rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .np-header {
+      transition-duration: 0.01ms;
+    }
+    .np-nav-link {
+      transition-duration: 0.01ms;
+    }
+    .np-btn-primary {
+      transition-duration: 0.01ms;
+    }
+    .np-theme-toggle {
+      transition-duration: 0.01ms;
+    }
+  }
 </style>
 
 <script is:inline>
@@ -406,7 +456,9 @@ const navLinks = [
     if (focusables.length) {
       firstFocusable = focusables[0]
       lastFocusable = focusables[focusables.length - 1]
-      setTimeout(function() { focusables[0].focus() }, 100)
+      setTimeout(function () {
+        focusables[0].focus()
+      }, 100)
     }
   }
 
@@ -425,25 +477,37 @@ const navLinks = [
   }
 
   if (btn && menu && menuIcon && closeIcon) {
-    btn.addEventListener('click', function(e) {
+    btn.addEventListener('click', function (e) {
       e.preventDefault()
       e.stopPropagation()
       var isOpen = menu.classList.contains('np-mobile-menu--open')
       isOpen ? close() : open()
     })
 
-    document.addEventListener('click', function(e) {
-      if (!btn.contains(e.target) && !menu.contains(e.target) && menu.classList.contains('np-mobile-menu--open')) {
+    document.addEventListener('click', function (e) {
+      if (
+        !btn.contains(e.target) &&
+        !menu.contains(e.target) &&
+        menu.classList.contains('np-mobile-menu--open')
+      ) {
         close()
       }
     })
 
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && menu.classList.contains('np-mobile-menu--open')) {
+    document.addEventListener('keydown', function (e) {
+      if (
+        e.key === 'Escape' &&
+        menu.classList.contains('np-mobile-menu--open')
+      ) {
         close()
       }
       // Trap focus within the menu
-      if (e.key === 'Tab' && menu.classList.contains('np-mobile-menu--open') && firstFocusable && lastFocusable) {
+      if (
+        e.key === 'Tab' &&
+        menu.classList.contains('np-mobile-menu--open') &&
+        firstFocusable &&
+        lastFocusable
+      ) {
         if (e.shiftKey && document.activeElement === firstFocusable) {
           e.preventDefault()
           lastFocusable.focus()
@@ -454,8 +518,12 @@ const navLinks = [
       }
     })
 
-    window.addEventListener('resize', function() {
-      if (window.innerWidth >= 768 && menu.classList.contains('np-mobile-menu--open')) close()
+    window.addEventListener('resize', function () {
+      if (
+        window.innerWidth >= 768 &&
+        menu.classList.contains('np-mobile-menu--open')
+      )
+        close()
     })
   }
 </script>

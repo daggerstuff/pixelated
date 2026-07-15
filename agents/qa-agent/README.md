@@ -9,7 +9,7 @@ digests. Sub-agent of the broader Eve workflow. Status: **Done** (PIX-3958).
 | Slot            | Path                                                                                                                                       |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | Runtime config  | `agent/agent.ts` (`defineAgent` + Zod `outputSchema`)                                                                                      |
-| Standing rules  | `agent/instructions.md`, `agent/instructions/{flagging-rules.md,report-format.md,scoring-criteria.md}`                                                   |
+| Standing rules  | `agent/instructions.md`, `agent/instructions/{flagging-rules.md,report-format.md,scoring-criteria.md}`                                     |
 | Tools (6)       | `agent/tools/`: `detect_emotional_patterns`, `fetch_sessions`, `flag_training_gap`, `generate_report`, `score_session`, `summarize_cohort` |
 | Channels (3)    | `agent/channels/eve.ts`, `agent/channels/linear-chatops.ts`, `agent/channels/slack-supervisor-digest.ts`                                   |
 | Connections (2) | `agent/connections/foresight.ts`, `agent/connections/workers-ai-mcp.ts` — `defineMcpClientConnection`, env-gated URLs                      |
@@ -23,9 +23,11 @@ digests. Sub-agent of the broader Eve workflow. Status: **Done** (PIX-3958).
 
 ## Foresight wiring (live)
 
-- `score_session.ts` calls `searchMemories({ query: 'session_id:<uuid>', limit, tag_filter: ['session_id:<uuid>'] })`, concatenates `memories[].content` into the
-  scored `transcript`, and passes it to the Workers AI (`llama-3.2-3b-instruct`)
-  scoring prompt. Returns `transcript_fetched: boolean`.
+- `score_session.ts` calls
+  `searchMemories({ query: 'session_id:<uuid>', limit, tag_filter: ['session_id:<uuid>'] })`,
+  concatenates `memories[].content` into the scored `transcript`, and passes it
+  to the Workers AI (`llama-3.2-3b-instruct`) scoring prompt. Returns
+  `transcript_fetched: boolean`.
 - `summarize_cohort.ts` queries a cohort `tag_filter`, parses per-session JSON
   memory content, aggregates the 5 rubric dimensions (mean / p10 / p90), and
   surfaces the top-5 gap trainees.

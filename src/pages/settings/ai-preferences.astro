@@ -24,11 +24,13 @@ const evalResult = await policyEngine.evaluate({
   context: {
     auditEnabled: true,
     consentVerified: true,
-  }
+  },
 })
 
 if (!evalResult.allowed) {
-  return Astro.redirect(`/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`)
+  return Astro.redirect(
+    `/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`,
+  )
 }
 
 // Get the current user

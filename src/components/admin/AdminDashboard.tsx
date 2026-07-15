@@ -261,7 +261,11 @@ export const AdminDashboard: FC = () => {
 
           {/* Navigation Tabs */}
           <div className="px-6">
-            <nav className="flex space-x-8" aria-label="Dashboard views" role="tablist">
+            <nav
+              className="flex space-x-8"
+              aria-label="Dashboard views"
+              role="tablist"
+            >
               {dashboardTabs.map((tab) => (
                 <button
                   key={tab.id}
