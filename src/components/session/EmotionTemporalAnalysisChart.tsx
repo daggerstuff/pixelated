@@ -15,6 +15,25 @@ import {
   Area,
 } from 'recharts'
 
+// Per-view caption. Title in mono label role + body description per doctrine §3.
+const VIEW_MODES = [
+  { key: 'trends', label: 'Trends' },
+  { key: 'critical', label: 'Critical Points' },
+  { key: 'progression', label: 'Progression' },
+  { key: 'transitions', label: 'Transitions' },
+  { key: 'relationships', label: 'Relationships' },
+] as const
+
+const VIEW_CAPTIONS: Record<ViewMode, string> = {
+  trends: 'Emotional trend patterns across sessions. Positive slopes = increasing intensity; negative = decreasing.',
+  critical: 'High-intensity emotional moments — often breakthroughs or challenges.',
+  progression: 'Overall emotional improvement. Positive = beneficial change; negative may need attention.',
+  transitions: 'Most common emotional shifts and their frequency — insight into regulation patterns.',
+  relationships: 'Correlations between emotions. Positive co-occur; negative rarely co-occur.',
+}
+
+type ViewMode = (typeof VIEW_MODES)[number]['key']
+
 import { cn } from '@/lib/utils'
 
 import type {
@@ -24,6 +43,20 @@ import type {
   TemporalTransition,
 } from '../../lib/ai/temporal/EmotionTemporalAnalyzer'
 
+// Zero-chroma chart chrome (DESIGN.md §2.1): axes/gridlines/refs/tooltip frames
+// stay on the np neutral ramp. Only data marks earn hue (Okabe-Ito palette above).
+const axisTick = { fontSize: 10, fill: 'var(--np-muted)' }
+const axisLineProps = { stroke: 'var(--np-line)', strokeWidth: 0.5 }
+const gridProps = { strokeDasharray: '3 3', stroke: 'var(--np-line)' }
+const tooltipStyle = {
+  backgroundColor: 'var(--np-elevated)',
+  border: '1px solid var(--np-line)',
+  borderRadius: '0px',
+  fontSize: '12px',
+  color: 'var(--np-text)',
+}
+const refLineProps = { stroke: 'var(--np-muted)', strokeWidth: 1 }
+
 type EmotionTemporalAnalysisChartProps = {
   data: TemporalEmotionAnalysis
   className?: string
@@ -32,26 +65,43 @@ type EmotionTemporalAnalysisChartProps = {
   clientId?: string
 }
 
-// Color map for common emotions
+// Bounded categorical palette (Okabe-Ito, colorblind-safe) — series marks only per DESIGN.md §2.1.
+// Chart chrome (axes, labels, tooltips, container) stays zero-chroma via np-tokens.
+const emotionPalette = [
+  '#E69F00', // orange
+  '#56B4E9', // sky blue
+  '#009E73', // bluish green
+  '#F0E442', // yellow
+  '#0072B2', // blue
+  '#D55E00', // vermillion
+  '#CC79A7', // reddish purple
+  '#999999', // grey
+]
+
+// Color map for common emotions — maps each emotion to a bounded palette entry.
 const emotionColors: Record<string, string> = {
-  happiness: '#4ade80', // green-400
-  joy: '#22c55e', // green-500
-  excitement: '#10b981', // emerald-500
-  contentment: '#60a5fa', // blue-400
-  gratitude: '#3b82f6', // blue-500
-  neutral: '#94a3b8', // slate-400
-  surprise: '#c084fc', // purple-400
-  anxiety: '#f59e0b', // amber-500
-  fear: '#f97316', // orange-500
-  anger: '#ef4444', // red-500
-  sadness: '#6366f1', // indigo-500
-  disgust: '#8b5cf6', // violet-500
+  happiness: emotionPalette[2],
+  joy: emotionPalette[2],
+  excitement: emotionPalette[0],
+  contentment: emotionPalette[4],
+  gratitude: emotionPalette[1],
+  neutral: emotionPalette[7],
+  surprise: emotionPalette[6],
+  anxiety: emotionPalette[3],
+  fear: emotionPalette[5],
+  anger: emotionPalette[5],
+  sadness: emotionPalette[4],
+  disgust: emotionPalette[6],
 }
 
-// Get color for an emotion type, with fallback
+// Get color for an emotion type, with fallback to the first palette entry
 const getEmotionColor = (emotion: string): string => {
-  return emotionColors[emotion.toLowerCase()] ?? '#94a3b8' // slate-400 default
+  return emotionColors[emotion.toLowerCase()] ?? emotionPalette[7]
 }
+
+// Named series colors for the recharts multi-series trend/correlation views.
+const seriesTrendColor = emotionPalette[4] // blue — Trend series
+const seriesCorrelationColor = emotionPalette[2] // green — Correlation series
 
 const toNumber = (value: unknown): number => {
   return typeof value === 'number' ? value : 0
@@ -71,9 +121,7 @@ export default function EmotionTemporalAnalysisChart({
   isLoading = false,
   height = 400,
 }: EmotionTemporalAnalysisChartProps) {
-  const [viewMode, setViewMode] = useState<
-    'trends' | 'critical' | 'progression' | 'transitions' | 'relationships'
-  >('trends')
+  const [viewMode, setViewMode] = useState<ViewMode>('trends')
   const [emotionFilters, setEmotionFilters] = useState<Record<string, boolean>>(
     {},
   )
@@ -182,22 +230,22 @@ export default function EmotionTemporalAnalysisChart({
       {
         name: 'Overall Improvement',
         value: progression.overallImprovement,
-        fill: progression.overallImprovement >= 0 ? '#22c55e' : '#ef4444',
+        fill: progression.overallImprovement >= 0 ? emotionPalette[2] : emotionPalette[5],
       },
       {
         name: 'Stability Change',
         value: progression.stabilityChange,
-        fill: progression.stabilityChange >= 0 ? '#3b82f6' : '#f97316',
+        fill: progression.stabilityChange >= 0 ? emotionPalette[4] : emotionPalette[5],
       },
       {
         name: 'Positive Emotion Change',
         value: progression.positiveEmotionChange,
-        fill: progression.positiveEmotionChange >= 0 ? '#4ade80' : '#f59e0b',
+        fill: progression.positiveEmotionChange >= 0 ? emotionPalette[2] : emotionPalette[0],
       },
       {
         name: 'Negative Emotion Change',
         value: progression.negativeEmotionChange,
-        fill: progression.negativeEmotionChange >= 0 ? '#8b5cf6' : '#6366f1',
+        fill: progression.negativeEmotionChange >= 0 ? emotionPalette[6] : emotionPalette[4],
       },
     ]
   }
@@ -225,7 +273,7 @@ export default function EmotionTemporalAnalysisChart({
         name: `${rel.dimensions[0]} & ${rel.dimensions[1]}`,
         correlation: rel.correlation,
         description: rel.description,
-        color: rel.correlation >= 0 ? '#22c55e' : '#ef4444',
+        color: rel.correlation >= 0 ? emotionPalette[2] : emotionPalette[5],
       }),
     )
   }
@@ -241,10 +289,13 @@ export default function EmotionTemporalAnalysisChart({
   // Loading state
   if (isLoading) {
     return (
-      <div className="bg-gray-50 flex items-center justify-center rounded-lg p-6">
+      <div
+        className="np-surface flex items-center justify-center p-6"
+        style={{ border: '1px solid var(--np-line)' }}
+      >
         <div className="flex w-full animate-pulse flex-col">
-          <div className="bg-gray-200 mb-2.5 h-4 w-3/4 rounded"></div>
-          <div className="bg-gray-200 h-40 w-full rounded"></div>
+          <div className="mb-2.5 h-4 w-3/4 np-elevated"></div>
+          <div className="h-40 w-full np-elevated"></div>
         </div>
       </div>
     )
@@ -257,11 +308,14 @@ export default function EmotionTemporalAnalysisChart({
     (data.transitions ?? []).length === 0
   ) {
     return (
-      <div className="bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6">
-        <p className="text-gray-500 mb-2">
+      <div
+        className="np-surface flex flex-col items-center justify-center p-6"
+        style={{ border: '1px solid var(--np-line)' }}
+      >
+        <p className="np-text mb-2">
           No temporal analysis data available
         </p>
-        <p className="text-gray-400 text-sm">
+        <p className="np-muted text-sm">
           More data needs to be collected across sessions
         </p>
       </div>
@@ -271,16 +325,18 @@ export default function EmotionTemporalAnalysisChart({
   // Render the appropriate chart based on view mode
   const renderChart = () => {
     if (viewMode === 'trends') {
+      const trendData = prepareTrendData()
       return (
         <AreaChart
-          data={prepareTrendData()}
+          data={trendData}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis domain={[-1, 1]} />
+          <CartesianGrid {...gridProps} />
+          <XAxis dataKey="name" tick={axisTick} axisLine={axisLineProps} />
+          <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
           <Tooltip
-            formatter={(value: any, name: any) => {
+            contentStyle={tooltipStyle}
+            formatter={(value: number | string, name: number | string) => {
               if (name === 'slope') {
                 const numericValue = toNumber(value)
                 return [
@@ -299,9 +355,9 @@ export default function EmotionTemporalAnalysisChart({
           />
 
           <Legend />
-          <ReferenceLine y={0} stroke="#666" />
+          <ReferenceLine y={0} {...refLineProps} />
           <defs>
-            {prepareTrendData().map((item) => (
+            {trendData.map((item) => (
               <linearGradient
                 key={item.name}
                 id={`gradient-${item.name}`}
@@ -319,8 +375,8 @@ export default function EmotionTemporalAnalysisChart({
           <Area
             type="monotone"
             dataKey="slope"
-            stroke="#8884d8"
-            fill="#8884d8"
+            stroke={seriesTrendColor}
+            fill={seriesTrendColor}
             strokeWidth={2}
             fillOpacity={0.6}
             name="Trend"
@@ -329,8 +385,8 @@ export default function EmotionTemporalAnalysisChart({
           <Area
             type="monotone"
             dataKey="correlation"
-            stroke="#82ca9d"
-            fill="#82ca9d"
+            stroke={seriesCorrelationColor}
+            fill={seriesCorrelationColor}
             strokeWidth={2}
             fillOpacity={0.6}
             name="Correlation"
@@ -342,21 +398,16 @@ export default function EmotionTemporalAnalysisChart({
     if (viewMode === 'critical') {
       return (
         <ScatterChart margin={{ top: 20, right: 30, left: 0, bottom: 10 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis type="category" dataKey="name" name="Emotion" />
+          <CartesianGrid {...gridProps} />
+          <XAxis type="category" dataKey="name" name="Emotion" tick={axisTick} axisLine={axisLineProps} />
 
-          <YAxis type="number" dataKey="intensity" name="Intensity" />
+          <YAxis type="number" dataKey="intensity" name="Intensity" tick={axisTick} axisLine={axisLineProps} />
 
           <ZAxis type="category" dataKey="sessionId" name="Session" />
 
           <Tooltip
-            cursor={{ strokeDasharray: '3 3' }}
-            formatter={(value: any, name: any) => {
-              if (name === 'Intensity') {
-                return [value, name]
-              }
-              return [value, name]
-            }}
+            cursor={{ strokeDasharray: '3 3', stroke: 'var(--np-line)' }}
+            contentStyle={tooltipStyle}
           />
 
           <Legend />
@@ -373,18 +424,19 @@ export default function EmotionTemporalAnalysisChart({
     }
 
     if (viewMode === 'progression') {
+      const progressionData = prepareProgressionData()
       return (
         <AreaChart
-          data={prepareProgressionData()}
+          data={progressionData}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
+          <CartesianGrid {...gridProps} />
+          <XAxis dataKey="name" tick={axisTick} axisLine={axisLineProps} />
+          <YAxis tick={axisTick} axisLine={axisLineProps} />
+          <Tooltip contentStyle={tooltipStyle} />
           <Legend />
-          <ReferenceLine y={0} stroke="#666" />
-          {prepareProgressionData().map((item) => (
+          <ReferenceLine y={0} {...refLineProps} />
+          {progressionData.map((item) => (
             <Area
               key={item.name}
               type="monotone"
@@ -406,13 +458,15 @@ export default function EmotionTemporalAnalysisChart({
           data={prepareTransitionsData()}
           margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
+          <CartesianGrid {...gridProps} />
+          <XAxis dataKey="name" tick={axisTick} axisLine={axisLineProps} />
           <YAxis
             yAxisId="left"
             orientation="left"
             dataKey="frequency"
             name="Frequency"
+            tick={axisTick}
+            axisLine={axisLineProps}
           />
 
           <YAxis
@@ -420,10 +474,13 @@ export default function EmotionTemporalAnalysisChart({
             orientation="right"
             dataKey="duration"
             name="Avg. Duration (min)"
+            tick={axisTick}
+            axisLine={axisLineProps}
           />
 
           <Tooltip
-            formatter={(value: any, name: any, _props: any) => {
+            contentStyle={tooltipStyle}
+            formatter={(value: number | string, name: number | string) => {
               if (name === 'frequency') {
                 return [value, 'Frequency']
               }
@@ -439,8 +496,8 @@ export default function EmotionTemporalAnalysisChart({
             yAxisId="left"
             type="monotone"
             dataKey="frequency"
-            stroke="#8884d8"
-            fill="#8884d8"
+            stroke={seriesTrendColor}
+            fill={seriesTrendColor}
             fillOpacity={0.6}
             strokeWidth={2}
             name="Frequency"
@@ -450,7 +507,7 @@ export default function EmotionTemporalAnalysisChart({
             yAxisId="right"
             type="monotone"
             dataKey="duration"
-            stroke="#82ca9d"
+            stroke={seriesCorrelationColor}
             strokeWidth={2}
             name="Avg Duration (min)"
           />
@@ -463,11 +520,12 @@ export default function EmotionTemporalAnalysisChart({
         data={prepareRelationshipsData()}
         margin={{ top: 20, right: 30, left: 0, bottom: 10 }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis domain={[-1, 1]} />
+        <CartesianGrid {...gridProps} />
+        <XAxis dataKey="name" tick={axisTick} axisLine={axisLineProps} />
+        <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
         <Tooltip
-          formatter={(value: any, name: any) => {
+          contentStyle={tooltipStyle}
+          formatter={(value: number | string, name: number | string) => {
             if (name === 'correlation') {
               return [formatNumber(value, 2), 'Correlation']
             }
@@ -475,12 +533,12 @@ export default function EmotionTemporalAnalysisChart({
           }}
         />
         <Legend />
-        <ReferenceLine y={0} stroke="#666" />
+        <ReferenceLine y={0} stroke="var(--np-muted)" />
         <Area
           type="monotone"
           dataKey="correlation"
-          stroke="#8884d8"
-          fill="#8884d8"
+          stroke={seriesTrendColor}
+          fill={seriesTrendColor}
           fillOpacity={0.6}
           strokeWidth={2}
           name="Correlation"
@@ -490,68 +548,47 @@ export default function EmotionTemporalAnalysisChart({
   }
 
   return (
-    <div className={cn('p-4 bg-white rounded-lg shadow-sm', className)}>
-      <div className="mb-4 flex flex-col items-start justify-between gap-2 sm:flex-row sm:items-center">
-        <h3 className="text-gray-900 text-lg font-medium">
+    <div
+      className={cn('p-4 np-surface', className)}
+      style={{ border: '1px solid var(--np-line)' }}
+    >
+      <div className="mb-4 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-baseline">
+        <h3
+          className="np-text"
+          style={{ fontFamily: 'var(--np-font-display)', fontWeight: 'var(--np-weight-headline)', fontSize: 'var(--np-text-title)', letterSpacing: '-0.01em' }}
+        >
           Temporal Emotion Analysis
         </h3>
 
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setViewMode('trends')}
-            className={cn(
-              'px-3 py-1 text-sm rounded-full',
-              viewMode === 'trends'
-                ? 'bg-purple-100 text-purple-800'
-                : 'bg-gray-100 text-gray-600',
-            )}
-          >
-            Trends
-          </button>
-          <button
-            onClick={() => setViewMode('critical')}
-            className={cn(
-              'px-3 py-1 text-sm rounded-full',
-              viewMode === 'critical'
-                ? 'bg-orange-100 text-orange-800'
-                : 'bg-gray-100 text-gray-600',
-            )}
-          >
-            Critical Points
-          </button>
-          <button
-            onClick={() => setViewMode('progression')}
-            className={cn(
-              'px-3 py-1 text-sm rounded-full',
-              viewMode === 'progression'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-gray-100 text-gray-600',
-            )}
-          >
-            Progression
-          </button>
-          <button
-            onClick={() => setViewMode('transitions')}
-            className={cn(
-              'px-3 py-1 text-sm rounded-full',
-              viewMode === 'transitions'
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-gray-100 text-gray-600',
-            )}
-          >
-            Transitions
-          </button>
-          <button
-            onClick={() => setViewMode('relationships')}
-            className={cn(
-              'px-3 py-1 text-sm rounded-full',
-              viewMode === 'relationships'
-                ? 'bg-indigo-100 text-indigo-800'
-                : 'bg-gray-100 text-gray-600',
-            )}
-          >
-            Relationships
-          </button>
+        {/* Segmented control — one shared class, selected via np-elevated fill + np-text. */}
+        <div
+          role="tablist"
+          aria-label="Temporal analysis view"
+          className="flex flex-wrap"
+          style={{ border: '1px solid var(--np-line)' }}
+        >
+          {VIEW_MODES.map((mode) => {
+            const selected = viewMode === mode.key
+            return (
+              <button
+                key={mode.key}
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setViewMode(mode.key)}
+                className={cn(
+                  'px-3 py-1.5 text-sm transition-colors',
+                  selected ? 'np-text' : 'np-muted',
+                )}
+                style={{
+                  fontFamily: 'var(--np-font-body)',
+                  background: selected ? 'var(--np-elevated)' : 'transparent',
+                  borderRight: '1px solid var(--np-line)',
+                }}
+              >
+                {mode.label}
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -563,71 +600,57 @@ export default function EmotionTemporalAnalysisChart({
               key={emotion}
               onClick={() => toggleEmotionFilter(emotion)}
               className={cn(
-                'px-2 py-1 text-xs rounded-full border',
-                isSelected ? 'text-white' : 'bg-white text-gray-600',
+                'np-surface flex items-center gap-1.5 px-2 py-1 text-xs border',
+                isSelected ? 'np-text font-semibold' : 'np-muted',
               )}
               style={{
-                backgroundColor: isSelected
-                  ? getEmotionColor(emotion)
-                  : undefined,
+                backgroundColor: 'var(--np-surface)',
+                borderColor: isSelected ? 'var(--np-mid)' : 'var(--np-line)',
               }}
             >
+              {/* Emotion-color swatch is the data mark (hue earned); label chrome stays zero-chroma. */}
+              <span
+                aria-hidden="true"
+                className="inline-block h-2 w-2"
+                style={{
+                  backgroundColor: getEmotionColor(emotion),
+                  opacity: isSelected ? 1 : 0.4,
+                }}
+              />
               {emotion}
             </button>
           ))}
         </div>
       )}
 
-      {/* Chart based on selected view */}
-      <div style={{ width: '100%', height: `${height}px` }}>
+      {/* Chart based on selected view. Keyed wrapper remounts on view change →
+          recharts state never leaks + the fade-in replays as a state-change cue.
+          Scope: this keyframe is local to this component's key → no global clash. */}
+      <style>{`
+        @keyframes etac-chart-enter { from { opacity: 0 } to { opacity: 1 } }
+        .etac-chart { animation: etac-chart-enter var(--np-duration-normal) var(--np-ease-out) both; }
+        @media (prefers-reduced-motion: reduce) {
+          .etac-chart { animation: none }
+        }
+      `}</style>
+      <div key={viewMode} className="etac-chart" style={{ width: '100%', height: `${height}px` }}>
         <ResponsiveContainer width="100%" height="100%">
           {renderChart()}
         </ResponsiveContainer>
       </div>
 
-      {/* Summary text based on view */}
-      <div className="text-gray-600 mt-4 text-sm">
-        {viewMode === 'trends' && (
-          <p>
-            This chart shows emotional trend patterns over time, helping to
-            identify which emotions are increasing or decreasing in intensity
-            across sessions. Positive slopes indicate increasing emotions, while
-            negative slopes show decreasing trends.
-          </p>
-        )}
-
-        {viewMode === 'critical' && (
-          <p>
-            Critical emotional points represent significant moments with high
-            emotional intensity. These points often indicate important
-            therapeutic breakthroughs or challenges.
-          </p>
-        )}
-
-        {viewMode === 'progression' && (
-          <p>
-            The progression chart shows overall emotional improvement metrics.
-            Positive values indicate beneficial changes, while negative values
-            may indicate areas needing attention.
-          </p>
-        )}
-
-        {viewMode === 'transitions' && (
-          <p>
-            This view shows the most common emotional transitions and their
-            frequency. Understanding emotional shifts provides insight into
-            emotional regulation patterns.
-          </p>
-        )}
-
-        {viewMode === 'relationships' && (
-          <p>
-            Emotional relationships show correlations between different
-            emotions. Positive correlations indicate emotions that tend to occur
-            together, while negative correlations show emotions that rarely
-            co-occur.
-          </p>
-        )}
+      {/* Caption — mono label + body description per doctrine §3.
+          Replaces the verbose per-view <p> wall with a single dense caption. */}
+      <div className="mt-4 flex items-start gap-2 pt-3" style={{ borderTop: '1px solid var(--np-line)' }}>
+        <span
+          className="np-muted uppercase shrink-0"
+          style={{ fontFamily: 'var(--np-font-mono)', fontSize: 'var(--np-text-caption)', letterSpacing: 'var(--np-tracking-label)', paddingTop: '2px' }}
+        >
+          {VIEW_MODES.find((m) => m.key === viewMode)?.label}
+        </span>
+        <p className="np-muted" style={{ fontSize: 'var(--np-text-small)', lineHeight: 1.5 }}>
+          {VIEW_CAPTIONS[viewMode]}
+        </p>
       </div>
     </div>
   )

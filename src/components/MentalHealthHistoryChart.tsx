@@ -45,17 +45,29 @@ type ScoreValues = {
   [K in ScoreMetric]: number
 }
 
+// Bounded categorical palette (Okabe-Ito, colorblind-safe) — series marks per DESIGN.md §2.1.
+const scorePalette = [
+  '#E69F00', // orange
+  '#56B4E9', // sky blue
+  '#009E73', // bluish green
+  '#F0E442', // yellow
+  '#0072B2', // blue
+  '#D55E00', // vermillion
+  '#CC79A7', // reddish purple
+  '#999999', // grey
+]
+
 const SCORE_COLORS: Record<ScoreMetric, string> = {
-  depression: '#ef4444',
-  anxiety: '#f97316',
-  stress: '#eab308',
-  anger: '#dc2626',
-  socialIsolation: '#8b5cf6',
-  bipolarDisorder: '#06b6d4',
-  ocd: '#10b981',
-  eatingDisorder: '#f59e0b',
-  socialAnxiety: '#ec4899',
-  panicDisorder: '#6366f1',
+  depression: scorePalette[5],
+  anxiety: scorePalette[0],
+  stress: scorePalette[3],
+  anger: scorePalette[5],
+  socialIsolation: scorePalette[6],
+  bipolarDisorder: scorePalette[4],
+  ocd: scorePalette[2],
+  eatingDisorder: scorePalette[0],
+  socialAnxiety: scorePalette[6],
+  panicDisorder: scorePalette[4],
 }
 
 const SCORE_LABELS: Record<ScoreMetric, string> = {
@@ -76,6 +88,14 @@ const isScoreMetric = (metric: string): metric is ScoreMetric =>
 
 const getScoreLabel = (metric: string): string =>
   isScoreMetric(metric) ? SCORE_LABELS[metric] : metric
+
+// Zero-chroma tooltip chrome (DESIGN.md §2.1). Shared across both charts.
+const chartTooltipStyle = {
+  backgroundColor: 'var(--np-elevated)',
+  border: '1px solid var(--np-line)',
+  borderRadius: '0px',
+  color: 'var(--np-text)',
+}
 
 const mapLatestScore = (
   scoreMetric: ScoreMetric,
@@ -117,9 +137,9 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
 
   if (!hasData) {
     return (
-      <div className="bg-muted/20 border-muted-foreground/20 flex h-full w-full items-center justify-center rounded-lg border-2 border-dashed">
+      <div className="np-surface flex h-full w-full items-center justify-center" style={{ border: '2px dashed var(--np-line)' }}>
         <div className="text-center">
-          <div className="text-muted-foreground mb-2">
+          <div className="np-muted mb-2">
             <svg
               className="mx-auto mb-2 h-8 w-8"
               fill="none"
@@ -134,10 +154,10 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
               />
             </svg>
           </div>
-          <p className="text-muted-foreground text-sm font-medium">
+          <p className="np-text text-sm font-medium">
             No Analysis Data
           </p>
-          <p className="text-muted-foreground mt-1 text-xs">
+          <p className="np-muted mt-1 text-xs">
             Charts will appear after message analysis
           </p>
         </div>
@@ -149,41 +169,38 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
     <div className="h-full w-full space-y-4">
       {/* Current State Radar Chart */}
       <div className="h-48">
-        <h4 className="text-muted-foreground mb-2 text-sm font-medium">
+        <h4
+          className="np-muted mb-2"
+          style={{ fontFamily: 'var(--np-font-display)', fontWeight: 'var(--np-weight-headline)', fontSize: 'var(--np-text-small)', letterSpacing: '-0.01em' }}
+        >
           Current Mental Health Profile
         </h4>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={latestScores}>
             <PolarGrid
               gridType="polygon"
-              className="stroke-muted-foreground/20"
+              stroke="var(--np-line)"
             />
             <PolarAngleAxis
               dataKey="metric"
-              tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
-              className="text-xs"
+              tick={{ fontSize: 10, fill: 'var(--np-muted)' }}
             />
             <PolarRadiusAxis
               angle={90}
               domain={[0, 100]}
-              tick={{ fontSize: 8, fill: 'hsl(var(--muted-foreground))' }}
+              tick={{ fontSize: 8, fill: 'var(--np-muted)' }}
               tickCount={4}
             />
             <Radar
               name="Score"
               dataKey="score"
-              stroke="hsl(var(--primary))"
-              fill="hsl(var(--primary))"
-              fillOpacity={0.1}
+              stroke={scorePalette[4]}
+              fill={scorePalette[4]}
+              fillOpacity={0.15}
               strokeWidth={2}
             />
             <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px',
-                fontSize: '12px',
-              }}
+              contentStyle={{ ...chartTooltipStyle, fontSize: '12px' }}
               formatter={(value: number) => [`${value}%`, 'Score']}
             />
           </RadarChart>
@@ -193,39 +210,37 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
       {/* Trend Lines */}
       {timeSeriesData.length > 1 && (
         <div className="h-32">
-          <h4 className="text-muted-foreground mb-2 text-sm font-medium">
+          <h4
+            className="np-muted mb-2"
+            style={{ fontFamily: 'var(--np-font-display)', fontWeight: 'var(--np-weight-headline)', fontSize: 'var(--np-text-small)', letterSpacing: '-0.01em' }}
+          >
             Trend Analysis
           </h4>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={timeSeriesData}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                className="stroke-muted-foreground/10"
+                stroke="var(--np-line)"
               />
               <XAxis
                 dataKey="session"
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fontSize: 10, fill: 'var(--np-muted)' }}
                 axisLine={{
-                  stroke: 'hsl(var(--muted-foreground))',
+                  stroke: 'var(--np-line)',
                   strokeWidth: 0.5,
                 }}
               />
               <YAxis
                 domain={[0, 1]}
-                tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                tick={{ fontSize: 10, fill: 'var(--np-muted)' }}
                 axisLine={{
-                  stroke: 'hsl(var(--muted-foreground))',
+                  stroke: 'var(--np-line)',
                   strokeWidth: 0.5,
                 }}
                 tickFormatter={(value: number) => `${Math.round(value * 100)}%`}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: 'hsl(var(--background))',
-                  border: '1px solid hsl(var(--border))',
-                  borderRadius: '6px',
-                  fontSize: '11px',
-                }}
+                contentStyle={{ ...chartTooltipStyle, fontSize: '11px' }}
                 formatter={(value: number, name: string) => [
                   `${Math.round(value * 100)}%`,
                   getScoreLabel(name),

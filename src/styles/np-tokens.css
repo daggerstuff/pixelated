@@ -138,8 +138,8 @@
   --np-hover: oklch(0.89 0 0);
   --np-active: oklch(0.93 0 0);
   --np-text: oklch(0.15 0 0);       /* #262626 */
-  --np-muted: oklch(0.55 0 0);      /* #8c8c8c */
-  --np-mid: oklch(0.45 0 0);
+  --np-muted: oklch(0.42 0 0);      /* #6b6b6b — AA: 4.47–5.11:1 on light surfaces */
+  --np-mid: oklch(0.42 0 0);        /* aliases muted: brighter-than-muted not AA-safe in light */
   --np-line: rgba(0, 0, 0, 0.08);
   --np-line-strong: rgba(0, 0, 0, 0.16);
   --np-overlay: rgba(0, 0, 0, 0.4);
