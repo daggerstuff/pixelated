@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { WORD_RE, jaccard, tokenize } from './audit_text'
+import { WORD_RE, jaccard, tokenize } from '../lib/audit_text.js'
 
 // Therapy-specific slop patterns that the LLM was instructed NOT to use
 const THERAPY_SLOP_RE =
