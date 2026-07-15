@@ -22,12 +22,19 @@ export default defineTool({
           ? 'unreachable'
           : 'healthy'
 
+    const trainingInfra = process.env.TRAINING_INFRA_MCP_URL
+      ? 'configured'
+      : 'not_configured'
+    const k8s = process.env.K8S_MCP_URL ? 'configured' : 'not_configured'
+    const slack = process.env.SLACK_BOT_TOKEN ? 'configured' : 'not_configured'
+    const linear = process.env.LINEAR_API_KEY ? 'configured' : 'not_configured'
+
     return {
-      training_infra: 'unknown',
-      k8s: 'unknown',
+      training_infra: trainingInfra,
+      k8s,
       foresight,
-      slack: 'unknown',
-      linear: 'unknown',
+      slack,
+      linear,
       checked_at: new Date().toISOString(),
     }
   },

@@ -3,6 +3,7 @@ import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
 import { getModel } from '../lib/workers-ai.js'
+import { searchMemories } from '../foresight-client.js'
 
 interface DimensionScore {
   name: string
@@ -22,6 +23,7 @@ interface SessionScoreResult {
   max_total: number
   risk_flags: string[]
   model: string
+  transcript_fetched: boolean
 }
 
 const DIMENSIONS = [
@@ -52,6 +54,19 @@ export default defineTool({
   inputSchema: SCHEMA,
   async execute(input: ScoreSessionInput) {
     const model = getModel()
+
+    // Fetch session transcript from Foresight for evidence-based scoring
+    const memories = await searchMemories({
+      query: `session_id:${input.session_id}`,
+      limit: 50,
+      tag_filter: [`session_id:${input.session_id}`],
+    })
+
+    const transcript = (memories ?? [])
+      .map((m) => m.content)
+      .filter(Boolean)
+      .join('\n---\n')
+
     if (!model) {
       return {
         session_id: input.session_id,
@@ -69,6 +84,7 @@ export default defineTool({
         max_total: 50,
         risk_flags: [],
         model: 'none',
+        transcript_fetched: !!transcript,
       }
     }
 
@@ -81,7 +97,10 @@ export default defineTool({
       `{"dimensions":[{"name":"rapport","score":0-10,"rationale":"max 60 chars"}],` +
       `"risk_flags":["session_abort","boundary_violation","crisis_missed","escalation_needed"]}\n\n` +
       `Session: ${input.session_id}, Cohort: ${input.cohort_id}, ` +
-      `Rubric: ${input.rubric_version}`
+      `Rubric: ${input.rubric_version}\n\n` +
+      (transcript
+        ? `Session Transcript:\n${transcript.slice(0, 4000)}`
+        : 'No transcript available in Foresight.')
 
     const { text } = await generateText({ model, prompt })
     const result = parseScore(text)
@@ -100,6 +119,7 @@ export default defineTool({
       max_total: maxTotal,
       risk_flags: result.risk_flags,
       model: '@cf/meta/llama-3.2-3b-instruct',
+      transcript_fetched: !!transcript,
     } satisfies SessionScoreResult
   },
 })

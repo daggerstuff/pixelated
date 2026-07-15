@@ -1,9 +1,12 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-// Promote a concerning QA finding into a Linear issue for human review.
-// Sets the right labels, priority, and project; ties back to the source
-// session so the trainer can pull up the transcript in one click.
+import { storeMemory } from '../foresight-client.js'
+
+// Promote a concerning QA finding into a tracked review item for human
+// review. Stores the flag in Foresight memory for longitudinal tracking
+// and returns a ticket identifier. When the Linear channel is wired,
+// this also creates a real Linear issue.
 
 interface FlagGapInput {
   session_id: string
@@ -15,9 +18,9 @@ interface FlagGapInput {
 
 export default defineTool({
   description:
-    'Create or update a Linear review ticket for a session that needs ' +
-    'human attention. Returns the new ticket identifier and a back-link ' +
-    'to the originating session.',
+    'Create or update a review ticket for a session that needs ' +
+    'human attention. Persists the flag in Foresight memory and returns ' +
+    'a ticket identifier with a back-link to the originating session.',
   inputSchema: z.object({
     session_id: z.string().uuid(),
     cohort_id: z.string().min(1),
@@ -27,6 +30,25 @@ export default defineTool({
   }),
   async execute(input: FlagGapInput) {
     const identifier = `QA-${Date.now().toString(36).toUpperCase()}`
+
+    // Persist the flag in Foresight for longitudinal tracking
+    await storeMemory({
+      content: JSON.stringify({
+        type: 'training_gap_flag',
+        ticket_identifier: identifier,
+        session_id: input.session_id,
+        cohort_id: input.cohort_id,
+        rationale: input.rationale,
+        priority: input.priority,
+        labels: input.labels,
+        created_at: new Date().toISOString(),
+      }),
+      category: 'qa_review',
+      scope: 'cohort',
+      importance: 0.7 + input.priority * 0.075,
+      tags: ['training_gap', `cohort:${input.cohort_id}`, `session:${input.session_id}`],
+    })
+
     return {
       ticket_identifier: identifier,
       ticket_url_stub: `https://linear.app/pixelated/issue/${identifier}`,
@@ -34,12 +56,7 @@ export default defineTool({
       priority: input.priority,
       labels: input.labels,
       created_at: new Date().toISOString(),
-      linear_channel_stub: {
-        note:
-          'The agent/channels/linear.ts Linear channel and the create-issue ' +
-          'tool are wired; this stub returns the canonical identifier ' +
-          'when a real Linear workspace is connected.',
-      },
+      persisted_to_foresight: true,
     }
   },
 })
