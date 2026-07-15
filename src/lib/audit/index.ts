@@ -2,6 +2,7 @@ export {
   type AuditLogEntry,
   getUserAuditLogs,
   logAuditEvent,
+  logGovernanceDecision,
   createAuditLog,
   createResourceAuditLog,
 } from './log'
