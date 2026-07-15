@@ -1,13 +1,11 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { mongoClient } from '../db/mongoClient'
 import mongoQueryValidator from 'mongodb-query-validator'
-const validateQuery = (query: unknown) => {
-  const result = mongoQueryValidator(query as Record<string, unknown>)
-  if (!result.isValidQuery) throw new Error('Invalid query fields: ' + result.invalidFields.join(', '))
-  return true
+
+import { mongoClient } from '../db/mongoClient'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const { validateQuery } = mongoQueryValidator as unknown as {
+  validateQuery: (query: unknown) => boolean
 }
-import mongoSanitize from 'mongo-sanitize'
-const sanitize = mongoSanitize
+import sanitize from 'mongo-sanitize'
 
 const logger = createBuildSafeLogger('default')
 

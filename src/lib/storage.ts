@@ -18,7 +18,7 @@ export function getStorageItem<T>(key: string, defaultValue: T): T {
 
   try {
     const item = localStorage.getItem(key)
-    return item !== null ? (JSON.parse(item)) : defaultValue
+    return item !== null ? JSON.parse(item) : defaultValue
   } catch {
     return defaultValue
   }

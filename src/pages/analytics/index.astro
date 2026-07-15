@@ -22,11 +22,13 @@ const evalResult = await policyEngine.evaluate({
     userId: Astro.locals.user?.id,
     auditEnabled: true,
     consentVerified: true,
-  }
+  },
 })
 
 if (!evalResult.allowed) {
-  return Astro.redirect(`/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`)
+  return Astro.redirect(
+    `/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`,
+  )
 }
 
 // Default analytics configuration

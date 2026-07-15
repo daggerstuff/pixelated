@@ -94,13 +94,14 @@ export const GET: APIRoute = protectRoute()(async ({
           ? dbPlan.endDate.toISOString()
           : String(dbPlan.endDate)
         : null,
-      status: (dbPlan.status === 'paused'
-        ? 'Discontinued'
-        : dbPlan.status === 'draft'
-          ? 'Draft'
-          : dbPlan.status === 'active'
-            ? 'Active'
-            : 'Completed'),
+      status:
+        dbPlan.status === 'paused'
+          ? 'Discontinued'
+          : dbPlan.status === 'draft'
+            ? 'Draft'
+            : dbPlan.status === 'active'
+              ? 'Active'
+              : 'Completed',
       generalNotes: dbPlan.notes,
       createdAt:
         dbPlan.createdAt instanceof Date

@@ -27,7 +27,9 @@ export default defineTool({
       'checked_at' in status &&
       typeof (status as Record<string, unknown>).checked_at === 'string' &&
       !isNaN(
-        new Date((status as Record<string, unknown>).checked_at as string).getTime(),
+        new Date(
+          (status as Record<string, unknown>).checked_at as string,
+        ).getTime(),
       )
     ) {
       foresight = 'healthy'

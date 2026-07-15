@@ -1134,10 +1134,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
         )
 
         const url = `https://${this.config.accountName}.blob.core.windows.net`
-        this.blobServiceClient = new BlobServiceClient(
-          url,
-          credential,
-        )
+        this.blobServiceClient = new BlobServiceClient(url, credential)
       }
 
       if (!this.blobServiceClient) {

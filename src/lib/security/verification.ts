@@ -19,7 +19,10 @@ const logger = createBuildSafeLogger('default')
 export function createSignedVerificationToken(payload: unknown): string {
   try {
     const timestamp = Date.now()
-    const tokenPayload = JSON.parse(JSON.stringify(payload)) as Record<string, unknown>
+    const tokenPayload = JSON.parse(JSON.stringify(payload)) as Record<
+      string,
+      unknown
+    >
     const token = {
       ...tokenPayload,
       iat: timestamp,
