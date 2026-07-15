@@ -94,7 +94,7 @@ export class DataExportDAO {
   async findById(id: string): Promise<DataExport | null> {
     const collection = await this.getCollection()
     // Query by custom 'id' field (UUID) used in the service
-    const request = await collection.findOne({ id: id } as { id: string })
+    const request = await collection.findOne({ id: id })
 
     // Don't overwrite UUID 'id' with MongoDB _id
     return request
@@ -103,7 +103,7 @@ export class DataExportDAO {
   async findByPatientId(patientId: string): Promise<DataExport[]> {
     const collection = await this.getCollection()
     const requests = await collection
-      .find({ patientId: patientId } as { patientId: string })
+      .find({ patientId: patientId })
       .sort({ createdAt: -1 })
       .toArray()
 
@@ -132,7 +132,7 @@ export class DataExportDAO {
     const { _id, ...safeUpdates } = updates
 
     const result = await collection.findOneAndUpdate(
-      { id: id } as { id: string },
+      { id: id },
       { $set: safeUpdates },
       { returnDocument: 'after' },
     )
@@ -144,8 +144,8 @@ export class DataExportDAO {
   async addFile(exportId: string, file: ExportFile): Promise<void> {
     const collection = await this.getCollection()
     await collection.updateOne(
-      { id: exportId } as { id: string },
-      { $push: { files: file } } as Record<string, unknown>,
+      { id: exportId },
+      { $push: { files: file } },
     )
   }
 }
@@ -718,7 +718,7 @@ export class AgentActivityDAO {
     turnId: string,
   ): Promise<AgentActivityRecord | null> {
     const collection = await this.getCollection()
-    return collection.findOne({ turnId } as { turnId: string })
+    return collection.findOne({ turnId })
   }
 }
 

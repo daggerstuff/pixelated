@@ -7,9 +7,11 @@
  */
 
 /* Supabase import removed - migrate to MongoDB */
+import { mongoClient } from '../../db/mongoClient'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import type {
-  ConsentType,
+import {
+  CONSENT_TABLES,
+  type ConsentType,
   ConsentVersion,
   UserConsent,
   ConsentOption,
@@ -28,8 +30,11 @@ export class ConsentService {
    */
   async getConsentTypes(): Promise<ConsentType[]> {
     try {
-      // TODO: Replace with MongoDB implementation
-      const data: unknown[] = [] // Stub: Replace with MongoDB result
+      const data = await mongoClient.db
+        .collection(CONSENT_TABLES.CONSENT_TYPES)
+        .find({ is_active: true })
+        .toArray()
+
       return data.map((type: unknown) => {
         const t = type as {
           id: string
@@ -139,12 +144,48 @@ export class ConsentService {
     userId: string,
     consentTypeId: string,
   ): Promise<UserConsent | null> {
-    void userId
-    void consentTypeId
     try {
-      // Get current version ID for this consent type
-      // TODO: Replace with MongoDB implementation
-      return null
+      const pipeline = [
+        { $match: { user_id: userId, is_active: true } },
+        {
+          $lookup: {
+            from: CONSENT_TABLES.CONSENT_VERSIONS,
+            localField: 'consent_version_id',
+            foreignField: 'id',
+            as: 'version',
+          },
+        },
+        { $unwind: '$version' },
+        { $match: { 'version.consent_type_id': consentTypeId } },
+      ]
+
+      const cursor = mongoClient.db
+        .collection(CONSENT_TABLES.USER_CONSENTS)
+        .aggregate(pipeline)
+      const data = await cursor.toArray()
+      const doc = data[0]
+
+      if (!doc) {
+        return null
+      }
+
+      return {
+        id: doc.id as string,
+        userId: doc.user_id as string,
+        consentVersionId: doc.consent_version_id as string,
+        grantedAt: doc.granted_at as string,
+        ipAddress: doc.ip_address as string | undefined,
+        userAgent: doc.user_agent as string | undefined,
+        isActive: doc.is_active as boolean,
+        withdrawalDate: doc.withdrawal_date as string | undefined,
+        withdrawalReason: doc.withdrawal_reason as string | undefined,
+        granularOptions: doc.granular_options as
+          | Record<string, boolean>
+          | undefined,
+        proofOfConsent: doc.proof_of_consent as string | undefined,
+        createdAt: doc.created_at as string,
+        updatedAt: doc.updated_at as string,
+      }
     } catch (error: unknown) {
       logger.error('Unexpected error in getUserConsent', error)
       throw new Error('Failed to fetch user consent', { cause: error })

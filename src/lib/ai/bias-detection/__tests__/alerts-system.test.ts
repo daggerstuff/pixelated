@@ -63,7 +63,7 @@ describe('BiasAlertSystem', () => {
     sessionId: 'test-session-123',
     timestamp: new Date(),
     overallBiasScore: 0.8,
-    alertLevel: 'critical' as AlertLevel,
+    alertLevel: 'critical',
     layerResults: {
       preprocessing: {
         biasScore: 0.7,
@@ -504,7 +504,7 @@ describe('BiasAlertSystem', () => {
     it('should handle notification failures gracefully', async () => {
       const result: BiasAnalysisResult = {
         ...mockAnalysisResult,
-        alertLevel: 'high' as AlertLevel,
+        alertLevel: 'high',
       }
 
       // Mock a notification failure
@@ -540,7 +540,7 @@ describe('BiasAlertSystem', () => {
     it('should escalate alerts based on severity', async () => {
       const criticalResult: BiasAnalysisResult = {
         ...mockAnalysisResult,
-        alertLevel: 'critical' as AlertLevel,
+        alertLevel: 'critical',
         overallBiasScore: 0.9,
       }
 
@@ -723,7 +723,7 @@ describe('BiasAlertSystem', () => {
       const resultNoDemo: BiasAnalysisResult = {
         ...mockAnalysisResult,
         overallBiasScore: 0.7,
-        demographics: undefined as any,
+        demographics: undefined,
         layerResults: undefined as any,
       }
 
@@ -1085,7 +1085,7 @@ describe('BiasAlertSystem', () => {
         ...mockAnalysisResult,
         overallBiasScore: 0.75,
         sessionId: 'throwing-condition',
-      } as any as BiasAnalysisResult
+      }
 
       await alertSystem.checkAlerts(result)
       // Should still generate alerts from non-throwing rules
@@ -1103,7 +1103,7 @@ describe('BiasAlertSystem', () => {
       await expect(
         alertSystem.processAlert({
           sessionId: 'process-error',
-          level: 'high' as AlertLevel,
+          level: 'high',
           biasScore: 0.8,
           analysisResult: mockAnalysisResult,
         }),

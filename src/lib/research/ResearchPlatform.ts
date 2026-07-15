@@ -334,7 +334,7 @@ export class ResearchPlatform {
       const consentValidation =
         await this.consentService.validateResearchAccess(
           clientIds,
-          'anonymizedResearch' as keyof ResearchConsent,
+          'anonymizedResearch',
         )
 
       if (consentValidation.invalidClients.length > 0) {

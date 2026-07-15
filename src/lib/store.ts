@@ -241,7 +241,7 @@ export const useStore = create<StoreState>()(
               | ((state: StoreState) => StoreState | Partial<StoreState>),
             replace?: false,
           ) => void
-          const get = _get as unknown as () => StoreState
+          const get = _get
 
           return {
             // Original state
@@ -547,7 +547,7 @@ export const useStore = create<StoreState>()(
                   },
                 },
               })),
-          } as StoreState
+          }
         },
         {
           name: 'therapy-state-enhanced',

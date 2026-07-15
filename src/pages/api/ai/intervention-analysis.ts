@@ -140,7 +140,7 @@ export const POST = async ({ request }: { request: Request }) => {
       const conversationMessages = Array.isArray(conversation)
         ? conversation
         : typeof conversation === 'string'
-        ? ([{ role: 'user', content: conversation as string, name: '' }] as AIMessage[])
+        ? ([{ role: 'user', content: conversation, name: '' }] as AIMessage[])
         : []
 
       result = await interventionService.analyzeIntervention(
