@@ -20,7 +20,7 @@ export function jsonResponse(payload: unknown, status = 200): Response {
     headers: {
       'Content-Type': 'application/json',
       'Deprecation': 'true',
-      'Sunset': 'Sat, 01 Nov 2025 00:00:00 GMT',
+      'Sunset': 'Sat, 01 Jan 2027 00:00:00 GMT',
     },
   })
 }
