@@ -520,11 +520,27 @@ export function Sidebar() {
               transition: 'color 0.15s var(--np-ease)',
             }}
             onClick={() => setIsOpen(!isOpen)}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--np-text)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--np-muted)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = 'var(--np-text)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = 'var(--np-muted)'
+            }}
           >
-            <svg style={{ width: '14px', height: '14px', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d={isOpen ? 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z' : 'M4 6h16M4 12h16M4 18h16'} clipRule="evenodd" />
+            <svg
+              style={{ width: '14px', height: '14px', flexShrink: 0 }}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d={
+                  isOpen
+                    ? 'M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 6a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z'
+                    : 'M4 6h16M4 12h16M4 18h16'
+                }
+                clipRule="evenodd"
+              />
             </svg>
             <span style={{ marginLeft: '10px' }}>Toggle Menu</span>
           </button>
@@ -536,22 +552,35 @@ export function Sidebar() {
               <button
                 onClick={() => toggleSection(section.title.toLowerCase())}
                 style={styles.sectionBtn}
-                onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--np-text)' }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--np-muted)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--np-text)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--np-muted)'
+                }}
               >
-                <span style={{ flex: 1, textAlign: 'left' }}>{section.title}</span>
+                <span style={{ flex: 1, textAlign: 'left' }}>
+                  {section.title}
+                </span>
                 <svg
                   style={{
                     width: '12px',
                     height: '12px',
                     transition: 'transform 0.15s var(--np-ease)',
-                    transform: expandedSections[section.title.toLowerCase()] ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transform: expandedSections[section.title.toLowerCase()]
+                      ? 'rotate(180deg)'
+                      : 'rotate(0deg)',
                   }}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
@@ -560,10 +589,12 @@ export function Sidebar() {
                   {section.items.map((item) => {
                     const isActive =
                       pathname === item.href ||
-                      (item.children?.some((child) => pathname === child.href))
-                    const hasChildren = item.children && item.children.length > 0
+                      item.children?.some((child) => pathname === child.href)
+                    const hasChildren =
+                      item.children && item.children.length > 0
                     const itemKey = `${section.title}-${item.name}`
-                    const isExpanded = expandedItems[itemKey] ?? (isActive && hasChildren)
+                    const isExpanded =
+                      expandedItems[itemKey] ?? (isActive && hasChildren)
 
                     return (
                       <li key={item.name}>
@@ -576,12 +607,16 @@ export function Sidebar() {
                           onClick={(e) => {
                             if (hasChildren) {
                               e.preventDefault()
-                              setExpandedItems({ ...expandedItems, [itemKey]: !isExpanded })
+                              setExpandedItems({
+                                ...expandedItems,
+                                [itemKey]: !isExpanded,
+                              })
                             }
                           }}
                           onMouseEnter={(e) => {
                             if (!isActive) {
-                              e.currentTarget.style.background = 'var(--np-hover)'
+                              e.currentTarget.style.background =
+                                'var(--np-hover)'
                               e.currentTarget.style.color = 'var(--np-text)'
                             }
                           }}
@@ -593,7 +628,9 @@ export function Sidebar() {
                           }}
                         >
                           <span style={styles.iconWrapper}>{item.icon}</span>
-                          <span style={{ marginLeft: '10px', flex: 1 }}>{item.name}</span>
+                          <span style={{ marginLeft: '10px', flex: 1 }}>
+                            {item.name}
+                          </span>
                           {item.badge && (
                             <span style={styles.badge}>{item.badge}</span>
                           )}
@@ -604,23 +641,32 @@ export function Sidebar() {
                                 height: '12px',
                                 marginLeft: 'auto',
                                 transition: 'transform 0.15s var(--np-ease)',
-                                transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                                transform: isExpanded
+                                  ? 'rotate(90deg)'
+                                  : 'rotate(0deg)',
                               }}
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
                             >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
                             </svg>
                           )}
                         </a>
                         {hasChildren && isExpanded && (
-                          <ul style={{
-                            listStyle: 'none',
-                            margin: '2px 0 2px 16px',
-                            padding: 0,
-                            borderLeft: '1px solid var(--np-line)',
-                          }}>
+                          <ul
+                            style={{
+                              listStyle: 'none',
+                              margin: '2px 0 2px 16px',
+                              padding: 0,
+                              borderLeft: '1px solid var(--np-line)',
+                            }}
+                          >
                             {item.children!.map((child) => {
                               const isChildActive = pathname === child.href
                               return (
@@ -629,23 +675,33 @@ export function Sidebar() {
                                     href={child.href}
                                     style={{
                                       ...styles.childLink,
-                                      ...(isChildActive ? styles.childLinkActive : {}),
+                                      ...(isChildActive
+                                        ? styles.childLinkActive
+                                        : {}),
                                     }}
                                     onMouseEnter={(e) => {
                                       if (!isChildActive) {
-                                        e.currentTarget.style.background = 'var(--np-hover)'
-                                        e.currentTarget.style.color = 'var(--np-text)'
+                                        e.currentTarget.style.background =
+                                          'var(--np-hover)'
+                                        e.currentTarget.style.color =
+                                          'var(--np-text)'
                                       }
                                     }}
                                     onMouseLeave={(e) => {
                                       if (!isChildActive) {
-                                        e.currentTarget.style.background = 'transparent'
-                                        e.currentTarget.style.color = 'var(--np-muted)'
+                                        e.currentTarget.style.background =
+                                          'transparent'
+                                        e.currentTarget.style.color =
+                                          'var(--np-muted)'
                                       }
                                     }}
                                   >
-                                    <span style={styles.iconWrapper}>{child.icon}</span>
-                                    <span style={{ marginLeft: '8px' }}>{child.name}</span>
+                                    <span style={styles.iconWrapper}>
+                                      {child.icon}
+                                    </span>
+                                    <span style={{ marginLeft: '8px' }}>
+                                      {child.name}
+                                    </span>
                                   </a>
                                 </li>
                               )

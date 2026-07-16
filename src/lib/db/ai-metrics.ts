@@ -1,7 +1,6 @@
+import type { AIMetrics } from '../../types/mongodb.types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { mongoClient } from './mongoClient'
-
-import type { AIMetrics } from '../types/mongodb.types'
 
 const logger = createBuildSafeLogger('ai-metrics') // Supabase import removed - migrate to MongoDB
 

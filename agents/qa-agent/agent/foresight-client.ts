@@ -90,6 +90,7 @@ export async function searchMemories(
           query_type: 'keyword',
           limit: params.limit ?? 10,
           min_importance: params.min_importance ?? 0.1,
+          tag_filter: params.tag_filter ?? [],
         },
       },
     })

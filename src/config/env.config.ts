@@ -88,7 +88,7 @@ export function getEnv(): z.infer<typeof envSchema> {
   let envSource: Record<string, unknown>
 
   if (typeof process !== 'undefined') {
-    envSource = (process.env) || {}
+    envSource = process.env || {}
   } else {
     envSource = typeof import.meta !== 'undefined' ? import.meta.env : {}
   }
