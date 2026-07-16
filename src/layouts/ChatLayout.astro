@@ -1,5 +1,9 @@
 ---
 import '@/styles/np-tokens.css'
+import '@fontsource-variable/fraunces/full.css'
+import '@fontsource/public-sans/400.css'
+import '@fontsource/public-sans/700.css'
+import '@fontsource-variable/jetbrains-mono/wght.css'
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
 import SpeedInsights from '@vercel/speed-insights/astro'
 import Analytics from '@vercel/analytics/astro'
@@ -19,7 +23,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#0f172a" />
+    <meta name="theme-color" content="#1a1a1a" />
     <title>{title} | Pixelated Empathy</title>
 
     <script src="/js/polyfill-detector.js" is:inline></script>
