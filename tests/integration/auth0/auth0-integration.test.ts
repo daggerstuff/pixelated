@@ -285,10 +285,8 @@ describe('Auth0 Integration Tests', () => {
       }
     Auth0SocialAuthServiceClass = socialAuthMod.Auth0SocialAuthService
 
-    auth0JwtService =
-      (await import('../../../src/lib/auth/auth0-jwt-service'))
-    auth0RbacService =
-      (await import('../../../src/lib/auth/auth0-rbac-service'))
+    auth0JwtService = await import('../../../src/lib/auth/auth0-jwt-service')
+    auth0RbacService = await import('../../../src/lib/auth/auth0-rbac-service')
   })
 
   afterAll(() => {

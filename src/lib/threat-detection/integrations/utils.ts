@@ -296,7 +296,7 @@ export async function checkSuspiciousIPWithIntelligence(
   },
 ): Promise<boolean> {
   if (!config?.enabled) {
-    return (isSuspiciousIPSync)(ip)
+    return isSuspiciousIPSync(ip)
   }
 
   try {
@@ -325,7 +325,7 @@ export async function checkSuspiciousIPWithIntelligence(
         error: String(error),
       },
     )
-    return (isSuspiciousIPSync)(ip)
+    return isSuspiciousIPSync(ip)
   }
 }
 

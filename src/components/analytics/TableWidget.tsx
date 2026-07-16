@@ -161,9 +161,12 @@ export function TableWidget({
       result = result.filter((row) =>
         columns.some((column) => {
           const rawVal = row[column.key]
-          const value = typeof rawVal === 'string' || typeof rawVal === 'number' || typeof rawVal === 'boolean'
-            ? String(rawVal).toLowerCase()
-            : ''
+          const value =
+            typeof rawVal === 'string' ||
+            typeof rawVal === 'number' ||
+            typeof rawVal === 'boolean'
+              ? String(rawVal).toLowerCase()
+              : ''
           return value.includes(searchLower)
         }),
       )
@@ -186,8 +189,18 @@ export function TableWidget({
           return direction === 'asc' ? 1 : -1
         }
 
-        const aStr = typeof aValue === 'string' || typeof aValue === 'number' || typeof aValue === 'boolean' ? String(aValue) : ''
-        const bStr = typeof bValue === 'string' || typeof bValue === 'number' || typeof bValue === 'boolean' ? String(bValue) : ''
+        const aStr =
+          typeof aValue === 'string' ||
+          typeof aValue === 'number' ||
+          typeof aValue === 'boolean'
+            ? String(aValue)
+            : ''
+        const bStr =
+          typeof bValue === 'string' ||
+          typeof bValue === 'number' ||
+          typeof bValue === 'boolean'
+            ? String(bValue)
+            : ''
 
         const comparison = aStr.localeCompare(bStr)
         return direction === 'asc' ? comparison : -comparison
@@ -210,7 +223,12 @@ export function TableWidget({
           columns
             .map((col) => {
               const value = row[col.key]
-              const strVal = typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ? String(value) : ''
+              const strVal =
+                typeof value === 'string' ||
+                typeof value === 'number' ||
+                typeof value === 'boolean'
+                  ? String(value)
+                  : ''
               // Escape quotes and wrap in quotes
               const escaped = strVal.replace(/"/g, '""')
               return `"${escaped}"`
@@ -320,7 +338,11 @@ export function TableWidget({
                       <TableCell key={`${rowIndex}-${column.key}`}>
                         {column.render
                           ? column.render(row[column.key], row)
-                          : typeof row[column.key] === 'string' || typeof row[column.key] === 'number' || typeof row[column.key] === 'boolean' ? String(row[column.key]) : ''}
+                          : typeof row[column.key] === 'string' ||
+                              typeof row[column.key] === 'number' ||
+                              typeof row[column.key] === 'boolean'
+                            ? String(row[column.key])
+                            : ''}
                       </TableCell>
                     ))}
                   </TableRow>
