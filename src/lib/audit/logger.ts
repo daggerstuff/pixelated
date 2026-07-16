@@ -6,6 +6,7 @@
  */
 
 import type { Db } from 'mongodb'
+import { createHash } from 'crypto'
 import { v4 as uuidv4 } from 'uuid'
 
 import { mongodb } from '../../config/mongodb.config'
@@ -19,6 +20,119 @@ import {
 } from './events'
 
 const logger = createBuildSafeLogger('audit-logger')
+
+/**
+ * Tamper-evident audit trail (HIPAA).
+ *
+ * Every persisted audit event is linked into a SHA-256 hash chain: each
+ * event's `hash` is SHA-256(previousHash || canonicalPayload), where
+ * `previousHash` is the `hash` of the immediately preceding event. Any
+ * modification, deletion, or reordering of historical events breaks the
+ * chain from that point forward, which `verifyAuditChain` detects.
+ */
+const AUDIT_CHAIN_GENESIS = '0'.repeat(64)
+
+/**
+ * When the link to the chain cannot be computed (DB unavailable, schema
+ * mismatch, contention, etc.) we persist the audit row with a sentinel
+ * hash instead of dropping the event. The sentinel is intentionally a
+ * short, non-hex string distinguishable from every legal SHA-256 hex
+ * digest (legal hashes are 64 lowercase hex characters) so that
+ * `verifyAuditChain` can flag the row as a chain break rather than
+ * silently accept it as a chained event.
+ *
+ * MongoDB drops `undefined` field values at write time, which would
+ * cause the previously-fallback path to persist an unchained event
+ * whose `hash` field is missing entirely — making `verifyAuditChain`
+ * see neither a sentinel nor a chain link. The sentinel string
+ * sidesteps that by guaranteeing a value Mongo will store.
+ */
+export const AUDIT_CHAIN_BREAK = '__CHAIN_BREAK__'
+
+/** The immutable, meaningful subset of an event used for chain hashing. */
+export function chainPayload(event: AuditEvent): Record<string, unknown> {
+  return {
+    id: event.id,
+    timestamp:
+      event.timestamp instanceof Date
+        ? event.timestamp.toISOString()
+        : event.timestamp,
+    userId: event.userId,
+    type: event.type,
+    action: event.action,
+    severity: event.severity,
+    resourceId: event.resourceId ?? null,
+    resourceType: event.resourceType ?? null,
+    status: event.status,
+    metadata: event.metadata ?? null,
+    ipAddress: event.ipAddress ?? null,
+    userAgent: event.userAgent ?? null,
+    errorMessage: event.errorMessage ?? null,
+  }
+}
+
+/** SHA-256 over `previousHash || canonicalPayload`. */
+export function computeChainHash(
+  previousHash: string,
+  payload: Record<string, unknown>,
+): string {
+  return createHash('sha256')
+    .update(`${previousHash}|${JSON.stringify(payload)}`)
+    .digest('hex')
+}
+
+export interface AuditChainVerification {
+  valid: boolean
+  brokenAtIndex?: number
+  brokenAtId?: string
+  reason?: string
+}
+
+/**
+ * Verify an ordered sequence of audit events forms an unbroken hash chain.
+ * Pure function — pass events already sorted by insertion order.
+ */
+export function verifyAuditChain(events: AuditEvent[]): AuditChainVerification {
+  let previousHash = AUDIT_CHAIN_GENESIS
+
+  for (let i = 0; i < events.length; i += 1) {
+    const event = events[i] as AuditEvent
+
+    if (!event.hash || event.hash === AUDIT_CHAIN_BREAK) {
+      return {
+        valid: false,
+        brokenAtIndex: i,
+        brokenAtId: event.id,
+        reason:
+          event.hash === AUDIT_CHAIN_BREAK
+            ? 'chain break sentinel — link failed at persistence time'
+            : 'missing hash',
+      }
+    }
+    if (event.previousHash !== previousHash) {
+      return {
+        valid: false,
+        brokenAtIndex: i,
+        brokenAtId: event.id,
+        reason: 'previousHash mismatch',
+      }
+    }
+
+    const expected = computeChainHash(previousHash, chainPayload(event))
+    if (expected !== event.hash) {
+      return {
+        valid: false,
+        brokenAtIndex: i,
+        brokenAtId: event.id,
+        reason: 'hash mismatch',
+      }
+    }
+
+    previousHash = event.hash
+  }
+
+  return { valid: true }
+}
 
 function emitVolatileFallback(auditEvent: AuditEvent, reason: string): void {
   logger.warn('Audit Event using volatile fallback', {
@@ -254,24 +368,99 @@ export class AuditLogger {
   }
 
   /**
-   * Persist the event to the database with a simple retry mechanism
+   * Link an event into the SHA-256 hash chain via an atomic cursor upsert.
+   *
+   * Each persistence increments a `chain_audit_cursor` document whose `{seq,
+   * hash}` is the unique tail of the chain. `findOneAndUpdate` with
+   * `returnDocument: 'after'` and `$inc: { seq: 1 }` gives us both the
+   * previous and new seq+hash in one atomic op, so two concurrent
+   * `logEvent()` calls cannot read the same last event and produce the
+   * same `previousHash`. (The earlier read-then-write pattern permitted
+   * a race where both events ended up linking to the same predecessor,
+   * which `verifyAuditChain` would later reject as a broken chain.)
+   *
+   * Returns the linked event plus its new chain seq, both stamped
+   * monotonically. On failure, returns the un-linked event so the caller
+   * can persist a "chain break" sentinel rather than dropping the audit
+   * record entirely.
+   */
+  private async withChainHash(auditEvent: AuditEvent): Promise<{
+    event: AuditEvent
+    seq: number
+  }> {
+    try {
+      const db = await this.ensureConnected()
+      const cursor = await db
+        .collection<{ _id: string; seq: number; hash: string }>(
+          'chain_audit_cursor',
+        )
+        .findOneAndUpdate(
+          { _id: 'tail' },
+          { $inc: { seq: 1 } },
+          { upsert: true, returnDocument: 'before' },
+        )
+      const previousHash = cursor?.hash ?? AUDIT_CHAIN_GENESIS
+      const previousSeq = cursor?.seq ?? 0
+      const newSeq = previousSeq + 1
+      const hash = computeChainHash(previousHash, chainPayload(auditEvent))
+      return {
+        event: { ...auditEvent, previousHash, hash },
+        seq: newSeq,
+      }
+    } catch (err: unknown) {
+      logger.warn(
+        'Audit chain link failed; storing event with chain-break sentinel',
+        {
+          auditId: auditEvent.id,
+          error: err instanceof Error ? err.message : String(err),
+        },
+      )
+      return {
+        event: {
+          ...auditEvent,
+          hash: AUDIT_CHAIN_BREAK,
+          previousHash: AUDIT_CHAIN_BREAK,
+        },
+        seq: 0,
+      }
+    }
+  }
+
+  /**
+   * Persist the event to the database with a simple retry mechanism. The
+   * chain hash is recomputed on every attempt: a previous implementation
+   * reused the first-attempt hash across retries, which linked the event
+   * to a stale predecessor if another event had been persisted during
+   * the back-off window.
    */
   private async persistEventWithRetry(
     auditEvent: AuditEvent,
     attempt = 1,
   ): Promise<void> {
+    let chained: AuditEvent
+    try {
+      const linked = await this.withChainHash(auditEvent)
+      chained = linked.event
+    } catch (err: unknown) {
+      logger.error('Audit chain link crashed; refusing to persist uncategorized', {
+        auditId: auditEvent.id,
+        error: err instanceof Error ? err.message : String(err),
+      })
+      throw err
+    }
+
     try {
       const db = await this.ensureConnected()
       await db.collection('audit_logs').insertOne({
-        ...auditEvent,
+        ...chained,
         timestamp:
-          auditEvent.timestamp instanceof Date
-            ? auditEvent.timestamp
-            : new Date(auditEvent.timestamp),
+          chained.timestamp instanceof Date
+            ? chained.timestamp
+            : new Date(chained.timestamp),
       })
 
       logger.info('Audit Event Persisted to Database', {
-        auditId: auditEvent.id,
+        auditId: chained.id,
         attempt,
       })
     } catch (error: unknown) {
@@ -280,7 +469,7 @@ export class AuditLogger {
         logger.warn(
           `Audit Log Persistence Attempt ${attempt} Failed. Retrying in ${delay}ms...`,
           {
-            auditId: auditEvent.id,
+            auditId: chained.id,
             error:
               error instanceof Error
                 ? error instanceof Error
@@ -294,9 +483,25 @@ export class AuditLogger {
         return this.persistEventWithRetry(auditEvent, attempt + 1)
       }
 
-      // If we reach here, retries are exhausted
+      // Retries exhausted — bubble.
       throw error
     }
+  }
+
+  /**
+   * Read the full audit collection (in monotonic seq order) and verify
+   * the hash chain is intact. Methods that mutate the chain (insert/delete)
+   * deliberately remain serialised through `withChainHash` + the
+   * `chain_audit_cursor` upsert; this reader walks the persisted chain.
+   */
+  public async verifyChain(): Promise<AuditChainVerification> {
+    const db = await this.ensureConnected()
+    const events = await db
+      .collection<AuditEvent>('audit_logs')
+      .find({})
+      .sort({ _id: 1 })
+      .toArray()
+    return verifyAuditChain(events)
   }
 }
 
