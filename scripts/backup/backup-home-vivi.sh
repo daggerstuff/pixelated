@@ -275,7 +275,11 @@ load_rclone_args() {
     "*.sock" \
     "*.log" \
     ".cache/home-backup-*" \
-    ".cache/home-vivi-backup-*")
+    ".cache/home-vivi-backup-*" \
+    "**/.ssh/**" \
+    ".ssh/**" \
+    "**/.config/rclone/**" \
+    ".config/rclone/**")
 
   if [[ -n "${BACKUP_RCLONE_EXCLUDE_EXTRA}" ]]; then
     while IFS= read -r exclude_arg; do
@@ -582,7 +586,11 @@ case "$BACKUP_MODE" in
       "--exclude=.local/share/home_backups/**" \
       "--exclude=.cache/home-vivi-backup.lock" \
       "--exclude=**/node_modules/**" \
-      "--exclude=**/.venv/**")
+      "--exclude=**/.venv/**" \
+      "--exclude=**/.ssh/**" \
+      "--exclude=.ssh/**" \
+      "--exclude=**/.config/rclone/**" \
+      "--exclude=.config/rclone/**")
 
     mkdir -p "$ARCHIVE_STAGING_DIR"
     cleanup_staging

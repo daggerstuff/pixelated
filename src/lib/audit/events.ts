@@ -16,6 +16,8 @@ export enum AuditEventType {
   SECURITY = 'security',
   THERAPEUTIC = 'therapeutic',
   SYSTEM = 'system',
+  GOVERNANCE_ALLOW = 'governance_allow',
+  GOVERNANCE_DENY = 'governance_deny',
 }
 
 /**
@@ -64,4 +66,29 @@ export interface AuditEvent {
   userAgent?: string
   status: 'success' | 'failure'
   errorMessage?: string
+  /**
+   * SHA-256 hash-chain linkage.
+   *
+   * `previousHash` is the `hash` of the immediately preceding audit event
+   * written to the chain; `hash` is the SHA-256 over the **exact** string
+   * `previousHash || "|" || JSON.stringify(chainPayload(event))`.
+   *
+   * The contract — explicitly documenting the delimiter and serialization:
+   *
+   * - Delimiter: a single `"|"` byte between `previousHash` and the payload.
+   * - Payload serialization: `JSON.stringify(chainPayload(event))` —
+   *   the `chainPayload` helper returns a canonical subset (id, timestamp,
+   *   userId, type, action, severity, resourceId, resourceType, status,
+   *   metadata, ipAddress, userAgent, errorMessage).
+   * - Hash algorithm: SHA-256, hex digest.
+   *
+   * Independent verifiers MUST replicate this exact serialization to
+   * reproduce our chain hashes; see `verifyAuditChain` in `logger.ts`.
+   *
+   * Absent (undefined) for pre-chain legacy events or events that failed
+   * to link atomically. `verifyAuditChain` reports these as
+   * `reason: 'missing hash'` so the chain break is detectable.
+   */
+  previousHash?: string
+  hash?: string
 }

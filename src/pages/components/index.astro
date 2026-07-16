@@ -1,6 +1,103 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
+
+const cards = [
+  {
+    href: '/components/analytics-dashboard',
+    title: 'Analytics Dashboard',
+    blurb: 'Advanced charting and data visualization tools',
+    icon: '📊',
+    features: [
+      'Multiple chart types (line, bar, pie, scatter)',
+      'Real-time data updates',
+      'Responsive design',
+      'Interactive tooltips',
+      'Therapy-focused analytics',
+    ],
+    cta: 'View Analytics Demo',
+  },
+  {
+    href: '/components/emotion-visualization',
+    title: '3D Emotion Visualization',
+    blurb: 'Immersive emotion mapping and particle systems',
+    icon: '🎭',
+    features: [
+      'Valence-Arousal-Dominance model',
+      'Interactive 3D particle systems',
+      'Real-time emotion tracking',
+      'Mouse and touch controls',
+      'WebGL performance optimization',
+    ],
+    cta: 'Explore 3D Emotions',
+  },
+  {
+    href: '/components/treatment-plans',
+    title: 'Treatment Plan Manager',
+    blurb: 'Comprehensive clinical workflow management',
+    icon: '🎯',
+    features: [
+      'SMART goal setting and tracking',
+      'Milestone management',
+      'Progress visualization',
+      'Multi-category treatment plans',
+      'Collaborative planning tools',
+    ],
+    cta: 'Manage Treatment Plans',
+  },
+  {
+    href: '/components/security-demo',
+    title: 'Privacy & Security Demo',
+    blurb: 'Fully Homomorphic Encryption showcase',
+    icon: '🔒',
+    features: [
+      'Compute on encrypted data',
+      'HIPAA compliance demonstration',
+      'Performance benchmarking',
+      'Interactive FHE operations',
+      'Privacy-preserving analytics',
+    ],
+    cta: 'Test FHE Security',
+  },
+  {
+    href: '/components/ui-showcase',
+    title: 'UI Component Showcase',
+    blurb: 'Modern carousel and interface elements',
+    icon: '🎨',
+    features: [
+      'Multiple carousel effects',
+      'Touch gesture support',
+      'Accessibility features',
+      'Responsive breakpoints',
+      'Custom content integration',
+    ],
+    cta: 'Explore UI Components',
+  },
+  {
+    href: '/therapy-chat',
+    title: 'Therapy Chat System',
+    blurb: 'AI-powered therapeutic conversation interface',
+    icon: '💬',
+    features: [
+      'AI therapy assistant integration',
+      'Emotion-aware responses',
+      'Crisis intervention protocols',
+      'Session transcription',
+      'Multi-modal communication',
+    ],
+    cta: 'Try Chat System',
+  },
+]
+
+const integrations = [
+  { name: 'Analytics Dashboard', state: 'integrated' },
+  { name: '3D Emotion Visualization', state: 'integrated' },
+  { name: 'Treatment Plan Manager', state: 'integrated' },
+  { name: 'FHE Security Demo', state: 'integrated' },
+  { name: 'UI Component Showcase', state: 'integrated' },
+  { name: 'Therapy Chat System', state: 'previous' },
+  { name: 'Emotion Temporal Analysis', state: 'previous' },
+]
 ---
 
 <BaseLayout
@@ -10,10 +107,10 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
   <section class="container mx-auto py-8 px-4">
     <div class="max-w-7xl mx-auto">
       <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 np-text">
           Enterprise Components
         </h1>
-        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+        <p class="text-xl max-w-3xl mx-auto np-muted">
           Discover our comprehensive suite of enterprise-grade components
           designed specifically for therapy platforms, healthcare applications,
           and patient management systems.
@@ -40,7 +137,6 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
               title: 'Analytics Dashboard',
               description: 'Advanced charting and data visualization',
               icon: 'chart',
-              gradient: 'from-blue-500 to-indigo-600',
               subtitle: 'Comprehensive data visualization and insights',
             },
             {
@@ -48,7 +144,6 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
               title: '3D Emotion Visualization',
               description: 'Immersive emotion mapping and particle systems',
               icon: '🎭',
-              gradient: 'from-purple-500 to-pink-600',
               subtitle: 'Interactive emotion visualization systems',
             },
             {
@@ -56,7 +151,6 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
               title: 'Treatment Planning',
               description: 'Comprehensive treatment plan management',
               icon: 'target',
-              gradient: 'from-green-500 to-emerald-600',
               subtitle: 'Goal tracking and milestone management',
             },
             {
@@ -64,7 +158,6 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
               title: 'Privacy & Security',
               description: 'Fully Homomorphic Encryption demo',
               icon: '🔒',
-              gradient: 'from-red-500 to-orange-600',
               subtitle: 'Privacy-preserving computation demo',
             },
             {
@@ -72,7 +165,6 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
               title: 'UI Components',
               description: 'Interactive user interface elements',
               icon: '🎨',
-              gradient: 'from-teal-500 to-cyan-600',
               subtitle: 'Modern carousel and interface components',
             },
           ]}
@@ -81,234 +173,89 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
 
       <!-- Component Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-        <!-- Analytics Dashboard -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <div
-            class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 text-white"
-          >
-            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"
-            ></svg>
-            <h3 class="text-xl font-bold mb-2">Analytics Dashboard</h3>
-            <p class="text-blue-100">
-              Advanced charting and data visualization tools
-            </p>
-          </div>
-          <div class="p-6">
-            <ul class="space-y-2 text-sm mb-4">
-              <li>✓ Multiple chart types (line, bar, pie, scatter)</li>
-              <li>✓ Real-time data updates</li>
-              <li>✓ Responsive design</li>
-              <li>✓ Interactive tooltips</li>
-              <li>✓ Therapy-focused analytics</li>
-            </ul>
-            <a
-              href="/components/analytics-dashboard"
-              class="inline-block w-full text-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+        {
+          cards.map((card) => (
+            <div
+              class="overflow-hidden flex flex-col"
+              style="background: var(--np-surface); border: 1px solid var(--np-line);"
             >
-              View Analytics Demo
-            </a>
-          </div>
-        </div>
-
-        <!-- 3D Emotion Visualization -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <div
-            class="bg-gradient-to-r from-purple-500 to-pink-600 p-6 text-white"
-          >
-            <div class="text-4xl mb-3">🎭</div>
-            <h3 class="text-xl font-bold mb-2">3D Emotion Visualization</h3>
-            <p class="text-purple-100">
-              Immersive emotion mapping and particle systems
-            </p>
-          </div>
-          <div class="p-6">
-            <ul class="space-y-2 text-sm mb-4">
-              <li>✓ Valence-Arousal-Dominance model</li>
-              <li>✓ Interactive 3D particle systems</li>
-              <li>✓ Real-time emotion tracking</li>
-              <li>✓ Mouse and touch controls</li>
-              <li>✓ WebGL performance optimization</li>
-            </ul>
-            <a
-              href="/components/emotion-visualization"
-              class="inline-block w-full text-center px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
-            >
-              Explore 3D Emotions
-            </a>
-          </div>
-        </div>
-
-        <!-- Treatment Plan Manager -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <div
-            class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 text-white"
-          >
-            <svg class="w-16 h-16" fill="currentColor" viewBox="0 0 24 24"
-            ></svg>
-            <h3 class="text-xl font-bold mb-2">Treatment Plan Manager</h3>
-            <p class="text-green-100">
-              Comprehensive clinical workflow management
-            </p>
-          </div>
-          <div class="p-6">
-            <ul class="space-y-2 text-sm mb-4">
-              <li>✓ SMART goal setting and tracking</li>
-              <li>✓ Milestone management</li>
-              <li>✓ Progress visualization</li>
-              <li>✓ Multi-category treatment plans</li>
-              <li>✓ Collaborative planning tools</li>
-            </ul>
-            <a
-              href="/components/treatment-plans"
-              class="inline-block w-full text-center px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-            >
-              Manage Treatment Plans
-            </a>
-          </div>
-        </div>
-
-        <!-- Privacy & Security -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <div
-            class="bg-gradient-to-r from-red-500 to-orange-600 p-6 text-white"
-          >
-            <div class="text-4xl mb-3">🔒</div>
-            <h3 class="text-xl font-bold mb-2">Privacy & Security Demo</h3>
-            <p class="text-red-100">Fully Homomorphic Encryption showcase</p>
-          </div>
-          <div class="p-6">
-            <ul class="space-y-2 text-sm mb-4">
-              <li>✓ Compute on encrypted data</li>
-              <li>✓ HIPAA compliance demonstration</li>
-              <li>✓ Performance benchmarking</li>
-              <li>✓ Interactive FHE operations</li>
-              <li>✓ Privacy-preserving analytics</li>
-            </ul>
-            <a
-              href="/components/security-demo"
-              class="inline-block w-full text-center px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-            >
-              Test FHE Security
-            </a>
-          </div>
-        </div>
-
-        <!-- UI Component Showcase -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <div
-            class="bg-gradient-to-r from-teal-500 to-cyan-600 p-6 text-white"
-          >
-            <div class="text-4xl mb-3">🎨</div>
-            <h3 class="text-xl font-bold mb-2">UI Component Showcase</h3>
-            <p class="text-teal-100">Modern carousel and interface elements</p>
-          </div>
-          <div class="p-6">
-            <ul class="space-y-2 text-sm mb-4">
-              <li>✓ Multiple carousel effects</li>
-              <li>✓ Touch gesture support</li>
-              <li>✓ Accessibility features</li>
-              <li>✓ Responsive breakpoints</li>
-              <li>✓ Custom content integration</li>
-            </ul>
-            <a
-              href="/components/ui-showcase"
-              class="inline-block w-full text-center px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors"
-            >
-              Explore UI Components
-            </a>
-          </div>
-        </div>
-
-        <!-- Chat System -->
-        <div
-          class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-        >
-          <div
-            class="bg-gradient-to-r from-indigo-500 to-blue-600 p-6 text-white"
-          >
-            <div class="text-4xl mb-3">💬</div>
-            <h3 class="text-xl font-bold mb-2">Therapy Chat System</h3>
-            <p class="text-indigo-100">
-              AI-powered therapeutic conversation interface
-            </p>
-          </div>
-          <div class="p-6">
-            <ul class="space-y-2 text-sm mb-4">
-              <li>✓ AI therapy assistant integration</li>
-              <li>✓ Emotion-aware responses</li>
-              <li>✓ Crisis intervention protocols</li>
-              <li>✓ Session transcription</li>
-              <li>✓ Multi-modal communication</li>
-            </ul>
-            <a
-              href="/therapy-chat"
-              class="inline-block w-full text-center px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
-            >
-              Try Chat System
-            </a>
-          </div>
-        </div>
+              <div class="p-6" style="background: var(--np-elevated);">
+                <div class="text-4xl mb-3">{card.icon}</div>
+                <h3 class="text-xl font-bold mb-2 np-text">{card.title}</h3>
+                <p class="np-muted">{card.blurb}</p>
+              </div>
+              <div class="p-6 flex flex-col flex-1">
+                <ul class="space-y-2 text-sm mb-4 np-mid flex-1">
+                  {card.features.map((f) => (
+                    <li>✓ {f}</li>
+                  ))}
+                </ul>
+                <a
+                  href={card.href}
+                  class="inline-block w-full text-center px-4 py-2 font-semibold np-cta"
+                >
+                  {card.cta}
+                </a>
+              </div>
+            </div>
+          ))
+        }
       </div>
 
       <!-- Enterprise Features -->
       <div
-        class="bg-gradient-to-r from-gray-50 to-blue-50 dark:from-gray-900 dark:to-blue-950 rounded-lg p-8 mb-16"
+        class="p-8 mb-16"
+        style="background: var(--np-surface); border: 1px solid var(--np-line);"
       >
-        <h2 class="text-3xl font-bold text-center mb-8">
+        <h2 class="text-3xl font-bold text-center mb-8 np-text">
           Enterprise-Grade Features
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="text-center">
             <div
-              class="bg-white dark:bg-gray-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              class="w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <span class="text-2xl">🏥</span>
             </div>
-            <h4 class="font-semibold mb-2">HIPAA Compliant</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <h4 class="font-semibold mb-2 np-text">HIPAA Compliant</h4>
+            <p class="text-sm np-muted">
               Full healthcare data protection and privacy compliance
             </p>
           </div>
           <div class="text-center">
             <div
-              class="bg-white dark:bg-gray-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              class="w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <span class="text-2xl">📱</span>
             </div>
-            <h4 class="font-semibold mb-2">Mobile First</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <h4 class="font-semibold mb-2 np-text">Mobile First</h4>
+            <p class="text-sm np-muted">
               Responsive design optimized for all device sizes
             </p>
           </div>
           <div class="text-center">
             <div
-              class="bg-white dark:bg-gray-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              class="w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <span class="text-2xl">♿</span>
             </div>
-            <h4 class="font-semibold mb-2">Accessibility</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <h4 class="font-semibold mb-2 np-text">Accessibility</h4>
+            <p class="text-sm np-muted">
               WCAG 2.1 AA compliant with screen reader support
             </p>
           </div>
           <div class="text-center">
             <div
-              class="bg-white dark:bg-gray-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              class="w-16 h-16 flex items-center justify-center mx-auto mb-4"
+              style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <span class="text-2xl">⚡</span>
             </div>
-            <h4 class="font-semibold mb-2">Performance</h4>
-            <p class="text-sm text-gray-600 dark:text-gray-400">
+            <h4 class="font-semibold mb-2 np-text">Performance</h4>
+            <p class="text-sm np-muted">
               Optimized for speed with lazy loading and caching
             </p>
           </div>
@@ -316,106 +263,59 @@ import { DynamicSwiperCarousel } from '@/lib/utils/dynamic-components'
       </div>
 
       <!-- Integration Status -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12">
-        <h2 class="text-2xl font-bold mb-6 text-center">
+      <div
+        class="p-8 mb-12"
+        style="background: var(--np-surface); border: 1px solid var(--np-line);"
+      >
+        <h2 class="text-2xl font-bold mb-6 text-center np-text">
           Platform Integration Status
         </h2>
         <div class="space-y-4">
-          <div
-            class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="font-medium">Analytics Dashboard</span>
-            </div>
-            <span class="text-green-600 font-semibold">✓ Integrated</span>
-          </div>
-          <div
-            class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="font-medium">3D Emotion Visualization</span>
-            </div>
-            <span class="text-green-600 font-semibold">✓ Integrated</span>
-          </div>
-          <div
-            class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="font-medium">Treatment Plan Manager</span>
-            </div>
-            <span class="text-green-600 font-semibold">✓ Integrated</span>
-          </div>
-          <div
-            class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="font-medium">FHE Security Demo</span>
-            </div>
-            <span class="text-green-600 font-semibold">✓ Integrated</span>
-          </div>
-          <div
-            class="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span class="font-medium">UI Component Showcase</span>
-            </div>
-            <span class="text-green-600 font-semibold">✓ Integrated</span>
-          </div>
-          <div
-            class="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span class="font-medium">Therapy Chat System</span>
-            </div>
-            <span class="text-blue-600 font-semibold"
-              >✓ Previously Integrated</span
-            >
-          </div>
-          <div
-            class="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950 rounded-lg"
-          >
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span class="font-medium">Emotion Temporal Analysis</span>
-            </div>
-            <span class="text-blue-600 font-semibold"
-              >✓ Previously Integrated</span
-            >
-          </div>
+          {
+            integrations.map((row) => (
+              <div
+                class="flex items-center justify-between p-4"
+                style="background: var(--np-elevated); border: 1px solid var(--np-line);"
+              >
+                <div class="flex items-center space-x-3">
+                  <div class="w-3 h-3 np-mid" style="background: var(--np-mid);" />
+                  <span class="font-medium np-text">{row.name}</span>
+                </div>
+                <span class="font-semibold np-mid">
+                  {row.state === 'integrated' ? '✓ Integrated' : '✓ Previously Integrated'}
+                </span>
+              </div>
+            ))
+          }
         </div>
       </div>
 
       <!-- Call to Action -->
       <div class="text-center">
-        <h2 class="text-3xl font-bold mb-4">Ready to Explore?</h2>
-        <p
-          class="text-xl text-gray-600 dark:text-gray-400 mb-8 max-w-2xl mx-auto"
-        >
+        <h2 class="text-3xl font-bold mb-4 np-text">Ready to Explore?</h2>
+        <p class="text-xl mb-8 max-w-2xl mx-auto np-muted">
           Dive into our comprehensive component library and see how these
           enterprise-grade tools can transform your therapy platform experience.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
           <a
             href="/demo-hub"
-            class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold"
+            class="px-8 py-3 text-lg font-semibold np-cta"
+            style="background: var(--np-elevated);"
           >
             Interactive Demo Hub
           </a>
           <a
             href="/dashboard"
-            class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-lg font-semibold"
+            class="px-8 py-3 text-lg font-semibold"
+            style="background: var(--np-surface); color: var(--np-text); border: 1px solid var(--np-line);"
           >
             Platform Dashboard
           </a>
           <a
             href="/mental-health-demo"
-            class="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-lg font-semibold"
+            class="px-8 py-3 text-lg font-semibold"
+            style="background: var(--np-bg); color: var(--np-text); border: 1px solid var(--np-line);"
           >
             Mental Health Demo
           </a>
