@@ -177,3 +177,56 @@ body {
    Not as an accent, not as a background tint, not as a hover state.
    The only color in the interface is the content.
    ============================================= */
+
+/* =============================================
+   LEGACY COMPATIBILITY ALIASES (charliecreates PR #4932)
+   Layouts still consumed: BrutalistLayout, BlogLayout, TailusLayout,
+   ChatLayout, DocumentationLayout. Map the historical variable names
+   onto the Neutral Precision ramp so the consumers stay renderable
+   without importing additional stylesheets. All values resolve to
+   zero-chroma NP tokens at the canonical elevation steps; no
+   accent/glass/shadow effects re-enter the system through this block.
+   ============================================= */
+:root {
+  /* Accent (legacy) -> muted NP — preserves contrast on Brutalist scroll
+     progress while removing hue. */
+  --accent-primary: var(--np-text);
+  --accent-primary-dim: var(--np-muted);
+  --accent-primary-glow: transparent;
+
+  /* Surface refresh */
+  --bg-primary: var(--np-bg);
+  --bg-secondary: var(--np-surface);
+  --bg-elevated: var(--np-elevated);
+  --bg-glass: var(--np-surface);
+  --bg-surface-ghost: var(--np-surface);
+
+  /* Text scale */
+  --text-primary: var(--np-text);
+  --text-secondary: var(--np-muted);
+  --text-muted: var(--np-muted);
+
+  /* Borders / dividers */
+  --border-subtle: var(--np-line);
+  --border-primary: var(--np-line-strong);
+  --divider-dotted: var(--np-line);
+  --divider-weak: var(--np-surface);
+
+  /* Hairline radii (zero-radius doctrine — preserve names, set to 0) */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+
+  /* Type family */
+  --font-mono: var(--np-font-mono);
+
+  /* Motion (state-only, neutral) */
+  --duration-fast: var(--np-duration-fast);
+
+  /* Compatibility shim for Brutalist scroll-progress + ChatLayout skip link */
+  --z-sticky: var(--np-z-sticky);
+  --focus-ring: 0 0 0 3px var(--np-mid);
+
+  /* Container for layouts that previously expected an 80rem-ish shell */
+  --container-refined: 76rem;
+}
