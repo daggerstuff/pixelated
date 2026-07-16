@@ -4,6 +4,10 @@
  * Modern + Minimalist + Brutalist design system
  */
 import '@/styles/np-tokens.css'
+import '@fontsource-variable/fraunces/full.css'
+import '@fontsource/public-sans/400.css'
+import '@fontsource/public-sans/700.css'
+import '@fontsource-variable/jetbrains-mono/wght.css'
 import BrutalistHeader from '@/components/BrutalistHeader.astro'
 import BrutalistFooter from '@/components/BrutalistFooter.astro'
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
@@ -33,7 +37,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#081112" />
+    <meta name="theme-color" content="#1a1a1a" />
 
     <title>{title}</title>
     <meta name="description" content={description} />

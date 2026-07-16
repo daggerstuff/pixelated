@@ -566,14 +566,30 @@ export default function EmotionTemporalAnalysisChart({
           aria-label="Temporal analysis view"
           className="flex flex-wrap"
           style={{ border: '1px solid var(--np-line)' }}
+          onKeyDown={(e) => {
+            const keys = VIEW_MODES.map((m) => m.key)
+            const idx = keys.indexOf(viewMode)
+            let next: number | null = null
+            if (e.key === 'ArrowRight') next = (idx + 1) % keys.length
+            else if (e.key === 'ArrowLeft') next = (idx - 1 + keys.length) % keys.length
+            else if (e.key === 'Home') next = 0
+            else if (e.key === 'End') next = keys.length - 1
+            if (next !== null) {
+              e.preventDefault()
+              setViewMode(keys[next] as ViewMode)
+              document.getElementById(`tab-${keys[next]}`)?.focus()
+            }
+          }}
         >
           {VIEW_MODES.map((mode) => {
             const selected = viewMode === mode.key
             return (
               <button
                 key={mode.key}
+                id={`tab-${mode.key}`}
                 role="tab"
                 aria-selected={selected}
+                tabIndex={selected ? 0 : -1}
                 onClick={() => setViewMode(mode.key)}
                 className={cn(
                   'px-3 py-1.5 text-sm transition-colors',
@@ -633,7 +649,13 @@ export default function EmotionTemporalAnalysisChart({
           .etac-chart { animation: none }
         }
       `}</style>
-      <div key={viewMode} className="etac-chart" style={{ width: '100%', height: `${height}px` }}>
+      <div
+        key={viewMode}
+        role="tabpanel"
+        aria-labelledby={`tab-${viewMode}`}
+        className="etac-chart"
+        style={{ width: '100%', height: `${height}px` }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           {renderChart()}
         </ResponsiveContainer>
