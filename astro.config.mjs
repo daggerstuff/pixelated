@@ -908,6 +908,9 @@ export default defineConfig({
         '**/.venv/**',
       ],
     },
+    headers: {
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    },
   },
 
   preview: {

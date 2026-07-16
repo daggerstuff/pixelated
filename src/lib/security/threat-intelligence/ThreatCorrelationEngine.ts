@@ -1625,9 +1625,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
   ): Promise<void> {
     try {
       const doc = { ...correlation, created_at: new Date() }
-      await this.correlationsCollection.insertOne(
-        doc,
-      )
+      await this.correlationsCollection.insertOne(doc)
 
       // Emit correlation event
       this.emit('correlation:detected', correlation)

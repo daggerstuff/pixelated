@@ -121,38 +121,41 @@ export function FocusTrap({
 
   // Handle tab key to trap focus within the container
   // Performance: use useCallback to maintain stable function reference
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (!active || e.key !== 'Tab') {
-      return
-    }
-
-    const focusableElements = getFocusableElements()
-    if (focusableElements.length === 0) {
-      return
-    }
-
-    const firstElement = focusableElements[0]
-    const lastElement = focusableElements[focusableElements.length - 1]
-    const { activeElement } = document
-
-    // If Shift+Tab and on first element, wrap to last element
-    if (e.shiftKey && activeElement === firstElement) {
-      e.preventDefault()
-      if (lastElement) {
-        lastElement.focus()
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!active || e.key !== 'Tab') {
+        return
       }
-    }
-    // If Tab and on last element, wrap to first element
-    else if (!e.shiftKey && activeElement === lastElement) {
-      e.preventDefault()
-      if (firstElement) {
-        firstElement.focus()
+
+      const focusableElements = getFocusableElements()
+      if (focusableElements.length === 0) {
+        return
       }
-      if (onEscape) {
-        onEscape()
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+      const { activeElement } = document
+
+      // If Shift+Tab and on first element, wrap to last element
+      if (e.shiftKey && activeElement === firstElement) {
+        e.preventDefault()
+        if (lastElement) {
+          lastElement.focus()
+        }
       }
-    }
-  }, [active, getFocusableElements, onEscape])
+      // If Tab and on last element, wrap to first element
+      else if (!e.shiftKey && activeElement === lastElement) {
+        e.preventDefault()
+        if (firstElement) {
+          firstElement.focus()
+        }
+        if (onEscape) {
+          onEscape()
+        }
+      }
+    },
+    [active, getFocusableElements, onEscape],
+  )
 
   // Don't render anything if not active
   if (!active) {

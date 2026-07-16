@@ -22,7 +22,10 @@ import { secureRandomHex } from './security/random'
  * a real signature so the result is `string` rather than `any`.
  */
 interface CryptoJsAdapter {
-  HmacSHA256: (message: string, key: string) => { toString: (encoder: unknown) => string }
+  HmacSHA256: (
+    message: string,
+    key: string,
+  ) => { toString: (encoder: unknown) => string }
   enc: { Base64: unknown }
 }
 const crypto = CryptoJS as unknown as CryptoJsAdapter

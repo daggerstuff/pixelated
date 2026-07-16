@@ -143,10 +143,7 @@ export class DataExportDAO {
 
   async addFile(exportId: string, file: ExportFile): Promise<void> {
     const collection = await this.getCollection()
-    await collection.updateOne(
-      { id: exportId },
-      { $push: { files: file } },
-    )
+    await collection.updateOne({ id: exportId }, { $push: { files: file } })
   }
 }
 
