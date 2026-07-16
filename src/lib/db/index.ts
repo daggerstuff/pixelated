@@ -394,7 +394,10 @@ export class DatabaseMigration {
     fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'>,
   ): Promise<Array<{ name: string; sql: string }>> {
     const entries = await fsAdapter.readdir(dir)
-    const sqlFiles = entries.filter((f) => /^\d{3}_.+\.sql$/.test(f)).sort()
+    const sqlFiles = entries
+      .filter((f) => /^\d{3}_.+\.sql$/.test(f))
+      .filter((f) => !f.endsWith('.rollback.sql'))
+      .sort()
     const out: Array<{ name: string; sql: string }> = []
     for (const file of sqlFiles) {
       const sql = await fsAdapter.readFile(path.join(dir, file), 'utf8')

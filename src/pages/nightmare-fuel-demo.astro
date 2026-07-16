@@ -72,160 +72,111 @@ const trainingMetrics = {
 <BaseLayout {title} {description}>
   <!-- Hero Section -->
   <section
-    class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-red-950 via-black to-gray-950"
+    class="relative min-h-screen flex items-center justify-center overflow-hidden"
+    style="background: var(--np-bg);"
   >
-    <!-- Animated Background Elements -->
-    <div class="absolute inset-0">
-      <div
-        class="absolute top-20 left-10 w-32 h-32 bg-red-900/20 rounded-full blur-3xl animate-pulse"
-      >
-      </div>
-      <div
-        class="absolute bottom-20 right-10 w-48 h-48 bg-rose-900/20 rounded-full blur-3xl animate-pulse animation-delay-2000"
-      >
-      </div>
-      <div
-        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-orange-900/10 rounded-full blur-3xl animate-pulse animation-delay-3000"
-      >
-      </div>
-    </div>
-
-    <!-- Floating Warning Symbols -->
-    <div class="absolute inset-0 pointer-events-none">
-      <div
-        class="absolute top-10 left-20 text-6xl text-red-600/40 animate-bounce"
-      >
-        ⚠️
-      </div>
-      <div
-        class="absolute top-1/3 right-16 text-5xl text-red-500/30 animate-pulse"
-      >
-        🚨
-      </div>
-      <div
-        class="absolute bottom-1/4 left-1/3 text-7xl text-red-700/20 animate-bounce animation-delay-1000"
-      >
-        💀
-      </div>
-      <div
-        class="absolute top-1/2 right-1/4 text-4xl text-red-600/30 animate-pulse animation-delay-1500"
-      >
-        🔥
-      </div>
-    </div>
-
     <div class="container mx-auto px-6 text-center relative z-10">
       <div class="mb-12">
         <div
-          class="inline-flex items-center gap-4 px-6 py-3 bg-red-600/20 border border-red-600/40 rounded-full mb-8 backdrop-blur-sm"
+          class="inline-flex items-center gap-4 px-6 py-3 np-elevated mb-8"
+          style="border: 1px solid var(--np-line);"
         >
-          <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-          <span class="font-bold text-red-400"
-            >⚠️ HIGHLY SENSITIVE MATERIAL ⚠️</span
+          <span class="np-mid" aria-hidden="true">⚠️</span>
+          <span class="font-bold np-text tracking-wide"
+            >HIGHLY SENSITIVE MATERIAL</span
           >
-          <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+          <span class="np-mid" aria-hidden="true">⚠️</span>
         </div>
       </div>
 
-      <h1
-        class="text-6xl md:text-8xl lg:text-9xl font-black mb-8 text-white tracking-tighter"
-      >
-        <span class="text-red-400">NIGHTMARE</span><br />
-        <span class="text-orange-400 animate-pulse">FUEL</span>
+      <h1 class="text-6xl md:text-8xl lg:text-9xl font-black mb-8 np-text tracking-tighter">
+        NIGHTMARE<br />FUEL
       </h1>
 
       <p
-        class="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed"
+        class="text-xl md:text-2xl np-muted mb-8 max-w-4xl mx-auto leading-relaxed"
       >
-        The ultimate crisis training simulator. <strong class="text-red-300"
+        The ultimate crisis training simulator. <strong class="np-text"
           >No human supervision needed.</strong
         ><br />
-        Tackle the scenarios that make experienced counselors quit. <strong
-          class="text-orange-300">AI-guided intervention.</strong
-        >
+        Tackle the scenarios that make experienced counselors quit. <strong class="np-mid">AI-guided intervention.</strong>
       </p>
 
       <div
         class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12 max-w-4xl mx-auto"
       >
         <div class="text-center">
-          <div class="text-4xl font-bold text-red-400">
+          <div class="text-4xl font-bold np-text">
             {trainingMetrics.counselors_trained}
           </div>
-          <div class="text-sm text-gray-400">Counselors Trained</div>
+          <div class="text-sm np-muted">Counselors Trained</div>
         </div>
         <div class="text-center">
-          <div class="text-4xl font-bold text-orange-400">
+          <div class="text-4xl font-bold np-text">
             {trainingMetrics.success_rate}%
           </div>
-          <div class="text-sm text-gray-400">Success Rate</div>
+          <div class="text-sm np-muted">Success Rate</div>
         </div>
         <div class="text-center">
-          <div class="text-4xl font-bold text-red-400">
+          <div class="text-4xl font-bold np-text">
             {trainingMetrics.crisis_prevention_rate}%
           </div>
-          <div class="text-sm text-gray-400">Crisis Prevention</div>
+          <div class="text-sm np-muted">Crisis Prevention</div>
         </div>
         <div class="text-center">
-          <div class="text-4xl font-bold text-orange-400">
+          <div class="text-4xl font-bold np-text">
             {trainingMetrics.secondary_trauma_reduction}%
           </div>
-          <div class="text-sm text-gray-400">Trauma Reduction</div>
+          <div class="text-sm np-muted">Trauma Reduction</div>
         </div>
       </div>
 
       <button
         id="startDemoBtn"
-        class="group relative px-12 py-6 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xl rounded-lg overflow-hidden hover:scale-105 transition-transform"
+        class="px-12 py-6 font-bold text-xl np-cta np-ring"
+        style="background: var(--np-elevated);"
       >
-        <span class="relative z-10">START TRAINING →</span>
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-red-500/50 to-orange-500/50 opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-        </div>
-        <div
-          class="absolute -inset-1 bg-gradient-to-r from-red-600/20 to-orange-600/20 rounded-lg blur-xl opacity-0 group-hover:opacity-100 transition-opacity"
-        >
-        </div>
+        START TRAINING →
       </button>
 
-      <p class="mt-8 text-gray-400 text-sm max-w-2xl mx-auto">
-        ⚠️ <strong class="text-red-400">WARNING:</strong> This demo contains extreme
+      <p class="mt-8 np-muted text-sm max-w-2xl mx-auto">
+        <strong class="np-text">⚠ WARNING:</strong> This demo contains extreme
         crisis scenarios designed for professional training only.
       </p>
     </div>
   </section>
 
   <!-- Demo Interface - Hidden Initially -->
-  <section id="demoInterface" class="hidden min-h-screen bg-black relative">
+  <section
+    id="demoInterface"
+    class="hidden min-h-screen relative"
+    style="background: var(--np-bg);"
+  >
     <!-- Header -->
     <div
-      class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-red-800/30"
+      class="fixed top-0 left-0 right-0 z-50"
+      style="background: var(--np-surface); border-bottom: 1px solid var(--np-line);"
     >
       <div class="container mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-4">
-            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-            <h1 class="text-xl font-bold text-white">LIVE TRAINING SESSION</h1>
-            <div class="text-sm text-gray-400">
-              AI Supervision: <span class="text-green-400">ACTIVE</span>
+            <h1 class="text-xl font-bold np-text">LIVE TRAINING SESSION</h1>
+            <div class="text-sm np-muted">
+              AI Supervision: <span class="np-text">ACTIVE</span>
             </div>
           </div>
           <div class="flex items-center gap-6">
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-400">Timer:</span>
-              <div id="sessionTimer" class="text-yellow-400 font-bold">
-                05:00
-              </div>
+              <span class="text-sm np-muted">Timer:</span>
+              <div id="sessionTimer" class="np-text font-bold">05:00</div>
             </div>
             <div class="flex items-center gap-2">
-              <span class="text-sm text-gray-400">Stability:</span>
-              <div id="stabilityMetric" class="text-green-400">STABLE</div>
+              <span class="text-sm np-muted">Stability:</span>
+              <div id="stabilityMetric" class="np-mid">STABLE</div>
             </div>
             <button
               id="endSessionBtn"
-              class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-              >END SESSION</button
+              class="px-4 py-2 font-semibold np-cta">END SESSION</button
             >
           </div>
         </div>
@@ -240,22 +191,24 @@ const trainingMetrics = {
           <!-- Current Scenario -->
           <div
             id="scenarioPanel"
-            class="bg-gray-900 border border-red-800/30 rounded-lg p-6"
+            class="p-6"
+            style="background: var(--np-surface); border: 1px solid var(--np-line);"
           >
             <div class="flex items-center justify-between mb-6">
-              <h2 id="scenarioTitle" class="text-2xl font-bold text-red-400">
+              <h2 id="scenarioTitle" class="text-2xl font-bold np-text">
                 Select Scenario to Begin
               </h2>
               <div
                 id="crisisBadge"
-                class="px-3 py-1 bg-red-600/20 border border-red-600/40 rounded-full text-sm font-bold text-red-300"
+                class="px-3 py-1 text-sm font-bold np-text uppercase"
+                style="background: var(--np-elevated); border: 1px solid var(--np-line);"
               >
                 EXTREME
               </div>
             </div>
             <div
               id="scenarioDescription"
-              class="text-gray-300 mb-6 text-lg leading-relaxed"
+              class="np-muted mb-6 text-lg leading-relaxed"
             >
               Choose a scenario from the database to begin your training
               session.
@@ -267,35 +220,34 @@ const trainingMetrics = {
             <!-- AI Analysis Panel -->
             <div
               id="aiAnalysisPanel"
-              class="bg-black border border-red-500/30 rounded-lg p-4 mb-6"
+              class="p-4 mb-6"
+              style="background: var(--np-bg); border: 1px solid var(--np-line);"
             >
               <h3
-                class="text-lg font-semibold text-red-400 mb-3 flex items-center gap-2"
+                class="text-lg font-semibold np-text mb-3 flex items-center gap-2"
               >
-                <div class="w-4 h-4 bg-green-400 rounded-full animate-pulse">
-                </div>
+                <span class="np-mid" aria-hidden="true">●</span>
                 LIVE AI ANALYSIS
               </h3>
-              <div id="aiAnalysis" class="text-gray-400">
+              <div id="aiAnalysis" class="np-muted">
                 <div class="flex items-center gap-2 mb-2">
-                  <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse">
-                  </div>
-                  <span class="text-yellow-400">System initializing...</span>
+                  <span class="np-muted">○</span>
+                  <span class="np-muted">System initializing...</span>
                 </div>
               </div>
             </div>
 
             <!-- Conversation/Client Input -->
-            <div class="bg-black border border-gray-700 rounded-lg p-4">
-              <h4 class="text-lg font-semibold text-orange-400 mb-3">
+            <div class="p-4" style="background: var(--np-bg); border: 1px solid var(--np-line);">
+              <h4 class="text-lg font-semibold np-text mb-3">
                 CLIENT SIMULATOR
               </h4>
               <div
                 id="clientResponses"
                 class="space-y-3 mb-4 min-h-[200px] max-h-[400px] overflow-y-auto"
               >
-                <div class="bg-red-950/30 border border-red-800/30 rounded p-3">
-                  <p class="text-gray-400">Awaiting scenario selection...</p>
+                <div class="p-3" style="background: var(--np-elevated); border: 1px solid var(--np-line);">
+                  <p class="np-muted">Awaiting scenario selection...</p>
                 </div>
               </div>
 
@@ -304,11 +256,12 @@ const trainingMetrics = {
                 <textarea
                   id="counselorInput"
                   placeholder="Type your therapeutic response..."
-                  class="flex-1 p-3 bg-black border border-gray-600 rounded text-white placeholder-gray-500 resize-none min-h-[80px] focus:border-red-500 focus:outline-none"
+                  class="flex-1 p-3 resize-none min-h-[80px] focus:outline-none"
+                  style="background: var(--np-bg); color: var(--np-text); border: 1px solid var(--np-line);"
                 ></textarea>
                 <button
                   id="sendResponseBtn"
-                  class="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white font-semibold rounded hover:from-red-700 hover:to-orange-700 transition-all"
+                  class="px-6 py-3 font-semibold np-cta"
                 >
                   →
                 </button>
@@ -320,34 +273,41 @@ const trainingMetrics = {
         <!-- Control Panel -->
         <div class="space-y-6">
           <!-- Scenario Selector -->
-          <div class="bg-gray-900 border border-red-800/30 rounded-lg p-6">
+          <div class="p-6" style="background: var(--np-surface); border: 1px solid var(--np-line);">
             <h3
-              class="text-xl font-bold text-red-400 mb-4 flex items-center gap-2"
+              class="text-xl font-bold np-text mb-4 flex items-center gap-2"
             >
-              <span class="text-orange-400">💀</span>
+              <span class="np-mid" aria-hidden="true">💀</span>
               ULTRA NIGHTMARE SCENARIOS
             </h3>
             <div id="scenarioList" class="space-y-3">
               {
                 nightmareScenarios.map((scenario) => (
                   <div
-                    class="scenario-item bg-black border border-gray-700 rounded-lg p-4 cursor-pointer hover:border-red-500/50 transition-all group"
+                    class="scenario-item p-4 cursor-pointer transition-all group"
                     data-scenario={scenario.id}
+                    style="background: var(--np-bg); border: 1px solid var(--np-line);"
                   >
                     <div class="flex items-center justify-between mb-2">
-                      <h4 class="font-semibold text-orange-400">
+                      <h4 class="font-semibold np-text">
                         {scenario.title}
                       </h4>
-                      <div class="text-xs px-2 py-1 bg-red-600/20 border border-red-600/40 rounded text-red-300">
+                      <div
+                        class="text-xs px-2 py-1 np-mid"
+                        style="background: var(--np-elevated); border: 1px solid var(--np-line);"
+                      >
                         {scenario.stephenKingFactor}/10 Stephen King Factor
                       </div>
                     </div>
-                    <p class="text-sm text-gray-400 mb-2">
+                    <p class="text-sm np-muted mb-2">
                       {scenario.description}
                     </p>
                     <div class="flex flex-wrap gap-1">
                       {scenario.tags.map((tag) => (
-                        <span class="text-xs px-1 py-0.5 bg-red-900/20 text-red-400 rounded">
+                        <span
+                          class="text-xs px-1 py-0.5 np-muted"
+                          style="background: var(--np-elevated);"
+                        >
                           {tag}
                         </span>
                       ))}
@@ -359,77 +319,80 @@ const trainingMetrics = {
           </div>
 
           <!-- Performance Metrics -->
-          <div class="bg-gray-900 border border-red-800/30 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-orange-400 mb-4">
+          <div class="p-6" style="background: var(--np-surface); border: 1px solid var(--np-line);">
+            <h3 class="text-xl font-bold np-text mb-4">
               PERFORMANCE TRACKING
             </h3>
             <div class="space-y-4">
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Crisis Recognition</span>
+                <span class="np-muted">Crisis Recognition</span>
                 <div class="flex items-center gap-2">
                   <div
                     id="crisisRecognitionBar"
-                    class="w-20 h-2 bg-gray-700 rounded"
+                    class="w-20 h-2"
+                    style="background: var(--np-elevated);"
                   >
                     <div
-                      class="h-full bg-gradient-to-r from-red-600 to-orange-600 rounded"
-                      style="width: 0%"
+                      class="h-full"
+                      style="width: 0%; background: var(--np-text);"
                     >
                     </div>
                   </div>
-                  <span id="crisisRecognitionValue" class="text-white font-bold"
+                  <span id="crisisRecognitionValue" class="np-text font-bold"
                     >0%</span
                   >
                 </div>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Intervention Quality</span>
+                <span class="np-muted">Intervention Quality</span>
                 <div class="flex items-center gap-2">
                   <div
                     id="interventionQualityBar"
-                    class="w-20 h-2 bg-gray-700 rounded"
+                    class="w-20 h-2"
+                    style="background: var(--np-elevated);"
                   >
                     <div
-                      class="h-full bg-gradient-to-r from-yellow-600 to-orange-600 rounded"
-                      style="width: 0%"
+                      class="h-full"
+                      style="width: 0%; background: var(--np-text);"
                     >
                     </div>
                   </div>
                   <span
                     id="interventionQualityValue"
-                    class="text-white font-bold">0%</span
+                    class="np-text font-bold">0%</span
                   >
                 </div>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Empathy Score</span>
+                <span class="np-muted">Empathy Score</span>
                 <div class="flex items-center gap-2">
                   <div
                     id="empathyScoreBar"
-                    class="w-20 h-2 bg-gray-700 rounded"
+                    class="w-20 h-2"
+                    style="background: var(--np-elevated);"
                   >
                     <div
-                      class="h-full bg-gradient-to-r from-green-600 to-emerald-600 rounded"
-                      style="width: 0%"
+                      class="h-full"
+                      style="width: 0%; background: var(--np-text);"
                     >
                     </div>
                   </div>
-                  <span id="empathyScoreValue" class="text-white font-bold"
+                  <span id="empathyScoreValue" class="np-text font-bold"
                     >0%</span
                   >
                 </div>
               </div>
               <div class="flex items-center justify-between">
-                <span class="text-gray-400">Professional Boundaries</span>
+                <span class="np-muted">Professional Boundaries</span>
                 <div class="flex items-center gap-2">
-                  <div id="boundariesBar" class="w-20 h-2 bg-gray-700 rounded">
+                  <div id="boundariesBar" class="w-20 h-2" style="background: var(--np-elevated);">
                     <div
-                      class="h-full bg-gradient-to-r from-blue-600 to-cyan-600 rounded"
-                      style="width: 0%"
+                      class="h-full"
+                      style="width: 0%; background: var(--np-text);"
                     >
                     </div>
                   </div>
-                  <span id="boundariesValue" class="text-white font-bold"
+                  <span id="boundariesValue" class="np-text font-bold"
                     >0%</span
                   >
                 </div>
@@ -438,43 +401,39 @@ const trainingMetrics = {
           </div>
 
           <!-- Session Status -->
-          <div class="bg-black border border-red-500/30 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-green-400 mb-4">
+          <div class="p-6" style="background: var(--np-bg); border: 1px solid var(--np-line);">
+            <h3 class="text-xl font-bold np-text mb-4">
               AI SUPERVISOR STATUS
             </h3>
             <div class="space-y-3">
               <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse">
-                </div>
-                <span class="text-gray-300"
-                  >Real-time Analysis: <strong class="text-green-400"
+                <span class="np-mid" aria-hidden="true">●</span>
+                <span class="np-muted"
+                  >Real-time Analysis: <strong class="np-text"
                     >ACTIVE</strong
                   ></span
                 >
               </div>
               <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse">
-                </div>
-                <span class="text-gray-300"
-                  >Safety Monitoring: <strong class="text-green-400"
+                <span class="np-mid" aria-hidden="true">●</span>
+                <span class="np-muted"
+                  >Safety Monitoring: <strong class="np-text"
                     >SECURE</strong
                   ></span
                 >
               </div>
               <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse">
-                </div>
-                <span class="text-gray-300"
-                  >Secondary Trauma Prevention: <strong class="text-yellow-400"
+                <span class="np-muted" aria-hidden="true">○</span>
+                <span class="np-muted"
+                  >Secondary Trauma Prevention: <strong class="np-mid"
                     >ENABLED</strong
                   ></span
                 >
               </div>
               <div class="flex items-center gap-2">
-                <div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse">
-                </div>
-                <span class="text-gray-300"
-                  >Crisis Protocols: <strong class="text-blue-400"
+                <span class="np-mid" aria-hidden="true">●</span>
+                <span class="np-muted"
+                  >Crisis Protocols: <strong class="np-mid"
                     >STANDBY</strong
                   ></span
                 >
@@ -484,40 +443,40 @@ const trainingMetrics = {
             <!-- Alert Panel -->
             <div
               id="alertPanel"
-              class="mt-4 p-3 bg-red-900/20 border border-red-700/30 rounded hidden"
+              class="mt-4 p-3 hidden"
+              style="background: var(--np-elevated); border: 1px solid var(--np-line);"
             >
               <div class="flex items-center gap-2">
-                <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse">
-                </div>
-                <span id="alertText" class="text-red-400 font-semibold"></span>
+                <span class="np-text font-bold" aria-hidden="true">⚠</span>
+                <span id="alertText" class="np-text font-semibold"></span>
               </div>
             </div>
           </div>
 
           <!-- Quick Actions -->
-          <div class="bg-gray-900 border border-orange-800/30 rounded-lg p-6">
-            <h3 class="text-xl font-bold text-orange-400 mb-4">
+          <div class="p-6" style="background: var(--np-surface); border: 1px solid var(--np-line);">
+            <h3 class="text-xl font-bold np-text mb-4">
               QUICK ACTIONS
             </h3>
             <div class="grid grid-cols-2 gap-3">
               <button
                 id="pauseBtn"
-                class="px-4 py-2 bg-yellow-600 text-white rounded font-semibold hover:bg-yellow-700 transition-colors"
+                class="px-4 py-2 font-semibold np-cta"
                 >PAUSE</button
               >
               <button
                 id="safetyModeBtn"
-                class="px-4 py-2 bg-green-600 text-white rounded font-semibold hover:bg-green-700 transition-colors"
+                class="px-4 py-2 font-semibold np-cta"
                 >SAFE MODE</button
               >
               <button
                 id="debriefBtn"
-                class="px-4 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition-colors"
+                class="px-4 py-2 font-semibold np-cta"
                 >DEBRIEF</button
               >
               <button
                 id="emergencyBtn"
-                class="px-4 py-2 bg-red-600 text-white rounded font-semibold hover:bg-red-700 transition-colors"
+                class="px-4 py-2 font-semibold np-cta"
                 >EMERGENCY</button
               >
             </div>
@@ -530,20 +489,22 @@ const trainingMetrics = {
   <!-- Welcome Modal -->
   <div
     id="welcomeModal"
-    class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50"
+    class="fixed inset-0 flex items-center justify-center z-50"
+    style="background: rgba(0, 0, 0, 0.8);"
   >
     <div
-      class="bg-gray-900 border-2 border-red-600 rounded-lg p-8 max-w-2xl mx-6"
+      class="p-8 max-w-2xl mx-6"
+      style="background: var(--np-surface); border: 2px solid var(--np-line);"
     >
       <div class="text-center mb-6">
-        <div class="text-6xl mb-4 animate-pulse">⚠️</div>
-        <h2 class="text-3xl font-bold text-red-400 mb-4">
+        <div class="text-6xl mb-4">⚠️</div>
+        <h2 class="text-3xl font-bold np-text mb-4">
           PSYCHOLOGICAL SAFETY WARNING
         </h2>
       </div>
 
-      <div class="text-gray-300 mb-6 space-y-3">
-        <p class="font-bold text-orange-300">
+      <div class="np-muted mb-6 space-y-3">
+        <p class="font-bold np-text">
           This training simulation contains:
         </p>
         <ul class="list-disc list-inside space-y-2 text-sm">
@@ -560,8 +521,8 @@ const trainingMetrics = {
         </ul>
       </div>
 
-      <div class="bg-red-900/20 border border-red-600/40 rounded p-4 mb-6">
-        <p class="text-red-400 text-sm font-semibold text-center">
+      <div class="p-4 mb-6" style="background: var(--np-elevated); border: 1px solid var(--np-line);">
+        <p class="np-text text-sm font-semibold text-center">
           ⚠️ DO NOT PROCEED if you have active PTSD, trauma history, or
           psychological vulnerabilities
         </p>
@@ -570,13 +531,15 @@ const trainingMetrics = {
       <div class="flex gap-4">
         <button
           id="declineBtn"
-          class="flex-1 px-6 py-3 bg-gray-600 text-white rounded font-bold hover:bg-gray-700 transition-colors"
+          class="flex-1 px-6 py-3 font-bold np-cta"
+          style="background: var(--np-bg);"
         >
           I DECLINE - EXIT NOW
         </button>
         <button
           id="acceptBtn"
-          class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white rounded font-bold hover:from-red-700 hover:to-orange-700 transition-all"
+          class="flex-1 px-6 py-3 font-bold np-cta"
+          style="background: var(--np-elevated);"
         >
           I ACCEPT - SHOW ME THE HORROR
         </button>
@@ -707,7 +670,7 @@ const trainingMetrics = {
     tagsContainer.innerHTML = scenario.tags
       .map(
         (tag) =>
-          `<span class="text-xs px-2 py-1 bg-red-900/30 text-red-400 border border-red-700/40 rounded">${tag}</span>`,
+          `<span class="text-xs px-2 py-1 np-muted" style="background:var(--np-elevated);border:1px solid var(--np-line)">${tag}</span>`,
       )
       .join('')
 
@@ -719,11 +682,14 @@ const trainingMetrics = {
 
     // Highlight selected scenario
     scenarioItems.forEach((item) => {
-      item.classList.remove('border-red-500', 'bg-red-950')
+      item.style.borderColor = 'var(--np-line)'
+      item.style.background = 'var(--np-bg)'
     })
-    document
-      .querySelector(`[data-scenario="${scenarioId}"]`)
-      .classList.add('border-red-500', 'bg-red-950')
+    const selected = document.querySelector(`[data-scenario="${scenarioId}"]`)
+    if (selected) {
+      selected.style.borderColor = 'var(--np-text)'
+      selected.style.background = 'var(--np-elevated)'
+    }
 
     // Start metrics animation
     animateMetrics()
@@ -745,13 +711,13 @@ const trainingMetrics = {
       document.getElementById('aiAnalysis').innerHTML = `
         <div class="space-y-2">
           <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            <span class="text-red-400 font-semibold">⚠️ EXTREME CRISIS DETECTED</span>
+            <span class="np-text font-bold" aria-hidden="true">⚠</span>
+            <span class="np-text font-semibold">⚠ EXTREME CRISIS DETECTED</span>
           </div>
-          <div class="text-sm text-gray-400 mt-1">
+          <div class="text-sm np-muted mt-1">
             Immediate intervention required. Safety protocols activated.
           </div>
-          <div class="mt-2 text-xs text-yellow-400">
+          <div class="mt-2 text-xs np-mid">
             Stephen King Factor: 10/10 - Reality-breaking content
           </div>
         </div>
@@ -763,14 +729,16 @@ const trainingMetrics = {
   function typeResponse(text) {
     const clientResponses = document.getElementById('clientResponses')
     const responseDiv = document.createElement('div')
-    responseDiv.className =
-      'bg-red-950/30 border border-red-800/30 rounded p-3 opacity-0 transition-opacity'
+    responseDiv.className = 'p-3 opacity-0 transition-opacity'
+    responseDiv.style.background = 'var(--np-elevated)'
+    responseDiv.style.border = '1px solid var(--np-line)'
 
     const avatar = document.createElement('div')
-    avatar.className = 'w-2 h-2 bg-red-500 rounded-full mb-2'
+    avatar.className = 'w-2 h-2 mb-2'
+    avatar.style.background = 'var(--np-mid)'
 
     const textElement = document.createElement('p')
-    textElement.className = 'text-gray-300'
+    textElement.className = 'np-text'
 
     responseDiv.appendChild(avatar)
     responseDiv.appendChild(textElement)
@@ -800,17 +768,17 @@ const trainingMetrics = {
       analysisPanel.innerHTML = `
         <div class="space-y-3">
           <div class="flex items-center gap-2">
-            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            <span class="text-red-400 font-semibold">⚠️ EXTREME CRISIS DETECTED</span>
+            <span class="np-text font-bold" aria-hidden="true">⚠</span>
+            <span class="np-text font-semibold">⚠ EXTREME CRISIS DETECTED</span>
           </div>
-          <div class="text-sm space-y-1 text-gray-400">
+          <div class="text-sm space-y-1 np-muted">
             <div>✗ Psychological boundaries compromised</div>
             <div>✗ Reality-testing severely impaired</div>
             <div>✓ Immediate containment recommended</div>
           </div>
-          <div class="mt-2 p-2 bg-red-900/20 border border-red-700/30 rounded">
-            <div class="text-red-300 font-semibold">Stephen King Factor: ${stephenKing}/10</div>
-            <div class="text-xs text-gray-500 mt-1">Reality-breaking, consciousness-destroying content</div>
+          <div class="mt-2 p-2" style="background:var(--np-elevated);border:1px solid var(--np-line)">
+            <div class="np-text font-semibold">Stephen King Factor: ${stephenKing}/10</div>
+            <div class="text-xs np-muted mt-1">Reality-breaking, consciousness-destroying content</div>
           </div>
         </div>
       `
@@ -893,14 +861,16 @@ const trainingMetrics = {
   function addCounselorResponse(text) {
     const clientResponses = document.getElementById('clientResponses')
     const responseDiv = document.createElement('div')
-    responseDiv.className =
-      'bg-green-950/30 border border-green-800/30 rounded p-3 ml-8'
+    responseDiv.className = 'p-3 ml-8'
+    responseDiv.style.background = 'var(--np-surface)'
+    responseDiv.style.border = '1px solid var(--np-line)'
 
     const avatar = document.createElement('div')
-    avatar.className = 'w-2 h-2 bg-green-500 rounded-full mb-2'
+    avatar.className = 'w-2 h-2 mb-2'
+    avatar.style.background = 'var(--np-text)'
 
     const textElement = document.createElement('p')
-    textElement.className = 'text-gray-300'
+    textElement.className = 'np-text'
     textElement.textContent = text
 
     responseDiv.appendChild(avatar)
@@ -922,16 +892,16 @@ const trainingMetrics = {
       response.toLowerCase().includes('i hear you')
     ) {
       analysisText =
-        '\n<div class="flex items-center gap-2">\n<div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>\n<span class="text-green-400">✓ Empathetic response detected</span>\n</div>'
+        '\n<div class="flex items-center gap-2">\n<span class="np-text" aria-hidden="true">✓</span>\n<span class="np-text">✓ Empathetic response detected</span>\n</div>'
     } else if (
       response.toLowerCase().includes('help') ||
       response.toLowerCase().includes('safety')
     ) {
       analysisText =
-        '\n<div class="flex items-center gap-2">\n<div class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>\n<span class="text-blue-400">✓ Safety focus detected</span>\n</div>'
+        '\n<div class="flex items-center gap-2">\n<span class="np-mid" aria-hidden="true">●</span>\n<span class="np-mid">● Safety focus detected</span>\n</div>'
     } else if (response.length < 20) {
       analysisText =
-        '\n<div class="flex items-center gap-2">\n<div class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>\n<span class="text-yellow-400">⚠ Response may be too brief for crisis intervention</span>\n</div>'
+        '\n<div class="flex items-center gap-2">\n<span class="np-muted" aria-hidden="true">○</span>\n<span class="np-muted">⚠ Response may be too brief for crisis intervention</span>\n</div>'
     }
 
     if (analysisText) {
@@ -982,8 +952,8 @@ const trainingMetrics = {
 
       pauseBtn.textContent = isPaused ? 'PAUSE' : 'RESUME'
       pauseBtn.className = isPaused
-        ? 'px-4 py-2 bg-yellow-600 text-white rounded font-semibold hover:bg-yellow-700 transition-colors'
-        : 'px-4 py-2 bg-orange-600 text-white rounded font-semibold hover:bg-orange-700 transition-colors'
+        ? 'px-4 py-2 font-semibold np-cta'
+        : 'px-4 py-2 font-semibold np-cta'
 
       // Toggle session active
       sessionActive = isPaused
@@ -1080,12 +1050,11 @@ const trainingMetrics = {
   }
 
   #clientResponses::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: var(--np-bg);
   }
 
   #clientResponses::-webkit-scrollbar-thumb {
-    background: #e53e3e;
-    border-radius: 3px;
+    background: var(--np-mid);
   }
 
   .scenario-item {
@@ -1093,21 +1062,7 @@ const trainingMetrics = {
     overflow: hidden;
   }
 
-  .scenario-item::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      45deg,
-      transparent,
-      rgba(239, 68, 68, 0.05),
-      transparent
-    );
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  .scenario-item:hover::before {
-    opacity: 1;
+  .scenario-item:hover {
+    border-color: var(--np-text) !important;
   }
 </style>

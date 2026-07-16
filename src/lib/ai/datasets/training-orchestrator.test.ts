@@ -1,7 +1,15 @@
 /* @vitest-environment node */
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, test } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
+
+// HuggingFaceTrainingBackend reads AI_SERVICE_API_KEY from env into a module-level
+// const at import time, so the key must be present BEFORE the backend module is
+// evaluated. A side-effect import placed ahead of the orchestrator import runs
+// first (ESM evaluates imports in source order) and seeds the env in time, so the
+// backend proceeds to the network call instead of throwing "API key required".
+import "./training-orchestrator.test-env";
+
 import { FineTuningOrchestrator } from "./training-orchestrator";
 
 function writeDatasetFile(content: string): string {
@@ -153,6 +161,11 @@ describe("FineTuningOrchestrator", () => {
   });
 
   describe("error backends", () => {
+    beforeEach(() => {
+      // Ensure the backend proceeds past its API-key guard to the network call.
+      process.env["AI_SERVICE_API_KEY"] = "test-key";
+    });
+
     test("huggingface backend throws when microservice unreachable", async () => {
       const orch = new FineTuningOrchestrator();
       await expect(

@@ -75,6 +75,6 @@ and explicit affordances over hidden gestures.
 **Contrast-verify mandate:** because the system carries emphasis through value
 contrast alone (no hue, no accent), contrast is not a guaranteed property of the
 neutral ramp — it must be measured for each text/background pair. Body text
-needs ≥4.5:1 against its surface; large text (≥18px or bold ≥14px) needs ≥3:1;
+needs ≥4.5:1 against its surface; large text (≥24px or bold ≥18.5px) needs ≥3:1;
 placeholder text needs the same 4.5:1. The muted-gray default (`oklch(0.55)`) on
 a tinted near-white fails this silently — never ship a pair without checking.
