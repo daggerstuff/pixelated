@@ -142,8 +142,8 @@ export const AgentPerformanceHeatmap: React.FC<AgentPerformanceHeatmapProps> = (
                   when over limit. scaleX (transform) not width — no layout anim. */}
               <div className="relative h-1.5 w-full" style={{ background: 'var(--np-elevated)' }}>
                 {/* threshold ticks: 200ms (warn), 500ms (bad) */}
-                <div className="absolute top-0 bottom-0 w-px" style={{ left: '20%', background: 'var(--np-line-strong)' }} />
-                <div className="absolute top-0 bottom-0 w-px" style={{ left: '50%', background: 'var(--np-line-strong)' }} />
+                <div className="absolute top-0 bottom-0 z-10 w-px" style={{ left: '20%', background: 'var(--np-line-strong)' }} />
+                <div className="absolute top-0 bottom-0 z-10 w-px" style={{ left: '50%', background: 'var(--np-line-strong)' }} />
                 <div
                   className="h-full origin-left"
                   style={{
