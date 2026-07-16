@@ -416,6 +416,7 @@
     "eslint-plugin-react-hooks": "latest",
     "eslint-plugin-vitest-globals": "latest",
     "espree": "latest",
+    "fake-indexeddb": "^6.2.5",
     "glob": "^13.0.6",
     "globals": "latest",
     "globby": "latest",
