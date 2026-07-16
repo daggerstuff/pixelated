@@ -42,11 +42,20 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* Zero-radius + zero-shadow doctrine override — ResultCard.tsx wires
+     Tailwind rounded-xl + hover:shadow-xl; collapse them here so the
+     component-rendered card picks up zero radius and zero shadow
+     regardless of what utility classes live on the JSX. */
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 .result-card:hover {
   background: var(--np-elevated);
   border-color: var(--np-text);
+  /* Hover lift is tonal, not shadow-based — strip any Tailwind
+     hover:shadow-* utility applied inside the component. */
+  box-shadow: none !important;
 }
 
 .source-chip {
