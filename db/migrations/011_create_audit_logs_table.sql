@@ -5,6 +5,13 @@
 --
 -- Column set matches the middleware's INSERT exactly:
 --   (user_id, action, resource_type, resource_id, changes, ip_address, user_agent, status, created_at)
+--
+-- Privacy: `changes` is a JSON column (not free-form TEXT) so the audit sink
+-- never accepts arbitrary request body blobs. The application layer is
+-- responsible for storing only the *redacted allowlist* (action diff, resource
+-- identifiers, audit-relevant metadata) — clinical/PII fields from mutated
+-- request bodies must never reach this column. See src/lib/audit/redaction.ts
+-- for the canonical allowlist + redaction pipeline used by the middleware.
 
 CREATE TABLE IF NOT EXISTS audit_logs (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -12,7 +19,7 @@ CREATE TABLE IF NOT EXISTS audit_logs (
     action        VARCHAR(50)  NOT NULL,
     resource_type VARCHAR(50),
     resource_id   VARCHAR(255),
-    changes       TEXT,
+    changes       JSONB,
     ip_address    VARCHAR(45),
     user_agent    TEXT,
     status        VARCHAR(20)  NOT NULL DEFAULT 'success',
