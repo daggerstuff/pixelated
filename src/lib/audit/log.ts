@@ -54,6 +54,16 @@ export async function getUserAuditLogs(
 
 /**
  * Log an audit event (Integrated with AuditLogger)
+ *
+ * NOTE: This helper delegates to `AuditLogger.logEvent`, which queues
+ * persistence through `AuditPersistenceQueue`. The returned promise
+ * resolves *as soon as the event is queued*, not when persistence has
+ * succeeded or failed. Callers that require a durable write before
+ * reporting success (compliance material) should call `AuditLogger` and
+ * `AuditPersistenceQueue` directly and await the underlying `insertOne`.
+ * For best-effort audit (the common case), this fire-and-forget semantics
+ * is acceptable; the queue applies retries with exponential back-off and
+ * surfaces final failures as a "volatile fallback" log line.
  */
 export async function logAuditEvent(
   userId: string,
@@ -91,6 +101,39 @@ export async function createResourceAuditLog(
   metadata?: Record<string, unknown>,
 ): Promise<void> {
   return logAuditEvent(userId, action, resourceId, resourceType, metadata)
+}
+
+/**
+ * Log a governance compliance decision (allow/deny) as an audit event.
+ *
+ * This makes the data-governance -> audit trail integration real (previously
+ * it only existed as a pattern inside the audit-integration test mock). The
+ * decision is recorded with an explicit `GOVERNANCE_ALLOW` / `GOVERNANCE_DENY`
+ * event type so governance outcomes are distinguishable in the audit log.
+ */
+export async function logGovernanceDecision(
+  userId: string,
+  resourceId: string,
+  allowed: boolean,
+  options?: {
+    operation?: string
+    reasons?: string[]
+    resourceType?: string
+  },
+): Promise<void> {
+  await AuditLogger.getInstance().logEvent({
+    userId,
+    type: allowed ? AuditEventType.GOVERNANCE_ALLOW : AuditEventType.GOVERNANCE_DENY,
+    action: 'governance_validation',
+    severity: AuditSeverity.INFO,
+    resourceId,
+    resourceType: options?.resourceType ?? 'governance',
+    status: allowed ? 'success' : 'failure',
+    metadata: {
+      operation: options?.operation,
+      reasons: options?.reasons ?? [],
+    },
+  })
 }
 
 function toLegacyAuditEvent(
