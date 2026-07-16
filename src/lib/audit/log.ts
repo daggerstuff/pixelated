@@ -54,6 +54,16 @@ export async function getUserAuditLogs(
 
 /**
  * Log an audit event (Integrated with AuditLogger)
+ *
+ * NOTE: This helper delegates to `AuditLogger.logEvent`, which queues
+ * persistence through `AuditPersistenceQueue`. The returned promise
+ * resolves *as soon as the event is queued*, not when persistence has
+ * succeeded or failed. Callers that require a durable write before
+ * reporting success (compliance material) should call `AuditLogger` and
+ * `AuditPersistenceQueue` directly and await the underlying `insertOne`.
+ * For best-effort audit (the common case), this fire-and-forget semantics
+ * is acceptable; the queue applies retries with exponential back-off and
+ * surfaces final failures as a "volatile fallback" log line.
  */
 export async function logAuditEvent(
   userId: string,
