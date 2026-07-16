@@ -346,30 +346,26 @@ these areas must target the doctrine, not the surrounding drift.
 
 ### A. Competing theme files (no single source of truth)
 
-Five CSS files each define a partial palette and behave as peers, not layers:
+The five CSS files referenced below were retired in Phase 4 (see above).
+This appendix entry is kept as a historical record of why each existed and
+where the live equivalent now lives:
 
-- `uno.config.ts` — header reads "Combining: Brutalist + Minimalist Dark +
-  Corporate Sleek + Enterprise + Antfu Elegance". Fonts correct (Public Sans /
-  JetBrains Mono Variable / Fraunces Variable). But `:root` redefines
-  `--accent-primary: #10b981` (emerald) — banned.
-- `public/css/variables.css` — **true to doctrine**: `oklch(0.10 0 0)` bg,
-  `oklch(0.93 0 0)` text. This is the file to treat as canonical; the others
-  should collapse into it.
-- `public/css/borders.css` — `--border-accent: 1px solid rgba(16,185,129,0.3)`
-  (emerald), used by `.card:hover`. Defines `border-radius: var(--radius-lg)` on
-  `.card`.
-- `public/css/brutalist-minimal.css` — an explicit radius scale
-  (`sm 2px / md 4px / lg 8px`) used across ~20 rules. Doctrine is 0px
-  everywhere.
-- `public/css/button-fixes.css` — `border-radius: 8px !important`. Hard
-  override, bans contravene via `!important`.
-- `public/css/design-system.css` — `--card-radius`, `--button-radius` tokens
-  (value-set elsewhere; non-zero).
+- `uno.config.ts` — superseded by `src/styles/np-tokens.css` as the single
+  token source of truth. Any `:root` overrides remaining in `uno.config.ts`
+  are ignored at runtime because `np-tokens.css` is loaded last in
+  `main.css` (this PR).
+- `public/css/variables.css` — historical origin of the OKLCH ramp; the
+  canonical tokens have moved to `src/styles/np-tokens.css`. The file was
+  deleted in Phase 4.
+- `public/css/borders.css`, `brutalist-minimal.css`, `button-fixes.css`,
+  `design-system.css` — retired in Phase 4; effective radius scale is now
+  0px across `--radius-sm/md/lg` (alias block in `np-tokens.css`) and the
+  legacy emerald `--border-accent` no longer applies because the
+  consumers were also deleted.
 
-**Fix direction:** consolidate to one token file (`variables.css`-equivalent),
-delete the radius scale (set all radius tokens to `0`), remove `--border-accent`
-and every emerald literal. Replace `!important` radius overrides by deleting the
-rules.
+If a future temptation arises to re-introduce any of the retired files
+or their radius scale, restore the alias block semantics first: every
+radius maps to 0px and every accent maps to the muted NP token.
 
 ### B. Emerald accent surviving in ~30 components
 
