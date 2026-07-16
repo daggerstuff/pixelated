@@ -10,12 +10,12 @@ import { parsePagination, requireMemoryUser, toMemoryScope } from '../_shared'
 vi.mock('@/lib/services/product-memory-gateway', () => ({
   getProductMemoryGateway: vi.fn().mockReturnValue('mock-gateway'),
   ProductMemoryGatewayError: class ProductMemoryGatewayError extends Error {
-    status: number;
+    status: number
     constructor(message: string, status: number) {
-      super(message);
-      this.status = status;
+      super(message)
+      this.status = status
     }
-  }
+  },
 }))
 
 vi.mock('@/lib/auth', () => ({
@@ -332,7 +332,9 @@ describe('withAuthenticatedMemoryRoute', () => {
     const mockUser = { id: 'user-1' }
     vi.mocked(getCurrentUser).mockResolvedValueOnce(mockUser as any)
 
-    const mockResponse = new Response(JSON.stringify({ success: true }), { status: 200 })
+    const mockResponse = new Response(JSON.stringify({ success: true }), {
+      status: 200,
+    })
     const handler = vi.fn().mockResolvedValueOnce(mockResponse)
     const route = withAuthenticatedMemoryRoute('testAction', handler)
 
@@ -347,12 +349,50 @@ describe('withAuthenticatedMemoryRoute', () => {
 
 describe('getGateway', () => {
   it('calls getProductMemoryGateway and returns its result', async () => {
-    const { getGateway } = await import('../_shared');
-    const { getProductMemoryGateway } = await import('@/lib/services/product-memory-gateway');
+    const { getGateway } = await import('../_shared')
+    const { getProductMemoryGateway } =
+      await import('@/lib/services/product-memory-gateway')
 
-    const result = getGateway();
+    const result = getGateway()
 
-    expect(getProductMemoryGateway).toHaveBeenCalled();
-    expect(result).toBe('mock-gateway');
-  });
-});
+    expect(getProductMemoryGateway).toHaveBeenCalled()
+    expect(result).toBe('mock-gateway')
+  })
+})
+
+describe('handleMemoryApiError', () => {
+  it('handles ProductMemoryGatewayError with 404 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } =
+      await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Not found', 404)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(404)
+    const data = await response.json()
+    expect(data.error).toBe('Not Found')
+  })
+
+  it('handles standard Error', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+
+    const error = new Error('Some unexpected error')
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.error).toBe('Internal Server Error')
+  })
+
+  it('handles unknown error types', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+
+    const error = 'Just a string error'
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(500)
+    const data = await response.json()
+    expect(data.error).toBe('Internal Server Error')
+  })
+})

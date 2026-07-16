@@ -102,10 +102,7 @@ export const PUT: APIRoute = async ({ request }) => {
         preferences: unknown,
       ) => Promise<unknown>
     }
-    const result = await service.updatePreferences?.(
-      user.id,
-      preferences,
-    )
+    const result = await service.updatePreferences?.(user.id, preferences)
 
     return new Response(JSON.stringify(result), {
       status: 200,

@@ -1419,7 +1419,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
               metadata: {
                 taxiiVersion: data['spec_version'] as string,
                 objectType: o['type'],
-                labels: (o['labels']) ?? [],
+                labels: o['labels'] ?? [],
               },
             })
           }
@@ -1700,7 +1700,7 @@ class OTXFeedProcessor implements FeedProcessor {
                   pulseName: pulse['name'] as string,
                   pulseAuthor: pulse['author_name'] as string,
                   tlp: pulse['tlp'],
-                  tags: (pulse['tags']) ?? [],
+                  tags: pulse['tags'] ?? [],
                 },
               })
             }

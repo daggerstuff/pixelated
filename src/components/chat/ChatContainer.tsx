@@ -152,8 +152,7 @@ export function ChatContainer({
                 typeof msg === 'object' &&
                 msg !== null &&
                 'id' in msg &&
-                (typeof (msg).id === 'string' ||
-                  typeof (msg).id === 'number')
+                (typeof msg.id === 'string' || typeof msg.id === 'number')
 
               const key = hasId(message)
                 ? message.id

@@ -418,9 +418,7 @@ describe('Authentication Middleware', () => {
     })
 
     it('should reject request without user', async () => {
-      const result = await requireRole(mockRequest, [
-        'admin',
-      ])
+      const result = await requireRole(mockRequest, ['admin'])
 
       expect(result.success).toBe(false)
       expect(result.response?.status).toBe(401)

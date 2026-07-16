@@ -583,8 +583,7 @@ export class Auth0MFAService {
       throw new Error('Auth0 management client not initialized')
     }
 
-    const getGuardianEnrollments = auth0Management.users
-      .getGuardianEnrollments
+    const getGuardianEnrollments = auth0Management.users.getGuardianEnrollments
 
     return await getGuardianEnrollments({ id: userId })
   }

@@ -134,9 +134,7 @@ export function rateLimiter(
       response &&
       typeof (response as { json?: unknown }).json === 'function'
     ) {
-      ;(response).json(
-        tooManyRequestsPayload,
-      )
+      response.json(tooManyRequestsPayload)
     } else {
       res.json(tooManyRequestsPayload)
     }

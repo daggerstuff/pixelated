@@ -35,10 +35,7 @@ export async function registerPIIDetection(
 
     logger.info('PII detection service registered and initialized')
   } catch (error: unknown) {
-    logger.error(
-      'Failed to register PII detection service',
-      error,
-    )
+    logger.error('Failed to register PII detection service', error)
     throw error
   }
 }
@@ -129,10 +126,7 @@ export function registerPIIMiddleware(
 
     logger.info('PII detection middleware registered')
   } catch (error: unknown) {
-    logger.error(
-      'Failed to register PII detection middleware',
-      error,
-    )
+    logger.error('Failed to register PII detection middleware', error)
     throw error
   }
 }
@@ -154,10 +148,7 @@ export async function registerPIIDetectionSystem(
 
     logger.info('PII detection system registered and initialized')
   } catch (error: unknown) {
-    logger.error(
-      'Failed to register PII detection system',
-      error,
-    )
+    logger.error('Failed to register PII detection system', error)
     throw error
   }
 }

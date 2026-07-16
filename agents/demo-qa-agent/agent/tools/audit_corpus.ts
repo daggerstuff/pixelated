@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { WORD_RE, jaccard, tokenize } from './audit_text'
+import { WORD_RE, jaccard, tokenize } from '../lib/audit_text.js'
 
 /**
  * Hardened fragility audit for the demo corpus.

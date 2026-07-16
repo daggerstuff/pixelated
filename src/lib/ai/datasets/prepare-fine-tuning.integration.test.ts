@@ -16,9 +16,11 @@ const testRecord = {
 };
 
 describe("prepare-fine-tuning integration", () => {
-  const preparedDir = join(process.cwd(), "data", "prepared");
-  const sourceDir = join(process.cwd(), "ai", "data", "normalized");
-  const testOnlyOutDir = join(process.cwd(), "data", "test-prepared");
+  // Unique run-scoped directories so parallel vitest workers (and aborted
+  // prior runs) never collide on shared files or read a stale artifact.
+  const runId = `${process.pid}-${Date.now()}`;
+  const sourceDir = join(process.cwd(), "ai", "data", `normalized-${runId}`);
+  const testOnlyOutDir = join(process.cwd(), "data", `test-prepared-${runId}`);
   const testFilePath = join(sourceDir, "test_integration_normalized.jsonl");
 
   beforeAll(() => {
@@ -27,9 +29,8 @@ describe("prepare-fine-tuning integration", () => {
   });
 
   afterAll(() => {
-    try { rmSync(testFilePath, { force: true }); } catch {}
-    try { rmSync(join(preparedDir, "openai_dataset.jsonl"), { force: true }); } catch {}
-    try { rmSync(join(preparedDir, "huggingface_dataset.jsonl"), { force: true }); } catch {}
+    try { rmSync(sourceDir, { recursive: true, force: true }); } catch {}
+    try { rmSync(testOnlyOutDir, { recursive: true, force: true }); } catch {}
   });
 
   test("prepareForOpenAI produces valid OpenAI-format output", async () => {

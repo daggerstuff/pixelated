@@ -122,7 +122,7 @@ export function normalizeError(
     typeof error === 'string'
       ? error
       : error && typeof error === 'object' && 'message' in error
-        ? String((error).message)
+        ? String(error.message)
         : 'An unknown error occurred'
 
   return new AppError(message, {

@@ -464,7 +464,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         String(data['severity'] ?? data['confidence'] ?? 'medium'),
       )
       const confidence = this.extractConfidence(
-        (data['confidence'] ?? data['score'] ?? 50),
+        data['confidence'] ?? data['score'] ?? 50,
       )
 
       if (!iocValue) {
@@ -580,7 +580,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         tags: Array.isArray(data['labels']) ? (data['labels'] as string[]) : [],
         metadata: {
           stixType: data['type'] || 'unknown',
-          specVersion: (data['spec_version']) || '2.0',
+          specVersion: data['spec_version'] || '2.0',
           transformationDate: new Date(),
         },
       }

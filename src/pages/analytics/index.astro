@@ -5,10 +5,31 @@ import { PrivacyDashboard } from '@/components/analytics/PrivacyDashboard'
 import AnalyticsDashboard from '@/components/chat/AnalyticsDashboardReact'
 import { ConversionDashboard } from '@/components/analytics/ConversionDashboard'
 import { requirePageAuth } from '@/lib/auth/serverAuth'
+import { PolicyEngine } from '@/lib/governance/policy-engine'
 import type { AstroGlobal } from 'astro'
 
 // Protect this route - only authenticated users can access analytics
-await requirePageAuth(Astro as AstroGlobal)
+const authResponse = await requirePageAuth(Astro as AstroGlobal)
+if (authResponse) {
+  return authResponse
+}
+
+// Enforce Data Governance policies
+const policyEngine = new PolicyEngine()
+const evalResult = await policyEngine.evaluate({
+  action: 'view_analytics',
+  context: {
+    userId: Astro.locals.user?.id,
+    auditEnabled: true,
+    consentVerified: true,
+  },
+})
+
+if (!evalResult.allowed) {
+  return Astro.redirect(
+    `/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`,
+  )
+}
 
 // Default analytics configuration
 const defaultConfig = {

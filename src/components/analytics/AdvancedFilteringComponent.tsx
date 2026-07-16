@@ -209,11 +209,7 @@ export function AdvancedFilteringComponent({
               <Select
                 value={options.timeRange?.presetRange ?? 'custom'}
                 onValueChange={(value) =>
-                  handleChange(
-                    'timeRange',
-                    'presetRange',
-                    value,
-                  )
+                  handleChange('timeRange', 'presetRange', value)
                 }
                 placeholder="Select time range"
               >
@@ -662,11 +658,7 @@ export function AdvancedFilteringComponent({
               <Select
                 value={options.visualization?.groupBy ?? 'session'}
                 onValueChange={(value) =>
-                  handleChange(
-                    'visualization',
-                    'groupBy',
-                    value,
-                  )
+                  handleChange('visualization', 'groupBy', value)
                 }
                 placeholder="Select grouping"
               >

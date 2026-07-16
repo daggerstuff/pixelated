@@ -325,7 +325,7 @@ export class RealFHEService implements FHEService {
     }
 
     if (dataType === 'boolean') {
-      return (data[0] !== 0)
+      return data[0] !== 0
     }
 
     if (dataType === 'string') {
