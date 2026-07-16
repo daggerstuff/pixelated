@@ -32,6 +32,23 @@ const logger = createBuildSafeLogger('audit-logger')
  */
 const AUDIT_CHAIN_GENESIS = '0'.repeat(64)
 
+/**
+ * When the link to the chain cannot be computed (DB unavailable, schema
+ * mismatch, contention, etc.) we persist the audit row with a sentinel
+ * hash instead of dropping the event. The sentinel is intentionally a
+ * short, non-hex string distinguishable from every legal SHA-256 hex
+ * digest (legal hashes are 64 lowercase hex characters) so that
+ * `verifyAuditChain` can flag the row as a chain break rather than
+ * silently accept it as a chained event.
+ *
+ * MongoDB drops `undefined` field values at write time, which would
+ * cause the previously-fallback path to persist an unchained event
+ * whose `hash` field is missing entirely — making `verifyAuditChain`
+ * see neither a sentinel nor a chain link. The sentinel string
+ * sidesteps that by guaranteeing a value Mongo will store.
+ */
+export const AUDIT_CHAIN_BREAK = '__CHAIN_BREAK__'
+
 /** The immutable, meaningful subset of an event used for chain hashing. */
 export function chainPayload(event: AuditEvent): Record<string, unknown> {
   return {
@@ -81,12 +98,15 @@ export function verifyAuditChain(events: AuditEvent[]): AuditChainVerification {
   for (let i = 0; i < events.length; i += 1) {
     const event = events[i] as AuditEvent
 
-    if (!event.hash) {
+    if (!event.hash || event.hash === AUDIT_CHAIN_BREAK) {
       return {
         valid: false,
         brokenAtIndex: i,
         brokenAtId: event.id,
-        reason: 'missing hash',
+        reason:
+          event.hash === AUDIT_CHAIN_BREAK
+            ? 'chain break sentinel — link failed at persistence time'
+            : 'missing hash',
       }
     }
     if (event.previousHash !== previousHash) {
@@ -398,8 +418,8 @@ export class AuditLogger {
       return {
         event: {
           ...auditEvent,
-          hash: undefined,
-          previousHash: undefined,
+          hash: AUDIT_CHAIN_BREAK,
+          previousHash: AUDIT_CHAIN_BREAK,
         },
         seq: 0,
       }
