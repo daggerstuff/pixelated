@@ -1,5 +1,6 @@
 import { getLogger } from "../logging";
 import { SlackAlerter } from "./slack-alert";
+import { ComplianceValidator } from "./compliance-validator";
 import { UnifiedMonitor, type MonitorEvent } from "./unified-monitor";
 
 const logger = getLogger({ module: "governance-bridge" } as any);
@@ -34,6 +35,11 @@ export class GovernanceBridge {
   /** Expose the underlying monitor for inspection / test assertions. */
   getMonitor(): UnifiedMonitor {
     return this.monitor;
+  }
+
+  /** Create a ComplianceValidator wired to this bridge's monitor. */
+  createValidator(): ComplianceValidator {
+    return new ComplianceValidator(this.monitor);
   }
 
   /** Wire Slack alerts. Called once at app startup if SLACK_WEBHOOK_URL is set. */
@@ -115,7 +121,7 @@ export class GovernanceBridge {
       source: "governance",
       event: compliant ? "compliance_allow" : "compliance_failure",
       timestamp: new Date().toISOString(),
-      details: { operation, reasons, ...details },
+      details: { ...details, operation, reasons },
     });
   }
 }

@@ -100,6 +100,10 @@ describe("GovernanceBridge", () => {
   });
 
   describe("Slack alert wiring", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
     it("sends alert via Slack when threshold breached", async () => {
       const mockFetch = vi.fn().mockResolvedValue({ ok: true });
       vi.stubGlobal("fetch", mockFetch);
@@ -116,8 +120,6 @@ describe("GovernanceBridge", () => {
       expect(body.text).toContain("compliance_failure");
       expect(body.text).toContain("5");
       expect(body.text).toContain("governance");
-
-      vi.unstubAllGlobals();
     });
   });
 
