@@ -15,6 +15,24 @@ if (authResponse) {
   return authResponse
 }
 
+import { PolicyEngine } from '@/lib/governance/policy-engine'
+
+// Enforce Data Governance policies
+const policyEngine = new PolicyEngine()
+const evalResult = await policyEngine.evaluate({
+  action: 'view_settings',
+  context: {
+    auditEnabled: true,
+    consentVerified: true,
+  },
+})
+
+if (!evalResult.allowed) {
+  return Astro.redirect(
+    `/unauthorized?reason=${encodeURIComponent(evalResult.reason)}`,
+  )
+}
+
 // Get the current user
 // We're not using the user in this demo
 

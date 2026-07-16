@@ -147,11 +147,7 @@ export class DocumentVersioningService {
     fileId: string,
     version: number,
   ): Promise<DocumentVersion | null> {
-    return this.getFileVersionInternal(
-      drizzle(this.db),
-      fileId,
-      version,
-    )
+    return this.getFileVersionInternal(drizzle(this.db), fileId, version)
   }
 
   async getCurrentVersion(fileId: string): Promise<DocumentVersion | null> {

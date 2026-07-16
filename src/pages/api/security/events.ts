@@ -79,10 +79,7 @@ export const GET = async ({ request }) => {
       },
     )
   } catch (error: unknown) {
-    logger.error(
-      'Error fetching security events:',
-      error,
-    )
+    logger.error('Error fetching security events:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: {

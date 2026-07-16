@@ -40,7 +40,7 @@ describe('SessionList', () => {
     const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: (firstItem
+      items: firstItem
         ? [
             firstItem,
             {
@@ -49,7 +49,7 @@ describe('SessionList', () => {
               targetSources: ['Different Source'],
             },
           ]
-        : []),
+        : [],
       total: 2,
     }
 
@@ -68,7 +68,7 @@ describe('SessionList', () => {
     const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: (firstItem
+      items: firstItem
         ? [
             firstItem,
             {
@@ -77,7 +77,7 @@ describe('SessionList', () => {
               currentPhase: 'evaluation',
             },
           ]
-        : []),
+        : [],
       total: 2,
     }
 
