@@ -1,4 +1,11 @@
-import { useEffect, useState, lazy, Suspense, useCallback } from 'react'
+import {
+  useEffect,
+  useState,
+  lazy,
+  Suspense,
+  useCallback,
+  useMemo,
+} from 'react'
 
 import { clientScenarios } from '@/data/scenarios'
 import { useStore } from '@/lib/store'
@@ -31,6 +38,11 @@ import { loadSampleModels } from '@/lib/utils/load-sample-models'
 
 import { ChatContainer } from './ChatContainer'
 import { CognitiveModelSelector } from './CognitiveModelSelector'
+import {
+  SessionTimeline,
+  type SessionGoal,
+  type SessionProgressData,
+} from './SessionTimeline'
 import {
   IconChevronDown,
   IconMaximize,
@@ -112,12 +124,15 @@ function ProfessionalTherapistWorkspace() {
   const [usePatientSimulation, setUsePatientSimulation] = useState(false)
   // Add SupervisorFeedback state
   const [showSupervisorFeedback, setShowSupervisorFeedback] = useState(false)
+  const [showSessionProgress, setShowSessionProgress] = useState(false)
+  const [sessionGoals, setSessionGoals] = useState<SessionGoal[]>([])
 
   const {
     isLoading: isPatientModelLoading,
     error: patientModelError,
     currentModelId,
     currentModel,
+    styleConfig,
     selectModel,
     updateStyleConfig,
     generatePatientResponse,
@@ -129,6 +144,75 @@ function ProfessionalTherapistWorkspace() {
   const { detectEmotions } = useEmotionDetection()
   const { assessRisk } = useRiskAssessment()
   const storeState = useStore()
+
+  const sessionProgress = useMemo<SessionProgressData>(() => {
+    const therapistTurns = messages.filter((message) => message.role === 'user')
+    const totalTurns = Math.max(1, therapistTurns.length)
+    const defenseIntensity = Math.round(
+      Math.min(5, Math.max(1, styleConfig.defenseLevel / 2)),
+    )
+    const allianceScore = currentModel?.therapeuticProgress.rapportScore
+
+    return {
+      id: currentModel?.id ?? selectedScenario.id ?? 'current-session',
+      label: 'Current session',
+      events: therapistTurns.map((message, index) => ({
+        turn: index + 1,
+        type: 'intervention' as const,
+        label: 'Therapist intervention delivered',
+        detail: message.content,
+        allianceScore,
+      })),
+      beliefs: (currentModel?.coreBeliefs ?? []).map((belief) => ({
+        belief: belief.belief,
+        confidence: belief.strength,
+        turn: totalTurns,
+        interventionCorrelated: therapistTurns.length > 0,
+      })),
+      defenses: therapistTurns.map((_, index) => ({
+        mechanism: 'General guardedness',
+        intensity: defenseIntensity,
+        turn: index + 1,
+      })),
+      goals: sessionGoals,
+      allianceScore,
+      milestones: currentModel?.therapeuticProgress.insights.map(
+        (insight) => insight.insight,
+      ),
+    }
+  }, [
+    currentModel,
+    messages,
+    selectedScenario.id,
+    sessionGoals,
+    styleConfig.defenseLevel,
+  ])
+
+  const sessionProgressSessions = useMemo<SessionProgressData[]>(() => {
+    const priorSessions =
+      currentModel?.therapeuticProgress.sessionProgressLog.map((entry) => ({
+        id: `${currentModel.id}-session-${entry.sessionNumber}`,
+        label: `Session ${entry.sessionNumber}`,
+        events: entry.keyInsights.map((insight, index) => ({
+          turn: index + 1,
+          type: 'emotion-shift' as const,
+          label: insight,
+        })),
+        beliefs: [],
+        defenses: [
+          {
+            mechanism: 'General guardedness',
+            intensity: Math.min(5, Math.max(1, 3 + entry.resistanceShift)),
+            turn: Math.max(1, entry.keyInsights.length),
+          },
+        ],
+        goals: [],
+        allianceScore: currentModel.therapeuticProgress.rapportScore,
+        milestones: entry.keyInsights,
+      })) ?? []
+
+    return [...priorSessions, sessionProgress]
+  }, [currentModel, sessionProgress])
 
   // Initialize mental health chat if not already initialized
   useEffect(() => {
@@ -306,8 +390,7 @@ function ProfessionalTherapistWorkspace() {
 
   // Get the most recent message with mental health analysis
   const getLatestMentalHealthAnalysis = ():
-    | MentalHealthChatAnalysis
-    | undefined => {
+    MentalHealthChatAnalysis | undefined => {
     const messagesWithAnalysis = messages.filter((m) => m.mentalHealthAnalysis)
     if (messagesWithAnalysis.length === 0) {
       return undefined
@@ -464,6 +547,18 @@ function ProfessionalTherapistWorkspace() {
             )}
           >
             Supervisor Feedback
+          </button>
+          <button
+            onClick={() => setShowSessionProgress(!showSessionProgress)}
+            className={cn(
+              'rounded-lg px-3 py-1.5 text-sm',
+              showSessionProgress
+                ? 'bg-green-800/70 text-green-200'
+                : 'bg-green-900/30 text-green-400',
+            )}
+            aria-expanded={showSessionProgress}
+          >
+            Session Progress
           </button>
           <button
             onClick={() => setIsExpanded(!isExpanded)}
@@ -652,10 +747,7 @@ function ProfessionalTherapistWorkspace() {
                     getLatestMentalHealthAnalysis()?.category === 'critical'
                       ? 'high'
                       : ((getLatestMentalHealthAnalysis()?.category as
-                          | 'low'
-                          | 'medium'
-                          | 'high'
-                          | undefined) ?? 'low'),
+                          'low' | 'medium' | 'high' | undefined) ?? 'low'),
                   summary: 'Analysis summary not available',
                   scores: {},
                 }}
@@ -698,6 +790,16 @@ function ProfessionalTherapistWorkspace() {
               scenario={selectedScenario.name}
             />
           </Suspense>
+        </div>
+      )}
+
+      {showSessionProgress && (
+        <div className="mt-4 border border-white/10 bg-[#0a0a0a] p-4">
+          <SessionTimeline
+            sessions={sessionProgressSessions}
+            activeSessionId={sessionProgress.id}
+            onGoalsChange={(_sessionId, goals) => setSessionGoals(goals)}
+          />
         </div>
       )}
 
