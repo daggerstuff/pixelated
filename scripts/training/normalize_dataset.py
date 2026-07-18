@@ -22,7 +22,7 @@ with open(INPUT_FILE) as f:
             continue
         try:
             data = json.loads(line)
-        except:
+        except Exception:
             continue
 
         # We only care about rows with conversational arrays

@@ -6,7 +6,18 @@
  */
 // Implements API integration with a Presidio Python service for PHI detection.
 // In production, configure PRESIDIO_API_URL to point to the Python service.
-const PRESIDIO_URL = process.env.PRESIDIO_API_URL || 'http://127.0.0.1:5001'
+const PRESIDIO_URL = process.env.PRESIDIO_API_URL
+if (!PRESIDIO_URL) {
+  throw new Error(
+    'PRESIDIO_API_URL environment variable is required. ' +
+    'Set it to your Presidio service URL (e.g., https://presidio.example.com).',
+  )
+}
+if (!PRESIDIO_URL.startsWith('https://')) {
+  throw new Error(
+    'PRESIDIO_API_URL must use HTTPS to ensure HIPAA-compliant encrypted transmission of PHI data.',
+  )
+}
 
 class Analyzer {
   async loadDefaultPiiRecognizer(): Promise<void> {

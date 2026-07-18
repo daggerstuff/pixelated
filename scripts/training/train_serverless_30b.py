@@ -67,11 +67,6 @@ async def rollout(model: art.Model, messages: list) -> art.Trajectory:
         metrics={"response_len": 0, "expected_len": 0, "length_ratio": 0.0},
     )
 
-    # Add user prompt (last message before assistant)
-    user_msg = context[-1] if context else {"role": "user", "content": "Hello"}
-    if user_msg.get("role") != "user":
-        user_msg = {"role": "user", "content": user_msg.get("content", "")}
-
     # Ensure trajectory ends with user message for generation
     trajectory.messages_and_choices = list(context)
 
