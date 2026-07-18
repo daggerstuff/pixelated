@@ -336,16 +336,6 @@ export function createLazyMcpClient<T extends { close(): Promise<void> }>(
 
   return {
     getClient: async () => lazyClient.get(),
-    close: async () => {
-      const client = await lazyClient.get().catch(() => null);
-      await lazyClient.unload();
-      if (client) {
-        try {
-          await client.close();
-        } catch {
-          /* ignore */
-        }
-      }
-    },
+    close: async () => lazyClient.close(),
   };
 }

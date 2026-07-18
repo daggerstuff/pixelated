@@ -22,9 +22,9 @@ if not WANDB_API_KEY:
     raise ValueError("WANDB_API_KEY is required for serverless training.")
 
 # Configuration
-PROJECT = "wayfarer-ab-test"  # Keeping project name as is, unless you want this changed too!
-MODEL_NAME = "qwen3-14b-serverless-rl"
-BASE_MODEL = "OpenPipe/Qwen3-14B-Instruct"
+PROJECT = "wayfarer-ab-test"
+MODEL_NAME = "qwen3-30b-serverless-rl"
+BASE_MODEL = "OpenPipe/Qwen3-30B-A3B-Instruct-2507"
 DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
 
 # RL Hyperparameters
@@ -143,15 +143,16 @@ async def main():
     )
 
     backend = ServerlessBackend(api_key=WANDB_API_KEY)
-
-    logging.info("Forking from SFT checkpoint...")
-    await backend._experimental_fork_checkpoint(
-        model,
-        from_model="wayfarer-2-12b-serverless-sft",
-        verbose=True,
-    )
-
     await model.register(backend)
+
+    from art.utils.sft import train_sft_from_file
+
+    logging.info("Starting SFT Warmup...")
+    await train_sft_from_file(
+        model=model,
+        file_path=DATASET_PATH,
+        epochs=1,
+    )
 
     start_step = await model.get_step()
     logging.info(f"Starting RL from step {start_step}")

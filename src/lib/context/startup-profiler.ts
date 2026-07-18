@@ -26,13 +26,48 @@ export async function profileAgentStartup(
   const profiler = new StartupProfiler();
 
   for (const [label, loader] of Object.entries(components)) {
-    await profiler.profileAsync(label, async () => {
-      const result = await loader();
-      return result;
-    });
+    try {
+      await profiler.profileAsync(label, async () => {
+        const result = await loader();
+        return result;
+      });
+    } catch (err) {
+      console.error(`[${agentName}] startup component "${label}" failed:`, err);
+    }
   }
 
   const report = profiler.report();
   console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2));
   return report;
+}
+
+/**
+ * Options for profiling an agent's startup context from static connection
+ * descriptions. This is the legacy shape used by agent entry points.
+ */
+export interface ProfileAndLogAgentStartupOptions {
+  agentName: string;
+  agentDir: string;
+  connectionDescriptions: Record<string, string>;
+}
+
+/**
+ * Profile and log an agent's startup context from its connection descriptions.
+ *
+ * This is a convenience wrapper around {@link StartupProfiler} for the common
+ * case where the agent only needs to estimate the token footprint of its MCP
+ * connection descriptions at startup.
+ */
+export function profileAndLogAgentStartup(
+  options: ProfileAndLogAgentStartupOptions,
+): void {
+  const { agentName, connectionDescriptions } = options;
+  const profiler = new StartupProfiler();
+
+  for (const [label, description] of Object.entries(connectionDescriptions)) {
+    profiler.profileText(label, description);
+  }
+
+  const report = profiler.report();
+  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2));
 }

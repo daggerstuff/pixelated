@@ -1,27 +1,24 @@
-import { dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { defineAgent } from 'eve'
-import { z } from 'zod'
-import { profileAndLogAgentStartup } from '@/lib/context/agent-profiler.js'
+import { defineAgent } from "eve";
+import { z } from "zod";
+import { profileAndLogAgentStartup } from "@/lib/context/startup-profiler.js";
 
-import {
-  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
-  agentModel,
-} from './lib/workers-ai.js'
+import { AGENT_MODEL_CONTEXT_WINDOW_TOKENS, agentModel } from "./lib/workers-ai.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+// Lazy MCP client for direct programmatic access
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 profileAndLogAgentStartup({
-  agentName: 'session-agent',
+  agentName: "session-agent",
   agentDir: __dirname,
   connectionDescriptions: {
-    foresight:
-      'Foresight memory:MCP for conversation-rehearsal session context.',
-    'memory-mcp':
-      'Pixelated session memory:MCP backed by MongoDB. Owns session records.',
+    foresight: "Foresight memory:MCP for conversation-rehearsal session context.",
+    "memory-mcp": "Pixelated session memory:MCP backed by MongoDB. Owns session records.",
   },
-})
+});
 
 export default defineAgent({
   model: agentModel,
@@ -34,20 +31,13 @@ export default defineAgent({
   },
   outputSchema: z.object({
     session_id: z.string().uuid().optional(),
-    state: z.enum([
-      'NEW',
-      'RECOVERING',
-      'ACTIVE',
-      'AWAITING_SUPERVISOR',
-      'CLOSING',
-      'CLOSED',
-    ]),
+    state: z.enum(["NEW", "RECOVERING", "ACTIVE", "AWAITING_SUPERVISOR", "CLOSING", "CLOSED"]),
     reply: z
       .string()
       .max(2000)
       .describe(
-        'The single in-character reply the supervisor-approved participant ' +
-          'produces for this turn. Never narration, never out-of-character.',
+        "The single in-character reply the supervisor-approved participant " +
+          "produces for this turn. Never narration, never out-of-character.",
       ),
     emotion: z
       .object({
@@ -55,12 +45,7 @@ export default defineAgent({
         intensity: z.number().min(0).max(1),
         valence: z.number().min(-1).max(1),
         risk_flags: z.array(
-          z.enum([
-            'crisis_ideation',
-            'harm_to_others',
-            'medical_emergency',
-            'distress',
-          ]),
+          z.enum(["crisis_ideation", "harm_to_others", "medical_emergency", "distress"]),
         ),
         confidence: z.number().min(0).max(1),
       })
@@ -77,8 +62,8 @@ export default defineAgent({
       .max(10)
       .optional()
       .describe(
-        'Optional non-PII notes the agent wants Foresight to retain for ' +
-          'longitudinal tracking across sessions.',
+        "Optional non-PII notes the agent wants Foresight to retain for " +
+          "longitudinal tracking across sessions.",
       ),
   }),
-})
+});

@@ -1,7 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 
-import { createLazyResource } from "@/lib/context/optimization.js";
+import { createLazyMcpClient } from "@/lib/context/optimization.js";
 
 const FORESIGHT_URL = process.env.FORESIGHT_URL ?? "http://127.0.0.1:8764/sse";
 
@@ -12,16 +12,12 @@ const FORESIGHT_URL = process.env.FORESIGHT_URL ?? "http://127.0.0.1:8764/sse";
  * agent's startup context small and avoiding an idle SSE connection when the
  * agent is not actively using Foresight.
  */
-const lazyClient = createLazyResource<Client>(async () => {
+export const { getClient, close } = createLazyMcpClient<Client>(async () => {
   const transport = new SSEClientTransport(new URL(FORESIGHT_URL));
   const client = new Client({ name: "advisor-agent", version: "1.0.0" }, { capabilities: {} });
   await client.connect(transport);
   return client;
 });
-
-export async function getClient(): Promise<Client> {
-  return lazyClient.get();
-}
 
 type ToolResultContent = Array<{ text?: string }>;
 
@@ -128,6 +124,3 @@ export async function getSystemStatus(): Promise<Record<string, unknown> | null>
   }
 }
 
-export async function close(): Promise<void> {
-  await lazyClient.close();
-}
