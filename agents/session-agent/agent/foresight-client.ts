@@ -1,29 +1,31 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
 
+import { createLazyResource } from '@/lib/context/optimization.js'
+
 import { registerProcessShutdown } from './lib/process-shutdown.js'
 
 const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'
 
-let client: Client | null = null
-let connecting: Promise<Client> | null = null
+/**
+ * Lazy-loaded Foresight MCP client.
+ *
+ * The client is not created until the first tool call, keeping the session
+ * agent's startup context small and avoiding an idle SSE connection when the
+ * agent is not actively using Foresight.
+ */
+const lazyClient = createLazyResource<Client>(async () => {
+  const transport = new SSEClientTransport(new URL(FORESIGHT_URL))
+  const client = new Client(
+    { name: 'session-agent', version: '1.0.0' },
+    { capabilities: {} },
+  )
+  await client.connect(transport)
+  return client
+})
 
 async function getClient(): Promise<Client> {
-  if (client) return client
-  if (connecting) return connecting
-
-  connecting = (async () => {
-    const transport = new SSEClientTransport(new URL(FORESIGHT_URL))
-    const c = new Client(
-      { name: 'session-agent', version: '1.0.0' },
-      { capabilities: {} },
-    )
-    await c.connect(transport)
-    client = c
-    return c
-  })()
-
-  return connecting
+  return lazyClient.get()
 }
 
 type ToolResultContent = Array<{ text?: string }>
@@ -135,14 +137,14 @@ export async function getSystemStatus(): Promise<Record<
 }
 
 export async function close(): Promise<void> {
+  const client = lazyClient.isLoaded() ? await lazyClient.get() : null
+  await lazyClient.unload()
   if (client) {
     try {
       await client.close()
     } catch {
       /* ignore */
     }
-    client = null
-    connecting = null
   }
 }
 
