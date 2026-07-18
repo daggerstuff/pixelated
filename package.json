@@ -264,7 +264,7 @@
     "ai": "latest",
     "archiver": "latest",
     "astro-icon": "latest",
-    "auth0": "^5.14.0",
+    "auth0": "^6.0.0",
     "axios": "^1.18.1",
     "bcryptjs": "latest",
     "better-sqlite3": "latest",
