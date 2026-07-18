@@ -9,7 +9,7 @@
  *   const report = await profileAgentStartup('pipeline-agent', { ... })
  */
 
-import { StartupProfiler, estimateTokens } from "./optimization.js";
+import { StartupProfiler } from "./optimization.js";
 
 /**
  * Profile an agent's startup sequence.
