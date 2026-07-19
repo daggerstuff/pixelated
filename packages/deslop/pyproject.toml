@@ -11,6 +11,7 @@ authors = [{name = "Pixelated Empathy"}]
 requires-python = ">=3.10"
 dependencies = [
     "rich>=13.0.0",
+    "typer>=0.12.0",
     "pyyaml>=6.0"
 ]
 keywords = ["ai", "dataset", "cleaning", "slop", "llm", "preprocessing"]
@@ -28,3 +29,8 @@ Homepage = "https://github.com/daggerstuff/pixelated"
 
 [project.scripts]
 deslop = "deslop.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
