@@ -1,50 +1,152 @@
-# 🧼 Deslop CLI
+```
+ ██████╗ ███████╗██████╗ ██████╗ ███████╗██████╗
+ ██╔══██╗██╔════╝██╔═══╝ ██╔══██╗██╔════╝██╔══██╗
+ ██║  ██║█████╗  ██║     ██████╔╝█████╗  ██████╔╝
+ ██║  ██║██╔══╝  ██║     ██╔═══╝ ██╔══╝  ██╔══██╗
+ ██████╔╝███████╗╚██████╗██║     ███████╗██║  ██║
+ ╚═════╝ ╚══════╝ ╚═════╝╚═╝     ╚══════╝╚═╝  ╚═╝
+                    clean your data.
+```
 
-**The ultimate AI Corpus Deslopping Engine.**
+[![PyPI version](https://img.shields.io/pypi/v/deslop-cli.svg)](https://pypi.org/project/deslop-cli/)
+[![Python versions](https://img.shields.io/pypi/pyversions/deslop-cli.svg)](https://pypi.org/project/deslop-cli/)
 
-Are you fine-tuning an LLM? Training a specialized model? Stop feeding your models generic,
-AI-generated slop. `deslop-cli` is a blazing fast, highly configurable toolkit that recursively
-scans and sanitizes your JSON/JSONL datasets, stripping out AI clichés, overly enthusiastic tones,
-and repetitive structural markers.
+**deslop** is a dataset hygiene CLI for teams fine-tuning, evaluating, or selling synthetic data. It detects
+AI-cliché contamination, produces audit reports, previews safe rewrites, and cleans JSON/JSONL records
+while preserving schema.
 
-Make your synthetic datasets sound *human* again.
+## Why it exists
 
-## 🚀 Features
+Synthetic corpora often contain repeated assistant phrases: "happy to help," "robust," "moving forward,"
+"as an AI language model," and other polish that makes downstream models sound generic. deslop gives data
+teams a measurable quality gate before training, evals, or delivery.
 
-* **Recursive JSON Traversal:** Doesn't matter if your dataset is a flat JSONL or deeply nested
-  conversational trees. If there's a string, `deslop` will find the slop.
-* **Deterministic Replacements:** Replaces slop phrases (e.g., "happy to help", "as discussed")
-  with human-sounding equivalents using a Zipf-weighted distribution, preserving natural variance.
-* **Ollama LLM Regen:** Need more than a regex replacement? Pass `--mode ollama` to completely rewrite the offending records dynamically using your local LLM.
-* **Beautiful Remediation Reports:** Scans your dataset and generates a gorgeous terminal report of your exact Slop Density Percentage.
-* **Extensible:** (Coming Soon) Bring your own `rules.yaml` to define custom jargon, slop pools, and company-specific markers.
+## Features
 
-## 📦 Installation
+- Field-aware JSON/JSONL scanning with record IDs, field paths, snippets, and pattern counts
+- Deterministic cleaning with weighted replacement pools and detect-only marker removal
+- Preview and diff commands before writing files
+- HTML, Markdown, and JSON quality reports
+- CI density gate via `--fail-on-density`
+- Bundled rule packs for generic AI, support, clinical, sales, devrel, academic, roleplay, therapy simulation, chatbot, and synthetic eval datasets
+- Custom `rules.yaml` without mutating global defaults
+- Ollama regeneration that defaults to flagged records only and validates top-level schema
+
+## Install
 
 ```bash
 pip install deslop-cli
 ```
 
-## 🛠️ Usage
+## Quick start
 
-### 1. Scan your dataset
-Get a detailed Slop Remediation Report without altering your files:
+Scan a dataset:
+
 ```bash
-deslop scan my_dataset.jsonl
+deslop scan data.jsonl
 ```
 
-### 2. Clean in-place (Fast Regex)
-Instantly swap cliches with natural human variance:
-```bash
-deslop clean my_dataset.jsonl --in-place
-```
-*(Alternatively, specify an output file: `deslop clean in.jsonl --output out.jsonl`)*
+Emit machine-readable JSON:
 
-### 3. Deep LLM Regeneration
-Target the worst offenders and completely rewrite them using a local model:
 ```bash
-deslop ollama my_dataset.jsonl --endpoint http://127.0.0.1:11434 --model llama3.2 --in-place
+deslop scan data.jsonl --json
 ```
 
----
-Built with ❤️ by Pixelated Empathy
+Create a shareable audit report:
+
+```bash
+deslop scan data.jsonl --report deslop-report.html
+```
+
+Preview changes without writing:
+
+```bash
+deslop preview data.jsonl --limit 20
+```
+
+Clean to a new file:
+
+```bash
+deslop clean data.jsonl --output clean.jsonl
+```
+
+Clean in place with a backup:
+
+```bash
+deslop clean data.jsonl --in-place --backup
+```
+
+Use rule packs and field filters:
+
+```bash
+deslop scan data.jsonl --packs generic-ai,clinical --fields messages.*.content,response
+```
+
+Fail CI when contamination is too high:
+
+```bash
+deslop scan data.jsonl --fail-on-density 5
+```
+
+Regenerate flagged records with Ollama:
+
+```bash
+deslop regen data.jsonl --output regen.jsonl --provider ollama --endpoint http://127.0.0.1:11434 --model llama3.2
+```
+
+## Rule packs
+
+List bundled packs:
+
+```bash
+deslop rules list
+```
+
+Inspect a pack:
+
+```bash
+deslop rules explain clinical
+```
+
+Use a custom rules file:
+
+```bash
+deslop scan data.jsonl --rules examples/rules.example.yaml
+```
+
+Custom file shape:
+
+```yaml
+markers:
+  - bespoke slop
+
+pools:
+  delighted to assist:
+    - ["I can help", 0.35]
+    - ["I'll take a look", 0.25]
+    - [null, 0.4]
+```
+
+## Development
+
+```bash
+cd packages/deslop
+uv sync --dev
+uv run pytest -q
+uv run python -m deslop.cli scan tests/fixtures/sample.jsonl
+```
+
+## Business surface
+
+deslop is designed to become more than a one-off regex cleaner:
+
+- quality reports for dataset vendors
+- CI gates for fine-tuning pipelines
+- domain-specific private rule packs
+- hosted dataset audit API
+- certification reports for synthetic data deliveries
+- eval hooks to measure whether cleanup improves downstream behavior
+
+## License
+
+MIT
