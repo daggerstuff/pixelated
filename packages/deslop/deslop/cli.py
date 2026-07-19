@@ -16,6 +16,21 @@ rules_app = typer.Typer(help="Inspect bundled rule packs.")
 app.add_typer(rules_app, name="rules")
 console = Console()
 
+BANNER = r"""
+ ██████╗ ███████╗██████╗ ██████╗ ███████╗██████╗
+ ██╔══██╗██╔════╝██╔═══╝ ██╔══██╗██╔════╝██╔══██╗
+ ██║  ██║█████╗  ██║     ██████╔╝█████╗  ██████╔╝
+ ██║  ██║██╔══╝  ██║     ██╔═══╝ ██╔══╝  ██╔══██╗
+ ██████╔╝███████╗╚██████╗██║     ███████╗██║  ██║
+ ╚═════╝ ╚══════╝ ╚═════╝╚═╝     ╚══════╝╚═╝  ╚═╝
+                   clean your data.
+"""
+
+
+def show_banner(json_output: bool) -> None:
+    if not json_output:
+        console.print(f"[dim]{BANNER}[/dim]\n")
+
 
 def parse_csv(value: str | None) -> tuple[str, ...]:
     if value is None or not value.strip():
@@ -56,6 +71,7 @@ def scan(
     sample: int | None = typer.Option(None, "--sample", help="Scan only the first N records."),
     fail_on_density: float | None = typer.Option(None, "--fail-on-density", help="Exit non-zero above this density."),
 ) -> None:
+    show_banner(json_output)
     active_rules = build_rules(rules, packs)
     scan_report = scan_file(input_file, ScanOptions(rules=active_rules, fields=parse_csv(fields), sample=sample))
     if report is not None:
@@ -79,6 +95,7 @@ def clean(
     fields: str | None = typer.Option(None, "--fields", help="Comma-separated field path filters."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
+    show_banner(json_output)
     if output is None and not in_place:
         raise typer.BadParameter("clean requires --output or --in-place")
     target = output or input_file.with_suffix(input_file.suffix + ".tmp")
@@ -106,6 +123,7 @@ def preview(
     fields: str | None = typer.Option(None, "--fields"),
     json_output: bool = typer.Option(False, "--json"),
 ) -> None:
+    show_banner(json_output)
     report = preview_file(input_file, CleanOptions(rules=build_rules(rules, packs), fields=parse_csv(fields)), limit)
     if json_output:
         console.print(dump_json(report.to_dict()))
@@ -134,6 +152,7 @@ def regen(
     packs: str | None = typer.Option(None, "--packs"),
     json_output: bool = typer.Option(False, "--json"),
 ) -> None:
+    show_banner(json_output)
     active_rules = build_rules(rules, packs)
     if provider == "ollama":
         report = regen_file_with_ollama(
@@ -162,6 +181,7 @@ def regen(
 
 @rules_app.command("list")
 def list_rules() -> None:
+    show_banner(False)
     table = Table(show_edge=False)
     table.add_column("pack", style="cyan")
     table.add_column("markers")
@@ -172,6 +192,7 @@ def list_rules() -> None:
 
 @rules_app.command("explain")
 def explain_rule_pack(name: str) -> None:
+    show_banner(False)
     markers = DEFAULT_RULE_PACKS.get(name)
     if markers is None:
         raise typer.BadParameter(f"unknown rule pack: {name}")
