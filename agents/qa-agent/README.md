@@ -12,11 +12,11 @@ digests. Sub-agent of the broader Eve workflow. Status: **Done** (PIX-3958).
 | Standing rules  | `agent/instructions.md`, `agent/instructions/{flagging-rules.md,report-format.md,scoring-criteria.md}`                                     |
 | Tools (6)       | `agent/tools/`: `detect_emotional_patterns`, `fetch_sessions`, `flag_training_gap`, `generate_report`, `score_session`, `summarize_cohort` |
 | Channels (3)    | `agent/channels/eve.ts`, `agent/channels/linear-chatops.ts`, `agent/channels/slack-supervisor-digest.ts`                                   |
-| Connections (1) | `agent/connections/foresight.ts` — `defineMcpClientConnection`, env-gated URL                                                              |
+| Connections (2) | `agent/connections/foresight.ts`, `agent/connections/workers-ai-mcp.ts` — `defineMcpClientConnection`, env-gated URLs                      |
 | Sub-agents (2)  | `agent/subagents/report-writer/`, `agent/subagents/scoring-engine/`                                                                        |
 | Hooks (1)       | `agent/hooks/qa_audit.ts`                                                                                                                  |
 | Schedules (1)   | `agent/schedules/daily-review.ts` — cron `30 23 * * *` (daily QA review digest)                                                            |
-| Lib             | `agent/lib/runtime-mode.ts`, `agent/lib/workers-ai.ts`, `agent/lib/workers-ai-mcp-client.ts` (lazy), `agent/foresight-client.ts`           |
+| Lib             | `agent/lib/runtime-mode.ts`, `agent/lib/workers-ai.ts`, `agent/foresight-client.ts`                                                        |
 | Evals           | `evals/evals.config.ts`, `evals/no-sessions.eval.ts`                                                                                       |
 | K8s             | `k8s/deployment.yaml`                                                                                                                      |
 | Tests           | `tests/` — 7 files (6 unit + 1 `qa-review-lifecycle.integration.test.ts`)                                                                  |

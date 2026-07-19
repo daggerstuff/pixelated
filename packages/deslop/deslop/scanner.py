@@ -1,100 +1,71 @@
-import json
+from dataclasses import dataclass
 from pathlib import Path
 
-from deslop.rules.core import DEFAULT_SLOP_MARKERS, DEFAULT_SLOP_POOLS, get_slop_regex
+from deslop.engine import field_is_selected
+from deslop.io import read_records, string_fields
+from deslop.models import Finding, ScanReport
+from deslop.rules.core import RuleSet, get_pattern_regex
 
 
-def scan_file(input_file: Path) -> dict:
+@dataclass(frozen=True, slots=True)
+class ScanOptions:
+    rules: RuleSet | None = None
+    fields: tuple[str, ...] = ()
+    sample: int | None = None
+    finding_limit: int = 200
+
+
+def make_snippet(text: str, start: int, end: int, radius: int = 42) -> str:
+    left = max(start - radius, 0)
+    right = min(end + radius, len(text))
+    prefix = "…" if left > 0 else ""
+    suffix = "…" if right < len(text) else ""
+    return f"{prefix}{text[left:right]}{suffix}"
+
+
+def scan_file(input_file: Path, options: ScanOptions | None = None) -> ScanReport:
+    active_options = options or ScanOptions()
+    rules = active_options.rules or RuleSet.default()
+    regex = get_pattern_regex(rules.all_patterns())
     processed = 0
     flagged_records = 0
-    pattern_counts = {}
+    pattern_counts: dict[str, int] = {}
+    fields_affected: dict[str, int] = {}
+    findings: list[Finding] = []
 
-    marker_regexes = {marker: get_slop_regex({marker: []}) for marker in DEFAULT_SLOP_POOLS.keys()}
-    for marker in DEFAULT_SLOP_MARKERS:
-        marker_regexes[marker] = get_slop_regex({marker: []})
-
-    import os
-
-    file_size = os.path.getsize(input_file)
-
-    try:
-        from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
-
-        has_rich = True
-    except ImportError:
-        has_rich = False
-
-    def _scan_logic():
-        nonlocal processed, flagged_records, pattern_counts
-
-        if has_rich:
-            with Progress(
-                SpinnerColumn(),
-                TextColumn("[progress.description]{task.description}"),
-                BarColumn(),
-                TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-                TimeElapsedColumn(),
-            ) as progress:
-                task = progress.add_task("[cyan]Scanning dataset...", total=file_size)
-
-                with open(input_file, encoding="utf-8") as fin:
-                    for line in fin:
-                        progress.advance(task, len(line.encode("utf-8")))
-                        _process_line(line)
-        else:
-            with open(input_file, encoding="utf-8") as fin:
-                for line in fin:
-                    _process_line(line)
-
-    def _process_line(line):
-        nonlocal processed, flagged_records, pattern_counts
-        if not line.strip():
-            return
-        try:
-            record = json.loads(line)
-        except json.JSONDecodeError:
-            return
-
+    for record in read_records(input_file):
+        if active_options.sample is not None and processed >= active_options.sample:
+            break
         processed += 1
         record_flagged = False
-
-        def traverse_and_scan(data):
-            nonlocal record_flagged
-            if isinstance(data, dict):
-                for k, v in data.items():
-                    if isinstance(v, str):
-                        for marker, regex in marker_regexes.items():
-                            if regex.search(v):
-                                pattern_counts[marker] = pattern_counts.get(marker, 0) + 1
-                                record_flagged = True
-                    else:
-                        traverse_and_scan(v)
-            elif isinstance(data, list):
-                for v in data:
-                    if isinstance(v, str):
-                        for marker, regex in marker_regexes.items():
-                            if regex.search(v):
-                                pattern_counts[marker] = pattern_counts.get(marker, 0) + 1
-                                record_flagged = True
-                    else:
-                        traverse_and_scan(v)
-
-        traverse_and_scan(record)
+        for field_path, text in string_fields(record.value):
+            if not field_is_selected(field_path, active_options.fields):
+                continue
+            for match in regex.finditer(text):
+                pattern = match.group(0).lower()
+                pattern_counts[pattern] = pattern_counts.get(pattern, 0) + 1
+                fields_affected[field_path] = fields_affected.get(field_path, 0) + 1
+                record_flagged = True
+                if len(findings) < active_options.finding_limit:
+                    findings.append(
+                        Finding(
+                            record_index=record.index,
+                            record_id=record.record_id,
+                            field_path=field_path,
+                            pattern=pattern,
+                            snippet=make_snippet(text, match.start(), match.end()),
+                        )
+                    )
         if record_flagged:
             flagged_records += 1
 
-    _scan_logic()
-
-    sorted_patterns = dict(sorted(pattern_counts.items(), key=lambda item: item[1], reverse=True))
-
-    density = 0
-    if processed > 0:
-        density = round((flagged_records / processed) * 100, 2)
-
-    return {
-        "file": str(input_file),
-        "records_scanned": processed,
-        "records_flagged": flagged_records,
-        "slop_density_pct": density,
-        "top_slop_patterns": sorted_patterns,
-    }
+    density = round((flagged_records / processed) * 100, 2) if processed > 0 else 0
+    return ScanReport(
+        file=str(input_file),
+        records_scanned=processed,
+        records_flagged=flagged_records,
+        slop_density_pct=density,
+        top_slop_patterns=dict(sorted(pattern_counts.items(), key=lambda item: item[1], reverse=True)),
+        fields_affected=dict(sorted(fields_affected.items(), key=lambda item: item[1], reverse=True)),
+        findings=findings,
+    )
