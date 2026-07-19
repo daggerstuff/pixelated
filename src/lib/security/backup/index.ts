@@ -976,9 +976,6 @@ export class BackupSecurityManager {
    */
   private async restoreData(data: Uint8Array): Promise<void> {
     try {
-      // Convert data to string
-      const dataStr = new TextDecoder().decode(data);
-
       // [PIX-43] Data restoration is not implemented — processRestoredData is a
       // stub. Throw so restoreBackup surfaces an explicit failure rather than
       // returning true while nothing was actually restored.

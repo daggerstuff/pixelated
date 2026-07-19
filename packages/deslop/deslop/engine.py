@@ -25,7 +25,7 @@ def normalize_spacing(text: str) -> str:
     text = re.sub(r"\s+([,.;:!?])", r"\1", text)
     text = re.sub(r"([—-])\s*([,.;:!?])", r"\1", text)
     text = re.sub(r"\s{2,}", " ", text)
-    return text.strip(" ,")
+    return text.strip()
 
 
 def remove_slop(text: str, item_id: str = "generic_id", rules: RuleSet | None = None) -> str:
