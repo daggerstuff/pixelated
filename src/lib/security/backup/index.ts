@@ -193,6 +193,7 @@ export interface BackupConfig {
   monitoringConfig: BackupMonitoringConfig
   recoveryTesting: RecoveryTestConfig
   encryptionKey?: string // Hex-encoded encryption key
+  onRestore?: (data: unknown) => Promise<void> // Callback to handle restored data
 }
 
 interface EncryptedBackupData {
@@ -1096,13 +1097,19 @@ export class BackupSecurityManager {
    * @param data The restored data object
    */
   private async processRestoredData(data: unknown): Promise<void> {
-    // This is where you would implement the actual data restoration logic
-    // The implementation would be specific to your application's needs
-    // [PIX-43] TODO: What did I just fucking say?
     logger.info('Processing restored data')
 
-    // For now, just log that we received the data
-    logger.debug('Restored data', { data })
+    if (this.config.onRestore) {
+      try {
+        await this.config.onRestore(data)
+        logger.info('Data restoration completed successfully')
+      } catch (error) {
+        logger.error('Error during data restoration callback', { error })
+        throw error
+      }
+    } else {
+      logger.warn('No onRestore handler configured for BackupSecurityManager', { data })
+    }
   }
 }
 

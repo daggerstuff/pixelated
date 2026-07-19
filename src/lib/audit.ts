@@ -598,17 +598,6 @@ export async function createResourceAuditLog(
   details?: AuditDetails,
   status: AuditEventStatus = AuditEventStatus.SUCCESS,
 ): Promise<AuditLogEntry> {
-  logger.warn(
-    'createResourceAuditLog is a placeholder and needs full implementation.',
-    {
-      eventType,
-      userId,
-      resource,
-      details,
-      status,
-    },
-  )
-
   return createHIPAACompliantAuditLog({
     userId,
     action: `${eventType}:${resource.type}`,
@@ -621,7 +610,7 @@ export async function createResourceAuditLog(
       resourceType: resource.type,
       resourceId: resource.id,
     },
-    notes: 'Log created from createResourceAuditLog placeholder function.',
+    notes: 'Generated via createResourceAuditLog',
   })
 }
 

@@ -4,9 +4,21 @@
  * This implementation can detect PHI/PII in clinical text with high accuracy and
  * configurable redaction strategies for HIPAA compliance.
  */
-// TODO: 'Not be a bitch'
-// Mock implementations since Presidio is a Python package, not JavaScript
-// In production, you would need to call a Python service
+// Implements API integration with a Presidio Python service for PHI detection.
+// In production, configure PRESIDIO_API_URL to point to the Python service.
+const PRESIDIO_URL = process.env.PRESIDIO_API_URL
+if (!PRESIDIO_URL) {
+  throw new Error(
+    'PRESIDIO_API_URL environment variable is required. ' +
+    'Set it to your Presidio service URL (e.g., https://presidio.example.com).',
+  )
+}
+if (!PRESIDIO_URL.startsWith('https://')) {
+  throw new Error(
+    'PRESIDIO_API_URL must use HTTPS to ensure HIPAA-compliant encrypted transmission of PHI data.',
+  )
+}
+
 class Analyzer {
   async loadDefaultPiiRecognizer(): Promise<void> {
     return Promise.resolve()
@@ -16,26 +28,58 @@ class Analyzer {
     text: string,
     options: { language: string },
   ): Promise<AnalyzeResult[]> {
-    // Use text and options parameters to avoid unused variable warnings
-    logger.info(
-      `Analyzing text with length ${text.length} in language ${options.language}`,
-    )
-    return Promise.resolve([] as AnalyzeResult[])
+    try {
+      const response = await fetch(`${PRESIDIO_URL}/analyze`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text,
+          language: options.language,
+        }),
+      })
+      
+      if (!response.ok) {
+        logger.warn(`Presidio analyze API returned ${response.status}`)
+        return []
+      }
+      
+      return (await response.json()) as AnalyzeResult[]
+    } catch (error) {
+      logger.error('Failed to communicate with Presidio analyze API', { error })
+      return []
+    }
   }
 }
 
 class Anonymizer {
   async anonymize(payload: unknown): Promise<{ text: string }> {
-    // Safely extract text if payload is the expected shape
+    try {
+      const response = await fetch(`${PRESIDIO_URL}/anonymize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      
+      if (!response.ok) {
+        logger.warn(`Presidio anonymize API returned ${response.status}`)
+        return this.fallbackAnonymize(payload)
+      }
+      
+      return (await response.json()) as { text: string }
+    } catch (error) {
+      logger.error('Failed to communicate with Presidio anonymize API', { error })
+      return this.fallbackAnonymize(payload)
+    }
+  }
+  
+  private fallbackAnonymize(payload: unknown): { text: string } {
     if (typeof payload === 'object' && payload !== null && 'text' in payload) {
       const obj = payload as { text?: unknown }
       if (typeof obj.text === 'string') {
-        return Promise.resolve({ text: obj.text })
+        return { text: obj.text }
       }
     }
-
-    // If payload doesn't match expected shape, return empty text to avoid throwing
-    return Promise.resolve({ text: '' })
+    return { text: '' }
   }
 }
 

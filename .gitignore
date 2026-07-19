@@ -21,6 +21,8 @@
 .oxlintignore/
 .superpowers/
 .ralph-tui
+.factory/
+.art/
 hackathon/
 skills/
 
@@ -316,7 +318,6 @@ gha-creds-*.json
 
 # === COPILOT CLI ===
 .copilot/
-.factory/
 .github/copilot/settings.local.json
 .github/mcp.json
 .moderne/

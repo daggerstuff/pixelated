@@ -6,20 +6,20 @@ every stage transition. Status: **Done** (PIX-3959).
 
 ## What's here (Eve filesystem-first layout)
 
-| Slot            | Path                                                                                                                                                                                                 |
-| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime config  | `agent/agent.ts` (`defineAgent` + Zod `outputSchema`)                                                                                                                                                |
-| Standing rules  | `agent/instructions.md`, `agent/instructions/{state-machine.md,promotion-policy.md}`                                                                                                                 |
-| Tools (7)       | `agent/tools/`: `check_pipeline_health`, `curate_dataset`, `promote_to_production`, `promote_to_staging`, `rollback_model`, `run_evaluation` (gated via `always()`), `run_training`                  |
-| Channels (4)    | `agent/channels/eve.ts`, `agent/channels/slack.ts`, `agent/channels/slack-events.ts`, `agent/channels/linear.ts`                                                                                     |
-| Connections (4) | `agent/connections/foresight.ts`, `agent/connections/k8s-mcp.ts`, `agent/connections/training-infra-mcp.ts`, `agent/connections/workers-ai-mcp.ts` — all `defineMcpClientConnection`, env-gated URLs |
-| Sub-agents (1)  | `agent/subagents/evaluator/`                                                                                                                                                                         |
-| Hooks (1)       | `agent/hooks/pipeline_audit.ts`                                                                                                                                                                      |
-| Schedules (1)   | `agent/schedules/weekly-train.ts` — cron `0 9 * * 1` (Monday 09:00 UTC: infra health check + curation)                                                                                               |
-| Lib             | `agent/lib/runtime-mode.ts`, `agent/lib/workers-ai.ts`, `agent/foresight-client.ts`                                                                                                                  |
-| Evals           | `evals/evals.config.ts`, `evals/health-check.eval.ts`                                                                                                                                                |
-| K8s             | `k8s/deployment.yaml`                                                                                                                                                                                |
-| Tests           | `tests/` — **7 files / 13 tests** (unit per tool + `pipeline-lifecycle.integration.test.ts`) — added this cycle                                                                                      |
+| Slot            | Path                                                                                                                                                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime config  | `agent/agent.ts` (`defineAgent` + Zod `outputSchema`)                                                                                                                                                                   |
+| Standing rules  | `agent/instructions.md`, `agent/instructions/{state-machine.md,promotion-policy.md}`                                                                                                                                    |
+| Tools (7)       | `agent/tools/`: `check_pipeline_health`, `curate_dataset`, `promote_to_production`, `promote_to_staging`, `rollback_model`, `run_evaluation` (gated via `always()`), `run_training`                                     |
+| Channels (4)    | `agent/channels/eve.ts`, `agent/channels/slack.ts`, `agent/channels/slack-events.ts`, `agent/channels/linear.ts`                                                                                                        |
+| Connections (1) | `agent/connections/foresight.ts` — `defineMcpClientConnection`, env-gated URL                                                                                                                                           |
+| Sub-agents (1)  | `agent/subagents/evaluator/`                                                                                                                                                                                            |
+| Hooks (1)       | `agent/hooks/pipeline_audit.ts`                                                                                                                                                                                         |
+| Schedules (1)   | `agent/schedules/weekly-train.ts` — cron `0 9 * * 1` (Monday 09:00 UTC: infra health check + curation)                                                                                                                  |
+| Lib             | `agent/lib/runtime-mode.ts`, `agent/lib/workers-ai.ts`, `agent/lib/k8s-mcp-client.ts` (lazy), `agent/lib/training-infra-mcp-client.ts` (lazy), `agent/lib/workers-ai-mcp-client.ts` (lazy), `agent/foresight-client.ts` |
+| Evals           | `evals/evals.config.ts`, `evals/health-check.eval.ts`                                                                                                                                                                   |
+| K8s             | `k8s/deployment.yaml`                                                                                                                                                                                                   |
+| Tests           | `tests/` — **7 files / 13 tests** (unit per tool + `pipeline-lifecycle.integration.test.ts`) — added this cycle                                                                                                         |
 
 ## Foresight wiring (live)
 
