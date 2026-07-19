@@ -48,7 +48,6 @@ COPY config/package/.npmrc ./.npmrc
 COPY packages/pixelated-sdk/package.json ./packages/pixelated-sdk/package.json
 COPY packages/memory-schema/package.json ./packages/memory-schema/package.json
 COPY business-strategy-cms/package.json ./business-strategy-cms/package.json
-COPY package/package.json ./package/package.json
 
 # Install all dependencies (dev + prod) required for build
 # Retry with --no-frozen-lockfile if --frozen-lockfile fails (lockfile drift in CI)

@@ -1,7 +1,6 @@
 packages:
   - 'packages/*'
   - 'business-strategy-cms'
-  - 'package'
   - 'tests/integration'
   - 'foresight/cli'
   # Committed lockfile is the trusted source of truth;

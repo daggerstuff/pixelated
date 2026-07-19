@@ -1,0 +1,25 @@
+{
+  "dataset": "customer-support",
+  "entries": [
+    {
+      "text": "As per our discussion, your order has been shipped.",
+      "category": "shipping"
+    },
+    {
+      "text": "Thank you for reaching out. I'm here to help.",
+      "category": "greeting"
+    },
+    {
+      "text": "The API returns a 200 status code on success.",
+      "category": "technical"
+    },
+    {
+      "text": "I understand your frustration. Let me look into this.",
+      "category": "empathy"
+    },
+    {
+      "text": "Configure the environment variables in .env.local.",
+      "category": "technical"
+    }
+  ]
+}

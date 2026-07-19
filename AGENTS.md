@@ -67,15 +67,16 @@ REDIS_URL=redis://localhost:6379/0 UPSTASH_REDIS_REST_URL=redis://localhost:6379
 
 Follow conventions documented in:
 
-- `.factory/rules/typescript.md` - TypeScript and React patterns
-- `.factory/rules/astro.md` - Astro 6 component, routing, and SSR rules
-- `.factory/rules/python.md` - Python/uv toolchain and ruff/pyright conventions
-- `.factory/rules/testing.md` - Vitest, Playwright, and pytest patterns
-- `.factory/rules/security.md` - HIPAA, secrets, auth/gating, threat modeling
+- `.agents/rules/typescript.md` - TypeScript and React patterns
+- `.agents/rules/astro.md` - Astro 6 component, routing, and SSR rules
+- `.agents/rules/python.md` - Python/uv toolchain and ruff/pyright conventions
+- `.agents/rules/testing.md` - Vitest, Playwright, and pytest patterns
+- `.agents/rules/security.md` - HIPAA, secrets, auth/gating, threat modeling
 
 ## Personal Preferences
 
-Refer to `~/.factory/memories.md` for personal coding preferences and past decisions.
+Personal coding preferences and past decisions are tracked via the **Foresight Memory & Continuity System** (see section below).
+Use `foresight store "prefer pnpm over npm"` to persist durable preferences.
 
 ---
 
@@ -215,15 +216,6 @@ Prefer Droid's structured workflows over ad-hoc prompting for non-trivial work.
 - **Prompt**: goal in one sentence, constraints, related files, verification command
 - **Best practice**: 1-2 day phases, one behavior per phase, one verification per phase
 - **Reference**: `~/.agents/skills/droid-workflow/SKILL.md`
-
-### Missions (multi-feature)
-
-- **Trigger**: 50+ file refactors, big multi-feature implementations (10+ files)
-- **How**: `/missions` → Droid collaborates on plan, derives features + milestones → hands to Mission Control
-- **Stay engaged**: redirect stuck/blocked workers; re-plan if direction changes
-- **Heuristic**: `#features + 2 × #milestones` worker runs. Plan validation upfront > rework after
-- **Headless**: `droid exec --mission -f mission.md` for CI/scheduled missions
-- **Reference**: `~/.agents/skills/droid-workflow/SKILL.md` + `~/.factory/missions/README.md`
 
 ### How to Talk to Droid (always-on)
 
