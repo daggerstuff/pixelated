@@ -96,7 +96,12 @@ def load_rule_set(filepath: Path | None = None, packs: list[str] | None = None) 
         for item in pool:
             if not isinstance(item, list) or len(item) != 2:
                 raise RuntimeError(f"pool entry '{key}' must be [replacement, weight], got {item!r}")
-            validated.append((item[0], float(item[1])))
+            replacement, weight = item
+            if replacement is not None and not isinstance(replacement, str):
+                raise RuntimeError(
+                    f"pool entry '{key}' replacement must be a string or null, got {type(replacement).__name__}: {replacement!r}"
+                )
+            validated.append((replacement, float(weight)))
         replacements[str(key).lower()] = validated
 
     markers = [*rules.markers, *(str(marker).lower() for marker in raw_markers)]

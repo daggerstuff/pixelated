@@ -96,6 +96,8 @@ def clean(
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     show_banner(json_output)
+    if output is not None and in_place:
+        raise typer.BadParameter("clean: --output and --in-place are mutually exclusive")
     if output is None and not in_place:
         raise typer.BadParameter("clean requires --output or --in-place")
     target = output or input_file.with_suffix(input_file.suffix + ".tmp")
