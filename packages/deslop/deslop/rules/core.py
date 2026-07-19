@@ -87,12 +87,17 @@ def load_rule_set(filepath: Path | None = None, packs: list[str] | None = None) 
     if not isinstance(raw_pools, dict):
         raise RuntimeError(f"'pools' must be a mapping, got {type(raw_pools).__name__}")
     raw_markers = raw.get("markers", [])
-    if not isinstance(raw_markers, (list, tuple)):
+    if not isinstance(raw_markers, list):
         raise RuntimeError(f"'markers' must be a list, got {type(raw_markers).__name__}")
 
     replacements = {key: list(value) for key, value in rules.replacements.items()}
     for key, pool in raw_pools.items():
-        replacements[str(key).lower()] = [(item[0], float(item[1])) for item in pool]
+        validated = []
+        for item in pool:
+            if not isinstance(item, list) or len(item) != 2:
+                raise RuntimeError(f"pool entry '{key}' must be [replacement, weight], got {item!r}")
+            validated.append((item[0], float(item[1])))
+        replacements[str(key).lower()] = validated
 
     markers = [*rules.markers, *(str(marker).lower() for marker in raw_markers)]
     return RuleSet(replacements=replacements, markers=tuple(dict.fromkeys(markers)))

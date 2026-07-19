@@ -979,15 +979,10 @@ export class BackupSecurityManager {
       // Convert data to string
       const dataStr = new TextDecoder().decode(data);
 
-      // Parse the data
-      const restoredData = JSON.parse(dataStr) as unknown;
-
-      // Process the restored data (implementation would be specific to the application)
-      logger.info(`Successfully restored data of size: ${data.byteLength} bytes`);
-
       // [PIX-43] Data restoration is not implemented — processRestoredData is a
       // stub. Throw so restoreBackup surfaces an explicit failure rather than
       // returning true while nothing was actually restored.
+      logger.info(`Parsed backup data of size: ${data.byteLength} bytes`);
       throw new Error("Data restoration not implemented: processRestoredData is a stub (PIX-43)");
     } catch (error: unknown) {
       logger.error(

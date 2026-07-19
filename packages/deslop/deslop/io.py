@@ -24,7 +24,10 @@ def read_records(path: Path) -> Iterator[DatasetRecord]:
     text = path.read_text(encoding="utf-8")
     stripped = text.lstrip()
     if stripped.startswith("["):
-        payload = json.loads(text)
+        try:
+            payload = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"malformed JSON array: {path}") from exc
         if not isinstance(payload, list):
             return
         for index, item in enumerate(payload):
