@@ -1,0 +1,932 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>deslop — Clean AI Slop from Your Data</title>
+    <meta
+      name="description"
+      content="Remove filler phrases, detect low-density text, and rewrite AI-generated content with local LLMs."
+    />
+    <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0a0a0a;
+        --surface: #0f0f0f;
+        --surface-2: #1a1a1a;
+        --border: #2a2a2a;
+        --text: #e0e0e0;
+        --muted: #9ca3af;
+        --terminal: #00ff41;
+        --terminal-dim: rgba(0, 255, 65, 0.1);
+        --error: #ff3333;
+        --warn: #ffd700;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          'IBM Plex Sans',
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        overflow-x: hidden;
+      }
+
+      ::selection {
+        background: var(--terminal);
+        color: var(--bg);
+      }
+
+      .font-mono {
+        font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+      }
+
+      /* ── Utility ──────────────────────────────── */
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+      .container-narrow {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      .text-terminal {
+        color: var(--terminal);
+      }
+      .text-muted {
+        color: var(--muted);
+      }
+      .text-center {
+        text-align: center;
+      }
+
+      /* ── Animations ───────────────────────────── */
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(24px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+        }
+        50% {
+          box-shadow: 0 0 40px rgba(0, 255, 65, 0.2);
+        }
+      }
+
+      .animate-in {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.6s ease,
+          transform 0.6s ease;
+      }
+
+      .animate-in.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── Scan Lines Overlay ───────────────────── */
+
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 255, 65, 0.015) 2px,
+          rgba(0, 255, 65, 0.015) 4px
+        );
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      /* ── Hero ─────────────────────────────────── */
+
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 80px 24px;
+        position: relative;
+      }
+
+      .ascii-logo {
+        font-size: clamp(6px, 1.2vw, 14px);
+        line-height: 1.15;
+        color: var(--terminal);
+        margin-bottom: 24px;
+        white-space: pre;
+        display: inline-block;
+        text-align: left;
+        letter-spacing: -0.5px;
+      }
+
+      .hero-tagline {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 48px;
+      }
+
+      .hero h1 {
+        font-size: clamp(32px, 5vw, 56px);
+        font-weight: 700;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        color: #ffffff;
+      }
+
+      .hero h1 .accent {
+        color: var(--terminal);
+      }
+
+      .hero-desc {
+        font-size: 18px;
+        color: var(--muted);
+        max-width: 540px;
+        margin: 0 auto 40px;
+        line-height: 1.7;
+      }
+
+      .install-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 16px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        padding: 16px 24px;
+        border-radius: 8px;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .install-box:hover {
+        border-color: rgba(0, 255, 65, 0.3);
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.1);
+      }
+
+      .install-box .prompt {
+        color: var(--muted);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+      }
+
+      .install-box code {
+        color: var(--terminal);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 16px;
+      }
+
+      .hero-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 48px;
+      }
+
+      .hero-nav a {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 8px 16px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .hero-nav a:hover {
+        color: var(--terminal);
+        border-color: rgba(0, 255, 65, 0.3);
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateX(-50%) translateY(0);
+          opacity: 0.4;
+        }
+        50% {
+          transform: translateX(-50%) translateY(6px);
+          opacity: 0.8;
+        }
+      }
+
+      .scroll-hint svg {
+        width: 24px;
+        height: 24px;
+        color: var(--border);
+      }
+
+      /* ── Section Common ───────────────────────── */
+
+      section {
+        padding: 100px 0;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 64px;
+      }
+
+      .section-header h2 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 12px;
+      }
+
+      .section-header .subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      /* ── Features ─────────────────────────────── */
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      .feature-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 32px;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+
+      .feature-card:hover {
+        border-color: rgba(0, 255, 65, 0.3);
+        transform: translateY(-4px);
+      }
+
+      .feature-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .feature-card h3 svg {
+        width: 20px;
+        height: 20px;
+        color: var(--terminal);
+        flex-shrink: 0;
+      }
+
+      .feature-card p {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .feature-card code {
+        display: block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--border);
+        margin-top: 16px;
+      }
+
+      .feature-card code span {
+        color: var(--terminal);
+      }
+
+      /* ── Demo Terminal ────────────────────────── */
+
+      .demo-section {
+        background: var(--surface);
+      }
+
+      .terminal {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 60px rgba(0, 255, 65, 0.05);
+      }
+
+      .terminal-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        background: var(--surface-2);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .terminal-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border);
+      }
+
+      .terminal-dot.red {
+        background: #ff5f57;
+      }
+      .terminal-dot.yellow {
+        background: #febc2e;
+      }
+      .terminal-dot.green {
+        background: #28c840;
+      }
+
+      .terminal-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--muted);
+        margin-left: 8px;
+      }
+
+      .terminal-body {
+        padding: 24px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        line-height: 1.7;
+      }
+
+      .terminal-body .prompt {
+        color: var(--muted);
+      }
+      .terminal-body .cmd {
+        color: var(--terminal);
+      }
+      .terminal-body .output {
+        color: var(--text);
+      }
+      .terminal-body .dim {
+        color: var(--muted);
+      }
+      .terminal-body .accent {
+        color: var(--terminal);
+      }
+      .terminal-body .warn {
+        color: var(--warn);
+      }
+      .terminal-body .error {
+        color: var(--error);
+      }
+
+      .terminal-body pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 16px;
+        background: var(--terminal);
+        animation: blink 1s step-end infinite;
+        vertical-align: text-bottom;
+        margin-left: 2px;
+      }
+
+      /* ── Before/After ─────────────────────────── */
+
+      .comparison {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-top: 48px;
+      }
+
+      .comparison-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 24px;
+      }
+
+      .comparison-card.after {
+        border-color: rgba(0, 255, 65, 0.3);
+      }
+
+      .comparison-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+      }
+
+      .comparison-label.before {
+        color: var(--error);
+      }
+      .comparison-label.after {
+        color: var(--terminal);
+      }
+
+      .comparison-card code {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        line-height: 1.7;
+        display: block;
+        white-space: pre-wrap;
+      }
+
+      /* ── Modes ────────────────────────────────── */
+
+      .modes-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+      }
+
+      .mode-card {
+        text-align: center;
+        padding: 40px 24px;
+      }
+
+      .mode-number {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--terminal);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 12px;
+      }
+
+      .mode-card:hover .mode-number {
+        color: var(--terminal);
+      }
+
+      .mode-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 8px;
+      }
+
+      .mode-card p {
+        font-size: 14px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      /* ── CTA Section ──────────────────────────── */
+
+      .cta-section {
+        background: var(--surface);
+        text-align: center;
+      }
+
+      .cta-box {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 32px;
+        max-width: 480px;
+        margin: 0 auto;
+        box-shadow: 0 0 40px rgba(0, 255, 65, 0.05);
+      }
+
+      .cta-box .line {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 14px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .cta-box .line:last-child {
+        color: var(--terminal);
+        margin-bottom: 0;
+      }
+
+      .cta-links {
+        display: flex;
+        justify-content: center;
+        gap: 32px;
+        margin-top: 48px;
+      }
+
+      .cta-links a {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+        color: var(--muted);
+        text-decoration: none;
+        transition: color 0.2s;
+        cursor: pointer;
+      }
+
+      .cta-links a:hover {
+        color: var(--terminal);
+      }
+
+      /* ── Footer ───────────────────────────────── */
+
+      footer {
+        padding: 40px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .footer-inner span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--border);
+      }
+
+      .footer-inner .accent {
+        color: var(--terminal);
+      }
+
+      /* ── Responsive ───────────────────────────── */
+
+      @media (max-width: 768px) {
+        .features-grid,
+        .modes-grid,
+        .comparison {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-nav {
+          gap: 4px;
+        }
+        .hero-nav a {
+          font-size: 12px;
+          padding: 6px 12px;
+        }
+        .cta-links {
+          flex-direction: column;
+          gap: 16px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .install-box {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Hero -->
+    <section class="hero">
+      <div>
+        <pre class="ascii-logo" aria-hidden="true">
+██████╗ ███████╗██████╗ ██████╗ ███████╗██████╗
+██╔══██╗██╔════╝██╔═══╝ ██╔══██╗██╔════╝██╔══██╗
+██║  ██║█████╗  ██║     ██████╔╝█████╗  ██████╔╝
+██║  ██║██╔══╝  ██║     ██╔═══╝ ██╔══╝  ██╔══██╗
+██████╔╝███████╗╚██████╗██║     ███████╗██║  ██║
+╚═════╝ ╚══════╝ ╚═════╝╚═╝     ╚══════╝╚═╝  ╚═╝</pre>
+
+        <p class="hero-tagline">clean your data.</p>
+
+        <h1>
+          Remove AI slop.<br /><span class="accent">Keep the signal.</span>
+        </h1>
+
+        <p class="hero-desc">
+          Detect filler phrases, measure text density, and clean AI-generated
+          datasets. Regex-first, LLM-optional, privacy by default.
+        </p>
+
+        <div class="install-box">
+          <span class="prompt">$</span>
+          <code>pip install deslop-cli</code>
+        </div>
+
+        <nav class="hero-nav">
+          <a href="#features">features</a>
+          <a href="#demo">demo</a>
+          <a href="#modes">modes</a>
+          <a
+            href="https://github.com/daggerstuff/pixelated/tree/main/packages/deslop"
+            >github</a
+          >
+        </nav>
+      </div>
+
+      <div class="scroll-hint">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+          ></path>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>What it does</h2>
+          <p class="subtitle font-mono">// three things, nothing else</p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card animate-in">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+              Scan
+            </h3>
+            <p>
+              Detect slop patterns and measure density. See exactly how much of
+              your dataset is filler.
+            </p>
+            <code class="font-mono"><span>$</span> deslop scan data.jsonl</code>
+          </div>
+
+          <div class="feature-card animate-in">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                ></path>
+              </svg>
+              Clean
+            </h3>
+            <p>
+              Regex-powered replacement. Deterministic, fast, free. No API
+              calls, no data leaves your machine.
+            </p>
+            <code class="font-mono"
+              ><span>$</span> deslop clean data.jsonl -o clean.jsonl</code
+            >
+          </div>
+
+          <div class="feature-card animate-in">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                ></path>
+              </svg>
+              Regen
+            </h3>
+            <p>
+              LLM-powered rewriting via Ollama. Context-aware, local, optional.
+              Your data stays on your machine.
+            </p>
+            <code class="font-mono"
+              ><span>$</span> deslop regen data.jsonl --model llama3.2</code
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo -->
+    <section id="demo" class="demo-section">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>See it in action</h2>
+          <p class="subtitle font-mono">// real output, no mockups</p>
+        </div>
+
+        <div class="terminal animate-in">
+          <div class="terminal-header">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <span class="terminal-title">terminal</span>
+          </div>
+          <div class="terminal-body">
+            <pre><span class="prompt">$</span> <span class="cmd">deslop scan examples/sample.jsonl</span>
+
+<span class="accent"> ██████╗ ███████╗██████╗ ██████╗ ███████╗██████╗</span>
+<span class="accent"> ██╔══██╗██╔════╝██╔═══╝ ██╔══██╗██╔════╝██╔══██╗</span>
+<span class="accent"> ██║  ██║█████╗  ██║     ██████╔╝█████╗  ██████╔╝</span>
+<span class="accent"> ██║  ██║██╔══╝  ██║     ██╔═══╝ ██╔══╝  ██╔══██╗</span>
+<span class="accent"> ██████╔╝███████╗╚██████╗██║     ███████╗██║  ██║</span>
+<span class="accent"> ╚═════╝ ╚══════╝ ╚═════╝╚═╝     ╚══════╝╚═╝  ╚═╝</span>
+
+<span class="output">scan results</span>
+<span class="dim">────────────────────────────────────────</span>
+  <span class="dim">density:</span>   <span class="warn">33.33%</span>
+  <span class="dim">flagged:</span>   <span class="output">2 / 6 records</span>
+
+<span class="output">pattern       ┃ hits</span>
+<span class="dim">━━━━━━━━━━━━━━━╇━━━━━━</span>
+ <span class="dim">as discussed  │</span>    <span class="output">1</span>
+ <span class="dim">happy to help │</span>    <span class="output">1</span>
+
+<span class="prompt">$</span> <span class="cursor"></span></pre>
+          </div>
+        </div>
+
+        <div class="comparison animate-in">
+          <div class="comparison-card before">
+            <div class="comparison-label before">// before</div>
+            <code
+              >"As discussed earlier, the system processes data
+              efficiently."</code
+            >
+          </div>
+          <div class="comparison-card after">
+            <div class="comparison-label after">// after</div>
+            <code>"The system processes data efficiently."</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modes -->
+    <section id="modes">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>Three modes</h2>
+          <p class="subtitle font-mono">// pick your depth</p>
+        </div>
+
+        <div class="modes-grid">
+          <div class="mode-card animate-in">
+            <div class="mode-number">read-only</div>
+            <h3>scan</h3>
+            <p>
+              Read-only analysis. Count patterns, calculate density. No
+              modifications.
+            </p>
+          </div>
+
+          <div class="mode-card animate-in">
+            <div class="mode-number">regex</div>
+            <h3>clean</h3>
+            <p>
+              Regex replacement. Deterministic, fast, free. Output to file or
+              stdout.
+            </p>
+          </div>
+
+          <div class="mode-card animate-in">
+            <div class="mode-number">llm</div>
+            <h3>ollama</h3>
+            <p>
+              LLM rewriting. Context-aware, local, optional. Requires Ollama.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>Get started</h2>
+          <p class="subtitle font-mono">// install in one line</p>
+        </div>
+
+        <div class="cta-box animate-in">
+          <div class="line font-mono">$ pip install deslop-cli</div>
+          <div class="line font-mono">$ deslop scan your-data.jsonl</div>
+          <div class="line font-mono">✓ done. your data is clean.</div>
+        </div>
+
+        <div class="cta-links animate-in">
+          <a href="https://pypi.org/project/deslop-cli/">pypi</a>
+          <a
+            href="https://github.com/daggerstuff/pixelated/tree/main/packages/deslop"
+            >github</a
+          >
+          <a
+            href="https://github.com/daggerstuff/pixelated/tree/main/packages/deslop#readme"
+            >docs</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-inner">
+          <span>deslop v0.2.0</span>
+          <span
+            >built with <span class="accent">python</span> +
+            <span class="accent">rich</span></span
+          >
+          <span>MIT License</span>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+      // Intersection Observer for scroll animations
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible')
+            }
+          })
+        },
+        { threshold: 0.1, rootMargin: '0px 0px -50px 0px' },
+      )
+
+      document
+        .querySelectorAll('.animate-in')
+        .forEach((el) => observer.observe(el))
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault()
+          const target = document.querySelector(this.getAttribute('href'))
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+        })
+      })
+    </script>
+  </body>
+</html>
