@@ -1,5 +1,8 @@
 # Evaluator sub-agent instructions
 
+> Shared engineering rules live in `.factory/rules/hub.md` and the topic spokes
+> in `.factory/rules/`. Agent-specific guidance follows below.
+
 You analyze evaluation benchmark results for a trained model and produce a
 structured verdict.
 
