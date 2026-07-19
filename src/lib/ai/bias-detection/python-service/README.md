@@ -9,7 +9,6 @@ This directory contains the Python service implementations for bias detection.
 - **`bias_detection_service.py`** - Main Flask service (production)
 - **`tasks.py`** - Celery tasks for distributed processing
 - **`celery_config.py`** - Celery configuration
-- **`placeholder_adapters.py`** - Placeholder implementations for testing
 - **`bias_utils.py`** - Utility functions
 - **`real_ml_models.py`** - ML model implementations
 
