@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 import urllib.error
 import urllib.request
 from dataclasses import dataclass
@@ -116,6 +117,13 @@ def call_openai_compatible(endpoint: str, model: str, prompt: str, api_key_env: 
 
 
 def parse_json_object(content: str) -> JsonObject:
+    """Extract the first balanced JSON object from `content` that parses as a dict.
+
+    Malformed JSON (e.g. unterminated strings, trailing commas) raises
+    ``RuntimeError`` so callers like ``regen_file`` can catch and skip the
+    record gracefully instead of propagating ``json.JSONDecodeError`` (which
+    is a subclass of ``ValueError``, not ``RuntimeError``).
+    """
     start = content.find("{")
     while start >= 0:
         depth = 0
@@ -126,7 +134,10 @@ def parse_json_object(content: str) -> JsonObject:
             elif char == "}":
                 depth -= 1
                 if depth == 0:
-                    candidate = json.loads(content[start : index + 1])
+                    try:
+                        candidate = json.loads(content[start : index + 1])
+                    except json.JSONDecodeError as exc:
+                        raise RuntimeError(f"LLM returned malformed JSON object: {content[:240]!r}") from exc
                     if isinstance(candidate, dict):
                         return candidate
         start = content.find("{", start + 1)
@@ -168,7 +179,13 @@ def regen_file(
 ) -> RegenReport:
     flagged_ids = set[str]()
     if only_flagged:
-        report = scan_file(input_file, ScanOptions(rules=rules, finding_limit=10_000))
+        # Effectively unbounded: the default finding_limit caps findings (for
+        # scan reports); leaving it capped would silently drop flagged records
+        # beyond the cap from regen.
+        report = scan_file(
+            input_file,
+            ScanOptions(rules=rules, finding_limit=sys.maxsize),
+        )
         flagged_ids = {finding.record_id for finding in report.findings}
 
     processed = 0
