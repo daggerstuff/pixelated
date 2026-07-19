@@ -14,6 +14,7 @@ class Finding:
     field_path: str
     pattern: str
     snippet: str
+    category: str = ""  # canonical 17-value BiasType value (GENDER, RACIAL, etc.) or "slop"; from deslop engine substrate (PIX-4078)
 
 
 @dataclass(frozen=True, slots=True)

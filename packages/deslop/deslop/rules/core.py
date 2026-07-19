@@ -48,6 +48,52 @@ DEFAULT_RULE_PACKS: Final[dict[str, tuple[str, ...]]] = {
     "therapy-simulation": ("tell me more about that", "how does that make you feel", "i hear you"),
     "chatbot-assistant": ("certainly", "of course", "I'm here to help"),
     "synthetic-evals": ("the correct answer is", "step-by-step", "let's solve this"),
+    # Engine substrate extensions (PIX-4078 / Issue 4): unified detection categories
+    # drawn from canonical 17-value BiasType + sycophancy + fabrication-signal
+    "bias": (
+        "exotic",
+        "foreign",
+        "different",  # racial/ethnicity backhanded
+        "aggressive",
+        "assertive",
+        "dominant",  # gender
+        "emotional",
+        "sensitive",
+        "nurturing",  # gender
+        "hysterical",
+        "irrational",
+        "overreacting",  # gender
+        "stoic",
+        "unemotional",
+        "detached",  # gender
+        "young",
+        "inexperienced",
+        "naive",
+        "old",
+        "outdated",
+        "senile",  # age
+        "millennial",
+        "entitled",
+        "lazy",  # age
+        "articulate",
+        "well-spoken",  # racial backhanded compliment
+    ),
+    "sycophancy": (
+        "you're absolutely right",
+        "i completely agree",
+        "no one could disagree",
+        "that is the best point ever",
+        "i'd never contradict you",
+        "you're so insightful",
+        "everyone should listen to you",
+    ),
+    "fabrication-signal": (
+        "according to a 2023 study by",
+        "research shows that 87.3% of",
+        "recent data indicates precisely 94.2%",  # over-precise numbers
+        "as reported in the Journal of",  # fake-citation markers
+        "it is well-established that every expert agrees",
+    ),
 }
 
 

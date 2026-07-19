@@ -98,21 +98,22 @@ class BiasDetectionService:
 
     async def analyze_session(self, session_data: object, user_id: str) -> dict[str, Any]:
         data = self._coerce_session_data(session_data)
-        fairlearn = await self._run_fairlearn_analysis(data)
-        interpretability = await self._run_interpretability_analysis(data)
-        outcome_fairness = self._analyze_outcome_fairness(data)
-        performance_disparities = self._analyze_performance_disparities(data)
-        engagement_levels = self._analyze_engagement_levels(data)
-        interaction_patterns = self._analyze_interaction_patterns(data)
-
+        # Placeholder layers (fairlearn, interpretability, outcome_fairness,
+        # performance_disparities, engagement_levels, interaction_patterns)
+        # REMOVED per BIAS_CONSOLIDATION (Issue 3). They returned deterministic
+        # fake scores (e.g. 0.25, 0.18) with no real detection. Real detection
+        # is handled by model_service.predict_ensemble + lexical rules from
+        # bias_detector.py (ported to packages/deslop/deslop/rules/core.py).
+        # See placeholder_service.py lines 10-89 for removed signatures.
+        # If real fairlearn/aif360 import works, wire _run_fairlearn_analysis
+        # to fairness_analyzer; else keep lexical-only.
+        # layer_results kept minimal (only real results from model ensemble).
         layer_results = {
-            "fairlearn": fairlearn,
-            "interpretability": interpretability,
-            "outcome_fairness": outcome_fairness,
-            "performance_disparities": performance_disparities,
-            "engagement_levels": engagement_levels,
-            "interaction_patterns": interaction_patterns,
+            "fairlearn": await self._run_fairlearn_analysis(data),
         }
+        # The 5 removed placeholder layers are documented as removed above.
+        # Any external caller relying on them should migrate to model_service
+        # predictions and deslop engine categories (bias / sycophancy / fabrication-signal).
         layer_scores = [item.get("bias_score", 0.0) for item in layer_results.values() if isinstance(item, dict)]
         overall = float(sum(layer_scores) / len(layer_scores)) if layer_scores else 0.0
 
@@ -154,17 +155,10 @@ class BiasDetectionService:
     async def _run_interpretability_analysis(self, session_data: object) -> dict[str, Any]:
         return await self.diagnostic_service.run_interpretability_analysis(self._coerce_session_data(session_data))
 
-    def _analyze_outcome_fairness(self, session_data: object) -> dict[str, Any]:
-        return placeholder_service.outcome_fairness_placeholder()
-
-    def _analyze_performance_disparities(self, session_data: object) -> dict[str, Any]:
-        return placeholder_service.performance_disparities_placeholder()
-
-    def _analyze_engagement_levels(self, session_data: object) -> dict[str, Any]:
-        return placeholder_service.engagement_levels_placeholder()
-
-    def _analyze_interaction_patterns(self, session_data: object) -> dict[str, Any]:
-        return placeholder_service.interaction_patterns_placeholder()
+    # Placeholder-layer methods removed per Issue 3 (Placeholder Replacement).
+    # See placeholder_service.py (lines 10-89) for signatures that are no
+    # longer called. External callers should migrate to model_service
+    # predictions or deslop engine categories (bias / sycophancy / fabrication-signal).
 
     async def initialize(self) -> bool:
         """Initialize the bias detection service"""
