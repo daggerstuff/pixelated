@@ -3,12 +3,28 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "deslop"
-version = "0.1.0"
-description = "A generalized AI Corpus Deslopping Engine."
+name = "deslop-cli"
+version = "0.2.0"
+description = "The ultimate AI Corpus Deslopping Engine. Clean, sanitize, and de-AI your datasets."
+readme = "README.md"
 authors = [{name = "Pixelated Empathy"}]
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "rich>=13.0.0",
+    "pyyaml>=6.0"
+]
+keywords = ["ai", "dataset", "cleaning", "slop", "llm", "preprocessing"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Text Processing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+]
+
+[project.urls]
+Homepage = "https://github.com/daggerstuff/pixelated"
 
 [project.scripts]
 deslop = "deslop.cli:main"

@@ -47,6 +47,19 @@ def get_slop_regex(pools: dict) -> re.Pattern:
     return re.compile(rf"\b({'|'.join(escaped)})\b", re.IGNORECASE)
 
 
+def load_custom_rules(filepath):
+    import yaml
+
+    with open(filepath) as f:
+        data = yaml.safe_load(f)
+    if "pools" in data:
+        global DEFAULT_SLOP_POOLS
+        DEFAULT_SLOP_POOLS.update(data["pools"])
+    if "markers" in data:
+        global DEFAULT_SLOP_MARKERS
+        DEFAULT_SLOP_MARKERS.extend(data["markers"])
+
+
 def _weighted_pick(pool: list, seed_key: str) -> str | None:
     if not pool:
         return None
