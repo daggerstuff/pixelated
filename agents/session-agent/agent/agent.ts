@@ -1,10 +1,29 @@
+import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { defineAgent } from 'eve'
 import { z } from 'zod'
+import { profileAndLogAgentStartup } from '@/lib/context/startup-profiler.js'
 
 import {
   AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   agentModel,
 } from './lib/workers-ai.js'
+
+// Profile startup context consumption for agent entry point
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+
+profileAndLogAgentStartup({
+  agentName: 'session-agent',
+  agentDir: __dirname,
+  connectionDescriptions: {
+    'foresight':
+      'Foresight memory MCP for conversation-rehearsal session context.',
+    'memory-mcp':
+      'Pixelated session memory MCP backed by MongoDB. Owns session records.',
+  },
+})
 
 export default defineAgent({
   model: agentModel,
