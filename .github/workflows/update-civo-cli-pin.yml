@@ -25,11 +25,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST=$(curl -sSfL -H "Authorization: Bearer $GITHUB_TOKEN" \
-            https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
+          LATEST=$(gh release view --repo civo/cli --json tagName -q .tagName)
 
           if [[ -z "$LATEST" || "$LATEST" != v* ]]; then
-            echo "❌ Could not resolve a valid version from GitHub API. Got: '$LATEST'"
+            echo "❌ Could not resolve a valid version from gh CLI. Got: '$LATEST'"
             exit 1
           fi
 
