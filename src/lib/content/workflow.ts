@@ -5,38 +5,28 @@ export const workflowContent = {
     {
       number: '01',
       title: 'Choose the clinical skill to practice',
-      body: 'Start with intake structure, empathy, rupture repair, crisis response, cultural humility, or another teachable skill.',
+      body: 'Intake structure, empathy, rupture repair, crisis response, cultural humility — or another teachable skill.',
     },
     {
       number: '02',
       title: 'Run a realistic AI client session',
-      body: 'The trainee responds in the moment while the system preserves the transcript, scenario context, and review data.',
+      body: 'The trainee responds in the moment. The system preserves the transcript, context, and review data.',
     },
     {
       number: '03',
       title: 'Score, coach, and repeat',
-      body: 'Supervisors use the session record to give targeted feedback, then assign a retry or related case.',
+      body: 'Supervisors give targeted feedback from the record, then assign a retry or a related case.',
     },
   ],
   bandLabel: 'What each session leaves behind',
-  bandTitle: 'A session record, scoring signals, and supervisor-ready notes.',
-  bandBody:
-    'The practice run becomes a record your team can teach from, compare across trainees, and revisit as skills improve.',
+  bandTitle: 'A record, scoring signals, and supervisor-ready notes.',
+  bandBody: 'The practice run becomes a record your team can teach from, compare, and revisit as skills improve.',
   outputs: [
-    {
-      label: 'Durable record',
-      value:
-        'A saved transcript and notes lane the team can reopen without guesswork.',
-    },
+    { label: 'Durable record', value: 'A saved transcript and notes lane the team can reopen without guesswork.' },
     {
       label: 'Specific feedback',
-      value:
-        'A concrete read on which intervention worked, which response missed, and what to practice next.',
+      value: 'Which intervention worked, which missed, what to practice next.',
     },
-    {
-      label: 'Shared standard',
-      value:
-        'One scenario the team can use to compare judgment across clinicians.',
-    },
+    { label: 'Shared standard', value: 'One scenario the team can use to compare judgment across clinicians.' },
   ],
 } as const
