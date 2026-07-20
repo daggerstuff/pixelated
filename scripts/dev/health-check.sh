@@ -9,12 +9,14 @@ QUIET=false
 [[ "${1:-}" == "--quiet" ]] && QUIET=true
 
 declare -A PORTS=(
+  [5173]="Astro (pixelated dev server)"
   [27017]="MongoDB (pixelated-mongo)"
   [6379]="Redis (pixelated-redis)"
   [5432]="PostgreSQL (pixelated-postgres)"
 )
 
 declare -A RECOVERY=(
+  [5173]="Start with: pnpm dev"
   [27017]="Start with: sudo docker compose -f docker/docker-compose.local-mongo.yml up -d"
   [6379]="Start with: sudo docker compose -f docker/docker-compose.db.yml up -d redis"
   [5432]="Start with: sudo docker compose -f docker/docker-compose.db.yml up -d postgres"
