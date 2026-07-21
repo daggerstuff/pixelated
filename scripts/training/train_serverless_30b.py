@@ -12,6 +12,7 @@ import random
 
 import art
 from art.serverless.backend import ServerlessBackend
+from openai import AsyncOpenAI
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -23,8 +24,8 @@ if not WANDB_API_KEY:
 
 # Configuration
 PROJECT = "wayfarer-ab-test"
-MODEL_NAME = "qwen3-30b-serverless-rl"
-BASE_MODEL = "OpenPipe/Qwen3-30B-A3B-Instruct-2507"
+MODEL_NAME = "qwen3-30b-serverless-rl-v2"
+BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
 DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
 
 # RL Hyperparameters
@@ -32,6 +33,14 @@ GROUPS_PER_STEP = 5
 ROLLOUTS_PER_GROUP = 8
 LEARNING_RATE = 1e-5
 MAX_RL_STEPS = 100
+
+# Use local Ollama for rollouts to avoid W&B inference quota costs.
+# W&B serverless training remains free for us; inference is not.
+OLLAMA_CLIENT = AsyncOpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama",
+)
+OLLAMA_MODEL = "hf.co/unsloth/Qwen3.5-4B-GGUF:Q4_K_S"
 
 
 def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
@@ -55,8 +64,6 @@ def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
 
 async def rollout(model: art.Model, messages: list) -> art.Trajectory:
     """Generate a response and compute reward."""
-    client = model.openai_client()
-
     # Build trajectory from messages (all but last = context, last = expected assistant)
     context = messages[:-1] if len(messages) > 1 else messages
     expected = messages[-1]["content"] if messages else ""
@@ -70,26 +77,15 @@ async def rollout(model: art.Model, messages: list) -> art.Trajectory:
     # Ensure trajectory ends with user message for generation
     trajectory.messages_and_choices = list(context)
 
-    # Generate completion
-    completion = await client.chat.completions.create(
-        model=model.get_inference_name(),
+    # Generate completion via local Ollama (free) instead of W&B inference (paid)
+    completion = await OLLAMA_CLIENT.chat.completions.create(
+        model=OLLAMA_MODEL,
         messages=trajectory.messages(),
         max_tokens=1024,
         temperature=0.8,
         logprobs=True,
-        extra_body={"return_token_ids": True},
     )
     choice = completion.choices[0]
-
-    # Extract prompt_token_ids from completion and attach to choice
-    prompt_token_ids = getattr(completion, "prompt_token_ids", None)
-    if prompt_token_ids is None and hasattr(completion, "model_extra") and completion.model_extra:
-        prompt_token_ids = completion.model_extra.get("prompt_token_ids")
-
-    if prompt_token_ids is not None:
-        if getattr(choice, "__pydantic_extra__", None) is None:
-            object.__setattr__(choice, "__pydantic_extra__", {})
-        choice.__pydantic_extra__["prompt_token_ids"] = prompt_token_ids
 
     trajectory.messages_and_choices.append(choice)
     response = choice.message.content or ""
@@ -142,11 +138,12 @@ async def main():
 
     from art.utils.sft import train_sft_from_file
 
-    logging.info("Starting SFT Warmup...")
+    logging.info("Starting SFT Warmup (limited to 50 steps for practicality)...")
     await train_sft_from_file(
         model=model,
         file_path=DATASET_PATH,
         epochs=1,
+        final_step=50,
     )
 
     start_step = await model.get_step()
