@@ -13,6 +13,7 @@ const memorySchemaAlias = {
 }
 const baseNodeTestGlobs = [
   'src/tests/health-monitor.test.ts',
+  'src/tests/hipaa-compliance.test.ts',
   'src/lib/logging/__tests__/audit-logger.test.ts',
   'src/pages/api/**/*.test.ts',
   'src/pages/api/**/*.spec.ts',

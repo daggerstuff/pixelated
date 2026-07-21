@@ -101,7 +101,7 @@ const trainingPrograms: any[] = []
           </h2>
           <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {activeTrainingSessions.map((session: any) => (
-              <Card class="p-6 hover:shadow-lg transition-shadow border-l-4 border-l-blue-500">
+              <Card class="p-6 hover:shadow-lg transition-shadow border-l-4 border-l-neutral-500">
                 <div class="flex items-start justify-between mb-4">
                   <div>
                     <h3 class="text-lg font-semibold text-gray-900">
@@ -233,14 +233,14 @@ const trainingPrograms: any[] = []
       <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {
           readinessEnhancements.map((enhancement) => (
-            <Card class="p-6 border-l-4 border-l-purple-500 flex flex-col">
+            <Card class="p-6 border-l-4 border-l-neutral-500 flex flex-col">
               <div class="mb-4">
                 <h3 class="text-lg font-semibold text-gray-900">
                   {enhancement.title}
                 </h3>
                 <p class="text-sm text-gray-600">{enhancement.summary}</p>
               </div>
-              <div class="text-xs font-semibold text-purple-600 uppercase tracking-wide mb-2">
+              <div class="text-xs font-semibold text-neutral-600 uppercase tracking-wide mb-2">
                 Primary audience
               </div>
               <div class="text-sm font-medium text-gray-900 mb-4">
