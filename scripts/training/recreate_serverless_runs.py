@@ -27,20 +27,11 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-from openai import AsyncOpenAI
-
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
 PROJECT = "wayfarer-ab-test"
-
-# Use local Ollama for rollouts to avoid W&B inference quota costs.
-OLLAMA_CLIENT = AsyncOpenAI(
-    base_url="http://localhost:11434/v1",
-    api_key="ollama",
-)
-OLLAMA_MODEL = "hf.co/unsloth/Qwen3.5-4B-GGUF:Q4_K_S"
 
 
 def generate_report():
@@ -179,11 +170,12 @@ async def run_30b_experiment():
 
 
 async def rollout(model, messages: list):
-    """Generate a response and compute reward via local Ollama."""
+    """Generate a response and compute reward."""
     import math
 
     import art
 
+    client = model.openai_client()
     context = messages[:-1] if len(messages) > 1 else messages
     expected = messages[-1]["content"] if messages else ""
 
@@ -194,14 +186,23 @@ async def rollout(model, messages: list):
     )
     trajectory.messages_and_choices = list(context)
 
-    completion = await OLLAMA_CLIENT.chat.completions.create(
-        model=OLLAMA_MODEL,
+    completion = await client.chat.completions.create(
+        model=model.get_inference_name(),
         messages=trajectory.messages(),
         max_tokens=1024,
         temperature=0.8,
         logprobs=True,
+        extra_body={"return_token_ids": True},
     )
     choice = completion.choices[0]
+
+    prompt_token_ids = getattr(completion, "prompt_token_ids", None)
+    if prompt_token_ids is None and hasattr(completion, "model_extra") and completion.model_extra:
+        prompt_token_ids = completion.model_extra.get("prompt_token_ids")
+    if prompt_token_ids is not None:
+        if getattr(choice, "__pydantic_extra__", None) is None:
+            object.__setattr__(choice, "__pydantic_extra__", {})
+        choice.__pydantic_extra__["prompt_token_ids"] = prompt_token_ids
 
     trajectory.messages_and_choices.append(choice)
     response = choice.message.content or ""
@@ -236,11 +237,26 @@ async def rollout(model, messages: list):
 
 
 async def evaluate_12b_model():
-    """Evaluate on golden questions using local Ollama (NOT the trained W&B model).
+    """Evaluate the trained 12B model on golden questions."""
+    import art
+    from art.serverless.backend import ServerlessBackend
 
-    NOTE: W&B inference is not free for us, so we use Ollama for evaluation.
-    This evaluates the local Ollama model, not the W&B serverless checkpoint.
-    """
+    if not WANDB_API_KEY:
+        raise ValueError("WANDB_API_KEY is required")
+
+    MODEL_NAME = "wayfarer-2-12b-serverless-rl-v2"
+    PROJECT = "wayfarer-ab-test"
+
+    logger.info("Loading trained 12B model for evaluation...")
+    model = art.TrainableModel(
+        name=MODEL_NAME,
+        project=PROJECT,
+        entity="wutang",
+        base_model="OpenPipe/Qwen3-14B-Instruct",
+    )
+    backend = ServerlessBackend(api_key=WANDB_API_KEY)
+    await model.register(backend)
+
     # Load golden questions
     golden_path = Path("ai/lab/evals/golden_questions.json")
     if not golden_path.exists():
@@ -250,12 +266,13 @@ async def evaluate_12b_model():
     with open(golden_path) as f:
         questions = json.load(f)
 
-    logger.info(f"Evaluating on {len(questions)} questions via Ollama...")
+    logger.info(f"Evaluating on {len(questions)} questions...")
     results = []
     for q in questions[:5]:  # Test with first 5
         prompt = q.get("question", q.get("prompt", ""))
-        completion = await OLLAMA_CLIENT.chat.completions.create(
-            model=OLLAMA_MODEL,
+        client = model.openai_client()
+        completion = await client.chat.completions.create(
+            model=model.get_inference_name(),
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1024,
             temperature=0.8,
