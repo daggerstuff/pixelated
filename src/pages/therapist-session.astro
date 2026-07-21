@@ -1,0 +1,22 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import MemoryAwareChatSystem from '@/components/chat/MemoryAwareChatSystem'
+
+export const prerender = false
+const sessionId = Astro.url.searchParams.get('sessionId') || undefined
+---
+
+<BaseLayout
+  title="Therapist Session Memory | Pixelated Empathy"
+  description="AI-assisted therapist session with memory write and retrieval"
+>
+  <MemoryAwareChatSystem
+    client:load
+    {sessionId}
+    title="Therapist Session Memory"
+    subtitle="AI-assisted therapy session with memory write and retrieval"
+    showMemoryStats={true}
+    showMemoryInsights={true}
+    enableMemoryToggle={false}
+  />
+</BaseLayout>
