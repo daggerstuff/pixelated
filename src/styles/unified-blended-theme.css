@@ -4,15 +4,15 @@
    ================================================ */
 
 /* Import modular theme components */
-@import './variables.css';
-@import './typography.css';
-@import './spacing.css';
-@import './borders.css';
-@import './shadows.css';
-@import './gradients.css';
-@import './mesh.css';
-@import './transitions.css';
-@import './utilities.css';
+@import "./variables.css";
+@import "./typography.css";
+@import "./spacing.css";
+@import "./borders.css";
+@import "./shadows.css";
+@import "./gradients.css";
+@import "./mesh.css";
+@import "./transitions.css";
+@import "./utilities.css";
 
 /* Keep base styles and media queries as they are for compatibility */
 /* === BASE STYLES === */
@@ -162,10 +162,7 @@ a:hover {
 }
 
 .display-heading--gradient {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: inherit;
 }
 
 /* === BUTTON SYSTEM === */
@@ -348,17 +345,11 @@ a:hover {
 
 /* === UTILITY CLASSES === */
 .text-gradient-primary {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: inherit;
 }
 
 .text-gradient-accent {
-  background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: inherit;
 }
 
 .eyebrow-text {
@@ -383,12 +374,7 @@ a:hover {
 
 .divider {
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--border-primary),
-    transparent
-  );
+  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
   margin: var(--spacing-12) 0;
 }
 
