@@ -9,12 +9,26 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  # Required: this workflow edits `.github/workflows/deploy-civo.yml`, which is
-  # itself a workflow file. GitHub's default `GITHUB_TOKEN` does not include
-  # the `workflows` scope and the push was rejected with
+  # NOTE: The `permissions:` block above applies ONLY to the default
+  # GITHUB_TOKEN. The Create Pull Request step below uses
+  # `secrets.WORKFLOW_PAT` (a Personal Access Token with `workflow` scope)
+  # to authorize pushes that edit files under `.github/workflows/`, since
+  # the default GITHUB_TOKEN lacks that scope and the push is otherwise
+  # rejected with
   # `refusing to allow a GitHub App to create or update workflow ...
   # without workflows permission`.
-  workflows: write
+  #
+  # Setup (one-time, by a repo admin):
+  #   1. github.com → Settings → Developer settings → Personal access
+  #      tokens → Tokens (classic) → Generate new token → scope: `workflow`
+  #      (recommend fine-grained PAT scoped to this single repo with an
+  #      expiry, OR a GitHub App with Workflows: Read & Write — both are
+  #      safer than a classic PAT scoped to the whole account).
+  #   2. Repo → Settings → Secrets and variables → Actions → New
+  #      repository secret → name: `WORKFLOW_PAT`, value: <paste token>.
+  #
+  # Until `WORKFLOW_PAT` is configured, the Create Pull Request step will
+  # fail with a pre-flight error pointing at this comment.
 
 jobs:
   check-and-update:
@@ -65,11 +79,34 @@ jobs:
           echo "old=$OLD" >> $GITHUB_OUTPUT
           echo "new=$NEW" >> $GITHUB_OUTPUT
 
-      - name: Create Pull Request
+      - name: "Pre-flight: verify WORKFLOW_PAT secret exists"
+        id: preflight
         if: steps.update.outputs.changed == 'true'
+        run: |
+          # Soft-fail: if WORKFLOW_PAT isn't configured yet, emit a warning
+          # and skip the Create Pull Request step below. The workflow will
+          # still register as success so CI dashboards don't show a red run
+          # for an unconfigured-repo state. Once a repo admin configures
+          # the secret (see permissions: block), the next run will publish
+          # the PR normally.
+          if [[ -z "${{ secrets.WORKFLOW_PAT }}" ]]; then
+            echo "::warning::WORKFLOW_PAT secret is not set on this repository."
+            echo "::warning::Skipping Create Pull Request step. See the"
+            echo "::warning::permissions: block at the top of this file for"
+            echo "::warning::setup instructions (PAT with 'workflow' scope)."
+            echo "has_pat=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_pat=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true' && steps.preflight.outputs.has_pat == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use WORKFLOW_PAT (not GITHUB_TOKEN) so the push is authorized
+          # to modify files under .github/workflows/. See permissions: block
+          # above for setup instructions.
+          token: ${{ secrets.WORKFLOW_PAT }}
           commit-message:
             'chore: bump kubectl fallback version from ${{
             steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
