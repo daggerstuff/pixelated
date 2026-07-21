@@ -18,6 +18,9 @@ COPY ${AGENT_DIR}/package.json ${AGENT_DIR}/pnpm-lock.yaml ${AGENT_DIR}/pnpm-wor
 RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
 COPY ${AGENT_DIR}/ ./
+# Copy src/lib/context into the image so `../../lib/context/...` imports
+# resolve at build time — the Dockerfile otherwise only mounts ${AGENT_DIR}.
+COPY src/lib/context ./lib/context
 RUN pnpm build
 
 FROM node:24.16.0-bookworm-slim AS runtime

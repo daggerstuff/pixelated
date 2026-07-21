@@ -9,6 +9,12 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # Required: this workflow edits `.github/workflows/deploy-civo.yml`, which is
+  # itself a workflow file. GitHub's default `GITHUB_TOKEN` does not include
+  # the `workflows` scope and the push was rejected with
+  # `refusing to allow a GitHub App to create or update workflow ...
+  # without workflows permission`.
+  workflows: write
 
 jobs:
   check-and-update:
