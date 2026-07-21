@@ -486,4 +486,97 @@ describe('SDK Contract Tests', () => {
       ).rejects.toThrow()
     })
   })
+
+  describe('Developer Memory Endpoints', () => {
+    const developerBase = 'https://api.pixelatedempathy.com/api/v1/developer/memory'
+
+    it('developer.memory.storeMemory should POST to /api/v1/developer/memory', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          id: 'mem-dev-1',
+          content: 'developer memory',
+          category: 'fact',
+          scope: 'session',
+          retention: 'short_term',
+          importance: 0.5,
+          createdAt: '2026-01-01T00:00:00Z',
+        }),
+        text: async () => JSON.stringify({}),
+      } as any)
+
+      const result = await client.developer.memory.storeMemory({
+        content: 'developer memory',
+      })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining(developerBase),
+        expect.objectContaining({ method: 'POST' }),
+      )
+      expect(result.id).toBe('mem-dev-1')
+    })
+
+    it('developer.memory.getMemory should GET /api/v1/developer/memory/:id', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: {
+            id: 'mem-dev-1',
+            content: 'developer memory',
+            category: 'fact',
+            scope: 'session',
+            retention: 'short_term',
+            importance: 0.5,
+            createdAt: '2026-01-01T00:00:00Z',
+            updatedAt: null,
+          },
+        }),
+        text: async () => JSON.stringify({}),
+      } as any)
+
+      const result = await client.developer.memory.getMemory({
+        memoryId: 'mem-dev-1',
+      })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining(`${developerBase}/mem-dev-1`),
+        expect.any(Object),
+      )
+      expect(result.id).toBe('mem-dev-1')
+    })
+
+    it('developer.memory.listMemories should GET /api/v1/developer/memory', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [],
+          pagination: { limit: 10, offset: 0, total: 0 },
+        }),
+        text: async () => JSON.stringify({}),
+      } as any)
+
+      await client.developer.memory.listMemories({ limit: 10, offset: 0 })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining(developerBase),
+        expect.any(Object),
+      )
+    })
+
+    it('should forward X-API-Key header to developer endpoints', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [],
+          pagination: { limit: 10, offset: 0, total: 0 },
+        }),
+        text: async () => JSON.stringify({}),
+      } as any)
+
+      await client.developer.memory.listMemories()
+
+      const callHeaders = mockFetch.mock.calls[0][1]?.headers as Headers
+      expect(callHeaders.get('X-API-Key')).toBe('test_key')
+    })
+  })
 })
