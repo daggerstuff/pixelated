@@ -52,7 +52,7 @@ if "${CMD[@]}"; then
         TO_DELETE=$((COUNT - 2))
         echo "Found $COUNT backups. Deleting oldest $TO_DELETE..."
 
-        for (( i=0; i<$TO_DELETE; i++ )); do
+        for (( i=0; i<TO_DELETE; i++ )); do
             OLD_BACKUP="${BACKUPS[$i]}"
             echo "Deleting oldest backup: $OLD_BACKUP"
             rclone purge "$REMOTE_NAME:$BACKUP_ROOT/$HOSTNAME/$OLD_BACKUP"

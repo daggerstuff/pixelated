@@ -2,7 +2,6 @@
 set -euo pipefail
 
 SERVICE="${1:-backup-home-vivi.service}"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MONITOR="${2:-1}"
 MONITOR="${MONITOR,,}"
 
