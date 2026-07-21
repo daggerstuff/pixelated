@@ -1,57 +1,52 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from "@/lib/auth-client";
 
-import { useConversationMemory } from '../../hooks/useMemory'
-import { getJournalResearchAuthToken } from '../../lib/api/journal-research/auth'
+import { useConversationMemory } from "../../hooks/useMemory";
+import { getJournalResearchAuthToken } from "../../lib/api/journal-research/auth";
 
 // Basic UI scaffold for therapist training session
-const initialClientMessage =
-  'Hello, I am your client. How can you help me today?'
+const initialClientMessage = "Hello, I am your client. How can you help me today?";
 
 // Types
 interface BiasAnalysisResult {
-  overallScore: number
-  riskLevel: string
-  recommendations?: string[]
+  overallScore: number;
+  riskLevel: string;
+  recommendations?: string[];
 }
 
 interface WebSocketMessage {
-  type: string
+  type: string;
   payload?: {
-    content?: string
-    role?: string
-    userId?: string
-    authorId?: string
-    message?: string
-    [key: string]: unknown
-  }
+    content?: string;
+    role?: string;
+    userId?: string;
+    authorId?: string;
+    message?: string;
+    [key: string]: unknown;
+  };
 }
 
 interface ConversationEntry {
-  id: string
-  role: 'client' | 'therapist'
-  message: string
+  id: string;
+  role: "client" | "therapist";
+  message: string;
 }
 
 interface CoachingNote {
-  id: string
-  authorId: string
-  content: string
-  timestamp: string
+  id: string;
+  authorId: string;
+  content: string;
+  timestamp: string;
 }
 
 // Helper function to create deduplication key
-function createMessageKey(
-  userId: string,
-  role: string,
-  content: string,
-): string {
-  return `${userId}:${role}:${content}`
+function createMessageKey(userId: string, role: string, content: string): string {
+  return `${userId}:${role}:${content}`;
 }
 
 function createNoteKey(authorId: string, content: string): string {
-  return `${authorId}:coaching_note:${content}`
+  return `${authorId}:coaching_note:${content}`;
 }
 
 /**
@@ -60,61 +55,61 @@ function createNoteKey(authorId: string, content: string): string {
  */
 const ROLE_TEXT_CONFIG = {
   observer: {
-    ariaLabel: 'Coaching note input',
-    placeholder: 'Add a coaching note...',
-    submitButton: 'Send Note',
-    activeColor: 'purple',
+    ariaLabel: "Coaching note input",
+    placeholder: "Add a coaching note...",
+    submitButton: "Send Note",
+    activeColor: "purple",
   },
   trainee: {
-    ariaLabel: 'Therapeutic response input',
-    placeholder: 'Type your therapeutic response...',
-    submitButton: 'Send Response',
-    activeColor: 'blue',
+    ariaLabel: "Therapeutic response input",
+    placeholder: "Type your therapeutic response...",
+    submitButton: "Send Response",
+    activeColor: "blue",
   },
-} as const
+} as const;
 
 export function TrainingSessionComponent() {
-  const { data: session } = authClient.useSession()
+  const { data: session } = authClient.useSession();
   // Use authenticated user ID, fallback to demo user for development/testing
-  const userId = session?.user?.id ?? 'demo-therapist'
-  const sessionId = 'session-1'
-  const [therapistResponse, setTherapistResponse] = useState('')
+  const userId = session?.user?.id ?? "demo-therapist";
+  const sessionId = "session-1";
+  const [therapistResponse, setTherapistResponse] = useState("");
   const [conversation, setConversation] = useState<ConversationEntry[]>([
-    { id: `msg-${Date.now()}`, role: 'client', message: initialClientMessage },
-  ])
-  const [evaluation, setEvaluation] = useState<string | null>(null)
-  const [coachingNotes, setCoachingNotes] = useState<CoachingNote[]>([])
+    { id: `msg-${Date.now()}`, role: "client", message: initialClientMessage },
+  ]);
+  const [evaluation, setEvaluation] = useState<string | null>(null);
+  const [coachingNotes, setCoachingNotes] = useState<CoachingNote[]>([]);
 
   // Fishbowl Mode State
-  const [role, setRole] = useState<'trainee' | 'observer'>('trainee')
+  const [role, setRole] = useState<"trainee" | "observer">("trainee");
 
   // Computed helpers (Review suggestion: extract isObserver and config)
-  const isObserver = role === 'observer'
+  const isObserver = role === "observer";
   // ⚡ Bolt: memoize textConfig to prevent unnecessary re-evaluations during renders
   const textConfig = useMemo(
     () => (isObserver ? ROLE_TEXT_CONFIG.observer : ROLE_TEXT_CONFIG.trainee),
     [isObserver],
-  )
+  );
 
-  const ws = useRef<WebSocket | null>(null)
+  const ws = useRef<WebSocket | null>(null);
   // Use refs to avoid stale closures in WebSocket handlers
-  const roleRef = useRef<'trainee' | 'observer'>(role)
-  const userIdRef = useRef<string>(userId)
+  const roleRef = useRef<"trainee" | "observer">(role);
+  const userIdRef = useRef<string>(userId);
   // Track authentication state
-  const isAuthenticatedRef = useRef<boolean>(false)
+  const isAuthenticatedRef = useRef<boolean>(false);
   // Track messages we've added locally to prevent duplicates from WebSocket echoes
-  const locallyAddedMessages = useRef<Set<string>>(new Set())
+  const locallyAddedMessages = useRef<Set<string>>(new Set());
 
   // Keep refs in sync with state
   useEffect(() => {
-    roleRef.current = role
-  }, [role])
+    roleRef.current = role;
+  }, [role]);
 
   useEffect(() => {
-    userIdRef.current = userId
-  }, [userId])
+    userIdRef.current = userId;
+  }, [userId]);
 
-  const memory = useConversationMemory(userId, sessionId)
+  const memory = useConversationMemory(userId, sessionId);
 
   // Helper function to analyze bias
   const analyzeBias = async (
@@ -128,37 +123,34 @@ export function TrainingSessionComponent() {
         sessionId,
         timestamp: new Date().toISOString(),
         participantDemographics: { userId },
-        scenario: 'therapist-training',
-        content: [
-          ...conversation,
-          { role: 'therapist' as const, message: therapistResponse },
-        ],
+        scenario: "therapist-training",
+        content: [...conversation, { role: "therapist" as const, message: therapistResponse }],
         metadata: {},
       },
-    }
+    };
 
     try {
-      const res = await fetch('/api/bias-detection/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/bias-detection/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sessionPayload),
-      })
+      });
 
       if (!res.ok) {
-        return null
+        return null;
       }
 
-      const data = await res.json()
+      const data = await res.json();
       if (data?.success && data?.data) {
-        return data.data as BiasAnalysisResult
+        return data.data as BiasAnalysisResult;
       }
 
-      return null
+      return null;
     } catch (err) {
-      console.error('Bias analysis failed:', err)
-      return null
+      console.error("Bias analysis failed:", err);
+      return null;
     }
-  }
+  };
 
   // Helper function to generate AI response
   const generateAIResponse = async (
@@ -171,104 +163,95 @@ export function TrainingSessionComponent() {
           role: entry.role,
           content: entry.message,
         })),
-        { role: 'user', content: therapistResponse },
+        { role: "user", content: therapistResponse },
       ],
-      model: 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+      model: "mistralai/Mixtral-8x7B-Instruct-v0.2",
       temperature: 0.7,
       maxResponseTokens: 256,
-    }
+    };
 
     try {
-      const res = await fetch('/api/ai/response', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/ai/response", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      })
+      });
 
       if (!res.ok) {
-        return 'Thank you for your response.'
+        return "Thank you for your response.";
       }
 
-      const data = await res.json()
+      const data = await res.json();
       if (data?.content) {
-        return data.content
+        return data.content;
       }
 
-      return 'Thank you for your response.'
+      return "Thank you for your response.";
     } catch (err) {
-      console.error('AI response generation failed:', err)
-      return 'Thank you for your response.'
+      console.error("AI response generation failed:", err);
+      return "Thank you for your response.";
     }
-  }
+  };
 
   // Helper function to format evaluation message
   const formatEvaluation = (biasResult: BiasAnalysisResult | null): string => {
     if (!biasResult) {
-      return 'Bias analysis unavailable.'
+      return "Bias analysis unavailable.";
     }
 
-    const recommendations = biasResult.recommendations?.join(', ') ?? 'None'
-    return `Bias Score: ${biasResult.overallScore} | Risk Level: ${biasResult.riskLevel}\nRecommendations: ${recommendations}`
-  }
+    const recommendations = biasResult.recommendations?.join(", ") ?? "None";
+    return `Bias Score: ${biasResult.overallScore} | Risk Level: ${biasResult.riskLevel}\nRecommendations: ${recommendations}`;
+  };
 
   // Helper function to handle authentication response
-  const handleAuthenticated = useCallback(
-    (websocket: WebSocket, sessionId: string) => {
-      const currentRole = roleRef.current
-      const currentUserId = userIdRef.current
-      websocket.send(
-        JSON.stringify({
-          type: 'join_session',
-          payload: {
-            sessionId,
-            role: currentRole,
-            userId: currentUserId,
-          },
-        }),
-      )
-    },
-    [],
-  )
+  const handleAuthenticated = useCallback((websocket: WebSocket, sessionId: string) => {
+    const currentRole = roleRef.current;
+    const currentUserId = userIdRef.current;
+    websocket.send(
+      JSON.stringify({
+        type: "join_session",
+        payload: {
+          sessionId,
+          role: currentRole,
+          userId: currentUserId,
+        },
+      }),
+    );
+  }, []);
 
   // Helper function to handle session messages
   const handleSessionMessage = useCallback(
     (
       msg: WebSocketMessage,
       locallyAddedMessages: React.MutableRefObject<Set<string>>,
-      _currentRole: 'trainee' | 'observer',
-      setConversation: React.Dispatch<
-        React.SetStateAction<ConversationEntry[]>
-      >,
+      _currentRole: "trainee" | "observer",
+      setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
     ) => {
-      const messageContent = msg.payload?.content
-      const messageRole = msg.payload?.role
-      const messageUserId = msg.payload?.userId
+      const messageContent = msg.payload?.content;
+      const messageRole = msg.payload?.role;
+      const messageUserId = msg.payload?.userId;
 
       if (!messageContent || !messageRole || !messageUserId) {
-        return
+        return;
       }
 
-      const messageKey = createMessageKey(
-        messageUserId,
-        messageRole,
-        messageContent,
-      )
+      const messageKey = createMessageKey(messageUserId, messageRole, messageContent);
 
       if (locallyAddedMessages.current.has(messageKey)) {
-        return
+        return;
       }
 
       setConversation((prev) => [
         ...prev,
         {
           id: `msg-${Date.now()}-${messageUserId}`,
-          role: messageRole as 'client' | 'therapist',
+          role: messageRole as "client" | "therapist",
           message: messageContent,
         },
-      ])
+      ]);
     },
     [],
-  )
+  );
 
   // Helper function to handle coaching notes
   const handleCoachingNote = useCallback(
@@ -277,35 +260,33 @@ export function TrainingSessionComponent() {
       locallyAddedMessages: React.MutableRefObject<Set<string>>,
       setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
     ) => {
-      const noteContent = msg.payload?.content
-      const noteAuthorId = msg.payload?.authorId
+      const noteContent = msg.payload?.content;
+      const noteAuthorId = msg.payload?.authorId;
 
       if (!noteContent || !noteAuthorId) {
-        return
+        return;
       }
 
-      const noteKey = createNoteKey(noteAuthorId, noteContent)
+      const noteKey = createNoteKey(noteAuthorId, noteContent);
 
       if (locallyAddedMessages.current.has(noteKey)) {
-        return
+        return;
       }
 
       // Construct a proper CoachingNote object with all required fields
-      const payloadTimestamp = msg.payload?.['timestamp']
+      const payloadTimestamp = msg.payload?.["timestamp"];
       const coachingNote: CoachingNote = {
         id: `note-${Date.now()}-${noteAuthorId}`,
         authorId: noteAuthorId,
         content: noteContent,
         timestamp:
-          typeof payloadTimestamp === 'string'
-            ? payloadTimestamp
-            : new Date().toISOString(),
-      }
+          typeof payloadTimestamp === "string" ? payloadTimestamp : new Date().toISOString(),
+      };
 
-      setCoachingNotes((prev) => [...prev, coachingNote])
+      setCoachingNotes((prev) => [...prev, coachingNote]);
     },
     [],
-  )
+  );
 
   // Helper function to handle WebSocket messages
   const handleWebSocketMessage = useCallback(
@@ -315,51 +296,44 @@ export function TrainingSessionComponent() {
       locallyAddedMessages: React.MutableRefObject<Set<string>>,
       isAuthenticatedRef: React.MutableRefObject<boolean>,
       websocket: WebSocket,
-      setConversation: React.Dispatch<
-        React.SetStateAction<ConversationEntry[]>
-      >,
+      setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
       setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
     ) => {
       try {
-        const msg = JSON.parse(event.data) as WebSocketMessage
+        const msg = JSON.parse(event.data) as WebSocketMessage;
 
-        if (msg.type === 'authenticated') {
-          console.log('Authenticated with Training Server', msg.payload)
-          isAuthenticatedRef.current = true
-          handleAuthenticated(websocket, sessionId)
-          return
+        if (msg.type === "authenticated") {
+          console.log("Authenticated with Training Server", msg.payload);
+          isAuthenticatedRef.current = true;
+          handleAuthenticated(websocket, sessionId);
+          return;
         }
 
-        if (msg.type === 'session_joined') {
-          console.log('Joined session', msg.payload)
-          return
+        if (msg.type === "session_joined") {
+          console.log("Joined session", msg.payload);
+          return;
         }
 
-        if (msg.type === 'error') {
-          console.error('WebSocket error:', msg.payload?.message)
-          return
+        if (msg.type === "error") {
+          console.error("WebSocket error:", msg.payload?.message);
+          return;
         }
 
-        if (msg.type === 'session_message') {
-          handleSessionMessage(
-            msg,
-            locallyAddedMessages,
-            roleRef.current,
-            setConversation,
-          )
-          return
+        if (msg.type === "session_message") {
+          handleSessionMessage(msg, locallyAddedMessages, roleRef.current, setConversation);
+          return;
         }
 
-        if (msg.type === 'coaching_note') {
-          handleCoachingNote(msg, locallyAddedMessages, setCoachingNotes)
-          return
+        if (msg.type === "coaching_note") {
+          handleCoachingNote(msg, locallyAddedMessages, setCoachingNotes);
+          return;
         }
       } catch (e) {
-        console.error('Error parsing WS message', e)
+        console.error("Error parsing WS message", e);
       }
     },
     [handleAuthenticated, handleSessionMessage, handleCoachingNote],
-  )
+  );
 
   useEffect(() => {
     // Load conversation history from memory
@@ -367,36 +341,35 @@ export function TrainingSessionComponent() {
       if (history && history.length > 0) {
         setConversation(
           history.map((m) => ({
-            id: `msg-${m.createdAt?.toString() ?? ''}-${m.id || m.content}`,
-            role: (m.metadata?.role ?? 'client') as 'client' | 'therapist',
+            id: `msg-${m.createdAt?.toString() ?? ""}-${m.id || m.content}`,
+            role: (m.metadata?.role ?? "client") as "client" | "therapist",
             message: m.content,
           })),
-        )
+        );
       }
-    })
-  }, [memory])
+    });
+  }, [memory]);
 
   // WebSocket Connection
   useEffect(() => {
-    locallyAddedMessages.current.clear()
-    isAuthenticatedRef.current = false
+    locallyAddedMessages.current.clear();
+    isAuthenticatedRef.current = false;
 
-    const wsUrl =
-      import.meta['env']['PUBLIC_TRAINING_WS_URL'] ?? 'ws://localhost:8084'
-    const websocket = new WebSocket(wsUrl)
-    ws.current = websocket
+    const wsUrl = import.meta["env"]["PUBLIC_TRAINING_WS_URL"] ?? "ws://localhost:8084";
+    const websocket = new WebSocket(wsUrl);
+    ws.current = websocket;
 
     websocket.onopen = async () => {
-      const authToken = (await getJournalResearchAuthToken()) ?? ''
+      const authToken = (await getJournalResearchAuthToken()) ?? "";
       websocket.send(
         JSON.stringify({
-          type: 'authenticate',
+          type: "authenticate",
           payload: {
             token: authToken,
           },
         }),
-      )
-    }
+      );
+    };
 
     websocket.onmessage = (event) => {
       handleWebSocketMessage(
@@ -407,108 +380,102 @@ export function TrainingSessionComponent() {
         websocket,
         setConversation,
         setCoachingNotes,
-      )
-    }
+      );
+    };
 
     websocket.onerror = (error) => {
-      console.error('WebSocket error:', error)
-    }
+      console.error("WebSocket error:", error);
+    };
 
     websocket.onclose = () => {
-      console.log('WebSocket connection closed')
-    }
+      console.log("WebSocket connection closed");
+    };
 
     return () => {
       if (
         websocket.readyState === WebSocket.OPEN ||
         websocket.readyState === WebSocket.CONNECTING
       ) {
-        websocket.close()
+        websocket.close();
       }
-      ws.current = null
-    }
-  }, [sessionId, userId, handleWebSocketMessage])
+      ws.current = null;
+    };
+  }, [sessionId, userId, handleWebSocketMessage]);
 
   // Helper function to send join session message
-  const sendJoinSession = useCallback(
-    (websocket: WebSocket, sessionId: string) => {
-      const currentUserId = userIdRef.current
-      websocket.send(
-        JSON.stringify({
-          type: 'join_session',
-          payload: {
-            sessionId,
-            role: roleRef.current,
-            userId: currentUserId,
-          },
-        }),
-      )
-    },
-    [],
-  )
+  const sendJoinSession = useCallback((websocket: WebSocket, sessionId: string) => {
+    const currentUserId = userIdRef.current;
+    websocket.send(
+      JSON.stringify({
+        type: "join_session",
+        payload: {
+          sessionId,
+          role: roleRef.current,
+          userId: currentUserId,
+        },
+      }),
+    );
+  }, []);
 
   // Helper function to send authentication
   const sendAuthentication = useCallback(async (websocket: WebSocket) => {
-    const authToken = (await getJournalResearchAuthToken()) ?? ''
+    const authToken = (await getJournalResearchAuthToken()) ?? "";
     websocket.send(
       JSON.stringify({
-        type: 'authenticate',
+        type: "authenticate",
         payload: {
           token: authToken,
         },
       }),
-    )
-  }, [])
+    );
+  }, []);
 
   // Handle role changes
   useEffect(() => {
-    locallyAddedMessages.current.clear()
+    locallyAddedMessages.current.clear();
     setConversation([
       {
         id: `msg-${Date.now()}`,
-        role: 'client',
+        role: "client",
         message: initialClientMessage,
       },
-    ])
-    setEvaluation(null)
+    ]);
+    setEvaluation(null);
 
     if (!ws.current) {
-      return undefined
+      return undefined;
     }
 
     if (ws.current.readyState === WebSocket.CONNECTING) {
       const handleOpen = async () => {
         if (isAuthenticatedRef.current) {
-          sendJoinSession(ws.current!, sessionId)
+          sendJoinSession(ws.current!, sessionId);
         } else {
-          await sendAuthentication(ws.current!)
+          await sendAuthentication(ws.current!);
         }
-        ws.current?.removeEventListener('open', handleOpen)
-      }
-      ws.current.addEventListener('open', handleOpen)
+        ws.current?.removeEventListener("open", handleOpen);
+      };
+      ws.current.addEventListener("open", handleOpen);
       return () => {
-        ws.current?.removeEventListener('open', handleOpen)
-      }
+        ws.current?.removeEventListener("open", handleOpen);
+      };
     }
 
-    if (
-      ws.current.readyState === WebSocket.CLOSED ||
-      ws.current.readyState === WebSocket.CLOSING
-    ) {
-      return undefined
+    if (ws.current.readyState === WebSocket.CLOSED || ws.current.readyState === WebSocket.CLOSING) {
+      return undefined;
     }
 
     if (ws.current.readyState === WebSocket.OPEN) {
       if (isAuthenticatedRef.current) {
-        sendJoinSession(ws.current, sessionId)
+        sendJoinSession(ws.current, sessionId);
       } else {
         sendAuthentication(ws.current).catch((error) => {
-          console.error('Failed to send authentication:', error)
-        })
+          console.error("Failed to send authentication:", error);
+        });
       }
     }
-    return undefined
-  }, [role, sessionId, sendJoinSession, sendAuthentication])
+    return undefined;
+  }, [role, sessionId, sendJoinSession, sendAuthentication]);
 
   // Handle observer note submission
   const handleObserverNote = useCallback(
@@ -521,11 +488,11 @@ export function TrainingSessionComponent() {
       setTherapistResponse: React.Dispatch<React.SetStateAction<string>>,
     ) => {
       if (!noteContent.trim()) {
-        return
+        return;
       }
 
-      const noteKey = createNoteKey(userId, noteContent)
-      locallyAddedMessages.current.add(noteKey)
+      const noteKey = createNoteKey(userId, noteContent);
+      locallyAddedMessages.current.add(noteKey);
 
       setCoachingNotes((prev) => [
         ...prev,
@@ -535,19 +502,19 @@ export function TrainingSessionComponent() {
           content: noteContent,
           timestamp: new Date().toISOString(),
         },
-      ])
+      ]);
 
       ws.current?.send(
         JSON.stringify({
-          type: 'coaching_note',
+          type: "coaching_note",
           payload: { content: noteContent },
         }),
-      )
+      );
 
-      setTherapistResponse('')
+      setTherapistResponse("");
     },
     [],
-  )
+  );
 
   // Handle trainee response submission
   const handleTraineeResponse = useCallback(
@@ -559,69 +526,67 @@ export function TrainingSessionComponent() {
       ws: React.MutableRefObject<WebSocket | null>,
       locallyAddedMessages: React.MutableRefObject<Set<string>>,
       memory: ReturnType<typeof useConversationMemory>,
-      setConversation: React.Dispatch<
-        React.SetStateAction<ConversationEntry[]>
-      >,
+      setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
       setEvaluation: React.Dispatch<React.SetStateAction<string | null>>,
       setTherapistResponse: React.Dispatch<React.SetStateAction<string>>,
     ) => {
       const therapistMessage: ConversationEntry = {
         id: `msg-${Date.now()}-${userId}`,
-        role: 'therapist',
+        role: "therapist",
         message: response,
-      }
+      };
 
-      const updatedConversation = [...conversation, therapistMessage]
+      const updatedConversation = [...conversation, therapistMessage];
 
-      setConversation((prev) => [...prev, therapistMessage])
-      await memory.addMessage(response, 'user')
+      setConversation((prev) => [...prev, therapistMessage]);
+      await memory.addMessage(response, "user");
 
-      const messageKey = createMessageKey(userId, 'therapist', response)
-      locallyAddedMessages.current.add(messageKey)
+      const messageKey = createMessageKey(userId, "therapist", response);
+      locallyAddedMessages.current.add(messageKey);
 
       ws.current?.send(
         JSON.stringify({
-          type: 'session_message',
-          payload: { content: response, role: 'therapist' },
+          type: "session_message",
+          payload: { content: response, role: "therapist" },
         }),
-      )
+      );
 
       const [biasResult, nextClientMsg] = await Promise.all([
         analyzeBias(sessionId, updatedConversation, response, userId),
         generateAIResponse(updatedConversation, response),
-      ])
+      ]);
 
-      setEvaluation(formatEvaluation(biasResult))
+      setEvaluation(formatEvaluation(biasResult));
 
       const clientMessage: ConversationEntry = {
         id: `msg-${Date.now()}-${userId}`,
-        role: 'client',
+        role: "client",
         message: nextClientMsg,
-      }
+      };
 
-      setConversation((prev) => [...prev, clientMessage])
-      await memory.addMessage(nextClientMsg, 'assistant')
+      setConversation((prev) => [...prev, clientMessage]);
+      await memory.addMessage(nextClientMsg, "assistant");
 
-      const clientMessageKey = createMessageKey(userId, 'client', nextClientMsg)
-      locallyAddedMessages.current.add(clientMessageKey)
+      const clientMessageKey = createMessageKey(userId, "client", nextClientMsg);
+      locallyAddedMessages.current.add(clientMessageKey);
 
       ws.current?.send(
         JSON.stringify({
-          type: 'session_message',
-          payload: { content: nextClientMsg, role: 'client' },
+          type: "session_message",
+          payload: { content: nextClientMsg, role: "client" },
         }),
-      )
+      );
 
-      setTherapistResponse('')
+      setTherapistResponse("");
     },
     [],
-  )
+  );
 
   const handleResponse = useCallback(async () => {
-    const currentRole = roleRef.current
-    const currentUserId = userIdRef.current
+    const currentRole = roleRef.current;
+    const currentUserId = userIdRef.current;
 
-    if (currentRole === 'observer') {
+    if (currentRole === "observer") {
       handleObserverNote(
         therapistResponse,
         currentUserId,
@@ -629,8 +594,8 @@ export function TrainingSessionComponent() {
         locallyAddedMessages,
         setCoachingNotes,
         setTherapistResponse,
-      )
-      return
+      );
+      return;
     }
 
     await handleTraineeResponse(
@@ -644,7 +609,7 @@ export function TrainingSessionComponent() {
       setConversation,
       setEvaluation,
       setTherapistResponse,
-    )
+    );
   }, [
     therapistResponse,
     conversation,
@@ -652,25 +617,23 @@ export function TrainingSessionComponent() {
     memory,
     handleObserverNote,
     handleTraineeResponse,
-  ])
+  ]);
 
   return (
     <div className="bg-white/5 border-white/10 mx-auto grid max-w-4xl grid-cols-1 gap-6 rounded-2xl border p-8 shadow-2xl backdrop-blur-md md:grid-cols-3">
       <div className="md:col-span-2">
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-white text-2xl font-bold">
-            Therapist Training Session
-          </h2>
+          <h2 className="text-white text-2xl font-bold">Therapist Training Session</h2>
           <div className="flex space-x-2">
             <button
-              onClick={() => setRole('trainee')}
-              className={`rounded px-3 py-1 text-sm ${!isObserver ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+              onClick={() => setRole("trainee")}
+              className={`rounded px-3 py-1 text-sm ${!isObserver ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
             >
               Trainee
             </button>
             <button
-              onClick={() => setRole('observer')}
-              className={`rounded px-3 py-1 text-sm ${isObserver ? 'bg-purple-600 text-white' : 'bg-gray-700 text-gray-300'}`}
+              onClick={() => setRole("observer")}
+              className={`rounded px-3 py-1 text-sm ${isObserver ? "bg-purple-600 text-white" : "bg-gray-700 text-gray-300"}`}
             >
               Observer
             </button>
@@ -682,13 +645,13 @@ export function TrainingSessionComponent() {
             <div
               key={entry.id}
               className={`rounded-lg p-4 ${
-                entry.role === 'client'
-                  ? 'bg-blue-500/20 border-blue-500 border-l-4'
-                  : 'bg-green-500/20 border-green-500 border-l-4'
+                entry.role === "client"
+                  ? "bg-neutral-500/10 border-neutral-500 border-l-4"
+                  : "bg-neutral-500/5 border-neutral-400 border-l-4"
               }`}
             >
               <div className="text-gray-300 mb-1 text-sm font-semibold">
-                {entry.role === 'client' ? 'Client' : 'Therapist'}
+                {entry.role === "client" ? "Client" : "Therapist"}
               </div>
               <div className="text-white">{entry.message}</div>
             </div>
@@ -701,7 +664,7 @@ export function TrainingSessionComponent() {
             onChange={(e) => setTherapistResponse(e.target.value)}
             rows={3}
             aria-label={textConfig.ariaLabel}
-            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${isObserver ? 'focus:ring-purple-500' : 'focus:ring-blue-500'}`}
+            className={`bg-white/10 border-white/20 text-white placeholder-gray-400 w-full rounded-lg border p-3 focus:outline-none focus:ring-2 ${isObserver ? "focus:ring-purple-500" : "focus:ring-blue-500"}`}
             placeholder={textConfig.placeholder}
           />
 
@@ -710,8 +673,8 @@ export function TrainingSessionComponent() {
             disabled={!therapistResponse.trim()}
             className={`text-white w-full rounded-lg px-6 py-3 font-medium transition-colors ${
               isObserver
-                ? 'bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600'
-                : 'bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600'
+                ? "bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600"
+                : "bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600"
             }`}
           >
             {textConfig.submitButton}
@@ -720,9 +683,7 @@ export function TrainingSessionComponent() {
 
         {evaluation && (
           <div className="bg-yellow-500/20 border-yellow-500/30 mt-6 rounded-lg border p-4">
-            <div className="text-yellow-300 mb-2 font-semibold">
-              AI Feedback
-            </div>
+            <div className="text-yellow-300 mb-2 font-semibold">AI Feedback</div>
             <div className="text-white whitespace-pre-line">{evaluation}</div>
           </div>
         )}
@@ -730,9 +691,7 @@ export function TrainingSessionComponent() {
 
       {/* Sidebar for Coaching Notes */}
       <div className="bg-black/20 rounded-xl p-4 md:col-span-1">
-        <h3 className="text-purple-300 mb-4 text-lg font-semibold">
-          Coaching Notes
-        </h3>
+        <h3 className="text-purple-300 mb-4 text-lg font-semibold">Coaching Notes</h3>
         {coachingNotes.length === 0 ? (
           <div className="text-gray-400 text-sm italic">No notes yet.</div>
         ) : (
@@ -752,5 +711,5 @@ export function TrainingSessionComponent() {
         )}
       </div>
     </div>
-  )
+  );
 }
