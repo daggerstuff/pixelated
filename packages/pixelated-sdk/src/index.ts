@@ -498,8 +498,25 @@ export class PixelatedClient {
    * Foresight memory client (typed memory operations via Foresight gateway)
    */
   get foresight(): ForesightClient {
+    return this.createMemoryClient("/api/v1/memory");
+  }
+
+  /**
+   * Developer memory client (external developer API surface)
+   *
+   * Targets `/api/v1/developer/memory/*` and is intended for use with an
+   * API key. The same typed memory operations are exposed as the Foresight
+   * client, but routed through the developer-only endpoint.
+   */
+  get developer(): { memory: ForesightClient } {
+    return {
+      memory: this.createMemoryClient("/api/v1/developer/memory"),
+    };
+  }
+
+  private createMemoryClient(basePath: string): ForesightClient {
     return new ForesightClient({
-      baseUrl: this.baseUrl.replace("/api/v1", "/api/v1/memory"),
+      baseUrl: this.baseUrl.replace("/api/v1", basePath),
       getHeaders: () => {
         const h: Record<string, string> = {};
         if (this.apiKey) h["X-API-Key"] = this.apiKey;

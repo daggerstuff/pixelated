@@ -1,0 +1,8 @@
+# ShellCheck configuration — https://github.com/koalaman/shellcheck
+# Applies to all shell scripts in this repository.
+
+# All backup/deploy scripts use bash (#!/usr/bin/env bash)
+shell=bash
+
+# Don't follow `source`/`.` includes from outside this checkout
+external-sources=false

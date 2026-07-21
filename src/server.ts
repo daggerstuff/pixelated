@@ -17,6 +17,7 @@ import {
 import { SocketService } from "./services/socketService";
 
 import { GovernanceBridge } from "./lib/governance/governance-bridge";
+import { createSessionMiddleware } from "./lib/session";
 
 import "dotenv/config";
 
@@ -111,6 +112,9 @@ app.use(
   }),
 );
 app.use(express.json());
+
+// Session middleware (PIX-3755: Redis-backed sessions for horizontal scaling)
+app.use(createSessionMiddleware());
 
 // API Routes
 app.use("/api/auth", authRoutes);

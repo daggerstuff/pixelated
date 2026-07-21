@@ -59,7 +59,8 @@ die() {
 create_backup_dir() {
     local user_home="/home/${CONFIG[username]}"
     local backup_root="${CONFIG[output_dir]}"
-    local timestamp=$(date +%Y%m%d_%H%M%S)
+    local timestamp
+    timestamp=$(date +%Y%m%d_%H%M%S)
     local backup_dir="${backup_root}/pixelated-config-${timestamp}"
     
     info "Creating backup directory: ${backup_dir}"
@@ -370,12 +371,15 @@ create_archive() {
     
     info "Creating archive: ${output}"
     
-    local parent_dir=$(dirname "${backup_dir}")
-    local base_name=$(basename "${backup_dir}")
+    local parent_dir
+    parent_dir=$(dirname "${backup_dir}")
+    local base_name
+    base_name=$(basename "${backup_dir}")
     
     tar -czf "${output}" -C "${parent_dir}" "${base_name}"
     
-    local size=$(du -h "${output}" | cut -f1)
+    local size
+    size=$(du -h "${output}" | cut -f1)
     success "Archive created: ${output} (${size})"
 }
 

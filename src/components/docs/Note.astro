@@ -33,47 +33,47 @@ const { type = 'info', title, className } = Astro.props
   }
 
   .note-info {
-    background-color: #f0f9ff;
-    border-left-color: #0ea5e9;
-    color: #0c4a6e;
+    background-color: #f5f5f5;
+    border-left-color: #a3a3a3;
+    color: #404040;
   }
 
   .note-warning {
-    background-color: #fffbeb;
-    border-left-color: #f59e0b;
-    color: #92400e;
+    background-color: #f0f0f0;
+    border-left-color: #808080;
+    color: #262626;
   }
 
   .note-tip {
-    background-color: #f0fdf4;
-    border-left-color: #10b981;
-    color: #065f46;
+    background-color: #e8e8e8;
+    border-left-color: #666666;
+    color: #1a1a1a;
   }
 
   .note-danger {
-    background-color: #fef2f2;
-    border-left-color: #ef4444;
-    color: #991b1b;
+    background-color: #e0e0e0;
+    border-left-color: #525252;
+    color: #171717;
   }
 
   /* Dark mode support */
   :global(.dark) .note-info {
-    background-color: #0c4a6e;
-    color: #bae6fd;
+    background-color: #262626;
+    color: #d4d4d4;
   }
 
   :global(.dark) .note-warning {
-    background-color: #92400e;
-    color: #fed7aa;
+    background-color: #333333;
+    color: #c0c0c0;
   }
 
   :global(.dark) .note-tip {
-    background-color: #065f46;
-    color: #bbf7d0;
+    background-color: #404040;
+    color: #a3a3a3;
   }
 
   :global(.dark) .note-danger {
-    background-color: #991b1b;
-    color: #fecaca;
+    background-color: #525252;
+    color: #a3a3a3;
   }
 </style>
