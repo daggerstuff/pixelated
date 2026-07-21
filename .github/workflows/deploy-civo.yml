@@ -58,10 +58,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
-            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-            env.IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -75,10 +72,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
-            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-            env.SESSION_AGENT_IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
           cache-to: type=gha,mode=max,scope=session-agent
           platforms: linux/amd64
@@ -92,10 +86,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
-            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-            env.QA_AGENT_IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
           cache-to: type=gha,mode=max,scope=qa-agent
           platforms: linux/amd64
@@ -109,10 +100,7 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
-            steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
-            env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent
           cache-to: type=gha,mode=max,scope=pipeline-agent
           platforms: linux/amd64
@@ -139,51 +127,20 @@ jobs:
           persist-credentials: false
 
       - name: Install Civo CLI
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-<<<<<<< Updated upstream
           # Resolve the latest release tag from GitHub API (authenticated — 5,000 req/hr vs 60)
           AUTH_HEADER="Authorization: Bearer ${GITHUB_TOKEN}"
           CIVO_VERSION=$(curl -sL -H "${AUTH_HEADER}" https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
           if [ -z "$CIVO_VERSION" ]; then
             echo "GitHub API rate limited or unreachable; falling back to v1.5.4"
-=======
-          # Resolve the latest release tag via gh CLI.
-          # `|| true` keeps the step alive if `gh` returns non-zero; the empty/v-prefix
-          # check below then routes us to the pinned fallback (v1.5.4).
-          CIVO_VERSION="$(gh release view --repo civo/cli --json tagName -q .tagName 2>/dev/null || true)"
-          if [ -z "$CIVO_VERSION" ] || [[ "$CIVO_VERSION" != v* ]]; then
-            echo "::warning::gh release view did not return a v-prefixed tag; falling back to v1.5.4"
->>>>>>> Stashed changes
             CIVO_VERSION="v1.5.4"
           fi
           echo "Civo CLI version: $CIVO_VERSION"
 
-<<<<<<< Updated upstream
           DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[]? | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
           if [ -z "$DOWNLOAD_URL" ]; then
             echo "Could not resolve asset URL from API; falling back to constructed URL"
             DOWNLOAD_URL="https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
-=======
-          # Download the linux/amd64 archive. Prefer gh release download; fall back to a
-          # direct API+curl+jq lookup so we don't lose the public-URL resilience path.
-          ARCHIVE="/tmp/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
-          if ! gh release download "$CIVO_VERSION" --repo civo/cli \
-               --pattern 'civo-*-linux-amd64.tar.gz' \
-               --dir /tmp 2>/dev/null; then
-            echo "::warning::gh release download failed for ${CIVO_VERSION}; trying direct API lookup"
-            ASSET_URL=$(curl -sSfL -H "Authorization: Bearer $GITHUB_TOKEN" \
-              https://api.github.com/repos/civo/cli/releases/tags/"$CIVO_VERSION" \
-              | jq -r '.assets[] | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url' \
-              | head -n1)
-            if [ -z "$ASSET_URL" ]; then
-              echo "❌ Direct API lookup also failed for ${CIVO_VERSION}"
-              exit 1
-            fi
-            curl -sSfL "$ASSET_URL" -o "$ARCHIVE"
->>>>>>> Stashed changes
           fi
           echo "Download URL: $DOWNLOAD_URL"
 
