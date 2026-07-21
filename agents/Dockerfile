@@ -18,9 +18,17 @@ COPY ${AGENT_DIR}/package.json ${AGENT_DIR}/pnpm-lock.yaml ${AGENT_DIR}/pnpm-wor
 RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 
 COPY ${AGENT_DIR}/ ./
-# Copy src/lib/context into the image so `../../lib/context/...` imports
-# resolve at build time — the Dockerfile otherwise only mounts ${AGENT_DIR}.
-COPY src/lib/context ./lib/context
+# Copy src/lib/context into the image at the absolute path `/lib/context`
+# so that `../../lib/context/...` imports in agents/<name>/agent/agent.ts
+# resolve correctly. Relative to /agent/agent/agent.ts:
+#   ../  -> /agent/
+#   ../../  -> /      (container root)
+#   ../../lib/context  -> /lib/context
+# The earlier `COPY src/lib/context ./lib/context` landed at /agent/lib/context,
+# which is one level too deep and caused `module not found` at eve build time.
+# Local-dev time still uses the stub at agents/lib/context/startup-profiler.ts
+# (relative-path resolution from agents/<name>/agent/ goes up two levels).
+COPY src/lib/context /lib/context
 RUN pnpm build
 
 FROM node:24.16.0-bookworm-slim AS runtime
