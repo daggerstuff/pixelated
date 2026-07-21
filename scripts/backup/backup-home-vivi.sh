@@ -125,7 +125,8 @@ if [[ -z "${HOME:-}" || ! -d "$HOME" || "$HOME" == "/root" ]]; then
   elif [[ "${SOURCE_DIR%/*}" == "/home" && -d "$SOURCE_DIR" ]]; then
     export HOME="$SOURCE_DIR"
   else
-    export HOME="/home/$(id -un)"
+    HOME="/home/$(id -un)"
+    export HOME
   fi
 fi
 
@@ -311,11 +312,12 @@ is_skipped_section() {
 
   skip_candidates="$(printf '%s' "${BACKUP_SKIP_SECTIONS:-}" | tr ',;' ' ')"
   for skip_section in ${skip_candidates}; do
-    case "$section_name" in
-      $skip_section)
-        return 0
-        ;;
-    esac
+    # BACKUP_SKIP_SECTIONS contains glob patterns like '.gemini-*' that must
+    # expand during matching, so the RHS of == is intentionally unquoted.
+    # shellcheck disable=SC2053
+    if [[ "$section_name" == $skip_section ]]; then
+      return 0
+    fi
   done
   return 1
 }
