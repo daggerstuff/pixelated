@@ -13,6 +13,35 @@
   }
 }
 
+@keyframes typing-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+.animate-typing-dot {
+  animation: typing-dot 1.4s ease-in-out infinite;
+}
+
+@keyframes gentle-float {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+}
+.animate-gentle-float {
+  animation: gentle-float 2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   /* Organic drift animations from pixelated-theme.css */
   @keyframes float-organic {
