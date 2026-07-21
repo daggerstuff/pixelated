@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
-"""Minimal test to check if 30B model works with serverless backend.
-
-NOTE: W&B inference is NOT free for us. This test uses local Ollama for
-inference and only tests W&B serverless registration/training.
-"""
+"""Minimal test to check if 30B model works with serverless backend."""
 
 import asyncio
 import os
-
-from openai import AsyncOpenAI
 
 WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
 if not WANDB_API_KEY:
@@ -16,12 +10,6 @@ if not WANDB_API_KEY:
 
 import art
 from art.serverless.backend import ServerlessBackend
-
-OLLAMA_CLIENT = AsyncOpenAI(
-    base_url="http://localhost:11434/v1",
-    api_key="ollama",
-)
-OLLAMA_MODEL = "hf.co/unsloth/Qwen3.5-4B-GGUF:Q4_K_S"
 
 
 async def main():
@@ -36,9 +24,10 @@ async def main():
     await model.register(backend)
     print(f"Model registered! Step: {await model.get_step()}")
 
-    print("Testing local Ollama inference (NOT W&B inference)...")
-    completion = await OLLAMA_CLIENT.chat.completions.create(
-        model=OLLAMA_MODEL,
+    print("Testing inference...")
+    client = model.openai_client()
+    completion = await client.chat.completions.create(
+        model=model.get_inference_name(),
         messages=[{"role": "user", "content": "Hello, how are you?"}],
         max_tokens=50,
         temperature=0.8,

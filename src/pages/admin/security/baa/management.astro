@@ -423,10 +423,10 @@ const mockUpcomingActions = [
               <div
                 class={`border-l-4 ${
                   action.priority === 'high'
-                    ? 'border-red-500'
+                    ? 'border-neutral-500'
                     : action.priority === 'medium'
-                      ? 'border-amber-500'
-                      : 'border-blue-500'
+                      ? 'border-neutral-400'
+                      : 'border-neutral-300'
                 } pl-4 py-2`}
               >
                 <div class="flex justify-between">
@@ -434,10 +434,10 @@ const mockUpcomingActions = [
                   <span
                     class={`text-xs font-medium ${
                       action.priority === 'high'
-                        ? 'text-red-600'
+                        ? 'text-neutral-800'
                         : action.priority === 'medium'
-                          ? 'text-amber-600'
-                          : 'text-blue-600'
+                          ? 'text-neutral-700'
+                          : 'text-neutral-600'
                     }`}
                   >
                     {action.priority.toUpperCase()}
