@@ -4,8 +4,6 @@
 
 - Governs Claude Code sessions for `Pixelated Empathy`.
 - Main source of truth: root `AGENTS.md`.
-- Python via `uv run` (non-default choice), JS via `pnpm`. Full script list
-  in `package.json` + `pyproject.toml` — run `pnpm run` to enumerate.
 - Keep this file concise and high-signal (shorter files improve adherence).
 
 ## Rules
