@@ -136,7 +136,8 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          # GH_TOKEN is provided at the job level (see deploy-civo: env:).
+          # GH_TOKEN is exported at the deploy-civo job level above; gh CLI
+          # uses it automatically for release view / download calls.
           CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
           if [ -z "$CIVO_VERSION" ]; then
             echo "gh CLI could not resolve a tag; falling back to v1.5.4"
@@ -189,11 +190,8 @@ jobs:
 
       - name: Install kubectl and kustomize
         run: |
-          # kubectl: plain-text endpoint at dl.k8s.io (no auth needed)
-          # kustomize: public github.com release asset (anonymous OK,
-          #   CDN-backed so the api.github.com 60-req/hr limit doesn't apply)
-          # Both steps here work without GH_TOKEN; GH_TOKEN is still present
-          # from the job-level env block if a future step adds gh CLI.
+          # kubectl + kustomize are public-CDN downloads (no auth needed).
+          # GH_TOKEN is inherited from the job-level env block but unused here.
           # Resolve stable kubectl version with fallback
           KUBE_STABLE=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null) || {
             echo "⚠️  Could not resolve stable kubectl version from CDN; falling back to v1.36.2"
