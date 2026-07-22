@@ -125,7 +125,7 @@ export class FHEEmotionClassifier {
           throw new Error("FHE emotion classification failed: invalid result format");
         }
       } else {
-        encryptedResult = result.result as unknown as EncryptedData<string>;
+        encryptedResult = result.result;
       }
       encryptedDataResults.push(encryptedResult);
     }
