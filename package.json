@@ -503,7 +503,6 @@
     "path-to-regexp": "8.4.2"
   },
   "overrides": {
-<<<<<<< Updated upstream
     "@vercel/oidc": "3.7.1",
     "cookie": "^2.0.1",
     "fast-uri": "3.1.4",
@@ -511,9 +510,6 @@
     "shell-quote": "1.9.0",
     "@opentelemetry/propagator-jaeger": "2.10.0",
     "adm-zip": "0.6.0"
-=======
-    "@vercel/oidc": "3.7.1"
->>>>>>> Stashed changes
   },
   "engines": {
     "node": ">=24"
