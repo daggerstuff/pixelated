@@ -24,38 +24,12 @@ jobs:
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-
-      - name: Get pnpm store directory
-        id: pnpm-store
-        shell: bash
-        run: echo "store_path=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ${{ steps.pnpm-store.outputs.store_path }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Install native build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3 build-essential
-          npm install -g node-gyp
-
       - name: Clean pnpm cache
         run: pnpm store prune
-
-      - name: Install dependencies
-        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Configure Git
         run: |
