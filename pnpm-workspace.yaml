@@ -266,6 +266,7 @@ overrides:
   '@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0': npm:path-to-regexp@6.3.0
   astro>devalue: '>=5.8.1'
   axios: '>=1.15.1'
+  adm-zip: 0.6.0
   brace-expansion: '>=5.0.5'
   cookie: '^0.7.2'
   '@vercel/oidc': '3.7.1'
@@ -300,6 +301,7 @@ overrides:
   basic-ftp: '>=5.2.0'
   flatted: ^3.4.2
   serialize-javascript: ^8.0.0
+  shell-quote: 1.9.0
   body-parser: '>=1.20.3'
   express-rate-limit: '>=8.2.2'
   send: '>=0.19.0'
