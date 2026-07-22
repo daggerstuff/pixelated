@@ -31,6 +31,14 @@ jobs:
       # from the rhysd/actionlint action. Same pinned v1.7.7 as the
       # local helper (scripts/ci/run-actionlint.sh).
       - name: Download actionlint v1.7.7
+        env:
+          # Defensive: the GitHub release asset is public (anonymous works),
+          # but weekly CI runners share an IP pool with anonymous traffic,
+          # which is rate-limited at 60 req/hr per IP per the GitHub API docs.
+          # Sending GH_TOKEN raises the limit to 5000 req/hr per token and
+          # future-proofs against flakes. Mirrors the GH_TOKEN fix applied to
+          # deploy-civo.yml + update-civo-cli-pin.yml.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           curl --connect-timeout 30 --retry 3 --retry-delay 5 -sSL \
             -o /tmp/actionlint.tar.gz \
