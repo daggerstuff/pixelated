@@ -374,6 +374,19 @@ describe('handleMemoryApiError', () => {
     expect(data.error).toBe('Not Found')
   })
 
+  it('handles ProductMemoryGatewayError with 400 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } =
+      await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Bad request', 400)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBe('Bad Request')
+  })
+
   it('handles standard Error', async () => {
     const { handleMemoryApiError } = await import('../_shared')
 
