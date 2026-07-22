@@ -1,0 +1,98 @@
+# Session queries — require @auth
+
+query GetSession($id: ID!) {
+  session(id: $id) {
+    __typename
+    id
+    clientId
+    therapistId
+    startTime
+    endTime
+    sessionType
+    status
+    notes
+    transcript
+    aiAnalysis {
+      __typename
+      emotionalState
+      techniques
+      recommendations
+      riskAssessment
+    }
+  }
+}
+
+query ListSessions(
+  $clientId: ID
+  $therapistId: ID
+  $status: SessionStatus
+  $startDate: DateTime
+  $endDate: DateTime
+  $limit: Int = 50
+  $offset: Int = 0
+) {
+  sessions(
+    clientId: $clientId
+    therapistId: $therapistId
+    status: $status
+    startDate: $startDate
+    endDate: $endDate
+    limit: $limit
+    offset: $offset
+  ) {
+    __typename
+    id
+    clientId
+    therapistId
+    startTime
+    endTime
+    sessionType
+    status
+    notes
+  }
+}
+
+query GetSessionEmotions($sessionId: ID!) {
+  session(id: $sessionId) {
+    __typename
+    id
+    emotions {
+      __typename
+      id
+      sessionId
+      timestamp
+      emotions {
+        __typename
+        joy
+        sadness
+        anger
+        fear
+        surprise
+        disgust
+        trust
+        anticipation
+      }
+      dimensions {
+        __typename
+        valence
+        arousal
+        dominance
+      }
+      confidence
+    }
+  }
+}
+
+query GetSessionTurns($sessionId: ID!) {
+  session(id: $sessionId) {
+    __typename
+    id
+    turns {
+      __typename
+      id
+      role
+      content
+      timestamp
+    }
+  }
+}
