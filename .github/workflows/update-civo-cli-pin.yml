@@ -72,12 +72,7 @@ jobs:
         id: preflight
         if: steps.update.outputs.changed == 'true'
         run: |
-          # Soft-fail: if WORKFLOW_PAT isn't configured yet, emit a warning
-          # and skip the Create Pull Request step below. The workflow will
-          # still register as success so CI dashboards don't show a red run
-          # for an unconfigured-repo state. Once a repo admin configures
-          # the secret (see .github/workflows/_shared-conventions.md), the
-          # next run will publish the PR normally.
+          # Soft-fail (rationale in .github/workflows/_shared-conventions.md#workflow_pat_secret_for_editing_workflow_files).
           if [[ -z "${{ secrets.WORKFLOW_PAT }}" ]]; then
             echo "::warning::WORKFLOW_PAT secret is not set on this repository."
             echo "::warning::Skipping Create Pull Request step. See the"
