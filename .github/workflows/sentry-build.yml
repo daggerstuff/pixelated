@@ -2,7 +2,7 @@ name: Build & Sentry Release
 
 permissions:
   contents: read
-  packages: write
+  packages: write  # Required: GHCR push via docker/login-action with GITHUB_TOKEN
 
 on:
   push:
