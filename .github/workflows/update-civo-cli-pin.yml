@@ -33,9 +33,7 @@ permissions:
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
-    # GH_TOKEN declared at job-level per shared convention. Rationale,
-    # variable-name semantics, and the rationale for *not* mirroring per
-    # step live in [.github/workflows/_shared-conventions.md](./_shared-conventions.md#gh_token--variable-name-mismatch).
+    # GH_TOKEN declared at job-level per shared convention; rationale in .github/workflows/_shared-conventions.md.
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
