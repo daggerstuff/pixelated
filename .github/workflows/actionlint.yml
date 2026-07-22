@@ -21,21 +21,37 @@ on:
 jobs:
   actionlint:
     runs-on: ubuntu-latest
-    # 15min budget: rhysd/actionlint's Docker image builds Go from source
-    # on first run, which can take 8-12min. Subsequent runs hit the
-    # cached image and complete in seconds.
-    timeout-minutes: 15
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
-      # Pin to a specific tag for supply-chain reproducibility. Update
-      # this tag (and the ACTIONLINT_VERSION var in
-      # scripts/ci/run-actionlint.sh) when bumping actionlint.
-      # Source: https://github.com/rhysd/actionlint/releases
+      # Direct-binary download: ~1s vs 8-12min cold-cache Docker build
+      # from the rhysd/actionlint action. Same pinned v1.7.7 as the
+      # local helper (scripts/ci/run-actionlint.sh).
+      - name: Download actionlint v1.7.7
+        run: |
+          curl --connect-timeout 30 --retry 3 --retry-delay 5 -sSL \
+            -o /tmp/actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz"
+          mkdir -p /tmp/actionlint-bin
+          tar -xzf /tmp/actionlint.tar.gz -C /tmp/actionlint-bin
+          chmod +x /tmp/actionlint-bin/actionlint
+          /tmp/actionlint-bin/actionlint --version
+
       - name: Run actionlint
-        uses: rhysd/actionlint@v1.7.7
-        # The official action picks up .actionlint.yml automatically,
-        # so shellcheck-built-in stays disabled in CI without extra
-        # CLI flags. Run with -color off in CI for plain-text logs.
+        run: |
+          echo "::group::actionlint results"
+          # --ignore shellcheck-built-in: we run shellcheck separately in
+          # .github/workflows/shellcheck.yml; don't double-lint.
+          /tmp/actionlint-bin/actionlint -color \
+            --ignore shellcheck-built-in \
+            .github/workflows/*.yml
+          rc=$?
+          echo "::endgroup::"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::actionlint found violations (exit $rc). See the group above for details."
+            exit "$rc"
+          fi
+          echo "✅ All workflow files passed actionlint"
