@@ -29,6 +29,11 @@ COPY ${AGENT_DIR}/ ./
 # Local-dev time still uses the stub at agents/lib/context/startup-profiler.ts
 # (relative-path resolution from agents/<name>/agent/ goes up two levels).
 COPY src/lib/context /lib/context
+# Also COPY src/lib to /src/lib for tsconfig "@/lib/*" path aliases which
+# resolve to ../../src/lib/* from /agent/ → /src/lib/* at runtime.
+# Without this, eve's authored-modules (which use @/lib/utils for Tailwind
+# class merging) fail with "Cannot find package '@/lib'" during pnpm build.
+COPY src/lib /src/lib
 RUN pnpm build
 
 FROM node:24.16.0-bookworm-slim AS runtime
