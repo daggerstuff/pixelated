@@ -21,7 +21,10 @@ on:
 jobs:
   actionlint:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    # 15min budget: rhysd/actionlint's Docker image builds Go from source
+    # on first run, which can take 8-12min. Subsequent runs hit the
+    # cached image and complete in seconds.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
         with:
