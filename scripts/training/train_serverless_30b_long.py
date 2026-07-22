@@ -12,8 +12,19 @@ import random
 
 import art
 from art.serverless.backend import ServerlessBackend
+from openai import AsyncOpenAI
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+ALIBABA_API_KEY = os.environ.get("DASHSCOPE_API_KEY", os.environ.get("ALIBABA_CLOUD_API_KEY", ""))
+if not ALIBABA_API_KEY:
+    raise ValueError("DASHSCOPE_API_KEY (or ALIBABA_CLOUD_API_KEY) is required for Alibaba rollouts.")
+
+ALIBABA_CLIENT = AsyncOpenAI(
+    api_key=ALIBABA_API_KEY,
+    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+)
+ALIBABA_MODEL = "qwen3-30b-a3b-instruct"
 
 WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
 if not WANDB_API_KEY:
@@ -46,7 +57,6 @@ def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
 
 
 async def rollout(model: art.Model, messages: list) -> art.Trajectory:
-    client = model.openai_client()
     context = messages[:-1] if len(messages) > 1 else messages
     expected = messages[-1]["content"] if messages else ""
 
@@ -57,24 +67,13 @@ async def rollout(model: art.Model, messages: list) -> art.Trajectory:
     )
     trajectory.messages_and_choices = list(context)
 
-    completion = await client.chat.completions.create(
-        model=model.get_inference_name(),
+    completion = await ALIBABA_CLIENT.chat.completions.create(
+        model=ALIBABA_MODEL,
         messages=trajectory.messages(),
         max_tokens=1024,
         temperature=0.8,
-        logprobs=True,
-        extra_body={"return_token_ids": True},
     )
     choice = completion.choices[0]
-
-    prompt_token_ids = getattr(completion, "prompt_token_ids", None)
-    if prompt_token_ids is None and hasattr(completion, "model_extra") and completion.model_extra:
-        prompt_token_ids = completion.model_extra.get("prompt_token_ids")
-    if prompt_token_ids is not None:
-        if getattr(choice, "__pydantic_extra__", None) is None:
-            object.__setattr__(choice, "__pydantic_extra__", {})
-        choice.__pydantic_extra__["prompt_token_ids"] = prompt_token_ids
-
     trajectory.messages_and_choices.append(choice)
     response = choice.message.content or ""
 
@@ -111,21 +110,33 @@ async def main():
         project=PROJECT,
         entity="wutang",
         base_model=BASE_MODEL,
+        inference_api_key=ALIBABA_API_KEY,
+        inference_base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        inference_model_name=ALIBABA_MODEL,
     )
     backend = ServerlessBackend(api_key=WANDB_API_KEY)
     await model.register(backend)
 
     from art.utils.sft import train_sft_from_file
 
-    logging.info(f"Starting SFT Warmup ({SFT_WARMUP_STEPS} steps)...")
-    await train_sft_from_file(
-        model=model,
-        file_path=DATASET_PATH,
-        epochs=1,
-        final_step=SFT_WARMUP_STEPS,
-    )
-
     start_step = await model.get_step()
+    logging.info(f"Model current step: {start_step}")
+
+    if start_step < SFT_WARMUP_STEPS:
+        logging.info(f"Starting SFT Warmup ({SFT_WARMUP_STEPS} steps)...")
+        await train_sft_from_file(
+            model=model,
+            file_path=DATASET_PATH,
+            epochs=1,
+            initial_step=start_step,
+            final_step=SFT_WARMUP_STEPS,
+            verbose=True,
+        )
+        logging.info("SFT warmup complete.")
+        start_step = await model.get_step()
+    else:
+        logging.info(f"SFT warmup already complete ({start_step} >= {SFT_WARMUP_STEPS}), skipping.")
+
     logging.info(f"Starting RL from step {start_step}")
 
     for step in range(MAX_RL_STEPS):
