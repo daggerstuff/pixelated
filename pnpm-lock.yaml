@@ -191,14 +191,14 @@ importers:
         specifier: latest
         version: 0.11.1(@composio/core@0.14.0(ws@8.21.1(utf-8-validate@6.0.6))(zod@4.4.3))(ai@7.0.34(zod@4.4.3))
       '@fontsource-variable/fraunces':
-        specifier: ^5.2.9
-        version: 5.2.9
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource-variable/jetbrains-mono':
-        specifier: ^5.2.8
-        version: 5.2.8
+        specifier: ^5.3.0
+        version: 5.3.0
       '@fontsource/public-sans':
-        specifier: ^5.2.7
-        version: 5.2.7
+        specifier: ^5.3.0
+        version: 5.3.0
       '@google-cloud/storage':
         specifier: ^7.21.0
         version: 7.21.0
@@ -494,8 +494,8 @@ importers:
         specifier: ^1.4.0
         version: 1.4.0
       mongoose:
-        specifier: ^9.7.4
-        version: 9.7.4(@mongodb-js/zstd@7.0.0)
+        specifier: ^9.8.0
+        version: 9.8.0(@mongodb-js/zstd@7.0.0)
       morgan:
         specifier: ^1.11.0
         version: 1.11.0
@@ -1059,8 +1059,8 @@ importers:
         specifier: ^9.0.0
         version: 9.0.3
       mongoose:
-        specifier: ^9.7.4
-        version: 9.7.4(@mongodb-js/zstd@7.0.0)
+        specifier: ^9.8.0
+        version: 9.8.0(@mongodb-js/zstd@7.0.0)
       multer:
         specifier: ^2.1.1
         version: 2.2.0
@@ -2659,17 +2659,17 @@ packages:
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
 
-  '@fontsource-variable/fraunces@5.2.9':
-    resolution: {integrity: sha512-Y6IjunlN9Ni723np+GIgAaKzCDBrPRrqNi01TZxHs5wtHYROWFM9W6yiT+/gGwSjWIRD18oX17kD/BRWekc/Lw==}
+  '@fontsource-variable/fraunces@5.3.0':
+    resolution: {integrity: sha512-9BYGySn4AHEJdgp9Z28tQ3X+laJMEOITXkQarZXeloWQZDq5oOvXJ3kDA8c7MGIfpogIaZfjrQBqmda8POOCKA==}
 
-  '@fontsource-variable/jetbrains-mono@5.2.8':
-    resolution: {integrity: sha512-WBA9elru6Jdp5df2mES55wuOO0WIrn3kpXnI4+W2ek5u3ZgLS9XS4gmIlcQhiZOWEKl95meYdvK7xI+ETLCq/Q==}
+  '@fontsource-variable/jetbrains-mono@5.3.0':
+    resolution: {integrity: sha512-F32xpS2NsGYoQi2ADSkKTgpJj7ozajsGgDJ8woTnqjmIB+dxDIqImjl4pXZVEExu8UFZ2ndhmX18EBS/hdz3Lw==}
 
   '@fontsource/inter@5.3.0':
     resolution: {integrity: sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==}
 
-  '@fontsource/public-sans@5.2.7':
-    resolution: {integrity: sha512-pVttDr3HvhVIt2x6sZJfZKksNEpq23C1JCHTQwT9KWJdmFRdNeRM8gQftq8uP72sPW+p3Ku9x8HPk2E392DFvg==}
+  '@fontsource/public-sans@5.3.0':
+    resolution: {integrity: sha512-kjODI0S3zdv0mBYCIQ8TbBayaiqszpc2UbhJiO3bjIqVVXzcWfHSt2o3WBCLOY3juaGaQoy4MoWCcgmfI5hCuA==}
 
   '@github/copilot-darwin-arm64@1.0.71':
     resolution: {integrity: sha512-mEWzyqbqRAWgyU7i2uuSRoVPx/TwaFQX0nZmw0bc30aJ0BnO7cy2kYQyCHw8ykmf/tfxT0xauZ6k0BOFmWizzQ==}
@@ -10932,33 +10932,6 @@ packages:
   mongodb-query-validator@1.4.0:
     resolution: {integrity: sha512-HGEKildy9G4Kw/9vsfLJWPnPU0o8kmU+wJJ0ZOUDWUClGK2374aIgo15MBrbswSUoKmOkJPfFgqz2VaCPRH/1w==}
 
-  mongodb@7.2.0:
-    resolution: {integrity: sha512-F/2+BMZtLVhY30ioZp0dAmZ+IRZMBqI+nrv6t5+9/1AIwCa8sMRC3jBf81lpxMhnZgqq8CoUD503Z1oZWq1/sw==}
-    engines: {node: '>=20.19.0'}
-    peerDependencies:
-      '@aws-sdk/credential-providers': ^3.806.0
-      '@mongodb-js/zstd': ^7.0.0
-      gcp-metadata: ^7.0.1
-      kerberos: ^7.0.0
-      mongodb-client-encryption: '>=7.0.0 <7.1.0'
-      snappy: ^7.3.2
-      socks: ^2.8.6
-    peerDependenciesMeta:
-      '@aws-sdk/credential-providers':
-        optional: true
-      '@mongodb-js/zstd':
-        optional: true
-      gcp-metadata:
-        optional: true
-      kerberos:
-        optional: true
-      mongodb-client-encryption:
-        optional: true
-      snappy:
-        optional: true
-      socks:
-        optional: true
-
   mongodb@7.5.0:
     resolution: {integrity: sha512-5FnrEDLnvp6ycUOGLNLLU33BfCx2qmp2mJjGPDwKLruYsVzXVSK5fsGpoDXvsXJwBfBsD7ebMRdawbDxC2814g==}
     engines: {node: '>=20.19.0'}
@@ -10986,8 +10959,8 @@ packages:
       socks:
         optional: true
 
-  mongoose@9.7.4:
-    resolution: {integrity: sha512-nuSYGUWWzNd4EAbGYxE469wPTL+kmxb5+91YvCvMkJ08rvNRht/usZUU3LuFuk7rDutF2QWBZHPHuzM8TxXApA==}
+  mongoose@9.8.0:
+    resolution: {integrity: sha512-PDGx3XACxrBQyWf4YT+5s1Xsx19x84UWGlRVIza4i9RG6qKjGcoG7odotT6uquR6YoaDMTZ6ZZc/jMXLrNPyyA==}
     engines: {node: '>=20.19.0'}
 
   morgan@1.11.0:
@@ -15794,13 +15767,13 @@ snapshots:
 
   '@floating-ui/utils@0.2.12': {}
 
-  '@fontsource-variable/fraunces@5.2.9': {}
+  '@fontsource-variable/fraunces@5.3.0': {}
 
-  '@fontsource-variable/jetbrains-mono@5.2.8': {}
+  '@fontsource-variable/jetbrains-mono@5.3.0': {}
 
   '@fontsource/inter@5.3.0': {}
 
-  '@fontsource/public-sans@5.2.7': {}
+  '@fontsource/public-sans@5.3.0': {}
 
   '@github/copilot-darwin-arm64@1.0.71':
     optional: true
@@ -24994,14 +24967,6 @@ snapshots:
 
   mongodb-query-validator@1.4.0: {}
 
-  mongodb@7.2.0(@mongodb-js/zstd@7.0.0):
-    dependencies:
-      '@mongodb-js/saslprep': 1.4.12
-      bson: 7.3.1
-      mongodb-connection-string-url: 7.0.2
-    optionalDependencies:
-      '@mongodb-js/zstd': 7.0.0
-
   mongodb@7.5.0(@mongodb-js/zstd@7.0.0):
     dependencies:
       '@mongodb-js/saslprep': 1.4.12
@@ -25010,11 +24975,11 @@ snapshots:
     optionalDependencies:
       '@mongodb-js/zstd': 7.0.0
 
-  mongoose@9.7.4(@mongodb-js/zstd@7.0.0):
+  mongoose@9.8.0(@mongodb-js/zstd@7.0.0):
     dependencies:
       '@standard-schema/spec': 1.1.0
       kareem: 3.3.0
-      mongodb: 7.2.0(@mongodb-js/zstd@7.0.0)
+      mongodb: 7.5.0(@mongodb-js/zstd@7.0.0)
       mpath: 0.9.0
       mquery: 6.0.0
       ms: 2.1.3
