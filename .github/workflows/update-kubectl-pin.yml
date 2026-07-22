@@ -108,11 +108,9 @@ jobs:
           # above for setup instructions.
           token: ${{ secrets.WORKFLOW_PAT }}
           commit-message:
-            'chore: bump kubectl fallback version from ${{
-            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+            'chore: bump kubectl fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
           title:
-            'chore: update kubectl pinned fallback version to ${{
-            steps.update.outputs.new }}'
+            'chore: update kubectl pinned fallback version to ${{ steps.update.outputs.new }}'
           body: |
             A new kubectl stable version has been released: **${{ steps.update.outputs.new }}**
 
