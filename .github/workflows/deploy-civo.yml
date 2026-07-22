@@ -119,6 +119,14 @@ jobs:
     environment:
       name: civo
       url: https://pixelatedempathy.com
+    # Job-level GH_TOKEN env: gh CLI checks $GH_TOKEN (not $GITHUB_TOKEN)
+    # for auth. Without this, the 'Install Civo CLI' step exits with
+    #   'gh: To use GitHub CLI in a GitHub Actions workflow, set the
+    #    GH_TOKEN environment variable.'
+    # Set once at job level rather than per-step so any future step that
+    # uses `gh release` / `gh api` inherits the token automatically.
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -127,14 +135,8 @@ jobs:
           persist-credentials: false
 
       - name: Install Civo CLI
-        env:
-          # gh CLI checks $GH_TOKEN (not $GITHUB_TOKEN) for auth. Without
-          # this env block the step exits with:
-          #   'gh: To use GitHub CLI in a GitHub Actions workflow, set the
-          #    GH_TOKEN environment variable.'
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Resolve the latest release tag via gh CLI (auto-falls-back GH_TOKEN → GITHUB_TOKEN)
+          # GH_TOKEN is provided at the job level (see deploy-civo: env:).
           CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
           if [ -z "$CIVO_VERSION" ]; then
             echo "gh CLI could not resolve a tag; falling back to v1.5.4"
@@ -186,14 +188,12 @@ jobs:
           chmod 600 ~/.kube/config
 
       - name: Install kubectl and kustomize
-        env:
-          # Defensive: kustomize archive is downloaded from a public
-          # github.com release URL (no auth strictly needed) but curl
-          # honors ${GH_TOKEN} when set. Setting it mirrors the Install
-          # Civo CLI fix and keeps all download steps consistent if
-          # future maintainers swap curl for `gh release download`.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # kubectl: plain-text endpoint at dl.k8s.io (no auth needed)
+          # kustomize: public github.com release asset (anonymous OK,
+          #   CDN-backed so the api.github.com 60-req/hr limit doesn't apply)
+          # Both steps here work without GH_TOKEN; GH_TOKEN is still present
+          # from the job-level env block if a future step adds gh CLI.
           # Resolve stable kubectl version with fallback
           KUBE_STABLE=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null) || {
             echo "⚠️  Could not resolve stable kubectl version from CDN; falling back to v1.36.2"
