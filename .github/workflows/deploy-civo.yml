@@ -127,6 +127,12 @@ jobs:
           persist-credentials: false
 
       - name: Install Civo CLI
+        env:
+          # gh CLI checks $GH_TOKEN (not $GITHUB_TOKEN) for auth. Without
+          # this env block the step exits with:
+          #   'gh: To use GitHub CLI in a GitHub Actions workflow, set the
+          #    GH_TOKEN environment variable.'
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Resolve the latest release tag via gh CLI (auto-falls-back GH_TOKEN → GITHUB_TOKEN)
           CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
@@ -180,6 +186,13 @@ jobs:
           chmod 600 ~/.kube/config
 
       - name: Install kubectl and kustomize
+        env:
+          # Defensive: kustomize archive is downloaded from a public
+          # github.com release URL (no auth strictly needed) but curl
+          # honors ${GH_TOKEN} when set. Setting it mirrors the Install
+          # Civo CLI fix and keeps all download steps consistent if
+          # future maintainers swap curl for `gh release download`.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Resolve stable kubectl version with fallback
           KUBE_STABLE=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null) || {
