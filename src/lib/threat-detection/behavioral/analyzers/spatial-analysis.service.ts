@@ -110,7 +110,7 @@ export class SpatialAnalysisService {
     let maxDistance = 0
     for (let i = 0; i < locations.length; i++) {
       for (let j = i + 1; j < locations.length; j++) {
-        const d = this.haversineDistance(locations[i]!, locations[j]!)
+        const d = this.haversineDistance(locations[i], locations[j])
         if (d > maxDistance) {
           maxDistance = d
         }
@@ -124,7 +124,7 @@ export class SpatialAnalysisService {
     let totalDistance = 0
     let validPairs = 0
     for (let i = 0; i < locations.length - 1; i++) {
-      totalDistance += this.haversineDistance(locations[i]!, locations[i + 1]!)
+      totalDistance += this.haversineDistance(locations[i], locations[i + 1])
       validPairs++
     }
     return validPairs > 0 ? totalDistance / validPairs : 0
