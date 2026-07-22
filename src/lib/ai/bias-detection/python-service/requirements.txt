@@ -343,7 +343,7 @@ pandas==3.0.3
     #   evaluate
     #   fairlearn
     #   shap
-pillow==12.2.0
+pillow==12.3.0
     # via
     #   imageio
     #   matplotlib
@@ -362,7 +362,7 @@ propcache==0.5.2
     #   yarl
 psycopg2-binary==2.9.12
     # via bias-detection-service (pyproject.toml)
-pyarrow==24.0.0
+pyarrow==25.0.0
     # via datasets
 pycparser==3.0
     # via cffi
@@ -438,7 +438,7 @@ scipy==1.15.3
     #   shap
 sentry-sdk==2.60.0
     # via bias-detection-service (pyproject.toml)
-setuptools==81.0.0
+setuptools==83.0.0
     # via
     #   spacy
     #   thinc
@@ -488,7 +488,7 @@ tifffile==2026.5.15
     # via scikit-image
 tokenizers==0.22.2
     # via transformers
-torch==2.12.1
+torch==2.13.0
     # via bias-detection-service (pyproject.toml)
 tqdm==4.67.3
     # via

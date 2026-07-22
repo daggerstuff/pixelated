@@ -145,6 +145,9 @@
   --np-overlay: rgba(0, 0, 0, 0.4);
   --np-selection: rgba(0, 0, 0, 0.08);
   --np-selection-text: oklch(0.15 0 0);
+
+  /* Legacy alias (see compatibility block): --np-text as rgb() triplet */
+  --accent-primary-rgb: 38, 38, 38;
 }
 
 /* =============================================
@@ -219,6 +222,7 @@ body {
 
   /* Type family */
   --font-mono: var(--np-font-mono);
+  --font-body: var(--np-font-body);
 
   /* Motion (state-only, neutral) */
   --duration-fast: var(--np-duration-fast);

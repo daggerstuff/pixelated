@@ -20,6 +20,8 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-24.04
+    env:
+      TRIVY_STRICT_GATE: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -156,6 +158,18 @@ jobs:
         with:
           name: trivy-sarif
           path: trivy-results.sarif
+
+      - name: Trivy security gate (active)
+        if: always() && steps.trivy_sarif.outputs.found == 'true'
+        env:
+          TRIVY_OUTCOME: ${{ steps.trivy.outcome }}
+        run: |
+          if [[ "${TRIVY_OUTCOME}" == "failure" && "${TRIVY_STRICT_GATE:-false}" == "true" ]]; then
+            echo "::error::Trivy strict gate: CRITICAL/HIGH vulnerabilities detected."
+            echo "    Inspect findings at: https://github.com/${{ github.repository }}/security/code-scanning"
+            exit 1
+          fi
+          echo "✅ Trivy gate: no CRITICAL/HIGH vulnerabilities detected."
 
       - name: Upload Checkov Infrastructure scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
