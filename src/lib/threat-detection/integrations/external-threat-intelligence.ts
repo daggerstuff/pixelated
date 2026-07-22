@@ -580,7 +580,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         tags: Array.isArray(data['labels']) ? (data['labels'] as string[]) : [],
         metadata: {
           stixType: data['type'] || 'unknown',
-          specVersion: data['spec_version'] || '2.0',
+          specVersion: data['spec_version'] ?? '2.0',
           transformationDate: new Date(),
         },
       }

@@ -114,7 +114,7 @@ describe('tryRequireNode', () => {
       throw new Error('Module not found')
     })
     const globalAny = globalThis as unknown as Record<string, unknown>
-    globalAny['require'] = mockRequire as unknown
+    globalAny['require'] = mockRequire
 
     const result = tryRequireNode('nonexistent-module')
     expect(result).toBeNull()
@@ -125,7 +125,7 @@ describe('tryRequireNode', () => {
     const mockModule = { hello: 'world' }
     const mockRequire = vi.fn(() => mockModule)
     const globalAny = globalThis as unknown as Record<string, unknown>
-    globalAny['require'] = mockRequire as unknown
+    globalAny['require'] = mockRequire
 
     const result = tryRequireNode('some-module')
     expect(result).toBe(mockModule)

@@ -279,7 +279,7 @@ export const useJournalResearchWebSocket = ({
           ) as ArrayBuffer
         }
         // SharedArrayBuffer is not supported
-        return new TextEncoder().encode(String(data)).buffer as ArrayBuffer
+        return new TextEncoder().encode(String(data)).buffer
       })()
 
       const socket = socketRef.current

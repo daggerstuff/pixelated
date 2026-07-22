@@ -18,7 +18,7 @@ export interface BenchmarkResult {
 }
 
 export class BenchmarkReporter {
-  private results: BenchmarkResult[] = [];
+  private readonly results: BenchmarkResult[] = [];
   private startTime: number = 0;
 
   start(): void {
@@ -30,10 +30,10 @@ export class BenchmarkReporter {
       typeof slo === "number"
         ? typeof actual === "number"
           ? actual <= slo
-          : !!actual === (slo !== 0)
+          : actual === (slo !== 0)
         : typeof actual === "boolean"
           ? actual === slo
-          : !!actual === !!slo;
+          : !!actual === slo;
 
     this.results.push({
       name,

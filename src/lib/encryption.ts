@@ -43,7 +43,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder()
   const keyMaterial = await (webcrypto.subtle as SubtleCrypto).importKey(
     'raw',
-    encoder.encode(encryptionKey).buffer as ArrayBuffer,
+    encoder.encode(encryptionKey).buffer,
     'PBKDF2',
     false,
     ['deriveBits', 'deriveKey'],
@@ -61,7 +61,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
     { name: ALGORITHM, length: 256 },
     false,
     ['encrypt', 'decrypt'],
-  ) as Promise<CryptoKey>
+  )
 }
 
 function validateInput(data: unknown): void {

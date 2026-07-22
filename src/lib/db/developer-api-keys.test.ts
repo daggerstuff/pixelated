@@ -40,7 +40,7 @@ vi.mock("../redis", () => {
     zadd: vi.fn().mockResolvedValue(1),
     zremrangebyscore: vi.fn().mockResolvedValue(0),
     zcard: vi.fn().mockResolvedValue(0),
-    pipeline: vi.fn() as unknown as LegacyRedisClient["pipeline"],
+    pipeline: vi.fn(),
     multi: vi.fn(),
   };
 

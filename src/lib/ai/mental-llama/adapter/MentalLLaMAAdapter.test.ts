@@ -224,14 +224,14 @@ describe("MentalLLaMAAdapter (Consolidated)", () => {
 
       const result = await adapter.analyzeMentalHealth(baseParams);
 
-      expect(mockTaskRouterRoute as Mock).toHaveBeenCalledWith({
+      expect(mockTaskRouterRoute).toHaveBeenCalledWith({
         text: baseParams.text,
         context: expect.objectContaining({
           userId: "",
           sessionId: "",
         }),
       });
-      expect(mockModelProviderInvoke as Mock).toHaveBeenCalled();
+      expect(mockModelProviderInvoke).toHaveBeenCalled();
       expect(result.mentalHealthCategory).toBe("depression");
       expect(result.confidence).toBe(0.85); // LLM overrides router if higher
       expect(result.explanation).toBe("Shows signs of depression.");
@@ -256,7 +256,7 @@ describe("MentalLLaMAAdapter (Consolidated)", () => {
 
       expect(result.isCrisis).toBe(true);
       expect(result.mentalHealthCategory).toBe("crisis");
-      expect(mockCrisisNotifierSendCrisisAlert as Mock).toHaveBeenCalled();
+      expect(mockCrisisNotifierSendCrisisAlert).toHaveBeenCalled();
       expect(mockModelProviderInvoke).not.toHaveBeenCalled(); // Should return early
     });
 
@@ -285,7 +285,7 @@ describe("MentalLLaMAAdapter (Consolidated)", () => {
 
       expect(result.isCrisis).toBe(true);
       expect(result.mentalHealthCategory).toBe("crisis");
-      expect(mockCrisisNotifierSendCrisisAlert as Mock).toHaveBeenCalled();
+      expect(mockCrisisNotifierSendCrisisAlert).toHaveBeenCalled();
     });
 
     it("should handle LLM response parsing error", async () => {

@@ -40,7 +40,7 @@ export function ResetPasswordForm({
         redirectTo: window.location.href,
       })
 
-      if (response && response.success) {
+      if (response?.success) {
         // Dispatch custom event that the parent page is listening for
         const event = new CustomEvent('password-reset-success')
         document.dispatchEvent(event)

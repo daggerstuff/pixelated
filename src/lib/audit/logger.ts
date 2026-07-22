@@ -96,7 +96,7 @@ export function verifyAuditChain(events: AuditEvent[]): AuditChainVerification {
   let previousHash = AUDIT_CHAIN_GENESIS
 
   for (let i = 0; i < events.length; i += 1) {
-    const event = events[i] as AuditEvent
+    const event = events[i]
 
     if (!event.hash || event.hash === AUDIT_CHAIN_BREAK) {
       return {
