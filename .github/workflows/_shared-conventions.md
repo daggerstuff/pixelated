@@ -40,13 +40,50 @@ duplicating the same env declaration). Search git history for the
 original removal commit if you want the diff that introduced the
 job-level pattern.
 
+## WORKFLOW_PAT secret for editing workflow files
+
+GitHub's default `GITHUB_TOKEN` cannot authorize pushes that modify
+files under `.github/workflows/`. Such pushes fail with:
+
+> refusing to allow a GitHub App to create or update workflow `.yml`
+>   without workflows permission
+
+To create PRs that edit workflow files (e.g., `update-kubectl-pin.yml`
+auto-bumping a kubectl pin, or `update-civo-cli-pin.yml` auto-bumping
+a Civo CLI pin), the workflow's `peter-evans/create-pull-request` step
+must authenticate with a Personal Access Token (PAT) that has the
+**`workflow`** scope.
+
+The convention name: `WORKFLOW_PAT` (uppercase, snake_case) -- registered
+as a repo secret in Settings -> Secrets and variables -> Actions.
+
+Setup (one-time, by a repo admin):
+
+1. github.com -> Settings -> Developer settings -> Personal access
+   tokens -> Tokens (classic) -> Generate new token -> scope: `workflow`.
+   Recommended: fine-grained PAT scoped to *this single repo* with an
+   expiry, OR a GitHub App with Workflows: Read & Write -- both are safer
+   than a classic PAT scoped to the whole account.
+2. Repo -> Settings -> Secrets and variables -> Actions -> New repository
+   secret -> name: `WORKFLOW_PAT`, value: <paste token>.
+
+Until `WORKFLOW_PAT` is configured, the Create Pull Request step fails
+with a pre-flight warning pointing at the `permissions:` block of the
+caller workflow. The workflow registers as success so CI dashboards
+don't show a red run for an unconfigured-repo state.
+
 ## Cross-references
 
-| Workflow | Where the convention applies |
-|---|---|
-| `deploy-civo.yml` | `deploy-civo` job — env block above the steps |
-| `update-civo-cli-pin.yml` | `check-and-update` job — env block above the steps |
+| Workflow | Convention | Where the convention applies |
+|---|---|---|
+| `deploy-civo.yml` | GH_TOKEN | `deploy-civo` job -- env block above the steps |
+| `update-civo-cli-pin.yml` | GH_TOKEN | `check-and-update` job -- env block above the steps |
+| `update-civo-cli-pin.yml` | WORKFLOW_PAT | `permissions:` block at the top of the file |
+| `update-kubectl-pin.yml` | WORKFLOW_PAT | `permissions:` block at the top of the file |
 
-Both files comment on the env block with a one-line pointer to this
-document. Future workflows that need GitHub API auth should follow the
-same pattern: job-level `env: GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}`.
+Workflows following the GH_TOKEN convention comment the env block with
+a one-line pointer to this document's GH_TOKEN section. Workflows
+following the WORKFLOW_PAT convention comment the permissions block
+with a one-line pointer to this document's WORKFLOW_PAT section. New
+workflows that need GitHub API auth, OR that open PRs editing other
+workflow files, should follow the same pattern.
