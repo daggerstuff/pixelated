@@ -1,15 +1,10 @@
 # actionlint configuration for the Pixelated Empathy repo.
 # Docs: https://github.com/rhysd/actionlint/blob/main/docs/config.md
 #
-# We disable actionlint's built-in shellcheck invocation because we run
-# shellcheck separately in .github/workflows/shellcheck.yml with its own
-# severity threshold and a narrower file set. Avoid running it twice.
-disabled-rules:
-  # Disable actionlint's built-in shellcheck invocation. We run
-  # shellcheck separately in .github/workflows/shellcheck.yml with
-  # its own severity threshold and a narrower file set, so we don't
-  # want actionlint to also lint the embedded shell snippets.
-  - shellcheck-built-in
+# Note: actionlint's CLI flag `-shellcheck=` (empty value) disables the
+# automatic shellcheck invocation. We rely on that flag in the workflow
+# (and in scripts/ci/run-actionlint.sh) rather than a config file, since
+# the only supported way to disable shellcheck integration is the CLI flag.
 
 # Allow self-hosted runner labels referenced in any workflow. If we ever
 # add a self-hosted runner, list its label here so actionlint stops

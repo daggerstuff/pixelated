@@ -43,10 +43,16 @@ jobs:
       - name: Run actionlint
         run: |
           echo "::group::actionlint results"
-          # --ignore shellcheck-built-in: we run shellcheck separately in
-          # .github/workflows/shellcheck.yml; don't double-lint.
+          # -shellcheck= (empty value): disable actionlint's automatic
+          # shellcheck invocation. GitHub Actions' ubuntu-latest runners
+          # have shellcheck pre-installed in $PATH, so actionlint picks
+          # it up and runs it on every embedded `run:` step. We run
+          # shellcheck separately in .github/workflows/shellcheck.yml
+          # with its own severity threshold and a narrower file set,
+          # so we don't want actionlint to also lint the embedded
+          # shell snippets.
           /tmp/actionlint-bin/actionlint -color \
-            --ignore shellcheck-built-in \
+            -shellcheck= \
             .github/workflows/*.yml
           rc=$?
           echo "::endgroup::"
