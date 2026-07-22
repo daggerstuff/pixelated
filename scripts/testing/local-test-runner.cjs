@@ -5,7 +5,7 @@
 
 const { spawn } = require('child_process')
 
-const skip = (process.env.SKIP_TESTS || '').toLowerCase()
+const skip = (process.env.SKIP_TESTS ?? '').toLowerCase()
 if (skip === 'true' || skip === '1') {
   console.log('SKIP_TESTS is set - skipping tests (local only)')
   process.exit(0)
