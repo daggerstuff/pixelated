@@ -131,7 +131,7 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          # GH_TOKEN is exported at the deploy-civo job level above; gh uses it for release view/download auth.
+          # GH_TOKEN is exported at the deploy-civo job level above; gh CLI picks it up automatically for release view/download auth.
           CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
           if [ -z "$CIVO_VERSION" ]; then
             echo "gh CLI could not resolve a tag; falling back to v1.5.4"
