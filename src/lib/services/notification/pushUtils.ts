@@ -80,7 +80,7 @@ export async function sendNotification(
   const signature = await subtle.sign(
     { name: 'ECDSA', hash: 'SHA-256' },
     privateKey,
-    new TextEncoder().encode(input) as unknown as ArrayBuffer,
+    new TextEncoder().encode(input),
   )
 
   const jwt = `${input}.${uint8ArrayToBase64(new Uint8Array(signature))}`
