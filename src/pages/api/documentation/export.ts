@@ -18,7 +18,7 @@ const repository = new AIRepository()
 const aiService = getAIService()
 const documentationSystem = new DocumentationSystem(
   repository,
-  aiService as unknown as AIService,
+  aiService,
 )
 
 export const GET = async ({ request }) => {
