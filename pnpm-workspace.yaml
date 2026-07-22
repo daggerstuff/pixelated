@@ -237,7 +237,8 @@ overrides:
   '@foresight/core>esbuild': 0.25.0
   '@foresight/core>minimatch': 9.0.7
   '@foresight/core>vite': 6.4.2
-  '@foresight/docs>fast-uri': 3.1.1
+  fast-uri: 3.1.4
+  '@foresight/docs>fast-uri': 3.1.4
   '@foresight/docs>serialize-javascript': ^7.0.5
   '@google-cloud/storage>uuid': '>=11.1.1'
   gcp-metadata>uuid: '>=11.1.1'
@@ -285,7 +286,7 @@ overrides:
   h3: '>=1.15.9'
   hono: ^4.12.14
   ip-address: '>=10.1.1'
-  js-yaml: 4.2.0
+  js-yaml: 4.3.0
   markdown-it: 14.2.0
   '@opentelemetry/core': 2.8.0
   joi: 17.13.4

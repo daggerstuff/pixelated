@@ -54,7 +54,7 @@ jobs:
       - uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: '24.16.0'
-          pnpm-version: '11.11.0'
+          # pnpm-version omitted — auto-detects from package.json packageManager field
           cache-key-prefix: '${{ env.PNPM_CACHE_VERSION }}'
 
       - name: Format check
