@@ -43,9 +43,13 @@ jobs:
       - name: Get latest Civo CLI version
         id: latest
         env:
+          # GH_TOKEN (not GITHUB_TOKEN) so the env var name matches what
+          # curl references below. The auto-injected $GITHUB_TOKEN is a
+          # different reserved variable that we cannot reliably reference
+          # from the bash script in this step.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST=$(curl -sSfL -H "Authorization: Bearer $GITHUB_TOKEN" \
+          LATEST=$(curl -sSfL -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
 
           if [[ -z "$LATEST" || "$LATEST" != v* ]]; then
