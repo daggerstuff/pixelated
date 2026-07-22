@@ -13,4 +13,10 @@ RUN pip install --no-cache-dir -e ".[pe]"
 
 COPY src/pe/ src/pe/
 
+# Create non-root user and fix permissions
+RUN groupadd -g 1001 app && useradd -u 1001 -g app -m app && \
+    chown -R app:app /app
+
+USER app
+
 CMD ["celery", "-A", "src.pe.celery_app", "worker", "--loglevel=info", "--concurrency=4"]

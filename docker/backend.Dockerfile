@@ -18,6 +18,12 @@ RUN pip install --no-cache-dir -e ".[pe]"
 COPY src/pe/ src/pe/
 COPY src/pe/migrations/alembic.ini src/pe/migrations/
 
+# Create non-root user and fix permissions
+RUN groupadd -g 1001 app && useradd -u 1001 -g app -m app && \
+    chown -R app:app /app
+
+USER app
+
 EXPOSE 8000
 
 CMD ["uvicorn", "src.pe.main:app", "--host", "0.0.0.0", "--port", "8000"]
