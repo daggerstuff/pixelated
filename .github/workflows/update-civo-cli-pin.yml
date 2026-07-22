@@ -33,10 +33,10 @@ permissions:
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
-    # Job-level GH_TOKEN env: GH_TOKEN is the name the curl Authorization
-    # header references below; the auto-injected $GITHUB_TOKEN cannot be
-    # reliably referenced from a step's bash script. Set at job level so
-    # any future step that needs GitHub API auth inherits the same token.
+    # Job-level GH_TOKEN env: the curl Authorization header below references
+    # $GH_TOKEN literally. Set it once at job level (rather than per-step)
+    # so the API call stays authenticated, and any future step that needs
+    # GitHub API auth (curl or `gh` CLI) inherits the same token.
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
