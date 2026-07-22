@@ -87,3 +87,24 @@ following the WORKFLOW_PAT convention comment the permissions block
 with a one-line pointer to this document's WORKFLOW_PAT section. New
 workflows that need GitHub API auth, OR that open PRs editing other
 workflow files, should follow the same pattern.
+
+## Naming conventions
+
+All workflow-level convention names in this repository use
+**uppercase, snake_case**: `GH_TOKEN`, `WORKFLOW_PAT`. This is a
+convention, not a YAML or GitHub requirement. Follow it when adding
+a new cross-workflow secret or env var so the cross-references table
+remains internally consistent. Specifically:
+
+- The constant name is **all-caps** (matching shell/secret convention).
+- Words are separated by underscores (`_`), not hyphens (`-`).
+- The secret name registered in Settings > Secrets and variables >
+  Actions is the **same value**. The YAML key in `permissions:` or
+  `env:` blocks, the inline comment pointing to this document, and
+  the heading used in `_shared-conventions.md` all mirror that value
+  exactly.
+
+If a future workflow needs a different secret for a different
+GitHub-scope reason, keep the pattern: pick a new all-caps name,
+register the repo secret under it, and add a `## <NAME>` section in
+this document with the rationale.
