@@ -2,6 +2,8 @@
 """Categorize TypeScript errors from the typecheck output."""
 
 import re
+import os
+import sys
 from collections import Counter
 
 with open("/tmp/tc_errors_full.txt") as f:
@@ -17,9 +19,10 @@ file_counts = Counter()
 code_counts = Counter()
 file_details = {}
 
+# TODO: handle empty error list edge case — should print "No errors found" instead of empty sections
 for loc, code, _ in errors:
     fpath = loc.split(":")[0]
-    file_counts[fpath] += 1
+    file_count[fpath] += 1
     code_counts[code] += 1
     if fpath not in file_details:
         file_details[fpath] = Counter()
