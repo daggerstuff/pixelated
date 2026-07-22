@@ -1,0 +1,60 @@
+name: actionlint
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - '.github/workflows/**'
+      - '.actionlint.yml'
+      - 'package.json'
+  pull_request:
+    branches: [staging]
+    paths:
+      - '.github/workflows/**'
+      - '.actionlint.yml'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # actionlint itself: pinned to a specific commit SHA for supply-chain
+      # safety. Bump manually in this file rather than relying on mutable tags.
+      # Authoritative source: https://github.com/rhysd/actionlint releases.
+      - name: Download actionlint (pinned v1.7.7)
+        id: get_actionlint
+        run: |
+          curl --connect-timeout 30 --retry 3 --retry-delay 5 -sSL \
+            -o /tmp/actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz"
+          tar -xzf /tmp/actionlint.tar.gz -C /tmp
+          ls -la /tmp/actionlint
+          /tmp/actionlint --version
+
+      - name: Run actionlint on all workflow files
+        id: lint
+        run: |
+          echo "::group::actionlint results"
+          /tmp/actionlint -color .github/workflows/*.yml
+          rc=$?
+          echo "::endgroup::"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::actionlint found violations (exit $rc). See the group above for details."
+            exit "$rc"
+          fi
+          echo "✅ All workflow files passed actionlint"
+
+      # Optional: surface the actionlint version we pinned so future bumps
+      # to this workflow file also update the version block above.
+      - name: Print actionlint version
+        if: always()
+        run: /tmp/actionlint --version
