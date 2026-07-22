@@ -1,35 +1,77 @@
-const CACHE_NAME = 'image-cache-v1'
-const IMAGE_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000 // 7 days
+const CACHE_VERSION = '__SW_VERSION__'
+const STATIC_CACHE = `static-${CACHE_VERSION}`
+const SWR_CACHE = `swr-${CACHE_VERSION}`
 
-// Helper function to check if URL is an image
-function isImageUrl(url) {
-  return url.match(/\.(jpg|jpeg|png|webp|avif)$/i)
+// Static asset patterns (CacheFirst)
+const STATIC_PATTERNS = [
+  /\/\/[^/]+\/_astro\//,
+  /\/_astro\//,
+  /\/css\//,
+  /\/fonts\//,
+  /\/js\//,
+  /\/models\//,
+  /\/optimized\//,
+  /\/katex\//,
+  /\/polyfills\//,
+  /\/images\//,
+  /\.(?:jpg|jpeg|png|webp|avif|gif|svg|ico|woff2?|ttf|otf|eot)$/i,
+]
+
+// Public API patterns (StaleWhileRevalidate)
+const SWR_PATTERNS = [
+  /\/api\/v1\/health/,
+  /\/api\/health/,
+  /\/api\/developer\//,
+  /\/api\/v1\/developer\//,
+  /\/api\/v1\/search$/,
+  /\/docs\/api\//,
+]
+
+// PHI routes — NEVER intercept (let network handle always)
+const PHI_PATTERNS = [
+  /\/api\/sessions\//,
+  /\/api\/auth\//,
+  /\/api\/v1\/memory\//,
+  /\/api\/memory\//,
+  /\/api\/v1\/preferences\//,
+  /\/api\/v1\/profile\//,
+  /\/api\/v1\/admin\//,
+  /\/api\/graphql$/,
+  /\/api\/chat$/,
+  /\/api\/treatment-plans\//,
+  /\/api\/emotions\//,
+  /\/api\/agent-notes\//,
+  /\/api\/agent-note-collab\//,
+  /\/api\/ai\//,
+  /\/api\/dashboard$/,
+  /\/api\/ingestion\//,
+  /\/api\/reprioritization\//,
+]
+
+function isStaticAsset(url) {
+  return STATIC_PATTERNS.some((p) => p.test(url))
 }
 
-// Helper to check if cache entry is expired
-async function isCacheExpired(response) {
-  const cachedDate = response.headers.get('sw-cache-date')
-  if (!cachedDate) {
-    return true
-  }
+function isSWRRoute(url) {
+  return SWR_PATTERNS.some((p) => p.test(url))
+}
 
-  const age = Date.now() - new Date(cachedDate).getTime()
-  return age > IMAGE_CACHE_DURATION
+function isPHIRoute(url) {
+  return PHI_PATTERNS.some((p) => p.test(url))
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(self.skipWaiting())
+  event.waitUntil(caches.open(STATIC_CACHE).then(() => self.skipWaiting()))
 })
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     Promise.all([
       self.clients.claim(),
-      // Clean up old caches
       caches.keys().then(async (keys) => {
         return Promise.all(
           keys
-            .filter((key) => key !== CACHE_NAME)
+            .filter((key) => key !== STATIC_CACHE && key !== SWR_CACHE)
             .map(async (key) => caches.delete(key)),
         )
       }),
@@ -37,45 +79,64 @@ self.addEventListener('activate', (event) => {
   )
 })
 
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting()
+  }
+})
+
 self.addEventListener('fetch', (event) => {
-  if (!isImageUrl(event.request.url)) {
+  const { request } = event
+  const url = request.url
+
+  // Only handle GET requests
+  if (request.method !== 'GET') {
     return
   }
 
-  event.respondWith(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      const cachedResponse = await cache.match(event.request)
+  // NEVER intercept PHI routes — always go to network
+  if (isPHIRoute(url)) {
+    return
+  }
 
-      if (cachedResponse && !(await isCacheExpired(cachedResponse))) {
-        return cachedResponse
-      }
-
-      try {
-        const response = await fetch(event.request)
-
-        // Clone the response before caching
-        const responseToCache = response.clone()
-
-        // Add cache date header
-        const headers = new Headers(responseToCache.headers)
-        headers.append('sw-cache-date', new Date().toISOString())
-
-        const modifiedResponse = new Response(await responseToCache.blob(), {
-          status: responseToCache.status,
-          statusText: responseToCache.statusText,
-          headers,
-        })
-
-        void cache.put(event.request, modifiedResponse)
-
-        return response
-      } catch (error) {
-        // Return expired cached response if fetch fails
-        if (cachedResponse) {
-          return cachedResponse
+  // CacheFirst for static assets
+  if (isStaticAsset(url)) {
+    event.respondWith(
+      caches.open(STATIC_CACHE).then(async (cache) => {
+        const cached = await cache.match(request)
+        if (cached) {
+          return cached
         }
-        throw error
-      }
-    }),
-  )
+        try {
+          const response = await fetch(request)
+          if (response.ok) {
+            void cache.put(request, response.clone())
+          }
+          return response
+        } catch (err) {
+          return cached ?? Response.error()
+        }
+      }),
+    )
+    return
+  }
+
+  // StaleWhileRevalidate for public API routes
+  if (isSWRRoute(url)) {
+    event.respondWith(
+      caches.open(SWR_CACHE).then(async (cache) => {
+        const cached = await cache.match(request)
+        const fetchPromise = fetch(request)
+          .then((response) => {
+            if (response.ok) {
+              void cache.put(request, response.clone())
+            }
+            return response
+          })
+          .catch(() => cached)
+        return cached ?? fetchPromise
+      }),
+    )
+    return
+  }
 })
