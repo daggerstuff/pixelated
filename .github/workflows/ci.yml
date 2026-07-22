@@ -32,7 +32,6 @@ jobs:
     timeout-minutes: 45
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      TRIVY_STRICT_GATE: false
       VITEST_COVERAGE_ENABLED: false
       PNPM_CACHE_VERSION: v2
       REDIS_URL: ${{ secrets['REDIS_URL'] }}
@@ -52,41 +51,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash scripts/devops/init-submodules.sh
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          version: 11.11.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24.16.0
-
-      - name: Install native build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3 build-essential
-          npm install -g node-gyp
-
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: |
-          echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache pnpm store
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ${{ steps.pnpm-store.outputs.path }}
-          key:
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
-            hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
-
-      - name: Install dependencies
-        run: |
-          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          node-version: '24.16.0'
+          # pnpm-version omitted — auto-detects from package.json packageManager field
+          cache-key-prefix: '${{ env.PNPM_CACHE_VERSION }}'
 
       - name: Format check
         continue-on-error: true
@@ -180,13 +149,13 @@ jobs:
             echo "No CRITICAL/HIGH vulnerabilities found."
           fi
 
-      - name: Security gate (soft-fail currently)
+      - name: Security gate (active)
         if: always() && hashFiles('trivy-results.sarif') != ''
-        continue-on-error: true
         run: |
           findings="${{ steps.trivy_summary.outputs.critical_or_high_findings || '0' }}"
-          strict_gate="${TRIVY_STRICT_GATE:-false}"
-          if [[ "$findings" -gt 0 && "${strict_gate,,}" == "true" ]]; then
-            echo "Trivy strict gate is enabled and critical/high findings were detected."
+          if [[ "$findings" -gt 0 ]]; then
+            echo "::error::Trivy strict gate: ${findings} CRITICAL/HIGH vulnerabilities detected."
+            echo "    Inspect findings at: https://github.com/${{ github.repository }}/security/code-scanning"
             exit 1
           fi
+          echo "✅ Trivy gate: no CRITICAL/HIGH vulnerabilities detected."

@@ -11,7 +11,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   struct-setup:
@@ -30,33 +29,11 @@ jobs:
           persist-credentials: false
           submodules: false
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version: 24.16.0
-
-      - name: Get pnpm store path
-        id: pnpm-store
-        run: |
-          echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
-
-      - name: Cache pnpm store
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ${{ steps.pnpm-store.outputs.path }}
-          key:
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
-            hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
-
-      - name: Install dependencies
-        run: |
-          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          node-version: '24.16.0'
+          cache-key-prefix: '${{ env.PNPM_CACHE_VERSION }}'
+          install-native-deps: 'false'
 
       - name: Install Struct CLI
         continue-on-error: true

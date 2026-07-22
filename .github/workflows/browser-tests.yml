@@ -2,7 +2,6 @@ name: Browser Compatibility Tests
 
 permissions:
   contents: read
-  actions: write
 
 on:
   push:
@@ -24,6 +23,8 @@ jobs:
     name: Run Browser Tests
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    permissions:
+      actions: write
 
     steps:
       - uses: actions/checkout@v7
@@ -171,6 +172,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [browser-tests]
     if: always()
+    permissions:
+      actions: write
 
     steps:
       - uses: actions/checkout@v7

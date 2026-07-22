@@ -9,10 +9,14 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # WORKFLOW_PAT rationale + setup; see .github/workflows/_shared-conventions.md#workflow_pat_secret_for_editing_workflow_files.
 
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
+    # GH_TOKEN declared at job-level per shared convention; rationale in .github/workflows/_shared-conventions.md.
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -22,10 +26,9 @@ jobs:
 
       - name: Get latest Civo CLI version
         id: latest
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST=$(curl -sSfL -H "Authorization: Bearer $GITHUB_TOKEN" \
+          # GH_TOKEN is exported at the check-and-update job level above.
+          LATEST=$(curl -sSfL -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
 
           if [[ -z "$LATEST" || "$LATEST" != v* ]]; then
@@ -39,7 +42,13 @@ jobs:
       - name: Get current pinned version
         id: current
         run: |
-          CURRENT=$(grep -oP 'falling back to \Kv[\d]+\.[\d]+\.[\d]+' .github/workflows/deploy-civo.yml)
+          # Grep the CIVO_VERSION="vX.Y.Z" assignment directly (mirrors the
+          # update-kubectl-pin workflow's pattern). A generic
+          # 'falling back to vX.Y.Z' grep matches BOTH the CIVO_VERSION
+          # fallback line AND the KUBE_STABLE fallback line in
+          # deploy-civo.yml, producing multi-line output that $GITHUB_OUTPUT
+          # rejects with 'Invalid format'.
+          CURRENT=$(grep -oP 'CIVO_VERSION="\Kv[\d]+\.[\d]+\.[\d]+' .github/workflows/deploy-civo.yml)
           echo "Current pin: $CURRENT"
           echo "version=$CURRENT" >> $GITHUB_OUTPUT
 
@@ -59,17 +68,33 @@ jobs:
           echo "old=$OLD" >> $GITHUB_OUTPUT
           echo "new=$NEW" >> $GITHUB_OUTPUT
 
-      - name: Create Pull Request
+      - name: "Pre-flight: verify WORKFLOW_PAT secret exists"
+        id: preflight
         if: steps.update.outputs.changed == 'true'
+        run: |
+          # Soft-fail (rationale in .github/workflows/_shared-conventions.md#workflow_pat_secret_for_editing_workflow_files).
+          if [[ -z "${{ secrets.WORKFLOW_PAT }}" ]]; then
+            echo "::warning::WORKFLOW_PAT secret is not set on this repository."
+            echo "::warning::Skipping Create Pull Request step. See the"
+            echo "::warning::permissions: block at the top of this file for"
+            echo "::warning::setup instructions (PAT with 'workflow' scope)."
+            echo "has_pat=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_pat=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true' && steps.preflight.outputs.has_pat == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use WORKFLOW_PAT (not GITHUB_TOKEN) so the push is authorized
+          # to modify files under .github/workflows/. See permissions: block
+          # above for setup instructions.
+          token: ${{ secrets.WORKFLOW_PAT }}
           commit-message:
-            'chore: bump Civo CLI fallback version from ${{
-            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+            'chore: bump Civo CLI fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
           title:
-            'chore: update Civo CLI pinned fallback version to ${{
-            steps.update.outputs.new }}'
+            'chore: update Civo CLI pinned fallback version to ${{ steps.update.outputs.new }}'
           body: |
             The Civo CLI has released a new version: **${{ steps.update.outputs.new }}**
 

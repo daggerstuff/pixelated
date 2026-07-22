@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # WORKFLOW_PAT rationale + setup; see .github/workflows/_shared-conventions.md#workflow_pat_secret_for_editing_workflow_files.
 
 jobs:
   check-and-update:
@@ -59,17 +60,33 @@ jobs:
           echo "old=$OLD" >> $GITHUB_OUTPUT
           echo "new=$NEW" >> $GITHUB_OUTPUT
 
-      - name: Create Pull Request
+      - name: "Pre-flight: verify WORKFLOW_PAT secret exists"
+        id: preflight
         if: steps.update.outputs.changed == 'true'
+        run: |
+          # Soft-fail (rationale in .github/workflows/_shared-conventions.md#workflow_pat_secret_for_editing_workflow_files).
+          if [[ -z "${{ secrets.WORKFLOW_PAT }}" ]]; then
+            echo "::warning::WORKFLOW_PAT secret is not set on this repository."
+            echo "::warning::Skipping Create Pull Request step. See the"
+            echo "::warning::permissions: block at the top of this file for"
+            echo "::warning::setup instructions (PAT with 'workflow' scope)."
+            echo "has_pat=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_pat=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create Pull Request
+        if: steps.update.outputs.changed == 'true' && steps.preflight.outputs.has_pat == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Use WORKFLOW_PAT (not GITHUB_TOKEN) so the push is authorized
+          # to modify files under .github/workflows/. See permissions: block
+          # above for setup instructions.
+          token: ${{ secrets.WORKFLOW_PAT }}
           commit-message:
-            'chore: bump kubectl fallback version from ${{
-            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+            'chore: bump kubectl fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
           title:
-            'chore: update kubectl pinned fallback version to ${{
-            steps.update.outputs.new }}'
+            'chore: update kubectl pinned fallback version to ${{ steps.update.outputs.new }}'
           body: |
             A new kubectl stable version has been released: **${{ steps.update.outputs.new }}**
 

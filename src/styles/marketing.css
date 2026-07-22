@@ -207,6 +207,43 @@
   color: var(--accent-primary);
 }
 
+.marketing-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* === Form fields === */
+.marketing-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 1rem; /* ≥16px — prevents iOS Safari auto-zoom on focus */
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.marketing-input::placeholder {
+  color: var(--text-muted);
+}
+
+.marketing-input:hover {
+  border-color: rgba(var(--accent-primary-rgb), 0.35);
+}
+
+.marketing-input:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-color: rgba(var(--accent-primary-rgb), 0.5);
+}
+
 .marketing-note {
   margin-top: 1rem;
   font-family: var(--font-mono);

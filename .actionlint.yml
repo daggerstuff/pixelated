@@ -1,0 +1,18 @@
+# actionlint configuration for the Pixelated Empathy repo.
+# Docs: https://github.com/rhysd/actionlint/blob/main/docs/config.md
+#
+# Note: actionlint's CLI flag `-shellcheck=` (empty value) disables the
+# automatic shellcheck invocation. We rely on that flag in the workflow
+# (and in scripts/ci/run-actionlint.sh) rather than a config file, since
+# the only supported way to disable shellcheck integration is the CLI flag.
+
+# Allow self-hosted runner labels referenced in any workflow. If we ever
+# add a self-hosted runner, list its label here so actionlint stops
+# warning about an unknown label. (No self-hosted runners configured
+# today; section kept as documentation for future setup.)
+self-hosted-runner:
+  labels: []
+  matrix: {}
+
+# config-variables are not used today; empty sections are fine.
+config-variables: null

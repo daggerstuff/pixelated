@@ -1,0 +1,63 @@
+name: actionlint
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - '.github/workflows/**'
+      - '.actionlint.yml'
+      - 'package.json'
+  pull_request:
+    branches: [staging]
+    paths:
+      - '.github/workflows/**'
+      - '.actionlint.yml'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      # Direct-binary download: ~1s vs 8-12min cold-cache Docker build
+      # from the rhysd/actionlint action. Same pinned v1.7.7 as the
+      # local helper (scripts/ci/run-actionlint.sh).
+      - name: Download actionlint v1.7.7
+        run: |
+          curl --connect-timeout 30 --retry 3 --retry-delay 5 -sSL \
+            -o /tmp/actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v1.7.7/actionlint_1.7.7_linux_amd64.tar.gz"
+          mkdir -p /tmp/actionlint-bin
+          tar -xzf /tmp/actionlint.tar.gz -C /tmp/actionlint-bin
+          chmod +x /tmp/actionlint-bin/actionlint
+          /tmp/actionlint-bin/actionlint --version
+
+      - name: Run actionlint
+        run: |
+          echo "::group::actionlint results"
+          # -shellcheck= (empty value): disable actionlint's automatic
+          # shellcheck invocation. GitHub Actions' ubuntu-latest runners
+          # have shellcheck pre-installed in $PATH, so actionlint picks
+          # it up and runs it on every embedded `run:` step. We run
+          # shellcheck separately in .github/workflows/shellcheck.yml
+          # with its own severity threshold and a narrower file set,
+          # so we don't want actionlint to also lint the embedded
+          # shell snippets.
+          /tmp/actionlint-bin/actionlint -color \
+            -shellcheck= \
+            .github/workflows/*.yml
+          rc=$?
+          echo "::endgroup::"
+          if [ "$rc" -ne 0 ]; then
+            echo "::error::actionlint found violations (exit $rc). See the group above for details."
+            exit "$rc"
+          fi
+          echo "✅ All workflow files passed actionlint"

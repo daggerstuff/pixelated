@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "setuptools>=78.1.1",
+  "setuptools>=83.0.0",
   "wheel>=0.38.1",
 ] # Fixes CVE-2024-6345, CVE-2025-47273, CVE-2022-40898
 build-backend = "setuptools.build_meta"
@@ -35,12 +35,12 @@ dependencies = [
   # Reference: https://docs.sentry.io/platforms/python/metrics/
   "sentry-sdk[fastapi]>=2.44.0",
   # Multi-modal AI Dependencies
-  "torch>=2.12.1",
+  "torch>=2.13.0",
   "torchvision>=0.21.0",
   "torchaudio>=2.8.0",
   "transformers>=5.7.0",
   "opencv-python>=4.8.0",
-  "pillow>=12.2.0", # Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
+  "pillow>=12.3.0", # Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "librosa>=0.10.0",
   "soundfile>=0.12.0",
   "moviepy>=1.0.3",
