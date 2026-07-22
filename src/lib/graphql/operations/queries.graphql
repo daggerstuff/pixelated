@@ -1,0 +1,4 @@
+# Health check query — public, no auth required
+query Health {
+  health
+}
