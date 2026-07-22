@@ -20,6 +20,7 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get inst
     make \
     g++ \
     curl \
+    libvips-dev \
     && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
     echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
