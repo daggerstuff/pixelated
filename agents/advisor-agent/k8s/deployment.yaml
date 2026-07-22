@@ -21,8 +21,22 @@ spec:
     spec:
       imagePullSecrets:
         - name: dockerhub-registry-credentials
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: agent
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           image: docker.io/pixelatedempathy/pipeline-agent:latest
           ports:
             - containerPort: 2000
@@ -96,6 +110,9 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 5
             failureThreshold: 3
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
           resources:
             requests:
               cpu: 100m
@@ -103,6 +120,9 @@ spec:
             limits:
               cpu: "1"
               memory: 1Gi
+      volumes:
+        - name: tmp
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

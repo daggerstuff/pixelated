@@ -35,8 +35,17 @@ spec:
         runAsUser: 1001
         runAsGroup: 1001
         fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: pixelated-empathy
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           # Pin to an IMMUTABLE reference (digest or semver), not :latest.
           # :latest + imagePullPolicy: Always lets two pods pull different
           # builds, so each bakes a different dist/ _astro hash and the Service
@@ -60,6 +69,8 @@ spec:
             - name: cloudflare-tls
               mountPath: /etc/ssl/cloudflare
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
           env:
             - name: PORT
               value: "4321"
@@ -107,3 +118,5 @@ spec:
         - name: cloudflare-tls
           secret:
             secretName: cloudflare-origin-tls
+        - name: tmp
+          emptyDir: {}
