@@ -1,0 +1,51 @@
+# Subscription operations — require @auth, transport via graphql-ws
+
+subscription SessionUpdated($sessionId: ID) {
+  sessionUpdated(sessionId: $sessionId) {
+    __typename
+    id
+    clientId
+    therapistId
+    startTime
+    endTime
+    sessionType
+    status
+  }
+}
+
+subscription EmotionAnalysisCreated($sessionId: ID) {
+  emotionAnalysisCreated(sessionId: $sessionId) {
+    __typename
+    id
+    sessionId
+    timestamp
+    emotions {
+      __typename
+      joy
+      sadness
+      anger
+      fear
+      surprise
+      disgust
+      trust
+      anticipation
+    }
+    dimensions {
+      __typename
+      valence
+      arousal
+      dominance
+    }
+    confidence
+  }
+}
+
+subscription ConversationTurnAdded($sessionId: ID) {
+  conversationTurnAdded(sessionId: $sessionId) {
+    __typename
+    id
+    role
+    content
+    timestamp
+  }
+}

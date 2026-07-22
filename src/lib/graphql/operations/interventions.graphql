@@ -1,0 +1,19 @@
+# Intervention queries — require @auth
+
+query GetInterventions($userId: ID!, $limit: Int = 10, $offset: Int = 0) {
+  interventions(userId: $userId, limit: $limit, offset: $offset) {
+    __typename
+    id
+    userId
+    conversation
+    intervention
+    userResponse
+    effectiveness
+    insights
+    recommendedFollowUp
+    modelId
+    modelProvider
+    createdAt
+    updatedAt
+  }
+}
