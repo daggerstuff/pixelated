@@ -37,4 +37,4 @@ if [[ "$#" -eq 0 ]]; then
 fi
 
 echo "→ Running actionlint v${ACTIONLINT_VERSION} on: $*"
-exec "${BIN}" -color "$@"
+exec "${BIN}" -color -shellcheck= "$@"
