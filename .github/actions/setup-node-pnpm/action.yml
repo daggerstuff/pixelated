@@ -1,0 +1,95 @@
+name: Setup Node.js with pnpm
+description: |
+  Setup Node.js, pnpm (via pnpm/action-setup), cache the pnpm store, and
+  optionally install native build dependencies and/or project dependencies.
+
+  Replaces the 6-step boilerplate (setup pnpm → setup Node → get store path
+  → cache store → native deps → install deps) used across 10+ workflow files.
+
+inputs:
+  node-version:
+    description: Node.js version to install (e.g. '24.16.0')
+    required: true
+  pnpm-version:
+    description: |
+      Specific pnpm version to install. When empty the pnpm/action-setup
+      reads the version from the package.json packageManager field.
+    required: false
+    default: ''
+  cache-key-prefix:
+    description: |
+      Optional prefix for the pnpm-store cache key, e.g. 'v2' from
+      PNPM_CACHE_VERSION. Produces key with the prefix inserted between
+      'pnpm-store-' and the hash-based portion for manual cache busting.
+    required: false
+    default: ''
+  install-native-deps:
+    description: |
+      Install python3, build-essential, and node-gyp required by native
+      addon compilation.
+    required: false
+    default: 'true'
+  clean-node-modules:
+    description: |
+      Run rm -rf node_modules before install to fix stale lockfile
+      artifacts (needed when switching between workspaces or lockfiles).
+    required: false
+    default: 'false'
+  install-deps:
+    description: |
+      Run PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+      after setup is complete. Set to 'false' when a custom install command
+      (e.g. --ignore-scripts) is needed.
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      with:
+        run_install: false
+        version: ${{ inputs.pnpm-version || '' }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Get pnpm store path
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache pnpm store
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: >-
+          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != ''
+          && format('-{0}', inputs.cache-key-prefix) || ''
+          }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != ''
+          && format('-{0}', inputs.cache-key-prefix) || '' }}-
+
+    - name: Clean pnpm workspace artifacts
+      if: ${{ inputs.clean-node-modules == 'true' }}
+      shell: bash
+      run: rm -rf node_modules
+
+    - name: Install native build dependencies
+      if: ${{ inputs.install-native-deps == 'true' }}
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 build-essential
+        npm install -g node-gyp
+
+    - name: Install dependencies
+      if: ${{ inputs.install-deps == 'true' }}
+      shell: bash
+      env:
+        PNPM_CONFIG_TRUST_LOCKFILE: 'true'
+      run: pnpm install --no-frozen-lockfile
