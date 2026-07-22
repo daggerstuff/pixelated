@@ -1,0 +1,17 @@
+# Anonymized metrics — requires @auth(scope: "admin")
+
+query GetAnonymizedMetrics {
+  anonymizedMetrics {
+    __typename
+    aggregateEmotionScores
+    techniqueEffectiveness
+    demographicBreakdown
+    temporalTrends
+    privacyMetrics {
+      __typename
+      kAnonymity
+      differentialPrivacyEpsilon
+      reidentificationRisk
+    }
+  }
+}
