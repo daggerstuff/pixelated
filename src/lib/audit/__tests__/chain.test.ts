@@ -110,7 +110,7 @@ describe('verifyAuditChain', () => {
   })
 
   it('detects a missing hash', () => {
-    const events = [makeEvent({ id: 'e1' })] as unknown as AuditEvent[]
+    const events = [makeEvent({ id: 'e1' })]
     const res = verifyAuditChain(events)
     expect(res.valid).toBe(false)
     expect(res.reason).toBe('missing hash')
@@ -142,7 +142,7 @@ describe('AuditLogger persistence builds a hash chain', () => {
     const auditLogger = AuditLogger.getInstance()
     const ensureSpy = vi
       .spyOn(auditLogger as unknown as { ensureConnected: () => Promise<unknown> }, 'ensureConnected')
-      .mockResolvedValue(db as unknown as never)
+      .mockResolvedValue(db)
 
     await (auditLogger as unknown as { persistEventWithRetry: (e: AuditEvent) => Promise<void> }).persistEventWithRetry(
       makeEvent({ id: 'e1' }),
