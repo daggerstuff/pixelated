@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 45
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      TRIVY_STRICT_GATE: false
+      TRIVY_STRICT_GATE: true
       VITEST_COVERAGE_ENABLED: false
       PNPM_CACHE_VERSION: v2
       REDIS_URL: ${{ secrets['REDIS_URL'] }}
@@ -180,13 +180,13 @@ jobs:
             echo "No CRITICAL/HIGH vulnerabilities found."
           fi
 
-      - name: Security gate (soft-fail currently)
+      - name: Security gate (active)
         if: always() && hashFiles('trivy-results.sarif') != ''
-        continue-on-error: true
         run: |
           findings="${{ steps.trivy_summary.outputs.critical_or_high_findings || '0' }}"
-          strict_gate="${TRIVY_STRICT_GATE:-false}"
-          if [[ "$findings" -gt 0 && "${strict_gate,,}" == "true" ]]; then
-            echo "Trivy strict gate is enabled and critical/high findings were detected."
+          if [[ "$findings" -gt 0 ]]; then
+            echo "::error::Trivy strict gate: ${findings} CRITICAL/HIGH vulnerabilities detected."
+            echo "    Inspect findings at: https://github.com/${{ github.repository }}/security/code-scanning"
             exit 1
           fi
+          echo "✅ Trivy gate: no CRITICAL/HIGH vulnerabilities detected."
