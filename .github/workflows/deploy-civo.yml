@@ -119,12 +119,9 @@ jobs:
     environment:
       name: civo
       url: https://pixelatedempathy.com
-    # Job-level GH_TOKEN env: gh CLI checks $GH_TOKEN (not $GITHUB_TOKEN)
-    # for auth. Without this, the 'Install Civo CLI' step exits with
-    #   'gh: To use GitHub CLI in a GitHub Actions workflow, set the
-    #    GH_TOKEN environment variable.'
-    # Set once at job level rather than per-step so any future step that
-    # uses `gh release` / `gh api` inherits the token automatically.
+    # GH_TOKEN declared at job-level per shared convention. Rationale,
+    # variable-name semantics, and the rationale for *not* mirroring per
+    # step live in [.github/workflows/_shared-conventions.md](./_shared-conventions.md#gh_token--variable-name-mismatch).
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
