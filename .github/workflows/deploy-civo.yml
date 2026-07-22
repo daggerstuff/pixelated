@@ -128,33 +128,31 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          # Resolve the latest release tag from GitHub API (authenticated — 5,000 req/hr vs 60)
-          AUTH_HEADER="Authorization: Bearer ${GITHUB_TOKEN}"
-          CIVO_VERSION=$(curl -sL -H "${AUTH_HEADER}" https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
+          # Resolve the latest release tag via gh CLI (auto-falls-back GH_TOKEN → GITHUB_TOKEN)
+          CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
           if [ -z "$CIVO_VERSION" ]; then
-            echo "GitHub API rate limited or unreachable; falling back to v1.5.4"
+            echo "gh CLI could not resolve a tag; falling back to v1.5.4"
             CIVO_VERSION="v1.5.4"
           fi
           echo "Civo CLI version: $CIVO_VERSION"
 
-          DOWNLOAD_URL=$(curl -sL -H "${AUTH_HEADER}" "https://api.github.com/repos/civo/cli/releases/tags/${CIVO_VERSION}" | jq -r '.assets[]? | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url // empty')
-          if [ -z "$DOWNLOAD_URL" ]; then
-            echo "Could not resolve asset URL from API; falling back to constructed URL"
-            DOWNLOAD_URL="https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
-          fi
-          echo "Download URL: $DOWNLOAD_URL"
-
-          # Download with -f to fail on HTTP errors
-          curl -sSfL "$DOWNLOAD_URL" -o /tmp/civo.tar.gz
-
-          # Validate the file is actually gzip before extraction
-          if ! file /tmp/civo.tar.gz | grep -q 'gzip compressed'; then
-            echo "❌ Downloaded file is not gzip. Contents:"
-            head -c 500 /tmp/civo.tar.gz
+          # Download the linux/amd64 archive directly; gh handles auth + asset selection.
+          ARCHIVE="/tmp/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
+          if ! gh release download "$CIVO_VERSION" --repo civo/cli \
+               --pattern 'civo-*-linux-amd64.tar.gz' \
+               --dir /tmp; then
+            echo "❌ gh release download failed for ${CIVO_VERSION}"
             exit 1
           fi
 
-          tar xzf /tmp/civo.tar.gz -C /usr/local/bin/ civo
+          # Validate the file is actually gzip before extraction
+          if ! file "$ARCHIVE" | grep -q 'gzip compressed'; then
+            echo "❌ Downloaded file is not gzip. Contents:"
+            head -c 500 "$ARCHIVE"
+            exit 1
+          fi
+
+          tar xzf "$ARCHIVE" -C /usr/local/bin/ civo
           civo --version
 
       - name: Configure Civo
