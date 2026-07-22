@@ -119,9 +119,7 @@ jobs:
     environment:
       name: civo
       url: https://pixelatedempathy.com
-    # GH_TOKEN declared at job-level per shared convention. Rationale,
-    # variable-name semantics, and the rationale for *not* mirroring per
-    # step live in [.github/workflows/_shared-conventions.md](./_shared-conventions.md#gh_token--variable-name-mismatch).
+    # GH_TOKEN declared at job-level per shared convention; rationale in .github/workflows/_shared-conventions.md.
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -133,8 +131,7 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          # GH_TOKEN is exported at the deploy-civo job level above; gh CLI
-          # uses it automatically for release view / download calls.
+          # GH_TOKEN is exported at the deploy-civo job level above; gh uses it for release view/download auth.
           CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
           if [ -z "$CIVO_VERSION" ]; then
             echo "gh CLI could not resolve a tag; falling back to v1.5.4"
