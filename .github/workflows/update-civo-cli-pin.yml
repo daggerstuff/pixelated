@@ -33,10 +33,9 @@ permissions:
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
-    # Job-level GH_TOKEN env: the curl Authorization header below references
-    # $GH_TOKEN literally. Set it once at job level (rather than per-step)
-    # so the API call stays authenticated, and any future step that needs
-    # GitHub API auth (curl or `gh` CLI) inherits the same token.
+    # GH_TOKEN declared at job-level per shared convention. Rationale,
+    # variable-name semantics, and the rationale for *not* mirroring per
+    # step live in [.github/workflows/_shared-conventions.md](./_shared-conventions.md#gh_token--variable-name-mismatch).
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
