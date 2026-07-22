@@ -25,10 +25,10 @@ export default defineTool({
     } else if (
       typeof status === 'object' &&
       'checked_at' in status &&
-      typeof (status as Record<string, unknown>).checked_at === 'string' &&
+      typeof (status).checked_at === 'string' &&
       !isNaN(
         new Date(
-          (status as Record<string, unknown>).checked_at as string,
+          (status).checked_at,
         ).getTime(),
       )
     ) {
