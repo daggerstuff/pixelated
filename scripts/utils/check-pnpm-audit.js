@@ -6,6 +6,12 @@
  * Parses pnpm audit --json output and exits with non-zero code
  * if vulnerabilities at or above a specified severity are found.
  *
+ * Reads only `data.vulnerabilities` (pnpm 11 format). Deliberately ignores
+ * `data.advisories` (yarn-style / pnpm <=9) and `data.metadata.vulnerabilities`
+ * (aggregate counts that double-count the entries already present in
+ * `data.vulnerabilities`). Reading those produced false positives that
+ * disagreed with `pnpm audit --json`'s own summary.
+ *
  * Usage: node check-pnpm-audit.js --fail-on high audit-results.json
  */
 
@@ -40,20 +46,19 @@ function severityIndex(severity) {
   return idx === -1 ? 0 : idx;
 }
 
+/**
+ * Read vulnerability entries from a pnpm 11+ audit JSON document.
+ *
+ * pnpm 11 emits the canonical format under `data.vulnerabilities`, which can
+ * be either an Array (older callers) or an Object keyed by package name. We
+ * deliberately do NOT read `data.advisories` (yarn-style / pnpm <=9 format,
+ * which pnpm 11 leaves empty but stale parsers keep using) or
+ * `data.metadata.vulnerabilities` (aggregate counts that double-count the
+ * entries already present in `data.vulnerabilities`). Reading those produced
+ * false positives that disagreed with `pnpm audit --json`'s own summary.
+ */
 function extractVulnerabilities(data) {
   const vulnerabilities = [];
-
-  if (data.advisories) {
-    for (const [id, advisory] of Object.entries(data.advisories)) {
-      vulnerabilities.push({
-        id,
-        severity: advisory.severity || 'unknown',
-        title: advisory.title || advisory.overview || 'No title',
-        module_name: advisory.module_name || advisory.moduleName || 'unknown',
-        url: advisory.url || advisory.cves?.[0] || '',
-      });
-    }
-  }
 
   if (data.vulnerabilities) {
     if (Array.isArray(data.vulnerabilities)) {
@@ -76,23 +81,6 @@ function extractVulnerabilities(data) {
           module_name: name,
           url: info.via?.[0]?.url || info.url || '',
         });
-      }
-    }
-  }
-
-  if (data.metadata && data.metadata.vulnerabilities) {
-    const counts = data.metadata.vulnerabilities;
-    for (const sev of SEVERITY_ORDER) {
-      if (counts[sev] > 0) {
-        for (let i = 0; i < counts[sev]; i++) {
-          vulnerabilities.push({
-            id: 'aggregate',
-            severity: sev,
-            title: 'Aggregate vulnerability count',
-            module_name: 'unknown',
-            url: '',
-          });
-        }
       }
     }
   }
