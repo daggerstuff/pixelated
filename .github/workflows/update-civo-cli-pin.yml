@@ -33,6 +33,12 @@ permissions:
 jobs:
   check-and-update:
     runs-on: ubuntu-latest
+    # Job-level GH_TOKEN env: GH_TOKEN is the name the curl Authorization
+    # header references below; the auto-injected $GITHUB_TOKEN cannot be
+    # reliably referenced from a step's bash script. Set at job level so
+    # any future step that needs GitHub API auth inherits the same token.
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -42,13 +48,8 @@ jobs:
 
       - name: Get latest Civo CLI version
         id: latest
-        env:
-          # GH_TOKEN (not GITHUB_TOKEN) so the env var name matches what
-          # curl references below. The auto-injected $GITHUB_TOKEN is a
-          # different reserved variable that we cannot reliably reference
-          # from the bash script in this step.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # GH_TOKEN is exported at the check-and-update job level above.
           LATEST=$(curl -sSfL -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // empty')
 
