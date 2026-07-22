@@ -176,19 +176,19 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
         const fileData = coverageData[file]
         if (fileData) {
           // Count statements
-          const statements = fileData.s || {}
+          const statements = fileData.s ?? {}
           const statementCounts = Object.values(statements)
           totalStatements += statementCounts.length
           coveredStatements += statementCounts.filter((c) => c > 0).length
 
           // Count functions
-          const functions = fileData.f || {}
+          const functions = fileData.f ?? {}
           const functionCounts = Object.values(functions)
           totalFunctions += functionCounts.length
           coveredFunctions += functionCounts.filter((c) => c > 0).length
 
           // Count branches
-          const branches = fileData.b || {}
+          const branches = fileData.b ?? {}
           for (const branchArr of Object.values(branches)) {
             if (Array.isArray(branchArr)) {
               totalBranches += branchArr.length
@@ -214,7 +214,7 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
       }
     } else if (existsSync(coberturaPath)) {
       // Try to parse Cobertura XML as fallback
-      const xml = readFileSync(coberturaPath, 'utf8') as string
+      const xml = readFileSync(coberturaPath, 'utf8')
       // Extract coverage percentage from XML
       const coverageMatch = xml.match(/coverage="([^"]+)"/)
       if (coverageMatch) {
