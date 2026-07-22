@@ -119,6 +119,9 @@ jobs:
     environment:
       name: civo
       url: https://pixelatedempathy.com
+    # GH_TOKEN declared at job-level per shared convention; rationale in .github/workflows/_shared-conventions.md.
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -128,7 +131,7 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          # Resolve the latest release tag via gh CLI (auto-falls-back GH_TOKEN → GITHUB_TOKEN)
+          # GH_TOKEN is exported at the deploy-civo job level above; gh uses it for release view/download auth.
           CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
           if [ -z "$CIVO_VERSION" ]; then
             echo "gh CLI could not resolve a tag; falling back to v1.5.4"
@@ -181,6 +184,8 @@ jobs:
 
       - name: Install kubectl and kustomize
         run: |
+          # kubectl + kustomize are public-CDN downloads (no auth needed).
+          # GH_TOKEN is inherited from the job-level env block but unused here.
           # Resolve stable kubectl version with fallback
           KUBE_STABLE=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null) || {
             echo "⚠️  Could not resolve stable kubectl version from CDN; falling back to v1.36.2"
