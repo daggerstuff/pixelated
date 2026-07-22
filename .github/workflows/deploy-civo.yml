@@ -185,8 +185,8 @@ jobs:
         run: |
           # Resolve stable kubectl version with fallback
           KUBE_STABLE=$(curl -sSfL https://dl.k8s.io/release/stable.txt 2>/dev/null) || {
-            echo "⚠️  Could not resolve stable kubectl version from CDN; falling back to v1.32.0"
-            KUBE_STABLE="v1.32.0"
+            echo "⚠️  Could not resolve stable kubectl version from CDN; falling back to v1.36.2"
+            KUBE_STABLE="v1.36.2"
           }
           echo "Kubectl version: $KUBE_STABLE"
 
