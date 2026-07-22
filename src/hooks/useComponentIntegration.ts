@@ -39,7 +39,7 @@ export function useChartData(params: UseChartDataParams) {
           dataPoints: params.dataPoints,
         })
         if (signal?.aborted) return
-        setChartData(data as unknown as Record<string, unknown>)
+        setChartData(data)
       } catch (err: unknown) {
         if (signal?.aborted) return
         const message =
