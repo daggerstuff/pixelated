@@ -1,11 +1,11 @@
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getZKProofService } from '@/lib/fhe/zk-proof-service'
-import type { ZKProofArtifact } from '@/lib/fhe/zk-proof-service'
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { getZKProofService } from "@/lib/fhe/zk-proof-service";
+import type { ZKProofArtifact } from "@/lib/fhe/zk-proof-service";
 
-import { protectRoute } from '../../../../lib/auth/serverAuth'
+import { protectRoute } from "../../../../lib/auth/serverAuth";
 
-export const prerender = false
-const logger = createBuildSafeLogger('zk-verify-api')
+export const prerender = false;
+const logger = createBuildSafeLogger("zk-verify-api");
 
 /**
  * POST /api/v1/zk/verify
@@ -25,17 +25,17 @@ const logger = createBuildSafeLogger('zk-verify-api')
  */
 export const POST = protectRoute({})(async ({ request }) => {
   try {
-    const body = (await request.json()) as Partial<ZKProofArtifact>
+    const body = (await request.json()) as Partial<ZKProofArtifact>;
 
     // Validate required fields
     const requiredFields: (keyof ZKProofArtifact)[] = [
-      'proof',
-      'publicInputHash',
-      'publicOutputHash',
-      'merkleRoot',
-      'operationType',
-      'timestamp',
-    ]
+      "proof",
+      "publicInputHash",
+      "publicOutputHash",
+      "merkleRoot",
+      "operationType",
+      "timestamp",
+    ];
 
     for (const field of requiredFields) {
       if (!body[field]) {
@@ -47,12 +47,12 @@ export const POST = protectRoute({})(async ({ request }) => {
           {
             status: 400,
             headers: {
-              'Content-Type': 'application/json',
-              'Cache-Control': 'no-store, no-cache, must-revalidate',
-              'Pragma': 'no-cache',
+              "Content-Type": "application/json",
+              "Cache-Control": "no-store, no-cache, must-revalidate",
+              Pragma: "no-cache",
             },
           },
-        )
+        );
       }
     }
 
@@ -64,9 +64,10 @@ export const POST = protectRoute({})(async ({ request }) => {
       operationType: body.operationType!,
       timestamp: body.timestamp!,
       durationMs: body.durationMs ?? 0,
-    }
+      proofMode: body.proofMode ?? "hash-commitment",
+    };
 
-    const zkService = getZKProofService()
+    const zkService = getZKProofService();
 
     // Verify the proof: the caller provides the expected input/output hashes
     // (these are public inputs to the ZK proof)
@@ -74,13 +75,13 @@ export const POST = protectRoute({})(async ({ request }) => {
       proofArtifact,
       proofArtifact.publicInputHash,
       proofArtifact.publicOutputHash,
-    )
+    );
 
-    logger.info('ZK proof verification requested', {
+    logger.info("ZK proof verification requested", {
       valid,
       operationType: proofArtifact.operationType,
       merkleRoot: proofArtifact.merkleRoot.slice(0, 16),
-    })
+    });
 
     return new Response(
       JSON.stringify({
@@ -88,36 +89,37 @@ export const POST = protectRoute({})(async ({ request }) => {
         operationType: proofArtifact.operationType,
         timestamp: proofArtifact.timestamp,
         merkleRoot: proofArtifact.merkleRoot,
+        proofMode: proofArtifact.proofMode,
       }),
       {
         status: valid ? 200 : 422,
         headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-          'Pragma': 'no-cache',
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+          Pragma: "no-cache",
         },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error('ZK proof verification failed', { error })
+    logger.error("ZK proof verification failed", { error });
 
     return new Response(
       JSON.stringify({
         valid: false,
-        error: 'Proof verification failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Proof verification failed",
+        message: error instanceof Error ? error.message : "Unknown error",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-store, no-cache, must-revalidate',
-          'Pragma': 'no-cache',
+          "Content-Type": "application/json",
+          "Cache-Control": "no-store, no-cache, must-revalidate",
+          Pragma: "no-cache",
         },
       },
-    )
+    );
   }
-})
+});
 
 /**
  * GET /api/v1/zk/verify
@@ -127,28 +129,27 @@ export const POST = protectRoute({})(async ({ request }) => {
 export const GET = protectRoute({})(async () => {
   return new Response(
     JSON.stringify({
-      endpoint: '/api/v1/zk/verify',
-      method: 'POST',
-      description:
-        'Verifies a Zero-Knowledge proof artifact for data pipeline integrity',
-      proofSystem: 'SP1 (Succinct) with hash-based commitments',
-      adr: 'ADR-0004',
+      endpoint: "/api/v1/zk/verify",
+      method: "POST",
+      description: "Verifies a Zero-Knowledge proof artifact for data pipeline integrity",
+      proofSystem: "SP1 (Succinct) with hash-based commitments",
+      adr: "ADR-0004",
       requiredFields: [
-        'proof',
-        'publicInputHash',
-        'publicOutputHash',
-        'merkleRoot',
-        'operationType',
-        'timestamp',
+        "proof",
+        "publicInputHash",
+        "publicOutputHash",
+        "merkleRoot",
+        "operationType",
+        "timestamp",
       ],
     }),
     {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'Pragma': 'no-cache',
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        Pragma: "no-cache",
       },
     },
-  )
-})
+  );
+});
