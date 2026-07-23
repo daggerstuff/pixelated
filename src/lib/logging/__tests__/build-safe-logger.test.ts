@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

@@ -76,12 +76,12 @@ export function complexityLimitRule(
             let fieldType = fieldDef.type;
 
             // Strip NonNull wrapper (equivalent to getNullableType)
-            if (fieldType && fieldType[Symbol.toStringTag] === "GraphQLNonNull") {
+            if (fieldType?.[Symbol.toStringTag] === "GraphQLNonNull") {
               fieldType = fieldType.ofType;
             }
 
             // Check if it's a list type (equivalent to isListType)
-            if (fieldType && fieldType[Symbol.toStringTag] === "GraphQLList") {
+            if (fieldType?.[Symbol.toStringTag] === "GraphQLList") {
               cost = LIST_BASE_COST;
 
               const limitArg = node.arguments?.find(

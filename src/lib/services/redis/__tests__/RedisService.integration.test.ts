@@ -472,7 +472,7 @@ describeFn('RedisService Integration Tests', () => {
         return redis.set(key, `value-${i}`)
       })
 
-      await expect(Promise.all(operations)).resolves.not.toThrow()
+       await expect(Promise.all(operations)).resolves.not.toThrow()
     })
 
     it('should handle mixed operations concurrently', async () => {
@@ -524,7 +524,7 @@ describeFn('RedisService Integration Tests', () => {
         // This should retry and eventually fail
         await expect(retryRedis.get(key)).rejects.toMatchObject({
           code: RedisErrorCode.OPERATION_FAILED,
-        } as Partial<RedisServiceError>)
+        })
       } finally {
         await retryRedis.disconnect()
       }
