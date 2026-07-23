@@ -7,6 +7,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - ./alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - ./alerts:/etc/prometheus/alerts
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -23,7 +24,7 @@ services:
     ports:
       - '3100:3000'
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=\${GF_ADMIN_PASSWORD}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_ADMIN_PASSWORD}
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
@@ -44,6 +45,16 @@ services:
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/alertmanager'
+    environment:
+      - SMTP_SMARTHOST=${SMTP_SMARTHOST:-smtp.gmail.com:587}
+      - SMTP_FROM=${SMTP_FROM:-alerts@pixelatedempathy.com}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - PAGERDUTY_ROUTING_KEY=${PAGERDUTY_ROUTING_KEY}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - ALERT_EMAIL_TO=${ALERT_EMAIL_TO:-admin@pixelatedempathy.com}
+      - CRITICAL_ALERT_EMAIL=${CRITICAL_ALERT_EMAIL:-critical@pixelatedempathy.com}
+      - WARNING_ALERT_EMAIL=${WARNING_ALERT_EMAIL:-warnings@pixelatedempathy.com}
     restart: unless-stopped
 
   node-exporter:
@@ -68,7 +79,17 @@ services:
     ports:
       - '9187:9187'
     environment:
-      - DATA_SOURCE_NAME=postgresql://\${POSTGRES_USER}:\${POSTGRES_PASSWORD}@pixelated-postgres:5432/\${POSTGRES_DB}?sslmode=disable
+      - DATA_SOURCE_NAME=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@pixelated-postgres:5432/${POSTGRES_DB}?sslmode=disable
+    restart: unless-stopped
+
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: pixelated-empathy-redis-exporter
+    ports:
+      - '9121:9121'
+    environment:
+      - REDIS_ADDR=redis://${REDIS_HOST:-pixelated-redis}:${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
     restart: unless-stopped
 
 volumes:
