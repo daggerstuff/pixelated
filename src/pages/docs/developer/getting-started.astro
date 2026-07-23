@@ -1,0 +1,197 @@
+---
+import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
+---
+
+<DocumentationLayout
+  title="Getting Started with the API"
+  description="Authenticate and make your first API request in under 5 minutes"
+>
+  <h1>Getting Started with the API</h1>
+
+  <p>
+    This guide walks you through obtaining an API key, making your first
+    authenticated request, and understanding rate limits. By the end, you'll
+    be ready to integrate the Pixelated Empathy API into your application.
+  </p>
+
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#create-api-key">Create an API Key</a></li>
+    <li><a href="#first-request">Make Your First Request</a></li>
+    <li><a href="#authentication">Authentication Methods</a></li>
+    <li><a href="#rate-limits">Rate Limits & Quotas</a></li>
+    <li><a href="#error-handling">Error Handling</a></li>
+    <li><a href="#next-steps">Next Steps</a></li>
+  </ol>
+
+  <h2 id="prerequisites">Prerequisites</h2>
+  <ul>
+    <li>A Pixelated Empathy account with developer access</li>
+    <li>Node.js 18+ or Python 3.9+ installed (for SDK usage)</li>
+    <li><code>curl</code> or any HTTP client for testing</li>
+  </ul>
+
+  <h2 id="create-api-key">Create an API Key</h2>
+  <p>
+    API keys are managed through the admin dashboard. Keys are scoped to
+    specific permissions and have per-key rate limits.
+  </p>
+
+  <ol>
+    <li>Navigate to the <a href="/admin/api-keys">API Key Management</a> dashboard</li>
+    <li>Click "Create New Key"</li>
+    <li>Select the scopes your application needs:
+      <ul>
+        <li><code>read</code> — Read access to non-PHI endpoints</li>
+        <li><code>write</code> — Create/update resources</li>
+        <li><code>developer:manage</code> — Manage API keys (rotation, revocation)</li>
+        <li><code>analytics:read</code> — Access analytics endpoints</li>
+        <li><code>memory:read</code> / <code>memory:write</code> — Memory API access</li>
+        <li><code>admin</code> — Full admin access (use with caution)</li>
+      </ul>
+    </li>
+    <li>Set a name and optional expiration date</li>
+    <li>Copy the generated key — it's shown only once</li>
+  </ol>
+
+  <div class="callout callout-warning">
+    <strong>Security:</strong> Store your API key securely. Never commit it to
+    version control or expose it in client-side code. Use environment variables
+    or a secrets manager.
+  </div>
+
+  <h2 id="first-request">Make Your First Request</h2>
+  <p>Once you have an API key, make a test request:</p>
+
+  <pre><code class="language-bash">curl -X GET https://api.pixelatedempathy.com/api/v1/health \
+  -H "X-API-Key: dev_your_api_key_here"</code></pre>
+
+  <p>Expected response:</p>
+  <pre><code class="language-json">{
+  "status": "healthy",
+  "version": "1",
+  "timestamp": "2026-07-23T00:00:00Z"
+}</code></pre>
+
+  <p>The response includes the <code>X-API-Version</code> header indicating the API version that served your request.</p>
+
+  <h2 id="authentication">Authentication Methods</h2>
+
+  <h3>API Key (Recommended for Server-Side)</h3>
+  <p>
+    Include your API key in the <code>X-API-Key</code> header on every request.
+    This is the simplest method for server-to-server integrations.
+  </p>
+
+  <pre><code class="language-bash">curl -X GET https://api.pixelatedempathy.com/api/v1/search?q=anxiety \
+  -H "X-API-Key: dev_your_api_key_here"</code></pre>
+
+  <h3>JWT Bearer Token (Session-Based)</h3>
+  <p>
+    For applications using user login flows, use the JWT bearer token from
+    the authentication endpoint. This is useful for browser-based applications.
+  </p>
+
+  <pre><code class="language-bash"># First, authenticate to get a JWT
+curl -X POST https://api.pixelatedempathy.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "..."}'
+
+# Then use the token
+curl -X GET https://api.pixelatedempathy.com/api/v1/profile \
+  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIs..."</code></pre>
+
+  <h3>Scopes</h3>
+  <p>
+    Each API key has assigned scopes. Requests requiring a scope your key
+    doesn't have will return <code>403 Forbidden</code>. Check the
+    <a href="/docs/api/swagger">API reference</a> for required scopes per
+    endpoint.
+  </p>
+
+  <h2 id="rate-limits">Rate Limits & Quotas</h2>
+  <p>
+    Every API response includes rate limit headers:
+  </p>
+  <ul>
+    <li><code>X-RateLimit-Limit</code> — Maximum requests per minute for your tier</li>
+    <li><code>X-RateLimit-Remaining</code> — Requests remaining in the current window</li>
+    <li><code>X-RateLimit-Reset</code> — Unix timestamp when the window resets</li>
+    <li><code>X-RateLimit-Daily-Remaining</code> — Daily quota remaining</li>
+    <li><code>X-RateLimit-Monthly-Remaining</code> — Monthly quota remaining</li>
+  </ul>
+
+  <p>When you exceed a limit, the API returns:</p>
+  <pre><code class="language-json">HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+Retry-After: 12
+
+{
+  "error": "rate_limit_exceeded",
+  "message": "Rate limit exceeded. Retry after 12 seconds.",
+  "remaining": 0,
+  "resetTimeMs": 180000
+}</code></pre>
+
+  <h2 id="error-handling">Error Handling</h2>
+  <p>The API uses standard HTTP status codes:</p>
+  <ul>
+    <li><code>200</code> — Success</li>
+    <li><code>201</code> — Created</li>
+    <li><code>400</code> — Bad request (validation error)</li>
+    <li><code>401</code> — Unauthorized (missing or invalid key)</li>
+    <li><code>403</code> — Forbidden (insufficient scopes)</li>
+    <li><code>404</code> — Not found</li>
+    <li><code>429</code> — Rate limit exceeded</li>
+    <li><code>500</code> — Internal server error</li>
+  </ul>
+
+  <p>Error responses include a <code>message</code> field with details:</p>
+  <pre><code class="language-json">{
+  "error": "validation_error",
+  "message": "Query parameter 'q' is required",
+  "details": { "field": "q", "issue": "required" }
+}</code></pre>
+
+  <h2 id="next-steps">Next Steps</h2>
+  <ul>
+    <li><a href="/docs/developer/code-examples">Code examples in TypeScript and Python</a></li>
+    <li><a href="/docs/developer/sdk-guide">SDK installation and usage guide</a></li>
+    <li><a href="/docs/api/swagger">Interactive API reference (Swagger UI)</a></li>
+    <li><a href="/docs/api/api-versioning">API versioning policy</a></li>
+  </ul>
+</DocumentationLayout>
+
+<style>
+  .callout {
+    padding: 1rem 1.25rem;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .callout-warning {
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+  }
+
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  :not(pre) > code {
+    background: #f1f5f9;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+</style>
