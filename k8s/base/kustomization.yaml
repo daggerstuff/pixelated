@@ -10,6 +10,8 @@ resources:
 - frontend-config.yaml
 - ingress.yaml
 - hpa.yaml
+- secret-store.yaml
+- external-secrets.yaml
 labels:
 - pairs:
     app.kubernetes.io/name: pixelated-empathy
