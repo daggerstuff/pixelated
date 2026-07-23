@@ -1,3 +1,16 @@
+---
+description: Blue-green deployment strategy for zero-downtime production releases
+pubDate: '2026-07-23'
+author: Pixelated Team
+tags:
+  - deployment
+  - blue-green
+  - kubernetes
+draft: false
+toc: true
+title: Blue-Green Deployment Strategy
+---
+
 # Blue-Green Deployment Strategy
 
 ## Overview

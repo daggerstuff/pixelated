@@ -1,0 +1,286 @@
+---
+import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
+---
+
+<DocumentationLayout
+  title="Developer Portal"
+  description="API reference, SDKs, guides, and interactive tools for Pixelated Empathy developers"
+>
+  <h1>Developer Portal</h1>
+
+  <p>
+    Welcome to the Pixelated Empathy developer portal. Build integrations with
+    our clinical AI platform using our REST API, auto-generated SDKs, and
+    interactive tools.
+  </p>
+
+  <div class="dev-portal-grid">
+    <a href="/docs/developer/getting-started" class="portal-card">
+      <div class="card-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+        </svg>
+      </div>
+      <h2>Getting Started</h2>
+      <p>
+        Authenticate your first API request in under 5 minutes. API keys, JWT
+        tokens, and rate limits explained.
+      </p>
+    </a>
+
+    <a href="/docs/api/swagger" class="portal-card">
+      <div class="card-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      </div>
+      <h2>API Reference</h2>
+      <p>
+        Interactive Swagger UI with try-it-out functionality. Browse all
+        endpoints, schemas, and response codes.
+      </p>
+    </a>
+
+    <a href="/docs/developer/code-examples" class="portal-card">
+      <div class="card-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+      </div>
+      <h2>Code Examples</h2>
+      <p>
+        Copy-paste TypeScript and Python snippets using our auto-generated SDKs.
+        Real-world integration patterns.
+      </p>
+    </a>
+
+    <a href="/docs/developer/sdk-guide" class="portal-card">
+      <div class="card-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+          ></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+      </div>
+      <h2>SDK Guide</h2>
+      <p>
+        Install and use the TypeScript and Python SDKs auto-generated from our
+        OpenAPI spec.
+      </p>
+    </a>
+
+    <a href="/docs/api/_openapi.yaml" class="portal-card">
+      <div class="card-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+          ></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+      </div>
+      <h2>OpenAPI Spec</h2>
+      <p>
+        Download the raw OpenAPI 3.1 specification. Use it to generate clients
+        in any language.
+      </p>
+    </a>
+
+    <a href="/admin/api-keys" class="portal-card">
+      <div class="card-icon">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
+          ></path>
+        </svg>
+      </div>
+      <h2>API Key Management</h2>
+      <p>
+        Create, rotate, and manage your API keys. View rate limits and quota
+        usage.
+      </p>
+    </a>
+  </div>
+
+  <h2>API Versioning</h2>
+  <p>
+    The API uses URL path-based versioning (<code>/v1/</code>) as the primary
+    scheme, with the <code>X-API-Version</code> response header providing supplementary
+    version information. See the
+    <a href="/docs/api/api-versioning">versioning policy</a> for deprecation timelines
+    and backward compatibility guarantees.
+  </p>
+
+  <h2>Rate Limits & Quotas</h2>
+  <div class="tier-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Tier</th>
+          <th>Requests/min</th>
+          <th>Daily Quota</th>
+          <th>Monthly Quota</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Free</td>
+          <td>60</td>
+          <td>1,000</td>
+          <td>10,000</td>
+        </tr>
+        <tr>
+          <td>Developer</td>
+          <td>200</td>
+          <td>5,000</td>
+          <td>50,000</td>
+        </tr>
+        <tr>
+          <td>Professional</td>
+          <td>1,000</td>
+          <td>25,000</td>
+          <td>250,000</td>
+        </tr>
+        <tr>
+          <td>Enterprise</td>
+          <td>5,000</td>
+          <td>100,000</td>
+          <td>1,000,000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>
+    Rate limit headers (<code>X-RateLimit-Limit</code>,
+    <code>X-RateLimit-Remaining</code>, <code>X-RateLimit-Reset</code>) are
+    included on every API response. When limits are exceeded, the API returns
+    <code>429 Too Many Requests</code> with a <code>Retry-After</code> header.
+  </p>
+</DocumentationLayout>
+
+<style>
+  .dev-portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin: 2rem 0;
+  }
+
+  .portal-card {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    border: 1px solid var(--border, #e2e8f0);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .portal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-icon {
+    margin-bottom: 1rem;
+    color: #4f46e5;
+  }
+
+  .portal-card h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .portal-card p {
+    font-size: 0.875rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  .tier-table {
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border, #e2e8f0);
+  }
+
+  th {
+    font-weight: 600;
+    background: var(--bg-muted, #f8fafc);
+  }
+</style>

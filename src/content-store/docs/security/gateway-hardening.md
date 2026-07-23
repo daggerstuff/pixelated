@@ -1,3 +1,17 @@
+---
+description: Production hardening configuration for the API gateway layer
+pubDate: '2026-07-23'
+author: Platform Team
+tags:
+  - security
+  - infrastructure
+  - gateway
+  - traefik
+draft: false
+toc: true
+title: API Gateway Hardening Guide
+---
+
 # API Gateway Hardening Guide
 
 ## Overview
