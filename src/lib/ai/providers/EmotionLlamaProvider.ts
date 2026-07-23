@@ -15,6 +15,10 @@ import type {
   EmotionDimensions,
   EmotionMetadata,
 } from '../emotions/types'
+import {
+  getExplainabilityService,
+  type ExplainabilityContext,
+} from '../explainability'
 
 const logger = createBuildSafeLogger('EmotionLlamaProvider')
 
@@ -81,7 +85,7 @@ export class EmotionLlamaProvider {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
+          'Authorization': `Bearer ${this.apiKey}`,
           'X-Model-Version': this.modelVersion,
         },
         body: JSON.stringify(payload),
@@ -104,7 +108,7 @@ export class EmotionLlamaProvider {
         return this.fallbackAnalysis(text, startTime)
       }
 
-      const result = (await response.json())
+      const result = await response.json()
 
       // Decrypt and process the response
       const decryptedResult = await this.processEncryptedResponse(result)
@@ -184,12 +188,14 @@ export class EmotionLlamaProvider {
     const dimensions = this.calculateDimensions(emotions)
 
     const processingTime = Date.now() - startTime
+    const emotionVector = this.convertEmotionArrayToVector(emotions)
+    const perEmotion = this.calculatePerEmotionConfidence(emotions)
 
-    return {
+    const baseAnalysis: EmotionAnalysis = {
       id: uuidv4(),
       sessionId: this.generateSessionId(),
       timestamp: new Date().toISOString(),
-      emotions: this.convertEmotionArrayToVector(emotions),
+      emotions: emotionVector,
       dimensions,
       confidence: 0.6, // Lower confidence for fallback
       metadata: {
@@ -198,9 +204,36 @@ export class EmotionLlamaProvider {
         modelVersion: 'fallback-v1.0',
         confidence: {
           overall: 0.6,
-          perEmotion: this.calculatePerEmotionConfidence(emotions),
+          perEmotion,
         },
       },
+    }
+
+    // Enrich with explainability sources and technique attribution
+    const explainabilityService = getExplainabilityService()
+    const context: ExplainabilityContext = {
+      provider: 'llama',
+      modelVersion: 'fallback-v1.0',
+      inputLength: text.length,
+      processingTime,
+      fallbackUsed: true,
+      neutralBaseline: false,
+      perEmotionConfidence: perEmotion,
+    }
+
+    const enriched = explainabilityService.enrich(
+      baseAnalysis,
+      context,
+      emotionVector,
+    )
+    return {
+      ...enriched,
+      id: enriched.id,
+      sessionId: enriched.sessionId,
+      timestamp: enriched.timestamp,
+      emotions: enriched.emotions,
+      dimensions: enriched.dimensions,
+      metadata: enriched.metadata,
     }
   }
 
@@ -210,20 +243,32 @@ export class EmotionLlamaProvider {
   private createNeutralAnalysis(startTime: number): EmotionAnalysis {
     const processingTime = Date.now() - startTime
 
-    return {
+    const neutralEmotions: EmotionVector = {
+      joy: 0,
+      sadness: 0,
+      anger: 0,
+      fear: 0,
+      surprise: 0,
+      disgust: 0,
+      trust: 0.5, // Slight trust for neutral state
+      anticipation: 0,
+    }
+    const perEmotion: Record<keyof EmotionVector, number> = {
+      joy: 1.0,
+      sadness: 1.0,
+      anger: 1.0,
+      fear: 1.0,
+      surprise: 1.0,
+      disgust: 1.0,
+      trust: 1.0,
+      anticipation: 1.0,
+    }
+
+    const baseAnalysis: EmotionAnalysis = {
       id: uuidv4(),
       sessionId: this.generateSessionId(),
       timestamp: new Date().toISOString(),
-      emotions: {
-        joy: 0,
-        sadness: 0,
-        anger: 0,
-        fear: 0,
-        surprise: 0,
-        disgust: 0,
-        trust: 0.5, // Slight trust for neutral state
-        anticipation: 0,
-      },
+      emotions: neutralEmotions,
       dimensions: {
         valence: 0,
         arousal: 0,
@@ -236,18 +281,36 @@ export class EmotionLlamaProvider {
         modelVersion: this.modelVersion,
         confidence: {
           overall: 1.0,
-          perEmotion: {
-            joy: 1.0,
-            sadness: 1.0,
-            anger: 1.0,
-            fear: 1.0,
-            surprise: 1.0,
-            disgust: 1.0,
-            trust: 1.0,
-            anticipation: 1.0,
-          },
+          perEmotion,
         },
       },
+    }
+
+    // Enrich with explainability sources and technique attribution
+    const explainabilityService = getExplainabilityService()
+    const context: ExplainabilityContext = {
+      provider: 'llama',
+      modelVersion: this.modelVersion,
+      inputLength: 0,
+      processingTime,
+      fallbackUsed: false,
+      neutralBaseline: true,
+      perEmotionConfidence: perEmotion,
+    }
+
+    const enriched = explainabilityService.enrich(
+      baseAnalysis,
+      context,
+      neutralEmotions,
+    )
+    return {
+      ...enriched,
+      id: enriched.id,
+      sessionId: enriched.sessionId,
+      timestamp: enriched.timestamp,
+      emotions: enriched.emotions,
+      dimensions: enriched.dimensions,
+      metadata: enriched.metadata,
     }
   }
 
@@ -261,11 +324,14 @@ export class EmotionLlamaProvider {
   ): EmotionAnalysis {
     const processingTime = Date.now() - startTime
 
-    return {
+    const emotions = this.convertEmotionArrayToVector(result.emotions)
+    const perEmotion = this.calculatePerEmotionConfidence(result.emotions)
+
+    const baseAnalysis: EmotionAnalysis = {
       id: uuidv4(),
       sessionId: this.generateSessionId(),
       timestamp: new Date().toISOString(),
-      emotions: this.convertEmotionArrayToVector(result.emotions),
+      emotions,
       dimensions: result.dimensions,
       confidence: result.confidence,
       metadata: {
@@ -274,9 +340,37 @@ export class EmotionLlamaProvider {
         modelVersion: this.modelVersion,
         confidence: {
           overall: result.confidence,
-          perEmotion: this.calculatePerEmotionConfidence(result.emotions),
+          perEmotion,
         },
       },
+    }
+
+    // Enrich with explainability sources and technique attribution
+    const explainabilityService = getExplainabilityService()
+    const context: ExplainabilityContext = {
+      provider: 'llama',
+      modelVersion: this.modelVersion,
+      inputLength: _originalText.length,
+      processingTime,
+      fallbackUsed: false,
+      neutralBaseline: false,
+      perEmotionConfidence: perEmotion,
+    }
+
+    const enriched = explainabilityService.enrich(
+      baseAnalysis,
+      context,
+      emotions,
+    )
+    return {
+      ...enriched,
+      // Preserve original interface structure
+      id: enriched.id,
+      sessionId: enriched.sessionId,
+      timestamp: enriched.timestamp,
+      emotions: enriched.emotions,
+      dimensions: enriched.dimensions,
+      metadata: enriched.metadata,
     }
   }
 
