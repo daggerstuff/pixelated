@@ -65,7 +65,7 @@ function toISO(value: Date | string | undefined | null): string | null {
 function mapSession(raw: TherapySession & { _id?: unknown }): NonNullable<GraphqlSession> {
   const id =
     ((raw as Record<string, unknown>).sessionId as string | undefined) ??
-    String((raw as Record<string, unknown>)._id?.toString?.() ?? "");
+    ((raw as Record<string, unknown>)._id?.toString?.() ?? "");
   return {
     id,
     clientId: raw.clientId,
@@ -137,7 +137,7 @@ function mapEmotion(raw: EmotionAnalysis): Record<string, unknown> {
 function mapIntervention(
   raw: InterventionAnalysisResult & { _id?: unknown },
 ): Record<string, unknown> {
-  const id = raw.id ?? String(raw._id?.toString?.() ?? "");
+  const id = raw.id ?? (raw._id?.toString?.() ?? "");
   return {
     id,
     userId: raw.userId,
