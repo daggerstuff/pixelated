@@ -415,3 +415,152 @@ jobs:
         with:
           header: 📋 SBOM
           path: sbom-summary.md
+
+  container-image-scan:
+    name: Container Image Scan
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: node:24.18.0-bookworm-slim
+            dockerfile: Dockerfile
+          - image: node:24.16.0-bookworm-slim
+            dockerfile: docker/Dockerfile.production
+          - image: node:24.16.0-alpine
+            dockerfile: docker/Dockerfile.prod
+          - image: python:3.13-slim
+            dockerfile: docker/backend.Dockerfile
+          - image: mcr.microsoft.com/playwright:v1.57.0-jammy
+            dockerfile: docker/Dockerfile.playwright
+          - image: debian:bookworm-slim
+            dockerfile: docker/traefik/Dockerfile
+          - image: nvcr.io/nvidia/pytorch:26.01-py3
+            dockerfile: ai/Dockerfile
+          - image: nvidia/cuda:12.6.3-devel-ubuntu22.04
+            dockerfile: docker/training-service/Dockerfile
+          - image: nvidia/cuda:12.9.1-runtime-ubuntu24.04
+            dockerfile: ai/nemo/gpu/Dockerfile
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Scan base image with Trivy
+        id: trivy_image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ matrix.image }}
+          scan-type: image
+          scanners: vuln
+          format: json
+          output: trivy-image-${{ matrix.dockerfile }}.json
+          severity: CRITICAL,HIGH
+          exit-code: '1'
+        continue-on-error: true
+
+      - name: Check scan results
+        id: scan_result
+        run: |
+          if [ -s trivy-image-${{ matrix.dockerfile }}.json ]; then
+            vulns=$(jq '[.Results[]? | .Vulnerabilities[]?] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            critical=$(jq '[.Results[]? | .Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            high=$(jq '[.Results[]? | .Vulnerabilities[]? | select(.Severity=="HIGH")] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            echo "total=$vulns" >> $GITHUB_OUTPUT
+            echo "critical=$critical" >> $GITHUB_OUTPUT
+            echo "high=$high" >> $GITHUB_OUTPUT
+            echo "::warning::${{ matrix.dockerfile }} (${{ matrix.image }}): $critical CRITICAL, $high HIGH vulnerabilities"
+            if [ "$critical" -gt 0 ]; then
+              echo "::error::CRITICAL vulnerabilities found in ${{ matrix.image }}"
+              exit 1
+            fi
+          else
+            echo "total=0" >> $GITHUB_OUTPUT
+            echo "critical=0" >> $GITHUB_OUTPUT
+            echo "high=0" >> $GITHUB_OUTPUT
+            echo "::notice::No scan results for ${{ matrix.image }} (scan may have been skipped)"
+          fi
+
+      - name: Upload image scan results
+        if: always()
+        uses: actions/upload-artifact@043fb1d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: container-scan-${{ matrix.dockerfile }}
+          path: trivy-image-${{ matrix.dockerfile }}.json
+
+  dockerfile-config-scan:
+    name: Dockerfile Configuration Scan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Scan all Dockerfiles with Trivy config scan
+        id: trivy_config
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scanners: misconfig,secret
+          format: sarif
+          output: dockerfile-config-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: '0'
+        continue-on-error: true
+
+      - name: Check for SARIF file
+        id: config_sarif
+        run: |
+          if [ -s dockerfile-config-results.sarif ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Dockerfile config scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.config_sarif.outputs.found == 'true'
+        with:
+          sarif_file: dockerfile-config-results.sarif
+          category: trivy-dockerfile-config
+
+      - name: Upload Dockerfile config SARIF as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always() && steps.config_sarif.outputs.found == 'true'
+        with:
+          name: dockerfile-config-sarif
+          path: dockerfile-config-results.sarif
+
+      - name: Generate Dockerfile scan summary
+        run: |
+          echo "## 🔍 Container Image & Dockerfile Scan Summary" > container-scan-summary.md
+          echo "" >> container-scan-summary.md
+          echo "### Base Image Vulnerabilities" >> container-scan-summary.md
+          echo "| Dockerfile | Base Image | CRITICAL | HIGH |" >> container-scan-summary.md
+          echo "|-----------|------------|----------|------|" >> container-scan-summary.md
+          echo "| (see container-scan-* artifacts for details) |" >> container-scan-summary.md
+          echo "" >> container-scan-summary.md
+          echo "### Dockerfile Configuration Issues" >> container-scan-summary.md
+          echo "See SARIF results in GitHub Security tab (category: trivy-dockerfile-config)" >> container-scan-summary.md
+          echo "" >> container-scan-summary.md
+          echo "**Scanned Dockerfiles:**" >> container-scan-summary.md
+          echo "- Dockerfile (root)" >> container-scan-summary.md
+          echo "- docker/Dockerfile.production" >> container-scan-summary.md
+          echo "- docker/Dockerfile.prod" >> container-scan-summary.md
+          echo "- docker/backend.Dockerfile" >> container-scan-summary.md
+          echo "- docker/celery.Dockerfile" >> container-scan-summary.md
+          echo "- docker/Dockerfile.playwright" >> container-scan-summary.md
+          echo "- docker/traefik/Dockerfile" >> container-scan-summary.md
+          echo "- docker/training-service/Dockerfile" >> container-scan-summary.md
+          echo "- ai/Dockerfile" >> container-scan-summary.md
+          echo "- ai/nemo/gpu/Dockerfile" >> container-scan-summary.md
+          echo "- ai-services/Dockerfile" >> container-scan-summary.md
+          echo "- agents/Dockerfile" >> container-scan-summary.md
+          echo "- business-strategy-cms/Dockerfile" >> container-scan-summary.md
+          echo "- business-strategy-cms/Dockerfile.prod" >> container-scan-summary.md
+          cat container-scan-summary.md
+
+      - name: Post container scan summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: 🔍 Container Image Scan
+          path: container-scan-summary.md
