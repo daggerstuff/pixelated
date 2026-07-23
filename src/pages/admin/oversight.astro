@@ -1,0 +1,601 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+---
+
+<DashboardLayout title="Human Oversight Dashboard | Admin">
+  <div class="container px-4 py-8 mx-auto max-w-6xl">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Human Oversight Dashboard
+      </h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        Intervention approval queue, manual override tracking, audit trail, and
+        clinical governance checklist for supervised AI response review.
+      </p>
+    </header>
+
+    <!-- Mode indicator -->
+    <section id="mode-indicator" class="mb-8">
+      <div
+        class="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-700 dark:bg-blue-900/20"
+      >
+        <div class="flex items-center gap-3">
+          <span
+            class="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+            id="oversight-mode-badge">Supervised Mode</span
+          >
+          <p class="text-sm text-blue-700 dark:text-blue-300">
+            All AI responses require human approval before delivery. Manual
+            overrides are logged with full audit trail.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Queue statistics -->
+    <section
+      id="queue-stats"
+      class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-6"
+    >
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2
+          class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+        >
+          Total
+        </h2>
+        <p
+          id="stat-total"
+          class="mt-2 text-2xl font-bold text-gray-900 dark:text-white"
+        >
+          0
+        </p>
+      </div>
+      <div
+        class="rounded-lg border border-yellow-200 bg-yellow-50 p-4 shadow-sm dark:border-yellow-700 dark:bg-yellow-900/20"
+      >
+        <h2
+          class="text-xs font-medium uppercase tracking-wider text-yellow-600 dark:text-yellow-400"
+        >
+          Pending
+        </h2>
+        <p
+          id="stat-pending"
+          class="mt-2 text-2xl font-bold text-yellow-700 dark:text-yellow-300"
+        >
+          0
+        </p>
+      </div>
+      <div
+        class="rounded-lg border border-green-200 bg-green-50 p-4 shadow-sm dark:border-green-700 dark:bg-green-900/20"
+      >
+        <h2
+          class="text-xs font-medium uppercase tracking-wider text-green-600 dark:text-green-400"
+        >
+          Approved
+        </h2>
+        <p
+          id="stat-approved"
+          class="mt-2 text-2xl font-bold text-green-700 dark:text-green-300"
+        >
+          0
+        </p>
+      </div>
+      <div
+        class="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm dark:border-red-700 dark:bg-red-900/20"
+      >
+        <h2
+          class="text-xs font-medium uppercase tracking-wider text-red-600 dark:text-red-400"
+        >
+          Rejected
+        </h2>
+        <p
+          id="stat-rejected"
+          class="mt-2 text-2xl font-bold text-red-700 dark:text-red-300"
+        >
+          0
+        </p>
+      </div>
+      <div
+        class="rounded-lg border border-purple-200 bg-purple-50 p-4 shadow-sm dark:border-purple-700 dark:bg-purple-900/20"
+      >
+        <h2
+          class="text-xs font-medium uppercase tracking-wider text-purple-600 dark:text-purple-400"
+        >
+          Overridden
+        </h2>
+        <p
+          id="stat-overridden"
+          class="mt-2 text-2xl font-bold text-purple-700 dark:text-purple-300"
+        >
+          0
+        </p>
+      </div>
+      <div
+        class="rounded-lg border border-gray-200 bg-gray-50 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900/20"
+      >
+        <h2
+          class="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+        >
+          Expired
+        </h2>
+        <p
+          id="stat-expired"
+          class="mt-2 text-2xl font-bold text-gray-700 dark:text-gray-300"
+        >
+          0
+        </p>
+      </div>
+    </section>
+
+    <!-- Governance Checklist -->
+    <section id="governance-checklist" class="mb-8">
+      <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        Clinical Governance Checklist
+      </h2>
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+          All items must be satisfied before an intervention can be approved.
+        </p>
+        <div id="checklist-items" class="space-y-3">
+          <!-- Checklist items rendered client-side -->
+        </div>
+        <div class="mt-4 flex items-center gap-3">
+          <button
+            id="checklist-demo-btn"
+            class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          >
+            Demo: Complete Checklist
+          </button>
+          <span
+            id="checklist-status"
+            class="text-sm text-gray-500 dark:text-gray-400"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pending Interventions Queue -->
+    <section id="pending-queue" class="mb-8">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Pending Interventions
+        </h2>
+        <button
+          id="enqueue-demo-btn"
+          class="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+        >
+          Demo: Enqueue Sample
+        </button>
+      </div>
+      <div
+        class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-900/50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Request ID
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Session
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Priority
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Response Preview
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Confidence
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Queued At
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="pending-table-body"
+            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800"
+          >
+            <tr>
+              <td
+                colspan="6"
+                class="px-4 py-8 text-center text-gray-400 dark:text-gray-500"
+              >
+                No pending interventions
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Recent Audit Trail -->
+    <section id="audit-trail" class="mb-8">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Recent Audit Trail
+        </h2>
+        <button
+          id="refresh-audit-btn"
+          class="rounded-md bg-gray-600 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+        >
+          Refresh
+        </button>
+      </div>
+      <div
+        class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-900/50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Action
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Session
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Therapist
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Timestamp
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Reason
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Checklist
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="audit-table-body"
+            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800"
+          >
+            <tr>
+              <td
+                colspan="6"
+                class="px-4 py-8 text-center text-gray-400 dark:text-gray-500"
+              >
+                No audit entries
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Recent Manual Overrides -->
+    <section id="manual-overrides" class="mb-8">
+      <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        Recent Manual Overrides
+      </h2>
+      <div
+        class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-900/50">
+            <tr>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Override ID
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Session
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Action
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Therapist
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Reason
+              </th>
+              <th
+                class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Timestamp
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="overrides-table-body"
+            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800"
+          >
+            <tr>
+              <td
+                colspan="6"
+                class="px-4 py-8 text-center text-gray-400 dark:text-gray-500"
+              >
+                No manual overrides
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</DashboardLayout>
+
+<script>
+  const CHECKLIST_ITEMS = [
+    {
+      id: 'risk_assessed',
+      label: 'Risk level has been assessed and is appropriate',
+    },
+    {
+      id: 'technique_appropriate',
+      label: 'Therapeutic technique is appropriate for the clinical context',
+    },
+    {
+      id: 'no_harmful_content',
+      label: 'Response contains no harmful or contraindicated content',
+    },
+    {
+      id: 'privacy_preserved',
+      label: 'Patient privacy and confidentiality are preserved',
+    },
+    {
+      id: 'cultural_sensitivity',
+      label: 'Response is culturally sensitive and appropriate',
+    },
+    {
+      id: 'clinical_accuracy',
+      label: 'Clinical information is accurate and evidence-based',
+    },
+    {
+      id: 'appropriate_boundary',
+      label: 'Response maintains appropriate therapeutic boundaries',
+    },
+    {
+      id: 'crisis_protocol',
+      label: 'If crisis indicators present, crisis protocol is followed',
+    },
+  ]
+
+  function renderChecklist(satisfied = false) {
+    const container = document.getElementById('checklist-items')
+    if (!container) return
+    container.innerHTML = CHECKLIST_ITEMS.map((item) => {
+      const icon = satisfied
+        ? '<span class="text-green-600 dark:text-green-400">\u2713</span>'
+        : '<span class="text-gray-400 dark:text-gray-500">\u25CB</span>'
+      return `
+        <div class="flex items-center gap-3">
+          <span class="text-lg">${icon}</span>
+          <span class="text-sm text-gray-700 dark:text-gray-300">${item.label}</span>
+        </div>
+      `
+    }).join('')
+  }
+
+  // Demo: In a real app, this would fetch from /api/v1/admin/oversight/stats
+  function updateStats() {
+    // Placeholder: would be populated from API
+  }
+
+  function renderPending(interventions) {
+    const tbody = document.getElementById('pending-table-body')
+    if (!tbody) return
+    if (!interventions || interventions.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No pending interventions</td></tr>'
+      return
+    }
+    tbody.innerHTML = interventions
+      .map((i) => {
+        const priorityColor =
+          {
+            critical:
+              'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+            high: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+            medium:
+              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+            low: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+          }[i.priority] || 'bg-gray-100 text-gray-800'
+        const preview = (i.response?.content || '').slice(0, 80) + '...'
+        return `
+        <tr>
+          <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">${i.requestId}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${i.sessionId}</td>
+          <td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${priorityColor}">${i.priority}</span></td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${preview}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${((i.response?.confidence || 0) * 100).toFixed(0)}%</td>
+          <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">${i.queuedAt}</td>
+        </tr>
+      `
+      })
+      .join('')
+  }
+
+  function renderAuditTrail(entries) {
+    const tbody = document.getElementById('audit-table-body')
+    if (!tbody) return
+    if (!entries || entries.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No audit entries</td></tr>'
+      return
+    }
+    const actionColors = {
+      approval:
+        'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+      rejection: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+      override:
+        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+      queue: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+      expire: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+      checklist:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+    }
+    tbody.innerHTML = entries
+      .map((e) => {
+        const color = actionColors[e.actionType] || 'bg-gray-100 text-gray-800'
+        const checklistBadge = e.checklistResult
+          ? e.checklistResult.passed
+            ? '<span class="text-green-600">PASS</span>'
+            : '<span class="text-red-600">FAIL</span>'
+          : '<span class="text-gray-400">N/A</span>'
+        return `
+        <tr>
+          <td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${color}">${e.actionType}</span></td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${e.sessionId}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${e.therapistId}</td>
+          <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">${e.timestamp}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${e.reason || '-'}</td>
+          <td class="px-4 py-3 text-sm">${checklistBadge}</td>
+        </tr>
+      `
+      })
+      .join('')
+  }
+
+  function renderOverrides(overrides) {
+    const tbody = document.getElementById('overrides-table-body')
+    if (!tbody) return
+    if (!overrides || overrides.length === 0) {
+      tbody.innerHTML =
+        '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 dark:text-gray-500">No manual overrides</td></tr>'
+      return
+    }
+    tbody.innerHTML = overrides
+      .map((o) => {
+        const actionColor =
+          o.action === 'replace'
+            ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+        return `
+        <tr>
+          <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">${o.overrideId}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${o.sessionId}</td>
+          <td class="px-4 py-3"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${actionColor}">${o.action}</span></td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${o.therapistId}</td>
+          <td class="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">${o.reason}</td>
+          <td class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">${o.timestamp}</td>
+        </tr>
+      `
+      })
+      .join('')
+  }
+
+  // Demo data for initial render
+  const demoPending = [
+    {
+      requestId: 'req-demo-001',
+      sessionId: 'session-101',
+      priority: 'high',
+      response: {
+        content:
+          'I understand you are feeling overwhelmed. Let us explore grounding techniques.',
+        confidence: 0.82,
+      },
+      queuedAt: new Date().toISOString(),
+    },
+  ]
+
+  const demoAudit = [
+    {
+      actionType: 'queue',
+      sessionId: 'session-101',
+      therapistId: 'system',
+      timestamp: new Date().toISOString(),
+      reason: null,
+      checklistResult: null,
+    },
+  ]
+
+  const demoOverrides = [
+    {
+      overrideId: 'override-demo-001',
+      sessionId: 'session-099',
+      action: 'replace',
+      therapistId: 'therapist-001',
+      reason: 'Original response was too generic',
+      timestamp: new Date().toISOString(),
+    },
+  ]
+
+  // Initialize
+  renderChecklist(false)
+  renderPending(demoPending)
+  renderAuditTrail(demoAudit)
+  renderOverrides(demoOverrides)
+
+  // Checklist demo button
+  document
+    .getElementById('checklist-demo-btn')
+    ?.addEventListener('click', () => {
+      renderChecklist(true)
+      const status = document.getElementById('checklist-status')
+      if (status) {
+        status.textContent = 'All items satisfied - checklist passed'
+        status.className = 'text-sm text-green-600 dark:text-green-400'
+      }
+    })
+
+  // Enqueue demo button
+  let demoCount = 1
+  document.getElementById('enqueue-demo-btn')?.addEventListener('click', () => {
+    demoCount++
+    demoPending.push({
+      requestId: `req-demo-${String(demoCount).padStart(3, '0')}`,
+      sessionId: `session-${100 + demoCount}`,
+      priority: ['critical', 'high', 'medium', 'low'][demoCount % 4],
+      response: {
+        content:
+          'New intervention queued for review. Please verify clinical appropriateness.',
+        confidence: 0.75,
+      },
+      queuedAt: new Date().toISOString(),
+    })
+    renderPending(demoPending)
+  })
+
+  // Refresh audit button
+  document
+    .getElementById('refresh-audit-btn')
+    ?.addEventListener('click', () => {
+      const status = document.getElementById('checklist-status')
+      if (status) {
+        status.textContent = 'Audit trail refreshed'
+        status.className = 'text-sm text-blue-600 dark:text-blue-400'
+      }
+    })
+</script>
