@@ -64,11 +64,11 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   <h2 id="first-request">Make Your First Request</h2>
   <p>Once you have an API key, make a test request:</p>
 
-  <pre><code class="language-bash">curl -X GET https://api.pixelatedempathy.com/api/v1/health \
+  <pre><code class="language-bash" is:raw>curl -X GET https://api.pixelatedempathy.com/api/v1/health \
   -H "X-API-Key: dev_your_api_key_here"</code></pre>
 
   <p>Expected response:</p>
-  <pre><code class="language-json">{
+  <pre><code class="language-json" is:raw>{
   "status": "healthy",
   "version": "1",
   "timestamp": "2026-07-23T00:00:00Z"
@@ -84,7 +84,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     This is the simplest method for server-to-server integrations.
   </p>
 
-  <pre><code class="language-bash">curl -X GET https://api.pixelatedempathy.com/api/v1/search?q=anxiety \
+  <pre><code class="language-bash" is:raw>curl -X GET https://api.pixelatedempathy.com/api/v1/search?q=anxiety \
   -H "X-API-Key: dev_your_api_key_here"</code></pre>
 
   <h3>JWT Bearer Token (Session-Based)</h3>
@@ -93,7 +93,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     the authentication endpoint. This is useful for browser-based applications.
   </p>
 
-  <pre><code class="language-bash"># First, authenticate to get a JWT
+  <pre><code class="language-bash" is:raw># First, authenticate to get a JWT
 curl -X POST https://api.pixelatedempathy.com/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "..."}'
@@ -123,7 +123,7 @@ curl -X GET https://api.pixelatedempathy.com/api/v1/profile \
   </ul>
 
   <p>When you exceed a limit, the API returns:</p>
-  <pre><code class="language-json">HTTP/1.1 429 Too Many Requests
+  <pre><code class="language-json" is:raw>HTTP/1.1 429 Too Many Requests
 Content-Type: application/json
 Retry-After: 12
 
@@ -148,7 +148,7 @@ Retry-After: 12
   </ul>
 
   <p>Error responses include a <code>message</code> field with details:</p>
-  <pre><code class="language-json">{
+  <pre><code class="language-json" is:raw>{
   "error": "validation_error",
   "message": "Query parameter 'q' is required",
   "details": { "field": "q", "issue": "required" }

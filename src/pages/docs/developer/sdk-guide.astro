@@ -45,7 +45,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   <h2>TypeScript SDK</h2>
 
   <h3>Installation</h3>
-  <pre><code class="language-bash">npm install @pixelated-empathy/auto-sdk
+  <pre><code class="language-bash" is:raw>npm install @pixelated-empathy/auto-sdk
 # or
 pnpm add @pixelated-empathy/auto-sdk</code></pre>
 
@@ -99,12 +99,12 @@ const memory = await client.createMemory({
   <h2>Python SDK</h2>
 
   <h3>Installation</h3>
-  <pre><code class="language-bash">pip install pixelated-empathy-sdk
+  <pre><code class="language-bash" is:raw>pip install pixelated-empathy-sdk
 # or
 uv add pixelated-empathy-sdk</code></pre>
 
   <h3>Configuration</h3>
-  <pre><code class="language-python">import os
+  <pre><code class="language-python" is:raw>import os
 from pixelated_empathy_sdk import Configuration, DefaultApi
 
 config = Configuration(
@@ -116,7 +116,7 @@ config = Configuration(
 client = DefaultApi(config)</code></pre>
 
   <h3>Using the Client</h3>
-  <pre><code class="language-python"># All methods are typed with auto-generated interfaces
+  <pre><code class="language-python" is:raw># All methods are typed with auto-generated interfaces
 health = client.get_health()
 print(health.status, health.version)
 
@@ -156,7 +156,7 @@ print(memory.id, memory.created_at)</code></pre>
   </ol>
 
   <p>To regenerate SDKs manually:</p>
-  <pre><code class="language-bash">./scripts/ci/generate-sdks.sh        # Generate only
+  <pre><code class="language-bash" is:raw>./scripts/ci/generate-sdks.sh        # Generate only
 ./scripts/ci/generate-sdks.sh --publish  # Generate + publish</code></pre>
 
   <h2>Related</h2>
