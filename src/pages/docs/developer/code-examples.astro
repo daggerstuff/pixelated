@@ -56,7 +56,7 @@ uv add pixelated-empathy-sdk</code></pre>
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-typescript">import { Configuration, DefaultApi } from '@pixelated-empathy/auto-sdk';
+      <pre><code class="language-typescript" is:raw>import { Configuration, DefaultApi } from '@pixelated-empathy/auto-sdk';
 
 const config = new Configuration({
   apiKey: process.env.PIXELATED_API_KEY!,
@@ -88,7 +88,7 @@ client = DefaultApi(config)</code></pre>
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-typescript">// Search for content
+      <pre><code class="language-typescript" is:raw>// Search for content
 const results = await client.searchContent({
   q: 'anxiety management techniques',
   limit: 10,
@@ -119,7 +119,7 @@ for result in results.data:
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-typescript">// Analyze a session for bias indicators
+      <pre><code class="language-typescript" is:raw>// Analyze a session for bias indicators
 const analysis = await client.analyzeBias({
   sessionId: 'session-abc-123',
   demographics: {
@@ -158,7 +158,7 @@ print(analysis.confidence_score)</code></pre>
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-typescript">// Create a memory entry
+      <pre><code class="language-typescript" is:raw>// Create a memory entry
 const memory = await client.createMemory({
   userId: 'user-123',
   content: 'Patient responded well to CBT session 3',
@@ -199,7 +199,7 @@ results = client.search_memories(
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-typescript">import { ApiException } from '@pixelated-empathy/auto-sdk';
+      <pre><code class="language-typescript" is:raw>import { ApiException } from '@pixelated-empathy/auto-sdk';
 
 try {
   const result = await client.searchContent({ q: 'test' });
@@ -240,7 +240,7 @@ except ApiException as e:
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-typescript">const config = new Configuration({
+      <pre><code class="language-typescript" is:raw>const config = new Configuration({
   apiKey: process.env.PIXELATED_API_KEY!,
   basePath: 'https://api.pixelatedempathy.com',
   // Built-in retry with exponential backoff
