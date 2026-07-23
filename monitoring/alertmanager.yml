@@ -1,31 +1,102 @@
 global:
-  smtp_smarthost: 'smtp.gmail.com:587'
-  smtp_from: 'alerts@your-domain.com'
-  smtp_auth_username: 'your-email@gmail.com'
-  smtp_auth_password: 'your-app-password'
+  smtp_smarthost: '${SMTP_SMARTHOST:smtp.gmail.com:587}'
+  smtp_from: '${SMTP_FROM:alerts@pixelatedempathy.com}'
+  smtp_auth_username: '${SMTP_USERNAME:}'
+  smtp_auth_password: '${SMTP_PASSWORD:}'
 
 route:
-  group_by: ['alertname']
+  group_by: ['alertname', 'service', 'severity']
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 1h
-  receiver: 'web.hook'
+  receiver: 'default'
+  routes:
+    # Critical alerts -> PagerDuty + email
+    - matchers:
+        - severity = critical
+      receiver: 'critical-notifications'
+      group_wait: 5s
+      repeat_interval: 30m
+
+    # Warning alerts -> Slack + email
+    - matchers:
+        - severity = warning
+      receiver: 'warning-notifications'
+      group_wait: 30s
+      repeat_interval: 2h
+
+    # Emergency alerts -> PagerDuty immediate
+    - matchers:
+        - severity = emergency
+      receiver: 'emergency-notifications'
+      group_wait: 0s
+      repeat_interval: 15m
 
 receivers:
-  - name: 'web.hook'
+  - name: 'default'
     email_configs:
-      - to: 'admin@your-domain.com'
+      - to: '${ALERT_EMAIL_TO:admin@pixelatedempathy.com}'
+        send_resolved: true
 
-  - name: 'slack-notifications'
+  - name: 'critical-notifications'
+    pagerduty_configs:
+      - routing_key: '${PAGERDUTY_ROUTING_KEY:}'
+        description: '{{ .CommonAnnotations.summary }}'
+        severity: critical
+        class: '{{ .CommonLabels.service }}'
+        group: '{{ .CommonLabels.service }}'
+        component: '{{ .CommonLabels.service }}'
+    email_configs:
+      - to: '${CRITICAL_ALERT_EMAIL:critical@pixelatedempathy.com}'
+        headers:
+          - { key: Subject, value: '[CRITICAL] {{ .CommonAnnotations.summary }}' }
+        send_resolved: true
+
+  - name: 'warning-notifications'
     slack_configs:
-      - api_url: 'https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK'
+      - api_url: '${SLACK_WEBHOOK_URL:}'
         channel: '#alerts'
-        title: 'Business Strategy CMS Alert'
-        text: '{{ range .Alerts }}{{ .Annotations.summary }}{{ end }}'
+        title: '[WARNING] {{ .CommonAnnotations.summary }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}\nLabels: {{ .Labels }}{{ end }}'
+        send_resolved: true
+    email_configs:
+      - to: '${WARNING_ALERT_EMAIL:warnings@pixelatedempathy.com}'
+        headers:
+          - { key: Subject, value: '[WARNING] {{ .CommonAnnotations.summary }}' }
+        send_resolved: true
+
+  - name: 'emergency-notifications'
+    pagerduty_configs:
+      - routing_key: '${PAGERDUTY_ROUTING_KEY:}'
+        description: 'EMERGENCY: {{ .CommonAnnotations.summary }}'
+        severity: critical
+        class: '{{ .CommonLabels.service }}'
+        group: '{{ .CommonLabels.service }}'
+    slack_configs:
+      - api_url: '${SLACK_WEBHOOK_URL:}'
+        channel: '#alerts-critical'
+        title: ':rotating_light: EMERGENCY: {{ .CommonAnnotations.summary }}'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
 
 inhibit_rules:
-  - source_match:
-      severity: 'critical'
-    target_match:
-      severity: 'warning'
-    equal: ['alertname', 'dev', 'instance']
+  # Suppress warning if critical alert for same service is firing
+  - source_matchers:
+      - severity = critical
+    target_matchers:
+      - severity = warning
+    equal: ['service', 'alertname']
+
+  # Suppress disk warning if critical disk alert is firing
+  - source_matchers:
+      - alertname = DiskSpaceCritical
+    target_matchers:
+      - alertname = DiskSpaceLow
+    equal: ['instance', 'mountpoint']
+
+  # Suppress high CPU if emergency memory is firing
+  - source_matchers:
+      - alertname = EmergencyMemoryUsage
+    target_matchers:
+      - alertname = HighCPUUsage
+    equal: ['instance']
