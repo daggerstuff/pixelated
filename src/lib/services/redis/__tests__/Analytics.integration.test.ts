@@ -417,7 +417,7 @@ describeFn('analytics Integration', () => {
         }),
       )
 
-      await expect(Promise.all(promises)).resolves.toBeDefined()
+       await expect(Promise.all(promises)).resolves.toBeDefined()
     })
   })
 

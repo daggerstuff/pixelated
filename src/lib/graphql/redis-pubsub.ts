@@ -106,7 +106,7 @@ class InMemoryPubSub {
 class RedisPubSub {
   private publisher: RedisClient | null = null;
   private subscriber: RedisClient | null = null;
-  private topicHandlers: Map<string, Set<(payload: unknown) => void>> = new Map();
+  private readonly topicHandlers: Map<string, Set<(payload: unknown) => void>> = new Map();
   private initialized = false;
 
   /**
@@ -129,7 +129,7 @@ class RedisPubSub {
       // Create duplicate connections for pub/sub
       // ioredis requires a dedicated connection for subscribing
       const Redis = (await import("ioredis")).default;
-      const redisUrl = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL || "";
+      const redisUrl = (process.env.REDIS_URL ?? process.env.UPSTASH_REDIS_REST_URL) || "";
 
       if (redisUrl) {
         this.publisher = new Redis(redisUrl);
