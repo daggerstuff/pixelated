@@ -1,6 +1,6 @@
 # Production Dockerfile for Pixelated Empathy
 # Base stage for shared environment (no build tools)
-ARG NODE_IMAGE=node:24.18.0-bookworm-slim
+ARG NODE_IMAGE=node:24-bookworm-slim
 FROM ${NODE_IMAGE} AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
