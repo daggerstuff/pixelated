@@ -3,17 +3,20 @@ groups:
     rules:
       # Launch Success Metrics
       - alert: LowSessionCompletionRate
-        expr:
-          sum(rate(pixelated_empathy_sessions_completed_total[5m])) /
-          sum(rate(pixelated_empathy_sessions_started_total[5m])) * 100) < 80
+        expr: |
+          (
+            sum(rate(pixelated_empathy_sessions_completed_total[5m]))
+            /
+            sum(rate(pixelated_empathy_sessions_started_total[5m]))
+            * 100
+          ) < 80
         for: 10m
         labels:
           severity: warning
           category: launch-metric
         annotations:
           summary: 'Session completion rate below 80%'
-          description:
-            'Session completion rate is {{ $value }}%, target is >80%'
+          description: 'Session completion rate is {{ $value }}%, target is >80%'
 
       - alert: HighResponseTimeLaunch
         expr:
@@ -25,8 +28,7 @@ groups:
           category: launch-metric
         annotations:
           summary: 'Response time above 2 seconds (95th percentile)'
-          description:
-            '95th percentile response time is {{ $value }}s, target is <2s'
+          description: '95th percentile response time is {{ $value }}s, target is <2s'
 
       - alert: LowUserSatisfaction
         expr: avg(pixelated_empathy_user_satisfaction_score) < 7
@@ -36,11 +38,10 @@ groups:
           category: launch-metric
         annotations:
           summary: 'User satisfaction score below 7/10'
-          description:
-            'Average user satisfaction is {{ $value }}/10, target is >7/10'
+          description: 'Average user satisfaction is {{ $value }}/10, target is >7/10'
 
       - alert: HighSystemDowntime
-        expr: avg_over_time(up{job="pixelated-empathy"}[24h]) * 100 < 99
+        expr: avg_over_time(up{job="pixelated-app"}[24h]) * 100 < 99
         for: 1h
         labels:
           severity: critical
@@ -58,8 +59,7 @@ groups:
           category: safety
         annotations:
           summary: 'High crisis detection rate'
-          description:
-            '{{ $value }} crisis detections per hour, review may be needed'
+          description: '{{ $value }} crisis detections per hour, review may be needed'
 
       - alert: CrisisEscalationFailure
         expr: rate(pixelated_empathy_crisis_escalation_failures_total[10m]) > 0
@@ -69,9 +69,7 @@ groups:
           category: safety
         annotations:
           summary: 'Crisis escalation failures detected'
-          description:
-            '{{ $value }} escalation failures in the last 10 minutes - IMMEDIATE
-            REVIEW REQUIRED'
+          description: '{{ $value }} escalation failures in the last 10 minutes - IMMEDIATE REVIEW REQUIRED'
 
       # User Engagement Alerts
       - alert: ZeroActiveUsers
@@ -82,8 +80,7 @@ groups:
           category: engagement
         annotations:
           summary: 'No active users for 2 hours'
-          description:
-            'No users have been active for 2 hours during launch period'
+          description: 'No users have been active for 2 hours during launch period'
 
       - alert: UserRegistrationFailure
         expr: rate(pixelated_empathy_user_registrations_failed_total[10m]) > 0
@@ -117,9 +114,13 @@ groups:
           description: '{{ $value }}% of max connections in use'
 
       - alert: HighErrorRateLaunch
-        expr:
-          rate(http_requests_total{status=~"5.."}[5m]) /
-          rate(http_requests_total[5m]) * 100 > 1
+        expr: |
+          (
+            rate(http_requests_total{status=~"5.."}[5m])
+            /
+            rate(http_requests_total[5m])
+            * 100
+          ) > 1
         for: 5m
         labels:
           severity: critical
@@ -137,8 +138,7 @@ groups:
           category: infrastructure
         annotations:
           summary: 'Monitoring system component down'
-          description:
-            '{{ $labels.job }} is down - monitoring may be incomplete'
+          description: '{{ $labels.job }} is down - monitoring may be incomplete'
 
       - alert: BackupSystemFailure
         expr: pixelated_empathy_backup_status == 0
@@ -148,5 +148,4 @@ groups:
           category: infrastructure
         annotations:
           summary: 'Backup system failure'
-          description:
-            'Backup system is not reporting success - investigation required'
+          description: 'Backup system is not reporting success - investigation required'
