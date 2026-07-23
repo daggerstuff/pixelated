@@ -35,6 +35,17 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend integration
 
+API_VERSION = 1
+
+
+@app.after_request
+def add_version_header(response):
+    """Add X-API-Version header to all /api/ responses."""
+    if request.path.startswith("/api/"):
+        response.headers["X-API-Version"] = str(API_VERSION)
+    return response
+
+
 # Register blueprints
 app.register_blueprint(dream_bp)
 

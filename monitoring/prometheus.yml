@@ -4,6 +4,10 @@ global:
 
 rule_files:
   - 'alert_rules.yml'
+  - 'alerts/application.yml'
+  - 'alerts/performance-alerts.yaml'
+  - 'alerts/safety-alerts.yaml'
+  - 'alerts/launch-alerts.yaml'
 
 alerting:
   alertmanagers:
@@ -12,27 +16,42 @@ alerting:
             - alertmanager:9093
 
 scrape_configs:
+  # Main application (Astro SSR)
   - job_name: 'pixelated-app'
     static_configs:
       - targets: ['pixelated-app:3000']
     metrics_path: '/metrics'
     scrape_interval: 10s
 
+  # AI service (FastAPI backend)
   - job_name: 'ai-service'
     static_configs:
       - targets: ['pixelated-ai:8000']
     metrics_path: '/metrics'
     scrape_interval: 10s
 
+  # PostgreSQL exporter
   - job_name: 'postgres-exporter'
     static_configs:
       - targets: ['pixelated-empathy-postgres-exporter:9187']
 
+  # Redis exporter
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets: ['pixelated-empathy-redis-exporter:9121']
+
+  # Node exporter (system metrics)
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['pixelated-empathy-node-exporter:9100']
 
+  # Caddy reverse proxy
   - job_name: 'caddy'
     static_configs:
       - targets: ['pixelated-caddy:2019']
     metrics_path: '/metrics'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
