@@ -227,7 +227,7 @@ export class AdminService {
     token: string,
   ): Promise<{ userId: string; role: AdminRole } | null> {
     try {
-      const payload = (await verifyToken(token)) as { userId: string }
+      const payload = ( verifyToken(token)) as { userId: string }
       if (!payload?.userId) {
         return null
       }

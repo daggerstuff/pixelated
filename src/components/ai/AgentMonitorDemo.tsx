@@ -185,7 +185,7 @@ export const AgentMonitorDemo: React.FC = () => {
       if (feedback === 'correction' && comment && mode === 'backend') {
         await streamInference(query, [], { 
           gestaltDirective: comment
-        } as any);
+        });
       }
       
       console.log(`Feedback ${feedback} saved for ${activityId}`);
