@@ -8,6 +8,17 @@ from pydantic import BaseModel
 
 app = FastAPI(title="Pixelated Python Backend")
 
+API_VERSION = 1
+
+
+@app.middleware("http")
+async def add_version_header(request, call_next):
+    """Add X-API-Version header to all /api/ responses."""
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["X-API-Version"] = str(API_VERSION)
+    return response
+
 
 async def get_db_connection():
     db_url = os.environ.get("DATABASE_URL", "postgresql://vivi@localhost/pixelated")

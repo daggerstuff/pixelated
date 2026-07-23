@@ -7,6 +7,7 @@ import {
 } from './lib/auth/auth0-middleware'
 import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
+import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { rateLimitMiddleware } from './lib/middleware/rate-limit'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { tracingMiddleware } from './lib/tracing/middleware'
@@ -126,4 +127,5 @@ export const onRequest = sequence(
   corsMiddleware,
   projectAuthMiddleware,
   rateLimitMiddleware,
+  apiVersioningMiddleware,
 )

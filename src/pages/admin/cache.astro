@@ -1,0 +1,383 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+---
+
+<DashboardLayout title="Cache Performance Dashboard | Admin">
+  <div class="container px-4 py-8 mx-auto max-w-6xl">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        Cache Performance Dashboard
+      </h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        Monitor cache hit ratios, per-prefix statistics, and top-missed keys
+        across the application cache layer.
+      </p>
+    </header>
+
+    <!-- Overall hit ratio card -->
+    <section id="overview" class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2
+          class="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+        >
+          Overall Hit Ratio
+        </h2>
+        <p
+          id="hit-ratio"
+          class="mt-3 text-4xl font-bold text-gray-900 dark:text-white"
+        >
+          —
+        </p>
+        <div
+          class="mt-2 h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
+        >
+          <div
+            id="hit-ratio-bar"
+            class="h-full rounded-full bg-green-500 transition-all duration-500"
+            style="width: 0%"
+          >
+          </div>
+        </div>
+        <p
+          id="hit-ratio-detail"
+          class="mt-2 text-sm text-gray-500 dark:text-gray-400"
+        >
+          — hits / — misses
+        </p>
+      </div>
+
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2
+          class="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+        >
+          Total Requests
+        </h2>
+        <p
+          id="total-requests"
+          class="mt-3 text-4xl font-bold text-gray-900 dark:text-white"
+        >
+          —
+        </p>
+      </div>
+
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2
+          class="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+        >
+          Cache Hits / Misses
+        </h2>
+        <div class="mt-3 flex gap-6">
+          <div>
+            <span
+              class="text-2xl font-bold text-green-600 dark:text-green-400"
+              id="total-hits">—</span
+            >
+            <span class="ml-1 text-sm text-gray-500 dark:text-gray-400"
+              >hits</span
+            >
+          </div>
+          <div>
+            <span
+              class="text-2xl font-bold text-red-600 dark:text-red-400"
+              id="total-misses">—</span
+            >
+            <span class="ml-1 text-sm text-gray-500 dark:text-gray-400"
+              >misses</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Per-prefix table -->
+    <section class="mb-8">
+      <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        Per-Prefix Statistics
+      </h2>
+      <div
+        class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700"
+      >
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Prefix
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Hits
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Misses
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Total
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Hit Ratio
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Bar
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="prefix-table-body"
+            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
+          >
+            <tr>
+              <td
+                colspan="6"
+                class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+              >
+                Loading…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Top misses -->
+    <section class="mb-8">
+      <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+        Top Missed Keys
+      </h2>
+      <div
+        class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700"
+      >
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Key
+              </th>
+              <th
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+              >
+                Miss Count
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="top-misses-body"
+            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
+          >
+            <tr>
+              <td
+                colspan="2"
+                class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+              >
+                Loading…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PHI non-cached verification -->
+    <section class="mb-8">
+      <div
+        class="rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20"
+      >
+        <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+          PHI Route Cache Verification
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          All PHI routes (sessions, auth, memory, preferences, profile, admin,
+          graphql, chat, treatment-plans, emotions, agent-notes, AI, dashboard,
+          ingestion, reprioritization) are configured with
+          <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+            >no-store, no-cache, must-revalidate</code
+          >
+          in <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+            >vercel.json</code
+          >
+          and are never intercepted by the service worker.
+        </p>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Verified by automated tests:
+          <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+            >cache-headers.test.ts</code
+          >
+          (36 tests) and
+          <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+            >service-worker-routes.test.ts</code
+          >
+          (42 tests).
+        </p>
+      </div>
+    </section>
+
+    <!-- Controls -->
+    <div class="flex gap-4">
+      <button
+        id="refresh-btn"
+        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+        type="button"
+      >
+        Refresh
+      </button>
+      <span
+        id="last-updated"
+        class="self-center text-sm text-gray-500 dark:text-gray-400"
+      >
+        Not yet loaded
+      </span>
+    </div>
+  </div>
+
+  <script is:inline>
+    async function loadCacheStats() {
+      try {
+        const res = await fetch('/api/v1/admin/cache-stats', {
+          headers: { Accept: 'application/json' },
+        })
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`)
+        }
+        const data = await res.json()
+        renderStats(data)
+      } catch (err) {
+        console.error('Failed to load cache stats:', err)
+        document.getElementById('hit-ratio').textContent = 'Error'
+        document.getElementById('last-updated').textContent =
+          'Failed to load: ' + (err instanceof Error ? err.message : 'unknown')
+      }
+    }
+
+    function renderStats(data) {
+      // Overview
+      const hitPct = (data.overallHitRatio * 100).toFixed(1)
+      document.getElementById('hit-ratio').textContent = hitPct + '%'
+      document.getElementById('hit-ratio-bar').style.width = hitPct + '%'
+      document.getElementById('hit-ratio-detail').textContent =
+        data.overallHits + ' hits / ' + data.overallMisses + ' misses'
+      document.getElementById('total-requests').textContent =
+        data.overallTotal.toLocaleString()
+      document.getElementById('total-hits').textContent =
+        data.overallHits.toLocaleString()
+      document.getElementById('total-misses').textContent =
+        data.overallMisses.toLocaleString()
+
+      // Per-prefix table
+      const tbody = document.getElementById('prefix-table-body')
+      if (data.perPrefix.length === 0) {
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No data yet</td></tr>'
+      } else {
+        tbody.innerHTML = data.perPrefix
+          .map(function (p) {
+            const ratio = (p.hitRatio * 100).toFixed(1)
+            const barColor =
+              p.hitRatio >= 0.7
+                ? 'bg-green-500'
+                : p.hitRatio >= 0.4
+                  ? 'bg-yellow-500'
+                  : 'bg-red-500'
+            return (
+              '<tr>' +
+              '<td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-white">' +
+              escapeHtml(p.prefix) +
+              '</td>' +
+              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              p.hits.toLocaleString() +
+              '</td>' +
+              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              p.misses.toLocaleString() +
+              '</td>' +
+              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              p.totalRequests.toLocaleString() +
+              '</td>' +
+              '<td class="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">' +
+              ratio +
+              '%</td>' +
+              '<td class="px-6 py-4">' +
+              '<div class="h-2 w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">' +
+              '<div class="h-full rounded-full ' +
+              barColor +
+              '" style="width:' +
+              ratio +
+              '%"></div>' +
+              '</div>' +
+              '</td>' +
+              '</tr>'
+            )
+          })
+          .join('')
+      }
+
+      // Top misses
+      const missesBody = document.getElementById('top-misses-body')
+      if (data.topMisses.length === 0) {
+        missesBody.innerHTML =
+          '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No miss data yet</td></tr>'
+      } else {
+        missesBody.innerHTML = data.topMisses
+          .map(function (m) {
+            return (
+              '<tr>' +
+              '<td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-white break-all">' +
+              escapeHtml(m.key) +
+              '</td>' +
+              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              m.count.toLocaleString() +
+              '</td>' +
+              '</tr>'
+            )
+          })
+          .join('')
+      }
+
+      // Last updated
+      document.getElementById('last-updated').textContent =
+        'Updated: ' + new Date(data.measuredAt).toLocaleString()
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div')
+      div.textContent = str
+      return div.innerHTML
+    }
+
+    document
+      .getElementById('refresh-btn')
+      .addEventListener('click', function () {
+        this.textContent = 'Loading…'
+        this.disabled = true
+        loadCacheStats().finally(
+          function () {
+            const btn = document.getElementById('refresh-btn')
+            btn.textContent = 'Refresh'
+            btn.disabled = false
+          }.bind(this),
+        )
+      })
+
+    // Auto-load on page entry
+    loadCacheStats()
+
+    // Auto-refresh every 30 seconds
+    setInterval(loadCacheStats, 30000)
+  </script>
+</DashboardLayout>

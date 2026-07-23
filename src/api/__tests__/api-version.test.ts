@@ -49,11 +49,11 @@ describe("apiVersionResolver", () => {
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
-    } as unknown as Partial<Response>;
+    };
   });
 
   it("should set req.apiVersion from URL path", () => {
-    req = { path: "/api/v2/users" } as unknown as Request;
+    req = { path: "/api/v2/users" };
     apiVersionResolver()(req as Request, res as Response, next as unknown as NextFunction);
     expect(req.apiVersion).toBe("2");
   });
@@ -71,19 +71,19 @@ describe("apiVersionResolver", () => {
   });
 
   it("should rewrite URL when version is in path", () => {
-    req = { path: "/api/v2/users/123" } as unknown as Request;
+    req = { path: "/api/v2/users/123" };
     apiVersionResolver()(req as Request, res as Response, next as unknown as NextFunction);
     expect(req.url).toBe("/api/users/123");
   });
 
   it("should not rewrite URL when no version in path", () => {
-    req = { path: "/api/users/123" } as unknown as Request;
+    req = { path: "/api/users/123" };
     apiVersionResolver()(req as Request, res as Response, next as unknown as NextFunction);
     expect(req.url).toBe("/api/users/123");
   });
 
   it("should call next", () => {
-    req = { path: "/api/users" } as unknown as Request;
+    req = { path: "/api/users" };
     apiVersionResolver()(req as Request, res as Response, next as unknown as NextFunction);
     expect(next).toHaveBeenCalled();
   });
@@ -99,17 +99,17 @@ describe("requireApiVersion", () => {
     res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
-    } as unknown as Partial<Response>;
+    };
   });
 
   it("should call next when version meets minimum requirement", () => {
-    req = { path: "/api/v2/users" } as unknown as Request;
+    req = { path: "/api/v2/users" };
     requireApiVersion("1")(req as Request, res as Response, next as unknown as NextFunction);
     expect(next).toHaveBeenCalled();
   });
 
   it("should return 426 when version is below minimum requirement", () => {
-    req = { path: "/api/v1/users" } as unknown as Request;
+    req = { path: "/api/v1/users" };
     requireApiVersion("2")(req as Request, res as Response, next as unknown as NextFunction);
     expect(res.status).toHaveBeenCalledWith(426);
     expect(res.json).toHaveBeenCalledWith({

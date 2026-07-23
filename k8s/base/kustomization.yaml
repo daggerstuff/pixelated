@@ -1,7 +1,8 @@
 resources:
 - namespace.yaml
 - configmap.yaml
-- deployment.yaml
+- deployment-blue.yaml
+- deployment-green.yaml
 - redis-deployment.yaml
 - redis-network-policy.yaml
 - service.yaml
@@ -10,6 +11,8 @@ resources:
 - frontend-config.yaml
 - ingress.yaml
 - hpa.yaml
+- secret-store.yaml
+- external-secrets.yaml
 labels:
 - pairs:
     app.kubernetes.io/name: pixelated-empathy

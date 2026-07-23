@@ -1,0 +1,63 @@
+# ---------------------------------------------------------------------------
+# External Secrets Operator — Helm values for installation
+#
+# Install with:
+#   helm repo add external-secrets https://charts.external-secrets.io
+#   helm install external-secrets external-secrets/external-secrets \
+#     -n external-secrets --create-namespace \
+#     -f k8s/base/eso-install.yaml
+#
+# This file can also be used with ArgoCD/Flux as a HelmRelease values file.
+# ---------------------------------------------------------------------------
+
+installCRDs: true
+
+replicaCount: 2
+
+# RBAC — ESO needs cluster-wide read for SecretStore/ExternalSecret CRDs
+rbac:
+  create: true
+
+# Service account for ESO controller
+serviceAccount:
+  create: true
+  name: external-secrets
+
+# Webhook for CRD validation
+webhook:
+  enabled: true
+  replicaCount: 1
+
+# Metrics for Prometheus
+metrics:
+  enabled: true
+  service:
+    port: 8080
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+
+# Security hardening
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65532
+  runAsGroup: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# Resource limits
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

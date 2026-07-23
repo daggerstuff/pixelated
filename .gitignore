@@ -155,6 +155,9 @@ unsloth_compiled_cache/
 !.env.project
 !.env.vault
 !config/secrets/*.example
+!config/secrets/README.md
+!config/secrets/.gitignore
+config/secrets/*
 .env*
 .env.sentry-build-plugin
 .flaskenv*

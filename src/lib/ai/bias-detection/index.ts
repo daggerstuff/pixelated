@@ -57,12 +57,20 @@ export type {
   FallbackAnalysisResult,
   SystemPerformanceMetrics,
 } from './bias-detection-interfaces'
+export type {
+  BiasAuditReport,
+  BiasAuditOptions,
+  SegmentResult,
+  SegmentQualityMetrics,
+  VarianceResult,
+} from './audit-runner'
 
 // Utilities
 export * from './utils'
 
 // Services
 export { getAuditLogger } from './audit'
+export { getBiasAuditRunner, resetBiasAuditRunner, BiasAuditRunner } from './audit-runner'
 export { getCacheManager } from './cache'
 export { performanceMonitor } from './performance-monitor'
 

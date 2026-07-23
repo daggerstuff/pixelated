@@ -6,6 +6,11 @@ global:
   checkNewVersion: true
   sendAnonymousUsage: false
 
+# Server Lifecycle
+server:
+  gracefulShutdownTimeout: 30s
+  keepAlivePingInterval: 15s
+
 # API and Dashboard
 api:
   dashboard: true
@@ -27,9 +32,22 @@ entryPoints:
       middlewares:
         - security-headers@file
         - rate-limit@file
+        - cors@file
+        - request-size-limit@file
+        - gateway-timeouts@file
+    transport:
+      respondingTimeouts:
+        readTimeout: 60s
+        writeTimeout: 60s
+        idleTimeout: 120s
+    http2:
+      maxConcurrentStreams: 250
 
   metrics:
     address: ':8082'
+    http:
+      middlewares:
+        - metrics-ip-allowlist@file
 
 # Certificate Resolvers
 certificatesResolvers:

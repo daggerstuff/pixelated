@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getCacheMetricsService } from './cache-metrics'
 import type { RedisClient } from './types/redis'
 
 const logger = createBuildSafeLogger('cache-service')
@@ -151,10 +152,12 @@ class VercelKVCacheService implements CacheService {
 
       if (result) {
         logger.debug('Cache hit', { key })
+        getCacheMetricsService().recordHit(key)
         return result
       }
 
       logger.debug('Cache miss', { key })
+      getCacheMetricsService().recordMiss(key)
       return null
     } catch (error: unknown) {
       logger.error('Error getting from cache', { key, error })
@@ -287,6 +290,7 @@ class MemoryCacheService implements CacheService {
 
     if (!entry) {
       logger.debug('Memory cache miss', { key })
+      getCacheMetricsService().recordMiss(key)
       return null
     }
 
@@ -294,10 +298,12 @@ class MemoryCacheService implements CacheService {
     if (entry.expires < now) {
       this.cache.delete(fullKey)
       logger.debug('Memory cache expired', { key })
+      getCacheMetricsService().recordMiss(key)
       return null
     }
 
     logger.debug('Memory cache hit', { key })
+    getCacheMetricsService().recordHit(key)
     return entry.value as T
   }
 

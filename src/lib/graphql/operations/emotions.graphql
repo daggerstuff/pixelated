@@ -1,0 +1,38 @@
+# Emotion queries — require @auth
+
+query GetEmotions($sessionId: ID!) {
+  emotions(sessionId: $sessionId) {
+    __typename
+    id
+    sessionId
+    timestamp
+    emotions {
+      __typename
+      joy
+      sadness
+      anger
+      fear
+      surprise
+      disgust
+      trust
+      anticipation
+    }
+    dimensions {
+      __typename
+      valence
+      arousal
+      dominance
+    }
+    confidence
+    metadata {
+      __typename
+      source
+      processingTime
+      modelVersion
+      confidence {
+        __typename
+        overall
+      }
+    }
+  }
+}

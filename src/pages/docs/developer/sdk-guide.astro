@@ -1,0 +1,207 @@
+---
+import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
+---
+
+<DocumentationLayout
+  title="SDK Guide"
+  description="Install and use the TypeScript and Python SDKs auto-generated from OpenAPI"
+>
+  <h1>SDK Guide</h1>
+
+  <p>
+    The Pixelated Empathy SDKs are auto-generated from our
+    <a href="/docs/api/_openapi.yaml">OpenAPI 3.1 specification</a> using
+    <a href="https://openapi-generator.tech/">openapi-generator</a>. The
+    generation pipeline runs automatically in CI whenever the spec changes.
+  </p>
+
+  <h2>Available SDKs</h2>
+
+  <table class="sdk-table">
+    <thead>
+      <tr>
+        <th>Language</th>
+        <th>Package</th>
+        <th>Registry</th>
+        <th>Min Version</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>TypeScript</td>
+        <td><code>@pixelated-empathy/auto-sdk</code></td>
+        <td>npm</td>
+        <td>Node.js 18+</td>
+      </tr>
+      <tr>
+        <td>Python</td>
+        <td><code>pixelated-empathy-sdk</code></td>
+        <td>PyPI</td>
+        <td>Python 3.9+</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>TypeScript SDK</h2>
+
+  <h3>Installation</h3>
+  <pre><code class="language-bash">npm install @pixelated-empathy/auto-sdk
+# or
+pnpm add @pixelated-empathy/auto-sdk</code></pre>
+
+  <h3>Configuration</h3>
+  <pre><code class="language-typescript">import {
+  Configuration,
+  DefaultApi,
+} from '@pixelated-empathy/auto-sdk';
+
+const config = new Configuration({
+  // Required: API key from /admin/api-keys
+  apiKey: process.env.PIXELATED_API_KEY,
+
+  // Optional: Override base URL (default: https://api.pixelatedempathy.com)
+  basePath: process.env.PIXELATED_API_URL ?? 'https://api.pixelatedempathy.com',
+
+  // Optional: Request timeout (default: 30000ms)
+  timeout: 30000,
+
+  // Optional: Retry configuration
+  retry: {
+    maxRetries: 3,
+    initialDelayMs: 500,
+    maxDelayMs: 5000,
+    retryOnStatus: [429, 500, 502, 503],
+  },
+});
+
+const client = new DefaultApi(config);</code></pre>
+
+  <h3>Using the Client</h3>
+  <pre><code class="language-typescript">// All methods are typed with auto-generated interfaces
+const health = await client.getHealth();
+//    ^? { status: string; version: string; timestamp: string }
+
+const search = await client.searchContent({
+  q: 'anxiety',
+  limit: 10,
+  offset: 0,
+});
+//    ^? { data: SearchResult[]; total: number; page: number }
+
+// Type-safe request and response objects
+const memory = await client.createMemory({
+  userId: 'user-123',
+  content: 'Session notes',
+  metadata: { sessionType: 'cbt' },
+});
+//    ^? { id: string; userId: string; content: string; createdAt: string }</code></pre>
+
+  <h2>Python SDK</h2>
+
+  <h3>Installation</h3>
+  <pre><code class="language-bash">pip install pixelated-empathy-sdk
+# or
+uv add pixelated-empathy-sdk</code></pre>
+
+  <h3>Configuration</h3>
+  <pre><code class="language-python">import os
+from pixelated_empathy_sdk import Configuration, DefaultApi
+
+config = Configuration(
+    api_key=os.environ["PIXELATED_API_KEY"],
+    host=os.environ.get("PIXELATED_API_URL", "https://api.pixelatedempathy.com"),
+    timeout=30000,
+)
+
+client = DefaultApi(config)</code></pre>
+
+  <h3>Using the Client</h3>
+  <pre><code class="language-python"># All methods are typed with auto-generated interfaces
+health = client.get_health()
+print(health.status, health.version)
+
+search = client.search_content(q="anxiety", limit=10, offset=0)
+for result in search.data:
+    print(result.id, result.title)
+
+# Type-safe request and response objects
+memory = client.create_memory(
+    user_id="user-123",
+    content="Session notes",
+    metadata={"sessionType": "cbt"},
+)
+print(memory.id, memory.created_at)</code></pre>
+
+  <h2>Hand-Written SDK (Legacy)</h2>
+  <p>
+    A hand-written TypeScript SDK (<code>@pixelated-empathy/sdk</code>) is
+    also available at <code>packages/pixelated-sdk/</code>. It provides
+    additional features like Zod schema validation and a fluent API. The
+    auto-generated SDK is recommended for new integrations as it stays
+    in sync with the OpenAPI spec automatically.
+  </p>
+
+  <h2>SDK Generation Pipeline</h2>
+  <p>
+    The SDK generation pipeline runs in CI at
+    <code>.github/workflows/sdk-generation.yml</code>. It:
+  </p>
+  <ol>
+    <li>Validates the OpenAPI spec with Spectral linting</li>
+    <li>Downloads <code>openapi-generator-cli</code> v7.12.0</li>
+    <li>Generates TypeScript (typescript-fetch) and Python SDKs</li>
+    <li>Builds and type-checks both packages</li>
+    <li>Publishes to npm and PyPI on <code>main</code> branch</li>
+    <li>Uploads generated code as CI artifacts</li>
+  </ol>
+
+  <p>To regenerate SDKs manually:</p>
+  <pre><code class="language-bash">./scripts/ci/generate-sdks.sh        # Generate only
+./scripts/ci/generate-sdks.sh --publish  # Generate + publish</code></pre>
+
+  <h2>Related</h2>
+  <ul>
+    <li><a href="/docs/developer/getting-started">Getting Started Guide</a></li>
+    <li><a href="/docs/developer/code-examples">Code Examples</a></li>
+    <li><a href="/docs/api/swagger">Interactive API Reference</a></li>
+  </ul>
+</DocumentationLayout>
+
+<style>
+  .sdk-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+
+  th, td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  th {
+    font-weight: 600;
+    background: #f8fafc;
+  }
+
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  :not(pre) > code {
+    background: #f1f5f9;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+  }
+</style>
