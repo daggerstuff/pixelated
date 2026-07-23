@@ -425,9 +425,9 @@ jobs:
         include:
           - image: node:24.18.0-bookworm-slim
             dockerfile: Dockerfile
-          - image: node:24.16.0-bookworm-slim
+          - image: node:24.18.0-bookworm-slim
             dockerfile: docker/Dockerfile.production
-          - image: node:24.16.0-alpine
+          - image: node:24.18.0-alpine
             dockerfile: docker/Dockerfile.prod
           - image: python:3.13-slim
             dockerfile: docker/backend.Dockerfile

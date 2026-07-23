@@ -1,6 +1,6 @@
 # Production Dockerfile for Pixelated Empathy
 # Base stage for shared environment (no build tools)
-ARG NODE_IMAGE=node:24.16.0-bookworm-slim
+ARG NODE_IMAGE=node:24.18.0-bookworm-slim
 FROM ${NODE_IMAGE} AS base
 WORKDIR /app
 ENV PNPM_HOME="/pnpm"
@@ -51,10 +51,12 @@ RUN set -eux; \
     echo 'Acquire::http::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries && \
     echo 'Acquire::https::Timeout "20";' >> /etc/apt/apt.conf.d/80-retries && \
     apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
     if ! apt-get install --no-install-recommends --no-install-suggests -y curl; then \
       echo "Retrying after apt index sync issue..." && \
       rm -rf /var/lib/apt/lists/* && \
       apt-get update && \
+      apt-get upgrade -y --no-install-recommends && \
       apt-get install --no-install-recommends --no-install-suggests -y curl; \
     fi && \
     rm -rf /var/lib/apt/lists/*
