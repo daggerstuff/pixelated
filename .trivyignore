@@ -1,0 +1,5 @@
+# KSV-0121: HostPath volume to /proc and /sys in monitoring/memory-alerts.yaml
+# Node-exporter requires these mounts for system metrics collection.
+# Already hardened: read-only mounts, type: Directory, container seccomp: RuntimeDefault,
+# runAsNonRoot, readOnlyRootFilesystem, all capabilities dropped.
+KSV-0121
