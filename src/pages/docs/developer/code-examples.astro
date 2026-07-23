@@ -1,0 +1,342 @@
+---
+import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
+---
+
+<DocumentationLayout
+  title="Code Examples"
+  description="TypeScript and Python code examples using the Pixelated Empathy SDKs"
+>
+  <h1>Code Examples</h1>
+
+  <p>
+    Real-world integration patterns using the auto-generated TypeScript and
+    Python SDKs. These SDKs are generated from our
+    <a href="/docs/api/_openapi.yaml">OpenAPI 3.1 specification</a> and support
+    all API endpoints.
+  </p>
+
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#install">SDK Installation</a></li>
+    <li><a href="#setup">Initialization</a></li>
+    <li><a href="#search">Content Search</a></li>
+    <li><a href="#bias">Bias Analysis</a></li>
+    <li><a href="#memory">Memory Operations</a></li>
+    <li><a href="#error-handling">Error Handling</a></li>
+    <li><a href="#retry">Retry & Backoff</a></li>
+  </ol>
+
+  <h2 id="install">SDK Installation</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-bash">npm install @pixelated-empathy/auto-sdk
+# or
+pnpm add @pixelated-empathy/auto-sdk</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-bash">pip install pixelated-empathy-sdk
+# or
+uv add pixelated-empathy-sdk</code></pre>
+    </div>
+  </div>
+
+  <h2 id="setup">Initialization</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-typescript">import { Configuration, DefaultApi } from '@pixelated-empathy/auto-sdk';
+
+const config = new Configuration({
+  apiKey: process.env.PIXELATED_API_KEY!,
+  basePath: 'https://api.pixelatedempathy.com',
+});
+
+const client = new DefaultApi(config);</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-python">import os
+from pixelated_empathy_sdk import Configuration, DefaultApi
+
+config = Configuration(
+    api_key=os.environ["PIXELATED_API_KEY"],
+    host="https://api.pixelatedempathy.com",
+)
+
+client = DefaultApi(config)</code></pre>
+    </div>
+  </div>
+
+  <h2 id="search">Content Search</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-typescript">// Search for content
+const results = await client.searchContent({
+  q: 'anxiety management techniques',
+  limit: 10,
+});
+
+console.log(results.data);
+// [{ id: 'doc-123', title: 'CBT for Anxiety', ... }, ...]</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-python"># Search for content
+results = client.search_content(
+    q="anxiety management techniques",
+    limit=10,
+)
+
+for result in results.data:
+    print(result.title, result.id)</code></pre>
+    </div>
+  </div>
+
+  <h2 id="bias">Bias Analysis</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-typescript">// Analyze a session for bias indicators
+const analysis = await client.analyzeBias({
+  sessionId: 'session-abc-123',
+  demographics: {
+    age: '25-34',
+    gender: 'female',
+    ethnicity: 'hispanic',
+  },
+});
+
+console.log(analysis.bias_indicators);
+console.log(analysis.confidence_score);</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-python"># Analyze a session for bias indicators
+analysis = client.analyze_bias(
+    session_id="session-abc-123",
+    demographics={
+        "age": "25-34",
+        "gender": "female",
+        "ethnicity": "hispanic",
+    },
+)
+
+print(analysis.bias_indicators)
+print(analysis.confidence_score)</code></pre>
+    </div>
+  </div>
+
+  <h2 id="memory">Memory Operations</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-typescript">// Create a memory entry
+const memory = await client.createMemory({
+  userId: 'user-123',
+  content: 'Patient responded well to CBT session 3',
+  metadata: { sessionType: 'cbt', week: 3 },
+});
+
+// Search memories
+const results = await client.searchMemories({
+  userId: 'user-123',
+  query: 'CBT response',
+  limit: 5,
+});</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-python"># Create a memory entry
+memory = client.create_memory(
+    user_id="user-123",
+    content="Patient responded well to CBT session 3",
+    metadata={"sessionType": "cbt", "week": 3},
+)
+
+# Search memories
+results = client.search_memories(
+    user_id="user-123",
+    query="CBT response",
+    limit=5,
+)</code></pre>
+    </div>
+  </div>
+
+  <h2 id="error-handling">Error Handling</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-typescript">import { ApiException } from '@pixelated-empathy/auto-sdk';
+
+try {
+  const result = await client.searchContent({ q: 'test' });
+} catch (error) {
+  if (error instanceof ApiException) {
+    if (error.status === 429) {
+      console.log('Rate limited. Retry after:', error.headers['retry-after']);
+    } else if (error.status === 401) {
+      console.log('Invalid API key');
+    } else {
+      console.log('API error:', error.message);
+    }
+  }
+}</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-python">from pixelated_empathy_sdk import ApiException
+
+try:
+    result = client.search_content(q="test")
+except ApiException as e:
+    if e.status == 429:
+        print(f"Rate limited. Retry after: {e.headers.get('Retry-After')}")
+    elif e.status == 401:
+        print("Invalid API key")
+    else:
+        print(f"API error: {e.message}")</code></pre>
+    </div>
+  </div>
+
+  <h2 id="retry">Retry & Backoff</h2>
+
+  <div class="tab-group">
+    <div class="tab-header">
+      <button class="tab-btn active" data-tab="ts">TypeScript</button>
+      <button class="tab-btn" data-tab="py">Python</button>
+    </div>
+
+    <div class="tab-content active" data-tab="ts">
+      <pre><code class="language-typescript">const config = new Configuration({
+  apiKey: process.env.PIXELATED_API_KEY!,
+  basePath: 'https://api.pixelatedempathy.com',
+  // Built-in retry with exponential backoff
+  retry: {
+    maxRetries: 3,
+    initialDelayMs: 500,
+    maxDelayMs: 5000,
+    retryOnStatus: [429, 500, 502, 503],
+  },
+});
+
+const client = new DefaultApi(config);</code></pre>
+    </div>
+
+    <div class="tab-content" data-tab="py">
+      <pre><code class="language-python">config = Configuration(
+    api_key=os.environ["PIXELATED_API_KEY"],
+    host="https://api.pixelatedempathy.com",
+    retry_config=RetryConfig(
+        max_retries=3,
+        initial_delay_ms=500,
+        max_delay_ms=5000,
+        retry_on_status=[429, 500, 502, 503],
+    ),
+)</code></pre>
+    </div>
+  </div>
+
+  <h2>Related</h2>
+  <ul>
+    <li><a href="/docs/developer/getting-started">Getting Started Guide</a></li>
+    <li><a href="/docs/developer/sdk-guide">SDK Installation Guide</a></li>
+    <li><a href="/docs/api/swagger">Interactive API Reference</a></li>
+  </ul>
+</DocumentationLayout>
+
+<style>
+  .tab-group {
+    margin: 1.5rem 0;
+  }
+
+  .tab-header {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .tab-btn {
+    padding: 0.5rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #64748b;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tab-btn.active {
+    color: #4f46e5;
+    border-bottom-color: #4f46e5;
+  }
+
+  .tab-content {
+    display: none;
+    padding-top: 1rem;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.tab-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+      const group = btn.closest('.tab-group');
+      group.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+      group.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
+      btn.classList.add('active');
+      group.querySelector(`.tab-content[data-tab="${tab}"]`).classList.add('active');
+    });
+  });
+</script>

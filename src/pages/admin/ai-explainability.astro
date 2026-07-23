@@ -1,0 +1,493 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+---
+
+<DashboardLayout title="AI Explainability Dashboard | Admin">
+  <div class="container px-4 py-8 mx-auto max-w-6xl">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        AI Explainability Dashboard
+      </h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        View confidence scores, source attribution, and technique mapping for AI
+        emotion analysis results. Demonstrates explainability layer integration.
+      </p>
+    </header>
+
+    <!-- Sample Analysis Section -->
+    <section id="analysis" class="mb-8">
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Emotion Analysis Explainability
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          The explainability layer enriches every AI emotion analysis result
+          with:
+        </p>
+        <ul
+          class="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300 space-y-1 mb-4"
+        >
+          <li>
+            <strong>Confidence score</strong> (0-1): Normalized confidence from the
+            LLM provider, capped and clamped to valid range.
+          </li>
+          <li>
+            <strong>Sources array</strong>: Documents where each result
+            component originated — LLM, FHE encryption layer, keyword fallback,
+            dimensional model, per-emotion metadata.
+          </li>
+          <li>
+            <strong>Technique attribution</strong>: Maps dominant emotions to
+            therapeutic techniques (e.g., sadness → ACTIVE_LISTENING) with
+            confidence and reasoning.
+          </li>
+        </ul>
+
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            Source Types
+          </h3>
+          <table
+            class="w-full text-sm text-left text-gray-700 dark:text-gray-300"
+          >
+            <thead class="text-xs uppercase text-gray-500 dark:text-gray-400">
+              <tr>
+                <th class="pb-2 pr-4">Type</th>
+                <th class="pb-2 pr-4">Reference</th>
+                <th class="pb-2 pr-4">Confidence</th>
+                <th class="pb-2">Description</th>
+              </tr>
+            </thead>
+            <tbody id="sources-table-body"></tbody>
+          </table>
+        </div>
+
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            Technique Attribution
+          </h3>
+          <div id="technique-attribution" class="space-y-2">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              Run a sample analysis to see technique attribution.
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+            Confidence Visualization
+          </h3>
+          <div class="flex items-center gap-3">
+            <div
+              class="flex-1 h-4 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
+            >
+              <div
+                id="confidence-bar"
+                class="h-full rounded-full bg-gradient-to-r from-yellow-400 to-green-500 transition-all duration-300"
+                style="width: 0%"
+              >
+              </div>
+            </div>
+            <span
+              id="confidence-value"
+              class="text-lg font-bold text-gray-900 dark:text-white">N/A</span
+            >
+          </div>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            Green ≥ 0.8 (high) · Yellow ≥ 0.5 (medium) · Red < 0.5 (low)
+          </p>
+        </div>
+
+        <div class="mt-6">
+          <button
+            id="run-sample"
+            class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Run Sample Analysis
+          </button>
+          <button
+            id="run-fallback"
+            class="ml-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+          >
+            Simulate Fallback
+          </button>
+          <button
+            id="run-neutral"
+            class="ml-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+          >
+            Neutral Input
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Source Attribution Detail -->
+    <section id="source-detail" class="mb-8">
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          How Source Attribution Works
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Every AI response payload now includes a <code>sources</code> array that
+          traces the origin of each component in the analysis. This provides auditability
+          and transparency for clinical AI decisions.
+        </p>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div
+            class="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
+          >
+            <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-200">
+              LLM Source
+            </h3>
+            <p class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+              Generated by the LLaMA emotion analysis model. Confidence
+              contribution: 0.85.
+            </p>
+          </div>
+          <div
+            class="rounded-md border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20"
+          >
+            <h3
+              class="text-sm font-semibold text-purple-900 dark:text-purple-200"
+            >
+              FHE Source
+            </h3>
+            <p class="mt-1 text-xs text-purple-700 dark:text-purple-300">
+              Input encrypted via BFV scheme before LLM inference. Confidence
+              contribution: 0.95.
+            </p>
+          </div>
+          <div
+            class="rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
+          >
+            <h3
+              class="text-sm font-semibold text-amber-900 dark:text-amber-200"
+            >
+              Keyword Fallback
+            </h3>
+            <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">
+              Local keyword-based detection used when API unavailable.
+              Confidence contribution: 0.60.
+            </p>
+          </div>
+          <div
+            class="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20"
+          >
+            <h3
+              class="text-sm font-semibold text-green-900 dark:text-green-200"
+            >
+              Dimensional Model
+            </h3>
+            <p class="mt-1 text-xs text-green-700 dark:text-green-300">
+              Russell Circumplex Model maps emotions to VAD dimensions.
+              Confidence contribution: 0.80.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Technique Map -->
+    <section id="technique-map" class="mb-8">
+      <div
+        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+      >
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Emotion → Technique Mapping
+        </h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          The explainability layer maps dominant emotions to therapeutic
+          techniques from the TherapeuticTechnique enum (12 techniques).
+        </p>
+        <div class="overflow-x-auto">
+          <table
+            class="w-full text-sm text-left text-gray-700 dark:text-gray-300"
+          >
+            <thead class="text-xs uppercase text-gray-500 dark:text-gray-400">
+              <tr>
+                <th class="pb-2 pr-4">Dominant Emotion</th>
+                <th class="pb-2 pr-4">Primary Technique</th>
+                <th class="pb-2 pr-4">Alternative</th>
+                <th class="pb-2">Confidence Formula</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">joy</td>
+                <td class="py-2 pr-4">VALIDATION</td>
+                <td class="py-2 pr-4">STRENGTH_BASED</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">sadness</td>
+                <td class="py-2 pr-4">ACTIVE_LISTENING</td>
+                <td class="py-2 pr-4">VALIDATION</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">anger</td>
+                <td class="py-2 pr-4">COGNITIVE_RESTRUCTURING</td>
+                <td class="py-2 pr-4">GROUNDING_TECHNIQUES</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">fear</td>
+                <td class="py-2 pr-4">GROUNDING_TECHNIQUES</td>
+                <td class="py-2 pr-4">MINDFULNESS</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">disgust</td>
+                <td class="py-2 pr-4">COGNITIVE_RESTRUCTURING</td>
+                <td class="py-2 pr-4">REFRAMING</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">trust</td>
+                <td class="py-2 pr-4">REFLECTIVE_STATEMENTS</td>
+                <td class="py-2 pr-4">ACTIVE_LISTENING</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">anticipation</td>
+                <td class="py-2 pr-4">GOAL_SETTING</td>
+                <td class="py-2 pr-4">MOTIVATIONAL_INTERVIEWING</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+              <tr class="border-t border-gray-200 dark:border-gray-700">
+                <td class="py-2 pr-4">surprise</td>
+                <td class="py-2 pr-4">OPEN_ENDED_QUESTIONS</td>
+                <td class="py-2 pr-4">—</td>
+                <td class="py-2">0.5 + intensity × 0.4</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+</DashboardLayout>
+
+<script>
+  const TECHNIQUE_MAP = {
+    joy: ['VALIDATION', 'STRENGTH_BASED'],
+    sadness: ['ACTIVE_LISTENING', 'VALIDATION'],
+    anger: ['COGNITIVE_RESTRUCTURING', 'GROUNDING_TECHNIQUES'],
+    fear: ['GROUNDING_TECHNIQUES', 'MINDFULNESS'],
+    surprise: ['OPEN_ENDED_QUESTIONS'],
+    disgust: ['COGNITIVE_RESTRUCTURING', 'REFRAMING'],
+    trust: ['REFLECTIVE_STATEMENTS', 'ACTIVE_LISTENING'],
+    anticipation: ['GOAL_SETTING', 'MOTIVATIONAL_INTERVIEWING'],
+  }
+
+  function buildSources(context) {
+    const timestamp = new Date().toISOString()
+    const sources = []
+
+    if (context.neutralBaseline) {
+      sources.push({
+        type: 'neutral-baseline',
+        reference: 'empty-input',
+        confidenceContribution: 1.0,
+        description: 'Neutral baseline for empty input',
+        timestamp,
+      })
+      return sources
+    }
+
+    if (context.fallbackUsed) {
+      sources.push({
+        type: 'keyword-fallback',
+        reference: 'detectEmotionsLocally',
+        confidenceContribution: 0.6,
+        description: 'Local keyword-based emotion detection (fallback)',
+        timestamp,
+      })
+    } else {
+      sources.push({
+        type: 'llm',
+        reference: context.modelVersion,
+        confidenceContribution: 0.85,
+        description: 'LLM analysis via ' + context.provider,
+        timestamp,
+      })
+      sources.push({
+        type: 'fhe',
+        reference: 'encrypt/decrypt',
+        confidenceContribution: 0.95,
+        description: 'FHE BFV encryption/decryption',
+        timestamp,
+      })
+    }
+
+    sources.push({
+      type: 'dimensional-model',
+      reference: 'russell-circumplex',
+      confidenceContribution: 0.8,
+      description: 'Russell Circumplex Model VAD mapping',
+      timestamp,
+    })
+
+    return sources
+  }
+
+  function attributeTechnique(emotions) {
+    const entries = Object.entries(emotions).filter(([, v]) => v > 0)
+    if (entries.length === 0) return undefined
+    entries.sort((a, b) => b[1] - a[1])
+    const [dominant, intensity] = entries[0]
+    const techniques = TECHNIQUE_MAP[domant] ?? ['ACTIVE_LISTENING']
+    const confidence = Math.min(0.5 + intensity * 0.4, 0.95)
+    const reasoning = [
+      'Dominant emotion: ' +
+        dominant +
+        ' (intensity ' +
+        intensity.toFixed(2) +
+        ')',
+      'Mapped to technique: ' + techniques[0],
+    ]
+    const alternatives =
+      techniques.length > 1
+        ? techniques.slice(1).map((t) => ({
+            technique: t,
+            confidence: Math.max(confidence - 0.15, 0.3),
+          }))
+        : undefined
+    return {
+      technique: techniques[0],
+      confidence,
+      reasoning,
+      alternatives,
+    }
+  }
+
+  function renderSources(sources) {
+    const tbody = document.getElementById('sources-table-body')
+    if (!tbody) return
+    tbody.innerHTML = ''
+    sources.forEach((s) => {
+      const tr = document.createElement('tr')
+      tr.className = 'border-t border-gray-200 dark:border-gray-700'
+      tr.innerHTML =
+        '<td class="py-2 pr-4 font-mono text-xs">' +
+        s.type +
+        '</td>' +
+        '<td class="py-2 pr-4 font-mono text-xs">' +
+        s.reference +
+        '</td>' +
+        '<td class="py-2 pr-4">' +
+        s.confidenceContribution.toFixed(2) +
+        '</td>' +
+        '<td class="py-2 text-xs">' +
+        (s.description ?? '') +
+        '</td>'
+      tbody.appendChild(tr)
+    })
+  }
+
+  function renderTechnique(attribution) {
+    const container = document.getElementById('technique-attribution')
+    if (!container) return
+    if (!attribution) {
+      container.innerHTML =
+        '<p class="text-sm text-gray-500 dark:text-gray-400">No technique attribution (no dominant emotion detected).</p>'
+      return
+    }
+    let html =
+      '<div class="rounded-md border border-gray-200 p-4 dark:border-gray-700">' +
+      '<div class="flex items-center gap-3">' +
+      '<span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-900 dark:bg-blue-900/30 dark:text-blue-200">' +
+      attribution.technique +
+      '</span>' +
+      '<span class="text-sm text-gray-600 dark:text-gray-400">Confidence: ' +
+      attribution.confidence.toFixed(2) +
+      '</span>' +
+      '</div>' +
+      '<ul class="mt-3 list-disc pl-6 text-sm text-gray-700 dark:text-gray-300">'
+    attribution.reasoning.forEach((r) => {
+      html += '<li>' + r + '</li>'
+    })
+    if (attribution.alternatives) {
+      html +=
+        '<li>Alternatives: ' +
+        attribution.alternatives
+          .map((a) => a.technique + ' (' + a.confidence.toFixed(2) + ')')
+          .join(', ') +
+        '</li>'
+    }
+    html += '</ul></div>'
+    container.innerHTML = html
+  }
+
+  function renderConfidence(confidence) {
+    const bar = document.getElementById('confidence-bar')
+    const value = document.getElementById('confidence-value')
+    if (!bar || !value) return
+    const pct = Math.round(confidence * 100)
+    bar.style.width = pct + '%'
+    value.textContent = confidence.toFixed(2)
+    if (confidence >= 0.8) {
+      bar.className =
+        'h-full rounded-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-300'
+    } else if (confidence >= 0.5) {
+      bar.className =
+        'h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 transition-all duration-300'
+    } else {
+      bar.className =
+        'h-full rounded-full bg-gradient-to-r from-red-400 to-red-600 transition-all duration-300'
+    }
+  }
+
+  function runAnalysis(scenario) {
+    let context, emotions, confidence
+    if (scenario === 'sample') {
+      context = {
+        provider: 'llama',
+        modelVersion: 'llama-emotion-v1.0',
+        fallbackUsed: false,
+        neutralBaseline: false,
+      }
+      emotions = { joy: 0.75, sadness: 0.2, trust: 0.6 }
+      confidence = 0.85
+    } else if (scenario === 'fallback') {
+      context = {
+        provider: 'llama',
+        modelVersion: 'fallback-v1.0',
+        fallbackUsed: true,
+        neutralBaseline: false,
+      }
+      emotions = { sadness: 0.7, fear: 0.3 }
+      confidence = 0.6
+    } else {
+      context = {
+        provider: 'llama',
+        modelVersion: 'llama-emotion-v1.0',
+        fallbackUsed: false,
+        neutralBaseline: true,
+      }
+      emotions = { trust: 0.5 }
+      confidence = 1.0
+    }
+
+    const sources = buildSources(context)
+    const technique = attributeTechnique(emotions)
+    renderSources(sources)
+    renderTechnique(technique)
+    renderConfidence(confidence)
+  }
+
+  document
+    .getElementById('run-sample')
+    ?.addEventListener('click', () => runAnalysis('sample'))
+  document
+    .getElementById('run-fallback')
+    ?.addEventListener('click', () => runAnalysis('fallback'))
+  document
+    .getElementById('run-neutral')
+    ?.addEventListener('click', () => runAnalysis('neutral'))
+</script>
