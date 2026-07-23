@@ -1,3 +1,6 @@
+# Blue-green Service — routes traffic to the active slot.
+# The `slot` selector is patched by the blue-green deploy script
+# to switch traffic between blue and green deployments.
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,6 +11,7 @@ metadata:
 spec:
   selector:
     app: pixelated-empathy-api
+    slot: blue
   ports:
     - port: 80
       targetPort: http
