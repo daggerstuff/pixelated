@@ -40,8 +40,8 @@ const shifts = [
 ---
 
 <BaseLayout
-  title="About Pixelated Empathy"
-  description="Why Pixelated Empathy exists and how it helps therapist training teams run clearer, more specific supervision."
+  title="About"
+  description="Why Pixelated Empathy was built: therapist training teams need supervision that gets more specific, not more abstract. Founder-led, focused on the next case."
   fullWidthMain
 >
   <script
@@ -63,23 +63,13 @@ const shifts = [
     ]}
     primaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
     secondaryCTA={{ text: 'Plan a pilot review', href: '/contact' }}
-    stats={[
-      {
-        label: 'Built for',
-        value: 'Clinical training teams',
-        detail: 'Supervisors, educators, and cohort-based programs',
-      },
-      {
-        label: 'Core outcome',
-        value: 'Sharper coaching',
-        detail: 'Point to the exact turn that should change next',
-      },
-      {
-        label: 'Workflow',
-        value: 'One hard case',
-        detail: 'Run, review, compare, and retry from the same record',
-      },
-    ]}
+    proof={{
+      label: 'What we optimize for',
+      body: `<p><strong>Keep the case, transcript, and coaching lane attached to the same run.</strong></p>
+        <p>Make difficult sessions repeatable enough for teams to compare judgment.</p>
+        <p>Treat privacy, retention, and review controls as product design decisions.</p>`,
+      caption: 'Three principles that drive the build',
+    }}
   />
   <section class="marketing-section">
     <div class="marketing-shell">

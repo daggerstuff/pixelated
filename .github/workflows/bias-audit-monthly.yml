@@ -1,0 +1,87 @@
+name: Monthly Bias Audit
+
+permissions:
+  contents: write
+  issues: write
+
+on:
+  schedule:
+    # Run at 00:00 UTC on the 1st of every month
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+env:
+  NODE_VERSION: 24.16.0
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  run-bias-audit:
+    name: Run Bias Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          clean-node-modules: 'true'
+
+      - name: Ensure reports directory exists
+        run: mkdir -p ai/data/reports
+
+      - name: Run bias audit
+        id: bias-audit
+        run: |
+          MONTH=$(date -u +%Y-%m)
+          pnpm tsx scripts/bias-audit/run-monthly-audit.ts "$MONTH"
+        env:
+          NODE_ENV: production
+
+      - name: Commit and push report
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ai/data/reports/bias-audit-*.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(bias-audit): monthly bias audit report for $(date -u +%Y-%m)"
+            git push
+          fi
+
+      - name: Create alert issue if threshold exceeded
+        if: steps.bias-audit.outputs.threshold-exceeded == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const month = '${{ steps.bias-audit.outputs.month }}';
+            const alertLevel = '${{ steps.bias-audit.outputs.alert-level }}';
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[BIAS ALERT ${alertLevel.toUpperCase()}] Bias audit threshold exceeded for ${month}`,
+              body: [
+                `## Bias Audit Alert — ${month}`,
+                ``,
+                `**Alert Level**: ${alertLevel}`,
+                `**Report**: ai/data/reports/bias-audit-${month}.json`,
+                ``,
+                `The monthly bias audit has detected variance exceeding the 2% threshold across demographic segments.`,
+                ``,
+                `### Action Required`,
+                `1. Review the audit report at \`ai/data/reports/bias-audit-${month}.json\``,
+                `2. Identify which metrics and segments show the highest variance`,
+                `3. Investigate potential bias sources in the AI pipeline`,
+                `4. Document mitigation steps taken`,
+                ``,
+                `This issue was automatically created by the Monthly Bias Audit workflow.`,
+              ].join('\n'),
+              labels: ['bias-alert', 'safety-critical', 'automated'],
+            });

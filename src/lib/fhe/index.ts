@@ -90,3 +90,13 @@ export { FHEOperation } from './types'
 export { RealFHEService, realFHEService as fheService } from './fhe-service'
 export { FHEEmotionClassifier } from './fhe-emotion-classifier'
 export { createEmotionClassifierFHEService } from './fhe-emotion-classifier'
+export {
+  ZKProofService,
+  getZKProofService,
+  resetZKProofService,
+} from './zk-proof-service'
+export type {
+  ZKProofArtifact,
+  ZKProvenResult,
+  FHEOperationCallback,
+} from './zk-proof-service'
