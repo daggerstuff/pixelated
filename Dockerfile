@@ -1,6 +1,6 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.18.0-bookworm-slim AS base
+FROM node:24-bookworm-slim AS base
 
 # Apply OS-level security updates to patch known vulnerabilities
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*

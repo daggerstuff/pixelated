@@ -91,28 +91,6 @@ export { RealFHEService, realFHEService as fheService } from './fhe-service'
 export { FHEEmotionClassifier } from './fhe-emotion-classifier'
 export { createEmotionClassifierFHEService } from './fhe-emotion-classifier'
 export {
-  ZKProofService,
-  getZKProofService,
-  resetZKProofService,
-} from './zk-proof-service'
-export type {
-  ZKProofArtifact,
-  ZKProvenResult,
-  FHEOperationCallback,
-} from './zk-proof-service'
-
-export {
-  SP1Prover,
-  getSP1Prover,
-  resetSP1Prover,
-} from './sp1-prover'
-export type {
-  ProofMode,
-  SP1ProofRequest,
-  SP1ProofResult,
-  SP1VerifyResult,
-} from './sp1-prover'
-export {
   EncryptedTextProcessor,
   getEncryptedTextProcessor,
   resetEncryptedTextProcessor,
