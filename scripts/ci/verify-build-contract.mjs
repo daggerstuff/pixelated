@@ -46,6 +46,7 @@ const PACKAGE_IGNORE_SET = new Set([
   "next-auth",
   "next-auth/jwt",
   "@21st-extension/toolbar",
+  "@pixelated-empathy/auto-sdk",
   "@vercel/speed-insights/astro",
   "@vercel/analytics/astro",
   "node-seal",
