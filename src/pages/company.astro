@@ -41,8 +41,8 @@ const facts = [
 ---
 
 <BaseLayout
-  title="Company Overview - Pixelated Empathy"
-  description="Company overview for Pixelated Empathy, including operating profile, focus, and who the product is built for."
+  title="Company Overview"
+  description="Pixelated Empathy's operating profile: founder-led, United States, focused on clinical simulation for therapist training and sensitive supervision workflows."
   fullWidthMain
 >
   <MarketingPageHero
@@ -53,7 +53,14 @@ const facts = [
     trustLine={['United States', 'Founder-led', 'Sensitive-workflow focus']}
     primaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
     secondaryCTA={{ text: 'Talk to the team', href: '/contact' }}
-    stats={facts}
+    proof={{
+      label: 'Operating profile',
+      body: `<p><strong>Stage.</strong> Founder-led build (2025, United States).</p>
+        <p><strong>Focus.</strong> Clinical simulation for therapist training, supervision, and review.</p>
+        <p><strong>Rollout.</strong> Start small, judge fast. A focused pilot, not a long procurement maze.</p>
+        <p><strong>Primary ask.</strong> One hard case — enough to prove whether coaching gets clearer.</p>`,
+      caption: 'How the company is set up to stay close to the workflow',
+    }}
   />
 
   <section class="marketing-section">
