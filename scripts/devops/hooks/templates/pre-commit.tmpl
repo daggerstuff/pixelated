@@ -103,8 +103,17 @@ fi
 
 # C. Run linting via lint-staged (Fix Issue #2: performant linting only on staged files)
 if command -v pnpm >/dev/null 2>&1 && [ -f .lintstagedrc.json ]; then
-  echo -e "${GREEN}✨ Running linting via lint-staged (only on changed files)...${NC}"
-  pnpm exec lint-staged --quiet
+  echo -e "${GREEN}✨ Running linting via lint-staged (verbose, only on changed files)...${NC}"
+  # Verbose: omit --quiet so each linter's real output streams inline.
+  # This surfaces the offending file+rule+line the moment a check fails,
+  # instead of a bare ✖ that forces a manual reproduction to diagnose.
+  if ! pnpm exec lint-staged; then
+    echo -e "${RED}❌ [Hook] lint-staged found failures above. See the per-command output (file, rule, line) to fix them.${NC}"
+    echo -e "${YELLOW}   Re-run a specific linter directly, e.g.:${NC}"
+    echo -e "${YELLOW}     pnpm exec oxlint -c .oxlintrc.json <file>${NC}"
+    echo -e "${YELLOW}     pnpm exec ruff check --fix <file> && pnpm exec ruff format <file>${NC}"
+    exit 1
+  fi
 else
   echo -e "${YELLOW}✨ Running full project linting (consider setting up lint-staged)...${NC}"
   pnpm run lint

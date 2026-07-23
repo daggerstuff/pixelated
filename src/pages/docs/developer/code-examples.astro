@@ -35,13 +35,13 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
     </div>
 
     <div class="tab-content active" data-tab="ts">
-      <pre><code class="language-bash">npm install @pixelated-empathy/auto-sdk
+      <pre><code class="language-bash" is:raw>npm install @pixelated-empathy/auto-sdk
 # or
 pnpm add @pixelated-empathy/auto-sdk</code></pre>
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-bash">pip install pixelated-empathy-sdk
+      <pre><code class="language-bash" is:raw>pip install pixelated-empathy-sdk
 # or
 uv add pixelated-empathy-sdk</code></pre>
     </div>
@@ -67,7 +67,7 @@ const client = new DefaultApi(config);</code></pre>
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-python">import os
+      <pre><code class="language-python" is:raw>import os
 from pixelated_empathy_sdk import Configuration, DefaultApi
 
 config = Configuration(
@@ -99,7 +99,7 @@ console.log(results.data);
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-python"># Search for content
+      <pre><code class="language-python" is:raw># Search for content
 results = client.search_content(
     q="anxiety management techniques",
     limit=10,
@@ -134,7 +134,7 @@ console.log(analysis.confidence_score);</code></pre>
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-python"># Analyze a session for bias indicators
+      <pre><code class="language-python" is:raw># Analyze a session for bias indicators
 analysis = client.analyze_bias(
     session_id="session-abc-123",
     demographics={
@@ -174,7 +174,7 @@ const results = await client.searchMemories({
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-python"># Create a memory entry
+      <pre><code class="language-python" is:raw># Create a memory entry
 memory = client.create_memory(
     user_id="user-123",
     content="Patient responded well to CBT session 3",
@@ -217,7 +217,7 @@ try {
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-python">from pixelated_empathy_sdk import ApiException
+      <pre><code class="language-python" is:raw>from pixelated_empathy_sdk import ApiException
 
 try:
     result = client.search_content(q="test")
@@ -256,7 +256,7 @@ const client = new DefaultApi(config);</code></pre>
     </div>
 
     <div class="tab-content" data-tab="py">
-      <pre><code class="language-python">config = Configuration(
+      <pre><code class="language-python" is:raw>config = Configuration(
     api_key=os.environ["PIXELATED_API_KEY"],
     host="https://api.pixelatedempathy.com",
     retry_config=RetryConfig(
