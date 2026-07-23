@@ -205,7 +205,7 @@ describe('PresidioPHIDetector internals and detectPHI paths', () => {
   })
 
   it('detectAndRedactPHIAsync resolves to a string', async () => {
-    await expect(detectAndRedactPHIAsync('hello world')).resolves.toBe(
+     await expect(detectAndRedactPHIAsync('hello world')).resolves.toBe(
       'hello world',
     )
   })

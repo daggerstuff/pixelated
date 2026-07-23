@@ -30,7 +30,7 @@ function setupMockFetch(responseData: unknown, status = 200) {
     headers: new Headers({ "content-type": "application/json" }),
     json: () => Promise.resolve(responseData),
     text: () => Promise.resolve(JSON.stringify(responseData)),
-  } as Response);
+  });
 }
 
 beforeEach(() => {
@@ -420,7 +420,7 @@ describe("GraphqlSDK Client", () => {
 
       const callArgs = mockFetch.mock.calls[0];
       const requestInit = callArgs[1] as RequestInit;
-      const headers = new Headers(requestInit.headers as HeadersInit);
+      const headers = new Headers(requestInit.headers);
       expect(headers.get("X-API-Key")).toBe("pk_secret_key");
       expect(headers.get("Authorization")).toBeNull();
     });
@@ -438,7 +438,7 @@ describe("GraphqlSDK Client", () => {
 
       const callArgs = mockFetch.mock.calls[0];
       const requestInit = callArgs[1] as RequestInit;
-      const headers = new Headers(requestInit.headers as HeadersInit);
+      const headers = new Headers(requestInit.headers);
       expect(headers.get("Authorization")).toBe("Bearer eyJtoken");
       expect(headers.get("X-API-Key")).toBeNull();
     });
@@ -457,7 +457,7 @@ describe("GraphqlSDK Client", () => {
 
       const callArgs = mockFetch.mock.calls[0];
       const requestInit = callArgs[1] as RequestInit;
-      const headers = new Headers(requestInit.headers as HeadersInit);
+      const headers = new Headers(requestInit.headers);
       expect(headers.get("X-API-Key")).toBe("pk_key");
       expect(headers.get("Authorization")).toBeNull();
     });
@@ -476,7 +476,7 @@ describe("GraphqlSDK Client", () => {
 
       const callArgs = mockFetch.mock.calls[0];
       const requestInit = callArgs[1] as RequestInit;
-      const headers = new Headers(requestInit.headers as HeadersInit);
+      const headers = new Headers(requestInit.headers);
       expect(headers.get("X-Custom-Header")).toBe("custom-value");
     });
   });
@@ -520,7 +520,7 @@ describe("GraphqlSDK Client", () => {
         headers: new Headers({ "content-type": "application/json" }),
         json: () => Promise.resolve(errorResponse),
         text: () => Promise.resolve(JSON.stringify(errorResponse)),
-      } as Response);
+      });
 
       const client = createGraphqlClient({
         endpoint: "http://localhost:5173/api/graphql",
@@ -538,7 +538,7 @@ describe("GraphqlSDK Client", () => {
         headers: new Headers({ "content-type": "application/json" }),
         json: () => Promise.resolve({ errors: [{ message: "Internal error" }] }),
         text: () => Promise.resolve(JSON.stringify({ errors: [{ message: "Internal error" }] })),
-      } as Response);
+      });
 
       const client = createGraphqlClient({
         endpoint: "http://localhost:5173/api/graphql",
