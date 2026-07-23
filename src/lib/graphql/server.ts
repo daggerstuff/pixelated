@@ -73,7 +73,7 @@ async function buildContext(request: Request): Promise<GraphqlContext> {
 // Yoga server
 // ──────────────────────────────────────────────
 
-export const yoga = createYoga<GraphqlContext, {}>({
+export const yoga = createYoga<GraphqlContext>({
   schema,
   context: ({ request }) => buildContext(request),
   graphqlEndpoint: "/api/graphql",

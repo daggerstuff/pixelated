@@ -46,7 +46,7 @@ afterEach(() => {
 describe('auditLoggingService', () => {
   describe('logEvent', () => {
     it('should log an event with sanitized details', async () => {
-      await expect(
+       await expect(
         auditLoggingService.logEvent(testEntry),
       ).resolves.not.toThrow()
       expect(infoSpy).toHaveBeenCalled()
