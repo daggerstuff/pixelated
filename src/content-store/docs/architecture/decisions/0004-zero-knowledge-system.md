@@ -219,3 +219,26 @@ vs. non-interactive proof generation).
 - Selected SP1 with hash-based commitment proofs
 - Supersedes MP-SPDZ reference in ADR-0001
 - Benchmark results confirm sub-5s target for hash-commitment proofs
+
+2026-07-23:
+
+- **PIX-4118: SP1 integration implemented**
+- Rust guest program at `sp1-guest/src/main.rs` proves Merkle root construction
+  over pipeline step hashes using SHA-256 (sp1-zkvm v4.1)
+- `SP1Prover` TypeScript layer (`src/lib/fhe/sp1-prover.ts`) detects SP1 ELF
+  binary, shells out to `cargo prove run --elf`, falls back to hash-commitment
+  mode when SP1 toolchain unavailable
+- `ZKProofService` now delegates to `SP1Prover` — `ZKProofArtifact` includes
+  `proofMode: 'sp1' | 'hash-commitment'` field
+- `POST /api/v1/zk/verify` endpoint returns `proofMode` in response
+- 12 ZK integration tests pass (`zk-sp1-integration.test.ts`)
+- **PIX-4116: FHE upgrade implemented**
+- `EncryptedTextProcessor` (`src/lib/fhe/encrypted-text-processor.ts`) provides
+  9 fully homomorphic text operations using SEAL BFV BatchEncoder:
+  sentiment, categorize, word_count, character_count, keyword_density,
+  tokenize, filter, summarize, reading_level
+- All operations use multiplyPlain + rotation+add reduction — no decryption
+  during computation (only for categorize result construction)
+- `HomomorphicOperations.simulateOperation()` routes to encrypted processor
+  first, falls back to plaintext simulation with `plaintextFallback: true`
+- 13 FHE tests pass (`encrypted-text-processor.test.ts`)
