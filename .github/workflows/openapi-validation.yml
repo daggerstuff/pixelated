@@ -44,8 +44,6 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Cache spectral
         uses: actions/cache@v4
@@ -54,6 +52,7 @@ jobs:
           key: spectral-cli-${{ runner.os }}-v1
 
       - name: Validate all OpenAPI specs
+        id: validate-all
         run: node scripts/ci/validate-openapi.js
 
       - name: Validate specific spec (docs/api-reference/openapi.yaml)
@@ -131,7 +130,7 @@ jobs:
               # Write a minimal placeholder so the step doesn't fail
               with open('docs/api-reference/generated/fastapi-schema.json', 'w') as f:
                   json.dump({'openapi': '3.1.0', 'info': {'title': 'FastAPI (export pending)', 'version': '0.0.0'}, 'paths': {}}, f, indent=2)
-          " 2>& || true
+          " 2>&1 || true
 
       - name: Validate exported FastAPI schema
         run: |

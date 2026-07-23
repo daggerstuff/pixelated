@@ -482,7 +482,7 @@ jobs:
 
       - name: Upload image scan results
         if: always()
-        uses: actions/upload-artifact@043fb1d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: container-scan-${{ matrix.dockerfile }}
           path: trivy-image-${{ matrix.dockerfile }}.json
