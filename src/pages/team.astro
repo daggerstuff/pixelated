@@ -28,8 +28,8 @@ const futureRoles = [
 ---
 
 <BaseLayout
-  title="Team - Pixelated Empathy"
-  description="Learn who is currently building Pixelated Empathy and how the company is structured today."
+  title="Team"
+  description="Who is currently building Pixelated Empathy. Founder-led today, with product, engineering, and customer conversations kept close to the workflow."
   fullWidthMain
 >
   <MarketingPageHero
@@ -40,24 +40,13 @@ const futureRoles = [
     trustLine={['Founder-led', 'United States', 'Clinical workflow focus']}
     primaryCTA={{ text: 'Talk to the founder', href: '/contact' }}
     secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
-    stats={[
-      {
-        label: 'Current structure',
-        value: 'Founder-led',
-        detail:
-          'Product, engineering, and customer conversations stay close together',
-      },
-      {
-        label: 'Founded',
-        value: '2025',
-        detail: 'Company stage is still early and deliberate',
-      },
-      {
-        label: 'Hiring direction',
-        value: 'Quality first',
-        detail: 'Future roles should strengthen training quality and trust',
-      },
-    ]}
+    proof={{
+      label: 'Founder',
+      body: `<p><strong>Chad · Founder</strong></p>
+        <p>${founder.bio}</p>
+        <p><strong>Focus:</strong> ${founder.expertise}</p>`,
+      caption: 'Product, engineering, and customer conversations stay close together',
+    }}
   />
 
   <section class="marketing-section">

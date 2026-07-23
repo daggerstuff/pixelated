@@ -4,6 +4,8 @@ export const heroContent = {
     'Pixelated Empathy provides counseling programs and supervision teams with an evidence-based platform to rehearse risk assessment, rupture repair, crisis intervention, and clinical documentation in a secure, repeatable training environment.',
   helperText:
     'HIPAA-ready platform for counseling programs, clinical supervisors, training clinics, and behavioral health teams.',
+  metaDescription:
+    'Pixelated Empathy is a clinical simulation platform for therapist training. Rehearse risk assessment, rupture repair, and crisis intervention with review-ready transcripts.',
   kicker: 'Enterprise Clinical Training Platform',
   proofPoints: [
     {
