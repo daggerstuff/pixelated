@@ -30,7 +30,7 @@ http:
           'none'; worker-src 'self' blob:; manifest-src 'self'; media-src
           'self';"
 
-    # Rate Limiting
+    # Rate Limiting — DDoS protection (complements PIX-4095 per-key limits)
     rate-limit:
       rateLimit:
         average: 100
@@ -50,6 +50,51 @@ http:
         average: 50
         period: 1m
         burst: 100
+
+    # CORS
+    cors:
+      headers:
+        accessControlAllowCredentials: true
+        accessControlAllowHeaders:
+          - Authorization
+          - Content-Type
+          - X-API-Key
+          - X-Request-Id
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowOriginList:
+          - https://pixelatedempathy.com
+          - https://www.pixelatedempathy.com
+          - https://pixelatedempathy.tech
+        accessControlMaxAge: 600
+        addVaryHeader: true
+
+    # Request Body Size Limit (10MB)
+    request-size-limit:
+      buffering:
+        maxRequestBodyBytes: 10485760
+        memRequestBodyBytes: 2097152
+
+    # Gateway Timeouts
+    gateway-timeouts:
+      forwardingTimeouts:
+        dialTimeout: 10s
+        responseHeaderTimeout: 30s
+        idleConnTimeout: 90s
+
+    # Metrics IP Allowlist
+    metrics-ip-allowlist:
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+          - 127.0.0.1/32
 
     # Compression
     compression:

@@ -386,6 +386,7 @@
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
     "@playwright/test": "1.61.1",
+    "@stoplight/spectral-cli": "^6.15.5",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
@@ -526,6 +527,7 @@
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
   },
   "trustedDependencies": [
+    "@scarf/scarf",
     "aws-sdk",
     "core-js",
     "postinstall-postinstall",

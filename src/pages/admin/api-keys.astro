@@ -1,0 +1,390 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+---
+
+<DashboardLayout title="API Key Management">
+  <section class="overview">
+    <h2>Overview</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <span class="stat-label">Total Keys</span>
+        <span class="stat-value" id="total-keys">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Active Keys</span>
+        <span class="stat-value" id="active-keys">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Expired Keys</span>
+        <span class="stat-value" id="expired-keys">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Recent Failures (24h)</span>
+        <span class="stat-value" id="recent-failures">—</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Avg Rate Limit</span>
+        <span class="stat-value" id="avg-rate-limit">—</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="scope-distribution">
+    <h2>Scope Distribution</h2>
+    <div id="scope-distribution" class="scope-list"></div>
+  </section>
+
+  <section class="filters">
+    <h2>Filters</h2>
+    <div class="filter-row">
+      <label>
+        <input type="checkbox" id="filter-active" />
+        Active Only
+      </label>
+      <input type="text" id="filter-user-id" placeholder="Filter by user ID" />
+      <button id="btn-apply-filters" class="btn-primary">Apply</button>
+      <button id="btn-clear-filters" class="btn-secondary">Clear</button>
+    </div>
+  </section>
+
+  <section class="keys-table">
+    <h2>API Keys</h2>
+    <table id="keys-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>User</th>
+          <th>Prefix</th>
+          <th>Scopes</th>
+          <th>Rate Limit</th>
+          <th>Active</th>
+          <th>Last Used</th>
+          <th>Expires</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="keys-tbody"></tbody>
+    </table>
+  </section>
+
+  <section class="key-detail" id="key-detail" style="display: none;">
+    <h2>Key Detail & Usage</h2>
+    <div class="detail-grid">
+      <div class="detail-card">
+        <h3>Usage (Current Window)</h3>
+        <div id="usage-info"></div>
+      </div>
+      <div class="detail-card">
+        <h3>Key Info</h3>
+        <div id="key-info"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="actions">
+    <h2>Admin Actions</h2>
+    <div class="action-row">
+      <button id="btn-refresh" class="btn-primary">Refresh</button>
+      <button id="btn-stats" class="btn-secondary">Stats Only</button>
+    </div>
+  </section>
+</DashboardLayout>
+
+<style>
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  .stat-label {
+    font-size: 0.875rem;
+    color: #666;
+  }
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 4px;
+  }
+  .scope-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+  }
+  .scope-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 12px;
+    background: #e3f2fd;
+    font-size: 0.875rem;
+  }
+  .filter-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 12px 0;
+  }
+  .filter-row input[type='text'] {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+  }
+  th,
+  td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    font-weight: 600;
+    background: #f5f5f5;
+  }
+  .badge-active {
+    color: #2e7d32;
+    font-weight: bold;
+  }
+  .badge-inactive {
+    color: #c62828;
+  }
+  .badge-expired {
+    color: #e65100;
+  }
+  .btn-primary {
+    padding: 8px 16px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .btn-secondary {
+    padding: 8px 16px;
+    background: #eee;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .btn-danger {
+    padding: 4px 10px;
+    background: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .btn-view {
+    padding: 4px 10px;
+    background: #388e3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+  }
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+  .detail-card {
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+  .usage-bar {
+    height: 20px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .usage-fill {
+    height: 100%;
+    background: #4caf50;
+    transition: width 0.3s;
+  }
+  .usage-fill.high {
+    background: #ff9800;
+  }
+  .usage-fill.critical {
+    background: #f44336;
+  }
+</style>
+
+<script is:inline>
+  async function fetchStats() {
+    try {
+      const res = await fetch('/api/v1/admin/api-keys?stats=true')
+      const data = await res.json()
+      const s = data.stats
+      document.getElementById('total-keys').textContent = s.totalKeys
+      document.getElementById('active-keys').textContent = s.activeKeys
+      document.getElementById('expired-keys').textContent = s.expiredKeys
+      document.getElementById('recent-failures').textContent = s.recentFailures
+      document.getElementById('avg-rate-limit').textContent =
+        s.averageRateLimit + '/min'
+
+      const scopeDiv = document.getElementById('scope-distribution')
+      scopeDiv.innerHTML = ''
+      for (const [scope, count] of Object.entries(s.keysByScope)) {
+        const badge = document.createElement('span')
+        badge.className = 'scope-badge'
+        badge.textContent = `${scope}: ${count}`
+        scopeDiv.appendChild(badge)
+      }
+    } catch (e) {
+      console.error('Failed to fetch stats', e)
+    }
+  }
+
+  async function fetchKeys() {
+    const params = new URLSearchParams()
+    if (document.getElementById('filter-active').checked)
+      params.set('active', 'true')
+    const userId = document.getElementById('filter-user-id').value.trim()
+    if (userId) params.set('userId', userId)
+
+    try {
+      const res = await fetch('/api/v1/admin/api-keys?' + params.toString())
+      const data = await res.json()
+      const tbody = document.getElementById('keys-tbody')
+      tbody.innerHTML = ''
+
+      for (const key of data.keys) {
+        const row = document.createElement('tr')
+        const isActive = key.is_active
+        const isExpired =
+          key.expires_at && new Date(key.expires_at) < new Date()
+        const statusClass = isExpired
+          ? 'badge-expired'
+          : isActive
+            ? 'badge-active'
+            : 'badge-inactive'
+        const statusText = isExpired
+          ? 'Expired'
+          : isActive
+            ? 'Active'
+            : 'Inactive'
+
+        row.innerHTML = `
+          <td><code title="${key.id}">${key.id.substring(0, 8)}…</code></td>
+          <td>${key.name}</td>
+          <td><code title="${key.user_id}">${key.user_id.substring(0, 8)}…</code></td>
+          <td><code>${key.key_prefix}</code></td>
+          <td>${key.scopes.join(', ')}</td>
+          <td>${key.rate_limit}/min</td>
+          <td class="${statusClass}">${statusText}</td>
+          <td>${key.last_used_at ? new Date(key.last_used_at).toLocaleString() : 'Never'}</td>
+          <td>${key.expires_at ? new Date(key.expires_at).toLocaleDateString() : 'Never'}</td>
+          <td>
+            <button class="btn-view" onclick="viewKey('${key.id}')">View</button>
+            ${isActive ? `<button class="btn-danger" onclick="revokeKey('${key.id}')">Revoke</button>` : ''}
+          </td>
+        `
+        tbody.appendChild(row)
+      }
+    } catch (e) {
+      console.error('Failed to fetch keys', e)
+    }
+  }
+
+  async function viewKey(keyId) {
+    try {
+      const res = await fetch('/api/v1/admin/api-keys/' + keyId + '/usage', {
+        method: 'POST',
+      })
+      const data = await res.json()
+      const usage = data.usage
+
+      document.getElementById('key-detail').style.display = 'block'
+      const usageDiv = document.getElementById('usage-info')
+      const pct =
+        usage.rateLimit > 0
+          ? (usage.currentWindowCount / usage.rateLimit) * 100
+          : 0
+      const barClass = pct >= 90 ? 'critical' : pct >= 75 ? 'high' : ''
+      usageDiv.innerHTML = `
+        <p><strong>Current Window:</strong> ${usage.currentWindowCount} / ${usage.rateLimit} requests</p>
+        <p><strong>Remaining:</strong> ${usage.remaining}</p>
+        <p><strong>Resets in:</strong> ${Math.ceil((usage.resetTimeMs - Date.now()) / 1000)}s</p>
+        <div class="usage-bar"><div class="usage-fill ${barClass}" style="width: ${pct}%"></div></div>
+        <p><strong>Last Used:</strong> ${usage.lastUsedAt ? new Date(usage.lastUsedAt).toLocaleString() : 'Never'}</p>
+        <p><strong>Last Failure:</strong> ${usage.lastFailedAt ? new Date(usage.lastFailedAt).toLocaleString() : 'None'}</p>
+      `
+
+      const infoDiv = document.getElementById('key-info')
+      const keyRes = await fetch('/api/v1/admin/api-keys/' + keyId)
+      const keyData = await keyRes.json()
+      const k = keyData.api_key
+      infoDiv.innerHTML = `
+        <p><strong>ID:</strong> <code>${k.id}</code></p>
+        <p><strong>Name:</strong> ${k.name}</p>
+        <p><strong>User:</strong> <code>${k.user_id}</code></p>
+        <p><strong>Prefix:</strong> <code>${k.key_prefix}</code></p>
+        <p><strong>Scopes:</strong> ${k.scopes.join(', ')}</p>
+        <p><strong>Rate Limit:</strong> ${k.rate_limit}/min</p>
+        <p><strong>Active:</strong> ${k.is_active ? 'Yes' : 'No'}</p>
+        <p><strong>Created:</strong> ${new Date(k.created_at).toLocaleString()}</p>
+        <p><strong>Expires:</strong> ${k.expires_at ? new Date(k.expires_at).toLocaleDateString() : 'Never'}</p>
+      `
+    } catch (e) {
+      console.error('Failed to fetch usage', e)
+    }
+  }
+
+  async function revokeKey(keyId) {
+    if (!confirm('Revoke this API key? This action cannot be undone.')) return
+    try {
+      const res = await fetch('/api/v1/admin/api-keys/' + keyId, {
+        method: 'DELETE',
+      })
+      const data = await res.json()
+      if (data.success) {
+        alert('API key revoked successfully')
+        fetchKeys()
+        fetchStats()
+      } else {
+        alert('Failed: ' + (data.error || 'Unknown error'))
+      }
+    } catch (e) {
+      alert('Error: ' + e.message)
+    }
+  }
+
+  document.getElementById('btn-refresh').addEventListener('click', () => {
+    fetchKeys()
+    fetchStats()
+  })
+  document.getElementById('btn-stats').addEventListener('click', fetchStats)
+  document
+    .getElementById('btn-apply-filters')
+    .addEventListener('click', fetchKeys)
+  document.getElementById('btn-clear-filters').addEventListener('click', () => {
+    document.getElementById('filter-active').checked = false
+    document.getElementById('filter-user-id').value = ''
+    fetchKeys()
+  })
+
+  fetchStats()
+  fetchKeys()
+</script>

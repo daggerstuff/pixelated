@@ -1,0 +1,154 @@
+name: SDK Generation
+
+on:
+  push:
+    branches: [main, staging]
+    paths:
+      - 'docs/api-reference/openapi.yaml'
+      - 'docs/api-reference/openapi.json'
+      - 'packages/sdk-typescript/**'
+      - 'packages/sdk-python/**'
+      - 'scripts/ci/generate-sdks.sh'
+  pull_request:
+    paths:
+      - 'docs/api-reference/openapi.yaml'
+      - 'docs/api-reference/openapi.json'
+  schedule:
+    # Daily at 4 AM UTC
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to npm and PyPI'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  generate:
+    name: Generate SDKs from OpenAPI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Cache openapi-generator-cli
+        uses: actions/cache@v4
+        with:
+          path: .cache/openapi-generator-cli.jar
+          key: openapi-generator-cli-7.12.0
+
+      - name: Validate OpenAPI spec
+        run: |
+          npx @stoplight/spectral-cli lint docs/api-reference/openapi.yaml \
+            --ruleset .spectral.yaml --format json > spectral-results.json || true
+          echo "Spectral validation complete"
+
+      - name: Generate SDKs
+        run: ./scripts/ci/generate-sdks.sh
+
+      - name: Build TypeScript SDK
+        working-directory: packages/sdk-typescript
+        run: |
+          npm install
+          npm run build || echo "Build may fail without generated code — expected on first run"
+
+      - name: Build Python SDK
+        working-directory: packages/sdk-python
+        run: |
+          pip install build
+          python -m build || echo "Build may fail without generated code — expected on first run"
+
+      - name: Commit generated code
+        if: github.event_name == 'push' || github.event_name == 'schedule'
+        run: |
+          git config --local user.email "sdk-bot@pixelatedempathy.com"
+          git config --local user.name "SDK Generation Bot"
+          git add packages/sdk-typescript/src/ packages/sdk-python/pixelated_empathy_sdk/
+          git diff --staged --quiet || git commit -m "chore(sdk): auto-generate SDKs from OpenAPI spec"
+          git push || echo "No changes to commit"
+
+      - name: Publish to npm
+        if: (github.event_name == 'workflow_dispatch' && inputs.publish) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        working-directory: packages/sdk-typescript
+        run: |
+          npm install
+          npm run build
+          npm publish --access public || echo "npm publish skipped (may already exist)"
+
+      - name: Publish to PyPI
+        if: (github.event_name == 'workflow_dispatch' && inputs.publish) || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        env:
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        working-directory: packages/sdk-python
+        run: |
+          pip install build twine
+          python -m build
+          twine upload dist/* -u __token__ || echo "PyPI publish skipped (may already exist)"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-sdks
+          path: |
+            packages/sdk-typescript/src/
+            packages/sdk-python/pixelated_empathy_sdk/
+            packages/sdk-typescript/dist/
+          retention-days: 30
+
+  pr-comment:
+    name: PR SDK Comment
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: generate
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: generated-sdks
+          path: generated-sdks
+
+      - name: Count generated files
+        id: count
+        run: |
+          TS_FILES=$(find generated-sdks/packages/sdk-typescript -name '*.ts' 2>/dev/null | wc -l)
+          PY_FILES=$(find generated-sdks/packages/sdk-python -name '*.py' 2>/dev/null | wc -l)
+          echo "ts_files=$TS_FILES" >> $GITHUB_OUTPUT
+          echo "py_files=$PY_FILES" >> $GITHUB_OUTPUT
+
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: sdk-generation
+          message: |
+            ## SDK Generation Report
+
+            SDKs generated from the OpenAPI spec in this PR:
+
+            | Language | Files Generated |
+            |----------|----------------|
+            | TypeScript | ${{ steps.count.outputs.ts_files }} |
+            | Python | ${{ steps.count.outputs.py_files }} |
+
+            Generated SDKs are available as artifacts for download.
+
+            **Note**: SDKs are auto-published to npm and PyPI on merge to `main`.

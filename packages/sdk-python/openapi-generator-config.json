@@ -1,0 +1,12 @@
+{
+  "packageName": "pixelated_empathy_sdk",
+  "projectName": "pixelated-empathy-sdk",
+  "packageVersion": "1.0.0",
+  "packageUrl": "https://github.com/daggerstuff/pixelated",
+  "packageDescription": "Auto-generated Python SDK for the Pixelated Empathy API",
+  "packageAuthor": "Pixelated Empathy",
+  "packageAuthorEmail": "dev@pixelatedempathy.com",
+  "packageLicense": "MIT",
+  "pythonVersion": "3.9+",
+  "hideGenerationTimestamp": true
+}

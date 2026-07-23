@@ -94,18 +94,35 @@ https://mcp.pixelatedempathy.tech {
 
 # Main Application
 https://pixelatedempathy.tech, https://pixelatedempathy.com {
-    # Proxy to the main Astro/React application
+    request_body {
+        max_size 10MB
+    }
+
     reverse_proxy app:4321 {
         header_up Host {host}
         header_up X-Real-IP {remote_host}
         header_up X-Forwarded-For {remote_host}
+        transport http {
+            dial_timeout 10s
+            response_header_timeout 30s
+            keepalive 90s
+            keepalive_idle_conns 100
+        }
     }
 
-    # Security Headers
     header {
         X-Content-Type-Options nosniff
         X-Frame-Options "DENY"
         Referrer-Policy strict-origin-when-cross-origin
+        Access-Control-Allow-Origin "https://pixelatedempathy.com"
+        Access-Control-Allow-Methods "GET, POST, OPTIONS, PATCH, DELETE"
+        Access-Control-Allow-Headers "Content-Type, Authorization, X-API-Key"
+        Access-Control-Max-Age 600
+    }
+
+    @options method OPTIONS
+    handle @options {
+        respond 204
     }
 
     log {

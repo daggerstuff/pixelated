@@ -1,0 +1,9 @@
+{
+  "npmName": "@pixelated-empathy/auto-sdk",
+  "npmVersion": "1.0.0",
+  "snapshot": false,
+  "npmRepository": "https://registry.npmjs.org",
+  "supportsES6": true,
+  "typescriptThreePlus": true,
+  "useSingleRequestParameter": false
+}

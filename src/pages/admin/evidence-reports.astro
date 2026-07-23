@@ -1,0 +1,453 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+---
+
+<DashboardLayout title="Evidence Reports — Pixelated Empathy">
+  <div class="evidence-dashboard">
+    <h1>Evidence Generation Framework</h1>
+    <p>
+      Generate HIPAA-compliant evidence reports from anonymized research data.
+    </p>
+
+    <section class="templates-section">
+      <h2>Report Templates</h2>
+      <div id="templates-grid" class="templates-grid"></div>
+    </section>
+
+    <section class="generate-section">
+      <h2>Generate Report</h2>
+      <div class="generate-form">
+        <label>
+          Template:
+          <select id="template-select"></select>
+        </label>
+        <button id="generate-btn" class="btn btn-primary"
+          >Generate Report</button
+        >
+        <button id="irb-btn" class="btn btn-secondary"
+          >Generate IRB Export (JSON)</button
+        >
+        <button id="irb-md-btn" class="btn btn-secondary"
+          >Generate IRB Export (Markdown)</button
+        >
+      </div>
+    </section>
+
+    <section class="report-section" id="report-section" style="display:none;">
+      <h2>Generated Report</h2>
+      <div class="report-meta" id="report-meta"></div>
+      <div class="report-content" id="report-content"></div>
+    </section>
+
+    <section class="hipaa-section" id="hipaa-section" style="display:none;">
+      <h2>HIPAA Compliance Checklist</h2>
+      <div id="hipaa-checklist"></div>
+    </section>
+
+    <section class="status-section">
+      <div id="status-message" class="status-message"></div>
+    </section>
+  </div>
+
+  <style>
+    .evidence-dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .evidence-dashboard h1 {
+      margin-bottom: 0.5rem;
+    }
+    .evidence-dashboard p {
+      color: #666;
+      margin-bottom: 1.5rem;
+    }
+    .evidence-dashboard h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 0.5rem;
+    }
+    .templates-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1rem;
+    }
+    .template-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .template-card:hover {
+      border-color: #4a90d9;
+    }
+    .template-card.active {
+      border-color: #4a90d9;
+      background: #f0f7ff;
+    }
+    .template-card h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+    }
+    .template-card .category {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .template-card .category.effectiveness {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    .template-card .category.safety {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .template-card .category.alliance {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .template-card .desc {
+      color: #666;
+      font-size: 0.875rem;
+      margin: 0.5rem 0;
+    }
+    .template-card .hypotheses {
+      font-size: 0.75rem;
+      color: #999;
+    }
+    .generate-form {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .generate-form label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .generate-form select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .btn {
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .btn-primary {
+      background: #4a90d9;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #3a7bc8;
+    }
+    .btn-secondary {
+      background: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+    .btn-secondary:hover {
+      background: #e8e8e8;
+    }
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .report-meta {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    .report-meta .meta-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.25rem;
+    }
+    .report-meta .label {
+      font-weight: 600;
+      min-width: 120px;
+    }
+    .report-content {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 1.5rem;
+      overflow-x: auto;
+    }
+    .report-content pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+    .hipaa-checklist {
+      display: grid;
+      gap: 0.5rem;
+    }
+    .hipaa-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    .hipaa-item .check {
+      font-size: 1.2rem;
+    }
+    .hipaa-item .check.passed {
+      color: #2e7d32;
+    }
+    .hipaa-item .check.failed {
+      color: #c62828;
+    }
+    .hipaa-item .label-text {
+      flex: 1;
+    }
+    .hipaa-item .notes {
+      color: #666;
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+    .status-message {
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+    .status-message.info {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+    .status-message.error {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .status-message.success {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    .status-message:empty {
+      display: none;
+    }
+  </style>
+
+  <script is:inline>
+    const TEMPLATES = [
+      {
+        id: 'intervention-effectiveness-by-technique',
+        name: 'Intervention Effectiveness by Technique',
+        description:
+          'Evaluates differential effectiveness of therapeutic techniques on patient outcomes.',
+        category: 'effectiveness',
+        hypothesisCount: 3,
+      },
+      {
+        id: 'crisis-detection-accuracy-over-time',
+        name: 'Crisis Detection Accuracy Over Time',
+        description:
+          'Tracks AI crisis detection accuracy (sensitivity, specificity, FPR) across model versions.',
+        category: 'safety',
+        hypothesisCount: 3,
+      },
+      {
+        id: 'therapeutic-alliance-correlation-with-outcome',
+        name: 'Therapeutic Alliance Correlation with Outcome',
+        description:
+          'Analyzes correlation between therapeutic alliance scores and treatment outcomes.',
+        category: 'alliance',
+        hypothesisCount: 3,
+      },
+    ]
+
+    let selectedTemplate = null
+
+    function renderTemplates() {
+      const grid = document.getElementById('templates-grid')
+      const select = document.getElementById('template-select')
+      grid.innerHTML = ''
+      select.innerHTML = ''
+      for (const t of TEMPLATES) {
+        const card = document.createElement('div')
+        card.className = 'template-card'
+        card.dataset.id = t.id
+        card.innerHTML = `
+          <h3>${t.name}</h3>
+          <span class="category ${t.category}">${t.category}</span>
+          <p class="desc">${t.description}</p>
+          <p class="hypotheses">${t.hypothesisCount} hypotheses</p>
+        `
+        card.addEventListener('click', () => selectTemplate(t))
+        grid.appendChild(card)
+
+        const opt = document.createElement('option')
+        opt.value = t.id
+        opt.textContent = t.name
+        select.appendChild(opt)
+      }
+    }
+
+    function selectTemplate(t) {
+      selectedTemplate = t
+      document.querySelectorAll('.template-card').forEach((c) => {
+        c.classList.toggle('active', c.dataset.id === t.id)
+      })
+      document.getElementById('template-select').value = t.id
+    }
+
+    function setStatus(msg, type) {
+      const el = document.getElementById('status-message')
+      el.textContent = msg
+      el.className = `status-message ${type}`
+    }
+
+    async function generateReport() {
+      const templateId =
+        document.getElementById('template-select').value || selectedTemplate?.id
+      if (!templateId) {
+        setStatus('Please select a template first.', 'error')
+        return
+      }
+      const btn = document.getElementById('generate-btn')
+      btn.disabled = true
+      btn.textContent = 'Generating...'
+      setStatus('Generating evidence report...', 'info')
+      try {
+        const res = await fetch('/api/v1/admin/research/evidence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ templateId }),
+        })
+        if (!res.ok) {
+          const err = await res.json()
+          throw new Error(err.error || `HTTP ${res.status}`)
+        }
+        const data = await res.json()
+        displayReport(data)
+        setStatus(
+          `Report generated successfully: ${data.report.title}`,
+          'success',
+        )
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'error')
+      } finally {
+        btn.disabled = false
+        btn.textContent = 'Generate Report'
+      }
+    }
+
+    async function generateIRB(format) {
+      const templateId =
+        document.getElementById('template-select').value || selectedTemplate?.id
+      if (!templateId) {
+        setStatus('Please select a template first.', 'error')
+        return
+      }
+      const btnId = format === 'markdown' ? 'irb-md-btn' : 'irb-btn'
+      const btn = document.getElementById(btnId)
+      btn.disabled = true
+      const originalText = btn.textContent
+      btn.textContent = 'Generating...'
+      setStatus(`Generating IRB export (${format})...`, 'info')
+      try {
+        const res = await fetch('/api/v1/admin/research/evidence/irb', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ templateId, format }),
+        })
+        if (!res.ok) {
+          const err = await res
+            .json()
+            .catch(() => ({ error: `HTTP ${res.status}` }))
+          throw new Error(err.error || `HTTP ${res.status}`)
+        }
+        const contentType = res.headers.get('Content-Type') || ''
+        const disposition = res.headers.get('Content-Disposition') || ''
+        const filenameMatch = disposition.match(/filename="([^"]+)"/)
+        const filename = filenameMatch
+          ? filenameMatch[1]
+          : `irb-export-${templateId}.${format === 'markdown' ? 'md' : 'json'}`
+        const blob = await res.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = filename
+        a.click()
+        URL.revokeObjectURL(url)
+        const packageId = res.headers.get('X-Package-Id') || 'N/A'
+        setStatus(
+          `IRB export downloaded: ${filename} (Package ID: ${packageId})`,
+          'success',
+        )
+      } catch (e) {
+        setStatus(`Error: ${e.message}`, 'error')
+      } finally {
+        btn.disabled = false
+        btn.textContent = originalText
+      }
+    }
+
+    function displayReport(data) {
+      const section = document.getElementById('report-section')
+      const meta = document.getElementById('report-meta')
+      const content = document.getElementById('report-content')
+      const hipaaSection = document.getElementById('hipaa-section')
+      const hipaaChecklist = document.getElementById('hipaa-checklist')
+
+      section.style.display = 'block'
+      hipaaSection.style.display = 'block'
+
+      meta.innerHTML = `
+        <div class="meta-row"><span class="label">Report ID:</span> ${data.report.id}</div>
+        <div class="meta-row"><span class="label">Title:</span> ${data.report.title}</div>
+        <div class="meta-row"><span class="label">Template:</span> ${data.template.name}</div>
+        <div class="meta-row"><span class="label">Generated:</span> ${data.generatedAt}</div>
+      `
+
+      content.innerHTML = `<pre>${escapeHtml(data.markdown)}</pre>`
+
+      hipaaChecklist.innerHTML = ''
+      for (const item of data.hipaaChecklist) {
+        const div = document.createElement('div')
+        div.className = 'hipaa-item'
+        div.innerHTML = `
+          <span class="check ${item.satisfied ? 'passed' : 'failed'}">${item.satisfied ? '\u2705' : '\u274C'}</span>
+          <div class="label-text">
+            <div>${item.label}</div>
+            ${item.notes ? `<div class="notes">${item.notes}</div>` : ''}
+          </div>
+        `
+        hipaaChecklist.appendChild(div)
+      }
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderTemplates()
+      document
+        .getElementById('generate-btn')
+        .addEventListener('click', generateReport)
+      document
+        .getElementById('irb-btn')
+        .addEventListener('click', () => generateIRB('json'))
+      document
+        .getElementById('irb-md-btn')
+        .addEventListener('click', () => generateIRB('markdown'))
+    })
+  </script>
+</DashboardLayout>

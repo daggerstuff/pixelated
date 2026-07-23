@@ -1,0 +1,108 @@
+extends:
+  - spectral:oas
+  - spectral:oas:recommended
+
+rules:
+  # --- Enforce API versioning ---
+  api-version-in-info:
+    description: OpenAPI info.version must be present and follow semver (e.g. 1.0.0).
+    severity: error
+    given: $.info.version
+    then:
+      function: pattern
+      functionOptions:
+        match: '^\d+\.\d+\.\d+'
+
+  # --- Enforce server URLs ---
+  oas3-api-servers:
+    description: All OpenAPI specs must define at least one server URL.
+    severity: error
+    given: $.servers
+    then:
+      function: schema
+      functionOptions:
+        minItems: 1
+
+  # --- Enforce security schemes ---
+  oas3-operation-security-defined:
+    description: Operations with security requirements must reference defined security schemes.
+    severity: warn
+    given: $..security[*]~
+    then:
+      function: defined
+      functionOptions:
+        field: $.components.securitySchemes
+
+  # --- Enforce response examples for 2xx ---
+  oas3-response-example:
+    description: 2xx responses should include at least one example for documentation.
+    severity: info
+    given: $..responses[2XX]
+    then:
+      function: truthy
+      functionOptions:
+        properties:
+          - content
+
+  # --- Enforce operation IDs ---
+  operation-id-naming:
+    description: Operation IDs must use camelCase and be unique across the spec.
+    severity: warn
+    given: $..operationId
+    then:
+      function: pattern
+      functionOptions:
+        match: '^[a-z][a-zA-Z0-9]*$'
+
+  # --- Enforce tags for operations ---
+  operation-tags:
+    description: Every operation must have at least one tag for grouping.
+    severity: warn
+    given: $.paths.*.*
+    then:
+      function: truthy
+      functionOptions:
+        properties:
+          - tags
+
+  # --- Disallow HTTP basic auth ---
+  oas3-no-basic-auth:
+    description: HTTP Basic auth is not allowed — use JWT or API key.
+    severity: error
+    given: $.components.securitySchemes[*]
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: 'basic'
+
+  # --- Enforce contact info ---
+  contact-info:
+    description: OpenAPI info.contact must include name and email or url.
+    severity: warn
+    given: $.info.contact
+    then:
+      function: schema
+      functionOptions:
+        required:
+          - name
+
+  # --- Enforce summary on operations ---
+  operation-summary:
+    description: Every operation should have a summary for readability.
+    severity: info
+    given: $.paths.*.*
+    then:
+      function: truthy
+      functionOptions:
+        properties:
+          - summary
+
+  # --- Enforce 429 response for rate-limited endpoints ---
+  rate-limit-response:
+    description: Endpoints that may be rate-limited should document a 429 response.
+    severity: info
+    given: $.paths.*.get
+    then:
+      function: defined
+      functionOptions:
+        field: responses.429

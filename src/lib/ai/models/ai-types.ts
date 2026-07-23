@@ -84,6 +84,13 @@ export interface TherapeuticResponse {
   intervention?: boolean
   techniques?: string[]
   usage?: AIUsage
+  sources?: Array<{
+    type: string
+    reference: string
+    confidenceContribution: number
+    description?: string
+    timestamp: string
+  }>
 }
 
 export interface TherapySession {

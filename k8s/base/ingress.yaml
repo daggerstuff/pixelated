@@ -8,6 +8,17 @@ metadata:
     networking.gke.io/managed-certificates: pixelated-empathy-cert
     networking.gke.io/v1beta1.FrontendConfig: pixelated-empathy-frontend-config
     ingress.gcp.kubernetes.io/health-check-path: /health
+    nginx.ingress.kubernetes.io/proxy-body-size: 10m
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '60'
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: '10'
+    nginx.ingress.kubernetes.io/limit-rps: '100'
+    nginx.ingress.kubernetes.io/limit-burst: '50'
+    nginx.ingress.kubernetes.io/enable-cors: 'true'
+    nginx.ingress.kubernetes.io/cors-allow-origin: 'https://pixelatedempathy.com,https://www.pixelatedempathy.com'
+    nginx.ingress.kubernetes.io/cors-allow-methods: 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+    nginx.ingress.kubernetes.io/cors-allow-headers: 'Authorization, Content-Type, X-API-Key, X-Request-Id'
+    nginx.ingress.kubernetes.io/cors-max-age: '600'
 spec:
   ingressClassName: gce
   rules:
