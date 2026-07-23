@@ -287,24 +287,9 @@ async def main():
             split="train",
         )
 
-        all_rewards = [t.reward for g in train_groups for t in g.trajectories]
-        avg_reward = sum(all_rewards) / len(all_rewards) if all_rewards else 0.0
-
-        all_response_lens = [t.metrics.get("response_len", 0) for g in train_groups for t in g.trajectories]
-        all_expected_lens = [t.metrics.get("expected_len", 0) for g in train_groups for t in g.trajectories]
-        all_length_ratios = [t.metrics.get("length_ratio", 0) for g in train_groups for t in g.trajectories]
-        all_overlaps = [t.metrics.get("overlap", 0) for g in train_groups for t in g.trajectories]
-
-        log_rl_step(
-            step=result.step,
-            avg_reward=avg_reward,
-            metrics={
-                "response_len": sum(all_response_lens) / len(all_response_lens) if all_response_lens else 0.0,
-                "expected_len": sum(all_expected_lens) / len(all_expected_lens) if all_expected_lens else 0.0,
-                "length_ratio": sum(all_length_ratios) / len(all_length_ratios) if all_length_ratios else 0.0,
-                "overlap": sum(all_overlaps) / len(all_overlaps) if all_overlaps else 0.0,
-            },
-        )
+        avg_reward, metrics = compute_step_metrics(train_groups)
+        log_rl_step(step=result.step, avg_reward=avg_reward, metrics=metrics)
+        logging.info(f"Step {result.step}: avg_reward={avg_reward:.3f}")
         logging.info(f"Step {result.step}: avg_reward={avg_reward:.3f}")
 
     logging.info("RL training complete!")
