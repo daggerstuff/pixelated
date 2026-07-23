@@ -30,8 +30,8 @@ const coverageTopics = [
 ---
 
 <BaseLayout
-  title="Press & Media | Pixelated Empathy"
-  description="Press information and company background for Pixelated Empathy."
+  title="Press & Media"
+  description="Boilerplate, company background, and media contact for Pixelated Empathy. Use as-is or request specifics on the simulation, supervision, and review workflow."
   fullWidthMain
 >
   <MarketingPageHero
@@ -49,23 +49,12 @@ const coverageTopics = [
       href: 'mailto:info@pixelatedempathy.com',
     }}
     secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
-    stats={[
-      {
-        label: 'Media email',
-        value: 'info@pixelatedempathy.com',
-        detail: 'For background, company facts, and interview coordination',
-      },
-      {
-        label: 'Response window',
-        value: 'Two business days',
-        detail: 'Typical reply target for press inquiries',
-      },
-      {
-        label: 'Coverage fit',
-        value: 'Mental health tech',
-        detail: 'Training workflows, supervision, and AI simulation',
-      },
-    ]}
+    proof={{
+      label: 'Boilerplate',
+      body: `<p>Pixelated Empathy is a founder-led company building AI simulation tools that help therapists, supervisors, and training programs practice difficult mental health conversations before they happen in the real world.</p>
+        <p><strong>Coverage fit:</strong> simulation-based therapist training, AI roleplay and transcript review, supervisor workflows and cohort comparison, privacy and deployment expectations for training tools.</p>`,
+      caption: 'Use as-is or request specifics',
+    }}
   />
 
   <section class="marketing-section">
