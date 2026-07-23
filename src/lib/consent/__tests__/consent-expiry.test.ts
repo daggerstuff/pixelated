@@ -1,320 +1,490 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import {
   ConsentExpiryService,
   getConsentExpiryService,
   resetConsentExpiryService,
-} from "../ConsentExpiryService";
-import { consentManagementService } from "@/lib/research/services/ConsentManagementService";
+} from '../ConsentExpiryService'
 
-// Mock the logger
-vi.mock("@/lib/logging/logger", () => ({
+// ---- Mock setup ----
+
+// In-memory DB + Redis mock for consent persistence tests
+const mockConsentStore = new Map<string, Record<string, unknown>>()
+const mockAuditTrail: Record<string, unknown>[] = []
+
+vi.mock('@/lib/db', () => ({
+  query: vi.fn(async (sql: string, params: unknown[] = []) => {
+    const upper = sql.toUpperCase().trim()
+
+    // INSERT INTO consent_audit_trail
+    if (upper.startsWith('INSERT INTO CONSENT_AUDIT_TRAIL')) {
+      mockAuditTrail.push({
+        client_id: params[0],
+        operation: params[1],
+        old_level: params[2],
+        new_level: params[3],
+        reason: params[4],
+        ip_address: params[5],
+        user_agent: params[6],
+        timestamp: params[7],
+      })
+      return { rows: [], rowCount: 1 }
+    }
+
+    // INSERT INTO consent_records
+    if (upper.startsWith('INSERT INTO CONSENT_RECORDS')) {
+      const clientId = params[0] as string
+      const level = params[1] as string
+      const history = JSON.parse(params[2] as string)
+      const now = params[3] as Date
+      const exp = params[4] as Date
+      mockConsentStore.set(clientId, {
+        client_id: clientId,
+        current_level: level,
+        consent_history: history,
+        last_updated: now,
+        expiration_date: exp,
+        withdrawal_requested: false,
+        withdrawal_date: null,
+        data_purged: false,
+      })
+      return { rows: [], rowCount: 1 }
+    }
+
+    // UPDATE consent_records SET withdrawal
+    if (upper.includes('UPDATE CONSENT_RECORDS SET') && upper.includes('WITHDRAWAL_REQUESTED')) {
+      const clientId = params[params.length - 1] as string
+      const rec = mockConsentStore.get(clientId)
+      if (rec) {
+        rec['withdrawal_requested'] = true
+        rec['withdrawal_date'] = params[0]
+        rec['last_updated'] = params[0]
+      }
+      return { rows: [], rowCount: 1 }
+    }
+
+    // UPDATE consent_records SET data_purged
+    if (upper.includes('UPDATE CONSENT_RECORDS SET') && upper.includes('DATA_PURGED')) {
+      const clientId = params[0] as string
+      const rec = mockConsentStore.get(clientId)
+      if (rec) {
+        rec['data_purged'] = true
+      }
+      return { rows: [], rowCount: 1 }
+    }
+
+    // UPDATE consent_records SET current_level
+    if (upper.includes('UPDATE CONSENT_RECORDS SET')) {
+      const clientId = params[params.length - 1] as string
+      const rec = mockConsentStore.get(clientId)
+      if (rec) {
+        rec['current_level'] = params[0]
+        rec['consent_history'] = JSON.parse(params[1] as string)
+        rec['last_updated'] = params[2]
+      }
+      return { rows: [], rowCount: 1 }
+    }
+
+    // SELECT single consent record
+    if (upper.startsWith('SELECT') && upper.includes('FROM CONSENT_RECORDS') && upper.includes('WHERE CLIENT_ID = $1') && !upper.includes('GROUP BY')) {
+      const clientId = params[0] as string
+      const rec = mockConsentStore.get(clientId)
+      return { rows: rec ? [rec] : [], rowCount: rec ? 1 : 0 }
+    }
+
+    // SELECT COUNT(*) FROM consent_records (total)
+    if (upper.startsWith('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS')) {
+      return { rows: [{ count: String(mockConsentStore.size) }], rowCount: 1 }
+    }
+
+    // SELECT COUNT(*) ... WHERE withdrawal_requested = true
+    if (upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') && upper.includes('WITHDRAWAL_REQUESTED = TRUE')) {
+      const count = Array.from(mockConsentStore.values()).filter(r => r['withdrawal_requested'] === true).length
+      return { rows: [{ count: String(count) }], rowCount: 1 }
+    }
+
+    // SELECT COUNT(*) ... active
+    if (upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') && upper.includes('EXPIRATION_DATE > NOW()')) {
+      const count = Array.from(mockConsentStore.values()).filter(r =>
+        r['withdrawal_requested'] === false && r['data_purged'] === false &&
+        new Date(r['expiration_date'] as string) > new Date()
+      ).length
+      return { rows: [{ count: String(count) }], rowCount: 1 }
+    }
+
+    // SELECT COUNT(*) ... expired
+    if (upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') && upper.includes('EXPIRATION_DATE <= NOW()')) {
+      const count = Array.from(mockConsentStore.values()).filter(r =>
+        r['expiration_date'] && new Date(r['expiration_date'] as string) <= new Date() &&
+        r['withdrawal_requested'] === false && r['data_purged'] === false
+      ).length
+      return { rows: [{ count: String(count) }], rowCount: 1 }
+    }
+
+    // SELECT current_level, COUNT(*) ... GROUP BY
+    if (upper.includes('SELECT CURRENT_LEVEL, COUNT(*) AS COUNT') && upper.includes('GROUP BY')) {
+      const levels: Record<string, number> = {}
+      for (const rec of mockConsentStore.values()) {
+        if (rec['withdrawal_requested'] === false && rec['data_purged'] === false &&
+            new Date(rec['expiration_date'] as string) > new Date()) {
+          const lvl = rec['current_level'] as string
+          levels[lvl] = (levels[lvl] ?? 0) + 1
+        }
+      }
+      return { rows: Object.entries(levels).map(([k, v]) => ({ current_level: k, count: String(v) })), rowCount: Object.keys(levels).length }
+    }
+
+    // SELECT all consent_records (for export)
+    if (upper.startsWith('SELECT') && upper.includes('FROM CONSENT_RECORDS') && !upper.includes('WHERE')) {
+      return { rows: Array.from(mockConsentStore.values()), rowCount: mockConsentStore.size }
+    }
+
+    // SELECT audit trail by client
+    if (upper.includes('FROM CONSENT_AUDIT_TRAIL') && upper.includes('WHERE CLIENT_ID = $1')) {
+      const clientId = params[0] as string
+      return { rows: mockAuditTrail.filter(e => e['client_id'] === clientId), rowCount: 0 }
+    }
+
+    // SELECT all audit trail
+    if (upper.includes('FROM CONSENT_AUDIT_TRAIL') && !upper.includes('WHERE')) {
+      return { rows: [...mockAuditTrail].reverse(), rowCount: mockAuditTrail.length }
+    }
+
+    // Default
+    return { rows: [], rowCount: 0 }
+  }),
+}))
+
+vi.mock('@/lib/redis', () => ({
+  redis: {
+    get: vi.fn().mockResolvedValue(null),
+    setex: vi.fn().mockResolvedValue('OK'),
+    del: vi.fn().mockResolvedValue(1),
+  },
+}))
+
+vi.mock('@/lib/logging/logger', () => ({
   getLogger: () => ({
     info: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
     debug: vi.fn(),
   }),
-}));
+}))
 
-describe("ConsentExpiryService", () => {
-  let service: ConsentExpiryService;
+// ---- Tests ----
+
+describe('ConsentExpiryService', () => {
+  let service: ConsentExpiryService
 
   beforeEach(async () => {
-    resetConsentExpiryService();
-    service = getConsentExpiryService();
-    // Initialize some consent records for testing
-    await consentManagementService.initializeConsent("client-expired", "minimal");
-    await consentManagementService.initializeConsent("client-active", "full");
-    // Manually expire one consent by updating the store via the service
-    // Since the store is private, we use the public API
-    // We'll create a consent and then update its expiration
-  });
+    mockConsentStore.clear()
+    mockAuditTrail.length = 0
+    resetConsentExpiryService()
+    service = getConsentExpiryService()
+  })
 
   afterEach(() => {
-    resetConsentExpiryService();
-  });
+    resetConsentExpiryService()
+  })
 
-  describe("default config", () => {
-    it("should have warningDays=30 and criticalDays=7 by default", () => {
-      const config = service.getConfig();
-      expect(config.warningDays).toBe(30);
-      expect(config.criticalDays).toBe(7);
-    });
+  describe('default config', () => {
+    it('should have warningDays=30 and criticalDays=7 by default', () => {
+      const config = service.getConfig()
+      expect(config.warningDays).toBe(30)
+      expect(config.criticalDays).toBe(7)
+    })
 
-    it("should allow config updates", () => {
-      service.setConfig({ warningDays: 60 });
-      expect(service.getConfig().warningDays).toBe(60);
-      expect(service.getConfig().criticalDays).toBe(7); // unchanged
+    it('should allow config updates', () => {
+      service.setConfig({ warningDays: 60 })
+      expect(service.getConfig().warningDays).toBe(60)
+      expect(service.getConfig().criticalDays).toBe(7)
 
-      service.setConfig({ criticalDays: 14 });
-      expect(service.getConfig().criticalDays).toBe(14);
-    });
-  });
+      service.setConfig({ criticalDays: 14 })
+      expect(service.getConfig().criticalDays).toBe(14)
+    })
+  })
 
-  describe("checkExpiries", () => {
-    it("should return a valid ExpiryCheckResult structure", async () => {
-      const result = await service.checkExpiries();
+  describe('checkExpiries', () => {
+    it('should return a valid ExpiryCheckResult structure', async () => {
+      const result = await service.checkExpiries()
 
-      expect(result).toHaveProperty("checkedAt");
-      expect(result).toHaveProperty("totalChecked");
-      expect(result).toHaveProperty("reminders");
-      expect(result).toHaveProperty("summary");
-      expect(result.summary).toHaveProperty("expiringSoon");
-      expect(result.summary).toHaveProperty("expiringCritical");
-      expect(result.summary).toHaveProperty("expired");
-      expect(Array.isArray(result.reminders)).toBe(true);
-    });
+      expect(result).toHaveProperty('checkedAt')
+      expect(result).toHaveProperty('totalChecked')
+      expect(result).toHaveProperty('reminders')
+      expect(result).toHaveProperty('summary')
+      expect(result.summary).toHaveProperty('expiringSoon')
+      expect(result.summary).toHaveProperty('expiringCritical')
+      expect(result.summary).toHaveProperty('expired')
+    })
 
-    it("should include checkedAt as ISO string", async () => {
-      const result = await service.checkExpiries();
-      expect(() => new Date(result.checkedAt)).not.toThrow();
-      expect(new Date(result.checkedAt).toString()).not.toBe("Invalid Date");
-    });
+    it('should return empty reminders when no consents exist', async () => {
+      const result = await service.checkExpiries()
+      expect(result.reminders).toEqual([])
+      expect(result.totalChecked).toBe(0)
+    })
 
-    it("should count total clients checked", async () => {
-      const result = await service.checkExpiries();
-      expect(result.totalChecked).toBeGreaterThan(0);
-    });
-  });
+    it('should detect expired consents', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
 
-  describe("getExpiringConsents", () => {
-    it("should return array of consent records expiring within given days", async () => {
-      const expiring = await service.getExpiringConsents(365);
-      expect(Array.isArray(expiring)).toBe(true);
-      // All initialized consents have 365-day expiry, so they should be within 365 days
-      expect(expiring.length).toBeGreaterThan(0);
-    });
+      // Create a consent, then manually expire it
+      await consentManagementService.initializeConsent('expired-client', 'minimal')
 
-    it("should return empty array for 0 days (nothing expires immediately)", async () => {
-      const expiring = await service.getExpiringConsents(0);
-      // Consents were just initialized, so none expire in 0 days
-      expect(expiring.length).toBe(0);
-    });
+      // Manually set expiration to past
+      const rec = mockConsentStore.get('expired-client')!
+      rec['expiration_date'] = new Date(Date.now() - 86400000) // 1 day ago
 
-    it("should return all active consents for large days value", async () => {
-      const expiring = await service.getExpiringConsents(9999);
-      expect(expiring.length).toBeGreaterThanOrEqual(2);
-    });
-  });
+      const result = await service.checkExpiries()
+      const expiredReminders = result.reminders.filter(r => r.reminderType === 'expired')
+      expect(expiredReminders.length).toBe(1)
+      expect(expiredReminders[0].clientId).toBe('expired-client')
+    })
 
-  describe("reminder types", () => {
-    it("should classify consents correctly based on days until expiry", async () => {
-      // With default config: warning=30, critical=7
-      // New consents expire in 365 days, so they should be "none" (no reminder)
-      const result = await service.checkExpiries();
+    it('should detect expiring-critical consents (≤7 days)', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
 
-      // New consents shouldn't generate reminders (365 > 30)
-      const newConsentReminders = result.reminders.filter(
-        (r) => r.clientId === "client-active" || r.clientId === "client-expired",
-      );
-      // They might or might not have reminders depending on timing
-      // but the structure should be valid
-      for (const reminder of newConsentReminders) {
-        expect(["expiring-soon", "expiring-critical", "expired"]).toContain(reminder.reminderType);
-        expect(reminder.message).toContain(reminder.clientId);
-      }
-    });
+      await consentManagementService.initializeConsent('critical-client', 'full')
+      const rec = mockConsentStore.get('critical-client')!
+      rec['expiration_date'] = new Date(Date.now() + 5 * 86400000) // 5 days from now
 
-    it("should have correct message format for reminders", async () => {
-      const result = await service.checkExpiries();
+      const result = await service.checkExpiries()
+      const criticalReminders = result.reminders.filter(r => r.reminderType === 'expiring-critical')
+      expect(criticalReminders.length).toBe(1)
+      expect(criticalReminders[0].clientId).toBe('critical-client')
+    })
 
-      for (const reminder of result.reminders) {
-        expect(reminder.message).toContain(reminder.clientId);
-        expect(reminder.message).toContain("day");
-        expect(reminder).toHaveProperty("clientId");
-        expect(reminder).toHaveProperty("consentLevel");
-        expect(reminder).toHaveProperty("expirationDate");
-        expect(reminder).toHaveProperty("daysUntilExpiry");
-      }
-    });
-  });
+    it('should detect expiring-soon consents (≤30 days, >7 days)', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
 
-  describe("singleton", () => {
-    it("should return the same instance", () => {
-      const s1 = getConsentExpiryService();
-      const s2 = getConsentExpiryService();
-      expect(s1).toBe(s2);
-    });
+      await consentManagementService.initializeConsent('soon-client', 'limited')
+      const rec = mockConsentStore.get('soon-client')!
+      rec['expiration_date'] = new Date(Date.now() + 20 * 86400000) // 20 days from now
 
-    it("should return new instance after reset", () => {
-      const s1 = getConsentExpiryService();
-      resetConsentExpiryService();
-      const s2 = getConsentExpiryService();
-      expect(s1).not.toBe(s2);
-    });
-  });
+      const result = await service.checkExpiries()
+      const soonReminders = result.reminders.filter(r => r.reminderType === 'expiring-soon')
+      expect(soonReminders.length).toBe(1)
+      expect(soonReminders[0].clientId).toBe('soon-client')
+    })
 
-  describe("summary counts", () => {
-    it("should have consistent summary counts matching reminders array", async () => {
-      const result = await service.checkExpiries();
+    it('should skip withdrawn consents', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
 
-      const soonCount = result.reminders.filter((r) => r.reminderType === "expiring-soon").length;
-      const criticalCount = result.reminders.filter(
-        (r) => r.reminderType === "expiring-critical",
-      ).length;
-      const expiredCount = result.reminders.filter((r) => r.reminderType === "expired").length;
+      await consentManagementService.initializeConsent('withdrawn-client', 'full')
+      await consentManagementService.requestWithdrawal('withdrawn-client', 'test')
 
-      expect(result.summary.expiringSoon).toBe(soonCount);
-      expect(result.summary.expiringCritical).toBe(criticalCount);
-      expect(result.summary.expired).toBe(expiredCount);
-    });
-  });
-});
+      const result = await service.checkExpiries()
+      expect(result.reminders.find(r => r.clientId === 'withdrawn-client')).toBeUndefined()
+    })
 
-describe("Consent Management Service Integration", () => {
-  beforeEach(async () => {
-    // Initialize test data
-    await consentManagementService.initializeConsent("test-client-1", "minimal");
-    await consentManagementService.initializeConsent("test-client-2", "full");
-  });
+    it('should skip purged consents', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
 
-  describe("consent CRUD", () => {
-    it("should get consent record by clientId", async () => {
-      const record = await consentManagementService.getConsentRecord("test-client-1");
-      expect(record).not.toBeNull();
-      expect(record?.clientId).toBe("test-client-1");
-      expect(record?.currentLevel).toBe("minimal");
-    });
+      await consentManagementService.initializeConsent('purged-client', 'full')
+      await consentManagementService.requestWithdrawal('purged-client', 'test', true)
+      await consentManagementService.completeWithdrawal('purged-client')
 
-    it("should return null for non-existent client", async () => {
-      const record = await consentManagementService.getConsentRecord("non-existent");
-      expect(record).toBeNull();
-    });
+      const result = await service.checkExpiries()
+      expect(result.reminders.find(r => r.clientId === 'purged-client')).toBeUndefined()
+    })
 
-    it("should update consent level", async () => {
+    it('should update summary counts correctly', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+
+      await consentManagementService.initializeConsent('expired-1', 'minimal')
+      await consentManagementService.initializeConsent('critical-1', 'full')
+      await consentManagementService.initializeConsent('soon-1', 'limited')
+
+      mockConsentStore.get('expired-1')!['expiration_date'] = new Date(Date.now() - 86400000)
+      mockConsentStore.get('critical-1')!['expiration_date'] = new Date(Date.now() + 3 * 86400000)
+      mockConsentStore.get('soon-1')!['expiration_date'] = new Date(Date.now() + 15 * 86400000)
+
+      const result = await service.checkExpiries()
+      expect(result.summary.expired).toBe(1)
+      expect(result.summary.expiringCritical).toBe(1)
+      expect(result.summary.expiringSoon).toBe(1)
+    })
+  })
+
+  describe('getExpiringConsents', () => {
+    it('should return consents expiring within the given days', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+
+      await consentManagementService.initializeConsent('far-client', 'full')
+      await consentManagementService.initializeConsent('near-client', 'limited')
+
+      // far-client expires in 100 days, near-client in 5 days
+      mockConsentStore.get('near-client')!['expiration_date'] = new Date(Date.now() + 5 * 86400000)
+
+      const expiring = await service.getExpiringConsents(30)
+      expect(expiring.length).toBe(1)
+      expect(expiring[0].clientId).toBe('near-client')
+    })
+
+    it('should return empty array when no consents expiring', async () => {
+      const expiring = await service.getExpiringConsents(30)
+      expect(expiring).toEqual([])
+    })
+
+    it('should skip withdrawn and purged consents', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+
+      await consentManagementService.initializeConsent('active-client', 'full')
+      await consentManagementService.initializeConsent('withdrawn-client', 'full')
+      await consentManagementService.requestWithdrawal('withdrawn-client', 'test')
+
+      // Both expire soon
+      mockConsentStore.get('active-client')!['expiration_date'] = new Date(Date.now() + 3 * 86400000)
+      mockConsentStore.get('withdrawn-client')!['expiration_date'] = new Date(Date.now() + 3 * 86400000)
+
+      const expiring = await service.getExpiringConsents(30)
+      expect(expiring.length).toBe(1)
+      expect(expiring[0].clientId).toBe('active-client')
+    })
+  })
+
+  describe('singleton', () => {
+    it('should return the same instance', () => {
+      const a = getConsentExpiryService()
+      const b = getConsentExpiryService()
+      expect(a).toBe(b)
+    })
+
+    it('should return a new instance after reset', () => {
+      const a = getConsentExpiryService()
+      resetConsentExpiryService()
+      const b = getConsentExpiryService()
+      expect(a).not.toBe(b)
+    })
+  })
+
+  describe('ConsentManagementService persistence', () => {
+    it('should persist consent record to PostgreSQL on initialize', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('persist-test', 'full')
+
+      expect(mockConsentStore.has('persist-test')).toBe(true)
+      const rec = mockConsentStore.get('persist-test')!
+      expect(rec['current_level']).toBe('full')
+    })
+
+    it('should persist audit trail to PostgreSQL', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('audit-test', 'minimal')
+
+      expect(mockAuditTrail.length).toBeGreaterThan(0)
+      const entry = mockAuditTrail[0]
+      expect(entry['client_id']).toBe('audit-test')
+      expect(entry['operation']).toBe('initialize')
+    })
+
+    it('should update consent level in PostgreSQL', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('update-test', 'minimal')
       await consentManagementService.updateConsent({
-        clientId: "test-client-1",
-        newLevel: "full",
-        reason: "User upgraded consent",
-      });
+        clientId: 'update-test',
+        newLevel: 'full',
+        reason: 'upgrade',
+      })
 
-      const record = await consentManagementService.getConsentRecord("test-client-1");
-      expect(record?.currentLevel).toBe("full");
-      expect(record?.consentHistory.length).toBe(2);
-    });
+      const rec = mockConsentStore.get('update-test')!
+      expect(rec['current_level']).toBe('full')
+    })
 
-    it("should request withdrawal", async () => {
-      const result = await consentManagementService.requestWithdrawal(
-        "test-client-2",
-        "User requested withdrawal",
-        false,
-      );
+    it('should mark withdrawal in PostgreSQL', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('withdraw-test', 'full')
+      await consentManagementService.requestWithdrawal('withdraw-test', 'user request')
 
-      expect(result.consentRecord.withdrawalRequested).toBe(true);
-      expect(result.dataPurgeScheduled).toBe(true);
-      expect(result.gracePeriodEnd).toBeInstanceOf(Date);
-    });
+      const rec = mockConsentStore.get('withdraw-test')!
+      expect(rec['withdrawal_requested']).toBe(true)
+    })
 
-    it("should complete withdrawal", async () => {
-      await consentManagementService.requestWithdrawal("test-client-2", "Testing", false);
-      await consentManagementService.completeWithdrawal("test-client-2");
+    it('should mark data purged in PostgreSQL', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('purge-test', 'full')
+      await consentManagementService.requestWithdrawal('purge-test', 'test', true)
+      await consentManagementService.completeWithdrawal('purge-test')
 
-      const record = await consentManagementService.getConsentRecord("test-client-2");
-      expect(record?.dataPurged).toBe(true);
-    });
+      const rec = mockConsentStore.get('purge-test')!
+      expect(rec['data_purged']).toBe(true)
+    })
 
-    it("should throw when updating non-existent consent", async () => {
-      await expect(
-        consentManagementService.updateConsent({
-          clientId: "non-existent",
-          newLevel: "full",
-        }),
-      ).rejects.toThrow();
-    });
+    it('should return null for non-existent client', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const level = await consentManagementService.getConsentLevel('nonexistent')
+      expect(level).toBeNull()
+    })
 
-    it("should throw when completing withdrawal without request", async () => {
-      await expect(consentManagementService.completeWithdrawal("test-client-1")).rejects.toThrow();
-    });
-  });
+    it('should return null for withdrawn client', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('withdrawn-level-test', 'full')
+      await consentManagementService.requestWithdrawal('withdrawn-level-test', 'test')
 
-  describe("audit trail", () => {
-    it("should record initialize operation in audit trail", async () => {
-      await consentManagementService.initializeConsent("audit-test-client", "limited");
-      const trail = await consentManagementService.getAuditTrail("audit-test-client");
+      const level = await consentManagementService.getConsentLevel('withdrawn-level-test')
+      expect(level).toBeNull()
+    })
 
-      expect(trail.length).toBeGreaterThan(0);
-      const initEntry = trail.find((e) => e.operation === "initialize");
-      expect(initEntry).toBeDefined();
-      expect(initEntry?.newLevel).toBe("limited");
-    });
+    it('should return consent level for active client', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('level-test', 'limited')
+      const level = await consentManagementService.getConsentLevel('level-test')
+      expect(level).toBe('limited')
+    })
 
-    it("should record update operation in audit trail", async () => {
-      await consentManagementService.initializeConsent("audit-update-client", "minimal");
-      await consentManagementService.updateConsent({
-        clientId: "audit-update-client",
-        newLevel: "limited",
-        reason: "Audit test",
-      });
+    it('should return null for expired consent', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('expired-level-test', 'full')
+      mockConsentStore.get('expired-level-test')!['expiration_date'] = new Date(Date.now() - 86400000)
 
-      const trail = await consentManagementService.getAuditTrail("audit-update-client");
-      const updateEntry = trail.find((e) => e.operation === "update");
-      expect(updateEntry).toBeDefined();
-      expect(updateEntry?.oldLevel).toBe("minimal");
-      expect(updateEntry?.newLevel).toBe("limited");
-    });
+      const level = await consentManagementService.getConsentLevel('expired-level-test')
+      expect(level).toBeNull()
+    })
 
-    it("should record withdrawal request in audit trail", async () => {
-      await consentManagementService.requestWithdrawal("test-client-1", "Testing withdrawal");
+    it('should get consent statistics from PostgreSQL', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('stat-1', 'minimal')
+      await consentManagementService.initializeConsent('stat-2', 'full')
+      await consentManagementService.initializeConsent('stat-3', 'limited')
 
-      const trail = await consentManagementService.getAuditTrail("test-client-1");
-      const withdrawEntry = trail.find((e) => e.operation === "withdrawal-request");
-      expect(withdrawEntry).toBeDefined();
-      expect(withdrawEntry?.reason).toBe("Testing withdrawal");
-    });
+      const stats = await consentManagementService.getConsentStatistics()
+      expect(stats.totalClients).toBe(3)
+      expect(stats.activeConsents).toBe(3)
+      expect(stats.consentLevels.full).toBe(1)
+      expect(stats.consentLevels.minimal).toBe(1)
+      expect(stats.consentLevels.limited).toBe(1)
+    })
 
-    it("should return all audit entries when no clientId specified", async () => {
-      const trail = await consentManagementService.getAuditTrail();
-      expect(trail.length).toBeGreaterThan(0);
-      expect(trail.some((e) => e.clientId === "test-client-1")).toBe(true);
-      expect(trail.some((e) => e.clientId === "test-client-2")).toBe(true);
-    });
-  });
+    it('should export consent data from PostgreSQL', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('export-test', 'full')
 
-  describe("statistics", () => {
-    it("should return valid statistics structure", async () => {
-      const stats = await consentManagementService.getConsentStatistics();
+      const data = await consentManagementService.exportConsentData()
+      expect(data.consentRecords.length).toBeGreaterThanOrEqual(1)
+      expect(data.auditLog.length).toBeGreaterThanOrEqual(1)
+      expect(data.statistics).toBeDefined()
+    })
 
-      expect(stats).toHaveProperty("totalClients");
-      expect(stats).toHaveProperty("activeConsents");
-      expect(stats).toHaveProperty("consentLevels");
-      expect(stats).toHaveProperty("withdrawalRequests");
-      expect(stats).toHaveProperty("expiredConsents");
-      expect(stats.consentLevels).toHaveProperty("none");
-      expect(stats.consentLevels).toHaveProperty("minimal");
-      expect(stats.consentLevels).toHaveProperty("limited");
-      expect(stats.consentLevels).toHaveProperty("full");
-    });
-  });
+    it('should get audit trail filtered by clientId', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('audit-filter-1', 'minimal')
+      await consentManagementService.initializeConsent('audit-filter-2', 'full')
 
-  describe("export", () => {
-    it("should export consent data with all components", async () => {
-      const data = await consentManagementService.exportConsentData();
+      const trail = await consentManagementService.getAuditTrail('audit-filter-1')
+      expect(trail.every(e => e.clientId === 'audit-filter-1')).toBe(true)
+    })
 
-      expect(data).toHaveProperty("consentRecords");
-      expect(data).toHaveProperty("auditLog");
-      expect(data).toHaveProperty("statistics");
-      expect(Array.isArray(data.consentRecords)).toBe(true);
-      expect(Array.isArray(data.auditLog)).toBe(true);
-    });
-  });
+    it('should validate research access correctly', async () => {
+      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent('validate-full', 'full')
+      await consentManagementService.initializeConsent('validate-minimal', 'minimal')
 
-  describe("consent level checks", () => {
-    it("should return true for permitted research use with sufficient level", async () => {
-      const hasConsent = await consentManagementService.hasConsentFor(
-        "test-client-2",
-        "aggregateAnalytics",
-      );
-      expect(hasConsent).toBe(true); // full consent permits aggregateAnalytics
-    });
+      const result = await consentManagementService.validateResearchAccess(
+        ['validate-full', 'validate-minimal', 'nonexistent'],
+        'patternDiscovery',
+      )
 
-    it("should return false for research use with insufficient level", async () => {
-      // test-client-1 might have been updated in earlier tests, so check minimal
-      await consentManagementService.initializeConsent("minimal-test-client", "minimal");
-      const hasConsent = await consentManagementService.hasConsentFor(
-        "minimal-test-client",
-        "predictiveModeling",
-      );
-      expect(hasConsent).toBe(false); // minimal does not permit predictiveModeling
-    });
-  });
-});
+      expect(result.validClients).toContain('validate-full')
+      expect(result.invalidClients).toContain('validate-minimal')
+      expect(result.invalidClients).toContain('nonexistent')
+    })
+  })
+})
