@@ -186,8 +186,7 @@ jobs:
           category: checkov-helm
 
       - name: Create diagnostic artifact when Checkov SARIF is missing
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
           if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
@@ -198,8 +197,7 @@ jobs:
           fi
 
       - name: Upload Checkov diagnostic artifact
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -288,3 +286,132 @@ jobs:
         with:
           name: security-audit-results
           path: audit-results.json
+
+      - name: Generate vulnerability PR comment
+        if: github.event_name == 'pull_request'
+        id: vuln_comment
+        run: |
+          node scripts/ci/generate-vuln-comment.js audit-results.json > pr-comment.md || true
+          echo "Generated PR comment ($(wc -l < pr-comment.md) lines)"
+
+      - name: Post vulnerability summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: 🔒 Dependency Vulnerability Scan
+          path: pr-comment.md
+
+  python-dependency-scan:
+    name: Python Dependency Scan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Set up Python
+        uses: actions/setup-python@v6.3.0
+        with:
+          python-version: '3.13.13'
+
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
+
+      - name: Install pip-audit
+        run: uv pip install --system pip-audit
+
+      - name: Scan Python dependencies (ai submodule)
+        id: pip_audit_ai
+        continue-on-error: true
+        run: |
+          cd ai
+          uv pip install --system -r requirements-voice.txt 2>/dev/null || true
+          pip-audit -r requirements-voice.txt --format json -o ../pip-audit-ai.json --ignore-vuln || true
+          cd ..
+
+      - name: Scan Python dependencies (bias-detection service)
+        id: pip_audit_bias
+        continue-on-error: true
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          pip-audit -r requirements.txt --format json -o ../../../pip-audit-bias.json || true
+          cd -
+
+      - name: Scan Python dependencies (multimodal-bias-detection service)
+        id: pip_audit_multimodal
+        continue-on-error: true
+        run: |
+          if [ -d "src/lib/ai/multimodal-bias-detection/python-service" ] && \
+             [ -f "src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml" ]; then
+            cd src/lib/ai/multimodal-bias-detection/python-service
+            pip-audit --format json -o ../../../pip-audit-multimodal.json || true
+            cd -
+          else
+            echo '{"dependencies":[],"vulnerabilities":[]}' > pip-audit-multimodal.json
+          fi
+
+      - name: Enforce Python vulnerability threshold
+        run: |
+          node scripts/ci/check-pip-audit.js \
+            --fail-on high \
+            pip-audit-ai.json \
+            pip-audit-bias.json \
+            pip-audit-multimodal.json
+
+      - name: Upload Python audit results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: python-audit-results
+          path: |
+            pip-audit-ai.json
+            pip-audit-bias.json
+            pip-audit-multimodal.json
+
+  sbom-generation:
+    name: SBOM Generation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+          upload-artifact: false
+          upload-sbom: false
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cyclonedx.json
+          retention-days: 30
+
+      - name: Generate SBOM summary
+        run: |
+          echo "## 📋 SBOM Generated" > sbom-summary.md
+          echo "" >> sbom-summary.md
+          echo "Format: CycloneDX JSON" >> sbom-summary.md
+          echo "Components: $(node -e "const s=require('./sbom.cyclonedx.json'); console.log((s.components||[]).length)" 2>/dev/null || echo 'unknown')" >> sbom-summary.md
+          echo "" >> sbom-summary.md
+          echo "SBOM artifact available in workflow run artifacts." >> sbom-summary.md
+          cat sbom-summary.md
+
+      - name: Post SBOM summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: 📋 SBOM
+          path: sbom-summary.md
