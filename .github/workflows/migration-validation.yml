@@ -1,0 +1,175 @@
+name: Migration Validation
+
+on:
+  pull_request:
+    paths:
+      - 'db/**'
+      - 'scripts/devops/validate-migrations.sh'
+      - '.github/workflows/migration-validation.yml'
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - 'db/**'
+  schedule:
+    # Daily at 3:00 UTC
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-migrations:
+    name: Validate Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: pixelated_empathy
+          POSTGRES_USER: pixelated
+          POSTGRES_PASSWORD: migration-validate-password
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U pixelated -d pixelated_empathy"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      PGPASSWORD: migration-validate-password
+      PGHOST: localhost
+      PGPORT: 55432
+      PGUSER: pixelated
+      PGDATABASE: pixelated_empathy
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for PostgreSQL
+        run: |
+          for i in $(seq 1 30); do
+            if pg_isready -h localhost -p 55432 -U pixelated -d pixelated_empathy; then
+              echo "PostgreSQL is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "PostgreSQL did not become ready"
+          exit 1
+
+      - name: Generate migration checksums
+        run: |
+          echo "## Migration File Checksums" > migration-checksums.md
+          echo "" >> migration-checksums.md
+          echo "| File | SHA-256 |" >> migration-checksums.md
+          echo "|------|---------|" >> migration-checksums.md
+          for f in db/migrations/*.sql db/*.sql; do
+            [[ -f "$f" ]] || continue
+            checksum=$(sha256sum "$f" | cut -d' ' -f1)
+            echo "| $(basename "$f") | \`${checksum}\` |" >> migration-checksums.md
+          done
+          cat migration-checksums.md
+
+      - name: Dry-run migrations (transaction + ROLLBACK)
+        run: |
+          MIGRATIONS=$(ls db/migrations/*.sql 2>/dev/null | grep -v '.rollback.sql' | sort)
+          if [ -z "$MIGRATIONS" ]; then
+            echo "No migration files found"
+            exit 1
+          fi
+          for f in $MIGRATIONS; do
+            echo "::group::Dry-run: $(basename "$f")"
+            if ! echo "BEGIN; $(cat "$f") ROLLBACK;" | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
+              echo "::error::Dry-run failed for $(basename "$f")"
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
+          echo "::notice::All migrations dry-run validated"
+
+      - name: Apply forward migrations
+        run: |
+          MIGRATIONS=$(ls db/migrations/*.sql 2>/dev/null | grep -v '.rollback.sql' | sort)
+          for f in $MIGRATIONS; do
+            echo "::group::Applying: $(basename "$f")"
+            if ! psql -v ON_ERROR_STOP=1 < "$f" 2>&1; then
+              echo "::error::Forward migration failed: $(basename "$f")"
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
+          echo "::notice::All forward migrations applied"
+
+      - name: Capture schema snapshot
+        run: |
+          echo "## Schema Snapshot (after forward migrations)" > schema-snapshot.md
+          echo "" >> schema-snapshot.md
+          echo '```sql' >> schema-snapshot.md
+          psql -c "SELECT table_name, column_name, data_type, is_nullable FROM information_schema.columns WHERE table_schema = 'public' ORDER BY table_name, ordinal_position;" >> schema-snapshot.md 2>&1
+          echo '```' >> schema-snapshot.md
+
+      - name: Test rollbacks (reverse order)
+        run: |
+          ROLLBACKS=$(ls db/migrations/*.rollback.sql 2>/dev/null | sort -r)
+          if [ -z "$ROLLBACKS" ]; then
+            echo "::warning::No rollback files found — skipping rollback test"
+            exit 0
+          fi
+          for f in $ROLLBACKS; do
+            echo "::group::Rolling back: $(basename "$f")"
+            if ! psql -v ON_ERROR_STOP=1 < "$f" 2>&1; then
+              echo "::error::Rollback failed: $(basename "$f")"
+              exit 1
+            fi
+            echo "::endgroup::"
+          done
+          echo "::notice::All rollback migrations applied successfully"
+
+      - name: Verify schema integrity
+        run: |
+          # After rollback, verify no orphaned constraints or indexes
+          ORPHANED=$(psql -t -c "
+            SELECT count(*) FROM pg_constraint c
+            LEFT JOIN pg_class t ON c.conrelid = t.oid
+            WHERE t.oid IS NULL;
+          ")
+          if [ "$ORPHANED" -gt 0 ]; then
+            echo "::error::Orphaned constraints found: $ORPHANED"
+            exit 1
+          fi
+          echo "::notice::Schema integrity verified — no orphaned constraints"
+
+      - name: Upload migration artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: migration-artifacts
+          path: |
+            migration-checksums.md
+            schema-snapshot.md
+          retention-days: 90
+
+      - name: Post PR comment with results
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: 'Migration Validation'
+          path: |
+            migration-checksums.md
+            ---
+            ## Migration Validation Results
+
+            ✅ All forward migrations applied successfully
+            ✅ Rollback migrations tested (where available)
+            ✅ Schema integrity verified
+            ✅ Checksums generated for audit trail
+
+            See [migration artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for full details.
