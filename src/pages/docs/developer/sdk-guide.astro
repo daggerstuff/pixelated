@@ -50,7 +50,7 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
 pnpm add @pixelated-empathy/auto-sdk</code></pre>
 
   <h3>Configuration</h3>
-  <pre><code class="language-typescript">import {
+  <pre><code class="language-typescript" is:raw>import {
   Configuration,
   DefaultApi,
 } from '@pixelated-empathy/auto-sdk';
@@ -77,7 +77,7 @@ const config = new Configuration({
 const client = new DefaultApi(config);</code></pre>
 
   <h3>Using the Client</h3>
-  <pre><code class="language-typescript">// All methods are typed with auto-generated interfaces
+  <pre><code class="language-typescript" is:raw>// All methods are typed with auto-generated interfaces
 const health = await client.getHealth();
 //    ^? { status: string; version: string; timestamp: string }
 
