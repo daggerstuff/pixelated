@@ -1,0 +1,9 @@
+exclusions:
+  - id: KSV-0121
+    paths:
+      - monitoring/memory-alerts.yaml
+    comment: >
+      Node-exporter requires hostPath access to /proc and /sys for system
+      metrics collection. Mounts are read-only with type: Directory,
+      container seccomp: RuntimeDefault, runAsNonRoot,
+      readOnlyRootFilesystem, all capabilities dropped.
