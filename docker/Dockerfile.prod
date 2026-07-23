@@ -1,5 +1,8 @@
 # Production Dockerfile for Business Strategy CMS
-FROM node:24.16.0-alpine AS base
+FROM node:24.18.0-alpine AS base
+
+# Apply OS-level security updates
+RUN apk upgrade --no-cache
 
 # Install build dependencies for sharp and other native modules
 RUN apk add --no-cache \
