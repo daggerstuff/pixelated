@@ -1,0 +1,352 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { requirePageAuth } from '@/lib/auth/serverAuth'
+
+await requirePageAuth(Astro, 'admin')
+---
+
+<DashboardLayout title="Research Query Engine" user={Astro.locals.user}>
+  <div class="research-query-dashboard">
+    <h1>HIPAA-Compliant Research Query Engine</h1>
+    <p class="subtitle">
+      Execute anonymized research queries with differential privacy noise injection.
+      All queries are logged with audit trail. Raw PHI is never returned.
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Total Queries</div>
+        <div class="stat-value" id="total-queries">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Successful</div>
+        <div class="stat-value" id="successful-queries">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Failed</div>
+        <div class="stat-value" id="failed-queries">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Cache Hits</div>
+        <div class="stat-value" id="cache-hits">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Exec Time</div>
+        <div class="stat-value" id="avg-exec-time">—</div>
+      </div>
+    </div>
+
+    <section class="query-builder">
+      <h2>Execute Query</h2>
+      <form id="query-form">
+        <div class="form-row">
+          <label for="description">Query Description</label>
+          <input
+            type="text"
+            id="description"
+            name="description"
+            placeholder="e.g. Average emotion scores by technique type"
+            required
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="query-type">Query Type</label>
+          <select id="query-type" name="queryType">
+            <option value="aggregate-analysis">Aggregate Analysis</option>
+            <option value="sql">SQL</option>
+            <option value="pattern-discovery">Pattern Discovery</option>
+            <option value="longitudinal-analysis">Longitudinal Analysis</option>
+            <option value="cohort-comparison">Cohort Comparison</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="anonymization-level">Anonymization Level</label>
+          <select id="anonymization-level" name="anonymizationLevel">
+            <option value="high" selected>High (Full Anonymization)</option>
+            <option value="medium">Medium (Limited)</option>
+            <option value="low">Low (Minimal)</option>
+            <option value="none">None (Not Recommended)</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="epsilon">Differential Privacy Epsilon (0.01 - 1.0)</label>
+          <input
+            type="number"
+            id="epsilon"
+            name="epsilon"
+            min="0.01"
+            max="1.0"
+            step="0.01"
+            value="0.1"
+          />
+          <small>Lower = more privacy, more noise. Higher = less privacy, less noise.</small>
+        </div>
+
+        <div class="form-row">
+          <label for="output-format">Output Format</label>
+          <select id="output-format" name="outputFormat">
+            <option value="json" selected>JSON (aggregated)</option>
+            <option value="csv">CSV (anonymized)</option>
+            <option value="summary">Summary Statistics Only</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label for="session-type">Session Type (optional)</label>
+          <input
+            type="text"
+            id="session-type"
+            name="sessionType"
+            placeholder="e.g. individual, group"
+          />
+        </div>
+
+        <div class="form-row date-range">
+          <div>
+            <label for="date-start">Date From</label>
+            <input type="date" id="date-start" name="dateStart" />
+          </div>
+          <div>
+            <label for="date-end">Date To</label>
+            <input type="date" id="date-end" name="dateEnd" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="technique-type">Technique Type (optional)</label>
+          <input
+            type="text"
+            id="technique-type"
+            name="techniqueType"
+            placeholder="e.g. cognitive_restructuring"
+          />
+        </div>
+
+        <div class="form-row">
+          <label for="min-confidence">Min Confidence (optional)</label>
+          <input
+            type="number"
+            id="min-confidence"
+            name="minConfidence"
+            min="0"
+            max="1"
+            step="0.1"
+            placeholder="e.g. 0.7"
+          />
+        </div>
+
+        <button type="submit" class="btn-primary">Execute Query</button>
+      </form>
+    </section>
+
+    <section class="query-results" id="query-results-section" style="display: none;">
+      <h2>Query Results</h2>
+      <div class="result-meta" id="result-meta"></div>
+      <pre class="result-content" id="result-content"></pre>
+    </section>
+
+    <section class="audit-trail">
+      <h2>Query Audit Trail</h2>
+      <p class="hint">All queries are logged with requester, timestamp, and result shape (never raw data).</p>
+      <button id="refresh-audit" class="btn-secondary">Refresh Audit Trail</button>
+      <table class="audit-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Query ID</th>
+            <th>User</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Rows</th>
+            <th>Epsilon</th>
+            <th>Exec Time</th>
+            <th>Cache</th>
+          </tr>
+        </thead>
+        <tbody id="audit-trail-body">
+          <tr><td colspan="10" class="empty-state">No queries logged yet</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="hipaa-notice">
+      <h3>HIPAA Compliance</h3>
+      <ul>
+        <li>All query results are aggregated/anonymized — raw PHI is never returned</li>
+        <li>Differential privacy noise injection (Laplace mechanism) applied to all numeric outputs</li>
+        <li>K-anonymity (k=5) enforced — no results returned for groups smaller than k</li>
+        <li>Every query is logged with requester ID, timestamp, and result shape</li>
+        <li>Output formats: JSON (aggregated), CSV (anonymized), Summary (statistics only)</li>
+        <li>Configurable epsilon parameter per query for privacy budget control</li>
+      </ul>
+    </section>
+  </div>
+</DashboardLayout>
+
+<script is:inline>
+  async function loadAuditStats() {
+    try {
+      const resp = await fetch('/api/v1/admin/research/query/audit?stats=true', {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!resp.ok) return
+      const stats = await resp.json()
+      document.getElementById('total-queries').textContent = stats.totalQueries ?? 0
+      document.getElementById('successful-queries').textContent = stats.successfulQueries ?? 0
+      document.getElementById('failed-queries').textContent = stats.failedQueries ?? 0
+      document.getElementById('cache-hits').textContent = stats.cacheHits ?? 0
+      document.getElementById('avg-exec-time').textContent = (stats.avgExecutionTime ?? 0) + 'ms'
+    } catch (e) {
+      console.error('Failed to load audit stats:', e)
+    }
+  }
+
+  async function loadAuditTrail() {
+    try {
+      const resp = await fetch('/api/v1/admin/research/query/audit', {
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!resp.ok) return
+      const data = await resp.json()
+      const tbody = document.getElementById('audit-trail-body')
+      if (!data.entries || data.entries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" class="empty-state">No queries logged yet</td></tr>'
+        return
+      }
+      tbody.innerHTML = data.entries
+        .map((e) => {
+          const statusClass =
+            e.status === 'success'
+              ? 'status-success'
+              : e.status === 'error'
+                ? 'status-error'
+                : 'status-pending'
+          return '<tr>' +
+            '<td>' + new Date(e.timestamp).toLocaleString() + '</td>' +
+            '<td><code>' + e.queryId.slice(0, 8) + '</code></td>' +
+            '<td>' + e.userId + '</td>' +
+            '<td>' + e.queryType + '</td>' +
+            '<td>' + (e.queryDescription || '').slice(0, 50) + '</td>' +
+            '<td class="' + statusClass + '">' + e.status + '</td>' +
+            '<td>' + (e.resultShape?.rowCount ?? 0) + '</td>' +
+            '<td>' + e.epsilon + '</td>' +
+            '<td>' + e.executionTime + 'ms</td>' +
+            '<td>' + (e.cacheHit ? '✓' : '—') + '</td>' +
+            '</tr>'
+        })
+        .join('')
+    } catch (e) {
+      console.error('Failed to load audit trail:', e)
+    }
+  }
+
+  document.getElementById('query-form')?.addEventListener('submit', async (ev) => {
+    ev.preventDefault()
+    const form = ev.target
+    const description = form.description.value
+    const queryType = form.queryType.value
+    const anonymizationLevel = form.anonymizationLevel.value
+    const epsilon = parseFloat(form.epsilon.value) || 0.1
+    const outputFormat = form.outputFormat.value
+    const sessionType = form.sessionType.value || undefined
+    const dateStart = form.dateStart.value || undefined
+    const dateEnd = form.dateEnd.value || undefined
+    const techniqueType = form.techniqueType.value || undefined
+    const minConfidence = form.minConfidence.value ? parseFloat(form.minConfidence.value) : undefined
+
+    const filters = {}
+    if (sessionType) filters.sessionType = sessionType
+    if (dateStart || dateEnd) filters.dateRange = { start: dateStart || '2000-01-01', end: dateEnd || new Date().toISOString().slice(0, 10) }
+    if (techniqueType) filters.techniqueType = techniqueType
+    if (minConfidence) filters.minConfidence = minConfidence
+
+    const body = {
+      description,
+      type: queryType,
+      anonymizationLevel,
+      epsilon,
+      outputFormat,
+      dsl: { filters, aggregations: [{ field: '*', function: 'count', alias: 'record_count' }] },
+      requiresApproval: false,
+    }
+
+    try {
+      const resp = await fetch('/api/v1/admin/research/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const content = await resp.text()
+      const resultsSection = document.getElementById('query-results-section')
+      const resultMeta = document.getElementById('result-meta')
+      const resultContent = document.getElementById('result-content')
+
+      resultsSection.style.display = 'block'
+      const queryId = resp.headers.get('X-Query-Id') || ''
+      resultMeta.innerHTML =
+        '<div><strong>Query ID:</strong> ' + queryId + '</div>' +
+        '<div><strong>Status:</strong> ' + (resp.ok ? 'Success' : 'Error') + '</div>' +
+        '<div><strong>Format:</strong> ' + outputFormat + '</div>'
+
+      if (outputFormat === 'json') {
+        try {
+          resultContent.textContent = JSON.stringify(JSON.parse(content), null, 2)
+        } catch {
+          resultContent.textContent = content
+        }
+      } else {
+        resultContent.textContent = content
+      }
+
+      loadAuditStats()
+      loadAuditTrail()
+    } catch (e) {
+      console.error('Query execution failed:', e)
+    }
+  })
+
+  document.getElementById('refresh-audit')?.addEventListener('click', () => {
+    loadAuditStats()
+    loadAuditTrail()
+  })
+
+  loadAuditStats()
+  loadAuditTrail()
+</script>
+
+<style>
+  .research-query-dashboard { max-width: 1400px; margin: 0 auto; }
+  .subtitle { color: #666; margin-bottom: 1.5rem; }
+  .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .stat-card { background: #f8f9fa; border-radius: 8px; padding: 1rem; text-align: center; }
+  .stat-label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .stat-value { font-size: 1.5rem; font-weight: 700; color: #333; }
+  .query-builder { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+  .form-row { margin-bottom: 1rem; }
+  .form-row label { display: block; font-weight: 600; margin-bottom: 0.25rem; }
+  .form-row input, .form-row select { width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; }
+  .form-row small { color: #666; font-size: 0.75rem; }
+  .date-range { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .btn-primary { background: #2563eb; color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: 600; }
+  .btn-secondary { background: #e0e0e0; color: #333; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-bottom: 1rem; }
+  .query-results { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+  .result-meta { margin-bottom: 1rem; display: flex; gap: 2rem; }
+  .result-content { background: #1e293b; color: #e2e8f0; padding: 1rem; border-radius: 4px; overflow-x: auto; max-height: 400px; font-size: 0.875rem; }
+  .audit-trail { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; }
+  .audit-table { width: 100%; border-collapse: collapse; }
+  .audit-table th { text-align: left; padding: 0.5rem; border-bottom: 2px solid #e0e0e0; font-size: 0.75rem; text-transform: uppercase; }
+  .audit-table td { padding: 0.5rem; border-bottom: 1px solid #f0f0f0; font-size: 0.875rem; }
+  .status-success { color: #16a34a; font-weight: 600; }
+  .status-error { color: #dc2626; font-weight: 600; }
+  .status-pending { color: #d97706; font-weight: 600; }
+  .hipaa-notice { background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 1.5rem; }
+  .hipaa-notice h3 { color: #92400e; margin-top: 0; }
+  .hipaa-notice ul { margin: 0; padding-left: 1.5rem; }
+  .hipaa-notice li { margin-bottom: 0.25rem; color: #78350f; }
+  .empty-state { text-align: center; color: #999; padding: 2rem; }
+  .hint { color: #666; font-size: 0.875rem; margin-bottom: 1rem; }
+</style>
