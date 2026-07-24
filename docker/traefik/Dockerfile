@@ -8,7 +8,7 @@ COPY docker/traefik/traefik.yml /etc/traefik/traefik.yml
 COPY docker/traefik/dynamic.yml /etc/traefik/dynamic/dynamic.yml
 
 # Harden runtime by running as non-root while still binding privileged ports
-RUN apt-get update && apt-get install -y --no-install-recommends libcap2-bin ca-certificates \
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends libcap2-bin ca-certificates \
     && groupadd -r traefik && useradd -r -g traefik traefik \
     && setcap 'cap_net_bind_service=+ep' /usr/local/bin/traefik \
     && mkdir -p /letsencrypt /var/run/traefik \
