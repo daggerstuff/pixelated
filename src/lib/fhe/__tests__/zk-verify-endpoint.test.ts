@@ -1,3 +1,12 @@
+/**
+ * @vitest-environment node
+ *
+ * Rationale: zk-proof-service.ts statically imports ./sp1-prover, which
+ * transitively pulls in node:crypto / node:child_process / node:fs / node:path.
+ * The default vitest environment here is jsdom, which cannot resolve those
+ * node:* builtins and would fail at module-load. The node environment
+ * resolves them natively.
+ */
 import { describe, it, expect, beforeEach } from 'vitest'
 import { ZKProofService, resetZKProofService } from '../zk-proof-service'
 import type { ZKProofArtifact } from '../zk-proof-service'
