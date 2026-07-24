@@ -533,6 +533,15 @@
       "postinstall-postinstall",
       "protobufjs",
       "unrs-resolver"
+    ],
+    "onlyBuiltDependencies": [
+      "@scarf/scarf",
+      "aws-sdk",
+      "core-js",
+      "koffi",
+      "postinstall-postinstall",
+      "protobufjs",
+      "unrs-resolver"
     ]
   }
 }
