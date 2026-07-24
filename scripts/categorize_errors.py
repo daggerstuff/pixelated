@@ -17,6 +17,7 @@ file_counts = Counter()
 code_counts = Counter()
 file_details = {}
 
+# TODO: handle empty error list edge case — should print "No errors found" instead of empty sections
 for loc, code, _ in errors:
     fpath = loc.split(":")[0]
     file_counts[fpath] += 1
