@@ -7,6 +7,12 @@
       "skillPath": "scientific-skills/adaptyv/SKILL.md",
       "computedHash": "2778e1be6177aa324f0cbd20ccea09557d6463ebfd1f78b3c0637e4a1666d684"
     },
+    "adhd": {
+      "source": "uditakhourii/adhd",
+      "sourceType": "github",
+      "skillPath": "skills/adhd/SKILL.md",
+      "computedHash": "c9dd844eb830e59e60398765600e5504d06c6092323cfe6509de73520018deaf"
+    },
     "aeon": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",
@@ -815,6 +821,12 @@
       "sourceType": "github",
       "skillPath": "scientific-skills/research-grants/SKILL.md",
       "computedHash": "5b763ad1ed7efbde3ef066804ba968f5b809255b4ae967255c3f5ae4bf5b1cc3"
+    },
+    "resolving-merge-conflicts": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/resolving-merge-conflicts/SKILL.md",
+      "computedHash": "28aad6f8b1b7025abc8892fa8890f68fe1533499b28a565f416b159131d22fad"
     },
     "rowan": {
       "source": "K-Dense-AI/scientific-agent-skills",
