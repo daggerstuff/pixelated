@@ -5,7 +5,15 @@ export interface Props {
   lede: string
   note?: string
   trustLine?: readonly string[]
-  stats?: readonly { label: string; value: string; detail?: string }[]
+  /** Optional proof object — kept narrow, single artifact, drives composition */
+  proof?: {
+    /** Mono small-cap title above the artifact */
+    label: string
+    /** The artifact itself — supply as raw HTML/JSX (caller owns content) */
+    body: string
+    /** One-line caption below the artifact */
+    caption?: string
+  }
   primaryCTA?: { text: string; href: string }
   secondaryCTA?: { text: string; href: string }
 }
@@ -16,7 +24,7 @@ const {
   lede,
   note = '',
   trustLine = [],
-  stats = [],
+  proof,
   primaryCTA,
   secondaryCTA,
 } = Astro.props
@@ -67,16 +75,18 @@ const {
       </div>
 
       {
-        stats.length > 0 && (
-          <div class="marketing-stat-grid">
-            {stats.map((item) => (
-              <div class="marketing-stat-card">
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                {item.detail && <p>{item.detail}</p>}
-              </div>
-            ))}
-          </div>
+        proof && (
+          <aside class="marketing-hero__proof" aria-label={proof.label}>
+            <header class="marketing-hero__proof-head">
+              <span class="marketing-list-label">{proof.label}</span>
+            </header>
+            <div class="marketing-hero__proof-body" set:html={proof.body} />
+            {proof.caption && (
+              <footer class="marketing-hero__proof-foot">
+                <span>{proof.caption}</span>
+              </footer>
+            )}
+          </aside>
         )
       }
     </div>
