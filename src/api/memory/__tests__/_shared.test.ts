@@ -403,6 +403,19 @@ describe('handleMemoryApiError', () => {
     expect(data.error).toBe('Bad Request')
   })
 
+  it('handles ProductMemoryGatewayError with 401 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } =
+      await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Unauthorized', 401)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(502)
+    const data = await response.json()
+    expect(data.error).toBe('Bad Gateway')
+  })
+
   it('handles standard Error', async () => {
     const { handleMemoryApiError } = await import('../_shared')
 
