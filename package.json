@@ -528,6 +528,7 @@
     "@scarf/scarf",
     "aws-sdk",
     "core-js",
+    "koffi",
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"
