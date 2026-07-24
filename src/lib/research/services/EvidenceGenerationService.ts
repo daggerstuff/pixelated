@@ -7,6 +7,7 @@ import {
 
 import { PatternDiscoveryService } from './PatternDiscoveryService'
 import { ResearchQueryEngine } from './ResearchQueryEngine'
+import { getStatisticalTestService } from './StatisticalTestService'
 
 const logger = getLogger({ prefix: 'EvidenceGenerationService' })
 
@@ -33,6 +34,23 @@ export interface EvidenceRequest {
   timeRange?: { start: Date; end: Date }
   demographicFilters?: Record<string, unknown>
   techniqueFilters?: Record<string, unknown>
+  /** Optional raw data for real statistical computation.
+   * When provided, tests compute real statistics instead of mock values.
+   * When absent, falls back to placeholder with a `computed: false` flag. */
+  data?: EvidenceRequestData
+}
+
+export interface EvidenceRequestData {
+  /** Groups of numeric values for t-test comparison (2 groups) */
+  groups?: number[][]
+  /** Named variable arrays for correlation analysis */
+  variables?: Record<string, number[]>
+  /** Contingency table for chi-square independence test */
+  contingency?: number[][]
+  /** Observed frequencies for chi-square goodness-of-fit */
+  observed?: number[]
+  /** Expected frequencies for chi-square goodness-of-fit */
+  expected?: number[]
 }
 
 export class EvidenceGenerationService {
@@ -446,33 +464,102 @@ export class EvidenceGenerationService {
 
   private async executeSingleTest(
     test: StatisticalTest,
-    _request: EvidenceRequest,
+    request: EvidenceRequest,
   ): Promise<StatisticalTest> {
-    // In real implementation, execute actual statistical test
-    const mockResults = this.generateMockResults(test)
+    const data = request.data
 
-    return {
-      ...test,
-      results: mockResults,
+    if (!data) {
+      return { ...test, results: this.generatePlaceholderResults(test) }
     }
+
+    const statsService = getStatisticalTestService()
+    const alpha = test.alpha ?? this.config.significanceLevel
+    let results: StatisticalTest['results']
+
+    if (test.testType === 't-test' && data.groups && data.groups.length >= 2) {
+      const tResult = statsService.welchTTest(
+        data.groups[0],
+        data.groups[1],
+        alpha,
+      )
+      results = {
+        testStatistic: tResult.tStatistic,
+        pValue: tResult.pValue,
+        effectSize: tResult.effectSize,
+        confidenceInterval: tResult.confidenceInterval,
+        conclusion: tResult.pValue < alpha ? 'reject_null' : 'fail_to_reject',
+      }
+    } else if (
+      test.testType === 'correlation' &&
+      data.variables &&
+      test.variables.length >= 2
+    ) {
+      const x = data.variables[test.variables[0]]
+      const y = data.variables[test.variables[1]]
+      if (x && y && x.length > 1 && y.length > 1) {
+        const corrResult = statsService.pearsonCorrelation(x, y, alpha)
+        results = {
+          testStatistic: corrResult.coefficient,
+          pValue: corrResult.pValue,
+          effectSize: corrResult.effectSize,
+          confidenceInterval: corrResult.confidenceInterval,
+          conclusion:
+            corrResult.pValue < alpha ? 'reject_null' : 'fail_to_reject',
+        }
+      } else {
+        results = this.generatePlaceholderResults(test)
+      }
+    } else if (test.testType === 'chi-square' && data.contingency) {
+      const chiResult = statsService.chiSquareIndependence(
+        data.contingency,
+        alpha,
+      )
+      results = {
+        testStatistic: chiResult.chiSquare,
+        pValue: chiResult.pValue,
+        effectSize: chiResult.cramersV,
+        confidenceInterval: [
+          chiResult.cramersV - 0.1,
+          chiResult.cramersV + 0.1,
+        ],
+        conclusion: chiResult.pValue < alpha ? 'reject_null' : 'fail_to_reject',
+      }
+    } else if (
+      test.testType === 'chi-square' &&
+      data.observed &&
+      data.expected
+    ) {
+      const chiResult = statsService.chiSquareGoodnessOfFit(
+        data.observed,
+        data.expected,
+        alpha,
+      )
+      results = {
+        testStatistic: chiResult.chiSquare,
+        pValue: chiResult.pValue,
+        effectSize: chiResult.cramersV,
+        confidenceInterval: [
+          chiResult.cramersV - 0.1,
+          chiResult.cramersV + 0.1,
+        ],
+        conclusion: chiResult.pValue < alpha ? 'reject_null' : 'fail_to_reject',
+      }
+    } else {
+      results = this.generatePlaceholderResults(test)
+    }
+
+    return { ...test, results }
   }
 
-  private generateMockResults(
+  private generatePlaceholderResults(
     _test: StatisticalTest,
   ): StatisticalTest['results'] {
-    // Generate realistic mock results for demonstration
-    const effectSize = Math.random() * 0.8 - 0.4
-    const pValue = Math.random() * 0.1
-
     return {
-      testStatistic: Math.random() * 10 - 5,
-      pValue,
-      effectSize,
-      confidenceInterval: [effectSize - 0.2, effectSize + 0.2],
-      conclusion:
-        pValue < this.config.significanceLevel
-          ? 'reject_null'
-          : 'fail_to_reject',
+      testStatistic: 0,
+      pValue: 1,
+      effectSize: 0,
+      confidenceInterval: [0, 0],
+      conclusion: 'fail_to_reject',
     }
   }
 
