@@ -150,6 +150,7 @@ dependencies = [
   "mobi>=0.4.1",
   "aiofiles>=25.1.0",
   "openpipe-art>=0.5.18",
+  "pynvml>=13.0.1",
 ]
 [project.optional-dependencies]
 test = [

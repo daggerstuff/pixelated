@@ -3,6 +3,11 @@
  * Comprehensive type definitions for emotion analysis and multidimensional mapping
  */
 
+import type {
+  ExplainabilitySource,
+  TechniqueAttribution,
+} from '../explainability/types'
+
 export interface EmotionAnalysis {
   id: string
   sessionId: string
@@ -11,6 +16,8 @@ export interface EmotionAnalysis {
   dimensions: EmotionDimensions
   confidence: number
   metadata?: EmotionMetadata
+  sources?: ExplainabilitySource[]
+  techniqueAttribution?: TechniqueAttribution
 }
 
 export interface EmotionVector {

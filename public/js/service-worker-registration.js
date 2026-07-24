@@ -1,32 +1,36 @@
-// Service Worker Registration
+// Service Worker Registration — PIX-4061
+// Registers SW with update detection. On new SW version: skipWaiting + reload.
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js')
-      .then((_registration) => {
-        console.log('ServiceWorker registration successful')
+      .register('/sw.js', { updateViaCache: 'none' })
+      .then((registration) => {
+        // Listen for new SW installations
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing
+          if (!newWorker) return
+
+          newWorker.addEventListener('statechange', () => {
+            if (
+              newWorker.state === 'installed' &&
+              navigator.serviceWorker.controller
+            ) {
+              // New SW is waiting — tell it to skip waiting
+              newWorker.postMessage('SKIP_WAITING')
+            }
+          })
+        })
       })
-      .catch((_error) => {
-        console.error('ServiceWorker registration failed:', _error)
+      .catch((error) => {
+        console.error('ServiceWorker registration failed:', error)
       })
+
+    // Reload once when controller changes (new SW took over)
+    let refreshing = false
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return
+      refreshing = true
+      window.location.reload()
+    })
   })
 }
-!(function () {
-  try {
-    var e =
-        'undefined' != typeof window
-          ? window
-          : 'undefined' != typeof global
-            ? global
-            : 'undefined' != typeof globalThis
-              ? globalThis
-              : 'undefined' != typeof self
-                ? self
-                : {},
-      n = new e.Error().stack
-    n &&
-      ((e._sentryDebugIds = e._sentryDebugIds ?? {}),
-      (e._sentryDebugIds[n] = '26908714-2da8-5e12-b5bd-ef33dfb6ddde'))
-  } catch (e) {}
-})()
-//# debugId=26908714-2da8-5e12-b5bd-ef33dfb6ddde
