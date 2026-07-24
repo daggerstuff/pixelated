@@ -71,9 +71,9 @@ allowBuilds:
   '@mongodb-js/zstd': true
   core-js-pure: true
   node-liblzma: false
-  '@schpet/linear-cli': set this to true or false
+  '@schpet/linear-cli': true
   '@scarf/scarf': true
-  koffi: set this to true or false
+  koffi: true
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
