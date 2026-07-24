@@ -1,8 +1,8 @@
 # Pixelated Empathy — FastAPI Backend Dockerfile
 FROM python:3.13-slim AS base
 
-# Install system deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Apply OS-level security updates then install system deps
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends \
     curl \
     gcc \
     libpq-dev \
