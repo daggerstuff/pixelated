@@ -73,6 +73,7 @@ allowBuilds:
   node-liblzma: false
   '@schpet/linear-cli': set this to true or false
   '@scarf/scarf': true
+  koffi: set this to true or false
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
@@ -270,6 +271,7 @@ overrides:
   axios: '>=1.15.1'
   adm-zip: 0.6.0
   brace-expansion: '>=5.0.5'
+  astro>cookie: ^2.0.0
   cookie: '^0.7.2'
   '@vercel/oidc': '3.7.1'
   devalue: '>=5.8.1'
