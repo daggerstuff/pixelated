@@ -36,6 +36,7 @@ allowBuilds:
   hnswlib-node: true
   kerberos: true
   keytar: true
+  koffi: true
   libpg-query: false
   macos-export-certificate-and-key: true
   mongodb-client-encryption: true
