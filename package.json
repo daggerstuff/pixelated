@@ -290,6 +290,7 @@
     "dompurify": "^3.4.12",
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
+    "eve": "^0.27.1",
     "events": "latest",
     "express": "^5.2.1",
     "express-openid-connect": "^3.2.0",
@@ -364,7 +365,7 @@
     "vue": "latest",
     "workers-ai-provider": "^3.3.1",
     "ws": "^8.21.1",
-    "zod": "^4.4.3",
+    "zod": "^4.3.2",
     "zustand": "latest"
   },
   "devDependencies": {
