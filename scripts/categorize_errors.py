@@ -2,7 +2,6 @@
 """Categorize TypeScript errors from the typecheck output."""
 
 import re
-import os
 import sys
 from collections import Counter
 
