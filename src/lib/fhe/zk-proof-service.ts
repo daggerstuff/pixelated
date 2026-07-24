@@ -1,75 +1,76 @@
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { FHEOperation } from './types'
-import type { HomomorphicOperationResult } from './types'
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { FHEOperation } from "./types";
+import type { HomomorphicOperationResult } from "./types";
+import { getSP1Prover } from "./sp1-prover";
 
-const logger = createBuildSafeLogger('zk-proof-service')
+const logger = createBuildSafeLogger("zk-proof-service");
 
-const subtle = globalThis.crypto.subtle
+const subtle = globalThis.crypto.subtle;
 
 async function sha256(data: string): Promise<string> {
-  const encoded = new TextEncoder().encode(data)
-  const hashBuffer = await subtle.digest('SHA-256', encoded)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  const encoded = new TextEncoder().encode(data);
+  const hashBuffer = await subtle.digest("SHA-256", encoded);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /**
  * Build a Merkle root from a list of leaf hashes.
  */
-async function buildMerkleRoot(leaves: string[]): Promise<string> {
-  if (leaves.length === 0) return sha256('empty')
-  if (leaves.length === 1) return leaves[0]
+export async function buildMerkleRoot(leaves: string[]): Promise<string> {
+  if (leaves.length === 0) return sha256("empty");
+  if (leaves.length === 1) return leaves[0];
 
-  const nextLevel: string[] = []
+  const nextLevel: string[] = [];
   for (let i = 0; i < leaves.length; i += 2) {
-    const left = leaves[i]
-    const right = i + 1 < leaves.length ? leaves[i + 1] : leaves[i]
-    nextLevel.push(await sha256(`${left}${right}`))
+    const left = leaves[i];
+    const right = i + 1 < leaves.length ? leaves[i + 1] : leaves[i];
+    nextLevel.push(await sha256(`${left}${right}`));
   }
-  return buildMerkleRoot(nextLevel)
+  return buildMerkleRoot(nextLevel);
 }
 
 /**
  * Generate a random salt for proof commitments.
  */
 function generateSalt(): string {
-  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(32))
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(32));
   return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 /**
  * ZK Proof artifact for data pipeline integrity.
  *
- * This represents the public output of an SP1 proof that verifies:
- * 1. Input hash commitment matches the committed input
- * 2. The correct FHE operation was dispatched
- * 3. Output hash matches the expected derivation
- * 4. All intermediate step hashes form a valid Merkle tree
+ * When SP1 is available, `proof` contains the SP1 zkVM proof bytes.
+ * When SP1 is not available, `proofMode` is 'hash-commitment' and
+ * `proof` contains a SHA-256 hash commitment (fallback).
  */
 export interface ZKProofArtifact {
-  /** Hex-encoded proof bytes (would be SP1 proof in production) */
-  proof: string
+  /** SP1 proof bytes (hex) or hash-commitment proof (hex) */
+  proof: string;
   /** SHA-256 hash of the input data (public input to the proof) */
-  publicInputHash: string
+  publicInputHash: string;
   /** SHA-256 hash of the output data (public input to the proof) */
-  publicOutputHash: string
+  publicOutputHash: string;
   /** Merkle root over all pipeline step commitments */
-  merkleRoot: string
+  merkleRoot: string;
   /** FHE operation type that was proven */
-  operationType: string
+  operationType: string;
   /** Timestamp when proof was generated */
-  timestamp: number
+  timestamp: number;
   /** Proof generation duration in milliseconds */
-  durationMs: number
+  durationMs: number;
+  /** Proof mode: 'sp1' for real ZK proofs, 'hash-commitment' for fallback */
+  proofMode: "sp1" | "hash-commitment";
 }
 
 /**
  * Result of wrapping an FHE operation with ZK proof generation.
  */
 export interface ZKProvenResult extends HomomorphicOperationResult {
-  zkProof: ZKProofArtifact
+  zkProof: ZKProofArtifact;
 }
 
 /**
@@ -79,45 +80,53 @@ export type FHEOperationCallback = (
   inputData: string,
   operation: FHEOperation,
   params?: Record<string, unknown>,
-) => Promise<HomomorphicOperationResult>
+) => Promise<HomomorphicOperationResult>;
 
 /**
- * ZKProofService — generates zero-knowledge proofs of data pipeline integrity
- * for FHE operations.
+ * ZKProofService - generates zero-knowledge proofs of data pipeline
+ * integrity for FHE operations.
  *
- * Per ADR-0004, this service wraps FHE operations with hash-commitment proofs:
- * - Input hash commitment (SHA-256 of pre-encryption plaintext)
- * - Operation dispatch verification (hash of operation ID + parameters)
- * - Output derivation (SHA-256 of input_hash || operation_id || salt)
- * - Merkle root over all intermediate step hashes
+ * Per ADR-0004, this service wraps FHE operations with ZK proofs:
+ * - SP1 zkVM guest program verifies Merkle root construction
+ * - Hash-commitment fallback when SP1 toolchain is not installed
  *
- * In production, the proof bytes would be generated by an SP1 zkVM guest program.
- * In the current implementation, the proof is a simulated hash-commitment that
- * demonstrates the proof structure and timing characteristics.
+ * The SP1 guest program (sp1-guest/src/main.rs) proves:
+ * 1. Input hash commitment matches the committed input
+ * 2. The correct FHE operation was dispatched
+ * 3. Output hash matches the expected derivation
+ * 4. All intermediate step hashes form a valid Merkle tree
+ *
+ * SSR-only: this module transitively imports `node:crypto`, `node:fs`,
+ * `node:path`, and `node:child_process` via `./sp1-prover`. It must
+ * never be pulled into the client bundle. SSR consumers import it
+ * directly from `@/lib/fhe/zk-proof-service`. The barrel
+ * `@/lib/fhe` deliberately omits it.
  */
 export class ZKProofService {
-  private static instance: ZKProofService | null = null
+  private static instance: ZKProofService | null = null;
 
   private constructor() {
-    logger.info('ZKProofService initialized')
+    const prover = getSP1Prover();
+    logger.info(
+      `ZKProofService initialized (proof mode: ${prover.getProofMode()})`,
+    );
   }
 
   static getInstance(): ZKProofService {
     if (!ZKProofService.instance) {
-      ZKProofService.instance = new ZKProofService()
+      ZKProofService.instance = new ZKProofService();
     }
-    return ZKProofService.instance
+    return ZKProofService.instance;
   }
 
-  /**
-   * Reset the singleton instance (for testing).
-   */
   static reset(): void {
-    ZKProofService.instance = null
+    ZKProofService.instance = null;
   }
 
   /**
    * Generate a ZK proof for a data pipeline integrity claim.
+   *
+   * Uses SP1 zkVM when available, falls back to hash-commitment mode.
    *
    * @param inputData - The pre-encryption plaintext input
    * @param operationType - The FHE operation type (e.g., "summarize")
@@ -131,64 +140,53 @@ export class ZKProofService {
     outputData: string,
     pipelineSteps?: string[],
   ): Promise<ZKProofArtifact> {
-    const start = performance.now()
+    const start = performance.now();
 
-    // Step 1: Input hash commitment
-    const inputHash = await sha256(inputData)
+    // Step 1: Input/output hash commitments
+    const inputHash = await sha256(inputData);
+    const outputHash = await sha256(outputData);
 
-    // Step 2: Output hash commitment
-    const outputHash = await sha256(outputData)
-
-    // Step 3: Generate salt for commitment scheme
-    const salt = generateSalt()
-
-    // Step 4: Build pipeline step commitments
-    // If no intermediate steps provided, create a single-step commitment
+    // Step 2: Build pipeline step commitments
+    const salt = generateSalt();
     const steps = pipelineSteps ?? [
       await sha256(`${inputHash}|${operationType}|${salt}`),
-    ]
+    ];
+    const outputStep = await sha256(`${outputHash}|${operationType}|${salt}`);
+    steps.push(outputStep);
 
-    // Add output derivation as a step
-    const outputStep = await sha256(`${outputHash}|${operationType}|${salt}`)
-    steps.push(outputStep)
+    // Step 3: Merkle root over all pipeline step commitments
+    const merkleRoot = await buildMerkleRoot(steps);
 
-    // Step 5: Merkle root over all pipeline step commitments
-    const merkleRoot = await buildMerkleRoot(steps)
+    // Step 4: Delegate to SP1Prover (SP1 if available, hash-commitment fallback)
+    const sp1Prover = getSP1Prover();
+    const proofResult = await sp1Prover.prove({
+      inputHash,
+      outputHash,
+      operationType,
+      merkleRoot,
+      stepHashes: steps,
+    });
 
-    // Step 6: Generate final proof hash
-    // In production, this would be the SP1 proof public output
-    const proofHash = await sha256(
-      `${merkleRoot}|${inputHash}|${outputHash}|${salt}`,
-    )
-
-    const durationMs = performance.now() - start
+    const durationMs = performance.now() - start;
 
     logger.debug(
-      `Generated ZK proof for operation ${operationType} in ${durationMs.toFixed(2)}ms`,
-    )
+      `Generated ZK proof (${proofResult.mode}) for operation ${operationType} in ${durationMs.toFixed(2)}ms`,
+    );
 
     return {
-      proof: proofHash,
+      proof: proofResult.proof,
       publicInputHash: inputHash,
       publicOutputHash: outputHash,
       merkleRoot,
       operationType,
       timestamp: Date.now(),
       durationMs,
-    }
+      proofMode: proofResult.mode,
+    };
   }
 
   /**
    * Wrap an FHE operation with ZK proof generation.
-   *
-   * Executes the FHE callback, captures input/output, generates a proof,
-   * and returns the result augmented with the ZK proof artifact.
-   *
-   * @param inputData - Pre-encryption plaintext input
-   * @param operation - FHE operation to execute
-   * @param params - Operation parameters
-   * @param fheCallback - Callback that executes the actual FHE operation
-   * @returns ZKProvenResult containing the FHE result + ZK proof
    */
   async wrapOperation(
     inputData: string,
@@ -196,36 +194,32 @@ export class ZKProofService {
     params: Record<string, unknown> | undefined,
     fheCallback: FHEOperationCallback,
   ): Promise<ZKProvenResult> {
-    logger.info(`Wrapping FHE operation ${operation} with ZK proof`)
+    logger.info(`Wrapping FHE operation ${operation} with ZK proof`);
 
-    // Execute the FHE operation
-    const fheResult = await fheCallback(inputData, operation, params)
+    const fheResult = await fheCallback(inputData, operation, params);
 
     if (!fheResult.success) {
       throw new Error(
-        `FHE operation ${operation} failed: ${fheResult.error ?? 'unknown error'}`,
-      )
+        `FHE operation ${operation} failed: ${fheResult.error ?? "unknown error"}`,
+      );
     }
 
-    // Generate ZK proof for the pipeline integrity
     const zkProof = await this.generateProof(
       inputData,
       operation,
-      fheResult.result ?? '',
-    )
+      fheResult.result ?? "",
+    );
 
     return {
       ...fheResult,
       zkProof,
-    }
+    };
   }
 
   /**
    * Verify a ZK proof artifact.
    *
-   * In production, this would call the SP1 verifier.
-   * In the current implementation, it re-derives the proof hash
-   * and checks consistency.
+   * Uses SP1 verifier when available, falls back to hash-commitment verification.
    *
    * @param proof - The ZK proof artifact to verify
    * @param expectedInputHash - Expected input hash (from the caller)
@@ -237,28 +231,31 @@ export class ZKProofService {
     expectedInputHash: string,
     expectedOutputHash: string,
   ): Promise<boolean> {
-    // Verify public input/output hashes match
     if (proof.publicInputHash !== expectedInputHash) {
-      logger.warn('ZK proof verification failed: input hash mismatch')
-      return false
+      logger.warn("ZK proof verification failed: input hash mismatch");
+      return false;
     }
     if (proof.publicOutputHash !== expectedOutputHash) {
-      logger.warn('ZK proof verification failed: output hash mismatch')
-      return false
+      logger.warn("ZK proof verification failed: output hash mismatch");
+      return false;
     }
 
-    // Verify proof structure (non-empty, valid hex)
-    if (!proof.proof.match(/^[0-9a-f]{64}$/)) {
-      logger.warn('ZK proof verification failed: invalid proof format')
-      return false
-    }
-    if (!proof.merkleRoot.match(/^[0-9a-f]{64}$/)) {
-      logger.warn('ZK proof verification failed: invalid Merkle root format')
-      return false
+    const sp1Prover = getSP1Prover();
+    const mode = proof.proofMode ?? "hash-commitment";
+    const result = await sp1Prover.verify(
+      proof.proof,
+      expectedInputHash,
+      expectedOutputHash,
+      mode,
+    );
+
+    if (result.valid) {
+      logger.debug(`ZK proof verified (${mode}) in ${result.verificationTimeMs.toFixed(2)}ms`);
+    } else {
+      logger.warn(`ZK proof verification failed (${mode})`);
     }
 
-    logger.debug('ZK proof verified successfully')
-    return true
+    return result.valid;
   }
 }
 
@@ -266,12 +263,12 @@ export class ZKProofService {
  * Get the singleton ZKProofService instance.
  */
 export function getZKProofService(): ZKProofService {
-  return ZKProofService.getInstance()
+  return ZKProofService.getInstance();
 }
 
 /**
  * Reset the ZKProofService singleton (for testing).
  */
 export function resetZKProofService(): void {
-  ZKProofService.reset()
+  ZKProofService.reset();
 }
