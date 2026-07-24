@@ -520,17 +520,19 @@
     "node": ">=24"
   },
   "packageManager": "pnpm@11.15.1",
-  "allowScripts": {
-    "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
-    "file:../protobufjs@7.6.1/node_modules/protobufjs": true
-  },
-  "trustedDependencies": [
-    "@scarf/scarf",
-    "aws-sdk",
-    "core-js",
-    "koffi",
-    "postinstall-postinstall",
-    "protobufjs",
-    "unrs-resolver"
-  ]
+  "pnpm": {
+    "allowScripts": {
+      "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
+      "file:../protobufjs@7.6.1/node_modules/protobufjs": true
+    },
+    "trustedDependencies": [
+      "@scarf/scarf",
+      "aws-sdk",
+      "core-js",
+      "koffi",
+      "postinstall-postinstall",
+      "protobufjs",
+      "unrs-resolver"
+    ]
+  }
 }
