@@ -95,6 +95,12 @@ export type FHEOperationCallback = (
  * 2. The correct FHE operation was dispatched
  * 3. Output hash matches the expected derivation
  * 4. All intermediate step hashes form a valid Merkle tree
+ *
+ * SSR-only: this module transitively imports `node:crypto`, `node:fs`,
+ * `node:path`, and `node:child_process` via `./sp1-prover`. It must
+ * never be pulled into the client bundle. SSR consumers import it
+ * directly from `@/lib/fhe/zk-proof-service`. The barrel
+ * `@/lib/fhe` deliberately omits it.
  */
 export class ZKProofService {
   private static instance: ZKProofService | null = null;
