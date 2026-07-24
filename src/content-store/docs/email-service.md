@@ -9,9 +9,10 @@ pubDate: '2026-05-09'
 # Email Service
 
 The Email Service in Pixelated is designed to handle all transactional email
-communication with high reliability and security. It uses Postmark as the email
-delivery provider and implements a robust queuing system with Redis for reliable
-delivery.
+communication with high reliability and security. It uses **Resend** as the
+email delivery provider and implements a robust queuing system with Redis for
+reliable delivery. The service is located at
+`src/lib/services/email/EmailService.ts`.
 
 ## Features
 
@@ -65,8 +66,8 @@ console.log(`Queued: ${stats.queued}, Processing: ${stats.processing}`)
 The email service requires the following environment variables:
 
 ```bash
-$1=YOUR_API_KEY_HERE
-EMAIL_FROM_ADDRESS=noreply@gradiant.dev
+RESEND_API_KEY=YOUR_API_KEY_HERE
+EMAIL_FROM_ADDRESS=noreply@pixelatedempathy.com
 ```
 
 ## Queue System
@@ -215,7 +216,7 @@ Common issues and solutions:
 
 1. Emails not sending
    - Check queue statistics
-   - Verify Postmark credentials
+   - Verify Resend API key is set in `RESEND_API_KEY` environment variable
    - Check for rate limiting
 
 2. High failure rates
