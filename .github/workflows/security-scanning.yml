@@ -297,6 +297,7 @@ jobs:
       - name: Post vulnerability summary to PR
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
+        continue-on-error: true
         with:
           header: 🔒 Dependency Vulnerability Scan
           path: pr-comment.md
@@ -412,6 +413,7 @@ jobs:
       - name: Post SBOM summary to PR
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
+        continue-on-error: true
         with:
           header: 📋 SBOM
           path: sbom-summary.md
@@ -560,6 +562,7 @@ jobs:
       - name: Post container scan summary to PR
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
+        continue-on-error: true
         with:
           header: 🔍 Container Image Scan
           path: container-scan-summary.md
