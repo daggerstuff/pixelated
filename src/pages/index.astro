@@ -99,49 +99,55 @@ const buildableScenarios = [
             </div>
           </div>
 
-          <!-- Domain proof object: a real transcript + coaching lane. -->
-          <aside class="np-hero__transcript" aria-label="Sample session artifact">
-            <header class="np-hero__transcript-head">
-              <span class="np-data">Session 04 · Rupture Repair</span>
-              <span class="np-data np-hero__transcript-time"
-                >14:32 — 14:38</span
-              >
+          <!-- Domain proof object: a clinical supervision record, not a chat log. -->
+          <aside class="np-record" aria-label="Sample supervision record">
+            <header class="np-record__head">
+              <div class="np-record__meta">
+                <span class="np-record__case">Case 003 · Week 4</span>
+                <span class="np-record__topic">Disclosure under pressure</span>
+              </div>
+              <ul class="np-record__flags" aria-label="Session status">
+                <li class="np-record__flag np-record__flag--alert">Risk · watch</li>
+                <li class="np-record__flag">Retry assigned</li>
+              </ul>
             </header>
-            <dl class="np-hero__turns">
-              <div class="np-hero__turn">
-                <dt>
-                  <span class="np-data">Trainee</span>
-                  <time>14:32:18</time>
-                </dt>
-                <dd>Tell me what brought you in this week.</dd>
-              </div>
-              <div class="np-hero__turn">
-                <dt>
-                  <span class="np-data">Client</span>
-                  <time>14:32:42</time>
-                </dt>
-                <dd>I don't know if this is the right place. Maybe I shouldn't have come.</dd>
-              </div>
-              <div class="np-hero__turn np-hero__turn--note">
-                <dt>
-                  <span class="np-data">Supervisor</span>
-                  <time>14:33:05</time>
-                </dt>
-                <dd>
-                  Reassured before checking immediacy. Slow down — ask whether
-                  they want to keep going before naming the hesitation.
-                </dd>
-              </div>
-              <div class="np-hero__turn">
-                <dt>
-                  <span class="np-data">Trainee</span>
-                  <time>14:33:34</time>
-                </dt>
-                <dd>Want to keep going, or is this too much right now?</dd>
-              </div>
-            </dl>
-            <footer class="np-hero__transcript-foot">
-              <span class="np-data">Coaching lane · next attempt</span>
+
+            <div class="np-record__body">
+              <ol class="np-record__transcript">
+                <li class="np-record__turn">
+                  <span class="np-record__speaker">Counselor</span>
+                  <p class="np-record__line">
+                    <span class="np-record__timestamp">00:24</span>
+                    What brought you back this week?
+                  </p>
+                </li>
+                <li class="np-record__turn">
+                  <span class="np-record__speaker">Client</span>
+                  <p class="np-record__line">
+                    <span class="np-record__timestamp">00:48</span>
+                    I don't know if this is the right place. Maybe I shouldn't
+                    have come.
+                  </p>
+                  <aside class="np-record__margin" data-kind="supervisor">
+                    Hesitation at 00:48. Slow down before reassuring.
+                  </aside>
+                </li>
+                <li class="np-record__turn">
+                  <span class="np-record__speaker">Counselor</span>
+                  <p class="np-record__line">
+                    <span class="np-record__timestamp">01:40</span>
+                    Want to keep going, or is this too much right now?
+                  </p>
+                  <aside class="np-record__margin" data-kind="supervisor">
+                    Better. Checked immediacy before naming the fear.
+                  </aside>
+                </li>
+              </ol>
+            </div>
+
+            <footer class="np-record__foot">
+              <span class="np-record__lane">Coaching lane · next attempt</span>
+              <span class="np-record__score">Coachable · retry by W5</span>
             </footer>
           </aside>
         </div>
