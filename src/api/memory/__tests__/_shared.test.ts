@@ -74,6 +74,22 @@ describe('successResponse', () => {
       message: 'Success',
     })
   })
+
+  it('creates a Response with a custom message and status code', async () => {
+    const payload = { key: 'value' }
+    const { successResponse } = await import('../_shared')
+    const response = successResponse(payload, 'Created', 201)
+
+    expect(response.status).toBe(201)
+    expect(response.headers.get('Content-Type')).toBe('application/json')
+
+    const data = await response.json()
+    expect(data).toEqual({
+      success: true,
+      data: payload,
+      message: 'Created',
+    })
+  })
 })
 
 describe('errorResponse', () => {
