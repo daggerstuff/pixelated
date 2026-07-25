@@ -15,9 +15,6 @@ nodeAgent:
 
 exporter:
   secret:
-    externalSecret:
-      enabled: false
-  secret:
     name: metoro-exporter-secret
     bearerToken: "dummy"
     externalSecret:
