@@ -2,7 +2,8 @@
 # NVIDIA mixed‑model environment for ZYNTHOS (2026)
 # Sets per‑role model IDs, excluding Llama 3.2 and Ising.
 
-export COPILOT_PROVIDER_BASE_URL="https://integrate.api.nvidia.com/v1"
+export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
+export COPILOT_PROVIDER_API_KEY="sk_9router"
 
 # Role‑specific models
 export ZYNTHOS_LEAD_MODEL="nvidia/nemotron-3-super"   # large text model (no Llama)
