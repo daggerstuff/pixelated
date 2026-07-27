@@ -374,6 +374,7 @@
     "@astrojs/check": "latest",
     "@astrojs/markdoc": "^2.0.4",
     "@astrojs/rss": "latest",
+    "@astrojs/ts-plugin": "^1.10.10",
     "@axe-core/playwright": "^4.12.1",
     "@eslint/css": "latest",
     "@eslint/js": "^10.0.1",

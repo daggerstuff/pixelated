@@ -9,7 +9,7 @@ export const headerContent = {
     { href: '/contact', label: 'Contact' },
   ],
   actions: {
-    primary: { href: '/signup', text: 'Start Practice' },
+    primary: { href: '/register', text: 'Start Practice' },
     secondary: { href: '/login', text: 'Sign In' },
   },
 } as const
