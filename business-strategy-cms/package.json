@@ -64,7 +64,7 @@
     "@typescript-eslint/parser": "^8.59.2",
     "eslint": "^10.7.0",
     "jest": "^30.3.0",
-    "ts-jest": "^29.4.9",
+    "ts-jest": "^29.4.12",
     "tsc-alias": "^1.9.1",
     "tsx": "^4.23.1",
     "typescript": "~5.7.3"

@@ -77,6 +77,8 @@ Follow conventions documented in:
 
 Personal coding preferences and past decisions are tracked via the **Foresight Memory & Continuity System** (see section below).
 Use `foresight store "prefer pnpm over npm"` to persist durable preferences.
+Always use `uv` when calling / dealing with python commands.
+Always use `pnpm` over `npm`.`
 
 ---
 
@@ -147,34 +149,6 @@ exploration, or planning prose.
 
 **Skipping gate is not permitted w/o naming it.** If you decide it doesn't apply (pure conversation, no code), say so explicitly in first reply and why.
 
-### CLI Quick Reference
-
-```bash
-foresight store "text"         # Store a memory
-foresight list                 # List all memories (newest first)
-foresight query "search term"  # Keyword + hybrid search
-foresight get <id>             # Get memory by ID
-foresight doctor               # Health check — verifies DB + config
-foresight status               # System health overview
-foresight synthesize           # Find patterns & contradictions
-foresight profile              # Build user profile from memories
-```
-
-### MCP Tool Reference
-
-| Tool                         | Action                    | What it does                                       |
-| ---------------------------- | ------------------------- | -------------------------------------------------- |
-| `manage_memories`            | `store`                   | Save a new memory (content, scope, category, tags) |
-| `manage_memories`            | `update`                  | Edit an existing memory by ID                      |
-| `manage_memories`            | `delete`                  | Remove a memory by ID                              |
-| `search_memories`            | —                         | Unified search: ID lookup, keyword, or hybrid      |
-| `manage_context_blocks`      | `list` / `get` / `update` | Read/write context blocks                          |
-| `inject_context`             | —                         | Surface memories relevant to current conversation  |
-| `query_memories_temporal`    | —                         | Retrieve by time window or trend                   |
-| `process_session_transcript` | —                         | Extract memories from session transcript           |
-| `manage_curation_runs`       | —                         | Bulk reorganize memories (dedupe, rebalance)       |
-| `get_system_status`          | —                         | Health check + memory counts                       |
-
 ### Best Practices
 
 - **Store decisions, not transcripts** — "Chose streamable-http over stdio for MCP transport" beats 40 lines of deliberation
@@ -182,70 +156,6 @@ foresight profile              # Build user profile from memories
 - **Update context blocks when scope changes** — `pending_items` should reflect reality, not history
 - **Don't hoard** — Foresight is for durable context, not session scratch. One-liners > paragraphs
 - **Search before storing** — avoids duplicates; `search_memories` catches near-matches
-
-### Infrastructure
-
-- **Service**: systemd user service `foresight-mcp` on port `8764` (streamable-http, endpoint `/mcp`), launched via `scripts/memory/foresight-server.sh`
-- **Storage**: Ghost Postgres — all machines read/write same DB
-- **Config**: `.env` vars auto-loaded via `python-dotenv` — no `export` needed
-
-```bash
-systemctl --user status foresight-mcp     # Check if running
-systemctl --user restart foresight-mcp    # Restart after code update
-journalctl --user -u foresight-mcp -f     # Live logs
-foresight doctor                          # Health check + memory count + DB status
-```
-
-### Troubleshooting
-
-- **CLI writes to SQLite instead of Postgres**: Check `FORESIGHT_DB_URL` is in `.env` — `foresight doctor` shows active env overrides
-- **MCP server down**: `systemctl --user restart foresight-mcp`
-- **MCP client can't connect**: Verify port `8764` is listening (`ss -ltn | grep 8764`) and client URL is `http://127.0.0.1:8764/mcp`
-
----
-
-## Droid Workflow: Spec Mode & Missions
-
-Prefer Droid's structured workflows over ad-hoc prompting for non-trivial work.
-
-### Spec Mode (single-feature)
-
-- **Trigger**: ≥1 framework surface or feature-boundary change
-- **How**: Shift+Tab before prompt, `/spec` → Droid produces plan → you approve → Droid executes
-- **Output**: in-repo `IMPLEMENTATION_PLAN.md`
-- **Prompt**: goal in one sentence, constraints, related files, verification command
-- **Best practice**: 1-2 day phases, one behavior per phase, one verification per phase
-- **Reference**: `~/.agents/skills/droid-workflow/SKILL.md`
-
-### How to Talk to Droid (always-on)
-
-- Be explicit about goal. Provide context (file paths, error messages, ticket links).
-- Choose approach: Spec for single features, Missions for multi-feature, direct for routine fixes.
-- Define success: name verification command + expected output.
-- Reference files directly. Set boundaries. Break large projects into new sessions.
-
-### Soft recommendation
-
-Spec Mode and Missions are _recommended_ — not hard gates. If "would this benefit from writing it down before code lands?" → use them.
-
----
-
-## Dispatch Resume Gate (mandatory)
-
-Every monthly_llm_driver worker MUST call `dispatch_resume_gate.scan(month, CHUNKS_DIR)` BEFORE first chat_completion POST.
-
-If `scan` returns `missing_or_partial > 0` `stale_dispatch_pid` is alive, worker MUST:
-
-1. Kill stale dispatch
-2. Wait 30 seconds
-3. Write `/tmp/wayfarer_smoke/resume_<month>.json` (skip_list, re_dispatch_list, fresh_dispatch_list, rollover_wall_seconds)
-4. Launch chunks from fresh_dispatch_list
-
-resume file is durable contract: if worker dies, next resume continues from fresh_dispatch_list only.
-
-Workers MUST NOT bypass gate for short halving loops. gate runs <5 s on chunks tree and prevents silent failures.
-
-**Reference**: `skills/monthly_llm_driver/dispatch_resume_gate.py` + `library/dispatch_resume_gate.md`
 
 ---
 

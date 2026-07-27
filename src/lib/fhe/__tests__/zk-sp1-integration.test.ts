@@ -1,52 +1,20 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
-// Mock sp1-prover module
-const mockProve = vi.fn(async (req: {
-  inputHash: string;
-  outputHash: string;
-  operationType: string;
-  merkleRoot: string;
-  stepHashes: string[];
-}) => ({
-  proof: "a".repeat(64),
-  mode: "hash-commitment" as const,
-  publicInputs: { inputHash: req.inputHash, outputHash: req.outputHash },
-  proofSizeBytes: 32,
-  generationTimeMs: 1.5,
-}));
+import { sp1ProverMock } from "./_helpers/sp1ProverMock";
 
-const mockVerify = vi.fn(
-  async (
-    _proof: string,
-    _expectedInputHash: string,
-    _expectedOutputHash: string,
-    _mode?: string,
-  ) => ({
-    valid: true,
-    mode: "hash-commitment" as const,
-    verificationTimeMs: 0.5,
-  }),
-);
-
-vi.mock("../sp1-prover", () => ({
-  SP1Prover: class {
-    isSP1Available() {
-      return false;
-    }
-    getProofMode() {
-      return "hash-commitment";
-    }
-    prove = mockProve;
-    verify = mockVerify;
-  },
-  getSP1Prover: () => new (class {
-    isSP1Available() { return false; }
-    getProofMode() { return "hash-commitment"; }
-    prove = mockProve;
-    verify = mockVerify;
-  })(),
-  resetSP1Prover: () => {},
-}));
+// Single source of truth for the sp1-prover mock lives in
+// src/lib/fhe/__tests__/_helpers/sp1ProverMock.ts. Tests that want the real
+// sp1-prover should declare `@vitest-environment node` at the top instead
+// and skip this mock.
+//
+// IMPORTANT: wrap the helper in an inline arrow when passing to vi.mock.
+// Vitest's transformer hoists vi.mock above imports and lowers function
+// arguments to internal `__vi_import_X__` bindings. Passing the helper
+// directly (`vi.mock(path, sp1ProverMock)`) triggers a TDZ ReferenceError
+// at hoisted-eval time. The thunk defers the call until vitest actually
+// resolves the mocked module, by which point the ESM import is fully
+// initialized.
+vi.mock("../sp1-prover", () => sp1ProverMock());
 
 import { ZKProofService } from "../zk-proof-service";
 

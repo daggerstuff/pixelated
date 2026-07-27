@@ -7,40 +7,27 @@ import asyncio
 import datetime
 import json
 import logging
-import math
 import os
-import random
 import signal
+import tempfile
 
 import art
+import httpx
 import weave
 from art.serverless.backend import ServerlessBackend
 from art.utils.sft import train_sft_from_file
 from openai import AsyncOpenAI
+from serverless_utils import (
+    ShuffledEpochIterator,
+    apply_prune_filter,
+    compute_step_metrics,
+    load_dataset,
+    log_rl_step,
+    rollout,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
-
-
-# Suppress harmless W&B artifact-pruning warnings from serverless backend
-class _PruneWarningFilter(logging.Filter):
-    def filter(self, record: logging.LogRecord) -> bool:
-        msg = record.getMessage()
-        return "Could not prune old train-state artifacts" not in msg and "404 Client Error" not in msg
-
-
-# Apply to root logger and all existing loggers
-for logger_name in [*logging.root.manager.loggerDict.keys(), ""]:
-    logging.getLogger(logger_name).addFilter(_PruneWarningFilter())
-
-AZURE_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY", "")
-if not AZURE_API_KEY:
-    raise ValueError("AZURE_OPENAI_API_KEY is required for Azure rollouts.")
-
-AZURE_CLIENT = AsyncOpenAI(
-    api_key=AZURE_API_KEY,
-    base_url=os.environ.get("AZURE_OPENAI_ENDPOINT", "https://slutrock-resource.services.ai.azure.com/openai/v1"),
-)
-AZURE_MODEL = os.environ.get("AZURE_OPENAI_MODEL_NAME", "masked-qwen")
+apply_prune_filter()
 
 WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
 if not WANDB_API_KEY:
@@ -65,7 +52,7 @@ SUPERVISE = os.environ.get("SUPERVISE", "1") == "1"
 SHUTDOWN = asyncio.Event()
 
 
-def _handle_signal(signum, frame):
+def _handle_signal(signum, _frame):
     logging.info(f"Received signal {signum}, shutting down gracefully...")
     SHUTDOWN.set()
 
@@ -95,159 +82,7 @@ def save_checkpoint(step: int):
     logging.info(f"Checkpoint saved: step {step}")
 
 
-@weave.op()
-def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
-    res_words = response.lower().split()
-    exp_words = expected.lower().split()
-    if len(res_words) < n or len(exp_words) < n:
-        res_set = set(res_words)
-        exp_set = set(exp_words)
-        return len(res_set & exp_set) / len(exp_set) if exp_set else 0.0
-    res_ngrams = {tuple(res_words[i : i + n]) for i in range(len(res_words) - n + 1)}
-    exp_ngrams = {tuple(exp_words[i : i + n]) for i in range(len(exp_words) - n + 1)}
-    intersection = len(res_ngrams & exp_ngrams)
-    union = len(res_ngrams | exp_ngrams)
-    return intersection / union if union > 0 else 0.0
-
-
-@weave.op()
-async def rollout(_model: art.Model, messages: list, _step: int = 0) -> art.Trajectory:
-    context = messages[:-1] if len(messages) > 1 else messages
-    expected = messages[-1]["content"] if messages else ""
-
-    trajectory = art.Trajectory(
-        messages_and_choices=list(context),
-        reward=0.0,
-        metrics={"response_len": 0, "expected_len": 0, "length_ratio": 0.0},
-    )
-    trajectory.messages_and_choices = list(context)
-
-    completion = await AZURE_CLIENT.chat.completions.create(
-        model=AZURE_MODEL,
-        messages=trajectory.messages(),
-        max_tokens=1024,
-        temperature=0.8,
-    )
-    choice = completion.choices[0]
-    trajectory.messages_and_choices.append(choice)
-    response = choice.message.content or ""
-
-    response_len = len(response.split())
-    expected_len = len(expected.split())
-    target_len = max(expected_len, 100)
-    sigma = 150.0
-    length_reward = math.exp(-((response_len - target_len) ** 2) / (2 * sigma**2))
-    overlap = compute_ngram_overlap(response, expected, n=2)
-
-    trajectory.reward = length_reward * 0.4 + overlap * 0.6
-    trajectory.metrics["response_len"] = response_len
-    trajectory.metrics["expected_len"] = expected_len
-    trajectory.metrics["length_ratio"] = response_len / max(expected_len, 1)
-    trajectory.metrics["overlap"] = overlap
-
-    return trajectory
-
-
-@weave.op()
-def log_rl_step(
-    step: int,
-    avg_reward: float,
-    metrics: dict[str, float],
-) -> dict:
-    """Log per-step RL metrics to Weave."""
-    return {
-        "step": step,
-        "avg_reward": avg_reward,
-        "avg_response_len": metrics["response_len"],
-        "avg_expected_len": metrics["expected_len"],
-        "avg_length_ratio": metrics["length_ratio"],
-        "avg_overlap": metrics["overlap"],
-    }
-
-
-def load_dataset(path: str) -> list:
-    """Load, filter, and deduplicate training dataset."""
-    seen: set[str] = set()
-    examples = []
-    with open(path) as f:
-        for line in f:
-            data = json.loads(line)
-            messages = data.get("messages", [])
-            if len(messages) >= 2 and messages[-1].get("role") == "assistant":
-                # Fingerprint on first user + first assistant content to dedupe
-                user_content = next((m.get("content", "") for m in messages if m.get("role") == "user"), "")[:120]
-                assistant_content = next((m.get("content", "") for m in messages if m.get("role") == "assistant"), "")[
-                    :120
-                ]
-                fingerprint = f"{user_content}||{assistant_content}"
-                if fingerprint not in seen:
-                    seen.add(fingerprint)
-                    examples.append(messages)
-    return examples
-
-
-def compute_step_metrics(
-    train_groups: list,
-) -> tuple[float, dict[str, float]]:
-    """Compute average reward and metrics dict from train groups."""
-    all_rewards = [t.reward for g in train_groups for t in g.trajectories]
-    avg_reward = sum(all_rewards) / len(all_rewards) if all_rewards else 0.0
-
-    all_response_lens = [t.metrics.get("response_len", 0) for g in train_groups for t in g.trajectories]
-    all_expected_lens = [t.metrics.get("expected_len", 0) for g in train_groups for t in g.trajectories]
-    all_length_ratios = [t.metrics.get("length_ratio", 0) for g in train_groups for t in g.trajectories]
-    all_overlaps = [t.metrics.get("overlap", 0) for g in train_groups for t in g.trajectories]
-
-    metrics = {
-        "response_len": sum(all_response_lens) / len(all_response_lens) if all_response_lens else 0.0,
-        "expected_len": sum(all_expected_lens) / len(all_expected_lens) if all_expected_lens else 0.0,
-        "length_ratio": sum(all_length_ratios) / len(all_length_ratios) if all_length_ratios else 0.0,
-        "overlap": sum(all_overlaps) / len(all_overlaps) if all_overlaps else 0.0,
-    }
-    return avg_reward, metrics
-
-
-class ShuffledEpochIterator:
-    """Yield batches from a shuffled dataset, reshuffling at epoch boundaries."""
-
-    def __init__(self, examples: list, batch_size: int, seed: int = 42):
-        self.examples = examples
-        self.batch_size = batch_size
-        self.seed = seed
-        self.epoch = 0
-        self.index = 0
-        self._indices: list[int] = []
-        self._shuffle()
-
-    def _shuffle(self) -> None:
-        rng = random.Random(self.seed + self.epoch)
-        self._indices = list(range(len(self.examples)))
-        rng.shuffle(self._indices)
-        self.index = 0
-
-    def skip(self, n: int) -> None:
-        """Skip n examples (used for resume)."""
-        while n > 0:
-            remaining = len(self._indices) - self.index
-            if n >= remaining:
-                n -= remaining
-                self.epoch += 1
-                self._shuffle()
-            else:
-                self.index += n
-                n = 0
-
-    def next_batch(self) -> list:
-        """Return the next batch of examples."""
-        if self.index + self.batch_size > len(self._indices):
-            self.epoch += 1
-            self._shuffle()
-        batch_indices = self._indices[self.index : self.index + self.batch_size]
-        self.index += self.batch_size
-        return [self.examples[i] for i in batch_indices]
-
-
-async def _train_once(examples: list):
+async def _train_once(examples: list, dataset_path: str):
     """Single training attempt. Raises on unrecoverable failure."""
     weave.init(PROJECT)
     logging.info("Loading model...")
@@ -256,14 +91,30 @@ async def _train_once(examples: list):
         project=PROJECT,
         entity="wutang",
         base_model=BASE_MODEL,
-        inference_api_key=AZURE_API_KEY,
-        inference_base_url=os.environ.get(
-            "AZURE_OPENAI_ENDPOINT", "https://slutrock-resource.services.ai.azure.com/openai/v1"
-        ),
-        inference_model_name=AZURE_MODEL,
     )
     backend = ServerlessBackend(api_key=WANDB_API_KEY)
     await model.register(backend)
+
+    # Fallback to Ollama for inference (Azure/W&B inference quota exceeded)
+    ollama_base_url = os.environ.get("OLLAMA_BASE_URL", "https://ollama.pixelated.love/v1")
+    ollama_api_key = os.environ.get("OLLAMA_API_KEY", "ollama")
+    ollama_model = os.environ.get("OLLAMA_MODEL", "qwen3:30b-a3b")
+    model.inference_base_url = ollama_base_url
+    model.inference_api_key = ollama_api_key
+    model.inference_model_name = ollama_model
+    # Build a custom OpenAI client with a non-OpenAI User-Agent to avoid WAF blocks
+    model._openai_client = AsyncOpenAI(
+        base_url=ollama_base_url,
+        api_key=ollama_api_key,
+        default_headers={"User-Agent": "pixelated-training/1.0"},
+        http_client=httpx.AsyncClient(
+            timeout=httpx.Timeout(timeout=1200, connect=5.0),
+            limits=httpx.Limits(max_connections=100_000, max_keepalive_connections=100_000),
+        ),
+    )
+    # Monkey-patch backend inference name so rollouts use the Ollama model name
+    backend._model_inference_name = lambda _model, step=None: ollama_model  # type: ignore[method-assign]
+    logging.info(f"Inference overridden to Ollama: {ollama_base_url} model={ollama_model}")
 
     wandb_step = await model.get_step()
     checkpoint = load_checkpoint()
@@ -275,7 +126,7 @@ async def _train_once(examples: list):
         logging.info(f"Starting SFT Warmup ({SFT_WARMUP_STEPS} steps)...")
         await train_sft_from_file(
             model=model,
-            file_path=DATASET_PATH,
+            file_path=dataset_path,
             epochs=1,
             initial_step=resume_step,
             final_step=SFT_WARMUP_STEPS,
@@ -361,8 +212,15 @@ async def main():
     examples = load_dataset(DATASET_PATH)
     logging.info(f"Loaded {len(examples)} total examples.")
 
+    # Write deduped dataset to temp file so SFT warmup uses the same data as RL
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as tmp:
+        for msgs in examples:
+            tmp.write(json.dumps({"messages": msgs}) + "\n")
+        deduped_dataset_path = tmp.name
+    logging.info(f"Deduped dataset written to {deduped_dataset_path}")
+
     if not SUPERVISE:
-        await _train_once(examples)
+        await _train_once(examples, deduped_dataset_path)
         return
 
     attempt = 0
@@ -370,7 +228,7 @@ async def main():
         attempt += 1
         logging.info(f"=== Training attempt #{attempt} ===")
         try:
-            await _train_once(examples)
+            await _train_once(examples, deduped_dataset_path)
             logging.info("Training finished successfully.")
             break
         except Exception as e:
