@@ -18,8 +18,8 @@
   --np-font-body: 'Public Sans', system-ui, sans-serif;
   --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-  --np-content: 960px;
-  --np-content-narrow: 720px;
+  --np-content: 76rem;
+  --np-content-narrow: 55rem;
   --np-gap: 24px;
   --np-pad: clamp(16px, 4vw, 40px);
 }
@@ -66,11 +66,12 @@
 /* === Display / Headings === */
 .np-display {
   font-family: var(--np-font-display);
-  font-weight: 350;
+  font-weight: 400;
   font-size: clamp(2.5rem, 5vw, 4.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
   font-variation-settings:
+    'opsz' 144,
     'SOFT' 0,
     'WONK' 0;
   margin: 0;
@@ -206,8 +207,8 @@
 
 .np-hero__grid {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: clamp(32px, 5vw, 64px);
+  grid-template-columns: 1.15fr 1fr;
+  gap: clamp(40px, 6vw, 96px);
   align-items: start;
 }
 
@@ -218,7 +219,7 @@
 }
 
 .np-hero__display {
-  max-width: 18ch;
+  max-width: 22ch;
 }
 
 .np-hero__subtitle {
@@ -235,72 +236,175 @@
   margin-top: 36px;
 }
 
-/* Domain proof object — a transcript artifact, not a card */
-.np-hero__transcript {
+/* Domain proof object — a clinical supervision record, not a chat log.
+   Two-column: transcript body + supervisor margin annotations. */
+.np-record {
   border: 1px solid var(--np-line);
   background: var(--np-surface);
-  padding: 0;
   font-family: var(--np-font-mono);
+  position: relative;
 }
 
-.np-hero__transcript-head,
-.np-hero__transcript-foot {
+.np-record::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--np-text);
+  opacity: 0.85;
+}
+
+.np-record__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px 14px 24px;
+  border-bottom: 1px solid var(--np-line);
+  background: var(--np-elevated);
+}
+
+.np-record__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.np-record__case {
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  font-weight: 600;
+}
+
+.np-record__topic {
+  font-family: var(--np-font-display);
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--np-text);
+  font-variation-settings: 'opsz' 36;
+}
+
+.np-record__flags {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.np-record__flag {
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 8px;
+  border: 1px solid var(--np-line);
+  border-radius: 1px;
+  color: var(--np-muted);
+}
+
+.np-record__flag--alert {
+  color: var(--np-text);
+  border-color: var(--np-text);
+}
+
+.np-record__body {
+  padding: 12px 0;
+}
+
+.np-record__transcript {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.np-record__turn {
+  position: relative;
+  padding: 10px 20px 10px 24px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+  border-bottom: 1px dashed var(--np-line);
+}
+
+.np-record__turn:last-child {
+  border-bottom: none;
+}
+
+.np-record__speaker {
+  font-size: 0.625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--np-muted);
+}
+
+.np-record__line {
+  margin: 0;
+  font-family: var(--np-font-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--np-text);
+  font-weight: 450;
+}
+
+.np-record__timestamp {
+  display: inline-block;
+  color: var(--np-muted);
+  font-size: 0.6875rem;
+  margin-right: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.np-record__margin {
+  margin: 6px 0 0;
+  padding: 8px 10px 8px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 2px solid var(--np-muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--np-muted);
+  font-style: italic;
+  position: relative;
+}
+
+.np-record__margin::before {
+  content: '↳ supervisor note';
+  display: block;
+  font-style: normal;
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  margin-bottom: 3px;
+  opacity: 0.7;
+}
+
+.np-record__foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--np-line);
-}
-
-.np-hero__transcript-foot {
-  border-bottom: none;
+  padding: 12px 20px 12px 24px;
   border-top: 1px solid var(--np-line);
-}
-
-.np-hero__transcript-time {
-  color: var(--np-muted);
-}
-
-.np-hero__turns {
-  margin: 0;
-  padding: 0;
-}
-
-.np-hero__turn {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 6px;
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--np-line);
-}
-.np-hero__turn:last-child {
-  border-bottom: none;
-}
-
-.np-hero__turn dt {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
-  margin: 0;
-}
-
-.np-hero__turn dt time {
   font-size: 0.6875rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--np-muted);
+  font-weight: 600;
 }
 
-.np-hero__turn dd {
-  margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.65;
+.np-record__score {
   color: var(--np-text);
-  font-weight: 450; /* mono body lift — 400 reads thin on dark */
-}
-
-.np-hero__turn--note {
-  background: var(--np-elevated);
+  border: 1px solid var(--np-line);
+  padding: 3px 8px;
+  border-radius: 1px;
 }
 .np-hero__turn--note dd {
   color: var(--np-text); /* lifted from --np-mid for legibility */
