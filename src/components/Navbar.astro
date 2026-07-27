@@ -109,7 +109,7 @@ function isActive(href: string) {
       >
         <ThemeSwitcher />
         <a
-          href="/signup"
+          href="/register"
           class="relative group px-5 py-2 overflow-hidden rounded-md bg-white font-display font-bold text-sm text-void transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
         >
           <span class="relative z-10">Start Practice</span>
@@ -216,14 +216,14 @@ function isActive(href: string) {
           </li>
           <li role="none">
             <a
-              href="/signup"
+              href="/register"
               class:list={[
                 'block py-2 transition-colors',
-                isActive('/signup')
+                isActive('/register')
                   ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
               ]}
-              aria-current={isActive('/signup') ? 'page' : undefined}
+              aria-current={isActive('/register') ? 'page' : undefined}
               role="menuitem"
             >
               Sign up

@@ -17,6 +17,43 @@ interface RouteConfig extends AuthOptions {
   pattern: RegExp
 }
 
+// Internal, test, and dev-only pages that must never be reachable in
+// production. The public demo funnel (/demo-hub, /demo/*, /components/*) is
+// intentionally NOT listed — live marketing CTAs point at it.
+const internalOnlyRoutes = new Set([
+  '/test-sentry',
+  '/admin-test',
+  '/nightmare-fuel-demo',
+  '/brutalist-demo',
+  '/style-guide',
+  '/search-demo',
+  '/therapy-chat-plan',
+])
+
+const internalOnlyPrefixes = ['/dev/', '/browser-compatibility/']
+
+/**
+ * In production, rewrite internal/test-only pages to the 404 page.
+ * Uses next('/404') so the rest of the middleware chain still runs.
+ */
+const internalRouteGate: MiddlewareHandler = defineMiddleware(
+  (context, next) => {
+    if (!import.meta.env.PROD) {
+      return next()
+    }
+    const pathname = context.url.pathname.replace(/\/+$/, '') || '/'
+    const blocked =
+      internalOnlyRoutes.has(pathname) ||
+      internalOnlyPrefixes.some((prefix) => pathname.startsWith(prefix)) ||
+      pathname === '/dev' ||
+      pathname === '/browser-compatibility'
+    if (blocked) {
+      return next('/404')
+    }
+    return next()
+  },
+)
+
 // Route authentication configuration
 // Defines which routes require authentication and what strategy/scopes to use
 const routeAuthConfig: RouteConfig[] = [
@@ -125,6 +162,7 @@ export const onRequest = sequence(
   generateCspNonce,
   securityHeaders,
   corsMiddleware,
+  internalRouteGate,
   projectAuthMiddleware,
   rateLimitMiddleware,
   apiVersioningMiddleware,

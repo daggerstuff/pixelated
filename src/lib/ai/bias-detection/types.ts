@@ -616,6 +616,12 @@ export interface PerformanceSnapshot {
     averageResponseTime: number
     requestCount: number
     errorRate: number
+    /** P50 latency in ms (median) */
+    p50Latency: number
+    /** P95 latency in ms */
+    p95Latency: number
+    /** P99 latency in ms */
+    p99Latency: number
   }
 }
 

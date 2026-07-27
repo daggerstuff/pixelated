@@ -502,7 +502,7 @@ export function LoginForm({
       {mode === 'login' && showSignup && (
         <button
           type="button"
-          onClick={() => (globalThis.location.href = '/signup')}
+          onClick={() => (globalThis.location.href = '/register')}
           className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus mt-2 underline"
         >
           Don&apos;t have an account? Sign up
