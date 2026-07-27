@@ -65,9 +65,3 @@ export class PixelatedAutoSdk {
 export function createPixelatedClient(config: AutoSdkConfig = {}): PixelatedAutoSdk {
   return new PixelatedAutoSdk(config);
 }
-
-// Back-compat: previous SDK export.
-export {
-  PixelatedClient,
-  type PixelatedConfig,
-} from "../../pixelated-sdk/src/index.js";

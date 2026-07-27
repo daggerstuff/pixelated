@@ -23,16 +23,12 @@
   },
   "files": [
     "dist",
-    "README.md",
-    "GENERATED_README.md"
+    "README.md"
   ],
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist generated",
     "generate": "../../scripts/ci/generate-sdks.sh"
-  },
-  "dependencies": {
-    "form-data": "^4.0.0"
   },
   "devDependencies": {
     "typescript": "~5.7.3"
