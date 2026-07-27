@@ -52,11 +52,32 @@ function generateSalt(): string {
 }
 
 /**
+ * Max age of a ZK proof in milliseconds (5 minutes).
+ * Proofs older than this are rejected during verification to limit
+ * exposure to replay attacks and stale artifacts.
+ */
+export const MAX_PROOF_AGE_MS = 5 * 60 * 1000
+
+/**
+ * Generate a cryptographically-random hex nonce (32 bytes → 64 hex chars).
+ */
+function generateNonce(): string {
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(32))
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+}
+
+/**
  * ZK Proof artifact for data pipeline integrity.
  *
  * When SP1 is available, `proof` contains the SP1 zkVM proof bytes.
  * When SP1 is not available, `proofMode` is 'hash-commitment' and
  * `proof` contains a SHA-256 hash commitment (fallback).
+ *
+ * Every proof carries a unique `nonce` to enable replay-attack detection
+ * at the API layer. The `timestamp` field is checked against
+ * `MAX_PROOF_AGE_MS` during verification.
  */
 export interface ZKProofArtifact {
   /** SP1 proof bytes (hex) or hash-commitment proof (hex) */
@@ -75,6 +96,13 @@ export interface ZKProofArtifact {
   durationMs: number
   /** Proof mode: 'sp1' for real ZK proofs, 'hash-commitment' for fallback */
   proofMode: 'sp1' | 'hash-commitment'
+  /**
+   * Unique nonce per proof generation (32 random bytes as 64 hex chars).
+   * Enables replay-attack detection at the API layer: once a nonce has
+   * been presented for verification it should be recorded and subsequent
+   * attempts with the same nonce rejected.
+   */
+  nonce: string
 }
 
 /**
@@ -192,6 +220,7 @@ export class ZKProofService {
       timestamp: Date.now(),
       durationMs,
       proofMode: proofResult.mode,
+      nonce: generateNonce(),
     }
   }
 
@@ -249,6 +278,35 @@ export class ZKProofService {
       logger.warn("ZK proof verification failed: merkle root format invalid");
       return false;
     }
+
+    // Timestamp freshness: reject proofs older than MAX_PROOF_AGE_MS.
+    // This limits the window for replay attacks and ensures callers are
+    // verifying against recent, relevant pipeline steps.
+    const age = Date.now() - proof.timestamp
+    if (age > MAX_PROOF_AGE_MS) {
+      logger.warn('ZK proof verification failed: proof expired', {
+        ageMs: age,
+        maxAgeMs: MAX_PROOF_AGE_MS,
+        timestamp: proof.timestamp,
+      })
+      return false
+    }
+    if (age < 0) {
+      // Proof timestamp is in the future — likely clock drift or tampering.
+      logger.warn('ZK proof verification failed: proof timestamp in the future', {
+        ageMs: age,
+        timestamp: proof.timestamp,
+      })
+      return false
+    }
+
+    // Nonce format guard: ensure a nonce was provided so the API layer
+    // can enforce replay-attack prevention.
+    if (!proof.nonce || !/^[0-9a-f]{64}$/.test(proof.nonce)) {
+      logger.warn('ZK proof verification failed: nonce missing or malformed')
+      return false
+    }
+
     if (proof.publicInputHash !== expectedInputHash) {
       logger.warn('ZK proof verification failed: input hash mismatch')
       return false
