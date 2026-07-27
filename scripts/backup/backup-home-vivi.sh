@@ -2,7 +2,11 @@
 set -euo pipefail
 
 SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
-RCLONE_TARGET="${RCLONE_TARGET:-azureblob:vivi-home-backups}"
+# Legacy single-target knob. Default emptied so the multi-target setup
+# below takes precedence; the same script runs the twice-daily fleet
+# across hosts and uploads to 2 destinations (whitebat S3 + gdrive),
+# each under a hostname-keyed subfolder.
+RCLONE_TARGET="${RCLONE_TARGET:-}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
 LOCK_FILE_BASE="${HOME:-/home/vivi}"
 BACKUP_MODE="${BACKUP_MODE:-incremental}"
@@ -102,6 +106,17 @@ fi
 if [[ "${BACKUP_SKIP_SECTIONS}" != *".cargo"* ]]; then
   BACKUP_SKIP_SECTIONS+=" .cargo"
 fi
+# Per-host routing: each host writes under its own subfolder so the same
+# script, schedule, and buckets are shared across the 3-server fleet.
+# Sanitize to chars valid on every backend (S3, GCS, Drive, Azure Blob).
+if [[ -z "${BACKUP_HOSTNAME_RAW:-}" ]]; then
+  BACKUP_HOSTNAME_RAW="${BACKUP_HOSTNAME:-$(hostname 2>/dev/null || uname -n 2>/dev/null || echo unknown)}"
+fi
+BACKUP_HOSTNAME="$(printf '%s' "$BACKUP_HOSTNAME_RAW" | tr -c '[:alnum:]._-' '-')"
+if [[ -z "$BACKUP_HOSTNAME" || "$BACKUP_HOSTNAME" == "-" ]]; then
+  BACKUP_HOSTNAME="unknown"
+fi
+export BACKUP_HOSTNAME
 BACKUP_HEARTBEAT_INTERVAL="${BACKUP_HEARTBEAT_INTERVAL:-120}"
 SECTION_BACKUP_PATHS=()
 SECTION_FAIL_COUNT=0
@@ -113,116 +128,79 @@ BACKUP_RUN_STATE_FILE="${BACKUP_RUN_STATE_FILE:-}"
 BACKUP_RUN_STATE_MAX_AGE_SECONDS="${BACKUP_RUN_STATE_MAX_AGE_SECONDS:-0}"
 declare -A COMPLETED_SECTIONS=()
 
-if [[ "$RCLONE_TARGET" == "drive:vivi-home-backups" ]]; then
-  RCLONE_TARGET="gdrive:vivi-home-backups"
-fi
-
-# Normalize home context because systemd Environment substitutions can be resolved incorrectly
-# in some deployment paths (for example, resolving %h as /root before service user switches).
-if [[ -z "${HOME:-}" || ! -d "$HOME" || "$HOME" == "/root" ]]; then
-  if [[ -d "/home/vivi" ]]; then
-    export HOME="/home/vivi"
-  elif [[ "${SOURCE_DIR%/*}" == "/home" && -d "$SOURCE_DIR" ]]; then
-    export HOME="$SOURCE_DIR"
-  else
-    HOME="/home/$(id -un)"
-    export HOME
+# ----------------------------------------------------------------------------
+# Multi-target destination setup
+#
+# Ordered list of rclone upload targets for this backup run:
+#   1. RCLONE_TARGETS_RAW  -- newline/','/';' separated `remote:path` entries
+#      (explicit, lets hosts add or remove destinations per-environment).
+#   2. RCLONE_TARGET       -- legacy single-target knob (back-compat).
+#   3. BACKUP_WHITEBAT_TARGET -- defaults to `whitebat:home-backups`.
+#   4. BACKUP_GDRIVE_TARGET   -- defaults to `gdrive:vivi-home-backups`.
+#
+# Each destination is rewritten to `${base%/}/${BACKUP_HOSTNAME}/` so multiple
+# hosts can share the same buckets without collisions. Per-target retention
+# keeps the most recent BACKUP_KEEP_RUNS run folders per host.
+# ----------------------------------------------------------------------------
+RCLONE_TARGETS=()
+_add_target() {
+  local raw="${1:-}"
+  if [[ -z "$raw" ]]; then
+    return 0
   fi
-fi
-
-LOCK_FILE_BASE="$HOME"
-BACKUP_DIR="${BACKUP_DIR:-$HOME/.local/share/home_backups}"
-LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
-LOCK_FILE="${LOCK_FILE_BASE}/.cache/home-vivi-backup.lock"
-BACKUP_RESUME_STATE_DIR="${BACKUP_RESUME_STATE_DIR:-$BACKUP_DIR/.backup-state}"
-BACKUP_RUN_STATE_FILE="${BACKUP_RUN_STATE_FILE:-$BACKUP_RESUME_STATE_DIR/sectioned-run-state}"
-mkdir -p "$BACKUP_RESUME_STATE_DIR"
-
-if [[ -z "$BACKUP_RUN_ID" && -s "$BACKUP_RUN_STATE_FILE" ]]; then
-  SAVED_RUN_ID="$(tr -d '[:space:]' < "$BACKUP_RUN_STATE_FILE")"
-  if [[ -n "$SAVED_RUN_ID" ]]; then
-    if (( BACKUP_RUN_STATE_MAX_AGE_SECONDS > 0 )); then
-      BACKUP_RUN_STATE_MTIME="$(stat -c %Y "$BACKUP_RUN_STATE_FILE" 2>/dev/null || echo 0)"
-      BACKUP_RUN_STATE_AGE="$(( $(date +%s) - BACKUP_RUN_STATE_MTIME ))"
-      if (( BACKUP_RUN_STATE_AGE < 0 || BACKUP_RUN_STATE_AGE > BACKUP_RUN_STATE_MAX_AGE_SECONDS )); then
-        SAVED_RUN_ID=""
-      fi
-    fi
-    if [[ -n "$SAVED_RUN_ID" ]]; then
-      BACKUP_RUN_ID="$SAVED_RUN_ID"
-    fi
+  case "$raw" in
+    drive:*) raw="gdrive:${raw#drive:}" ;;
+  esac
+  local trimmed
+  trimmed="$(printf '%s' "$raw" | sed 's/^[[:space:]]*//; s/[[:space:]]*$//; s:/+$::')"
+  if [[ -z "$trimmed" || "$trimmed" != *:* ]]; then
+    return 0
   fi
-fi
-BACKUP_RUN_ID="${BACKUP_RUN_ID:-$(date +%Y%m%d-%H%M%S)}"
-BACKUP_SECTION_COMPLETED_FILE="${BACKUP_SECTION_COMPLETED_FILE:-$BACKUP_RESUME_STATE_DIR/sectioned-completed.${BACKUP_RUN_ID}}"
-echo "$BACKUP_RUN_ID" > "$BACKUP_RUN_STATE_FILE"
-
-if [[ -n "${RCLONE_CONFIG:-}" && ! -r "$RCLONE_CONFIG" ]]; then
-  RCLONE_CONFIG=""
-fi
-
-if [[ -z "${RCLONE_CONFIG:-}" ]]; then
-  if [[ -r "${HOME}/.config/rclone/rclone.conf" ]]; then
-    export RCLONE_CONFIG="${HOME}/.config/rclone/rclone.conf"
-  elif [[ "${SOURCE_DIR%/*}" == "/home" && -r "${SOURCE_DIR}/.config/rclone/rclone.conf" ]]; then
-    export RCLONE_CONFIG="${SOURCE_DIR}/.config/rclone/rclone.conf"
-    export HOME="$SOURCE_DIR"
-    LOG_FILE="${BACKUP_LOG_FILE:-$BACKUP_DIR/backup.log}"
-    LOCK_FILE="${HOME}/.cache/home-vivi-backup.lock"
-  fi
-fi
-
-if [[ -z "${RCLONE_CONFIG:-}" || ! -r "$RCLONE_CONFIG" ]]; then
-  echo "Unable to locate a readable rclone config file for backup upload." >&2
-  echo "Expected one of:" >&2
-  echo "  ${HOME}/.config/rclone/rclone.conf" >&2
-  [[ "${SOURCE_DIR%/*}" == "/home" ]] && echo "  ${SOURCE_DIR}/.config/rclone/rclone.conf" >&2
-  exit 1
-fi
-
-mkdir -p "$BACKUP_DIR"
-mkdir -p "$(dirname "$LOG_FILE")" "$(dirname "$LOCK_FILE")"
-mkdir -p "$SOURCE_DIR"
-
-log() {
-  printf '%s [backup] %s\n' "$(date -Iseconds)" "$*" | tee -a "$LOG_FILE"
+  RCLONE_TARGETS+=("$trimmed")
+  return 0
 }
 
-if ! command -v rclone >/dev/null 2>&1; then
-  log "rclone is required but not available"
-  exit 1
+if [[ -n "${RCLONE_TARGETS_RAW:-}" ]]; then
+  while IFS= read -r entry; do
+    _add_target "$entry"
+  done < <(printf '%s' "$RCLONE_TARGETS_RAW" | tr ',;' '\n')
 fi
+_add_target "$RCLONE_TARGET"
+_add_target "${BACKUP_WHITEBAT_TARGET:-whitebat:home-backups}"
+_add_target "${BACKUP_GDRIVE_TARGET:-gdrive:vivi-home-backups}"
 
-if ! command -v tar >/dev/null 2>&1 && [[ "$BACKUP_MODE" == "full" ]]; then
-  log "tar is required for full backup mode but is not available"
-  exit 1
-fi
-
-if [[ "$RCLONE_TARGET" == *:* ]]; then
-  RCLONE_REMOTE="${RCLONE_TARGET%%:*}"
-else
-  RCLONE_REMOTE=""
-fi
-if [[ -z "$RCLONE_REMOTE" ]]; then
-  log "Invalid RCLONE_TARGET value '$RCLONE_TARGET'. Expected format remote:path"
-  exit 1
-fi
-
-if ! rclone listremotes | grep -Fxq "${RCLONE_REMOTE}:"; then
-  log "Rclone remote '$RCLONE_REMOTE' is not configured"
-  log "Run 'rclone config' as user 'vivi' and then retry."
-  exit 1
-fi
-
+# Apply the global RCLONE_SYNC_PATH prefix (if set) to every target before
+# the per-host segment is appended inside the dispatcher.
 if [[ -n "$RCLONE_SYNC_PATH" ]]; then
-  if [[ "$RCLONE_TARGET" == *: ]]; then
-    RCLONE_DEST="$RCLONE_TARGET/$RCLONE_SYNC_PATH"
-  else
-    RCLONE_DEST="${RCLONE_TARGET%/}/$RCLONE_SYNC_PATH"
-  fi
-else
-  RCLONE_DEST="$RCLONE_TARGET"
+  _sync_path_trimmed="${RCLONE_SYNC_PATH#/}"
+  _sync_path_trimmed="${_sync_path_trimmed%/}"
+  for idx in "${!RCLONE_TARGETS[@]}"; do
+    t="${RCLONE_TARGETS[$idx]}"
+    RCLONE_TARGETS[$idx]="${t%/}/${_sync_path_trimmed}"
+  done
 fi
+
+# Fail fast on misconfigured targets / missing rclone remotes.
+if (( ${#RCLONE_TARGETS[@]} == 0 )); then
+  echo "No rclone upload targets configured. Set RCLONE_TARGETS, BACKUP_WHITEBAT_TARGET, or BACKUP_GDRIVE_TARGET." >&2
+  exit 1
+fi
+
+declare -a _VALID_REMOTES
+for t in "${RCLONE_TARGETS[@]}"; do
+  _remote="${t%%:*}"
+  if [[ -z "$_remote" || "$_remote" == "$t" || "$_remote" == */* ]]; then
+    echo "Invalid target '$t'. Expected remote:path" >&2
+    exit 1
+  fi
+  if ! rclone listremotes 2>/dev/null | grep -Fxq "${_remote}:"; then
+    echo "Rclone remote '$_remote' (target '$t') is not configured." >&2
+    echo "Run 'rclone config' as the service user and retry." >&2
+    exit 1
+  fi
+  _VALID_REMOTES+=("$_remote")
+done
+unset _remote _sync_path_trimmed t
 
 declare -a RCLONE_COPY_ARGS
 declare -a RCLONE_EXCLUDE_PATHS
