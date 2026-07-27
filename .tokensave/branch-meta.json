@@ -1,0 +1,10 @@
+{
+  "default_branch": "staging",
+  "branches": {
+    "staging": {
+      "db_file": "tokensave.db",
+      "created_at": "1785084269",
+      "last_synced_at": "1785084269"
+    }
+  }
+}
