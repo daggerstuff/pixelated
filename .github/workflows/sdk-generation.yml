@@ -136,7 +136,7 @@ jobs:
           echo "ts_files=$TS_FILES" >> $GITHUB_OUTPUT
           echo "py_files=$PY_FILES" >> $GITHUB_OUTPUT
 
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: sdk-generation
           message: |
