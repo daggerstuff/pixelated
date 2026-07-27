@@ -30,6 +30,9 @@ AI models to process the data.
   - Emotional pattern detection
   - Intervention effectiveness analysis
   - Risk assessment
+- **Encrypted Memory & Session Storage**: Secure storage for therapy session data
+- **Crisis Detection**: Homomorphic pattern matching for risk assessment
+- **Performance Caching**: Optimized FHE operations with intelligent caching
 
 ## Implementation Details
 
@@ -115,12 +118,58 @@ const sentimentTrend = await fheAnalytics.analyzeSentimentTrend(messages)
 const dashboard = await fheAnalytics.createAnalyticsDashboard(messages)
 ```
 
-### Export Public Key for External Use
+### Encrypted Memory & Session Storage
 
 ```typescript
-const publicKey = fheService.exportPublicKey()
-// Share this key with external systems that need to encrypt data
-// that your system will process homomorphically
+import { encryptedMemory } from '@/lib/fhe/encrypted-memory'
+
+// Create encrypted session
+const session = await encryptedMemory.createSession(
+  'session-123',
+  'therapist-456',
+  messages,
+)
+
+// Store emotional state
+await encryptedMemory.storeEmotionalState(
+  'session-123',
+  [0.8, 0.2, 0.1],
+  'emotion',
+)
+
+// Analyze emotional trajectory
+const trajectory =
+  await encryptedMemory.analyzeEmotionalTrajectory('session-123')
+```
+
+### Crisis Detection on Encrypted Patterns
+
+```typescript
+import { crisisDetection } from '@/lib/fhe/crisis-detection'
+
+// Analyze messages for crisis indicators
+const assessment = await crisisDetection.analyzeMessages(
+  'session-123',
+  messages,
+)
+
+// Check risk level
+if (assessment.riskLevel === 'critical') {
+  await crisisDetection.alertOnCriticalRisk(assessment)
+}
+```
+
+### FHE Caching for Performance
+
+```typescript
+import { fheCache } from '@/lib/fhe/fhe-cache'
+
+// Pre-warm cache with common patterns
+await fheCache.prewarmCache()
+
+// Get cache statistics
+const stats = fheCache.getStats()
+console.log(`Hit rate: ${stats.hitRate * 100}%`)
 ```
 
 ## Architecture
@@ -132,6 +181,9 @@ The FHE module consists of:
 3. **FHEOperation**: Enum of operations that can be performed on encrypted data
 4. **SEAL Context**: Management of cryptographic keys and operations
 5. **Types**: Interfaces for requests, responses, and metadata
+6. **EncryptedMemory**: Session and memory storage with FHE
+7. **CrisisDetection**: Homomorphic pattern matching for risk assessment
+8. **FHECache**: Performance optimization with intelligent caching
 
 ## Microsoft SEAL Implementation Details
 
@@ -174,7 +226,11 @@ FHE operations are computationally intensive. Consider the following:
 1. Key generation is slow and should be done during initialization
 2. Encrypting and decrypting with FHE takes more time than standard encryption
 3. Homomorphic operations are slower than plaintext operations
-4. For maximum performance, consider using Web Workers for FHE operations
+4. For maximum performance, consider using:
+   - FHE caching layer (`fheCache`)
+   - Web Workers for FHE operations
+   - Batch encryption/decryption operations
+   - Session-based caching for repeated operations
 
 ## Security Considerations
 
@@ -185,6 +241,7 @@ While using FHE:
 3. Apply appropriate access controls to FHE operations
 4. Monitor for timing attacks and side-channel vulnerabilities
 5. Ensure all communication channels are properly secured
+6. Use HIPAA-compliant encryption modes for patient data
 
 ## Real-world Application
 
@@ -194,3 +251,27 @@ In the therapy chat context, FHE enables:
 2. Detection of concerning patterns without compromising patient privacy
 3. Generation of insights while maintaining HIPAA compliance
 4. Secure collaboration between different healthcare providers
+5. Encrypted session storage for longitudinal therapy tracking
+6. Real-time crisis detection on encrypted data
+7. Performance optimization through intelligent caching
+
+## Module Structure
+
+```
+src/lib/fhe/
+├── types.ts                    # Type definitions and interfaces
+├── fhe-service.ts              # Main FHE service implementation
+├── fhe-factory.ts              # Service factory with mock/real implementations
+├── encrypted-text-processor.ts # Text processing on encrypted data
+├── fhe-emotion-classifier.ts   # Emotion classification on encrypted data
+├── analytics.ts                # Privacy-preserving analytics
+├── encrypted-memory.ts         # Encrypted session & memory storage (NEW)
+├── crisis-detection.ts         # Crisis detection on encrypted patterns (NEW)
+├── fhe-cache.ts                # Performance caching layer (NEW)
+├── seal-service.ts             # SEAL library wrapper
+├── seal-operations.ts          # Homomorphic operations
+├── zk-proof-service.ts         # Zero-knowledge proof verification
+├── sp1-prover.ts               # SP1 proof generation
+├── mock/                       # Mock implementations for testing
+└── __tests__/                  # Test suites
+```
