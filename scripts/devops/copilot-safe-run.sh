@@ -8,7 +8,7 @@ if [[ $# -eq 0 ]]; then
 fi
 
 COMMAND=("$@")
-DEFAULT_NEMOTRON_MODEL="nvidia/llama-3.2-90b-instruct"
+DEFAULT_NEMOTRON_MODEL="groq/openai/gpt-oss-120b"
 
 _copilot_safe_is_forbidden_model() {
   local candidate="$1"

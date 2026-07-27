@@ -17,10 +17,9 @@ if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/nul
   fi
 fi
 
-# NIM endpoint (OpenAI-compatible)
-export COPILOT_PROVIDER_BASE_URL="https://integrate.api.nvidia.com/v1"
-export NVIDIA_API_KEY="${NVIDIA_API_KEY:-${NVIDIA_NIM_API_KEY:-${NVIDIA_TOKEN:-}}}"
-export COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"
+# 9Router endpoint (OpenAI-compatible)
+export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
+export COPILOT_PROVIDER_API_KEY="sk_9router"
 export COPILOT_PROVIDER_TYPE="openai"
 
 # Keep qwen/GPT-4o mini drift from being reused as default for this project.
@@ -80,10 +79,10 @@ is_forbidden_model() {
   _nim_byok_is_forbidden_model "$@"
 }
 
-# Wire model — exact ID sent to Nvidia NIM. Environment can override these
+# Wire model — exact ID sent to 9Router. Environment can override these
 # values if you need to temporarily switch providers/models.
-export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-openai/gpt-oss-120b}"
-export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-m2.7}")"
+export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-groq/openai/gpt-oss-120b}"
+export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-groq/openai/gpt-oss-120b groq/llama-3.3-70b-versatile nvidia/z-ai/glm-5.2 nvidia/deepseek-ai/deepseek-v4-flash nvidia/moonshotai/kimi-k2.6 nvidia/minimaxai/minimax-m2.7}")"
 export COPILOT_MODEL="$(_nim_byok_sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
 
 # Provider model ID used by Copilot's BYOK wiring.
@@ -98,7 +97,7 @@ export COPILOT_PROVIDER_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${C
 export COPILOT_PROVIDER_MAX_PROMPT_TOKENS="120000"
 export COPILOT_PROVIDER_MAX_OUTPUT_TOKENS="8192"
 
-echo "Nvidia NIM BYOK configured:"
+echo "9Router BYOK configured:"
 echo "  Base URL: ${COPILOT_PROVIDER_BASE_URL}"
 echo "  Model:    ${COPILOT_MODEL}"
 echo "  Provider Model ID: ${COPILOT_PROVIDER_MODEL_ID}"
@@ -107,10 +106,9 @@ echo "  Fallback Provider IDs: ${COPILOT_PROVIDER_MODEL_SEQUENCE}"
 echo "  Tokens:   ${COPILOT_PROVIDER_MAX_PROMPT_TOKENS} prompt / ${COPILOT_PROVIDER_MAX_OUTPUT_TOKENS} output"
 echo ""
 echo "Switch model: export COPILOT_MODEL=<model-id>"
-echo "  GPT OSS:         openai/gpt-oss-120b"
-echo "  Nemotron Super:  nvidia/llama-3.3-nemotron-super-49b-v1.5"
-echo "  NIM default:     ${NIM_DEFAULT_MODEL}"
-echo "  GLM-5.1:         z-ai/glm-5.1"
-echo "  DeepSeek V3.2:   deepseek-ai/deepseek-v3.2"
-echo "  Kimi K2.6:       moonshotai/kimi-k2.6"
-echo "  MiniMax 2.7:     minimaxai/minimax-m2.7"
+echo "  GPT OSS:         groq/openai/gpt-oss-120b"
+echo "  Llama 3.3 70B:   groq/llama-3.3-70b-versatile"
+echo "  GLM-5.2:         nvidia/z-ai/glm-5.2"
+echo "  DeepSeek V4:     nvidia/deepseek-ai/deepseek-v4-flash"
+echo "  Kimi K2.6:       nvidia/moonshotai/kimi-k2.6"
+echo "  MiniMax 2.7:     nvidia/minimaxai/minimax-m2.7"
