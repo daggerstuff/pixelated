@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Wait for PostgreSQL
         run: |
@@ -151,7 +151,7 @@ jobs:
           echo "::notice::Schema integrity verified — no orphaned constraints"
 
       - name: Upload migration artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: migration-artifacts
@@ -162,7 +162,7 @@ jobs:
 
       - name: Post PR comment with results
         if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: 'Migration Validation'
           path: |

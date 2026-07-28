@@ -951,6 +951,12 @@ export default defineConfig({
   redirects: {
     '/admin': '/admin/dashboard',
     '/docs': '/docs/getting-started',
+    // Auth de-duplication: one login and one register surface.
+    '/signin': { status: 301, destination: '/login' },
+    '/signup': { status: 301, destination: '/register' },
+    // Chat consolidation: retired demo-grade and dead-mock chat pages.
+    '/ai-chat': { status: 301, destination: '/chat' },
+    '/mental-health-chat': { status: 301, destination: '/chat' },
   },
   devToolbar: {
     enabled: isDevelopment,

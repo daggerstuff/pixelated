@@ -173,7 +173,7 @@ export function requirePermission(permission: Permission) {
 
     if (!user) {
       return redirect(
-        `/signin?error=${encodeURIComponent(
+        `/login?error=${encodeURIComponent(
           'You must be signed in to access this page',
         )}`,
       )

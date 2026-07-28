@@ -2,6 +2,10 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 
+// Ensure a real 404 status even when this page is reached via a rewrite
+// (e.g. the production gate for internal-only routes in middleware.ts).
+Astro.response.status = 404
+
 const title = 'Page not found'
 const description =
   'The page you tried to reach is not here. Use the routes below to get back to a live surface.'
