@@ -2,7 +2,6 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import { SITE } from '@/config'
 import {
   heroContent,
   workflowContent,
@@ -56,25 +55,6 @@ const buildableScenarios = [
 
 <BaseLayout title={hero.title} description={hero.metaDescription}>
   <div class="np-page">
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        'name': SITE.name,
-        'url': SITE.website,
-        'description': SITE.description,
-        'foundingDate': '2024',
-        'sameAs': [
-          'https://github.com/nochadisfaction',
-          'https://twitter.com/empathypixel',
-        ],
-      })
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')}
-    />
-
     <!-- Hero: the one decision a visitor came here to make. -->
     <section class="np-hero">
       <div class="np-container">
@@ -97,6 +77,7 @@ const buildableScenarios = [
                 {hero.secondaryCTA.text}
               </a>
             </div>
+            <p class="np-hero__helper">{hero.helperText}</p>
           </div>
 
           <!-- Domain proof object: a clinical supervision record, not a chat log. -->
@@ -129,6 +110,7 @@ const buildableScenarios = [
                     have come.
                   </p>
                   <aside class="np-record__margin" data-kind="supervisor">
+                    <span class="np-record__margin-label">↳ supervisor note</span>
                     Hesitation at 00:48. Slow down before reassuring.
                   </aside>
                 </li>
@@ -139,6 +121,7 @@ const buildableScenarios = [
                     Want to keep going, or is this too much right now?
                   </p>
                   <aside class="np-record__margin" data-kind="supervisor">
+                    <span class="np-record__margin-label">↳ supervisor note</span>
                     Better. Checked immediacy before naming the fear.
                   </aside>
                 </li>
@@ -147,7 +130,7 @@ const buildableScenarios = [
 
             <footer class="np-record__foot">
               <span class="np-record__lane">Coaching lane · next attempt</span>
-              <span class="np-record__score">Coachable · retry by W5</span>
+              <span class="np-record__score">Coachable · retry by week 5</span>
             </footer>
           </aside>
         </div>
@@ -204,7 +187,7 @@ const buildableScenarios = [
           }
         </ol>
 
-        <div class="np-section-header" style="margin-top: 64px;">
+        <div class="np-section-header np-section-header--spaced">
           <span class="np-label">Scenarios your team can run today</span>
           <h2 class="np-headline">
             Three places teams start when training feels too improvised.
@@ -245,6 +228,11 @@ const buildableScenarios = [
               {cta.secondaryCTA.text}
             </a>
           </div>
+          <p class="np-cta__trust">
+            HIPAA-ready ·
+            <a href={withBasePath('/trust')}>Security &amp; data handling</a> ·
+            <a href={withBasePath('/terms')}>Terms</a>
+          </p>
           <p class="np-cta__meta">{cta.meta}</p>
         </div>
       </div>
