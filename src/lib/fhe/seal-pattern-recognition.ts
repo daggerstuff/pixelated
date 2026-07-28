@@ -441,6 +441,20 @@ export class SealPatternRecognitionService implements FHEService {
   }
 
   /**
+   * Encrypt multiple values
+   */
+  async encryptBatch(values: unknown[]): Promise<EncryptedData[]> {
+    return this.enhancedService.encryptBatch(values)
+  }
+
+  /**
+   * Decrypt multiple ciphertexts
+   */
+  async decryptBatch<T>(ciphertexts: EncryptedData<T>[]): Promise<T[]> {
+    return this.enhancedService.decryptBatch(ciphertexts)
+  }
+
+  /**
    * Enhanced service methods for cache and stats
    */
   async clearCache(): Promise<void> {

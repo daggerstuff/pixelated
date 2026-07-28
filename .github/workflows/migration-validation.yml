@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Wait for PostgreSQL
         run: |
@@ -85,14 +85,17 @@ jobs:
             echo "No migration files found"
             exit 1
           fi
-          for f in $MIGRATIONS; do
-            echo "::group::Dry-run: $(basename "$f")"
-            if ! echo "BEGIN; $(cat "$f") ROLLBACK;" | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
-              echo "::error::Dry-run failed for $(basename "$f")"
-              exit 1
-            fi
-            echo "::endgroup::"
-          done
+          echo "::group::Dry-run: all migrations in single transaction"
+          # Wrap ALL migration files in a single BEGIN/ROLLBACK so that later
+          # migrations can reference objects (tables, functions, etc.) created
+          # by earlier ones. Each file piped through cat avoids shell variable
+          # expansion of $ signs in SQL literals (e.g. bcrypt hashes).
+          # -- FILE: markers help trace psql line errors back to source files.
+          if ! { echo 'BEGIN;'; for f in $MIGRATIONS; do echo "-- FILE: $(basename "$f")"; cat "$f"; done; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$' | grep -v '^-- FILE:'; then
+            echo "::error::Dry-run failed"
+            exit 1
+          fi
+          echo "::endgroup::"
           echo "::notice::All migrations dry-run validated"
 
       - name: Apply forward migrations
@@ -135,11 +138,13 @@ jobs:
 
       - name: Verify schema integrity
         run: |
-          # After rollback, verify no orphaned constraints or indexes
+          # After rollback, verify no orphaned constraints or indexes.
+          # Exclude domain constraints (contypid != 0) — they have conrelid = 0
+          # by design and are valid constraints on custom DOMAIN types.
           ORPHANED=$(psql -t -c "
             SELECT count(*) FROM pg_constraint c
             LEFT JOIN pg_class t ON c.conrelid = t.oid
-            WHERE t.oid IS NULL;
+            WHERE t.oid IS NULL AND c.contypid = 0;
           ")
           if [ "$ORPHANED" -gt 0 ]; then
             echo "::error::Orphaned constraints found: $ORPHANED"
@@ -148,7 +153,7 @@ jobs:
           echo "::notice::Schema integrity verified — no orphaned constraints"
 
       - name: Upload migration artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: migration-artifacts
@@ -159,7 +164,7 @@ jobs:
 
       - name: Post PR comment with results
         if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: 'Migration Validation'
           path: |

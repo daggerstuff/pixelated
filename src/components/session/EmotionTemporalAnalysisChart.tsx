@@ -14,6 +14,7 @@ import {
   AreaChart,
   Area,
 } from 'recharts'
+import type { ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
 
 // Per-view caption. Title in mono label role + body description per doctrine §3.
 const VIEW_MODES = [
@@ -336,7 +337,7 @@ export default function EmotionTemporalAnalysisChart({
           <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
           <Tooltip
             contentStyle={tooltipStyle}
-            formatter={(value: number | string, name: number | string) => {
+            formatter={((value: ValueType, name: NameType) => {
               if (name === 'slope') {
                 const numericValue = toNumber(value)
                 return [
@@ -351,7 +352,7 @@ export default function EmotionTemporalAnalysisChart({
                 return [formatNumber(value, 2), 'Significance']
               }
               return [value, name]
-            }}
+            }) as any}
           />
 
           <Legend />
@@ -480,7 +481,7 @@ export default function EmotionTemporalAnalysisChart({
 
           <Tooltip
             contentStyle={tooltipStyle}
-            formatter={(value: number | string, name: number | string) => {
+            formatter={((value: ValueType, name: NameType) => {
               if (name === 'frequency') {
                 return [value, 'Frequency']
               }
@@ -488,7 +489,7 @@ export default function EmotionTemporalAnalysisChart({
                 return [formatNumber(value, 1), 'Avg Duration (min)']
               }
               return [value, name]
-            }}
+            }) as any}
           />
 
           <Legend />
@@ -525,12 +526,12 @@ export default function EmotionTemporalAnalysisChart({
         <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={(value: number | string, name: number | string) => {
+          formatter={((value: ValueType, name: NameType) => {
             if (name === 'correlation') {
               return [formatNumber(value, 2), 'Correlation']
             }
             return [value, name]
-          }}
+          }) as any}
         />
         <Legend />
         <ReferenceLine y={0} stroke="var(--np-muted)" />

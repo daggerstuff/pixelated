@@ -1,6 +1,7 @@
 import { randomBytes, createHash } from 'crypto'
 
 import { VALID_API_KEY_SCOPES, ApiKeyScope } from '../auth/scopes'
+export type { ApiKeyScope }
 import { logSecurityEvent, SecurityEventType } from '../security'
 import { redis } from '../redis'
 import { query } from './index'

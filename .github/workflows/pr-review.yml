@@ -1,0 +1,39 @@
+---
+# OpenHands PR Review Workflow
+#
+# Add LLM_API_KEY in GitHub Settings -> Secrets and variables -> Actions.
+# Trigger a review by adding the "review-this" label or requesting
+# "openhands-agent" as a reviewer.
+name: PR Review by OpenHands
+
+on:
+  pull_request:
+    types: [labeled, review_requested]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  pr-review:
+    if: |
+      github.event.label.name == 'review-this' ||
+      github.event.requested_reviewer.login == 'openhands-agent'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout for composite action
+        uses: actions/checkout@v4
+        with:
+          repository: OpenHands/software-agent-sdk
+          ref: main
+          sparse-checkout: .github/actions/pr-review
+
+      - name: Run PR Review
+        uses: ./.github/actions/pr-review
+        with:
+          llm-model: anthropic/claude-sonnet-4-5-20250929
+          llm-base-url: ''
+          extensions-version: main
+          llm-api-key: ${{ secrets.LLM_API_KEY }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}

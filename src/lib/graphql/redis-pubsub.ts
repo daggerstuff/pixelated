@@ -15,7 +15,8 @@
  * - graphql:conversationTurnAdded
  */
 
-import type { Redis as RedisClient } from "ioredis";
+import type Redis from "ioredis";
+type RedisClient = Redis;
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
 const logger = createBuildSafeLogger("graphql-redis-pubsub");
@@ -106,7 +107,7 @@ class InMemoryPubSub {
 class RedisPubSub {
   private publisher: RedisClient | null = null;
   private subscriber: RedisClient | null = null;
-  private readonly topicHandlers: Map<string, Set<(payload: unknown) => void>> = new Map();
+  private readonly topicHandlerMap: Map<string, Set<(payload: unknown) => void>> = new Map();
   private initialized = false;
 
   /**
@@ -118,9 +119,8 @@ class RedisPubSub {
     if (this.initialized) return true;
 
     try {
-      // Import redis service lazily to avoid circular deps and build issues
-      const { redisService } = await import("@/lib/redis");
-      const client = redisService.getClient();
+      // Import redis client lazily to avoid circular deps and build issues
+      const { redis: client } = await import("@/lib/redis");
       if (!client) {
         logger.warn("Redis client not available, using in-memory fallback");
         return false;
@@ -129,22 +129,24 @@ class RedisPubSub {
       // Create duplicate connections for pub/sub
       // ioredis requires a dedicated connection for subscribing
       const Redis = (await import("ioredis")).default;
-      const redisUrl = (process.env.REDIS_URL ?? process.env.UPSTASH_REDIS_REST_URL) || "";
+      const redisUrl = (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) || "";
 
       if (redisUrl) {
         this.publisher = new Redis(redisUrl);
         this.subscriber = new Redis(redisUrl);
       } else {
-        // Try duplicating existing connection
-        this.publisher = client.duplicate();
-        this.subscriber = client.duplicate();
+        // Use legacy client directly (no duplicate needed)
+        this.publisher = client as unknown as RedisClient;
+        this.subscriber = client as unknown as RedisClient;
       }
 
       // Set up message handler
-      this.subscriber.on("message", (channel: string, message: string) => {
-        try {
+      {
+        const sub = this.subscriber as unknown as { on: (event: string, handler: (channel: string, message: string) => void) => void };
+        sub.on("message", (channel: string, message: string) => {
+          try {
           const payload = JSON.parse(message) as unknown;
-          const handlers = this.topicHandlers.get(channel);
+          const handlers = this.topicHandlerMap.get(channel);
           if (handlers) {
             for (const handler of handlers) {
               handler(payload);
@@ -156,7 +158,8 @@ class RedisPubSub {
             error: err instanceof Error ? err.message : String(err),
           });
         }
-      });
+        });
+      }
 
       this.initialized = true;
       logger.info("Redis pub/sub initialized");
@@ -199,10 +202,10 @@ class RedisPubSub {
       }
     };
 
-    if (!this.topicHandlers.has(channel)) {
-      this.topicHandlers.set(channel, new Set());
+    if (!this.topicHandlerMap.has(channel)) {
+      this.topicHandlerMap.set(channel, new Set());
     }
-    this.topicHandlers.get(channel)!.add(handler);
+    this.topicHandlerMap.get(channel)!.add(handler);
 
     return {
       [Symbol.asyncIterator]: () => ({
@@ -218,10 +221,10 @@ class RedisPubSub {
           });
         },
         return: (): Promise<IteratorResult<{ [key: string]: unknown }>> => {
-          this.topicHandlers.get(channel)?.delete(handler);
-          if (this.topicHandlers.get(channel)?.size === 0) {
-            this.topicHandlers.delete(channel);
-            this.subscriber?.unsubscribe(channel);
+          this.topicHandlerMap.get(channel)?.delete(handler);
+          if (this.topicHandlerMap.get(channel)?.size === 0) {
+            this.topicHandlerMap.delete(channel);
+            void this.subscriber?.unsubscribe(channel);
           }
           return Promise.resolve({ done: true, value: undefined });
         },
