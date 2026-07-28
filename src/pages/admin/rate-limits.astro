@@ -2,7 +2,7 @@
 import DashboardLayout from '@/layouts/DashboardLayout.astro'
 ---
 
-<DashboardLayout title="Rate Limits & Quota Management" active="rate-limits">
+<DashboardLayout title="Rate Limits & Quota Management">
   <section class="admin-section">
     <h2>Rate Limits & Quota Management</h2>
     <p>
@@ -301,30 +301,33 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       const res = await fetch('/api/v1/admin/rate-limits?stats=true')
       const data = await res.json()
 
-      document.getElementById('stat-total').textContent = data.totalKeys ?? 0
-      document.getElementById('stat-rate').textContent =
-        data.keysNearRateLimit ?? 0
-      document.getElementById('stat-daily').textContent =
-        data.keysNearDailyQuota ?? 0
-      document.getElementById('stat-monthly').textContent =
-        data.keysNearMonthlyQuota ?? 0
+      const statTotal = document.getElementById('stat-total')
+      const statRate = document.getElementById('stat-rate')
+      const statDaily = document.getElementById('stat-daily')
+      const statMonthly = document.getElementById('stat-monthly')
+      if (statTotal) statTotal.textContent = String(data.totalKeys ?? 0)
+      if (statRate) statRate.textContent = String(data.keysNearRateLimit ?? 0)
+      if (statDaily) statDaily.textContent = String(data.keysNearDailyQuota ?? 0)
+      if (statMonthly) statMonthly.textContent = String(data.keysNearMonthlyQuota ?? 0)
 
       const dist = document.getElementById('tier-distribution')
-      const colors = {
+      const colors: Record<string, string> = {
         free: '#6b7280',
         developer: '#3b82f6',
         professional: '#8b5cf6',
         enterprise: '#f59e0b',
       }
-      dist.innerHTML = Object.entries(data.tierDistribution || {})
-        .map(([tier, count]) => {
-          const c = colors[tier] || '#666'
-          return `<span class="tier-badge" style="background:${c}22;color:${c}">${tier}: ${count}</span>`
-        })
-        .join('')
+      if (dist) {
+        dist.innerHTML = Object.entries(data.tierDistribution || {})
+          .map(([tier, count]: [string, unknown]) => {
+            const c = (colors as Record<string, string>)[tier] || '#666'
+            return `<span class="tier-badge" style="background:${c}22;color:${c}">${tier}: ${count}</span>`
+          })
+          .join('')
+      }
 
       const tbody = document.getElementById('usage-tbody')
-      tbody.innerHTML =
+      if (tbody) tbody.innerHTML =
         (data.usages || [])
           .map((u) => {
             const ratePct =
@@ -360,7 +363,8 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           .join('') ||
         '<tr><td colspan="7" class="muted">No active keys</td></tr>'
     } catch {
-      document.getElementById('usage-tbody').innerHTML =
+      const errTbody = document.getElementById('usage-tbody')
+      if (errTbody) errTbody.innerHTML =
         '<tr><td colspan="7" class="muted">Failed to load</td></tr>'
     }
   }
@@ -370,6 +374,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       const res = await fetch('/api/v1/admin/rate-limits/alerts')
       const data = await res.json()
       const container = document.getElementById('alerts-container')
+      if (!container) return
 
       if (!data.alerts || data.alerts.length === 0) {
         container.innerHTML = '<p class="muted">No active alerts</p>'
@@ -388,7 +393,8 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           .join('')}
       `
     } catch {
-      document.getElementById('alerts-container').innerHTML =
+      const errContainer = document.getElementById('alerts-container')
+      if (errContainer) errContainer.innerHTML =
         '<p class="muted">Failed to load alerts</p>'
     }
   }

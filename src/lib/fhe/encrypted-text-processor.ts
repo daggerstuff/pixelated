@@ -23,7 +23,6 @@ import { SealOperations } from "./seal-operations";
 import { SealService } from "./seal-service";
 import type { SealCipherText } from "./seal-service";
 import { SealSchemeType } from "./seal-types";
-import type { SealOperationResult } from "./seal-types";
 import { FHEOperation } from "./types";
 
 const logger = createBuildSafeLogger("encrypted-text-processor");
@@ -184,11 +183,19 @@ export interface EncryptedTextResult {
     /** Time taken in milliseconds */
     durationMs: number;
     /** Encoding used */
-    encoding: "word-frequency" | "character-codes" | "binary-indicator";
+    encoding: "word-frequency" | "character-codes" | "binary-indicator" | "token-structure" | "filter-match-count" | "sentence-scores" | "flesch-kincaid";
     /** Slot count used */
     slotCount: number;
     /** Whether plaintext fallback was used for any step */
     plaintextFallback: boolean;
+    /** Number of sentences (for summarize operations) */
+    sentenceCount?: number;
+    /** Maximum result length (for summarize operations) */
+    maxLength?: number;
+    /** Scoring formula description (for summarize operations) */
+    scoringFormula?: string;
+    /** Number of filter terms (for filter operations) */
+    filterTermsCount?: number;
   };
 }
 
@@ -202,7 +209,6 @@ export class EncryptedTextProcessor {
   private static instance: EncryptedTextProcessor | null = null;
   private readonly sealService: SealService;
   private readonly sealOps: SealOperations;
-  private initialized = false;
 
   private constructor() {
     this.sealService = SealService.getInstance();
@@ -226,7 +232,6 @@ export class EncryptedTextProcessor {
       await this.sealService.initialize();
       await this.sealService.generateKeys();
     }
-    this.initialized = true;
   }
 
   /**
@@ -680,7 +685,7 @@ export class EncryptedTextProcessor {
    */
   public async encryptedTokenize(text: string): Promise<EncryptedTextResult> {
     const startTime = Date.now();
-    const slotCount = this.sealService.getSlotCount();
+    const slotCount = this.getSlotCount();
     let operationsCount = 0;
 
     const words = text.trim().split(/\s+/).filter(Boolean);
@@ -730,7 +735,7 @@ export class EncryptedTextProcessor {
    */
   public async encryptedFilter(text: string, filterTerms: string[]): Promise<EncryptedTextResult> {
     const startTime = Date.now();
-    const slotCount = this.sealService.getSlotCount();
+    const slotCount = this.getSlotCount();
     let operationsCount = 0;
 
     const words = text.trim().split(/\s+/).filter(Boolean);
@@ -757,8 +762,12 @@ export class EncryptedTextProcessor {
     let n = words.length;
     while (n > 1) {
       const half = Math.floor(n / 2);
-      const rotated = await this.sealOps.rotate(encryptedSum, half);
-      encryptedSum = await this.sealOps.add(encryptedSum, rotated);
+      const rotResult = await this.sealOps.rotate(encryptedSum, half);
+      if (!rotResult.success || !rotResult.result) continue;
+      const addResult = await this.sealOps.add(encryptedSum, rotResult.result as SealCipherText);
+      if (addResult.success && addResult.result) {
+        encryptedSum = addResult.result as SealCipherText;
+      }
       n = n - half;
       operationsCount += 2;
     }
@@ -806,7 +815,7 @@ export class EncryptedTextProcessor {
    */
   public async encryptedSummarize(text: string, maxLength = 100): Promise<EncryptedTextResult> {
     const startTime = Date.now();
-    const slotCount = this.sealService.getSlotCount();
+    const slotCount = this.getSlotCount();
     let operationsCount = 0;
 
     // Split into sentences (plaintext needed for sentence boundary detection)
@@ -897,7 +906,7 @@ export class EncryptedTextProcessor {
    */
   public async encryptedReadingLevel(text: string): Promise<EncryptedTextResult> {
     const startTime = Date.now();
-    const slotCount = this.sealService.getSlotCount();
+    const slotCount = this.getSlotCount();
     let operationsCount = 0;
 
     const words = text.trim().split(/\s+/).filter(Boolean);

@@ -51,7 +51,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Wait for PostgreSQL
         run: |
@@ -87,7 +87,10 @@ jobs:
           fi
           for f in $MIGRATIONS; do
             echo "::group::Dry-run: $(basename "$f")"
-            if ! echo "BEGIN; $(cat "$f") ROLLBACK;" | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
+            # Pipe migration through stdin with BEGIN/ROLLBACK wrapper.
+            # Avoid double-quoted echo of file contents to prevent shell
+            # variable expansion of $ signs in SQL literals (e.g. bcrypt hashes).
+            if ! { echo 'BEGIN;'; cat "$f"; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
               echo "::error::Dry-run failed for $(basename "$f")"
               exit 1
             fi
@@ -148,7 +151,7 @@ jobs:
           echo "::notice::Schema integrity verified — no orphaned constraints"
 
       - name: Upload migration artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: migration-artifacts
@@ -159,7 +162,7 @@ jobs:
 
       - name: Post PR comment with results
         if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           header: 'Migration Validation'
           path: |

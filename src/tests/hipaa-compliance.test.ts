@@ -68,7 +68,7 @@ describe('HIPAA §164.312(b) — Audit Controls', () => {
 
   it('security-baseline.json declares phi_access as a tracked audit event', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = require('node:path').resolve(
+    const baselinePath = (require('node:path') as typeof import('path')).resolve(
       process.cwd(),
       'security-baseline.json',
     )
@@ -177,7 +177,7 @@ describe('HIPAA §164.312(e)(1) — Transmission Security', () => {
 
   it('encryption uses AES-256-GCM (declared in baseline)', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = require('node:path').resolve(
+    const baselinePath = (require('node:path') as typeof import('path')).resolve(
       process.cwd(),
       'security-baseline.json',
     )
@@ -197,7 +197,7 @@ describe('HIPAA §164.312(e)(1) — Transmission Security', () => {
 describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
   it('security-baseline.json exists and has required top-level keys', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = require('node:path').resolve(
+    const baselinePath = (require('node:path') as typeof import('path')).resolve(
       process.cwd(),
       'security-baseline.json',
     )
@@ -210,12 +210,12 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
     }
     expect(baseline.version).toBeDefined()
     expect(baseline.baseline).toBeDefined()
-    expect(baseline.baseline.security_policies).toBeDefined()
+    expect(baseline.baseline['security_policies']).toBeDefined()
   })
 
   it('compliance standards include HIPAA', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = require('node:path').resolve(
+    const baselinePath = (require('node:path') as typeof import('path')).resolve(
       process.cwd(),
       'security-baseline.json',
     )
@@ -228,7 +228,7 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
 
   it('HIPAA compliance tests are required per security baseline', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = require('node:path').resolve(
+    const baselinePath = (require('node:path') as typeof import('path')).resolve(
       process.cwd(),
       'security-baseline.json',
     )
@@ -246,7 +246,7 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
 describe('HIPAA §164.314 — Organizational Requirements', () => {
   it('incident response has a defined contact and response time target', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = require('node:path').resolve(
+    const baselinePath = (require('node:path') as typeof import('path')).resolve(
       process.cwd(),
       'security-baseline.json',
     )
