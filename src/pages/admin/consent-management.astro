@@ -13,11 +13,11 @@ const expiryResult = await expiryService.checkExpiries()
 
 // Get all consent records
 const clientIds = new Set(auditTrail.map((entry) => entry.clientId))
-const records = []
+const records: import('@/lib/research/services/ConsentManagementService').ConsentRecord[] = []
 for (const id of clientIds) {
   const record = await consentManagementService.getConsentRecord(id)
   if (record) {
-    records.push(record)
+    records.push(record as import('@/lib/research/services/ConsentManagementService').ConsentRecord)
   }
 }
 ---
@@ -323,8 +323,8 @@ for (const id of clientIds) {
 <script>
   // Initialize consent
   document.getElementById('init-consent-btn')?.addEventListener('click', async () => {
-    const clientId = document.getElementById('new-client-id')?.value
-    const level = document.getElementById('new-consent-level')?.value
+    const clientId = (document.getElementById('new-client-id') as HTMLInputElement | null)?.value
+    const level = (document.getElementById('new-consent-level') as HTMLSelectElement | null)?.value
     if (!clientId) {
       alert('Client ID is required')
       return
@@ -342,16 +342,17 @@ for (const id of clientIds) {
         const err = await res.json()
         alert('Failed: ' + (err.error || 'Unknown error'))
       }
-    } catch (e) {
-      alert('Error: ' + e.message)
+    } catch (err) {
+      alert('Error: ' + (err instanceof Error ? err.message : String(err)))
     }
   })
 
   // Update / Withdraw actions
   document.querySelectorAll('button[data-action]').forEach((btn) => {
     btn.addEventListener('click', async () => {
-      const action = btn.dataset.action
-      const clientId = btn.dataset.clientId
+      const htmlBtn = btn as HTMLElement
+      const action = htmlBtn.dataset['action']
+      const clientId = htmlBtn.dataset['clientId']
       if (action === 'update') {
         const newLevel = prompt('Enter new consent level (minimal, limited, full):')
         if (!newLevel) return
@@ -368,9 +369,8 @@ for (const id of clientIds) {
           } else {
             const err = await res.json()
             alert('Failed: ' + (err.error || 'Unknown error'))
-          }
-        } catch (e) {
-          alert('Error: ' + e.message)
+          }          } catch (updateErr) {
+          alert('Error: ' + (updateErr instanceof Error ? updateErr.message : String(updateErr)))
         }
       } else if (action === 'withdraw') {
         const reason = prompt('Reason for withdrawal (optional):') || undefined
@@ -388,8 +388,8 @@ for (const id of clientIds) {
             const err = await res.json()
             alert('Failed: ' + (err.error || 'Unknown error'))
           }
-        } catch (e) {
-          alert('Error: ' + e.message)
+        } catch (withdrawErr) {
+          alert('Error: ' + (withdrawErr instanceof Error ? withdrawErr.message : String(withdrawErr)))
         }
       }
     })

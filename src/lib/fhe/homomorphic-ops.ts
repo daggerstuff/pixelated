@@ -341,6 +341,7 @@ export class HomomorphicOperations {
         inputCiphertext.load(context, serializedCiphertext)
 
         // Perform the operation using SEAL
+        // oxlint-disable-next-line typescript(switch-exhaustiveness-check)
         switch (operation) {
           case FHEOperation.Rescale:
             return this.simulateOperation(encryptedData, operation, params)
@@ -721,7 +722,7 @@ export class HomomorphicOperations {
         if (encResult) {
           logger.info(
             `Operation ${operation} performed fully homomorphically`,
-            { operationCount: encResult.metadata.operationsCount },
+            { operationCount: encResult.metadata['operationsCount'] },
           )
           return {
             success: true,
