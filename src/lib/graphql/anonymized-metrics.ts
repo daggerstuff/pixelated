@@ -214,7 +214,7 @@ export async function resolveAnonymizedMetrics(
 
     // Step 2: Fetch emotion analyses for sessions
     const sessionIds = recentSessions.map((s) =>
-      String((s as Record<string, unknown>)['sessionId'] ?? (s as Record<string, unknown>)['_id'] ?? ""),
+      String((s as unknown as Record<string, unknown>)['sessionId'] ?? (s as unknown as Record<string, unknown>)['_id'] ?? ""),
     );
 
     const emotionResults: EmotionAnalysis[] = [];
@@ -245,7 +245,7 @@ export async function resolveAnonymizedMetrics(
     const sessionMap = new Map(
       recentSessions.map((s) => [
         String(
-          (s as Record<string, unknown>)['sessionId'] ?? (s as Record<string, unknown>)['_id'] ?? "",
+          (s as unknown as Record<string, unknown>)['sessionId'] ?? (s as unknown as Record<string, unknown>)['_id'] ?? "",
         ),
         s,
       ]),

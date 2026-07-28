@@ -32,7 +32,7 @@ vi.mock("../persisted-queries", () => ({
 
 // Mock redis-pubsub — use in-memory EventEmitter-based pubsub in tests
 vi.mock("../redis-pubsub", () => {
-  const { EventEmitter } = require("events");
+  const { EventEmitter } = await import("events");
   const emitter = new EventEmitter();
   const graphqlPubSub = {
     subscribe: (topic: string) => {
