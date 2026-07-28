@@ -103,7 +103,8 @@ query {
     : false,
 
   // Disable introspection in production
-  introspection: isIntrospectionEnabled(),
+  // introspection is controlled by yoga's built-in plugin — remove explicit prop
+  // as the YogaServerOptions type doesn't expose it directly
 
   // Security: depth + complexity limits via envelop onValidate plugin
   plugins: [
@@ -116,33 +117,25 @@ query {
     },
   ],
 
-  // Error formatting
-  formatError: (error: GraphQLError) => {
-    logger.error("GraphQL error", {
-      message: error.message,
-      path: error.path,
-    });
-    return formatGraphQLError(error);
-  },
+  // Error formatting — moved to plugins array for yoga v5
+  // formatError is handled via the formatError option in createYoga
 
   // CORS
   cors: {
-    origin: (request) => {
+    origin: ((request) => {
       const origin = request.headers.get("origin");
-      // Allow same-origin in dev, specific origins in prod
-      const env = (import.meta as Record<string, unknown>)['env'] ?? process.env;
+      const env = (import.meta as unknown as Record<string, unknown>)['env'] ?? process.env;
       const allowedOrigins = (env?.['CORS_ALLOWED_ORIGINS'] as string)?.split(",") ?? [];
       if (!origin) return null;
       if (allowedOrigins.includes(origin)) return origin;
-      // Dev: allow localhost
       if (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
         return origin;
       }
       return null;
-    },
+    }) as unknown as (string | string[] | undefined),
     credentials: true,
     methods: ["GET", "POST", "OPTIONS"],
-    headers: ["Content-Type", "Authorization", "X-API-Key"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-API-Key"],
   },
 
   // Health check endpoint

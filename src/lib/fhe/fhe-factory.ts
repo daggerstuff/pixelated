@@ -340,6 +340,14 @@ const sealFHEService: FHEService = {
       throw error;
     }
   },
+
+  async encryptBatch(values: unknown[]): Promise<EncryptedData[]> {
+    return Promise.all(values.map((v) => this.encrypt(v)));
+  },
+
+  async decryptBatch<T>(ciphertexts: EncryptedData<T>[]): Promise<T[]> {
+    return Promise.all(ciphertexts.map((c) => this.decrypt<T>(c)));
+  },
 };
 
 /**
