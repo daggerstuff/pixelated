@@ -377,25 +377,25 @@ export class ConsentManagementService {
     const totalResult = await query(
       'SELECT COUNT(*) as count FROM consent_records',
     )
-    const totalClients = parseInt(totalResult.rows[0]?.count ?? '0', 10)
+    const totalClients = parseInt(totalResult.rows[0]?.['count'] ?? '0', 10)
 
     const activeResult = await query(
       `SELECT COUNT(*) as count FROM consent_records
        WHERE withdrawal_requested = false AND data_purged = false
        AND expiration_date > NOW()`,
     )
-    const activeConsents = parseInt(activeResult.rows[0]?.count ?? '0', 10)
+    const activeConsents = parseInt(activeResult.rows[0]?.['count'] ?? '0', 10)
 
     const withdrawalResult = await query(
       `SELECT COUNT(*) as count FROM consent_records WHERE withdrawal_requested = true`,
     )
-    const withdrawalRequests = parseInt(withdrawalResult.rows[0]?.count ?? '0', 10)
+    const withdrawalRequests = parseInt(withdrawalResult.rows[0]?.['count'] ?? '0', 10)
 
     const expiredResult = await query(
       `SELECT COUNT(*) as count FROM consent_records
        WHERE expiration_date <= NOW() AND withdrawal_requested = false AND data_purged = false`,
     )
-    const expiredConsents = parseInt(expiredResult.rows[0]?.count ?? '0', 10)
+    const expiredConsents = parseInt(expiredResult.rows[0]?.['count'] ?? '0', 10)
 
     const levelResult = await query(
       `SELECT current_level, COUNT(*) as count FROM consent_records

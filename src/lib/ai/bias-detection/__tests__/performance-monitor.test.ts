@@ -96,24 +96,36 @@ describe('PerformanceMonitor', () => {
       const promOutput = performanceMonitor.exportMetrics('prometheus')
       expect(promOutput).toContain('# HELP')
       expect(promOutput).toContain('# TYPE')
-      expect(promOutput).toContain('bias_detection_requests_total')
-      expect(promOutput).toContain('bias_detection_errors_total')
-      expect(promOutput).toContain('bias_detection_response_time_avg')
+      expect(promOutput).toContain('bias_engine_requests_total')
+      expect(promOutput).toContain('bias_engine_errors_total')
+      expect(promOutput).toContain('bias_engine_latency_p50_ms')
+      expect(promOutput).toContain('bias_engine_latency_p95_ms')
+      expect(promOutput).toContain('bias_engine_latency_p99_ms')
     })
 
     it('should produce valid Prometheus metric format', () => {
       const promOutput = performanceMonitor.exportMetrics('prometheus')
       const lines = promOutput.split('\n')
       const metricLines = lines.filter(
-        (line) =>
-          line.startsWith('bias_detection_') && !line.startsWith('#'),
+        (line) => line.startsWith('bias_engine_') && !line.startsWith('#'),
       )
       expect(metricLines.length).toBeGreaterThan(0)
       metricLines.forEach((line) => {
-        const parts = line.split(' ')
-        expect(parts.length).toBe(2)
-        expect(Number.isFinite(Number(parts[1]))).toBe(true)
+        // Per-endpoint lines have format `name{labels} value`; per-endpoint
+        // metrics use 3+ parts. The simple counters use 2 parts. Accept both.
+        const trimmed = line.replace(/\{[^}]*\}/g, '')
+        const parts = trimmed.split(' ').filter(Boolean)
+        expect(parts.length).toBeGreaterThanOrEqual(2)
+        const value = Number(parts[parts.length - 1])
+        expect(Number.isFinite(value)).toBe(true)
       })
+    })
+
+    it('should include per-endpoint breakdown lines in Prometheus output', () => {
+      performanceMonitor.recordRequestTiming('/api/health', 'GET', 50, 200)
+      const promOutput = performanceMonitor.exportMetrics('prometheus')
+      expect(promOutput).toContain('bias_engine_endpoint_requests_total{endpoint="/api/health"}')
+      expect(promOutput).toContain('bias_engine_endpoint_p50{endpoint="/api/health"}')
     })
   })
 
@@ -130,6 +142,89 @@ describe('PerformanceMonitor', () => {
       expect(snapshot).toHaveProperty('summary')
       // A 0ms window matches nothing, so requestCount should be 0
       expect(snapshot.summary.requestCount).toBe(0)
+    })
+  })
+
+  // ── Enterprise hardening — Section 3 of PIX-3913 ──────────────────
+
+  describe('percentile metrics (p50/p95/p99)', () => {
+    it('exposes percentile fields in summary', () => {
+      const snap = performanceMonitor.getSnapshot()
+      expect(snap.summary).toHaveProperty('p50Latency')
+      expect(snap.summary).toHaveProperty('p95Latency')
+      expect(snap.summary).toHaveProperty('p99Latency')
+    })
+
+    it('returns monotonically non-decreasing percentiles for a sample', () => {
+      performanceMonitor.recordRequestTiming('/lat', 'GET', 10, 200)
+      performanceMonitor.recordRequestTiming('/lat', 'GET', 20, 200)
+      performanceMonitor.recordRequestTiming('/lat', 'GET', 30, 200)
+      performanceMonitor.recordRequestTiming('/lat', 'GET', 40, 200)
+      performanceMonitor.recordRequestTiming('/lat', 'GET', 50, 200)
+
+      const snap = performanceMonitor.getSnapshot()
+      expect(snap.summary.p50Latency).toBeLessThanOrEqual(snap.summary.p95Latency)
+      expect(snap.summary.p95Latency).toBeLessThanOrEqual(snap.summary.p99Latency)
+    })
+  })
+
+  describe('endpoint breakdown', () => {
+    it('aggregates per-endpoint percentiles when requested', () => {
+      performanceMonitor.recordRequestTiming('/a', 'GET', 100, 200)
+      performanceMonitor.recordRequestTiming('/a', 'GET', 200, 200)
+      performanceMonitor.recordRequestTiming('/b', 'POST', 50, 500)
+
+      const snap = performanceMonitor.getSnapshot(undefined, true)
+      expect(snap.endpointBreakdown).toBeDefined()
+      const a = snap.endpointBreakdown!['/a']
+      const b = snap.endpointBreakdown!['/b']
+      expect(a.requestCount).toBe(2)
+      expect(a.errorCount).toBe(0)
+      expect(b.errorCount).toBe(1)
+    })
+
+    it('omits breakdown when not requested', () => {
+      const snap = performanceMonitor.getSnapshot()
+      expect(snap.endpointBreakdown).toBeUndefined()
+    })
+  })
+
+  describe('health status transitions', () => {
+    it('starts healthy (0)', () => {
+      performanceMonitor.resetHealth()
+      const snap = performanceMonitor.getSnapshot()
+      const h = snap.metrics.find((m) => m.name === 'health_status')
+      expect(h?.value).toBe(0)
+    })
+
+    it('transitions to degraded (1) after 5 consecutive errors', () => {
+      performanceMonitor.resetHealth()
+      for (let i = 0; i < 5; i++) {
+        performanceMonitor.recordRequestTiming('/x', 'GET', 50, 500)
+      }
+      const snap = performanceMonitor.getSnapshot()
+      const h = snap.metrics.find((m) => m.name === 'health_status')
+      expect(h?.value).toBe(1)
+    })
+
+    it('transitions to unhealthy (2) after 10 consecutive errors', () => {
+      performanceMonitor.resetHealth()
+      for (let i = 0; i < 12; i++) {
+        performanceMonitor.recordRequestTiming('/x', 'GET', 50, 500)
+      }
+      const snap = performanceMonitor.getSnapshot()
+      const h = snap.metrics.find((m) => m.name === 'health_status')
+      expect(h?.value).toBe(2)
+    })
+
+    it('resetHealth() returns monitor to healthy', () => {
+      for (let i = 0; i < 12; i++) {
+        performanceMonitor.recordRequestTiming('/x', 'GET', 50, 500)
+      }
+      performanceMonitor.resetHealth()
+      const snap = performanceMonitor.getSnapshot()
+      const h = snap.metrics.find((m) => m.name === 'health_status')
+      expect(h?.value).toBe(0)
     })
   })
 })

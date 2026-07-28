@@ -54,6 +54,14 @@ describe('ZKProofService', () => {
       expect(proof.operationType).toBe('summarize')
       expect(proof.timestamp).toBeGreaterThan(0)
       expect(proof.durationMs).toBeGreaterThanOrEqual(0)
+      expect(proof.nonce).toMatch(/^[0-9a-f]{64}$/)
+      expect(proof.nonce).not.toBe('0'.repeat(64))
+    })
+
+    it('each generation produces a unique nonce', async () => {
+      const proof1 = await service.generateProof('input', 'summarize', 'output')
+      const proof2 = await service.generateProof('input', 'summarize', 'output')
+      expect(proof1.nonce).not.toBe(proof2.nonce)
     })
 
     it('generates proof in < 10 seconds (PIX-4068 AC)', async () => {
@@ -330,6 +338,61 @@ describe('ZKProofService', () => {
         invalidProof,
         proof.publicInputHash,
         proof.publicOutputHash,
+      )
+      expect(valid).toBe(false)
+    })
+
+    it('rejects proof with missing nonce', async () => {
+      const proof = await service.generateProof('input', 'summarize', 'output')
+      const { nonce: _, ...proofWithoutNonce } = proof
+
+      const valid = await service.verifyProof(
+        proofWithoutNonce as any,
+        proof.publicInputHash,
+        proof.publicOutputHash,
+      )
+      expect(valid).toBe(false)
+    })
+
+    it('rejects proof with malformed nonce', async () => {
+      const proof = await service.generateProof('input', 'summarize', 'output')
+
+      const valid = await service.verifyProof(
+        { ...proof, nonce: 'not-a-valid-nonce' },
+        proof.publicInputHash,
+        proof.publicOutputHash,
+      )
+      expect(valid).toBe(false)
+    })
+
+    it('rejects expired proof (older than MAX_PROOF_AGE_MS)', async () => {
+      const proof = await service.generateProof('input', 'summarize', 'output')
+
+      const expiredProof = {
+        ...proof,
+        timestamp: Date.now() - 10 * 60 * 1000, // 10 minutes old
+      }
+
+      const valid = await service.verifyProof(
+        expiredProof,
+        expiredProof.publicInputHash,
+        expiredProof.publicOutputHash,
+      )
+      expect(valid).toBe(false)
+    })
+
+    it('rejects proof with future timestamp', async () => {
+      const proof = await service.generateProof('input', 'summarize', 'output')
+
+      const futureProof = {
+        ...proof,
+        timestamp: Date.now() + 60 * 60 * 1000, // 1 hour in the future
+      }
+
+      const valid = await service.verifyProof(
+        futureProof,
+        futureProof.publicInputHash,
+        futureProof.publicOutputHash,
       )
       expect(valid).toBe(false)
     })
