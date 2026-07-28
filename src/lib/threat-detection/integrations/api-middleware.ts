@@ -72,10 +72,6 @@ declare global {
         role?: string
         [key: string]: any
       }
-      session?: {
-        id: string
-        [key: string]: any
-      }
     }
   }
 }

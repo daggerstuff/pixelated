@@ -7,6 +7,7 @@ import {
 } from '../../../../../../lib/research/services/QueryDSL'
 import { getQueryOutputFormatter } from '../../../../../../lib/research/services/QueryOutputFormatter'
 import { getQueryAuditService } from '../../../../../../lib/research/services/QueryAuditService'
+import type { QueryResult } from '../../../../../../lib/research/types/research-types'
 
 export const prerender = false
 
@@ -40,15 +41,16 @@ export const POST = protectRoute(
         : (query.parameters['epsilon'] as number) || 0.1
 
     const result = await researchPlatform.executeResearchQuery(query, userId, userRole)
+    const queryResult = result as unknown as QueryResult
 
     const auditService = getQueryAuditService()
-    const executionTime = result.metadata?.executionTime ?? 0
-    const cacheHit = result.metadata?.cacheHit ?? false
+    const executionTime = queryResult.metadata?.executionTime ?? 0
+    const cacheHit = queryResult.metadata?.cacheHit ?? false
     auditService.logQuery(
       query,
       userId,
       userRole,
-      result,
+      queryResult,
       epsilon,
       executionTime,
       cacheHit,
@@ -56,7 +58,7 @@ export const POST = protectRoute(
 
     const outputFormat = body.outputFormat || 'json'
     const formatter = getQueryOutputFormatter()
-    const formatted = formatter.format(result, outputFormat, body.description)
+    const formatted = formatter.format(queryResult, outputFormat, body.description)
 
     if (outputFormat === 'json') {
       return new Response(formatted.content, {

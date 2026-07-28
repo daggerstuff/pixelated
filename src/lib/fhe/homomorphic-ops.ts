@@ -682,7 +682,6 @@ export class HomomorphicOperations {
           case FHEOperation.CATEGORIZE:
             encResult = await textProcessor.encryptedCategorize(
               plaintextForEncoding,
-              normalizeOptionalRecordToStringArray(params?.['categories']),
             )
             break
           case FHEOperation.WORD_COUNT:

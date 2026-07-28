@@ -344,7 +344,7 @@ export class IRBExportService {
     try {
       const auditService = getQueryAuditService()
       const stats = auditService.getAuditStats()
-      const recent = auditService.getRecent(100)
+      const recent = auditService.getAuditTrail()
 
       return {
         queryCount: stats.totalQueries,
