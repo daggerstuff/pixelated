@@ -2,7 +2,7 @@
  * @vitest-environment node
  */
 
-import type { NextFunction } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
@@ -11,8 +11,6 @@ const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
 vi.mock('../../../lib/auth/auth0-middleware', () => ({
   authenticateRequest: mockAuthenticateRequest,
 }))
-
-import type { Response } from 'express'
 
 import { authMiddleware, requirePermissions, requireRoles } from '../auth'
 import {

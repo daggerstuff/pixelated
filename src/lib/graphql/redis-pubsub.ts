@@ -15,7 +15,7 @@
  * - graphql:conversationTurnAdded
  */
 
-import type Redis from "ioredis";
+import type { Redis } from "ioredis";
 type RedisClient = Redis;
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
@@ -143,6 +143,7 @@ class RedisPubSub {
 
       // Set up message handler
       this.subscriber.on("message", (channel: string, message: string) => {
+        void (async () => {
         try {
           const payload = JSON.parse(message) as unknown;
           const handlers = this.topicHandlers.get(channel);
@@ -157,6 +158,7 @@ class RedisPubSub {
             error: err instanceof Error ? err.message : String(err),
           });
         }
+      })();
       });
 
       this.initialized = true;

@@ -22,7 +22,7 @@
  * The admin role bypasses all scope checks.
  */
 
-import { defaultFieldResolver, GraphQLSchema } from "graphql";
+import { defaultFieldResolver, GraphQLSchema, type GraphQLResolveInfo } from "graphql";
 import { mapSchema, MapperKind, getDirectiveExtensions } from "@graphql-tools/utils";
 import type { GraphqlContext } from "./resolvers";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
@@ -78,7 +78,7 @@ export function applyAuthDirectives(schema: GraphQLSchema): GraphQLSchema {
         parent: unknown,
         args: unknown,
         context: GraphqlContext,
-        info: unknown,
+        info: GraphQLResolveInfo,
       ) => {
         // ── Authentication ──────────────────────────────────────
         if (authEntries?.length && !context.user) {
