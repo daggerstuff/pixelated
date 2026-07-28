@@ -159,18 +159,7 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
   /* Antfu style adjustments for blog posts */
   article {
     --content-width: 740px;
-    font-family:
-      'Inter',
-      -apple-system,
-      BlinkMacSystemFont,
-      'Segoe UI',
-      Roboto,
-      Oxygen,
-      Ubuntu,
-      Cantarell,
-      'Open Sans',
-      'Helvetica Neue',
-      sans-serif;
+    font-family: var(--np-font-body);
   }
 
   /* Typography */
@@ -189,7 +178,7 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
     margin-top: 2.5rem;
     margin-bottom: 1rem;
     padding-bottom: 0.25rem;
-    border-bottom: 1px solid rgba(125, 125, 125, 0.3);
+    border-bottom: 1px solid var(--np-line);
   }
 
   .prose h3 {
@@ -200,7 +189,7 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
   }
 
   .prose a {
-    color: var(--tw-prose-links);
+    color: var(--np-text);
     text-decoration: none;
     font-weight: inherit;
     border-bottom: 1px dotted;
@@ -212,11 +201,9 @@ const pathname = `/${basePath}/${entry.data.slug || entry.slug}`
   }
 
   .prose img {
-    border-radius: 0.5rem;
+    border-radius: 0px;
     margin: 1.5rem 0;
-    box-shadow:
-      0 4px 6px -1px rgba(0, 0, 0, 0.1),
-      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--np-line);
   }
 
   .prose code {

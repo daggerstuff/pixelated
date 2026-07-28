@@ -13,14 +13,6 @@ name = "agentmail"
 source = "agentmail-to/agentmail-skills"
 
 [[skills]]
-name = "astro"
-source = "path:.agents/skills/astro"
-
-[[skills]]
-name = "cloudflare-deploy"
-source = "path:.agents/skills/cloudflare-deploy"
-
-[[skills]]
 name = "git-lint"
 source = "path:.agents/skills/git-lint"
 
@@ -75,3 +67,7 @@ source = "path:.agents/skills/tavily-search"
 [[skills]]
 name = "wandb-primary"
 source = "path:.agents/skills/wandb-primary"
+
+[[skills]]
+name = "*"
+source = "pbakaus/impeccable"
