@@ -1,0 +1,58 @@
+# Linear Auto-Close on PR Merge
+#
+# Automatically transitions Linear tickets to Done when a pull request
+# containing the ticket ID (e.g. PIX-4121) in its title, body, branch name,
+# or merge commit message is merged into the default branch.
+#
+# How it works:
+#   1. Triggers on any closed pull request.
+#   2. If the PR was merged, dumps the full PR event payload to a JSON file.
+#   3. Runs auto_close_from_merge.py which extracts Linear issue keys,
+#      transitions them to "Done", and posts a comment with the PR link.
+#
+# Required GitHub secrets:
+#   LINEAR_AGENT_ACCESS_TOKEN  - Linear personal API key
+#
+# The workflow needs `pull-requests: read` to access PR metadata.
+# The Python script uses only the standard library (no pip dependencies).
+
+name: Linear Auto-Close on PR Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  auto-close:
+    # Only run on actual merges (not just closed PRs).
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Write PR event payload to file
+        run: |
+          cat > /tmp/pr-data.json << 'PR_EOF'
+          ${{ toJSON(github.event.pull_request) }}
+          PR_EOF
+
+      - name: Auto-close Linear tickets
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_AGENT_ACCESS_TOKEN }}
+        run: |
+          python scripts/task_sync/auto_close_from_merge.py \
+            --pr-data /tmp/pr-data.json \
+            --target-status Done

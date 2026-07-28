@@ -16,28 +16,26 @@
    ================================================ */
 
 :root {
-  --radius: var(--radius-sm);
-  --background: var(--bg-primary);
-  --foreground: var(--text-primary);
-  --border: var(--border-subtle);
-  --input: var(--bg-secondary);
+  --radius: 0px;
+  --background: var(--np-bg);
+  --foreground: var(--np-text);
+  --border: var(--np-line);
+  --input: var(--np-surface);
 }
-
-@custom-variant dark (&:is(.dark *));
 
 /* Global styles */
 html {
-  font-family: var(--font-sans, 'Public Sans', system-ui, sans-serif);
+  font-family: var(--np-font-body);
   max-width: 100vw;
   overflow-x: hidden;
   min-height: 100vh;
   box-sizing: border-box;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--np-bg) !important;
+  color: var(--np-text);
 }
 
 body {
-  font-family: var(--font-sans, 'Public Sans', system-ui, sans-serif);
+  font-family: var(--np-font-body);
   margin: 0;
   padding: 0;
   width: 100%;
@@ -47,8 +45,8 @@ body {
   flex-direction: column;
   min-height: 100vh;
   box-sizing: border-box;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--np-bg) !important;
+  color: var(--np-text);
   /* Tactile Grain Effect */
   position: relative;
 }

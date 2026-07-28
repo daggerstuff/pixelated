@@ -2,11 +2,9 @@
    TECHNICAL-HUMANIST MAIN ENTRY
    ================================================ */
 
-@import './variables.css';
+@import './np-tokens.css';
 @import './fonts.css';
 @import './global.css';
-@import './design-system.css';
-@import './marketing.css';
 
 /* Core Application Logic Styles */
 /* Core Application Logic Styles */
@@ -221,7 +219,7 @@
   gap: 1px;
 
   padding: 0.5rem 0.625rem;
-  border-radius: 6px;
+  border-radius: 0;
 
   background: transparent;
   outline: none;
@@ -260,7 +258,7 @@ mark.pagefind-highlight {
   min-width: 1.5rem;
   height: 1.25rem;
   padding: 0 0.375rem;
-  border-radius: 0.375rem;
+  border-radius: 0;
   border-width: 1px;
 
   font-size: 0.625rem;

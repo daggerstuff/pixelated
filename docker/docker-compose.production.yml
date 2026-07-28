@@ -284,6 +284,44 @@ services:
           cpus: '0.5'
           memory: 512M
 
+  # PAL Inference Service
+  pal-inference:
+    build:
+      context: ..
+      dockerfile: ai/api/Dockerfile
+    container_name: pixelated-pal-inference
+    restart: unless-stopped
+    ports:
+      - '8010:8010'
+    environment:
+      - PAL_API_PORT=8010
+      - PAL_LATENCY_BUDGET_SECONDS=${PAL_LATENCY_BUDGET_SECONDS:-2.0}
+      - PAL_SELECTOR_ENDPOINT=${PAL_SELECTOR_ENDPOINT:-}
+      - PAL_SELECTOR_MODEL=${PAL_SELECTOR_MODEL:-gpt-4o-mini}
+      - PAL_GENERATOR_ENDPOINT=${PAL_GENERATOR_ENDPOINT:-}
+      - PAL_GENERATOR_MODEL=${PAL_GENERATOR_MODEL:-gpt-4o-mini}
+      - PAL_CANDIDATE_PERSONAS=${PAL_CANDIDATE_PERSONAS:-}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.pal-inference.rule=(Host(`${DOMAIN:-pixelatedempathy.com}`) || Host(`www.${DOMAIN:-pixelatedempathy.com}`)) && PathPrefix(`/api/v1/pal`)'
+      - 'traefik.http.routers.pal-inference.entrypoints=websecure'
+      - 'traefik.http.routers.pal-inference.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.pal-inference.middlewares=security-headers@file,rate-limit-api@file'
+    healthcheck:
+      test: ['CMD', 'python', '-c', 'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8010/health")']
+      interval: 30s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
 volumes:
   postgres_data:
     driver: local
