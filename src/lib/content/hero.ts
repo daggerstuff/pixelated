@@ -18,7 +18,7 @@ export const heroContent = {
     },
   ],
   primaryCTA: { text: 'Request Demo', href: '/contact' },
-  secondaryCTA: { text: 'View Case Studies', href: '/demo-hub' },
+  secondaryCTA: { text: 'See the demo', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Inside the product',
     status: 'A practice room connected to a supervisor review desk.',
