@@ -133,22 +133,36 @@ jobs:
           persist-credentials: false
 
       - name: Install Civo CLI
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # GH_TOKEN is exported at the deploy-civo job level above; gh CLI picks it up automatically for release view/download auth.
-          CIVO_VERSION=$(gh release view --repo civo/cli --json tagName -q .tagName)
-          if [ -z "$CIVO_VERSION" ]; then
-            echo "gh CLI could not resolve a tag; falling back to v1.5.4"
+          # Resolve the latest release tag via gh CLI.
+          # `|| true` keeps the step alive if `gh` returns non-zero; the empty/v-prefix
+          # check below then routes us to the pinned fallback (v1.5.4).
+          CIVO_VERSION="$(gh release view --repo civo/cli --json tagName -q .tagName 2>/dev/null || true)"
+          if [ -z "$CIVO_VERSION" ] || [[ "$CIVO_VERSION" != v* ]]; then
+            echo "::warning::gh release view did not return a v-prefixed tag; falling back to v1.5.4"
             CIVO_VERSION="v1.5.4"
           fi
           echo "Civo CLI version: $CIVO_VERSION"
 
-          # Download the linux/amd64 archive directly; gh handles auth + asset selection.
+          # Download the linux/amd64 archive. Prefer gh release download; fall back to a
+          # direct API+curl+jq lookup so we don't lose the public-URL resilience path.
           ARCHIVE="/tmp/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz"
           if ! gh release download "$CIVO_VERSION" --repo civo/cli \
                --pattern 'civo-*-linux-amd64.tar.gz' \
-               --dir /tmp; then
-            echo "❌ gh release download failed for ${CIVO_VERSION}"
-            exit 1
+               --dir /tmp 2>/dev/null; then
+            echo "::warning::gh release download failed for ${CIVO_VERSION}; trying direct API lookup"
+            ASSET_URL=$(curl -sSfL -H "Authorization: Bearer $GITHUB_TOKEN" \
+              https://api.github.com/repos/civo/cli/releases/tags/"$CIVO_VERSION" \
+              | jq -r '.assets[] | select(.name | endswith("linux-amd64.tar.gz")) | .browser_download_url' \
+              | head -n1)
+            if [ -z "$ASSET_URL" ]; then
+              echo "❌ Direct API lookup also failed for ${CIVO_VERSION}"
+              exit 1
+            fi
+            curl -sSfL "$ASSET_URL" -o "$ARCHIVE"
           fi
 
           # Validate the file is actually gzip before extraction
