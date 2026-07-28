@@ -201,9 +201,8 @@ export class ZKProofService {
       inputHash,
       outputHash,
       operationType,
-      merkleRoot,
       stepHashes: steps,
-    })
+    } as import('./sp1-prover').SP1ProofRequest)
 
     const durationMs = performance.now() - start
 

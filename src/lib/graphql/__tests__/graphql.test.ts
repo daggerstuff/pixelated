@@ -31,7 +31,7 @@ vi.mock("../persisted-queries", () => ({
 }));
 
 // Mock redis-pubsub — use in-memory EventEmitter-based pubsub in tests
-vi.mock("../redis-pubsub", () => {
+vi.mock("../redis-pubsub", async () => {
   const { EventEmitter } = await import("events");
   const emitter = new EventEmitter();
   const graphqlPubSub = {
@@ -116,7 +116,7 @@ async function executeQuery(
   setAuth(authenticated);
 
   const body: Record<string, unknown> = { query };
-  if (variables) body.variables = variables;
+  if (variables) body['variables'] = variables;
 
   const request = new Request("http://localhost:3000/api/graphql", {
     method: "POST",
