@@ -126,8 +126,8 @@ export function complexityLimitRule(
  * In development, introspection is allowed for tools like GraphiQL.
  */
 export function isIntrospectionEnabled(): boolean {
-  const env = (import.meta as Record<string, unknown>).env ?? process.env;
-  const nodeEnv = (env?.NODE_ENV as string) ?? "development";
+  const env = (import.meta as Record<string, unknown>)['env'] ?? process.env;
+  const nodeEnv = (env?.['NODE_ENV'] as string) ?? "development";
   return nodeEnv !== "production";
 }
 
@@ -145,14 +145,14 @@ export function getValidationRules(schema: GraphQLSchema) {
 
 export function formatGraphQLError(error: GraphQLError) {
   const isProduction =
-    ((import.meta as Record<string, unknown>).env ?? process.env)?.NODE_ENV === "production";
+    ((import.meta as Record<string, unknown>)['env'] ?? process.env)?.['NODE_ENV'] === "production";
 
   return {
     message: error.message,
     path: error.path,
     locations: error.locations,
     extensions: {
-      code: (error.extensions?.code as string) ?? "INTERNAL_SERVER_ERROR",
+      code: (error.extensions?.['code'] as string) ?? "INTERNAL_SERVER_ERROR",
       ...(isProduction ? {} : { stack: error.stack }),
     },
   };
