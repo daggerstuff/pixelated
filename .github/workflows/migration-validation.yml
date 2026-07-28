@@ -85,17 +85,16 @@ jobs:
             echo "No migration files found"
             exit 1
           fi
-          for f in $MIGRATIONS; do
-            echo "::group::Dry-run: $(basename "$f")"
-            # Pipe migration through stdin with BEGIN/ROLLBACK wrapper.
-            # Avoid double-quoted echo of file contents to prevent shell
-            # variable expansion of $ signs in SQL literals (e.g. bcrypt hashes).
-            if ! { echo 'BEGIN;'; cat "$f"; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
-              echo "::error::Dry-run failed for $(basename "$f")"
-              exit 1
-            fi
-            echo "::endgroup::"
-          done
+          echo "::group::Dry-run: all migrations in single transaction"
+          # Wrap ALL migration files in a single BEGIN/ROLLBACK so that later
+          # migrations can reference objects (tables, functions, etc.) created
+          # by earlier ones. Each file piped through cat avoids shell variable
+          # expansion of $ signs in SQL literals (e.g. bcrypt hashes).
+          if ! { echo 'BEGIN;'; for f in $MIGRATIONS; do cat "$f"; done; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
+            echo "::error::Dry-run failed"
+            exit 1
+          fi
+          echo "::endgroup::"
           echo "::notice::All migrations dry-run validated"
 
       - name: Apply forward migrations
