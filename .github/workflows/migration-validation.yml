@@ -90,7 +90,8 @@ jobs:
           # migrations can reference objects (tables, functions, etc.) created
           # by earlier ones. Each file piped through cat avoids shell variable
           # expansion of $ signs in SQL literals (e.g. bcrypt hashes).
-          if ! { echo 'BEGIN;'; for f in $MIGRATIONS; do cat "$f"; done; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$'; then
+          # -- FILE: markers help trace psql line errors back to source files.
+          if ! { echo 'BEGIN;'; for f in $MIGRATIONS; do echo "-- FILE: $(basename "$f")"; cat "$f"; done; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$' | grep -v '^-- FILE:'; then
             echo "::error::Dry-run failed"
             exit 1
           fi
