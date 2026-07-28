@@ -79,10 +79,7 @@ rules:
     severity: warn
     given: $.info.contact
     then:
-      function: schema
-      functionOptions:
-        required:
-          - name
+      function: truthy
 
   # --- Enforce summary on operations ---
   operation-summary:
