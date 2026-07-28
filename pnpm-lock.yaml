@@ -452,7 +452,7 @@ importers:
         version: 3.2.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       express-rate-limit:
         specifier: '>=8.2.2'
-        version: 8.6.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+        version: 8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       express-session:
         specifier: ^1.19.0
         version: 1.19.0(supports-color@10.2.2)
@@ -647,7 +647,7 @@ importers:
         version: 3.6.0
       tar:
         specifier: ^7.5.11
-        version: 7.5.21
+        version: 7.5.22
       twilio:
         specifier: latest
         version: 6.0.2(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
@@ -1098,7 +1098,7 @@ importers:
         version: 5.2.1(supports-color@10.2.2)
       express-rate-limit:
         specifier: '>=8.2.2'
-        version: 8.6.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+        version: 8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -10037,12 +10037,6 @@ packages:
     peerDependencies:
       express: '>=4.20.0'
 
-  express-rate-limit@8.6.0:
-    resolution: {integrity: sha512-XKJXDsASUOo0LLtFwW5hCcQGH0N4WQc/Rn8/Pvoia+TJFOkkFPvrtW9lZOeeNcxQJspvOIERMwiRLsVFlhHEkA==}
-    engines: {node: '>= 16'}
-    peerDependencies:
-      express: '>=4.20.0'
-
   express-rate-limit@8.6.1:
     resolution: {integrity: sha512-0D493aP61w0TJ2A0wy27riRsO7FMQ7FK+KUHOKCSfPvYo0R55aiC6emCVgFUeShH0fq0ICPVzNcgoS+BsbXQCA==}
     engines: {node: '>= 16'}
@@ -14057,8 +14051,8 @@ packages:
   tar-stream@3.2.0:
     resolution: {integrity: sha512-ojzvCvVaNp6aOTFmG7jaRD0meowIAuPc3cMMhSgKiVWws1GyHbGd/xvnyuRKcKlMpt3qvxx6r0hreCNITP9hIg==}
 
-  tar@7.5.21:
-    resolution: {integrity: sha512-XdhtCvlMywwxpCW8YEq3lOXBJpUPTR2OHHcwLPO3HwsJqOHa2Ok/oJ7ruGzp+JrKoRPVCzJwAdEjqLW/vNRPHA==}
+  tar@7.5.22:
+    resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
     engines: {node: '>=18'}
 
   teeny-request@9.0.0:
@@ -17931,7 +17925,7 @@ snapshots:
       local-pkg: 1.2.1
       pathe: 2.0.3
       svgo: 3.3.4
-      tar: 7.5.21
+      tar: 7.5.22
     transitivePeerDependencies:
       - supports-color
 
@@ -18633,7 +18627,7 @@ snapshots:
       node-fetch: 2.7.0
       nopt: 8.1.0
       semver: 7.8.5
-      tar: 7.5.21
+      tar: 7.5.22
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -25107,14 +25101,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  express-rate-limit@8.6.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2):
-    dependencies:
-      debug: 4.4.3(supports-color@10.2.2)
-      express: 5.2.1(supports-color@10.2.2)
-      ip-address: 10.2.0
-    transitivePeerDependencies:
-      - supports-color
-
   express-rate-limit@8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
@@ -30168,7 +30154,7 @@ snapshots:
       - bare-buffer
       - react-native-b4a
 
-  tar@7.5.21:
+  tar@7.5.22:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
