@@ -81,7 +81,7 @@ registerPersistedOperation(
 // Plugin export
 // ──────────────────────────────────────────────
 
-const isProduction = process.env.NODE_ENV === "production" && process.env.VITEST !== "true";
+const isProduction = process.env['NODE_ENV'] === "production" && process.env['VITEST'] !== "true";
 
 /**
  * Creates the persisted operations plugin for graphql-yoga.
@@ -100,7 +100,7 @@ export function persistedOperationsPlugin() {
       // Try Apollo APQ format: body.extensions.persistedQuery.sha256Hash
       // This is handled by the plugin automatically; we only need
       // custom extraction for non-standard formats.
-      return null;
+      return null as unknown as ReturnType<ExtractPersistedOperationId<Record<string, unknown>>>;
     },
   });
   return plugin;

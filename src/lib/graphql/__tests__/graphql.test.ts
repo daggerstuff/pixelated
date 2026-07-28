@@ -32,7 +32,7 @@ vi.mock("../persisted-queries", () => ({
 
 // Mock redis-pubsub — use in-memory EventEmitter-based pubsub in tests
 vi.mock("../redis-pubsub", () => {
-  const { EventEmitter } = require("events");
+  const { EventEmitter } = await import("events");
   const emitter = new EventEmitter();
   const graphqlPubSub = {
     subscribe: (topic: string) => {
@@ -161,7 +161,7 @@ describe("GraphQL — PIX-4064", () => {
   it("health query returns ok", async () => {
     const result = await executeQuery("{ health }", true);
     expect(result.errors).toBeUndefined();
-    expect(result.data?.health).toBe("ok");
+    expect(result.data?.['health']).toBe("ok");
   });
 
   // ── Sessions (auth required) ──────────────
@@ -175,7 +175,7 @@ describe("GraphQL — PIX-4064", () => {
   it("sessions query returns empty array when no data", async () => {
     const result = await executeQuery("{ sessions(limit: 5) { id } }", true);
     expect(result.errors).toBeUndefined();
-    expect(result.data?.sessions).toEqual([]);
+    expect(result.data?.['sessions']).toEqual([]);
   });
 
   // ── Session by ID ──────────────────────
@@ -187,7 +187,7 @@ describe("GraphQL — PIX-4064", () => {
       { id: "507f1f77bcf86cd799439011" },
     );
     expect(result.errors).toBeUndefined();
-    expect(result.data?.session).toBeNull();
+    expect(result.data?.['session']).toBeNull();
   });
 
   it("session query requires authentication", async () => {
@@ -217,7 +217,7 @@ describe("GraphQL — PIX-4064", () => {
       { sid: "nonexistent-session" },
     );
     expect(result.errors).toBeUndefined();
-    expect(result.data?.emotions).toEqual([]);
+    expect(result.data?.['emotions']).toEqual([]);
   });
 
   // ── Interventions ──────────────────────
@@ -239,7 +239,7 @@ describe("GraphQL — PIX-4064", () => {
       { uid: "nonexistent-user" },
     );
     expect(result.errors).toBeUndefined();
-    expect(result.data?.interventions).toEqual([]);
+    expect(result.data?.['interventions']).toEqual([]);
   });
 
   // ── AnonymizedMetrics ──────────────────────
@@ -252,7 +252,7 @@ describe("GraphQL — PIX-4064", () => {
     expect(result.errors).toBeUndefined();
     // aiRepository is undefined in test env → resolver catch block returns
     // safe empty response: kAnonymity=0, epsilon=0, reidentificationRisk=1
-    expect(result.data?.anonymizedMetrics?.privacyMetrics).toEqual({
+    expect(result.data?.['anonymizedMetrics']?.['privacyMetrics']).toEqual({
       kAnonymity: 0,
       differentialPrivacyEpsilon: 0,
       reidentificationRisk: 1,
@@ -350,7 +350,7 @@ describe("GraphQL — PIX-4064", () => {
       true,
     );
     expect(result.errors).toBeUndefined();
-    expect(result.data?.sessions).toEqual([]);
+    expect(result.data?.['sessions']).toEqual([]);
   });
 
   // ── Session.turns field resolver ──────────────────────
@@ -361,7 +361,7 @@ describe("GraphQL — PIX-4064", () => {
       true,
     );
     expect(result.errors).toBeUndefined();
-    expect(result.data?.sessions).toEqual([]);
+    expect(result.data?.['sessions']).toEqual([]);
   });
 
   // ── Auth enforcement ──────────────────────
@@ -472,7 +472,7 @@ describe("GraphQL — PIX-4064", () => {
   it("health query is public — no auth required", async () => {
     const result = await executeQuery("{ health }", false);
     expect(result.errors).toBeUndefined();
-    expect(result.data?.health).toBe("ok");
+    expect(result.data?.['health']).toBe("ok");
   });
 
   it("anonymizedMetrics rejects non-admin user (scope enforcement)", async () => {
@@ -516,7 +516,7 @@ describe("GraphQL — PIX-4064", () => {
     });
     const result = await executeQuery("{ sessions(limit: 5) { id } }", true);
     expect(result.errors).toBeUndefined();
-    expect(result.data?.sessions).toEqual([]);
+    expect(result.data?.['sessions']).toEqual([]);
   });
 
   it("subscriptions reject unauthenticated via directive", async () => {
