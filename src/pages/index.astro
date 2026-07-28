@@ -82,57 +82,61 @@ const buildableScenarios = [
             <p class="np-hero__helper">{hero.helperText}</p>
           </div>
 
-          <!-- Domain proof object: Clinical Evaluation Console (Brutalist / Minimalist) -->
-          <aside class="np-record" aria-label="Clinical Simulation Audit Record">
+          <!-- TASTES §6 transcript proof object — Session 04 · Rupture repair. -->
+          <aside class="np-record" aria-label="Session 04 transcript proof object">
             <header class="np-record__head">
-              <div class="np-record__meta">
-                <span class="np-record__case">REC_ID // C-004 · WEEK 4</span>
-                <span class="np-record__topic">SUICIDALITY &amp; SAFETY PLANNING</span>
-              </div>
-              <div class="np-record__status-block">
-                <span class="np-record__flag np-record__flag--alert">RISK PROTOCOL</span>
-                <span class="np-record__flag">RETRY: ASSIGNED</span>
-              </div>
+              <span class="np-record__case">Session 04 · Rupture repair</span>
+              <span class="np-record__topic">Disclosure, then naming the loss</span>
             </header>
 
             <div class="np-record__body">
               <ol class="np-record__transcript">
                 <li class="np-record__turn">
-                  <span class="np-record__speaker">00:14 // TRAINEE</span>
+                  <span class="np-record__speaker">Counselor · 00:18</span>
                   <p class="np-record__line">
-                    I noticed your voice dropped when we touched on your living situation. Can we slow down and talk about safety right now?
+                    What brought you back this week?
                   </p>
                 </li>
                 <li class="np-record__turn">
-                  <span class="np-record__speaker">00:31 // AI CLIENT (SIM)</span>
+                  <span class="np-record__speaker">Client · 00:42</span>
                   <p class="np-record__line">
-                    If I tell you what's really happening, you'll call crisis response and force me into an inpatient unit.
+                    Something happened. I don't really know how to say it. I
+                    haven't told anyone, including [partner].
                   </p>
-                  <div class="np-record__eval-block" data-result="caution" role="note" aria-label="Supervisor Evaluation">
-                    <span class="np-record__eval-tag">[ SUPERVISOR EVALUATION // 00:31 ]</span>
-                    <p class="np-record__eval-text">
-                      Critical decision point. Validate autonomy and establish explicit voluntary safety contract before probing lethal means.
-                    </p>
-                  </div>
                 </li>
                 <li class="np-record__turn">
-                  <span class="np-record__speaker">00:52 // TRAINEE</span>
+                  <span class="np-record__speaker">Counselor · 01:04</span>
                   <p class="np-record__line">
-                    My commitment is to work with you transparently, not to make choices over your head. Let's agree on our safety boundary together first.
+                    Stay with me as long as you need. I won't rush this.
                   </p>
-                  <div class="np-record__eval-block" data-result="pass" role="note" aria-label="Supervisor Evaluation">
-                    <span class="np-record__eval-tag">[ SUPERVISOR EVALUATION // 00:52 ]</span>
-                    <p class="np-record__eval-text">
-                      CLINICAL MARK: PASS. De-escalation anchored; trainee maintained relational contract without triggering defensive shutdown.
-                    </p>
-                  </div>
+                </li>
+                <li class="np-record__turn">
+                  <span class="np-record__speaker">Client · 02:31</span>
+                  <p class="np-record__line">
+                    Three years ago. I had a stillbirth. Nobody knows except
+                    [partner], and we haven't said it out loud in two years.
+                  </p>
+                </li>
+                <li class="np-record__turn">
+                  <span class="np-record__speaker">Counselor · 03:12</span>
+                  <p class="np-record__line">
+                    You said it out loud just now. I'm here. We don't have to do
+                    anything else with it yet.
+                  </p>
+                </li>
+                <li class="np-record__turn">
+                  <span class="np-record__speaker">Client · 03:48</span>
+                  <p class="np-record__line">
+                    I didn't think I could. I still can't really. But you didn't
+                    make me fix it.
+                  </p>
                 </li>
               </ol>
             </div>
 
             <footer class="np-record__foot">
-              <span class="np-record__lane">COMPETENCY: RISK ASSESSMENT &amp; SAFETY CONTRACTING</span>
-              <span class="np-record__score">REOPEN AT W6</span>
+              <span class="np-record__lane">Turn 4 · Rupture named</span>
+              <span class="np-record__mark">Repair attempted · retry by W5</span>
             </footer>
           </aside>
         </div>
