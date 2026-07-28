@@ -3,8 +3,6 @@
 -- consent persistence (7-year retention per HIPAA §164.530(j))
 --
 
-BEGIN;
-
 -- consent_records: durable storage for client consent state
 CREATE TABLE IF NOT EXISTS consent_records (
   client_id           VARCHAR(255) PRIMARY KEY,
@@ -54,5 +52,3 @@ CREATE INDEX IF NOT EXISTS idx_consent_audit_trail_timestamp
 
 CREATE INDEX IF NOT EXISTS idx_consent_audit_trail_retention
   ON consent_audit_trail (expires_at);
-
-COMMIT;
