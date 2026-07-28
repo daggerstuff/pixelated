@@ -77,7 +77,7 @@ export function complexityLimitRule(
 
             // Strip NonNull wrapper (equivalent to getNullableType)
             if (fieldType?.[Symbol.toStringTag] === "GraphQLNonNull") {
-              fieldType = (fieldType as { ofType: import("graphql").GraphQLOutputType }).ofType;
+              fieldType = (fieldType as any).ofType;
             }
 
             // Check if it's a list type (equivalent to isListType)
