@@ -387,7 +387,7 @@
     "@graphql-codegen/typescript-operations": "^6.1.2",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
-    "@playwright/test": "1.61.1",
+    "@playwright/test": "1.62.0",
     "@stoplight/spectral-cli": "^6.15.5",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
@@ -430,7 +430,7 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "^0.28.1",
-    "eslint": "^10.7.0",
+    "eslint": "^10.8.0",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-n": "latest",
@@ -501,7 +501,7 @@
     "vitest": "^4.1.10",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.113.0",
+    "wrangler": "^4.114.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
