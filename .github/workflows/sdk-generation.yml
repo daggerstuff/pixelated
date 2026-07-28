@@ -54,6 +54,10 @@ jobs:
         with:
           python-version: '3.13'
 
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install pyyaml
+
       - name: Cache openapi-generator-cli
         uses: actions/cache@v6
         with:
