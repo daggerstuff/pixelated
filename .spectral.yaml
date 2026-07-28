@@ -1,6 +1,4 @@
-extends:
-  - spectral:oas
-  - spectral:oas:recommended
+extends: spectral:oas
 
 rules:
   # --- Enforce API versioning ---

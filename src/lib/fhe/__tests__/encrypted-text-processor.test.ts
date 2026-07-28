@@ -110,7 +110,6 @@ describe('EncryptedTextProcessor', () => {
     it('should return encrypted category scores', async () => {
       const result = await processor.encryptedCategorize(
         'I feel anxious about the future',
-        ['anxiety', 'depression', 'trauma'],
       )
       expect(result.operation).toBe('categorize')
       expect(result.fullyHomomorphic).toBe(true)

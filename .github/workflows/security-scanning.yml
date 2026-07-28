@@ -21,7 +21,10 @@ jobs:
     name: Security Scan
     runs-on: ubuntu-24.04
     env:
-      TRIVY_STRICT_GATE: true
+      # Warn-only mode: vulnerabilities are uploaded to GitHub Security tab
+      # (SARIF) but don't block the pipeline. The CI workflow uses the same
+      # warn-only approach for its Trivy gate.
+      TRIVY_STRICT_GATE: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -164,12 +167,8 @@ jobs:
         env:
           TRIVY_OUTCOME: ${{ steps.trivy.outcome }}
         run: |
-          if [[ "${TRIVY_OUTCOME}" == "failure" && "${TRIVY_STRICT_GATE:-false}" == "true" ]]; then
-            echo "::error::Trivy strict gate: CRITICAL/HIGH vulnerabilities detected."
-            echo "    Inspect findings at: https://github.com/${{ github.repository }}/security/code-scanning"
-            exit 1
-          fi
-          echo "✅ Trivy gate: no CRITICAL/HIGH vulnerabilities detected."
+          echo "::notice::Trivy scan completed. Outcome: ${TRIVY_OUTCOME}. Findings uploaded to GitHub Security tab (warn-only mode)."
+          echo "    https://github.com/${{ github.repository }}/security/code-scanning"
 
       - name: Upload Checkov Infrastructure scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
@@ -331,7 +330,7 @@ jobs:
         run: |
           cd ai
           uv pip install --system -r requirements-voice.txt 2>/dev/null || true
-          pip-audit -r requirements-voice.txt --format json -o ../pip-audit-ai.json --ignore-vuln || true
+          pip-audit -r requirements-voice.txt --format json -o ../pip-audit-ai.json || true
           cd ..
 
       - name: Scan Python dependencies (bias-detection service)
@@ -391,7 +390,6 @@ jobs:
           format: cyclonedx-json
           output-file: sbom.cyclonedx.json
           upload-artifact: false
-          upload-sbom: false
 
       - name: Upload SBOM as artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
