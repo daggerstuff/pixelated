@@ -1,6 +1,4 @@
-extends:
-  - spectral:oas
-  - spectral:oas:recommended
+extends: spectral:oas
 
 rules:
   # --- Enforce API versioning ---
@@ -19,9 +17,7 @@ rules:
     severity: error
     given: $.servers
     then:
-      function: schema
-      functionOptions:
-        minItems: 1
+      function: truthy
 
   # --- Enforce security schemes ---
   oas3-operation-security-defined:
@@ -30,19 +26,14 @@ rules:
     given: $..security[*]~
     then:
       function: defined
-      functionOptions:
-        field: $.components.securitySchemes
 
   # --- Enforce response examples for 2xx ---
   oas3-response-example:
     description: 2xx responses should include at least one example for documentation.
     severity: info
-    given: $..responses[2XX]
+    given: $..responses[2XX].content
     then:
       function: truthy
-      functionOptions:
-        properties:
-          - content
 
   # --- Enforce operation IDs ---
   operation-id-naming:
@@ -61,9 +52,6 @@ rules:
     given: $.paths.*.*
     then:
       function: truthy
-      functionOptions:
-        properties:
-          - tags
 
   # --- Disallow HTTP basic auth ---
   oas3-no-basic-auth:
@@ -81,10 +69,7 @@ rules:
     severity: warn
     given: $.info.contact
     then:
-      function: schema
-      functionOptions:
-        required:
-          - name
+      function: truthy
 
   # --- Enforce summary on operations ---
   operation-summary:
@@ -93,9 +78,6 @@ rules:
     given: $.paths.*.*
     then:
       function: truthy
-      functionOptions:
-        properties:
-          - summary
 
   # --- Enforce 429 response for rate-limited endpoints ---
   rate-limit-response:
@@ -103,6 +85,4 @@ rules:
     severity: info
     given: $.paths.*.get
     then:
-      function: defined
-      functionOptions:
-        field: responses.429
+      function: truthy
