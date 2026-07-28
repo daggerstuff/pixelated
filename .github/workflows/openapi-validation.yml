@@ -35,18 +35,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version-file: '.nvmrc'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
 
       - name: Cache spectral
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.npm/_npx
           key: spectral-cli-${{ runner.os }}-v1
@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload spectral results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: openapi-spectral-results
           path: |
@@ -90,17 +90,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           submodules: recursive
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version-file: 'ai/.python-version'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v7
 
       - name: Install FastAPI dependencies
         run: |
@@ -142,7 +142,7 @@ jobs:
 
       - name: Upload FastAPI schema
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fastapi-openapi-schema
           path: docs/api-reference/generated/
@@ -157,10 +157,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Upload spec as artifact (for GitHub Pages or SDK generation)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: openapi-spec-latest
           path: |
