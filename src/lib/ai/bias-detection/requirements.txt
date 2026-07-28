@@ -245,7 +245,7 @@ httpcore==1.0.9
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   httpx
-httplib2==0.31.2
+httplib2==0.32.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   google-api-python-client
