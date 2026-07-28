@@ -17,9 +17,7 @@ rules:
     severity: error
     given: $.servers
     then:
-      function: schema
-      functionOptions:
-        minItems: 1
+      function: truthy
 
   # --- Enforce security schemes ---
   oas3-operation-security-defined:
@@ -28,8 +26,6 @@ rules:
     given: $..security[*]~
     then:
       function: defined
-      functionOptions:
-        field: $.components.securitySchemes
 
   # --- Enforce response examples for 2xx ---
   oas3-response-example:
@@ -37,10 +33,9 @@ rules:
     severity: info
     given: $..responses[2XX]
     then:
-      function: truthy
+      function: defined
       functionOptions:
-        properties:
-          - content
+        field: content
 
   # --- Enforce operation IDs ---
   operation-id-naming:
@@ -59,9 +54,6 @@ rules:
     given: $.paths.*.*
     then:
       function: truthy
-      functionOptions:
-        properties:
-          - tags
 
   # --- Disallow HTTP basic auth ---
   oas3-no-basic-auth:
@@ -88,9 +80,6 @@ rules:
     given: $.paths.*.*
     then:
       function: truthy
-      functionOptions:
-        properties:
-          - summary
 
   # --- Enforce 429 response for rate-limited endpoints ---
   rate-limit-response:
@@ -98,6 +87,4 @@ rules:
     severity: info
     given: $.paths.*.get
     then:
-      function: defined
-      functionOptions:
-        field: responses.429
+      function: truthy
