@@ -156,12 +156,12 @@ describe('auditLoggingService (real branch coverage)', () => {
 
     const arg = info.mock.calls.at(-1)?.[0] as string
     const parsed = JSON.parse(arg) as { details: Record<string, unknown> }
-    expect(parsed.details.password).toBe('[REDACTED]')
-    expect(parsed.details.token).toBe('[REDACTED]')
-    expect(parsed.details.secret).toBe('[REDACTED]')
-    expect(parsed.details.ssn).toBe('[REDACTED]')
-    expect(parsed.details.dob).toBe('[REDACTED]')
-    expect(parsed.details.keepMe).toBe('visible')
+      expect(parsed.details['password']).toBe('[REDACTED]')
+    expect(parsed.details['token']).toBe('[REDACTED]')
+    expect(parsed.details['secret']).toBe('[REDACTED]')
+    expect(parsed.details['ssn']).toBe('[REDACTED]')
+    expect(parsed.details['dob']).toBe('[REDACTED]')
+    expect(parsed.details['keepMe']).toBe('visible')
     vi.restoreAllMocks()
   })
 
@@ -185,7 +185,7 @@ describe('auditLoggingService (real branch coverage)', () => {
       metadata: { sessionId: string }
     }
     expect(parsed.userId).toBe(testEntry.userId)
-    expect(parsed.metadata.sessionId).toBe('sess-1')
+    expect(parsed.metadata['sessionId']).toBe('sess-1')
     vi.restoreAllMocks()
   })
 
@@ -233,7 +233,7 @@ describe('auditLoggingService (coverage: levels, unimplemented, factory, dev)', 
     const arg = info.mock.calls.at(-1)?.[0] as string
     const parsed = JSON.parse(arg) as { details: Record<string, unknown> }
     // default redactFields includes 'password'
-    expect(parsed.details.password).toBe('[REDACTED]')
+    expect(parsed.details['password']).toBe('[REDACTED]')
   })
 
   it('routes output to the error log level', async () => {
