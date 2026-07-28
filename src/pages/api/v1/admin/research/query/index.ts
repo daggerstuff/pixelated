@@ -37,7 +37,7 @@ export const POST = protectRoute(
     const epsilon =
       typeof body.epsilon === 'number'
         ? body.epsilon
-        : (query.parameters.epsilon as number) || 0.1
+        : (query.parameters['epsilon'] as number) || 0.1
 
     const result = await researchPlatform.executeResearchQuery(query, userId, userRole)
 
