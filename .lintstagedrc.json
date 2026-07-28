@@ -12,5 +12,5 @@
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
   ],
-  "*.py": ["ruff check --fix --exit-zero", "ruff format"]
+  "*.py": ["uv run ruff check --fix --exit-zero", "uv run ruff format"]
 }

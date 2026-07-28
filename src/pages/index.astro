@@ -60,7 +60,9 @@ const buildableScenarios = [
       <div class="np-container">
         <div class="np-hero__grid">
           <div class="np-hero__primary">
-            <span class="np-label">Enterprise Clinical Training Platform</span>
+            <div class="np-hero__badge-row">
+              <span class="np-hero__sys-tag">[ SYSTEM // CLINICAL SIMULATION PLATFORM ]</span>
+            </div>
             <h1 class="np-display np-hero__display">{hero.title}</h1>
             <p class="np-body np-hero__subtitle">{hero.subtitle}</p>
             <div class="np-hero__actions">
@@ -80,57 +82,57 @@ const buildableScenarios = [
             <p class="np-hero__helper">{hero.helperText}</p>
           </div>
 
-          <!-- Domain proof object: a clinical supervision record, not a chat log. -->
-          <aside class="np-record" aria-label="Sample supervision record">
+          <!-- Domain proof object: Clinical Evaluation Console (Brutalist / Minimalist) -->
+          <aside class="np-record" aria-label="Clinical Simulation Audit Record">
             <header class="np-record__head">
               <div class="np-record__meta">
-                <span class="np-record__case">Case 003 · Week 4</span>
-                <span class="np-record__topic">Disclosure under pressure</span>
+                <span class="np-record__case">REC_ID // C-004 · WEEK 4</span>
+                <span class="np-record__topic">SUICIDALITY &amp; SAFETY PLANNING</span>
               </div>
-              <ul class="np-record__flags" aria-label="Session status">
-                <li class="np-record__flag np-record__flag--alert">Risk · watch</li>
-                <li class="np-record__flag">Retry assigned</li>
-              </ul>
+              <div class="np-record__status-block">
+                <span class="np-record__flag np-record__flag--alert">RISK PROTOCOL</span>
+                <span class="np-record__flag">RETRY: ASSIGNED</span>
+              </div>
             </header>
 
             <div class="np-record__body">
               <ol class="np-record__transcript">
                 <li class="np-record__turn">
-                  <span class="np-record__speaker">Counselor</span>
+                  <span class="np-record__speaker">00:14 // TRAINEE</span>
                   <p class="np-record__line">
-                    <span class="np-record__timestamp">00:24</span>
-                    What brought you back this week?
+                    I noticed your voice dropped when we touched on your living situation. Can we slow down and talk about safety right now?
                   </p>
                 </li>
                 <li class="np-record__turn">
-                  <span class="np-record__speaker">Client</span>
+                  <span class="np-record__speaker">00:31 // AI CLIENT (SIM)</span>
                   <p class="np-record__line">
-                    <span class="np-record__timestamp">00:48</span>
-                    I don't know if this is the right place. Maybe I shouldn't
-                    have come.
+                    If I tell you what's really happening, you'll call crisis response and force me into an inpatient unit.
                   </p>
-                  <aside class="np-record__margin" data-kind="supervisor">
-                    <span class="np-record__margin-label">↳ supervisor note</span>
-                    Hesitation at 00:48. Slow down before reassuring.
-                  </aside>
+                  <div class="np-record__eval-block" data-result="caution" role="note" aria-label="Supervisor Evaluation">
+                    <span class="np-record__eval-tag">[ SUPERVISOR EVALUATION // 00:31 ]</span>
+                    <p class="np-record__eval-text">
+                      Critical decision point. Validate autonomy and establish explicit voluntary safety contract before probing lethal means.
+                    </p>
+                  </div>
                 </li>
                 <li class="np-record__turn">
-                  <span class="np-record__speaker">Counselor</span>
+                  <span class="np-record__speaker">00:52 // TRAINEE</span>
                   <p class="np-record__line">
-                    <span class="np-record__timestamp">01:40</span>
-                    Want to keep going, or is this too much right now?
+                    My commitment is to work with you transparently, not to make choices over your head. Let's agree on our safety boundary together first.
                   </p>
-                  <aside class="np-record__margin" data-kind="supervisor">
-                    <span class="np-record__margin-label">↳ supervisor note</span>
-                    Better. Checked immediacy before naming the fear.
-                  </aside>
+                  <div class="np-record__eval-block" data-result="pass" role="note" aria-label="Supervisor Evaluation">
+                    <span class="np-record__eval-tag">[ SUPERVISOR EVALUATION // 00:52 ]</span>
+                    <p class="np-record__eval-text">
+                      CLINICAL MARK: PASS. De-escalation anchored; trainee maintained relational contract without triggering defensive shutdown.
+                    </p>
+                  </div>
                 </li>
               </ol>
             </div>
 
             <footer class="np-record__foot">
-              <span class="np-record__lane">Coaching lane · next attempt</span>
-              <span class="np-record__score">Coachable · retry by week 5</span>
+              <span class="np-record__lane">COMPETENCY: RISK ASSESSMENT &amp; SAFETY CONTRACTING</span>
+              <span class="np-record__score">REOPEN AT W6</span>
             </footer>
           </aside>
         </div>
@@ -138,26 +140,26 @@ const buildableScenarios = [
     </section>
 
     <!-- How the training loop works: the one path the product asks you to follow. -->
-    <section class="np-section">
+    <section class="np-section np-section--track">
       <div class="np-container">
-        <div class="np-section-header">
+        <div class="np-section-header np-section-header--track">
           <span class="np-label">{workflow.label}</span>
           <h2 class="np-headline">{workflow.title}</h2>
         </div>
 
-        <div class="np-steps">
+        <ol class="np-track" aria-label="Training loop steps">
           {
             workflow.steps.map((step) => (
-              <div class="np-step">
-                <span class="np-step__number">{step.number}</span>
-                <div class="np-step__body">
-                  <h3 class="np-title">{step.title}</h3>
-                  <p class="np-body">{step.body}</p>
-                </div>
-              </div>
+              <li class="np-track__step">
+                <span class="np-track__number" aria-hidden="true">
+                  {step.number}
+                </span>
+                <h3 class="np-title np-track__title">{step.title}</h3>
+                <p class="np-body np-track__body">{step.body}</p>
+              </li>
             ))
           }
-        </div>
+        </ol>
       </div>
     </section>
 
@@ -194,46 +196,77 @@ const buildableScenarios = [
           </h2>
         </div>
 
-        <ul class="np-scenarios">
-          {
-            buildableScenarios.map((scenario) => (
-              <li class="np-scenario">
-                <span class="np-data np-scenario__kicker">{scenario.kicker}</span>
-                <p class="np-body np-scenario__body">{scenario.body}</p>
-              </li>
-            ))
-          }
-        </ul>
+        <div class="np-scenarios-grid">
+          <article class="np-scenario-feature">
+            <span class="np-data np-scenario__kicker">Escalation</span>
+            <p class="np-body np-scenario__body">
+              Suicidality screening, de-escalation, safety planning, and what to
+              say when the room changes faster than expected.
+            </p>
+            <span class="np-scenario__pin" aria-hidden="true">
+              Highest-stakes · start here
+            </span>
+          </article>
+
+          <article class="np-scenario-side np-scenario-side--rupture">
+            <span class="np-data np-scenario__kicker">Rupture</span>
+            <p class="np-body np-scenario__body">
+              Avoidance, dysregulation, emotional withdrawal, and the repairs
+              that decide whether a client stays in the conversation.
+            </p>
+          </article>
+
+          <article class="np-scenario-side np-scenario-side--disclosure">
+            <span class="np-data np-scenario__kicker">Disclosure</span>
+            <p class="np-body np-scenario__body">
+              The turn where a client shares something high-stakes and the
+              therapist has to decide what to do next without flattening the
+              room.
+            </p>
+          </article>
+        </div>
       </div>
     </section>
 
     <!-- CTA: the one ask. -->
     <section class="np-cta">
-      <div class="np-container-narrow">
-        <div class="np-cta-inner">
-          <span class="np-label">{cta.label}</span>
-          <h2 class="np-headline">{cta.title}</h2>
-          <p class="np-body">{cta.intro}</p>
-          <div class="np-hero__actions">
-            <a
-              class="np-btn np-btn-primary"
-              href={withBasePath(cta.primaryCTA.href)}
-            >
-              {cta.primaryCTA.text}
-            </a>
-            <a
-              class="np-btn np-btn-ghost"
-              href={withBasePath(cta.secondaryCTA.href)}
-            >
-              {cta.secondaryCTA.text}
-            </a>
+      <div class="np-container">
+        <div class="np-cta-grid">
+          <div class="np-cta-pitch">
+            <span class="np-label">{cta.label}</span>
+            <h2 class="np-headline np-cta-pitch__title">{cta.title}</h2>
+            <p class="np-body np-cta-pitch__body">{cta.intro}</p>
+            <p class="np-cta__meta">{cta.meta}</p>
           </div>
-          <p class="np-cta__trust">
-            HIPAA-ready ·
-            <a href={withBasePath('/trust')}>Security &amp; data handling</a> ·
-            <a href={withBasePath('/terms')}>Terms</a>
-          </p>
-          <p class="np-cta__meta">{cta.meta}</p>
+
+          <div class="np-cta-commit">
+            <span class="np-data np-cta-commit__kicker">
+              Pilot · cohort of 4 clinicians
+            </span>
+            <p class="np-cta-commit__line">
+              Two intakes per clinician, supervised review at week three, full
+              transcript access for your training lead.
+            </p>
+            <div class="np-cta-commit__actions">
+              <a
+                class="np-btn np-btn-primary np-cta-commit__primary"
+                href={withBasePath(cta.primaryCTA.href)}
+              >
+                {cta.primaryCTA.text}
+              </a>
+              <a
+                class="np-btn np-btn-ghost np-cta-commit__secondary"
+                href={withBasePath(cta.secondaryCTA.href)}
+              >
+                {cta.secondaryCTA.text}
+              </a>
+            </div>
+            <p class="np-cta__trust">
+              HIPAA-ready ·
+              <a href={withBasePath('/trust')}>Security &amp; data handling</a> ·
+              <a href={withBasePath('/terms')}>Terms</a>
+            </p>
+          </div>
         </div>
       </div>
     </section>
