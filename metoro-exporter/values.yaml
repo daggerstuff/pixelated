@@ -1,0 +1,74 @@
+redis:
+  auth:
+    enabled: false
+    existingSecret: ""
+redisCluster:
+  auth:
+    enabled: false
+    existingSecret: ""
+
+serviceMonitorScraping:
+  enabled: false
+
+nodeAgent:
+  enabled: false
+
+exporter:
+  secret:
+    name: metoro-exporter-secret
+    bearerToken: "dummy"
+    externalSecret:
+      enabled: false
+  podDisruptionBudget:
+    enabled: false
+  serviceAccount:
+    create: true
+    name: metoro-exporter
+    annotations: {}
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  resources: {}
+  hostNetwork: false
+  extraEnv: []
+  autoscaling:
+    horizontalPodAutoscaler:
+      enabled: false
+    verticalPodAutoscaler:
+      enabled: false
+  metadata:
+    name: metoro-exporter
+    labels: {}
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 80
+  gracefulShutdown:
+    enabled: false
+  ebpf:
+    enabled: false
+  profiling:
+    enabled: false
+  envVars:
+    mandatory:
+      otlpUrl: ""
+      metoroUrl: ""
+    optional:
+      clusterName: ""
+      environmentName: ""
+  configMap:
+    name: metoro-exporter-config
+    data: {}
+  scheduling:
+    affinity: {}
+    tolerations: []
+    nodeSelector: {}
+  services:
+    metoroExporter:
+      name: metoro-exporter-service
+      port: 8080
+  clusterRole:
+    name: metoro-exporter-clusterrole
+  clusterRoleBinding:
+    name: metoro-exporter-clusterrolebinding
