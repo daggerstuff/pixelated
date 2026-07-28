@@ -138,11 +138,13 @@ jobs:
 
       - name: Verify schema integrity
         run: |
-          # After rollback, verify no orphaned constraints or indexes
+          # After rollback, verify no orphaned constraints or indexes.
+          # Exclude domain constraints (contypid != 0) — they have conrelid = 0
+          # by design and are valid constraints on custom DOMAIN types.
           ORPHANED=$(psql -t -c "
             SELECT count(*) FROM pg_constraint c
             LEFT JOIN pg_class t ON c.conrelid = t.oid
-            WHERE t.oid IS NULL;
+            WHERE t.oid IS NULL AND c.contypid = 0;
           ")
           if [ "$ORPHANED" -gt 0 ]; then
             echo "::error::Orphaned constraints found: $ORPHANED"
