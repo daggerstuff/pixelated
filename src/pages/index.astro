@@ -3,11 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
 import { SITE } from '@/config'
-import {
-  heroContent,
-  workflowContent,
-  ctaContent,
-} from '@/lib/content'
+import { heroContent, workflowContent, ctaContent } from '@/lib/content'
 
 const { hero, workflow, cta } = {
   hero: heroContent,
@@ -107,7 +103,9 @@ const buildableScenarios = [
                 <span class="np-record__topic">Disclosure under pressure</span>
               </div>
               <ul class="np-record__flags" aria-label="Session status">
-                <li class="np-record__flag np-record__flag--alert">Risk · watch</li>
+                <li class="np-record__flag np-record__flag--alert">
+                  Risk · watch
+                </li>
                 <li class="np-record__flag">Retry assigned</li>
               </ul>
             </header>
@@ -125,8 +123,8 @@ const buildableScenarios = [
                   <span class="np-record__speaker">Client</span>
                   <p class="np-record__line">
                     <span class="np-record__timestamp">00:48</span>
-                    I don't know if this is the right place. Maybe I shouldn't
-                    have come.
+                    I don't know if this is the right place. Maybe I shouldn't have
+                    come.
                   </p>
                   <aside class="np-record__margin" data-kind="supervisor">
                     Hesitation at 00:48. Slow down before reassuring.
@@ -182,13 +180,12 @@ const buildableScenarios = [
     <section class="np-section np-section--artifact">
       <div class="np-container">
         <div class="np-section-header">
-          <span class="np-label">A session, end to end</span>
           <h2 class="np-headline">
             What your team gets when the practice is logged.
           </h2>
           <p class="np-body">
-            Four things arrive together from one trainee attempt: a scenario,
-            a transcript, a supervisor note, and a record your next meeting can
+            Four things arrive together from one trainee attempt: a scenario, a
+            transcript, a supervisor note, and a record your next meeting can
             reopen without guesswork.
           </p>
         </div>
@@ -205,7 +202,6 @@ const buildableScenarios = [
         </ol>
 
         <div class="np-section-header" style="margin-top: 64px;">
-          <span class="np-label">Scenarios your team can run today</span>
           <h2 class="np-headline">
             Three places teams start when training feels too improvised.
           </h2>
@@ -215,7 +211,9 @@ const buildableScenarios = [
           {
             buildableScenarios.map((scenario) => (
               <li class="np-scenario">
-                <span class="np-data np-scenario__kicker">{scenario.kicker}</span>
+                <span class="np-data np-scenario__kicker">
+                  {scenario.kicker}
+                </span>
                 <p class="np-body np-scenario__body">{scenario.body}</p>
               </li>
             ))
@@ -228,7 +226,6 @@ const buildableScenarios = [
     <section class="np-cta">
       <div class="np-container-narrow">
         <div class="np-cta-inner">
-          <span class="np-label">{cta.label}</span>
           <h2 class="np-headline">{cta.title}</h2>
           <p class="np-body">{cta.intro}</p>
           <div class="np-hero__actions">

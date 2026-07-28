@@ -9,7 +9,10 @@
   --np-elevated: oklch(0.18 0 0);
   --np-hover: oklch(0.22 0 0);
   --np-text: oklch(0.93 0 0);
-  --np-muted: oklch(0.55 0 0);
+  /* Raised from 0.55 -> 0.62: oklch(0.55) renders #717171 and fails WCAG AA
+     (4.24/4.10/3.88:1 on bg/surface/elevated). 0.62 (#868686) clears 4.5:1
+     on every dark surface (5.65/5.47/5.16:1) while staying clearly secondary. */
+  --np-muted: oklch(0.62 0 0);
   --np-mid: oklch(0.7 0 0);
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
@@ -227,6 +230,8 @@
   max-width: 65ch;
   font-size: clamp(1rem, 1.5vw, 1.125rem);
   line-height: 1.7;
+  /* Primary value proposition: full ink, not muted. Leads the hero. */
+  color: var(--np-text);
 }
 
 .np-hero__actions {
