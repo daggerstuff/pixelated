@@ -253,7 +253,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -409,7 +409,7 @@ jobs:
           clean-node-modules: 'true'
 
       - name: Setup Python for ML service
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
