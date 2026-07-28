@@ -4,6 +4,7 @@
  */
 
 import type { TherapeuticResponse } from '../models/ai-types'
+export type { TherapeuticResponse }
 
 /** Oversight mode: supervised (human approval required) or autonomous (AI operates independently) */
 export type OversightMode = 'supervised' | 'autonomous'

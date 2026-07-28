@@ -12,9 +12,22 @@ import type { AuthUser } from './types'
 /**
  * Implementation of protectRoute higher-order function.
  * Wraps an API route handler with authentication and authorization checks.
+ *
+ * Supports two calling conventions:
+ * 1. Curried: `protectRoute(options)(handler)` — used in evidence/index.ts, irb.ts
+ * 2. Direct: `protectRoute(options, handler)` — used in query/index.ts, preview.ts, audit.ts
  */
-export function protectRoute(options: ProtectRouteOptions = {}) {
-  return (handler: ProtectedAPIRoute) => {
+
+export function protectRoute(options?: ProtectRouteOptions): (handler: ProtectedAPIRoute) => (context: BaseAPIContext) => Promise<Response>
+export function protectRoute(
+  options: ProtectRouteOptions,
+  handler: ProtectedAPIRoute,
+): (context: BaseAPIContext) => Promise<Response>
+export function protectRoute(
+  options: ProtectRouteOptions = {},
+  handler?: ProtectedAPIRoute,
+): unknown {
+  const wrap = (h: ProtectedAPIRoute) => {
     return async (context: BaseAPIContext) => {
       // 1. Authenticate request
       const authResult = await authenticateRequest(context.request)
@@ -73,9 +86,15 @@ export function protectRoute(options: ProtectRouteOptions = {}) {
         request: context.request,
       }
 
-      return handler(authContext)
+      return h(authContext)
     }
   }
+
+  if (handler) {
+    return wrap(handler)
+  }
+
+  return wrap
 }
 
 function normalizeAuthRole(value: unknown): AuthRole {

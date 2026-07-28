@@ -278,10 +278,10 @@ describe('StartupProfiler', () => {
 
     expect(text).toBe('hello world')
     const report = profiler.report()
-    expect(report.components.instructions.tokens).toBe(
+    expect(report.components['instructions'].tokens).toBe(
       estimateTokens('hello world'),
     )
-    expect(report.totalTokens).toBe(report.components.instructions.tokens)
+    expect(report.totalTokens).toBe(report.components['instructions'].tokens)
   })
 
   it('profiles asynchronous steps', async () => {
@@ -289,7 +289,7 @@ describe('StartupProfiler', () => {
     await profiler.profileAsync('connection', async () => 'lazy connection')
 
     const report = profiler.report()
-    expect(report.components.connection.tokens).toBe(
+    expect(report.components['connection'].tokens).toBe(
       estimateTokens('lazy connection'),
     )
   })
@@ -299,10 +299,10 @@ describe('StartupProfiler', () => {
     profiler.profileText('instructions', 'hello world')
 
     const report = profiler.report()
-    expect(report.components.instructions.tokens).toBe(
+    expect(report.components['instructions'].tokens).toBe(
       estimateTokens('hello world'),
     )
-    expect(report.totalTokens).toBe(report.components.instructions.tokens)
+    expect(report.totalTokens).toBe(report.components['instructions'].tokens)
   })
 
   it('aggregates repeated labels', () => {
@@ -311,7 +311,7 @@ describe('StartupProfiler', () => {
     profiler.profile('step', () => 'b')
 
     const report = profiler.report()
-    expect(report.components.step.tokens).toBe(
+    expect(report.components['step'].tokens).toBe(
       estimateTokens('a') + estimateTokens('b'),
     )
   })

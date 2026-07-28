@@ -523,6 +523,9 @@
     "node": ">=24"
   },
   "packageManager": "pnpm@11.17.0",
+  "pnpm": {
+    "onlyBuiltDependencies": ["koffi"]
+  },
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
@@ -531,6 +534,7 @@
     "@scarf/scarf",
     "aws-sdk",
     "core-js",
+    "koffi",
     "postinstall-postinstall",
     "protobufjs",
     "unrs-resolver"

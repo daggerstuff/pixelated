@@ -130,8 +130,8 @@ query {
     origin: (request) => {
       const origin = request.headers.get("origin");
       // Allow same-origin in dev, specific origins in prod
-      const env = (import.meta as Record<string, unknown>).env ?? process.env;
-      const allowedOrigins = (env?.CORS_ALLOWED_ORIGINS as string)?.split(",") ?? [];
+      const env = (import.meta as Record<string, unknown>)['env'] ?? process.env;
+      const allowedOrigins = (env?.['CORS_ALLOWED_ORIGINS'] as string)?.split(",") ?? [];
       if (!origin) return null;
       if (allowedOrigins.includes(origin)) return origin;
       // Dev: allow localhost
