@@ -409,21 +409,21 @@ export class BiasAuditRunner {
 
     // Log the audit action
     try {
-      const logger = getAuditLogger()
-      await logger.log({
-        action: 'create',
-        type: 'bias-audit',
-        description: `Bias audit completed for ${month}: ${report.summary}`,
-        metadata: {
+      const auditLogger = getAuditLogger()
+      await auditLogger.logAction(
+        { userId: 'audit-runner', email: 'audit-runner@pixelated.dev', role: { id: 'admin', name: 'Admin', description: 'System audit', level: 10 }, permissions: ['audit:write'] },
+        { type: 'create', category: 'bias-audit', description: `Bias audit completed for ${month}: ${report.summary}`, sensitivityLevel: 'low' },
+        'bias-audit',
+        {
           reportId: report.reportId,
           alertLevel: report.alertLevel,
           thresholdExceeded: report.thresholdExceeded,
           segmentCount: segments.length,
           totalSessions: sessions.length,
         },
-        timestamp: new Date(),
-        userId: 'audit-runner',
-      })
+        { ipAddress: '', userAgent: 'audit-runner' },
+        undefined,
+      )
     } catch {
       // Audit logging is best-effort — don't fail the audit
     }

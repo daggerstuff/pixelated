@@ -17,6 +17,7 @@ import { sp1ProverMock } from "./_helpers/sp1ProverMock";
 vi.mock("../sp1-prover", () => sp1ProverMock());
 
 import { ZKProofService } from "../zk-proof-service";
+import type { FHEOperationCallback } from "../zk-proof-service";
 
 describe("ZKProofService (SP1-integrated)", () => {
   let service: ZKProofService;
@@ -84,7 +85,7 @@ describe("ZKProofService (SP1-integrated)", () => {
           timestamp: new Date().toISOString(),
           metadata: {},
         }),
-      );
+      ) as unknown as FHEOperationCallback;
 
       const result = await service.wrapOperation(
         "test input",
@@ -113,7 +114,7 @@ describe("ZKProofService (SP1-integrated)", () => {
           metadata: {},
           error: "FHE error",
         }),
-      );
+      ) as unknown as FHEOperationCallback;
 
       await expect(
         service.wrapOperation(
