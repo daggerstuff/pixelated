@@ -426,3 +426,9 @@ run_training.sh
 .tokensave
 
 .dmctn/taste-skill-backups/2026-07-27T21-42-40-193Z
+CLAUDE.md
+.rsync-exclude
+DESIGN.md
+KIMI.md
+TASTES.md
+PRODUCT.md
