@@ -58,7 +58,7 @@ jobs:
 
       - name: Create alert issue if threshold exceeded
         if: steps.bias-audit.outputs.threshold-exceeded == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const month = '${{ steps.bias-audit.outputs.month }}';
