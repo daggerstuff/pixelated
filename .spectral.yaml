@@ -31,11 +31,9 @@ rules:
   oas3-response-example:
     description: 2xx responses should include at least one example for documentation.
     severity: info
-    given: $..responses[2XX]
+    given: $..responses[2XX].content
     then:
-      function: defined
-      functionOptions:
-        field: content
+      function: truthy
 
   # --- Enforce operation IDs ---
   operation-id-naming:
