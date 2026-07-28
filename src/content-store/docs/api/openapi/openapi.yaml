@@ -54,14 +54,49 @@ tags:
     description: Analytics and metrics
 
 paths:
-  /auth:
-    $ref: ./auth/auth.yaml#/paths/~1auth
+  # --- Auth endpoints ---
+  /auth/login:
+    $ref: ./auth/auth.yaml#/paths/~1login
+  /auth/register:
+    $ref: ./auth/auth.yaml#/paths/~1register
+  /auth/webauthn/register:
+    $ref: ./auth/auth.yaml#/paths/~1webauthn~1register
+  /auth/webauthn/login:
+    $ref: ./auth/auth.yaml#/paths/~1webauthn~1login
+
+  # --- User endpoints ---
   /users:
     $ref: ./users/users.yaml#/paths/~1users
+  /users/{id}:
+    $ref: ./users/users.yaml#/paths/~1users~1{id}
+  /users/devices:
+    $ref: ./users/users.yaml#/paths/~1users~1devices
+  /users/devices/{deviceId}:
+    $ref: ./users/users.yaml#/paths/~1users~1devices~1{deviceId}
+  /users/profile:
+    $ref: ./users/users.yaml#/paths/~1users~1profile
+  /users/email:
+    $ref: ./users/users.yaml#/paths/~1users~1email
+  /users/email/verify:
+    $ref: ./users/users.yaml#/paths/~1users~1email~1verify
+  /users/{userId}/profile-picture:
+    $ref: ./users/users.yaml#/paths/~1users~1{userId}~1profile-picture
+
+  # --- Session endpoints ---
   /sessions:
     $ref: ./sessions/sessions.yaml#/paths/~1sessions
-  /analytics:
-    $ref: ./analytics/analytics.yaml#/paths/~1analytics
+  /sessions/{id}:
+    $ref: ./sessions/sessions.yaml#/paths/~1sessions~1{id}
+  /sessions/current:
+    $ref: ./sessions/sessions.yaml#/paths/~1sessions~1current
+
+  # --- Analytics endpoints ---
+  /analytics/users/{userId}:
+    $ref: ./analytics/analytics.yaml#/paths/~1analytics~1users~1{userId}
+  /analytics/system:
+    $ref: ./analytics/analytics.yaml#/paths/~1analytics~1system
+  /analytics/export:
+    $ref: ./analytics/analytics.yaml#/paths/~1analytics~1export
 
 components:
   schemas:
@@ -70,7 +105,20 @@ components:
     Pagination:
       $ref: ./schemas/common.yaml#/Pagination
     Timestamp:
-      $ref: ./schemas/common.yaml#/Timestamp
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          description: Last update timestamp
+        deletedAt:
+          type: string
+          format: date-time
+          description: Deletion timestamp (if soft deleted)
     User:
       $ref: ./schemas/user.yaml#/User
     Session:

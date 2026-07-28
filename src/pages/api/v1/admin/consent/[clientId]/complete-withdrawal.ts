@@ -16,7 +16,7 @@ export const POST = protectRoute({
   validateUserAgent: true,
 })(async ({ params }) => {
   try {
-    const clientId = params.clientId as string
+    const clientId = params['clientId'] as string
 
     await consentManagementService.completeWithdrawal(clientId)
 

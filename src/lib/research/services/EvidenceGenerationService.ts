@@ -517,10 +517,10 @@ export class EvidenceGenerationService {
       results = {
         testStatistic: chiResult.chiSquare,
         pValue: chiResult.pValue,
-        effectSize: chiResult.cramersV,
+        effectSize: chiResult.effectSize,
         confidenceInterval: [
-          chiResult.cramersV - 0.1,
-          chiResult.cramersV + 0.1,
+          chiResult.effectSize - 0.1,
+          chiResult.effectSize + 0.1,
         ],
         conclusion: chiResult.pValue < alpha ? 'reject_null' : 'fail_to_reject',
       }
@@ -537,10 +537,10 @@ export class EvidenceGenerationService {
       results = {
         testStatistic: chiResult.chiSquare,
         pValue: chiResult.pValue,
-        effectSize: chiResult.cramersV,
+        effectSize: chiResult.effectSize,
         confidenceInterval: [
-          chiResult.cramersV - 0.1,
-          chiResult.cramersV + 0.1,
+          chiResult.effectSize - 0.1,
+          chiResult.effectSize + 0.1,
         ],
         conclusion: chiResult.pValue < alpha ? 'reject_null' : 'fail_to_reject',
       }

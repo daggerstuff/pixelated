@@ -2,7 +2,7 @@
  * @vitest-environment node
  */
 
-import type { NextFunction } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
@@ -11,8 +11,6 @@ const mockAuthenticateRequest = vi.hoisted(() => vi.fn())
 vi.mock('../../../lib/auth/auth0-middleware', () => ({
   authenticateRequest: mockAuthenticateRequest,
 }))
-
-import type { Response } from 'express'
 
 import { authMiddleware, requirePermissions, requireRoles } from '../auth'
 import {
@@ -54,7 +52,7 @@ describe('Authentication Middleware', () => {
         },
       })
 
-      authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       await vi.waitFor(() => {
         expect(mockNext).toHaveBeenCalled()
@@ -73,7 +71,7 @@ describe('Authentication Middleware', () => {
         error: 'Invalid token',
       })
 
-      authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       await vi.waitFor(() => {
         expect(statusSpy).toHaveBeenCalledWith(401)
@@ -87,7 +85,7 @@ describe('Authentication Middleware', () => {
     it('should handle authentication error gracefully', async () => {
       mockAuthenticateRequest.mockRejectedValue(new Error('Auth service error'))
 
-      authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       await vi.waitFor(() => {
         expect(statusSpy).toHaveBeenCalledWith(401)
@@ -108,7 +106,7 @@ describe('Authentication Middleware', () => {
         emailVerified: true,
       })
 
-      middleware(mockRequest, mockResponse, mockNext)
+      middleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -117,7 +115,7 @@ describe('Authentication Middleware', () => {
       const middleware = requireRoles(['admin'])
       mockRequest.user = undefined
 
-      middleware(mockRequest, mockResponse, mockNext)
+      middleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       expect(statusSpy).toHaveBeenCalledWith(401)
       expect(jsonSpy).toHaveBeenCalledWith({
@@ -134,7 +132,7 @@ describe('Authentication Middleware', () => {
         emailVerified: true,
       })
 
-      middleware(mockRequest, mockResponse, mockNext)
+      middleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       expect(statusSpy).toHaveBeenCalledWith(403)
       expect(jsonSpy).toHaveBeenCalledWith({
@@ -155,7 +153,7 @@ describe('Authentication Middleware', () => {
         emailVerified: true,
       })
 
-      middleware(mockRequest, mockResponse, mockNext)
+      middleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
     })
@@ -164,7 +162,7 @@ describe('Authentication Middleware', () => {
       const middleware = requirePermissions(['documents:read'])
       mockRequest.user = undefined
 
-      middleware(mockRequest, mockResponse, mockNext)
+      middleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       expect(statusSpy).toHaveBeenCalledWith(401)
     })
@@ -178,7 +176,7 @@ describe('Authentication Middleware', () => {
         emailVerified: true,
       })
 
-      middleware(mockRequest, mockResponse, mockNext)
+      middleware(mockRequest as unknown as Request, mockResponse, mockNext)
 
       expect(statusSpy).toHaveBeenCalledWith(403)
       expect(jsonSpy).toHaveBeenCalledWith({

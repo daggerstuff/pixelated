@@ -23,6 +23,7 @@
 .ralph-tui
 .factory/
 .art/
+.openhands/
 hackathon/
 skills/
 
@@ -423,3 +424,11 @@ run_training.sh
 
 .clinerules
 .tokensave
+
+.dmctn/taste-skill-backups/2026-07-27T21-42-40-193Z
+CLAUDE.md
+.rsync-exclude
+DESIGN.md
+KIMI.md
+TASTES.md
+PRODUCT.md

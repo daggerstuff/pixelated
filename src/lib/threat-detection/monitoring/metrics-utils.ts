@@ -180,13 +180,14 @@ function detectAnomaliesStatistical(metrics: MetricData[]): AnomalyResult[] {
       const zScore = Math.abs((metric.value - average) / stdDev)
       const isAnomaly = zScore > 2.5 // More than 2.5 standard deviations
 
-      return {
+      const result: AnomalyResult = {
         value: metric.value,
         isAnomaly,
         confidence: Math.min(zScore / 4, 1), // Normalize confidence
         severity: (zScore > 3.5 ? 'high' : zScore > 2.5 ? 'medium' : 'low'),
         reason: isAnomaly ? `Z-score: ${zScore.toFixed(2)}` : undefined,
       }
+      return result
     })
     .filter((result) => result.isAnomaly)
 }

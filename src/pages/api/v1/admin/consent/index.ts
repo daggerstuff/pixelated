@@ -1,4 +1,5 @@
 import { consentManagementService } from '@/lib/research/services/ConsentManagementService'
+import type { ConsentRecord } from '@/lib/research/types/research-types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { protectRoute } from '../../../../../lib/auth/serverAuth'
@@ -36,8 +37,8 @@ export const GET = protectRoute({
 
     const statistics = await consentManagementService.getConsentStatistics()
     const auditTrail = await consentManagementService.getAuditTrail()
-    const clientIds = new Set(auditTrail.map((entry) => entry.clientId))
-    const records = []
+    const clientIds = new Set(auditTrail.map((entry: { clientId: string }) => entry.clientId))
+    const records: ConsentRecord[] = []
     for (const id of clientIds) {
       const record = await consentManagementService.getConsentRecord(id)
       if (record) {

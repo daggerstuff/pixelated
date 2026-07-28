@@ -22,7 +22,7 @@
  * The admin role bypasses all scope checks.
  */
 
-import { defaultFieldResolver, GraphQLSchema } from "graphql";
+import { defaultFieldResolver, GraphQLSchema, type GraphQLResolveInfo } from "graphql";
 import { mapSchema, MapperKind, getDirectiveExtensions } from "@graphql-tools/utils";
 import type { GraphqlContext } from "./resolvers";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
@@ -64,13 +64,13 @@ export function applyAuthDirectives(schema: GraphQLSchema): GraphQLSchema {
     [MapperKind.OBJECT_FIELD]: (fieldConfig, fieldName) => {
       const directives = getDirectiveExtensions(fieldConfig, schema);
 
-      const authEntries = directives?.auth; // [{ scope?: string }] | undefined
-      const roleEntries = directives?.requireRole; // [{ role: string }] | undefined
+      const authEntries = directives?.['auth']; // [{ scope?: string }] | undefined
+      const roleEntries = directives?.['requireRole']; // [{ role: string }] | undefined
 
       if (!authEntries?.length && !roleEntries?.length) return fieldConfig;
 
-      const requiredScope = authEntries?.[0]?.scope as string | undefined;
-      const requiredRole = roleEntries?.[0]?.role as string | undefined;
+      const requiredScope = authEntries?.[0]?.['scope'] as string | undefined;
+      const requiredRole = roleEntries?.[0]?.['role'] as string | undefined;
 
       const originalResolve = fieldConfig.resolve ?? defaultFieldResolver;
 
@@ -78,7 +78,7 @@ export function applyAuthDirectives(schema: GraphQLSchema): GraphQLSchema {
         parent: unknown,
         args: unknown,
         context: GraphqlContext,
-        info: unknown,
+        info: GraphQLResolveInfo,
       ) => {
         // ── Authentication ──────────────────────────────────────
         if (authEntries?.length && !context.user) {

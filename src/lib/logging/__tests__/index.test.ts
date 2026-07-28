@@ -327,7 +327,7 @@ describe('getLogger / configureLogging', () => {
     const b = getLogger()
     // supplying options on the first call creates and caches that instance
     expect(a).toBe(b)
-    expect(a.options.prefix).toBe('first')
+    expect((a as unknown as { options: { prefix: string } }).options.prefix).toBe('first')
   })
 })
 

@@ -54,4 +54,4 @@ Session:
       description: Additional session metadata
       additionalProperties: true
     allOf:
-      - $ref: ./common.yaml#/Timestamp'
+      - $ref: ./common.yaml#/Timestamp

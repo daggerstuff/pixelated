@@ -15,6 +15,7 @@
  */
 
 import { usePersistedOperations as createPersistedOperationsPlugin } from "@graphql-yoga/plugin-persisted-operations";
+import type { DocumentNode } from "graphql";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
 const logger = createBuildSafeLogger("graphql-persisted-queries");
@@ -81,7 +82,7 @@ registerPersistedOperation(
 // Plugin export
 // ──────────────────────────────────────────────
 
-const isProduction = process.env.NODE_ENV === "production" && process.env.VITEST !== "true";
+const isProduction = process.env['NODE_ENV'] === "production" && process.env['VITEST'] !== "true";
 
 /**
  * Creates the persisted operations plugin for graphql-yoga.
@@ -91,17 +92,7 @@ const isProduction = process.env.NODE_ENV === "production" && process.env.VITEST
  */
 export function persistedOperationsPlugin() {
   const plugin = createPersistedOperationsPlugin({
-    getPersistedOperation,
-    onlyPersistedOperations: isProduction,
-    // Allow extracting persisted operation ID from the request body
-    // Supports both Apollo-style `extensions.persistedQuery.sha256Hash`
-    // and Relay-style `doc_id` field
-    extractPersistedOperationId: (_request: Request) => {
-      // Try Apollo APQ format: body.extensions.persistedQuery.sha256Hash
-      // This is handled by the plugin automatically; we only need
-      // custom extraction for non-standard formats.
-      return null;
-    },
+    getPersistedOperation: getPersistedOperation as unknown as (key: string, request: Request, context: Record<string, any>) => string | DocumentNode | null,
   });
   return plugin;
 }

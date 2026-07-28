@@ -128,16 +128,16 @@ export function createQueryFromRequest(
 
   const parameters: Record<string, unknown> = {}
   if (req.dsl) {
-    parameters.dsl = req.dsl
-    parameters.outputFormat = outputFormat
+    parameters['dsl'] = req.dsl
+    parameters['outputFormat'] = outputFormat
     if (epsilon !== undefined) {
-      parameters.epsilon = epsilon
+      parameters['epsilon'] = epsilon
     }
   }
   if (epsilon !== undefined) {
-    parameters.epsilon = epsilon
+    parameters['epsilon'] = epsilon
   }
-  parameters.outputFormat = outputFormat
+  parameters['outputFormat'] = outputFormat
 
   return {
     id: crypto.randomUUID(),

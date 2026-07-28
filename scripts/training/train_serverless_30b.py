@@ -42,7 +42,15 @@ GROUPS_PER_STEP = 5
 ROLLOUTS_PER_GROUP = 8
 LEARNING_RATE = 1e-5
 MAX_RL_STEPS = 100
-SFT_WARMUP_STEPS = 50
+SFT_WARMUP_STEPS = 50  # Number of SFT steps to run before RL
+
+
+# NOTE: ``rollout`` and ``compute_ngram_overlap`` are imported from
+# ``serverless_utils`` (see import block above).  The imported ``rollout``
+# signature is ``rollout(_model, messages, _step=0)``; it generates completions
+# through the model's own serverless inference endpoint and injects the
+# token IDs that the W&B serverless backend requires, so we reuse it
+# instead of redefining a local copy here.
 
 
 async def main():

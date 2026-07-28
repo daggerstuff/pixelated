@@ -35,7 +35,7 @@ const defaultItems: NavigationItem[] = [
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
   { label: 'Login', href: '/login', requiresGuest: true },
-  { label: 'Sign Up', href: '/signup', requiresGuest: true },
+  { label: 'Sign Up', href: '/register', requiresGuest: true },
 ]
 
 export function Navigation({

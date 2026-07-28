@@ -137,22 +137,22 @@ describe("QueryAuditService", () => {
       const query = makeQuery({ parameters: { description: longValue } });
       const entry = service.logQuery(query, "admin", "admin", makeResult(), 0.1, 10, false);
 
-      expect(entry.parameters.description).toHaveLength(103);
-      expect(entry.parameters.description).toContain("...");
+      expect(entry.parameters['description']).toHaveLength(103);
+      expect(entry.parameters['description']).toContain("...");
     });
 
     it("should sanitize array parameters as array[length]", () => {
       const query = makeQuery({ parameters: { ids: ["a", "b", "c"] } });
       const entry = service.logQuery(query, "admin", "admin", makeResult(), 0.1, 10, false);
 
-      expect(entry.parameters.ids).toBe("array[3]");
+      expect(entry.parameters['ids']).toBe("array[3]");
     });
 
     it("should sanitize object parameters as object", () => {
       const query = makeQuery({ parameters: { config: { nested: true } } });
       const entry = service.logQuery(query, "admin", "admin", makeResult(), 0.1, 10, false);
 
-      expect(entry.parameters.config).toBe("object");
+      expect(entry.parameters['config']).toBe("object");
     });
 
     it("should record cache hit", () => {
@@ -325,9 +325,9 @@ describe("QueryAuditService", () => {
       expect(stats.failedQueries).toBe(1);
       expect(stats.cacheHits).toBe(1);
       expect(stats.avgExecutionTime).toBe(53);
-      expect(stats.queriesByType.sql).toBe(2);
+      expect(stats.queriesByType['sql']).toBe(2);
       expect(stats.queriesByType["pattern-discovery"]).toBe(1);
-      expect(stats.queriesByUser.admin).toBe(3);
+      expect(stats.queriesByUser['admin']).toBe(3);
     });
 
     it("should handle empty audit trail", () => {
@@ -559,8 +559,8 @@ describe("QueryDSL", () => {
 
     expect(query.id).toBeDefined();
     expect(query.description).toBe("Test query with custom epsilon");
-    expect(query.parameters.epsilon).toBe(0.25);
-    expect(query.parameters.outputFormat).toBe("csv");
+    expect(query.parameters['epsilon']).toBe(0.25);
+    expect(query.parameters['outputFormat']).toBe("csv");
     expect(query.anonymizationLevel).toBe("medium");
     expect(query.type).toBe("aggregate-analysis");
     expect(query.createdBy).toBe("researcher-001");
@@ -574,7 +574,7 @@ describe("QueryDSL", () => {
 
     expect(query.type).toBe("aggregate-analysis");
     expect(query.anonymizationLevel).toBe("high");
-    expect(query.parameters.outputFormat).toBe("json");
+    expect(query.parameters['outputFormat']).toBe("json");
     expect(query.requiresApproval).toBe(true);
   });
 

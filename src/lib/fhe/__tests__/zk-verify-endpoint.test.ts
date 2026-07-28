@@ -8,7 +8,7 @@
  * resolves them natively.
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ZKProofService, resetZKProofService } from '../zk-proof-service'
+import { ZKProofService, resetZKProofService, MAX_PROOF_AGE_MS } from '../zk-proof-service'
 import type { ZKProofArtifact } from '../zk-proof-service'
 
 /**
@@ -18,6 +18,9 @@ import type { ZKProofArtifact } from '../zk-proof-service'
  * POST /api/v1/zk/verify endpoint delegates to. The endpoint itself
  * requires authentication middleware (protectRoute) which is tested
  * in the Playwright API security suite.
+ * 
+ * Enterprise hardening tests: nonce validation, replay prevention,
+ * timestamp freshness, and audit trail structure.
  */
 
 describe('ZK Proof Verification — Endpoint Logic', () => {
@@ -235,5 +238,91 @@ describe('ZK Proof Verification — Endpoint Logic', () => {
     const duration = performance.now() - start
 
     expect(duration).toBeLessThan(100)
+  })
+
+  // ── Enterprise hardening tests ─────────────────────────────────────
+
+  it('proof artifact includes a valid nonce for replay protection', async () => {
+    const proof = await service.generateProof(
+      'input',
+      'fhe-summarize',
+      'output',
+    )
+
+    expect(proof.nonce).toMatch(/^[0-9a-f]{64}$/)
+    expect(proof.nonce).not.toBe('0'.repeat(64))
+  })
+
+  it('rejects expired proof older than MAX_PROOF_AGE_MS', async () => {
+    const proof = await service.generateProof('input', 'op', 'output')
+    const expired = { ...proof, timestamp: Date.now() - 2 * MAX_PROOF_AGE_MS }
+
+    const valid = await service.verifyProof(
+      expired,
+      expired.publicInputHash,
+      expired.publicOutputHash,
+    )
+    expect(valid).toBe(false)
+  })
+
+  it('rejects proof with future timestamp (clock drift / tampering)', async () => {
+    const proof = await service.generateProof('input', 'op', 'output')
+    const futureProof = { ...proof, timestamp: Date.now() + 3600_000 }
+
+    const valid = await service.verifyProof(
+      futureProof,
+      futureProof.publicInputHash,
+      futureProof.publicOutputHash,
+    )
+    expect(valid).toBe(false)
+  })
+
+  it('rejects proof with missing nonce', async () => {
+    const proof = await service.generateProof('input', 'op', 'output')
+    const { nonce: _, ...noNonce } = proof
+
+    const valid = await service.verifyProof(
+      noNonce as any,
+      proof.publicInputHash,
+      proof.publicOutputHash,
+    )
+    expect(valid).toBe(false)
+  })
+
+  it('proof artifact lists nonce among required API fields', async () => {
+    const proof = await service.generateProof(
+      'input',
+      'fhe-summarize',
+      'output',
+    )
+
+    expect(proof.proof).toMatch(/^[0-9a-f]{64}$/)
+    expect(proof.publicInputHash).toMatch(/^[0-9a-f]{64}$/)
+    expect(proof.publicOutputHash).toMatch(/^[0-9a-f]{64}$/)
+    expect(proof.merkleRoot).toMatch(/^[0-9a-f]{64}$/)
+    expect(proof.nonce).toMatch(/^[0-9a-f]{64}$/)
+    expect(proof.operationType).toBe('fhe-summarize')
+    expect(proof.timestamp).toBeGreaterThan(0)
+    expect(proof.durationMs).toBeGreaterThanOrEqual(0)
+  })
+
+  it('proof artifact round-trip preserves nonce', async () => {
+    const proof = await service.generateProof(
+      'round-trip input',
+      'fhe-summarize',
+      'round-trip output',
+    )
+
+    const serialized = JSON.stringify(proof)
+    const deserialized = JSON.parse(serialized) as ZKProofArtifact
+
+    expect(deserialized.nonce).toBe(proof.nonce)
+
+    const valid = await service.verifyProof(
+      deserialized,
+      deserialized.publicInputHash,
+      deserialized.publicOutputHash,
+    )
+    expect(valid).toBe(true)
   })
 })
