@@ -185,7 +185,7 @@ export class ExplainabilityService {
 
     return {
       ...payload,
-      confidence: this.normalizeConfidence(payload.confidence as number),
+      confidence: this.normalizeConfidence(payload['confidence'] as number),
       sources,
       ...(techniqueAttribution ? { techniqueAttribution } : {}),
     }

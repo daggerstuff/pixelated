@@ -15,7 +15,8 @@
  * - graphql:conversationTurnAdded
  */
 
-import type { Redis as RedisClient } from "ioredis";
+import type Redis from "ioredis";
+type RedisClient = Redis;
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
 const logger = createBuildSafeLogger("graphql-redis-pubsub");
@@ -129,7 +130,7 @@ class RedisPubSub {
       // Create duplicate connections for pub/sub
       // ioredis requires a dedicated connection for subscribing
       const Redis = (await import("ioredis")).default;
-      const redisUrl = (process.env.REDIS_URL ?? process.env.UPSTASH_REDIS_REST_URL) || "";
+      const redisUrl = (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) || "";
 
       if (redisUrl) {
         this.publisher = new Redis(redisUrl);
@@ -221,7 +222,7 @@ class RedisPubSub {
           this.topicHandlers.get(channel)?.delete(handler);
           if (this.topicHandlers.get(channel)?.size === 0) {
             this.topicHandlers.delete(channel);
-            this.subscriber?.unsubscribe(channel);
+            void this.subscriber?.unsubscribe(channel);
           }
           return Promise.resolve({ done: true, value: undefined });
         },

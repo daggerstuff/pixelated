@@ -135,6 +135,7 @@ interface SealCKKSEncoder extends SealDisposable {
     plaintext: SealPlainText,
   ): void
   decode(plaintext: SealPlainText): number[] | Float64Array
+  readonly slotCount: number
 }
 
 interface SealCompressionEnum {

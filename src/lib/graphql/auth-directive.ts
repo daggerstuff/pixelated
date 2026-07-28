@@ -64,13 +64,13 @@ export function applyAuthDirectives(schema: GraphQLSchema): GraphQLSchema {
     [MapperKind.OBJECT_FIELD]: (fieldConfig, fieldName) => {
       const directives = getDirectiveExtensions(fieldConfig, schema);
 
-      const authEntries = directives?.auth; // [{ scope?: string }] | undefined
-      const roleEntries = directives?.requireRole; // [{ role: string }] | undefined
+      const authEntries = directives?.['auth']; // [{ scope?: string }] | undefined
+      const roleEntries = directives?.['requireRole']; // [{ role: string }] | undefined
 
       if (!authEntries?.length && !roleEntries?.length) return fieldConfig;
 
-      const requiredScope = authEntries?.[0]?.scope as string | undefined;
-      const requiredRole = roleEntries?.[0]?.role as string | undefined;
+      const requiredScope = authEntries?.[0]?.['scope'] as string | undefined;
+      const requiredRole = roleEntries?.[0]?.['role'] as string | undefined;
 
       const originalResolve = fieldConfig.resolve ?? defaultFieldResolver;
 

@@ -8,7 +8,8 @@ SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
 # each under a hostname-keyed subfolder.
 RCLONE_TARGET="${RCLONE_TARGET:-}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
-LOCK_FILE_BASE="${HOME:-/home/vivi}"
+# shellcheck disable=SC2034
+LOCK_FILE_BASE="${HOME:-/home/vivi}" # Used externally via env var for lock file path
 BACKUP_MODE="${BACKUP_MODE:-incremental}"
 BACKUP_KEEP_RUNS="${BACKUP_KEEP_RUNS:-2}"
 BACKUP_RUN_PREFIX="${BACKUP_RUN_PREFIX:-home-vivi-run}"

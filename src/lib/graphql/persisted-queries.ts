@@ -81,7 +81,7 @@ registerPersistedOperation(
 // Plugin export
 // ──────────────────────────────────────────────
 
-const isProduction = process.env.NODE_ENV === "production" && process.env.VITEST !== "true";
+const isProduction = process.env['NODE_ENV'] === "production" && process.env['VITEST'] !== "true";
 
 /**
  * Creates the persisted operations plugin for graphql-yoga.

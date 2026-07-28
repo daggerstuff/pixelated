@@ -51,7 +51,7 @@ function secureRandomFloat(): number {
  * skip the brittle bound and rely on the deterministic behavior assertions.
  */
 function assertFast(durationMs: number, boundMs: number): void {
-  if (process.env.CI) {
+  if (process.env['CI']) {
     expect(durationMs).toBeLessThan(boundMs)
   }
 }
