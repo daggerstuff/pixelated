@@ -22,7 +22,7 @@
  * ```
  */
 
-import { GraphQLClient, type Variables } from "graphql-request";
+import { GraphQLClient } from "graphql-request";
 
 import type {
   HealthQuery,
@@ -332,7 +332,6 @@ export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
   const client = new GraphQLClient(config.endpoint, {
     headers,
     fetch: config.fetch,
-    timeout: config.timeout,
   });
 
   return {
@@ -342,25 +341,25 @@ export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
     getSession: (variables: GetSessionQueryVariables) =>
       client.request<GetSessionQuery, GetSessionQueryVariables>(
         GetSessionDocument,
-        variables as Variables,
+        variables,
       ),
 
     listSessions: (variables?: ListSessionsQueryVariables) =>
       client.request<ListSessionsQuery, ListSessionsQueryVariables>(
         ListSessionsDocument,
-        (variables ?? {}) as Variables,
+        variables ?? ({} as ListSessionsQueryVariables),
       ),
 
     getEmotions: (variables: GetEmotionsQueryVariables) =>
       client.request<GetEmotionsQuery, GetEmotionsQueryVariables>(
         GetEmotionsDocument,
-        variables as Variables,
+        variables,
       ),
 
     getInterventions: (variables: GetInterventionsQueryVariables) =>
       client.request<GetInterventionsQuery, GetInterventionsQueryVariables>(
         GetInterventionsDocument,
-        variables as Variables,
+        variables,
       ),
 
     getAnonymizedMetrics: () =>
@@ -371,13 +370,13 @@ export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
     getSessionEmotions: (variables: GetSessionEmotionsQueryVariables) =>
       client.request<GetSessionEmotionsQuery, GetSessionEmotionsQueryVariables>(
         GetSessionEmotionsDocument,
-        variables as Variables,
+        variables,
       ),
 
     getSessionTurns: (variables: GetSessionTurnsQueryVariables) =>
       client.request<GetSessionTurnsQuery, GetSessionTurnsQueryVariables>(
         GetSessionTurnsDocument,
-        variables as Variables,
+        variables,
       ),
 
     // ── Subscription documents (raw strings for graphql-ws client) ──

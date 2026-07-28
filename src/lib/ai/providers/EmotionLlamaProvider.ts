@@ -221,20 +221,20 @@ export class EmotionLlamaProvider {
       perEmotionConfidence: perEmotion,
     }
 
+    // Enrich adds explainability fields (sources, confidence, techniqueAttribution)
+    // to the base EmotionAnalysis. Cast through unknown because the generic
+    // constraint T extends Record<string, unknown> conflicts with the
+    // EmotionAnalysis interface shape in strict TS.
     const enriched = explainabilityService.enrich(
-      baseAnalysis,
+      baseAnalysis as unknown as Record<string, unknown>,
       context,
-      emotionVector,
-    )
-    return {
-      ...enriched,
-      id: enriched.id,
-      sessionId: enriched.sessionId,
-      timestamp: enriched.timestamp,
-      emotions: enriched.emotions,
-      dimensions: enriched.dimensions,
-      metadata: enriched.metadata,
+      emotionVector as unknown as Record<string, number>,
+    ) as unknown as EmotionAnalysis & {
+      confidence: number
+      sources: import('../explainability/types').ExplainabilitySource[]
+      techniqueAttribution?: import('../explainability/types').TechniqueAttribution
     }
+    return enriched as EmotionAnalysis
   }
 
   /**
@@ -299,19 +299,11 @@ export class EmotionLlamaProvider {
     }
 
     const enriched = explainabilityService.enrich(
-      baseAnalysis,
+      baseAnalysis as unknown as Record<string, unknown>,
       context,
-      neutralEmotions,
+      neutralEmotions as unknown as Record<string, number>,
     )
-    return {
-      ...enriched,
-      id: enriched.id,
-      sessionId: enriched.sessionId,
-      timestamp: enriched.timestamp,
-      emotions: enriched.emotions,
-      dimensions: enriched.dimensions,
-      metadata: enriched.metadata,
-    }
+    return enriched as unknown as EmotionAnalysis
   }
 
   /**
@@ -358,20 +350,11 @@ export class EmotionLlamaProvider {
     }
 
     const enriched = explainabilityService.enrich(
-      baseAnalysis,
+      baseAnalysis as unknown as Record<string, unknown>,
       context,
-      emotions,
+      emotions as unknown as Record<string, number>,
     )
-    return {
-      ...enriched,
-      // Preserve original interface structure
-      id: enriched.id,
-      sessionId: enriched.sessionId,
-      timestamp: enriched.timestamp,
-      emotions: enriched.emotions,
-      dimensions: enriched.dimensions,
-      metadata: enriched.metadata,
-    }
+    return enriched as unknown as EmotionAnalysis
   }
 
   /**

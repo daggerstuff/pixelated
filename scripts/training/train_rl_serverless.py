@@ -46,15 +46,13 @@ ROLLOUTS_PER_GROUP = 8
 LEARNING_RATE = 1e-5
 MAX_RL_STEPS = 100
 
-AZURE_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY", "")
-if not AZURE_API_KEY:
-    raise ValueError("AZURE_OPENAI_API_KEY is required for Azure rollouts.")
-
-AZURE_CLIENT = AsyncOpenAI(
-    api_key=AZURE_API_KEY,
-    base_url=os.environ.get("AZURE_OPENAI_ENDPOINT", "https://slutrock-resource.services.ai.azure.com/openai/v1"),
+# Use local Ollama for rollouts to avoid W&B inference quota costs.
+# W&B serverless training remains free for us; inference is not.
+OLLAMA_CLIENT = AsyncOpenAI(
+    base_url="http://localhost:11434/v1",
+    api_key="ollama",
 )
-AZURE_MODEL = os.environ.get("AZURE_OPENAI_MODEL_NAME", "masked-qwen")
+OLLAMA_MODEL = "hf.co/unsloth/Qwen3.5-4B-GGUF:Q4_K_S"
 
 
 @weave.op()
@@ -93,9 +91,9 @@ async def rollout(model: art.Model, messages: list, step: int = 0) -> art.Trajec
     # Ensure trajectory ends with user message for generation
     trajectory.messages_and_choices = list(context)
 
-    # Generate completion via Azure OpenAI-compatible endpoint
-    completion = await AZURE_CLIENT.chat.completions.create(
-        model=AZURE_MODEL,
+    # Generate completion via local Ollama (free) instead of W&B inference (paid)
+    completion = await OLLAMA_CLIENT.chat.completions.create(
+        model=OLLAMA_MODEL,
         messages=trajectory.messages(),
         max_tokens=1024,
         temperature=0.8,
