@@ -16,7 +16,7 @@ export const GET = protectRoute({
   validateUserAgent: true,
 })(async ({ params }) => {
   try {
-    const clientId = params.clientId as string;
+    const clientId = params['clientId'] as string;
     const record = await consentManagementService.getConsentRecord(clientId);
 
     if (!record) {
@@ -59,7 +59,7 @@ export const PATCH = protectRoute({
   validateUserAgent: true,
 })(async ({ params, request }) => {
   try {
-    const clientId = params.clientId as string;
+    const clientId = params['clientId'] as string;
     const body = await request.json();
     const { newLevel, reason, effectiveDate } = body;
 
@@ -117,7 +117,7 @@ export const DELETE = protectRoute({
   validateUserAgent: true,
 })(async ({ params, request }) => {
   try {
-    const clientId = params.clientId as string;
+    const clientId = params['clientId'] as string;
     let body: { reason?: string; immediate?: boolean } = {};
     try {
       body = await request.json();
