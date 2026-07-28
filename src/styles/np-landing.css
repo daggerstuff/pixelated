@@ -151,15 +151,17 @@
   position: relative;
 }
 
+/* Inverted slab: the one unmistakable action on the page.
+   Clears WCAG 1.4.11 in both themes where an elevated-on-bg slab cannot. */
 .np-btn-primary {
-  background: var(--np-elevated);
-  color: var(--np-text);
+  background: var(--np-text);
+  color: var(--np-bg);
 }
 .np-btn-primary:hover {
-  background: var(--np-hover);
+  background: var(--np-mid);
 }
 .np-btn-primary:active {
-  background: var(--np-surface);
+  background: var(--np-muted);
 }
 
 .np-btn-ghost {
@@ -234,6 +236,17 @@
   gap: 16px;
   flex-wrap: wrap;
   margin-top: 36px;
+}
+
+/* Compliance line under the hero CTAs: quiet, factual, mono — record voice. */
+.np-hero__helper {
+  margin-top: 20px;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--np-muted);
+  max-width: 52ch;
+  line-height: 1.6;
 }
 
 /* Domain proof object — a clinical supervision record, not a chat log.
@@ -375,8 +388,7 @@
   position: relative;
 }
 
-.np-record__margin::before {
-  content: '↳ supervisor note';
+.np-record__margin-label {
   display: block;
   font-style: normal;
   font-size: 0.5625rem;
@@ -440,6 +452,11 @@
 /* === Section header === */
 .np-section-header {
   margin-bottom: 48px;
+}
+
+/* Second header inside a section: separates it from the block above. */
+.np-section-header--spaced {
+  margin-top: 64px;
 }
 
 .np-section-header p {
@@ -683,8 +700,9 @@
   justify-content: center;
 }
 
-.np-cta__meta {
-  margin-top: 24px;
+/* Both beat `.np-cta p`'s margin shorthand via the extra class. */
+.np-cta .np-cta__meta {
+  margin-top: 12px;
   font-family: var(--np-font-mono);
   font-size: 0.6875rem;
   color: var(--np-muted);
@@ -694,131 +712,25 @@
   line-height: 1.6;
 }
 
-/* header/footer live outside .np-page (in BaseLayout), so scope via :has() */
-body:has(.np-page) .site-header {
-  background: var(--np-bg);
-  border-bottom: 1px solid var(--np-line);
-}
-
-body:has(.np-page) .site-header .fm-container {
-  max-width: var(--np-content);
-  margin: 0 auto;
-  padding: 0 var(--np-pad);
-}
-
-body:has(.np-page) .site-header .brand {
-  font-family: var(--np-font-mono);
-  font-size: 0.8125rem;
-  letter-spacing: 0.02em;
-  color: var(--np-text);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-body:has(.np-page) .site-header .brand-mark {
-  width: 0.8rem;
-  height: 1.6rem;
-  border-left: 1px solid var(--np-text);
-  border-right: 1px solid var(--np-text);
-  display: block;
-}
-
-body:has(.np-page) .site-nav a {
-  font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-muted);
-  text-decoration: none;
-  transition: color 0.15s ease-out;
-  background-image: none !important;
-}
-body:has(.np-page) .site-nav a:hover {
-  color: var(--np-text);
-}
-body:has(.np-page) .site-nav a.fm-nav-active {
-  color: var(--np-text);
-}
-body:has(.np-page) .site-nav a.fm-nav-active::before {
-  background: var(--np-text);
-}
-
-body:has(.np-page) .theme-toggle {
-  border: 1px solid var(--np-line);
-  background: transparent;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s ease-out;
-}
-body:has(.np-page) .theme-toggle:hover {
-  background: var(--np-surface);
-}
-body:has(.np-page) .theme-toggle:focus-visible {
-  outline: 1px solid var(--np-mid);
-  outline-offset: 3px;
-}
-
-/* === Footer override — bring footer into NP tokens === */
-body:has(.np-page) .site-footer {
-  border-top: 1px solid var(--np-line);
-  padding: 24px 0;
-  background: var(--np-bg);
-}
-
-body:has(.np-page) .site-footer .fm-container {
-  max-width: var(--np-content);
-  margin: 0 auto;
-  padding: 0 var(--np-pad);
-}
-
-body:has(.np-page) .site-footer .fm-footer-inner {
-  border-top: none;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-}
-
-body:has(.np-page) .site-footer .fm-section-label {
-  font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-text);
-}
-
-body:has(.np-page) .site-footer .fm-footer-copy {
-  font-family: var(--np-font-body);
-  font-size: 0.8125rem;
-  color: var(--np-muted);
-  margin: 4px 0 0;
-}
-
-body:has(.np-page) .site-footer .fm-chip {
+/* Trust strip beside the pilot ask: the diligence path, one line. */
+.np-cta .np-cta__trust {
+  margin-top: 28px;
   font-family: var(--np-font-mono);
   font-size: 0.6875rem;
   letter-spacing: 0.02em;
-  text-transform: uppercase;
   color: var(--np-muted);
-  text-decoration: none;
-  padding: 4px 8px;
-  border: 1px solid var(--np-line);
-  transition:
-    color 0.15s ease,
-    border-color 0.15s ease;
-  background-image: none !important;
+  line-height: 1.6;
 }
-body:has(.np-page) .site-footer .fm-chip:hover {
+
+.np-cta__trust a {
   color: var(--np-text);
-  border-color: var(--np-mid);
-  background-image: none !important;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--np-line-strong);
+}
+
+.np-cta__trust a:hover {
+  text-decoration-color: var(--np-text);
 }
 
 /* === Feature cards — varied layout (wider first card) === */
