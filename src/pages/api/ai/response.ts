@@ -158,8 +158,14 @@ export const POST: APIRoute = async ({ request }) => {
     } = body;
 
     // Merge reverie prompt with any existing instructions
+    const MAX_REVERIE_PROMPT_LEN = 4096;
+    if (reveriePrompt && reveriePrompt.length > MAX_REVERIE_PROMPT_LEN) {
+      console.warn(
+        `[response.ts] reveriePrompt truncated from ${reveriePrompt.length} to ${MAX_REVERIE_PROMPT_LEN} chars`,
+      );
+    }
     const combinedInstructions =
-      [reveriePrompt ? reveriePrompt.slice(0, 4096) : null, instructions]
+      [reveriePrompt ? reveriePrompt.slice(0, MAX_REVERIE_PROMPT_LEN) : null, instructions]
         .filter(Boolean)
         .join("\n\n") || undefined;
 
