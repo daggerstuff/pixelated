@@ -8,6 +8,7 @@
 
 export type PIIStatus = "absent" | "redacted" | "present";
 export type ConsentGate = "open" | "restricted" | "blocked";
+export type ReveriePhase = "dormant" | "seeded" | "surfacing" | "active" | "fading";
 export type ConsolidationPhase =
   | "raw"
   | "consolidated"
@@ -47,7 +48,7 @@ export interface MemoryConsolidation {
   remCycles: number; // Remaining consolidation cycles
   schemaReferences: string[]; // Pointers to prior schema versions
   reverieEligible: boolean; // Reverie Engine: can this memory surface as a reverie?
-  reveriePhase: string; // Reverie Engine: 'dormant' | 'seeded' | 'surfacing' | 'active' | 'fading'
+  reveriePhase: ReveriePhase;
 }
 
 /** Canonical memory block — all fields required for tenant isolation and safety */

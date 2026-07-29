@@ -79,7 +79,10 @@ export class ForgettingEngine {
       };
     }
 
-    if (memory.importance.emotionalWeight >= this.config.reverieEligibleMinEmotionalWeight) {
+    if (
+      memory.importance.emotionalWeight >= this.config.reverieEligibleMinEmotionalWeight &&
+      !memory.gating.crisisFlag
+    ) {
       return {
         memoryId: memory.id,
         action: ForgetAction.LATENT,

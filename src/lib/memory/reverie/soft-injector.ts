@@ -92,7 +92,7 @@ export class SoftInjector {
 
     return {
       prompt,
-      activeReveries: [...this.activeReveries],
+      activeReveries: this.activeReveries.map((r) => ({ ...r })),
       totalInfluence,
       empty: this.activeReveries.length === 0,
     };
@@ -102,7 +102,7 @@ export class SoftInjector {
    * Get current active reveries without applying changes (read-only).
    */
   getActive(): ReadonlyArray<ReverieVector> {
-    return [...this.activeReveries];
+    return this.activeReveries.map((r) => ({ ...r }));
   }
 
   /**
@@ -175,14 +175,13 @@ export class SoftInjector {
   }
 
   /**
-   * Compute current influence of a reverie: resonance × phase influence × decay.
+   * Compute current influence of a reverie: resonance × phase influence.
+   * NOTE: Decay is already applied via applyDecay() which modifies resonanceScore.
+   * Do NOT apply decay again here — that would double-decay.
    */
-  private currentInfluence(reverie: ReverieVector, messageCount: number): number {
+  private currentInfluence(reverie: ReverieVector, _messageCount: number): number {
     const phaseWeight = PHASE_TO_INFLUENCE[reverie.phase] ?? 0;
-    const messagesSinceTrigger = Math.max(0, messageCount - reverie.lastTriggeredAt);
-    const halfLife = reverie.decayHalfLife || this.config.decayHalfLifeMessages;
-    const decay = Math.pow(2, -messagesSinceTrigger / halfLife);
-    return reverie.resonanceScore * phaseWeight * decay;
+    return reverie.resonanceScore * phaseWeight;
   }
 
   /**

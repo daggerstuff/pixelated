@@ -159,7 +159,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Merge reverie prompt with any existing instructions
     const combinedInstructions =
-      [reveriePrompt, instructions].filter(Boolean).join("\n\n") || undefined;
+      [reveriePrompt ? reveriePrompt.slice(0, 4096) : null, instructions]
+        .filter(Boolean)
+        .join("\n\n") || undefined;
 
     // Validate required fields
     if (!messages && !currentMessage) {

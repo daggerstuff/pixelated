@@ -150,7 +150,7 @@ function deriveRelationalPattern(schemaReferences: string[], categories: string[
   if (schemaCount >= 1) {
     return `emerging ${theme} pattern detected in consolidation; monitor for recurrence`;
   }
-  return null;
+  return `latent ${theme} signal — insufficient schema consolidation for pattern derivation`;
 }
 
 /**
@@ -181,7 +181,11 @@ export class LatentSurfacer {
    * CRITICAL: No raw memory content appears in the output. Only derived
    * behavioral modifiers, emotional tone, and validation patterns.
    */
-  surface(matches: FishhookMatch[], latentPool: MemoryBlock[]): ReverieVector[] {
+  surface(
+    matches: FishhookMatch[],
+    latentPool: MemoryBlock[],
+    messageCount: number,
+  ): ReverieVector[] {
     if (matches.length === 0) return [];
 
     // Index latent pool for quick lookup
@@ -201,6 +205,9 @@ export class LatentSurfacer {
 
       // Skip crisis memories from reverie surfacing — too delicate
       if (sourceMemory.gating.crisisFlag) continue;
+
+      // Skip blocked consent — these memories must not influence behavior
+      if (sourceMemory.gating.consentGate === "blocked") continue;
 
       const emotions = sourceMemory.emotions;
       const categories = emotions.categories;
@@ -223,7 +230,7 @@ export class LatentSurfacer {
         ),
         phase: determineInitialPhase(resonance),
         createdAt: match.timestamp,
-        lastTriggeredAt: match.timestamp,
+        lastTriggeredAt: messageCount,
         triggerCount: 1,
         decayHalfLife: this.config.decayHalfLifeMessages,
       };
@@ -250,7 +257,7 @@ export class LatentSurfacer {
    * Update an existing reverie vector when re-triggered.
    * Increments trigger count, updates last triggered, recalculates phase.
    */
-  retrigger(reverie: ReverieVector, newResonance: number, timestamp: number): ReverieVector {
+  retrigger(reverie: ReverieVector, newResonance: number, messageCount: number): ReverieVector {
     const triggerCount = reverie.triggerCount + 1;
     // Blend resonance — new detection weighted with existing
     const blendedResonance = reverie.resonanceScore * 0.4 + newResonance * 0.6;
@@ -264,7 +271,7 @@ export class LatentSurfacer {
     return {
       ...reverie,
       resonanceScore: blendedResonance,
-      lastTriggeredAt: timestamp,
+      lastTriggeredAt: messageCount,
       triggerCount,
       phase,
     };
