@@ -283,10 +283,10 @@ jobs:
           kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
           echo "Waiting for rollout..."
-          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=5m
-          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=5m
-          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=5m
-          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=5m
+          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
 
           echo "Waiting for old pods to fully terminate before smoke test..."
           # kubectl rollout status exits when new pods are Ready, but Terminating old
