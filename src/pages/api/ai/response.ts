@@ -1,70 +1,66 @@
-import type { APIRoute } from 'astro'
+import type { APIRoute } from "astro";
 
-import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
-import { createLLMService } from '@/lib/ai/services/llm-provider'
+import { ResponseGenerationService } from "@/lib/ai/services/response-generation";
+import { createLLMService } from "@/lib/ai/services/llm-provider";
 import type {
   AIService,
   AIServiceOptions,
   AIMessage,
   AIStreamChunk,
   TherapeuticResponse,
-} from '@/lib/ai/models/ai-types'
-import { aiRepository } from '@/lib/db/ai'
-import { trackApiRequest, trackApiError } from '@/lib/sentry/api-metrics'
-import { apiMetrics, countMetric } from '@/lib/sentry/utils'
+} from "@/lib/ai/models/ai-types";
+import { aiRepository } from "@/lib/db/ai";
+import { trackApiRequest, trackApiError } from "@/lib/sentry/api-metrics";
+import { apiMetrics, countMetric } from "@/lib/sentry/utils";
 
-import {
-  createAuditLog,
-  AuditEventType,
-  AuditEventStatus,
-} from '../../../lib/audit'
-import { getSession } from '../../../lib/auth/session'
+import { createAuditLog, AuditEventType, AuditEventStatus } from "../../../lib/audit";
+import { getSession } from "../../../lib/auth/session";
 
 const LLM_PROVIDER_API_KEYS: readonly string[] = [
-  'LLM_API_KEY',
-  'NVIDIA_API_KEY',
-  'NIM_API_KEY',
-  'NVIDIA_TOKEN',
-]
+  "LLM_API_KEY",
+  "NVIDIA_API_KEY",
+  "NIM_API_KEY",
+  "NVIDIA_TOKEN",
+];
 
 const LLM_PROVIDER_BASE_URLS: readonly string[] = [
-  'LLM_BASE_URL',
-  'LLM_API_URL',
-  'OPENAI_BASE_URL',
-  'NVIDIA_OPENAI_BASE_URL',
-  'NVIDIA_BASE_URL',
-  'NIM_BASE_URL',
-]
+  "LLM_BASE_URL",
+  "LLM_API_URL",
+  "OPENAI_BASE_URL",
+  "NVIDIA_OPENAI_BASE_URL",
+  "NVIDIA_BASE_URL",
+  "NIM_BASE_URL",
+];
 
 function getEnvValue(key: string): string | undefined {
-  const importMetaEnv = import.meta.env as Record<string, string | undefined>
-  return process.env[key] ?? importMetaEnv?.[key]
+  const importMetaEnv = import.meta.env as Record<string, string | undefined>;
+  return process.env[key] ?? importMetaEnv?.[key];
 }
 
 function resolveProviderApiKey(): string | undefined {
   for (const key of LLM_PROVIDER_API_KEYS) {
-    const value = getEnvValue(key)
-    if (value) return value
+    const value = getEnvValue(key);
+    if (value) return value;
   }
-  return undefined
+  return undefined;
 }
 
 function resolveSafeLlmBaseUrl(): string | undefined {
-  return LLM_PROVIDER_BASE_URLS.map((key) => getEnvValue(key)).find(Boolean)
+  return LLM_PROVIDER_BASE_URLS.map((key) => getEnvValue(key)).find(Boolean);
 }
 
 // Local Session interface - getSession returns null in this codebase
 interface Session {
   user?: {
-    id: string
-    email?: string
-    role?: string
-    name?: string
-  }
+    id: string;
+    email?: string;
+    role?: string;
+    name?: string;
+  };
   session?: {
-    sessionId?: string
-  }
-  expires?: string
+    sessionId?: string;
+  };
+  expires?: string;
 }
 
 /**
@@ -73,92 +69,84 @@ interface Session {
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Verify session for security
-    const session: Session | null = await getSession(request)
+    const session: Session | null = await getSession(request);
     if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Return endpoint information
     return new Response(
       JSON.stringify({
-        name: 'AI Therapeutic Response API',
-        description: 'Endpoint for generating therapeutic AI responses',
-        methods: ['POST'],
-        version: '1.0.0',
-        status: 'active',
-        authentication: 'required',
-        supportedModels: [
-          'minimaxai/minimax-m2.7',
-          'gpt-4',
-          'claude-3',
-        ],
+        name: "AI Therapeutic Response API",
+        description: "Endpoint for generating therapeutic AI responses",
+        methods: ["POST"],
+        version: "1.0.0",
+        status: "active",
+        authentication: "required",
+        supportedModels: ["minimaxai/minimax-m2.7", "gpt-4", "claude-3"],
         parameters: {
-          required: ['messages or currentMessage'],
-          optional: [
-            'model',
-            'temperature',
-            'maxResponseTokens',
-            'instructions',
-          ],
+          required: ["messages or currentMessage"],
+          optional: ["model", "temperature", "maxResponseTokens", "instructions"],
         },
         features: [
-          'therapeutic response generation',
-          'conversation context awareness',
-          'audit logging',
-          'token usage tracking',
+          "therapeutic response generation",
+          "conversation context awareness",
+          "audit logging",
+          "token usage tracking",
         ],
-        defaultModel: 'minimaxai/minimax-m2.7',
+        defaultModel: "minimaxai/minimax-m2.7",
         maxTokens: 1024,
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   } catch (error: unknown) {
     return new Response(
       JSON.stringify({
-        error: 'Failed to get endpoint information',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Failed to get endpoint information",
+        message: error instanceof Error ? String(error) : "Unknown error",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};
 
 /**
  * API route for therapeutic response generation
  */
 export const POST: APIRoute = async ({ request }) => {
-  const startTime = Date.now()
-  const endpoint = '/api/ai/response'
-  let session: Session | null = null
+  const startTime = Date.now();
+  const endpoint = "/api/ai/response";
+  let session: Session | null = null;
 
   try {
     // Verify session
-    session = await getSession(request)
+    session = await getSession(request);
     if (!session) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     // Parse request body
-    const body = await request.json() as {
-      messages?: AIMessage[]
-      currentMessage?: string
-      model?: string
-      temperature?: number
-      maxResponseTokens?: number
-      instructions?: string
-    }
+    const body = (await request.json()) as {
+      messages?: AIMessage[];
+      currentMessage?: string;
+      model?: string;
+      temperature?: number;
+      maxResponseTokens?: number;
+      instructions?: string;
+      reveriePrompt?: string;
+    };
     const {
       messages,
       currentMessage,
@@ -166,40 +154,39 @@ export const POST: APIRoute = async ({ request }) => {
       temperature = 0.7,
       maxResponseTokens = 1024,
       instructions,
-    } = body
+      reveriePrompt,
+    } = body;
+
+    // Merge reverie prompt with any existing instructions
+    const combinedInstructions =
+      [reveriePrompt, instructions].filter(Boolean).join("\n\n") || undefined;
 
     // Validate required fields
     if (!messages && !currentMessage) {
       return new Response(
         JSON.stringify({
-          error: 'Either messages or currentMessage is required',
+          error: "Either messages or currentMessage is required",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
     // Create LLM service
     const llmService = createLLMService({
-      apiKey: resolveProviderApiKey() ?? '',
+      apiKey: resolveProviderApiKey() ?? "",
       baseUrl: resolveSafeLlmBaseUrl(),
-    })
+    });
 
     // Use the model from the request or the default
-    const modelId = model ?? 'minimaxai/minimax-m2.7'
+    const modelId = model ?? "minimaxai/minimax-m2.7";
 
     // Create an adapter for the AI service
     const serviceAdapter: AIService = {
-      createChatCompletion: async (
-        messages: AIMessage[],
-        options?: AIServiceOptions,
-      ) => {
-        const response = await llmService.generateCompletion(
-          messages,
-          options,
-        )
+      createChatCompletion: async (messages: AIMessage[], options?: AIServiceOptions) => {
+        const response = await llmService.generateCompletion(messages, options);
         return {
           id: `llm-${Date.now()}`,
           created: Date.now(),
@@ -207,43 +194,35 @@ export const POST: APIRoute = async ({ request }) => {
           choices: [
             {
               message: {
-                role: 'assistant',
+                role: "assistant",
                 content:
-                  typeof response === 'object' &&
-                  response !== null &&
-                  'content' in response
+                  typeof response === "object" && response !== null && "content" in response
                     ? (response as { content: string }).content
-                    : '',
-                name: 'assistant',
+                    : "",
+                name: "assistant",
               },
-              finishReason: 'stop',
+              finishReason: "stop",
             },
           ],
           usage:
-            typeof response === 'object' &&
-            response !== null &&
-            'usage' in response
+            typeof response === "object" && response !== null && "usage" in response
               ? {
-                  promptTokens: ((response.usage as { promptTokens: number })
-                      ?.promptTokens || 0),
-                  completionTokens: ((response.usage as { completionTokens: number })
-                      ?.completionTokens || 0),
-                  totalTokens: ((response.usage as { totalTokens: number })?.totalTokens ||
-                      0),
+                  promptTokens: (response.usage as { promptTokens: number })?.promptTokens || 0,
+                  completionTokens:
+                    (response.usage as { completionTokens: number })?.completionTokens || 0,
+                  totalTokens: (response.usage as { totalTokens: number })?.totalTokens || 0,
                 }
               : {
                   promptTokens: 0,
                   completionTokens: 0,
                   totalTokens: 0,
                 },
-          provider: 'llm',
+          provider: "llm",
           content:
-            typeof response === 'object' &&
-            response !== null &&
-            'content' in response
+            typeof response === "object" && response !== null && "content" in response
               ? (response as { content: string }).content
-              : '',
-        }
+              : "",
+        };
       },
       createStreamingChatCompletion: async (
         _messages: AIMessage[],
@@ -252,13 +231,13 @@ export const POST: APIRoute = async ({ request }) => {
         return llmService.createStreamingChatCompletion(_messages, {
           ...(options ?? {}),
           model: options?.model ?? modelId,
-        })
+        });
       },
       getModelInfo: (model: string) => ({
         id: model,
         name: model,
-          provider: 'llm',
-        capabilities: ['chat'],
+        provider: "llm",
+        capabilities: ["chat"],
         contextWindow: 8192,
         maxTokens: 8192,
       }),
@@ -266,10 +245,7 @@ export const POST: APIRoute = async ({ request }) => {
         messages: AIMessage[],
         options?: AIServiceOptions,
       ) => {
-        const response = await llmService.generateCompletion(
-          messages,
-          options,
-        )
+        const response = await llmService.generateCompletion(messages, options);
         return {
           id: `llm-${Date.now()}`,
           created: Date.now(),
@@ -277,49 +253,41 @@ export const POST: APIRoute = async ({ request }) => {
           choices: [
             {
               message: {
-                role: 'assistant',
+                role: "assistant",
                 content:
-                  typeof response === 'object' &&
-                  response !== null &&
-                  'content' in response
+                  typeof response === "object" && response !== null && "content" in response
                     ? (response as { content: string }).content
-                    : '',
-                name: 'assistant',
+                    : "",
+                name: "assistant",
               },
-              finishReason: 'stop',
+              finishReason: "stop",
             },
           ],
           usage:
-            typeof response === 'object' &&
-            response !== null &&
-            'usage' in response
+            typeof response === "object" && response !== null && "usage" in response
               ? {
-                  promptTokens: ((response.usage as { promptTokens: number })
-                      ?.promptTokens || 0),
-                  completionTokens: ((response.usage as { completionTokens: number })
-                      ?.completionTokens || 0),
-                  totalTokens: ((response.usage as { totalTokens: number })?.totalTokens ||
-                      0),
+                  promptTokens: (response.usage as { promptTokens: number })?.promptTokens || 0,
+                  completionTokens:
+                    (response.usage as { completionTokens: number })?.completionTokens || 0,
+                  totalTokens: (response.usage as { totalTokens: number })?.totalTokens || 0,
                 }
               : {
                   promptTokens: 0,
                   completionTokens: 0,
                   totalTokens: 0,
                 },
-          provider: 'llm',
+          provider: "llm",
           content:
-            typeof response === 'object' &&
-            response !== null &&
-            'content' in response
+            typeof response === "object" && response !== null && "content" in response
               ? (response as { content: string }).content
-              : '',
-        }
+              : "",
+        };
       },
       // generateCompletion is not required for this adapter in current usage. Omitting to simplify typing.
       dispose: () => {
-        llmService.dispose()
+        llmService.dispose();
       },
-    }
+    };
 
     // Create response generation service
     const responseService = new ResponseGenerationService({
@@ -327,61 +295,61 @@ export const POST: APIRoute = async ({ request }) => {
       model: modelId,
       temperature,
       maxResponseTokens,
-    })
+    });
     // Log the request
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      'ai.response.request',
-      session?.user?.id ?? 'anonymous',
-      'response-generation',
+      "ai.response.request",
+      session?.user?.id ?? "anonymous",
+      "response-generation",
       {
-        model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId ?? "mistralai/Mixtral-8x7B-Instruct-v0.2",
         temperature,
         maxResponseTokens,
         messageCount: messages ? messages.length : 1,
       },
-    )
+    );
 
     // Start timer for latency measurement
-    const startTime = Date.now()
+    const startTime = Date.now();
 
     // Process the request
-    let result: TherapeuticResponse
+    let result: TherapeuticResponse;
     if (messages) {
       result = await responseService.generateResponseWithInstructions(
         messages,
-        instructions,
-      )
+        combinedInstructions,
+      );
     } else {
       result = await responseService.generateResponseWithInstructions(
-        [{ role: 'user', content: currentMessage ?? '' }],
-        instructions,
-      )
+        [{ role: "user", content: currentMessage ?? "" }],
+        combinedInstructions,
+      );
     }
 
-    const latencyMs = Date.now() - startTime
+    const latencyMs = Date.now() - startTime;
 
     // Track metrics
-    trackApiRequest(endpoint, 'POST', 200, latencyMs)
-    apiMetrics.responseTime(endpoint, latencyMs, 'POST')
-    countMetric('ai.response.generated', 1, {
-      model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      provider: 'llm',
+    trackApiRequest(endpoint, "POST", 200, latencyMs);
+    apiMetrics.responseTime(endpoint, latencyMs, "POST");
+    countMetric("ai.response.generated", 1, {
+      model: modelId ?? "mistralai/Mixtral-8x7B-Instruct-v0.2",
+      provider: "llm",
       success: true,
-    })
+    });
 
     // Store the result in the database
     await aiRepository.storeResponseGeneration({
-      userId: session?.user?.id ?? 'anonymous',
-      modelId: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
-      modelProvider: 'llm',
+      userId: session?.user?.id ?? "anonymous",
+      modelId: modelId ?? "mistralai/Mixtral-8x7B-Instruct-v0.2",
+      modelProvider: "llm",
       latencyMs,
       success: true,
       error: null,
-      prompt: currentMessage ?? (messages ? JSON.stringify(messages) : ''),
+      prompt: currentMessage ?? (messages ? JSON.stringify(messages) : ""),
       response: result?.content,
-      context: '',
-      instructions: instructions ?? null,
+      context: "",
+      instructions: combinedInstructions ?? null,
       temperature,
       maxTokens: maxResponseTokens,
       requestTokens: result?.usage?.promptTokens ?? 0,
@@ -390,64 +358,63 @@ export const POST: APIRoute = async ({ request }) => {
       metadata: {
         messageCount: messages ? messages.length : 1,
       },
-    })
+    });
 
     // Log the response
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      'ai.response.response',
-      session?.user?.id ?? 'anonymous',
-      'response-generation',
+      "ai.response.response",
+      session?.user?.id ?? "anonymous",
+      "response-generation",
       {
-        model: modelId ?? 'mistralai/Mixtral-8x7B-Instruct-v0.2',
+        model: modelId ?? "mistralai/Mixtral-8x7B-Instruct-v0.2",
         responseLength: result?.content.length,
         latencyMs,
       },
-    )
+    );
 
     return new Response(JSON.stringify(result), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error: unknown) {
-    const durationMs = Date.now() - startTime
-    const errorType =
-      error instanceof Error ? error.constructor.name : 'UnknownError'
+    const durationMs = Date.now() - startTime;
+    const errorType = error instanceof Error ? error.constructor.name : "UnknownError";
 
-    console.error('Error in response generation API:', error)
+    console.error("Error in response generation API:", error);
 
     // Track error metrics
-    trackApiError(endpoint, errorType, 'POST')
-    apiMetrics.responseTime(endpoint, durationMs, 'POST')
-    countMetric('ai.response.error', 1, {
+    trackApiError(endpoint, errorType, "POST");
+    apiMetrics.responseTime(endpoint, durationMs, "POST");
+    countMetric("ai.response.error", 1, {
       error_type: errorType,
       endpoint,
-    })
+    });
 
     // Create audit log for the error
     await createAuditLog(
       AuditEventType.AI_OPERATION,
-      'ai.response.error',
-      session?.user?.id ?? 'anonymous',
-      'response-generation',
+      "ai.response.error",
+      session?.user?.id ?? "anonymous",
+      "response-generation",
       {
         error: error instanceof Error ? error?.message : String(error),
         stack: error instanceof Error ? error?.stack : undefined,
-        status: 'error',
+        status: "error",
       },
       AuditEventStatus.FAILURE,
-    )
+    );
 
     return new Response(
       JSON.stringify({
-        error: 'An error occurred during response generation',
+        error: "An error occurred during response generation",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};
