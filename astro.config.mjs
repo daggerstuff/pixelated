@@ -1,3 +1,4 @@
+import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import process from 'node:process'
 
@@ -770,6 +771,32 @@ export default defineConfig({
     return [
       ...base,
       UnoCSS({ injectReset: true }),
+      // Inject build version into service worker for per-deploy cache busting
+      {
+        name: 'sw-version-injector',
+        hooks: {
+          'astro:build:done': async ({ dir }) => {
+            const swPath = path.join(dir.pathname, 'sw.js')
+            try {
+              const swContent = await readFile(swPath, 'utf-8')
+              const buildHash = process.env.SENTRY_RELEASE ?? `v-${Date.now()}`
+              const versioned = swContent.replace(
+                /__SW_VERSION__/g,
+                `v-${buildHash}`,
+              )
+              await writeFile(swPath, versioned, 'utf-8')
+              console.log(
+                `[sw-version-injector] Injected version ${buildHash} into sw.js`,
+              )
+            } catch (err) {
+              console.warn(
+                '[sw-version-injector] Could not inject SW version:',
+                err,
+              )
+            }
+          },
+        },
+      },
       ...(hasSentryDSN
         ? [
             sentry({
@@ -924,6 +951,12 @@ export default defineConfig({
   redirects: {
     '/admin': '/admin/dashboard',
     '/docs': '/docs/getting-started',
+    // Auth de-duplication: one login and one register surface.
+    '/signin': { status: 301, destination: '/login' },
+    '/signup': { status: 301, destination: '/register' },
+    // Chat consolidation: retired demo-grade and dead-mock chat pages.
+    '/ai-chat': { status: 301, destination: '/chat' },
+    '/mental-health-chat': { status: 301, destination: '/chat' },
   },
   devToolbar: {
     enabled: isDevelopment,

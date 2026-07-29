@@ -17,6 +17,7 @@ import type { SealOperationResult } from './seal-types'
 import type { SealContextOptions } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
 import type { HomomorphicOperationResult } from './types'
+import { getEncryptedTextProcessor } from './encrypted-text-processor'
 
 // Get logger
 const logger = createBuildSafeLogger('homomorphic-ops')
@@ -340,6 +341,7 @@ export class HomomorphicOperations {
         inputCiphertext.load(context, serializedCiphertext)
 
         // Perform the operation using SEAL
+        // oxlint-disable-next-line typescript(switch-exhaustiveness-check)
         switch (operation) {
           case FHEOperation.Rescale:
             return this.simulateOperation(encryptedData, operation, params)
@@ -663,6 +665,87 @@ export class HomomorphicOperations {
       // If we can't decode, just use the raw value for simulation
       decodedData = encryptedData
     }
+
+    // Try encrypted text processor for supported operations
+    const textProcessor = getEncryptedTextProcessor()
+    if (textProcessor.isAvailable()) {
+      const plaintextForEncoding = decodedData
+      let encResult:
+        | { result: string; operation: FHEOperation; fullyHomomorphic: boolean; metadata: Record<string, unknown> }
+        | null = null
+
+      try {
+        switch (operation) {
+          case FHEOperation.SENTIMENT:
+            encResult = await textProcessor.encryptedSentiment(plaintextForEncoding)
+            break
+          case FHEOperation.CATEGORIZE:
+            encResult = await textProcessor.encryptedCategorize(
+              plaintextForEncoding,
+            )
+            break
+          case FHEOperation.WORD_COUNT:
+            encResult = await textProcessor.encryptedWordCount(plaintextForEncoding)
+            break
+          case FHEOperation.CHARACTER_COUNT:
+            encResult = await textProcessor.encryptedCharacterCount(plaintextForEncoding)
+            break
+          case FHEOperation.KEYWORD_DENSITY:
+            encResult = await textProcessor.encryptedKeywordDensity(
+              plaintextForEncoding,
+              getStringArray(params?.['keywords']) ?? [],
+            )
+            break
+          case FHEOperation.TOKENIZE:
+            encResult = await textProcessor.encryptedTokenize(plaintextForEncoding)
+            break
+          case FHEOperation.FILTER:
+            encResult = await textProcessor.encryptedFilter(
+              plaintextForEncoding,
+              getStringArray(params?.['filterTerms']) ?? [],
+            )
+            break
+          case FHEOperation.SUMMARIZE:
+            encResult = await textProcessor.encryptedSummarize(
+              plaintextForEncoding,
+              getNumericValue(params?.['maxLength'], 100),
+            )
+            break
+          case FHEOperation.READING_LEVEL:
+            encResult = await textProcessor.encryptedReadingLevel(plaintextForEncoding)
+            break
+          default:
+            break
+        }
+
+        if (encResult) {
+          logger.info(
+            `Operation ${operation} performed fully homomorphically`,
+            { operationCount: encResult.metadata['operationsCount'] },
+          )
+          return {
+            success: true,
+            result: encResult.result,
+            operationType: operation,
+            timestamp: Date.now(),
+            metadata: {
+              ...encResult.metadata,
+              simulated: false,
+              fullyHomomorphic: true,
+              encryptedTextProcessor: true,
+            },
+          }
+        }
+      } catch (encError) {
+        logger.warn(
+          `Encrypted text processor failed for ${operation}, falling back to simulation`,
+          { error: encError instanceof Error ? encError.message : String(encError) },
+        )
+      }
+    }
+
+    // Fallback: plaintext simulation (decrypts → processes → re-encrypts)
+    metadata['plaintextFallback'] = true
 
     // Perform the operation (simulated)
     switch (operation) {

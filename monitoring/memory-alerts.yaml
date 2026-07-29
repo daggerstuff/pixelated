@@ -298,7 +298,8 @@ spec:
             capabilities:
               drop:
                 - ALL
-              # No additional capabilities needed for node-exporter
+            seccompProfile:
+              type: RuntimeDefault
           # Liveness probe
           livenessProbe:
             httpGet:
@@ -342,11 +343,11 @@ spec:
         - name: proc
           hostPath:
             path: /proc
-            type: ''
+            type: Directory
         - name: sys
           hostPath:
             path: /sys
-            type: ''
+            type: Directory
         # Temporary volume for writable filesystem
         - name: tmp
           emptyDir: {}

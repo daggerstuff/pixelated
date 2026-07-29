@@ -1,6 +1,6 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.18.0-bookworm-slim AS base
+FROM node:24-bookworm-slim AS base
 
 # Apply OS-level security updates to patch known vulnerabilities
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
@@ -20,6 +20,7 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get inst
     make \
     g++ \
     curl \
+    libvips-dev \
     && PNPM_SUCCESS=0; \
     for i in 1 2 3 4 5; do \
     echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
@@ -84,21 +85,18 @@ WORKDIR /app
 RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends curl && \
     rm -rf /var/lib/apt/lists/*
 
-# Create non-root user
-RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
-
 # Copy all dependencies from builder (includes workspace packages)
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copy built output and public assets from builder
-COPY --from=builder --chown=astro:astro /app/dist ./dist
-COPY --from=builder --chown=astro:astro /app/public ./public
-COPY --from=builder --chown=astro:astro /app/templates ./templates
-COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
-COPY --from=builder --chown=astro:astro /app/start-server-config.mjs ./start-server-config.mjs
-COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
-COPY --from=builder --chown=astro:astro /app/sentry-event-filter.mjs ./sentry-event-filter.mjs
-USER astro
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/templates ./templates
+COPY --from=builder --chown=node:node /app/start-server.mjs ./start-server.mjs
+COPY --from=builder --chown=node:node /app/start-server-config.mjs ./start-server-config.mjs
+COPY --from=builder --chown=node:node /app/instrument.mjs ./instrument.mjs
+COPY --from=builder --chown=node:node /app/sentry-event-filter.mjs ./sentry-event-filter.mjs
+USER node
 
 EXPOSE 4321
 

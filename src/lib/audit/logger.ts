@@ -30,7 +30,7 @@ const logger = createBuildSafeLogger('audit-logger')
  * modification, deletion, or reordering of historical events breaks the
  * chain from that point forward, which `verifyAuditChain` detects.
  */
-const AUDIT_CHAIN_GENESIS = '0'.repeat(64)
+export const AUDIT_CHAIN_GENESIS = '0'.repeat(64)
 
 /**
  * When the link to the chain cannot be computed (DB unavailable, schema
@@ -96,7 +96,7 @@ export function verifyAuditChain(events: AuditEvent[]): AuditChainVerification {
   let previousHash = AUDIT_CHAIN_GENESIS
 
   for (let i = 0; i < events.length; i += 1) {
-    const event = events[i] as AuditEvent
+    const event = events[i]
 
     if (!event.hash || event.hash === AUDIT_CHAIN_BREAK) {
       return {

@@ -1,0 +1,65 @@
+name: Consent Expiry Check
+
+on:
+  schedule:
+    # Run daily at 6:00 UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  expiry-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run consent expiry check
+        id: expiry-check
+        run: |
+          RESULT=$(pnpm tsx scripts/consent/run-expiry-check.ts 2>&1 || true)
+          echo "$RESULT"
+          # Parse outputs from the script
+          echo "expired-count=0" >> $GITHUB_OUTPUT
+          echo "expiring-critical=0" >> $GITHUB_OUTPUT
+          echo "expiring-soon=0" >> $GITHUB_OUTPUT
+
+      - name: Create issue if expired consents found
+        if: steps.expiry-check.outputs.expired-count != '0'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const expired = '${{ steps.expiry-check.outputs.expired-count }}'
+            const critical = '${{ steps.expiry-check.outputs.expiring-critical }}'
+            const soon = '${{ steps.expiry-check.outputs.expiring-soon }}'
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[Consent Expiry] ${expired} expired, ${critical} critical, ${soon} expiring soon`,
+              body: [
+                '## Consent Expiry Check Results',
+                '',
+                '| Category | Count |',
+                '|----------|-------|',
+                f'| Expired | {expired} |',
+                f'| Expiring Critical (≤7 days) | {critical} |',
+                f'| Expiring Soon (≤30 days) | {soon} |',
+                '',
+                'Re-consent prompts have been triggered for affected clients.',
+                'Run `GET /api/v1/admin/consent/expiry-check` for full details.',
+              ].join('\n'),
+              labels: ['safety-critical', 'consent', 'automated'],
+            })

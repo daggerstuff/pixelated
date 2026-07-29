@@ -2,48 +2,60 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import { SITE } from '@/config'
 import {
   heroContent,
-  introContent,
   workflowContent,
-  scenariosContent,
-  featuresContent,
   ctaContent,
 } from '@/lib/content'
 
-const { hero, intro, workflow, scenarios, features, cta } = {
+const { hero, workflow, cta } = {
   hero: heroContent,
-  intro: introContent,
   workflow: workflowContent,
-  scenarios: scenariosContent,
-  features: featuresContent,
   cta: ctaContent,
 }
+
+const sessionWalkthrough = [
+  {
+    label: 'Scenario',
+    value:
+      'A client in week three of therapy says she is not sure this is the right place and considers stopping.',
+  },
+  {
+    label: 'Practice room',
+    value:
+      'Trainee enters the conversation with an AI client that adapts to hesitation, disclosure timing, and the moment the room changes.',
+  },
+  {
+    label: 'Review desk',
+    value:
+      'Supervisor opens the transcript, marks the response that needed to slow down, and assigns the same scenario again as a retry.',
+  },
+  {
+    label: 'Training record',
+    value:
+      'The case, transcript, and supervisor note stay attached to the same run, so the next supervision meeting starts at the right moment.',
+  },
+]
+
+const buildableScenarios = [
+  {
+    kicker: 'Escalation',
+    body: 'Suicidality screening, de-escalation, safety planning, and what to say when the room changes faster than expected.',
+  },
+  {
+    kicker: 'Rupture',
+    body: 'Avoidance, dysregulation, emotional withdrawal, and the repairs that decide whether a client stays in the conversation.',
+  },
+  {
+    kicker: 'Disclosure',
+    body: 'The turn where a client shares something high-stakes and the therapist has to decide what to do next without flattening the room.',
+  },
+]
 ---
 
-<BaseLayout title={hero.title} description={hero.subtitle}>
+<BaseLayout title={hero.title} description={hero.metaDescription}>
   <div class="np-page">
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        'name': SITE.name,
-        'url': SITE.website,
-        'description': SITE.description,
-        'foundingDate': '2024',
-        'sameAs': [
-          'https://github.com/nochadisfaction',
-          'https://twitter.com/empathypixel',
-        ],
-      })
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')}
-    />
-
-    <!-- Hero -->
+    <!-- Hero: the one decision a visitor came here to make. -->
     <section class="np-hero">
       <div class="np-container np-hero__inner">
         <span class="np-label np-hero__kicker">{hero.kicker}</span>
@@ -95,254 +107,134 @@ const { hero, intro, workflow, scenarios, features, cta } = {
       </div>
     </section>
 
-    <!-- Why it matters -->
-    <section class="np-section">
-      <div class="np-container-narrow">
-        <div class="np-section-header">
-          <span class="np-label">{intro.label}</span>
-          <h2 class="np-headline">{intro.title}</h2>
-          {
-            intro.paragraphs.map((p) => (
-              <p class="np-body" style="margin-top:12px;">
-                {p}
-              </p>
-            ))
-          }
-        </div>
-      </div>
-
+    <!-- How the training loop works: the one path the product asks you to follow. -->
+    <section class="np-section np-section--track">
       <div class="np-container">
-        <span class="np-label" style="margin:0 0 12px var(--np-pad);"
-          >{intro.panelLabel}</span
-        >
-        <div class="np-card-grid">
-          {
-            intro.panelItems.map((item) => (
-              <div class="np-card">
-                <span class="np-data">{item.label}</span>
-                <p class="np-body" style="font-size:0.9375rem;">
-                  {item.body}
-                </p>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- Before / After -->
-    <section class="np-section" style="padding-top:0;">
-      <div class="np-container">
-        <div class="np-compare">
-          {
-            intro.evidenceCards.map((card) => (
-              <div class="np-compare__col">
-                <span class="np-compare__tag">{card.title}</span>
-                <ul class="np-compare__list">
-                  {card.items.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- How it works -->
-    <section class="np-section">
-      <div class="np-container">
-        <div class="np-section-header">
+        <div class="np-section-header np-section-header--track">
           <span class="np-label">{workflow.label}</span>
           <h2 class="np-headline">{workflow.title}</h2>
         </div>
 
-        <div class="np-steps">
+        <ol class="np-track" aria-label="Training loop steps">
           {
             workflow.steps.map((step) => (
-              <div class="np-step">
-                <span class="np-step__number">{step.number}</span>
-                <div class="np-step__body">
-                  <h3 class="np-title">{step.title}</h3>
-                  <p class="np-body">{step.body}</p>
-                </div>
-              </div>
+              <li class="np-track__step">
+                <span class="np-track__number" aria-hidden="true">
+                  {step.number}
+                </span>
+                <h3 class="np-title np-track__title">{step.title}</h3>
+                <p class="np-body np-track__body">{step.body}</p>
+              </li>
             ))
           }
-        </div>
+        </ol>
       </div>
     </section>
 
-    <!-- Workflow outputs band -->
-    <section class="np-band">
-      <div class="np-container-narrow">
-        <span class="np-label">{workflow.bandLabel}</span>
-        <h2 class="np-headline">{workflow.bandTitle}</h2>
-        <p class="np-body">{workflow.bandBody}</p>
-      </div>
-      <div class="np-container">
-        <div class="np-outputs">
-          {
-            workflow.outputs.map((output) => (
-              <div class="np-output">
-                <span class="np-data">{output.label}</span>
-                <p
-                  class="np-mono"
-                  style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);"
-                >
-                  {output.value}
-                </p>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- Scenarios -->
-    <section class="np-section">
+    <!-- One session, end to end: the actual product shape, walked as an artifact. -->
+    <section class="np-section np-section--artifact">
       <div class="np-container">
         <div class="np-section-header">
-          <span class="np-label">{scenarios.label}</span>
-          <h2 class="np-headline">{scenarios.title}</h2>
-        </div>
-
-        <div class="np-scenario-grid">
-          {
-            scenarios.cards.map((card) => (
-              <div class="np-scenario-card">
-                <span class="np-card__kicker">{card.kicker}</span>
-                <h3 class="np-title">{card.title}</h3>
-                <p class="np-body" style="font-size:0.9375rem;">
-                  {card.body}
-                </p>
-              </div>
-            ))
-          }
-        </div>
-
-        <!-- Strip: who it's for -->
-        <div class="np-strip">
-          <div class="np-strip__prose">
-            <span class="np-data">{scenarios.strip.label}</span>
-            <h3 class="np-title">{scenarios.strip.title}</h3>
-            <p class="np-body">{scenarios.strip.body}</p>
-          </div>
-          <div class="np-strip__items">
-            {
-              scenarios.strip.items.map((item) => (
-                <div class="np-strip__item">
-                  <span class="np-data">{item.label}</span>
-                  <p
-                    class="np-mono"
-                    style="font-size:0.8125rem;color:var(--np-text);"
-                  >
-                    {item.value}
-                  </p>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features -->
-    <section class="np-section">
-      <div class="np-container">
-        <div class="np-section-header">
-          <span class="np-label">{features.label}</span>
-          <h2 class="np-headline">{features.title}</h2>
-          <p class="np-body">{features.copy}</p>
-        </div>
-
-        <div class="np-features-grid">
-          {
-            features.cards.map((card) => (
-              <div class="np-feature-card">
-                <span class="np-data">{card.title}</span>
-                <p class="np-body" style="font-size:0.9375rem;">
-                  {card.description}
-                </p>
-              </div>
-            ))
-          }
-        </div>
-
-        <div class="np-hero__proof" style="margin-top:32px;">
-          {
-            features.proofItems.map((item) => (
-              <div class="np-hero__proof-item">
-                <p
-                  class="np-mono"
-                  style="font-size:0.8125rem;line-height:1.6;color:var(--np-muted);"
-                >
-                  {item}
-                </p>
-              </div>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="np-cta">
-      <div class="np-container-narrow">
-        <div class="np-cta-inner">
-          <span class="np-label">{cta.label}</span>
-          <h2 class="np-headline">{cta.title}</h2>
-          <p class="np-body">{cta.intro}</p>
-          <div class="np-hero__actions">
-            <a
-              class="np-btn np-btn-primary"
-              href={withBasePath(cta.primaryCTA.href)}
-            >
-              {cta.primaryCTA.text}
-            </a>
-            <a
-              class="np-btn np-btn-ghost"
-              href={withBasePath(cta.secondaryCTA.href)}
-            >
-              {cta.secondaryCTA.text}
-            </a>
-          </div>
-          <p class="np-cta__meta">{cta.meta}</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Resources — inline guidance for first-timers -->
-    <section class="np-section" style="padding-top:0;">
-      <div class="np-container">
-        <div class="np-help">
-          <span class="np-label">Explore</span>
-          <div class="np-help__links">
-            <a class="np-help__link" href={withBasePath('/features')}>
-              <span class="np-data">Features</span>
-              <span class="np-help__desc">How the platform works</span>
-            </a>
-            <a class="np-help__link" href={withBasePath('/trust')}>
-              <span class="np-data">Trust</span>
-              <span class="np-help__desc">Security and compliance</span>
-            </a>
-            <a class="np-help__link" href={withBasePath('/demo-hub')}>
-              <span class="np-data">Case Studies</span>
-              <span class="np-help__desc">Real training deployments</span>
-            </a>
-            <a class="np-help__link" href={withBasePath('/contact')}>
-              <span class="np-data">Contact</span>
-              <span class="np-help__desc">Talk to the team</span>
-            </a>
-          </div>
-          <p
-            class="np-mono"
-            style="font-size:0.6875rem;color:var(--np-muted);margin-top:12px;"
-          >
-            Book a pilot and try it with one cohort, one supervisor, and two
-            scenarios.
+          <span class="np-label">A session, end to end</span>
+          <h2 class="np-headline">
+            What your team gets when the practice is logged.
+          </h2>
+          <p class="np-body">
+            Four things arrive together from one trainee attempt: a scenario,
+            a transcript, a supervisor note, and a record your next meeting can
+            reopen without guesswork.
           </p>
+        </div>
+
+        <ol class="np-artifact">
+          {
+            sessionWalkthrough.map((step) => (
+              <li class="np-artifact__row">
+                <span class="np-data np-artifact__label">{step.label}</span>
+                <p class="np-body np-artifact__body">{step.value}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="np-section-header np-section-header--spaced">
+          <span class="np-label">Scenarios your team can run today</span>
+          <h2 class="np-headline">
+            Three places teams start when training feels too improvised.
+          </h2>
+        </div>
+
+        <div class="np-scenarios-grid">
+          <article class="np-scenario-feature">
+            <span class="np-data np-scenario__kicker">Escalation</span>
+            <p class="np-body np-scenario__body">
+              Suicidality screening, de-escalation, safety planning, and what to
+              say when the room changes faster than expected.
+            </p>
+            <span class="np-scenario__pin" aria-hidden="true">
+              Highest-stakes · start here
+            </span>
+          </article>
+
+          <article class="np-scenario-side np-scenario-side--rupture">
+            <span class="np-data np-scenario__kicker">Rupture</span>
+            <p class="np-body np-scenario__body">
+              Avoidance, dysregulation, emotional withdrawal, and the repairs
+              that decide whether a client stays in the conversation.
+            </p>
+          </article>
+
+          <article class="np-scenario-side np-scenario-side--disclosure">
+            <span class="np-data np-scenario__kicker">Disclosure</span>
+            <p class="np-body np-scenario__body">
+              The turn where a client shares something high-stakes and the
+              therapist has to decide what to do next without flattening the
+              room.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA: the one ask. -->
+    <section class="np-cta">
+      <div class="np-container">
+        <div class="np-cta-grid">
+          <div class="np-cta-pitch">
+            <span class="np-label">{cta.label}</span>
+            <h2 class="np-headline np-cta-pitch__title">{cta.title}</h2>
+            <p class="np-body np-cta-pitch__body">{cta.intro}</p>
+            <p class="np-cta__meta">{cta.meta}</p>
+          </div>
+
+          <div class="np-cta-commit">
+            <span class="np-data np-cta-commit__kicker">
+              Pilot · cohort of 4 clinicians
+            </span>
+            <p class="np-cta-commit__line">
+              Two intakes per clinician, supervised review at week three, full
+              transcript access for your training lead.
+            </p>
+            <div class="np-cta-commit__actions">
+              <a
+                class="np-btn np-btn-primary np-cta-commit__primary"
+                href={withBasePath(cta.primaryCTA.href)}
+              >
+                {cta.primaryCTA.text}
+              </a>
+              <a
+                class="np-btn np-btn-ghost np-cta-commit__secondary"
+                href={withBasePath(cta.secondaryCTA.href)}
+              >
+                {cta.secondaryCTA.text}
+              </a>
+            </div>
+            <p class="np-cta__trust">
+              HIPAA-ready ·
+              <a href={withBasePath('/trust')}>Security &amp; data handling</a> ·
+              <a href={withBasePath('/terms')}>Terms</a>
+            </p>
+          </div>
         </div>
       </div>
     </section>

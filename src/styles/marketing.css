@@ -132,26 +132,33 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--font-mono);
-  max-width: 14ch;
-  font-size: clamp(2.1rem, 3.2vw, 3.2rem);
-  line-height: 1.08;
-  letter-spacing: -0.045em;
+  font-family: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
+  font-weight: 350;
+  max-width: 16ch;
+  font-size: clamp(2.25rem, 4.4vw, 3.6rem);
+  line-height: 1.06;
+  letter-spacing: -0.022em;
   color: var(--text-primary);
   text-wrap: balance;
+  /* Light-on-dark weight compensation: 350 reads as ~400 on light */
+  font-feature-settings: 'kern', 'liga', 'calt';
 }
 
 .marketing-title--medium {
-  max-width: 16ch;
-  font-size: clamp(1.45rem, 2.2vw, 2.15rem);
+  max-width: 22ch;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 2.6vw, 2.15rem);
   line-height: 1.14;
+  letter-spacing: -0.018em;
 }
 
 .marketing-lede {
-  max-width: 58ch;
+  max-width: 60ch;
   margin: 1.45rem 0 0;
-  font-size: clamp(0.94rem, 1vw, 1.06rem);
-  line-height: 1.74;
+  font-family: var(--np-font-body, 'Public Sans', system-ui, sans-serif);
+  font-weight: 400;
+  font-size: clamp(1rem, 1.05vw, 1.125rem);
+  line-height: 1.55; /* short-form bridge: ~1.5 is the spec */
   color: var(--text-secondary);
   text-wrap: pretty;
 }
@@ -172,10 +179,10 @@
   padding: 0.92rem 1.4rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  font-family: var(--font-mono);
+  font-family: var(--np-font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
   font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   text-decoration: none;
   cursor: pointer;
@@ -205,6 +212,43 @@
 .marketing-button--secondary:hover {
   border-color: rgba(var(--accent-primary-rgb), 0.4);
   color: var(--accent-primary);
+}
+
+.marketing-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* === Form fields === */
+.marketing-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  font-family: var(--font-body);
+  font-size: 1rem; /* ≥16px — prevents iOS Safari auto-zoom on focus */
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.marketing-input::placeholder {
+  color: var(--text-muted);
+}
+
+.marketing-input:hover {
+  border-color: rgba(var(--accent-primary-rgb), 0.35);
+}
+
+.marketing-input:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+  border-color: rgba(var(--accent-primary-rgb), 0.5);
 }
 
 .marketing-note {
@@ -243,12 +287,33 @@
 .marketing-card__label,
 .marketing-list-label,
 .marketing-quote-label {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-family: var(--np-font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--accent-primary);
+}
+
+.marketing-eyebrow {
+  font-family: var(--np-font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--accent-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.marketing-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 1.4rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.7;
 }
 
 .marketing-stat-card strong {
@@ -259,9 +324,65 @@
 
 .marketing-stat-card p {
   margin: 0;
-  font-size: 0.9rem;
+  font-family: var(--np-font-body, 'Public Sans', system-ui, sans-serif);
+  font-size: 0.88rem;
   line-height: 1.55;
   color: var(--text-secondary);
+}
+
+/* === Domain proof panel (replaces generic stat-grid per page) === */
+.marketing-hero__proof {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  margin-top: 0;
+  align-self: stretch;
+  max-width: 32rem;
+}
+
+.marketing-hero__proof-head {
+  padding: 0.75rem 1.1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.marketing-hero__proof-body {
+  padding: 1.1rem 1.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.marketing-hero__proof-body :where(p, ul, ol, dl) {
+  margin: 0;
+}
+.marketing-hero__proof-body :where(li + li) {
+  margin-top: 0.4rem;
+}
+.marketing-hero__proof-body code {
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 5px;
+}
+.marketing-hero__proof-body em {
+  color: rgba(253, 252, 252, 0.7);
+  font-style: normal;
+}
+
+.marketing-hero__proof-foot {
+  padding: 0.7rem 1.1rem;
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(253, 252, 252, 0.55);
 }
 
 .marketing-section-header {
@@ -314,12 +435,27 @@
 .marketing-card h3,
 .marketing-card h4 {
   margin: 0;
+  font-family: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
+  font-weight: 400;
+  font-size: clamp(1.18rem, 1.7vw, 1.4rem);
+  line-height: 1.18;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+  text-wrap: balance;
 }
 
 .marketing-card p,
 .marketing-card li {
-  color: rgba(253, 252, 252, 0.76);
-  line-height: 1.72;
+  font-family: var(--np-font-body, 'Public Sans', system-ui, sans-serif);
+  font-weight: 400;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(253, 252, 252, 0.82);
+  text-wrap: pretty;
+}
+
+.marketing-card li {
+  margin-top: 0.4rem;
 }
 
 .marketing-list {

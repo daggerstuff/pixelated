@@ -23,6 +23,9 @@
 .ralph-tui
 .factory/
 .art/
+.openhands/
+.tokensave/
+.neon
 hackathon/
 skills/
 
@@ -155,6 +158,9 @@ unsloth_compiled_cache/
 !.env.project
 !.env.vault
 !config/secrets/*.example
+!config/secrets/README.md
+!config/secrets/.gitignore
+config/secrets/*
 .env*
 .env.sentry-build-plugin
 .flaskenv*
@@ -419,3 +425,12 @@ run_training.sh
 .impeccable
 
 .clinerules
+.tokensave
+
+.dmctn/taste-skill-backups/2026-07-27T21-42-40-193Z
+CLAUDE.md
+.rsync-exclude
+DESIGN.md
+KIMI.md
+TASTES.md
+PRODUCT.md

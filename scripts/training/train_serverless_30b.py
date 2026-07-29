@@ -6,15 +6,25 @@ Uses OpenPipe ART framework with ServerlessBackend + GRPO.
 import asyncio
 import json
 import logging
-import math
 import os
-import random
+import tempfile
 
 import art
+import weave
 from art.serverless.backend import ServerlessBackend
+from art.utils.sft import train_sft_from_file
+from serverless_utils import (
+    ShuffledEpochIterator,
+    apply_prune_filter,
+    compute_step_metrics,
+    load_dataset,
+    log_rl_step,
+    rollout,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(message)s")
+apply_prune_filter()
 
 # Required environment variable
 WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
@@ -23,8 +33,8 @@ if not WANDB_API_KEY:
 
 # Configuration
 PROJECT = "wayfarer-ab-test"
-MODEL_NAME = "qwen3-30b-serverless-rl"
-BASE_MODEL = "OpenPipe/Qwen3-30B-A3B-Instruct-2507"
+MODEL_NAME = "qwen3-30b-serverless-rl-v2"
+BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
 DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
 
 # RL Hyperparameters
@@ -32,101 +42,29 @@ GROUPS_PER_STEP = 5
 ROLLOUTS_PER_GROUP = 8
 LEARNING_RATE = 1e-5
 MAX_RL_STEPS = 100
+SFT_WARMUP_STEPS = 50  # Number of SFT steps to run before RL
 
 
-def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
-    """Compute n-gram Jaccard similarity for better semantic overlap estimation."""
-    res_words = response.lower().split()
-    exp_words = expected.lower().split()
-
-    if len(res_words) < n or len(exp_words) < n:
-        # Fallback to unigram overlap if very short
-        res_set = set(res_words)
-        exp_set = set(exp_words)
-        return len(res_set & exp_set) / len(exp_set) if exp_set else 0.0
-
-    res_ngrams = {tuple(res_words[i : i + n]) for i in range(len(res_words) - n + 1)}
-    exp_ngrams = {tuple(exp_words[i : i + n]) for i in range(len(exp_words) - n + 1)}
-
-    intersection = len(res_ngrams & exp_ngrams)
-    union = len(res_ngrams | exp_ngrams)
-    return intersection / union if union > 0 else 0.0
-
-
-async def rollout(model: art.Model, messages: list) -> art.Trajectory:
-    """Generate a response and compute reward."""
-    client = model.openai_client()
-
-    # Build trajectory from messages (all but last = context, last = expected assistant)
-    context = messages[:-1] if len(messages) > 1 else messages
-    expected = messages[-1]["content"] if messages else ""
-
-    trajectory = art.Trajectory(
-        messages_and_choices=list(context),
-        reward=0.0,
-        metrics={"response_len": 0, "expected_len": 0, "length_ratio": 0.0},
-    )
-
-    # Ensure trajectory ends with user message for generation
-    trajectory.messages_and_choices = list(context)
-
-    # Generate completion
-    completion = await client.chat.completions.create(
-        model=model.get_inference_name(),
-        messages=trajectory.messages(),
-        max_tokens=1024,
-        temperature=0.8,
-        logprobs=True,
-        extra_body={"return_token_ids": True},
-    )
-    choice = completion.choices[0]
-
-    # Extract prompt_token_ids from completion and attach to choice
-    prompt_token_ids = getattr(completion, "prompt_token_ids", None)
-    if prompt_token_ids is None and hasattr(completion, "model_extra") and completion.model_extra:
-        prompt_token_ids = completion.model_extra.get("prompt_token_ids")
-
-    if prompt_token_ids is not None:
-        if getattr(choice, "__pydantic_extra__", None) is None:
-            object.__setattr__(choice, "__pydantic_extra__", {})
-        choice.__pydantic_extra__["prompt_token_ids"] = prompt_token_ids
-
-    trajectory.messages_and_choices.append(choice)
-    response = choice.message.content or ""
-
-    # Compute reward
-    response_len = len(response.split())
-    expected_len = len(expected.split())
-
-    # Smooth Length reward (Gaussian penalty centered around target length)
-    target_len = max(expected_len, 100)  # Aim for expected length or at least 100 words
-    sigma = 150.0  # Tolerance for length variance
-    length_reward = math.exp(-((response_len - target_len) ** 2) / (2 * sigma**2))
-
-    # Advanced Similarity reward (N-gram overlap)
-    overlap = compute_ngram_overlap(response, expected, n=2)
-
-    # Combine rewards (weighting semantic overlap slightly higher)
-    trajectory.reward = length_reward * 0.4 + overlap * 0.6
-    trajectory.metrics["response_len"] = response_len
-    trajectory.metrics["expected_len"] = expected_len
-    trajectory.metrics["length_ratio"] = response_len / max(expected_len, 1)
-    trajectory.metrics["overlap"] = overlap
-
-    return trajectory
+# NOTE: ``rollout`` and ``compute_ngram_overlap`` are imported from
+# ``serverless_utils`` (see import block above).  The imported ``rollout``
+# signature is ``rollout(_model, messages, _step=0)``; it generates completions
+# through the model's own serverless inference endpoint and injects the
+# token IDs that the W&B serverless backend requires, so we reuse it
+# instead of redefining a local copy here.
 
 
 async def main():
+    weave.init(PROJECT)
     logging.info("Loading dataset...")
-    examples = []
-    with open(DATASET_PATH) as f:
-        for line in f:
-            data = json.loads(line)
-            messages = data.get("messages", [])
-            if len(messages) >= 2 and messages[-1].get("role") == "assistant":
-                examples.append(messages)
+    examples = load_dataset(DATASET_PATH)
+    logging.info(f"Loaded {len(examples)} deduplicated examples. Will iterate epoch-wise during RL.")
 
-    logging.info(f"Loaded {len(examples)} total examples. Will random sample during RL.")
+    # Write deduped dataset to temp file so SFT warmup uses the same data as RL
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".jsonl", delete=False) as tmp:
+        for msgs in examples:
+            tmp.write(json.dumps({"messages": msgs}) + "\n")
+        deduped_dataset_path = tmp.name
+    logging.info(f"Deduped dataset written to {deduped_dataset_path}")
 
     # Create/load model (starts from SFT checkpoint as BASE_MODEL)
     logging.info("Loading model...")
@@ -140,31 +78,66 @@ async def main():
     backend = ServerlessBackend(api_key=WANDB_API_KEY)
     await model.register(backend)
 
-    from art.utils.sft import train_sft_from_file
-
-    logging.info("Starting SFT Warmup...")
+    logging.info(f"Starting SFT Warmup (limited to {SFT_WARMUP_STEPS} steps)...")
     await train_sft_from_file(
         model=model,
-        file_path=DATASET_PATH,
+        file_path=deduped_dataset_path,
         epochs=1,
+        final_step=SFT_WARMUP_STEPS,
     )
 
     start_step = await model.get_step()
     logging.info(f"Starting RL from step {start_step}")
 
+    # Publish dataset to Weave
+    logging.info("Publishing dataset to Weave...")
+    weave_dataset = weave.Dataset(
+        name=f"{MODEL_NAME}-dataset",
+        rows=[{"messages": msgs} for msgs in examples],
+    )
+    weave.publish(weave_dataset)
+
+    # Epoch-based iterator
+    rl_steps_already_done = max(0, start_step - SFT_WARMUP_STEPS)
+    examples_to_skip = rl_steps_already_done * GROUPS_PER_STEP
+    iterator = ShuffledEpochIterator(examples, GROUPS_PER_STEP)
+    iterator.skip(examples_to_skip)
+    logging.info(
+        f"Dataset iterator: skipping {examples_to_skip} examples (epoch {iterator.epoch}, index {iterator.index})"
+    )
+
     # RL training loop
     for step in range(MAX_RL_STEPS):
-        # Sample batch randomly from the entire dataset pool
-        batch = random.sample(examples, min(GROUPS_PER_STEP, len(examples)))
+        batch = iterator.next_batch()
 
-        # Generate rollouts
-        train_groups = await art.gather_trajectory_groups(
-            (art.TrajectoryGroup(rollout(model, messages) for _ in range(ROLLOUTS_PER_GROUP)) for messages in batch),
-            pbar_desc=f"RL step {step + start_step}",
-        )
+        # Generate rollouts with Weave step attribution
+        with weave.attributes({"rl_step": step + start_step, "model": MODEL_NAME}):
+            train_groups = await art.gather_trajectory_groups(
+                (
+                    art.TrajectoryGroup(
+                        rollout(model, messages, _step=step + start_step) for _ in range(ROLLOUTS_PER_GROUP)
+                    )
+                    for messages in batch
+                ),
+                pbar_desc=f"RL step {step + start_step}",
+            )
 
-        # Train
-        result = await backend.train(model, train_groups, learning_rate=LEARNING_RATE)
+        # Train with retry
+        max_retries = 5
+        result = None
+        for attempt in range(max_retries):
+            try:
+                result = await backend.train(model, train_groups, learning_rate=LEARNING_RATE)
+                break
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    wait = 60 * (2**attempt)
+                    logging.warning(f"backend.train() failed (attempt {attempt + 1}/{max_retries}): {e}")
+                    logging.warning(f"Retrying in {wait}s...")
+                    await asyncio.sleep(wait)
+                else:
+                    raise
+        assert result is not None
         await model.log(
             train_groups,
             metrics=result.metrics,
@@ -172,8 +145,8 @@ async def main():
             split="train",
         )
 
-        all_rewards = [t.reward for g in train_groups for t in g.trajectories]
-        avg_reward = sum(all_rewards) / len(all_rewards) if all_rewards else 0.0
+        avg_reward, metrics = compute_step_metrics(train_groups)
+        log_rl_step(step=result.step, avg_reward=avg_reward, metrics=metrics)
         logging.info(f"Step {result.step}: avg_reward={avg_reward:.3f}")
 
     logging.info("RL training complete!")

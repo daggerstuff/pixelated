@@ -74,6 +74,22 @@ describe('successResponse', () => {
       message: 'Success',
     })
   })
+
+  it('creates a Response with a custom message and status code', async () => {
+    const payload = { key: 'value' }
+    const { successResponse } = await import('../_shared')
+    const response = successResponse(payload, 'Created', 201)
+
+    expect(response.status).toBe(201)
+    expect(response.headers.get('Content-Type')).toBe('application/json')
+
+    const data = await response.json()
+    expect(data).toEqual({
+      success: true,
+      data: payload,
+      message: 'Created',
+    })
+  })
 })
 
 describe('errorResponse', () => {
@@ -372,6 +388,45 @@ describe('handleMemoryApiError', () => {
     expect(response.status).toBe(404)
     const data = await response.json()
     expect(data.error).toBe('Not Found')
+  })
+
+  it('handles ProductMemoryGatewayError with 400 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } =
+      await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Bad request', 400)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(400)
+    const data = await response.json()
+    expect(data.error).toBe('Bad Request')
+  })
+
+  it('handles ProductMemoryGatewayError with 401 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } =
+      await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Unauthorized', 401)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(502)
+    const data = await response.json()
+    expect(data.error).toBe('Bad Gateway')
+  })
+
+  it('handles ProductMemoryGatewayError with 403 status', async () => {
+    const { handleMemoryApiError } = await import('../_shared')
+    const { ProductMemoryGatewayError } =
+      await import('@/lib/services/product-memory-gateway')
+
+    const error = new ProductMemoryGatewayError('Forbidden', 403)
+    const response = handleMemoryApiError('testAction', error)
+
+    expect(response.status).toBe(502)
+    const data = await response.json()
+    expect(data.error).toBe('Bad Gateway')
   })
 
   it('handles standard Error', async () => {

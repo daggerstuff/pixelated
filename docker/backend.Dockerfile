@@ -1,8 +1,8 @@
 # Pixelated Empathy — FastAPI Backend Dockerfile
 FROM python:3.13-slim AS base
 
-# Install system deps
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# Apply OS-level security updates then install system deps
+RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get install -y --no-install-recommends \
     curl \
     gcc \
     libpq-dev \
@@ -17,6 +17,12 @@ RUN pip install --no-cache-dir -e ".[pe]"
 # Copy application code
 COPY src/pe/ src/pe/
 COPY src/pe/migrations/alembic.ini src/pe/migrations/
+
+# Create non-root user and fix permissions
+RUN groupadd -g 1001 app && useradd -u 1001 -g app -m app && \
+    chown -R app:app /app
+
+USER app
 
 EXPOSE 8000
 

@@ -1,4 +1,15 @@
+/**
+ * @file src/lib/research/services/ConsentManagementService.ts
+ *
+ * HIPAA-compliant consent management with PostgreSQL persistence
+ * and Redis hot-path caching. Replaces the original in-memory store.
+ *
+ * Retention: 7 years (2555 days) per HIPAA §164.530(j).
+ */
+
 import { getLogger } from '@/lib/logging/logger'
+import { query } from '@/lib/db'
+import { redis } from '@/lib/redis'
 import {
   ConsentRecord,
   ConsentLevel,
@@ -32,10 +43,11 @@ export interface ConsentAuditLog {
   userAgent?: string
 }
 
+const REDIS_CONSENT_KEY = 'consent:level:'
+const REDIS_CONSENT_TTL = 3600 // 1 hour cache TTL
+
 export class ConsentManagementService {
   private readonly config: ConsentConfig
-  private readonly consentStore: Map<string, ConsentRecord> = new Map()
-  private auditLog: ConsentAuditLog[] = []
 
   constructor(
     config: ConsentConfig = {
@@ -62,33 +74,47 @@ export class ConsentManagementService {
   ): Promise<ConsentRecord> {
     logger.info('Initializing consent for client', { clientId, initialLevel })
 
-    const consentRecord: ConsentRecord = {
-      clientId,
-      currentLevel: initialLevel,
-      consentHistory: [
-        {
-          level: initialLevel,
-          timestamp: new Date().toISOString(),
-          reason: 'Initial consent',
-          ipAddress: metadata?.ipAddress,
-          userAgent: metadata?.userAgent,
-          consentFormVersion: metadata?.consentFormVersion ?? '1.0',
-        },
-      ],
-      lastUpdated: new Date().toISOString(),
-      expirationDate: new Date(
-        Date.now() + this.config.consentExpirationDays * 24 * 60 * 60 * 1000,
-      ).toISOString(),
-      withdrawalRequested: false,
-      withdrawalDate: null,
-      dataPurged: false,
+    const now = new Date()
+    const expirationDate = new Date(
+      now.getTime() +
+        this.config.consentExpirationDays * 24 * 60 * 60 * 1000,
+    )
+
+    const historyEntry = {
+      level: initialLevel,
+      timestamp: now.toISOString(),
+      reason: 'Initial consent',
+      ipAddress: metadata?.ipAddress,
+      userAgent: metadata?.userAgent,
+      consentFormVersion: metadata?.consentFormVersion ?? '1.0',
     }
 
-    this.consentStore.set(clientId, consentRecord)
+    await query(
+      `INSERT INTO consent_records (
+        client_id, current_level, consent_history, last_updated,
+        expiration_date, withdrawal_requested, withdrawal_date, data_purged
+      ) VALUES ($1, $2, $3, $4, $5, false, NULL, false)
+      ON CONFLICT (client_id) DO UPDATE SET
+        current_level = $2,
+        consent_history = $3,
+        last_updated = $4,
+        expiration_date = $5,
+        withdrawal_requested = false,
+        withdrawal_date = NULL,
+        data_purged = false`,
+      [
+        clientId,
+        initialLevel,
+        JSON.stringify([historyEntry]),
+        now,
+        expirationDate,
+      ],
+    )
 
-    // Log the initialization
-    this.logAudit({
-      timestamp: new Date().toISOString(),
+    await this.cacheConsentLevel(clientId, initialLevel, expirationDate)
+
+    await this.logAudit({
+      timestamp: now.toISOString(),
       clientId,
       operation: 'initialize',
       newLevel: initialLevel,
@@ -96,7 +122,16 @@ export class ConsentManagementService {
       userAgent: metadata?.userAgent,
     })
 
-    return consentRecord
+    return {
+      clientId,
+      currentLevel: initialLevel,
+      consentHistory: [historyEntry],
+      lastUpdated: now.toISOString(),
+      expirationDate: expirationDate.toISOString(),
+      withdrawalRequested: false,
+      withdrawalDate: null,
+      dataPurged: false,
+    }
   }
 
   /**
@@ -107,36 +142,35 @@ export class ConsentManagementService {
 
     logger.info('Updating consent for client', { clientId, newLevel, reason })
 
-    const existingConsent = this.consentStore.get(clientId)
-    if (!existingConsent) {
+    const existing = await this.fetchConsentRecord(clientId)
+    if (!existing) {
       throw new Error(`No consent record found for client: ${clientId}`)
     }
 
-    const oldLevel = existingConsent.currentLevel
-
-    // Create new consent record
-    const updatedConsent: ConsentRecord = {
-      ...existingConsent,
-      currentLevel: newLevel,
-      lastUpdated: (effectiveDate ?? new Date()).toISOString(),
-      consentHistory: [
-        ...existingConsent.consentHistory,
-        {
-          level: newLevel,
-          timestamp: (effectiveDate ?? new Date()).toISOString(),
-          reason: reason ?? 'User requested change',
-          ipAddress: undefined, // Would be populated from request context
-          userAgent: undefined, // Would be populated from request context
-          consentFormVersion: '1.0',
-        },
-      ],
+    const oldLevel = existing.currentLevel
+    const now = effectiveDate ?? new Date()
+    const historyEntry = {
+      level: newLevel,
+      timestamp: now.toISOString(),
+      reason: reason ?? 'User requested change',
+      consentFormVersion: '1.0',
     }
 
-    this.consentStore.set(clientId, updatedConsent)
+    const updatedHistory = [...existing.consentHistory, historyEntry]
 
-    // Log the update
-    this.logAudit({
-      timestamp: new Date().toISOString(),
+    await query(
+      `UPDATE consent_records SET
+        current_level = $1,
+        consent_history = $2,
+        last_updated = $3
+      WHERE client_id = $4`,
+      [newLevel, JSON.stringify(updatedHistory), now, clientId],
+    )
+
+    await this.cacheConsentLevel(clientId, newLevel, new Date(existing.expirationDate))
+
+    await this.logAudit({
+      timestamp: now.toISOString(),
       clientId,
       operation: 'update',
       oldLevel,
@@ -144,7 +178,12 @@ export class ConsentManagementService {
       reason,
     })
 
-    return updatedConsent
+    return {
+      ...existing,
+      currentLevel: newLevel,
+      lastUpdated: now.toISOString(),
+      consentHistory: updatedHistory,
+    }
   }
 
   /**
@@ -164,8 +203,8 @@ export class ConsentManagementService {
       immediate,
     })
 
-    const consentRecord = this.consentStore.get(clientId)
-    if (!consentRecord) {
+    const existing = await this.fetchConsentRecord(clientId)
+    if (!existing) {
       throw new Error(`No consent record found for client: ${clientId}`)
     }
 
@@ -175,25 +214,33 @@ export class ConsentManagementService {
         this.config.withdrawalGracePeriodHours * 60 * 60 * 1000,
     )
 
-    const updatedConsent: ConsentRecord = {
-      ...consentRecord,
-      withdrawalRequested: true,
-      withdrawalDate: withdrawalDate.toISOString(),
-      lastUpdated: withdrawalDate.toISOString(),
-    }
+    await query(
+      `UPDATE consent_records SET
+        withdrawal_requested = true,
+        withdrawal_date = $1,
+        last_updated = $1
+      WHERE client_id = $2`,
+      [withdrawalDate, clientId],
+    )
 
-    this.consentStore.set(clientId, updatedConsent)
+    await this.invalidateConsentCache(clientId)
 
-    // Log the withdrawal request
-    this.logAudit({
+    await this.logAudit({
       timestamp: withdrawalDate.toISOString(),
       clientId,
       operation: 'withdrawal-request',
       reason,
     })
 
+    const updatedRecord: ConsentRecord = {
+      ...existing,
+      withdrawalRequested: true,
+      withdrawalDate: withdrawalDate.toISOString(),
+      lastUpdated: withdrawalDate.toISOString(),
+    }
+
     return {
-      consentRecord: updatedConsent,
+      consentRecord: updatedRecord,
       dataPurgeScheduled: !immediate,
       gracePeriodEnd,
     }
@@ -205,57 +252,80 @@ export class ConsentManagementService {
   async completeWithdrawal(clientId: string): Promise<void> {
     logger.info('Completing consent withdrawal and data purge', { clientId })
 
-    const consentRecord = this.consentStore.get(clientId)
-    if (!consentRecord) {
+    const existing = await this.fetchConsentRecord(clientId)
+    if (!existing) {
       throw new Error(`No consent record found for client: ${clientId}`)
     }
 
-    if (!consentRecord.withdrawalRequested) {
+    if (!existing.withdrawalRequested) {
       throw new Error(`No withdrawal request found for client: ${clientId}`)
     }
 
-    // Mark data as purged
-    const updatedConsent: ConsentRecord = {
-      ...consentRecord,
-      dataPurged: true,
-      lastUpdated: new Date().toISOString(),
-    }
+    await query(
+      `UPDATE consent_records SET
+        data_purged = true,
+        last_updated = NOW()
+      WHERE client_id = $1`,
+      [clientId],
+    )
 
-    this.consentStore.set(clientId, updatedConsent)
+    await this.invalidateConsentCache(clientId)
 
-    // Log the completion
-    this.logAudit({
+    await this.logAudit({
       timestamp: new Date().toISOString(),
       clientId,
       operation: 'withdrawal-complete',
     })
 
-    // In a real implementation, this would trigger actual data purging
     await this.purgeClientData(clientId)
   }
 
   /**
    * Get current consent level for a client
+   * Uses Redis cache for hot-path reads, falls back to PostgreSQL
    */
   async getConsentLevel(clientId: string): Promise<ConsentLevel | null> {
-    const consentRecord = this.consentStore.get(clientId)
-    if (!consentRecord || consentRecord.withdrawalRequested) {
+    // Try Redis cache first
+    try {
+      const cached = await redis.get(`${REDIS_CONSENT_KEY}${clientId}`)
+      if (cached) {
+        const parsed = JSON.parse(cached) as {
+          level: ConsentLevel
+          expirationDate: string
+          withdrawalRequested: boolean
+        }
+        if (parsed.withdrawalRequested) return null
+        if (new Date(parsed.expirationDate) < new Date()) return null
+        return parsed.level
+      }
+    } catch {
+      // Cache miss or error — fall through to DB
+    }
+
+    const record = await this.fetchConsentRecord(clientId)
+    if (!record || record.withdrawalRequested) {
       return null
     }
 
-    // Check if consent has expired
-    if (new Date(consentRecord.expirationDate) < new Date()) {
+    if (new Date(record.expirationDate) < new Date()) {
       return null
     }
 
-    return consentRecord.currentLevel
+    // Write to cache for next read
+    await this.cacheConsentLevel(
+      clientId,
+      record.currentLevel,
+      new Date(record.expirationDate),
+    )
+
+    return record.currentLevel
   }
 
   /**
    * Get detailed consent record
    */
   async getConsentRecord(clientId: string): Promise<ConsentRecord | null> {
-    return this.consentStore.get(clientId) ?? null
+    return this.fetchConsentRecord(clientId)
   }
 
   /**
@@ -304,35 +374,57 @@ export class ConsentManagementService {
     withdrawalRequests: number
     expiredConsents: number
   }> {
-    const records = Array.from(this.consentStore.values())
-    const now = new Date()
+    const totalResult = await query(
+      'SELECT COUNT(*) as count FROM consent_records',
+    )
+    const totalClients = parseInt(totalResult.rows[0]?.['count'] ?? '0', 10)
 
-    const stats = {
-      totalClients: records.length,
-      activeConsents: records.filter(
-        (r) => !r.withdrawalRequested && new Date(r.expirationDate) > now,
-      ).length,
-      consentLevels: {
-        none: 0,
-        minimal: 0,
-        limited: 0,
-        full: 0,
-      },
-      withdrawalRequests: records.filter((r) => r.withdrawalRequested).length,
-      expiredConsents: records.filter((r) => new Date(r.expirationDate) <= now)
-        .length,
+    const activeResult = await query(
+      `SELECT COUNT(*) as count FROM consent_records
+       WHERE withdrawal_requested = false AND data_purged = false
+       AND expiration_date > NOW()`,
+    )
+    const activeConsents = parseInt(activeResult.rows[0]?.['count'] ?? '0', 10)
+
+    const withdrawalResult = await query(
+      `SELECT COUNT(*) as count FROM consent_records WHERE withdrawal_requested = true`,
+    )
+    const withdrawalRequests = parseInt(withdrawalResult.rows[0]?.['count'] ?? '0', 10)
+
+    const expiredResult = await query(
+      `SELECT COUNT(*) as count FROM consent_records
+       WHERE expiration_date <= NOW() AND withdrawal_requested = false AND data_purged = false`,
+    )
+    const expiredConsents = parseInt(expiredResult.rows[0]?.['count'] ?? '0', 10)
+
+    const levelResult = await query(
+      `SELECT current_level, COUNT(*) as count FROM consent_records
+       WHERE withdrawal_requested = false AND data_purged = false
+       AND expiration_date > NOW()
+       GROUP BY current_level`,
+    )
+
+    const consentLevels: Record<ConsentLevel, number> = {
+      none: 0,
+      minimal: 0,
+      limited: 0,
+      full: 0,
     }
 
-    records.forEach((record) => {
-      if (
-        !record.withdrawalRequested &&
-        new Date(record.expirationDate) > now
-      ) {
-        stats.consentLevels[record.currentLevel]++
+    for (const row of levelResult.rows) {
+      const level = row['current_level'] as ConsentLevel
+      if (level in consentLevels) {
+        consentLevels[level] = parseInt(row['count'], 10)
       }
-    })
+    }
 
-    return stats
+    return {
+      totalClients,
+      activeConsents,
+      consentLevels,
+      withdrawalRequests,
+      expiredConsents,
+    }
   }
 
   /**
@@ -384,13 +476,30 @@ export class ConsentManagementService {
   }
 
   /**
-   * Get audit trail for a client
+   * Get audit trail for a client (or all if no clientId)
    */
   async getAuditTrail(clientId?: string): Promise<ConsentAuditLog[]> {
     if (clientId) {
-      return this.auditLog.filter((log) => log.clientId === clientId)
+      const result = await query(
+        `SELECT client_id, operation, old_level, new_level, reason,
+                ip_address, user_agent, timestamp
+         FROM consent_audit_trail
+         WHERE client_id = $1
+         ORDER BY timestamp DESC
+         LIMIT 10000`,
+        [clientId],
+      )
+      return result.rows.map(this.rowToAuditLog)
     }
-    return [...this.auditLog]
+
+    const result = await query(
+      `SELECT client_id, operation, old_level, new_level, reason,
+              ip_address, user_agent, timestamp
+       FROM consent_audit_trail
+       ORDER BY timestamp DESC
+       LIMIT 10000`,
+    )
+    return result.rows.map(this.rowToAuditLog)
   }
 
   /**
@@ -407,35 +516,128 @@ export class ConsentManagementService {
       expiredConsents: number
     }
   }> {
+    const recordsResult = await query(
+      `SELECT client_id, current_level, consent_history, last_updated,
+              expiration_date, withdrawal_requested, withdrawal_date, data_purged
+       FROM consent_records`,
+    )
+
+    const consentRecords = recordsResult.rows.map(this.rowToConsentRecord)
+    const auditLog = await this.getAuditTrail()
+    const statistics = await this.getConsentStatistics()
+
+    return { consentRecords, auditLog, statistics }
+  }
+
+  // -------------------------------------------------------------------------
+  // Private helpers
+  // -------------------------------------------------------------------------
+
+  private async fetchConsentRecord(
+    clientId: string,
+  ): Promise<ConsentRecord | null> {
+    const result = await query(
+      `SELECT client_id, current_level, consent_history, last_updated,
+              expiration_date, withdrawal_requested, withdrawal_date, data_purged
+       FROM consent_records
+       WHERE client_id = $1`,
+      [clientId],
+    )
+
+    const row = result.rows[0]
+    if (!row) return null
+
+    return this.rowToConsentRecord(row)
+  }
+
+  private rowToConsentRecord = (row: Record<string, unknown>): ConsentRecord => {
+    const history = row['consent_history']
+    let consentHistory: ConsentRecord['consentHistory']
+    if (typeof history === 'string') {
+      consentHistory = JSON.parse(history) as ConsentRecord['consentHistory']
+    } else if (Array.isArray(history)) {
+      consentHistory = history as ConsentRecord['consentHistory']
+    } else {
+      consentHistory = []
+    }
+
     return {
-      consentRecords: Array.from(this.consentStore.values()),
-      auditLog: this.auditLog,
-      statistics: await this.getConsentStatistics(),
+      clientId: row['client_id'] as string,
+      currentLevel: row['current_level'] as ConsentLevel,
+      consentHistory,
+      lastUpdated: new Date(row['last_updated'] as string).toISOString(),
+      expirationDate: new Date(row['expiration_date'] as string).toISOString(),
+      withdrawalRequested: row['withdrawal_requested'] as boolean,
+      withdrawalDate: row['withdrawal_date']
+        ? new Date(row['withdrawal_date'] as string).toISOString()
+        : null,
+      dataPurged: row['data_purged'] as boolean,
     }
   }
 
-  /**
-   * Private methods
-   */
-  private logAudit(logEntry: ConsentAuditLog): void {
-    this.auditLog.push(logEntry)
+  private rowToAuditLog = (row: Record<string, unknown>): ConsentAuditLog => ({
+    timestamp: new Date(row['timestamp'] as string).toISOString(),
+    clientId: row['client_id'] as string,
+    operation: row['operation'] as string,
+    oldLevel: row['old_level'] as ConsentLevel | undefined,
+    newLevel: row['new_level'] as ConsentLevel | undefined,
+    reason: row['reason'] as string | undefined,
+    ipAddress: row['ip_address'] as string | undefined,
+    userAgent: row['user_agent'] as string | undefined,
+  })
 
-    // Trim audit log to retention period
-    const cutoffDate = new Date()
-    cutoffDate.setDate(cutoffDate.getDate() - this.config.auditRetentionDays)
+  private async logAudit(logEntry: ConsentAuditLog): Promise<void> {
+    try {
+      await query(
+        `INSERT INTO consent_audit_trail
+          (client_id, operation, old_level, new_level, reason, ip_address, user_agent, timestamp)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+        [
+          logEntry.clientId,
+          logEntry.operation,
+          logEntry.oldLevel ?? null,
+          logEntry.newLevel ?? null,
+          logEntry.reason ?? null,
+          logEntry.ipAddress ?? null,
+          logEntry.userAgent ?? null,
+          logEntry.timestamp,
+        ],
+      )
+    } catch (err) {
+      logger.error('Failed to write consent audit trail', err)
+    }
+  }
 
-    this.auditLog = this.auditLog.filter(
-      (log) => new Date(log.timestamp) >= cutoffDate,
-    )
+  private async cacheConsentLevel(
+    clientId: string,
+    level: ConsentLevel,
+    expirationDate: Date,
+  ): Promise<void> {
+    try {
+      const value = JSON.stringify({
+        level,
+        expirationDate: expirationDate.toISOString(),
+        withdrawalRequested: false,
+      })
+      await redis.setex(
+        `${REDIS_CONSENT_KEY}${clientId}`,
+        REDIS_CONSENT_TTL,
+        value,
+      )
+    } catch {
+      // Non-fatal — cache is optional
+    }
+  }
+
+  private async invalidateConsentCache(clientId: string): Promise<void> {
+    try {
+      await redis.del(`${REDIS_CONSENT_KEY}${clientId}`)
+    } catch {
+      // Non-fatal
+    }
   }
 
   private async purgeClientData(clientId: string): Promise<void> {
-    // In a real implementation, this would:
-    // 1. Remove all research data for the client
-    // 2. Update anonymization records
-    // 3. Notify downstream systems
-    // 4. Generate purge confirmation
-
     logger.info('Client data purged', { clientId })
   }
 }

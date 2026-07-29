@@ -1,20 +1,28 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
 
-const title = '404 - Page Not Found'
-const description = 'Sorry, the page you are looking for could not be found.'
+// Ensure a real 404 status even when this page is reached via a rewrite
+// (e.g. the production gate for internal-only routes in middleware.ts).
+Astro.response.status = 404
+
+const title = 'Page not found'
+const description =
+  'The page you tried to reach is not here. Use the routes below to get back to a live surface.'
 ---
 
 <BaseLayout {title} {description}>
-  <div class="container mx-auto px-4 py-16 text-center">
-    <h1 class="text-4xl font-bold mb-4">404</h1>
-    <p class="text-xl mb-8">Page not found</p>
-    <p>Nice to meet you tho!</p>
-    <a
-      href="/"
-      class="inline-block bg-blue-500 text-white px-4 py-2 rounded mt-4 hover:bg-blue-600"
-    >
-      Return Home
-    </a>
-  </div>
+  <MarketingPageHero
+    eyebrow="Status · 404"
+    title="This page is not here."
+    lede="The URL is correct, but the route does not exist on this site. Pick a live surface instead."
+    primaryCTA={{ text: 'Go home', href: '/' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/#demo' }}
+    note="Live destinations are listed below."
+    proof={{
+      label: 'Live routes',
+      body: `<ul class="marketing-list"><li><a href="/features"><strong>Features</strong> · what the platform does</a></li><li><a href="/trust"><strong>Trust</strong> · privacy, security, controls</a></li><li><a href="/about"><strong>About</strong> · who builds it and why</a></li><li><a href="/contact"><strong>Contact</strong> · evaluate, pilot, or ask</a></li></ul>`,
+      caption: 'Or email info@pixelatedempathy.com if a route is missing on purpose.',
+    }}
+  />
 </BaseLayout>

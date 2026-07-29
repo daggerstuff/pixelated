@@ -17,8 +17,8 @@ const organizationSchema = {
 ---
 
 <BaseLayout
-  title="Contact | Pixelated Empathy"
-  description="Get in touch with our team. Schedule demos, discuss pilots, or ask security and rollout questions."
+  title="Contact"
+  description="Talk to the Pixelated Empathy team about a demo, a pilot, or a security and rollout review. Founder-led replies, typically within two business days."
   fullWidthMain
 >
   <script
@@ -44,23 +44,14 @@ const organizationSchema = {
       href: 'mailto:info@pixelatedempathy.com',
     }}
     secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
-    stats={[
-      {
-        label: 'Best for',
-        value: 'Pilots + trust review',
-        detail: 'Bring rollout, privacy, or supervision questions',
-      },
-      {
-        label: 'Email',
-        value: 'info@pixelatedempathy.com',
-        detail: 'For demos, partnerships, and evaluation',
-      },
-      {
-        label: 'Company',
-        value: 'Founder-led',
-        detail: 'Built in the United States',
-      },
-    ]}
+    proof={{
+      label: 'What helps us reply usefully',
+      body: `<p><strong>The case or supervision workflow you want to improve.</strong></p>
+        <p>Whether you want a demo, pilot discussion, or security review.</p>
+        <p>Any rollout, retention, or deployment constraints that matter early.</p>
+        <p>Founder-led replies. Response target: two business days. United States.</p>`,
+      caption: 'Form below, or email info@pixelatedempathy.com directly',
+    }}
   />
 
   <section class="marketing-section">
@@ -137,7 +128,7 @@ const organizationSchema = {
                   name="name"
                   required
                   maxlength="100"
-                  class="brutalist-input"
+                  class="marketing-input"
                   placeholder="Your name"
                 />
                 <div class="mt-1 hidden text-xs text-red-400" id="name-error">
@@ -145,7 +136,7 @@ const organizationSchema = {
               </div>
 
               <div>
-                <label for="email" class="eyebrow-text mb-2 block">
+                <label for="email" class="marketing-eyebrow">
                   Email <span style="color: var(--accent-primary);">*</span>
                 </label>
                 <input
@@ -154,7 +145,7 @@ const organizationSchema = {
                   name="email"
                   required
                   maxlength="100"
-                  class="brutalist-input"
+                  class="marketing-input"
                   placeholder="you@example.com"
                 />
                 <div class="mt-1 hidden text-xs text-red-400" id="email-error">
@@ -172,7 +163,7 @@ const organizationSchema = {
                 name="subject"
                 required
                 maxlength="200"
-                class="brutalist-input"
+                class="marketing-input"
                 placeholder="Pilot, demo, trust review, or something else"
               />
               <div class="mt-1 hidden text-xs text-red-400" id="subject-error">
@@ -189,7 +180,7 @@ const organizationSchema = {
                 rows="6"
                 required
                 maxlength="2000"
-                class="brutalist-input resize-none"
+                class="marketing-input resize-none"
                 placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."
               ></textarea>
               <div class="mt-1 flex items-center justify-between">
@@ -205,7 +196,7 @@ const organizationSchema = {
               <button
                 type="submit"
                 id="submit-button"
-                class="btn-brutalist btn-brutalist--primary"
+                class="marketing-button marketing-button--primary"
               >
                 <span id="submit-text">Send Message</span>
                 <svg
@@ -262,7 +253,7 @@ const organizationSchema = {
   <script>
     const form = document.getElementById('contact-form')!
     const submitButton = document.getElementById(
-      'submit-btn',
+      'submit-button',
     ) as HTMLButtonElement
 
     const submitText = document.getElementById('submit-text')
@@ -485,3 +476,6 @@ const organizationSchema = {
     }
   </style>
 </BaseLayout>
+t>
+t>
+t>

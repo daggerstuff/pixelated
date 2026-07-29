@@ -1,0 +1,397 @@
+---
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import { consentManagementService } from '@/lib/research/services/ConsentManagementService'
+import { getConsentExpiryService } from '@/lib/consent'
+
+// Fetch data server-side
+const statistics = await consentManagementService.getConsentStatistics()
+const auditTrail = await consentManagementService.getAuditTrail()
+
+// Run expiry check
+const expiryService = getConsentExpiryService()
+const expiryResult = await expiryService.checkExpiries()
+
+// Get all consent records
+const clientIds = new Set(auditTrail.map((entry) => entry.clientId))
+const records: import('@/lib/research/services/ConsentManagementService').ConsentRecord[] = []
+for (const id of clientIds) {
+  const record = await consentManagementService.getConsentRecord(id)
+  if (record) {
+    records.push(record as import('@/lib/research/services/ConsentManagementService').ConsentRecord)
+  }
+}
+---
+
+<DashboardLayout title="Consent Management" description="HIPAA-compliant consent record management with audit trail and automated expiry checks">
+  <div class="space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight">Consent Management</h1>
+        <p class="text-sm text-muted-foreground mt-1">
+          HIPAA-compliant consent CRUD with automated expiry checks and audit trail
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <a href="/admin/consent" class="px-3 py-2 text-sm border rounded-md hover:bg-accent">
+          MongoDB Dashboard
+        </a>
+        <a href="/admin" class="px-3 py-2 text-sm border rounded-md hover:bg-accent">
+          Admin Home
+        </a>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div class="border rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Total Clients</span>
+          <span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">CRUD</span>
+        </div>
+        <p class="text-2xl font-bold mt-2" id="stat-total">{statistics.totalClients}</p>
+      </div>
+      <div class="border rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Active Consents</span>
+          <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">Active</span>
+        </div>
+        <p class="text-2xl font-bold mt-2 text-green-600" id="stat-active">{statistics.activeConsents}</p>
+      </div>
+      <div class="border rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Withdrawals</span>
+          <span class="text-xs px-2 py-1 bg-orange-100 text-orange-700 rounded">Pending</span>
+        </div>
+        <p class="text-2xl font-bold mt-2 text-orange-600" id="stat-withdrawals">{statistics.withdrawalRequests}</p>
+      </div>
+      <div class="border rounded-lg p-4">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Expired Consents</span>
+          <span class="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">Alert</span>
+        </div>
+        <p class="text-2xl font-bold mt-2 text-red-600" id="stat-expired">{statistics.expiredConsents}</p>
+      </div>
+    </div>
+
+    <!-- Consent Levels Breakdown -->
+    <div class="border rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">Consent Level Distribution</h2>
+      <div class="space-y-2">
+        {Object.entries(statistics.consentLevels).map(([level, count]) => (
+          <div class="flex items-center justify-between">
+            <span class="text-sm capitalize">{level}</span>
+            <div class="flex items-center gap-2">
+              <div class="h-2 w-32 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  class="h-full rounded-full"
+                  style={`width: ${statistics.activeConsents > 0 ? Math.round((count / statistics.activeConsents) * 100) : 0}%`}
+                  class:list={[
+                    level === 'full' ? 'bg-green-500' : '',
+                    level === 'limited' ? 'bg-blue-500' : '',
+                    level === 'minimal' ? 'bg-yellow-500' : '',
+                    level === 'none' ? 'bg-gray-400' : '',
+                  ]}
+                />
+              </div>
+              <span class="text-sm font-medium w-8">{count}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Expiry Check Results -->
+    <div class="border rounded-lg p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold">Automated Expiry Check</h2>
+        <span class="text-xs text-muted-foreground">
+          Checked: {new Date(expiryResult.checkedAt).toLocaleString()}
+        </span>
+      </div>
+
+      <div class="grid gap-3 md:grid-cols-3 mb-4">
+        <div class="text-center p-3 bg-yellow-50 border border-yellow-200 rounded">
+          <p class="text-2xl font-bold text-yellow-700">{expiryResult.summary.expiringSoon}</p>
+          <p class="text-xs text-muted-foreground">Expiring Soon (≤30d)</p>
+        </div>
+        <div class="text-center p-3 bg-orange-50 border border-orange-200 rounded">
+          <p class="text-2xl font-bold text-orange-700">{expiryResult.summary.expiringCritical}</p>
+          <p class="text-xs text-muted-foreground">Expiring Critical (≤7d)</p>
+        </div>
+        <div class="text-center p-3 bg-red-50 border border-red-200 rounded">
+          <p class="text-2xl font-bold text-red-700">{expiryResult.summary.expired}</p>
+          <p class="text-xs text-muted-foreground">Expired (re-consent required)</p>
+        </div>
+      </div>
+
+      {expiryResult.reminders.length > 0 && (
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-2 px-3">Client ID</th>
+                <th class="text-left py-2 px-3">Level</th>
+                <th class="text-left py-2 px-3">Expires</th>
+                <th class="text-left py-2 px-3">Days</th>
+                <th class="text-left py-2 px-3">Status</th>
+                <th class="text-left py-2 px-3">Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expiryResult.reminders.map((reminder) => (
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-2 px-3 font-mono text-xs">{reminder.clientId}</td>
+                  <td class="py-2 px-3 capitalize">{reminder.consentLevel}</td>
+                  <td class="py-2 px-3">{new Date(reminder.expirationDate).toLocaleDateString()}</td>
+                  <td class="py-2 px-3">{reminder.daysUntilExpiry}</td>
+                  <td class="py-2 px-3">
+                    <span
+                      class:list={[
+                        'px-2 py-1 rounded text-xs font-medium',
+                        reminder.reminderType === 'expired' ? 'bg-red-100 text-red-700' : '',
+                        reminder.reminderType === 'expiring-critical' ? 'bg-orange-100 text-orange-700' : '',
+                        reminder.reminderType === 'expiring-soon' ? 'bg-yellow-100 text-yellow-700' : '',
+                      ]}
+                    >
+                      {reminder.reminderType}
+                    </span>
+                  </td>
+                  <td class="py-2 px-3 text-xs text-muted-foreground">{reminder.message}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {expiryResult.reminders.length === 0 && (
+        <p class="text-center text-muted-foreground py-4">
+          No expiring or expired consents. All consent records are current.
+        </p>
+      )}
+    </div>
+
+    <!-- Initialize New Consent -->
+    <div class="border rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">Initialize New Consent</h2>
+      <div class="flex flex-wrap gap-3 items-end">
+        <div>
+          <label class="text-sm font-medium block mb-1">Client ID</label>
+          <input
+            type="text"
+            id="new-client-id"
+            placeholder="client-123"
+            class="px-3 py-2 border rounded-md text-sm w-48"
+          />
+        </div>
+        <div>
+          <label class="text-sm font-medium block mb-1">Consent Level</label>
+          <select id="new-consent-level" class="px-3 py-2 border rounded-md text-sm">
+            <option value="minimal">Minimal</option>
+            <option value="limited">Limited</option>
+            <option value="full">Full</option>
+          </select>
+        </div>
+        <button
+          id="init-consent-btn"
+          class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+        >
+          Initialize Consent
+        </button>
+      </div>
+    </div>
+
+    <!-- Consent Records Table -->
+    <div class="border rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">Consent Records ({records.length})</h2>
+      {records.length > 0 ? (
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b">
+                <th class="text-left py-2 px-3">Client ID</th>
+                <th class="text-left py-2 px-3">Level</th>
+                <th class="text-left py-2 px-3">Last Updated</th>
+                <th class="text-left py-2 px-3">Expires</th>
+                <th class="text-left py-2 px-3">Withdrawal</th>
+                <th class="text-left py-2 px-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {records.map((record) => (
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-2 px-3 font-mono text-xs">{record.clientId}</td>
+                  <td class="py-2 px-3 capitalize">{record.currentLevel}</td>
+                  <td class="py-2 px-3 text-xs">{new Date(record.lastUpdated).toLocaleDateString()}</td>
+                  <td class="py-2 px-3 text-xs">{new Date(record.expirationDate).toLocaleDateString()}</td>
+                  <td class="py-2 px-3">
+                    {record.withdrawalRequested ? (
+                      <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">Requested</span>
+                    ) : (
+                      <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">Active</span>
+                    )}
+                  </td>
+                  <td class="py-2 px-3">
+                    <div class="flex gap-1">
+                      <button
+                        class="px-2 py-1 text-xs border rounded hover:bg-accent"
+                        data-action="update"
+                        data-client-id={record.clientId}
+                      >
+                        Update
+                      </button>
+                      <button
+                        class="px-2 py-1 text-xs border rounded text-red-600 hover:bg-red-50"
+                        data-action="withdraw"
+                        data-client-id={record.clientId}
+                      >
+                        Withdraw
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p class="text-center text-muted-foreground py-4">
+          No consent records. Initialize a new consent above.
+        </p>
+      )}
+    </div>
+
+    <!-- Audit Trail -->
+    <div class="border rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">HIPAA Audit Trail ({auditTrail.length} entries)</h2>
+      {auditTrail.length > 0 ? (
+        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead class="sticky top-0 bg-white">
+              <tr class="border-b">
+                <th class="text-left py-2 px-3">Timestamp</th>
+                <th class="text-left py-2 px-3">Client ID</th>
+                <th class="text-left py-2 px-3">Operation</th>
+                <th class="text-left py-2 px-3">Old Level</th>
+                <th class="text-left py-2 px-3">New Level</th>
+                <th class="text-left py-2 px-3">Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {auditTrail.slice().reverse().slice(0, 100).map((entry) => (
+                <tr class="border-b hover:bg-gray-50">
+                  <td class="py-1 px-3 text-xs text-muted-foreground">{new Date(entry.timestamp).toLocaleString()}</td>
+                  <td class="py-1 px-3 font-mono text-xs">{entry.clientId}</td>
+                  <td class="py-1 px-3">
+                    <span class="px-2 py-1 bg-gray-100 rounded text-xs">{entry.operation}</span>
+                  </td>
+                  <td class="py-1 px-3 capitalize text-xs">{entry.oldLevel ?? '-'}</td>
+                  <td class="py-1 px-3 capitalize text-xs">{entry.newLevel ?? '-'}</td>
+                  <td class="py-1 px-3 text-xs text-muted-foreground">{entry.reason ?? '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p class="text-center text-muted-foreground py-4">
+          No audit trail entries. Consent operations will appear here.
+        </p>
+      )}
+    </div>
+
+    <!-- API Documentation -->
+    <div class="border rounded-lg p-4">
+      <h2 class="text-lg font-semibold mb-3">API Endpoints</h2>
+      <div class="space-y-2 text-sm font-mono">
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent — List all records + stats</div>
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent?clientId=X — Get one record</div>
+        <div><span class="text-blue-600 font-bold">POST</span> /api/v1/admin/consent — Initialize consent</div>
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent/:clientId — Get specific record</div>
+        <div><span class="text-yellow-600 font-bold">PATCH</span> /api/v1/admin/consent/:clientId — Update consent level</div>
+        <div><span class="text-red-600 font-bold">DELETE</span> /api/v1/admin/consent/:clientId — Request withdrawal</div>
+        <div><span class="text-blue-600 font-bold">POST</span> /api/v1/admin/consent/:clientId/complete-withdrawal — Complete withdrawal</div>
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent/audit — Full audit trail</div>
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent/audit?clientId=X — Client audit trail</div>
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent/export — Export all consent data</div>
+        <div><span class="text-green-600 font-bold">GET</span> /api/v1/admin/consent/expiry-check — Run expiry check</div>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>
+
+<script>
+  // Initialize consent
+  document.getElementById('init-consent-btn')?.addEventListener('click', async () => {
+    const clientId = (document.getElementById('new-client-id') as HTMLInputElement | null)?.value
+    const level = (document.getElementById('new-consent-level') as HTMLSelectElement | null)?.value
+    if (!clientId) {
+      alert('Client ID is required')
+      return
+    }
+    try {
+      const res = await fetch('/api/v1/admin/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clientId, level }),
+      })
+      if (res.ok) {
+        alert('Consent initialized successfully')
+        window.location.reload()
+      } else {
+        const err = await res.json()
+        alert('Failed: ' + (err.error || 'Unknown error'))
+      }
+    } catch (err) {
+      alert('Error: ' + (err instanceof Error ? err.message : String(err)))
+    }
+  })
+
+  // Update / Withdraw actions
+  document.querySelectorAll('button[data-action]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const htmlBtn = btn as HTMLElement
+      const action = htmlBtn.dataset['action']
+      const clientId = htmlBtn.dataset['clientId']
+      if (action === 'update') {
+        const newLevel = prompt('Enter new consent level (minimal, limited, full):')
+        if (!newLevel) return
+        const reason = prompt('Reason for update (optional):') || undefined
+        try {
+          const res = await fetch(`/api/v1/admin/consent/${clientId}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ newLevel, reason }),
+          })
+          if (res.ok) {
+            alert('Consent updated')
+            window.location.reload()
+          } else {
+            const err = await res.json()
+            alert('Failed: ' + (err.error || 'Unknown error'))
+          }          } catch (updateErr) {
+          alert('Error: ' + (updateErr instanceof Error ? updateErr.message : String(updateErr)))
+        }
+      } else if (action === 'withdraw') {
+        const reason = prompt('Reason for withdrawal (optional):') || undefined
+        if (!confirm('Are you sure you want to request consent withdrawal?')) return
+        try {
+          const res = await fetch(`/api/v1/admin/consent/${clientId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reason }),
+          })
+          if (res.ok) {
+            alert('Withdrawal requested')
+            window.location.reload()
+          } else {
+            const err = await res.json()
+            alert('Failed: ' + (err.error || 'Unknown error'))
+          }
+        } catch (withdrawErr) {
+          alert('Error: ' + (withdrawErr instanceof Error ? withdrawErr.message : String(withdrawErr)))
+        }
+      }
+    })
+  })
+</script>

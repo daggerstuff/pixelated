@@ -71,7 +71,9 @@ allowBuilds:
   '@mongodb-js/zstd': true
   core-js-pure: true
   node-liblzma: false
-  '@schpet/linear-cli': set this to true or false
+  '@schpet/linear-cli': true
+  '@scarf/scarf': true
+  koffi: true
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
@@ -237,7 +239,8 @@ overrides:
   '@foresight/core>esbuild': 0.25.0
   '@foresight/core>minimatch': 9.0.7
   '@foresight/core>vite': 6.4.2
-  '@foresight/docs>fast-uri': 3.1.1
+  fast-uri: 3.1.4
+  '@foresight/docs>fast-uri': 3.1.4
   '@foresight/docs>serialize-javascript': ^7.0.5
   '@google-cloud/storage>uuid': '>=11.1.1'
   gcp-metadata>uuid: '>=11.1.1'
@@ -249,6 +252,7 @@ overrides:
   '@modelcontextprotocol/sdk': ^1.29.0
   '@opentelemetry/api': ^1.9.0
   '@opentelemetry/otlp-proto-exporter-base': ^0.51.1
+  '@opentelemetry/propagator-jaeger': ^2.10.0
   '@opentelemetry/otlp-transformer>protobufjs': 8.0.2
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': 8.0.2
   '@tootallnate/once': ^3.0.1
@@ -265,7 +269,9 @@ overrides:
   '@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0': npm:path-to-regexp@6.3.0
   astro>devalue: '>=5.8.1'
   axios: '>=1.15.1'
+  adm-zip: 0.6.0
   brace-expansion: '>=5.0.5'
+  astro>cookie: ^2.0.0
   cookie: '^0.7.2'
   '@vercel/oidc': '3.7.1'
   devalue: '>=5.8.1'
@@ -285,7 +291,7 @@ overrides:
   h3: '>=1.15.9'
   hono: ^4.12.14
   ip-address: '>=10.1.1'
-  js-yaml: 4.2.0
+  js-yaml: 4.3.0
   markdown-it: 14.2.0
   '@opentelemetry/core': 2.8.0
   joi: 17.13.4
@@ -299,6 +305,7 @@ overrides:
   basic-ftp: '>=5.2.0'
   flatted: ^3.4.2
   serialize-javascript: ^8.0.0
+  shell-quote: 1.9.0
   body-parser: '>=1.20.3'
   express-rate-limit: '>=8.2.2'
   send: '>=0.19.0'

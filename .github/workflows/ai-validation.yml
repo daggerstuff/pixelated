@@ -36,7 +36,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24.16.0
 
@@ -67,36 +67,10 @@ jobs:
         env:
           AI_VALIDATION_SECRET: ${{ secrets.AI_VALIDATION_SECRET }}
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          run_install: false
-
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Setup pnpm cache
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
-        with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
-
-      - name: Clean pnpm workspace artifacts
-        run: rm -rf node_modules
-
-      - name: Install native build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3 build-essential
-          npm install -g node-gyp
-
-      - name: Install dependencies
-        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          node-version: '24.16.0'
+          clean-node-modules: 'true'
 
       - name: Install system tools (jq, bc)
         run: |

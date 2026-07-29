@@ -1,0 +1,98 @@
+# Blue-green deployment — Blue slot (active by default)
+# See: k8s/base/deployment-green.yaml for the green (inactive) slot.
+# Traffic is routed via the Service selector (`slot: blue` or `slot: green`).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pixelated-empathy-blue
+  namespace: pixelated-empathy
+  labels:
+    app: pixelated-empathy-api
+    slot: blue
+spec:
+  # Replicas managed by HPA — leave unset for GitOps-driven scaling.
+  progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 0
+  selector:
+    matchLabels:
+      app: pixelated-empathy-api
+      slot: blue
+  template:
+    metadata:
+      labels:
+        app: pixelated-empathy-api
+        slot: blue
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: pixelated-empathy-api
+        image: pixelatedempathy/api:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5001
+          name: http
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: pixelated-empathy-config
+        - secretRef:
+            name: pixelated-empathy-secrets
+        env:
+        - name: APP_NAME
+          value: "pixelated-empathy"
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@pixelated-empathy-redis:6379/0"
+        - name: DEPLOYMENT_SLOT
+          value: "blue"
+        resources:
+          requests:
+            cpu: "25m"
+            memory: "64Mi"
+          limits:
+            cpu: "150m"
+            memory: "192Mi"
+        startupProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 12
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 5

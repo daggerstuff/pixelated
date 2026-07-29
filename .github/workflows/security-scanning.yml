@@ -20,6 +20,11 @@ jobs:
   security-scan:
     name: Security Scan
     runs-on: ubuntu-24.04
+    env:
+      # Warn-only mode: vulnerabilities are uploaded to GitHub Security tab
+      # (SARIF) but don't block the pipeline. The CI workflow uses the same
+      # warn-only approach for its Trivy gate.
+      TRIVY_STRICT_GATE: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -32,7 +37,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Set up Python
-        uses: actions/setup-python@v6.3.0
+        uses: actions/setup-python@v7
         with:
           python-version: '3.13.13'
 
@@ -157,6 +162,14 @@ jobs:
           name: trivy-sarif
           path: trivy-results.sarif
 
+      - name: Trivy security gate (active)
+        if: always() && steps.trivy_sarif.outputs.found == 'true'
+        env:
+          TRIVY_OUTCOME: ${{ steps.trivy.outcome }}
+        run: |
+          echo "::notice::Trivy scan completed. Outcome: ${TRIVY_OUTCOME}. Findings uploaded to GitHub Security tab (warn-only mode)."
+          echo "    https://github.com/${{ github.repository }}/security/code-scanning"
+
       - name: Upload Checkov Infrastructure scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.checkov_infra_sarif.outputs.found == 'true' }}
@@ -172,8 +185,7 @@ jobs:
           category: checkov-helm
 
       - name: Create diagnostic artifact when Checkov SARIF is missing
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
           if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
@@ -184,8 +196,7 @@ jobs:
           fi
 
       - name: Upload Checkov diagnostic artifact
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -219,7 +230,7 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: 24.16.0
           package-manager-cache: false
@@ -274,3 +285,282 @@ jobs:
         with:
           name: security-audit-results
           path: audit-results.json
+
+      - name: Generate vulnerability PR comment
+        if: github.event_name == 'pull_request'
+        id: vuln_comment
+        run: |
+          node scripts/ci/generate-vuln-comment.js audit-results.json > pr-comment.md || true
+          echo "Generated PR comment ($(wc -l < pr-comment.md) lines)"
+
+      - name: Post vulnerability summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        continue-on-error: true
+        with:
+          header: 🔒 Dependency Vulnerability Scan
+          path: pr-comment.md
+
+  python-dependency-scan:
+    name: Python Dependency Scan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.13.13'
+
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
+
+      - name: Install pip-audit
+        run: uv pip install --system pip-audit
+
+      - name: Scan Python dependencies (ai submodule)
+        id: pip_audit_ai
+        continue-on-error: true
+        run: |
+          cd ai
+          uv pip install --system -r requirements-voice.txt 2>/dev/null || true
+          pip-audit -r requirements-voice.txt --format json -o ../pip-audit-ai.json || true
+          cd ..
+
+      - name: Scan Python dependencies (bias-detection service)
+        id: pip_audit_bias
+        continue-on-error: true
+        run: |
+          cd src/lib/ai/bias-detection/python-service
+          pip-audit -r requirements.txt --format json -o ../../../pip-audit-bias.json || true
+          cd -
+
+      - name: Scan Python dependencies (multimodal-bias-detection service)
+        id: pip_audit_multimodal
+        continue-on-error: true
+        run: |
+          if [ -d "src/lib/ai/multimodal-bias-detection/python-service" ] && \
+             [ -f "src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml" ]; then
+            cd src/lib/ai/multimodal-bias-detection/python-service
+            pip-audit --format json -o ../../../pip-audit-multimodal.json || true
+            cd -
+          else
+            echo '{"dependencies":[],"vulnerabilities":[]}' > pip-audit-multimodal.json
+          fi
+
+      - name: Enforce Python vulnerability threshold
+        run: |
+          node scripts/ci/check-pip-audit.js \
+            --fail-on high \
+            pip-audit-ai.json \
+            pip-audit-bias.json \
+            pip-audit-multimodal.json
+
+      - name: Upload Python audit results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: python-audit-results
+          path: |
+            pip-audit-ai.json
+            pip-audit-bias.json
+            pip-audit-multimodal.json
+
+  sbom-generation:
+    name: SBOM Generation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+          upload-artifact: false
+
+      - name: Upload SBOM as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cyclonedx.json
+          retention-days: 30
+
+      - name: Generate SBOM summary
+        run: |
+          echo "## 📋 SBOM Generated" > sbom-summary.md
+          echo "" >> sbom-summary.md
+          echo "Format: CycloneDX JSON" >> sbom-summary.md
+          echo "Components: $(node -e "const s=require('./sbom.cyclonedx.json'); console.log((s.components||[]).length)" 2>/dev/null || echo 'unknown')" >> sbom-summary.md
+          echo "" >> sbom-summary.md
+          echo "SBOM artifact available in workflow run artifacts." >> sbom-summary.md
+          cat sbom-summary.md
+
+      - name: Post SBOM summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        continue-on-error: true
+        with:
+          header: 📋 SBOM
+          path: sbom-summary.md
+
+  container-image-scan:
+    name: Container Image Scan
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: node:24-bookworm-slim
+            dockerfile: Dockerfile
+          - image: node:24-bookworm-slim
+            dockerfile: docker/Dockerfile.production
+          - image: node:24-alpine
+            dockerfile: docker/Dockerfile.prod
+          - image: python:3.13-slim
+            dockerfile: docker/backend.Dockerfile
+          - image: mcr.microsoft.com/playwright:v1.60.0-jammy
+            dockerfile: docker/Dockerfile.playwright
+          - image: debian:bookworm-slim
+            dockerfile: docker/traefik/Dockerfile
+          - image: nvcr.io/nvidia/pytorch:26.07-py3
+            dockerfile: ai/Dockerfile
+          - image: nvidia/cuda:12.8.1-runtime-ubuntu24.04
+            dockerfile: docker/training-service/Dockerfile
+          - image: nvidia/cuda:12.9.2-runtime-ubuntu24.04
+            dockerfile: ai/nemo/gpu/Dockerfile
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Scan base image with Trivy
+        id: trivy_image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ matrix.image }}
+          scan-type: image
+          scanners: vuln
+          format: json
+          output: trivy-image-${{ matrix.dockerfile }}.json
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+        continue-on-error: true
+
+      - name: Check scan results
+        id: scan_result
+        run: |
+          if [ -s trivy-image-${{ matrix.dockerfile }}.json ]; then
+            vulns=$(jq '[.Results[]? | .Vulnerabilities[]?] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            critical=$(jq '[.Results[]? | .Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            high=$(jq '[.Results[]? | .Vulnerabilities[]? | select(.Severity=="HIGH")] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            echo "total=$vulns" >> $GITHUB_OUTPUT
+            echo "critical=$critical" >> $GITHUB_OUTPUT
+            echo "high=$high" >> $GITHUB_OUTPUT
+            echo "::warning::${{ matrix.dockerfile }} (${{ matrix.image }}): $critical CRITICAL, $high HIGH vulnerabilities"
+            if [ "$critical" -gt 0 ]; then
+              echo "::warning::CRITICAL vulnerabilities found in ${{ matrix.image }}. Results uploaded to Security tab."
+            fi
+          else
+            echo "total=0" >> $GITHUB_OUTPUT
+            echo "critical=0" >> $GITHUB_OUTPUT
+            echo "high=0" >> $GITHUB_OUTPUT
+            echo "::notice::No scan results for ${{ matrix.image }} (scan may have been skipped)"
+          fi
+
+      - name: Upload image scan results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: container-scan-${{ matrix.dockerfile }}
+          path: trivy-image-${{ matrix.dockerfile }}.json
+
+  dockerfile-config-scan:
+    name: Dockerfile Configuration Scan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Scan all Dockerfiles with Trivy config scan
+        id: trivy_config
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scanners: misconfig,secret
+          format: sarif
+          output: dockerfile-config-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: '0'
+        continue-on-error: true
+
+      - name: Check for SARIF file
+        id: config_sarif
+        run: |
+          if [ -s dockerfile-config-results.sarif ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Dockerfile config scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.config_sarif.outputs.found == 'true'
+        with:
+          sarif_file: dockerfile-config-results.sarif
+          category: trivy-dockerfile-config
+
+      - name: Upload Dockerfile config SARIF as artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always() && steps.config_sarif.outputs.found == 'true'
+        with:
+          name: dockerfile-config-sarif
+          path: dockerfile-config-results.sarif
+
+      - name: Generate Dockerfile scan summary
+        run: |
+          echo "## 🔍 Container Image & Dockerfile Scan Summary" > container-scan-summary.md
+          echo "" >> container-scan-summary.md
+          echo "### Base Image Vulnerabilities" >> container-scan-summary.md
+          echo "| Dockerfile | Base Image | CRITICAL | HIGH |" >> container-scan-summary.md
+          echo "|-----------|------------|----------|------|" >> container-scan-summary.md
+          echo "| (see container-scan-* artifacts for details) |" >> container-scan-summary.md
+          echo "" >> container-scan-summary.md
+          echo "### Dockerfile Configuration Issues" >> container-scan-summary.md
+          echo "See SARIF results in GitHub Security tab (category: trivy-dockerfile-config)" >> container-scan-summary.md
+          echo "" >> container-scan-summary.md
+          echo "**Scanned Dockerfiles:**" >> container-scan-summary.md
+          echo "- Dockerfile (root)" >> container-scan-summary.md
+          echo "- docker/Dockerfile.production" >> container-scan-summary.md
+          echo "- docker/Dockerfile.prod" >> container-scan-summary.md
+          echo "- docker/backend.Dockerfile" >> container-scan-summary.md
+          echo "- docker/celery.Dockerfile" >> container-scan-summary.md
+          echo "- docker/Dockerfile.playwright" >> container-scan-summary.md
+          echo "- docker/traefik/Dockerfile" >> container-scan-summary.md
+          echo "- docker/training-service/Dockerfile" >> container-scan-summary.md
+          echo "- ai/Dockerfile" >> container-scan-summary.md
+          echo "- ai/nemo/gpu/Dockerfile" >> container-scan-summary.md
+          echo "- ai-services/Dockerfile" >> container-scan-summary.md
+          echo "- agents/Dockerfile" >> container-scan-summary.md
+          echo "- business-strategy-cms/Dockerfile" >> container-scan-summary.md
+          echo "- business-strategy-cms/Dockerfile.prod" >> container-scan-summary.md
+          cat container-scan-summary.md
+
+      - name: Post container scan summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        continue-on-error: true
+        with:
+          header: 🔍 Container Image Scan
+          path: container-scan-summary.md

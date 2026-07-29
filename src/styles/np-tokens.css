@@ -25,18 +25,19 @@
   --np-selection-text: oklch(0.93 0 0);
 
   /* =============================================
-     TYPOGRAPHY
+     TYPOGRAPHY — Pure Monospace Technical Instrument
+     Zero generic SaaS fonts (Public Sans / Inter / Fraunces purged)
      ============================================= */
-  --np-font-display: 'Fraunces Variable', Georgia, serif;
-  --np-font-body: 'Public Sans', system-ui, sans-serif;
+  --np-font-display: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --np-font-body: 'JetBrains Mono Variable', ui-monospace, monospace;
   --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
-  /* Widths & weights for Fraunces */
-  --np-weight-display: 350;
-  --np-weight-headline: 400;
+  /* Weights */
+  --np-weight-display: 600;
+  --np-weight-headline: 600;
   --np-weight-title: 600;
   --np-weight-body: 400;
-  --np-weight-label: 450;
+  --np-weight-label: 500;
   --np-weight-data: 400;
 
   /* Scale (clamped) */
@@ -145,6 +146,9 @@
   --np-overlay: rgba(0, 0, 0, 0.4);
   --np-selection: rgba(0, 0, 0, 0.08);
   --np-selection-text: oklch(0.15 0 0);
+
+  /* Legacy alias (see compatibility block): --np-text as rgb() triplet */
+  --accent-primary-rgb: 38, 38, 38;
 }
 
 /* =============================================
@@ -219,6 +223,7 @@ body {
 
   /* Type family */
   --font-mono: var(--np-font-mono);
+  --font-body: var(--np-font-body);
 
   /* Motion (state-only, neutral) */
   --duration-fast: var(--np-duration-fast);

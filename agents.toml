@@ -13,9 +13,61 @@ name = "agentmail"
 source = "agentmail-to/agentmail-skills"
 
 [[skills]]
-name = "astro"
-source = "path:.agents/skills/astro"
+name = "git-lint"
+source = "path:.agents/skills/git-lint"
 
 [[skills]]
-name = "cloudflare-deploy"
-source = "path:.agents/skills/cloudflare-deploy"
+name = "git-pull"
+source = "path:.agents/skills/git-pull"
+
+[[skills]]
+name = "git-push"
+source = "path:.agents/skills/git-push"
+
+[[skills]]
+name = "adhd"
+source = "path:.agents/skills/adhd"
+
+[[skills]]
+name = "resolving-merge-conflicts"
+source = "path:.agents/skills/resolving-merge-conflicts"
+
+[[skills]]
+name = "tavily-best-practices"
+source = "path:.agents/skills/tavily-best-practices"
+
+[[skills]]
+name = "tavily-cli"
+source = "path:.agents/skills/tavily-cli"
+
+[[skills]]
+name = "tavily-crawl"
+source = "path:.agents/skills/tavily-crawl"
+
+[[skills]]
+name = "tavily-dynamic-search"
+source = "path:.agents/skills/tavily-dynamic-search"
+
+[[skills]]
+name = "tavily-extract"
+source = "path:.agents/skills/tavily-extract"
+
+[[skills]]
+name = "tavily-map"
+source = "path:.agents/skills/tavily-map"
+
+[[skills]]
+name = "tavily-research"
+source = "path:.agents/skills/tavily-research"
+
+[[skills]]
+name = "tavily-search"
+source = "path:.agents/skills/tavily-search"
+
+[[skills]]
+name = "wandb-primary"
+source = "path:.agents/skills/wandb-primary"
+
+[[skills]]
+name = "*"
+source = "pbakaus/impeccable"

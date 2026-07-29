@@ -245,7 +245,7 @@ httpcore==1.0.9
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   httpx
-httplib2==0.31.2
+httplib2==0.32.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   google-api-python-client
@@ -392,7 +392,7 @@ mdurl==0.1.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   markdown-it-py
-mistune==3.2.1
+mistune==3.3.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
@@ -614,7 +614,7 @@ pexpect==4.9.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   ipython
-pillow==12.2.0
+pillow==12.3.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   imageio
@@ -667,11 +667,11 @@ pure-eval==0.2.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   stack-data
-pyarrow==24.0.0
+pyarrow==25.0.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   datasets
-pyasn1==0.6.3
+pyasn1==0.6.4
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   oauth2client
@@ -814,7 +814,7 @@ scipy==1.15.3
     #   shap
 seaborn==0.13.2
     # via -r src/lib/ai/bias-detection/requirements.txt
-setuptools==80.10.2
+setuptools==83.0.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   dash
@@ -910,7 +910,7 @@ toolz==1.1.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   altair
-torch==2.12.1
+torch==2.13.0
     # via -r src/lib/ai/bias-detection/requirements.txt
 tornado==6.5.7
     # via -r src/lib/ai/bias-detection/requirements.txt
