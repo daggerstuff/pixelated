@@ -220,7 +220,7 @@ export class ConsolidationPipeline {
             memoryId: latentId,
             content: current.content,
             metadata: {
-              retention: "latent",
+              retention: current.retention,
               latentAt: new Date().toISOString(),
               reverieEligible: true,
             },

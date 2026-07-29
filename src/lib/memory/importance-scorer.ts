@@ -54,6 +54,7 @@ const HIGH_CATEGORIES = new Set([
   "anger",
   "despair",
   "hopelessness",
+  "sadness",
 ]);
 
 export function emotionalWeight(categories: string[]): number {
@@ -165,7 +166,7 @@ export class ImportanceScorer {
         remCycles: 0,
         schemaReferences: [],
         reverieEligible: false,
-        reveriePhase: "",
+        reveriePhase: "dormant",
       },
     };
 
