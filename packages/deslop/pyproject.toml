@@ -12,7 +12,8 @@ authors = [{name = "Pixelated Empathy"}]
 requires-python = ">=3.10"
 dependencies = [
     "rich>=13.0.0",
-    "pyyaml>=6.0"
+    "pyyaml>=6.0",
+    "typer>=0.15.0"
 ]
 keywords = ["ai", "dataset", "cleaning", "slop", "llm", "preprocessing", "json", "jsonl", "nlp", "data-engineering"]
 classifiers = [

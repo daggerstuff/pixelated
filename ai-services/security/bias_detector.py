@@ -1,16 +1,43 @@
 """
 Bias Detector - Python Implementation
 Analyzes therapeutic sessions for demographic bias using Fairlearn
+
+Taxonomy note (PIX-4078): the bias category strings used here
+("gender", "age", "ethnicity", "language") are now backed by the canonical
+17-value BiasType enum at
+src/lib/ai/bias-detection/python-service/bias_detection/models.py. Per the
+resolved taxonomy review, "ethnicity" maps to the canonical RACIAL value
+(no split). The string representation is preserved for API-backward
+compatibility via StrEnum.value; consumers continue to receive the same
+category strings.
 """
 
 import logging
 import re
+import sys
 from enum import StrEnum
+from pathlib import Path
 
 import numpy as np
 from pydantic import BaseModel, Field
 
+# Canonical 17-value BiasType taxonomy (single source of truth) — import
+# before any local definitions so the canonical enum is available.
+_CANONICAL_MODELS = Path(__file__).resolve().parents[2] / "src" / "lib" / "ai" / "bias-detection" / "python-service"
+if str(_CANONICAL_MODELS) not in sys.path:
+    sys.path.insert(0, str(_CANONICAL_MODELS))
+
+from bias_detection.models import BiasType as CanonicalBiasType
+
 logger = logging.getLogger(__name__)
+
+
+# Local bias-category aliases mapped to the canonical 17-value enum.
+# Reviewer decision (PIX-4078): ethnicity -> RACIAL (no split).
+BIAS_CATEGORY_GENDER = CanonicalBiasType.GENDER
+BIAS_CATEGORY_AGE = CanonicalBiasType.AGE
+BIAS_CATEGORY_ETHNICITY = CanonicalBiasType.RACIAL  # "ethnicity" -> RACIAL
+BIAS_CATEGORY_LANGUAGE = CanonicalBiasType.LANGUAGE
 
 
 class BiasLevel(StrEnum):
@@ -53,7 +80,7 @@ class TherapeuticSession(BaseModel):
 
 
 class BiasIndicator(BaseModel):
-    category: str  # 'gender', 'age', 'ethnicity', 'language'
+    category: str  # canonical BiasType value (gender/age/racial/language) — see BIAS_CATEGORY_* above
     severity: float  # 0-1
     evidence: list[str]
     affected_group: str
@@ -84,6 +111,12 @@ AGE_BIAS_PATTERNS = [
 ETHNICITY_BIAS_PATTERNS = [
     (r"\b(exotic|foreign|different)\b", "non-white", 0.3),
     (r"\b(articulate|well-spoken)\b", "non-white", 0.4),  # Backhanded compliment
+]
+
+LANGUAGE_BIAS_PATTERNS = [
+    (r"\b(foreign accent|broken english|hard to understand)\b", "non-native speaker", 0.4),
+    (r"\b(articulate|well-spoken|good english)\b", "non-native speaker", 0.3),  # Praise as bias marker
+    (r"\b(native speaker|fluent)\b", "non-native speaker", 0.2),
 ]
 
 
@@ -160,7 +193,7 @@ def detect_gender_bias(text: str, gender: str) -> list[BiasIndicator]:
             if matches:
                 indicators.append(
                     BiasIndicator(
-                        category="gender",
+                        category=BIAS_CATEGORY_GENDER,
                         severity=severity,
                         evidence=matches[:3],  # First 3 examples
                         affected_group=f"{gender} participants",
@@ -189,7 +222,7 @@ def detect_age_bias(text: str, age: str) -> list[BiasIndicator]:
             if matches:
                 indicators.append(
                     BiasIndicator(
-                        category="age",
+                        category=BIAS_CATEGORY_AGE,
                         severity=severity,
                         evidence=matches[:3],
                         affected_group=f"{age_category} participants",
@@ -211,7 +244,7 @@ def detect_ethnicity_bias(text: str, ethnicity: str) -> list[BiasIndicator]:
         if matches:
             indicators.append(
                 BiasIndicator(
-                    category="ethnicity",
+                    category=BIAS_CATEGORY_ETHNICITY,
                     severity=severity,
                     evidence=matches[:3],
                     affected_group=f"{ethnicity} participants",

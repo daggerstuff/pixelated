@@ -30,6 +30,69 @@ class BiasType(StrEnum):
     CRIMINAL_HISTORY = "criminal_history"
 
 
+# Canonical taxonomy mapping — the single source of truth reconciling the
+# legacy bias vocabulary surfaces to this 17-value BiasType enum.
+#
+# Old surfaces consolidated (see docs/bias_taxonomy_mapping.md for the full
+# table):
+#   * ai-services/security/bias_detector.py bare-string categories:
+#       "gender", "age", "ethnicity", "language"
+#   * python-service/bias_detection/constants.py BIASED_TERMS_DICT keys:
+#       "gender", "racial", "age", "ability"
+#   * TechDeck 8-value Enum (DELETED — was dead code with zero importers):
+#       GENDER, RACIAL, AGE, SOCIOECONOMIC, GEOGRAPHIC, DISABILITY,
+#       RELIGIOUS, SEXUAL_ORIENTATION
+#       Note: TechDeck DISABILITY → canonical ABILITY (canonical uses ABILITY).
+#
+# The multimodal BiasType enum at
+# src/lib/ai/multimodal-bias-detection/python-service/.../models.py is
+# deliberately NOT merged here: it models multimedia-specific bias types
+# (VISUAL_REPRESENTATION, BODY_IMAGE, TECHNOLOGY_BIAS, ...) that are a
+# distinct domain from text-bias taxonomy.
+#
+# The deslop DEFAULT_RULE_PACKS collections (packages/deslop/deslop/rules/core.py)
+# are tone/style slop-marker packs, not a bias taxonomy — an orthogonal axis.
+# G004 extends the deslop substrate with a `bias` pack drawn from these values.
+#
+# Reviewer decision (PIX-4078, resolved inline): map local "ethnicity" →
+# RACIAL (no split). Local "language" → LANGUAGE. constants.py "racial" →
+# RACIAL. TechDeck "disability" → ABILITY.
+BIAS_TAXONOMY_MAPPING: dict[str, "BiasType"] = {
+    # ai-services/security/bias_detector.py bare strings
+    "gender": BiasType.GENDER,
+    "age": BiasType.AGE,
+    "ethnicity": BiasType.RACIAL,
+    "language": BiasType.LANGUAGE,
+    # constants.py BIASED_TERMS_DICT keys
+    "racial": BiasType.RACIAL,
+    "ability": BiasType.ABILITY,
+    # TechDeck 8-enum values (module deleted; strings kept for any persisted payloads)
+    "socioeconomic": BiasType.SOCIOECONOMIC,
+    "geographic": BiasType.GEOGRAPHIC,
+    "disability": BiasType.ABILITY,
+    "religious": BiasType.RELIGIOUS,
+    "sexual_orientation": BiasType.SEXUAL_ORIENTATION,
+}
+
+
+def canonical_bias_type(value: str | BiasType) -> BiasType:
+    """Resolve any legacy bias-category string or BiasType to the canonical 17-enum value.
+
+    Accepts: a BiasType instance (returned as-is), or any key in
+    BIAS_TAXONOMY_MAPPING (legacy string category). Raises ValueError for
+    unknown categories so callers cannot silently drop a bias signal.
+    """
+    if isinstance(value, BiasType):
+        return value
+    if value in BIAS_TAXONOMY_MAPPING:
+        return BIAS_TAXONOMY_MAPPING[value]
+    # Allow BiasType string values directly (e.g. "racial").
+    try:
+        return BiasType(value)
+    except ValueError as exc:
+        raise ValueError(f"Unknown bias category {value!r}; not in canonical 17-value BiasType taxonomy") from exc
+
+
 class AnalysisStatus(StrEnum):
     """Status of bias analysis"""
 

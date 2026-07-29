@@ -1,40 +1,40 @@
 export const introContent = {
   label: 'Why it matters',
-  title: 'Therapists need safe reps before a real session requires them.',
+  title: 'Therapists need reps before a real session demands them.',
   paragraphs: [
-    'Most programs know which conversations pressure new clinicians: risk, anger, silence, shame, boundary pressure, cultural misses, and disclosure. Those moments need practice before they become someone’s real session.',
-    'Pixelated Empathy gives teams a repeatable place to rehearse those moments with enough structure for faculty to teach skill instead of relying on charisma, memory, or one-off roleplay.',
+    'Risk, anger, silence, shame, disclosure — these moments decide whether a clinician is ready. They need practice before they become someone’s session.',
+    'Pixelated Empathy gives teams a repeatable place to rehearse them — with enough structure for faculty to teach skill, not rely on charisma.',
   ],
   panelLabel: 'Who uses it',
   panelItems: [
     {
       label: 'Counseling programs',
-      body: 'Prepare students for practicum with standardized client encounters and a clearer readiness signal.',
+      body: 'Standardized client encounters and a clearer readiness signal before practicum.',
     },
     {
       label: 'Supervision groups',
-      body: 'Give associates and interns focused practice between live cases without inventing ad hoc roleplays every week.',
+      body: 'Focused practice between live cases — no ad hoc roleplay every week.',
     },
     {
       label: 'Care organizations',
-      body: 'Rehearse high-risk communication patterns before staff encounter them in intake, crisis, or retention workflows.',
+      body: 'Rehearse high-risk communication before it shows up in intake, crisis, or retention.',
     },
   ],
   evidenceCards: [
     {
       title: 'Without a system',
       items: [
-        'Roleplay quality depends on who is in the room that day.',
-        'Feedback often arrives as a general impression.',
-        'Faculty cannot easily compare skill growth across trainees.',
+        'Roleplay quality depends on who is in the room.',
+        'Feedback arrives as general impression.',
+        'Skill growth is hard to compare across trainees.',
       ],
     },
     {
       title: 'With a system',
       items: [
-        'The same scenario can be assigned, repeated, and revisited.',
+        'Scenarios can be assigned, repeated, and revisited.',
         'The actual language is available for teaching.',
-        'Progress is tied to observable clinical behavior.',
+        'Progress is tied to observable behavior.',
       ],
     },
   ],

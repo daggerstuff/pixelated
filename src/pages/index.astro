@@ -57,88 +57,52 @@ const buildableScenarios = [
   <div class="np-page">
     <!-- Hero: the one decision a visitor came here to make. -->
     <section class="np-hero">
+      <div class="np-container np-hero__inner">
+        <span class="np-label np-hero__kicker">{hero.kicker}</span>
+        <h1 class="np-display np-hero__display">{hero.title}</h1>
+        <p class="np-body np-hero__subtitle">{hero.subtitle}</p>
+        <div class="np-hero__actions">
+          <a
+            class="np-btn np-btn-primary"
+            href={withBasePath(hero.primaryCTA.href)}
+          >
+            {hero.primaryCTA.text}
+          </a>
+          <a
+            class="np-btn np-btn-ghost"
+            href={withBasePath(hero.secondaryCTA.href)}
+          >
+            {hero.secondaryCTA.text}
+          </a>
+        </div>
+      </div>
+
+      <div class="np-container np-hero__artifact">
+        <figure class="np-hero__art">
+          <img
+            src={withBasePath(hero.artifact.image)}
+            alt={hero.artifact.imageAlt}
+            loading="eager"
+            width="960"
+            height="540"
+          />
+          <figcaption class="np-hero__art-cap">
+            <span class="np-data">{hero.artifact.chip}</span>
+            <span class="np-mono">{hero.artifact.status}</span>
+          </figcaption>
+        </figure>
+      </div>
+
       <div class="np-container">
-        <div class="np-hero__grid">
-          <div class="np-hero__primary">
-            <div class="np-hero__badge-row">
-              <span class="np-hero__sys-tag">[ SYSTEM // CLINICAL SIMULATION PLATFORM ]</span>
-            </div>
-            <h1 class="np-display np-hero__display">{hero.title}</h1>
-            <p class="np-body np-hero__subtitle">{hero.subtitle}</p>
-            <div class="np-hero__actions">
-              <a
-                class="np-btn np-btn-primary"
-                href={withBasePath(hero.primaryCTA.href)}
-              >
-                {hero.primaryCTA.text}
-              </a>
-              <a
-                class="np-btn np-btn-ghost"
-                href={withBasePath(hero.secondaryCTA.href)}
-              >
-                {hero.secondaryCTA.text}
-              </a>
-            </div>
-            <p class="np-hero__helper">{hero.helperText}</p>
-          </div>
-
-          <!-- TASTES §6 transcript proof object — Session 04 · Rupture repair. -->
-          <aside class="np-record" aria-label="Session 04 transcript proof object">
-            <header class="np-record__head">
-              <span class="np-record__case">Session 04 · Rupture repair</span>
-              <span class="np-record__topic">Disclosure, then naming the loss</span>
-            </header>
-
-            <div class="np-record__body">
-              <ol class="np-record__transcript">
-                <li class="np-record__turn">
-                  <span class="np-record__speaker">Counselor · 00:18</span>
-                  <p class="np-record__line">
-                    What brought you back this week?
-                  </p>
-                </li>
-                <li class="np-record__turn">
-                  <span class="np-record__speaker">Client · 00:42</span>
-                  <p class="np-record__line">
-                    Something happened. I don't really know how to say it. I
-                    haven't told anyone, including [partner].
-                  </p>
-                </li>
-                <li class="np-record__turn">
-                  <span class="np-record__speaker">Counselor · 01:04</span>
-                  <p class="np-record__line">
-                    Stay with me as long as you need. I won't rush this.
-                  </p>
-                </li>
-                <li class="np-record__turn">
-                  <span class="np-record__speaker">Client · 02:31</span>
-                  <p class="np-record__line">
-                    Three years ago. I had a stillbirth. Nobody knows except
-                    [partner], and we haven't said it out loud in two years.
-                  </p>
-                </li>
-                <li class="np-record__turn">
-                  <span class="np-record__speaker">Counselor · 03:12</span>
-                  <p class="np-record__line">
-                    You said it out loud just now. I'm here. We don't have to do
-                    anything else with it yet.
-                  </p>
-                </li>
-                <li class="np-record__turn">
-                  <span class="np-record__speaker">Client · 03:48</span>
-                  <p class="np-record__line">
-                    I didn't think I could. I still can't really. But you didn't
-                    make me fix it.
-                  </p>
-                </li>
-              </ol>
-            </div>
-
-            <footer class="np-record__foot">
-              <span class="np-record__lane">Turn 4 · Rupture named</span>
-              <span class="np-record__mark">Repair attempted · retry by W5</span>
-            </footer>
-          </aside>
+        <div class="np-hero__proof">
+          {
+            hero.proofPoints.map((point) => (
+              <div class="np-hero__proof-item">
+                <span class="np-data">{point.label}</span>
+                <p class="np-mono">{point.text}</p>
+              </div>
+            ))
+          }
         </div>
       </div>
     </section>
