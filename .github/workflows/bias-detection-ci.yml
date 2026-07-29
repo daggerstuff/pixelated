@@ -152,6 +152,7 @@ jobs:
   typescript-tests:
     name: TypeScript Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     needs: [security-scan, code-quality]
     if: ${{ needs.security-scan.result == 'success' && needs.code-quality.result
       == 'success' }}
@@ -391,6 +392,7 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [typescript-tests, python-tests]
     permissions:
       actions: write
