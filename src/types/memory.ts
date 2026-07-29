@@ -8,10 +8,13 @@
 
 export type PIIStatus = 'absent' | 'redacted' | 'present'
 export type ConsentGate = 'open' | 'restricted' | 'blocked'
+export type ReveriePhase =
+  'dormant' | 'seeded' | 'surfacing' | 'active' | 'fading'
 export type ConsolidationPhase =
   | 'raw'
   | 'consolidated'
   | 'archived'
+  | 'latent' // Reverie Engine: memories that surface as subconscious influences
   | 'forgotten'
 
 /** Importance scoring breakdown */
@@ -21,6 +24,7 @@ export interface MemoryImportance {
   relevance: number // Query-context cosine similarity [0, 1]
   emotionalWeight: number // Crisis multiplier (1.0–5.0x)
   actionability: number // Goal-relevance score [0, 1]
+  reveriePotential: number // Reverie Engine: [0,1] likelihood of surfacing as subconscious influence
 }
 
 /** Emotional tagging from Plutchik wheel + VAD */
@@ -44,6 +48,8 @@ export interface MemoryConsolidation {
   lastProcessed: number // Unix timestamp ms
   remCycles: number // Remaining consolidation cycles
   schemaReferences: string[] // Pointers to prior schema versions
+  reverieEligible: boolean // Reverie Engine: can this memory surface as a reverie?
+  reveriePhase: ReveriePhase
 }
 
 /** Canonical memory block — all fields required for tenant isolation and safety */
