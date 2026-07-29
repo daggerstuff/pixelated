@@ -161,13 +161,7 @@ export class ReverieEngine {
         continue;
       }
 
-      // Check emotional weight threshold — lower bar for raw/consolidated memories
-      const isProcessed =
-        mem.consolidation.phase === "archived" || mem.consolidation.phase === "forgotten";
-      const minWeight = isProcessed
-        ? this.config.reverieEligibleMinEmotionalWeight
-        : this.config.reverieEligibleMinEmotionalWeight * 0.25;
-      if (mem.importance.emotionalWeight < minWeight) {
+      if (mem.importance.emotionalWeight < this.config.reverieEligibleMinEmotionalWeight) {
         continue;
       }
 

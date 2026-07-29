@@ -62,6 +62,8 @@ export function useChat(options: ChatOptions): UseChatReturn {
 
     try {
       // Prepare the request - format for mental health API if needed
+      const { reveriePrompt, ...restExtra } = extraBody ?? {};
+
       const requestBody = api.includes("mental-health")
         ? {
             message: content,
@@ -75,9 +77,10 @@ export function useChat(options: ChatOptions): UseChatReturn {
             options: {
               enableCrisisDetection: true,
               responseStyle: "therapeutic",
+              ...(reveriePrompt ? { reveriePrompt } : {}),
             },
             ...body,
-            ...extraBody,
+            ...restExtra,
           }
         : {
             messages: messages.concat(userMessage),
