@@ -145,12 +145,13 @@ export class RemDreamScheduler {
       if (
         (m.consolidation.phase === "archived" || m.consolidation.phase === "forgotten") &&
         m.importance.emotionalWeight >= 2.0 &&
+        m.importance.raw >= 0.3 &&
         !m.gating.crisisFlag
       ) {
         const potential = Math.min(
           0.4 * (m.importance.emotionalWeight / 5.0) +
             0.2 * Math.min(m.emotions.categories.length / 5, 1) +
-            0.2 * Math.min(m.consolidation.schemaReferences.length / 3, 1) +
+            0.2 * Math.min(m.consolidation.schemaReferences.length / 5, 1) +
             0.2 * m.importance.recency,
           1,
         );
