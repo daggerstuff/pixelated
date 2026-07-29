@@ -70,16 +70,11 @@ export class ForgettingEngine {
       };
     }
 
-    if (retention >= this.config.deleteThreshold) {
-      return {
-        memoryId: memory.id,
-        action: ForgetAction.ARCHIVE,
-        reason: `Retention score ${retention.toFixed(3)} — archive candidate`,
-        retentionScore: retention,
-      };
-    }
-
+    // Check LATENT before ARCHIVE — emotionally significant memories in the
+    // archive zone (deleteThreshold <= retention < archiveThreshold) should
+    // become reverie candidates, not archived.
     if (
+      retention >= this.config.deleteThreshold &&
       memory.importance.emotionalWeight >= this.config.reverieEligibleMinEmotionalWeight &&
       !memory.gating.crisisFlag
     ) {
@@ -87,6 +82,15 @@ export class ForgettingEngine {
         memoryId: memory.id,
         action: ForgetAction.LATENT,
         reason: `Retention ${retention.toFixed(3)} — reverie candidate (emotional weight ${memory.importance.emotionalWeight})`,
+        retentionScore: retention,
+      };
+    }
+
+    if (retention >= this.config.deleteThreshold) {
+      return {
+        memoryId: memory.id,
+        action: ForgetAction.ARCHIVE,
+        reason: `Retention score ${retention.toFixed(3)} — archive candidate`,
         retentionScore: retention,
       };
     }
