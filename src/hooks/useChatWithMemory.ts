@@ -7,6 +7,7 @@ import type { MemoryEntry } from "../lib/memory/memory-client";
 import { useChat, type UseChatReturn } from "./useChat";
 import { useMemory, type UseMemoryReturn } from "./useMemory";
 import { ReverieEngine, DEFAULT_REVERIE_CONFIG, type ReverieConfig } from "@/lib/memory/reverie";
+import { emotionalWeight } from "@/lib/memory/importance-scorer";
 
 export interface ChatWithMemoryOptions {
   initialMessages?: Message[];
@@ -33,6 +34,11 @@ function toMemoryBlock(entry: MemoryEntry): MemoryBlock {
   const ts = entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now();
   const hasCrisis = !!meta.crisisSeverity && meta.crisisSeverity !== "none";
 
+  const extracted = extractEmotions(entry.content);
+  const weight = emotionalWeight(extracted.categories);
+  const tags = Array.isArray(meta.tags) ? meta.tags : [];
+  const categories = Array.from(new Set([...extracted.categories, ...tags]));
+
   return {
     id: entry.id,
     tenantId: meta.userId ?? "unknown",
@@ -43,14 +49,14 @@ function toMemoryBlock(entry: MemoryEntry): MemoryBlock {
       raw: 0.5,
       recency: 0.5,
       relevance: 0.5,
-      emotionalWeight: hasCrisis ? 3.0 : 0.5,
+      emotionalWeight: hasCrisis ? 5.0 : weight,
       actionability: 0.5,
       reveriePotential: 0.5,
     },
     emotions: {
-      valence: 0,
-      arousal: 0,
-      categories: Array.isArray(meta.tags) ? meta.tags : [],
+      valence: extracted.valence,
+      arousal: extracted.arousal,
+      categories,
     },
     gating: {
       piiStatus: meta.piiRemoved ? "redacted" : "absent",
