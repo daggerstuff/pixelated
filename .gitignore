@@ -24,6 +24,8 @@
 .factory/
 .art/
 .openhands/
+.tokensave/
+.neon
 hackathon/
 skills/
 
