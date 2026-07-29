@@ -89,7 +89,7 @@ export const GET: APIRoute = async ({ request }) => {
         supportedModels: ["minimaxai/minimax-m2.7", "gpt-4", "claude-3"],
         parameters: {
           required: ["messages or currentMessage"],
-          optional: ["model", "temperature", "maxResponseTokens", "instructions"],
+          optional: ["model", "temperature", "maxResponseTokens", "instructions", "reveriePrompt"],
         },
         features: [
           "therapeutic response generation",
