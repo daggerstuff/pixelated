@@ -273,13 +273,17 @@ jobs:
           kubectl apply -f agents/session-agent/k8s/deployment.yaml
           kubectl apply -f agents/qa-agent/k8s/deployment.yaml
           kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
-          kubectl set image deployment/pixelated-empathy pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
+          # Delete orphaned deployment (not in kustomization, stale spec)
+          kubectl delete deployment/pixelated-empathy -n pixelated-empathy --ignore-not-found
+
+          # Target blue (active slot — Service routes to slot: blue)
+          kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
           kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
           kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
           kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
           echo "Waiting for rollout..."
-          kubectl rollout status deployment/pixelated-empathy -n pixelated-empathy --timeout=5m
+          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=5m
           kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=5m
           kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=5m
           kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=5m
@@ -300,7 +304,7 @@ jobs:
 
           echo "Verifying new image is running on at least one pod..."
           EXPECTED_DIGEST="${{ needs.build-and-push.outputs.app_digest }}"
-          RUNNING_IMAGE=$(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy -o jsonpath='{.items[*].spec.containers[0].image}' | tr ' ' '\n' | head -n 1)
+          RUNNING_IMAGE=$(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy,slot=blue -o jsonpath='{.items[*].spec.containers[0].image}' | tr ' ' '\n' | head -n 1)
           if [[ "${RUNNING_IMAGE}" != *"${EXPECTED_DIGEST}"* ]]; then
             echo "⚠️ Image mismatch: expected digest '${EXPECTED_DIGEST}' but running '${RUNNING_IMAGE}'"
             echo "This can happen when concurrent deployments overwrite the same tag."
