@@ -501,7 +501,7 @@
     "vitest": "^4.1.10",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.114.0",
+    "wrangler": "^4.115.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
