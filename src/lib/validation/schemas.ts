@@ -56,7 +56,7 @@ export const CompletionRequestSchema = z.object({
   presence_penalty: z.number().min(-2).max(2).default(0).optional(),
   frequency_penalty: z.number().min(-2).max(2).default(0).optional(),
   top_p: z.number().min(0).max(1).default(1).optional(),
-  reveriePrompt: z.string().max(8192).optional(),
+  reveriePrompt: z.string().min(1).max(8192).optional(),
 });
 
 /**
