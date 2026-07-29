@@ -79,8 +79,6 @@ def _load_fairlearn() -> bool:
     return FAIRLEARN_AVAILABLE
 
 
-# Removed unused model and placeholder imports
-
 logger = logging.getLogger(__name__)
 
 
@@ -90,9 +88,7 @@ class FairnessAnalyzer:
     def __init__(self, warning_threshold: float = 0.3):
         self.warning_threshold = warning_threshold
 
-    async def run_preprocessing_analysis(
-        self, session_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def run_preprocessing_analysis(self, session_data: dict[str, Any]) -> dict[str, Any]:
         """Run preprocessing layer bias analysis using AIF360 and demographic analysis."""
         try:
             _load_aif360()
@@ -144,9 +140,7 @@ class FairnessAnalyzer:
             }
 
             if FAIRLEARN_AVAILABLE:
-                fairlearn_analysis = await self._run_fairlearn_analysis(
-                    session_data, predictions
-                )
+                fairlearn_analysis = await self._run_fairlearn_analysis(session_data, predictions)
                 result["metrics"]["fairlearn"] = fairlearn_analysis
                 result["bias_score"] = fairlearn_analysis.get("bias_score", 0.0)
 
@@ -164,37 +158,21 @@ class FairnessAnalyzer:
             logger.error("Model-level analysis failed: %s", e)
             return {"layer": "model_level", "bias_score": 0.0, "error": str(e)}
 
-    def _analyze_demographic_representation(
-        self, session_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _analyze_demographic_representation(self, session_data: dict[str, Any]) -> dict[str, Any]:
         """Analyze demographic representation using entropy."""
         try:
             # Look for demographics in various possible nesting levels
-            demographics = (
-                session_data.get("participant_demographics")
-                or session_data.get("demographics")
-                or {}
-            )
+            demographics = session_data.get("participant_demographics") or session_data.get("demographics") or {}
 
-            gender_dist = (
-                demographics.get("gender_distribution")
-                or demographics.get("gender")
-                or {}
-            )
+            gender_dist = demographics.get("gender_distribution") or demographics.get("gender") or {}
             if isinstance(gender_dist, str):
                 gender_dist = {gender_dist: 1}
 
-            age_dist = (
-                demographics.get("age_distribution") or demographics.get("age") or {}
-            )
+            age_dist = demographics.get("age_distribution") or demographics.get("age") or {}
             if isinstance(age_dist, str):
                 age_dist = {age_dist: 1}
 
-            ethnicity_dist = (
-                demographics.get("ethnicity_distribution")
-                or demographics.get("ethnicity")
-                or {}
-            )
+            ethnicity_dist = demographics.get("ethnicity_distribution") or demographics.get("ethnicity") or {}
             if isinstance(ethnicity_dist, str):
                 ethnicity_dist = {ethnicity_dist: 1}
 
@@ -202,13 +180,9 @@ class FairnessAnalyzer:
             gender_entropy = self._calculate_entropy(
                 list(gender_dist.values()) if isinstance(gender_dist, dict) else [1.0]
             )
-            age_entropy = self._calculate_entropy(
-                list(age_dist.values()) if isinstance(age_dist, dict) else [1.0]
-            )
+            age_entropy = self._calculate_entropy(list(age_dist.values()) if isinstance(age_dist, dict) else [1.0])
             ethnicity_entropy = self._calculate_entropy(
-                list(ethnicity_dist.values())
-                if isinstance(ethnicity_dist, dict)
-                else [1.0]
+                list(ethnicity_dist.values()) if isinstance(ethnicity_dist, dict) else [1.0]
             )
 
             # Normalize entropy
@@ -222,9 +196,7 @@ class FairnessAnalyzer:
             )
 
             representation_score = (
-                (gender_entropy + age_entropy + ethnicity_entropy) / (3 * max_entropy)
-                if max_entropy > 0
-                else 0.5
+                (gender_entropy + age_entropy + ethnicity_entropy) / (3 * max_entropy) if max_entropy > 0 else 0.5
             )
             bias_score = 1.0 - representation_score
 
@@ -249,9 +221,7 @@ class FairnessAnalyzer:
         probs = [v / total for v in values if v > 0]
         return -sum(p * np.log(p) for p in probs)
 
-    async def _run_aif360_analysis(
-        self, _session_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _run_aif360_analysis(self, _session_data: dict[str, Any]) -> dict[str, Any]:
         """Wrap AIF360 BinaryLabelDataset metrics."""
         if not AIF360_AVAILABLE:
             return {"bias_score": 0.0, "error": "AIF360 not available"}
