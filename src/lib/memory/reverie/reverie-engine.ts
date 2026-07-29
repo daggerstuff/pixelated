@@ -40,7 +40,6 @@ export class ReverieEngine {
   private injector: SoftInjector;
   private messageCount = 0;
   private latentPool: MemoryBlock[] = [];
-  private lastDetectionAt = 0;
 
   constructor(config: ReverieConfig = DEFAULT_REVERIE_CONFIG) {
     this.config = config;
@@ -72,12 +71,13 @@ export class ReverieEngine {
 
     // Check if detection should run this cycle
     if (!this.detector.shouldRun(this.messageCount)) {
+      const injectionResult = this.injector.apply([], this.messageCount);
       return {
         fishhooks: [],
         newReveries: [],
-        activeReveries: [...this.injector.getActive()],
-        reveriePrompt: this.injector.getActive().length > 0 ? this.injector.getCurrentPrompt() : "",
-        changed: false,
+        activeReveries: injectionResult.activeReveries,
+        reveriePrompt: injectionResult.prompt,
+        changed: !injectionResult.empty,
         elapsedMs: Date.now() - startTime,
       };
     }
@@ -106,12 +106,14 @@ export class ReverieEngine {
     }
 
     // Phase 2: Surface reverie vectors from matches
-    const newReveries: ReverieVector[] = this.surfacer.surface(fishhooks, this.latentPool);
+    const newReveries: ReverieVector[] = this.surfacer.surface(
+      fishhooks,
+      this.latentPool,
+      this.messageCount,
+    );
 
     // Phase 3: Inject into soft injector (merge + decay + resolve + prompt)
     const injectionResult = this.injector.apply(newReveries, this.messageCount);
-
-    this.lastDetectionAt = this.messageCount;
 
     return {
       fishhooks,
@@ -149,13 +151,23 @@ export class ReverieEngine {
         continue;
       }
 
-      // Only seed from archived or forgotten phase
-      if (mem.consolidation.phase !== "archived" && mem.consolidation.phase !== "forgotten") {
+      // Only seed from archived, forgotten, raw, or consolidated phase
+      if (
+        mem.consolidation.phase !== "archived" &&
+        mem.consolidation.phase !== "forgotten" &&
+        mem.consolidation.phase !== "raw" &&
+        mem.consolidation.phase !== "consolidated"
+      ) {
         continue;
       }
 
-      // Check emotional weight threshold
-      if (mem.importance.emotionalWeight < this.config.reverieEligibleMinEmotionalWeight) {
+      // Check emotional weight threshold — lower bar for raw/consolidated memories
+      const isProcessed =
+        mem.consolidation.phase === "archived" || mem.consolidation.phase === "forgotten";
+      const minWeight = isProcessed
+        ? this.config.reverieEligibleMinEmotionalWeight
+        : this.config.reverieEligibleMinEmotionalWeight * 0.25;
+      if (mem.importance.emotionalWeight < minWeight) {
         continue;
       }
 
@@ -180,7 +192,7 @@ export class ReverieEngine {
     return {
       seeds,
       alreadyLatent,
-      latentPoolSize: this.latentPool.length,
+      latentPoolSize: this.latentPool.length + seeds.length,
       elapsedMs: Date.now() - startTime,
     };
   }
@@ -255,7 +267,7 @@ export class ReverieEngine {
   clear(): void {
     this.injector.clear();
     this.messageCount = 0;
-    this.lastDetectionAt = 0;
+    this.latentPool = [];
   }
 
   /**

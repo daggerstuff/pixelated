@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 import type { Message } from "@/types/chat";
 import type { MemoryBlock } from "@/types/memory";
@@ -31,7 +31,7 @@ export type UseChatWithMemoryReturn = UseChatReturn & {
 function toMemoryBlock(entry: MemoryEntry): MemoryBlock {
   const meta = entry.metadata ?? {};
   const ts = entry.createdAt ? new Date(entry.createdAt).getTime() : Date.now();
-  const hasCrisis = !!meta.crisisSeverity;
+  const hasCrisis = !!meta.crisisSeverity && meta.crisisSeverity !== "none";
 
   return {
     id: entry.id,
@@ -64,7 +64,7 @@ function toMemoryBlock(entry: MemoryEntry): MemoryBlock {
       remCycles: 0,
       schemaReferences: [],
       reverieEligible: false,
-      reveriePhase: "none",
+      reveriePhase: "dormant",
     },
   };
 }
@@ -211,7 +211,7 @@ function extractEmotions(text: string): {
   if (weightSum === 0) return { valence: 0, arousal: 0, categories: [] };
   return {
     valence: Math.max(-1, Math.min(1, valenceSum / weightSum)),
-    arousal: Math.max(-1, Math.min(1, arousalSum / weightSum)),
+    arousal: Math.max(0, Math.min(1, (arousalSum / weightSum + 1) / 2)),
     categories,
   };
 }
@@ -222,7 +222,7 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}): UseChatW
 
   const chat = useChat({
     initialMessages,
-    api: options.api ?? "/api/chat",
+    api: options.api ?? "/api/ai/completion",
   });
   const memory = useMemory({
     userId: sessionId,
@@ -236,6 +236,10 @@ export function useChatWithMemory(options: ChatWithMemoryOptions = {}): UseChatW
     reverieRef.current = new ReverieEngine(options.reverieConfig ?? DEFAULT_REVERIE_CONFIG);
   }
   const reverie = reverieRef.current;
+
+  useEffect(() => {
+    reverie.clear();
+  }, [sessionId, reverie]);
 
   const sendMessage = useCallback(
     async (message: string) => {
