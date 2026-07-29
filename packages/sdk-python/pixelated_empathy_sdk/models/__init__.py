@@ -1,7 +1,6 @@
 # coding: utf-8
 
 # flake8: noqa
-
 """
     Pixelated Empathy API
 
@@ -15,33 +14,7 @@
 """  # noqa: E501
 
 
-__version__ = "1.0.0"
-
-# import apis into sdk package
-from pixelated_empathy_sdk.api.admin_api import AdminApi
-from pixelated_empathy_sdk.api.authentication_api import AuthenticationApi
-from pixelated_empathy_sdk.api.bias_analysis_api import BiasAnalysisApi
-from pixelated_empathy_sdk.api.content_api import ContentApi
-from pixelated_empathy_sdk.api.developer_api_keys_api import DeveloperAPIKeysApi
-from pixelated_empathy_sdk.api.developer_memory_api import DeveloperMemoryApi
-from pixelated_empathy_sdk.api.memory_api import MemoryApi
-from pixelated_empathy_sdk.api.memory_v1_api import MemoryV1Api
-from pixelated_empathy_sdk.api.system_api import SystemApi
-from pixelated_empathy_sdk.api.training_api import TrainingApi
-from pixelated_empathy_sdk.api.user_api import UserApi
-
-# import ApiClient
-from pixelated_empathy_sdk.api_response import ApiResponse
-from pixelated_empathy_sdk.api_client import ApiClient
-from pixelated_empathy_sdk.configuration import Configuration
-from pixelated_empathy_sdk.exceptions import OpenApiException
-from pixelated_empathy_sdk.exceptions import ApiTypeError
-from pixelated_empathy_sdk.exceptions import ApiValueError
-from pixelated_empathy_sdk.exceptions import ApiKeyError
-from pixelated_empathy_sdk.exceptions import ApiAttributeError
-from pixelated_empathy_sdk.exceptions import ApiException
-
-# import models into sdk package
+# import models into model package
 from pixelated_empathy_sdk.models.admin_user_view import AdminUserView
 from pixelated_empathy_sdk.models.api_key import ApiKey
 from pixelated_empathy_sdk.models.auth_callback200_response import AuthCallback200Response
