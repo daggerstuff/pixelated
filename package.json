@@ -194,7 +194,7 @@
     "@ai-sdk/provider": "^4.0.3",
     "@astrojs/node": "^11.0.2",
     "@astrojs/react": "latest",
-    "@astrojs/vercel": "10.0.8",
+    "@astrojs/vercel": "11.0.4",
     "@auth0/auth0-react": "latest",
     "@aws-sdk/client-dynamodb": "latest",
     "@aws-sdk/client-ec2": "latest",
