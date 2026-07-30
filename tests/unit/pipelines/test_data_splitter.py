@@ -1,4 +1,4 @@
-from ai.core.pipelines.data_splitter import DataSplitter
+from ai.pkg_mera.core.pipelines.data_splitter import DataSplitter
 
 
 def test_split_ratios():
