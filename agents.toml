@@ -69,5 +69,10 @@ name = "wandb-primary"
 source = "path:.agents/skills/wandb-primary"
 
 [[skills]]
+name = "verify"
+source = "path:.agents/skills/verify"
+
+[[skills]]
 name = "*"
 source = "pbakaus/impeccable"
+

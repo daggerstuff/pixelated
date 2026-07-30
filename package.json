@@ -343,7 +343,6 @@
     "react-hook-form": "latest",
     "react-hot-toast": "latest",
     "react-i18next": "latest",
-    "react-router-dom": "latest",
     "recharts": "latest",
     "redis": "latest",
     "rehype-sanitize": "latest",
@@ -508,7 +507,7 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "brace-expansion": "5.0.6",
+    "brace-expansion": "^5.0.8",
     "form-data": "4.0.6",
     "path-to-regexp": "8.4.2"
   },

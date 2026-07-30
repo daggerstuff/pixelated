@@ -209,7 +209,7 @@ peerDependencyRules:
   allowedVersions:
     '@ai-sdk/anthropic': '4'
     '@ai-sdk/provider': '4'
-    '@babel/core': '7'
+    '@babel/core': '>=7.29.1'
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'
     '@types/pg': 8.16.0
@@ -248,7 +248,9 @@ overrides:
   retry-request>uuid: '>=11.1.1'
   teeny-request>uuid: '>=11.1.1'
   '@grpc/proto-loader>protobufjs': '>=8.0.2'
-  '@hono/node-server': ^1.19.13
+  '@hono/node-server': ^2.0.12
+  'sharp': ^0.35.3
+  '@babel/core': ^7.29.7
   '@modelcontextprotocol/sdk': ^1.29.0
   '@opentelemetry/api': ^1.9.0
   '@opentelemetry/otlp-proto-exporter-base': ^0.51.1
@@ -270,7 +272,7 @@ overrides:
   astro>devalue: '>=5.8.1'
   axios: '>=1.15.1'
   adm-zip: 0.6.0
-  brace-expansion: '>=5.0.5'
+  brace-expansion: ^5.0.8
   astro>cookie: ^2.0.0
   cookie: '^0.7.2'
   '@vercel/oidc': '3.7.1'
