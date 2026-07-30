@@ -7,7 +7,6 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getAuditTrailService } from './audit-trail'
 import type {
-  ApprovalStatus,
   ApproveOptions,
   EnqueueOptions,
   InterventionPriority,
@@ -15,7 +14,6 @@ import type {
   QueueStats,
   RejectOptions,
   TherapeuticResponse,
-  GovernanceChecklistResult,
 } from './types'
 
 const logger = createBuildSafeLogger('InterventionApprovalQueue')
