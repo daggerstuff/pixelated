@@ -1,4 +1,20 @@
 #!/usr/bin/env bash
+# scripts/ci/get-changed-files.sh
+#
+# Collect changed files from a GitHub Actions event into a file.
+# Determines the diff base from PR_BASE_SHA, GITHUB_EVENT_BEFORE, or falls
+# back to the full commit tree.
+#
+# Usage: get-changed-files.sh [output-path]
+#   output-path   File to write changed file list (default: /tmp/changed_files.txt)
+#
+# Exit codes:
+#   0 — files collected successfully (or none changed)
+#   1 — failed to collect changed files
+#
+# Required env:
+#   GITHUB_SHA  — current commit SHA
+
 set -euo pipefail
 
 OUTPUT_PATH="${1:-/tmp/changed_files.txt}"
