@@ -26,6 +26,12 @@ Foresight MCP is wired over **HTTP/SSE** via `agent/foresight-client.ts`
 exposes `storeMemory` / `searchMemories` and is used for session hydration and
 persistent notes. Connection config lives in `agent/connections/foresight.ts`.
 
+## Handoff protocol
+
+- **→ qa-agent:** `conclude_session.ts` writes session end event to Foresight
+  with tag `handoff:qa`. qa-agent's daily schedule picks up sessions requiring
+  review.
+
 ## Notes / non-gaps
 
 - **No schedule is defined for this agent** — the parent ticket (PIX-3957) does
