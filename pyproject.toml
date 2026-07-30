@@ -125,7 +125,7 @@ dependencies = [
   "lightning-sdk>=2025.12.2",
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
-  "gitpython>=3.1.43",
+  "gitpython>=3.1.55",
   "modal>=1.4.1",
   "gradient-adk>=0.2.11",
   "virtualenv>=21.2.0",
@@ -135,6 +135,8 @@ dependencies = [
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
+  # localstack is a dev/test-only dependency. pip-audit flags PYSEC-2023-243
+  # (missing SSL verification) but no fix version is available; accepted risk.
   "localstack>=2026.5.0",
   "python-telegram-bot>=22.7",
   "anthropic>=0.107.1",
@@ -293,8 +295,8 @@ combine_as_imports = true
 force_single_line = false
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
-testpaths = ["tests", "ai/core/tests"]
-norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
+testpaths = ["tests"]
+norecursedirs = []
 asyncio_default_fixture_loop_scope = "function"
 markers = [
   "integration: marks tests as integration tests (require external services)",
