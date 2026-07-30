@@ -5780,6 +5780,7 @@ dependencies = [
     { name = "sqlalchemy" },
     { name = "starlette" },
     { name = "structlog" },
+    { name = "tavily-cli" },
     { name = "textblob" },
     { name = "textstat" },
     { name = "torch", version = "2.13.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "python_full_version < '3.15' and platform_machine != 'x86_64' and sys_platform == 'darwin'" },
@@ -5983,6 +5984,7 @@ requires-dist = [
     { name = "sqlalchemy", specifier = ">=2.0.51" },
     { name = "starlette", specifier = ">=1.0.1" },
     { name = "structlog", specifier = ">=25.4.0" },
+    { name = "tavily-cli", specifier = ">=0.1.5" },
     { name = "textblob", specifier = ">=0.19.0" },
     { name = "textstat", specifier = ">=0.7.8" },
     { name = "torch", specifier = "==2.13.0", index = "https://download.pytorch.org/whl/cpu" },
@@ -8423,6 +8425,38 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/46/58/8c37dea7bbf769b20d58e7ace7e5edfe65b849442b00ffcdd56be88697c6/tabulate-0.10.0.tar.gz", hash = "sha256:e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d", size = 91754, upload-time = "2026-03-04T18:55:34.402Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl", hash = "sha256:f0b0622e567335c8fabaaa659f1b33bcb6ddfe2e496071b743aa113f8774f2d3", size = 39814, upload-time = "2026-03-04T18:55:31.284Z" },
+]
+
+[[package]]
+name = "tavily-cli"
+version = "0.1.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "click" },
+    { name = "httpx" },
+    { name = "requests" },
+    { name = "rich" },
+    { name = "tavily-python" },
+    { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6f/a9/66ff068ec69bba1ae39a8dd23031ebe4c97ec4cdb59a48c7a7a02c6306f0/tavily_cli-0.1.5.tar.gz", hash = "sha256:cb492674cf6ca2c18979abc4261c7a23ae93ceb6f5c8b959eeb45a600fe838f5", size = 25708, upload-time = "2026-07-20T13:46:47.14Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/99/82be8848b44bbfc86dc00f8aea2c7b6d46a07075216c23bc9745201957f1/tavily_cli-0.1.5-py3-none-any.whl", hash = "sha256:c3690cad2fd3949b32e64173e6c1f0528b6a714a0ff199426056d8dbc3e915a6", size = 33238, upload-time = "2026-07-20T13:46:46.091Z" },
+]
+
+[[package]]
+name = "tavily-python"
+version = "0.7.26"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "requests" },
+    { name = "tiktoken" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/bd/29/c2d5056dbf45a80484df5a1bf0d0ae59c611aa9680372c400a278fbf0c50/tavily_python-0.7.26.tar.gz", hash = "sha256:36202728144fce1ef0cece33800f98e3cdeb5f600e6678c50b1232b866a2f509", size = 29647, upload-time = "2026-06-10T18:38:45.231Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1b/c2/616ebcd49561d74c93099efa45fd5a4af2e528415f01351575980be0ba9e/tavily_python-0.7.26-py3-none-any.whl", hash = "sha256:9b9e7f2d10b3572444e13e9a3bf4f5341975d591cbc1306be04ef89a363e42a7", size = 21940, upload-time = "2026-06-10T18:38:44.127Z" },
 ]
 
 [[package]]
