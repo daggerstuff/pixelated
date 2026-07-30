@@ -6,7 +6,7 @@ import type {
   HipAAChecklistItem,
 } from './EvidenceReportTemplates'
 import { getQueryAuditService } from './QueryAuditService'
-import { consentManagementService } from './ConsentManagementService'
+
 
 const logger = getLogger({ prefix: 'IRBExportService' })
 
@@ -233,7 +233,7 @@ export class IRBExportService {
 
   private generateMethodology(
     report: EvidenceReport,
-    template: ReportTemplate,
+    _template: ReportTemplate,
   ): IRBMethodology {
     return {
       studyDesign:

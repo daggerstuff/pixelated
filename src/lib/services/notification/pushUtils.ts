@@ -13,6 +13,13 @@ export interface PushSubscription {
   }
 }
 
+export interface VapidJwtOptions {
+  /** Subscriber email. Defaults to `mailto:admin@example.com`. */
+  sub?: string
+  /** TTL in seconds. Defaults to 12 hours (43200). */
+  ttlSeconds?: number
+}
+
 export class ExpiredSubscriptionError extends Error {
   constructor(message = 'Push subscription has expired') {
     super(message)
@@ -33,8 +40,8 @@ export async function generateVAPIDKeys(): Promise<{
     ['sign', 'verify'],
   )
 
-  const publicKey = await subtle.exportKey('raw', keyPair.publicKey)
-  const privateKey = await subtle.exportKey('pkcs8', keyPair.privateKey)
+  const publicKey = (await subtle.exportKey('raw', keyPair.publicKey)) as ArrayBuffer
+  const privateKey = (await subtle.exportKey('pkcs8', keyPair.privateKey)) as ArrayBuffer
 
   return {
     publicKey: uint8ArrayToBase64(new Uint8Array(publicKey)),
@@ -42,14 +49,14 @@ export async function generateVAPIDKeys(): Promise<{
   }
 }
 
-export async function sendNotification(
-  subscription: PushSubscription,
-  payload: Record<string, unknown>,
-  vapidKeys: { publicKey: string; privateKey: string },
-): Promise<void> {
-  const encodedPayload = new TextEncoder().encode(JSON.stringify(payload))
+export async function buildVapidJwt(
+  endpoint: string,
+  vapidKeys: { privateKey: string },
+  options: VapidJwtOptions = {},
+): Promise<string> {
+  const { sub = 'mailto:admin@example.com', ttlSeconds = 12 * 60 * 60 } = options
 
-  // Import VAPID keys
+  // Import VAPID private key
   const privateKeyData = base64ToUint8Array(vapidKeys.privateKey)
     .buffer as ArrayBuffer
   const privateKey = await subtle.importKey(
@@ -63,7 +70,7 @@ export async function sendNotification(
     ['sign'],
   )
 
-  // Generate signature
+  // Build JWT
   const header = {
     typ: 'JWT',
     alg: 'ES256',
@@ -71,21 +78,31 @@ export async function sendNotification(
 
   const now = Math.floor(Date.now() / 1000)
   const claims = {
-    aud: new URL(subscription.endpoint).origin,
-    exp: now + 12 * 60 * 60, // 12 hours from now
-    sub: 'mailto:admin@example.com', // Replace with your email
+    aud: new URL(endpoint).origin,
+    exp: now + ttlSeconds,
+    sub,
   }
 
   const input = `${btoa(JSON.stringify(header))}.${btoa(JSON.stringify(claims))}`
   const signature = await subtle.sign(
     { name: 'ECDSA', hash: 'SHA-256' },
     privateKey,
-    new TextEncoder().encode(input),
+    new TextEncoder().encode(input) as NodeJS.BufferSource,
   )
 
-  const jwt = `${input}.${uint8ArrayToBase64(new Uint8Array(signature))}`
+  return `${input}.${uint8ArrayToBase64(new Uint8Array(signature))}`
+}
 
-  // Send the push message
+export async function sendNotification(
+  subscription: PushSubscription,
+  payload: Record<string, unknown>,
+  vapidKeys: { publicKey: string; privateKey: string },
+): Promise<void> {
+  const encodedPayload = new TextEncoder().encode(JSON.stringify(payload))
+
+  // Build VAPID JWT and send the push message
+  const jwt = await buildVapidJwt(subscription.endpoint, vapidKeys)
+
   const response = await fetch(subscription.endpoint, {
     method: 'POST',
     headers: {
