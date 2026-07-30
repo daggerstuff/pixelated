@@ -16,9 +16,9 @@
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
 
-  --np-font-display: "JetBrains Mono Variable", ui-monospace, monospace;
-  --np-font-body: "JetBrains Mono Variable", ui-monospace, monospace;
-  --np-font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --np-font-display: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --np-font-body: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   --np-content: 76rem;
   --np-content-narrow: 55rem;
@@ -73,9 +73,9 @@
   line-height: 1.05;
   letter-spacing: -0.02em;
   font-variation-settings:
-    "opsz" 96,
-    "SOFT" 0,
-    "WONK" 0;
+    'opsz' 96,
+    'SOFT' 0,
+    'WONK' 0;
   margin: 0;
 }
 
@@ -191,7 +191,7 @@
   text-decoration: none;
 }
 .np-btn-link::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -801,7 +801,7 @@
 }
 
 .np-compare__list li::before {
-  content: "—";
+  content: '—';
   position: absolute;
   left: 0;
   color: var(--np-line-strong);
@@ -1004,7 +1004,7 @@
 /* === Proof strip — no longer used here, keep for compat === */
 
 /* === Light mode === */
-:root[data-theme="light"]:has(.np-page) {
+:root[data-theme='light']:has(.np-page) {
   --np-bg: oklch(0.98 0 0);
   --np-surface: oklch(0.95 0 0);
   --np-elevated: oklch(0.92 0 0);

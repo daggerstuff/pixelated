@@ -2,11 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import {
-  heroContent,
-  workflowContent,
-  ctaContent,
-} from '@/lib/content'
+import { heroContent, workflowContent, ctaContent } from '@/lib/content'
 
 const { hero, workflow, cta } = {
   hero: heroContent,
@@ -79,7 +75,11 @@ const buildableScenarios = [
         </div>
 
         <!-- Chat conversation demo — visual showcase, not functional -->
-        <aside class="np-chat-demo" aria-label="Example therapy conversation on the platform" role="region">
+        <aside
+          class="np-chat-demo"
+          aria-label="Example therapy conversation on the platform"
+          role="region"
+        >
           <div class="np-chat-demo__header">
             <span class="np-chat-demo__label">Live session</span>
             <span class="np-chat-demo__status">Client: Sarah</span>
@@ -108,7 +108,10 @@ const buildableScenarios = [
 
             <div class="np-chat-demo__msg np-chat-demo__msg--client">
               <div class="np-chat-demo__bubble np-chat-demo__bubble--client">
-                <p>I don&#39;t know. I just feel like I&#39;m not getting anywhere.</p>
+                <p>
+                  I don&#39;t know. I just feel like I&#39;m not getting
+                  anywhere.
+                </p>
               </div>
               <span class="np-chat-demo__sender">Client</span>
             </div>
@@ -136,8 +139,9 @@ const buildableScenarios = [
             <div class="np-chat-demo__msg np-chat-demo__msg--therapist">
               <div class="np-chat-demo__bubble np-chat-demo__bubble--therapist">
                 <p>
-                  It makes sense to expect change to feel more obvious. Let&#39;s
-                  look at what has shifted&mdash;even the small things.
+                  It makes sense to expect change to feel more obvious.
+                  Let&#39;s look at what has shifted&mdash;even the small
+                  things.
                 </p>
               </div>
               <span class="np-chat-demo__sender">Trainee</span>
@@ -152,7 +156,8 @@ const buildableScenarios = [
           </div>
 
           <p class="np-chat-demo__note">
-            Simulated conversation&ensp;&middot;&ensp;Trainee responds to an AI client
+            Simulated conversation&ensp;&middot;&ensp;Trainee responds to an AI
+            client
           </p>
         </aside>
       </div>
@@ -204,8 +209,8 @@ const buildableScenarios = [
             What your team gets when the practice is logged.
           </h2>
           <p class="np-body">
-            Four things arrive together from one trainee attempt: a scenario,
-            a transcript, a supervisor note, and a record your next meeting can
+            Four things arrive together from one trainee attempt: a scenario, a
+            transcript, a supervisor note, and a record your next meeting can
             reopen without guesswork.
           </p>
         </div>
