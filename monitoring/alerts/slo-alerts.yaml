@@ -53,18 +53,18 @@ groups:
       # General API SLO
       - record: pixelated:slo_errors_total:ratio_rate1h
         expr: |
-          sum(rate(http_requests_total{route!~"/api/chat|/api/auth/.*|/health.*",status=~"5.."}[1h]))
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*",status=~"5.."}[1h]))
           /
-          sum(rate(http_requests_total{route!~"/api/chat|/api/auth/.*|/health.*"}[1h]))
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*"}[1h]))
         labels:
           slo: rest-api
           service: api
 
       - record: pixelated:slo_errors_total:ratio_rate6h
         expr: |
-          sum(rate(http_requests_total{route!~"/api/chat|/api/auth/.*|/health.*",status=~"5.."}[6h]))
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*",status=~"5.."}[6h]))
           /
-          sum(rate(http_requests_total{route!~"/api/chat|/api/auth/.*|/health.*"}[6h]))
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*"}[6h]))
         labels:
           slo: rest-api
           service: api
@@ -113,9 +113,9 @@ groups:
 
       - record: pixelated:slo_errors_total:error_budget
         expr: |
-          (1 - (sum(rate(http_requests_total{route!~"/api/chat|/api/auth/.*|/health.*",status=~"5.."}[30d]))
+          (1 - (sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*",status=~"5.."}[30d]))
                /
-               sum(rate(http_requests_total{route!~"/api/chat|/api/auth/.*|/health.*"}[30d])))
+               sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*"}[30d])))
            / (1 - 0.999)) * 100
         labels:
           slo: rest-api
@@ -161,6 +161,34 @@ groups:
         labels:
           slo: user-auth
           slo_target: "99.99"
+
+      - record: pixelated:slo_errors_total:burnrate1h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate1h / (1 - 0.999)
+        labels:
+          slo: rest-api
+          slo_target: "99.9"
+
+      - record: pixelated:slo_errors_total:burnrate6h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate6h / (1 - 0.999)
+        labels:
+          slo: rest-api
+          slo_target: "99.9"
+
+      - record: pixelated:slo_errors_total:burnrate1h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate1h / (1 - 0.995)
+        labels:
+          slo: ai-inference
+          slo_target: "99.5"
+
+      - record: pixelated:slo_errors_total:burnrate6h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate6h / (1 - 0.995)
+        labels:
+          slo: ai-inference
+          slo_target: "99.5"
 
   # ── Multi-Window, Multi-Burn-Rate Alerts ───────────────────────
   - name: pixelated-slo-alerts
