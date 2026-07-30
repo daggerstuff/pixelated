@@ -12,7 +12,7 @@ dependencies = [
   "pandas",
   "numpy",
   "scikit-learn",
-  "pyjwt",
+  "pyjwt>=2.13.0",
   # Security: Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "werkzeug>=3.1.4",
   "fairlearn",
@@ -72,7 +72,7 @@ dependencies = [
   # Security: Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
   "fastmcp>=2.14.0",
   # Security: Fixes GHSA-7f5h-v6xp-fcq8, CVE-2026-48710 (BadHost)
-  "starlette>=1.0.1",
+  "starlette>=1.3.1",
   "h11>=0.15.0",
   # Security: Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
   "keras>=3.12.0",
