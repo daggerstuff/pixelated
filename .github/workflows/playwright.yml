@@ -6,8 +6,22 @@ permissions:
 on:
   push:
     branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'config/playwright.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/playwright.yml'
   pull_request:
     branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'config/playwright.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/playwright.yml'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
