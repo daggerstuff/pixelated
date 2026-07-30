@@ -1,0 +1,38 @@
+# Blackbox Exporter Configuration (SLA-2 / PIX-4145)
+# Used by Prometheus to probe HTTP health endpoints
+# and expose probe results as Prometheus metrics
+#
+# Modules:
+#   http_2xx          — Basic health check, expects HTTP 200
+#   http_health_custom — Extended health check, accepts 200/503,
+#                        validates response body contains "healthy"
+
+modules:
+  http_2xx:
+    prober: http
+    timeout: 10s
+    http:
+      preferred_ip_protocol: "ip4"
+      valid_status_codes: [200]
+      method: GET
+
+  http_health_custom:
+    prober: http
+    timeout: 10s
+    http:
+      preferred_ip_protocol: "ip4"
+      valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+      valid_status_codes: [200, 503]  # /v1/health returns 503 when degraded
+      method: GET
+      fail_if_body_not_matches_regexp:
+        - "healthy"
+
+  http_qdrant_health:
+    prober: http
+    timeout: 10s
+    http:
+      preferred_ip_protocol: "ip4"
+      valid_status_codes: [200]
+      method: GET
+      fail_if_body_not_matches_regexp:
+        - "ok"
