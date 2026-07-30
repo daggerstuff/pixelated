@@ -6,8 +6,22 @@ permissions:
 on:
   push:
     branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'tests/browser/**'
+      - 'config/playwright.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/browser-tests.yml'
   pull_request:
     branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'tests/browser/**'
+      - 'config/playwright.config.ts'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/browser-tests.yml'
   workflow_dispatch:
 
 env:
