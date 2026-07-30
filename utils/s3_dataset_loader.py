@@ -7,7 +7,7 @@ from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
-from ai.core.utils.s3_dataset_loader import (
+from ai.pkg_mera.core.utils.s3_dataset_loader import (
     S3DatasetLoader as CoreS3DatasetLoader,
     get_s3_dataset_path as _core_get_s3_dataset_path,
 )
