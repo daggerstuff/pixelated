@@ -33,8 +33,8 @@ export async function generateVAPIDKeys(): Promise<{
     ['sign', 'verify'],
   )
 
-  const publicKey = await subtle.exportKey('raw', keyPair.publicKey)
-  const privateKey = await subtle.exportKey('pkcs8', keyPair.privateKey)
+  const publicKey = (await subtle.exportKey('raw', keyPair.publicKey)) as ArrayBuffer
+  const privateKey = (await subtle.exportKey('pkcs8', keyPair.privateKey)) as ArrayBuffer
 
   return {
     publicKey: uint8ArrayToBase64(new Uint8Array(publicKey)),
@@ -50,8 +50,8 @@ export async function sendNotification(
   const encodedPayload = new TextEncoder().encode(JSON.stringify(payload))
 
   // Import VAPID keys
-  const privateKeyData = base64ToUint8Array(vapidKeys.privateKey)
-    .buffer as ArrayBuffer
+  const privateKeyData = (base64ToUint8Array(vapidKeys.privateKey)
+    .buffer as ArrayBuffer)
   const privateKey = await subtle.importKey(
     'pkcs8',
     privateKeyData,
@@ -80,7 +80,7 @@ export async function sendNotification(
   const signature = await subtle.sign(
     { name: 'ECDSA', hash: 'SHA-256' },
     privateKey,
-    new TextEncoder().encode(input),
+    new TextEncoder().encode(input) as NodeJS.BufferSource,
   )
 
   const jwt = `${input}.${uint8ArrayToBase64(new Uint8Array(signature))}`
