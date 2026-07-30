@@ -21,9 +21,10 @@ then returns scored, actionable advice without modifying files.
 
 ## Status
 
-Vertical slice. The advisor reviews worktree state and files on demand and
-returns structured critique. Pipeline guidance docs are referenced but not yet
-driven by live pipeline state.
+The advisor reviews worktree state and files on demand and returns structured
+critique. Now wired into pipeline-agent's promotion gates via
+`evaluate_pipeline_review` — receives structured `context` payloads specifying
+what's being reviewed and returns scored, actionable advice.
 
 ## Notes
 
