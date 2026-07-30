@@ -12,7 +12,7 @@ dependencies = [
   "pandas",
   "numpy",
   "scikit-learn",
-  "pyjwt",
+  "pyjwt>=2.13.0",
   # Security: Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "werkzeug>=3.1.4",
   "fairlearn",
@@ -72,7 +72,7 @@ dependencies = [
   # Security: Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
   "fastmcp>=2.14.0",
   # Security: Fixes GHSA-7f5h-v6xp-fcq8, CVE-2026-48710 (BadHost)
-  "starlette>=1.0.1",
+  "starlette>=1.3.1",
   "h11>=0.15.0",
   # Security: Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
   "keras>=3.12.0",
@@ -125,7 +125,7 @@ dependencies = [
   "lightning-sdk>=2025.12.2",
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
-  "gitpython>=3.1.43",
+  "gitpython>=3.1.55",
   "modal>=1.4.1",
   "gradient-adk>=0.2.11",
   "virtualenv>=21.2.0",
@@ -135,6 +135,8 @@ dependencies = [
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
+  # localstack is a dev/test-only dependency. pip-audit flags PYSEC-2023-243
+  # (missing SSL verification) but no fix version is available; accepted risk.
   "localstack>=2026.5.0",
   "python-telegram-bot>=22.7",
   "anthropic>=0.107.1",
@@ -151,6 +153,7 @@ dependencies = [
   "aiofiles>=25.1.0",
   "openpipe-art>=0.5.18",
   "pynvml>=13.0.1",
+  "tavily-cli>=0.1.5",
 ]
 [project.optional-dependencies]
 test = [
@@ -292,8 +295,8 @@ combine_as_imports = true
 force_single_line = false
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
-testpaths = ["tests", "ai/core/tests"]
-norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
+testpaths = ["tests"]
+norecursedirs = []
 asyncio_default_fixture_loop_scope = "function"
 markers = [
   "integration: marks tests as integration tests (require external services)",

@@ -343,7 +343,6 @@
     "react-hook-form": "latest",
     "react-hot-toast": "latest",
     "react-i18next": "latest",
-    "react-router-dom": "latest",
     "recharts": "latest",
     "redis": "latest",
     "rehype-sanitize": "latest",
@@ -508,7 +507,7 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "brace-expansion": "5.0.6",
+    "brace-expansion": "^5.0.8",
     "form-data": "4.0.6",
     "path-to-regexp": "8.4.2"
   },
@@ -518,7 +517,8 @@
     "js-yaml": "4.3.0",
     "shell-quote": "1.9.0",
     "@opentelemetry/propagator-jaeger": "2.10.0",
-    "adm-zip": "0.6.0"
+    "adm-zip": "0.6.0",
+    "@babel/core": "^7.29.7"
   },
   "engines": {
     "node": ">=24"

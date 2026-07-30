@@ -1,7 +1,7 @@
 /**
  * PIX-536: Evidence-based reprioritization engine — TypeScript mirror.
  *
- * Matches the Python implementation in ai/core/pipelines/reprioritization_engine.py.
+ * Matches the Python implementation in ai/pkg_mera/core/pipelines/reprioritization_engine.py.
  * Consumes feedback reports from PIX-508, produces reprioritized backlog items
  * for Workstreams A, B, C.
  *
