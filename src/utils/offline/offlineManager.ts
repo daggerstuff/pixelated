@@ -66,7 +66,7 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
 
         if (queued && onRequestQueued) {
           onRequestQueued({
-            id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: `req_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
             url,
             method: method as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
             headers: (options.headers as Record<string, string>) || {},

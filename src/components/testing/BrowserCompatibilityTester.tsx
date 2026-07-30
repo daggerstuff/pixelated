@@ -23,10 +23,10 @@ export function BrowserCompatibilityTester() {
     // Collect browser information
     setBrowserInfo({
       userAgent: navigator.userAgent,
-      platform: navigator.platform,
+      platform: (navigator as Navigator & { platform: string }).platform,
       language: navigator.language,
       cookiesEnabled: navigator.cookieEnabled,
-      vendor: navigator.vendor,
+      vendor: (navigator as Navigator & { vendor: string }).vendor,
       screenSize: `${window.innerWidth}x${window.innerHeight}`,
       pixelRatio: window.devicePixelRatio,
       touchPoints: navigator.maxTouchPoints,
