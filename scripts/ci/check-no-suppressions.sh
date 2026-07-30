@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # scripts/ci/check-no-suppressions.sh
 #
 # Pre-merge guard: fail the build if any forbidden suppression token

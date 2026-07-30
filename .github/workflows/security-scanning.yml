@@ -1,4 +1,12 @@
-name: Security Scanning
+# ⚠️ DEPRECATED — Consolidated into .github/workflows/security.yml
+#
+# This file is kept for historical run reference only.
+# All jobs have been migrated to the consolidated workflow.
+# Do not add new jobs here — add them to security.yml instead.
+#
+# TODO: Remove this file after 2026-08-31 when all active branches
+#       have picked up the consolidated workflow.
+name: Security Scanning (DEPRECATED)
 
 permissions:
   contents: read
