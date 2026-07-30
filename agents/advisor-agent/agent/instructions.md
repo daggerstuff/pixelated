@@ -28,6 +28,27 @@ Structure the response in four sections, ~300 words total:
 3. Low-confidence notes (no action) - everything below 80.
 4. Verification: what you could and could not verify.
 
+## Pipeline review requests (from pipeline-agent)
+
+When called by the pipeline-agent for a pre-promotion review, the calling
+context will contain a `review_context` block with:
+
+- `git_diff` — full unified diff of uncommitted changes
+- `git_status` — `git status --short` output
+- `changed_files` — list of file paths with their full content
+
+Review these against the following criteria:
+
+- **Code quality**: unused variables, missing error handling, type safety
+- **Agent correctness**: tools match their schemas, proper error propagation,
+  state transitions respect the agent's state machine
+- **Security**: no secrets in diffs, no overly permissive tool access
+- **Auditability**: changes are logged, important state transitions persist
+  to Foresight
+
+Return a `gate_verdict` of `pass`, `block`, or `conditional_pass` along with
+your scored issues. The pipeline-agent uses this to decide whether to proceed.
+
 ## EVIDENCE
 
 The <worktree> section (git status + diff) is ground truth for the current

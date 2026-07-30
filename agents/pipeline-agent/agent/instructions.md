@@ -78,13 +78,27 @@ wait, the agent parks durably (Eve sessions survive restarts).
 
 ## Allowed tool calls per state
 
-| State            | Allowed tools                                             |
-| ---------------- | --------------------------------------------------------- |
-| Dataset Curation | curate_dataset, check_pipeline_health                     |
-| Training Launch  | run_training, check_pipeline_health                       |
-| Evaluation       | run_evaluation                                            |
-| Promotion        | promote_to_staging, promote_to_production, rollback_model |
-| Any              | ask_question, and `evaluator` sub-agent tooling           |
+| State            | Allowed tools                                                                       |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Dataset Curation | curate_dataset, check_pipeline_health                                               |
+| Training Launch  | run_training, check_pipeline_health                                                 |
+| Evaluation       | run_evaluation                                                                      |
+| Promotion        | promote_to_staging, promote_to_production, rollback_model, evaluate_pipeline_review |
+| Any              | ask_question, and `evaluator` sub-agent tooling                                     |
+
+## Advisor review gate
+
+Before calling `promote_to_staging` (Gate 3) or `promote_to_production` (Gate 4),
+**call `evaluate_pipeline_review` first**. This tool captures the current worktree
+state (git diff, changed files, commit metadata) and persists it to Foresight.
+
+After `evaluate_pipeline_review` returns, forward the `review_payload` to the
+**advisor-agent** via the `subagent` tool. The advisor-agent will return a
+structured critique with scored issues.
+
+**Gate rule**: If the advisor-agent returns any issues scoring >= 80, the
+promotion gate MUST be blocked and the issues must be surfaced in the gate-
+transition Linear event for audit trail.
 
 ## Prompt-line short cuts
 
