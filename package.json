@@ -518,7 +518,8 @@
     "js-yaml": "4.3.0",
     "shell-quote": "1.9.0",
     "@opentelemetry/propagator-jaeger": "2.10.0",
-    "adm-zip": "0.6.0"
+    "adm-zip": "0.6.0",
+    "@babel/core": "^7.29.7"
   },
   "engines": {
     "node": ">=24"
