@@ -135,5 +135,80 @@ describe('pushUtils', () => {
 
       expect(decoded).toBe(JSON.stringify(payload))
     })
+
+    it('should include a valid VAPID JWT with correct aud, exp, and sub claims', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 201, statusText: 'Created' }),
+      )
+
+      const beforeCall = Math.floor(Date.now() / 1000)
+      await sendNotification(subscription, payload, vapidKeys)
+      const afterCall = Math.floor(Date.now() / 1000)
+
+      const init = mockFetch.mock.calls[0][1] as RequestInit
+      const authHeader = (init!.headers as Record<string, string>)['Authorization']
+      const jwtMatch = authHeader.match(/vapid t=([^,]+),/)
+      expect(jwtMatch).toBeTruthy()
+      const jwt = jwtMatch![1]
+
+      const [header64, claims64, signature64] = jwt.split('.')
+      expect(header64).toBeDefined()
+      expect(claims64).toBeDefined()
+      expect(signature64).toBeDefined()
+
+      const header = JSON.parse(atob(header64!))
+      expect(header).toEqual({ typ: 'JWT', alg: 'ES256' })
+
+      const claims = JSON.parse(atob(claims64!))
+      expect(claims.aud).toBe(new URL(subscription.endpoint).origin)
+      expect(claims.sub).toBe('mailto:admin@example.com')
+      expect(claims.exp).toBeGreaterThanOrEqual(beforeCall + 12 * 60 * 60)
+      expect(claims.exp).toBeLessThanOrEqual(afterCall + 12 * 60 * 60)
+    })
+
+    it('should throw when the subscription endpoint is an invalid URL', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 201, statusText: 'Created' }),
+      )
+
+      const invalidSubscription = {
+        ...subscription,
+        endpoint: 'not a valid url',
+      }
+
+      await expect(
+        sendNotification(invalidSubscription, payload, vapidKeys),
+      ).rejects.toThrow()
+    })
+
+    it('should throw when the subscription endpoint is missing a protocol', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 201, statusText: 'Created' }),
+      )
+
+      const missingProtocolSubscription = {
+        ...subscription,
+        endpoint: 'push.example.com/push/123',
+      }
+
+      await expect(
+        sendNotification(missingProtocolSubscription, payload, vapidKeys),
+      ).rejects.toThrow()
+    })
+
+    it('should throw when the subscription endpoint is an empty string', async () => {
+      mockFetch.mockResolvedValueOnce(
+        new Response(null, { status: 201, statusText: 'Created' }),
+      )
+
+      const emptyEndpointSubscription = {
+        ...subscription,
+        endpoint: '',
+      }
+
+      await expect(
+        sendNotification(emptyEndpointSubscription, payload, vapidKeys),
+      ).rejects.toThrow()
+    })
   })
 })
