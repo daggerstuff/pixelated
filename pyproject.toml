@@ -293,8 +293,8 @@ combine_as_imports = true
 force_single_line = false
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
-testpaths = ["tests", "ai/core/tests"]
-norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
+testpaths = ["tests"]
+norecursedirs = []
 asyncio_default_fixture_loop_scope = "function"
 markers = [
   "integration: marks tests as integration tests (require external services)",
