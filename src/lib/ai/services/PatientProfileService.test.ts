@@ -6,11 +6,6 @@ import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
   CognitiveModel,
   CoreBelief,
-  DemographicInfo,
-  DiagnosisInfo,
-  SkillAcquired,
-  TherapeuticProgress,
-  ConversationalStyle,
 } from '../types/CognitiveModel'
 import { PatientProfileService } from './PatientProfileService' // Updated import
 

@@ -5,10 +5,7 @@ import type { PatientProfile, ConversationMessage } from '../models/patient'
 import type {
   CognitiveModel,
   CoreBelief,
-  DemographicInfo,
-  DiagnosisInfo,
   TherapeuticProgress,
-  ConversationalStyle,
 } from '../types/CognitiveModel'
 import { BeliefConsistencyService } from './BeliefConsistencyService'
 import { PatientProfileService } from './PatientProfileService'
