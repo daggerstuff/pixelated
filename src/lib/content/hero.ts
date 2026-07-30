@@ -1,10 +1,10 @@
 export const heroContent = {
-  title: 'Practice room for therapists in training',
+  title: 'The practice room for therapists in training',
   subtitle:
-    'Rehearse the conversations that pressure new clinicians — before they become someone’s real session.',
+    'The conversations that push new clinicians happen here first. Before they happen in a real session.',
   helperText:
     'HIPAA-ready simulations for counseling programs, supervisors, and behavioral health teams.',
-  kicker: 'Clinical Training Platform',
+  kicker: 'Practice platform',
   proofPoints: [
     {
       label: 'For programs',
@@ -28,20 +28,29 @@ export const heroContent = {
     context: [
       {
         label: 'Practice room',
-        value: 'The trainee enters a scenario and makes live clinical choices in the moment.',
+        value:
+          'The trainee enters a scenario and makes live clinical choices in the moment.',
       },
       {
         label: 'Review desk',
-        value: 'The supervisor opens the record, reviews the exchange, and turns it into feedback.',
+        value:
+          'The supervisor opens the record, reviews the exchange, and turns it into feedback.',
       },
     ],
     outputs: [
-      { label: 'Supervisor note', value: 'Mark a response for praise, correction, or another attempt.' },
+      {
+        label: 'Supervisor note',
+        value: 'Mark a response for praise, correction, or another attempt.',
+      },
       {
         label: 'Training record',
-        value: 'Conversation, scenario, and instructor notes stay attached to the same session.',
+        value:
+          'Conversation, scenario, and instructor notes stay attached to the same session.',
       },
-      { label: 'Repeatable practice', value: 'Run the same client again and see if the response changes.' },
+      {
+        label: 'Repeatable practice',
+        value: 'Run the same client again and see if the response changes.',
+      },
     ],
     readout: [
       { label: 'Users', value: 'Trainees + supervisors' },

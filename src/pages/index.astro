@@ -2,11 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import {
-  heroContent,
-  workflowContent,
-  ctaContent,
-} from '@/lib/content'
+import { heroContent, workflowContent, ctaContent } from '@/lib/content'
 
 const { hero, workflow, cta } = {
   hero: heroContent,
@@ -55,42 +51,115 @@ const buildableScenarios = [
 
 <BaseLayout title={hero.title} description={hero.metaDescription}>
   <div class="np-page">
-    <!-- Hero: the one decision a visitor came here to make. -->
-    <section class="np-hero">
-      <div class="np-container np-hero__inner">
-        <span class="np-label np-hero__kicker">{hero.kicker}</span>
-        <h1 class="np-display np-hero__display">{hero.title}</h1>
-        <p class="np-body np-hero__subtitle">{hero.subtitle}</p>
-        <div class="np-hero__actions">
-          <a
-            class="np-btn np-btn-primary"
-            href={withBasePath(hero.primaryCTA.href)}
-          >
-            {hero.primaryCTA.text}
-          </a>
-          <a
-            class="np-btn np-btn-ghost"
-            href={withBasePath(hero.secondaryCTA.href)}
-          >
-            {hero.secondaryCTA.text}
-          </a>
+    <!-- Hero: content left, conversation demo right -->
+    <section class="np-hero" aria-label="Platform overview">
+      <div class="np-container np-hero__grid">
+        <div class="np-hero__content">
+          <span class="np-label np-hero__kicker">{hero.kicker}</span>
+          <h1 class="np-display np-hero__display">{hero.title}</h1>
+          <p class="np-body np-hero__subtitle">{hero.subtitle}</p>
+          <div class="np-hero__actions">
+            <a
+              class="np-btn np-btn-primary"
+              href={withBasePath(hero.primaryCTA.href)}
+            >
+              {hero.primaryCTA.text}
+            </a>
+            <a
+              class="np-btn np-btn-ghost"
+              href={withBasePath(hero.secondaryCTA.href)}
+            >
+              {hero.secondaryCTA.text}
+            </a>
+          </div>
         </div>
-      </div>
 
-      <div class="np-container np-hero__artifact">
-        <figure class="np-hero__art">
-          <img
-            src={withBasePath(hero.artifact.image)}
-            alt={hero.artifact.imageAlt}
-            loading="eager"
-            width="960"
-            height="540"
-          />
-          <figcaption class="np-hero__art-cap">
-            <span class="np-data">{hero.artifact.chip}</span>
-            <span class="np-mono">{hero.artifact.status}</span>
-          </figcaption>
-        </figure>
+        <!-- Chat conversation demo — visual showcase, not functional -->
+        <aside
+          class="np-chat-demo"
+          aria-label="Example therapy conversation on the platform"
+          role="region"
+        >
+          <div class="np-chat-demo__header">
+            <span class="np-chat-demo__label">Live session</span>
+            <span class="np-chat-demo__status">Client: Sarah</span>
+          </div>
+
+          <div class="np-chat-demo__messages">
+            <div class="np-chat-demo__msg np-chat-demo__msg--client">
+              <div class="np-chat-demo__bubble np-chat-demo__bubble--client">
+                <p>
+                  I&#39;ve been thinking about whether this is really working
+                  for me.
+                </p>
+              </div>
+              <span class="np-chat-demo__sender">Client</span>
+            </div>
+
+            <div class="np-chat-demo__msg np-chat-demo__msg--therapist">
+              <div class="np-chat-demo__bubble np-chat-demo__bubble--therapist">
+                <p>
+                  It sounds like you&#39;re not sure this is the right place.
+                  What feels off?
+                </p>
+              </div>
+              <span class="np-chat-demo__sender">Trainee</span>
+            </div>
+
+            <div class="np-chat-demo__msg np-chat-demo__msg--client">
+              <div class="np-chat-demo__bubble np-chat-demo__bubble--client">
+                <p>
+                  I don&#39;t know. I just feel like I&#39;m not getting
+                  anywhere.
+                </p>
+              </div>
+              <span class="np-chat-demo__sender">Client</span>
+            </div>
+
+            <div class="np-chat-demo__msg np-chat-demo__msg--therapist">
+              <div class="np-chat-demo__bubble np-chat-demo__bubble--therapist">
+                <p>
+                  That&#39;s worth sitting with. Can you tell me what
+                  &ldquo;getting somewhere&rdquo; would look like?
+                </p>
+              </div>
+              <span class="np-chat-demo__sender">Trainee</span>
+            </div>
+
+            <div class="np-chat-demo__msg np-chat-demo__msg--client">
+              <div class="np-chat-demo__bubble np-chat-demo__bubble--client">
+                <p>
+                  I guess&hellip; I thought I&#39;d feel different by now. Like
+                  something would click.
+                </p>
+              </div>
+              <span class="np-chat-demo__sender">Client</span>
+            </div>
+
+            <div class="np-chat-demo__msg np-chat-demo__msg--therapist">
+              <div class="np-chat-demo__bubble np-chat-demo__bubble--therapist">
+                <p>
+                  It makes sense to expect change to feel more obvious.
+                  Let&#39;s look at what has shifted&mdash;even the small
+                  things.
+                </p>
+              </div>
+              <span class="np-chat-demo__sender">Trainee</span>
+            </div>
+          </div>
+
+          <div class="np-chat-demo__typing" aria-hidden="true">
+            <span class="np-chat-demo__dot"></span>
+            <span class="np-chat-demo__dot"></span>
+            <span class="np-chat-demo__dot"></span>
+            <span>Client is typing</span>
+          </div>
+
+          <p class="np-chat-demo__note">
+            Simulated conversation&ensp;&middot;&ensp;Trainee responds to an AI
+            client
+          </p>
+        </aside>
       </div>
 
       <div class="np-container">
@@ -140,8 +209,8 @@ const buildableScenarios = [
             What your team gets when the practice is logged.
           </h2>
           <p class="np-body">
-            Four things arrive together from one trainee attempt: a scenario,
-            a transcript, a supervisor note, and a record your next meeting can
+            Four things arrive together from one trainee attempt: a scenario, a
+            transcript, a supervisor note, and a record your next meeting can
             reopen without guesswork.
           </p>
         </div>
