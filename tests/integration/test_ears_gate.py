@@ -1,11 +1,11 @@
 def test_ears_gate_class_exists():
-    from ai.core.pipelines.ears_compliance_gate import EarsComplianceGate
+    from ai.pkg_mera.core.pipelines.ears_compliance_gate import EarsComplianceGate
 
     assert EarsComplianceGate is not None
 
 
 def test_ears_gate_methods_exist():
-    from ai.core.pipelines.ears_compliance_gate import EarsComplianceGate
+    from ai.pkg_mera.core.pipelines.ears_compliance_gate import EarsComplianceGate
 
     assert hasattr(EarsComplianceGate, "validate_dataset")
     assert hasattr(EarsComplianceGate, "validate_compliance")
@@ -13,7 +13,7 @@ def test_ears_gate_methods_exist():
 
 
 def test_ears_gate_validates_empty_dataset():
-    from ai.core.pipelines.ears_compliance_gate import EarsComplianceGate
+    from ai.pkg_mera.core.pipelines.ears_compliance_gate import EarsComplianceGate
 
     gate = EarsComplianceGate()
     result = gate.validate_dataset(dataset_data=[])
@@ -23,7 +23,7 @@ def test_ears_gate_validates_empty_dataset():
 
 
 def test_ears_gate_validates_sample_dataset():
-    from ai.core.pipelines.ears_compliance_gate import EarsComplianceGate
+    from ai.pkg_mera.core.pipelines.ears_compliance_gate import EarsComplianceGate
 
     gate = EarsComplianceGate()
 
