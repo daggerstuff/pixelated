@@ -10,11 +10,7 @@ import {
   StoreMemoryInput,
   GetMemoryInput,
   QueryMemoriesInput,
-  SearchMemoriesInput,
-  ListMemoriesInput,
-  UpdateMemoryInput,
   DeleteMemoryInput,
-  SubscribeFilter,
   ForesightMemory,
 } from '../foresight'
 

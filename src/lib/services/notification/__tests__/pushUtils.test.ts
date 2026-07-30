@@ -10,6 +10,8 @@ import {
   afterEach,
 } from 'vitest'
 
+import type { MockInstance } from 'vitest'
+
 import { ExpiredSubscriptionError, sendNotification } from '../pushUtils'
 
 const mockFetch = vi.fn<typeof fetch>()
@@ -17,8 +19,8 @@ const mockFetch = vi.fn<typeof fetch>()
 const originalFetch = globalThis.fetch
 
 describe('pushUtils', () => {
-  let importKeySpy: ReturnType<typeof vi.spyOn<typeof subtle, 'importKey'>>
-  let signSpy: ReturnType<typeof vi.spyOn<typeof subtle, 'sign'>>
+  let importKeySpy: MockInstance
+  let signSpy: MockInstance
 
   beforeEach(() => {
     vi.clearAllMocks()
