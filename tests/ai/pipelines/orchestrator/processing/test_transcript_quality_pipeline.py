@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from ai.core.pipelines.processing.transcript_quality_pipeline import (
+from ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline import (
     TranscriptQualityPipeline,
 )
 
@@ -11,10 +11,14 @@ from ai.core.pipelines.processing.transcript_quality_pipeline import (
 @pytest.fixture
 def mock_dependencies():
     with (
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.VoiceTranscriber") as mock_whisper,
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.NemoCuratorClient") as mock_curator,
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.NemoEvaluatorClient") as mock_evaluator,
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.TranscriptCorrector") as mock_corrector,
+        patch("ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.VoiceTranscriber") as mock_whisper,
+        patch("ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.NemoCuratorClient") as mock_curator,
+        patch(
+            "ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.NemoEvaluatorClient"
+        ) as mock_evaluator,
+        patch(
+            "ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.TranscriptCorrector"
+        ) as mock_corrector,
     ):
         # Setup mock instances
         whisper_instance = mock_whisper.return_value
@@ -90,10 +94,10 @@ def test_process_audio_flow(mock_dependencies):
 
 def test_process_audio_failure():
     with (
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.VoiceTranscriber") as mock_whisper,
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.NemoCuratorClient"),
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.NemoEvaluatorClient"),
-        patch("ai.core.pipelines.processing.transcript_quality_pipeline.TranscriptCorrector"),
+        patch("ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.VoiceTranscriber") as mock_whisper,
+        patch("ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.NemoCuratorClient"),
+        patch("ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.NemoEvaluatorClient"),
+        patch("ai.pkg_mera.core.pipelines.processing.transcript_quality_pipeline.TranscriptCorrector"),
     ):
         mock_transcriber = mock_whisper.return_value
         pipeline = TranscriptQualityPipeline()

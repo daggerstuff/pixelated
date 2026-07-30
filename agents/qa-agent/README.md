@@ -21,6 +21,12 @@ digests. Sub-agent of the broader Eve workflow. Status: **Done** (PIX-3958).
 | K8s             | `k8s/deployment.yaml`                                                                                                                      |
 | Tests           | `tests/` — 7 files (6 unit + 1 `qa-review-lifecycle.integration.test.ts`)                                                                  |
 
+## Handoff protocol
+
+- **→ pipeline-agent:** `flag_training_gap.ts` writes a `training_gap` memory
+  with tag `handoff:pipeline`. pipeline-agent reads flagged gaps in its weekly
+  schedule.
+
 ## Foresight wiring (live)
 
 - `score_session.ts` calls
