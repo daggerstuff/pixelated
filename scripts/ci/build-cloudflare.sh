@@ -1,9 +1,16 @@
-#!/bin/bash
-# Cloudflare Pages build script that skips Python dependency installation
-# This script temporarily hides pyproject.toml to prevent Cloudflare from
-# automatically installing Python dependencies during the build
+#!/usr/bin/env bash
+# scripts/ci/build-cloudflare.sh
+#
+# Cloudflare Pages build script that skips Python dependency installation.
+# Temporarily hides pyproject.toml to prevent Cloudflare from automatically
+# installing Python dependencies during the build.
+#
+# Usage: build-cloudflare.sh [--help]
+# Exit codes:
+#   0 — build succeeded
+#   1 — build failed
 
-set -e
+set -euo pipefail
 
 echo "🔵 Starting Cloudflare Pages build (Python dependencies will be skipped)"
 

@@ -1,11 +1,11 @@
 def test_crisis_detector_class_exists():
-    from ai.core.pipelines.quality.production_crisis_detector import ProductionCrisisDetector
+    from ai.pkg_mera.core.pipelines.quality.production_crisis_detector import ProductionCrisisDetector
 
     assert ProductionCrisisDetector is not None
 
 
 def test_crisis_detector_methods_exist():
-    from ai.core.pipelines.quality.production_crisis_detector import ProductionCrisisDetector
+    from ai.pkg_mera.core.pipelines.quality.production_crisis_detector import ProductionCrisisDetector
 
     assert hasattr(ProductionCrisisDetector, "detect_crisis")
     assert hasattr(ProductionCrisisDetector, "_analyze_crisis_indicators")
@@ -13,7 +13,7 @@ def test_crisis_detector_methods_exist():
 
 
 def test_crisis_detector_returns_result():
-    from ai.core.pipelines.quality.production_crisis_detector import ProductionCrisisDetector
+    from ai.pkg_mera.core.pipelines.quality.production_crisis_detector import ProductionCrisisDetector
 
     detector = ProductionCrisisDetector()
     result = detector.detect_crisis({"content": "I'm feeling okay today"})
@@ -25,7 +25,7 @@ def test_crisis_detector_returns_result():
 
 
 def test_crisis_detector_flags_emergency():
-    from ai.core.pipelines.quality.production_crisis_detector import (
+    from ai.pkg_mera.core.pipelines.quality.production_crisis_detector import (
         CrisisLevel,
         ProductionCrisisDetector,
     )

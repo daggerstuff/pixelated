@@ -41,7 +41,7 @@ CHECKPOINTS_MAP = {
 ACTIVE_DUPLICATES = {
     # target_key -> canonical_key
     "PIX-273": "PIX-1894",  # Kickoff: CI Federation Initiative
-    "PIX-292": "PIX-1898",  # Wire readiness check into Azure pre-deploy stage
+    # PIX-292 → PIX-1898 removed (Azure decommissioned)
     "PIX-299": "PIX-1879",  # Write runbook and escalation map
     "PIX-222": "PIX-1879",  # Write runbook and escalation map (second duplicate)
     "PIX-252": "PIX-1890",  # Home Directory Backup System Redesign - implementation
@@ -216,33 +216,13 @@ Document where each pipeline check lives, their owners, the break/fix resolution
 - [ ] Define step-by-step resolution steps for common build/test failures.
 - [ ] Establish ownership matrix and contact paths for critical alerts.""",
     },
-    "Wire readiness check into Azure pre-deploy stage": {
-        "body": """### Core Objective
-Integrate automated release-readiness gating checks into the Azure CD release pipeline before GKE/AKS deployments can proceed.
-
-### Technical Design Specs
-- **Approval Gate**:
-  - Implement a pre-deployment gate task in the YAML CD release flow.
-  - Query the unified readiness aggregator status endpoint before executing deploy stages.
-  - Fail the deployment if any critical quality gate (lint, test, security) is unverified.
-
-### Atlassian & Code Linkages
-- **Pipeline Config**: [.azure-pipelines/pre-deploy.yaml](file:///home/vivi/pixelated/.azure-pipelines/pre-deploy.yaml)
-- **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
-
-### Verification & Testing Checklist
-- [ ] Add the pre-deployment gate task in the YAML workflow.
-- [ ] Verify that deployment is successfully blocked when any check fails.
-- [ ] Verify that deployment proceeds when all checks pass.""",
-    },
     "Publish CI operating model RFC": {
         "body": """### Core Objective
 Author and publish a consensus RFC standardizing the federated CI operating rules and pipeline architecture.
 
 ### Technical Design Specs
 - **Operating Rules**:
-  - Establish Azure Pipelines as the sole deploy authority.
-  - Enforce build/artifact lineage and provenance validation.
+  - Enforce artifact provenance and validation.
   - Lock one owner per pipeline capability.
 
 ### Atlassian & Code Linkages
@@ -280,8 +260,7 @@ Align the team on the scope, goals, and timeline of the CI federation initiative
 
 ### Technical Design Specs
 - **Scope Definition**:
-  - Establish Azure Pipelines as the single deployment gatekeeper.
-  - Align GitHub Actions, GitLab CI, and Bitbucket Pipelines into a unified release flow.
+  - Align GitHub Actions and Bitbucket Pipelines into a unified release flow.
 
 ### Atlassian & Code Linkages
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
@@ -338,7 +317,7 @@ Define the structured JSON schema mapping release-readiness status, checks, and 
     },
     "Create pipeline inventory across providers": {
         "body": """### Core Objective
-Catalog all active workflow pipelines across Azure, GitHub, GitLab, and Bitbucket.
+Catalog all active workflow pipelines across GitHub and Bitbucket.
 
 ### Technical Design Specs
 - Crawl all repositories and list active pipelines, build steps, trigger parameters, and status endpoints.
