@@ -291,7 +291,7 @@
     "dompurify": "^3.4.12",
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
-    "eve": "^0.27.12",
+    "eve": "^0.27.13",
     "events": "latest",
     "express": "^5.2.1",
     "express-openid-connect": "^3.2.1",
