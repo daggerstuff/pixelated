@@ -10,7 +10,7 @@ every stage transition. Status: **Done** (PIX-3959).
 | --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Runtime config  | `agent/agent.ts` (`defineAgent` + Zod `outputSchema`)                                                                                                                                                                   |
 | Standing rules  | `agent/instructions.md`, `agent/instructions/{state-machine.md,promotion-policy.md}`                                                                                                                                    |
-| Tools (7)       | `agent/tools/`: `check_pipeline_health`, `curate_dataset`, `promote_to_production`, `promote_to_staging`, `rollback_model`, `run_evaluation` (gated via `always()`), `run_training`                                     |
+| Tools (8)       | `agent/tools/`: `check_pipeline_health`, `curate_dataset`, `evaluate_pipeline_review`, `promote_to_production`, `promote_to_staging`, `rollback_model`, `run_evaluation` (gated via `always()`), `run_training`         |
 | Channels (4)    | `agent/channels/eve.ts`, `agent/channels/slack.ts`, `agent/channels/slack-events.ts`, `agent/channels/linear.ts`                                                                                                        |
 | Connections (1) | `agent/connections/foresight.ts` — `defineMcpClientConnection`, env-gated URL                                                                                                                                           |
 | Sub-agents (1)  | `agent/subagents/evaluator/`                                                                                                                                                                                            |
@@ -20,6 +20,14 @@ every stage transition. Status: **Done** (PIX-3959).
 | Evals           | `evals/evals.config.ts`, `evals/health-check.eval.ts`                                                                                                                                                                   |
 | K8s             | `k8s/deployment.yaml`                                                                                                                                                                                                   |
 | Tests           | `tests/` — **7 files / 13 tests** (unit per tool + `pipeline-lifecycle.integration.test.ts`) — added this cycle                                                                                                         |
+
+## Advisor review gate
+
+- **`evaluate_pipeline_review`** — captures current worktree state (git diff,
+  source files) and sends it to advisor-agent as a subagent call. Blocks the
+  promotion gate if advisor-agent returns issues scoring >= 80.
+- Integrated into `promote_to_staging.ts` and `promote_to_production.ts` as a
+  pre-gate step.
 
 ## Foresight wiring (live)
 
