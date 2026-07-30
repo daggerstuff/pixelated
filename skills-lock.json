@@ -374,6 +374,12 @@
       "skillPath": "scientific-skills/etetoolkit/SKILL.md",
       "computedHash": "947bd71a5dcd040cba2317a1d9fbfa16f83ee7e5a9defbc4c8ab958233b1093b"
     },
+    "eve": {
+      "source": "vercel/eve",
+      "sourceType": "github",
+      "skillPath": "skills/eve/SKILL.md",
+      "computedHash": "4833349453c45c606f79202e495b7bbc42ea380f329f3beee36b9927763f19ef"
+    },
     "exa-search": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",

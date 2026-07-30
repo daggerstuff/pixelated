@@ -151,6 +151,7 @@ dependencies = [
   "aiofiles>=25.1.0",
   "openpipe-art>=0.5.18",
   "pynvml>=13.0.1",
+  "tavily-cli>=0.1.5",
 ]
 [project.optional-dependencies]
 test = [
