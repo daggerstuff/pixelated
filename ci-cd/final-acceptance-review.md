@@ -77,8 +77,8 @@
 | `ci.yml` uses `continue-on-error: true` on all steps — soft gate only    | (no issue)          | High     |
 | Provider pipeline fetch in aggregator needs credentials configured       | Operational concern | Medium   |
 | Old schema files in `ci-cd/` should be migrated to new format or removed | (no issue)          | Low      |
-| Pre-deployment gate not yet wired into Azure                             | PIX-1898            | High     |
-| Dry-run promotion tests not yet executed                                 | PIX-1913            | High     |
+
+| Dry-run promotion tests not yet executed | PIX-1913 | High |
 
 ---
 

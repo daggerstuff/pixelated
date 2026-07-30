@@ -7,6 +7,7 @@ Execute all Linear workspace improvements:
 4. Cancel stale/invalid tickets (PIX-242)
 5. Create label definitions
 """
+
 import json
 import logging
 import os
@@ -21,32 +22,32 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 # ── Constants ──────────────────────────────────────────────────────────────────
 TEAM_ID = "52861523-9089-49a3-8be5-4032d68cb55a"
 
-STATE_TODO     = "d47f8fab-abb9-474e-879b-9c581a9852ed"
-STATE_BACKLOG  = "74b11563-2856-45f3-bcb7-e813702cd73f"
+STATE_TODO = "d47f8fab-abb9-474e-879b-9c581a9852ed"
+STATE_BACKLOG = "74b11563-2856-45f3-bcb7-e813702cd73f"
 STATE_CANCELED = "1a98745d-dd54-4796-bc6d-12fc794f8cea"
 
 PROJECTS = {
-    "memory_mayhem":    "022b75fa-d681-4070-b3e3-0d152d7daf1e",
-    "training":         "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
-    "churnmeon":        "7fb7fc08-8b19-4210-8215-f73f3b559a46",
-    "autoreview":       "2889fe87-ad71-4edf-99c5-75224ee3f18f",
-    "discovery":        "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
-    "checkmate":        "97b72bac-e84b-46e4-a82e-dc657030dcb9",
-    "foresight":        "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
-    "dataset":          "dd29a94c-6283-4c13-9eef-0f7546321f1d",
-    "governance":       "0aa3ad95-f694-4633-88c9-e127865a0ba1",
-    "test_security":    "97409cfb-e01c-4094-9728-577c79bf53ae",
-    "hybrid_app":       "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
-    "ci_federation":    "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
-    "platform":         "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
-    "data_pipeline":    "07810eff-50bb-4518-974a-07b4938f3264",
+    "memory_mayhem": "022b75fa-d681-4070-b3e3-0d152d7daf1e",
+    "training": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "churnmeon": "7fb7fc08-8b19-4210-8215-f73f3b559a46",
+    "autoreview": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "discovery": "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
+    "checkmate": "97b72bac-e84b-46e4-a82e-dc657030dcb9",
+    "foresight": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "dataset": "dd29a94c-6283-4c13-9eef-0f7546321f1d",
+    "governance": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "test_security": "97409cfb-e01c-4094-9728-577c79bf53ae",
+    "hybrid_app": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+    "ci_federation": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "platform": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "data_pipeline": "07810eff-50bb-4518-974a-07b4938f3264",
 }
 
 # Priority: 0=no priority, 1=urgent, 2=high, 3=medium, 4=low
 PRIORITY_URGENT = 1
-PRIORITY_HIGH   = 2
+PRIORITY_HIGH = 2
 PRIORITY_MEDIUM = 3
-PRIORITY_LOW    = 4
+PRIORITY_LOW = 4
 
 DRY_RUN = "--dry-run" in sys.argv
 
@@ -82,8 +83,7 @@ def create_issue(spec: IssueSpec) -> str | None:
         inp["parentId"] = spec.parent_id
 
     mutation = (
-        "mutation($input: IssueCreateInput!) { "
-        "issueCreate(input: $input) { success issue { id identifier title } } }"
+        "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id identifier title } } }"
     )
     try:
         res = _linear_graphql_query(mutation, {"input": inp})
@@ -105,10 +105,7 @@ def update_issue(uuid: str, identifier: str, **fields) -> bool:
         logging.info("[DRY RUN] Would update %s: %s", identifier, fields)
         return True
 
-    mutation = (
-        "mutation($id: String!, $input: IssueUpdateInput!) { "
-        "issueUpdate(id: $id, input: $input) { success } }"
-    )
+    mutation = "mutation($id: String!, $input: IssueUpdateInput!) { issueUpdate(id: $id, input: $input) { success } }"
     try:
         res = _linear_graphql_query(mutation, {"id": uuid, "input": fields})
         data = _extract_graphql_payload(res)
@@ -128,10 +125,7 @@ def add_relation(issue_id: str, related_id: str, rel_type: str = "blocks") -> No
     if DRY_RUN:
         logging.info("[DRY RUN] Would add relation %s -> %s (%s)", issue_id, related_id, rel_type)
         return
-    mutation = (
-        "mutation($input: IssueRelationCreateInput!) { "
-        "issueRelationCreate(input: $input) { success } }"
-    )
+    mutation = "mutation($input: IssueRelationCreateInput!) { issueRelationCreate(input: $input) { success } }"
     inp = {"issueId": issue_id, "relatedIssueId": related_id, "type": rel_type}
     try:
         res = _linear_graphql_query(mutation, {"input": inp})
@@ -267,25 +261,22 @@ Complete all property-based and unit tests for the training pipeline modules, ac
         "project": "ci_federation",
         "priority": PRIORITY_MEDIUM,
         "desc": """### Core Objective
-Execute the CI federation plan: publish the RFC, establish ownership matrix, implement the readiness aggregator, wire the Azure pre-deploy gate, and go live with unified pipeline reporting.
+Execute the CI federation plan: publish the RFC, establish ownership matrix, implement the readiness aggregator, and go live with unified pipeline reporting.
 
 ### Technical Design Specs
-- **Azure**: Sole deployment authority; pre-deploy gate blocks on aggregator status
 - **GitHub Actions**: CodeQL/SARIF security lane
-- **GitLab CI**: Fast MR checks (lint/typecheck/unit/integration)
 - **Bitbucket**: AI/governance validation lane
 - **Aggregator**: `scripts/devops/aggregate-readiness.py` outputting consolidated JSON
 
 ### Atlassian & Code Linkages
-- **Sub-tasks**: PIX-1879, PIX-1882, PIX-1884, PIX-1889, PIX-1898
+- **Sub-tasks**: PIX-1879, PIX-1882, PIX-1884, PIX-1889
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
 - [ ] RFC published and signed off
 - [ ] Ownership matrix documented and agreed
 - [ ] Readiness aggregator endpoint returning valid JSON
-- [ ] Azure pre-deploy gate blocking on aggregator failure
-- [ ] All three provider lanes (GitHub/GitLab/Bitbucket) reporting to aggregator""",
+- [ ] Both provider lanes (GitHub/Bitbucket) reporting to aggregator""",
     },
     {
         "name": "EPIC: Churnmeon — Reliability Finish Line",
@@ -313,13 +304,15 @@ Bring Churnmeon from operationally promising but documentationally noisy to a re
 
 for epic_def in epics_to_create:
     logging.info("\nCreating epic: %s", epic_def["name"])
-    epic_id = create_issue(IssueSpec(
-        title=epic_def["name"],
-        description=epic_def["desc"],
-        project_id=PROJECTS[epic_def["project"]],
-        state_id=STATE_TODO,
-        priority=epic_def["priority"],
-    ))
+    epic_id = create_issue(
+        IssueSpec(
+            title=epic_def["name"],
+            description=epic_def["desc"],
+            project_id=PROJECTS[epic_def["project"]],
+            state_id=STATE_TODO,
+            priority=epic_def["priority"],
+        )
+    )
     if epic_id:
         created_epics[epic_def["name"]] = epic_id
 
@@ -720,13 +713,15 @@ created_ticket_ids: dict[str, str] = {}  # title -> uuid
 
 for ticket in new_tickets:
     logging.info("\nCreating ticket: %s", ticket["title"])
-    tid = create_issue(IssueSpec(
-        title=ticket["title"],
-        description=ticket["desc"],
-        project_id=PROJECTS[ticket["project"]],
-        state_id=ticket["state"],
-        priority=ticket["priority"],
-    ))
+    tid = create_issue(
+        IssueSpec(
+            title=ticket["title"],
+            description=ticket["desc"],
+            project_id=PROJECTS[ticket["project"]],
+            state_id=ticket["state"],
+            priority=ticket["priority"],
+        )
+    )
     if tid:
         created_ticket_ids[ticket["title"]] = tid
 
@@ -747,16 +742,16 @@ if pix_242:
 # 3b. Set priorities and move Triage items to Backlog with correct priority
 triage_fixes = [
     # key, priority, new_state, note
-    ("PIX-318", PRIORITY_HIGH,   STATE_BACKLOG, "Blocked on memory gateway stabilization (PIX-328)"),
-    ("PIX-331", PRIORITY_HIGH,   STATE_BACKLOG, "Phase 2 AutoReview — begins after Phase 1 ships"),
+    ("PIX-318", PRIORITY_HIGH, STATE_BACKLOG, "Blocked on memory gateway stabilization (PIX-328)"),
+    ("PIX-331", PRIORITY_HIGH, STATE_BACKLOG, "Phase 2 AutoReview — begins after Phase 1 ships"),
     ("PIX-332", PRIORITY_MEDIUM, STATE_BACKLOG, "Phase 3 AutoReview — blocked on Phase 2"),
     ("PIX-333", PRIORITY_MEDIUM, STATE_BACKLOG, "Phase 4 AutoReview — blocked on Phase 3"),
-    ("PIX-334", PRIORITY_LOW,    STATE_BACKLOG, "Phase 5 AutoReview — long horizon"),
-    ("PIX-338", PRIORITY_LOW,    STATE_BACKLOG, "Low priority enhancement — begin after Phase 1 ships"),
+    ("PIX-334", PRIORITY_LOW, STATE_BACKLOG, "Phase 5 AutoReview — long horizon"),
+    ("PIX-338", PRIORITY_LOW, STATE_BACKLOG, "Low priority enhancement — begin after Phase 1 ships"),
     ("PIX-339", PRIORITY_MEDIUM, STATE_BACKLOG, "Blocked on AutoReview Phase 1 completion"),
     ("PIX-346", PRIORITY_MEDIUM, STATE_BACKLOG, "Blocked on AutoReview Phase 1 completion"),
     ("PIX-347", PRIORITY_MEDIUM, STATE_BACKLOG, "Blocked on AutoReview Phase 1 completion"),
-    ("PIX-534", PRIORITY_LOW,    STATE_BACKLOG, "Iteration cycle — activates after fine-tune evaluation"),
+    ("PIX-534", PRIORITY_LOW, STATE_BACKLOG, "Iteration cycle — activates after fine-tune evaluation"),
 ]
 
 for key, priority, new_state, reason in triage_fixes:
