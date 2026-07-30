@@ -12,7 +12,7 @@ import {
 
 import type { MockInstance } from 'vitest'
 
-import { ExpiredSubscriptionError, sendNotification } from '../pushUtils'
+import { buildVapidJwt, ExpiredSubscriptionError, sendNotification } from '../pushUtils'
 
 const mockFetch = vi.fn<typeof fetch>()
 
@@ -33,6 +33,99 @@ describe('pushUtils', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     globalThis.fetch = originalFetch
+  })
+
+  describe('buildVapidJwt', () => {
+    const endpoint = 'https://push.example.com/push/123'
+
+    const vapidKeys = {
+      publicKey: 'mock-public-key',
+      privateKey: 'bW9jay1wcml2YXRlLWtleQ==',
+    }
+
+    it('should build a JWT with correct typ/alg header', async () => {
+      const jwt = await buildVapidJwt(endpoint, vapidKeys)
+      const [header64] = jwt.split('.')
+      expect(header64).toBeDefined()
+      expect(JSON.parse(atob(header64!))).toEqual({ typ: 'JWT', alg: 'ES256' })
+    })
+
+    it('should include aud matching the endpoint origin', async () => {
+      const jwt = await buildVapidJwt(endpoint, vapidKeys)
+      const [, claims64] = jwt.split('.')
+      const claims = JSON.parse(atob(claims64!))
+      expect(claims.aud).toBe(new URL(endpoint).origin)
+    })
+
+    it('should include the provided sub claim', async () => {
+      const jwt = await buildVapidJwt(endpoint, vapidKeys, {
+        sub: 'mailto:test@example.com',
+      })
+      const [, claims64] = jwt.split('.')
+      const claims = JSON.parse(atob(claims64!))
+      expect(claims.sub).toBe('mailto:test@example.com')
+    })
+
+    it('should default sub to admin email', async () => {
+      const jwt = await buildVapidJwt(endpoint, vapidKeys)
+      const [, claims64] = jwt.split('.')
+      const claims = JSON.parse(atob(claims64!))
+      expect(claims.sub).toBe('mailto:admin@example.com')
+    })
+
+    it('should set exp ~12 hours from now by default', async () => {
+      const beforeCall = Math.floor(Date.now() / 1000)
+      const jwt = await buildVapidJwt(endpoint, vapidKeys)
+      const afterCall = Math.floor(Date.now() / 1000)
+
+      const [, claims64] = jwt.split('.')
+      const claims = JSON.parse(atob(claims64!))
+      expect(claims.exp).toBeGreaterThanOrEqual(beforeCall + 12 * 60 * 60)
+      expect(claims.exp).toBeLessThanOrEqual(afterCall + 12 * 60 * 60)
+    })
+
+    it('should allow overriding the TTL', async () => {
+      const beforeCall = Math.floor(Date.now() / 1000)
+      const jwt = await buildVapidJwt(endpoint, vapidKeys, { ttlSeconds: 300 })
+      const afterCall = Math.floor(Date.now() / 1000)
+
+      const [, claims64] = jwt.split('.')
+      const claims = JSON.parse(atob(claims64!))
+      expect(claims.exp).toBeGreaterThanOrEqual(beforeCall + 300)
+      expect(claims.exp).toBeLessThanOrEqual(afterCall + 300)
+    })
+
+    it('should use subtle.importKey and subtle.sign', async () => {
+      await buildVapidJwt(endpoint, vapidKeys)
+
+      expect(importKeySpy).toHaveBeenCalledOnce()
+      expect(importKeySpy).toHaveBeenCalledWith(
+        'pkcs8',
+        expect.any(ArrayBuffer),
+        { name: 'ECDSA', namedCurve: 'P-256' },
+        false,
+        ['sign'],
+      )
+
+      expect(signSpy).toHaveBeenCalledOnce()
+      expect(signSpy).toHaveBeenCalledWith(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        expect.anything(),
+        expect.any(Uint8Array),
+      )
+    })
+
+    it('should throw when the endpoint is an invalid URL', async () => {
+      await expect(buildVapidJwt('not a valid url', vapidKeys)).rejects.toThrow()
+    })
+
+    it('should throw when the endpoint is missing a protocol', async () => {
+      await expect(buildVapidJwt('push.example.com/push', vapidKeys)).rejects.toThrow()
+    })
+
+    it('should throw when the endpoint is an empty string', async () => {
+      await expect(buildVapidJwt('', vapidKeys)).rejects.toThrow()
+    })
   })
 
   describe('sendNotification', () => {
