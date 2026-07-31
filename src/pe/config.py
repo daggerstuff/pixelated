@@ -7,7 +7,7 @@ import warnings
 from pathlib import Path
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Known insecure default values that MUST be replaced in production
@@ -48,6 +48,30 @@ class Settings(BaseSettings):
 
     # ── Encryption ───────────────────────────────────────────────
     ENCRYPTION_KEY: str = "change-me-in-production"  # 32-byte hex for AES-256
+
+    # ── LLM / AI Provider ─────────────────────────────────────────
+    # These env vars use aliases to work without the PE_ prefix.
+    # Validation happens at provider-creation time, not at boot.
+    LLM_PROVIDER: Literal["mock", "openai", "openai-compatible"] = Field(
+        default="mock",
+        alias="LLM_PROVIDER",
+        description="LLM provider type. Options: mock, openai, openai-compatible",
+    )
+    LLM_API_KEY: str | None = Field(
+        default=None,
+        alias="LLM_API_KEY",
+        description="API key for the LLM provider. Optional when provider=mock, required otherwise",
+    )
+    LLM_BASE_URL: str | None = Field(
+        default=None,
+        alias="LLM_BASE_URL",
+        description="Base URL for the LLM API. Required for openai-compatible providers",
+    )
+    LLM_MODEL_ID: str | None = Field(
+        default=None,
+        alias="LLM_MODEL_ID",
+        description="Model identifier passed to the provider (e.g. gpt-4, claude-3-opus)",
+    )
 
     # ── Redis ────────────────────────────────────────────────────
     REDIS_URL: str = "redis://localhost:6379/0"
