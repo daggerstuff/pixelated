@@ -1,5 +1,9 @@
 /* @vitest-environment node */
 import { describe, it, expect } from 'vitest'
+import { vi } from 'vitest'
+
+vi.stubEnv('ENCRYPTION_KEY', 'test-encryption-key-32-chars-long!')
+vi.stubEnv('JWT_SECRET', 'test-jwt-secret-32-chars-long-for-testing!')
 
 import { config } from '@/config/env.config'
 
