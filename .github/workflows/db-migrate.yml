@@ -28,24 +28,24 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      # Target database: the existing DATABASE_URL secret (the shared
-      # LiteLLM/Prisma Postgres that hosts users/consent_records and already
-      # carries a legacy schema_migrations table with version/applied_at
-      # columns). The runner reconciles that legacy table to the app-shaped
-      # name/executed_at form on first run so new tables like consent_records
-      # never lag the deploy pipeline.
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      # Target database: the Pixelated app's dedicated Postgres (the `pixelated`
+      # database in the Neon project, configured as APP_DATABASE_URL). It is a
+      # fresh, app-shaped database so migrations 001-013 (which FK to
+      # users(id)) apply cleanly. This is intentionally separate from the
+      # consent workflow's DATABASE_URL, which points at the shared
+      # LiteLLM/Prisma database that cannot host these migrations.
+      DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Verify DATABASE_URL secret is configured
+      - name: Verify APP_DATABASE_URL secret is configured
         if: env.DATABASE_URL == ''
         run: |
-          echo "::error::DATABASE_URL secret is not set."
+          echo "::error::APP_DATABASE_URL secret is not set."
           echo "Add it under repository Settings -> Secrets and variables -> Actions."
-          echo "It must point at the Postgres database that hosts the app tables"
-          echo "(users, sessions, consent_records) for migrations to apply against."
+          echo "It must point at the Pixelated app's dedicated Postgres database"
+          echo "(the fresh `pixelated` DB) for migrations 001-013 to apply against."
           exit 1
 
       - name: Setup Node
