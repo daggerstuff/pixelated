@@ -55,6 +55,7 @@ def emit_bias_events(
     overall_score: float,
     alert_level: str,
     detected_biases: list | None = None,
+    receipt_root_hash: str | None = None,
 ) -> bool:
     """Publish bias/crisis events to the foresight EventBus.
 
@@ -79,6 +80,7 @@ def emit_bias_events(
         "session_id": session_id,
         "user_id": user_id,
         "detected_biases": detected_biases,
+        "receipt_root_hash": receipt_root_hash,
     }
 
     events = [

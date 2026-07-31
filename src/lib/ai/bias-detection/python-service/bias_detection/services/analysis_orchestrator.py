@@ -95,6 +95,7 @@ class AnalysisOrchestrator:
                 overall_score=final_result.get("overall_bias_score", 0.0),
                 alert_level=final_result.get("alert_level", "low"),
                 detected_biases=final_result.get("detected_biases", []),
+                receipt_root_hash=final_result.get("receipt_root_hash"),
             )
         except Exception as e:
             logger.warning("Failed to emit bias events", error=str(e))
