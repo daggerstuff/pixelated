@@ -5,57 +5,19 @@
  */
 import { getConsentExpiryService, resetConsentExpiryService } from "../../src/lib/consent";
 import { initializeDatabase } from "../../src/lib/db";
-
-/**
- * Parse a postgres:// or postgresql:// connection string into the
- * DatabaseConfig shape accepted by initializeDatabase().
- */
-function parseDatabaseUrl(url: string): {
-  host: string;
-  port: number;
-  database: string;
-  user: string;
-  password: string;
-  ssl: boolean | object;
-} {
-  const parsed = new URL(url);
-  const sslMode = parsed.searchParams.get("sslmode");
-  // Match the app's server.ts behavior: enable TLS (without cert validation,
-  // intentionally mirroring server.ts) for production and for remote hosts,
-  // unless sslmode explicitly disables it.
-  const isRemoteHost =
-    parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1";
-  const enableSsl =
-    sslMode === "require" ||
-    sslMode === "verify-ca" ||
-    sslMode === "verify-full" ||
-    sslMode === "no-verify" ||
-    (sslMode !== "disable" &&
-      sslMode !== "prefer" &&
-      (process.env["NODE_ENV"] === "production" || isRemoteHost));
-  const ssl: boolean | object = enableSsl
-    ? { rejectUnauthorized: false }
-    : false;
-  return {
-    host: parsed.hostname,
-    port: parsed.port ? parseInt(parsed.port, 10) : 5432,
-    database: parsed.pathname.replace(/^\//, ""),
-    user: decodeURIComponent(parsed.username),
-    password: decodeURIComponent(parsed.password),
-    ssl,
-  };
-}
+import { parseDatabaseUrl } from "../../src/lib/db/parse-database-url";
 
 async function main() {
   // Initialize the connection pool so the consent queries run against a real
-  // database. Prefers DATABASE_URL when present (CI sets it from secrets);
-  // otherwise falls back to the DB_* environment variables used by the app.
+  // database. CI sets DATABASE_URL from secrets; a blank/missing secret must
+  // fail with a clear message instead of silently falling back to localhost.
   const databaseUrl = process.env["DATABASE_URL"];
-  if (databaseUrl) {
-    initializeDatabase(parseDatabaseUrl(databaseUrl));
-  } else {
-    initializeDatabase();
+  if (!databaseUrl) {
+    throw new Error(
+      "DATABASE_URL is not set. Configure the DATABASE_URL secret for the Consent Expiry Check workflow.",
+    );
   }
+  initializeDatabase(parseDatabaseUrl(databaseUrl));
 
   const service = getConsentExpiryService();
   const result = await service.checkExpiries();
