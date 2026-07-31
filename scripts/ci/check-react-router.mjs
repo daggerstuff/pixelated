@@ -10,6 +10,10 @@
  * `react-router-dom` in `src/`, so the dependency was removed. This guard
  * fails CI if any version of `react-router` or `react-router-dom` is
  * resolved in the lockfile.
+ *
+ * NOTE: CI coverage now lives in scripts/ci/security-regression-gate.sh
+ * (lockfile grep, no install needed — PIX-4143 S9). This .mjs is retained
+ * as a standalone manual check; keep both in sync if the blocklist changes.
  */
 
 import { execFileSync } from 'node:child_process';

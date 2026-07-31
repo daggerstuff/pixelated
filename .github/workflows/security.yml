@@ -640,3 +640,23 @@ jobs:
         with:
           name: dockerfile-config-sarif
           path: dockerfile-config-results.sarif
+
+  # -----------------------------------------------------------------------
+  # Security regression gate (PIX-4143 S9)
+  # Fails when a previously-remediated vulnerability is reintroduced.
+  # Complements the scanners above (which catch NEW issues) by catching
+  # KNOWN ones coming back. Fast: runs on the lockfile + repo, no install.
+  # -----------------------------------------------------------------------
+  security-regression-gate:
+    name: Security Regression Gate
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Run security regression gate
+        run: bash scripts/ci/security-regression-gate.sh
