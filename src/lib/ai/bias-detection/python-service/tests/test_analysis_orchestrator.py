@@ -67,13 +67,16 @@ class AnalysisOrchestratorEventEmissionTest(unittest.IsolatedAsyncioTestCase):
             overall_score=self.SCORE,
             alert_level="low",
             detected_biases=[],
+            receipt_root_hash=None,
         )
 
     async def test_receipt_root_hash_forwarded_from_session_data(self):
         self.session["receipt_root_hash"] = "a" * 64
-        with patch("bias_detection.services.analysis_orchestrator.emit_bias_events"):
+        with patch("bias_detection.services.analysis_orchestrator.emit_bias_events") as mock_emit:
             result = await self.orchestrator.analyze_session(self.session)
         self.assertEqual(result["receipt_root_hash"], "a" * 64)
+        mock_emit.assert_called_once()
+        self.assertEqual(mock_emit.call_args.kwargs["receipt_root_hash"], "a" * 64)
 
     async def test_receipt_root_hash_defaults_to_none_when_absent(self):
         with patch("bias_detection.services.analysis_orchestrator.emit_bias_events"):
@@ -91,6 +94,7 @@ class AnalysisOrchestratorEventEmissionTest(unittest.IsolatedAsyncioTestCase):
             overall_score=0.25,
             alert_level="warning",
             detected_biases=[],
+            receipt_root_hash=None,
         )
 
     async def test_critical_score_passes_critical_alert_level(self):
@@ -104,6 +108,7 @@ class AnalysisOrchestratorEventEmissionTest(unittest.IsolatedAsyncioTestCase):
             overall_score=0.75,
             alert_level="critical",
             detected_biases=[],
+            receipt_root_hash=None,
         )
 
     async def test_detected_biases_are_forwarded_to_emitter(self):
