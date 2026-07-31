@@ -4,7 +4,10 @@ import { generateTestKey, generateData, measureOperation } from './test-utils'
 
 // Check if Redis should be skipped for perf tests
 const SKIP_REDIS_TESTS =
-  process.env['SKIP_REDIS_TESTS'] === 'true' || process.env['CI'] === 'true'
+  process.env['SKIP_REDIS_TESTS'] === 'true' ||
+  process.env['CI'] === 'true' ||
+  !process.env['REDIS_URL'] ||
+  !process.env['REDIS_KEY_PREFIX']
 
 // Conditionally skip the entire test suite if Redis is not available
 const noopDescribe = describe.skip
