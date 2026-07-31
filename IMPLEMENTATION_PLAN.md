@@ -163,7 +163,7 @@ def rolling_window(self, window=timedelta(days=7), threshold=3):
 
 - [x] Test: `ai/tests/test_edge_case_filter_bypass.py`
 - [x] Impl: `ai/safety/enhanced_safety_filter.py:273-285`
-- [ ] Follow-up: Wire `is_training_edge_case` into SDG pipeline Nightmare Fuel samples (already at `ai/training/sdg_pipeline.py:1676`)
+- [x] Follow-up: Wire `is_training_edge_case` into SDG pipeline Nightmare Fuel samples (already at `ai/training/sdg_pipeline.py:1676`, covered by `test_edge_case_tag_always_set`)
 
 ### R1 — Cryptographic Receipts (COMPLETED)
 
