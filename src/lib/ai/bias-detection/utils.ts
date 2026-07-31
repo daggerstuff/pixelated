@@ -727,7 +727,8 @@ export function getAllowedOrigin(origin: string | undefined): string {
   return "";
 }
 
-// Unit tests for getAllowedOrigin function
+// Unit tests for getAllowedOrigin function — guarded for runtime safety
+if (typeof describe !== "undefined") {
 describe("getAllowedOrigin", () => {
   const originalEnv = process.env["ALLOWED_ORIGINS"];
 
@@ -804,3 +805,4 @@ describe("getAllowedOrigin", () => {
     });
   });
 });
+}
