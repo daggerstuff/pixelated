@@ -13,6 +13,9 @@ permissions:
 jobs:
   expiry-check:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
