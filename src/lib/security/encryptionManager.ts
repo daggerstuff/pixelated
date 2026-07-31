@@ -105,7 +105,7 @@ class EncryptionManager {
   }
 
   private async generateKeyPair(): Promise<{ id: string; key: CryptoKey }> {
-    const keyId = `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const keyId = `key_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 
     if (this.config.algorithm.startsWith('AES')) {
       const key = await crypto.subtle.generateKey(
