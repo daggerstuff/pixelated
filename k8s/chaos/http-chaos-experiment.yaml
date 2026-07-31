@@ -1,0 +1,122 @@
+# Chaos Mesh: HTTP Chaos — API Backend Failure
+# Scenario: Abort HTTP requests to /health and /api/* endpoints with 503 error.
+# Simulates API backend failure / unhealthy responses.
+# Validates liveness probe failure → pod restart, client retry behavior,
+# and 5xx error rate alerting (HighErrorRate, SLO burn rate alerts).
+# See: docs/enterprise/runbooks/resilience-testing.md §3.4
+apiVersion: chaos-mesh.org/v1alpha1
+kind: HTTPChaos
+metadata:
+  name: http-abort-api-backend
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: http-backend-failure
+spec:
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  target: "Pod"
+  port: 5001                   # Container port (http)
+  path: "*"                    # All paths
+  method: null                 # All HTTP methods
+  request_headers: {}
+  abort: true                  # Abort requests — connection reset
+  scheduler:
+    cron: "@every 10m"
+  duration: "2m"
+---
+
+# Chaos Mesh: HTTP Chaos — Delay Responses
+# Scenario: Delay all HTTP responses by 3 seconds (exceeds p95 SLO of 500ms).
+# Tests latency SLO breach detection, HighResponseTime alert,
+# and SLO latency burn rate alerts.
+# See: docs/enterprise/runbooks/resilience-testing.md §3.4
+apiVersion: chaos-mesh.org/v1alpha1
+kind: HTTPChaos
+metadata:
+  name: http-delay-api-responses
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: http-latency-injection
+spec:
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  target: "Pod"
+  port: 5001
+  path: "/api/*"               # API endpoints only (not /health)
+  method: null
+  request_headers: {}
+  delay: "3s"                  # 3 second delay (6x p95 SLO)
+  scheduler:
+    cron: "@every 15m"
+  duration: "3m"
+---
+
+# Chaos Mesh: Stress Chaos — CPU Burn
+# Scenario: Saturate CPU on API pods to 90%+.
+# Tests HPA scale-up under CPU pressure, CPUUsageHigh alert,
+# and graceful request handling under resource starvation.
+# See: docs/enterprise/runbooks/resilience-testing.md §3.5
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: cpu-burn-api
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: resource-exhaustion
+spec:
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  stressors:
+    cpu:
+      workers: 2               # 2 CPU workers
+      load: 90                  # 90% CPU load per worker
+  scheduler:
+    cron: "@every 20m"
+  duration: "2m"
+---
+
+# Chaos Mesh: Stress Chaos — Memory Burn
+# Scenario: Consume memory toward OOM limit on API pods.
+# Tests OOM kill behavior, MemoryUsageHigh alert, and HPA memory scaling.
+# See: docs/enterprise/runbooks/resilience-testing.md §3.5
+apiVersion: chaos-mesh.org/v1alpha1
+kind: StressChaos
+metadata:
+  name: memory-burn-api
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: resource-exhaustion
+spec:
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  stressors:
+    memory:
+      workers: 1
+      size: "150MB"            # Push toward 192Mi limit
+  scheduler:
+    cron: "@every 20m"
+  duration: "2m"

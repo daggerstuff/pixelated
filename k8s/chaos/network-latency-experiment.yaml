@@ -1,0 +1,73 @@
+# Chaos Mesh: Network Latency Experiment
+# Scenario: Inject 200ms latency + 10ms jitter into API pod egress traffic.
+# Validates p95/p99 latency SLO compliance under degraded network conditions,
+# client-side timeout handling, and graceful degradation behavior.
+# See: docs/enterprise/runbooks/resilience-testing.md §3.2
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-latency-api-egress
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: network-latency
+spec:
+  action: delay
+  mode: all                    # Apply to all matching pods
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  delay:
+    latency: "200ms"           # Fixed delay
+    correlation: "25"          # 25% correlation (some packets delayed more)
+    jitter: "10ms"             # Random jitter
+  direction: to                # Affect egress (outbound) traffic
+  target:                      # Apply to traffic going OUT of API pods
+    selector:
+      namespaces:
+        - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-redis  # Target: Redis pod (simulates slow cache)
+    mode: all
+  scheduler:
+    cron: "@every 15m"
+  duration: "5m"
+---
+
+# Chaos Mesh: Network Loss Experiment
+# Scenario: Inject 10% packet loss between API and Redis.
+# Tests retry logic, connection pooling resilience, and circuit breaker behavior.
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-loss-api-redis
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: network-loss
+spec:
+  action: loss
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  loss:
+    loss: "10"                 # 10% packet loss
+    correlation: "50"          # 50% correlation (bursty loss)
+  direction: to
+  target:
+    selector:
+      namespaces:
+        - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-redis
+    mode: all
+  scheduler:
+    cron: "@every 20m"
+  duration: "3m"

@@ -1,0 +1,352 @@
+# SLO Monitoring & Multi-Window, Multi-Burn-Rate Alerts
+# Implements SLO tracking with error budget burn rate alerting
+# Follows Google SRE Workbook best practices for multi-window, multi-burn-rate approach
+#
+# Reference: PIX-4145 (SLA-2: Implement SLO Monitoring & Burn Rate Alerts)
+
+groups:
+  # ── SLO Recording Rules ─────────────────────────────────────────
+  - name: pixelated-slo-recording-rules
+    interval: 1m
+    rules:
+      # ── Aggregate error ratios ──────────────────────────────────
+      # Each SLO measures the ratio of bad requests to total requests over various windows
+
+      # Therapy Chat SLO
+      - record: pixelated:slo_errors_total:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{route=~"/api/chat.*",status=~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{route=~"/api/chat.*"}[1h]))
+        labels:
+          slo: therapy-chat
+          service: chat
+
+      - record: pixelated:slo_errors_total:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{route=~"/api/chat.*",status=~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{route=~"/api/chat.*"}[6h]))
+        labels:
+          slo: therapy-chat
+          service: chat
+
+      # Auth SLO
+      - record: pixelated:slo_errors_total:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{route=~"/api/auth/.*",status=~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{route=~"/api/auth/.*"}[1h]))
+        labels:
+          slo: user-auth
+          service: auth
+
+      - record: pixelated:slo_errors_total:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{route=~"/api/auth/.*",status=~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{route=~"/api/auth/.*"}[6h]))
+        labels:
+          slo: user-auth
+          service: auth
+
+      # General API SLO
+      - record: pixelated:slo_errors_total:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*",status=~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*"}[1h]))
+        labels:
+          slo: rest-api
+          service: api
+
+      - record: pixelated:slo_errors_total:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*",status=~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*"}[6h]))
+        labels:
+          slo: rest-api
+          service: api
+
+      # AI Inference SLO
+      - record: pixelated:slo_errors_total:ratio_rate1h
+        expr: |
+          sum(rate(ai_inference_errors_total[1h]))
+          /
+          sum(rate(ai_inference_duration_seconds_count[1h]))
+        labels:
+          slo: ai-inference
+          service: ai
+
+      - record: pixelated:slo_errors_total:ratio_rate6h
+        expr: |
+          sum(rate(ai_inference_errors_total[6h]))
+          /
+          sum(rate(ai_inference_duration_seconds_count[6h]))
+        labels:
+          slo: ai-inference
+          service: ai
+
+      # ── Error budget ────────────────────────────────────────────
+      # Tracks remaining error budget as a percentage
+
+      - record: pixelated:slo_errors_total:error_budget
+        expr: |
+          (1 - (sum(rate(http_requests_total{route=~"/api/chat.*",status=~"5.."}[30d]))
+               /
+               sum(rate(http_requests_total{route=~"/api/chat.*"}[30d])))
+           / (1 - 0.9995)) * 100
+        labels:
+          slo: therapy-chat
+          slo_target: "99.95"
+
+      - record: pixelated:slo_errors_total:error_budget
+        expr: |
+          (1 - (sum(rate(http_requests_total{route=~"/api/auth/.*",status=~"5.."}[30d]))
+               /
+               sum(rate(http_requests_total{route=~"/api/auth/.*"}[30d])))
+           / (1 - 0.9999)) * 100
+        labels:
+          slo: user-auth
+          slo_target: "99.99"
+
+      - record: pixelated:slo_errors_total:error_budget
+        expr: |
+          (1 - (sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*",status=~"5.."}[30d]))
+               /
+               sum(rate(http_requests_total{route!~"/api/chat.*|/api/auth/.*|/health.*"}[30d])))
+           / (1 - 0.999)) * 100
+        labels:
+          slo: rest-api
+          slo_target: "99.9"
+
+      - record: pixelated:slo_errors_total:error_budget
+        expr: |
+          (1 - (sum(rate(ai_inference_errors_total[30d]))
+               /
+               sum(rate(ai_inference_duration_seconds_count[30d])))
+           / (1 - 0.995)) * 100
+        labels:
+          slo: ai-inference
+          slo_target: "99.5"
+
+      # ── Burn rate ───────────────────────────────────────────────
+      # Burn rate of 1 = consuming budget exactly at rate that would exhaust it
+      # in the SLO window.  Burn rate of 2 = exhausting twice as fast.
+      - record: pixelated:slo_errors_total:burnrate1h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate1h / (1 - 0.9995)
+        labels:
+          slo: therapy-chat
+          slo_target: "99.95"
+
+      - record: pixelated:slo_errors_total:burnrate6h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate6h / (1 - 0.9995)
+        labels:
+          slo: therapy-chat
+          slo_target: "99.95"
+
+      - record: pixelated:slo_errors_total:burnrate1h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate1h / (1 - 0.9999)
+        labels:
+          slo: user-auth
+          slo_target: "99.99"
+
+      - record: pixelated:slo_errors_total:burnrate6h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate6h / (1 - 0.9999)
+        labels:
+          slo: user-auth
+          slo_target: "99.99"
+
+      - record: pixelated:slo_errors_total:burnrate1h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate1h / (1 - 0.999)
+        labels:
+          slo: rest-api
+          slo_target: "99.9"
+
+      - record: pixelated:slo_errors_total:burnrate6h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate6h / (1 - 0.999)
+        labels:
+          slo: rest-api
+          slo_target: "99.9"
+
+      - record: pixelated:slo_errors_total:burnrate1h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate1h / (1 - 0.995)
+        labels:
+          slo: ai-inference
+          slo_target: "99.5"
+
+      - record: pixelated:slo_errors_total:burnrate6h
+        expr: |
+          pixelated:slo_errors_total:ratio_rate6h / (1 - 0.995)
+        labels:
+          slo: ai-inference
+          slo_target: "99.5"
+
+  # ── Multi-Window, Multi-Burn-Rate Alerts ───────────────────────
+  - name: pixelated-slo-alerts
+    interval: 1m
+    rules:
+      # SLO: Therapy Chat (99.95% — 0.05% error budget)
+      # Budget exhausted in ~15 days at 2x burn, ~3 days at 10x
+
+      - alert: SLOTherapyChatBurnRateWarning
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="therapy-chat"} > 2
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="therapy-chat"} > 2
+        for: 5m
+        labels:
+          severity: warning
+          slo: therapy-chat
+        annotations:
+          summary: 'SLO burn rate warning — Therapy Chat'
+          description: >
+            Therapy Chat error budget burning at >2x rate over 1h and 6h windows.
+            Budget would be exhausted in approximately 15 days.
+            Current 1h burn rate: {{ $value | humanize }}
+
+      - alert: SLOTherapyChatBurnRateCritical
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="therapy-chat"} > 10
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="therapy-chat"} > 10
+        for: 5m
+        labels:
+          severity: critical
+          slo: therapy-chat
+        annotations:
+          summary: 'SLO burn rate critical — Therapy Chat'
+          description: >
+            Therapy Chat error budget burning at >10x rate over 1h and 6h windows.
+            Budget would be exhausted in approximately 3 days.
+            Current 1h burn rate: {{ $value | humanize }}
+
+      # SLO: User Auth (99.99% — 0.01% error budget)
+
+      - alert: SLOAuthBurnRateWarning
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="user-auth"} > 2
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="user-auth"} > 2
+        for: 5m
+        labels:
+          severity: warning
+          slo: user-auth
+        annotations:
+          summary: 'SLO burn rate warning — User Auth'
+          description: >
+            User Auth error budget burning at >2x rate. Budget would be
+            exhausted in approximately 15 days.
+
+      - alert: SLOAuthBurnRateCritical
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="user-auth"} > 10
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="user-auth"} > 10
+        for: 5m
+        labels:
+          severity: critical
+          slo: user-auth
+        annotations:
+          summary: 'SLO burn rate critical — User Auth'
+          description: >
+            User Auth error budget burning at >10x rate. Budget would be
+            exhausted in approximately 3 days.
+
+      # SLO: REST API (99.9% — 0.1% error budget)
+
+      - alert: SLOAPIBurnRateWarning
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="rest-api"} > 2
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="rest-api"} > 2
+        for: 5m
+        labels:
+          severity: warning
+          slo: rest-api
+        annotations:
+          summary: 'SLO burn rate warning — REST API'
+          description: >
+            REST API error budget burning at >2x rate. Budget would be
+            exhausted in approximately 15 days.
+
+      - alert: SLOAPIBurnRateCritical
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="rest-api"} > 10
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="rest-api"} > 10
+        for: 5m
+        labels:
+          severity: critical
+          slo: rest-api
+        annotations:
+          summary: 'SLO burn rate critical — REST API'
+          description: >
+            REST API error budget burning at >10x rate. Budget would be
+            exhausted in approximately 3 days.
+
+      # SLO: AI Inference (99.5% — 0.5% error budget)
+
+      - alert: SLOAIBurnRateWarning
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="ai-inference"} > 2
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="ai-inference"} > 2
+        for: 5m
+        labels:
+          severity: warning
+          slo: ai-inference
+        annotations:
+          summary: 'SLO burn rate warning — AI Inference'
+          description: >
+            AI Inference error budget burning at >2x rate. Budget would be
+            exhausted in approximately 15 days.
+
+      - alert: SLOAIBurnRateCritical
+        expr: |
+          pixelated:slo_errors_total:burnrate1h{slo="ai-inference"} > 10
+          and
+          pixelated:slo_errors_total:burnrate6h{slo="ai-inference"} > 10
+        for: 5m
+        labels:
+          severity: critical
+          slo: ai-inference
+        annotations:
+          summary: 'SLO burn rate critical — AI Inference'
+          description: >
+            AI Inference error budget burning at >10x rate. Budget would be
+            exhausted in approximately 3 days.
+
+      # ── Error Budget Depletion Alerts ──────────────────────────
+
+      - alert: SLOErrorBudgetDepleted
+        expr: |
+          pixelated:slo_errors_total:error_budget < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'SLO error budget critically low — {{ $labels.slo }}'
+          description: >
+            Error budget for {{ $labels.slo }} (target: {{ $labels.slo_target }}%)
+            is below 10% remaining. Current: {{ $value | humanize }}%
+
+      - alert: SLOErrorBudgetExhausted
+        expr: |
+          pixelated:slo_errors_total:error_budget <= 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: 'SLO error budget exhausted — {{ $labels.slo }}'
+          description: >
+            Error budget for {{ $labels.slo }} (target: {{ $labels.slo_target }}%)
+            is fully exhausted. Immediate reliability intervention required.

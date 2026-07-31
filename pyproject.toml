@@ -154,6 +154,7 @@ dependencies = [
   "openpipe-art>=0.5.18",
   "pynvml>=13.0.1",
   "tavily-cli>=0.1.5",
+  "celery>=5.6.3",
 ]
 [project.optional-dependencies]
 test = [
@@ -261,7 +262,9 @@ select = [
 ]
 ignore = ["E501", "UP017", "PLR2004"]
 [tool.ruff.lint.per-file-ignores]
+"scripts/diagnose-llm.py" = ["E402", "T201"]
 "scripts/verify_stage2_persona_quality.py" = ["E402", "PLC0415"]
+"tests/integration/test_persona_llm_path.py" = ["PLC0415"]
 "scripts/task_sync/sync_from_linear.py" = ["T201"]
 "scripts/task_sync/auto_close_from_merge.py" = ["T201"]
 "scripts/categorize.py" = ["T201"]
