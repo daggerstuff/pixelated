@@ -4,8 +4,21 @@
  * Runs the expiry check and outputs results.
  */
 import { getConsentExpiryService, resetConsentExpiryService } from "../../src/lib/consent";
+import { initializeDatabase } from "../../src/lib/db";
+import { parseDatabaseUrl } from "../../src/lib/db/parse-database-url";
 
 async function main() {
+  // Initialize the connection pool so the consent queries run against a real
+  // database. CI sets DATABASE_URL from secrets; a blank/missing secret must
+  // fail with a clear message instead of silently falling back to localhost.
+  const databaseUrl = process.env["DATABASE_URL"];
+  if (!databaseUrl) {
+    throw new Error(
+      "DATABASE_URL is not set. Configure the DATABASE_URL secret for the Consent Expiry Check workflow.",
+    );
+  }
+  initializeDatabase(parseDatabaseUrl(databaseUrl));
+
   const service = getConsentExpiryService();
   const result = await service.checkExpiries();
 

@@ -1,0 +1,65 @@
+name: DB Migrate
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - 'db/migrations/**'
+      - 'src/lib/db/**'
+      - 'scripts/db-migrate.ts'
+      - '.github/workflows/db-migrate.yml'
+  schedule:
+    # Daily safety net at 4:00 UTC — applies anything a push missed.
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: db-migrate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply pending migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # The Pixelated app's real Postgres (hosts users/sessions/bias_analyses,
+      # where migrations 001-013 FK to users(id)). This is intentionally a
+      # separate secret from the consent workflow's DATABASE_URL, which points
+      # at a shared LiteLLM/Prisma database that cannot host these migrations.
+      DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Verify APP_DATABASE_URL secret is configured
+        if: env.DATABASE_URL == ''
+        run: |
+          echo "::error::APP_DATABASE_URL secret is not set."
+          echo "Add it under repository Settings -> Secrets and variables -> Actions."
+          echo "It must point at the Pixelated app's Postgres (the database hosting"
+          echo "users/sessions/bias_analyses), not the shared LiteLLM/Prisma database."
+          exit 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply pending migrations
+        run: pnpm db:migrate
+
+      - name: Show migration status
+        if: always()
+        run: pnpm db:status
