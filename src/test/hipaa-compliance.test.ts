@@ -10,7 +10,29 @@
  * - 45 CFR 164.310 - Physical Safeguards
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
+
+// Mock FHE encryption module — SEAL bindings are unavailable in jsdom
+vi.mock('../lib/fhe/encryption', () => ({
+  encrypt: vi.fn(async (value: unknown) => ({
+    id: `enc-${Date.now()}`,
+    data: `encrypted:${String(value)}`,
+    dataType: typeof value === 'string' ? 'string' : 'object',
+    metadata: { encryptedAt: Date.now(), mode: 'fhe' },
+  })),
+  decrypt: vi.fn(async (enc: { data: string }) => {
+    const raw = String(enc.data)
+    return raw.startsWith('encrypted:') ? raw.slice('encrypted:'.length) : raw
+  }),
+}))
+
+import {
+  encryptField,
+  decryptField,
+  encryptPHIFields,
+  decryptPHIFields,
+  PHI_FIELDS,
+} from '../lib/fhe/field-encryption'
 
 // Mock implementations for testing
 interface AuditEvent {
@@ -421,5 +443,127 @@ describe('HIPAA Compliance Integration', () => {
     Object.values(safeguards).forEach((implemented) => {
       expect(implemented).toBe(true)
     })
+  })
+})
+
+/**
+ * FHE Field-Level Encryption Tests (PIX-4198)
+ */
+describe('FHE Field-Level Encryption', () => {
+  it('encrypts and decrypts a single PHI field', async () => {
+    const originalValue = 'patient@example.com'
+    const encrypted = await encryptField('contact.email', originalValue)
+
+    expect(encrypted.fhe).toBe(true)
+    expect(encrypted.field).toBe('contact.email')
+    expect(encrypted.payload).not.toBe(originalValue)
+    expect(encrypted.encryptedAt).toBeDefined()
+
+    const decrypted = await decryptField<string>(encrypted)
+    expect(decrypted).toBe(originalValue)
+  })
+
+  it('encrypts all PHI fields on a patient record', async () => {
+    const patientData = {
+      name: 'John Doe',
+      contact: {
+        email: 'john@example.com',
+        phone: '555-0100',
+      },
+      diagnosis: ['anxiety', 'depression'],
+      notes: 'Patient reports improved sleep',
+    }
+
+    const encrypted = await encryptPHIFields(patientData, PHI_FIELDS)
+
+    expect(encrypted.encryptedFields).toContain('name')
+    expect(encrypted.encryptedFields).toContain('contact.email')
+    expect(encrypted.encryptedFields).toContain('contact.phone')
+    expect(encrypted.encryptedFields).toContain('diagnosis')
+    expect(encrypted.encryptedFields).toContain('notes')
+
+    expect((encrypted as any).name.fhe).toBe(true)
+    expect((encrypted as any).contact.email.fhe).toBe(true)
+  })
+
+  it('decrypts all PHI fields on a patient record', async () => {
+    const originalData = {
+      name: 'Jane Smith',
+      contact: {
+        email: 'jane@example.com',
+        phone: '555-0200',
+      },
+      diagnosis: ['PTSD'],
+      notes: 'Responding well to treatment',
+    }
+
+    const encrypted = await encryptPHIFields(originalData, PHI_FIELDS)
+    const decrypted = await decryptPHIFields(encrypted)
+
+    expect(decrypted.name).toBe(originalData.name)
+    expect((decrypted as any).contact.email).toBe(originalData.contact.email)
+    expect((decrypted as any).contact.phone).toBe(originalData.contact.phone)
+    expect(decrypted.diagnosis).toEqual(originalData.diagnosis)
+    expect(decrypted.notes).toBe(originalData.notes)
+  })
+
+  it('handles empty and null values gracefully', async () => {
+    const patientData = {
+      name: 'Test Patient',
+      contact: {
+        email: '',
+        phone: null,
+      },
+    }
+
+    const encrypted = await encryptPHIFields(patientData, PHI_FIELDS)
+
+    expect(encrypted.encryptedFields).toContain('name')
+    expect(encrypted.encryptedFields).not.toContain('contact.email')
+    expect(encrypted.encryptedFields).not.toContain('contact.phone')
+
+    const decrypted = await decryptPHIFields(encrypted)
+    expect(decrypted.name).toBe(patientData.name)
+  })
+
+  it('preserves non-PHI fields unchanged', async () => {
+    const patientData = {
+      id: 'patient-123',
+      name: 'John Doe',
+      riskLevel: 'medium',
+      progress: 75,
+      treatmentStatus: 'active',
+    }
+
+    const encrypted = await encryptPHIFields(patientData, PHI_FIELDS)
+
+    expect(encrypted.id).toBe(patientData.id)
+    expect(encrypted.riskLevel).toBe(patientData.riskLevel)
+    expect(encrypted.progress).toBe(patientData.progress)
+    expect(encrypted.treatmentStatus).toBe(patientData.treatmentStatus)
+    expect((encrypted as any).name.fhe).toBe(true)
+  })
+
+  it('roundtrip encryption maintains data integrity', async () => {
+    const sensitiveData = {
+      medicalRecordNumber: 'MRN-2026-001234',
+      emergencyContact: {
+        name: 'Emergency Contact',
+        phone: '555-9111',
+      },
+    }
+
+    const encrypted = await encryptPHIFields(sensitiveData, PHI_FIELDS)
+    const decrypted = await decryptPHIFields(encrypted)
+
+    expect(decrypted.medicalRecordNumber).toBe(
+      sensitiveData.medicalRecordNumber,
+    )
+    expect((decrypted as any).emergencyContact.name).toBe(
+      sensitiveData.emergencyContact.name,
+    )
+    expect((decrypted as any).emergencyContact.phone).toBe(
+      sensitiveData.emergencyContact.phone,
+    )
   })
 })
