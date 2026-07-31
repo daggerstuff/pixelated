@@ -16,11 +16,10 @@
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
 
-  --np-font-display: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --np-font-display: "JetBrains Mono Variable", ui-monospace, monospace;
   --np-font-body:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
-  --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --np-font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
   --np-content: 76rem;
   --np-content-narrow: 55rem;
@@ -190,7 +189,7 @@
   text-decoration: none;
 }
 .np-btn-link::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px;
   left: 0;
@@ -206,7 +205,7 @@
 }
 
 .np-btn:focus-visible {
-  outline: 1px solid var(--np-mid);
+  outline: 2px solid var(--np-mid);
   outline-offset: 3px;
 }
 
@@ -339,12 +338,7 @@
      at the bottom — reads as a live session rather than a tall stack. */
   max-height: clamp(300px, 40vh, 440px);
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    #000 64px,
-    #000 100%
-  );
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 100%);
 }
 
@@ -814,7 +808,7 @@
 }
 
 .np-compare__list li::before {
-  content: '—';
+  content: "—";
   position: absolute;
   left: 0;
   color: var(--np-line-strong);
@@ -1017,7 +1011,7 @@
 /* === Proof strip — no longer used here, keep for compat === */
 
 /* === Light mode === */
-:root[data-theme='light']:has(.np-page) {
+:root[data-theme="light"]:has(.np-page) {
   --np-bg: oklch(0.98 0 0);
   --np-surface: oklch(0.95 0 0);
   --np-elevated: oklch(0.92 0 0);

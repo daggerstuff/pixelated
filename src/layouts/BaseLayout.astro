@@ -534,6 +534,15 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     outline-offset: 2px;
   }
 
+  /* === COARSE POINTERS (touch) — bump nav link tap targets to WCAG 2.5.5 (>=44px) === */
+  @media (pointer: coarse) {
+    .np-shared-nav a {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
+
   /* === REDUCED MOTION === */
   @media (prefers-reduced-motion: reduce) {
     .np-shared-nav a {
