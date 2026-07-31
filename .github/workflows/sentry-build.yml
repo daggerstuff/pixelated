@@ -2,11 +2,18 @@ name: Build & Sentry Release
 
 permissions:
   contents: read
-  packages: write  # Required: GHCR push via docker/login-action with GITHUB_TOKEN
+  packages: write # Required: GHCR push via docker/login-action with GITHUB_TOKEN
 
 on:
   push:
     branches: [main, master, staging]
+    paths:
+      - 'src/**'
+      - 'Dockerfile'
+      - 'docker/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/sentry-build.yml'
   workflow_dispatch:
 
 env:
@@ -68,6 +75,5 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags:
-            ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false
