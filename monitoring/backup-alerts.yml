@@ -1,0 +1,139 @@
+groups:
+  - name: pixelated-empathy-backup-monitoring
+    rules:
+      # --- Backup Missed Alerts (daily backups expected) ---
+
+      - alert: BackupMissed
+        expr: |
+          (time() - backup_last_success_timestamp_seconds{backup_type=~"postgresql|postgresql-ai|redis|app-data|monitoring-data"}) > 90000
+        for: 10m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup missed for {{ $labels.backup_type }}"
+          description: "No successful backup for {{ $labels.backup_type }} in over 25 hours. Expected daily backup at 2 AM. Check backup-system.sh logs and cron schedule."
+
+      - alert: BackupForesightMissed
+        expr: (time() - backup_last_success_timestamp_seconds{backup_type="foresight-memory"}) > 90000
+        for: 10m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: foresight-memory
+        annotations:
+          summary: "Foresight memory DB backup missed"
+          description: "No successful Foresight/Memory DB backup in over 25 hours. Check scripts/memory/backup-shared-memory-db.sh and ensure it's in cron."
+
+      - alert: BackupMongoDBAtlasMissed
+        expr: (time() - backup_last_success_timestamp_seconds{backup_type="mongodb-atlas"}) > 90000
+        for: 30m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: mongodb-atlas
+        annotations:
+          summary: "MongoDB Atlas backup not reported"
+          description: "No successful MongoDB Atlas backup reported in over 25 hours. Verify Atlas automated backup configuration and check Atlas dashboard."
+
+      # --- Backup Failure Alerts ---
+
+      - alert: BackupFailed
+        expr: backup_status{backup_type=~"postgresql|postgresql-ai|redis|foresight-memory|app-data|monitoring-data"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup failed for {{ $labels.backup_type }}"
+          description: "Last backup attempt for {{ $labels.backup_type }} failed (status=0). Check backup script logs immediately. Requires manual intervention before next scheduled backup."
+
+      - alert: BackupFailuresDetected
+        expr: increase(backup_failure_total[24h]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup failures detected for {{ $labels.backup_type }}"
+          description: "{{ $value }} backup failure(s) in the last 24 hours for {{ $labels.backup_type }}. Review backup logs and resolve recurring issues."
+
+      # --- Backup Age Critical ---
+
+      - alert: BackupAgeCritical
+        expr: (time() - backup_last_success_timestamp_seconds{backup_type=~"postgresql|postgresql-ai|redis|foresight-memory|app-data|monitoring-data"}) > 172800
+        for: 15m
+        labels:
+          severity: critical
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup age critical for {{ $labels.backup_type }}"
+          description: "No successful backup for {{ $labels.backup_type }} in over 48 hours. This is a critical situation — data loss window exceeds RPO targets. Escalate to SRE Lead immediately."
+
+      # --- Backup Size Anomaly ---
+
+      - alert: BackupSizeAnomaly
+        expr: |
+          backup_size_bytes > 0
+          and
+          backup_size_bytes < (backup_size_bytes offset 1d * 0.5)
+        for: 5m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup size anomaly for {{ $labels.backup_type }}"
+          description: "Backup size for {{ $labels.backup_type }} dropped more than 50% compared to yesterday. This may indicate data loss, corruption, or backup script issues. Verify backup contents."
+
+      - alert: BackupSizeZero
+        expr: backup_size_bytes{backup_type=~"postgresql|postgresql-ai|redis|foresight-memory|app-data|monitoring-data"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup size is zero for {{ $labels.backup_type }}"
+          description: "Backup size for {{ $labels.backup_type }} is 0 bytes. This indicates a completely empty or failed backup. Investigate immediately."
+
+      # --- Backup Duration ---
+
+      - alert: BackupDurationHigh
+        expr: backup_last_duration_seconds{backup_type=~"postgresql|postgresql-ai|redis|app-data|monitoring-data"} > 3600
+        for: 5m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup duration high for {{ $labels.backup_type }}"
+          description: "Last backup for {{ $labels.backup_type }} took {{ $value }}s (>1 hour). This may impact backup window and RPO targets. Investigate performance degradation."
+
+      # --- Backup Verification ---
+
+      - alert: BackupVerificationFailed
+        expr: increase(backup_verify_last_success_timestamp_seconds{backup_type=~"postgresql|app-data"}[0]) unless (backup_verify_last_success_timestamp_seconds > 0)
+        for: 5m
+        labels:
+          severity: warning
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup verification failed for {{ $labels.backup_type }}"
+          description: "Monthly backup verification (verify-backups.sh) failed for {{ $labels.backup_type }}. Integrity check (gzip -t / tar -tzf) did not pass. Check /var/log/backup-verification.log."
+
+      - alert: BackupVerificationMissed
+        expr: (time() - backup_verify_last_success_timestamp_seconds{backup_type=~"postgresql|app-data"}) > 2678400
+        for: 1h
+        labels:
+          severity: warning
+          service: backup
+          backup_type: "{{ $labels.backup_type }}"
+        annotations:
+          summary: "Backup verification missed for {{ $labels.backup_type }}"
+          description: "No backup verification for {{ $labels.backup_type }} in over 31 days. Monthly verification (verify-backups.sh) should run on 1st of each month at 4 AM."
