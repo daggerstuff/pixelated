@@ -295,7 +295,7 @@
   const initParallax = () => {
     const parallaxElements = document.querySelectorAll('.parallax-element')
     window.addEventListener('scroll', () => {
-      const scrolled = window.pageYOffset
+      const scrolled = window.scrollY
       parallaxElements.forEach((el) => {
         const element = el as HTMLElement
         const speed = parseFloat(element.dataset['parallaxSpeed'] || '') || 0.5

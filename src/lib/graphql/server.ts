@@ -15,7 +15,7 @@
 
 import { createYoga } from "graphql-yoga";
 import { makeExecutableSchema } from "@graphql-tools/schema";
-import { GraphQLError } from "graphql";
+
 import { getCurrentUser } from "@/lib/auth/index";
 import { typeDefs } from "./schema";
 import { resolvers, type GraphqlContext } from "./resolvers";
@@ -24,7 +24,6 @@ import {
   depthLimitRule,
   complexityLimitRule,
   isIntrospectionEnabled,
-  formatGraphQLError,
 } from "./security";
 import { graphqlPubSub } from "./redis-pubsub";
 import { persistedOperationsPlugin } from "./persisted-queries";

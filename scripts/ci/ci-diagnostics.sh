@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+# scripts/ci/ci-diagnostics.sh
+#
+# CI Environment Diagnostics — reports system info, Node version,
+# package.json analysis, lockfile status, network connectivity, and
+# pnpm store state. Useful for debugging pnpm install issues.
+#
+# Usage: ci-diagnostics.sh [--help]
+# Exit codes:
+#   0 — diagnostics collected successfully
+
 set -euo pipefail
 
 echo "🔍 CI Environment Diagnostics for pnpm install issues"

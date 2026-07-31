@@ -23,21 +23,6 @@ const moodData = filteredSessions.map((session: any) => ({
   value: session.mood || 0,
 }))
 
-const _engagementData = filteredSessions.map((session: any) => ({
-  date: new Date(session.timestamp).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  }),
-  value: session.engagement || 0,
-}))
-
-const _pieData = [
-  { name: 'Completed', value: metrics.completedSessions || 0 },
-  { name: 'In Progress', value: metrics.inProgressSessions || 0 },
-  { name: 'Cancelled', value: metrics.cancelledSessions || 0 },
-]
-
-const _COLORS = ['#0088FE', '#00C49F', '#FFBB28']
 ---
 
 <div class="space-y-6">

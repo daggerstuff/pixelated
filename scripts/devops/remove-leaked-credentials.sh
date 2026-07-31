@@ -40,7 +40,6 @@ git filter-repo --replace-text /tmp/filter-expressions.txt --force
 echo "🔗 Re-adding remotes..."
 git remote add origin git@github.com:pixelatedempathy/pixelated.git
 git remote add gitlab git@gitlab.com:ratchetaf/pixelated.git
-git remote add azure git@ssh.dev.azure.com:v3/pixeljump/pixelated/pixelated
 git remote add bucket git@bitbucket.org:ratchetaf/pixelated.git
 
 echo ""
@@ -52,7 +51,6 @@ echo "2. Review the changes: git log --oneline -10"
 echo "3. Force push to all remotes:"
 echo "   git push --force --all origin"
 echo "   git push --force --all gitlab"
-echo "   git push --force --all azure"
 echo "   git push --force --all bucket"
 echo "4. Notify team members to re-clone the repository"
 echo "5. Check GitGuardian to confirm the alert is resolved"

@@ -1,0 +1,158 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Release Readiness Report",
+  "description": "Schema for the consolidated readiness report produced by aggregate-readiness.py",
+  "type": "object",
+  "required": [
+    "meta",
+    "releaseId",
+    "git",
+    "readiness",
+    "summary",
+    "validationLanes",
+    "providerPipelines"
+  ],
+  "properties": {
+    "meta": {
+      "description": "Report metadata",
+      "type": "object",
+      "required": ["generatedAt", "schemaVersion", "generator"],
+      "properties": {
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of report generation"
+        },
+        "schemaVersion": {
+          "type": "string",
+          "description": "Version of the output schema",
+          "pattern": "^\\d+\\.\\d+$"
+        },
+        "generator": {
+          "type": "string",
+          "description": "Name/identifier of the generating tool"
+        }
+      }
+    },
+    "releaseId": {
+      "type": "string",
+      "description": "Readable identifier for this readiness snapshot"
+    },
+    "git": {
+      "description": "Git state at generation time",
+      "type": "object",
+      "required": ["commit", "branch"],
+      "properties": {
+        "commit": { "type": "string", "description": "Full commit hash" },
+        "branch": { "type": "string", "description": "Branch name" }
+      }
+    },
+    "readiness": {
+      "description": "Overall readiness verdict and score",
+      "type": "object",
+      "required": ["status", "score"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ready", "warning", "not-ready"],
+          "description": "ready = all pass, warning = some skipped, not-ready = failures"
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Overall readiness percentage (passed / total * 100)"
+        }
+      }
+    },
+    "summary": {
+      "description": "Aggregate counts across all validation lanes",
+      "type": "object",
+      "required": ["totalLanes", "passedLanes", "failedLanes", "skippedLanes"],
+      "properties": {
+        "totalLanes": { "type": "integer", "minimum": 0 },
+        "passedLanes": { "type": "integer", "minimum": 0 },
+        "failedLanes": { "type": "integer", "minimum": 0 },
+        "skippedLanes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "validationLanes": {
+      "description": "Results from locally executed validation checks",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["status", "exitCode", "stdout", "stderr"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["pass", "fail", "skipped"],
+            "description": "Check outcome"
+          },
+          "exitCode": {
+            "type": ["integer", "null"],
+            "description": "Process exit code (null when command was not executed)"
+          },
+          "stdout": { "type": "string" },
+          "stderr": { "type": "string" }
+        }
+      }
+    },
+    "providerPipelines": {
+      "description": "Pipeline results from external CI/CD providers",
+      "type": "object",
+      "required": ["github"],
+      "properties": {
+        "github": {
+          "type": "array",
+          "description": "GitHub Actions workflow runs for the current ref",
+          "items": { "$ref": "#/definitions/providerPipelineResult" }
+        },
+        "gitlab": {
+          "type": "array",
+          "description": "GitLab CI pipeline jobs for the current ref",
+          "items": { "$ref": "#/definitions/providerPipelineResult" }
+        },
+        "bitbucket": {
+          "type": "array",
+          "description": "Bitbucket Pipelines results for the current ref",
+          "items": { "$ref": "#/definitions/providerPipelineResult" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "providerPipelineResult": {
+      "type": "object",
+      "required": ["name", "status", "url"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Pipeline or workflow name"
+        },
+        "status": {
+          "type": "string",
+          "description": "Pipeline status (completed, in_progress, pending, etc.)"
+        },
+        "conclusion": {
+          "type": ["string", "null"],
+          "description": "Pipeline conclusion (success, failure, neutral, cancelled, null if running)"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Link to the pipeline run"
+        },
+        "startedAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the run started"
+        },
+        "completedAt": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when the run completed"
+        }
+      }
+    }
+  }
+}

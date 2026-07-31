@@ -1,14 +1,20 @@
-#!/bin/bash
-set -euo pipefail
-
-# Build script with proper error handling for CI environments
-# This script prevents EPIPE errors and handles build failures gracefully
+#!/usr/bin/env bash
+# scripts/ci/ci-build.sh
 #
-# Key improvements:
-# 1. Sets NODE_OPTIONS to prevent memory issues
-# 2. Handles SIGPIPE signals properly
-# 3. Implements proper error reporting
-# 4. Optimizes for CI build conditions
+# Build the Pixelated application with CI-optimized settings.
+# Handles NODE_OPTIONS tuning, SIGPIPE, and CI environment detection.
+#
+# Usage: ci-build.sh [--json] [--quiet] [--help]
+# Exit codes:
+#   0 — build succeeded
+#   1 — build failed
+#
+# Flags:
+#   --json    Output structured JSON result instead of human-readable
+#   --quiet   Suppress non-error output
+#   --help    Print this help and exit 0
+
+set -euo pipefail
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -21,9 +27,6 @@ CI_PROVIDER=""
 if [ -n "${CI:-}" ] || [ -n "${GITHUB_ACTIONS:-}" ]; then
   IS_CI=true
   CI_PROVIDER="GitHub Actions"
-elif [ -n "${TF_BUILD:-}" ]; then
-  IS_CI=true
-  CI_PROVIDER="Azure Pipelines"
 elif [ -n "${VERCEL:-}" ]; then
   IS_CI=true
   CI_PROVIDER="Vercel"

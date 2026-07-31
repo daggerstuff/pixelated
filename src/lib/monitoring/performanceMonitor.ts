@@ -338,7 +338,7 @@ class PerformanceMonitor {
     message: string,
   ): void {
     const alert: PerformanceAlert = {
-      id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+      id: `alert_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       type,
       metric,
       value,

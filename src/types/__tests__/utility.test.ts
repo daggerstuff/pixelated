@@ -13,19 +13,19 @@ describe('Utility Types and Assertion Helpers', () => {
     })
 
     it('should throw for null', () => {
-      expect(() => assertDefined(null)).toThrowError(
+      expect(() => assertDefined(null)).toThrow(
         'Value is null or undefined',
       )
     })
 
     it('should throw for undefined', () => {
-      expect(() => assertDefined(undefined)).toThrowError(
+      expect(() => assertDefined(undefined)).toThrow(
         'Value is null or undefined',
       )
     })
 
     it('should throw with custom message', () => {
-      expect(() => assertDefined(null, 'Custom error')).toThrowError(
+      expect(() => assertDefined(null, 'Custom error')).toThrow(
         'Custom error',
       )
     })
@@ -39,7 +39,7 @@ describe('Utility Types and Assertion Helpers', () => {
 
     it('should throw when predicate returns false', () => {
       const isString = (val: unknown): val is string => typeof val === 'string'
-      expect(() => assertType(123, isString)).toThrowError(
+      expect(() => assertType(123, isString)).toThrow(
         'Type assertion failed',
       )
     })

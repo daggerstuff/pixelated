@@ -216,7 +216,7 @@ export class AIMonitoringService extends EventEmitter {
   ): Promise<void> {
     const severity = this.calculateSeverity(zScore)
     const alert: Alert = {
-      id: `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `anomaly_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
       timestamp: new Date(),
       severity,
       category: 'anomaly',
@@ -237,7 +237,7 @@ export class AIMonitoringService extends EventEmitter {
   ): Promise<void> {
     const severity = this.calculateSeverityFromChange(changeRatio)
     const alert: Alert = {
-      id: `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `pattern_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
       timestamp: new Date(),
       severity,
       category: 'pattern',

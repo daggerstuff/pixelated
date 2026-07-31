@@ -158,7 +158,7 @@ class IndexedDBRequestQueue {
   }
 
   private generateId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `req_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
   }
 
   private getPriorityWeight(priority: QueuedRequest['priority']): number {

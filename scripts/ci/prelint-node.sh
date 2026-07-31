@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # scripts/ci/prelint-node.sh
 #
 # Pre-lint hook: source nvm (best-effort), switch to the version pinned in
