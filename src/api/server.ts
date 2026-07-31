@@ -105,16 +105,22 @@ app.use(morgan(morganFormat));
 app.use(requestLogger);
 
 // ============================================================================
+// PUBLIC ROUTES (NO AUTH REQUIRED)
+// ============================================================================
+
+// Health route must be before rate limiter to avoid being blocked by rate limiting
+app.use("/api/health", healthRoutes);
+
+// ============================================================================
 // RATE LIMITING
 // ============================================================================
 
 app.use(rateLimiter);
 
 // ============================================================================
-// PUBLIC ROUTES (NO AUTH REQUIRED)
+// PUBLIC ROUTES CONTINUED (NO AUTH REQUIRED)
 // ============================================================================
 
-app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/readiness", readinessRoutes);
 
