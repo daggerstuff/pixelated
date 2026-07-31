@@ -119,3 +119,43 @@ scrape_configs:
     metrics_path: '/metrics'
     scrape_interval: 5s
     scrape_timeout: 4s
+
+  # ── Unified Backend Stack (docker-compose.backend.yml) ─────────────────
+  # These targets match the service names and ports defined in
+  # docker/docker-compose.backend.yml and use health endpoints
+  # for liveness scraping.
+
+  - job_name: 'pe-express-api'
+    static_configs:
+      - targets: ['express-api:5000']
+    metrics_path: '/api/health'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  - job_name: 'pe-fastapi'
+    static_configs:
+      - targets: ['pe-backend:8000']
+    metrics_path: '/health'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  - job_name: 'pe-bias-detection-svc'
+    static_configs:
+      - targets: ['bias-detection:8001']
+    metrics_path: '/health'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  - job_name: 'pe-ai-service-svc'
+    static_configs:
+      - targets: ['ai-service:8002']
+    metrics_path: '/health'
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  - job_name: 'pe-websocket-svc'
+    static_configs:
+      - targets: ['websocket-server:4321']
+    metrics_path: '/api/health'
+    scrape_interval: 10s
+    scrape_timeout: 5s
