@@ -10,9 +10,14 @@ import datetime
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
+from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Any
+
+import httpx
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -210,10 +215,186 @@ def calculate_summary(validation_lanes: dict) -> dict:
     }
 
 
-def aggregate_readiness(
+# ---------------------------------------------------------------------------
+# Provider API clients — query external CI/CD pipeline statuses
+# ---------------------------------------------------------------------------
+
+
+class ProviderClient(ABC):
+    """Abstract base for CI/CD provider API clients."""
+
+    @abstractmethod
+    def fetch_pipelines(self, branch: str, commit: str) -> list[dict[str, Any]]:
+        """Fetch pipeline results for the given branch/commit from this provider."""
+
+
+class GitHubActionsClient(ProviderClient):
+    """Queries the GitHub Actions API for workflow runs on the current ref."""
+
+    API_BASE = "https://api.github.com"
+
+    def __init__(self, token: str | None = None, repo: str | None = None) -> None:
+        self.token = token or os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+        self.repo = repo or self._detect_repo()
+
+    @staticmethod
+    def _detect_repo() -> str | None:
+        """Detect GitHub repo slug from git remote origin."""
+        try:
+            remote = subprocess.check_output(
+                ["git", "remote", "get-url", "origin"], stderr=subprocess.DEVNULL, text=True
+            ).strip()
+            # Supports: git@github.com:org/repo.git and https://github.com/org/repo
+            match = re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?$", remote)
+            if match:
+                return match.group(1)
+        except Exception:
+            pass
+        return None
+
+    def fetch_pipelines(self, branch: str, commit: str) -> list[dict[str, Any]]:
+        """Fetch workflow runs for the given branch from GitHub Actions."""
+        _ = commit
+        if not self.token:
+            logger.warning("  ▌ GITHUB_TOKEN not set — skipping GitHub Actions fetch")
+            return []
+        if not self.repo:
+            logger.warning("  ▌ Could not detect GitHub repo — skipping GitHub Actions fetch")
+            return []
+
+        headers = {
+            "Authorization": f"Bearer {self.token}",
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "pixelated-readiness-aggregator/1.0",
+        }
+        url = f"{self.API_BASE}/repos/{self.repo}/actions/runs"
+        params: dict[str, str] = {"branch": branch, "per_page": "30"}
+
+        try:
+            logger.info("  ▌ Fetching GitHub Actions runs for %s/%s ...", self.repo, branch)
+            resp = httpx.get(url, headers=headers, params=params, timeout=30.0)
+            resp.raise_for_status()
+            data = resp.json()
+        except httpx.HTTPStatusError as exc:
+            logger.warning("  ▌ GitHub API error: %s %s", exc.response.status_code, exc.response.text[:200])
+            return []
+        except httpx.RequestError as exc:
+            logger.warning("  ▌ GitHub API request failed: %s", exc)
+            return []
+
+        results: list[dict[str, Any]] = []
+        for run in data.get("workflow_runs", []):
+            results.append(
+                {
+                    "name": run.get("name", "unknown"),
+                    "status": run.get("status", "unknown"),
+                    "conclusion": run.get("conclusion"),
+                    "url": run.get("html_url", ""),
+                    "startedAt": run.get("run_started_at"),
+                    "completedAt": run.get("updated_at"),
+                }
+            )
+        return results
+
+
+class GitLabCIClient(ProviderClient):
+    """Stub: queries GitLab CI pipeline status (requires gitlab-token)."""
+
+    def __init__(self, token: str | None = None, project_id: str | None = None) -> None:
+        self.token = token or os.environ.get("GITLAB_TOKEN")
+        self.project_id = project_id or os.environ.get("CI_PROJECT_ID")
+
+    def fetch_pipelines(self, branch: str, commit: str) -> list[dict[str, Any]]:
+        _ = branch, commit
+        logger.info("  ▌ GitLab CI provider not configured — skipping")
+        return []
+
+
+class BitbucketPipelinesClient(ProviderClient):
+    """Stub: queries Bitbucket Pipelines status (requires bitbucket-auth)."""
+
+    def __init__(
+        self, username: str | None = None, app_password: str | None = None, repo_slug: str | None = None
+    ) -> None:
+        self.username = username or os.environ.get("BITBUCKET_USERNAME")
+        self.app_password = app_password or os.environ.get("BITBUCKET_APP_PASSWORD")
+        self.repo_slug = repo_slug or os.environ.get("BITBUCKET_REPO")
+
+    def fetch_pipelines(self, branch: str, commit: str) -> list[dict[str, Any]]:
+        _ = branch, commit
+        logger.info("  ▌ Bitbucket Pipelines provider not configured — skipping")
+        return []
+
+
+def fetch_provider_pipelines(
+    branch: str,
+    commit: str,
+    enabled_providers: list[str] | None = None,
+    github_token: str | None = None,
+    github_repo: str | None = None,
+) -> dict[str, list[dict[str, Any]]]:
+    """Fetch pipeline results from all configured CI/CD providers.
+
+    Args:
+        branch: Git branch name.
+        commit: Git commit hash.
+        enabled_providers: List of providers to query (default: all that have credentials).
+        github_token: GitHub token override.
+        github_repo: GitHub repository slug override.
+
+    Returns:
+        Dict mapping provider names to lists of pipeline result dicts.
+    """
+    providers: dict[str, ProviderClient] = {
+        "github": GitHubActionsClient(token=github_token, repo=github_repo),
+        "gitlab": GitLabCIClient(),
+        "bitbucket": BitbucketPipelinesClient(),
+    }
+
+    results: dict[str, list[dict[str, Any]]] = {}
+    for name, client in providers.items():
+        if enabled_providers and name not in enabled_providers:
+            continue
+        results[name] = client.fetch_pipelines(branch, commit)
+    return results
+
+
+def calculate_provider_summary(provider_pipelines: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+    """Calculate aggregate provider pipeline stats."""
+    total = 0
+    passed = 0
+    failed = 0
+    running = 0
+
+    for pipelines in provider_pipelines.values():
+        for p in pipelines:
+            total += 1
+            conclusion = p.get("conclusion")
+            status = p.get("status", "")
+            if conclusion == "success":
+                passed += 1
+            elif status in ("completed",) and conclusion != "success":
+                failed += 1
+            elif status in ("in_progress", "pending", "queued", "waiting"):
+                running += 1
+            else:
+                failed += 1
+
+    return {
+        "total": total,
+        "passed": passed,
+        "failed": failed,
+        "running": running,
+    }
+
+
+def aggregate_readiness(  # noqa: PLR0913 — all params are independent CLI options
     dry_run: bool = False,
     output_path: str | None = None,
     cwd: str | None = None,
+    providers: list[str] | None = None,
+    github_token: str | None = None,
+    github_repo: str | None = None,
 ) -> int:
     """Aggregate validation lane statuses and output readiness report."""
     logger.info("▸ Aggregating Validation Lane Readiness Status...")
@@ -233,18 +414,44 @@ def aggregate_readiness(
 
     summary = calculate_summary(validation_lanes)
 
+    # Fetch provider pipeline results
+    provider_pipelines = fetch_provider_pipelines(
+        branch=branch,
+        commit=commit_hash,
+        enabled_providers=providers,
+        github_token=github_token,
+        github_repo=github_repo,
+    )
+    provider_summary = calculate_provider_summary(provider_pipelines)
+
+    # Combine local + provider stats for overall readiness
+    combined_total = summary["total"] + provider_summary["total"]
+    combined_passed = summary["passed"] + provider_summary["passed"]
+    combined_failed = summary["failed"] + provider_summary["failed"]
+    overall_score = (combined_passed / combined_total * 100) if combined_total > 0 else 0.0
+
+    has_provider_failures = provider_summary["failed"] > 0
+    if summary["failed"] > 0 or has_provider_failures:
+        overall_status = "not-ready"
+    elif provider_summary["running"] > 0 or summary["skipped"] == summary["total"] or summary["skipped"] > 0:
+        overall_status = "warning"
+    else:
+        overall_status = "ready"
+
     report = {
         "meta": {"generatedAt": timestamp, "schemaVersion": "1.0", "generator": "pixelated-readiness-aggregator"},
         "releaseId": f"ready-{normalize_branch(branch)}-{commit_hash[:7]}",
         "git": {"commit": commit_hash, "branch": branch},
-        "readiness": {"status": summary["overallStatus"], "score": summary["overallScore"]},
+        "readiness": {"status": overall_status, "score": round(overall_score, 1)},
         "summary": {
-            "totalLanes": summary["total"],
-            "passedLanes": summary["passed"],
-            "failedLanes": summary["failed"],
+            "totalLanes": combined_total,
+            "passedLanes": combined_passed,
+            "failedLanes": combined_failed,
             "skippedLanes": summary["skipped"],
         },
         "validationLanes": validation_lanes,
+        "providerPipelines": provider_pipelines,
+        "providerSummary": provider_summary,
     }
 
     logger.info("")
@@ -257,6 +464,18 @@ def aggregate_readiness(
     logger.info("Passed Lanes:   %d", report["summary"]["passedLanes"])
     logger.info("Failed Lanes:   %d", report["summary"]["failedLanes"])
     logger.info("Skipped Lanes:  %d", report["summary"]["skippedLanes"])
+
+    has_provider_data = provider_summary["total"] > 0
+    if has_provider_data:
+        logger.info("")
+        logger.info("--- Provider Pipelines ---")
+        logger.info(
+            "GitHub:    %d total, %d passed, %d failed, %d running",
+            provider_summary["total"],
+            provider_summary["passed"],
+            provider_summary["failed"],
+            provider_summary["running"],
+        )
     logger.info("==========================================")
 
     if output_path:
@@ -267,13 +486,13 @@ def aggregate_readiness(
         logger.info("Report saved to: %s", out_p)
 
     if report["readiness"]["status"] == "not-ready":
-        logger.info("Release is not ready — validation lanes have failures.")
+        logger.info("Release is not ready — validation lanes or provider pipelines have failures.")
         return 1
     if report["readiness"]["status"] == "warning":
         logger.info("Release has warnings but is acceptable under policy.")
         return 0
 
-    logger.info("All validation lanes pass!")
+    logger.info("All validation lanes and provider pipelines pass!")
     return 0
 
 
@@ -299,12 +518,34 @@ def main():
         default=None,
         help="Project root directory (default: current directory)",
     )
+    parser.add_argument(
+        "--providers",
+        type=str,
+        nargs="*",
+        default=None,
+        help="CI/CD providers to query (e.g. github gitlab bitbucket). Default: all with credentials.",
+    )
+    parser.add_argument(
+        "--github-token",
+        type=str,
+        default=None,
+        help="GitHub personal access token (default: GITHUB_TOKEN env)",
+    )
+    parser.add_argument(
+        "--github-repo",
+        type=str,
+        default=None,
+        help="GitHub repo slug (owner/name). Default: detected from git remote.",
+    )
     args = parser.parse_args()
     sys.exit(
         aggregate_readiness(
             dry_run=args.dry_run,
             output_path=args.output,
             cwd=args.cwd,
+            providers=args.providers,
+            github_token=args.github_token,
+            github_repo=args.github_repo,
         )
     )
 

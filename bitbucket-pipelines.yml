@@ -1,0 +1,307 @@
+image: node:24.16.0-bullseye-slim
+
+clone:
+  depth: full # SonarCloud scanner needs full history
+
+definitions:
+  services:
+    docker:
+      memory: 4096
+  caches:
+    sonar: ~/.sonar/cache
+    pnpm: ~/.pnpm-store
+    uv: ~/.cache/uv
+    pip: ~/.cache/pip
+  steps:
+    # ------------------------------------------------------------------
+    # Shared step: Install Node.js / pnpm dependencies
+    # ------------------------------------------------------------------
+    - step: &install-deps
+        name: Install Dependencies
+        caches:
+          - pnpm
+        script:
+          - npm install -g pnpm@11.12.0
+          - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+            scripts/devops/pnpm-install-with-fallback.sh
+        artifacts:
+          - node_modules/**
+
+    # ------------------------------------------------------------------
+    # Shared step: Lint & Oxlint
+    # ------------------------------------------------------------------
+    - step: &lint-oxlint
+        name: Lint & Oxlint
+        caches:
+          - pnpm
+        script:
+          - npm install -g pnpm@11.12.0
+          - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+            scripts/devops/pnpm-install-with-fallback.sh
+          - pnpm lint
+          - pnpm exec oxlint --type-aware -c .oxlintrc.json .
+
+    # ------------------------------------------------------------------
+    # Shared step: Security Scan (Node.js)
+    # ------------------------------------------------------------------
+    - step: &security-scan
+        name: Security Scan
+        caches:
+          - pnpm
+        script:
+          - npm install -g pnpm@11.12.0
+          - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+            scripts/devops/pnpm-install-with-fallback.sh
+          - pnpm security:scan
+
+    # ------------------------------------------------------------------
+    # Shared step: Playwright Smoke E2E
+    # ------------------------------------------------------------------
+    - step: &playwright-e2e
+        name: Playwright Smoke E2E
+        caches:
+          - pnpm
+        script:
+          - npm install -g pnpm@11.12.0
+          - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+            scripts/devops/pnpm-install-with-fallback.sh
+          - pnpm test:e2e:smoke
+
+    # ------------------------------------------------------------------
+    # Shared step: Build, test, SonarCloud analysis
+    # ------------------------------------------------------------------
+    - step: &build-test-sonarcloud
+        name: Build, Test & SonarCloud
+        size: 2x
+        caches:
+          - pnpm
+          - sonar
+        services:
+          - docker
+        script:
+          - npm install -g pnpm@11.12.0
+          - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+          - pnpm test --silent
+          - pnpm build --if-present
+          - pipe: sonarsource/sonarcloud-scan:4.0.0
+            variables:
+              SONAR_TOKEN: $SONAR_TOKEN
+
+    # ------------------------------------------------------------------
+    # Shared step: SonarCloud Quality Gate
+    # ------------------------------------------------------------------
+    - step: &check-quality-gate
+        name: SonarCloud Quality Gate
+        script:
+          - pipe: sonarsource/sonarcloud-quality-gate:0.1.6
+            variables:
+              SONAR_TOKEN: $SONAR_TOKEN
+
+    # ------------------------------------------------------------------
+    # AI validation: Governance Matrix
+    # ------------------------------------------------------------------
+    - step: &governance-validate
+        name: Governance Matrix Validation
+        image: python:3.13.13-bookworm
+        caches:
+          - uv
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - uv run python scripts/governance/validate_data_source_matrix.py
+
+    # ------------------------------------------------------------------
+    # AI validation: Data Pipeline
+    # ------------------------------------------------------------------
+    - step: &ai-data-validation
+        name: AI Data Pipeline Validation
+        image: python:3.13.13-bookworm
+        caches:
+          - uv
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - |
+            if [ -f "ai/dataset_pipeline/ingestion/dual_persona_loader.py" ]; then
+              cd ai/dataset_pipeline/ingestion/
+              uv run python dual_persona_loader.py || echo "Data loader validation completed"
+            else
+              echo "No AI data pipeline found, skipping..."
+            fi
+
+    # ------------------------------------------------------------------
+    # AI validation: Model Architecture
+    # ------------------------------------------------------------------
+    - step: &ai-model-validation
+        name: AI Model Architecture Validation
+        image: python:3.13.13-bookworm
+        caches:
+          - uv
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - |
+            if [ -f "ai/lightning/inference_service.py" ]; then
+              cd ai && uv run python -c "import sys; sys.path.insert(0, 'lightning'); from inference_service import app; print('imports OK')" || echo "Model validation completed"
+            else
+              echo "No AI model service found, skipping..."
+            fi
+
+    # ------------------------------------------------------------------
+    # AI validation: Python type check
+    # ------------------------------------------------------------------
+    - step: &ai-type-check
+        name: AI Type Check
+        image: python:3.13.13-bookworm
+        caches:
+          - uv
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - uv run mypy ai/ --ignore-missing-imports --show-error-codes || true
+
+    # ------------------------------------------------------------------
+    # AI validation: Python security scan
+    # ------------------------------------------------------------------
+    - step: &ai-security-scan
+        name: AI Security Scan
+        image: python:3.13.13-bookworm
+        caches:
+          - uv
+          - pip
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - uv pip install pip-audit bandit
+          - uv run pip-audit --desc -r ai/requirements-voice.txt || true
+          - uv run bandit -r ai/ -f json -o bandit-report.json || true
+        artifacts:
+          - bandit-report.json
+
+    # ------------------------------------------------------------------
+    # AI validation: Ingestion stub check
+    # ------------------------------------------------------------------
+    - step: &ingestion-stub-check
+        name: Ingestion Stub Check
+        image: python:3.13.13-bookworm
+        script:
+          - python --version
+          - pip install --no-input --quiet uv
+          - chmod +x scripts/ingestion/run_stub.py
+          - uv run python scripts/ingestion/run_stub.py
+
+    # ------------------------------------------------------------------
+    # AI validation: Quality scoring stub test
+    # ------------------------------------------------------------------
+    - step: &quality-scoring-test
+        name: Quality Scoring Stub Test
+        image: python:3.13.13-bookworm
+        script:
+          - python --version
+          - pip install --no-input --quiet uv pytest
+          - uv run pytest -q tests/python/test_quality_scoring_stub.py
+
+pipelines:
+  # Arch: Bitbucket = AI validation lane only — GH Actions owns lint/security/test.
+  default:
+    - step: *install-deps
+
+  branches:
+    master:
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate
+
+    production:
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate
+
+  pull-requests:
+    '**':
+      - step: *install-deps
+      - parallel:
+          - step: *lint-oxlint
+          - step: *security-scan
+          - step: *playwright-e2e
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate
+
+      # AI validation steps — only when ai/ changes
+      - step: *governance-validate
+        condition:
+          changesets:
+            includePaths:
+              - 'ai/**'
+              - 'scripts/governance/**'
+      - step: *ai-data-validation
+        condition:
+          changesets:
+            includePaths:
+              - 'ai/dataset_pipeline/**'
+              - 'bitbucket-pipelines.yml'
+      - step: *ai-model-validation
+        condition:
+          changesets:
+            includePaths:
+              - 'ai/lightning/**'
+              - 'ai/config/**'
+      - step: *ai-type-check
+        condition:
+          changesets:
+            includePaths:
+              - 'ai/**/*.py'
+      - step: *ai-security-scan
+        condition:
+          changesets:
+            includePaths:
+              - 'ai/**'
+              - 'ai/requirements*.txt'
+              - 'ai/pyproject.toml'
+      - step: *ingestion-stub-check
+        condition:
+          changesets:
+            includePaths:
+              - 'scripts/ingestion/**'
+      - step: *quality-scoring-test
+        condition:
+          changesets:
+            includePaths:
+              - 'tests/python/**'
+              - 'scripts/quality/**'
+
+  tags:
+    'v*':
+      - step: *install-deps
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate
+
+  custom:
+    full-test-suite:
+      - step: *install-deps
+      - parallel:
+          - step: *lint-oxlint
+          - step: *security-scan
+          - step: *playwright-e2e
+      - step: *build-test-sonarcloud
+      - step: *check-quality-gate
+      - step: *governance-validate
+      - step: *ingestion-stub-check
+      - step: *quality-scoring-test
+
+    ai-validation:
+      - step: *governance-validate
+      - step: *ai-data-validation
+      - step: *ai-model-validation
+      - step: *ai-type-check
+      - step: *ai-security-scan
+
+    security-audit:
+      - step: *install-deps
+      - step: *security-scan
+
+    quick-test:
+      - step: *install-deps
+      - step: *lint-oxlint

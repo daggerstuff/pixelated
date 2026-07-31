@@ -41,12 +41,6 @@ import type {
   GetSessionEmotionsQueryVariables,
   GetSessionTurnsQuery,
   GetSessionTurnsQueryVariables,
-  SessionUpdatedSubscription,
-  SessionUpdatedSubscriptionVariables,
-  EmotionAnalysisCreatedSubscription,
-  EmotionAnalysisCreatedSubscriptionVariables,
-  ConversationTurnAddedSubscription,
-  ConversationTurnAddedSubscriptionVariables,
 } from "./generated/types";
 
 // ── Query document strings ──────────────────────────────
@@ -442,12 +436,6 @@ export type {
   GetSessionEmotionsQueryVariables,
   GetSessionTurnsQuery,
   GetSessionTurnsQueryVariables,
-  SessionUpdatedSubscription,
-  SessionUpdatedSubscriptionVariables,
-  EmotionAnalysisCreatedSubscription,
-  EmotionAnalysisCreatedSubscriptionVariables,
-  ConversationTurnAddedSubscription,
-  ConversationTurnAddedSubscriptionVariables,
 } from "./generated/types";
 
 export type {
