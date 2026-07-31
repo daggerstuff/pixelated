@@ -25,27 +25,41 @@
     ========================================================================== */
 
 :root {
-  /* Self-contained Dark Metal tokens (TASTES.md source of truth) */
-  --fm-bg: #0a0a0a;
-  --fm-bg-2: #121212;
-  --fm-bg-3: #1a1a1a;
-  --fm-border: rgba(255, 255, 255, 0.08);
-  --fm-border-strong: rgba(255, 255, 255, 0.14);
-  --fm-text: #f6f1e8;
-  --fm-muted: #b0b0b0;
-  --fm-muted-soft: rgba(176, 176, 176, 0.6);
-  --fm-accent: #ff8533; /* electric orange — primary */
-  --fm-accent-strong: #ff7300;
-  --fm-accent-2: #22d3ee; /* cyan — type tokens */
-  --fm-accent-3: #8fb8a2; /* clinical green — value tokens */
-  --fm-danger: #f87171;
+  /* Zero-chroma monochrome tokens — realigned to "The Quiet Instrument"
+     (DESIGN.md). Every former warm/accent value now resolves to a step on
+     the neutral NP ramp; no hue, no serif display, no glow, no radius. */
+  --fm-bg: var(--np-bg, oklch(0.1 0 0));
+  --fm-bg-2: var(--np-surface, oklch(0.14 0 0));
+  --fm-bg-3: var(--np-elevated, oklch(0.18 0 0));
+  --fm-border: var(--np-line, rgba(255, 255, 255, 0.06));
+  --fm-border-strong: var(--np-line-strong, rgba(255, 255, 255, 0.12));
+  --fm-text: var(--np-text, oklch(0.93 0 0));
+  --fm-muted: var(--np-muted, oklch(0.62 0 0));
+  --fm-muted-soft: var(--np-mid, oklch(0.7 0 0));
+  /* Former orange/cyan/green accents — all collapsed to neutral ink. */
+  --fm-accent: var(--np-text, oklch(0.93 0 0));
+  --fm-accent-strong: var(--np-text, oklch(0.93 0 0));
+  --fm-accent-2: var(--np-mid, oklch(0.7 0 0));
+  --fm-accent-3: var(--np-mid, oklch(0.7 0 0));
+  --fm-danger: var(--np-text, oklch(0.93 0 0));
   --fm-mono:
     'JetBrains Mono Variable', ui-monospace, 'JetBrains Mono', monospace;
-  --fm-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
-  --fm-sans: 'Public Sans', system-ui, sans-serif;
-  --fm-radius: 2px;
-  --fm-radius-lg: 4px;
-  --fm-glow: 0 8px 24px rgba(255, 133, 51, 0.18);
+  --fm-display: var(--np-font-display, 'JetBrains Mono Variable', ui-monospace, monospace);
+  --fm-sans:
+    var(
+      --np-font-body,
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      Helvetica,
+      Arial,
+      sans-serif
+    );
+  --fm-radius: 0px;
+  --fm-radius-lg: 0px;
+  --fm-glow: none;
   --fm-container: 1080px;
 }
 
@@ -330,39 +344,42 @@
   }
 }
 
-/* Dark Metal fusion — overrides keel's dark theme across the whole site */
+/* Monochrome fusion — realigns keel's dark theme to "The Quiet Instrument"
+   across the whole site. Formerly the warm-cream + electric-orange "Dark
+   Metal" override; now every value is a zero-chroma step on the NP ramp. */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-bg: #0a0a0a;
-  --color-surface: #121212;
-  --color-elevated: #1a1a1a;
-  --color-glass: rgba(18, 18, 18, 0.8);
-  --color-text: #f6f1e8;
+  --color-bg: var(--np-bg, oklch(0.1 0 0));
+  --color-surface: var(--np-surface, oklch(0.14 0 0));
+  --color-elevated: var(--np-elevated, oklch(0.18 0 0));
+  --color-glass: var(--np-surface, oklch(0.14 0 0));
+  --color-text: var(--np-text, oklch(0.93 0 0));
   --color-text-strong: #ffffff;
-  --color-muted: #b0b0b0;
-  --color-soft: #1a1a1a;
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.14);
+  --color-muted: var(--np-muted, oklch(0.62 0 0));
+  --color-soft: var(--np-elevated, oklch(0.18 0 0));
+  --color-line: var(--np-line, rgba(255, 255, 255, 0.06));
+  --color-line-strong: var(--np-line-strong, rgba(255, 255, 255, 0.12));
   --color-overlay: rgba(0, 0, 0, 0.75);
-  --color-accent: #ff8533;
-  --color-accent-rgb: 255, 133, 51;
-  --color-accent-hover: #ff7300;
-  --color-accent-soft: rgba(255, 133, 51, 0.16);
-  --color-brand: #10b981; /* keep clinical emerald for clinical surfaces */
-  --focus-ring: 0 0 0 3px rgba(255, 133, 51, 0.3);
+  /* Accent collapses to neutral ink — the only color is content. */
+  --color-accent: var(--np-text, oklch(0.93 0 0));
+  --color-accent-rgb: 237, 237, 237;
+  --color-accent-hover: var(--np-mid, oklch(0.7 0 0));
+  --color-accent-soft: rgba(255, 255, 255, 0.1);
+  --color-brand: var(--np-text, oklch(0.93 0 0));
+  --focus-ring: 0 0 0 3px rgba(255, 255, 255, 0.35);
   /* keel alias tokens used by keel components */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #121212;
-  --bg-glass: rgba(18, 18, 18, 0.8);
-  --text-primary: #f6f1e8;
-  --text-secondary: #b0b0b0;
-  --text-muted: rgba(176, 176, 176, 0.7);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-primary: rgba(255, 255, 255, 0.14);
-  --border-primary-rgb: 38, 38, 38;
-  --divider-dotted: rgba(255, 255, 255, 0.08);
-  --divider-weak: #1a1a1a;
-  --bg-surface-ghost: #1a1a1a;
+  --bg-primary: var(--np-bg, oklch(0.1 0 0));
+  --bg-secondary: var(--np-surface, oklch(0.14 0 0));
+  --bg-glass: var(--np-surface, oklch(0.14 0 0));
+  --text-primary: var(--np-text, oklch(0.93 0 0));
+  --text-secondary: var(--np-muted, oklch(0.62 0 0));
+  --text-muted: var(--np-muted, oklch(0.62 0 0));
+  --border-subtle: var(--np-line, rgba(255, 255, 255, 0.06));
+  --border-primary: var(--np-line-strong, rgba(255, 255, 255, 0.12));
+  --border-primary-rgb: 237, 237, 237;
+  --divider-dotted: var(--np-line, rgba(255, 255, 255, 0.06));
+  --divider-weak: var(--np-elevated, oklch(0.18 0 0));
+  --bg-surface-ghost: var(--np-elevated, oklch(0.18 0 0));
 }
 
 /* Built records section */

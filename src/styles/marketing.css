@@ -33,28 +33,18 @@
   padding: clamp(3rem, 6vw, 4.5rem) 0;
 }
 
+/* Flat by doctrine: alternating sections read via a hairline + a one-step
+   tonal lift, never an accent glow or gradient wash. */
 .marketing-section--soft {
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(var(--accent-primary-rgb), 0.12),
-      transparent 28%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(var(--accent-primary-rgb), 0.015),
-      transparent 100%
-    );
+  background: var(--np-surface);
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
 }
 
 .marketing-section--emphasis {
-  background:
-    radial-gradient(
-      circle at top left,
-      rgba(var(--accent-primary-rgb), 0.16),
-      transparent 24%
-    ),
-    linear-gradient(180deg, rgba(var(--accent-primary-rgb), 0.02), transparent);
+  background: var(--np-surface);
+  border-top: 1px solid var(--np-line-strong);
+  border-bottom: 1px solid var(--np-line-strong);
 }
 
 .marketing-rule {
@@ -97,19 +87,7 @@
   padding: clamp(2.35rem, 3.8vw, 3.7rem);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(var(--accent-primary-rgb), 0.09),
-      transparent 34%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.03),
-      rgba(255, 255, 255, 0.01)
-    ),
-    var(--bg-glass);
-  backdrop-filter: blur(14px);
+  background: var(--np-surface);
 }
 
 .marketing-hero__panel::after {
@@ -132,15 +110,14 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
-  font-weight: 350;
-  max-width: 16ch;
+  font-family: var(--np-font-display, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-weight: 500;
+  max-width: 18ch;
   font-size: clamp(2.25rem, 4.4vw, 3.6rem);
   line-height: 1.06;
   letter-spacing: -0.022em;
   color: var(--text-primary);
   text-wrap: balance;
-  /* Light-on-dark weight compensation: 350 reads as ~400 on light */
   font-feature-settings: 'kern', 'liga', 'calt';
 }
 
@@ -198,9 +175,15 @@
 }
 
 .marketing-button--primary {
-  color: var(--bg-primary);
-  background: var(--accent-primary);
-  border: 1px solid rgba(var(--accent-primary-rgb), 0.45);
+  color: var(--np-bg);
+  background: var(--np-text);
+  border: 1px solid var(--np-text);
+}
+
+.marketing-button--primary:hover {
+  color: var(--np-text);
+  background: var(--np-bg);
+  border-color: var(--np-text);
 }
 
 .marketing-button--secondary {
@@ -210,8 +193,8 @@
 }
 
 .marketing-button--secondary:hover {
-  border-color: rgba(var(--accent-primary-rgb), 0.4);
-  color: var(--accent-primary);
+  border-color: var(--np-text);
+  color: var(--np-text);
 }
 
 .marketing-button:disabled {
@@ -242,13 +225,13 @@
 }
 
 .marketing-input:hover {
-  border-color: rgba(var(--accent-primary-rgb), 0.35);
+  border-color: var(--np-mid);
 }
 
 .marketing-input:focus-visible {
-  outline: 2px solid var(--accent-primary);
+  outline: 2px solid var(--np-mid);
   outline-offset: 2px;
-  border-color: rgba(var(--accent-primary-rgb), 0.5);
+  border-color: var(--np-mid);
 }
 
 .marketing-note {
@@ -276,11 +259,7 @@
   padding: 1.15rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.035),
-    rgba(255, 255, 255, 0.015)
-  );
+  background: var(--np-surface);
 }
 
 .marketing-stat-card span,
@@ -292,7 +271,7 @@
   font-weight: 600;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-  color: var(--accent-primary);
+  color: var(--np-muted);
 }
 
 .marketing-eyebrow {
@@ -301,7 +280,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--accent-primary);
+  color: var(--np-muted);
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
@@ -418,17 +397,12 @@
   padding: clamp(1.35rem, 2vw, 1.75rem);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(
-    180deg,
-    rgba(48, 44, 44, 0.6),
-    rgba(39, 35, 35, 0.44)
-  );
-  backdrop-filter: blur(10px);
+  background: var(--np-surface);
 }
 
 .marketing-card--accent {
-  border-color: rgba(var(--accent-primary-rgb), 0.35);
-  background: rgba(var(--accent-primary-rgb), 0.08);
+  border-color: var(--np-line-strong);
+  background: var(--np-elevated);
 }
 
 .marketing-card h2,
@@ -490,11 +464,7 @@
   padding: 1.5rem 1.65rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(
-    180deg,
-    rgba(48, 44, 44, 0.52),
-    rgba(39, 35, 35, 0.34)
-  );
+  background: var(--np-surface);
 }
 
 .marketing-proof-band__items {
@@ -537,11 +507,7 @@
   padding: 1.55rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: linear-gradient(
-    180deg,
-    rgba(48, 44, 44, 0.52),
-    rgba(39, 35, 35, 0.36)
-  );
+  background: var(--np-surface);
 }
 
 .marketing-quote-card blockquote {
@@ -561,20 +527,9 @@
   grid-template-columns: minmax(0, 1.2fr) minmax(20rem, 0.8fr);
   gap: 1.35rem;
   padding: clamp(1.65rem, 2.8vw, 2.8rem);
-  border: 1px solid rgba(var(--accent-primary-rgb), 0.28);
+  border: 1px solid var(--np-line-strong);
   border-radius: var(--radius-sm);
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(var(--accent-primary-rgb), 0.14),
-      transparent 30%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, 0.04),
-      rgba(255, 255, 255, 0.015)
-    );
-  backdrop-filter: blur(12px);
+  background: var(--np-surface);
 }
 
 .marketing-cta-band__aside {
@@ -625,8 +580,8 @@
 }
 
 .marketing-inline-link:hover {
-  color: var(--accent-primary);
-  border-color: rgba(var(--accent-primary-rgb), 0.5);
+  color: var(--np-text);
+  border-color: var(--np-mid);
 }
 
 .marketing-hero__trustline {
@@ -649,7 +604,7 @@
   width: 0.35rem;
   height: 0.35rem;
   border-radius: 999px;
-  background: rgba(var(--accent-primary-rgb), 0.8);
+  background: var(--np-mid);
 }
 
 @media (max-width: 1080px) {
