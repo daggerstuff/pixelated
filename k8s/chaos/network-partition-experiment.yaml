@@ -1,0 +1,68 @@
+# Chaos Mesh: Network Partition Experiment
+# Scenario: Complete network partition between API and Redis pods.
+# Simulates DNS failure / service unreachable / full network outage.
+# Validates circuit breaker activation, fallback behavior, cache failure handling,
+# and alert triggering (RedisDown, ApplicationDown).
+# See: docs/enterprise/runbooks/resilience-testing.md §3.3
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-partition-api-redis
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: network-partition
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  direction: to
+  target:
+    selector:
+      namespaces:
+        - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-redis
+    mode: all
+  scheduler:
+    cron: "@every 30m"
+  duration: "1m"               # Short — full partition is destructive
+---
+
+# Chaos Mesh: Network Partition — API to AI Service
+# Scenario: Cut traffic between pixelated-app and pixelated-ai service.
+# Tests AI service fallback, cached response serving, and degraded mode operation.
+# See: docs/enterprise/runbooks/resilience-testing.md §3.3
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: network-partition-api-ai
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: network-partition
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  direction: to
+  target:
+    selector:
+      namespaces:
+        - pixelated-empathy
+    labelSelectors:
+      app: pixelated-ai         # AI service pods (if deployed in cluster)
+    mode: all
+  scheduler:
+    cron: "@every 30m"
+  duration: "1m"

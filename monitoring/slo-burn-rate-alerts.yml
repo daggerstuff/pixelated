@@ -1,0 +1,227 @@
+# SLO Burn Rate Alerts — Pixelated Empathy
+#
+# Multi-window multi-burn-rate alerts following the Google SRE pattern.
+# References recording rules defined in slo-recording-rules.yml.
+#
+# Burn rates are pre-normalized by error budget in the recording rules,
+# so the same thresholds apply to both 99.9% and 99.95% SLO services:
+#   14.4x → 2% of error budget consumed in 1 hour  (page, fast)
+#   6x    → 5% of error budget consumed in 6 hours (page, medium)
+#   3x    → 10% of error budget consumed in 3 days  (ticket, slow)
+#
+# Alert routing (via alertmanager.yml):
+#   critical → PagerDuty + Email, 30m repeat
+#   warning  → Slack + Email, 2h repeat
+#
+# SLO definitions: docs/enterprise/runbooks/slo-definitions.md
+
+groups:
+  # ============================================================
+  # Group 1: Availability burn-rate alerts (all 7 services)
+  # ============================================================
+  - name: slo-availability-burn-rate-alerts
+    rules:
+      # --- Fast burn: 2% budget/hour → page immediately ---
+      - alert: SLOAvailabilityFastBurnRate
+        expr: |
+          slo:avbl_burn_rate:1h > 14.4
+          and on(service)
+          slo:avbl_burn_rate:5m > 14.4
+        for: 2m
+        labels:
+          severity: critical
+          slo_type: availability
+          burn_tier: fast
+        annotations:
+          summary: "SLO fast burn: {{ $labels.service }} consuming 2%+ error budget/hour"
+          description: >-
+            Service {{ $labels.service }} is burning its availability error budget
+            at >14.4x the normal rate. At this pace, 2% of the monthly error budget
+            will be consumed within 1 hour. Both the 1h and 5m burn rates exceed
+            the threshold. Investigate immediately — check service health, recent
+            deployments, and infrastructure status.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+      # --- Medium burn: 5% budget/6h → page ---
+      - alert: SLOAvailabilityMediumBurnRate
+        expr: |
+          slo:avbl_burn_rate:6h > 6
+          and on(service)
+          slo:avbl_burn_rate:30m > 6
+        for: 15m
+        labels:
+          severity: critical
+          slo_type: availability
+          burn_tier: medium
+        annotations:
+          summary: "SLO medium burn: {{ $labels.service }} consuming 5%+ error budget/6h"
+          description: >-
+            Service {{ $labels.service }} is burning its availability error budget
+            at >6x the normal rate. At this pace, 5% of the monthly error budget
+            will be consumed within 6 hours. Both the 6h and 30m burn rates exceed
+            the threshold. Investigate service degradation and plan remediation.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+      # --- Slow burn: 10% budget/3d → ticket ---
+      - alert: SLOAvailabilitySlowBurnRate
+        expr: |
+          slo:avbl_burn_rate:3d > 3
+          and on(service)
+          slo:avbl_burn_rate:6h > 3
+        for: 30m
+        labels:
+          severity: warning
+          slo_type: availability
+          burn_tier: slow
+        annotations:
+          summary: "SLO slow burn: {{ $labels.service }} consuming 10%+ error budget/3d"
+          description: >-
+            Service {{ $labels.service }} is burning its availability error budget
+            at >3x the normal rate. At this pace, 10% of the monthly error budget
+            will be consumed within 3 days. Both the 3d and 6h burn rates exceed
+            the threshold. Create a ticket to investigate sustained degradation.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+  # ============================================================
+  # Group 2: Request error burn-rate alerts (HTTP services only)
+  # ============================================================
+  - name: slo-request-error-burn-rate-alerts
+    rules:
+      # --- Fast burn: 2% budget/hour → page immediately ---
+      - alert: SLORequestErrorFastBurnRate
+        expr: |
+          slo:req_burn_rate:1h > 14.4
+          and on(service)
+          slo:req_burn_rate:5m > 14.4
+        for: 2m
+        labels:
+          severity: critical
+          slo_type: request_error
+          burn_tier: fast
+        annotations:
+          summary: "SLO request-error fast burn: {{ $labels.service }} 5xx at 14.4x+ budget rate"
+          description: >-
+            Service {{ $labels.service }} is returning 5xx errors at >14.4x the
+            allowed error-budget rate. 2% of the monthly error budget will be
+            consumed within 1 hour. Both 1h and 5m request-error burn rates exceed
+            the threshold. Check application logs, error tracking, and recent
+            deployments immediately.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+      # --- Medium burn: 5% budget/6h → page ---
+      - alert: SLORequestErrorMediumBurnRate
+        expr: |
+          slo:req_burn_rate:6h > 6
+          and on(service)
+          slo:req_burn_rate:30m > 6
+        for: 15m
+        labels:
+          severity: critical
+          slo_type: request_error
+          burn_tier: medium
+        annotations:
+          summary: "SLO request-error medium burn: {{ $labels.service }} 5xx at 6x+ budget rate"
+          description: >-
+            Service {{ $labels.service }} is returning 5xx errors at >6x the
+            allowed error-budget rate. 5% of the monthly error budget will be
+            consumed within 6 hours. Both 6h and 30m request-error burn rates
+            exceed the threshold. Investigate sustained error patterns.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+      # --- Slow burn: 10% budget/3d → ticket ---
+      - alert: SLORequestErrorSlowBurnRate
+        expr: |
+          slo:req_burn_rate:3d > 3
+          and on(service)
+          slo:req_burn_rate:6h > 3
+        for: 30m
+        labels:
+          severity: warning
+          slo_type: request_error
+          burn_tier: slow
+        annotations:
+          summary: "SLO request-error slow burn: {{ $labels.service }} 5xx at 3x+ budget rate"
+          description: >-
+            Service {{ $labels.service }} is returning 5xx errors at >3x the
+            allowed error-budget rate. 10% of the monthly error budget will be
+            consumed within 3 days. Create a ticket to investigate persistent
+            error patterns.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+  # ============================================================
+  # Group 3: Latency SLO violation alerts (HTTP services)
+  # ============================================================
+  - name: slo-latency-violation-alerts
+    rules:
+      # --- pixelated-app p95 latency > 500ms for 10m ---
+      - alert: SLOLatencyP95Violation
+        expr: slo:latency_p95:seconds5m{service="pixelated-app"} > 0.5
+        for: 10m
+        labels:
+          severity: warning
+          service: pixelated-app
+          slo_type: latency_p95
+          slo_target_ms: "500"
+        annotations:
+          summary: "SLO latency violation: pixelated-app p95 > 500ms for 10m"
+          description: >-
+            The pixelated-app p95 response latency has exceeded the 500ms SLO
+            target for over 10 minutes. Current p95: {{ $value }}s.
+            Check for slow queries, high load, or deployment regressions.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+      # --- ai-service average inference latency > 2s for 10m ---
+      - alert: SLOLatencyAvgViolation
+        expr: slo:latency_avg:seconds5m{service="ai-service"} > 2.0
+        for: 10m
+        labels:
+          severity: warning
+          service: ai-service
+          slo_type: latency_avg
+          slo_target_ms: "2000"
+        annotations:
+          summary: "SLO latency violation: ai-service avg inference > 2s for 10m"
+          description: >-
+            The ai-service average inference latency has exceeded the 2s SLO
+            target for over 10 minutes. Current average: {{ $value }}s.
+            Check GPU availability, model loading, and request queue depth.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+  # ============================================================
+  # Group 4: Error budget exhaustion alert
+  # ============================================================
+  - name: slo-error-budget-alerts
+    rules:
+      # --- Error budget nearly exhausted (<10% remaining) ---
+      - alert: SLOErrorBudgetNearlyExhausted
+        expr: slo:error_budget_remaining:pct < 0.1
+        for: 1h
+        labels:
+          severity: critical
+          slo_type: error_budget
+        annotations:
+          summary: "SLO error budget nearly exhausted: {{ $labels.service }} (<10% remaining)"
+          description: >-
+            Service {{ $labels.service }} has less than 10% of its monthly error
+            budget remaining (current: {{ $value | humanizePercentage }}).
+            Per the error budget policy, feature development must freeze until
+            the SLO is back in compliance. Require a postmortem if budget reaches 0.
+            Runbook: docs/enterprise/runbooks/slo-definitions.md
+
+      # --- Error budget exhausted (0% remaining) ---
+      - alert: SLOErrorBudgetExhausted
+        expr: slo:error_budget_remaining:pct <= 0
+        for: 5m
+        labels:
+          severity: critical
+          slo_type: error_budget
+        annotations:
+          summary: "SLO error budget EXHAUSTED: {{ $labels.service }}"
+          description: >-
+            Service {{ $labels.service }} has consumed 100% of its monthly error
+            budget. Per the error budget policy:
+            1. Page on-call engineer immediately
+            2. Initiate feature freeze for this service
+            3. Start postmortem process within 24 hours
+            4. Freeze non-reliability work until SLO recovers
+            Runbook: docs/enterprise/runbooks/slo-definitions.md

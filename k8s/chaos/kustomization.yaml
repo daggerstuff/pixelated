@@ -1,0 +1,18 @@
+# Kustomization — Chaos Engineering Experiments
+# Chaos Mesh experiment manifests for resilience testing in staging.
+# Install Chaos Mesh first: see docs/enterprise/runbooks/resilience-testing.md §2
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: pixelated-empathy
+
+resources:
+  - pod-kill-experiment.yaml
+  - network-latency-experiment.yaml
+  - network-partition-experiment.yaml
+  - http-chaos-experiment.yaml
+
+commonLabels:
+  app.kubernetes.io/name: pixelated-empathy
+  app.kubernetes.io/component: chaos-engineering
+  app.kubernetes.io/managed-by: kustomize

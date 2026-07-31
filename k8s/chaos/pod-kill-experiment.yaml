@@ -1,0 +1,52 @@
+# Chaos Mesh: Pod Kill Experiment
+# Scenario: Randomly kill API pods to validate Kubernetes self-healing,
+# HPA scale-up, liveness/readiness probe behavior, and zero-downtime recovery.
+# See: docs/enterprise/runbooks/resilience-testing.md §3.1
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-api
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: pod-failure
+spec:
+  action: pod-kill
+  mode: one                    # Kill one pod at a time
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  scheduler:
+    cron: "@every 5m"           # Repeat every 5 minutes during experiment window
+  duration: "30s"              # Experiment runs for 30 seconds
+  gracePeriodSeconds: 0        # Immediate kill — no graceful shutdown
+---
+
+# Chaos Mesh: Pod Failure Experiment
+# Scenario: Mark pods as unavailable (NotReady) for extended period.
+# Tests HPA scale-out, service mesh circuit breaking, and client retry logic.
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-failure-api
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: chaos-experiment
+    chaos-mesh.org/chaos-scenario: pod-failure
+spec:
+  action: pod-failure          # Pods marked NotReady (not killed)
+  mode: fixed-percent
+  value: "50"                   # 50% of pods become NotReady
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      app: pixelated-empathy-api
+  scheduler:
+    cron: "@every 10m"
+  duration: "2m"               # NotReady for 2 minutes
+  gracePeriodSeconds: 5
