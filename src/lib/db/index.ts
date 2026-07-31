@@ -268,11 +268,39 @@ export class DatabaseMigration {
   }
 
   /**
-   * Check if migrations table exists and create if needed
+   * Check if the migrations table exists and create if needed.
+   *
+   * Some databases predate this runner and carry a schema_migrations table
+   * with a foreign shape (version integer PRIMARY KEY, applied_at text)
+   * recorded by earlier tooling. Those version numbers are bookkeeping from a
+   * different migration system and cannot be trusted to match this repo's
+   * NNN_*.sql files — drift has been observed (recorded versions whose tables
+   * never existed). The legacy table is therefore preserved as
+   * schema_migrations_legacy for history and a fresh app-shaped tracking
+   * table is created, so every migration file is (re)applied and recorded
+   * from the repo's own history instead of being skipped on bad bookkeeping.
    */
   async ensureMigrationsTable(): Promise<void> {
     await query(`
       CREATE TABLE IF NOT EXISTS schema_migrations (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) UNIQUE NOT NULL,
+        executed_at TIMESTAMP DEFAULT NOW()
+      )
+    `)
+
+    const columns = await this.getSchemaMigrationsColumns()
+    if (!columns.includes('version')) return
+    // Legacy shape detected: preserve it and start a fresh tracking table. A
+    // pre-existing schema_migrations_legacy is unreachable here (after the
+    // first successful run schema_migrations is app-shaped and never carries
+    // a version column again), so a failed RENAME fails loudly rather than
+    // silently mis-tracking.
+    await query(
+      'ALTER TABLE schema_migrations RENAME TO schema_migrations_legacy',
+    )
+    await query(`
+      CREATE TABLE schema_migrations (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) UNIQUE NOT NULL,
         executed_at TIMESTAMP DEFAULT NOW()
@@ -387,6 +415,19 @@ export class DatabaseMigration {
       else pending.push(name)
     }
     return { applied, pending }
+  }
+
+  /**
+   * List the actual columns of schema_migrations (empty when the table does
+   * not exist yet).
+   */
+  private async getSchemaMigrationsColumns(): Promise<string[]> {
+    const result = await query<{ column_name: string }>(
+      `SELECT column_name
+         FROM information_schema.columns
+        WHERE table_name = 'schema_migrations'`,
+    )
+    return result.rows.map((row: { column_name: string }) => row.column_name)
   }
 
   private async listMigrationFiles(
