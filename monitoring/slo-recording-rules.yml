@@ -1,0 +1,746 @@
+# SLO Recording Rules — Pixelated Empathy
+#
+# Records SLI error ratios, latency values, and burn rates for all
+# customer-facing services. Follows the Google SRE multi-window
+# multi-burn-rate pattern for error-budget tracking.
+#
+# SLO targets and error budgets are defined in:
+#   docs/enterprise/runbooks/slo-definitions.md
+#
+# Burn-rate windows (for 30-day compliance period):
+#   5m + 1h  → fast burn (page)   — 2% budget in 1h  → 14.4x
+#   30m + 6h → medium burn (page) — 5% budget in 6h → 6x
+#   6h + 3d  → slow burn (ticket) — 10% budget in 3d → 3x
+#
+# Services:
+#   99.9%  SLO (budget 0.001):  pixelated-app, ai-service, redis-exporter,
+#                              node-exporter, foresight-mcp
+#   99.95% SLO (budget 0.0005): postgres-exporter, caddy
+
+groups:
+  # ============================================================
+  # Group 1: Availability SLI — error ratio per service per window
+  # ============================================================
+  - name: slo-availability-sli
+    rules:
+      # --- pixelated-app (99.9%) ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="pixelated-app"}[5m])
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="pixelated-app"}[30m])
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="pixelated-app"}[1h])
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="pixelated-app"}[6h])
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="pixelated-app"}[24h])
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="pixelated-app"}[3d])
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+
+      # --- ai-service (99.9%) ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="ai-service"}[5m])
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="ai-service"}[30m])
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="ai-service"}[1h])
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="ai-service"}[6h])
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="ai-service"}[24h])
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="ai-service"}[3d])
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+
+      # --- postgres-exporter (99.95%) ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="postgres-exporter"}[5m])
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="postgres-exporter"}[30m])
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="postgres-exporter"}[1h])
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="postgres-exporter"}[6h])
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="postgres-exporter"}[24h])
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="postgres-exporter"}[3d])
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+
+      # --- redis-exporter (99.9%) ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="redis-exporter"}[5m])
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="redis-exporter"}[30m])
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="redis-exporter"}[1h])
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="redis-exporter"}[6h])
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="redis-exporter"}[24h])
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="redis-exporter"}[3d])
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+
+      # --- node-exporter (99.9%) ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="node-exporter"}[5m])
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="node-exporter"}[30m])
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="node-exporter"}[1h])
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="node-exporter"}[6h])
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="node-exporter"}[24h])
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="node-exporter"}[3d])
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+
+      # --- caddy (99.95%) ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="caddy"}[5m])
+        labels:
+          service: caddy
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="caddy"}[30m])
+        labels:
+          service: caddy
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="caddy"}[1h])
+        labels:
+          service: caddy
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="caddy"}[6h])
+        labels:
+          service: caddy
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="caddy"}[24h])
+        labels:
+          service: caddy
+          slo_target: "99.95"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="caddy"}[3d])
+        labels:
+          service: caddy
+          slo_target: "99.95"
+
+      # --- foresight-mcp (99.9%) — not yet scraped, rules ready for when scrape config added ---
+      - record: slo:avbl_error:ratio_rate5m
+        expr: 1 - avg_over_time(up{job="foresight-mcp"}[5m])
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate30m
+        expr: 1 - avg_over_time(up{job="foresight-mcp"}[30m])
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate1h
+        expr: 1 - avg_over_time(up{job="foresight-mcp"}[1h])
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate6h
+        expr: 1 - avg_over_time(up{job="foresight-mcp"}[6h])
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate24h
+        expr: 1 - avg_over_time(up{job="foresight-mcp"}[24h])
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+      - record: slo:avbl_error:ratio_rate3d
+        expr: 1 - avg_over_time(up{job="foresight-mcp"}[3d])
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+
+  # ============================================================
+  # Group 2: Request error SLI — 5xx ratio for HTTP services
+  # ============================================================
+  - name: slo-request-error-sli
+    rules:
+      # --- pixelated-app request error rate (99.9%, budget 0.001) ---
+      - record: slo:req_error:ratio_rate5m
+        expr: |
+          sum(rate(http_requests_total{job="pixelated-app",status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="pixelated-app"}[5m]))
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate30m
+        expr: |
+          sum(rate(http_requests_total{job="pixelated-app",status=~"5.."}[30m]))
+          /
+          sum(rate(http_requests_total{job="pixelated-app"}[30m]))
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{job="pixelated-app",status=~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{job="pixelated-app"}[1h]))
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{job="pixelated-app",status=~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{job="pixelated-app"}[6h]))
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate24h
+        expr: |
+          sum(rate(http_requests_total{job="pixelated-app",status=~"5.."}[24h]))
+          /
+          sum(rate(http_requests_total{job="pixelated-app"}[24h]))
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate3d
+        expr: |
+          sum(rate(http_requests_total{job="pixelated-app",status=~"5.."}[3d]))
+          /
+          sum(rate(http_requests_total{job="pixelated-app"}[3d]))
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+
+      # --- ai-service request error rate (99.9%, budget 0.001) ---
+      - record: slo:req_error:ratio_rate5m
+        expr: |
+          sum(rate(http_requests_total{job="ai-service",status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="ai-service"}[5m]))
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate30m
+        expr: |
+          sum(rate(http_requests_total{job="ai-service",status=~"5.."}[30m]))
+          /
+          sum(rate(http_requests_total{job="ai-service"}[30m]))
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate1h
+        expr: |
+          sum(rate(http_requests_total{job="ai-service",status=~"5.."}[1h]))
+          /
+          sum(rate(http_requests_total{job="ai-service"}[1h]))
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate6h
+        expr: |
+          sum(rate(http_requests_total{job="ai-service",status=~"5.."}[6h]))
+          /
+          sum(rate(http_requests_total{job="ai-service"}[6h]))
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate24h
+        expr: |
+          sum(rate(http_requests_total{job="ai-service",status=~"5.."}[24h]))
+          /
+          sum(rate(http_requests_total{job="ai-service"}[24h]))
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:req_error:ratio_rate3d
+        expr: |
+          sum(rate(http_requests_total{job="ai-service",status=~"5.."}[3d]))
+          /
+          sum(rate(http_requests_total{job="ai-service"}[3d]))
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+
+  # ============================================================
+  # Group 3: Latency SLI — per HTTP service per window
+  # ============================================================
+  - name: slo-latency-sli
+    rules:
+      # --- pixelated-app p95 latency (target: ≤500ms = 0.5s) ---
+      - record: slo:latency_p95:seconds5m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="pixelated-app"}[5m]))
+          )
+        labels:
+          service: pixelated-app
+          slo_target_ms: "500"
+      - record: slo:latency_p95:seconds30m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="pixelated-app"}[30m]))
+          )
+        labels:
+          service: pixelated-app
+          slo_target_ms: "500"
+      - record: slo:latency_p95:seconds1h
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="pixelated-app"}[1h]))
+          )
+        labels:
+          service: pixelated-app
+          slo_target_ms: "500"
+      - record: slo:latency_p95:seconds6h
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="pixelated-app"}[6h]))
+          )
+        labels:
+          service: pixelated-app
+          slo_target_ms: "500"
+      - record: slo:latency_p95:seconds24h
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(http_request_duration_seconds_bucket{job="pixelated-app"}[24h]))
+          )
+        labels:
+          service: pixelated-app
+          slo_target_ms: "500"
+
+      # --- ai-service average inference latency (target: ≤2s) ---
+      - record: slo:latency_avg:seconds5m
+        expr: |
+          rate(ai_inference_duration_seconds_sum[5m])
+          /
+          rate(ai_inference_duration_seconds_count[5m])
+        labels:
+          service: ai-service
+          slo_target_ms: "2000"
+      - record: slo:latency_avg:seconds30m
+        expr: |
+          rate(ai_inference_duration_seconds_sum[30m])
+          /
+          rate(ai_inference_duration_seconds_count[30m])
+        labels:
+          service: ai-service
+          slo_target_ms: "2000"
+      - record: slo:latency_avg:seconds1h
+        expr: |
+          rate(ai_inference_duration_seconds_sum[1h])
+          /
+          rate(ai_inference_duration_seconds_count[1h])
+        labels:
+          service: ai-service
+          slo_target_ms: "2000"
+      - record: slo:latency_avg:seconds6h
+        expr: |
+          rate(ai_inference_duration_seconds_sum[6h])
+          /
+          rate(ai_inference_duration_seconds_count[6h])
+        labels:
+          service: ai-service
+          slo_target_ms: "2000"
+      - record: slo:latency_avg:seconds24h
+        expr: |
+          rate(ai_inference_duration_seconds_sum[24h])
+          /
+          rate(ai_inference_duration_seconds_count[24h])
+        labels:
+          service: ai-service
+          slo_target_ms: "2000"
+
+  # ============================================================
+  # Group 4: Availability burn rate — error_ratio / error_budget
+  # ============================================================
+  - name: slo-availability-burn-rate
+    rules:
+      # 99.9% SLO services (budget 0.001) — burn_rate = error_ratio / 0.001
+      # --- pixelated-app ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+
+      # --- ai-service ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+
+      # --- redis-exporter ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="redis-exporter"} / 0.001
+        labels:
+          service: redis-exporter
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="redis-exporter"} / 0.001
+        labels:
+          service: redis-exporter
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="redis-exporter"} / 0.001
+        labels:
+          service: redis-exporter
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="redis-exporter"} / 0.001
+        labels:
+          service: redis-exporter
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="redis-exporter"} / 0.001
+        labels:
+          service: redis-exporter
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="redis-exporter"} / 0.001
+        labels:
+          service: redis-exporter
+
+      # --- node-exporter ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="node-exporter"} / 0.001
+        labels:
+          service: node-exporter
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="node-exporter"} / 0.001
+        labels:
+          service: node-exporter
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="node-exporter"} / 0.001
+        labels:
+          service: node-exporter
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="node-exporter"} / 0.001
+        labels:
+          service: node-exporter
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="node-exporter"} / 0.001
+        labels:
+          service: node-exporter
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="node-exporter"} / 0.001
+        labels:
+          service: node-exporter
+
+      # --- foresight-mcp ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="foresight-mcp"} / 0.001
+        labels:
+          service: foresight-mcp
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="foresight-mcp"} / 0.001
+        labels:
+          service: foresight-mcp
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="foresight-mcp"} / 0.001
+        labels:
+          service: foresight-mcp
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="foresight-mcp"} / 0.001
+        labels:
+          service: foresight-mcp
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="foresight-mcp"} / 0.001
+        labels:
+          service: foresight-mcp
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="foresight-mcp"} / 0.001
+        labels:
+          service: foresight-mcp
+
+      # 99.95% SLO services (budget 0.0005) — burn_rate = error_ratio / 0.0005
+      # --- postgres-exporter ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="postgres-exporter"} / 0.0005
+        labels:
+          service: postgres-exporter
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="postgres-exporter"} / 0.0005
+        labels:
+          service: postgres-exporter
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="postgres-exporter"} / 0.0005
+        labels:
+          service: postgres-exporter
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="postgres-exporter"} / 0.0005
+        labels:
+          service: postgres-exporter
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="postgres-exporter"} / 0.0005
+        labels:
+          service: postgres-exporter
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="postgres-exporter"} / 0.0005
+        labels:
+          service: postgres-exporter
+
+      # --- caddy ---
+      - record: slo:avbl_burn_rate:5m
+        expr: slo:avbl_error:ratio_rate5m{service="caddy"} / 0.0005
+        labels:
+          service: caddy
+      - record: slo:avbl_burn_rate:30m
+        expr: slo:avbl_error:ratio_rate30m{service="caddy"} / 0.0005
+        labels:
+          service: caddy
+      - record: slo:avbl_burn_rate:1h
+        expr: slo:avbl_error:ratio_rate1h{service="caddy"} / 0.0005
+        labels:
+          service: caddy
+      - record: slo:avbl_burn_rate:6h
+        expr: slo:avbl_error:ratio_rate6h{service="caddy"} / 0.0005
+        labels:
+          service: caddy
+      - record: slo:avbl_burn_rate:24h
+        expr: slo:avbl_error:ratio_rate24h{service="caddy"} / 0.0005
+        labels:
+          service: caddy
+      - record: slo:avbl_burn_rate:3d
+        expr: slo:avbl_error:ratio_rate3d{service="caddy"} / 0.0005
+        labels:
+          service: caddy
+
+  # ============================================================
+  # Group 5: Request error burn rate — for HTTP services
+  # ============================================================
+  - name: slo-request-error-burn-rate
+    rules:
+      # 99.9% SLO (budget 0.001)
+      # --- pixelated-app ---
+      - record: slo:req_burn_rate:5m
+        expr: slo:req_error:ratio_rate5m{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:req_burn_rate:30m
+        expr: slo:req_error:ratio_rate30m{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:req_burn_rate:1h
+        expr: slo:req_error:ratio_rate1h{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:req_burn_rate:6h
+        expr: slo:req_error:ratio_rate6h{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:req_burn_rate:24h
+        expr: slo:req_error:ratio_rate24h{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+      - record: slo:req_burn_rate:3d
+        expr: slo:req_error:ratio_rate3d{service="pixelated-app"} / 0.001
+        labels:
+          service: pixelated-app
+
+      # --- ai-service ---
+      - record: slo:req_burn_rate:5m
+        expr: slo:req_error:ratio_rate5m{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:req_burn_rate:30m
+        expr: slo:req_error:ratio_rate30m{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:req_burn_rate:1h
+        expr: slo:req_error:ratio_rate1h{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:req_burn_rate:6h
+        expr: slo:req_error:ratio_rate6h{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:req_burn_rate:24h
+        expr: slo:req_error:ratio_rate24h{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+      - record: slo:req_burn_rate:3d
+        expr: slo:req_error:ratio_rate3d{service="ai-service"} / 0.001
+        labels:
+          service: ai-service
+
+  # ============================================================
+  # Group 6: Error budget remaining (24h window approximation)
+  # ============================================================
+  - name: slo-error-budget
+    rules:
+      # Error budget consumed over 24h as percentage of monthly budget
+      # monthly_budget = error_budget * (30 * 24 * 60) minutes
+      # consumed = error_ratio_24h * (24 * 60) minutes
+      # remaining% = 1 - (consumed / monthly_budget)
+      #            = 1 - (error_ratio_24h * 1440) / (error_budget * 43200)
+      #            = 1 - (error_ratio_24h / error_budget) / 30
+      #            = 1 - burn_rate_24h / 30
+
+      # 99.9% services (budget 0.001)
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="pixelated-app"} / 0.001) / 30, 1)
+        labels:
+          service: pixelated-app
+          slo_target: "99.9"
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="ai-service"} / 0.001) / 30, 1)
+        labels:
+          service: ai-service
+          slo_target: "99.9"
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="redis-exporter"} / 0.001) / 30, 1)
+        labels:
+          service: redis-exporter
+          slo_target: "99.9"
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="node-exporter"} / 0.001) / 30, 1)
+        labels:
+          service: node-exporter
+          slo_target: "99.9"
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="foresight-mcp"} / 0.001) / 30, 1)
+        labels:
+          service: foresight-mcp
+          slo_target: "99.9"
+
+      # 99.95% services (budget 0.0005)
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="postgres-exporter"} / 0.0005) / 30, 1)
+        labels:
+          service: postgres-exporter
+          slo_target: "99.95"
+      - record: slo:error_budget_remaining:pct
+        expr: clamp_max(1 - (slo:avbl_error:ratio_rate24h{service="caddy"} / 0.0005) / 30, 1)
+        labels:
+          service: caddy
+          slo_target: "99.95"

@@ -1,0 +1,367 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Pixelated Empathy - SLO Monitoring",
+    "tags": ["pixelated-empathy", "slo", "error-budget"],
+    "style": "dark",
+    "timezone": "browser",
+    "refresh": "30s",
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "title": "App SLO Availability (5m)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "1 - slo:avbl_error:ratio_rate5m{service=\"pixelated-app\"}",
+            "legendFormat": "Availability"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 0.999 },
+                { "color": "green", "value": 0.9999 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+      },
+      {
+        "id": 2,
+        "title": "AI Service SLO Availability (5m)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "1 - slo:avbl_error:ratio_rate5m{service=\"ai-service\"}",
+            "legendFormat": "Availability"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 0.999 },
+                { "color": "green", "value": 0.9999 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
+      },
+      {
+        "id": 3,
+        "title": "PostgreSQL SLO Availability (5m)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "1 - slo:avbl_error:ratio_rate5m{service=\"postgresql\"}",
+            "legendFormat": "Availability"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 0.999 },
+                { "color": "green", "value": 0.9999 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 }
+      },
+      {
+        "id": 4,
+        "title": "Redis SLO Availability (5m)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "1 - slo:avbl_error:ratio_rate5m{service=\"redis\"}",
+            "legendFormat": "Availability"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "yellow", "value": 0.999 },
+                { "color": "green", "value": 0.9999 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 }
+      },
+      {
+        "id": 5,
+        "title": "App Error Budget Remaining",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "slo:error_budget_remaining:pct{service=\"pixelated-app\"}",
+            "legendFormat": "Budget"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "orange", "value": 0.1 },
+                { "color": "yellow", "value": 0.25 },
+                { "color": "green", "value": 0.5 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 4 }
+      },
+      {
+        "id": 6,
+        "title": "AI Service Error Budget Remaining",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "slo:error_budget_remaining:pct{service=\"ai-service\"}",
+            "legendFormat": "Budget"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "orange", "value": 0.1 },
+                { "color": "yellow", "value": 0.25 },
+                { "color": "green", "value": 0.5 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 6, "y": 4 }
+      },
+      {
+        "id": 7,
+        "title": "PostgreSQL Error Budget Remaining",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "slo:error_budget_remaining:pct{service=\"postgresql\"}",
+            "legendFormat": "Budget"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "orange", "value": 0.1 },
+                { "color": "yellow", "value": 0.25 },
+                { "color": "green", "value": 0.5 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 12, "y": 4 }
+      },
+      {
+        "id": 8,
+        "title": "Redis Error Budget Remaining",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "slo:error_budget_remaining:pct{service=\"redis\"}",
+            "legendFormat": "Budget"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percentunit",
+            "color": { "mode": "thresholds" },
+            "thresholds": {
+              "steps": [
+                { "color": "red", "value": 0 },
+                { "color": "orange", "value": 0.1 },
+                { "color": "yellow", "value": 0.25 },
+                { "color": "green", "value": 0.5 }
+              ]
+            },
+            "mappings": []
+          }
+        },
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 4 }
+      },
+      {
+        "id": 9,
+        "title": "Availability Burn Rate (1h window)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "slo:avbl_burn_rate:1h",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "yAxes": [{ "label": "Burn Rate (x)", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
+      },
+      {
+        "id": 10,
+        "title": "Request Error Burn Rate (1h window)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "slo:req_burn_rate:1h",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "yAxes": [{ "label": "Burn Rate (x)", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
+      },
+      {
+        "id": 11,
+        "title": "App Latency p95",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "slo:latency_p95:seconds5m{service=\"pixelated-app\"}",
+            "legendFormat": "p95 (5m)"
+          },
+          {
+            "expr": "slo:latency_p95:seconds1h{service=\"pixelated-app\"}",
+            "legendFormat": "p95 (1h)"
+          },
+          {
+            "expr": "slo:latency_p95:seconds24h{service=\"pixelated-app\"}",
+            "legendFormat": "p95 (24h)"
+          }
+        ],
+        "yAxes": [{ "label": "Seconds", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 }
+      },
+      {
+        "id": 12,
+        "title": "AI Service Avg Latency",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "slo:latency_avg:seconds5m{service=\"ai-service\"}",
+            "legendFormat": "avg (5m)"
+          },
+          {
+            "expr": "slo:latency_avg:seconds1h{service=\"ai-service\"}",
+            "legendFormat": "avg (1h)"
+          },
+          {
+            "expr": "slo:latency_avg:seconds24h{service=\"ai-service\"}",
+            "legendFormat": "avg (24h)"
+          }
+        ],
+        "yAxes": [{ "label": "Seconds", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 }
+      },
+      {
+        "id": 13,
+        "title": "Error Budget Remaining (24h projection)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "slo:error_budget_remaining:pct",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "yAxes": [
+          { "label": "Remaining", "min": 0, "max": 1, "format": "percentunit" },
+          { "show": false }
+        ],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 }
+      },
+      {
+        "id": 14,
+        "title": "Request 5xx Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "slo:req_error:ratio_rate5m",
+            "legendFormat": "{{service}} (5m)"
+          },
+          {
+            "expr": "slo:req_error:ratio_rate1h",
+            "legendFormat": "{{service}} (1h)"
+          }
+        ],
+        "yAxes": [{ "label": "Error Ratio", "min": 0 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 }
+      },
+      {
+        "id": 15,
+        "title": "System Resource SLOs",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "100 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100",
+            "legendFormat": "CPU Usage %"
+          },
+          {
+            "expr": "(node_memory_MemTotal - node_memory_MemAvailable) / node_memory_MemTotal * 100",
+            "legendFormat": "Memory Usage %"
+          },
+          {
+            "expr": "(1 - node_filesystem_avail / node_filesystem_size) * 100",
+            "legendFormat": "Disk Usage %"
+          }
+        ],
+        "yAxes": [{ "label": "Percent", "min": 0, "max": 100 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 }
+      },
+      {
+        "id": 16,
+        "title": "Caddy & Foresight MCP Status",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "up{job=\"caddy\"}",
+            "legendFormat": "Caddy"
+          },
+          {
+            "expr": "up{job=\"foresight-mcp\"}",
+            "legendFormat": "Foresight MCP"
+          }
+        ],
+        "yAxes": [{ "label": "Status", "min": 0, "max": 1 }, { "show": false }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 }
+      }
+    ]
+  }
+}
