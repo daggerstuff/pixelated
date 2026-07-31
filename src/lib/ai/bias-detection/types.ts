@@ -1,851 +1,865 @@
 // Types used by BiasDetectionEngine and tests
 
 export interface BiasThresholdsConfig {
-  warning: number
-  high: number
-  critical: number
+  warning: number;
+  high: number;
+  critical: number;
   /** @deprecated Use warning */
-  warningLevel?: number
+  warningLevel?: number;
   /** @deprecated Use high */
-  highLevel?: number
+  highLevel?: number;
   /** @deprecated Use critical */
-  criticalLevel?: number
+  criticalLevel?: number;
 }
 
 export interface BiasLayerWeights {
-  preprocessing: number
-  modelLevel: number
-  interactive: number
-  evaluation: number
+  preprocessing: number;
+  modelLevel: number;
+  interactive: number;
+  evaluation: number;
 }
 
-export type AlertLevel = 'low' | 'medium' | 'high' | 'critical'
+export type AlertLevel = "low" | "medium" | "high" | "critical";
 
 export interface DataQualityMetrics {
-  completeness: number
-  consistency: number
-  coverage?: number
-  accuracy: number
-  timeliness: number
-  validity: number
-  missingDataByDemographic: Record<string, number>
+  completeness: number;
+  consistency: number;
+  coverage?: number;
+  accuracy: number;
+  timeliness: number;
+  validity: number;
+  missingDataByDemographic: Record<string, number>;
 }
 
 export interface FairnessMetrics {
-  demographicParity: number
-  equalizedOdds: number
-  equalOpportunity: number
-  calibration: number
-  individualFairness: number
-  counterfactualFairness: number
+  demographicParity: number;
+  equalizedOdds: number;
+  equalOpportunity: number;
+  calibration: number;
+  individualFairness: number;
+  counterfactualFairness: number;
 }
 
 export interface ModelPerformanceMetrics {
-  accuracy: number
-  precision: number
-  recall: number
-  f1Score: number
-  auc: number
-  calibrationError: number
-  demographicBreakdown: Record<string, number>
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  auc: number;
+  calibrationError: number;
+  demographicBreakdown: Record<string, number>;
 }
 
 export interface BiasDetectionConfig {
-  environment?: string
-  pythonServiceUrl?: string
-  pythonServiceTimeout?: number
-  pythonServicePort?: number
-  thresholds?: BiasThresholdsConfig
-  layerWeights?: BiasLayerWeights
-  evaluationMetrics?: string[]
-  metricsConfig?: BiasMetricsConfig
-  alertConfig?: BiasAlertConfig
-  reportConfig?: BiasReportConfig
-  explanationConfig?: BiasExplanationConfig
-  pythonServiceConfig?: PythonServiceConfig
-  cacheConfig?: BiasCacheConfig
-  securityConfig?: SecurityConfig
-  performanceConfig?: PerformanceConfig
-  loggingConfig?: LoggingConfig
-  mlToolkitConfig?: MLToolkitConfig
-  hipaaCompliant?: boolean
-  dataMaskingEnabled?: boolean
-  auditLogging?: boolean
-  strictMode?: boolean
+  environment?: string;
+  pythonServiceUrl?: string;
+  pythonServiceTimeout?: number;
+  pythonServicePort?: number;
+  thresholds?: BiasThresholdsConfig;
+  layerWeights?: BiasLayerWeights;
+  evaluationMetrics?: string[];
+  metricsConfig?: BiasMetricsConfig;
+  alertConfig?: BiasAlertConfig;
+  reportConfig?: BiasReportConfig;
+  explanationConfig?: BiasExplanationConfig;
+  pythonServiceConfig?: PythonServiceConfig;
+  cacheConfig?: BiasCacheConfig;
+  securityConfig?: SecurityConfig;
+  performanceConfig?: PerformanceConfig;
+  loggingConfig?: LoggingConfig;
+  mlToolkitConfig?: MLToolkitConfig;
+  hipaaCompliant?: boolean;
+  dataMaskingEnabled?: boolean;
+  auditLogging?: boolean;
+  strictMode?: boolean;
   // Batch processing defaults
   batchProcessingConfig?: {
-    enabled?: boolean
-    batchSize?: number
-    maxBatchDelayMs?: number
-    retryFailedBatches?: boolean
-    maxRetryAttempts?: number
-    backoffStrategy?: 'fixed' | 'exponential'
-    enableDebug?: boolean
-    concurrency?: number
-    timeoutMs?: number
-    retries?: number
-  }
+    enabled?: boolean;
+    batchSize?: number;
+    maxBatchDelayMs?: number;
+    retryFailedBatches?: boolean;
+    maxRetryAttempts?: number;
+    backoffStrategy?: "fixed" | "exponential";
+    enableDebug?: boolean;
+    concurrency?: number;
+    timeoutMs?: number;
+    retries?: number;
+  };
 }
 
 export interface BiasMetricsConfig {
-  dataQualityMetrics?: Partial<DataQualityMetrics>
-  fairnessMetrics?: Partial<FairnessMetrics>
-  performanceMetrics?: Partial<ModelPerformanceMetrics>
-  enableRealTimeMonitoring?: boolean
-  metricsRetentionDays?: number
-  aggregationIntervals?: string[] // ['1h', '1d', '1w', '1m']
-  dashboardRefreshRate?: number // seconds
-  exportFormats?: string[] // ['json', 'csv', 'pdf']
+  dataQualityMetrics?: Partial<DataQualityMetrics>;
+  fairnessMetrics?: Partial<FairnessMetrics>;
+  performanceMetrics?: Partial<ModelPerformanceMetrics>;
+  enableRealTimeMonitoring?: boolean;
+  metricsRetentionDays?: number;
+  aggregationIntervals?: string[]; // ['1h', '1d', '1w', '1m']
+  dashboardRefreshRate?: number; // seconds
+  exportFormats?: string[]; // ['json', 'csv', 'pdf']
 }
 
 export interface BiasAlertConfig {
-  alertLevel?: AlertLevel
-  alertMessage?: string
-  alertLevels?: string[]
+  alertLevel?: AlertLevel;
+  alertMessage?: string;
+  alertLevels?: string[];
   alertThresholds?: {
-    low: number
-    medium: number
-    high: number
-    critical: number
-  }
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
   alertActions?: {
-    low: string[]
-    medium: string[]
-    high: string[]
-    critical: string[]
-  }
-  enableSlackNotifications?: boolean
-  enableEmailNotifications?: boolean
-  slackWebhookUrl?: string | undefined
-  emailRecipients?: string[]
-  alertCooldownMinutes?: number // Prevent alert spam
+    low: string[];
+    medium: string[];
+    high: string[];
+    critical: string[];
+  };
+  enableSlackNotifications?: boolean;
+  enableEmailNotifications?: boolean;
+  slackWebhookUrl?: string | undefined;
+  emailRecipients?: string[];
+  alertCooldownMinutes?: number; // Prevent alert spam
   escalationThresholds?: {
-    criticalResponseTimeMinutes: number
-    highResponseTimeMinutes: number
-  }
+    criticalResponseTimeMinutes: number;
+    highResponseTimeMinutes: number;
+  };
 }
 
 export interface BiasReportConfig {
-  reportTitle?: string
-  reportDescription?: string
-  reportFrequency?: 'daily' | 'weekly' | 'monthly'
-  reportFormats?: ('json' | 'csv' | 'pdf')[]
-  exportFormats?: ('json' | 'csv' | 'pdf')[]
-  reportDestinations?: ('console' | 'email' | 's3')[]
-  includeConfidentialityAnalysis?: boolean
-  includeDemographicBreakdown?: boolean
-  includeTemporalTrends?: boolean
-  includeRecommendations?: boolean
-  reportTemplate?: 'standard' | 'executive' | 'technical'
+  reportTitle?: string;
+  reportDescription?: string;
+  reportFrequency?: "daily" | "weekly" | "monthly";
+  reportFormats?: ("json" | "csv" | "pdf")[];
+  exportFormats?: ("json" | "csv" | "pdf")[];
+  reportDestinations?: ("console" | "email" | "s3")[];
+  includeConfidentialityAnalysis?: boolean;
+  includeDemographicBreakdown?: boolean;
+  includeTemporalTrends?: boolean;
+  includeRecommendations?: boolean;
+  reportTemplate?: "standard" | "executive" | "technical";
 }
 
 export interface BiasExplanationConfig {
-  explanationTitle?: string
-  explanationDescription?: string
-  explanationMethods?: ('shap' | 'lime' | 'integrated-gradients')[]
+  explanationTitle?: string;
+  explanationDescription?: string;
+  explanationMethods?: ("shap" | "lime" | "integrated-gradients")[];
   explanationThresholds?: {
-    low: number
-    medium: number
-    high: number
-    critical: number
-  }
-  explanationMethod?: 'shap' | 'lime' | 'integrated-gradients'
-  maxFeatures?: number
-  includeCounterfactuals?: boolean
-  generateVisualization?: boolean
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
+  explanationMethod?: "shap" | "lime" | "integrated-gradients";
+  maxFeatures?: number;
+  includeCounterfactuals?: boolean;
+  generateVisualization?: boolean;
 }
 
 export interface PythonServiceConfig {
-  host?: string
-  port?: number
-  timeout?: number
-  retries?: number
-  healthCheckInterval?: number
+  host?: string;
+  port?: number;
+  timeout?: number;
+  retries?: number;
+  healthCheckInterval?: number;
 }
 
 export interface BiasCacheConfig {
-  enabled?: boolean
-  ttl?: number // milliseconds
-  maxSize?: number
-  compressionEnabled?: boolean
-  compressionThreshold?: number
-  enableDistributedCache?: boolean
+  enabled?: boolean;
+  ttl?: number; // milliseconds
+  maxSize?: number;
+  compressionEnabled?: boolean;
+  compressionThreshold?: number;
+  enableDistributedCache?: boolean;
 }
 
 export interface SecurityConfig {
-  encryptionEnabled?: boolean
-  auditLoggingEnabled?: boolean
-  sessionTimeoutMs?: number
-  maxSessionSizeMB?: number
-  rateLimitPerMinute?: number
-  jwtSecret?: string
-  encryptionKey?: string
+  encryptionEnabled?: boolean;
+  auditLoggingEnabled?: boolean;
+  sessionTimeoutMs?: number;
+  maxSessionSizeMB?: number;
+  rateLimitPerMinute?: number;
+  jwtSecret?: string;
+  encryptionKey?: string;
   // Note: secrets should come from secure env vars, not config
 }
 
 export interface PerformanceConfig {
-  maxConcurrentAnalyses?: number
-  analysisTimeoutMs?: number
-  batchSize?: number
-  enableMetrics?: boolean
+  maxConcurrentAnalyses?: number;
+  analysisTimeoutMs?: number;
+  batchSize?: number;
+  enableMetrics?: boolean;
 }
 
 export interface LoggingConfig {
-  level?: string
-  enableConsole?: boolean
-  enableFile?: boolean
-  enableDebug?: boolean
-  filePath?: string
-  maxFileSize?: string
-  maxFiles?: number
-  enableStructured?: boolean
+  level?: string;
+  enableConsole?: boolean;
+  enableFile?: boolean;
+  enableDebug?: boolean;
+  filePath?: string;
+  maxFileSize?: string;
+  maxFiles?: number;
+  enableStructured?: boolean;
 }
 
 export interface MLToolkitConfig {
-  enabled?: boolean
-  framework?: 'tensorflow' | 'pytorch' | 'scikit-learn'
-  version?: string
-  tensorflow?: { enabled?: boolean; fallbackOnError?: boolean }
-  aif360?: { enabled?: boolean; fallbackOnError?: boolean }
-  fairlearn?: { enabled?: boolean; fallbackOnError?: boolean }
+  enabled?: boolean;
+  framework?: "tensorflow" | "pytorch" | "scikit-learn";
+  version?: string;
+  tensorflow?: { enabled?: boolean; fallbackOnError?: boolean };
+  aif360?: { enabled?: boolean; fallbackOnError?: boolean };
+  fairlearn?: { enabled?: boolean; fallbackOnError?: boolean };
   huggingFace?: {
-    enabled?: boolean
-    fallbackOnError?: boolean
-    apiKey?: string
-    model?: string
-  }
+    enabled?: boolean;
+    fallbackOnError?: boolean;
+    apiKey?: string;
+    model?: string;
+  };
   interpretability?: {
-    enabled?: boolean
-    fallbackOnError?: boolean
-    shap?: { enabled?: boolean }
-    lime?: { enabled?: boolean }
-  }
-  spacy?: { enabled?: boolean; fallbackOnError?: boolean; model?: string }
+    enabled?: boolean;
+    fallbackOnError?: boolean;
+    shap?: { enabled?: boolean };
+    lime?: { enabled?: boolean };
+  };
+  spacy?: { enabled?: boolean; fallbackOnError?: boolean; model?: string };
 }
 
 export interface GroupPerformanceComparison {
-  groupA: string
-  groupB: string
-  metric: string
-  valueA: number
-  valueB: number
-  disparity: number
+  groupA: string;
+  groupB: string;
+  metric: string;
+  valueA: number;
+  valueB: number;
+  disparity: number;
 }
 
 export interface TherapeuticSession {
-  sessionId: string
-  sessionDate?: string
-  sessionDuration?: number
-  sessionType?: string
-  sessionNotes?: string
-  participantDemographics?: ParticipantDemographics
-  scenario?: TrainingScenario
-  content?: SessionContent
-  aiResponses?: AIResponse[]
-  expectedOutcomes?: ExpectedOutcome[]
-  transcripts?: SessionTranscript[]
-  userInputs?: string[]
-  metadata?: SessionMetadata
-  timestamp?: Date
-  [key: string]: unknown
+  sessionId: string;
+  sessionDate?: string;
+  sessionDuration?: number;
+  sessionType?: string;
+  sessionNotes?: string;
+  participantDemographics?: ParticipantDemographics;
+  scenario?: TrainingScenario;
+  content?: SessionContent;
+  aiResponses?: AIResponse[];
+  expectedOutcomes?: ExpectedOutcome[];
+  transcripts?: SessionTranscript[];
+  userInputs?: string[];
+  metadata?: SessionMetadata;
+  timestamp?: Date;
+  [key: string]: unknown;
 }
 
 export interface ParticipantDemographics {
-  age?: string
-  gender?: string
-  ethnicity?: string
-  primaryLanguage?: string
-  socioeconomicStatus?: string
-  education?: string
-  region?: string
-  culturalBackground?: string[]
-  disabilityStatus?: string
+  age?: string;
+  gender?: string;
+  ethnicity?: string;
+  primaryLanguage?: string;
+  socioeconomicStatus?: string;
+  education?: string;
+  region?: string;
+  culturalBackground?: string[];
+  disabilityStatus?: string;
 }
 
 export interface TrainingScenario {
-  scenarioId: string
-  learningObjectives?: string[]
-  [key: string]: unknown
-  complexity?: 'low' | 'medium' | 'high' | 'intermediate' | 'advanced'
-  description?: string
+  scenarioId: string;
+  learningObjectives?: string[];
+  [key: string]: unknown;
+  complexity?: "low" | "medium" | "high" | "intermediate" | "advanced";
+  description?: string;
   type:
-    | 'depression'
-    | 'anxiety'
-    | 'trauma'
-    | 'substance-abuse'
-    | 'relationship-issues'
-    | 'general-wellness'
-  tags?: string[]
+    | "depression"
+    | "anxiety"
+    | "trauma"
+    | "substance-abuse"
+    | "relationship-issues"
+    | "general-wellness";
+  tags?: string[];
 }
 
 export interface SessionContent {
-  transcript?: string
-  aiResponses?: string[]
-  userInputs?: string[]
-  patientPresentation?: string
-  patientResponses?: string[]
-  therapeuticInterventions?: string[]
-  sessionNotes?: string
-  [key: string]: unknown
-  metadata?: Record<string, any>
+  transcript?: string;
+  aiResponses?: string[];
+  userInputs?: string[];
+  patientPresentation?: string;
+  patientResponses?: string[];
+  therapeuticInterventions?: string[];
+  sessionNotes?: string;
+  [key: string]: unknown;
+  metadata?: Record<string, any>;
 }
 
 export interface AIResponse {
-  responseId: string
-  text?: string
-  timestamp: Date
-  type?: 'diagnostic' | 'intervention' | 'risk-assessment' | 'recommendation'
-  content?: string
-  confidence?: number
-  modelUsed?: string
-  reasoning?: string
-  metadata?: Record<string, any>
+  responseId: string;
+  text?: string;
+  timestamp: Date;
+  type?: "diagnostic" | "intervention" | "risk-assessment" | "recommendation";
+  content?: string;
+  confidence?: number;
+  modelUsed?: string;
+  reasoning?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface ExpectedOutcome {
-  outcomeId: string
-  description: string
-  achieved: boolean
+  outcomeId: string;
+  description: string;
+  achieved: boolean;
 }
 
 export interface SessionTranscript {
-  speaker: 'user' | 'therapist' | 'ai'
-  speakerId?: string
-  text: string
-  content?: string
-  timestamp: Date
-  emotionalTone?: string
-  confidenceLevel?: number
+  speaker: "user" | "therapist" | "ai";
+  speakerId?: string;
+  text: string;
+  content?: string;
+  timestamp: Date;
+  emotionalTone?: string;
+  confidenceLevel?: number;
 }
 
 export interface SessionMetadata {
-  sessionStartTime?: Date
-  sessionEndTime?: Date
-  location?: string
-  device?: string
-  tags?: string[]
-  trainingInstitution?: string
-  traineeId?: string
-  sessionDuration?: number
-  completionStatus?: string
-  [key: string]: any
+  sessionStartTime?: Date;
+  sessionEndTime?: Date;
+  location?: string;
+  device?: string;
+  tags?: string[];
+  trainingInstitution?: string;
+  traineeId?: string;
+  sessionDuration?: number;
+  completionStatus?: string;
+  [key: string]: any;
 }
 
-export type BiasedTerm = string | { term: string; context: string; biasType: string; severity: string; suggestedAlternative: string }
+export type BiasedTerm =
+  | string
+  | {
+      term: string;
+      context: string;
+      biasType: string;
+      severity: string;
+      suggestedAlternative: string;
+    };
 
 export interface PreprocessingLayerResult {
-  biasScore: number
+  biasScore: number;
   linguisticBias: {
-    genderBiasScore: number
-    racialBiasScore: number
-    ageBiasScore: number
-    culturalBiasScore: number
-    overallBiasScore?: number
-    biasedTerms: Array<BiasedTerm>
+    genderBiasScore: number;
+    racialBiasScore: number;
+    ageBiasScore: number;
+    culturalBiasScore: number;
+    overallBiasScore?: number;
+    biasedTerms: Array<BiasedTerm>;
     sentimentAnalysis: {
-      positive?: number
-      neutral?: number
-      negative?: number
-      overallSentiment: number
-      emotionalValence: number
-      subjectivity: number
-      demographicVariations: Record<string, number>
-    }
-  }
+      positive?: number;
+      neutral?: number;
+      negative?: number;
+      overallSentiment: number;
+      emotionalValence: number;
+      subjectivity: number;
+      demographicVariations: Record<string, number>;
+    };
+  };
   representationAnalysis: {
-    representationParity?: number
-    minorityGroupScore?: number
-    demographicDistribution: Record<string, number>
-    underrepresentedGroups: string[]
-    overrepresentedGroups: string[]
-    diversityIndex: number
-    intersectionalityAnalysis: any[]
-  }
-  dataQualityMetrics: DataQualityMetrics
-  recommendations: string[]
-  detectedBiases?: string[]
-  fallbackMode?: boolean
-  serviceError?: string
-  layer?: string
-  timestamp?: string
-  sessionId?: string
+    representationParity?: number;
+    minorityGroupScore?: number;
+    demographicDistribution: Record<string, number>;
+    underrepresentedGroups: string[];
+    overrepresentedGroups: string[];
+    diversityIndex: number;
+    intersectionalityAnalysis: any[];
+  };
+  dataQualityMetrics: DataQualityMetrics;
+  recommendations: string[];
+  detectedBiases?: string[];
+  fallbackMode?: boolean;
+  serviceError?: string;
+  layer?: string;
+  timestamp?: string;
+  sessionId?: string;
 }
 
 export interface ModelLevelLayerResult {
-  biasScore: number
-  fairnessMetrics: FairnessMetrics
-  performanceMetrics: ModelPerformanceMetrics
-  groupPerformanceComparison: GroupPerformanceComparison[]
-  recommendations: string[]
-  detectedBiases?: string[]
-  fallbackMode?: boolean
-  serviceError?: string
+  biasScore: number;
+  fairnessMetrics: FairnessMetrics;
+  performanceMetrics: ModelPerformanceMetrics;
+  groupPerformanceComparison: GroupPerformanceComparison[];
+  recommendations: string[];
+  detectedBiases?: string[];
+  fallbackMode?: boolean;
+  serviceError?: string;
 }
 
 export interface InteractiveLayerResult {
-  biasScore: number
+  biasScore: number;
   counterfactualAnalysis: {
-    scenariosAnalyzed: number
-    biasDetected: boolean
-    consistencyScore: number
-    problematicScenarios: any[]
-  }
-  featureImportance: any[]
-  whatIfScenarios: any[]
-  recommendations: string[]
-  detectedBiases?: string[]
-  fallbackMode?: boolean
-  serviceError?: string
+    scenariosAnalyzed: number;
+    biasDetected: boolean;
+    consistencyScore: number;
+    problematicScenarios: any[];
+  };
+  featureImportance: any[];
+  whatIfScenarios: any[];
+  recommendations: string[];
+  detectedBiases?: string[];
+  fallbackMode?: boolean;
+  serviceError?: string;
 }
 
 export interface EvaluationLayerResult {
-  biasScore: number
+  biasScore: number;
   huggingFaceMetrics: {
-    toxicity: number
-    bias: number
-    regard: Record<string, number>
-    stereotype: number
-    fairness: number
-  }
+    toxicity: number;
+    bias: number;
+    regard: Record<string, number>;
+    stereotype: number;
+    fairness: number;
+  };
   customMetrics: {
-    therapeuticBias: number
-    culturalSensitivity: number
-    professionalEthics: number
-    patientSafety: number
-  }
+    therapeuticBias: number;
+    culturalSensitivity: number;
+    professionalEthics: number;
+    patientSafety: number;
+  };
   temporalAnalysis: {
-    trendDirection: 'stable' | 'increasing' | 'decreasing' | 'worsening'
-    changeRate: number
-    seasonalPatterns: any[]
-    interventionEffectiveness: any[]
-  }
-  recommendations: string[]
-  detectedBiases?: string[]
-  fallbackMode?: boolean
-  serviceError?: string
+    trendDirection: "stable" | "increasing" | "decreasing" | "worsening";
+    changeRate: number;
+    seasonalPatterns: any[];
+    interventionEffectiveness: any[];
+  };
+  recommendations: string[];
+  detectedBiases?: string[];
+  fallbackMode?: boolean;
+  serviceError?: string;
 }
 
-export type PreprocessingAnalysisResult = Partial<PreprocessingLayerResult>
-export type ModelLevelAnalysisResult = Partial<ModelLevelLayerResult>
-export type InteractiveAnalysisResult = Partial<InteractiveLayerResult>
-export type EvaluationAnalysisResult = Partial<EvaluationLayerResult>
+export type PreprocessingAnalysisResult = Partial<PreprocessingLayerResult>;
+export type ModelLevelAnalysisResult = Partial<ModelLevelLayerResult>;
+export type InteractiveAnalysisResult = Partial<InteractiveLayerResult>;
+export type EvaluationAnalysisResult = Partial<EvaluationLayerResult>;
 
 export type LayerResults = {
-  preprocessing: PreprocessingAnalysisResult
-  modelLevel: ModelLevelAnalysisResult
-  interactive: InteractiveAnalysisResult
-  evaluation: EvaluationAnalysisResult
-  [key: string]: unknown
-}
+  preprocessing: PreprocessingAnalysisResult;
+  modelLevel: ModelLevelAnalysisResult;
+  interactive: InteractiveAnalysisResult;
+  evaluation: EvaluationAnalysisResult;
+  [key: string]: unknown;
+};
 
 export interface BiasAnalysisResult {
-  sessionId: string
-  overallBiasScore: number
-  alertLevel: AlertLevel
-  confidence: number
-  layerResults: LayerResults
-  recommendations: string[]
-  timestamp: Date
-  demographics?: ParticipantDemographics
-  explanation?: string
-  error?: string
+  sessionId: string;
+  overallBiasScore: number;
+  alertLevel: AlertLevel;
+  confidence: number;
+  layerResults: LayerResults;
+  recommendations: string[];
+  timestamp: Date;
+  demographics?: ParticipantDemographics;
+  explanation?: string;
+  error?: string;
 }
 
-export type AnalysisResult = BiasAnalysisResult
+export type AnalysisResult = BiasAnalysisResult;
 
 export interface BiasAlert {
-  alertId: string
-  sessionId: string
-  timestamp?: Date | string
-  level: AlertLevel
-  message?: string
-  biasScore?: number
-  acknowledged?: boolean
-  status?: string
-  type?: string
-  resolvedAt?: Date
+  alertId: string;
+  sessionId: string;
+  timestamp?: Date | string;
+  level: AlertLevel;
+  message?: string;
+  biasScore?: number;
+  acknowledged?: boolean;
+  status?: string;
+  type?: string;
+  resolvedAt?: Date;
 }
 
 export interface BiasDashboardSummary {
-  totalSessions?: number
-  averageBiasScore?: number
-  alertsLayerBreakdown?: Record<string, number>
-  alertsLast24h?: number
-  activeAlerts?: number
-  totalAlerts?: number
-  highRiskSessions?: number
-  criticalAlerts?: number
-  trendDirection?: 'up' | 'down' | 'stable' | 'improving' | 'worsening'
-  alerts?: Record<AlertLevel, number>
-  complianceScore?: number
-  [key: string]: unknown
+  totalSessions?: number;
+  averageBiasScore?: number;
+  alertsLayerBreakdown?: Record<string, number>;
+  alertsLast24h?: number;
+  activeAlerts?: number;
+  totalAlerts?: number;
+  highRiskSessions?: number;
+  criticalAlerts?: number;
+  trendDirection?: "up" | "down" | "stable" | "improving" | "worsening";
+  alerts?: Record<AlertLevel, number>;
+  complianceScore?: number;
+  [key: string]: unknown;
 }
 
 export interface DashboardRecommendation {
-  id: string
-  title: string
-  description: string
-  priority: 'low' | 'medium' | 'high' | 'critical'
-  impact: string
-  action: string
-  actionUrl?: string
+  id: string;
+  title: string;
+  description: string;
+  priority: "low" | "medium" | "high" | "critical";
+  impact: string;
+  action: string;
+  actionUrl?: string;
 }
 
 export interface BiasDashboardData {
-  summary: BiasDashboardSummary
+  summary: BiasDashboardSummary;
   trends: Array<{
-    date: string
-    time?: string
-    biasScore: number
-    sessionCount: number
-    alertCount: number
-    demographicBreakdown?: Record<string, number>
-  }>
-  alerts: BiasAlert[]
+    date: string;
+    time?: string;
+    biasScore: number;
+    sessionCount: number;
+    alertCount: number;
+    demographicBreakdown?: DemographicBreakdown;
+  }>;
+  alerts: BiasAlert[];
   demographics: {
     [key: string]:
       | {
           [value: string]:
             | number
             | {
-                count: number
-                averageBias: number
+                count: number;
+                averageBias: number;
               }
-            | Record<string, unknown>
+            | Record<string, unknown>;
         }
-      | unknown[]
-  }
-  recentAnalyses: BiasAnalysisResult[]
-  recommendations: DashboardRecommendation[]
+      | unknown[];
+  };
+  recentAnalyses: BiasAnalysisResult[];
+  recommendations: DashboardRecommendation[];
 }
 
-export type DashboardData = BiasDashboardData
+export type DashboardData = BiasDashboardData;
 
 export interface SessionData {
-  sessionId: string
-  sessionDate?: string
-  sessionDuration?: number
-  sessionType?: string
-  sessionNotes?: string
+  sessionId: string;
+  sessionDate?: string;
+  sessionDuration?: number;
+  sessionType?: string;
+  sessionNotes?: string;
   sessionData?: {
-    transcript: string
+    transcript: string;
     metadata: {
-      age: string
-      gender: string
-      race: string
-      language: string
-    }
-  }
-  participantDemographics?: ParticipantDemographics
-  content?: SessionContent
-  [key: string]: unknown
+      age: string;
+      gender: string;
+      race: string;
+      language: string;
+    };
+  };
+  participantDemographics?: ParticipantDemographics;
+  content?: SessionContent;
+  [key: string]: unknown;
 }
 
 // Define CacheEntry type
 export interface CacheEntry<T = any> {
-  key: string
-  value: T
-  timestamp: Date
-  expiresAt: Date
-  accessCount: number
-  lastAccessed: Date
-  tags: string[]
+  key: string;
+  value: T;
+  timestamp: Date;
+  expiresAt: Date;
+  accessCount: number;
+  lastAccessed: Date;
+  tags: string[];
 }
 
 // Define CacheStats type
 export interface CacheStats {
-  totalEntries: number
-  hitRate: number
-  missRate: number
-  evictionCount: number
-  memoryUsage: number
-  oldestEntry: Date
-  newestEntry: Date
-  redisHits: number
-  redisMisses: number
-  memoryHits: number
-  memoryMisses: number
+  totalEntries: number;
+  hitRate: number;
+  missRate: number;
+  evictionCount: number;
+  memoryUsage: number;
+  oldestEntry: Date;
+  newestEntry: Date;
+  redisHits: number;
+  redisMisses: number;
+  memoryHits: number;
+  memoryMisses: number;
 }
 
 // Define BiasReport type
 export interface BiasReport {
-  reportId?: string
-  title?: string
-  description?: string
-  createdAt?: Date
-  generatedAt?: Date
-  timeRange?: { start: Date; end: Date }
-  overallFairnessScore?: number
-  recommendations?: string[]
+  reportId?: string;
+  title?: string;
+  description?: string;
+  createdAt?: Date;
+  generatedAt?: Date;
+  timeRange?: { start: Date; end: Date };
+  overallFairnessScore?: number;
+  recommendations?: string[];
   executiveSummary?: {
-    keyFindings: string[]
-    criticalIssues: string[]
-    improvementAreas: string[]
-    complianceStatus: string
-  }
+    keyFindings: string[];
+    criticalIssues: string[];
+    improvementAreas: string[];
+    complianceStatus: string;
+  };
   detailedAnalysis?: {
-    demographicAnalysis: any
-    temporalTrends: any
-    performanceAnalysis: any
-    interventionAnalysis: any
-  }
-  appendices?: any[]
-  data?: Record<string, any>
+    demographicAnalysis: any;
+    temporalTrends: any;
+    performanceAnalysis: any;
+    interventionAnalysis: any;
+  };
+  appendices?: any[];
+  data?: Record<string, any>;
   summary?: {
-    sessionCount: number
-    averageBiasScore: number
-  }
-  performance?: Record<string, unknown>
-  alerts?: Record<string, number>
-  [key: string]: unknown
+    sessionCount: number;
+    averageBiasScore: number;
+  };
+  performance?: Record<string, unknown>;
+  alerts?: Record<string, number>;
+  [key: string]: unknown;
 }
 
 export interface PerformanceSnapshot {
-  timestamp: number
+  timestamp: number;
   memoryUsage?: {
-    before: number
-    after: number
-    delta: number
-  }
+    before: number;
+    after: number;
+    delta: number;
+  };
   metrics: Array<{
-    name: string
-    value: number
-    unit: string
-  }>
+    name: string;
+    value: number;
+    unit: string;
+  }>;
   summary: {
-    averageResponseTime: number
-    requestCount: number
-    errorRate: number
+    averageResponseTime: number;
+    requestCount: number;
+    errorRate: number;
     /** P50 latency in ms (median) */
-    p50Latency: number
+    p50Latency: number;
     /** P95 latency in ms */
-    p95Latency: number
+    p95Latency: number;
     /** P99 latency in ms */
-    p99Latency: number
-  }
+    p99Latency: number;
+  };
 }
 
 export interface UserContext {
-  userId: string
-  email: string
+  userId: string;
+  email: string;
   role: {
-    id: string
-    name: string
-    description: string
-    level: number
-  }
-  permissions: string[]
-  institution?: string
-  department?: string
+    id: string;
+    name: string;
+    description: string;
+    level: number;
+  };
+  permissions: string[];
+  institution?: string;
+  department?: string;
 }
 
 export interface AuditAction {
-  type: string
-  category: string
-  description: string
-  sensitivityLevel: 'low' | 'medium' | 'high' | 'critical'
+  type: string;
+  category: string;
+  description: string;
+  sensitivityLevel: "low" | "medium" | "high" | "critical";
 }
 
 export interface AuditLogEntry {
-  id: string
-  timestamp: Date
-  userId: string
-  userEmail: string
-  action: AuditAction
-  resource: string
-  details: Record<string, unknown>
-  ipAddress: string
-  userAgent: string
-  success: boolean
-  resourceId?: string
-  sessionId?: string
-  errorMessage?: string
+  id: string;
+  timestamp: Date;
+  userId: string;
+  userEmail: string;
+  action: AuditAction;
+  resource: string;
+  details: Record<string, unknown>;
+  ipAddress: string;
+  userAgent: string;
+  success: boolean;
+  resourceId?: string;
+  sessionId?: string;
+  errorMessage?: string;
 }
 
 export interface DataAccessLog {
-  id: string
-  timestamp: Date
-  userId: string
-  dataType: string
-  dataIds: string[]
-  accessReason: string
-  retentionPeriod: number
-  anonymized: boolean
-  approvedBy?: string
+  id: string;
+  timestamp: Date;
+  userId: string;
+  dataType: string;
+  dataIds: string[];
+  accessReason: string;
+  retentionPeriod: number;
+  anonymized: boolean;
+  approvedBy?: string;
 }
 
 export interface RetentionPolicy {
-  dataType: string
-  retentionPeriod: number
-  autoDelete: boolean
-  archiveBeforeDelete: boolean
-  approvalRequired: boolean
+  dataType: string;
+  retentionPeriod: number;
+  autoDelete: boolean;
+  archiveBeforeDelete: boolean;
+  approvalRequired: boolean;
 }
 
 export interface DataRetentionStatus {
-  totalRecords: number
-  recordsNearExpiry: number
-  expiredRecords: number
-  retentionPolicies: RetentionPolicy[]
-  lastCleanup: Date
+  totalRecords: number;
+  recordsNearExpiry: number;
+  expiredRecords: number;
+  retentionPolicies: RetentionPolicy[];
+  lastCleanup: Date;
 }
 
 export interface EncryptionStatus {
   dataAtRest: {
-    encrypted: boolean
-    algorithm: string
-    keyRotationDate: Date
-  }
+    encrypted: boolean;
+    algorithm: string;
+    keyRotationDate: Date;
+  };
   dataInTransit: {
-    encrypted: boolean
-    protocol: string
-    certificateExpiry: Date
-  }
+    encrypted: boolean;
+    protocol: string;
+    certificateExpiry: Date;
+  };
   backups: {
-    encrypted: boolean
-    location: string
-    lastBackup: Date
-  }
+    encrypted: boolean;
+    location: string;
+    lastBackup: Date;
+  };
 }
 
 export interface ComplianceViolation {
-  id: string
-  type: string
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  description: string
-  detectedAt: Date
-  remediation: string[]
+  id: string;
+  type: string;
+  severity: "low" | "medium" | "high" | "critical";
+  description: string;
+  detectedAt: Date;
+  remediation: string[];
 }
 
 export interface ComplianceRecommendation {
-  id: string
-  category: string
-  priority: 'low' | 'medium' | 'high' | 'critical'
-  title: string
-  description: string
-  implementationSteps: string[]
-  timeline: string
-  complianceStandards: string[]
+  id: string;
+  category: string;
+  priority: "low" | "medium" | "high" | "critical";
+  title: string;
+  description: string;
+  implementationSteps: string[];
+  timeline: string;
+  complianceStandards: string[];
 }
 
 export interface ComplianceReport {
-  id: string
-  generatedAt: Date
-  period: { start: Date; end: Date }
-  complianceScore: number
-  violations: ComplianceViolation[]
-  recommendations: ComplianceRecommendation[]
-  auditTrail: AuditLogEntry[]
-  dataRetentionStatus: DataRetentionStatus
-  encryptionStatus: EncryptionStatus
+  id: string;
+  generatedAt: Date;
+  period: { start: Date; end: Date };
+  complianceScore: number;
+  violations: ComplianceViolation[];
+  recommendations: ComplianceRecommendation[];
+  auditTrail: AuditLogEntry[];
+  dataRetentionStatus: DataRetentionStatus;
+  encryptionStatus: EncryptionStatus;
 }
 
 export interface ConfigurationUpdate {
-  id?: string
-  timestamp?: Date
-  userId?: string
-  reason?: string
-  rollbackAvailable?: boolean
-  section: string
-  user?: string
-  changesApplied?: boolean
+  id?: string;
+  timestamp?: Date;
+  userId?: string;
+  reason?: string;
+  rollbackAvailable?: boolean;
+  section: string;
+  user?: string;
+  changesApplied?: boolean;
   changes: Array<{
-    field: string
-    oldValue: any
-    newValue: any
-    impact: 'low' | 'medium' | 'high' | 'critical'
-    requiresRestart: boolean
-  }>
-  [key: string]: unknown
+    field: string;
+    oldValue: any;
+    newValue: any;
+    impact: "low" | "medium" | "high" | "critical";
+    requiresRestart: boolean;
+  }>;
+  [key: string]: unknown;
 }
 
 export interface BiasSummaryStats {
-  totalSessions: number
-  averageBiasScore: number
-  alertsLayerBreakdown: Record<string, number>
-  alertsLast24h: number
-  activeAlerts: number
-  trendDirection: 'up' | 'down' | 'stable' | 'increasing' | 'decreasing' | 'worsening'
-  alerts: Record<AlertLevel, number>
-  criticalIssues: number
-  improvementRate: number
-  complianceScore: number
+  totalSessions: number;
+  averageBiasScore: number;
+  alertsLayerBreakdown: Record<string, number>;
+  alertsLast24h: number;
+  activeAlerts: number;
+  trendDirection: "up" | "down" | "stable" | "increasing" | "decreasing" | "worsening";
+  alerts: Record<AlertLevel, number>;
+  criticalIssues: number;
+  improvementRate: number;
+  complianceScore: number;
 }
 
 export interface BiasTrendData {
-  date: string
-  biasScore: number
-  sessionCount: number
-  alertCount: number
-  demographicBreakdown: Record<string, number>
+  date: string;
+  biasScore: number;
+  sessionCount: number;
+  alertCount: number;
+  demographicBreakdown: DemographicBreakdown;
 }
 
 export interface DemographicBreakdown {
   [dimension: string]: {
     [value: string]: {
-      count: number
-      averageBias: number
-    }
-  }
+      count: number;
+      averageBias: number;
+    };
+  };
 }
 
 export interface BiasDetectionEvent {
-  type: string
-  payload: any
-  timestamp: Date
+  type: string;
+  payload: any;
+  timestamp: Date;
 }
 
 // WebSocket message types for real-time bias detection
 export interface WebSocketMessage {
-  type: string
-  timestamp: Date
-  sessionId?: string
-  data: unknown
+  type: string;
+  timestamp: Date;
+  sessionId?: string;
+  data: unknown;
 }
 
 export interface BiasAlertWebSocketEvent extends WebSocketMessage {
-  type: 'bias-alert'
+  type: "bias-alert";
   data: {
-    alert: BiasAlert
-    analysisResult: BiasAnalysisResult
-    requiresImmediateAction: boolean
-  }
+    alert: BiasAlert;
+    analysisResult: BiasAnalysisResult;
+    requiresImmediateAction: boolean;
+  };
 }
 
 export interface DashboardUpdateWebSocketEvent extends WebSocketMessage {
-  type: 'dashboard-update'
+  type: "dashboard-update";
   data: {
-    summary: BiasDashboardSummary
-    newAlerts: BiasAlert[]
-    updatedTrends: BiasTrendData[]
-  }
+    summary: BiasDashboardSummary;
+    newAlerts: BiasAlert[];
+    updatedTrends: BiasTrendData[];
+  };
 }
 
 export interface SystemStatusWebSocketEvent extends WebSocketMessage {
-  type: 'system-status'
+  type: "system-status";
   data: {
-    status: 'healthy' | 'degraded' | 'unhealthy' | 'error' | 'authenticated' | 'authentication_failed' | 'heartbeat'
-    timestamp: Date
+    status:
+      | "healthy"
+      | "degraded"
+      | "unhealthy"
+      | "error"
+      | "authenticated"
+      | "authentication_failed"
+      | "heartbeat";
+    timestamp: Date;
     services?: {
-      pythonService: { status: 'up' | 'down'; lastCheck: Date }
-      database: { status: 'up' | 'down'; lastCheck: Date }
-      cache: { status: 'up' | 'down'; lastCheck: Date }
-      alertSystem: { status: 'up' | 'down'; lastCheck: Date }
-    }
-    version?: string
-    uptime?: number
-    error?: string
-    userId?: string
-    permissions?: string[]
-  }
+      pythonService: { status: "up" | "down"; lastCheck: Date };
+      database: { status: "up" | "down"; lastCheck: Date };
+      cache: { status: "up" | "down"; lastCheck: Date };
+      alertSystem: { status: "up" | "down"; lastCheck: Date };
+    };
+    version?: string;
+    uptime?: number;
+    error?: string;
+    userId?: string;
+    permissions?: string[];
+  };
 }
 
 export interface AnalysisCompleteWebSocketEvent extends WebSocketMessage {
-  type: 'analysis-complete'
+  type: "analysis-complete";
   data: {
-    sessionId: string
-    result: BiasAnalysisResult
-    processingTime: number
-  }
+    sessionId: string;
+    result: BiasAnalysisResult;
+    processingTime: number;
+  };
 }
-
