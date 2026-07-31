@@ -25,11 +25,16 @@
   --np-selection-text: oklch(0.93 0 0);
 
   /* =============================================
-     TYPOGRAPHY — Pure Monospace Technical Instrument
-     Zero generic SaaS fonts (Public Sans / Inter / Fraunces purged)
+     TYPOGRAPHY — Structure in mono, prose in grotesque
+     Zero generic SaaS webfonts (Public Sans / Inter / Fraunces purged).
+     Structure (display/headings/labels/data/chrome) is JetBrains Mono — the
+     instrument voice. Reading-length prose is a neutral system grotesque so
+     paragraphs are never set in a fixed-width face. See DESIGN.md Typography.
      ============================================= */
   --np-font-display: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --np-font-body: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --np-font-body:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
   --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   /* Weights */
