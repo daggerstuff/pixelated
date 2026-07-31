@@ -451,7 +451,9 @@ export class AnalyticsService {
           language:
             typeof navigator !== 'undefined' ? navigator.language : 'unknown',
           platform:
-            typeof navigator !== 'undefined' ? navigator.platform : 'server',
+            typeof navigator !== 'undefined'
+              ? (navigator as Navigator & { platform: string }).platform
+              : 'server',
           screenSize:
             typeof window !== 'undefined'
               ? `${window.innerWidth}x${window.innerHeight}`

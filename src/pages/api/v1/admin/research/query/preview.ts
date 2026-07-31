@@ -1,7 +1,5 @@
-import type { APIRoute } from 'astro'
 import { protectRoute } from '../../../../../../lib/auth/serverAuth'
-import { dslToSQL, createQueryFromRequest, type ResearchQueryRequest } from '../../../../../../lib/research/services/QueryDSL'
-import { getQueryOutputFormatter } from '../../../../../../lib/research/services/QueryOutputFormatter'
+import { dslToSQL, type ResearchQueryRequest } from '../../../../../../lib/research/services/QueryDSL'
 
 export const prerender = false
 
