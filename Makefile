@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build
 
 .DEFAULT_GOAL := help
 
@@ -67,6 +67,34 @@ docker-down: ## Stop database containers
 
 docker-logs: ## Tail database container logs
 	docker compose -f docker/docker-compose.db.yml logs -f
+
+# ── Unified Backend Stack ─────────────────────────────────
+
+# Sources .env.backend into the shell so compose interpolation sees
+# POSTGRES_PASSWORD / REDIS_PASSWORD / etc., then runs compose.
+BACKEND_COMPOSE := set -a; . ./.env.backend; set +a; docker compose -f docker/docker-compose.backend.yml
+
+backend-up: ## Start the full backend stack (databases + APIs + services + monitoring)
+	$(BACKEND_COMPOSE) up -d
+
+backend-down: ## Stop the full backend stack
+	$(BACKEND_COMPOSE) down
+
+backend-logs: ## Tail backend stack logs
+	$(BACKEND_COMPOSE) logs -f
+
+backend-reset: ## Stop and reset the backend stack (removes volumes)
+	$(BACKEND_COMPOSE) down -v
+	$(BACKEND_COMPOSE) up -d
+
+backend-ps: ## Show backend stack container status
+	$(BACKEND_COMPOSE) ps
+
+backend-build: ## Build (or rebuild) all backend service images
+	$(BACKEND_COMPOSE) build
+
+backend-health: ## Check all backend services health
+	./scripts/devops/backend-health-check.sh
 
 # ── Setup ───────────────────────────────────────────────
 

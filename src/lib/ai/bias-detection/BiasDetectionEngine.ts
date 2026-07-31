@@ -130,7 +130,7 @@ export class BiasDetectionEngine {
     };
 
     this.config = {
-      pythonServiceUrl: cfg["pythonServiceUrl"] ?? "http://localhost:5000",
+      pythonServiceUrl: cfg["pythonServiceUrl"] ?? process.env["BIAS_DETECTION_SERVICE_URL"] ?? "http://localhost:5000",
       pythonServiceTimeout: cfg["pythonServiceTimeout"] ?? 30000,
       thresholds: normalizedThresholds,
       layerWeights: cfg["layerWeights"] ?? DEFAULT_WEIGHTS,
@@ -261,7 +261,14 @@ export class BiasDetectionEngine {
 
   async initialize() {
     // Be tolerant of mocks that don't provide initialize
-    await this.pythonService.initialize();
+    try {
+      await this.pythonService.initialize();
+    } catch (error) {
+      logger.warn(
+        "Python bias service unavailable at startup; using in-JS fallback analysis",
+        { error },
+      );
+    }
     await this.alertSystem.initialize();
     this.initialized = true;
   }
