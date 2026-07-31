@@ -170,8 +170,8 @@ def rolling_window(self, window=timedelta(days=7), threshold=3):
 - [x] Test: `ai/tests/test_receipts.py` (4 tests pass)
 - [x] Core: `ai/receipts/receipt.py` (ReceiptEnvelope + Ledger)
 - [x] Emission: `ai/safety/inference_safety_filter.py:240-262`
-- [ ] Receipt persistence (SQLite/PostgreSQL)
-- [ ] FHE ciphertext hash integration
+- [x] Receipt persistence (SQLite/PostgreSQL)
+- [x] FHE ciphertext hash integration
 - [x] Receipt root hash propagation to bias detection result
 
 ### L4 — JIT Trigger Engine (COMPLETED)
@@ -190,7 +190,7 @@ def rolling_window(self, window=timedelta(days=7), threshold=3):
 - [x] **INT-2**: Wire receipt_root_hash through bias detection pipeline
 - [x] **INT-3**: Build JIT scenario injector (Nightmare Fuel → session block)
 - [x] **INT-4**: Per-clinician rolling windows + persistence
-- [ ] **INT-5**: Receipt ledger persistence + audit export
+- [x] **INT-5**: Receipt ledger persistence + audit export
 
 ---
 
