@@ -58,7 +58,6 @@ jobs:
           cache-key-prefix: '${{ env.PNPM_CACHE_VERSION }}'
 
       - name: Format check
-        continue-on-error: true
         env:
           PR_BASE_SHA:
             ${{ github.event_name == 'pull_request' &&
@@ -72,31 +71,25 @@ jobs:
           fi
 
       - name: Check for unresolved imports
-        continue-on-error: true
         run: pnpm lint:ci:imports
 
       - name: Lint code
-        continue-on-error: true
         run: pnpm lint:ci
 
       - name: Lint markdown
-        continue-on-error: true
         run: pnpm lint:markdown:ci
 
       - name: Check for unused exports
-        continue-on-error: true
         run: pnpm lint:ci:unused-exports
 
       - name: Check astro hints against baseline
-        continue-on-error: true
         run: node scripts/ci/check-astro-hints.mjs
 
       - name: Run unit tests
-        continue-on-error: true
         run: |
           # Timeout prevents hanging integration tests (no Redis/Auth0 in CI)
-          # from consuming the entire job budget. The step continues regardless.
-          timeout 10m pnpm test || true
+          # from consuming the entire job budget.
+          timeout 10m pnpm test
 
       - name: Build Docker image
         id: build-image
@@ -112,7 +105,6 @@ jobs:
           NODE_OPTIONS:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
             || '--no-deprecation' }}
-        continue-on-error: true
         with:
           image-ref:
             pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}

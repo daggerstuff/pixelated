@@ -1,9 +1,4 @@
-import { Pool } from 'pg'
-
-// Database connection pool
-const pool = new Pool({
-  connectionString: process.env['DATABASE_URL'],
-})
+import { getPool } from '../../../lib/db'
 
 export const POST: import('astro').APIRoute = async ({ request }) => {
   try {
@@ -17,7 +12,7 @@ export const POST: import('astro').APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
       // Update session with progress metrics if provided
       if (progressMetrics) {
@@ -83,7 +78,7 @@ export const GET = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
       const query = `
         SELECT progress_metrics, progress_snapshots, skill_scores
