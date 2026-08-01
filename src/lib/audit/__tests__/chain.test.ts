@@ -120,20 +120,38 @@ describe('verifyAuditChain', () => {
 describe('AuditLogger persistence builds a hash chain', () => {
   function makeFakeDb() {
     const store: AuditEvent[] = []
-    const collection = () => ({
-      find: () => ({
-        sort: () => ({
-          limit: () => ({
-            toArray: async () =>
-              store.length ? [store[store.length - 1]] : [],
+    let cursorSeq = 0
+    let cursorHash = GENESIS
+    
+    const collection = (name: string) => {
+      if (name === 'chain_audit_cursor') {
+        return {
+          findOneAndUpdate: async () => {
+            const prevSeq = cursorSeq
+            const prevHash = cursorHash
+            cursorSeq += 1
+            return { seq: prevSeq, hash: prevHash }
+          },
+        }
+      }
+      return {
+        find: () => ({
+          sort: () => ({
+            limit: () => ({
+              toArray: async () =>
+                store.length ? [store[store.length - 1]] : [],
+            }),
           }),
         }),
-      }),
-      insertOne: async (doc: AuditEvent) => {
-        store.push(doc)
-        return { insertedId: (doc as { _id?: unknown })._id }
-      },
-    })
+        insertOne: async (doc: AuditEvent) => {
+          store.push(doc)
+          if (doc.hash) {
+            cursorHash = doc.hash
+          }
+          return { insertedId: (doc as { _id?: unknown })._id }
+        },
+      }
+    }
     return { collection, store }
   }
 
