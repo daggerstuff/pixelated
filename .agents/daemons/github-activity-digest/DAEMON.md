@@ -4,10 +4,12 @@ purpose: Publish one low-noise daily digest of meaningful GitHub pull request an
 routines:
   - Collect meaningful GitHub pull request and CI activity since the previous scheduled run.
   - Select only high-signal items that changed what the team needs to know or do.
-  - Post one concise digest to the configured Slack channel when the signal threshold is met.
+  - When a verified Slack destination is configured, post one concise digest if the signal threshold is met and no digest exists for the UTC date.
 deny:
   - Do not modify GitHub state.
+  - Do not post when the Slack destination is missing or unverified.
   - Do not create more than one digest message for the same UTC date.
+  - Do not post threaded retries or quiet-day confirmation messages.
   - Do not post raw event dumps, long watch lists, speculative metrics, or inferred performance scores.
   - Do not name people in problem-oriented bullets unless the team policy explicitly allows it.
   - Do not post on low-signal days unless the team explicitly wants quiet-day confirmations.
@@ -18,9 +20,10 @@ schedule: "0 15 * * 1-5"
 
 ## Repository configuration
 
-Use this repository-specific value:
+Repository policy:
 
-- Slack channel: `<slack_channel_name>`
+- Slack destination: none configured or verified.
+- Until a destination is explicitly configured and verified, no-op silently without posting.
 
 ## Scope
 
@@ -62,7 +65,11 @@ No-op silently when there has been no repository activity since the previous sch
 
 Use `references/digest-template.md`.
 
-Format the Slack message with Slack `mrkdwn`, not standard Markdown. Use Slack link syntax (`<url|label>`), bold section labels with `*text*`, and plain hyphen bullets. Do not use Markdown headings, Markdown links (`[label](url)`), tables, nested lists, or code fences in the final Slack message.
+Start each top-level digest with the immutable exact marker `GitHub daily digest (YYYY-MM-DD UTC)`, substituting the current UTC date.
+
+Format the Slack message with Slack `mrkdwn`, not standard Markdown. Use Slack link syntax (`<url|label>`), bold section labels with `*text*`, and plain hyphen bullets.
+
+Do not use Markdown headings, Markdown links (`[label](url)`), tables, nested lists, or code fences in the final Slack message.
 
 Limits:
 
@@ -73,6 +80,12 @@ Limits:
 
 ## Communication policy
 
-No-op silently when no item meets the signal threshold, duplicate detection shows today's digest already exists, or required configuration is missing.
+Before posting, inspect recent messages in the configured channel and the prior activation context for a Charlie-authored message with today's exact immutable marker.
+
+If found, no-op silently.
+
+On retry or after ambiguous delivery, re-check for the exact marker before any further post attempt. Create at most one top-level digest per UTC date; do not use a thread for a retry.
+
+No-op silently when no item meets the signal threshold, duplicate detection shows today's digest already exists, or the Slack destination is missing or unverified.
 
 Do not post a digest asking for configuration or policy decisions. Surface blockers only when a configured safe Slack channel exists and human action is required.
