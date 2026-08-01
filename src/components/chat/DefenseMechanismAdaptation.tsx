@@ -25,7 +25,11 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
         : 'text-[#b0b0b0]'
 
   const trendSymbol =
-    defense.trend === 'increasing' ? '↑' : defense.trend === 'decreasing' ? '↓' : '→'
+    defense.trend === 'increasing'
+      ? '↑'
+      : defense.trend === 'decreasing'
+        ? '↓'
+        : '→'
 
   return (
     <div className="border border-white/10 bg-[#121212] p-4">
@@ -119,7 +123,12 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
       name: defense.name.replace('-', ' '),
       x,
       y,
-      anchor: Math.abs(Math.cos(angle)) < 0.1 ? 'middle' : Math.cos(angle) > 0 ? 'start' : 'end',
+      anchor:
+        Math.abs(Math.cos(angle)) < 0.1
+          ? 'middle'
+          : Math.cos(angle) > 0
+            ? 'start'
+            : 'end',
     }
   })
 
@@ -184,7 +193,7 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
             key={index}
             x={label.x}
             y={label.y}
-            textAnchor={label.anchor}
+            textAnchor={label.anchor as 'start' | 'middle' | 'end'}
             dominantBaseline="middle"
             className="fill-[#b0b0b0] text-[8px]"
           >
@@ -223,7 +232,8 @@ export function DefenseMechanismAdaptation({
           Defense mechanism adaptation
         </h2>
         <p className="mt-2 text-sm text-[#b0b0b0]">
-          No defense mechanisms tracked yet. Defense patterns are analyzed during therapy sessions.
+          No defense mechanisms tracked yet. Defense patterns are analyzed
+          during therapy sessions.
         </p>
       </section>
     )
@@ -233,10 +243,7 @@ export function DefenseMechanismAdaptation({
     defenses.reduce((sum, d) => sum + d.adaptationScore, 0) / defenses.length
 
   return (
-    <section
-      className={className}
-      aria-labelledby="defense-adaptation-heading"
-    >
+    <section className={className} aria-labelledby="defense-adaptation-heading">
       <div className="mb-4">
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
           Psychological defenses

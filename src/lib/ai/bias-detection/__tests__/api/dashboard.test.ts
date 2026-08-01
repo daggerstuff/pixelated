@@ -71,14 +71,14 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         biasScore: 0.32,
         sessionCount: 25,
         alertCount: 3,
-        demographicBreakdown: { age: 0.3, gender: 0.2 },
+        demographicBreakdown: { age: { '18-24': { count: 1, averageBias: 0.3 } }, gender: { male: { count: 1, averageBias: 0.2 } } },
       },
       {
         date: '2024-01-15T00:00:00.000Z',
         biasScore: 0.35,
         sessionCount: 28,
         alertCount: 4,
-        demographicBreakdown: { age: 0.35, gender: 0.25 },
+        demographicBreakdown: { age: { '18-24': { count: 1, averageBias: 0.35 } }, gender: { male: { count: 1, averageBias: 0.25 } } },
       },
     ],
     demographics: {

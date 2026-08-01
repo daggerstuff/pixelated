@@ -1,9 +1,12 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, type Mock } from 'vitest'
+
 import { SealMemoryManager, SealResourceScope } from '../seal-memory'
 import type { Disposable } from '../seal-memory'
 
-function createMockDisposable(name?: string): Disposable & { delete: ReturnType<typeof vi.fn> } {
-  return { delete: vi.fn() }
+function createMockDisposable(
+  name?: string,
+): Disposable & { delete: Mock<() => void> } {
+  return { delete: vi.fn() as Mock<() => void> }
 }
 
 describe('SealMemoryManager', () => {
@@ -73,7 +76,11 @@ describe('SealMemoryManager', () => {
 
     it('handles delete errors without throwing', () => {
       const manager = new SealMemoryManager()
-      const obj = { delete: vi.fn(() => { throw new Error('delete failed') }) }
+      const obj = {
+        delete: vi.fn(() => {
+          throw new Error('delete failed')
+        }),
+      }
       manager.track(obj, 'failing')
       expect(() => manager.release(obj, 'failing')).not.toThrow()
     })
@@ -120,7 +127,11 @@ describe('SealMemoryManager', () => {
     it('continues releasing even if one delete throws', () => {
       const manager = new SealMemoryManager()
       const good1 = createMockDisposable()
-      const bad = { delete: vi.fn(() => { throw new Error('boom') }) }
+      const bad = {
+        delete: vi.fn(() => {
+          throw new Error('boom')
+        }),
+      }
       const good2 = createMockDisposable()
       manager.track(good1, 'g1')
       manager.track(bad as Disposable, 'bad')

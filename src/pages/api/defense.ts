@@ -36,13 +36,17 @@ type DefenseMechanismName = (typeof VALID_MECHANISMS)[number]
  * Validate defense mechanism name
  */
 const isValidMechanism = (name: unknown): name is DefenseMechanismName =>
-  typeof name === 'string' && VALID_MECHANISMS.includes(name as DefenseMechanismName)
+  typeof name === 'string' &&
+  VALID_MECHANISMS.includes(name as DefenseMechanismName)
 
 /**
  * Validate intensity score (0-5 scale)
  */
 const isValidIntensity = (value: unknown): value is number =>
-  typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 5
+  typeof value === 'number' &&
+  Number.isFinite(value) &&
+  value >= 0 &&
+  value <= 5
 
 /**
  * Validate turn number
@@ -110,7 +114,9 @@ export const POST: APIRoute = async ({ request }) => {
 
       if (!isValidIntensity(intensity)) {
         return new Response(
-          JSON.stringify({ error: 'Intensity must be a number between 0 and 5' }),
+          JSON.stringify({
+            error: 'Intensity must be a number between 0 and 5',
+          }),
           { status: 400, headers: { 'Content-Type': 'application/json' } },
         )
       }
@@ -257,16 +263,23 @@ export const GET: APIRoute = async ({ request }) => {
 
       const result = await client.query(queryText, params)
 
-      const readings: DefenseMechanismRecord[] = result.rows.map((row) => ({
-        mechanism: row.mechanism,
-        intensity: row.intensity,
-        turn: row.turn,
-        sessionId: row.session_id,
-        therapistId: row.therapist_id ?? undefined,
-        createdAt: row.created_at instanceof Date
-          ? row.created_at.toISOString()
-          : String(row.created_at),
-      }))
+      const readings: DefenseMechanismRecord[] = (
+        result.rows as Record<string, unknown>[]
+      ).map((row) => {
+        const therapistId = row['therapist_id'] as string | null | undefined
+        const createdAtRaw = row['created_at']
+        return {
+          mechanism: String(row['mechanism']),
+          intensity: Number(row['intensity']),
+          turn: Number(row['turn']),
+          sessionId: String(row['session_id']),
+          therapistId: therapistId ? String(therapistId) : undefined,
+          createdAt:
+            createdAtRaw instanceof Date
+              ? createdAtRaw.toISOString()
+              : String(createdAtRaw as string | number),
+        }
+      })
 
       return new Response(
         JSON.stringify({

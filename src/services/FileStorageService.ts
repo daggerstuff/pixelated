@@ -159,9 +159,13 @@ export class FileStorageService {
       },
     })
 
-    const uploadUrl = await getSignedUrl(this.s3Client, command, {
-      expiresIn: 3600,
-    })
+    const uploadUrl = await getSignedUrl(
+      this.s3Client as unknown as Parameters<typeof getSignedUrl>[0],
+      command,
+      {
+        expiresIn: 3600,
+      },
+    )
 
     const fileUrl = this.cloudFrontDomain
       ? `https://${this.cloudFrontDomain}/${key}`
@@ -179,7 +183,11 @@ export class FileStorageService {
       Key: fileKey,
     })
 
-    return getSignedUrl(this.s3Client, command, { expiresIn })
+    return getSignedUrl(
+      this.s3Client as unknown as Parameters<typeof getSignedUrl>[0],
+      command,
+      { expiresIn },
+    )
   }
 
   async deleteFile(fileKey: string): Promise<void> {

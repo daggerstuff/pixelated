@@ -11,6 +11,8 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "src/lib/auth/__tests__/integration.test.ts",
   "src/lib/auth/auth0-jwt-service.ts",
   "src/lib/auth/__tests__/middleware.test.ts",
+  "src/lib/encryption.ts",
+  "src/lib/hooks/journal-research/useWebSocket.ts",
   "src/lib/research/ResearchPlatform.ts",
   "src/lib/research/services/HIPAADataService.ts",
   "src/tests/api/session/skills-api.test.ts",

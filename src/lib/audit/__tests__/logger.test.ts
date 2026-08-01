@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   warn: vi.fn(),
   error: vi.fn(),
   debug: vi.fn(),
-  scanContent: vi.fn(() => null),
+  scanContent: vi.fn<() => { redactedContent?: string } | null>(() => null),
   uuid: vi.fn(() => 'audit-event-1'),
   connect: vi.fn(),
 }))
@@ -49,7 +49,9 @@ describe('AuditLogger', () => {
       const auditLogger = AuditLogger.getInstance()
 
       vi.spyOn(
-        auditLogger as unknown as { persistEventWithRetry: () => Promise<void> },
+        auditLogger as unknown as {
+          persistEventWithRetry: () => Promise<void>
+        },
         'persistEventWithRetry',
       ).mockRejectedValueOnce(new Error('MongoDB unavailable'))
 
@@ -122,10 +124,10 @@ describe('AuditLogger', () => {
 
       expect(typeof auditId).toBe('string')
       expect(auditId.length).toBeGreaterThan(0)
-      
+
       // Wait for async persistence queue to flush
       await new Promise((resolve) => setTimeout(resolve, 10))
-      
+
       expect(mockDb.collection).toHaveBeenCalledWith('chain_audit_cursor')
       expect(mockDb.collection).toHaveBeenCalledWith('audit_logs')
     })
@@ -133,7 +135,7 @@ describe('AuditLogger', () => {
     it('assigns unique IDs to each event', async () => {
       let callCount = 0
       mocks.uuid.mockImplementation(() => `audit-event-${++callCount}`)
-      
+
       const mockDb = {
         collection: vi.fn().mockReturnValue({
           findOneAndUpdate: vi.fn().mockResolvedValue({
@@ -305,9 +307,14 @@ describe('AuditLogger', () => {
 
       const { logTherapeuticEvent } = await import('../logger')
 
-      const auditId = await logTherapeuticEvent('user-1', 'session_start', 'session-123', {
-        duration: 30,
-      })
+      const auditId = await logTherapeuticEvent(
+        'user-1',
+        'session_start',
+        'session-123',
+        {
+          duration: 30,
+        },
+      )
 
       expect(typeof auditId).toBe('string')
       expect(auditId.length).toBeGreaterThan(0)

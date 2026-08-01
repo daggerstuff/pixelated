@@ -43,7 +43,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
   const encoder = new TextEncoder()
   const keyMaterial = await (webcrypto.subtle as SubtleCrypto).importKey(
     'raw',
-    encoder.encode(encryptionKey).buffer,
+    encoder.encode(encryptionKey),
     'PBKDF2',
     false,
     ['deriveBits', 'deriveKey'],
@@ -124,9 +124,11 @@ export async function encrypt(data: unknown): Promise<string> {
 
     return JSON.stringify(result)
   } catch (error: unknown) {
-    throw new (Error as {
-      new (message: string, options?: ErrorOptions): Error
-    })(`Encryption failed: ${(error as Error).message}`, {
+    throw new (
+      Error as {
+        new (message: string, options?: ErrorOptions): Error
+      }
+    )(`Encryption failed: ${(error as Error).message}`, {
       cause: error,
     })
   }
@@ -178,9 +180,11 @@ export async function decrypt(encryptedDataStr: string): Promise<unknown> {
     const decoder = new TextDecoder()
     return JSON.parse(decoder.decode(decrypted))
   } catch (error: unknown) {
-    throw new (Error as {
-      new (message: string, options?: ErrorOptions): Error
-    })(`Decryption failed: ${(error as Error).message}`, {
+    throw new (
+      Error as {
+        new (message: string, options?: ErrorOptions): Error
+      }
+    )(`Decryption failed: ${(error as Error).message}`, {
       cause: error,
     })
   }
