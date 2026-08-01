@@ -152,6 +152,7 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
     // Read actual coverage from vitest/coverage output
     const coverageJsonPath = path.join(process.cwd(), 'coverage', 'coverage-final.json')
     const coberturaPath = path.join(process.cwd(), 'coverage', 'cobertura-coverage.xml')
+    const coverageAuditPath = path.join(process.cwd(), 'scripts/ci/coverage-audit-report.json')
 
     let coverage = 0
     let coverageDetails: Record<string, unknown> = {}
@@ -228,6 +229,16 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
     // If no coverage data exists, return appropriate status
     if (coverage === 0 && !existsSync(path.join(process.cwd(), 'coverage'))) {
       coverageDetails = { message: 'No coverage data found - run tests first' }
+    }
+
+    if (existsSync(coverageAuditPath)) {
+      try {
+        const auditReport = JSON.parse(readFileSync(coverageAuditPath, 'utf8'))
+        coverageDetails.perModuleCoverage = auditReport.modules
+        coverageDetails.auditTimestamp = auditReport.timestamp
+      } catch {
+        // Audit report parse failure is non-fatal
+      }
     }
 
     return {
