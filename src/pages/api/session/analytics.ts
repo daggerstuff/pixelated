@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
 
 import { getSession } from '../../../lib/auth/session'
+import { getPool } from '../../../lib/db'
 
 type SessionMetricPayload = {
   metricName?: unknown
@@ -136,11 +136,6 @@ const parseMetadata = (
   return isRecord(metadata) ? metadata : {}
 }
 
-// Database connection pool
-const pool = new Pool({
-  connectionString: process.env['DATABASE_URL'],
-})
-
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Verify authentication
@@ -162,7 +157,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const { sessionId, analyticsData } = requestBody
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
       const sessionQuery = `
         SELECT therapist_id FROM sessions WHERE id = $1
@@ -286,7 +281,7 @@ export const GET: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
       const sessionQuery = `
         SELECT therapist_id FROM sessions WHERE id = $1
