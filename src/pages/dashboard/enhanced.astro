@@ -10,6 +10,10 @@ import {
   DynamicParticleVisualization,
   DynamicSwiperCarousel,
   DynamicTreatmentPlanManager,
+  DynamicMultiSessionProgression,
+  DynamicBeliefChangeTracker,
+  DynamicDefenseMechanismAdaptation,
+  DynamicGoalAttainmentScale,
 } from '@/lib/utils/dynamic-components'
 
 const { user } = Astro.props as { user: any }
@@ -573,6 +577,46 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
                     useBackendData: true,
                   }}
                   className="h-48"
+                />
+              </div>
+            </Card>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <Card>
+              <div class="p-6">
+                <DynamicMultiSessionProgression
+                  client:visible
+                  sessions={[]}
+                />
+              </div>
+            </Card>
+
+            <Card>
+              <div class="p-6">
+                <DynamicBeliefChangeTracker
+                  client:visible
+                  beliefs={[]}
+                />
+              </div>
+            </Card>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <Card>
+              <div class="p-6">
+                <DynamicDefenseMechanismAdaptation
+                  client:visible
+                  defenses={[]}
+                />
+              </div>
+            </Card>
+
+            <Card>
+              <div class="p-6">
+                <DynamicGoalAttainmentScale
+                  client:visible
+                  goals={[]}
                 />
               </div>
             </Card>
