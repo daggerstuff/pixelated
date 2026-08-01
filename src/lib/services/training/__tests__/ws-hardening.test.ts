@@ -355,16 +355,38 @@ describe('PIX-3935: audit-log.ts — AuditLog', () => {
 describe('PIX-3935: TrainingWebSocketServer — origin rejection', () => {
   beforeEach(() => {
     vi.resetModules()
-  })
-
-  it('rejects connection from non-allowed origin', async () => {
     vi.doMock('../origin', () => ({
       isOriginAllowed: vi.fn().mockReturnValue(false),
       parseAllowedOrigins: vi
         .fn()
         .mockReturnValue(new Set(['https://app.pixelatedempathy.com'])),
     }))
+    vi.doMock('../session-store', () => ({
+      SessionStore: vi.fn().mockImplementation(() => ({
+        init: vi.fn(),
+        close: vi.fn(),
+        save: vi.fn(),
+        load: vi.fn(),
+      })),
+    }))
+    vi.doMock('../ratelimit', () => ({
+      RateLimiter: vi.fn().mockImplementation(() => ({
+        check: vi.fn().mockResolvedValue(true),
+        consume: vi.fn().mockResolvedValue(true),
+      })),
+    }))
+    vi.doMock('../../ai/GestaltClient', () => ({
+      GestaltClient: vi.fn().mockImplementation(() => ({
+        send: vi.fn(),
+        close: vi.fn(),
+      })),
+    }))
+    vi.doMock('../../auth/jwt-service', () => ({
+      validateToken: vi.fn(),
+    }))
+  })
 
+  it('rejects connection from non-allowed origin', async () => {
     const { TrainingWebSocketServer } =
       await import('../TrainingWebSocketServer')
     const server = new TrainingWebSocketServer(0, {
