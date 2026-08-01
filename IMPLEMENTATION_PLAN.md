@@ -70,90 +70,45 @@ This plan wires the three TDD-verified primitives into a cohesive vertical fidel
 
 ---
 
-## Remaining Work
+## Completed Work (All Items Delivered)
 
-### 1. Emit Events from Bias Detection (Priority: HIGH)
+**Status: ✅ COMPLETE** — All integration work delivered and verified in codebase.
 
-**File:** `src/lib/ai/bias-detection/python-service/bias_detection/services/analysis_orchestrator.py`
-
-**Change:** After `analyze_session()` completes, publish EventBus events:
-
-```python
-# In analyze_session(), after final_result computed:
-from foresight.foresight.event_bus import EventBus, EventType, Event
-from datetime import datetime, timezone
-
-bus = EventBus.get_instance()
-
-# Bias event
-if final_result["overall_bias_score"] >= 0.3:
-    bus.publish(Event(
-        id=uuid.uuid4().hex,
-        event_type=EventType.BIAS_DETECTED,
-        timestamp=datetime.now(timezone.utc),
-        actor="bias_orchestrator",
-        entity_id=session_id,
-        payload={
-            "clinician_id": session_data.get("user_id", "anonymous"),
-            "session_id": session_id,
-            "bias_score": final_result["overall_bias_score"],
-            "alert_level": final_result["alert_level"],
-        }
-    ))
-
-# Crisis event (if crisis detected in layer results)
-crisis_layer = next((r for r in layer_results if r.get("layer") == "diagnostic"), {})
-if crisis_layer.get("crisis_detected"):
-    bus.publish(Event(...))
-```
-
-### 2. Wire Receipt Root Hash to Bias Detection (Priority: HIGH)
+### 1. ✅ Emit Events from Bias Detection (COMPLETED)
 
 **File:** `src/lib/ai/bias-detection/python-service/bias_detection/services/analysis_orchestrator.py`
 
-**Change:** Accept `receipt_root_hash` in session_data, include in analysis result for traceability.
+**Delivered:** EventBus integration emits BIAS_DETECTED, BIAS_THRESHOLD_EXCEEDED, CRISIS_DETECTED, and CRISIS_THRESHOLD_EXCEEDED events after `analyze_session()` completes.
 
-### 3. JIT Scenario Injection into Nightmare Fuel (Priority: HIGH)
+### 2. ✅ Wire Receipt Root Hash to Bias Detection (COMPLETED)
 
-**File:** New `ai/triggers/jit_scenario_injector.py`
+**File:** `src/lib/ai/bias-detection/python-service/bias_detection/services/analysis_orchestrator.py`
 
-**Logic:** When `TriggerDecision.should_trigger=True`:
+**Delivered:** `receipt_root_hash` extracted from session_data and included in analysis result for traceability.
 
-1. Call Nightmare Fuel generator with targeted spec (domain gap + difficulty)
-2. Inject generated scenario into clinician's next session via existing block system
-3. Block schema label: `jit_scenario_topup`, InjectionPoint.PrePrompt
+### 3. ✅ JIT Scenario Injection into Nightmare Fuel (COMPLETED)
 
-### 4. Per-Clinician Flag Grouping (Priority: MEDIUM)
+**File:** `ai/triggers/jit_scenario_injector.py`
+
+**Delivered:** JITTriggerEngine injects targeted Nightmare Fuel scenarios when `TriggerDecision.should_trigger=True`.
+
+### 4. ✅ Per-Clinician Flag Grouping (COMPLETED)
 
 **File:** `foresight/foresight/triggers.py`
 
-**Change:** `rolling_window()` currently aggregates all clinicians. Need per-clinician window tracking:
+**Delivered:** `rolling_window()` groups flags by clinician_id and returns per-clinician TriggerDecision dict.
 
-```python
-def rolling_window(self, window=timedelta(days=7), threshold=3):
-    # Group flags by clinician_id
-    by_clinician = defaultdict(list)
-    for f in self._flags:
-        by_clinician[f.clinician_id].append(f)
+### 5. ✅ Receipt-Ledger Persistence (COMPLETED)
 
-    decisions = {}
-    for cid, flags in by_clinician.items():
-        # ... existing logic per clinician
-        decisions[cid] = TriggerDecision(...)
-    return decisions
-```
+**File:** `ai/receipts/receipt.py` + `ai/receipts/persistence.py`
 
-### 5. Receipt-Ledger Persistence (Priority: MEDIUM)
+**Delivered:** SQLite/PostgreSQL persistence layer for production receipt storage and audit export.
 
-**File:** `ai/receipts/receipt.py` + new `ai/receipts/persistence.py`
+### 6. ✅ FHE Ciphertext Hash Integration (COMPLETED)
 
-**Change:** Ledger currently in-memory. Add SQLite/PostgreSQL persistence for production.
+**File:** `src/lib/ai/providers/EmotionLlamaProvider.py`
 
-### 6. FHE Ciphertext Hash Integration (Priority: MEDIUM)
-
-**File:** `src/lib/ai/providers/EmotionLlamaProvider.py` (or FHE inference entry point)
-
-**Change:** When FHE encryption used, compute `fhe_ciphertext_hash` and pass via `request_metadata` to `InferenceSafetyFilter`.
+**Delivered:** FHE ciphertext hash computed and passed via `request_metadata` to InferenceSafetyFilter.
 
 ---
 
