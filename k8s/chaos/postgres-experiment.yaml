@@ -1,0 +1,58 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: postgres-partition
+  namespace: pixelated-empathy
+spec:
+  action: partition
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      "app": "postgres"
+  direction: both
+  externalTargets:
+    - "pixelated-empathy.svc.cluster.local"
+  duration: "120s"
+  scheduler:
+    cron: "@every 30m"
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: postgres-latency
+  namespace: pixelated-empathy
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      "app": "postgres"
+  delay:
+    latency: "500ms"
+    jitter: "100ms"
+  duration: "60s"
+  scheduler:
+    cron: "@every 20m"
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: IOChaos
+metadata:
+  name: postgres-io-delay
+  namespace: pixelated-empathy
+spec:
+  action: latency
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      "app": "postgres"
+  delay: "100ms"
+  path: /var/lib/postgresql/data
+  duration: "60s"
+  scheduler:
+    cron: "@every 25m"

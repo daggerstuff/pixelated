@@ -185,7 +185,14 @@
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",
-    "mcp:manage": "node scripts/mcp-manager.js"
+    "mcp:manage": "node scripts/mcp-manager.js",
+    "backend:up": "set -a && . ./.env.backend && set +a && docker compose -f docker/docker-compose.backend.yml up -d",
+    "backend:down": "set -a && . ./.env.backend && set +a && docker compose -f docker/docker-compose.backend.yml down",
+    "backend:logs": "set -a && . ./.env.backend && set +a && docker compose -f docker/docker-compose.backend.yml logs -f",
+    "backend:reset": "set -a && . ./.env.backend && set +a && docker compose -f docker/docker-compose.backend.yml down -v && docker compose -f docker/docker-compose.backend.yml up -d",
+    "backend:ps": "set -a && . ./.env.backend && set +a && docker compose -f docker/docker-compose.backend.yml ps",
+    "backend:build": "set -a && . ./.env.backend && set +a && docker compose -f docker/docker-compose.backend.yml build",
+    "backend:health": "./scripts/devops/backend-health-check.sh"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
