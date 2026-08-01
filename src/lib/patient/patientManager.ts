@@ -680,7 +680,9 @@ class PatientManager {
   private async decryptPatientData(
     patient: PatientProfile,
   ): Promise<PatientProfile> {
-    return decryptPHIFields(patient as Record<string, unknown>) as Promise<PatientProfile>
+    return decryptPHIFields(
+      patient as unknown as Record<string, unknown>,
+    ) as unknown as PatientProfile
   }
 
   /**
