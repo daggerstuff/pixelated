@@ -32,6 +32,7 @@ function makeMemory(
       relevance: 0,
       emotionalWeight: 1,
       actionability,
+      reveriePotential: 0.1,
     },
     emotions: { valence: -0.3, arousal: 0.7, categories },
     gating: {
@@ -45,6 +46,8 @@ function makeMemory(
       lastProcessed: 0,
       remCycles: 0,
       schemaReferences: [],
+      reverieEligible: false,
+      reveriePhase: 'dormant',
     },
   }
 }
