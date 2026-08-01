@@ -1,0 +1,177 @@
+name: Chaos Validation (Staging)
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Chaos experiment scenario to run'
+        required: true
+        type: choice
+        options:
+          - pod-kill
+          - network-latency
+          - network-partition
+          - http-chaos
+          - all
+      duration:
+        description: 'Experiment duration in seconds (default: 300)'
+        required: false
+        type: string
+        default: '300'
+  schedule:
+    - cron: '0 10 * * 1'
+
+concurrency:
+  group: chaos-validation-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  chaos-experiment:
+    name: Run Chaos Experiment
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging' || github.event_name == 'workflow_dispatch'
+    environment: staging
+
+    env:
+      SCENARIO: ${{ github.event.inputs.scenario || 'pod-kill' }}
+      DURATION: ${{ github.event.inputs.duration || '300' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Configure kubectl
+        uses: azure/k8s-set-context@b9b48c6a10c68c6a4c0e5b4c6a4a4a4a4a4a4a4a # v4.0.0
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.CIVO_KUBECONFIG }}
+          context: pixelated-staging
+
+      - name: Verify cluster access
+        run: |
+          kubectl cluster-info
+          kubectl get nodes
+          kubectl get ns pixelated-empathy
+
+      - name: Verify Chaos Mesh installation
+        run: |
+          kubectl get pods -n chaos-mesh
+          kubectl get crd | grep chaos-mesh.org
+
+      - name: Record pre-experiment state
+        id: pre-state
+        run: |
+          echo "=== Pre-Experiment State ==="
+          kubectl get pods -n pixelated-empathy
+          kubectl get hpa -n pixelated-empathy
+          echo "pod_count=$(kubectl get pods -n pixelated-empathy --no-headers | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: Run chaos experiment
+        run: |
+          if [ "$SCENARIO" = "all" ]; then
+            echo "Running all scenarios sequentially..."
+            for exp in pod-kill network-latency network-partition http-chaos; do
+              echo "=== Running $exp ==="
+              kubectl apply -f "k8s/chaos/${exp}-experiment.yaml"
+              sleep $((DURATION / 4))
+              kubectl delete -f "k8s/chaos/${exp}-experiment.yaml" --ignore-not-found=true
+              sleep 60
+            done
+          else
+            echo "Running $SCENARIO for ${DURATION}s..."
+            kubectl apply -f "k8s/chaos/${SCENARIO}-experiment.yaml"
+            sleep "$DURATION"
+            kubectl delete -f "k8s/chaos/${SCENARIO}-experiment.yaml" --ignore-not-found=true
+          fi
+
+      - name: Monitor experiment
+        run: |
+          echo "=== Monitoring for 60 seconds ==="
+          for i in $(seq 1 12); do
+            echo "--- Check $i/12 ---"
+            kubectl get pods -n pixelated-empathy
+            kubectl get chaos -n pixelated-empathy || true
+            sleep 5
+          done
+
+      - name: Record post-experiment state
+        id: post-state
+        run: |
+          echo "=== Post-Experiment State ==="
+          kubectl get pods -n pixelated-empathy
+          kubectl get hpa -n pixelated-empathy
+          echo "pod_count=$(kubectl get pods -n pixelated-empathy --no-headers | wc -l)" >> "$GITHUB_OUTPUT"
+
+      - name: Verify recovery
+        run: |
+          echo "Waiting 120 seconds for full recovery..."
+          sleep 120
+
+          echo "=== Recovery Check ==="
+          kubectl get pods -n pixelated-empathy
+
+          NOT_READY=$(kubectl get pods -n pixelated-empathy --no-headers | grep -v "Running" | wc -l)
+          if [ "$NOT_READY" -gt 0 ]; then
+            echo "ERROR: $NOT_READY pods not in Running state"
+            kubectl describe pods -n pixelated-empathy
+            exit 1
+          fi
+
+          echo "All pods recovered successfully"
+
+      - name: Generate experiment report
+        if: always()
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          JOB_STATUS: ${{ job.status }}
+          PRE_POD_COUNT: ${{ steps.pre-state.outputs.pod_count }}
+          POST_POD_COUNT: ${{ steps.post-state.outputs.pod_count }}
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          REPORT_FILE=".agent/internal/chaos-results/${DATE}-${SCENARIO}.md"
+
+          mkdir -p .agent/internal/chaos-results
+
+          cat > "$REPORT_FILE" <<EOF
+          # Chaos Experiment Report
+
+          **Date**: ${DATE}
+          **Scenario**: ${SCENARIO}
+          **Environment**: staging
+          **Trigger**: ${EVENT_NAME}
+          **Duration**: ${DURATION}s
+
+          ## Pre-Experiment State
+          - Pod count: ${PRE_POD_COUNT}
+
+          ## Post-Experiment State
+          - Pod count: ${POST_POD_COUNT}
+
+          ## Recovery
+          - Status: ${JOB_STATUS}
+
+          ## Next Steps
+          - Review metrics in Grafana
+          - Check alert history in Alertmanager
+          - Update experiment parameters if needed
+          EOF
+
+          echo "Report generated: $REPORT_FILE"
+
+      - name: Upload experiment report
+        if: always()
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: chaos-report-${{ github.run_id }}
+          path: .agent/internal/chaos-results/
+          retention-days: 30
+
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          echo "=== Cleaning up failed experiment ==="
+          kubectl delete podchaos,networkchaos,httpchaos -n pixelated-empathy --all --ignore-not-found=true
+          kubectl get pods -n pixelated-empathy
