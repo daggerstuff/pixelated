@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-08-01T02:24:32.767Z",
+  "timestamp": "2026-08-01T02:32:59.345Z",
   "tool": "coverage-audit",
   "coverageFile": "/home/vivi/firstmate/projects/pixelated/coverage/coverage-final.json",
   "summary": {
     "totalModules": 18,
-    "totalFiles": 66,
-    "overallCoveragePct": 47.65776229190863,
-    "passingModules": 6,
-    "failingModules": 3
+    "totalFiles": 22,
+    "overallCoveragePct": 46.19031493396546,
+    "passingModules": 2,
+    "failingModules": 1
   },
   "modules": [
     {
@@ -93,11 +93,11 @@
     {
       "name": "config",
       "priority": "P0",
-      "files": 1,
+      "files": 0,
       "statements": {
-        "total": 5,
-        "covered": 5,
-        "pct": 100
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
         "total": 0,
@@ -113,21 +113,21 @@
     {
       "name": "lib/auth",
       "priority": "P1",
-      "files": 1,
+      "files": 0,
       "statements": {
-        "total": 15,
-        "covered": 12,
-        "pct": 80
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 4,
-        "covered": 3,
-        "pct": 75
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 18,
-        "covered": 12,
-        "pct": 66.7
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
@@ -193,14 +193,14 @@
     {
       "name": "types",
       "priority": "P1",
-      "files": 1,
+      "files": 0,
       "statements": {
-        "total": 3,
+        "total": 0,
         "covered": 0,
         "pct": 0
       },
       "functions": {
-        "total": 1,
+        "total": 0,
         "covered": 0,
         "pct": 0
       },
@@ -213,21 +213,21 @@
     {
       "name": "lib/ehr",
       "priority": "P2",
-      "files": 5,
+      "files": 0,
       "statements": {
-        "total": 172,
-        "covered": 101,
-        "pct": 58.7
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 34,
-        "covered": 22,
-        "pct": 64.7
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 59,
-        "covered": 26,
-        "pct": 44.1
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
@@ -236,58 +236,58 @@
       "files": 20,
       "statements": {
         "total": 2854,
-        "covered": 1194,
-        "pct": 41.8
+        "covered": 1285,
+        "pct": 45
       },
       "functions": {
         "total": 406,
-        "covered": 189,
-        "pct": 46.6
+        "covered": 208,
+        "pct": 51.2
       },
       "branches": {
         "total": 1395,
-        "covered": 360,
-        "pct": 25.8
+        "covered": 397,
+        "pct": 28.5
       }
     },
     {
       "name": "hooks",
       "priority": "P2",
-      "files": 6,
+      "files": 0,
       "statements": {
-        "total": 336,
-        "covered": 263,
-        "pct": 78.3
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 80,
-        "covered": 62,
-        "pct": 77.5
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 227,
-        "covered": 124,
-        "pct": 54.6
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
       "name": "utils",
       "priority": "P2",
-      "files": 30,
+      "files": 0,
       "statements": {
-        "total": 1682,
-        "covered": 808,
-        "pct": 48
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 359,
-        "covered": 169,
-        "pct": 47.1
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 1005,
-        "covered": 437,
-        "pct": 43.5
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
