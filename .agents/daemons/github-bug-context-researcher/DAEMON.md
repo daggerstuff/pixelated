@@ -20,7 +20,8 @@ deny:
 
 ## Trigger and bug signals
 
-The watch condition is intended only for newly opened GitHub issues that already look like bugs or regressions from observable issue metadata. GitHub issue APIs and searches may return pull requests; verify that the triggering target has no pull-request identity before researching or commenting. A pull request must never trigger this daemon.
+The watch condition is intended only for newly opened GitHub issues that already look like bugs or regressions from observable issue metadata. GitHub issue APIs and searches
+may return pull requests; verify that the triggering target has no pull-request identity before researching or commenting. A pull request must never trigger this daemon.
 
 Treat an issue as in scope when at least one of these usable signals is present:
 
@@ -32,15 +33,18 @@ No-op silently when the issue appears to be a feature request, task, question, p
 
 ## Research policy
 
-Use the triggering GitHub issue as the source of truth for the symptom and affected area. Derive search terms from the title, labels, component names, error text, stack frames, explicitly linked repository URLs, and concrete nouns in the issue body.
+Use the triggering GitHub issue as the source of truth for the symptom and affected area. Derive search terms from the title, labels, component names, error text, stack
+frames, explicitly linked repository URLs, and concrete nouns in the issue body.
 
 Search in this order:
 
 1. Related GitHub issues in the triggering repository that were created or updated in the last 180 days.
 2. Recent pull requests, commits, files, or documentation in the triggering repository when they directly explain the symptom, ownership, or likely changed area.
-3. Issues or supporting repository evidence in another repository only when the triggering issue explicitly links that repository and explains why it is relevant to the same symptom or component.
+3. Issues or supporting repository evidence in another repository only when the triggering issue explicitly links that repository and explains why it is relevant to the same
+symptom or component.
 
-Related issues are the primary research context. Pull requests, commits, branches, files, and documentation may be cited only as supporting evidence; do not treat a pull request as an issue candidate or trigger target.
+Related issues are the primary research context. Pull requests, commits, branches, files, and documentation may be cited only as supporting evidence; do not treat a pull
+request as an issue candidate or trigger target.
 
 Prefer fresh, specific evidence over broad matches. At most five total links may appear in the comment. Use fewer links when fewer are useful.
 
@@ -57,13 +61,16 @@ Suspicious areas: <files, modules, services, or ownership clues with evidence>
 Missing repro details: <specific details needed, if any>
 ```
 
-Omit empty sections. Do not include raw log dumps, long search transcripts, secrets, private customer context, or speculative blame. On a public repository, cite only evidence that is safe to expose publicly. Phrase findings as evidence and uncertainty, not final root cause, unless the root cause is directly proven.
+Omit empty sections. Do not include raw log dumps, long search transcripts, secrets, private customer context, or speculative blame. On a public repository, cite only evidence
+that is safe to expose publicly. Phrase findings as evidence and uncertainty, not final root cause, unless the root cause is directly proven.
 
 ## Idempotency and deduplication
 
-Before commenting, inspect existing Charlie comments on the issue. If an equivalent `Bug triage context` comment already covers the same issue title/body, relevant links, and search results, no-op.
+Before commenting, inspect existing Charlie comments on the issue. If an equivalent `Bug triage context` comment already covers the same issue title/body, relevant links, and
+search results, no-op.
 
-If the issue changed materially and a fresh comment would reduce triage work, post one new concise follow-up rather than repeating the original content. Re-check that the target is still an issue and that the proposed comment is not equivalent immediately before writing.
+If the issue changed materially and a fresh comment would reduce triage work, post one new concise follow-up rather than repeating the original content. Re-check that the
+target is still an issue and that the proposed comment is not equivalent immediately before writing.
 
 ## No-op when
 
