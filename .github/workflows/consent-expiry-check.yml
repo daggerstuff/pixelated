@@ -43,7 +43,23 @@ jobs:
             const critical = '${{ steps.expiry-check.outputs.expiring-critical }}'
             const soon = '${{ steps.expiry-check.outputs.expiring-soon }}'
 
-            // Avoid opening a new issue every daily run while consents remain expired.
+            const title = `[Consent Expiry] ${expired} expired, ${critical} critical, ${soon} expiring soon`
+            const body = [
+              '## Consent Expiry Check Results',
+              '',
+              '| Category | Count |',
+              '|----------|-------|',
+              `| Expired | ${expired} |`,
+              `| Expiring Critical (≤7 days) | ${critical} |`,
+              `| Expiring Soon (≤30 days) | ${soon} |`,
+              '',
+              'Re-consent prompts have been triggered for affected clients.',
+              'Run `GET /api/v1/admin/consent/expiry-check` for full details.',
+            ].join('\n')
+
+            // Reuse the open issue (if any) instead of opening a new one every
+            // daily run, but keep its counts fresh: update title/body whenever
+            // the numbers have changed so the tracker never shows stale data.
             const { data: openIssues } = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -56,8 +72,22 @@ jobs:
                 issue.title.startsWith('[Consent Expiry]'),
             )
             if (existing) {
+              if (existing.title === title) {
+                console.log(
+                  `Open issue #${existing.number} already up to date; skipping.`,
+                )
+                return
+              }
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                title,
+                body,
+                labels: ['safety-critical', 'consent', 'automated'],
+              })
               console.log(
-                `Open issue #${existing.number} already tracks consent expiry; skipping duplicate.`,
+                `Open issue #${existing.number} updated with fresh expiry counts.`,
               )
               return
             }
@@ -65,18 +95,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `[Consent Expiry] ${expired} expired, ${critical} critical, ${soon} expiring soon`,
-              body: [
-                '## Consent Expiry Check Results',
-                '',
-                '| Category | Count |',
-                '|----------|-------|',
-                `| Expired | ${expired} |`,
-                `| Expiring Critical (≤7 days) | ${critical} |`,
-                `| Expiring Soon (≤30 days) | ${soon} |`,
-                '',
-                'Re-consent prompts have been triggered for affected clients.',
-                'Run `GET /api/v1/admin/consent/expiry-check` for full details.',
-              ].join('\n'),
+              title,
+              body,
               labels: ['safety-critical', 'consent', 'automated'],
             })
