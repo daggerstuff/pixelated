@@ -1,13 +1,13 @@
 {
-  "timestamp": "2026-08-01T02:19:58.382Z",
+  "timestamp": "2026-08-01T02:24:32.767Z",
   "tool": "coverage-audit",
   "coverageFile": "/home/vivi/firstmate/projects/pixelated/coverage/coverage-final.json",
   "summary": {
     "totalModules": 18,
-    "totalFiles": 96,
-    "overallCoveragePct": 37.468290208016235,
-    "passingModules": 4,
-    "failingModules": 8
+    "totalFiles": 66,
+    "overallCoveragePct": 47.65776229190863,
+    "passingModules": 6,
+    "failingModules": 3
   },
   "modules": [
     {
@@ -33,41 +33,41 @@
     {
       "name": "lib/security",
       "priority": "P0",
-      "files": 11,
+      "files": 0,
       "statements": {
-        "total": 987,
-        "covered": 193,
-        "pct": 19.6
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 144,
-        "covered": 13,
-        "pct": 9
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 492,
-        "covered": 20,
-        "pct": 4.1
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
       "name": "lib/logging",
       "priority": "P0",
-      "files": 2,
+      "files": 1,
       "statements": {
-        "total": 35,
-        "covered": 12,
-        "pct": 34.3
+        "total": 7,
+        "covered": 6,
+        "pct": 85.7
       },
       "functions": {
-        "total": 20,
-        "covered": 6,
-        "pct": 30
+        "total": 6,
+        "covered": 5,
+        "pct": 83.3
       },
       "branches": {
-        "total": 21,
+        "total": 1,
         "covered": 1,
-        "pct": 4.8
+        "pct": 100
       }
     },
     {
@@ -93,201 +93,201 @@
     {
       "name": "config",
       "priority": "P0",
-      "files": 11,
+      "files": 1,
       "statements": {
-        "total": 169,
-        "covered": 43,
-        "pct": 25.4
+        "total": 5,
+        "covered": 5,
+        "pct": 100
       },
       "functions": {
-        "total": 102,
-        "covered": 11,
-        "pct": 10.8
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 52,
-        "covered": 13,
-        "pct": 25
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
       "name": "lib/auth",
       "priority": "P1",
-      "files": 20,
+      "files": 1,
       "statements": {
-        "total": 1777,
-        "covered": 585,
-        "pct": 32.9
+        "total": 15,
+        "covered": 12,
+        "pct": 80
       },
       "functions": {
-        "total": 266,
-        "covered": 72,
-        "pct": 27.1
+        "total": 4,
+        "covered": 3,
+        "pct": 75
       },
       "branches": {
-        "total": 1270,
-        "covered": 377,
-        "pct": 29.7
+        "total": 18,
+        "covered": 12,
+        "pct": 66.7
       }
     },
     {
       "name": "lib/audit",
       "priority": "P1",
-      "files": 1,
+      "files": 0,
       "statements": {
-        "total": 177,
-        "covered": 88,
-        "pct": 49.7
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 30,
-        "covered": 10,
-        "pct": 33.3
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 134,
-        "covered": 28,
-        "pct": 20.9
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
       "name": "lib/db",
       "priority": "P1",
-      "files": 3,
+      "files": 0,
       "statements": {
-        "total": 293,
-        "covered": 218,
-        "pct": 74.4
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 61,
-        "covered": 37,
-        "pct": 60.7
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 131,
-        "covered": 87,
-        "pct": 66.4
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
       "name": "lib/memory",
       "priority": "P1",
-      "files": 24,
+      "files": 1,
       "statements": {
-        "total": 1716,
-        "covered": 1464,
-        "pct": 85.3
+        "total": 92,
+        "covered": 73,
+        "pct": 79.3
       },
       "functions": {
-        "total": 397,
-        "covered": 356,
-        "pct": 89.7
+        "total": 20,
+        "covered": 16,
+        "pct": 80
       },
       "branches": {
-        "total": 822,
-        "covered": 535,
-        "pct": 65.1
+        "total": 49,
+        "covered": 28,
+        "pct": 57.1
       }
     },
     {
       "name": "types",
       "priority": "P1",
-      "files": 3,
+      "files": 1,
       "statements": {
-        "total": 58,
-        "covered": 44,
-        "pct": 75.9
+        "total": 3,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 19,
-        "covered": 9,
-        "pct": 47.4
+        "total": 1,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 26,
-        "covered": 18,
-        "pct": 69.2
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
       "name": "lib/ehr",
       "priority": "P2",
-      "files": 0,
+      "files": 5,
       "statements": {
-        "total": 0,
-        "covered": 0,
-        "pct": 0
+        "total": 172,
+        "covered": 101,
+        "pct": 58.7
       },
       "functions": {
-        "total": 0,
-        "covered": 0,
-        "pct": 0
+        "total": 34,
+        "covered": 22,
+        "pct": 64.7
       },
       "branches": {
-        "total": 0,
-        "covered": 0,
-        "pct": 0
+        "total": 59,
+        "covered": 26,
+        "pct": 44.1
       }
     },
     {
       "name": "lib/fhe",
       "priority": "P2",
-      "files": 12,
+      "files": 20,
       "statements": {
-        "total": 1736,
-        "covered": 123,
-        "pct": 7.1
+        "total": 2854,
+        "covered": 1194,
+        "pct": 41.8
       },
       "functions": {
-        "total": 201,
-        "covered": 16,
-        "pct": 8
+        "total": 406,
+        "covered": 189,
+        "pct": 46.6
       },
       "branches": {
-        "total": 820,
-        "covered": 21,
-        "pct": 2.6
+        "total": 1395,
+        "covered": 360,
+        "pct": 25.8
       }
     },
     {
       "name": "hooks",
       "priority": "P2",
-      "files": 0,
+      "files": 6,
       "statements": {
-        "total": 0,
-        "covered": 0,
-        "pct": 0
+        "total": 336,
+        "covered": 263,
+        "pct": 78.3
       },
       "functions": {
-        "total": 0,
-        "covered": 0,
-        "pct": 0
+        "total": 80,
+        "covered": 62,
+        "pct": 77.5
       },
       "branches": {
-        "total": 0,
-        "covered": 0,
-        "pct": 0
+        "total": 227,
+        "covered": 124,
+        "pct": 54.6
       }
     },
     {
       "name": "utils",
       "priority": "P2",
-      "files": 1,
+      "files": 30,
       "statements": {
-        "total": 33,
-        "covered": 9,
-        "pct": 27.3
+        "total": 1682,
+        "covered": 808,
+        "pct": 48
       },
       "functions": {
-        "total": 5,
-        "covered": 2,
-        "pct": 40
+        "total": 359,
+        "covered": 169,
+        "pct": 47.1
       },
       "branches": {
-        "total": 30,
-        "covered": 6,
-        "pct": 20
+        "total": 1005,
+        "covered": 437,
+        "pct": 43.5
       }
     },
     {
@@ -313,21 +313,21 @@
     {
       "name": "lib/services",
       "priority": "P3",
-      "files": 2,
+      "files": 0,
       "statements": {
-        "total": 695,
-        "covered": 30,
-        "pct": 4.3
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 194,
-        "covered": 3,
-        "pct": 1.5
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 358,
-        "covered": 12,
-        "pct": 3.4
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     },
     {
@@ -353,21 +353,21 @@
     {
       "name": "pages/api",
       "priority": "P3",
-      "files": 6,
+      "files": 0,
       "statements": {
-        "total": 208,
-        "covered": 145,
-        "pct": 69.7
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "functions": {
-        "total": 12,
-        "covered": 7,
-        "pct": 58.3
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       },
       "branches": {
-        "total": 173,
-        "covered": 82,
-        "pct": 47.4
+        "total": 0,
+        "covered": 0,
+        "pct": 0
       }
     }
   ]
