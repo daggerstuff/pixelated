@@ -1,51 +1,59 @@
 /* @vitest-environment node */
-/**
- * PIX-3935: TrainingWebSocketServer tests
- *
- * Separated from ws-hardening.test.ts to avoid module cache pollution.
- * The earlier tests in ws-hardening.test.ts import the real modules,
- * which interferes with the dynamic mocking needed for TrainingWebSocketServer.
- */
-
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+const mockIsOriginAllowed = vi.fn().mockReturnValue(true)
+const mockParseAllowedOrigins = vi.fn().mockReturnValue(new Set())
+const mockSessionStore = vi.fn().mockImplementation(() => ({
+  init: vi.fn(),
+  close: vi.fn(),
+  save: vi.fn(),
+  load: vi.fn(),
+}))
+const mockRateLimiter = vi.fn().mockImplementation(() => ({
+  check: vi.fn().mockResolvedValue(true),
+  consume: vi.fn().mockResolvedValue(true),
+}))
+const mockGestaltClient = vi.fn().mockImplementation(() => ({
+  send: vi.fn(),
+  close: vi.fn(),
+}))
+const mockValidateToken = vi.fn()
+
+vi.mock('../origin', () => ({
+  isOriginAllowed: (...args: unknown[]) => mockIsOriginAllowed(...args),
+  parseAllowedOrigins: (...args: unknown[]) => mockParseAllowedOrigins(...args),
+}))
+
+vi.mock('../session-store', () => ({
+  SessionStore: (...args: unknown[]) => mockSessionStore(...args),
+}))
+
+vi.mock('../ratelimit', () => ({
+  RateLimiter: (...args: unknown[]) => mockRateLimiter(...args),
+}))
+
+vi.mock('../../ai/GestaltClient', () => ({
+  GestaltClient: (...args: unknown[]) => mockGestaltClient(...args),
+}))
+
+vi.mock('../../auth/jwt-service', () => ({
+  validateToken: (...args: unknown[]) => mockValidateToken(...args),
+}))
+
+import { TrainingWebSocketServer } from '../TrainingWebSocketServer'
 
 describe('PIX-3935: TrainingWebSocketServer — origin rejection', () => {
   beforeEach(() => {
-    vi.resetModules()
-    vi.doMock('../origin', () => ({
-      isOriginAllowed: vi.fn().mockReturnValue(false),
-      parseAllowedOrigins: vi
-        .fn()
-        .mockReturnValue(new Set(['https://app.pixelatedempathy.com'])),
-    }))
-    vi.doMock('../session-store', () => ({
-      SessionStore: vi.fn().mockImplementation(() => ({
-        init: vi.fn(),
-        close: vi.fn(),
-        save: vi.fn(),
-        load: vi.fn(),
-      })),
-    }))
-    vi.doMock('../ratelimit', () => ({
-      RateLimiter: vi.fn().mockImplementation(() => ({
-        check: vi.fn().mockResolvedValue(true),
-        consume: vi.fn().mockResolvedValue(true),
-      })),
-    }))
-    vi.doMock('../../ai/GestaltClient', () => ({
-      GestaltClient: vi.fn().mockImplementation(() => ({
-        send: vi.fn(),
-        close: vi.fn(),
-      })),
-    }))
-    vi.doMock('../../auth/jwt-service', () => ({
-      validateToken: vi.fn(),
-    }))
+    vi.clearAllMocks()
+    mockIsOriginAllowed.mockReturnValue(true)
+    mockParseAllowedOrigins.mockReturnValue(
+      new Set(['https://app.pixelatedempathy.com']),
+    )
   })
 
-  it('rejects connection from non-allowed origin', async () => {
-    const { TrainingWebSocketServer } =
-      await import('../TrainingWebSocketServer')
+  it('rejects connection from non-allowed origin', () => {
+    mockIsOriginAllowed.mockReturnValue(false)
+
     const server = new TrainingWebSocketServer(0, {
       auditLog: {
         write: vi.fn(),
@@ -75,16 +83,9 @@ describe('PIX-3935: TrainingWebSocketServer — origin rejection', () => {
     expect(closeSpy).toHaveBeenCalledWith(1008, 'Origin not allowed')
   })
 
-  it('allows connection from allowed origin', async () => {
-    vi.doMock('../origin', () => ({
-      isOriginAllowed: vi.fn().mockReturnValue(true),
-      parseAllowedOrigins: vi
-        .fn()
-        .mockReturnValue(new Set(['https://app.pixelatedempathy.com'])),
-    }))
+  it('allows connection from allowed origin', () => {
+    mockIsOriginAllowed.mockReturnValue(true)
 
-    const { TrainingWebSocketServer } =
-      await import('../TrainingWebSocketServer')
     const server = new TrainingWebSocketServer(0, {
       auditLog: {
         write: vi.fn(),
@@ -117,39 +118,12 @@ describe('PIX-3935: TrainingWebSocketServer — origin rejection', () => {
 
 describe('PIX-3935: TrainingWebSocketServer — per-IP limit', () => {
   beforeEach(() => {
-    vi.resetModules()
-    vi.doMock('../origin', () => ({
-      isOriginAllowed: vi.fn().mockReturnValue(true),
-      parseAllowedOrigins: vi.fn().mockReturnValue(new Set()),
-    }))
-    vi.doMock('../session-store', () => ({
-      SessionStore: vi.fn().mockImplementation(() => ({
-        init: vi.fn(),
-        close: vi.fn(),
-        save: vi.fn(),
-        load: vi.fn(),
-      })),
-    }))
-    vi.doMock('../ratelimit', () => ({
-      RateLimiter: vi.fn().mockImplementation(() => ({
-        check: vi.fn().mockResolvedValue(true),
-        consume: vi.fn().mockResolvedValue(true),
-      })),
-    }))
-    vi.doMock('../../ai/GestaltClient', () => ({
-      GestaltClient: vi.fn().mockImplementation(() => ({
-        send: vi.fn(),
-        close: vi.fn(),
-      })),
-    }))
-    vi.doMock('../../auth/jwt-service', () => ({
-      validateToken: vi.fn(),
-    }))
+    vi.clearAllMocks()
+    mockIsOriginAllowed.mockReturnValue(true)
+    mockParseAllowedOrigins.mockReturnValue(new Set())
   })
 
-  it('rejects 6th concurrent connection from same IP', async () => {
-    const { TrainingWebSocketServer } =
-      await import('../TrainingWebSocketServer')
+  it('rejects 6th concurrent connection from same IP', () => {
     const server = new TrainingWebSocketServer(0, {
       auditLog: {
         write: vi.fn(),
@@ -194,14 +168,7 @@ describe('PIX-3935: TrainingWebSocketServer — per-IP limit', () => {
     )
   })
 
-  it('allows connections from different IPs', async () => {
-    vi.doMock('../origin', () => ({
-      isOriginAllowed: vi.fn().mockReturnValue(true),
-      parseAllowedOrigins: vi.fn().mockReturnValue(new Set()),
-    }))
-
-    const { TrainingWebSocketServer } =
-      await import('../TrainingWebSocketServer')
+  it('allows connections from different IPs', () => {
     const server = new TrainingWebSocketServer(0, {
       auditLog: {
         write: vi.fn(),
@@ -236,39 +203,12 @@ describe('PIX-3935: TrainingWebSocketServer — per-IP limit', () => {
 
 describe('PIX-3935: idle-disconnect ping timer', () => {
   beforeEach(() => {
-    vi.resetModules()
-    vi.doMock('../origin', () => ({
-      isOriginAllowed: vi.fn().mockReturnValue(true),
-      parseAllowedOrigins: vi.fn().mockReturnValue(new Set()),
-    }))
-    vi.doMock('../session-store', () => ({
-      SessionStore: vi.fn().mockImplementation(() => ({
-        init: vi.fn(),
-        close: vi.fn(),
-        save: vi.fn(),
-        load: vi.fn(),
-      })),
-    }))
-    vi.doMock('../ratelimit', () => ({
-      RateLimiter: vi.fn().mockImplementation(() => ({
-        check: vi.fn().mockResolvedValue(true),
-        consume: vi.fn().mockResolvedValue(true),
-      })),
-    }))
-    vi.doMock('../../ai/GestaltClient', () => ({
-      GestaltClient: vi.fn().mockImplementation(() => ({
-        send: vi.fn(),
-        close: vi.fn(),
-      })),
-    }))
-    vi.doMock('../../auth/jwt-service', () => ({
-      validateToken: vi.fn(),
-    }))
+    vi.clearAllMocks()
+    mockIsOriginAllowed.mockReturnValue(true)
+    mockParseAllowedOrigins.mockReturnValue(new Set())
   })
 
-  it('registers a client timer on connection', async () => {
-    const { TrainingWebSocketServer } =
-      await import('../TrainingWebSocketServer')
+  it('registers a client timer on connection', () => {
     const server = new TrainingWebSocketServer(0)
     const mockWs = {
       close: vi.fn(),
@@ -287,9 +227,7 @@ describe('PIX-3935: idle-disconnect ping timer', () => {
       } as any,
     )
 
-    // Verify a timer was registered (setInterval was called in handleConnection)
     expect(server['clientTimers'].size).toBeGreaterThanOrEqual(1)
-    // Verify lastPong entry was set (Date.now() recorded on connect)
     expect(server['lastPong'].size).toBeGreaterThanOrEqual(1)
   })
 })
