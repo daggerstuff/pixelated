@@ -4,7 +4,7 @@
 
 CREATE TABLE IF NOT EXISTS defense_readings (
   id SERIAL PRIMARY KEY,
-  session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
+  session_id UUID NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
   therapist_id TEXT,
   mechanism TEXT NOT NULL,
   intensity NUMERIC(3,1) NOT NULL CHECK (intensity >= 0 AND intensity <= 5),
