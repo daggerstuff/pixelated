@@ -171,8 +171,10 @@ class EncryptionManager {
       throw new Error(`Key not found: ${targetKeyId}`)
     }
 
-    // Generate random IV
-    const iv = crypto.getRandomValues(new Uint8Array(12))
+    // Generate random IV - size depends on algorithm
+    // AES-GCM uses 12 bytes, AES-CBC uses 16 bytes
+    const ivSize = this.config.algorithm === 'AES-CBC' ? 16 : 12
+    const iv = crypto.getRandomValues(new Uint8Array(ivSize))
 
     // Convert data to Uint8Array
     const encoder = new TextEncoder()
@@ -257,19 +259,15 @@ class EncryptionManager {
     let decrypted: ArrayBuffer
 
     if (algorithm === 'AES-GCM') {
-      // Combine ciphertext and tag for GCM
-      const tag = encryptedData.tag
-        ? this.base64ToArrayBuffer(encryptedData.tag)
-        : new Uint8Array(16).buffer
-      const combined = this.combineCiphertextAndTag(ciphertext, tag)
-
+      // Web Crypto API returns ciphertext with tag already appended
+      // No need to recombine - use ciphertext as-is
       decrypted = await crypto.subtle.decrypt(
         {
           name: 'AES-GCM',
           iv: iv,
         },
         key,
-        combined,
+        ciphertext,
       )
     } else if (algorithm === 'AES-CBC') {
       decrypted = await crypto.subtle.decrypt(
