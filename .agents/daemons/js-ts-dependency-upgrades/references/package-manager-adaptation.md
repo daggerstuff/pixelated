@@ -1,6 +1,8 @@
 # Package manager configuration
 
-Use repository evidence to replace the `DAEMON.md` configuration placeholders before enabling the daemon. Keep the runtime daemon focused on the configured commands rather than package-manager auto-detection.
+Use repository evidence to replace the `DAEMON.md` configuration placeholders before
+enabling the daemon. Keep the runtime daemon focused on the configured commands rather
+than package-manager auto-detection.
 
 ## Lockfile hints
 
@@ -15,7 +17,9 @@ If multiple lockfiles exist, inspect recent commits and package scripts before c
 
 ## Configuration examples
 
-These examples are starting points. Replace them with repository-specific commands and only use commands that preserve the daemon's patch/minor policy. Do not use `@latest` or major-version update flags unless the daemon policy is explicitly expanded.
+These examples are starting points. Replace them with repository-specific commands and only
+use commands that preserve the daemon's patch/minor policy. Do not use `@latest` or
+major-version update flags unless the daemon policy is explicitly expanded.
 
 pnpm:
 

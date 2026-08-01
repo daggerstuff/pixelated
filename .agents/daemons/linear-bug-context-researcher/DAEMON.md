@@ -31,7 +31,9 @@ No-op silently when the issue appears to be a feature request, task, question, p
 
 ## Research policy
 
-Use the triggering Linear issue as the source of truth for the symptom and affected area. Derive search terms from the title, labels, component names, error text, stack frames, linked GitHub URLs, and concrete nouns in the issue body.
+Use the triggering Linear issue as the source of truth for the symptom and affected area.
+Derive search terms from the title, labels, component names, error text, stack frames,
+linked GitHub URLs, and concrete nouns in the issue body.
 
 Search in this order:
 
@@ -55,7 +57,9 @@ Suspicious areas: <files, modules, services, or ownership clues with evidence>
 Missing repro details: <specific details needed, if any>
 ```
 
-Omit empty sections. Do not include raw log dumps, long search transcripts, or speculative blame. Phrase findings as evidence and uncertainty, not final root cause, unless the root cause is directly proven.
+Omit empty sections. Do not include raw log dumps, long search transcripts, or speculative
+blame. Phrase findings as evidence and uncertainty, not final root cause, unless the root
+cause is directly proven.
 
 ## Idempotency
 
