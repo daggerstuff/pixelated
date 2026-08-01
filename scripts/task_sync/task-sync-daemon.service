@@ -1,0 +1,19 @@
+[Unit]
+Description=Pixelated Empathy Task Sync Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pixelated
+Group=pixelated
+WorkingDirectory=/opt/pixelated
+ExecStart=/opt/pixelated/.venv/bin/python scripts/task_sync/sync_daemon.py --interval 15 --log-file /var/log/pixelated/task-sync.log
+Restart=on-failure
+RestartSec=30
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=task-sync-daemon
+
+[Install]
+WantedBy=multi-user.target
