@@ -3,8 +3,11 @@
  * Comprehensive patient data management with privacy and security
  */
 
-import encryptionManager from '../../lib/security/encryptionManager'
-import type { EncryptedData } from '../../lib/security/encryptionManager'
+import {
+  encryptPHIFields,
+  decryptPHIFields,
+  PHI_FIELDS,
+} from '../../lib/fhe/field-encryption'
 import type {
   PatientProfile,
   TreatmentPlan,
@@ -73,35 +76,20 @@ class PatientManager {
     const patientId = this.generatePatientId()
     const now = new Date()
 
+    // Encrypt all PHI fields using FHE
+    const encryptedData = await encryptPHIFields(
+      patientData as Record<string, unknown>,
+      PHI_FIELDS,
+    )
+
     const patientProfile: PatientProfile = {
       id: patientId,
-      ...patientData,
+      ...(encryptedData as unknown as Omit<
+        PatientProfile,
+        'id' | 'createdAt' | 'updatedAt'
+      >),
       createdAt: now,
       updatedAt: now,
-      encryptedFields: [],
-    }
-
-    // Encrypt sensitive fields
-    if (patientData['contact']?.email) {
-      const encrypted = await encryptionManager.encrypt(
-        patientData['contact'].email,
-      )
-      patientProfile.contact = {
-        ...patientData['contact'],
-        email: JSON.stringify(encrypted),
-      }
-      patientProfile.encryptedFields.push('contact.email')
-    }
-
-    if (patientData['contact']?.phone) {
-      const encrypted = await encryptionManager.encrypt(
-        patientData['contact'].phone,
-      )
-      patientProfile.contact = {
-        ...patientProfile.contact,
-        phone: JSON.stringify(encrypted),
-      }
-      patientProfile.encryptedFields.push('contact.phone')
     }
 
     // Update search index
@@ -692,31 +680,7 @@ class PatientManager {
   private async decryptPatientData(
     patient: PatientProfile,
   ): Promise<PatientProfile> {
-    const decrypted = { ...patient }
-
-    if (
-      patient.encryptedFields.includes('contact.email') &&
-      patient.contact?.email
-    ) {
-      const encryptedData: EncryptedData = JSON.parse(patient.contact.email)
-      decrypted.contact = {
-        ...decrypted.contact,
-        email: await encryptionManager.decrypt(encryptedData),
-      }
-    }
-
-    if (
-      patient.encryptedFields.includes('contact.phone') &&
-      patient.contact?.phone
-    ) {
-      const encryptedData: EncryptedData = JSON.parse(patient.contact.phone)
-      decrypted.contact = {
-        ...decrypted.contact,
-        phone: await encryptionManager.decrypt(encryptedData),
-      }
-    }
-
-    return decrypted
+    return decryptPHIFields(patient as Record<string, unknown>) as Promise<PatientProfile>
   }
 
   /**

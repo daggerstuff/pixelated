@@ -18,7 +18,54 @@
  *   45 CFR 164.308(a)(1)   — Security Management Process
  */
 
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeAll } from 'vitest'
+import { vi } from 'vitest'
+
+vi.mock('@/config/env.config', () => ({
+  config: {
+    isProduction: () => false,
+    isDevelopment: () => false,
+    isTest: () => true,
+    security: {
+      enableBruteForceProtection: () => true,
+      maxLoginAttempts: () => 5,
+      accountLockoutDuration: () => 900000,
+      apiAbuseThreshold: () => 100,
+      enableAlerts: () => true,
+      encryption: {
+        algorithm: () => 'aes-256-gcm',
+        key: () => 'test-encryption-key-32-chars-long!',
+      },
+      audit: {
+        enabled: () => true,
+        retentionDays: () => 2555,
+      },
+    },
+  },
+}))
+
+vi.mock('@/lib/auth/config', () => ({
+  HIPAA_CONFIG: {
+    auditLogging: {
+      enabled: true,
+      includeSensitiveData: false,
+      retentionPeriod: 2555,
+    },
+  },
+  PASSWORD_CONFIG: {
+    minLength: 12,
+    maxLength: 128,
+    requireLowercase: true,
+    requireUppercase: true,
+    requireNumber: true,
+    requireSpecial: true,
+  },
+  JWT_CONFIG: {
+    secret: 'test-jwt-secret-32-chars-long-for-testing!',
+    expiresIn: 3600,
+    refreshExpiresIn: 86400,
+  },
+}))
 
 import { config } from '@/config/env.config'
 import { encrypt, decrypt } from '@/lib/encryption'

@@ -6,15 +6,22 @@
  *   pnpm db:rollback  # roll back the most recently applied migration
  *   pnpm db:status    # show applied vs pending migrations
  *
- * Environment: standard DB_* vars (DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD).
+ * Environment: prefers DATABASE_URL when set (CI passes it from secrets);
+ * otherwise falls back to the standard DB_* vars (DB_HOST, DB_PORT, DB_NAME,
+ * DB_USER, DB_PASSWORD).
  */
 
 import { closeDatabase, initializeDatabase, migrations } from '../src/lib/db/index.ts'
+import { parseDatabaseUrl } from '../src/lib/db/parse-database-url'
 
 const DEFAULT_MIGRATIONS_DIR = './db/migrations'
 
 async function ensureDatabase() {
-  initializeDatabase()
+  // Prefer DATABASE_URL when present (CI sets it from secrets); otherwise
+  // fall back to the DB_* environment variables used by the app.
+  const databaseUrl = process.env['DATABASE_URL']
+  if (databaseUrl) initializeDatabase(parseDatabaseUrl(databaseUrl))
+  else initializeDatabase()
 }
 
 async function runMigrate(): Promise<number> {

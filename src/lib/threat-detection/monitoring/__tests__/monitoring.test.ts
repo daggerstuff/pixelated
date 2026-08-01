@@ -520,7 +520,7 @@ describe('Enhanced Monitoring Service', () => {
       await service.trackMetric(metricData)
 
       expect(mockRedis.set).toHaveBeenCalledWith(
-        `metric:response_time:${Date.now()}`,
+        expect.stringMatching(/^metric:response_time:\d+$/),
         expect.any(String),
         'EX',
         86400,

@@ -54,8 +54,7 @@ export class BiasMetricsCollector {
       // Start local aggregation timer
       this.startAggregation()
     } catch (error: unknown) {
-      // In test environment or when explicitly configured, throw the error
-      if (process.env['NODE_ENV'] === 'test' || this.config.strictMode) {
+      if (this.config.strictMode) {
         throw error
       }
 

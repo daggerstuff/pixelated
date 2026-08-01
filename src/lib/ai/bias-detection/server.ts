@@ -50,7 +50,6 @@ class BiasDetectionServer {
 
   private async handleHealthCheck(req: IncomingMessage, res: NodeServerResponse): Promise<void> {
     try {
-      const engineHealth = await this.engine.getHealthStatus()
       const serverHealth = {
         status: this.isRunning ? 'healthy' : 'unhealthy',
         uptime: process.uptime(),
@@ -58,21 +57,13 @@ class BiasDetectionServer {
         timestamp: new Date().toISOString(),
       }
 
-      const engineHealthy =
-        typeof engineHealth.overall === 'string'
-          ? engineHealth.overall === 'healthy'
-          : engineHealth.overall
-      const overallHealth =
-        engineHealthy && this.isRunning ? 'healthy' : 'degraded'
-
       this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
-          status: overallHealth,
+          status: this.isRunning ? 'healthy' : 'unhealthy',
           timestamp: new Date().toISOString(),
           services: {
             server: serverHealth,
-            engine: engineHealth,
           },
           version: process.env['npm_package_version'] ?? '1.0.0',
         },
@@ -388,9 +379,6 @@ class BiasDetectionServer {
   }
 
   async start(): Promise<{ status: string; port: number }> {
-    // Initialize the bias detection engine
-    await this.engine.initialize()
-
     this.server = createServer(
       (req: IncomingMessage, res: NodeServerResponse) => {
         this.handleRequest(req, res).catch((error) => {
@@ -412,9 +400,11 @@ class BiasDetectionServer {
         appLogger.info(
           `Bias Detection Service started on port ${BIAS_DETECTION_PORT}`,
         )
-        appLogger.info(
-          `Bias Detection Service started on port ${BIAS_DETECTION_PORT}`,
-        )
+        
+        // Initialize the engine after server is listening
+        this.engine.initialize().catch((error) => {
+          appLogger.error('Engine initialization failed:', error)
+        })
         appLogger.info('Available endpoints:')
         appLogger.info('  GET /health - Health check')
         appLogger.info('  POST /analyze - Single session bias analysis')

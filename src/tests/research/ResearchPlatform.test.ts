@@ -1,6 +1,84 @@
 /* @vitest-environment node */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
+// Mock database and redis before importing services
+const consentStore = new Map<string, Record<string, unknown>>()
+const auditStore: Record<string, unknown>[] = []
+
+vi.mock('@/lib/db', () => ({
+  query: vi.fn().mockImplementation((sql: string, params?: unknown[]) => {
+    if (sql.includes('INSERT INTO consent_records')) {
+      const clientId = params?.[0] as string
+      consentStore.set(clientId, {
+        client_id: clientId,
+        current_level: params?.[1],
+        consent_history: params?.[2],
+        last_updated: params?.[3],
+        expiration_date: params?.[4],
+        withdrawal_requested: false,
+        withdrawal_date: null,
+        data_purged: false,
+      })
+      return Promise.resolve({ rows: [] })
+    }
+    if (sql.includes('SELECT') && sql.includes('FROM consent_records') && sql.includes('WHERE client_id')) {
+      const clientId = params?.[0] as string
+      const record = consentStore.get(clientId)
+      return Promise.resolve({ rows: record ? [record] : [] })
+    }
+    if (sql.includes('UPDATE consent_records')) {
+      const clientId = params?.[params.length - 1] as string
+      const existing = consentStore.get(clientId)
+      if (existing) {
+        if (sql.includes('current_level')) {
+          existing.current_level = params?.[0]
+          existing.consent_history = params?.[1]
+          existing.last_updated = params?.[2]
+        }
+        if (sql.includes('withdrawal_requested')) {
+          existing.withdrawal_requested = true
+          existing.withdrawal_date = params?.[0]
+          existing.last_updated = params?.[0]
+        }
+        if (sql.includes('data_purged')) {
+          existing.data_purged = true
+          existing.last_updated = new Date().toISOString()
+        }
+      }
+      return Promise.resolve({ rows: [] })
+    }
+    if (sql.includes('INSERT INTO consent_audit_trail')) {
+      auditStore.push({
+        client_id: params?.[0],
+        operation: params?.[1],
+        old_level: params?.[2],
+        new_level: params?.[3],
+        reason: params?.[4],
+        ip_address: params?.[5],
+        user_agent: params?.[6],
+        timestamp: params?.[7],
+      })
+      return Promise.resolve({ rows: [] })
+    }
+    if (sql.includes('SELECT') && sql.includes('FROM consent_audit_trail')) {
+      return Promise.resolve({ rows: auditStore })
+    }
+    return Promise.resolve({ rows: [] })
+  }),
+  initializeDatabase: vi.fn().mockResolvedValue(undefined),
+}))
+
+const redisStore = new Map<string, string>()
+vi.mock('@/lib/redis', () => ({
+  redis: {
+    get: vi.fn().mockImplementation((key: string) => Promise.resolve(redisStore.get(key) ?? null)),
+    set: vi.fn().mockImplementation((key: string, value: string) => { redisStore.set(key, value); return Promise.resolve('OK') }),
+    setex: vi.fn().mockImplementation((key: string, _ttl: number, value: string) => { redisStore.set(key, value); return Promise.resolve('OK') }),
+    del: vi.fn().mockImplementation((key: string) => { redisStore.delete(key); return Promise.resolve(1) }),
+    keys: vi.fn().mockResolvedValue([]),
+  },
+}))
+
 import { ResearchPlatform } from '@/lib/research/ResearchPlatform'
 import { AnonymizationService } from '@/lib/research/services/AnonymizationService'
 import { ConsentManagementService } from '@/lib/research/services/ConsentManagementService'

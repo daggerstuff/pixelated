@@ -13,6 +13,9 @@ permissions:
 jobs:
   expiry-check:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -39,6 +42,26 @@ jobs:
             const expired = '${{ steps.expiry-check.outputs.expired-count }}'
             const critical = '${{ steps.expiry-check.outputs.expiring-critical }}'
             const soon = '${{ steps.expiry-check.outputs.expiring-soon }}'
+
+            // Avoid opening a new issue every daily run while consents remain expired.
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            })
+            const existing = openIssues.find(
+              (issue) =>
+                !issue.pull_request &&
+                issue.title.startsWith('[Consent Expiry]'),
+            )
+            if (existing) {
+              console.log(
+                `Open issue #${existing.number} already tracks consent expiry; skipping duplicate.`,
+              )
+              return
+            }
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -48,9 +71,9 @@ jobs:
                 '',
                 '| Category | Count |',
                 '|----------|-------|',
-                f'| Expired | {expired} |',
-                f'| Expiring Critical (≤7 days) | {critical} |',
-                f'| Expiring Soon (≤30 days) | {soon} |',
+                `| Expired | ${expired} |`,
+                `| Expiring Critical (≤7 days) | ${critical} |`,
+                `| Expiring Soon (≤30 days) | ${soon} |`,
                 '',
                 'Re-consent prompts have been triggered for affected clients.',
                 'Run `GET /api/v1/admin/consent/expiry-check` for full details.',

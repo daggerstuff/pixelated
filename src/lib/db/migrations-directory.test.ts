@@ -298,4 +298,100 @@ describe('DatabaseMigration directory methods', () => {
       expect(result.pending).toEqual(['011_workspace_id.sql'])
     })
   })
+
+  describe('legacy schema_migrations reconciliation', () => {
+    it('preserves a legacy version/applied_at tracking table and starts fresh', async () => {
+      mockQueryFn.mockImplementation(async (text: string) => {
+        if (text.includes('CREATE TABLE IF NOT EXISTS schema_migrations')) {
+          return { rows: [], rowCount: 0 }
+        }
+        if (text.includes('information_schema.columns')) {
+          return {
+            rows: [{ column_name: 'version' }, { column_name: 'applied_at' }],
+            rowCount: 2,
+          }
+        }
+        return { rows: [], rowCount: 0 }
+      })
+
+      await migration.ensureMigrationsTable()
+
+      const sql = mockQueryFn.mock.calls.map((c) => c[0] as string)
+      expect(sql).toContain(
+        'ALTER TABLE schema_migrations RENAME TO schema_migrations_legacy',
+      )
+      // A fresh app-shaped tracking table is created after the rename.
+      expect(
+        sql.filter((s) => s.includes('CREATE TABLE schema_migrations')).length,
+      ).toBeGreaterThanOrEqual(1)
+    })
+
+    it('applies every migration after resetting an unreliable legacy tracking table', async () => {
+      mockQueryFn.mockImplementation(async (text: string) => {
+        if (text.includes('CREATE TABLE IF NOT EXISTS schema_migrations')) {
+          return { rows: [], rowCount: 0 }
+        }
+        if (text.includes('information_schema.columns')) {
+          return {
+            rows: [{ column_name: 'version' }, { column_name: 'applied_at' }],
+            rowCount: 2,
+          }
+        }
+        return { rows: [], rowCount: 0 }
+      })
+
+      const fs = buildFsAdapter({
+        '010_workspaces.sql': 'CREATE TABLE workspaces (id UUID);',
+        '011_workspace_id.sql':
+          'ALTER TABLE users ADD COLUMN workspace_id UUID;',
+        '012_rbac.sql': 'CREATE TABLE roles (id UUID);',
+      })
+
+      const result = await migration.runMigrationsFromDirectory(
+        '/migrations',
+        fs as unknown as Parameters<
+          typeof migration.runMigrationsFromDirectory
+        >[1],
+      )
+
+      // The unreliable legacy rows were renamed out of the way, so every file
+      // is treated as pending, applied idempotently, and recorded.
+      expect(result.applied).toEqual([
+        '010_workspaces.sql',
+        '011_workspace_id.sql',
+        '012_rbac.sql',
+      ])
+      expect(result.skipped).toEqual([])
+      const sql = mockQueryFn.mock.calls.map((c) => c[0] as string)
+      expect(sql).toContain(
+        'ALTER TABLE schema_migrations RENAME TO schema_migrations_legacy',
+      )
+    })
+
+    it('is a no-op when the tracking table already uses the app shape', async () => {
+      mockQueryFn.mockImplementation(async (text: string) => {
+        if (text.includes('CREATE TABLE IF NOT EXISTS schema_migrations')) {
+          return { rows: [], rowCount: 0 }
+        }
+        if (text.includes('information_schema.columns')) {
+          return {
+            rows: [
+              { column_name: 'id' },
+              { column_name: 'name' },
+              { column_name: 'executed_at' },
+            ],
+            rowCount: 3,
+          }
+        }
+        return { rows: [], rowCount: 0 }
+      })
+
+      await migration.ensureMigrationsTable()
+
+      const sql = mockQueryFn.mock.calls.map((c) => c[0] as string)
+      expect(
+        sql.some((s) => s.startsWith('ALTER TABLE schema_migrations')),
+      ).toBe(false)
+    })
+  })
 })
