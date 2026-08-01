@@ -75,6 +75,8 @@
     "test:unit": "NODE_ENV=test NODE_OPTIONS='--max-old-space-size=8192' vitest run -c config/vitest.config.ts --coverage",
     "test:integration": "vitest run tests/integration/",
     "test:coverage": "NODE_ENV=test vitest run -c config/vitest.config.ts --coverage",
+    "test:coverage-audit": "tsx scripts/ci/coverage-audit.ts --write-json",
+    "test:strict-mode": "tsx scripts/ci/ts-strict-mode-tracker.ts --write-json",
     "test:watch": "vitest watch",
     "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_faiss_standalone.py tests/test_relevance_scorer_standalone.py",
     "test:hipaa": "node scripts/consolidated-test.js hipaa",
