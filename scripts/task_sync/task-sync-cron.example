@@ -1,0 +1,7 @@
+# Pixelated Empathy Task Sync — cron example
+#
+# Run sync every 15 minutes:
+# */15 * * * * cd /opt/pixelated && .venv/bin/python scripts/task_sync/sync_daemon.py --once --log-file /var/log/pixelated/task-sync.log >> /var/log/pixelated/task-sync-cron.log 2>&1
+#
+# Run sync every hour:
+# 0 * * * * cd /opt/pixelated && .venv/bin/python scripts/task_sync/sync_daemon.py --once --log-file /var/log/pixelated/task-sync.log >> /var/log/pixelated/task-sync-cron.log 2>&1
