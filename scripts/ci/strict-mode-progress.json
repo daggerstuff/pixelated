@@ -1,42 +1,144 @@
 {
-  "timestamp": "2026-07-19T22:30:00Z",
+  "timestamp": "2026-08-01T02:01:25.639Z",
   "tool": "ts-strict-mode-tracker",
-  "version": "2.0.0",
   "config": {
     "noImplicitAny": true,
-    "noUncheckedIndexedAccess": true,
-    "strict": true,
-    "skipLibCheck": true
+    "noUncheckedIndexedAccess": true
   },
-  "status": "BASELINE_PENDING",
-  "blockers": [
-    "Full tsc --noEmit check exceeds environment timeout (120s) for 1427 source files",
-    "Run `pnpm tsx scripts/ci/ts-strict-mode-tracker.ts --write-json` locally for live data"
-  ],
+  "summary": {
+    "totalModules": 18,
+    "totalFiles": 921,
+    "totalErrors": 0,
+    "cleanModules": 18,
+    "failingModules": 0,
+    "migrationProgressPct": 100
+  },
   "modules": [
-    { "name": "lib/encryption", "files": 1,   "errors": null, "passed": null, "priority": "P0" },
-    { "name": "lib/security",  "files": 53,  "errors": null, "passed": null, "priority": "P0" },
-    { "name": "lib/logging",   "files": 9,   "errors": null, "passed": null, "priority": "P0" },
-    { "name": "middleware",     "files": 5,   "errors": null, "passed": null, "priority": "P0" },
-    { "name": "config",         "files": 19,  "errors": null, "passed": null, "priority": "P0" },
-    { "name": "lib/auth",       "files": 38,  "errors": null, "passed": null, "priority": "P1" },
-    { "name": "lib/audit",      "files": 8,   "errors": null, "passed": null, "priority": "P1" },
-    { "name": "lib/db",         "files": 20,  "errors": null, "passed": null, "priority": "P1" },
-    { "name": "lib/memory",     "files": 37,  "errors": null, "passed": null, "priority": "P1" },
-    { "name": "types",          "files": 50,  "errors": null, "passed": null, "priority": "P1" },
-    { "name": "lib/ehr",        "files": 12,  "errors": null, "passed": null, "priority": "P2" },
-    { "name": "lib/fhe",        "files": 34,  "errors": null, "passed": null, "priority": "P2" },
-    { "name": "hooks",          "files": 46,  "errors": null, "passed": null, "priority": "P2" },
-    { "name": "utils",          "files": 40,  "errors": null, "passed": null, "priority": "P2" },
-    { "name": "lib/ai",         "files": 172, "errors": null, "passed": null, "priority": "P3" },
-    { "name": "lib/services",   "files": 53,  "errors": null, "passed": null, "priority": "P3" },
-    { "name": "components",     "files": 71,  "errors": null, "passed": null, "priority": "P3" },
-    { "name": "pages/api",      "files": 203, "errors": null, "passed": null, "priority": "P3" }
-  ],
-  "migrationOrder": {
-    "phase1": ["lib/encryption", "lib/security", "lib/logging", "middleware", "config"],
-    "phase2": ["lib/auth", "lib/audit", "lib/db", "lib/memory", "types"],
-    "phase3": ["lib/ehr", "lib/fhe", "hooks", "utils"],
-    "phase4": ["lib/ai", "lib/services", "components", "pages/api"]
-  }
+    {
+      "name": "lib/auth",
+      "files": 38,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/audit",
+      "files": 8,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/security",
+      "files": 53,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/encryption",
+      "files": 0,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/ai",
+      "files": 182,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/ehr",
+      "files": 12,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/fhe",
+      "files": 41,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/logging",
+      "files": 9,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/services",
+      "files": 54,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/memory",
+      "files": 42,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "lib/db",
+      "files": 21,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "utils",
+      "files": 40,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "hooks",
+      "files": 46,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "components",
+      "files": 71,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "pages/api",
+      "files": 229,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "middleware",
+      "files": 5,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "config",
+      "files": 19,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    },
+    {
+      "name": "types",
+      "files": 51,
+      "errors": 0,
+      "passed": true,
+      "sampleErrors": []
+    }
+  ]
 }
