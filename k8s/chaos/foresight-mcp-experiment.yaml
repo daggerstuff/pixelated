@@ -1,0 +1,65 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: foresight-mcp-pod-kill
+  namespace: pixelated-empathy
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      "app": "foresight-mcp"
+  gracePeriod: 0
+  duration: "30s"
+  scheduler:
+    cron: "@every 5m"
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: NetworkChaos
+metadata:
+  name: foresight-mcp-network-latency
+  namespace: pixelated-empathy
+spec:
+  action: delay
+  mode: all
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      "app": "foresight-mcp"
+  delay:
+    latency: "200ms"
+    jitter: "50ms"
+  duration: "60s"
+  scheduler:
+    cron: "@every 10m"
+---
+apiVersion: chaos-mesh.org/v1alpha1
+kind: HTTPChaos
+metadata:
+  name: foresight-mcp-http-fault
+  namespace: pixelated-empathy
+spec:
+  selector:
+    namespaces:
+      - pixelated-empathy
+    labelSelectors:
+      "app": "foresight-mcp"
+  mode: all
+  target:
+    selector:
+      namespaces:
+        - pixelated-empathy
+      labelSelectors:
+        "app": "foresight-mcp"
+    port: 8080
+  port: 8080
+  method: GET
+  replace:
+    code: 503
+    body: "Service temporarily unavailable"
+  duration: "30s"
+  scheduler:
+    cron: "@every 15m"
