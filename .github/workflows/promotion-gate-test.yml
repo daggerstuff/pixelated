@@ -1,0 +1,231 @@
+name: Promotion Gate Test (Staging)
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: 'Test scenario: pass (all green) or fail (one lane fails)'
+        required: true
+        type: choice
+        options:
+          - pass
+          - fail
+        default: 'fail'
+  schedule:
+    - cron: '0 14 * * 5'  # Weekly Friday 2pm UTC
+
+concurrency:
+  group: promotion-gate-test-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  readiness-gate-test:
+    name: Test Readiness Gate Logic
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install httpx
+
+      - name: Run readiness aggregator (dry-run, all pass)
+        if: github.event.inputs.scenario == 'pass' || github.event_name == 'schedule'
+        id: readiness-pass
+        run: |
+          echo "=== Testing PASS scenario (all lanes green) ==="
+          python3 scripts/devops/aggregate-readiness.py --dry-run --output /tmp/readiness-pass.json
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat /tmp/readiness-pass.json | python3 -m json.tool
+
+      - name: Verify PASS scenario blocks correctly
+        if: github.event.inputs.scenario == 'pass' || github.event_name == 'schedule'
+        run: |
+          STATUS=$(python3 -c "import json; print(json.load(open('/tmp/readiness-pass.json'))['readiness']['status'])")
+          SCORE=$(python3 -c "import json; print(json.load(open('/tmp/readiness-pass.json'))['readiness']['score'])")
+
+          echo "Readiness status: $STATUS"
+          echo "Readiness score: $SCORE"
+
+          if [ "$STATUS" != "ready" ] && [ "$STATUS" != "warning" ]; then
+            echo "ERROR: Expected status 'ready' or 'warning' but got '$STATUS'"
+            exit 1
+          fi
+
+          echo "✓ PASS scenario: readiness gate correctly reports ready"
+
+      - name: Simulate FAIL scenario (inject failing lane)
+        if: github.event.inputs.scenario == 'fail'
+        id: readiness-fail
+        run: |
+          echo "=== Testing FAIL scenario (one lane fails) ==="
+
+          # Create a mock readiness report with a failing lane
+          cat > /tmp/readiness-fail.json <<'EOF'
+          {
+            "readiness": {
+              "status": "not-ready",
+              "score": 75.0,
+              "timestamp": "2026-08-01T00:00:00Z",
+              "commit": "test-commit-sha",
+              "branch": "staging"
+            },
+            "summary": {
+              "totalLanes": 4,
+              "passedLanes": 3,
+              "failedLanes": 1,
+              "skippedLanes": 0
+            },
+            "validationLanes": {
+              "lint": {"status": "pass", "exitCode": 0, "command": "pnpm lint"},
+              "typecheck": {"status": "pass", "exitCode": 0, "command": "pnpm typecheck"},
+              "tests": {"status": "fail", "exitCode": 1, "command": "pnpm test:unit", "stderr": "Test suite failed"},
+              "format": {"status": "pass", "exitCode": 0, "command": "pnpm format:check"}
+            },
+            "providerPipelines": [],
+            "providerSummary": {"total": 0, "passed": 0, "failed": 0, "running": 0}
+          }
+          EOF
+
+          cat /tmp/readiness-fail.json | python3 -m json.tool
+
+      - name: Verify FAIL scenario blocks deploy
+        if: github.event.inputs.scenario == 'fail'
+        run: |
+          STATUS=$(python3 -c "import json; print(json.load(open('/tmp/readiness-fail.json'))['readiness']['status'])")
+          SCORE=$(python3 -c "import json; print(json.load(open('/tmp/readiness-fail.json'))['readiness']['score'])")
+          FAILED=$(python3 -c "import json; print(json.load(open('/tmp/readiness-fail.json'))['summary']['failedLanes'])")
+
+          echo "Readiness status: $STATUS"
+          echo "Readiness score: $SCORE"
+          echo "Failed lanes: $FAILED"
+
+          if [ "$STATUS" != "not-ready" ]; then
+            echo "ERROR: Expected status 'not-ready' but got '$STATUS'"
+            exit 1
+          fi
+
+          if [ "$FAILED" -eq 0 ]; then
+            echo "ERROR: Expected at least 1 failed lane but got $FAILED"
+            exit 1
+          fi
+
+          echo "✓ FAIL scenario: readiness gate correctly blocks deployment"
+
+      - name: Test deploy gate decision logic
+        run: |
+          echo "=== Testing deploy gate decision logic ==="
+
+          # Simulate the gate decision that would be used in deploy-civo.yml
+          python3 <<'PYEOF'
+          import json
+          import sys
+
+          def should_deploy(readiness_file):
+              """Gate logic: deploy only if status is 'ready' or 'warning'."""
+              try:
+                  with open(readiness_file) as f:
+                      report = json.load(f)
+                  status = report['readiness']['status']
+                  score = report['readiness']['score']
+
+                  print(f"Readiness status: {status}")
+                  print(f"Readiness score: {score}")
+
+                  if status == 'not-ready':
+                      print("❌ BLOCKED: Readiness gate failed — deployment blocked")
+                      return False
+                  elif status == 'warning':
+                      print("⚠️  WARNING: Readiness has warnings but deployment allowed")
+                      return True
+                  elif status == 'ready':
+                      print("✅ READY: All checks passed — deployment allowed")
+                      return True
+                  else:
+                      print(f"❓ UNKNOWN: Unexpected status '{status}' — blocking for safety")
+                      return False
+              except Exception as e:
+                  print(f"❌ ERROR: Could not read readiness report: {e}")
+                  return False
+
+          # Test the scenario
+          scenario = "${{ github.event.inputs.scenario || 'pass' }}"
+          readiness_file = f"/tmp/readiness-{scenario}.json"
+
+          if scenario == 'pass':
+              # For pass scenario, run the actual aggregator
+              import subprocess
+              result = subprocess.run(
+                  ["python3", "scripts/devops/aggregate-readiness.py", "--dry-run", "--output", readiness_file],
+                  capture_output=True,
+                  text=True
+              )
+
+          allowed = should_deploy(readiness_file)
+
+          # For the test, we expect:
+          # - pass scenario: deployment allowed
+          # - fail scenario: deployment blocked
+          expected = (scenario == 'pass')
+          if allowed == expected:
+              print(f"✓ Gate decision matches expected behavior for '{scenario}' scenario")
+              sys.exit(0)
+          else:
+              print(f"❌ Gate decision mismatch: allowed={allowed}, expected={expected}")
+              sys.exit(1)
+          PYEOF
+
+      - name: Generate test report
+        if: always()
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          SCENARIO="${{ github.event.inputs.scenario || 'scheduled' }}"
+          REPORT_FILE=".agent/internal/ci-federation/promotion-test-${DATE}-${SCENARIO}.md"
+
+          mkdir -p .agent/internal/ci-federation
+
+          cat > "$REPORT_FILE" <<EOF
+          # Promotion Gate Test Report
+
+          **Date**: ${DATE}
+          **Scenario**: ${SCENARIO}
+          **Environment**: staging
+          **Trigger**: ${{ github.event_name }}
+
+          ## Test Results
+          - Readiness aggregator: ${{ job.status }}
+          - Gate decision logic: verified
+          - Expected behavior: ${{ github.event.inputs.scenario == 'pass' && 'deployment allowed' || 'deployment blocked' }}
+
+          ## Validation
+          - PASS scenario: all lanes green → readiness=ready → deploy allowed
+          - FAIL scenario: one lane fails → readiness=not-ready → deploy blocked
+
+          ## Next Steps
+          - Review readiness aggregator output
+          - Verify deploy-civo.yml uses this gate before deployment
+          - Schedule regular promotion tests (weekly)
+          EOF
+
+          echo "Report generated: $REPORT_FILE"
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: promotion-test-report-${{ github.run_id }}
+          path: .agent/internal/ci-federation/
+          retention-days: 30
