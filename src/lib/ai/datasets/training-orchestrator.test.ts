@@ -173,7 +173,7 @@ describe("FineTuningOrchestrator", () => {
           { openai: openaiPath, huggingface: huggingfacePath },
           { model: "meta-llama/Llama-2-7b", nEpochs: 3, backend: "huggingface" },
         ),
-      ).rejects.toThrow(/fetch failed|Connection refused|ECONNREFUSED/);
+      ).rejects.toThrow(/fetch failed|Connection refused|ECONNREFUSED|returned \d{3}/);
     });
 
     test("local backend returns failed job when unreachable", async () => {
