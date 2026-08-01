@@ -1,5 +1,6 @@
 /* @vitest-environment node */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
 import { SealSchemeType } from '../seal-types'
 import type { SealContextOptions } from '../seal-types'
 
@@ -37,8 +38,8 @@ const mockSealModule = {
     Batching: vi.fn(() => 'plain-mod'),
   },
   Context: vi.fn(() => ({
-    parametersSet: () => true,
-    usingKeyswitching: () => true,
+    parametersSet: (): boolean => true,
+    usingKeyswitching: (): boolean => true,
     delete: vi.fn(),
   })),
 }
@@ -59,19 +60,22 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-function makeOptions(overrides: Partial<SealContextOptions> = {}): SealContextOptions {
+function makeOptions(
+  overrides: Partial<SealContextOptions> = {},
+): SealContextOptions {
   return {
     scheme: SealSchemeType.BFV,
     params: {
       polyModulusDegree: 4096,
       securityLevel: 'tc128',
+      coeffModulusBits: [],
     },
     ...overrides,
   }
 }
 
 describe('SealContext', () => {
-  let ctx: SealContext
+  let ctx: InstanceType<typeof SealContext>
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -82,7 +86,7 @@ describe('SealContext', () => {
     it('stores options and defaults securityLevel to tc256 when not set', () => {
       const noSecCtx = new SealContext({
         scheme: SealSchemeType.BFV,
-        params: { polyModulusDegree: 4096 },
+        params: { polyModulusDegree: 4096, coeffModulusBits: [] },
       })
       expect(noSecCtx.getOptions().params.securityLevel).toBeUndefined()
     })
@@ -92,42 +96,67 @@ describe('SealContext', () => {
     it('initializes with BFV scheme', async () => {
       await ctx.initialize()
       expect(ctx.isInitialized()).toBe(true)
-      expect(mockSealModule.EncryptionParameters).toHaveBeenCalledWith('scheme-bfv')
+      expect(mockSealModule.EncryptionParameters).toHaveBeenCalledWith(
+        'scheme-bfv',
+      )
     })
 
     it('initializes with CKKS scheme', async () => {
-      const ckksCtx = new SealContext(makeOptions({
-        scheme: SealSchemeType.CKKS,
-        params: {
-          polyModulusDegree: 8192,
-          coeffModulusBits: [60, 40, 40, 60],
-        },
-      }))
+      const ckksCtx = new SealContext(
+        makeOptions({
+          scheme: SealSchemeType.CKKS,
+          params: {
+            polyModulusDegree: 8192,
+            coeffModulusBits: [60, 40, 40, 60],
+          },
+        }),
+      )
       await ckksCtx.initialize()
       expect(ckksCtx.isInitialized()).toBe(true)
-      expect(mockSealModule.EncryptionParameters).toHaveBeenCalledWith('scheme-ckks')
-      expect(mockSealModule.CoeffModulus.Create).toHaveBeenCalledWith(8192, [60, 40, 40, 60])
+      expect(mockSealModule.EncryptionParameters).toHaveBeenCalledWith(
+        'scheme-ckks',
+      )
+      expect(mockSealModule.CoeffModulus.Create).toHaveBeenCalledWith(
+        8192,
+        [60, 40, 40, 60],
+      )
     })
 
     it('initializes with BGV scheme', async () => {
-      const bgvCtx = new SealContext(makeOptions({ scheme: SealSchemeType.BGV }))
+      const bgvCtx = new SealContext(
+        makeOptions({ scheme: SealSchemeType.BGV }),
+      )
       await bgvCtx.initialize()
       expect(bgvCtx.isInitialized()).toBe(true)
-      expect(mockSealModule.EncryptionParameters).toHaveBeenCalledWith('scheme-bgv')
+      expect(mockSealModule.EncryptionParameters).toHaveBeenCalledWith(
+        'scheme-bgv',
+      )
     })
 
     it('maps security level tc192', async () => {
-      const ctx192 = new SealContext(makeOptions({
-        params: { polyModulusDegree: 4096, securityLevel: 'tc192' },
-      }))
+      const ctx192 = new SealContext(
+        makeOptions({
+          params: {
+            polyModulusDegree: 4096,
+            securityLevel: 'tc192',
+            coeffModulusBits: [],
+          },
+        }),
+      )
       await ctx192.initialize()
       expect(ctx192.isInitialized()).toBe(true)
     })
 
     it('maps security level tc256', async () => {
-      const ctx256 = new SealContext(makeOptions({
-        params: { polyModulusDegree: 4096, securityLevel: 'tc256' },
-      }))
+      const ctx256 = new SealContext(
+        makeOptions({
+          params: {
+            polyModulusDegree: 4096,
+            securityLevel: 'tc256',
+            coeffModulusBits: [],
+          },
+        }),
+      )
       await ctx256.initialize()
       expect(ctx256.isInitialized()).toBe(true)
     })
@@ -151,7 +180,9 @@ describe('SealContext', () => {
         usingKeyswitching: () => false,
         delete: vi.fn(),
       })
-      await expect(ctx.initialize()).rejects.toThrow('SEAL parameters are not valid')
+      await expect(ctx.initialize()).rejects.toThrow(
+        'SEAL parameters are not valid',
+      )
     })
 
     it('throws when node-seal import fails and no browser fallback', async () => {
@@ -159,7 +190,9 @@ describe('SealContext', () => {
         default: vi.fn(() => Promise.reject(new Error('not found'))),
       }))
       const failCtx = new SealContext(makeOptions())
-      await expect(failCtx.initialize()).rejects.toThrow('SEAL initialization failed')
+      await expect(failCtx.initialize()).rejects.toThrow(
+        'SEAL initialization failed',
+      )
       vi.doUnmock('node-seal')
     })
   })

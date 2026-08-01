@@ -212,7 +212,7 @@ export const MultiSessionProgression = React.lazy(async () => {
 })
 
 export const DynamicMultiSessionProgression = (
-  props: Record<string, unknown>,
+  props: ComponentProps<typeof MultiSessionProgression>,
 ) => (
   <Suspense fallback={<DefaultLoading />}>
     <MultiSessionProgression {...props} />
@@ -224,19 +224,22 @@ export const BeliefChangeTracker = React.lazy(async () => {
   return { default: module.BeliefChangeTracker }
 })
 
-export const DynamicBeliefChangeTracker = (props: Record<string, unknown>) => (
+export const DynamicBeliefChangeTracker = (
+  props: ComponentProps<typeof BeliefChangeTracker>,
+) => (
   <Suspense fallback={<DefaultLoading />}>
     <BeliefChangeTracker {...props} />
   </Suspense>
 )
 
 export const DefenseMechanismAdaptation = React.lazy(async () => {
-  const module = await import('../../components/chat/DefenseMechanismAdaptation')
+  const module =
+    await import('../../components/chat/DefenseMechanismAdaptation')
   return { default: module.DefenseMechanismAdaptation }
 })
 
 export const DynamicDefenseMechanismAdaptation = (
-  props: Record<string, unknown>,
+  props: ComponentProps<typeof DefenseMechanismAdaptation>,
 ) => (
   <Suspense fallback={<DefaultLoading />}>
     <DefenseMechanismAdaptation {...props} />
@@ -248,7 +251,9 @@ export const GoalAttainmentScale = React.lazy(async () => {
   return { default: module.GoalAttainmentScale }
 })
 
-export const DynamicGoalAttainmentScale = (props: Record<string, unknown>) => (
+export const DynamicGoalAttainmentScale = (
+  props: ComponentProps<typeof GoalAttainmentScale>,
+) => (
   <Suspense fallback={<DefaultLoading />}>
     <GoalAttainmentScale {...props} />
   </Suspense>

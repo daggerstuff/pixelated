@@ -107,7 +107,7 @@ export async function decryptField<T = string>(
 
   try {
     const encryptedData: EncryptedData = JSON.parse(encryptedField.payload)
-    const decrypted = await decrypt<string>(encryptedData)
+    const decrypted = (await decrypt(encryptedData)) as string
     logger.debug(`Decrypted PHI field: ${encryptedField.field}`)
 
     if (
@@ -195,10 +195,7 @@ function setNestedValue(
   const parts = path.split('.')
   let current: Record<string, unknown> = obj
   for (let i = 0; i < parts.length - 1; i++) {
-    if (
-      typeof current[parts[i]] !== 'object' ||
-      current[parts[i]] === null
-    ) {
+    if (typeof current[parts[i]] !== 'object' || current[parts[i]] === null) {
       current[parts[i]] = {}
     }
     current = current[parts[i]] as Record<string, unknown>
