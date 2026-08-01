@@ -150,9 +150,20 @@ async function checkCrisisDetection(): Promise<ProductionReadinessCheck> {
 async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
   try {
     // Read actual coverage from vitest/coverage output
-    const coverageJsonPath = path.join(process.cwd(), 'coverage', 'coverage-final.json')
-    const coberturaPath = path.join(process.cwd(), 'coverage', 'cobertura-coverage.xml')
-    const coverageAuditPath = path.join(process.cwd(), 'scripts/ci/coverage-audit-report.json')
+    const coverageJsonPath = path.join(
+      process.cwd(),
+      'coverage',
+      'coverage-final.json',
+    )
+    const coberturaPath = path.join(
+      process.cwd(),
+      'coverage',
+      'cobertura-coverage.xml',
+    )
+    const coverageAuditPath = path.join(
+      process.cwd(),
+      'scripts/ci/coverage-audit-report.json',
+    )
 
     let coverage = 0
     let coverageDetails: Record<string, unknown> = {}
@@ -161,7 +172,14 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
     if (existsSync(coverageJsonPath)) {
       const coverageData = JSON.parse(
         readFileSync(coverageJsonPath, 'utf8'),
-      ) as Record<string, { s?: Record<string, number>; f?: Record<string, number>; b?: Record<string, number[]> }>
+      ) as Record<
+        string,
+        {
+          s?: Record<string, number>
+          f?: Record<string, number>
+          b?: Record<string, number[]>
+        }
+      >
       const files = Object.keys(coverageData)
 
       // Calculate coverage from the coverage-final.json format (vitest v8)
@@ -234,8 +252,8 @@ async function checkTestCoverage(): Promise<ProductionReadinessCheck> {
     if (existsSync(coverageAuditPath)) {
       try {
         const auditReport = JSON.parse(readFileSync(coverageAuditPath, 'utf8'))
-        coverageDetails.perModuleCoverage = auditReport.modules
-        coverageDetails.auditTimestamp = auditReport.timestamp
+        coverageDetails['perModuleCoverage'] = auditReport['modules']
+        coverageDetails['auditTimestamp'] = auditReport['timestamp']
       } catch {
         // Audit report parse failure is non-fatal
       }

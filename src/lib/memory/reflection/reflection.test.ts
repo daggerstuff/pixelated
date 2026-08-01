@@ -18,6 +18,7 @@ function makeMemory(overrides: Partial<MemoryBlock> = {}): MemoryBlock {
       relevance: 0.5,
       emotionalWeight: 1.0,
       actionability: 0.3,
+      reveriePotential: 0.1,
     },
     emotions: overrides.emotions ?? {
       valence: 0.0,
@@ -35,6 +36,8 @@ function makeMemory(overrides: Partial<MemoryBlock> = {}): MemoryBlock {
       lastProcessed: 0,
       remCycles: 3,
       schemaReferences: [],
+      reverieEligible: false,
+      reveriePhase: 'dormant',
     },
   }
 }

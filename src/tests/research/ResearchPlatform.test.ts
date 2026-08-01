@@ -21,7 +21,11 @@ vi.mock('@/lib/db', () => ({
       })
       return Promise.resolve({ rows: [] })
     }
-    if (sql.includes('SELECT') && sql.includes('FROM consent_records') && sql.includes('WHERE client_id')) {
+    if (
+      sql.includes('SELECT') &&
+      sql.includes('FROM consent_records') &&
+      sql.includes('WHERE client_id')
+    ) {
       const clientId = params?.[0] as string
       const record = consentStore.get(clientId)
       return Promise.resolve({ rows: record ? [record] : [] })
@@ -31,18 +35,18 @@ vi.mock('@/lib/db', () => ({
       const existing = consentStore.get(clientId)
       if (existing) {
         if (sql.includes('current_level')) {
-          existing.current_level = params?.[0]
-          existing.consent_history = params?.[1]
-          existing.last_updated = params?.[2]
+          existing['current_level'] = params?.[0]
+          existing['consent_history'] = params?.[1]
+          existing['last_updated'] = params?.[2]
         }
         if (sql.includes('withdrawal_requested')) {
-          existing.withdrawal_requested = true
-          existing.withdrawal_date = params?.[0]
-          existing.last_updated = params?.[0]
+          existing['withdrawal_requested'] = true
+          existing['withdrawal_date'] = params?.[0]
+          existing['last_updated'] = params?.[0]
         }
         if (sql.includes('data_purged')) {
-          existing.data_purged = true
-          existing.last_updated = new Date().toISOString()
+          existing['data_purged'] = true
+          existing['last_updated'] = new Date().toISOString()
         }
       }
       return Promise.resolve({ rows: [] })
@@ -71,10 +75,25 @@ vi.mock('@/lib/db', () => ({
 const redisStore = new Map<string, string>()
 vi.mock('@/lib/redis', () => ({
   redis: {
-    get: vi.fn().mockImplementation((key: string) => Promise.resolve(redisStore.get(key) ?? null)),
-    set: vi.fn().mockImplementation((key: string, value: string) => { redisStore.set(key, value); return Promise.resolve('OK') }),
-    setex: vi.fn().mockImplementation((key: string, _ttl: number, value: string) => { redisStore.set(key, value); return Promise.resolve('OK') }),
-    del: vi.fn().mockImplementation((key: string) => { redisStore.delete(key); return Promise.resolve(1) }),
+    get: vi
+      .fn()
+      .mockImplementation((key: string) =>
+        Promise.resolve(redisStore.get(key) ?? null),
+      ),
+    set: vi.fn().mockImplementation((key: string, value: string) => {
+      redisStore.set(key, value)
+      return Promise.resolve('OK')
+    }),
+    setex: vi
+      .fn()
+      .mockImplementation((key: string, _ttl: number, value: string) => {
+        redisStore.set(key, value)
+        return Promise.resolve('OK')
+      }),
+    del: vi.fn().mockImplementation((key: string) => {
+      redisStore.delete(key)
+      return Promise.resolve(1)
+    }),
     keys: vi.fn().mockResolvedValue([]),
   },
 }))
