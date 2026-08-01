@@ -205,6 +205,55 @@ export const DynamicParticleVisualization = (
   </Suspense>
 )
 
+// Dynamic imports for session progress visualization components
+export const MultiSessionProgression = React.lazy(async () => {
+  const module = await import('../../components/chat/MultiSessionProgression')
+  return { default: module.MultiSessionProgression }
+})
+
+export const DynamicMultiSessionProgression = (
+  props: Record<string, unknown>,
+) => (
+  <Suspense fallback={<DefaultLoading />}>
+    <MultiSessionProgression {...props} />
+  </Suspense>
+)
+
+export const BeliefChangeTracker = React.lazy(async () => {
+  const module = await import('../../components/chat/BeliefChangeTracker')
+  return { default: module.BeliefChangeTracker }
+})
+
+export const DynamicBeliefChangeTracker = (props: Record<string, unknown>) => (
+  <Suspense fallback={<DefaultLoading />}>
+    <BeliefChangeTracker {...props} />
+  </Suspense>
+)
+
+export const DefenseMechanismAdaptation = React.lazy(async () => {
+  const module = await import('../../components/chat/DefenseMechanismAdaptation')
+  return { default: module.DefenseMechanismAdaptation }
+})
+
+export const DynamicDefenseMechanismAdaptation = (
+  props: Record<string, unknown>,
+) => (
+  <Suspense fallback={<DefaultLoading />}>
+    <DefenseMechanismAdaptation {...props} />
+  </Suspense>
+)
+
+export const GoalAttainmentScale = React.lazy(async () => {
+  const module = await import('../../components/chat/GoalAttainmentScale')
+  return { default: module.GoalAttainmentScale }
+})
+
+export const DynamicGoalAttainmentScale = (props: Record<string, unknown>) => (
+  <Suspense fallback={<DefaultLoading />}>
+    <GoalAttainmentScale {...props} />
+  </Suspense>
+)
+
 // Dynamically import Three.js module when needed
 // Dynamically import chart.js module when needed
 export const useChartModule = () => {

@@ -1,0 +1,147 @@
+---
+export const prerender = false
+
+import DashboardLayout from '../../layouts/DashboardLayout.astro'
+import Card from '@/components/ui/Card.astro'
+import {
+  DynamicMultiSessionProgression,
+  DynamicBeliefChangeTracker,
+  DynamicDefenseMechanismAdaptation,
+  DynamicGoalAttainmentScale,
+} from '@/lib/utils/dynamic-components'
+
+const { user } = Astro.props as { user: any }
+
+const therapistId =
+  Astro.url.searchParams.get('therapistId') || user?.id || ''
+const sessionId = Astro.url.searchParams.get('sessionId') || ''
+---
+
+<DashboardLayout
+  title="Session Progress | Pixelated Empathy Therapy"
+  description="Multi-session progression tracking with belief changes, defense mechanisms, and goal attainment"
+>
+  <div class="container mx-auto py-6 space-y-6">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533] mb-1">
+          Longitudinal tracking
+        </p>
+        <h1 class="text-4xl font-bold tracking-tight mb-2">
+          Session Progress
+        </h1>
+        <p class="text-muted-foreground text-lg">
+          Multi-session progression metrics, belief changes, and therapeutic
+          outcomes
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a
+          href="/dashboard/enhanced?mode=analytics"
+          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          Back to Analytics
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <Card>
+        <div class="p-4">
+          <p class="text-sm font-medium text-muted-foreground">Sessions</p>
+          <p class="text-2xl font-bold">—</p>
+        </div>
+      </Card>
+      <Card>
+        <div class="p-4">
+          <p class="text-sm font-medium text-muted-foreground">
+            Avg Alliance
+          </p>
+          <p class="text-2xl font-bold">—/10</p>
+        </div>
+      </Card>
+      <Card>
+        <div class="p-4">
+          <p class="text-sm font-medium text-muted-foreground">
+            Beliefs Tracked
+          </p>
+          <p class="text-2xl font-bold">—</p>
+        </div>
+      </Card>
+      <Card>
+        <div class="p-4">
+          <p class="text-sm font-medium text-muted-foreground">
+            Goals Achieved
+          </p>
+          <p class="text-2xl font-bold">—/—</p>
+        </div>
+      </Card>
+    </div>
+
+    <Card>
+      <div class="p-6">
+        <DynamicMultiSessionProgression
+          client:visible
+          sessions={[]}
+        />
+      </div>
+    </Card>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <Card>
+        <div class="p-6">
+          <DynamicBeliefChangeTracker
+            client:visible
+            beliefs={[]}
+          />
+        </div>
+      </Card>
+
+      <Card>
+        <div class="p-6">
+          <DynamicDefenseMechanismAdaptation
+            client:visible
+            defenses={[]}
+          />
+        </div>
+      </Card>
+    </div>
+
+    <Card>
+      <div class="p-6">
+        <DynamicGoalAttainmentScale
+          client:visible
+          goals={[]}
+        />
+      </div>
+    </Card>
+
+    <div class="flex items-center justify-between pt-6 border-t border-border">
+      <div class="flex items-center gap-4 text-sm text-muted-foreground">
+        <span>
+          Therapist: <span class="font-medium">{therapistId || '—'}</span>
+        </span>
+        <span>•</span>
+        <span>
+          Session: <span class="font-medium">{sessionId || 'All'}</span>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a
+          href="/dashboard/enhanced?mode=analytics"
+          class="px-4 py-2 text-sm bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+        >
+          Analytics Dashboard
+        </a>
+        <a
+          href="/dashboard/enhanced"
+          class="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          Enhanced Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>

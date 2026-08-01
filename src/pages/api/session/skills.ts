@@ -1,12 +1,7 @@
 import type { APIRoute } from 'astro'
-import { Pool } from 'pg'
 
+import { getPool } from '../../../lib/db'
 import { getSkillCategory } from '../../../lib/skillCategories'
-
-// Database connection pool
-const pool = new Pool({
-  connectionString: process.env['DATABASE_URL'],
-})
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -21,7 +16,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     }
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
       // Update session with skill scores
       const sessionQuery = `
@@ -141,7 +136,7 @@ export const GET: APIRoute = async ({ request }) => {
     const sessionId = url.searchParams.get('sessionId')
     const therapistId = url.searchParams.get('therapistId')
 
-    const client = await pool.connect()
+    const client = await getPool().connect()
     try {
       if (sessionId) {
         // Get skill scores from specific session
