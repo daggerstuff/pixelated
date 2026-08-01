@@ -44,17 +44,12 @@ jobs:
         env:
           NODE_ENV: production
 
-      - name: Commit and push report
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add ai/data/reports/bias-audit-*.json
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore(bias-audit): monthly bias audit report for $(date -u +%Y-%m)"
-            git push
-          fi
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bias-audit-report-${{ steps.bias-audit.outputs.month }}
+          path: ${{ steps.bias-audit.outputs.report-path }}
+          if-no-files-found: error
 
       - name: Create alert issue if threshold exceeded
         if: steps.bias-audit.outputs.threshold-exceeded == 'true'
@@ -67,12 +62,13 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `[BIAS ALERT ${alertLevel.toUpperCase()}] Bias audit threshold exceeded for ${month}`,
-              body: [
-                `## Bias Audit Alert — ${month}`,
-                ``,
-                `**Alert Level**: ${alertLevel}`,
-                `**Report**: ai/data/reports/bias-audit-${month}.json`,
-                ``,
+            body: [
+              `## Bias Audit Alert — ${month}`,
+              ``,
+              `**Alert Level**: ${alertLevel}`,
+              `**Report Artifact**: bias-audit-report-${month} (see workflow run artifacts)`,
+              `**Workflow Run**: ${context.payload.repository.html_url}/actions/runs/${context.runId}`,
+              ``,
                 `The monthly bias audit has detected variance exceeding the 2% threshold across demographic segments.`,
                 ``,
                 `### Action Required`,
