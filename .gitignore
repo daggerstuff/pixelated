@@ -434,3 +434,8 @@ DESIGN.md
 KIMI.md
 TASTES.md
 PRODUCT.md
+
+# Build output directories
+.output/
+**/.output/
+
