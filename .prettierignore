@@ -26,6 +26,7 @@ public/polyfills/
 
 # ignore large markdown content stores that fail formatting
 src/content-store/
+session-ses_*.md
 tests/AGENTS.md
 tests/test-results/
 
