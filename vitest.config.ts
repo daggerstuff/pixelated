@@ -78,7 +78,9 @@ const targetedJsdomLibGlobs = ["/lib/providers/"];
 
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
-    (entry.includes("/api/") || entry.includes("/lib/") || entry.startsWith("agents/")) &&
+    (entry.includes("/api/") ||
+      entry.includes("/lib/") ||
+      entry.startsWith("agents/")) &&
     !entry.includes("__tests__/AIChat") &&
     !targetedJsdomLibGlobs.some((pattern) => entry.includes(pattern)),
 );
@@ -110,11 +112,17 @@ export default defineConfig({
       { find: "@/", replacement: `${path.resolve(process.cwd(), "src")}/` },
       {
         find: "react-dom/test-utils",
-        replacement: path.resolve(projectRoot, "__mocks__/react-dom/test-utils.js"),
+        replacement: path.resolve(
+          projectRoot,
+          "__mocks__/react-dom/test-utils.js",
+        ),
       },
       {
         find: /@testing-library\/react\/dist\/act-compat\.js$/,
-        replacement: path.resolve(projectRoot, "src/test/testing-library-act-compat.ts"),
+        replacement: path.resolve(
+          projectRoot,
+          "src/test/testing-library-act-compat.ts",
+        ),
       },
       {
         find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
@@ -186,11 +194,17 @@ export default defineConfig({
             },
             {
               find: "react-dom/test-utils",
-              replacement: path.resolve(process.cwd(), "__mocks__/react-dom/test-utils.js"),
+              replacement: path.resolve(
+                process.cwd(),
+                "__mocks__/react-dom/test-utils.js",
+              ),
             },
             {
               find: /@testing-library\/react\/dist\/act-compat\.js$/,
-              replacement: path.resolve(process.cwd(), "src/test/testing-library-act-compat.ts"),
+              replacement: path.resolve(
+                process.cwd(),
+                "src/test/testing-library-act-compat.ts",
+              ),
             },
             {
               find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
@@ -201,11 +215,17 @@ export default defineConfig({
             },
             {
               find: "react/jsx-dev-runtime",
-              replacement: path.resolve(process.cwd(), "node_modules/react/jsx-dev-runtime.js"),
+              replacement: path.resolve(
+                process.cwd(),
+                "node_modules/react/jsx-dev-runtime.js",
+              ),
             },
             {
               find: "react/jsx-runtime",
-              replacement: path.resolve(process.cwd(), "node_modules/react/jsx-runtime.js"),
+              replacement: path.resolve(
+                process.cwd(),
+                "node_modules/react/jsx-runtime.js",
+              ),
             },
           ],
           conditions: ["node", "import", "module", "default"],
