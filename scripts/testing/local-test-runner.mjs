@@ -60,8 +60,8 @@ const ADVISORY_BUCKET_DIRS = {
     "src/lib/evidence-assistant",
     "src/lib/logging",
     "src/lib/mental-health",
-    "src/lib/providers",
     "src/lib/rate-limiting",
+    // src/lib/providers intentionally excluded — React component tests need jsdom env + setup.ts (jest-dom, matchMedia), but /lib/ heuristic routes to node project
     "src/lib/sdk",
     "src/lib/sentry",
     "src/lib/styles",
