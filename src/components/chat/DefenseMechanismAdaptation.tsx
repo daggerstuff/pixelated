@@ -1,37 +1,41 @@
-import { useId } from "react";
+import { useId } from 'react'
 
 type DefenseMechanism = {
-  name: string;
-  baselineIntensity: number;
-  currentIntensity: number;
-  trend: "increasing" | "decreasing" | "stable";
-  adaptationScore: number;
-};
+  name: string
+  baselineIntensity: number
+  currentIntensity: number
+  trend: 'increasing' | 'decreasing' | 'stable'
+  adaptationScore: number
+}
 
 type DefenseMechanismAdaptationProps = {
-  defenses: DefenseMechanism[];
-  className?: string;
-};
+  defenses: DefenseMechanism[]
+  className?: string
+}
 
 function DefenseBar({ defense }: { defense: DefenseMechanism }) {
-  const baselinePercentage = (defense.baselineIntensity / 5) * 100;
-  const currentPercentage = (defense.currentIntensity / 5) * 100;
+  const baselinePercentage = (defense.baselineIntensity / 5) * 100
+  const currentPercentage = (defense.currentIntensity / 5) * 100
 
   const trendColor =
-    defense.trend === "increasing"
-      ? "text-[#ff8533]"
-      : defense.trend === "decreasing"
-        ? "text-[#8fb8a2]"
-        : "text-[#b0b0b0]";
+    defense.trend === 'increasing'
+      ? 'text-[#ff8533]'
+      : defense.trend === 'decreasing'
+        ? 'text-[#8fb8a2]'
+        : 'text-[#b0b0b0]'
 
   const trendSymbol =
-    defense.trend === "increasing" ? "↑" : defense.trend === "decreasing" ? "↓" : "→";
+    defense.trend === 'increasing'
+      ? '↑'
+      : defense.trend === 'decreasing'
+        ? '↓'
+        : '→'
 
   return (
     <div className="border border-white/10 bg-[#121212] p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <h4 className="text-sm font-medium capitalize text-[#f6f1e8]">
-          {defense.name.replace("-", " ")}
+          {defense.name.replace('-', ' ')}
         </h4>
         <div className="flex items-center gap-2">
           <span className={`font-mono text-xs ${trendColor}`}>
@@ -52,7 +56,10 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
             </span>
           </div>
           <div className="h-2 w-full bg-white/10">
-            <div className="h-full bg-[#b0b0b0]" style={{ width: `${baselinePercentage}%` }} />
+            <div
+              className="h-full bg-[#b0b0b0]"
+              style={{ width: `${baselinePercentage}%` }}
+            />
           </div>
         </div>
 
@@ -72,60 +79,70 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
-  const chartId = useId();
+  const chartId = useId()
 
   if (defenses.length === 0) {
-    return null;
+    return null
   }
 
-  const centerX = 100;
-  const centerY = 100;
-  const maxRadius = 80;
-  const angleStep = (2 * Math.PI) / defenses.length;
+  const centerX = 100
+  const centerY = 100
+  const maxRadius = 80
+  const angleStep = (2 * Math.PI) / defenses.length
 
   const baselinePoints = defenses
     .map((defense, index) => {
-      const angle = angleStep * index - Math.PI / 2;
-      const radius = (defense.baselineIntensity / 5) * maxRadius;
-      const x = centerX + radius * Math.cos(angle);
-      const y = centerY + radius * Math.sin(angle);
-      return `${x},${y}`;
+      const angle = angleStep * index - Math.PI / 2
+      const radius = (defense.baselineIntensity / 5) * maxRadius
+      const x = centerX + radius * Math.cos(angle)
+      const y = centerY + radius * Math.sin(angle)
+      return `${x},${y}`
     })
-    .join(" ");
+    .join(' ')
 
   const currentPoints = defenses
     .map((defense, index) => {
-      const angle = angleStep * index - Math.PI / 2;
-      const radius = (defense.currentIntensity / 5) * maxRadius;
-      const x = centerX + radius * Math.cos(angle);
-      const y = centerY + radius * Math.sin(angle);
-      return `${x},${y}`;
+      const angle = angleStep * index - Math.PI / 2
+      const radius = (defense.currentIntensity / 5) * maxRadius
+      const x = centerX + radius * Math.cos(angle)
+      const y = centerY + radius * Math.sin(angle)
+      return `${x},${y}`
     })
-    .join(" ");
+    .join(' ')
 
   const labels = defenses.map((defense, index) => {
-    const angle = angleStep * index - Math.PI / 2;
-    const labelRadius = maxRadius + 15;
-    const x = centerX + labelRadius * Math.cos(angle);
-    const y = centerY + labelRadius * Math.sin(angle);
+    const angle = angleStep * index - Math.PI / 2
+    const labelRadius = maxRadius + 15
+    const x = centerX + labelRadius * Math.cos(angle)
+    const y = centerY + labelRadius * Math.sin(angle)
     return {
-      name: defense.name.replace("-", " "),
+      name: defense.name.replace('-', ' '),
       x,
       y,
-      anchor: Math.abs(Math.cos(angle)) < 0.1 ? "middle" : Math.cos(angle) > 0 ? "start" : "end",
-    };
-  });
+      anchor:
+        Math.abs(Math.cos(angle)) < 0.1
+          ? 'middle'
+          : Math.cos(angle) > 0
+            ? 'start'
+            : 'end',
+    }
+  })
 
   return (
     <div className="border border-white/10 bg-[#121212] p-4">
       <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
         Defense pattern overview
       </h3>
-      <svg className="mx-auto h-64 w-64" viewBox="0 0 200 200" role="img" aria-labelledby={chartId}>
+      <svg
+        className="mx-auto h-64 w-64"
+        viewBox="0 0 200 200"
+        role="img"
+        aria-labelledby={chartId}
+      >
         <title id={chartId}>Defense mechanism radar chart</title>
         {/* Grid circles */}
         {[0.2, 0.4, 0.6, 0.8, 1].map((scale) => (
@@ -141,9 +158,9 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
         ))}
         {/* Grid lines */}
         {defenses.map((_, index) => {
-          const angle = angleStep * index - Math.PI / 2;
-          const x = centerX + maxRadius * Math.cos(angle);
-          const y = centerY + maxRadius * Math.sin(angle);
+          const angle = angleStep * index - Math.PI / 2
+          const x = centerX + maxRadius * Math.cos(angle)
+          const y = centerY + maxRadius * Math.sin(angle)
           return (
             <line
               key={index}
@@ -154,7 +171,7 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
               stroke="rgba(255,255,255,0.1)"
               strokeWidth="1"
             />
-          );
+          )
         })}
         {/* Baseline polygon */}
         <polygon
@@ -176,7 +193,7 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
             key={index}
             x={label.x}
             y={label.y}
-            textAnchor={label.anchor as "start" | "middle" | "end"}
+            textAnchor={label.anchor as 'start' | 'middle' | 'end'}
             dominantBaseline="middle"
             className="fill-[#b0b0b0] text-[8px]"
           >
@@ -195,7 +212,7 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export function DefenseMechanismAdaptation({
@@ -204,19 +221,26 @@ export function DefenseMechanismAdaptation({
 }: DefenseMechanismAdaptationProps) {
   if (defenses.length === 0) {
     return (
-      <section className={className} aria-labelledby="defense-adaptation-heading">
-        <h2 id="defense-adaptation-heading" className="text-lg font-semibold text-[#f6f1e8]">
+      <section
+        className={className}
+        aria-labelledby="defense-adaptation-heading"
+      >
+        <h2
+          id="defense-adaptation-heading"
+          className="text-lg font-semibold text-[#f6f1e8]"
+        >
           Defense mechanism adaptation
         </h2>
         <p className="mt-2 text-sm text-[#b0b0b0]">
-          No defense mechanisms tracked yet. Defense patterns are analyzed during therapy sessions.
+          No defense mechanisms tracked yet. Defense patterns are analyzed
+          during therapy sessions.
         </p>
       </section>
-    );
+    )
   }
 
   const averageAdaptation =
-    defenses.reduce((sum, d) => sum + d.adaptationScore, 0) / defenses.length;
+    defenses.reduce((sum, d) => sum + d.adaptationScore, 0) / defenses.length
 
   return (
     <section className={className} aria-labelledby="defense-adaptation-heading">
@@ -224,11 +248,15 @@ export function DefenseMechanismAdaptation({
         <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533]">
           Psychological defenses
         </p>
-        <h2 id="defense-adaptation-heading" className="text-xl font-semibold text-[#f6f1e8]">
+        <h2
+          id="defense-adaptation-heading"
+          className="text-xl font-semibold text-[#f6f1e8]"
+        >
           Defense mechanism adaptation
         </h2>
         <p className="mt-1 text-sm text-[#b0b0b0]">
-          {defenses.length} mechanisms tracked · Average adaptation: {averageAdaptation.toFixed(1)}
+          {defenses.length} mechanisms tracked · Average adaptation:{' '}
+          {averageAdaptation.toFixed(1)}
           /10
         </p>
       </div>
@@ -243,5 +271,5 @@ export function DefenseMechanismAdaptation({
         </div>
       </div>
     </section>
-  );
+  )
 }
