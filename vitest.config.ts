@@ -71,10 +71,16 @@ const targetedTestGlobs = process.env["VITEST_TARGET_TESTS"]
       .map((entry) => entry.trim())
       .filter(Boolean)
   : [];
+// React provider tests under src/lib/providers need jsdom (window, localStorage,
+// matchMedia). Per-file @vitest-environment is ignored when a vitest project
+// include glob pins the file to the node project.
+const targetedJsdomLibGlobs = ["/lib/providers/"];
+
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
     (entry.includes("/api/") || entry.includes("/lib/") || entry.startsWith("agents/")) &&
-    !entry.includes("__tests__/AIChat"),
+    !entry.includes("__tests__/AIChat") &&
+    !targetedJsdomLibGlobs.some((pattern) => entry.includes(pattern)),
 );
 const targetedJsdomTestGlobs = targetedTestGlobs.filter(
   (entry) => !targetedNodeTestGlobs.includes(entry),
