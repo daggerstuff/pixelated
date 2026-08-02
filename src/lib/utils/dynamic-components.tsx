@@ -5,46 +5,54 @@
  * and address chunk size warnings.
  */
 
-import React from "react";
-import { Suspense } from "react";
-import type { ComponentProps } from "react";
+import React from 'react'
+import { Suspense } from 'react'
+import type { ComponentProps } from 'react'
 
-import type EmotionTemporalAnalysisChartComponent from "../../components/session/EmotionTemporalAnalysisChart";
+import type EmotionTemporalAnalysisChartComponent from '../../components/session/EmotionTemporalAnalysisChart'
 
 type EmotionTemporalAnalysisChartProps = ComponentProps<
   typeof EmotionTemporalAnalysisChartComponent
->;
+>
 
-const MultidimensionalEmotionChartFallback = ({ className }: { className?: string }) => (
+const MultidimensionalEmotionChartFallback = ({
+  className,
+}: {
+  className?: string
+}) => (
   <div
-    className={`bg-slate-100 flex h-[360px] items-center justify-center rounded-lg p-4 text-sm ${className ?? ""}`}
+    className={`bg-slate-100 flex h-[360px] items-center justify-center rounded-lg p-4 text-sm ${className ?? ''}`}
   >
     Multidimensional emotion visualization is temporarily unavailable.
   </div>
-);
+)
 
 const SwiperCarouselFallback = ({ className }: { className?: string }) => (
   <div
-    className={`bg-slate-100 flex h-64 items-center justify-center rounded-lg p-4 text-sm ${className ?? ""}`}
+    className={`bg-slate-100 flex h-64 items-center justify-center rounded-lg p-4 text-sm ${className ?? ''}`}
   >
     Carousel is temporarily unavailable.
   </div>
-);
+)
 
-const ParticleVisualizationFallback = ({ className }: { className?: string }) => (
+const ParticleVisualizationFallback = ({
+  className,
+}: {
+  className?: string
+}) => (
   <div
-    className={`bg-slate-100 flex h-[360px] items-center justify-center rounded-lg p-4 text-sm ${className ?? ""}`}
+    className={`bg-slate-100 flex h-[360px] items-center justify-center rounded-lg p-4 text-sm ${className ?? ''}`}
   >
     Particle visualization is temporarily unavailable.
   </div>
-);
+)
 
 // Loading components with different visual styles
 const DefaultLoading = () => (
   <div className="flex min-h-[200px] items-center justify-center p-4">
     <div className="text-muted-foreground animate-pulse">Loading...</div>
   </div>
-);
+)
 
 const VisualizationLoading = () => (
   <div className="bg-slate-50 flex min-h-[400px] items-center justify-center rounded-lg p-8">
@@ -53,7 +61,7 @@ const VisualizationLoading = () => (
       <div className="text-slate-500 text-sm">Loading visualization...</div>
     </div>
   </div>
-);
+)
 
 const ThreeDLoading = () => (
   <div className="bg-slate-50 flex min-h-[400px] items-center justify-center rounded-lg p-8">
@@ -62,7 +70,7 @@ const ThreeDLoading = () => (
       <div className="text-slate-500 text-sm">Loading 3D visualization...</div>
     </div>
   </div>
-);
+)
 
 // Error fallback component
 const ErrorFallback = ({ error }: { error: Error }) => (
@@ -70,128 +78,138 @@ const ErrorFallback = ({ error }: { error: Error }) => (
     <p className="text-red-600 font-medium">Failed to load component</p>
     <p className="text-red-500 text-sm">{String(error)}</p>
   </div>
-);
+)
 
 // Dynamic imports for large visualization components
 const MultidimensionalEmotionChart = React.lazy(async () => ({
   default: MultidimensionalEmotionChartFallback,
-}));
+}))
 
-export const DynamicMultidimensionalEmotionChart = (props: Record<string, unknown>) => (
+export const DynamicMultidimensionalEmotionChart = (
+  props: Record<string, unknown>,
+) => (
   <Suspense fallback={<ThreeDLoading />}>
     <MultidimensionalEmotionChart {...props} />
   </Suspense>
-);
+)
 
 const EmotionTemporalAnalysisChart = React.lazy(async () => {
-  const module = await import("../../components/session/EmotionTemporalAnalysisChart");
+  const module =
+    await import('../../components/session/EmotionTemporalAnalysisChart')
   return {
     default: module.default,
-  };
-});
+  }
+})
 
-export const DynamicEmotionTemporalAnalysisChart = (props: EmotionTemporalAnalysisChartProps) => (
+export const DynamicEmotionTemporalAnalysisChart = (
+  props: EmotionTemporalAnalysisChartProps,
+) => (
   <Suspense fallback={<VisualizationLoading />}>
     <EmotionTemporalAnalysisChart {...props} />
   </Suspense>
-);
+)
 
 const TherapyChatSystem = React.lazy(async () => {
-  const module = await import("../../components/chat/TherapyChatSystem");
-  return { default: module.default };
-});
+  const module = await import('../../components/chat/TherapyChatSystem')
+  return { default: module.default }
+})
 
 export const DynamicTherapyChatSystem = (props: Record<string, unknown>) => (
   <Suspense fallback={<DefaultLoading />}>
     <TherapyChatSystem {...props} />
   </Suspense>
-);
+)
 
 // Dynamic imports for large data processing components
 const FHEDemo = React.lazy(async () => {
-  const module = await import("../../components/security/FHEDemo");
-  return { default: module.default };
-});
+  const module = await import('../../components/security/FHEDemo')
+  return { default: module.default }
+})
 
 export const DynamicFHEDemo = (props: Record<string, unknown>) => (
   <Suspense fallback={<DefaultLoading />}>
     <FHEDemo {...props} />
   </Suspense>
-);
+)
 
 const DemoFHEDemo = React.lazy(async () => {
-  const module = await import("../../components/demo/FHEDemo");
-  return { default: module.default };
-});
+  const module = await import('../../components/demo/FHEDemo')
+  return { default: module.default }
+})
 
 export const DynamicDemoFHEDemo = (props: Record<string, unknown>) => (
   <Suspense fallback={<DefaultLoading />}>
     <DemoFHEDemo {...props} />
   </Suspense>
-);
+)
 
 // Dynamic imports for large UI components
 const SwiperCarousel = React.lazy(async () => ({
   default: SwiperCarouselFallback,
-}));
+}))
 
 export const DynamicSwiperCarousel = (props: Record<string, unknown>) => (
   <Suspense fallback={<DefaultLoading />}>
     <SwiperCarousel {...props} />
   </Suspense>
-);
+)
 
 // Dynamic imports for chart components
 const ChartComponent = React.lazy(async () => {
-  const module = await import("../../components/analytics/ChartComponent");
-  return { default: module.default };
-});
+  const module = await import('../../components/analytics/ChartComponent')
+  return { default: module.default }
+})
 
 export const DynamicChartComponent = (props: Record<string, unknown>) => (
   <Suspense fallback={<VisualizationLoading />}>
     <ChartComponent {...props} />
   </Suspense>
-);
+)
 
 const EnhancedChartComponent = React.lazy(async () => {
-  const module = await import("../../components/analytics/EnhancedChartComponent");
-  return { default: module.default };
-});
+  const module =
+    await import('../../components/analytics/EnhancedChartComponent')
+  return { default: module.default }
+})
 
-export const DynamicEnhancedChartComponent = (props: Record<string, unknown>) => (
+export const DynamicEnhancedChartComponent = (
+  props: Record<string, unknown>,
+) => (
   <Suspense fallback={<VisualizationLoading />}>
     <EnhancedChartComponent {...props} />
   </Suspense>
-);
+)
 
 // Dynamic imports for large dashboard components
 const TreatmentPlanManager = React.lazy(async () => {
-  const module = await import("../../components/therapy/TreatmentPlanManager");
-  return { default: module.default };
-});
+  const module = await import('../../components/therapy/TreatmentPlanManager')
+  return { default: module.default }
+})
 
 export const DynamicTreatmentPlanManager = (props: Record<string, unknown>) => (
   <Suspense fallback={<DefaultLoading />}>
     <TreatmentPlanManager {...props} />
   </Suspense>
-);
+)
 
 // Dynamic imports for large particle visualizations
 const ParticleVisualization = React.lazy(async () => ({
   default: ParticleVisualizationFallback,
-}));
+}))
 
-export const DynamicParticleVisualization = (props: Record<string, unknown>) => (
+export const DynamicParticleVisualization = (
+  props: Record<string, unknown>,
+) => (
   <Suspense fallback={<ThreeDLoading />}>
     <ParticleVisualization {...props} />
   </Suspense>
-);
+)
 
 // Dynamic imports for session progress visualization components
 const MultiSessionProgression = React.lazy(async () => {
-  const module = await import("../../components/chat/MultiSessionProgression");
-  return { default: module.MultiSessionProgression };
-});
+  const module = await import('../../components/chat/MultiSessionProgression')
+  return { default: module.MultiSessionProgression }
+})
 
 export const DynamicMultiSessionProgression = (
   props: ComponentProps<typeof MultiSessionProgression>,
@@ -199,23 +217,26 @@ export const DynamicMultiSessionProgression = (
   <Suspense fallback={<DefaultLoading />}>
     <MultiSessionProgression {...props} />
   </Suspense>
-);
+)
 
 const BeliefChangeTracker = React.lazy(async () => {
-  const module = await import("../../components/chat/BeliefChangeTracker");
-  return { default: module.BeliefChangeTracker };
-});
+  const module = await import('../../components/chat/BeliefChangeTracker')
+  return { default: module.BeliefChangeTracker }
+})
 
-export const DynamicBeliefChangeTracker = (props: ComponentProps<typeof BeliefChangeTracker>) => (
+export const DynamicBeliefChangeTracker = (
+  props: ComponentProps<typeof BeliefChangeTracker>,
+) => (
   <Suspense fallback={<DefaultLoading />}>
     <BeliefChangeTracker {...props} />
   </Suspense>
-);
+)
 
 const DefenseMechanismAdaptation = React.lazy(async () => {
-  const module = await import("../../components/chat/DefenseMechanismAdaptation");
-  return { default: module.DefenseMechanismAdaptation };
-});
+  const module =
+    await import('../../components/chat/DefenseMechanismAdaptation')
+  return { default: module.DefenseMechanismAdaptation }
+})
 
 export const DynamicDefenseMechanismAdaptation = (
   props: ComponentProps<typeof DefenseMechanismAdaptation>,
@@ -223,29 +244,31 @@ export const DynamicDefenseMechanismAdaptation = (
   <Suspense fallback={<DefaultLoading />}>
     <DefenseMechanismAdaptation {...props} />
   </Suspense>
-);
+)
 
 const GoalAttainmentScale = React.lazy(async () => {
-  const module = await import("../../components/chat/GoalAttainmentScale");
-  return { default: module.GoalAttainmentScale };
-});
+  const module = await import('../../components/chat/GoalAttainmentScale')
+  return { default: module.GoalAttainmentScale }
+})
 
-export const DynamicGoalAttainmentScale = (props: ComponentProps<typeof GoalAttainmentScale>) => (
+export const DynamicGoalAttainmentScale = (
+  props: ComponentProps<typeof GoalAttainmentScale>,
+) => (
   <Suspense fallback={<DefaultLoading />}>
     <GoalAttainmentScale {...props} />
   </Suspense>
-);
+)
 
 // Dynamically import Three.js module when needed
 // Dynamically import chart.js module when needed
 const useChartModule = () => {
-  const [chartModule, setChartModule] = React.useState<unknown>(null);
+  const [chartModule, setChartModule] = React.useState<unknown>(null)
 
   React.useEffect(() => {
-    void import("chart.js").then((module) => {
-      setChartModule(module);
-    });
-  }, []);
+    void import('chart.js').then((module) => {
+      setChartModule(module)
+    })
+  }, [])
 
-  return chartModule;
-};
+  return chartModule
+}

@@ -1,106 +1,108 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from 'react'
 
-import { journalResearchApiClient } from "@/lib/api/journal-research";
-import storageManager from "@/utils/storage/storageManager";
+import { journalResearchApiClient } from '@/lib/api/journal-research'
+import storageManager from '@/utils/storage/storageManager'
 
-import { createBuildSafeLogger } from "../../logging/build-safe-logger";
-const logger = createBuildSafeLogger("useWebSocket");
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('useWebSocket')
 
 const getAuthToken = () => {
-  if (typeof window === "undefined") {
-    return null;
+  if (typeof window === 'undefined') {
+    return null
   }
   try {
-    const token = storageManager.get("auth_token") ?? storageManager.get("authToken");
+    const token =
+      storageManager.get('auth_token') ?? storageManager.get('authToken')
     if (!token) {
-      return null;
+      return null
     }
-    if (typeof token !== "string") {
-      return null;
+    if (typeof token !== 'string') {
+      return null
     }
-    return token.startsWith("Bearer ") ? token.slice(7) : token;
+    return token.startsWith('Bearer ') ? token.slice(7) : token
   } catch (error: unknown) {
-    logger.warn("Failed to read auth token for WebSocket connection", error);
-    return null;
+    logger.warn('Failed to read auth token for WebSocket connection', error)
+    return null
   }
-};
+}
 
-const buildWebSocketUrl = (baseUrl: string, path: string, authToken: string | null) => {
-  const url = new URL(path, baseUrl);
-  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+const buildWebSocketUrl = (
+  baseUrl: string,
+  path: string,
+  authToken: string | null,
+) => {
+  const url = new URL(path, baseUrl)
+  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
   if (authToken) {
-    url.searchParams.set("token", authToken);
+    url.searchParams.set('token', authToken)
   }
-  return url.toString();
-};
+  return url.toString()
+}
 
 type WebSocketConnectionState =
-  | "disconnected"
-  | "connecting"
-  | "connected"
-  | "reconnecting"
-  | "error";
+  'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error'
 
 interface ProgressUpdateMessage {
-  type: "progress_update";
-  sessionId: string;
+  type: 'progress_update'
+  sessionId: string
   data: {
-    phase: string;
-    progress: number;
-    metrics?: Record<string, number>;
-    message?: string;
-  };
-  timestamp: string;
+    phase: string
+    progress: number
+    metrics?: Record<string, number>
+    message?: string
+  }
+  timestamp: string
 }
 
 interface StatusUpdateMessage {
-  type: "status_update";
-  sessionId: string;
+  type: 'status_update'
+  sessionId: string
   data: {
-    status: string;
-    phase?: string;
-    message?: string;
-  };
-  timestamp: string;
+    status: string
+    phase?: string
+    message?: string
+  }
+  timestamp: string
 }
 
 interface NotificationMessage {
-  type: "notification";
-  sessionId: string;
+  type: 'notification'
+  sessionId: string
   data: {
-    level: "info" | "success" | "warning" | "error";
-    title: string;
-    message: string;
-    actionUrl?: string;
-  };
-  timestamp: string;
+    level: 'info' | 'success' | 'warning' | 'error'
+    title: string
+    message: string
+    actionUrl?: string
+  }
+  timestamp: string
 }
 
-export type WebSocketMessage = ProgressUpdateMessage | StatusUpdateMessage | NotificationMessage;
+export type WebSocketMessage =
+  ProgressUpdateMessage | StatusUpdateMessage | NotificationMessage
 
 interface UseJournalResearchWebSocketOptions {
-  sessionId: string | null;
+  sessionId: string | null
   /**
    * Relative endpoint path. Defaults to `/sessions/{sessionId}/progress/stream`.
    */
-  endpoint?: string;
-  protocols?: string | string[];
-  enabled?: boolean;
-  reconnectIntervalMs?: number;
-  maxReconnectAttempts?: number;
-  onMessage?: (message: WebSocketMessage) => void;
-  onError?: (error: Error) => void;
-  onOpen?: () => void;
-  onClose?: () => void;
+  endpoint?: string
+  protocols?: string | string[]
+  enabled?: boolean
+  reconnectIntervalMs?: number
+  maxReconnectAttempts?: number
+  onMessage?: (message: WebSocketMessage) => void
+  onError?: (error: Error) => void
+  onOpen?: () => void
+  onClose?: () => void
 }
 
 interface UseJournalResearchWebSocketReturn {
-  connectionState: WebSocketConnectionState;
-  isConnected: boolean;
-  reconnectAttempts: number;
-  send: (data: string | ArrayBuffer | Blob | ArrayBufferView) => void;
-  close: () => void;
-  reconnect: () => void;
+  connectionState: WebSocketConnectionState
+  isConnected: boolean
+  reconnectAttempts: number
+  send: (data: string | ArrayBuffer | Blob | ArrayBufferView) => void
+  close: () => void
+  reconnect: () => void
 }
 
 export const useJournalResearchWebSocket = ({
@@ -115,95 +117,104 @@ export const useJournalResearchWebSocket = ({
   onOpen,
   onClose,
 }: UseJournalResearchWebSocketOptions): UseJournalResearchWebSocketReturn => {
-  const reconnectTimerRef = useRef<number | null>(null);
-  const socketRef = useRef<WebSocket | null>(null);
-  const shouldReconnectRef = useRef(true);
-  const reconnectAttemptsRef = useRef(0);
-  const [connectionState, setConnectionState] = useState<WebSocketConnectionState>("disconnected");
-  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const reconnectTimerRef = useRef<number | null>(null)
+  const socketRef = useRef<WebSocket | null>(null)
+  const shouldReconnectRef = useRef(true)
+  const reconnectAttemptsRef = useRef(0)
+  const [connectionState, setConnectionState] =
+    useState<WebSocketConnectionState>('disconnected')
+  const [reconnectAttempts, setReconnectAttempts] = useState(0)
 
   const handleMessage = useCallback(
     (event: MessageEvent) => {
       try {
-        const data = JSON.parse(event.data) as unknown;
+        const data = JSON.parse(event.data) as unknown
         if (
-          typeof data === "object" &&
+          typeof data === 'object' &&
           data !== null &&
-          "type" in data &&
-          typeof data.type === "string"
+          'type' in data &&
+          typeof data.type === 'string'
         ) {
-          onMessage?.(data as WebSocketMessage);
+          onMessage?.(data as WebSocketMessage)
         }
       } catch (error: unknown) {
-        logger.warn("Failed to parse WebSocket message", error);
-        onError?.(error as Error);
+        logger.warn('Failed to parse WebSocket message', error)
+        onError?.(error as Error)
       }
     },
     [onMessage, onError],
-  );
+  )
 
   const connect = useCallback(() => {
-    if (typeof window === "undefined") {
-      return;
+    if (typeof window === 'undefined') {
+      return
     }
     if (!sessionId || !enabled) {
-      return;
+      return
     }
 
-    const baseUrl = journalResearchApiClient.getBaseUrl();
-    const path = endpoint ?? `/sessions/${sessionId}/progress/stream`;
-    const authToken = getAuthToken();
-    const wsUrl = buildWebSocketUrl(baseUrl, path, authToken);
+    const baseUrl = journalResearchApiClient.getBaseUrl()
+    const path = endpoint ?? `/sessions/${sessionId}/progress/stream`
+    const authToken = getAuthToken()
+    const wsUrl = buildWebSocketUrl(baseUrl, path, authToken)
 
     if (socketRef.current?.readyState === WebSocket.OPEN) {
-      return;
+      return
     }
 
-    setConnectionState(reconnectAttemptsRef.current > 0 ? "reconnecting" : "connecting");
+    setConnectionState(
+      reconnectAttemptsRef.current > 0 ? 'reconnecting' : 'connecting',
+    )
 
     try {
-      const websocketProtocols = protocols && protocols.length > 0 ? protocols : undefined;
-      socketRef.current = new WebSocket(wsUrl, websocketProtocols);
+      const websocketProtocols =
+        protocols && protocols.length > 0 ? protocols : undefined
+      socketRef.current = new WebSocket(wsUrl, websocketProtocols)
 
       socketRef.current.onopen = () => {
-        setConnectionState("connected");
-        setReconnectAttempts(0);
-        reconnectAttemptsRef.current = 0;
-        onOpen?.();
-      };
+        setConnectionState('connected')
+        setReconnectAttempts(0)
+        reconnectAttemptsRef.current = 0
+        onOpen?.()
+      }
 
-      socketRef.current.onmessage = handleMessage;
+      socketRef.current.onmessage = handleMessage
 
       socketRef.current.onerror = () => {
-        setConnectionState("error");
-        const error = new Error("WebSocket connection error");
-        onError?.(error);
-      };
+        setConnectionState('error')
+        const error = new Error('WebSocket connection error')
+        onError?.(error)
+      }
 
       socketRef.current.onclose = () => {
-        setConnectionState("disconnected");
-        onClose?.();
+        setConnectionState('disconnected')
+        onClose?.()
 
         if (
           shouldReconnectRef.current &&
           reconnectIntervalMs > 0 &&
           reconnectAttemptsRef.current < maxReconnectAttempts
         ) {
-          reconnectAttemptsRef.current += 1;
-          setReconnectAttempts(reconnectAttemptsRef.current);
-          reconnectTimerRef.current = window.setTimeout(connect, reconnectIntervalMs);
+          reconnectAttemptsRef.current += 1
+          setReconnectAttempts(reconnectAttemptsRef.current)
+          reconnectTimerRef.current = window.setTimeout(
+            connect,
+            reconnectIntervalMs,
+          )
         } else if (reconnectAttemptsRef.current >= maxReconnectAttempts) {
           const error = new Error(
             `WebSocket reconnection failed after ${maxReconnectAttempts} attempts`,
-          );
-          onError?.(error);
+          )
+          onError?.(error)
         }
-      };
+      }
     } catch (error: unknown) {
-      setConnectionState("error");
+      setConnectionState('error')
       const normalizedError =
-        error instanceof Error ? error : new Error("WebSocket connection failed");
-      onError?.(normalizedError);
+        error instanceof Error
+          ? error
+          : new Error('WebSocket connection failed')
+      onError?.(normalizedError)
     }
   }, [
     sessionId,
@@ -216,89 +227,91 @@ export const useJournalResearchWebSocket = ({
     onOpen,
     onError,
     onClose,
-  ]);
+  ])
 
   useEffect(() => {
     if (!enabled || !sessionId) {
-      return;
+      return
     }
 
-    connect();
+    connect()
 
     return () => {
-      shouldReconnectRef.current = false;
+      shouldReconnectRef.current = false
       if (reconnectTimerRef.current) {
-        window.clearTimeout(reconnectTimerRef.current);
-        reconnectTimerRef.current = null;
+        window.clearTimeout(reconnectTimerRef.current)
+        reconnectTimerRef.current = null
       }
-      socketRef.current?.close();
-      socketRef.current = null;
-    };
-  }, [enabled, sessionId, connect]);
+      socketRef.current?.close()
+      socketRef.current = null
+    }
+  }, [enabled, sessionId, connect])
 
   const send = useCallback(
     (data: string | ArrayBuffer | Blob | ArrayBufferView) => {
       if (data instanceof Blob) {
-        const blobUnsupportedError = new Error("Blob payloads are not supported");
-        onError?.(blobUnsupportedError);
-        return;
+        const blobUnsupportedError = new Error(
+          'Blob payloads are not supported',
+        )
+        onError?.(blobUnsupportedError)
+        return
       }
 
       // Convert data to string or ArrayBuffer for WebSocket send
       // ArrayBufferView (e.g. Uint8Array) is narrowed to ArrayBuffer
       const payload: string | ArrayBuffer = (() => {
-        if (typeof data === "string") {
-          return data;
+        if (typeof data === 'string') {
+          return data
         }
         if (data instanceof ArrayBuffer) {
-          return data;
+          return data
         }
         if (ArrayBuffer.isView(data)) {
           return data.buffer.slice(
             data.byteOffset,
             data.byteOffset + data.byteLength,
-          ) as ArrayBuffer;
+          ) as ArrayBuffer
         }
         // SharedArrayBuffer is not supported
-        return new TextEncoder().encode(String(data)).buffer as ArrayBuffer;
-      })();
+        return new TextEncoder().encode(String(data)).buffer as ArrayBuffer
+      })()
 
-      const socket = socketRef.current;
+      const socket = socketRef.current
       if (socket?.readyState === WebSocket.OPEN) {
-        socket.send(payload);
+        socket.send(payload)
       } else {
-        const error = new Error("WebSocket is not connected");
-        onError?.(error);
+        const error = new Error('WebSocket is not connected')
+        onError?.(error)
       }
     },
     [onError],
-  );
+  )
 
   const close = useCallback(() => {
-    shouldReconnectRef.current = false;
+    shouldReconnectRef.current = false
     if (reconnectTimerRef.current) {
-      window.clearTimeout(reconnectTimerRef.current);
-      reconnectTimerRef.current = null;
+      window.clearTimeout(reconnectTimerRef.current)
+      reconnectTimerRef.current = null
     }
-    socketRef.current?.close();
-    socketRef.current = null;
-    setConnectionState("disconnected");
-  }, []);
+    socketRef.current?.close()
+    socketRef.current = null
+    setConnectionState('disconnected')
+  }, [])
 
   const reconnect = useCallback(() => {
-    close();
-    reconnectAttemptsRef.current = 0;
-    setReconnectAttempts(0);
-    shouldReconnectRef.current = true;
-    connect();
-  }, [close, connect]);
+    close()
+    reconnectAttemptsRef.current = 0
+    setReconnectAttempts(0)
+    shouldReconnectRef.current = true
+    connect()
+  }, [close, connect])
 
   return {
     connectionState,
-    isConnected: connectionState === "connected",
+    isConnected: connectionState === 'connected',
     reconnectAttempts,
     send,
     close,
     reconnect,
-  };
-};
+  }
+}
