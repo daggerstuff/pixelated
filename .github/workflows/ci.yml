@@ -86,9 +86,10 @@ jobs:
 
       - name: Run unit tests
         run: |
-          # Use advisory suite so tests requiring Redis/Mongo/Auth0
-          # do not hang in this job (services are not running here).
-          VITEST_SUITE=advisory timeout 10m pnpm test
+          # Sharded advisory suite runs in advisory-tests.yml. Run only the core
+          # bucket here as a fast smoke — the full unbucketed corpus hangs without
+          # Redis/Mongo/Auth0 and exceeds the timeout (run 30737434511, exit 124).
+          VITEST_BUCKET=core timeout 15m pnpm test:advisory
 
       - name: Build Docker image
         id: build-image

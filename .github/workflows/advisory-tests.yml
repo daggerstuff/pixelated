@@ -11,6 +11,7 @@ on:
       - 'ai/**'
       - 'tests/**'
       - 'agents/**'
+      - 'scripts/**'
       - 'vitest.config.ts'
       - 'scripts/testing/**'
       - 'package.json'

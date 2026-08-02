@@ -52,7 +52,7 @@ const ADVISORY_BUCKET_DIRS = {
     "src/api",
     "src/simulator",
     "src/test",
-    "tests/api",
+    // tests/api intentionally excluded — Playwright specs, not Vitest (run via `pnpm dlx playwright test tests/api`)
     "tests/unit",
     // singletons
     "src/lib/agent-note-collab",
