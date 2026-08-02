@@ -39,7 +39,7 @@ import { glob } from "glob";
 // ---------------------------------------------------------------------------
 
 const INDEX_PATH = resolve(".cache/knip-index.json");
-const INDEX_VERSION = 2;
+const INDEX_VERSION = 3;
 const SCAN_GLOB = "{src,frontend/src,business-strategy-cms/src}/**/*.{ts,tsx,js,jsx,astro}";
 const SCAN_IGNORE = [
   "**/node_modules/**",
