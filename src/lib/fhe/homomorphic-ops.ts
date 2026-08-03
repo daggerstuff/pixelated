@@ -714,6 +714,19 @@ export class HomomorphicOperations {
           case FHEOperation.READING_LEVEL:
             encResult = await textProcessor.encryptedReadingLevel(plaintextForEncoding)
             break
+          case FHEOperation.Addition:
+          case FHEOperation.Subtraction:
+          case FHEOperation.Multiplication:
+          case FHEOperation.Square:
+          case FHEOperation.Negation:
+          case FHEOperation.Rotation:
+          case FHEOperation.Polynomial:
+          case FHEOperation.Rescale:
+          case FHEOperation.EMOTION_CLASSIFY:
+          case FHEOperation.CUSTOM:
+          case FHEOperation.ANALYZE:
+            // Arithmetic/non-text operations not supported by encrypted text processor
+            break
           default:
             break
         }
