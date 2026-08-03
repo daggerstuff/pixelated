@@ -98,6 +98,8 @@ EXCLUDE_GLOBS=(
     '*/.eve/*'
     # Git submodules have their own quality rules.
     '*/foresight/*'
+    # Generated OpenAPI SDK TypeScript models contain generated lint suppression headers
+    '*packages/sdk-typescript/*'
 )
 
 # Source roots scanned when no CLI files are passed. Missing directories

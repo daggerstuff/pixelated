@@ -9,7 +9,7 @@ const SCHEMA = z.object({
 
 export default defineTool({
   description:
-    'Get a trainee's full profile, cohort assignment, curriculum progress, and ' +
+    "Get a trainee's full profile, cohort assignment, curriculum progress, and " +
     'session count. Queries Foresight across trainee, enrollment, curriculum, ' +
     'and session categories.',
   inputSchema: SCHEMA,
