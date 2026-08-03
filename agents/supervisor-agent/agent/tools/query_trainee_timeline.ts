@@ -11,7 +11,7 @@ const SCHEMA = z.object({
 
 export default defineTool({
   description:
-    'Build a chronological timeline of a single trainee's journey through the program. ' +
+    "Build a chronological timeline of a single trainee's journey through the program. " +
     'Includes enrollment, cohort assignments, curriculum progress, session activity, ' +
     'and QA scores.',
   inputSchema: SCHEMA,

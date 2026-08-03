@@ -30,6 +30,8 @@ hackathon/
 skills/
 
 # === VIRTUAL ENVIRONMENTS ===
+**/.git_ignore/**
+**/.git_disabled/**
 **/.venv/
 **/conda_env/
 **/env/
@@ -418,7 +420,6 @@ notebooks
 foresight_cli
 .skillroute
 .kilocode
-.codebase-memory
 .baselines
 .kimiflare
 run_training.sh
