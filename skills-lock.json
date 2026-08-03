@@ -618,6 +618,12 @@
       "skillPath": "scientific-skills/neuropixels-analysis/SKILL.md",
       "computedHash": "41b2d51810ea4ca510642efe7147eebaf68adac4a026055c0fa8d8d7253592e4"
     },
+    "nvidia-skill-finder": {
+      "source": "NVIDIA/skills",
+      "sourceType": "github",
+      "skillPath": "skills/nvidia-skill-finder/SKILL.md",
+      "computedHash": "0b3ae23dcaa7336232c625617080b5ac869da11e7e92630aac7d0b505d14ba92"
+    },
     "omero-integration": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",
