@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout for composite action
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: OpenHands/software-agent-sdk
           ref: main
