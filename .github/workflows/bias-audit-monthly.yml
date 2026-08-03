@@ -45,7 +45,7 @@ jobs:
           NODE_ENV: production
 
       - name: Upload report artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: bias-audit-report-${{ steps.bias-audit.outputs.month }}
           path: ${{ steps.bias-audit.outputs.report-path }}
