@@ -24,6 +24,9 @@ const EXCLUDED_FROM_OXFMT = new Set([
 
 const OXFMT_APPLICABLE_EXTENSIONS = new Set([".js", ".ts", ".mjs", ".cjs", ".mts", ".cts"]);
 
+/** Session dump markdown files are local artifacts and are not formatted. */
+const SESSION_DUMP_PATTERN = /^session-ses_[^/]+\.md$/;
+
 /** @param {string[]} files */
 function dedupeAndFilterExisting(files) {
   const seen = new Set();
@@ -31,7 +34,14 @@ function dedupeAndFilterExisting(files) {
   const results = [];
 
   for (const filePath of files) {
-    if (typeof filePath !== "string" || !filePath || !existsSync(filePath)) {
+    if (
+      typeof filePath !== "string" ||
+      !filePath ||
+      SESSION_DUMP_PATTERN.test(filePath)
+    ) {
+      continue;
+    }
+    if (!existsSync(filePath)) {
       continue;
     }
     if (lstatSync(filePath).isSymbolicLink()) {
