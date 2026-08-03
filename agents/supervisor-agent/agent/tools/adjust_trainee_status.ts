@@ -13,7 +13,7 @@ const SCHEMA = z.object({
 
 export default defineTool({
   description:
-    'Change a trainee's enrollment status (ACTIVE, PAUSED, SUSPENDED, WITHDRAWN). ' +
+    "Change a trainee's enrollment status (ACTIVE, PAUSED, SUSPENDED, WITHDRAWN). " +
     'PAUSED prevents new session assignments. WITHDRAWN ends all active enrollments. ' +
     'All changes are logged to Foresight with long_term retention for audit trail.',
   inputSchema: SCHEMA,
