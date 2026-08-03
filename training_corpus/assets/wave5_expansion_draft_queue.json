@@ -1,0 +1,138 @@
+{
+  "pack_id": "wave5_authoring_queue",
+  "source_artifacts": [
+    "/tmp/pytest-of-vivi/pytest-115/test_write_expansion_execution0/wave5_registry.json",
+    "/tmp/pytest-of-vivi/pytest-115/test_write_expansion_execution0/report/expansion_queue.json"
+  ],
+  "notes": [
+    "Queue scaffolds generated from active wave5 expansion packets."
+  ],
+  "entries": [
+    {
+      "queue_id": "wave5_batch_01_task-5-10-counsel-chat::scenario::task-5-10-counsel-chat::01::presenting-problem-clusters",
+      "source_ref": "gdrive:processed/phase_2_professional_datasets/task_5_10_counsel_chat",
+      "source_family": "wave5_expansion_queue",
+      "artifact_kind": "scenario",
+      "draft_status": "queued",
+      "target_pack": "wave5_batch_01_task-5-10-counsel-chat",
+      "title": "Presenting Problem Clusters [SYNTHESIS_FEEDSTOCK]",
+      "prompt_excerpt": null,
+      "source_excerpt": null,
+      "provenance_notes": [
+        "mode:SYNTHESIS_FEEDSTOCK",
+        "priority:HIGH",
+        "source_class:remote_processed"
+      ],
+      "governance_flags": [],
+      "candidate_payload": {},
+      "review_notes": [],
+      "metadata": {
+        "packet_id": "task-5-10-counsel-chat::01::presenting-problem-clusters",
+        "extraction_target": "presenting_problem_clusters",
+        "lane_targets": [
+          "simulation"
+        ],
+        "mode": "SYNTHESIS_FEEDSTOCK",
+        "priority": "HIGH",
+        "source_class": "remote_processed",
+        "batch_id": "wave5_batch_01_task-5-10-counsel-chat"
+      }
+    },
+    {
+      "queue_id": "wave5_batch_01_task-5-10-counsel-chat::scenario::task-5-10-counsel-chat::01::presenting-problem-clusters",
+      "source_ref": "gdrive:processed/phase_2_professional_datasets/task_5_10_counsel_chat",
+      "source_family": "wave5_expansion_queue",
+      "artifact_kind": "scenario",
+      "draft_status": "queued",
+      "target_pack": "wave5_batch_01_task-5-10-counsel-chat",
+      "title": "Presenting Problem Clusters [BENCHMARK_SEED]",
+      "prompt_excerpt": null,
+      "source_excerpt": null,
+      "provenance_notes": [
+        "mode:BENCHMARK_SEED",
+        "priority:HIGH",
+        "source_class:remote_processed"
+      ],
+      "governance_flags": [
+        "keep_as_holdout_or_design_seed"
+      ],
+      "candidate_payload": {},
+      "review_notes": [],
+      "metadata": {
+        "packet_id": "task-5-10-counsel-chat::01::presenting-problem-clusters",
+        "extraction_target": "presenting_problem_clusters",
+        "lane_targets": [
+          "benchmark",
+          "evaluator"
+        ],
+        "mode": "BENCHMARK_SEED",
+        "priority": "HIGH",
+        "source_class": "remote_processed",
+        "batch_id": "wave5_batch_01_task-5-10-counsel-chat"
+      }
+    },
+    {
+      "queue_id": "wave5_batch_01_task-5-10-counsel-chat::benchmark_spec::task-5-10-counsel-chat::02::benchmark-question-families",
+      "source_ref": "gdrive:processed/phase_2_professional_datasets/task_5_10_counsel_chat",
+      "source_family": "wave5_expansion_queue",
+      "artifact_kind": "benchmark_spec",
+      "draft_status": "queued",
+      "target_pack": "wave5_batch_01_task-5-10-counsel-chat",
+      "title": "Benchmark Question Families [SYNTHESIS_FEEDSTOCK]",
+      "prompt_excerpt": null,
+      "source_excerpt": null,
+      "provenance_notes": [
+        "mode:SYNTHESIS_FEEDSTOCK",
+        "priority:HIGH",
+        "source_class:remote_processed"
+      ],
+      "governance_flags": [],
+      "candidate_payload": {},
+      "review_notes": [],
+      "metadata": {
+        "packet_id": "task-5-10-counsel-chat::02::benchmark-question-families",
+        "extraction_target": "benchmark_question_families",
+        "lane_targets": [
+          "simulation"
+        ],
+        "mode": "SYNTHESIS_FEEDSTOCK",
+        "priority": "HIGH",
+        "source_class": "remote_processed",
+        "batch_id": "wave5_batch_01_task-5-10-counsel-chat"
+      }
+    },
+    {
+      "queue_id": "wave5_batch_01_task-5-10-counsel-chat::benchmark_spec::task-5-10-counsel-chat::02::benchmark-question-families",
+      "source_ref": "gdrive:processed/phase_2_professional_datasets/task_5_10_counsel_chat",
+      "source_family": "wave5_expansion_queue",
+      "artifact_kind": "benchmark_spec",
+      "draft_status": "queued",
+      "target_pack": "wave5_batch_01_task-5-10-counsel-chat",
+      "title": "Benchmark Question Families [BENCHMARK_SEED]",
+      "prompt_excerpt": null,
+      "source_excerpt": null,
+      "provenance_notes": [
+        "mode:BENCHMARK_SEED",
+        "priority:HIGH",
+        "source_class:remote_processed"
+      ],
+      "governance_flags": [
+        "keep_as_holdout_or_design_seed"
+      ],
+      "candidate_payload": {},
+      "review_notes": [],
+      "metadata": {
+        "packet_id": "task-5-10-counsel-chat::02::benchmark-question-families",
+        "extraction_target": "benchmark_question_families",
+        "lane_targets": [
+          "benchmark",
+          "evaluator"
+        ],
+        "mode": "BENCHMARK_SEED",
+        "priority": "HIGH",
+        "source_class": "remote_processed",
+        "batch_id": "wave5_batch_01_task-5-10-counsel-chat"
+      }
+    }
+  ]
+}
