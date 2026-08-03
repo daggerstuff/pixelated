@@ -41,7 +41,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Configure kubectl
         uses: azure/k8s-set-context@b9b48c6a10c68c6a4c0e5b4c6a4a4a4a4a4a4a4a # v4.0.0
@@ -163,7 +163,7 @@ jobs:
 
       - name: Upload experiment report
         if: always()
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: chaos-report-${{ github.run_id }}
           path: .agent/internal/chaos-results/
