@@ -9,6 +9,13 @@ resources:
   - deployment-green.yaml
   - service.yaml
   - ingress.yaml
+  # Traefik Middleware CRDs — referenced by ingress.yaml router.middlewares annotation.
+  # Without these CRDs the middleware references are dangling and security headers never apply.
+  - middleware-security-headers.yaml
+  # TODO: create middleware CRDs for these dangling references (out of scope for security-headers fix):
+  # - middleware-rate-limit.yaml        (pixelated-empathy-rate-limit@kubernetescrd)
+  # - middleware-cors.yaml              (pixelated-empathy-cors@kubernetescrd)
+  # - middleware-request-size-limit.yaml (pixelated-empathy-request-size-limit@kubernetescrd)
 
 # Rewrite `pixelatedempathy/api:latest` placeholder in deployment.yaml.
 # Tag must match the deployed build (see CI IMAGE_TAG).
