@@ -1,0 +1,41 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pixelated-empathy-cors
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: pixelated-empathy
+spec:
+  headers:
+    # Allowed origins — mirrors src/lib/auth/cors-config.ts ALLOWED_ORIGINS
+    # plus the public-facing site origins.
+    accessControlAllowOriginList:
+      - "https://pixelatedempathy.com"
+      - "https://www.pixelatedempathy.com"
+      - "https://app.pixelatedempathy.com"
+      - "https://api.pixelatedempathy.com"
+    accessControlAllowMethods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+      - "PATCH"
+    accessControlAllowHeaders:
+      - "Content-Type"
+      - "Authorization"
+      - "Accept"
+      - "X-Requested-With"
+      - "X-Request-ID"
+      - "X-API-Key"
+      - "X-Client-Version"
+    accessControlExposeHeaders:
+      - "X-Request-ID"
+      - "X-RateLimit-Limit"
+      - "X-RateLimit-Remaining"
+      - "X-RateLimit-Reset"
+    accessControlAllowCredentials: true
+    accessControlMaxAge: 86400
+    addVaryHeader: true
