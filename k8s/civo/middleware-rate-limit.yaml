@@ -1,0 +1,18 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pixelated-empathy-rate-limit
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: pixelated-empathy
+spec:
+  rateLimit:
+    # Mirrors src/lib/middleware/rate-limit.ts defaults:
+    # RATE_LIMIT_MAX_REQUESTS=100 per RATE_LIMIT_WINDOW_MS=60000ms (60s).
+    # The app middleware applies finer-grained per-role/per-path limits on top;
+    # this is the edge-level first line of defense.
+    average: 100
+    period: 60s
+    burst: 50

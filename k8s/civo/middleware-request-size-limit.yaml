@@ -1,0 +1,16 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pixelated-empathy-request-size-limit
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: pixelated-empathy
+spec:
+  buffering:
+    # 10 MiB — reasonable upper bound for API payloads, file uploads,
+    # and FHE operation requests. Requests exceeding this receive 413.
+    maxRequestBodyBytes: 10485760
+    # Keep bodies up to 2 MiB in memory; spill larger to disk.
+    memRequestBodyBytes: 2097152
