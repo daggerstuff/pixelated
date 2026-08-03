@@ -395,7 +395,7 @@
     "@graphql-codegen/typescript-operations": "^6.1.2",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
-    "@playwright/test": "1.62.0",
+    "@playwright/test": "1.62.1",
     "@stoplight/spectral-cli": "^6.15.5",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
