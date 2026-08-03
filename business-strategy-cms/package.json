@@ -27,7 +27,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1044.0",
     "@aws-sdk/s3-request-presigner": "^3.1044.0",
-    "axios": "^1.18.1",
+    "axios": "^1.19.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "digest-fetch": "^3.1.1",
@@ -38,7 +38,7 @@
     "helmet": "^8.3.0",
     "joi": "^18.2.3",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.8.1",
+    "mongoose": "^9.9.0",
     "multer": "^2.2.0",
     "multer-s3": "^3.0.1",
     "nodemailer": "^9.0.3",
