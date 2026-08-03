@@ -12,7 +12,7 @@ on:
           - fail
         default: 'fail'
   schedule:
-    - cron: '0 14 * * 5'  # Weekly Friday 2pm UTC
+    - cron: '0 14 * * 5' # Weekly Friday 2pm UTC
 
 concurrency:
   group: promotion-gate-test-${{ github.ref }}
