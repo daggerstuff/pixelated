@@ -1,0 +1,43 @@
+{
+  "datasets": {
+    "professional_therapeutic": {
+      "wave3_seed_simulation": {
+        "path": "s3://pixel-data/training-corpus/wave3_seed/wave3_seed_simulation.jsonl",
+        "stage": "stage1_foundation",
+        "type": "conversation",
+        "quality_profile": "wave3_seed",
+        "focus": "simulation",
+        "fallback_paths": {
+          "local": "/home/vivi/pixelated/ai/training_corpus/assets/wave3_seed_simulation.jsonl"
+        },
+        "legacy_paths": []
+      }
+    }
+  },
+  "supplementary": {
+    "wave3_seed_evaluator": {
+      "path": "s3://pixel-data/training-corpus/wave3_seed/wave3_seed_evaluator.jsonl",
+      "stage": "stage2_therapeutic_expertise",
+      "type": "knowledge_base",
+      "quality_profile": "wave3_seed",
+      "focus": "evaluator",
+      "fallback_paths": {
+        "local": "/home/vivi/pixelated/ai/training_corpus/assets/wave3_seed_evaluator.jsonl"
+      },
+      "legacy_paths": []
+    }
+  },
+  "edge_case_sources": {
+    "wave3_seed_benchmark": {
+      "path": "s3://pixel-data/training-corpus/wave3_seed/wave3_seed_benchmark.jsonl",
+      "stage": "stage3_edge_stress_test",
+      "type": "synthetic_edge",
+      "quality_profile": "wave3_seed",
+      "focus": "benchmark",
+      "fallback_paths": {
+        "local": "/home/vivi/pixelated/ai/training_corpus/assets/wave3_seed_benchmark.jsonl"
+      },
+      "legacy_paths": []
+    }
+  }
+}

@@ -215,8 +215,8 @@ export interface ForesightClientConfig {
  */
 export declare class ForesightClientError extends Error {
     readonly statusCode: number;
-    readonly body?: unknown | undefined;
-    constructor(message: string, statusCode: number, body?: unknown | undefined);
+    readonly body?: unknown;
+    constructor(message: string, statusCode: number, body?: unknown);
 }
 /**
  * First-class TypeScript SDK client for Foresight memory operations.

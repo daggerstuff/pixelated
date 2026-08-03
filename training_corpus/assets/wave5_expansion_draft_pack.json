@@ -1,0 +1,2430 @@
+{
+  "version": "2026-04-09-wave5-expansion-draft-pack",
+  "queue_version": "2026-04-09-wave5-expansion-ticket-queue",
+  "ticket_count": 5,
+  "source_dossier_count": 5,
+  "card_count": 36,
+  "authoring_cards": [
+    {
+      "card_id": "wave5::counsel_chat_raw::scenario_archetypes",
+      "ticket_id": "wave5::counsel_chat_raw",
+      "source_key": "counsel_chat_raw",
+      "source_title": "CounselChat Raw Question Archive",
+      "priority": "P0",
+      "artifact_type": "scenario_archetypes",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "scenario_id",
+        "title",
+        "summary",
+        "activation_cues",
+        "hidden_driver",
+        "difficulty",
+        "repair_opportunities"
+      ],
+      "fields_to_mine": [
+        "question title",
+        "question body",
+        "topic tags",
+        "public help-seeking phrasing",
+        "presenting_problem_archetypes",
+        "help_seeking_phrasings",
+        "public_question_benchmark_prompts"
+      ],
+      "extraction_focus": [
+        "high-volume presenting problems",
+        "public help-seeking language",
+        "benchmark prompts for response comparison"
+      ],
+      "discard_zones": [
+        "do_not_copy_forum_answers_verbatim",
+        "use_question_side_as_client_seed",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "public help-seeking phrasing",
+        "self-worth collapse openings",
+        "family and relationship presenting problems"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "dialogue_seed_rows",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/counsel-chat/data",
+        "20200325_counsel_chat.csv",
+        "counselchat-data.csv"
+      ],
+      "sample_evidence": [
+        {
+          "label": "public_question",
+          "excerpt": "Short public questions surface strong shame, confusion, and urgency even when the language is compact."
+        }
+      ],
+      "writing_notes": [
+        "Archetypes should generalize beyond the original source row.",
+        "Use the question side as the client voice and rewrite the response side from scratch.",
+        "Do not preserve forum-answer cadence or canned advice tone."
+      ]
+    },
+    {
+      "card_id": "wave5::counsel_chat_raw::client_state_profiles",
+      "ticket_id": "wave5::counsel_chat_raw",
+      "source_key": "counsel_chat_raw",
+      "source_title": "CounselChat Raw Question Archive",
+      "priority": "P0",
+      "artifact_type": "client_state_profiles",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "state_id",
+        "label",
+        "presenting_style",
+        "common_distortions",
+        "escalation_markers",
+        "repair_openings"
+      ],
+      "fields_to_mine": [
+        "question title",
+        "question body",
+        "topic tags",
+        "public help-seeking phrasing",
+        "presenting_problem_archetypes",
+        "help_seeking_phrasings",
+        "public_question_benchmark_prompts"
+      ],
+      "extraction_focus": [
+        "high-volume presenting problems",
+        "public help-seeking language",
+        "benchmark prompts for response comparison"
+      ],
+      "discard_zones": [
+        "do_not_copy_forum_answers_verbatim",
+        "use_question_side_as_client_seed",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "public help-seeking phrasing",
+        "self-worth collapse openings",
+        "family and relationship presenting problems"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "dialogue_seed_rows",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/counsel-chat/data",
+        "20200325_counsel_chat.csv",
+        "counselchat-data.csv"
+      ],
+      "sample_evidence": [
+        {
+          "label": "public_question",
+          "excerpt": "Short public questions surface strong shame, confusion, and urgency even when the language is compact."
+        }
+      ],
+      "writing_notes": [
+        "Describe the client-side inner state, not the therapist's interpretation.",
+        "Use the question side as the client voice and rewrite the response side from scratch.",
+        "Do not preserve forum-answer cadence or canned advice tone."
+      ]
+    },
+    {
+      "card_id": "wave5::counsel_chat_raw::dialogue_seed_rows",
+      "ticket_id": "wave5::counsel_chat_raw",
+      "source_key": "counsel_chat_raw",
+      "source_title": "CounselChat Raw Question Archive",
+      "priority": "P0",
+      "artifact_type": "dialogue_seed_rows",
+      "target_count": 110,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "row_id",
+        "lane",
+        "input",
+        "output",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "question title",
+        "question body",
+        "topic tags",
+        "public help-seeking phrasing",
+        "presenting_problem_archetypes",
+        "help_seeking_phrasings",
+        "public_question_benchmark_prompts"
+      ],
+      "extraction_focus": [
+        "high-volume presenting problems",
+        "public help-seeking language",
+        "benchmark prompts for response comparison"
+      ],
+      "discard_zones": [
+        "do_not_copy_forum_answers_verbatim",
+        "use_question_side_as_client_seed",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "public help-seeking phrasing",
+        "self-worth collapse openings",
+        "family and relationship presenting problems"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "dialogue_seed_rows",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/counsel-chat/data",
+        "20200325_counsel_chat.csv",
+        "counselchat-data.csv"
+      ],
+      "sample_evidence": [
+        {
+          "label": "public_question",
+          "excerpt": "Short public questions surface strong shame, confusion, and urgency even when the language is compact."
+        }
+      ],
+      "writing_notes": [
+        "Write Pixelated-native rows instead of copying source wording verbatim.",
+        "Use the question side as the client voice and rewrite the response side from scratch.",
+        "Do not preserve forum-answer cadence or canned advice tone."
+      ]
+    },
+    {
+      "card_id": "wave5::counsel_chat_raw::benchmark_specs",
+      "ticket_id": "wave5::counsel_chat_raw",
+      "source_key": "counsel_chat_raw",
+      "source_title": "CounselChat Raw Question Archive",
+      "priority": "P0",
+      "artifact_type": "benchmark_specs",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "benchmark_id",
+        "benchmark_slice",
+        "prompt",
+        "must_detect",
+        "likely_therapist_mistakes",
+        "rubric_items"
+      ],
+      "fields_to_mine": [
+        "question title",
+        "question body",
+        "topic tags",
+        "public help-seeking phrasing",
+        "presenting_problem_archetypes",
+        "help_seeking_phrasings",
+        "public_question_benchmark_prompts"
+      ],
+      "extraction_focus": [
+        "high-volume presenting problems",
+        "public help-seeking language",
+        "benchmark prompts for response comparison"
+      ],
+      "discard_zones": [
+        "do_not_copy_forum_answers_verbatim",
+        "use_question_side_as_client_seed",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "public help-seeking phrasing",
+        "self-worth collapse openings",
+        "family and relationship presenting problems"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "dialogue_seed_rows",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/counsel-chat/data",
+        "20200325_counsel_chat.csv",
+        "counselchat-data.csv"
+      ],
+      "sample_evidence": [
+        {
+          "label": "public_question",
+          "excerpt": "Short public questions surface strong shame, confusion, and urgency even when the language is compact."
+        }
+      ],
+      "writing_notes": [
+        "Keep the prompt compact and the grading contract explicit.",
+        "Use the question side as the client voice and rewrite the response side from scratch.",
+        "Do not preserve forum-answer cadence or canned advice tone."
+      ]
+    },
+    {
+      "card_id": "wave5::counsel_chat_raw::benchmark_rows",
+      "ticket_id": "wave5::counsel_chat_raw",
+      "source_key": "counsel_chat_raw",
+      "source_title": "CounselChat Raw Question Archive",
+      "priority": "P0",
+      "artifact_type": "benchmark_rows",
+      "target_count": 40,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "row_id",
+        "benchmark_slice",
+        "prompt",
+        "expected_behavior",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "question title",
+        "question body",
+        "topic tags",
+        "public help-seeking phrasing",
+        "presenting_problem_archetypes",
+        "help_seeking_phrasings",
+        "public_question_benchmark_prompts"
+      ],
+      "extraction_focus": [
+        "high-volume presenting problems",
+        "public help-seeking language",
+        "benchmark prompts for response comparison"
+      ],
+      "discard_zones": [
+        "do_not_copy_forum_answers_verbatim",
+        "use_question_side_as_client_seed",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "public help-seeking phrasing",
+        "self-worth collapse openings",
+        "family and relationship presenting problems"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "dialogue_seed_rows",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/counsel-chat/data",
+        "20200325_counsel_chat.csv",
+        "counselchat-data.csv"
+      ],
+      "sample_evidence": [
+        {
+          "label": "public_question",
+          "excerpt": "Short public questions surface strong shame, confusion, and urgency even when the language is compact."
+        }
+      ],
+      "writing_notes": [
+        "Use for executable holdout examples, not default simulation training.",
+        "Use the question side as the client voice and rewrite the response side from scratch.",
+        "Do not preserve forum-answer cadence or canned advice tone."
+      ]
+    },
+    {
+      "card_id": "wave5::counsel_chat_raw::preference_pair_candidates",
+      "ticket_id": "wave5::counsel_chat_raw",
+      "source_key": "counsel_chat_raw",
+      "source_title": "CounselChat Raw Question Archive",
+      "priority": "P0",
+      "artifact_type": "preference_pair_candidates",
+      "target_count": 6,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "pair_id",
+        "decision_axis",
+        "candidate_a",
+        "candidate_b",
+        "preferred_behavior"
+      ],
+      "fields_to_mine": [
+        "question title",
+        "question body",
+        "topic tags",
+        "public help-seeking phrasing",
+        "presenting_problem_archetypes",
+        "help_seeking_phrasings",
+        "public_question_benchmark_prompts"
+      ],
+      "extraction_focus": [
+        "high-volume presenting problems",
+        "public help-seeking language",
+        "benchmark prompts for response comparison"
+      ],
+      "discard_zones": [
+        "do_not_copy_forum_answers_verbatim",
+        "use_question_side_as_client_seed",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "public help-seeking phrasing",
+        "self-worth collapse openings",
+        "family and relationship presenting problems"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "dialogue_seed_rows",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/counsel-chat/data",
+        "20200325_counsel_chat.csv",
+        "counselchat-data.csv"
+      ],
+      "sample_evidence": [
+        {
+          "label": "public_question",
+          "excerpt": "Short public questions surface strong shame, confusion, and urgency even when the language is compact."
+        }
+      ],
+      "writing_notes": [
+        "Pairs should isolate one decision axis at a time.",
+        "Use the question side as the client voice and rewrite the response side from scratch.",
+        "Do not preserve forum-answer cadence or canned advice tone."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::scenario_archetypes",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "scenario_archetypes",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "scenario_id",
+        "title",
+        "summary",
+        "activation_cues",
+        "hidden_driver",
+        "difficulty",
+        "repair_opportunities"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Archetypes should generalize beyond the original source row.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::client_state_profiles",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "client_state_profiles",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "state_id",
+        "label",
+        "presenting_style",
+        "common_distortions",
+        "escalation_markers",
+        "repair_openings"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Describe the client-side inner state, not the therapist's interpretation.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::dialogue_seed_rows",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "dialogue_seed_rows",
+      "target_count": 100,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "row_id",
+        "lane",
+        "input",
+        "output",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Write Pixelated-native rows instead of copying source wording verbatim.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::therapist_moves",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "therapist_moves",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "move_id",
+        "label",
+        "goal",
+        "use_when",
+        "avoid_when",
+        "failure_modes"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Encode the hidden technique, not a named counselor persona.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::evaluator_specs",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "evaluator_specs",
+      "target_count": 6,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "evaluator_id",
+        "task",
+        "required_signals",
+        "fail_conditions",
+        "output_contract"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Evaluator tasks should check for cues, misses, and unsafe overcorrections.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::benchmark_specs",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "benchmark_specs",
+      "target_count": 6,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "benchmark_id",
+        "benchmark_slice",
+        "prompt",
+        "must_detect",
+        "likely_therapist_mistakes",
+        "rubric_items"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Keep the prompt compact and the grading contract explicit.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::benchmark_rows",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "benchmark_rows",
+      "target_count": 24,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "row_id",
+        "benchmark_slice",
+        "prompt",
+        "expected_behavior",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Use for executable holdout examples, not default simulation training.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::preference_pair_candidates",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "preference_pair_candidates",
+      "target_count": 4,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "pair_id",
+        "decision_axis",
+        "candidate_a",
+        "candidate_b",
+        "preferred_behavior"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Pairs should isolate one decision axis at a time.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::psydt_corpus::session_scaffolds",
+      "ticket_id": "wave5::psydt_corpus",
+      "source_key": "psydt_corpus",
+      "source_title": "PsyDT Long-Session Counselor Corpus",
+      "priority": "P0",
+      "artifact_type": "session_scaffolds",
+      "target_count": 2,
+      "lane_targets": [
+        "simulation"
+      ],
+      "required_fields": [
+        "scaffold_id",
+        "session_phases",
+        "turning_points",
+        "dropout_risks",
+        "repair_paths"
+      ],
+      "fields_to_mine": [
+        "session organization",
+        "turning points",
+        "repair paths",
+        "intervention sequencing",
+        "long_horizon_session_scaffolds",
+        "intervention_sequence_patterns",
+        "session_progression_bundles"
+      ],
+      "extraction_focus": [
+        "session progression over multiple turns",
+        "intervention sequencing and reformulation moments",
+        "evaluator criteria for technique progression"
+      ],
+      "discard_zones": [
+        "do_not_copy_counselor_persona_style",
+        "extract_structure_not_identity"
+      ],
+      "signals_to_mine": [
+        "multi-session organization",
+        "intervention sequencing",
+        "dropout and repair turns"
+      ],
+      "candidate_outputs": [
+        "session_scaffolds",
+        "therapist_moves",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:datasets/SoulChat2.0/PsyDTCorpus",
+        "README",
+        "train split",
+        "test split"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_scaffold",
+          "excerpt": "The strongest signal is sequence: alliance check, formulation pressure, move adjustment, and continuation choice."
+        }
+      ],
+      "writing_notes": [
+        "Capture sequence and dropout/repair risks rather than dialogue text.",
+        "Mine session scaffolds and intervention logic without imitating the named counselor.",
+        "Preserve structure, remove persona."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::scenario_archetypes",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "scenario_archetypes",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "scenario_id",
+        "title",
+        "summary",
+        "activation_cues",
+        "hidden_driver",
+        "difficulty",
+        "repair_opportunities"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Archetypes should generalize beyond the original source row.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::client_state_profiles",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "client_state_profiles",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "state_id",
+        "label",
+        "presenting_style",
+        "common_distortions",
+        "escalation_markers",
+        "repair_openings"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Describe the client-side inner state, not the therapist's interpretation.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::dialogue_seed_rows",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "dialogue_seed_rows",
+      "target_count": 120,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "row_id",
+        "lane",
+        "input",
+        "output",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Write Pixelated-native rows instead of copying source wording verbatim.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::therapist_moves",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "therapist_moves",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "move_id",
+        "label",
+        "goal",
+        "use_when",
+        "avoid_when",
+        "failure_modes"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Encode the hidden technique, not a named counselor persona.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::evaluator_specs",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "evaluator_specs",
+      "target_count": 6,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "evaluator_id",
+        "task",
+        "required_signals",
+        "fail_conditions",
+        "output_contract"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Evaluator tasks should check for cues, misses, and unsafe overcorrections.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::benchmark_specs",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "benchmark_specs",
+      "target_count": 6,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "benchmark_id",
+        "benchmark_slice",
+        "prompt",
+        "must_detect",
+        "likely_therapist_mistakes",
+        "rubric_items"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Keep the prompt compact and the grading contract explicit.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::benchmark_rows",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "benchmark_rows",
+      "target_count": 24,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "row_id",
+        "benchmark_slice",
+        "prompt",
+        "expected_behavior",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Use for executable holdout examples, not default simulation training.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::preference_pair_candidates",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "preference_pair_candidates",
+      "target_count": 4,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "pair_id",
+        "decision_axis",
+        "candidate_a",
+        "candidate_b",
+        "preferred_behavior"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Pairs should isolate one decision axis at a time.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_9_soulchat::session_scaffolds",
+      "ticket_id": "wave5::task_5_9_soulchat",
+      "source_key": "task_5_9_soulchat",
+      "source_title": "SoulChat 2.0 REBT Sessions",
+      "priority": "P0",
+      "artifact_type": "session_scaffolds",
+      "target_count": 2,
+      "lane_targets": [
+        "simulation",
+        "evaluator",
+        "benchmark"
+      ],
+      "required_fields": [
+        "scaffold_id",
+        "session_phases",
+        "turning_points",
+        "dropout_risks",
+        "repair_paths"
+      ],
+      "fields_to_mine": [
+        "session progression",
+        "belief dispute turns",
+        "repair attempts",
+        "challenge calibration",
+        "session_phase_transitions",
+        "hidden_therapist_move_chains",
+        "client_resistance_patterns",
+        "pacing_and_reframing_moves"
+      ],
+      "extraction_focus": [
+        "REBT-style session progressions without copying therapist wording",
+        "long-session challenge-versus-support calibration",
+        "repairable rupture moments across longer sessions"
+      ],
+      "discard_zones": [
+        "do_not_copy_chinese_source_wording_verbatim",
+        "do_not_preserve_counselor_identity_style",
+        "extract_structure_not_surface_form",
+        "do_not_train_directly_from_reference_text"
+      ],
+      "signals_to_mine": [
+        "resistance-softening transitions",
+        "belief-disputation sequences",
+        "late-session rupture repair"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "therapist_moves",
+        "session_scaffolds"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_2_professional_datasets/task_5_9_soulchat",
+        "task_5_9_soulchat_report.json",
+        "soulchat_2_0_conversations.jsonl"
+      ],
+      "sample_evidence": [
+        {
+          "label": "session_progression",
+          "excerpt": "Longer REBT sessions move from problem report to belief challenge to emotional shift and relapse-risk repair."
+        }
+      ],
+      "writing_notes": [
+        "Capture sequence and dropout/repair risks rather than dialogue text.",
+        "Convert session structure into Pixelated-native dialogue seeds instead of copying translated wording.",
+        "Strip counselor persona markers and preserve only move logic and pacing."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_27_condition_specific::scenario_archetypes",
+      "ticket_id": "wave5::task_5_27_condition_specific",
+      "source_key": "task_5_27_condition_specific",
+      "source_title": "Condition-Specific Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "scenario_archetypes",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "scenario_id",
+        "title",
+        "summary",
+        "activation_cues",
+        "hidden_driver",
+        "difficulty",
+        "repair_opportunities"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "condition tag",
+        "risk markers",
+        "distortion language",
+        "condition_coded_client_states",
+        "crisis_adjacent_language",
+        "difficult_client_prompt_seeds"
+      ],
+      "extraction_focus": [
+        "depression, anxiety, ADHD, BPD, and PTSD distress styles",
+        "condition-shaped reassurance seeking",
+        "symptom escalation markers without copying raw crisis rows verbatim"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "condition-coded self-report language",
+        "crisis-adjacent wording",
+        "distortion-specific distress framing"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_27_condition_specific",
+        "task_5_27_condition_specific_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "condition_state",
+          "excerpt": "Depression, anxiety, ADHD, BPD, and PTSD rows expose different flavors of urgency, shame, checking, overwhelm, and volatility."
+        }
+      ],
+      "writing_notes": [
+        "Archetypes should generalize beyond the original source row.",
+        "Use original text to derive state profiles and benchmark prompts; do not retain wrapper responses.",
+        "Compress symptom-specific wording into generalizable but still textured client states."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_27_condition_specific::client_state_profiles",
+      "ticket_id": "wave5::task_5_27_condition_specific",
+      "source_key": "task_5_27_condition_specific",
+      "source_title": "Condition-Specific Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "client_state_profiles",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "state_id",
+        "label",
+        "presenting_style",
+        "common_distortions",
+        "escalation_markers",
+        "repair_openings"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "condition tag",
+        "risk markers",
+        "distortion language",
+        "condition_coded_client_states",
+        "crisis_adjacent_language",
+        "difficult_client_prompt_seeds"
+      ],
+      "extraction_focus": [
+        "depression, anxiety, ADHD, BPD, and PTSD distress styles",
+        "condition-shaped reassurance seeking",
+        "symptom escalation markers without copying raw crisis rows verbatim"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "condition-coded self-report language",
+        "crisis-adjacent wording",
+        "distortion-specific distress framing"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_27_condition_specific",
+        "task_5_27_condition_specific_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "condition_state",
+          "excerpt": "Depression, anxiety, ADHD, BPD, and PTSD rows expose different flavors of urgency, shame, checking, overwhelm, and volatility."
+        }
+      ],
+      "writing_notes": [
+        "Describe the client-side inner state, not the therapist's interpretation.",
+        "Use original text to derive state profiles and benchmark prompts; do not retain wrapper responses.",
+        "Compress symptom-specific wording into generalizable but still textured client states."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_27_condition_specific::dialogue_seed_rows",
+      "ticket_id": "wave5::task_5_27_condition_specific",
+      "source_key": "task_5_27_condition_specific",
+      "source_title": "Condition-Specific Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "dialogue_seed_rows",
+      "target_count": 140,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "row_id",
+        "lane",
+        "input",
+        "output",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "condition tag",
+        "risk markers",
+        "distortion language",
+        "condition_coded_client_states",
+        "crisis_adjacent_language",
+        "difficult_client_prompt_seeds"
+      ],
+      "extraction_focus": [
+        "depression, anxiety, ADHD, BPD, and PTSD distress styles",
+        "condition-shaped reassurance seeking",
+        "symptom escalation markers without copying raw crisis rows verbatim"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "condition-coded self-report language",
+        "crisis-adjacent wording",
+        "distortion-specific distress framing"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_27_condition_specific",
+        "task_5_27_condition_specific_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "condition_state",
+          "excerpt": "Depression, anxiety, ADHD, BPD, and PTSD rows expose different flavors of urgency, shame, checking, overwhelm, and volatility."
+        }
+      ],
+      "writing_notes": [
+        "Write Pixelated-native rows instead of copying source wording verbatim.",
+        "Use original text to derive state profiles and benchmark prompts; do not retain wrapper responses.",
+        "Compress symptom-specific wording into generalizable but still textured client states."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_27_condition_specific::benchmark_specs",
+      "ticket_id": "wave5::task_5_27_condition_specific",
+      "source_key": "task_5_27_condition_specific",
+      "source_title": "Condition-Specific Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "benchmark_specs",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "benchmark_id",
+        "benchmark_slice",
+        "prompt",
+        "must_detect",
+        "likely_therapist_mistakes",
+        "rubric_items"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "condition tag",
+        "risk markers",
+        "distortion language",
+        "condition_coded_client_states",
+        "crisis_adjacent_language",
+        "difficult_client_prompt_seeds"
+      ],
+      "extraction_focus": [
+        "depression, anxiety, ADHD, BPD, and PTSD distress styles",
+        "condition-shaped reassurance seeking",
+        "symptom escalation markers without copying raw crisis rows verbatim"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "condition-coded self-report language",
+        "crisis-adjacent wording",
+        "distortion-specific distress framing"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_27_condition_specific",
+        "task_5_27_condition_specific_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "condition_state",
+          "excerpt": "Depression, anxiety, ADHD, BPD, and PTSD rows expose different flavors of urgency, shame, checking, overwhelm, and volatility."
+        }
+      ],
+      "writing_notes": [
+        "Keep the prompt compact and the grading contract explicit.",
+        "Use original text to derive state profiles and benchmark prompts; do not retain wrapper responses.",
+        "Compress symptom-specific wording into generalizable but still textured client states."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_27_condition_specific::benchmark_rows",
+      "ticket_id": "wave5::task_5_27_condition_specific",
+      "source_key": "task_5_27_condition_specific",
+      "source_title": "Condition-Specific Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "benchmark_rows",
+      "target_count": 50,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "row_id",
+        "benchmark_slice",
+        "prompt",
+        "expected_behavior",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "condition tag",
+        "risk markers",
+        "distortion language",
+        "condition_coded_client_states",
+        "crisis_adjacent_language",
+        "difficult_client_prompt_seeds"
+      ],
+      "extraction_focus": [
+        "depression, anxiety, ADHD, BPD, and PTSD distress styles",
+        "condition-shaped reassurance seeking",
+        "symptom escalation markers without copying raw crisis rows verbatim"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "condition-coded self-report language",
+        "crisis-adjacent wording",
+        "distortion-specific distress framing"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_27_condition_specific",
+        "task_5_27_condition_specific_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "condition_state",
+          "excerpt": "Depression, anxiety, ADHD, BPD, and PTSD rows expose different flavors of urgency, shame, checking, overwhelm, and volatility."
+        }
+      ],
+      "writing_notes": [
+        "Use for executable holdout examples, not default simulation training.",
+        "Use original text to derive state profiles and benchmark prompts; do not retain wrapper responses.",
+        "Compress symptom-specific wording into generalizable but still textured client states."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_27_condition_specific::preference_pair_candidates",
+      "ticket_id": "wave5::task_5_27_condition_specific",
+      "source_key": "task_5_27_condition_specific",
+      "source_title": "Condition-Specific Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "preference_pair_candidates",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "pair_id",
+        "decision_axis",
+        "candidate_a",
+        "candidate_b",
+        "preferred_behavior"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "condition tag",
+        "risk markers",
+        "distortion language",
+        "condition_coded_client_states",
+        "crisis_adjacent_language",
+        "difficult_client_prompt_seeds"
+      ],
+      "extraction_focus": [
+        "depression, anxiety, ADHD, BPD, and PTSD distress styles",
+        "condition-shaped reassurance seeking",
+        "symptom escalation markers without copying raw crisis rows verbatim"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "condition-coded self-report language",
+        "crisis-adjacent wording",
+        "distortion-specific distress framing"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_specs"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_27_condition_specific",
+        "task_5_27_condition_specific_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "condition_state",
+          "excerpt": "Depression, anxiety, ADHD, BPD, and PTSD rows expose different flavors of urgency, shame, checking, overwhelm, and volatility."
+        }
+      ],
+      "writing_notes": [
+        "Pairs should isolate one decision axis at a time.",
+        "Use original text to derive state profiles and benchmark prompts; do not retain wrapper responses.",
+        "Compress symptom-specific wording into generalizable but still textured client states."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_28_specialized_populations::scenario_archetypes",
+      "ticket_id": "wave5::task_5_28_specialized_populations",
+      "source_key": "task_5_28_specialized_populations",
+      "source_title": "Specialized Populations Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "scenario_archetypes",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "scenario_id",
+        "title",
+        "summary",
+        "activation_cues",
+        "hidden_driver",
+        "difficulty",
+        "repair_opportunities"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "population tag",
+        "life context",
+        "self-description",
+        "life_context_archetypes",
+        "first_person_vulnerable_language",
+        "specialized_population_benchmarks"
+      ],
+      "extraction_focus": [
+        "parenting strain",
+        "loneliness and social starvation",
+        "divorce and family reorganization",
+        "social anxiety in daily-life contexts"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "population-shaped vulnerable language",
+        "life-context archetypes",
+        "non-crisis but high-pain loneliness patterns"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_rows"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_28_specialized_populations",
+        "task_5_28_specialized_populations_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "life_context",
+          "excerpt": "Parenting, loneliness, divorce, and social-anxiety posts expose durable life-context pressure without requiring therapist-answer reuse."
+        }
+      ],
+      "writing_notes": [
+        "Archetypes should generalize beyond the original source row.",
+        "Keep the raw first-person texture and discard the synthetic therapist wrapper.",
+        "Abstract the setting and preserve the vulnerable logic."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_28_specialized_populations::client_state_profiles",
+      "ticket_id": "wave5::task_5_28_specialized_populations",
+      "source_key": "task_5_28_specialized_populations",
+      "source_title": "Specialized Populations Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "client_state_profiles",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "state_id",
+        "label",
+        "presenting_style",
+        "common_distortions",
+        "escalation_markers",
+        "repair_openings"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "population tag",
+        "life context",
+        "self-description",
+        "life_context_archetypes",
+        "first_person_vulnerable_language",
+        "specialized_population_benchmarks"
+      ],
+      "extraction_focus": [
+        "parenting strain",
+        "loneliness and social starvation",
+        "divorce and family reorganization",
+        "social anxiety in daily-life contexts"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "population-shaped vulnerable language",
+        "life-context archetypes",
+        "non-crisis but high-pain loneliness patterns"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_rows"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_28_specialized_populations",
+        "task_5_28_specialized_populations_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "life_context",
+          "excerpt": "Parenting, loneliness, divorce, and social-anxiety posts expose durable life-context pressure without requiring therapist-answer reuse."
+        }
+      ],
+      "writing_notes": [
+        "Describe the client-side inner state, not the therapist's interpretation.",
+        "Keep the raw first-person texture and discard the synthetic therapist wrapper.",
+        "Abstract the setting and preserve the vulnerable logic."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_28_specialized_populations::dialogue_seed_rows",
+      "ticket_id": "wave5::task_5_28_specialized_populations",
+      "source_key": "task_5_28_specialized_populations",
+      "source_title": "Specialized Populations Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "dialogue_seed_rows",
+      "target_count": 140,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "row_id",
+        "lane",
+        "input",
+        "output",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "population tag",
+        "life context",
+        "self-description",
+        "life_context_archetypes",
+        "first_person_vulnerable_language",
+        "specialized_population_benchmarks"
+      ],
+      "extraction_focus": [
+        "parenting strain",
+        "loneliness and social starvation",
+        "divorce and family reorganization",
+        "social anxiety in daily-life contexts"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "population-shaped vulnerable language",
+        "life-context archetypes",
+        "non-crisis but high-pain loneliness patterns"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_rows"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_28_specialized_populations",
+        "task_5_28_specialized_populations_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "life_context",
+          "excerpt": "Parenting, loneliness, divorce, and social-anxiety posts expose durable life-context pressure without requiring therapist-answer reuse."
+        }
+      ],
+      "writing_notes": [
+        "Write Pixelated-native rows instead of copying source wording verbatim.",
+        "Keep the raw first-person texture and discard the synthetic therapist wrapper.",
+        "Abstract the setting and preserve the vulnerable logic."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_28_specialized_populations::benchmark_specs",
+      "ticket_id": "wave5::task_5_28_specialized_populations",
+      "source_key": "task_5_28_specialized_populations",
+      "source_title": "Specialized Populations Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "benchmark_specs",
+      "target_count": 8,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "benchmark_id",
+        "benchmark_slice",
+        "prompt",
+        "must_detect",
+        "likely_therapist_mistakes",
+        "rubric_items"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "population tag",
+        "life context",
+        "self-description",
+        "life_context_archetypes",
+        "first_person_vulnerable_language",
+        "specialized_population_benchmarks"
+      ],
+      "extraction_focus": [
+        "parenting strain",
+        "loneliness and social starvation",
+        "divorce and family reorganization",
+        "social anxiety in daily-life contexts"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "population-shaped vulnerable language",
+        "life-context archetypes",
+        "non-crisis but high-pain loneliness patterns"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_rows"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_28_specialized_populations",
+        "task_5_28_specialized_populations_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "life_context",
+          "excerpt": "Parenting, loneliness, divorce, and social-anxiety posts expose durable life-context pressure without requiring therapist-answer reuse."
+        }
+      ],
+      "writing_notes": [
+        "Keep the prompt compact and the grading contract explicit.",
+        "Keep the raw first-person texture and discard the synthetic therapist wrapper.",
+        "Abstract the setting and preserve the vulnerable logic."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_28_specialized_populations::benchmark_rows",
+      "ticket_id": "wave5::task_5_28_specialized_populations",
+      "source_key": "task_5_28_specialized_populations",
+      "source_title": "Specialized Populations Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "benchmark_rows",
+      "target_count": 40,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "row_id",
+        "benchmark_slice",
+        "prompt",
+        "expected_behavior",
+        "metadata"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "population tag",
+        "life context",
+        "self-description",
+        "life_context_archetypes",
+        "first_person_vulnerable_language",
+        "specialized_population_benchmarks"
+      ],
+      "extraction_focus": [
+        "parenting strain",
+        "loneliness and social starvation",
+        "divorce and family reorganization",
+        "social anxiety in daily-life contexts"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "population-shaped vulnerable language",
+        "life-context archetypes",
+        "non-crisis but high-pain loneliness patterns"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_rows"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_28_specialized_populations",
+        "task_5_28_specialized_populations_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "life_context",
+          "excerpt": "Parenting, loneliness, divorce, and social-anxiety posts expose durable life-context pressure without requiring therapist-answer reuse."
+        }
+      ],
+      "writing_notes": [
+        "Use for executable holdout examples, not default simulation training.",
+        "Keep the raw first-person texture and discard the synthetic therapist wrapper.",
+        "Abstract the setting and preserve the vulnerable logic."
+      ]
+    },
+    {
+      "card_id": "wave5::task_5_28_specialized_populations::preference_pair_candidates",
+      "ticket_id": "wave5::task_5_28_specialized_populations",
+      "source_key": "task_5_28_specialized_populations",
+      "source_title": "Specialized Populations Reddit Mine",
+      "priority": "P1",
+      "artifact_type": "preference_pair_candidates",
+      "target_count": 6,
+      "lane_targets": [
+        "simulation",
+        "benchmark",
+        "evaluator"
+      ],
+      "required_fields": [
+        "pair_id",
+        "decision_axis",
+        "candidate_a",
+        "candidate_b",
+        "preferred_behavior"
+      ],
+      "fields_to_mine": [
+        "original_text",
+        "population tag",
+        "life context",
+        "self-description",
+        "life_context_archetypes",
+        "first_person_vulnerable_language",
+        "specialized_population_benchmarks"
+      ],
+      "extraction_focus": [
+        "parenting strain",
+        "loneliness and social starvation",
+        "divorce and family reorganization",
+        "social anxiety in daily-life contexts"
+      ],
+      "discard_zones": [
+        "discard_synthetic_therapist_wrapper",
+        "use_original_text_only",
+        "keep_as_holdout_or_design_seed"
+      ],
+      "signals_to_mine": [
+        "population-shaped vulnerable language",
+        "life-context archetypes",
+        "non-crisis but high-pain loneliness patterns"
+      ],
+      "candidate_outputs": [
+        "scenario_archetypes",
+        "client_state_profiles",
+        "benchmark_rows"
+      ],
+      "sample_paths": [
+        "gdrive:processed/phase_4_reddit_mental_health/task_5_28_specialized_populations",
+        "task_5_28_specialized_populations_report.json"
+      ],
+      "sample_evidence": [
+        {
+          "label": "life_context",
+          "excerpt": "Parenting, loneliness, divorce, and social-anxiety posts expose durable life-context pressure without requiring therapist-answer reuse."
+        }
+      ],
+      "writing_notes": [
+        "Pairs should isolate one decision axis at a time.",
+        "Keep the raw first-person texture and discard the synthetic therapist wrapper.",
+        "Abstract the setting and preserve the vulnerable logic."
+      ]
+    }
+  ],
+  "summary": {
+    "by_artifact_type": {
+      "scenario_archetypes": 5,
+      "client_state_profiles": 5,
+      "dialogue_seed_rows": 5,
+      "benchmark_specs": 5,
+      "benchmark_rows": 5,
+      "preference_pair_candidates": 5,
+      "therapist_moves": 2,
+      "evaluator_specs": 2,
+      "session_scaffolds": 2
+    },
+    "by_source_key": {
+      "counsel_chat_raw": 6,
+      "psydt_corpus": 9,
+      "task_5_9_soulchat": 9,
+      "task_5_27_condition_specific": 6,
+      "task_5_28_specialized_populations": 6
+    }
+  }
+}

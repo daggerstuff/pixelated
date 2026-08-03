@@ -1,0 +1,14 @@
+{
+  "version": "2026-04-08.wave1",
+  "source_seed_pack": "/home/vivi/pixelated/ai/training_corpus/assets/wave1_seed_pack.json",
+  "outputs": {
+    "simulation": "/home/vivi/pixelated/ai/training_corpus/assets/wave1_seed_simulation.jsonl",
+    "evaluator": "/home/vivi/pixelated/ai/training_corpus/assets/wave1_seed_evaluator.jsonl",
+    "benchmark": "/home/vivi/pixelated/ai/training_corpus/assets/wave1_seed_benchmark.jsonl"
+  },
+  "record_counts": {
+    "simulation": 6,
+    "evaluator": 6,
+    "benchmark": 10
+  }
+}
