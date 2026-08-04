@@ -20,6 +20,18 @@ export { getSession } from "./session";
 export type { User, AuthUser } from "./types";
 
 /**
+ * Distinguish Web API Request from AstroCookies.
+ * AstroCookies exposes a `headers()` method, so `"headers" in context` is not
+ * sufficient — that false positive caused PIX-4245 on pages passing cookies.
+ */
+function isWebRequest(context: Request | AstroCookies): context is Request {
+  return (
+    typeof (context as Request).url === "string" &&
+    (context as Request).headers instanceof Headers
+  );
+}
+
+/**
  * Get the current user from the request or cookies
  * Supports both JWT (users) and API keys (developers)
  */
@@ -33,9 +45,8 @@ export async function getCurrentUser(context: Request | AstroCookies): Promise<{
   let token: string | null = null;
   let isApiKey = false;
 
-  if ("headers" in context) {
-    // It's a Request object
-    const request = context as Request;
+  if (isWebRequest(context)) {
+    const request = context;
 
     // Check for API key first (X-API-Key header)
     const apiKey = request.headers.get("X-API-Key");
@@ -52,11 +63,11 @@ export async function getCurrentUser(context: Request | AstroCookies): Promise<{
     // Fallback to JWT token extraction
     token = extractTokenFromRequest(request);
   } else {
-    // It's AstroCookies
+    const cookies = context;
     // Check for Auth0 token first, then fallback to configured name
     token =
-      (context as AstroCookies).get(authConfig.cookies.accessToken)?.value ??
-      (context as AstroCookies).get("auth_token")?.value ??
+      cookies.get(authConfig.cookies.accessToken)?.value ??
+      cookies.get("auth_token")?.value ??
       null;
   }
 
