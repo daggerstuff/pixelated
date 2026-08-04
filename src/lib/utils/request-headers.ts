@@ -108,9 +108,7 @@ export function normalizeRequestHeaders<T extends { headers?: unknown }>(
     return request
   }
 
-  const normalizedHeaders = new Headers(
-    getRequestHeaderEntries(request.headers as HeaderRecord),
-  )
+  const normalizedHeaders = new Headers(getRequestHeaderEntries(request.headers))
 
   try {
     Object.defineProperty(request, 'headers', {
