@@ -1,6 +1,7 @@
 import { defineMiddleware } from 'astro:middleware'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getRequestHeader, getRequestHeaderEntries } from '../utils/request-headers'
 
 const logger = createBuildSafeLogger('default')
 
@@ -106,8 +107,8 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
   }
 
   const config = getConfig()
-  const origin = request.headers.get('Origin')
-  const hasApiKey = request.headers.has('X-API-Key')
+  const origin = getRequestHeader(request, 'Origin')
+  const hasApiKey = getRequestHeader(request, 'X-API-Key') !== undefined
 
   try {
     // Process the request first to catch any errors
@@ -176,7 +177,7 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
           origin,
           path,
           method: request.method,
-          headers: Object.fromEntries(request.headers.entries()),
+          headers: Object.fromEntries(getRequestHeaderEntries(request)),
         })
 
         // Return 403 Forbidden for unauthorized origins

@@ -12,6 +12,7 @@ import { rateLimitMiddleware } from './lib/middleware/rate-limit'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { tracingMiddleware } from './lib/tracing/middleware'
 import { markSpanError } from './lib/tracing/utils'
+import { normalizeRequestHeaders } from './lib/utils/request-headers'
 
 interface RouteConfig extends AuthOptions {
   pattern: RegExp
@@ -50,6 +51,15 @@ const internalRouteGate: MiddlewareHandler = defineMiddleware(
     if (blocked) {
       return next('/404')
     }
+    return next()
+  },
+)
+
+const normalizeRequestHeadersMiddleware: MiddlewareHandler = defineMiddleware(
+  (context, next) => {
+    normalizeRequestHeaders(
+      context.request as unknown as { headers?: unknown },
+    )
     return next()
   },
 )
@@ -158,6 +168,7 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
 // Tracing middleware is first to capture all requests
 // Rate limiting is placed after auth so we can use role-based limits
 export const onRequest = sequence(
+  normalizeRequestHeadersMiddleware,
   tracingMiddleware,
   generateCspNonce,
   securityHeaders,

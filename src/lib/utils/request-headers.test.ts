@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getRequestHeader, getRequestHeaderEntries } from './request-headers'
+import {
+  getRequestHeader,
+  getRequestHeaderEntries,
+  normalizeRequestHeaders,
+} from './request-headers'
 
 describe('request header utilities', () => {
   it('reads values from Fetch Headers', () => {
@@ -49,5 +53,18 @@ describe('request header utilities', () => {
       ['x-forwarded-for', '203.0.113.7'],
       ['user-agent', 'node-agent'],
     ])
+  })
+
+  it('normalizes plain request headers to Fetch-compatible Headers', () => {
+    const request = {
+      headers: {
+        'x-forwarded-for': '203.0.113.8',
+      },
+    }
+
+    normalizeRequestHeaders(request)
+
+    expect(request.headers).toBeInstanceOf(Headers)
+    expect(request.headers.get('x-forwarded-for')).toBe('203.0.113.8')
   })
 })
