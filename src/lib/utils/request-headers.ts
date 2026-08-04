@@ -26,7 +26,7 @@ function resolveHeaders(source: HeaderSource): HeaderGetter | HeaderRecord | nul
     !('get' in source && typeof source['get'] === 'function')
   ) {
     const headers = source['headers']
-    return isRecord(headers) ? (headers as HeaderGetter | HeaderRecord) : null
+    return isRecord(headers) ? headers : null
   }
 
   return source as HeaderGetter | HeaderRecord
