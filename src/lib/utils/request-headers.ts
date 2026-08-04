@@ -108,12 +108,25 @@ export function normalizeRequestHeaders<T extends { headers?: unknown }>(
     return request
   }
 
-  Object.defineProperty(request, 'headers', {
-    value: new Headers(getRequestHeaderEntries(request.headers as HeaderRecord)),
-    writable: true,
-    enumerable: true,
-    configurable: true,
-  })
+  const normalizedHeaders = new Headers(
+    getRequestHeaderEntries(request.headers as HeaderRecord),
+  )
+
+  try {
+    Object.defineProperty(request, 'headers', {
+      value: normalizedHeaders,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    })
+  } catch {
+    try {
+      request.headers = normalizedHeaders
+    } catch {
+      // Some request-like wrappers may expose sealed headers. Callers can still
+      // read them through getRequestHeader without creating a new failure.
+    }
+  }
 
   return request
 }
