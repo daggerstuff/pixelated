@@ -1,20 +1,20 @@
 export const heroContent = {
-  title: 'The practice room for therapists in training',
+  title: 'Therapists rehearse hard conversations before they reach a real client.',
   subtitle:
-    'The hardest turns in therapy — risk, rupture, disclosure — should never be rehearsed for the first time on a real client. Practice them here against an AI client that pushes back, then walk into supervision with the transcript already open.',
+    'Pixelated Empathy is a clinical simulation platform for therapist training. Trainees practice intake, crisis, rupture, and disclosure against an AI client that responds in real time. Supervisors review the transcript, mark the moments that matter, and coach the next attempt from evidence — not memory.',
   metaDescription:
-    'Pixelated Empathy is the practice room for therapists in training: rehearse crisis, rupture, and disclosure against an adaptive AI client, then review the transcript with a supervisor.',
+    'Pixelated Empathy is a clinical simulation platform: trainees practice therapy conversations against an AI client, supervisors review transcripts and coach from evidence. Built for counseling programs, supervisors, and behavioral health teams.',
   helperText:
     'HIPAA-ready simulations for counseling programs, supervisors, and behavioral health teams.',
-  kicker: 'Practice platform',
+  kicker: 'Clinical simulation platform',
   proofPoints: [
     {
       label: 'For programs',
-      text: 'Accreditation-ready AI clients that hold up across intake, crisis, rupture repair, and disclosure — the same case, assignable to every trainee.',
+      text: 'Assign the same AI client to every trainee. Scenarios cover intake, crisis, rupture repair, and disclosure — repeatable, standardized, and ready for accreditation review.',
     },
     {
       label: 'For supervisors',
-      text: 'Reopen any attempt at the exact turn that mattered, mark the decision point, and coach the retry from evidence instead of memory.',
+      text: 'Open any attempt at the exact turn that mattered. Mark the decision point, leave a note, and assign a retry — the transcript is already there.',
     },
   ],
   primaryCTA: { text: 'Request Demo', href: '/contact' },
