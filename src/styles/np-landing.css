@@ -16,7 +16,7 @@
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
 
-  --np-font-display: "JetBrains Mono Variable", ui-monospace, monospace;
+  --np-font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --np-font-body:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --np-font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
@@ -66,30 +66,31 @@
   display: block;
 }
 
-/* === Display / Headings === */
+/* === Display / Headings — brutalist: heavy sans, tight tracking === */
 .np-display {
   font-family: var(--np-font-display);
-  font-weight: 500;
-  font-size: clamp(2.25rem, 4.4vw, 3.6rem);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-weight: var(--np-weight-display, 900);
+  font-size: var(--np-text-display, clamp(2rem, 3.8vw, 3.25rem));
+  line-height: 1.0;
+  letter-spacing: var(--np-tracking-display, -0.035em);
   margin: 0;
 }
 
 .np-headline {
   font-family: var(--np-font-display);
-  font-weight: 400;
-  font-size: clamp(1.6rem, 3vw, 2.25rem);
-  line-height: 1.15;
+  font-weight: var(--np-weight-headline, 800);
+  font-size: var(--np-text-headline, clamp(1.5rem, 2.6vw, 2.125rem));
+  line-height: 1.1;
+  letter-spacing: -0.025em;
   margin: 0;
 }
 
 .np-title {
-  font-family: var(--np-font-mono);
-  font-weight: 600;
+  font-family: var(--np-font-display);
+  font-weight: 700;
   font-size: 1.125rem;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
   margin: 0;
 }
 
@@ -234,7 +235,7 @@
 }
 
 .np-hero__display {
-  max-width: 16ch;
+  max-width: 20ch;
   margin-top: 16px;
   text-wrap: balance;
 }
@@ -294,9 +295,9 @@
   text-wrap: balance;
 }
 
-/* === Chat demo — inline conversation showcase === */
+/* === Chat demo — raw transcript showcase, no bubbles === */
 .np-chat-demo {
-  border: 1px solid var(--np-line);
+  border: 1px solid var(--np-line-strong);
   background: var(--np-surface);
   display: flex;
   flex-direction: column;
@@ -306,7 +307,7 @@
 
 .np-chat-demo__header {
   padding: var(--np-space-3) var(--np-space-4);
-  border-bottom: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -318,82 +319,69 @@
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--np-muted);
+  color: var(--np-text);
+  font-weight: 700;
 }
 
 .np-chat-demo__status {
   font-family: var(--np-font-mono);
   font-size: 0.6875rem;
-  color: var(--np-mid);
+  color: var(--np-muted);
+  letter-spacing: 0.02em;
 }
 
 .np-chat-demo__messages {
-  padding: var(--np-space-4);
+  padding: 0 var(--np-space-4);
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: var(--np-space-5);
+  gap: 0;
   /* Bound the transcript so the panel stays balanced beside the hero
-     statement; older turns recede under a soft top fade, newest anchored
-     at the bottom — reads as a live session rather than a tall stack. */
+     statement; older turns recede under a soft top fade. */
   max-height: clamp(300px, 40vh, 440px);
   overflow: hidden;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 100%);
 }
 
-.np-chat-demo__msg {
+/* Each entry: sender tag above, message text below, hairline divider */
+.np-chat-demo__entry {
+  padding: var(--np-space-4) 0;
+  border-bottom: 1px solid var(--np-line);
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-width: 88%;
-  flex-shrink: 0;
+  gap: 6px;
 }
 
-.np-chat-demo__msg--client {
-  align-self: flex-start;
+.np-chat-demo__entry:last-child {
+  border-bottom: 0;
 }
 
-.np-chat-demo__msg--therapist {
-  align-self: flex-end;
-  align-items: flex-end;
-}
-
-.np-chat-demo__bubble {
-  padding: var(--np-space-3) var(--np-space-4);
-  border-radius: 0;
-}
-
-.np-chat-demo__bubble--client {
-  background: var(--np-elevated);
-  border: 1px solid var(--np-line);
-}
-
-.np-chat-demo__bubble--therapist {
-  background: var(--np-bg);
-  border: 1px solid var(--np-line-strong);
-}
-
-.np-chat-demo__bubble p {
-  margin: 0;
-  font-family: var(--np-font-body);
-  font-size: var(--np-text-small);
-  line-height: var(--np-leading-body);
-  color: var(--np-text);
-  text-wrap: pretty;
+.np-chat-demo__entry--therapist {
+  padding-left: var(--np-space-4);
+  border-left: 2px solid var(--np-line-strong);
+  margin-left: calc(-1 * var(--np-space-4));
 }
 
 .np-chat-demo__sender {
   font-family: var(--np-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-muted);
-  padding: 0 4px;
+  font-weight: 600;
 }
 
-.np-chat-demo__msg--therapist .np-chat-demo__sender {
-  text-align: right;
+.np-chat-demo__entry--therapist .np-chat-demo__sender {
+  color: var(--np-text);
+}
+
+.np-chat-demo__entry p {
+  margin: 0;
+  font-family: var(--np-font-body);
+  font-size: var(--np-text-small, 0.875rem);
+  line-height: 1.6;
+  color: var(--np-text);
+  text-wrap: pretty;
 }
 
 /* Typing indicator at the bottom of the chat */
@@ -402,10 +390,10 @@
   align-items: center;
   gap: 6px;
   padding: var(--np-space-3) var(--np-space-4);
-  border-top: 1px solid var(--np-line);
+  border-top: 1px solid var(--np-line-strong);
   font-family: var(--np-font-mono);
   font-size: 0.625rem;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--np-muted);
 }
@@ -468,7 +456,7 @@
   color: var(--np-muted);
   padding: var(--np-space-2) var(--np-space-4) var(--np-space-3);
   border-top: 1px solid var(--np-line);
-  text-align: center;
+  text-align: left;
   letter-spacing: 0.02em;
 }
 
@@ -526,6 +514,40 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* === Product screenshot — grayscaled to keep the monochrome edge === */
+.np-screenshot {
+  margin: 32px 0 48px;
+  padding: 0;
+  border: 1px solid var(--np-line-strong);
+  background: var(--np-surface);
+}
+
+.np-screenshot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: grayscale(1) contrast(1.08) brightness(0.95);
+  transition: filter 0.3s ease;
+}
+
+.np-screenshot:hover img {
+  filter: grayscale(1) contrast(1.12) brightness(1);
+}
+
+.np-screenshot__caption {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: var(--np-space-3) var(--np-space-4);
+  border-top: 1px solid var(--np-line);
+}
+
+.np-screenshot__caption .np-mono {
+  font-size: 0.8125rem;
+  color: var(--np-muted);
+  text-wrap: balance;
 }
 
 /* === One-session artifact: a single ordered row, label + body, hairline-divided. === */
@@ -733,8 +755,8 @@
 }
 
 .np-track__number {
-  font-family: var(--np-font-display);
-  font-weight: 350;
+  font-family: var(--np-font-mono);
+  font-weight: 200;
   font-size: clamp(3.25rem, 5.5vw, 4.5rem);
   line-height: 0.9;
   letter-spacing: -0.04em;

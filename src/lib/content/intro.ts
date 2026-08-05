@@ -1,9 +1,9 @@
 export const introContent = {
   label: 'Why it matters',
-  title: 'Therapists need reps before a real session demands them.',
+  title: 'The hardest moments in therapy should not be practiced on a real person.',
   paragraphs: [
-    'Risk, anger, silence, shame, disclosure — these moments decide whether a clinician is ready. They need practice before they become someone’s session.',
-    'Pixelated Empathy gives teams a repeatable place to rehearse them — with enough structure for faculty to teach skill, not rely on charisma.',
+    'Risk, anger, silence, shame, disclosure — these are the turns that decide whether a clinician is ready. They deserve rehearsal before they become someone\u2019s session.',
+    'Pixelated Empathy gives counseling programs a repeatable place to rehearse them. Trainees talk to an AI client. Supervisors review the transcript. Skill gets taught from what actually happened, not from impression.',
   ],
   panelLabel: 'Who uses it',
   panelItems: [
