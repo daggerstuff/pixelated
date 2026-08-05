@@ -17,19 +17,21 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+from pydantic import BaseModel, ConfigDict, Field, StrictStr
+from typing import Any, ClassVar, Dict, List
+from pixelated_empathy_sdk.models.pagination import Pagination
+from pixelated_empathy_sdk.models.public_memory import PublicMemory
 from typing import Optional, Set
 from typing_extensions import Self
 
-class Pagination(BaseModel):
+class SearchMemoriesResponse(BaseModel):
     """
-    Pagination
+    SearchMemoriesResponse
     """ # noqa: E501
-    limit: Optional[StrictInt] = None
-    offset: Optional[StrictInt] = None
-    total: Optional[StrictInt] = None
-    __properties: ClassVar[List[str]] = ["limit", "offset", "total"]
+    data: List[PublicMemory]
+    query: StrictStr = Field(description="Echo of the submitted search string")
+    pagination: Pagination
+    __properties: ClassVar[List[str]] = ["data", "query", "pagination"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +51,7 @@ class Pagination(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of Pagination from a JSON string"""
+        """Create an instance of SearchMemoriesResponse from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -70,11 +72,21 @@ class Pagination(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+        # override the default output from pydantic by calling `to_dict()` of each item in data (list)
+        _items = []
+        if self.data:
+            for _item_data in self.data:
+                if _item_data:
+                    _items.append(_item_data.to_dict())
+            _dict['data'] = _items
+        # override the default output from pydantic by calling `to_dict()` of pagination
+        if self.pagination:
+            _dict['pagination'] = self.pagination.to_dict()
         return _dict
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of Pagination from a dict"""
+        """Create an instance of SearchMemoriesResponse from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +94,9 @@ class Pagination(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "limit": obj.get("limit"),
-            "offset": obj.get("offset"),
-            "total": obj.get("total")
+            "data": [PublicMemory.from_dict(_item) for _item in obj["data"]] if obj.get("data") is not None else None,
+            "query": obj.get("query"),
+            "pagination": Pagination.from_dict(obj["pagination"]) if obj.get("pagination") is not None else None
         })
         return _obj
 
