@@ -17,19 +17,19 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictInt
+from pydantic import BaseModel, ConfigDict, StrictStr
 from typing import Any, ClassVar, Dict, List, Optional
 from typing import Optional, Set
 from typing_extensions import Self
 
-class Pagination(BaseModel):
+class ErrorEnvelope(BaseModel):
     """
-    Pagination
+    ErrorEnvelope
     """ # noqa: E501
-    limit: Optional[StrictInt] = None
-    offset: Optional[StrictInt] = None
-    total: Optional[StrictInt] = None
-    __properties: ClassVar[List[str]] = ["limit", "offset", "total"]
+    error: Optional[StrictStr] = None
+    message: Optional[StrictStr] = None
+    code: Optional[StrictStr] = None
+    __properties: ClassVar[List[str]] = ["error", "message", "code"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +49,7 @@ class Pagination(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of Pagination from a JSON string"""
+        """Create an instance of ErrorEnvelope from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,7 +74,7 @@ class Pagination(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of Pagination from a dict"""
+        """Create an instance of ErrorEnvelope from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +82,9 @@ class Pagination(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "limit": obj.get("limit"),
-            "offset": obj.get("offset"),
-            "total": obj.get("total")
+            "error": obj.get("error"),
+            "message": obj.get("message"),
+            "code": obj.get("code")
         })
         return _obj
 
