@@ -65,7 +65,9 @@ describe('request header utilities', () => {
     normalizeRequestHeaders(request)
 
     expect(request.headers).toBeInstanceOf(Headers)
-    expect(request.headers.get('x-forwarded-for')).toBe('203.0.113.8')
+    expect((request.headers as unknown as Headers).get('x-forwarded-for')).toBe(
+      '203.0.113.8',
+    )
   })
 
   it('does not throw when a request-like object cannot be normalized in place', () => {
