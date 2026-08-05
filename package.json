@@ -455,7 +455,7 @@
     "ioredis-mock": "latest",
     "js-base64": "latest",
     "jsdom": "latest",
-    "knip": "^6.29.0",
+    "knip": "^6.31.0",
     "lint-staged": "latest",
     "markdownlint": "latest",
     "markdownlint-cli": "latest",
@@ -507,7 +507,7 @@
     "vitest": "^4.1.10",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.116.0",
+    "wrangler": "^4.118.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
