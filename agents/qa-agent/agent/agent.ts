@@ -1,6 +1,6 @@
 import { defineAgent } from 'eve'
-import { profileAndLogAgentStartup } from '../../lib/context/startup-profiler.js'
 
+import { profileAndLogAgentStartup } from '../../lib/context/startup-profiler.js'
 import {
   AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   agentModel,

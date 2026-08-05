@@ -330,4 +330,3 @@ describe('TokenEncryptionService (real node:crypto AES-256-GCM)', () => {
     expect(await realService.decrypt<string>(after)).toBe('after-rotation')
   })
 })
-

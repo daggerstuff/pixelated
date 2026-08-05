@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+
 import { causalDagService } from '../../../lib/causal/causal-dag'
 
 export const POST: APIRoute = async ({ request }) => {

@@ -55,22 +55,26 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       <div class="stat-card">
         <span class="stat-label">Total Active Keys</span><span
           class="stat-value"
-          id="stat-total">—</span>
+          id="stat-total">—</span
+        >
       </div>
       <div class="stat-card alert">
         <span class="stat-label">Near Rate Limit</span><span
           class="stat-value"
-          id="stat-rate">—</span>
+          id="stat-rate">—</span
+        >
       </div>
       <div class="stat-card alert">
         <span class="stat-label">Near Daily Quota</span><span
           class="stat-value"
-          id="stat-daily">—</span>
+          id="stat-daily">—</span
+        >
       </div>
       <div class="stat-card alert">
         <span class="stat-label">Near Monthly Quota</span><span
           class="stat-value"
-          id="stat-monthly">—</span>
+          id="stat-monthly">—</span
+        >
       </div>
     </div>
   </section>
@@ -307,8 +311,10 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       const statMonthly = document.getElementById('stat-monthly')
       if (statTotal) statTotal.textContent = String(data.totalKeys ?? 0)
       if (statRate) statRate.textContent = String(data.keysNearRateLimit ?? 0)
-      if (statDaily) statDaily.textContent = String(data.keysNearDailyQuota ?? 0)
-      if (statMonthly) statMonthly.textContent = String(data.keysNearMonthlyQuota ?? 0)
+      if (statDaily)
+        statDaily.textContent = String(data.keysNearDailyQuota ?? 0)
+      if (statMonthly)
+        statMonthly.textContent = String(data.keysNearMonthlyQuota ?? 0)
 
       const dist = document.getElementById('tier-distribution')
       const colors: Record<string, string> = {
@@ -327,30 +333,31 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       }
 
       const tbody = document.getElementById('usage-tbody')
-      if (tbody) tbody.innerHTML =
-        (data.usages || [])
-          .map((u) => {
-            const ratePct =
-              u.rateLimit.limit > 0
-                ? u.rateLimit.remaining / u.rateLimit.limit
-                : 1
-            const dailyPct =
-              u.dailyQuota.limit > 0
-                ? u.dailyQuota.remaining / u.dailyQuota.limit
-                : 1
-            const monthlyPct =
-              u.monthlyQuota.limit > 0
-                ? u.monthlyQuota.remaining / u.monthlyQuota.limit
-                : 1
-            const rateClass =
-              ratePct > 0.5 ? 'green' : ratePct > 0.1 ? 'yellow' : 'red'
-            const dailyClass =
-              dailyPct > 0.5 ? 'green' : dailyPct > 0.2 ? 'yellow' : 'red'
-            const monthlyClass =
-              monthlyPct > 0.5 ? 'green' : monthlyPct > 0.2 ? 'yellow' : 'red'
-            const alertClass = u.alertThresholdExceeded ? 'warning' : 'none'
-            const alertText = u.alertThresholdExceeded ? '⚠' : 'OK'
-            return `<tr>
+      if (tbody)
+        tbody.innerHTML =
+          (data.usages || [])
+            .map((u) => {
+              const ratePct =
+                u.rateLimit.limit > 0
+                  ? u.rateLimit.remaining / u.rateLimit.limit
+                  : 1
+              const dailyPct =
+                u.dailyQuota.limit > 0
+                  ? u.dailyQuota.remaining / u.dailyQuota.limit
+                  : 1
+              const monthlyPct =
+                u.monthlyQuota.limit > 0
+                  ? u.monthlyQuota.remaining / u.monthlyQuota.limit
+                  : 1
+              const rateClass =
+                ratePct > 0.5 ? 'green' : ratePct > 0.1 ? 'yellow' : 'red'
+              const dailyClass =
+                dailyPct > 0.5 ? 'green' : dailyPct > 0.2 ? 'yellow' : 'red'
+              const monthlyClass =
+                monthlyPct > 0.5 ? 'green' : monthlyPct > 0.2 ? 'yellow' : 'red'
+              const alertClass = u.alertThresholdExceeded ? 'warning' : 'none'
+              const alertText = u.alertThresholdExceeded ? '⚠' : 'OK'
+              return `<tr>
           <td><code>${u.apiKeyId.substring(0, 12)}…</code></td>
           <td>—</td>
           <td>${u.tier.name}</td>
@@ -359,13 +366,14 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           <td>${u.monthlyQuota.remaining}/${u.monthlyQuota.limit} <span class="usage-bar"><span class="usage-bar-fill ${monthlyClass}" style="width:${monthlyPct * 100}%"></span></span></td>
           <td><span class="alert-badge ${alertClass}">${alertText}</span></td>
         </tr>`
-          })
-          .join('') ||
-        '<tr><td colspan="7" class="muted">No active keys</td></tr>'
+            })
+            .join('') ||
+          '<tr><td colspan="7" class="muted">No active keys</td></tr>'
     } catch {
       const errTbody = document.getElementById('usage-tbody')
-      if (errTbody) errTbody.innerHTML =
-        '<tr><td colspan="7" class="muted">Failed to load</td></tr>'
+      if (errTbody)
+        errTbody.innerHTML =
+          '<tr><td colspan="7" class="muted">Failed to load</td></tr>'
     }
   }
 
@@ -394,8 +402,8 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       `
     } catch {
       const errContainer = document.getElementById('alerts-container')
-      if (errContainer) errContainer.innerHTML =
-        '<p class="muted">Failed to load alerts</p>'
+      if (errContainer)
+        errContainer.innerHTML = '<p class="muted">Failed to load alerts</p>'
     }
   }
 

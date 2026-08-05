@@ -46,7 +46,9 @@ export default defineTool({
         if (parsed.type === 'trainee_profile') {
           changeRecord.previous_status = parsed.status ?? 'UNKNOWN'
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     const stored = await storeMemory({

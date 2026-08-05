@@ -1,4 +1,5 @@
 import { defineMiddleware } from 'astro:middleware'
+
 import { getApiVersion, setVersionHeader, isApiRoute } from '../api-versioning'
 
 /**

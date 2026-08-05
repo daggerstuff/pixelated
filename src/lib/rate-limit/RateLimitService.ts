@@ -1,8 +1,7 @@
 import { randomBytes } from 'crypto'
 
-import { redis } from '../redis'
 import { getLogger } from '../logging/logger'
-
+import { redis } from '../redis'
 import type {
   ApiTier,
   QuotaAlert,

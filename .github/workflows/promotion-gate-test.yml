@@ -43,7 +43,9 @@ jobs:
           pip install httpx
 
       - name: Run readiness aggregator (dry-run, all pass)
-        if: github.event.inputs.scenario == 'pass' || github.event_name == 'schedule'
+        if:
+          github.event.inputs.scenario == 'pass' || github.event_name ==
+          'schedule'
         id: readiness-pass
         run: |
           echo "=== Testing PASS scenario (all lanes green) ==="
@@ -52,7 +54,9 @@ jobs:
           cat /tmp/readiness-pass.json | python3 -m json.tool
 
       - name: Verify PASS scenario blocks correctly
-        if: github.event.inputs.scenario == 'pass' || github.event_name == 'schedule'
+        if:
+          github.event.inputs.scenario == 'pass' || github.event_name ==
+          'schedule'
         run: |
           STATUS=$(python3 -c "import json; print(json.load(open('/tmp/readiness-pass.json'))['readiness']['status'])")
           SCORE=$(python3 -c "import json; print(json.load(open('/tmp/readiness-pass.json'))['readiness']['score'])")

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+
 import {
   ConsentExpiryService,
   getConsentExpiryService,
@@ -51,7 +52,10 @@ vi.mock('@/lib/db', () => ({
     }
 
     // UPDATE consent_records SET withdrawal
-    if (upper.includes('UPDATE CONSENT_RECORDS SET') && upper.includes('WITHDRAWAL_REQUESTED')) {
+    if (
+      upper.includes('UPDATE CONSENT_RECORDS SET') &&
+      upper.includes('WITHDRAWAL_REQUESTED')
+    ) {
       const clientId = params[params.length - 1] as string
       const rec = mockConsentStore.get(clientId)
       if (rec) {
@@ -63,7 +67,10 @@ vi.mock('@/lib/db', () => ({
     }
 
     // UPDATE consent_records SET data_purged
-    if (upper.includes('UPDATE CONSENT_RECORDS SET') && upper.includes('DATA_PURGED')) {
+    if (
+      upper.includes('UPDATE CONSENT_RECORDS SET') &&
+      upper.includes('DATA_PURGED')
+    ) {
       const clientId = params[0] as string
       const rec = mockConsentStore.get(clientId)
       if (rec) {
@@ -85,7 +92,12 @@ vi.mock('@/lib/db', () => ({
     }
 
     // SELECT single consent record
-    if (upper.startsWith('SELECT') && upper.includes('FROM CONSENT_RECORDS') && upper.includes('WHERE CLIENT_ID = $1') && !upper.includes('GROUP BY')) {
+    if (
+      upper.startsWith('SELECT') &&
+      upper.includes('FROM CONSENT_RECORDS') &&
+      upper.includes('WHERE CLIENT_ID = $1') &&
+      !upper.includes('GROUP BY')
+    ) {
       const clientId = params[0] as string
       const rec = mockConsentStore.get(clientId)
       return { rows: rec ? [rec] : [], rowCount: rec ? 1 : 0 }
@@ -97,56 +109,103 @@ vi.mock('@/lib/db', () => ({
     }
 
     // SELECT COUNT(*) ... WHERE withdrawal_requested = true
-    if (upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') && upper.includes('WITHDRAWAL_REQUESTED = TRUE')) {
-      const count = Array.from(mockConsentStore.values()).filter(r => r['withdrawal_requested'] === true).length
+    if (
+      upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') &&
+      upper.includes('WITHDRAWAL_REQUESTED = TRUE')
+    ) {
+      const count = Array.from(mockConsentStore.values()).filter(
+        (r) => r['withdrawal_requested'] === true,
+      ).length
       return { rows: [{ count: String(count) }], rowCount: 1 }
     }
 
     // SELECT COUNT(*) ... active
-    if (upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') && upper.includes('EXPIRATION_DATE > NOW()')) {
-      const count = Array.from(mockConsentStore.values()).filter(r =>
-        r['withdrawal_requested'] === false && r['data_purged'] === false &&
-        new Date(r['expiration_date'] as string) > new Date()
+    if (
+      upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') &&
+      upper.includes('EXPIRATION_DATE > NOW()')
+    ) {
+      const count = Array.from(mockConsentStore.values()).filter(
+        (r) =>
+          r['withdrawal_requested'] === false &&
+          r['data_purged'] === false &&
+          new Date(r['expiration_date'] as string) > new Date(),
       ).length
       return { rows: [{ count: String(count) }], rowCount: 1 }
     }
 
     // SELECT COUNT(*) ... expired
-    if (upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') && upper.includes('EXPIRATION_DATE <= NOW()')) {
-      const count = Array.from(mockConsentStore.values()).filter(r =>
-        r['expiration_date'] && new Date(r['expiration_date'] as string) <= new Date() &&
-        r['withdrawal_requested'] === false && r['data_purged'] === false
+    if (
+      upper.includes('SELECT COUNT(*) AS COUNT FROM CONSENT_RECORDS') &&
+      upper.includes('EXPIRATION_DATE <= NOW()')
+    ) {
+      const count = Array.from(mockConsentStore.values()).filter(
+        (r) =>
+          r['expiration_date'] &&
+          new Date(r['expiration_date'] as string) <= new Date() &&
+          r['withdrawal_requested'] === false &&
+          r['data_purged'] === false,
       ).length
       return { rows: [{ count: String(count) }], rowCount: 1 }
     }
 
     // SELECT current_level, COUNT(*) ... GROUP BY
-    if (upper.includes('SELECT CURRENT_LEVEL, COUNT(*) AS COUNT') && upper.includes('GROUP BY')) {
+    if (
+      upper.includes('SELECT CURRENT_LEVEL, COUNT(*) AS COUNT') &&
+      upper.includes('GROUP BY')
+    ) {
       const levels: Record<string, number> = {}
       for (const rec of mockConsentStore.values()) {
-        if (rec['withdrawal_requested'] === false && rec['data_purged'] === false &&
-            new Date(rec['expiration_date'] as string) > new Date()) {
+        if (
+          rec['withdrawal_requested'] === false &&
+          rec['data_purged'] === false &&
+          new Date(rec['expiration_date'] as string) > new Date()
+        ) {
           const lvl = rec['current_level'] as string
           levels[lvl] = (levels[lvl] ?? 0) + 1
         }
       }
-      return { rows: Object.entries(levels).map(([k, v]) => ({ current_level: k, count: String(v) })), rowCount: Object.keys(levels).length }
+      return {
+        rows: Object.entries(levels).map(([k, v]) => ({
+          current_level: k,
+          count: String(v),
+        })),
+        rowCount: Object.keys(levels).length,
+      }
     }
 
     // SELECT all consent_records (for export)
-    if (upper.startsWith('SELECT') && upper.includes('FROM CONSENT_RECORDS') && !upper.includes('WHERE')) {
-      return { rows: Array.from(mockConsentStore.values()), rowCount: mockConsentStore.size }
+    if (
+      upper.startsWith('SELECT') &&
+      upper.includes('FROM CONSENT_RECORDS') &&
+      !upper.includes('WHERE')
+    ) {
+      return {
+        rows: Array.from(mockConsentStore.values()),
+        rowCount: mockConsentStore.size,
+      }
     }
 
     // SELECT audit trail by client
-    if (upper.includes('FROM CONSENT_AUDIT_TRAIL') && upper.includes('WHERE CLIENT_ID = $1')) {
+    if (
+      upper.includes('FROM CONSENT_AUDIT_TRAIL') &&
+      upper.includes('WHERE CLIENT_ID = $1')
+    ) {
       const clientId = params[0] as string
-      return { rows: mockAuditTrail.filter(e => e['client_id'] === clientId), rowCount: 0 }
+      return {
+        rows: mockAuditTrail.filter((e) => e['client_id'] === clientId),
+        rowCount: 0,
+      }
     }
 
     // SELECT all audit trail
-    if (upper.includes('FROM CONSENT_AUDIT_TRAIL') && !upper.includes('WHERE')) {
-      return { rows: [...mockAuditTrail].reverse(), rowCount: mockAuditTrail.length }
+    if (
+      upper.includes('FROM CONSENT_AUDIT_TRAIL') &&
+      !upper.includes('WHERE')
+    ) {
+      return {
+        rows: [...mockAuditTrail].reverse(),
+        rowCount: mockAuditTrail.length,
+      }
     }
 
     // Default
@@ -224,78 +283,116 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should detect expired consents', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
       // Create a consent, then manually expire it
-      await consentManagementService.initializeConsent('expired-client', 'minimal')
+      await consentManagementService.initializeConsent(
+        'expired-client',
+        'minimal',
+      )
 
       // Manually set expiration to past
       const rec = mockConsentStore.get('expired-client')!
       rec['expiration_date'] = new Date(Date.now() - 86400000) // 1 day ago
 
       const result = await service.checkExpiries()
-      const expiredReminders = result.reminders.filter(r => r.reminderType === 'expired')
+      const expiredReminders = result.reminders.filter(
+        (r) => r.reminderType === 'expired',
+      )
       expect(expiredReminders.length).toBe(1)
       expect(expiredReminders[0].clientId).toBe('expired-client')
     })
 
     it('should detect expiring-critical consents (≤7 days)', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
-      await consentManagementService.initializeConsent('critical-client', 'full')
+      await consentManagementService.initializeConsent(
+        'critical-client',
+        'full',
+      )
       const rec = mockConsentStore.get('critical-client')!
       rec['expiration_date'] = new Date(Date.now() + 5 * 86400000) // 5 days from now
 
       const result = await service.checkExpiries()
-      const criticalReminders = result.reminders.filter(r => r.reminderType === 'expiring-critical')
+      const criticalReminders = result.reminders.filter(
+        (r) => r.reminderType === 'expiring-critical',
+      )
       expect(criticalReminders.length).toBe(1)
       expect(criticalReminders[0].clientId).toBe('critical-client')
     })
 
     it('should detect expiring-soon consents (≤30 days, >7 days)', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
       await consentManagementService.initializeConsent('soon-client', 'limited')
       const rec = mockConsentStore.get('soon-client')!
       rec['expiration_date'] = new Date(Date.now() + 20 * 86400000) // 20 days from now
 
       const result = await service.checkExpiries()
-      const soonReminders = result.reminders.filter(r => r.reminderType === 'expiring-soon')
+      const soonReminders = result.reminders.filter(
+        (r) => r.reminderType === 'expiring-soon',
+      )
       expect(soonReminders.length).toBe(1)
       expect(soonReminders[0].clientId).toBe('soon-client')
     })
 
     it('should skip withdrawn consents', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
-      await consentManagementService.initializeConsent('withdrawn-client', 'full')
-      await consentManagementService.requestWithdrawal('withdrawn-client', 'test')
+      await consentManagementService.initializeConsent(
+        'withdrawn-client',
+        'full',
+      )
+      await consentManagementService.requestWithdrawal(
+        'withdrawn-client',
+        'test',
+      )
 
       const result = await service.checkExpiries()
-      expect(result.reminders.find(r => r.clientId === 'withdrawn-client')).toBeUndefined()
+      expect(
+        result.reminders.find((r) => r.clientId === 'withdrawn-client'),
+      ).toBeUndefined()
     })
 
     it('should skip purged consents', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
       await consentManagementService.initializeConsent('purged-client', 'full')
-      await consentManagementService.requestWithdrawal('purged-client', 'test', true)
+      await consentManagementService.requestWithdrawal(
+        'purged-client',
+        'test',
+        true,
+      )
       await consentManagementService.completeWithdrawal('purged-client')
 
       const result = await service.checkExpiries()
-      expect(result.reminders.find(r => r.clientId === 'purged-client')).toBeUndefined()
+      expect(
+        result.reminders.find((r) => r.clientId === 'purged-client'),
+      ).toBeUndefined()
     })
 
     it('should update summary counts correctly', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
       await consentManagementService.initializeConsent('expired-1', 'minimal')
       await consentManagementService.initializeConsent('critical-1', 'full')
       await consentManagementService.initializeConsent('soon-1', 'limited')
 
-      mockConsentStore.get('expired-1')!['expiration_date'] = new Date(Date.now() - 86400000)
-      mockConsentStore.get('critical-1')!['expiration_date'] = new Date(Date.now() + 3 * 86400000)
-      mockConsentStore.get('soon-1')!['expiration_date'] = new Date(Date.now() + 15 * 86400000)
+      mockConsentStore.get('expired-1')!['expiration_date'] = new Date(
+        Date.now() - 86400000,
+      )
+      mockConsentStore.get('critical-1')!['expiration_date'] = new Date(
+        Date.now() + 3 * 86400000,
+      )
+      mockConsentStore.get('soon-1')!['expiration_date'] = new Date(
+        Date.now() + 15 * 86400000,
+      )
 
       const result = await service.checkExpiries()
       expect(result.summary.expired).toBe(1)
@@ -306,13 +403,16 @@ describe('ConsentExpiryService', () => {
 
   describe('getExpiringConsents', () => {
     it('should return consents expiring within the given days', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
       await consentManagementService.initializeConsent('far-client', 'full')
       await consentManagementService.initializeConsent('near-client', 'limited')
 
       // far-client expires in 100 days, near-client in 5 days
-      mockConsentStore.get('near-client')!['expiration_date'] = new Date(Date.now() + 5 * 86400000)
+      mockConsentStore.get('near-client')!['expiration_date'] = new Date(
+        Date.now() + 5 * 86400000,
+      )
 
       const expiring = await service.getExpiringConsents(30)
       expect(expiring.length).toBe(1)
@@ -325,15 +425,26 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should skip withdrawn and purged consents', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
 
       await consentManagementService.initializeConsent('active-client', 'full')
-      await consentManagementService.initializeConsent('withdrawn-client', 'full')
-      await consentManagementService.requestWithdrawal('withdrawn-client', 'test')
+      await consentManagementService.initializeConsent(
+        'withdrawn-client',
+        'full',
+      )
+      await consentManagementService.requestWithdrawal(
+        'withdrawn-client',
+        'test',
+      )
 
       // Both expire soon
-      mockConsentStore.get('active-client')!['expiration_date'] = new Date(Date.now() + 3 * 86400000)
-      mockConsentStore.get('withdrawn-client')!['expiration_date'] = new Date(Date.now() + 3 * 86400000)
+      mockConsentStore.get('active-client')!['expiration_date'] = new Date(
+        Date.now() + 3 * 86400000,
+      )
+      mockConsentStore.get('withdrawn-client')!['expiration_date'] = new Date(
+        Date.now() + 3 * 86400000,
+      )
 
       const expiring = await service.getExpiringConsents(30)
       expect(expiring.length).toBe(1)
@@ -358,7 +469,8 @@ describe('ConsentExpiryService', () => {
 
   describe('ConsentManagementService persistence', () => {
     it('should persist consent record to PostgreSQL on initialize', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('persist-test', 'full')
 
       expect(mockConsentStore.has('persist-test')).toBe(true)
@@ -367,7 +479,8 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should persist audit trail to PostgreSQL', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('audit-test', 'minimal')
 
       expect(mockAuditTrail.length).toBeGreaterThan(0)
@@ -377,7 +490,8 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should update consent level in PostgreSQL', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('update-test', 'minimal')
       await consentManagementService.updateConsent({
         clientId: 'update-test',
@@ -390,18 +504,27 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should mark withdrawal in PostgreSQL', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('withdraw-test', 'full')
-      await consentManagementService.requestWithdrawal('withdraw-test', 'user request')
+      await consentManagementService.requestWithdrawal(
+        'withdraw-test',
+        'user request',
+      )
 
       const rec = mockConsentStore.get('withdraw-test')!
       expect(rec['withdrawal_requested']).toBe(true)
     })
 
     it('should mark data purged in PostgreSQL', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('purge-test', 'full')
-      await consentManagementService.requestWithdrawal('purge-test', 'test', true)
+      await consentManagementService.requestWithdrawal(
+        'purge-test',
+        'test',
+        true,
+      )
       await consentManagementService.completeWithdrawal('purge-test')
 
       const rec = mockConsentStore.get('purge-test')!
@@ -409,38 +532,58 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should return null for non-existent client', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
-      const level = await consentManagementService.getConsentLevel('nonexistent')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
+      const level =
+        await consentManagementService.getConsentLevel('nonexistent')
       expect(level).toBeNull()
     })
 
     it('should return null for withdrawn client', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
-      await consentManagementService.initializeConsent('withdrawn-level-test', 'full')
-      await consentManagementService.requestWithdrawal('withdrawn-level-test', 'test')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent(
+        'withdrawn-level-test',
+        'full',
+      )
+      await consentManagementService.requestWithdrawal(
+        'withdrawn-level-test',
+        'test',
+      )
 
-      const level = await consentManagementService.getConsentLevel('withdrawn-level-test')
+      const level = await consentManagementService.getConsentLevel(
+        'withdrawn-level-test',
+      )
       expect(level).toBeNull()
     })
 
     it('should return consent level for active client', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('level-test', 'limited')
       const level = await consentManagementService.getConsentLevel('level-test')
       expect(level).toBe('limited')
     })
 
     it('should return null for expired consent', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
-      await consentManagementService.initializeConsent('expired-level-test', 'full')
-      mockConsentStore.get('expired-level-test')!['expiration_date'] = new Date(Date.now() - 86400000)
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent(
+        'expired-level-test',
+        'full',
+      )
+      mockConsentStore.get('expired-level-test')!['expiration_date'] = new Date(
+        Date.now() - 86400000,
+      )
 
-      const level = await consentManagementService.getConsentLevel('expired-level-test')
+      const level =
+        await consentManagementService.getConsentLevel('expired-level-test')
       expect(level).toBeNull()
     })
 
     it('should get consent statistics from PostgreSQL', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('stat-1', 'minimal')
       await consentManagementService.initializeConsent('stat-2', 'full')
       await consentManagementService.initializeConsent('stat-3', 'limited')
@@ -454,7 +597,8 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should export consent data from PostgreSQL', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('export-test', 'full')
 
       const data = await consentManagementService.exportConsentData()
@@ -464,18 +608,27 @@ describe('ConsentExpiryService', () => {
     })
 
     it('should get audit trail filtered by clientId', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
-      await consentManagementService.initializeConsent('audit-filter-1', 'minimal')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
+      await consentManagementService.initializeConsent(
+        'audit-filter-1',
+        'minimal',
+      )
       await consentManagementService.initializeConsent('audit-filter-2', 'full')
 
-      const trail = await consentManagementService.getAuditTrail('audit-filter-1')
-      expect(trail.every(e => e.clientId === 'audit-filter-1')).toBe(true)
+      const trail =
+        await consentManagementService.getAuditTrail('audit-filter-1')
+      expect(trail.every((e) => e.clientId === 'audit-filter-1')).toBe(true)
     })
 
     it('should validate research access correctly', async () => {
-      const { consentManagementService } = await import('@/lib/research/services/ConsentManagementService')
+      const { consentManagementService } =
+        await import('@/lib/research/services/ConsentManagementService')
       await consentManagementService.initializeConsent('validate-full', 'full')
-      await consentManagementService.initializeConsent('validate-minimal', 'minimal')
+      await consentManagementService.initializeConsent(
+        'validate-minimal',
+        'minimal',
+      )
 
       const result = await consentManagementService.validateResearchAccess(
         ['validate-full', 'validate-minimal', 'nonexistent'],

@@ -11,146 +11,159 @@ import {
   Activity,
   TrendingUp,
   AlertCircle,
-} from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+} from 'lucide-react'
+import { useState, useEffect, useCallback } from 'react'
 
-import Alert from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge/index";
-import { Button } from "@/components/ui/button/index";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/index";
-import { Progress } from "@/components/ui/progress";
-import { Textarea } from "@/components/ui/textarea";
-import { apiClient, APIError } from "@/lib/api-client";
-import type { CrisisDetectionResponse } from "@/types/crisis-detection";
+import Alert from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index'
+import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea'
+import { apiClient, APIError } from '@/lib/api-client'
+import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 
 interface CrisisAssessment {
-  riskLevel: "none" | "low" | "moderate" | "high" | "imminent";
-  riskScore: number;
+  riskLevel: 'none' | 'low' | 'moderate' | 'high' | 'imminent'
+  riskScore: number
   crisisIndicators: {
     suicidalIdeation: {
-      present: boolean;
-      confidence: number;
-      severity?: number;
-    };
-    selfHarm: { present: boolean; confidence: number; severity?: number };
-    hopelessness: { present: boolean; confidence: number; severity?: number };
-    impulsivity: { present: boolean; confidence: number; severity?: number };
-    socialIsolation: { present: boolean; confidence: number; severity?: number };
-    substanceUse: { present: boolean; confidence: number; severity?: number };
-  };
-  protectiveFactors: string[];
-  immediateActions: string[];
+      present: boolean
+      confidence: number
+      severity?: number
+    }
+    selfHarm: { present: boolean; confidence: number; severity?: number }
+    hopelessness: { present: boolean; confidence: number; severity?: number }
+    impulsivity: { present: boolean; confidence: number; severity?: number }
+    socialIsolation: { present: boolean; confidence: number; severity?: number }
+    substanceUse: { present: boolean; confidence: number; severity?: number }
+  }
+  protectiveFactors: string[]
+  immediateActions: string[]
   emergencyResources: {
-    type: string;
-    contact: string;
-    description: string;
-    available: string;
-  }[];
-  confidenceLevel: number;
-  timestamp: string;
+    type: string
+    contact: string
+    description: string
+    available: string
+  }[]
+  confidenceLevel: number
+  timestamp: string
 }
 
 export default function CrisisDetectionDemo() {
-  const [inputText, setInputText] = useState("");
-  const [assessing, setAssessing] = useState(false);
-  const [assessment, setAssessment] = useState<CrisisAssessment | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [inputText, setInputText] = useState('')
+  const [assessing, setAssessing] = useState(false)
+  const [assessment, setAssessment] = useState<CrisisAssessment | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const [realTimeMonitoring, setRealTimeMonitoring] = useState(false);
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [assessmentHistory, setAssessmentHistory] = useState<CrisisAssessment[]>([]);
+  const [realTimeMonitoring, setRealTimeMonitoring] = useState(false)
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
+    null,
+  )
+  const [assessmentHistory, setAssessmentHistory] = useState<
+    CrisisAssessment[]
+  >([])
 
   const performCrisisAssessment = useCallback(
     async (isRealTime: boolean = false) => {
       if (!inputText.trim()) {
-        setError("Please enter content to assess for crisis indicators");
-        return;
+        setError('Please enter content to assess for crisis indicators')
+        return
       }
 
       if (!isRealTime) {
-        setAssessing(true);
-        setError(null);
-        setAssessment(null);
+        setAssessing(true)
+        setError(null)
+        setAssessment(null)
       }
 
       try {
         const result: CrisisDetectionResponse = await apiClient.detectCrisis({
           content: inputText,
-          contentType: "chat_message",
+          contentType: 'chat_message',
           context: {
             previousAssessments: assessmentHistory.slice(-3), // Last 3 assessments for context
             sessionMetadata: {
               previousCrisisFlags: assessmentHistory
-                .filter((a) => a.riskLevel === "high" || a.riskLevel === "imminent")
+                .filter(
+                  (a) => a.riskLevel === 'high' || a.riskLevel === 'imminent',
+                )
                 .map((a) => `${a.riskLevel}_risk`),
             },
           },
           options: {
-            sensitivityLevel: "high",
+            sensitivityLevel: 'high',
             includeTreatmentSuggestions: true,
             includeResourceRecommendations: true,
             enableImmediateNotifications: true,
           },
-        });
+        })
 
         const crisisAssessment: CrisisAssessment = {
           riskLevel: result.assessment.overallRisk,
           riskScore:
-            result.assessment.overallRisk === "imminent"
+            result.assessment.overallRisk === 'imminent'
               ? 0.95
-              : result.assessment.overallRisk === "high"
+              : result.assessment.overallRisk === 'high'
                 ? 0.8
-                : result.assessment.overallRisk === "moderate"
+                : result.assessment.overallRisk === 'moderate'
                   ? 0.6
-                  : result.assessment.overallRisk === "low"
+                  : result.assessment.overallRisk === 'low'
                     ? 0.3
                     : 0.1,
           crisisIndicators: {
             suicidalIdeation: {
               present: result.assessment.suicidalIdeation.present,
               confidence:
-                result.assessment.suicidalIdeation.severity === "with_intent"
+                result.assessment.suicidalIdeation.severity === 'with_intent'
                   ? 0.95
-                  : result.assessment.suicidalIdeation.severity === "with_plan"
+                  : result.assessment.suicidalIdeation.severity === 'with_plan'
                     ? 0.85
-                    : result.assessment.suicidalIdeation.severity === "active"
+                    : result.assessment.suicidalIdeation.severity === 'active'
                       ? 0.75
-                      : result.assessment.suicidalIdeation.severity === "passive"
+                      : result.assessment.suicidalIdeation.severity ===
+                          'passive'
                         ? 0.5
                         : 0.1,
               severity:
-                result.assessment.suicidalIdeation.severity === "with_intent"
+                result.assessment.suicidalIdeation.severity === 'with_intent'
                   ? 10
-                  : result.assessment.suicidalIdeation.severity === "with_plan"
+                  : result.assessment.suicidalIdeation.severity === 'with_plan'
                     ? 9
-                    : result.assessment.suicidalIdeation.severity === "active"
+                    : result.assessment.suicidalIdeation.severity === 'active'
                       ? 7
-                      : result.assessment.suicidalIdeation.severity === "passive"
+                      : result.assessment.suicidalIdeation.severity ===
+                          'passive'
                         ? 4
                         : 0,
             },
             selfHarm: {
               present: result.assessment.selfHarm.present,
               confidence:
-                result.assessment.selfHarm.risk === "high"
+                result.assessment.selfHarm.risk === 'high'
                   ? 0.9
-                  : result.assessment.selfHarm.risk === "moderate"
+                  : result.assessment.selfHarm.risk === 'moderate'
                     ? 0.6
                     : 0.3,
               severity:
-                result.assessment.selfHarm.frequency === "daily"
+                result.assessment.selfHarm.frequency === 'daily'
                   ? 10
-                  : result.assessment.selfHarm.frequency === "frequent"
+                  : result.assessment.selfHarm.frequency === 'frequent'
                     ? 8
-                    : result.assessment.selfHarm.frequency === "occasional"
+                    : result.assessment.selfHarm.frequency === 'occasional'
                       ? 5
-                      : result.assessment.selfHarm.frequency === "rare"
+                      : result.assessment.selfHarm.frequency === 'rare'
                         ? 2
                         : 0,
             },
             hopelessness: {
               present: result.riskFactors.some((rf: unknown) =>
-                (rf as { factor: string }).factor.includes("hopelessness"),
+                (rf as { factor: string }).factor.includes('hopelessness'),
               ),
               confidence: 0.7,
               severity: 6,
@@ -159,15 +172,15 @@ export default function CrisisDetectionDemo() {
               present: result.assessment.agitation.present,
               confidence: result.assessment.agitation.controllable ? 0.4 : 0.8,
               severity:
-                result.assessment.agitation.severity === "severe"
+                result.assessment.agitation.severity === 'severe'
                   ? 9
-                  : result.assessment.agitation.severity === "moderate"
+                  : result.assessment.agitation.severity === 'moderate'
                     ? 6
                     : 3,
             },
             socialIsolation: {
               present: result.riskFactors.some((rf: unknown) =>
-                (rf as { factor: string }).factor.includes("isolation"),
+                (rf as { factor: string }).factor.includes('isolation'),
               ),
               confidence: 0.6,
               severity: 5,
@@ -176,9 +189,9 @@ export default function CrisisDetectionDemo() {
               present: result.assessment.substanceUse.present,
               confidence: result.assessment.substanceUse.acute ? 0.9 : 0.5,
               severity:
-                result.assessment.substanceUse.impairment === "severe"
+                result.assessment.substanceUse.impairment === 'severe'
                   ? 9
-                  : result.assessment.substanceUse.impairment === "moderate"
+                  : result.assessment.substanceUse.impairment === 'moderate'
                     ? 6
                     : 3,
             },
@@ -189,49 +202,54 @@ export default function CrisisDetectionDemo() {
           immediateActions: result.recommendations.immediate.map(
             (action: unknown) => (action as { action: string }).action,
           ),
-          emergencyResources: result.resources.crisis.map((resource: unknown) => {
-            const r = resource as {
-              name: string;
-              contact: string;
-              specialization: string[];
-              availability: string;
-            };
-            return {
-              type: r.name,
-              contact: r.contact,
-              description: r.specialization.join(", "),
-              available: r.availability,
-            };
-          }),
+          emergencyResources: result.resources.crisis.map(
+            (resource: unknown) => {
+              const r = resource as {
+                name: string
+                contact: string
+                specialization: string[]
+                availability: string
+              }
+              return {
+                type: r.name,
+                contact: r.contact,
+                description: r.specialization.join(', '),
+                available: r.availability,
+              }
+            },
+          ),
           confidenceLevel: result.metadata.confidenceScore / 100,
           timestamp: new Date().toISOString(),
-        };
+        }
 
         if (!isRealTime) {
-          setAssessment(crisisAssessment);
+          setAssessment(crisisAssessment)
         }
 
         // Add to assessment history
-        setAssessmentHistory((prev) => [...prev.slice(-9), crisisAssessment]); // Keep last 10
+        setAssessmentHistory((prev) => [...prev.slice(-9), crisisAssessment]) // Keep last 10
 
         // Handle high-risk situations
-        if (crisisAssessment.riskLevel === "imminent" || crisisAssessment.riskLevel === "high") {
+        if (
+          crisisAssessment.riskLevel === 'imminent' ||
+          crisisAssessment.riskLevel === 'high'
+        ) {
           // Could trigger notifications, alerts, etc.
-          console.warn("HIGH RISK SITUATION DETECTED:", crisisAssessment);
+          console.warn('HIGH RISK SITUATION DETECTED:', crisisAssessment)
         }
       } catch (error: unknown) {
-        console.error("Crisis assessment failed:", error);
+        console.error('Crisis assessment failed:', error)
 
         if (error instanceof APIError) {
-          setError(`Assessment failed: ${String(error)}`);
+          setError(`Assessment failed: ${String(error)}`)
         } else {
-          setError("Assessment failed. Please try again.");
+          setError('Assessment failed. Please try again.')
         }
 
         // Fallback to demo data for demonstration
         if (!isRealTime) {
           const demoAssessment: CrisisAssessment = {
-            riskLevel: "moderate",
+            riskLevel: 'moderate',
             riskScore: 0.65,
             crisisIndicators: {
               suicidalIdeation: { present: false, confidence: 0.15 },
@@ -242,112 +260,114 @@ export default function CrisisDetectionDemo() {
               substanceUse: { present: false, confidence: 0.12 },
             },
             protectiveFactors: [
-              "Strong family support system mentioned",
-              "Currently employed/functioning",
-              "No history of suicide attempts",
-              "Seeking help by reaching out",
+              'Strong family support system mentioned',
+              'Currently employed/functioning',
+              'No history of suicide attempts',
+              'Seeking help by reaching out',
             ],
             immediateActions: [
-              "Continue monitoring for escalation",
-              "Ensure professional mental health support",
-              "Activate support network",
-              "Safety planning recommended",
+              'Continue monitoring for escalation',
+              'Ensure professional mental health support',
+              'Activate support network',
+              'Safety planning recommended',
             ],
             emergencyResources: [
               {
-                type: "Crisis Hotline",
-                contact: "988",
-                description: "National Suicide Prevention Lifeline",
-                available: "24/7",
+                type: 'Crisis Hotline',
+                contact: '988',
+                description: 'National Suicide Prevention Lifeline',
+                available: '24/7',
               },
               {
-                type: "Crisis Text Line",
-                contact: "Text HOME to 741741",
-                description: "Free, confidential crisis support via text",
-                available: "24/7",
+                type: 'Crisis Text Line',
+                contact: 'Text HOME to 741741',
+                description: 'Free, confidential crisis support via text',
+                available: '24/7',
               },
             ],
             confidenceLevel: 0.78,
             timestamp: new Date().toISOString(),
-          };
+          }
 
           setTimeout(() => {
-            setAssessment(demoAssessment);
-            setError(null);
-          }, 2000);
+            setAssessment(demoAssessment)
+            setError(null)
+          }, 2000)
         }
       } finally {
         if (!isRealTime) {
-          setAssessing(false);
+          setAssessing(false)
         }
       }
     },
     [inputText, assessmentHistory],
-  );
+  )
 
   // Real-time monitoring effect
   useEffect(() => {
     if (realTimeMonitoring && inputText.length > 50) {
       // Clear existing timeout
       if (typingTimeout) {
-        clearTimeout(typingTimeout);
+        clearTimeout(typingTimeout)
       }
 
       // Set new timeout for real-time analysis
       const timeout = setTimeout(() => {
-        void performCrisisAssessment(true); // Silent assessment
-      }, 2000); // Wait 2 seconds after user stops typing
+        void performCrisisAssessment(true) // Silent assessment
+      }, 2000) // Wait 2 seconds after user stops typing
 
-      setTypingTimeout(timeout);
+      setTypingTimeout(timeout)
     }
 
     return () => {
       if (typingTimeout) {
-        clearTimeout(typingTimeout);
+        clearTimeout(typingTimeout)
       }
-    };
-  }, [inputText, realTimeMonitoring, typingTimeout, performCrisisAssessment]);
+    }
+  }, [inputText, realTimeMonitoring, typingTimeout, performCrisisAssessment])
 
   const getRiskLevelColor = (level: string) => {
     switch (level) {
-      case "none":
-        return "bg-neutral-100 text-neutral-800 border-neutral-200";
-      case "low":
-        return "bg-neutral-100 text-neutral-800 border-neutral-200";
-      case "moderate":
-        return "bg-neutral-100 text-neutral-800 border-neutral-200";
-      case "high":
-        return "bg-neutral-100 text-neutral-800 border-neutral-200";
-      case "imminent":
-        return "bg-neutral-100 text-neutral-800 border-neutral-200";
+      case 'none':
+        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+      case 'low':
+        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+      case 'moderate':
+        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+      case 'high':
+        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+      case 'imminent':
+        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
       default:
-        return "bg-neutral-100 text-neutral-800 border-neutral-200";
+        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
     }
-  };
+  }
 
   const getRiskIcon = (level: string) => {
     switch (level) {
-      case "none":
-        return <CheckCircle className="text-neutral-600 h-5 w-5" />;
-      case "low":
-        return <Shield className="text-neutral-600 h-5 w-5" />;
-      case "moderate":
-        return <AlertTriangle className="text-neutral-600 h-5 w-5" />;
-      case "high":
-        return <AlertTriangle className="text-neutral-600 h-5 w-5" />;
-      case "imminent":
-        return <AlertTriangle className="text-neutral-600 h-5 w-5" />;
+      case 'none':
+        return <CheckCircle className="text-neutral-600 h-5 w-5" />
+      case 'low':
+        return <Shield className="text-neutral-600 h-5 w-5" />
+      case 'moderate':
+        return <AlertTriangle className="text-neutral-600 h-5 w-5" />
+      case 'high':
+        return <AlertTriangle className="text-neutral-600 h-5 w-5" />
+      case 'imminent':
+        return <AlertTriangle className="text-neutral-600 h-5 w-5" />
       default:
-        return <Shield className="text-neutral-600 h-5 w-5" />;
+        return <Shield className="text-neutral-600 h-5 w-5" />
     }
-  };
+  }
 
   const getIndicatorIcon = (present: boolean, confidence: number) => {
-    if (present && confidence > 0.7) return <AlertTriangle className="text-neutral-500 h-4 w-4" />;
-    if (present && confidence > 0.5) return <AlertTriangle className="text-neutral-500 h-4 w-4" />;
-    if (present) return <AlertTriangle className="text-neutral-500 h-4 w-4" />;
-    return <CheckCircle className="text-neutral-500 h-4 w-4" />;
-  };
+    if (present && confidence > 0.7)
+      return <AlertTriangle className="text-neutral-500 h-4 w-4" />
+    if (present && confidence > 0.5)
+      return <AlertTriangle className="text-neutral-500 h-4 w-4" />
+    if (present) return <AlertTriangle className="text-neutral-500 h-4 w-4" />
+    return <CheckCircle className="text-neutral-500 h-4 w-4" />
+  }
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6 p-6">
@@ -358,13 +378,14 @@ export default function CrisisDetectionDemo() {
           Crisis Detection & Assessment
         </h1>
         <p className="text-gray-600 mx-auto max-w-2xl">
-          Advanced AI-powered crisis detection system for real-time assessment of suicide risk,
-          self-harm indicators, and mental health emergencies with immediate resource
-          recommendations.
+          Advanced AI-powered crisis detection system for real-time assessment
+          of suicide risk, self-harm indicators, and mental health emergencies
+          with immediate resource recommendations.
         </p>
         <div className="bg-neutral-100 border-neutral-200 text-neutral-800 rounded-lg border p-4 text-sm">
-          <strong>Important:</strong> This is a demonstration tool. For actual crises, immediately
-          contact emergency services (911) or the National Suicide Prevention Lifeline (988).
+          <strong>Important:</strong> This is a demonstration tool. For actual
+          crises, immediately contact emergency services (911) or the National
+          Suicide Prevention Lifeline (988).
         </div>
       </div>
 
@@ -388,7 +409,10 @@ export default function CrisisDetectionDemo() {
             <div className="text-gray-500 text-sm">
               {inputText.length} characters • Real-time crisis detection
               {realTimeMonitoring && (
-                <Badge variant="outline" className="bg-neutral-100 text-neutral-700 ml-2">
+                <Badge
+                  variant="outline"
+                  className="bg-neutral-100 text-neutral-700 ml-2"
+                >
                   <Activity className="mr-1 h-3 w-3" />
                   Live Monitoring
                 </Badge>
@@ -399,10 +423,12 @@ export default function CrisisDetectionDemo() {
                 variant="outline"
                 size="sm"
                 onClick={() => setRealTimeMonitoring(!realTimeMonitoring)}
-                className={realTimeMonitoring ? "bg-neutral-100 border-neutral-200" : ""}
+                className={
+                  realTimeMonitoring ? 'bg-neutral-100 border-neutral-200' : ''
+                }
               >
                 <Activity className="mr-2 h-4 w-4" />
-                {realTimeMonitoring ? "Disable" : "Enable"} Real-time
+                {realTimeMonitoring ? 'Disable' : 'Enable'} Real-time
               </Button>
               <Button
                 onClick={async () => performCrisisAssessment(false)}
@@ -430,12 +456,17 @@ export default function CrisisDetectionDemo() {
               <TrendingUp className="h-3 w-3" />
               <span>
                 {assessmentHistory.length} previous assessment
-                {assessmentHistory.length !== 1 ? "s" : ""}
+                {assessmentHistory.length !== 1 ? 's' : ''}
               </span>
               {assessmentHistory
                 .slice(-3)
-                .some((a) => a.riskLevel === "high" || a.riskLevel === "imminent") && (
-                <Badge variant="outline" className="text-neutral-700 border-neutral-200">
+                .some(
+                  (a) => a.riskLevel === 'high' || a.riskLevel === 'imminent',
+                ) && (
+                <Badge
+                  variant="outline"
+                  className="text-neutral-700 border-neutral-200"
+                >
                   <AlertCircle className="mr-1 h-3 w-3" />
                   High-risk history
                 </Badge>
@@ -455,7 +486,7 @@ export default function CrisisDetectionDemo() {
       {assessment && (
         <div className="space-y-6">
           {/* Risk Level Overview */}
-          <Card className="border-l-4 border-l-neutral-500">
+          <Card className="border-l-neutral-500 border-l-4">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -474,22 +505,32 @@ export default function CrisisDetectionDemo() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <div>
                   <h4 className="text-gray-900 mb-2 font-medium">Risk Score</h4>
-                  <Progress value={assessment.riskScore * 100} className="mb-2 w-full" />
+                  <Progress
+                    value={assessment.riskScore * 100}
+                    className="mb-2 w-full"
+                  />
                   <div className="text-gray-600 text-sm">
                     {(assessment.riskScore * 100).toFixed(1)}% risk probability
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-gray-900 mb-2 font-medium">Confidence Level</h4>
-                  <Progress value={assessment.confidenceLevel * 100} className="mb-2 w-full" />
+                  <h4 className="text-gray-900 mb-2 font-medium">
+                    Confidence Level
+                  </h4>
+                  <Progress
+                    value={assessment.confidenceLevel * 100}
+                    className="mb-2 w-full"
+                  />
                   <div className="text-gray-600 text-sm">
                     {(assessment.confidenceLevel * 100).toFixed(1)}% confidence
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="text-gray-900 mb-2 font-medium">Assessment Time</h4>
+                  <h4 className="text-gray-900 mb-2 font-medium">
+                    Assessment Time
+                  </h4>
                   <div className="text-gray-600 flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     <span className="text-sm">
@@ -511,28 +552,40 @@ export default function CrisisDetectionDemo() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                {Object.entries(assessment.crisisIndicators).map(([key, indicator]) => (
-                  <div key={key} className="rounded-lg border p-4">
-                    <div className="mb-2 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {getIndicatorIcon(indicator.present, indicator.confidence)}
-                        <span className="font-medium capitalize">
-                          {key.replace(/([A-Z])/g, " $1").toLowerCase()}
+                {Object.entries(assessment.crisisIndicators).map(
+                  ([key, indicator]) => (
+                    <div key={key} className="rounded-lg border p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {getIndicatorIcon(
+                            indicator.present,
+                            indicator.confidence,
+                          )}
+                          <span className="font-medium capitalize">
+                            {key.replace(/([A-Z])/g, ' $1').toLowerCase()}
+                          </span>
+                        </div>
+                        <div className="text-gray-600 text-sm">
+                          {Math.round(indicator.confidence * 100)}%
+                        </div>
+                      </div>
+
+                      <Progress
+                        value={indicator.confidence * 100}
+                        className="mb-2 w-full"
+                      />
+
+                      <div className="text-gray-500 flex justify-between text-xs">
+                        <span>
+                          {indicator.present ? 'Present' : 'Not detected'}
                         </span>
-                      </div>
-                      <div className="text-gray-600 text-sm">
-                        {Math.round(indicator.confidence * 100)}%
+                        {indicator.severity && (
+                          <span>Severity: {indicator.severity}/10</span>
+                        )}
                       </div>
                     </div>
-
-                    <Progress value={indicator.confidence * 100} className="mb-2 w-full" />
-
-                    <div className="text-gray-500 flex justify-between text-xs">
-                      <span>{indicator.present ? "Present" : "Not detected"}</span>
-                      {indicator.severity && <span>Severity: {indicator.severity}/10</span>}
-                    </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>
@@ -577,7 +630,9 @@ export default function CrisisDetectionDemo() {
                       className="bg-neutral-100 border-neutral-200 rounded-lg border p-3"
                     >
                       <div className="mb-1 flex items-center justify-between">
-                        <h4 className="text-neutral-900 font-medium">{resource.type}</h4>
+                        <h4 className="text-neutral-900 font-medium">
+                          {resource.type}
+                        </h4>
                         <Badge
                           variant="outline"
                           className="bg-neutral-200 text-neutral-700 text-xs"
@@ -588,7 +643,9 @@ export default function CrisisDetectionDemo() {
                       <div className="text-neutral-800 mb-1 font-mono text-lg">
                         {resource.contact}
                       </div>
-                      <p className="text-neutral-700 text-sm">{resource.description}</p>
+                      <p className="text-neutral-700 text-sm">
+                        {resource.description}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -626,7 +683,7 @@ export default function CrisisDetectionDemo() {
                 <Button
                   variant="outline"
                   className="bg-neutral-100 border-neutral-200 text-neutral-700 hover:bg-neutral-200"
-                  onClick={() => window.open("tel:988")}
+                  onClick={() => window.open('tel:988')}
                 >
                   <Phone className="mr-2 h-4 w-4" />
                   Call 988 (Crisis Lifeline)
@@ -635,7 +692,7 @@ export default function CrisisDetectionDemo() {
                 <Button
                   variant="outline"
                   className="bg-neutral-100 border-neutral-200 text-neutral-700 hover:bg-neutral-200"
-                  onClick={() => window.open("sms:741741?body=HOME")}
+                  onClick={() => window.open('sms:741741?body=HOME')}
                 >
                   Crisis Text Line
                 </Button>
@@ -653,5 +710,5 @@ export default function CrisisDetectionDemo() {
         </div>
       )}
     </div>
-  );
+  )
 }
