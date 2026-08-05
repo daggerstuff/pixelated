@@ -484,7 +484,7 @@
     "rehype-external-links": "latest",
     "remark-code-import": "latest",
     "remark-imgattr": "latest",
-    "rollup": "^4.62.3",
+    "rollup": "^4.62.4",
     "rollup-plugin-visualizer": "latest",
     "satori": "latest",
     "satori-html": "latest",
