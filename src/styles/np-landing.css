@@ -53,7 +53,7 @@
 
 /* === Section === */
 .np-section {
-  padding: clamp(56px, 8vw, 96px) 0;
+  padding: clamp(72px, 10vw, 128px) 0;
 }
 
 /* === Labels === */
@@ -168,6 +168,11 @@
 }
 .np-btn-primary:active {
   background: var(--np-surface);
+  transform: translateY(1px);
+}
+
+.np-btn-ghost:active {
+  transform: translateY(1px);
 }
 
 .np-btn-ghost {
@@ -304,6 +309,11 @@
   flex-direction: column;
   width: 100%;
   position: relative;
+  transition: border-color var(--np-duration-slow) var(--np-ease);
+}
+
+.np-chat-demo:hover {
+  border-color: var(--np-mid);
 }
 
 .np-chat-demo__header {
@@ -446,6 +456,11 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: background var(--np-duration-fast) var(--np-ease);
+}
+
+.np-hero__proof-item:hover {
+  background: var(--np-surface);
 }
 
 .np-hero__proof-item .np-mono {
@@ -453,6 +468,71 @@
   line-height: 1.6;
   color: var(--np-muted);
   text-wrap: pretty;
+}
+
+/* === Trust strip === */
+.np-trust {
+  padding: var(--np-space-8) 0;
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
+  background: var(--np-bg);
+}
+
+.np-trust__label {
+  font-family: var(--np-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+  text-align: center;
+  margin-bottom: var(--np-space-4);
+}
+
+.np-trust__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--np-space-3) var(--np-space-6);
+  margin-bottom: var(--np-space-5);
+}
+
+.np-trust__badge {
+  font-family: var(--np-font-display);
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-text);
+  padding: 6px 14px;
+  border: 1px solid var(--np-line);
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+.np-trust__logos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--np-space-6) var(--np-space-8);
+  margin-top: var(--np-space-3);
+  opacity: 0.5;
+}
+
+.np-trust__logo {
+  height: 28px;
+  width: auto;
+  filter: grayscale(1) contrast(0.8);
+  opacity: 0.6;
+}
+
+@media (max-width: 640px) {
+  .np-trust__logos {
+    gap: var(--np-space-4) var(--np-space-5);
+  }
+  .np-trust__logo {
+    height: 22px;
+  }
 }
 
 /* Demo note — subtle below the chat */
@@ -468,12 +548,12 @@
 
 /* === Section header === */
 .np-section-header {
-  margin-bottom: 48px;
+  margin-bottom: 64px;
 }
 
 /* Second header inside a section: separates it from the block above. */
 .np-section-header--spaced {
-  margin-top: 64px;
+  margin-top: 80px;
 }
 
 .np-section-header p {
@@ -576,6 +656,15 @@
   padding: 24px 0;
   border-bottom: 1px solid var(--np-line);
   align-items: baseline;
+  transition: background var(--np-duration-fast) var(--np-ease);
+  padding-left: 16px;
+  padding-right: 16px;
+  margin-left: -16px;
+  margin-right: -16px;
+}
+
+.np-artifact__row:hover {
+  background: var(--np-surface);
 }
 
 .np-artifact__label {
@@ -622,6 +711,11 @@
   gap: 16px;
   grid-row: 1 / span 2;
   position: relative;
+  transition: background var(--np-duration-fast) var(--np-ease);
+}
+
+.np-scenario-feature:hover {
+  background: var(--np-surface);
 }
 
 .np-scenario-feature .np-scenario__kicker {
@@ -650,6 +744,11 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  transition: background var(--np-duration-fast) var(--np-ease);
+}
+
+.np-scenario-side:hover {
+  background: var(--np-surface);
 }
 
 .np-scenario-side--rupture {
@@ -754,6 +853,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  transition: background var(--np-duration-fast) var(--np-ease);
+}
+
+.np-track__step:hover {
+  background: var(--np-surface);
 }
 
 .np-track__step + .np-track__step {
@@ -842,10 +946,23 @@
   color: var(--np-line-strong);
 }
 
+/* === Mid-page CTA band: the third placement of the primary action.
+   Full-width, centered, minimal — lets the button carry the weight. === */
+.np-cta-band {
+  padding: clamp(56px, 7vw, 88px) 0;
+  border-top: 1px solid var(--np-line);
+  border-bottom: 1px solid var(--np-line);
+  text-align: center;
+}
+
+.np-cta-band__btn {
+  min-width: 240px;
+}
+
 /* === CTA block: split decision band — pitch on the left, bordered commit
    panel on the right. No more centered stack. === */
 .np-cta {
-  padding: clamp(64px, 8vw, 96px) 0;
+  padding: clamp(80px, 10vw, 128px) 0;
 }
 
 .np-cta-grid {
@@ -1034,6 +1151,21 @@
   .np-help__links {
     grid-template-columns: 1fr 1fr;
   }
+  .np-section {
+    padding: 56px 0;
+  }
+  .np-section-header {
+    margin-bottom: 40px;
+  }
+  .np-section-header--spaced {
+    margin-top: 56px;
+  }
+  .np-cta {
+    padding: 56px 0;
+  }
+  .np-cta-band {
+    padding: 48px 0;
+  }
 }
 
 /* === Proof strip — no longer used here, keep for compat === */
@@ -1194,10 +1326,42 @@
   }
 }
 
+/* === Scroll reveals: fade-up on enter. Applied via IntersectionObserver.
+   Respects prefers-reduced-motion (see media query below). === */
+.np-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 600ms var(--np-ease),
+    transform 600ms var(--np-ease);
+}
+
+.np-reveal--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* === Reduced motion === */
 @media (prefers-reduced-motion: reduce) {
   .np-btn,
-  .np-btn-link::after {
+  .np-btn-link::after,
+  .np-track__step,
+  .np-scenario-feature,
+  .np-scenario-side,
+  .np-artifact__row,
+  .np-hero__proof-item,
+  .np-chat-demo,
+  .np-screenshot img,
+  .np-help__link {
     transition: none !important;
+  }
+  .np-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .np-btn-primary:active,
+  .np-btn-ghost:active {
+    transform: none !important;
   }
 }
