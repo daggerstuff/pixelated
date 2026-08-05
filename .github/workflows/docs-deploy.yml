@@ -6,14 +6,13 @@ on:
     paths:
       - "src/pages/docs/**"
       - "src/content-store/docs/**"
-      - "docs/api-reference/**"
+      - "src/content-store/docs/api-reference/**"
       - "packages/sdk-typescript/README.md"
       - "packages/sdk-python/README.md"
   pull_request:
     paths:
       - "src/pages/docs/**"
       - "src/content-store/docs/**"
-      - "docs/api-reference/**"
   schedule:
     - cron: "0 4 * * *"  # Daily at 4 AM UTC
   workflow_dispatch:
@@ -57,7 +56,7 @@ jobs:
 
       - name: Validate OpenAPI spec
         run: |
-          npx @stoplight/spectral-cli lint docs/api-reference/openapi.yaml \
+          npx @stoplight/spectral-cli lint src/content-store/docs/api-reference/openapi.yaml \
             --ruleset .spectral.yaml \
             --format json \
             > spectral-results.json 2>/dev/null || true
