@@ -192,7 +192,8 @@ describe('PxConfigSchema', () => {
     expect(() => PxConfigSchema.parse({})).toThrow();
   });
 
-  it('rejects config with empty agents record', () => {
-    expect(() => PxConfigSchema.parse({ agents: {} })).toThrow();
+  it('accepts empty agents record (schema allows it, loader catches it)', () => {
+    const result = PxConfigSchema.parse({ agents: {} });
+    expect(Object.keys(result.agents)).toHaveLength(0);
   });
 });
