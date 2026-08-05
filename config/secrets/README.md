@@ -1,8 +1,8 @@
 # Local Development Secrets
 
 This directory contains secret files for local development. In production,
-secrets are managed by External Secrets Operator (ESO) backed by Vault or
-AWS Secrets Manager — see `k8s/base/external-secrets.yaml`.
+secrets are managed by External Secrets Operator (ESO) backed by Vault or AWS
+Secrets Manager — see `k8s/base/external-secrets.yaml`.
 
 ## Setup
 
@@ -28,24 +28,24 @@ echo "your-auth0-mgmt-client-secret" > auth0-management-client-secret
 
 ## Files
 
-| File | Purpose |
-|------|---------|
-| `db-password` | PostgreSQL password |
-| `redis-password` | Redis password |
-| `jwt-secret` | JWT signing secret |
-| `encryption-key` | FHE encryption key |
-| `auth0-domain` | Auth0 tenant domain |
-| `auth0-client-id` | Auth0 client ID |
-| `auth0-client-secret` | Auth0 client secret |
-| `auth0-management-client-id` | Auth0 management API client ID |
+| File                             | Purpose                            |
+| -------------------------------- | ---------------------------------- |
+| `db-password`                    | PostgreSQL password                |
+| `redis-password`                 | Redis password                     |
+| `jwt-secret`                     | JWT signing secret                 |
+| `encryption-key`                 | FHE encryption key                 |
+| `auth0-domain`                   | Auth0 tenant domain                |
+| `auth0-client-id`                | Auth0 client ID                    |
+| `auth0-client-secret`            | Auth0 client secret                |
+| `auth0-management-client-id`     | Auth0 management API client ID     |
 | `auth0-management-client-secret` | Auth0 management API client secret |
 
 ## Production
 
-In production, these files are NOT used. Secrets are synced from the
-external secret store (Vault/AWS Secrets Manager/Doppler) by ESO into
-Kubernetes Secret resources. See `k8s/base/external-secrets.yaml`.
+In production, these files are NOT used. Secrets are synced from the external
+secret store (Vault/AWS Secrets Manager/Doppler) by ESO into Kubernetes Secret
+resources. See `k8s/base/external-secrets.yaml`.
 
-Docker Compose production (`docker/docker-compose.production.yml`) uses
-these files as Docker secrets. For production deployments, mount secrets
-from the secret store instead.
+Docker Compose production (`docker/docker-compose.production.yml`) uses these
+files as Docker secrets. For production deployments, mount secrets from the
+secret store instead.
