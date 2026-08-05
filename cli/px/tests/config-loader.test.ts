@@ -1,9 +1,11 @@
-import { describe, expect, it } from 'vitest'
 import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 import { dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import { describe, expect, it } from 'vitest'
+
 import { loadConfig, loadConfigFile } from '../src/lib/config-loader.js'
 import { parsePxConfig } from '../src/lib/config-schema.js'
 import { deepMerge } from '../src/lib/deep-merge.js'

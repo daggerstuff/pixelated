@@ -1,8 +1,10 @@
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import { Command } from 'commander'
 import pc from 'picocolors'
+
 import { registerAll } from './commands/index.js'
 
 const here = dirname(fileURLToPath(import.meta.url))

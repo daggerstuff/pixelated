@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs'
+
 import { type PxConfig, parsePxConfig } from './config-schema.js'
 import { deepMerge } from './deep-merge.js'
-import { defaultConfigPath, repoConfigPath, userConfigPath } from './paths.js'
 import { isPlainObject } from './is-plain-object.js'
+import { defaultConfigPath, repoConfigPath, userConfigPath } from './paths.js'
 
 export type ConfigSource = 'default' | 'user' | 'repo' | 'cli'
 

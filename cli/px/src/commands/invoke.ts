@@ -1,5 +1,6 @@
 import type { Command } from 'commander'
 import pc from 'picocolors'
+
 import { loadConfig } from '../lib/config-loader.js'
 import { invokeAgentTool } from '../lib/invoke.js'
 
