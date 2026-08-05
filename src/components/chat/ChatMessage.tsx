@@ -1,13 +1,13 @@
-import { memo, useCallback } from "react";
-import type { FC } from "react";
+import { memo, useCallback } from 'react'
+import type { FC } from 'react'
 
-import { useTheme } from "@/components/theme/ThemeProvider";
-import { cn } from "@/lib/utils";
-import type { Message } from "@/types/chat";
+import { useTheme } from '@/components/theme/ThemeProvider'
+import { cn } from '@/lib/utils'
+import type { Message } from '@/types/chat'
 
 export interface ChatMessageProps {
-  message: Message;
-  isTyping?: boolean;
+  message: Message
+  isTyping?: boolean
 }
 
 /**
@@ -21,29 +21,35 @@ export interface ChatMessageProps {
  * - Timestamp display when available
  * - Screen-reader accessible live region for new messages
  */
-const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, isTyping = false }) {
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
+const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({
+  message,
+  isTyping = false,
+}) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
 
   // Derive display traits from the message
-  const isUser = message.role === "user";
-  const isSystem = message.role === "system";
+  const isUser = message.role === 'user'
+  const isSystem = message.role === 'system'
   const isError =
     message.isError === true ||
-    (typeof message.content === "string" && message.content.startsWith("Error:"));
-  const showName = !isUser && message.name && message.name.length > 0;
-  const hasTimestamp = typeof message.timestamp === "string" && message.timestamp.length > 0;
-  const hasContent = typeof message.content === "string" && message.content.length > 0;
+    (typeof message.content === 'string' &&
+      message.content.startsWith('Error:'))
+  const showName = !isUser && message.name && message.name.length > 0
+  const hasTimestamp =
+    typeof message.timestamp === 'string' && message.timestamp.length > 0
+  const hasContent =
+    typeof message.content === 'string' && message.content.length > 0
 
   const formatTimestamp = useCallback((ts: string): string => {
     try {
-      const date = new Date(ts);
-      if (Number.isNaN(date.getTime())) return "";
-      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      const date = new Date(ts)
+      if (Number.isNaN(date.getTime())) return ''
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     } catch {
-      return "";
+      return ''
     }
-  }, []);
+  }, [])
 
   // --- Typing indicator ---
   if (isTyping) {
@@ -56,19 +62,23 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
       >
         <div
           className={cn(
-            "rounded-2xl border px-4 py-3",
+            'rounded-2xl border px-4 py-3',
             isDark
-              ? "border-gray-700 bg-gray-800 text-gray-200"
-              : "border-gray-200 bg-gray-100 text-gray-900",
+              ? 'border-gray-700 bg-gray-800 text-gray-200'
+              : 'border-gray-200 bg-gray-100 text-gray-900',
           )}
         >
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{message.name || "Assistant"}</span>
+            <span className="text-sm font-medium">
+              {message.name || 'Assistant'}
+            </span>
             {message.analyzed && (
               <span
                 className={cn(
-                  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px]",
-                  isDark ? "bg-blue-900/60 text-blue-300" : "bg-blue-100 text-blue-700",
+                  'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px]',
+                  isDark
+                    ? 'bg-blue-900/60 text-blue-300'
+                    : 'bg-blue-100 text-blue-700',
                 )}
               >
                 analyzing
@@ -78,38 +88,38 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
           <div className="mt-2 flex items-center gap-1" aria-hidden="true">
             <span
               className={cn(
-                "inline-block h-2 w-2 animate-typing-dot rounded-full",
-                isDark ? "bg-gray-400" : "bg-gray-500",
+                'inline-block h-2 w-2 animate-typing-dot rounded-full',
+                isDark ? 'bg-gray-400' : 'bg-gray-500',
               )}
-              style={{ animationDelay: "0ms" }}
+              style={{ animationDelay: '0ms' }}
             />
             <span
               className={cn(
-                "inline-block h-2 w-2 animate-typing-dot rounded-full",
-                isDark ? "bg-gray-400" : "bg-gray-500",
+                'inline-block h-2 w-2 animate-typing-dot rounded-full',
+                isDark ? 'bg-gray-400' : 'bg-gray-500',
               )}
-              style={{ animationDelay: "150ms" }}
+              style={{ animationDelay: '150ms' }}
             />
             <span
               className={cn(
-                "inline-block h-2 w-2 animate-typing-dot rounded-full",
-                isDark ? "bg-gray-400" : "bg-gray-500",
+                'inline-block h-2 w-2 animate-typing-dot rounded-full',
+                isDark ? 'bg-gray-400' : 'bg-gray-500',
               )}
-              style={{ animationDelay: "300ms" }}
+              style={{ animationDelay: '300ms' }}
             />
           </div>
         </div>
       </div>
-    );
+    )
   }
   // --- Empty state guard ---
   if (!hasContent && !isError) {
-    return null;
+    return null
   }
 
   return (
     <div
-      className={cn("flex", isUser ? "justify-end" : "justify-start")}
+      className={cn('flex', isUser ? 'justify-end' : 'justify-start')}
       role="log"
       aria-atomic="true"
     >
@@ -117,18 +127,27 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
         {/* Sender name + timestamp row */}
         {(showName || hasTimestamp) && (
           <div
-            className={cn("flex items-center gap-2 px-1", isUser ? "justify-end" : "justify-start")}
+            className={cn(
+              'flex items-center gap-2 px-1',
+              isUser ? 'justify-end' : 'justify-start',
+            )}
           >
             {showName && (
               <span
-                className={cn("text-xs font-medium", isDark ? "text-gray-400" : "text-gray-500")}
+                className={cn(
+                  'text-xs font-medium',
+                  isDark ? 'text-gray-400' : 'text-gray-500',
+                )}
               >
                 {message.name}
               </span>
             )}
             {hasTimestamp && (
               <time
-                className={cn("text-[10px]", isDark ? "text-gray-600" : "text-gray-400")}
+                className={cn(
+                  'text-[10px]',
+                  isDark ? 'text-gray-600' : 'text-gray-400',
+                )}
                 dateTime={message.timestamp}
               >
                 {formatTimestamp(message.timestamp!)}
@@ -140,33 +159,33 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
         {/* Main message bubble */}
         <div
           className={cn(
-            "rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words",
-            isUser && "bg-blue-600 text-white",
+            'rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words',
+            isUser && 'bg-blue-600 text-white',
             isSystem &&
               cn(
-                "border text-center text-xs italic",
+                'border text-center text-xs italic',
                 isDark
-                  ? "border-gray-700 bg-gray-800/80 text-gray-400"
-                  : "border-gray-200 bg-gray-50 text-gray-500",
+                  ? 'border-gray-700 bg-gray-800/80 text-gray-400'
+                  : 'border-gray-200 bg-gray-50 text-gray-500',
               ),
             isError &&
               cn(
-                "border",
+                'border',
                 isDark
-                  ? "border-red-800 bg-red-900/40 text-red-200"
-                  : "border-red-200 bg-red-50 text-red-800",
+                  ? 'border-red-800 bg-red-900/40 text-red-200'
+                  : 'border-red-200 bg-red-50 text-red-800',
               ),
             !isUser &&
               !isSystem &&
               !isError &&
               cn(
-                "border",
+                'border',
                 isDark
-                  ? "border-gray-700 bg-gray-800 text-gray-200"
-                  : "border-gray-200 bg-white text-gray-900",
+                  ? 'border-gray-700 bg-gray-800 text-gray-200'
+                  : 'border-gray-200 bg-white text-gray-900',
               ),
           )}
-          aria-label={`${message.role} message${isError ? " with error" : ""}`}
+          aria-label={`${message.role} message${isError ? ' with error' : ''}`}
         >
           {hasContent ? message.content : isError ? message.content : null}
         </div>
@@ -174,15 +193,17 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
         {/* --- Footer badges row --- */}
         <div
           className={cn(
-            "flex flex-wrap items-center gap-2 px-1",
-            isUser ? "justify-end" : "justify-start",
+            'flex flex-wrap items-center gap-2 px-1',
+            isUser ? 'justify-end' : 'justify-start',
           )}
         >
           {message.encrypted && (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",
-                isDark ? "bg-green-900/40 text-green-400" : "bg-green-50 text-green-700",
+                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
+                isDark
+                  ? 'bg-green-900/40 text-green-400'
+                  : 'bg-green-50 text-green-700',
               )}
               title="End-to-end encrypted"
             >
@@ -206,8 +227,10 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
           {message.verified && (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",
-                isDark ? "bg-blue-900/40 text-blue-400" : "bg-blue-50 text-blue-700",
+                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
+                isDark
+                  ? 'bg-blue-900/40 text-blue-400'
+                  : 'bg-blue-50 text-blue-700',
               )}
               title="Sender verified"
             >
@@ -231,8 +254,10 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
           {message.memoryStored && (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",
-                isDark ? "bg-purple-900/40 text-purple-400" : "bg-purple-50 text-purple-700",
+                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
+                isDark
+                  ? 'bg-purple-900/40 text-purple-400'
+                  : 'bg-purple-50 text-purple-700',
               )}
               title="Stored in session memory"
             >
@@ -255,8 +280,10 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
           {message.analyzed && !isTyping && (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium",
-                isDark ? "bg-amber-900/40 text-amber-400" : "bg-amber-50 text-amber-700",
+                'inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium',
+                isDark
+                  ? 'bg-amber-900/40 text-amber-400'
+                  : 'bg-amber-50 text-amber-700',
               )}
               title="Content has been analyzed"
             >
@@ -278,7 +305,7 @@ const ChatMessage: FC<ChatMessageProps> = memo(function ChatMessage({ message, i
         </div>
       </div>
     </div>
-  );
-});
+  )
+})
 
-export { ChatMessage };
+export { ChatMessage }

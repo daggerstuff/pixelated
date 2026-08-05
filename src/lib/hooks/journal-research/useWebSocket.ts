@@ -40,7 +40,11 @@ const buildWebSocketUrl = (
 }
 
 type WebSocketConnectionState =
-  'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error'
+  | 'disconnected'
+  | 'connecting'
+  | 'connected'
+  | 'reconnecting'
+  | 'error'
 
 interface ProgressUpdateMessage {
   type: 'progress_update'
@@ -78,7 +82,9 @@ interface NotificationMessage {
 }
 
 export type WebSocketMessage =
-  ProgressUpdateMessage | StatusUpdateMessage | NotificationMessage
+  | ProgressUpdateMessage
+  | StatusUpdateMessage
+  | NotificationMessage
 
 interface UseJournalResearchWebSocketOptions {
   sessionId: string | null

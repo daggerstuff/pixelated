@@ -1,6 +1,7 @@
 export const scenariosContent = {
   label: 'Where teams start',
-  title: 'The conversations clinicians should not have to improvise under pressure.',
+  title:
+    'The conversations clinicians should not have to improvise under pressure.',
   cards: [
     {
       kicker: 'Escalation',
@@ -25,7 +26,10 @@ export const scenariosContent = {
     items: [
       { label: 'Graduate programs', value: 'Repeatable trainee rehearsal' },
       { label: 'Supervision teams', value: 'Concrete review and coaching' },
-      { label: 'Care organizations', value: 'High-stakes communication practice' },
+      {
+        label: 'Care organizations',
+        value: 'High-stakes communication practice',
+      },
     ],
   },
 } as const

@@ -1,6 +1,7 @@
 export const featuresContent = {
   label: 'Product modules',
-  title: 'A case library, a practice room, and a review desk built for supervision.',
+  title:
+    'A case library, a practice room, and a review desk built for supervision.',
   copy: 'Not a generic chatbot. A training system for scenario design, repeated practice, and evidence-based review.',
   proofLabel: 'What changes operationally',
   proofItems: [

@@ -99,7 +99,9 @@ export class QueryOutputFormatter {
       lines.push('')
       lines.push('=== Anonymization Metrics ===')
       lines.push('K-Anonymity: ' + audit.kAnonymity)
-      lines.push('Differential Privacy Epsilon: ' + audit.differentialPrivacyEpsilon)
+      lines.push(
+        'Differential Privacy Epsilon: ' + audit.differentialPrivacyEpsilon,
+      )
       lines.push('Noise Level: ' + audit.noiseLevel)
       lines.push('Suppression Rate: ' + audit.suppressionRate + '%')
     }
@@ -153,7 +155,9 @@ export class QueryOutputFormatter {
 
     if (result.status === 'pending-approval') {
       lines.push('')
-      lines.push('NOTE: Query requires approval before results can be returned.')
+      lines.push(
+        'NOTE: Query requires approval before results can be returned.',
+      )
     }
 
     lines.push('')
@@ -204,7 +208,12 @@ export class QueryOutputFormatter {
   private generateFilename(queryId: string, extension: string): string {
     const timestamp = new Date().toISOString().slice(0, 10)
     return (
-      'research-query-' + queryId.slice(0, 8) + '-' + timestamp + '.' + extension
+      'research-query-' +
+      queryId.slice(0, 8) +
+      '-' +
+      timestamp +
+      '.' +
+      extension
     )
   }
 }

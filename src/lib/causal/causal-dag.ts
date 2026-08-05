@@ -32,10 +32,15 @@ export interface CausalDagService {
   addEdge(from: string, to: string, weight?: number): void
   removeNode(id: string): void
   removeEdge(from: string, to: string): void
-  estimateIntervention(request: InterventionRequest): Promise<InterventionResult>
+  estimateIntervention(
+    request: InterventionRequest,
+  ): Promise<InterventionResult>
   getAncestors(nodeId: string): string[]
   getDescendants(nodeId: string): string[]
-  getGraph(): { nodes: string[]; edges: Array<{ from: string; to: string; weight?: number }> }
+  getGraph(): {
+    nodes: string[]
+    edges: Array<{ from: string; to: string; weight?: number }>
+  }
 }
 
 export class DefaultCausalDagService implements CausalDagService {
@@ -111,7 +116,9 @@ export class DefaultCausalDagService implements CausalDagService {
     this.edges.get(from)?.delete(to)
   }
 
-  async estimateIntervention(request: InterventionRequest): Promise<InterventionResult> {
+  async estimateIntervention(
+    request: InterventionRequest,
+  ): Promise<InterventionResult> {
     const { nodeId } = request
     const node = this.nodes.get(nodeId)
 
@@ -142,7 +149,10 @@ export class DefaultCausalDagService implements CausalDagService {
     }
 
     // Confidence based on graph connectivity
-    const confidence = Math.min(1.0, (ancestors.length + descendants.length) / 10)
+    const confidence = Math.min(
+      1.0,
+      (ancestors.length + descendants.length) / 10,
+    )
 
     return {
       nodeId,
@@ -194,7 +204,10 @@ export class DefaultCausalDagService implements CausalDagService {
     return Array.from(descendants)
   }
 
-  getGraph(): { nodes: string[]; edges: Array<{ from: string; to: string; weight?: number }> } {
+  getGraph(): {
+    nodes: string[]
+    edges: Array<{ from: string; to: string; weight?: number }>
+  } {
     const nodes = Array.from(this.nodes.keys())
     const edges: Array<{ from: string; to: string; weight?: number }> = []
 
@@ -233,7 +246,9 @@ export class DefaultCausalDagService implements CausalDagService {
     if (from === to) return 1.0
 
     const visited = new Set<string>()
-    const queue: Array<{ node: string; weight: number }> = [{ node: from, weight: 1.0 }]
+    const queue: Array<{ node: string; weight: number }> = [
+      { node: from, weight: 1.0 },
+    ]
 
     while (queue.length > 0) {
       const { node: current, weight } = queue.shift()!

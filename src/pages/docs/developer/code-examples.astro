@@ -11,8 +11,8 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   <p>
     Real-world integration patterns using the auto-generated TypeScript and
     Python SDKs. These SDKs are generated from our
-    <a href="/docs/api/_openapi.yaml">OpenAPI 3.1 specification</a> and support
-    all API endpoints.
+    <a href="/docs/api/_openapi.yaml">OpenAPI 3.1 specification</a> and support all
+    API endpoints.
   </p>
 
   <h2>Table of Contents</h2>
@@ -297,7 +297,9 @@ const client = new DefaultApi(config);</code></pre>
     cursor: pointer;
     font-size: 0.875rem;
     color: #64748b;
-    transition: color 0.2s, border-color 0.2s;
+    transition:
+      color 0.2s,
+      border-color 0.2s;
   }
 
   .tab-btn.active {
@@ -331,12 +333,18 @@ const client = new DefaultApi(config);</code></pre>
 <script is:inline>
   document.querySelectorAll('.tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const tab = btn.dataset.tab;
-      const group = btn.closest('.tab-group');
-      group.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
-      group.querySelectorAll('.tab-content').forEach((c) => c.classList.remove('active'));
-      btn.classList.add('active');
-      group.querySelector(`.tab-content[data-tab="${tab}"]`).classList.add('active');
-    });
-  });
+      const tab = btn.dataset.tab
+      const group = btn.closest('.tab-group')
+      group
+        .querySelectorAll('.tab-btn')
+        .forEach((b) => b.classList.remove('active'))
+      group
+        .querySelectorAll('.tab-content')
+        .forEach((c) => c.classList.remove('active'))
+      btn.classList.add('active')
+      group
+        .querySelector(`.tab-content[data-tab="${tab}"]`)
+        .classList.add('active')
+    })
+  })
 </script>

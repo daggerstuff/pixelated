@@ -137,7 +137,10 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
 
   if (!hasData) {
     return (
-      <div className="np-surface flex h-full w-full items-center justify-center" style={{ border: '2px dashed var(--np-line)' }}>
+      <div
+        className="np-surface flex h-full w-full items-center justify-center"
+        style={{ border: '2px dashed var(--np-line)' }}
+      >
         <div className="text-center">
           <div className="np-muted mb-2">
             <svg
@@ -154,9 +157,7 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
               />
             </svg>
           </div>
-          <p className="np-text text-sm font-medium">
-            No Analysis Data
-          </p>
+          <p className="np-text text-sm font-medium">No Analysis Data</p>
           <p className="np-muted mt-1 text-xs">
             Charts will appear after message analysis
           </p>
@@ -171,16 +172,18 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
       <div className="h-48">
         <h4
           className="np-muted mb-2"
-          style={{ fontFamily: 'var(--np-font-display)', fontWeight: 'var(--np-weight-headline)', fontSize: 'var(--np-text-small)', letterSpacing: '-0.01em' }}
+          style={{
+            fontFamily: 'var(--np-font-display)',
+            fontWeight: 'var(--np-weight-headline)',
+            fontSize: 'var(--np-text-small)',
+            letterSpacing: '-0.01em',
+          }}
         >
           Current Mental Health Profile
         </h4>
         <ResponsiveContainer width="100%" height="100%">
           <RadarChart data={latestScores}>
-            <PolarGrid
-              gridType="polygon"
-              stroke="var(--np-line)"
-            />
+            <PolarGrid gridType="polygon" stroke="var(--np-line)" />
             <PolarAngleAxis
               dataKey="metric"
               tick={{ fontSize: 10, fill: 'var(--np-muted)' }}
@@ -212,16 +215,18 @@ export const MentalHealthHistoryChart = memo(function MentalHealthHistoryChart({
         <div className="h-32">
           <h4
             className="np-muted mb-2"
-            style={{ fontFamily: 'var(--np-font-display)', fontWeight: 'var(--np-weight-headline)', fontSize: 'var(--np-text-small)', letterSpacing: '-0.01em' }}
+            style={{
+              fontFamily: 'var(--np-font-display)',
+              fontWeight: 'var(--np-weight-headline)',
+              fontSize: 'var(--np-text-small)',
+              letterSpacing: '-0.01em',
+            }}
           >
             Trend Analysis
           </h4>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={timeSeriesData}>
-              <CartesianGrid
-                strokeDasharray="3 3"
-                stroke="var(--np-line)"
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--np-line)" />
               <XAxis
                 dataKey="session"
                 tick={{ fontSize: 10, fill: 'var(--np-muted)' }}

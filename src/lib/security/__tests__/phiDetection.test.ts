@@ -205,36 +205,33 @@ describe('PresidioPHIDetector internals and detectPHI paths', () => {
   })
 
   it('detectAndRedactPHIAsync resolves to a string', async () => {
-     await expect(detectAndRedactPHIAsync('hello world')).resolves.toBe(
+    await expect(detectAndRedactPHIAsync('hello world')).resolves.toBe(
       'hello world',
     )
   })
 
+  describe('getPlaceholderForEntityType remaining unimplemented entity types', () => {
+    const detector = PresidioPHIDetector.getInstance()
+    const unimplemented: PHIEntityType[] = [
+      PHIEntityType.MEDICAL_RECORD_NUMBER,
+      PHIEntityType.DATE_TIME,
+      PHIEntityType.AGE,
+      PHIEntityType.IP_ADDRESS,
+      PHIEntityType.URL,
+      PHIEntityType.US_PASSPORT,
+      PHIEntityType.US_DRIVER_LICENSE,
+      PHIEntityType.CREDIT_CARD,
+      PHIEntityType.US_BANK_NUMBER,
+      PHIEntityType.IBAN_CODE,
+      PHIEntityType.US_ITIN,
+      PHIEntityType.MEDICAL_LICENSE,
+      PHIEntityType.ORGANIZATION,
+    ]
 
-describe('getPlaceholderForEntityType remaining unimplemented entity types', () => {
-  const detector = PresidioPHIDetector.getInstance()
-  const unimplemented: PHIEntityType[] = [
-    PHIEntityType.MEDICAL_RECORD_NUMBER,
-    PHIEntityType.DATE_TIME,
-    PHIEntityType.AGE,
-    PHIEntityType.IP_ADDRESS,
-    PHIEntityType.URL,
-    PHIEntityType.US_PASSPORT,
-    PHIEntityType.US_DRIVER_LICENSE,
-    PHIEntityType.CREDIT_CARD,
-    PHIEntityType.US_BANK_NUMBER,
-    PHIEntityType.IBAN_CODE,
-    PHIEntityType.US_ITIN,
-    PHIEntityType.MEDICAL_LICENSE,
-    PHIEntityType.ORGANIZATION,
-  ]
-
-  it.each(unimplemented)('throws "Not implemented" for %s', (type) => {
-    expect(() =>
-      detector['getPlaceholderForEntityType'](type),
-    ).toThrow(/Not implemented/)
+    it.each(unimplemented)('throws "Not implemented" for %s', (type) => {
+      expect(() => detector['getPlaceholderForEntityType'](type)).toThrow(
+        /Not implemented/,
+      )
+    })
   })
 })
-
-})
-

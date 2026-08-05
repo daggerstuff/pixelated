@@ -15,24 +15,27 @@
  * - graphql:conversationTurnAdded
  */
 
-import type Redis from "ioredis";
-type RedisClient = Redis;
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import type Redis from 'ioredis'
+type RedisClient = Redis
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-const logger = createBuildSafeLogger("graphql-redis-pubsub");
+const logger = createBuildSafeLogger('graphql-redis-pubsub')
 
 // ──────────────────────────────────────────────
 // Topic type
 // ──────────────────────────────────────────────
 
-export type PubSubTopic = "sessionUpdated" | "emotionAnalysisCreated" | "conversationTurnAdded";
+export type PubSubTopic =
+  | 'sessionUpdated'
+  | 'emotionAnalysisCreated'
+  | 'conversationTurnAdded'
 
-export type PubSubPayload = Record<string, unknown>;
+export type PubSubPayload = Record<string, unknown>
 
 interface PubSubTopics {
-  sessionUpdated: { sessionUpdated: PubSubPayload };
-  emotionAnalysisCreated: { emotionAnalysisCreated: PubSubPayload };
-  conversationTurnAdded: { conversationTurnAdded: PubSubPayload };
+  sessionUpdated: { sessionUpdated: PubSubPayload }
+  emotionAnalysisCreated: { emotionAnalysisCreated: PubSubPayload }
+  conversationTurnAdded: { conversationTurnAdded: PubSubPayload }
 }
 
 // ──────────────────────────────────────────────
@@ -40,32 +43,36 @@ interface PubSubTopics {
 // ──────────────────────────────────────────────
 
 interface InMemorySubscriber {
-  topic: string;
-  push: (payload: unknown) => void;
+  topic: string
+  push: (payload: unknown) => void
 }
 
 class InMemoryPubSub {
-  private subscribers: InMemorySubscriber[] = [];
-  private idCounter = 0;
+  private subscribers: InMemorySubscriber[] = []
+  private idCounter = 0
 
   subscribe(topic: string): AsyncIterable<{ [key: string]: unknown }> {
-    const queue: unknown[] = [];
+    const queue: unknown[] = []
     let resolveNext:
-      | ((value: { done: false; value: unknown } | { done: true; value: undefined }) => void)
-      | null = null;
-    const subId = ++this.idCounter;
+      | ((
+          value:
+            | { done: false; value: unknown }
+            | { done: true; value: undefined },
+        ) => void)
+      | null = null
+    const subId = ++this.idCounter
 
     const push = (payload: unknown) => {
       if (resolveNext) {
-        const r = resolveNext;
-        resolveNext = null;
-        r({ done: false, value: { [topic]: payload } });
+        const r = resolveNext
+        resolveNext = null
+        r({ done: false, value: { [topic]: payload } })
       } else {
-        queue.push(payload);
+        queue.push(payload)
       }
-    };
+    }
 
-    this.subscribers.push({ topic, push });
+    this.subscribers.push({ topic, push })
 
     return {
       [Symbol.asyncIterator]: () => ({
@@ -74,27 +81,27 @@ class InMemoryPubSub {
             return Promise.resolve({
               done: false,
               value: { [topic]: queue.shift() },
-            });
+            })
           }
           return new Promise((resolve) => {
-            resolveNext = resolve as typeof resolveNext;
-          });
+            resolveNext = resolve as typeof resolveNext
+          })
         },
         return: (): Promise<IteratorResult<{ [key: string]: unknown }>> => {
           this.subscribers = this.subscribers.filter(
             (_, i) => i !== this.subscribers.findIndex((s) => s.push === push),
-          );
-          logger.debug("InMemory subscription closed", { topic, subId });
-          return Promise.resolve({ done: true, value: undefined });
+          )
+          logger.debug('InMemory subscription closed', { topic, subId })
+          return Promise.resolve({ done: true, value: undefined })
         },
       }),
-    };
+    }
   }
 
   publish(topic: string, payload: unknown): void {
     for (const sub of this.subscribers) {
       if (sub.topic === topic) {
-        sub.push(payload);
+        sub.push(payload)
       }
     }
   }
@@ -105,10 +112,13 @@ class InMemoryPubSub {
 // ──────────────────────────────────────────────
 
 class RedisPubSub {
-  private publisher: RedisClient | null = null;
-  private subscriber: RedisClient | null = null;
-  private readonly topicHandlerMap: Map<string, Set<(payload: unknown) => void>> = new Map();
-  private initialized = false;
+  private publisher: RedisClient | null = null
+  private subscriber: RedisClient | null = null
+  private readonly topicHandlerMap: Map<
+    string,
+    Set<(payload: unknown) => void>
+  > = new Map()
+  private initialized = false
 
   /**
    * Initialize Redis pub/sub connections.
@@ -116,96 +126,112 @@ class RedisPubSub {
    * when GraphQL subscriptions aren't used.
    */
   private async ensureInitialized(): Promise<boolean> {
-    if (this.initialized) return true;
+    if (this.initialized) return true
 
     try {
       // Import redis client lazily to avoid circular deps and build issues
-      const { redis: client } = await import("@/lib/redis");
+      const { redis: client } = await import('@/lib/redis')
       if (!client) {
-        logger.warn("Redis client not available, using in-memory fallback");
-        return false;
+        logger.warn('Redis client not available, using in-memory fallback')
+        return false
       }
 
       // Create duplicate connections for pub/sub
       // ioredis requires a dedicated connection for subscribing
-      const Redis = (await import("ioredis")).default;
-      const redisUrl = (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) || "";
+      const Redis = (await import('ioredis')).default
+      const redisUrl =
+        (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) ||
+        ''
 
       if (redisUrl) {
-        this.publisher = new Redis(redisUrl);
-        this.subscriber = new Redis(redisUrl);
+        this.publisher = new Redis(redisUrl)
+        this.subscriber = new Redis(redisUrl)
       } else {
         // Use legacy client directly (no duplicate needed)
-        this.publisher = client as unknown as RedisClient;
-        this.subscriber = client as unknown as RedisClient;
+        this.publisher = client as unknown as RedisClient
+        this.subscriber = client as unknown as RedisClient
       }
 
       // Set up message handler
       {
-        const sub = this.subscriber as unknown as { on: (event: string, handler: (channel: string, message: string) => void) => void };
-        sub.on("message", (channel: string, message: string) => {
-          try {
-          const payload = JSON.parse(message) as unknown;
-          const handlers = this.topicHandlerMap.get(channel);
-          if (handlers) {
-            for (const handler of handlers) {
-              handler(payload);
-            }
-          }
-        } catch (err) {
-          logger.error("Failed to parse Redis pub/sub message", {
-            channel,
-            error: err instanceof Error ? err.message : String(err),
-          });
+        const sub = this.subscriber as unknown as {
+          on: (
+            event: string,
+            handler: (channel: string, message: string) => void,
+          ) => void
         }
-        });
+        sub.on('message', (channel: string, message: string) => {
+          try {
+            const payload = JSON.parse(message) as unknown
+            const handlers = this.topicHandlerMap.get(channel)
+            if (handlers) {
+              for (const handler of handlers) {
+                handler(payload)
+              }
+            }
+          } catch (err) {
+            logger.error('Failed to parse Redis pub/sub message', {
+              channel,
+              error: err instanceof Error ? err.message : String(err),
+            })
+          }
+        })
       }
 
-      this.initialized = true;
-      logger.info("Redis pub/sub initialized");
-      return true;
+      this.initialized = true
+      logger.info('Redis pub/sub initialized')
+      return true
     } catch (err) {
-      logger.error("Redis pub/sub initialization failed, using in-memory fallback", {
-        error: err instanceof Error ? err.message : String(err),
-      });
-      return false;
+      logger.error(
+        'Redis pub/sub initialization failed, using in-memory fallback',
+        {
+          error: err instanceof Error ? err.message : String(err),
+        },
+      )
+      return false
     }
   }
 
   private channelFor(topic: PubSubTopic): string {
-    return `graphql:${topic}`;
+    return `graphql:${topic}`
   }
 
-  async subscribe(topic: PubSubTopic): Promise<AsyncIterable<{ [key: string]: unknown }>> {
-    const redisReady = await this.ensureInitialized();
+  async subscribe(
+    topic: PubSubTopic,
+  ): Promise<AsyncIterable<{ [key: string]: unknown }>> {
+    const redisReady = await this.ensureInitialized()
 
     if (!redisReady || !this.subscriber) {
       // Fallback to in-memory
-      return inMemoryFallback.subscribe(this.channelFor(topic));
+      return inMemoryFallback.subscribe(this.channelFor(topic))
     }
 
-    const channel = this.channelFor(topic);
-    await this.subscriber.subscribe(channel);
+    const channel = this.channelFor(topic)
+    await this.subscriber.subscribe(channel)
 
-    const queue: unknown[] = [];
+    const queue: unknown[] = []
     let resolveNext:
-      | ((value: { done: false; value: unknown } | { done: true; value: undefined }) => void)
-      | null = null;
+      | ((
+          value:
+            | { done: false; value: unknown }
+            | { done: true; value: undefined },
+        ) => void)
+      | null = null
 
     const handler = (payload: unknown) => {
       if (resolveNext) {
-        const r = resolveNext;
-        resolveNext = null;
-        r({ done: false, value: { [topic]: payload } });
+        const r = resolveNext
+        resolveNext = null
+        r({ done: false, value: { [topic]: payload } })
       } else {
-        queue.push(payload);
+        queue.push(payload)
       }
-    };
+    }
 
     if (!this.topicHandlerMap.has(channel)) {
-      this.topicHandlerMap.set(channel, new Set());
+      this.topicHandlerMap.set(channel, new Set())
     }
-    this.topicHandlerMap.get(channel)!.add(handler);
+    this.topicHandlerMap.get(channel)!.add(handler)
 
     return {
       [Symbol.asyncIterator]: () => ({
@@ -214,34 +240,34 @@ class RedisPubSub {
             return Promise.resolve({
               done: false,
               value: { [topic]: queue.shift() },
-            });
+            })
           }
           return new Promise((resolve) => {
-            resolveNext = resolve as typeof resolveNext;
-          });
+            resolveNext = resolve as typeof resolveNext
+          })
         },
         return: (): Promise<IteratorResult<{ [key: string]: unknown }>> => {
-          this.topicHandlerMap.get(channel)?.delete(handler);
+          this.topicHandlerMap.get(channel)?.delete(handler)
           if (this.topicHandlerMap.get(channel)?.size === 0) {
-            this.topicHandlerMap.delete(channel);
-            void this.subscriber?.unsubscribe(channel);
+            this.topicHandlerMap.delete(channel)
+            void this.subscriber?.unsubscribe(channel)
           }
-          return Promise.resolve({ done: true, value: undefined });
+          return Promise.resolve({ done: true, value: undefined })
         },
       }),
-    };
+    }
   }
 
   async publish(topic: PubSubTopic, payload: PubSubPayload): Promise<void> {
-    const redisReady = await this.ensureInitialized();
+    const redisReady = await this.ensureInitialized()
 
     if (!redisReady || !this.publisher) {
-      inMemoryFallback.publish(this.channelFor(topic), payload);
-      return;
+      inMemoryFallback.publish(this.channelFor(topic), payload)
+      return
     }
 
-    const channel = this.channelFor(topic);
-    await this.publisher.publish(channel, JSON.stringify(payload));
+    const channel = this.channelFor(topic)
+    await this.publisher.publish(channel, JSON.stringify(payload))
   }
 }
 
@@ -249,8 +275,8 @@ class RedisPubSub {
 // Singleton instances
 // ──────────────────────────────────────────────
 
-const inMemoryFallback = new InMemoryPubSub();
-const redisPubSub = new RedisPubSub();
+const inMemoryFallback = new InMemoryPubSub()
+const redisPubSub = new RedisPubSub()
 
 // ──────────────────────────────────────────────
 // Public API — implements graphql-yoga PubSub interface
@@ -267,9 +293,11 @@ const redisPubSub = new RedisPubSub();
  *   publish: (topic, payload) => graphqlPubSub.publish(topic, payload),
  */
 export const graphqlPubSub = {
-  subscribe: (topic: PubSubTopic): Promise<AsyncIterable<{ [key: string]: unknown }>> =>
+  subscribe: (
+    topic: PubSubTopic,
+  ): Promise<AsyncIterable<{ [key: string]: unknown }>> =>
     redisPubSub.subscribe(topic),
 
   publish: (topic: PubSubTopic, payload: PubSubPayload): Promise<void> =>
     redisPubSub.publish(topic, payload),
-};
+}

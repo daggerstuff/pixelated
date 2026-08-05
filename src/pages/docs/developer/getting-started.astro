@@ -10,8 +10,8 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
 
   <p>
     This guide walks you through obtaining an API key, making your first
-    authenticated request, and understanding rate limits. By the end, you'll
-    be ready to integrate the Pixelated Empathy API into your application.
+    authenticated request, and understanding rate limits. By the end, you'll be
+    ready to integrate the Pixelated Empathy API into your application.
   </p>
 
   <h2>Table of Contents</h2>
@@ -39,15 +39,22 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   </p>
 
   <ol>
-    <li>Navigate to the <a href="/admin/api-keys">API Key Management</a> dashboard</li>
+    <li>
+      Navigate to the <a href="/admin/api-keys">API Key Management</a> dashboard
+    </li>
     <li>Click "Create New Key"</li>
-    <li>Select the scopes your application needs:
+    <li>
+      Select the scopes your application needs:
       <ul>
         <li><code>read</code> — Read access to non-PHI endpoints</li>
         <li><code>write</code> — Create/update resources</li>
-        <li><code>developer:manage</code> — Manage API keys (rotation, revocation)</li>
+        <li>
+          <code>developer:manage</code> — Manage API keys (rotation, revocation)
+        </li>
         <li><code>analytics:read</code> — Access analytics endpoints</li>
-        <li><code>memory:read</code> / <code>memory:write</code> — Memory API access</li>
+        <li>
+          <code>memory:read</code> / <code>memory:write</code> — Memory API access
+        </li>
         <li><code>admin</code> — Full admin access (use with caution)</li>
       </ul>
     </li>
@@ -56,9 +63,9 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   </ol>
 
   <div class="callout callout-warning">
-    <strong>Security:</strong> Store your API key securely. Never commit it to
-    version control or expose it in client-side code. Use environment variables
-    or a secrets manager.
+    <strong>Security:</strong> Store your API key securely. Never commit it to version
+    control or expose it in client-side code. Use environment variables or a secrets
+    manager.
   </div>
 
   <h2 id="first-request">Make Your First Request</h2>
@@ -74,14 +81,17 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
   "timestamp": "2026-07-23T00:00:00Z"
 }</code></pre>
 
-  <p>The response includes the <code>X-API-Version</code> header indicating the API version that served your request.</p>
+  <p>
+    The response includes the <code>X-API-Version</code> header indicating the API
+    version that served your request.
+  </p>
 
   <h2 id="authentication">Authentication Methods</h2>
 
   <h3>API Key (Recommended for Server-Side)</h3>
   <p>
-    Include your API key in the <code>X-API-Key</code> header on every request.
-    This is the simplest method for server-to-server integrations.
+    Include your API key in the <code>X-API-Key</code> header on every request. This
+    is the simplest method for server-to-server integrations.
   </p>
 
   <pre><code class="language-bash" is:raw>curl -X GET https://api.pixelatedempathy.com/api/v1/search?q=anxiety \
@@ -89,8 +99,8 @@ import DocumentationLayout from '@/layouts/DocumentationLayout.astro'
 
   <h3>JWT Bearer Token (Session-Based)</h3>
   <p>
-    For applications using user login flows, use the JWT bearer token from
-    the authentication endpoint. This is useful for browser-based applications.
+    For applications using user login flows, use the JWT bearer token from the
+    authentication endpoint. This is useful for browser-based applications.
   </p>
 
   <pre><code class="language-bash" is:raw># First, authenticate to get a JWT
@@ -106,20 +116,25 @@ curl -X GET https://api.pixelatedempathy.com/api/v1/profile \
   <p>
     Each API key has assigned scopes. Requests requiring a scope your key
     doesn't have will return <code>403 Forbidden</code>. Check the
-    <a href="/docs/api/swagger">API reference</a> for required scopes per
-    endpoint.
+    <a href="/docs/api/swagger">API reference</a> for required scopes per endpoint.
   </p>
 
   <h2 id="rate-limits">Rate Limits & Quotas</h2>
-  <p>
-    Every API response includes rate limit headers:
-  </p>
+  <p>Every API response includes rate limit headers:</p>
   <ul>
-    <li><code>X-RateLimit-Limit</code> — Maximum requests per minute for your tier</li>
-    <li><code>X-RateLimit-Remaining</code> — Requests remaining in the current window</li>
-    <li><code>X-RateLimit-Reset</code> — Unix timestamp when the window resets</li>
+    <li>
+      <code>X-RateLimit-Limit</code> — Maximum requests per minute for your tier
+    </li>
+    <li>
+      <code>X-RateLimit-Remaining</code> — Requests remaining in the current window
+    </li>
+    <li>
+      <code>X-RateLimit-Reset</code> — Unix timestamp when the window resets
+    </li>
     <li><code>X-RateLimit-Daily-Remaining</code> — Daily quota remaining</li>
-    <li><code>X-RateLimit-Monthly-Remaining</code> — Monthly quota remaining</li>
+    <li>
+      <code>X-RateLimit-Monthly-Remaining</code> — Monthly quota remaining
+    </li>
   </ul>
 
   <p>When you exceed a limit, the API returns:</p>
@@ -156,9 +171,16 @@ Retry-After: 12
 
   <h2 id="next-steps">Next Steps</h2>
   <ul>
-    <li><a href="/docs/developer/code-examples">Code examples in TypeScript and Python</a></li>
-    <li><a href="/docs/developer/sdk-guide">SDK installation and usage guide</a></li>
-    <li><a href="/docs/api/swagger">Interactive API reference (Swagger UI)</a></li>
+    <li>
+      <a href="/docs/developer/code-examples"
+        >Code examples in TypeScript and Python</a>
+    </li>
+    <li>
+      <a href="/docs/developer/sdk-guide">SDK installation and usage guide</a>
+    </li>
+    <li>
+      <a href="/docs/api/swagger">Interactive API reference (Swagger UI)</a>
+    </li>
     <li><a href="/docs/api/api-versioning">API versioning policy</a></li>
   </ul>
 </DocumentationLayout>

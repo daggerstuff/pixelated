@@ -9,7 +9,11 @@
 export type PIIStatus = 'absent' | 'redacted' | 'present'
 export type ConsentGate = 'open' | 'restricted' | 'blocked'
 export type ReveriePhase =
-  'dormant' | 'seeded' | 'surfacing' | 'active' | 'fading'
+  | 'dormant'
+  | 'seeded'
+  | 'surfacing'
+  | 'active'
+  | 'fading'
 export type ConsolidationPhase =
   | 'raw'
   | 'consolidated'

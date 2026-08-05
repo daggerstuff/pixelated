@@ -1,5 +1,9 @@
 name: OpenAPI Validation
 
+permissions:
+  pull-requests: write
+  contents: read
+
 on:
   pull_request:
     paths:
@@ -58,7 +62,9 @@ jobs:
         id: validate-all
         run: node scripts/ci/validate-openapi.js
 
-      - name: Validate specific spec (src/content-store/docs/api-reference/openapi.yaml)
+      - name:
+          Validate specific spec
+          (src/content-store/docs/api-reference/openapi.yaml)
         if: always()
         run: |
           npx @stoplight/spectral-cli lint src/content-store/docs/api-reference/openapi.yaml \
