@@ -3,7 +3,7 @@ name: OpenAPI Validation
 on:
   pull_request:
     paths:
-      - 'docs/api-reference/**'
+      - 'src/content-store/docs/api-reference/**'
       - 'src/pages/docs/api/**'
       - 'src/content-store/docs/api/**'
       - 'docs/api/**'
@@ -15,7 +15,7 @@ on:
       - main
       - staging
     paths:
-      - 'docs/api-reference/**'
+      - 'src/content-store/docs/api-reference/**'
       - 'src/pages/docs/api/**'
       - 'src/content-store/docs/api/**'
       - 'docs/api/**'
@@ -58,10 +58,10 @@ jobs:
         id: validate-all
         run: node scripts/ci/validate-openapi.js
 
-      - name: Validate specific spec (docs/api-reference/openapi.yaml)
+      - name: Validate specific spec (src/content-store/docs/api-reference/openapi.yaml)
         if: always()
         run: |
-          npx @stoplight/spectral-cli lint docs/api-reference/openapi.yaml \
+          npx @stoplight/spectral-cli lint src/content-store/docs/api-reference/openapi.yaml \
             --ruleset .spectral.yaml \
             --format json > spectral-results.json || true
 
@@ -116,7 +116,7 @@ jobs:
 
       - name: Export FastAPI schemas
         run: |
-          mkdir -p docs/api-reference/generated
+          mkdir -p openapi/generated
           # Try to export FastAPI schema if app module is importable
           python3 -c "
           import json, sys
@@ -125,20 +125,20 @@ jobs:
               sys.path.insert(0, 'ai')
               from src.lib.ai.bias_detection.python_service.main import app
               schema = app.openapi()
-              with open('docs/api-reference/generated/fastapi-schema.json', 'w') as f:
+              with open('openapi/generated/fastapi-schema.json', 'w') as f:
                   json.dump(schema, f, indent=2)
               print('FastAPI schema exported successfully')
           except Exception as e:
               print(f'FastAPI export skipped: {e}')
               # Write a minimal placeholder so the step doesn't fail
-              with open('docs/api-reference/generated/fastapi-schema.json', 'w') as f:
+              with open('openapi/generated/fastapi-schema.json', 'w') as f:
                   json.dump({'openapi': '3.1.0', 'info': {'title': 'FastAPI (export pending)', 'version': '0.0.0'}, 'paths': {}}, f, indent=2)
           " 2>&1 || true
 
       - name: Validate exported FastAPI schema
         run: |
-          if [ -f docs/api-reference/generated/fastapi-schema.json ]; then
-            npx @stoplight/spectral-cli lint docs/api-reference/generated/fastapi-schema.json \
+          if [ -f openapi/generated/fastapi-schema.json ]; then
+            npx @stoplight/spectral-cli lint openapi/generated/fastapi-schema.json \
               --ruleset .spectral.yaml \
               --fail-severity error || true
           fi
@@ -148,7 +148,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: fastapi-openapi-schema
-          path: docs/api-reference/generated/
+          path: openapi/generated/
           retention-days: 30
 
   publish-spec:
@@ -167,8 +167,7 @@ jobs:
         with:
           name: openapi-spec-latest
           path: |
-            docs/api-reference/openapi.yaml
-            docs/api-reference/openapi.json
+            src/content-store/docs/api-reference/openapi.yaml
             src/pages/docs/api/_openapi.yaml
             src/content-store/docs/api/openapi/openapi.yaml
             docs/api/memory-v1.openapi.yaml
