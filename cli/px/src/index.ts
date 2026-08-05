@@ -21,6 +21,7 @@ registerConfigCommand(program);
 registerListCommand(program);
 registerHealthCommand(program);
 registerInitCommand(program);
+registerHookCommand(program);
 
 // Dynamic agent commands — auto-generated from config
 function registerAgentCommands(): void {
