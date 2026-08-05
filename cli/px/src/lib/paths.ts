@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const moduleDir = dirname(fileURLToPath(import.meta.url))
 
-export function findRepoRoot(startDir = process.cwd()): string {
+function findRepoRoot(startDir = process.cwd()): string {
   let current = resolve(startDir)
 
   while (true) {
@@ -35,6 +35,7 @@ export function repoConfigPath(cwd = process.cwd()): string {
   return join(findRepoRoot(cwd), '.px', 'config.json')
 }
 
-export function packageRoot(): string {
+function packageRoot(): string {
   return resolve(moduleDir, '..', '..')
 }
+
