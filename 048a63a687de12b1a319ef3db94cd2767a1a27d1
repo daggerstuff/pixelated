@@ -1,0 +1,9 @@
+scripts/enterprise/vendor-termination-audit.ts
+  ai_agent 1-177
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "048a63a687de12b1a319ef3db94cd2767a1a27d1",
+  "prompts": {}
+}
