@@ -4,14 +4,17 @@ import { getRequestHeader } from '../utils/request-headers'
 import { mongoClient } from './mongoClient'
 
 export type Conversation = Database['public']['Tables']['conversations']['Row']
-type NewConversation = Database['public']['Tables']['conversations']['Insert']
+export type NewConversation =
+  Database['public']['Tables']['conversations']['Insert']
 export type UpdateConversation =
   Database['public']['Tables']['conversations']['Update']
 
 /**
  * Get all conversations for a user
  */
-async function getConversations(userId: string): Promise<Conversation[]> {
+export async function getConversations(
+  userId: string,
+): Promise<Conversation[]> {
   const conversations = await mongoClient.db
     .collection('conversations')
     .find({ user_id: userId })
@@ -24,7 +27,7 @@ async function getConversations(userId: string): Promise<Conversation[]> {
 /**
  * Get a single conversation by ID
  */
-async function getConversation(
+export async function getConversation(
   id: string,
   userId: string,
 ): Promise<Conversation | null> {
@@ -39,7 +42,7 @@ async function getConversation(
 /**
  * Create a new conversation
  */
-async function createConversation(
+export async function createConversation(
   conversation: NewConversation,
   request?: Request,
 ): Promise<Conversation> {
@@ -115,7 +118,7 @@ export async function updateConversation(
 /**
  * Delete a conversation
  */
-async function deleteConversation(
+export async function deleteConversation(
   id: string,
   userId: string,
   request?: Request,
@@ -146,7 +149,7 @@ async function deleteConversation(
 /**
  * Admin function to get all conversations (for staff/admin only)
  */
-async function adminGetAllConversations(): Promise<Conversation[]> {
+export async function adminGetAllConversations(): Promise<Conversation[]> {
   const conversations = await mongoClient.db
     .collection('conversations')
     .find()

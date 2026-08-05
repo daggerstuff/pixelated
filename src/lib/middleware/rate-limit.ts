@@ -25,7 +25,7 @@ const RATE_LIMIT_MAX_REQUESTS = safeParseInt(
 )
 
 // Rate limit configuration for different API endpoints
-interface RateLimitConfig {
+export interface RateLimitConfig {
   /** Path pattern to match */
   path: string
   /** Rate limits by role */
