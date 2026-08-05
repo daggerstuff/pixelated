@@ -156,6 +156,7 @@ dependencies = [
   "tavily-cli>=0.1.5",
   "celery>=5.6.3",
   "langchain-nvidia-ai-endpoints>=1.4.3",
+  "local-deep-research[mcp]>=1.2.14",
 ]
 [project.optional-dependencies]
 test = [
