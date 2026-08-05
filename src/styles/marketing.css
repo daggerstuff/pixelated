@@ -116,7 +116,7 @@
     ui-monospace,
     monospace
   );
-  font-weight: 500;
+  font-weight: 800;
   max-width: 18ch;
   font-size: clamp(2.25rem, 4.4vw, 3.6rem);
   line-height: 1.06;
@@ -128,10 +128,10 @@
 
 .marketing-title--medium {
   max-width: 22ch;
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(1.5rem, 2.6vw, 2.15rem);
   line-height: 1.14;
-  letter-spacing: -0.018em;
+  letter-spacing: -0.035em;
 }
 
 .marketing-lede {
@@ -435,10 +435,10 @@
     ui-monospace,
     monospace
   );
-  font-weight: 400;
+  font-weight: 700;
   font-size: clamp(1.18rem, 1.7vw, 1.4rem);
   line-height: 1.18;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.035em;
   color: var(--text-primary);
   text-wrap: balance;
 }

@@ -110,10 +110,10 @@
   margin: 0 0 0.75rem;
   color: var(--fm-text);
   font-family: var(--fm-display);
-  font-weight: 600;
+  font-weight: 800;
   font-size: clamp(1.6rem, 3vw, 2.4rem);
   line-height: 1.15;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.035em;
 }
 .fm-section-text {
   max-width: 58ch;
@@ -157,7 +157,7 @@
 .fm-hairline-cell__title {
   margin: 0.75rem 0 0.4rem;
   font-family: var(--fm-display);
-  font-weight: 500;
+  font-weight: 700;
   font-size: 1rem;
   color: var(--fm-text);
 }
@@ -390,9 +390,10 @@
   margin: 1.5rem 0 1rem;
   color: var(--fm-text);
   font-family: var(--fm-display);
-  font-weight: 600;
+  font-weight: 800;
   font-size: clamp(1.8rem, 4vw, 2.6rem);
   line-height: 1.2;
+  letter-spacing: -0.035em;
 }
 .fm-built-records__thumb {
   aspect-ratio: 4 / 3;

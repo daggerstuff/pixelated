@@ -4,11 +4,11 @@
    ================================================ */
 
 :root {
-  /* === TYPOGRAPHY SYSTEM === */
-  --font-sans: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Berkeley Mono", "JetBrains Mono", "SF Mono", monospace;
-  --font-display: "Lexend", "Source Sans 3", sans-serif;
-  --font-label: "Berkeley Mono", "JetBrains Mono", "SF Mono", monospace;
+  /* === TYPOGRAPHY SYSTEM (aliased to np-tokens) === */
+  --font-sans: var(--np-font-body);
+  --font-mono: var(--np-font-mono);
+  --font-display: var(--np-font-display);
+  --font-label: var(--np-font-mono);
 
   /* Fluid Typography Scale */
   --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
