@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "academic-research": {
+      "source": "tdimino/claude-code-minoan",
+      "sourceType": "github",
+      "skillPath": "skills/research/academic-research/SKILL.md",
+      "computedHash": "53d0238864bd2178cf2228218714bd9d1e3f07ac493a86c93692522d42a907b6"
+    },
     "adaptyv": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",
@@ -291,6 +297,12 @@
       "skillPath": "scientific-skills/consciousness-council/SKILL.md",
       "computedHash": "2be1b7e1806e7d52afa6fe2cc6fbcff5e918a89dd4ba60e1481e0193386b29a4"
     },
+    "crisis-detection-intervention-ai": {
+      "source": "erichowens/some_claude_skills",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/crisis-detection-intervention-ai/SKILL.md",
+      "computedHash": "c453febf49423c8f283ea878e1a9cabe9d22e8b20e711f274be09e42ef57b481"
+    },
     "dask": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",
@@ -462,6 +474,12 @@
       "sourceType": "github",
       "skillPath": "scientific-skills/gtars/SKILL.md",
       "computedHash": "621b7b049f2a3699ccf2b39d194581fa5d6b77c9af1e0df7cdd98a8ca1dd3f9d"
+    },
+    "health-data-dpia": {
+      "source": "mukul975/privacy-data-protection-skills",
+      "sourceType": "github",
+      "skillPath": "skills/privacy/health-data-dpia/SKILL.md",
+      "computedHash": "88d67b5fdad7f327f0f3cef3d1a1e4e54b07c83bdc31a154ca57ed2a1ea9e816"
     },
     "histolab": {
       "source": "K-Dense-AI/scientific-agent-skills",
@@ -731,6 +749,12 @@
       "sourceType": "github",
       "skillPath": "scientific-skills/protocolsio-integration/SKILL.md",
       "computedHash": "e64de7f3791a074d45d261778621e17a056cf4566f074eb733eee80819c6224b"
+    },
+    "psychology-research": {
+      "source": "beita6969/scienceclaw",
+      "sourceType": "github",
+      "skillPath": "skills/psychology-research/SKILL.md",
+      "computedHash": "6833f897219d52c4c1c34644beb3c5277b87a6f3a526fae56113aec7d4f774cc"
     },
     "pufferlib": {
       "source": "K-Dense-AI/scientific-agent-skills",
