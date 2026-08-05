@@ -1,5 +1,6 @@
 export const heroContent = {
-  title: 'Therapists rehearse hard conversations before they reach a real client.',
+  title:
+    'Therapists rehearse hard conversations before they reach a real client.',
   subtitle:
     'Pixelated Empathy is a clinical simulation platform for therapist training. Trainees practice intake, crisis, rupture, and disclosure against an AI client that responds in real time. Supervisors review the transcript, mark the moments that matter, and coach the next attempt from evidence — not memory.',
   metaDescription:
