@@ -7,8 +7,8 @@
   color-scheme: light;
 
   /* === FONTS (keel) === */
-  --font-display: 'Fraunces Variable', Georgia, serif;
-  --font-body: 'Public Sans', system-ui, sans-serif;
+  --font-display: var(--np-font-display);
+  --font-body: var(--np-font-body);
   --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   /* === BRAND (Emerald) — retained for clinical/non-homepage surfaces === */

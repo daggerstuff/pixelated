@@ -132,7 +132,7 @@
 .marketing-lede {
   max-width: 60ch;
   margin: 1.45rem 0 0;
-  font-family: var(--np-font-body, 'Public Sans', system-ui, sans-serif);
+  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
   font-weight: 400;
   font-size: clamp(1rem, 1.05vw, 1.125rem);
   line-height: 1.55; /* short-form bridge: ~1.5 is the spec */
@@ -208,7 +208,7 @@
   display: block;
   width: 100%;
   padding: 0.75rem 0.9rem;
-  font-family: var(--font-body);
+  font-family: var(--np-font-body);
   font-size: 1rem; /* ≥16px — prevents iOS Safari auto-zoom on focus */
   line-height: 1.5;
   color: var(--text-primary);
@@ -303,7 +303,7 @@
 
 .marketing-stat-card p {
   margin: 0;
-  font-family: var(--np-font-body, 'Public Sans', system-ui, sans-serif);
+  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
   font-size: 0.88rem;
   line-height: 1.55;
   color: var(--text-secondary);
@@ -409,7 +409,7 @@
 .marketing-card h3,
 .marketing-card h4 {
   margin: 0;
-  font-family: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
+  font-family: var(--np-font-display, 'JetBrains Mono Variable', ui-monospace, monospace);
   font-weight: 400;
   font-size: clamp(1.18rem, 1.7vw, 1.4rem);
   line-height: 1.18;
@@ -420,7 +420,7 @@
 
 .marketing-card p,
 .marketing-card li {
-  font-family: var(--np-font-body, 'Public Sans', system-ui, sans-serif);
+  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
   font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.65;
