@@ -3,4 +3,5 @@
 # Called by git via core.hooksPath. All errors fail-open (stderr warning, exit 0).
 # Actual logic lives in `px hook post-merge` — this script is a thin passthrough.
 
-exec px hook post-merge
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec node "$SCRIPT_DIR/../dist/index.js" hook post-merge

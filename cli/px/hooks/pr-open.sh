@@ -4,4 +4,5 @@
 # Passes PR URL via --pr flag from GITHUB_PR_URL env or first argument.
 # Actual logic lives in `px hook pr-open` — this script is a thin passthrough.
 
-exec px hook pr-open "$@"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec node "$SCRIPT_DIR/../dist/index.js" hook pr-open "$@"
