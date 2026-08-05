@@ -6,8 +6,8 @@
  * misclassified cookies and threw on GET /register.
  */
 
-import { describe, expect, it, vi, beforeEach } from 'vitest'
 import type { AstroCookies } from 'astro'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 vi.mock('../../../config/auth.config', () => ({
   authConfig: {

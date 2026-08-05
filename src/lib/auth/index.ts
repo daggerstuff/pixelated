@@ -3,21 +3,21 @@
  * Provides complete authentication system with Auth0 integration
  */
 
-import type { AstroCookies } from "astro";
+import type { AstroCookies } from 'astro'
 
-import { authConfig } from "../../config/auth.config";
-import { getUserById as getAuth0UserById } from "../../services/auth0.service";
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
-import { validateToken } from "./auth0-jwt-service";
-import { extractTokenFromRequest } from "./auth0-middleware";
-const logger = createBuildSafeLogger("index");
+import { authConfig } from '../../config/auth.config'
+import { getUserById as getAuth0UserById } from '../../services/auth0.service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { validateToken } from './auth0-jwt-service'
+import { extractTokenFromRequest } from './auth0-middleware'
+const logger = createBuildSafeLogger('index')
 
-export type { SessionData } from "./session";
+export type { SessionData } from './session'
 // Re-export session for compatibility
-export { getSession } from "./session";
+export { getSession } from './session'
 
 // Re-export User type for compatibility
-export type { User, AuthUser } from "./types";
+export type { User, AuthUser } from './types'
 
 /**
  * Distinguish Web API Request from AstroCookies.
@@ -26,9 +26,9 @@ export type { User, AuthUser } from "./types";
  */
 function isWebRequest(context: Request | AstroCookies): context is Request {
   return (
-    typeof (context as Request).url === "string" &&
+    typeof (context as Request).url === 'string' &&
     (context as Request).headers instanceof Headers
-  );
+  )
 }
 
 /**
@@ -36,83 +36,88 @@ function isWebRequest(context: Request | AstroCookies): context is Request {
  * Supports both JWT (users) and API keys (developers)
  */
 export async function getCurrentUser(context: Request | AstroCookies): Promise<{
-  id: string;
-  role: string;
-  accountId?: string;
-  workspaceId?: string;
-  scopes?: string[];
+  id: string
+  role: string
+  accountId?: string
+  workspaceId?: string
+  scopes?: string[]
 } | null> {
-  let token: string | null = null;
-  let isApiKey = false;
+  let token: string | null = null
+  let isApiKey = false
 
   if (isWebRequest(context)) {
-    const request = context;
+    const request = context
 
     // Check for API key first (X-API-Key header)
-    const apiKey = request.headers.get("X-API-Key");
+    const apiKey = request.headers.get('X-API-Key')
     if (apiKey) {
-      isApiKey = true;
+      isApiKey = true
       // Validate API key and return developer user
-      const developerUser = await validateApiKeyAndGetUser(apiKey);
+      const developerUser = await validateApiKeyAndGetUser(apiKey)
       if (developerUser) {
-        return developerUser;
+        return developerUser
       }
       // If API key invalid, fall through to check JWT
     }
 
     // Fallback to JWT token extraction
-    token = extractTokenFromRequest(request);
+    token = extractTokenFromRequest(request)
   } else {
-    const cookies = context;
+    const cookies = context
     // Check for Auth0 token first, then fallback to configured name
     token =
       cookies.get(authConfig.cookies.accessToken)?.value ??
-      cookies.get("auth_token")?.value ??
-      null;
+      cookies.get('auth_token')?.value ??
+      null
   }
 
   if (!token && !isApiKey) {
-    return null;
+    return null
   }
 
   // If we had an API key but it was invalid, we already returned null above
   // If we have a JWT token, validate it
   if (token) {
     try {
-      const result = await validateToken(token, "access");
+      const result = await validateToken(token, 'access')
       if (result.valid && result.userId) {
         return {
           id: result.userId,
-          role: result.role ?? "guest",
+          role: result.role ?? 'guest',
           accountId: result.accountId,
           workspaceId: result.workspaceId,
-        };
+        }
       }
     } catch {
       // Token validation failed
     }
   }
 
-  return null;
+  return null
 }
 
 /**
  * Check if the current user has the specified role
  */
-export async function hasRole(context: AstroCookies | Request, role: string): Promise<boolean> {
-  const user = await getCurrentUser(context);
+export async function hasRole(
+  context: AstroCookies | Request,
+  role: string,
+): Promise<boolean> {
+  const user = await getCurrentUser(context)
   if (!user) {
-    return false;
+    return false
   }
-  return user.role === role;
+  return user.role === role
 }
 
 /**
  * Check if the current user is authenticated
  */
-export async function isAuthenticated(context: AstroCookies | Request): Promise<boolean> {
-  const user = await getCurrentUser(context);
-  return !!user;
+export async function isAuthenticated(
+  context: AstroCookies | Request,
+): Promise<boolean> {
+  const user = await getCurrentUser(context)
+  return !!user
 }
 
 /**
@@ -122,23 +127,23 @@ export async function requirePageAuth(
   context: { request: Request },
   role?: string,
 ): Promise<Response | null> {
-  const user = await getCurrentUser(context.request);
+  const user = await getCurrentUser(context.request)
 
   if (!user) {
     return new Response(null, {
       status: 302,
-      headers: { Location: "/login" },
-    });
+      headers: { Location: '/login' },
+    })
   }
 
   if (role && user.role !== role) {
     return new Response(null, {
       status: 302,
-      headers: { Location: "/access-denied" },
-    });
+      headers: { Location: '/access-denied' },
+    })
   }
 
-  return null;
+  return null
 }
 
 export type {
@@ -147,7 +152,7 @@ export type {
   TokenType,
   TokenValidationResult,
   UserRole,
-} from "./auth0-jwt-service";
+} from './auth0-jwt-service'
 
 // Export server-side auth functionality
 export {
@@ -158,9 +163,9 @@ export {
   refreshAccessToken,
   revokeToken,
   validateToken,
-} from "./auth0-jwt-service";
+} from './auth0-jwt-service'
 // Export authentication types and middleware
-export * from "./types";
+export * from './types'
 
 // Auth0/Legacy Bridge exports removed
 
@@ -173,7 +178,7 @@ export {
   getClientIp,
   requireRole,
   securityHeaders,
-} from "./auth0-middleware";
+} from './auth0-middleware'
 
 /**
  * Initialize authentication system
@@ -181,41 +186,43 @@ export {
 export async function initializeAuthSystem(): Promise<void> {
   try {
     // Start token cleanup scheduler
-    const { startTokenCleanupScheduler } = await import("./auth0-jwt-service");
-    startTokenCleanupScheduler();
+    const { startTokenCleanupScheduler } = await import('./auth0-jwt-service')
+    startTokenCleanupScheduler()
 
-    logger.info("✅ Authentication system initialized successfully (Auth0-native)");
+    logger.info(
+      '✅ Authentication system initialized successfully (Auth0-native)',
+    )
   } catch (error: unknown) {
-    logger.error("❌ Failed to initialize authentication system:", error);
-    throw error;
+    logger.error('❌ Failed to initialize authentication system:', error)
+    throw error
   }
 }
 
 export async function getUserById(
   userId: string,
 ): Promise<{ id: string; email?: string; name?: string } | null> {
-  if (import.meta.env?.MODE === "test" || process.env["NODE_ENV"] === "test") {
+  if (import.meta.env?.MODE === 'test' || process.env['NODE_ENV'] === 'test') {
     return {
       id: userId,
       email: `${userId}@example.com`,
       name: `User ${userId}`,
-    };
+    }
   }
 
   try {
-    const user = await getAuth0UserById(userId);
+    const user = await getAuth0UserById(userId)
     if (!user) {
-      return null;
+      return null
     }
 
     return {
       id: user.id,
       email: user.email,
       name: user.fullName,
-    };
+    }
   } catch (error: unknown) {
-    logger.error("Failed to look up Auth0 user:", error);
-    return null;
+    logger.error('Failed to look up Auth0 user:', error)
+    return null
   }
 }
 
@@ -229,20 +236,20 @@ export async function getUserById(
 async function validateApiKeyAndGetUser(
   apiKey: string,
 ): Promise<{ id: string; role: string; scopes: string[] } | null> {
-  const { developerApiKeyManager } = await import("@/lib/db/developer-api-keys");
+  const { developerApiKeyManager } = await import('@/lib/db/developer-api-keys')
 
-  const validation = await developerApiKeyManager.validateApiKey(apiKey);
+  const validation = await developerApiKeyManager.validateApiKey(apiKey)
 
   if (!validation.valid || !validation.api_key) {
-    return null;
+    return null
   }
 
-  const keyRecord = validation.api_key;
+  const keyRecord = validation.api_key
   return {
     id: keyRecord.user_id,
-    role: keyRecord.scopes.includes("admin") ? "admin" : "developer",
+    role: keyRecord.scopes.includes('admin') ? 'admin' : 'developer',
     scopes: keyRecord.scopes,
-  };
+  }
 }
 
 export const auth = {
@@ -250,6 +257,6 @@ export const auth = {
   isAuthenticated,
   hasRole,
   getUserById,
-};
+}
 
-export const requireAuth = requirePageAuth;
+export const requireAuth = requirePageAuth
