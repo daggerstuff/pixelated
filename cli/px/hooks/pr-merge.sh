@@ -4,4 +4,5 @@
 # Passes PR URL via --pr flag from GITHUB_PR_URL env or first argument.
 # Actual logic lives in `px hook pr-merge` — this script is a thin passthrough.
 
-exec px hook pr-merge "$@"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec node "$SCRIPT_DIR/../dist/index.js" hook pr-merge "$@"
