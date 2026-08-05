@@ -1,11 +1,15 @@
-import { defineConfig } from 'tsup';
+import { defineConfig } from 'tsup'
 
 export default defineConfig({
-  entry: ['src/index.ts'],
-  format: ['esm'],
+  entry: { index: 'src/index.ts' },
+  format: ['esm', 'cjs'],
   target: 'node24',
   clean: true,
   dts: true,
   sourcemap: true,
-  treeshake: true,
-});
+  shims: true,
+  splitting: false,
+  outExtension({ format }) {
+    return { js: format === 'esm' ? '.mjs' : '.cjs' }
+  },
+})
