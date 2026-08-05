@@ -21,14 +21,15 @@ export function registerHookCommand(program: Command): void {
     .command('hook <event>')
     .description('Run a git hook event (called by hook scripts)')
     .option('--pr <url>', 'PR URL (for pr-open / pr-merge events)')
-    .action(async (event: string, opts: { pr?: string }) => {
+    .option('--dry-run', 'print what would be sent, do not call agent')
+    .action(async (event: string, opts: { pr?: string; dryRun?: boolean }) => {
       await runHook(event, opts);
     });
 }
 
 async function runHook(
   event: string,
-  opts: { pr?: string },
+  opts: { pr?: string; dryRun?: boolean },
 ): Promise<void> {
   // 1. Load config — fail-open if config unavailable
   let config: PxConfig;
@@ -80,6 +81,21 @@ async function runHook(
 
   // 6. Build request body from git context
   const body: Record<string, unknown> = { ...context, event };
+
+  // Dry-run: print what would be sent and exit
+  if (opts.dryRun) {
+    const payload = {
+      method: 'POST',
+      url: `${agent.endpoint.replace(/\/$/, '')}/eve/v1/${tool}`,
+      agent: hookConfig.agent,
+      tool,
+      async: isAsync,
+      timeout: agent.timeout,
+      body,
+    };
+    console.log(JSON.stringify(payload, null, 2));
+    return;
+  }
 
   // 7. Call agent — fail-open on any error
   try {
@@ -239,7 +255,7 @@ function extractGitContext(
  * matchGlob(['src/bar.ts'], 'scenarios/**') // false
  * matchGlob(['scenarios/foo.yml', 'bar.clinical.yml'], 'scenarios/**|*.clinical.yml') // true
  */
-function matchGlob(files: string[], pattern: string): boolean {
+export function matchGlob(files: string[], pattern: string): boolean {
   // Split on | for multiple patterns
   const patterns = pattern.split('|');
 
