@@ -52,9 +52,6 @@
     "src/lib/governance/policy-engine.ts",
     "src/lib/middleware/csrf.ts",
     "src/lib/research/services/*.ts",
-    "src/lib/middleware/cors.ts",
-    "src/lib/middleware/rate-limit.ts",
-    "src/lib/db/messages.ts",
-    "src/lib/db/conversations.ts"
+    "src/lib/auth/index.ts"
   ]
 }
