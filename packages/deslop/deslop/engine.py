@@ -25,6 +25,10 @@ def normalize_spacing(text: str) -> str:
     text = re.sub(r"\s+([,.;:!?])", r"\1", text)
     text = re.sub(r"([—-])\s*([,.;:!?])", r"\1", text)
     text = re.sub(r"\s{2,}", " ", text)
+    # Clean orphaned punctuation left by None replacements (e.g. "Of course. Can you" → ". Can you")
+    text = re.sub(r"^[.,;:!?]+\s+", "", text)
+    # Collapse doubled sentence punctuation (e.g. "you. . That" → "you. That")
+    text = re.sub(r"([.!?])\s+[.,;:!?]+\s+", r"\1 ", text)
     return text.strip()
 
 
