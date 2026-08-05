@@ -3,6 +3,7 @@ packages:
   - 'business-strategy-cms'
   - 'tests/integration'
   - 'foresight/cli'
+  - 'cli/px'
   # Committed lockfile is the trusted source of truth;
   # skips re-verifying minimumReleaseAge on every install.
 trustLockfile: true
