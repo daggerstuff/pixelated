@@ -23,14 +23,7 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "packages/sdk-typescript/src/runtime.ts",
 ]);
 
-const OXFMT_APPLICABLE_EXTENSIONS = new Set([
-  ".js",
-  ".ts",
-  ".mjs",
-  ".cjs",
-  ".mts",
-  ".cts",
-]);
+const OXFMT_APPLICABLE_EXTENSIONS = new Set([".js", ".ts", ".mjs", ".cjs", ".mts", ".cts"]);
 
 /** Session dump markdown files are local artifacts and are not formatted. */
 const SESSION_DUMP_PATTERN = /^session-ses_[^/]+\.md$/;
@@ -94,13 +87,9 @@ function readFilesFromPath(filePath) {
 /** @returns {string[]} */
 function readChangedFilesFromGit() {
   /** @type {SpawnSyncTextResult} */
-  const result = spawnSync(
-    "git",
-    ["diff", "--name-only", "--diff-filter=ACMRTUXB", "--"],
-    {
-      encoding: "utf8",
-    },
-  );
+  const result = spawnSync("git", ["diff", "--name-only", "--diff-filter=ACMRTUXB", "--"], {
+    encoding: "utf8",
+  });
   const exitCode = typeof result.status === "number" ? result.status : 0;
 
   if (exitCode !== 0 || typeof result.stdout !== "string") {
@@ -139,9 +128,5 @@ const oxfmtFiles = changedFiles.filter((filePath) => {
 });
 
 if (oxfmtFiles.length > 0) {
-  runCommand("oxfmt", [
-    "--check",
-    "--no-error-on-unmatched-pattern",
-    ...oxfmtFiles,
-  ]);
+  runCommand("oxfmt", ["--check", "--no-error-on-unmatched-pattern", ...oxfmtFiles]);
 }
