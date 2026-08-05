@@ -51,6 +51,7 @@
     "collections/**",
     "src/lib/governance/policy-engine.ts",
     "src/lib/middleware/csrf.ts",
-    "src/lib/research/services/*.ts"
+    "src/lib/research/services/*.ts",
+    "src/lib/auth/index.ts"
   ]
 }
