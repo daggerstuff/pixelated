@@ -1,10 +1,9 @@
 export const heroContent = {
-  title:
-    'Therapists rehearse hard conversations before they reach a real client.',
+  title: 'Rehearse hard conversations before real clients.',
   subtitle:
-    'Pixelated Empathy is a clinical simulation platform for therapist training. Trainees practice intake, crisis, rupture, and disclosure against an AI client that responds in real time. Supervisors review the transcript, mark the moments that matter, and coach the next attempt from evidence — not memory.',
+    'Trainees practice therapy conversations with an AI client. Supervisors review the transcript and coach from what actually happened — not from memory.',
   metaDescription:
-    'Pixelated Empathy is a clinical simulation platform: trainees practice therapy conversations against an AI client, supervisors review transcripts and coach from evidence. Built for counseling programs, supervisors, and behavioral health teams.',
+    'Pixelated Empathy is a clinical simulation platform for therapist training. Trainees practice therapy conversations with an AI client. Supervisors review transcripts and coach from evidence. Built for counseling programs and behavioral health teams.',
   helperText:
     'HIPAA-ready simulations for counseling programs, supervisors, and behavioral health teams.',
   kicker: 'Clinical simulation platform',
@@ -18,7 +17,7 @@ export const heroContent = {
       text: 'Open any attempt at the exact turn that mattered. Mark the decision point, leave a note, and assign a retry — the transcript is already there.',
     },
   ],
-  primaryCTA: { text: 'Request Demo', href: '/contact' },
+  primaryCTA: { text: 'Request a Demo', href: '/contact' },
   secondaryCTA: { text: 'See the demo', href: '/demo-hub' },
   artifact: {
     eyebrow: 'Inside the product',

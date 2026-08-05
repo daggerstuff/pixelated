@@ -23,7 +23,7 @@ export const ctaContent = {
     'Trainees understand the practice task without long onboarding.',
     'Supervisors can use the record to teach a specific skill.',
   ],
-  primaryCTA: { text: 'Book a pilot', href: '/contact' },
+  primaryCTA: { text: 'Request a Demo', href: '/contact' },
   secondaryCTA: { text: 'See the demo', href: '/demo-hub' },
   meta: 'For counseling programs, clinical supervisors, and behavioral health teams.',
 } as const
