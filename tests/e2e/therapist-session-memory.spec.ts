@@ -1,8 +1,11 @@
 import { test, expect } from '@playwright/test'
 
+import {
+  THERAPIST_SESSION_WRITE_MESSAGE,
+  generateClinicalSessionId,
+} from '../fixtures/clinical-session'
 import { TherapistSessionPage } from './pages/TherapistSessionPage'
 import { login } from './test-utils'
-import { THERAPIST_SESSION_WRITE_MESSAGE, generateClinicalSessionId } from '../fixtures/clinical-session'
 
 test.describe('Therapist Session Memory Flow', () => {
   let sessionPage: TherapistSessionPage

@@ -70,7 +70,7 @@ export class PolicyStore {
     if (doc) {
       const { _id, ...rest } = doc
       return {
-        id: typeof _id === 'string' ? _id : (_id)?.toString(),
+        id: typeof _id === 'string' ? _id : _id?.toString(),
         ...rest,
       } as GovernancePolicy
     }

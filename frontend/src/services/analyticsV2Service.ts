@@ -1,24 +1,68 @@
 // Sprint 3 Analytics — Demo Data & API Client
 // Used as fallback when backend is unavailable
 import type {
-  CompetencyData, ConsumptionData, ComplianceData,
-  StateVelocityDataPoint, InterventionRate, DeEscalationDataPoint,
-  OSCEScoreRow, BurnRateData, SeatActivationData,
-  TokenExpenditureCategory, PHIInterceptionData,
-  AuditChainStatus, InferenceLatencyPoint,
+  CompetencyData,
+  ConsumptionData,
+  ComplianceData,
+  StateVelocityDataPoint,
+  InterventionRate,
+  DeEscalationDataPoint,
+  OSCEScoreRow,
+  BurnRateData,
+  SeatActivationData,
+  TokenExpenditureCategory,
+  PHIInterceptionData,
+  AuditChainStatus,
+  InferenceLatencyPoint,
 } from '@/types/analytics'
 
 export const DEMO_COMPETENCY: CompetencyData = {
   stateVelocities: [
-    { state: 'Presentation → History', medianTimeSeconds: 45, cohort: 'All Learners' },
-    { state: 'History → Assessment', medianTimeSeconds: 92, cohort: 'All Learners' },
-    { state: 'Assessment → Diagnosis', medianTimeSeconds: 128, cohort: 'All Learners' },
-    { state: 'Presentation → Escalation', medianTimeSeconds: 180, cohort: 'All Learners' },
-    { state: 'Escalation → De-escalation', medianTimeSeconds: 65, cohort: 'All Learners' },
-    { state: 'Presentation → History', medianTimeSeconds: 38, cohort: 'Experienced' },
-    { state: 'History → Assessment', medianTimeSeconds: 74, cohort: 'Experienced' },
-    { state: 'Assessment → Diagnosis', medianTimeSeconds: 105, cohort: 'Experienced' },
-    { state: 'Presentation → History', medianTimeSeconds: 58, cohort: 'Novice' },
+    {
+      state: 'Presentation → History',
+      medianTimeSeconds: 45,
+      cohort: 'All Learners',
+    },
+    {
+      state: 'History → Assessment',
+      medianTimeSeconds: 92,
+      cohort: 'All Learners',
+    },
+    {
+      state: 'Assessment → Diagnosis',
+      medianTimeSeconds: 128,
+      cohort: 'All Learners',
+    },
+    {
+      state: 'Presentation → Escalation',
+      medianTimeSeconds: 180,
+      cohort: 'All Learners',
+    },
+    {
+      state: 'Escalation → De-escalation',
+      medianTimeSeconds: 65,
+      cohort: 'All Learners',
+    },
+    {
+      state: 'Presentation → History',
+      medianTimeSeconds: 38,
+      cohort: 'Experienced',
+    },
+    {
+      state: 'History → Assessment',
+      medianTimeSeconds: 74,
+      cohort: 'Experienced',
+    },
+    {
+      state: 'Assessment → Diagnosis',
+      medianTimeSeconds: 105,
+      cohort: 'Experienced',
+    },
+    {
+      state: 'Presentation → History',
+      medianTimeSeconds: 58,
+      cohort: 'Novice',
+    },
     { state: 'History → Assessment', medianTimeSeconds: 120, cohort: 'Novice' },
   ],
   interventionRate: { totalTurns: 5842, inputGuardTriggers: 127, rate: 2.17 },
@@ -30,17 +74,62 @@ export const DEMO_COMPETENCY: CompetencyData = {
     { scenario: 'Trauma Assessment', successRate: 84, attempts: 112 },
   ],
   osceScores: [
-    { learnerName: 'Alex Thompson', infoExtractionRate: 92, communicationScore: 88, totalTurns: 24, criticalItemsFound: 8, criticalItemsTotal: 10 },
-    { learnerName: 'Jane Miller', infoExtractionRate: 85, communicationScore: 79, totalTurns: 18, criticalItemsFound: 6, criticalItemsTotal: 10 },
-    { learnerName: 'Robert Kim', infoExtractionRate: 78, communicationScore: 82, totalTurns: 15, criticalItemsFound: 5, criticalItemsTotal: 8 },
-    { learnerName: 'Sarah Chen', infoExtractionRate: 95, communicationScore: 93, totalTurns: 28, criticalItemsFound: 9, criticalItemsTotal: 10 },
-    { learnerName: 'Mike Torres', infoExtractionRate: 71, communicationScore: 75, totalTurns: 12, criticalItemsFound: 4, criticalItemsTotal: 8 },
+    {
+      learnerName: 'Alex Thompson',
+      infoExtractionRate: 92,
+      communicationScore: 88,
+      totalTurns: 24,
+      criticalItemsFound: 8,
+      criticalItemsTotal: 10,
+    },
+    {
+      learnerName: 'Jane Miller',
+      infoExtractionRate: 85,
+      communicationScore: 79,
+      totalTurns: 18,
+      criticalItemsFound: 6,
+      criticalItemsTotal: 10,
+    },
+    {
+      learnerName: 'Robert Kim',
+      infoExtractionRate: 78,
+      communicationScore: 82,
+      totalTurns: 15,
+      criticalItemsFound: 5,
+      criticalItemsTotal: 8,
+    },
+    {
+      learnerName: 'Sarah Chen',
+      infoExtractionRate: 95,
+      communicationScore: 93,
+      totalTurns: 28,
+      criticalItemsFound: 9,
+      criticalItemsTotal: 10,
+    },
+    {
+      learnerName: 'Mike Torres',
+      infoExtractionRate: 71,
+      communicationScore: 75,
+      totalTurns: 12,
+      criticalItemsFound: 4,
+      criticalItemsTotal: 8,
+    },
   ],
 }
 
 export const DEMO_CONSUMPTION: ConsumptionData = {
-  burnRate: { hoursConsumed: 843, hoursAllocated: 1200, periodStart: '2025-06-01', periodEnd: '2025-12-31' },
-  seatActivation: { licensesProvisioned: 75, activeMonthlyUsers: 48, peakConcurrent: 12, utilizationRate: 64 },
+  burnRate: {
+    hoursConsumed: 843,
+    hoursAllocated: 1200,
+    periodStart: '2025-06-01',
+    periodEnd: '2025-12-31',
+  },
+  seatActivation: {
+    licensesProvisioned: 75,
+    activeMonthlyUsers: 48,
+    peakConcurrent: 12,
+    utilizationRate: 64,
+  },
   tokenExpenditure: [
     { category: 'Chest Pain Assessment', tokens: 890000 },
     { category: 'SOB Assessment', tokens: 620000 },
@@ -62,7 +151,11 @@ export const DEMO_COMPLIANCE: ComplianceData = {
     ],
     trend: 'decreasing',
   },
-  auditChain: { chainValid: true, lastVerifiedAt: new Date().toISOString(), totalEntries: 14892 },
+  auditChain: {
+    chainValid: true,
+    lastVerifiedAt: new Date().toISOString(),
+    totalEntries: 14892,
+  },
   inferenceLatency: [
     { timestamp: 'Jun 1', avgMs: 1240, p95Ms: 2100 },
     { timestamp: 'Jun 2', avgMs: 1180, p95Ms: 1950 },
@@ -94,5 +187,8 @@ export const analyticsApi = {
   getCompetency: () => get<CompetencyData>('/admin/analytics/competency'),
   getConsumption: () => get<ConsumptionData>('/admin/analytics/consumption'),
   getCompliance: () => get<ComplianceData>('/admin/analytics/compliance'),
-  verifyAuditChain: () => get<{ chain_valid: boolean; last_verified_at: string }>('/admin/analytics/audit-chain/verify'),
+  verifyAuditChain: () =>
+    get<{ chain_valid: boolean; last_verified_at: string }>(
+      '/admin/analytics/audit-chain/verify',
+    ),
 }
