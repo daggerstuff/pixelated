@@ -17,13 +17,13 @@ export default defineConfig({
   },
   theme: {
     colors: {
-      foreground: 'oklch(0.93 0 0)',
-      background: 'oklch(0.10 0 0)',
+      foreground: 'var(--np-text)',
+      background: 'var(--np-bg)',
     },
     fontFamily: {
-      sans: '"Public Sans", system-ui, sans-serif',
+      sans: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
       mono: '"JetBrains Mono Variable", ui-monospace, monospace',
-      display: '"Fraunces Variable", Georgia, serif',
+      display: '"JetBrains Mono Variable", ui-monospace, monospace',
     },
   },
   presets: [
