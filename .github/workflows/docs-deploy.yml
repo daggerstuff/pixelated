@@ -4,17 +4,17 @@ on:
   push:
     branches: [main, staging]
     paths:
-      - "src/pages/docs/**"
-      - "src/content-store/docs/**"
-      - "src/content-store/docs/api-reference/**"
-      - "packages/sdk-typescript/README.md"
-      - "packages/sdk-python/README.md"
+      - 'src/pages/docs/**'
+      - 'src/content-store/docs/**'
+      - 'src/content-store/docs/api-reference/**'
+      - 'packages/sdk-typescript/README.md'
+      - 'packages/sdk-python/README.md'
   pull_request:
     paths:
-      - "src/pages/docs/**"
-      - "src/content-store/docs/**"
+      - 'src/pages/docs/**'
+      - 'src/content-store/docs/**'
   schedule:
-    - cron: "0 4 * * *"  # Daily at 4 AM UTC
+    - cron: '0 4 * * *' # Daily at 4 AM UTC
   workflow_dispatch:
 
 permissions:
@@ -33,7 +33,7 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version-file: ".nvmrc"
+          node-version-file: '.nvmrc'
 
       - uses: pnpm/action-setup@v6
 
