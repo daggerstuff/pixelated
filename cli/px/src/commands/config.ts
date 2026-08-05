@@ -28,4 +28,3 @@ export function registerConfig(program: Command): void {
       )
     })
 }
-

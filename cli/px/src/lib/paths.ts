@@ -38,4 +38,3 @@ export function repoConfigPath(cwd = process.cwd()): string {
 function packageRoot(): string {
   return resolve(moduleDir, '..', '..')
 }
-

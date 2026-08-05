@@ -32,4 +32,3 @@ export type PxConfig = z.infer<typeof pxConfigSchema>
 export function parsePxConfig(input: unknown): PxConfig {
   return pxConfigSchema.parse(input)
 }
-

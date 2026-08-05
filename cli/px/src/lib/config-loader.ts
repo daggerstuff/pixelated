@@ -120,4 +120,3 @@ export function loadConfigFile(path: string): PxConfig {
   }
   return parsePxConfig(raw)
 }
-
