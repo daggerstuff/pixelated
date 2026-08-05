@@ -152,9 +152,10 @@ test('login page has proper transitions', async ({ page }) => {
 })
 
 // Visual regression test for login page
-// Skip in CI because baseline screenshots often drift due to font/hydration differences.
-test.skip(process.env['CI'] === 'true', 'Visual regression skipped in CI')
 test('login page visual comparison', async ({ page }) => {
+  // Skip in CI because baseline screenshots often drift due to font/hydration differences.
+  test.skip(process.env['CI'] === 'true', 'Visual regression skipped in CI')
+
   // Mock the auth profile endpoint to avoid rate limiting in CI
   // This ensures the page renders consistently
   await page.route('/api/auth/auth0-profile', async (route) => {
