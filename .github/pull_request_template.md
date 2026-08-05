@@ -13,9 +13,11 @@
 <!-- If this PR includes database migrations, check the following: -->
 
 - [ ] Migration file follows `NNN_description.sql` naming convention
-- [ ] Rollback file included (`NNN_description.rollback.sql`) if schema is modified
+- [ ] Rollback file included (`NNN_description.rollback.sql`) if schema is
+      modified
 - [ ] Migration tested locally with `./scripts/devops/validate-migrations.sh`
-- [ ] No destructive operations without explicit `IF EXISTS` / `IF NOT EXISTS` guards
+- [ ] No destructive operations without explicit `IF EXISTS` / `IF NOT EXISTS`
+      guards
 - [ ] Indexes added for new columns used in queries
 - [ ] Migration is idempotent (safe to run multiple times)
 

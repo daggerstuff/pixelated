@@ -16,10 +16,7 @@ const logger = createBuildSafeLogger('documentation-api')
 // Dependency injection for DocumentationSystem
 const repository = new AIRepository()
 const aiService = getAIService()
-const documentationSystem = new DocumentationSystem(
-  repository,
-  aiService,
-)
+const documentationSystem = new DocumentationSystem(repository, aiService)
 
 export const GET = async ({ request }) => {
   try {

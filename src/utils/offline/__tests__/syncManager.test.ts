@@ -1,12 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
+import { indexedDBRequestQueue } from '../indexedDBRequestQueue'
+import { SyncManager } from '../syncManager'
+
 // jsdom has no IndexedDB. Polyfill it so the IndexedDB-backed request queue
 // (instantiated as a singleton on import) can open its database instead of
 // throwing "ReferenceError: indexedDB is not defined" from initDB.
 import 'fake-indexeddb/auto'
-
-import { indexedDBRequestQueue } from '../indexedDBRequestQueue'
-import { SyncManager } from '../syncManager'
 
 describe('SyncManager', () => {
   let syncManager: SyncManager

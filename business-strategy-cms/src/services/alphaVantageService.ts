@@ -439,13 +439,11 @@ export class AlphaVantageService {
       const indicators = data
         .filter(isRecord)
         .slice(0, 12)
-        .map(
-          (item): EconomicIndicator => ({
-            name: indicator,
-            value: toDisplayString(item['value']) || 'N/A',
-            date: toDisplayString(item['date']) || 'N/A',
-          }),
-        )
+        .map((item): EconomicIndicator => ({
+          name: indicator,
+          value: toDisplayString(item['value']) || 'N/A',
+          date: toDisplayString(item['date']) || 'N/A',
+        }))
 
       this.setCache(cacheKey, indicators)
       return indicators
@@ -477,16 +475,14 @@ export class AlphaVantageService {
 
       const rawData = response.data.feed
       const data = Array.isArray(rawData) ? rawData : []
-      const sentiments = data.filter(isRecord).map(
-        (item): NewsSentiment => ({
-          title: toDisplayString(item['title']),
-          url: toDisplayString(item['url']),
-          summary: toDisplayString(item['summary']),
-          sentiment: parseSentiment(item['overall_sentiment_label']),
-          relevance: parseNumber(item['relevance_score']),
-          timePublished: toDisplayString(item['time_published']),
-        }),
-      )
+      const sentiments = data.filter(isRecord).map((item): NewsSentiment => ({
+        title: toDisplayString(item['title']),
+        url: toDisplayString(item['url']),
+        summary: toDisplayString(item['summary']),
+        sentiment: parseSentiment(item['overall_sentiment_label']),
+        relevance: parseNumber(item['relevance_score']),
+        timePublished: toDisplayString(item['time_published']),
+      }))
 
       this.setCache(cacheKey, sentiments)
       return sentiments
@@ -517,18 +513,16 @@ export class AlphaVantageService {
 
       const rawData = response.data.quarterlyEarnings
       const data = Array.isArray(rawData) ? rawData : []
-      const earnings = data.filter(isRecord).map(
-        (item): QuarterlyEarnings => ({
-          fiscalDateEnding:
-            typeof item['fiscalDateEnding'] === 'string'
-              ? item['fiscalDateEnding']
-              : '',
-          reportedEPS: parseNumber(item['reportedEPS']),
-          estimatedEPS: parseNumber(item['estimatedEPS']),
-          surprise: parseNumber(item['surprise']),
-          surprisePercentage: parseNumber(item['surprisePercentage']),
-        }),
-      )
+      const earnings = data.filter(isRecord).map((item): QuarterlyEarnings => ({
+        fiscalDateEnding:
+          typeof item['fiscalDateEnding'] === 'string'
+            ? item['fiscalDateEnding']
+            : '',
+        reportedEPS: parseNumber(item['reportedEPS']),
+        estimatedEPS: parseNumber(item['estimatedEPS']),
+        surprise: parseNumber(item['surprise']),
+        surprisePercentage: parseNumber(item['surprisePercentage']),
+      }))
 
       this.setCache(cacheKey, earnings)
       return earnings

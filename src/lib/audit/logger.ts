@@ -5,8 +5,9 @@
  * Integrates with the application's logging and security systems.
  */
 
-import type { Db } from 'mongodb'
 import { createHash } from 'crypto'
+
+import type { Db } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
 import { mongodb } from '../../config/mongodb.config'
@@ -442,10 +443,13 @@ export class AuditLogger {
       const linked = await this.withChainHash(auditEvent)
       chained = linked.event
     } catch (err: unknown) {
-      logger.error('Audit chain link crashed; refusing to persist uncategorized', {
-        auditId: auditEvent.id,
-        error: err instanceof Error ? err.message : String(err),
-      })
+      logger.error(
+        'Audit chain link crashed; refusing to persist uncategorized',
+        {
+          auditId: auditEvent.id,
+          error: err instanceof Error ? err.message : String(err),
+        },
+      )
       throw err
     }
 

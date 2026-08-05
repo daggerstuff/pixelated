@@ -2,8 +2,8 @@
 
 ## Step 1: Register Trainee
 
-- Collect full profile: name, email, clinical role, experience level,
-  licensing info, clinical background, specialization, credentials.
+- Collect full profile: name, email, clinical role, experience level, licensing
+  info, clinical background, specialization, credentials.
 - Store as `category: trainee` with `retention: long_term`, `importance: 0.8`.
 - Tags: `trainee:<id>`, `intake`, `enrollment`.
 

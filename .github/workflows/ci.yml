@@ -59,7 +59,8 @@ jobs:
 
       - name: Format check
         env:
-          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA:
+            ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -106,7 +107,8 @@ jobs:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
             || '--no-deprecation' }}
         with:
-          image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          image-ref:
+            pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '0'

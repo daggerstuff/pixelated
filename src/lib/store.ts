@@ -374,11 +374,9 @@ export const useStore = create<StoreState>()(
                 },
               })),
             setSortBy: (sortBy, sortOrder: UIState['sortOrder'] = 'desc') =>
-              set(
-                (state): Partial<StoreState> => ({
-                  uiState: { ...state.uiState, sortBy, sortOrder },
-                }),
-              ),
+              set((state): Partial<StoreState> => ({
+                uiState: { ...state.uiState, sortBy, sortOrder },
+              })),
 
             // Enhanced actions - Session State
             updateSessionState: (sessionState) =>

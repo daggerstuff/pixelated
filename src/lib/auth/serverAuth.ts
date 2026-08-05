@@ -18,7 +18,11 @@ import type { AuthUser } from './types'
  * 2. Direct: `protectRoute(options, handler)` — used in query/index.ts, preview.ts, audit.ts
  */
 
-export function protectRoute(options?: ProtectRouteOptions): (handler: ProtectedAPIRoute) => (context: BaseAPIContext) => Promise<Response>
+export function protectRoute(
+  options?: ProtectRouteOptions,
+): (
+  handler: ProtectedAPIRoute,
+) => (context: BaseAPIContext) => Promise<Response>
 export function protectRoute(
   options: ProtectRouteOptions,
   handler: ProtectedAPIRoute,
