@@ -17,19 +17,20 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictInt
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Any, ClassVar, Dict, List, Optional
+from typing_extensions import Annotated
 from typing import Optional, Set
 from typing_extensions import Self
 
-class Pagination(BaseModel):
+class SearchMemoryRequest(BaseModel):
     """
-    Pagination
+    SearchMemoryRequest
     """ # noqa: E501
-    limit: Optional[StrictInt] = None
-    offset: Optional[StrictInt] = None
-    total: Optional[StrictInt] = None
-    __properties: ClassVar[List[str]] = ["limit", "offset", "total"]
+    q: Annotated[str, Field(min_length=1, strict=True, max_length=1000)] = Field(description="Search query string")
+    limit: Optional[Annotated[int, Field(le=100, strict=True, ge=1)]] = 10
+    offset: Optional[Annotated[int, Field(strict=True, ge=0)]] = 0
+    __properties: ClassVar[List[str]] = ["q", "limit", "offset"]
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -49,7 +50,7 @@ class Pagination(BaseModel):
 
     @classmethod
     def from_json(cls, json_str: str) -> Optional[Self]:
-        """Create an instance of Pagination from a JSON string"""
+        """Create an instance of SearchMemoryRequest from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
     def to_dict(self) -> Dict[str, Any]:
@@ -74,7 +75,7 @@ class Pagination(BaseModel):
 
     @classmethod
     def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
-        """Create an instance of Pagination from a dict"""
+        """Create an instance of SearchMemoryRequest from a dict"""
         if obj is None:
             return None
 
@@ -82,9 +83,9 @@ class Pagination(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
-            "limit": obj.get("limit"),
-            "offset": obj.get("offset"),
-            "total": obj.get("total")
+            "q": obj.get("q"),
+            "limit": obj.get("limit") if obj.get("limit") is not None else 10,
+            "offset": obj.get("offset") if obj.get("offset") is not None else 0
         })
         return _obj
 
