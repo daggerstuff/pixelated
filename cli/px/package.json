@@ -1,25 +1,41 @@
 {
-  "name": "@pixelated/px-cli",
+  "name": "px-cli",
   "version": "0.1.0",
-  "private": true,
+  "description": "px CLI — invoke Eve agents and manage git-hook integration config.",
   "type": "module",
   "bin": {
-    "px": "./dist/index.js"
+    "px": "dist/index.mjs"
   },
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup",
-    "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "tsup && vitest run"
+  },
+  "engines": {
+    "node": ">=24"
   },
   "dependencies": {
-    "commander": "^14.0.0",
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.0",
     "zod": "^4.3.2"
   },
   "devDependencies": {
-    "@types/node": "^26.1.1",
-    "tsup": "^8.5.0",
-    "typescript": "~5.7.3",
+    "@types/node": "^24.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
     "vitest": "^4.1.10"
   }
 }
