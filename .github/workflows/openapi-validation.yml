@@ -1,5 +1,9 @@
 name: OpenAPI Validation
 
+permissions:
+  pull-requests: write
+  contents: read
+
 on:
   pull_request:
     paths:
