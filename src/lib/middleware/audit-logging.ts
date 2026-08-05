@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { createResourceAuditLog } from '../audit'
 import { getSession } from '../auth/session'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getRequestHeader } from '../utils/request-headers'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -89,7 +90,7 @@ async function getSafeRequestBody(
 ): Promise<string | null> {
   try {
     // Only process specific content types to avoid binary data
-    const contentType = request.headers.get('Content-Type') ?? ''
+    const contentType = getRequestHeader(request, 'Content-Type') ?? ''
     if (
       !contentType.includes('application/json') &&
       !contentType.includes('application/x-www-form-urlencoded') &&
@@ -204,7 +205,7 @@ export const auditLoggingMiddleware = defineMiddleware(
       return next()
     }
 
-    const requestId = request.headers.get('x-request-id') ?? uuidv4()
+    const requestId = getRequestHeader(request, 'x-request-id') ?? uuidv4()
     const startTime = performance.now()
     const url = new URL(request.url)
     const path = url.pathname
@@ -247,11 +248,11 @@ export const auditLoggingMiddleware = defineMiddleware(
       path,
       query: Object.fromEntries(url.searchParams),
       headers: {},
-      userAgent: request.headers.get('user-agent') ?? 'unknown',
-      referer: request.headers.get('referer') ?? 'direct',
+      userAgent: getRequestHeader(request, 'user-agent') ?? 'unknown',
+      referer: getRequestHeader(request, 'referer') ?? 'direct',
       ipAddress:
-        request.headers.get('x-forwarded-for') ??
-        request.headers.get('cf-connecting-ip') ??
+        getRequestHeader(request, 'x-forwarded-for') ??
+        getRequestHeader(request, 'cf-connecting-ip') ??
         'unknown',
     }
 
@@ -266,7 +267,7 @@ export const auditLoggingMiddleware = defineMiddleware(
       'accept-language',
     ]
     headersToLog.forEach((header) => {
-      const value = request.headers.get(header)
+      const value = getRequestHeader(request, header)
       if (value) {
         ;(metadata['headers'] as Record<string, string>)[header] = value
       }

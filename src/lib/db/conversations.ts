@@ -1,5 +1,6 @@
 import type { Database } from '../../types/supabase'
 import { createAuditLog, AuditEventType } from '../audit'
+import { getRequestHeader } from '../utils/request-headers'
 import { mongoClient } from './mongoClient'
 
 export type Conversation = Database['public']['Tables']['conversations']['Row']
@@ -67,8 +68,8 @@ export async function createConversation(
     {
       conversationId: newConversation._id.toHexString(),
       title: conversation.title,
-      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
-      userAgent: request?.headers.get('user-agent') ?? undefined,
+      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
+      userAgent: getRequestHeader(request, 'user-agent'),
     },
   )
 
@@ -106,8 +107,8 @@ export async function updateConversation(
     {
       conversationId: id,
       updates,
-      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
-      userAgent: request?.headers.get('user-agent') ?? undefined,
+      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
+      userAgent: getRequestHeader(request, 'user-agent'),
     },
   )
 
@@ -139,8 +140,8 @@ export async function deleteConversation(
     'conversations',
     {
       conversationId: id,
-      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
-      userAgent: request?.headers.get('user-agent') ?? undefined,
+      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
+      userAgent: getRequestHeader(request, 'user-agent'),
     },
   )
 }

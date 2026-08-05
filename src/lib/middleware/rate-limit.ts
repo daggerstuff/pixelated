@@ -2,6 +2,7 @@ import { defineMiddleware } from 'astro:middleware'
 
 import { getSession } from '../auth/session'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getRequestHeader } from '../utils/request-headers'
 
 // Initialize logger
 const logger = createBuildSafeLogger('rate-limit')
@@ -147,9 +148,9 @@ export const rateLimitMiddleware = defineMiddleware(
 
       // Get client IP for rate limiting
       const clientIp =
-        request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-        request.headers.get('cf-connecting-ip') ??
-        request.headers.get('x-real-ip') ??
+        getRequestHeader(request, 'x-forwarded-for')?.split(',')[0].trim() ??
+        getRequestHeader(request, 'cf-connecting-ip') ??
+        getRequestHeader(request, 'x-real-ip') ??
         'anonymous'
 
       // Get user role from session

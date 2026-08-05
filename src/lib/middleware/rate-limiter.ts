@@ -1,4 +1,5 @@
 import { RateLimiter } from '../../utils/rate-limiter'
+import { getRequestHeader } from '../utils/request-headers'
 
 // Create a rate limiter instance
 const limiter = new RateLimiter({
@@ -17,8 +18,8 @@ export async function rateLimiter(
 ): Promise<Response | undefined> {
   // Get client IP from headers
   const ip =
-    request.headers.get('x-forwarded-for') ??
-    request.headers.get('x-real-ip') ??
+    getRequestHeader(request, 'x-forwarded-for') ??
+    getRequestHeader(request, 'x-real-ip') ??
     'unknown'
 
   // Use the first IP if x-forwarded-for returns a comma-separated list
