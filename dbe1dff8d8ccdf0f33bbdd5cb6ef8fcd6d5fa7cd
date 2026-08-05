@@ -1,0 +1,31 @@
+cli/px/src/commands/hook.ts
+  s_e79c379de6b9af::t_342cdd0139fbcf 258
+cli/px/src/output/format.test.ts
+  s_e79c379de6b9af::t_5286546d3927c3 1-110
+cli/px/src/config/loader.test.ts
+  s_e79c379de6b9af::t_723f69f5495094 1-148
+cli/px/src/client/http.test.ts
+  s_e79c379de6b9af::t_06e224d7bc17c0 1-199
+cli/px/src/output/response.test.ts
+  s_e79c379de6b9af::t_d4b51141989286 1-83
+cli/px/src/commands/hook.test.ts
+  s_e79c379de6b9af::t_a521b93bdddf8c 1-103
+cli/px/src/config/schema.test.ts
+  s_e79c379de6b9af::t_8646e9d7eb463f 1-198
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "dbe1dff8d8ccdf0f33bbdd5cb6ef8fcd6d5fa7cd",
+  "prompts": {},
+  "sessions": {
+    "s_e79c379de6b9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030a9748fffejidjFI26VRl6Dh",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
