@@ -106,7 +106,7 @@ describe('getCurrentUser — AstroCookies vs Request (PIX-4245)', () => {
     vi.mocked(validateToken).mockResolvedValueOnce({
       valid: true,
       userId: 'user-from-request',
-      role: 'user',
+      role: 'patient',
     })
 
     const request = new Request('https://example.com/register', {
