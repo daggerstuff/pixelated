@@ -14,9 +14,7 @@
     "asana",
     "colab-mcp"
   ],
-  "disabledMcpjsonServers": [
-    "colab-mcp"
-  ],
+  "disabledMcpjsonServers": ["colab-mcp"],
   "skillOverrides": {
     "distill": "off",
     "executing-plans": "off",

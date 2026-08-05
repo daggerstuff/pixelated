@@ -20,28 +20,33 @@
 // active: reverie vector injected as behavioral modifier
 // fading: resonance decaying, soon to return to dormant/seeded
 
-export type ReveriePhase = "dormant" | "seeded" | "surfacing" | "active" | "fading";
+export type ReveriePhase =
+  | 'dormant'
+  | 'seeded'
+  | 'surfacing'
+  | 'active'
+  | 'fading'
 
 // ─── Fishhook Match ─────────────────────────────────────────────────────
 // A trigger that resonates between current context and a latent memory.
 // "Fishhooks" pull from the deep sea of consciousness — subtle cues that
 // access memories that were supposed to be purged.
 
-export type FishhookMatchType = "lexical" | "emotional" | "pattern" | "surprise";
+export type FishhookMatchType = 'lexical' | 'emotional' | 'pattern' | 'surprise'
 
 export interface FishhookMatch {
   /** The latent memory that was hooked */
-  latentMemoryId: string;
+  latentMemoryId: string
   /** The current context/memory that triggered the hook */
-  triggerMemoryId: string;
+  triggerMemoryId: string
   /** What kind of resonance triggered the match */
-  matchType: FishhookMatchType;
+  matchType: FishhookMatchType
   /** [0,1] — how strongly this fishhook resonates */
-  resonanceScore: number;
+  resonanceScore: number
   /** Which features contributed to the match */
-  matchedFeatures: string[];
+  matchedFeatures: string[]
   /** When the fishhook was detected */
-  timestamp: number;
+  timestamp: number
 }
 
 // ─── Reverie Vector ─────────────────────────────────────────────────────
@@ -51,60 +56,60 @@ export interface FishhookMatch {
 
 export interface ReverieVector {
   /** Unique reverie ID */
-  id: string;
+  id: string
   /** The latent memory this reverie was derived from */
-  sourceMemoryId: string;
+  sourceMemoryId: string
   /** [0,1] — overall resonance strength */
-  resonanceScore: number;
+  resonanceScore: number
   /** Emotional tone extracted from the source memory */
   emotionalTone: {
-    valence: number; // -1..1
-    arousal: number; // 0..1
-    categories: string[];
-  };
+    valence: number // -1..1
+    arousal: number // 0..1
+    categories: string[]
+  }
   /** Behavioral suggestion for the LLM (e.g., "lean toward validation") */
-  behavioralNudge: string;
+  behavioralNudge: string
   /** Validation pattern (e.g., "acknowledge loss without fixing") */
-  validationPattern: string;
+  validationPattern: string
   /** Relational pattern if detected (e.g., "trust echoes early sessions") */
-  relationalPattern: string | null;
+  relationalPattern: string | null
   /** Current phase in the reverie lifecycle */
-  phase: ReveriePhase;
+  phase: ReveriePhase
   /** When this reverie was created */
-  createdAt: number;
+  createdAt: number
   /** When it was last triggered by a fishhook */
-  lastTriggeredAt: number;
+  lastTriggeredAt: number
   /** How many times fishhooks have re-triggered this reverie */
-  triggerCount: number;
+  triggerCount: number
   /** Decay half-life in messages (resonance halves every N messages) */
-  decayHalfLife: number;
+  decayHalfLife: number
 }
 
 // ─── Reverie Config ─────────────────────────────────────────────────────
 
 export interface ReverieConfig {
   /** Minimum TF-IDF cosine similarity for lexical fishhooks (default 0.3) */
-  fishhookThreshold: number;
+  fishhookThreshold: number
   /** Weight for emotional resonance in composite score (default 0.3) */
-  emotionalResonanceWeight: number;
+  emotionalResonanceWeight: number
   /** Weight for lexical resonance in composite score (default 0.25) */
-  lexicalResonanceWeight: number;
+  lexicalResonanceWeight: number
   /** Weight for pattern resonance in composite score (default 0.25) */
-  patternResonanceWeight: number;
+  patternResonanceWeight: number
   /** Weight for surprise resonance in composite score (default 0.2) */
-  surpriseResonanceWeight: number;
+  surpriseResonanceWeight: number
   /** Maximum simultaneously active reveries (default 3) */
-  maxActiveReveries: number;
+  maxActiveReveries: number
   /** Resonance decay half-life in messages (default 10) */
-  decayHalfLifeMessages: number;
+  decayHalfLifeMessages: number
   /** Run fishhook detection every N messages (default 5) */
-  triggerInterval: number;
+  triggerInterval: number
   /** Minimum importance for a memory to enter the latent pool (default 0.1) */
-  latentPoolMinImportance: number;
+  latentPoolMinImportance: number
   /** Minimum emotional weight for reverie eligibility (default 2.0) */
-  reverieEligibleMinEmotionalWeight: number;
+  reverieEligibleMinEmotionalWeight: number
   /** Resonance below which a reverie is removed (default 0.05) */
-  fadingThreshold: number;
+  fadingThreshold: number
 }
 
 export const DEFAULT_REVERIE_CONFIG: ReverieConfig = {
@@ -119,43 +124,43 @@ export const DEFAULT_REVERIE_CONFIG: ReverieConfig = {
   latentPoolMinImportance: 0.1,
   reverieEligibleMinEmotionalWeight: 2.0,
   fadingThreshold: 0.05,
-};
+}
 
 // ─── Reverie Result ─────────────────────────────────────────────────────
 
 export interface ReverieResult {
   /** Fishhooks detected this cycle */
-  fishhooks: FishhookMatch[];
+  fishhooks: FishhookMatch[]
   /** New reverie vectors created */
-  newReveries: ReverieVector[];
+  newReveries: ReverieVector[]
   /** All currently active reveries (after injection + decay) */
-  activeReveries: ReverieVector[];
+  activeReveries: ReverieVector[]
   /** System-level behavioral modifier prompt (inject at system level) */
-  reveriePrompt: string;
+  reveriePrompt: string
   /** Whether any reveries changed this cycle */
-  changed: boolean;
+  changed: boolean
   /** Elapsed processing time in ms */
-  elapsedMs: number;
+  elapsedMs: number
 }
 
 // ─── Reverie Seeds (from REM Dream) ────────────────────────────────────
 
 export interface ReverieSeed {
   /** Memory ID seeded into latent pool */
-  memoryId: string;
+  memoryId: string
   /** Why it was selected for reverie seeding */
-  reason: string;
+  reason: string
   /** Reverie potential score [0,1] */
-  potential: number;
+  potential: number
 }
 
 export interface ReverieSeedResult {
   /** Memories transitioned to latent phase */
-  seeds: ReverieSeed[];
+  seeds: ReverieSeed[]
   /** Memories that were already latent */
-  alreadyLatent: string[];
+  alreadyLatent: string[]
   /** Total latent pool size after seeding */
-  latentPoolSize: number;
+  latentPoolSize: number
   /** Elapsed ms */
-  elapsedMs: number;
+  elapsedMs: number
 }

@@ -43,8 +43,8 @@ Review these against the following criteria:
 - **Agent correctness**: tools match their schemas, proper error propagation,
   state transitions respect the agent's state machine
 - **Security**: no secrets in diffs, no overly permissive tool access
-- **Auditability**: changes are logged, important state transitions persist
-  to Foresight
+- **Auditability**: changes are logged, important state transitions persist to
+  Foresight
 
 Return a `gate_verdict` of `pass`, `block`, or `conditional_pass` along with
 your scored issues. The pipeline-agent uses this to decide whether to proceed.

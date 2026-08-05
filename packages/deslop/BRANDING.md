@@ -2,7 +2,8 @@
 
 ## Logo
 
-The deslop logo is ASCII art. No raster images, no vector illustrations. The text IS the mark.
+The deslop logo is ASCII art. No raster images, no vector illustrations. The
+text IS the mark.
 
 ```
  ██████╗ ███████╗██████╗ ██████╗ ███████╗██████╗
@@ -28,9 +29,11 @@ The deslop logo is ASCII art. No raster images, no vector illustrations. The tex
 
 ## Typography
 
-**Font stack**: `ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace`
+**Font stack**:
+`ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace`
 
-No Google Fonts. No web fonts. System monospace only. The tool runs in terminals — its brand should look like it lives there too.
+No Google Fonts. No web fonts. System monospace only. The tool runs in terminals
+— its brand should look like it lives there too.
 
 ## Voice & Tone
 
@@ -48,7 +51,10 @@ Lowercase. Period. No exclamation marks ever.
 ## Usage Rules
 
 1. **ASCII art is the logo.** Never replace it with a raster/vector image.
-2. **Terminal green is sacred.** `#00FF41` is the only color that appears in both dark and light contexts.
+2. **Terminal green is sacred.** `#00FF41` is the only color that appears in
+   both dark and light contexts.
 3. **Monospace everything.** If it has letters, it's monospace.
-4. **No decorative elements.** Borders, shadows, gradients — all forbidden. Density IS the aesthetic.
-5. **Consistency across surfaces.** README, landing page, CLI output, docs — same palette, same voice, same density.
+4. **No decorative elements.** Borders, shadows, gradients — all forbidden.
+   Density IS the aesthetic.
+5. **Consistency across surfaces.** README, landing page, CLI output, docs —
+   same palette, same voice, same density.

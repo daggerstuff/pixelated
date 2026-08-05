@@ -23,9 +23,14 @@ vi.mock('../../security/dlp', () => ({
   dlpService: { scanContent: mocks.scanContent },
 }))
 
-import { AuditLogger, chainPayload, computeChainHash, verifyAuditChain } from '../logger'
 import { AuditEventType, AuditSeverity } from '../events'
 import type { AuditEvent } from '../events'
+import {
+  AuditLogger,
+  chainPayload,
+  computeChainHash,
+  verifyAuditChain,
+} from '../logger'
 
 const GENESIS = '0'.repeat(64)
 
@@ -122,7 +127,7 @@ describe('AuditLogger persistence builds a hash chain', () => {
     const store: AuditEvent[] = []
     let cursorSeq = 0
     let cursorHash = GENESIS
-    
+
     const collection = (name: string) => {
       if (name === 'chain_audit_cursor') {
         return {
@@ -159,15 +164,22 @@ describe('AuditLogger persistence builds a hash chain', () => {
     const db = makeFakeDb()
     const auditLogger = AuditLogger.getInstance()
     const ensureSpy = vi
-      .spyOn(auditLogger as unknown as { ensureConnected: () => Promise<unknown> }, 'ensureConnected')
+      .spyOn(
+        auditLogger as unknown as { ensureConnected: () => Promise<unknown> },
+        'ensureConnected',
+      )
       .mockResolvedValue(db)
 
-    await (auditLogger as unknown as { persistEventWithRetry: (e: AuditEvent) => Promise<void> }).persistEventWithRetry(
-      makeEvent({ id: 'e1' }),
-    )
-    await (auditLogger as unknown as { persistEventWithRetry: (e: AuditEvent) => Promise<void> }).persistEventWithRetry(
-      makeEvent({ id: 'e2' }),
-    )
+    await (
+      auditLogger as unknown as {
+        persistEventWithRetry: (e: AuditEvent) => Promise<void>
+      }
+    ).persistEventWithRetry(makeEvent({ id: 'e1' }))
+    await (
+      auditLogger as unknown as {
+        persistEventWithRetry: (e: AuditEvent) => Promise<void>
+      }
+    ).persistEventWithRetry(makeEvent({ id: 'e2' }))
 
     expect(db.store).toHaveLength(2)
     expect(db.store[0].previousHash).toBe(GENESIS)

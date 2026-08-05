@@ -1,12 +1,13 @@
 import type { APIRoute } from 'astro'
+
 import { protectRoute } from '../../../../../../lib/auth/serverAuth'
 import { researchPlatform } from '../../../../../../lib/research/ResearchPlatform'
+import { getQueryAuditService } from '../../../../../../lib/research/services/QueryAuditService'
 import {
   createQueryFromRequest,
   type ResearchQueryRequest,
 } from '../../../../../../lib/research/services/QueryDSL'
 import { getQueryOutputFormatter } from '../../../../../../lib/research/services/QueryOutputFormatter'
-import { getQueryAuditService } from '../../../../../../lib/research/services/QueryAuditService'
 import type { QueryResult } from '../../../../../../lib/research/types/research-types'
 
 export const prerender = false
@@ -18,16 +19,25 @@ export const POST = protectRoute(
     try {
       body = (await request.json()) as ResearchQueryRequest
     } catch {
-      return new Response(
-        JSON.stringify({ error: 'Invalid JSON body' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } },
-      )
+      return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      })
     }
 
     if (!body.description) {
       return new Response(
         JSON.stringify({ error: 'Query description required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } },
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+          },
+        },
       )
     }
 
@@ -40,7 +50,11 @@ export const POST = protectRoute(
         ? body.epsilon
         : (query.parameters['epsilon'] as number) || 0.1
 
-    const result = await researchPlatform.executeResearchQuery(query, userId, userRole)
+    const result = await researchPlatform.executeResearchQuery(
+      query,
+      userId,
+      userRole,
+    )
     const queryResult = result as unknown as QueryResult
 
     const auditService = getQueryAuditService()
@@ -58,7 +72,11 @@ export const POST = protectRoute(
 
     const outputFormat = body.outputFormat || 'json'
     const formatter = getQueryOutputFormatter()
-    const formatted = formatter.format(queryResult, outputFormat, body.description)
+    const formatted = formatter.format(
+      queryResult,
+      outputFormat,
+      body.description,
+    )
 
     if (outputFormat === 'json') {
       return new Response(formatted.content, {
@@ -104,7 +122,10 @@ export const GET = protectRoute(
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
       },
     )
   },

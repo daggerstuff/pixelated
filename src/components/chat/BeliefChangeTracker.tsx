@@ -31,12 +31,16 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
         : 'No change'
 
   const changeColor =
-    change > 0 ? 'text-[#ff8533]' : change < 0 ? 'text-[#8fb8a2]' : 'text-[#b0b0b0]'
+    change > 0
+      ? 'text-[#ff8533]'
+      : change < 0
+        ? 'text-[#8fb8a2]'
+        : 'text-[#b0b0b0]'
 
   const percentage = (belief.currentStrength / 10) * 100
 
   return (
-    <div className="border border-white/10 bg-[#121212] p-4">
+    <div className="border-white/10 border bg-[#121212] p-4">
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
@@ -61,7 +65,7 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
         </div>
 
         <div className="mt-3">
-          <div className="h-2 w-full bg-white/10">
+          <div className="bg-white/10 h-2 w-full">
             <div
               className="h-full bg-[#8fb8a2] transition-all duration-300"
               style={{ width: `${percentage}%` }}
@@ -71,7 +75,7 @@ function BeliefSlider({ belief }: { belief: BeliefEntry }) {
       </button>
 
       {expanded && belief.history.length > 0 && (
-        <div className="mt-4 border-t border-white/10 pt-3">
+        <div className="border-white/10 mt-4 border-t pt-3">
           <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
             Change history
           </h4>
@@ -113,14 +117,17 @@ export function BeliefChangeTracker({
           Belief change tracker
         </h2>
         <p className="mt-2 text-sm text-[#b0b0b0]">
-          No beliefs tracked yet. Beliefs are identified during therapy sessions.
+          No beliefs tracked yet. Beliefs are identified during therapy
+          sessions.
         </p>
       </section>
     )
   }
 
   const coreBeliefs = beliefs.filter((b) => b.category === 'core')
-  const intermediateBeliefs = beliefs.filter((b) => b.category === 'intermediate')
+  const intermediateBeliefs = beliefs.filter(
+    (b) => b.category === 'intermediate',
+  )
   const automaticThoughts = beliefs.filter((b) => b.category === 'automatic')
 
   return (

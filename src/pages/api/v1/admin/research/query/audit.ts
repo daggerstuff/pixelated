@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+
 import { protectRoute } from '../../../../../../lib/auth/serverAuth'
 import { getQueryAuditService } from '../../../../../../lib/research/services/QueryAuditService'
 
@@ -21,7 +22,10 @@ export const GET = protectRoute(
       const auditStats = auditService.getAuditStats()
       return new Response(JSON.stringify(auditStats), {
         status: 200,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
       })
     }
 
@@ -33,9 +37,15 @@ export const GET = protectRoute(
       endDate,
     })
 
-    return new Response(JSON.stringify({ entries: trail, count: trail.length }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
-    })
+    return new Response(
+      JSON.stringify({ entries: trail, count: trail.length }),
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      },
+    )
   },
 )

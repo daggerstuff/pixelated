@@ -112,9 +112,9 @@ const data = await sdk.client.request<MyType>('GET', '/some/custom/path')
 
 ## Versioning
 
-SDK versions are tied to the API version from the OpenAPI spec. The current
-API version is `1.0.0` (API v1). See
-`src/content-store/docs/api/api-versioning.md` for deprecation and sunset policy.
+SDK versions are tied to the API version from the OpenAPI spec. The current API
+version is `1.0.0` (API v1). See `src/content-store/docs/api/api-versioning.md`
+for deprecation and sunset policy.
 
 ## License
 

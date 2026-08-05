@@ -88,9 +88,10 @@ wait, the agent parks durably (Eve sessions survive restarts).
 
 ## Advisor review gate
 
-Before calling `promote_to_staging` (Gate 3) or `promote_to_production` (Gate 4),
-**call `evaluate_pipeline_review` first**. This tool captures the current worktree
-state (git diff, changed files, commit metadata) and persists it to Foresight.
+Before calling `promote_to_staging` (Gate 3) or `promote_to_production` (Gate
+4), **call `evaluate_pipeline_review` first**. This tool captures the current
+worktree state (git diff, changed files, commit metadata) and persists it to
+Foresight.
 
 After `evaluate_pipeline_review` returns, forward the `review_payload` to the
 **advisor-agent** via the `subagent` tool. The advisor-agent will return a

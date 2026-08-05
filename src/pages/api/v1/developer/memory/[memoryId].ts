@@ -52,29 +52,26 @@ function resolveMemoryId(
 // GET /api/v1/developer/memory/:memoryId
 // ---------------------------------------------------------------------------
 
-export const GET = withDeveloperV1Contract(
-  'read',
-  async (context, caller) => {
-    const id = resolveMemoryId(context.params)
-    if (!id.ok) return id.response
+export const GET = withDeveloperV1Contract('read', async (context, caller) => {
+  const id = resolveMemoryId(context.params)
+  if (!id.ok) return id.response
 
-    const record = await getProductMemoryGateway().getMemory({
-      ...caller.scope,
-      memoryId: id.memoryId,
+  const record = await getProductMemoryGateway().getMemory({
+    ...caller.scope,
+    memoryId: id.memoryId,
+  })
+  if (!record) {
+    return jsonError({
+      status: 404,
+      code: 'not_found',
+      message: 'The requested memory was not found.',
     })
-    if (!record) {
-      return jsonError({
-        status: 404,
-        code: 'not_found',
-        message: 'The requested memory was not found.',
-      })
-    }
-    const body: GetMemoryResponse = {
-      data: toPublicMemory(record),
-    }
-    return jsonResponse(body)
-  },
-)
+  }
+  const body: GetMemoryResponse = {
+    data: toPublicMemory(record),
+  }
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // PATCH /api/v1/developer/memory/:memoryId
@@ -86,10 +83,7 @@ export const PATCH = withDeveloperV1Contract(
     const id = resolveMemoryId(context.params)
     if (!id.ok) return id.response
 
-    const parsed = await parseRequestJson(
-      UpdateMemoryRequest,
-      context.request,
-    )
+    const parsed = await parseRequestJson(UpdateMemoryRequest, context.request)
     if (!parsed.ok) return parsed.response
     const input = parsed.data
 

@@ -192,7 +192,7 @@ describeFn('RedisService Performance', () => {
         return redis.set(key, data)
       })
 
-       await expect(Promise.all(operations)).resolves.not.toThrow()
+      await expect(Promise.all(operations)).resolves.not.toThrow()
 
       const stats = await redis.getPoolStats()
       expect(stats.totalConnections).toBeLessThanOrEqual(50)

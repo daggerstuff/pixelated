@@ -41,12 +41,17 @@ export const SESSION_CONFIG = {
 
 export function validateSessionConfig(): void {
   if (!SESSION_CONFIG.secret && process.env['NODE_ENV'] === 'production') {
-    throw new Error('SESSION_SECRET environment variable is required in production')
+    throw new Error(
+      'SESSION_SECRET environment variable is required in production',
+    )
   }
 }
 
 export function useRedisSessions(): boolean {
-  return process.env['USE_REDIS_SESSIONS'] === 'true' || process.env['USE_REDIS_SESSIONS'] === '1'
+  return (
+    process.env['USE_REDIS_SESSIONS'] === 'true' ||
+    process.env['USE_REDIS_SESSIONS'] === '1'
+  )
 }
 
 export function createRedisStore(): session.Store {

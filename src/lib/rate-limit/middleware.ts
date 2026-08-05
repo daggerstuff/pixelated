@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto'
 
-import { redis } from '../redis'
 import { getLogger } from '../logging/logger'
+import { redis } from '../redis'
 import { getRateLimitService } from './RateLimitService'
 import { API_TIERS, inferTierFromRateLimit } from './types'
 import type { ApiTier, RateLimitResult } from './types'

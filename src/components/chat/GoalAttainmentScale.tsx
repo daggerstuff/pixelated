@@ -27,11 +27,11 @@ export type GoalAttainmentScaleProps = {
 }
 
 const categoryLabels: Record<TherapeuticGoal['category'], string> = {
-  'symptom_reduction': 'Symptom Reduction',
-  'cognitive_restructuring': 'Cognitive Restructuring',
-  'behavioral_activation': 'Behavioral Activation',
-  'relationship_improvement': 'Relationship Improvement',
-  'skill_development': 'Skill Development',
+  symptom_reduction: 'Symptom Reduction',
+  cognitive_restructuring: 'Cognitive Restructuring',
+  behavioral_activation: 'Behavioral Activation',
+  relationship_improvement: 'Relationship Improvement',
+  skill_development: 'Skill Development',
 }
 
 function GoalCard({
@@ -44,11 +44,13 @@ function GoalCard({
   const [expanded, setExpanded] = useState(false)
 
   const progressPercentage = (goal.currentScore / goal.targetScore) * 100
-  const completedCheckpoints = goal.checkpoints.filter((c) => c.completed).length
+  const completedCheckpoints = goal.checkpoints.filter(
+    (c) => c.completed,
+  ).length
   const totalCheckpoints = goal.checkpoints.length
 
   return (
-    <div className="border border-white/10 bg-[#121212] p-4">
+    <div className="border-white/10 border bg-[#121212] p-4">
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
@@ -75,7 +77,7 @@ function GoalCard({
         </div>
 
         <div className="mt-3">
-          <div className="h-2 w-full bg-white/10">
+          <div className="bg-white/10 h-2 w-full">
             <div
               className="h-full bg-[#8fb8a2] transition-all duration-300"
               style={{ width: `${Math.min(progressPercentage, 100)}%` }}
@@ -91,7 +93,7 @@ function GoalCard({
       </button>
 
       {expanded && totalCheckpoints > 0 && (
-        <div className="mt-4 border-t border-white/10 pt-3">
+        <div className="border-white/10 mt-4 border-t pt-3">
           <h4 className="mb-2 font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
             Checkpoints
           </h4>
@@ -103,7 +105,7 @@ function GoalCard({
                   id={`checkpoint-${checkpoint.id}`}
                   checked={checkpoint.completed}
                   onChange={() => onCheckpointToggle?.(goal.id, checkpoint.id)}
-                  className="mt-0.5 h-4 w-4 border border-white/20 bg-[#0a0a0a] accent-[#8fb8a2] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                  className="border-white/20 mt-0.5 h-4 w-4 border bg-[#0a0a0a] accent-[#8fb8a2] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
                 />
                 <label
                   htmlFor={`checkpoint-${checkpoint.id}`}
@@ -139,7 +141,8 @@ export function GoalAttainmentScale({
           Goal attainment scale
         </h2>
         <p className="mt-2 text-sm text-[#b0b0b0]">
-          No therapeutic goals set yet. Goals are defined collaboratively during therapy sessions.
+          No therapeutic goals set yet. Goals are defined collaboratively during
+          therapy sessions.
         </p>
       </section>
     )

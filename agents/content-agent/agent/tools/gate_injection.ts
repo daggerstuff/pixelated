@@ -1,6 +1,6 @@
-import { defineTool } from "eve/tools";
-import { always } from "eve/tools/approval";
-import { z } from "zod";
+import { defineTool } from 'eve/tools'
+import { always } from 'eve/tools/approval'
+import { z } from 'zod'
 
 /**
  * Content publishing safety controller for the scenario library.
@@ -16,73 +16,78 @@ import { z } from "zod";
  */
 
 interface GateInput {
-  last_audit_pass: boolean;
-  last_audit_blocking_count: number;
-  scenario_ids: string[];
-  dry_run?: boolean;
+  last_audit_pass: boolean
+  last_audit_blocking_count: number
+  scenario_ids: string[]
+  dry_run?: boolean
 }
 
 const SCHEMA = z.object({
   last_audit_pass: z
     .boolean()
-    .describe("Whether the most recent audit_corpus run passed (zero blocking findings)."),
+    .describe(
+      'Whether the most recent audit_corpus run passed (zero blocking findings).',
+    ),
   last_audit_blocking_count: z
     .number()
     .int()
     .min(0)
-    .describe("Blocking finding count from the most recent audit_corpus run."),
+    .describe('Blocking finding count from the most recent audit_corpus run.'),
   scenario_ids: z
     .array(z.string().min(1))
     .min(1)
-    .describe("Scenario IDs requesting publishing to the library."),
+    .describe('Scenario IDs requesting publishing to the library.'),
   dry_run: z
     .boolean()
     .optional()
     .default(true)
-    .describe("If true, only return a verdict; never mark as authorized-to-publish."),
-});
+    .describe(
+      'If true, only return a verdict; never mark as authorized-to-publish.',
+    ),
+})
 
 export default defineTool({
   description:
-    "Content publishing safety gate for the scenario library. Blocks " +
-    "scenario publishing unless the last audit passed with zero blocking " +
-    "findings AND a human approves. Behind always() approval because a " +
-    "cleared gate adds scenarios to the live training library.",
+    'Content publishing safety gate for the scenario library. Blocks ' +
+    'scenario publishing unless the last audit passed with zero blocking ' +
+    'findings AND a human approves. Behind always() approval because a ' +
+    'cleared gate adds scenarios to the live training library.',
   inputSchema: SCHEMA,
   approval: always<GateInput>(),
   async execute(input: GateInput) {
-    const auditCleared = input.last_audit_pass && input.last_audit_blocking_count === 0;
+    const auditCleared =
+      input.last_audit_pass && input.last_audit_blocking_count === 0
 
     if (!auditCleared) {
       return {
         authorized: false,
         scenario_count: input.scenario_ids.length,
         reason:
-          "Audit not cleared: " +
+          'Audit not cleared: ' +
           `${input.last_audit_blocking_count} blocking finding(s). ` +
-          "Fix the scenarios and re-run audit_corpus before requesting publishing.",
+          'Fix the scenarios and re-run audit_corpus before requesting publishing.',
         required_before_publish: [
-          "audit_corpus pass (zero blocking)",
-          "human approval of this gate",
+          'audit_corpus pass (zero blocking)',
+          'human approval of this gate',
         ],
-        state: "BLOCKED",
+        state: 'BLOCKED',
         evaluated_at: new Date().toISOString(),
-      };
+      }
     }
 
     // Audit cleared. dry_run never authorizes a live publish; a real publish
     // still requires the human to approve the always() gate.
-    const authorized = input.dry_run === false;
+    const authorized = input.dry_run === false
 
     return {
       authorized,
       scenario_count: input.scenario_ids.length,
       reason: authorized
-        ? "Audit cleared and human approved — safe to publish scenarios to the library."
-        : "Audit cleared. Awaiting human approval of this gate to authorize publishing.",
-      required_before_publish: ["human approval of this gate"],
-      state: authorized ? "AUTHORIZED" : "AWAITING_APPROVAL",
+        ? 'Audit cleared and human approved — safe to publish scenarios to the library.'
+        : 'Audit cleared. Awaiting human approval of this gate to authorize publishing.',
+      required_before_publish: ['human approval of this gate'],
+      state: authorized ? 'AUTHORIZED' : 'AWAITING_APPROVAL',
       evaluated_at: new Date().toISOString(),
-    };
+    }
   },
-});
+})

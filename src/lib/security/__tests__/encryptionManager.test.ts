@@ -1,5 +1,6 @@
 /* @vitest-environment node */
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
 import { EncryptionManager } from '../encryptionManager'
 import type { EncryptionConfig, EncryptedData } from '../encryptionManager'
 
@@ -195,10 +196,10 @@ describe('EncryptionManager', () => {
     it('should update usage count after encryption', async () => {
       const initialKeys = manager.listKeys()
       const initialUsage = initialKeys[0].usage.length
-      
+
       await manager.encrypt('data 1')
       await manager.encrypt('data 2')
-      
+
       const updatedKeys = manager.listKeys()
       expect(updatedKeys[0].usage.length).toBeGreaterThan(initialUsage)
     })

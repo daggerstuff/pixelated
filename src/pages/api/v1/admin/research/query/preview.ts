@@ -1,5 +1,8 @@
 import { protectRoute } from '../../../../../../lib/auth/serverAuth'
-import { dslToSQL, type ResearchQueryRequest } from '../../../../../../lib/research/services/QueryDSL'
+import {
+  dslToSQL,
+  type ResearchQueryRequest,
+} from '../../../../../../lib/research/services/QueryDSL'
 
 export const prerender = false
 
@@ -10,16 +13,25 @@ export const POST = protectRoute(
     try {
       body = (await request.json()) as ResearchQueryRequest
     } catch {
-      return new Response(
-        JSON.stringify({ error: 'Invalid JSON body' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } },
-      )
+      return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+        status: 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
+      })
     }
 
     if (!body.dsl) {
       return new Response(
         JSON.stringify({ error: 'DSL filter required for this endpoint' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } },
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store',
+          },
+        },
       )
     }
 
@@ -35,7 +47,10 @@ export const POST = protectRoute(
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
+        },
       },
     )
   },

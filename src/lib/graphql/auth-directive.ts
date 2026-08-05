@@ -22,12 +22,22 @@
  * The admin role bypasses all scope checks.
  */
 
-import { defaultFieldResolver, GraphQLSchema, type GraphQLResolveInfo } from "graphql";
-import { mapSchema, MapperKind, getDirectiveExtensions } from "@graphql-tools/utils";
-import type { GraphqlContext } from "./resolvers";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import {
+  mapSchema,
+  MapperKind,
+  getDirectiveExtensions,
+} from '@graphql-tools/utils'
+import {
+  defaultFieldResolver,
+  GraphQLSchema,
+  type GraphQLResolveInfo,
+} from 'graphql'
 
-const logger = createBuildSafeLogger("graphql-auth-directive");
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+import type { GraphqlContext } from './resolvers'
+
+const logger = createBuildSafeLogger('graphql-auth-directive')
 
 /**
  * Check whether the user satisfies the required scope.
@@ -37,20 +47,24 @@ const logger = createBuildSafeLogger("graphql-auth-directive");
  * @param scopes User scopes (API-key users only; JWT users have none)
  * @returns `true` if access is allowed, `false` otherwise
  */
-function hasScopeAccess(scope: string, role: string, scopes: string[]): boolean {
+function hasScopeAccess(
+  scope: string,
+  role: string,
+  scopes: string[],
+): boolean {
   // Admin role bypasses all scope checks
-  if (role === "admin") return true;
+  if (role === 'admin') return true
 
   // The literal scope "admin" maps to role check only
-  if (scope === "admin") return role === "admin";
+  if (scope === 'admin') return role === 'admin'
 
   // API-key users: check explicit scopes array
-  if (scopes.length > 0) return scopes.includes(scope);
+  if (scopes.length > 0) return scopes.includes(scope)
 
   // JWT users without scopes: non-admin scope is satisfied by any authenticated user.
   // Scope enforcement is primarily for API-key callers; JWT callers are trusted at
   // the route level via the existing dual-mode auth middleware.
-  return true;
+  return true
 }
 
 /**
@@ -62,17 +76,17 @@ function hasScopeAccess(scope: string, role: string, scopes: string[]): boolean 
 export function applyAuthDirectives(schema: GraphQLSchema): GraphQLSchema {
   return mapSchema(schema, {
     [MapperKind.OBJECT_FIELD]: (fieldConfig, fieldName) => {
-      const directives = getDirectiveExtensions(fieldConfig, schema);
+      const directives = getDirectiveExtensions(fieldConfig, schema)
 
-      const authEntries = directives?.['auth']; // [{ scope?: string }] | undefined
-      const roleEntries = directives?.['requireRole']; // [{ role: string }] | undefined
+      const authEntries = directives?.['auth'] // [{ scope?: string }] | undefined
+      const roleEntries = directives?.['requireRole'] // [{ role: string }] | undefined
 
-      if (!authEntries?.length && !roleEntries?.length) return fieldConfig;
+      if (!authEntries?.length && !roleEntries?.length) return fieldConfig
 
-      const requiredScope = authEntries?.[0]?.['scope'] as string | undefined;
-      const requiredRole = roleEntries?.[0]?.['role'] as string | undefined;
+      const requiredScope = authEntries?.[0]?.['scope'] as string | undefined
+      const requiredRole = roleEntries?.[0]?.['role'] as string | undefined
 
-      const originalResolve = fieldConfig.resolve ?? defaultFieldResolver;
+      const originalResolve = fieldConfig.resolve ?? defaultFieldResolver
 
       fieldConfig.resolve = async (
         parent: unknown,
@@ -82,43 +96,43 @@ export function applyAuthDirectives(schema: GraphQLSchema): GraphQLSchema {
       ) => {
         // ── Authentication ──────────────────────────────────────
         if (authEntries?.length && !context.user) {
-          logger.warn("Auth directive blocked unauthenticated request", {
+          logger.warn('Auth directive blocked unauthenticated request', {
             field: fieldName,
             scope: requiredScope,
-          });
-          throw new Error("Authentication required");
+          })
+          throw new Error('Authentication required')
         }
 
         // ── Scope check ─────────────────────────────────────────
         if (authEntries?.length && requiredScope && context.user) {
-          const userScopes = context.user.scopes ?? [];
+          const userScopes = context.user.scopes ?? []
           if (!hasScopeAccess(requiredScope, context.user.role, userScopes)) {
-            logger.warn("Auth directive blocked insufficient scope", {
+            logger.warn('Auth directive blocked insufficient scope', {
               field: fieldName,
               requiredScope,
               userRole: context.user.role,
               userScopes,
-            });
-            throw new Error(`Scope '${requiredScope}' required`);
+            })
+            throw new Error(`Scope '${requiredScope}' required`)
           }
         }
 
         // ── Role check ─────────────────────────────────────────
         if (roleEntries?.length && requiredRole && context.user) {
           if (context.user.role !== requiredRole) {
-            logger.warn("Role directive blocked insufficient role", {
+            logger.warn('Role directive blocked insufficient role', {
               field: fieldName,
               requiredRole,
               userRole: context.user.role,
-            });
-            throw new Error(`Role '${requiredRole}' required`);
+            })
+            throw new Error(`Role '${requiredRole}' required`)
           }
         }
 
-        return originalResolve(parent, args, context, info);
-      };
+        return originalResolve(parent, args, context, info)
+      }
 
-      return fieldConfig;
+      return fieldConfig
     },
-  });
+  })
 }

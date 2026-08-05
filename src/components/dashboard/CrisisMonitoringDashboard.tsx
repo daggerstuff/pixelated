@@ -9,164 +9,178 @@ import {
   Phone,
   Eye,
   BarChart3,
-} from "lucide-react";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+} from 'lucide-react'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
 
-import Alert from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge/index";
-import { Button } from "@/components/ui/button/index";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card/index";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { CrisisPrediction } from "@/lib/ai/services/PredictiveCrisisModelingService";
+import Alert from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index'
+import { Progress } from '@/components/ui/progress'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 
 export interface PatientRiskData {
-  id: string;
-  name: string;
-  currentRisk: "minimal" | "low" | "moderate" | "high" | "imminent";
-  prediction: CrisisPrediction;
-  lastAssessment: string;
-  lastContact: string;
-  escalationStatus?: "active" | "resolved" | "monitoring";
-  therapistId: string;
-  alerts: AlertItem[];
+  id: string
+  name: string
+  currentRisk: 'minimal' | 'low' | 'moderate' | 'high' | 'imminent'
+  prediction: CrisisPrediction
+  lastAssessment: string
+  lastContact: string
+  escalationStatus?: 'active' | 'resolved' | 'monitoring'
+  therapistId: string
+  alerts: AlertItem[]
 }
 
 export interface AlertItem {
-  id: string;
-  type: "prediction" | "escalation" | "missed_session" | "manual" | "system";
-  severity: "low" | "medium" | "high" | "critical";
-  message: string;
-  timestamp: string;
-  acknowledged: boolean;
-  actions: string[];
+  id: string
+  type: 'prediction' | 'escalation' | 'missed_session' | 'manual' | 'system'
+  severity: 'low' | 'medium' | 'high' | 'critical'
+  message: string
+  timestamp: string
+  acknowledged: boolean
+  actions: string[]
 }
 
 export interface DashboardMetrics {
-  totalPatients: number;
-  highRiskPatients: number;
-  activeEscalations: number;
-  todayAssessments: number;
-  averageResponseTime: string;
-  escalationRate: number;
-  falsePositiveRate: number;
+  totalPatients: number
+  highRiskPatients: number
+  activeEscalations: number
+  todayAssessments: number
+  averageResponseTime: string
+  escalationRate: number
+  falsePositiveRate: number
 }
 
 export interface CrisisMonitoringDashboardProps {
-  therapistId?: string;
-  refreshInterval?: number;
-  showEmergencyControls?: boolean;
+  therapistId?: string
+  refreshInterval?: number
+  showEmergencyControls?: boolean
 }
 
 // Performance optimization: Extracted these mapping dictionaries to the module level
 // to prevent O(N) object allocations on every render cycle during .map() iterations.
 const RISK_COLORS = {
-  minimal: "text-neutral-600 bg-neutral-100",
-  low: "text-neutral-700 bg-neutral-100",
-  moderate: "text-neutral-700 bg-neutral-200",
-  high: "text-neutral-800 bg-neutral-200",
-  imminent: "text-neutral-900 bg-neutral-300",
-} as const;
+  minimal: 'text-neutral-600 bg-neutral-100',
+  low: 'text-neutral-700 bg-neutral-100',
+  moderate: 'text-neutral-700 bg-neutral-200',
+  high: 'text-neutral-800 bg-neutral-200',
+  imminent: 'text-neutral-900 bg-neutral-300',
+} as const
 
 const SEVERITY_COLORS = {
-  low: "border-neutral-200 bg-neutral-50",
-  medium: "border-neutral-300 bg-neutral-100",
-  high: "border-neutral-400 bg-neutral-100",
-  critical: "border-neutral-500 bg-neutral-200",
-} as const;
+  low: 'border-neutral-200 bg-neutral-50',
+  medium: 'border-neutral-300 bg-neutral-100',
+  high: 'border-neutral-400 bg-neutral-100',
+  critical: 'border-neutral-500 bg-neutral-200',
+} as const
 
 const RISK_DOT_COLORS = {
-  imminent: "bg-neutral-900",
-  high: "bg-neutral-800",
-  moderate: "bg-neutral-700",
-  low: "bg-neutral-600",
-  minimal: "bg-neutral-500",
-} as const;
+  imminent: 'bg-neutral-900',
+  high: 'bg-neutral-800',
+  moderate: 'bg-neutral-700',
+  low: 'bg-neutral-600',
+  minimal: 'bg-neutral-500',
+} as const
 
-export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps> = ({
-  therapistId = "current_therapist",
+export const CrisisMonitoringDashboard: React.FC<
+  CrisisMonitoringDashboardProps
+> = ({
+  therapistId = 'current_therapist',
   refreshInterval = 30000, // 30 seconds
   showEmergencyControls = true,
 }) => {
-  const [patients, setPatients] = useState<PatientRiskData[]>([]);
-  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const [patients, setPatients] = useState<PatientRiskData[]>([])
+  const [alerts, setAlerts] = useState<AlertItem[]>([])
   const [metrics, setMetrics] = useState<DashboardMetrics>({
     totalPatients: 0,
     highRiskPatients: 0,
     activeEscalations: 0,
     todayAssessments: 0,
-    averageResponseTime: "0m",
+    averageResponseTime: '0m',
     escalationRate: 0,
     falsePositiveRate: 0,
-  });
-  const [activeTab, setActiveTab] = useState("overview");
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [loading, setLoading] = useState(false);
+  })
+  const [activeTab, setActiveTab] = useState('overview')
+  const [autoRefresh, setAutoRefresh] = useState(true)
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [loading, setLoading] = useState(false)
 
   // Fetch dashboard data
   const fetchDashboardData = useCallback(async () => {
-    setLoading(true);
+    setLoading(true)
     try {
       // Simulated API calls - replace with actual endpoints
-      const [patientsResponse, alertsResponse, metricsResponse] = await Promise.all([
-        fetchPatientRiskData(therapistId),
-        fetchAlerts(therapistId),
-        fetchMetrics(therapistId),
-      ]);
+      const [patientsResponse, alertsResponse, metricsResponse] =
+        await Promise.all([
+          fetchPatientRiskData(therapistId),
+          fetchAlerts(therapistId),
+          fetchMetrics(therapistId),
+        ])
 
-      setPatients(patientsResponse);
-      setAlerts(alertsResponse);
-      setMetrics(metricsResponse);
-      setLastUpdated(new Date());
+      setPatients(patientsResponse)
+      setAlerts(alertsResponse)
+      setMetrics(metricsResponse)
+      setLastUpdated(new Date())
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      console.error('Error fetching dashboard data:', error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [therapistId]);
+  }, [therapistId])
 
   // Auto-refresh effect
   useEffect(() => {
-    void fetchDashboardData();
+    void fetchDashboardData()
 
     if (autoRefresh) {
-      const interval = setInterval(fetchDashboardData, refreshInterval);
-      return () => clearInterval(interval);
+      const interval = setInterval(fetchDashboardData, refreshInterval)
+      return () => clearInterval(interval)
     }
-    return undefined;
-  }, [fetchDashboardData, autoRefresh, refreshInterval]);
+    return undefined
+  }, [fetchDashboardData, autoRefresh, refreshInterval])
 
   // Performance optimization: Compute formatted date strings once to avoid expensive O(N) Date creations during render
   const memoizedAlerts = useMemo(() => {
     return alerts.map((alert) => ({
       ...alert,
       timestampString: new Date(alert.timestamp).toLocaleString(),
-    }));
-  }, [alerts]);
+    }))
+  }, [alerts])
 
   // Performance optimization: Memoize derived alert values to prevent unnecessary O(N) filtering on every render
   const unacknowledgedAlertsCount = useMemo(() => {
-    return memoizedAlerts.filter((a) => !a.acknowledged).length;
-  }, [memoizedAlerts]);
+    return memoizedAlerts.filter((a) => !a.acknowledged).length
+  }, [memoizedAlerts])
 
   const criticalUnacknowledgedAlerts = useMemo(() => {
-    return memoizedAlerts.filter((a) => a.severity === "critical" && !a.acknowledged);
-  }, [memoizedAlerts]);
+    return memoizedAlerts.filter(
+      (a) => a.severity === 'critical' && !a.acknowledged,
+    )
+  }, [memoizedAlerts])
 
   // Performance optimization: Compute formatted date strings once to avoid expensive O(N) Date creations during render
   const memoizedPatients = useMemo(() => {
     return patients.map((patient) => ({
       ...patient,
       lastContactString: new Date(patient.lastContact).toLocaleDateString(),
-      lastAssessmentString: new Date(patient.lastAssessment).toLocaleDateString(),
-    }));
-  }, [patients]);
+      lastAssessmentString: new Date(
+        patient.lastAssessment,
+      ).toLocaleDateString(),
+    }))
+  }, [patients])
 
   // Performance optimization: Memoize derived patient risk data to prevent O(N) operations on every render
   const highRiskPatients = useMemo(() => {
-    return memoizedPatients.filter((p) => p.currentRisk === "high" || p.currentRisk === "imminent");
-  }, [memoizedPatients]);
+    return memoizedPatients.filter(
+      (p) => p.currentRisk === 'high' || p.currentRisk === 'imminent',
+    )
+  }, [memoizedPatients])
 
   const riskDistribution = useMemo(() => {
     const distribution = {
@@ -175,53 +189,60 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       moderate: 0,
       low: 0,
       minimal: 0,
-    };
+    }
     patients.forEach((p) => {
       if (p.currentRisk in distribution) {
-        distribution[p.currentRisk]++;
+        distribution[p.currentRisk]++
       }
-    });
-    return distribution;
-  }, [patients]);
+    })
+    return distribution
+  }, [patients])
 
   // Get risk color for styling
   const getRiskColor = (risk: string): string => {
-    return RISK_COLORS[risk as keyof typeof RISK_COLORS] || RISK_COLORS.minimal;
-  };
+    return RISK_COLORS[risk as keyof typeof RISK_COLORS] || RISK_COLORS.minimal
+  }
 
   // Get severity color for alerts
   const getSeverityColor = (severity: string): string => {
-    return SEVERITY_COLORS[severity as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.low;
-  };
+    return (
+      SEVERITY_COLORS[severity as keyof typeof SEVERITY_COLORS] ||
+      SEVERITY_COLORS.low
+    )
+  }
 
   // Handle alert acknowledgment
   const acknowledgeAlert = async (alertId: string) => {
     try {
-      await acknowledgeAlertAPI(alertId);
+      await acknowledgeAlertAPI(alertId)
       setAlerts((prev) =>
-        prev.map((alert) => (alert.id === alertId ? { ...alert, acknowledged: true } : alert)),
-      );
+        prev.map((alert) =>
+          alert.id === alertId ? { ...alert, acknowledged: true } : alert,
+        ),
+      )
     } catch (error) {
-      console.error("Error acknowledging alert:", error);
+      console.error('Error acknowledging alert:', error)
     }
-  };
+  }
 
   // Trigger manual escalation
   const triggerManualEscalation = async (patientId: string) => {
     try {
-      await triggerEscalationAPI(patientId, "manual");
-      await fetchDashboardData(); // Refresh data
+      await triggerEscalationAPI(patientId, 'manual')
+      await fetchDashboardData() // Refresh data
     } catch (error) {
-      console.error("Error triggering escalation:", error);
+      console.error('Error triggering escalation:', error)
     }
-  };
+  }
 
   return (
     <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-gray-900 text-3xl font-bold">Crisis Monitoring Dashboard</h1>
+          <h1 className="text-gray-900 text-3xl font-bold">
+            Crisis Monitoring Dashboard
+          </h1>
           <p className="text-gray-600">
             Real-time crisis risk monitoring and escalation management
           </p>
@@ -229,11 +250,11 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
         <div className="flex items-center space-x-4">
           <Button
-            variant={autoRefresh ? "default" : "outline"}
+            variant={autoRefresh ? 'default' : 'outline'}
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
             <Activity className="mr-2 h-4 w-4" />
-            Auto-refresh {autoRefresh ? "ON" : "OFF"}
+            Auto-refresh {autoRefresh ? 'ON' : 'OFF'}
           </Button>
 
           <Button onClick={fetchDashboardData} disabled={loading}>
@@ -251,11 +272,15 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">Total Patients</CardTitle>
+            <CardTitle className="text-gray-600 text-sm font-medium">
+              Total Patients
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{metrics.totalPatients}</span>
+              <span className="text-2xl font-bold">
+                {metrics.totalPatients}
+              </span>
               <Users className="text-gray-400 h-5 w-5" />
             </div>
           </CardContent>
@@ -263,7 +288,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">High Risk</CardTitle>
+            <CardTitle className="text-gray-600 text-sm font-medium">
+              High Risk
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
@@ -275,14 +302,16 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
             <div className="text-gray-500 mt-1 text-xs">
               {metrics.totalPatients > 0
                 ? `${Math.round((metrics.highRiskPatients / metrics.totalPatients) * 100)}% of total`
-                : "0% of total"}
+                : '0% of total'}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">Active Escalations</CardTitle>
+            <CardTitle className="text-gray-600 text-sm font-medium">
+              Active Escalations
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
@@ -299,11 +328,15 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-gray-600 text-sm font-medium">Today's Assessments</CardTitle>
+            <CardTitle className="text-gray-600 text-sm font-medium">
+              Today's Assessments
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
-              <span className="text-2xl font-bold">{metrics.todayAssessments}</span>
+              <span className="text-2xl font-bold">
+                {metrics.todayAssessments}
+              </span>
               <BarChart3 className="text-gray-400 h-5 w-5" />
             </div>
             <div className="text-gray-500 mt-1 text-xs">
@@ -317,7 +350,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts ({unacknowledgedAlertsCount})</TabsTrigger>
+          <TabsTrigger value="alerts">
+            Alerts ({unacknowledgedAlertsCount})
+          </TabsTrigger>
           <TabsTrigger value="patients">Patients</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
@@ -359,7 +394,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                     <div className="flex items-center space-x-3">
                       <div
                         className={`h-3 w-3 rounded-full ${
-                          patient.currentRisk === "imminent" ? "bg-neutral-900" : "bg-neutral-800"
+                          patient.currentRisk === 'imminent'
+                            ? 'bg-neutral-900'
+                            : 'bg-neutral-800'
                         }`}
                       />
                       <div>
@@ -379,7 +416,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={async () => triggerManualEscalation(patient.id)}
+                          onClick={async () =>
+                            triggerManualEscalation(patient.id)
+                          }
                         >
                           <Phone className="mr-1 h-4 w-4" />
                           Escalate
@@ -413,7 +452,9 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                 <div className="text-center">
                   <BarChart3 className="mx-auto mb-2 h-12 w-12" />
                   Risk trend visualization would go here
-                  <div className="mt-2 text-sm">Integration with charting library needed</div>
+                  <div className="mt-2 text-sm">
+                    Integration with charting library needed
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -423,15 +464,26 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
         {/* Alerts Tab */}
         <TabsContent value="alerts" className="space-y-4">
           {memoizedAlerts.map((alert) => (
-            <Card key={alert.id} className={`border-l-4 ${getSeverityColor(alert.severity)}`}>
+            <Card
+              key={alert.id}
+              className={`border-l-4 ${getSeverityColor(alert.severity)}`}
+            >
               <CardContent className="pt-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="mb-2 flex items-center space-x-2">
-                      <Badge variant={alert.severity === "critical" ? "destructive" : "secondary"}>
+                      <Badge
+                        variant={
+                          alert.severity === 'critical'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                      >
                         {alert.severity.toUpperCase()}
                       </Badge>
-                      <span className="text-gray-500 text-sm">{alert.timestampString}</span>
+                      <span className="text-gray-500 text-sm">
+                        {alert.timestampString}
+                      </span>
                       {alert.acknowledged && (
                         <Badge variant="outline" className="text-neutral-700">
                           <CheckCircle className="mr-1 h-3 w-3" />
@@ -456,7 +508,10 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
 
                   <div className="ml-4 flex items-center space-x-2">
                     {!alert.acknowledged && (
-                      <Button size="sm" onClick={async () => acknowledgeAlert(alert.id)}>
+                      <Button
+                        size="sm"
+                        onClick={async () => acknowledgeAlert(alert.id)}
+                      >
                         <CheckCircle className="mr-1 h-4 w-4" />
                         Acknowledge
                       </Button>
@@ -493,8 +548,12 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                       />
 
                       <div>
-                        <h3 className="text-gray-900 font-medium">{patient.name}</h3>
-                        <p className="text-gray-500 text-sm">ID: {patient.id}</p>
+                        <h3 className="text-gray-900 font-medium">
+                          {patient.name}
+                        </h3>
+                        <p className="text-gray-500 text-sm">
+                          ID: {patient.id}
+                        </p>
                       </div>
                     </div>
 
@@ -504,7 +563,8 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                           {patient.currentRisk.toUpperCase()}
                         </Badge>
                         <div className="text-gray-500 mt-1 text-sm">
-                          Confidence: {Math.round(patient.prediction.confidence * 100)}%
+                          Confidence:{' '}
+                          {Math.round(patient.prediction.confidence * 100)}%
                         </div>
                       </div>
 
@@ -521,11 +581,11 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                       {patient.escalationStatus && (
                         <Badge
                           variant={
-                            patient.escalationStatus === "active"
-                              ? "destructive"
-                              : patient.escalationStatus === "monitoring"
-                                ? "secondary"
-                                : "outline"
+                            patient.escalationStatus === 'active'
+                              ? 'destructive'
+                              : patient.escalationStatus === 'monitoring'
+                                ? 'secondary'
+                                : 'outline'
                           }
                         >
                           {patient.escalationStatus}
@@ -537,11 +597,11 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                   {patient.prediction.primaryRiskFactors.length > 0 && (
                     <div className="mt-3 border-t pt-3">
                       <div className="text-gray-600 text-sm">
-                        <strong>Primary risk factors:</strong>{" "}
-                        {patient.prediction.primaryRiskFactors.join(", ")}
+                        <strong>Primary risk factors:</strong>{' '}
+                        {patient.prediction.primaryRiskFactors.join(', ')}
                       </div>
                       <div className="text-gray-600 mt-1 text-sm">
-                        <strong>Intervention window:</strong>{" "}
+                        <strong>Intervention window:</strong>{' '}
                         {patient.prediction.interventionWindow.optimal}
                       </div>
                     </div>
@@ -574,7 +634,10 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
                       <span>False Positive Rate</span>
                       <span>{metrics.falsePositiveRate.toFixed(1)}%</span>
                     </div>
-                    <Progress value={metrics.falsePositiveRate} className="mt-1" />
+                    <Progress
+                      value={metrics.falsePositiveRate}
+                      className="mt-1"
+                    />
                   </div>
 
                   <div>
@@ -593,22 +656,35 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {["imminent", "high", "moderate", "low", "minimal"].map((risk) => {
-                    const count = riskDistribution[risk as keyof typeof riskDistribution];
-                    const percentage = patients.length > 0 ? (count / patients.length) * 100 : 0;
+                  {['imminent', 'high', 'moderate', 'low', 'minimal'].map(
+                    (risk) => {
+                      const count =
+                        riskDistribution[risk as keyof typeof riskDistribution]
+                      const percentage =
+                        patients.length > 0
+                          ? (count / patients.length) * 100
+                          : 0
 
-                    return (
-                      <div key={risk} className="flex items-center justify-between">
-                        <span className="text-sm capitalize">{risk} Risk</span>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-20 text-right text-sm">{count} patients</div>
-                          <div className="text-gray-500 w-12 text-right text-sm">
-                            {percentage.toFixed(0)}%
+                      return (
+                        <div
+                          key={risk}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-sm capitalize">
+                            {risk} Risk
+                          </span>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-20 text-right text-sm">
+                              {count} patients
+                            </div>
+                            <div className="text-gray-500 w-12 text-right text-sm">
+                              {percentage.toFixed(0)}%
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      )
+                    },
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -616,50 +692,55 @@ export const CrisisMonitoringDashboard: React.FC<CrisisMonitoringDashboardProps>
         </TabsContent>
       </Tabs>
     </div>
-  );
-};
+  )
+}
 
 // Simulated API functions - replace with actual implementations
-async function fetchPatientRiskData(therapistId: string): Promise<PatientRiskData[]> {
+async function fetchPatientRiskData(
+  therapistId: string,
+): Promise<PatientRiskData[]> {
   // Simulated data
   return [
     {
-      id: "patient_001",
-      name: "Jane Doe",
-      currentRisk: "high",
+      id: 'patient_001',
+      name: 'Jane Doe',
+      currentRisk: 'high',
       prediction: {
-        riskLevel: "high",
-        timeframe: "within_day",
+        riskLevel: 'high',
+        timeframe: 'within_day',
         confidence: 0.89,
-        primaryRiskFactors: ["Social isolation", "Recent trauma disclosure"],
-        protectiveFactors: ["Strong therapeutic alliance"],
+        primaryRiskFactors: ['Social isolation', 'Recent trauma disclosure'],
+        protectiveFactors: ['Strong therapeutic alliance'],
         interventionWindow: {
-          optimal: "Within 24 hours",
-          critical: "Within 72 hours",
+          optimal: 'Within 24 hours',
+          critical: 'Within 72 hours',
         },
-        escalationTriggers: ["Immediate clinical review required"],
+        escalationTriggers: ['Immediate clinical review required'],
       },
-      lastAssessment: "2025-10-29T10:30:00Z",
-      lastContact: "2025-10-28T14:20:00Z",
-      escalationStatus: "monitoring",
+      lastAssessment: '2025-10-29T10:30:00Z',
+      lastContact: '2025-10-28T14:20:00Z',
+      escalationStatus: 'monitoring',
       therapistId,
       alerts: [],
     },
-  ];
+  ]
 }
 
 async function fetchAlerts(_therapistId: string): Promise<AlertItem[]> {
   return [
     {
-      id: "alert_001",
-      type: "prediction",
-      severity: "high",
-      message: "Patient Jane Doe showing elevated crisis risk indicators",
-      timestamp: "2025-10-29T11:15:00Z",
+      id: 'alert_001',
+      type: 'prediction',
+      severity: 'high',
+      message: 'Patient Jane Doe showing elevated crisis risk indicators',
+      timestamp: '2025-10-29T11:15:00Z',
       acknowledged: false,
-      actions: ["Schedule urgent session", "Contact emergency contact if no response"],
+      actions: [
+        'Schedule urgent session',
+        'Contact emergency contact if no response',
+      ],
     },
-  ];
+  ]
 }
 
 async function fetchMetrics(_therapistId: string): Promise<DashboardMetrics> {
@@ -668,20 +749,23 @@ async function fetchMetrics(_therapistId: string): Promise<DashboardMetrics> {
     highRiskPatients: 3,
     activeEscalations: 1,
     todayAssessments: 12,
-    averageResponseTime: "2.3m",
+    averageResponseTime: '2.3m',
     escalationRate: 8.5,
     falsePositiveRate: 4.2,
-  };
+  }
 }
 
 async function acknowledgeAlertAPI(alertId: string): Promise<void> {
   // API call to acknowledge alert
-  console.log("Acknowledging alert:", alertId);
+  console.log('Acknowledging alert:', alertId)
 }
 
-async function triggerEscalationAPI(patientId: string, type: string): Promise<void> {
+async function triggerEscalationAPI(
+  patientId: string,
+  type: string,
+): Promise<void> {
   // API call to trigger escalation
-  console.log("Triggering escalation for patient:", patientId, "type:", type);
+  console.log('Triggering escalation for patient:', patientId, 'type:', type)
 }
 
-export default CrisisMonitoringDashboard;
+export default CrisisMonitoringDashboard

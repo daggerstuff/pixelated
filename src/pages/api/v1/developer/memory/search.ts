@@ -27,56 +27,47 @@ import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 // GET /api/v1/developer/memory/search
 // ---------------------------------------------------------------------------
 
-export const GET = withDeveloperV1Contract(
-  'read',
-  async (context, caller) => {
-    const url = new URL(context.request.url)
-    const params = parseSearchParams(SearchMemoriesQuery, url)
-    if (!params.ok) return params.response
-    const { q, limit = 10, offset = 0 } = params.data
+export const GET = withDeveloperV1Contract('read', async (context, caller) => {
+  const url = new URL(context.request.url)
+  const params = parseSearchParams(SearchMemoriesQuery, url)
+  if (!params.ok) return params.response
+  const { q, limit = 10, offset = 0 } = params.data
 
-    const result = await getProductMemoryGateway().searchMemories({
-      ...caller.scope,
-      query: q,
-      limit,
-      offset,
-    })
+  const result = await getProductMemoryGateway().searchMemories({
+    ...caller.scope,
+    query: q,
+    limit,
+    offset,
+  })
 
-    const body: SearchMemoriesResponse = {
-      data: result.memories.map((m) => toPublicMemory(m)),
-      query: q,
-      pagination: Pagination.parse({ limit, offset, total: result.total }),
-    }
-    return jsonResponse(body)
-  },
-)
+  const body: SearchMemoriesResponse = {
+    data: result.memories.map((m) => toPublicMemory(m)),
+    query: q,
+    pagination: Pagination.parse({ limit, offset, total: result.total }),
+  }
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // POST /api/v1/developer/memory/search
 // ---------------------------------------------------------------------------
 
-export const POST = withDeveloperV1Contract(
-  'read',
-  async (context, caller) => {
-    const parsed = await parseRequestJson(
-      SearchMemoryRequest,
-      context.request,
-    )
-    if (!parsed.ok) return parsed.response
-    const { q, limit = 10, offset = 0 } = parsed.data
+export const POST = withDeveloperV1Contract('read', async (context, caller) => {
+  const parsed = await parseRequestJson(SearchMemoryRequest, context.request)
+  if (!parsed.ok) return parsed.response
+  const { q, limit = 10, offset = 0 } = parsed.data
 
-    const result = await getProductMemoryGateway().searchMemories({
-      ...caller.scope,
-      query: q,
-      limit,
-      offset,
-    })
+  const result = await getProductMemoryGateway().searchMemories({
+    ...caller.scope,
+    query: q,
+    limit,
+    offset,
+  })
 
-    const body: SearchMemoriesResponse = {
-      data: result.memories.map((m) => toPublicMemory(m)),
-      query: q,
-      pagination: Pagination.parse({ limit, offset, total: result.total }),
-    }
-    return jsonResponse(body)
-  },
-)
+  const body: SearchMemoriesResponse = {
+    data: result.memories.map((m) => toPublicMemory(m)),
+    query: q,
+    pagination: Pagination.parse({ limit, offset, total: result.total }),
+  }
+  return jsonResponse(body)
+})

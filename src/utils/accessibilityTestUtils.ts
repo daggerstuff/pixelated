@@ -181,10 +181,7 @@ export async function checkAccessibilityViolations(
   }
 
   // Run axe analysis
-  const results = await axe.run(
-    container,
-    axeOptions,
-  )
+  const results = await axe.run(container, axeOptions)
 
   // Enhance violations with WCAG criteria
   const enhancedViolations = enhanceViolations(results.violations)

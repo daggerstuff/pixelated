@@ -1,25 +1,25 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { Lightbulb } from "lucide-react";
+import { motion, AnimatePresence } from 'framer-motion'
+import { Lightbulb } from 'lucide-react'
 // Real-time bias indicator component for live feedback
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react'
 
 interface BiasIndicator {
-  type: "demographic" | "cultural" | "linguistic" | "gender" | "age";
-  severity: "low" | "medium" | "high";
-  confidence: number;
-  description: string;
-  suggestion: string;
+  type: 'demographic' | 'cultural' | 'linguistic' | 'gender' | 'age'
+  severity: 'low' | 'medium' | 'high'
+  confidence: number
+  description: string
+  suggestion: string
 }
 
 interface RealTimeBiasIndicatorProps {
-  content: string;
+  content: string
   demographics: {
-    age: string;
-    gender: string;
-    ethnicity: string;
-    primaryLanguage: string;
-  };
-  onBiasUpdate?: (indicators: BiasIndicator[]) => void;
+    age: string
+    gender: string
+    ethnicity: string
+    primaryLanguage: string
+  }
+  onBiasUpdate?: (indicators: BiasIndicator[]) => void
 }
 
 export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
@@ -29,151 +29,161 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
 }) => {
   // Real-time bias analysis
   const biasIndicators = useMemo(() => {
-    if (!content || content.length < 10) return [];
+    if (!content || content.length < 10) return []
 
-    const indicators: BiasIndicator[] = [];
-    const lowerContent = content.toLowerCase();
+    const indicators: BiasIndicator[] = []
+    const lowerContent = content.toLowerCase()
 
     // Demographic bias patterns
     const demographicTerms = [
-      "young people",
-      "elderly",
-      "older adults",
-      "teenagers",
-      "seniors",
-      "boys",
-      "girls",
-      "men",
-      "women",
-      "guys",
-      "ladies",
-    ];
+      'young people',
+      'elderly',
+      'older adults',
+      'teenagers',
+      'seniors',
+      'boys',
+      'girls',
+      'men',
+      'women',
+      'guys',
+      'ladies',
+    ]
 
     const culturalTerms = [
-      "your culture",
-      "your people",
-      "where you come from",
-      "typical for",
-      "in your community",
-      "your background",
-    ];
+      'your culture',
+      'your people',
+      'where you come from',
+      'typical for',
+      'in your community',
+      'your background',
+    ]
 
     const genderBiasTerms = [
-      "emotional",
-      "hysterical",
-      "aggressive",
-      "sensitive",
-      "weak",
-      "provider",
-      "caregiver",
-      "natural",
-      "should be",
-    ];
+      'emotional',
+      'hysterical',
+      'aggressive',
+      'sensitive',
+      'weak',
+      'provider',
+      'caregiver',
+      'natural',
+      'should be',
+    ]
 
     // Check for demographic assumptions
     demographicTerms.forEach((term) => {
       if (lowerContent.includes(term)) {
         indicators.push({
-          type: "demographic",
-          severity: "medium",
+          type: 'demographic',
+          severity: 'medium',
           confidence: 0.75,
           description: `Potential demographic generalization: "${term}"`,
-          suggestion: "Consider using more specific, individual-focused language",
-        });
+          suggestion:
+            'Consider using more specific, individual-focused language',
+        })
       }
-    });
+    })
 
     // Check for cultural bias
     culturalTerms.forEach((term) => {
       if (lowerContent.includes(term)) {
         indicators.push({
-          type: "cultural",
-          severity: "high",
+          type: 'cultural',
+          severity: 'high',
           confidence: 0.85,
           description: `Cultural assumption detected: "${term}"`,
-          suggestion: "Avoid cultural generalizations; focus on individual experiences",
-        });
+          suggestion:
+            'Avoid cultural generalizations; focus on individual experiences',
+        })
       }
-    });
+    })
 
     // Check for gender bias
     genderBiasTerms.forEach((term) => {
       if (lowerContent.includes(term)) {
         indicators.push({
-          type: "gender",
-          severity: "medium",
+          type: 'gender',
+          severity: 'medium',
           confidence: 0.7,
           description: `Potential gender bias: "${term}"`,
-          suggestion: "Use gender-neutral language when possible",
-        });
+          suggestion: 'Use gender-neutral language when possible',
+        })
       }
-    });
+    })
 
     // Language complexity bias
-    const words = content.split(/\s+/);
-    const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+    const words = content.split(/\s+/)
+    const avgWordLength =
+      words.reduce((sum, word) => sum + word.length, 0) / words.length
 
-    if (avgWordLength > 6 && demographics.primaryLanguage !== "en") {
+    if (avgWordLength > 6 && demographics.primaryLanguage !== 'en') {
       indicators.push({
-        type: "linguistic",
-        severity: "low",
+        type: 'linguistic',
+        severity: 'low',
         confidence: 0.6,
-        description: "Complex language may create barriers for non-native speakers",
-        suggestion: "Consider simplifying language for better accessibility",
-      });
+        description:
+          'Complex language may create barriers for non-native speakers',
+        suggestion: 'Consider simplifying language for better accessibility',
+      })
     }
 
     // Age-related bias
     if (
-      demographics.age === "65+" &&
-      (lowerContent.includes("technology") || lowerContent.includes("digital"))
+      demographics.age === '65+' &&
+      (lowerContent.includes('technology') || lowerContent.includes('digital'))
     ) {
       indicators.push({
-        type: "age",
-        severity: "low",
+        type: 'age',
+        severity: 'low',
         confidence: 0.65,
-        description: "Age-related technology assumptions may be present",
-        suggestion: "Avoid assumptions about technology comfort based on age",
-      });
+        description: 'Age-related technology assumptions may be present',
+        suggestion: 'Avoid assumptions about technology comfort based on age',
+      })
     }
 
-    onBiasUpdate?.(indicators);
-    return indicators;
-  }, [content, demographics, onBiasUpdate]);
+    onBiasUpdate?.(indicators)
+    return indicators
+  }, [content, demographics, onBiasUpdate])
 
   const overallScore = useMemo(() => {
-    if (biasIndicators.length === 0) return 100;
+    if (biasIndicators.length === 0) return 100
 
     const totalSeverity = biasIndicators.reduce((sum, indicator) => {
       const severityWeight =
-        indicator.severity === "high" ? 3 : indicator.severity === "medium" ? 2 : 1;
-      return sum + severityWeight * indicator.confidence;
-    }, 0);
+        indicator.severity === 'high'
+          ? 3
+          : indicator.severity === 'medium'
+            ? 2
+            : 1
+      return sum + severityWeight * indicator.confidence
+    }, 0)
 
-    return Math.max(0, 100 - totalSeverity * 10);
-  }, [biasIndicators]);
+    return Math.max(0, 100 - totalSeverity * 10)
+  }, [biasIndicators])
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-neutral-600";
-    if (score >= 60) return "text-neutral-700";
-    return "text-neutral-800";
-  };
+    if (score >= 80) return 'text-neutral-600'
+    if (score >= 60) return 'text-neutral-700'
+    return 'text-neutral-800'
+  }
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-neutral-100";
-    if (score >= 60) return "bg-neutral-200";
-    return "bg-neutral-300";
-  };
+    if (score >= 80) return 'bg-neutral-100'
+    if (score >= 60) return 'bg-neutral-200'
+    return 'bg-neutral-300'
+  }
 
   if (!content || content.length < 10) {
     return (
       <div className="bg-gray-50 rounded-lg p-4">
         <div className="text-gray-500 text-center">
           <div className="text-sm">Real-time Bias Analysis</div>
-          <div className="mt-1 text-xs">Start typing to see live feedback...</div>
+          <div className="mt-1 text-xs">
+            Start typing to see live feedback...
+          </div>
         </div>
       </div>
-    );
+    )
   }
 
   return (
@@ -192,10 +202,10 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
           </div>
           <div className="text-gray-600 text-sm">
             {overallScore >= 80
-              ? "✓ Excellent"
+              ? '✓ Excellent'
               : overallScore >= 60
-                ? "⚠ Needs Review"
-                : "⚠ High Risk"}
+                ? '⚠ Needs Review'
+                : '⚠ High Risk'}
           </div>
         </div>
 
@@ -215,10 +225,10 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
         <motion.div
           className={`h-2 rounded-full transition-all duration-500 ${
             overallScore >= 80
-              ? "bg-neutral-500"
+              ? 'bg-neutral-500'
               : overallScore >= 60
-                ? "bg-neutral-600"
-                : "bg-neutral-700"
+                ? 'bg-neutral-600'
+                : 'bg-neutral-700'
           }`}
           style={{ width: `${overallScore}%` }}
           initial={{ width: 0 }}
@@ -231,11 +241,13 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
         {biasIndicators.length > 0 && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="space-y-2"
           >
-            <div className="text-gray-700 text-sm font-medium">Detected Issues:</div>
+            <div className="text-gray-700 text-sm font-medium">
+              Detected Issues:
+            </div>
             {biasIndicators.map((indicator, index) => (
               <motion.div
                 key={index}
@@ -243,34 +255,36 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className={`rounded-lg border-l-4 p-3 ${
-                  indicator.severity === "high"
-                    ? "bg-neutral-100 border-neutral-500"
-                    : indicator.severity === "medium"
-                      ? "bg-neutral-50 border-neutral-400"
-                      : "bg-neutral-50 border-neutral-300"
+                  indicator.severity === 'high'
+                    ? 'bg-neutral-100 border-neutral-500'
+                    : indicator.severity === 'medium'
+                      ? 'bg-neutral-50 border-neutral-400'
+                      : 'bg-neutral-50 border-neutral-300'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2">
                       <span
-                        className={`rounded-full px-2 py-1 text-xs font-medium bg-neutral-100 text-neutral-700`}
+                        className={`bg-neutral-100 text-neutral-700 rounded-full px-2 py-1 text-xs font-medium`}
                       >
                         {indicator.type}
                       </span>
                       <span
                         className={`text-xs font-medium ${
-                          indicator.severity === "high"
-                            ? "text-neutral-800"
-                            : indicator.severity === "medium"
-                              ? "text-neutral-700"
-                              : "text-neutral-600"
+                          indicator.severity === 'high'
+                            ? 'text-neutral-800'
+                            : indicator.severity === 'medium'
+                              ? 'text-neutral-700'
+                              : 'text-neutral-600'
                         }`}
                       >
                         {indicator.severity.toUpperCase()}
                       </span>
                     </div>
-                    <div className="text-gray-700 mt-1 text-sm">{indicator.description}</div>
+                    <div className="text-gray-700 mt-1 text-sm">
+                      {indicator.description}
+                    </div>
                     <div className="text-gray-600 mt-1 text-xs">
                       <Lightbulb className="h-5 w-5" /> {indicator.suggestion}
                     </div>
@@ -293,7 +307,11 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
           className="bg-neutral-100 border-neutral-200 rounded-lg border p-3"
         >
           <div className="flex items-center space-x-2">
-            <svg className="text-neutral-600 h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg
+              className="text-neutral-600 h-5 w-5"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -310,7 +328,7 @@ export const RealTimeBiasIndicator: React.FC<RealTimeBiasIndicatorProps> = ({
         </motion.div>
       )}
     </motion.div>
-  );
-};
+  )
+}
 
-export default RealTimeBiasIndicator;
+export default RealTimeBiasIndicator

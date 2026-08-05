@@ -132,7 +132,9 @@ const liveDemo = {
           class="inline-block w-2 h-2 np-mid"
           style="background: var(--np-mid);"
           aria-hidden="true"></span>
-        <span class="font-bold np-text tracking-wide">DEMO LIBRARY AVAILABLE</span>
+        <span class="font-bold np-text tracking-wide"
+          >DEMO LIBRARY AVAILABLE</span
+        >
       </div>
 
       <!-- Headline -->
@@ -141,15 +143,18 @@ const liveDemo = {
       </h1>
 
       <!-- Description -->
-      <p class="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed np-muted mb-12">
+      <p
+        class="text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed np-muted mb-12"
+      >
         Explore the product through focused demos covering simulation,
         analytics, privacy, and supporting workflow components. This page is
-        meant to show what exists, not make inflated claims about what does
-        not.
+        meant to show what exists, not make inflated claims about what does not.
       </p>
 
       <!-- CTA -->
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
+      <div
+        class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
+      >
         <button
           id="live-demo-btn"
           class="px-8 py-4 font-bold np-cta np-ring"
@@ -176,7 +181,9 @@ const liveDemo = {
       const liveDemoBtn = document.getElementById('live-demo-btn')
       if (liveDemoBtn) {
         liveDemoBtn.addEventListener('click', function () {
-          const liveDemoSection = document.querySelector('section:nth-of-type(2)')
+          const liveDemoSection = document.querySelector(
+            'section:nth-of-type(2)',
+          )
           if (liveDemoSection) {
             liveDemoSection.scrollIntoView({ behavior: 'smooth' })
           }
@@ -185,7 +192,9 @@ const liveDemo = {
       const modulesBtn = document.getElementById('modules-btn')
       if (modulesBtn) {
         modulesBtn.addEventListener('click', function () {
-          const modulesSection = document.querySelector('section:nth-of-type(3)')
+          const modulesSection = document.querySelector(
+            'section:nth-of-type(3)',
+          )
           if (modulesSection) {
             modulesSection.scrollIntoView({ behavior: 'smooth' })
           }
@@ -261,7 +270,9 @@ const liveDemo = {
                 {Object.entries(demo.stats).map(([key, value]) => (
                   <div class="text-center">
                     <div class="text-lg font-bold np-text">{value}</div>
-                    <div class="text-xs uppercase tracking-wide np-muted">{key}</div>
+                    <div class="text-xs uppercase tracking-wide np-muted">
+                      {key}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -295,22 +306,30 @@ const liveDemo = {
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div class="p-6 text-center" style="background: var(--np-elevated);">
           <div class="text-4xl font-bold np-text">85%</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">Diagnostic Accuracy</div>
+          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+            Diagnostic Accuracy
+          </div>
           <div class="text-xs np-muted mt-2">Average improvement</div>
         </div>
         <div class="p-6 text-center" style="background: var(--np-elevated);">
           <div class="text-4xl font-bold np-text">300%</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">Skill Acquisition</div>
+          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+            Skill Acquisition
+          </div>
           <div class="text-xs np-muted mt-2">Faster than traditional</div>
         </div>
         <div class="p-6 text-center" style="background: var(--np-elevated);">
           <div class="text-4xl font-bold np-text">78%</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">Bias Reduction</div>
+          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+            Bias Reduction
+          </div>
           <div class="text-xs np-muted mt-2">Cultural competency</div>
         </div>
         <div class="p-6 text-center" style="background: var(--np-elevated);">
           <div class="text-4xl font-bold np-text">0</div>
-          <div class="mt-2 np-mid uppercase tracking-wide text-sm">Patient Harm</div>
+          <div class="mt-2 np-mid uppercase tracking-wide text-sm">
+            Patient Harm
+          </div>
           <div class="text-xs np-muted mt-2">Perfect safety record</div>
         </div>
       </div>
@@ -324,8 +343,8 @@ const liveDemo = {
         READY TO REVIEW THE WORKFLOW?
       </h2>
       <p class="text-xl np-muted mb-8">
-        Use the demos to see how the platform handles simulation, feedback,
-        and supporting product surfaces before you talk to us.
+        Use the demos to see how the platform handles simulation, feedback, and
+        supporting product surfaces before you talk to us.
       </p>
       <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
         <a
@@ -351,13 +370,11 @@ const liveDemo = {
         >
         <span
           class="px-3 py-1 font-semibold np-muted"
-          style="border: 1px solid var(--np-line);"
-          >✓ Full support</span
+          style="border: 1px solid var(--np-line);">✓ Full support</span
         >
         <span
           class="px-3 py-1 font-semibold np-muted"
-          style="border: 1px solid var(--np-line);"
-          >✓ Custom integration</span
+          style="border: 1px solid var(--np-line);">✓ Custom integration</span
         >
       </div>
     </div>

@@ -37,11 +37,11 @@ vi.mock('../../logging/logger', () => ({
   }),
 }))
 
+import { createRateLimitResponse, setRateLimitHeaders } from '../middleware'
 import { RateLimitService } from '../RateLimitService'
 import { resetRateLimitService } from '../RateLimitService'
 import { API_TIERS, inferTierFromRateLimit, DEFAULT_TIER } from '../types'
 import type { ApiTier } from '../types'
-import { createRateLimitResponse, setRateLimitHeaders } from '../middleware'
 
 const freeTier = API_TIERS.free
 const devTier = API_TIERS.developer

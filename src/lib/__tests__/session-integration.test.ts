@@ -31,7 +31,10 @@ vi.mock('@/lib/redis', () => ({
 }))
 
 const { mockRedisStore } = vi.hoisted(() => ({
-  mockRedisStore: vi.fn().mockImplementation(function (this: any, options: { client: unknown; prefix: string; ttl: number }) {
+  mockRedisStore: vi.fn().mockImplementation(function (
+    this: any,
+    options: { client: unknown; prefix: string; ttl: number },
+  ) {
     this.client = options.client
     this.prefix = options.prefix
     this.ttl = options.ttl
@@ -94,7 +97,9 @@ describe('Session Persistence Integration (PIX-3755)', () => {
     // Simulate login - session stored
     const sessionKey = 'sess:login-session-abc'
     await mockSetInCache(sessionKey, { userId: 'user-123' })
-    expect(mockSetInCache).toHaveBeenCalledWith(sessionKey, { userId: 'user-123' })
+    expect(mockSetInCache).toHaveBeenCalledWith(sessionKey, {
+      userId: 'user-123',
+    })
 
     // Simulate logout - session destroyed
     mockRedis.del.mockResolvedValue(1)

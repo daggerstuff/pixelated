@@ -177,13 +177,13 @@ describe('breachNotificationSystem Integration Tests', () => {
 
     it('should handle the case when getUserById returns null', async () => {
       mockGetUserById.mockResolvedValue(null)
-       await expect(reportBreach(mockBreach)).resolves.not.toThrow()
+      await expect(reportBreach(mockBreach)).resolves.not.toThrow()
       expect(mockSendEmail).not.toHaveBeenCalled()
     })
 
     it('should handle the case when getUserById returns undefined', async () => {
       mockGetUserById.mockResolvedValue(undefined)
-       await expect(reportBreach(mockBreach)).resolves.not.toThrow()
+      await expect(reportBreach(mockBreach)).resolves.not.toThrow()
       expect(mockSendEmail).not.toHaveBeenCalled()
     })
 
@@ -204,7 +204,7 @@ describe('breachNotificationSystem Integration Tests', () => {
         affectedUsers: ['user1', 'user2'],
       }
 
-       await expect(reportBreach(breachWithMultipleUsers)).resolves.not.toThrow()
+      await expect(reportBreach(breachWithMultipleUsers)).resolves.not.toThrow()
 
       expect(mockSendEmail).toHaveBeenCalledTimes(2)
       expect(mockSendEmail).toHaveBeenCalledWith(
@@ -298,7 +298,7 @@ describe('breachNotificationSystem Integration Tests', () => {
     it('should handle email sending failures', async () => {
       mockSendEmail.mockRejectedValue(new Error('Email error'))
 
-       await expect(reportBreach(mockBreach)).resolves.toBeDefined()
+      await expect(reportBreach(mockBreach)).resolves.toBeDefined()
 
       expect(vi.mocked(logger).error).toHaveBeenCalledWith(
         'Failed to notify user:',

@@ -8,7 +8,12 @@
  * resolves them natively.
  */
 import { describe, it, expect, beforeEach } from 'vitest'
-import { ZKProofService, resetZKProofService, MAX_PROOF_AGE_MS } from '../zk-proof-service'
+
+import {
+  ZKProofService,
+  resetZKProofService,
+  MAX_PROOF_AGE_MS,
+} from '../zk-proof-service'
 import type { ZKProofArtifact } from '../zk-proof-service'
 
 /**
@@ -18,7 +23,7 @@ import type { ZKProofArtifact } from '../zk-proof-service'
  * POST /api/v1/zk/verify endpoint delegates to. The endpoint itself
  * requires authentication middleware (protectRoute) which is tested
  * in the Playwright API security suite.
- * 
+ *
  * Enterprise hardening tests: nonce validation, replay prevention,
  * timestamp freshness, and audit trail structure.
  */

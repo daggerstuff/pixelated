@@ -67,9 +67,9 @@ runs:
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: >-
-          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != ''
-          && format('-{0}', inputs.cache-key-prefix) || ''
-          }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != '' &&
+          format('-{0}', inputs.cache-key-prefix) || '' }}-${{
+          hashFiles('**/pnpm-lock.yaml') }}
         restore-keys: |
           ${{ runner.os }}-pnpm-store${{ inputs.cache-key-prefix != ''
           && format('-{0}', inputs.cache-key-prefix) || '' }}-

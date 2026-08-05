@@ -186,10 +186,7 @@ export function withDeveloperV1Contract(
   handler: DeveloperV1AuthHandler,
 ): (context: DeveloperV1RouteContext) => Promise<Response> {
   return async (context: DeveloperV1RouteContext): Promise<Response> => {
-    const auth = await requireDeveloperMemoryCaller(
-      context.request,
-      operation,
-    )
+    const auth = await requireDeveloperMemoryCaller(context.request, operation)
     if (!auth.ok) return auth.response
 
     try {
