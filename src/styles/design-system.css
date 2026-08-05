@@ -27,11 +27,11 @@
     linear-gradient(180deg, var(--divider-dotted) 1px, transparent 1px);
   --noise-pattern: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
 
-  /* === TYPOGRAPHY SYSTEM === */
-  --font-family-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --font-family-sans: 'Public Sans', system-ui, sans-serif;
-  --font-family-display: 'Fraunces Variable', Georgia, serif;
-  --font-family-label: 'JetBrains Mono Variable', ui-monospace, monospace;
+  /* === TYPOGRAPHY SYSTEM (aliased to np-tokens) === */
+  --font-family-mono: var(--np-font-mono);
+  --font-family-sans: var(--np-font-body);
+  --font-family-display: var(--np-font-display);
+  --font-family-label: var(--np-font-mono);
 
   --font-mono: var(--font-family-mono);
   --font-sans: var(--font-family-sans);
