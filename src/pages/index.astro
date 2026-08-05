@@ -163,8 +163,28 @@ const buildableScenarios = [
       </div>
     </section>
 
+    <!-- Trust strip: credentials and institutional signals -->
+    <section class="np-trust" aria-label="Credentials and standards">
+      <div class="np-container">
+        <p class="np-trust__label">Built for clinical training programs</p>
+        <div class="np-trust__row">
+          <span class="np-trust__badge">HIPAA-ready</span>
+          <span class="np-trust__badge">FERPA-aligned</span>
+          <span class="np-trust__badge">Evidence-based scenarios</span>
+          <span class="np-trust__badge">Accreditation-ready records</span>
+        </div>
+        <div class="np-trust__logos">
+          <img src={withBasePath('/images/client-logo-1.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
+          <img src={withBasePath('/images/client-logo-2.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
+          <img src={withBasePath('/images/client-logo-3.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
+          <img src={withBasePath('/images/client-logo-4.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
+          <img src={withBasePath('/images/client-logo-5.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
+        </div>
+      </div>
+    </section>
+
     <!-- How the training loop works: the one path the product asks you to follow. -->
-    <section class="np-section np-section--track">
+    <section class="np-section np-section--track np-reveal">
       <div class="np-container">
         <div class="np-section-header np-section-header--track">
           <span class="np-label">{workflow.label}</span>
@@ -188,7 +208,7 @@ const buildableScenarios = [
     </section>
 
     <!-- One session, end to end: the actual product shape, walked as an artifact. -->
-    <section class="np-section np-section--artifact">
+    <section class="np-section np-section--artifact np-reveal">
       <div class="np-container">
         <div class="np-section-header">
           <span class="np-label">A session, end to end</span>
@@ -267,8 +287,21 @@ const buildableScenarios = [
       </div>
     </section>
 
+    <!-- Mid-page CTA: the third placement of the primary action, after the
+         strongest proof (the session walkthrough + scenarios). -->
+    <section class="np-cta-band np-reveal" aria-label="Request a demo">
+      <div class="np-container">
+        <a
+          class="np-btn np-btn-primary np-cta-band__btn"
+          href={withBasePath(hero.primaryCTA.href)}
+        >
+          {hero.primaryCTA.text}
+        </a>
+      </div>
+    </section>
+
     <!-- CTA: the one ask. -->
-    <section class="np-cta">
+    <section class="np-cta np-reveal">
       <div class="np-container">
         <div class="np-cta-grid">
           <div class="np-cta-pitch">
@@ -310,4 +343,28 @@ const buildableScenarios = [
       </div>
     </section>
   </div>
+
+  <script>
+    // Scroll-triggered fade-up reveals via IntersectionObserver.
+    // Respects prefers-reduced-motion: CSS handles the override so JS
+    // just needs to add the class — no motion if user opted out.
+    const revealEls = document.querySelectorAll('.np-reveal');
+    if ('IntersectionObserver' in window && revealEls.length > 0) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('np-reveal--in');
+              io.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+      );
+      revealEls.forEach((el) => io.observe(el));
+    } else {
+      // Fallback: show everything immediately.
+      revealEls.forEach((el) => el.classList.add('np-reveal--in'));
+    }
+  </script>
 </BaseLayout>
