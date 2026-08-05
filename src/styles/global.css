@@ -120,15 +120,25 @@ h5,
 h6 {
   font-family: var(--np-font-display);
   margin: 2rem 0 1rem;
-  line-height: var(--leading-tight, 1.2);
-  letter-spacing: -0.02em;
+  line-height: var(--np-leading-headline, 1.15);
+  letter-spacing: var(--np-tracking-display, -0.035em);
   color: var(--text-primary);
 }
 
 h1 {
-  font-size: 2.625rem; /* 42px */
-  font-weight: 700;
-  line-height: 1.16;
+  font-size: var(--np-text-display, 2.625rem);
+  font-weight: var(--np-weight-display, 900);
+  line-height: var(--np-leading-display, 1.05);
+}
+
+h2 {
+  font-size: var(--np-text-headline, 2rem);
+  font-weight: var(--np-weight-headline, 800);
+}
+
+h3 {
+  font-size: var(--np-text-title, 1.125rem);
+  font-weight: var(--np-weight-title, 700);
 }
 
 code,
