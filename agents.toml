@@ -14,15 +14,15 @@ source = "agentmail-to/agentmail-skills"
 
 [[skills]]
 name = "git-lint"
-source = "path:.agents/skills/git-lint"
+source = "path:/home/vivi/.agents/skills/git-lint"
 
 [[skills]]
 name = "git-pull"
-source = "path:.agents/skills/git-pull"
+source = "path:/home/vivi/.agents/skills/git-pull"
 
 [[skills]]
 name = "git-push"
-source = "path:.agents/skills/git-push"
+source = "path:/home/vivi/.agents/skills/git-push"
 
 [[skills]]
 name = "adhd"
@@ -30,7 +30,7 @@ source = "path:.agents/skills/adhd"
 
 [[skills]]
 name = "resolving-merge-conflicts"
-source = "path:.agents/skills/resolving-merge-conflicts"
+source = "path:/home/vivi/.agents/skills/resolving-merge-conflicts"
 
 [[skills]]
 name = "tavily-best-practices"
@@ -66,7 +66,7 @@ source = "path:.agents/skills/tavily-search"
 
 [[skills]]
 name = "wandb-primary"
-source = "path:.agents/skills/wandb-primary"
+source = "path:/home/vivi/.agents/skills/wandb-primary"
 
 [[skills]]
 name = "verify"
