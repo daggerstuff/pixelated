@@ -110,7 +110,12 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-family: var(
+    --np-font-display,
+    'JetBrains Mono Variable',
+    ui-monospace,
+    monospace
+  );
   font-weight: 500;
   max-width: 18ch;
   font-size: clamp(2.25rem, 4.4vw, 3.6rem);
@@ -156,7 +161,12 @@
   padding: 0.92rem 1.4rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  font-family: var(--np-font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-family: var(
+    --np-font-mono,
+    'JetBrains Mono Variable',
+    ui-monospace,
+    monospace
+  );
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -266,7 +276,12 @@
 .marketing-card__label,
 .marketing-list-label,
 .marketing-quote-label {
-  font-family: var(--np-font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-family: var(
+    --np-font-mono,
+    'JetBrains Mono Variable',
+    ui-monospace,
+    monospace
+  );
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.13em;
@@ -275,7 +290,12 @@
 }
 
 .marketing-eyebrow {
-  font-family: var(--np-font-mono, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-family: var(
+    --np-font-mono,
+    'JetBrains Mono Variable',
+    ui-monospace,
+    monospace
+  );
   font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -409,7 +429,12 @@
 .marketing-card h3,
 .marketing-card h4 {
   margin: 0;
-  font-family: var(--np-font-display, 'JetBrains Mono Variable', ui-monospace, monospace);
+  font-family: var(
+    --np-font-display,
+    'JetBrains Mono Variable',
+    ui-monospace,
+    monospace
+  );
   font-weight: 400;
   font-size: clamp(1.18rem, 1.7vw, 1.4rem);
   line-height: 1.18;
