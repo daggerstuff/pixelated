@@ -174,11 +174,36 @@ const buildableScenarios = [
           <span class="np-trust__badge">Accreditation-ready records</span>
         </div>
         <div class="np-trust__logos">
-          <img src={withBasePath('/images/client-logo-1.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
-          <img src={withBasePath('/images/client-logo-2.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
-          <img src={withBasePath('/images/client-logo-3.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
-          <img src={withBasePath('/images/client-logo-4.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
-          <img src={withBasePath('/images/client-logo-5.svg')} alt="" aria-hidden="true" class="np-trust__logo" />
+          <img
+            src={withBasePath('/images/client-logo-1.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-2.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-3.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-4.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-5.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
         </div>
       </div>
     </section>
@@ -350,23 +375,23 @@ const buildableScenarios = [
     // Scroll-triggered fade-up reveals via IntersectionObserver.
     // Respects prefers-reduced-motion: CSS handles the override so JS
     // just needs to add the class — no motion if user opted out.
-    const revealEls = document.querySelectorAll('.np-reveal');
+    const revealEls = document.querySelectorAll('.np-reveal')
     if ('IntersectionObserver' in window && revealEls.length > 0) {
       const io = new IntersectionObserver(
         (entries) => {
           for (const entry of entries) {
             if (entry.isIntersecting) {
-              entry.target.classList.add('np-reveal--in');
-              io.unobserve(entry.target);
+              entry.target.classList.add('np-reveal--in')
+              io.unobserve(entry.target)
             }
           }
         },
         { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
-      );
-      revealEls.forEach((el) => io.observe(el));
+      )
+      revealEls.forEach((el) => io.observe(el))
     } else {
       // Fallback: show everything immediately.
-      revealEls.forEach((el) => el.classList.add('np-reveal--in'));
+      revealEls.forEach((el) => el.classList.add('np-reveal--in'))
     }
   </script>
 </BaseLayout>
