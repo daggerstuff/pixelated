@@ -220,6 +220,7 @@ security-scan-artifacts
 
 # === TEMP & CACHES ===
 .cache
+.hf_cache/
 .local
 .mypy_cache
 .pytest_cache
