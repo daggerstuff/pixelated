@@ -452,7 +452,7 @@
     "gray-matter": "latest",
     "hastscript": "latest",
     "headroom-ai": "^0.22.4",
-    "hono": "^4.12.31",
+    "hono": "^4.12.34",
     "html-entities": "latest",
     "ioredis-mock": "latest",
     "js-base64": "latest",
