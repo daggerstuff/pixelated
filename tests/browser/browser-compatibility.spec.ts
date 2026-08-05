@@ -33,8 +33,9 @@ for (const { url, name } of TEST_URLS) {
     const response = await page.goto(url, { waitUntil: 'domcontentloaded' })
     expect(response?.status()).toBeLessThan(400)
 
-    // Wait for the page to load completely
-    await page.waitForLoadState('networkidle')
+    // Use 'load' instead of 'networkidle' — font/analytics requests can prevent
+    // networkidle from settling within the CI timeout.
+    await page.waitForLoadState('load')
 
     // Check that the page title is not empty
     await page.waitForFunction(
