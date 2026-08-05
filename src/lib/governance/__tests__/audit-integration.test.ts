@@ -26,7 +26,9 @@ vi.mock('../../security/dlp', () => ({
 // Intercept the validator's audit emit so the wiring assertion is reliable
 // regardless of module-instance resolution. The real helper behaviour is
 // covered by the dedicated logGovernanceDecision test below.
-vi.mock('@/lib/audit/log', () => ({ logGovernanceDecision: mocks.logGovernanceDecision }))
+vi.mock('@/lib/audit/log', () => ({
+  logGovernanceDecision: mocks.logGovernanceDecision,
+}))
 
 describe('Audit Integration (governance -> audit trail)', () => {
   beforeEach(() => {

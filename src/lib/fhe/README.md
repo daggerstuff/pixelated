@@ -30,7 +30,8 @@ AI models to process the data.
   - Emotional pattern detection
   - Intervention effectiveness analysis
   - Risk assessment
-- **Encrypted Memory & Session Storage**: Secure storage for therapy session data
+- **Encrypted Memory & Session Storage**: Secure storage for therapy session
+  data
 - **Crisis Detection**: Homomorphic pattern matching for risk assessment
 - **Performance Caching**: Optimized FHE operations with intelligent caching
 

@@ -30,33 +30,30 @@ import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 // GET /api/v1/developer/memory — list
 // ---------------------------------------------------------------------------
 
-export const GET = withDeveloperV1Contract(
-  'read',
-  async (context, caller) => {
-    const url = new URL(context.request.url)
-    const params = parseSearchParams(ListMemoriesQuery, url)
-    if (!params.ok) return params.response
-    const { limit = 10, offset = 0, category, tags } = params.data
+export const GET = withDeveloperV1Contract('read', async (context, caller) => {
+  const url = new URL(context.request.url)
+  const params = parseSearchParams(ListMemoriesQuery, url)
+  if (!params.ok) return params.response
+  const { limit = 10, offset = 0, category, tags } = params.data
 
-    const result = await getProductMemoryGateway().listMemories({
-      ...caller.scope,
+  const result = await getProductMemoryGateway().listMemories({
+    ...caller.scope,
+    limit,
+    offset,
+    category,
+    tags,
+  })
+
+  const body: ListMemoriesResponse = {
+    data: result.memories.map((m) => toPublicMemory(m)),
+    pagination: Pagination.parse({
       limit,
       offset,
-      category,
-      tags,
-    })
-
-    const body: ListMemoriesResponse = {
-      data: result.memories.map((m) => toPublicMemory(m)),
-      pagination: Pagination.parse({
-        limit,
-        offset,
-        total: result.total,
-      }),
-    }
-    return jsonResponse(body)
-  },
-)
+      total: result.total,
+    }),
+  }
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // POST /api/v1/developer/memory — create
@@ -65,10 +62,7 @@ export const GET = withDeveloperV1Contract(
 export const POST = withDeveloperV1Contract(
   'write',
   async (context, caller) => {
-    const parsed = await parseRequestJson(
-      CreateMemoryRequest,
-      context.request,
-    )
+    const parsed = await parseRequestJson(CreateMemoryRequest, context.request)
     if (!parsed.ok) return parsed.response
     const input = parsed.data
 

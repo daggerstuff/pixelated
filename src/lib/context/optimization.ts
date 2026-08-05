@@ -18,12 +18,12 @@
  * wrappers can be dropped in without changing call sites.
  */
 export interface McpConnectionConfig {
-  url: string;
-  description?: string;
-  headers?: Record<string, string>;
+  url: string
+  description?: string
+  headers?: Record<string, string>
   auth?: {
-    getToken: () => Promise<{ token: string }>;
-  };
+    getToken: () => Promise<{ token: string }>
+  }
 }
 
 /**
@@ -31,35 +31,35 @@ export interface McpConnectionConfig {
  */
 export interface LazyConnection<T> {
   /** Returns the underlying resource, initializing it on first call. */
-  get: () => Promise<T>;
+  get: () => Promise<T>
   /** True if the resource has already been initialized. */
-  isLoaded: () => boolean;
+  isLoaded: () => boolean
   /** Drops the cached resource so the next `get()` re-initializes. */
-  unload: () => Promise<void>;
+  unload: () => Promise<void>
   /**
    * Gracefully shut down the resource if it has a `close()` method, then
    * unload it. Awaits any in-flight factory so a still-connecting MCP client
    * is captured and closed rather than leaked.
    */
-  close: () => Promise<void>;
+  close: () => Promise<void>
 }
 
 /**
  * A set of rules organized as a central hub plus agent/topic spokes.
  */
 export interface RuleSet {
-  hub: string;
-  spokes: string[];
+  hub: string
+  spokes: string[]
 }
 
 /**
  * Snapshot of context consumption at a point in time.
  */
 export interface ContextProfile {
-  timestamp: string;
-  totalTokens: number;
-  totalMs?: number;
-  components: Record<string, { tokens: number; ms: number }>;
+  timestamp: string
+  totalTokens: number
+  totalMs?: number
+  components: Record<string, { tokens: number; ms: number }>
 }
 
 /**
@@ -69,15 +69,15 @@ export interface ContextProfile {
  * it is meant for budgeting and profiling, not billing.
  */
 export function estimateTokens(text: string | null | undefined): number {
-  if (!text) return 0;
-  return Math.max(1, Math.ceil(text.length / 4));
+  if (!text) return 0
+  return Math.max(1, Math.ceil(text.length / 4))
 }
 
 /**
  * Tracks consumption against a fixed context-window budget.
  */
 export class ContextBudget {
-  private used = 0;
+  private used = 0
 
   constructor(
     private readonly maxTokens: number,
@@ -86,38 +86,38 @@ export class ContextBudget {
 
   /** Record that `tokens` were consumed. */
   consume(tokens: number): void {
-    this.used += Math.max(0, tokens);
+    this.used += Math.max(0, tokens)
   }
 
   /** Record consumption by estimating tokens from a text fragment. */
   consumeText(text: string | null | undefined): void {
-    this.consume(estimateTokens(text));
+    this.consume(estimateTokens(text))
   }
 
   /** Remaining tokens before the budget is exhausted. */
   remaining(): number {
-    return Math.max(0, this.maxTokens - this.used);
+    return Math.max(0, this.maxTokens - this.used)
   }
 
   /** True if consumption has crossed the warning threshold. */
   isOverThreshold(): boolean {
-    return this.used >= this.maxTokens * this.thresholdPercent;
+    return this.used >= this.maxTokens * this.thresholdPercent
   }
 
   /** Current usage as a percentage of the total budget. */
   usagePercent(): number {
-    if (this.maxTokens <= 0) return 0;
-    return (this.used / this.maxTokens) * 100;
+    if (this.maxTokens <= 0) return 0
+    return (this.used / this.maxTokens) * 100
   }
 
   /** Reset consumption to zero. */
   reset(): void {
-    this.used = 0;
+    this.used = 0
   }
 
   /** Current consumed tokens. */
   get usedTokens(): number {
-    return this.used;
+    return this.used
   }
 }
 
@@ -128,86 +128,91 @@ export class ContextBudget {
  * keeps optional, heavy resources out of the startup context window and
  * avoids establishing network connections that may never be used.
  */
-export function createLazyResource<T>(factory: () => T | Promise<T>): LazyConnection<T> {
-  let cached: T | undefined;
-  let loading: Promise<T> | undefined;
-  let loadGeneration = 0;
-  let closing = false;
+export function createLazyResource<T>(
+  factory: () => T | Promise<T>,
+): LazyConnection<T> {
+  let cached: T | undefined
+  let loading: Promise<T> | undefined
+  let loadGeneration = 0
+  let closing = false
 
   const closeIfCloseable = async (resource: T): Promise<void> => {
-    if (resource != null && typeof (resource as { close?: unknown }).close === "function") {
-      await (resource as unknown as { close: () => Promise<void> }).close();
+    if (
+      resource != null &&
+      typeof (resource as { close?: unknown }).close === 'function'
+    ) {
+      await (resource as unknown as { close: () => Promise<void> }).close()
     }
-  };
+  }
 
   return {
     isLoaded: () => cached !== undefined,
     get: async () => {
-      if (closing) throw new Error("Resource is closing");
-      if (cached !== undefined) return cached;
-      if (loading !== undefined) return loading;
+      if (closing) throw new Error('Resource is closing')
+      if (cached !== undefined) return cached
+      if (loading !== undefined) return loading
 
-      const gen = ++loadGeneration;
+      const gen = ++loadGeneration
       const promise = Promise.resolve(factory())
         .then((resource) => {
           if (loadGeneration !== gen) {
-            void closeIfCloseable(resource);
-            return resource;
+            void closeIfCloseable(resource)
+            return resource
           }
-          cached = resource;
-          return resource;
+          cached = resource
+          return resource
         })
         .catch((err) => {
           if (loadGeneration === gen) {
-            loading = undefined;
+            loading = undefined
           }
-          throw err;
+          throw err
         })
         .finally(() => {
           if (loadGeneration === gen) {
-            loading = undefined;
+            loading = undefined
           }
-        });
+        })
 
-      loading = promise;
-      return loading;
+      loading = promise
+      return loading
     },
     unload: async () => {
-      cached = undefined;
-      loadGeneration++;
-      const currentLoading = loading;
-      loading = undefined;
+      cached = undefined
+      loadGeneration++
+      const currentLoading = loading
+      loading = undefined
       if (currentLoading) {
         try {
-          await currentLoading;
+          await currentLoading
         } catch {
           // ignore errors from the discarded load
         }
       }
     },
     close: async () => {
-      if (closing) return;
-      closing = true;
+      if (closing) return
+      closing = true
 
-      let resource: T | undefined;
+      let resource: T | undefined
       if (loading) {
         try {
-          resource = await loading;
+          resource = await loading
         } catch {
           // Factory failed — nothing to close.
         }
       }
-      resource ??= cached;
+      resource ??= cached
 
       if (resource) {
-        await closeIfCloseable(resource);
+        await closeIfCloseable(resource)
       }
 
-      cached = undefined;
-      loading = undefined;
-      loadGeneration++;
+      cached = undefined
+      loading = undefined
+      loadGeneration++
     },
-  };
+  }
 }
 
 /**
@@ -220,7 +225,7 @@ export function createLazyResource<T>(factory: () => T | Promise<T>): LazyConnec
 export function createLazyMcpConnection<T extends McpConnectionConfig>(
   factory: () => T | Promise<T>,
 ): LazyConnection<T> {
-  return createLazyResource(factory);
+  return createLazyResource(factory)
 }
 
 /**
@@ -231,14 +236,14 @@ export function createLazyMcpConnection<T extends McpConnectionConfig>(
  * be used as an agent instruction body.
  */
 export function loadHubAndSpokeRules(hub: string, spokes: string[]): string {
-  const parts = [`# Hub Rules\n\n${hub.trim()}`];
+  const parts = [`# Hub Rules\n\n${hub.trim()}`]
 
   for (const [index, spoke] of spokes.entries()) {
-    if (!spoke.trim()) continue;
-    parts.push(`# Spoke ${index + 1}\n\n${spoke.trim()}`);
+    if (!spoke.trim()) continue
+    parts.push(`# Spoke ${index + 1}\n\n${spoke.trim()}`)
   }
 
-  return parts.join("\n\n---\n\n");
+  return parts.join('\n\n---\n\n')
 }
 
 /**
@@ -248,64 +253,67 @@ export function loadHubAndSpokeRules(hub: string, spokes: string[]): string {
  * connections, or tool groups dominate the context window.
  */
 export class StartupProfiler {
-  private readonly startTime: number;
-  private readonly components = new Map<string, { tokens: number; ms: number }>();
+  private readonly startTime: number
+  private readonly components = new Map<
+    string,
+    { tokens: number; ms: number }
+  >()
 
   constructor() {
-    this.startTime = performance.now();
+    this.startTime = performance.now()
   }
 
   /** Profile a synchronous initialization step. */
   profile<T>(label: string, fn: () => T): T {
-    const t0 = performance.now();
-    const result = fn();
-    const ms = performance.now() - t0;
-    const tokens = typeof result === "string" ? estimateTokens(result) : 0;
-    this.record(label, tokens, ms);
-    return result;
+    const t0 = performance.now()
+    const result = fn()
+    const ms = performance.now() - t0
+    const tokens = typeof result === 'string' ? estimateTokens(result) : 0
+    this.record(label, tokens, ms)
+    return result
   }
 
   /** Profile an asynchronous initialization step. */
   async profileAsync<T>(label: string, fn: () => Promise<T>): Promise<T> {
-    const t0 = performance.now();
+    const t0 = performance.now()
     try {
-      const result = await fn();
-      const tokens = typeof result === "string" ? estimateTokens(result) : 0;
-      this.record(label, tokens, performance.now() - t0);
-      return result;
+      const result = await fn()
+      const tokens = typeof result === 'string' ? estimateTokens(result) : 0
+      this.record(label, tokens, performance.now() - t0)
+      return result
     } catch (error) {
-      this.record(label, 0, performance.now() - t0);
-      throw error;
+      this.record(label, 0, performance.now() - t0)
+      throw error
     }
   }
 
   /** Profile a static text fragment (e.g. instructions, connection descriptions). */
   profileText(label: string, text: string | null | undefined): number {
-    const tokens = estimateTokens(text);
-    this.record(label, tokens, 0);
-    return tokens;
+    const tokens = estimateTokens(text)
+    this.record(label, tokens, 0)
+    return tokens
   }
 
   private record(label: string, tokens: number, ms: number): void {
-    const existing = this.components.get(label);
+    const existing = this.components.get(label)
     if (existing) {
       this.components.set(label, {
         tokens: existing.tokens + tokens,
         ms: existing.ms + ms,
-      });
+      })
     } else {
-      this.components.set(label, { tokens, ms });
+      this.components.set(label, { tokens, ms })
     }
   }
 
   /** Return a snapshot of current context consumption. */
   report(): ContextProfile {
-    let totalTokens = 0;
-    const componentRecord: Record<string, { tokens: number; ms: number }> = {};
+    let totalTokens = 0
+    const componentRecord: Record<string, { tokens: number; ms: number }> = {}
 
     for (const [label, { tokens, ms }] of this.components.entries()) {
-      totalTokens += tokens;
-      componentRecord[label] = { tokens, ms };
+      totalTokens += tokens
+      componentRecord[label] = { tokens, ms }
     }
 
     return {
@@ -313,12 +321,12 @@ export class StartupProfiler {
       totalTokens,
       totalMs: this.elapsedMs(),
       components: componentRecord,
-    };
+    }
   }
 
   /** Elapsed milliseconds since the profiler was created. */
   elapsedMs(): number {
-    return performance.now() - this.startTime;
+    return performance.now() - this.startTime
   }
 }
 
@@ -329,13 +337,13 @@ export class StartupProfiler {
 export function createLazyMcpClient<T extends { close(): Promise<void> }>(
   factory: () => Promise<T>,
 ): {
-  getClient: () => Promise<T>;
-  close: () => Promise<void>;
+  getClient: () => Promise<T>
+  close: () => Promise<void>
 } {
-  const lazyClient = createLazyResource<T>(factory);
+  const lazyClient = createLazyResource<T>(factory)
 
   return {
     getClient: async () => lazyClient.get(),
     close: async () => lazyClient.close(),
-  };
+  }
 }

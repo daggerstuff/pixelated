@@ -1,16 +1,19 @@
-import { defineAgent } from "eve";
-import { profileAndLogAgentStartup } from "../../lib/context/startup-profiler.js";
+import { defineAgent } from 'eve'
 
-import { AGENT_MODEL_CONTEXT_WINDOW_TOKENS, agentModel } from "./lib/workers-ai.js";
+import { profileAndLogAgentStartup } from '../../lib/context/startup-profiler.js'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from './lib/workers-ai.js'
 
 profileAndLogAgentStartup({
-  agentName: "intake-agent",
+  agentName: 'intake-agent',
   agentDir: import.meta.dirname,
   connectionDescriptions: {
     foresight:
-      "Foresight memory MCP for trainee profiles, cohort assignments, and curriculum progress.",
+      'Foresight memory MCP for trainee profiles, cohort assignments, and curriculum progress.',
   },
-});
+})
 
 export default defineAgent({
   model: agentModel,
@@ -18,4 +21,4 @@ export default defineAgent({
   compaction: {
     thresholdPercent: 0.7,
   },
-});
+})

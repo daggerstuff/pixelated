@@ -1,15 +1,15 @@
-import type { CodegenConfig } from "@graphql-codegen/cli";
+import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  schema: "./src/lib/graphql/schema.graphql",
-  documents: ["./src/lib/graphql/operations/**/*.graphql"],
+  schema: './src/lib/graphql/schema.graphql',
+  documents: ['./src/lib/graphql/operations/**/*.graphql'],
   generates: {
-    "src/lib/graphql/generated/types.ts": {
-      plugins: ["typescript", "typescript-operations"],
+    'src/lib/graphql/generated/types.ts': {
+      plugins: ['typescript', 'typescript-operations'],
       config: {
         scalars: {
-          JSON: "Record<string, unknown>",
-          DateTime: "string",
+          JSON: 'Record<string, unknown>',
+          DateTime: 'string',
         },
         nonOptionalTypename: true,
         skipTypename: false,
@@ -19,6 +19,6 @@ const config: CodegenConfig = {
       },
     },
   },
-};
+}
 
-export default config;
+export default config

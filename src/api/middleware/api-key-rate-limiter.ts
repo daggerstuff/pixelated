@@ -11,60 +11,64 @@
  * the existing IP-based rate limiter).
  */
 
-import type { NextFunction } from "express";
+import type { NextFunction } from 'express'
 
-import { getRedisClient } from "../../lib/database/connection";
-import { asRedisOps } from "../../lib/redis-ops";
+import { getRedisClient } from '../../lib/database/connection'
+import { asRedisOps } from '../../lib/redis-ops'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 type RateLimiterRequest = {
-  ip?: string;
-  socket?: { remoteAddress?: string };
-  headers: Record<string, string | string[] | undefined>;
-  user?: { id?: string };
-  apiKeyId?: string;
-};
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: { id?: string }
+  apiKeyId?: string
+}
 
 type RateLimiterResponse = {
-  set: (name: string, value: string) => RateLimiterResponse;
-  setHeader?: (name: string, value: string) => RateLimiterResponse;
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
   status: (statusCode: number) => {
-    json: (body: unknown) => RateLimiterResponse;
-  };
-  json: (body: unknown) => RateLimiterResponse;
-};
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
 
 export interface RateLimitResult {
-  allowed: boolean;
-  remaining: number;
-  resetTimeMs: number;
+  allowed: boolean
+  remaining: number
+  resetTimeMs: number
 }
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
-const DEFAULT_WINDOW_MS = 60_000; // 60 seconds
-const DEFAULT_MAX_REQUESTS = 1_000;
+const DEFAULT_WINDOW_MS = 60_000 // 60 seconds
+const DEFAULT_MAX_REQUESTS = 1_000
 
 const tooManyRequestsPayload = {
-  error: "Too Many Requests",
-  message: "Rate limit exceeded. Please try again later.",
-};
+  error: 'Too Many Requests',
+  message: 'Rate limit exceeded. Please try again later.',
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function setRateLimitHeader(res: RateLimiterResponse, name: string, value: string): void {
-  if (typeof res.setHeader === "function") {
-    res.setHeader(name, value);
+function setRateLimitHeader(
+  res: RateLimiterResponse,
+  name: string,
+  value: string,
+): void {
+  if (typeof res.setHeader === 'function') {
+    res.setHeader(name, value)
   }
-  if (typeof res.set === "function") {
-    res.set(name, value);
+  if (typeof res.set === 'function') {
+    res.set(name, value)
   }
 }
 
@@ -73,7 +77,7 @@ function setRateLimitHeader(res: RateLimiterResponse, name: string, value: strin
 // ---------------------------------------------------------------------------
 
 export class ApiKeyRateLimiter {
-  private redisAvailable = true;
+  private redisAvailable = true
 
   /**
    * Check whether a request is allowed under the sliding window.
@@ -93,60 +97,60 @@ export class ApiKeyRateLimiter {
     windowMs: number = DEFAULT_WINDOW_MS,
   ): Promise<RateLimitResult> {
     if (!this.redisAvailable) {
-      return { allowed: true, remaining: maxRequests, resetTimeMs: 0 };
+      return { allowed: true, remaining: maxRequests, resetTimeMs: 0 }
     }
 
-    const now = Date.now();
-    const windowStart = now - windowMs;
-    const key = `ratelimit:apikey:${apiKeyId}:${windowMs}`;
+    const now = Date.now()
+    const windowStart = now - windowMs
+    const key = `ratelimit:apikey:${apiKeyId}:${windowMs}`
 
     // Unique member: timestamp + random suffix to avoid collisions
-    const member = `${now}:${Math.random().toString(36).substring(2, 8)}`;
+    const member = `${now}:${Math.random().toString(36).substring(2, 8)}`
 
     try {
-      const redis = getRedisClient();
-      const r = asRedisOps(redis);
+      const redis = getRedisClient()
+      const r = asRedisOps(redis)
 
       // 1. Add current request
-      await r.zadd(key, now, member);
+      await r.zadd(key, now, member)
 
       // 2. Remove entries older than the window
-      await r.zremrangebyscore(key, -Infinity, windowStart);
+      await r.zremrangebyscore(key, -Infinity, windowStart)
 
       // 3. Count remaining entries (zcard after cleanup = current window count)
       //    RedisService doesn't expose zcount, so we use zcard which is
       //    correct because zremrangebyscore just removed all expired entries.
       const rawCount = await (
         redis as unknown as Record<string, unknown> & {
-          zcard?: (k: string) => Promise<number>;
+          zcard?: (k: string) => Promise<number>
         }
-      ).zcard?.(key);
+      ).zcard?.(key)
 
       const count =
-        typeof rawCount === "number"
+        typeof rawCount === 'number'
           ? rawCount
-          : typeof rawCount === "string"
+          : typeof rawCount === 'string'
             ? parseInt(rawCount, 10)
-            : 0;
+            : 0
 
       // Set a TTL on the key so it auto-expires after the window + buffer
-      if (typeof r.expire === "function") {
-        await r.expire(key, Math.ceil(windowMs / 1000) + 10);
+      if (typeof r.expire === 'function') {
+        await r.expire(key, Math.ceil(windowMs / 1000) + 10)
       }
 
-      const remaining = Math.max(0, maxRequests - count);
-      const resetTimeMs = now + windowMs;
+      const remaining = Math.max(0, maxRequests - count)
+      const resetTimeMs = now + windowMs
 
       if (count > maxRequests) {
-        return { allowed: false, remaining: 0, resetTimeMs };
+        return { allowed: false, remaining: 0, resetTimeMs }
       }
 
-      return { allowed: true, remaining, resetTimeMs };
+      return { allowed: true, remaining, resetTimeMs }
     } catch (error: unknown) {
-      console.error("API key rate limiter Redis error:", error);
-      this.redisAvailable = false;
+      console.error('API key rate limiter Redis error:', error)
+      this.redisAvailable = false
       // Fail open
-      return { allowed: true, remaining: maxRequests, resetTimeMs: 0 };
+      return { allowed: true, remaining: maxRequests, resetTimeMs: 0 }
     }
   }
 }
@@ -155,7 +159,7 @@ export class ApiKeyRateLimiter {
 // Singleton
 // ---------------------------------------------------------------------------
 
-export const apiKeyRateLimiter = new ApiKeyRateLimiter();
+export const apiKeyRateLimiter = new ApiKeyRateLimiter()
 
 // ---------------------------------------------------------------------------
 // Express Middleware Factory
@@ -163,9 +167,9 @@ export const apiKeyRateLimiter = new ApiKeyRateLimiter();
 
 export interface ApiKeySlidingWindowOptions {
   /** Window duration in milliseconds (default: 60_000) */
-  windowMs?: number;
+  windowMs?: number
   /** Override max requests (default: uses per-key rate_limit from DB) */
-  maxRequests?: number;
+  maxRequests?: number
 }
 
 /**
@@ -180,46 +184,67 @@ export interface ApiKeySlidingWindowOptions {
  */
 export function apiKeySlidingWindow(
   options: ApiKeySlidingWindowOptions = {},
-): (req: RateLimiterRequest, res: RateLimiterResponse, next: NextFunction) => void {
-  const windowMs = options.windowMs ?? DEFAULT_WINDOW_MS;
+): (
+  req: RateLimiterRequest,
+  res: RateLimiterResponse,
+  next: NextFunction,
+) => void {
+  const windowMs = options.windowMs ?? DEFAULT_WINDOW_MS
 
-  return (req: RateLimiterRequest, res: RateLimiterResponse, next: NextFunction): void => {
-    const apiKeyId = req.apiKeyId;
+  return (
+    req: RateLimiterRequest,
+    res: RateLimiterResponse,
+    next: NextFunction,
+  ): void => {
+    const apiKeyId = req.apiKeyId
     if (!apiKeyId) {
       // No API key ID on request — skip rate limiting
-      next();
-      return;
+      next()
+      return
     }
 
     // Per-key max from DB record, or override, or default
     const maxRequests =
       options.maxRequests ??
-      ((req as Record<string, unknown>)['apiKeyRateLimit'] as number | undefined) ??
-      DEFAULT_MAX_REQUESTS;
+      ((req as Record<string, unknown>)['apiKeyRateLimit'] as
+        | number
+        | undefined) ??
+      DEFAULT_MAX_REQUESTS
 
     void apiKeyRateLimiter
       .checkLimit(apiKeyId, maxRequests, windowMs)
       .then((result) => {
-        setRateLimitHeader(res, "X-RateLimit-Limit", String(maxRequests));
-        setRateLimitHeader(res, "X-RateLimit-Remaining", String(result.remaining));
-        setRateLimitHeader(res, "X-RateLimit-Reset", String(Math.ceil(result.resetTimeMs / 1000)));
+        setRateLimitHeader(res, 'X-RateLimit-Limit', String(maxRequests))
+        setRateLimitHeader(
+          res,
+          'X-RateLimit-Remaining',
+          String(result.remaining),
+        )
+        setRateLimitHeader(
+          res,
+          'X-RateLimit-Reset',
+          String(Math.ceil(result.resetTimeMs / 1000)),
+        )
 
         if (!result.allowed) {
-          const response = res.status(429);
-          if (response && typeof (response as { json?: unknown }).json === "function") {
-            response.json(tooManyRequestsPayload);
+          const response = res.status(429)
+          if (
+            response &&
+            typeof (response as { json?: unknown }).json === 'function'
+          ) {
+            response.json(tooManyRequestsPayload)
           } else {
-            res.json(tooManyRequestsPayload);
+            res.json(tooManyRequestsPayload)
           }
-          return;
+          return
         }
 
-        next();
+        next()
       })
       .catch((error: unknown) => {
-        console.error("API key sliding window middleware error:", error);
+        console.error('API key sliding window middleware error:', error)
         // Fail open
-        next();
-      });
-  };
+        next()
+      })
+  }
 }

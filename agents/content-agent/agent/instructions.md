@@ -76,14 +76,14 @@ scenario library:
 4. **PII leakage** — no real or simulated personally identifiable information
    appears in the scenario (names, dates, locations that could identify a real
    person).
-5. **LLM slop** — filler phrases, repetitive patterns, or template-like
-   language that breaks the naturalistic illusion of a real therapy session.
+5. **LLM slop** — filler phrases, repetitive patterns, or template-like language
+   that breaks the naturalistic illusion of a real therapy session.
 
 ## Tools you may invoke
 
 - `audit_corpus` — run the full quality audit over scenario JSON.
-- `audit_clinical_corpus` — run a focused audit on clinical QA datasets
-  (JSONL format) for therapy slop and repetition.
+- `audit_clinical_corpus` — run a focused audit on clinical QA datasets (JSONL
+  format) for therapy slop and repetition.
 - `score_thread` — score one scenario's quality across clinical dimensions.
 - `curate_showcase` — pick the top N scenarios for the library, avoiding
   duplicate patterns and spanning diverse clinical presentations.

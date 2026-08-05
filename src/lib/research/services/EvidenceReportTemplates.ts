@@ -1,5 +1,6 @@
 import { getLogger } from '@/lib/logging'
 import type { EvidenceReport } from '@/lib/research/types/research-types'
+
 import {
   EvidenceGenerationService,
   type Hypothesis,
