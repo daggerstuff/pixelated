@@ -5,7 +5,7 @@ import { deepMerge } from './deep-merge.js'
 import { isPlainObject } from './is-plain-object.js'
 import { defaultConfigPath, repoConfigPath, userConfigPath } from './paths.js'
 
-export type ConfigSource = 'default' | 'user' | 'repo' | 'cli'
+type ConfigSource = 'default' | 'user' | 'repo' | 'cli'
 
 export interface LoadedConfig {
   config: PxConfig
@@ -120,3 +120,4 @@ export function loadConfigFile(path: string): PxConfig {
   }
   return parsePxConfig(raw)
 }
+
