@@ -7,6 +7,7 @@ import { registerConfigCommand } from './commands/config.js';
 import { registerListCommand } from './commands/list.js';
 import { registerHealthCommand } from './commands/health.js';
 import { registerInitCommand } from './commands/init.js';
+import { registerHookCommand } from './commands/hook.js';
 
 const program = new Command();
 
