@@ -21,7 +21,8 @@ export interface ConfigurationParameters {
   queryParamsStringify?: (params: HTTPQuery) => string; // stringify function for query strings
   username?: string; // parameter for basic security
   password?: string; // parameter for basic security
-  apiKey?: string | Promise<string> | ((name: string) => string | Promise<string>); // parameter for apiKey security
+  apiKey?:
+    string | Promise<string> | ((name: string) => string | Promise<string>); // parameter for apiKey security
   accessToken?:
     | string
     | Promise<string>
@@ -38,7 +39,9 @@ export class Configuration {
   }
 
   get basePath(): string {
-    return this.configuration.basePath != null ? this.configuration.basePath : BASE_PATH;
+    return this.configuration.basePath != null
+      ? this.configuration.basePath
+      : BASE_PATH;
   }
 
   get fetchApi(): FetchAPI | undefined {
@@ -69,10 +72,14 @@ export class Configuration {
     return undefined;
   }
 
-  get accessToken(): ((name?: string, scopes?: string[]) => string | Promise<string>) | undefined {
+  get accessToken():
+    | ((name?: string, scopes?: string[]) => string | Promise<string>)
+    | undefined {
     const accessToken = this.configuration.accessToken;
     if (accessToken) {
-      return typeof accessToken === "function" ? accessToken : async () => accessToken;
+      return typeof accessToken === "function"
+        ? accessToken
+        : async () => accessToken;
     }
     return undefined;
   }
@@ -108,12 +115,18 @@ export class BaseAPI {
     return next;
   }
 
-  withPreMiddleware<T extends BaseAPI>(this: T, ...preMiddlewares: Array<Middleware["pre"]>) {
+  withPreMiddleware<T extends BaseAPI>(
+    this: T,
+    ...preMiddlewares: Array<Middleware["pre"]>
+  ) {
     const middlewares = preMiddlewares.map((pre) => ({ pre }));
     return this.withMiddleware<T>(...middlewares);
   }
 
-  withPostMiddleware<T extends BaseAPI>(this: T, ...postMiddlewares: Array<Middleware["post"]>) {
+  withPostMiddleware<T extends BaseAPI>(
+    this: T,
+    ...postMiddlewares: Array<Middleware["post"]>
+  ) {
     const middlewares = postMiddlewares.map((post) => ({ post }));
     return this.withMiddleware<T>(...middlewares);
   }
@@ -152,18 +165,29 @@ export class BaseAPI {
     initOverrides?: RequestInit | InitOverrideFunction,
   ) {
     let url = this.configuration.basePath + context.path;
-    if (context.query !== undefined && Object.keys(context.query).length !== 0) {
+    if (
+      context.query !== undefined &&
+      Object.keys(context.query).length !== 0
+    ) {
       // only add the querystring to the URL if there are query parameters.
       // this is done to avoid urls ending with a "?" character which buggy webservers
       // do not handle correctly sometimes.
       url += "?" + this.configuration.queryParamsStringify(context.query);
     }
 
-    const headers = Object.assign({}, this.configuration.headers, context.headers);
-    Object.keys(headers).forEach((key) => (headers[key] === undefined ? delete headers[key] : {}));
+    const headers = Object.assign(
+      {},
+      this.configuration.headers,
+      context.headers,
+    );
+    Object.keys(headers).forEach((key) =>
+      headers[key] === undefined ? delete headers[key] : {},
+    );
 
     const initOverrideFn =
-      typeof initOverrides === "function" ? initOverrides : async () => initOverrides;
+      typeof initOverrides === "function"
+        ? initOverrides
+        : async () => initOverrides;
 
     const initParams = {
       method: context.method,
@@ -214,7 +238,10 @@ export class BaseAPI {
     }
     let response: Response | undefined = undefined;
     try {
-      response = await (this.configuration.fetchApi || fetch)(fetchParams.url, fetchParams.init);
+      response = await (this.configuration.fetchApi || fetch)(
+        fetchParams.url,
+        fetchParams.init,
+      );
     } catch (e) {
       for (const middleware of this.middleware) {
         if (middleware.onError) {
@@ -313,7 +340,8 @@ export const COLLECTION_FORMATS = {
 export type FetchAPI = WindowOrWorkerGlobalScope["fetch"];
 
 export type Json = any;
-export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";
+export type HTTPMethod =
+  "GET" | "POST" | "PUT" | "PATCH" | "DELETE" | "OPTIONS" | "HEAD";
 export type HTTPHeaders = { [key: string]: string };
 export type HTTPQuery = {
   [key: string]:
@@ -332,7 +360,8 @@ export type HTTPRequestInit = {
   credentials?: RequestCredentials;
   body?: HTTPBody;
 };
-export type ModelPropertyNaming = "camelCase" | "snake_case" | "PascalCase" | "original";
+export type ModelPropertyNaming =
+  "camelCase" | "snake_case" | "PascalCase" | "original";
 
 export type InitOverrideFunction = (requestContext: {
   init: HTTPRequestInit;
@@ -398,7 +427,10 @@ export function exists(json: any, key: string) {
 }
 
 export function mapValues(data: any, fn: (item: any) => any) {
-  return Object.keys(data).reduce((acc, key) => ({ ...acc, [key]: fn(data[key]) }), {});
+  return Object.keys(data).reduce(
+    (acc, key) => ({ ...acc, [key]: fn(data[key]) }),
+    {},
+  );
 }
 
 export function canConsumeForm(consumes: Consume[]): boolean {
