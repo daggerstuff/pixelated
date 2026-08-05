@@ -10,7 +10,7 @@ export async function invokeAgentTool(
   options: InvokeAgentToolOptions,
 ): Promise<unknown> {
   const url = new URL(
-    `/eve/v1/tools/${encodeURIComponent(options.tool)}`,
+    `/eve/v1/${encodeURIComponent(options.tool)}`,
     options.endpoint,
   )
   const controller = new AbortController()
