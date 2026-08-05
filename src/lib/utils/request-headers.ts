@@ -15,7 +15,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
-function resolveHeaders(source: HeaderSource): HeaderGetter | HeaderRecord | null {
+function resolveHeaders(
+  source: HeaderSource,
+): HeaderGetter | HeaderRecord | null {
   if (!source) {
     return null
   }
@@ -78,7 +80,9 @@ export function getRequestHeader(
   return undefined
 }
 
-export function getRequestHeaderEntries(source: HeaderSource): [string, string][] {
+export function getRequestHeaderEntries(
+  source: HeaderSource,
+): [string, string][] {
   const headers = resolveHeaders(source)
   if (!headers) {
     return []
@@ -108,7 +112,9 @@ export function normalizeRequestHeaders<T extends { headers?: unknown }>(
     return request
   }
 
-  const normalizedHeaders = new Headers(getRequestHeaderEntries(request.headers))
+  const normalizedHeaders = new Headers(
+    getRequestHeaderEntries(request.headers),
+  )
 
   try {
     Object.defineProperty(request, 'headers', {

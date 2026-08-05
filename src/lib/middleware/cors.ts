@@ -1,7 +1,10 @@
 import { defineMiddleware } from 'astro:middleware'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { getRequestHeader, getRequestHeaderEntries } from '../utils/request-headers'
+import {
+  getRequestHeader,
+  getRequestHeaderEntries,
+} from '../utils/request-headers'
 
 const logger = createBuildSafeLogger('default')
 

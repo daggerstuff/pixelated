@@ -5,9 +5,9 @@ import {
   authenticateRequest,
   type AuthOptions,
 } from './lib/auth/auth0-middleware'
+import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
-import { apiVersioningMiddleware } from './lib/middleware/api-versioning'
 import { rateLimitMiddleware } from './lib/middleware/rate-limit'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { tracingMiddleware } from './lib/tracing/middleware'
@@ -57,9 +57,7 @@ const internalRouteGate: MiddlewareHandler = defineMiddleware(
 
 const normalizeRequestHeadersMiddleware: MiddlewareHandler = defineMiddleware(
   (context, next) => {
-    normalizeRequestHeaders(
-      context.request as unknown as { headers?: unknown },
-    )
+    normalizeRequestHeaders(context.request as unknown as { headers?: unknown })
     return next()
   },
 )
