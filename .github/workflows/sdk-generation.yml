@@ -4,15 +4,13 @@ on:
   push:
     branches: [main, staging]
     paths:
-      - 'docs/api-reference/openapi.yaml'
-      - 'docs/api-reference/openapi.json'
+      - 'src/content-store/docs/api-reference/openapi.yaml'
       - 'packages/sdk-typescript/**'
       - 'packages/sdk-python/**'
       - 'scripts/ci/generate-sdks.sh'
   pull_request:
     paths:
-      - 'docs/api-reference/openapi.yaml'
-      - 'docs/api-reference/openapi.json'
+      - 'src/content-store/docs/api-reference/openapi.yaml'
   schedule:
     # Daily at 4 AM UTC
     - cron: '0 4 * * *'
@@ -66,7 +64,7 @@ jobs:
 
       - name: Validate OpenAPI spec
         run: |
-          npx @stoplight/spectral-cli lint docs/api-reference/openapi.yaml \
+          npx @stoplight/spectral-cli lint src/content-store/docs/api-reference/openapi.yaml \
             --ruleset .spectral.yaml --format json > spectral-results.json || true
           echo "Spectral validation complete"
 
