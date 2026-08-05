@@ -118,7 +118,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-display, 'Fraunces Variable', Georgia, serif);
+  font-family: var(--np-font-display);
   margin: 2rem 0 1rem;
   line-height: var(--leading-tight, 1.2);
   letter-spacing: -0.02em;
