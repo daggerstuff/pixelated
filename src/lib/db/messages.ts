@@ -5,13 +5,13 @@ import { updateConversation } from './conversations'
 import { mongoClient } from './mongoClient'
 
 export type Message = Database['public']['Tables']['messages']['Row']
-export type NewMessage = Database['public']['Tables']['messages']['Insert']
-export type UpdateMessage = Database['public']['Tables']['messages']['Update']
+type NewMessage = Database['public']['Tables']['messages']['Insert']
+type UpdateMessage = Database['public']['Tables']['messages']['Update']
 
 /**
  * Get messages for a conversation
  */
-export async function getMessages(
+async function getMessages(
   conversationId: string,
   userId: string,
   limit = 50,
@@ -42,7 +42,7 @@ export async function getMessages(
 /**
  * Create a new message
  */
-export async function createMessage(
+async function createMessage(
   message: NewMessage,
   userId: string,
   request?: Request,
@@ -96,7 +96,7 @@ export async function createMessage(
 /**
  * Update a message (e.g., for flagging content)
  */
-export async function updateMessage(
+async function updateMessage(
   id: string,
   conversationId: string,
   userId: string,
@@ -147,7 +147,7 @@ export async function updateMessage(
 /**
  * Flag a message for review (e.g., harmful content)
  */
-export async function flagMessage(
+async function flagMessage(
   id: string,
   conversationId: string,
   userId: string,
