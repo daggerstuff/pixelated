@@ -1,13 +1,30 @@
-import { Command } from 'commander';
-import { loadConfig } from '../config/loader.js';
-import { formatConfig } from '../output/format.js';
+import type { Command } from 'commander'
+import pc from 'picocolors'
 
-export function registerConfigCommand(program: Command): void {
+import { loadConfig } from '../lib/config-loader.js'
+
+export function registerConfig(program: Command): void {
   program
     .command('config')
-    .description('Show resolved configuration (merged from all sources)')
-    .action(() => {
-      const loaded = loadConfig();
-      console.log(formatConfig(loaded));
-    });
+    .description('Show the resolved px config (merged from all sources)')
+    .option('--sources', 'Include config source paths in output')
+    .action((options: { sources?: boolean }) => {
+      const loaded = loadConfig()
+
+      if (!options.sources) {
+        console.log(JSON.stringify(loaded.config, null, 2))
+        return
+      }
+
+      console.log(
+        JSON.stringify(
+          {
+            config: loaded.config,
+            sources: loaded.sources,
+          },
+          null,
+          2,
+        ),
+      )
+    })
 }

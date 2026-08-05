@@ -16,8 +16,7 @@ const REPO_ROOT = resolve(import.meta.dirname, "..", "..");
 
 // All OpenAPI spec files in the repo (relative to repo root)
 const SPEC_FILES = [
-  "docs/api-reference/openapi.yaml",
-  "docs/api-reference/openapi.json",
+  "src/content-store/docs/api-reference/openapi.yaml",
   "src/pages/docs/api/_openapi.yaml",
   "src/content-store/docs/api/openapi/openapi.yaml",
   "docs/api/memory-v1.openapi.yaml",
