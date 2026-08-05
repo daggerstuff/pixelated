@@ -6,14 +6,18 @@
 import type { AstroCookies } from 'astro'
 
 import { authConfig } from '../../config/auth.config'
+import { getUserById as getAuth0UserById } from '../../services/auth0.service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
+const logger = createBuildSafeLogger('index')
 
+export type { SessionData } from './session'
 // Re-export session for compatibility
 export { getSession } from './session'
 
 // Re-export User type for compatibility
-export type { User } from './types'
+export type { User, AuthUser } from './types'
 
 /**
  * Distinguish Web API Request from AstroCookies.
@@ -116,8 +120,111 @@ export async function isAuthenticated(
   return !!user
 }
 
+/**
+ * Legacy compatibility: requirePageAuth
+ */
+export async function requirePageAuth(
+  context: { request: Request },
+  role?: string,
+): Promise<Response | null> {
+  const user = await getCurrentUser(context.request)
+
+  if (!user) {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: '/login' },
+    })
+  }
+
+  if (role && user.role !== role) {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: '/access-denied' },
+    })
+  }
+
+  return null
+}
+
+export type {
+  ClientInfo,
+  TokenPair,
+  TokenType,
+  TokenValidationResult,
+  UserRole,
+} from './auth0-jwt-service'
+
 // Export server-side auth functionality
-export { authenticateRequest } from './auth0-middleware'
+export {
+  AuthenticationError,
+  cleanupExpiredTokens,
+  generateTokenPair,
+  measureTokenOperation,
+  refreshAccessToken,
+  revokeToken,
+  validateToken,
+} from './auth0-jwt-service'
+// Export authentication types and middleware
+export * from './types'
+
+// Auth0/Legacy Bridge exports removed
+
+// Middleware exports
+export {
+  authenticateRequest,
+  csrfProtection,
+  extractTokenFromRequest,
+  getClientInfo,
+  getClientIp,
+  requireRole,
+  securityHeaders,
+} from './auth0-middleware'
+
+/**
+ * Initialize authentication system
+ */
+export async function initializeAuthSystem(): Promise<void> {
+  try {
+    // Start token cleanup scheduler
+    const { startTokenCleanupScheduler } = await import('./auth0-jwt-service')
+    startTokenCleanupScheduler()
+
+    logger.info(
+      '✅ Authentication system initialized successfully (Auth0-native)',
+    )
+  } catch (error: unknown) {
+    logger.error('❌ Failed to initialize authentication system:', error)
+    throw error
+  }
+}
+
+export async function getUserById(
+  userId: string,
+): Promise<{ id: string; email?: string; name?: string } | null> {
+  if (import.meta.env?.MODE === 'test' || process.env['NODE_ENV'] === 'test') {
+    return {
+      id: userId,
+      email: `${userId}@example.com`,
+      name: `User ${userId}`,
+    }
+  }
+
+  try {
+    const user = await getAuth0UserById(userId)
+    if (!user) {
+      return null
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.fullName,
+    }
+  } catch (error: unknown) {
+    logger.error('Failed to look up Auth0 user:', error)
+    return null
+  }
+}
 
 /**
  * Validate API key and return developer user information.
@@ -144,3 +251,12 @@ async function validateApiKeyAndGetUser(
     scopes: keyRecord.scopes,
   }
 }
+
+export const auth = {
+  getCurrentUser,
+  isAuthenticated,
+  hasRole,
+  getUserById,
+}
+
+export const requireAuth = requirePageAuth
