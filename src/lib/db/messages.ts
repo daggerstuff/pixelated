@@ -1,5 +1,6 @@
 import type { Database } from '../../types/supabase'
 import { createAuditLog, AuditEventType } from '../audit'
+import { getRequestHeader } from '../utils/request-headers'
 import { updateConversation } from './conversations'
 import { mongoClient } from './mongoClient'
 
@@ -84,8 +85,8 @@ export async function createMessage(
       messageId: newMessage._id.toHexString(),
       conversationId: message.conversation_id,
       role: message.role,
-      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
-      userAgent: request?.headers.get('user-agent') ?? undefined,
+      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
+      userAgent: getRequestHeader(request, 'user-agent'),
     },
   )
 
@@ -135,8 +136,8 @@ export async function updateMessage(
       messageId: id,
       conversationId,
       updates,
-      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
-      userAgent: request?.headers.get('user-agent') ?? undefined,
+      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
+      userAgent: getRequestHeader(request, 'user-agent'),
     },
   )
 
