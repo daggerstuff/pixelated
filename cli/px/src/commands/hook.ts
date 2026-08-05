@@ -237,7 +237,7 @@ function extractGitContext(
  * @example
  * matchGlob(['scenarios/foo.yml', 'src/bar.ts'], 'scenarios/**') // true
  * matchGlob(['src/bar.ts'], 'scenarios/**') // false
- * matchGlob(['scenarios/foo.yml', 'bar.clinical.yml'], 'scenarios/**|**/*.clinical.yml') // true
+ * matchGlob(['scenarios/foo.yml', 'bar.clinical.yml'], 'scenarios/**|*.clinical.yml') // true
  */
 function matchGlob(files: string[], pattern: string): boolean {
   // Split on | for multiple patterns
