@@ -2,7 +2,6 @@ import type { Command } from 'commander'
 import pc from 'picocolors'
 
 import { loadConfig } from '../lib/config-loader.js'
-import type { LoadedConfig } from '../lib/config-loader.js'
 
 export function registerConfig(program: Command): void {
   program
@@ -30,4 +29,3 @@ export function registerConfig(program: Command): void {
     })
 }
 
-export type { LoadedConfig }
