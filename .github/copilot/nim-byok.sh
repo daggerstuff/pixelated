@@ -81,8 +81,8 @@ is_forbidden_model() {
 
 # Wire model — exact ID sent to 9Router. Environment can override these
 # values if you need to temporarily switch providers/models.
-export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-groq/openai/gpt-oss-120b}"
-export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-groq/openai/gpt-oss-120b groq/llama-3.3-70b-versatile nvidia/z-ai/glm-5.2 nvidia/deepseek-ai/deepseek-v4-flash nvidia/moonshotai/kimi-k2.6 nvidia/minimaxai/minimax-m2.7}")"
+export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-nvidia/z-ai/glm-5.2}"
+export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-nvidia/z-ai/glm-5.2 groq/llama-3.3-70b-versatile nvidia/deepseek-ai/deepseek-v4-flash nvidia/moonshotai/kimi-k2.6 nvidia/minimaxai/minimax-m3}")"
 export COPILOT_MODEL="$(_nim_byok_sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
 
 # Provider model ID used by Copilot's BYOK wiring.
@@ -106,7 +106,7 @@ echo "  Fallback Provider IDs: ${COPILOT_PROVIDER_MODEL_SEQUENCE}"
 echo "  Tokens:   ${COPILOT_PROVIDER_MAX_PROMPT_TOKENS} prompt / ${COPILOT_PROVIDER_MAX_OUTPUT_TOKENS} output"
 echo ""
 echo "Switch model: export COPILOT_MODEL=<model-id>"
-echo "  GPT OSS:         groq/openai/gpt-oss-120b"
+echo "  GLM 5.2:         nvidia/z-ai/glm-5.2"
 echo "  Llama 3.3 70B:   groq/llama-3.3-70b-versatile"
 echo "  GLM-5.2:         nvidia/z-ai/glm-5.2"
 echo "  DeepSeek V4:     nvidia/deepseek-ai/deepseek-v4-flash"
