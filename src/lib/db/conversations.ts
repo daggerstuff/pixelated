@@ -4,17 +4,14 @@ import { getRequestHeader } from '../utils/request-headers'
 import { mongoClient } from './mongoClient'
 
 export type Conversation = Database['public']['Tables']['conversations']['Row']
-type NewConversation =
-  Database['public']['Tables']['conversations']['Insert']
+type NewConversation = Database['public']['Tables']['conversations']['Insert']
 export type UpdateConversation =
   Database['public']['Tables']['conversations']['Update']
 
 /**
  * Get all conversations for a user
  */
-async function getConversations(
-  userId: string,
-): Promise<Conversation[]> {
+async function getConversations(userId: string): Promise<Conversation[]> {
   const conversations = await mongoClient.db
     .collection('conversations')
     .find({ user_id: userId })
