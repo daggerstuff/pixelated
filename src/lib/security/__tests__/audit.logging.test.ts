@@ -46,7 +46,7 @@ afterEach(() => {
 describe('auditLoggingService', () => {
   describe('logEvent', () => {
     it('should log an event with sanitized details', async () => {
-       await expect(
+      await expect(
         auditLoggingService.logEvent(testEntry),
       ).resolves.not.toThrow()
       expect(infoSpy).toHaveBeenCalled()
@@ -156,7 +156,7 @@ describe('auditLoggingService (real branch coverage)', () => {
 
     const arg = info.mock.calls.at(-1)?.[0] as string
     const parsed = JSON.parse(arg) as { details: Record<string, unknown> }
-      expect(parsed.details['password']).toBe('[REDACTED]')
+    expect(parsed.details['password']).toBe('[REDACTED]')
     expect(parsed.details['token']).toBe('[REDACTED]')
     expect(parsed.details['secret']).toBe('[REDACTED]')
     expect(parsed.details['ssn']).toBe('[REDACTED]')
@@ -306,9 +306,7 @@ describe('auditLoggingService (coverage: levels, unimplemented, factory, dev)', 
   it('logs to debug in development (storeLogEntry dev branch)', async () => {
     process.env['NODE_ENV'] = 'development'
     const svc = new AuditLoggingService(testConfig)
-    const debug = vi
-      .spyOn(console, 'debug')
-      .mockImplementation(() => undefined)
+    const debug = vi.spyOn(console, 'debug').mockImplementation(() => undefined)
     vi.spyOn(console, 'info').mockImplementation(() => undefined)
     vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     vi.spyOn(console, 'error').mockImplementation(() => undefined)
@@ -349,7 +347,6 @@ describe('auditLoggingService (coverage: levels, unimplemented, factory, dev)', 
     expect(info).toHaveBeenCalledWith('Audit logging service cleaned up')
   })
 })
-
 
 describe('auditLoggingService (coverage: no userId / no details branches)', () => {
   it('skips userId hashing when userId is absent', async () => {
@@ -405,6 +402,3 @@ describe('auditLoggingService (coverage: no userId / no details branches)', () =
     expect(info).toHaveBeenCalled()
   })
 })
-
-
-

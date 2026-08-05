@@ -32,7 +32,7 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
         : '→'
 
   return (
-    <div className="border border-white/10 bg-[#121212] p-4">
+    <div className="border-white/10 border bg-[#121212] p-4">
       <div className="mb-3 flex items-baseline justify-between gap-3">
         <h4 className="text-sm font-medium capitalize text-[#f6f1e8]">
           {defense.name.replace('-', ' ')}
@@ -55,7 +55,7 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
               {defense.baselineIntensity.toFixed(1)}/5
             </span>
           </div>
-          <div className="h-2 w-full bg-white/10">
+          <div className="bg-white/10 h-2 w-full">
             <div
               className="h-full bg-[#b0b0b0]"
               style={{ width: `${baselinePercentage}%` }}
@@ -70,7 +70,7 @@ function DefenseBar({ defense }: { defense: DefenseMechanism }) {
               {defense.currentIntensity.toFixed(1)}/5
             </span>
           </div>
-          <div className="h-2 w-full bg-white/10">
+          <div className="bg-white/10 h-2 w-full">
             <div
               className="h-full bg-[#8fb8a2] transition-all duration-300"
               style={{ width: `${currentPercentage}%` }}
@@ -133,7 +133,7 @@ function DefenseRadar({ defenses }: { defenses: DefenseMechanism[] }) {
   })
 
   return (
-    <div className="border border-white/10 bg-[#121212] p-4">
+    <div className="border-white/10 border bg-[#121212] p-4">
       <h3 className="mb-3 font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
         Defense pattern overview
       </h3>

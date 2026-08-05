@@ -1,18 +1,14 @@
 /* @vitest-environment node */
 import { subtle } from 'crypto'
 
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-} from 'vitest'
-
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import type { MockInstance } from 'vitest'
 
-import { buildVapidJwt, ExpiredSubscriptionError, sendNotification } from '../pushUtils'
+import {
+  buildVapidJwt,
+  ExpiredSubscriptionError,
+  sendNotification,
+} from '../pushUtils'
 
 const mockFetch = vi.fn<typeof fetch>()
 
@@ -26,7 +22,9 @@ describe('pushUtils', () => {
     vi.clearAllMocks()
     globalThis.fetch = mockFetch
 
-    importKeySpy = vi.spyOn(subtle, 'importKey').mockResolvedValue({} as CryptoKey)
+    importKeySpy = vi
+      .spyOn(subtle, 'importKey')
+      .mockResolvedValue({} as CryptoKey)
     signSpy = vi.spyOn(subtle, 'sign').mockResolvedValue(new ArrayBuffer(8))
   })
 
@@ -116,11 +114,15 @@ describe('pushUtils', () => {
     })
 
     it('should throw when the endpoint is an invalid URL', async () => {
-      await expect(buildVapidJwt('not a valid url', vapidKeys)).rejects.toThrow()
+      await expect(
+        buildVapidJwt('not a valid url', vapidKeys),
+      ).rejects.toThrow()
     })
 
     it('should throw when the endpoint is missing a protocol', async () => {
-      await expect(buildVapidJwt('push.example.com/push', vapidKeys)).rejects.toThrow()
+      await expect(
+        buildVapidJwt('push.example.com/push', vapidKeys),
+      ).rejects.toThrow()
     })
 
     it('should throw when the endpoint is an empty string', async () => {
@@ -163,7 +165,9 @@ describe('pushUtils', () => {
         'Authorization': expect.stringContaining('vapid t=') as string,
       })
 
-      const authHeader = (init!.headers as Record<string, string>)['Authorization']
+      const authHeader = (init!.headers as Record<string, string>)[
+        'Authorization'
+      ]
       expect(authHeader).toContain(`k=${vapidKeys.publicKey}`)
 
       expect(init?.body).toBeInstanceOf(Uint8Array)
@@ -207,12 +211,17 @@ describe('pushUtils', () => {
 
     it('should throw a generic error for other non-ok responses', async () => {
       mockFetch.mockResolvedValueOnce(
-        new Response(null, { status: 500, statusText: 'Internal Server Error' }),
+        new Response(null, {
+          status: 500,
+          statusText: 'Internal Server Error',
+        }),
       )
 
       await expect(
         sendNotification(subscription, payload, vapidKeys),
-      ).rejects.toThrow('Failed to send push notification: 500 Internal Server Error')
+      ).rejects.toThrow(
+        'Failed to send push notification: 500 Internal Server Error',
+      )
     })
 
     it('should include the encoded payload in the request body', async () => {
@@ -239,7 +248,9 @@ describe('pushUtils', () => {
       const afterCall = Math.floor(Date.now() / 1000)
 
       const init = mockFetch.mock.calls[0][1] as RequestInit
-      const authHeader = (init!.headers as Record<string, string>)['Authorization']
+      const authHeader = (init!.headers as Record<string, string>)[
+        'Authorization'
+      ]
       const jwtMatch = authHeader.match(/vapid t=([^,]+),/)
       expect(jwtMatch).toBeTruthy()
       const jwt = jwtMatch![1]

@@ -80,9 +80,9 @@ describe('security-baseline.json policy invariants', () => {
   })
 
   it('declares at least 2 SAST tools', () => {
-    expect(baseline.baseline.vulnerability_scanning.sast_tools.length).toBeGreaterThanOrEqual(
-      2,
-    )
+    expect(
+      baseline.baseline.vulnerability_scanning.sast_tools.length,
+    ).toBeGreaterThanOrEqual(2)
   })
 
   it('includes HIPAA and GDPR in compliance standards', () => {

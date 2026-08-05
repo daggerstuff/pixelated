@@ -4,14 +4,18 @@
   "description": "Auto-generated TypeScript SDK for the Pixelated Empathy API (generated from OpenAPI spec)",
   "keywords": [
     "api",
+    "auto-generated",
     "empathy",
-    "pixelated",
-    "sdk",
     "openapi",
-    "auto-generated"
+    "pixelated",
+    "sdk"
   ],
   "license": "MIT",
   "author": "Pixelated Empathy",
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,10 +25,10 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist generated",
@@ -32,9 +36,5 @@
   },
   "devDependencies": {
     "typescript": "~5.7.3"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org"
   }
 }

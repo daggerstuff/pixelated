@@ -488,7 +488,8 @@ describe('SDK Contract Tests', () => {
   })
 
   describe('Developer Memory Endpoints', () => {
-    const developerBase = 'https://api.pixelatedempathy.com/api/v1/developer/memory'
+    const developerBase =
+      'https://api.pixelatedempathy.com/api/v1/developer/memory'
 
     it('developer.memory.storeMemory should POST to /api/v1/developer/memory', async () => {
       mockFetch.mockResolvedValueOnce({

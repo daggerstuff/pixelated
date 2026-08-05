@@ -40,8 +40,14 @@ export async function generateVAPIDKeys(): Promise<{
     ['sign', 'verify'],
   )
 
-  const publicKey = (await subtle.exportKey('raw', keyPair.publicKey)) as ArrayBuffer
-  const privateKey = (await subtle.exportKey('pkcs8', keyPair.privateKey)) as ArrayBuffer
+  const publicKey = (await subtle.exportKey(
+    'raw',
+    keyPair.publicKey,
+  )) as ArrayBuffer
+  const privateKey = (await subtle.exportKey(
+    'pkcs8',
+    keyPair.privateKey,
+  )) as ArrayBuffer
 
   return {
     publicKey: uint8ArrayToBase64(new Uint8Array(publicKey)),
@@ -54,7 +60,8 @@ export async function buildVapidJwt(
   vapidKeys: { privateKey: string },
   options: VapidJwtOptions = {},
 ): Promise<string> {
-  const { sub = 'mailto:admin@example.com', ttlSeconds = 12 * 60 * 60 } = options
+  const { sub = 'mailto:admin@example.com', ttlSeconds = 12 * 60 * 60 } =
+    options
 
   // Import VAPID private key
   const privateKeyData = base64ToUint8Array(vapidKeys.privateKey)

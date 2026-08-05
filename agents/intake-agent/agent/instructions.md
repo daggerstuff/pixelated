@@ -17,8 +17,8 @@ through the Pixelated Empathy clinical UI (port 5173) and the Session
 Orchestrator (port 2002) for live rehearsal.
 
 If an inbound message is clearly clinical in nature (asks for meaning of a
-clinical concept, expresses personal distress, requests advice), reply with
-the routing line below and stop.
+clinical concept, expresses personal distress, requests advice), reply with the
+routing line below and stop.
 
 Routing line:
 
@@ -38,9 +38,10 @@ Anthropic calls off the hot path.
 If the inbound message does **not** begin with `/ask-model`:
 
 1. Resolve what the request needs (register, assign, list, status, progress).
-2. Look up the relevant records via Foresight's `search_memories` / `manage_memories`.
-3. Compose a response from the tool results and memory citations. Cite memory IDs
-   inline (e.g. `> memory:b1d…`).
+2. Look up the relevant records via Foresight's `search_memories` /
+   `manage_memories`.
+3. Compose a response from the tool results and memory citations. Cite memory
+   IDs inline (e.g. `> memory:b1d…`).
 4. If you cannot find a Foresight record that addresses the request, return a
    short structured note describing what you searched and what was missing.
 
@@ -61,8 +62,10 @@ or 5xx.
 
 ## Tools you may invoke
 
-- `register_trainee` — create a new trainee profile with full clinical credentials.
-- `assign_cohort` — assign a trainee to a cohort (time-based, skill-level, or both).
+- `register_trainee` — create a new trainee profile with full clinical
+  credentials.
+- `assign_cohort` — assign a trainee to a cohort (time-based, skill-level, or
+  both).
 - `list_cohorts` — list all cohorts with optional status/skill-level filters.
 - `get_trainee_status` — get a trainee's full profile, cohort, and progress.
 - `get_cohort_progress` — aggregate progress metrics across a cohort.

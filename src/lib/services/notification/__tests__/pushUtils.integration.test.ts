@@ -1,7 +1,6 @@
 /* @vitest-environment node */
 import { http } from 'msw'
 import { setupServer } from 'msw/node'
-
 import {
   describe,
   it,
@@ -84,7 +83,9 @@ describe('sendNotification integration (MSW)', () => {
     await sendNotification(subscription, payload, vapidKeys)
 
     expect(lastRequest).toBeTruthy()
-    expect(lastRequest!.headers.get('Content-Type')).toBe('application/octet-stream')
+    expect(lastRequest!.headers.get('Content-Type')).toBe(
+      'application/octet-stream',
+    )
     expect(lastRequest!.headers.get('Content-Encoding')).toBe('aes128gcm')
     expect(lastRequest!.headers.get('TTL')).toBe('43200')
   })
@@ -144,7 +145,9 @@ describe('sendNotification integration (MSW)', () => {
 
     await expect(
       sendNotification(subscription, payload, vapidKeys),
-    ).rejects.toThrow('Failed to send push notification: 500 Internal Server Error')
+    ).rejects.toThrow(
+      'Failed to send push notification: 500 Internal Server Error',
+    )
   })
 
   it('should propagate errors when the push service is unreachable', async () => {

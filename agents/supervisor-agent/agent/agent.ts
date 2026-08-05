@@ -1,17 +1,20 @@
-import { defineAgent } from "eve";
-import { profileAndLogAgentStartup } from "../../lib/context/startup-profiler.js";
+import { defineAgent } from 'eve'
 
-import { AGENT_MODEL_CONTEXT_WINDOW_TOKENS, agentModel } from "./lib/workers-ai.js";
+import { profileAndLogAgentStartup } from '../../lib/context/startup-profiler.js'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from './lib/workers-ai.js'
 
 profileAndLogAgentStartup({
-  agentName: "supervisor-agent",
+  agentName: 'supervisor-agent',
   agentDir: import.meta.dirname,
   connectionDescriptions: {
     foresight:
-      "Foresight memory MCP for cross-agent queries: session QA scores, " +
-      "cohort trends, trainee records, clinical boundary flags, and training provenance.",
+      'Foresight memory MCP for cross-agent queries: session QA scores, ' +
+      'cohort trends, trainee records, clinical boundary flags, and training provenance.',
   },
-});
+})
 
 export default defineAgent({
   model: agentModel,
@@ -19,4 +22,4 @@ export default defineAgent({
   compaction: {
     thresholdPercent: 0.7,
   },
-});
+})

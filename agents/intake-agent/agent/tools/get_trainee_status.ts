@@ -48,7 +48,9 @@ export default defineTool({
             sessionIds.push(parsed.trainee_id)
           }
         }
-      } catch { /* skip unparseable */ }
+      } catch {
+        /* skip unparseable */
+      }
     }
 
     // Fetch session IDs from session records (tag-based query)
@@ -62,7 +64,9 @@ export default defineTool({
         try {
           const parsed = JSON.parse(m.content) as { session_id?: string }
           return parsed.session_id ?? null
-        } catch { return null }
+        } catch {
+          return null
+        }
       })
       .filter(Boolean)
 
@@ -72,7 +76,9 @@ export default defineTool({
       profile,
       cohort,
       curriculum: {
-        completed_steps: curriculumSteps.filter((s) => (s as Record<string, unknown>).status === 'COMPLETED').length,
+        completed_steps: curriculumSteps.filter(
+          (s) => (s as Record<string, unknown>).status === 'COMPLETED',
+        ).length,
         total_steps: curriculumSteps.length,
         steps: curriculumSteps,
       },

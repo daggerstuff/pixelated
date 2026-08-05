@@ -99,7 +99,12 @@ export type {
 // sp1-prover exports removed from barrel — it uses node:crypto and must not
 // be pulled into the client bundle. SSR-only consumers import directly:
 //   import { getSP1Prover } from '@/lib/fhe/sp1-prover'
-export type { ProofMode, SP1ProofRequest, SP1ProofResult, SP1VerifyResult } from './sp1-prover'
+export type {
+  ProofMode,
+  SP1ProofRequest,
+  SP1ProofResult,
+  SP1VerifyResult,
+} from './sp1-prover'
 
 // zk-proof-service is also SSR-only — it transitively imports sp1-prover and
 // therefore node:crypto / node:child_process / node:fs / node:path, none of

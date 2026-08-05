@@ -8,6 +8,7 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getEncryptedTextProcessor } from './encrypted-text-processor'
 import { SealResourceScope } from './seal-memory'
 import type { SealOperations } from './seal-operations'
 import { SealService } from './seal-service'
@@ -17,7 +18,6 @@ import type { SealOperationResult } from './seal-types'
 import type { SealContextOptions } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
 import type { HomomorphicOperationResult } from './types'
-import { getEncryptedTextProcessor } from './encrypted-text-processor'
 
 // Get logger
 const logger = createBuildSafeLogger('homomorphic-ops')
@@ -670,25 +670,30 @@ export class HomomorphicOperations {
     const textProcessor = getEncryptedTextProcessor()
     if (textProcessor.isAvailable()) {
       const plaintextForEncoding = decodedData
-      let encResult:
-        | { result: string; operation: FHEOperation; fullyHomomorphic: boolean; metadata: Record<string, unknown> }
-        | null = null
+      let encResult: {
+        result: string
+        operation: FHEOperation
+        fullyHomomorphic: boolean
+        metadata: Record<string, unknown>
+      } | null = null
 
       try {
         switch (operation) {
           case FHEOperation.SENTIMENT:
-            encResult = await textProcessor.encryptedSentiment(plaintextForEncoding)
+            encResult =
+              await textProcessor.encryptedSentiment(plaintextForEncoding)
             break
           case FHEOperation.CATEGORIZE:
-            encResult = await textProcessor.encryptedCategorize(
-              plaintextForEncoding,
-            )
+            encResult =
+              await textProcessor.encryptedCategorize(plaintextForEncoding)
             break
           case FHEOperation.WORD_COUNT:
-            encResult = await textProcessor.encryptedWordCount(plaintextForEncoding)
+            encResult =
+              await textProcessor.encryptedWordCount(plaintextForEncoding)
             break
           case FHEOperation.CHARACTER_COUNT:
-            encResult = await textProcessor.encryptedCharacterCount(plaintextForEncoding)
+            encResult =
+              await textProcessor.encryptedCharacterCount(plaintextForEncoding)
             break
           case FHEOperation.KEYWORD_DENSITY:
             encResult = await textProcessor.encryptedKeywordDensity(
@@ -697,7 +702,8 @@ export class HomomorphicOperations {
             )
             break
           case FHEOperation.TOKENIZE:
-            encResult = await textProcessor.encryptedTokenize(plaintextForEncoding)
+            encResult =
+              await textProcessor.encryptedTokenize(plaintextForEncoding)
             break
           case FHEOperation.FILTER:
             encResult = await textProcessor.encryptedFilter(
@@ -712,7 +718,8 @@ export class HomomorphicOperations {
             )
             break
           case FHEOperation.READING_LEVEL:
-            encResult = await textProcessor.encryptedReadingLevel(plaintextForEncoding)
+            encResult =
+              await textProcessor.encryptedReadingLevel(plaintextForEncoding)
             break
           case FHEOperation.Addition:
           case FHEOperation.Subtraction:
@@ -752,7 +759,10 @@ export class HomomorphicOperations {
       } catch (encError) {
         logger.warn(
           `Encrypted text processor failed for ${operation}, falling back to simulation`,
-          { error: encError instanceof Error ? encError.message : String(encError) },
+          {
+            error:
+              encError instanceof Error ? encError.message : String(encError),
+          },
         )
       }
     }
