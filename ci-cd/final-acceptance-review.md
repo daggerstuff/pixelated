@@ -1,8 +1,7 @@
 # Final Acceptance Review — CI Federation Gates
 
-**Date:** 2026-07-30
-**Reviewer:** Chad
-**Project:** CI Federation & Release Readiness (PIX-1875)
+**Date:** 2026-07-30 **Reviewer:** Chad **Project:** CI Federation & Release
+Readiness (PIX-1875)
 
 ---
 
@@ -51,21 +50,27 @@
 ### ✅ Active Gates (block on failure)
 
 - `actionlint.yml` — blocks on workflow YAML errors (exit code propagated)
-- `migration-validation.yml` — blocks on migration failure (dry-run + forward + rollback tests)
+- `migration-validation.yml` — blocks on migration failure (dry-run + forward +
+  rollback tests)
 - `openapi-validation.yml` — blocks on invalid API specs
 
 ### ⚠️ Soft Gates (continue-on-error)
 
-- `ci.yml` — **all steps use `continue-on-error: true`** including lint, tests, and Trivy scan. The security gate step warns but does not fail the job. Lint/test failures and
+- `ci.yml` — **all steps use `continue-on-error: true`** including lint, tests,
+  and Trivy scan. The security gate step warns but does not fail the job.
+  Lint/test failures and
   - CRITICAL/HIGH vulnerabilities are logged but do not block PRs or deploys.
-- **Impact:** CI federations's primary `ci.yml` gate is advisory-only. Consider removing `continue-on-error: true` on critical steps (unit tests, security gate) to enforce
+- **Impact:** CI federations's primary `ci.yml` gate is advisory-only. Consider
+  removing `continue-on-error: true` on critical steps (unit tests, security
+  gate) to enforce
   - actual gating.
 
 ### ✅ Consolidated Workflows (completed)
 
 - `codeql.yml` → merged into `security.yml` ✅
 - `security-scanning.yml` → merged into `security.yml`, deprecated ✅
-- `ci-cd/bitbucket-pipelines.yaml` → consolidated into root `bitbucket-pipelines.yml`, removed ✅
+- `ci-cd/bitbucket-pipelines.yaml` → consolidated into root
+  `bitbucket-pipelines.yml`, removed ✅
 
 ---
 
@@ -104,4 +109,5 @@
 - AI validation pipeline: `ai-validation.yml` (scheduled daily + manual trigger)
 - Bitbucket AI lane: `bitbucket-pipelines.yml` (root) with path conditions
 
-**Escalation contacts:** Not yet documented. Should include DevOps lead for CI federation gates, AI team lead for AI validation pipeline.
+**Escalation contacts:** Not yet documented. Should include DevOps lead for CI
+federation gates, AI team lead for AI validation pipeline.

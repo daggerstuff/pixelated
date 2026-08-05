@@ -119,11 +119,11 @@ export function createEnhancedFHEService(
 
     // Batch operations
     encryptBatch: async (values: unknown[]): Promise<EncryptedData[]> => {
-      return baseService.encryptBatch(values);
+      return baseService.encryptBatch(values)
     },
 
     decryptBatch: async <T>(ciphertexts: EncryptedData<T>[]): Promise<T[]> => {
-      return baseService.decryptBatch(ciphertexts);
+      return baseService.decryptBatch(ciphertexts)
     },
 
     // Additional methods specific to enhanced service

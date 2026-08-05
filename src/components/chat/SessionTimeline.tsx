@@ -89,7 +89,7 @@ function MetricTrend({
     .join(' ')
 
   return (
-    <div className="border border-white/10 bg-[#121212] p-3">
+    <div className="border-white/10 border bg-[#121212] p-3">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
           {label}
@@ -206,7 +206,7 @@ export function SessionTimeline({
             <select
               value={session.id}
               onChange={(event) => setSelectedSessionId(event.target.value)}
-              className="ml-2 border border-white/20 bg-[#121212] px-2 py-1 text-sm text-[#f6f1e8] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+              className="border-white/20 ml-2 border bg-[#121212] px-2 py-1 text-sm text-[#f6f1e8] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
             >
               {sessions.map((candidate) => (
                 <option key={candidate.id} value={candidate.id}>
@@ -236,13 +236,13 @@ export function SessionTimeline({
         />
       </div>
 
-      <div className="mb-5 border border-white/10 bg-[#121212] p-4">
+      <div className="border-white/10 mb-5 border bg-[#121212] p-4">
         <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
           Turn timeline
         </h3>
         {session.events.length > 0 ? (
           <ol
-            className="relative mt-4 border-l border-white/15 pl-5"
+            className="border-white/15 relative mt-4 border-l pl-5"
             aria-label={`${session.label} events by turn`}
           >
             {session.events.map((event) => (
@@ -272,7 +272,7 @@ export function SessionTimeline({
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
-        <div className="border border-white/10 bg-[#121212] p-4">
+        <div className="border-white/10 border bg-[#121212] p-4">
           <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
             Belief changes
           </h3>
@@ -299,7 +299,7 @@ export function SessionTimeline({
             )}
           </ul>
         </div>
-        <div className="border border-white/10 bg-[#121212] p-4">
+        <div className="border-white/10 border bg-[#121212] p-4">
           <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
             Goal attainment scaling
           </h3>
@@ -333,7 +333,7 @@ export function SessionTimeline({
                       ),
                     )
                   }
-                  className="border border-white/20 bg-[#0a0a0a] px-2 py-1 font-mono text-xs text-[#f6f1e8] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                  className="border-white/20 border bg-[#0a0a0a] px-2 py-1 font-mono text-xs text-[#f6f1e8] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
                 >
                   {([-2, -1, 0, 1, 2] as const).map((score) => (
                     <option key={score} value={score}>
@@ -360,7 +360,7 @@ export function SessionTimeline({
                   }
                 }}
                 placeholder="Add a session goal"
-                className="min-w-0 flex-1 border border-white/20 bg-[#0a0a0a] px-2 py-1 text-sm text-[#f6f1e8] placeholder:text-[#b0b0b0] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
+                className="border-white/20 min-w-0 flex-1 border bg-[#0a0a0a] px-2 py-1 text-sm text-[#f6f1e8] placeholder:text-[#b0b0b0] focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-[#ff8533]"
               />
               <button
                 type="button"
@@ -375,7 +375,7 @@ export function SessionTimeline({
       </div>
 
       {sessions.length > 1 && (
-        <div className="mt-5 border border-white/10 bg-[#121212] p-4">
+        <div className="border-white/10 mt-5 border bg-[#121212] p-4">
           <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
             Multi-session progression
           </h3>
@@ -383,7 +383,7 @@ export function SessionTimeline({
             {sessions.map((candidate) => (
               <article
                 key={candidate.id}
-                className="border border-white/10 p-3"
+                className="border-white/10 border p-3"
               >
                 <h4 className="text-sm font-medium text-[#f6f1e8]">
                   {candidate.label}

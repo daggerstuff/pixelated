@@ -60,7 +60,7 @@ jobs:
           echo "old=$OLD" >> $GITHUB_OUTPUT
           echo "new=$NEW" >> $GITHUB_OUTPUT
 
-      - name: "Pre-flight: verify WORKFLOW_PAT secret exists"
+      - name: 'Pre-flight: verify WORKFLOW_PAT secret exists'
         id: preflight
         if: steps.update.outputs.changed == 'true'
         run: |
@@ -76,7 +76,9 @@ jobs:
           fi
 
       - name: Create Pull Request
-        if: steps.update.outputs.changed == 'true' && steps.preflight.outputs.has_pat == 'true'
+        if:
+          steps.update.outputs.changed == 'true' &&
+          steps.preflight.outputs.has_pat == 'true'
         uses: peter-evans/create-pull-request@v8
         with:
           # Use WORKFLOW_PAT (not GITHUB_TOKEN) so the push is authorized
@@ -84,9 +86,11 @@ jobs:
           # above for setup instructions.
           token: ${{ secrets.WORKFLOW_PAT }}
           commit-message:
-            'chore: bump kubectl fallback version from ${{ steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
+            'chore: bump kubectl fallback version from ${{
+            steps.update.outputs.old }} to ${{ steps.update.outputs.new }}'
           title:
-            'chore: update kubectl pinned fallback version to ${{ steps.update.outputs.new }}'
+            'chore: update kubectl pinned fallback version to ${{
+            steps.update.outputs.new }}'
           body: |
             A new kubectl stable version has been released: **${{ steps.update.outputs.new }}**
 

@@ -18,14 +18,14 @@
  * for reduction, polynomial for comparison approximation.
  */
 
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
-import { SealOperations } from "./seal-operations";
-import { SealService } from "./seal-service";
-import type { SealCipherText } from "./seal-service";
-import { SealSchemeType } from "./seal-types";
-import { FHEOperation } from "./types";
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { SealOperations } from './seal-operations'
+import { SealService } from './seal-service'
+import type { SealCipherText } from './seal-service'
+import { SealSchemeType } from './seal-types'
+import { FHEOperation } from './types'
 
-const logger = createBuildSafeLogger("encrypted-text-processor");
+const logger = createBuildSafeLogger('encrypted-text-processor')
 
 /**
  * Vocabulary for sentiment analysis — maps words to sentiment scores.
@@ -84,7 +84,7 @@ const SENTIMENT_VOCABULARY: Record<string, number> = {
   suicide: -3,
   kill: -3,
   die: -2,
-};
+}
 
 /**
  * Category keywords for categorization.
@@ -163,7 +163,7 @@ const CATEGORY_VOCABULARY: Record<string, Record<string, number>> = {
     need: 1,
     things: 1,
   },
-};
+}
 
 /**
  * Result of encrypted text processing.
@@ -171,32 +171,39 @@ const CATEGORY_VOCABULARY: Record<string, Record<string, number>> = {
  */
 export interface EncryptedTextResult {
   /** Encrypted result ciphertext (serialized) */
-  result: string;
+  result: string
   /** Operation that was performed */
-  operation: FHEOperation;
+  operation: FHEOperation
   /** Whether computation was fully homomorphic (no decryption) */
-  fullyHomomorphic: boolean;
+  fullyHomomorphic: boolean
   /** Metadata about the computation */
   metadata: {
     /** Number of SEAL operations performed */
-    operationsCount: number;
+    operationsCount: number
     /** Time taken in milliseconds */
-    durationMs: number;
+    durationMs: number
     /** Encoding used */
-    encoding: "word-frequency" | "character-codes" | "binary-indicator" | "token-structure" | "filter-match-count" | "sentence-scores" | "flesch-kincaid";
+    encoding:
+      | 'word-frequency'
+      | 'character-codes'
+      | 'binary-indicator'
+      | 'token-structure'
+      | 'filter-match-count'
+      | 'sentence-scores'
+      | 'flesch-kincaid'
     /** Slot count used */
-    slotCount: number;
+    slotCount: number
     /** Whether plaintext fallback was used for any step */
-    plaintextFallback: boolean;
+    plaintextFallback: boolean
     /** Number of sentences (for summarize operations) */
-    sentenceCount?: number;
+    sentenceCount?: number
     /** Maximum result length (for summarize operations) */
-    maxLength?: number;
+    maxLength?: number
     /** Scoring formula description (for summarize operations) */
-    scoringFormula?: string;
+    scoringFormula?: string
     /** Number of filter terms (for filter operations) */
-    filterTermsCount?: number;
-  };
+    filterTermsCount?: number
+  }
 }
 
 /**
@@ -206,22 +213,22 @@ export interface EncryptedTextResult {
  * operations. All computation happens on ciphertext — no decryption occurs.
  */
 export class EncryptedTextProcessor {
-  private static instance: EncryptedTextProcessor | null = null;
-  private readonly sealService: SealService;
-  private readonly sealOps: SealOperations;
+  private static instance: EncryptedTextProcessor | null = null
+  private readonly sealService: SealService
+  private readonly sealOps: SealOperations
 
   private constructor() {
-    this.sealService = SealService.getInstance();
-    this.sealOps = new SealOperations(this.sealService);
+    this.sealService = SealService.getInstance()
+    this.sealOps = new SealOperations(this.sealService)
   }
 
   public static getInstance(): EncryptedTextProcessor {
-    EncryptedTextProcessor.instance ??= new EncryptedTextProcessor();
-    return EncryptedTextProcessor.instance;
+    EncryptedTextProcessor.instance ??= new EncryptedTextProcessor()
+    return EncryptedTextProcessor.instance
   }
 
   public static reset(): void {
-    EncryptedTextProcessor.instance = null;
+    EncryptedTextProcessor.instance = null
   }
 
   /**
@@ -229,8 +236,8 @@ export class EncryptedTextProcessor {
    */
   private async ensureInitialized(): Promise<void> {
     if (!this.sealService.hasKeys()) {
-      await this.sealService.initialize();
-      await this.sealService.generateKeys();
+      await this.sealService.initialize()
+      await this.sealService.generateKeys()
     }
   }
 
@@ -239,9 +246,9 @@ export class EncryptedTextProcessor {
    */
   private getSlotCount(): number {
     if (this.sealService.getSchemeType() === SealSchemeType.CKKS) {
-      return this.sealService.getCKKSEncoder().slotCount;
+      return this.sealService.getCKKSEncoder().slotCount
     }
-    return this.sealService.getBatchEncoder().slotCount;
+    return this.sealService.getBatchEncoder().slotCount
   }
 
   /**
@@ -254,19 +261,19 @@ export class EncryptedTextProcessor {
    * @returns number[] of length min(vocabulary.length, slotCount)
    */
   private encodeWordFrequency(text: string, vocabulary: string[]): number[] {
-    const slotCount = this.getSlotCount();
-    const vocabSize = Math.min(vocabulary.length, slotCount);
-    const words = text.toLowerCase().split(/\s+/);
-    const freq: number[] = new Array(vocabSize).fill(0);
+    const slotCount = this.getSlotCount()
+    const vocabSize = Math.min(vocabulary.length, slotCount)
+    const words = text.toLowerCase().split(/\s+/)
+    const freq: number[] = new Array(vocabSize).fill(0)
 
     for (const word of words) {
-      const idx = vocabulary.indexOf(word);
+      const idx = vocabulary.indexOf(word)
       if (idx >= 0 && idx < vocabSize) {
-        freq[idx] += 1;
+        freq[idx] += 1
       }
     }
 
-    return freq;
+    return freq
   }
 
   /**
@@ -282,75 +289,87 @@ export class EncryptedTextProcessor {
    * NO DECRYPTION during computation. Result is encrypted.
    */
   public async encryptedSentiment(text: string): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    let operationsCount = 0;
+    const startTime = Date.now()
+    let operationsCount = 0
 
-    await this.ensureInitialized();
+    await this.ensureInitialized()
 
-    const vocabulary = Object.keys(SENTIMENT_VOCABULARY);
-    const slotCount = this.getSlotCount();
-    const vocabSize = Math.min(vocabulary.length, slotCount);
+    const vocabulary = Object.keys(SENTIMENT_VOCABULARY)
+    const slotCount = this.getSlotCount()
+    const vocabSize = Math.min(vocabulary.length, slotCount)
 
     // Step 1: Encode text as word frequency vector
-    const freqVector = this.encodeWordFrequency(text, vocabulary);
-    operationsCount++;
+    const freqVector = this.encodeWordFrequency(text, vocabulary)
+    operationsCount++
 
     // Step 2: Encrypt the frequency vector
-    const encryptedFreq = await this.sealService.encrypt(freqVector);
-    operationsCount++;
+    const encryptedFreq = await this.sealService.encrypt(freqVector)
+    operationsCount++
 
     // Step 3: Create plaintext sentiment weight vector
     const weightVector = vocabulary
       .slice(0, vocabSize)
-      .map((word) => SENTIMENT_VOCABULARY[word] ?? 0);
+      .map((word) => SENTIMENT_VOCABULARY[word] ?? 0)
     // Pad to slotCount
     while (weightVector.length < slotCount) {
-      weightVector.push(0);
+      weightVector.push(0)
     }
 
     // Step 4: multiplyPlain — element-wise multiplication
     // encryptedFreq * weightVector = encrypted element-wise sentiment scores
-    const multiplyResult = await this.sealOps.multiply(encryptedFreq, weightVector);
-    operationsCount++;
+    const multiplyResult = await this.sealOps.multiply(
+      encryptedFreq,
+      weightVector,
+    )
+    operationsCount++
 
     if (!multiplyResult.success || !multiplyResult.result) {
-      throw new Error(`Encrypted sentiment multiply failed: ${multiplyResult.error}`);
+      throw new Error(
+        `Encrypted sentiment multiply failed: ${multiplyResult.error}`,
+      )
     }
 
     // Step 5: Rotation + add reduction to sum all slots
     // This is the log-sum pattern: rotate by 1, add, rotate by 2, add, etc.
-    let sumCipher = multiplyResult.result as SealCipherText;
-    const logSlots = Math.ceil(Math.log2(slotCount));
+    let sumCipher = multiplyResult.result as SealCipherText
+    const logSlots = Math.ceil(Math.log2(slotCount))
 
     for (let i = 0; i < logSlots; i++) {
-      const steps = 2 ** i;
-      const rotResult = await this.sealOps.rotate(sumCipher, steps);
-      operationsCount++;
+      const steps = 2 ** i
+      const rotResult = await this.sealOps.rotate(sumCipher, steps)
+      operationsCount++
 
       if (!rotResult.success || !rotResult.result) {
-        throw new Error(`Encrypted sentiment rotation ${i} failed: ${rotResult.error}`);
+        throw new Error(
+          `Encrypted sentiment rotation ${i} failed: ${rotResult.error}`,
+        )
       }
 
-      const addResult = await this.sealOps.add(sumCipher, rotResult.result as SealCipherText);
-      operationsCount++;
+      const addResult = await this.sealOps.add(
+        sumCipher,
+        rotResult.result as SealCipherText,
+      )
+      operationsCount++
 
       if (!addResult.success || !addResult.result) {
-        throw new Error(`Encrypted sentiment addition ${i} failed: ${addResult.error}`);
+        throw new Error(
+          `Encrypted sentiment addition ${i} failed: ${addResult.error}`,
+        )
       }
 
-      sumCipher = addResult.result as SealCipherText;
+      sumCipher = addResult.result as SealCipherText
     }
 
     // Serialize result
-    const serialized = sumCipher.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = sumCipher.save()
+    const durationMs = Date.now() - startTime
 
-    logger.info("Encrypted sentiment analysis complete", {
+    logger.info('Encrypted sentiment analysis complete', {
       operationsCount,
       durationMs,
       vocabSize,
       slotCount,
-    });
+    })
 
     return {
       result: serialized,
@@ -359,11 +378,11 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "word-frequency",
+        encoding: 'word-frequency',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
@@ -378,91 +397,97 @@ export class EncryptedTextProcessor {
    * NO DECRYPTION during computation.
    */
   public async encryptedCategorize(text: string): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    let operationsCount = 0;
+    const startTime = Date.now()
+    let operationsCount = 0
 
-    await this.ensureInitialized();
+    await this.ensureInitialized()
 
     // Build combined vocabulary from all categories
-    const allWords = new Set<string>();
+    const allWords = new Set<string>()
     for (const cat of Object.keys(CATEGORY_VOCABULARY)) {
       for (const word of Object.keys(CATEGORY_VOCABULARY[cat])) {
-        allWords.add(word);
+        allWords.add(word)
       }
     }
-    const vocabulary = Array.from(allWords);
-    const slotCount = this.getSlotCount();
-    const vocabSize = Math.min(vocabulary.length, slotCount);
+    const vocabulary = Array.from(allWords)
+    const slotCount = this.getSlotCount()
+    const vocabSize = Math.min(vocabulary.length, slotCount)
 
     // Encode text as word frequency vector
-    const freqVector = this.encodeWordFrequency(text, vocabulary);
-    operationsCount++;
+    const freqVector = this.encodeWordFrequency(text, vocabulary)
+    operationsCount++
 
     // Encrypt the frequency vector
-    const encryptedFreq = await this.sealService.encrypt(freqVector);
-    operationsCount++;
+    const encryptedFreq = await this.sealService.encrypt(freqVector)
+    operationsCount++
 
     // For each category, compute encrypted score
-    const categories = Object.keys(CATEGORY_VOCABULARY);
-    const categoryScores: number[] = new Array(slotCount).fill(0);
+    const categories = Object.keys(CATEGORY_VOCABULARY)
+    const categoryScores: number[] = new Array(slotCount).fill(0)
 
     for (let catIdx = 0; catIdx < categories.length; catIdx++) {
-      const category = categories[catIdx];
-      const catWeights = CATEGORY_VOCABULARY[category];
+      const category = categories[catIdx]
+      const catWeights = CATEGORY_VOCABULARY[category]
 
       // Build weight vector for this category
-      const weightVector: number[] = new Array(slotCount).fill(0);
+      const weightVector: number[] = new Array(slotCount).fill(0)
       for (let i = 0; i < vocabSize; i++) {
-        weightVector[i] = catWeights[vocabulary[i]] ?? 0;
+        weightVector[i] = catWeights[vocabulary[i]] ?? 0
       }
 
       // multiplyPlain
-      const multResult = await this.sealOps.multiply(encryptedFreq, weightVector);
-      operationsCount++;
+      const multResult = await this.sealOps.multiply(
+        encryptedFreq,
+        weightVector,
+      )
+      operationsCount++
 
       if (!multResult.success || !multResult.result) {
         throw new Error(
           `Encrypted categorize multiply for ${category} failed: ${multResult.error}`,
-        );
+        )
       }
 
       // Rotation + add reduction
-      let sumCipher = multResult.result as SealCipherText;
-      const logSlots = Math.ceil(Math.log2(slotCount));
+      let sumCipher = multResult.result as SealCipherText
+      const logSlots = Math.ceil(Math.log2(slotCount))
 
       for (let i = 0; i < logSlots; i++) {
-        const rotResult = await this.sealOps.rotate(sumCipher, 2 ** i);
-        operationsCount++;
-        if (!rotResult.success || !rotResult.result) continue;
+        const rotResult = await this.sealOps.rotate(sumCipher, 2 ** i)
+        operationsCount++
+        if (!rotResult.success || !rotResult.result) continue
 
-        const addResult = await this.sealOps.add(sumCipher, rotResult.result as SealCipherText);
-        operationsCount++;
+        const addResult = await this.sealOps.add(
+          sumCipher,
+          rotResult.result as SealCipherText,
+        )
+        operationsCount++
         if (addResult.success && addResult.result) {
-          sumCipher = addResult.result as SealCipherText;
+          sumCipher = addResult.result as SealCipherText
         }
       }
 
       // Decrypt only the sum to get the category score (for result construction)
       // NOTE: We decrypt here to BUILD the result, but the computation was
       // fully homomorphic. The intermediate values were never decrypted.
-      const scoreArray = await this.sealService.decrypt(sumCipher);
-      categoryScores[catIdx] = scoreArray[0] || 0;
+      const scoreArray = await this.sealService.decrypt(sumCipher)
+      categoryScores[catIdx] = scoreArray[0] || 0
     }
 
     // Re-encrypt the category scores for the result
-    const encryptedScores = await this.sealService.encrypt(categoryScores);
-    operationsCount++;
+    const encryptedScores = await this.sealService.encrypt(categoryScores)
+    operationsCount++
 
-    const serialized = encryptedScores.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = encryptedScores.save()
+    const durationMs = Date.now() - startTime
 
-    logger.info("Encrypted categorization complete", {
+    logger.info('Encrypted categorization complete', {
       operationsCount,
       durationMs,
       categories: categories.length,
       vocabSize,
       slotCount,
-    });
+    })
 
     return {
       result: serialized,
@@ -471,11 +496,11 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "word-frequency",
+        encoding: 'word-frequency',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
@@ -487,50 +512,53 @@ export class EncryptedTextProcessor {
    * NO DECRYPTION during computation.
    */
   public async encryptedWordCount(text: string): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    let operationsCount = 0;
+    const startTime = Date.now()
+    let operationsCount = 0
 
-    await this.ensureInitialized();
+    await this.ensureInitialized()
 
-    const slotCount = this.getSlotCount();
-    const words = text.split(/\s+/).filter((w) => w.length > 0);
-    const wordSlots: number[] = new Array(slotCount).fill(0);
+    const slotCount = this.getSlotCount()
+    const words = text.split(/\s+/).filter((w) => w.length > 0)
+    const wordSlots: number[] = new Array(slotCount).fill(0)
 
     // Binary indicator: 1 per word, 0 for empty slots
     for (let i = 0; i < Math.min(words.length, slotCount); i++) {
-      wordSlots[i] = 1;
+      wordSlots[i] = 1
     }
-    operationsCount++;
+    operationsCount++
 
     // Encrypt the indicator vector
-    const encryptedIndicators = await this.sealService.encrypt(wordSlots);
-    operationsCount++;
+    const encryptedIndicators = await this.sealService.encrypt(wordSlots)
+    operationsCount++
 
     // Rotation + add reduction to count
-    let sumCipher = encryptedIndicators;
-    const logSlots = Math.ceil(Math.log2(slotCount));
+    let sumCipher = encryptedIndicators
+    const logSlots = Math.ceil(Math.log2(slotCount))
 
     for (let i = 0; i < logSlots; i++) {
-      const rotResult = await this.sealOps.rotate(sumCipher, 2 ** i);
-      operationsCount++;
-      if (!rotResult.success || !rotResult.result) continue;
+      const rotResult = await this.sealOps.rotate(sumCipher, 2 ** i)
+      operationsCount++
+      if (!rotResult.success || !rotResult.result) continue
 
-      const addResult = await this.sealOps.add(sumCipher, rotResult.result as SealCipherText);
-      operationsCount++;
+      const addResult = await this.sealOps.add(
+        sumCipher,
+        rotResult.result as SealCipherText,
+      )
+      operationsCount++
       if (addResult.success && addResult.result) {
-        sumCipher = addResult.result as SealCipherText;
+        sumCipher = addResult.result as SealCipherText
       }
     }
 
-    const serialized = sumCipher.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = sumCipher.save()
+    const durationMs = Date.now() - startTime
 
-    logger.info("Encrypted word count complete", {
+    logger.info('Encrypted word count complete', {
       operationsCount,
       durationMs,
       wordCount: words.length,
       slotCount,
-    });
+    })
 
     return {
       result: serialized,
@@ -539,11 +567,11 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "binary-indicator",
+        encoding: 'binary-indicator',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
@@ -554,50 +582,55 @@ export class EncryptedTextProcessor {
    *
    * NO DECRYPTION during computation.
    */
-  public async encryptedCharacterCount(text: string): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    let operationsCount = 0;
+  public async encryptedCharacterCount(
+    text: string,
+  ): Promise<EncryptedTextResult> {
+    const startTime = Date.now()
+    let operationsCount = 0
 
-    await this.ensureInitialized();
+    await this.ensureInitialized()
 
-    const slotCount = this.getSlotCount();
-    const charSlots: number[] = new Array(slotCount).fill(0);
+    const slotCount = this.getSlotCount()
+    const charSlots: number[] = new Array(slotCount).fill(0)
 
     // Binary indicator: 1 per character
     for (let i = 0; i < Math.min(text.length, slotCount); i++) {
-      charSlots[i] = 1;
+      charSlots[i] = 1
     }
-    operationsCount++;
+    operationsCount++
 
     // Encrypt the indicator vector
-    const encryptedIndicators = await this.sealService.encrypt(charSlots);
-    operationsCount++;
+    const encryptedIndicators = await this.sealService.encrypt(charSlots)
+    operationsCount++
 
     // Rotation + add reduction
-    let sumCipher = encryptedIndicators;
-    const logSlots = Math.ceil(Math.log2(slotCount));
+    let sumCipher = encryptedIndicators
+    const logSlots = Math.ceil(Math.log2(slotCount))
 
     for (let i = 0; i < logSlots; i++) {
-      const rotResult = await this.sealOps.rotate(sumCipher, 2 ** i);
-      operationsCount++;
-      if (!rotResult.success || !rotResult.result) continue;
+      const rotResult = await this.sealOps.rotate(sumCipher, 2 ** i)
+      operationsCount++
+      if (!rotResult.success || !rotResult.result) continue
 
-      const addResult = await this.sealOps.add(sumCipher, rotResult.result as SealCipherText);
-      operationsCount++;
+      const addResult = await this.sealOps.add(
+        sumCipher,
+        rotResult.result as SealCipherText,
+      )
+      operationsCount++
       if (addResult.success && addResult.result) {
-        sumCipher = addResult.result as SealCipherText;
+        sumCipher = addResult.result as SealCipherText
       }
     }
 
-    const serialized = sumCipher.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = sumCipher.save()
+    const durationMs = Date.now() - startTime
 
-    logger.info("Encrypted character count complete", {
+    logger.info('Encrypted character count complete', {
       operationsCount,
       durationMs,
       charCount: text.length,
       slotCount,
-    });
+    })
 
     return {
       result: serialized,
@@ -606,11 +639,11 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "binary-indicator",
+        encoding: 'binary-indicator',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
@@ -632,33 +665,33 @@ export class EncryptedTextProcessor {
     text: string,
     keywords: string[],
   ): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    let operationsCount = 0;
+    const startTime = Date.now()
+    let operationsCount = 0
 
-    await this.ensureInitialized();
+    await this.ensureInitialized()
 
-    const slotCount = this.getSlotCount();
-    const words = text.toLowerCase().split(/\s+/);
-    const keywordSet = new Set(keywords.map((k) => k.toLowerCase()));
+    const slotCount = this.getSlotCount()
+    const words = text.toLowerCase().split(/\s+/)
+    const keywordSet = new Set(keywords.map((k) => k.toLowerCase()))
 
     // Slot 0: keyword count, Slot 1: total word count
-    let keywordCount = 0;
+    let keywordCount = 0
     for (const word of words) {
-      if (keywordSet.has(word)) keywordCount++;
+      if (keywordSet.has(word)) keywordCount++
     }
-    const totalCount = words.length;
+    const totalCount = words.length
 
     // Encode as 2-element vector
-    const densityVector: number[] = new Array(slotCount).fill(0);
-    densityVector[0] = keywordCount;
-    densityVector[1] = totalCount;
-    operationsCount++;
+    const densityVector: number[] = new Array(slotCount).fill(0)
+    densityVector[0] = keywordCount
+    densityVector[1] = totalCount
+    operationsCount++
 
-    const encryptedDensity = await this.sealService.encrypt(densityVector);
-    operationsCount++;
+    const encryptedDensity = await this.sealService.encrypt(densityVector)
+    operationsCount++
 
-    const serialized = encryptedDensity.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = encryptedDensity.save()
+    const durationMs = Date.now() - startTime
 
     return {
       result: serialized,
@@ -667,11 +700,11 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "word-frequency",
+        encoding: 'word-frequency',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
@@ -684,30 +717,32 @@ export class EncryptedTextProcessor {
    * The server never sees the plaintext tokens — only encrypted counts/lengths.
    */
   public async encryptedTokenize(text: string): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    const slotCount = this.getSlotCount();
-    let operationsCount = 0;
+    const startTime = Date.now()
+    const slotCount = this.getSlotCount()
+    let operationsCount = 0
 
-    const words = text.trim().split(/\s+/).filter(Boolean);
+    const words = text.trim().split(/\s+/).filter(Boolean)
 
     // Build vector: [tokenCount, avgTokenLength, tokenLen0, tokenLen1, ...]
-    const tokenVector: number[] = new Array(slotCount).fill(0);
-    tokenVector[0] = words.length;
+    const tokenVector: number[] = new Array(slotCount).fill(0)
+    tokenVector[0] = words.length
     const avgLen =
       words.length > 0
-        ? Math.round((words.reduce((sum, w) => sum + w.length, 0) / words.length) * 100) / 100
-        : 0;
-    tokenVector[1] = Math.round(avgLen * 100); // scaled for integer encoding
+        ? Math.round(
+            (words.reduce((sum, w) => sum + w.length, 0) / words.length) * 100,
+          ) / 100
+        : 0
+    tokenVector[1] = Math.round(avgLen * 100) // scaled for integer encoding
     for (let i = 0; i < Math.min(words.length, slotCount - 2); i++) {
-      tokenVector[2 + i] = words[i].length;
+      tokenVector[2 + i] = words[i].length
     }
-    operationsCount++;
+    operationsCount++
 
-    const encryptedTokens = await this.sealService.encrypt(tokenVector);
-    operationsCount++;
+    const encryptedTokens = await this.sealService.encrypt(tokenVector)
+    operationsCount++
 
-    const serialized = encryptedTokens.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = encryptedTokens.save()
+    const durationMs = Date.now() - startTime
 
     return {
       result: serialized,
@@ -716,11 +751,11 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "token-structure",
+        encoding: 'token-structure',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
@@ -733,59 +768,66 @@ export class EncryptedTextProcessor {
    *   slot 1 = total word count
    *   slot 2 = match ratio (matched/total * 1000 for integer encoding)
    */
-  public async encryptedFilter(text: string, filterTerms: string[]): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    const slotCount = this.getSlotCount();
-    let operationsCount = 0;
+  public async encryptedFilter(
+    text: string,
+    filterTerms: string[],
+  ): Promise<EncryptedTextResult> {
+    const startTime = Date.now()
+    const slotCount = this.getSlotCount()
+    let operationsCount = 0
 
-    const words = text.trim().split(/\s+/).filter(Boolean);
-    const lowerTerms = filterTerms.map((t) => t.toLowerCase());
-    const lowerWords = words.map((w) => w.toLowerCase());
+    const words = text.trim().split(/\s+/).filter(Boolean)
+    const lowerTerms = filterTerms.map((t) => t.toLowerCase())
+    const lowerWords = words.map((w) => w.toLowerCase())
 
     // Build word presence vector (1 if word matches any filter term)
-    const presenceVector: number[] = new Array(slotCount).fill(0);
-    let matchCount = 0;
+    const presenceVector: number[] = new Array(slotCount).fill(0)
+    let matchCount = 0
     for (let i = 0; i < words.length; i++) {
       if (lowerTerms.some((term) => lowerWords[i].includes(term))) {
-        presenceVector[i] = 1;
-        matchCount++;
+        presenceVector[i] = 1
+        matchCount++
       }
     }
-    operationsCount++;
+    operationsCount++
 
     // Encrypt the presence vector
-    const encryptedPresence = await this.sealService.encrypt(presenceVector);
-    operationsCount++;
+    const encryptedPresence = await this.sealService.encrypt(presenceVector)
+    operationsCount++
 
     // Rotation+add reduction to count matches
-    let encryptedSum = encryptedPresence;
-    let n = words.length;
+    let encryptedSum = encryptedPresence
+    let n = words.length
     while (n > 1) {
-      const half = Math.floor(n / 2);
-      const rotResult = await this.sealOps.rotate(encryptedSum, half);
-      if (!rotResult.success || !rotResult.result) continue;
-      const addResult = await this.sealOps.add(encryptedSum, rotResult.result as SealCipherText);
+      const half = Math.floor(n / 2)
+      const rotResult = await this.sealOps.rotate(encryptedSum, half)
+      if (!rotResult.success || !rotResult.result) continue
+      const addResult = await this.sealOps.add(
+        encryptedSum,
+        rotResult.result as SealCipherText,
+      )
       if (addResult.success && addResult.result) {
-        encryptedSum = addResult.result as SealCipherText;
+        encryptedSum = addResult.result as SealCipherText
       }
-      n = n - half;
-      operationsCount += 2;
+      n = n - half
+      operationsCount += 2
     }
 
     // Build result vector: [matchedCount, totalWords, ratio*1000]
-    const matchedCount = matchCount;
-    const totalWords = words.length;
-    const ratio = totalWords > 0 ? Math.round((matchedCount / totalWords) * 1000) : 0;
-    const resultVector: number[] = new Array(slotCount).fill(0);
-    resultVector[0] = matchedCount;
-    resultVector[1] = totalWords;
-    resultVector[2] = ratio;
+    const matchedCount = matchCount
+    const totalWords = words.length
+    const ratio =
+      totalWords > 0 ? Math.round((matchedCount / totalWords) * 1000) : 0
+    const resultVector: number[] = new Array(slotCount).fill(0)
+    resultVector[0] = matchedCount
+    resultVector[1] = totalWords
+    resultVector[2] = ratio
 
-    const encryptedResult = await this.sealService.encrypt(resultVector);
-    operationsCount++;
+    const encryptedResult = await this.sealService.encrypt(resultVector)
+    operationsCount++
 
-    const serialized = encryptedResult.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = encryptedResult.save()
+    const durationMs = Date.now() - startTime
 
     return {
       result: serialized,
@@ -794,12 +836,12 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "filter-match-count",
+        encoding: 'filter-match-count',
         slotCount,
         plaintextFallback: false,
         filterTermsCount: filterTerms.length,
       },
-    };
+    }
   }
 
   /**
@@ -813,23 +855,26 @@ export class EncryptedTextProcessor {
    *
    * Returns encrypted vector of sentence scores.
    */
-  public async encryptedSummarize(text: string, maxLength = 100): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    const slotCount = this.getSlotCount();
-    let operationsCount = 0;
+  public async encryptedSummarize(
+    text: string,
+    maxLength = 100,
+  ): Promise<EncryptedTextResult> {
+    const startTime = Date.now()
+    const slotCount = this.getSlotCount()
+    let operationsCount = 0
 
     // Split into sentences (plaintext needed for sentence boundary detection)
     const sentences = text
       .split(/[.!?]+/)
       .map((s) => s.trim())
-      .filter(Boolean);
+      .filter(Boolean)
 
-    const totalSentences = sentences.length;
+    const totalSentences = sentences.length
     if (totalSentences === 0) {
-      const emptyVector: number[] = new Array(slotCount).fill(0);
-      const encryptedEmpty = await this.sealService.encrypt(emptyVector);
-      operationsCount++;
-      const serialized = encryptedEmpty.save();
+      const emptyVector: number[] = new Array(slotCount).fill(0)
+      const encryptedEmpty = await this.sealService.encrypt(emptyVector)
+      operationsCount++
+      const serialized = encryptedEmpty.save()
       return {
         result: serialized,
         operation: FHEOperation.SUMMARIZE,
@@ -837,43 +882,48 @@ export class EncryptedTextProcessor {
         metadata: {
           operationsCount,
           durationMs: Date.now() - startTime,
-          encoding: "sentence-scores",
+          encoding: 'sentence-scores',
           slotCount,
           plaintextFallback: false,
           sentenceCount: 0,
         },
-      };
+      }
     }
 
     // Score each sentence
-    const positionWeight = 0.3;
-    const lengthWeight = 0.3;
-    const keywordWeight = 0.4;
+    const positionWeight = 0.3
+    const lengthWeight = 0.3
+    const keywordWeight = 0.4
 
-    const scoreVector: number[] = new Array(slotCount).fill(0);
-    const totalWords = sentences.reduce((sum, s) => sum + s.split(/\s+/).filter(Boolean).length, 0);
+    const scoreVector: number[] = new Array(slotCount).fill(0)
+    const totalWords = sentences.reduce(
+      (sum, s) => sum + s.split(/\s+/).filter(Boolean).length,
+      0,
+    )
 
     for (let i = 0; i < Math.min(totalSentences, slotCount); i++) {
-      const words = sentences[i].split(/\s+/).filter(Boolean);
-      const wordCount = words.length;
-      const normalizedLength = totalWords > 0 ? Math.round((wordCount / totalWords) * 1000) : 0;
-      const positionScore = Math.round((1 - i / totalSentences) * 1000);
+      const words = sentences[i].split(/\s+/).filter(Boolean)
+      const wordCount = words.length
+      const normalizedLength =
+        totalWords > 0 ? Math.round((wordCount / totalWords) * 1000) : 0
+      const positionScore = Math.round((1 - i / totalSentences) * 1000)
       // Keyword density: count words longer than 5 chars (proxy for content words)
-      const contentWords = words.filter((w) => w.length > 5).length;
-      const densityScore = wordCount > 0 ? Math.round((contentWords / wordCount) * 1000) : 0;
+      const contentWords = words.filter((w) => w.length > 5).length
+      const densityScore =
+        wordCount > 0 ? Math.round((contentWords / wordCount) * 1000) : 0
 
       scoreVector[i] =
         Math.round(positionWeight * positionScore) +
         Math.round(lengthWeight * normalizedLength) +
-        Math.round(keywordWeight * densityScore);
+        Math.round(keywordWeight * densityScore)
     }
-    operationsCount++;
+    operationsCount++
 
-    const encryptedScores = await this.sealService.encrypt(scoreVector);
-    operationsCount++;
+    const encryptedScores = await this.sealService.encrypt(scoreVector)
+    operationsCount++
 
-    const serialized = encryptedScores.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = encryptedScores.save()
+    const durationMs = Date.now() - startTime
 
     return {
       result: serialized,
@@ -882,14 +932,14 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "sentence-scores",
+        encoding: 'sentence-scores',
         slotCount,
         plaintextFallback: false,
         sentenceCount: totalSentences,
         maxLength,
-        scoringFormula: "position*0.3 + length*0.3 + keyword*0.4",
+        scoringFormula: 'position*0.3 + length*0.3 + keyword*0.4',
       },
-    };
+    }
   }
 
   /**
@@ -904,55 +954,59 @@ export class EncryptedTextProcessor {
    *   slot 3 = reading ease score (scaled by 1000)
    *   slot 4 = grade level (scaled by 1000)
    */
-  public async encryptedReadingLevel(text: string): Promise<EncryptedTextResult> {
-    const startTime = Date.now();
-    const slotCount = this.getSlotCount();
-    let operationsCount = 0;
+  public async encryptedReadingLevel(
+    text: string,
+  ): Promise<EncryptedTextResult> {
+    const startTime = Date.now()
+    const slotCount = this.getSlotCount()
+    let operationsCount = 0
 
-    const words = text.trim().split(/\s+/).filter(Boolean);
-    const sentences = text.split(/[.!?]+/).filter(Boolean);
-    const wordCount = words.length;
-    const sentenceCount = Math.max(sentences.length, 1);
+    const words = text.trim().split(/\s+/).filter(Boolean)
+    const sentences = text.split(/[.!?]+/).filter(Boolean)
+    const wordCount = words.length
+    const sentenceCount = Math.max(sentences.length, 1)
 
     // Estimate syllables (vowel group counting heuristic)
     const totalSyllables = words.reduce((sum, word) => {
-      const vowels = (word.toLowerCase().match(/[aeiouy]+/g) ?? []).length;
-      return sum + Math.max(vowels, 1);
-    }, 0);
+      const vowels = (word.toLowerCase().match(/[aeiouy]+/g) ?? []).length
+      return sum + Math.max(vowels, 1)
+    }, 0)
 
     // Flesch Reading Ease = 206.835 - 1.015*(words/sentences) - 84.6*(syllables/words)
     // Scale by 1000 for integer encoding
-    const wordsPerSentence = sentenceCount > 0 ? Math.round((wordCount / sentenceCount) * 1000) : 0;
-    const syllablesPerWord = wordCount > 0 ? Math.round((totalSyllables / wordCount) * 1000) : 0;
+    const wordsPerSentence =
+      sentenceCount > 0 ? Math.round((wordCount / sentenceCount) * 1000) : 0
+    const syllablesPerWord =
+      wordCount > 0 ? Math.round((totalSyllables / wordCount) * 1000) : 0
 
     const readingEase = Math.round(
       (206.835 -
         1.015 * (wordCount / sentenceCount) -
         84.6 * (totalSyllables / Math.max(wordCount, 1))) *
         1000,
-    );
+    )
     const gradeLevel = Math.round(
       (0.39 * (wordCount / sentenceCount) +
         11.8 * (totalSyllables / Math.max(wordCount, 1)) -
         15.59) *
         1000,
-    );
+    )
 
-    const resultVector: number[] = new Array(slotCount).fill(0);
-    resultVector[0] = wordCount;
-    resultVector[1] = sentenceCount;
-    resultVector[2] = totalSyllables;
-    resultVector[3] = readingEase;
-    resultVector[4] = gradeLevel;
-    resultVector[5] = wordsPerSentence;
-    resultVector[6] = syllablesPerWord;
-    operationsCount++;
+    const resultVector: number[] = new Array(slotCount).fill(0)
+    resultVector[0] = wordCount
+    resultVector[1] = sentenceCount
+    resultVector[2] = totalSyllables
+    resultVector[3] = readingEase
+    resultVector[4] = gradeLevel
+    resultVector[5] = wordsPerSentence
+    resultVector[6] = syllablesPerWord
+    operationsCount++
 
-    const encryptedResult = await this.sealService.encrypt(resultVector);
-    operationsCount++;
+    const encryptedResult = await this.sealService.encrypt(resultVector)
+    operationsCount++
 
-    const serialized = encryptedResult.save();
-    const durationMs = Date.now() - startTime;
+    const serialized = encryptedResult.save()
+    const durationMs = Date.now() - startTime
 
     return {
       result: serialized,
@@ -961,18 +1015,18 @@ export class EncryptedTextProcessor {
       metadata: {
         operationsCount,
         durationMs,
-        encoding: "flesch-kincaid",
+        encoding: 'flesch-kincaid',
         slotCount,
         plaintextFallback: false,
       },
-    };
+    }
   }
 
   /**
    * Check if the processor is available (SEAL initialized with keys).
    */
   public isAvailable(): boolean {
-    return this.sealService.hasKeys();
+    return this.sealService.hasKeys()
   }
 
   /**
@@ -989,15 +1043,15 @@ export class EncryptedTextProcessor {
       FHEOperation.FILTER,
       FHEOperation.SUMMARIZE,
       FHEOperation.READING_LEVEL,
-    ];
+    ]
   }
 }
 
 // Singleton exports
 export function getEncryptedTextProcessor(): EncryptedTextProcessor {
-  return EncryptedTextProcessor.getInstance();
+  return EncryptedTextProcessor.getInstance()
 }
 
 export function resetEncryptedTextProcessor(): void {
-  EncryptedTextProcessor.reset();
+  EncryptedTextProcessor.reset()
 }

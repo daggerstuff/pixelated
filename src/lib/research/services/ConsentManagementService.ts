@@ -7,8 +7,8 @@
  * Retention: 7 years (2555 days) per HIPAA §164.530(j).
  */
 
-import { getLogger } from '@/lib/logging/logger'
 import { query } from '@/lib/db'
+import { getLogger } from '@/lib/logging/logger'
 import { redis } from '@/lib/redis'
 import {
   ConsentRecord,
@@ -76,8 +76,7 @@ export class ConsentManagementService {
 
     const now = new Date()
     const expirationDate = new Date(
-      now.getTime() +
-        this.config.consentExpirationDays * 24 * 60 * 60 * 1000,
+      now.getTime() + this.config.consentExpirationDays * 24 * 60 * 60 * 1000,
     )
 
     const historyEntry = {
@@ -167,7 +166,11 @@ export class ConsentManagementService {
       [newLevel, JSON.stringify(updatedHistory), now, clientId],
     )
 
-    await this.cacheConsentLevel(clientId, newLevel, new Date(existing.expirationDate))
+    await this.cacheConsentLevel(
+      clientId,
+      newLevel,
+      new Date(existing.expirationDate),
+    )
 
     await this.logAudit({
       timestamp: now.toISOString(),
@@ -389,13 +392,19 @@ export class ConsentManagementService {
     const withdrawalResult = await query(
       `SELECT COUNT(*) as count FROM consent_records WHERE withdrawal_requested = true`,
     )
-    const withdrawalRequests = parseInt(withdrawalResult.rows[0]?.['count'] ?? '0', 10)
+    const withdrawalRequests = parseInt(
+      withdrawalResult.rows[0]?.['count'] ?? '0',
+      10,
+    )
 
     const expiredResult = await query(
       `SELECT COUNT(*) as count FROM consent_records
        WHERE expiration_date <= NOW() AND withdrawal_requested = false AND data_purged = false`,
     )
-    const expiredConsents = parseInt(expiredResult.rows[0]?.['count'] ?? '0', 10)
+    const expiredConsents = parseInt(
+      expiredResult.rows[0]?.['count'] ?? '0',
+      10,
+    )
 
     const levelResult = await query(
       `SELECT current_level, COUNT(*) as count FROM consent_records
@@ -550,7 +559,9 @@ export class ConsentManagementService {
     return this.rowToConsentRecord(row)
   }
 
-  private rowToConsentRecord = (row: Record<string, unknown>): ConsentRecord => {
+  private rowToConsentRecord = (
+    row: Record<string, unknown>,
+  ): ConsentRecord => {
     const history = row['consent_history']
     let consentHistory: ConsentRecord['consentHistory']
     if (typeof history === 'string') {

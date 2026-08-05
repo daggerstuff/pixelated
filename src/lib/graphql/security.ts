@@ -17,19 +17,20 @@
  * instanceof hazard where instanceOf() fails across module realms.
  */
 
-import { GraphQLSchema, ValidationContext, GraphQLError, Kind } from "graphql";
-import depthLimit from "graphql-depth-limit";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { GraphQLSchema, ValidationContext, GraphQLError, Kind } from 'graphql'
+import depthLimit from 'graphql-depth-limit'
 
-const logger = createBuildSafeLogger("graphql-security");
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('graphql-security')
 
 // ──────────────────────────────────────────────
 // Constants
 // ──────────────────────────────────────────────
 
-export const MAX_DEPTH = 10;
-export const MAX_COMPLEXITY = 1000;
-const LIST_BASE_COST = 10;
+export const MAX_DEPTH = 10
+export const MAX_COMPLEXITY = 1000
+const LIST_BASE_COST = 10
 
 // ──────────────────────────────────────────────
 // Depth limit validation rule
@@ -37,8 +38,8 @@ const LIST_BASE_COST = 10;
 
 export function depthLimitRule(): ReturnType<typeof depthLimit> {
   return depthLimit(MAX_DEPTH, (depth: number) =>
-    logger.warn("GraphQL depth limit exceeded", { depth }),
-  );
+    logger.warn('GraphQL depth limit exceeded', { depth }),
+  )
 }
 
 // ──────────────────────────────────────────────
@@ -64,37 +65,37 @@ export function complexityLimitRule(
   _schema: GraphQLSchema,
 ): (context: ValidationContext) => Record<string, unknown> {
   return (context: ValidationContext) => {
-    let complexity = 0;
+    let complexity = 0
 
     return {
       Field: {
         enter: (node) => {
-          const fieldDef = context.getFieldDef();
-          let cost = 1;
+          const fieldDef = context.getFieldDef()
+          let cost = 1
 
           if (fieldDef) {
-            let fieldType = fieldDef.type;
+            let fieldType = fieldDef.type
 
             // Strip NonNull wrapper (equivalent to getNullableType)
-            if (fieldType?.[Symbol.toStringTag] === "GraphQLNonNull") {
-              fieldType = (fieldType as any).ofType;
+            if (fieldType?.[Symbol.toStringTag] === 'GraphQLNonNull') {
+              fieldType = (fieldType as any).ofType
             }
 
             // Check if it's a list type (equivalent to isListType)
-            if (fieldType?.[Symbol.toStringTag] === "GraphQLList") {
-              cost = LIST_BASE_COST;
+            if (fieldType?.[Symbol.toStringTag] === 'GraphQLList') {
+              cost = LIST_BASE_COST
 
               const limitArg = node.arguments?.find(
-                (a) => a.name.value === "limit" && a.value.kind === Kind.INT,
-              );
+                (a) => a.name.value === 'limit' && a.value.kind === Kind.INT,
+              )
               if (limitArg && limitArg.value.kind === Kind.INT) {
-                const limitValue = parseInt(limitArg.value.value, 10);
-                cost = LIST_BASE_COST * limitValue;
+                const limitValue = parseInt(limitArg.value.value, 10)
+                cost = LIST_BASE_COST * limitValue
               }
             }
           }
 
-          complexity += cost;
+          complexity += cost
         },
       },
       OperationDefinition: {
@@ -104,17 +105,17 @@ export function complexityLimitRule(
               new GraphQLError(
                 `Query complexity ${complexity} exceeds maximum of ${MAX_COMPLEXITY}`,
               ),
-            );
+            )
           } else if (complexity > MAX_COMPLEXITY * 0.8) {
-            logger.warn("GraphQL complexity approaching limit", {
+            logger.warn('GraphQL complexity approaching limit', {
               complexity,
               limit: MAX_COMPLEXITY,
-            });
+            })
           }
         },
       },
-    };
-  };
+    }
+  }
 }
 
 // ──────────────────────────────────────────────
@@ -126,9 +127,10 @@ export function complexityLimitRule(
  * In development, introspection is allowed for tools like GraphiQL.
  */
 export function isIntrospectionEnabled(): boolean {
-  const env = (import.meta as unknown as Record<string, unknown>)['env'] ?? process.env;
-  const nodeEnv = (env?.['NODE_ENV'] as string) ?? "development";
-  return nodeEnv !== "production";
+  const env =
+    (import.meta as unknown as Record<string, unknown>)['env'] ?? process.env
+  const nodeEnv = (env?.['NODE_ENV'] as string) ?? 'development'
+  return nodeEnv !== 'production'
 }
 
 // ──────────────────────────────────────────────
@@ -136,7 +138,7 @@ export function isIntrospectionEnabled(): boolean {
 // ──────────────────────────────────────────────
 
 export function getValidationRules(schema: GraphQLSchema) {
-  return [depthLimitRule(), complexityLimitRule(schema)];
+  return [depthLimitRule(), complexityLimitRule(schema)]
 }
 
 // ──────────────────────────────────────────────
@@ -145,15 +147,16 @@ export function getValidationRules(schema: GraphQLSchema) {
 
 export function formatGraphQLError(error: GraphQLError) {
   const isProduction =
-    ((import.meta as unknown as Record<string, unknown>)['env'] ?? process.env)?.['NODE_ENV'] === "production";
+    ((import.meta as unknown as Record<string, unknown>)['env'] ??
+      process.env)?.['NODE_ENV'] === 'production'
 
   return {
     message: error.message,
     path: error.path,
     locations: error.locations,
     extensions: {
-      code: (error.extensions?.['code'] as string) ?? "INTERNAL_SERVER_ERROR",
+      code: (error.extensions?.['code'] as string) ?? 'INTERNAL_SERVER_ERROR',
       ...(isProduction ? {} : { stack: error.stack }),
     },
-  };
+  }
 }

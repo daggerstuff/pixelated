@@ -68,24 +68,20 @@ vi.mock('@/lib/auth/config', () => ({
 }))
 
 import { config } from '@/config/env.config'
-import { encrypt, decrypt } from '@/lib/encryption'
-import { HIPAA_CONFIG, PASSWORD_CONFIG, JWT_CONFIG } from '@/lib/auth/config'
-import { verifyAuditChain, AUDIT_CHAIN_GENESIS } from '@/lib/audit/logger'
 import type { AuditEvent } from '@/lib/audit/events'
 import { AuditEventType, AuditSeverity, AuditAction } from '@/lib/audit/events'
+import { verifyAuditChain, AUDIT_CHAIN_GENESIS } from '@/lib/audit/logger'
+import { HIPAA_CONFIG, PASSWORD_CONFIG, JWT_CONFIG } from '@/lib/auth/config'
+import { encrypt, decrypt } from '@/lib/encryption'
 
 import 'dotenv/config'
-
-
 
 // ---------------------------------------------------------------------------
 // Shared helpers
 // ---------------------------------------------------------------------------
 
 /** Build a minimal valid AuditEvent. */
-function makeAuditEvent(
-  overrides: Partial<AuditEvent> = {},
-): AuditEvent {
+function makeAuditEvent(overrides: Partial<AuditEvent> = {}): AuditEvent {
   return {
     id: 'test-event-001',
     timestamp: new Date('2026-01-15T12:00:00Z'),
@@ -115,10 +111,9 @@ describe('HIPAA §164.312(b) — Audit Controls', () => {
 
   it('security-baseline.json declares phi_access as a tracked audit event', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = (require('node:path') as typeof import('path')).resolve(
-      process.cwd(),
-      'security-baseline.json',
-    )
+    const baselinePath = (
+      require('node:path') as typeof import('path')
+    ).resolve(process.cwd(), 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { audit: { include_events: string[] } }
@@ -224,10 +219,9 @@ describe('HIPAA §164.312(e)(1) — Transmission Security', () => {
 
   it('encryption uses AES-256-GCM (declared in baseline)', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = (require('node:path') as typeof import('path')).resolve(
-      process.cwd(),
-      'security-baseline.json',
-    )
+    const baselinePath = (
+      require('node:path') as typeof import('path')
+    ).resolve(process.cwd(), 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { encryption: { data_at_rest: { algorithm: string } } }
@@ -244,10 +238,9 @@ describe('HIPAA §164.312(e)(1) — Transmission Security', () => {
 describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
   it('security-baseline.json exists and has required top-level keys', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = (require('node:path') as typeof import('path')).resolve(
-      process.cwd(),
-      'security-baseline.json',
-    )
+    const baselinePath = (
+      require('node:path') as typeof import('path')
+    ).resolve(process.cwd(), 'security-baseline.json')
     expect(fs.existsSync(baselinePath)).toBe(true)
 
     const raw = fs.readFileSync(baselinePath, 'utf8')
@@ -262,10 +255,9 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
 
   it('compliance standards include HIPAA', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = (require('node:path') as typeof import('path')).resolve(
-      process.cwd(),
-      'security-baseline.json',
-    )
+    const baselinePath = (
+      require('node:path') as typeof import('path')
+    ).resolve(process.cwd(), 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { compliance_standards: string[] }
@@ -275,10 +267,9 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
 
   it('HIPAA compliance tests are required per security baseline', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = (require('node:path') as typeof import('path')).resolve(
-      process.cwd(),
-      'security-baseline.json',
-    )
+    const baselinePath = (
+      require('node:path') as typeof import('path')
+    ).resolve(process.cwd(), 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { testing: { hipaa_compliance_tests_required: boolean } }
@@ -293,10 +284,9 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
 describe('HIPAA §164.314 — Organizational Requirements', () => {
   it('incident response has a defined contact and response time target', () => {
     const fs = require('node:fs') as typeof import('fs')
-    const baselinePath = (require('node:path') as typeof import('path')).resolve(
-      process.cwd(),
-      'security-baseline.json',
-    )
+    const baselinePath = (
+      require('node:path') as typeof import('path')
+    ).resolve(process.cwd(), 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: {
@@ -314,8 +304,7 @@ describe('HIPAA §164.314 — Organizational Requirements', () => {
       baseline.baseline.incident_response.response_time_target_minutes,
     ).toBeGreaterThan(0)
     expect(
-      baseline.baseline.incident_response
-        .notification_authorities_within_hours,
+      baseline.baseline.incident_response.notification_authorities_within_hours,
     ).toBeLessThanOrEqual(72)
   })
 })

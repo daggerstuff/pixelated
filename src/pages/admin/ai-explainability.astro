@@ -288,12 +288,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
   function buildSources(context) {
     const timestamp = new Date().toISOString()
     const sources: Array<{
-    type: string
-    reference: string
-    confidenceContribution: number
-    description: string
-    timestamp: string
-  }> = []
+      type: string
+      reference: string
+      confidenceContribution: number
+      description: string
+      timestamp: string
+    }> = []
 
     if (context.neutralBaseline) {
       sources.push({
@@ -343,7 +343,9 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
   }
 
   function attributeTechnique(emotions: Record<string, number>) {
-    const entries = Object.entries(emotions).filter(([, v]) => v > 0) as Array<[string, number]>
+    const entries = Object.entries(emotions).filter(([, v]) => v > 0) as Array<
+      [string, number]
+    >
     if (entries.length === 0) return undefined
     entries.sort((a, b) => b[1] - a[1])
     const [dominant, intensity] = entries[0]

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { DefaultCausalDagService } from '../lib/causal/causal-dag'
 
 describe('CausalDagService', () => {
@@ -127,7 +128,7 @@ describe('CausalDagService', () => {
 
     it('should throw error for non-existent node', async () => {
       await expect(
-        service.estimateIntervention({ nodeId: 'X', value: 1.0 })
+        service.estimateIntervention({ nodeId: 'X', value: 1.0 }),
       ).rejects.toThrow('Node X does not exist')
     })
 

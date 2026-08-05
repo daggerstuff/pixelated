@@ -86,7 +86,9 @@ describe('EncryptedTextProcessor', () => {
 
   describe('Sentiment', () => {
     it('should return encrypted sentiment score', async () => {
-      const result = await processor.encryptedSentiment('I am happy and joyful today')
+      const result = await processor.encryptedSentiment(
+        'I am happy and joyful today',
+      )
       expect(result.operation).toBe('sentiment')
       expect(result.fullyHomomorphic).toBe(true)
       expect(result.result).toBeDefined()
@@ -119,7 +121,9 @@ describe('EncryptedTextProcessor', () => {
 
   describe('Word Count', () => {
     it('should return encrypted word count', async () => {
-      const result = await processor.encryptedWordCount('one two three four five')
+      const result = await processor.encryptedWordCount(
+        'one two three four five',
+      )
       expect(result.operation).toBe('word_count')
       expect(result.fullyHomomorphic).toBe(true)
     })
@@ -154,9 +158,10 @@ describe('EncryptedTextProcessor', () => {
 
   describe('Filter', () => {
     it('should return encrypted match count', async () => {
-      const result = await processor.encryptedFilter('anxiety depression stress', [
-        'anxiety',
-      ])
+      const result = await processor.encryptedFilter(
+        'anxiety depression stress',
+        ['anxiety'],
+      )
       expect(result.operation).toBe('filter')
       expect(result.fullyHomomorphic).toBe(true)
     })

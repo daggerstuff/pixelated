@@ -46,8 +46,10 @@ The supervisor-agent reads across data produced by other agents:
 - Does **not** conduct rehearsal sessions — that belongs to session-agent.
 - Does **not** score individual sessions — that belongs to qa-agent.
 - Does **not** manage the training pipeline — that belongs to pipeline-agent.
-- Does **not** handle enrollment or cohort assignment — that belongs to intake-agent.
-- **Can** adjust thresholds, pause/resume trainees, and update cohort assignments.
+- Does **not** handle enrollment or cohort assignment — that belongs to
+  intake-agent.
+- **Can** adjust thresholds, pause/resume trainees, and update cohort
+  assignments.
 
 ## Foresight wiring (live)
 

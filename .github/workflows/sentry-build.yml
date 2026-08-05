@@ -75,5 +75,6 @@ jobs:
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
+          tags:
+            ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false

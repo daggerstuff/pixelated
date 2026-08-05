@@ -585,19 +585,13 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
           <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
             <Card>
               <div class="p-6">
-                <DynamicMultiSessionProgression
-                  client:visible
-                  sessions={[]}
-                />
+                <DynamicMultiSessionProgression client:visible sessions={[]} />
               </div>
             </Card>
 
             <Card>
               <div class="p-6">
-                <DynamicBeliefChangeTracker
-                  client:visible
-                  beliefs={[]}
-                />
+                <DynamicBeliefChangeTracker client:visible beliefs={[]} />
               </div>
             </Card>
           </div>
@@ -614,10 +608,7 @@ const showAdvanced = Astro.url.searchParams.get('advanced') === 'true'
 
             <Card>
               <div class="p-6">
-                <DynamicGoalAttainmentScale
-                  client:visible
-                  goals={[]}
-                />
+                <DynamicGoalAttainmentScale client:visible goals={[]} />
               </div>
             </Card>
           </div>

@@ -5,8 +5,16 @@ import { searchMemories } from '../foresight-client.js'
 
 const SCHEMA = z.object({
   trainee_id: z.string().uuid().describe('UUID of the trainee.'),
-  include_sessions: z.boolean().optional().default(true).describe('Include session records.'),
-  include_scores: z.boolean().optional().default(true).describe('Include QA score records.'),
+  include_sessions: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe('Include session records.'),
+  include_scores: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe('Include QA score records.'),
 })
 
 export default defineTool({
@@ -39,14 +47,23 @@ export default defineTool({
     for (const m of allMemories) {
       try {
         const parsed = JSON.parse(m.content) as Record<string, unknown>
-        const ts = (parsed.enrolled_at ?? parsed.assigned_at ?? parsed.recorded_at ?? parsed.scored_at ?? parsed.evaluated_at ?? '') as string
+        const ts = (parsed.enrolled_at ??
+          parsed.assigned_at ??
+          parsed.recorded_at ??
+          parsed.scored_at ??
+          parsed.evaluated_at ??
+          '') as string
 
         switch (parsed.type) {
           case 'trainee_profile':
             events.push({ type: 'enrollment', timestamp: ts, detail: parsed })
             break
           case 'cohort_assignment':
-            events.push({ type: 'cohort_assignment', timestamp: ts, detail: parsed })
+            events.push({
+              type: 'cohort_assignment',
+              timestamp: ts,
+              detail: parsed,
+            })
             break
           case 'curriculum_step':
             events.push({ type: 'curriculum', timestamp: ts, detail: parsed })
@@ -62,11 +79,16 @@ export default defineTool({
             }
             break
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     // Sort chronologically
-    events.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+    events.sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    )
 
     return {
       trainee_id: input.trainee_id,

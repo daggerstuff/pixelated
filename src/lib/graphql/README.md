@@ -4,7 +4,8 @@ Type-safe GraphQL client generated from the Pixelated Empathy GraphQL schema.
 
 ## Installation
 
-The SDK is part of the Pixelated Empathy codebase and uses `graphql-request` for isomorphic (Node + browser) HTTP transport.
+The SDK is part of the Pixelated Empathy codebase and uses `graphql-request` for
+isomorphic (Node + browser) HTTP transport.
 
 ## Quick Start
 
@@ -52,7 +53,8 @@ const { anonymizedMetrics } = await client.getAnonymizedMetrics()
 
 ## Subscriptions
 
-Subscription documents are exposed as raw strings for use with a `graphql-ws` client:
+Subscription documents are exposed as raw strings for use with a `graphql-ws`
+client:
 
 ```typescript
 import { createGraphqlClient } from '@/lib/graphql/client'
@@ -98,7 +100,8 @@ Dual-mode auth (same as REST API):
 - **API Key**: Set `apiKey` in config → sends `X-API-Key` header
 - **JWT**: Set `jwt` in config → sends `Authorization: Bearer` header
 
-Field-level security is enforced server-side via `@auth` and `@auth(scope: "admin")` directives.
+Field-level security is enforced server-side via `@auth` and
+`@auth(scope: "admin")` directives.
 
 ## Regenerating Types
 
@@ -106,8 +109,11 @@ Field-level security is enforced server-side via `@auth` and `@auth(scope: "admi
 pnpm codegen:graphql
 ```
 
-This runs `graphql-codegen` with config from `codegen.ts`, regenerating `src/lib/graphql/generated/types.ts` from the schema and operation documents.
+This runs `graphql-codegen` with config from `codegen.ts`, regenerating
+`src/lib/graphql/generated/types.ts` from the schema and operation documents.
 
 ## Browser Usage
 
-The client uses `graphql-request` which auto-detects `fetch` in browser environments. No additional polyfills needed in modern browsers. For Node 18+, `fetch` is built-in.
+The client uses `graphql-request` which auto-detects `fetch` in browser
+environments. No additional polyfills needed in modern browsers. For Node 18+,
+`fetch` is built-in.

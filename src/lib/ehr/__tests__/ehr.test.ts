@@ -48,7 +48,7 @@ describe('eHR Service', () => {
 
   describe('configureProvider', () => {
     it('should successfully configure a provider', async () => {
-       await expect(
+      await expect(
         ehrService.configureProvider(mockProvider),
       ).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -67,7 +67,7 @@ describe('eHR Service', () => {
   describe('connect', () => {
     it('should successfully connect to a configured provider', async () => {
       await ehrService.configureProvider(mockProvider)
-       await expect(ehrService.connect(mockProvider.id)).resolves.not.toThrow()
+      await expect(ehrService.connect(mockProvider.id)).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalledWith(
         `Connected to EHR provider: ${mockProvider.id}`,
       )
@@ -82,7 +82,7 @@ describe('eHR Service', () => {
     it('should successfully disconnect from a connected provider', async () => {
       await ehrService.configureProvider(mockProvider)
       await ehrService.connect(mockProvider.id)
-       await expect(
+      await expect(
         ehrService.disconnect(mockProvider.id),
       ).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -215,7 +215,7 @@ describe('epic Provider', () => {
       vi.spyOn(epicProvider as any, 'getClient').mockReturnValue(mockFhirClient)
 
       // Now initialization should work without network calls
-       await expect(epicProvider.initialize()).resolves.not.toThrow()
+      await expect(epicProvider.initialize()).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalledWith(
         `Initializing provider ${providerConfig.id}`,
       )
@@ -236,7 +236,7 @@ describe('epic Provider', () => {
 
   describe('cleanup', () => {
     it('should successfully cleanup provider', async () => {
-       await expect(epicProvider.cleanup()).resolves.not.toThrow()
+      await expect(epicProvider.cleanup()).resolves.not.toThrow()
       expect(mockLogger.info).toHaveBeenCalledWith(
         `Cleaned up provider ${providerConfig.id}`,
       )

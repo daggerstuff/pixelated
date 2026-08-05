@@ -20,7 +20,9 @@ export class TherapistSessionPage extends BasePage {
   }
 
   async gotoForSession(sessionId: string): Promise<void> {
-    await this.page.goto(`${this.url}?sessionId=${encodeURIComponent(sessionId)}`)
+    await this.page.goto(
+      `${this.url}?sessionId=${encodeURIComponent(sessionId)}`,
+    )
     await this.page.waitForLoadState('networkidle')
   }
 

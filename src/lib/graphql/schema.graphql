@@ -281,7 +281,11 @@ type Query {
   emotions(sessionId: ID!): [EmotionAnalysis!]! @auth
 
   "Get intervention records for a user"
-  interventions(userId: ID!, limit: Int = 10, offset: Int = 0): [InterventionRecord!]! @auth
+  interventions(
+    userId: ID!
+    limit: Int = 10
+    offset: Int = 0
+  ): [InterventionRecord!]! @auth
 
   "Get anonymized research metrics — admin only"
   anonymizedMetrics: AnonymizedMetrics @auth(scope: "admin")

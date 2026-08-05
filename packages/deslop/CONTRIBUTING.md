@@ -24,7 +24,8 @@ mypy deslop/
 
 ## Adding Slop Patterns
 
-Edit `deslop/rules/core.py`. Add patterns to `DEFAULT_SLOP_POOLS` (for replacement) or `DEFAULT_SLOP_MARKERS` (for detection only).
+Edit `deslop/rules/core.py`. Add patterns to `DEFAULT_SLOP_POOLS` (for
+replacement) or `DEFAULT_SLOP_MARKERS` (for detection only).
 
 Each pool entry should be:
 
@@ -34,7 +35,8 @@ Each pool entry should be:
 
 ## Adding Custom Rules
 
-Users can define rules in YAML. See the README for format. If you add a new rule type, document it in both the README and this file.
+Users can define rules in YAML. See the README for format. If you add a new rule
+type, document it in both the README and this file.
 
 ## Code Style
 

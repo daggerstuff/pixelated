@@ -8,13 +8,14 @@
  * resolves them natively.
  */
 import { describe, it, expect, beforeEach } from 'vitest'
+
 import { FHEOperation } from '../types'
+import type { HomomorphicOperationResult } from '../types'
 import {
   ZKProofService,
   getZKProofService,
   resetZKProofService,
 } from '../zk-proof-service'
-import type { HomomorphicOperationResult } from '../types'
 
 /**
  * ZKProofService Tests — PIX-4068

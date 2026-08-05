@@ -472,7 +472,7 @@ describeFn('RedisService Integration Tests', () => {
         return redis.set(key, `value-${i}`)
       })
 
-       await expect(Promise.all(operations)).resolves.not.toThrow()
+      await expect(Promise.all(operations)).resolves.not.toThrow()
     })
 
     it('should handle mixed operations concurrently', async () => {

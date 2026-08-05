@@ -1,10 +1,10 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { FHEOperation } from './types'
-import type { HomomorphicOperationResult } from './types'
 // Lazy import to keep `node:crypto`/`node:fs`/`node:child_process` (used only by the
 // server-side SP1 prover) out of the client bundle. Statically importing
 // sp1-prover here would drag Node builtins into @/lib/fhe (client-reachable).
 import type { SP1Prover } from './sp1-prover'
+import { FHEOperation } from './types'
+import type { HomomorphicOperationResult } from './types'
 
 let getSP1ProverPromise: Promise<() => SP1Prover> | null = null
 function loadSP1Prover(): Promise<() => SP1Prover> {
@@ -274,8 +274,8 @@ export class ZKProofService {
     // merkleRoot is no longer a 64-char lowercase hex digest. Tests in
     // zk-proof-service.test.ts and zk-verify-endpoint.test.ts assert this.
     if (!/^[0-9a-f]{64}$/.test(proof.merkleRoot)) {
-      logger.warn("ZK proof verification failed: merkle root format invalid");
-      return false;
+      logger.warn('ZK proof verification failed: merkle root format invalid')
+      return false
     }
 
     // Timestamp freshness: reject proofs older than MAX_PROOF_AGE_MS.
@@ -292,10 +292,13 @@ export class ZKProofService {
     }
     if (age < 0) {
       // Proof timestamp is in the future — likely clock drift or tampering.
-      logger.warn('ZK proof verification failed: proof timestamp in the future', {
-        ageMs: age,
-        timestamp: proof.timestamp,
-      })
+      logger.warn(
+        'ZK proof verification failed: proof timestamp in the future',
+        {
+          ageMs: age,
+          timestamp: proof.timestamp,
+        },
+      )
       return false
     }
 

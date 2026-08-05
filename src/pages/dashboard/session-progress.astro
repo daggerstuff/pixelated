@@ -12,8 +12,7 @@ import {
 
 const { user } = Astro.props as { user: any }
 
-const therapistId =
-  Astro.url.searchParams.get('therapistId') || user?.id || ''
+const therapistId = Astro.url.searchParams.get('therapistId') || user?.id || ''
 const sessionId = Astro.url.searchParams.get('sessionId') || ''
 ---
 
@@ -24,12 +23,12 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
   <div class="container mx-auto py-6 space-y-6">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533] mb-1">
+        <p
+          class="font-mono text-xs uppercase tracking-[0.16em] text-[#ff8533] mb-1"
+        >
           Longitudinal tracking
         </p>
-        <h1 class="text-4xl font-bold tracking-tight mb-2">
-          Session Progress
-        </h1>
+        <h1 class="text-4xl font-bold tracking-tight mb-2">Session Progress</h1>
         <p class="text-muted-foreground text-lg">
           Multi-session progression metrics, belief changes, and therapeutic
           outcomes
@@ -55,9 +54,7 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
       </Card>
       <Card>
         <div class="p-4">
-          <p class="text-sm font-medium text-muted-foreground">
-            Avg Alliance
-          </p>
+          <p class="text-sm font-medium text-muted-foreground">Avg Alliance</p>
           <p class="text-2xl font-bold">—/10</p>
         </div>
       </Card>
@@ -81,39 +78,27 @@ const sessionId = Astro.url.searchParams.get('sessionId') || ''
 
     <Card>
       <div class="p-6">
-        <DynamicMultiSessionProgression
-          client:visible
-          sessions={[]}
-        />
+        <DynamicMultiSessionProgression client:visible sessions={[]} />
       </div>
     </Card>
 
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
       <Card>
         <div class="p-6">
-          <DynamicBeliefChangeTracker
-            client:visible
-            beliefs={[]}
-          />
+          <DynamicBeliefChangeTracker client:visible beliefs={[]} />
         </div>
       </Card>
 
       <Card>
         <div class="p-6">
-          <DynamicDefenseMechanismAdaptation
-            client:visible
-            defenses={[]}
-          />
+          <DynamicDefenseMechanismAdaptation client:visible defenses={[]} />
         </div>
       </Card>
     </div>
 
     <Card>
       <div class="p-6">
-        <DynamicGoalAttainmentScale
-          client:visible
-          goals={[]}
-        />
+        <DynamicGoalAttainmentScale client:visible goals={[]} />
       </div>
     </Card>
 

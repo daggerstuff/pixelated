@@ -6,73 +6,82 @@
  * privacy through homomorphic encryption.
  */
 
-import { createBuildSafeLogger } from "../logging/build-safe-logger";
-import { type FHEService, type EncryptedData, EncryptionMode, FHEOperation } from "./types";
-import { getFHEService, FHEImplementation } from "./fhe-factory";
-import type { ChatMessage } from "../../types/chat";
+import type { ChatMessage } from '../../types/chat'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getFHEService, FHEImplementation } from './fhe-factory'
+import {
+  type FHEService,
+  type EncryptedData,
+  EncryptionMode,
+  FHEOperation,
+} from './types'
 
-const logger = createBuildSafeLogger("encrypted-memory");
+const logger = createBuildSafeLogger('encrypted-memory')
 
 /**
  * Encrypted session state
  */
 export interface EncryptedSessionState {
-  sessionId: string;
-  therapistId: string;
-  encryptedData: EncryptedData;
-  createdAt: number;
-  updatedAt: number;
+  sessionId: string
+  therapistId: string
+  encryptedData: EncryptedData
+  createdAt: number
+  updatedAt: number
   metadata: {
-    messageCount: number;
-    emotionalTrajectory?: string;
-    riskLevel?: string;
-    tags?: string[];
-  };
+    messageCount: number
+    emotionalTrajectory?: string
+    riskLevel?: string
+    tags?: string[]
+  }
 }
 
 /**
  * Encrypted memory entry for patient history
  */
 export interface EncryptedMemoryEntry {
-  entryId: string;
-  patientId: string;
-  encryptedContent: EncryptedData;
-  entryType: "session_summary" | "emotional_pattern" | "crisis_indicator" | "therapist_note";
-  createdAt: number;
+  entryId: string
+  patientId: string
+  encryptedContent: EncryptedData
+  entryType:
+    | 'session_summary'
+    | 'emotional_pattern'
+    | 'crisis_indicator'
+    | 'therapist_note'
+  createdAt: number
   metadata: {
-    sessionId?: string;
-    keywords?: string[];
-    sentiment?: string;
-    confidence?: number;
-  };
+    sessionId?: string
+    keywords?: string[]
+    sentiment?: string
+    confidence?: number
+  }
 }
 
 /**
  * Emotional state vector stored encrypted
  */
 export interface EncryptedEmotionalState {
-  sessionId: string;
-  timestamp: number;
-  encryptedVector: EncryptedData;
-  vectorType: "emotion" | "sentiment" | "risk" | "trajectory";
+  sessionId: string
+  timestamp: number
+  encryptedVector: EncryptedData
+  vectorType: 'emotion' | 'sentiment' | 'risk' | 'trajectory'
   metadata: {
-    dimensions: number;
-    encoding: "one-hot" | "dense" | "sparse";
-  };
+    dimensions: number
+    encoding: 'one-hot' | 'dense' | 'sparse'
+  }
 }
 
 /**
  * Encrypted memory store service
  */
 export class EncryptedMemoryService {
-  private static instance: EncryptedMemoryService | null = null;
-  private fheService: FHEService | null = null;
-  private initialized = false;
+  private static instance: EncryptedMemoryService | null = null
+  private fheService: FHEService | null = null
+  private initialized = false
 
   // In-memory storage (production should use encrypted DB)
-  private sessions = new Map<string, EncryptedSessionState>();
-  private memories = new Map<string, EncryptedMemoryEntry>();
-  private emotionalStates = new Map<string, EncryptedEmotionalState[]>();
+  private sessions = new Map<string, EncryptedSessionState>()
+  private memories = new Map<string, EncryptedMemoryEntry>()
+  private emotionalStates = new Map<string, EncryptedEmotionalState[]>()
 
   private constructor() {}
 
@@ -80,35 +89,37 @@ export class EncryptedMemoryService {
    * Get singleton instance
    */
   public static getInstance(): EncryptedMemoryService {
-    EncryptedMemoryService.instance ??= new EncryptedMemoryService();
-    return EncryptedMemoryService.instance;
+    EncryptedMemoryService.instance ??= new EncryptedMemoryService()
+    return EncryptedMemoryService.instance
   }
 
   /**
    * Initialize the service
    */
   public async initialize(): Promise<void> {
-    if (this.initialized) return;
+    if (this.initialized) return
 
     try {
-      const env = process.env["NODE_ENV"];
-      const useMock = env === "test" || env === "development";
+      const env = process.env['NODE_ENV']
+      const useMock = env === 'test' || env === 'development'
       this.fheService = await getFHEService({
-        implementation: useMock ? FHEImplementation.Mock : FHEImplementation.SEAL,
-      } as any);
+        implementation: useMock
+          ? FHEImplementation.Mock
+          : FHEImplementation.SEAL,
+      } as any)
 
-      await this.fheService.initialize();
-      this.initialized = true;
-      logger.info("Encrypted memory service initialized");
+      await this.fheService.initialize()
+      this.initialized = true
+      logger.info('Encrypted memory service initialized')
     } catch (error) {
-      logger.error("Failed to initialize encrypted memory service", { error });
-      throw error;
+      logger.error('Failed to initialize encrypted memory service', { error })
+      throw error
     }
   }
 
   private async ensureInitialized(): Promise<void> {
     if (!this.initialized) {
-      await this.initialize();
+      await this.initialize()
     }
   }
 
@@ -120,8 +131,8 @@ export class EncryptedMemoryService {
     therapistId: string,
     initialMessages: ChatMessage[],
   ): Promise<EncryptedSessionState> {
-    await this.ensureInitialized();
-    if (!this.fheService) throw new Error("FHE service not initialized");
+    await this.ensureInitialized()
+    if (!this.fheService) throw new Error('FHE service not initialized')
 
     // Encrypt session data
     const encryptedContent = await this.fheService.encrypt(
@@ -136,7 +147,7 @@ export class EncryptedMemoryService {
           createdAt: Date.now(),
         },
       }),
-    );
+    )
 
     const state: EncryptedSessionState = {
       sessionId,
@@ -147,11 +158,11 @@ export class EncryptedMemoryService {
       metadata: {
         messageCount: initialMessages.length,
       },
-    };
+    }
 
-    this.sessions.set(sessionId, state);
-    logger.info(`Created encrypted session ${sessionId.slice(-8)}`);
-    return state;
+    this.sessions.set(sessionId, state)
+    logger.info(`Created encrypted session ${sessionId.slice(-8)}`)
+    return state
   }
 
   /**
@@ -161,9 +172,9 @@ export class EncryptedMemoryService {
     sessionId: string,
     newMessages: ChatMessage[],
   ): Promise<EncryptedSessionState | null> {
-    await this.ensureInitialized();
-    const session = this.sessions.get(sessionId);
-    if (!session) return null;
+    await this.ensureInitialized()
+    const session = this.sessions.get(sessionId)
+    if (!session) return null
 
     // Encrypt new messages
     const encryptedMessages = await Promise.all(
@@ -172,11 +183,11 @@ export class EncryptedMemoryService {
         timestamp: msg.timestamp,
         content: await this.fheService!.encrypt(msg.content),
       })),
-    );
+    )
 
     // Update session state
-    session.updatedAt = Date.now();
-    session.metadata.messageCount += newMessages.length;
+    session.updatedAt = Date.now()
+    session.metadata.messageCount += newMessages.length
 
     // Store encrypted messages
     session.encryptedData = await this.fheService!.encrypt(
@@ -184,17 +195,17 @@ export class EncryptedMemoryService {
         messages: encryptedMessages,
         metadata: session.encryptedData.metadata,
       }),
-    );
+    )
 
-    this.sessions.set(sessionId, session);
-    return session;
+    this.sessions.set(sessionId, session)
+    return session
   }
 
   /**
    * Get session state (returns encrypted data)
    */
   public getSession(sessionId: string): EncryptedSessionState | null {
-    return this.sessions.get(sessionId) || null;
+    return this.sessions.get(sessionId) || null
   }
 
   /**
@@ -203,13 +214,13 @@ export class EncryptedMemoryService {
   public async createMemoryEntry(
     patientId: string,
     content: string,
-    entryType: EncryptedMemoryEntry["entryType"],
-    metadata: EncryptedMemoryEntry["metadata"] = {},
+    entryType: EncryptedMemoryEntry['entryType'],
+    metadata: EncryptedMemoryEntry['metadata'] = {},
   ): Promise<EncryptedMemoryEntry> {
-    await this.ensureInitialized();
-    if (!this.fheService) throw new Error("FHE service not initialized");
+    await this.ensureInitialized()
+    if (!this.fheService) throw new Error('FHE service not initialized')
 
-    const encryptedContent = await this.fheService.encrypt(content);
+    const encryptedContent = await this.fheService.encrypt(content)
 
     const entry: EncryptedMemoryEntry = {
       entryId: `mem-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -218,18 +229,20 @@ export class EncryptedMemoryService {
       entryType,
       createdAt: Date.now(),
       metadata,
-    };
+    }
 
-    this.memories.set(entry.entryId, entry);
-    logger.info(`Created encrypted memory entry ${entry.entryId.slice(-8)}`);
-    return entry;
+    this.memories.set(entry.entryId, entry)
+    logger.info(`Created encrypted memory entry ${entry.entryId.slice(-8)}`)
+    return entry
   }
 
   /**
    * Get memory entries for patient
    */
   public getPatientMemories(patientId: string): EncryptedMemoryEntry[] {
-    return Array.from(this.memories.values()).filter((entry) => entry.patientId === patientId);
+    return Array.from(this.memories.values()).filter(
+      (entry) => entry.patientId === patientId,
+    )
   }
 
   /**
@@ -238,12 +251,12 @@ export class EncryptedMemoryService {
   public async storeEmotionalState(
     sessionId: string,
     vector: number[],
-    vectorType: EncryptedEmotionalState["vectorType"],
+    vectorType: EncryptedEmotionalState['vectorType'],
   ): Promise<EncryptedEmotionalState> {
-    await this.ensureInitialized();
-    if (!this.fheService) throw new Error("FHE service not initialized");
+    await this.ensureInitialized()
+    if (!this.fheService) throw new Error('FHE service not initialized')
 
-    const encryptedVector = await this.fheService.encrypt(vector);
+    const encryptedVector = await this.fheService.encrypt(vector)
 
     const state: EncryptedEmotionalState = {
       sessionId,
@@ -252,63 +265,65 @@ export class EncryptedMemoryService {
       vectorType,
       metadata: {
         dimensions: vector.length,
-        encoding: "dense",
+        encoding: 'dense',
       },
-    };
+    }
 
     if (!this.emotionalStates.has(sessionId)) {
-      this.emotionalStates.set(sessionId, []);
+      this.emotionalStates.set(sessionId, [])
     }
-    this.emotionalStates.get(sessionId)!.push(state);
+    this.emotionalStates.get(sessionId)!.push(state)
 
-    return state;
+    return state
   }
 
   /**
    * Get emotional trajectory for session
    */
   public getEmotionalTrajectory(sessionId: string): EncryptedEmotionalState[] {
-    return this.emotionalStates.get(sessionId) || [];
+    return this.emotionalStates.get(sessionId) || []
   }
 
   /**
    * Analyze emotional trajectory homomorphically
    */
   public async analyzeEmotionalTrajectory(sessionId: string): Promise<{
-    trend: "improving" | "declining" | "stable";
-    volatility: number;
-    encryptedAnalysis: EncryptedData;
+    trend: 'improving' | 'declining' | 'stable'
+    volatility: number
+    encryptedAnalysis: EncryptedData
   }> {
-    await this.ensureInitialized();
-    if (!this.fheService) throw new Error("FHE service not initialized");
+    await this.ensureInitialized()
+    if (!this.fheService) throw new Error('FHE service not initialized')
 
-    const states = this.getEmotionalTrajectory(sessionId);
+    const states = this.getEmotionalTrajectory(sessionId)
     if (states.length < 2) {
       return {
-        trend: "stable",
+        trend: 'stable',
         volatility: 0,
         encryptedAnalysis: await this.fheService.encrypt({
-          trend: "stable",
+          trend: 'stable',
           volatility: 0,
         }),
-      };
+      }
     }
 
     // Encrypt trajectory data for homomorphic analysis
     const trajectoryData = states.map((s) => ({
       timestamp: s.timestamp,
       vectorType: s.vectorType,
-    }));
+    }))
 
-    const encryptedAnalysis = await this.fheService.encrypt(JSON.stringify(trajectoryData));
+    const encryptedAnalysis = await this.fheService.encrypt(
+      JSON.stringify(trajectoryData),
+    )
 
     // In production, perform homomorphic analysis on encrypted vectors
     // For now, return encrypted trajectory data
     return {
-      trend: "stable",
+      trend: 'stable',
       volatility: 0,
       encryptedAnalysis,
-    };
+    }
   }
 
   /**
@@ -318,31 +333,33 @@ export class EncryptedMemoryService {
     patientId: string,
     keywords: string[],
   ): Promise<EncryptedMemoryEntry[]> {
-    await this.ensureInitialized();
-    const entries = this.getPatientMemories(patientId);
+    await this.ensureInitialized()
+    const entries = this.getPatientMemories(patientId)
 
     // Encrypt keywords for encrypted search
-    const encryptedKeywords = await Promise.all(keywords.map((k) => this.fheService!.encrypt(k)));
+    const encryptedKeywords = await Promise.all(
+      keywords.map((k) => this.fheService!.encrypt(k)),
+    )
 
     // In production, perform homomorphic search on encrypted content
     // For now, return all entries (client-side filtering after decryption)
-    return entries;
+    return entries
   }
 
   /**
    * Delete session (securely wipe encrypted data)
    */
   public deleteSession(sessionId: string): void {
-    this.sessions.delete(sessionId);
-    this.emotionalStates.delete(sessionId);
-    logger.info(`Deleted encrypted session ${sessionId.slice(-8)}`);
+    this.sessions.delete(sessionId)
+    this.emotionalStates.delete(sessionId)
+    logger.info(`Deleted encrypted session ${sessionId.slice(-8)}`)
   }
 
   /**
    * Export all encrypted data for backup
    */
   public async exportEncryptedData(): Promise<Record<string, unknown>> {
-    await this.ensureInitialized();
+    await this.ensureInitialized()
 
     return {
       sessions: Array.from(this.sessions.values()).map((s) => ({
@@ -360,60 +377,67 @@ export class EncryptedMemoryService {
         createdAt: m.createdAt,
         metadata: m.metadata,
       })),
-    };
+    }
   }
 
   /**
    * Import encrypted data from backup
    */
-  public async importEncryptedData(data: Record<string, unknown>): Promise<void> {
-    await this.ensureInitialized();
+  public async importEncryptedData(
+    data: Record<string, unknown>,
+  ): Promise<void> {
+    await this.ensureInitialized()
 
-    const sessionsArr = data["sessions"] as Array<Record<string, unknown>> | undefined;
+    const sessionsArr = data['sessions'] as
+      | Array<Record<string, unknown>>
+      | undefined
     if (sessionsArr) {
       for (const session of sessionsArr) {
-        this.sessions.set((session["sessionId"] as string) || "", {
-          sessionId: (session["sessionId"] as string) || "",
-          therapistId: (session["therapistId"] as string) || "",
+        this.sessions.set((session['sessionId'] as string) || '', {
+          sessionId: (session['sessionId'] as string) || '',
+          therapistId: (session['therapistId'] as string) || '',
           encryptedData: {
             id: `imported-${Date.now()}`,
-            data: (session["encryptedData"] as string) || "",
-            dataType: "string",
-            metadata: (session["metadata"] as Record<string, unknown>) || {},
+            data: (session['encryptedData'] as string) || '',
+            dataType: 'string',
+            metadata: (session['metadata'] as Record<string, unknown>) || {},
           },
-          createdAt: (session["createdAt"] as number) || 0,
-          updatedAt: (session["updatedAt"] as number) || 0,
-          metadata: (session["metadata"] as any) || {},
-        });
+          createdAt: (session['createdAt'] as number) || 0,
+          updatedAt: (session['updatedAt'] as number) || 0,
+          metadata: (session['metadata'] as any) || {},
+        })
       }
     }
 
-    const memoriesArr = data["memories"] as Array<Record<string, unknown>> | undefined;
+    const memoriesArr = data['memories'] as
+      | Array<Record<string, unknown>>
+      | undefined
     if (memoriesArr) {
       for (const memory of memoriesArr) {
-        this.memories.set((memory["entryId"] as string) || "", {
-          entryId: (memory["entryId"] as string) || "",
-          patientId: (memory["patientId"] as string) || "",
+        this.memories.set((memory['entryId'] as string) || '', {
+          entryId: (memory['entryId'] as string) || '',
+          patientId: (memory['patientId'] as string) || '',
           encryptedContent: {
             id: `imported-${Date.now()}`,
-            data: (memory["encryptedContent"] as string) || "",
-            dataType: "string",
-            metadata: (memory["metadata"] as Record<string, unknown>) || {},
+            data: (memory['encryptedContent'] as string) || '',
+            dataType: 'string',
+            metadata: (memory['metadata'] as Record<string, unknown>) || {},
           },
           entryType:
-            (memory["entryType"] as EncryptedMemoryEntry["entryType"]) || "session_summary",
-          createdAt: (memory["createdAt"] as number) || 0,
-          metadata: (memory["metadata"] as any) || {},
-        });
+            (memory['entryType'] as EncryptedMemoryEntry['entryType']) ||
+            'session_summary',
+          createdAt: (memory['createdAt'] as number) || 0,
+          metadata: (memory['metadata'] as any) || {},
+        })
       }
     }
 
-    const sessionCount = sessionsArr?.length || 0;
-    const memoryCount = memoriesArr?.length || 0;
-    logger.info(`Imported ${sessionCount} sessions and ${memoryCount} memories`);
+    const sessionCount = sessionsArr?.length || 0
+    const memoryCount = memoriesArr?.length || 0
+    logger.info(`Imported ${sessionCount} sessions and ${memoryCount} memories`)
   }
 }
 
 // Export singleton instance
-export const encryptedMemory = EncryptedMemoryService.getInstance();
-export default encryptedMemory;
+export const encryptedMemory = EncryptedMemoryService.getInstance()
+export default encryptedMemory

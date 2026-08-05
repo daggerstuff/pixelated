@@ -1,11 +1,11 @@
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
-import { getZKProofService, MAX_PROOF_AGE_MS } from "@/lib/fhe/zk-proof-service";
-import type { ZKProofArtifact } from "@/lib/fhe/zk-proof-service";
+import { getZKProofService, MAX_PROOF_AGE_MS } from '@/lib/fhe/zk-proof-service'
+import type { ZKProofArtifact } from '@/lib/fhe/zk-proof-service'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-import { protectRoute } from "../../../../lib/auth/serverAuth";
+import { protectRoute } from '../../../../lib/auth/serverAuth'
 
-export const prerender = false;
-const logger = createBuildSafeLogger("zk-verify-api");
+export const prerender = false
+const logger = createBuildSafeLogger('zk-verify-api')
 
 /**
  * In-memory nonce cache for replay-attack prevention (opaque, ephemeral).
@@ -52,51 +52,99 @@ export const POST = protectRoute({
   const user = locals.user
 
   try {
-    const body = (await request.json()) as Partial<ZKProofArtifact>;
+    const body = (await request.json()) as Partial<ZKProofArtifact>
 
     // ── Enterprise field validation at endpoint boundary ─────────────
     const requiredFields: (keyof ZKProofArtifact)[] = [
-      "proof", "publicInputHash", "publicOutputHash",
-      "merkleRoot", "operationType", "timestamp", "nonce",
-    ];
+      'proof',
+      'publicInputHash',
+      'publicOutputHash',
+      'merkleRoot',
+      'operationType',
+      'timestamp',
+      'nonce',
+    ]
 
     for (const field of requiredFields) {
       const value = body[field]
       if (value === undefined || value === null || value === '') {
         logger.warn('ZK proof verification rejected: missing field', {
-          field, userId: user?.id,
+          field,
+          userId: user?.id,
         })
         return new Response(
-          JSON.stringify({ valid: false, error: `Missing required field: ${field}` }),
-          { status: 400, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-        );
+          JSON.stringify({
+            valid: false,
+            error: `Missing required field: ${field}`,
+          }),
+          {
+            status: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-store, no-cache, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          },
+        )
       }
     }
 
     // Validate hex format of hash fields at the endpoint boundary
-    const hashFields: (keyof Pick<ZKProofArtifact, 'proof' | 'publicInputHash' | 'publicOutputHash' | 'merkleRoot' | 'nonce'>)[] = [
-      'proof', 'publicInputHash', 'publicOutputHash', 'merkleRoot', 'nonce',
+    const hashFields: (keyof Pick<
+      ZKProofArtifact,
+      'proof' | 'publicInputHash' | 'publicOutputHash' | 'merkleRoot' | 'nonce'
+    >)[] = [
+      'proof',
+      'publicInputHash',
+      'publicOutputHash',
+      'merkleRoot',
+      'nonce',
     ]
     for (const field of hashFields) {
       if (!HASH_RE.test(String(body[field] ?? ''))) {
-        logger.warn('ZK proof verification rejected: field format invalid', { field, userId: user?.id })
+        logger.warn('ZK proof verification rejected: field format invalid', {
+          field,
+          userId: user?.id,
+        })
         return new Response(
           JSON.stringify({
             valid: false,
             error: `Invalid format for field: ${field} (expected 64-char lowercase hex)`,
           }),
-          { status: 400, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-        );
+          {
+            status: 400,
+            headers: {
+              'Content-Type': 'application/json',
+              'Cache-Control': 'no-store, no-cache, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          },
+        )
       }
     }
 
     // operationType must be a non-empty string
-    if (typeof body.operationType !== 'string' || body.operationType.length === 0) {
-      logger.warn('ZK proof verification rejected: empty operationType', { userId: user?.id })
+    if (
+      typeof body.operationType !== 'string' ||
+      body.operationType.length === 0
+    ) {
+      logger.warn('ZK proof verification rejected: empty operationType', {
+        userId: user?.id,
+      })
       return new Response(
-        JSON.stringify({ valid: false, error: 'operationType must be a non-empty string' }),
-        { status: 400, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-      );
+        JSON.stringify({
+          valid: false,
+          error: 'operationType must be a non-empty string',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, no-cache, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        },
+      )
     }
 
     const proofArtifact: ZKProofArtifact = {
@@ -107,29 +155,43 @@ export const POST = protectRoute({
       operationType: body.operationType!,
       timestamp: body.timestamp!,
       durationMs: body.durationMs ?? 0,
-      proofMode: body.proofMode ?? "hash-commitment",
+      proofMode: body.proofMode ?? 'hash-commitment',
       nonce: body.nonce!,
-    };
+    }
 
     // ── Replay-attack detection ──────────────────────────────────────
     pruneNonceCache()
     if (verifiedNonces.has(proofArtifact.nonce)) {
-      logger.warn('ZK proof verification rejected: nonce already used (replay)', {
-        nonce: proofArtifact.nonce.slice(0, 16), userId: user?.id,
-      })
+      logger.warn(
+        'ZK proof verification rejected: nonce already used (replay)',
+        {
+          nonce: proofArtifact.nonce.slice(0, 16),
+          userId: user?.id,
+        },
+      )
       return new Response(
-        JSON.stringify({ valid: false, error: 'Replay detected: this proof has already been verified' }),
-        { status: 429, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-      );
+        JSON.stringify({
+          valid: false,
+          error: 'Replay detected: this proof has already been verified',
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, no-cache, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        },
+      )
     }
 
-    const zkService = getZKProofService();
+    const zkService = getZKProofService()
 
     const valid = await zkService.verifyProof(
       proofArtifact,
       proofArtifact.publicInputHash,
       proofArtifact.publicOutputHash,
-    );
+    )
 
     // Record the nonce so it cannot be replayed
     verifiedNonces.add(proofArtifact.nonce)
@@ -139,7 +201,7 @@ export const POST = protectRoute({
     // ── Enterprise audit log ─────────────────────────────────────────
     // Every verification attempt is logged with the authenticated user's
     // identity, satisfying HIPAA audit-control requirements (45 CFR § 164.312(b)).
-    logger.info("ZK proof verification", {
+    logger.info('ZK proof verification', {
       valid,
       userId: user?.id,
       userRole: user?.role,
@@ -150,7 +212,7 @@ export const POST = protectRoute({
       durationMs: Math.round(durationMs),
       timestamp: proofArtifact.timestamp,
       ageMs: Date.now() - proofArtifact.timestamp,
-    });
+    })
 
     return new Response(
       JSON.stringify({
@@ -161,27 +223,41 @@ export const POST = protectRoute({
         proofMode: proofArtifact.proofMode,
         durationMs: Math.round(durationMs),
       }),
-      { status: valid ? 200 : 422, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-    );
+      {
+        status: valid ? 200 : 422,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      },
+    )
   } catch (error: unknown) {
     const durationMs = performance.now() - startTime
 
-    logger.error("ZK proof verification failed", {
+    logger.error('ZK proof verification failed', {
       error,
       userId: user?.id,
       durationMs: Math.round(durationMs),
-    });
+    })
 
     return new Response(
       JSON.stringify({
         valid: false,
-        error: "Proof verification failed",
-        message: error instanceof Error ? error.message : "Unknown error",
+        error: 'Proof verification failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
-      { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-    );
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      },
+    )
   }
-});
+})
 
 /**
  * GET /api/v1/zk/verify
@@ -197,20 +273,33 @@ export const GET = protectRoute({
 
   return new Response(
     JSON.stringify({
-      endpoint: "/api/v1/zk/verify",
-      method: "POST",
-      description: "Verifies a Zero-Knowledge proof artifact for data pipeline integrity",
-      proofSystem: "SP1 (Succinct) with hash-based commitments",
-      adr: "ADR-0004",
+      endpoint: '/api/v1/zk/verify',
+      method: 'POST',
+      description:
+        'Verifies a Zero-Knowledge proof artifact for data pipeline integrity',
+      proofSystem: 'SP1 (Succinct) with hash-based commitments',
+      adr: 'ADR-0004',
       proofMaxAgeMs: MAX_PROOF_AGE_MS,
-      replayProtection: "nonce-based (ephemeral in-memory cache)",
-      authMethod: "any authenticated user (validated IP match)",
+      replayProtection: 'nonce-based (ephemeral in-memory cache)',
+      authMethod: 'any authenticated user (validated IP match)',
       requiredFields: [
-        "proof", "publicInputHash", "publicOutputHash",
-        "merkleRoot", "operationType", "timestamp", "nonce",
+        'proof',
+        'publicInputHash',
+        'publicOutputHash',
+        'merkleRoot',
+        'operationType',
+        'timestamp',
+        'nonce',
       ],
-      auditLogging: "per-user identity logged on every verification attempt",
+      auditLogging: 'per-user identity logged on every verification attempt',
     }),
-    { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store, no-cache, must-revalidate", Pragma: "no-cache" } },
-  );
-});
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    },
+  )
+})

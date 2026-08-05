@@ -4,6 +4,6 @@ markers:
 
 pools:
   delighted to assist:
-    - ["I can help", 0.35]
+    - ['I can help', 0.35]
     - ["I'll take a look", 0.25]
     - [null, 0.4]

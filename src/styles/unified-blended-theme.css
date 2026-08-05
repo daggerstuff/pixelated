@@ -4,15 +4,15 @@
    ================================================ */
 
 /* Import modular theme components */
-@import "./variables.css";
-@import "./typography.css";
-@import "./spacing.css";
-@import "./borders.css";
-@import "./shadows.css";
-@import "./gradients.css";
-@import "./mesh.css";
-@import "./transitions.css";
-@import "./utilities.css";
+@import './variables.css';
+@import './typography.css';
+@import './spacing.css';
+@import './borders.css';
+@import './shadows.css';
+@import './gradients.css';
+@import './mesh.css';
+@import './transitions.css';
+@import './utilities.css';
 
 /* Keep base styles and media queries as they are for compatibility */
 /* === BASE STYLES === */
@@ -374,7 +374,12 @@ a:hover {
 
 .divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border-primary), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--border-primary),
+    transparent
+  );
   margin: var(--spacing-12) 0;
 }
 

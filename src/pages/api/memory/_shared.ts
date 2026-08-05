@@ -1,31 +1,35 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID } from 'node:crypto'
 
-import { getCurrentUser } from "@/lib/auth";
-import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { getCurrentUser } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   ProductMemoryGatewayError,
   getProductMemoryGateway,
   type ProductMemoryScope,
-} from "@/lib/services/product-memory-gateway";
+} from '@/lib/services/product-memory-gateway'
 
-export const memoryApiLogger = createBuildSafeLogger("memory-api");
+export const memoryApiLogger = createBuildSafeLogger('memory-api')
 
 export async function requireMemoryUser(request: Request) {
-  return getCurrentUser(request);
+  return getCurrentUser(request)
 }
 
 export function jsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
     status,
     headers: {
-      "Content-Type": "application/json",
-      Deprecation: "true",
-      Sunset: "Fri, 01 Jan 2027 00:00:00 GMT",
+      'Content-Type': 'application/json',
+      'Deprecation': 'true',
+      'Sunset': 'Fri, 01 Jan 2027 00:00:00 GMT',
     },
-  });
+  })
 }
 
-export function successResponse(data: unknown, message = "Success", status = 200): Response {
+export function successResponse(
+  data: unknown,
+  message = 'Success',
+  status = 200,
+): Response {
   return jsonResponse(
     {
       success: true,
@@ -33,7 +37,7 @@ export function successResponse(data: unknown, message = "Success", status = 200
       message,
     },
     status,
-  );
+  )
 }
 
 /**
@@ -49,34 +53,39 @@ export function errorResponse(
     success: false,
     error,
     message,
-  };
-
-  if (details) {
-    response["details"] = details;
   }
 
-  return jsonResponse(response, status);
+  if (details) {
+    response['details'] = details
+  }
+
+  return jsonResponse(response, status)
 }
 
-export function jsonError(status: number, error: string, message: string): Response {
-  return jsonResponse({ error, message }, status);
+export function jsonError(
+  status: number,
+  error: string,
+  message: string,
+): Response {
+  return jsonResponse({ error, message }, status)
 }
 
 export function parsePagination(url: URL): {
-  limit: number;
-  offset: number;
+  limit: number
+  offset: number
 } {
-  const rawLimit = Number.parseInt(url.searchParams.get("limit") ?? "10", 10);
-  const rawOffset = Number.parseInt(url.searchParams.get("offset") ?? "0", 10);
+  const rawLimit = Number.parseInt(url.searchParams.get('limit') ?? '10', 10)
+  const rawOffset = Number.parseInt(url.searchParams.get('offset') ?? '0', 10)
 
   return {
-    limit: Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 10,
+    limit:
+      Number.isFinite(rawLimit) && rawLimit > 0 ? Math.min(rawLimit, 100) : 10,
     offset: Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0,
-  };
+  }
 }
 
 export function getGateway() {
-  return getProductMemoryGateway();
+  return getProductMemoryGateway()
 }
 
 /** The public product API scopes memory to user+account+workspace only.
@@ -93,7 +102,7 @@ export function toMemoryScope(
     accountId,
     workspaceId,
     includeShared: true,
-  };
+  }
 }
 
 export function assertRequestedUser(
@@ -101,35 +110,50 @@ export function assertRequestedUser(
   requestedUserId: string | null | undefined,
 ): Response | null {
   if (requestedUserId && requestedUserId !== actualUserId) {
-    return jsonError(400, "Bad Request", "userId must match the authenticated user");
+    return jsonError(
+      400,
+      'Bad Request',
+      'userId must match the authenticated user',
+    )
   }
-  return null;
+  return null
 }
 
 export type MemoryRouteContext = {
-  request: Request;
-  params?: Record<string, string | undefined>;
-  cookies?: unknown;
-};
+  request: Request
+  params?: Record<string, string | undefined>
+  cookies?: unknown
+}
 
-type AuthenticatedMemoryUser = NonNullable<Awaited<ReturnType<typeof requireMemoryUser>>>;
+type AuthenticatedMemoryUser = NonNullable<
+  Awaited<ReturnType<typeof requireMemoryUser>>
+>
 
-export function withAuthenticatedMemoryRoute<TContext extends MemoryRouteContext>(
+export function withAuthenticatedMemoryRoute<
+  TContext extends MemoryRouteContext,
+>(
   action: string,
-  handler: (context: TContext, user: AuthenticatedMemoryUser) => Promise<Response>,
+  handler: (
+    context: TContext,
+    user: AuthenticatedMemoryUser,
+  ) => Promise<Response>,
 ) {
   return async (context: TContext): Promise<Response> => {
-    const user = await requireMemoryUser(context.request);
+    const user = await requireMemoryUser(context.request)
     if (!user) {
-      return jsonError(401, "Unauthorized", "You must be authenticated to access this endpoint");
+      return jsonError(
+        401,
+        'Unauthorized',
+        'You must be authenticated to access this endpoint',
+      )
     }
 
     try {
-      return await handler(context, user);
+      return await handler(context, user)
     } catch (error: unknown) {
-      return handleMemoryApiError(action, error);
+      return handleMemoryApiError(action, error)
     }
-  };
+  }
 }
 
 /**
@@ -145,61 +169,79 @@ export function withAuthenticatedMemoryRoute<TContext extends MemoryRouteContext
  */
 export function legacyV1Shim(
   v1Handler: (context: MemoryRouteContext) => Promise<Response>,
-  transformSuccess: (v1Body: Record<string, unknown>, status: number) => Record<string, unknown>,
+  transformSuccess: (
+    v1Body: Record<string, unknown>,
+    status: number,
+  ) => Record<string, unknown>,
 ) {
   return async (context: MemoryRouteContext): Promise<Response> => {
-    const v1Response = await v1Handler(context);
+    const v1Response = await v1Handler(context)
 
     if (v1Response.status >= 400) {
-      const body = await v1Response.json();
-      return jsonResponse(body, v1Response.status);
+      const body = await v1Response.json()
+      return jsonResponse(body, v1Response.status)
     }
 
-    const body = (await v1Response.json()) as Record<string, unknown>;
-    return jsonResponse(transformSuccess(body, v1Response.status), v1Response.status);
-  };
+    const body = (await v1Response.json()) as Record<string, unknown>
+    return jsonResponse(
+      transformSuccess(body, v1Response.status),
+      v1Response.status,
+    )
+  }
 }
 
 export function handleMemoryApiError(action: string, error: unknown): Response {
-  const correlationId = randomUUID();
+  const correlationId = randomUUID()
 
   if (error instanceof ProductMemoryGatewayError) {
     memoryApiLogger.error(`Error ${action}:`, {
       correlationId,
       status: error.status,
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
+      message: error instanceof Error ? error.message : 'Unknown error',
+    })
     if (error.status === 404) {
-      return jsonError(404, "Not Found", "Memory not found");
+      return jsonError(404, 'Not Found', 'Memory not found')
     }
 
     if (error.status === 400) {
-      return jsonError(400, "Bad Request", "Invalid memory request");
+      return jsonError(400, 'Bad Request', 'Invalid memory request')
     }
 
     if (error.status === 401 || error.status === 403) {
       return jsonError(
         502,
-        "Bad Gateway",
+        'Bad Gateway',
         `Memory service authorization failed (${correlationId})`,
-      );
+      )
     }
 
-    return jsonError(502, "Bad Gateway", `Memory service request failed (${correlationId})`);
+    return jsonError(
+      502,
+      'Bad Gateway',
+      `Memory service request failed (${correlationId})`,
+    )
   }
 
   if (error instanceof Error) {
     memoryApiLogger.error(`Error ${action}:`, {
       correlationId,
       name: error.name,
-      message: error instanceof Error ? error.message : "Unknown error",
-    });
-    return jsonError(500, "Internal Server Error", `Memory operation failed (${correlationId})`);
+      message: error instanceof Error ? error.message : 'Unknown error',
+    })
+    return jsonError(
+      500,
+      'Internal Server Error',
+      `Memory operation failed (${correlationId})`,
+    )
   }
 
   memoryApiLogger.error(`Error ${action}:`, {
     correlationId,
-    message: "Unknown error",
-  });
-  return jsonError(500, "Internal Server Error", `Unknown memory error (${correlationId})`);
+    message: 'Unknown error',
+  })
+  return jsonError(
+    500,
+    'Internal Server Error',
+    `Unknown memory error (${correlationId})`,
+  )
 }

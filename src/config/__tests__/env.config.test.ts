@@ -1,12 +1,14 @@
 // @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { config, env, getEnv } from '../env.config'
 
 const originalEnv: Record<string, string | undefined> = {}
 
 function snapshotEnv() {
   for (const key of Object.keys(originalEnv)) delete originalEnv[key]
-  for (const key of Object.keys(process.env)) originalEnv[key] = process.env[key]
+  for (const key of Object.keys(process.env))
+    originalEnv[key] = process.env[key]
 }
 
 function restoreEnv() {
@@ -37,7 +39,12 @@ afterEach(() => {
 
 describe('getEnv (stateless validation)', () => {
   it('applies schema defaults when keys are absent', () => {
-    applyEnv({ NODE_ENV: undefined, PORT: undefined, LOG_LEVEL: undefined, CI: undefined })
+    applyEnv({
+      NODE_ENV: undefined,
+      PORT: undefined,
+      LOG_LEVEL: undefined,
+      CI: undefined,
+    })
     const result = getEnv()
     expect(result.NODE_ENV).toBe('development')
     expect(result.PORT).toBe(3000)
@@ -46,7 +53,12 @@ describe('getEnv (stateless validation)', () => {
   })
 
   it('coerces and surfaces provided overrides', () => {
-    applyEnv({ NODE_ENV: 'production', PORT: '8080', LOG_LEVEL: 'debug', CI: undefined })
+    applyEnv({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      LOG_LEVEL: 'debug',
+      CI: undefined,
+    })
     const result = getEnv()
     expect(result.NODE_ENV).toBe('production')
     expect(result.PORT).toBe(8080)
@@ -88,51 +100,50 @@ describe('getEnv secret masking', () => {
     expect(logSpy).not.toHaveBeenCalled()
   })
 
-describe('maskEnv patterns and passthrough', () => {
-  it('masks secret/token/dsn keys, passes through safe keys, hides unknown keys', () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    applyEnv({
-      CI: 'true',
-      NODE_ENV: 'production',
-      REDIS_TOKEN: 'rt',
-      AXIOM_TOKEN: 'at',
-      SITE_URL: 'https://x',
-      PUBLIC_WIDGET: 'w',
-      SOME_RANDOM_KEY: 'value',
-    })
-    getEnv()
-    const logged = logSpy.mock.calls[0][1] as Record<string, unknown>
-    expect(logged['REDIS_TOKEN']).toBe('[hidden]')
-    expect(logged['AXIOM_TOKEN']).toBe('[hidden]')
-    expect(logged['SITE_URL']).toBe('https://x')
-    expect(logged['PUBLIC_WIDGET']).toBe('w')
-    expect(logged['SOME_RANDOM_KEY']).toBe('[hidden]')
-  })
-
-  it('passes through null/undefined values unchanged (best-effort)', () => {
-    const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    applyEnv({ CI: 'true', NODE_ENV: 'production' })
-    let injected = false
-    try {
-      Object.defineProperty(process.env, 'NULL_VAL', {
-        value: undefined,
-        enumerable: true,
-        configurable: true,
+  describe('maskEnv patterns and passthrough', () => {
+    it('masks secret/token/dsn keys, passes through safe keys, hides unknown keys', () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+      applyEnv({
+        CI: 'true',
+        NODE_ENV: 'production',
+        REDIS_TOKEN: 'rt',
+        AXIOM_TOKEN: 'at',
+        SITE_URL: 'https://x',
+        PUBLIC_WIDGET: 'w',
+        SOME_RANDOM_KEY: 'value',
       })
-      injected = true
-    } catch {
-      injected = false
-    }
-    getEnv()
-    if (injected) {
+      getEnv()
       const logged = logSpy.mock.calls[0][1] as Record<string, unknown>
-      if ('NULL_VAL' in logged) {
-        expect(logged['NULL_VAL']).toBeUndefined()
-      }
-    }
-  })
-})
+      expect(logged['REDIS_TOKEN']).toBe('[hidden]')
+      expect(logged['AXIOM_TOKEN']).toBe('[hidden]')
+      expect(logged['SITE_URL']).toBe('https://x')
+      expect(logged['PUBLIC_WIDGET']).toBe('w')
+      expect(logged['SOME_RANDOM_KEY']).toBe('[hidden]')
+    })
 
+    it('passes through null/undefined values unchanged (best-effort)', () => {
+      const logSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+      applyEnv({ CI: 'true', NODE_ENV: 'production' })
+      let injected = false
+      try {
+        Object.defineProperty(process.env, 'NULL_VAL', {
+          value: undefined,
+          enumerable: true,
+          configurable: true,
+        })
+        injected = true
+      } catch {
+        injected = false
+      }
+      getEnv()
+      if (injected) {
+        const logged = logSpy.mock.calls[0][1] as Record<string, unknown>
+        if ('NULL_VAL' in logged) {
+          expect(logged['NULL_VAL']).toBeUndefined()
+        }
+      }
+    })
+  })
 })
 
 describe('config object getters', () => {
@@ -259,8 +270,6 @@ describe('config object getters', () => {
     expect(config.ai.anthropicApiKey()).toBeUndefined()
   })
 
-
-
   it('exposes worker websocket port defaults', () => {
     expect(config.workers.analytics.wsPort()).toBe(8083)
     expect(config.workers.notification.wsPort()).toBe(8082)
@@ -371,8 +380,6 @@ describe('config object getters', () => {
     expect(config.mentalLLaMA.enablePythonBridge()).toBeUndefined()
     expect(config.mentalLLaMA.pythonBridgeScriptPath()).toBeUndefined()
   })
-
-
 })
 
 describe('env() memoization', () => {
@@ -380,7 +387,6 @@ describe('env() memoization', () => {
     expect(env()).toBe(env())
   })
 })
-
 
 describe('maskEnv secret/safe pattern coverage', () => {
   it('hides keys matching secret patterns and passes through safe/unknown handling', () => {
@@ -476,4 +482,3 @@ describe('maskEnv null/undefined passthrough', () => {
 // node and jsdom environments, so that branch is unreachable under vitest
 // without a non-Node/SSR runtime. The null/undefined `maskEnv` branch above is
 // covered via a stubbed `process.env` plain object instead.
-

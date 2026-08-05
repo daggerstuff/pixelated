@@ -1,12 +1,12 @@
 import { getLogger } from '@/lib/logging'
 import type { EvidenceReport } from '@/lib/research/types/research-types'
+
 import type {
   GeneratedReport,
   ReportTemplate,
   HipAAChecklistItem,
 } from './EvidenceReportTemplates'
 import { getQueryAuditService } from './QueryAuditService'
-
 
 const logger = getLogger({ prefix: 'IRBExportService' })
 

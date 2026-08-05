@@ -1,20 +1,20 @@
 # SP1 Guest Program: Data Pipeline Integrity Proof
 
-This directory contains the SP1 zkVM guest program that proves data
-pipeline integrity for the Pixelated Empathy FHE layer.
+This directory contains the SP1 zkVM guest program that proves data pipeline
+integrity for the Pixelated Empathy FHE layer.
 
 ## Overview
 
-The guest program runs inside the SP1 zero-knowledge virtual machine
-and proves that:
+The guest program runs inside the SP1 zero-knowledge virtual machine and proves
+that:
 
 1. A SHA-256 commitment to input data was correctly computed
 2. A SHA-256 commitment to output data was correctly computed
 3. The Merkle root of pipeline step hashes was correctly constructed
 4. The operation type is committed to the proof
 
-The verifier learns only the public commitments (input hash, output
-hash, Merkle root, operation type) — not the actual input/output data.
+The verifier learns only the public commitments (input hash, output hash, Merkle
+root, operation type) — not the actual input/output data.
 
 ## Building
 
