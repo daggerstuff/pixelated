@@ -26,10 +26,10 @@ services:
     # Enable host.docker.internal on Linux (already works on Mac/Windows)
     # This allows containers to reach services on the host machine (e.g., LM Studio)
     extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 'host.docker.internal:host-gateway'
 
     ports:
-      - "5000:5000"
+      - '5000:5000'
     environment:
       # ============================================================================
       # Full configuration reference: docs/CONFIGURATION.md
@@ -52,9 +52,9 @@ services:
       # - Ensures consistency between Docker configuration and application settings
       # - Users can still change ports via Docker's port mapping (see below)
       # ============================================================================
-      - LDR_WEB_HOST=0.0.0.0                 # Must bind to all interfaces for Docker networking
-      - LDR_WEB_PORT=5000                    # Internal port must match Docker's expectation
-      - LDR_DATA_DIR=/data                   # Must match the volume mount point
+      - LDR_WEB_HOST=0.0.0.0 # Must bind to all interfaces for Docker networking
+      - LDR_WEB_PORT=5000 # Internal port must match Docker's expectation
+      - LDR_DATA_DIR=/data # Must match the volume mount point
 
       # ============================================================================
       # TO CHANGE PORTS: Use Docker port mapping, NOT the settings above!
@@ -159,15 +159,15 @@ services:
     # images). If you change any of those here, update that section to match.
     # ============================================================================
     security_opt:
-      - "no-new-privileges:true"
+      - 'no-new-privileges:true'
     cap_drop:
       - ALL
     cap_add:
-      - CHOWN        # chown -R ldruser:ldruser /data
-      - FOWNER       # chmod on files not owned by root (after chown to ldruser)
+      - CHOWN # chown -R ldruser:ldruser /data
+      - FOWNER # chmod on files not owned by root (after chown to ldruser)
       - DAC_OVERRIDE # mkdir in /home/ldruser (.config dir, mode 755 = no write for others)
-      - SETUID       # setpriv setuid() syscall to switch to ldruser
-      - SETGID       # setpriv setgid() syscall to switch group
+      - SETUID # setpriv setuid() syscall to switch to ldruser
+      - SETGID # setpriv setgid() syscall to switch group
     restart: unless-stopped
     depends_on:
       ollama:
@@ -175,7 +175,6 @@ services:
 
       searxng:
         condition: service_started
-
 
   ollama:
     image: ollama/ollama:latest@sha256:8850b8b33936b9fb246e7b3e02849941f1151ea847e5fb15511f17de9589aea1
@@ -194,7 +193,7 @@ services:
     # (`docker exec ollama_service ollama pull <model>`) or let LDR pull on
     # first use. Healthcheck below probes the daemon (model-agnostic, #3885).
     healthcheck:
-      test: [ "CMD", "ollama", "list" ]
+      test: ['CMD', 'ollama', 'list']
       interval: 10s
       timeout: 5s
       start_period: 30s
@@ -206,7 +205,7 @@ services:
     networks:
       - ldr-network
     security_opt:
-      - "no-new-privileges:true"
+      - 'no-new-privileges:true'
     cap_drop:
       - ALL
     # WARNING: Do NOT add ports: - "11434:11434" — Ollama has no authentication.
@@ -219,7 +218,7 @@ services:
     networks:
       - ldr-network
     security_opt:
-      - "no-new-privileges:true"
+      - 'no-new-privileges:true'
     # Note: no cap_drop here — upstream removed cap_drop: ALL from their
     # official compose in searxng/searxng-docker@31acd45 ("[fix] remove
     # security cap", 2025-05-20), and the new container template at
@@ -230,7 +229,7 @@ services:
     # not worth the maintenance cost. no-new-privileges and the pinned
     # digest are the meaningful guardrails. See #3874.
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:8080/healthz"]
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:8080/healthz']
       interval: 30s
       timeout: 10s
       start_period: 30s
@@ -238,7 +237,6 @@ services:
     volumes:
       - searxng_data:/etc/searxng
     restart: unless-stopped
-
 
 volumes:
   ldr_data:

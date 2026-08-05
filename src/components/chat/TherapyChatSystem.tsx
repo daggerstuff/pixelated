@@ -39,16 +39,16 @@ import { loadSampleModels } from '@/lib/utils/load-sample-models'
 import { ChatContainer } from './ChatContainer'
 import { CognitiveModelSelector } from './CognitiveModelSelector'
 import {
-  SessionTimeline,
-  type SessionGoal,
-  type SessionProgressData,
-} from './SessionTimeline'
-import {
   IconChevronDown,
   IconMaximize,
   IconMinimize,
   IconMental,
 } from './icons'
+import {
+  SessionTimeline,
+  type SessionGoal,
+  type SessionProgressData,
+} from './SessionTimeline'
 
 // Extended Message type with mental health analysis
 interface ExtendedMessage extends Message {
@@ -390,7 +390,8 @@ function ProfessionalTherapistWorkspace() {
 
   // Get the most recent message with mental health analysis
   const getLatestMentalHealthAnalysis = ():
-    MentalHealthChatAnalysis | undefined => {
+    | MentalHealthChatAnalysis
+    | undefined => {
     const messagesWithAnalysis = messages.filter((m) => m.mentalHealthAnalysis)
     if (messagesWithAnalysis.length === 0) {
       return undefined
@@ -747,7 +748,10 @@ function ProfessionalTherapistWorkspace() {
                     getLatestMentalHealthAnalysis()?.category === 'critical'
                       ? 'high'
                       : ((getLatestMentalHealthAnalysis()?.category as
-                          'low' | 'medium' | 'high' | undefined) ?? 'low'),
+                          | 'low'
+                          | 'medium'
+                          | 'high'
+                          | undefined) ?? 'low'),
                   summary: 'Analysis summary not available',
                   scores: {},
                 }}
@@ -794,7 +798,7 @@ function ProfessionalTherapistWorkspace() {
       )}
 
       {showSessionProgress && (
-        <div className="mt-4 border border-white/10 bg-[#0a0a0a] p-4">
+        <div className="border-white/10 mt-4 border bg-[#0a0a0a] p-4">
           <SessionTimeline
             sessions={sessionProgressSessions}
             activeSessionId={sessionProgress.id}

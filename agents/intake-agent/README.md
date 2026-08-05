@@ -19,16 +19,17 @@ trainee status to other agents and supervisors. Status: **Phase 1 - Done**.
 
 ## Tools
 
-- **`register_trainee`** — registers a new trainee with name, email, clinical role,
-  experience level, and credentials. Creates a Foresight memory record and returns
-  `{ trainee_id, enrolled_at, status, enrollment_url? }`.
-- **`assign_cohort`** — assigns a trainee to an existing or new cohort (time-based
-  or skill-level: BEGINNER/INTERMEDIATE/ADVANCED). Creates cohort if `cohort_id`
-  omitted.
+- **`register_trainee`** — registers a new trainee with name, email, clinical
+  role, experience level, and credentials. Creates a Foresight memory record and
+  returns `{ trainee_id, enrolled_at, status, enrollment_url? }`.
+- **`assign_cohort`** — assigns a trainee to an existing or new cohort
+  (time-based or skill-level: BEGINNER/INTERMEDIATE/ADVANCED). Creates cohort if
+  `cohort_id` omitted.
 - **`list_cohorts`** — queries Foresight for cohorts filtered by status
-  (ACTIVE/COMPLETED/UPCOMING). Returns cohort list with size, date range, status.
-- **`get_trainee_status`** — queries Foresight for all trainee records: enrollment,
-  cohort, curriculum progress, session count, and latest scores.
+  (ACTIVE/COMPLETED/UPCOMING). Returns cohort list with size, date range,
+  status.
+- **`get_trainee_status`** — queries Foresight for all trainee records:
+  enrollment, cohort, curriculum progress, session count, and latest scores.
 - **`get_cohort_progress`** — aggregates qa-agent score records from Foresight
   across all trainees in a cohort. Returns averages by rubric dimension and
   completion rate.

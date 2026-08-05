@@ -20,7 +20,6 @@ import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-
 import { buildMerkleRoot } from './zk-proof-service'
 
 /**
@@ -124,7 +123,9 @@ export class SP1Prover {
           logger.info('SP1 toolchain detected (sp1up found)')
         } else {
           this.sp1Available = false
-          logger.info('SP1 toolchain not available, using hash-commitment fallback')
+          logger.info(
+            'SP1 toolchain not available, using hash-commitment fallback',
+          )
         }
       })
     } catch {
@@ -184,9 +185,12 @@ export class SP1Prover {
           generationTimeMs: elapsed,
         }
       } catch (err) {
-        logger.warn('SP1 proof generation failed, falling back to hash-commitment', {
-          error: err instanceof Error ? err.message : String(err),
-        })
+        logger.warn(
+          'SP1 proof generation failed, falling back to hash-commitment',
+          {
+            error: err instanceof Error ? err.message : String(err),
+          },
+        )
       }
     }
 
@@ -285,14 +289,10 @@ export class SP1Prover {
     return new Promise<string>((resolve, reject) => {
       // In production, this would use sp1-sdk TypeScript bindings
       // or shell out to `cargo prove run` with the ELF
-      const proc = spawn(
-        'cargo',
-        ['prove', 'run', '--elf', this.elfPath!],
-        {
-          stdio: ['pipe', 'pipe', 'pipe'],
-          timeout: 30000,
-        },
-      )
+      const proc = spawn('cargo', ['prove', 'run', '--elf', this.elfPath!], {
+        stdio: ['pipe', 'pipe', 'pipe'],
+        timeout: 30000,
+      })
 
       proc.stdin?.write(guestInput)
       proc.stdin?.end()

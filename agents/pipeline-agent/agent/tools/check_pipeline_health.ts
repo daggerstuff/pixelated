@@ -25,12 +25,8 @@ export default defineTool({
     } else if (
       typeof status === 'object' &&
       'checked_at' in status &&
-      typeof (status).checked_at === 'string' &&
-      !isNaN(
-        new Date(
-          (status).checked_at,
-        ).getTime(),
-      )
+      typeof status.checked_at === 'string' &&
+      !isNaN(new Date(status.checked_at).getTime())
     ) {
       foresight = 'healthy'
     } else {

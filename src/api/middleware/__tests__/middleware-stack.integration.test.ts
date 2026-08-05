@@ -188,7 +188,7 @@ describe('Middleware Stack Integration', () => {
       throw error
     }
 
-     await expect(
+    await expect(
       faultyMiddleware(mockRequest, mockResponse, mockNext),
     ).rejects.toBe(error)
   })

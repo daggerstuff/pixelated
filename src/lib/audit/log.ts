@@ -123,7 +123,9 @@ export async function logGovernanceDecision(
 ): Promise<void> {
   await AuditLogger.getInstance().logEvent({
     userId,
-    type: allowed ? AuditEventType.GOVERNANCE_ALLOW : AuditEventType.GOVERNANCE_DENY,
+    type: allowed
+      ? AuditEventType.GOVERNANCE_ALLOW
+      : AuditEventType.GOVERNANCE_DENY,
     action: 'governance_validation',
     severity: AuditSeverity.INFO,
     resourceId,

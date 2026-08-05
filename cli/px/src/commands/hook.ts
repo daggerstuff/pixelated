@@ -1,9 +1,14 @@
-import { Command } from 'commander';
-import { execSync } from 'node:child_process';
-import { loadConfig, findAgent, validateTool } from '../config/loader.js';
-import type { PxConfig, HookConfig } from '../config/schema.js';
-import { callAgent, HttpError, TimeoutError } from '../client/http.js';
-import { formatInteractiveResponse, formatAsyncResponse } from '../output/response.js';
+import { execSync } from 'node:child_process'
+
+import { Command } from 'commander'
+
+import { callAgent, HttpError, TimeoutError } from '../client/http.js'
+import { loadConfig, findAgent, validateTool } from '../config/loader.js'
+import type { PxConfig, HookConfig } from '../config/schema.js'
+import {
+  formatInteractiveResponse,
+  formatAsyncResponse,
+} from '../output/response.js'
 
 /**
  * `px hook <event>` — internal command called by git hook scripts.
@@ -23,8 +28,8 @@ export function registerHookCommand(program: Command): void {
     .option('--pr <url>', 'PR URL (for pr-open / pr-merge events)')
     .option('--dry-run', 'print what would be sent, do not call agent')
     .action(async (event: string, opts: { pr?: string; dryRun?: boolean }) => {
-      await runHook(event, opts);
-    });
+      await runHook(event, opts)
+    })
 }
 
 async function runHook(
@@ -32,55 +37,55 @@ async function runHook(
   opts: { pr?: string; dryRun?: boolean },
 ): Promise<void> {
   // 1. Load config — fail-open if config unavailable
-  let config: PxConfig;
+  let config: PxConfig
   try {
-    const loaded = loadConfig();
-    config = loaded.config;
+    const loaded = loadConfig()
+    config = loaded.config
   } catch {
-    process.exit(0);
+    process.exit(0)
   }
 
   // 2. Get hook config for this event
-  const hookConfig: HookConfig | undefined = config.hooks?.[event];
+  const hookConfig: HookConfig | undefined = config.hooks?.[event]
   if (!hookConfig) {
     // No hook configured for this event → silent exit
-    process.exit(0);
+    process.exit(0)
   }
 
   // 3. Resolve agent + validate tool — fail-open if misconfigured
-  let agent;
+  let agent
   try {
-    agent = findAgent(config, hookConfig.agent);
-    validateTool(agent, hookConfig.tool);
+    agent = findAgent(config, hookConfig.agent)
+    validateTool(agent, hookConfig.tool)
   } catch (e) {
     console.error(
       `px: hook ${event} misconfigured — ${e instanceof Error ? e.message : 'unknown'}`,
-    );
-    process.exit(0);
+    )
+    process.exit(0)
   }
 
-  const tool = hookConfig.tool;
-  const isAsync = hookConfig.async ?? agent.async;
+  const tool = hookConfig.tool
+  const isAsync = hookConfig.async ?? agent.async
 
   // 4. Extract git context based on event type
-  const context = extractGitContext(event, opts);
+  const context = extractGitContext(event, opts)
 
   // 5. Apply filter if configured
   if (hookConfig.filter) {
-    const files = (context as { files?: string[] }).files;
+    const files = (context as { files?: string[] }).files
     if (!files || files.length === 0) {
       // No files to filter → silent exit
-      process.exit(0);
+      process.exit(0)
     }
-    const matched = matchGlob(files, hookConfig.filter);
+    const matched = matchGlob(files, hookConfig.filter)
     if (!matched) {
       // No matching files → silent exit
-      process.exit(0);
+      process.exit(0)
     }
   }
 
   // 6. Build request body from git context
-  const body: Record<string, unknown> = { ...context, event };
+  const body: Record<string, unknown> = { ...context, event }
 
   // Dry-run: print what would be sent and exit
   if (opts.dryRun) {
@@ -92,9 +97,9 @@ async function runHook(
       async: isAsync,
       timeout: agent.timeout,
       body,
-    };
-    console.log(JSON.stringify(payload, null, 2));
-    return;
+    }
+    console.log(JSON.stringify(payload, null, 2))
+    return
   }
 
   // 7. Call agent — fail-open on any error
@@ -104,31 +109,31 @@ async function runHook(
       tool,
       body,
       timeoutMs: agent.timeout,
-    });
+    })
 
     if (isAsync) {
       const taskId =
-        (res.data as Record<string, unknown>)?.['task_id'] as string ??
-        'unknown';
-      const channel = config.slack?.channel;
-      console.log(formatAsyncResponse(taskId, channel));
+        ((res.data as Record<string, unknown>)?.['task_id'] as string) ??
+        'unknown'
+      const channel = config.slack?.channel
+      console.log(formatAsyncResponse(taskId, channel))
     } else {
-      console.log(formatInteractiveResponse(res.data));
+      console.log(formatInteractiveResponse(res.data))
     }
   } catch (e) {
     // Fail-open: print warning to stderr, exit 0
     if (e instanceof TimeoutError) {
       console.error(
         `px: hook ${event} — request timed out after ${agent.timeout}ms`,
-      );
+      )
     } else if (e instanceof HttpError) {
-      console.error(`px: hook ${event} — ${e.message}`);
+      console.error(`px: hook ${event} — ${e.message}`)
     } else {
       console.error(
         `px: hook ${event} failed — ${e instanceof Error ? e.message : 'unknown error'}`,
-      );
+      )
     }
-    process.exit(0);
+    process.exit(0)
   }
 }
 
@@ -140,7 +145,7 @@ function extractGitContext(
   event: string,
   opts: { pr?: string },
 ): Record<string, unknown> {
-  const context: Record<string, unknown> = {};
+  const context: Record<string, unknown> = {}
 
   try {
     switch (event) {
@@ -148,40 +153,31 @@ function extractGitContext(
         // Staged files
         const output = execSync('git diff --cached --name-only', {
           encoding: 'utf-8',
-        });
-        context['files'] = output
-          .trim()
-          .split('\n')
-          .filter(Boolean);
-        break;
+        })
+        context['files'] = output.trim().split('\n').filter(Boolean)
+        break
       }
 
       case 'pre-push': {
         // Current branch
         const branch = execSync('git rev-parse --abbrev-ref HEAD', {
           encoding: 'utf-8',
-        }).trim();
-        context['branch'] = branch;
+        }).trim()
+        context['branch'] = branch
 
         // Unpushed commits
         try {
           const commits = execSync(
             `git rev-list --reverse origin/${branch}..HEAD`,
             { encoding: 'utf-8' },
-          );
-          context['commits'] = commits
-            .trim()
-            .split('\n')
-            .filter(Boolean);
+          )
+          context['commits'] = commits.trim().split('\n').filter(Boolean)
         } catch {
           // Remote ref may not exist (first push) — use all commits
           const allCommits = execSync('git rev-list --reverse HEAD', {
             encoding: 'utf-8',
-          });
-          context['commits'] = allCommits
-            .trim()
-            .split('\n')
-            .filter(Boolean);
+          })
+          context['commits'] = allCommits.trim().split('\n').filter(Boolean)
         }
 
         // Also grab changed files for context
@@ -189,60 +185,54 @@ function extractGitContext(
           const files = execSync(
             `git diff --name-only origin/${branch}..HEAD`,
             { encoding: 'utf-8' },
-          );
-          context['files'] = files
-            .trim()
-            .split('\n')
-            .filter(Boolean);
+          )
+          context['files'] = files.trim().split('\n').filter(Boolean)
         } catch {
           // Non-fatal
         }
-        break;
+        break
       }
 
       case 'post-merge': {
         // Just triggered after merge — report branch
         const branch = execSync('git rev-parse --abbrev-ref HEAD', {
           encoding: 'utf-8',
-        }).trim();
-        context['branch'] = branch;
-        break;
+        }).trim()
+        context['branch'] = branch
+        break
       }
 
       case 'pr-open': {
         // PR URL from --pr flag or env
-        const prUrl = opts.pr ?? process.env['GITHUB_PR_URL'] ?? '';
-        context['prUrl'] = prUrl;
+        const prUrl = opts.pr ?? process.env['GITHUB_PR_URL'] ?? ''
+        context['prUrl'] = prUrl
 
         // Branch info
         const branch = execSync('git rev-parse --abbrev-ref HEAD', {
           encoding: 'utf-8',
-        }).trim();
-        context['branch'] = branch;
-        break;
+        }).trim()
+        context['branch'] = branch
+        break
       }
 
       case 'pr-merge': {
         // Files changed in the merge commit
         const output = execSync('git diff --name-only HEAD~1..HEAD', {
           encoding: 'utf-8',
-        });
-        context['files'] = output
-          .trim()
-          .split('\n')
-          .filter(Boolean);
-        break;
+        })
+        context['files'] = output.trim().split('\n').filter(Boolean)
+        break
       }
 
       default:
         // Unknown event — no context
-        break;
+        break
     }
   } catch {
     // Git command failed — proceed with whatever context we have
   }
 
-  return context;
+  return context
 }
 
 /**
@@ -257,16 +247,16 @@ function extractGitContext(
  */
 export function matchGlob(files: string[], pattern: string): boolean {
   // Split on | for multiple patterns
-  const patterns = pattern.split('|');
+  const patterns = pattern.split('|')
 
   for (const glob of patterns) {
-    const regex = globToRegex(glob.trim());
+    const regex = globToRegex(glob.trim())
     if (files.some((f) => regex.test(f))) {
-      return true;
+      return true
     }
   }
 
-  return false;
+  return false
 }
 
 /**
@@ -274,37 +264,37 @@ export function matchGlob(files: string[], pattern: string): boolean {
  * Handles: ** → .*, * → [^/]*, ? → ., . → \.
  */
 function globToRegex(glob: string): RegExp {
-  let result = '';
-  let i = 0;
+  let result = ''
+  let i = 0
 
   while (i < glob.length) {
-    const char = glob[i];
+    const char = glob[i]
 
     if (char === '*' && glob[i + 1] === '*') {
       // ** → match any path segments (including /)
-      result += '.*';
-      i += 2;
+      result += '.*'
+      i += 2
       // Skip trailing / if present (scenarios/** → scenarios/.*)
       if (glob[i] === '/') {
         // Include the / in the match — scenarios/.* matches scenarios/foo.yml
-        i++; // Skip the / — .* already covers it
+        i++ // Skip the / — .* already covers it
       }
     } else if (char === '*') {
       // * → match any chars except /
-      result += '[^/]*';
-      i++;
+      result += '[^/]*'
+      i++
     } else if (char === '?') {
       // ? → match single char except /
-      result += '[^/]';
-      i++;
+      result += '[^/]'
+      i++
     } else if (char === '.') {
-      result += '\\.';
-      i++;
+      result += '\\.'
+      i++
     } else {
-      result += char;
-      i++;
+      result += char
+      i++
     }
   }
 
-  return new RegExp(`^${result}$`);
+  return new RegExp(`^${result}$`)
 }
