@@ -34,7 +34,7 @@ function Sparkline({
 
   if (data.length === 0) {
     return (
-      <div className="border border-white/10 bg-[#121212] p-3">
+      <div className="border-white/10 border bg-[#121212] p-3">
         <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
           {label}
         </h4>
@@ -54,7 +54,7 @@ function Sparkline({
   const latest = data[data.length - 1] ?? 0
 
   return (
-    <div className="border border-white/10 bg-[#121212] p-3">
+    <div className="border-white/10 border bg-[#121212] p-3">
       <div className="mb-2 flex items-baseline justify-between gap-3">
         <h4 className="font-mono text-xs uppercase tracking-wide text-[#b0b0b0]">
           {label}
@@ -175,7 +175,7 @@ export function MultiSessionProgression({
         )}
       </div>
 
-      <div className="mt-5 border border-white/10 bg-[#121212] p-4">
+      <div className="border-white/10 mt-5 border bg-[#121212] p-4">
         <h3 className="font-mono text-sm uppercase tracking-wide text-[#f6f1e8]">
           Session timeline
         </h3>

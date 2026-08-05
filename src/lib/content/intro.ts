@@ -1,6 +1,7 @@
 export const introContent = {
   label: 'Why it matters',
-  title: 'The hardest moments in therapy should not be practiced on a real person.',
+  title:
+    'The hardest moments in therapy should not be practiced on a real person.',
   paragraphs: [
     'Risk, anger, silence, shame, disclosure — these are the turns that decide whether a clinician is ready. They deserve rehearsal before they become someone\u2019s session.',
     'Pixelated Empathy gives counseling programs a repeatable place to rehearse them. Trainees talk to an AI client. Supervisors review the transcript. Skill gets taught from what actually happened, not from impression.',

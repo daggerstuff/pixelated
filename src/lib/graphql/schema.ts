@@ -327,4 +327,4 @@ export const typeDefs = /* GraphQL */ `
     "Fires when a conversation turn is added to a session"
     conversationTurnAdded(sessionId: ID): ConversationTurn! @auth
   }
-`;
+`

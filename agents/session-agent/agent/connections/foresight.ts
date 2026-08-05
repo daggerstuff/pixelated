@@ -1,4 +1,4 @@
-import { defineMcpClientConnection } from "eve/connections";
+import { defineMcpClientConnection } from 'eve/connections'
 
 // Foresight stores session memory: per-session transcripts, per-trainee
 // longitudinal trends, and emotional signal rollups. The server now supports
@@ -9,15 +9,15 @@ import { defineMcpClientConnection } from "eve/connections";
 //   FORESIGHT_PORT=8764 scripts/memory/foresight-server.sh
 
 export default defineMcpClientConnection({
-  url: process.env.FORESIGHT_URL ?? "http://127.0.0.1:8764/sse",
+  url: process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse',
   description:
-    "Foresight memory MCP for conversation-rehearsal session context. Stores " +
-    "transcripts, per-session state, and per-trainee longitudinal signals.",
+    'Foresight memory MCP for conversation-rehearsal session context. Stores ' +
+    'transcripts, per-session state, and per-trainee longitudinal signals.',
   auth: process.env.FORESIGHT_URL
     ? {
         getToken: async () => ({
-          token: process.env.FORESIGHT_TOKEN ?? "",
+          token: process.env.FORESIGHT_TOKEN ?? '',
         }),
       }
     : undefined,
-});
+})

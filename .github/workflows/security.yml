@@ -34,7 +34,8 @@ jobs:
       security-events: write
       actions: write
     concurrency:
-      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
+      group:
+        codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
@@ -99,7 +100,9 @@ jobs:
 
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile --ignore-scripts
+        run:
+          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'
@@ -122,7 +125,9 @@ jobs:
       - name: Install Python dependencies
         if: matrix.language == 'python'
         env:
-          VIRTUAL_ENV: ${{ github.workspace }}/src/lib/ai/bias-detection/python-service/.venv
+          VIRTUAL_ENV:
+            ${{ github.workspace
+            }}/src/lib/ai/bias-detection/python-service/.venv
         run: |
           if [ -d "src/lib/ai/bias-detection/python-service" ]; then
             cd src/lib/ai/bias-detection/python-service
@@ -226,7 +231,9 @@ jobs:
         id: trivy
         uses: aquasecurity/trivy-action@v0.36.0
         env:
-          NODE_OPTIONS: ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation' || '--no-deprecation' }}
+          NODE_OPTIONS:
+            ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
+            || '--no-deprecation' }}
         with:
           cache: 'false'
           scan-type: 'fs'
@@ -328,7 +335,9 @@ jobs:
           category: checkov-helm
 
       - name: Upload Checkov artifacts
-        if: always() && (steps.checkov_infra_sarif.outputs.found == 'true' || steps.checkov_helm_sarif.outputs.found == 'true')
+        if:
+          always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
+          steps.checkov_helm_sarif.outputs.found == 'true')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: checkov-sarif
@@ -397,7 +406,9 @@ jobs:
           fi
 
       - name: Enforce high+ vulnerability threshold
-        run: node scripts/utils/check-pnpm-audit.js --fail-on high audit-results.json
+        run:
+          node scripts/utils/check-pnpm-audit.js --fail-on high
+          audit-results.json
 
       - name: Upload audit results
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7

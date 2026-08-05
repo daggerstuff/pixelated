@@ -278,11 +278,16 @@ const integrations = [
                 style="background: var(--np-elevated); border: 1px solid var(--np-line);"
               >
                 <div class="flex items-center space-x-3">
-                  <div class="w-3 h-3 np-mid" style="background: var(--np-mid);" />
+                  <div
+                    class="w-3 h-3 np-mid"
+                    style="background: var(--np-mid);"
+                  />
                   <span class="font-medium np-text">{row.name}</span>
                 </div>
                 <span class="font-semibold np-mid">
-                  {row.state === 'integrated' ? '✓ Integrated' : '✓ Previously Integrated'}
+                  {row.state === 'integrated'
+                    ? '✓ Integrated'
+                    : '✓ Previously Integrated'}
                 </span>
               </div>
             ))

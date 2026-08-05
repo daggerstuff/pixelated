@@ -22,7 +22,7 @@
  * ```
  */
 
-import { GraphQLClient } from "graphql-request";
+import { GraphQLClient } from 'graphql-request'
 
 import type {
   HealthQuery,
@@ -41,7 +41,7 @@ import type {
   GetSessionEmotionsQueryVariables,
   GetSessionTurnsQuery,
   GetSessionTurnsQueryVariables,
-} from "./generated/types";
+} from './generated/types'
 
 // ── Query document strings ──────────────────────────────
 
@@ -49,7 +49,7 @@ const HealthDocument = /* GraphQL */ `
   query Health {
     health
   }
-`;
+`
 
 const GetSessionDocument = /* GraphQL */ `
   query GetSession($id: ID!) {
@@ -73,7 +73,7 @@ const GetSessionDocument = /* GraphQL */ `
       }
     }
   }
-`;
+`
 
 const ListSessionsDocument = /* GraphQL */ `
   query ListSessions(
@@ -105,7 +105,7 @@ const ListSessionsDocument = /* GraphQL */ `
       notes
     }
   }
-`;
+`
 
 const GetEmotionsDocument = /* GraphQL */ `
   query GetEmotions($sessionId: ID!) {
@@ -144,7 +144,7 @@ const GetEmotionsDocument = /* GraphQL */ `
       }
     }
   }
-`;
+`
 
 const GetInterventionsDocument = /* GraphQL */ `
   query GetInterventions($userId: ID!, $limit: Int = 10, $offset: Int = 0) {
@@ -164,7 +164,7 @@ const GetInterventionsDocument = /* GraphQL */ `
       updatedAt
     }
   }
-`;
+`
 
 const GetAnonymizedMetricsDocument = /* GraphQL */ `
   query GetAnonymizedMetrics {
@@ -182,7 +182,7 @@ const GetAnonymizedMetricsDocument = /* GraphQL */ `
       }
     }
   }
-`;
+`
 
 const GetSessionEmotionsDocument = /* GraphQL */ `
   query GetSessionEmotions($sessionId: ID!) {
@@ -215,7 +215,7 @@ const GetSessionEmotionsDocument = /* GraphQL */ `
       }
     }
   }
-`;
+`
 
 const GetSessionTurnsDocument = /* GraphQL */ `
   query GetSessionTurns($sessionId: ID!) {
@@ -231,7 +231,7 @@ const GetSessionTurnsDocument = /* GraphQL */ `
       }
     }
   }
-`;
+`
 
 // ── Subscription documents ──────────────────────────────
 
@@ -248,7 +248,7 @@ const SessionUpdatedDocument = /* GraphQL */ `
       status
     }
   }
-`;
+`
 
 const EmotionAnalysisCreatedDocument = /* GraphQL */ `
   subscription EmotionAnalysisCreated($sessionId: ID) {
@@ -277,7 +277,7 @@ const EmotionAnalysisCreatedDocument = /* GraphQL */ `
       confidence
     }
   }
-`;
+`
 
 const ConversationTurnAddedDocument = /* GraphQL */ `
   subscription ConversationTurnAdded($sessionId: ID) {
@@ -289,23 +289,23 @@ const ConversationTurnAddedDocument = /* GraphQL */ `
       timestamp
     }
   }
-`;
+`
 
 // ── Client configuration ────────────────────────────────
 
 export interface GraphqlClientConfig {
   /** GraphQL endpoint URL (e.g. http://localhost:5173/api/graphql) */
-  endpoint: string;
+  endpoint: string
   /** API key for X-API-Key header authentication */
-  apiKey?: string;
+  apiKey?: string
   /** JWT token for Authorization: Bearer header */
-  jwt?: string;
+  jwt?: string
   /** Custom fetch implementation (browser auto-detects) */
-  fetch?: typeof fetch;
+  fetch?: typeof fetch
   /** Request timeout in ms */
-  timeout?: number;
+  timeout?: number
   /** Additional headers */
-  headers?: Record<string, string>;
+  headers?: Record<string, string>
 }
 
 /**
@@ -315,22 +315,23 @@ export interface GraphqlClientConfig {
  * Isomorphic — works in Node.js and browsers via `graphql-request`.
  */
 export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
-  const headers: Record<string, string> = { ...config.headers };
+  const headers: Record<string, string> = { ...config.headers }
 
   if (config.apiKey) {
-    headers["X-API-Key"] = config.apiKey;
+    headers['X-API-Key'] = config.apiKey
   } else if (config.jwt) {
-    headers["Authorization"] = `Bearer ${config.jwt}`;
+    headers['Authorization'] = `Bearer ${config.jwt}`
   }
 
   const client = new GraphQLClient(config.endpoint, {
     headers,
     fetch: config.fetch,
-  });
+  })
 
   return {
     // ── Query operations ──
-    health: () => client.request<HealthQuery, HealthQueryVariables>(HealthDocument),
+    health: () =>
+      client.request<HealthQuery, HealthQueryVariables>(HealthDocument),
 
     getSession: (variables: GetSessionQueryVariables) =>
       client.request<GetSessionQuery, GetSessionQueryVariables>(
@@ -357,9 +358,10 @@ export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
       ),
 
     getAnonymizedMetrics: () =>
-      client.request<GetAnonymizedMetricsQuery, GetAnonymizedMetricsQueryVariables>(
-        GetAnonymizedMetricsDocument,
-      ),
+      client.request<
+        GetAnonymizedMetricsQuery,
+        GetAnonymizedMetricsQueryVariables
+      >(GetAnonymizedMetricsDocument),
 
     getSessionEmotions: (variables: GetSessionEmotionsQueryVariables) =>
       client.request<GetSessionEmotionsQuery, GetSessionEmotionsQueryVariables>(
@@ -379,42 +381,50 @@ export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
       emotionAnalysisCreated: EmotionAnalysisCreatedDocument,
       conversationTurnAdded: ConversationTurnAddedDocument,
     },
-  };
+  }
 }
 
 // ── SDK type interface ──────────────────────────────────
 
 export interface GraphqlSdk {
   /** Health check — public, no auth required */
-  health(): Promise<HealthQuery>;
+  health(): Promise<HealthQuery>
 
   /** Get a single session by ID */
-  getSession(variables: GetSessionQueryVariables): Promise<GetSessionQuery>;
+  getSession(variables: GetSessionQueryVariables): Promise<GetSessionQuery>
 
   /** List sessions with optional filters */
-  listSessions(variables?: ListSessionsQueryVariables): Promise<ListSessionsQuery>;
+  listSessions(
+    variables?: ListSessionsQueryVariables,
+  ): Promise<ListSessionsQuery>
 
   /** Get emotion analyses for a session */
-  getEmotions(variables: GetEmotionsQueryVariables): Promise<GetEmotionsQuery>;
+  getEmotions(variables: GetEmotionsQueryVariables): Promise<GetEmotionsQuery>
 
   /** Get intervention records for a user */
-  getInterventions(variables: GetInterventionsQueryVariables): Promise<GetInterventionsQuery>;
+  getInterventions(
+    variables: GetInterventionsQueryVariables,
+  ): Promise<GetInterventionsQuery>
 
   /** Get anonymized research metrics — admin only */
-  getAnonymizedMetrics(): Promise<GetAnonymizedMetricsQuery>;
+  getAnonymizedMetrics(): Promise<GetAnonymizedMetricsQuery>
 
   /** Get emotions for a session via Session.emotions field resolver */
-  getSessionEmotions(variables: GetSessionEmotionsQueryVariables): Promise<GetSessionEmotionsQuery>;
+  getSessionEmotions(
+    variables: GetSessionEmotionsQueryVariables,
+  ): Promise<GetSessionEmotionsQuery>
 
   /** Get conversation turns for a session via Session.turns field resolver */
-  getSessionTurns(variables: GetSessionTurnsQueryVariables): Promise<GetSessionTurnsQuery>;
+  getSessionTurns(
+    variables: GetSessionTurnsQueryVariables,
+  ): Promise<GetSessionTurnsQuery>
 
   /** Raw subscription document strings for use with graphql-ws */
   subscriptions: {
-    sessionUpdated: string;
-    emotionAnalysisCreated: string;
-    conversationTurnAdded: string;
-  };
+    sessionUpdated: string
+    emotionAnalysisCreated: string
+    conversationTurnAdded: string
+  }
 }
 
 // ── Re-export generated types ──────────────────────────
@@ -436,7 +446,7 @@ export type {
   GetSessionEmotionsQueryVariables,
   GetSessionTurnsQuery,
   GetSessionTurnsQueryVariables,
-} from "./generated/types";
+} from './generated/types'
 
 export type {
   Session,
@@ -454,4 +464,4 @@ export type {
   ConversationRole,
   PersonaMode,
   TrendDirection,
-} from "./generated/types";
+} from './generated/types'

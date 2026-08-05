@@ -9,7 +9,7 @@
  *   const report = await profileAgentStartup('pipeline-agent', { ... })
  */
 
-import { StartupProfiler } from "./optimization.js";
+import { StartupProfiler } from './optimization.js'
 
 /**
  * Profile an agent's startup sequence.
@@ -23,22 +23,22 @@ export async function profileAgentStartup(
   agentName: string,
   components: Record<string, () => Promise<unknown>>,
 ) {
-  const profiler = new StartupProfiler();
+  const profiler = new StartupProfiler()
 
   for (const [label, loader] of Object.entries(components)) {
     try {
       await profiler.profileAsync(label, async () => {
-        const result = await loader();
-        return result;
-      });
+        const result = await loader()
+        return result
+      })
     } catch (err) {
-      console.error(`[${agentName}] startup component "${label}" failed:`, err);
+      console.error(`[${agentName}] startup component "${label}" failed:`, err)
     }
   }
 
-  const report = profiler.report();
-  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2));
-  return report;
+  const report = profiler.report()
+  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2))
+  return report
 }
 
 /**
@@ -46,9 +46,9 @@ export async function profileAgentStartup(
  * descriptions. This is the legacy shape used by agent entry points.
  */
 export interface ProfileAndLogAgentStartupOptions {
-  agentName: string;
-  agentDir: string;
-  connectionDescriptions: Record<string, string>;
+  agentName: string
+  agentDir: string
+  connectionDescriptions: Record<string, string>
 }
 
 /**
@@ -61,13 +61,13 @@ export interface ProfileAndLogAgentStartupOptions {
 export function profileAndLogAgentStartup(
   options: ProfileAndLogAgentStartupOptions,
 ): void {
-  const { agentName, connectionDescriptions } = options;
-  const profiler = new StartupProfiler();
+  const { agentName, connectionDescriptions } = options
+  const profiler = new StartupProfiler()
 
   for (const [label, description] of Object.entries(connectionDescriptions)) {
-    profiler.profileText(label, description);
+    profiler.profileText(label, description)
   }
 
-  const report = profiler.report();
-  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2));
+  const report = profiler.report()
+  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2))
 }
