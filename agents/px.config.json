@@ -1,0 +1,109 @@
+{
+  "agents": {
+    "advisor": {
+      "endpoint": "http://localhost:2001",
+      "tools": ["get_worktree", "read_file"],
+      "async": false,
+      "timeout": 30000
+    },
+    "content": {
+      "endpoint": "http://localhost:2002",
+      "tools": [
+        "audit_corpus",
+        "audit_clinical_corpus",
+        "score_thread",
+        "curate_showcase",
+        "gate_injection"
+      ],
+      "async": false,
+      "timeout": 30000
+    },
+    "intake": {
+      "endpoint": "http://localhost:2003",
+      "tools": [
+        "assign_cohort",
+        "get_cohort_progress",
+        "get_trainee_status",
+        "list_cohorts",
+        "record_curriculum_step",
+        "register_trainee"
+      ],
+      "async": false,
+      "timeout": 30000
+    },
+    "pipeline": {
+      "endpoint": "http://localhost:2004",
+      "tools": [
+        "check_pipeline_health",
+        "curate_dataset",
+        "evaluate_pipeline_review",
+        "promote_to_production",
+        "promote_to_staging",
+        "rollback_model",
+        "run_evaluation",
+        "run_training"
+      ],
+      "async": false,
+      "timeout": 30000
+    },
+    "qa": {
+      "endpoint": "http://localhost:2005",
+      "tools": [
+        "detect_emotional_patterns",
+        "fetch_sessions",
+        "flag_training_gap",
+        "generate_report",
+        "score_session",
+        "summarize_cohort"
+      ],
+      "async": false,
+      "timeout": 30000
+    },
+    "session": {
+      "endpoint": "http://localhost:2006",
+      "tools": [
+        "analyze_emotion",
+        "analyze_pace",
+        "check_clinical_boundary",
+        "conclude_session",
+        "hydrate_session",
+        "process_message",
+        "save_session",
+        "start_session",
+        "validate_response"
+      ],
+      "async": false,
+      "timeout": 30000
+    },
+    "supervisor": {
+      "endpoint": "http://localhost:2007",
+      "tools": [
+        "adjust_threshold",
+        "adjust_trainee_status",
+        "compare_trainees",
+        "generate_supervisor_report",
+        "list_flagged_sessions",
+        "notify_slack",
+        "query_cohort_trends",
+        "query_trainee_timeline"
+      ],
+      "async": false,
+      "timeout": 30000
+    }
+  },
+  "slack": {
+    "webhook": "",
+    "channel": ""
+  },
+  "hooks": {
+    "pre-commit": {
+      "agent": "content",
+      "tool": "audit_corpus",
+      "filter": "scenarios/**"
+    },
+    "pre-push": {
+      "agent": "advisor",
+      "tool": "read_file"
+    }
+  }
+}
