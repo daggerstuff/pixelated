@@ -123,7 +123,7 @@ export default defineTool({
         total_scored_sessions: scoredCount,
         total_flags: flags.length,
         critical_flags: flags.filter(
-          (f) => (f as Record<string, unknown>).severity === 'critical',
+          (f) => (f).severity === 'critical',
         ).length,
         dimension_averages: dimensionAverages,
       },

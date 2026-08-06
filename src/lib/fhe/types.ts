@@ -35,6 +35,8 @@ export enum FHEOperation {
   Rotation = 'rotation',
   Polynomial = 'polynomial',
   Rescale = 'rescale',
+  DotProduct = 'dot_product',
+
 
   // Text analysis operations
   SENTIMENT = 'sentiment',

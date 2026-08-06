@@ -395,17 +395,17 @@ export class DeveloperApiKeyManager {
       }
     }
 
-    const totalKeys = Number(totalResult.rows[0]?.count ?? 0)
-    const activeKeys = Number(activeResult.rows[0]?.count ?? 0)
+    const totalKeys = (totalResult.rows[0]?.count ?? 0)
+    const activeKeys = (activeResult.rows[0]?.count ?? 0)
 
     return {
       totalKeys,
       activeKeys,
       inactiveKeys: totalKeys - activeKeys,
-      expiredKeys: Number(expiredResult.rows[0]?.count ?? 0),
+      expiredKeys: (expiredResult.rows[0]?.count ?? 0),
       keysByScope,
-      recentFailures: Number(recentFailuresResult.rows[0]?.count ?? 0),
-      averageRateLimit: Math.round(Number(avgRateResult.rows[0]?.avg ?? 0)),
+      recentFailures: (recentFailuresResult.rows[0]?.count ?? 0),
+      averageRateLimit: Math.round((avgRateResult.rows[0]?.avg ?? 0)),
     }
   }
 
@@ -453,8 +453,8 @@ export class DeveloperApiKeyManager {
       rateLimit,
       remaining: Math.max(0, rateLimit - currentCount),
       resetTimeMs,
-      lastUsedAt: apiKey['last_used_at'] as unknown as Date | null,
-      lastFailedAt: apiKey['last_failed_at'] as unknown as Date | null,
+      lastUsedAt: apiKey['last_used_at'],
+      lastFailedAt: apiKey['last_failed_at'],
     }
   }
 

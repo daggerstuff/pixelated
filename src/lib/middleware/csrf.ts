@@ -79,7 +79,7 @@ function setCSRFCookie(
     httpOnly: config.cookieHttpOnly,
     sameSite: config.cookieSameSite,
     maxAge: config.cookieMaxAge,
-  } as any)
+  })
 }
 
 /**

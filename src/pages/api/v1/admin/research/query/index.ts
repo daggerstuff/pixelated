@@ -70,7 +70,7 @@ export const POST = protectRoute(
       cacheHit,
     )
 
-    const outputFormat = body.outputFormat || 'json'
+    const outputFormat = body.outputFormat ?? 'json'
     const formatter = getQueryOutputFormatter()
     const formatted = formatter.format(
       queryResult,

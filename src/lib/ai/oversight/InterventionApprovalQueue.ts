@@ -22,10 +22,10 @@ const logger = createBuildSafeLogger('InterventionApprovalQueue')
 const DEFAULT_TIMEOUT_MS = 30 * 60 * 1000
 
 class InterventionApprovalQueue {
-  private queue: Map<string, QueuedIntervention> = new Map()
+  private readonly queue: Map<string, QueuedIntervention> = new Map()
   private order: string[] = []
   private timeoutMs: number = DEFAULT_TIMEOUT_MS
-  private expiredIds: Set<string> = new Set()
+  private readonly expiredIds: Set<string> = new Set()
 
   private generateRequestId(): string {
     return `req-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
@@ -213,7 +213,7 @@ class InterventionApprovalQueue {
       .map((id) => this.queue.get(id))
       .filter(
         (item): item is QueuedIntervention =>
-          item !== undefined && item.status === 'pending',
+          item?.status === 'pending',
       )
       .sort((a, b) => {
         const priorityDiff =
@@ -230,7 +230,7 @@ class InterventionApprovalQueue {
       .map((id) => this.queue.get(id))
       .filter(
         (item): item is QueuedIntervention =>
-          item !== undefined && item.sessionId === sessionId,
+          item?.sessionId === sessionId,
       )
   }
 

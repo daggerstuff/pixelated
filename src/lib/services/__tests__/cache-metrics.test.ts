@@ -207,7 +207,7 @@ describe('CacheMetricsService', () => {
       }
 
       const serviceWithRedis = new CacheMetricsService(
-        mockRedis as unknown as import('../types/redis').RedisClient,
+        mockRedis,
       )
 
       // Add some in-memory counts
@@ -244,7 +244,7 @@ describe('CacheMetricsService', () => {
       }
 
       const serviceWithRedis = new CacheMetricsService(
-        mockRedis as unknown as import('../types/redis').RedisClient,
+        mockRedis,
       )
 
       serviceWithRedis.recordHit('test:1')
@@ -272,7 +272,7 @@ describe('CacheMetricsService', () => {
       }
 
       const serviceWithRedis = new CacheMetricsService(
-        mockRedis as unknown as import('../types/redis').RedisClient,
+        mockRedis,
       )
 
       serviceWithRedis.recordHit('test:1')

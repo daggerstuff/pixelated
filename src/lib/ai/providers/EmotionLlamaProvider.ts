@@ -8,7 +8,7 @@
 import { createHash } from "crypto";
 import { v4 as uuidv4 } from "uuid";
 
-import type { FHESystem } from "../../fhe/index";
+import type { FHEService } from "../../fhe/index";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 import type {
   EmotionAnalysis,
@@ -37,10 +37,10 @@ export interface EmotionDetectionResult {
 export class EmotionLlamaProvider {
   private readonly baseUrl: string;
   private readonly apiKey: string;
-  private readonly fheService: FHESystem;
+  private readonly fheService: FHEService;
   private readonly modelVersion = "llama-emotion-v1.0";
 
-  constructor(baseUrl: string, apiKey: string, fheService: FHESystem) {
+  constructor(baseUrl: string, apiKey: string, fheService: FHEService) {
     this.baseUrl = baseUrl.replace(/\/$/, ""); // Remove trailing slash
     this.apiKey = apiKey;
     this.fheService = fheService;
@@ -67,13 +67,15 @@ export class EmotionLlamaProvider {
       logger.debug("Analyzing emotions for text", { textLength: text.length });
 
       // Encrypt the text using FHE
-      const encryptedText = await this.fheService.encrypt(text);
+      const encryptedData = await this.fheService.encrypt(text);
+      const encryptedText = JSON.stringify(encryptedData);
 
       // Deterministic hash of the ciphertext so the receipt ledger can
       // correlate this inference turn without exposing the ciphertext.
       const fheCiphertextHash = createHash("sha256")
-        .update(JSON.stringify(encryptedText))
+        .update(encryptedText)
         .digest("hex");
+
 
       // Prepare the request payload
       const payload = {
@@ -149,12 +151,16 @@ export class EmotionLlamaProvider {
   private async processEncryptedResponse(encryptedResult: any): Promise<EmotionDetectionResult> {
     try {
       // Decrypt the emotion analysis result
-      const decryptedEmotions = await this.fheService.decrypt(encryptedResult.emotions);
-      const decryptedDimensions = await this.fheService.decrypt(encryptedResult.dimensions);
+      const decryptedEmotions = await this.fheService.decrypt<string[]>(
+        typeof encryptedResult.emotions === 'string' ? JSON.parse(encryptedResult.emotions) : encryptedResult.emotions
+      );
+      const decryptedDimensions = await this.fheService.decrypt<{valence: number; arousal: number; dominance: number}>(
+        typeof encryptedResult.dimensions === 'string' ? JSON.parse(encryptedResult.dimensions) : encryptedResult.dimensions
+      );
 
       return {
-        emotions: JSON.parse(decryptedEmotions),
-        dimensions: JSON.parse(decryptedDimensions),
+        emotions: typeof decryptedEmotions === 'string' ? JSON.parse(decryptedEmotions) : decryptedEmotions,
+        dimensions: typeof decryptedDimensions === 'string' ? JSON.parse(decryptedDimensions) : decryptedDimensions,
         confidence: encryptedResult.confidence ?? 0.8,
         metadata: encryptedResult.metadata ?? {},
       };
@@ -223,7 +229,7 @@ export class EmotionLlamaProvider {
       sources: import("../explainability/types").ExplainabilitySource[];
       techniqueAttribution?: import("../explainability/types").TechniqueAttribution;
     };
-    return enriched as EmotionAnalysis;
+    return enriched;
   }
 
   /**

@@ -34,10 +34,10 @@ import { LatentSurfacer } from './latent-surfacer'
 import { SoftInjector } from './soft-injector'
 
 export class ReverieEngine {
-  private config: ReverieConfig
-  private detector: FishhookDetector
-  private surfacer: LatentSurfacer
-  private injector: SoftInjector
+  private readonly config: ReverieConfig
+  private readonly detector: FishhookDetector
+  private readonly surfacer: LatentSurfacer
+  private readonly injector: SoftInjector
   private messageCount = 0
   private latentPool: MemoryBlock[] = []
 

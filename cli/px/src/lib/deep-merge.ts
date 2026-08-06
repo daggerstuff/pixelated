@@ -14,8 +14,8 @@ export function deepMerge<T extends Record<string, unknown>>(
 
       if (isPlainObject(existing) && isPlainObject(value)) {
         result[key] = deepMerge(
-          existing as Record<string, unknown>,
-          value as Record<string, unknown>,
+          existing,
+          value,
         )
         continue
       }

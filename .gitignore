@@ -444,3 +444,4 @@ PRODUCT.md
 # Agent session dumps (large, unformatted; never commit)
 session-ses_*.md
 
+ai/data/

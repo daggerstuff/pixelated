@@ -169,7 +169,7 @@ describe('EncryptedMemoryService', () => {
         memories: [],
       }
 
-      await encryptedMemory.importEncryptedData(data as any)
+      await encryptedMemory.importEncryptedData(data)
 
       const session = encryptedMemory.getSession('imported-1')
       expect(session).toBeDefined()

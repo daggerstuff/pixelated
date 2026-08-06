@@ -16,10 +16,7 @@ function formatAgents(agents: Record<string, AgentConfig>): string {
 function formatHooks(config: PxConfig): string {
   if (!config.hooks) return '  (none)'
   const lines: string[] = []
-  for (const [event, hook] of Object.entries(config.hooks) as [
-    string,
-    HookConfig,
-  ][]) {
+  for (const [event, hook] of Object.entries(config.hooks)) {
     lines.push(
       `  ${event} → ${hook.agent}.${hook.tool}${hook.filter ? ` (filter: ${hook.filter})` : ''}${hook.async ? ' [async]' : ''}`,
     )
@@ -36,7 +33,7 @@ export function formatConfig(loaded: LoadedConfig): string {
   for (const s of sources) lines.push(`  ${s}`)
   lines.push('')
   lines.push('Agents:')
-  lines.push(formatAgents(config.agents as Record<string, AgentConfig>))
+  lines.push(formatAgents(config.agents))
   lines.push('')
   if (config.slack) {
     lines.push('Slack:')
@@ -53,11 +50,8 @@ export function formatAgentList(config: PxConfig): string {
   const lines: string[] = []
   lines.push('px agents — available agents and tools')
   lines.push('')
-  for (const [name, agent] of Object.entries(config.agents) as [
-    string,
-    AgentConfig,
-  ][]) {
-    lines.push(`${name}`)
+  for (const [name, agent] of Object.entries(config.agents)) {
+    lines.push(name)
     lines.push(`  endpoint: ${agent.endpoint}`)
     lines.push(`  tools:    ${agent.tools.join(', ')}`)
     lines.push(`  async:    ${agent.async}`)
@@ -66,10 +60,7 @@ export function formatAgentList(config: PxConfig): string {
   }
   if (config.hooks) {
     lines.push('Hook mapping:')
-    for (const [event, hook] of Object.entries(config.hooks) as [
-      string,
-      HookConfig,
-    ][]) {
+    for (const [event, hook] of Object.entries(config.hooks)) {
       lines.push(
         `  ${event} → ${hook.agent}.${hook.tool}${hook.filter ? ` (filter: ${hook.filter})` : ''}`,
       )

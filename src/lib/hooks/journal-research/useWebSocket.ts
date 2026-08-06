@@ -265,7 +265,7 @@ export const useJournalResearchWebSocket = ({
 
       // Convert data to string or ArrayBuffer for WebSocket send
       // ArrayBufferView (e.g. Uint8Array) is narrowed to ArrayBuffer
-      const payload: string | ArrayBuffer = (() => {
+      const payload: any = (() => {
         if (typeof data === 'string') {
           return data
         }
@@ -279,7 +279,7 @@ export const useJournalResearchWebSocket = ({
           ) as ArrayBuffer
         }
         // SharedArrayBuffer is not supported
-        return new TextEncoder().encode(String(data)).buffer as ArrayBuffer
+        return new TextEncoder().encode(String(data)).buffer
       })()
 
       const socket = socketRef.current

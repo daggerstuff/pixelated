@@ -167,7 +167,7 @@ export function usePersistentObject<T extends Record<string, any>>({
         ...prev,
         [field]:
           typeof value === 'function'
-            ? (value as (prev: T[K]) => T[K])(prev[field])
+            ? (value as Function)(prev[field])
             : value,
       }))
     },

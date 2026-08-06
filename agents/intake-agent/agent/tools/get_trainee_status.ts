@@ -77,7 +77,7 @@ export default defineTool({
       cohort,
       curriculum: {
         completed_steps: curriculumSteps.filter(
-          (s) => (s as Record<string, unknown>).status === 'COMPLETED',
+          (s) => (s).status === 'COMPLETED',
         ).length,
         total_steps: curriculumSteps.length,
         steps: curriculumSteps,

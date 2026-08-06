@@ -30,6 +30,189 @@ import {
 
 const logger = appLogger
 
+/**
+ * Per-disorder symptom lexicon. Surface forms (snake_case) map to clinically
+ * meaningful manifestation/cognition labels. Used by:
+ *   - {@link MentalArenaAdapter.getSymptomTemplatesForDisorder} (sample pool)
+ *   - {@link MentalArenaAdapter.extractManifestations} / extractCognitions
+ *     (NLP phrase matching against LLM-generated patient text)
+ *
+ * Tokens are matched against prose by converting underscores to whitespace
+ * (see tokenToPhraseRegex), so "catastrophic_thinking" matches
+ * "catastrophic thinking" and "catastrophic-thinking".
+ */
+const SYMPTOM_LEXICON: Record<
+  DisorderCategory,
+  Array<{
+    name: string
+    manifestations: string[]
+    cognitions: string[]
+  }>
+> = {
+  [DisorderCategory.Anxiety]: [
+    {
+      name: 'excessive_worry',
+      manifestations: ['restlessness', 'fatigue', 'difficulty_concentrating'],
+      cognitions: ['catastrophic_thinking', 'need_for_control', 'fear_of_unknown'],
+    },
+    {
+      name: 'panic_symptoms',
+      manifestations: ['rapid_heartbeat', 'sweating', 'trembling'],
+      cognitions: ['fear_of_dying', 'fear_of_losing_control', 'derealization'],
+    },
+  ],
+  [DisorderCategory.Depression]: [
+    {
+      name: 'persistent_sadness',
+      manifestations: ['low_mood', 'crying_spells', 'hopelessness'],
+      cognitions: ['negative_self_talk', 'worthlessness', 'guilt'],
+    },
+    {
+      name: 'anhedonia',
+      manifestations: ['loss_of_interest', 'reduced_pleasure', 'social_withdrawal'],
+      cognitions: ['nothing_matters', 'life_meaningless', 'no_point_trying'],
+    },
+  ],
+  [DisorderCategory.PTSD]: [
+    {
+      name: 'intrusive_memories',
+      manifestations: ['flashbacks', 'nightmares', 'hypervigilance'],
+      cognitions: ['threat_is_omnipresent', 'nowhere_is_safe', 'it_will_happen_again'],
+    },
+    {
+      name: 'avoidance_numbing',
+      manifestations: ['emotional_numbing', 'avoidance_of_triggers', 'startle_response'],
+      cognitions: ['the_past_is_always_present', 'i_am_unworthy_of_safety', 'nothing_can_be_trusted'],
+    },
+  ],
+  [DisorderCategory.ADHD]: [
+    {
+      name: 'inattention',
+      manifestations: ['difficulty_sustaining_attention', 'easily_distracted', 'forgetfulness'],
+      cognitions: ['i_cant_focus_on_anything', 'everything_is_overwhelming', 'i_always_fail_at_tasks'],
+    },
+    {
+      name: 'hyperactivity_impulsivity',
+      manifestations: ['fidgeting', 'excessive_talking', 'interrupting_others'],
+      cognitions: ['i_cant_slow_down', 'my_mind_wont_stop', 'i_act_before_i_think'],
+    },
+  ],
+  [DisorderCategory.OCD]: [
+    {
+      name: 'obsessions',
+      manifestations: ['intrusive_thoughts', 'contamination_fear', 'harm_fear'],
+      cognitions: ['something_terrible_will_happen', 'i_must_prevent_disaster', 'my_thoughts_are_dangerous'],
+    },
+    {
+      name: 'compulsions',
+      manifestations: ['repeated_checking', 'excessive_cleaning', 'counting_rituals'],
+      cognitions: ['i_must_do_it_again', 'it_needs_to_be_perfect', 'if_i_stop_something_bad_happens'],
+    },
+  ],
+  [DisorderCategory.BipolarDisorder]: [
+    {
+      name: 'manic_episode',
+      manifestations: ['elevated_mood', 'racing_thoughts', 'decreased_need_for_sleep', 'grandiosity'],
+      cognitions: ['i_am_invincible', 'i_dont_need_sleep', 'i_can_do_anything'],
+    },
+    {
+      name: 'depressive_episode',
+      manifestations: ['profound_low_mood', 'psychomotor_retardation', 'loss_of_energy'],
+      cognitions: ['everything_is_crushing', 'i_am_a_burden', 'there_is_no_future'],
+    },
+  ],
+  [DisorderCategory.EatingDisorder]: [
+    {
+      name: 'restrictive_behaviors',
+      manifestations: ['food_restriction', 'weight_preoccupation', 'calorie_counting'],
+      cognitions: ['i_must_control_my_body', 'i_am_never_thin_enough', 'food_is_the_enemy'],
+    },
+    {
+      name: 'body_image_disturbance',
+      manifestations: ['body_dissatisfaction', 'fear_of_weight_gain', 'body_checking'],
+      cognitions: ['my_body_is_wrong', 'i_disgust_myself', 'i_must_be_punished'],
+    },
+  ],
+  [DisorderCategory.SocialAnxiety]: [
+    {
+      name: 'performance_fear',
+      manifestations: ['blushing', 'sweating_in_public', 'shaking_voice'],
+      cognitions: ['everyone_is_watching_me', 'i_will_be_embarrassed', 'i_am_being_judged'],
+    },
+    {
+      name: 'interaction_fear',
+      manifestations: ['eye_contact_avoidance', 'silence_in_groups', 'social_withdrawal_from_peers'],
+      cognitions: ['i_have_nothing_to_say', 'people_will_think_i_am_stupid', 'i_am_inherently_boring'],
+    },
+  ],
+  [DisorderCategory.PanicDisorder]: [
+    {
+      name: 'panic_attacks',
+      manifestations: ['sudden_intense_fear', 'chest_pain', 'shortness_of_breath', 'dizziness'],
+      cognitions: ['i_am_having_a_heart_attack', 'i_am_going_to_die', 'my_body_is_failing'],
+    },
+    {
+      name: 'anticipatory_anxiety',
+      manifestations: ['fear_of_future_attacks', 'body_scanning', 'agoraphobic_avoidance'],
+      cognitions: ['it_will_happen_again', 'i_cant_go_far_from_home', 'nowhere_is_safe_from_panic'],
+    },
+  ],
+  [DisorderCategory.Trauma]: [
+    {
+      name: 'disassociation',
+      manifestations: ['derealization', 'depersonalization', 'memory_gaps'],
+      cognitions: ['i_am_not_real', 'this_isnt_happening', 'i_am_outside_my_body'],
+    },
+    {
+      name: 'relationship_disruption',
+      manifestations: ['trust_impairment', 'intimacy_difficulty', 'emotional_dysregulation'],
+      cognitions: ['no_one_can_be_trusted', 'i_am_fundamentally_broken', 'i_will_be_hurt_again'],
+    },
+  ],
+}
+
+/**
+ * Build a case-insensitive regex that matches a symptom lexicon token's
+ * surface form (underscores treated as flexible whitespace/punctuation).
+ * Returns null for falsy input.
+ */
+function tokenToPhraseRegex(token: string): RegExp | null {
+  if (!token) {
+    return null
+  }
+  const words = token.split('_').filter(Boolean)
+  if (words.length === 0) {
+    return null
+  }
+  const pattern = words
+    .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('[\\s\'-]+')
+  return new RegExp(`(?:^|\\b)${pattern}(?:\\b|$)`, 'iu')
+}
+
+/**
+ * Extract any lexicon tokens (manifestations or cognitions) that appear in
+ * `text` as surface-form phrases. `text` is the LLM-generated patient
+ * description; `tokensByDisorder` is the per-disorder lexicon slice to match
+ * against. Returns de-duplicated snake_case tokens in order of first match.
+ */
+function matchTokens(text: string, tokens: string[]): string[] {
+  const normalized = text.toLowerCase()
+  const matched: string[] = []
+  const seen = new Set<string>()
+  for (const token of tokens) {
+    if (seen.has(token)) {
+      continue
+    }
+    const re = tokenToPhraseRegex(token)
+    if (re?.test(normalized)) {
+      matched.push(token)
+      seen.add(token)
+    }
+  }
+  return matched
+}
+
 export interface MentalArenaProvider {
   analyzeEmotions(text: string): Promise<EmotionAnalysisResult>
   generateIntervention(
@@ -563,11 +746,11 @@ export class MentalArenaAdapter {
         ...symptom,
         manifestations: [
           ...symptom.manifestations,
-          ...this.extractManifestations(encodedText),
+          ...this.extractManifestations(encodedText, disorder),
         ],
         cognitions: [
           ...symptom.cognitions,
-          ...this.extractCognitions(encodedText),
+          ...this.extractCognitions(encodedText, disorder),
         ],
       }))
 
@@ -841,71 +1024,10 @@ export class MentalArenaAdapter {
       cognitions: string[]
     }>
   > {
-    // This would typically come from a clinical database or knowledge base
-    const symptomTemplates: Record<
-      DisorderCategory,
-      Array<{
-        name: string
-        manifestations: string[]
-        cognitions: string[]
-      }>
-    > = {
-      [DisorderCategory.Anxiety]: [
-        {
-          name: 'excessive_worry',
-          manifestations: [
-            'restlessness',
-            'fatigue',
-            'difficulty_concentrating',
-          ],
-          cognitions: [
-            'catastrophic_thinking',
-            'need_for_control',
-            'fear_of_unknown',
-          ],
-        },
-        {
-          name: 'panic_symptoms',
-          manifestations: ['rapid_heartbeat', 'sweating', 'trembling'],
-          cognitions: [
-            'fear_of_dying',
-            'fear_of_losing_control',
-            'derealization',
-          ],
-        },
-      ],
-      [DisorderCategory.Depression]: [
-        {
-          name: 'persistent_sadness',
-          manifestations: ['low_mood', 'crying_spells', 'hopelessness'],
-          cognitions: ['negative_self_talk', 'worthlessness', 'guilt'],
-        },
-        {
-          name: 'anhedonia',
-          manifestations: [
-            'loss_of_interest',
-            'reduced_pleasure',
-            'social_withdrawal',
-          ],
-          cognitions: [
-            'nothing_matters',
-            'life_meaningless',
-            'no_point_trying',
-          ],
-        },
-      ],
-      // ... Add more disorder templates
-      [DisorderCategory.PTSD]: [],
-      [DisorderCategory.ADHD]: [],
-      [DisorderCategory.OCD]: [],
-      [DisorderCategory.BipolarDisorder]: [],
-      [DisorderCategory.EatingDisorder]: [],
-      [DisorderCategory.SocialAnxiety]: [],
-      [DisorderCategory.PanicDisorder]: [],
-      [DisorderCategory.Trauma]: [],
-    }
-
-    return symptomTemplates[disorder] || []
+    // In practice this would come from a clinical database or knowledge base;
+    // for now we surface the in-repo lexicon so downstream NLP extraction
+    // (extractManifestations / extractCognitions) shares one source of truth.
+    return SYMPTOM_LEXICON[disorder] ?? []
   }
 
   private selectRandomSymptoms<T>(
@@ -1024,16 +1146,34 @@ export class MentalArenaAdapter {
     return `Generate a natural patient description that subtly incorporates these symptoms for ${disorder}: ${JSON.stringify(profile.symptoms)}`
   }
 
-  private extractManifestations(_text: string): string[] {
-    // Simple extraction - would be more sophisticated in production
-    // TODO: Implement NLP-based manifestation extraction
-    return []
+  /**
+   * NLP-based manifestation extraction.
+   *
+   * Scans LLM-generated patient text for surface forms of any manifestation
+   * token in the {@link SYMPTOM_LEXICON} slice for `disorder` (underscores
+   * turned into flexible whitespace/punctuation). Returns matched tokens in
+   * snake_case, de-duplicated and order-preserved.
+   *
+   * Surface-form matching keeps this deterministic and dependency-free: if
+   * the generated text says "I can't sleep, my heart races and I sweat for no
+   * reason", the Anxiety lexicon yields `['rapid_heartbeat', 'sweating']` via
+   * the `panic_symptoms` entry.
+   */
+  private extractManifestations(text: string, disorder: DisorderCategory): string[] {
+    const templates = SYMPTOM_LEXICON[disorder] ?? []
+    const tokens = templates.flatMap((t) => t.manifestations)
+    return matchTokens(text, tokens)
   }
 
-  private extractCognitions(_text: string): string[] {
-    // Simple extraction - would be more sophisticated in production
-    // TODO: Implement cognitive pattern extraction
-    return []
+  /**
+   * NLP-based cognitive-pattern extraction. See
+   * {@link MentalArenaAdapter.extractManifestations} — same mechanics, against
+   * the `cognitions` slice of the lexicon.
+   */
+  private extractCognitions(text: string, disorder: DisorderCategory): string[] {
+    const templates = SYMPTOM_LEXICON[disorder] ?? []
+    const tokens = templates.flatMap((t) => t.cognitions)
+    return matchTokens(text, tokens)
   }
 
   private createInitialConversationPrompt(

@@ -71,16 +71,16 @@ export class FHECacheService {
   private initialized = false
 
   // Computation cache: operation hash -> encrypted result
-  private computationCache = new Map<string, CacheEntry>()
+  private readonly computationCache = new Map<string, CacheEntry>()
 
   // Session cache: sessionId -> session data
-  private sessionCache = new Map<string, SessionCacheEntry>()
+  private readonly sessionCache = new Map<string, SessionCacheEntry>()
 
   // Key cache: keyId -> encryption key (for key rotation)
-  private keyCache = new Map<string, EncryptedData>()
+  private readonly keyCache = new Map<string, EncryptedData>()
 
   // Configuration
-  private config: CacheConfig
+  private readonly config: CacheConfig
 
   // Cache statistics
   private hits = 0
@@ -286,7 +286,7 @@ export class FHECacheService {
    * Get cached encryption key
    */
   public getCachedKey(keyId: string): EncryptedData | null {
-    return this.keyCache.get(keyId) || null
+    return this.keyCache.get(keyId) ?? null
   }
 
   /**
@@ -353,7 +353,7 @@ export class FHECacheService {
     let oldestTime = Infinity
 
     for (const [key, entry] of this.keyCache.entries()) {
-      const metadata = entry.metadata as Record<string, unknown> | undefined
+      const metadata = entry.metadata
       if (
         metadata &&
         typeof metadata['timestamp'] === 'number' &&

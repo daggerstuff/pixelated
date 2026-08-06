@@ -30,9 +30,7 @@ export class ExplainabilityService {
   private static instance: ExplainabilityService | null = null
 
   static getInstance(): ExplainabilityService {
-    if (ExplainabilityService.instance === null) {
-      ExplainabilityService.instance = new ExplainabilityService()
-    }
+    ExplainabilityService.instance ??= new ExplainabilityService();
     return ExplainabilityService.instance
   }
 
@@ -57,7 +55,7 @@ export class ExplainabilityService {
 
     if (context.neutralBaseline) {
       sources.push({
-        type: 'neutral-baseline' as ExplainabilitySourceType,
+        type: 'neutral-baseline',
         reference: 'empty-input',
         confidenceContribution: 1.0,
         description:
@@ -69,7 +67,7 @@ export class ExplainabilityService {
 
     if (context.fallbackUsed) {
       sources.push({
-        type: 'keyword-fallback' as ExplainabilitySourceType,
+        type: 'keyword-fallback',
         reference: 'detectEmotionsLocally',
         confidenceContribution: 0.6,
         description:
@@ -78,14 +76,14 @@ export class ExplainabilityService {
       })
     } else {
       sources.push({
-        type: 'llm' as ExplainabilitySourceType,
+        type: 'llm',
         reference: context.modelVersion,
         confidenceContribution: 0.85,
         description: `LLM analysis via ${context.provider} (${context.modelVersion})`,
         timestamp,
       })
       sources.push({
-        type: 'fhe' as ExplainabilitySourceType,
+        type: 'fhe',
         reference: 'encrypt/decrypt',
         confidenceContribution: 0.95,
         description:
@@ -95,7 +93,7 @@ export class ExplainabilityService {
     }
 
     sources.push({
-      type: 'dimensional-model' as ExplainabilitySourceType,
+      type: 'dimensional-model',
       reference: 'russell-circumplex',
       confidenceContribution: 0.8,
       description:
@@ -105,7 +103,7 @@ export class ExplainabilityService {
 
     if (context.perEmotionConfidence) {
       sources.push({
-        type: 'metadata' as ExplainabilitySourceType,
+        type: 'metadata',
         reference: 'per-emotion-confidence',
         confidenceContribution: this.averagePerEmotionConfidence(
           context.perEmotionConfidence,
