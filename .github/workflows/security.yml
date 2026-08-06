@@ -15,7 +15,7 @@ on:
     branches: [main, master, staging]
   schedule:
     # Run daily at midnight
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
 
 # ---------------------------------------------------------------------------
 # Jobs
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "python"]
+        language: ['javascript', 'python']
     steps:
       - uses: actions/checkout@v7
         with:
@@ -161,7 +161,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
-          category: "/language:${{ matrix.language }}"
+          category: '/language:${{ matrix.language }}'
           upload: true
           output: sarif-latest
 
@@ -232,14 +232,14 @@ jobs:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
             || '--no-deprecation' }}
         with:
-          cache: "false"
-          scan-type: "fs"
-          scanners: "vuln,secret,misconfig"
+          cache: 'false'
+          scan-type: 'fs'
+          scanners: 'vuln,secret,misconfig'
           trivy-config: .github/security/trivy/trivy.yaml
-          format: "sarif"
-          output: "trivy-results.sarif"
-          exit-code: "1"
-          severity: "CRITICAL,HIGH"
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
           skip-files: >-
             ai/training/sliced/stage2_therapeutic_expertise/clinical_diagnosis_mental_health.json,
             ai/training/sliced/stage2_therapeutic_expertise/cultural_nuances.json,
@@ -257,7 +257,7 @@ jobs:
           framework: terraform,terraform_plan,bicep
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
-          skip_path: "clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified"
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -574,7 +574,7 @@ jobs:
           format: json
           output: trivy-image-${{ matrix.dockerfile }}.json
           severity: CRITICAL,HIGH
-          exit-code: "0"
+          exit-code: '0'
         continue-on-error: true
 
       - name: Check scan results
@@ -621,7 +621,7 @@ jobs:
           format: sarif
           output: dockerfile-config-results.sarif
           severity: CRITICAL,HIGH,MEDIUM
-          exit-code: "0"
+          exit-code: '0'
         continue-on-error: true
 
       - name: Check for SARIF
