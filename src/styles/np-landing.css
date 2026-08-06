@@ -1280,9 +1280,19 @@
   }
 }
 
+@media (max-width: 900px) {
+  .np-features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .np-feature-card:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 640px) {
   .np-hero__display {
     max-width: none;
+    font-size: clamp(2rem, 8vw, 2.5rem);
   }
   .np-hero__subtitle {
     max-width: 42ch;

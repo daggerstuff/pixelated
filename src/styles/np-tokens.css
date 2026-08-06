@@ -226,6 +226,21 @@ body {
   /* Type family */
   --font-mono: var(--np-font-mono);
   --font-body: var(--np-font-body);
+  --font-sans: var(--np-font-body);
+  --font-label: var(--np-font-mono);
+  --font-display: var(--np-font-display);
+
+  /* Fluid text scale (from removed typography.css) */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.4rem + 0.5vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.7rem + 0.875vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 2rem + 1.25vw, 3rem);
+  --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 4.5rem);
+  --text-6xl: clamp(3.75rem, 3rem + 3.75vw, 6rem);
 
   /* Motion (state-only, neutral) */
   --duration-fast: var(--np-duration-fast);
@@ -236,4 +251,18 @@ body {
 
   /* Container for layouts that previously expected an 80rem-ish shell */
   --container-refined: 76rem;
+
+  /* Legacy color tokens (used by fhe-dashboard) */
+  --color-background: var(--np-bg);
+  --color-background-card: var(--np-elevated);
+  --color-border: var(--np-line);
+  --color-error: var(--np-text);
+  --color-error-bg: var(--np-surface);
+  --color-heading: var(--np-text);
+  --color-primary: var(--np-text);
+  --color-success: var(--np-text);
+  --color-success-bg: var(--np-surface);
+  --color-text-muted: var(--np-muted);
+  --color-warning: var(--np-muted);
+  --color-warning-bg: var(--np-surface);
 }
