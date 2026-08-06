@@ -75,7 +75,7 @@ class IsolationTree {
   private c(n: number): number {
     if (n <= 1) return 0
     const H = Math.log(n - 1) + 0.5772156649
-    return 2 * H - (2 * (n - 1) / n)
+    return 2 * H - (2 * (n - 1)) / n
   }
 }
 
@@ -119,25 +119,25 @@ export class IsolationForest {
         avgPathLength += tree.pathLength(point)
       }
       avgPathLength /= this.trees.length
-      
+
       // Compute anomaly score: 2^(-E(h(x)) / c(n))
       return Math.pow(2, -avgPathLength / c)
     })
   }
-  
+
   public retrainOnline(data: number[][], replaceRatio: number = 0.1): void {
     if (!this.isTrained) {
       this.fit(data)
       return
     }
-    
+
     // Replace the oldest `replaceRatio` of trees with new trees fit on the new data
     const treesToReplace = Math.max(1, Math.floor(this.nTrees * replaceRatio))
     const maxHeight = Math.ceil(Math.log2(this.sampleSize))
-    
+
     // Remove oldest trees
     this.trees.splice(0, treesToReplace)
-    
+
     // Add new trees
     for (let i = 0; i < treesToReplace; i++) {
       const sample: number[][] = []
@@ -150,11 +150,10 @@ export class IsolationForest {
     }
   }
 
-
   private c(n: number): number {
     if (n <= 1) return 0
     const H = Math.log(n - 1) + 0.5772156649
-    return 2 * H - (2 * (n - 1) / n)
+    return 2 * H - (2 * (n - 1)) / n
   }
 }
 
@@ -234,14 +233,14 @@ export class MLAnomalyDetector implements AnomalyDetector {
     })
 
     this.isolationForest = new IsolationForest(100, 256)
-    
+
     // Generate some dummy normal baseline data so the forest is trained and can predict anomalies
     const dummyData: number[][] = []
     for (let i = 0; i < 500; i++) {
       dummyData.push(
         Array(FEATURE_VECTOR_DIMENSION)
           .fill(0)
-          .map(() => Math.random() * 0.2)
+          .map(() => Math.random() * 0.2),
       )
     }
     this.isolationForest.fit(dummyData)

@@ -62,7 +62,7 @@ class FHEChat {
     // Generate a verification hash for the message
     const data = `${message.id}-${message.senderId}-${message.timestamp}`
     // Basic fallback hash logic since real FHE doesn't expose generateHash
-    const { createHash } = await import('node:crypto');
+    const { createHash } = await import('node:crypto')
     return createHash('sha256').update(data).digest('hex')
   }
 }
