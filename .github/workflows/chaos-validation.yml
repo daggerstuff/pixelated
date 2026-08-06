@@ -12,6 +12,8 @@ on:
           - network-latency
           - network-partition
           - http-chaos
+          - postgres
+          - foresight-mcp
           - all
       duration:
         description: 'Experiment duration in seconds (default: 300)'
@@ -75,7 +77,7 @@ jobs:
         run: |
           if [ "$SCENARIO" = "all" ]; then
             echo "Running all scenarios sequentially..."
-            for exp in pod-kill network-latency network-partition http-chaos; do
+            for exp in pod-kill network-latency network-partition http-chaos postgres foresight-mcp; do
               echo "=== Running $exp ==="
               kubectl apply -f "k8s/chaos/${exp}-experiment.yaml"
               sleep $((DURATION / 4))
@@ -175,5 +177,5 @@ jobs:
         if: failure()
         run: |
           echo "=== Cleaning up failed experiment ==="
-          kubectl delete podchaos,networkchaos,httpchaos -n pixelated-empathy --all --ignore-not-found=true
+          kubectl delete podchaos,networkchaos,httpchaos,iochaos -n pixelated-empathy --all --ignore-not-found=true
           kubectl get pods -n pixelated-empathy
