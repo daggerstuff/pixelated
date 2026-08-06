@@ -16,10 +16,11 @@
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
 
-  --np-font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --np-font-display:
+    'Archivo Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --np-font-body:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
   --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   --np-content: 76rem;
@@ -67,30 +68,31 @@
   display: block;
 }
 
-/* === Display / Headings — brutalist: heavy sans, tight tracking === */
+/* === Display / Headings — brutalist: Archivo Black display, Inter headlines === */
 .np-display {
   font-family: var(--np-font-display);
-  font-weight: var(--np-weight-display, 900);
-  font-size: var(--np-text-display, clamp(2rem, 3.8vw, 3.25rem));
+  font-weight: var(--np-weight-display, 400);
+  font-size: var(--np-text-display, clamp(2.5rem, 6vw, 4.5rem));
   line-height: 1;
-  letter-spacing: var(--np-tracking-display, -0.035em);
+  letter-spacing: var(--np-tracking-display, -0.045em);
+  text-transform: uppercase;
   margin: 0;
 }
 
 .np-headline {
-  font-family: var(--np-font-display);
-  font-weight: var(--np-weight-headline, 800);
-  font-size: var(--np-text-headline, clamp(1.5rem, 2.6vw, 2.125rem));
-  line-height: 1.1;
-  letter-spacing: -0.025em;
+  font-family: var(--np-font-body);
+  font-weight: 900;
+  font-size: var(--np-text-headline, clamp(1.75rem, 3.5vw, 2.75rem));
+  line-height: 1.05;
+  letter-spacing: -0.03em;
   margin: 0;
 }
 
 .np-title {
-  font-family: var(--np-font-display);
-  font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.25;
+  font-family: var(--np-font-body);
+  font-weight: 800;
+  font-size: 1.25rem;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -139,11 +141,11 @@
   font-family: var(--np-font-mono);
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  padding: 14px 28px;
-  min-height: 48px;
-  border: 1px solid var(--np-line-strong);
+  padding: 16px 32px;
+  min-height: 52px;
+  border: 2px solid var(--np-line-strong);
   border-radius: 0;
   cursor: pointer;
   text-decoration: none;
@@ -159,7 +161,7 @@
 .np-btn-primary {
   background: var(--np-text);
   color: var(--np-bg);
-  border: 1px solid var(--np-text);
+  border: 2px solid var(--np-text);
 }
 .np-btn-primary:hover {
   background: var(--np-bg);
@@ -178,7 +180,7 @@
 .np-btn-ghost {
   background: transparent;
   color: var(--np-text);
-  border: 1px solid var(--np-line-strong);
+  border: 2px solid var(--np-line-strong);
 }
 .np-btn-ghost:hover {
   background: var(--np-elevated);
@@ -241,7 +243,7 @@
 }
 
 .np-hero__display {
-  max-width: 20ch;
+  max-width: 14ch;
   margin-top: 16px;
   text-wrap: balance;
 }
@@ -303,7 +305,7 @@
 
 /* === Chat demo — raw transcript showcase, no bubbles === */
 .np-chat-demo {
-  border: 1px solid var(--np-line-strong);
+  border: 2px solid var(--np-line-strong);
   background: var(--np-surface);
   display: flex;
   flex-direction: column;
@@ -317,8 +319,8 @@
 }
 
 .np-chat-demo__header {
-  padding: var(--np-space-3) var(--np-space-4);
-  border-bottom: 1px solid var(--np-line-strong);
+  padding: var(--np-space-4) var(--np-space-4);
+  border-bottom: 2px solid var(--np-line-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -327,8 +329,8 @@
 
 .np-chat-demo__label {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-text);
   font-weight: 700;
@@ -336,9 +338,9 @@
 
 .np-chat-demo__status {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--np-muted);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .np-chat-demo__messages {
@@ -380,11 +382,11 @@
 
 .np-chat-demo__sender {
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--np-muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .np-chat-demo__entry--therapist .np-chat-demo__sender {
@@ -406,10 +408,10 @@
   align-items: center;
   gap: 6px;
   padding: var(--np-space-3) var(--np-space-4);
-  border-top: 1px solid var(--np-line-strong);
+  border-top: 2px solid var(--np-line-strong);
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-muted);
 }
@@ -447,8 +449,8 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1px;
   margin-top: clamp(48px, 6vw, 72px);
-  border-top: 1px solid var(--np-line);
-  border-bottom: 1px solid var(--np-line);
+  border-top: 2px solid var(--np-line-strong);
+  border-bottom: 2px solid var(--np-line-strong);
 }
 
 .np-hero__proof-item {
@@ -473,8 +475,8 @@
 /* === Trust strip === */
 .np-trust {
   padding: var(--np-space-8) 0;
-  border-top: 1px solid var(--np-line);
-  border-bottom: 1px solid var(--np-line);
+  border-top: 2px solid var(--np-line-strong);
+  border-bottom: 2px solid var(--np-line-strong);
   background: var(--np-bg);
 }
 
@@ -498,13 +500,13 @@
 
 .np-trust__badge {
   font-family: var(--np-font-display);
-  font-weight: 800;
-  font-size: 0.75rem;
+  font-weight: 400;
+  font-size: 0.875rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--np-text);
-  padding: 6px 14px;
-  border: 1px solid var(--np-line);
+  padding: 10px 20px;
+  border: 2px solid var(--np-line-strong);
   border-radius: 0;
   white-space: nowrap;
 }
@@ -606,7 +608,7 @@
 .np-screenshot {
   margin: 32px 0 48px;
   padding: 0;
-  border: 1px solid var(--np-line-strong);
+  border: 2px solid var(--np-line-strong);
   background: var(--np-surface);
 }
 
@@ -865,11 +867,11 @@
 }
 
 .np-track__number {
-  font-family: var(--np-font-mono);
-  font-weight: 200;
-  font-size: clamp(3.25rem, 5.5vw, 4.5rem);
+  font-family: var(--np-font-display);
+  font-weight: 400;
+  font-size: clamp(3.5rem, 6vw, 5rem);
   line-height: 0.9;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.05em;
   color: var(--np-text);
   display: block;
 }
@@ -950,8 +952,8 @@
    Full-width, centered, minimal — lets the button carry the weight. === */
 .np-cta-band {
   padding: clamp(56px, 7vw, 88px) 0;
-  border-top: 1px solid var(--np-line);
-  border-bottom: 1px solid var(--np-line);
+  border-top: 2px solid var(--np-line-strong);
+  border-bottom: 2px solid var(--np-line-strong);
   text-align: center;
 }
 
@@ -1005,7 +1007,7 @@
 /* Commit panel: bordered slab that holds the actions + trust line. */
 .np-cta-commit {
   padding: clamp(32px, 4vw, 48px);
-  border: 1px solid var(--np-line);
+  border: 2px solid var(--np-line-strong);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1279,9 +1281,19 @@
   }
 }
 
+@media (max-width: 900px) {
+  .np-features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .np-feature-card:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 640px) {
   .np-hero__display {
     max-width: none;
+    font-size: clamp(2rem, 8vw, 2.5rem);
   }
   .np-hero__subtitle {
     max-width: 42ch;

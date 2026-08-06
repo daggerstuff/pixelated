@@ -19,6 +19,7 @@ async function main(): Promise<void> {
     .description('px CLI — invoke Eve agents and inspect merged config')
     .version(pkg.version, '-v, --version', 'output the version number')
     .helpOption('-h, --help', 'display help')
+    .allowUnknownOption()
 
   registerAll(program)
 

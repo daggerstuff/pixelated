@@ -135,9 +135,6 @@ dependencies = [
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
-  # localstack is a dev/test-only dependency. pip-audit flags PYSEC-2023-243
-  # (missing SSL verification) but no fix version is available; accepted risk.
-  "localstack>=2026.5.0",
   "python-telegram-bot>=22.7",
   "anthropic>=0.107.1",
   "libcst>=1.8.6",
