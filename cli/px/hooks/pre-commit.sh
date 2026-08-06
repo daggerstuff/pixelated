@@ -4,4 +4,4 @@
 # Actual logic lives in `px hook pre-commit` — this script is a thin passthrough.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec node "$SCRIPT_DIR/../dist/index.js" hook pre-commit
+exec node "$SCRIPT_DIR/../dist/index.mjs" hook pre-commit

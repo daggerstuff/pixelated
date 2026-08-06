@@ -164,12 +164,10 @@ router.post(
 
     // Only process Issue and Project events
     if (eventType !== 'Issue' && eventType !== 'Project') {
-      res
-        .status(200)
-        .json({
-          status: 'ignored',
-          reason: `Unwatched event type: ${eventType}`,
-        })
+      res.status(200).json({
+        status: 'ignored',
+        reason: `Unwatched event type: ${eventType}`,
+      })
       return
     }
 
