@@ -31,6 +31,11 @@ const { cspNonce } = Astro.locals
 ---
 
 <style>
+  .glass-panel {
+    background: var(--np-elevated, var(--bg-elevated, #1a1a1a));
+    backdrop-filter: none;
+  }
+
   .slide-enter-content {
     animation: slide-enter 0.3s ease-out;
   }
