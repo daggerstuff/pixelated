@@ -11,6 +11,8 @@ resources:
   - network-latency-experiment.yaml
   - network-partition-experiment.yaml
   - http-chaos-experiment.yaml
+  - postgres-experiment.yaml
+  - foresight-mcp-experiment.yaml
 
 commonLabels:
   app.kubernetes.io/name: pixelated-empathy
