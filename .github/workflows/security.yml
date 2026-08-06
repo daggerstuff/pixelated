@@ -15,7 +15,7 @@ on:
     branches: [main, master, staging]
   schedule:
     # Run daily at midnight
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 # ---------------------------------------------------------------------------
 # Jobs
@@ -34,12 +34,11 @@ jobs:
       security-events: write
       actions: write
     concurrency:
-      group:
-        codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
+      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript', 'python']
+        language: ["javascript", "python"]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -100,8 +99,7 @@ jobs:
 
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run:
-          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
           --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
@@ -125,8 +123,7 @@ jobs:
       - name: Install Python dependencies
         if: matrix.language == 'python'
         env:
-          VIRTUAL_ENV:
-            ${{ github.workspace
+          VIRTUAL_ENV: ${{ github.workspace
             }}/src/lib/ai/bias-detection/python-service/.venv
         run: |
           if [ -d "src/lib/ai/bias-detection/python-service" ]; then
@@ -164,7 +161,7 @@ jobs:
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
         with:
-          category: '/language:${{ matrix.language }}'
+          category: "/language:${{ matrix.language }}"
           upload: true
           output: sarif-latest
 
@@ -235,14 +232,14 @@ jobs:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
             || '--no-deprecation' }}
         with:
-          cache: 'false'
-          scan-type: 'fs'
-          scanners: 'vuln,secret,misconfig'
+          cache: "false"
+          scan-type: "fs"
+          scanners: "vuln,secret,misconfig"
           trivy-config: .github/security/trivy/trivy.yaml
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+          format: "sarif"
+          output: "trivy-results.sarif"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
           skip-files: >-
             ai/training/sliced/stage2_therapeutic_expertise/clinical_diagnosis_mental_health.json,
             ai/training/sliced/stage2_therapeutic_expertise/cultural_nuances.json,
@@ -260,7 +257,7 @@ jobs:
           framework: terraform,terraform_plan,bicep
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
-          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
+          skip_path: "clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified"
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -335,8 +332,7 @@ jobs:
           category: checkov-helm
 
       - name: Upload Checkov artifacts
-        if:
-          always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
+        if: always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
           steps.checkov_helm_sarif.outputs.found == 'true')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -406,8 +402,7 @@ jobs:
           fi
 
       - name: Enforce high+ vulnerability threshold
-        run:
-          node scripts/utils/check-pnpm-audit.js --fail-on high
+        run: node scripts/utils/check-pnpm-audit.js --fail-on high
           audit-results.json
 
       - name: Upload audit results
@@ -579,7 +574,7 @@ jobs:
           format: json
           output: trivy-image-${{ matrix.dockerfile }}.json
           severity: CRITICAL,HIGH
-          exit-code: '0'
+          exit-code: "0"
         continue-on-error: true
 
       - name: Check scan results
@@ -626,7 +621,7 @@ jobs:
           format: sarif
           output: dockerfile-config-results.sarif
           severity: CRITICAL,HIGH,MEDIUM
-          exit-code: '0'
+          exit-code: "0"
         continue-on-error: true
 
       - name: Check for SARIF
