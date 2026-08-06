@@ -195,7 +195,7 @@ export class QueryAuditService {
 let singleton: QueryAuditService | null = null
 
 export function getQueryAuditService(): QueryAuditService {
-  singleton ??= new QueryAuditService();
+  singleton ??= new QueryAuditService()
   return singleton
 }
 
