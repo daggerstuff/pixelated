@@ -586,7 +586,9 @@ export class ConsentManagementService {
     }
   }
 
-  private readonly rowToAuditLog = (row: Record<string, unknown>): ConsentAuditLog => ({
+  private readonly rowToAuditLog = (
+    row: Record<string, unknown>,
+  ): ConsentAuditLog => ({
     timestamp: new Date(row['timestamp'] as string).toISOString(),
     clientId: row['client_id'] as string,
     operation: row['operation'] as string,

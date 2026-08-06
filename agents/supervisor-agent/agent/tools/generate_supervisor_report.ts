@@ -122,9 +122,7 @@ export default defineTool({
       metrics: {
         total_scored_sessions: scoredCount,
         total_flags: flags.length,
-        critical_flags: flags.filter(
-          (f) => (f).severity === 'critical',
-        ).length,
+        critical_flags: flags.filter((f) => f.severity === 'critical').length,
         dimension_averages: dimensionAverages,
       },
     }

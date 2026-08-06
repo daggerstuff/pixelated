@@ -40,14 +40,8 @@ export async function generateVAPIDKeys(): Promise<{
     ['sign', 'verify'],
   )
 
-  const publicKey = (await subtle.exportKey(
-    'raw',
-    keyPair.publicKey,
-  ))
-  const privateKey = (await subtle.exportKey(
-    'pkcs8',
-    keyPair.privateKey,
-  ))
+  const publicKey = await subtle.exportKey('raw', keyPair.publicKey)
+  const privateKey = await subtle.exportKey('pkcs8', keyPair.privateKey)
 
   return {
     publicKey: uint8ArrayToBase64(new Uint8Array(publicKey)),

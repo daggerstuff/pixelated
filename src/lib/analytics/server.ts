@@ -25,7 +25,7 @@ interface AnalyticsEvent {
 const events: AnalyticsEvent[] = []
 
 // Simple in-memory rate limiter
-const rateLimitCache = new Map<string, { count: number, resetTime: number }>()
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>()
 const RATE_LIMIT_WINDOW_MS = 60000 // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 100
 
@@ -40,7 +40,9 @@ app.use('/events', (req: Request, res: Response, next) => {
   }
 
   if (record.count >= MAX_REQUESTS_PER_WINDOW) {
-    res.status(429).json({ error: 'Too many requests, please try again later.' })
+    res
+      .status(429)
+      .json({ error: 'Too many requests, please try again later.' })
     return
   }
 
@@ -85,10 +87,13 @@ app.post('/events', (req: Request, res: Response): void => {
 app.get('/metrics', (_req: Request, res: Response): void => {
   const totalEvents = events.length
 
-  const eventsByType = events.reduce((acc, event) => {
-    acc[event.type] = (acc[event.type] ?? 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const eventsByType = events.reduce(
+    (acc, event) => {
+      acc[event.type] = (acc[event.type] ?? 0) + 1
+      return acc
+    },
+    {} as Record<string, number>,
+  )
 
   const uniqueUsers = new Set(events.map((e) => e.userId).filter(Boolean)).size
 
@@ -104,11 +109,14 @@ app.get('/metrics', (_req: Request, res: Response): void => {
 app.get('/metrics/prometheus', (_req: Request, res: Response): void => {
   let promText = `# HELP http_requests_total Total number of analytics events
 # TYPE http_requests_total counter\n`
-  
-  const eventsByType = events.reduce((acc, event) => {
-    acc[event.type] = (acc[event.type] ?? 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+
+  const eventsByType = events.reduce(
+    (acc, event) => {
+      acc[event.type] = (acc[event.type] ?? 0) + 1
+      return acc
+    },
+    {} as Record<string, number>,
+  )
 
   for (const [type, count] of Object.entries(eventsByType)) {
     promText += `http_requests_total{type="${type}"} ${count}\n`
@@ -124,9 +132,8 @@ app.get('/metrics/prometheus', (_req: Request, res: Response): void => {
 
 // GET /dashboard - Simple HTML dashboard
 app.get('/dashboard', (_req: Request, res: Response): void => {
-  const uniqueUsersCount = new Set(
-    events.map((e) => e.userId).filter(Boolean),
-  ).size
+  const uniqueUsersCount = new Set(events.map((e) => e.userId).filter(Boolean))
+    .size
 
   const html = `
     <!DOCTYPE html>

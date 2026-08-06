@@ -6,7 +6,6 @@
  * entry-point for all FHE operations across the platform.
  */
 
-
 export type { FHEService, FHEOperationResult, EncryptedData } from './types'
 export { FHEOperation } from './types'
 export { RealFHEService, realFHEService as fheService } from './fhe-service'

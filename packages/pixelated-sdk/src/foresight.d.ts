@@ -24,48 +24,44 @@ export declare const RetentionPolicy: z.ZodEnum<{
   permanent: 'permanent'
 }>
 export type RetentionPolicy = z.infer<typeof RetentionPolicy>
-export declare const ForesightMemory: z.ZodObject<
-  {
-    id: z.ZodString
-    content: z.ZodString
-    category: z.ZodString
-    tags: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>
-    scope: z.ZodDefault<
-      z.ZodOptional<
-        z.ZodEnum<{
-          session: 'session'
-          arc: 'arc'
-          trait: 'trait'
-          fact: 'fact'
-        }>
-      >
+export declare const ForesightMemory: z.ZodObject<{
+  id: z.ZodString
+  content: z.ZodString
+  category: z.ZodString
+  tags: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>
+  scope: z.ZodDefault<
+    z.ZodOptional<
+      z.ZodEnum<{
+        session: 'session'
+        arc: 'arc'
+        trait: 'trait'
+        fact: 'fact'
+      }>
     >
-    retention: z.ZodDefault<
-      z.ZodOptional<
-        z.ZodEnum<{
-          ephemeral: 'ephemeral'
-          short_term: 'short_term'
-          long_term: 'long_term'
-          permanent: 'permanent'
-        }>
-      >
+  >
+  retention: z.ZodDefault<
+    z.ZodOptional<
+      z.ZodEnum<{
+        ephemeral: 'ephemeral'
+        short_term: 'short_term'
+        long_term: 'long_term'
+        permanent: 'permanent'
+      }>
     >
-    importance: z.ZodDefault<z.ZodOptional<z.ZodNumber>>
-    emotionalContext: z.ZodOptional<
-      z.ZodObject<
-        {
-          valence: z.ZodOptional<z.ZodNumber>
-          arousal: z.ZodOptional<z.ZodNumber>
-          dominance: z.ZodOptional<z.ZodNumber>
-          primaryEmotion: z.ZodOptional<z.ZodString>
-          intensity: z.ZodOptional<z.ZodNumber>
-        }
-      >
-    >
-    createdAt: z.ZodString
-    updatedAt: z.ZodNullable<z.ZodString>
-  }
->
+  >
+  importance: z.ZodDefault<z.ZodOptional<z.ZodNumber>>
+  emotionalContext: z.ZodOptional<
+    z.ZodObject<{
+      valence: z.ZodOptional<z.ZodNumber>
+      arousal: z.ZodOptional<z.ZodNumber>
+      dominance: z.ZodOptional<z.ZodNumber>
+      primaryEmotion: z.ZodOptional<z.ZodString>
+      intensity: z.ZodOptional<z.ZodNumber>
+    }>
+  >
+  createdAt: z.ZodString
+  updatedAt: z.ZodNullable<z.ZodString>
+}>
 export type ForesightMemory = z.infer<typeof ForesightMemory>
 export declare const StoreMemoryInput: z.ZodObject<
   {
@@ -90,15 +86,13 @@ export declare const StoreMemoryInput: z.ZodObject<
     >
     importance: z.ZodOptional<z.ZodNumber>
     emotionalContext: z.ZodOptional<
-      z.ZodObject<
-        {
-          valence: z.ZodOptional<z.ZodNumber>
-          arousal: z.ZodOptional<z.ZodNumber>
-          dominance: z.ZodOptional<z.ZodNumber>
-          primaryEmotion: z.ZodOptional<z.ZodString>
-          intensity: z.ZodOptional<z.ZodNumber>
-        }
-      >
+      z.ZodObject<{
+        valence: z.ZodOptional<z.ZodNumber>
+        arousal: z.ZodOptional<z.ZodNumber>
+        dominance: z.ZodOptional<z.ZodNumber>
+        primaryEmotion: z.ZodOptional<z.ZodString>
+        intensity: z.ZodOptional<z.ZodNumber>
+      }>
     >
   },
   z.core.$strict
@@ -184,48 +178,44 @@ export type ListMemoriesInput = z.infer<typeof ListMemoriesInput>
 export declare const ListMemoriesOutput: z.ZodObject<
   {
     data: z.ZodArray<
-      z.ZodObject<
-        {
-          id: z.ZodString
-          content: z.ZodString
-          category: z.ZodString
-          tags: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>
-          scope: z.ZodDefault<
-            z.ZodOptional<
-              z.ZodEnum<{
-                session: 'session'
-                arc: 'arc'
-                trait: 'trait'
-                fact: 'fact'
-              }>
-            >
+      z.ZodObject<{
+        id: z.ZodString
+        content: z.ZodString
+        category: z.ZodString
+        tags: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>
+        scope: z.ZodDefault<
+          z.ZodOptional<
+            z.ZodEnum<{
+              session: 'session'
+              arc: 'arc'
+              trait: 'trait'
+              fact: 'fact'
+            }>
           >
-          retention: z.ZodDefault<
-            z.ZodOptional<
-              z.ZodEnum<{
-                ephemeral: 'ephemeral'
-                short_term: 'short_term'
-                long_term: 'long_term'
-                permanent: 'permanent'
-              }>
-            >
+        >
+        retention: z.ZodDefault<
+          z.ZodOptional<
+            z.ZodEnum<{
+              ephemeral: 'ephemeral'
+              short_term: 'short_term'
+              long_term: 'long_term'
+              permanent: 'permanent'
+            }>
           >
-          importance: z.ZodDefault<z.ZodOptional<z.ZodNumber>>
-          emotionalContext: z.ZodOptional<
-            z.ZodObject<
-              {
-                valence: z.ZodOptional<z.ZodNumber>
-                arousal: z.ZodOptional<z.ZodNumber>
-                dominance: z.ZodOptional<z.ZodNumber>
-                primaryEmotion: z.ZodOptional<z.ZodString>
-                intensity: z.ZodOptional<z.ZodNumber>
-              }
-            >
-          >
-          createdAt: z.ZodString
-          updatedAt: z.ZodNullable<z.ZodString>
-        }
-      >
+        >
+        importance: z.ZodDefault<z.ZodOptional<z.ZodNumber>>
+        emotionalContext: z.ZodOptional<
+          z.ZodObject<{
+            valence: z.ZodOptional<z.ZodNumber>
+            arousal: z.ZodOptional<z.ZodNumber>
+            dominance: z.ZodOptional<z.ZodNumber>
+            primaryEmotion: z.ZodOptional<z.ZodString>
+            intensity: z.ZodOptional<z.ZodNumber>
+          }>
+        >
+        createdAt: z.ZodString
+        updatedAt: z.ZodNullable<z.ZodString>
+      }>
     >
     pagination: z.ZodObject<
       {

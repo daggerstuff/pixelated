@@ -81,7 +81,10 @@ export class EncryptedMemoryService {
   // In-memory storage (production should use encrypted DB)
   private readonly sessions = new Map<string, EncryptedSessionState>()
   private readonly memories = new Map<string, EncryptedMemoryEntry>()
-  private readonly emotionalStates = new Map<string, EncryptedEmotionalState[]>()
+  private readonly emotionalStates = new Map<
+    string,
+    EncryptedEmotionalState[]
+  >()
 
   private constructor() {}
 
@@ -389,8 +392,7 @@ export class EncryptedMemoryService {
     await this.ensureInitialized()
 
     const sessionsArr = data['sessions'] as
-      | Array<Record<string, unknown>>
-      | undefined
+      Array<Record<string, unknown>> | undefined
     if (sessionsArr) {
       for (const session of sessionsArr) {
         this.sessions.set((session['sessionId'] as string) || '', {
@@ -398,7 +400,7 @@ export class EncryptedMemoryService {
           therapistId: (session['therapistId'] as string) || '',
           encryptedData: {
             id: `imported-${Date.now()}`,
-            data: (session['encryptedData']) || '',
+            data: session['encryptedData'] || '',
             dataType: 'string',
             metadata: (session['metadata'] as Record<string, unknown>) || {},
           },
@@ -410,8 +412,7 @@ export class EncryptedMemoryService {
     }
 
     const memoriesArr = data['memories'] as
-      | Array<Record<string, unknown>>
-      | undefined
+      Array<Record<string, unknown>> | undefined
     if (memoriesArr) {
       for (const memory of memoriesArr) {
         this.memories.set((memory['entryId'] as string) || '', {
@@ -419,7 +420,7 @@ export class EncryptedMemoryService {
           patientId: (memory['patientId'] as string) || '',
           encryptedContent: {
             id: `imported-${Date.now()}`,
-            data: (memory['encryptedContent']) || '',
+            data: memory['encryptedContent'] || '',
             dataType: 'string',
             metadata: (memory['metadata'] as Record<string, unknown>) || {},
           },

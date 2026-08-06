@@ -206,9 +206,7 @@ describe('CacheMetricsService', () => {
         mget: vi.fn().mockResolvedValue([]),
       }
 
-      const serviceWithRedis = new CacheMetricsService(
-        mockRedis,
-      )
+      const serviceWithRedis = new CacheMetricsService(mockRedis)
 
       // Add some in-memory counts
       serviceWithRedis.recordHit('api:123')
@@ -243,9 +241,7 @@ describe('CacheMetricsService', () => {
         mget: vi.fn().mockResolvedValue([]),
       }
 
-      const serviceWithRedis = new CacheMetricsService(
-        mockRedis,
-      )
+      const serviceWithRedis = new CacheMetricsService(mockRedis)
 
       serviceWithRedis.recordHit('test:1')
       serviceWithRedis.recordMiss('test:2')
@@ -271,9 +267,7 @@ describe('CacheMetricsService', () => {
         mget: vi.fn().mockResolvedValue([]),
       }
 
-      const serviceWithRedis = new CacheMetricsService(
-        mockRedis,
-      )
+      const serviceWithRedis = new CacheMetricsService(mockRedis)
 
       serviceWithRedis.recordHit('test:1')
 
