@@ -183,7 +183,7 @@ export function registerInitCommand(program: Command): void {
         const { config } = loadConfig(dir)
         const agentCount = Object.keys(config.agents).length
         const toolCount = (
-          Object.values(config.agents) as AgentConfig[]
+          Object.values(config.agents)
         ).reduce((sum, a) => sum + a.tools.length, 0)
         console.log(`\n${agentCount} agents, ${toolCount} tools configured.`)
         console.log('Run `px list` to see all agents.')

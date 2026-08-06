@@ -51,6 +51,7 @@ export const SEAL_SUPPORTED_OPERATIONS: Record<SealSchemeType, FHEOperation[]> =
       FHEOperation.Square,
       FHEOperation.Rotation,
       FHEOperation.Polynomial,
+      FHEOperation.DotProduct,
     ],
     [SealSchemeType.BGV]: [
       FHEOperation.Addition,
@@ -60,6 +61,7 @@ export const SEAL_SUPPORTED_OPERATIONS: Record<SealSchemeType, FHEOperation[]> =
       FHEOperation.Square,
       FHEOperation.Rotation,
       FHEOperation.Polynomial,
+      FHEOperation.DotProduct,
     ],
     [SealSchemeType.CKKS]: [
       FHEOperation.Addition,
@@ -70,6 +72,7 @@ export const SEAL_SUPPORTED_OPERATIONS: Record<SealSchemeType, FHEOperation[]> =
       FHEOperation.Rotation,
       FHEOperation.Polynomial,
       FHEOperation.Rescale, // CKKS specific operation
+      FHEOperation.DotProduct,
     ],
   }
 

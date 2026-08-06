@@ -8,6 +8,7 @@
 
 /* Supabase import removed - migrate to MongoDB */
 import { v4 as uuidv4 } from "uuid";
+import crypto from "node:crypto";
 import { mongoClient } from "../../db/mongoClient";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 import {
@@ -248,12 +249,14 @@ export class ConsentService {
 
       const now = new Date().toISOString();
       const consentId = uuidv4();
+      const hashedIp = params.ipAddress ? crypto.createHash('sha256').update(params.ipAddress).digest('hex') : null;
+      
       const consentDoc = {
         id: consentId,
         user_id: params.userId,
         consent_version_id: params.consentVersionId,
         granted_at: now,
-        ip_address: params.ipAddress ?? null,
+        ip_address: hashedIp,
         user_agent: params.userAgent ?? null,
         is_active: true,
         withdrawal_date: null,
@@ -272,7 +275,7 @@ export class ConsentService {
         action: "grant",
         action_timestamp: now,
         performed_by: params.userId,
-        ip_address: params.ipAddress ?? null,
+        ip_address: hashedIp,
         user_agent: params.userAgent ?? null,
         details: {
           consentVersionId: params.consentVersionId,
@@ -333,6 +336,8 @@ export class ConsentService {
         return false;
       }
 
+      const hashedIp = params.ipAddress ? crypto.createHash('sha256').update(params.ipAddress).digest('hex') : null;
+
       const auditDoc = {
         id: uuidv4(),
         user_id: params.userId,
@@ -340,7 +345,7 @@ export class ConsentService {
         action: "withdraw",
         action_timestamp: now,
         performed_by: params.userId,
-        ip_address: params.ipAddress ?? null,
+        ip_address: hashedIp,
         user_agent: params.userAgent ?? null,
         details: { reason: params.reason ?? null },
         created_at: now,

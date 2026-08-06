@@ -47,16 +47,14 @@ export declare const HealthSchema: z.ZodObject<
     timestamp: z.ZodString
     version: z.ZodString
     uptime: z.ZodOptional<z.ZodNumber>
-  },
-  z.core.$strip
+  }
 >
 export declare const VersionSchema: z.ZodObject<
   {
     version: z.ZodString
     build: z.ZodString
     commit: z.ZodOptional<z.ZodString>
-  },
-  z.core.$strip
+  }
 >
 export declare const ApiKeyElementSchema: z.ZodObject<
   {
@@ -68,8 +66,7 @@ export declare const ApiKeyElementSchema: z.ZodObject<
     created_at: z.ZodString
     expires_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
     last_used_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
-  },
-  z.core.$strip
+  }
 >
 export declare const ApiKeyListSchema: z.ZodObject<
   {
@@ -84,22 +81,19 @@ export declare const ApiKeyListSchema: z.ZodObject<
           created_at: z.ZodString
           expires_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
           last_used_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
-        },
-        z.core.$strip
+        }
       >
     >
-  },
-  z.core.$strip
+  }
 >
 export declare const ApiKeyCreateSchema: z.ZodObject<
   {
     key: z.ZodString
     id: z.ZodString
-  },
-  z.core.$strip
+  }
 >
 export declare const ApiKeyRevokeSchema: z.ZodOptional<
-  z.ZodObject<{}, z.core.$strip>
+  z.ZodObject<{}>
 >
 export interface SearchResult {
   id: string
@@ -178,9 +172,9 @@ export declare class PixelatedClient {
   /**
    * Internal helper for API requests with retry logic
    */
-  private request
-  private parseResponse
-  private sleep
+  private readonly request
+  private readonly parseResponse
+  private readonly sleep
   /**
    * Bias Analysis API
    */
@@ -265,7 +259,7 @@ export declare class PixelatedClient {
   get developer(): {
     memory: ForesightClient
   }
-  private createMemoryClient
+  private readonly createMemoryClient
   /**
    * System API
    */

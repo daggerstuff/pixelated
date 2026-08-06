@@ -215,9 +215,7 @@ let metricsInstance: CacheMetricsService | null = null
 export function getCacheMetricsService(
   redis?: RedisClient | null,
 ): CacheMetricsService {
-  if (!metricsInstance) {
-    metricsInstance = new CacheMetricsService(redis ?? null)
-  }
+  metricsInstance ??= new CacheMetricsService(redis ?? null);
   return metricsInstance
 }
 
