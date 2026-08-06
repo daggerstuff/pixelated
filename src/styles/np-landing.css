@@ -80,7 +80,7 @@
 }
 
 .np-headline {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--np-font-body);
   font-weight: 900;
   font-size: var(--np-text-headline, clamp(1.75rem, 3.5vw, 2.75rem));
   line-height: 1.05;
@@ -89,7 +89,7 @@
 }
 
 .np-title {
-  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--np-font-body);
   font-weight: 800;
   font-size: 1.25rem;
   line-height: 1.2;
@@ -499,7 +499,7 @@
 }
 
 .np-trust__badge {
-  font-family: 'Archivo Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--np-font-display);
   font-weight: 400;
   font-size: 0.875rem;
   letter-spacing: 0.04em;
@@ -867,7 +867,7 @@
 }
 
 .np-track__number {
-  font-family: 'Archivo Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--np-font-display);
   font-weight: 400;
   font-size: clamp(3.5rem, 6vw, 5rem);
   line-height: 0.9;
