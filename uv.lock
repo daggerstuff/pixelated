@@ -6548,7 +6548,7 @@ requires-dist = [
     { name = "clickhouse-driver", specifier = ">=0.2.10" },
     { name = "coverage", marker = "extra == 'dev'" },
     { name = "coverage", marker = "extra == 'test'" },
-    { name = "cryptography", specifier = ">=46.0.6,<50" },
+    { name = "cryptography", specifier = ">=46.0.6,<51" },
     { name = "data-designer", specifier = ">=0.6.1,<0.9" },
     { name = "datasets", specifier = ">=2.19.0" },
     { name = "e2b", specifier = ">=2.6.1" },

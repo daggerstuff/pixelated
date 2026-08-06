@@ -67,6 +67,11 @@ fi
 
 echo -e "${BLUE}🔍 [Hook] Running pre-commit checks...${NC}"
 
+# Guard: prevent install-git-hooks.sh from overwriting this file mid-execution.
+# pnpm exec lint-staged triggers pnpm prepare → install-git-hooks.sh → cp,
+# which corrupts the running script because bash reads files line-by-line.
+export PIXELATED_PRECOMMIT_HOOK=1
+
 # A. Secret scanning (Catch potential leaks before they leave)
 echo "🔒 Scanning for secrets..."
 # Check for staged files matching sensitive filename patterns (exclude .env.example/.sample)

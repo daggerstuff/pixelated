@@ -45,13 +45,13 @@ describe('pushUtils', () => {
       const jwt = await buildVapidJwt(endpoint, vapidKeys)
       const [header64] = jwt.split('.')
       expect(header64).toBeDefined()
-      expect(JSON.parse(atob(header64!))).toEqual({ typ: 'JWT', alg: 'ES256' })
+      expect(JSON.parse(atob(header64))).toEqual({ typ: 'JWT', alg: 'ES256' })
     })
 
     it('should include aud matching the endpoint origin', async () => {
       const jwt = await buildVapidJwt(endpoint, vapidKeys)
       const [, claims64] = jwt.split('.')
-      const claims = JSON.parse(atob(claims64!))
+      const claims = JSON.parse(atob(claims64))
       expect(claims.aud).toBe(new URL(endpoint).origin)
     })
 
@@ -60,14 +60,14 @@ describe('pushUtils', () => {
         sub: 'mailto:test@example.com',
       })
       const [, claims64] = jwt.split('.')
-      const claims = JSON.parse(atob(claims64!))
+      const claims = JSON.parse(atob(claims64))
       expect(claims.sub).toBe('mailto:test@example.com')
     })
 
     it('should default sub to admin email', async () => {
       const jwt = await buildVapidJwt(endpoint, vapidKeys)
       const [, claims64] = jwt.split('.')
-      const claims = JSON.parse(atob(claims64!))
+      const claims = JSON.parse(atob(claims64))
       expect(claims.sub).toBe('mailto:admin@example.com')
     })
 
@@ -77,7 +77,7 @@ describe('pushUtils', () => {
       const afterCall = Math.floor(Date.now() / 1000)
 
       const [, claims64] = jwt.split('.')
-      const claims = JSON.parse(atob(claims64!))
+      const claims = JSON.parse(atob(claims64))
       expect(claims.exp).toBeGreaterThanOrEqual(beforeCall + 12 * 60 * 60)
       expect(claims.exp).toBeLessThanOrEqual(afterCall + 12 * 60 * 60)
     })
@@ -88,7 +88,7 @@ describe('pushUtils', () => {
       const afterCall = Math.floor(Date.now() / 1000)
 
       const [, claims64] = jwt.split('.')
-      const claims = JSON.parse(atob(claims64!))
+      const claims = JSON.parse(atob(claims64))
       expect(claims.exp).toBeGreaterThanOrEqual(beforeCall + 300)
       expect(claims.exp).toBeLessThanOrEqual(afterCall + 300)
     })
@@ -248,7 +248,7 @@ describe('pushUtils', () => {
       const afterCall = Math.floor(Date.now() / 1000)
 
       const init = mockFetch.mock.calls[0][1] as RequestInit
-      const authHeader = (init!.headers as Record<string, string>)[
+      const authHeader = (init.headers as Record<string, string>)[
         'Authorization'
       ]
       const jwtMatch = authHeader.match(/vapid t=([^,]+),/)
@@ -260,10 +260,10 @@ describe('pushUtils', () => {
       expect(claims64).toBeDefined()
       expect(signature64).toBeDefined()
 
-      const header = JSON.parse(atob(header64!))
+      const header = JSON.parse(atob(header64))
       expect(header).toEqual({ typ: 'JWT', alg: 'ES256' })
 
-      const claims = JSON.parse(atob(claims64!))
+      const claims = JSON.parse(atob(claims64))
       expect(claims.aud).toBe(new URL(subscription.endpoint).origin)
       expect(claims.sub).toBe('mailto:admin@example.com')
       expect(claims.exp).toBeGreaterThanOrEqual(beforeCall + 12 * 60 * 60)

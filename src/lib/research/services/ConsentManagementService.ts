@@ -559,7 +559,7 @@ export class ConsentManagementService {
     return this.rowToConsentRecord(row)
   }
 
-  private rowToConsentRecord = (
+  private readonly rowToConsentRecord = (
     row: Record<string, unknown>,
   ): ConsentRecord => {
     const history = row['consent_history']
@@ -586,7 +586,7 @@ export class ConsentManagementService {
     }
   }
 
-  private rowToAuditLog = (row: Record<string, unknown>): ConsentAuditLog => ({
+  private readonly rowToAuditLog = (row: Record<string, unknown>): ConsentAuditLog => ({
     timestamp: new Date(row['timestamp'] as string).toISOString(),
     clientId: row['client_id'] as string,
     operation: row['operation'] as string,

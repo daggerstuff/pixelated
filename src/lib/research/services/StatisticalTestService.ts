@@ -639,9 +639,7 @@ export class StatisticalTestService {
 let instance: StatisticalTestService | null = null
 
 export function getStatisticalTestService(): StatisticalTestService {
-  if (!instance) {
-    instance = new StatisticalTestService()
-  }
+  instance ??= new StatisticalTestService();
   return instance
 }
 
