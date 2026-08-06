@@ -140,7 +140,7 @@ class RedisPubSub {
       // ioredis requires a dedicated connection for subscribing
       const Redis = (await import('ioredis')).default
       const redisUrl =
-        (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) ||
+        (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) ??
         ''
 
       if (redisUrl) {

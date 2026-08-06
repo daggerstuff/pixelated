@@ -59,14 +59,12 @@ export declare const ForesightMemory: z.ZodObject<
           dominance: z.ZodOptional<z.ZodNumber>
           primaryEmotion: z.ZodOptional<z.ZodString>
           intensity: z.ZodOptional<z.ZodNumber>
-        },
-        z.core.$strip
+        }
       >
     >
     createdAt: z.ZodString
     updatedAt: z.ZodNullable<z.ZodString>
-  },
-  z.core.$strip
+  }
 >
 export type ForesightMemory = z.infer<typeof ForesightMemory>
 export declare const StoreMemoryInput: z.ZodObject<
@@ -99,8 +97,7 @@ export declare const StoreMemoryInput: z.ZodObject<
           dominance: z.ZodOptional<z.ZodNumber>
           primaryEmotion: z.ZodOptional<z.ZodString>
           intensity: z.ZodOptional<z.ZodNumber>
-        },
-        z.core.$strip
+        }
       >
     >
   },
@@ -222,14 +219,12 @@ export declare const ListMemoriesOutput: z.ZodObject<
                 dominance: z.ZodOptional<z.ZodNumber>
                 primaryEmotion: z.ZodOptional<z.ZodString>
                 intensity: z.ZodOptional<z.ZodNumber>
-              },
-              z.core.$strip
+              }
             >
           >
           createdAt: z.ZodString
           updatedAt: z.ZodNullable<z.ZodString>
-        },
-        z.core.$strip
+        }
       >
     >
     pagination: z.ZodObject<
@@ -324,7 +319,7 @@ export declare class ForesightClient {
   private readonly maxRetries
   private readonly retryDelay
   constructor(config?: ForesightClientConfig)
-  private request
+  private readonly request
   /**
    * Store a new memory.
    *
