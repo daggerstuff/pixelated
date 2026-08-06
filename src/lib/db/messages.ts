@@ -1,12 +1,12 @@
-import type { Database } from '../../types/supabase'
-import { createAuditLog, AuditEventType } from '../audit'
-import { getRequestHeader } from '../utils/request-headers'
-import { updateConversation } from './conversations'
-import { mongoClient } from './mongoClient'
+import type { Database } from "../../types/supabase";
+import { createAuditLog, AuditEventType } from "../audit";
+import { getRequestHeader } from "../utils/request-headers";
+import { updateConversation } from "./conversations";
+import { mongoClient } from "./mongoClient";
 
-export type Message = Database['public']['Tables']['messages']['Row']
-export type NewMessage = Database['public']['Tables']['messages']['Insert']
-export type UpdateMessage = Database['public']['Tables']['messages']['Update']
+export type Message = Database["public"]["Tables"]["messages"]["Row"];
+export type NewMessage = Database["public"]["Tables"]["messages"]["Insert"];
+export type UpdateMessage = Database["public"]["Tables"]["messages"]["Update"];
 
 /**
  * Get messages for a conversation
@@ -18,25 +18,76 @@ export async function getMessages(
   offset = 0,
 ): Promise<Message[]> {
   // First verify the user has access to this conversation
-  const { ObjectId } = await import('mongodb')
+  const { ObjectId } = await import("mongodb");
   const conversation = await mongoClient.db
-    .collection('conversations')
-    .findOne({ _id: new ObjectId(conversationId), user_id: userId })
+    .collection("conversations")
+    .findOne({ _id: new ObjectId(conversationId), user_id: userId });
 
   if (!conversation) {
-    throw new Error('Unauthorized access to conversation')
+    throw new Error("Unauthorized access to conversation");
   }
 
   // Then get the messages
   const messages = await mongoClient.db
-    .collection('messages')
+    .collection("messages")
     .find({ conversation_id: conversationId })
     .sort({ created_at: -1 })
     .skip(offset)
     .limit(limit)
-    .toArray()
+    .toArray();
 
-  return messages as unknown as Message[]
+  return messages as unknown as Message[];
+}
+
+/**
+ * Get all messages across conversations linked to a therapy session.
+ *
+ * Uses a MongoDB aggregation pipeline to join conversations → messages in a
+ * single round-trip, eliminating the N+1 query pattern of fetching conversations
+ * then looping `getMessages` per conversation.
+ *
+ * Authorization: conversations are filtered by both `session_id` AND `user_id`,
+ * so a caller can only retrieve turns for sessions they own.
+ *
+ * Sorting: messages are returned in chronological ascending order (oldest first)
+ * to preserve natural conversation flow.
+ *
+ * Pagination: `$skip` + `$limit` are applied at the DB level, not in-memory.
+ */
+export async function getSessionTurns(
+  sessionId: string,
+  userId: string,
+  limit = 100,
+  offset = 0,
+): Promise<Message[]> {
+  const pipeline = [
+    // 1. Match conversations for this session + user (authorization)
+    { $match: { session_id: sessionId, user_id: userId } },
+    // 2. Convert _id (ObjectId) to string for $lookup join
+    { $addFields: { _id_str: { $toString: "$_id" } } },
+    // 3. Join messages collection (conversation_id is stored as hex string)
+    {
+      $lookup: {
+        from: "messages",
+        localField: "_id_str",
+        foreignField: "conversation_id",
+        as: "messages",
+      },
+    },
+    // 4. Unwind — one pipeline doc per message
+    { $unwind: "$messages" },
+    // 5. Chronological order (oldest first)
+    { $sort: { "messages.created_at": 1 } },
+    // 6. DB-level pagination
+    { $skip: offset },
+    { $limit: limit },
+    // 7. Extract just the message documents
+    { $replaceRoot: { newRoot: "$messages" } },
+  ];
+
+  const results = await mongoClient.db.collection("conversations").aggregate(pipeline).toArray();
+
+  return results as unknown as Message[];
 }
 
 /**
@@ -48,49 +99,43 @@ export async function createMessage(
   request?: Request,
 ): Promise<Message> {
   // First verify the user has access to this conversation
-  const { ObjectId } = await import('mongodb')
+  const { ObjectId } = await import("mongodb");
   const conversation = await mongoClient.db
-    .collection('conversations')
-    .findOne({ _id: new ObjectId(message.conversation_id), user_id: userId })
+    .collection("conversations")
+    .findOne({ _id: new ObjectId(message.conversation_id), user_id: userId });
 
   if (!conversation) {
-    throw new Error('Unauthorized access to conversation')
+    throw new Error("Unauthorized access to conversation");
   }
 
   // Create the message
   const result = await mongoClient.db
-    .collection('messages')
-    .insertOne(message as unknown as Record<string, unknown>)
+    .collection("messages")
+    .insertOne(message as unknown as Record<string, unknown>);
   const newMessage = {
     ...message,
     _id: result.insertedId,
     id: result.insertedId.toHexString(),
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }
+  };
 
   // Update the conversation's last_message_at timestamp
   await updateConversation(message.conversation_id, userId, {
     last_message_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  })
+  });
 
   // Log the event for HIPAA compliance
-  await createAuditLog(
-    AuditEventType.CREATE,
-    'message_created',
-    userId,
-    'messages',
-    {
-      messageId: newMessage._id.toHexString(),
-      conversationId: message.conversation_id,
-      role: message.role,
-      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
-      userAgent: getRequestHeader(request, 'user-agent'),
-    },
-  )
+  await createAuditLog(AuditEventType.CREATE, "message_created", userId, "messages", {
+    messageId: newMessage._id.toHexString(),
+    conversationId: message.conversation_id,
+    role: message.role,
+    ipAddress: getRequestHeader(request, "x-forwarded-for"),
+    userAgent: getRequestHeader(request, "user-agent"),
+  });
 
-  return newMessage as unknown as Message
+  return newMessage as unknown as Message;
 }
 
 /**
@@ -104,44 +149,38 @@ export async function updateMessage(
   request?: Request,
 ): Promise<Message> {
   // First verify the user has access to this conversation
-  const { ObjectId } = await import('mongodb')
+  const { ObjectId } = await import("mongodb");
   const conversation = await mongoClient.db
-    .collection('conversations')
-    .findOne({ _id: new ObjectId(conversationId), user_id: userId })
+    .collection("conversations")
+    .findOne({ _id: new ObjectId(conversationId), user_id: userId });
 
   if (!conversation) {
-    throw new Error('Unauthorized access to conversation')
+    throw new Error("Unauthorized access to conversation");
   }
 
   // Update the message
   const result = await mongoClient.db
-    .collection('messages')
+    .collection("messages")
     .findOneAndUpdate(
       { _id: new ObjectId(id), conversation_id: conversationId },
       { $set: updates },
-      { returnDocument: 'after' },
-    )
+      { returnDocument: "after" },
+    );
 
-  if (!result?.['value']) {
-    throw new Error('Failed to update message')
+  if (!result?.["value"]) {
+    throw new Error("Failed to update message");
   }
 
   // Log the event for HIPAA compliance
-  await createAuditLog(
-    AuditEventType.MODIFY,
-    'message_updated',
-    userId,
-    'messages',
-    {
-      messageId: id,
-      conversationId,
-      updates,
-      ipAddress: getRequestHeader(request, 'x-forwarded-for'),
-      userAgent: getRequestHeader(request, 'user-agent'),
-    },
-  )
+  await createAuditLog(AuditEventType.MODIFY, "message_updated", userId, "messages", {
+    messageId: id,
+    conversationId,
+    updates,
+    ipAddress: getRequestHeader(request, "x-forwarded-for"),
+    userAgent: getRequestHeader(request, "user-agent"),
+  });
 
-  return result['value']
+  return result["value"];
 }
 
 /**
@@ -161,9 +200,9 @@ export async function flagMessage(
       flagged_by: userId,
       reason,
     },
-  }
+  };
 
-  return updateMessage(id, conversationId, userId, updates, request)
+  return updateMessage(id, conversationId, userId, updates, request);
 }
 
 /**
@@ -171,21 +210,21 @@ export async function flagMessage(
  */
 export async function adminGetFlaggedMessages(): Promise<Message[]> {
   const messages = await mongoClient.db
-    .collection('messages')
+    .collection("messages")
     .aggregate([
       { $match: { is_flagged: true } },
       {
         $lookup: {
-          from: 'conversations',
-          localField: 'conversation_id',
-          foreignField: '_id',
-          as: 'conversations',
+          from: "conversations",
+          localField: "conversation_id",
+          foreignField: "_id",
+          as: "conversations",
         },
       },
-      { $unwind: '$conversations' },
+      { $unwind: "$conversations" },
       { $sort: { created_at: -1 } },
     ])
-    .toArray()
+    .toArray();
 
-  return messages as unknown as Message[]
+  return messages as unknown as Message[];
 }
