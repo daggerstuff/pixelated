@@ -5,4 +5,4 @@
 # Actual logic lives in `px hook pr-merge` — this script is a thin passthrough.
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-exec node "$SCRIPT_DIR/../dist/index.js" hook pr-merge "$@"
+exec node "$SCRIPT_DIR/../dist/index.mjs" hook pr-merge "$@"
