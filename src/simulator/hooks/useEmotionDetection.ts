@@ -40,7 +40,7 @@ export const useEmotionDetection = () => {
           return
         }
 
-        const fheSystem = fheService;
+        const fheSystem = fheService
 
         providerRef.current = new EmotionLlamaProvider(
           baseUrl,
