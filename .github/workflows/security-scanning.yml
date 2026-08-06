@@ -14,7 +14,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  GHA_LOCAL_RUN: 'false'
+  GHA_LOCAL_RUN: "false"
 
 on:
   push:
@@ -22,7 +22,7 @@ on:
   pull_request:
     branches: [main, master, staging]
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 
 jobs:
   security-scan:
@@ -47,7 +47,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: '3.13.13'
+          python-version: "3.13.13"
 
       - name: Set up uv
         uses: ./.github/actions/setup-uv
@@ -75,14 +75,14 @@ jobs:
             ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
             || '--no-deprecation' }}
         with:
-          cache: 'false'
-          scan-type: 'fs'
-          scanners: 'vuln,secret,misconfig'
+          cache: "false"
+          scan-type: "fs"
+          scanners: "vuln,secret,misconfig"
           trivy-config: .github/security/trivy/trivy.yaml
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+          format: "sarif"
+          output: "trivy-results.sarif"
+          exit-code: "1"
+          severity: "CRITICAL,HIGH"
           skip-files: ai/training/sliced/stage2_therapeutic_expertise/clinical_diagnosis_mental_health.json,ai/training/sliced/stage2_therapeutic_expertise/cultural_nuances.json,ai/training/v1/stage2_expertise/reasoning/clinical_diagnosis_mental_health.json,ai/training/v1/stage2_expertise/reasoning/cultural_nuances.json
           # Keep SARIF aligned with the configured severity gate.
           limit-severities-for-sarif: true
@@ -97,8 +97,8 @@ jobs:
           framework: terraform,terraform_plan,bicep
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
-          skip_check: ''
-          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
+          skip_check: ""
+          skip_path: "clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified"
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -112,7 +112,7 @@ jobs:
           framework: kubernetes,helm
           output_format: sarif
           output_file_path: checkov-helm-results.sarif
-          skip_check: ''
+          skip_check: ""
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -160,7 +160,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.trivy_sarif.outputs.found == 'true' }}
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
           category: trivy-fs
 
       - name: Upload Trivy SARIF as artifact
@@ -182,19 +182,18 @@ jobs:
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.checkov_infra_sarif.outputs.found == 'true' }}
         with:
-          sarif_file: 'checkov-infra-results.sarif'
+          sarif_file: "checkov-infra-results.sarif"
           category: checkov-infra
 
       - name: Upload Helm/Kubernetes Checkov scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4
         if: ${{ always() && steps.checkov_helm_sarif.outputs.found == 'true' }}
         with:
-          sarif_file: 'checkov-helm-results.sarif'
+          sarif_file: "checkov-helm-results.sarif"
           category: checkov-helm
 
       - name: Create diagnostic artifact when Checkov SARIF is missing
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
           if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
@@ -205,8 +204,7 @@ jobs:
           fi
 
       - name: Upload Checkov diagnostic artifact
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -326,7 +324,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v7.0.0
         with:
-          python-version: '3.13.13'
+          python-version: "3.13.13"
 
       - name: Set up uv
         uses: ./.github/actions/setup-uv
@@ -465,7 +463,7 @@ jobs:
           format: json
           output: trivy-image-${{ matrix.dockerfile }}.json
           severity: CRITICAL,HIGH
-          exit-code: '0'
+          exit-code: "0"
         continue-on-error: true
 
       - name: Check scan results
@@ -512,7 +510,7 @@ jobs:
           format: sarif
           output: dockerfile-config-results.sarif
           severity: CRITICAL,HIGH,MEDIUM
-          exit-code: '0'
+          exit-code: "0"
         continue-on-error: true
 
       - name: Check for SARIF file
