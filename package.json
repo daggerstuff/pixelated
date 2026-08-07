@@ -308,7 +308,7 @@
     "flexsearch": "latest",
     "framer-motion": "^12.43.0",
     "geoip-lite": "^2.0.3",
-    "graphql": "^16.9.0",
+    "graphql": "^17.0.2",
     "graphql-depth-limit": "^1.1.0",
     "graphql-query-complexity": "^2.0.0",
     "graphql-request": "^7.4.0",
