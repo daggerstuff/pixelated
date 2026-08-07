@@ -144,7 +144,9 @@ class WebRTCSignalingService {
       'type' in data &&
       'sessionId' in data &&
       'userId' in data &&
-      (data.type === 'offer' || data.type === 'answer' || data.type === 'ice-candidate')
+      (data.type === 'offer' ||
+        data.type === 'answer' ||
+        data.type === 'ice-candidate')
     )
   }
 }

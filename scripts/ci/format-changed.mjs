@@ -13,6 +13,10 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "src/lib/auth/__tests__/middleware.test.ts",
   "src/lib/encryption.ts",
   "src/lib/hooks/journal-research/useWebSocket.ts",
+  // prettier vs oxfmt irreconcilable conflicts (union type line wrapping)
+  "src/lib/fhe/encrypted-memory.ts",
+  "src/lib/graphql/redis-pubsub.ts",
+  "src/lib/security/consent/ConsentService.ts",
   "src/lib/research/ResearchPlatform.ts",
   "src/lib/research/services/HIPAADataService.ts",
   "src/tests/api/session/skills-api.test.ts",

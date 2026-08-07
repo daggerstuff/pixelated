@@ -295,8 +295,8 @@ export function useChatWithMemory(
   // Reverie engine instance — persists across renders
   const reverieRef = useRef<ReverieEngine | null>(null)
   reverieRef.current ??= new ReverieEngine(
-      options.reverieConfig ?? DEFAULT_REVERIE_CONFIG,
-    );
+    options.reverieConfig ?? DEFAULT_REVERIE_CONFIG,
+  )
   const reverie = reverieRef.current
 
   useEffect(() => {

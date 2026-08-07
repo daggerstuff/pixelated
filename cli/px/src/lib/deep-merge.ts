@@ -13,10 +13,7 @@ export function deepMerge<T extends Record<string, unknown>>(
       const existing = result[key]
 
       if (isPlainObject(existing) && isPlainObject(value)) {
-        result[key] = deepMerge(
-          existing,
-          value,
-        )
+        result[key] = deepMerge(existing, value)
         continue
       }
 

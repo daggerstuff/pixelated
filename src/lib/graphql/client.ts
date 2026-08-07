@@ -342,7 +342,7 @@ export function createGraphqlClient(config: GraphqlClientConfig): GraphqlSdk {
     listSessions: (variables?: ListSessionsQueryVariables) =>
       client.request<ListSessionsQuery, ListSessionsQueryVariables>(
         ListSessionsDocument,
-        variables ?? ({}),
+        variables ?? {},
       ),
 
     getEmotions: (variables: GetEmotionsQueryVariables) =>

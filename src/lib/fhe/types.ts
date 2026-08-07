@@ -37,7 +37,6 @@ export enum FHEOperation {
   Rescale = 'rescale',
   DotProduct = 'dot_product',
 
-
   // Text analysis operations
   SENTIMENT = 'sentiment',
   CATEGORIZE = 'categorize',

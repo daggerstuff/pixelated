@@ -395,17 +395,17 @@ export class DeveloperApiKeyManager {
       }
     }
 
-    const totalKeys = (totalResult.rows[0]?.count ?? 0)
-    const activeKeys = (activeResult.rows[0]?.count ?? 0)
+    const totalKeys = totalResult.rows[0]?.count ?? 0
+    const activeKeys = activeResult.rows[0]?.count ?? 0
 
     return {
       totalKeys,
       activeKeys,
       inactiveKeys: totalKeys - activeKeys,
-      expiredKeys: (expiredResult.rows[0]?.count ?? 0),
+      expiredKeys: expiredResult.rows[0]?.count ?? 0,
       keysByScope,
-      recentFailures: (recentFailuresResult.rows[0]?.count ?? 0),
-      averageRateLimit: Math.round((avgRateResult.rows[0]?.avg ?? 0)),
+      recentFailures: recentFailuresResult.rows[0]?.count ?? 0,
+      averageRateLimit: Math.round(avgRateResult.rows[0]?.avg ?? 0),
     }
   }
 

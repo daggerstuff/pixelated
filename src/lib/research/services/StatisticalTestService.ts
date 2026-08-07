@@ -639,7 +639,7 @@ export class StatisticalTestService {
 let instance: StatisticalTestService | null = null
 
 export function getStatisticalTestService(): StatisticalTestService {
-  instance ??= new StatisticalTestService();
+  instance ??= new StatisticalTestService()
   return instance
 }
 

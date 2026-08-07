@@ -127,12 +127,84 @@ export class EncryptedCrisisDetectionService {
   }
 
   private readonly keywordGroups: Record<string, string[]> = {
-    self_harm: ['knife', 'cut', 'wound', 'razor', 'blade', 'hurt', 'harm', 'damage', 'injure', 'bleed', 'pain', 'hurting', 'self'],
-    suicidal: ['suicide', 'kill', 'die', 'end', 'done', 'finish', 'death', 'dead', 'dying', 'want to die', 'wish to die', 'no reason', 'nothing left'],
-    violence: ['hurt', 'harm', 'attack', 'kill', 'murder', 'violent', 'weapon', 'gun', 'fight', 'assault', 'beat'],
-    abuse: ['abuse', 'assault', 'rape', 'sexual', 'domestic', 'partner', 'child', 'vulnerable'],
-    distress: ['overwhelmed', "can't", "couldn't", 'breaking', 'falling apart', 'hopeless', 'despair', 'no hope', 'panic', 'anxiety', 'terrified', 'crying', 'sobbing', 'tears'],
-    trauma: ['flashback', 'nightmare', 'triggered', 'ptsd', 'trauma', 'dissociate', 'spaced']
+    self_harm: [
+      'knife',
+      'cut',
+      'wound',
+      'razor',
+      'blade',
+      'hurt',
+      'harm',
+      'damage',
+      'injure',
+      'bleed',
+      'pain',
+      'hurting',
+      'self',
+    ],
+    suicidal: [
+      'suicide',
+      'kill',
+      'die',
+      'end',
+      'done',
+      'finish',
+      'death',
+      'dead',
+      'dying',
+      'want to die',
+      'wish to die',
+      'no reason',
+      'nothing left',
+    ],
+    violence: [
+      'hurt',
+      'harm',
+      'attack',
+      'kill',
+      'murder',
+      'violent',
+      'weapon',
+      'gun',
+      'fight',
+      'assault',
+      'beat',
+    ],
+    abuse: [
+      'abuse',
+      'assault',
+      'rape',
+      'sexual',
+      'domestic',
+      'partner',
+      'child',
+      'vulnerable',
+    ],
+    distress: [
+      'overwhelmed',
+      "can't",
+      "couldn't",
+      'breaking',
+      'falling apart',
+      'hopeless',
+      'despair',
+      'no hope',
+      'panic',
+      'anxiety',
+      'terrified',
+      'crying',
+      'sobbing',
+      'tears',
+    ],
+    trauma: [
+      'flashback',
+      'nightmare',
+      'triggered',
+      'ptsd',
+      'trauma',
+      'dissociate',
+      'spaced',
+    ],
   }
 
   private allKeywords: string[] = []
@@ -153,7 +225,9 @@ export class EncryptedCrisisDetectionService {
     for (const [category, keywords] of Object.entries(this.keywordGroups)) {
       const vector = new Array(this.allKeywords.length).fill(0)
       for (let i = 0; i < this.allKeywords.length; i++) {
-        if (keywords.map(k => k.toLowerCase()).includes(this.allKeywords[i])) {
+        if (
+          keywords.map((k) => k.toLowerCase()).includes(this.allKeywords[i])
+        ) {
           vector[i] = 1
         }
       }
@@ -292,7 +366,7 @@ export class EncryptedCrisisDetectionService {
       const opResult = await this.fheService.processEncrypted(
         encryptedStr,
         FHEOperation.DotProduct,
-        { vector: patternVector }
+        { vector: patternVector },
       )
 
       if (!opResult.success || !opResult.result) {
@@ -327,7 +401,7 @@ export class EncryptedCrisisDetectionService {
       }
 
       // Normalize score based on vector weight
-      const maxScore = patternVector.filter(v => v > 0).length
+      const maxScore = patternVector.filter((v) => v > 0).length
       return maxScore > 0 ? Math.min(score / maxScore, 1.0) : 0
     } catch (err) {
       logger.error('True homomorphic match failed, falling back', { err })
@@ -350,7 +424,7 @@ export class EncryptedCrisisDetectionService {
       }
     }
 
-    const maxScore = patternVector.filter(v => v > 0).length
+    const maxScore = patternVector.filter((v) => v > 0).length
     return maxScore > 0 ? Math.min(matchCount / maxScore, 1.0) : 0
   }
 

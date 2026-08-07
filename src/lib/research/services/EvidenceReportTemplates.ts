@@ -439,7 +439,7 @@ export class EvidenceReportGenerator {
 let instance: EvidenceReportGenerator | null = null
 
 export function getEvidenceReportGenerator(): EvidenceReportGenerator {
-  instance ??= new EvidenceReportGenerator();
+  instance ??= new EvidenceReportGenerator()
   return instance
 }
 
