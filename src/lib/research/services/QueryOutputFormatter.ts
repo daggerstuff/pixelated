@@ -221,7 +221,7 @@ export class QueryOutputFormatter {
 let singleton: QueryOutputFormatter | null = null
 
 export function getQueryOutputFormatter(): QueryOutputFormatter {
-  singleton ??= new QueryOutputFormatter();
+  singleton ??= new QueryOutputFormatter()
   return singleton
 }
 

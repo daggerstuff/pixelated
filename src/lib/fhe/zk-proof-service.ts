@@ -8,7 +8,7 @@ import type { HomomorphicOperationResult } from './types'
 
 let getSP1ProverPromise: Promise<() => SP1Prover> | null = null
 function loadSP1Prover(): Promise<() => SP1Prover> {
-  getSP1ProverPromise ??= import('./sp1-prover').then((m) => m.getSP1Prover);
+  getSP1ProverPromise ??= import('./sp1-prover').then((m) => m.getSP1Prover)
   return getSP1ProverPromise
 }
 
@@ -149,7 +149,7 @@ export class ZKProofService {
   }
 
   static getInstance(): ZKProofService {
-    ZKProofService.instance ??= new ZKProofService();
+    ZKProofService.instance ??= new ZKProofService()
     return ZKProofService.instance
   }
 
