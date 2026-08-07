@@ -12,7 +12,12 @@ export class WebSocketService {
   private reconnectTimer: NodeJS.Timeout | null = null
   private pingInterval: NodeJS.Timeout | null = null
   private isConnecting: boolean = false
-  private readonly messageQueue: { type: string; payload: Record<string, unknown>; resolve: () => void; reject: (err: unknown) => void }[] = []
+  private readonly messageQueue: {
+    type: string
+    payload: Record<string, unknown>
+    resolve: () => void
+    reject: (err: unknown) => void
+  }[] = []
 
   private constructor() {}
 
@@ -24,7 +29,11 @@ export class WebSocketService {
   }
 
   public connect(url: string): void {
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN ||
+        this.ws.readyState === WebSocket.CONNECTING)
+    ) {
       return
     }
 
@@ -41,7 +50,7 @@ export class WebSocketService {
           clearTimeout(this.reconnectTimer)
           this.reconnectTimer = null
         }
-        
+
         // Start heartbeat
         this.pingInterval = setInterval(() => {
           if (this.ws?.readyState === WebSocket.OPEN) {
@@ -60,21 +69,26 @@ export class WebSocketService {
 
       this.ws.onmessage = (event: MessageEvent) => {
         try {
-          const raw: string = typeof event.data === 'string' ? event.data : String(event.data)
+          const raw: string =
+            typeof event.data === 'string' ? event.data : String(event.data)
           const data = JSON.parse(raw) as Record<string, unknown>
           const type = data['type']
-          
+
           if (type === 'pong') {
             return // Heartbeat response, ignore
           }
-          
+
           if (typeof type === 'string' && type && this.handlers.has(type)) {
             const typeHandlers = this.handlers.get(type)
             typeHandlers?.forEach((handler) => handler(data))
           }
         } catch (error) {
-          const rawEvent: string = typeof event.data === 'string' ? event.data : String(event.data)
-          logger.error('Failed to parse WebSocket message', { error, data: rawEvent })
+          const rawEvent: string =
+            typeof event.data === 'string' ? event.data : String(event.data)
+          logger.error('Failed to parse WebSocket message', {
+            error,
+            data: rawEvent,
+          })
         }
       }
 
@@ -93,7 +107,7 @@ export class WebSocketService {
       this.scheduleReconnect()
     }
   }
-  
+
   private cleanup(): void {
     this.isConnecting = false
     if (this.pingInterval) {

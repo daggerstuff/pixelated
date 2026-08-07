@@ -26,9 +26,7 @@ const logger = createBuildSafeLogger('graphql-redis-pubsub')
 // ──────────────────────────────────────────────
 
 export type PubSubTopic =
-  | 'sessionUpdated'
-  | 'emotionAnalysisCreated'
-  | 'conversationTurnAdded'
+  'sessionUpdated' | 'emotionAnalysisCreated' | 'conversationTurnAdded'
 
 export type PubSubPayload = Record<string, unknown>
 
@@ -56,8 +54,7 @@ class InMemoryPubSub {
     let resolveNext:
       | ((
           value:
-            | { done: false; value: unknown }
-            | { done: true; value: undefined },
+            { done: false; value: unknown } | { done: true; value: undefined },
         ) => void)
       | null = null
     const subId = ++this.idCounter
@@ -140,8 +137,7 @@ class RedisPubSub {
       // ioredis requires a dedicated connection for subscribing
       const Redis = (await import('ioredis')).default
       const redisUrl =
-        (process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL']) ??
-        ''
+        process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL'] ?? ''
 
       if (redisUrl) {
         this.publisher = new Redis(redisUrl)
@@ -213,8 +209,7 @@ class RedisPubSub {
     let resolveNext:
       | ((
           value:
-            | { done: false; value: unknown }
-            | { done: true; value: undefined },
+            { done: false; value: unknown } | { done: true; value: undefined },
         ) => void)
       | null = null
 
