@@ -316,7 +316,7 @@ export class RateLimitService {
 let instance: RateLimitService | null = null
 
 export function getRateLimitService(): RateLimitService {
-  instance ??= new RateLimitService();
+  instance ??= new RateLimitService()
   return instance
 }
 
