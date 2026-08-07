@@ -150,7 +150,7 @@ export class ConsentExpiryService {
 let instance: ConsentExpiryService | null = null
 
 export function getConsentExpiryService(): ConsentExpiryService {
-  instance ??= new ConsentExpiryService();
+  instance ??= new ConsentExpiryService()
   return instance
 }
 
