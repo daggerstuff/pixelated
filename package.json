@@ -395,7 +395,7 @@
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
     "@playwright/test": "1.62.1",
-    "@stoplight/spectral-cli": "^6.15.5",
+    "@stoplight/spectral-cli": "^6.16.3",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
