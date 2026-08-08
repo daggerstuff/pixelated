@@ -166,13 +166,4 @@ class IndexedDBStorage {
   }
 }
 
-/**
- * Default IndexedDB instance for pixelated offline storage.
- */
-export const pixelatedIndexedDB = new IndexedDBStorage({
-  dbName: 'pixelated_offline',
-  version: 1,
-  storeName: 'storage',
-})
-
 export default IndexedDBStorage
