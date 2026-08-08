@@ -19,25 +19,21 @@ export async function login(
   rememberMe: boolean = false,
 ): Promise<void> {
   // In CI the bias-detection workflow sets E2E_TEST_AUTH=1 on the app server.
-  // Authenticate via the test-auth API instead of the login UI so Playwright
-  // does not depend on React hydration timing or CORS allowlists for same-origin
-  // fetches against the production preview build.
+  // Authenticate via the test-auth signin API so Playwright receives the
+  // HttpOnly session cookie from Set-Cookie (addCookies alone does not match
+  // the server-issued cookie and leaves /admin routes unauthenticated).
   if (process.env['E2E_TEST_AUTH'] === '1') {
-    const baseURL =
-      process.env['BASE_URL'] ??
-      (process.env['CI'] ? 'http://127.0.0.1:4321' : 'http://127.0.0.1:5173')
-    const { hostname } = new URL(baseURL)
+    const response = await page.request.post('/api/auth/signin', {
+      data: { email, password },
+      headers: { 'Content-Type': 'application/json' },
+    })
 
-    await page.context().addCookies([
-      {
-        name: 'auth-token',
-        value: 'e2e-test-admin',
-        domain: hostname,
-        path: '/',
-        httpOnly: true,
-        sameSite: 'Lax',
-      },
-    ])
+    if (!response.ok()) {
+      throw new Error(
+        `E2E signin failed (${response.status()}): ${await response.text()}`,
+      )
+    }
+
     return
   }
 
