@@ -447,7 +447,7 @@ importers:
         version: 3.3.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       express-rate-limit:
         specifier: '>=8.2.2'
-        version: 8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+        version: 8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       express-session:
         specifier: ^1.19.0
         version: 1.19.0(supports-color@10.2.2)
@@ -543,7 +543,7 @@ importers:
         version: 7.0.0
       nodemailer:
         specifier: ^9.0.1
-        version: 9.0.3
+        version: 9.0.4
       otplib:
         specifier: ^13.4.1
         version: 13.4.1
@@ -1090,7 +1090,7 @@ importers:
         version: 5.2.1(supports-color@10.2.2)
       express-rate-limit:
         specifier: '>=8.2.2'
-        version: 8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+        version: 8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -1114,7 +1114,7 @@ importers:
         version: 3.0.1(@aws-sdk/client-s3@3.1101.0)
       nodemailer:
         specifier: ^9.0.1
-        version: 9.0.3
+        version: 9.0.4
       pg:
         specifier: ^8.22.0
         version: 8.22.0
@@ -9973,8 +9973,8 @@ packages:
     peerDependencies:
       express: '>=4.20.0'
 
-  express-rate-limit@8.6.1:
-    resolution: {integrity: sha512-0D493aP61w0TJ2A0wy27riRsO7FMQ7FK+KUHOKCSfPvYo0R55aiC6emCVgFUeShH0fq0ICPVzNcgoS+BsbXQCA==}
+  express-rate-limit@8.6.2:
+    resolution: {integrity: sha512-YH4ru+eOJxQABscKFfRCy9R7x9QFGdezclVMwwgFFndzS2Xnm0uo6B0ABZsLhcpeptGv2qvuJVWlQr9gQZoC3A==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>=4.20.0'
@@ -12335,8 +12335,8 @@ packages:
   node-seal@7.0.0:
     resolution: {integrity: sha512-R5q8PQ6z3Hyq7x1uunNf5yZtDuSlffYkWFA5uvzL2fYF/IHL7+KwCsRdLlG3inBU1dMUgakDWiuqf0csMvcang==}
 
-  nodemailer@9.0.3:
-    resolution: {integrity: sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw==}
+  nodemailer@9.0.4:
+    resolution: {integrity: sha512-LmJNRVRtfSCULxcZpy0Cpg4WWenlUZ9+zbmTO+S7v9wD6XreYLjXRFtDjtV/4F0HT5p1GyZfA0Ux/myxHb18CQ==}
     engines: {node: '>=6.0.0'}
 
   nopt@8.1.0:
@@ -18626,7 +18626,7 @@ snapshots:
       eventsource: 3.0.7
       eventsource-parser: 3.1.0
       express: 5.2.1(supports-color@10.2.2)
-      express-rate-limit: 8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+      express-rate-limit: 8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       hono: 4.12.31
       jose: 6.2.3
       json-schema-typed: 8.0.2
@@ -25032,7 +25032,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  express-rate-limit@8.6.1(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2):
+  express-rate-limit@8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
       express: 5.2.1(supports-color@10.2.2)
@@ -28080,7 +28080,7 @@ snapshots:
 
   node-seal@7.0.0: {}
 
-  nodemailer@9.0.3: {}
+  nodemailer@9.0.4: {}
 
   nopt@8.1.0:
     dependencies:
