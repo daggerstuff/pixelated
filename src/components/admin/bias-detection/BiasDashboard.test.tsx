@@ -228,7 +228,30 @@ describe('BiasDashboard', () => {
       )
       .mockResolvedValue(
         createDashboardResponse({
-          success: true,
+          summary: {
+            totalSessions: 100,
+            averageBiasScore: 0.5,
+            highBiasSessions: 5,
+            totalAlerts: 10,
+            complianceScore: 0.85,
+            alertsLast24h: 0,
+          },
+          alerts: [
+            {
+              alertId: '1',
+              type: 'high_bias',
+              message: 'High bias detected',
+              timestamp: new Date().toISOString(),
+              level: 'high',
+              sessionId: 'session-1',
+              acknowledged: false,
+              status: 'active',
+            },
+          ],
+          trends: [],
+          demographics: {},
+          recentAnalyses: [],
+          recommendations: [],
         }),
       )
   })
@@ -528,7 +551,7 @@ describe('BiasDashboard', () => {
     expect(screen.getByLabelText(/time range/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/bias score level/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/alert level/i)).toBeInTheDocument()
-    expect(screen.getByLabelText(/demographics/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/^demographics$/i)).toBeInTheDocument()
   })
 
   it('handles time range filter changes', async () => {

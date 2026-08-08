@@ -172,7 +172,10 @@ export function TabsList({ children, className = '' }: TabsListProps) {
 }
 
 // Props for the TabsTrigger component
-export interface TabsTriggerProps {
+export interface TabsTriggerProps extends Omit<
+  React.ButtonHTMLAttributes<HTMLButtonElement>,
+  'value'
+> {
   value: string
   children: ReactNode
   className?: string
@@ -185,6 +188,7 @@ export function TabsTrigger({
   children,
   className = '',
   disabled = false,
+  ...rest
 }: TabsTriggerProps) {
   const { activeValue, setActiveValue, registerTab, unregisterTab } =
     useTabsContext()
@@ -209,6 +213,7 @@ export function TabsTrigger({
       className={`tabs-trigger ${isActive ? 'tabs-trigger-active' : ''} ${className}`}
       onClick={() => !disabled && setActiveValue(value)}
       disabled={disabled}
+      {...rest}
     >
       {children}
     </button>

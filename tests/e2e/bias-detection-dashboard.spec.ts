@@ -37,8 +37,10 @@ test.describe('Bias Detection Dashboard', () => {
       // Verify main dashboard container is present
       await expect(page.locator('[data-testid="bias-dashboard"]')).toBeVisible()
 
-      // Verify dashboard title
-      await expect(page.locator('h1')).toContainText(/bias detection/i)
+      // Verify dashboard title (scope to the React mount — the admin layout also has h1s)
+      await expect(
+        page.getByTestId('bias-dashboard').getByRole('heading', { level: 1 }),
+      ).toContainText(/bias detection/i)
 
       // Verify the tab navigation is present
       await expect(page.locator('[data-testid="trends-tab"]')).toBeVisible()
@@ -75,9 +77,10 @@ test.describe('Bias Detection Dashboard', () => {
         'true',
       )
 
-      // Summary section renders (average bias score heading appears in the
-      // summary cards — the component renders metric labels with text)
-      await expect(page.locator('main')).toBeVisible()
+      // Summary section renders inside the dashboard's primary landmark
+      await expect(
+        page.getByRole('main', { name: 'Dashboard main content' }),
+      ).toBeVisible()
     })
   })
 
@@ -228,11 +231,9 @@ test.describe('Bias Detection Dashboard', () => {
       })
       await expect(autoRefreshButton).toBeVisible()
 
-      // Clicking toggles the state label
+      // Clicking toggles the visible state label on the same control
       await autoRefreshButton.click()
-      await expect(
-        page.getByRole('button', { name: /auto-refresh off/i }),
-      ).toBeVisible()
+      await expect(autoRefreshButton).toContainText(/auto-refresh off/i)
     })
   })
 
