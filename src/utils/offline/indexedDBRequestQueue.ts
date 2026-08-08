@@ -18,7 +18,7 @@ export interface QueuedRequest {
   priority: 'low' | 'normal' | 'high' | 'critical'
 }
 
-export interface RequestQueueOptions {
+interface RequestQueueOptions {
   maxQueueSize?: number
   maxRetries?: number
   retryDelay?: number
