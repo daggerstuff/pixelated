@@ -2,7 +2,7 @@
  * IndexedDB storage wrapper for offline-first scenarios.
  * Provides async key-value storage to complement synchronous StorageManager.
  */
-interface IndexedDBStorageConfig {
+export interface IndexedDBStorageConfig {
   dbName: string
   version: number
   storeName: string
