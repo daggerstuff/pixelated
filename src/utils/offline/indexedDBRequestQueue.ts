@@ -126,7 +126,8 @@ class IndexedDBRequestQueue {
       const result = await new Promise<StoredQueue | undefined>(
         (resolve, reject) => {
           request.onerror = () => reject(request.error)
-          request.onsuccess = () => resolve(request.result as StoredQueue | undefined)
+          request.onsuccess = () =>
+            resolve(request.result as StoredQueue | undefined)
         },
       )
 
