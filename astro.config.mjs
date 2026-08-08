@@ -371,6 +371,25 @@ export default defineConfig({
             },
           }
         : {},
+      rollupOptions: {
+        /**
+         * Suppress sourcemap warnings from Astro's internal plugins
+         * (astro:build, astro:transitions) that transform output but don't
+         * generate sourcemaps. These use Rollup code SOURCEMAP_BROKEN.
+         * @param {Record<string, unknown> & { code?: string; message?: string }} warning
+         */
+        onwarn(warning, defaultHandler) {
+          if (
+            warning.code === 'SOURCEMAP_BROKEN' ||
+            warning.code === 'SOURCEMAP_ERROR' ||
+            (typeof warning.message === 'string' &&
+              warning.message.includes('Sourcemap is likely to be incorrect'))
+          ) {
+            return
+          }
+          defaultHandler?.(warning)
+        },
+      },
     },
     plugins: [
       ...(hasSentryDSN
@@ -443,6 +462,21 @@ export default defineConfig({
               // explicitly overrides it.
               if (env.build && config.build?.sourcemap != null) {
                 env.build.sourcemap ??= config.build.sourcemap
+              }
+
+              // Propagate rollupOptions.onwarn to each environment build.
+              // Astro spawns separate Vite builds per environment (client, ssr,
+              // prerender). Vite's top-level build.rollupOptions.onwarn only
+              // applies to the client environment. Without propagation, sourcemap
+              // warnings from Astro's internal plugins (astro:build,
+              // astro:transitions) leak through in the other environments.
+              const topLevelOnwarn = config.build?.rollupOptions?.onwarn
+              if (typeof topLevelOnwarn === 'function') {
+                env.build ??= {}
+                env.build.rollupOptions ??= {}
+                if (typeof env.build.rollupOptions.onwarn !== 'function') {
+                  env.build.rollupOptions.onwarn = topLevelOnwarn
+                }
               }
 
               if (env.build?.rolldownOptions) {
