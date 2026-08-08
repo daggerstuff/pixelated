@@ -226,11 +226,7 @@ export function FormStyleGuide() {
             <Label className="np-fsg__label" htmlFor="error-input">
               Input with error
             </Label>
-            <Input
-              id="error-input"
-              placeholder="invalid input"
-              error
-            />
+            <Input id="error-input" placeholder="invalid input" error />
             <p className="np-fsg__error-text">this field is required</p>
           </div>
 
@@ -318,10 +314,7 @@ export function FormStyleGuide() {
             <Label className="np-fsg__label" htmlFor="default-textarea">
               Default textarea
             </Label>
-            <Textarea
-              id="default-textarea"
-              placeholder="enter your message"
-            />
+            <Textarea id="default-textarea" placeholder="enter your message" />
           </div>
 
           <div className="np-fsg__field">
