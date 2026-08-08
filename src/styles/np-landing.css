@@ -329,74 +329,71 @@
   text-wrap: balance;
 }
 
-/* === Practice room — transcript as clinical artifact === */
+/* === Chat demo — raw transcript showcase, no bubbles === */
 .np-chat-demo {
-  border: 1px solid var(--np-line-strong);
-  background: var(--np-bg);
+  border: 2px solid var(--np-line-strong);
+  background: var(--np-surface);
   display: flex;
   flex-direction: column;
   width: 100%;
   position: relative;
+  transition: border-color var(--np-duration-slow) var(--np-ease);
 }
 
-/* File header — reads like a terminal title bar, not a chat widget.
-   Inverted contrast: dark text on the light strip makes the transcript
-   below drop away into evidence. */
-.np-chat-demo__file-header {
-  padding: 10px var(--np-space-4);
-  border-bottom: 1px solid var(--np-line-strong);
+.np-chat-demo:hover {
+  border-color: var(--np-mid);
+}
+
+.np-chat-demo__header {
+  padding: var(--np-space-4) var(--np-space-4);
+  border-bottom: 2px solid var(--np-line-strong);
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: var(--np-space-2);
-  background: var(--np-surface);
 }
 
-.np-chat-demo__file-label {
+.np-chat-demo__label {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
-  text-transform: lowercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--np-text);
   font-weight: 700;
 }
 
-.np-chat-demo__file-id {
+.np-chat-demo__status {
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
+  font-size: 0.75rem;
   color: var(--np-muted);
   letter-spacing: 0.04em;
-  text-transform: lowercase;
 }
 
-/* Transcript body — older turns recede under a hard linear mask.
-   The fade starts late (96px) so the first two turns anchor the
-   scene before history dissolves. */
 .np-chat-demo__messages {
   padding: 0 var(--np-space-4);
   display: flex;
   flex-direction: column;
-  max-height: clamp(320px, 42vh, 480px);
+  gap: 0;
+  /* Bound the transcript so the panel stays balanced beside the hero
+     statement; older turns recede under a soft top fade. */
+  max-height: clamp(300px, 40vh, 440px);
   overflow: hidden;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0,
-    #000 96px,
+    #000 64px,
     #000 100%
   );
-  mask-image: linear-gradient(to bottom, transparent 0, #000 96px, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 64px, #000 100%);
 }
 
-/* Each turn: speaker initial left, message right. Two-column transcript
-   layout — the speaker mark is a gutter, not a label above the text.
-   Differentiation between S. and T. comes from weight and the initial
-   alone, never from a border-left. */
+/* Each entry: sender tag above, message text below, hairline divider */
 .np-chat-demo__entry {
-  display: grid;
-  grid-template-columns: 2ch 1fr;
-  gap: 0 var(--np-space-3);
   padding: var(--np-space-4) 0;
   border-bottom: 1px solid var(--np-line);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .np-chat-demo__entry:last-child {
@@ -404,29 +401,25 @@
 }
 
 .np-chat-demo__entry--therapist {
-  background: var(--np-surface);
-  margin-left: calc(-1 * var(--np-space-4));
-  margin-right: calc(-1 * var(--np-space-4));
   padding-left: var(--np-space-4);
-  padding-right: var(--np-space-4);
+  border-left: 2px solid var(--np-line-strong);
+  margin-left: calc(-1 * var(--np-space-4));
 }
 
-.np-chat-demo__speaker {
+.np-chat-demo__sender {
   font-family: var(--np-font-mono);
   font-size: 0.75rem;
-  line-height: 1.6;
-  letter-spacing: 0;
-  text-transform: none;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--np-muted);
-  font-weight: 400;
-}
-
-.np-chat-demo__entry--therapist .np-chat-demo__speaker {
-  color: var(--np-text);
   font-weight: 700;
 }
 
-.np-chat-demo__line {
+.np-chat-demo__entry--therapist .np-chat-demo__sender {
+  color: var(--np-text);
+}
+
+.np-chat-demo__entry p {
   margin: 0;
   font-family: var(--np-font-body);
   font-size: var(--np-text-small, 0.875rem);
@@ -435,38 +428,44 @@
   text-wrap: pretty;
 }
 
-/* Live mark — single blinking cursor replaces the three-dot bounce.
-   A terminal cursor communicates "composing" without animating shapes. */
-.np-chat-demo__live {
+/* Typing indicator at the bottom of the chat */
+.np-chat-demo__typing {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: var(--np-space-3) var(--np-space-4);
-  border-top: 1px solid var(--np-line-strong);
+  border-top: 2px solid var(--np-line-strong);
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--np-muted);
 }
 
-.np-chat-demo__cursor {
-  font-family: var(--np-font-mono);
-  font-size: 0.875rem;
-  line-height: 1;
-  color: var(--np-text);
-  font-weight: 700;
-  animation: np-chat-blink 1.1s steps(1) infinite;
+.np-chat-demo__dot {
+  width: 5px;
+  height: 5px;
+  background: var(--np-mid);
+  border-radius: 0;
+  animation: np-chat-pulse 1.4s ease-in-out infinite;
 }
 
-@keyframes np-chat-blink {
+.np-chat-demo__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.np-chat-demo__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes np-chat-pulse {
   0%,
-  50% {
-    opacity: 1;
-  }
-  50.01%,
+  60%,
   100% {
-    opacity: 0;
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 0.8;
   }
 }
 
@@ -566,7 +565,7 @@
   }
 }
 
-/* Demo note — flush left under the live bar */
+/* Demo note — subtle below the chat */
 .np-chat-demo__note {
   font-family: var(--np-font-mono);
   font-size: 0.625rem;
@@ -574,8 +573,7 @@
   padding: var(--np-space-2) var(--np-space-4) var(--np-space-3);
   border-top: 1px solid var(--np-line);
   text-align: left;
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
+  letter-spacing: 0.02em;
 }
 
 /* === Section header === */
