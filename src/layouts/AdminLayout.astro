@@ -1,12 +1,7 @@
 ---
 import { SITE } from '../config'
 import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
-import '@fontsource-variable/jetbrains-mono/wght.css'
-import '@fontsource/inter/400.css'
-import '@fontsource/inter/500.css'
-import '@fontsource/inter/700.css'
-import '@fontsource/inter/800.css'
-import '@fontsource/inter/900.css'
+import '@/lib/fonts'
 import '@/styles/np-tokens.css'
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
 import { ADMIN_NAV_ITEMS } from '@/components/admin/admin-nav'
@@ -30,6 +25,11 @@ const { cspNonce } = Astro.locals
 ---
 
 <style>
+  .glass-panel {
+    background: var(--np-elevated, var(--bg-elevated, #1a1a1a));
+    backdrop-filter: none;
+  }
+
   .slide-enter-content {
     animation: slide-enter 0.3s ease-out;
   }

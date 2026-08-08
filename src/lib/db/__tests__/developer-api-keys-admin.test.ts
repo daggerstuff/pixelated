@@ -127,7 +127,7 @@ describe('DeveloperApiKeyManager — Admin Methods', () => {
 
       const keys = await manager.listAllApiKeys({ activeOnly: true })
       expect(keys).toHaveLength(1)
-      const sql = mockQuery.mock.calls[0][0] as string
+      const sql = mockQuery.mock.calls[0][0]
       expect(sql).toContain('is_active = true')
     })
 
@@ -136,7 +136,7 @@ describe('DeveloperApiKeyManager — Admin Methods', () => {
 
       const keys = await manager.listAllApiKeys({ userId: 'user-1' })
       expect(keys).toHaveLength(1)
-      const sql = mockQuery.mock.calls[0][0] as string
+      const sql = mockQuery.mock.calls[0][0]
       expect(sql).toContain('user_id = $1')
     })
 
@@ -148,7 +148,7 @@ describe('DeveloperApiKeyManager — Admin Methods', () => {
         userId: 'user-1',
       })
       expect(keys).toHaveLength(1)
-      const sql = mockQuery.mock.calls[0][0] as string
+      const sql = mockQuery.mock.calls[0][0]
       expect(sql).toContain('is_active = true')
       expect(sql).toContain('user_id = $1')
     })

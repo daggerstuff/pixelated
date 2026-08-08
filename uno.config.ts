@@ -21,9 +21,9 @@ export default defineConfig({
       background: 'var(--np-bg)',
     },
     fontFamily: {
-      sans: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-      mono: '"JetBrains Mono Variable", ui-monospace, monospace',
-      display: '"JetBrains Mono Variable", ui-monospace, monospace',
+      sans: 'var(--np-font-body, "Inter", ui-sans-serif, system-ui, sans-serif)',
+      mono: 'var(--np-font-mono, "JetBrains Mono Variable", ui-monospace, monospace)',
+      display: 'var(--np-font-display, "Archivo Black", "Inter", sans-serif)',
     },
   },
   presets: [

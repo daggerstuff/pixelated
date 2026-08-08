@@ -116,7 +116,7 @@ def generate_qa_pair(passage: str, transcript: dict) -> dict | None:
 def main():
     parser = argparse.ArgumentParser(description="Build QA dataset from transcripts")
     parser.add_argument("--transcript-dir", type=Path, default=Path("ai/data/transcripts/ingested"))
-    parser.add_argument("--output", type=Path, default=Path("data/qa_pairs_v3.jsonl"))
+    parser.add_argument("--output", type=Path, default=Path("ai/data/qa_pairs_v3.jsonl"))
     parser.add_argument("--sample", action="store_true")
     parser.add_argument("--max-files", type=int, default=None)
     args = parser.parse_args()

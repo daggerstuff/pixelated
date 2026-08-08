@@ -16,10 +16,11 @@
   --np-line: rgba(255, 255, 255, 0.06);
   --np-line-strong: rgba(255, 255, 255, 0.12);
 
-  --np-font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --np-font-display:
+    'Archivo Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --np-font-body:
-    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
   --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
 
   --np-content: 76rem;
@@ -56,7 +57,7 @@
   padding: clamp(72px, 10vw, 128px) 0;
 }
 
-/* === Labels === */
+/* === Labels — clinical file header style: leading hairline + mono text === */
 .np-label {
   font-family: var(--np-font-mono);
   font-size: 0.6875rem;
@@ -64,33 +65,56 @@
   text-transform: uppercase;
   color: var(--np-muted);
   margin-bottom: 12px;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* === Display / Headings — brutalist: heavy sans, tight tracking === */
+.np-label::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--np-line-strong);
+  flex-shrink: 0;
+}
+
+/* === Display / Headings — clinical instrument voice.
+   No uppercase shouting. Inter Black sentence-case for display, tight
+   tracking. Mono accents on key words via .np-mono-word. === */
 .np-display {
-  font-family: var(--np-font-display);
-  font-weight: var(--np-weight-display, 900);
-  font-size: var(--np-text-display, clamp(2rem, 3.8vw, 3.25rem));
-  line-height: 1;
-  letter-spacing: var(--np-tracking-display, -0.035em);
+  font-family: var(--np-font-body);
+  font-weight: 900;
+  font-size: var(--np-text-display, clamp(2.5rem, 6vw, 4.5rem));
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-transform: none;
   margin: 0;
 }
 
+/* Inline mono accent — use on a word or phrase inside a headline to inject
+   the clinical/data voice without breaking the line. */
+.np-mono-word {
+  font-family: var(--np-font-mono);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
 .np-headline {
-  font-family: var(--np-font-display);
-  font-weight: var(--np-weight-headline, 800);
-  font-size: var(--np-text-headline, clamp(1.5rem, 2.6vw, 2.125rem));
-  line-height: 1.1;
+  font-family: var(--np-font-body);
+  font-weight: 900;
+  font-size: var(--np-text-headline, clamp(1.75rem, 3.5vw, 2.75rem));
+  line-height: 1.08;
   letter-spacing: -0.025em;
+  text-transform: none;
   margin: 0;
 }
 
 .np-title {
-  font-family: var(--np-font-display);
-  font-weight: 700;
-  font-size: 1.125rem;
-  line-height: 1.25;
+  font-family: var(--np-font-body);
+  font-weight: 800;
+  font-size: 1.25rem;
+  line-height: 1.2;
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -139,7 +163,7 @@
   font-family: var(--np-font-mono);
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   padding: 14px 28px;
   min-height: 48px;
@@ -178,7 +202,7 @@
 .np-btn-ghost {
   background: transparent;
   color: var(--np-text);
-  border: 1px solid var(--np-line-strong);
+  border: 2px solid var(--np-line-strong);
 }
 .np-btn-ghost:hover {
   background: var(--np-elevated);
@@ -238,10 +262,13 @@
 
 .np-hero__kicker {
   margin-bottom: 0;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--np-mid);
 }
 
 .np-hero__display {
-  max-width: 20ch;
+  max-width: 16ch;
   margin-top: 16px;
   text-wrap: balance;
 }
@@ -250,7 +277,8 @@
   margin-top: 20px;
   max-width: 46ch;
   text-align: left;
-  color: var(--np-mid);
+  color: var(--np-text);
+  opacity: 0.75;
   font-size: var(--np-text-body);
   line-height: var(--np-leading-body);
   text-wrap: pretty;
@@ -303,7 +331,7 @@
 
 /* === Chat demo — raw transcript showcase, no bubbles === */
 .np-chat-demo {
-  border: 1px solid var(--np-line-strong);
+  border: 2px solid var(--np-line-strong);
   background: var(--np-surface);
   display: flex;
   flex-direction: column;
@@ -317,8 +345,8 @@
 }
 
 .np-chat-demo__header {
-  padding: var(--np-space-3) var(--np-space-4);
-  border-bottom: 1px solid var(--np-line-strong);
+  padding: var(--np-space-4) var(--np-space-4);
+  border-bottom: 2px solid var(--np-line-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -327,8 +355,8 @@
 
 .np-chat-demo__label {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-text);
   font-weight: 700;
@@ -336,9 +364,9 @@
 
 .np-chat-demo__status {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   color: var(--np-muted);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
 }
 
 .np-chat-demo__messages {
@@ -380,11 +408,11 @@
 
 .np-chat-demo__sender {
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--np-muted);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .np-chat-demo__entry--therapist .np-chat-demo__sender {
@@ -406,10 +434,10 @@
   align-items: center;
   gap: 6px;
   padding: var(--np-space-3) var(--np-space-4);
-  border-top: 1px solid var(--np-line-strong);
+  border-top: 2px solid var(--np-line-strong);
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.06em;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-muted);
 }
@@ -447,8 +475,8 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1px;
   margin-top: clamp(48px, 6vw, 72px);
-  border-top: 1px solid var(--np-line);
-  border-bottom: 1px solid var(--np-line);
+  border-top: 2px solid var(--np-line-strong);
+  border-bottom: 2px solid var(--np-line-strong);
 }
 
 .np-hero__proof-item {
@@ -464,17 +492,19 @@
 }
 
 .np-hero__proof-item .np-mono {
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  color: var(--np-muted);
+  font-family: var(--np-font-body);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--np-text);
   text-wrap: pretty;
 }
 
 /* === Trust strip === */
 .np-trust {
   padding: var(--np-space-8) 0;
-  border-top: 1px solid var(--np-line);
-  border-bottom: 1px solid var(--np-line);
+  border-top: 2px solid var(--np-line-strong);
+  border-bottom: 2px solid var(--np-line-strong);
   background: var(--np-bg);
 }
 
@@ -497,14 +527,14 @@
 }
 
 .np-trust__badge {
-  font-family: var(--np-font-display);
-  font-weight: 800;
+  font-family: var(--np-font-mono);
+  font-weight: 500;
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--np-text);
-  padding: 6px 14px;
-  border: 1px solid var(--np-line);
+  padding: 8px 16px;
+  border: 1px solid var(--np-line-strong);
   border-radius: 0;
   white-space: nowrap;
 }
@@ -606,7 +636,7 @@
 .np-screenshot {
   margin: 32px 0 48px;
   padding: 0;
-  border: 1px solid var(--np-line-strong);
+  border: 2px solid var(--np-line-strong);
   background: var(--np-surface);
 }
 
@@ -661,10 +691,17 @@
   padding-right: 16px;
   margin-left: -16px;
   margin-right: -16px;
+  counter-increment: np-artifact;
 }
 
 .np-artifact__row:hover {
   background: var(--np-surface);
+}
+
+.np-artifact__row .np-artifact__label::before {
+  content: counter(np-artifact, decimal-leading-zero) '  ';
+  color: var(--np-muted);
+  font-weight: 400;
 }
 
 .np-artifact__label {
@@ -677,10 +714,11 @@
 
 .np-artifact__body {
   margin: 0;
-  font-size: 1rem;
-  line-height: 1.65;
+  font-size: 1.0625rem;
+  line-height: 1.6;
   color: var(--np-text);
   max-width: 60ch;
+  text-wrap: pretty;
 }
 
 @media (max-width: 720px) {
@@ -712,6 +750,7 @@
   grid-row: 1 / span 2;
   position: relative;
   transition: background var(--np-duration-fast) var(--np-ease);
+  border-top: 2px solid var(--np-text);
 }
 
 .np-scenario-feature:hover {
@@ -724,8 +763,11 @@
 
 .np-scenario-feature .np-scenario__body {
   font-size: clamp(1rem, 1.2vw, 1.125rem);
-  line-height: 1.65;
+  line-height: 1.6;
   max-width: 38ch;
+  color: var(--np-text);
+  opacity: 0.85;
+  text-wrap: pretty;
 }
 
 .np-scenario__pin {
@@ -805,8 +847,8 @@
 }
 
 .np-step__number {
-  font-family: var(--np-font-display);
-  font-weight: 350;
+  font-family: var(--np-font-mono);
+  font-weight: 600;
   font-size: 1.5rem;
   line-height: 1;
   color: var(--np-muted);
@@ -866,8 +908,8 @@
 
 .np-track__number {
   font-family: var(--np-font-mono);
-  font-weight: 200;
-  font-size: clamp(3.25rem, 5.5vw, 4.5rem);
+  font-weight: 700;
+  font-size: clamp(3rem, 5vw, 4rem);
   line-height: 0.9;
   letter-spacing: -0.04em;
   color: var(--np-text);
@@ -876,13 +918,21 @@
 
 .np-track__title {
   margin: 0;
-  max-width: 14ch;
+  max-width: 16ch;
+  font-family: var(--np-font-body);
+  font-weight: 800;
+  font-size: 1.125rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .np-track__body {
   margin: 0;
   max-width: 36ch;
   color: var(--np-text);
+  opacity: 0.7;
+  font-size: 0.9375rem;
+  line-height: 1.55;
 }
 
 @media (max-width: 720px) {
@@ -933,10 +983,12 @@
 .np-compare__list li {
   font-family: var(--np-font-body);
   font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--np-muted);
+  line-height: 1.55;
+  color: var(--np-text);
+  opacity: 0.72;
   padding-left: 16px;
   position: relative;
+  text-wrap: pretty;
 }
 
 .np-compare__list li::before {
@@ -950,8 +1002,8 @@
    Full-width, centered, minimal — lets the button carry the weight. === */
 .np-cta-band {
   padding: clamp(56px, 7vw, 88px) 0;
-  border-top: 1px solid var(--np-line);
-  border-bottom: 1px solid var(--np-line);
+  border-top: 2px solid var(--np-line-strong);
+  border-bottom: 2px solid var(--np-line-strong);
   text-align: center;
 }
 
@@ -991,6 +1043,10 @@
   margin: 0;
   max-width: 42ch;
   color: var(--np-text);
+  opacity: 0.8;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  text-wrap: pretty;
 }
 
 .np-cta-pitch .np-cta__meta {
@@ -1005,7 +1061,7 @@
 /* Commit panel: bordered slab that holds the actions + trust line. */
 .np-cta-commit {
   padding: clamp(32px, 4vw, 48px);
-  border: 1px solid var(--np-line);
+  border: 1px solid var(--np-line-strong);
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -1017,6 +1073,18 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-muted);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.np-cta-commit__kicker::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--np-line-strong);
+  flex-shrink: 0;
 }
 
 .np-cta-commit__line {
@@ -1279,9 +1347,19 @@
   }
 }
 
+@media (max-width: 900px) {
+  .np-features-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .np-feature-card:first-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 640px) {
   .np-hero__display {
     max-width: none;
+    font-size: clamp(2rem, 8vw, 2.5rem);
   }
   .np-hero__subtitle {
     max-width: 42ch;

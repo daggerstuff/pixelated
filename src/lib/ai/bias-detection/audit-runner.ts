@@ -240,7 +240,7 @@ function groupByDemographic(
       continue
     }
 
-    value = demo[dimension] as string | undefined
+    value = demo[dimension]
     if (!value) continue
 
     if (!groups.has(value)) groups.set(value, [])
@@ -260,12 +260,12 @@ function computeVariance(
 ): VarianceResult {
   const values = segments
     .filter((s) => s.sampleSize > 0)
-    .map((s) => s.metrics[metric] as number)
+    .map((s) => s.metrics[metric])
     .filter((v) => typeof v === 'number' && !Number.isNaN(v))
 
   if (values.length < 2) {
     return {
-      metric: String(metric),
+      metric: metric,
       max: 0,
       min: 0,
       variance: 0,
@@ -279,7 +279,7 @@ function computeVariance(
   const variance = (max - min) * 100 // Convert to percentage points
 
   return {
-    metric: String(metric),
+    metric: metric,
     max,
     min,
     variance,
@@ -452,9 +452,7 @@ export class BiasAuditRunner {
 let runnerInstance: BiasAuditRunner | null = null
 
 export function getBiasAuditRunner(): BiasAuditRunner {
-  if (!runnerInstance) {
-    runnerInstance = new BiasAuditRunner()
-  }
+  runnerInstance ??= new BiasAuditRunner();
   return runnerInstance
 }
 

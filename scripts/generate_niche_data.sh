@@ -24,11 +24,11 @@ SDG_THERAPIST_STYLE_PROFILE="${SDG_THERAPIST_STYLE_PROFILE:-warm_professional}"
 SDG_STYLE_AUDIT_PROFILES="${SDG_STYLE_AUDIT_PROFILES:-$SDG_THERAPIST_STYLE_PROFILE}"
 SDG_STYLE_AUDIT_LIMIT="${SDG_STYLE_AUDIT_LIMIT:-120}"
 SDG_RUN_STYLE_AUDIT="${SDG_RUN_STYLE_AUDIT:-true}"
-OUTPUT_DIR="/home/vivi/pixelated/data/therapeutic"
+OUTPUT_DIR="/home/vivi/pixelated/ai/data/therapeutic"
 SDG_STYLE_AUDIT_SUMMARY_PATH="${SDG_STYLE_AUDIT_SUMMARY_PATH:-${OUTPUT_DIR}/style_audit_summary.json}"
-LOG_FILE="/home/vivi/pixelated/data/therapeutic/generation.log"
+LOG_FILE="/home/vivi/pixelated/ai/data/therapeutic/generation.log"
 AI_DIR="/home/vivi/pixelated/ai"
-STATE_FILE="/home/vivi/pixelated/data/therapeutic/.generation_state"
+STATE_FILE="/home/vivi/pixelated/ai/data/therapeutic/.generation_state"
 
 # Categories to generate (derived from sdg_pipeline.py NICHE_CATEGORIES keys)
 CATEGORIES=(
@@ -352,12 +352,12 @@ PYEOF
 import json
 from collections import Counter
 
-with open('/home/vivi/pixelated/data/therapeutic/niche_categories_1000.jsonl') as f:
+with open('/home/vivi/pixelated/ai/data/therapeutic/niche_categories_1000.jsonl') as f:
     samples = [json.loads(l) for l in f if l.strip()]
 
 categories = Counter(s.get('category') for s in samples)
 
-with open('/home/vivi/pixelated/data/therapeutic/category_report.json', 'w') as f:
+with open('/home/vivi/pixelated/ai/data/therapeutic/category_report.json', 'w') as f:
     json.dump(dict(categories), f, indent=2)
 
 total = sum(categories.values())

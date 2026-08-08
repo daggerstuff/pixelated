@@ -1,1 +1,3 @@
-{}
+{
+  "vitest.configSearchPatternExclude": "{**/node_modules/**,**/vendor/**,**/.*/**,**/*.d.ts,**/corpus/artifacts/mockup-sandbox/**}"
+}

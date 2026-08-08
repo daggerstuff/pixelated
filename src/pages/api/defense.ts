@@ -273,11 +273,11 @@ export const GET: APIRoute = async ({ request }) => {
           intensity: Number(row['intensity']),
           turn: Number(row['turn']),
           sessionId: String(row['session_id']),
-          therapistId: therapistId ? String(therapistId) : undefined,
+          therapistId: therapistId ? therapistId : undefined,
           createdAt:
             createdAtRaw instanceof Date
               ? createdAtRaw.toISOString()
-              : String(createdAtRaw as string | number),
+              : String(createdAtRaw),
         }
       })
 

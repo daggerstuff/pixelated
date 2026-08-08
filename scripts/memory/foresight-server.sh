@@ -79,8 +79,15 @@ unset VIRTUAL_ENV_DIR
 
 cd "${FORESIGHT_ROOT}"
 
-# Switch to SSE transport when FORESIGHT_PORT is set (default: stdio)
+# Switch to streamable-http transport when FORESIGHT_PORT is set (default: stdio).
+# Use stateless HTTP so the server keeps no per-client session state: HTTP MCP
+# clients (e.g. the Copilot CLI transport) cache the Mcp-Session-Id from the
+# initial handshake and never re-handshake, so any server restart that wipes the
+# in-memory session dict would strand the client with HTTP 404 "Session expired"
+# errors forever. Stateless mode sidesteps session tracking entirely, making
+# server restarts safe without requiring the client to re-initialize.
 if [[ -n "${FORESIGHT_PORT:-}" ]]; then
+  export FASTMCP_STATELESS_HTTP=1
   set -- "--port" "${FORESIGHT_PORT}" "$@"
 fi
 

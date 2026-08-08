@@ -10,7 +10,7 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getEncryptedTextProcessor } from './encrypted-text-processor'
 import { SealResourceScope } from './seal-memory'
-import type { SealOperations } from './seal-operations'
+import { SealOperations } from './seal-operations'
 import { SealService } from './seal-service'
 import type { SealCipherText } from './seal-service'
 import { SealSchemeType } from './seal-types'
@@ -250,9 +250,6 @@ export class HomomorphicOperations {
 
       // In client environment, initialize SEAL operations if client-side processing is enabled
       if (!isServer && this.enableClientSideProcessing) {
-        // use statically imported SealService
-        const { SealOperations } = await import('./seal-operations')
-
         const sealService = SealService.getInstance()
         await sealService.initialize(contextOptions)
 
@@ -265,9 +262,6 @@ export class HomomorphicOperations {
 
       // In server environment, initialize SEAL operations if server-side processing is enabled
       if (isServer && this.enableServerSideProcessing) {
-        // use statically imported SealService
-        const { SealOperations } = await import('./seal-operations')
-
         const sealService = SealService.getInstance()
         await sealService.initialize(contextOptions)
 
@@ -413,7 +407,8 @@ export class HomomorphicOperations {
           case FHEOperation.Negation:
           case FHEOperation.Polynomial:
           case FHEOperation.Rotation:
-          case FHEOperation.Square: {
+          case FHEOperation.Square:
+          case FHEOperation.DotProduct: {
             // These are native SEAL operations that can be performed directly
             const opResult = await this.performNativeSealOperation(
               operation,
@@ -593,6 +588,23 @@ export class HomomorphicOperations {
           operation,
         }
 
+      case FHEOperation.DotProduct: {
+        const dotResult = await this.sealOps.dotProduct(
+          inputCiphertext,
+          getNumericArray(params?.['vector'], [1]),
+        )
+        if (dotResult.success && dotResult.result) {
+          const res = resolveSerializedResult(dotResult.result)
+          return { result: res, success: true, operation }
+        }
+        return {
+          result: '',
+          success: false,
+          error: dotResult.error,
+          operation,
+        }
+      }
+
       case FHEOperation.Rescale:
       case FHEOperation.SENTIMENT:
       case FHEOperation.CATEGORIZE:
@@ -724,6 +736,7 @@ export class HomomorphicOperations {
           case FHEOperation.Addition:
           case FHEOperation.Subtraction:
           case FHEOperation.Multiplication:
+          case FHEOperation.DotProduct:
           case FHEOperation.Square:
           case FHEOperation.Negation:
           case FHEOperation.Rotation:
@@ -741,7 +754,9 @@ export class HomomorphicOperations {
         if (encResult) {
           logger.info(
             `Operation ${operation} performed fully homomorphically`,
-            { operationCount: encResult.metadata['operationsCount'] },
+            {
+              operationCount: encResult.metadata['operationsCount'],
+            },
           )
           return {
             success: true,
@@ -881,6 +896,7 @@ export class HomomorphicOperations {
       case FHEOperation.Addition:
       case FHEOperation.Subtraction:
       case FHEOperation.Multiplication:
+      case FHEOperation.DotProduct:
       case FHEOperation.Square:
       case FHEOperation.Negation:
       case FHEOperation.Rotation:

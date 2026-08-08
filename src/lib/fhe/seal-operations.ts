@@ -434,6 +434,81 @@ export class SealOperations {
   }
 
   /**
+   * Compute a dot product on a ciphertext and another ciphertext or plaintext array
+   *
+   * @param a Ciphertext to multiply
+   * @param b Second ciphertext or plaintext number array
+   * @returns Dot product result (sum of element-wise multiplication in all slots)
+   */
+  public async dotProduct(
+    a: SealCipherText,
+    b: SealCipherText | number[],
+  ): Promise<SealOperationResult> {
+    try {
+      if (!this.isOperationSupported(FHEOperation.DotProduct)) {
+        throw new OperationError(
+          `Dot product not supported in scheme ${this.service.getSchemeType()}`,
+        )
+      }
+
+      const scope = new SealResourceScope()
+
+      // 1. Element-wise multiply
+      const multResult = await this.multiply(a, b)
+      if (!multResult.success || !multResult.result) {
+        return {
+          ...multResult,
+          operation: FHEOperation.DotProduct,
+        }
+      }
+
+      let sumCipher = multResult.result as SealCipherText
+      scope.track(sumCipher)
+
+      // 2. Reduce by summing slots
+      const scheme = this.service.getSchemeType()
+      let slotCount = 0
+      if (scheme === SealSchemeType.CKKS) {
+        slotCount = this.service.getCKKSEncoder().slotCount
+      } else {
+        slotCount = this.service.getBatchEncoder().slotCount
+      }
+
+      const logSlots = Math.ceil(Math.log2(slotCount))
+      for (let i = 0; i < logSlots; i++) {
+        const rotResult = await this.rotate(sumCipher, 2 ** i)
+        if (!rotResult.success || !rotResult.result) continue
+
+        const rotCipher = rotResult.result as SealCipherText
+        scope.track(rotCipher)
+
+        const addResult = await this.add(sumCipher, rotCipher)
+        if (addResult.success && addResult.result) {
+          sumCipher = addResult.result as SealCipherText
+          scope.track(sumCipher)
+        }
+      }
+
+      const seal = this.service.getSeal()
+      const finalResult = seal.CipherText()
+      finalResult.copy(sumCipher)
+
+      return {
+        result: finalResult,
+        success: true,
+        operation: FHEOperation.DotProduct,
+      }
+    } catch (error: unknown) {
+      logger.error('Homomorphic dot product failed', { error })
+      return {
+        success: false,
+        error: error instanceof Error ? String(error) : String(error),
+        operation: FHEOperation.DotProduct,
+      }
+    }
+  }
+
+  /**
    * Compute a polynomial on a ciphertext
    *
    * @param a Ciphertext input

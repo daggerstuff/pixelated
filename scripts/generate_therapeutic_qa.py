@@ -227,7 +227,7 @@ def create_passages(text: str, min_words: int = 200, max_words: int = 800) -> li
 def main():
     parser = argparse.ArgumentParser(description="Generate therapeutic QA pairs")
     parser.add_argument("--transcript-dir", type=Path, default=Path("ai/data/transcripts/ingested"))
-    parser.add_argument("--output", type=Path, default=Path("data/therapeutic_qa_pairs.jsonl"))
+    parser.add_argument("--output", type=Path, default=Path("ai/data/therapeutic_qa_pairs.jsonl"))
     parser.add_argument("--sample", action="store_true")
     parser.add_argument("--max-files", type=int, default=None)
     args = parser.parse_args()

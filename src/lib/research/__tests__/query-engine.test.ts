@@ -599,7 +599,7 @@ describe('QueryOutputFormatter', () => {
           noiseLevel: 0.05,
           suppressionRate: 12,
         },
-      } as any,
+      },
     })
     const formatted = formatter.format(result, 'summary')
 

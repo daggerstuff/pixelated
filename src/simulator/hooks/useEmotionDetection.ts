@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-import { createFHESystem } from '@/lib/fhe'
+import { fheService } from '@/lib/fhe'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import type { EmotionAnalysis } from '../../lib/ai/emotions/types'
@@ -40,7 +40,7 @@ export const useEmotionDetection = () => {
           return
         }
 
-        const fheSystem = createFHESystem()
+        const fheSystem = fheService
 
         providerRef.current = new EmotionLlamaProvider(
           baseUrl,

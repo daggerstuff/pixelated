@@ -19,6 +19,13 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   exit 0
 fi
 
+# Guard: skip reinstallation when a pre-commit hook is already running.
+# pnpm exec lint-staged triggers pnpm prepare → this script → cp, which
+# overwrites the running hook file and corrupts bash's line-by-line read.
+if [ -n "${PIXELATED_PRECOMMIT_HOOK:-}" ]; then
+  exit 0
+fi
+
 GIT_DIR=$(git rev-parse --git-common-dir 2>/dev/null || git rev-parse --git-dir 2>/dev/null)
 if [ -z "$GIT_DIR" ]; then
   echo "Not inside a git repository (missing GIT_DIR); skipping git hook installation."

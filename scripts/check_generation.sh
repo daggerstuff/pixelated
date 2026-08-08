@@ -3,7 +3,7 @@
 # Check generation progress
 #
 
-OUTPUT_DIR="/home/vivi/pixelated/data/therapeutic"
+OUTPUT_DIR="/home/vivi/pixelated/ai/data/therapeutic"
 STATE_FILE="${OUTPUT_DIR}/.generation_state"
 CONSOLIDATED="${OUTPUT_DIR}/niche_categories_1000.jsonl"
 

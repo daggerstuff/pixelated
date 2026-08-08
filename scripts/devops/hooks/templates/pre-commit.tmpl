@@ -67,6 +67,11 @@ fi
 
 echo -e "${BLUE}🔍 [Hook] Running pre-commit checks...${NC}"
 
+# Guard: prevent install-git-hooks.sh from overwriting this file mid-execution.
+# pnpm exec lint-staged triggers pnpm prepare → install-git-hooks.sh → cp,
+# which corrupts the running script because bash reads files line-by-line.
+export PIXELATED_PRECOMMIT_HOOK=1
+
 # A. Secret scanning (Catch potential leaks before they leave)
 echo "🔒 Scanning for secrets..."
 # Check for staged files matching sensitive filename patterns (exclude .env.example/.sample)
@@ -92,8 +97,18 @@ password: restToken,password = fs.readFileSync,password = password,password: pas
 token: tokenResponse.access_token,password: newPassword,SecurePassword123,SecurePass123,\
 admin:password@127.0.0.1,cookie-based,token = authHeader,client_secret: credentials,\
 password: 'password,password: subscription,postgresql://neondb_owner:npg_,\
-password: 'Password123,token: 'valid-token,password: 'wrong-password" \
-  SCAN_MODE=block SCAN_SCOPE=staged bash .github/hooks/secrets-scanner/scan-secrets.sh
+password: 'Password123,token: 'valid-token,password: 'wrong-password"
+  _repo_root="$(git rev-parse --show-superproject-toplevel 2>/dev/null || true)"
+  if [ -z "$_repo_root" ]; then
+    _repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+  fi
+  _scanner_path="$_repo_root/.github/hooks/secrets-scanner/scan-secrets.sh"
+  if [ -n "$_repo_root" ] && [ -f "$_scanner_path" ]; then
+    SECRETS_ALLOWLIST="$SECRETS_ALLOWLIST" SCAN_MODE=block SCAN_SCOPE=staged bash "$_scanner_path"
+  else
+    echo -e "${YELLOW}⚠️  [Hook] Secrets scanner not found at $_scanner_path, skipping content scan${NC}"
+  fi
+  unset _repo_root _scanner_path
 
 # B. Check lockfile synchronization
 if [ -f scripts/devops/check-lockfiles-pre-commit.sh ]; then
