@@ -40,7 +40,7 @@ function makeSession(
 ): TherapeuticSession {
   return {
     sessionId: id,
-    participantDemographics: demo as any,
+    participantDemographics: demo,
     aiResponses: responses,
     expectedOutcomes: outcomes ?? [
       { outcomeId: `${id}-o1`, description: 'Engagement', achieved: true },

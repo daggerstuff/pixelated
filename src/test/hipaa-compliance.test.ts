@@ -21,7 +21,7 @@ vi.mock('../lib/fhe/encryption', () => ({
     metadata: { encryptedAt: Date.now(), mode: 'fhe' },
   })),
   decrypt: vi.fn(async (enc: { data: string }) => {
-    const raw = String(enc.data)
+    const raw = enc.data
     return raw.startsWith('encrypted:') ? raw.slice('encrypted:'.length) : raw
   }),
 }))
@@ -459,7 +459,7 @@ describe('FHE Field-Level Encryption', () => {
     expect(encrypted.payload).not.toBe(originalValue)
     expect(encrypted.encryptedAt).toBeDefined()
 
-    const decrypted = await decryptField<string>(encrypted)
+    const decrypted = await decryptField(encrypted)
     expect(decrypted).toBe(originalValue)
   })
 

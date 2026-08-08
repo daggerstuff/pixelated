@@ -185,7 +185,7 @@ function determineInitialPhase(resonanceScore: number): ReveriePhase {
 // ─── LatentSurfacer ───────────────────────────────────────────────────
 
 export class LatentSurfacer {
-  private config: ReverieConfig
+  private readonly config: ReverieConfig
 
   constructor(config: ReverieConfig = DEFAULT_REVERIE_CONFIG) {
     this.config = config
