@@ -41,66 +41,46 @@ export interface UserProfile {
   lastLogin?: string
 }
 export declare const UserProfileSchema: z.ZodType<UserProfile>
-export declare const HealthSchema: z.ZodObject<
-  {
-    status: z.ZodString
-    timestamp: z.ZodString
-    version: z.ZodString
-    uptime: z.ZodOptional<z.ZodNumber>
-  },
-  z.core.$strip
->
-export declare const VersionSchema: z.ZodObject<
-  {
-    version: z.ZodString
-    build: z.ZodString
-    commit: z.ZodOptional<z.ZodString>
-  },
-  z.core.$strip
->
-export declare const ApiKeyElementSchema: z.ZodObject<
-  {
-    id: z.ZodString
-    name: z.ZodString
-    key_prefix: z.ZodString
-    scopes: z.ZodArray<z.ZodString>
-    is_active: z.ZodBoolean
-    created_at: z.ZodString
-    expires_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
-    last_used_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
-  },
-  z.core.$strip
->
-export declare const ApiKeyListSchema: z.ZodObject<
-  {
-    keys: z.ZodArray<
-      z.ZodObject<
-        {
-          id: z.ZodString
-          name: z.ZodString
-          key_prefix: z.ZodString
-          scopes: z.ZodArray<z.ZodString>
-          is_active: z.ZodBoolean
-          created_at: z.ZodString
-          expires_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
-          last_used_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
-        },
-        z.core.$strip
-      >
-    >
-  },
-  z.core.$strip
->
-export declare const ApiKeyCreateSchema: z.ZodObject<
-  {
-    key: z.ZodString
-    id: z.ZodString
-  },
-  z.core.$strip
->
-export declare const ApiKeyRevokeSchema: z.ZodOptional<
-  z.ZodObject<{}, z.core.$strip>
->
+export declare const HealthSchema: z.ZodObject<{
+  status: z.ZodString
+  timestamp: z.ZodString
+  version: z.ZodString
+  uptime: z.ZodOptional<z.ZodNumber>
+}>
+export declare const VersionSchema: z.ZodObject<{
+  version: z.ZodString
+  build: z.ZodString
+  commit: z.ZodOptional<z.ZodString>
+}>
+export declare const ApiKeyElementSchema: z.ZodObject<{
+  id: z.ZodString
+  name: z.ZodString
+  key_prefix: z.ZodString
+  scopes: z.ZodArray<z.ZodString>
+  is_active: z.ZodBoolean
+  created_at: z.ZodString
+  expires_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
+  last_used_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
+}>
+export declare const ApiKeyListSchema: z.ZodObject<{
+  keys: z.ZodArray<
+    z.ZodObject<{
+      id: z.ZodString
+      name: z.ZodString
+      key_prefix: z.ZodString
+      scopes: z.ZodArray<z.ZodString>
+      is_active: z.ZodBoolean
+      created_at: z.ZodString
+      expires_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
+      last_used_at: z.ZodOptional<z.ZodNullable<z.ZodString>>
+    }>
+  >
+}>
+export declare const ApiKeyCreateSchema: z.ZodObject<{
+  key: z.ZodString
+  id: z.ZodString
+}>
+export declare const ApiKeyRevokeSchema: z.ZodOptional<z.ZodObject<{}>>
 export interface SearchResult {
   id: string
   title: string
@@ -178,9 +158,9 @@ export declare class PixelatedClient {
   /**
    * Internal helper for API requests with retry logic
    */
-  private request
-  private parseResponse
-  private sleep
+  private readonly request
+  private readonly parseResponse
+  private readonly sleep
   /**
    * Bias Analysis API
    */
@@ -265,7 +245,7 @@ export declare class PixelatedClient {
   get developer(): {
     memory: ForesightClient
   }
-  private createMemoryClient
+  private readonly createMemoryClient
   /**
    * System API
    */

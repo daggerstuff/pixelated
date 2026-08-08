@@ -134,7 +134,7 @@ describe('SealMemoryManager', () => {
       }
       const good2 = createMockDisposable()
       manager.track(good1, 'g1')
-      manager.track(bad as Disposable, 'bad')
+      manager.track(bad, 'bad')
       manager.track(good2, 'g2')
       manager.releaseAll()
       expect(good1.delete).toHaveBeenCalledOnce()

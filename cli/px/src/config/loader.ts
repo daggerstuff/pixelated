@@ -31,7 +31,7 @@ function mergeAgents(
 ): Record<string, AgentConfig> {
   const result: Record<string, AgentConfig> = { ...base }
   for (const [key, val] of Object.entries(override)) {
-    result[key] = { ...result[key]!, ...val }
+    result[key] = { ...result[key], ...val }
   }
   return result
 }
@@ -83,7 +83,7 @@ export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
   const userRaw = readJsonSafe(userPath)
   if (userRaw) {
     sources.push(userPath)
-    config = mergeConfigs(config, userRaw as Partial<PxConfig>)
+    config = mergeConfigs(config, userRaw)
   }
 
   // 3. Repo-local override (.px/config.json relative to repo root)
@@ -91,7 +91,7 @@ export function loadConfig(cwd: string = process.cwd()): LoadedConfig {
   const repoLocalRaw = readJsonSafe(repoLocalPath)
   if (repoLocalRaw) {
     sources.push(repoLocalPath)
-    config = mergeConfigs(config, repoLocalRaw as Partial<PxConfig>)
+    config = mergeConfigs(config, repoLocalRaw)
   }
 
   return { config, sources }

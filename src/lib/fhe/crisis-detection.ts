@@ -85,7 +85,7 @@ export class EncryptedCrisisDetectionService {
   private thresholds: DetectionThresholds = DEFAULT_THRESHOLDS
 
   // Risk pattern vectors (encrypted search patterns)
-  private riskPatterns: Map<string, number[]> = new Map()
+  private readonly riskPatterns: Map<string, number[]> = new Map()
 
   private constructor() {
     this.initializeRiskPatterns()
@@ -126,183 +126,124 @@ export class EncryptedCrisisDetectionService {
     }
   }
 
+  private readonly keywordGroups: Record<string, string[]> = {
+    self_harm: [
+      'knife',
+      'cut',
+      'wound',
+      'razor',
+      'blade',
+      'hurt',
+      'harm',
+      'damage',
+      'injure',
+      'bleed',
+      'pain',
+      'hurting',
+      'self',
+    ],
+    suicidal: [
+      'suicide',
+      'kill',
+      'die',
+      'end',
+      'done',
+      'finish',
+      'death',
+      'dead',
+      'dying',
+      'want to die',
+      'wish to die',
+      'no reason',
+      'nothing left',
+    ],
+    violence: [
+      'hurt',
+      'harm',
+      'attack',
+      'kill',
+      'murder',
+      'violent',
+      'weapon',
+      'gun',
+      'fight',
+      'assault',
+      'beat',
+    ],
+    abuse: [
+      'abuse',
+      'assault',
+      'rape',
+      'sexual',
+      'domestic',
+      'partner',
+      'child',
+      'vulnerable',
+    ],
+    distress: [
+      'overwhelmed',
+      "can't",
+      "couldn't",
+      'breaking',
+      'falling apart',
+      'hopeless',
+      'despair',
+      'no hope',
+      'panic',
+      'anxiety',
+      'terrified',
+      'crying',
+      'sobbing',
+      'tears',
+    ],
+    trauma: [
+      'flashback',
+      'nightmare',
+      'triggered',
+      'ptsd',
+      'trauma',
+      'dissociate',
+      'spaced',
+    ],
+  }
+
+  private allKeywords: string[] = []
+
   /**
    * Initialize risk pattern vectors for homomorphic matching
    */
   private initializeRiskPatterns(): void {
-    // Self-harm patterns
-    this.riskPatterns.set('self_harm', [
-      1,
-      0,
-      0,
-      0,
-      0, // knife, cut, wound
-      0,
-      1,
-      0,
-      0,
-      0, // razor, blade, hurt
-      0,
-      0,
-      1,
-      0,
-      0, // harm, damage, injure
-      0,
-      0,
-      0,
-      1,
-      0, // bleed, wound, cut
-      0,
-      0,
-      0,
-      0,
-      1, // pain, hurting, self
-    ])
+    const uniqueKeywords = new Set<string>()
+    for (const group of Object.values(this.keywordGroups)) {
+      for (const kw of group) {
+        uniqueKeywords.add(kw.toLowerCase())
+      }
+    }
+    this.allKeywords = Array.from(uniqueKeywords)
 
-    // Suicidal ideation patterns
-    this.riskPatterns.set('suicidal', [
-      1,
-      0,
-      0,
-      0,
-      0, // suicide, kill, die
-      0,
-      1,
-      0,
-      0,
-      0, // end, done, finish
-      0,
-      0,
-      1,
-      0,
-      0, // death, dead, dying
-      0,
-      0,
-      0,
-      1,
-      0, // want to die, wish to die
-      0,
-      0,
-      0,
-      0,
-      1, // no reason, nothing left
-    ])
+    // Build the pattern vectors for each category
+    for (const [category, keywords] of Object.entries(this.keywordGroups)) {
+      const vector = new Array(this.allKeywords.length).fill(0)
+      for (let i = 0; i < this.allKeywords.length; i++) {
+        if (
+          keywords.map((k) => k.toLowerCase()).includes(this.allKeywords[i])
+        ) {
+          vector[i] = 1
+        }
+      }
+      this.riskPatterns.set(category, vector)
+    }
+  }
 
-    // Violence patterns
-    this.riskPatterns.set('violence', [
-      1,
-      0,
-      0,
-      0,
-      0, // hurt, harm, attack
-      0,
-      1,
-      0,
-      0,
-      0, // kill, kill, murder
-      0,
-      0,
-      1,
-      0,
-      0, // violent, violence, aggressive
-      0,
-      0,
-      0,
-      1,
-      0, // weapon, gun, knife
-      0,
-      0,
-      0,
-      0,
-      1, // fight, assault, beat
-    ])
-
-    // Abuse patterns
-    this.riskPatterns.set('abuse', [
-      1,
-      0,
-      0,
-      0,
-      0, // abuse, hurt, harm
-      0,
-      1,
-      0,
-      0,
-      0, // assault, attack, violate
-      0,
-      0,
-      1,
-      0,
-      0, // rape, sexual, molested
-      0,
-      0,
-      0,
-      1,
-      0, // domestic, partner, spouse
-      0,
-      0,
-      0,
-      0,
-      1, // child, elderly, vulnerable
-    ])
-
-    // Severe distress patterns
-    this.riskPatterns.set('distress', [
-      1,
-      0,
-      0,
-      0,
-      0, // overwhelmed, can't, couldn't
-      0,
-      1,
-      0,
-      0,
-      0, // breaking,崩溃，falling apart
-      0,
-      0,
-      1,
-      0,
-      0, // hopeless, despair, no hope
-      0,
-      0,
-      0,
-      1,
-      0, // panic, anxiety, terrified
-      0,
-      0,
-      0,
-      0,
-      1, // crying, sobbing, tears
-    ])
-
-    // Trauma response patterns
-    this.riskPatterns.set('trauma', [
-      1,
-      0,
-      0,
-      0,
-      0, // flashback, flashbacks, reliving
-      0,
-      1,
-      0,
-      0,
-      0, // nightmare, nightmares, nightmar
-      0,
-      0,
-      1,
-      0,
-      0, // triggered, trigger, triggering
-      0,
-      0,
-      0,
-      1,
-      0, // PTSD, trauma, traumatic
-      0,
-      0,
-      0,
-      0,
-      1, // dissociate, dissociation, spaced
-    ])
+  private encodeMessageVector(text: string): number[] {
+    const vector = new Array(this.allKeywords.length).fill(0)
+    const lowerText = text.toLowerCase()
+    for (let i = 0; i < this.allKeywords.length; i++) {
+      if (lowerText.includes(this.allKeywords[i])) {
+        vector[i] = 1
+      }
+    }
+    return vector
   }
 
   /**
@@ -339,8 +280,9 @@ export class EncryptedCrisisDetectionService {
     for (const message of messages) {
       if (message.role !== 'user') continue
 
-      // Encrypt message content
-      const encryptedMsg = await this.fheService.encrypt(message.content)
+      // Encode message to binary presence vector then encrypt
+      const msgVector = this.encodeMessageVector(message.content)
+      const encryptedMsg = await this.fheService.encrypt(msgVector)
 
       // Perform homomorphic pattern matching for each risk category
       for (const [patternName, patternVector] of this.riskPatterns) {
@@ -407,99 +349,83 @@ export class EncryptedCrisisDetectionService {
 
   /**
    * Perform homomorphic pattern matching
-   * In production: actual FHE dot product on encrypted data
-   * For now: plaintext matching with encrypted result
+   * Uses actual FHE dot product via processEncrypted, decrypting the score on the server side
    */
   private async homomorphicMatch(
     encryptedMsg: EncryptedData,
     patternVector: number[],
     plaintext: string,
   ): Promise<number> {
-    // For production: perform actual homomorphic dot product
-    // For now: use keyword matching and encrypt the score
-    const score = this.keywordMatchScore(plaintext, patternVector)
+    if (!this.fheService?.processEncrypted) {
+      // Fallback
+      return this.keywordMatchScore(plaintext, patternVector)
+    }
 
-    // Encrypt the score for homomorphic verification
-    const encryptedScore = await this.fheService!.encrypt([score])
-    return score
+    try {
+      const encryptedStr = JSON.stringify(encryptedMsg)
+      const opResult = await this.fheService.processEncrypted(
+        encryptedStr,
+        FHEOperation.DotProduct,
+        { vector: patternVector },
+      )
+
+      if (!opResult.success || !opResult.result) {
+        throw new Error(String(opResult.error || 'Unknown FHE error'))
+      }
+
+      // Decrypt the result to get the score
+      let encryptedResult: EncryptedData
+      if (typeof opResult.result === 'string') {
+        encryptedResult = JSON.parse(opResult.result) as EncryptedData
+      } else {
+        encryptedResult = opResult.result as unknown as EncryptedData
+      }
+
+      const decryptedStr = await this.fheService.decrypt(encryptedResult)
+      let score = 0
+      if (typeof decryptedStr === 'string') {
+        try {
+          const parsed = JSON.parse(decryptedStr)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            score = Number(parsed[0])
+          } else {
+            score = Number(parsed)
+          }
+        } catch {
+          score = Number(decryptedStr)
+        }
+      } else if (Array.isArray(decryptedStr) && decryptedStr.length > 0) {
+        score = Number(decryptedStr[0])
+      } else {
+        score = Number(decryptedStr)
+      }
+
+      // Normalize score based on vector weight
+      const maxScore = patternVector.filter((v) => v > 0).length
+      return maxScore > 0 ? Math.min(score / maxScore, 1.0) : 0
+    } catch (err) {
+      logger.error('True homomorphic match failed, falling back', { err })
+      return this.keywordMatchScore(plaintext, patternVector)
+    }
   }
 
   /**
    * Keyword-based pattern matching score (0-1)
+   * Fallback for when true FHE is unavailable.
    */
   private keywordMatchScore(text: string, patternVector: number[]): number {
     const lowerText = text.toLowerCase()
     let matchCount = 0
 
-    // Pattern vectors encode keyword groups
-    const keywordGroups = [
-      [
-        'knife',
-        'cut',
-        'wound',
-        'razor',
-        'blade',
-        'hurt',
-        'harm',
-        'damage',
-        'injure',
-        'bleed',
-      ],
-      [
-        'suicide',
-        'kill',
-        'die',
-        'death',
-        'end',
-        'done',
-        'finish',
-        'dead',
-        'dying',
-      ],
-      [
-        'hurt',
-        'harm',
-        'attack',
-        'kill',
-        'murder',
-        'violent',
-        'weapon',
-        'gun',
-        'fight',
-      ],
-      [
-        'abuse',
-        'assault',
-        'rape',
-        'sexual',
-        'domestic',
-        'partner',
-        'child',
-        'vulnerable',
-      ],
-      [
-        'overwhelmed',
-        "can't",
-        "couldn't",
-        'hopeless',
-        'despair',
-        'panic',
-        'anxiety',
-      ],
-      ['flashback', 'nightmare', 'triggered', 'PTSD', 'trauma', 'dissociate'],
-    ]
-
-    const groupIdx = patternVector.findIndex((v) => v === 1)
-    if (groupIdx === -1) return 0
-
-    const keywords = keywordGroups[groupIdx]
-    for (const keyword of keywords) {
-      if (lowerText.includes(keyword)) {
+    // Compare against the global allKeywords using patternVector
+    for (let i = 0; i < this.allKeywords.length; i++) {
+      if (patternVector[i] === 1 && lowerText.includes(this.allKeywords[i])) {
         matchCount++
       }
     }
 
-    return matchCount / keywords.length
+    const maxScore = patternVector.filter((v) => v > 0).length
+    return maxScore > 0 ? Math.min(matchCount / maxScore, 1.0) : 0
   }
 
   /**

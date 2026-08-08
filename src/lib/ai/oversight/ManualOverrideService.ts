@@ -12,7 +12,7 @@ const logger = createBuildSafeLogger('ManualOverrideService')
 
 class ManualOverrideService {
   private overrides: ManualOverrideAction[] = []
-  private maxOverrides = 10000
+  private readonly maxOverrides = 10000
 
   private generateOverrideId(): string {
     return `override-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`

@@ -84,9 +84,7 @@ export class SP1Prover {
   }
 
   static getInstance(): SP1Prover {
-    if (!SP1Prover.instance) {
-      SP1Prover.instance = new SP1Prover()
-    }
+    SP1Prover.instance ??= new SP1Prover()
     return SP1Prover.instance
   }
 

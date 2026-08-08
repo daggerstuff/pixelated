@@ -101,7 +101,7 @@ export const POST = protectRoute({
       'nonce',
     ]
     for (const field of hashFields) {
-      if (!HASH_RE.test(String(body[field] ?? ''))) {
+      if (!HASH_RE.test(body[field] ?? '')) {
         logger.warn('ZK proof verification rejected: field format invalid', {
           field,
           userId: user?.id,
@@ -152,7 +152,7 @@ export const POST = protectRoute({
       publicInputHash: body.publicInputHash!,
       publicOutputHash: body.publicOutputHash!,
       merkleRoot: body.merkleRoot!,
-      operationType: body.operationType!,
+      operationType: body.operationType,
       timestamp: body.timestamp!,
       durationMs: body.durationMs ?? 0,
       proofMode: body.proofMode ?? 'hash-commitment',

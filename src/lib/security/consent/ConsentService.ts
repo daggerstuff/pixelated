@@ -7,6 +7,8 @@
  */
 
 /* Supabase import removed - migrate to MongoDB */
+import { v4 as uuidv4 } from 'uuid'
+import crypto from 'node:crypto'
 import { mongoClient } from '../../db/mongoClient'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
@@ -67,33 +69,30 @@ export class ConsentService {
   async getCurrentConsentVersion(
     consentTypeId: string,
   ): Promise<ConsentVersion> {
-    void consentTypeId
     try {
-      // TODO: Replace with MongoDB implementation
-      const data: unknown = {} // Stub: Replace with MongoDB result
+      const data = await mongoClient.db
+        .collection(CONSENT_TABLES.CONSENT_VERSIONS)
+        .find({ consent_type_id: consentTypeId, is_current: true })
+        .sort({ effective_date: -1 })
+        .limit(1)
+        .toArray()
+      const doc = data[0]
+      if (!doc) {
+        throw new Error('No current consent version found for type')
+      }
       return {
-        id: (data as Record<string, unknown>)['id'] as string,
-        consentTypeId: (data as Record<string, unknown>)[
-          'consent_type_id'
-        ] as string,
-        version: (data as Record<string, unknown>)['version'] as string,
-        effectiveDate: (data as Record<string, unknown>)[
-          'effective_date'
-        ] as string,
-        expirationDate: (data as Record<string, unknown>)[
-          'expiration_date'
-        ] as string,
-        documentText: (data as Record<string, unknown>)[
-          'document_text'
-        ] as string,
-        summary: (data as Record<string, unknown>)['summary'] as string,
-        isCurrent: (data as Record<string, unknown>)['is_current'] as boolean,
-        approvalDate: (data as Record<string, unknown>)[
-          'approval_date'
-        ] as string,
-        approvedBy: (data as Record<string, unknown>)['approved_by'] as string,
-        createdAt: (data as Record<string, unknown>)['created_at'] as string,
-        updatedAt: (data as Record<string, unknown>)['updated_at'] as string,
+        id: doc['id'] as string,
+        consentTypeId: doc['consent_type_id'] as string,
+        version: doc['version'] as string,
+        effectiveDate: doc['effective_date'] as string,
+        expirationDate: doc['expiration_date'] as string | undefined,
+        documentText: doc['document_text'] as string,
+        summary: doc['summary'] as string,
+        isCurrent: doc['is_current'] as boolean,
+        approvalDate: (doc['approval_date'] as string) || '',
+        approvedBy: (doc['approved_by'] as string) || '',
+        createdAt: doc['created_at'] as string,
+        updatedAt: doc['updated_at'] as string,
       }
     } catch (error: unknown) {
       logger.error('Unexpected error in getCurrentConsentVersion', error)
@@ -107,28 +106,29 @@ export class ConsentService {
    * Get options for a specific consent type
    */
   async getConsentOptions(consentTypeId: string): Promise<ConsentOption[]> {
-    void consentTypeId
     try {
-      // TODO: Replace with MongoDB implementation
-      const data: unknown[] = [] // Stub: Replace with MongoDB result
-      return data.map((option: unknown) => {
-        const optionData = option as Record<string, unknown>
-        const rawDefaultValue = optionData['default_value']
+      const data = await mongoClient.db
+        .collection(CONSENT_TABLES.CONSENT_OPTIONS)
+        .find({ consent_type_id: consentTypeId })
+        .sort({ display_order: 1 })
+        .toArray()
+      return data.map((option: Record<string, unknown>) => {
+        const rawDefaultValue = option['default_value']
         const defaultValue =
           typeof rawDefaultValue === 'boolean'
             ? rawDefaultValue
             : rawDefaultValue === 'true' || rawDefaultValue === '1'
 
         return {
-          id: optionData['id'] as string,
-          consentTypeId: optionData['consent_type_id'] as string,
-          optionName: optionData['option_name'] as string,
-          description: optionData['description'] as string,
-          isRequired: optionData['is_required'] as boolean,
+          id: option['id'] as string,
+          consentTypeId: option['consent_type_id'] as string,
+          optionName: option['option_name'] as string,
+          description: option['description'] as string,
+          isRequired: option['is_required'] as boolean,
           defaultValue,
-          displayOrder: optionData['display_order'] as number,
-          createdAt: optionData['created_at'] as string,
-          updatedAt: optionData['updated_at'] as string,
+          displayOrder: option['display_order'] as number,
+          createdAt: option['created_at'] as string,
+          updatedAt: option['updated_at'] as string,
         }
       })
     } catch (error: unknown) {
@@ -180,8 +180,7 @@ export class ConsentService {
         withdrawalDate: doc['withdrawal_date'] as string | undefined,
         withdrawalReason: doc['withdrawal_reason'] as string | undefined,
         granularOptions: doc['granular_options'] as
-          | Record<string, boolean>
-          | undefined,
+          Record<string, boolean> | undefined,
         proofOfConsent: doc['proof_of_consent'] as string | undefined,
         createdAt: doc['created_at'] as string,
         updatedAt: doc['updated_at'] as string,
@@ -198,11 +197,53 @@ export class ConsentService {
   async getUserConsentStatus(
     params: GetConsentStatusParams,
   ): Promise<UserConsentStatus[]> {
-    void params
     try {
-      // Get consent types - either all or specific one
-      // TODO: Replace with MongoDB implementation
-      return []
+      const typeFilter: Record<string, unknown> = { is_active: true }
+      if (params.consentTypeId) {
+        typeFilter['id'] = params.consentTypeId
+      } else if (params.consentTypeName) {
+        typeFilter['name'] = params.consentTypeName
+      }
+      const typeDocs = await mongoClient.db
+        .collection(CONSENT_TABLES.CONSENT_TYPES)
+        .find(typeFilter)
+        .toArray()
+
+      const statuses: UserConsentStatus[] = []
+      for (const typeDoc of typeDocs) {
+        const consentTypeId = typeDoc['id'] as string
+        const consentType: ConsentType = {
+          id: consentTypeId,
+          name: typeDoc['name'] as string,
+          description: typeDoc['description'] as string,
+          scope: typeDoc['scope'] as ConsentType['scope'],
+          isActive: typeDoc['is_active'] as boolean,
+          createdAt: typeDoc['created_at'] as string,
+          updatedAt: typeDoc['updated_at'] as string,
+        }
+
+        const currentVersion =
+          await this.getCurrentConsentVersion(consentTypeId)
+        const userConsent = await this.getUserConsent(
+          params.userId,
+          consentTypeId,
+        )
+        const hasActive = await this.hasActiveConsent(
+          params.userId,
+          consentTypeId,
+        )
+        const consentOptions = await this.getConsentOptions(consentTypeId)
+
+        statuses.push({
+          consentType,
+          currentVersion,
+          userConsent: userConsent ?? undefined,
+          hasActiveConsent: hasActive,
+          consentOptions,
+          selectedOptions: userConsent?.granularOptions,
+        })
+      }
+      return statuses
     } catch (error: unknown) {
       logger.error('Unexpected error in getUserConsentStatus', error)
       throw new Error('Failed to fetch user consent status', { cause: error })
@@ -213,11 +254,77 @@ export class ConsentService {
    * Grant consent for a user
    */
   async grantConsent(params: GrantConsentParams): Promise<UserConsent> {
-    void params
     try {
-      // Check if there's already an active consent for this version
-      // TODO: Replace with MongoDB implementation
-      return {} as unknown as UserConsent
+      const existing = await mongoClient.db
+        .collection(CONSENT_TABLES.USER_CONSENTS)
+        .findOne({
+          user_id: params.userId,
+          consent_version_id: params.consentVersionId,
+          is_active: true,
+        })
+      if (existing) {
+        throw new Error('User already has an active consent for this version')
+      }
+
+      const now = new Date().toISOString()
+      const consentId = uuidv4()
+      const hashedIp = params.ipAddress
+        ? crypto.createHash('sha256').update(params.ipAddress).digest('hex')
+        : null
+
+      const consentDoc = {
+        id: consentId,
+        user_id: params.userId,
+        consent_version_id: params.consentVersionId,
+        granted_at: now,
+        ip_address: hashedIp,
+        user_agent: params.userAgent ?? null,
+        is_active: true,
+        withdrawal_date: null,
+        withdrawal_reason: null,
+        granular_options: params.granularOptions ?? null,
+        proof_of_consent: params.proofOfConsent ?? null,
+        created_at: now,
+        updated_at: now,
+      }
+      await mongoClient.db
+        .collection(CONSENT_TABLES.USER_CONSENTS)
+        .insertOne(consentDoc)
+
+      const auditDoc = {
+        id: uuidv4(),
+        user_id: params.userId,
+        consent_id: consentId,
+        action: 'grant',
+        action_timestamp: now,
+        performed_by: params.userId,
+        ip_address: hashedIp,
+        user_agent: params.userAgent ?? null,
+        details: {
+          consentVersionId: params.consentVersionId,
+          granularOptions: params.granularOptions ?? {},
+        },
+        created_at: now,
+      }
+      await mongoClient.db
+        .collection(CONSENT_TABLES.CONSENT_AUDIT_TRAIL)
+        .insertOne(auditDoc)
+
+      return {
+        id: consentId,
+        userId: params.userId,
+        consentVersionId: params.consentVersionId,
+        grantedAt: now,
+        ipAddress: params.ipAddress,
+        userAgent: params.userAgent,
+        isActive: true,
+        withdrawalDate: undefined,
+        withdrawalReason: undefined,
+        granularOptions: params.granularOptions,
+        proofOfConsent: params.proofOfConsent,
+        createdAt: now,
+        updatedAt: now,
+      }
     } catch (error: unknown) {
       logger.error('Unexpected error in grantConsent', error)
       throw new Error('Failed to grant consent', { cause: error })
@@ -228,10 +335,56 @@ export class ConsentService {
    * Withdraw a user's consent
    */
   async withdrawConsent(params: WithdrawConsentParams): Promise<boolean> {
-    void params
     try {
-      // Get the consent record
-      // TODO: Replace with MongoDB implementation
+      const existing = await mongoClient.db
+        .collection(CONSENT_TABLES.USER_CONSENTS)
+        .findOne({
+          id: params.consentId,
+          user_id: params.userId,
+          is_active: true,
+        })
+      if (!existing) {
+        return false
+      }
+
+      const now = new Date().toISOString()
+      const updateResult = await mongoClient.db
+        .collection(CONSENT_TABLES.USER_CONSENTS)
+        .updateOne(
+          { id: params.consentId },
+          {
+            $set: {
+              is_active: false,
+              withdrawal_date: now,
+              withdrawal_reason: params.reason ?? null,
+              updated_at: now,
+            },
+          },
+        )
+      if (updateResult.matchedCount === 0) {
+        return false
+      }
+
+      const hashedIp = params.ipAddress
+        ? crypto.createHash('sha256').update(params.ipAddress).digest('hex')
+        : null
+
+      const auditDoc = {
+        id: uuidv4(),
+        user_id: params.userId,
+        consent_id: params.consentId,
+        action: 'withdraw',
+        action_timestamp: now,
+        performed_by: params.userId,
+        ip_address: hashedIp,
+        user_agent: params.userAgent ?? null,
+        details: { reason: params.reason ?? null },
+        created_at: now,
+      }
+      await mongoClient.db
+        .collection(CONSENT_TABLES.CONSENT_AUDIT_TRAIL)
+        .insertOne(auditDoc)
+
       return true
     } catch (error: unknown) {
       logger.error('Unexpected error in withdrawConsent', error)
@@ -246,12 +399,26 @@ export class ConsentService {
     userId: string,
     consentTypeId: string,
   ): Promise<boolean> {
-    void userId
-    void consentTypeId
     try {
-      // Get the consent type
-      // TODO: Replace with MongoDB implementation
-      return false
+      const pipeline = [
+        { $match: { user_id: userId, is_active: true } },
+        {
+          $lookup: {
+            from: CONSENT_TABLES.CONSENT_VERSIONS,
+            localField: 'consent_version_id',
+            foreignField: 'id',
+            as: 'version',
+          },
+        },
+        { $unwind: '$version' },
+        { $match: { 'version.consent_type_id': consentTypeId } },
+        { $limit: 1 },
+      ]
+      const cursor = mongoClient.db
+        .collection(CONSENT_TABLES.USER_CONSENTS)
+        .aggregate(pipeline)
+      const data = await cursor.toArray()
+      return data.length > 0
     } catch (error: unknown) {
       logger.error('Unexpected error in hasActiveConsent', error)
       throw new Error('Failed to check active consent', { cause: error })

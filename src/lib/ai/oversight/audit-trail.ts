@@ -16,7 +16,7 @@ const logger = createBuildSafeLogger('OversightAuditTrail')
 
 class AuditTrailService {
   private entries: AuditTrailEntry[] = []
-  private maxEntries = 10000
+  private readonly maxEntries = 10000
 
   private generateId(): string {
     return `audit-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`

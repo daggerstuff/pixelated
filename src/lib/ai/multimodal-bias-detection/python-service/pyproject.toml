@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=83.0.0",
-  "wheel>=0.38.1",
+  "wheel>=0.47.0",
 ] # Fixes CVE-2024-6345, CVE-2025-47273, CVE-2022-40898
 build-backend = "setuptools.build_meta"
 
@@ -23,56 +23,56 @@ classifiers = [
 ]
 
 dependencies = [
-  "fastapi>=0.117.1",
-  "uvicorn[standard]>=0.24.0",
-  "gunicorn>=22.0.0",
-  "pydantic>=2.11.9",
+  "fastapi>=0.141.1",
+  "uvicorn[standard]>=0.52.1",
+  "gunicorn>=26.0.0",
+  "pydantic>=2.13.4",
   "pydantic-settings>=2.14.2",
 "python-dotenv>=1.2.2",
-  "structlog>=25.4.0",
-  "prometheus-client>=0.19.0",
+  "structlog>=26.1.0",
+  "prometheus-client>=0.26.0",
   # Sentry SDK for error tracking and metrics
   # Reference: https://docs.sentry.io/platforms/python/metrics/
-  "sentry-sdk[fastapi]>=2.44.0",
+  "sentry-sdk[fastapi]>=2.66.1",
   # Multi-modal AI Dependencies
   "torch>=2.13.0",
   "torchvision>=0.21.0",
   "torchaudio>=2.8.0",
-  "transformers>=5.7.0",
-  "opencv-python>=4.8.0",
+  "transformers>=5.14.1",
+  "opencv-python>=5.0.0.93",
   "pillow>=12.3.0", # Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "librosa>=0.10.0",
-  "soundfile>=0.12.0",
+  "soundfile>=0.14.0",
   "moviepy>=1.0.3",
   # Vision Models
-  "timm>=0.9.0",
-  "open-clip-torch>=2.0.0",
+  "timm>=1.0.28",
+  "open-clip-torch>=3.3.0",
   "pytorch-lightning>=2.6.5", # Fixes CVE-2026-31221 (insecure deserialization RCE in load_from_checkpoint)
   # Audio Processing
-  "speechbrain>=0.5.0",
-  "pyannote.audio>=2.1.0",
+  "speechbrain>=1.1.0",
+  "pyannote.audio>=4.0.7",
   # Database and Caching
-  "psycopg2-binary>=2.9.0",
-  "redis>=5.0.1",
-  "sqlalchemy>=2.0.0",
-  "alembic>=1.12.0",
+  "psycopg2-binary>=2.9.12",
+  "redis>=8.1.0",
+  "sqlalchemy>=2.0.51",
+  "alembic>=1.19.0",
   # Utilities
   "httpx>=0.28.1",
   "aiohttp>=3.14.3",
   "ulid-py>=1.1.0",
-  "tenacity>=8.2.3",
-  "celery>=5.3.0",
+  "tenacity>=9.1.4",
+  "celery>=5.6.3",
   # Media Processing
-  "numpy>=1.24.0",
-  "pandas>=2.0.0",
-  "scikit-learn>=1.5.0",
-  "matplotlib>=3.7.0",
+  "numpy>=2.4.6",
+  "pandas>=3.0.5",
+  "scikit-learn>=1.9.0",
+  "matplotlib>=3.11.1",
   "seaborn>=0.12.0",
   # Security: Pin transitive dependencies to secure versions
-  "keras>=3.12.0", # Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
+  "keras>=3.15.1", # Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
   "starlette>=1.3.1", # Fixes GHSA-7f5h-v6xp-fcq8
-  "werkzeug>=3.1.4", # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
-  "fonttools>=4.61.0", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
+  "werkzeug>=3.1.8", # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
+  "fonttools>=4.63.0", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability)
   "urllib3>=2.7.0", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
 ]
 
