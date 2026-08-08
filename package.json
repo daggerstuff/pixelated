@@ -85,6 +85,7 @@
     "test:security": "node scripts/consolidated-test.js security",
     "test:bias-detection": "vitest run src/lib/ai/bias-detection/ src/components/admin/bias-detection/",
     "e2e": "playwright test --config=config/playwright.config.ts",
+    "test:e2e": "playwright test --config=config/playwright.config.ts",
     "e2e:smoke": "playwright test tests/e2e/smoke/ --config=config/playwright.config.ts",
     "e2e:browser": "playwright test tests/browser/ --config=config/playwright.config.ts",
     "e2e:browser-compat": "playwright test tests/browser-compatibility.spec.ts --config=config/playwright-browser-compat.config.ts",
