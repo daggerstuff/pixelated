@@ -45,7 +45,7 @@ export function dslToSQL(dsl: QueryDSL): string {
   let paramIdx = 1
 
   for (const agg of dsl.aggregations) {
-    const alias = agg.alias || `${agg.function}_${agg.field}`
+    const alias = agg.alias ?? `${agg.function}_${agg.field}`
     selectParts.push(`${agg.function.toUpperCase()}(${agg.field}) AS ${alias}`)
   }
 
@@ -121,10 +121,10 @@ export function createQueryFromRequest(
   req: ResearchQueryRequest,
   userId: string,
 ): ResearchQuery {
-  const type = req.type || 'aggregate-analysis'
-  const anonymizationLevel = req.anonymizationLevel || 'high'
+  const type = req.type ?? 'aggregate-analysis'
+  const anonymizationLevel = req.anonymizationLevel ?? 'high'
   const epsilon = req.epsilon
-  const outputFormat = req.outputFormat || 'json'
+  const outputFormat = req.outputFormat ?? 'json'
 
   const parameters: Record<string, unknown> = {}
   if (req.dsl) {

@@ -15,7 +15,7 @@ export function registerHealthCommand(program: Command): void {
       const timeoutMs = parseInt(opts.timeout, 10) || 5000
 
       const results: HealthResult[] = []
-      const entries = Object.entries(config.agents) as [string, AgentConfig][]
+      const entries = Object.entries(config.agents)
 
       await Promise.all(
         entries.map(async ([name, agent]) => {

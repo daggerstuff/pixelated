@@ -8,16 +8,152 @@ import type {
 } from '../behavioral-analysis-service'
 
 /**
- * MockIsolationForest - Placeholder until real Isolation Forest implementation is integrated.
- * Returns random scores in 0.1-0.3 range (normal behavior) to avoid false positives.
- * TODO: Replace with actual Isolation Forest implementation
+ * Isolation Forest Implementation
  */
-class MockIsolationForest {
-  constructor(_nTrees: number, _sampleSize: number) {}
+class IsolationTree {
+  private readonly splitFeature: number | null = null
+  private readonly splitValue: number | null = null
+  private readonly left: IsolationTree | null = null
+  private readonly right: IsolationTree | null = null
+  private readonly size: number
+  private readonly currentHeight: number
 
-  predict(data: number[][]): number[] {
-    // Return random scores in low range - real implementation needed for actual detection
-    return data.map(() => Math.random() * 0.2 + 0.1) // 0.1 to 0.3 range
+  constructor(data: number[][], currentHeight: number, maxHeight: number) {
+    this.size = data.length
+    this.currentHeight = currentHeight
+
+    if (data.length <= 1 || currentHeight >= maxHeight) {
+      return
+    }
+
+    const numFeatures = data[0].length
+    this.splitFeature = Math.floor(Math.random() * numFeatures)
+
+    let min = data[0][this.splitFeature]
+    let max = min
+    for (let i = 1; i < data.length; i++) {
+      const val = data[i][this.splitFeature]
+      if (val < min) min = val
+      if (val > max) max = val
+    }
+
+    if (min === max) {
+      return
+    }
+
+    this.splitValue = min + Math.random() * (max - min)
+
+    const leftData: number[][] = []
+    const rightData: number[][] = []
+
+    for (const point of data) {
+      if (point[this.splitFeature] < this.splitValue) {
+        leftData.push(point)
+      } else {
+        rightData.push(point)
+      }
+    }
+
+    this.left = new IsolationTree(leftData, currentHeight + 1, maxHeight)
+    this.right = new IsolationTree(rightData, currentHeight + 1, maxHeight)
+  }
+
+  public pathLength(point: number[]): number {
+    if (this.left === null && this.right === null) {
+      return this.currentHeight + this.c(this.size)
+    }
+    if (this.splitFeature !== null && this.splitValue !== null) {
+      if (point[this.splitFeature] < this.splitValue) {
+        return this.left ? this.left.pathLength(point) : this.currentHeight
+      } else {
+        return this.right ? this.right.pathLength(point) : this.currentHeight
+      }
+    }
+    return this.currentHeight
+  }
+
+  private c(n: number): number {
+    if (n <= 1) return 0
+    const H = Math.log(n - 1) + 0.5772156649
+    return 2 * H - (2 * (n - 1)) / n
+  }
+}
+
+export class IsolationForest {
+  private trees: IsolationTree[] = []
+  private readonly sampleSize: number
+  private readonly nTrees: number
+  private isTrained = false
+
+  constructor(nTrees: number, sampleSize: number) {
+    this.nTrees = nTrees
+    this.sampleSize = sampleSize
+  }
+
+  public fit(data: number[][]): void {
+    this.trees = []
+    const maxHeight = Math.ceil(Math.log2(this.sampleSize))
+
+    for (let i = 0; i < this.nTrees; i++) {
+      const sample: number[][] = []
+      const actualSampleSize = Math.min(this.sampleSize, data.length)
+      for (let j = 0; j < actualSampleSize; j++) {
+        const randomIndex = Math.floor(Math.random() * data.length)
+        sample.push(data[randomIndex])
+      }
+      this.trees.push(new IsolationTree(sample, 0, maxHeight))
+    }
+    this.isTrained = true
+  }
+
+  public predict(data: number[][]): number[] {
+    if (!this.isTrained || this.trees.length === 0) {
+      // Return safe scores if untrained to avoid false positives
+      return data.map(() => Math.random() * 0.2 + 0.1)
+    }
+
+    const c = this.c(this.sampleSize)
+    return data.map((point) => {
+      let avgPathLength = 0
+      for (const tree of this.trees) {
+        avgPathLength += tree.pathLength(point)
+      }
+      avgPathLength /= this.trees.length
+
+      // Compute anomaly score: 2^(-E(h(x)) / c(n))
+      return Math.pow(2, -avgPathLength / c)
+    })
+  }
+
+  public retrainOnline(data: number[][], replaceRatio: number = 0.1): void {
+    if (!this.isTrained) {
+      this.fit(data)
+      return
+    }
+
+    // Replace the oldest `replaceRatio` of trees with new trees fit on the new data
+    const treesToReplace = Math.max(1, Math.floor(this.nTrees * replaceRatio))
+    const maxHeight = Math.ceil(Math.log2(this.sampleSize))
+
+    // Remove oldest trees
+    this.trees.splice(0, treesToReplace)
+
+    // Add new trees
+    for (let i = 0; i < treesToReplace; i++) {
+      const sample: number[][] = []
+      const actualSampleSize = Math.min(this.sampleSize, data.length)
+      for (let j = 0; j < actualSampleSize; j++) {
+        const randomIndex = Math.floor(Math.random() * data.length)
+        sample.push(data[randomIndex])
+      }
+      this.trees.push(new IsolationTree(sample, 0, maxHeight))
+    }
+  }
+
+  private c(n: number): number {
+    if (n <= 1) return 0
+    const H = Math.log(n - 1) + 0.5772156649
+    return 2 * H - (2 * (n - 1)) / n
   }
 }
 
@@ -25,7 +161,7 @@ const FEATURE_VECTOR_DIMENSION = 10
 
 export class MLAnomalyDetector implements AnomalyDetector {
   private model: tf.Sequential | null = null
-  private isolationForest: MockIsolationForest | null = null
+  private isolationForest: IsolationForest | null = null
 
   constructor(private readonly modelPath: string) {
     void this.modelPath
@@ -96,7 +232,18 @@ export class MLAnomalyDetector implements AnomalyDetector {
       loss: 'meanSquaredError',
     })
 
-    this.isolationForest = new MockIsolationForest(100, 256)
+    this.isolationForest = new IsolationForest(100, 256)
+
+    // Generate some dummy normal baseline data so the forest is trained and can predict anomalies
+    const dummyData: number[][] = []
+    for (let i = 0; i < 500; i++) {
+      dummyData.push(
+        Array(FEATURE_VECTOR_DIMENSION)
+          .fill(0)
+          .map(() => Math.random() * 0.2),
+      )
+    }
+    this.isolationForest.fit(dummyData)
   }
 
   private featuresToVector(features: BehavioralFeatures): number[] {

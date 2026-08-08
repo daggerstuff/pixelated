@@ -1,227 +1,551 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
-
-import FormStyleGuide from '../components/ui/FormStyleGuide'
+import { FormStyleGuide } from '../components/ui/FormStyleGuide'
+import '@/styles/np-landing.css'
 
 const title = 'Style Guide | Pixelated Empathy'
 const description =
-  'Comprehensive style guide for the Pixelated Empathy design system.'
+  'Neutral Precision design system reference — tokens, type, and components.'
 ---
 
 <BaseLayout {title} {description}>
-  <main class="container mx-auto py-12 px-4">
-    <h1 class="text-4xl font-bold mb-8 text-center">
-      Pixelated Empathy Style Guide
-    </h1>
-    <p class="text-lg text-center mb-12 max-w-3xl mx-auto">
-      This style guide provides a comprehensive overview of the Pixelated
-      Empathy design system components, ensuring consistent styling and user
-      experience across the entire application.
-    </p>
+  <div class="np-page np-styleguide">
+    <!-- File header: clinical artifact framing -->
+    <div class="np-styleguide__file-header">
+      <span class="np-chat-demo__file-label">design-system.run</span>
+      <span class="np-chat-demo__file-id">NP // neutral-precision</span>
+    </div>
 
-    <section class="mb-16">
-      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
-        <h2 class="text-3xl font-bold mb-6 text-center">Colors</h2>
+    <section class="np-styleguide__intro">
+      <span class="np-label">Reference</span>
+      <h1 class="np-display">Neutral Precision</h1>
+      <p class="np-body">
+        The Quiet Instrument. Zero-chroma grayscale, flat by doctrine, JetBrains
+        Mono for data and chrome, Archivo Black for display, Inter for body.
+        Every component here is the source of truth for the live product.
+      </p>
+    </section>
 
-        <div class="space-y-8">
-          <div>
-            <h3 class="text-xl font-semibold mb-4">Primary Colors</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="space-y-2">
-                <div class="h-20 bg-primary rounded-md"></div>
-                <p class="text-sm font-medium">Primary</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-primary-foreground rounded-md"></div>
-                <p class="text-sm font-medium">Primary Foreground</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-secondary rounded-md"></div>
-                <p class="text-sm font-medium">Secondary</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-secondary-foreground rounded-md"></div>
-                <p class="text-sm font-medium">Secondary Foreground</p>
-              </div>
-            </div>
+    <!-- Colors: the zero-chroma ramp -->
+    <section class="np-styleguide__section">
+      <div class="np-styleguide__section-header">
+        <span class="np-data">01 // palette</span>
+        <h2 class="np-headline">Zero-chroma ramp</h2>
+        <p class="np-body">
+          All colors resolve to oklch with C = 0. Depth comes from tonal
+          layering — never shadows, never hue.
+        </p>
+      </div>
+
+      <div class="np-sg-swatches">
+        <div class="np-sg-swatch">
+          <div class="np-sg-swatch__chip" style="background: var(--np-bg)">
           </div>
-
-          <div>
-            <h3 class="text-xl font-semibold mb-4">UI Colors</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="space-y-2">
-                <div class="h-20 bg-background rounded-md border"></div>
-                <p class="text-sm font-medium">Background</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-foreground rounded-md"></div>
-                <p class="text-sm font-medium">Foreground</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-card rounded-md border"></div>
-                <p class="text-sm font-medium">Card</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-card-foreground rounded-md"></div>
-                <p class="text-sm font-medium">Card Foreground</p>
-              </div>
-            </div>
+          <span class="np-data">--np-bg</span>
+          <span class="np-mono">oklch(0.1 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div class="np-sg-swatch__chip" style="background: var(--np-surface)">
           </div>
+          <span class="np-data">--np-surface</span>
+          <span class="np-mono">oklch(0.14 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div
+            class="np-sg-swatch__chip"
+            style="background: var(--np-elevated)"
+          >
+          </div>
+          <span class="np-data">--np-elevated</span>
+          <span class="np-mono">oklch(0.18 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div class="np-sg-swatch__chip" style="background: var(--np-hover)">
+          </div>
+          <span class="np-data">--np-hover</span>
+          <span class="np-mono">oklch(0.22 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div class="np-sg-swatch__chip" style="background: var(--np-text)">
+          </div>
+          <span class="np-data">--np-text</span>
+          <span class="np-mono">oklch(0.93 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div class="np-sg-swatch__chip" style="background: var(--np-mid)">
+          </div>
+          <span class="np-data">--np-mid</span>
+          <span class="np-mono">oklch(0.7 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div class="np-sg-swatch__chip" style="background: var(--np-muted)">
+          </div>
+          <span class="np-data">--np-muted</span>
+          <span class="np-mono">oklch(0.55 0 0)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div
+            class="np-sg-swatch__chip np-sg-swatch__chip--border"
+            style="background: var(--np-line)"
+          >
+          </div>
+          <span class="np-data">--np-line</span>
+          <span class="np-mono">rgba(255 255 255 / 0.06)</span>
+        </div>
+        <div class="np-sg-swatch">
+          <div
+            class="np-sg-swatch__chip np-sg-swatch__chip--border"
+            style="background: var(--np-line-strong)"
+          >
+          </div>
+          <span class="np-data">--np-line-strong</span>
+          <span class="np-mono">rgba(255 255 255 / 0.12)</span>
+        </div>
+      </div>
+    </section>
 
-          <div>
-            <h3 class="text-xl font-semibold mb-4">Feedback Colors</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="space-y-2">
-                <div class="h-20 bg-destructive rounded-md"></div>
-                <p class="text-sm font-medium">Destructive</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-destructive-foreground rounded-md"></div>
-                <p class="text-sm font-medium">Destructive Foreground</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-success rounded-md"></div>
-                <p class="text-sm font-medium">Success</p>
-              </div>
-              <div class="space-y-2">
-                <div class="h-20 bg-muted rounded-md"></div>
-                <p class="text-sm font-medium">Muted</p>
-              </div>
-            </div>
+    <!-- Typography: the three families -->
+    <section class="np-styleguide__section">
+      <div class="np-styleguide__section-header">
+        <span class="np-data">02 // type</span>
+        <h2 class="np-headline">Three families, zero ambiguity</h2>
+        <p class="np-body">
+          Archivo Black for display — wide, heavy, raw. Inter for body and
+          titles. JetBrains Mono for data, labels, and chrome.
+        </p>
+      </div>
+
+      <div class="np-sg-type-spec">
+        <div class="np-sg-type-row">
+          <span class="np-data np-sg-type-row__label">display</span>
+          <span class="np-mono np-sg-type-row__font"
+            >--np-font-display · Archivo Black</span
+          >
+          <p
+            class="np-display np-sg-type-row__sample"
+            style="font-size: var(--np-text-display)"
+          >
+            The quiet instrument
+          </p>
+        </div>
+        <div class="np-sg-type-row">
+          <span class="np-data np-sg-type-row__label">headline</span>
+          <span class="np-mono np-sg-type-row__font">Inter · weight 900</span>
+          <h2
+            class="np-headline np-sg-type-row__sample"
+            style="font-size: var(--np-text-headline)"
+          >
+            Rehearse hard conversations
+          </h2>
+        </div>
+        <div class="np-sg-type-row">
+          <span class="np-data np-sg-type-row__label">body</span>
+          <span class="np-mono np-sg-type-row__font"
+            >--np-font-body · Inter</span
+          >
+          <p class="np-body np-sg-type-row__sample">
+            A trainee enters the conversation with an AI client that adapts to
+            hesitation, disclosure timing, and the moment the room changes.
+          </p>
+        </div>
+        <div class="np-sg-type-row">
+          <span class="np-data np-sg-type-row__label">mono</span>
+          <span class="np-mono np-sg-type-row__font"
+            >--np-font-mono · JetBrains Mono</span
+          >
+          <p class="np-mono np-sg-type-row__sample">
+            S-03 // rupture-repair · live · s. composing
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Type scale -->
+    <section class="np-styleguide__section">
+      <div class="np-styleguide__section-header">
+        <span class="np-data">03 // scale</span>
+        <h2 class="np-headline">Type scale</h2>
+      </div>
+
+      <div class="np-sg-scale">
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-display</span>
+          <span class="np-mono np-sg-scale-row__val"
+            >clamp(2.5, 6vw, 4.5rem)</span
+          >
+          <span
+            class="np-display np-sg-scale-row__sample"
+            style="font-size: var(--np-text-display)">Hold the room.</span
+          >
+        </div>
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-headline</span>
+          <span class="np-mono np-sg-scale-row__val"
+            >clamp(1.75, 3.5vw, 2.75rem)</span
+          >
+          <span
+            class="np-headline np-sg-scale-row__sample"
+            style="font-size: var(--np-text-headline)"
+            >Start where it gets hard.</span
+          >
+        </div>
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-title</span>
+          <span class="np-mono np-sg-scale-row__val">1.25rem</span>
+          <span
+            class="np-title np-sg-scale-row__sample"
+            style="font-size: var(--np-text-title)">Review desk</span
+          >
+        </div>
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-body</span>
+          <span class="np-mono np-sg-scale-row__val">1rem</span>
+          <span
+            class="np-body np-sg-scale-row__sample"
+            style="font-size: var(--np-text-body)"
+            >The case, transcript, and supervisor note stay attached.</span
+          >
+        </div>
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-data</span>
+          <span class="np-mono np-sg-scale-row__val">0.875rem</span>
+          <span
+            class="np-data np-sg-scale-row__sample"
+            style="font-size: var(--np-text-data)">S-03 // rupture-repair</span
+          >
+        </div>
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-label</span>
+          <span class="np-mono np-sg-scale-row__val">0.75rem</span>
+          <span
+            class="np-label np-sg-scale-row__sample"
+            style="font-size: var(--np-text-label)">Training record</span
+          >
+        </div>
+        <div class="np-sg-scale-row">
+          <span class="np-mono np-sg-scale-row__token">--np-text-caption</span>
+          <span class="np-mono np-sg-scale-row__val">0.6875rem</span>
+          <span
+            class="np-mono np-sg-scale-row__sample"
+            style="font-size: var(--np-text-caption)"
+            >simulated · trainee responds to an ai client</span
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Components: buttons, badges, chips -->
+    <section class="np-styleguide__section">
+      <div class="np-styleguide__section-header">
+        <span class="np-data">04 // components</span>
+        <h2 class="np-headline">Buttons & badges</h2>
+        <p class="np-body">
+          0px radius, 2px borders, mono uppercase labels. No shadows, no glow.
+        </p>
+      </div>
+
+      <div class="np-sg-components">
+        <div class="np-sg-comp-group">
+          <span class="np-data np-sg-comp-group__label">Buttons</span>
+          <div class="np-sg-comp-group__items">
+            <a class="np-btn np-btn-primary" href="#">Primary action</a>
+            <a class="np-btn np-btn-ghost" href="#">Ghost action</a>
+            <button class="np-btn np-btn-primary" disabled>Disabled</button>
+          </div>
+        </div>
+
+        <div class="np-sg-comp-group">
+          <span class="np-data np-sg-comp-group__label">Trust badges</span>
+          <div class="np-sg-comp-group__items">
+            <span class="np-trust__badge">HIPAA-ready</span>
+            <span class="np-trust__badge">FERPA-aligned</span>
+            <span class="np-trust__badge">Evidence-based</span>
+            <span class="np-trust__badge">Accreditation-ready</span>
+          </div>
+        </div>
+
+        <div class="np-sg-comp-group">
+          <span class="np-data np-sg-comp-group__label">Chips</span>
+          <div class="np-sg-comp-group__items">
+            <span class="fm-chip">crisis assessment</span>
+            <span class="fm-chip">trauma disclosure</span>
+            <span class="fm-chip">rupture repair</span>
+            <span class="fm-chip">resistance</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="mb-16">
-      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
-        <h2 class="text-3xl font-bold mb-6 text-center">Typography</h2>
-
-        <div class="space-y-8">
-          <div>
-            <h3 class="text-xl font-semibold mb-4">Headings</h3>
-            <div class="space-y-4">
-              <div>
-                <h1 class="text-5xl font-bold">Heading 1</h1>
-                <p class="text-sm text-muted-foreground mt-1">
-                  text-5xl font-bold
-                </p>
-              </div>
-              <div>
-                <h2 class="text-4xl font-bold">Heading 2</h2>
-                <p class="text-sm text-muted-foreground mt-1">
-                  text-4xl font-bold
-                </p>
-              </div>
-              <div>
-                <h3 class="text-3xl font-bold">Heading 3</h3>
-                <p class="text-sm text-muted-foreground mt-1">
-                  text-3xl font-bold
-                </p>
-              </div>
-              <div>
-                <h4 class="text-2xl font-bold">Heading 4</h4>
-                <p class="text-sm text-muted-foreground mt-1">
-                  text-2xl font-bold
-                </p>
-              </div>
-              <div>
-                <h5 class="text-xl font-bold">Heading 5</h5>
-                <p class="text-sm text-muted-foreground mt-1">
-                  text-xl font-bold
-                </p>
-              </div>
-              <div>
-                <h6 class="text-lg font-bold">Heading 6</h6>
-                <p class="text-sm text-muted-foreground mt-1">
-                  text-lg font-bold
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-semibold mb-4">Body Text</h3>
-            <div class="space-y-4">
-              <div>
-                <p class="text-base">
-                  Base text (text-base): The quick brown fox jumps over the lazy
-                  dog.
-                </p>
-              </div>
-              <div>
-                <p class="text-sm">
-                  Small text (text-sm): The quick brown fox jumps over the lazy
-                  dog.
-                </p>
-              </div>
-              <div>
-                <p class="text-xs">
-                  Extra small text (text-xs): The quick brown fox jumps over the
-                  lazy dog.
-                </p>
-              </div>
-              <div>
-                <p class="text-lg">
-                  Large text (text-lg): The quick brown fox jumps over the lazy
-                  dog.
-                </p>
-              </div>
-              <div>
-                <p class="text-xl">
-                  Extra large text (text-xl): The quick brown fox jumps over the
-                  lazy dog.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="text-xl font-semibold mb-4">Text Styles</h3>
-            <div class="space-y-4">
-              <div>
-                <p class="font-bold">
-                  Bold text: The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-              <div>
-                <p class="italic">
-                  Italic text: The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-              <div>
-                <p class="underline">
-                  Underlined text: The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-              <div>
-                <p class="line-through">
-                  Strikethrough text: The quick brown fox jumps over the lazy
-                  dog.
-                </p>
-              </div>
-              <div>
-                <p class="text-muted-foreground">
-                  Muted text: The quick brown fox jumps over the lazy dog.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Form elements -->
+    <section class="np-styleguide__section">
+      <div class="np-styleguide__section-header">
+        <span class="np-data">05 // forms</span>
+        <h2 class="np-headline">Form elements</h2>
+        <p class="np-body">
+          Form inputs styled in the NP system. 0px radius, hairline borders,
+          mono labels.
+        </p>
       </div>
-    </section>
 
-    <section class="mb-16">
-      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
-        <h2 class="text-3xl font-bold mb-6 text-center">Buttons</h2>
-      </div>
-    </section>
-
-    <section class="mb-16">
-      <div class="max-w-5xl mx-auto bg-card rounded-lg shadow-md p-8">
-        <h2 class="text-3xl font-bold mb-6 text-center">Form Elements</h2>
+      <div class="np-sg-form-container">
         <FormStyleGuide client:load />
       </div>
     </section>
-  </main>
+
+    <!-- Spacing & radius -->
+    <section class="np-styleguide__section">
+      <div class="np-styleguide__section-header">
+        <span class="np-data">06 // geometry</span>
+        <h2 class="np-headline">Spacing & radius</h2>
+      </div>
+
+      <div class="np-sg-geometry">
+        <div class="np-sg-geom-group">
+          <span class="np-data">radius</span>
+          <span class="np-mono">--np-radius: 0px</span>
+          <span class="np-body"
+            >All corners squared. No border-radius anywhere in the system.</span
+          >
+        </div>
+        <div class="np-sg-geom-group">
+          <span class="np-data">shadow</span>
+          <span class="np-mono">--np-shadow: none</span>
+          <span class="np-body"
+            >Depth comes from tonal layering (surface > elevated > hover), never
+            drop shadows.</span
+          >
+        </div>
+        <div class="np-sg-geom-group">
+          <span class="np-data">content width</span>
+          <span class="np-mono">--np-content: 76rem</span>
+          <span class="np-body">Primary container. Narrow variant: 55rem.</span>
+        </div>
+        <div class="np-sg-geom-group">
+          <span class="np-data">section spacing</span>
+          <span class="np-mono"
+            >--np-section-y: clamp(3.5rem, 5.5vw, 5.5rem)</span
+          >
+          <span class="np-body">Vertical rhythm between major sections.</span>
+        </div>
+      </div>
+    </section>
+  </div>
 </BaseLayout>
+
+<style>
+  .np-styleguide {
+    max-width: var(--np-content);
+    margin: 0 auto;
+    padding: var(--np-space-12) var(--np-pad);
+    font-family: var(--np-font-body);
+    color: var(--np-text);
+  }
+
+  .np-styleguide__file-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--np-space-2) var(--np-space-3);
+    border: 1px solid var(--np-line);
+    border-bottom: none;
+    background: var(--np-surface);
+    font-family: var(--np-font-mono);
+    font-size: var(--np-text-caption);
+  }
+
+  .np-styleguide__intro {
+    padding: var(--np-space-10) 0 var(--np-space-12);
+    border-bottom: 1px solid var(--np-line);
+  }
+  .np-styleguide__intro .np-label {
+    display: block;
+    margin-bottom: var(--np-space-3);
+  }
+  .np-styleguide__intro .np-display {
+    margin: 0 0 var(--np-space-4);
+  }
+  .np-styleguide__intro .np-body {
+    max-width: 55ch;
+    color: var(--np-muted);
+  }
+
+  .np-styleguide__section {
+    padding: var(--np-space-12) 0;
+    border-bottom: 1px solid var(--np-line);
+  }
+  .np-styleguide__section:last-child {
+    border-bottom: none;
+  }
+
+  .np-styleguide__section-header {
+    margin-bottom: var(--np-space-8);
+  }
+  .np-styleguide__section-header .np-data {
+    display: block;
+    margin-bottom: var(--np-space-2);
+    color: var(--np-mid);
+  }
+  .np-styleguide__section-header .np-headline {
+    margin: 0 0 var(--np-space-3);
+  }
+  .np-styleguide__section-header .np-body {
+    max-width: 58ch;
+    color: var(--np-muted);
+  }
+
+  /* Swatches */
+  .np-sg-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--np-space-4);
+  }
+  .np-sg-swatch {
+    display: flex;
+    flex-direction: column;
+    gap: var(--np-space-1);
+  }
+  .np-sg-swatch__chip {
+    height: 72px;
+    border: 1px solid var(--np-line-strong);
+  }
+  .np-sg-swatch__chip--border {
+    border: 1px solid var(--np-line-strong);
+  }
+  .np-sg-swatch .np-data {
+    font-size: var(--np-text-label);
+    color: var(--np-text);
+  }
+  .np-sg-swatch .np-mono {
+    font-size: var(--np-text-caption);
+    color: var(--np-muted);
+  }
+
+  /* Type spec */
+  .np-sg-type-spec {
+    display: flex;
+    flex-direction: column;
+    gap: var(--np-space-8);
+  }
+  .np-sg-type-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: var(--np-space-2) var(--np-space-6);
+    align-items: baseline;
+  }
+  .np-sg-type-row__sample {
+    grid-column: 2;
+    margin: 0;
+    line-height: var(--np-leading-display);
+  }
+  .np-sg-type-row__label {
+    color: var(--np-mid);
+  }
+  .np-sg-type-row__font {
+    font-size: var(--np-text-label);
+    color: var(--np-muted);
+  }
+  @media (max-width: 600px) {
+    .np-sg-type-row {
+      grid-template-columns: 1fr;
+      gap: var(--np-space-1);
+    }
+    .np-sg-type-row__sample {
+      grid-column: 1;
+    }
+  }
+
+  /* Scale table */
+  .np-sg-scale {
+    display: flex;
+    flex-direction: column;
+  }
+  .np-sg-scale-row {
+    display: grid;
+    grid-template-columns: 160px 200px 1fr;
+    gap: var(--np-space-4);
+    align-items: baseline;
+    padding: var(--np-space-3) 0;
+    border-top: 1px solid var(--np-line);
+  }
+  .np-sg-scale-row:first-child {
+    border-top: 1px solid var(--np-line-strong);
+  }
+  .np-sg-scale-row__token {
+    font-size: var(--np-text-label);
+    color: var(--np-mid);
+  }
+  .np-sg-scale-row__val {
+    font-size: var(--np-text-label);
+    color: var(--np-muted);
+  }
+  .np-sg-scale-row__sample {
+    margin: 0;
+  }
+  @media (max-width: 700px) {
+    .np-sg-scale-row {
+      grid-template-columns: 1fr;
+      gap: var(--np-space-1);
+    }
+  }
+
+  /* Components */
+  .np-sg-components {
+    display: flex;
+    flex-direction: column;
+    gap: var(--np-space-8);
+  }
+  .np-sg-comp-group__label {
+    display: block;
+    margin-bottom: var(--np-space-3);
+    color: var(--np-mid);
+  }
+  .np-sg-comp-group__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--np-space-3);
+    align-items: center;
+  }
+
+  /* Form container */
+  .np-sg-form-container {
+    border: 1px solid var(--np-line);
+    background: var(--np-surface);
+    padding: var(--np-space-8);
+  }
+
+  /* Geometry */
+  .np-sg-geometry {
+    display: flex;
+    flex-direction: column;
+    gap: var(--np-space-6);
+  }
+  .np-sg-geom-group {
+    display: grid;
+    grid-template-columns: 120px 240px 1fr;
+    gap: var(--np-space-4);
+    align-items: baseline;
+    padding: var(--np-space-3) 0;
+    border-top: 1px solid var(--np-line);
+  }
+  .np-sg-geom-group:first-child {
+    border-top: 1px solid var(--np-line-strong);
+  }
+  .np-sg-geom-group .np-data {
+    color: var(--np-mid);
+  }
+  .np-sg-geom-group .np-mono {
+    font-size: var(--np-text-label);
+    color: var(--np-text);
+  }
+  .np-sg-geom-group .np-body {
+    font-size: var(--np-text-small);
+    color: var(--np-muted);
+    max-width: 50ch;
+  }
+  @media (max-width: 700px) {
+    .np-sg-geom-group {
+      grid-template-columns: 1fr;
+      gap: var(--np-space-1);
+    }
+  }
+</style>
