@@ -10,6 +10,16 @@ const { hero, workflow, cta } = {
   cta: ctaContent,
 }
 
+const accentIndex = hero.title.indexOf(hero.titleAccent)
+const heroTitleParts =
+  accentIndex === -1
+    ? { before: hero.title, accent: '', after: '' }
+    : {
+        before: hero.title.slice(0, accentIndex),
+        accent: hero.titleAccent,
+        after: hero.title.slice(accentIndex + hero.titleAccent.length),
+      }
+
 const sessionWalkthrough = [
   {
     label: 'Scenario',
@@ -57,8 +67,9 @@ const buildableScenarios = [
         <div class="np-hero__content">
           <span class="np-hero__kicker np-data">{hero.kicker}</span>
           <h1 class="np-display np-hero__display">
-            Rehearse <span class="np-mono-word">hard conversations</span> before real
-            clients.
+            {heroTitleParts.before}<span class="np-mono-word"
+              >{heroTitleParts.accent}</span
+            >{heroTitleParts.after}
           </h1>
           <p class="np-body-strong np-hero__subtitle">{hero.subtitle}</p>
           <div class="np-hero__actions">

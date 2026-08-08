@@ -121,7 +121,7 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
   let isSameOrigin = false
   if (origin) {
     try {
-      isSameOrigin = new URL(origin).host === url.host
+      isSameOrigin = new URL(origin).origin === url.origin
     } catch {
       // Malformed Origin header — treat as cross-origin
       isSameOrigin = false
