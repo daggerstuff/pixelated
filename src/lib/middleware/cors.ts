@@ -97,6 +97,15 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+/** Same-origin browser requests (e.g. login form → /api/auth/signin) must not be blocked by CORS. */
+function isSameOrigin(request: Request, origin: string): boolean {
+  try {
+    return new URL(request.url).origin === origin
+  } catch {
+    return false
+  }
+}
+
 /**
  * CORS middleware implementation with enhanced security and error handling
  */
@@ -113,30 +122,17 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
   const origin = getRequestHeader(request, 'Origin')
   const hasApiKey = getRequestHeader(request, 'X-API-Key') !== undefined
 
-  // Same-origin requests (Origin host matches the request host) are never
-  // cross-origin, so CORS restrictions should not apply. This matters for
-  // self-hosted previews and CI (e.g. bias-detection E2E) where the production
-  // bundle is served from localhost but the browser still sends an Origin
-  // header on POST requests.
-  let isSameOrigin = false
-  if (origin) {
-    try {
-      isSameOrigin = new URL(origin).origin === url.origin
-    } catch {
-      // Malformed Origin header — treat as cross-origin
-      isSameOrigin = false
-    }
-  }
-
   try {
     // Process the request first to catch any errors
     const response = await next()
 
     // Apply CORS headers if origin is present
     if (origin) {
-      // Check if origin is allowed, is same-origin, or request has an API key
+      // Same-origin, allowlisted, or API-key-authenticated requests are permitted.
       const allowed =
-        hasApiKey || isSameOrigin || isOriginAllowed(origin, config)
+        hasApiKey ||
+        isSameOrigin(request, origin) ||
+        isOriginAllowed(origin, config)
 
       if (allowed) {
         response.headers.set('Access-Control-Allow-Origin', origin)
@@ -235,7 +231,8 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          ...(origin && isOriginAllowed(origin, config)
+          ...(origin &&
+          (isSameOrigin(request, origin) || isOriginAllowed(origin, config))
             ? {
                 'Access-Control-Allow-Origin': origin,
                 'Access-Control-Allow-Credentials': 'true',
