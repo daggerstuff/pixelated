@@ -508,6 +508,11 @@ jobs:
         env:
           POSTGRES_USER: postgres
 
+      - name: Seed E2E test user
+        run: pnpm tsx scripts/seed-e2e-user.ts
+        env:
+          DATABASE_URL: postgresql://postgres@localhost:5432/test_db
+
       - name: Ensure Playwright report directory exists
         run: mkdir -p playwright-report-browser-compat
 
@@ -571,6 +576,7 @@ jobs:
           exit 1
         env:
           NODE_ENV: test
+          E2E_TEST_AUTH: '1'
           DATABASE_URL: postgresql://postgres@localhost:5432/test_db
           PGUSER: postgres
           PGDATABASE: test_db
@@ -581,18 +587,21 @@ jobs:
           DB_PASSWORD: ''
 
       - name: Run Playwright tests
-        # Smoke spec only: dashboard spec beforeEach hangs on login
-        # (waitForNavigation networkidle) and expects admin auth/testids not
-        # provisioned in CI. Full dashboard E2E runs locally or in a dedicated job.
+        # Full dashboard + smoke specs. The dashboard spec authenticates via
+        # the E2E test-auth bypass (E2E_TEST_AUTH=1 on "Start application"):
+        # signin accepts the seeded test@example.com/password123 and issues an
+        # admin session cookie, and middleware grants an admin locals session
+        # for that cookie — no Auth0 tenant required.
         run: >-
-          pnpm e2e tests/e2e/smoke/bias-detection-smoke.spec.ts
-          --project=chromium
+          pnpm e2e tests/e2e/bias-detection-dashboard.spec.ts
+          tests/e2e/smoke/bias-detection-smoke.spec.ts --project=chromium
         env:
           NODE_ENV: test
           # The app is already started by the "Start application" step; tell
           # Playwright to reuse it instead of trying to start a second instance
           # on port 4321.
           DISABLE_PLAYWRIGHT_WEBSERVER: '1'
+          E2E_TEST_AUTH: '1'
           DATABASE_URL: postgresql://postgres@localhost:5432/test_db
           PGUSER: postgres
           PGDATABASE: test_db
