@@ -12,7 +12,7 @@ const logger = createBuildSafeLogger('default')
  * CORS configuration
  * Separate configurations for development and production
  */
-export const corsOptions = {
+const corsOptions = {
   development: {
     allowedOrigins: [
       'http://localhost:3000',
