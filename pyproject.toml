@@ -5,7 +5,7 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14" # Only 3.13 resolves the dev graph (data-designer family caps); CI runs 3.13.13
 dependencies = [
   "flask[async]", # self-bundle (`asgiref` adds async to `flask`); NOT a flat-deps marker — see IMPORTANT note
   "flask-cors>=6.0.2", # Updated to latest secure version
@@ -21,14 +21,14 @@ dependencies = [
   "scikit-image>=0.26.0",
   "spacy>=3.8.14", # Updated to latest secure version
   # Security: Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip) and GHSA-7p94-766c-hgjp
-  "nltk>=3.9.4",
+  "nltk>=3.10.1",
   "evaluate",
-  "cryptography>=46.0.6,<50", # Upper bound matches data-designer-engine 0.6.x/0.7.x; dependabot bumps stay within 46.x
+  "cryptography>=46.0.6,<51", # Upper bound matches data-designer-engine 0.6.x/0.7.x; dependabot bumps stay within 46.x
   # Security: Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "requests>=2.33.0",
   "python-dotenv>=1.2.1", # Updated to latest secure version
   "numba>=0.63.1",
-  "faiss-cpu>=1.11.0",
+  "faiss-cpu>=1.15.0",
   "matplotlib>=3.10.3",
   "psutil>=7.0.0",
   "chardet>=5.2.0,<8.0.0",
@@ -48,14 +48,14 @@ dependencies = [
   "einops>=0.8.0",
   "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
-  "huggingface-hub>=0.24.0",
+  "huggingface-hub>=1.26.0",
   "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
   "torch==2.13.0", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
   "sentry-sdk>=2.44.0",
-  "openai>=1.107.2",
+  "openai>=2.53.0",
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
   "authlib>=1.6.11", # Updated to latest secure version
@@ -93,18 +93,18 @@ dependencies = [
   "nemo-microservices[data-designer]>=1.0.0", # IMPORTANT: extra does NOT install `data-designer`; direct `data-designer` pin below pulls duckdb/faker/lxml/marko/sqlfluff; the extra doesn't pull them
   "kaggle>=1.8.2",
   "youtube-transcript-api>=0.6.0",
-  "boto3>=1.40.75", # Keep compatible with checkov
+  "boto3>=1.43.64", # Keep compatible with checkov
   # Google Drive API for direct Drive-to-Drive transfers
   "google-api-python-client>=2.150.0",
   "google-auth-httplib2>=0.2.0",
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
-  "ngcsdk>=4.16.0",
+  "ngcsdk>=4.34.10",
   # Security: Fixes GHSA-hqmj-h5c6-369m, GHSA-p433-9wv8-28xj, GHSA-cmw6-hcpp-c6jp
   "onnx>=1.22.0",
   "onnxscript>=0.6.2",
   "fastapi>=0.124.4",
-  "uvicorn>=0.44.0",
+  "uvicorn>=0.52.1",
   "minio>=7.2.20",
   "librosa>=0.11.0",
   "langsmith-fetch>=0.3.1",
@@ -125,7 +125,7 @@ dependencies = [
   "lightning-sdk>=2025.12.2",
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
-  "gitpython>=3.1.55",
+  "gitpython>=3.1.58",
   "modal>=1.4.1",
   "gradient-adk>=0.2.11",
   "virtualenv>=21.2.0",
@@ -145,12 +145,12 @@ dependencies = [
   "beautifulsoup4>=4.15.0",
   "sqlalchemy>=2.0.51",
   "ebooklib>=0.20",
-  "pypdf>=6.14.2",
+  "pypdf>=6.15.0",
   "mobi>=0.4.1",
   "aiofiles>=25.1.0",
   "openpipe-art>=0.5.18",
   "pynvml>=13.0.1",
-  "tavily-cli>=0.1.5",
+  "tavily-cli>=0.1.6",
   "celery>=5.6.3",
   "langchain-nvidia-ai-endpoints>=1.4.3",
   "local-deep-research[mcp]>=1.2.14",
@@ -163,7 +163,7 @@ test = [
   "pytest-asyncio",
   "coverage",
   "types-requests",
-  "hypothesis>=6.152.9",
+  "hypothesis>=6.165.1",
 ]
 dev = [
   "black",
@@ -186,7 +186,7 @@ dev = [
 [project.scripts]
 process-priority-5 = "ai.scripts.process_priority_5:main"
 [build-system]
-requires = ["setuptools>=78.1.1", "wheel>=0.38.1"]
+requires = ["setuptools>=78.1.1", "wheel>=0.47.0"]
 build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
@@ -330,6 +330,7 @@ index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
 # Security: Override openpipe-art's litellm cap (<=1.82.0) to fix CVE-2026-35030 and 9 other critical vulnerabilities
 override-dependencies = ["litellm>=1.83.0"]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
 # Note: Increase timeout via environment variable: UV_HTTP_TIMEOUT=300 uv sync
 # Note: nvidia-nim and ngc-python-cli require NVIDIA NGC authentication
 # Install them manually with: uv pip install --extra-index-url https://pypi.ngc.nvidia.com nvidia-nim ngc-python-cli
@@ -338,7 +339,7 @@ override-dependencies = ["litellm>=1.83.0"]
 [dependency-groups]
 dev = [
   "black>=25.12.0",
-  "coverage>=7.13.4",
+  "coverage>=7.15.3",
   "flake8>=7.3.0",
   "isort>=6.0.1",
   "mypy>=1.16.1",
@@ -354,7 +355,7 @@ dev = [
   "sourcery>=1.37.0; sys_platform == 'darwin'",
   "types-requests>=2.32.4.20260107",
   "asyncpg>=0.31.0",
-  "hypothesis>=6.155.2",
+  "hypothesis>=6.165.1",
 ]
 
 [[tool.uv.index]]

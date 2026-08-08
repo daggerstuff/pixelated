@@ -79,9 +79,12 @@ export class EncryptedMemoryService {
   private initialized = false
 
   // In-memory storage (production should use encrypted DB)
-  private sessions = new Map<string, EncryptedSessionState>()
-  private memories = new Map<string, EncryptedMemoryEntry>()
-  private emotionalStates = new Map<string, EncryptedEmotionalState[]>()
+  private readonly sessions = new Map<string, EncryptedSessionState>()
+  private readonly memories = new Map<string, EncryptedMemoryEntry>()
+  private readonly emotionalStates = new Map<
+    string,
+    EncryptedEmotionalState[]
+  >()
 
   private constructor() {}
 
@@ -106,7 +109,7 @@ export class EncryptedMemoryService {
         implementation: useMock
           ? FHEImplementation.Mock
           : FHEImplementation.SEAL,
-      } as any)
+      })
 
       await this.fheService.initialize()
       this.initialized = true
@@ -205,7 +208,7 @@ export class EncryptedMemoryService {
    * Get session state (returns encrypted data)
    */
   public getSession(sessionId: string): EncryptedSessionState | null {
-    return this.sessions.get(sessionId) || null
+    return this.sessions.get(sessionId) ?? null
   }
 
   /**
@@ -281,7 +284,7 @@ export class EncryptedMemoryService {
    * Get emotional trajectory for session
    */
   public getEmotionalTrajectory(sessionId: string): EncryptedEmotionalState[] {
-    return this.emotionalStates.get(sessionId) || []
+    return this.emotionalStates.get(sessionId) ?? []
   }
 
   /**
@@ -389,8 +392,7 @@ export class EncryptedMemoryService {
     await this.ensureInitialized()
 
     const sessionsArr = data['sessions'] as
-      | Array<Record<string, unknown>>
-      | undefined
+      Array<Record<string, unknown>> | undefined
     if (sessionsArr) {
       for (const session of sessionsArr) {
         this.sessions.set((session['sessionId'] as string) || '', {
@@ -398,20 +400,19 @@ export class EncryptedMemoryService {
           therapistId: (session['therapistId'] as string) || '',
           encryptedData: {
             id: `imported-${Date.now()}`,
-            data: (session['encryptedData'] as string) || '',
+            data: session['encryptedData'] || '',
             dataType: 'string',
             metadata: (session['metadata'] as Record<string, unknown>) || {},
           },
           createdAt: (session['createdAt'] as number) || 0,
           updatedAt: (session['updatedAt'] as number) || 0,
-          metadata: (session['metadata'] as any) || {},
+          metadata: (session['metadata'] as any) ?? {},
         })
       }
     }
 
     const memoriesArr = data['memories'] as
-      | Array<Record<string, unknown>>
-      | undefined
+      Array<Record<string, unknown>> | undefined
     if (memoriesArr) {
       for (const memory of memoriesArr) {
         this.memories.set((memory['entryId'] as string) || '', {
@@ -419,7 +420,7 @@ export class EncryptedMemoryService {
           patientId: (memory['patientId'] as string) || '',
           encryptedContent: {
             id: `imported-${Date.now()}`,
-            data: (memory['encryptedContent'] as string) || '',
+            data: memory['encryptedContent'] || '',
             dataType: 'string',
             metadata: (memory['metadata'] as Record<string, unknown>) || {},
           },
@@ -427,13 +428,13 @@ export class EncryptedMemoryService {
             (memory['entryType'] as EncryptedMemoryEntry['entryType']) ||
             'session_summary',
           createdAt: (memory['createdAt'] as number) || 0,
-          metadata: (memory['metadata'] as any) || {},
+          metadata: (memory['metadata'] as any) ?? {},
         })
       }
     }
 
-    const sessionCount = sessionsArr?.length || 0
-    const memoryCount = memoriesArr?.length || 0
+    const sessionCount = sessionsArr?.length ?? 0
+    const memoryCount = memoriesArr?.length ?? 0
     logger.info(`Imported ${sessionCount} sessions and ${memoryCount} memories`)
   }
 }

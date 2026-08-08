@@ -40,11 +40,7 @@ const buildWebSocketUrl = (
 }
 
 type WebSocketConnectionState =
-  | 'disconnected'
-  | 'connecting'
-  | 'connected'
-  | 'reconnecting'
-  | 'error'
+  'disconnected' | 'connecting' | 'connected' | 'reconnecting' | 'error'
 
 interface ProgressUpdateMessage {
   type: 'progress_update'
@@ -82,9 +78,7 @@ interface NotificationMessage {
 }
 
 export type WebSocketMessage =
-  | ProgressUpdateMessage
-  | StatusUpdateMessage
-  | NotificationMessage
+  ProgressUpdateMessage | StatusUpdateMessage | NotificationMessage
 
 interface UseJournalResearchWebSocketOptions {
   sessionId: string | null
@@ -265,7 +259,7 @@ export const useJournalResearchWebSocket = ({
 
       // Convert data to string or ArrayBuffer for WebSocket send
       // ArrayBufferView (e.g. Uint8Array) is narrowed to ArrayBuffer
-      const payload: string | ArrayBuffer = (() => {
+      const payload: any = (() => {
         if (typeof data === 'string') {
           return data
         }
@@ -279,7 +273,7 @@ export const useJournalResearchWebSocket = ({
           ) as ArrayBuffer
         }
         // SharedArrayBuffer is not supported
-        return new TextEncoder().encode(String(data)).buffer as ArrayBuffer
+        return new TextEncoder().encode(String(data)).buffer
       })()
 
       const socket = socketRef.current

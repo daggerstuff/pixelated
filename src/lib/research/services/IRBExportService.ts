@@ -409,9 +409,7 @@ export class IRBExportService {
 let instance: IRBExportService | null = null
 
 export function getIRBExportService(): IRBExportService {
-  if (!instance) {
-    instance = new IRBExportService()
-  }
+  instance ??= new IRBExportService()
   return instance
 }
 
