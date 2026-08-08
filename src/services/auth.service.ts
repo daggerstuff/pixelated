@@ -1,23 +1,23 @@
-import * as bcrypt from 'bcrypt'
-import * as jwt from 'jsonwebtoken'
+import * as bcrypt from "bcrypt";
+import * as jwt from "jsonwebtoken";
 
-import type { User } from '../entities/user.entity'
-import { RegisterDto } from '../validation/register-schema'
+import type { User } from "../entities/user.entity";
+import { RegisterDto } from "../validation/register-schema";
 
-type UserRepository = {
+export type UserRepository = {
   findOne(options: {
     where: {
-      email: string
-    }
-  }): Promise<User | null>
-  create(user: { email: string; password: string }): User
-  save(user: User): Promise<User>
-}
+      email: string;
+    };
+  }): Promise<User | null>;
+  create(user: { email: string; password: string }): User;
+  save(user: User): Promise<User>;
+};
 
 class UnauthorizedException extends Error {
   constructor(message: string) {
-    super(message)
-    this.name = 'UnauthorizedException'
+    super(message);
+    this.name = "UnauthorizedException";
   }
 }
 
@@ -28,39 +28,39 @@ export class AuthService {
     // Check if email already exists
     const existingUser = await this.userRepository.findOne({
       where: { email: dto.email },
-    })
+    });
     if (existingUser) {
-      throw new UnauthorizedException('Email already registered')
+      throw new UnauthorizedException("Email already registered");
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(dto.password, 10)
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
 
     const user = this.userRepository.create({
       email: dto.email,
       password: hashedPassword,
-    })
+    });
 
-    return this.userRepository.save(user)
+    return this.userRepository.save(user);
   }
 
   async validateUser(email: string, password: string): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { email: email } })
+    const user = await this.userRepository.findOne({ where: { email: email } });
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException("Invalid credentials");
     }
 
-    const hashedPassword = await bcrypt.compare(password, user.password)
+    const hashedPassword = await bcrypt.compare(password, user.password);
     if (!hashedPassword) {
-      throw new UnauthorizedException('Invalid credentials')
+      throw new UnauthorizedException("Invalid credentials");
     }
 
-    return user
+    return user;
   }
 
   async generateToken(user: User): Promise<string> {
-    return jwt.sign({ id: user.id }, process.env['JWT_SECRET']!, {
-      expiresIn: '1h',
-    })
+    return jwt.sign({ id: user.id }, process.env["JWT_SECRET"]!, {
+      expiresIn: "1h",
+    });
   }
 }

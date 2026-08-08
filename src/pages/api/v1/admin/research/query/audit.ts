@@ -9,11 +9,11 @@ export const GET = protectRoute(
   { requiredRole: 'admin', validateIPMatch: true, validateUserAgent: true },
   async ({ request }) => {
     const url = new URL(request.url)
-    const userId = url.searchParams.get('userId') || undefined
-    const queryId = url.searchParams.get('queryId') || undefined
-    const queryType = url.searchParams.get('queryType') || undefined
-    const startDate = url.searchParams.get('startDate') || undefined
-    const endDate = url.searchParams.get('endDate') || undefined
+    const userId = url.searchParams.get('userId') ?? undefined
+    const queryId = url.searchParams.get('queryId') ?? undefined
+    const queryType = url.searchParams.get('queryType') ?? undefined
+    const startDate = url.searchParams.get('startDate') ?? undefined
+    const endDate = url.searchParams.get('endDate') ?? undefined
     const stats = url.searchParams.get('stats') === 'true'
 
     const auditService = getQueryAuditService()

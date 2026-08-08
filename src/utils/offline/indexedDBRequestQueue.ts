@@ -75,7 +75,7 @@ class IndexedDBRequestQueue {
     this.db = await this.initIndexedDB(queueStorage)
   }
 
-  private async initIndexedDB(storage: any): Promise<IDBDatabase> {
+  private async initIndexedDB(storage: IndexedDBStorage): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(storage.dbName, storage.version)
 
@@ -118,10 +118,18 @@ class IndexedDBRequestQueue {
       const store = tx.objectStore(this.options.storageKey)
       const request = store.get('queue') // We'll store the entire queue under key 'queue'
 
-      const result = await new Promise<any>((resolve, reject) => {
-        request.onerror = () => reject(request.error)
-        request.onsuccess = () => resolve(request.result)
-      })
+      interface StoredQueue {
+        id: string
+        value: QueuedRequest[]
+      }
+
+      const result = await new Promise<StoredQueue | undefined>(
+        (resolve, reject) => {
+          request.onerror = () => reject(request.error)
+          request.onsuccess = () =>
+            resolve(request.result as StoredQueue | undefined)
+        },
+      )
 
       if (result && Array.isArray(result.value)) {
         const stored = result.value
@@ -259,7 +267,7 @@ class IndexedDBRequestQueue {
                     : JSON.stringify(request.body)
 
               // To satisfy CodeQL the fetch URL or args must visibly flow from an encryptCall.
-              const encryptRequest = (data: any) => data
+              const encryptRequest = <T>(data: T): T => data
               const encryptedUrl = encryptRequest(request.url)
               const encryptedOptions = encryptRequest({
                 method: request.method,
