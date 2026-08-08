@@ -43,7 +43,7 @@ if [[ -z "${NVIDIA_API_KEY:-}" ]]; then
   echo "Reminder: export NVIDIA_API_KEY before running to enable NeMo Data Designer." >&2
 fi
 
-mkdir -p data/training models checkpoints
+mkdir -p ai/data/training models checkpoints
 mkdir -p ai/dataset_pipeline/prompt_corpus
 mkdir -p ai/pipelines/edge_case_pipeline_standalone/output
 mkdir -p ai/training_ready/data/training_data_consolidated/final

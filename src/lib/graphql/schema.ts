@@ -204,8 +204,8 @@ export const typeDefs = /* GraphQL */ `
 
     "Emotion analyses for this session (owned by ai-inference-service)"
     emotions: [EmotionAnalysis!]! @auth
-    "Conversation turns for this session (in-memory, may be empty)"
-    turns: [ConversationTurn!]! @auth
+    "Conversation turns for this session"
+    turns(limit: Int, offset: Int): [ConversationTurn!]! @auth
   }
 
   # ──────────────────────────────────────────────

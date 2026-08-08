@@ -30,17 +30,17 @@ function getCacheControl(rule: VercelHeaderRule): string | undefined {
 
 function isNoStoreRule(rule: VercelHeaderRule): boolean {
   const cc = getCacheControl(rule)
-  return cc !== undefined && cc.includes('no-store')
+  return cc?.includes('no-store') ?? false
 }
 
 function isImmutableRule(rule: VercelHeaderRule): boolean {
   const cc = getCacheControl(rule)
-  return cc !== undefined && cc.includes('immutable')
+  return cc?.includes('immutable') ?? false
 }
 
 function isSWRRule(rule: VercelHeaderRule): boolean {
   const cc = getCacheControl(rule)
-  return cc !== undefined && cc.includes('stale-while-revalidate')
+  return cc?.includes('stale-while-revalidate') ?? false
 }
 
 describe('PIX-4062: Vercel Edge Cache Rules', () => {
