@@ -73,78 +73,73 @@ const buildableScenarios = [
           </div>
         </div>
 
-        <!-- Chat conversation demo — raw transcript style, not bubbles -->
+        <!-- Practice room — transcript as clinical artifact -->
         <aside
           class="np-chat-demo"
           aria-label="Example therapy conversation on the platform"
           role="region"
         >
-          <div class="np-chat-demo__header">
-            <span class="np-chat-demo__label">Session transcript</span>
-            <span class="np-chat-demo__status"
-              >Scenario 03 · Rupture repair</span
-            >
+          <div class="np-chat-demo__file-header">
+            <span class="np-chat-demo__file-label">transcript.run</span>
+            <span class="np-chat-demo__file-id">S-03 // rupture-repair</span>
           </div>
 
           <div class="np-chat-demo__messages">
             <div class="np-chat-demo__entry">
-              <span class="np-chat-demo__sender">Client — Sarah</span>
-              <p>
+              <span class="np-chat-demo__speaker">S.</span>
+              <p class="np-chat-demo__line">
                 I&#39;ve been thinking about whether this is really working for
                 me.
               </p>
             </div>
 
             <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
-              <span class="np-chat-demo__sender">Trainee</span>
-              <p>
+              <span class="np-chat-demo__speaker">T.</span>
+              <p class="np-chat-demo__line">
                 It sounds like you&#39;re not sure this is the right place. What
                 feels off?
               </p>
             </div>
 
             <div class="np-chat-demo__entry">
-              <span class="np-chat-demo__sender">Client — Sarah</span>
-              <p>
+              <span class="np-chat-demo__speaker">S.</span>
+              <p class="np-chat-demo__line">
                 I don&#39;t know. I just feel like I&#39;m not getting anywhere.
               </p>
             </div>
 
             <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
-              <span class="np-chat-demo__sender">Trainee</span>
-              <p>
+              <span class="np-chat-demo__speaker">T.</span>
+              <p class="np-chat-demo__line">
                 That&#39;s worth sitting with. Can you tell me what
                 &ldquo;getting somewhere&rdquo; would look like?
               </p>
             </div>
 
             <div class="np-chat-demo__entry">
-              <span class="np-chat-demo__sender">Client — Sarah</span>
-              <p>
+              <span class="np-chat-demo__speaker">S.</span>
+              <p class="np-chat-demo__line">
                 I guess&hellip; I thought I&#39;d feel different by now. Like
                 something would click.
               </p>
             </div>
 
             <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
-              <span class="np-chat-demo__sender">Trainee</span>
-              <p>
+              <span class="np-chat-demo__speaker">T.</span>
+              <p class="np-chat-demo__line">
                 It makes sense to expect change to feel more obvious. Let&#39;s
                 look at what has shifted&mdash;even the small things.
               </p>
             </div>
           </div>
 
-          <div class="np-chat-demo__typing" aria-hidden="true">
-            <span class="np-chat-demo__dot"></span>
-            <span class="np-chat-demo__dot"></span>
-            <span class="np-chat-demo__dot"></span>
-            <span>Client is typing</span>
+          <div class="np-chat-demo__live" aria-hidden="true">
+            <span class="np-chat-demo__cursor">|</span>
+            <span class="np-chat-demo__live-text">live · s. composing</span>
           </div>
 
           <p class="np-chat-demo__note">
-            Simulated conversation&ensp;&middot;&ensp;Trainee responds to an AI
-            client
+            simulated&ensp;&middot;&ensp;trainee responds to an ai client
           </p>
         </aside>
       </div>
