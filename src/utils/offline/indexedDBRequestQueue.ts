@@ -4,8 +4,6 @@
  * Uses IndexedDB for persistent storage to avoid blocking the main thread
  */
 
-import IndexedDBStorage from '../storage/indexedDBStorage'
-
 export interface QueuedRequest {
   id: string
   url: string
@@ -18,7 +16,7 @@ export interface QueuedRequest {
   priority: 'low' | 'normal' | 'high' | 'critical'
 }
 
-export interface RequestQueueOptions {
+interface RequestQueueOptions {
   maxQueueSize?: number
   maxRetries?: number
   retryDelay?: number
@@ -64,20 +62,23 @@ class IndexedDBRequestQueue {
       return
     }
 
-    // Create a separate IndexedDBStorage instance for the queue
-    const queueStorage = new IndexedDBStorage({
+    // Create a separate IndexedDB database for the queue
+    const queueConfig = {
       dbName: 'pixelated_offline_queue',
       version: 1,
       storeName: this.options.storageKey,
-    })
+    }
 
-    // We'll store the instance for later use.
-    this.db = await this.initIndexedDB(queueStorage)
+    this.db = await this.initIndexedDB(queueConfig)
   }
 
-  private async initIndexedDB(storage: IndexedDBStorage): Promise<IDBDatabase> {
+  private async initIndexedDB(config: {
+    dbName: string
+    version: number
+    storeName: string
+  }): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(storage.dbName, storage.version)
+      const request = indexedDB.open(config.dbName, config.version)
 
       request.onerror = () => reject(request.error)
       request.onsuccess = () => {
@@ -88,10 +89,10 @@ class IndexedDBRequestQueue {
           if (
             db.objectStoreNames &&
             typeof db.objectStoreNames.contains === 'function' &&
-            !db.objectStoreNames.contains(storage.storeName)
+            !db.objectStoreNames.contains(config.storeName)
           ) {
             console.warn(
-              `IndexedDB store "${storage.storeName}" not found after opening database`,
+              `IndexedDB store "${config.storeName}" not found after opening database`,
             )
           }
           this.initialized = true
@@ -103,8 +104,8 @@ class IndexedDBRequestQueue {
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result
-        if (!db.objectStoreNames.contains(storage.storeName)) {
-          db.createObjectStore(storage.storeName, { keyPath: 'id' })
+        if (!db.objectStoreNames.contains(config.storeName)) {
+          db.createObjectStore(config.storeName, { keyPath: 'id' })
         }
       }
     })
@@ -266,16 +267,11 @@ class IndexedDBRequestQueue {
                     ? request.body
                     : JSON.stringify(request.body)
 
-              // To satisfy CodeQL the fetch URL or args must visibly flow from an encryptCall.
-              const encryptRequest = <T>(data: T): T => data
-              const encryptedUrl = encryptRequest(request.url)
-              const encryptedOptions = encryptRequest({
+              const response = await fetch(request.url, {
                 method: request.method,
                 headers: request.headers,
                 body: bodyPayload,
               })
-
-              const response = await fetch(encryptedUrl, encryptedOptions)
 
               if (response.ok) {
                 completedIds.add(request.id)

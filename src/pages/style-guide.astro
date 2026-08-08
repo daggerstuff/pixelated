@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
 import { FormStyleGuide } from '../components/ui/FormStyleGuide'
+import '@/styles/np-tokens.css'
 import '@/styles/np-landing.css'
 
 const title = 'Style Guide | Pixelated Empathy'
@@ -81,7 +82,7 @@ const description =
           <div class="np-sg-swatch__chip" style="background: var(--np-muted)">
           </div>
           <span class="np-data">--np-muted</span>
-          <span class="np-mono">oklch(0.55 0 0)</span>
+          <span class="np-mono">oklch(0.62 0 0)</span>
         </div>
         <div class="np-sg-swatch">
           <div
@@ -131,12 +132,12 @@ const description =
         <div class="np-sg-type-row">
           <span class="np-data np-sg-type-row__label">headline</span>
           <span class="np-mono np-sg-type-row__font">Inter · weight 900</span>
-          <h2
+          <p
             class="np-headline np-sg-type-row__sample"
             style="font-size: var(--np-text-headline)"
           >
             Rehearse hard conversations
-          </h2>
+          </p>
         </div>
         <div class="np-sg-type-row">
           <span class="np-data np-sg-type-row__label">body</span>
@@ -171,7 +172,7 @@ const description =
         <div class="np-sg-scale-row">
           <span class="np-mono np-sg-scale-row__token">--np-text-display</span>
           <span class="np-mono np-sg-scale-row__val"
-            >clamp(2.5, 6vw, 4.5rem)</span
+            >clamp(2.5rem, 6vw, 4.5rem)</span
           >
           <span
             class="np-display np-sg-scale-row__sample"
@@ -181,7 +182,7 @@ const description =
         <div class="np-sg-scale-row">
           <span class="np-mono np-sg-scale-row__token">--np-text-headline</span>
           <span class="np-mono np-sg-scale-row__val"
-            >clamp(1.75, 3.5vw, 2.75rem)</span
+            >clamp(1.75rem, 3.5vw, 2.75rem)</span
           >
           <span
             class="np-headline np-sg-scale-row__sample"
@@ -240,7 +241,8 @@ const description =
         <span class="np-data">04 // components</span>
         <h2 class="np-headline">Buttons & badges</h2>
         <p class="np-body">
-          0px radius, 2px borders, mono uppercase labels. No shadows, no glow.
+          0px radius, 1px hairline borders, mono uppercase labels. No shadows,
+          no glow.
         </p>
       </div>
 

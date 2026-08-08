@@ -202,7 +202,7 @@
 .np-btn-ghost {
   background: transparent;
   color: var(--np-text);
-  border: 2px solid var(--np-line-strong);
+  border: 1px solid var(--np-line-strong);
 }
 .np-btn-ghost:hover {
   background: var(--np-elevated);
