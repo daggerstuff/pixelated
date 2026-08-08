@@ -44,8 +44,8 @@ export interface CausalDagService {
 }
 
 export class DefaultCausalDagService implements CausalDagService {
-  private nodes: Map<string, CausalNode> = new Map()
-  private edges: Map<string, Map<string, number>> = new Map()
+  private readonly nodes: Map<string, CausalNode> = new Map()
+  private readonly edges: Map<string, Map<string, number>> = new Map()
 
   addNode(id: string, metadata?: Record<string, unknown>): void {
     if (this.nodes.has(id)) {

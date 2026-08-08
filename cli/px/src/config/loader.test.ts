@@ -84,7 +84,7 @@ describe('loadConfig', () => {
     )
 
     const { config, sources } = loadConfig(tempDir)
-    expect(config.agents.advisor!.endpoint).toBe('http://override:3000')
+    expect(config.agents.advisor.endpoint).toBe('http://override:3000')
     expect(sources.length).toBe(2)
   })
 

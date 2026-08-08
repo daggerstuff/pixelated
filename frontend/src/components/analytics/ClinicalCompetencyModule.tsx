@@ -33,7 +33,7 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
     const point: any = { state: state.split('→')[0].trim() }
     cohorts.forEach((cohort, i) => {
       const match = data.find((d) => d.state === state && d.cohort === cohort)
-      if (match) point[cohort || 'All'] = match.medianTimeSeconds
+      if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
     })
     return point
   })
@@ -81,7 +81,7 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
                 <Line
                   key={cohort}
                   type="monotone"
-                  dataKey={cohort || 'All'}
+                  dataKey={cohort ?? 'All'}
                   stroke={colors[i]}
                   strokeWidth={2}
                   dot={{ r: 3 }}

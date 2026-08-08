@@ -46,7 +46,7 @@ const PHASE_TO_INFLUENCE: Record<ReveriePhase, number> = {
 }
 
 export class SoftInjector {
-  private config: ReverieConfig
+  private readonly config: ReverieConfig
   private activeReveries: ReverieVector[] = []
   private messageCounter: number = 0
 

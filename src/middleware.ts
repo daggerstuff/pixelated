@@ -109,6 +109,37 @@ function getRouteConfig(request: Request): RouteConfig | null {
 const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
   async (context, next) => {
     const { request } = context
+
+    // E2E test-auth bypass — ONLY active when E2E_TEST_AUTH=1 (set exclusively
+    // in the bias-detection CI workflow). Lets Playwright exercise the admin
+    // dashboard end-to-end without an Auth0 tenant: the test cookie is issued
+    // by POST /api/auth/signin when it accepts the seeded test credentials.
+    // Never activate in production: the env var is not set there, and the
+    // cookie value is never minted by any real auth path. NODE_ENV=test is a
+    // second gate so a stray env var can never open an admin backdoor.
+    if (
+      process.env['E2E_TEST_AUTH'] === '1' &&
+      process.env['NODE_ENV'] === 'test'
+    ) {
+      const cookieHeader = request.headers.get('cookie') ?? ''
+      if (cookieHeader.includes('auth-token=e2e-test-admin')) {
+        const e2eUser = {
+          id: 'e2e-test-admin',
+          email: 'test@example.com',
+          emailVerified: true,
+          role: 'admin',
+          fullName: 'E2E Test Admin',
+        }
+        context.locals.user = e2eUser
+        context.locals.session = {
+          id: 'e2e-test-session',
+          userId: 'e2e-test-admin',
+          expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+        }
+        return next()
+      }
+    }
+
     const routeConfig = getRouteConfig(request)
 
     // Allow non-protected routes through quickly
