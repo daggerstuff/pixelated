@@ -5,7 +5,7 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.15" # Python 3.15 is not yet released; unbounded requires-python made Dependabot resolve unresolvable 3.15 splits
 dependencies = [
   "flask[async]", # self-bundle (`asgiref` adds async to `flask`); NOT a flat-deps marker — see IMPORTANT note
   "flask-cors>=6.0.2", # Updated to latest secure version
