@@ -323,7 +323,7 @@ requires-dist = [
     { name = "fonttools", specifier = ">=4.61.0" },
     { name = "gunicorn", specifier = ">=22.0.0" },
     { name = "httpx", specifier = ">=0.28.1" },
-    { name = "keras", specifier = ">=3.12.0" },
+    { name = "keras", specifier = ">=3.15.0" },
     { name = "lime", specifier = ">=0.2.0" },
     { name = "nltk", specifier = ">=3.10.0" },
     { name = "numba", specifier = ">=0.57.0" },
