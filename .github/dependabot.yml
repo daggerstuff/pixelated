@@ -246,3 +246,83 @@ updates:
           - '*'
         update-types:
           - 'major'
+
+  # UV - Daily security updates (pyproject.toml + uv.lock)
+  - package-ecosystem: 'uv'
+    directory: '/'
+    schedule:
+      interval: 'daily'
+      time: '03:00'
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: '/'
+    rebase-strategy: 'auto'
+    commit-message:
+      prefix: 'chore(deps):'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'python'
+      - 'uv'
+    groups:
+      uv:
+        patterns:
+          - '*'
+    ignore:
+      # cryptography 50 conflicts with data-designer-engine caps (<=49) until NeMo
+      # ships a release compatible with cryptography 50.
+      - dependency-name: 'cryptography'
+        update-types:
+          - 'version-update:semver-patch'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-major'
+      # Security patches through 1.6.x pin pypdf~=6.10.1; project requires
+      # pypdf>=6.14.2 for CVE fixes. Upgrading local-deep-research to 1.8+
+      # conflicts with data-designer pandas/pyarrow constraints.
+      - dependency-name: 'local-deep-research'
+        update-types:
+          - 'version-update:semver-patch'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-major'
+
+  - package-ecosystem: 'uv'
+    directory: '/src/lib/ai/bias-detection/python-service'
+    schedule:
+      interval: 'daily'
+      time: '03:00'
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: '/'
+    rebase-strategy: 'auto'
+    commit-message:
+      prefix: 'chore(deps):'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'python'
+      - 'uv'
+    groups:
+      uv:
+        patterns:
+          - '*'
+
+  - package-ecosystem: 'uv'
+    directory: '/src/lib/ai/multimodal-bias-detection/python-service'
+    schedule:
+      interval: 'daily'
+      time: '03:00'
+    open-pull-requests-limit: 10
+    pull-request-branch-name:
+      separator: '/'
+    rebase-strategy: 'auto'
+    commit-message:
+      prefix: 'chore(deps):'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'python'
+      - 'uv'
+    groups:
+      uv:
+        patterns:
+          - '*'
