@@ -2,7 +2,7 @@
  * IndexedDB storage wrapper for offline-first scenarios.
  * Provides async key-value storage to complement synchronous StorageManager.
  */
-export interface IndexedDBStorageConfig {
+interface IndexedDBStorageConfig {
   dbName: string
   version: number
   storeName: string
@@ -13,9 +13,9 @@ export interface IndexedDBStorageConfig {
  * All methods return Promises for non-blocking operation.
  */
 class IndexedDBStorage {
-  private readonly dbName: string
-  private readonly version: number
-  private readonly storeName: string
+  public readonly dbName: string
+  public readonly version: number
+  public readonly storeName: string
   private db: IDBDatabase | null = null
   private initialized = false
 
@@ -165,14 +165,5 @@ class IndexedDBStorage {
     })
   }
 }
-
-/**
- * Default IndexedDB instance for pixelated offline storage.
- */
-export const pixelatedIndexedDB = new IndexedDBStorage({
-  dbName: 'pixelated_offline',
-  version: 1,
-  storeName: 'storage',
-})
 
 export default IndexedDBStorage
