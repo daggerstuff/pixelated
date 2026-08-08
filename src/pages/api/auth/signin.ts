@@ -20,6 +20,57 @@ export const POST = async ({
   request: Request
   clientAddress: string
 }) => {
+  // E2E test-auth bypass — ONLY active when E2E_TEST_AUTH=1 (set exclusively
+  // in the bias-detection CI workflow). Accepts the seeded test credentials
+  // and issues the cookie that src/middleware.ts trusts to grant an admin
+  // session. This lets the Playwright dashboard spec run without an Auth0
+  // tenant. Never activates in production: E2E_TEST_AUTH is unset there, and
+  // NODE_ENV=test is a second gate so a stray env var cannot open a backdoor.
+  if (
+    process.env['E2E_TEST_AUTH'] === '1' &&
+    process.env['NODE_ENV'] === 'test'
+  ) {
+    try {
+      const body = await request.json()
+      if (
+        body.email === 'test@example.com' &&
+        body.password === 'password123'
+      ) {
+        const headers = new Headers()
+        headers.set('Content-Type', 'application/json')
+        headers.append(
+          'Set-Cookie',
+          'auth-token=e2e-test-admin; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600',
+        )
+        return new Response(
+          JSON.stringify({
+            success: true,
+            user: {
+              id: 'e2e-test-admin',
+              email: 'test@example.com',
+              role: 'admin',
+              fullName: 'E2E Test Admin',
+            },
+            token: 'e2e-test-admin',
+          }),
+          { status: 200, headers },
+        )
+      }
+      return new Response(JSON.stringify({ error: 'Invalid credentials' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    } catch {
+      return new Response(
+        JSON.stringify({ error: 'Email and password are required' }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+  }
+
   let clientInfo
   try {
     // Extract client information
