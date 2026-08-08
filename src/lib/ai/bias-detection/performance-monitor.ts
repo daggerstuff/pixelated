@@ -46,7 +46,7 @@ function percentile(sorted: number[], p: number): number {
   if (lower === upper) return sorted[lower];
 
   const frac = rank - lower;
-  return sorted[lower]! * (1 - frac) + sorted[upper]! * frac;
+  return sorted[lower] * (1 - frac) + sorted[upper] * frac;
 }
 
 // ---------------------------------------------------------------------------
@@ -236,8 +236,8 @@ class PerformanceMonitor {
     const map: Record<string, { durations: number[]; errors: number }> = {};
     for (const r of recent) {
       if (!map[r.endpoint]) map[r.endpoint] = { durations: [], errors: 0 };
-      map[r.endpoint]!.durations.push(r.duration);
-      if (r.statusCode >= 400) map[r.endpoint]!.errors++;
+      map[r.endpoint].durations.push(r.duration);
+      if (r.statusCode >= 400) map[r.endpoint].errors++;
     }
 
     const breakdown: EndpointBreakdown = {};

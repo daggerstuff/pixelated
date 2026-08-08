@@ -142,7 +142,7 @@ describe('pingHealth', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       status: 200,
-    } as Response)
+    })
 
     const result = await pingHealth('http://localhost:2000', 5000)
     expect(result.ok).toBe(true)
@@ -154,7 +154,7 @@ describe('pingHealth', () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 503,
-    } as Response)
+    })
 
     const result = await pingHealth('http://localhost:2000', 5000)
     expect(result.ok).toBe(false)
@@ -182,7 +182,7 @@ describe('pingHealth', () => {
   })
 
   it('strips trailing slash from endpoint', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, status: 200 } as Response)
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 200 })
 
     await pingHealth('http://localhost:2000/', 5000)
     expect(mockFetch.mock.calls[0][0]).toBe(
@@ -191,7 +191,7 @@ describe('pingHealth', () => {
   })
 
   it('uses default timeout of 5000ms', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true, status: 200 } as Response)
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 200 })
 
     await pingHealth('http://localhost:2000')
     // Verify it was called (default timeout applied internally)
