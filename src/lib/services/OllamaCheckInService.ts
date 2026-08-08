@@ -6,31 +6,29 @@
  */
 
 export interface CheckInResult {
-  shouldContinue: boolean
-  improvements: ImprovementSuggestion[]
-  reasoningLog: string[]
-  decision: string
+  shouldContinue: boolean;
+  improvements: ImprovementSuggestion[];
+  reasoningLog: string[];
+  decision: string;
+  rawResponse?: string;
 }
 
 export interface ImprovementSuggestion {
-  id: string
-  suggestion: string
-  category: string
-  priority: string
+  id: string;
+  suggestion: string;
+  category: string;
+  priority: string;
 }
 
 export class OllamaCheckInService {
-  async performCheckIn(
-    _taskSummary: string,
-    _context: string,
-  ): Promise<CheckInResult> {
+  async performCheckIn(_taskSummary: string, _context: string): Promise<CheckInResult> {
     return {
       shouldContinue: true,
       improvements: [],
       reasoningLog: [],
-      decision: 'continue',
-    }
+      decision: "continue",
+    };
   }
 }
 
-export default OllamaCheckInService
+export default OllamaCheckInService;
