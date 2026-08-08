@@ -299,7 +299,7 @@
     "dompurify": "^3.4.13",
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
-    "eve": "^0.29.2",
+    "eve": "^0.30.6",
     "events": "latest",
     "express": "^5.2.1",
     "express-openid-connect": "^3.3.0",
