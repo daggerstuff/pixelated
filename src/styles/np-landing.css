@@ -2,30 +2,10 @@
    Dark-first, zero chroma, flat by doctrine.
    DESIGN.md: The Quiet Instrument */
 
-/* === Tokens (applied at :root when NP page exists so header/footer siblings inherit) === */
+/* === Tokens ===
+   Colors, type, and layout come from np-tokens.css at :root. Only the gutter is
+   overridden here: marketing pages run wider than app surfaces. */
 :root:has(.np-page) {
-  --np-bg: oklch(0.1 0 0);
-  --np-surface: oklch(0.14 0 0);
-  --np-elevated: oklch(0.18 0 0);
-  --np-hover: oklch(0.22 0 0);
-  --np-text: oklch(0.93 0 0);
-  /* muted nudged 0.55 -> 0.62 so body-weight copy clears WCAG AA (>=4.5:1)
-     against bg, surface, and elevated — the doctrine's contrast-verify mandate. */
-  --np-muted: oklch(0.62 0 0);
-  --np-mid: oklch(0.7 0 0);
-  --np-line: rgba(255, 255, 255, 0.06);
-  --np-line-strong: rgba(255, 255, 255, 0.12);
-
-  --np-font-display:
-    'Archivo Black', 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --np-font-body:
-    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif;
-  --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-
-  --np-content: 76rem;
-  --np-content-narrow: 55rem;
-  --np-gap: 24px;
   --np-pad: clamp(16px, 4vw, 40px);
 }
 
@@ -1237,19 +1217,6 @@
 }
 
 /* === Proof strip — no longer used here, keep for compat === */
-
-/* === Light mode === */
-:root[data-theme='light']:has(.np-page) {
-  --np-bg: oklch(0.98 0 0);
-  --np-surface: oklch(0.95 0 0);
-  --np-elevated: oklch(0.92 0 0);
-  --np-hover: oklch(0.88 0 0);
-  --np-text: oklch(0.15 0 0);
-  --np-muted: oklch(0.5 0 0);
-  --np-mid: oklch(0.4 0 0);
-  --np-line: rgba(0, 0, 0, 0.08);
-  --np-line-strong: rgba(0, 0, 0, 0.15);
-}
 
 /* === Content band === */
 .np-band {
