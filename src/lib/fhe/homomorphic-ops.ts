@@ -10,7 +10,7 @@
 import { createBuildSafeLogger } from "../logging/build-safe-logger";
 import { getEncryptedTextProcessor } from "./encrypted-text-processor";
 import { SealResourceScope } from "./seal-memory";
-import type { SealOperations } from "./seal-operations";
+import { SealOperations } from "./seal-operations";
 import { SealService } from "./seal-service";
 import type { SealCipherText } from "./seal-service";
 import { SealSchemeType } from "./seal-types";
@@ -222,9 +222,6 @@ export class HomomorphicOperations {
 
       // In client environment, initialize SEAL operations if client-side processing is enabled
       if (!isServer && this.enableClientSideProcessing) {
-        // use statically imported SealService
-        const { SealOperations } = await import("./seal-operations");
-
         const sealService = SealService.getInstance();
         await sealService.initialize(contextOptions);
 
@@ -237,9 +234,6 @@ export class HomomorphicOperations {
 
       // In server environment, initialize SEAL operations if server-side processing is enabled
       if (isServer && this.enableServerSideProcessing) {
-        // use statically imported SealService
-        const { SealOperations } = await import("./seal-operations");
-
         const sealService = SealService.getInstance();
         await sealService.initialize(contextOptions);
 
