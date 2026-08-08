@@ -18,6 +18,25 @@ export async function login(
   password: string = 'password123',
   rememberMe: boolean = false,
 ): Promise<void> {
+  // In CI the bias-detection workflow sets E2E_TEST_AUTH=1 on the app server.
+  // Authenticate via the test-auth signin API so Playwright receives the
+  // HttpOnly session cookie from Set-Cookie (addCookies alone does not match
+  // the server-issued cookie and leaves /admin routes unauthenticated).
+  if (process.env['E2E_TEST_AUTH'] === '1') {
+    const response = await page.request.post('/api/auth/signin', {
+      data: { email, password },
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    if (!response.ok()) {
+      throw new Error(
+        `E2E signin failed (${response.status()}): ${await response.text()}`,
+      )
+    }
+
+    return
+  }
+
   // Navigate to login page
   await page.goto('/login')
 
