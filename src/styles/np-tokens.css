@@ -16,7 +16,9 @@
   --np-hover: oklch(0.22 0 0); /* #383838 — Hover states */
   --np-active: oklch(0.16 0 0); /* #292929 — Active/pressed */
   --np-text: oklch(0.93 0 0); /* #ededed — Body, headings */
-  --np-muted: oklch(0.55 0 0); /* #8c8c8c — Labels, captions */
+  /* Lightness floor set by contrast, not taste: 0.62 is the lowest value that
+     clears WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
+  --np-muted: oklch(0.62 0 0); /* Labels, captions */
   --np-mid: oklch(0.7 0 0); /* #b3b3b3 — Enhanced muted */
   --np-line: rgba(255, 255, 255, 0.06); /* Borders, dividers */
   --np-line-strong: rgba(255, 255, 255, 0.12);
@@ -142,7 +144,9 @@
   --np-hover: oklch(0.89 0 0);
   --np-active: oklch(0.93 0 0);
   --np-text: oklch(0.15 0 0); /* #262626 */
-  --np-muted: oklch(0.55 0 0); /* #8c8c8c */
+  /* Lightness ceiling set by contrast: 0.48 is the highest value that clears
+     WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
+  --np-muted: oklch(0.48 0 0);
   --np-mid: oklch(0.45 0 0);
   --np-line: rgba(0, 0, 0, 0.08);
   --np-line-strong: rgba(0, 0, 0, 0.16);
