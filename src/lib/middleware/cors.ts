@@ -113,14 +113,30 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
   const origin = getRequestHeader(request, 'Origin')
   const hasApiKey = getRequestHeader(request, 'X-API-Key') !== undefined
 
+  // Same-origin requests (Origin host matches the request host) are never
+  // cross-origin, so CORS restrictions should not apply. This matters for
+  // self-hosted previews and CI (e.g. bias-detection E2E) where the production
+  // bundle is served from localhost but the browser still sends an Origin
+  // header on POST requests.
+  let isSameOrigin = false
+  if (origin) {
+    try {
+      isSameOrigin = new URL(origin).host === url.host
+    } catch {
+      // Malformed Origin header — treat as cross-origin
+      isSameOrigin = false
+    }
+  }
+
   try {
     // Process the request first to catch any errors
     const response = await next()
 
     // Apply CORS headers if origin is present
     if (origin) {
-      // Check if origin is allowed OR if request has an API key
-      const allowed = hasApiKey || isOriginAllowed(origin, config)
+      // Check if origin is allowed, is same-origin, or request has an API key
+      const allowed =
+        hasApiKey || isSameOrigin || isOriginAllowed(origin, config)
 
       if (allowed) {
         response.headers.set('Access-Control-Allow-Origin', origin)
