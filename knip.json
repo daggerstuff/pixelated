@@ -27,7 +27,8 @@
     "src/lib/middleware/csrf.ts",
     "src/lib/research/services/*.ts",
     "src/lib/fhe/exports.ts",
-    "src/lib/fhe/operations.ts"
+    "src/lib/fhe/operations.ts",
+    "src/utils/offline/offlineManager.ts"
   ],
   "project": [
     "src/**/*.{ts,tsx,js,jsx,astro}",
