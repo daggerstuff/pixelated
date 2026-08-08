@@ -581,9 +581,15 @@ jobs:
           DB_PASSWORD: ''
 
       - name: Run Playwright tests
-        run: pnpm e2e --project=chromium
+        run: >-
+          pnpm e2e tests/e2e/bias-detection-dashboard.spec.ts
+          tests/e2e/smoke/bias-detection-smoke.spec.ts --project=chromium
         env:
           NODE_ENV: test
+          # The app is already started by the "Start application" step; tell
+          # Playwright to reuse it instead of trying to start a second instance
+          # on port 4321.
+          DISABLE_PLAYWRIGHT_WEBSERVER: '1'
           DATABASE_URL: postgresql://postgres@localhost:5432/test_db
           PGUSER: postgres
           PGDATABASE: test_db
