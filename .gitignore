@@ -333,6 +333,11 @@ gha-creds-*.json
 .omx/
 .opencode/
 .qlty/
+.autobots-state/
+.lavish/
+autobots.toml
+context/
+models/
 .shared/
 .squad/
 skills-lock.json
