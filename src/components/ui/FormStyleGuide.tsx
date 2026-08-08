@@ -54,7 +54,7 @@ export function FormStyleGuide() {
           gap: 0.4rem;
         }
         .np-fsg__grid--1 {
-          grid-template-columns: 1fr;
+          grid-column: 1 / -1;
         }
 
         /* NP-styled labels */
@@ -155,14 +155,12 @@ export function FormStyleGuide() {
           cursor: not-allowed !important;
         }
         /* Outline/ghost variant */
-        .np-fsg button[class*='outline'],
-        .np-fsg button[class*='ghost'] {
+        .np-fsg .np-fsg__btn-ghost {
           background: transparent !important;
           color: var(--np-mid, #b3b3b3) !important;
           border-color: var(--np-line-strong, rgba(255,255,255,0.12)) !important;
         }
-        .np-fsg button[class*='outline']:hover,
-        .np-fsg button[class*='ghost']:hover {
+        .np-fsg .np-fsg__btn-ghost:hover {
           border-color: var(--np-text, #ededed) !important;
           color: var(--np-text, #ededed) !important;
           background: transparent !important;
@@ -226,8 +224,8 @@ export function FormStyleGuide() {
             <Label className="np-fsg__label" htmlFor="error-input">
               Input with error
             </Label>
-            <Input id="error-input" placeholder="invalid input" error />
-            <p className="np-fsg__error-text">this field is required</p>
+            <Input id="error-input" placeholder="invalid input" error aria-describedby="error-input-msg" />
+            <p id="error-input-msg" className="np-fsg__error-text">this field is required</p>
           </div>
 
           <div className="np-fsg__field">
@@ -406,7 +404,7 @@ export function FormStyleGuide() {
           </div>
 
           <div className="np-fsg__form-actions np-fsg__grid--1">
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline" className="np-fsg__btn-ghost">Cancel</Button>
             <Button>Submit</Button>
           </div>
         </form>

@@ -1,5 +1,7 @@
 export const heroContent = {
   title: 'Rehearse hard conversations before real clients.',
+  /** Substring of `title` rendered in mono to accent the clinical framing. */
+  titleAccent: 'hard conversations',
   subtitle:
     'Trainees practice therapy conversations with an AI client. Supervisors review the transcript and coach from what actually happened — not from memory.',
   metaDescription:

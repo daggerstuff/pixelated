@@ -379,12 +379,15 @@ export default defineConfig({
          * @param {Record<string, unknown> & { code?: string; message?: string }} warning
          */
         onwarn(warning, defaultHandler) {
-          if (
-            warning.code === 'SOURCEMAP_BROKEN' ||
-            warning.code === 'SOURCEMAP_ERROR' ||
-            (typeof warning.message === 'string' &&
-              warning.message.includes('Sourcemap is likely to be incorrect'))
-          ) {
+          const astroInternalPlugins = ['astro:build', 'astro:transitions']
+          const isAstroInternalSourcemapWarning =
+            astroInternalPlugins.includes(warning.plugin) &&
+            (warning.code === 'SOURCEMAP_BROKEN' ||
+              warning.code === 'SOURCEMAP_ERROR' ||
+              (typeof warning.message === 'string' &&
+                warning.message.includes('Sourcemap is likely to be incorrect')))
+
+          if (isAstroInternalSourcemapWarning) {
             return
           }
           defaultHandler?.(warning)
