@@ -156,7 +156,7 @@ function bayesianSurprise(
 // ─── FishhookDetector ─────────────────────────────────────────────────────
 
 export class FishhookDetector {
-  private config: ReverieConfig
+  private readonly config: ReverieConfig
   private idf: Map<string, number> | null = null
   private idfCorpus: string[] = []
 

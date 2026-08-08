@@ -34,7 +34,7 @@ let vapidKeys: Awaited<ReturnType<typeof generateVAPIDKeys>>
 let lastRequest: Request | null = null
 
 const server = setupServer(
-  http.post(`${endpoint}`, async ({ request }) => {
+  http.post(endpoint, async ({ request }) => {
     lastRequest = request
     return new Response(null, { status: 201, statusText: 'Created' })
   }),
@@ -104,7 +104,7 @@ describe('sendNotification integration (MSW)', () => {
     expect(publicKey).toBe(vapidKeys.publicKey)
 
     const [, claims64] = jwt.split('.')
-    const claims = JSON.parse(atob(claims64!))
+    const claims = JSON.parse(atob(claims64))
     expect(claims.aud).toBe(new URL(endpoint).origin)
     expect(claims.sub).toBe('mailto:admin@example.com')
   })
