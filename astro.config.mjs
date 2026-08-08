@@ -470,8 +470,7 @@ export default defineConfig({
               // applies to the client environment. Without propagation, sourcemap
               // warnings from Astro's internal plugins (astro:build,
               // astro:transitions) leak through in the other environments.
-              const topLevelOnwarn =
-                config.build?.rollupOptions?.onwarn
+              const topLevelOnwarn = config.build?.rollupOptions?.onwarn
               if (typeof topLevelOnwarn === 'function') {
                 env.build ??= {}
                 env.build.rollupOptions ??= {}
