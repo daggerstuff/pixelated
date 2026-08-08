@@ -33,8 +33,10 @@ export async function login(
   // Submit the form
   await page.click('button[type="submit"]')
 
-  // Wait for navigation to complete
-  await page.waitForNavigation({ waitUntil: 'networkidle' })
+  // Avoid networkidle — SPAs with polling/WebSockets never reach it and hang CI.
+  await page.waitForURL((url) => !url.pathname.endsWith('/login'), {
+    timeout: 15000,
+  })
 }
 
 /**
@@ -49,7 +51,7 @@ export async function logout(page: Page): Promise<void> {
   await page.click('[data-testid="logout-button"]')
 
   // Wait for logout to complete and redirect
-  await page.waitForNavigation({ waitUntil: 'networkidle' })
+  await page.waitForURL(/^\/(login|index\.html)?$/, { timeout: 15000 })
 
   // Verify we're logged out (redirected to login or homepage)
   await expect(page).toHaveURL(/^\/(login|index\.html)?$/)
