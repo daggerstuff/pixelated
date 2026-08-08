@@ -525,7 +525,7 @@ jobs:
           PYTHON_PID=$!
           echo "Started Python service with PID: $PYTHON_PID"
           echo "Waiting for Python service to be ready..."
-          MAX_RETRIES=20
+          MAX_RETRIES=60
           RETRY_COUNT=0
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
             if curl -sSf http://localhost:5000/health > /dev/null 2>&1; then
@@ -546,6 +546,7 @@ jobs:
         env:
           FLASK_ENV: testing
           ENV: ci
+          PORT: '5000'
           FLASK_SECRET_KEY: test-flask-secret
           ENCRYPTION_PASSWORD: test-encryption-password
           ENCRYPTION_SALT: test-encryption-salt
