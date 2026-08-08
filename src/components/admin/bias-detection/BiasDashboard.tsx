@@ -192,10 +192,7 @@ interface TrendItem extends BaseFilterableItem {
 }
 
 type FilterableData =
-  | BaseFilterableItem[]
-  | BiasAnalysisItem[]
-  | AlertItem[]
-  | TrendItem[]
+  BaseFilterableItem[] | BiasAnalysisItem[] | AlertItem[] | TrendItem[]
 
 // Tooltip props type
 interface TooltipProps {
@@ -783,7 +780,21 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         )
       }
 
-      const data = (await response.json()) as BiasDashboardData
+      const payload = (await response.json()) as
+        | ({ success?: boolean; data?: BiasDashboardData } & BiasDashboardData)
+        | BiasDashboardData
+
+      const data: BiasDashboardData =
+        'data' in payload && payload.data != null
+          ? payload.data
+          : (payload as BiasDashboardData)
+
+      if (!data.summary) {
+        throw new Error(
+          'Dashboard API returned an invalid payload (missing summary)',
+        )
+      }
+
       setDashboardData(data)
       setLastUpdated(new Date())
 
