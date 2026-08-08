@@ -146,6 +146,19 @@ export const rateLimitMiddleware = defineMiddleware(
         return next()
       }
 
+      // E2E test-auth mode (bias-detection CI workflow only): skip rate
+      // limiting entirely. The Playwright dashboard spec signs in once per
+      // test and the dashboard issues several /api/bias-detection/* requests
+      // per page load; the anonymous-IP budget (5/min) would 429 the suite.
+      // E2E_TEST_AUTH=1 is set exclusively in the CI workflow, so this branch
+      // never activates in production.
+      if (
+        process.env['E2E_TEST_AUTH'] === '1' &&
+        process.env['NODE_ENV'] === 'test'
+      ) {
+        return next()
+      }
+
       // Get client IP for rate limiting
       const clientIp =
         getRequestHeader(request, 'x-forwarded-for')?.split(',')[0].trim() ??
