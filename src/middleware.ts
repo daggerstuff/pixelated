@@ -115,12 +115,9 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
     // dashboard end-to-end without an Auth0 tenant: the test cookie is issued
     // by POST /api/auth/signin when it accepts the seeded test credentials.
     // Never activate in production: the env var is not set there, and the
-    // cookie value is never minted by any real auth path. NODE_ENV=test is a
-    // second gate so a stray env var can never open an admin backdoor.
-    if (
-      process.env['E2E_TEST_AUTH'] === '1' &&
-      process.env['NODE_ENV'] === 'test'
-    ) {
+    // cookie value is never minted by any real auth path. E2E_TEST_AUTH is
+    // only set in the bias-detection CI workflow.
+    if (process.env['E2E_TEST_AUTH'] === '1') {
       const cookieHeader = request.headers.get('cookie') ?? ''
       if (cookieHeader.includes('auth-token=e2e-test-admin')) {
         const e2eUser = {
