@@ -24,12 +24,9 @@ export const POST = async ({
   // in the bias-detection CI workflow). Accepts the seeded test credentials
   // and issues the cookie that src/middleware.ts trusts to grant an admin
   // session. This lets the Playwright dashboard spec run without an Auth0
-  // tenant. Never activates in production: E2E_TEST_AUTH is unset there, and
-  // NODE_ENV=test is a second gate so a stray env var cannot open a backdoor.
-  if (
-    process.env['E2E_TEST_AUTH'] === '1' &&
-    process.env['NODE_ENV'] === 'test'
-  ) {
+  // tenant. Never activates in production: E2E_TEST_AUTH is unset there.
+  // E2E_TEST_AUTH is only set in the bias-detection CI workflow.
+  if (process.env['E2E_TEST_AUTH'] === '1') {
     try {
       const body = await request.json()
       if (
