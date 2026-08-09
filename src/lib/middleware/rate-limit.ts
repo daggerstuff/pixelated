@@ -25,7 +25,7 @@ const RATE_LIMIT_MAX_REQUESTS = safeParseInt(
 )
 
 // Rate limit configuration for different API endpoints
-export interface RateLimitConfig {
+interface RateLimitConfig {
   /** Path pattern to match */
   path: string
   /** Rate limits by role */
@@ -151,11 +151,11 @@ export const rateLimitMiddleware = defineMiddleware(
       // test and the dashboard issues several /api/bias-detection/* requests
       // per page load; the anonymous-IP budget (5/min) would 429 the suite.
       // E2E_TEST_AUTH=1 is set exclusively in the CI workflow, so this branch
-      // never activates in production.
-      if (
-        process.env['E2E_TEST_AUTH'] === '1' &&
-        process.env['NODE_ENV'] === 'test'
-      ) {
+      // never activates in production. We intentionally do not also require
+      // NODE_ENV=test here: the preview server started via `pnpm start` after
+      // `pnpm build` may keep NODE_ENV=production while still running the CI
+      // workflow with E2E_TEST_AUTH=1.
+      if (process.env['E2E_TEST_AUTH'] === '1') {
         return next()
       }
 
