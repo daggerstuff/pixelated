@@ -425,7 +425,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "@vitest/coverage-v8": "^4.1.10",
     "@vitest/eslint-plugin": "latest",
-    "astro": "^7.1.5",
+    "astro": "^7.2.0",
     "astro-eslint-parser": "latest",
     "astro-robots-txt": "latest",
     "autoprefixer": "latest",
@@ -457,7 +457,7 @@
     "ioredis-mock": "latest",
     "js-base64": "latest",
     "jsdom": "latest",
-    "knip": "^6.31.0",
+    "knip": "^6.32.0",
     "lint-staged": "latest",
     "markdownlint": "latest",
     "markdownlint-cli": "latest",
@@ -509,7 +509,7 @@
     "vitest": "^4.1.10",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.118.0",
+    "wrangler": "^4.119.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
