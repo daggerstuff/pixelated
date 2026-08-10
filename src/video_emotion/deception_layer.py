@@ -9,8 +9,7 @@ def enrich_deception_score(event: EmotionEvent) -> EmotionEvent:
     """Enrich deception score with cross-modal misalignment signal.
 
     Future: fuse audio prosody, transcript sentiment, and facial AU streams.
-    Prototype: minimal boost on flagged events, clamp to [0, 1].
+    Prototype: pass-through — no amplification without cross-modal confirmation.
+    Amplifying on deception_flag alone would inflate scores from a single modality.
     """
-    if event.deception_flag:
-        event.score = min(1.0, event.score * 1.1)
     return event
