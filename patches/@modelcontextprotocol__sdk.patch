@@ -1,0 +1,45 @@
+diff --git a/dist/esm/shared/uriTemplate.js b/dist/esm/shared/uriTemplate.js
+index 2837ba826d5e62cc39f5f0931c22ff7012785718..896d96e4c5d3635c68bd802cfdf7d8dcf3589b0d 100644
+--- a/dist/esm/shared/uriTemplate.js
++++ b/dist/esm/shared/uriTemplate.js
+@@ -93,14 +93,14 @@ export class UriTemplate {
+         if (part.operator === '?' || part.operator === '&') {
+             const pairs = part.names
+                 .map(name => {
+-                const value = variables[name];
+-                if (value === undefined)
+-                    return '';
+-                const encoded = Array.isArray(value)
+-                    ? value.map(v => this.encodeValue(v, part.operator)).join(',')
+-                    : this.encodeValue(value.toString(), part.operator);
+-                return `${name}=${encoded}`;
+-            })
++                    const value = variables[name];
++                    if (value === undefined)
++                        return '';
++                    const encoded = Array.isArray(value)
++                        ? value.map(v => this.encodeValue(v, part.operator)).join(',')
++                        : this.encodeValue(value.toString(), part.operator);
++                    return `${name}=${encoded}`;
++                })
+                 .filter(pair => pair.length > 0);
+             if (pairs.length === 0)
+                 return '';
+@@ -181,7 +181,7 @@ export class UriTemplate {
+         const name = part.name;
+         switch (part.operator) {
+             case '':
+-                pattern = part.exploded ? '([^/]+(?:,[^/]+)*)' : '([^/,]+)';
++                pattern = part.exploded ? '([^/,]+(?:,[^/,]+)*)' : '([^/,]+)';
+                 break;
+             case '+':
+             case '#':
+@@ -191,7 +191,7 @@ export class UriTemplate {
+                 pattern = '\\.([^/,]+)';
+                 break;
+             case '/':
+-                pattern = '/' + (part.exploded ? '([^/]+(?:,[^/]+)*)' : '([^/,]+)');
++                pattern = '/' + (part.exploded ? '([^/,]+(?:,[^/,]+)*)' : '([^/,]+)');
+                 break;
+             default:
+                 pattern = '([^/]+)';

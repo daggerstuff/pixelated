@@ -1,0 +1,43 @@
+--- node_modules/@modelcontextprotocol/sdk/dist/esm/shared/uriTemplate.js	2025-10-13 09:34:42.864770613 -0400
++++ node_modules/.pnpm_patches/@modelcontextprotocol/sdk@1.25.1/dist/esm/shared/uriTemplate.js	2026-01-06 23:20:25.327631147 -0500
+@@ -93,14 +93,14 @@
+         if (part.operator === '?' || part.operator === '&') {
+             const pairs = part.names
+                 .map(name => {
+-                const value = variables[name];
+-                if (value === undefined)
+-                    return '';
+-                const encoded = Array.isArray(value)
+-                    ? value.map(v => this.encodeValue(v, part.operator)).join(',')
+-                    : this.encodeValue(value.toString(), part.operator);
+-                return `${name}=${encoded}`;
+-            })
++                    const value = variables[name];
++                    if (value === undefined)
++                        return '';
++                    const encoded = Array.isArray(value)
++                        ? value.map(v => this.encodeValue(v, part.operator)).join(',')
++                        : this.encodeValue(value.toString(), part.operator);
++                    return `${name}=${encoded}`;
++                })
+                 .filter(pair => pair.length > 0);
+             if (pairs.length === 0)
+                 return '';
+@@ -181,7 +181,7 @@
+         const name = part.name;
+         switch (part.operator) {
+             case '':
+-                pattern = part.exploded ? '([^/]+(?:,[^/]+)*)' : '([^/,]+)';
++                pattern = part.exploded ? '([^/,]+(?:,[^/,]+)*)' : '([^/,]+)';
+                 break;
+             case '+':
+             case '#':
+@@ -191,7 +191,7 @@
+                 pattern = '\\.([^/,]+)';
+                 break;
+             case '/':
+-                pattern = '/' + (part.exploded ? '([^/]+(?:,[^/]+)*)' : '([^/,]+)');
++                pattern = '/' + (part.exploded ? '([^/,]+(?:,[^/,]+)*)' : '([^/,]+)');
+                 break;
+             default:
+                 pattern = '([^/]+)';
