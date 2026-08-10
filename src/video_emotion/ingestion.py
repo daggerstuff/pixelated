@@ -11,8 +11,11 @@ def extract_frames(video_path: str, fps_target: int = 30) -> list[AUFrame]:
     """Extract frames from video at target FPS.
 
     Returns list of AUFrame with timestamp_ms only (no AU scores yet).
-    Returns empty list if video cannot be opened.
+    Returns empty list if video cannot be opened or fps_target is invalid.
     """
+    if fps_target <= 0:
+        return []
+
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
         return []
