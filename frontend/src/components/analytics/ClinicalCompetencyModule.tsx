@@ -44,7 +44,11 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
         <CardTitle className="text-sm">State Transition Velocity</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-64" role="region" aria-label="State transition velocity chart">
+        <div
+          className="h-64"
+          role="region"
+          aria-label="State transition velocity chart"
+        >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
