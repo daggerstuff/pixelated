@@ -2,6 +2,9 @@
 // Type system: Archivo Black for display (brutalist, wide, heavy),
 // Inter for titles/body (readable sans), JetBrains Mono for data/labels/chrome.
 import '@/lib/fonts'
+/* Astro-palette base tokens (AGPL import-only CSS, no .astro source copied) */
+/* style.css is loaded via <link> in <head> — public assets must not be
+   imported through Astro frontmatter (Vite build resolution failure). */
 import '@/styles/np-tokens.css'
 import '@/styles/marketing.css'
 import '@/styles/fm-fusion.css'
@@ -137,6 +140,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <link rel="icon" href={withBasePath('/favicon.ico')} />
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
+    <link rel="stylesheet" href={withBasePath('/css/style.css')} />
     <title>{fullTitle}</title>
 
     <meta property="og:type" content={ogType} />
@@ -157,6 +161,8 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <script is:inline nonce={cspNonce}>
       const storedTheme = localStorage.getItem('theme')
       document.documentElement.dataset['theme'] = storedTheme || 'dark'
+      const storedPalette = localStorage.getItem('palette') || 'herdr'
+      document.documentElement.dataset['palette'] = storedPalette
     </script>
     <script
       is:inline
@@ -282,6 +288,19 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
           new CustomEvent('theme-changed', { detail: { theme: next } }),
         )
       })
+      // Palette cycle: 18 palettes; click to cycle through list
+      const palettes = ['herdr','catppuccin','catppuccin-latte','terminal','tokyo-night','tokyo-night-day','dracula','nord','gruvbox','gruvbox-light','one-dark','one-light','solarized','solarized-light','kanagawa','kanagawa-lotus','rose-pine','rose-pine-dawn','vesper']
+      const paletteBtn = document.querySelector('[data-palette-toggle]') || document.querySelector('[data-theme-toggle]')
+      if (paletteBtn) {
+        paletteBtn.addEventListener('dblclick', () => {
+          const current = document.documentElement.dataset['palette'] || 'herdr'
+          const idx = palettes.indexOf(current)
+          const next = palettes[(idx + 1) % palettes.length]
+          document.documentElement.dataset['palette'] = next
+          localStorage.setItem('palette', next)
+          window.dispatchEvent(new CustomEvent('palette-changed', { detail: { palette: next } }))
+        })
+      }
     </script>
   </body>
 </html>

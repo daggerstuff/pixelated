@@ -1,53 +1,128 @@
+# =============================================================================
+# .gitignore — Pixelated Empathy
+# Consolidated, grouped, sorted. Negation patterns (!) MUST come AFTER
+# the broad pattern they undo — later lines override earlier ones.
+# =============================================================================
+
 # === IDE & EDITORS ===
-.claude/
-.continue-here.md
-.crush/
-.cursor/
-.gemini/
-.Jules/
-.letta/
-.omg/
-.pnpm-store/
-.qwen/
-.serena/
-.sonarlint/
-.vscode/
-.vercel/
+.idea/
 .kiro/
-.omo/
-.claude-octopus/
-.geminiignore/
 .kiro_tmp/
-.oxlintignore/
-.superpowers/
-.ralph-tui
-.factory/
+.vscode/
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# === AI / LLM AGENTS & TOOLS ===
+.agents/
+.antigravitycli/
 .art/
-.openhands/
-.tokensave/
+.baselines/
+.claude/
+.claude-octopus/
+.clawhub
+.clinerules
+.cm
+.codex/
+.commandcode
+.continue-here.md
+.copilot/
+.crush/
+.dmctn/
+.eve/
+.factory/
+.foresight
+.gemini/
+.geminiignore/
+.goose/
+.impeccable
+.Jules/
+.kilocode
+.kimiflare
+.kilo
+.letta/
+.lavish/
+.mastracode/
+.mcp.json
+.mcp.json.tmp
+.moderne/
 .neon
+.omc
+.omo/
+.omg/
+.omx/
+openhands/
+.opencode/
+.oxlintignore/
+.pi/
+.playwright-mcp
+.qlty/
+.qwen/
+.ralph-tui
+.rsync-exclude
+.scannerwork
+.scrapy
+.serena/
+.shared/
+.sisyphus/
+.skillroute
+.sonarlint/
+.squad/
+.squad-workstream
+.superpowers/
+.swarm/
+.tokensave/
+.vercel/
+.windsurf
+.autobots-state/
+autobots.toml
+**/AGENTS.md
+CLAUDE.md
+DESIGN.md
 hackathon/
+HANDOFF.md
+id_ed25519
+id_rsa
+job.md
+KIMI.md
+PRODUCT.md
+scratch
 skills/
+skills-lock.json
+struct-agent-key.json
+TASTES.md
+test.md
+__mocks__
+
+# Squad runtime state
+.squad/decisions/inbox/
+.squad/log/
+.squad/orchestration-log/
+.squad/sessions/
 
 # === VIRTUAL ENVIRONMENTS ===
-**/.git_ignore/**
-**/.git_disabled/**
-**/.venv/
-**/conda_env/
-**/env/
-**/venv/
 .autoswitch_venv
 .envrc
 .venv
 .venv-churner
+**/.venv/
+**/.git_disabled/**
+**/.git_ignore/**
+**/conda_env/
+**/env/
+**/venv/
 
-# === PYTHON CACHES & BUILD ===
+# === PYTHON ===
 *$py.class
-**/__pycache__/
 *.egg
 *.egg-info/
 *.py[cod]
 *.pyc
+*.pyd
+*.pyo
 *.so
 .coverage
 .coverage.*
@@ -59,45 +134,85 @@ skills/
 .tox/
 MANIFEST
 
-# === DATA DIRECTORY (GENERATED FILES) ===
-data/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-local_settings.py
-parts/
-run_all.py
-sdist/
-share/python-wheels/
-wheels/
-
 # === NODE.JS & FRONTEND ===
+*.tsbuildinfo
 .nyc_output/
-/.vite/
-/.vite/deps/
-/dist/
-/dist/bundle-analysis.html
-/npm-debug.log*
-/playwright-report-browser-compat
-/playwright-report/
-/playwright/.cache/
+.pnpm-store/
+/node_modules/
 /pnpm-debug.log*
+/npm-debug.log*
 /yarn-debug.log*
 /yarn-error.log*
-node_modules/
+/playwright-report/
+/playwright-report-browser-compat
+/playwright/.cache/
+/playwright/.auth/
+/blob-report/
+/.vite/
 tsconfig.json.backup
 verbose/coverage/
 
+# === BUILD OUTPUT & DIST ===
+*.manifest
+*.node
+*.spec
+/.astro
+/.bin
+/.output
+/.python
+/.vite/deps/
+/artifacts/
+/bin/
+/build/
+/data/
+dist/
+develop-eggs/
+downloads/
+eggs/
+parts/
+sdist/
+share/python-wheels/
+wheels/
+bundle-analysis.html
+**/.output/
+
 # === DATABASES & LOGS ===
 *.db
+*.dump
 *.log
-/*.log
-/Thumbs.db*
 db.sqlite3
 db.sqlite3-journal
+memory.db-shm
+memory.db-wal
 nohup.out
+
+# === SECRETS & ENVIRONMENT ===
+# Broad ignore first, then negate specific files to track.
+# Negations MUST come AFTER .env* or they get re-ignored.
+.env*
+.flaskenv*
+*.key
+*.p12
+*.pem
+*.pfx
+alloy-helm-values.yaml
+alloy-key.json
+credentials.json
+gusher-pix.json
+infra/sinker/caddy/oauth2-proxy-cfg.env
+secrets.json
+sp-cert.pem
+sp-key.pem
+*service-connection*.json
+/secrets.*.json
+config/secrets/*
+# Negations
+!.env.example
+!.env.project
+!.env.vault
+!config/secrets/*.example
+!config/secrets/README.md
+!config/secrets/.gitignore
 
 # === ARCHIVES, MEDIA & BINARIES ===
 *.7z
@@ -105,6 +220,8 @@ nohup.out
 *.avi
 *.backup
 *.deb
+*.dll
+*.dylib
 *.exe
 *.flac
 *.flv
@@ -115,13 +232,14 @@ nohup.out
 *.mp4
 *.pack
 *.pkg
+*.sql.gz
 *.tar.gz
 *.wav
 *.webm
 *.wmv
 *.zip
 
-# === ML, AI & DATA ===
+# === ML / AI MODEL FILES & DATA ===
 *.bin
 *.ckpt
 *.h5
@@ -130,7 +248,6 @@ nohup.out
 *.model
 *.onnx
 *.pickle
-.pi/
 *.pkl
 *.pt
 *.pth
@@ -148,45 +265,15 @@ processed/
 test_write.txt
 therapeutic_ai_final_stage1/
 training_ready/
+unsloth_compiled_cache/
 val_loss_full_curve.csv
 wandb/
 wandb_hist.csv
 wandb_ver.txt
 zthgquiz_history.json
-unsloth_compiled_cache/
+ai/data/
 
-# === SECRETS & ENVIRONMENT ===
-!.env.example
-!.env.project
-!.env.vault
-!config/secrets/*.example
-!config/secrets/README.md
-!config/secrets/.gitignore
-config/secrets/*
-.env*
-.env.sentry-build-plugin
-.flaskenv*
-/.env
-/.env.development
-/.env.local
-/.env.production
-/.env.staging
-/.env.test
-/*.env.*
-alloy-key.json
-alloy-helm-values.yaml
-*.key
-*.p12
-*.pem
-*.pfx
-*service-connection*.json
-/secrets.*.json
-sp-cert.pem
-sp-key.pem
-
-# === TERRAFORM, INFRA & CLOUD ===
-!terraform/gcp/terraform.tfvars.example
-/.azure-artifacts/
+# === TERRAFORM & INFRA ===
 **/.terraform/
 **/.terraform.lock.hcl
 **/*.tfplan
@@ -196,12 +283,14 @@ sp-key.pem
 **/*.tfvars.json
 **/terraform.tfvars
 **/terraform.tfvars.json
-
-# k8s runtime secrets generated by CI/deploy scripts
+!terraform/gcp/terraform.tfvars.example
+/.azure-artifacts/
 k8s/base/secrets.generated.yaml
 k8s/base/secrets.local.yaml
+postgres-sts.yaml
+values.yaml
 
-# === REPORTS, SCANS & MONITORING ===
+# === REPORTS, SCANS & TESTING ===
 .build-errors.md
 .codacy
 .osv-scanner.toml
@@ -213,10 +302,13 @@ k8s/base/secrets.local.yaml
 /test-results/
 config/test-results/
 config/playwright-report/
-# Test output files
 *_output.txt
 test_output.txt
 security-scan-artifacts
+coverage/
+cover/
+performance-results
+stats.html
 
 # === TEMP & CACHES ===
 .cache
@@ -229,76 +321,54 @@ security-scan-artifacts
 .tmp
 .webassets-cache
 tmp/
+.lighthouseci/
+lhci_temp_data/
+
+# === DOWNLOADED CLI TOOLS ===
+ngc-cli.md5
+ngc-cli/
+aws/dist
+cf-workers/workers-ai-mcp
+notebooks
 
 # === PROJECT SPECIFIC & MISC ===
 .agent/
-.agents/
 .brv
 .endgame
 .memory/
 .notes/
-.scrapy
-.sisyphus/
-.windsurf
-.eve/
-/*.DS_Store*
-/.astro
-/.bin
-/bin/
-/.output
-/.python
-/.tsbuildinfo
-/*.iml
-*.dll
-*.dump
-*.dylib
-*.manifest
-*.node
-*.pyd
-*.pyo
-*.spec
-*.sql.gz
-artifacts/
-backups/
-browser-compatibility/
-bundle-analysis.html
+.NOTES.md
+.local-memory
+.metrics/
+.reports
+.uv-cache
+.test-coverage-analysis.md
+.security-audit-report.md
+/.security/
+/security/
+opencode.json
+patches
+launch_ovh_job.sh
+run_all.sh
+run_all.py
+local_settings.py
+screenshot_context.png
 codemap.md
-cover/
-coverage/
 deployment-backup
 deployment-backup*/
 drive/
 external/
 instance/
-launch_ovh_job.sh
-opencode.json
-patches
-performance-results
-postgres-sts.yaml
-run_all.sh
-run_all.py
-screenshot_context.png
+volumes/
+backups/
+browser-compatibility/
+foresight_cli
+foresight_mcp/
+ai/.moderne
 scripts/backup-home.sh
 scripts/home-backup.service
 scripts/home-backup.timer
 scripts/install-backup.sh
-stats.html
-values.yaml
-volumes/
-
-# === INTERNAL & PRIVATE ===
-/security/
-.ai/internal/plans
-.business-strategy/
-.goose/
-.local-memory
-.metrics/
-.playwright-mcp
-.reports
-.uv-cache
-.NOTES.md
-memory.db-shm
-memory.db-wal
 scripts/colab
 scripts/data/extract_youtube_transcripts.py
 scripts/data/run_pix30_academic_pulls.py
@@ -307,79 +377,19 @@ scripts/memory/run-shared-memory-service.sh
 scripts/run-simple-dataset-integration.py
 scripts/run-simple-integrated-pipeline.py
 scripts/run-standalone-integrated-pipeline.py
+scripts/hetzner
 scripts/*.ipynb
 tests/scripts/
-# === INTERNAL & PRIVATE ===
-/.security/
-.scannerwork
-.swarm/
-.test-coverage-analysis.md
-.security-audit-report.md
-
-# OpenMemory - IDE/Assistant specific rules
-gha-creds-*.json
-
-# Playwright
-/blob-report/
-/playwright/.auth/
-/config/playwright-report/
-/config/test-results/
-
-# === COPILOT CLI ===
-.copilot/
-.github/copilot/settings.local.json
-.github/mcp.json
-.moderne/
-.omx/
-.opencode/
-.qlty/
-.autobots-state/
-.lavish/
-autobots.toml
+package/bundle/
+sliced_output.worktrees/
+latest
+run_training.sh
 context/
 models/
-.shared/
-.squad/
-skills-lock.json
+agents.lock
+.agents/.gitignore
 
-**/AGENTS.md
-.cm
-.kilo
-__mocks__
-# Squad: ignore runtime state (logs, inbox, sessions)
-.squad/decisions/inbox/
-.squad/log/
-.squad/orchestration-log/
-.squad/sessions/
-# Squad: SubSquad activation file (local to this machine)
-.squad-workstream
-ai/.moderne
-
-.mcp.json
-.mcp.json.tmp
-HANDOFF.md
-
-# Temp symlinks
-latest
-
-.omc
-.foresight
-job.md
-test.md
-gusher-pix.json
-package/bundle/
-
-.antigravitycli/
-.ai/
-.codegraph/
-scratch
-sliced_output.worktrees/
-struct-agent-key.json
-id_rsa
-id_ed25519
-credentials.json
-secrets.json
-# Dataset assembly pipeline (large inventory files; keep docs and small reports)
+# Dataset assembly pipeline (large inventory files)
 data/assembly/local_inventory.json
 data/assembly/s3_inventory.json
 data/assembly/gdrive_scan_report.json
@@ -387,66 +397,21 @@ data/assembly/gdrive_scan.py
 data/assembly/borderline_report.json
 data/assembly/edge_case_report.json
 
-# Dataset staging (large files — assembled JSONL + provenance CSV)
+# Dataset staging (large assembled JSONL + provenance CSV)
 dataset_staging/
 
-# Lighthouse CI local output
-.lighthouseci/
-
-# LHCI temp storage
-lhci_temp_data/
-
-# Auto-generated by dotagents — do not commit these files.
-agents.lock
-.agents/.gitignore
-
-scripts/hetzner
-.Jules/
-.vercel
-HANDOFF.md
-infra/sinker/caddy/oauth2-proxy-cfg.env
-
-
-# === AGENT LOGS ===
-.codex/
-
-# === DOWNLOADED CLI TOOLS ===
-ngc-cli.md5
-ngc-cli/
-
-aws/dist
-cf-workers/workers-ai-mcp
-notebooks
-
-# Stray foresight_mcp/ dir (artifact, not source — submodule is foresight-mcp/)
-/foresight_mcp/
-.clawhub
-
-.commandcode
-foresight_cli
-.skillroute
-.kilocode
-.baselines
-.kimiflare
-run_training.sh
-.impeccable
-
-.clinerules
-.tokensave
-
-.dmctn/taste-skill-backups/2026-07-27T21-42-40-193Z
-CLAUDE.md
-.rsync-exclude
-DESIGN.md
-KIMI.md
-TASTES.md
-PRODUCT.md
-
-# Build output directories
-.output/
-**/.output/
-
-# Agent session dumps (large, unformatted; never commit)
+# Agent session dumps (large, unformatted)
 session-ses_*.md
 
-ai/data/
+# === BUSINESS STRATEGY (PRIVATE) ===
+.ai/
+.ai/internal/plans
+.business-strategy/
+.codegraph/
+
+# OpenMemory — IDE/Assistant credential files
+gha-creds-*.json
+
+# GitHub Copilot
+.github/copilot/settings.local.json
+.github/mcp.json
