@@ -1,15 +1,11 @@
-import type { APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 
 import { getCurrentUser } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-import {
-  AIMessage,
-  AIServiceOptions,
-  createLLMService,
-} from '../../../lib/ai/AIService'
-import { AIRepository } from '../../../lib/db/ai/repository'
-import { DocumentationService } from '../../../lib/documentation'
+import { AIMessage, AIServiceOptions, createLLMService } from '@/lib/ai/AIService'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { DocumentationSystem as DocumentationService } from '@/lib/documentation/DocumentationSystem'
 
 const logger = createBuildSafeLogger('documentation-api')
 
@@ -70,28 +66,20 @@ const aiService = {
       },
       provider: 'llm',
       content: result.content,
-    } as import('../../../lib/ai/models/ai-types').AICompletion
+    } as import('@/lib/ai/models/ai-types').AICompletion
   },
 }
-const documentationService = new (DocumentationService as any)(
-  repository,
-  aiService,
-)
+const documentationService = new DocumentationService(repository, aiService)
 
-export const POST = async ({ request }: any) => {
+interface GenerateDocRequestBody {
+  section?: string
+  options?: Parameters<typeof documentationService.generateDocumentation>[1]
+}
+
+export const POST: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
-    // To get cookies in Astro API route, use the request.headers
-    // We'll create a minimal cookies API compatible with getCurrentUser
-    const cookieHeader = request.headers.get('cookie') ?? ''
-    const cookies = {
-      get: (name: string) => {
-        const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))
-        return match ? { value: match[1] } : undefined
-      },
-    }
-
-    const user = await getCurrentUser(cookies as any)
+    const user = await getCurrentUser(request)
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -124,7 +112,7 @@ export const POST = async ({ request }: any) => {
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = (await request.json()) as GenerateDocRequestBody
     const { section, options } = body
 
     if (!section) {
@@ -171,3 +159,4 @@ export const POST = async ({ request }: any) => {
     )
   }
 }
+

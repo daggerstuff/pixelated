@@ -4792,7 +4792,10 @@ test = [
     { name = "types-requests" },
 ]
 video-emotion = [
+    { name = "numpy" },
     { name = "opencv-python" },
+    { name = "pandas" },
+    { name = "pydantic" },
 ]
 
 [package.dev-dependencies]
@@ -4895,13 +4898,15 @@ requires-dist = [
     { name = "nltk", specifier = ">=3.10.1" },
     { name = "numba", specifier = ">=0.63.1" },
     { name = "numpy" },
+    { name = "numpy", marker = "extra == 'video-emotion'" },
     { name = "onnx", specifier = ">=1.22.0" },
     { name = "onnxscript", specifier = ">=0.6.2" },
     { name = "openai", specifier = ">=2.53.0" },
     { name = "openai-whisper", specifier = ">=20250625" },
-    { name = "opencv-python", marker = "extra == 'video-emotion'", specifier = ">=4.10.0" },
+    { name = "opencv-python", marker = "extra == 'video-emotion'" },
     { name = "openpipe-art", specifier = ">=0.5.18" },
     { name = "pandas" },
+    { name = "pandas", marker = "extra == 'video-emotion'" },
     { name = "peft", specifier = ">=0.10.0" },
     { name = "pillow", specifier = ">=12.1.1" },
     { name = "pinecone-client", specifier = ">=6.0.0" },
@@ -4910,6 +4915,7 @@ requires-dist = [
     { name = "psutil", specifier = ">=7.0.0" },
     { name = "pyarrow", specifier = ">=22.0.0,<26" },
     { name = "pydantic", specifier = ">=2.12.5" },
+    { name = "pydantic", marker = "extra == 'video-emotion'", specifier = ">=2" },
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pygments", specifier = ">=2.20.0" },
     { name = "pyjwt", specifier = ">=2.13.0" },
