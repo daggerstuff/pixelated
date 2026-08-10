@@ -1,8 +1,5 @@
-import { AIService } from '@/lib/ai/models/ai-types'
+import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
 import { aiRepository } from '@/lib/db/ai'
-
-// import type { APIRoute, APIContext } from 'astro'
-import type { AIMessage } from '../../../lib/ai/models/ai-types.js'
 // Import the type expected by InterventionAnalysisService
 import { InterventionAnalysisService } from '../../../lib/ai/services/intervention-analysis'
 import { createLLMService } from '../../../lib/ai/services/llm-provider'
