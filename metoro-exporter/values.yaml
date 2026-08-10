@@ -1,9 +1,0 @@
-redis:
-  auth:
-    enabled: false
-    existingSecret: "redis-secret"
-
-redisCluster:
-  auth:
-    enabled: false
-    existingSecret: "redis-cluster-secret"
