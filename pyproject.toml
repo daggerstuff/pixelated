@@ -46,7 +46,7 @@ dependencies = [
   "datasets>=2.19.0",
   "sentencepiece>=0.2.0",
   "einops>=0.8.0",
-  "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
+  "sentence-transformers>=5.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
   "huggingface-hub>=1.26.0",
   "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
@@ -64,15 +64,15 @@ dependencies = [
   "redis>=6.4.0",
   "bcrypt>=4.3.0",
   "email-validator>=2.3.0",
-  "python-socketio>=5.16.1",
+  "python-socketio>=5.16.4",
   "flask-socketio>=5.3.6",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
   "neo4j>=6.1,<6.3",
   # Security: Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
-  "fastmcp>=2.14.0",
+  "fastmcp>=3.4.6",
   # Security: Fixes GHSA-7f5h-v6xp-fcq8, CVE-2026-48710 (BadHost)
-  "starlette>=1.3.1",
+  "starlette>=1.4.1",
   "h11>=0.15.0",
   # Security: Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
   "keras>=3.12.0",
@@ -96,7 +96,7 @@ dependencies = [
   "boto3>=1.43.64", # Keep compatible with checkov
   # Google Drive API for direct Drive-to-Drive transfers
   "google-api-python-client>=2.150.0",
-  "google-auth-httplib2>=0.2.0",
+  "google-auth-httplib2>=0.4.1",
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
   "ngcsdk>=4.34.10",
@@ -112,7 +112,7 @@ dependencies = [
   "pydantic>=2.12.5",
   "clickhouse-driver>=0.2.10",
   "nest-asyncio>=1.6.0",
-  "google-genai>=1.61.0",
+  "google-genai>=2.17.0",
   "e2b>=2.6.1",
   "lancedb>=0.30.2",
   "openai-whisper>=20250625",
