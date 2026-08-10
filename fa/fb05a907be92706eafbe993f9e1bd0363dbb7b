@@ -1,0 +1,60 @@
+tests/video_emotion/test_au_extractor.py
+  s_7107b1f995be50::t_c930606a84fdbf 1-37
+src/video_emotion/au_extractor.py
+  s_7107b1f995be50::t_54ab86fcc710f0 1-39
+src/video_emotion/deception_layer.py
+  s_7107b1f995be50::t_3bd53cb7deaab0 1-16
+tests/video_emotion/test_deception_layer.py
+  s_7107b1f995be50::t_67f4c939e43c4c 1-3,5-56
+  s_7107b1f995be50::t_d099347e58defa 4
+scripts/run_video_emotion_prototype.py
+  s_7107b1f995be50::t_99dd0123fcc983 1-46
+tests/video_emotion/test_e2e.py
+  s_7107b1f995be50::t_36a6ff36fb99f5 1-71
+src/video_emotion/temporal_filter.py
+  s_7107b1f995be50::t_aabae452bc8aa0 1-53
+uv.lock
+  ai_agent 4221-4232,4794-4796,4902,4975
+src/video_emotion/audit_writer.py
+  s_7107b1f995be50::t_c5835ab2de54b4 7
+  s_7107b1f995be50::t_595c758db67f16 1-6,8-22
+src/video_emotion/ingestion.py
+  s_7107b1f995be50::t_116a9053e1969b 7
+  s_7107b1f995be50::t_3209f2a71f48fa 1-6,8-35
+tests/video_emotion/test_types.py
+  s_7107b1f995be50::t_a4e7b47b729f59 1-41
+tests/video_emotion/test_audit_writer.py
+  s_7107b1f995be50::t_d099347e58defa 7
+  s_7107b1f995be50::t_583dc03754945e 1-6,8-86
+tests/video_emotion/test_temporal_filter.py
+  s_7107b1f995be50::t_d099347e58defa 4
+  s_7107b1f995be50::t_cba80993e7856b 1-3,5-53
+src/video_emotion/__init__.py
+  s_7107b1f995be50::t_433560b76f4d68 1-2,4-5
+  s_7107b1f995be50::t_42186ed35e6a4c 3
+src/video_emotion/types.py
+  s_7107b1f995be50::t_d099347e58defa 12-13
+  s_7107b1f995be50::t_bb712bc0fd6d38 1-11,14-23
+pyproject.toml
+  s_7107b1f995be50::t_f207b32962d42a 168-170
+data/synthetic/README.md
+  s_7107b1f995be50::t_ab9664219d8240 1-6
+tests/video_emotion/test_ingestion.py
+  s_7107b1f995be50::t_772df3de6459a9 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "fafb05a907be92706eafbe993f9e1bd0363dbb7b",
+  "prompts": {},
+  "sessions": {
+    "s_7107b1f995be50": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_0142f2065ffeDFey7EQeF52goL",
+        "model": "unknown"
+      },
+      "human_author": "Chad <chad@pixelated.app>"
+    }
+  }
+}
