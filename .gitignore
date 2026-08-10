@@ -384,7 +384,6 @@ sliced_output.worktrees/
 latest
 run_training.sh
 context/
-models/
 agents.lock
 .agents/.gitignore
 
