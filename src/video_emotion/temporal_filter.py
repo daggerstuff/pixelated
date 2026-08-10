@@ -32,7 +32,7 @@ def detect_events(frames: list[AUFrame], window_ms: int = 500) -> list[EmotionEv
         if au12 > 0.7 and au6 < 0.2:
             au_combo = "AU12+AU6-"
             score = au12
-            deception = False
+            deception = True  # forced smile = deception per spec §4
         elif au4 > 0.5 and au15 > 0.4:
             au_combo = "AU4+AU15"
             score = max(au4, au15)
