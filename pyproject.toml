@@ -165,6 +165,9 @@ test = [
   "types-requests",
   "hypothesis>=6.165.1",
 ]
+video-emotion = [
+  "opencv-python>=4.10.0",
+]
 dev = [
   "black",
   "isort",
