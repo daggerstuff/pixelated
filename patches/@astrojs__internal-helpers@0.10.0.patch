@@ -1,0 +1,22 @@
+diff --git a/dist/fs.js b/dist/fs.js
+index 8e78d211f10c73491a2e39f1469631e23504dc98..3041a740813ef5b614dcc7f016d150dc2a2925ae 100644
+--- a/dist/fs.js
++++ b/dist/fs.js
+@@ -36,7 +36,7 @@ async function copyFilesToFolder(files, outDir, exclude = []) {
+     }
+   }
+   for (const origin of fileList) {
+-    const dest = new URL(nodePath.relative(commonAncestor, origin), outDir);
++    const dest = new URL(nodePath.relative(commonAncestor, origin).replace(/%/g, '%25').replace(/#/g, '%23'), outDir);
+     const realpath = await fs.realpath(origin);
+     const isSymlink = realpath !== origin;
+     const isDir = (await fs.stat(origin)).isDirectory();
+@@ -46,7 +46,7 @@ async function copyFilesToFolder(files, outDir, exclude = []) {
+       await fs.mkdir(new URL(".", dest), { recursive: true });
+     }
+     if (isSymlink) {
+-      const realdest = fileURLToPath(new URL(nodePath.relative(commonAncestor, realpath), outDir));
++      const realdest = fileURLToPath(new URL(nodePath.relative(commonAncestor, realpath).replace(/%/g, '%25').replace(/#/g, '%23'), outDir));
+       const target = nodePath.relative(fileURLToPath(new URL(".", dest)), realdest);
+       if (!existsSync(dest)) {
+         await fs.symlink(target, dest, isDir ? "dir" : "file");
