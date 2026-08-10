@@ -420,6 +420,7 @@ body {
   --line-strong: #a89984;
   --accent: #b57614;
   --accent-soft: #fabd2f;
+  --ink-soft: #665c54;
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -560,7 +561,7 @@ body {
   --np-line: var(--line);
   --np-line-strong: var(--line-strong);
   --np-mid: var(--accent);
-  --np-muted: var(--accent-soft);
+  --np-muted: var(--ink-soft, var(--ink));
   --np-radius: 0px;
   --np-radius-button: 0px;
   --np-radius-card: 0px;
