@@ -75,6 +75,7 @@ allowBuilds:
   '@schpet/linear-cli': true
   '@scarf/scarf': true
   koffi: true
+  '@google/genai': true
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
