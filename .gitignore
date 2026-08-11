@@ -5,6 +5,7 @@
 # =============================================================================
 
 # === IDE & EDITORS ===
+.cursor/
 .idea/
 .kiro/
 .kiro_tmp/
@@ -139,6 +140,7 @@ MANIFEST
 .nyc_output/
 .pnpm-store/
 /node_modules/
+**/node_modules/
 /pnpm-debug.log*
 /npm-debug.log*
 /yarn-debug.log*
@@ -383,7 +385,8 @@ package/bundle/
 sliced_output.worktrees/
 latest
 run_training.sh
-context/
+/context/
+/models/
 agents.lock
 .agents/.gitignore
 

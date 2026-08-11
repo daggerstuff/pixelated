@@ -51,6 +51,8 @@ export interface AIModelInfo {
   maxTokens: number
 }
 
+export type AIModel = AIModelInfo
+
 export interface AIService {
   createChatCompletion(
     messages: AIMessage[],

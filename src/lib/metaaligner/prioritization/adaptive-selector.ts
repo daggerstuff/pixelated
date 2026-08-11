@@ -3,7 +3,7 @@
  * Bridges context detection with objective weighting to select objectives dynamically
  */
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/ai-types'
 import {
   ObjectiveWeightingEngine,
   DEFAULT_WEIGHT_ADJUSTMENT_PARAMS,

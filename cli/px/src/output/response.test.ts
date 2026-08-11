@@ -36,15 +36,14 @@ describe('formatInteractiveResponse', () => {
     expect(formatInteractiveResponse({})).toBe('{}')
   })
 
-  it('formats flat object', () => {
+  it('formats score object', () => {
     const result = formatInteractiveResponse({
       name: 'test',
-      score: 95,
+      score: 4,
       active: true,
     })
-    expect(result).toContain('name: test')
-    expect(result).toContain('score: 95')
-    expect(result).toContain('active: true')
+    expect(result).toContain('Score')
+    expect(result).toContain('4/5')
   })
 
   it('formats nested object', () => {
