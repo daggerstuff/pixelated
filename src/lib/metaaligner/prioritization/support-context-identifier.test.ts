@@ -4,7 +4,7 @@
 
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/ai-types'
 import {
   createSupportContextIdentifier,
   EmotionalState,

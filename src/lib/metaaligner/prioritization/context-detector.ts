@@ -4,7 +4,7 @@
  * to enable dynamic objective prioritization
  */
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/ai-types'
 import { CrisisDetectionService } from '../../ai/services/crisis-detection'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ContextType, type AlignmentContext } from '../core/objectives'

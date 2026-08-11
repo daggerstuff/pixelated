@@ -3,7 +3,7 @@
  * Specialized component for identifying and classifying educational mental health queries
  */
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/ai-types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('educational-context-recognizer')

@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * Unit tests for Context Detection System
  */
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/ai-types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
 import { ContextType } from '../core/objectives'
 import {

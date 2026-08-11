@@ -14,7 +14,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import type { AIService, AICompletion } from '../../ai/models/types'
+import type { AIService, AICompletion } from '../../ai/models/ai-types'
 import { ContextType } from '../core/objectives'
 import { AdaptiveSelector } from '../prioritization/adaptive-selector'
 import { ContextDetector } from '../prioritization/context-detector'
