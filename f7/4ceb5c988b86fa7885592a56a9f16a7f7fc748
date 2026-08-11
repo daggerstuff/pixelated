@@ -1,0 +1,33 @@
+src/styles/np-tokens.css
+  s_644d0b35703fa5::t_5fea0f3474cef4 33-34,36-38,138,298,311,324,337,350,363,376,389,402,415,429,442,455,468,481,494,507,520,533
+src/pages/api/documentation/generate.ts
+  s_9a329b4966c619::t_8fad033d2dabeb 1,6-8,69,72,74-79,82,115,162
+pyproject.toml
+  s_9a329b4966c619::t_05be2034917db0 169-172
+src/pages/api/ai/intervention-analysis.ts
+  s_644d0b35703fa5::t_5fea0f3474cef4 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "f74ceb5c988b86fa7885592a56a9f16a7f7fc748",
+  "prompts": {},
+  "sessions": {
+    "s_644d0b35703fa5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_012d20952ffeiM7ZGmbOKlblrP",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_9a329b4966c619": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7256f454-8f72-4c5e-b773-6fadc464480f",
+        "model": "thinkingmachines/inkling"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
