@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
  * Unit tests for Educational Context Recognition System
  */
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService } from '../../ai/models/ai-types'
 import {
   EducationalContextRecognizer,
   createEducationalContextRecognizer,
@@ -20,7 +20,7 @@ import type {
 // Mock dependencies
 const mockAIService: AIService = {
   getModelInfo:
-    vi.fn<(model: string) => ReturnType<AIService['getModelInfo']>>(),
+    vi.fn<(model: string) => ReturnType<NonNullable<AIService['getModelInfo']>>>(),
   createChatCompletion:
     vi.fn<
       (

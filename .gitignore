@@ -5,6 +5,7 @@
 # =============================================================================
 
 # === IDE & EDITORS ===
+.cursor/
 .idea/
 .kiro/
 .kiro_tmp/
@@ -384,7 +385,8 @@ package/bundle/
 sliced_output.worktrees/
 latest
 run_training.sh
-context/
+/context/
+/models/
 agents.lock
 .agents/.gitignore
 

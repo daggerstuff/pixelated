@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import type { AIModel } from '../lib/ai/models/types'
+import type { AIModel } from '../lib/ai/models/ai-types'
 
 interface Message {
   id: string // Add unique ID to each message

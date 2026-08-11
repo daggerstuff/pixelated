@@ -234,7 +234,7 @@ export function ChatDemo({
             .filter((m) => m.role !== 'system' && m.content !== undefined)
             .slice(-maxMessages) // Limit message history
             .map((m) => ({
-              role: m.role,
+              role: m.role as 'user' | 'assistant',
               content: m.content || '',
               name: m.name ?? '',
             }))}

@@ -107,8 +107,23 @@ export function loadConfig(options: LoadConfigOptions = {}): LoadedConfig {
 
   const merged = deepMerge(defaultRaw ?? {}, userRaw, repoRaw, cliRaw)
 
+  const config = parsePxConfig(merged)
+
+  // Local dev mode: when PX_LOCAL=1 is set, redirect all agent endpoints
+  // to localhost so `px` commands hit a local stub server (from `px serve`).
+  if (process.env['PX_LOCAL'] === '1') {
+    const localPort = process.env['PX_LOCAL_PORT'] ?? '2000'
+    const localEndpoint = `http://localhost:${localPort}`
+    for (const agentName of Object.keys(config.agents)) {
+      config.agents[agentName] = {
+        ...config.agents[agentName],
+        endpoint: localEndpoint,
+      }
+    }
+  }
+
   return {
-    config: parsePxConfig(merged),
+    config,
     sources,
   }
 }
