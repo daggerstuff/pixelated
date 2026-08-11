@@ -1,0 +1,148 @@
+---
+# px Agent CI Triggers
+#
+# Runs px agent tools on PR open and PR merge events.
+# On PR open: advisor review (async) — posts findings as a PR comment.
+# On PR merge to staging: qa score_session (async) — evaluates session quality.
+#
+# Requires PX_AGENT_ENDPOINT configured as a repository secret pointing to
+# the K8s agent ingress (e.g. http://advisor-agent.pixelated.svc.cluster.local:2000).
+# When PX_LOCAL is not set, the CLI uses endpoints from agents/px.config.json.
+name: px Agent CI
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [staging]
+  push:
+    branches: [staging]
+    paths:
+      - 'src/**'
+      - 'ai/**'
+      - 'cli/**'
+      - 'agents/**'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  advisor-review:
+    name: Advisor Code Review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Build px CLI
+        run: pnpm --filter px build
+
+      - name: Run advisor review
+        env:
+          PX_LOCAL: '1'
+        run: |
+          node cli/px/dist/index.mjs serve --port 2000 &
+          SERVE_PID=$!
+          sleep 2
+          node cli/px/dist/index.mjs advisor review --json > advisor-review.json
+          kill $SERVE_PID
+          cat advisor-review.json
+
+      - name: Post review comment
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let body;
+            try {
+              const raw = fs.readFileSync('advisor-review.json', 'utf8');
+              const data = JSON.parse(raw);
+              const findings = data.findings || [];
+              const summary = data.summary || 'No summary available';
+              const risk = data.risk || 'unknown';
+              const lines = [
+                `## px Advisor Review`,
+                ``,
+                `**Risk:** ${risk}`,
+                ``,
+                summary,
+                ``,
+              ];
+              if (findings.length > 0) {
+                lines.push('| Severity | Message | Path |');
+                lines.push('|----------|---------|------|');
+                for (const f of findings) {
+                  lines.push(`| ${f.severity} | ${f.message} | \`${f.path || '-'}\` |`);
+                }
+              } else {
+                lines.push('No findings.');
+              }
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: lines.join('\n'),
+              });
+            } catch (e) {
+              console.log('Could not post review comment:', e.message);
+            }
+
+  qa-score:
+    name: QA Session Score
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Build px CLI
+        run: pnpm --filter px build
+
+      - name: Run QA session scoring
+        env:
+          PX_LOCAL: '1'
+        run: |
+          node cli/px/dist/index.mjs serve --port 2000 &
+          SERVE_PID=$!
+          sleep 2
+          node cli/px/dist/index.mjs qa score --json > qa-score.json
+          kill $SERVE_PID
+          cat qa-score.json
+
+      - name: Upload QA results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: px-qa-results
+          path: qa-score.json
+          retention-days: 30
