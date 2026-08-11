@@ -1,0 +1,19 @@
+.gitignore
+  s_2cff71b12477dd::t_f7c92fa074b9ca 142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b15754e120ba5552fe3d67d44d49aa3a86cfc8e4",
+  "prompts": {},
+  "sessions": {
+    "s_2cff71b12477dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_0120f6bf7ffelCZQB86j1DzZDU",
+        "model": "unknown"
+      },
+      "human_author": "Chad <chad@pixelated.app>"
+    }
+  }
+}
