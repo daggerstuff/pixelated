@@ -188,7 +188,7 @@ wheels = [
 
 [[package]]
 name = "anthropic"
-version = "0.120.2"
+version = "0.121.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
@@ -200,9 +200,9 @@ dependencies = [
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d7/10/4ca013cb166f226bd89e0aeb0fcaff94f45ddf716d4925ce89475d3c587b/anthropic-0.120.2.tar.gz", hash = "sha256:9722efc10c27a30a69f5338ddacdb35bc6a64297a4e4ba729bf83af873d5fb3a", size = 1008421, upload-time = "2026-07-28T17:38:26.986Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0f/ca/3cb2c20ee729736fbd4546d5d8b67e818288529fe70cb7a80dbf80aef70b/anthropic-0.121.0.tar.gz", hash = "sha256:e79d6e08ab3376602fc9a70d4d5ea3540817c76cf7e16658bed790834e1833d6", size = 1013292, upload-time = "2026-08-07T17:11:07.241Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/63/af/0f5db57b9397a0f3b7fc204cbef143401a7cadaf982330f97f1ce3d39f34/anthropic-0.120.2-py3-none-any.whl", hash = "sha256:0f0bc2b381dc0eb41c8d886b815d79c2041cd2374f83aed36f574b6dc9c579c1", size = 1022851, upload-time = "2026-07-28T17:38:25.466Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/91/b3d41643f1f639927e8c5fb02c3bd8bffe6f1f29e219b3bd4c61e267b15c/anthropic-0.121.0-py3-none-any.whl", hash = "sha256:6048713fa441e59e1cba8363171cd2a86273b25bd213e9c7ac70a523af88b011", size = 1035493, upload-time = "2026-08-07T17:11:08.508Z" },
 ]
 
 [[package]]
@@ -4826,7 +4826,7 @@ requires-dist = [
     { name = "aiofiles", specifier = ">=25.1.0" },
     { name = "aiohttp", specifier = ">=3.14.0" },
     { name = "aiosqlite", specifier = ">=0.22.1" },
-    { name = "anthropic", specifier = ">=0.107.1" },
+    { name = "anthropic", specifier = ">=0.121.0" },
     { name = "authlib", specifier = ">=1.6.11" },
     { name = "bcrypt", specifier = ">=4.3.0" },
     { name = "beautifulsoup4", specifier = ">=4.15.0" },
@@ -4954,7 +4954,7 @@ requires-dist = [
     { name = "sentry-sdk", specifier = ">=2.44.0" },
     { name = "shap", specifier = ">=0.41.0" },
     { name = "sourcery", marker = "sys_platform == 'darwin' and extra == 'dev'" },
-    { name = "spacy", specifier = ">=3.8.14" },
+    { name = "spacy", specifier = ">=3.8.15" },
     { name = "sqlalchemy", specifier = ">=2.0.51" },
     { name = "starlette", specifier = ">=1.4.1" },
     { name = "structlog", specifier = ">=25.4.0" },
@@ -4969,7 +4969,7 @@ requires-dist = [
     { name = "undetected-chromedriver", specifier = ">=3.5.5" },
     { name = "urllib3", specifier = ">=2.7.0" },
     { name = "uvicorn", specifier = ">=0.52.1" },
-    { name = "virtualenv", specifier = ">=21.2.0" },
+    { name = "virtualenv", specifier = ">=21.7.2" },
     { name = "voyageai", specifier = ">=0.3.7" },
     { name = "wandb", specifier = ">=0.21.1" },
     { name = "watchdog", specifier = ">=5.0.3" },
@@ -6482,10 +6482,11 @@ wheels = [
 
 [[package]]
 name = "spacy"
-version = "3.8.14"
+version = "3.8.15"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "catalogue" },
+    { name = "click" },
     { name = "confection" },
     { name = "cymem" },
     { name = "jinja2" },
@@ -6506,8 +6507,8 @@ dependencies = [
     { name = "weasel" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1e/ce/cae678f664d5467016819253f5d6e52f8e68a12d8e799b651d73ec2a9a4b/spacy-3.8.14-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:9699c1248d115d5825987c287a6f6acd66386ef3ebee7994ee67ba093e932c59", size = 32841057, upload-time = "2026-03-29T10:41:12.585Z" },
-    { url = "https://files.pythonhosted.org/packages/ec/53/df5c1fee45f200b749ba72eeb536fbb2c545fc56230324954263b2f3be00/spacy-3.8.14-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:69b2264294097336e86832e8663f1ab3a7215621184863c96c082ab17ee11937", size = 32717872, upload-time = "2026-03-29T10:41:18.193Z" },
+    { url = "https://files.pythonhosted.org/packages/02/6f/2169d692c0502f73e64aa7bbc3cba14a26af85c4b648ed153083ecdce45d/spacy-3.8.15-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ce66d75279ee84b749eea058ff3ea79a31adf0ff53f887943dced258ceb6ce2a", size = 32329824, upload-time = "2026-08-07T17:21:27.674Z" },
+    { url = "https://files.pythonhosted.org/packages/70/f4/2f56347442608ef75877b4d90f582a01e3ccd44742eb13391e1c8097a5ac/spacy-3.8.15-cp313-cp313-musllinux_1_2_x86_64.whl", hash = "sha256:e1aaf79b42c0e8c5dd4801b474c22a61fc68edb347fd3a6e09d5cba7e1aed5db", size = 32854888, upload-time = "2026-08-07T17:21:35.642Z" },
 ]
 
 [[package]]
@@ -7369,7 +7370,7 @@ wheels = [
 
 [[package]]
 name = "virtualenv"
-version = "21.7.1"
+version = "21.7.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "distlib" },
@@ -7377,9 +7378,9 @@ dependencies = [
     { name = "platformdirs" },
     { name = "python-discovery" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/fa/18004e5cb15541ad2a68ff219c755233b012b12d4ec8663d06a258082bec/virtualenv-21.7.1.tar.gz", hash = "sha256:d0dbfaa5483487baea28d7210ef8d24c9d1bd0f10f449eeb215568825a9b334e", size = 5525237, upload-time = "2026-07-30T15:40:36.36Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/00/02e4bd40f64546974752c168ddb6b26a4d49a8b252c93e2312bae8d339a1/virtualenv-21.7.2.tar.gz", hash = "sha256:8bf688bd159b32c3bd6966555c5a2605a07724b93671c32cfe3e45ac28058987", size = 5525335, upload-time = "2026-08-07T22:56:14.704Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/a7/ded126c19495158a05c7202b3389139839d4cf78d622d453867778e0f7a8/virtualenv-21.7.1-py3-none-any.whl", hash = "sha256:6394973f990536e34c05157179146c020284c42fe01da1dfeb0ba16c345280d9", size = 5504576, upload-time = "2026-07-30T15:40:34.512Z" },
+    { url = "https://files.pythonhosted.org/packages/2f/4a/fa71f902185d8a1ac6543dee2fff6aea894050b1c48c4cd0cef913c7490d/virtualenv-21.7.2-py3-none-any.whl", hash = "sha256:7c7f4638881064cc57edd2dd55b307cf4da35bb3f6df6f036b5e8b658f6b5bf5", size = 5504622, upload-time = "2026-08-07T22:56:12.832Z" },
 ]
 
 [[package]]
