@@ -166,7 +166,10 @@ test = [
   "hypothesis>=6.165.1",
 ]
 video-emotion = [
-  "opencv-python>=4.10.0",
+  "pydantic>=2",
+  "numpy",
+  "opencv-python",
+  "pandas",
 ]
 dev = [
   "black",
