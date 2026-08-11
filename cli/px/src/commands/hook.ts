@@ -1,6 +1,9 @@
 import { execSync } from 'node:child_process'
+import { existsSync, writeFileSync, chmodSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 
 import { Command } from 'commander'
+import pc from 'picocolors'
 
 import { callAgent, HttpError, TimeoutError } from '../client/http.js'
 import { loadConfig, findAgent, validateTool } from '../config/loader.js'
@@ -298,3 +301,151 @@ function globToRegex(glob: string): RegExp {
 
   return new RegExp(`^${result}$`)
 }
+
+// ── Hook installation ────────────────────────────────
+
+/** Git hook events that map to .git/hooks/<name> files. */
+const GIT_HOOK_EVENTS = [
+  'pre-commit',
+  'pre-push',
+  'post-merge',
+] as const
+
+interface InstallOptions {
+  preview?: boolean
+  force?: boolean
+}
+
+/**
+ * `px hook install` — write git hook scripts that call `px hook <event>`.
+ * Only installs for events that map to actual git hooks (pre-commit, pre-push,
+ * post-merge). pr-open / pr-merge are GitHub Actions, not git hooks.
+ */
+export function registerHookInstallCommand(program: Command): void {
+  // Attach as subcommand: `px hook install`
+  const hookCmd = program.commands.find((c) => c.name() === 'hook')
+  if (!hookCmd) {
+    // If registerHookCommand hasn't been called yet, register on program directly
+    registerInstallSubcommand(program)
+    return
+  }
+  registerInstallSubcommand(hookCmd)
+}
+
+function registerInstallSubcommand(target: Command): void {
+  target
+    .command('install')
+    .description('Install git hook scripts for configured agent hooks')
+    .option('--preview', 'preview hooks without writing files')
+    .option('--force', 'overwrite existing hook files')
+    .action(async (opts: InstallOptions) => {
+      await runInstall(opts)
+    })
+}
+
+async function runInstall(opts: InstallOptions): Promise<void> {
+  let config: PxConfig
+  try {
+    const loaded = loadConfig()
+    config = loaded.config
+  } catch (e) {
+    console.error(
+      pc.red(`px hook install: failed to load config — ${e instanceof Error ? e.message : 'unknown'}`),
+    )
+    process.exitCode = 1
+    return
+  }
+
+  const hooks = config.hooks ?? {}
+  const installableEvents = GIT_HOOK_EVENTS.filter((event) => hooks[event])
+
+  if (installableEvents.length === 0) {
+    console.log(pc.yellow('px hook install: no git hooks configured (pre-commit, pre-push, post-merge)'))
+    return
+  }
+
+  // Find .git/hooks directory
+  const gitHooksDir = findGitHooksDir()
+  if (!gitHooksDir) {
+    console.error(pc.red('px hook install: could not locate .git/hooks directory'))
+    process.exitCode = 1
+    return
+  }
+
+  for (const event of installableEvents) {
+    const hookConfig = hooks[event]
+    if (!hookConfig) continue
+    const hookPath = resolve(gitHooksDir, event)
+
+    // Build hook script
+    const script = buildHookScript(event, hookConfig)
+
+    if (opts.preview) {
+      console.log(pc.cyan(`[dry-run] would write ${hookPath}:\n`))
+      console.log(script)
+      console.log()
+      continue
+    }
+
+    // Check if file exists and is not a px-managed hook
+    if (existsSync(hookPath) && !opts.force) {
+      const content = readFileSync(hookPath, 'utf8')
+      if (!content.includes('px: managed hook')) {
+        console.log(
+          pc.yellow(`  skipped ${event} — file exists (use --force to overwrite)`),
+        )
+        continue
+      }
+    }
+
+    // Write hook script
+    writeFileSync(hookPath, script, { mode: 0o755 })
+    try {
+      chmodSync(hookPath, 0o755)
+    } catch {
+      // Some filesystems don't support chmod — ignore
+    }
+
+    console.log(pc.green(`  installed ${event} → ${hookConfig.agent}.${hookConfig.tool}`))
+  }
+
+  if (opts.preview) {
+    console.log(pc.cyan(`\npx hook install: preview complete (no files written)`))
+  } else {
+    console.log(pc.green(`\npx hook install: ${installableEvents.length} hook(s) installed in ${gitHooksDir}`))
+  }
+}
+
+function findGitHooksDir(): string | null {
+  try {
+    const gitDir = execSync('git rev-parse --git-dir', {
+      encoding: 'utf-8',
+      cwd: process.cwd(),
+    }).trim()
+    const hooksDir = resolve(gitDir, 'hooks')
+    return hooksDir
+  } catch {
+    return null
+  }
+}
+
+function buildHookScript(event: string, hookConfig: HookConfig): string {
+  const agent = hookConfig.agent
+  const tool = hookConfig.tool
+  const isAsync = hookConfig.async ?? false
+  const asyncFlag = isAsync ? ' --async' : ''
+
+  const lines = [
+    '#!/usr/bin/env bash',
+    `# px: managed hook — ${event} → ${agent}.${tool}`,
+    `# Regenerate with: px hook install`,
+    'set -euo pipefail',
+    '',
+    `# Run the ${event} hook via px`,
+    `px hook ${event}${asyncFlag}`,
+    '',
+  ]
+  return lines.join('\n')
+}
+
+
