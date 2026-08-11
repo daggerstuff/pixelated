@@ -1,13 +1,5 @@
-/**
- * Central AI type definitions.
- *
- * These types are imported throughout the codebase via `../models/ai-types`.
- * They are defined here (rather than re-exported) because they represent the
- * canonical shapes used by the LLM provider layer and dependent services.
- */
-
 export interface AIMessage {
-  role: string
+  role: 'user' | 'assistant' | 'system'
   content: string
   name?: string
 }
@@ -16,7 +8,17 @@ export interface AIServiceOptions {
   model?: string
   temperature?: number
   maxTokens?: number
+  stream?: boolean
   stop?: string[]
+}
+
+export interface AIStreamChunk {
+  id: string
+  model: string
+  created: number
+  content: string
+  done: boolean
+  finishReason?: 'stop' | 'length' | 'content_filter'
 }
 
 export interface AIUsage {
@@ -26,12 +28,8 @@ export interface AIUsage {
 }
 
 export interface AIChoice {
-  message: {
-    role: string
-    content: string
-    tool_calls?: unknown[]
-  }
-  finishReason: string
+  message: AIMessage
+  finishReason: 'stop' | 'length' | 'content_filter'
 }
 
 export interface AICompletion {
@@ -42,15 +40,6 @@ export interface AICompletion {
   usage: AIUsage
   provider: string
   content: string
-}
-
-export interface AIStreamChunk {
-  id: string
-  model: string
-  created: number
-  content: string
-  done: boolean
-  finishReason?: 'stop' | 'length' | 'content_filter'
 }
 
 export interface AIModelInfo {
@@ -65,23 +54,29 @@ export interface AIModelInfo {
 export type AIModel = AIModelInfo
 
 export interface AIService {
-  generateCompletion?(
-    messages: AIMessage[],
-    options?: AIServiceOptions,
-  ): Promise<AICompletion | { content: string; usage?: AIUsage }>
   createChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
   ): Promise<AICompletion>
+
   createStreamingChatCompletion(
     messages: AIMessage[],
     options?: AIServiceOptions,
   ): Promise<AsyncGenerator<AIStreamChunk, void, void>>
+
+  getModelInfo(model: string): AIModelInfo
+
   createChatCompletionWithTracking?(
     messages: AIMessage[],
     options?: AIServiceOptions,
   ): Promise<AICompletion>
-  getModelInfo?(model: string): AIModelInfo
+
+  generateCompletion?(
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+    provider?: string,
+  ): Promise<AICompletion>
+
   dispose(): void
 }
 
@@ -90,30 +85,31 @@ export interface TherapeuticResponse {
   confidence: number
   intervention?: boolean
   techniques?: string[]
-  followUp?: string[]
-  riskLevel?: 'low' | 'medium' | 'high' | 'critical'
-  suggestedFollowup?: string
-  approach?: string
   usage?: AIUsage
+  sources?: Array<{
+    type: string
+    reference: string
+    confidenceContribution: number
+    description?: string
+    timestamp: string
+  }>
 }
 
 export interface TherapySession {
-  sessionId: string
+  sessionId?: string
   clientId: string
-  therapistId: string
+  therapistId?: string
   startTime: Date
-  endTime?: Date
-  status: 'active' | 'completed' | 'cancelled'
-  securityLevel: 'standard' | 'hipaa' | 'maximum'
-  emotionAnalysisEnabled: boolean
-  sessionType?: string
-  transcript?: string
-  aiAnalysis?: {
-    emotionalState?: string[]
-    techniques?: string[]
-    recommendations?: string[]
-    riskAssessment?: string
-  }
+  endTime: Date
+  sessionType?: 'individual' | 'group' | 'family' | 'crisis'
+  status?: 'scheduled' | 'active' | 'completed' | 'cancelled'
   notes?: string
+  transcript?: string
   metadata?: Record<string, unknown>
+  aiAnalysis?: {
+    emotionalState: string[]
+    techniques: string[]
+    recommendations: string[]
+    riskAssessment: 'low' | 'medium' | 'high'
+  }
 }

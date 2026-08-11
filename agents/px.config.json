@@ -89,6 +89,17 @@
       ],
       "async": false,
       "timeout": 30000
+    },
+    "eve": {
+      "endpoint": "http://eve-agent.pixelated.svc.cluster.local:2000",
+      "tools": [
+        "clean_corpus",
+        "replace_slop",
+        "regenerate_record",
+        "evaluate_corpus_gate"
+      ],
+      "async": false,
+      "timeout": 30000
     }
   },
   "slack": {

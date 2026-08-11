@@ -28,7 +28,7 @@ def extract_au_scores(frame: AUFrame, use_real_openface: bool = False) -> AUFram
         10: random.uniform(0, 0.3),  # upper lip raiser
         12: random.uniform(0.5, 1.0),  # lip corner puller
         14: random.uniform(0, 0.3),  # dimpler
-        15: random.uniform(0, 0.2),  # lip corner depressor
+        15: random.uniform(0, 0.5),  # lip corner depressor
         17: random.uniform(0, 0.3),  # chin raiser
         20: random.uniform(0, 0.2),  # lip stretcher
         23: random.uniform(0, 0.3),  # lip tightener

@@ -1,0 +1,90 @@
+{
+  "format": "layers-model",
+  "generatedBy": "TensorFlow.js v4.22.0",
+  "convertedBy": null,
+  "modelTopology": {
+    "class_name": "Sequential",
+    "config": {
+      "name": "emotion_detection_model",
+      "layers": [
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 8,
+            "activation": "relu",
+            "use_bias": true,
+            "kernel_initializer": {
+              "class_name": "GlorotUniform",
+              "config": { "seed": null }
+            },
+            "bias_initializer": {
+              "class_name": "Zeros",
+              "config": {}
+            },
+            "kernel_regularizer": null,
+            "bias_regularizer": null,
+            "activity_regularizer": null,
+            "kernel_constraint": null,
+            "bias_constraint": null,
+            "name": "dense_1",
+            "trainable": true,
+            "batch_input_shape": [null, 10],
+            "dtype": "float32"
+          }
+        },
+        {
+          "class_name": "Dense",
+          "config": {
+            "units": 3,
+            "activation": "sigmoid",
+            "use_bias": true,
+            "kernel_initializer": {
+              "class_name": "GlorotUniform",
+              "config": { "seed": null }
+            },
+            "bias_initializer": {
+              "class_name": "Zeros",
+              "config": {}
+            },
+            "kernel_regularizer": null,
+            "bias_regularizer": null,
+            "activity_regularizer": null,
+            "kernel_constraint": null,
+            "bias_constraint": null,
+            "name": "dense_2",
+            "trainable": true
+          }
+        }
+      ]
+    },
+    "keras_version": "2.12.0",
+    "backend": "tensorflow"
+  },
+  "weightsManifest": [
+    {
+      "paths": ["weights.bin"],
+      "weights": [
+        {
+          "name": "dense_1/kernel",
+          "shape": [10, 8],
+          "dtype": "float32"
+        },
+        {
+          "name": "dense_1/bias",
+          "shape": [8],
+          "dtype": "float32"
+        },
+        {
+          "name": "dense_2/kernel",
+          "shape": [8, 3],
+          "dtype": "float32"
+        },
+        {
+          "name": "dense_2/bias",
+          "shape": [3],
+          "dtype": "float32"
+        }
+      ]
+    }
+  ]
+}
