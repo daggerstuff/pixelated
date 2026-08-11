@@ -120,7 +120,7 @@ overrides:
 
 patchedDependencies:
   '@astrojs/internal-helpers': 585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3
-  '@astrojs/vercel': 6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869
+  '@astrojs/vercel': 5d6dd6f625750a6448088e2c42260a3850161303a73d0c022521187bf021a48c
   astro: 2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de
 
 importers:
@@ -147,7 +147,7 @@ importers:
         version: 6.0.2(@types/node@26.2.0)(@types/react-dom@19.2.4(@types/react@19.2.18))(@types/react@19.2.18)(jiti@2.7.0)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(supports-color@10.2.2)(terser@5.49.2)(tsx@4.23.12)(yaml@2.8.4)
       '@astrojs/vercel':
         specifier: 11.0.5
-        version: 11.0.5(patch_hash=6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869)(@aws-sdk/credential-provider-web-identity@3.972.73)(astro@7.2.0(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@26.2.0)(@upstash/redis@1.38.2)(@vercel/functions@3.9.2(@aws-sdk/credential-provider-web-identity@3.972.73)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(aws4fetch@1.0.20)(db0@0.3.4(better-sqlite3@13.0.3)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@opentelemetry/api@1.9.1)(@types/pg@8.21.0)(@upstash/redis@1.38.2)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.1)))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.8.4))(react@19.2.8)(rollup@4.62.4)(supports-color@10.2.2)(vue@3.5.41(typescript@5.7.3))(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+        version: 11.0.5(patch_hash=5d6dd6f625750a6448088e2c42260a3850161303a73d0c022521187bf021a48c)(@aws-sdk/credential-provider-web-identity@3.972.73)(astro@7.2.0(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@26.2.0)(@upstash/redis@1.38.2)(@vercel/functions@3.9.2(@aws-sdk/credential-provider-web-identity@3.972.73)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(aws4fetch@1.0.20)(db0@0.3.4(better-sqlite3@13.0.3)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@opentelemetry/api@1.9.1)(@types/pg@8.21.0)(@upstash/redis@1.38.2)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.1)))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.8.4))(react@19.2.8)(rollup@4.62.4)(supports-color@10.2.2)(vue@3.5.41(typescript@5.7.3))(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.23.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
@@ -15713,7 +15713,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/vercel@11.0.5(patch_hash=6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869)(@aws-sdk/credential-provider-web-identity@3.972.73)(astro@7.2.0(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@26.2.0)(@upstash/redis@1.38.2)(@vercel/functions@3.9.2(@aws-sdk/credential-provider-web-identity@3.972.73)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(aws4fetch@1.0.20)(db0@0.3.4(better-sqlite3@13.0.3)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@opentelemetry/api@1.9.1)(@types/pg@8.21.0)(@upstash/redis@1.38.2)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.1)))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.8.4))(react@19.2.8)(rollup@4.62.4)(supports-color@10.2.2)(vue@3.5.41(typescript@5.7.3))(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
+  '@astrojs/vercel@11.0.5(patch_hash=5d6dd6f625750a6448088e2c42260a3850161303a73d0c022521187bf021a48c)(@aws-sdk/credential-provider-web-identity@3.972.73)(astro@7.2.0(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@emnapi/core@1.11.2)(@emnapi/runtime@1.11.3)(@types/node@26.2.0)(@upstash/redis@1.38.2)(@vercel/functions@3.9.2(@aws-sdk/credential-provider-web-identity@3.972.73)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(aws4fetch@1.0.20)(db0@0.3.4(better-sqlite3@13.0.3)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@opentelemetry/api@1.9.1)(@types/pg@8.21.0)(@upstash/redis@1.38.2)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.1)))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(terser@5.49.2)(tsx@4.23.12)(yaml@2.8.4))(react@19.2.8)(rollup@4.62.4)(supports-color@10.2.2)(vue@3.5.41(typescript@5.7.3))(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.2(patch_hash=585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3)
       '@vercel/analytics': 1.6.1(react@19.2.8)(vue@3.5.41(typescript@5.7.3))
