@@ -1,7 +1,7 @@
 // Core AI Types
 export * from './types/CognitiveModel'
 export * from './types/TherapeuticGoals'
-export * from './models/types'
+export * from './models/ai-types'
 
 // Emotion Processing
 export * from './emotions/EmotionSynthesizer'
