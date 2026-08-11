@@ -1,0 +1,7 @@
+ksv0125:
+  trusted_registries:
+    - docker.io
+    - quay.io
+    - nvcr.io
+    - ghcr.io
+    - registry.k8s.io
