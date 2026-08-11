@@ -98,6 +98,8 @@ interface InvokeOptions {
   sync?: boolean
   verbose?: boolean
   dryRun?: boolean
+  compact?: boolean
+  noColor?: boolean
 }
 
 async function runAgentTool(
@@ -183,7 +185,12 @@ async function runAgentTool(
       const channel = config.slack?.channel
       console.log(formatAsyncResponse(taskId, channel))
     } else {
-      console.log(formatInteractiveResponse(result))
+      console.log(
+        formatInteractiveResponse(result, {
+          compact: options.compact,
+          noColor: options.noColor,
+        }),
+      )
     }
 
     if (options.verbose) {
@@ -214,10 +221,18 @@ export function registerAgentCommands(program: Command): void {
         .option('--sync', 'Force sync mode (wait for result)')
         .option('--verbose', 'Show detailed request/response info')
         .option('--dry-run', 'Print request payload without calling agent')
-        .action(async (options: InvokeOptions) => {
-          // Root-level --json (from invoke) may consume the flag before subcommand parsing
-          const rootJson = (program.opts().json ?? false) as boolean
-          await runAgentTool(agentName, tool, { ...options, json: options.json ?? rootJson })
+        .option('--compact', 'Single-line summary output')
+        .option('--no-color', 'Disable colored output')
+        .action(async (...args: unknown[]) => {
+          // Root-level options (from invoke) may consume flags before subcommand parsing
+          const rootOpts = program.opts() as Record<string, unknown>
+          const options = args[0] as InvokeOptions
+          await runAgentTool(agentName, tool, {
+            ...options,
+            json: options.json ?? (rootOpts.json as boolean),
+            compact: options.compact ?? (rootOpts.compact as boolean),
+            noColor: options.noColor ?? (rootOpts.noColor as boolean),
+          })
         })
       // Also register full tool name if different from alias (e.g. `px qa score_session`)
       if (alias !== tool) {
@@ -231,9 +246,18 @@ export function registerAgentCommands(program: Command): void {
           .option('--sync', 'Force sync mode (wait for result)')
           .option('--verbose', 'Show detailed request/response info')
           .option('--dry-run', 'Print request payload without calling agent')
-          .action(async (options: InvokeOptions) => {
-            const rootJson = (program.opts().json ?? false) as boolean
-            await runAgentTool(agentName, tool, { ...options, json: options.json ?? rootJson })
+          .option('--compact', 'Single-line summary output')
+          .option('--no-color', 'Disable colored output')
+          .action(async (...args: unknown[]) => {
+            // Root-level options (from invoke) may consume flags before subcommand parsing
+            const rootOpts = program.opts() as Record<string, unknown>
+            const options = args[0] as InvokeOptions
+            await runAgentTool(agentName, tool, {
+              ...options,
+              json: options.json ?? (rootOpts.json as boolean),
+              compact: options.compact ?? (rootOpts.compact as boolean),
+              noColor: options.noColor ?? (rootOpts.noColor as boolean),
+            })
           })
       }
     }
