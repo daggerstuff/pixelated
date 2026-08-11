@@ -2,7 +2,7 @@
 import AIChatReact from './AIChatReact'
 
 export interface Props {
-  availableModels?: import('../lib/ai/models/types').AIModel[]
+  availableModels?: import('../lib/ai/models/ai-types').AIModel[]
   showModelSelector?: boolean
   title?: string
   description?: string
@@ -43,7 +43,7 @@ const {
   }
   <AIChatReact
     client:visible
-    availableModels={availableModels as import('../lib/ai/models/types').AIModel[]}
+    availableModels={availableModels as import('../lib/ai/models/ai-types').AIModel[]}
     {showModelSelector}
   >
     <div
