@@ -214,7 +214,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       aiResource.id, // resource is a string
       {
         // details instead of metadata
-        modelName: aiService.getModelInfo('default')?.name || 'unknown',
+        modelName: aiService.getModelInfo?.('default')?.name || 'unknown',
         sensitivityLevel,
         batchSize: batch ? batch.length : 0,
         textLength: text ? text.length : 0,
@@ -231,7 +231,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       aiResource.id, // resource is a string
       {
         // details instead of metadata
-        modelName: aiService.getModelInfo('default')?.name || 'unknown',
+        modelName: aiService.getModelInfo?.('default')?.name || 'unknown',
         resultCount: Array.isArray(result) ? result.length : 1,
         crisisDetected,
         latencyMs: Date.now() - startTime,
