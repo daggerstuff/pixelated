@@ -18,6 +18,8 @@ export function registerInvoke(root: Command): void {
       (value) => Number.parseInt(value, 10),
     )
     .option('--json', 'Output raw JSON response')
+    .option('--compact', 'Compact single-line output')
+    .option('--no-color', 'Disable colored output')
     .option('--async', 'Force async mode (returns task ID)')
     .option('--sync', 'Force sync mode (wait for result)')
     .option('--verbose', 'Show detailed request/response info')
@@ -31,6 +33,8 @@ export function registerInvoke(root: Command): void {
           endpoint?: string
           timeout?: number
           json?: boolean
+          compact?: boolean
+          noColor?: boolean
           async?: boolean
           sync?: boolean
           verbose?: boolean
@@ -132,7 +136,12 @@ export function registerInvoke(root: Command): void {
             const channel = config.slack?.channel
             console.log(formatAsyncResponse(taskId, channel))
           } else {
-            console.log(formatInteractiveResponse(result))
+            console.log(
+              formatInteractiveResponse(result, {
+                compact: options.compact,
+                noColor: options.noColor,
+              }),
+            )
           }
 
           if (options.verbose) {
