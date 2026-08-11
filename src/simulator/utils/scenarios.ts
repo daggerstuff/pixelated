@@ -9,7 +9,7 @@ import type { Scenario } from '../types'
  * Example predefined scenarios for the simulation
  * In a real implementation, these would come from an API
  */
-const exampleScenarios: Scenario[] = [
+export const exampleScenarios: Scenario[] = [
   {
     id: 'anxiety-001',
     title: 'Anxiety Management Session',

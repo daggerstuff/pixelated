@@ -119,10 +119,10 @@ function mapSession(raw: TherapySession & { _id?: unknown }): NonNullable<Graphq
     metadata: (raw.metadata as Record<string, unknown> | null) ?? null,
     aiAnalysis: raw.aiAnalysis
       ? {
-          emotionalState: raw.aiAnalysis.emotionalState,
-          techniques: raw.aiAnalysis.techniques,
-          recommendations: raw.aiAnalysis.recommendations,
-          riskAssessment: raw.aiAnalysis.riskAssessment.toUpperCase(),
+          emotionalState: raw.aiAnalysis.emotionalState ?? [],
+          techniques: raw.aiAnalysis.techniques ?? [],
+          recommendations: raw.aiAnalysis.recommendations ?? [],
+          riskAssessment: (raw.aiAnalysis.riskAssessment ?? '').toUpperCase(),
         }
       : null,
   };
