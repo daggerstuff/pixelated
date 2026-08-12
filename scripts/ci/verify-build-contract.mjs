@@ -106,7 +106,7 @@ function isAlias(value) {
  * @returns {boolean} */
 function shouldIgnoreUnresolved(sourcePath, specifier) {
   const relativeSource = path.relative(projectRoot, sourcePath).replace(/\\/g, "/");
-  if (PACKAGE_IGNORE_SET.has(specifier)) return true;
+  if (PACKAGE_IGNORE_SET.has(specifier) || specifier === "/pagefind/pagefind.js") return true;
 
   if (relativeSource === "src/lib/fhe.ts" && specifier === "node-seal") return true;
   if (relativeSource === "src/lib/fhe/seal-context.ts" && specifier === "node-seal") return true;
