@@ -53,6 +53,7 @@ const PACKAGE_IGNORE_SET = new Set([
   "pdfkit",
   "bcrypt",
   "typeorm",
+  "/pagefind/pagefind.js",
 ]);
 const LOCAL_IGNORE_FILES = [
   "src/pages/api/auth/auth0-engagement-analytics.ts",
