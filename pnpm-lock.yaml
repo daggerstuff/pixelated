@@ -1712,6 +1712,24 @@ packages:
     resolution: {integrity: sha512-CGznePoL+1oWCSzqmkvlYMpWQEZohPR3LntjKXXfVH+oh6Kd8d+yHLkjpiAGwPIHAxFe4OAq3aKfRnv/wqWIyA==}
     engines: {node: '>=20.0.0'}
 
+<<<<<<< HEAD
+  '@aws-sdk/client-dynamodb@3.1108.0':
+    resolution: {integrity: sha512-fJPQJFZeLdjlktT/AxnsBUkDVeZeCB4kuU1UEPOD5/JFr8wCDAVdLKNO6pks/0ALnn7ELLfEJb/YfRoc/a7k6g==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-ec2@3.1108.0':
+    resolution: {integrity: sha512-aa59c+QsWk1cx2TfRVyrtrZZWEhiltrMBBRYsbc5hxsxfcckEq/pW+xmQrM31E6hewazZJHwIKNa9ODrOEQ1aw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-eks@3.1108.0':
+    resolution: {integrity: sha512-Uv6VocEWrua4sjrZn1HWvSjU0MfbwlYHz1UcWVcaFPCEkvtThy5MApdyljNJj6nanTLHhpkC4RDpHsZmXb6U5A==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-kms@3.1108.0':
+    resolution: {integrity: sha512-MQrpjiQUVkpPyR9b2LwUJVdnwvdRvLnGxPNIk1BOF+2ICw8CMU7Uva0KeBRts1QEIca7rU4fgDHp2TmusjTaYg==}
+    engines: {node: '>=20.0.0'}
+
+=======
   '@aws-sdk/checksums@3.1000.27':
     resolution: {integrity: sha512-insWOqKKNUrbN/dohEG7BJ0U5GkyqhjbMb/NHNaLUtq+7my2M8C4EnZZZoxMmXRqCC+P9dEr+KyJA2JGGzoKLg==}
     engines: {node: '>=20.0.0'}
@@ -1732,6 +1750,7 @@ packages:
     resolution: {integrity: sha512-MQrpjiQUVkpPyR9b2LwUJVdnwvdRvLnGxPNIk1BOF+2ICw8CMU7Uva0KeBRts1QEIca7rU4fgDHp2TmusjTaYg==}
     engines: {node: '>=20.0.0'}
 
+>>>>>>> origin/staging
   '@aws-sdk/client-rds@3.1108.0':
     resolution: {integrity: sha512-Xi28in8E5BZm3dvGB7kph6u1yBdPCqKBXQb9v+J+YaD4uQXJBDaPdAhVsiLdBpvpqcIj+JRSU42ehsIfcDvnMQ==}
     engines: {node: '>=20.0.0'}
@@ -15968,6 +15987,11 @@ snapshots:
       '@smithy/types': 4.16.1
       tslib: 2.8.1
 
+<<<<<<< HEAD
+  '@aws-sdk/client-dynamodb@3.1108.0':
+    dependencies:
+      '@aws-sdk/core': 3.977.7
+=======
   '@aws-sdk/checksums@3.1000.27':
     dependencies:
       '@aws-sdk/core': 3.977.7
@@ -15979,6 +16003,7 @@ snapshots:
   '@aws-sdk/client-dynamodb@3.1108.0':
     dependencies:
       '@aws-sdk/core': 3.977.7
+>>>>>>> origin/staging
       '@aws-sdk/credential-provider-node': 3.972.79
       '@aws-sdk/dynamodb-codec': 3.973.42
       '@aws-sdk/middleware-endpoint-discovery': 3.972.28
