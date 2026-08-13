@@ -25,10 +25,20 @@ export interface AuditLogEntry {
   }
 }
 
+export interface AuditLogQuery {
+  startDate?: Date
+  endDate?: Date
+  eventType?: string
+  userId?: string
+  action?: string
+  status?: 'success' | 'failure'
+}
+
 export class AuditLoggingService {
   private readonly config: AuditLogConfig
   private readonly logger: Console
   private readonly context: string
+  private readonly logStore: AuditLogEntry[] = []
 
   constructor(
     config: AuditLogConfig = {
@@ -124,41 +134,77 @@ export class AuditLoggingService {
   }
 
   private async storeLogEntry(entry: AuditLogEntry): Promise<void> {
-    // Implement your storage mechanism here
-    // This could be writing to a file, sending to a logging service,
-    // storing in a database, etc.
-
-    // For now, we'll just log to console
+    this.logStore.push(entry)
     if (process.env['NODE_ENV'] === 'development') {
       this.logger.debug('Storing audit log entry:', entry)
     }
   }
 
-  async queryLogs(_filters: {
-    startDate?: Date
-    endDate?: Date
-    eventType?: string
-    userId?: string
-    status?: 'success' | 'failure'
-  }): Promise<AuditLogEntry[]> {
-    // Implement your log querying mechanism here
-    console.debug('queryLogs called with filters:', _filters)
-    throw new Error('Log querying not implemented')
+  private filterLogs(query: AuditLogQuery): AuditLogEntry[] {
+    return this.logStore.filter((entry) => {
+      if (query.startDate && new Date(entry.timestamp) < query.startDate) {
+        return false
+      }
+      if (query.endDate && new Date(entry.timestamp) > query.endDate) {
+        return false
+      }
+      if (query.eventType && entry.eventType !== query.eventType) {
+        return false
+      }
+      if (query.userId && entry.userId !== query.userId) {
+        return false
+      }
+      if (query.action && entry.action !== query.action) {
+        return false
+      }
+      if (query.status && entry.status !== query.status) {
+        return false
+      }
+      return true
+    })
+  }
+
+  async queryLogs(filters: AuditLogQuery): Promise<AuditLogEntry[]> {
+    return this.filterLogs(filters)
   }
 
   async exportLogs(
-    _format: 'json' | 'csv',
-    _filters?: {
-      startDate?: Date
-      endDate?: Date
-      eventType?: string
-      userId?: string
-      status?: 'success' | 'failure'
-    },
+    format: 'json' | 'csv',
+    filters?: AuditLogQuery,
   ): Promise<string> {
-    // Implement your log export mechanism here
-    console.debug('exportLogs called with:', { _format, _filters })
-    throw new Error('Log export not implemented')
+    const logs = this.filterLogs(filters ?? {})
+
+    if (format === 'json') {
+      return JSON.stringify(logs, null, 2)
+    }
+
+    const headers = [
+      'timestamp',
+      'eventType',
+      'userId',
+      'action',
+      'status',
+      'resourceType',
+      'resourceId',
+    ]
+    const escape = (val: string | undefined): string => {
+      if (!val) return ''
+      const needsQuoting = /[",\n]/.test(val)
+      const escaped = val.replace(/"/g, '""')
+      return needsQuoting ? `"${escaped}"` : escaped
+    }
+    const rows = logs.map((entry) =>
+      [
+        escape(entry.timestamp),
+        escape(entry.eventType),
+        escape(entry.userId),
+        escape(entry.action),
+        escape(entry.status),
+        escape(entry.resourceType),
+        escape(entry.resourceId),
+      ].join(','),
+    )
+    return [headers.join(','), ...rows].join('\n')
   }
 
   async cleanup(): Promise<void> {
