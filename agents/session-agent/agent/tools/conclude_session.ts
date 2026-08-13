@@ -1,6 +1,7 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { updateSessionState } from '../mongo-client.js'
 import { storeMemory } from '../foresight-client.js'
 
 // Finalize a session: stop accepting new turns, persist the closing state,
@@ -50,12 +51,20 @@ export default defineTool({
       tags: [`session:${input.session_id}`, 'session_closed', 'handoff:qa'],
     })
 
+    const mongoUpdated = await updateSessionState(
+      input.session_id,
+      input.final_state,
+      input.exit_reason,
+      input.summary,
+    )
+
     return {
       session_id: input.session_id,
       exit_reason: input.exit_reason,
       state: input.final_state,
       closed_at: closedAt,
       emit_session_closed: true,
+      mongo_updated: mongoUpdated,
       handoff: {
         target: 'qa-agent',
         tag: 'handoff:qa',

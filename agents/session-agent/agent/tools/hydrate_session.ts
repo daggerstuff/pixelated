@@ -1,6 +1,7 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { hydrateSession, type TranscriptTurn } from '../mongo-client.js'
 import { searchMemories } from '../foresight-client.js'
 
 const SCHEMA = z.object({
@@ -16,6 +17,26 @@ export default defineTool({
     'returns an empty list and state `NEW`.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
+    // 1. Try MongoDB first (durable store)
+    const mongoSession = await hydrateSession(input.session_id, input.max_turns)
+    if (mongoSession && mongoSession.transcripts.length > 0) {
+      return {
+        session_id: input.session_id,
+        last_state: mongoSession.state,
+        last_persisted_at: mongoSession.updated_at ?? mongoSession.started_at,
+        recent_turns: mongoSession.transcripts.map((t: TranscriptTurn) => ({
+          role: t.role,
+          text: t.text,
+          timestamp: t.timestamp,
+        })),
+        truncated: false,
+        source: 'mongodb',
+        pid_file: process.pid,
+        requested_at: new Date().toISOString(),
+      }
+    }
+
+    // 2. Fall back to Foresight (semantic memory)
     const results = await searchMemories({
       query: `session:${input.session_id}`,
       limit: input.max_turns,
@@ -60,6 +81,7 @@ export default defineTool({
           : null,
       recent_turns: recentTurns,
       truncated: (results ?? []).length > input.max_turns,
+      source: recentTurns.length > 0 ? 'foresight' : 'none',
       pid_file: process.pid,
       requested_at: new Date().toISOString(),
     }
