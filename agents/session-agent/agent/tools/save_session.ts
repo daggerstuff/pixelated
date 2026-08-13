@@ -1,6 +1,7 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { saveSessionTranscript } from '../mongo-client.js'
 import { storeMemory } from '../foresight-client.js'
 
 // Persist a durable session artifact: the final transcript, a summary
@@ -101,6 +102,24 @@ export default defineTool({
       if (result?.memory_id) memoryIds.push(result.memory_id)
     }
 
+    // 3. Persist the full transcript and emotion rollups to MongoDB (durable store)
+    const mongoResult = await saveSessionTranscript(
+      input.session_id,
+      input.transcripts.map((t) => ({
+        role: t.role,
+        text: t.text,
+        timestamp: t.timestamp,
+      })),
+      input.emotion_rollups.map((r) => ({
+        primary_emotion: r.primary_emotion,
+        intensity: r.intensity,
+        valence: r.valence,
+        risk_flags: r.risk_flags,
+        timestamp: r.timestamp,
+      })),
+      input.summary,
+    )
+
     return {
       session_id: input.session_id,
       persisted_at: new Date().toISOString(),
@@ -113,10 +132,12 @@ export default defineTool({
           'ai-services/security/pii_scrubber.py. Persisted text MUST be ' +
           'scrubbed before reaching either backend.',
       },
-      mongo_stub: {
-        collection: 'sessions',
+      mongo: {
+        collection: 'rehearsal_sessions',
         document_id: input.session_id,
-        note: 'Mongo upsert via the session-mcp (TODO) is not yet wired.',
+        transcript_count: mongoResult.transcript_count,
+        emotion_rollup_count: mongoResult.emotion_rollup_count,
+        persisted: mongoResult.transcript_count > 0,
       },
       summary_written: input.summary ? true : false,
     }

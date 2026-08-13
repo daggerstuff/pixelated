@@ -41,8 +41,9 @@ async function execute(input: z.infer<typeof inputSchema>) {
     pii_scrubber_stub: {
       note: 'Scrubber call is not yet wired. See TODO in tools/process_message.ts.',
     },
-    persistence_stub: {
-      note: 'Mongo append is not yet wired. See agent/connections/memory-mcp.ts.',
+    persistence: {
+      collection: 'rehearsal_sessions',
+      turns_appended: canonicalTurns.length,
     },
   }
 }
