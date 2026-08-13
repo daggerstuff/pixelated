@@ -32,15 +32,11 @@ def test_ensemble_loads_keyword_fallback_when_local_ml_is_disabled() -> None:
         loaded = await ensemble.load_all_models()
         prediction = await ensemble.predict_ensemble("The elderly woman was ignored.")
 
-        assert loaded is True  # nosec
-        assert ensemble.services  # nosec
-        assert any(  # nosec
-            isinstance(service, KeywordBiasModelService) for service in ensemble.services
-        )
-        assert prediction["models_used"] == 1  # nosec
-        assert any(  # nosec
-            result["bias_type"] == BiasType.AGE for result in prediction["ensemble_results"]
-        )
+        assert loaded is True
+        assert ensemble.services
+        assert any(isinstance(service, KeywordBiasModelService) for service in ensemble.services)
+        assert prediction["models_used"] == 1
+        assert any(result["bias_type"] == BiasType.AGE for result in prediction["ensemble_results"])
 
     asyncio.run(run())
 
@@ -58,10 +54,8 @@ def test_ensemble_continues_when_optional_model_fails_to_load() -> None:
         loaded = await ensemble.load_all_models()
         prediction = await ensemble.predict_ensemble("The young man was selected.")
 
-        assert loaded is True  # nosec
-        assert prediction["models_used"] == 1  # nosec
-        assert any(  # nosec
-            result["bias_type"] == BiasType.GENDER for result in prediction["ensemble_results"]
-        )
+        assert loaded is True
+        assert prediction["models_used"] == 1
+        assert any(result["bias_type"] == BiasType.GENDER for result in prediction["ensemble_results"])
 
     asyncio.run(run())
