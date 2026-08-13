@@ -1,5 +1,8 @@
-import { localDev, placeholderAuth, vercelOidc } from 'eve/channels/auth'
+import { httpBasic, localDev, placeholderAuth, vercelOidc } from 'eve/channels/auth'
 import { eveChannel } from 'eve/channels/eve'
+
+const authUsername = process.env.EVE_AUTH_USERNAME
+const authPassword = process.env.EVE_AUTH_PASSWORD
 
 export default eveChannel({
   auth: [
@@ -7,9 +10,11 @@ export default eveChannel({
     localDev(),
     // Lets the eve TUI and your Vercel deployments reach the deployed agent.
     vercelOidc(),
-    // This placeholder will not allow browser requests in production.
-    // Replace it with your app's auth provider, like Auth.js or Clerk,
-    // or use none() for a public demo.
-    placeholderAuth(),
+    // HTTP Basic auth for self-hosted production. Requires EVE_AUTH_USERNAME
+    // and EVE_AUTH_PASSWORD env vars. Falls back to placeholderAuth (401)
+    // when credentials are not configured — fail closed, never open.
+    authUsername && authPassword
+      ? httpBasic({ username: authUsername, password: authPassword })
+      : placeholderAuth(),
   ],
 })

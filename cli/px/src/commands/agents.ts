@@ -175,12 +175,17 @@ async function runAgentTool(
   }
 
   try {
+    const user = process.env.EVE_AUTH_USERNAME
+    const pass = process.env.EVE_AUTH_PASSWORD
+    const authHeader =
+      user && pass ? `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}` : undefined
     const result = await invokeAgentTool({
       endpoint: agentConfig.endpoint,
       tool,
       body,
       timeout: agentConfig.timeout,
       async: isAsync,
+      authHeader,
     })
 
     if (options.json) {

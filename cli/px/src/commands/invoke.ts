@@ -6,6 +6,16 @@ import { invokeAgentTool } from '../lib/invoke.js'
 import { formatAsyncResponse } from '../output/response.js'
 
 export function registerInvoke(program: Command): void {
+  /** Build a Basic auth header from EVE_AUTH_USERNAME/EVE_AUTH_PASSWORD env vars. */
+  function buildAuthHeader(): string | undefined {
+    const user = process.env.EVE_AUTH_USERNAME
+    const pass = process.env.EVE_AUTH_PASSWORD
+    if (user && pass) {
+      return `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`
+    }
+    return undefined
+  }
+
   program
     .command('invoke')
     .description('Invoke a tool on an agent via the Eve session API')
@@ -116,12 +126,14 @@ export function registerInvoke(program: Command): void {
         }
 
         try {
+          const authHeader = buildAuthHeader()
           const result = await invokeAgentTool({
             endpoint: agentConfig.endpoint,
             tool,
             body,
             timeout: agentConfig.timeout,
             async: isAsync,
+            authHeader,
           })
 
           if (options.json) {
