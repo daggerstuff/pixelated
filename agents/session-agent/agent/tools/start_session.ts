@@ -1,6 +1,7 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { saveSessionHeader } from '../mongo-client.js'
 import { storeMemory, searchMemories } from '../foresight-client.js'
 
 const SCHEMA = z.object({
@@ -67,6 +68,13 @@ export default defineTool({
       }
     }
 
+    const mongoId = await saveSessionHeader(
+      sessionId,
+      input.trainee_id,
+      input.scenario_id,
+      input.resume ? 'RECOVERING' : 'NEW',
+    )
+
     return {
       session_id: sessionId,
       trainee_id: input.trainee_id,
@@ -79,10 +87,10 @@ export default defineTool({
         note: 'Foresight MCP write failed or server unreachable on port 8764.',
       },
       recovered_context: recoveredContext,
-      mongo_stub: {
-        collection: 'sessions',
-        document_id: sessionId,
-        note: 'Mongo write is not yet wired in this slice. See agent/connections/memory-mcp.ts.',
+      mongo: {
+        collection: 'rehearsal_sessions',
+        document_id: mongoId ?? sessionId,
+        persisted: mongoId !== null,
       },
     }
   },
