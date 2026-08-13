@@ -105,6 +105,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = existsSync(path.join(__dirname, "dist/client"))
   ? path.join(__dirname, "dist/client")
   : path.resolve(__dirname, "../../dist/client");
+// Rooted prefix (with trailing separator) so sibling directories cannot
+// match the clientDist prefix during the traversal check below.
+const clientDistRoot = clientDist.endsWith(path.sep)
+  ? clientDist
+  : `${clientDist}${path.sep}`;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -142,7 +147,7 @@ function resolveStaticFile(urlPath) {
   const filePath = path.join(clientDist, normalized === "/" ? "index.html" : normalized);
 
   // Prevent directory traversal — resolved path must stay inside clientDist
-  if (!filePath.startsWith(clientDist)) return null;
+  if (filePath !== clientDist && !filePath.startsWith(clientDistRoot)) return null;
 
   // Try exact match first (must be a file with an extension)
   if (existsSync(filePath) && path.extname(filePath)) {

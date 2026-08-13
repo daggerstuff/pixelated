@@ -36,26 +36,47 @@ export function displayIssues() {
     return
   }
 
-  container.innerHTML = issues
-    .map(
-      (issue) => `
-    <div class="issue-item">
-      <div class="issue-header">
-        <span class="issue-title">${issue.component} - ${issue.browser}</span>
-        <span class="issue-severity ${issue.severity}">${issue.severity}</span>
-      </div>
-      <p class="issue-description">${issue.description}</p>
-      <button
-        class="btn btn-danger btn-sm"
-        onclick="window.compatibilityTesting.removeIssue(${issue.id})"
-        aria-label="Remove issue for ${issue.component} in ${issue.browser}"
-      >
-        Remove
-      </button>
-    </div>
-  `,
-    )
-    .join('')
+  // Build DOM nodes with textContent (never innerHTML) so stored issue data
+  // cannot inject scripts.
+  container.replaceChildren(
+    ...issues.map((issue) => {
+      const item = document.createElement('div')
+      item.className = 'issue-item'
+
+      const header = document.createElement('div')
+      header.className = 'issue-header'
+
+      const title = document.createElement('span')
+      title.className = 'issue-title'
+      title.textContent = `${issue.component} - ${issue.browser}`
+
+      const severity = document.createElement('span')
+      severity.className = `issue-severity ${issue.severity}`
+      severity.textContent = issue.severity
+
+      header.append(title, severity)
+
+      const description = document.createElement('p')
+      description.className = 'issue-description'
+      description.textContent = issue.description
+
+      const removeButton = document.createElement('button')
+      removeButton.className = 'btn btn-danger btn-sm'
+      removeButton.textContent = 'Remove'
+      removeButton.setAttribute(
+        'aria-label',
+        `Remove issue for ${issue.component} in ${issue.browser}`,
+      )
+      removeButton.addEventListener('click', () => {
+        if (typeof issue.id === 'number') {
+          removeIssue(issue.id)
+        }
+      })
+
+      item.append(header, description, removeButton)
+      return item
+    }),
+  )
 }
 
 /**
