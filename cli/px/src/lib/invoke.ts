@@ -1,3 +1,5 @@
+import { invokeViaEveSession, type EveSessionResult } from '../client/eve-session.js'
+
 export interface InvokeAgentToolOptions {
   endpoint: string
   tool: string
@@ -6,38 +8,33 @@ export interface InvokeAgentToolOptions {
   async: boolean
 }
 
+/**
+ * Invoke an agent tool via the Eve session API.
+ *
+ * Eve agents are conversational — they don't expose individual REST endpoints
+ * per tool. Instead, we POST to /eve/v1/session with a message instructing the
+ * agent to run the specified tool, then stream the NDJSON response to collect
+ * the final assistant message.
+ */
 export async function invokeAgentTool(
   options: InvokeAgentToolOptions,
-): Promise<unknown> {
-  const url = new URL(
-    `/eve/v1/${encodeURIComponent(options.tool)}`,
-    options.endpoint,
-  )
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), options.timeout)
+): Promise<EveSessionResult> {
+  const message = buildToolMessage(options.tool, options.body)
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        ...(options.async ? { 'x-px-async': '1' } : {}),
-      },
-      body: JSON.stringify(options.body ?? {}),
-      signal: controller.signal,
-    })
+  return invokeViaEveSession({
+    endpoint: options.endpoint,
+    message,
+    timeoutMs: options.timeout,
+  })
+}
 
-    const text = await response.text()
-    const payload = text.length > 0 ? JSON.parse(text) : null
-
-    if (!response.ok) {
-      throw new Error(
-        `Agent request failed (${response.status} ${response.statusText}): ${text}`,
-      )
-    }
-
-    return payload
-  } finally {
-    clearTimeout(timeout)
+/**
+ * Build a natural-language message that asks the agent to run a specific tool
+ * with the given parameters.
+ */
+function buildToolMessage(tool: string, body: unknown): string {
+  if (body && typeof body === 'object' && Object.keys(body as object).length > 0) {
+    return `Run the ${tool} tool with these parameters:\n${JSON.stringify(body, null, 2)}`
   }
+  return `Run the ${tool} tool.`
 }

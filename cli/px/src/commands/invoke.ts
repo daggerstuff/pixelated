@@ -3,12 +3,14 @@ import pc from 'picocolors'
 
 import { loadConfig } from '../lib/config-loader.js'
 import { invokeAgentTool } from '../lib/invoke.js'
-import { formatInteractiveResponse, formatAsyncResponse } from '../output/response.js'
+import { formatAsyncResponse } from '../output/response.js'
 
-export function registerInvoke(root: Command): void {
-  root
-    .argument('[agent]', 'Agent name from config (e.g. content, advisor)')
-    .argument('[tool]', 'Tool name to invoke')
+export function registerInvoke(program: Command): void {
+  program
+    .command('invoke')
+    .description('Invoke a tool on an agent via the Eve session API')
+    .argument('<agent>', 'Agent name from config (e.g. content, advisor)')
+    .argument('<tool>', 'Tool name to invoke')
     .option('--body <payload>', 'JSON request body')
     .option('--stdin', 'Read JSON request body from stdin')
     .option('--endpoint <url>', 'Override agent endpoint')
@@ -23,10 +25,11 @@ export function registerInvoke(root: Command): void {
     .option('--async', 'Force async mode (returns task ID)')
     .option('--sync', 'Force sync mode (wait for result)')
     .option('--verbose', 'Show detailed request/response info')
+    .option('--dry-run', 'Print request payload without calling agent')
     .action(
       async (
-        agent: string | undefined,
-        tool: string | undefined,
+        agent: string,
+        tool: string,
         options: {
           body?: string
           stdin?: boolean
@@ -38,15 +41,9 @@ export function registerInvoke(root: Command): void {
           async?: boolean
           sync?: boolean
           verbose?: boolean
+          dryRun?: boolean
         },
-        cmd: Command,
       ) => {
-        if (!agent || !tool) {
-          root.outputHelp()
-          process.exitCode = 1
-          return
-        }
-
         const cliOverrides: Record<string, unknown> = {}
         if (options.endpoint) {
           cliOverrides.agent = agent
@@ -96,18 +93,18 @@ export function registerInvoke(root: Command): void {
           body = JSON.parse(options.body)
         }
 
-        const url = `${agentConfig.endpoint.replace(/\/$/, '')}/eve/v1/${tool}`
+        const sessionUrl = `${agentConfig.endpoint.replace(/\/$/, '')}/eve/v1/session`
 
         if (options.verbose) {
           console.error(
-            pc.gray(`px: POST ${url} (async=${isAsync}, timeout=${agentConfig.timeout}ms)`),
+            pc.gray(`px: POST ${sessionUrl} (tool=${tool}, async=${isAsync}, timeout=${agentConfig.timeout}ms)`),
           )
         }
 
-        if (cmd.args.includes('--dry-run')) {
+        if (options.dryRun) {
           const payload = {
             method: 'POST',
-            url,
+            url: sessionUrl,
             agent,
             tool,
             async: isAsync,
@@ -130,22 +127,17 @@ export function registerInvoke(root: Command): void {
           if (options.json) {
             console.log(JSON.stringify(result, null, 2))
           } else if (isAsync) {
-            const taskId =
-              (result as Record<string, unknown>)?.['task_id'] as string ??
-              'unknown'
             const channel = config.slack?.channel
-            console.log(formatAsyncResponse(taskId, channel))
+            console.log(formatAsyncResponse(result.sessionId, channel))
           } else {
-            console.log(
-              formatInteractiveResponse(result, {
-                compact: options.compact,
-                noColor: options.noColor,
-              }),
-            )
+            const text = options.compact
+              ? result.message.replace(/\n+/g, ' ')
+              : result.message
+            console.log(text)
           }
 
           if (options.verbose) {
-            console.error(pc.gray(`px: response received`))
+            console.error(pc.gray(`px: response received (session ${result.sessionId})`))
           }
         } catch (error) {
           const msg = error instanceof Error ? error.message : String(error)
