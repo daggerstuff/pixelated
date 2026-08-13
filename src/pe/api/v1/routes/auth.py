@@ -11,13 +11,14 @@ from __future__ import annotations
 
 import hashlib
 import secrets
-import warnings
 
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.pe.config import settings
 from src.pe.core.dependencies import get_current_user, get_db_session, get_rls_session
 from src.pe.core.rbac import UserRole, require_role, role_at_least
 from src.pe.core.security import (
@@ -115,18 +116,42 @@ def _hash_email(email: str) -> str:
     return hashlib.sha256(email.lower().encode("utf-8")).hexdigest()
 
 
-def _encrypt_email(email: str, _key: str) -> bytes:
-    """DEV-ONLY stub — does NOT actually encrypt.
+def _derive_aes_key() -> bytes:
+    """Derive a 32-byte AES-256 key from the configured ENCRYPTION_KEY.
 
-    WARNING: This is a development placeholder that stores plaintext bytes.
-    In production, implement pgp_sym_encrypt() at the DB level or
-    replace with real application-layer encryption before deployment.
+    If ENCRYPTION_KEY is a valid 64-char hex string, it is decoded directly.
+    Otherwise (e.g. the insecure default in dev), it is SHA-256 hashed to
+    produce a deterministic 32-byte key.
     """
-    warnings.warn(
-        "_encrypt_email is a DEV-ONLY stub that stores plaintext — implement real encryption before production use",
-        stacklevel=2,
-    )
-    return email.encode("utf-8")
+    raw = settings.ENCRYPTION_KEY.encode("utf-8")
+    if len(raw) == 64 and all(c in b"0123456789abcdefABCDEF" for c in raw):
+        return bytes.fromhex(raw.decode())
+    return hashlib.sha256(raw).digest()
+
+
+def _encrypt_email(email: str, _key: str | None = None) -> bytes:
+    """Encrypt an email address using AES-256-GCM.
+
+    Returns ``nonce (12 bytes) || ciphertext || tag (16 bytes)``.
+    The ``_key`` parameter is retained for backward-compatibility but ignored;
+    the encryption key is sourced from ``settings.ENCRYPTION_KEY``.
+    """
+    aesgcm = AESGCM(_derive_aes_key())
+    nonce = secrets.token_bytes(12)
+    ct = aesgcm.encrypt(nonce, email.encode("utf-8"), None)
+    return nonce + ct
+
+
+def _decrypt_email(ciphertext: bytes, _key: str | None = None) -> str:
+    """Decrypt an email ciphertext produced by :func:`_encrypt_email`.
+
+    Raises ``ValueError`` if the key does not match or the ciphertext is corrupt.
+    """
+    if len(ciphertext) < 28:  # 12-byte nonce + 16-byte tag minimum
+        raise ValueError("ciphertext too short to contain nonce and tag")
+    aesgcm = AESGCM(_derive_aes_key())
+    nonce, ct = ciphertext[:12], ciphertext[12:]
+    return aesgcm.decrypt(nonce, ct, None).decode("utf-8")
 
 
 # ── Auth Endpoints ────────────────────────────────────────────────
@@ -295,7 +320,7 @@ async def create_user(
 
     # Create user
     password_hash = hash_password(request.password)
-    encrypted_email = _encrypt_email(request.email, "")
+    encrypted_email = _encrypt_email(request.email)
 
     result = await session.execute(
         text("""
