@@ -9,10 +9,7 @@ import {
 profileAndLogAgentStartup({
   agentName: 'pipeline-agent',
   agentDir: import.meta.dirname,
-  connectionDescriptions: {
-    foresight:
-      'Foresight memory MCP for pipeline dataset versioning and training metadata.',
-  },
+  // Foresight is accessed directly via agent/foresight-client.ts.
 })
 
 export default defineAgent({

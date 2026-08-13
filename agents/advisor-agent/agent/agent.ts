@@ -10,8 +10,6 @@ profileAndLogAgentStartup({
   agentName: 'advisor-agent',
   agentDir: import.meta.dirname,
   connectionDescriptions: {
-    foresight:
-      'Foresight memory MCP for pipeline dataset versioning and training metadata.',
     linear: 'Linear workspace: issues, projects, cycles, and comments.',
     notion: 'Notion workspace: search and edit pages and databases.',
   },

@@ -11,7 +11,7 @@ backend agent in Pixelated Empathy's Eve workflow. Status: **Done** (PIX-3957).
 | Standing rules  | `agent/instructions.md`, `agent/instructions/clinical-rules.md`, `agent/instructions/session-flow.md`                                                                                                                                             |
 | Tools (9)       | `agent/tools/`: `analyze_emotion`, `analyze_pace`, `check_clinical_boundary`, `conclude_session`, `hydrate_session`, `process_message`, `save_session`, `start_session`, `validate_response`                                                      |
 | Channels (2)    | `agent/channels/eve.ts`, `agent/channels/http.ts` (`/eve/v1/health` + session middleware)                                                                                                                                                         |
-| Connections (3) | `agent/connections/foresight.ts`, `agent/connections/memory-mcp.ts`, `agent/connections/workers-ai-mcp.ts` — all `defineMcpClientConnection` with env-gated URLs (`process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'`)                     |
+| Connections (3) | `agent/connections/foresight.ts`, `agent/connections/memory-mcp.ts`, `agent/connections/workers-ai-mcp.ts` — all `defineMcpClientConnection` with env-gated URLs (`process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'`)                     |
 | Sub-agents (2)  | `agent/subagents/emotion-analyzer/`, `agent/subagents/supervisor-observer/`                                                                                                                                                                       |
 | Hooks (1)       | `agent/hooks/pii_scrubber.ts` (logs-only scrubber on `message.completed`)                                                                                                                                                                         |
 | Lib             | `agent/lib/process-shutdown.ts`, `agent/lib/workers-ai.ts`, `agent/foresight-client.ts` (SSEClientTransport → `/sse`)                                                                                                                             |
@@ -22,7 +22,7 @@ backend agent in Pixelated Empathy's Eve workflow. Status: **Done** (PIX-3957).
 ## Foresight transport
 
 Foresight MCP is wired over **HTTP/SSE** via `agent/foresight-client.ts`
-(`SSEClientTransport` to `${FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'}`). It
+(`SSEClientTransport` to `${FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'}`). It
 exposes `storeMemory` / `searchMemories` and is used for session hydration and
 persistent notes. Connection config lives in `agent/connections/foresight.ts`.
 

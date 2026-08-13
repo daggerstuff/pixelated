@@ -12,7 +12,7 @@ trainee status to other agents and supervisors. Status: **Phase 1 - Done**.
 | Standing rules  | `agent/instructions.md`, `agent/instructions/enrollment-flow.md`, `agent/instructions/cohort-rules.md`                                     |
 | Tools (6)       | `agent/tools/`: `register_trainee`, `assign_cohort`, `list_cohorts`, `get_trainee_status`, `get_cohort_progress`, `record_curriculum_step` |
 | Channels (2)    | `agent/channels/eve.ts`, `agent/channels/linear.ts`                                                                                        |
-| Connections (1) | `agent/connections/foresight.ts` — `defineMcpClientConnection`, env-gated URL (`process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'`) |
+| Connections (1) | `agent/connections/foresight.ts` — `defineMcpClientConnection`, env-gated URL (`process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'`) |
 | Lib             | `agent/lib/workers-ai.ts`, `agent/foresight-client.ts` (SSEClientTransport → `/sse`)                                                       |
 | Evals           | `evals/evals.config.ts`, `evals/smoke.eval.ts`                                                                                             |
 | Tests           | `tests/` — 6 unit tests (one per tool)                                                                                                     |

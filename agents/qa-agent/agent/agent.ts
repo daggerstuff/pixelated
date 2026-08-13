@@ -11,10 +11,7 @@ import {
 profileAndLogAgentStartup({
   agentName: 'qa-agent',
   agentDir: import.meta.dirname,
-  connectionDescriptions: {
-    foresight:
-      'Foresight memory MCP for QA batch review. Pulls closed-session transcripts and cohort longitudinal emotion series.',
-  },
+  // Foresight is accessed directly via agent/foresight-client.ts.
 })
 
 export default defineAgent({

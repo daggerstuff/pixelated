@@ -9,10 +9,7 @@ import {
 profileAndLogAgentStartup({
   agentName: 'content-agent',
   agentDir: import.meta.dirname,
-  connectionDescriptions: {
-    foresight:
-      'Foresight memory MCP for clinical content curation. Stores audit results, curation picks, and scenario library gate decisions.',
-  },
+  // Foresight is accessed directly via agent/foresight-client.ts.
 })
 
 export default defineAgent({

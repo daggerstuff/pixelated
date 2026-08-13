@@ -9,11 +9,9 @@ import {
 profileAndLogAgentStartup({
   agentName: 'supervisor-agent',
   agentDir: import.meta.dirname,
-  connectionDescriptions: {
-    foresight:
-      'Foresight memory MCP for cross-agent queries: session QA scores, ' +
-      'cohort trends, trainee records, clinical boundary flags, and training provenance.',
-  },
+  // Foresight is accessed directly via agent/foresight-client.ts (streamable
+  // HTTP POST), not through an Eve MCP connection, to avoid the Vercel AI SDK
+  // streamable HTTP transport doing a GET that Foresight's /mcp rejects (405).
 })
 
 export default defineAgent({
