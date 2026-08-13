@@ -263,8 +263,8 @@ class TestBiasDetectionService(unittest.TestCase):
                 ),
             ):
                 initialized = await self.service.initialize()
-                assert initialized is True  # nosec
-                assert self.service.is_initialized is True  # nosec
+                assert initialized is True
+                assert self.service.is_initialized is True
 
         asyncio.run(run())
 
@@ -287,8 +287,8 @@ class TestBiasDetectionService(unittest.TestCase):
                 ),
             ):
                 initialized = await self.service.initialize()
-                assert initialized is True  # nosec
-                assert self.service.is_initialized is True  # nosec
+                assert initialized is True
+                assert self.service.is_initialized is True
 
         asyncio.run(run())
 
@@ -311,8 +311,8 @@ class TestBiasDetectionService(unittest.TestCase):
                 ),
             ):
                 initialized = await self.service.initialize()
-                assert initialized is False  # nosec
-                assert self.service.is_initialized is False  # nosec
+                assert initialized is False
+                assert self.service.is_initialized is False
 
         asyncio.run(run())
 
