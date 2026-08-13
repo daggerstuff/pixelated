@@ -20,6 +20,7 @@ export interface EveSessionOptions {
   endpoint: string
   message: string
   timeoutMs: number
+  authHeader?: string
 }
 
 export interface EveSessionResult {
@@ -56,9 +57,16 @@ export async function createEveSession(
   const timer = setTimeout(() => controller.abort(), options.timeoutMs)
 
   try {
+    const headers: Record<string, string> = {
+      'content-type': 'application/json',
+    }
+    if (options.authHeader) {
+      headers['authorization'] = options.authHeader
+    }
+
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers,
       body: JSON.stringify({ message: options.message }),
       signal: controller.signal,
     })
@@ -97,14 +105,22 @@ export async function streamEveSession(
   sessionId: string,
   timeoutMs: number,
   onEvent?: (event: EveEvent) => void,
+  authHeader?: string,
 ): Promise<EveSessionResult> {
   const url = `${endpoint.replace(/\/$/, '')}/eve/v1/session/${sessionId}/stream`
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), timeoutMs)
 
   try {
+    const headers: Record<string, string> = {
+      accept: 'application/x-ndjson',
+    }
+    if (authHeader) {
+      headers['authorization'] = authHeader
+    }
+
     const res = await fetch(url, {
-      headers: { accept: 'application/x-ndjson' },
+      headers,
       signal: controller.signal,
     })
 
@@ -199,5 +215,7 @@ export async function invokeViaEveSession(
     options.endpoint,
     sessionId,
     options.timeoutMs,
+    undefined,
+    options.authHeader,
   )
 }
