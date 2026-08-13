@@ -81,13 +81,102 @@ export interface DLPResult {
 /**
  * Data Loss Prevention service to control data exfiltration
  */
+export interface ProcessSensitiveContentOptions {
+  action: string
+  contentType: string
+  preserveFormat: boolean
+}
+
+export interface ProcessSensitiveContentResult {
+  content: string
+  wasModified: boolean
+  triggeredRules: string[]
+}
+
 export class DLPService {
+  /**
+   * Process sensitive content by scanning against DLP rules and applying
+   * the appropriate action (redact, block, or allow).
+   *
+   * @param dataStr The content to process
+   * @param options Configuration for how to handle sensitive content
+   * @returns Result with processed content, whether it was modified, and triggered rules
+   * @throws Error if content is blocked by DLP policy
+   */
   processSensitiveContent(
-    _dataStr: string,
-    _arg1: { action: string; contentType: string; preserveFormat: boolean },
-  ) {
-    throw new Error('Method not implemented.')
+    dataStr: string,
+    options: ProcessSensitiveContentOptions,
+  ): ProcessSensitiveContentResult {
+    const result = this.scanContent(dataStr, {
+      userId: 'system',
+      action: options.action,
+    })
+
+    if (!result.allowed) {
+      throw new Error(
+        `Content blocked by DLP policy: ${result.reason ?? 'unknown reason'}`,
+      )
+    }
+
+    const wasModified =
+      result.redactedContent !== undefined && result.redactedContent !== dataStr
+
+    let content = dataStr
+    if (result.redactedContent !== undefined) {
+      content = options.preserveFormat
+        ? this.preserveFormatRedaction(dataStr, result.redactedContent)
+        : result.redactedContent
+    }
+
+    return {
+      content,
+      wasModified,
+      triggeredRules: result.triggeredRules,
+    }
   }
+
+  /**
+   * Preserve the original format by replacing only the redacted portions
+   * with × characters while maintaining the original string length.
+   */
+  private preserveFormatRedaction(
+    original: string,
+    redacted: string,
+  ): string {
+    if (original === redacted) {
+      return original
+    }
+
+    // Find common prefix
+    let prefixLen = 0
+    const minLen = Math.min(original.length, redacted.length)
+    while (
+      prefixLen < minLen &&
+      original[prefixLen] === redacted[prefixLen]
+    ) {
+      prefixLen++
+    }
+
+    // Find common suffix
+    let suffixLen = 0
+    while (
+      suffixLen < minLen - prefixLen &&
+      original[original.length - 1 - suffixLen] ===
+        redacted[redacted.length - 1 - suffixLen]
+    ) {
+      suffixLen++
+    }
+
+    // Build result: prefix + × for redacted zone + suffix
+    const redactedZoneLen = original.length - prefixLen - suffixLen
+    const result =
+      original.slice(0, prefixLen) +
+      '×'.repeat(redactedZoneLen) +
+      original.slice(original.length - suffixLen)
+
+    return result
+  }
+
   private rules: DLPRule[] = []
 
   constructor() {
