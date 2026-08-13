@@ -1,11 +1,11 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
+import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 
 import { createLazyMcpClient } from '@/lib/context/optimization.js'
 
 import { registerProcessShutdown } from './lib/process-shutdown.js'
 
-const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'
+const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'
 
 /**
  * Lazy-loaded Foresight MCP client.
@@ -15,7 +15,7 @@ const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/sse'
  * agent is not actively using Foresight.
  */
 export const { getClient, close } = createLazyMcpClient<Client>(async () => {
-  const transport = new SSEClientTransport(new URL(FORESIGHT_URL))
+  const transport = new StreamableHTTPClientTransport(new URL(FORESIGHT_URL))
   const client = new Client(
     { name: 'session-agent', version: '1.0.0' },
     { capabilities: {} },
