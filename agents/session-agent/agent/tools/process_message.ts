@@ -1,6 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { saveSessionTranscript } from '../mongo-client.js'
+
 const draftTurnSchema = z.object({
   role: z.enum(['trainee', 'participant', 'supervisor']),
   text: z.string().min(1),
@@ -20,15 +22,21 @@ export default defineTool({
     'Returns the canonicalized turn list and current state.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
-    // PII stripping is delegated to the existing ai-services scrubber via a
-    // future sidecar; this slice deliberately does not inline a regex-based
-    // redaction so we never drift from the canonical scrubber in
-    // ai-services/security/pii_scrubber.py.
     const canonicalTurns = input.turns.map((turn) => ({
       ...turn,
       timestamp: turn.timestamp ?? new Date().toISOString(),
       contains_pii: null,
     }))
+
+    await saveSessionTranscript(
+      input.session_id,
+      canonicalTurns.map((t) => ({
+        role: t.role,
+        text: t.text,
+        timestamp: t.timestamp,
+      })),
+      [],
+    )
 
     return {
       session_id: input.session_id,
@@ -37,8 +45,9 @@ export default defineTool({
       pii_scrubber_stub: {
         note: 'Scrubber call is not yet wired. See TODO in tools/process_message.ts.',
       },
-      persistence_stub: {
-        note: 'Mongo append is not yet wired. See agent/connections/memory-mcp.ts.',
+      persistence: {
+        collection: 'rehearsal_sessions',
+        turns_appended: canonicalTurns.length,
       },
     }
   },
