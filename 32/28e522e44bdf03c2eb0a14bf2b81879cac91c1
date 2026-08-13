@@ -1,0 +1,30 @@
+src/lib/services/patient-rights/dataPortabilityService.ts
+  s_992233a7668668::t_afa9db5576e2ef 188
+  s_074527b93405dd::t_85b2b1e2a9dabf 883
+  s_992233a7668668::t_11bb7c20e08b80 5-7,12
+  s_074527b93405dd::t_d28fc3ae22069f 699
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3228e522e44bdf03c2eb0a14bf2b81879cac91c1",
+  "prompts": {},
+  "sessions": {
+    "s_074527b93405dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e908ccef-534a-4b04-83e5-b6fdd20a6b3b",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_992233a7668668": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6da6755e-7c7e-4795-b313-ac28273fda83",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
