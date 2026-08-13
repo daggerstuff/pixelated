@@ -35,6 +35,21 @@ async function fetchUpstream(
   return fetch(url, init)
 }
 
+async function sendUpstreamBody(
+  res: ExpressResponse,
+  upstream: Response,
+): Promise<void> {
+  res.status(upstream.status)
+  // Forward the upstream media type instead of letting Express default to
+  // text/html, so proxied JSON bodies are never interpreted as HTML by the
+  // browser (prevents reflected XSS via user-controlled session ids).
+  res.setHeader(
+    'Content-Type',
+    upstream.headers.get('content-type') ?? 'application/json; charset=utf-8',
+  )
+  res.send(await upstream.text())
+}
+
 export function mountSessionAgentRouter(
   opts: {
     agentOrigin: string // base URL where the eve agent listens, e.g. http://127.0.0.1:2000
@@ -53,8 +68,7 @@ export function mountSessionAgentRouter(
       '/eve/v1/session',
       req,
     )
-    res.status(upstream.status)
-    res.send(await upstream.text())
+    await sendUpstreamBody(res, upstream)
   })
 
   router.post('/session/:id/message', async (req, res: ExpressResponse) => {
@@ -67,8 +81,7 @@ export function mountSessionAgentRouter(
       `/eve/v1/session/${req.params.id}`,
       req,
     )
-    res.status(upstream.status)
-    res.send(await upstream.text())
+    await sendUpstreamBody(res, upstream)
   })
 
   router.post('/session/:id/intervene', async (req, res: ExpressResponse) => {
@@ -81,8 +94,7 @@ export function mountSessionAgentRouter(
       `/eve/v1/session/${req.params.id}`,
       req,
     )
-    res.status(upstream.status)
-    res.send(await upstream.text())
+    await sendUpstreamBody(res, upstream)
   })
 
   // SSE forwarder; pass-through.
