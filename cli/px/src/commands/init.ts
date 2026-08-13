@@ -5,71 +5,11 @@ import { join } from 'node:path'
 import { Command } from 'commander'
 
 import { loadConfig } from '../config/loader.js'
-import type { AgentConfig } from '../config/schema.js'
 
 const DEFAULT_CONFIG = {
   agents: {
-    advisor: {
-      endpoint: 'http://advisor-agent.pixelated.svc.cluster.local:2000',
-      tools: ['review', 'get_worktree', 'read_file'],
-      async: false,
-      timeout: 30000,
-    },
-    content: {
-      endpoint: 'http://content-agent.pixelated.svc.cluster.local:2000',
-      tools: [
-        'audit_corpus',
-        'audit_clinical_corpus',
-        'score_thread',
-        'curate_showcase',
-        'gate_injection',
-      ],
-      async: false,
-      timeout: 30000,
-    },
-    qa: {
-      endpoint: 'http://qa-agent.pixelated.svc.cluster.local:2000',
-      tools: [
-        'score_session',
-        'fetch_sessions',
-        'detect_emotional_patterns',
-        'flag_training_gap',
-        'summarize_cohort',
-        'generate_report',
-      ],
-      async: true,
-      timeout: 30000,
-    },
-    pipeline: {
-      endpoint: 'http://pipeline-agent.pixelated.svc.cluster.local:2000',
-      tools: [
-        'curate_dataset',
-        'run_training',
-        'run_evaluation',
-        'promote_to_staging',
-        'promote_to_production',
-        'rollback_model',
-        'check_pipeline_health',
-        'evaluate_pipeline_review',
-      ],
-      async: true,
-      timeout: 30000,
-    },
-    intake: {
-      endpoint: 'http://intake-agent.pixelated.svc.cluster.local:2000',
-      tools: [
-        'register_trainee',
-        'assign_cohort',
-        'list_cohorts',
-        'get_trainee_status',
-        'get_cohort_progress',
-        'record_curriculum_step',
-      ],
-      async: false,
-      timeout: 30000,
-    },
     supervisor: {
-      endpoint: 'http://supervisor-agent.pixelated.svc.cluster.local:2000',
+      endpoint: 'http://127.0.0.1:2000',
       tools: [
         'query_cohort_trends',
         'compare_trainees',
@@ -81,10 +21,80 @@ const DEFAULT_CONFIG = {
         'notify_slack',
       ],
       async: false,
-      timeout: 30000,
+      timeout: 60000,
+    },
+    advisor: {
+      endpoint: 'http://127.0.0.1:2005',
+      tools: ['review', 'get_worktree', 'read_file'],
+      async: false,
+      timeout: 180000,
+    },
+    content: {
+      endpoint: 'http://127.0.0.1:2010',
+      tools: [
+        'audit_corpus',
+        'audit_clinical_corpus',
+        'score_thread',
+        'curate_showcase',
+        'gate_injection',
+      ],
+      async: false,
+      timeout: 60000,
+    },
+    eve: {
+      endpoint: 'http://127.0.0.1:2015',
+      tools: [
+        'clean_corpus',
+        'replace_slop',
+        'regenerate_record',
+        'evaluate_corpus_gate',
+      ],
+      async: false,
+      timeout: 60000,
+    },
+    intake: {
+      endpoint: 'http://127.0.0.1:2020',
+      tools: [
+        'register_trainee',
+        'assign_cohort',
+        'list_cohorts',
+        'get_trainee_status',
+        'get_cohort_progress',
+        'record_curriculum_step',
+      ],
+      async: false,
+      timeout: 60000,
+    },
+    pipeline: {
+      endpoint: 'http://127.0.0.1:2025',
+      tools: [
+        'curate_dataset',
+        'run_training',
+        'run_evaluation',
+        'promote_to_staging',
+        'promote_to_production',
+        'rollback_model',
+        'check_pipeline_health',
+        'evaluate_pipeline_review',
+      ],
+      async: true,
+      timeout: 180000,
+    },
+    qa: {
+      endpoint: 'http://127.0.0.1:2030',
+      tools: [
+        'score_session',
+        'fetch_sessions',
+        'detect_emotional_patterns',
+        'flag_training_gap',
+        'summarize_cohort',
+        'generate_report',
+      ],
+      async: true,
+      timeout: 60000,
     },
     session: {
-      endpoint: 'http://session-agent.pixelated.svc.cluster.local:2000',
+      endpoint: 'http://127.0.0.1:2035',
       tools: [
         'start_session',
         'process_message',
@@ -97,7 +107,7 @@ const DEFAULT_CONFIG = {
         'conclude_session',
       ],
       async: false,
-      timeout: 30000,
+      timeout: 60000,
     },
   },
   slack: {

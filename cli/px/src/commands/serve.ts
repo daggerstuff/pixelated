@@ -215,7 +215,7 @@ const TOOL_STUBS: Record<string, (body: unknown) => unknown> = {
   }),
   analyze_pace: () => ({
     pace: 'optimal',
-    turns_per_minute: 2.1,
+    turns_per_minute: 2.5,
   }),
   check_clinical_boundary: () => ({
     within_bounds: true,
@@ -238,11 +238,35 @@ const TOOL_STUBS: Record<string, (body: unknown) => unknown> = {
     concluded: true,
     session_id: 'sess_001',
   }),
+
+  // ── eve ─────────────────────────────────────────────
+  clean_corpus: () => ({
+    cleaned: true,
+    removed: 3,
+  }),
+  replace_slop: () => ({
+    replaced: 5,
+  }),
+  regenerate_record: () => ({
+    regenerated: true,
+    record_id: 'rec_001',
+  }),
+  evaluate_corpus_gate: () => ({
+    passed: true,
+    score: 0.92,
+  }),
 }
 
 /**
- * Default stub for tools without a specific mock.
+ * In-memory session store for the stub Eve session API.
  */
+interface StubSession {
+  id: string
+  message: string
+  createdAt: number
+}
+
+const sessions = new Map<string, StubSession>()
 
 interface ServeOptions {
   port?: string
@@ -293,6 +317,7 @@ export function registerServeCommand(program: Command): void {
         console.log(pc.gray(`  agents:  ${agentNames}`))
         console.log(pc.gray(`  tools:   ${servedTools.size} endpoints`))
         console.log(pc.gray(`  health:  GET /eve/v1/health`))
+        console.log(pc.gray(`  session: POST /eve/v1/session, GET /eve/v1/session/:id/stream`))
         console.log(pc.gray(`  set PX_LOCAL=1 to route px commands to localhost`))
       })
 
@@ -319,12 +344,82 @@ function handleRequest(
 
   // Health check
   if (req.method === 'GET' && url === '/eve/v1/health') {
-    writeJson(res, 200, { status: 'ok' })
+    writeJson(res, 200, { ok: true, status: 'ok' })
     return
   }
 
-  // Tool invocation
-  if (req.method === 'POST' && url.startsWith('/eve/v1/')) {
+  // Eve session API: POST /eve/v1/session
+  if (req.method === 'POST' && url === '/eve/v1/session') {
+    readBody(req, (body) => {
+      const message = (body as { message?: string })?.message ?? ''
+      const session: StubSession = {
+        id: `wrun_${randomUUID()}`,
+        message,
+        createdAt: Date.now(),
+      }
+      sessions.set(session.id, session)
+
+      writeJson(res, 200, {
+        ok: true,
+        sessionId: session.id,
+        status: 'accepted',
+      })
+
+      if (verbose) {
+        console.error(pc.gray(`  [serve] session ${session.id} created`))
+      }
+    })
+    return
+  }
+
+  // Eve session stream: GET /eve/v1/session/:id/stream
+  const streamMatch = url.match(/^\/eve\/v1\/session\/([^/]+)\/stream$/)
+  if (req.method === 'GET' && streamMatch) {
+    const sessionId = streamMatch[1]
+    const session = sessions.get(sessionId)
+
+    if (!session) {
+      writeJson(res, 404, { error: 'session not found' })
+      return
+    }
+
+    // Emit a minimal NDJSON event stream that the client expects
+    const events = [
+      { type: 'session.started', data: { sessionId } },
+      { type: 'turn.started', data: {} },
+      { type: 'message.received', data: { message: session.message } },
+      {
+        type: 'message.completed',
+        data: {
+          message: `[stub] Processed: ${session.message}`,
+        },
+      },
+      { type: 'turn.completed', data: {} },
+      { type: 'session.waiting', data: { wait: 'next-user-message' } },
+    ]
+
+    res.writeHead(200, {
+      'content-type': 'application/x-ndjson',
+      'cache-control': 'no-cache',
+      connection: 'keep-alive',
+    })
+
+    for (const event of events) {
+      res.write(JSON.stringify(event) + '\n')
+    }
+    res.end()
+
+    // Clean up session
+    sessions.delete(sessionId)
+
+    if (verbose) {
+      console.error(pc.gray(`  [serve] stream closed for ${sessionId}`))
+    }
+    return
+  }
+
+  // Legacy tool invocation (backward compat): POST /eve/v1/<tool>
+  if (req.method === 'POST' && url.startsWith('/eve/v1/') && !url.includes('/session')) {
     const tool = url.slice('/eve/v1/'.length)
 
     if (!tool) {

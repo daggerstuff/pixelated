@@ -3,7 +3,7 @@ import pc from 'picocolors'
 
 import { loadConfig } from '../lib/config-loader.js'
 import { invokeAgentTool } from '../lib/invoke.js'
-import { formatInteractiveResponse, formatAsyncResponse } from '../output/response.js'
+import { formatAsyncResponse } from '../output/response.js'
 
 /**
  *
@@ -88,6 +88,12 @@ const AGENT_TOOLS: Record<string, ToolAlias[]> = {
     { alias: 'progress', tool: 'get_cohort_progress', description: 'Get cohort progress' },
     { alias: 'curriculum', tool: 'record_curriculum_step', description: 'Record curriculum step completion' },
   ],
+  eve: [
+    { alias: 'clean', tool: 'clean_corpus', description: 'Clean a corpus of synthetic data' },
+    { alias: 'slop', tool: 'replace_slop', description: 'Replace slop in synthetic data' },
+    { alias: 'regen', tool: 'regenerate_record', description: 'Regenerate a corpus record' },
+    { alias: 'gate', tool: 'evaluate_corpus_gate', description: 'Evaluate corpus quality gate' },
+  ],
 }
 
 interface InvokeOptions {
@@ -146,18 +152,18 @@ async function runAgentTool(
     body = JSON.parse(options.body)
   }
 
-  const url = `${agentConfig.endpoint.replace(/\/$/, '')}/eve/v1/${tool}`
+  const sessionUrl = `${agentConfig.endpoint.replace(/\/$/, '')}/eve/v1/session`
 
   if (options.verbose) {
     console.error(
-      pc.gray(`px: POST ${url} (async=${isAsync}, timeout=${agentConfig.timeout}ms)`),
+      pc.gray(`px: POST ${sessionUrl} (tool=${tool}, async=${isAsync}, timeout=${agentConfig.timeout}ms)`),
     )
   }
 
   if (options.dryRun) {
     const payload = {
       method: 'POST',
-      url,
+      url: sessionUrl,
       agent,
       tool,
       async: isAsync,
@@ -180,21 +186,17 @@ async function runAgentTool(
     if (options.json) {
       console.log(JSON.stringify(result, null, 2))
     } else if (isAsync) {
-      const taskId =
-        (result as Record<string, unknown>)?.['task_id'] as string ?? 'unknown'
       const channel = config.slack?.channel
-      console.log(formatAsyncResponse(taskId, channel))
+      console.log(formatAsyncResponse(result.sessionId, channel))
     } else {
-      console.log(
-        formatInteractiveResponse(result, {
-          compact: options.compact,
-          noColor: options.noColor,
-        }),
-      )
+      const text = options.compact
+        ? result.message.replace(/\n+/g, ' ')
+        : result.message
+      console.log(text)
     }
 
     if (options.verbose) {
-      console.error(pc.gray(`px: response received`))
+      console.error(pc.gray(`px: response received (session ${result.sessionId})`))
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
