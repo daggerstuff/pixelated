@@ -1,7 +1,7 @@
 /**
  * @module adapter
- * @description This module provides an adapter for transforming outputs from different LLM providers into a unified format.
- * It allows the MetaAligner pipeline to process responses from various LLMs in a standardized way.
+ * @description module provides adapter transforming outputs LLM providers into unified format.
+ * allows MetaAligner pipeline process responses various LLMs in standardized way.
  */
 
 import type { LLMResponse as MentalLLaMAResponse } from '../../ai/mental-llama/types/mentalLLaMATypes'
@@ -12,25 +12,63 @@ import type {
 } from './unified-api'
 
 /**
- * Represents the supported LLM providers.
- * This enum is used to identify the source of the LLM output.
+ * Represents supported LLM providers.
+ * enum used identify source LLM output.
  */
 export type LLMProvider = 'MentalLLaMA' | 'OpenAI' | 'Anthropic' | 'Gemini'
 
 /**
- * The LLM adapter class.
- * This class is responsible for transforming provider-specific LLM outputs into the unified format.
+ * Raw output shapes from each supported provider's chat completion API.
+ */
+export interface OpenAIRawOutput {
+  id?: string
+  choices?: Array<{
+    message?: { role?: string; content?: string }
+    finish_reason?: string
+  }>
+  usage?: {
+    prompt_tokens?: number
+    completion_tokens?: number
+    total_tokens?: number
+  }
+  model?: string
+}
+
+export interface AnthropicRawOutput {
+  id?: string
+  content?: Array<{ type?: string; text?: string }>
+  usage?: { input_tokens?: number; output_tokens?: number }
+  stop_reason?: string
+  model?: string
+}
+
+export interface GeminiRawOutput {
+  candidates?: Array<{
+    content?: { parts?: Array<{ text?: string }>; role?: string }
+    finishReason?: string
+  }>
+  usageMetadata?: {
+    promptTokenCount?: number
+    candidatesTokenCount?: number
+    totalTokenCount?: number
+  }
+  model?: string
+}
+
+/**
+ * LLM adapter class.
+ * responsible transforming provider-specific LLM outputs into unified format.
  */
 export class LLMAdapter {
   /**
-   * Transforms the raw output from an LLM provider into a {@link UnifiedProcessingRequest}.
-   * This is the main method of the adapter, which dispatches to the appropriate provider-specific transformer.
+   * Transforms raw output LLM provider into {@link UnifiedProcessingRequest}.
+   * main method adapter, dispatches appropriate provider-specific transformer.
    *
-   * @param provider - The LLM provider, e.g., 'MentalLLaMA', 'OpenAI'.
-   * @param rawOutput - The raw output from the LLM provider.
-   * @param context - The context for the processing request.
-   * @returns The transformed processing request, ready to be sent to the MetaAligner pipeline.
-   * @throws An error if the provider is not supported.
+   * @param provider - LLM provider, e.g., 'MentalLLaMA', 'OpenAI'.
+   * @param rawOutput - raw output LLM provider.
+   * @param context - context processing request.
+   * @returns transformed processing request, ready sent MetaAligner pipeline.
+   * @throws An error provider not supported.
    */
   public transform(
     provider: LLMProvider,
@@ -44,26 +82,29 @@ export class LLMAdapter {
           context,
         )
       case 'OpenAI':
-        // Placeholder for OpenAI adapter
-        throw new Error('OpenAI adapter not implemented yet.')
+        return this.transformOpenAI(
+          rawOutput as OpenAIRawOutput,
+          context,
+        )
       case 'Anthropic':
-        // Placeholder for Anthropic adapter
-        throw new Error('Anthropic adapter not implemented yet.')
+        return this.transformAnthropic(
+          rawOutput as AnthropicRawOutput,
+          context,
+        )
       case 'Gemini':
-        // Placeholder for Gemini adapter
-        throw new Error('Gemini adapter not implemented yet.')
-      default:
-        throw new Error(`Unsupported LLM provider: ${provider}`)
+        return this.transformGemini(
+          rawOutput as GeminiRawOutput,
+          context,
+        )
+      default: {
+        const exhaustive: never = provider
+        throw new Error(`Unsupported LLM provider: ${String(exhaustive)}`)
+      }
     }
   }
 
   /**
-   * Transforms the output from the MentalLLaMA provider.
-   * This method is specific to the MentalLLaMA provider and its {@link MentalLLaMAResponse} format.
-   *
-   * @param rawOutput - The raw output from the MentalLLaMA provider.
-   * @param context - The context for the processing request.
-   * @returns The transformed processing request.
+   * Transforms raw output from the MentalLLaMA provider into unified format.
    */
   private transformMentalLLaMA(
     rawOutput: MentalLLaMAResponse,
@@ -79,9 +120,96 @@ export class LLMAdapter {
       },
     }
 
-    return {
-      llmOutput,
-      context,
+    return { llmOutput, context }
+  }
+
+  /**
+   * Transforms raw output from the OpenAI Chat Completions API into unified format.
+   */
+  private transformOpenAI(
+    rawOutput: OpenAIRawOutput,
+    context: UnifiedContext,
+  ): UnifiedProcessingRequest {
+    const choice = rawOutput.choices?.[0]
+    const content = choice?.message?.content ?? ''
+    const llmOutput: LLMOutput = {
+      content,
+      metadata: {
+        provider: 'OpenAI',
+        model: rawOutput.model,
+        finishReason: choice?.finish_reason,
+        tokenUsage: rawOutput.usage
+          ? {
+              promptTokens: rawOutput.usage.prompt_tokens ?? 0,
+              completionTokens: rawOutput.usage.completion_tokens ?? 0,
+              totalTokens: rawOutput.usage.total_tokens ?? 0,
+            }
+          : undefined,
+      },
     }
+    return { llmOutput, context }
+  }
+
+  /**
+   * Transforms raw output from the Anthropic Messages API into unified format.
+   */
+  private transformAnthropic(
+    rawOutput: AnthropicRawOutput,
+    context: UnifiedContext,
+  ): UnifiedProcessingRequest {
+    const content =
+      rawOutput.content
+        ?.map((block) => block.text ?? '')
+        .join('') ?? ''
+    const llmOutput: LLMOutput = {
+      content,
+      metadata: {
+        provider: 'Anthropic',
+        model: rawOutput.model,
+        finishReason: rawOutput.stop_reason,
+        tokenUsage:
+          rawOutput.usage != null
+            ? {
+                promptTokens: rawOutput.usage.input_tokens ?? 0,
+                completionTokens: rawOutput.usage.output_tokens ?? 0,
+                totalTokens:
+                  (rawOutput.usage.input_tokens ?? 0) +
+                  (rawOutput.usage.output_tokens ?? 0),
+              }
+            : undefined,
+      },
+    }
+    return { llmOutput, context }
+  }
+
+  /**
+   * Transforms raw output from the Google Gemini generateContent API into unified format.
+   */
+  private transformGemini(
+    rawOutput: GeminiRawOutput,
+    context: UnifiedContext,
+  ): UnifiedProcessingRequest {
+    const candidate = rawOutput.candidates?.[0]
+    const content =
+      candidate?.content?.parts
+        ?.map((part) => part.text ?? '')
+        .join('') ?? ''
+    const llmOutput: LLMOutput = {
+      content,
+      metadata: {
+        provider: 'Gemini',
+        model: rawOutput.model,
+        finishReason: candidate?.finishReason,
+        tokenUsage: rawOutput.usageMetadata
+          ? {
+              promptTokens: rawOutput.usageMetadata.promptTokenCount ?? 0,
+              completionTokens:
+                rawOutput.usageMetadata.candidatesTokenCount ?? 0,
+              totalTokens: rawOutput.usageMetadata.totalTokenCount ?? 0,
+            }
+          : undefined,
+      },
+    }
+    return { llmOutput, context }
   }
 }
