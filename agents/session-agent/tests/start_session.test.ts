@@ -20,14 +20,14 @@ async function execute(input: z.infer<typeof inputSchema>) {
     state: input.resume ? 'RECOVERING' : 'NEW',
     persisted_at: persistedAt,
     resume_token: `${sessionId}:${persistedAt}`,
-    foresight_stub: {
+    foresight_memory: {
       memory_id: null,
       note: 'Foresight MCP write is not yet wired in this slice.',
     },
-    mongo_stub: {
-      collection: 'sessions',
+    mongo: {
+      collection: 'rehearsal_sessions',
       document_id: sessionId,
-      note: 'Mongo write is not yet wired in this slice.',
+      persisted: false,
     },
   }
 }
@@ -105,25 +105,25 @@ describe('start_session', () => {
     expect(result.persisted_at).toMatch(/^\d{4}-\d{2}-\d{2}T/)
   })
 
-  it('should return foresight_stub with memory_id=null', async () => {
+  it('should return foresight_memory with memory_id=null', async () => {
     const result = await execute({
       trainee_id: 'alice',
       scenario_id: 'scenario-1',
     })
-    expect(result.foresight_stub).toBeDefined()
+    expect(result.foresight_memory).toBeDefined()
     expect(
-      (result.foresight_stub as Record<string, unknown>).memory_id,
+      (result.foresight_memory as Record<string, unknown>).memory_id,
     ).toBeNull()
   })
 
-  it('should return mongo_stub with collection=sessions', async () => {
+  it('should return mongo with collection=rehearsal_sessions', async () => {
     const result = await execute({
       trainee_id: 'alice',
       scenario_id: 'scenario-1',
     })
-    expect(result.mongo_stub).toBeDefined()
-    expect((result.mongo_stub as Record<string, unknown>).collection).toBe(
-      'sessions',
+    expect(result.mongo).toBeDefined()
+    expect((result.mongo as Record<string, unknown>).collection).toBe(
+      'rehearsal_sessions',
     )
   })
 })
