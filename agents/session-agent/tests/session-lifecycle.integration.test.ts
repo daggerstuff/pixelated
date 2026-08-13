@@ -57,8 +57,8 @@ async function startSession(input: z.infer<typeof startSessionSchema>) {
     state: input.resume ? 'RECOVERING' : 'NEW',
     persisted_at: new Date().toISOString(),
     resume_token: `${sessionId}:${new Date().toISOString()}`,
-    foresight_stub: { memory_id: null },
-    mongo_stub: { collection: 'sessions', document_id: sessionId },
+    foresight_memory: { memory_id: null },
+    mongo: { collection: 'rehearsal_sessions', document_id: sessionId, persisted: false },
   }
 }
 
