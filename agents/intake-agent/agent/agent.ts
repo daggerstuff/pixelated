@@ -9,10 +9,7 @@ import {
 profileAndLogAgentStartup({
   agentName: 'intake-agent',
   agentDir: import.meta.dirname,
-  connectionDescriptions: {
-    foresight:
-      'Foresight memory MCP for trainee profiles, cohort assignments, and curriculum progress.',
-  },
+  // Foresight is accessed directly via agent/foresight-client.ts.
 })
 
 export default defineAgent({

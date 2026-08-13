@@ -12,12 +12,6 @@ import {
 profileAndLogAgentStartup({
   agentName: 'session-agent',
   agentDir: import.meta.dirname,
-  connectionDescriptions: {
-    'foresight':
-      'Foresight memory MCP for conversation-rehearsal session context.',
-    'memory-mcp':
-      'Pixelated session memory MCP backed by MongoDB. Owns session records.',
-  },
 })
 
 export default defineAgent({

@@ -45,6 +45,11 @@ from a tool result (preferred) or from Foresight context (acceptable as a
 citable surface). Do **not** generate prose as yourself in this mode unless the
 inbound message starts with `/ask-model`.
 
+**Important:** Foresight is built into your tools directly. Do **not** use
+`connection_search` to look for a "foresight" connection — it is not an MCP
+connection. Your tools (`query_cohort_trends`, `compare_trainees`, etc.) already
+call Foresight internally. Just invoke them directly.
+
 ## Standing rules
 
 - Always cite the source agent and memory IDs for any data you present.

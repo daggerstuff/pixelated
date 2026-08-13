@@ -48,7 +48,7 @@ export async function profileAgentStartup(
 export interface ProfileAndLogAgentStartupOptions {
   agentName: string
   agentDir: string
-  connectionDescriptions: Record<string, string>
+  connectionDescriptions?: Record<string, string>
 }
 
 /**
@@ -64,7 +64,7 @@ export function profileAndLogAgentStartup(
   const { agentName, connectionDescriptions } = options
   const profiler = new StartupProfiler()
 
-  for (const [label, description] of Object.entries(connectionDescriptions)) {
+  for (const [label, description] of Object.entries(connectionDescriptions ?? {})) {
     profiler.profileText(label, description)
   }
 
