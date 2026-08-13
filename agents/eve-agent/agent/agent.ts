@@ -1,8 +1,12 @@
 import { defineAgent } from 'eve'
+import {
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  agentModel,
+} from './lib/workers-ai.js'
 
 export default defineAgent({
-  name: 'eve-agent',
-  description: 'Vercel Edge & AI Infrastructure Agent',
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   compaction: {
     thresholdPercent: 0.75,
   },
