@@ -28,23 +28,24 @@ from scripts.task_sync.tri_sync import (
 )
 
 
-def make_record(  # noqa: PLR0913
+def make_record(
     provider: str,
     external_id: str,
     title: str,
     body: str,
     status: str,
-    minutes_ago: int = 0,
-    sync_key: str | None = None,
+    **overrides,
 ) -> TaskRecord:
+    updated_at = datetime.now(timezone.utc) - timedelta(minutes=overrides.pop("minutes_ago", 0))
     return TaskRecord(
         provider=provider,
         external_id=external_id,
         title=title,
         body=body,
         status=status,
-        updated_at=datetime.now(timezone.utc) - timedelta(minutes=minutes_ago),
-        sync_key=sync_key,
+        updated_at=updated_at,
+        sync_key=overrides.pop("sync_key", None),
+        **overrides,
     )
 
 
