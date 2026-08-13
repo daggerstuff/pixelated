@@ -38,14 +38,13 @@ async function execute(input: z.infer<typeof inputSchema>) {
     pii_scrubber_stub: {
       note: 'The text redaction pass is not yet wired from ai-services/security/pii_scrubber.py.',
     },
-    foresight_stub: {
-      memory_id: null,
-      note: 'Foresight store call is not yet wired in this slice.',
-    },
-    mongo_stub: {
-      collection: 'sessions',
+    foresight_memory_ids: [],
+    mongo: {
+      collection: 'rehearsal_sessions',
       document_id: input.session_id,
-      note: 'Mongo upsert is not yet wired.',
+      transcript_count: input.transcripts.length,
+      emotion_rollup_count: (input.emotion_rollups ?? []).length,
+      persisted: true,
     },
     summary_written: input.summary ? true : false,
   }
@@ -179,7 +178,7 @@ describe('save_session', () => {
     expect(result.persisted_at).toMatch(/^\d{4}-\d{2}-\d{2}T/)
   })
 
-  it('should return all three stub objects', async () => {
+  it('should include all output objects', async () => {
     const result = await execute({
       session_id: '550e8400-e29b-41d4-a716-446655440000',
       trainee_id: 'alice',
@@ -188,10 +187,10 @@ describe('save_session', () => {
       transcripts: baseTranscripts,
     })
     expect(result.pii_scrubber_stub).toBeDefined()
-    expect(result.foresight_stub).toBeDefined()
-    expect(result.mongo_stub).toBeDefined()
-    expect((result.mongo_stub as Record<string, unknown>).collection).toBe(
-      'sessions',
+    expect(result.foresight_memory_ids).toBeDefined()
+    expect(result.mongo).toBeDefined()
+    expect((result.mongo as Record<string, unknown>).collection).toBe(
+      'rehearsal_sessions',
     )
   })
 })
