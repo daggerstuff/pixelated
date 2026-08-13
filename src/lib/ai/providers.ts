@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions } from './models/ai-types'
+import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions, AIUsage } from './models/ai-types'
 import { createLLMService } from './services/llm-provider'
 
 const appLogger = createBuildSafeLogger('ai-providers')
@@ -294,15 +294,153 @@ function createLLMServiceAdapter(config: AIProviderConfig): AIService {
 }
 
 function createAnthropicServiceAdapter(config: AIProviderConfig): AIService {
-  // Placeholder implementation for Anthropic
+  const baseUrl = config.baseUrl ?? 'https://api.anthropic.com'
+
+  const headers = (extra?: Record<string, string>) => ({
+    'Content-Type': 'application/json',
+    'x-api-key': config.apiKey,
+    'anthropic-version': '2023-06-01',
+    ...extra,
+  })
+
+  const createChatCompletion = async (
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+  ): Promise<AICompletion> => {
+    const model = options?.model ?? config.defaultModel
+    const systemMsg = messages.find((m) => m.role === 'system')
+    const userMessages = messages
+      .filter((m) => m.role !== 'system')
+      .map((m) => ({ role: m.role, content: m.content }))
+
+    const response = await fetch(`${baseUrl}/v1/messages`, {
+      method: 'POST',
+      headers: headers(),
+      body: JSON.stringify({
+        model,
+        max_tokens: options?.maxTokens ?? 4096,
+        temperature: options?.temperature,
+        stop_sequences: options?.stop,
+        system: systemMsg?.content,
+        messages: userMessages,
+      }),
+    })
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => response.statusText)
+      throw new Error(`Anthropic API error (${response.status}): ${errText}`)
+    }
+
+    const data = await response.json() as {
+      id: string
+      content: Array<{ text: string; type: string }>
+      usage: { input_tokens: number; output_tokens: number }
+      stop_reason?: string
+    }
+
+    const content = data.content?.map((c) => c.text).join('') ?? ''
+    const usage: AIUsage = {
+      promptTokens: data.usage?.input_tokens ?? 0,
+      completionTokens: data.usage?.output_tokens ?? 0,
+      totalTokens: (data.usage?.input_tokens ?? 0) + (data.usage?.output_tokens ?? 0),
+    }
+
+    return {
+      id: data.id,
+      created: Date.now(),
+      model,
+      choices: [
+        {
+          message: { role: 'assistant', content },
+          finishReason: data.stop_reason === 'max_tokens' ? 'length' : 'stop',
+        },
+      ],
+      usage,
+      provider: 'anthropic',
+      content,
+    }
+  }
+
   return {
-    createChatCompletion: async () => {
-      throw new Error('Anthropic service not implemented')
+    createChatCompletion,
+    createStreamingChatCompletion: async (messages, options) => {
+      const model = options?.model ?? config.defaultModel
+      const systemMsg = messages.find((m) => m.role === 'system')
+      const userMessages = messages
+        .filter((m) => m.role !== 'system')
+        .map((m) => ({ role: m.role, content: m.content }))
+
+      const response = await fetch(`${baseUrl}/v1/messages`, {
+        method: 'POST',
+        headers: headers({ Accept: 'text/event-stream' }),
+        body: JSON.stringify({
+          model,
+          max_tokens: options?.maxTokens ?? 4096,
+          temperature: options?.temperature,
+          stop_sequences: options?.stop,
+          stream: true,
+          system: systemMsg?.content,
+          messages: userMessages,
+        }),
+      })
+
+      if (!response.ok || !response.body) {
+        const errText = await response.text().catch(() => response.statusText)
+        throw new Error(`Anthropic stream error (${response.status}): ${errText}`)
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      const msgId = `anthropic-${Date.now()}`
+
+      const stream = async function* (): AsyncGenerator<AIStreamChunk, void, void> {
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue
+              const jsonStr = line.slice(6).trim()
+              if (!jsonStr || jsonStr === '[DONE]') continue
+              try {
+                const event = JSON.parse(jsonStr) as {
+                  type: string
+                  delta?: { text?: string; stop_reason?: string }
+                  message?: { id?: string }
+                }
+                if (event.type === 'content_block_delta' && event.delta?.text) {
+                  yield {
+                    id: event.message?.id ?? msgId,
+                    model,
+                    created: Date.now(),
+                    content: event.delta.text,
+                    done: false,
+                  }
+                } else if (event.delta?.stop_reason) {
+                  yield {
+                    id: msgId,
+                    model,
+                    created: Date.now(),
+                    content: '',
+                    done: true,
+                    finishReason: event.delta.stop_reason === 'max_tokens' ? 'length' : 'stop',
+                  }
+                }
+              } catch {
+                // skip malformed SSE line
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock()
+        }
+      }
+      return stream()
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('Anthropic streaming not implemented'),
-      ),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
@@ -311,22 +449,157 @@ function createAnthropicServiceAdapter(config: AIProviderConfig): AIService {
       contextWindow: 100000,
       maxTokens: 4096,
     }),
-    dispose: () => {
-      // Cleanup if needed
-    },
+    dispose: () => {},
   }
 }
 
 function createOpenAIServiceAdapter(config: AIProviderConfig): AIService {
-  // Placeholder implementation for OpenAI
+  const baseUrl = config.baseUrl ?? 'https://api.openai.com'
+
+  const createChatCompletion = async (
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+  ): Promise<AICompletion> => {
+    const model = options?.model ?? config.defaultModel
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+        max_tokens: options?.maxTokens ?? 4096,
+        temperature: options?.temperature,
+        stop: options?.stop,
+      }),
+    })
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => response.statusText)
+      throw new Error(`OpenAI API error (${response.status}): ${errText}`)
+    }
+
+    const data = await response.json() as {
+      id: string
+      created: number
+      model: string
+      choices: Array<{
+        message: { role: string; content: string }
+        finish_reason: string
+      }>
+      usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number }
+    }
+
+    const choice = data.choices?.[0]
+    const content = choice?.message?.content ?? ''
+    const usage: AIUsage = {
+      promptTokens: data.usage?.prompt_tokens ?? 0,
+      completionTokens: data.usage?.completion_tokens ?? 0,
+      totalTokens: data.usage?.total_tokens ?? 0,
+    }
+
+    return {
+      id: data.id,
+      created: data.created,
+      model: data.model,
+      choices: [
+        {
+          message: { role: 'assistant', content },
+          finishReason: choice?.finish_reason === 'length' ? 'length' : 'stop',
+        },
+      ],
+      usage,
+      provider: 'openai',
+      content,
+    }
+  }
+
   return {
-    createChatCompletion: async () => {
-      throw new Error('OpenAI service not implemented')
+    createChatCompletion,
+    createStreamingChatCompletion: async (messages, options) => {
+      const model = options?.model ?? config.defaultModel
+      const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          model,
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
+          max_tokens: options?.maxTokens ?? 4096,
+          temperature: options?.temperature,
+          stop: options?.stop,
+          stream: true,
+        }),
+      })
+
+      if (!response.ok || !response.body) {
+        const errText = await response.text().catch(() => response.statusText)
+        throw new Error(`OpenAI stream error (${response.status}): ${errText}`)
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      const msgId = `openai-${Date.now()}`
+
+      const stream = async function* (): AsyncGenerator<AIStreamChunk, void, void> {
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue
+              const jsonStr = line.slice(6).trim()
+              if (!jsonStr || jsonStr === '[DONE]') continue
+              try {
+                const event = JSON.parse(jsonStr) as {
+                  id?: string
+                  model?: string
+                  created?: number
+                  choices: Array<{
+                    delta?: { content?: string; role?: string }
+                    finish_reason?: string
+                  }>
+                }
+                const delta = event.choices?.[0]?.delta
+                if (delta?.content) {
+                  yield {
+                    id: event.id ?? msgId,
+                    model: event.model ?? model,
+                    created: event.created ?? Date.now(),
+                    content: delta.content,
+                    done: false,
+                  }
+                }
+                const finishReason = event.choices?.[0]?.finish_reason
+                if (finishReason) {
+                  yield {
+                    id: msgId,
+                    model: event.model ?? model,
+                    created: event.created ?? Date.now(),
+                    content: '',
+                    done: true,
+                    finishReason: finishReason === 'length' ? 'length' : 'stop',
+                  }
+                }
+              } catch {
+                // skip malformed SSE line
+              }
+            }
+          }
+        } finally {
+          reader.releaseLock()
+        }
+      }
+      return stream()
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('OpenAI streaming not implemented'),
-      ),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
@@ -335,22 +608,150 @@ function createOpenAIServiceAdapter(config: AIProviderConfig): AIService {
       contextWindow: 8192,
       maxTokens: 4096,
     }),
-    dispose: () => {
-      // Cleanup if needed
-    },
+    dispose: () => {},
   }
 }
 
 function createHuggingFaceServiceAdapter(config: AIProviderConfig): AIService {
-  // Placeholder implementation for Hugging Face
+  const baseUrl =
+    config.baseUrl ?? 'https://api-inference.huggingface.co/models'
+
+  const createChatCompletion = async (
+    messages: AIMessage[],
+    options?: AIServiceOptions,
+  ): Promise<AICompletion> => {
+    const model = options?.model ?? config.defaultModel
+    const prompt = messages
+      .map((m) => `${m.role === 'assistant' ? 'Assistant' : m.role === 'system' ? 'System' : 'User'}: ${m.content}`)
+      .join('\n')
+
+    const response = await fetch(`${baseUrl}/${model}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        inputs: prompt,
+        parameters: {
+          max_new_tokens: options?.maxTokens ?? 1024,
+          temperature: options?.temperature,
+          return_full_text: false,
+        },
+        options: { wait_for_model: true },
+      }),
+    })
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => response.statusText)
+      throw new Error(`HuggingFace API error (${response.status}): ${errText}`)
+    }
+
+    const data = (await response.json()) as Array<{ generated_text?: string }> | { generated_text?: string }
+    const generated = Array.isArray(data) ? data[0]?.generated_text ?? '' : data.generated_text ?? ''
+    const content = generated.trim()
+
+    const usage: AIUsage = {
+      promptTokens: Math.ceil(prompt.length / 4),
+      completionTokens: Math.ceil(content.length / 4),
+      totalTokens: Math.ceil((prompt.length + content.length) / 4),
+    }
+
+    return {
+      id: `hf-${Date.now()}`,
+      created: Date.now(),
+      model,
+      choices: [
+        {
+          message: { role: 'assistant', content },
+          finishReason: 'stop',
+        },
+      ],
+      usage,
+      provider: 'huggingface',
+      content,
+    }
+  }
+
   return {
-    createChatCompletion: async () => {
-      throw new Error('Hugging Face service not implemented')
+    createChatCompletion,
+    createStreamingChatCompletion: async (messages, options) => {
+      const model = options?.model ?? config.defaultModel
+      const prompt = messages
+        .map((m) => `${m.role === 'assistant' ? 'Assistant' : m.role === 'system' ? 'System' : 'User'}: ${m.content}`)
+        .join('\n')
+
+      const response = await fetch(`${baseUrl}/${model}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.apiKey}`,
+        },
+        body: JSON.stringify({
+          inputs: prompt,
+          parameters: {
+            max_new_tokens: options?.maxTokens ?? 1024,
+            temperature: options?.temperature,
+            return_full_text: false,
+          },
+          stream: true,
+        }),
+      })
+
+      if (!response.ok || !response.body) {
+        const errText = await response.text().catch(() => response.statusText)
+        throw new Error(`HuggingFace stream error (${response.status}): ${errText}`)
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+      const msgId = `hf-${Date.now()}`
+
+      const stream = async function* (): AsyncGenerator<AIStreamChunk, void, void> {
+        try {
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() ?? ''
+            for (const line of lines) {
+              const trimmed = line.trim()
+              if (!trimmed.startsWith('data:')) continue
+              const jsonStr = trimmed.slice(5).trim()
+              if (!jsonStr || jsonStr === '[DONE]') continue
+              try {
+                const event = JSON.parse(jsonStr) as { token?: { text?: string }; generated_text?: string }
+                const chunk = event.token?.text ?? event.generated_text ?? ''
+                if (chunk) {
+                  yield {
+                    id: msgId,
+                    model,
+                    created: Date.now(),
+                    content: chunk,
+                    done: false,
+                  }
+                }
+              } catch {
+                // skip malformed SSE line
+              }
+            }
+          }
+          yield {
+            id: msgId,
+            model,
+            created: Date.now(),
+            content: '',
+            done: true,
+            finishReason: 'stop',
+          }
+        } finally {
+          reader.releaseLock()
+        }
+      }
+      return stream()
     },
-    createStreamingChatCompletion: async (_messages, _options) =>
-      Promise.reject(
-        new Error('Hugging Face streaming not implemented'),
-      ),
     getModelInfo: (model: string) => ({
       id: model,
       name: model,
@@ -359,9 +760,7 @@ function createHuggingFaceServiceAdapter(config: AIProviderConfig): AIService {
       contextWindow: 2048,
       maxTokens: 1024,
     }),
-    dispose: () => {
-      // Cleanup if needed
-    },
+    dispose: () => {},
   }
 }
 
