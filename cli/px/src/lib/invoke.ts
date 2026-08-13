@@ -6,6 +6,7 @@ export interface InvokeAgentToolOptions {
   body: unknown
   timeout: number
   async: boolean
+  authHeader?: string
 }
 
 /**
@@ -25,6 +26,7 @@ export async function invokeAgentTool(
     endpoint: options.endpoint,
     message,
     timeoutMs: options.timeout,
+    authHeader: options.authHeader,
   })
 }
 
