@@ -206,6 +206,18 @@ interface BackupMetadata extends BaseBackupMetadata {
   authTag: string // Base64-encoded authentication tag
 }
 
+interface RestoreResult {
+  modelsProcessed: number
+  documentsRestored: number
+  models: Record<string, { restored: number; errors: number }>
+}
+
+interface BackupDataPayload {
+  timestamp: string
+  type: string
+  data: Record<string, Record<string, unknown>[]>
+}
+
 /**
  * Core class for backup security management
  */
@@ -949,7 +961,7 @@ export class BackupSecurityManager {
       const decryptedData = await this.decrypt(encryptedData, iv, authTag)
 
       // Restore the data
-      await this.restoreData(decryptedData)
+      const restoreResult = await this.restoreData(decryptedData)
 
       // Update metadata
       const updatedMetadata = {
@@ -968,6 +980,8 @@ export class BackupSecurityManager {
         {
           size: encryptedData.byteLength,
           path: metadata.path,
+          documentsRestored: restoreResult.documentsRestored,
+          modelsProcessed: restoreResult.modelsProcessed,
         },
       )
 
@@ -1062,17 +1076,122 @@ export class BackupSecurityManager {
 
   /**
    * Restore data from a decrypted backup
-   * @param data The decrypted backup data
+   * @param data The decrypted backup data (JSON in Uint8Array format)
+   * @returns RestoreResult with counts of restored documents and models
    */
-  private async restoreData(data: Uint8Array): Promise<void> {
+  private async restoreData(data: Uint8Array): Promise<RestoreResult> {
     try {
-      // [PIX-43] Data restoration is not implemented — processRestoredData is a
-      // stub. Throw so restoreBackup surfaces an explicit failure rather than
-      // returning true while nothing was actually restored.
-      logger.info(`Parsed backup data of size: ${data.byteLength} bytes`)
-      throw new Error(
-        'Data restoration not implemented: processRestoredData is a stub (PIX-43)',
+      logger.info(`Parsing backup data of size: ${data.byteLength} bytes`)
+
+      const json = JSON.parse(new TextDecoder().decode(data)) as BackupDataPayload
+
+      if (!json.data || typeof json.data !== 'object') {
+        throw new Error('Invalid backup format: missing "data" field')
+      }
+
+      const mongooseModule = 'mongoose'
+      const mongoose =
+        (await import(/* @vite-ignore */ mongooseModule)).default ??
+        (await import(/* @vite-ignore */ mongooseModule))
+
+      const connection = mongoose.connection
+      if (connection.readyState !== 1) {
+        throw new Error('Mongoose connection is not ready — cannot restore data')
+      }
+
+      const result: RestoreResult = {
+        modelsProcessed: 0,
+        documentsRestored: 0,
+        models: {},
+      }
+
+      for (const [modelName, documents] of Object.entries(json.data)) {
+        if (!Array.isArray(documents)) {
+          logger.warn(`Skipping "${modelName}": expected array of documents`)
+          continue
+        }
+
+        let Model: import('mongoose').Model<unknown>
+        try {
+          Model = connection.model(modelName)
+        } catch {
+          logger.warn(
+            `Skipping "${modelName}": model not registered in current schema`,
+          )
+          result.models[modelName] = { restored: 0, errors: 0 }
+          result.modelsProcessed++
+          continue
+        }
+
+        if (documents.length === 0) {
+          result.models[modelName] = { restored: 0, errors: 0 }
+          result.modelsProcessed++
+          continue
+        }
+
+        const ops = documents.map((doc: Record<string, unknown>) => ({
+          updateOne: {
+            filter: { _id: doc._id },
+            update: { $set: doc },
+            upsert: true,
+          },
+        }))
+
+        try {
+          const bulkResult = await Model.bulkWrite(ops, { ordered: false })
+          const restored =
+            (bulkResult.upsertedCount ?? 0) +
+            (bulkResult.modifiedCount ?? 0)
+          const errors = bulkResult.writeErrors?.length ?? 0
+
+          result.models[modelName] = { restored, errors }
+          result.documentsRestored += restored
+          result.modelsProcessed++
+
+          logger.info(
+            `Restored ${restored} documents for model "${modelName}" (${errors} errors)`,
+          )
+        } catch (bulkError: unknown) {
+          const errors = documents.length
+          result.models[modelName] = { restored: 0, errors }
+          result.documentsRestored += 0
+          result.modelsProcessed++
+
+          logger.error(
+            `Bulk restore failed for model "${modelName}": ${bulkError instanceof Error ? bulkError.message : String(bulkError)}`,
+          )
+        }
+      }
+
+      // Integrity verification: re-read one model to confirm data was written
+      if (result.modelsProcessed > 0 && result.documentsRestored > 0) {
+        const firstModelName = Object.keys(json.data)[0]
+        const firstModelDocs = json.data[firstModelName]
+        if (firstModelDocs && firstModelDocs.length > 0) {
+          try {
+            const Model = connection.model(firstModelName)
+            const sampleId = (firstModelDocs[0] as Record<string, unknown>)._id
+            const verified = await Model.exists({ _id: sampleId })
+            if (!verified) {
+              throw new Error(
+                `Integrity check failed: document ${String(sampleId)} from model "${firstModelName}" not found after restore`,
+              )
+            }
+            logger.info('Integrity verification passed')
+          } catch (verifyError: unknown) {
+            throw new Error(
+              `Post-restore integrity verification failed: ${verifyError instanceof Error ? verifyError.message : String(verifyError)}`,
+              { cause: verifyError },
+            )
+          }
+        }
+      }
+
+      logger.info(
+        `Restore complete: ${result.documentsRestored} documents across ${result.modelsProcessed} models`,
       )
+
+      return result
     } catch (error: unknown) {
       logger.error(
         `Failed to restore data: ${error instanceof Error ? String(error) : String(error)}`,
