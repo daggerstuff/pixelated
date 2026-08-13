@@ -104,6 +104,9 @@ __mocks__
 .squad/orchestration-log/
 .squad/sessions/
 
+# Workflow runtime state (locks, events, runs)
+**/.workflow-data/
+
 # === VIRTUAL ENVIRONMENTS ===
 .autoswitch_venv
 .envrc
