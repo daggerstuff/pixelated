@@ -166,12 +166,9 @@ export function useChatCompletion({
       startTime: initialMessages.length > 0 ? new Date() : null,
     },
   )
-  const [messageStats] = useState<MessageStats>({
-    longestMessage: 0,
-    shortestMessage: 0,
-    averageLength: 0,
-    sentimentDistribution: {},
-  })
+  const [sentimentDistribution, setSentimentDistribution] = useState<{
+    [key: string]: number
+  }>({})
 
   // Store last user message for retry functionality
   const lastUserMessageRef = useRef<string | null>(null)
@@ -774,9 +771,29 @@ export function useChatCompletion({
   }, [])
 
   // Get message stats
+  const messageStats: MessageStats = useMemo(() => {
+    if (!messages.length) {
+      return {
+        longestMessage: 0,
+        shortestMessage: 0,
+        averageLength: 0,
+        sentimentDistribution,
+      }
+    }
+    const lens = messages.map((m) => m.content.length)
+    const longestMessage = Math.max(...lens)
+    const shortestMessage = Math.min(...lens)
+    const averageLength =
+      lens.reduce((sum, len) => sum + len, 0) / lens.length
+    return {
+      longestMessage,
+      shortestMessage,
+      averageLength,
+      sentimentDistribution,
+    }
+  }, [messages, sentimentDistribution])
+
   const getMessageStats = useCallback((): MessageStats => {
-    // This is a placeholder implementation.
-    // A real implementation would calculate this based on the messages.
     return messageStats
   }, [messageStats])
 
