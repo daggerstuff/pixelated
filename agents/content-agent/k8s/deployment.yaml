@@ -1,0 +1,122 @@
+# content-agent K8s manifest.
+#
+# Deploys the content audit agent as a long-running Node service.
+# Event-driven (no schedule); reachable via Eve HTTP channel.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: content-agent
+  namespace: pixelated-empathy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: content-agent
+  template:
+    metadata:
+      labels:
+        app: content-agent
+    spec:
+      imagePullSecrets:
+        - name: dockerhub-registry-credentials
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: agent
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+          image: docker.io/pixelatedempathy/content-agent:latest
+          ports:
+            - containerPort: 2000
+              name: http
+          env:
+            - name: PORT
+              value: "2000"
+            - name: HOST
+              value: "0.0.0.0"
+            - name: NODE_ENV
+              value: production
+            - name: CLOUDFLARE_ACCOUNT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-workers-ai
+                  key: account-id
+            - name: CLOUDFLARE_AI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-workers-ai
+                  key: api-key
+            - name: WORKERS_AI_AGENT_MODEL
+              value: "@cf/moonshotai/kimi-k2.7-code"
+            - name: FORESIGHT_URL
+              value: http://foresight:8765/mcp
+            - name: EVE_AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: eve-auth
+                  key: username
+            - name: EVE_AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eve-auth
+                  key: password
+          startupProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 3
+            failureThreshold: 30
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: content-agent
+  namespace: pixelated-empathy
+spec:
+  selector:
+    app: content-agent
+  ports:
+    - name: http
+      port: 80
+      targetPort: 2000

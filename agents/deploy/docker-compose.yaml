@@ -1,0 +1,154 @@
+# Pixelated Empathy Agent Fleet — standalone Docker Compose
+#
+# Builds and runs all 8 agents + supporting services (MongoDB, Redis)
+# on a single host. Use for staging, development, or production on a
+# single VM.
+#
+# Usage:
+#   docker compose -f agents/deploy/docker-compose.yaml up -d
+#   docker compose -f agents/deploy/docker-compose.yaml logs -f
+#   docker compose -f agents/deploy/docker-compose.yaml down
+#
+services:
+  # --- Supporting services ---
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-Stopped
+
+  # --- Agent fleet ---
+
+  supervisor-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/supervisor-agent
+    ports:
+      - "2000:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on: [mongo, redis]
+
+  advisor-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/advisor-agent
+    ports:
+      - "2005:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  content-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/content-agent
+    ports:
+      - "2010:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  eve-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/eve-agent
+    ports:
+      - "2015:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  intake-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/intake-agent
+    ports:
+      - "2020:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  pipeline-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/pipeline-agent
+    ports:
+      - "2025:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  qa-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/qa-agent
+    ports:
+      - "2030:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  session-agent:
+    build:
+      context: ../..
+      dockerfile: agents/Dockerfile
+      args:
+        AGENT_DIR: agents/session-agent
+    ports:
+      - "2035:2000"
+    env_file: .env.agents
+    environment:
+      - PORT=2000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+    restart: unless-stopped
+    depends_on: [mongo]
+
+volumes:
+  mongo-data:
