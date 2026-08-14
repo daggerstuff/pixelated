@@ -22,7 +22,6 @@ export default defineConfig({
     presetTypography(),
     presetWebFonts({
       fonts: {
-        sans: 'Inter:400,500,600,700',
         mono: 'JetBrains Mono:400,500,600',
       },
     }),
@@ -30,6 +29,10 @@ export default defineConfig({
 
   // Custom theme configuration matching our design system
   theme: {
+    fontFamily: {
+      sans: 'var(--np-font-display)',
+      mono: 'var(--np-font-mono)',
+    },
     colors: {
       // Primary color scale (OKLCH-based)
       'primary': {
