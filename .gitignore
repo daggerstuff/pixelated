@@ -420,6 +420,10 @@ gha-creds-*.json
 hero-screenshot.mjs
 startup-system-wide.sh
 
+# px CLI link artifacts
+cli/px/pnpm-lock.yaml
+cli/px/pnpm-workspace.yaml
+
 # GitHub Copilot
 .github/copilot/settings.local.json
 .github/mcp.json
