@@ -8,6 +8,7 @@ import '@/lib/fonts'
 import '@/styles/np-tokens.css'
 import '@/styles/marketing.css'
 import '@/styles/fm-fusion.css'
+import ThemeSwitcher from '@/components/ThemeSwitcher.astro'
 import { withBasePath } from '@/utils/path'
 import { SITE } from '@/config'
 
@@ -161,8 +162,11 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <script is:inline nonce={cspNonce}>
       const storedTheme = localStorage.getItem('theme')
       document.documentElement.dataset['theme'] = storedTheme || 'dark'
-      const storedPalette = localStorage.getItem('palette') || 'herdr'
-      document.documentElement.dataset['palette'] = storedPalette
+      const storedPalette = localStorage.getItem('site-palette')
+      const systemPalette = window.matchMedia('(prefers-color-scheme: dark)').matches
+        ? 'vesper'
+        : 'rose-pine-dawn'
+      document.documentElement.setAttribute('data-palette', storedPalette || systemPalette)
     </script>
     <script
       is:inline
@@ -179,23 +183,39 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
   </head>
   <body>
     <a class="np-skip-link" href="#main-content">Skip to main content</a>
-    <!-- NP Shared Header — The Quiet Instrument -->
-    <header class="np-shared-header">
-      <div class="np-shared-header-inner">
-        <a class="np-shared-brand" href={withBasePath('/')}>
-          <div class="np-shared-brand-icon">
-            <img src="/apple-touch-icon.png" alt="" width="28" height="28" />
-          </div>
-          <div class="np-shared-brand-text">
-            <span class="np-shared-brand-name">Pixelated</span>
-            <span class="np-shared-brand-sub">Empathy</span>
-          </div>
+
+    <ThemeSwitcher showHint={true} />
+
+    <header class="site-header">
+      <nav class="nav" aria-label="Primary navigation">
+        <a class="brand" href={withBasePath('/')} aria-label={siteName}>
+          <span>{siteName}</span>
         </a>
-        <nav class="np-shared-nav" aria-label="Main navigation">
+
+        <details class="nav-menu">
+          <summary class="nav-menu-button" aria-label="Open navigation">
+            <span></span>
+            <span></span>
+            <span></span>
+          </summary>
+          <div class="nav-menu-panel">
+            {
+              navItems.map((item) => (
+                <a
+                  href={withBasePath(item.href)}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              ))
+            }
+          </div>
+        </details>
+
+        <div class="nav-links">
           {
             navItems.map((item) => (
               <a
-                class={isActive(item.href) ? 'np-shared-active' : ''}
                 href={withBasePath(item.href)}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
@@ -203,81 +223,85 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
               </a>
             ))
           }
-        </nav>
-        <button
-          class="np-shared-toggle"
-          type="button"
-          aria-label="Toggle color theme"
-          data-theme-toggle
-        >
-          <svg
-            class="np-shared-toggle-sun"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.25"
-            aria-hidden="true"
+        </div>
+
+        <div class="nav-tools">
+          <button class="nav-icon-link" type="button" id="search-open" aria-label="Search (Ctrl/K)">
+            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+          </button>
+          <button
+            class="nav-icon-link"
+            type="button"
+            aria-label="Toggle color theme"
+            data-theme-toggle
           >
-            <circle cx="8" cy="8" r="3.25"></circle>
-            <path
-              d="M8 0.75v2M8 13.25v2M15.25 8h-2M2.75 8h-2M13.13 2.87l-1.42 1.42M4.29 11.71l-1.42 1.42M13.13 13.13l-1.42-1.42M4.29 4.29L2.87 2.87"
-            ></path>
-          </svg>
-          <svg
-            class="np-shared-toggle-moon"
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.25"
-            aria-hidden="true"
-          >
-            <path
-              d="M13.25 9.6A5.75 5.75 0 0 1 6.4 2.75a5.75 5.75 0 1 0 6.85 6.85Z"
-            ></path>
-          </svg>
-        </button>
-      </div>
+            <svg
+              class="nav-toggle-sun"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.25"
+              aria-hidden="true"
+            >
+              <circle cx="8" cy="8" r="3.25"></circle>
+              <path
+                d="M8 0.75v2M8 13.25v2M15.25 8h-2M2.75 8h-2M13.13 2.87l-1.42 1.42M4.29 11.71l-1.42 1.42M13.13 13.13l-1.42-1.42M4.29 4.29L2.87 2.87"
+              ></path>
+            </svg>
+            <svg
+              class="nav-toggle-moon"
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.25"
+              aria-hidden="true"
+            >
+              <path
+                d="M13.25 9.6A5.75 5.75 0 0 1 6.4 2.75a5.75 5.75 0 1 0 6.85 6.85Z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
     </header>
 
     <main id="main-content">
       <slot />
     </main>
 
-    <!-- NP Shared Footer -->
-    <footer class="np-shared-footer">
-      <div class="np-shared-footer-inner">
-        <div>
-          <span class="np-shared-footer-brand">{siteName}</span>
-          <p class="np-shared-footer-copy">
-            &copy; {new Date().getFullYear()}{' '}{siteName}. All rights
-            reserved.
-          </p>
-        </div>
-        <div class="np-shared-footer-links">
-          <a class="np-shared-footer-link" href={withBasePath('/about')}
-            >About</a
-          >
-          <a class="np-shared-footer-link" href={withBasePath('/trust')}
-            >Trust &amp; Security</a
-          >
-          <a class="np-shared-footer-link" href={withBasePath('/privacy')}
-            >Privacy</a
-          >
-          <a class="np-shared-footer-link" href={withBasePath('/terms')}
-            >Terms</a
-          >
-          <a class="np-shared-footer-link" href={withBasePath('/contact')}
-            >Contact</a
-          >
-        </div>
-      </div>
+    <!-- astro-palette footer -->
+    <footer class="footer">
+      <span>&copy; {new Date().getFullYear()} {siteName}</span>
     </footer>
 
+    <!-- Search overlay (astro-palette style, Cmd/Ctrl K) -->
+    <div class="theme-overlay" id="search-overlay" hidden>
+      <div class="theme-overlay-panel" role="dialog" aria-label="Search" aria-modal="true">
+        <div class="search-input-row">
+          <span class="search-prompt" aria-hidden="true">$</span>
+          <input id="search-input" type="search" autocomplete="off" spellcheck="false" aria-label="Search query" />
+          <span class="search-caret" aria-hidden="true"></span>
+        </div>
+        <div class="search-results" id="search-results" role="listbox" aria-label="Search results">
+          <p class="search-empty">Type to search</p>
+        </div>
+        <div class="theme-overlay-footer">
+          <span class="theme-overlay-actions">
+            <button class="theme-close-btn" type="button" id="search-close-btn">esc</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
     <script>
+      // Theme toggle (light/dark) — retained for components that depend on data-theme
       const toggle = document.querySelector('[data-theme-toggle]')
       toggle?.addEventListener('click', () => {
         const current = document.documentElement.dataset['theme']
@@ -288,252 +312,213 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
           new CustomEvent('theme-changed', { detail: { theme: next } }),
         )
       })
-      // Palette cycle: 18 palettes; click to cycle through list
-      const palettes = ['herdr','catppuccin','catppuccin-latte','terminal','tokyo-night','tokyo-night-day','dracula','nord','gruvbox','gruvbox-light','one-dark','one-light','solarized','solarized-light','kanagawa','kanagawa-lotus','rose-pine','rose-pine-dawn','vesper']
-      const paletteBtn = document.querySelector('[data-palette-toggle]') || document.querySelector('[data-theme-toggle]')
-      if (paletteBtn) {
-        paletteBtn.addEventListener('dblclick', () => {
-          const current = document.documentElement.dataset['palette'] || 'herdr'
-          const idx = palettes.indexOf(current)
-          const next = palettes[(idx + 1) % palettes.length]
-          document.documentElement.dataset['palette'] = next
-          localStorage.setItem('palette', next)
-          window.dispatchEvent(new CustomEvent('palette-changed', { detail: { palette: next } }))
-        })
+    </script>
+
+    <script>
+      // Search overlay — astro-palette style, with Pagefind when available
+      let searchController: AbortController | undefined
+
+      function initSearch() {
+        searchController?.abort()
+        searchController = new AbortController()
+        const { signal } = searchController
+
+        const overlay = document.getElementById('search-overlay')
+        const input = document.getElementById('search-input') as HTMLInputElement | null
+        const resultsEl = document.getElementById('search-results')
+        const openBtn = document.getElementById('search-open')
+        const closeBtn = document.getElementById('search-close-btn')
+        if (!overlay || !input || !resultsEl || !openBtn || !closeBtn) return
+
+        let pagefind: { search: (q: string) => Promise<any>; init: () => void } | null = null
+        let pagefindFailed = false
+
+        async function loadPagefind() {
+          if (pagefind || pagefindFailed) return pagefind
+          try {
+            pagefind = await new Function("return import('/pagefind/pagefind.js')")()
+            pagefind?.init()
+          } catch {
+            pagefindFailed = true
+          }
+          return pagefind
+        }
+
+        let items: HTMLElement[] = []
+        let activeIndex = -1
+        let debounceTimer: ReturnType<typeof setTimeout> | undefined
+        let queryId = 0
+
+        function setEmpty(message: string) {
+          if (!resultsEl) return
+          resultsEl.innerHTML = ''
+          const p = document.createElement('p')
+          p.className = 'search-empty'
+          p.textContent = message
+          resultsEl.append(p)
+          items = []
+          activeIndex = -1
+        }
+
+        function setActive(index: number) {
+          activeIndex = index
+          items.forEach((item, i) => {
+            item.setAttribute('aria-selected', String(i === index))
+          })
+          items[index]?.scrollIntoView({ block: 'nearest' })
+        }
+
+        async function runSearch(query: string) {
+          const id = ++queryId
+          if (!query.trim()) {
+            setEmpty('Type to search')
+            return
+          }
+          const pf = await loadPagefind()
+          if (!pf) {
+            setEmpty('Search index not found: run npm run build to generate it.')
+            return
+          }
+          const res = await pf.search(query)
+          if (id !== queryId || !resultsEl) return
+          const top = await Promise.all(res.results.slice(0, 8).map((r: any) => r.data()))
+          if (id !== queryId) return
+          if (top.length === 0) {
+            setEmpty(`No matches for "${query}"`)
+            return
+          }
+          resultsEl.innerHTML = ''
+          items = top.map((data: any) => {
+            const link = document.createElement('a')
+            link.className = 'search-result'
+            link.href = data.url
+            link.setAttribute('role', 'option')
+            const title = document.createElement('span')
+            title.className = 'search-result-title'
+            title.textContent = data.meta?.title ?? data.url
+            const excerpt = document.createElement('span')
+            excerpt.className = 'search-result-excerpt'
+            excerpt.innerHTML = data.excerpt ?? ''
+            link.append(title, excerpt)
+            link.addEventListener('click', () => { input.value = '' }, { signal })
+            resultsEl.append(link)
+            return link as HTMLElement
+          })
+          setActive(0)
+        }
+
+        function openOverlay() {
+          if (!overlay) return
+          overlay.hidden = false
+          document.body.style.overflow = 'hidden'
+          input.value = ''
+          activeIndex = -1
+          setEmpty('Type to search')
+          input.focus()
+          void loadPagefind()
+        }
+
+        function closeOverlay() {
+          if (!overlay) return
+          overlay.hidden = true
+          document.body.style.overflow = ''
+        }
+
+        input.addEventListener('input', () => {
+          clearTimeout(debounceTimer)
+          debounceTimer = setTimeout(() => runSearch(input.value), 150)
+        }, { signal })
+
+        openBtn.addEventListener('click', openOverlay, { signal })
+        closeBtn.addEventListener('click', closeOverlay, { signal })
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) closeOverlay()
+        }, { signal })
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
+            if (document.getElementById('theme-overlay')?.hidden === false) return
+            e.preventDefault()
+            if (overlay.hidden) openOverlay()
+            else closeOverlay()
+            return
+          }
+          if (overlay.hidden) return
+          if (e.key === 'Escape') {
+            e.preventDefault()
+            closeOverlay()
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault()
+            setActive(Math.min(items.length - 1, activeIndex + 1))
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault()
+            setActive(Math.max(0, activeIndex - 1))
+          } else if (e.key === 'Enter') {
+            const active = items[activeIndex]
+            if (active) {
+              e.preventDefault()
+              active.click()
+            }
+          } else if (e.key === 'Tab') {
+            const focusables = [input, ...items, closeBtn].filter(Boolean) as HTMLElement[]
+            const first = focusables[0]
+            const last = focusables[focusables.length - 1]
+            if (!first || !last) return
+            if (e.shiftKey && document.activeElement === first) {
+              e.preventDefault()
+              last.focus()
+            } else if (!e.shiftKey && document.activeElement === last) {
+              e.preventDefault()
+              first.focus()
+            }
+          }
+        }, { signal })
       }
+
+      document.addEventListener('astro:page-load', initSearch)
     </script>
   </body>
 </html>
 
 <style is:global>
-  /* NP Shared Header — The Quiet Instrument, public pages variant */
+  /* astro-palette nav header — overrides the .nav/.site-header defaults
+     from style.css with pixelated's brand identity. */
 
-  .np-shared-header {
-    position: sticky;
-    top: 0;
-    z-index: var(--np-z-sticky, 50);
-    background: var(--np-bg);
-    border-bottom: 1px solid var(--np-line);
-  }
-
-  .np-shared-header-inner {
-    max-width: var(--np-content, 76rem);
-    margin: 0 auto;
+  .nav-tools {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 0 var(--np-pad, clamp(1rem, 3vw, 2rem));
-    height: 56px;
+    gap: 2px;
   }
 
-  .np-shared-brand {
+  /* Theme toggle: sun shows when dark, moon shows when light */
+  .nav-toggle-moon {
+    display: none;
+  }
+  html[data-theme='light'] .nav-toggle-sun {
+    display: none;
+  }
+  html[data-theme='light'] .nav-toggle-moon {
+    display: block;
+  }
+
+  /* Brand uses pixelated's identity alongside site name */
+  .brand {
     display: flex;
     align-items: center;
     gap: 10px;
     text-decoration: none;
   }
-
-  .np-shared-brand-icon {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--np-elevated);
-  }
-
-  .np-shared-brand-icon img {
-    display: block;
-  }
-
-  .np-shared-brand-text {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .np-shared-brand-name {
+  .brand span {
     font-family: var(--np-font-display);
     font-size: 1rem;
     font-weight: 350;
     letter-spacing: -0.02em;
     line-height: 1.1;
     color: var(--np-text);
+    white-space: nowrap;
   }
 
-  .np-shared-brand-sub {
-    font-family: var(--np-font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--np-muted);
-    line-height: 1.2;
-  }
-
-  .np-shared-nav {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .np-shared-nav a {
-    padding: 6px 12px;
-    font-family: var(--np-font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--np-muted);
-    text-decoration: none;
-    transition:
-      color 0.15s var(--np-ease),
-      background 0.15s var(--np-ease),
-      transform 0.15s var(--np-ease);
-  }
-
-  .np-shared-nav a:hover {
-    color: var(--np-text);
-    background: var(--np-surface);
-  }
-
-  .np-shared-nav a:active {
-    background: var(--np-active);
-    transform: scale(0.97);
-  }
-
-  .np-shared-nav a.np-shared-active {
-    color: var(--np-text);
-  }
-
-  .np-shared-nav a:focus-visible {
-    outline: 2px solid var(--np-mid);
-    outline-offset: 3px;
-  }
-
-  .np-shared-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    background: transparent;
-    border: 1px solid var(--np-line);
-    cursor: pointer;
-    padding: 0;
-    color: var(--np-muted);
-    transition:
-      color 0.15s var(--np-ease),
-      border-color 0.15s var(--np-ease),
-      transform 0.15s var(--np-ease);
-  }
-
-  .np-shared-toggle:hover {
-    color: var(--np-text);
-    border-color: var(--np-mid);
-  }
-
-  .np-shared-toggle:active {
-    transform: scale(0.97);
-  }
-
-  .np-shared-toggle:focus-visible {
-    outline: 2px solid var(--np-mid);
-    outline-offset: 3px;
-  }
-
-  .np-shared-toggle-sun,
-  .np-shared-toggle-moon {
-    display: block;
-  }
-
-  /* Dark shows the sun (switch to light); light shows the moon. */
-  html[data-theme='light'] .np-shared-toggle-sun {
-    display: none;
-  }
-  html:not([data-theme='light']) .np-shared-toggle-moon {
-    display: none;
-  }
-
-  /* NP Shared Footer */
-  .np-shared-footer {
-    border-top: 1px solid var(--np-line);
-    background: var(--np-bg);
-  }
-
-  .np-shared-footer-inner {
-    max-width: var(--np-content, 76rem);
-    margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.25rem;
-    padding: 3rem var(--np-pad, clamp(1rem, 3vw, 2rem));
-  }
-
-  .np-shared-footer-brand {
-    font-family: var(--np-font-display);
-    font-size: 0.875rem;
-    font-weight: 350;
-    color: var(--np-text);
-  }
-
-  .np-shared-footer-copy {
-    margin: 0.5rem 0 0;
-    font-family: var(--np-font-body);
-    font-size: 0.8125rem;
-    color: var(--np-muted);
-  }
-
-  .np-shared-footer-links {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-  }
-
-  .np-shared-footer-link {
-    font-family: var(--np-font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--np-muted);
-    text-decoration: none;
-    transition: color 0.15s var(--np-ease);
-  }
-
-  .np-shared-footer-link:hover {
-    color: var(--np-text);
-  }
-
-  @media (max-width: 640px) {
-    .np-shared-footer-inner {
-      flex-direction: column;
-      text-align: center;
-    }
-    .np-shared-header-inner {
-      height: auto;
-      flex-wrap: wrap;
-      padding: 8px var(--np-pad);
-      gap: 4px;
-    }
-    .np-shared-nav {
-      order: 3;
-      width: 100%;
-      flex-wrap: wrap;
-      gap: 0;
-    }
-    .np-shared-nav a {
-      white-space: nowrap;
-      padding: 8px 10px;
-      font-size: 0.75rem;
-    }
-    .np-shared-nav a:first-child {
-      padding-left: 0;
-    }
-    .np-shared-brand {
-      flex-shrink: 0;
-    }
-  }
-
-  /* === SKIP LINK === */
+  /* NP Skip link */
   .np-skip-link {
     position: absolute;
     top: -100%;
@@ -551,27 +536,5 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     top: 8px;
     outline: 1px solid var(--np-mid);
     outline-offset: 2px;
-  }
-
-  /* === COARSE POINTERS (touch) — bump nav link tap targets to WCAG 2.5.5 (>=44px) === */
-  @media (pointer: coarse) {
-    .np-shared-nav a {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
-    }
-  }
-
-  /* === REDUCED MOTION === */
-  @media (prefers-reduced-motion: reduce) {
-    .np-shared-nav a {
-      transition-duration: 0.01ms;
-    }
-    .np-shared-toggle {
-      transition-duration: 0.01ms;
-    }
-    .np-shared-footer-link {
-      transition-duration: 0.01ms;
-    }
   }
 </style>
