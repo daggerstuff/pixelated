@@ -15,6 +15,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { dlpService } from '../security/dlp'
 import {
   type AuditEvent,
+  type ReceiptLedgerExport,
   AuditAction,
   AuditEventType,
   AuditSeverity,
@@ -528,6 +529,36 @@ export const logTherapeuticEvent = async (
     metadata,
     status: 'success',
   })
+
+/**
+ * Export the audit receipt ledger as a structured, chain-verified document.
+ *
+ * Reads the full audit log from the database, verifies the SHA-256 hash chain,
+ * and returns a serializable export object including patient identification,
+ * event count, and chain validity status for HIPAA data portability.
+ */
+export const exportReceiptLedger = async (patientId: string): Promise<ReceiptLedgerExport> => {
+  const loggerInst = AuditLogger.getInstance()
+  const db = await loggerInst.ensureConnected()
+
+  const events = await db
+    .collection<AuditEvent>('audit_logs')
+    .find({ patientId })
+    .sort({ timestamp: 1 })
+    .toArray()
+
+  // Verify chain integrity
+  const verification = verifyAuditChain(events as AuditEvent[])
+
+  return {
+    exportId: uuidv4(),
+    patientId,
+    exportedAt: new Date(),
+    totalEvents: events.length,
+    chainValid: verification.valid,
+    events,
+  }
+}
 
 export const logSecurityAlert = async (
   userId: string,
