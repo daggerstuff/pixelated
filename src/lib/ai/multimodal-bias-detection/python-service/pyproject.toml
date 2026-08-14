@@ -33,12 +33,12 @@ dependencies = [
   "prometheus-client>=0.26.0",
   # Sentry SDK for error tracking and metrics
   # Reference: https://docs.sentry.io/platforms/python/metrics/
-  "sentry-sdk[fastapi]>=2.66.1",
+  "sentry-sdk[fastapi]>=2.67.1",
   # Multi-modal AI Dependencies
   "torch>=2.13.0",
   "torchvision>=0.21.0",
   "torchaudio>=2.8.0",
-  "transformers>=5.14.1",
+  "transformers>=5.15.0",
   "opencv-python>=5.0.0.93",
   "pillow>=12.3.0", # Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "librosa>=0.10.0",
