@@ -18,6 +18,7 @@ export enum AuditEventType {
   SYSTEM = 'system',
   GOVERNANCE_ALLOW = 'governance_allow',
   GOVERNANCE_DENY = 'governance_deny',
+  RECEIPT_LEDGER = 'receipt_ledger',
 }
 
 /**
@@ -91,4 +92,20 @@ export interface AuditEvent {
    */
   previousHash?: string
   hash?: string
+}
+
+/**
+ * Receipt ledger export.
+ *
+ * A structured export of audit events from the hash-chain audit trail,
+ * including chain validity verification, patient identification, and
+ * event count for HIPAA-compliant data portability.
+ */
+export interface ReceiptLedgerExport {
+  exportId: string
+  patientId: string
+  exportedAt: Date
+  totalEvents: number
+  chainValid: boolean
+  events: AuditEvent[]
 }
