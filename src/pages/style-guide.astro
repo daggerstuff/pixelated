@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 import { FormStyleGuide } from '../components/ui/FormStyleGuide'
 import '@/styles/np-tokens.css'
 import '@/styles/np-landing.css'
+import '@/styles/fm-fusion.css'
 
 const title = 'Style Guide | Pixelated Empathy'
 const description =
@@ -22,8 +23,8 @@ const description =
       <h1 class="np-display">Neutral Precision</h1>
       <p class="np-body">
         The Quiet Instrument. Zero-chroma grayscale, flat by doctrine, JetBrains
-        Mono for data and chrome, Archivo Black for display, Inter for body.
-        Every component here is the source of truth for the live product.
+        Mono Variable across all typographic roles. Every component here is the
+        source of truth for the live product.
       </p>
     </section>
 
@@ -105,14 +106,14 @@ const description =
       </div>
     </section>
 
-    <!-- Typography: the three families -->
+    <!-- Typography: one family, full hierarchy -->
     <section class="np-styleguide__section">
       <div class="np-styleguide__section-header">
         <span class="np-data">02 // type</span>
-        <h2 class="np-headline">Three families, zero ambiguity</h2>
+        <h2 class="np-headline">One family, full hierarchy</h2>
         <p class="np-body">
-          Archivo Black for display — wide, heavy, raw. Inter for body and
-          titles. JetBrains Mono for data, labels, and chrome.
+          JetBrains Mono Variable across all roles — weight, size, and tracking
+          carry the full hierarchy. No serif display, no soft sans.
         </p>
       </div>
 
@@ -120,7 +121,7 @@ const description =
         <div class="np-sg-type-row">
           <span class="np-data np-sg-type-row__label">display</span>
           <span class="np-mono np-sg-type-row__font"
-            >--np-font-display · Archivo Black</span
+            >--np-font-display · JetBrains Mono</span
           >
           <p
             class="np-display np-sg-type-row__sample"
@@ -131,7 +132,7 @@ const description =
         </div>
         <div class="np-sg-type-row">
           <span class="np-data np-sg-type-row__label">headline</span>
-          <span class="np-mono np-sg-type-row__font">Inter · weight 900</span>
+          <span class="np-mono np-sg-type-row__font">JetBrains Mono · weight 600</span>
           <p
             class="np-headline np-sg-type-row__sample"
             style="font-size: var(--np-text-headline)"
@@ -142,7 +143,7 @@ const description =
         <div class="np-sg-type-row">
           <span class="np-data np-sg-type-row__label">body</span>
           <span class="np-mono np-sg-type-row__font"
-            >--np-font-body · Inter</span
+            >--np-font-body · JetBrains Mono</span
           >
           <p class="np-body np-sg-type-row__sample">
             A trainee enters the conversation with an AI client that adapts to
@@ -325,7 +326,7 @@ const description =
         <div class="np-sg-geom-group">
           <span class="np-data">section spacing</span>
           <span class="np-mono"
-            >--np-section-y: clamp(3.5rem, 5.5vw, 5.5rem)</span
+            >--np-section-y: clamp(4rem, 8vw, 5.5rem)</span
           >
           <span class="np-body">Vertical rhythm between major sections.</span>
         </div>

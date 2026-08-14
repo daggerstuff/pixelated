@@ -34,13 +34,13 @@
 
 /* === Section === */
 .np-section {
-  padding: clamp(72px, 10vw, 128px) 0;
+  padding: clamp(4rem, 8vw, 5.5rem) 0;
 }
 
 /* === Labels — clinical file header style: leading hairline + mono text === */
 .np-label {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--np-muted);
@@ -59,61 +59,62 @@
   flex-shrink: 0;
 }
 
-/* === Display / Headings — clinical instrument voice.
-   No uppercase shouting. Inter Black sentence-case for display, tight
-   tracking. Mono accents on key words via .np-mono-word. === */
+/* === Display / Headings — Pure Monospace Technical Instrument.
+   JetBrains Mono Variable carries the full hierarchy through weight,
+   size, and tracking alone — no serif display, no soft sans.
+   The hero headline's accent word is emphasized by weight, not font swap. === */
 .np-display {
-  font-family: var(--np-font-body);
-  font-weight: 900;
-  font-size: var(--np-text-display, clamp(2.5rem, 6vw, 4.5rem));
-  line-height: 1.02;
-  letter-spacing: -0.035em;
+  font-family: var(--np-font-display);
+  font-weight: var(--np-weight-display, 400);
+  font-size: var(--np-text-display, clamp(2.8rem, 7vw, 6rem));
+  line-height: var(--np-leading-display, 0.92);
+  letter-spacing: var(--np-tracking-display, -0.07em);
   text-transform: none;
   margin: 0;
 }
 
-/* Inline mono accent — use on a word or phrase inside a headline to inject
-   the clinical/data voice without breaking the line. */
+/* Accent word inside a headline — weight contrast on the same face.
+   Refuses the Inter→JetBrains font swap that breaks the headline flow. */
 .np-mono-word {
-  font-family: var(--np-font-mono);
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--np-font-display);
+  font-weight: 700;
+  letter-spacing: -0.025em;
 }
 
 .np-headline {
-  font-family: var(--np-font-body);
-  font-weight: 900;
-  font-size: var(--np-text-headline, clamp(1.75rem, 3.5vw, 2.75rem));
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  font-family: var(--np-font-display);
+  font-weight: var(--np-weight-headline, 600);
+  font-size: var(--np-text-headline, clamp(1.5rem, 3vw, 2.2rem));
+  line-height: var(--np-leading-headline, 1.05);
+  letter-spacing: var(--np-tracking-headline, -0.035em);
   text-transform: none;
   margin: 0;
 }
 
 .np-title {
-  font-family: var(--np-font-body);
-  font-weight: 800;
-  font-size: 1.25rem;
-  line-height: 1.2;
+  font-family: var(--np-font-display);
+  font-weight: var(--np-weight-title, 700);
+  font-size: var(--np-text-title, 1.125rem);
+  line-height: var(--np-leading-title, 1.2);
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .np-body {
-  font-family: var(--np-font-body);
-  font-weight: 400;
+  font-family: var(--np-font-display);
+  font-weight: var(--np-weight-body, 400);
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: var(--np-leading-body, 1.65);
   color: var(--np-muted);
   margin: 0;
   max-width: 68ch;
 }
 
 .np-body-strong {
-  font-family: var(--np-font-body);
-  font-weight: 400;
+  font-family: var(--np-font-display);
+  font-weight: var(--np-weight-body, 400);
   font-size: 1rem;
-  line-height: 1.7;
+  line-height: var(--np-leading-body, 1.65);
   color: var(--np-text);
   margin: 0;
 }
@@ -121,8 +122,8 @@
 .np-mono {
   font-family: var(--np-font-mono);
   font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: var(--np-text-data, 0.8125rem);
+  line-height: var(--np-leading-data, 1.55);
   margin: 0;
 }
 
@@ -192,7 +193,7 @@
 .np-btn-link {
   padding: 0;
   min-height: auto;
-  font-family: var(--np-font-body);
+  font-family: var(--np-font-display);
   font-size: 1rem;
   letter-spacing: 0;
   text-transform: none;
@@ -222,7 +223,7 @@
 
 /* === Hero === */
 .np-hero {
-  padding: clamp(72px, 10vw, 128px) 0 clamp(48px, 6vw, 72px);
+  padding: clamp(5rem, 8vw, 6rem) 0 clamp(2.5rem, 5vw, 3.5rem);
 }
 
 /* Two-column grid: content left, chat demo right */
@@ -241,26 +242,27 @@
 }
 
 .np-hero__kicker {
+  font-family: var(--np-font-mono);
   margin-bottom: 0;
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.08em;
   color: var(--np-mid);
 }
 
 .np-hero__display {
-  max-width: 16ch;
+  max-width: 28ch;
   margin-top: 16px;
   text-wrap: balance;
 }
 
 .np-hero__subtitle {
+  font-family: var(--np-font-display);
   margin-top: 20px;
   max-width: 46ch;
   text-align: left;
-  color: var(--np-text);
-  opacity: 0.75;
+  color: var(--np-muted);
   font-size: var(--np-text-body);
-  line-height: var(--np-leading-body);
+  line-height: var(--np-leading-body, 1.65);
   text-wrap: pretty;
 }
 
@@ -269,7 +271,7 @@
   gap: 16px;
   flex-wrap: wrap;
   justify-content: flex-start;
-  margin-top: 36px;
+  margin-top: 28px;
 }
 
 /* Product screenshot — the focal anchor that takes focus off the type
@@ -401,9 +403,9 @@
 
 .np-chat-demo__entry p {
   margin: 0;
-  font-family: var(--np-font-body);
-  font-size: var(--np-text-small, 0.875rem);
-  line-height: 1.6;
+  font-family: var(--np-font-display);
+  font-size: var(--np-text-small, 0.9375rem);
+  line-height: var(--np-leading-body, 1.65);
   color: var(--np-text);
   text-wrap: pretty;
 }
@@ -472,8 +474,8 @@
 }
 
 .np-hero__proof-item .np-mono {
-  font-family: var(--np-font-body);
-  font-size: 0.9375rem;
+  font-family: var(--np-font-mono);
+  font-size: var(--np-text-small, 0.9375rem);
   font-weight: 400;
   line-height: 1.55;
   color: var(--np-text);
@@ -490,7 +492,7 @@
 
 .np-trust__label {
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--np-muted);
@@ -508,9 +510,9 @@
 
 .np-trust__badge {
   font-family: var(--np-font-mono);
-  font-weight: 500;
-  font-size: 0.75rem;
-  letter-spacing: 0.04em;
+  font-weight: var(--np-weight-label, 500);
+  font-size: var(--np-text-label, 0.75rem);
+  letter-spacing: var(--np-tracking-label, 0.04em);
   text-transform: uppercase;
   color: var(--np-text);
   padding: 8px 16px;
@@ -548,7 +550,7 @@
 /* Demo note — subtle below the chat */
 .np-chat-demo__note {
   font-family: var(--np-font-mono);
-  font-size: 0.625rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   color: var(--np-muted);
   padding: var(--np-space-2) var(--np-space-4) var(--np-space-3);
   border-top: 1px solid var(--np-line);
@@ -589,7 +591,7 @@
 
 .np-card__kicker {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--np-muted);
@@ -694,8 +696,8 @@
 
 .np-artifact__body {
   margin: 0;
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  font-size: var(--np-text-body, 1rem);
+  line-height: var(--np-leading-body, 1.65);
   color: var(--np-text);
   max-width: 60ch;
   text-wrap: pretty;
@@ -754,7 +756,7 @@
   margin-top: auto;
   padding-top: 24px;
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-muted);
@@ -782,7 +784,7 @@
 }
 
 .np-scenario-side .np-scenario__body {
-  font-size: 0.9375rem;
+  font-size: var(--np-text-small, 0.9375rem);
   line-height: 1.6;
 }
 
@@ -796,7 +798,7 @@
 
 .np-scenario__body {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--np-text-small, 0.9375rem);
   line-height: 1.6;
   color: var(--np-text);
 }
@@ -899,9 +901,9 @@
 .np-track__title {
   margin: 0;
   max-width: 16ch;
-  font-family: var(--np-font-body);
-  font-weight: 800;
-  font-size: 1.125rem;
+  font-family: var(--np-font-display);
+  font-weight: var(--np-weight-title, 700);
+  font-size: var(--np-text-title, 1.125rem);
   line-height: 1.2;
   letter-spacing: -0.02em;
 }
@@ -911,7 +913,7 @@
   max-width: 36ch;
   color: var(--np-text);
   opacity: 0.7;
-  font-size: 0.9375rem;
+  font-size: var(--np-text-small, 0.9375rem);
   line-height: 1.55;
 }
 
@@ -945,7 +947,7 @@
 
 .np-compare__tag {
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--np-muted);
@@ -961,8 +963,8 @@
 }
 
 .np-compare__list li {
-  font-family: var(--np-font-body);
-  font-size: 0.9375rem;
+  font-family: var(--np-font-display);
+  font-size: var(--np-text-small, 0.9375rem);
   line-height: 1.55;
   color: var(--np-text);
   opacity: 0.72;
@@ -1024,15 +1026,15 @@
   max-width: 42ch;
   color: var(--np-text);
   opacity: 0.8;
-  font-size: 1.0625rem;
-  line-height: 1.6;
+  font-size: var(--np-text-body, 1rem);
+  line-height: var(--np-leading-body, 1.65);
   text-wrap: pretty;
 }
 
 .np-cta-pitch .np-cta__meta {
   margin: 8px 0 0;
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   color: var(--np-muted);
   max-width: 50ch;
   line-height: 1.6;
@@ -1049,7 +1051,7 @@
 }
 
 .np-cta-commit__kicker {
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--np-muted);
@@ -1069,7 +1071,7 @@
 
 .np-cta-commit__line {
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: var(--np-text-small, 0.9375rem);
   line-height: 1.6;
   color: var(--np-text);
   max-width: 38ch;
@@ -1100,7 +1102,7 @@
   padding-top: 20px;
   border-top: 1px solid var(--np-line);
   font-family: var(--np-font-mono);
-  font-size: 0.6875rem;
+  font-size: var(--np-text-caption, 0.6875rem);
   letter-spacing: 0.02em;
   color: var(--np-muted);
   line-height: 1.6;
@@ -1152,7 +1154,7 @@
 }
 
 .np-feature-card:first-child .np-title {
-  font-size: 1.25rem;
+  font-size: var(--np-text-title, 1.125rem);
 }
 
 /* === Help/Resources section === */
@@ -1189,9 +1191,9 @@
 }
 
 .np-help__desc {
-  font-family: var(--np-font-body);
-  font-size: 0.8125rem;
-  line-height: 1.5;
+  font-family: var(--np-font-display);
+  font-size: var(--np-text-data, 0.8125rem);
+  line-height: var(--np-leading-data, 1.55);
   color: var(--np-muted);
 }
 
@@ -1326,7 +1328,8 @@
 @media (max-width: 640px) {
   .np-hero__display {
     max-width: none;
-    font-size: clamp(2rem, 8vw, 2.5rem);
+    /* impeccable-disable-next-line design-system-font-size: mobile display variant */
+    font-size: clamp(2.2rem, 8vw, 3rem);
   }
   .np-hero__subtitle {
     max-width: 42ch;
