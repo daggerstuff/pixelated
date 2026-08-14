@@ -215,7 +215,7 @@
     "@aws-sdk/lib-dynamodb": "latest",
     "@aws-sdk/s3-request-presigner": "latest",
     "@azure/storage-blob": "latest",
-    "@browserbasehq/stagehand": "^3.7.1",
+    "@browserbasehq/stagehand": "^4.0.0",
     "@cloudflare/ai-chat": "^0.10.1",
     "@cloudflare/shell": "^0.4.3",
     "@cloudflare/think": "^0.15.1",
