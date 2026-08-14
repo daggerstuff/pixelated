@@ -416,6 +416,10 @@ session-ses_*.md
 # OpenMemory — IDE/Assistant credential files
 gha-creds-*.json
 
+# Scratch / one-off scripts
+hero-screenshot.mjs
+startup-system-wide.sh
+
 # GitHub Copilot
 .github/copilot/settings.local.json
 .github/mcp.json
