@@ -511,7 +511,7 @@
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
     "wrangler": "^4.120.1",
-    "yaml": "2.8.4"
+    "yaml": "2.9.0"
   },
   "peerDependencies": {
     "hono": "^4.12.14"
