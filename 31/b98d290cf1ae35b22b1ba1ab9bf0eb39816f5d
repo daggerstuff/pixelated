@@ -1,0 +1,35 @@
+agents/session-agent/package.json
+  ai_agent 23
+agents/session-agent/agent/mongo-client.ts
+  ai_agent 1-224
+agents/session-agent/agent/tools/save_session.ts
+  ai_agent 4,105-122,135-136,138-140
+agents/session-agent/tests/process_message.test.ts
+  ai_agent 44-46
+agents/session-agent/agent/tools/hydrate_session.ts
+  s_992233a7668668::t_e0b07e05cfec83 4,20-39,84
+agents/session-agent/agent/tools/start_session.ts
+  ai_agent 4,71-77,90-93
+agents/session-agent/agent/tools/conclude_session.ts
+  s_992233a7668668::t_e0b07e05cfec83 4
+agents/session-agent/agent/tools/process_message.ts
+  s_992233a7668668::t_7754a46e8ad8c9 4-5,31-40,48-50
+agents/session-agent/pnpm-lock.yaml
+  ai_agent 18,24-27,141-143,394-399,555-558,1002-1004,1024-1054,1174-1177,1264-1266,1309-1312,1492-1499,1655-1658,1834-1839,1880,1885,1997-1998,2089,2092,2384-2385,2398-2408,2417,2432,2524-2525,2666-2669,2697-2700,2718,2721,2765-2770
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "31b98d290cf1ae35b22b1ba1ab9bf0eb39816f5d",
+  "prompts": {},
+  "sessions": {
+    "s_992233a7668668": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6da6755e-7c7e-4795-b313-ac28273fda83",
+        "model": "z-ai/glm-5.2"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
