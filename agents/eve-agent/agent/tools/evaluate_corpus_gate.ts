@@ -18,6 +18,7 @@ export default defineTool({
       })
 
       return {
+        success: true,
         passed: true,
         output: stdout.trim(),
         evaluated_at: new Date().toISOString(),
@@ -25,6 +26,7 @@ export default defineTool({
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err)
       return {
+        success: false,
         passed: false,
         error: errorMsg,
         evaluated_at: new Date().toISOString(),
