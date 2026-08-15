@@ -1,0 +1,99 @@
+---
+title: 'AI Engine — Cognitive Engine Overview'
+description: 'The model research and training environment powering Pixelated Empathy\'s emotional intelligence, response generation, and crisis monitoring.'
+---
+
+## What Is the AI Engine?
+
+The **AI Engine** is the cognitive core of Pixelated Empathy. It is a Python-based environment for model research, training, and inference — handling emotion detection, therapeutic response generation, AI client simulation, response evaluation, and real-time crisis monitoring.
+
+The engine is maintained as a submodule of the main Pixelated repository and runs as a separate service during development and production.
+
+<Info>
+  **Repository:** [github.com/daggerstuff/ai](https://github.com/daggerstuff/ai) (submodule of [daggerstuff/pixelated](https://github.com/daggerstuff/pixelated))
+</Info>
+
+---
+
+## What It Does
+
+### Emotion Detection
+
+The engine classifies emotional states in real time using a multi-label approach based on **Plutchik's Wheel of Emotions**. Each detected emotion is characterised by intensity (`0.0`–`1.0`), valence (`-1.0`–`1.0`), and arousal (`0.0`–`1.0`). See [Emotion Model](/concepts/emotion-model) for the scoring system.
+
+### Therapeutic Response Generation
+
+The engine generates responses that demonstrate the **EARS framework** — Empathise, Acknowledge, Reflect, Support — and scores the therapist's responses for therapeutic quality. See [EARS Framework](/concepts/ears-framework).
+
+### AI Client Simulation
+
+The engine simulates clients with **Big Five (OCEAN)** personality profiles that drive consistent behavioural patterns, emotional responses, resistance patterns, and trust progression. See [Personality Model](/concepts/personality-model).
+
+### Crisis Monitoring
+
+Real-time monitoring across five crisis signal categories (self-harm, violence, despair, substance abuse, medical) with five-level risk classification and severity modifiers. See [Crisis Signals](/concepts/crisis-signals).
+
+### Bias Detection
+
+The engine monitors for 40+ bias categories during sessions, computing demographic parity, equalised odds, and treatment equality as fairness metrics. See [Bias Types](/concepts/bias-types).
+
+---
+
+## Training Pipeline
+
+The engine includes infrastructure for model training:
+
+- **SFT (Supervised Fine-Tuning)** — Training on therapeutic conversation datasets
+- **DPO (Direct Preference Optimisation)** — Aligning model responses to clinical preferences
+- **GRPO (Group Relative Policy Optimisation)** — Group-based reinforcement learning
+- **Safety checkers** — Multilingual and clinical safety validators
+- **Reward scoring** — Scoring therapeutic quality of generated responses
+- **Coverage gates** — 95% safety-critical coverage, 40% pilot coverage thresholds
+
+<Warning>
+  Model training runs CPU-only PyTorch in CI. Production inference may use GPU acceleration.
+</Warning>
+
+---
+
+## Architecture
+
+```text
+┌──────────────────────────────────────────┐
+│            AI Engine (Python)            │
+├──────────────────────────────────────────┤
+│  ┌─────────┐  ┌──────────┐  ┌─────────┐ │
+│  │ Emotion │  │ Response │  │ Client  │ │
+│  │ Detect  │  │ Generate │  │ Simulate│ │
+│  └────┬────┘  └────┬─────┘  └────┬────┘ │
+│       │            │             │       │
+│  ┌────▼────────────▼─────────────▼────┐  │
+│  │        Response Evaluation         │  │
+│  │   (EARS scoring + bias + crisis)   │  │
+│  └───────────────────────────────────┘  │
+│                                          │
+│  ┌──────────────────────────────────┐   │
+│  │    Training Pipeline             │   │
+│  │  (SFT, DPO, GRPO, safety)        │   │
+│  └──────────────────────────────────┘   │
+└──────────────────────────────────────────┘
+        ▲                       ▲
+        │                       │
+   Inference calls        Training data
+   from Pixelated          from sessions
+```
+
+---
+
+## How It Connects
+
+The AI Engine is called by the **Pixelated** platform for inference during training sessions and uses **Foresight** for persistent memory of session context and therapeutic patterns.
+
+<CardGroup cols={2}>
+  <Card title="Pixelated Platform" icon="cube" href="/products/pixelated/overview">
+    The main orchestrator that calls the AI Engine for real-time inference.
+  </Card>
+  <Card title="Foresight" icon="database" href="/products/foresight/overview">
+    Provides persistent memory across training sessions for the AI Engine.
+  </Card>
+</CardGroup>
