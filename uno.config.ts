@@ -21,9 +21,9 @@ export default defineConfig({
       background: 'var(--np-bg)',
     },
     fontFamily: {
-      sans: 'var(--np-font-body, "Inter", ui-sans-serif, system-ui, sans-serif)',
-      mono: 'var(--np-font-mono, "JetBrains Mono Variable", ui-monospace, monospace)',
-      display: 'var(--np-font-display, "Archivo Black", "Inter", sans-serif)',
+      sans: 'var(--np-font-body, "Switzer", ui-sans-serif, system-ui, sans-serif)',
+      mono: 'var(--np-font-mono, "IoskeleyMono", ui-monospace, monospace)',
+      display: 'var(--np-font-display, "IoskeleyMono", ui-monospace, monospace)',
     },
   },
   presets: [
