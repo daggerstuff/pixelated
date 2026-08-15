@@ -31,6 +31,7 @@ def run_bd(args: list[str], *, dry_run: bool) -> bool:
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
+        check=False,
     )
     if completed.returncode != 0:
         pass
@@ -242,6 +243,7 @@ def apply_jsonl_batch(
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
+        check=False,
     )
     if completed.returncode != 0:
         return 1

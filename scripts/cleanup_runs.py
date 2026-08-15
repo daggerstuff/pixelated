@@ -13,16 +13,15 @@ OWNER = "daggerstuff"
 REPO = "pixelated"
 CUTOFF = (datetime.now(timezone.utc) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
 PARALLEL = 10  # Reduced to avoid secondary rate limits
-BATCH_SIZE = 100  # Fetch batch size from API
 DRY_RUN = "--dry-run" in sys.argv
 RUNS_ONLY = "--runs-only" in sys.argv
 CACHES_ONLY = "--caches-only" in sys.argv
 
 
-def gh(*args, **kwargs):
+def gh(*args):
     """Run a gh CLI command and return parsed JSON or raw output."""
     cmd = ["gh", "api", *list(args)]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=120, **kwargs)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=120, shell=False, check=False)
     if result.returncode != 0:
         return None
     return result.stdout.strip()
@@ -66,6 +65,7 @@ def delete_run(run_id):
         capture_output=True,
         text=True,
         timeout=30,
+        check=False,
     )
     return (run_id, result.returncode == 0)
 
@@ -135,6 +135,7 @@ def delete_cache(cache_id):
         capture_output=True,
         text=True,
         timeout=30,
+        check=False,
     )
     return (cache_id, result.returncode == 0)
 
@@ -185,32 +186,17 @@ def main():
     if do_runs:
         remaining = get_remaining_count()
 
-        if remaining == 0 or DRY_RUN:
-            pass
-        else:
-            total_deleted = 0
-            round_num = 0
+        if remaining != 0 and not DRY_RUN:
             while True:
-                round_num += 1
                 run_ids = fetch_run_ids()
                 if not run_ids:
                     break
-                deleted = 0
-                failed = 0
-                start = time.time()
                 with ThreadPoolExecutor(max_workers=PARALLEL) as executor:
                     futures = {executor.submit(delete_run, rid): rid for rid in run_ids}
-                    for i, future in enumerate(as_completed(futures), 1):
-                        _rid, ok = future.result()
-                        if ok:
-                            deleted += 1
-                        else:
-                            failed += 1
-                        if i % 100 == 0:
-                            elapsed = time.time() - start
-                            i / elapsed if elapsed > 0 else 0
-                elapsed = time.time() - start
-                total_deleted += deleted
+                    results = [future.result() for future in as_completed(futures)]
+                    for rid, ok in results:
+                        if not ok:
+                            print(f"Failed to delete run {rid}")
                 remaining = get_remaining_count()
                 if remaining == 0:
                     break
@@ -220,28 +206,27 @@ def main():
     if do_caches:
         remaining = get_remaining_cache_count()
 
-        if remaining == 0 or DRY_RUN:
-            pass
-        else:
-            cache_ids = fetch_cache_ids()
-            deleted = 0
-            failed = 0
-            if not cache_ids:
-                pass
-            else:
-                start = time.time()
+        if remaining != 0 and not DRY_RUN:
+            any_failure = False
+            while True:
+                cache_ids = fetch_cache_ids()
+                if not cache_ids:
+                    break
+                deletion_failures = False
                 with ThreadPoolExecutor(max_workers=PARALLEL) as executor:
                     futures = {executor.submit(delete_cache, cid): cid for cid in cache_ids}
-                    for i, future in enumerate(as_completed(futures), 1):
-                        _cid, ok = future.result()
-                        if ok:
-                            deleted += 1
-                        else:
-                            failed += 1
-                        if i % 50 == 0:
-                            elapsed = time.time() - start
-                            i / elapsed if elapsed > 0 else 0
-                elapsed = time.time() - start
+                    for future in as_completed(futures):
+                        cid, success = future.result()
+                        if not success:
+                            deletion_failures = True
+                if deletion_failures:
+                    any_failure = True
+                remaining = get_remaining_cache_count()
+                if remaining == 0:
+                    break
+                time.sleep(15)
+            if any_failure:
+                return 1
 
 
 if __name__ == "__main__":
