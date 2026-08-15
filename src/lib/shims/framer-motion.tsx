@@ -4,8 +4,6 @@ import React from 'react'
 // Types
 // ---------------------------------------------------------------------------
 
-export type Variants = Record<string, Record<string, unknown>>
-
 type MotionProps = {
   initial?: unknown
   animate?: unknown
@@ -133,8 +131,8 @@ export function useMotionValue<T>(initial: T): MotionValue<T> {
   )
 }
 
-export function useTransform<T>(
-  _value: MotionValue,
+export function useTransform<T, V = unknown>(
+  _value: MotionValue<V>,
   _inputRange: number[],
   outputRange: T[],
 ): MotionValue<T> {
