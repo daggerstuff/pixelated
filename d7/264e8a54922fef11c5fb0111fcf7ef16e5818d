@@ -1,0 +1,19 @@
+src/lib/audit/__tests__/log.test.ts
+  s_ce8b3c0a296613::t_7e03a9498348e7 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d7264e8a54922fef11c5fb0111fcf7ef16e5818d",
+  "prompts": {},
+  "sessions": {
+    "s_ce8b3c0a296613": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_02c9f2812ffeSODtiG0fbTpJ1D",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

@@ -1,0 +1,62 @@
+cli/px/tsconfig.json
+  s_e79c379de6b9af::t_d9bffbe48273df 1-17
+cli/px/src/config/loader.ts
+  s_e79c379de6b9af::t_1639b7a4821b99 29,33
+  s_e79c379de6b9af::t_bd48fe3abc4264 1-28,30-32,34-39,43,45-77,79-120
+  s_e79c379de6b9af::t_30efe25ca5f2dc 40-42,44
+  s_e79c379de6b9af::t_d0063b2c88902f 78
+cli/px/src/output/format.ts
+  s_e79c379de6b9af::t_f01ddf2cf4e078 3-18,20-35,37-52,54-62,64-99
+  s_e79c379de6b9af::t_0a64f40654ba7f 2
+  s_e79c379de6b9af::t_0a12f6beebfb05 19
+  s_e79c379de6b9af::t_dc9afdc23eb1e3 36
+  s_e79c379de6b9af::t_c0d99f12bafb2b 1
+  s_e79c379de6b9af::t_da48351dc535ad 53,63
+cli/px/tsup.config.ts
+  s_e79c379de6b9af::t_e178bcfb3f0ef5 1-11
+cli/px/src/client/http.ts
+  s_e79c379de6b9af::t_7b1ce390c581e8 1-112
+agents/px.config.json
+  s_e79c379de6b9af::t_573a764e107ea3 1-56
+cli/px/package.json
+  s_e79c379de6b9af::t_3a067ff2927c5a 1-25
+cli/px/src/commands/list.ts
+  s_e79c379de6b9af::t_79e8bf39696847 1-13
+cli/px/src/commands/health.ts
+  s_e79c379de6b9af::t_f368d49eee569e 1-2,4-16,18-39
+  s_e79c379de6b9af::t_f6cb2b68090051 3
+  s_e79c379de6b9af::t_057683b0e2e8c0 17
+cli/px/src/config/schema.ts
+  s_e79c379de6b9af::t_f1dfe3655dd0c5 31
+  s_e79c379de6b9af::t_1dc2f5fdbf1f50 33
+  s_e79c379de6b9af::t_70cf24d1d05a60 1-30,32,34-40
+cli/px/src/commands/config.ts
+  s_e79c379de6b9af::t_2baaaa92f2382e 1-13
+cli/px/src/index.ts
+  s_e79c379de6b9af::t_48a9da73925120 3
+  s_e79c379de6b9af::t_ca5de8fe8998c8 35
+  s_e79c379de6b9af::t_fbd2a501a4060a 1-2,4-25,27-34,36-155
+  s_e79c379de6b9af::t_f834e8c90424e2 26
+cli/px/src/output/response.ts
+  s_e79c379de6b9af::t_7796ae2b6a116e 1-45
+cli/px/src/commands/init.ts
+  s_e79c379de6b9af::t_0f674ddba38b23 119
+  s_e79c379de6b9af::t_711e87f80c77f7 6
+  s_e79c379de6b9af::t_ead689ee7be1e1 1-5,7-118,120-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "14d58c290a276bc9b3b9eebd0da3274d5ffb2d18",
+  "prompts": {},
+  "sessions": {
+    "s_e79c379de6b9af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_030a9748fffejidjFI26VRl6Dh",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

@@ -1,0 +1,33 @@
+patches/@modelcontextprotocol__sdk.patch
+  s_9ed4f05cc638b8::t_8369030046203a 1-45
+patches/modelcontextprotocol__sdk@1.25.1.patch
+  s_9ed4f05cc638b8::t_8369030046203a 1-43
+patches/react/react-dom.esm.js
+  s_9ed4f05cc638b8::t_8369030046203a 1-39
+patches/react/react-dom-client.esm.js
+  s_9ed4f05cc638b8::t_8369030046203a 1-37
+patches/astro.patch
+  s_9ed4f05cc638b8::t_8369030046203a 1-31
+patches/@astrojs__vercel.patch
+  s_9ed4f05cc638b8::t_8369030046203a 1-29
+patches/@astrojs__internal-helpers@0.10.0.patch
+  s_9ed4f05cc638b8::t_8369030046203a 1-22
+patches/react/index.esm.js
+  s_9ed4f05cc638b8::t_8369030046203a 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "24bef0a0c04ec7805fe125f218da1bacdba18e9e",
+  "prompts": {},
+  "sessions": {
+    "s_9ed4f05cc638b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_01658a28affemYXGR5SHfsoP7F",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

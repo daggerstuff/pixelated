@@ -1,0 +1,21 @@
+src/lib/metaaligner/prioritization/educational-context-recognizer.test.ts
+  s_ada65dc30fc0ca::t_2592de199922e5 23
+src/pages/api/ai/crisis-detection.ts
+  s_ada65dc30fc0ca::t_2592de199922e5 217,234
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2ff91dd4a1c52524f73d977b403a4d40745ebc30",
+  "prompts": {},
+  "sessions": {
+    "s_ada65dc30fc0ca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_011631468ffeLd4OaZSMLZjnF4",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

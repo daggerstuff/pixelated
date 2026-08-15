@@ -1,0 +1,15 @@
+src/lib/ai/bias-detection/python-service/tests/test_bias_detection_service.py
+  ai_agent 266-267,290-291,314-315
+src/lib/ai/bias-detection/python-service/tests/test_model_ensemble_service.py
+  ai_agent 35-39,57-59
+src/lib/ai/bias-detection/python-service/tests/test_sentry_metrics.py
+  ai_agent 7,22,37,43,49,55
+tests/python/test_task_sync_tri_sync.py
+  ai_agent 31,37,39,46-48
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "c3dfec1c7e83b24814e4baab0534f787de1101fb",
+  "prompts": {}
+}

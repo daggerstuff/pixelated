@@ -1,0 +1,19 @@
+.oxlintrc.json
+  s_9ed4f05cc638b8::t_45926e5c9bcf2c 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5a247e6faa294950efe1d34165af2b325c5175b6",
+  "prompts": {},
+  "sessions": {
+    "s_9ed4f05cc638b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_01658a28affemYXGR5SHfsoP7F",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

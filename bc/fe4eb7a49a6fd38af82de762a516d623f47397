@@ -1,0 +1,9 @@
+agents/advisor-agent/agent/tools/read_file.ts
+  ai_agent 2,12,14-28,30-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "bcfe4eb7a49a6fd38af82de762a516d623f47397",
+  "prompts": {}
+}
