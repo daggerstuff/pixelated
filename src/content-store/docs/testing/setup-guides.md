@@ -226,7 +226,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Install pnpm
-RUN npm install -g pnpm@8
+RUN npm install -g pnpm@latest
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
