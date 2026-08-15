@@ -39,7 +39,7 @@ interface Baseline {
 }
 
 function loadBaseline(): Baseline {
-  const baselinePath = path.join(process.cwd(), 'security-baseline.json')
+  const baselinePath = path.join(process.cwd(), 'config', 'security-baseline.json')
   expect(fs.existsSync(baselinePath)).toBe(true)
   const raw = fs.readFileSync(baselinePath, 'utf8')
   return JSON.parse(raw) as Baseline
