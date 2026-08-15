@@ -4,8 +4,6 @@ import React from 'react'
 // Types
 // ---------------------------------------------------------------------------
 
-export type Variants = Record<string, Record<string, unknown>>
-
 type MotionProps = {
   initial?: unknown
   animate?: unknown
