@@ -316,18 +316,25 @@ describe('auditLoggingService (coverage: levels, unimplemented, factory, dev)', 
     expect(debug).toHaveBeenCalled()
   })
 
-  it('queryLogs throws not-implemented', async () => {
+  it('queryLogs returns filtered log entries', async () => {
     const svc = new AuditLoggingService(testConfig)
-    await expect(svc.queryLogs({})).rejects.toThrow(
-      'Log querying not implemented',
-    )
+    await svc.logEvent({
+      eventType: 'LOGIN_ATTEMPT',
+      action: 'login',
+      status: 'success',
+      details: {},
+      metadata: {},
+    })
+    const logs = await svc.queryLogs({})
+    expect(Array.isArray(logs)).toBe(true)
+    expect(logs.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('exportLogs throws not-implemented', async () => {
+  it('exportLogs returns JSON string', async () => {
     const svc = new AuditLoggingService(testConfig)
-    await expect(svc.exportLogs('json')).rejects.toThrow(
-      'Log export not implemented',
-    )
+    const result = await svc.exportLogs('json')
+    expect(typeof result).toBe('string')
+    expect(() => JSON.parse(result)).not.toThrow()
   })
 
   it('getAuditLogger returns an AuditLoggingService instance', () => {

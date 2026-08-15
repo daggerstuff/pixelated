@@ -163,6 +163,7 @@ class SyncDaemon:
                 text=True,
                 timeout=300,  # 5 minute timeout
                 env=env,
+                check=False,
             )
 
             duration = time.time() - start_time
