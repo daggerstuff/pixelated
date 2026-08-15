@@ -1,0 +1,98 @@
+---
+title: 'Therapeutic Alliance'
+description: 'How Pixelated Empathy tracks therapeutic alliance using Bordin\'s model and analyses conversational dynamics during training sessions.'
+---
+
+## Therapeutic Alliance
+
+**Therapeutic alliance** — the collaborative bond between therapist and client —
+is one of the strongest predictors of positive therapeutic outcomes across all
+modalities. Pixelated Empathy tracks alliance development using **Bordin's
+model**, which identifies three core components:
+
+<CardGroup cols={3}>
+  <Card title="Task Agreement" icon="list-check">
+    The degree to which therapist and client agree on what they're working on in
+    session — the specific activities, techniques, and approaches being used.
+  </Card>
+  <Card title="Goal Alignment" icon="bullseye">
+    Shared understanding of the desired outcomes of therapy — what success looks
+    like, and whether both parties are working toward the same end.
+  </Card>
+  <Card title="Relational Bond" icon="heart">
+    The quality of the human connection — mutual trust, respect, warmth, and the
+    client's sense that the therapist genuinely cares about their wellbeing.
+  </Card>
+</CardGroup>
+
+### Alliance in The Empathy Gym
+
+During training sessions, therapeutic alliance is tracked as a `0.0` to `1.0`
+continuous score that evolves throughout the conversation:
+
+- **Below 0.4** — Weak alliance. The system may generate feedback suggesting the
+  therapist focus on rapport-building before introducing interventions.
+- **0.4 – 0.7** — Developing alliance. The client is cautiously engaged, and the
+  system encourages deepening the connection.
+- **Above 0.7** — Strong alliance. The therapeutic relationship can support more
+  challenging interventions like confrontation, cognitive restructuring, or
+  trauma processing.
+
+Alliance strength is influenced by the therapist's demonstrated empathy,
+validation, consistency, and respect for the client's autonomy. Alliance
+_ruptures_ — moments where the bond weakens — are detected and flagged as
+critical learning opportunities.
+
+---
+
+## Conversational Dynamics
+
+Beyond the content of what's said, Pixelated Empathy analyses _how_ the
+conversation flows. These dynamics are often invisible to the participants but
+are powerful indicators of therapeutic effectiveness.
+
+### Tracked Dimensions
+
+<AccordionGroup>
+  <Accordion title="Tone patterns" icon="waveform-lines">
+    Analysis of the emotional colour of language over time. The platform tracks shifts in tone — from warm to clinical, from tentative to assertive — and correlates them with client engagement and alliance strength.
+
+    Tone is measured through linguistic markers (word choice, sentence structure, hedging language) and, when voice mode is active, through acoustic features (pitch variation, speaking rate, volume dynamics).
+
+  </Accordion>
+
+  <Accordion title="Conversational flow" icon="arrows-spin">
+    The rhythm of the dialogue — how smoothly turns pass between therapist and client. Healthy therapeutic flow involves balanced turn-taking, appropriate response latency, and natural topic transitions.
+
+    **Indicators of good flow:**
+    - Responses that build on what the client said (vs. abrupt topic changes)
+    - Appropriate response length (not too brief, not overwhelming)
+    - Questions that feel organic rather than interrogative
+
+    **Red flags:**
+    - Multiple rapid-fire questions without processing time
+    - Monologue-length responses that dominate the conversation
+    - Non-sequitur topic shifts that break the client's narrative
+
+  </Accordion>
+
+  <Accordion title="Emotional reciprocity" icon="arrows-left-right">
+    The degree to which the therapist's emotional expression matches (but does not mirror) the client's emotional state. Effective reciprocity means meeting the client where they are emotionally while maintaining professional groundedness.
+
+    - **Under-reciprocity:** Therapist appears flat or disconnected when the client is in distress → damages alliance.
+    - **Over-reciprocity:** Therapist becomes as emotionally activated as the client → loses therapeutic presence.
+    - **Calibrated reciprocity:** Therapist conveys understanding of the emotional weight while remaining a stable, regulated presence → strengthens alliance.
+
+  </Accordion>
+
+  <Accordion title="Silence patterns" icon="volume-xmark">
+    Silence in therapy is not empty — it's information. The platform distinguishes between:
+
+    - **Productive silence** — The client is processing, integrating, or gathering courage to share something difficult. The therapist holds space without interrupting.
+    - **Uncomfortable silence** — An awkward gap where neither party knows how to proceed. Often indicates a missed therapeutic moment.
+    - **Resistant silence** — The client is disengaging, shutting down, or expressing passive resistance.
+
+    The appropriate therapeutic response differs for each type. Feedback reports highlight silence patterns and whether the therapist responded effectively.
+
+  </Accordion>
+</AccordionGroup>

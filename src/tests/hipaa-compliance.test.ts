@@ -113,7 +113,7 @@ describe('HIPAA §164.312(b) — Audit Controls', () => {
     const fs = require('node:fs') as typeof import('fs')
     const baselinePath = (
       require('node:path') as typeof import('path')
-    ).resolve(process.cwd(), 'security-baseline.json')
+    ).resolve(process.cwd(), 'config', 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { audit: { include_events: string[] } }
@@ -221,7 +221,7 @@ describe('HIPAA §164.312(e)(1) — Transmission Security', () => {
     const fs = require('node:fs') as typeof import('fs')
     const baselinePath = (
       require('node:path') as typeof import('path')
-    ).resolve(process.cwd(), 'security-baseline.json')
+    ).resolve(process.cwd(), 'config', 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { encryption: { data_at_rest: { algorithm: string } } }
@@ -240,7 +240,7 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
     const fs = require('node:fs') as typeof import('fs')
     const baselinePath = (
       require('node:path') as typeof import('path')
-    ).resolve(process.cwd(), 'security-baseline.json')
+    ).resolve(process.cwd(), 'config', 'security-baseline.json')
     expect(fs.existsSync(baselinePath)).toBe(true)
 
     const raw = fs.readFileSync(baselinePath, 'utf8')
@@ -257,7 +257,7 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
     const fs = require('node:fs') as typeof import('fs')
     const baselinePath = (
       require('node:path') as typeof import('path')
-    ).resolve(process.cwd(), 'security-baseline.json')
+    ).resolve(process.cwd(), 'config', 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { compliance_standards: string[] }
@@ -269,7 +269,7 @@ describe('HIPAA §164.308(a)(1) — Security Management Process', () => {
     const fs = require('node:fs') as typeof import('fs')
     const baselinePath = (
       require('node:path') as typeof import('path')
-    ).resolve(process.cwd(), 'security-baseline.json')
+    ).resolve(process.cwd(), 'config', 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: { testing: { hipaa_compliance_tests_required: boolean } }
@@ -286,7 +286,7 @@ describe('HIPAA §164.314 — Organizational Requirements', () => {
     const fs = require('node:fs') as typeof import('fs')
     const baselinePath = (
       require('node:path') as typeof import('path')
-    ).resolve(process.cwd(), 'security-baseline.json')
+    ).resolve(process.cwd(), 'config', 'security-baseline.json')
     const raw = fs.readFileSync(baselinePath, 'utf8')
     const baseline = JSON.parse(raw) as {
       baseline: {
