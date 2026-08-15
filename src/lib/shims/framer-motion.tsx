@@ -133,8 +133,8 @@ export function useMotionValue<T>(initial: T): MotionValue<T> {
   )
 }
 
-export function useTransform<T>(
-  _value: MotionValue,
+export function useTransform<T, V = unknown>(
+  _value: MotionValue<V>,
   _inputRange: number[],
   outputRange: T[],
 ): MotionValue<T> {
