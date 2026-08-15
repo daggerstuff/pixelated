@@ -32,7 +32,7 @@ fi
 
 # 3. Configure pnpm and Install Node dependencies
   echo "🟢 Configuring pnpm..."
-  npm install -g pnpm@11.12.0
+  npm install -g pnpm
 chmod +x scripts/devops/pnpm-install-with-fallback.sh
 scripts/devops/pnpm-install-with-fallback.sh
 bash scripts/devops/install-git-hooks.sh
