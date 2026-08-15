@@ -1,43 +1,9 @@
-scripts/task_sync/dedupe_github.py
-  s_8288eca51e6a35::t_fc3581334b298a 18,106,123-196,228-234,237-239,311
-scripts/task_sync/tri_sync.py
-  s_8288eca51e6a35::t_fc3581334b298a 640,663
-scripts/data/regen_banned_sessions.py
-  s_8288eca51e6a35::t_fc3581334b298a 104,123
-scripts/devops/apply-gusher-dedup-and-adhd.py
-  s_8288eca51e6a35::t_fc3581334b298a 34,246
-.gitignore
-  s_8288eca51e6a35::t_fc3581334b298a 430-431
-scripts/devops/test-promotion-gate.py
-  s_8288eca51e6a35::t_fc3581334b298a 85
-scripts/task_sync/sync_daemon.py
-  s_8288eca51e6a35::t_fc3581334b298a 166
-src/lib/security/__tests__/audit.logging.test.ts
-  s_dd6187f491e4ff::t_d389463e990929 319,321-330,333,335-337
-scripts/cleanup_runs.py
-  s_8288eca51e6a35::t_fc3581334b298a 21,24,68,138,189,196-199,209-215,218-229
+pnpm-lock.yaml
+  ai_agent 1212-1248,2296-2298,2303-2307,7182-7184,8689-8691,10770-10773,10854-10857,11447-11450,12274-12277,13519-13522,14125-14127,16543-16547,16553-16558,17763-17770,17786-17798,17909-17913,21765-21768,22449-22457,23532,25736-25737,25805-25806,26608-26612,27379-27404,27776-27787,29310-29311,29978-29979,30285-30301,30340-30368
 ---
 {
   "schema_version": "authorship/3.0.0",
   "git_ai_version": "1.5.2",
   "base_commit_sha": "c617f47558709dd377845aaf597aee9e06d301d2",
-  "prompts": {},
-  "sessions": {
-    "s_8288eca51e6a35": {
-      "agent_id": {
-        "tool": "claude",
-        "id": "ses_fff0b5bc3ffeLskW3zsQ6eo5Y1",
-        "model": "unknown"
-      },
-      "human_author": "Chad <chad@pixelated.app>"
-    },
-    "s_dd6187f491e4ff": {
-      "agent_id": {
-        "tool": "claude",
-        "id": "ses_ffc499840ffeU7UGNxokXq2YqQ",
-        "model": "unknown"
-      },
-      "human_author": "Chad <chad@pixelated.app>"
-    }
-  }
+  "prompts": {}
 }
