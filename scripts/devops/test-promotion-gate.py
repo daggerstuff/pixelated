@@ -82,7 +82,7 @@ def run_aggregator(scenario: str, output_file: Path) -> bool:
         return True
 
     # Run actual aggregator for pass scenario
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     return result.returncode == 0
 
 

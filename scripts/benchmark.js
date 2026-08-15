@@ -1,5 +1,5 @@
 #!/usr/bin/env ts-node
-import { DreamScheduler } from './src/services/dream-scheduler'
+import { DreamScheduler } from '../src/services/dream-scheduler'
 
 const envConsolidationUrl = process.env.CONSOLIDATION_URL
 const consolidationUrl =

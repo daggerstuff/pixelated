@@ -101,6 +101,7 @@ def ovhai_download(batch_name: str, dest: Path) -> bool:
         ],
         capture_output=True,
         text=True,
+        check=False,
     )
     return result.returncode == 0 and (dest / batch_name).exists()
 
@@ -119,6 +120,7 @@ def ovhai_upload(local_path: Path, remote_name: str) -> bool:
         ],
         capture_output=True,
         text=True,
+        check=False,
     )
     return result.returncode == 0
 

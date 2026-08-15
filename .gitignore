@@ -427,3 +427,6 @@ cli/px/pnpm-workspace.yaml
 # GitHub Copilot
 .github/copilot/settings.local.json
 .github/mcp.json
+
+.px
+ai/PAL_MEDDIES_IMPLEMENTATION_PLAN.md

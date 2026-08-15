@@ -15,6 +15,7 @@ import re
 import subprocess
 import sys
 import time
+import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
@@ -22,7 +23,6 @@ SYNC_LINE_RE = re.compile(r"(?im)^\s*(?P<key>[a-z0-9_.-]+)\s*:\s*(?P<value>.+?)\
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 CLOSE_REASON = "not planned"
 RATE_LIMIT_DELAY = 0.5  # seconds between API calls
-BATCH_SIZE = 50
 
 
 def extract_metadata(body: str) -> dict[str, str]:
@@ -39,56 +39,8 @@ def extract_metadata(body: str) -> dict[str, str]:
     return metadata
 
 
-def fetch_all_issues(repo: str) -> list[dict]:
-    """Fetch all issues from the repo using gh CLI."""
-    all_issues: list[dict] = []
-    limit = 100
-    page = 0
-    while True:
-        page += 1
-        (page - 1) * limit
-        result = subprocess.run(
-            [
-                "gh",
-                "issue",
-                "list",
-                "--repo",
-                repo,
-                "--state",
-                "all",
-                "--limit",
-                str(limit + 1),
-                "--json",
-                "number,title,state,body,createdAt",
-                "-S",
-                "updated:<=2099-12-31 sort:created-asc",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-        if result.returncode != 0:
-            break
-
-        data = json.loads(result.stdout)
-        if not data:
-            break
-
-        # gh CLI returns at most --limit items, but doesn't support --page directly.
-        # We use --limit to get a batch and rely on the fact that default sort is
-        # creation-asc. However, this approach hits issues with large repos.
-        # Instead, use the REST API directly here.
-        all_issues.extend(data)
-        if len(data) < limit:
-            break
-
-    return all_issues
-
-
 def fetch_all_issues_via_api(repo: str, token: str) -> list[dict]:
     """Fetch all issues via GitHub REST API (reliable pagination)."""
-    import urllib.request
-
     owner, repo_name = repo.split("/")
     headers = {
         "Authorization": f"Bearer {token}",
@@ -151,6 +103,7 @@ def close_issue(repo: str, issue_number: int) -> bool:
             capture_output=True,
             text=True,
             timeout=30,
+            check=False,
         )
         if result.returncode == 0:
             return True
@@ -165,6 +118,80 @@ def close_issue(repo: str, issue_number: int) -> bool:
         return False
 
     return False
+
+
+def _sorted_for_keep(group: list[dict]) -> list[dict]:
+    """Sort a duplicate group so the keeper (longest body, then earliest, then lowest number) is first."""
+    return sorted(
+        group,
+        key=lambda x: (
+            -(len(x.get("body", "") or "")),
+            x.get("created_at", ""),
+            x["number"],
+        ),
+    )
+
+
+def _plan_true_duplicates(linear_map: dict[str, list[dict]]) -> tuple[int, list[tuple[int, int, str]]]:
+    """Plan closes for groups sharing the same Linear ID. Returns (group_count, closes)."""
+    closes: list[tuple[int, int, str]] = []  # (close_num, keep_num, linear_id)
+    groups = 0
+    for lid, lid_group in linear_map.items():
+        if len(lid_group) > 1:
+            groups += 1
+            sorted_group = _sorted_for_keep(lid_group)
+            keep = sorted_group[0]
+            closes.extend((dup["number"], keep["number"], lid) for dup in sorted_group[1:])
+    return groups, closes
+
+
+def _plan_no_meta_duplicates(no_meta: list[dict]) -> tuple[int, list[tuple[int, int]]]:
+    """Plan closes for title duplicates with no sync metadata. Returns (group_count, closes)."""
+    if len(no_meta) <= 1:
+        return 0, []
+    sorted_no_meta = sorted(no_meta, key=lambda x: (x.get("created_at", ""), x["number"]))
+    keep = sorted_no_meta[0]
+    return 1, [(dup["number"], keep["number"]) for dup in sorted_no_meta[1:]]
+
+
+def _plan_collisions(group: list[dict]) -> tuple[int, list[tuple[int, int]]]:
+    """Plan closes for title collisions (different Linear IDs). Partition by Linear ID,
+    select one keeper per subgroup, build closures from subgroup keepers."""
+    # Partition group by Linear ID (exclude empty/no-linear issues from subgroup selection)
+    linear_subgroups: dict[str, list[dict]] = defaultdict(list)
+    no_linear: list[dict] = []
+    for issue in group:
+        meta = extract_metadata(issue.get("body", "") or "")
+        lid = meta.get("linear", "")
+        if lid:
+            linear_subgroups[lid].append(issue)
+        else:
+            no_linear.append(issue)
+
+    # Select keeper from each Linear subgroup using existing keeper-ordering
+    subgroup_keepers: list[dict] = []
+    for lid, subgroup in linear_subgroups.items():
+        sorted_sub = _sorted_for_keep(subgroup)
+        subgroup_keepers.append(sorted_sub[0])
+
+    # Include no-linear issues as their own candidate subgroup (each forms a subgroup of 1)
+    # If there are no-linear issues, treat them as additional candidates
+    candidates = subgroup_keepers + no_linear
+
+    if not candidates:
+        return 0, []
+
+    # If only one subgroup/keeper exists, no collision to resolve
+    if len(candidates) == 1:
+        return 0, []
+
+    # Build collision closures: select global keeper from candidates, close rest
+    sorted_candidates = _sorted_for_keep(candidates)
+    global_keep = sorted_candidates[0]
+    closes = [(c["number"], global_keep["number"]) for c in sorted_candidates[1:]]
+    # Only build closures from subgroup keepers and no-linear candidates that were not retained
+    # The prompt says: "Select the global keeper from that candidate set, then close only the remaining canonical candidates against it, excluding any issue already retained as a true-duplicate keeper."
+    return 1, closes
 
 
 def classify_and_plan(issues: list[dict]) -> dict:
@@ -198,44 +225,18 @@ def classify_and_plan(issues: list[dict]) -> dict:
             else:
                 no_meta.append(issue)
 
-        # True duplicates: same Linear ID
-        for lid, lid_group in linear_map.items():
-            if len(lid_group) > 1:
-                true_dup_groups += 1
-                # Keep the one with the best body (longest), or if same, earliest
-                sorted_group = sorted(
-                    lid_group,
-                    key=lambda x: (
-                        -(len(x.get("body", "") or "")),
-                        x.get("created_at", ""),
-                        x["number"],
-                    ),
-                )
-                keep = sorted_group[0]
-                for dup in sorted_group[1:]:
-                    true_dup_closes.append((dup["number"], keep["number"], lid))
+        groups, closes = _plan_true_duplicates(linear_map)
+        true_dup_groups += groups
+        true_dup_closes.extend(closes)
 
-        # No-metadata duplicates
-        if len(no_meta) > 1:
-            no_meta_groups += 1
-            sorted_no_meta = sorted(no_meta, key=lambda x: (x.get("created_at", ""), x["number"]))
-            keep = sorted_no_meta[0]
-            for dup in sorted_no_meta[1:]:
-                no_meta_closes.append((dup["number"], keep["number"]))
+        groups, closes = _plan_no_meta_duplicates(no_meta)
+        no_meta_groups += groups
+        no_meta_closes.extend(closes)
 
         if len(linear_map) > 1 and len(no_meta) == 0:
-            collision_groups += 1
-            sorted_group = sorted(
-                group,
-                key=lambda x: (
-                    -(len(x.get("body", "") or "")),
-                    x.get("created_at", ""),
-                    x["number"],
-                ),
-            )
-            keep = sorted_group[0]
-            for dup in sorted_group[1:]:
-                collision_closes.append((dup["number"], keep["number"]))
+            groups, closes = _plan_collisions(group)
+            collision_groups += groups
+            collision_closes.extend(closes)
 
     return {
         "singles": singles,
@@ -246,24 +247,6 @@ def classify_and_plan(issues: list[dict]) -> dict:
         "collision_groups": collision_groups,
         "collision_closes": collision_closes,
     }
-
-
-def plan_summary(plan: dict) -> str:
-    total = len(plan["true_dup_closes"]) + len(plan["no_meta_closes"]) + len(plan["collision_closes"])
-    lines = [
-        f"  Single-issue titles:       {plan['singles']}",
-        f"  Title collision groups:     {plan['collision_groups']}",
-        f"  Title collision issues → close: {len(plan['collision_closes'])}",
-        "",
-        f"  True duplicate groups:      {plan['true_dup_groups']}",
-        f"  True duplicate issues → close: {len(plan['true_dup_closes'])}",
-        "",
-        f"  No-metadata duplicate groups: {plan['no_meta_groups']}",
-        f"  No-metadata issues → close:    {len(plan['no_meta_closes'])}",
-        "",
-        f"  TOTAL TO CLOSE:            {total}",
-    ]
-    return "\n".join(lines)
 
 
 def main():
@@ -324,14 +307,10 @@ def main():
     all_closes.sort(key=lambda x: x["issue"])
 
     results = {"closed": 0, "failed": 0, "skipped": []}
-    batch_num = 0
 
-    for i, item in enumerate(all_closes):
+    for item in all_closes:
         issue_num = item["issue"]
         keep_num = item["keep"]
-
-        if i % BATCH_SIZE == 0:
-            batch_num += 1
 
         success = close_issue(full_repo, issue_num)
         if success:
@@ -343,9 +322,6 @@ def main():
         sys.stdout.write(f"  #{issue_num} → close (keep #{keep_num}): {'OK' if success else 'FAIL'}\n")
         sys.stdout.flush()
         time.sleep(RATE_LIMIT_DELAY)
-
-    if results["failed"] > 0:
-        pass
 
     # Summary JSON to stdout for parsing
     return 0 if results["failed"] == 0 else 1
