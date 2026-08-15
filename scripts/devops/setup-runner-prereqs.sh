@@ -24,10 +24,10 @@ echo "Configuring Docker permissions..."
 usermod -aG docker azureuser
 chmod 666 /var/run/docker.sock
 
-echo "Installing Node.js 20..."
-curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+echo "Installing Node.js 24..."
+curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 apt-get install -y nodejs
-npm install -g pnpm@11.12.0
+npm install -g pnpm@11.21.0
 
 echo "Installing uv..."
 curl -LsSf https://astral.sh/uv/install.sh | sudo -u azureuser sh
