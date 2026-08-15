@@ -43,10 +43,10 @@
   --fm-accent-3: var(--np-mid, oklch(0.7 0 0));
   --fm-danger: var(--np-text, oklch(0.93 0 0));
   --fm-mono:
-    'JetBrains Mono Variable', ui-monospace, 'JetBrains Mono', monospace;
+    'IoskeleyMono', ui-monospace, monospace;
   --fm-display: var(
     --np-font-display,
-    'JetBrains Mono Variable',
+    'IoskeleyMono',
     ui-monospace,
     monospace
   );
@@ -320,7 +320,7 @@
 }
 .fm-btn-glow--ghost:hover {
   border-color: var(--fm-muted);
-  background: rgba(255, 255, 255, 0.03);
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
   color: var(--fm-text);
   box-shadow: none;
 }
@@ -358,7 +358,7 @@
   --color-elevated: var(--np-elevated, oklch(0.18 0 0));
   --color-glass: var(--np-surface, oklch(0.14 0 0));
   --color-text: var(--np-text, oklch(0.93 0 0));
-  --color-text-strong: #ffffff;
+  --color-text-strong: var(--np-text, #fff);
   --color-muted: var(--np-muted, oklch(0.62 0 0));
   --color-soft: var(--np-elevated, oklch(0.18 0 0));
   --color-line: var(--np-line, rgba(255, 255, 255, 0.06));
@@ -368,9 +368,9 @@
   --color-accent: var(--np-text, oklch(0.93 0 0));
   --color-accent-rgb: 237, 237, 237;
   --color-accent-hover: var(--np-mid, oklch(0.7 0 0));
-  --color-accent-soft: rgba(255, 255, 255, 0.1);
+  --color-accent-soft: color-mix(in srgb, var(--np-mid, #fff) 10%, transparent);
   --color-brand: var(--np-text, oklch(0.93 0 0));
-  --focus-ring: 0 0 0 3px rgba(255, 255, 255, 0.35);
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--np-mid, #fff) 35%, transparent);
   /* keel alias tokens used by keel components */
   --bg-primary: var(--np-bg, oklch(0.1 0 0));
   --bg-secondary: var(--np-surface, oklch(0.14 0 0));

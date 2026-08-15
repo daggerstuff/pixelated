@@ -95,8 +95,8 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(180deg, color-mix(in srgb, var(--ink) 3%, transparent) 1px, transparent 1px);
   background-size: 2.75rem 2.75rem;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent 70%);
   pointer-events: none;
@@ -112,7 +112,7 @@
   margin: 0;
   font-family: var(
     --np-font-display,
-    'JetBrains Mono Variable',
+    'IoskeleyMono',
     ui-monospace,
     monospace
   );
@@ -163,7 +163,7 @@
   border: 1px solid var(--border-subtle);
   font-family: var(
     --np-font-mono,
-    'JetBrains Mono Variable',
+    'IoskeleyMono',
     ui-monospace,
     monospace
   );
@@ -197,9 +197,9 @@
 }
 
 .marketing-button--secondary {
-  color: rgba(253, 252, 252, 0.9);
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(253, 252, 252, 0.14);
+  color: color-mix(in srgb, var(--ink) 90%, transparent);
+  background: color-mix(in srgb, var(--ink) 4%, transparent);
+  border-color: color-mix(in srgb, var(--ink) 14%, transparent);
 }
 
 .marketing-button--secondary:hover {
@@ -250,7 +250,7 @@
   font-size: 0.76rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(253, 252, 252, 0.5);
+  color: color-mix(in srgb, var(--ink) 50%, transparent);
 }
 
 .marketing-stat-grid {
@@ -278,7 +278,7 @@
 .marketing-quote-label {
   font-family: var(
     --np-font-mono,
-    'JetBrains Mono Variable',
+    'IoskeleyMono',
     ui-monospace,
     monospace
   );
@@ -292,7 +292,7 @@
 .marketing-eyebrow {
   font-family: var(
     --np-font-mono,
-    'JetBrains Mono Variable',
+    'IoskeleyMono',
     ui-monospace,
     monospace
   );
@@ -336,7 +336,7 @@
   font-family: var(--font-mono);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
   overflow: hidden;
   margin-top: 0;
   align-self: stretch;
@@ -366,11 +366,11 @@
 }
 .marketing-hero__proof-body code {
   font-family: inherit;
-  background: rgba(255, 255, 255, 0.05);
+  background: color-mix(in srgb, var(--ink) 5%, transparent);
   padding: 1px 5px;
 }
 .marketing-hero__proof-body em {
-  color: rgba(253, 252, 252, 0.7);
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
   font-style: normal;
 }
 
@@ -381,7 +381,7 @@
   font-size: 0.6875rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(253, 252, 252, 0.55);
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
 }
 
 .marketing-section-header {
@@ -431,7 +431,7 @@
   margin: 0;
   font-family: var(
     --np-font-display,
-    'JetBrains Mono Variable',
+    'IoskeleyMono',
     ui-monospace,
     monospace
   );
@@ -449,7 +449,7 @@
   font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.65;
-  color: rgba(253, 252, 252, 0.82);
+  color: color-mix(in srgb, var(--ink) 82%, transparent);
   text-wrap: pretty;
 }
 
@@ -502,7 +502,7 @@
   padding: 1rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
 }
 
 .marketing-proof-item strong {
@@ -564,7 +564,7 @@
   padding: 1.3rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in srgb, var(--ink) 2%, transparent);
 }
 
 .marketing-cta-band__aside ul {
@@ -596,9 +596,9 @@
 }
 
 .marketing-inline-link {
-  color: rgba(253, 252, 252, 0.88);
+  color: color-mix(in srgb, var(--ink) 88%, transparent);
   text-decoration: none;
-  border-bottom: 1px dotted rgba(255, 255, 255, 0.28);
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 28%, transparent);
   transition:
     color var(--duration-fast) var(--ease-out),
     border-color var(--duration-fast) var(--ease-out);
@@ -614,7 +614,7 @@
   flex-wrap: wrap;
   gap: 0.95rem;
   margin-top: 1.35rem;
-  color: rgba(253, 252, 252, 0.56);
+  color: color-mix(in srgb, var(--ink) 56%, transparent);
   font-size: 0.9rem;
 }
 

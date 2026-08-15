@@ -6,7 +6,6 @@ import {
   presetAttributify,
   presetIcons,
   presetTypography,
-  presetWebFonts,
 } from 'unocss'
 
 export default defineConfig({
@@ -20,11 +19,6 @@ export default defineConfig({
       },
     }),
     presetTypography(),
-    presetWebFonts({
-      fonts: {
-        mono: 'JetBrains Mono:400,500,600',
-      },
-    }),
   ],
 
   // Custom theme configuration matching our design system
@@ -280,18 +274,18 @@ export default defineConfig({
     [
       'glass',
       {
-        'background': 'rgba(255, 255, 255, 0.1)',
+        'background': 'color-mix(in srgb, var(--ink) 10%, transparent)',
         'backdrop-filter': 'blur(10px)',
-        'border': '1px solid rgba(255, 255, 255, 0.2)',
+        'border': '1px solid color-mix(in srgb, var(--ink) 20%, transparent)',
       },
     ],
 
     [
       'glass-dark',
       {
-        'background': 'rgba(0, 0, 0, 0.2)',
+        'background': 'color-mix(in srgb, var(--bg) 80%, transparent)',
         'backdrop-filter': 'blur(10px)',
-        'border': '1px solid rgba(255, 255, 255, 0.1)',
+        'border': '1px solid color-mix(in srgb, var(--ink) 10%, transparent)',
       },
     ],
   ],

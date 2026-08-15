@@ -31,7 +31,7 @@ export function FormStyleGuide() {
           gap: 0.25rem;
         }
         .np-fsg__group-title {
-          font-family: var(--np-font-mono, 'JetBrains Mono', monospace);
+          font-family: var(--np-font-mono, 'IoskeleyMono', monospace);
           font-size: var(--np-text-label, 0.75rem);
           font-weight: 500;
           letter-spacing: 0.04em;
@@ -59,7 +59,7 @@ export function FormStyleGuide() {
 
         /* NP-styled labels */
         .np-fsg .np-fsg__label {
-          font-family: var(--np-font-mono, 'JetBrains Mono', monospace) !important;
+          font-family: var(--np-font-mono, 'IoskeleyMono', monospace) !important;
           font-size: var(--np-text-label, 0.75rem) !important;
           font-weight: 500 !important;
           letter-spacing: 0.04em !important;
@@ -80,7 +80,7 @@ export function FormStyleGuide() {
           border: 1px solid var(--np-line-strong, rgba(255,255,255,0.12)) !important;
           background: var(--np-bg, #1a1a1a) !important;
           color: var(--np-text, #ededed) !important;
-          font-family: var(--np-font-mono, 'JetBrains Mono', monospace) !important;
+          font-family: var(--np-font-mono, 'IoskeleyMono', monospace) !important;
           font-size: var(--np-text-small, 0.875rem) !important;
           box-shadow: none !important;
           transition: border-color var(--np-duration-fast, 0.15s) ease-out !important;
@@ -97,7 +97,7 @@ export function FormStyleGuide() {
         .np-fsg input::placeholder,
         .np-fsg textarea::placeholder {
           color: var(--np-muted, #8c8c8c) !important;
-          font-family: var(--np-font-mono, 'JetBrains Mono', monospace) !important;
+          font-family: var(--np-font-mono, 'IoskeleyMono', monospace) !important;
         }
         .np-fsg input:disabled,
         .np-fsg textarea:disabled {
@@ -110,7 +110,7 @@ export function FormStyleGuide() {
           background: var(--np-surface, #242424) !important;
         }
         .np-fsg .np-fsg__error-text {
-          font-family: var(--np-font-mono, 'JetBrains Mono', monospace);
+          font-family: var(--np-font-mono, 'IoskeleyMono', monospace);
           font-size: var(--np-text-caption, 0.6875rem);
           color: var(--np-text, #ededed);
           text-transform: lowercase;
@@ -133,7 +133,7 @@ export function FormStyleGuide() {
           border: 1px solid var(--np-text, #ededed) !important;
           background: var(--np-text, #ededed) !important;
           color: var(--np-bg, #1a1a1a) !important;
-          font-family: var(--np-font-mono, 'JetBrains Mono', monospace) !important;
+          font-family: var(--np-font-mono, 'IoskeleyMono', monospace) !important;
           font-size: var(--np-text-label, 0.75rem) !important;
           font-weight: 600 !important;
           letter-spacing: 0.04em !important;

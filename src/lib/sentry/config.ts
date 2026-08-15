@@ -153,7 +153,9 @@ export function beforeSend(event: Event): Event | null {
   // Drop events originating from a local Vite dev server (localhost / 127.0.0.1)
   // so that dev-only errors (e.g. stale Vite dep chunks) never appear in Sentry
   // regardless of which --mode flag was passed to the dev server.
-  if (typeof window !== 'undefined') {
+  // Skip this filter if PUBLIC_SENTRY_ALLOW_LOCALHOST is set to '1' for testing.
+  const allowLocalhost = import.meta.env['PUBLIC_SENTRY_ALLOW_LOCALHOST'] === '1'
+  if (!allowLocalhost && typeof window !== 'undefined') {
     const { hostname } = window.location
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return null
