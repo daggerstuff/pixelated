@@ -1,0 +1,47 @@
+benchmark.js
+  s_27723409b04adc::t_de050db9cdd76c 2
+sonar-project.properties
+  s_27723409b04adc::t_de050db9cdd76c 1-63
+src/lib/security/__tests__/audit.logging.test.ts
+  s_27723409b04adc::t_de050db9cdd76c 319,321-323,326,328-330
+src/lib/shims/framer-motion.tsx
+  s_27723409b04adc::t_de050db9cdd76c 136-137
+scripts/task_sync/dedupe_github.py
+  s_27723409b04adc::t_de050db9cdd76c 25,42-87,90-91,201-224,227-238,251-268,327,329,333-335,347-348
+scripts/cleanup_runs.py
+  s_27723409b04adc::t_de050db9cdd76c 16,22,25,188-192,194,198-200,203-213,223-232,235-244
+app.json
+  s_27723409b04adc::t_de050db9cdd76c 4,11
+src/lib/shims/framer-motion.test.tsx
+  s_27723409b04adc::t_de050db9cdd76c 1-122
+library/dispatch_resume_gate.md
+  s_27723409b04adc::t_de050db9cdd76c 1-256
+src/lib/search-browser.test.ts
+  s_27723409b04adc::t_de050db9cdd76c 1-27
+experiments/PLAN_colab_ovhai.md
+  s_27723409b04adc::t_de050db9cdd76c 1-161
+uv.lock
+  ai_agent 4847
+scripts/devops/test-promotion-gate.py
+  s_27723409b04adc::t_de050db9cdd76c 85
+PLAN.md
+  s_27723409b04adc::t_de050db9cdd76c 1-525
+package.json
+  s_27723409b04adc::t_de050db9cdd76c 67,165,230,244,256,318,382
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ffcf57d158ea120cb362489df2973ce626c81197",
+  "prompts": {},
+  "sessions": {
+    "s_27723409b04adc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_ffb35985fffeNejdIzR4BhsIH8",
+        "model": "unknown"
+      },
+      "human_author": "PR Churn Bot <bot@composio.dev>"
+    }
+  }
+}
