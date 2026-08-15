@@ -156,7 +156,7 @@ install_node_stack() {
     sudo -u "$REAL_USER" bash -c "
         export NVM_DIR=\"\$HOME/.nvm\"
         [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"
-        npm install -g pnpm@11.12.0
+        npm install -g pnpm
     "
 
     # Install Bun
