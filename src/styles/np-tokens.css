@@ -20,22 +20,23 @@
      clears WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
   --np-muted: oklch(0.62 0 0); /* Labels, captions */
   --np-mid: oklch(0.7 0 0); /* #b3b3b3 — Enhanced muted */
-  --np-line: rgba(255, 255, 255, 0.06); /* Borders, dividers */
-  --np-line-strong: rgba(255, 255, 255, 0.12);
+  --np-line: color-mix(in srgb, var(--ink, #fff) 6%, transparent); /* Borders, dividers */
+  --np-line-strong: color-mix(in srgb, var(--ink, #fff) 12%, transparent);
   --np-overlay: rgba(0, 0, 0, 0.75);
-  --np-selection: rgba(255, 255, 255, 0.08);
-  --np-selection-text: oklch(0.93 0 0);
+  --np-selection: color-mix(in srgb, var(--ink, #fff) 8%, transparent);
+  --np-selection-text: var(--ink, oklch(0.93 0 0));
 
   /* =============================================
-      TYPOGRAPHY — Pure Monospace Technical Instrument.
-      JetBrains Mono Variable carries display, body, and mono roles alike.
-      Weight, size, and tracking carry all hierarchy. No serif display,
-      no soft sans — the clinical audit face only.
-      Aligned with astro-palette terminal aesthetic.
+      TYPOGRAPHY — Terminal instrument.
+      IoskeleyMono carries display and mono roles (hero headline,
+      labels, data tables, clinical audit logs) — the terminal face.
+      Switzer carries the body reading role (subtitles, prose, UI text) —
+      a Söhne alternative for clean, neutral body text.
+      Weight, size, and tracking carry all hierarchy within each face.
       ============================================= */
-  --np-font-display: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --np-font-body: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --np-font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --np-font-display: 'IoskeleyMono', ui-monospace, monospace;
+  --np-font-body: 'Switzer', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --np-font-mono: 'IoskeleyMono', ui-monospace, monospace;
 
   /* Weights — weight carries hierarchy (The Content-is-Type Rule) */
   --np-weight-display: 400;
@@ -64,17 +65,18 @@
   --np-leading-label: 1.3;
 
   /* Letter spacing — tight display, tracked labels */
-  --np-tracking-display: -0.07em;
+  --np-tracking-display: -0.04em;
   --np-tracking-headline: -0.035em;
   --np-tracking-label: 0.04em;
 
   /* =============================================
      FLAT BY DESIGN
      ============================================= */
+  /* Flat by doctrine, but interactive elements carry astro-palette's 4px radius */
   --np-radius: 0px;
-  --np-radius-button: 0px;
+  --np-radius-button: 4px;
   --np-radius-card: 0px;
-  --np-radius-input: 0px;
+  --np-radius-input: 4px;
 
   /* No shadows — tonal layering is the depth system */
   --np-shadow: none;
@@ -149,32 +151,14 @@
      WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
   --np-muted: oklch(0.48 0 0);
   --np-mid: oklch(0.45 0 0);
-  --np-line: rgba(0, 0, 0, 0.08);
-  --np-line-strong: rgba(0, 0, 0, 0.16);
+  --np-line: color-mix(in srgb, var(--ink, #000) 8%, transparent);
+  --np-line-strong: color-mix(in srgb, var(--ink, #000) 16%, transparent);
   --np-overlay: rgba(0, 0, 0, 0.4);
   --np-selection: rgba(0, 0, 0, 0.08);
   --np-selection-text: oklch(0.15 0 0);
 
   /* Legacy alias (see compatibility block): --np-text as rgb() triplet */
   --accent-primary-rgb: 38, 38, 38;
-
-  /* Astro-palette variable aliases (hybrid B) */
-  --bg: var(--np-bg);
-  --ink: var(--np-text);
-  --ink-soft: var(--np-muted);
-  --surface: var(--np-surface);
-  --surface-elevated: var(--np-elevated);
-  --line: var(--np-line);
-  --line-strong: var(--np-line-strong);
-  --accent: var(--np-mid);
-  --accent-soft: var(--np-muted);
-  --radius-sm: var(--np-radius, 0px);
-  --radius-md: 0px;
-  --radius-lg: 0px;
-  --max: var(--np-content, 76rem);
-  --font-body: var(--np-font-body);
-  --font-mono: var(--np-font-mono);
-  --font-display: var(--np-font-display);
 }
 
 /* =============================================
@@ -292,280 +276,34 @@ body {
 }
 
 /* ==============================================
-   18 SWITCHABLE PALETTES (astro-palette)
-   Default: herdr mapped to NP grayscale
-   Switch via documentElement.setAttribute('data-palette', ...)
-   ============================================== */
-:root[data-palette='herdr'] {
-  --bg: oklch(0.1 0 0);
-  --ink: oklch(0.93 0 0);
-  --surface: oklch(0.14 0 0);
-  --surface-elevated: oklch(0.18 0 0);
-  --line: rgba(255, 255, 255, 0.06);
-  --line-strong: rgba(255, 255, 255, 0.12);
-  --accent: oklch(0.7 0 0);
-  --accent-soft: oklch(0.62 0 0);
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-}
-:root[data-palette='catppuccin'] {
-  --bg: #1e1e2e;
-  --ink: #cdd6f4;
-  --surface: #313244;
-  --surface-elevated: #45475a;
-  --line: #45475a;
-  --line-strong: #585b70;
-  --accent: #cba6f7;
-  --accent-soft: #b4befe;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='catppuccin-latte'] {
-  --bg: #eff1f5;
-  --ink: #4c4f69;
-  --surface: #ccd0da;
-  --surface-elevated: #bcc0cc;
-  --line: #bcc0cc;
-  --line-strong: #a9adc7;
-  --accent: #8839ef;
-  --accent-soft: #7287fd;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='terminal'] {
-  --bg: #0d1117;
-  --ink: #c9d1d9;
-  --surface: #161b22;
-  --surface-elevated: #21262d;
-  --line: #30363d;
-  --line-strong: #8b949e;
-  --accent: #58a6ff;
-  --accent-soft: #79c0ff;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-}
-:root[data-palette='tokyo-night'] {
-  --bg: #1a1b26;
-  --ink: #a9b1d6;
-  --surface: #24283b;
-  --surface-elevated: #414868;
-  --line: #414868;
-  --line-strong: #565f89;
-  --accent: #7aa2f7;
-  --accent-soft: #bb9af7;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-}
-:root[data-palette='tokyo-night-day'] {
-  --bg: #d5d6db;
-  --ink: #343b58;
-  --surface: #c0caf5;
-  --surface-elevated: #e0e4f1;
-  --line: #a9b1d6;
-  --line-strong: #565f89;
-  --accent: #7aa2f7;
-  --accent-soft: #9ece6a;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-}
-:root[data-palette='dracula'] {
-  --bg: #282a36;
-  --ink: #f8f8f2;
-  --surface: #44475a;
-  --surface-elevated: #6272a4;
-  --line: #6272a4;
-  --line-strong: #f8f8f2;
-  --accent: #bd93f9;
-  --accent-soft: #ff79c6;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='nord'] {
-  --bg: #2e3440;
-  --ink: #eceff4;
-  --surface: #3b4252;
-  --surface-elevated: #434c5e;
-  --line: #4c566a;
-  --line-strong: #88c0d0;
-  --accent: #88c0d0;
-  --accent-soft: #81a1c1;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='gruvbox'] {
-  --bg: #282828;
-  --ink: #ebdbb2;
-  --surface: #3c3836;
-  --surface-elevated: #504945;
-  --line: #504945;
-  --line-strong: #928374;
-  --accent: #fe8019;
-  --accent-soft: #fabd2f;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='gruvbox-light'] {
-  --bg: #fbf1c7;
-  --ink: #3c3836;
-  --surface: #f9f5d7;
-  --surface-elevated: #f2e5bc;
-  --line: #ebdbb2;
-  --line-strong: #a89984;
-  --accent: #b57614;
-  --accent-soft: #fabd2f;
-  --ink-soft: #665c54;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='one-dark'] {
-  --bg: #282c34;
-  --ink: #abb2bf;
-  --surface: #3e4451;
-  --surface-elevated: #5c6370;
-  --line: #5c6370;
-  --line-strong: #61afef;
-  --accent: #61afef;
-  --accent-soft: #c678dd;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='one-light'] {
-  --bg: #fafafa;
-  --ink: #383a42;
-  --surface: #e8e8e8;
-  --surface-elevated: #f0f0f0;
-  --line: #c8c8c8;
-  --line-strong: #a8a8a8;
-  --accent: #0184bc;
-  --accent-soft: #4078f2;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='solarized'] {
-  --bg: #002b36;
-  --ink: #839496;
-  --surface: #073642;
-  --surface-elevated: #0a3d52;
-  --line: #073642;
-  --line-strong: #2aa198;
-  --accent: #2aa198;
-  --accent-soft: #268bd2;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='solarized-light'] {
-  --bg: #fdf6e3;
-  --ink: #657b83;
-  --surface: #f5f0dc;
-  --surface-elevated: #eee8d5;
-  --line: #eee8d5;
-  --line-strong: #93a1a1;
-  --accent: #268bd2;
-  --accent-soft: #2aa198;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='kanagawa'] {
-  --bg: #1f1f28;
-  --ink: #dcd7ba;
-  --surface: #2a2a37;
-  --surface-elevated: #363646;
-  --line: #363646;
-  --line-strong: #7e9cd8;
-  --accent: #7e9cd8;
-  --accent-soft: #e46876;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='kanagawa-lotus'] {
-  --bg: #f2ecde;
-  --ink: #54546d;
-  --surface: #dedce5;
-  --surface-elevated: #d0d0d8;
-  --line: #c8c8c8;
-  --line-strong: #938aa9;
-  --accent: #658594;
-  --accent-soft: #c4746e;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='rose-pine'] {
-  --bg: #191724;
-  --ink: #e0def4;
-  --surface: #26233a;
-  --surface-elevated: #6e6a86;
-  --line: #6e6a86;
-  --line-strong: #e0def4;
-  --accent: #f6c177;
-  --accent-soft: #eb6f92;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='rose-pine-dawn'] {
-  --bg: #faf4ed;
-  --ink: #575279;
-  --surface: #f4ede8;
-  --surface-elevated: #dfdad9;
-  --line: #dfdad9;
-  --line-strong: #817c87;
-  --accent: #d7827e;
-  --accent-soft: #907aa9;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-}
-:root[data-palette='vesper'] {
-  --bg: #101010;
-  --ink: #e8e8e8;
-  --surface: #1a1a1a;
-  --surface-elevated: #2a2a2a;
-  --line: #333333;
-  --line-strong: #888888;
-  --accent: #c678dd;
-  --accent-soft: #61afef;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 6px;
-}
-
-/* ==============================================
    PALETTE → NP TOKEN BRIDGE
-   Maps the astro-palette --bg/--ink/--surface aliases
-   onto the --np-* equivalents so NP components respond
-   to palette switches. Uses var() which resolves at
-   use-time, so the specific palette rule's values are
-   picked up regardless of source order.
+   Maps astro-palette's --bg/--ink/--bg-elevated/etc.
+   (defined in public/css/style.css) onto the --np-*
+   equivalents so all NP components and legacy aliases
+   respond to palette switches. Uses var() which
+   resolves at use-time, so the specific palette
+   rule's values are picked up regardless of source
+   order.
    ============================================== */
 :root[data-palette] {
   --np-bg: var(--bg);
   --np-text: var(--ink);
-  --np-surface: var(--surface);
-  --np-elevated: var(--surface-elevated, var(--surface));
-  --np-hover: var(--surface-elevated, var(--surface));
-  --np-active: var(--surface);
+  --np-surface: var(--bg-elevated);
+  --np-elevated: var(--bg-elevated);
+  --np-hover: var(--bg-elevated);
+  --np-active: var(--bg-elevated);
   --np-line: var(--line);
   --np-line-strong: var(--line-strong);
   --np-mid: var(--accent);
-  --np-muted: var(--ink-soft, var(--ink));
+  --np-muted: var(--muted);
+  --np-selection: color-mix(in srgb, var(--ink) 8%, transparent);
+  --np-selection-text: var(--ink);
+  /* Compatibility aliases for code that uses --surface directly */
+  --surface: var(--bg-elevated);
+  --surface-elevated: var(--bg-elevated);
+  /* Flat by doctrine, but interactive elements carry astro-palette's radius */
   --np-radius: 0px;
-  --np-radius-button: 0px;
+  --np-radius-button: var(--radius-sm, 4px);
   --np-radius-card: 0px;
-  --np-radius-input: 0px;
+  --np-radius-input: var(--radius-sm, 4px);
 }
