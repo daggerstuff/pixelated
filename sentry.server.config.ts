@@ -15,5 +15,9 @@ const serverConfig = initSentry({
 // via Sentry.withSentry(). Skip the @sentry/astro (Node-based) init to avoid
 // importing Node-incompatible runtime modules in the Workers bundle.
 if (import.meta.env['DEPLOY_TARGET'] !== 'cloudflare') {
-  initServer(serverConfig)
+  try {
+    initServer(serverConfig)
+  } catch (err) {
+    console.warn('[Sentry] Server init failed:', err)
+  }
 }

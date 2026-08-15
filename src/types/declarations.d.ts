@@ -1,8 +1,5 @@
 // Type declarations for packages without TypeScript definitions
 
-// @fontsource/* CSS-only font packages
-declare module '@fontsource/inter'
-
 // k6 testing framework
 declare module 'k6' {
   export function check(

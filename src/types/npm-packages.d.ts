@@ -151,5 +151,3 @@ declare module '@vercel/analytics/astro' {
   const Analytics: any
   export default Analytics
 }
-
-declare module '@fontsource/inter' {}
