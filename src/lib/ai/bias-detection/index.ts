@@ -1,81 +1,18 @@
 /**
  * Bias Detection Engine - Main Exports
  *
- * Refactored modular implementation for better maintainability.
+ * Barrel re-exports only symbols consumed by external callers.
+ * Import specific modules directly for advanced use cases.
  */
 
-// Main engine
-export { BiasDetectionEngine } from './BiasDetectionEngine'
+// Main engine — consumed by EmotionValidationPipeline
+export { BiasDetectionEngine } from "./BiasDetectionEngine";
 
-// Core modules
-export { PythonBiasDetectionBridge } from './python-bridge'
-export { BiasMetricsCollector } from './metrics-collector'
-// Bias Detection Alert System
-export { BiasAlertSystem } from './alerts-system'
-
-// Type exports - explicitly handle duplicates
+// Type exports — consumed by admin dashboard components
 export type {
-  BiasDetectionConfig,
-  TherapeuticSession,
-  SessionContent,
-  ParticipantDemographics,
   BiasAnalysisResult,
-  AlertLevel,
-  BiasDetectionEvent,
-  BiasMetricsConfig,
-  BiasAlertConfig,
-  BiasReportConfig,
-  BiasExplanationConfig,
   BiasDashboardData,
   DashboardRecommendation,
   BiasAlert,
   BiasDashboardSummary,
-  ModelPerformanceMetrics,
-} from './types'
-
-// Re-export interfaces (avoiding PerformanceMetrics duplicate)
-export type {
-  PythonSessionData,
-  PythonAnalysisResult,
-  LayerMetrics,
-  LayerResult,
-  MetricData,
-  ReportGenerationOptions,
-  TimeRange,
-  MetricsBatchRequest,
-  MetricsBatchResponse,
-  DashboardOptions,
-  DashboardMetrics,
-  AlertData,
-  NotificationData,
-  SystemNotificationData,
-  AlertRegistration,
-  AlertResponse,
-  AlertAcknowledgment,
-  AlertEscalation,
-  AlertStatistics,
-  FallbackAnalysisResult,
-  SystemPerformanceMetrics,
-} from './bias-detection-interfaces'
-export type {
-  BiasAuditReport,
-  BiasAuditOptions,
-  SegmentResult,
-  SegmentQualityMetrics,
-  VarianceResult,
-} from './audit-runner'
-
-// Utilities
-export * from './utils'
-
-// Services
-export { getAuditLogger } from './audit'
-export { getBiasAuditRunner, resetBiasAuditRunner, BiasAuditRunner } from './audit-runner'
-export { getCacheManager } from './cache'
-export { performanceMonitor } from './performance-monitor'
-
-// Serverless helpers
-export * from './serverless-handlers'
-
-// Default export
-export { BiasDetectionEngine as default } from './BiasDetectionEngine'
+} from "./types";
