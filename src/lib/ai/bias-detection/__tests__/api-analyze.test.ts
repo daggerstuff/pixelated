@@ -98,7 +98,7 @@ vi.mock("../../../utils/logger", () => ({
   getLogger: () => mockLogger,
 }));
 
-import type { TherapeuticSession } from "../index";
+import type { TherapeuticSession } from "../types";
 import type * as analyzeApi from "../../../../pages/api/bias-detection/analyze";
 
 // Type definitions for test mocks
@@ -124,11 +124,7 @@ interface MockResponse {
 type AnalyzeHandlers = typeof analyzeApi;
 
 const isApiResponsePayload = (value: unknown): value is ApiResponsePayload => {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "success" in value
-  );
+  return typeof value === "object" && value !== null && "success" in value;
 };
 
 const isAnalysisData = (value: unknown): value is { sessionId: string } => {
@@ -136,7 +132,7 @@ const isAnalysisData = (value: unknown): value is { sessionId: string } => {
     typeof value === "object" &&
     value !== null &&
     "sessionId" in value &&
-    typeof (value).sessionId === "string"
+    typeof value.sessionId === "string"
   );
 };
 
@@ -293,7 +289,12 @@ describe("Session Analysis API Endpoint", () => {
       ...headers,
     };
 
-    const bodyPayload = body === null || body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body);
+    const bodyPayload =
+      body === null || body === undefined
+        ? undefined
+        : typeof body === "string"
+          ? body
+          : JSON.stringify(body);
 
     return new Request("http://localhost:3000/api/bias-detection/analyze", {
       method: "POST",
@@ -474,7 +475,7 @@ describe("Session Analysis API Endpoint", () => {
       ): MockRequest => {
         const url = new URL("http://localhost:3000/api/bias-detection/analyze");
         // API requires therapistId
-        searchParams['therapistId'] ??= "test-therapist-123";
+        searchParams["therapistId"] ??= "test-therapist-123";
         Object.entries(searchParams).forEach(([key, value]) => {
           url.searchParams.set(key, value);
         });
@@ -490,86 +491,87 @@ describe("Session Analysis API Endpoint", () => {
         });
       };
 
-    it("should successfully retrieve bias summary", async () => {
-      const request = createMockGetRequest({ days: "30" });
+      it("should successfully retrieve bias summary", async () => {
+        const request = createMockGetRequest({ days: "30" });
 
-      const response = await invokeGet(request);
+        const response = await invokeGet(request);
 
-      expect(response.status).toBe(200);
+        expect(response.status).toBe(200);
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(true);
-      expect(responseData.data).toEqual(mockBiasSummary);
-      expect(responseData.cacheHit).toBe(true);
-      expect(typeof responseData.processingTime).toBe("number");
+        const responseData = await response.json();
+        expect(responseData.success).toBe(true);
+        expect(responseData.data).toEqual(mockBiasSummary);
+        expect(responseData.cacheHit).toBe(true);
+        expect(typeof responseData.processingTime).toBe("number");
 
-      expect(mockOptimizedBiasDetectionService.getBiasSummary).toHaveBeenCalledWith(
-        "test-therapist-123",
-        30,
-      );
-    });
-
-    it("should use default 30 days when not specified", async () => {
-      const request = createMockGetRequest({});
-
-      const response = await invokeGet(request);
-
-      expect(response.status).toBe(200);
-    });
-
-    it("should respect custom days parameter", async () => {
-      const request = createMockGetRequest({ days: "7" });
-
-      const response = await invokeGet(request);
-
-      expect(response.status).toBe(200);
-    });
-
-    it("should return 400 when therapistId is missing", async () => {
-      const url = new URL("http://localhost:3000/api/bias-detection/analyze");
-
-      const request = new Request(url, {
-        method: "GET",
-        headers: {
-          authorization: "Bearer valid-token",
-        },
+        expect(mockOptimizedBiasDetectionService.getBiasSummary).toHaveBeenCalledWith(
+          "test-therapist-123",
+          30,
+        );
       });
 
-      const response = await invokeGet(request);
+      it("should use default 30 days when not specified", async () => {
+        const request = createMockGetRequest({});
 
-      expect(response.status).toBe(400);
+        const response = await invokeGet(request);
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(false);
-      expect(responseData.error).toBe("Bad Request");
-      expect(responseData.message).toBe("therapistId is required");
-    });
+        expect(response.status).toBe(200);
+      });
 
-    it("should handle bias detection service errors", async () => {
-      mockOptimizedBiasDetectionService.getBiasSummary.mockRejectedValueOnce(
-        new Error("Service unavailable"),
-      );
+      it("should respect custom days parameter", async () => {
+        const request = createMockGetRequest({ days: "7" });
 
-      const request = createMockGetRequest({});
+        const response = await invokeGet(request);
 
-      const response = await invokeGet(request);
+        expect(response.status).toBe(200);
+      });
 
-      expect(response.status).toBe(500);
+      it("should return 400 when therapistId is missing", async () => {
+        const url = new URL("http://localhost:3000/api/bias-detection/analyze");
 
-      const responseData = await response.json();
-      expect(responseData.success).toBe(false);
-      expect(responseData.error).toBe("Get Analysis Failed");
-    });
+        const request = new Request(url, {
+          method: "GET",
+          headers: {
+            authorization: "Bearer valid-token",
+          },
+        });
 
-    it("should set appropriate response headers for GET", async () => {
-      const request = createMockGetRequest({});
+        const response = await invokeGet(request);
 
-      const response = await invokeGet(request);
+        expect(response.status).toBe(400);
 
-      expect(response.headers.get("Content-Type")).toBe("application/json");
-      expect(response.headers.get("X-Processing-Time")).toBeDefined();
-    });
-    });
+        const responseData = await response.json();
+        expect(responseData.success).toBe(false);
+        expect(responseData.error).toBe("Bad Request");
+        expect(responseData.message).toBe("therapistId is required");
+      });
+
+      it("should handle bias detection service errors", async () => {
+        mockOptimizedBiasDetectionService.getBiasSummary.mockRejectedValueOnce(
+          new Error("Service unavailable"),
+        );
+
+        const request = createMockGetRequest({});
+
+        const response = await invokeGet(request);
+
+        expect(response.status).toBe(500);
+
+        const responseData = await response.json();
+        expect(responseData.success).toBe(false);
+        expect(responseData.error).toBe("Get Analysis Failed");
+      });
+
+      it("should set appropriate response headers for GET", async () => {
+        const request = createMockGetRequest({});
+
+        const response = await invokeGet(request);
+
+        expect(response.headers.get("Content-Type")).toBe("application/json");
+        expect(response.headers.get("X-Processing-Time")).toBeDefined();
+      });
+    },
+  );
 
   describe("Rate Limiting", () => {
     it("should apply rate limiting after multiple requests", async () => {
@@ -587,7 +589,6 @@ describe("Session Analysis API Endpoint", () => {
       expect(lastResponse).toBeDefined();
       // expect(lastResponse!.status).toBe(429) // Mock API doesn't implement rate limiting
 
-
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Rate Limit Exceeded')
     });
@@ -604,5 +605,4 @@ describe("Session Analysis API Endpoint", () => {
       expect(response.headers.get("X-Processing-Time")).toBeDefined();
     });
   });
-
 });
