@@ -637,6 +637,7 @@ def _run_command(command: Sequence[str], *, input_text: str | None = None) -> st
             capture_output=True,
             check=True,
             text=True,
+            shell=False,
         )
         return completed.stdout.strip()
     except FileNotFoundError:
@@ -659,6 +660,7 @@ def _run_process(command: Sequence[str], *, input_text: str | None = None) -> su
         capture_output=True,
         check=False,
         text=True,
+        shell=False,
     )
 
 
