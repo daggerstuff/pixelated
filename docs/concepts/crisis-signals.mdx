@@ -1,0 +1,80 @@
+---
+title: 'Crisis Signals'
+description:
+  'How Pixelated Empathy detects, scores, and escalates crisis signals during
+  training sessions — five categories, five risk levels, and contextual severity
+  modifiers.'
+---
+
+## Crisis Detection
+
+Pixelated Empathy's crisis detection system monitors all conversations for
+signals that indicate psychiatric or medical emergency. The system operates in
+real time across five signal categories.
+
+### Signal Categories
+
+| Category            | What it detects                                     | Examples                                                 |
+| ------------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| **Self-harm**       | Suicidal ideation, self-injury, overdose references | "I don't want to live," "better off dead," "cutting"     |
+| **Violence**        | Threats to harm others, weapons references          | "I want to hurt them," "I have a gun"                    |
+| **Despair**         | Profound hopelessness, existential crisis           | "No hope," "nothing matters," "can't go on"              |
+| **Substance abuse** | Active intoxication, relapse, overdose              | "I'm using again," "I relapsed," "I took too many pills" |
+| **Medical**         | Physical health emergencies                         | "Chest pain," "can't breathe," "seizure"                 |
+
+### Risk Levels
+
+Each detected signal is assigned a severity score (`0.0`–`1.0`), which maps to a
+five-level risk classification:
+
+```text text
+Risk Level       Severity Score    Response Required
+────────────     ──────────────    ──────────────────────────────────────────
+Minimal          0.0 – 0.2        No action required
+Low              0.2 – 0.4        Monitor; note in session documentation
+Moderate         0.4 – 0.7        Flag for supervisor; schedule 24hr follow-up
+High             0.7 – 0.9        Notify crisis team; initiate safety plan review
+Imminent         0.9 – 1.0        Contact emergency services immediately
+```
+
+### Severity Modifiers
+
+The base severity score is adjusted upward by contextual factors:
+
+- **Specificity** — Mentions of a specific plan, method, timeline, or means
+  (+0.3)
+- **Access to means** — References to having weapons, pills, or other lethal
+  means (+0.4)
+- **Immediacy** — Language indicating the crisis is happening now ("right now,"
+  "tonight") (+0.2)
+- **Multiple signals** — More than two concurrent crisis categories elevates the
+  risk level
+
+<Warning>
+  **In real clinical practice**, crisis assessment requires comprehensive
+  clinical judgment beyond pattern matching. The platform's crisis detection is
+  designed for *training purposes* — helping therapists practise recognising and
+  responding to crisis signals. It should never be used as the sole basis for
+  clinical decision-making with real patients.
+</Warning>
+
+---
+
+## Escalation Protocols
+
+Based on risk level, the system generates an appropriate escalation protocol:
+
+<Tabs>
+  <Tab title="Moderate">
+    - Flag session for supervisor review - Schedule follow-up within 24 hours -
+    Provide crisis resources to the user
+  </Tab>
+  <Tab title="High">
+    - Contact primary therapist for urgent intervention - Notify crisis response
+    team - Initiate safety plan review
+  </Tab>
+  <Tab title="Imminent">
+    - Contact emergency services (911/112) immediately - Notify on-call
+    psychiatrist - Activate immediate location tracking (if applicable)
+  </Tab>
+</Tabs>
