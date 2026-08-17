@@ -1,5 +1,5 @@
 import React from 'react'
-import type { ChangeEvent } from 'react'
+import type { ChangeEvent, SyntheticEvent } from 'react'
 import { useState } from 'react'
 
 import { clientScenarios } from '@/data/scenarios'
@@ -134,7 +134,7 @@ export function TherapyChatClient() {
     }
   }
 
-  const handleSecureSubmit = async (e: React.FormEvent) => {
+  const handleSecureSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     if (!input.trim()) {
       return

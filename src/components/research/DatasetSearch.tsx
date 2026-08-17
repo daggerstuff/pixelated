@@ -1,5 +1,5 @@
 import { ChartBar } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useState, SyntheticEvent } from 'react'
 
 import { researchAPI, type DatasetMetadata } from '@/lib/api/research'
 
@@ -29,7 +29,7 @@ export default function DatasetSearch() {
     return () => clearTimeout(timer)
   }, [hasSearched, minTurns, minQuality])
 
-  const handleSearch = async (e?: React.FormEvent) => {
+  const handleSearch = async (e?: SyntheticEvent) => {
     if (e) e.preventDefault()
 
     setLoading(true)

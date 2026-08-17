@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from 'react'
-
+import React, { useState, useCallback, SyntheticEvent } from 'react'
 import { useConversationMemory } from '../hooks/useConversationMemory'
 import { tokens } from '../lib/design-tokens'
 import { cn } from '../lib/utils'
@@ -123,7 +122,7 @@ function TrainingSession({ className }: TrainingSessionProps) {
   }
 
   // Feedback submission handler
-  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+  const handleFeedbackSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     try {
       await fetch('/api/evaluation', {

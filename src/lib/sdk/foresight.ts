@@ -61,7 +61,7 @@ export type MemoryCategory = z.infer<typeof MemoryCategory>
 // ---------------------------------------------------------------------------
 
 export const ForesightMemory = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   content: z.string().min(1).max(64_000),
   category: z.string().min(1).max(64),
   tags: z.array(z.string().min(1).max(64)).max(64).optional().default([]),
@@ -113,14 +113,14 @@ export const StoreMemoryInput = z
         'related',
       ])
       .optional(),
-    relatedMemoryId: z.string().uuid().optional(),
+    relatedMemoryId: z.uuid().optional(),
   })
   .strict()
 export type StoreMemoryInput = z.infer<typeof StoreMemoryInput>
 
 export const StoreMemoryOutput = z
   .object({
-    id: z.string().uuid(),
+    id: z.uuid(),
     content: z.string(),
     category: z.string(),
     tags: z.array(z.string()).optional().default([]),
@@ -138,7 +138,7 @@ export type StoreMemoryOutput = z.infer<typeof StoreMemoryOutput>
 
 export const GetMemoryInput = z
   .object({
-    memoryId: z.string().uuid(),
+    memoryId: z.uuid(),
   })
   .strict()
 export type GetMemoryInput = z.infer<typeof GetMemoryInput>
@@ -213,7 +213,7 @@ export type ListMemoriesOutput = z.infer<typeof ListMemoriesOutput>
 
 export const UpdateMemoryInput = z
   .object({
-    memoryId: z.string().uuid(),
+    memoryId: z.uuid(),
     content: z.string().min(1).max(64_000).optional(),
     category: Category.optional(),
     tags: z.array(Tag).max(64).optional(),
@@ -230,14 +230,14 @@ export type UpdateMemoryInput = z.infer<typeof UpdateMemoryInput>
 
 export const DeleteMemoryInput = z
   .object({
-    memoryId: z.string().uuid(),
+    memoryId: z.uuid(),
   })
   .strict()
 export type DeleteMemoryInput = z.infer<typeof DeleteMemoryInput>
 
 export const DeleteMemoryOutput = z
   .object({
-    id: z.string().uuid(),
+    id: z.uuid(),
   })
   .strict()
 export type DeleteMemoryOutput = z.infer<typeof DeleteMemoryOutput>

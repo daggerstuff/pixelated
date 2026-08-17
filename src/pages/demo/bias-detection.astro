@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout.astro'
 import BrutalistCard from '@/components/ui/BrutalistCard.astro'
 import BrutalistButton from '@/components/ui/BrutalistButton.astro'
 
-import { ChartBar, Rocket, Search, Target, TrendingUp } from 'lucide-react'
+import { Rocket, Search, Target } from 'lucide-react'
 export const prerender = false
 ---
 
@@ -503,7 +503,7 @@ export const prerender = false
 
       generateSessionId() {
         return (
-          'demo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+          'demo_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11)
         )
       }
 

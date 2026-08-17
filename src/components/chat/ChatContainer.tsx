@@ -1,4 +1,4 @@
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent, SyntheticEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useTheme } from '@/components/theme/ThemeProvider'
@@ -82,7 +82,7 @@ export function ChatContainer({
     setInput(e.target.value)
   }
 
-  function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: SyntheticEvent) {
     e.preventDefault()
 
     if (!input.trim() || isLoading || disabled) {

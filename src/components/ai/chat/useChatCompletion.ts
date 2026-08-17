@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect } from 'react'
+import { useCallback, useState, useRef, useEffect, useMemo } from 'react'
 
 import type { AIMessage, AIStreamChunk } from '@/lib/ai/AIService'
 import { logger } from '@/lib/logger'

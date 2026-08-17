@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-
+import React, { useState, SyntheticEvent } from 'react'
 // Helper function for string concatenation
 const formatStorageLocation = (type: string, bucket: string): string => {
   switch (type) {
@@ -83,7 +82,7 @@ export default function BackupLocationTab() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsFormLoading(true)
     // Simulate API call

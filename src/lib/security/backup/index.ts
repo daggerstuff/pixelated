@@ -1111,7 +1111,7 @@ export class BackupSecurityManager {
           continue
         }
 
-        let Model: import('mongoose').Model<unknown>
+        let Model: ReturnType<typeof connection.model>
         try {
           Model = connection.model(modelName)
         } catch {
@@ -1131,7 +1131,7 @@ export class BackupSecurityManager {
 
         const ops = documents.map((doc: Record<string, unknown>) => ({
           updateOne: {
-            filter: { _id: doc._id },
+            filter: { _id: doc['_id'] },
             update: { $set: doc },
             upsert: true,
           },
@@ -1170,7 +1170,7 @@ export class BackupSecurityManager {
         if (firstModelDocs && firstModelDocs.length > 0) {
           try {
             const Model = connection.model(firstModelName)
-            const sampleId = (firstModelDocs[0] as Record<string, unknown>)._id
+            const sampleId = (firstModelDocs[0] as Record<string, unknown>)['_id']
             const verified = await Model.exists({ _id: sampleId })
             if (!verified) {
               throw new Error(

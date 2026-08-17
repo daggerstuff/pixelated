@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, SyntheticEvent } from 'react'
 
 import { useTheme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'
@@ -8,7 +8,7 @@ import { IconSend } from './icons'
 export interface ChatInputProps {
   value: string
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void
-  onSubmit: (e: React.FormEvent) => void
+  onSubmit: (e: SyntheticEvent) => void
   isLoading: boolean
   disabled?: boolean
   placeholder?: string

@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react'
-
+import React, { useEffect, useMemo, useRef, useState, useCallback, SyntheticEvent } from 'react'
 import { useSimulator } from '../context/SimulatorContext'
 import type {
   SimulationContainerProps,
@@ -151,7 +150,7 @@ export function SimulationContainer({
 
   // Handle form submission
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: SyntheticEvent) => {
       e.preventDefault()
 
       if (!userResponse.trim() || isProcessing || !state.isRunning) {

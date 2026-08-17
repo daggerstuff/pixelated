@@ -25,7 +25,7 @@ export function ProgressBar({
   variant = 'default',
 }: ProgressBarProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
-  const id = `progress-${Math.random().toString(36).substr(2, 9)}`
+  const id = `progress-${Math.random().toString(36).slice(2, 11)}`
 
   return (
     <div className={cn('w-full', className)}>

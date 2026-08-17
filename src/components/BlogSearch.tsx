@@ -1,5 +1,5 @@
 import { Search, Loader2 } from 'lucide-react'
-import React, { useState } from 'react'
+import { useState, SyntheticEvent } from 'react'
 
 import { cn } from '../lib/utils.js'
 import { Button } from './ui/button/index.js'
@@ -49,7 +49,7 @@ export function BlogSearch() {
   const [isSearching, setIsSearching] = useState(false)
 
   async function handleSearch(
-    e: React.FormEvent<HTMLFormElement>,
+    e: SyntheticEvent<HTMLFormElement>,
   ): Promise<void> {
     e.preventDefault()
     if (!query.trim()) {
