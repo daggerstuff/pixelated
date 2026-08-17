@@ -482,7 +482,7 @@ export class MLAnomalyDetector implements AnomalyDetector {
   }
 
   private generateAnomalyId(): string {
-    return `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `anomaly_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
   }
 
   private getReconstructionThreshold(profile: BehaviorProfile): number {

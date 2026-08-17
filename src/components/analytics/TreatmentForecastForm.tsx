@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, SyntheticEvent } from 'react'
 import type { FC } from 'react'
 
 import { ChartWidget } from '@/components/analytics/ChartWidget'
@@ -54,7 +54,7 @@ const TreatmentForecastForm: FC = () => {
     }
   }
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError(null)
