@@ -88,7 +88,7 @@ cd "${FORESIGHT_ROOT}"
 # server restarts safe without requiring the client to re-initialize.
 if [[ -n "${FORESIGHT_PORT:-}" ]]; then
   export FASTMCP_STATELESS_HTTP=1
-  set -- "--port" "${FORESIGHT_PORT}" "$@"
+  set -- "--host" "${FORESIGHT_HOST:-0.0.0.0}" "--port" "${FORESIGHT_PORT}" "$@"
 fi
 
 exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight "$@"
