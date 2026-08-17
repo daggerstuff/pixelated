@@ -382,7 +382,7 @@
     "@astrojs/markdoc": "^2.0.6",
     "@astrojs/rss": "latest",
     "@astrojs/ts-plugin": "^1.10.10",
-    "@axe-core/playwright": "^4.12.1",
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/css": "latest",
     "@eslint/js": "^10.0.1",
     "@eslint/json": "latest",
@@ -507,7 +507,7 @@
     "vitest": "^4.1.10",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.120.1",
+    "wrangler": "^4.123.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
