@@ -99,9 +99,9 @@ const lightPalettes = [
     function updateUI(value: string) {
       const activeValue = value || defaultPalette()
       for (const opt of options) {
-        opt.setAttribute('aria-selected', String(opt.dataset.value === activeValue))
+        opt.setAttribute('aria-selected', String(opt.dataset['value'] === activeValue))
       }
-      const active = options.find((opt) => opt.dataset.value === activeValue)
+      const active = options.find((opt) => opt.dataset['value'] === activeValue)
       if (hintLabel && active) {
         hintLabel.textContent = active.textContent?.trim() ?? ''
       }
@@ -132,8 +132,8 @@ const lightPalettes = [
     function preview(index: number) {
       const opt = options[index]
       if (!opt) return
-      setPalette(opt.dataset.value ?? '')
-      updateUI(opt.dataset.value ?? '')
+      setPalette(opt.dataset['value'] ?? '')
+      updateUI(opt.dataset['value'] ?? '')
       opt.focus()
     }
 
@@ -164,7 +164,7 @@ const lightPalettes = [
     options.forEach((opt, idx) => {
       opt.addEventListener(
         'click',
-        () => commit(opt.dataset.value ?? ''),
+        () => commit(opt.dataset['value'] ?? ''),
         { signal },
       )
       opt.addEventListener('mouseenter', () => preview(idx), { signal })
@@ -187,7 +187,7 @@ const lightPalettes = [
           )
         } else if (e.key === 'Enter' && idx >= 0) {
           e.preventDefault()
-          commit(options[idx]?.dataset.value ?? '')
+          commit(options[idx]?.dataset['value'] ?? '')
         } else if (e.key === 'Escape') {
           e.preventDefault()
           revert()
