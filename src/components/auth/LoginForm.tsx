@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, SyntheticEvent } from 'react'
 
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/toast'
@@ -204,7 +204,7 @@ export function LoginForm({
   }
 
   // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     e.stopPropagation()
 

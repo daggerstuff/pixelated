@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, SyntheticEvent } from 'react'
 
 import { useEvidenceAssistant } from '../../hooks/useEvidenceAssistant'
 import type { EvidenceCollection } from '../../lib/evidence-assistant/types'
@@ -34,7 +34,7 @@ export function EvidenceAssistantPanel() {
     }
   }, [groundedAnswerEnabled, generateAnswer])
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const trimmedQuery = query.trim()

@@ -1,5 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react'
-
+import React, { useState, useCallback, useRef, SyntheticEvent } from 'react'
 import { InputValidator } from '@/middleware/security'
 
 interface BiasDetectionFormProps {
@@ -167,7 +166,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
   )
 
   const handleSubmit = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: SyntheticEvent) => {
       e.preventDefault()
 
       if (!validateForm()) {

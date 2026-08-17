@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo, SyntheticEvent } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 import { cn } from '../../lib/utils'
@@ -168,7 +168,7 @@ export function EnhancedSimulationContainer({
 
   // Handle form submission
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: SyntheticEvent) => {
       e.preventDefault()
 
       if (!userResponse.trim() || isSubmitting) {

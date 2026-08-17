@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-
+import React, { useState, useEffect, useRef, useCallback, SyntheticEvent } from "react"
 import { isFormField } from "./form-validation-types";
 import type {
   ValidationRule,
@@ -231,7 +230,7 @@ export function MobileFormValidation({
 
   // Handle form submission with proper type inference
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: SyntheticEvent) => {
       if (!validateOnSubmit) {
         return;
       }
@@ -344,7 +343,7 @@ export function MobileFormValidation({
     if (React.isValidElement(child) && isFormElement(child)) {
       const formChild = child;
       return React.cloneElement(formChild, {
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+        onSubmit: (e: SyntheticEvent<HTMLFormElement>) => {
           formRef.current = e.currentTarget;
           handleSubmit(e);
         },

@@ -215,7 +215,7 @@ export function TrainingSessionComponent() {
   const handleSessionMessage = useCallback(
     (
       msg: WebSocketMessage,
-      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      locallyAddedMessages: React.RefObject<Set<string>>,
       _currentRole: "trainee" | "observer",
       setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
     ) => {
@@ -248,7 +248,7 @@ export function TrainingSessionComponent() {
   const handleCoachingNote = useCallback(
     (
       msg: WebSocketMessage,
-      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      locallyAddedMessages: React.RefObject<Set<string>>,
       setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
     ) => {
       const noteContent = msg.payload?.content;
@@ -283,8 +283,8 @@ export function TrainingSessionComponent() {
     (
       event: MessageEvent,
       sessionId: string,
-      locallyAddedMessages: React.MutableRefObject<Set<string>>,
-      isAuthenticatedRef: React.MutableRefObject<boolean>,
+      locallyAddedMessages: React.RefObject<Set<string>>,
+      isAuthenticatedRef: React.RefObject<boolean>,
       websocket: WebSocket,
       setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
       setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
@@ -459,8 +459,8 @@ export function TrainingSessionComponent() {
     (
       noteContent: string,
       userId: string,
-      ws: React.MutableRefObject<WebSocket | null>,
-      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      ws: React.RefObject<WebSocket | null>,
+      locallyAddedMessages: React.RefObject<Set<string>>,
       setCoachingNotes: React.Dispatch<React.SetStateAction<CoachingNote[]>>,
       setTherapistResponse: React.Dispatch<React.SetStateAction<string>>,
     ) => {
@@ -500,8 +500,8 @@ export function TrainingSessionComponent() {
       conversation: ConversationEntry[],
       sessionId: string,
       userId: string,
-      ws: React.MutableRefObject<WebSocket | null>,
-      locallyAddedMessages: React.MutableRefObject<Set<string>>,
+      ws: React.RefObject<WebSocket | null>,
+      locallyAddedMessages: React.RefObject<Set<string>>,
       memory: ReturnType<typeof useConversationMemory>,
       setConversation: React.Dispatch<React.SetStateAction<ConversationEntry[]>>,
       setEvaluation: React.Dispatch<React.SetStateAction<string | null>>,
