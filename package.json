@@ -507,7 +507,7 @@
     "vitest": "^4.1.10",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.120.1",
+    "wrangler": "^4.123.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
@@ -529,7 +529,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.21.0",
+  "packageManager": "pnpm@11.22.0",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
