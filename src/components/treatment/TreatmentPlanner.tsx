@@ -1,5 +1,4 @@
-import React, { useState, useMemo, FC } from 'react'
-
+import React, { useState, useMemo, FC, SyntheticEvent } from 'react'
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 import RecommendationDisplay from '../ai/RecommendationDisplay'
 
@@ -22,7 +21,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('all')
 
-  async function fetchRecommendations(e: React.FormEvent<HTMLFormElement>) {
+  async function fetchRecommendations(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     setLoading(true)
     setError(null)

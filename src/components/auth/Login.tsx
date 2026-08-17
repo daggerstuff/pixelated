@@ -2,7 +2,7 @@ import {
   createElement as h,
   useState,
   ChangeEvent,
-  FormEvent,
+  SyntheticEvent,
   ReactNode,
 } from 'react'
 
@@ -23,7 +23,7 @@ export default function LoginForm() {
     setUser((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)

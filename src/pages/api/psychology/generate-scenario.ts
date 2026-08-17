@@ -248,7 +248,7 @@ const THERAPEUTIC_FRAMEWORKS_DETAILED = {
 }
 
 function generateUniqueId(): string {
-  return `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  return `scenario_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
 }
 
 function selectClientProfile(

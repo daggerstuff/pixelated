@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-
+import React, { useState, useEffect, SyntheticEvent } from 'react'
 import { authClient } from '@/lib/auth-client'
 
 import { AccessibilityAnnouncer } from '../ui/AccessibilityAnnouncer'
@@ -76,7 +75,7 @@ export function RegisterForm({
     }
   }, [isLoading, errorMessage, isSuccessful])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
 
     // The MobileFormValidation component will handle form validation

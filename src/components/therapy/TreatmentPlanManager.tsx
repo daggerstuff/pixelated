@@ -1,5 +1,5 @@
 import { PlusCircle, Trash2 } from 'lucide-react'
-import React, { useState, useEffect, useCallback, useId, FC } from 'react'
+import React, { useState, useEffect, useCallback, useId, FC, SyntheticEvent } from 'react'
 import { toast } from 'sonner'
 
 import {
@@ -466,7 +466,7 @@ const TreatmentPlanManager: FC = () => {
     })
   }
 
-  const handleCreatePlan = async (e: React.FormEvent) => {
+  const handleCreatePlan = async (e: SyntheticEvent) => {
     e.preventDefault()
     setIsLoading(true)
     const payload = {
@@ -525,7 +525,7 @@ const TreatmentPlanManager: FC = () => {
     }
   }
 
-  const handleUpdatePlan = async (e: React.FormEvent) => {
+  const handleUpdatePlan = async (e: SyntheticEvent) => {
     e.preventDefault()
     if (!editingPlanData?.id) {
       return
