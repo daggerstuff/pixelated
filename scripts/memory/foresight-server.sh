@@ -67,7 +67,7 @@ if [[ -z "${UV_BIN}" ]]; then
   exit 1
 fi
 
-export UV_CACHE_DIR="/home/vivi/.gemini/tmp/uv-cache"
+export UV_CACHE_DIR="${UV_CACHE_DIR:-/home/vivi/.gemini/tmp/uv-cache}"
 
 # Force the project-local venv (foresight/.venv) regardless of any
 # ambient VIRTUAL_ENV — agent transports frequently run with the workspace
