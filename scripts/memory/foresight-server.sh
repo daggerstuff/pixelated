@@ -67,7 +67,7 @@ if [[ -z "${UV_BIN}" ]]; then
   exit 1
 fi
 
-export UV_CACHE_DIR="/home/vivi/.gemini/tmp/uv-cache"
+export UV_CACHE_DIR="${UV_CACHE_DIR:-/home/vivi/.gemini/tmp/uv-cache}"
 
 # Force the project-local venv (foresight/.venv) regardless of any
 # ambient VIRTUAL_ENV — agent transports frequently run with the workspace
@@ -88,7 +88,7 @@ cd "${FORESIGHT_ROOT}"
 # server restarts safe without requiring the client to re-initialize.
 if [[ -n "${FORESIGHT_PORT:-}" ]]; then
   export FASTMCP_STATELESS_HTTP=1
-  set -- "--port" "${FORESIGHT_PORT}" "$@"
+  set -- "--host" "${FORESIGHT_HOST:-0.0.0.0}" "--port" "${FORESIGHT_PORT}" "$@"
 fi
 
 exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight "$@"
