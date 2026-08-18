@@ -30,6 +30,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify DATABASE_URL secret is configured
+        if: env.DATABASE_URL == ''
+        run: |
+          echo "::error::DATABASE_URL secret is not set."
+          echo "Add it under repository Settings -> Secrets and variables -> Actions."
+          echo "It must point at the database containing consent records."
+          exit 1
+
       - name: Run consent expiry check
         id: expiry-check
         run: pnpm tsx scripts/consent/run-expiry-check.ts
