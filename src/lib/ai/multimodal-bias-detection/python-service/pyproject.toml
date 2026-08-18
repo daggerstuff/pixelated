@@ -1,7 +1,7 @@
 [build-system]
 requires = [
   "setuptools>=83.0.0",
-  "wheel>=0.47.0",
+  "wheel>=0.48.0",
 ] # Fixes CVE-2024-6345, CVE-2025-47273, CVE-2022-40898
 build-backend = "setuptools.build_meta"
 
@@ -24,7 +24,7 @@ classifiers = [
 
 dependencies = [
   "fastapi>=0.141.1",
-  "uvicorn[standard]>=0.52.1",
+  "uvicorn[standard]>=0.52.3",
   "gunicorn>=26.0.0",
   "pydantic>=2.13.4",
   "pydantic-settings>=2.15.0",
@@ -33,7 +33,7 @@ dependencies = [
   "prometheus-client>=0.26.0",
   # Sentry SDK for error tracking and metrics
   # Reference: https://docs.sentry.io/platforms/python/metrics/
-  "sentry-sdk[fastapi]>=2.67.1",
+  "sentry-sdk[fastapi]>=2.68.0",
   # Multi-modal AI Dependencies
   "torch>=2.13.0",
   "torchvision>=0.21.0",
@@ -54,7 +54,7 @@ dependencies = [
   # Database and Caching
   "psycopg2-binary>=2.9.12",
   "redis>=8.1.0",
-  "sqlalchemy>=2.0.51",
+  "sqlalchemy>=2.0.52",
   "alembic>=1.19.1",
   # Utilities
   "httpx>=0.28.1",
