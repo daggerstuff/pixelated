@@ -67,7 +67,7 @@ jobs:
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
         with:
           run_install: false
 
@@ -251,7 +251,7 @@ jobs:
       - name: Run Checkov infrastructure scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_infra
-        uses: bridgecrewio/checkov-action@v12.3115.0
+        uses: bridgecrewio/checkov-action@v12.3117.0
         with:
           directory: .
           framework: terraform,terraform_plan,bicep
@@ -265,7 +265,7 @@ jobs:
       - name: Run Checkov Helm scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_helm
-        uses: bridgecrewio/checkov-action@v12.3115.0
+        uses: bridgecrewio/checkov-action@v12.3117.0
         with:
           directory: ai/helm/pixel-voice
           framework: kubernetes,helm
