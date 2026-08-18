@@ -1,0 +1,11 @@
+src/utils/compatibility-testing.ts
+  ai_agent 39-79
+scripts/utils/start-server.mjs
+  ai_agent 108-112,150
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "babfbae1459dcd7afca797bd30c830be614b4261",
+  "prompts": {}
+}

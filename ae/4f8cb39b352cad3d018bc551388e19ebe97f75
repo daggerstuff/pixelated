@@ -1,0 +1,21 @@
+.github/workflows/chaos-validation.yml
+  s_ce8b3c0a296613::t_7e03a9498348e7 15-16,80,180
+k8s/chaos/kustomization.yaml
+  s_ce8b3c0a296613::t_7e03a9498348e7 14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ae4f8cb39b352cad3d018bc551388e19ebe97f75",
+  "prompts": {},
+  "sessions": {
+    "s_ce8b3c0a296613": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_02c9f2812ffeSODtiG0fbTpJ1D",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

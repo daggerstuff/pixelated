@@ -1,0 +1,19 @@
+src/lib/ai/bias-detection/index.ts
+  s_60a44cca751217::t_fcece648c77b66 8,11-12,14,34,59,66,69,72-75,78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2c0978de01528153889c796c653324de044b27f4",
+  "prompts": {},
+  "sessions": {
+    "s_60a44cca751217": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_ffbc64ab1ffeQW7u8mCmYUfR5C",
+        "model": "unknown"
+      },
+      "human_author": "PR Churn Bot <bot@composio.dev>"
+    }
+  }
+}

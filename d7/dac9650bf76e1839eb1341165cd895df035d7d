@@ -1,0 +1,13 @@
+agents/eve-agent/tsconfig.json
+  ai_agent 1-13
+agents/eve-agent/agent/agent.ts
+  ai_agent 2-5,8-9
+agents/eve-agent/agent/lib/workers-ai.ts
+  ai_agent 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d7dac9650bf76e1839eb1341165cd895df035d7d",
+  "prompts": {}
+}

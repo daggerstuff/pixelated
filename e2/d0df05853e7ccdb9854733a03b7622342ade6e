@@ -1,0 +1,233 @@
+scripts/data/generate_edge_cases.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-93
+src/integrations/react/patches/react.js
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-37
+scripts/data/validate_classifications.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-234
+scripts/data/pixelated_edge_cases_designer.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-341
+scripts/data/validate_taxonomy_classifier.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-340
+src/lib/ai/bias-detection/python-service/.env.example
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-56
+src/lib/ai/multimodal-bias-detection/python-service/.env.example
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-98
+src/video_emotion/ingestion.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 14,16-18
+tests/video_emotion/test_types.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 2-3
+packages/sdk-python/pixelated_empathy_sdk/models/pagination.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-91
+scripts/data/expand_to_large_budget.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-139
+scripts/data/execute_notebook_gpu.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-16
+packages/sdk-typescript/src/models/PublicMemory.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-161
+scripts/data/ingest_new_hf_datasets.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-191
+packages/sdk-python/pixelated_empathy_sdk/models/error_envelope.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-91
+scripts/data/quality_scoring/README.md
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-69
+scripts/data/regen_banned_sessions.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-295
+src/lib/ai/mental-llama/models/MentalLLaMAModelProvider.test.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-184
+scripts/data/pixelated_edge_cases_vllm_l40s.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-282
+scripts/data/recategorize_s3_files.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-324
+src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 73
+packages/sdk-typescript/src/models/SearchMemoryRequest.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-82
+scripts/data/build_lane_c_corpus.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-670
+scripts/data/generate_long_sessions.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-48
+scripts/data/recategorize_dataset.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-67
+tests/data/__init__.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1
+scripts/data/categorize_datasets.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-146
+agents/eve-agent/agent/tools/evaluate_corpus_gate.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-34
+scripts/data/process_sample_batch.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-207
+packages/sdk-typescript/src/models/ErrorEnvelope.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-81
+tests/video_emotion/test_audit_writer.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1,10-11,17-18,21-23
+scripts/data/generate_100k_edge_case_llm_sessions.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-305
+scripts/data/pull_core.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-158
+business-strategy-cms/src/models/User.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-155
+tests/video_emotion/test_deception_layer.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1,7-8
+business-strategy-cms/src/models/DocumentMongoose.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-124
+scripts/data/generate_long_sessions_pix8.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-759
+business-strategy-cms/src/models/index.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-4
+src/lib/ai/mental-llama/models/index.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-2
+src/pages/api/documentation/generate.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1,6-8,69,72,74-79,82,115,162
+scripts/data/ingest_iansteenstra_therapy_eval.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-262
+src/video_emotion/temporal_filter.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 35
+business-strategy-cms/src/models/MarketData.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-38
+agents/eve-agent/agent/tools/replace_slop.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-74
+scripts/data/pull_pubmed_pmc.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-377
+scripts/data/release_0_coverage.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-316
+scripts/data/pull_zenodo.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-158
+src/lib/ai/models/registry.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-84
+tests/e2e/data/TestData.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-64
+packages/sdk-python/pixelated_empathy_sdk/models/search_memory_request.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-92
+packages/sdk-typescript/src/models/Pagination.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-81
+agents/eve-agent/agent/agent.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-9
+tests/unit/ai/models/__init__.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1
+scripts/data/pix8_dataset_enhancement.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-438
+packages/sdk-python/pixelated_empathy_sdk/models/search_memories_response.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-103
+scripts/data/quality_scoring/run_stub.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-64
+src/integrations/react/patches/react-dom.js
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-19
+packages/sdk-typescript/src/models/SearchMemoriesResponse.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-99
+packages/sdk-typescript/src/models/index.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-7
+scripts/data/pix30_utils.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-60
+frontend/src/components/analytics/ClinicalCompetencyModule.tsx
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 47-51
+tests/video_emotion/test_au_extractor.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1,7-12,16-21
+.env.example
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-163
+business-strategy-cms/src/models/CompetitorAnalysis.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-24
+agents/px.config.json
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 92-102
+agents/eve-agent/agent/tools/clean_corpus.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-62
+agents/eve-agent/agent/tools/regenerate_record.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-47
+business-strategy-cms/.env.example
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-77
+scripts/data/test_taxonomy_classifier.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-126
+scripts/data/run-migration.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-61
+public/models/emotion-detection/model.json
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-90
+scripts/data/generate_edge_cases_pix8.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-357
+scripts/data/generate_final_metrics.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-160
+src/simulator/data/new-scenarios.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-185
+src/styles/np-tokens.css
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 33-34,36-38,138,298,311,324,337,350,363,376,389,402,415,424,429,442,455,468,481,494,507,520,533,565
+packages/sdk-python/pixelated_empathy_sdk/models/public_memory.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-127
+scripts/data/ingest_kaggle_and_deep_niches.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-147
+business-strategy-cms/src/models/BusinessMetrics.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-31
+scripts/data/pull_who_iris.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-139
+src/lib/ai/models/types.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-22
+scripts/data/extract_books.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-864
+scripts/data/migrate-collaboration.js
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-94
+src/pages/api/ai/intervention-analysis.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1
+scripts/data/sourcing_cli.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-185
+business-strategy-cms/src/models/Document.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-175
+scripts/data/reapply_strict_quality_filter.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-79
+scripts/data/run-auth-migration.ts
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-75
+agents/eve-agent/agent/instructions.md
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-19
+scripts/data/quality_scoring/config.example.json
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-13
+src/video_emotion/au_extractor.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 31
+src/video_emotion/deception_layer.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 12-13,15-16
+agents/eve-agent/package.json
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-42
+scripts/data/registry_cli.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-152
+scripts/data/test_nvidia_nim.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-180
+scripts/data/quality_scoring/pipeline_integration.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-191
+scripts/data/pull_clinical_trials.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-145
+scripts/data/test_llm_classifier.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-334
+scripts/data/extensive_validation.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-411
+public/models/technique-detection/model.json
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-90
+scripts/data/quality_scoring/scoring_interface.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-93
+scripts/data/test_e2e_pipeline.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-60
+pyproject.toml
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 169-172
+scripts/data/generate_edge_case_sessions.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-409
+scripts/data/validate_data_source_matrix.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-120
+.github/security/trivy/data/ksv0125.yaml
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-7
+src/integrations/react/patches/react-dom-client.js
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-8
+scripts/data/pull_openalex.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-146
+packages/sdk-python/pixelated_empathy_sdk/models/__init__.py
+  s_ada65dc30fc0ca::t_c41bdb2c52957e 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e2d0df05853e7ccdb9854733a03b7622342ade6e",
+  "prompts": {},
+  "sessions": {
+    "s_ada65dc30fc0ca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_011631468ffeLd4OaZSMLZjnF4",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}

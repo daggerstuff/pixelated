@@ -1,0 +1,168 @@
+scripts/data/generate_long_sessions_pix8.py
+  ai_agent 1-759
+scripts/data/quality_scoring/scoring_interface.py
+  s_9a329b4966c619::t_735f219690d7bb 38-40,46
+  s_9a329b4966c619::t_6c9dc2b6a43359 41-45,47-48
+scripts/data/build_lane_c_corpus.py
+  ai_agent 1-670
+scripts/data/sourcing_cli.py
+  ai_agent 1-185
+scripts/data/ingest_new_hf_datasets.py
+  ai_agent 1-191
+src/video_emotion/ingestion.py
+  s_9ed4f05cc638b8::t_cd678667b80091 14,16-18
+src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml
+  s_9ed4f05cc638b8::t_cd678667b80091 73
+agents/eve-agent/agent/tools/evaluate_corpus_gate.ts
+  ai_agent 1-34
+scripts/data/extract_books.py
+  ai_agent 1-864
+scripts/data/test_e2e_pipeline.py
+  ai_agent 1-60
+scripts/data/ingest_kaggle_and_deep_niches.py
+  ai_agent 1-147
+src/styles/np-tokens.css
+  s_9ed4f05cc638b8::t_cd678667b80091 423,564
+agents/eve-agent/agent/tools/replace_slop.ts
+  ai_agent 1-74
+scripts/data/migrate-collaboration.js
+  ai_agent 1-94
+agents/eve-agent/agent/instructions.md
+  ai_agent 1-19
+scripts/data/execute_notebook_gpu.py
+  ai_agent 1-16
+scripts/data/generate_edge_case_sessions.py
+  ai_agent 1-409
+scripts/data/pull_zenodo.py
+  ai_agent 1-158
+scripts/data/pixelated_edge_cases_vllm_l40s.py
+  ai_agent 1-282
+scripts/data/test_taxonomy_classifier.py
+  ai_agent 1-126
+scripts/data/registry_cli.py
+  ai_agent 1-152
+scripts/data/process_sample_batch.py
+  ai_agent 1-207
+agents/eve-agent/agent/tools/clean_corpus.ts
+  ai_agent 1-62
+scripts/data/run-auth-migration.ts
+  ai_agent 1-75
+src/integrations/react/patches/react-dom.js
+  ai_agent 1-19
+src/simulator/data/scenarios.ts
+  ai_agent 1-471
+agents/eve-agent/package.json
+  ai_agent 1-42
+scripts/data/pull_who_iris.py
+  ai_agent 1-139
+scripts/data/validate_data_source_matrix.py
+  ai_agent 1-120
+agents/eve-agent/agent/agent.ts
+  ai_agent 1-9
+scripts/data/ingest_iansteenstra_therapy_eval.py
+  ai_agent 1-262
+scripts/data/validate_classifications.py
+  ai_agent 1-234
+scripts/data/run-migration.ts
+  ai_agent 1-61
+scripts/data/pull_clinical_trials.py
+  ai_agent 1-145
+business-strategy-cms/.env.example
+  ai_agent 1-77
+scripts/data/generate_100k_edge_case_llm_sessions.py
+  ai_agent 1-305
+.env.example
+  ai_agent 1-163
+agents/px.config.json
+  s_9ed4f05cc638b8::t_cd678667b80091 92-102
+src/integrations/react/patches/react.js
+  ai_agent 1-37
+src/lib/ai/multimodal-bias-detection/python-service/.env.example
+  ai_agent 1-98
+scripts/data/pix8_dataset_enhancement.py
+  ai_agent 1-438
+src/lib/ai/bias-detection/python-service/.env.example
+  ai_agent 1-56
+scripts/data/recategorize_s3_files.py
+  ai_agent 1-324
+scripts/data/regen_banned_sessions.py
+  ai_agent 1-295
+scripts/data/reapply_strict_quality_filter.py
+  ai_agent 1-79
+tests/e2e/data/TestData.ts
+  ai_agent 1-64
+scripts/data/pull_core.py
+  ai_agent 1-158
+src/integrations/react/patches/react-dom-client.js
+  ai_agent 1-8
+scripts/data/generate_long_sessions.py
+  ai_agent 1-48
+tests/data/__init__.py
+  ai_agent 1
+src/video_emotion/au_extractor.py
+  s_9ed4f05cc638b8::t_cd678667b80091 31
+scripts/data/pixelated_edge_cases_designer.py
+  ai_agent 1-341
+scripts/data/pull_openalex.py
+  ai_agent 1-146
+scripts/data/release_0_coverage.py
+  ai_agent 1-316
+src/simulator/data/new-scenarios.ts
+  ai_agent 1-185
+src/video_emotion/deception_layer.py
+  s_9ed4f05cc638b8::t_cd678667b80091 12-13
+src/video_emotion/temporal_filter.py
+  s_9ed4f05cc638b8::t_cd678667b80091 35
+scripts/data/generate_edge_cases_pix8.py
+  ai_agent 1-357
+scripts/data/generate_final_metrics.py
+  ai_agent 1-160
+.github/security/trivy/data/ksv0125.yaml
+  ai_agent 1-7
+agents/eve-agent/agent/tools/regenerate_record.ts
+  ai_agent 1-47
+scripts/data/expand_to_large_budget.py
+  ai_agent 1-139
+scripts/data/pix30_utils.py
+  ai_agent 1-60
+scripts/data/categorize_datasets.py
+  ai_agent 1-146
+scripts/data/test_llm_classifier.py
+  ai_agent 1-334
+scripts/data/test_nvidia_nim.py
+  ai_agent 1-180
+scripts/data/validate_taxonomy_classifier.py
+  ai_agent 1-340
+scripts/data/pull_pubmed_pmc.py
+  ai_agent 1-377
+scripts/data/recategorize_dataset.py
+  ai_agent 1-67
+scripts/data/extensive_validation.py
+  ai_agent 1-411
+scripts/data/generate_edge_cases.py
+  ai_agent 1-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "aa9a8bff7d46e444cc615407c1e953b11f33608d",
+  "prompts": {},
+  "sessions": {
+    "s_9a329b4966c619": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7256f454-8f72-4c5e-b773-6fadc464480f",
+        "model": "thinkingmachines/inkling"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    },
+    "s_9ed4f05cc638b8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ses_01658a28affemYXGR5SHfsoP7F",
+        "model": "unknown"
+      },
+      "human_author": "Dagger <dagger@pixelated.love>"
+    }
+  }
+}
