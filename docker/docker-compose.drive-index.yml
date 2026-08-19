@@ -1,0 +1,28 @@
+services:
+  drive-index-postgres:
+    image: pgvector/pgvector:pg17
+    container_name: drive-index-postgres
+    environment:
+      POSTGRES_DB: ${DRIVE_INDEX_DB:-drive_index}
+      POSTGRES_USER: ${DRIVE_INDEX_DB_USER:-drive_index}
+      POSTGRES_PASSWORD: ${DRIVE_INDEX_DB_PASSWORD:?DRIVE_INDEX_DB_PASSWORD is required}
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - drive_index_data:/var/lib/postgresql/data
+      - ../tools/gdrive-dataset-manager/sql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${DRIVE_INDEX_DB_USER:-drive_index} -d
+          ${DRIVE_INDEX_DB:-drive_index}',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  drive_index_data:
