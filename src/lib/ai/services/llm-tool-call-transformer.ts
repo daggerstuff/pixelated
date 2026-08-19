@@ -137,6 +137,8 @@ const normalizeMessageForToolCalls = (
   return normalized
 }
 
+export const normalizeToolCallPayload = (payload: unknown): unknown => normalizeToolCalls(payload)
+
 export const normalizeToolCalls = (payload: unknown): unknown => {
   const record = toRecord(payload)
   if (record === null || typeof record !== 'object') {
