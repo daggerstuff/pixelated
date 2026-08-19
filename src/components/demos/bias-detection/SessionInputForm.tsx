@@ -1,7 +1,6 @@
 // Custom session input form for bias detection analysis
 
-import React, { useState, useEffect, type FC } from 'react'
-
+import React, { useState, useEffect, type FC, SyntheticEvent } from 'react'
 import type {
   SessionData,
   Demographics,
@@ -62,7 +61,7 @@ export const SessionInputForm: FC<SessionInputFormProps> = ({
   }
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault()
 
     if (!validateForm()) {

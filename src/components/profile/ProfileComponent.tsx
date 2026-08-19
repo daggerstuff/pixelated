@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-
+import React, { useState, useEffect, SyntheticEvent } from 'react'
 import { SkeletonProfile } from '@/components/ui/skeleton'
 import type { User } from '@/types/user'
 
@@ -38,7 +37,7 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     // Show loading state while saving
     setIsLoading(true)
