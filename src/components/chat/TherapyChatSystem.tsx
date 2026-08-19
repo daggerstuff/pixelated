@@ -5,6 +5,7 @@ import {
   Suspense,
   useCallback,
   useMemo,
+  SyntheticEvent,
 } from 'react'
 
 import { clientScenarios } from '@/data/scenarios'
@@ -249,7 +250,7 @@ function ProfessionalTherapistWorkspace() {
   }
 
   // Handle message submission
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     setError(null)
 
@@ -662,7 +663,7 @@ function ProfessionalTherapistWorkspace() {
             messages={messages}
             onSendMessage={(msg) => {
               setInput(msg)
-              void handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+              void handleSubmit({ preventDefault: () => {} } as SyntheticEvent)
             }}
             isLoading={isLoading}
             {...(error ? { error } : {})}

@@ -321,7 +321,7 @@ export class AuditLogger {
   /**
    * Ensure database connection is established
    */
-  private async ensureConnected(): Promise<Db> {
+  async ensureConnected(): Promise<Db> {
     if (this.db) return this.db
     this.db = await mongodb.connect()
     return this.db

@@ -49,7 +49,10 @@ function dedupeAndFilterExisting(files) {
     if (!existsSync(filePath)) {
       continue;
     }
-    if (lstatSync(filePath).isSymbolicLink()) {
+    const stats = lstatSync(filePath);
+    // Submodule pointers show up as directories; their contents are
+    // formatted by the submodule's own repo/CI, not by this check.
+    if (stats.isSymbolicLink() || !stats.isFile()) {
       continue;
     }
     if (seen.has(filePath)) {

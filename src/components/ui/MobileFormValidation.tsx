@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-
+import React, { useState, useEffect, useRef, useCallback, SyntheticEvent } from 'react'
 interface ValidationRule {
   test: (value: string) => boolean
   message: string
@@ -234,7 +233,7 @@ export function MobileFormValidation({
   }
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: SyntheticEvent) => {
     if (validateOnSubmit) {
       // Mark all fields as touched
       if (formRef.current) {
@@ -329,7 +328,7 @@ export function MobileFormValidation({
       } = {
         ...specificChild.props,
         ref: formRef,
-        onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+        onSubmit: (e: SyntheticEvent<HTMLFormElement>) => {
           handleSubmit(e)
           // Call the original onSubmit if it exists
           if (specificChild.props.onSubmit) {
