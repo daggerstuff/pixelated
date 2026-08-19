@@ -38,6 +38,7 @@ const repairJsonString = (value: string): unknown | null => {
   if (value.length > TOOL_CALL_ARGS_MAX_LENGTH * 2) {
     return null
   }
+
   const normalized = value
     .replace(/,\s*([}\]])/g, '$1')
     .replace(/'/g, '"')
@@ -77,14 +78,21 @@ const normalizeToolCallId = (value: unknown, index: number): string => {
 }
 
 const toNormalizedToolCall = (item: unknown, index: number): NormalizedToolCall | null => {
-  const toolCall = toRecord(item)
+  if (!item || typeof item !== 'object') {
+    return null
+  }
+  const toolCall = item as Record<string, unknown>
   const functionData = toRecord(toolCall['function'])
-  const name = typeof toolCall['name'] === 'string'
-    ? toolCall['name']
-    : typeof functionData['name'] === 'string'
-      ? functionData['name']
-      : `tool_${index + 1}`
-  const rawArgs = (toolCall['arguments'] ?? functionData['arguments']) as string ?? '{}'
+
+  const name =
+    typeof toolCall['name'] === 'string'
+      ? toolCall['name']
+      : typeof functionData['name'] === 'string'
+        ? functionData['name']
+        : `tool_${index + 1}`
+
+  const rawArgs = toolCall['arguments'] ?? functionData['arguments'] ?? toolCall['function.arguments']
+
   return {
     id: normalizeToolCallId(toolCall['id'], index),
     type: typeof toolCall['type'] === 'string' ? toolCall['type'] : 'function',
@@ -101,9 +109,11 @@ const toToolCalls = (value: unknown): NormalizedToolCall[] | undefined => {
   if (!Array.isArray(value)) {
     return undefined
   }
+
   const normalized = value
     .map((toolCall, index) => toNormalizedToolCall(toolCall, index))
     .filter((toolCall): toolCall is NormalizedToolCall => toolCall !== null)
+
   return normalized.length > 0 ? normalized : undefined
 }
 
@@ -115,54 +125,82 @@ const normalizeMessageForToolCalls = (
   const legacyFunctionCall = toRecord((message as Record<string, unknown>)['function_call'])
   const hasFunctionCallShape =
     typeof normalized.tool_calls === 'undefined' &&
-    (typeof legacyFunctionCall['name'] === 'string' || typeof normalized['function_call'] === 'object')
+    (typeof legacyFunctionCall['name'] === 'string' ||
+      typeof normalized['function_call'] === 'object')
+
   const hasToolCalls = Array.isArray(normalized.tool_calls)
+
   if (hasToolCalls) {
     normalized.tool_calls = toToolCalls(normalized.tool_calls)
     return normalized
   }
+
   if (hasFunctionCallShape) {
     const syntheticToolCall: NormalizedToolCall = {
       id: normalizeToolCallId(normalized['tool_call_id'], index),
       type: 'function',
       function: {
-        name: typeof legacyFunctionCall['name'] === 'string' ? legacyFunctionCall['name'] : 'unknown',
-        arguments: typeof legacyFunctionCall['arguments'] === 'string' ? legacyFunctionCall['arguments'] : '{}',
+        name:
+          typeof legacyFunctionCall['name'] === 'string'
+            ? legacyFunctionCall['name']
+            : `tool_${index + 1}`,
+        arguments: normalizeArguments(
+          legacyFunctionCall['arguments'] ?? (message as Record<string, unknown>)['arguments'],
+        ),
       },
-      name: typeof legacyFunctionCall['name'] === 'string' ? legacyFunctionCall['name'] : 'unknown',
-      arguments: typeof legacyFunctionCall['arguments'] === 'string' ? legacyFunctionCall['arguments'] : '{}',
+      name:
+        typeof legacyFunctionCall['name'] === 'string'
+          ? legacyFunctionCall['name']
+          : `tool_${index + 1}`,
+      arguments: normalizeArguments(
+        legacyFunctionCall['arguments'] ?? (message as Record<string, unknown>)['arguments'],
+      ),
     }
     normalized.tool_calls = [syntheticToolCall]
+    return normalized
   }
+
   return normalized
 }
 
-export const normalizeToolCalls = (payload: unknown): unknown => {
-  const record = toRecord(payload)
-  if (record === null || typeof record !== 'object') {
-    return payload
-  }
-  const messages = (payload as Record<string, unknown>)['messages']
+const normalizeToolCalls = (
+  messages: ReadonlyArray<AIMessage | Record<string, unknown>>,
+): (AIMessage | Record<string, unknown>)[] => {
+  return messages.map((message, index) => normalizeMessageForToolCalls(message, index))
+}
+
+export const normalizeToolCallPayload = <T extends Record<string, unknown>>(
+  payload: T,
+): T => {
+  const messages = payload?.['messages']
   if (!Array.isArray(messages)) {
     return payload
   }
-  const nextPayload = { ...(payload as Record<string, unknown>),
-    messages: messages.map((message, index) => normalizeMessageForToolCalls(message as AIMessage | Record<string, unknown>, index)),
+
+  const nextPayload = {
+    ...payload,
+    messages: normalizeToolCalls(messages as Array<AIMessage | Record<string, unknown>>),
   }
+
+  return nextPayload
 }
 
 export const extractToolCallSummary = (toolCall: unknown): string => {
   const normalized = toRecord(toolCall)
   const functionData = toRecord(normalized['function'])
-  const functionName = typeof functionData['name'] === 'string'
-    ? functionData['name']
-    : typeof normalized['name'] === 'string'
-      ? normalized['name']
-      : 'tool'
-  const rawArgs = typeof normalized['arguments'] === 'string'
-    ? normalized['arguments']
-    : typeof functionData['arguments'] === 'string'
-      ? functionData['arguments']
-      : '{}'
+  const functionName =
+    typeof functionData['name'] === 'string'
+      ? functionData['name']
+      : typeof normalized['name'] === 'string'
+        ? normalized['name']
+        : 'tool'
+
+  const rawArgs =
+    typeof normalized['arguments'] === 'string'
+      ? normalized['arguments']
+      : typeof functionData['arguments'] === 'string'
+        ? functionData['arguments']
+        : '{}'
+
   return `${functionName}(${rawArgs})`
 }
