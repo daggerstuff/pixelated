@@ -29,7 +29,7 @@ jobs:
     name: CodeQL Analyze
     if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 30
     permissions:
       security-events: write
       actions: write
@@ -92,6 +92,7 @@ jobs:
 
       - name: Install native build dependencies
         if: matrix.language == 'javascript'
+        timeout-minutes: 5
         run: |
           sudo apt-get update
           sudo apt-get install -y python3 build-essential
