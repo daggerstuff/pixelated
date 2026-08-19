@@ -32,7 +32,7 @@ const initialTodosJson = JSON.stringify(initialTodos || [])
       if (!this.newTodo.trim()) return;
 
       this.todos.push({
-        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2),
         text: this.newTodo.trim(),
         completed: false
       });

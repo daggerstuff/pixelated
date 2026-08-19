@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-
+import React, { useState, SyntheticEvent } from 'react'
 import type { AIModel } from '../lib/ai/models/ai-types'
 
 interface Message {
@@ -32,7 +31,7 @@ export default function AIChatReact({
     availableModels[0]?.id ?? '',
   )
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
 
     if (!inputValue.trim()) {

@@ -7,7 +7,7 @@ import cors from 'cors'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 import helmet from 'helmet'
-import Redis, { type RedisOptions } from 'ioredis'
+import Redis from 'ioredis'
 import { Pool } from 'pg'
 
 import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'

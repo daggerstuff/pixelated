@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import React, { useState, useCallback } from 'react'
+import { useState, useCallback, SyntheticEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { researchAPI, type BookMetadata } from '@/lib/api/research'
@@ -85,7 +85,7 @@ export default function SearchInterface() {
     [researchAPI], // Explicitly added researchAPI dependency (Review suggestion)
   )
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: SyntheticEvent) => {
     e.preventDefault()
     // No need for useCallback here as it's passed to a raw <form> (Review suggestion)
     void executeSearch(query, selectedSources, filters)

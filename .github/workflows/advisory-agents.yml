@@ -1,0 +1,51 @@
+name: Advisory Tests — Agents
+permissions:
+  contents: read
+on:
+  push:
+    branches: [main, master, staging]
+    paths:
+      - 'agents/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/advisory-agents.yml'
+  pull_request:
+    branches: [main, master, staging]
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+jobs:
+  advisory-test-agents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITEST_SUITE: advisory
+      VITEST_BUCKET: agents
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+      - name: Setup Node / pnpm
+        uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+      - name: Run advisory suite (agents)
+        id: test-run
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          timeout 20m pnpm test:advisory 2>&1 | tee "advisory-test-agents.log"
+      - name: Upload advisory test log (agents)
+        if: always() && hashFiles('advisory-test-agents.log') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: advisory-test-log-agents
+          path: advisory-test-agents.log
+          retention-days: 14

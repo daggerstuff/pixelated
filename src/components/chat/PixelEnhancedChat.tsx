@@ -6,7 +6,7 @@
  */
 
 import { AlertCircle, Zap, AlertTriangle } from 'lucide-react'
-import React, { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, SyntheticEvent } from 'react'
 
 import { Badge } from '@/components/ui/badge/index'
 import {
@@ -75,7 +75,7 @@ export function PixelEnhancedChat({
    * Handle sending message with Pixel analysis
    */
   const handleSendMessage = useCallback(
-    async (e: React.FormEvent) => {
+    async (e: SyntheticEvent) => {
       e.preventDefault()
       if (!inputValue.trim()) return
 

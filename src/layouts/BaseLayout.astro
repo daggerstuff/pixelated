@@ -400,7 +400,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
             excerpt.className = 'search-result-excerpt'
             excerpt.innerHTML = data.excerpt ?? ''
             link.append(title, excerpt)
-            link.addEventListener('click', () => { input.value = '' }, { signal })
+            link.addEventListener('click', () => { if (input) input.value = '' }, { signal })
             resultsEl.append(link)
             return link as HTMLElement
           })
@@ -408,7 +408,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         }
 
         function openOverlay() {
-          if (!overlay) return
+          if (!overlay || !input) return
           overlay.hidden = false
           document.body.style.overflow = 'hidden'
           input.value = ''
@@ -424,10 +424,12 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
           document.body.style.overflow = ''
         }
 
-        input.addEventListener('input', () => {
-          clearTimeout(debounceTimer)
-          debounceTimer = setTimeout(() => runSearch(input.value), 150)
-        }, { signal })
+        if (input) {
+          input.addEventListener('input', () => {
+            clearTimeout(debounceTimer)
+            debounceTimer = setTimeout(() => runSearch(input.value), 150)
+          }, { signal })
+        }
 
         openBtn.addEventListener('click', openOverlay, { signal })
         closeBtn.addEventListener('click', closeOverlay, { signal })

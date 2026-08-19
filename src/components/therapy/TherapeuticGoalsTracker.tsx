@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, SyntheticEvent } from 'react'
 
 import { Button } from '@/components/ui/button/index'
 import { Card } from '@/components/ui/card/index'
@@ -315,7 +315,7 @@ export function TherapeuticGoalsTracker({
   )
 
   // Handle form submit
-  async function handleFormSubmit(e: React.FormEvent) {
+  async function handleFormSubmit(e: SyntheticEvent) {
     e.preventDefault()
     if (editGoal) {
       await updateGoal({ ...editGoal, ...form })

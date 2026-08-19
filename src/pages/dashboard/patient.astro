@@ -13,7 +13,6 @@ import {
 const { user } = Astro.props as { user: any }
 
 const clientId = user?.id || 'demo-patient'
-import { Users } from 'lucide-react'
 const sessionId = Astro.url.searchParams.get('sessionId') ?? undefined
 ---
 

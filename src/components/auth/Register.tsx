@@ -1,5 +1,4 @@
-import React, { useState } from 'react'
-
+import React, { useState, SyntheticEvent } from 'react'
 export default function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +34,7 @@ export default function RegisterForm() {
     }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
