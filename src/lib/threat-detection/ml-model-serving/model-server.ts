@@ -612,7 +612,7 @@ export class ModelServingServer extends EventEmitter {
     } catch (_e) {
       // ignore errors generating crypto bytes; fallback below
     }
-    return `pred_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `pred_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
   }
 
   async getHealth(): Promise<ServerHealthReport> {

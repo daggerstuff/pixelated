@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, SyntheticEvent } from 'react'
 
 import {
   ErrorMessage,
@@ -44,7 +44,7 @@ export function DiscoveryForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [submitError, setSubmitError] = useState<unknown>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
     setErrors({})
     setSubmitError(null)
