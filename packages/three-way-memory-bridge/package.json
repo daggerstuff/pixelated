@@ -1,0 +1,21 @@
+{
+  "name": "@pixelated/three-way-memory-bridge",
+  "version": "1.0.0",
+  "description": "3-Way Memory Bridge integrating Cloudflare Workers AI, Neon PostgreSQL (mastracode), and Foresight Memory System",
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2"
+  },
+  "devDependencies": {
+    "typescript": "~5.7.3",
+    "vitest": "^4.1.10"
+  }
+}
