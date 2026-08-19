@@ -147,7 +147,7 @@ export const POST: APIRoute = async ({ request }) => {
           simulatedResponse: {
             type: 'connection_established',
             payload: {
-              connectionId: `ws_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+              connectionId: `ws_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`,
               supportedFeatures: [
                 'real-time-analysis',
                 'progress-streaming',

@@ -277,6 +277,13 @@ updates:
       # pypdf>=6.14.2 for CVE fixes. Upgrading local-deep-research to 1.8+
       # conflicts with data-designer pandas/pyarrow constraints.
       - dependency-name: 'local-deep-research'
+      # litellm 1.84.0+ caps openai<3.0.0 but project requires openai>=3.1.0.
+      # The uv override-dependencies pins litellm to 1.83.0 (the last release
+      # without the openai<3.0.0 cap). Ignore entirely (not just version-update
+      # types) so grouped security jobs do not fail resolution. Revisit when
+      # openpipe-art ships a release compatible with litellm 1.84.0+ or when
+      # litellm relaxes the openai upper bound.
+      - dependency-name: 'litellm'
 
   - package-ecosystem: 'uv'
     directory: '/src/lib/ai/bias-detection/python-service'
