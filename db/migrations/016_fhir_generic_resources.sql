@@ -116,7 +116,7 @@ CREATE TABLE IF NOT EXISTS ehr_resource_history (
   history_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id UUID NOT NULL,
   resource_type TEXT NOT NULL,
-  resource_id UUID NOT NULL,
+  resource_id TEXT NOT NULL,
   version_id TEXT NOT NULL,
   fhir_resource JSONB NOT NULL,
   action TEXT NOT NULL,
