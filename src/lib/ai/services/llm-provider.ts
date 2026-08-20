@@ -264,12 +264,13 @@ function normalizeBaseUrl(baseUrl: string): string {
     .replace(/\/v1$/i, '')
 }
 
-function isRateLimitError(
+function isTransientAPIError(
   status: number,
   message: string,
   code?: string,
 ): boolean {
-  if (status === 429) {
+  // Transient provider/server failures: rate limits, timeouts, 5xx bursts.
+  if (status === 429 || status === 408 || (status >= 500 && status < 600)) {
     return true
   }
 
@@ -348,7 +349,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
     }
 
     const retryableMessage = extractedMessage || response.statusText
-    const isRetryable = isRateLimitError(
+    const isRetryable = isTransientAPIError(
       response.status,
       retryableMessage,
       extractedCode ?? errorCode,
