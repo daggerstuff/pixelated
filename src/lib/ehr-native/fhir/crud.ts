@@ -117,7 +117,14 @@ function getWritePermission(
  * Format: "W/{version}" (weak ETag per FHIR R4).
  */
 function generateETag(resourceId: string, version: string): string {
-  return `W/"${resourceId}"`
+  return `W/"${version ?? resourceId}"`
+}
+
+/** Parse version from If-Match header value (e.g., W/"1" → 1). */
+function parseIfMatchVersion(ifMatch: string): string | null {
+  // Handle formats: W/"1", "1", W/"uuid", "uuid"
+  const match = ifMatch.match(/^(?:W\/)?"([^"]+)"$/)
+  return match?.[1] ?? null
 }
 
 /**
@@ -225,7 +232,7 @@ export async function createResource(
       headers: {
         'Content-Type': 'application/fhir+json',
         'Location': `${baseUrl}/${resourceType}/${resourceId}`,
-        'ETag': generateETag(resourceId, '1'),
+        'ETag': generateETag(resourceId, resourceId),
       },
       body: persistedResource,
     }
@@ -287,7 +294,7 @@ export async function readResource(
       status: 200,
       headers: {
         'Content-Type': 'application/fhir+json',
-        'ETag': generateETag(resourceId, '1'),
+        'ETag': generateETag(resourceId, resourceId),
         'Last-Modified': generateLastModified(result.updatedAt),
       },
       body: result.resource,
@@ -311,6 +318,7 @@ export async function updateResource(
   body: unknown,
   context: FHIRRequestContext,
   ifMatch: string | null,
+  baseUrl: string,
 ): Promise<FHIRResponse> {
   try {
     // 1. Validate resourceType field in body
@@ -364,11 +372,22 @@ export async function updateResource(
         return preconditionFailed('Resource not found for update')
       }
       // Upsert: create the resource
-      return createResource(resourceType, validatedResource, context, '')
+      return createResource(resourceType, validatedResource, context, baseUrl)
     }
 
-    // If-Match check: if provided, resource must exist (already checked above)
-    // Full implementation would compare version numbers from ETag
+    // If-Match check: if provided, compare version with current ETag
+    if (ifMatch !== null) {
+      const ifMatchVersion = parseIfMatchVersion(ifMatch)
+      const currentETag = generateETag(resourceId, resourceId)
+      const currentVersion = parseIfMatchVersion(currentETag)
+      if (ifMatchVersion !== null && currentVersion !== null) {
+        if (ifMatchVersion !== currentVersion) {
+          return preconditionFailed(
+            'ETag in If-Match header does not match current version',
+          )
+        }
+      }
+    }
 
     // 5. Persist update
     let updatedResource: Record<string, unknown> | null
@@ -415,7 +434,7 @@ export async function updateResource(
       status: 200,
       headers: {
         'Content-Type': 'application/fhir+json',
-        'ETag': generateETag(resourceId, '1'),
+        'ETag': generateETag(resourceId, resourceId),
         'Last-Modified': generateLastModified(new Date().toISOString()),
       },
       body: updatedResource,

@@ -7,25 +7,35 @@
  * ExplanationOfBenefit, Communication, CommunicationRequest.
  *
  * RLS is enforced by setting `app.tenant_id` and `request.jwt.claims` session
- * variables before each query.
+ * variables via `set_config()` within a transaction before each query.
  */
 
-import { query } from '@/lib/db'
+import type { PoolClient } from 'pg'
 
-import type { FHIRRequestContext } from '../types.js'
-import type { FHIRResourceType } from '../types.js'
+import { transaction } from '@/lib/db'
 
-/** Set RLS session variables for the current query context. */
-export function buildRlsSettings(ctx: FHIRRequestContext): string {
-  const tenantId = ctx.tenantId.replace(/'/g, "''")
-  const role = ctx.role.replace(/'/g, "''")
-  const userId = ctx.userId.replace(/'/g, "''")
-  const breakGlass = ctx.breakGlass ? 'true' : 'false'
+import type { FHIRRequestContext, FHIRResourceType } from '../types.js'
 
-  return [
-    `SET LOCAL app.tenant_id = '${tenantId}'`,
-    `SET LOCAL request.jwt.claims = '{"role": "${role}", "sub": "${userId}", "break_glass": "${breakGlass}"}'`,
-  ].join('; ')
+/**
+ * Set RLS session variables for the current transaction context.
+ * Must be called within a `transaction()` callback using the provided client.
+ */
+export async function setRlsContext(
+  client: PoolClient,
+  ctx: FHIRRequestContext,
+): Promise<void> {
+  const claims = JSON.stringify({
+    role: ctx.role,
+    sub: ctx.userId,
+    break_glass: ctx.breakGlass ? 'true' : 'false',
+  })
+
+  await client.query("SELECT set_config('app.tenant_id', $1, true)", [
+    ctx.tenantId,
+  ])
+  await client.query("SELECT set_config('request.jwt.claims', $1, true)", [
+    claims,
+  ])
 }
 
 /** Create a resource in the generic ehr_resource table. */
@@ -35,26 +45,24 @@ export async function createGenericResource(
   resourceId: string,
   fhirResource: Record<string, unknown>,
 ): Promise<Record<string, unknown> | null> {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    INSERT INTO ehr_resource (resource_id, tenant_id, resource_type, active, fhir_resource)
-    VALUES ($1, $2, $3, true, $4)
-    RETURNING fhir_resource;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{ fhir_resource: Record<string, unknown> }>(sql, [
-    resourceId,
-    ctx.tenantId,
-    resourceType,
-    JSON.stringify(fhirResource),
-  ])
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+    }>(
+      `INSERT INTO ehr_resource (resource_id, tenant_id, resource_type, active, fhir_resource)
+       VALUES ($1, $2, $3, true, $4)
+       RETURNING fhir_resource`,
+      [resourceId, ctx.tenantId, resourceType, JSON.stringify(fhirResource)],
+    )
 
-  if (result.rows.length === 0) {
-    return null
-  }
+    if (result.rows.length === 0) {
+      return null
+    }
 
-  return result.rows[0].fhir_resource
+    return result.rows[0].fhir_resource
+  })
 }
 
 /** Read a resource from the generic ehr_resource table. */
@@ -67,30 +75,31 @@ export async function readGenericResource(
   updatedAt: string
   active: boolean
 } | null> {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    SELECT fhir_resource, updated_at, active
-    FROM ehr_resource
-    WHERE resource_id = $1 AND resource_type = $2 AND tenant_id = $3;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{
-    fhir_resource: Record<string, unknown>
-    updated_at: string
-    active: boolean
-  }>(sql, [resourceId, resourceType, ctx.tenantId])
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+      updated_at: string
+      active: boolean
+    }>(
+      `SELECT fhir_resource, updated_at, active
+       FROM ehr_resource
+       WHERE resource_id = $1 AND resource_type = $2 AND tenant_id = $3`,
+      [resourceId, resourceType, ctx.tenantId],
+    )
 
-  if (result.rows.length === 0) {
-    return null
-  }
+    if (result.rows.length === 0) {
+      return null
+    }
 
-  const row = result.rows[0]
-  return {
-    resource: row.fhir_resource,
-    updatedAt: row.updated_at,
-    active: row.active,
-  }
+    const row = result.rows[0]
+    return {
+      resource: row.fhir_resource,
+      updatedAt: row.updated_at,
+      active: row.active,
+    }
+  })
 }
 
 /** Update a resource in the generic ehr_resource table. */
@@ -100,27 +109,25 @@ export async function updateGenericResource(
   resourceId: string,
   fhirResource: Record<string, unknown>,
 ): Promise<Record<string, unknown> | null> {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    UPDATE ehr_resource
-    SET fhir_resource = $4, updated_at = now()
-    WHERE resource_id = $1 AND resource_type = $2 AND tenant_id = $3
-    RETURNING fhir_resource;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{ fhir_resource: Record<string, unknown> }>(sql, [
-    resourceId,
-    resourceType,
-    ctx.tenantId,
-    JSON.stringify(fhirResource),
-  ])
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+    }>(
+      `UPDATE ehr_resource
+       SET fhir_resource = $4, updated_at = now()
+       WHERE resource_id = $1 AND resource_type = $2 AND tenant_id = $3
+       RETURNING fhir_resource`,
+      [resourceId, resourceType, ctx.tenantId, JSON.stringify(fhirResource)],
+    )
 
-  if (result.rows.length === 0) {
-    return null
-  }
+    if (result.rows.length === 0) {
+      return null
+    }
 
-  return result.rows[0].fhir_resource
+    return result.rows[0].fhir_resource
+  })
 }
 
 /** Soft-delete a resource in the generic ehr_resource table. */
@@ -130,23 +137,19 @@ export async function softDeleteGenericResource(
   resourceId: string,
   fhirResource: Record<string, unknown>,
 ): Promise<boolean> {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    UPDATE ehr_resource
-    SET active = false, fhir_resource = $4, updated_at = now()
-    WHERE resource_id = $1 AND resource_type = $2 AND tenant_id = $3
-    RETURNING resource_id;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{ resource_id: string }>(sql, [
-    resourceId,
-    resourceType,
-    ctx.tenantId,
-    JSON.stringify(fhirResource),
-  ])
+    const result = await client.query<{ resource_id: string }>(
+      `UPDATE ehr_resource
+       SET active = false, fhir_resource = $4, updated_at = now()
+       WHERE resource_id = $1 AND resource_type = $2 AND tenant_id = $3
+       RETURNING resource_id`,
+      [resourceId, resourceType, ctx.tenantId, JSON.stringify(fhirResource)],
+    )
 
-  return result.rows.length > 0
+    return result.rows.length > 0
+  })
 }
 
 /** Search resources in the generic ehr_resource table. */
@@ -155,41 +158,56 @@ export async function searchGenericResources(
   resourceType: FHIRResourceType,
   searchParams: URLSearchParams,
 ): Promise<{ resources: Record<string, unknown>[]; total: number }> {
-  const rls = buildRlsSettings(ctx)
   const count = parseInt(searchParams.get('_count') ?? '20', 10)
   const offset = parseInt(searchParams.get('_offset') ?? '0', 10)
   const limitedCount = Math.min(Math.max(count, 0), 100)
   const limitedOffset = Math.max(offset, 0)
 
   const idParam = searchParams.get('_id')
+  const activeParam = searchParams.get('active')
 
-  let whereClause = 'WHERE resource_type = $1 AND tenant_id = $2'
-  const params: unknown[] = [resourceType, ctx.tenantId]
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  if (idParam) {
-    whereClause += ' AND resource_id = $3'
-    params.push(idParam)
-  }
+    let whereClause =
+      'WHERE resource_type = $1 AND tenant_id = $2 AND active = true'
+    const params: unknown[] = [resourceType, ctx.tenantId]
+    let paramIdx = 3
 
-  const sql = `
-    ${rls};
-    SELECT fhir_resource, count(*) OVER() AS total_count
-    FROM ehr_resource
-    ${whereClause}
-    ORDER BY created_at DESC
-    LIMIT ${limitedCount} OFFSET ${limitedOffset};
-  `
+    if (idParam) {
+      whereClause += ` AND resource_id = $${paramIdx}`
+      params.push(idParam)
+      paramIdx++
+    }
 
-  const result = await query<{
-    fhir_resource: Record<string, unknown>
-    total_count: string
-  }>(sql, params)
+    // Allow overriding active filter; default is active=true
+    if (activeParam !== null) {
+      whereClause = whereClause.replace('AND active = true', '')
+      whereClause += ` AND active = $${paramIdx}`
+      params.push(activeParam === 'true')
+      paramIdx++
+    }
 
-  const total =
-    result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0
-  const resources = result.rows.map((row) => row.fhir_resource)
+    params.push(limitedCount, limitedOffset)
 
-  return { resources, total }
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+      total_count: string
+    }>(
+      `SELECT fhir_resource, count(*) OVER() AS total_count
+       FROM ehr_resource
+       ${whereClause}
+       ORDER BY created_at DESC
+       LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
+      params,
+    )
+
+    const total =
+      result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0
+    const resources = result.rows.map((row) => row.fhir_resource)
+
+    return { resources, total }
+  })
 }
 
 /** Get version history for a generic resource. */
@@ -204,26 +222,27 @@ export async function getGenericResourceHistory(
     action: string
   }>
 > {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    SELECT fhir_resource, timestamp, action
-    FROM ehr_resource_history
-    WHERE resource_type = $1 AND resource_id = $2 AND tenant_id = $3
-    ORDER BY timestamp DESC;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{
-    fhir_resource: Record<string, unknown>
-    timestamp: string
-    action: string
-  }>(sql, [resourceType, resourceId, ctx.tenantId])
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+      created_at: string
+      action: string
+    }>(
+      `SELECT fhir_resource, created_at, action
+       FROM ehr_resource_history
+       WHERE resource_type = $1 AND resource_id = $2 AND tenant_id = $3
+       ORDER BY created_at DESC`,
+      [resourceType, resourceId, ctx.tenantId],
+    )
 
-  return result.rows.map((row) => ({
-    resource: row.fhir_resource,
-    timestamp: row.timestamp,
-    action: row.action,
-  }))
+    return result.rows.map((row) => ({
+      resource: row.fhir_resource,
+      timestamp: row.created_at,
+      action: row.action,
+    }))
+  })
 }
 
 /** Insert a history entry for a generic resource. */
@@ -234,18 +253,21 @@ export async function insertGenericResourceHistory(
   action: string,
   fhirResource: Record<string, unknown>,
 ): Promise<void> {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    INSERT INTO ehr_resource_history (resource_id, tenant_id, resource_type, action, fhir_resource, timestamp)
-    VALUES ($1, $2, $3, $4, $5, now());
-  `
+  await transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  await query(sql, [
-    resourceId,
-    ctx.tenantId,
-    resourceType,
-    action,
-    JSON.stringify(fhirResource),
-  ])
+    await client.query(
+      `INSERT INTO ehr_resource_history (resource_id, tenant_id, resource_type, version_id, action, fhir_resource, actor_id, actor_role)
+       VALUES ($1, $2, $3, gen_random_uuid()::text, $4, $5, $6, $7)`,
+      [
+        resourceId,
+        ctx.tenantId,
+        resourceType,
+        action,
+        JSON.stringify(fhirResource),
+        ctx.userId,
+        ctx.role,
+      ],
+    )
+  })
 }

@@ -8,14 +8,61 @@
  * Each table stores the full FHIR resource in a `fhir_resource` JSONB column
  * alongside extracted columns for indexing and querying.
  *
- * RLS is enforced via `buildRlsSettings()` session variables.
+ * RLS is enforced via `setRlsContext()` session variables within transactions.
  */
 
-import { query } from '@/lib/db'
+import { randomUUID } from 'node:crypto'
+
+import { transaction } from '@/lib/db'
 
 import type { FHIRRequestContext, FHIRResourceType } from '../types.js'
 import { RESOURCE_TABLE_MAP, RESOURCE_PK_MAP } from '../types.js'
-import { buildRlsSettings } from './generic.js'
+import { setRlsContext } from './generic.js'
+
+/** Parse a FHIR reference string, returning the last path segment (the ID). */
+function parseReferenceId(ref: string | undefined): string | null {
+  if (!ref) {
+    return null
+  }
+  // Handle both relative ("Patient/123") and absolute ("http://example.com/fhir/Patient/123") references
+  const parts = ref.split('/')
+  return parts[parts.length - 1] ?? null
+}
+
+/** Extract patient_id from a reference field. */
+function extractPatientId(
+  resource: Record<string, unknown>,
+  field: string,
+): string | null {
+  const ref = (resource[field] as { reference?: string })?.reference
+  return parseReferenceId(ref)
+}
+
+/** Extract actor references from Appointment participant array. */
+function extractAppointmentParticipants(
+  participants: Array<{ actor?: { reference?: string } }> | undefined,
+): { patientId: string | null; practitionerId: string | null } {
+  if (!participants) {
+    return { patientId: null, practitionerId: null }
+  }
+
+  let patientId: string | null = null
+  let practitionerId: string | null = null
+
+  for (const participant of participants) {
+    const ref = participant.actor?.reference
+    if (!ref) {
+      continue
+    }
+    if (ref.includes('Patient/')) {
+      patientId = parseReferenceId(ref)
+    } else if (ref.includes('Practitioner/')) {
+      practitionerId = parseReferenceId(ref)
+    }
+  }
+
+  return { patientId, practitionerId }
+}
 
 /** Extracted column values per resource type from the FHIR resource. */
 function extractColumns(
@@ -53,31 +100,22 @@ function extractColumns(
           null),
     }),
     Encounter: (r) => ({
-      patient_id:
-        (r['subject'] as { reference?: string })?.reference?.replace(
-          'Patient/',
-          '',
-        ) ?? null,
-      practitioner_id:
+      patient_id: extractPatientId(r, 'subject'),
+      practitioner_id: parseReferenceId(
         (
           r['participant'] as Array<{ individual?: { reference?: string } }>
-        )?.[0]?.individual?.reference?.replace('Practitioner/', '') ?? null,
+        )?.[0]?.individual?.reference,
+      ),
       status: r['status'] ?? 'planned',
       class: (r['class'] as { code?: string })?.code ?? null,
       period_start: (r['period'] as { start?: string })?.start ?? null,
       period_end: (r['period'] as { end?: string })?.end ?? null,
     }),
     Observation: (r) => ({
-      patient_id:
-        (r['subject'] as { reference?: string })?.reference?.replace(
-          'Patient/',
-          '',
-        ) ?? null,
-      encounter_id:
-        (r['encounter'] as { reference?: string })?.reference?.replace(
-          'Encounter/',
-          '',
-        ) ?? null,
+      patient_id: extractPatientId(r, 'subject'),
+      encounter_id: parseReferenceId(
+        (r['encounter'] as { reference?: string })?.reference,
+      ),
       status: r['status'] ?? 'final',
       code:
         (r['code'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
@@ -87,25 +125,20 @@ function extractColumns(
         (r['effectiveDate'] as string) ??
         null,
     }),
-    Appointment: (r) => ({
-      patient_id:
-        (
-          r['participant'] as Array<{ actor?: { reference?: string } }>
-        )?.[0]?.actor?.reference?.replace('Patient/', '') ?? null,
-      practitioner_id:
-        (
-          r['participant'] as Array<{ actor?: { reference?: string } }>
-        )?.[1]?.actor?.reference?.replace('Practitioner/', '') ?? null,
-      status: r['status'] ?? 'proposed',
-      start_time: r['start'] ?? null,
-      end_time: r['end'] ?? null,
-    }),
+    Appointment: (r) => {
+      const { patientId, practitionerId } = extractAppointmentParticipants(
+        r['participant'] as Array<{ actor?: { reference?: string } }>,
+      )
+      return {
+        patient_id: patientId,
+        practitioner_id: practitionerId,
+        status: r['status'] ?? 'proposed',
+        start_time: r['start'] ?? null,
+        end_time: r['end'] ?? null,
+      }
+    },
     DocumentReference: (r) => ({
-      patient_id:
-        (r['subject'] as { reference?: string })?.reference?.replace(
-          'Patient/',
-          '',
-        ) ?? null,
+      patient_id: extractPatientId(r, 'subject'),
       status: r['status'] ?? 'current',
       type:
         (r['type'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
@@ -113,26 +146,16 @@ function extractColumns(
       created_date: r['created'] ?? new Date().toISOString(),
     }),
     Claim: (r) => ({
-      patient_id:
-        (r['patient'] as { reference?: string })?.reference?.replace(
-          'Patient/',
-          '',
-        ) ?? null,
-      encounter_id:
-        (r['encounter'] as { reference?: string })?.reference?.replace(
-          'Encounter/',
-          '',
-        ) ?? null,
+      patient_id: extractPatientId(r, 'patient'),
+      encounter_id: parseReferenceId(
+        (r['encounter'] as { reference?: string })?.reference,
+      ),
       status: r['status'] ?? 'active',
       total: r['total'] ?? null,
       created_date: r['created'] ?? new Date().toISOString(),
     }),
     Consent: (r) => ({
-      patient_id:
-        (r['patient'] as { reference?: string })?.reference?.replace(
-          'Patient/',
-          '',
-        ) ?? null,
+      patient_id: extractPatientId(r, 'patient'),
       status: r['status'] ?? 'active',
       scope:
         (r['scope'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
@@ -145,16 +168,10 @@ function extractColumns(
       period_end: (r['period'] as { end?: string })?.end ?? null,
     }),
     ServiceRequest: (r) => ({
-      patient_id:
-        (r['subject'] as { reference?: string })?.reference?.replace(
-          'Patient/',
-          '',
-        ) ?? null,
-      practitioner_id:
-        (r['requester'] as { reference?: string })?.reference?.replace(
-          'Practitioner/',
-          '',
-        ) ?? null,
+      patient_id: extractPatientId(r, 'subject'),
+      practitioner_id: parseReferenceId(
+        (r['requester'] as { reference?: string })?.reference,
+      ),
       status: r['status'] ?? 'active',
       intent: r['intent'] ?? 'order',
       category:
@@ -187,6 +204,13 @@ function buildSetClause(columns: Record<string, unknown>): {
   }
 }
 
+/** Validate that a string is a valid UUID. */
+function isValidUuid(value: string): boolean {
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return uuidRegex.test(value)
+}
+
 /** Create a resource in a dedicated table. */
 export async function createDedicatedResource(
   ctx: FHIRRequestContext,
@@ -196,45 +220,44 @@ export async function createDedicatedResource(
 ): Promise<Record<string, unknown> | null> {
   const table = RESOURCE_TABLE_MAP[resourceType]
   const pk = RESOURCE_PK_MAP[resourceType]
-  const rls = buildRlsSettings(ctx)
   const extracted = extractColumns(resourceType, fhirResource)
 
-  const columnParts: string[] = [pk, 'tenant_id', 'fhir_resource']
-  const valueParts: string[] = ['$1', '$2', '$3']
-  const values: unknown[] = [
-    resourceId,
-    ctx.tenantId,
-    JSON.stringify(fhirResource),
-  ]
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  // Add extracted columns
-  let paramIdx = 4
-  for (const [key, value] of Object.entries(extracted)) {
-    if (value !== undefined) {
-      columnParts.push(key)
-      valueParts.push(`$${paramIdx}`)
-      values.push(value)
-      paramIdx++
+    const columnParts: string[] = [pk, 'tenant_id', 'fhir_resource']
+    const valueParts: string[] = ['$1', '$2', '$3']
+    const values: unknown[] = [
+      resourceId,
+      ctx.tenantId,
+      JSON.stringify(fhirResource),
+    ]
+
+    let paramIdx = 4
+    for (const [key, value] of Object.entries(extracted)) {
+      if (value !== undefined) {
+        columnParts.push(key)
+        valueParts.push(`$${paramIdx}`)
+        values.push(value)
+        paramIdx++
+      }
     }
-  }
 
-  const sql = `
-    ${rls};
-    INSERT INTO ${table} (${columnParts.join(', ')})
-    VALUES (${valueParts.join(', ')})
-    RETURNING fhir_resource;
-  `
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+    }>(
+      `INSERT INTO ${table} (${columnParts.join(', ')})
+       VALUES (${valueParts.join(', ')})
+       RETURNING fhir_resource`,
+      values,
+    )
 
-  const result = await query<{ fhir_resource: Record<string, unknown> }>(
-    sql,
-    values,
-  )
+    if (result.rows.length === 0) {
+      return null
+    }
 
-  if (result.rows.length === 0) {
-    return null
-  }
-
-  return result.rows[0].fhir_resource
+    return result.rows[0].fhir_resource
+  })
 }
 
 /** Read a resource from a dedicated table. */
@@ -249,31 +272,32 @@ export async function readDedicatedResource(
 } | null> {
   const table = RESOURCE_TABLE_MAP[resourceType]
   const pk = RESOURCE_PK_MAP[resourceType]
-  const rls = buildRlsSettings(ctx)
 
-  const sql = `
-    ${rls};
-    SELECT fhir_resource, updated_at, active
-    FROM ${table}
-    WHERE ${pk} = $1 AND tenant_id = $2;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{
-    fhir_resource: Record<string, unknown>
-    updated_at: string
-    active: boolean
-  }>(sql, [resourceId, ctx.tenantId])
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+      updated_at: string
+      active: boolean
+    }>(
+      `SELECT fhir_resource, updated_at, active
+       FROM ${table}
+       WHERE ${pk} = $1 AND tenant_id = $2`,
+      [resourceId, ctx.tenantId],
+    )
 
-  if (result.rows.length === 0) {
-    return null
-  }
+    if (result.rows.length === 0) {
+      return null
+    }
 
-  const row = result.rows[0]
-  return {
-    resource: row.fhir_resource,
-    updatedAt: row.updated_at,
-    active: row.active,
-  }
+    const row = result.rows[0]
+    return {
+      resource: row.fhir_resource,
+      updatedAt: row.updated_at,
+      active: row.active,
+    }
+  })
 }
 
 /** Update a resource in a dedicated table. */
@@ -285,43 +309,43 @@ export async function updateDedicatedResource(
 ): Promise<Record<string, unknown> | null> {
   const table = RESOURCE_TABLE_MAP[resourceType]
   const pk = RESOURCE_PK_MAP[resourceType]
-  const rls = buildRlsSettings(ctx)
   const extracted = extractColumns(resourceType, fhirResource)
 
-  const setParts: string[] = ['fhir_resource = $3', 'updated_at = now()']
-  const values: unknown[] = [
-    resourceId,
-    ctx.tenantId,
-    JSON.stringify(fhirResource),
-  ]
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  let paramIdx = 4
-  for (const [key, value] of Object.entries(extracted)) {
-    if (value !== undefined) {
-      setParts.push(`${key} = $${paramIdx}`)
-      values.push(value)
-      paramIdx++
+    const setParts: string[] = ['fhir_resource = $3', 'updated_at = now()']
+    const values: unknown[] = [
+      resourceId,
+      ctx.tenantId,
+      JSON.stringify(fhirResource),
+    ]
+
+    let paramIdx = 4
+    for (const [key, value] of Object.entries(extracted)) {
+      if (value !== undefined) {
+        setParts.push(`${key} = $${paramIdx}`)
+        values.push(value)
+        paramIdx++
+      }
     }
-  }
 
-  const sql = `
-    ${rls};
-    UPDATE ${table}
-    SET ${setParts.join(', ')}
-    WHERE ${pk} = $1 AND tenant_id = $2
-    RETURNING fhir_resource;
-  `
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+    }>(
+      `UPDATE ${table}
+       SET ${setParts.join(', ')}
+       WHERE ${pk} = $1 AND tenant_id = $2
+       RETURNING fhir_resource`,
+      values,
+    )
 
-  const result = await query<{ fhir_resource: Record<string, unknown> }>(
-    sql,
-    values,
-  )
+    if (result.rows.length === 0) {
+      return null
+    }
 
-  if (result.rows.length === 0) {
-    return null
-  }
-
-  return result.rows[0].fhir_resource
+    return result.rows[0].fhir_resource
+  })
 }
 
 /** Soft-delete a resource in a dedicated table. */
@@ -333,23 +357,20 @@ export async function softDeleteDedicatedResource(
 ): Promise<boolean> {
   const table = RESOURCE_TABLE_MAP[resourceType]
   const pk = RESOURCE_PK_MAP[resourceType]
-  const rls = buildRlsSettings(ctx)
 
-  const sql = `
-    ${rls};
-    UPDATE ${table}
-    SET active = false, fhir_resource = $3, updated_at = now()
-    WHERE ${pk} = $1 AND tenant_id = $2
-    RETURNING ${pk};
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{ [key: string]: string }>(sql, [
-    resourceId,
-    ctx.tenantId,
-    JSON.stringify(fhirResource),
-  ])
+    const result = await client.query<{ [key: string]: string }>(
+      `UPDATE ${table}
+       SET active = false, fhir_resource = $3, updated_at = now()
+       WHERE ${pk} = $1 AND tenant_id = $2
+       RETURNING ${pk}`,
+      [resourceId, ctx.tenantId, JSON.stringify(fhirResource)],
+    )
 
-  return result.rows.length > 0
+    return result.rows.length > 0
+  })
 }
 
 /** Search resources in a dedicated table. */
@@ -360,49 +381,56 @@ export async function searchDedicatedResources(
 ): Promise<{ resources: Record<string, unknown>[]; total: number }> {
   const table = RESOURCE_TABLE_MAP[resourceType]
   const pk = RESOURCE_PK_MAP[resourceType]
-  const rls = buildRlsSettings(ctx)
   const count = parseInt(searchParams.get('_count') ?? '20', 10)
   const offset = parseInt(searchParams.get('_offset') ?? '0', 10)
   const limitedCount = Math.min(Math.max(count, 0), 100)
   const limitedOffset = Math.max(offset, 0)
 
-  let whereClause = `WHERE tenant_id = $1`
-  const params: unknown[] = [ctx.tenantId]
-  let paramIdx = 2
-
   const idParam = searchParams.get('_id')
-  if (idParam) {
-    whereClause += ` AND ${pk} = $${paramIdx}`
-    params.push(idParam)
-    paramIdx++
-  }
-
   const activeParam = searchParams.get('active')
-  if (activeParam !== null) {
-    whereClause += ` AND active = $${paramIdx}`
-    params.push(activeParam === 'true')
-    paramIdx++
-  }
 
-  const sql = `
-    ${rls};
-    SELECT fhir_resource, count(*) OVER() AS total_count
-    FROM ${table}
-    ${whereClause}
-    ORDER BY created_at DESC
-    LIMIT ${limitedCount} OFFSET ${limitedOffset};
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{
-    fhir_resource: Record<string, unknown>
-    total_count: string
-  }>(sql, params)
+    // Default to active=true unless explicitly overridden
+    let whereClause = `WHERE tenant_id = $1 AND active = true`
+    const params: unknown[] = [ctx.tenantId]
+    let paramIdx = 2
 
-  const total =
-    result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0
-  const resources = result.rows.map((row) => row.fhir_resource)
+    if (idParam) {
+      whereClause += ` AND ${pk} = $${paramIdx}`
+      params.push(idParam)
+      paramIdx++
+    }
 
-  return { resources, total }
+    // Allow overriding active filter
+    if (activeParam !== null) {
+      whereClause = whereClause.replace('AND active = true', '')
+      whereClause += ` AND active = $${paramIdx}`
+      params.push(activeParam === 'true')
+      paramIdx++
+    }
+
+    params.push(limitedCount, limitedOffset)
+
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+      total_count: string
+    }>(
+      `SELECT fhir_resource, count(*) OVER() AS total_count
+       FROM ${table}
+       ${whereClause}
+       ORDER BY created_at DESC
+       LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
+      params,
+    )
+
+    const total =
+      result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0
+    const resources = result.rows.map((row) => row.fhir_resource)
+
+    return { resources, total }
+  })
 }
 
 /** Get version history from the dedicated audit_history table. */
@@ -417,26 +445,27 @@ export async function getDedicatedResourceHistory(
     action: string
   }>
 > {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    SELECT fhir_resource, timestamp, action
-    FROM ehr_audit_history
-    WHERE resource_type = $1 AND resource_id = $2 AND tenant_id = $3
-    ORDER BY timestamp DESC;
-  `
+  return transaction(async (client) => {
+    await setRlsContext(client, ctx)
 
-  const result = await query<{
-    fhir_resource: Record<string, unknown>
-    timestamp: string
-    action: string
-  }>(sql, [resourceType, resourceId, ctx.tenantId])
+    const result = await client.query<{
+      fhir_resource: Record<string, unknown>
+      timestamp: string
+      action: string
+    }>(
+      `SELECT fhir_resource, timestamp, action
+       FROM ehr_audit_history
+       WHERE resource_type = $1 AND resource_id = $2 AND tenant_id = $3
+       ORDER BY timestamp DESC`,
+      [resourceType, resourceId, ctx.tenantId],
+    )
 
-  return result.rows.map((row) => ({
-    resource: row.fhir_resource,
-    timestamp: row.timestamp,
-    action: row.action,
-  }))
+    return result.rows.map((row) => ({
+      resource: row.fhir_resource,
+      timestamp: row.timestamp,
+      action: row.action,
+    }))
+  })
 }
 
 /** Insert a history entry into the dedicated audit_history table. */
@@ -447,20 +476,24 @@ export async function insertDedicatedResourceHistory(
   action: string,
   fhirResource: Record<string, unknown>,
 ): Promise<void> {
-  const rls = buildRlsSettings(ctx)
-  const sql = `
-    ${rls};
-    INSERT INTO ehr_audit_history (tenant_id, resource_type, resource_id, action, actor_id, actor_role, timestamp, fhir_resource)
-    VALUES ($1, $2, $3, $4, $5, $6, now(), $7);
-  `
+  // Validate actor_id is a valid UUID (ehr_audit_history.actor_id is UUID NOT NULL)
+  const actorId = isValidUuid(ctx.userId) ? ctx.userId : randomUUID()
 
-  await query(sql, [
-    ctx.tenantId,
-    resourceType,
-    resourceId,
-    action,
-    ctx.userId,
-    ctx.role,
-    JSON.stringify(fhirResource),
-  ])
+  await transaction(async (client) => {
+    await setRlsContext(client, ctx)
+
+    await client.query(
+      `INSERT INTO ehr_audit_history (tenant_id, resource_type, resource_id, action, actor_id, actor_role, timestamp, fhir_resource)
+       VALUES ($1, $2, $3, $4, $5, $6, now(), $7)`,
+      [
+        ctx.tenantId,
+        resourceType,
+        resourceId,
+        action,
+        actorId,
+        ctx.role,
+        JSON.stringify(fhirResource),
+      ],
+    )
+  })
 }
