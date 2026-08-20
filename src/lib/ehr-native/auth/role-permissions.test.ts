@@ -1,14 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
 import {
-  CLINICAL_ROLES,
-  EHR_PERMISSIONS,
-  isClinicalRole,
-  isEHRPermission,
-  type ClinicalRole,
-  type EHRPermission,
-} from './types'
-import {
   CLINICAL_ROLE_DEFINITIONS,
   EHR_PERMISSION_DEFINITIONS,
   resolveRolePermissions,
@@ -18,6 +10,14 @@ import {
   permissionRequiresAudit,
   permissionRequiresMFA,
 } from './role-permissions'
+import {
+  CLINICAL_ROLES,
+  EHR_PERMISSIONS,
+  isClinicalRole,
+  isEHRPermission,
+  type ClinicalRole,
+  type EHRPermission,
+} from './types'
 
 describe('ClinicalRole type guards', () => {
   it('isClinicalRole returns true for valid roles', () => {
@@ -107,15 +107,15 @@ describe('CLINICAL_ROLE_DEFINITIONS', () => {
   })
 
   it('physician has sign_clinical_note permission', () => {
-    expect(
-      CLINICAL_ROLE_DEFINITIONS.physician.permissions,
-    ).toContain('sign_clinical_note')
+    expect(CLINICAL_ROLE_DEFINITIONS.physician.permissions).toContain(
+      'sign_clinical_note',
+    )
   })
 
   it('frontDesk does NOT have read_encounter permission', () => {
-    expect(
-      CLINICAL_ROLE_DEFINITIONS.frontDesk.permissions,
-    ).not.toContain('read_encounter')
+    expect(CLINICAL_ROLE_DEFINITIONS.frontDesk.permissions).not.toContain(
+      'read_encounter',
+    )
   })
 
   it('systemAdmin has all 25 permissions directly or via inheritance', () => {
@@ -199,9 +199,7 @@ describe('resolveRolePermissions (inheritance)', () => {
   it('pharmacist does NOT inherit from nurse (no inherits array)', () => {
     const pharmacistPerms = resolveRolePermissions('pharmacist')
     // pharmacist doesn't inherit from anyone
-    expect(
-      pharmacistPerms.has('write_encounter'),
-    ).toBe(false)
+    expect(pharmacistPerms.has('write_encounter')).toBe(false)
   })
 
   it('complianceOfficer does NOT have write permissions', () => {
@@ -253,7 +251,9 @@ describe('roleHasPermission', () => {
 
   it('returns false for missing permissions', () => {
     expect(roleHasPermission('frontDesk', 'read_encounter')).toBe(false)
-    expect(roleHasPermission('billingSpecialist', 'write_condition')).toBe(false)
+    expect(roleHasPermission('billingSpecialist', 'write_condition')).toBe(
+      false,
+    )
   })
 
   it('returns false for break_glass when role lacks it', () => {
@@ -272,7 +272,12 @@ describe('getRolePermissions', () => {
   it('returns sorted array of permissions', () => {
     const perms = getRolePermissions('frontDesk')
     expect(perms).toEqual(
-      ['manage_schedule', 'read_patient', 'read_schedule', 'write_patient'].sort(),
+      [
+        'manage_schedule',
+        'read_patient',
+        'read_schedule',
+        'write_patient',
+      ].sort(),
     )
   })
 
@@ -287,7 +292,7 @@ describe('Cycle safety in inheritance', () => {
     // All roles should resolve without hanging — if there were a cycle,
     // this test would timeout
     for (const role of CLINICAL_ROLES) {
-      const perms = resolveRolePermissions(role as ClinicalRole)
+      const perms = resolveRolePermissions(role)
       expect(perms.size).toBeGreaterThan(0)
     }
   })

@@ -6,13 +6,13 @@
  * consent system (`src/lib/research/services/ConsentManagementService`).
  */
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   AuditEventStatus,
   AuditEventType,
   createHIPAACompliantAuditLog,
 } from '@/lib/audit'
 import type { AuditDetails, AuditLogEntry } from '@/lib/audit'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { consentManagementService } from '@/lib/research/services/ConsentManagementService'
 import type { ConsentLevel } from '@/lib/research/types/research-types'
 
@@ -311,7 +311,8 @@ export async function activateBreakGlass(
 
     return {
       granted: false,
-      reason: 'A clinical justification reason is required for break-glass access',
+      reason:
+        'A clinical justification reason is required for break-glass access',
       auditLogId: deniedLog.id,
     }
   }
@@ -365,7 +366,10 @@ export async function checkPermissionWithBreakGlass(
   role: ClinicalRole,
   permission: EHRPermission,
   patientId: string,
-  breakGlassParams?: Omit<BreakGlassParams, 'role' | 'patientId' | 'permission'>,
+  breakGlassParams?: Omit<
+    BreakGlassParams,
+    'role' | 'patientId' | 'permission'
+  >,
 ): Promise<EHRPermissionCheckResult> {
   const baseCheck = await checkPermission(role, permission, patientId)
 
@@ -375,8 +379,7 @@ export async function checkPermissionWithBreakGlass(
 
   // If denied due to consent and break-glass params provided, try break-glass
   if (
-    breakGlassParams !== undefined &&
-    breakGlassParams.userId !== undefined &&
+    breakGlassParams?.userId !== undefined &&
     baseCheck.consentVerified === false
   ) {
     const bgResult = await activateBreakGlass({
@@ -425,7 +428,17 @@ export async function logEHRAccess(params: {
   granted: boolean
   reason?: string
 }): Promise<AuditLogEntry> {
-  const { userId, action, resource, role, permission, patientId, organizationId, granted, reason } = params
+  const {
+    userId,
+    action,
+    resource,
+    role,
+    permission,
+    patientId,
+    organizationId,
+    granted,
+    reason,
+  } = params
 
   return createHIPAACompliantAuditLog({
     userId,

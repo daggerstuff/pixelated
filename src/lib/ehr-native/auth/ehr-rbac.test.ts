@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import type { AuditLogEntry } from '@/lib/audit'
-import type { ConsentLevel } from '@/lib/research/types/research-types'
 
 import {
   verifyPatientConsent,
@@ -20,7 +19,8 @@ import type { EHRPermission } from './types'
 const mockGetConsentLevel = vi.fn()
 vi.mock('@/lib/research/services/ConsentManagementService', () => ({
   consentManagementService: {
-    getConsentLevel: (...args: unknown[]) => mockGetConsentLevel(...args) as unknown,
+    getConsentLevel: (...args: unknown[]) =>
+      mockGetConsentLevel(...args) as unknown,
   },
 }))
 
@@ -97,19 +97,19 @@ describe('verifyPatientConsent', () => {
   })
 
   it('returns true when consent level meets minimum', async () => {
-    mockGetConsentLevel.mockResolvedValue('minimal' as ConsentLevel)
+    mockGetConsentLevel.mockResolvedValue('minimal')
     const result = await verifyPatientConsent('patient-1', 'read_patient')
     expect(result).toBe(true)
   })
 
   it('returns true when consent level exceeds minimum', async () => {
-    mockGetConsentLevel.mockResolvedValue('full' as ConsentLevel)
+    mockGetConsentLevel.mockResolvedValue('full')
     const result = await verifyPatientConsent('patient-1', 'read_patient')
     expect(result).toBe(true)
   })
 
   it('returns false when consent level is insufficient', async () => {
-    mockGetConsentLevel.mockResolvedValue('none' as ConsentLevel)
+    mockGetConsentLevel.mockResolvedValue('none')
     const result = await verifyPatientConsent('patient-1', 'read_patient')
     expect(result).toBe(false)
   })
@@ -121,37 +121,51 @@ describe('verifyPatientConsent', () => {
   })
 
   it('requires full consent for export_phi', async () => {
-    mockGetConsentLevel.mockResolvedValue('limited' as ConsentLevel)
+    mockGetConsentLevel.mockResolvedValue('limited')
     const result = await verifyPatientConsent('patient-1', 'export_phi')
     expect(result).toBe(false)
 
-    mockGetConsentLevel.mockResolvedValue('full' as ConsentLevel)
+    mockGetConsentLevel.mockResolvedValue('full')
     const result2 = await verifyPatientConsent('patient-1', 'export_phi')
     expect(result2).toBe(true)
   })
 
   it('requires limited consent for write_clinical_note', async () => {
-    mockGetConsentLevel.mockResolvedValue('minimal' as ConsentLevel)
-    const result = await verifyPatientConsent('patient-1', 'write_clinical_note')
+    mockGetConsentLevel.mockResolvedValue('minimal')
+    const result = await verifyPatientConsent(
+      'patient-1',
+      'write_clinical_note',
+    )
     expect(result).toBe(false)
 
-    mockGetConsentLevel.mockResolvedValue('limited' as ConsentLevel)
-    const result2 = await verifyPatientConsent('patient-1', 'write_clinical_note')
+    mockGetConsentLevel.mockResolvedValue('limited')
+    const result2 = await verifyPatientConsent(
+      'patient-1',
+      'write_clinical_note',
+    )
     expect(result2).toBe(true)
   })
 })
 
 describe('checkPermission', () => {
   it('grants permission when role has it and consent is valid', async () => {
-    mockGetConsentLevel.mockResolvedValue('full' as ConsentLevel)
-    const result = await checkPermission('physician', 'read_patient', 'patient-1')
+    mockGetConsentLevel.mockResolvedValue('full')
+    const result = await checkPermission(
+      'physician',
+      'read_patient',
+      'patient-1',
+    )
     expect(result.granted).toBe(true)
     expect(result.breakGlassActivated).toBe(false)
     expect(result.consentVerified).toBe(true)
   })
 
   it('denies permission when role lacks it', async () => {
-    const result = await checkPermission('frontDesk', 'read_encounter', 'patient-1')
+    const result = await checkPermission(
+      'frontDesk',
+      'read_encounter',
+      'patient-1',
+    )
     expect(result.granted).toBe(false)
     expect(result.reason).toContain('does not have permission')
     expect(result.consentVerified).toBeNull()
@@ -159,15 +173,23 @@ describe('checkPermission', () => {
 
   it('denies permission when consent is missing', async () => {
     mockGetConsentLevel.mockResolvedValue(null)
-    const result = await checkPermission('physician', 'read_patient', 'patient-1')
+    const result = await checkPermission(
+      'physician',
+      'read_patient',
+      'patient-1',
+    )
     expect(result.granted).toBe(false)
     expect(result.reason).toContain('consent')
     expect(result.consentVerified).toBe(false)
   })
 
   it('denies permission when consent is insufficient', async () => {
-    mockGetConsentLevel.mockResolvedValue('none' as ConsentLevel)
-    const result = await checkPermission('physician', 'read_patient', 'patient-1')
+    mockGetConsentLevel.mockResolvedValue('none')
+    const result = await checkPermission(
+      'physician',
+      'read_patient',
+      'patient-1',
+    )
     expect(result.granted).toBe(false)
     expect(result.consentVerified).toBe(false)
   })
@@ -179,24 +201,40 @@ describe('checkPermission', () => {
   })
 
   it('grants schedule permission without consent check even with patientId', async () => {
-    const result = await checkPermission('frontDesk', 'manage_schedule', 'patient-1')
+    const result = await checkPermission(
+      'frontDesk',
+      'manage_schedule',
+      'patient-1',
+    )
     expect(result.granted).toBe(true)
     expect(result.consentVerified).toBeNull()
   })
 
   it('grants inherited permissions (physician reading medication)', async () => {
-    mockGetConsentLevel.mockResolvedValue('full' as ConsentLevel)
-    const result = await checkPermission('physician', 'read_medication', 'patient-1')
+    mockGetConsentLevel.mockResolvedValue('full')
+    const result = await checkPermission(
+      'physician',
+      'read_medication',
+      'patient-1',
+    )
     expect(result.granted).toBe(true)
   })
 
   it('denies break_glass for frontDesk (no break_glass permission)', async () => {
-    const result = await checkPermission('frontDesk', 'break_glass', 'patient-1')
+    const result = await checkPermission(
+      'frontDesk',
+      'break_glass',
+      'patient-1',
+    )
     expect(result.granted).toBe(false)
   })
 
   it('grants break_glass for physician', async () => {
-    const result = await checkPermission('physician', 'break_glass', 'patient-1')
+    const result = await checkPermission(
+      'physician',
+      'break_glass',
+      'patient-1',
+    )
     expect(result.granted).toBe(true)
     expect(result.consentVerified).toBeNull()
   })
@@ -282,7 +320,10 @@ describe('activateBreakGlass', () => {
     })
 
     expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
-    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<string, unknown>
+    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >
     expect(callArg['organizationId']).toBe('org-1')
   })
 
@@ -296,7 +337,10 @@ describe('activateBreakGlass', () => {
     })
 
     expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
-    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<string, unknown>
+    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >
     expect(callArg['status']).toBe('warning')
   })
 
@@ -310,14 +354,17 @@ describe('activateBreakGlass', () => {
     })
 
     expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
-    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<string, unknown>
+    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >
     expect(callArg['status']).toBe('blocked')
   })
 })
 
 describe('checkPermissionWithBreakGlass', () => {
   it('returns granted when base check passes', async () => {
-    mockGetConsentLevel.mockResolvedValue('full' as ConsentLevel)
+    mockGetConsentLevel.mockResolvedValue('full')
     const result = await checkPermissionWithBreakGlass(
       'physician',
       'read_patient',
@@ -421,7 +468,10 @@ describe('logEHRAccess', () => {
     })
 
     expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
-    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<string, unknown>
+    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >
     expect(callArg['eventType']).toBe('access')
     expect(callArg['status']).toBe('success')
   })
@@ -441,7 +491,10 @@ describe('logEHRAccess', () => {
     })
 
     expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
-    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<string, unknown>
+    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >
     expect(callArg['eventType']).toBe('access_denied')
     expect(callArg['status']).toBe('blocked')
   })
@@ -460,7 +513,10 @@ describe('logEHRAccess', () => {
       reason: 'Consent expired',
     })
 
-    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<string, unknown>
+    const callArg = mockCreateAuditLog.mock.calls[0][0] as Record<
+      string,
+      unknown
+    >
     const details = callArg['details'] as Record<string, unknown>
     expect(details['reason']).toBe('Consent expired')
   })

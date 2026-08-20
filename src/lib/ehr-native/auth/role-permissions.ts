@@ -370,8 +370,7 @@ export const CLINICAL_ROLE_DEFINITIONS: Record<
   careCoordinator: {
     name: 'careCoordinator',
     displayName: 'Care Coordinator',
-    description:
-      'Care coordinator with patient and schedule management access',
+    description: 'Care coordinator with patient and schedule management access',
     hierarchyLevel: 55,
     permissions: [
       'read_patient',
@@ -401,8 +400,7 @@ export const CLINICAL_ROLE_DEFINITIONS: Record<
   billingSpecialist: {
     name: 'billingSpecialist',
     displayName: 'Billing Specialist',
-    description:
-      'Billing specialist with claim and financial record access',
+    description: 'Billing specialist with claim and financial record access',
     hierarchyLevel: 40,
     permissions: [
       'read_patient',
@@ -554,18 +552,14 @@ export function getPermissionCategory(
 /**
  * Check if a permission requires audit logging when exercised.
  */
-export function permissionRequiresAudit(
-  permission: EHRPermission,
-): boolean {
+export function permissionRequiresAudit(permission: EHRPermission): boolean {
   return EHR_PERMISSION_DEFINITIONS[permission].auditRequired
 }
 
 /**
  * Check if a permission requires MFA before being exercised.
  */
-export function permissionRequiresMFA(
-  permission: EHRPermission,
-): boolean {
+export function permissionRequiresMFA(permission: EHRPermission): boolean {
   return EHR_PERMISSION_DEFINITIONS[permission].requiresMFA
 }
 
