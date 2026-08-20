@@ -252,6 +252,39 @@ export async function activateBreakGlass(
     }
   }
 
+  // Validate that the role has the requested permission
+  // Break-glass overrides consent, not role-based access
+  if (!roleHasPermission(role, permission)) {
+    logger.warn('Break-glass denied — role lacks requested permission', {
+      userId,
+      role,
+      patientId,
+      permission,
+    })
+
+    const deniedLog = await createAuditEntry({
+      userId,
+      action: 'break_glass_denied',
+      resource: 'ehr_break_glass',
+      eventType: AuditEventType.SECURITY,
+      status: AuditEventStatus.BLOCKED,
+      userRole: role,
+      patientId,
+      organizationId,
+      details: {
+        requestedPermission: permission,
+        reason,
+        denialReason: 'Role does not have the requested permission',
+      },
+    })
+
+    return {
+      granted: false,
+      reason: `Role '${role}' does not have the requested permission '${permission}'`,
+      auditLogId: deniedLog.id,
+    }
+  }
+
   // Validate that a reason was provided
   if (!reason || reason.trim().length === 0) {
     logger.warn('Break-glass denied — no reason provided', {

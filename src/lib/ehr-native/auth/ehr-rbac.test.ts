@@ -231,6 +231,20 @@ describe('activateBreakGlass', () => {
     expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
   })
 
+  it('denies break-glass when role lacks the requested permission', async () => {
+    const result = await activateBreakGlass({
+      userId: 'user-1',
+      role: 'nurse',
+      patientId: 'patient-1',
+      permission: 'adjudicate_claim',
+      reason: 'Emergency billing needed',
+    })
+
+    expect(result.granted).toBe(false)
+    expect(result.reason).toContain('does not have the requested permission')
+    expect(mockCreateAuditLog).toHaveBeenCalledTimes(1)
+  })
+
   it('denies break-glass when no reason is provided', async () => {
     const result = await activateBreakGlass({
       userId: 'user-1',
@@ -349,7 +363,6 @@ describe('checkPermissionWithBreakGlass', () => {
   })
 
   it('does not activate break-glass when denied for non-consent reasons', async () => {
-    // frontDesk doesn't have read_encounter at all
     const result = await checkPermissionWithBreakGlass(
       'frontDesk',
       'read_encounter',
@@ -357,6 +370,22 @@ describe('checkPermissionWithBreakGlass', () => {
       {
         userId: 'user-1',
         reason: 'Emergency',
+      },
+    )
+
+    expect(result.granted).toBe(false)
+    expect(result.breakGlassActivated).toBe(false)
+  })
+
+  it('denies break-glass when role has break_glass but lacks requested permission', async () => {
+    mockGetConsentLevel.mockResolvedValue(null)
+    const result = await checkPermissionWithBreakGlass(
+      'nurse',
+      'adjudicate_claim',
+      'patient-1',
+      {
+        userId: 'user-1',
+        reason: 'Emergency billing',
       },
     )
 
