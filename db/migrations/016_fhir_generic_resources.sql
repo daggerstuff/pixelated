@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS ehr_resource (
   patient_id UUID,
   status TEXT,
   fhir_resource JSONB NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -119,6 +120,7 @@ CREATE TABLE IF NOT EXISTS ehr_resource_history (
   resource_id UUID NOT NULL,
   version_id TEXT NOT NULL,
   fhir_resource JSONB NOT NULL,
+    active BOOLEAN NOT NULL DEFAULT true,
   action TEXT NOT NULL,
   actor_id TEXT,
   actor_role TEXT,
@@ -149,3 +151,6 @@ CREATE POLICY ehr_resource_history_insert ON ehr_resource_history
     tenant_id = current_setting('app.tenant_id')::uuid
     AND current_setting('request.jwt.claims', true)::jsonb->>'role' IS NOT NULL
   );
+
+
+CREATE INDEX IF NOT EXISTS idx_ehr_resource_active ON ehr_resource (active, resource_type, tenant_id);
