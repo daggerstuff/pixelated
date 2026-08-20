@@ -28,7 +28,7 @@ export function buildGeneralAnalysisPrompt(
   // Few-Shot Examples (Tier 4 - omitted for brevity, but important for real prompts)
 
   // Strategic Reminders (Tier 5 - simplified here)
-  const reminders = `Remember to output valid JSON. If no specific category is clear, use 'general_mental_health' or 'none'. Prioritize crisis detection.`
+  const reminders = `Remember to output valid JSON. If no specific category is clear, use 'general_mental_health'. Prioritize crisis detection.`
 
   return [
     {
@@ -58,7 +58,7 @@ export function buildCrisisAnalysisPrompt(text: string): Message[] {
 // Prompts for the MentalHealthTaskRouter
 const ROUTING_SYSTEM_PROMPT = `You are an expert text classification system for mental health related queries.
 Your task is to analyze the user's input text and determine the most relevant mental health category or task it implies.
-Categories include: depression, anxiety, stress, wellness, crisis, general_mental_health, or unknown.
+Categories include: depression, anxiety, stress, wellness, crisis, general_mental_health.
 Provide your output as a JSON object with the following fields:
 - "category": (string) The most relevant category.
 - "confidence": (float, 0.0-1.0) Your confidence in this classification.
