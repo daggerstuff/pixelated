@@ -205,7 +205,23 @@ async function runAgentTool(
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
-    console.error(pc.red(`px: ${msg}`))
+    // Provider failures (timeout, network, 429/5xx) are transient — surface a
+    // structured, renderable response instead of a bare exception.
+    const transient =
+      /timeout|timed out|fetch failed|network|ECONNRESET|429|5\d\d/.test(msg)
+    const gracefulResponse = {
+      error: msg,
+      fallback: true,
+      transient,
+      message: transient
+        ? 'LLM provider temporarily unavailable — retry in a moment'
+        : `Agent invocation failed: ${msg}`,
+    }
+    if (options.json) {
+      console.log(JSON.stringify(gracefulResponse, null, 2))
+    } else {
+      console.error(pc.red(`px: ${gracefulResponse.message}`))
+    }
     process.exitCode = 1
   }
 }

@@ -32,7 +32,7 @@ export type MentalLLaMAPythonBridgeInstance = Awaited<
  * Configuration for the MentalLLaMAFactory.
  */
 export interface MentalLLaMAFactoryConfig {
-  defaultModelTier?: '7B' | '13B' | string
+  defaultModelTier?: '7B' | '13B'
   enablePythonBridge?: boolean
   pythonBridgeScriptPath?: string
   // Potentially add overrides for keyword rules, LLM category maps, etc.

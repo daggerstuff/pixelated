@@ -357,34 +357,18 @@ export function generateDeviceFingerprint(
 
 /**
  * Sleep function for rate limiting
+ *
+ * Re-exported from the shared retry base (`src/lib/shared/retry.ts`) so every
+ * consumer — auth, AI, analytics, memory-bridge — shares one implementation.
  */
-export async function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
+export { retry, sleep } from '../shared/retry'
 
 /**
  * Retry function with exponential backoff
+ *
+ * Re-exported from the shared retry base. The signature is unchanged:
+ * `retry<T>(fn, maxRetries=3, delay=1000)`.
  */
-export async function retry<T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  delay: number = 1000,
-): Promise<T> {
-  let lastError: Error
-
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await fn()
-    } catch (error: unknown) {
-      lastError = error as Error
-      if (i < maxRetries - 1) {
-        await sleep(delay * Math.pow(2, i))
-      }
-    }
-  }
-
-  throw lastError!
-}
 
 /**
  * Debounce function

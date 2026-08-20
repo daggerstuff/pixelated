@@ -169,7 +169,7 @@ export function WebSocketConnectionManager(props: {
 type MessageRecord = {
   id?: string
   timestamp?: Date
-  type?: 'sent' | 'received' | string
+  type?: 'sent' | 'received'
   data?: unknown
   executionId?: string
 }
