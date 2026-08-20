@@ -44,7 +44,7 @@ export abstract class BiasDetectionError extends Error {
       cause?: Error | unknown
     } = {},
   ) {
-    super(message, { cause: options.cause })
+    super(message, { cause: options.cause as Error | undefined })
     this.name = this.constructor.name
     this.code = code
     this.severity = severity

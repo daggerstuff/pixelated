@@ -5,12 +5,12 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('smsUtils')
 
-let twilioClient: ReturnType<typeof twilio> | null = null
+let twilioClient: any = null
 
 /**
  * Initialize Twilio client with credentials
  */
-export function initializeTwilioClient(): ReturnType<typeof twilio> | null {
+export function initializeTwilioClient(): any {
   const accountSid = config.twilio.accountSid()
   const authToken = config.twilio.authToken()
 
@@ -31,7 +31,7 @@ export function initializeTwilioClient(): ReturnType<typeof twilio> | null {
 /**
  * Get the Twilio client, initializing it if necessary
  */
-export function getTwilioClient(): ReturnType<typeof twilio> | null {
+export function getTwilioClient(): any {
   if (!twilioClient) {
     return initializeTwilioClient()
   }

@@ -12,16 +12,16 @@ export type UserRole = 'admin' | 'therapist' | 'client' | 'guest'
  * Authenticated user data structure
  */
 export interface AuthUser {
-  id: string | unknown
-  email: string | unknown
-  name: string | unknown
-  image: string | unknown
-  role: UserRole | unknown
-  fullName: string | unknown
+  id: string
+  email: string
+  name: string
+  image: string
+  role: UserRole
+  fullName: string
   roles: UserRole[]
-  emailVerified: boolean | unknown
-  createdAt: string | unknown
-  lastSignIn: string | unknown
+  emailVerified: boolean
+  createdAt: string
+  lastSignIn: string
   avatarUrl?: string
   metadata?: Record<string, unknown>
 }

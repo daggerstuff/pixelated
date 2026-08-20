@@ -150,7 +150,7 @@ export interface AnalyzeMentalHealthParams {
   routingContext?: RoutingContextParams | undefined // Context for the task router
   options?:
     | {
-        modelTier?: '7B' | '13B' | string // Preferred model tier
+        modelTier?: '7B' | '13B' | string // Preferred model tier (string covers both literals)
         useExpertGuidance?: boolean
       }
     | undefined
