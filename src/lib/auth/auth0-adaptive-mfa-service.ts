@@ -17,6 +17,7 @@ import { auth0UserService } from '../../services/auth0.service'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
+import { retry } from './utils'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 const logger = createBuildSafeLogger('auth0-adaptive-mfa-service')
@@ -293,10 +294,16 @@ export class Auth0AdaptiveMFAService {
       } else {
         // Check Auth0 logs for suspicious activity from this IP
         if (auth0Management) {
-          const logs = await auth0Management.getLogs({
-            per_page: 10,
-            q: `ip:${ipAddress} AND type:f`,
-          })
+          const management = auth0Management
+          const logs = await retry(
+            async () =>
+              management.getLogs({
+                per_page: 10,
+                q: `ip:${ipAddress} AND type:f`,
+              }),
+            2,
+            500,
+          )
 
           if (logs.length > 0) {
             triggered = true
@@ -306,7 +313,7 @@ export class Auth0AdaptiveMFAService {
         }
 
         // Check if this is a new IP for the user
-        const user = await auth0UserService.getUserById(userId)
+        const user = await retry(async () => await auth0UserService.getUserById(userId), 2, 500)
         if (user?.lastLogin && Math.random() < 0.1) {
           triggered = true
           description = `New or unusual IP address for user`
@@ -354,7 +361,7 @@ export class Auth0AdaptiveMFAService {
       }
 
       // Check for unusual location change (simulated)
-      const user = await auth0UserService.getUserById(userId)
+      const user = await retry(async () => await auth0UserService.getUserById(userId), 2, 500)
       if (user && Math.random() < 0.05 && location.country) {
         triggered = true
         description = `Unusual location change detected`
@@ -442,10 +449,16 @@ export class Auth0AdaptiveMFAService {
       if (this.config.enableBehavioralAnalysis) {
         // Check recent failed login attempts
         if (auth0Management) {
-          const recentLogs = await auth0Management.getLogs({
-            per_page: 20,
-            q: `user_id:${userId} AND type:f AND date:[${new Date(Date.now() - 3600000).toISOString()} TO *]`,
-          })
+          const management = auth0Management
+          const recentLogs = await retry(
+            async () =>
+              management.getLogs({
+                per_page: 20,
+                q: `user_id:${userId} AND type:f AND date:[${new Date(Date.now() - 3600000).toISOString()} TO *]`,
+              }),
+            2,
+            500,
+          )
 
           if (recentLogs.length >= this.config.maxFailedAttempts) {
             triggered = true
@@ -459,7 +472,7 @@ export class Auth0AdaptiveMFAService {
         }
 
         // Check for unusual login patterns (simulated)
-        const user = await auth0UserService.getUserById(userId)
+        const user = await retry(async () => await auth0UserService.getUserById(userId), 2, 500)
         if (user?.lastLogin) {
           const lastLoginTime = new Date(user.lastLogin)
           const timeDiff = timestamp.getTime() - lastLoginTime.getTime()
