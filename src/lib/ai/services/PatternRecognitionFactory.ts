@@ -347,7 +347,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       const results: TrendPattern[] = rawTrendPatterns.map((rawPattern) => {
         // Create a properly structured TrendPattern object
         const pattern: TrendPattern = {
-          id: `trend-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          id: `trend-${String(Date.now())}-${String(Math.random().toString(36).substring(2, 9))}`,
           type: 'emotional',
           confidence: 0.7,
           startDate: startDate,
@@ -458,7 +458,7 @@ class ConcretePatternRecognitionService implements PatternRecognitionService {
       const results: CrossSessionPattern[] = rawPatterns.map((rawPattern) => {
         // Create a properly structured CrossSessionPattern object
         const pattern: CrossSessionPattern = {
-          id: `pattern-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          id: `pattern-${String(Date.now())}-${String(Math.random().toString(36).substring(2, 9))}`,
           type: 'behavioral',
           sessions: sessions
             .map((s) => s.sessionId)
