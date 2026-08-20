@@ -62,8 +62,6 @@ export const coverageStatusSchema = z.enum([
 
 export const claimSupportingInfoSchema = z.object({
   sequence: fhirPositiveIntSchema,
-  information: fhirReferenceSchema,
-  reason: fhirCodeableConceptSchema.optional(),
   category: fhirCodeableConceptSchema,
   code: fhirCodeableConceptSchema.optional(),
   timingDate: fhirDateSchema.optional(),
@@ -72,7 +70,6 @@ export const claimSupportingInfoSchema = z.object({
   valueString: fhirStringSchema.optional(),
   valueQuantity: fhirQuantitySchema.optional(),
   valueAttachment: fhirReferenceSchema.optional(),
-  reasonReference: fhirReferenceSchema.optional(),
 })
 
 export const claimDiagnosisSchema = z.object({
@@ -225,7 +222,7 @@ export type Claim = z.infer<typeof claimSchema>
 // ---------------------------------------------------------------------------
 
 export const claimResponseItemSchema = z.object({
-  fhirSequence: fhirPositiveIntSchema.optional(),
+  itemSequence: fhirPositiveIntSchema.optional(),
   noteNumber: fhirPositiveIntSchema.array().optional(),
   adjudication: z
     .array(
@@ -240,7 +237,7 @@ export const claimResponseItemSchema = z.object({
   detail: z
     .array(
       z.object({
-        fhirSequence: fhirPositiveIntSchema.optional(),
+        detailSequence: fhirPositiveIntSchema.optional(),
         noteNumber: fhirPositiveIntSchema.array().optional(),
         adjudication: z
           .array(
@@ -255,7 +252,7 @@ export const claimResponseItemSchema = z.object({
         subDetail: z
           .array(
             z.object({
-              fhirSequence: fhirPositiveIntSchema.optional(),
+              subDetailSequence: fhirPositiveIntSchema.optional(),
               noteNumber: fhirPositiveIntSchema.array().optional(),
               adjudication: z
                 .array(
@@ -307,7 +304,7 @@ export const claimResponseAddItemSchema = z.object({
 })
 
 export const claimResponseSubDetailSchema = z.object({
-  fhirSequence: fhirPositiveIntSchema.optional(),
+  subDetailSequence: fhirPositiveIntSchema.optional(),
   noteNumber: fhirPositiveIntSchema.array().optional(),
   adjudication: z
     .array(
@@ -322,7 +319,7 @@ export const claimResponseSubDetailSchema = z.object({
 })
 
 export const claimResponseDetailSchema = z.object({
-  fhirSequence: fhirPositiveIntSchema.optional(),
+  detailSequence: fhirPositiveIntSchema.optional(),
   noteNumber: fhirPositiveIntSchema.array().optional(),
   adjudication: z
     .array(

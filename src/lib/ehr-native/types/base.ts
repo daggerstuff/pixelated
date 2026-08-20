@@ -124,6 +124,7 @@ export const fhirNarrativeStatusSchema = z.enum([
   'generated',
   'extensions',
   'additional',
+  'empty',
 ])
 
 export const fhirNarrativeSchema = z.object({
