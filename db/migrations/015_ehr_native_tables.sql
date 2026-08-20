@@ -288,6 +288,8 @@ CREATE OR REPLACE FUNCTION ehr_patient_has_consent(
         WHERE c.patient_id = p_patient_id
           AND c.tenant_id = p_tenant_id
           AND c.status = 'active'
+          AND (c.period_start IS NULL OR c.period_start <= CURRENT_DATE)
+          AND (c.period_end IS NULL OR c.period_end >= CURRENT_DATE)
           AND (
               (p_min_level = 'none') OR
               (p_min_level = 'minimal' AND c.consent_level IN ('minimal', 'limited', 'full')) OR
@@ -295,7 +297,8 @@ CREATE OR REPLACE FUNCTION ehr_patient_has_consent(
               (p_min_level = 'full' AND c.consent_level = 'full')
           )
     );
-$$ LANGUAGE sql STABLE;
+$$ LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public;
 
 -- ============================================================================
 -- 4. ehr_encounter
@@ -312,6 +315,15 @@ CREATE TABLE IF NOT EXISTS ehr_encounter (
     fhir_resource    JSONB       NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+,
+    CONSTRAINT fk_ehr_encounter_patient
+        FOREIGN KEY (patient_id)
+            REFERENCES ehr_patient (patient_id)
+            ON DELETE RESTRICT,
+    CONSTRAINT fk_ehr_encounter_practitioner
+        FOREIGN KEY (practitioner_id)
+            REFERENCES ehr_practitioner (practitioner_id)
+            ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_ehr_encounter_tenant
@@ -411,6 +423,15 @@ CREATE TABLE IF NOT EXISTS ehr_appointment (
     fhir_resource    JSONB       NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+,
+    CONSTRAINT fk_ehr_appointment_patient
+        FOREIGN KEY (patient_id)
+            REFERENCES ehr_patient (patient_id)
+            ON DELETE RESTRICT,
+    CONSTRAINT fk_ehr_appointment_practitioner
+        FOREIGN KEY (practitioner_id)
+            REFERENCES ehr_practitioner (practitioner_id)
+            ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_ehr_appointment_tenant
@@ -496,6 +517,11 @@ CREATE TABLE IF NOT EXISTS ehr_document_reference (
     fhir_resource    JSONB       NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+,
+    CONSTRAINT fk_ehr_document_ref_patient
+        FOREIGN KEY (patient_id)
+            REFERENCES ehr_patient (patient_id)
+            ON DELETE RESTRICT
 );
 
 CREATE INDEX IF NOT EXISTS idx_ehr_document_ref_tenant
@@ -592,6 +618,15 @@ CREATE TABLE IF NOT EXISTS ehr_observation (
     fhir_resource    JSONB       NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+,
+    CONSTRAINT fk_ehr_observation_patient
+        FOREIGN KEY (patient_id)
+            REFERENCES ehr_patient (patient_id)
+            ON DELETE RESTRICT,
+    CONSTRAINT fk_ehr_observation_encounter
+        FOREIGN KEY (encounter_id)
+            REFERENCES ehr_encounter (encounter_id)
+            ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_ehr_observation_tenant
@@ -692,6 +727,15 @@ CREATE TABLE IF NOT EXISTS ehr_claim (
     fhir_resource    JSONB       NOT NULL,
     created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+,
+    CONSTRAINT fk_ehr_claim_patient
+        FOREIGN KEY (patient_id)
+            REFERENCES ehr_patient (patient_id)
+            ON DELETE RESTRICT,
+    CONSTRAINT fk_ehr_claim_encounter
+        FOREIGN KEY (encounter_id)
+            REFERENCES ehr_encounter (encounter_id)
+            ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_ehr_claim_tenant
@@ -787,6 +831,15 @@ CREATE TABLE IF NOT EXISTS ehr_service_request (
     fhir_resource      JSONB     NOT NULL,
     created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+,
+    CONSTRAINT fk_ehr_service_request_patient
+        FOREIGN KEY (patient_id)
+            REFERENCES ehr_patient (patient_id)
+            ON DELETE RESTRICT,
+    CONSTRAINT fk_ehr_service_request_practitioner
+        FOREIGN KEY (practitioner_id)
+            REFERENCES ehr_practitioner (practitioner_id)
+            ON DELETE SET NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_ehr_service_request_tenant
@@ -921,6 +974,11 @@ CREATE POLICY ehr_audit_history_insert
     WITH CHECK (
         tenant_id = current_setting('app.tenant_id')::uuid
         AND current_setting('request.jwt.claims', true)::jsonb->>'role' IS NOT NULL
+        AND actor_role = current_setting('request.jwt.claims', true)::jsonb->>'role'
+        AND (
+            actor_id = current_setting('request.jwt.claims', true)::jsonb->>'sub'
+            OR current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
+        )
     );
 
 -- Update: deny — audit records are immutable
