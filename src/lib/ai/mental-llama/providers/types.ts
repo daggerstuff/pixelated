@@ -43,7 +43,7 @@ export interface ChatCompletionOptions {
 export interface ChatCompletionResponseChoice {
   index?: number
   message: {
-    role: 'assistant' | string // Assistant role, but could be other strings for some models
+    role: string // Assistant role, but could be other strings for some models
     content: string | null
   }
   finish_reason?: string // e.g., 'stop', 'length', 'content_filter'
