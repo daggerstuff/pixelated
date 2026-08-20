@@ -474,7 +474,7 @@ export function createAuditLogEntry(
 }
 
 export function requiresAdditionalAuth(
-  dataType: "session-data" | "demographics" | string,
+  dataType: "session-data" | "demographics",
   role: string,
   sensitivity: "low" | "medium" | "high" | "critical",
 ) {

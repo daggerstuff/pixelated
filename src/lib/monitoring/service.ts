@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from "../logging/build-safe-logger";
+import { retry } from "../shared/retry";
 import type { MonitoringConfig } from "./config";
 import { getMonitoringConfig } from "./config";
 
@@ -264,32 +265,44 @@ export class MonitoringService {
         });
       }
 
-      // Send to Slack if configured
+      // Send to Slack if configured. External webhook writes are retried
+      // (shared base, src/lib/shared/retry.ts) so a transient Slack/network
+      // failure does not drop the alert. Non-ok responses throw so the retry
+      // wrapper treats them as failures; final failure stays logged only.
       if (this.config.alerts.slackWebhookUrl) {
-        await fetch(this.config.alerts.slackWebhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text: `*${type.toUpperCase()} ALERT*\n${data.message}`,
-            attachments: [
-              {
-                color: data.level === "error" ? "danger" : "warning",
-                fields: [
-                  {
-                    title: "Level",
-                    value: data.level,
-                    short: true,
-                  },
-                  {
-                    title: "Timestamp",
-                    value: new Date().toISOString(),
-                    short: true,
-                  },
-                ],
-              },
-            ],
-          }),
-        });
+        const webhookUrl = this.config.alerts.slackWebhookUrl;
+        await retry(async () => {
+          const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: `*${type.toUpperCase()} ALERT*\n${data.message}`,
+              attachments: [
+                {
+                  color: data.level === "error" ? "danger" : "warning",
+                  fields: [
+                    {
+                      title: "Level",
+                      value: data.level,
+                      short: true,
+                    },
+                    {
+                      title: "Timestamp",
+                      value: new Date().toISOString(),
+                      short: true,
+                    },
+                  ],
+                },
+              ],
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Slack webhook response: ${response.status} ${response.statusText}`,
+            );
+          }
+        }, 3, 1000);
       }
 
       // Send email if configured

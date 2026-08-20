@@ -1,24 +1,158 @@
-import { describe, it, expect, vi } from 'vitest';
-import { MemoryBridge } from './index.js';
+import { beforeEach, describe, it, expect, vi } from 'vitest'
+
+import { MemoryBridge } from './index.js'
+
+// The bridge constructs a Neon Client per query; swap the constructor for a
+// mock so retry paths can be exercised without a real database.
+const { mockClientConnect, mockClientQuery, mockClientEnd } = vi.hoisted(() => {
+  const mockClientConnect = vi.fn()
+  const mockClientQuery = vi.fn()
+  const mockClientEnd = vi.fn()
+  return { mockClientConnect, mockClientQuery, mockClientEnd }
+})
+
+vi.mock('@neondatabase/serverless', () => ({
+  Client: class {
+    connect = mockClientConnect
+    query = mockClientQuery
+    end = mockClientEnd
+  },
+}))
 
 describe('MemoryBridge', () => {
+  beforeEach(() => {
+    mockClientConnect.mockReset()
+    mockClientQuery.mockReset()
+    mockClientEnd.mockReset()
+  })
+
   it('assembles combined prompt context correctly', async () => {
     const bridge = new MemoryBridge({
       NEON_DATABASE_URL: '',
-      FORESIGHT_API_URL: 'http://localhost:8764'
-    });
+      FORESIGHT_API_URL: 'http://localhost:8764',
+    })
 
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         memories: [
-          { id: '1', content: 'Always prefer pnpm', category: 'preference' }
-        ]
-      })
-    } as any);
+          { id: '1', content: 'Always prefer pnpm', category: 'preference' },
+        ],
+      }),
+    } as any)
 
-    const context = await bridge.getContext('package manager preferences');
-    expect(context.foresightMemories).toHaveLength(1);
-    expect(context.combinedPromptContext).toContain('Always prefer pnpm');
-  });
-});
+    const context = await bridge.getContext('package manager preferences')
+    expect(context.foresightMemories).toHaveLength(1)
+    expect(context.combinedPromptContext).toContain('Always prefer pnpm')
+  })
+
+  describe('Foresight retry behavior', () => {
+    const okResponse = { ok: true, status: 200, json: async () => ({}) }
+    const errorResponse = { ok: false, status: 503, json: async () => ({}) }
+
+    it('retries transient Foresight failures and saves the memory', async () => {
+      const bridge = new MemoryBridge({
+        NEON_DATABASE_URL: '',
+        FORESIGHT_API_URL: 'http://localhost:8764',
+      })
+
+      const fetchMock = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('network blip'))
+        .mockResolvedValueOnce(errorResponse)
+        .mockResolvedValue(okResponse)
+      globalThis.fetch = fetchMock as any
+
+      const success = await bridge.saveMemory('durable memory', 'fact')
+
+      expect(success).toBe(true)
+      // Initial attempt + 2 retries
+      expect(fetchMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('returns false after exhausting Foresight retries', async () => {
+      const bridge = new MemoryBridge({
+        NEON_DATABASE_URL: '',
+        FORESIGHT_API_URL: 'http://localhost:8764',
+      })
+
+      const fetchMock = vi.fn().mockResolvedValue(errorResponse)
+      globalThis.fetch = fetchMock as any
+
+      const success = await bridge.saveMemory('lost memory', 'fact')
+
+      expect(success).toBe(false)
+      expect(fetchMock).toHaveBeenCalledTimes(3)
+    })
+
+    it('retries transient Foresight recall failures without dropping context', async () => {
+      const bridge = new MemoryBridge({
+        NEON_DATABASE_URL: '',
+        FORESIGHT_API_URL: 'http://localhost:8764',
+      })
+
+      const fetchMock = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('network blip'))
+        .mockResolvedValue({
+          ok: true,
+          status: 200,
+          json: async () => ({
+            memories: [{ id: '1', content: 'survived retry' }],
+          }),
+        })
+      globalThis.fetch = fetchMock as any
+
+      const context = await bridge.getContext('recall')
+
+      expect(context.foresightMemories).toHaveLength(1)
+      expect(fetchMock).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('Neon retry behavior', () => {
+    it('retries transient Neon query failures and returns thread messages', async () => {
+      const bridge = new MemoryBridge({
+        NEON_DATABASE_URL: 'postgres://test',
+        FORESIGHT_API_URL: '',
+      })
+
+      const row = {
+        id: '1',
+        thread_id: 't1',
+        role: 'user',
+        content: 'thread message',
+        created_at: '2026-01-01T00:00:00Z',
+      }
+      mockClientConnect.mockResolvedValue(undefined)
+      mockClientEnd.mockResolvedValue(undefined)
+      mockClientQuery
+        .mockRejectedValueOnce(new Error('connection reset'))
+        .mockResolvedValue({ rows: [row] })
+
+      const context = await bridge.getContext('recall', 't1')
+
+      expect(context.mastraThreadMessages).toHaveLength(1)
+      // Initial attempt + 1 retry; each attempt connects and closes
+      expect(mockClientQuery).toHaveBeenCalledTimes(2)
+      expect(mockClientConnect).toHaveBeenCalledTimes(2)
+      expect(mockClientEnd).toHaveBeenCalledTimes(2)
+    })
+
+    it('keeps going with empty thread context when Neon retries exhaust', async () => {
+      const bridge = new MemoryBridge({
+        NEON_DATABASE_URL: 'postgres://test',
+        FORESIGHT_API_URL: '',
+      })
+
+      mockClientConnect.mockResolvedValue(undefined)
+      mockClientEnd.mockResolvedValue(undefined)
+      mockClientQuery.mockRejectedValue(new Error('neon down'))
+
+      const context = await bridge.getContext('recall', 't1')
+
+      expect(context.mastraThreadMessages).toHaveLength(0)
+      expect(mockClientQuery).toHaveBeenCalledTimes(3)
+    })
+  })
+})

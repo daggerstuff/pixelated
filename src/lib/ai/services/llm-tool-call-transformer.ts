@@ -26,15 +26,15 @@ const toRecord = (value: unknown): Record<string, unknown> => {
   return value as Record<string, unknown>
 }
 
-const safeJsonParse = (value: string): unknown | null => {
+const safeJsonParse = (value: string): unknown => {
   try {
     return JSON.parse(value)
-  } catch (_error) {
+  } catch {
     return null
   }
 }
 
-const repairJsonString = (value: string): unknown | null => {
+const repairJsonString = (value: string): unknown => {
   if (value.length > TOOL_CALL_ARGS_MAX_LENGTH * 2) {
     return null
   }

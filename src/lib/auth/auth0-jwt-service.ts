@@ -21,6 +21,7 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+import { retry } from './utils'
 const logger = createBuildSafeLogger('auth0-jwt-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
@@ -176,14 +177,22 @@ async function getAuth0UserInfo(
     throw new AuthenticationError('Auth0 user info client not initialized')
   }
 
-  if (typeof auth0UserInfo.getUserInfo === 'function') {
-    return await auth0UserInfo.getUserInfo(accessToken)
-  }
-  if (typeof auth0UserInfo.getProfile === 'function') {
-    return await auth0UserInfo.getProfile(accessToken)
+  // Retry transient UserInfo failures so a single provider timeout on the
+  // refresh/validate path does not break the session.
+  const userClient = auth0UserInfo
+  const fetchUserInfo = () => {
+    if (typeof userClient.getUserInfo === 'function') {
+      return userClient.getUserInfo(accessToken)
+    }
+    if (typeof userClient.getProfile === 'function') {
+      return userClient.getProfile(accessToken)
+    }
+    return Promise.reject(
+      new AuthenticationError('Auth0 user info method not available'),
+    )
   }
 
-  throw new AuthenticationError('Auth0 user info method not available')
+  return await retry(fetchUserInfo, 2, 500)
 }
 
 export interface IdTokenPayload {
@@ -577,9 +586,15 @@ export async function refreshAccessToken(
     }
 
     // Exchange refresh token for new access token
-    const tokenResponse = await auth0Authentication.oauth.refreshTokenGrant({
-      refresh_token: refreshToken,
-    })
+    const client = auth0Authentication
+    const tokenResponse = await retry(
+      async () =>
+        await client.oauth.refreshTokenGrant({
+          refresh_token: refreshToken,
+        }),
+      2,
+      500,
+    )
     const tokenResponseData = toAuth0TokenResponse(tokenResponse.data)
     const accessToken =
       typeof tokenResponseData?.access_token === 'string'
