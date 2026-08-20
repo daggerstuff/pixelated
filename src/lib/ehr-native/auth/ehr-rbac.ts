@@ -188,6 +188,20 @@ export async function checkPermission(
         consentVerified: false,
       }
     }
+  } else if (requiresConsentCheck(permission)) {
+    logger.warn('Permission denied — consent required but no patient context', {
+      role,
+      permission,
+    })
+    return {
+      granted: false,
+      permission,
+      role,
+      reason:
+        'Permission requires patient consent, but no patient context was provided',
+      breakGlassActivated: false,
+      consentVerified: null,
+    }
   }
 
   // Permission granted

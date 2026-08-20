@@ -146,8 +146,11 @@ export interface ClinicalRoleDefinition {
   readonly displayName: string
   readonly description: string
   /**
-   * Hierarchy level — higher means more authority. Used for role inheritance:
-   * a role implicitly gains all permissions of roles at a lower level.
+   * Hierarchy level — higher means more authority. NOT used to compute
+   * permission inheritance. Permission inheritance is defined explicitly
+   * via the `inherits` arrays in `CLINICAL_ROLE_DEFINITIONS` and implemented
+   * in `role-permissions.ts`. `hierarchyLevel` is for secondary concerns
+   * such as sorting, display ordering, or UI grouping.
    */
   readonly hierarchyLevel: number
   /** Permissions explicitly granted to this role. */
