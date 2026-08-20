@@ -7,10 +7,15 @@
  * @see https://hl7.org/fhir/R4/http.html
  */
 
-import type { FHIRRequest, FHIRRequestContext, FHIRResourceType, FHIRResponse } from './types.js';
-import { isSupportedResourceType } from './validation.js';
-import { routeFHIRRequest } from './router.js';
-import { badRequest, unauthorized } from './error.js';
+import type {
+  FHIRRequest,
+  FHIRRequestContext,
+  FHIRResourceType,
+  FHIRResponse,
+} from './types.js'
+import { isSupportedResourceType } from './validation.js'
+import { routeFHIRRequest } from './router.js'
+import { badRequest, unauthorized } from './error.js'
 
 /**
  * Extract FHIR request context from HTTP headers.
@@ -23,36 +28,40 @@ import { badRequest, unauthorized } from './error.js';
  * - X-Break-Glass: 'true' if break-glass access is activated
  */
 function extractContext(headers: Headers): FHIRRequestContext | null {
-  const tenantId = headers.get('X-Tenant-Id');
-  const userId = headers.get('X-User-Id');
+  const tenantId = headers.get('X-Tenant-Id')
+  const userId = headers.get('X-User-Id')
 
   if (tenantId === null || userId === null) {
-    return null;
+    return null
   }
 
-  const role = headers.get('X-User-Role') ?? 'systemAdmin';
-  const breakGlass = headers.get('X-Break-Glass') === 'true';
+  const role = headers.get('X-User-Role') ?? 'systemAdmin'
+  const breakGlass = headers.get('X-Break-Glass') === 'true'
 
   // Parse JWT claims from Authorization header (if present)
-  let jwtClaims: Record<string, unknown> = { role, sub: userId, break_glass: breakGlass };
-  const authHeader = headers.get('Authorization');
+  let jwtClaims: Record<string, unknown> = {
+    role,
+    sub: userId,
+    break_glass: breakGlass,
+  }
+  const authHeader = headers.get('Authorization')
   if (authHeader !== null && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.slice(7);
+    const token = authHeader.slice(7)
     try {
       // Decode JWT payload (no verification — that's done by middleware)
-      const payload = token.split('.')[1];
+      const payload = token.split('.')[1]
       if (payload !== undefined) {
         const decoded = JSON.parse(
           Buffer.from(payload, 'base64').toString('utf-8'),
-        ) as Record<string, unknown>;
-        jwtClaims = { ...decoded, role, sub: userId, break_glass: breakGlass };
+        ) as Record<string, unknown>
+        jwtClaims = { ...decoded, role, sub: userId, break_glass: breakGlass }
       }
     } catch {
       // Invalid JWT — use default claims
     }
   }
 
-  return { tenantId, userId, role, breakGlass: breakGlass, jwtClaims };
+  return { tenantId, userId, role, breakGlass: breakGlass, jwtClaims }
 }
 
 /**
@@ -64,23 +73,26 @@ function extractContext(headers: Headers): FHIRRequestContext | null {
  * - /{ResourceType}/{id} → read, update, delete
  * - /{ResourceType}/{id}/_history → version history
  */
-function parsePath(
-  path: string,
-): {
-  isMetadata: boolean;
-  resourceType: string | null;
-  resourceId: string | null;
-  isHistory: boolean;
+function parsePath(path: string): {
+  isMetadata: boolean
+  resourceType: string | null
+  resourceId: string | null
+  isHistory: boolean
 } {
   // Remove leading/trailing slashes
-  const normalized = path.replace(/^\/+|\/+$/g, '');
+  const normalized = path.replace(/^\/+|\/+$/g, '')
 
   // Handle metadata
   if (normalized === 'metadata' || normalized === '$metadata') {
-    return { isMetadata: true, resourceType: null, resourceId: null, isHistory: false };
+    return {
+      isMetadata: true,
+      resourceType: null,
+      resourceId: null,
+      isHistory: false,
+    }
   }
 
-  const segments = normalized.split('/');
+  const segments = normalized.split('/')
 
   // /{ResourceType}
   if (segments.length === 1) {
@@ -89,7 +101,7 @@ function parsePath(
       resourceType: segments[0],
       resourceId: null,
       isHistory: false,
-    };
+    }
   }
 
   // /{ResourceType}/{id}
@@ -99,7 +111,7 @@ function parsePath(
       resourceType: segments[0],
       resourceId: segments[1],
       isHistory: false,
-    };
+    }
   }
 
   // /{ResourceType}/{id}/_history
@@ -109,7 +121,7 @@ function parsePath(
       resourceType: segments[0],
       resourceId: segments[1],
       isHistory: true,
-    };
+    }
   }
 
   // Unknown path pattern
@@ -118,7 +130,7 @@ function parsePath(
     resourceType: segments[0] ?? null,
     resourceId: segments[1] ?? null,
     isHistory: false,
-  };
+  }
 }
 
 /**
@@ -141,25 +153,25 @@ export async function handleFHIRRequest(
   baseUrl: string,
 ): Promise<FHIRResponse> {
   // 1. Extract request context from headers
-  const context = extractContext(headers);
+  const context = extractContext(headers)
   if (context === null) {
-    return unauthorized('Missing X-Tenant-Id or X-User-Id headers');
+    return unauthorized('Missing X-Tenant-Id or X-User-Id headers')
   }
 
   // 2. Parse path
-  const parsed = parsePath(path);
+  const parsed = parsePath(path)
 
   // 3. Validate resource type (if not metadata)
-  let resourceType: FHIRResourceType | null = null;
+  let resourceType: FHIRResourceType | null = null
   if (!parsed.isMetadata && parsed.resourceType !== null) {
     if (!isSupportedResourceType(parsed.resourceType)) {
-      return badRequest(`Unknown resource type: ${parsed.resourceType}`);
+      return badRequest(`Unknown resource type: ${parsed.resourceType}`)
     }
-    resourceType = parsed.resourceType;
+    resourceType = parsed.resourceType
   }
 
   // 4. Extract If-Match header
-  const ifMatch = headers.get('If-Match');
+  const ifMatch = headers.get('If-Match')
 
   // 5. Build FHIRRequest
   const fhirRequest: FHIRRequest = {
@@ -172,8 +184,8 @@ export async function handleFHIRRequest(
     body,
     ifMatch,
     context,
-  };
+  }
 
   // 6. Route and handle
-  return routeFHIRRequest(fhirRequest, baseUrl);
+  return routeFHIRRequest(fhirRequest, baseUrl)
 }

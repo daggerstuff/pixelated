@@ -13,28 +13,28 @@
  * - GET    /api/fhir/r4/{ResourceType}/{id}/_history → version history
  */
 
-import type { APIRoute } from 'astro';
+import type { APIRoute } from 'astro'
 
-export const prerender = false;
+export const prerender = false
 
-const ALL_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
+const ALL_METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const
 
 /**
  * Convert a FHIRResponse to a standard Response.
  */
 function toResponse(fhirResponse: {
-  status: number;
-  headers: Record<string, string>;
-  body: unknown;
+  status: number
+  headers: Record<string, string>
+  body: unknown
 }): Response {
-  const { status, headers, body } = fhirResponse;
+  const { status, headers, body } = fhirResponse
 
   // 204 No Content has no body
   if (status === 204) {
-    return new Response(null, { status, headers });
+    return new Response(null, { status, headers })
   }
 
-  return new Response(JSON.stringify(body), { status, headers });
+  return new Response(JSON.stringify(body), { status, headers })
 }
 
 /**
@@ -42,7 +42,7 @@ function toResponse(fhirResponse: {
  */
 const handler: APIRoute = async ({ request, url, params }) => {
   // Extract the catch-all path parameter
-  const pathParam = params['path'];
+  const pathParam = params['path']
 
   if (pathParam === undefined || pathParam === null) {
     return toResponse({
@@ -58,17 +58,17 @@ const handler: APIRoute = async ({ request, url, params }) => {
           },
         ],
       },
-    });
+    })
   }
 
   // Build the base URL for the FHIR server
-  const baseUrl = `${url.origin}/api/fhir/r4`;
+  const baseUrl = `${url.origin}/api/fhir/r4`
 
   // Parse body for POST/PUT
-  let body: unknown = null;
+  let body: unknown = null
   if (request.method === 'POST' || request.method === 'PUT') {
     try {
-      body = await request.json();
+      body = await request.json()
     } catch {
       return toResponse({
         status: 400,
@@ -83,12 +83,12 @@ const handler: APIRoute = async ({ request, url, params }) => {
             },
           ],
         },
-      });
+      })
     }
   }
 
   // Build headers object (only pass through needed headers)
-  const headers = new Headers();
+  const headers = new Headers()
   const passThroughHeaders = [
     'x-tenant-id',
     'x-user-id',
@@ -98,16 +98,16 @@ const handler: APIRoute = async ({ request, url, params }) => {
     'if-match',
     'content-type',
     'accept',
-  ];
+  ]
   for (const h of passThroughHeaders) {
-    const value = request.headers.get(h);
+    const value = request.headers.get(h)
     if (value !== null) {
-      headers.set(h, value);
+      headers.set(h, value)
     }
   }
 
   // Delegate to FHIR R4 server
-  const { handleFHIRRequest } = await import('@/lib/ehr-native/fhir/server.js');
+  const { handleFHIRRequest } = await import('@/lib/ehr-native/fhir/server.js')
 
   const fhirResponse = await handleFHIRRequest(
     request.method,
@@ -116,13 +116,13 @@ const handler: APIRoute = async ({ request, url, params }) => {
     headers,
     body,
     baseUrl,
-  );
+  )
 
-  return toResponse(fhirResponse);
-};
+  return toResponse(fhirResponse)
+}
 
 // Export handlers for each method (Astro requires individual exports)
-export const GET = handler;
-export const POST = handler;
-export const PUT = handler;
-export const DELETE = handler;
+export const GET = handler
+export const POST = handler
+export const PUT = handler
+export const DELETE = handler

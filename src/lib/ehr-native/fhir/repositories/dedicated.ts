@@ -11,102 +11,179 @@
  * RLS is enforced via `buildRlsSettings()` session variables.
  */
 
-import { query } from '@/lib/db';
-import type { FHIRRequestContext, FHIRResourceType } from '../types.js';
-import { RESOURCE_TABLE_MAP, RESOURCE_PK_MAP } from '../types.js';
-import { buildRlsSettings } from './generic.js';
+import { query } from '@/lib/db'
+import type { FHIRRequestContext, FHIRResourceType } from '../types.js'
+import { RESOURCE_TABLE_MAP, RESOURCE_PK_MAP } from '../types.js'
+import { buildRlsSettings } from './generic.js'
 
 /** Extracted column values per resource type from the FHIR resource. */
 export function extractColumns(
   resourceType: FHIRResourceType,
   resource: Record<string, unknown>,
 ): Record<string, unknown> {
-  const extractors: Partial<Record<FHIRResourceType, (r: Record<string, unknown>) => Record<string, unknown>>> = {
+  const extractors: Partial<
+    Record<
+      FHIRResourceType,
+      (r: Record<string, unknown>) => Record<string, unknown>
+    >
+  > = {
     Patient: (r) => ({
       mrn: (r['identifier'] as Array<{ value?: string }>)?.[0]?.value ?? null,
       active: r['active'] ?? true,
-      family_name: (r['name'] as Array<{ family?: string }>)?.[0]?.family ?? null,
-      given_name: (r['name'] as Array<{ given?: string[] }>)?.[0]?.given?.[0] ?? null,
+      family_name:
+        (r['name'] as Array<{ family?: string }>)?.[0]?.family ?? null,
+      given_name:
+        (r['name'] as Array<{ given?: string[] }>)?.[0]?.given?.[0] ?? null,
       birth_date: r['birthDate'] ?? null,
       gender: r['gender'] ?? null,
     }),
     Practitioner: (r) => ({
       npi: (r['identifier'] as Array<{ value?: string }>)?.[0]?.value ?? null,
       active: r['active'] ?? true,
-      name: (r['name'] as Array<{ text?: string }>)?.[0]?.text ??
-        ([((r['name'] as Array<{ family?: string; given?: string[] }>)?.[0]?.given?.[0]) ?? '',
-         ((r['name'] as Array<{ family?: string }>)?.[0]?.family) ?? ''].filter(Boolean).join(' ') || null),
+      name:
+        (r['name'] as Array<{ text?: string }>)?.[0]?.text ??
+        ([
+          (r['name'] as Array<{ family?: string; given?: string[] }>)?.[0]
+            ?.given?.[0] ?? '',
+          (r['name'] as Array<{ family?: string }>)?.[0]?.family ?? '',
+        ]
+          .filter(Boolean)
+          .join(' ') ||
+          null),
     }),
     Encounter: (r) => ({
-      patient_id: (r['subject'] as { reference?: string })?.reference?.replace('Patient/', '') ?? null,
-      practitioner_id: (r['participant'] as Array<{ individual?: { reference?: string } }>)?.[0]?.individual?.reference?.replace('Practitioner/', '') ?? null,
+      patient_id:
+        (r['subject'] as { reference?: string })?.reference?.replace(
+          'Patient/',
+          '',
+        ) ?? null,
+      practitioner_id:
+        (
+          r['participant'] as Array<{ individual?: { reference?: string } }>
+        )?.[0]?.individual?.reference?.replace('Practitioner/', '') ?? null,
       status: r['status'] ?? 'planned',
       class: (r['class'] as { code?: string })?.code ?? null,
       period_start: (r['period'] as { start?: string })?.start ?? null,
       period_end: (r['period'] as { end?: string })?.end ?? null,
     }),
     Observation: (r) => ({
-      patient_id: (r['subject'] as { reference?: string })?.reference?.replace('Patient/', '') ?? null,
-      encounter_id: (r['encounter'] as { reference?: string })?.reference?.replace('Encounter/', '') ?? null,
+      patient_id:
+        (r['subject'] as { reference?: string })?.reference?.replace(
+          'Patient/',
+          '',
+        ) ?? null,
+      encounter_id:
+        (r['encounter'] as { reference?: string })?.reference?.replace(
+          'Encounter/',
+          '',
+        ) ?? null,
       status: r['status'] ?? 'final',
-      code: (r['code'] as { coding?: Array<{ code?: string }> })?.coding?.[0]?.code ?? null,
-      effective_date: (r['effectiveDateTime'] as string) ?? (r['effectiveDate'] as string) ?? null,
+      code:
+        (r['code'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
+          ?.code ?? null,
+      effective_date:
+        (r['effectiveDateTime'] as string) ??
+        (r['effectiveDate'] as string) ??
+        null,
     }),
     Appointment: (r) => ({
-      patient_id: (r['participant'] as Array<{ actor?: { reference?: string } }>)?.[0]?.actor?.reference?.replace('Patient/', '') ?? null,
-      practitioner_id: (r['participant'] as Array<{ actor?: { reference?: string } }>)?.[1]?.actor?.reference?.replace('Practitioner/', '') ?? null,
+      patient_id:
+        (
+          r['participant'] as Array<{ actor?: { reference?: string } }>
+        )?.[0]?.actor?.reference?.replace('Patient/', '') ?? null,
+      practitioner_id:
+        (
+          r['participant'] as Array<{ actor?: { reference?: string } }>
+        )?.[1]?.actor?.reference?.replace('Practitioner/', '') ?? null,
       status: r['status'] ?? 'proposed',
       start_time: r['start'] ?? null,
       end_time: r['end'] ?? null,
     }),
     DocumentReference: (r) => ({
-      patient_id: (r['subject'] as { reference?: string })?.reference?.replace('Patient/', '') ?? null,
+      patient_id:
+        (r['subject'] as { reference?: string })?.reference?.replace(
+          'Patient/',
+          '',
+        ) ?? null,
       status: r['status'] ?? 'current',
-      type: (r['type'] as { coding?: Array<{ code?: string }> })?.coding?.[0]?.code ?? null,
+      type:
+        (r['type'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
+          ?.code ?? null,
       created_date: r['created'] ?? new Date().toISOString(),
     }),
     Claim: (r) => ({
-      patient_id: (r['patient'] as { reference?: string })?.reference?.replace('Patient/', '') ?? null,
-      encounter_id: (r['encounter'] as { reference?: string })?.reference?.replace('Encounter/', '') ?? null,
+      patient_id:
+        (r['patient'] as { reference?: string })?.reference?.replace(
+          'Patient/',
+          '',
+        ) ?? null,
+      encounter_id:
+        (r['encounter'] as { reference?: string })?.reference?.replace(
+          'Encounter/',
+          '',
+        ) ?? null,
       status: r['status'] ?? 'active',
       total: r['total'] ?? null,
       created_date: r['created'] ?? new Date().toISOString(),
     }),
     Consent: (r) => ({
-      patient_id: (r['patient'] as { reference?: string })?.reference?.replace('Patient/', '') ?? null,
+      patient_id:
+        (r['patient'] as { reference?: string })?.reference?.replace(
+          'Patient/',
+          '',
+        ) ?? null,
       status: r['status'] ?? 'active',
-      scope: (r['scope'] as { coding?: Array<{ code?: string }> })?.coding?.[0]?.code ?? null,
-      category: (r['category'] as Array<{ coding?: Array<{ code?: string }> }>)?.[0]?.coding?.[0]?.code ?? null,
+      scope:
+        (r['scope'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
+          ?.code ?? null,
+      category:
+        (r['category'] as Array<{ coding?: Array<{ code?: string }> }>)?.[0]
+          ?.coding?.[0]?.code ?? null,
       consent_level: 'minimal',
       period_start: (r['period'] as { start?: string })?.start ?? null,
       period_end: (r['period'] as { end?: string })?.end ?? null,
     }),
     ServiceRequest: (r) => ({
-      patient_id: (r['subject'] as { reference?: string })?.reference?.replace('Patient/', '') ?? null,
-      practitioner_id: (r['requester'] as { reference?: string })?.reference?.replace('Practitioner/', '') ?? null,
+      patient_id:
+        (r['subject'] as { reference?: string })?.reference?.replace(
+          'Patient/',
+          '',
+        ) ?? null,
+      practitioner_id:
+        (r['requester'] as { reference?: string })?.reference?.replace(
+          'Practitioner/',
+          '',
+        ) ?? null,
       status: r['status'] ?? 'active',
       intent: r['intent'] ?? 'order',
-      category: (r['category'] as Array<{ coding?: Array<{ code?: string }> }>)?.[0]?.coding?.[0]?.code ?? null,
-      code: (r['code'] as { coding?: Array<{ code?: string }> })?.coding?.[0]?.code ?? null,
+      category:
+        (r['category'] as Array<{ coding?: Array<{ code?: string }> }>)?.[0]
+          ?.coding?.[0]?.code ?? null,
+      code:
+        (r['code'] as { coding?: Array<{ code?: string }> })?.coding?.[0]
+          ?.code ?? null,
     }),
-  };
+  }
 
-  const extractor = extractors[resourceType];
-  return extractor ? extractor(resource) : {};
+  const extractor = extractors[resourceType]
+  return extractor ? extractor(resource) : {}
 }
 
 /** Build SET clause for extracted columns. */
-function buildSetClause(columns: Record<string, unknown>): { clause: string; values: unknown[] } {
-  const entries = Object.entries(columns).filter(([, v]) => v !== undefined);
+function buildSetClause(columns: Record<string, unknown>): {
+  clause: string
+  values: unknown[]
+} {
+  const entries = Object.entries(columns).filter(([, v]) => v !== undefined)
   if (entries.length === 0) {
-    return { clause: '', values: [] };
+    return { clause: '', values: [] }
   }
 
-  const parts = entries.map(([key], idx) => `${key} = $${idx + 1}`);
+  const parts = entries.map(([key], idx) => `${key} = $${idx + 1}`)
   return {
     clause: parts.join(', '),
     values: entries.map(([, v]) => v),
-  };
+  }
 }
 
 /** Create a resource in a dedicated table. */
@@ -116,23 +193,27 @@ export async function createDedicatedResource(
   resourceId: string,
   fhirResource: Record<string, unknown>,
 ): Promise<Record<string, unknown> | null> {
-  const table = RESOURCE_TABLE_MAP[resourceType];
-  const pk = RESOURCE_PK_MAP[resourceType];
-  const rls = buildRlsSettings(ctx);
-  const extracted = extractColumns(resourceType, fhirResource);
+  const table = RESOURCE_TABLE_MAP[resourceType]
+  const pk = RESOURCE_PK_MAP[resourceType]
+  const rls = buildRlsSettings(ctx)
+  const extracted = extractColumns(resourceType, fhirResource)
 
-  const columnParts: string[] = [pk, 'tenant_id', 'fhir_resource'];
-  const valueParts: string[] = ['$1', '$2', '$3'];
-  const values: unknown[] = [resourceId, ctx.tenantId, JSON.stringify(fhirResource)];
+  const columnParts: string[] = [pk, 'tenant_id', 'fhir_resource']
+  const valueParts: string[] = ['$1', '$2', '$3']
+  const values: unknown[] = [
+    resourceId,
+    ctx.tenantId,
+    JSON.stringify(fhirResource),
+  ]
 
   // Add extracted columns
-  let paramIdx = 4;
+  let paramIdx = 4
   for (const [key, value] of Object.entries(extracted)) {
     if (value !== undefined) {
-      columnParts.push(key);
-      valueParts.push(`$${paramIdx}`);
-      values.push(value);
-      paramIdx++;
+      columnParts.push(key)
+      valueParts.push(`$${paramIdx}`)
+      values.push(value)
+      paramIdx++
     }
   }
 
@@ -141,15 +222,18 @@ export async function createDedicatedResource(
     INSERT INTO ${table} (${columnParts.join(', ')})
     VALUES (${valueParts.join(', ')})
     RETURNING fhir_resource;
-  `;
+  `
 
-  const result = await query<{ fhir_resource: Record<string, unknown> }>(sql, values);
+  const result = await query<{ fhir_resource: Record<string, unknown> }>(
+    sql,
+    values,
+  )
 
   if (result.rows.length === 0) {
-    return null;
+    return null
   }
 
-  return result.rows[0].fhir_resource;
+  return result.rows[0].fhir_resource
 }
 
 /** Read a resource from a dedicated table. */
@@ -157,33 +241,38 @@ export async function readDedicatedResource(
   ctx: FHIRRequestContext,
   resourceType: FHIRResourceType,
   resourceId: string,
-): Promise<{ resource: Record<string, unknown>; updatedAt: string; active: boolean } | null> {
-  const table = RESOURCE_TABLE_MAP[resourceType];
-  const pk = RESOURCE_PK_MAP[resourceType];
-  const rls = buildRlsSettings(ctx);
+): Promise<{
+  resource: Record<string, unknown>
+  updatedAt: string
+  active: boolean
+} | null> {
+  const table = RESOURCE_TABLE_MAP[resourceType]
+  const pk = RESOURCE_PK_MAP[resourceType]
+  const rls = buildRlsSettings(ctx)
 
   const sql = `
     ${rls};
     SELECT fhir_resource, updated_at, active
     FROM ${table}
     WHERE ${pk} = $1 AND tenant_id = $2;
-  `;
+  `
 
-  const result = await query<{ fhir_resource: Record<string, unknown>; updated_at: string; active: boolean }>(sql, [
-    resourceId,
-    ctx.tenantId,
-  ]);
+  const result = await query<{
+    fhir_resource: Record<string, unknown>
+    updated_at: string
+    active: boolean
+  }>(sql, [resourceId, ctx.tenantId])
 
   if (result.rows.length === 0) {
-    return null;
+    return null
   }
 
-  const row = result.rows[0];
+  const row = result.rows[0]
   return {
     resource: row.fhir_resource,
     updatedAt: row.updated_at,
     active: row.active,
-  };
+  }
 }
 
 /** Update a resource in a dedicated table. */
@@ -193,20 +282,24 @@ export async function updateDedicatedResource(
   resourceId: string,
   fhirResource: Record<string, unknown>,
 ): Promise<Record<string, unknown> | null> {
-  const table = RESOURCE_TABLE_MAP[resourceType];
-  const pk = RESOURCE_PK_MAP[resourceType];
-  const rls = buildRlsSettings(ctx);
-  const extracted = extractColumns(resourceType, fhirResource);
+  const table = RESOURCE_TABLE_MAP[resourceType]
+  const pk = RESOURCE_PK_MAP[resourceType]
+  const rls = buildRlsSettings(ctx)
+  const extracted = extractColumns(resourceType, fhirResource)
 
-  const setParts: string[] = ['fhir_resource = $3', 'updated_at = now()'];
-  const values: unknown[] = [resourceId, ctx.tenantId, JSON.stringify(fhirResource)];
+  const setParts: string[] = ['fhir_resource = $3', 'updated_at = now()']
+  const values: unknown[] = [
+    resourceId,
+    ctx.tenantId,
+    JSON.stringify(fhirResource),
+  ]
 
-  let paramIdx = 4;
+  let paramIdx = 4
   for (const [key, value] of Object.entries(extracted)) {
     if (value !== undefined) {
-      setParts.push(`${key} = $${paramIdx}`);
-      values.push(value);
-      paramIdx++;
+      setParts.push(`${key} = $${paramIdx}`)
+      values.push(value)
+      paramIdx++
     }
   }
 
@@ -216,15 +309,18 @@ export async function updateDedicatedResource(
     SET ${setParts.join(', ')}
     WHERE ${pk} = $1 AND tenant_id = $2
     RETURNING fhir_resource;
-  `;
+  `
 
-  const result = await query<{ fhir_resource: Record<string, unknown> }>(sql, values);
+  const result = await query<{ fhir_resource: Record<string, unknown> }>(
+    sql,
+    values,
+  )
 
   if (result.rows.length === 0) {
-    return null;
+    return null
   }
 
-  return result.rows[0].fhir_resource;
+  return result.rows[0].fhir_resource
 }
 
 /** Soft-delete a resource in a dedicated table. */
@@ -234,9 +330,9 @@ export async function softDeleteDedicatedResource(
   resourceId: string,
   fhirResource: Record<string, unknown>,
 ): Promise<boolean> {
-  const table = RESOURCE_TABLE_MAP[resourceType];
-  const pk = RESOURCE_PK_MAP[resourceType];
-  const rls = buildRlsSettings(ctx);
+  const table = RESOURCE_TABLE_MAP[resourceType]
+  const pk = RESOURCE_PK_MAP[resourceType]
+  const rls = buildRlsSettings(ctx)
 
   const sql = `
     ${rls};
@@ -244,15 +340,15 @@ export async function softDeleteDedicatedResource(
     SET active = false, fhir_resource = $3, updated_at = now()
     WHERE ${pk} = $1 AND tenant_id = $2
     RETURNING ${pk};
-  `;
+  `
 
   const result = await query<{ [key: string]: string }>(sql, [
     resourceId,
     ctx.tenantId,
     JSON.stringify(fhirResource),
-  ]);
+  ])
 
-  return result.rows.length > 0;
+  return result.rows.length > 0
 }
 
 /** Search resources in a dedicated table. */
@@ -261,30 +357,30 @@ export async function searchDedicatedResources(
   resourceType: FHIRResourceType,
   searchParams: URLSearchParams,
 ): Promise<{ resources: Record<string, unknown>[]; total: number }> {
-  const table = RESOURCE_TABLE_MAP[resourceType];
-  const pk = RESOURCE_PK_MAP[resourceType];
-  const rls = buildRlsSettings(ctx);
-  const count = parseInt(searchParams.get('_count') ?? '20', 10);
-  const offset = parseInt(searchParams.get('_offset') ?? '0', 10);
-  const limitedCount = Math.min(Math.max(count, 0), 100);
-  const limitedOffset = Math.max(offset, 0);
+  const table = RESOURCE_TABLE_MAP[resourceType]
+  const pk = RESOURCE_PK_MAP[resourceType]
+  const rls = buildRlsSettings(ctx)
+  const count = parseInt(searchParams.get('_count') ?? '20', 10)
+  const offset = parseInt(searchParams.get('_offset') ?? '0', 10)
+  const limitedCount = Math.min(Math.max(count, 0), 100)
+  const limitedOffset = Math.max(offset, 0)
 
-  let whereClause = `WHERE tenant_id = $1`;
-  const params: unknown[] = [ctx.tenantId];
-  let paramIdx = 2;
+  let whereClause = `WHERE tenant_id = $1`
+  const params: unknown[] = [ctx.tenantId]
+  let paramIdx = 2
 
-  const idParam = searchParams.get('_id');
+  const idParam = searchParams.get('_id')
   if (idParam) {
-    whereClause += ` AND ${pk} = $${paramIdx}`;
-    params.push(idParam);
-    paramIdx++;
+    whereClause += ` AND ${pk} = $${paramIdx}`
+    params.push(idParam)
+    paramIdx++
   }
 
-  const activeParam = searchParams.get('active');
+  const activeParam = searchParams.get('active')
   if (activeParam !== null) {
-    whereClause += ` AND active = $${paramIdx}`;
-    params.push(activeParam === 'true');
-    paramIdx++;
+    whereClause += ` AND active = $${paramIdx}`
+    params.push(activeParam === 'true')
+    paramIdx++
   }
 
   const sql = `
@@ -294,14 +390,18 @@ export async function searchDedicatedResources(
     ${whereClause}
     ORDER BY created_at DESC
     LIMIT ${limitedCount} OFFSET ${limitedOffset};
-  `;
+  `
 
-  const result = await query<{ fhir_resource: Record<string, unknown>; total_count: string }>(sql, params);
+  const result = await query<{
+    fhir_resource: Record<string, unknown>
+    total_count: string
+  }>(sql, params)
 
-  const total = result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0;
-  const resources = result.rows.map((row) => row.fhir_resource);
+  const total =
+    result.rows.length > 0 ? parseInt(result.rows[0].total_count, 10) : 0
+  const resources = result.rows.map((row) => row.fhir_resource)
 
-  return { resources, total };
+  return { resources, total }
 }
 
 /** Get version history from the dedicated audit_history table. */
@@ -309,27 +409,33 @@ export async function getDedicatedResourceHistory(
   ctx: FHIRRequestContext,
   resourceType: FHIRResourceType,
   resourceId: string,
-): Promise<Array<{ resource: Record<string, unknown>; timestamp: string; action: string }>> {
-  const rls = buildRlsSettings(ctx);
+): Promise<
+  Array<{
+    resource: Record<string, unknown>
+    timestamp: string
+    action: string
+  }>
+> {
+  const rls = buildRlsSettings(ctx)
   const sql = `
     ${rls};
     SELECT fhir_resource, timestamp, action
     FROM ehr_audit_history
     WHERE resource_type = $1 AND resource_id = $2 AND tenant_id = $3
     ORDER BY timestamp DESC;
-  `;
+  `
 
-  const result = await query<{ fhir_resource: Record<string, unknown>; timestamp: string; action: string }>(sql, [
-    resourceType,
-    resourceId,
-    ctx.tenantId,
-  ]);
+  const result = await query<{
+    fhir_resource: Record<string, unknown>
+    timestamp: string
+    action: string
+  }>(sql, [resourceType, resourceId, ctx.tenantId])
 
   return result.rows.map((row) => ({
     resource: row.fhir_resource,
     timestamp: row.timestamp,
     action: row.action,
-  }));
+  }))
 }
 
 /** Insert a history entry into the dedicated audit_history table. */
@@ -340,12 +446,12 @@ export async function insertDedicatedResourceHistory(
   action: string,
   fhirResource: Record<string, unknown>,
 ): Promise<void> {
-  const rls = buildRlsSettings(ctx);
+  const rls = buildRlsSettings(ctx)
   const sql = `
     ${rls};
     INSERT INTO ehr_audit_history (tenant_id, resource_type, resource_id, action, actor_id, actor_role, timestamp, fhir_resource)
     VALUES ($1, $2, $3, $4, $5, $6, now(), $7);
-  `;
+  `
 
   await query(sql, [
     ctx.tenantId,
@@ -355,5 +461,5 @@ export async function insertDedicatedResourceHistory(
     ctx.userId,
     ctx.role,
     JSON.stringify(fhirResource),
-  ]);
+  ])
 }

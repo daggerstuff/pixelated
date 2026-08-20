@@ -5,7 +5,7 @@
  * context, resource type registry, and response helpers.
  */
 
-import type { z } from 'zod';
+import type { z } from 'zod'
 
 /** Supported FHIR R4 resource types. */
 export type FHIRResourceType =
@@ -31,7 +31,7 @@ export type FHIRResourceType =
   | 'Communication'
   | 'CommunicationRequest'
   | 'Consent'
-  | 'ServiceRequest';
+  | 'ServiceRequest'
 
 /** All 23 supported resource types. */
 export const SUPPORTED_RESOURCE_TYPES: readonly FHIRResourceType[] = [
@@ -58,7 +58,7 @@ export const SUPPORTED_RESOURCE_TYPES: readonly FHIRResourceType[] = [
   'CommunicationRequest',
   'Consent',
   'ServiceRequest',
-] as const;
+] as const
 
 /** Resource types with dedicated database tables (migration 015). */
 export const DEDICATED_TABLE_RESOURCES: readonly FHIRResourceType[] = [
@@ -71,7 +71,7 @@ export const DEDICATED_TABLE_RESOURCES: readonly FHIRResourceType[] = [
   'Claim',
   'Consent',
   'ServiceRequest',
-] as const;
+] as const
 
 /** Map of FHIR resource type → database table name. */
 export const RESOURCE_TABLE_MAP: Record<FHIRResourceType, string> = {
@@ -98,7 +98,7 @@ export const RESOURCE_TABLE_MAP: Record<FHIRResourceType, string> = {
   ExplanationOfBenefit: 'ehr_resource',
   Communication: 'ehr_resource',
   CommunicationRequest: 'ehr_resource',
-};
+}
 
 /** Map of FHIR resource type → primary key column name in the DB table. */
 export const RESOURCE_PK_MAP: Record<FHIRResourceType, string> = {
@@ -125,46 +125,46 @@ export const RESOURCE_PK_MAP: Record<FHIRResourceType, string> = {
   ExplanationOfBenefit: 'resource_id',
   Communication: 'resource_id',
   CommunicationRequest: 'resource_id',
-};
+}
 
 /** Request context extracted from the incoming HTTP request. */
 export interface FHIRRequestContext {
   /** Tenant ID from JWT or session. */
-  tenantId: string;
+  tenantId: string
   /** User ID from JWT. */
-  userId: string;
+  userId: string
   /** Clinical role from JWT. */
-  role: string;
+  role: string
   /** Whether break-glass access is activated. */
-  breakGlass: boolean;
+  breakGlass: boolean
   /** Raw JWT claims. */
-  jwtClaims: Record<string, unknown>;
+  jwtClaims: Record<string, unknown>
 }
 
 /** Parsed FHIR request. */
 export interface FHIRRequest {
   /** HTTP method. */
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   /** Resource type (e.g. "Patient"). */
-  resourceType: FHIRResourceType | null;
+  resourceType: FHIRResourceType | null
   /** Resource ID (for instance-level operations). */
-  resourceId: string | null;
+  resourceId: string | null
   /** Whether this is a _history request. */
-  isHistory: boolean;
+  isHistory: boolean
   /** Whether this is a metadata (CapabilityStatement) request. */
-  isMetadata: boolean;
+  isMetadata: boolean
   /** Search/query parameters from the URL. */
-  searchParams: URLSearchParams;
+  searchParams: URLSearchParams
   /** Request body (for POST/PUT). */
-  body: unknown;
+  body: unknown
   /** If-Match header value (for optimistic concurrency). */
-  ifMatch: string | null;
+  ifMatch: string | null
   /** Request context (tenant, user, role). */
-  context: FHIRRequestContext;
+  context: FHIRRequestContext
 }
 
 /** FHIR R4 OperationOutcome issue severity. */
-export type IssueSeverity = 'fatal' | 'error' | 'warning' | 'information';
+export type IssueSeverity = 'fatal' | 'error' | 'warning' | 'information'
 
 /** FHIR R4 OperationOutcome issue code. */
 export type IssueCode =
@@ -198,47 +198,47 @@ export type IssueCode =
   | 'timeout'
   | 'incomplete'
   | 'throttled'
-  | 'informational';
+  | 'informational'
 
 /** FHIR R4 OperationOutcome. */
 export interface OperationOutcome {
-  resourceType: 'OperationOutcome';
-  id?: string;
+  resourceType: 'OperationOutcome'
+  id?: string
   issue: Array<{
-    severity: IssueSeverity;
-    code: IssueCode;
-    diagnostics?: string;
-    details?: { text: string };
-    expression?: string[];
-  }>;
+    severity: IssueSeverity
+    code: IssueCode
+    diagnostics?: string
+    details?: { text: string }
+    expression?: string[]
+  }>
 }
 
 /** FHIR R4 Bundle. */
 export interface FHIRBundle {
-  resourceType: 'Bundle';
-  type: 'searchset' | 'history' | 'batch-response' | 'transaction-response';
-  total?: number;
+  resourceType: 'Bundle'
+  type: 'searchset' | 'history' | 'batch-response' | 'transaction-response'
+  total?: number
   entry: Array<{
-    fullUrl?: string;
-    resource?: Record<string, unknown>;
-    request?: { method: string; url: string };
-    response?: { status: string; etag?: string; lastModified?: string };
-  }>;
-  link?: Array<{ relation: string; url: string }>;
+    fullUrl?: string
+    resource?: Record<string, unknown>
+    request?: { method: string; url: string }
+    response?: { status: string; etag?: string; lastModified?: string }
+  }>
+  link?: Array<{ relation: string; url: string }>
 }
 
 /** Resource registry entry: maps resource type to its zod schema and table. */
 export interface ResourceRegistryEntry {
-  resourceType: FHIRResourceType;
-  schema: z.ZodType<Record<string, unknown>>;
-  table: string;
-  pkColumn: string;
-  isGeneric: boolean;
+  resourceType: FHIRResourceType
+  schema: z.ZodType<Record<string, unknown>>
+  table: string
+  pkColumn: string
+  isGeneric: boolean
 }
 
 /** Result of a FHIR operation. */
 export interface FHIRResponse {
-  status: number;
-  headers: Record<string, string>;
-  body: OperationOutcome | FHIRBundle | Record<string, unknown>;
+  status: number
+  headers: Record<string, string>
+  body: OperationOutcome | FHIRBundle | Record<string, unknown>
 }

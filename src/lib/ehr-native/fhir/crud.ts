@@ -6,18 +6,18 @@
  * @see https://hl7.org/fhir/R4/http.html
  */
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto'
 
 import type {
   FHIRRequestContext,
   FHIRResourceType,
   FHIRResponse,
-} from './types.js';
+} from './types.js'
 import {
   validateResource,
   validateResourceType,
   RESOURCE_REGISTRY,
-} from './validation.js';
+} from './validation.js'
 import {
   createDedicatedResource,
   readDedicatedResource,
@@ -29,7 +29,7 @@ import {
   softDeleteGenericResource,
   insertDedicatedResourceHistory,
   insertGenericResourceHistory,
-} from './repositories/index.js';
+} from './repositories/index.js'
 import {
   badRequest,
   conflict,
@@ -38,8 +38,8 @@ import {
   notFound,
   preconditionFailed,
   unprocessableEntity,
-} from './error.js';
-import { AuditEventType } from '@/lib/audit';
+} from './error.js'
+import { AuditEventType } from '@/lib/audit'
 
 /**
  * Permission mapping: FHIR resource type → required EHR permission.
@@ -68,7 +68,7 @@ const READ_PERMISSION_MAP: Partial<Record<FHIRResourceType, string>> = {
   CommunicationRequest: 'read_clinical_note',
   Consent: 'manage_consent',
   ServiceRequest: 'read_encounter',
-};
+}
 
 const WRITE_PERMISSION_MAP: Partial<Record<FHIRResourceType, string>> = {
   Patient: 'write_patient',
@@ -93,20 +93,22 @@ const WRITE_PERMISSION_MAP: Partial<Record<FHIRResourceType, string>> = {
   CommunicationRequest: 'write_clinical_note',
   Consent: 'manage_consent',
   ServiceRequest: 'write_encounter',
-};
+}
 
 /**
  * Get the FHIR permission for a read operation on a resource type.
  */
 function getReadPermission(resourceType: FHIRResourceType): string | undefined {
-  return READ_PERMISSION_MAP[resourceType];
+  return READ_PERMISSION_MAP[resourceType]
 }
 
 /**
  * Get the FHIR permission for a write operation on a resource type.
  */
-function getWritePermission(resourceType: FHIRResourceType): string | undefined {
-  return WRITE_PERMISSION_MAP[resourceType];
+function getWritePermission(
+  resourceType: FHIRResourceType,
+): string | undefined {
+  return WRITE_PERMISSION_MAP[resourceType]
 }
 
 /**
@@ -114,7 +116,7 @@ function getWritePermission(resourceType: FHIRResourceType): string | undefined 
  * Format: "W/{version}" (weak ETag per FHIR R4).
  */
 function generateETag(resourceId: string, version: string): string {
-  return `W/"${resourceId}"`;
+  return `W/"${resourceId}"`
 }
 
 /**
@@ -122,9 +124,9 @@ function generateETag(resourceId: string, version: string): string {
  */
 function generateLastModified(updatedAt: string): string {
   try {
-    return new Date(updatedAt).toUTCString();
+    return new Date(updatedAt).toUTCString()
   } catch {
-    return new Date().toUTCString();
+    return new Date().toUTCString()
   }
 }
 
@@ -143,28 +145,26 @@ export async function createResource(
 ): Promise<FHIRResponse> {
   try {
     // 1. Validate resourceType field in body
-    const typeCheck = validateResourceType(resourceType, body);
+    const typeCheck = validateResourceType(resourceType, body)
     if (!typeCheck.valid) {
-      return unprocessableEntity(
-        typeCheck.error ?? 'Resource type mismatch',
-      );
+      return unprocessableEntity(typeCheck.error ?? 'Resource type mismatch')
     }
 
     // 2. Zod schema validation
-    const validation = validateResource(resourceType, body);
+    const validation = validateResource(resourceType, body)
     if (!validation.success || validation.data === undefined) {
-      const issues = validation.error?.issues ?? [];
-      const message = issues.map((i) => `${i.path}: ${i.message}`).join('; ');
+      const issues = validation.error?.issues ?? []
+      const message = issues.map((i) => `${i.path}: ${i.message}`).join('; ')
       return unprocessableEntity(
         message || 'Validation failed',
         issues.map((i) => i.path),
-      );
+      )
     }
 
-    const validatedResource = validation.data;
+    const validatedResource = validation.data
 
     // 3. Check write permission
-    const permission = getWritePermission(resourceType);
+    const permission = getWritePermission(resourceType)
     if (permission !== undefined && context.role !== 'systemAdmin') {
       // Permission check is handled by RLS at DB level; no programmatic check here.
       // The RLS policies enforce both tenant isolation and role-based access.
@@ -172,12 +172,12 @@ export async function createResource(
 
     // 4. Generate resource ID if not present
     const resourceId =
-      (validatedResource['id'] as string | undefined) ?? randomUUID();
-    validatedResource['id'] = resourceId;
+      (validatedResource['id'] as string | undefined) ?? randomUUID()
+    validatedResource['id'] = resourceId
 
     // 5. Persist to database
-    const registry = RESOURCE_REGISTRY[resourceType];
-    let persistedResource: Record<string, unknown> | null;
+    const registry = RESOURCE_REGISTRY[resourceType]
+    let persistedResource: Record<string, unknown> | null
 
     if (registry.isGeneric) {
       persistedResource = await createGenericResource(
@@ -185,18 +185,18 @@ export async function createResource(
         resourceType,
         resourceId,
         validatedResource,
-      );
+      )
     } else {
       persistedResource = await createDedicatedResource(
         context,
         resourceType,
         resourceId,
         validatedResource,
-      );
+      )
     }
 
     if (persistedResource === null) {
-      return internalServerError('Failed to persist resource');
+      return internalServerError('Failed to persist resource')
     }
 
     // 6. Insert history entry
@@ -207,7 +207,7 @@ export async function createResource(
         resourceId,
         'create',
         persistedResource,
-      );
+      )
     } else {
       await insertDedicatedResourceHistory(
         context,
@@ -215,7 +215,7 @@ export async function createResource(
         resourceId,
         'create',
         persistedResource,
-      );
+      )
     }
 
     // 7. Return 201 Created with Location header
@@ -223,14 +223,14 @@ export async function createResource(
       status: 201,
       headers: {
         'Content-Type': 'application/fhir+json',
-        Location: `${baseUrl}/${resourceType}/${resourceId}`,
-        ETag: generateETag(resourceId, '1'),
+        'Location': `${baseUrl}/${resourceType}/${resourceId}`,
+        'ETag': generateETag(resourceId, '1'),
       },
       body: persistedResource,
-    };
+    }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Create failed';
-    return internalServerError(message);
+    const message = err instanceof Error ? err.message : 'Create failed'
+    return internalServerError(message)
   }
 }
 
@@ -247,17 +247,21 @@ export async function readResource(
   context: FHIRRequestContext,
 ): Promise<FHIRResponse> {
   try {
-    const registry = RESOURCE_REGISTRY[resourceType];
-    let result: { resource: Record<string, unknown>; updatedAt: string; active: boolean } | null;
+    const registry = RESOURCE_REGISTRY[resourceType]
+    let result: {
+      resource: Record<string, unknown>
+      updatedAt: string
+      active: boolean
+    } | null
 
     if (registry.isGeneric) {
-      result = await readGenericResource(context, resourceType, resourceId);
+      result = await readGenericResource(context, resourceType, resourceId)
     } else {
-      result = await readDedicatedResource(context, resourceType, resourceId);
+      result = await readDedicatedResource(context, resourceType, resourceId)
     }
 
     if (result === null) {
-      return notFound(resourceType, resourceId);
+      return notFound(resourceType, resourceId)
     }
 
     // If soft-deleted (active=false), return 410 Gone per FHIR convention
@@ -275,21 +279,21 @@ export async function readResource(
             },
           ],
         },
-      };
+      }
     }
 
     return {
       status: 200,
       headers: {
         'Content-Type': 'application/fhir+json',
-        ETag: generateETag(resourceId, '1'),
+        'ETag': generateETag(resourceId, '1'),
         'Last-Modified': generateLastModified(result.updatedAt),
       },
       body: result.resource,
-    };
+    }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Read failed';
-    return internalServerError(message);
+    const message = err instanceof Error ? err.message : 'Read failed'
+    return internalServerError(message)
   }
 }
 
@@ -309,80 +313,82 @@ export async function updateResource(
 ): Promise<FHIRResponse> {
   try {
     // 1. Validate resourceType field in body
-    const typeCheck = validateResourceType(resourceType, body);
+    const typeCheck = validateResourceType(resourceType, body)
     if (!typeCheck.valid) {
-      return unprocessableEntity(
-        typeCheck.error ?? 'Resource type mismatch',
-      );
+      return unprocessableEntity(typeCheck.error ?? 'Resource type mismatch')
     }
 
     // 2. Zod schema validation
-    const validation = validateResource(resourceType, body);
+    const validation = validateResource(resourceType, body)
     if (!validation.success || validation.data === undefined) {
-      const issues = validation.error?.issues ?? [];
-      const message = issues.map((i) => `${i.path}: ${i.message}`).join('; ');
+      const issues = validation.error?.issues ?? []
+      const message = issues.map((i) => `${i.path}: ${i.message}`).join('; ')
       return unprocessableEntity(
         message || 'Validation failed',
         issues.map((i) => i.path),
-      );
+      )
     }
 
-    const validatedResource = validation.data;
+    const validatedResource = validation.data
 
     // 3. Ensure id in body matches path id
-    const bodyId = validatedResource['id'];
+    const bodyId = validatedResource['id']
     if (bodyId !== undefined && bodyId !== resourceId) {
-      return conflict('Resource id in body does not match path id');
+      return conflict('Resource id in body does not match path id')
     }
-    validatedResource['id'] = resourceId;
+    validatedResource['id'] = resourceId
 
     // 4. Check If-Match for optimistic concurrency
     // If-Match format: W/"{version}" or "{version}"
     // We check that the resource exists; a full version-tracking implementation
     // would compare the version number. For now, we enforce that If-Match is present
     // when provided and the resource must exist.
-    const registry = RESOURCE_REGISTRY[resourceType];
-    let existing: { resource: Record<string, unknown>; updatedAt: string; active: boolean } | null;
+    const registry = RESOURCE_REGISTRY[resourceType]
+    let existing: {
+      resource: Record<string, unknown>
+      updatedAt: string
+      active: boolean
+    } | null
 
     if (registry.isGeneric) {
-      existing = await readGenericResource(context, resourceType, resourceId);
+      existing = await readGenericResource(context, resourceType, resourceId)
     } else {
-      existing = await readDedicatedResource(context, resourceType, resourceId);
+      existing = await readDedicatedResource(context, resourceType, resourceId)
     }
 
     if (existing === null) {
       // If resource doesn't exist and If-Match is provided, return 412
       // Otherwise, PUT can create (upsert) per FHIR R4
       if (ifMatch !== null) {
-        return preconditionFailed('Resource not found for update');
+        return preconditionFailed('Resource not found for update')
       }
       // Upsert: create the resource
-      return createResource(resourceType, validatedResource, context, '');
+      return createResource(resourceType, validatedResource, context, '')
     }
 
     // If-Match check: if provided, resource must exist (already checked above)
     // Full implementation would compare version numbers from ETag
 
     // 5. Persist update
-    let updatedResource: Record<string, unknown> | null;
+    let updatedResource: Record<string, unknown> | null
     if (registry.isGeneric) {
       updatedResource = await updateGenericResource(
         context,
         resourceType,
         resourceId,
         validatedResource,
-      );
+      )
     } else {
       updatedResource = await updateDedicatedResource(
         context,
         resourceType,
         resourceId,
         validatedResource,
-      );
+      )
     }
 
     if (updatedResource === null) {
-      return internalServerError('Failed to update resource');
+      return internalServerError('Failed to update resource')
     }
 
     // 6. Insert history entry
@@ -393,7 +399,7 @@ export async function updateResource(
         resourceId,
         'update',
         updatedResource,
-      );
+      )
     } else {
       await insertDedicatedResourceHistory(
         context,
@@ -401,21 +407,21 @@ export async function updateResource(
         resourceId,
         'update',
         updatedResource,
-      );
+      )
     }
 
     return {
       status: 200,
       headers: {
         'Content-Type': 'application/fhir+json',
-        ETag: generateETag(resourceId, '1'),
+        'ETag': generateETag(resourceId, '1'),
         'Last-Modified': generateLastModified(new Date().toISOString()),
       },
       body: updatedResource,
-    };
+    }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Update failed';
-    return internalServerError(message);
+    const message = err instanceof Error ? err.message : 'Update failed'
+    return internalServerError(message)
   }
 }
 
@@ -432,18 +438,22 @@ export async function deleteResource(
   context: FHIRRequestContext,
 ): Promise<FHIRResponse> {
   try {
-    const registry = RESOURCE_REGISTRY[resourceType];
+    const registry = RESOURCE_REGISTRY[resourceType]
 
     // Check if resource exists first
-    let existing: { resource: Record<string, unknown>; updatedAt: string; active: boolean } | null;
+    let existing: {
+      resource: Record<string, unknown>
+      updatedAt: string
+      active: boolean
+    } | null
     if (registry.isGeneric) {
-      existing = await readGenericResource(context, resourceType, resourceId);
+      existing = await readGenericResource(context, resourceType, resourceId)
     } else {
-      existing = await readDedicatedResource(context, resourceType, resourceId);
+      existing = await readDedicatedResource(context, resourceType, resourceId)
     }
 
     if (existing === null) {
-      return notFound(resourceType, resourceId);
+      return notFound(resourceType, resourceId)
     }
 
     if (!existing.active) {
@@ -452,33 +462,33 @@ export async function deleteResource(
         status: 204,
         headers: {},
         body: {},
-      };
+      }
     }
 
     // Soft delete: set active=false and update fhir_resource
-    let success: boolean;
+    let success: boolean
     if (registry.isGeneric) {
       success = await softDeleteGenericResource(
         context,
         resourceType,
         resourceId,
         existing.resource,
-      );
+      )
     } else {
       success = await softDeleteDedicatedResource(
         context,
         resourceType,
         resourceId,
         existing.resource,
-      );
+      )
     }
 
     if (!success) {
-      return internalServerError('Failed to delete resource');
+      return internalServerError('Failed to delete resource')
     }
 
     // Insert history entry
-    const deletedResource = { ...existing.resource, active: false };
+    const deletedResource = { ...existing.resource, active: false }
     if (registry.isGeneric) {
       await insertGenericResourceHistory(
         context,
@@ -486,7 +496,7 @@ export async function deleteResource(
         resourceId,
         'delete',
         deletedResource,
-      );
+      )
     } else {
       await insertDedicatedResourceHistory(
         context,
@@ -494,16 +504,16 @@ export async function deleteResource(
         resourceId,
         'delete',
         deletedResource,
-      );
+      )
     }
 
     return {
       status: 204,
       headers: {},
       body: {},
-    };
+    }
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Delete failed';
-    return internalServerError(message);
+    const message = err instanceof Error ? err.message : 'Delete failed'
+    return internalServerError(message)
   }
 }

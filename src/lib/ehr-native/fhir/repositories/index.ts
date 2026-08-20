@@ -11,7 +11,7 @@ export {
   searchGenericResources,
   getGenericResourceHistory,
   insertGenericResourceHistory,
-} from './generic.js';
+} from './generic.js'
 
 export {
   createDedicatedResource,
@@ -21,4 +21,4 @@ export {
   searchDedicatedResources,
   getDedicatedResourceHistory,
   insertDedicatedResourceHistory,
-} from './dedicated.js';
+} from './dedicated.js'

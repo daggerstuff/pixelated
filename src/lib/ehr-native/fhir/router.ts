@@ -4,13 +4,18 @@
  * Routes incoming FHIRRequest to the appropriate CRUD, search, or history handler.
  */
 
-import type { FHIRRequest, FHIRResourceType, FHIRResponse } from './types.js';
-import { isSupportedResourceType } from './validation.js';
-import { badRequest, notFound, notImplemented } from './error.js';
-import { createResource, readResource, updateResource, deleteResource } from './crud.js';
-import { searchResources } from './search.js';
-import { getResourceHistory } from './history.js';
-import { capabilityStatementResponse } from './capability-statement.js';
+import type { FHIRRequest, FHIRResourceType, FHIRResponse } from './types.js'
+import { isSupportedResourceType } from './validation.js'
+import { badRequest, notFound, notImplemented } from './error.js'
+import {
+  createResource,
+  readResource,
+  updateResource,
+  deleteResource,
+} from './crud.js'
+import { searchResources } from './search.js'
+import { getResourceHistory } from './history.js'
+import { capabilityStatementResponse } from './capability-statement.js'
 
 /**
  * Handle a FHIR R4 request by routing to the appropriate handler.
@@ -25,32 +30,35 @@ export async function routeFHIRRequest(
 ): Promise<FHIRResponse> {
   // Handle metadata (CapabilityStatement)
   if (request.isMetadata) {
-    return capabilityStatementResponse(baseUrl);
+    return capabilityStatementResponse(baseUrl)
   }
 
   // Validate resource type
-  if (request.resourceType === null || !isSupportedResourceType(request.resourceType)) {
+  if (
+    request.resourceType === null ||
+    !isSupportedResourceType(request.resourceType)
+  ) {
     return badRequest(
       `Unknown resource type: ${request.resourceType ?? 'none'}`,
-    );
+    )
   }
 
-  const resourceType = request.resourceType;
+  const resourceType = request.resourceType
 
   // Handle history endpoint: GET /{ResourceType}/{id}/_history
   if (request.isHistory) {
     if (request.method !== 'GET') {
-      return badRequest('Only GET is supported for history endpoints');
+      return badRequest('Only GET is supported for history endpoints')
     }
     if (request.resourceId === null) {
-      return badRequest('Resource ID is required for history');
+      return badRequest('Resource ID is required for history')
     }
     return getResourceHistory(
       resourceType,
       request.resourceId,
       request.context,
       baseUrl,
-    );
+    )
   }
 
   // Route by HTTP method
@@ -59,28 +67,33 @@ export async function routeFHIRRequest(
       // GET /{ResourceType}/{id} — read
       // GET /{ResourceType}?search — search
       if (request.resourceId !== null) {
-        return readResource(resourceType, request.resourceId, request.context);
+        return readResource(resourceType, request.resourceId, request.context)
       }
       return searchResources(
         resourceType,
         request.searchParams,
         request.context,
         baseUrl,
-      );
+      )
     }
 
     case 'POST': {
       // POST /{ResourceType} — create
       if (request.resourceId !== null) {
-        return badRequest('POST to a specific resource ID is not supported');
+        return badRequest('POST to a specific resource ID is not supported')
       }
-      return createResource(resourceType, request.body, request.context, baseUrl);
+      return createResource(
+        resourceType,
+        request.body,
+        request.context,
+        baseUrl,
+      )
     }
 
     case 'PUT': {
       // PUT /{ResourceType}/{id} — update
       if (request.resourceId === null) {
-        return badRequest('PUT requires a resource ID');
+        return badRequest('PUT requires a resource ID')
       }
       return updateResource(
         resourceType,
@@ -88,19 +101,19 @@ export async function routeFHIRRequest(
         request.body,
         request.context,
         request.ifMatch,
-      );
+      )
     }
 
     case 'DELETE': {
       // DELETE /{ResourceType}/{id} — soft delete
       if (request.resourceId === null) {
-        return badRequest('DELETE requires a resource ID');
+        return badRequest('DELETE requires a resource ID')
       }
-      return deleteResource(resourceType, request.resourceId, request.context);
+      return deleteResource(resourceType, request.resourceId, request.context)
     }
 
     default: {
-      return notImplemented(`HTTP method ${request.method} is not supported`);
+      return notImplemented(`HTTP method ${request.method} is not supported`)
     }
   }
 }

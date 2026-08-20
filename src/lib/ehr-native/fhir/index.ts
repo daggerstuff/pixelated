@@ -5,10 +5,10 @@
  */
 
 // Server entry point
-export { handleFHIRRequest } from './server.js';
+export { handleFHIRRequest } from './server.js'
 
 // Router
-export { routeFHIRRequest } from './router.js';
+export { routeFHIRRequest } from './router.js'
 
 // CRUD operations
 export {
@@ -16,19 +16,19 @@ export {
   readResource,
   updateResource,
   deleteResource,
-} from './crud.js';
+} from './crud.js'
 
 // Search
-export { searchResources } from './search.js';
+export { searchResources } from './search.js'
 
 // History
-export { getResourceHistory } from './history.js';
+export { getResourceHistory } from './history.js'
 
 // CapabilityStatement
 export {
   generateCapabilityStatement,
   capabilityStatementResponse,
-} from './capability-statement.js';
+} from './capability-statement.js'
 
 // Validation
 export {
@@ -38,7 +38,7 @@ export {
   getRegistryEntry,
   RESOURCE_REGISTRY,
   SCHEMA_REGISTRY,
-} from './validation.js';
+} from './validation.js'
 
 // Error helpers
 export {
@@ -52,7 +52,7 @@ export {
   unprocessableEntity,
   internalServerError,
   notImplemented,
-} from './error.js';
+} from './error.js'
 
 // Types (re-export from types.ts)
 export type {
@@ -65,7 +65,7 @@ export type {
   IssueSeverity,
   IssueCode,
   ResourceRegistryEntry,
-} from './types.js';
+} from './types.js'
 
 // Repository functions (for advanced use)
 export {
@@ -77,7 +77,7 @@ export {
   searchGenericResources,
   getGenericResourceHistory,
   insertGenericResourceHistory,
-} from './repositories/generic.js';
+} from './repositories/generic.js'
 
 export {
   extractColumns,
@@ -88,4 +88,4 @@ export {
   searchDedicatedResources,
   getDedicatedResourceHistory,
   insertDedicatedResourceHistory,
-} from './repositories/dedicated.js';
+} from './repositories/dedicated.js'
