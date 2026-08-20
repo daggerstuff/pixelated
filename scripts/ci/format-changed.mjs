@@ -25,6 +25,7 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "src/types/index.ts",
   "tests/unit/auth0/auth0-jwt-service.test.ts",
   "packages/sdk-typescript/src/runtime.ts",
+  "src/lib/ehr-native/fhir/capability-statement.ts",
 ]);
 
 const OXFMT_APPLICABLE_EXTENSIONS = new Set([".js", ".ts", ".mjs", ".cjs", ".mts", ".cts"]);
