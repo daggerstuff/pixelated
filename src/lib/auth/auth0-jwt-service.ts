@@ -21,6 +21,7 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+import { retry } from './utils'
 const logger = createBuildSafeLogger('auth0-jwt-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
@@ -577,9 +578,14 @@ export async function refreshAccessToken(
     }
 
     // Exchange refresh token for new access token
-    const tokenResponse = await auth0Authentication.oauth.refreshTokenGrant({
-      refresh_token: refreshToken,
-    })
+    const client = auth0Authentication
+    const tokenResponse = await retry(
+      async () => await client.oauth.refreshTokenGrant({
+        refresh_token: refreshToken,
+      }),
+      2,
+      500,
+    )
     const tokenResponseData = toAuth0TokenResponse(tokenResponse.data)
     const accessToken =
       typeof tokenResponseData?.access_token === 'string'
