@@ -60,7 +60,8 @@ function extractColumns(
           (r["name"] as Array<{ family?: string }>)?.[0]?.family ?? "",
         ]
           .filter(Boolean)
-          .join(" ") || null),
+          .join(" ") ||
+          null),
     }),
     Encounter: (r) => ({
       patient_id: extractFhirId(
@@ -84,17 +85,17 @@ function extractColumns(
         (r["encounter"] as { reference?: string })?.reference ?? undefined,
       ),
       status: r["status"] ?? "final",
-      code: (r["code"] as { coding?: Array<{ code?: string }> })?.coding?.[0]
-        ?.code ?? null,
+      code:
+        (r["code"] as { coding?: Array<{ code?: string }> })?.coding?.[0]
+          ?.code ?? null,
       effective_date:
         (r["effectiveDateTime"] as string) ??
         (r["effectiveDate"] as string) ??
         null,
     }),
     Appointment: (r) => {
-      const participants = (
-        r["participant"] as Array<{ actor?: { reference?: string } }>
-      ) ?? [];
+      const participants =
+        (r["participant"] as Array<{ actor?: { reference?: string } }>) ?? [];
       let patientId: string | null = null;
       let practitionerId: string | null = null;
       for (const p of participants) {
@@ -161,8 +162,9 @@ function extractColumns(
       category:
         (r["category"] as Array<{ coding?: Array<{ code?: string }> }>)?.[0]
           ?.coding?.[0]?.code ?? null,
-      code: (r["code"] as { coding?: Array<{ code?: string }> })?.coding?.[0]
-        ?.code ?? null,
+      code:
+        (r["code"] as { coding?: Array<{ code?: string }> })?.coding?.[0]
+          ?.code ?? null,
     }),
   };
 
