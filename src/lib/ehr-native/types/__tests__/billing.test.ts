@@ -112,16 +112,14 @@ describe('claimSchema', () => {
   })
   it('validates all status enum values', () => {
     for (const status of ['active', 'cancelled', 'draft', 'entered-in-error']) {
-      expect(
-        claimSchema.safeParse({ ...validClaim, status }).success,
-      ).toBe(true)
+      expect(claimSchema.safeParse({ ...validClaim, status }).success).toBe(
+        true,
+      )
     }
   })
   it('validates all use enum values', () => {
     for (const use of ['claim', 'preauthorization', 'predetermination']) {
-      expect(
-        claimSchema.safeParse({ ...validClaim, use }).success,
-      ).toBe(true)
+      expect(claimSchema.safeParse({ ...validClaim, use }).success).toBe(true)
     }
   })
 })

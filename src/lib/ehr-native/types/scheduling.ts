@@ -6,7 +6,7 @@
  * @see http://hl7.org/fhir/R4/slot.html
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 import {
   fhirBaseSchema,
@@ -22,7 +22,7 @@ import {
   fhirUrlSchema,
   fhirBooleanSchema,
   fhirPeriodSchema,
-} from './base';
+} from './base'
 
 // ---------------------------------------------------------------------------
 // Appointment
@@ -38,20 +38,20 @@ export const appointmentStatusSchema = z.enum([
   'entered-in-error',
   'checked-in',
   'waitlist',
-]);
+])
 
 export const appointmentParticipantStatusSchema = z.enum([
   'accepted',
   'declined',
   'tentative',
   'needs-action',
-]);
+])
 
 export const appointmentParticipantRequiredSchema = z.enum([
   'required',
   'optional',
   'information-only',
-]);
+])
 
 export const appointmentParticipantSchema = z.object({
   type: fhirCodeableConceptSchema.array().optional(),
@@ -59,7 +59,7 @@ export const appointmentParticipantSchema = z.object({
   required: appointmentParticipantRequiredSchema.optional(),
   status: appointmentParticipantStatusSchema,
   period: fhirPeriodSchema.optional(),
-});
+})
 
 export const appointmentSchema = fhirBaseSchema.extend({
   resourceType: z.literal('Appointment'),
@@ -84,10 +84,12 @@ export const appointmentSchema = fhirBaseSchema.extend({
   patientInstruction: fhirStringSchema.optional(),
   basedOn: fhirReferenceSchema.array().optional(),
   participant: appointmentParticipantSchema.array().min(1),
-});
+})
 
-export type Appointment = z.infer<typeof appointmentSchema>;
-export type AppointmentParticipant = z.infer<typeof appointmentParticipantSchema>;
+export type Appointment = z.infer<typeof appointmentSchema>
+export type AppointmentParticipant = z.infer<
+  typeof appointmentParticipantSchema
+>
 
 // ---------------------------------------------------------------------------
 // AppointmentResponse
@@ -98,7 +100,7 @@ export const appointmentResponseStatusSchema = z.enum([
   'declined',
   'tentative',
   'needs-action',
-]);
+])
 
 export const appointmentResponseSchema = fhirBaseSchema.extend({
   resourceType: z.literal('AppointmentResponse'),
@@ -110,9 +112,9 @@ export const appointmentResponseSchema = fhirBaseSchema.extend({
   actor: fhirReferenceSchema.optional(),
   participantStatus: appointmentResponseStatusSchema,
   comment: fhirStringSchema.optional(),
-});
+})
 
-export type AppointmentResponse = z.infer<typeof appointmentResponseSchema>;
+export type AppointmentResponse = z.infer<typeof appointmentResponseSchema>
 
 // ---------------------------------------------------------------------------
 // Schedule
@@ -128,9 +130,9 @@ export const scheduleSchema = fhirBaseSchema.extend({
   actor: fhirReferenceSchema.array().min(1),
   planningHorizon: fhirPeriodSchema.optional(),
   comment: fhirStringSchema.optional(),
-});
+})
 
-export type Schedule = z.infer<typeof scheduleSchema>;
+export type Schedule = z.infer<typeof scheduleSchema>
 
 // ---------------------------------------------------------------------------
 // Slot
@@ -142,7 +144,7 @@ export const slotStatusSchema = z.enum([
   'busy-unavailable',
   'busy-tentative',
   'entered-in-error',
-]);
+])
 
 export const slotSchema = fhirBaseSchema.extend({
   resourceType: z.literal('Slot'),
@@ -158,6 +160,6 @@ export const slotSchema = fhirBaseSchema.extend({
   serviceType: fhirCodeableConceptSchema.array().optional(),
   specialty: fhirCodeableConceptSchema.array().optional(),
   appointmentTypeCode: fhirCodeSchema.optional(),
-});
+})
 
-export type Slot = z.infer<typeof slotSchema>;
+export type Slot = z.infer<typeof slotSchema>

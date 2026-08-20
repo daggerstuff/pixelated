@@ -9,7 +9,7 @@
  * @see http://hl7.org/fhir/R4/
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirBaseSchema,
   fhirCodeSchema,
@@ -23,7 +23,7 @@ import {
   fhirUrlSchema,
   fhirInstantSchema,
   fhirBooleanSchema,
-} from './base.js';
+} from './base.js'
 
 // ---------------------------------------------------------------------------
 // DocumentReference
@@ -33,28 +33,25 @@ export const documentReferenceStatusSchema = z.enum([
   'current',
   'superseded',
   'entered-in-error',
-]);
+])
 
 export const documentReferenceDocStatusSchema = z.enum([
   'preliminary',
   'final',
   'amended',
   'entered-in-error',
-]);
+])
 
-export const documentReferenceModeSchema = z.enum([
-  'source',
-  'target',
-]);
+export const documentReferenceModeSchema = z.enum(['source', 'target'])
 
 export const documentReferenceAttesterModeSchema = z.enum([
   'personal',
   'professional',
   'legal',
   'official',
-]);
+])
 
-export const documentReferenceFormatCodesSchema = fhirCodeSchema;
+export const documentReferenceFormatCodesSchema = fhirCodeSchema
 
 export const documentReferenceContentSchema = z.object({
   attachment: z.object({
@@ -75,23 +72,18 @@ export const documentReferenceContentSchema = z.object({
       display: fhirStringSchema.optional(),
     })
     .optional(),
-});
+})
 
 export const documentReferenceAttesterSchema = z.object({
   mode: documentReferenceAttesterModeSchema,
   time: fhirDateTimeSchema.optional(),
   party: fhirReferenceSchema.optional(),
-});
+})
 
 export const documentReferenceRelatesToSchema = z.object({
-  code: z.enum([
-    'replaces',
-    'transforms',
-    'signs',
-    'appends',
-  ]),
+  code: z.enum(['replaces', 'transforms', 'signs', 'appends']),
   target: fhirReferenceSchema,
-});
+})
 
 export const documentReferenceContextSchema = z.object({
   encounter: fhirReferenceSchema.optional(),
@@ -107,7 +99,7 @@ export const documentReferenceContextSchema = z.object({
     })
     .array()
     .optional(),
-});
+})
 
 export const documentReferenceSchema = fhirBaseSchema.extend({
   resourceType: z.literal('DocumentReference'),
@@ -127,9 +119,9 @@ export const documentReferenceSchema = fhirBaseSchema.extend({
   securityLabel: fhirCodeableConceptSchema.array().optional(),
   content: documentReferenceContentSchema.array(),
   context: documentReferenceContextSchema.optional(),
-});
+})
 
-export type DocumentReference = z.infer<typeof documentReferenceSchema>;
+export type DocumentReference = z.infer<typeof documentReferenceSchema>
 
 // ---------------------------------------------------------------------------
 // Communication
@@ -144,45 +136,48 @@ export const communicationStatusSchema = z.enum([
   'completed',
   'entered-in-error',
   'unknown',
-]);
+])
 
 export const communicationStatusReasonSchema = z.enum([
   'on-hold',
   'stopped',
   'not-done',
-]);
+])
 
 export const communicationPrioritySchema = z.enum([
   'routine',
   'urgent',
   'asap',
   'stat',
-]);
+])
 
-export const communicationPayloadSchema = z.object({
-  contentString: fhirStringSchema.optional(),
-  contentAttachment: z
-    .object({
-      contentType: fhirCodeSchema.optional(),
-      language: fhirCodeSchema.optional(),
-      data: fhirStringSchema.optional(),
-      url: fhirUrlSchema.optional(),
-      size: fhirStringSchema.optional(),
-      hash: fhirStringSchema.optional(),
-      title: fhirStringSchema.optional(),
-      creation: fhirDateTimeSchema.optional(),
-    })
-    .optional(),
-  contentReference: fhirReferenceSchema.optional(),
-}).refine(
-  (payload) =>
-    payload.contentString !== undefined ||
-    payload.contentAttachment !== undefined ||
-    payload.contentReference !== undefined,
-  {
-    message: 'At least one content field must be present in Communication.payload',
-  },
-);
+export const communicationPayloadSchema = z
+  .object({
+    contentString: fhirStringSchema.optional(),
+    contentAttachment: z
+      .object({
+        contentType: fhirCodeSchema.optional(),
+        language: fhirCodeSchema.optional(),
+        data: fhirStringSchema.optional(),
+        url: fhirUrlSchema.optional(),
+        size: fhirStringSchema.optional(),
+        hash: fhirStringSchema.optional(),
+        title: fhirStringSchema.optional(),
+        creation: fhirDateTimeSchema.optional(),
+      })
+      .optional(),
+    contentReference: fhirReferenceSchema.optional(),
+  })
+  .refine(
+    (payload) =>
+      payload.contentString !== undefined ||
+      payload.contentAttachment !== undefined ||
+      payload.contentReference !== undefined,
+    {
+      message:
+        'At least one content field must be present in Communication.payload',
+    },
+  )
 
 export const communicationSchema = fhirBaseSchema.extend({
   resourceType: z.literal('Communication'),
@@ -217,9 +212,9 @@ export const communicationSchema = fhirBaseSchema.extend({
     })
     .array()
     .optional(),
-});
+})
 
-export type Communication = z.infer<typeof communicationSchema>;
+export type Communication = z.infer<typeof communicationSchema>
 
 // ---------------------------------------------------------------------------
 // CommunicationRequest
@@ -233,32 +228,35 @@ export const communicationRequestStatusSchema = z.enum([
   'completed',
   'entered-in-error',
   'unknown',
-]);
+])
 
-export const communicationRequestPayloadSchema = z.object({
-  contentString: fhirStringSchema.optional(),
-  contentAttachment: z
-    .object({
-      contentType: fhirCodeSchema.optional(),
-      language: fhirCodeSchema.optional(),
-      data: fhirStringSchema.optional(),
-      url: fhirUrlSchema.optional(),
-      size: fhirStringSchema.optional(),
-      hash: fhirStringSchema.optional(),
-      title: fhirStringSchema.optional(),
-      creation: fhirDateTimeSchema.optional(),
-    })
-    .optional(),
-  contentReference: fhirReferenceSchema.optional(),
-}).refine(
-  (payload) =>
-    payload.contentString !== undefined ||
-    payload.contentAttachment !== undefined ||
-    payload.contentReference !== undefined,
-  {
-    message: 'At least one content field must be present in CommunicationRequest.payload',
-  },
-);
+export const communicationRequestPayloadSchema = z
+  .object({
+    contentString: fhirStringSchema.optional(),
+    contentAttachment: z
+      .object({
+        contentType: fhirCodeSchema.optional(),
+        language: fhirCodeSchema.optional(),
+        data: fhirStringSchema.optional(),
+        url: fhirUrlSchema.optional(),
+        size: fhirStringSchema.optional(),
+        hash: fhirStringSchema.optional(),
+        title: fhirStringSchema.optional(),
+        creation: fhirDateTimeSchema.optional(),
+      })
+      .optional(),
+    contentReference: fhirReferenceSchema.optional(),
+  })
+  .refine(
+    (payload) =>
+      payload.contentString !== undefined ||
+      payload.contentAttachment !== undefined ||
+      payload.contentReference !== undefined,
+    {
+      message:
+        'At least one content field must be present in CommunicationRequest.payload',
+    },
+  )
 
 export const communicationRequestSchema = fhirBaseSchema.extend({
   resourceType: z.literal('CommunicationRequest'),
@@ -293,6 +291,6 @@ export const communicationRequestSchema = fhirBaseSchema.extend({
     })
     .array()
     .optional(),
-});
+})
 
-export type CommunicationRequest = z.infer<typeof communicationRequestSchema>;
+export type CommunicationRequest = z.infer<typeof communicationRequestSchema>

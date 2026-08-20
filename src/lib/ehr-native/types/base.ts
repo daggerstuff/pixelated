@@ -50,9 +50,7 @@ export const fhirUuidSchema = z.string().uuid()
  * FHIR date: YYYY, YYYY-MM, or YYYY-MM-DD
  * Per R4: a partial date is allowed
  */
-export const fhirDateSchema = z
-  .string()
-  .regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
+export const fhirDateSchema = z.string().regex(/^\d{4}(-\d{2}(-\d{2})?)?$/)
 
 /**
  * FHIR dateTime: YYYY, YYYY-MM, YYYY-MM-DD, or full ISO-8601 datetime
@@ -67,9 +65,7 @@ export const fhirDateTimeSchema = z
 /** FHIR instant: full ISO-8601 datetime with required timezone */
 export const fhirInstantSchema = z
   .string()
-  .regex(
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/,
-  )
+  .regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/)
 
 /** FHIR time: HH:MM:SS */
 export const fhirTimeSchema = z.string().regex(/^\d{2}:\d{2}:\d{2}(\.\d+)?$/)
@@ -226,12 +222,7 @@ export type FHIRIdentifier = z.infer<typeof fhirIdentifierSchema>
 // FHIRQuantity
 // ---------------------------------------------------------------------------
 
-export const fhirQuantityComparatorSchema = z.enum([
-  '<',
-  '<=',
-  '>=',
-  '>',
-])
+export const fhirQuantityComparatorSchema = z.enum(['<', '<=', '>=', '>'])
 
 export const fhirQuantitySchema = z.object({
   value: fhirDecimalSchema.optional(),
@@ -363,11 +354,7 @@ export const fhirAddressUseSchema = z.enum([
   'billing',
 ])
 
-export const fhirAddressTypeSchema = z.enum([
-  'postal',
-  'physical',
-  'both',
-])
+export const fhirAddressTypeSchema = z.enum(['postal', 'physical', 'both'])
 
 export const fhirAddressSchema = z.object({
   use: fhirAddressUseSchema.optional(),

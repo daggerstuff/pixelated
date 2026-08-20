@@ -121,7 +121,12 @@ describe('documentReferenceSchema', () => {
     }
   })
   it('validates all docStatus enum values', () => {
-    for (const docStatus of ['preliminary', 'final', 'amended', 'entered-in-error']) {
+    for (const docStatus of [
+      'preliminary',
+      'final',
+      'amended',
+      'entered-in-error',
+    ]) {
       expect(
         documentReferenceSchema.safeParse({
           resourceType: 'DocumentReference',
@@ -253,9 +258,7 @@ describe('communicationRequestSchema', () => {
       authoredOn: '2024-01-15',
       requester: { reference: 'Practitioner/456' },
       recipient: [{ reference: 'Patient/123' }],
-      payload: [
-        { contentString: 'Follow-up reminder' },
-      ],
+      payload: [{ contentString: 'Follow-up reminder' }],
       occurrenceDateTime: '2024-02-01',
     })
     expect(result.priority).toBe('urgent')

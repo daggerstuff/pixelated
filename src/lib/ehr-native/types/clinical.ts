@@ -159,7 +159,9 @@ export const practitionerRoleSchema = fhirBaseSchema.extend({
   availableTime: z
     .array(
       z.object({
-        daysOfWeek: z.array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])).optional(),
+        daysOfWeek: z
+          .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))
+          .optional(),
         allDay: fhirBooleanSchema.optional(),
         availableStartTime: fhirTimeSchema.optional(),
         availableEndTime: fhirTimeSchema.optional(),
@@ -300,7 +302,9 @@ export const encounterSchema = fhirBaseSchema.extend({
     .array(
       z.object({
         location: fhirReferenceSchema,
-        status: z.enum(['planned', 'active', 'reserved', 'completed']).optional(),
+        status: z
+          .enum(['planned', 'active', 'reserved', 'completed'])
+          .optional(),
         physicalType: fhirCodeableConceptSchema.optional(),
         period: fhirPeriodSchema.optional(),
       }),
@@ -456,7 +460,9 @@ export const observationSchema = fhirBaseSchema
         'valueDateTime',
         'valuePeriod',
       ]
-      const count = valueKeys.filter((k) => data[k as keyof typeof data] !== undefined).length
+      const count = valueKeys.filter(
+        (k) => data[k as keyof typeof data] !== undefined,
+      ).length
       return count <= 1
     },
     { message: 'At most one value[x] field must be present on Observation' },
@@ -561,10 +567,7 @@ export type Condition = z.infer<typeof conditionSchema>
 // AllergyIntolerance (http://hl7.org/fhir/R4/allergyintolerance.html)
 // ===========================================================================
 
-export const allergyIntoleranceTypeSchema = z.enum([
-  'allergy',
-  'intolerance',
-])
+export const allergyIntoleranceTypeSchema = z.enum(['allergy', 'intolerance'])
 
 export const allergyIntoleranceCategorySchema = z.enum([
   'food',
@@ -769,13 +772,21 @@ export const medicationRequestSchema = fhirBaseSchema.extend({
                 countMax: z.number().int().positive().optional(),
                 duration: z.number().optional(),
                 durationMax: z.number().optional(),
-                durationUnit: z.enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a']).optional(),
+                durationUnit: z
+                  .enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a'])
+                  .optional(),
                 frequency: z.number().int().positive().optional(),
                 frequencyMax: z.number().int().positive().optional(),
                 period: z.number().optional(),
                 periodMax: z.number().optional(),
-                periodUnit: z.enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a']).optional(),
-                dayOfWeek: z.array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])).optional(),
+                periodUnit: z
+                  .enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a'])
+                  .optional(),
+                dayOfWeek: z
+                  .array(
+                    z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
+                  )
+                  .optional(),
                 timeOfDay: z.array(fhirTimeSchema).optional(),
                 when: z.array(fhirCodeSchema).optional(),
                 offset: fhirIntegerSchema.optional(),

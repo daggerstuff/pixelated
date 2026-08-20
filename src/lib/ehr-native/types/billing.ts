@@ -6,7 +6,7 @@
  * @see http://hl7.org/fhir/R4/explanationofbenefit.html
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 import {
   fhirBaseSchema,
@@ -23,7 +23,7 @@ import {
   fhirReferenceSchema,
   fhirStringSchema,
   fhirUriSchema,
-} from './base';
+} from './base'
 
 // ---------------------------------------------------------------------------
 // Shared enums / sub-schemas
@@ -34,27 +34,27 @@ export const claimStatusSchema = z.enum([
   'cancelled',
   'draft',
   'entered-in-error',
-]);
+])
 
 export const claimUseSchema = z.enum([
   'claim',
   'preauthorization',
   'predetermination',
-]);
+])
 
 export const claimResponseStatusSchema = z.enum([
   'active',
   'cancelled',
   'draft',
   'entered-in-error',
-]);
+])
 
 export const coverageStatusSchema = z.enum([
   'active',
   'entered-in-error',
   'draft',
   'cancelled',
-]);
+])
 
 // ---------------------------------------------------------------------------
 // Claim
@@ -73,7 +73,7 @@ export const claimSupportingInfoSchema = z.object({
   valueQuantity: fhirQuantitySchema.optional(),
   valueAttachment: fhirReferenceSchema.optional(),
   reasonReference: fhirReferenceSchema.optional(),
-});
+})
 
 export const claimDiagnosisSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -82,7 +82,7 @@ export const claimDiagnosisSchema = z.object({
   type: fhirCodeableConceptSchema.array().optional(),
   onAdmission: fhirCodeableConceptSchema.optional(),
   packageCode: fhirCodeableConceptSchema.optional(),
-});
+})
 
 export const claimProcedureSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -91,7 +91,7 @@ export const claimProcedureSchema = z.object({
   type: fhirCodeableConceptSchema.array().optional(),
   date: fhirDateTimeSchema.optional(),
   udi: fhirReferenceSchema.array().optional(),
-});
+})
 
 export const claimInsuranceSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -100,14 +100,14 @@ export const claimInsuranceSchema = z.object({
   businessArrangement: fhirStringSchema.optional(),
   preAuthRef: fhirStringSchema.array().optional(),
   claimResponse: fhirReferenceSchema.optional(),
-});
+})
 
 export const claimAccidentSchema = z.object({
   date: fhirDateSchema.optional(),
   type: fhirCodeableConceptSchema.optional(),
   locationAddress: fhirStringSchema.optional(),
   locationReference: fhirReferenceSchema.optional(),
-});
+})
 
 export const claimItemSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -164,7 +164,7 @@ export const claimItemSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const claimCareTeamSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -172,12 +172,12 @@ export const claimCareTeamSchema = z.object({
   responsible: fhirBooleanSchema.optional(),
   role: fhirCodeableConceptSchema.optional(),
   qualification: fhirCodeableConceptSchema.optional(),
-});
+})
 
 export const claimPayeeSchema = z.object({
   type: fhirCodeableConceptSchema,
   party: fhirReferenceSchema.optional(),
-});
+})
 
 export const claimSchema = fhirBaseSchema.extend({
   resourceType: z.literal('Claim'),
@@ -216,9 +216,9 @@ export const claimSchema = fhirBaseSchema.extend({
   accident: claimAccidentSchema.optional(),
   item: claimItemSchema.array().optional(),
   total: fhirMoneySchema.optional(),
-});
+})
 
-export type Claim = z.infer<typeof claimSchema>;
+export type Claim = z.infer<typeof claimSchema>
 
 // ---------------------------------------------------------------------------
 // ClaimResponse
@@ -273,7 +273,7 @@ export const claimResponseItemSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const claimResponseAddItemSchema = z.object({
   itemSequence: fhirPositiveIntSchema.array().optional(),
@@ -304,7 +304,7 @@ export const claimResponseAddItemSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const claimResponseSubDetailSchema = z.object({
   fhirSequence: fhirPositiveIntSchema.optional(),
@@ -319,7 +319,7 @@ export const claimResponseSubDetailSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const claimResponseDetailSchema = z.object({
   fhirSequence: fhirPositiveIntSchema.optional(),
@@ -335,19 +335,19 @@ export const claimResponseDetailSchema = z.object({
     )
     .optional(),
   subDetail: claimResponseSubDetailSchema.array().optional(),
-});
+})
 
 export const claimResponseTotalSchema = z.object({
   category: fhirCodeableConceptSchema,
   amount: fhirMoneySchema,
-});
+})
 
 export const claimResponseProcessNoteSchema = z.object({
   number: fhirPositiveIntSchema.optional(),
   type: z.enum(['display', 'print', 'print-and-display']).optional(),
   text: fhirStringSchema,
   language: fhirCodeableConceptSchema.optional(),
-});
+})
 
 export const claimResponseInsuranceSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -355,14 +355,14 @@ export const claimResponseInsuranceSchema = z.object({
   coverage: fhirReferenceSchema,
   businessArrangement: fhirStringSchema.optional(),
   claimResponse: fhirReferenceSchema.optional(),
-});
+})
 
 export const claimResponseErrorSchema = z.object({
   itemSequence: fhirPositiveIntSchema.optional(),
   detailSequence: fhirPositiveIntSchema.optional(),
   subDetailSequence: fhirPositiveIntSchema.optional(),
   code: fhirCodeableConceptSchema,
-});
+})
 
 export const claimResponsePaymentSchema = z.object({
   type: fhirCodeableConceptSchema,
@@ -371,7 +371,7 @@ export const claimResponsePaymentSchema = z.object({
   date: fhirDateSchema.optional(),
   amount: fhirMoneySchema,
   identifier: fhirIdentifierSchema.optional(),
-});
+})
 
 export const claimResponseSchema = fhirBaseSchema.extend({
   resourceType: z.literal('ClaimResponse'),
@@ -410,9 +410,9 @@ export const claimResponseSchema = fhirBaseSchema.extend({
   communicationRequest: fhirReferenceSchema.array().optional(),
   insurance: claimResponseInsuranceSchema.array().optional(),
   error: claimResponseErrorSchema.array().optional(),
-});
+})
 
-export type ClaimResponse = z.infer<typeof claimResponseSchema>;
+export type ClaimResponse = z.infer<typeof claimResponseSchema>
 
 // ---------------------------------------------------------------------------
 // Coverage
@@ -422,7 +422,7 @@ export const coverageClassSchema = z.object({
   type: fhirCodeableConceptSchema,
   value: fhirStringSchema,
   name: fhirStringSchema.optional(),
-});
+})
 
 export const coverageCostToBeneficiarySchema = z.object({
   type: fhirCodeableConceptSchema.optional(),
@@ -436,7 +436,7 @@ export const coverageCostToBeneficiarySchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const coverageSchema = fhirBaseSchema.extend({
   resourceType: z.literal('Coverage'),
@@ -457,9 +457,9 @@ export const coverageSchema = fhirBaseSchema.extend({
   costToBeneficiary: coverageCostToBeneficiarySchema.array().optional(),
   subrogation: fhirBooleanSchema.optional(),
   contract: fhirReferenceSchema.array().optional(),
-});
+})
 
-export type Coverage = z.infer<typeof coverageSchema>;
+export type Coverage = z.infer<typeof coverageSchema>
 
 // ---------------------------------------------------------------------------
 // ExplanationOfBenefit
@@ -470,28 +470,33 @@ export const eobStatusSchema = z.enum([
   'cancelled',
   'draft',
   'entered-in-error',
-]);
+])
 
-export const eobOutcomeSchema = z.enum(['queued', 'complete', 'error', 'partial']);
+export const eobOutcomeSchema = z.enum([
+  'queued',
+  'complete',
+  'error',
+  'partial',
+])
 
 export const eobRelatedSchema = z.object({
   claim: fhirReferenceSchema.optional(),
   relationship: fhirCodeableConceptSchema.optional(),
   reference: fhirIdentifierSchema.optional(),
-});
+})
 
 export const eobInsuranceSchema = z.object({
   focal: fhirBooleanSchema,
   coverage: fhirReferenceSchema,
   preAuthRef: fhirStringSchema.array().optional(),
-});
+})
 
 export const eobAccidentSchema = z.object({
   date: fhirDateSchema.optional(),
   type: fhirCodeableConceptSchema.optional(),
   locationAddress: fhirStringSchema.optional(),
   locationReference: fhirReferenceSchema.optional(),
-});
+})
 
 export const eobItemSchema = z.object({
   sequence: fhirPositiveIntSchema,
@@ -581,7 +586,7 @@ export const eobItemSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const eobAddItemSchema = z.object({
   itemSequence: fhirPositiveIntSchema.array().optional(),
@@ -612,12 +617,12 @@ export const eobAddItemSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const eobTotalSchema = z.object({
   category: fhirCodeableConceptSchema,
   amount: fhirMoneySchema,
-});
+})
 
 export const eobPaymentSchema = z.object({
   type: fhirCodeableConceptSchema,
@@ -626,14 +631,14 @@ export const eobPaymentSchema = z.object({
   date: fhirDateSchema.optional(),
   amount: fhirMoneySchema,
   identifier: fhirIdentifierSchema.optional(),
-});
+})
 
 export const eobProcessNoteSchema = z.object({
   number: fhirPositiveIntSchema.optional(),
   type: z.enum(['display', 'print', 'print-and-display']).optional(),
   text: fhirStringSchema,
   language: fhirCodeableConceptSchema.optional(),
-});
+})
 
 export const eobBenefitBalanceSchema = z.object({
   category: fhirCodeableConceptSchema,
@@ -654,7 +659,7 @@ export const eobBenefitBalanceSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
 export const explanationOfBenefitSchema = fhirBaseSchema.extend({
   resourceType: z.literal('ExplanationOfBenefit'),
@@ -710,6 +715,6 @@ export const explanationOfBenefitSchema = fhirBaseSchema.extend({
   processNote: eobProcessNoteSchema.array().optional(),
   benefitPeriod: fhirPeriodSchema.optional(),
   benefitBalance: eobBenefitBalanceSchema.array().optional(),
-});
+})
 
-export type ExplanationOfBenefit = z.infer<typeof explanationOfBenefitSchema>;
+export type ExplanationOfBenefit = z.infer<typeof explanationOfBenefitSchema>

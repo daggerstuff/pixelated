@@ -63,8 +63,10 @@ describe('patientSchema', () => {
   })
   it('rejects invalid birthDate format', () => {
     expect(
-      patientSchema.safeParse({ resourceType: 'Patient', birthDate: '01/01/1990' })
-        .success,
+      patientSchema.safeParse({
+        resourceType: 'Patient',
+        birthDate: '01/01/1990',
+      }).success,
     ).toBe(false)
   })
 })
@@ -469,13 +471,15 @@ describe('observationSchema value[x] refine', () => {
 describe('observationValueSchema union', () => {
   it('validates valueQuantity variant', () => {
     expect(
-      observationValueSchema.safeParse({ valueQuantity: { value: 72 } }).success,
+      observationValueSchema.safeParse({ valueQuantity: { value: 72 } })
+        .success,
     ).toBe(true)
   })
   it('validates valueCodeableConcept variant', () => {
     expect(
-      observationValueSchema.safeParse({ valueCodeableConcept: { text: 'Normal' } })
-        .success,
+      observationValueSchema.safeParse({
+        valueCodeableConcept: { text: 'Normal' },
+      }).success,
     ).toBe(true)
   })
   it('validates valueString variant', () => {
@@ -489,9 +493,9 @@ describe('observationValueSchema union', () => {
     ).toBe(true)
   })
   it('validates valueInteger variant', () => {
-    expect(
-      observationValueSchema.safeParse({ valueInteger: 42 }).success,
-    ).toBe(true)
+    expect(observationValueSchema.safeParse({ valueInteger: 42 }).success).toBe(
+      true,
+    )
   })
   it('validates valueRange variant', () => {
     expect(
@@ -568,7 +572,8 @@ describe('conditionSchema', () => {
   })
   it('rejects missing resourceType', () => {
     expect(
-      conditionSchema.safeParse({ subject: { reference: 'Patient/123' } }).success,
+      conditionSchema.safeParse({ subject: { reference: 'Patient/123' } })
+        .success,
     ).toBe(false)
   })
 })

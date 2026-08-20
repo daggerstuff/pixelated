@@ -221,19 +221,16 @@ describe('scheduleSchema', () => {
       serviceCategory: [{ text: 'General' }],
       serviceType: [{ text: 'Consultation' }],
       specialty: [{ text: 'Cardiology' }],
-      actor: [
-        { reference: 'Practitioner/123' },
-        { reference: 'Location/456' },
-      ],
+      actor: [{ reference: 'Practitioner/123' }, { reference: 'Location/456' }],
       planningHorizon: { start: '2024-01-01', end: '2024-12-31' },
       comment: 'Regular schedule',
     })
     expect(result.active).toBe(true)
   })
   it('rejects missing actor array', () => {
-    expect(
-      scheduleSchema.safeParse({ resourceType: 'Schedule' }).success,
-    ).toBe(false)
+    expect(scheduleSchema.safeParse({ resourceType: 'Schedule' }).success).toBe(
+      false,
+    )
   })
   it('rejects empty actor array (min 1)', () => {
     expect(

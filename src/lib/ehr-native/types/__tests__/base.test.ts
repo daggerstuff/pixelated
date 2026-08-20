@@ -227,9 +227,9 @@ describe('fhirUuidSchema', () => {
     expect(fhirUuidSchema.safeParse('not-a-uuid').success).toBe(false)
   })
   it('rejects a truncated UUID', () => {
-    expect(
-      fhirUuidSchema.safeParse('550e8400-e29b-41d4-a716').success,
-    ).toBe(false)
+    expect(fhirUuidSchema.safeParse('550e8400-e29b-41d4-a716').success).toBe(
+      false,
+    )
   })
 })
 
@@ -268,9 +268,9 @@ describe('fhirDateTimeSchema', () => {
     expect(fhirDateTimeSchema.parse('2024-01-15')).toBe('2024-01-15')
   })
   it('validates full ISO datetime with Z', () => {
-    expect(
-      fhirDateTimeSchema.safeParse('2024-01-15T10:30:00Z').success,
-    ).toBe(true)
+    expect(fhirDateTimeSchema.safeParse('2024-01-15T10:30:00Z').success).toBe(
+      true,
+    )
   })
   it('validates full ISO datetime with timezone offset', () => {
     expect(
@@ -283,9 +283,9 @@ describe('fhirDateTimeSchema', () => {
     ).toBe(true)
   })
   it('validates datetime without timezone', () => {
-    expect(
-      fhirDateTimeSchema.safeParse('2024-01-15T10:30:00').success,
-    ).toBe(true)
+    expect(fhirDateTimeSchema.safeParse('2024-01-15T10:30:00').success).toBe(
+      true,
+    )
   })
   it('rejects an invalid format', () => {
     expect(fhirDateTimeSchema.safeParse('2024/01/15').success).toBe(false)
@@ -294,24 +294,24 @@ describe('fhirDateTimeSchema', () => {
 
 describe('fhirInstantSchema', () => {
   it('validates full ISO datetime with Z', () => {
-    expect(
-      fhirInstantSchema.parse('2024-01-15T10:30:00Z'),
-    ).toBe('2024-01-15T10:30:00Z')
+    expect(fhirInstantSchema.parse('2024-01-15T10:30:00Z')).toBe(
+      '2024-01-15T10:30:00Z',
+    )
   })
   it('validates full ISO datetime with timezone offset', () => {
-    expect(
-      fhirInstantSchema.parse('2024-01-15T10:30:00+05:30'),
-    ).toBe('2024-01-15T10:30:00+05:30')
+    expect(fhirInstantSchema.parse('2024-01-15T10:30:00+05:30')).toBe(
+      '2024-01-15T10:30:00+05:30',
+    )
   })
   it('validates with milliseconds', () => {
-    expect(
-      fhirInstantSchema.parse('2024-01-15T10:30:00.123Z'),
-    ).toBe('2024-01-15T10:30:00.123Z')
+    expect(fhirInstantSchema.parse('2024-01-15T10:30:00.123Z')).toBe(
+      '2024-01-15T10:30:00.123Z',
+    )
   })
   it('rejects datetime without timezone', () => {
-    expect(
-      fhirInstantSchema.safeParse('2024-01-15T10:30:00').success,
-    ).toBe(false)
+    expect(fhirInstantSchema.safeParse('2024-01-15T10:30:00').success).toBe(
+      false,
+    )
   })
   it('rejects YYYY format', () => {
     expect(fhirInstantSchema.safeParse('2024').success).toBe(false)
@@ -367,9 +367,9 @@ describe('fhirExtensionSchema', () => {
     ).toBe(false)
   })
   it('rejects an extension with invalid url', () => {
-    expect(
-      fhirExtensionSchema.safeParse({ url: 'not-a-url' }).success,
-    ).toBe(false)
+    expect(fhirExtensionSchema.safeParse({ url: 'not-a-url' }).success).toBe(
+      false,
+    )
   })
 })
 
@@ -394,14 +394,12 @@ describe('fhirNarrativeSchema', () => {
     ).toBe(true)
   })
   it('rejects a narrative without status', () => {
-    expect(
-      fhirNarrativeSchema.safeParse({ div: '<div/>' }).success,
-    ).toBe(false)
+    expect(fhirNarrativeSchema.safeParse({ div: '<div/>' }).success).toBe(false)
   })
   it('rejects a narrative without div', () => {
-    expect(
-      fhirNarrativeSchema.safeParse({ status: 'generated' }).success,
-    ).toBe(false)
+    expect(fhirNarrativeSchema.safeParse({ status: 'generated' }).success).toBe(
+      false,
+    )
   })
   it('rejects a narrative with empty div', () => {
     expect(
@@ -434,9 +432,9 @@ describe('fhirCodingSchema', () => {
     expect(fhirCodingSchema.safeParse({ code: 'active' }).success).toBe(true)
   })
   it('rejects a coding with whitespace in code', () => {
-    expect(
-      fhirCodingSchema.safeParse({ code: 'active code' }).success,
-    ).toBe(false)
+    expect(fhirCodingSchema.safeParse({ code: 'active code' }).success).toBe(
+      false,
+    )
   })
 })
 
@@ -472,9 +470,9 @@ describe('fhirIdentifierSchema', () => {
     expect(fhirIdentifierSchema.safeParse({}).success).toBe(true)
   })
   it('rejects an invalid use value', () => {
-    expect(
-      fhirIdentifierSchema.safeParse({ use: 'invalid' }).success,
-    ).toBe(false)
+    expect(fhirIdentifierSchema.safeParse({ use: 'invalid' }).success).toBe(
+      false,
+    )
   })
   it('validates all use enum values', () => {
     for (const use of ['usual', 'official', 'temp', 'secondary', 'old']) {
@@ -516,9 +514,9 @@ describe('fhirQuantitySchema', () => {
     expect(fhirQuantitySchema.safeParse({}).success).toBe(true)
   })
   it('rejects an invalid comparator', () => {
-    expect(
-      fhirQuantitySchema.safeParse({ comparator: '!=' }).success,
-    ).toBe(false)
+    expect(fhirQuantitySchema.safeParse({ comparator: '!=' }).success).toBe(
+      false,
+    )
   })
   it('validates all comparator values', () => {
     for (const comparator of ['<', '<=', '>=', '>']) {
@@ -656,9 +654,9 @@ describe('fhirMetaSchema', () => {
     expect(fhirMetaSchema.safeParse({}).success).toBe(true)
   })
   it('rejects an invalid versionId', () => {
-    expect(
-      fhirMetaSchema.safeParse({ versionId: 'invalid_id!' }).success,
-    ).toBe(false)
+    expect(fhirMetaSchema.safeParse({ versionId: 'invalid_id!' }).success).toBe(
+      false,
+    )
   })
   it('rejects an invalid lastUpdated (no timezone)', () => {
     expect(
@@ -707,17 +705,23 @@ describe('fhirContactPointSchema', () => {
     ).toBe(false)
   })
   it('rejects an invalid use value', () => {
-    expect(
-      fhirContactPointSchema.safeParse({ use: 'invalid' }).success,
-    ).toBe(false)
+    expect(fhirContactPointSchema.safeParse({ use: 'invalid' }).success).toBe(
+      false,
+    )
   })
   it('rejects rank of zero', () => {
-    expect(
-      fhirContactPointSchema.safeParse({ rank: 0 }).success,
-    ).toBe(false)
+    expect(fhirContactPointSchema.safeParse({ rank: 0 }).success).toBe(false)
   })
   it('validates all system enum values', () => {
-    for (const system of ['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other']) {
+    for (const system of [
+      'phone',
+      'fax',
+      'email',
+      'pager',
+      'url',
+      'sms',
+      'other',
+    ]) {
       expect(fhirContactPointSchema.safeParse({ system }).success).toBe(true)
     }
   })
@@ -743,14 +747,10 @@ describe('fhirAddressSchema', () => {
     expect(fhirAddressSchema.safeParse({}).success).toBe(true)
   })
   it('rejects an invalid use value', () => {
-    expect(
-      fhirAddressSchema.safeParse({ use: 'invalid' }).success,
-    ).toBe(false)
+    expect(fhirAddressSchema.safeParse({ use: 'invalid' }).success).toBe(false)
   })
   it('rejects an invalid type value', () => {
-    expect(
-      fhirAddressSchema.safeParse({ type: 'invalid' }).success,
-    ).toBe(false)
+    expect(fhirAddressSchema.safeParse({ type: 'invalid' }).success).toBe(false)
   })
   it('validates all use enum values', () => {
     for (const use of ['home', 'work', 'temp', 'old', 'billing']) {
@@ -781,9 +781,9 @@ describe('fhirHumanNameSchema', () => {
     expect(fhirHumanNameSchema.safeParse({}).success).toBe(true)
   })
   it('rejects an invalid use value', () => {
-    expect(
-      fhirHumanNameSchema.safeParse({ use: 'invalid' }).success,
-    ).toBe(false)
+    expect(fhirHumanNameSchema.safeParse({ use: 'invalid' }).success).toBe(
+      false,
+    )
   })
   it('validates all use enum values', () => {
     for (const use of [
