@@ -12,13 +12,13 @@ export type RetryOptions = {
     | number[]
     | ((
         response: Response | null,
-        error: unknown | null,
+        error: unknown,
         attempt: number,
       ) => boolean | Promise<boolean>)
   onRetry?: (attempt: number, responseOrError: Response | unknown) => void
 }
 
-const defaultRetryOn = (res: Response | null, err: unknown | null) => {
+const defaultRetryOn = (res: Response | null, err: unknown) => {
   if (err) {
     // Network errors, timeouts, and other fetch errors should retry
     return true

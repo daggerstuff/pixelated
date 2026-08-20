@@ -1,6 +1,6 @@
 // Type definitions for plugin arrays
-type RemarkPlugin = unknown
-type RehypePlugin = unknown
+type RemarkPlugin = (...args: unknown[]) => unknown
+type RehypePlugin = (...args: unknown[]) => unknown
 type RemarkPlugins = Array<RemarkPlugin | [RemarkPlugin, unknown]>
 type RehypePlugins = Array<RehypePlugin | [RehypePlugin, unknown]>
 import { rehypeHeadingIds } from '@astrojs/markdown-remark'
