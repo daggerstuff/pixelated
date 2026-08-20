@@ -290,6 +290,58 @@ describe('Auth0 JWT Service', () => {
         auth0JwtService.refreshAccessToken('invalid-refresh-token', {}),
       ).rejects.toThrow(auth0JwtService.AuthenticationError)
     })
+
+    it('should retry transient UserInfo failures during refresh and succeed', async () => {
+      const mockTokenResponse = {
+        access_token: 'new-access-token',
+        expires_in: 3600,
+        token_type: 'Bearer',
+      }
+
+      const mockUserResponse = {
+        'sub': 'auth0|123456',
+        'jti': 'new-token-id-456',
+        'https://pixelated.empathy/app_metadata': { roles: ['user'] },
+      }
+
+      mockAuthClient.oauth.refreshTokenGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      mockUserInfoClient.getUserInfo
+        .mockRejectedValueOnce(new Error('transient provider timeout'))
+        .mockResolvedValue({ data: mockUserResponse })
+
+      const result = await auth0JwtService.refreshAccessToken(
+        'old-refresh-token',
+        {},
+      )
+
+      expect(result.accessToken).toBe('new-access-token')
+      // Initial attempt + one retry
+      expect(mockUserInfoClient.getUserInfo).toHaveBeenCalledTimes(2)
+    })
+
+    it('should throw AuthenticationError when UserInfo keeps failing during refresh', async () => {
+      const mockTokenResponse = {
+        access_token: 'new-access-token',
+        expires_in: 3600,
+        token_type: 'Bearer',
+      }
+
+      mockAuthClient.oauth.refreshTokenGrant.mockResolvedValue({
+        data: mockTokenResponse,
+      })
+      mockUserInfoClient.getUserInfo.mockRejectedValue(
+        new Error('provider unavailable'),
+      )
+
+      await expect(
+        auth0JwtService.refreshAccessToken('old-refresh-token', {}),
+      ).rejects.toThrow(auth0JwtService.AuthenticationError)
+
+      // Initial attempt + one retry, then final failure surfaces
+      expect(mockUserInfoClient.getUserInfo).toHaveBeenCalledTimes(2)
+    })
   })
 
   describe('revokeToken', () => {

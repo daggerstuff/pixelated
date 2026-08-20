@@ -6,6 +6,7 @@
  * Uses differential privacy techniques and aggregation to ensure HIPAA compliance.
  */
 
+import { retry } from './shared/retry'
 import { createBuildSafeLogger } from './logging/build-safe-logger'
 
 // Initialize logger
@@ -262,32 +263,44 @@ export class AnalyticsService {
       return
     }
 
+    const endpointUrl = this.config.endpointUrl
     try {
-      const response = await fetch(this.config.endpointUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] ?? '',
-        },
-        body: JSON.stringify({
-          events,
-          source: 'therapy-chat-app',
-          timestamp: Date.now(),
-          batchId: `batch-${Date.now()}`,
-        }),
-      })
+      // External writes are retried with exponential backoff (shared base,
+      // src/lib/shared/retry.ts). Analytics is not user-latency-sensitive,
+      // so the default 3 retries / 1s base delay is acceptable.
+      await retry(
+        async () => {
+          const response = await fetch(endpointUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-API-Key': import.meta.env['PUBLIC_ANALYTICS_API_KEY'] ?? '',
+            },
+            body: JSON.stringify({
+              events,
+              source: 'therapy-chat-app',
+              timestamp: Date.now(),
+              batchId: `batch-${Date.now()}`,
+            }),
+          })
 
-      if (!response.ok) {
-        throw new Error(
-          `Analytics API response: ${response.status} ${response.statusText}`,
-        )
-      }
+          if (!response.ok) {
+            throw new Error(
+              `Analytics API response: ${response.status} ${response.statusText}`,
+            )
+          }
+        },
+        3,
+        1000,
+      )
     } catch (error: unknown) {
+      // Retries exhausted — propagate so callers can log, alert, or decide
+      // whether to fall back to local storage. Never swallow silently.
       const errorObj =
         error instanceof Error
           ? { message: String(error), stack: error?.stack }
           : { message: String(error) }
-      logger.error('Failed to send analytics to endpoint', errorObj)
+      logger.error('Failed to send analytics to endpoint after retries', errorObj)
       throw error
     }
   }
