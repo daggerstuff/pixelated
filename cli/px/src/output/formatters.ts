@@ -352,7 +352,7 @@ function formatListOfObjects(data: Record<string, unknown>[]): string {
 function formatCompact(data: unknown): string {
   if (data === null || data === undefined) return '(empty)'
   if (typeof data === 'string') return data
-  if (typeof data === 'number' || typeof data === 'boolean') return String(data)
+  if (typeof data === 'number' || typeof data === 'boolean') return String(data ?? 'unknown')
 
   if (Array.isArray(data)) {
     return `${data.length} item(s)`
@@ -373,7 +373,7 @@ function formatCompact(data: unknown): string {
     return parts.join('  ')
   }
 
-  return String(data)
+  return String(data ?? 'unknown')
 }
 
 // ── Helpers ──────────────────────────────────────────
