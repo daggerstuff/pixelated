@@ -173,6 +173,8 @@ function inferAuditEventType(action: string): AuditEventType {
     case AuditAction.START_SESSION:
     case AuditAction.END_SESSION:
       return AuditEventType.THERAPEUTIC
+    case AuditAction.DELETE_DATA:
+      return AuditEventType.SYSTEM
     default:
       return AuditEventType.THERAPEUTIC
   }
