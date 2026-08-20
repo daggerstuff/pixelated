@@ -22,6 +22,7 @@ const baseNodeTestGlobs = [
   'src/api/middleware/__tests__/**/*.test.ts',
   'src/api/memory/__tests__/**/*.test.ts',
   'src/lib/auth/**/*.test.ts',
+  'src/lib/shared/**/*.test.ts',
   'src/lib/services/product-memory-gateway.test.ts',
   'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
   'tests/unit/auth0/**/*.test.ts',
