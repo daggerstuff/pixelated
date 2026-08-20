@@ -69,7 +69,6 @@ export type {
 
 // Repository functions (for advanced use)
 export {
-  buildRlsSettings,
   createGenericResource,
   readGenericResource,
   updateGenericResource,
@@ -80,7 +79,6 @@ export {
 } from './repositories/generic.js'
 
 export {
-  extractColumns,
   createDedicatedResource,
   readDedicatedResource,
   updateDedicatedResource,

@@ -3,7 +3,6 @@
  */
 
 export {
-  buildRlsSettings,
   createGenericResource,
   readGenericResource,
   updateGenericResource,

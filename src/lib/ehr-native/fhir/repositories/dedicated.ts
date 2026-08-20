@@ -18,7 +18,7 @@ import { RESOURCE_TABLE_MAP, RESOURCE_PK_MAP } from '../types.js'
 import { buildRlsSettings } from './generic.js'
 
 /** Extracted column values per resource type from the FHIR resource. */
-export function extractColumns(
+function extractColumns(
   resourceType: FHIRResourceType,
   resource: Record<string, unknown>,
 ): Record<string, unknown> {
