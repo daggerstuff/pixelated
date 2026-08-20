@@ -56,7 +56,7 @@ class IndexedDBStorage {
     })
   }
 
-  async set(key: string, value: any): Promise<void> {
+  async set(key: string, value: unknown): Promise<void> {
     await this.init()
     await new Promise<void>((resolve, reject) => {
       if (!this.db) {
@@ -77,9 +77,9 @@ class IndexedDBStorage {
     })
   }
 
-  async get(key: string): Promise<any | undefined> {
+  async get(key: string): Promise<unknown> {
     await this.init()
-    return new Promise<any | undefined>((resolve, reject) => {
+    return new Promise<unknown>((resolve, reject) => {
       if (!this.db) {
         reject(new Error('Database not initialized'))
         return
