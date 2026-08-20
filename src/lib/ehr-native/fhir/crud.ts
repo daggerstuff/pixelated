@@ -232,7 +232,7 @@ export async function createResource(
       headers: {
         'Content-Type': 'application/fhir+json',
         'Location': `${baseUrl}/${resourceType}/${resourceId}`,
-        'ETag': generateETag(resourceId, resourceId),
+        'ETag': generateETag(resourceId, '1'),
       },
       body: persistedResource,
     }
@@ -294,7 +294,7 @@ export async function readResource(
       status: 200,
       headers: {
         'Content-Type': 'application/fhir+json',
-        'ETag': generateETag(resourceId, resourceId),
+        'ETag': generateETag(resourceId, '1'),
         'Last-Modified': generateLastModified(result.updatedAt),
       },
       body: result.resource,
@@ -378,7 +378,7 @@ export async function updateResource(
     // If-Match check: if provided, compare version with current ETag
     if (ifMatch !== null) {
       const ifMatchVersion = parseIfMatchVersion(ifMatch)
-      const currentETag = generateETag(resourceId, resourceId)
+      const currentETag = generateETag(resourceId, '1')
       const currentVersion = parseIfMatchVersion(currentETag)
       if (ifMatchVersion !== null && currentVersion !== null) {
         if (ifMatchVersion !== currentVersion) {
@@ -434,7 +434,7 @@ export async function updateResource(
       status: 200,
       headers: {
         'Content-Type': 'application/fhir+json',
-        'ETag': generateETag(resourceId, resourceId),
+        'ETag': generateETag(resourceId, '1'),
         'Last-Modified': generateLastModified(new Date().toISOString()),
       },
       body: updatedResource,

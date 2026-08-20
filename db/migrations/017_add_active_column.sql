@@ -62,3 +62,8 @@ ALTER TABLE ehr_service_request
 CREATE INDEX IF NOT EXISTS idx_ehr_service_request_active
   ON ehr_service_request (tenant_id, active)
   WHERE active = false;
+
+
+-- Fix: Change actor_id from UUID to TEXT to support non-UUID FHIR user IDs
+ALTER TABLE IF EXISTS ehr_audit_history ALTER COLUMN actor_id TYPE TEXT;
+ALTER TABLE IF EXISTS ehr_audit_history ALTER COLUMN actor_id DROP NOT NULL;

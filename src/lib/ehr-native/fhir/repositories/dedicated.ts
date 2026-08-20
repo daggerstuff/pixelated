@@ -477,7 +477,7 @@ export async function insertDedicatedResourceHistory(
   fhirResource: Record<string, unknown>,
 ): Promise<void> {
   // Validate actor_id is a valid UUID (ehr_audit_history.actor_id is UUID NOT NULL)
-  const actorId = isValidUuid(ctx.userId) ? ctx.userId : randomUUID()
+  const actorId = isValidUuid(ctx.userId) ? ctx.userId : null
 
   await transaction(async (client) => {
     await setRlsContext(client, ctx)
