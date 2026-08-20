@@ -101,6 +101,7 @@ export async function routeFHIRRequest(
         request.body,
         request.context,
         request.ifMatch,
+        baseUrl,
       )
     }
 

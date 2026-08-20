@@ -204,6 +204,7 @@ describe('routeFHIRRequest', () => {
       body,
       mockContext,
       'W/"1"',
+      BASE_URL,
     )
     expect(result).toBe(mockResponse)
   })

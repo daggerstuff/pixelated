@@ -265,6 +265,7 @@ describe('updateResource', () => {
       { ...validPatient, id: 'p1' },
       mockContext,
       null,
+      BASE_URL,
     )
 
     expect(result.status).toBe(200)
@@ -285,6 +286,7 @@ describe('updateResource', () => {
       wrongType,
       mockContext,
       null,
+      BASE_URL,
     )
 
     expect(result.status).toBe(422)
@@ -303,6 +305,7 @@ describe('updateResource', () => {
       { ...validPatient, id: 'different-id' },
       mockContext,
       null,
+      BASE_URL,
     )
 
     expect(result.status).toBe(409)
@@ -317,6 +320,7 @@ describe('updateResource', () => {
       { ...validPatient, id: 'nonexistent' },
       mockContext,
       'W/"1"',
+      BASE_URL,
     )
 
     expect(result.status).toBe(412)
@@ -336,6 +340,7 @@ describe('updateResource', () => {
       { ...validPatient, id: 'p1' },
       mockContext,
       null,
+      BASE_URL,
     )
 
     expect(result.status).toBe(500)
