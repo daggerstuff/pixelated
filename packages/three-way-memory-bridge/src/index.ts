@@ -73,19 +73,27 @@ export class MemoryBridge {
     const mastraThreadMessages: MastraMessage[] = []
     let foresightMemories: ForesightMemory[] = []
 
-    // 1. Fetch Mastra thread state from Neon cloud DB if threadId provided
+    // 1. Fetch Mastra thread state from Neon cloud DB if threadId provided.
+    // Retried so a transient Neon connection/query failure does not drop the
+    // thread context (silent swallow before).
     if (threadId && this.env.NEON_DATABASE_URL) {
       try {
-        const client = new Client(this.env.NEON_DATABASE_URL)
-        await client.connect()
-        const res = await client.query(
-          'SELECT id, thread_id, role, content, created_at FROM mastra_messages WHERE thread_id = $1 ORDER BY created_at DESC LIMIT 10',
-          [threadId],
-        )
-        await client.end()
-        mastraThreadMessages.push(...(res.rows as Record<string, unknown>[]))
+        const rows = await withRetry(async () => {
+          const client = new Client(this.env.NEON_DATABASE_URL)
+          await client.connect()
+          try {
+            const res = await client.query(
+              'SELECT id, thread_id, role, content, created_at FROM mastra_messages WHERE thread_id = $1 ORDER BY created_at DESC LIMIT 10',
+              [threadId],
+            )
+            return res.rows as Record<string, unknown>[]
+          } finally {
+            await client.end()
+          }
+        })
+        mastraThreadMessages.push(...rows)
       } catch (err) {
-        console.error('[MemoryBridge] Neon query failed:', err)
+        console.error('[MemoryBridge] Neon query failed after retries:', err)
       }
     }
 
