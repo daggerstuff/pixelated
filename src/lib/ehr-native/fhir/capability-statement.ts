@@ -12,12 +12,7 @@ import type { FHIRResourceType, FHIRResponse } from './types.js'
 
 /** FHIR R4 RESTful interaction codes. */
 type RestInteraction =
-  | 'read'
-  | 'search-type'
-  | 'create'
-  | 'update'
-  | 'delete'
-  | 'history-instance'
+  'read' | 'search-type' | 'create' | 'update' | 'delete' | 'history-instance'
 
 /** Common search parameters available on all resource types. */
 const COMMON_SEARCH_PARAMS = [
