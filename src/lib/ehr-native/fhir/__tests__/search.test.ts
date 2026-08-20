@@ -10,11 +10,11 @@ vi.mock('../repositories/index.js', () => ({
   searchGenericResources: vi.fn(),
 }))
 
-import { searchResources } from '../search.js'
 import {
   searchDedicatedResources,
   searchGenericResources,
 } from '../repositories/index.js'
+import { searchResources } from '../search.js'
 import type { FHIRRequestContext } from '../types.js'
 
 const mockContext: FHIRRequestContext = {

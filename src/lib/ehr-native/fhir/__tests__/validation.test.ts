@@ -3,6 +3,11 @@
  */
 
 import { describe, it, expect } from 'vitest'
+
+import {
+  SUPPORTED_RESOURCE_TYPES,
+  DEDICATED_TABLE_RESOURCES,
+} from '../types.js'
 import {
   validateResource,
   validateResourceType,
@@ -11,10 +16,6 @@ import {
   RESOURCE_REGISTRY,
   SCHEMA_REGISTRY,
 } from '../validation.js'
-import {
-  SUPPORTED_RESOURCE_TYPES,
-  DEDICATED_TABLE_RESOURCES,
-} from '../types.js'
 
 describe('isSupportedResourceType', () => {
   it('returns true for all supported resource types', () => {

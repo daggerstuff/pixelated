@@ -4,18 +4,18 @@
  * Routes incoming FHIRRequest to the appropriate CRUD, search, or history handler.
  */
 
-import type { FHIRRequest, FHIRResourceType, FHIRResponse } from './types.js'
-import { isSupportedResourceType } from './validation.js'
-import { badRequest, notFound, notImplemented } from './error.js'
+import { capabilityStatementResponse } from './capability-statement.js'
 import {
   createResource,
   readResource,
   updateResource,
   deleteResource,
 } from './crud.js'
-import { searchResources } from './search.js'
+import { badRequest, notFound, notImplemented } from './error.js'
 import { getResourceHistory } from './history.js'
-import { capabilityStatementResponse } from './capability-statement.js'
+import { searchResources } from './search.js'
+import type { FHIRRequest, FHIRResourceType, FHIRResponse } from './types.js'
+import { isSupportedResourceType } from './validation.js'
 
 /**
  * Handle a FHIR R4 request by routing to the appropriate handler.

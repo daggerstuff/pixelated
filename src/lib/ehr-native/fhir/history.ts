@@ -6,6 +6,11 @@
  * @see https://hl7.org/fhir/R4/http.html#history
  */
 
+import { internalServerError, notFound } from './error.js'
+import {
+  getDedicatedResourceHistory,
+  getGenericResourceHistory,
+} from './repositories/index.js'
 import type {
   FHIRRequestContext,
   FHIRResourceType,
@@ -13,11 +18,6 @@ import type {
   FHIRResponse,
 } from './types.js'
 import { RESOURCE_REGISTRY } from './validation.js'
-import {
-  getDedicatedResourceHistory,
-  getGenericResourceHistory,
-} from './repositories/index.js'
-import { internalServerError, notFound } from './error.js'
 
 /**
  * Build a FHIR history Bundle from repository results.

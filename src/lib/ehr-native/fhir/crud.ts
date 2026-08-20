@@ -8,16 +8,17 @@
 
 import { randomUUID } from 'node:crypto'
 
-import type {
-  FHIRRequestContext,
-  FHIRResourceType,
-  FHIRResponse,
-} from './types.js'
+import { AuditEventType } from '@/lib/audit'
+
 import {
-  validateResource,
-  validateResourceType,
-  RESOURCE_REGISTRY,
-} from './validation.js'
+  badRequest,
+  conflict,
+  forbidden,
+  internalServerError,
+  notFound,
+  preconditionFailed,
+  unprocessableEntity,
+} from './error.js'
 import {
   createDedicatedResource,
   readDedicatedResource,
@@ -30,16 +31,16 @@ import {
   insertDedicatedResourceHistory,
   insertGenericResourceHistory,
 } from './repositories/index.js'
+import type {
+  FHIRRequestContext,
+  FHIRResourceType,
+  FHIRResponse,
+} from './types.js'
 import {
-  badRequest,
-  conflict,
-  forbidden,
-  internalServerError,
-  notFound,
-  preconditionFailed,
-  unprocessableEntity,
-} from './error.js'
-import { AuditEventType } from '@/lib/audit'
+  validateResource,
+  validateResourceType,
+  RESOURCE_REGISTRY,
+} from './validation.js'
 
 /**
  * Permission mapping: FHIR resource type → required EHR permission.

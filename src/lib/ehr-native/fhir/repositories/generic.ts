@@ -11,6 +11,7 @@
  */
 
 import { query } from '@/lib/db'
+
 import type { FHIRRequestContext } from '../types.js'
 import type { FHIRResourceType } from '../types.js'
 

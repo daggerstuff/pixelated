@@ -7,6 +7,11 @@
  * @see https://hl7.org/fhir/R4/search.html
  */
 
+import { internalServerError } from './error.js'
+import {
+  searchDedicatedResources,
+  searchGenericResources,
+} from './repositories/index.js'
 import type {
   FHIRRequestContext,
   FHIRResourceType,
@@ -14,11 +19,6 @@ import type {
   FHIRResponse,
 } from './types.js'
 import { RESOURCE_REGISTRY } from './validation.js'
-import {
-  searchDedicatedResources,
-  searchGenericResources,
-} from './repositories/index.js'
-import { internalServerError } from './error.js'
 
 /**
  * Parse pagination parameters from search params.

@@ -9,6 +9,17 @@
 
 import { z } from 'zod'
 
+import {
+  claimSchema,
+  claimResponseSchema,
+  coverageSchema,
+  explanationOfBenefitSchema,
+} from '../types/billing.js'
+import {
+  documentReferenceSchema,
+  communicationSchema,
+  communicationRequestSchema,
+} from '../types/communication.js'
 // F1.0 FHIR R4 zod schemas
 import {
   fhirBaseSchema,
@@ -29,18 +40,6 @@ import {
   scheduleSchema,
   slotSchema,
 } from '../types/scheduling.js'
-import {
-  claimSchema,
-  claimResponseSchema,
-  coverageSchema,
-  explanationOfBenefitSchema,
-} from '../types/billing.js'
-import {
-  documentReferenceSchema,
-  communicationSchema,
-  communicationRequestSchema,
-} from '../types/communication.js'
-
 import type { FHIRResourceType, ResourceRegistryEntry } from './types.js'
 import {
   SUPPORTED_RESOURCE_TYPES,

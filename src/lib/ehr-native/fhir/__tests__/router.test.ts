@@ -24,7 +24,6 @@ vi.mock('../history.js', () => ({
   getResourceHistory: vi.fn(),
 }))
 
-import { routeFHIRRequest } from '../router.js'
 import { capabilityStatementResponse } from '../capability-statement.js'
 import {
   createResource,
@@ -32,8 +31,9 @@ import {
   updateResource,
   deleteResource,
 } from '../crud.js'
-import { searchResources } from '../search.js'
 import { getResourceHistory } from '../history.js'
+import { routeFHIRRequest } from '../router.js'
+import { searchResources } from '../search.js'
 import type { FHIRRequest, FHIRRequestContext, FHIRResponse } from '../types.js'
 
 const BASE_URL = 'https://example.com/fhir/r4'

@@ -7,6 +7,8 @@
  * @see https://hl7.org/fhir/R4/http.html
  */
 
+import { badRequest, unauthorized } from './error.js'
+import { routeFHIRRequest } from './router.js'
 import type {
   FHIRRequest,
   FHIRRequestContext,
@@ -14,8 +16,6 @@ import type {
   FHIRResponse,
 } from './types.js'
 import { isSupportedResourceType } from './validation.js'
-import { routeFHIRRequest } from './router.js'
-import { badRequest, unauthorized } from './error.js'
 
 /**
  * Extract FHIR request context from HTTP headers.

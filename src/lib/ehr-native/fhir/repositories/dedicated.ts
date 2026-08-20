@@ -12,6 +12,7 @@
  */
 
 import { query } from '@/lib/db'
+
 import type { FHIRRequestContext, FHIRResourceType } from '../types.js'
 import { RESOURCE_TABLE_MAP, RESOURCE_PK_MAP } from '../types.js'
 import { buildRlsSettings } from './generic.js'
