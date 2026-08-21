@@ -24,10 +24,20 @@ import {
 } from './ehr-audit-bridge.js'
 
 /**
+ * Log a warning when an audit result indicates failure.
+ */
+function checkAuditResult(result: EhrAuditResult, operation: string): void {
+  if (!result.success) {
+    console.warn(`[EHR-AUDIT] Audit emission failed for ${operation}: ${result.error ?? 'unknown error'}`)
+  }
+}
+
+/**
  * Extract EhrAuditContext from FHIRRequestContext.
  *
- * IP, User-Agent, and session ID come from jwtClaims if available,
- * since FHIRRequestContext doesn't carry them directly.
+ * IP, User-Agent, and session ID are passed as optional parameters
+ * (sourced from HTTP headers by the FHIR server). The breakGlassReason
+ * is extracted from jwtClaims when present.
  */
 export function buildEhrAuditContext(
   context: FHIRRequestContext,
@@ -63,16 +73,17 @@ export async function preWriteAudit(
   resourceId: string,
   action: EhrAuditAction,
 ): Promise<EhrAuditResult> {
-  // Import here to avoid circular dependency at module load time
   const { auditFHIREvent } = await import('./ehr-audit-bridge.js')
   const { AuditEventStatus } = await import('@/lib/audit')
-  return auditFHIREvent(
+  const result = await auditFHIREvent(
     ctx,
     resourceType,
     resourceId,
     action,
     AuditEventStatus.ATTEMPT,
   )
+  checkAuditResult(result, `pre-write ${action}`)
+  return result
 }
 
 /**
@@ -87,23 +98,31 @@ export async function postWriteAudit(
   action: EhrAuditAction,
   version?: string,
 ): Promise<EhrAuditResult> {
+  let result: EhrAuditResult
   switch (action) {
     case 'create':
-      return auditFHIRCreate(ctx, resourceType, resourceId, version)
+      result = await auditFHIRCreate(ctx, resourceType, resourceId, version)
+      break
     case 'update':
-      return auditFHIRUpdate(ctx, resourceType, resourceId, version)
+      result = await auditFHIRUpdate(ctx, resourceType, resourceId, version)
+      break
     case 'delete':
-      return auditFHIRDelete(ctx, resourceType, resourceId)
+      result = await auditFHIRDelete(ctx, resourceType, resourceId)
+      break
     case 'read':
-      return auditFHIRRead(ctx, resourceType, resourceId)
+      result = await auditFHIRRead(ctx, resourceType, resourceId)
+      break
     case 'break-glass':
-      return auditFHIRRead(ctx, resourceType, resourceId)
+      result = await auditFHIRRead(ctx, resourceType, resourceId)
+      break
     default: {
       const exhaustive: never = action
       void exhaustive
       throw new Error('Unhandled EhrAuditAction')
     }
   }
+  checkAuditResult(result, `post-write ${action}`)
+  return result
 }
 
 /**
@@ -116,7 +135,9 @@ export async function postWriteFailureAudit(
   action: EhrAuditAction,
   errorMessage: string,
 ): Promise<EhrAuditResult> {
-  return auditFHIRFailure(ctx, resourceType, resourceId, action, errorMessage)
+  const result = await auditFHIRFailure(ctx, resourceType, resourceId, action, errorMessage)
+  checkAuditResult(result, `failure ${action}`)
+  return result
 }
 
 /**
@@ -127,5 +148,7 @@ export async function readAudit(
   resourceType: FHIRResourceType,
   resourceId: string,
 ): Promise<EhrAuditResult> {
-  return auditFHIRRead(ctx, resourceType, resourceId)
+  const result = await auditFHIRRead(ctx, resourceType, resourceId)
+  checkAuditResult(result, 'read')
+  return result
 }

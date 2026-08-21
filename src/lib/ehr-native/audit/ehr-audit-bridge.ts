@@ -100,7 +100,6 @@ function getSeverity(
 ): AuditSeverity {
   if (breakGlass) return AuditSeverity.HIGH
   if (action === 'delete') return AuditSeverity.MEDIUM
-  if (action === 'break-glass') return AuditSeverity.HIGH
   return AuditSeverity.INFO
 }
 
@@ -220,7 +219,9 @@ export async function auditFHIREvent(
 
     // 2. Create chain-linked audit event (uses events.ts AuditEventType — UPDATE)
     const chainStatus: 'success' | 'failure' =
-      status === AuditEventStatus.SUCCESS ? 'success' : 'failure'
+      status === AuditEventStatus.FAILURE || status === AuditEventStatus.BLOCKED
+        ? 'failure'
+        : 'success'
     const chainEvent = buildChainEvent(
       ctx,
       resourceType,
@@ -238,6 +239,13 @@ export async function auditFHIREvent(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Audit emission failed'
+    console.error(`[EHR-AUDIT] Failed to emit audit event: ${message}`, {
+      userId: ctx.userId,
+      tenantId: ctx.tenantId,
+      resourceType,
+      resourceId,
+      action,
+    })
     return {
       success: false,
       error: message,

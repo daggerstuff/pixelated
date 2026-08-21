@@ -255,7 +255,6 @@ describe('EHR Audit Bridge', () => {
         role: 'nurse',
         tenantId: 'tenant-001',
         reason: 'Emergency access for patient care',
-        action: 'break-glass',
         ipAddress: '10.0.0.42',
         userAgent: 'Mozilla/5.0',
         sessionId: 'session-abc',

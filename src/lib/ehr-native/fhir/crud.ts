@@ -156,6 +156,7 @@ export async function createResource(
   context: FHIRRequestContext,
   baseUrl: string,
 ): Promise<FHIRResponse> {
+  let resourceId: string | undefined
   try {
     // 1. Validate resourceType field in body
     const typeCheck = validateResourceType(resourceType, body)
@@ -184,7 +185,7 @@ export async function createResource(
     }
 
     // 4. Generate resource ID if not present
-    const resourceId =
+    resourceId =
       (validatedResource['id'] as string | undefined) ?? randomUUID()
     validatedResource['id'] = resourceId
 
@@ -246,7 +247,7 @@ export async function createResource(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Create failed'
     const auditCtx = buildEhrAuditContext(context)
-    await postWriteFailureAudit(auditCtx, resourceType, resourceId, 'create', message)
+    await postWriteFailureAudit(auditCtx, resourceType, resourceId ?? 'unknown', 'create', message)
     return internalServerError(message)
   }
 }

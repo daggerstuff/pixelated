@@ -62,7 +62,6 @@ export interface BreakGlassAuditEntry {
   role: string
   tenantId: string
   reason: string
-  action: EhrAuditAction
   ipAddress?: string
   userAgent?: string
   sessionId?: string
