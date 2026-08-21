@@ -20,6 +20,7 @@ import {
   communicationSchema,
   communicationRequestSchema,
 } from '../types/communication.js'
+import { consentSchema } from '../types/consent.js'
 // F1.0 FHIR R4 zod schemas
 import {
   fhirBaseSchema,
@@ -87,7 +88,7 @@ export const SCHEMA_REGISTRY: Record<
     Record<string, unknown>
   >,
   // F1.0 does not define consentSchema or serviceRequestSchema — use base schema
-  Consent: fhirBaseSchema as z.ZodType<Record<string, unknown>>,
+  Consent: consentSchema as z.ZodType<Record<string, unknown>>,
   ServiceRequest: fhirBaseSchema as z.ZodType<Record<string, unknown>>,
 }
 

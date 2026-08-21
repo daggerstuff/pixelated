@@ -119,10 +119,13 @@ describe('validateResource', () => {
     expect(result.success).toBe(true)
   })
 
-  it('validates Consent with fhirBaseSchema fallback', () => {
+  it('validates Consent with consentSchema', () => {
     const consent = {
       resourceType: 'Consent',
       id: 'consent-1',
+      status: 'active',
+      scope: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/consentscope', code: 'treatment' }] },
+      patient: { reference: 'Patient/patient-1' },
     }
     const result = validateResource('Consent', consent)
     expect(result.success).toBe(true)

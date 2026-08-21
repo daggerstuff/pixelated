@@ -31,6 +31,13 @@ vi.mock('@/lib/audit', () => ({
     DELETE: 'DELETE',
     ACCESS: 'ACCESS',
   },
+  AuditEventStatus: {
+    SUCCESS: 'success',
+    FAILURE: 'failure',
+    ATTEMPT: 'attempt',
+    BLOCKED: 'blocked',
+    WARNING: 'warning',
+  },
 }))
 
 import {

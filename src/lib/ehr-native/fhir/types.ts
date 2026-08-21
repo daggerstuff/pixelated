@@ -139,6 +139,12 @@ export interface FHIRRequestContext {
   breakGlass: boolean
   /** Raw JWT claims. */
   jwtClaims: Record<string, unknown>
+  /** Client IP address from incoming HTTP request. */
+  ipAddress?: string
+  /** Client User-Agent from incoming HTTP request. */
+  userAgent?: string
+  /** Session ID from incoming HTTP request. */
+  sessionId?: string
 }
 
 /** Parsed FHIR request. */

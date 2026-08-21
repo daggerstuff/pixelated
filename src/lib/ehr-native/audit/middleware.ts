@@ -15,6 +15,7 @@
 
 import type { FHIRRequestContext, FHIRResourceType } from '../fhir/types.js'
 import {
+  auditBreakGlassFHIR,
   auditFHIRCreate,
   auditFHIRDelete,
   auditFHIRFailure,
@@ -22,6 +23,7 @@ import {
   auditFHIRUpdate,
 } from './ehr-audit-bridge.js'
 import type {
+  BreakGlassAuditEntry,
   EhrAuditAction,
   EhrAuditContext,
   EhrAuditResult,
@@ -52,14 +54,17 @@ export function buildEhrAuditContext(
   sessionId?: string,
 ): EhrAuditContext {
   const claims = context.jwtClaims
+  const ip = ipAddress ?? context.ipAddress
+  const ua = userAgent ?? context.userAgent
+  const session = sessionId ?? context.sessionId
   return {
     userId: context.userId,
     tenantId: context.tenantId,
     role: context.role,
     breakGlass: context.breakGlass,
-    ...(ipAddress !== undefined ? { ipAddress } : {}),
-    ...(userAgent !== undefined ? { userAgent } : {}),
-    ...(sessionId !== undefined ? { sessionId } : {}),
+    ...(ip !== undefined ? { ipAddress: ip } : {}),
+    ...(ua !== undefined ? { userAgent: ua } : {}),
+    ...(session !== undefined ? { sessionId: session } : {}),
     ...(typeof claims['breakGlassReason'] === 'string'
       ? { breakGlassReason: claims['breakGlassReason'] }
       : {}),
@@ -118,9 +123,21 @@ export async function postWriteAudit(
     case 'read':
       result = await auditFHIRRead(ctx, resourceType, resourceId)
       break
-    case 'break-glass':
-      result = await auditFHIRRead(ctx, resourceType, resourceId)
+    case 'break-glass': {
+      const entry: BreakGlassAuditEntry = {
+        resourceType,
+        resourceId,
+        userId: ctx.userId,
+        role: ctx.role,
+        tenantId: ctx.tenantId,
+        reason: ctx.breakGlassReason ?? 'Break-glass access',
+        ...(ctx.ipAddress !== undefined ? { ipAddress: ctx.ipAddress } : {}),
+        ...(ctx.userAgent !== undefined ? { userAgent: ctx.userAgent } : {}),
+        ...(ctx.sessionId !== undefined ? { sessionId: ctx.sessionId } : {}),
+      }
+      result = await auditBreakGlassFHIR(entry)
       break
+    }
     default: {
       const exhaustive: never = action
       void exhaustive

@@ -420,6 +420,37 @@ describe('EHR Audit Middleware', () => {
       expect(ctx.userAgent).toBe('TestAgent/1.0')
       expect(ctx.sessionId).toBe('sess-xyz')
     })
+
+    it('extracts ipAddress, userAgent, sessionId from FHIRRequestContext', () => {
+      const ctxWithClient: FHIRRequestContext = {
+        ...mockFhirContext,
+        ipAddress: '10.0.0.99',
+        userAgent: 'Mozilla/5.0',
+        sessionId: 'sess-from-ctx',
+      }
+      const ctx = buildEhrAuditContext(ctxWithClient)
+      expect(ctx.ipAddress).toBe('10.0.0.99')
+      expect(ctx.userAgent).toBe('Mozilla/5.0')
+      expect(ctx.sessionId).toBe('sess-from-ctx')
+    })
+
+    it('prefers explicit params over FHIRRequestContext fields', () => {
+      const ctxWithClient: FHIRRequestContext = {
+        ...mockFhirContext,
+        ipAddress: '10.0.0.99',
+        userAgent: 'Mozilla/5.0',
+        sessionId: 'sess-from-ctx',
+      }
+      const ctx = buildEhrAuditContext(
+        ctxWithClient,
+        '192.168.1.1',
+        'TestAgent/1.0',
+        'sess-explicit',
+      )
+      expect(ctx.ipAddress).toBe('192.168.1.1')
+      expect(ctx.userAgent).toBe('TestAgent/1.0')
+      expect(ctx.sessionId).toBe('sess-explicit')
+    })
   })
 
   describe('preWriteAudit', () => {
@@ -480,7 +511,7 @@ describe('EHR Audit Middleware', () => {
       expect(hipaaArgs.eventType).toBe('delete')
     })
 
-    it('dispatches to auditFHIRRead for unknown action (fallback)', async () => {
+    it('dispatches to auditFHIRRead for read action', async () => {
       const result = await postWriteAudit(
         baseCtx,
         'Patient',
@@ -491,6 +522,39 @@ describe('EHR Audit Middleware', () => {
       expect(result.success).toBe(true)
       const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]
       expect(hipaaArgs.eventType).toBe('access')
+    })
+
+    it('dispatches to auditBreakGlassFHIR for break-glass action (not auditFHIRRead)', async () => {
+      const breakGlassAuditCtx: EhrAuditContext = {
+        ...baseCtx,
+        breakGlass: true,
+        breakGlassReason: 'Emergency access',
+        ipAddress: '10.0.0.42',
+        userAgent: 'Mozilla/5.0',
+        sessionId: 'sess-bgp',
+      }
+
+      const result = await postWriteAudit(
+        breakGlassAuditCtx,
+        'Patient',
+        'patient-bgp-001',
+        'break-glass',
+      )
+
+      expect(result.success).toBe(true)
+
+      const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]
+      expect(hipaaArgs.userId).toBe('user-001')
+      expect(hipaaArgs.status).toBe('warning')
+      expect(hipaaArgs.action).toBe('fhir:break-glass')
+      expect(hipaaArgs.notes).toBe('Break-glass: Emergency access')
+      expect(hipaaArgs.details.breakGlass).toBe(true)
+      expect(hipaaArgs.details.ipAddress).toBe('10.0.0.42')
+      expect(hipaaArgs.details.userAgent).toBe('Mozilla/5.0')
+
+      const chainEvent = mockLogEvent.mock.calls[0][0]
+      expect(chainEvent.severity).toBe('high')
+      expect(chainEvent.metadata.breakGlass).toBe(true)
     })
   })
 
