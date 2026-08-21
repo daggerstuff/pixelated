@@ -51,6 +51,7 @@ jobs:
         run: pnpm run build
         env:
           NODE_OPTIONS: --max-old-space-size=8192
+          JWT_SECRET: test-jwt-secret-for-ci-only-do-not-use-in-production
 
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.15.x
@@ -58,6 +59,7 @@ jobs:
       - name: Start preview server
         run: |
           nohup env HOST=127.0.0.1 PORT="${LHCI_PORT}" WEBSITES_PORT="${LHCI_PORT}" \
+            JWT_SECRET=test-jwt-secret-for-ci-only-do-not-use-in-production \
             pnpm run start > /tmp/pixelated-preview.log 2>&1 &
           echo "PREVIEW_PID=$!" >> "$GITHUB_ENV"
 
