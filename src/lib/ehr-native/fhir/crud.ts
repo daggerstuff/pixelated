@@ -8,7 +8,12 @@
 
 import { randomUUID } from 'node:crypto'
 
-import { AuditEventType } from '@/lib/audit'
+import {
+  buildEhrAuditContext,
+  postWriteAudit,
+  postWriteFailureAudit,
+  readAudit,
+} from '../audit/index.js'
 
 import {
   badRequest,
@@ -226,7 +231,9 @@ export async function createResource(
       )
     }
 
-    // 7. Return 201 Created with Location header
+    const auditCtx = buildEhrAuditContext(context)
+    await postWriteAudit(auditCtx, resourceType, resourceId, 'create', '1')
+
     return {
       status: 201,
       headers: {
@@ -238,6 +245,8 @@ export async function createResource(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Create failed'
+    const auditCtx = buildEhrAuditContext(context)
+    await postWriteFailureAudit(auditCtx, resourceType, resourceId, 'create', message)
     return internalServerError(message)
   }
 }
@@ -289,6 +298,9 @@ export async function readResource(
         },
       }
     }
+
+    const auditCtx = buildEhrAuditContext(context)
+    await readAudit(auditCtx, resourceType, resourceId)
 
     return {
       status: 200,
@@ -430,6 +442,9 @@ export async function updateResource(
       )
     }
 
+    const auditCtx = buildEhrAuditContext(context)
+    await postWriteAudit(auditCtx, resourceType, resourceId, 'update', '1')
+
     return {
       status: 200,
       headers: {
@@ -441,6 +456,8 @@ export async function updateResource(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Update failed'
+    const auditCtx = buildEhrAuditContext(context)
+    await postWriteFailureAudit(auditCtx, resourceType, resourceId, 'update', message)
     return internalServerError(message)
   }
 }
@@ -527,6 +544,9 @@ export async function deleteResource(
       )
     }
 
+    const auditCtx = buildEhrAuditContext(context)
+    await postWriteAudit(auditCtx, resourceType, resourceId, 'delete')
+
     return {
       status: 204,
       headers: {},
@@ -534,6 +554,8 @@ export async function deleteResource(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Delete failed'
+    const auditCtx = buildEhrAuditContext(context)
+    await postWriteFailureAudit(auditCtx, resourceType, resourceId, 'delete', message)
     return internalServerError(message)
   }
 }
