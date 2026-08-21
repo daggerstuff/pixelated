@@ -61,7 +61,21 @@ function extractContext(headers: Headers): FHIRRequestContext | null {
     }
   }
 
-  return { tenantId, userId, role, breakGlass: breakGlass, jwtClaims }
+  const ipAddress =
+    headers.get('x-forwarded-for') ?? headers.get('x-real-ip') ?? null
+  const userAgent = headers.get('user-agent')
+  const sessionId = headers.get('x-session-id')
+
+  return {
+    tenantId,
+    userId,
+    role,
+    breakGlass: breakGlass,
+    jwtClaims,
+    ...(ipAddress !== null ? { ipAddress } : {}),
+    ...(userAgent !== null ? { userAgent } : {}),
+    ...(sessionId !== null ? { sessionId } : {}),
+  }
 }
 
 /**

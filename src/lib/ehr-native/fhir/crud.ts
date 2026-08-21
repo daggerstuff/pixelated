@@ -230,7 +230,12 @@ export async function createResource(
       )
     }
 
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await postWriteAudit(auditCtx, resourceType, resourceId, 'create', '1')
 
     return {
@@ -244,7 +249,12 @@ export async function createResource(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Create failed'
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await postWriteFailureAudit(
       auditCtx,
       resourceType,
@@ -304,7 +314,12 @@ export async function readResource(
       }
     }
 
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await readAudit(auditCtx, resourceType, resourceId)
 
     return {
@@ -447,7 +462,12 @@ export async function updateResource(
       )
     }
 
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await postWriteAudit(auditCtx, resourceType, resourceId, 'update', '1')
 
     return {
@@ -461,7 +481,12 @@ export async function updateResource(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Update failed'
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await postWriteFailureAudit(
       auditCtx,
       resourceType,
@@ -555,7 +580,12 @@ export async function deleteResource(
       )
     }
 
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await postWriteAudit(auditCtx, resourceType, resourceId, 'delete')
 
     return {
@@ -565,7 +595,12 @@ export async function deleteResource(
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Delete failed'
-    const auditCtx = buildEhrAuditContext(context)
+    const auditCtx = buildEhrAuditContext(
+      context,
+      context.ipAddress,
+      context.userAgent,
+      context.sessionId,
+    )
     await postWriteFailureAudit(
       auditCtx,
       resourceType,

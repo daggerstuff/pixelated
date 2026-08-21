@@ -119,8 +119,9 @@ export async function postWriteAudit(
       result = await auditFHIRRead(ctx, resourceType, resourceId)
       break
     case 'break-glass':
-      result = await auditFHIRRead(ctx, resourceType, resourceId)
-      break
+      throw new Error(
+        'postWriteAudit does not handle break-glass — use auditBreakGlassFHIR instead',
+      )
     default: {
       const exhaustive: never = action
       void exhaustive
