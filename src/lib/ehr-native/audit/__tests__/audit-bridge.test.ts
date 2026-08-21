@@ -14,7 +14,8 @@ const mockLogEvent = vi.fn()
 const mockVerifyAuditChain = vi.fn()
 
 vi.mock('@/lib/audit', () => ({
-  createHIPAACompliantAuditLog: (...args: unknown[]) => mockCreateHIPAACompliantAuditLog(...args),
+  createHIPAACompliantAuditLog: (...args: unknown[]) =>
+    mockCreateHIPAACompliantAuditLog(...args),
   AuditEventType: {
     ACCESS: 'access',
     CREATE: 'create',
@@ -145,7 +146,12 @@ describe('EHR Audit Bridge', () => {
 
   describe('auditFHIRCreate', () => {
     it('emits both HIPAA log and chain event for a create', async () => {
-      const result = await auditFHIRCreate(baseCtx, 'Patient', 'patient-123', '1')
+      const result = await auditFHIRCreate(
+        baseCtx,
+        'Patient',
+        'patient-123',
+        '1',
+      )
 
       expect(result.success).toBe(true)
       expect(result.auditLogId).toBe('hipaa-log-001')
@@ -178,7 +184,12 @@ describe('EHR Audit Bridge', () => {
 
   describe('auditFHIRUpdate', () => {
     it('emits both HIPAA log (MODIFY) and chain event (UPDATE) for an update', async () => {
-      const result = await auditFHIRUpdate(baseCtx, 'Observation', 'obs-456', '2')
+      const result = await auditFHIRUpdate(
+        baseCtx,
+        'Observation',
+        'obs-456',
+        '2',
+      )
 
       expect(result.success).toBe(true)
 
@@ -242,7 +253,9 @@ describe('EHR Audit Bridge', () => {
 
       const chainEvent = mockLogEvent.mock.calls[0][0]
       expect(chainEvent.status).toBe('failure')
-      expect(chainEvent.errorMessage).toBe('Validation failed: missing required field')
+      expect(chainEvent.errorMessage).toBe(
+        'Validation failed: missing required field',
+      )
     })
   })
 
@@ -266,9 +279,13 @@ describe('EHR Audit Bridge', () => {
       expect(hipaaArgs.userId).toBe('user-002')
       expect(hipaaArgs.eventType).toBe('access')
       expect(hipaaArgs.status).toBe('warning')
-      expect(hipaaArgs.notes).toBe('Break-glass: Emergency access for patient care')
+      expect(hipaaArgs.notes).toBe(
+        'Break-glass: Emergency access for patient care',
+      )
       expect(hipaaArgs.details.breakGlass).toBe(true)
-      expect(hipaaArgs.details.breakGlassReason).toBe('Emergency access for patient care')
+      expect(hipaaArgs.details.breakGlassReason).toBe(
+        'Emergency access for patient care',
+      )
       expect(hipaaArgs.details.ipAddress).toBe('10.0.0.42')
       expect(hipaaArgs.details.userAgent).toBe('Mozilla/5.0')
       expect(hipaaArgs.details.sessionId).toBe('session-abc')
@@ -276,7 +293,9 @@ describe('EHR Audit Bridge', () => {
       const chainEvent = mockLogEvent.mock.calls[0][0]
       expect(chainEvent.severity).toBe('high')
       expect(chainEvent.metadata.breakGlass).toBe(true)
-      expect(chainEvent.metadata.breakGlassReason).toBe('Emergency access for patient care')
+      expect(chainEvent.metadata.breakGlassReason).toBe(
+        'Emergency access for patient care',
+      )
       expect(chainEvent.ipAddress).toBe('10.0.0.42')
     })
   })
@@ -293,17 +312,23 @@ describe('EHR Audit Bridge', () => {
 
       const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]
       expect(hipaaArgs.details.breakGlass).toBe(true)
-      expect(hipaaArgs.details.breakGlassReason).toBe('Emergency access for patient care')
+      expect(hipaaArgs.details.breakGlassReason).toBe(
+        'Emergency access for patient care',
+      )
 
       const chainEvent = mockLogEvent.mock.calls[0][0]
       expect(chainEvent.metadata.breakGlass).toBe(true)
-      expect(chainEvent.metadata.breakGlassReason).toBe('Emergency access for patient care')
+      expect(chainEvent.metadata.breakGlassReason).toBe(
+        'Emergency access for patient care',
+      )
     })
   })
 
   describe('auditFHIREvent error handling', () => {
     it('returns failure result when createHIPAACompliantAuditLog throws', async () => {
-      mockCreateHIPAACompliantAuditLog.mockRejectedValue(new Error('DB connection failed'))
+      mockCreateHIPAACompliantAuditLog.mockRejectedValue(
+        new Error('DB connection failed'),
+      )
 
       const result = await auditFHIRCreate(baseCtx, 'Patient', 'patient-err')
 
@@ -399,7 +424,12 @@ describe('EHR Audit Middleware', () => {
 
   describe('preWriteAudit', () => {
     it('logs access attempt with ATTEMPT status', async () => {
-      const result = await preWriteAudit(baseCtx, 'Patient', 'patient-001', 'create')
+      const result = await preWriteAudit(
+        baseCtx,
+        'Patient',
+        'patient-001',
+        'create',
+      )
 
       expect(result.success).toBe(true)
 
@@ -410,7 +440,13 @@ describe('EHR Audit Middleware', () => {
 
   describe('postWriteAudit', () => {
     it('dispatches to auditFHIRCreate for create action', async () => {
-      const result = await postWriteAudit(baseCtx, 'Patient', 'patient-001', 'create', '1')
+      const result = await postWriteAudit(
+        baseCtx,
+        'Patient',
+        'patient-001',
+        'create',
+        '1',
+      )
 
       expect(result.success).toBe(true)
       const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]
@@ -418,7 +454,13 @@ describe('EHR Audit Middleware', () => {
     })
 
     it('dispatches to auditFHIRUpdate for update action', async () => {
-      const result = await postWriteAudit(baseCtx, 'Patient', 'patient-001', 'update', '2')
+      const result = await postWriteAudit(
+        baseCtx,
+        'Patient',
+        'patient-001',
+        'update',
+        '2',
+      )
 
       expect(result.success).toBe(true)
       const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]
@@ -426,7 +468,12 @@ describe('EHR Audit Middleware', () => {
     })
 
     it('dispatches to auditFHIRDelete for delete action', async () => {
-      const result = await postWriteAudit(baseCtx, 'Patient', 'patient-001', 'delete')
+      const result = await postWriteAudit(
+        baseCtx,
+        'Patient',
+        'patient-001',
+        'delete',
+      )
 
       expect(result.success).toBe(true)
       const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]
@@ -434,7 +481,12 @@ describe('EHR Audit Middleware', () => {
     })
 
     it('dispatches to auditFHIRRead for unknown action (fallback)', async () => {
-      const result = await postWriteAudit(baseCtx, 'Patient', 'patient-001', 'read')
+      const result = await postWriteAudit(
+        baseCtx,
+        'Patient',
+        'patient-001',
+        'read',
+      )
 
       expect(result.success).toBe(true)
       const hipaaArgs = mockCreateHIPAACompliantAuditLog.mock.calls[0][0]

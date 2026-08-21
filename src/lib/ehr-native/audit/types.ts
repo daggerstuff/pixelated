@@ -36,7 +36,8 @@ export interface EhrAuditContext {
  * - delete → AuditEventType.DELETE (both enums)
  * - read   → AuditEventType.ACCESS (both enums)
  */
-export type EhrAuditAction = 'create' | 'update' | 'delete' | 'read' | 'break-glass'
+export type EhrAuditAction =
+  'create' | 'update' | 'delete' | 'read' | 'break-glass'
 
 /**
  * Result of an audit operation.

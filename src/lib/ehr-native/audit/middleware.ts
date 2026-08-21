@@ -14,7 +14,11 @@
  */
 
 import type { FHIRRequestContext, FHIRResourceType } from '../fhir/types.js'
-import type { EhrAuditAction, EhrAuditContext, EhrAuditResult } from './types.js'
+import type {
+  EhrAuditAction,
+  EhrAuditContext,
+  EhrAuditResult,
+} from './types.js'
 import {
   auditFHIRCreate,
   auditFHIRDelete,
@@ -28,7 +32,9 @@ import {
  */
 function checkAuditResult(result: EhrAuditResult, operation: string): void {
   if (!result.success) {
-    console.warn(`[EHR-AUDIT] Audit emission failed for ${operation}: ${result.error ?? 'unknown error'}`)
+    console.warn(
+      `[EHR-AUDIT] Audit emission failed for ${operation}: ${result.error ?? 'unknown error'}`,
+    )
   }
 }
 
@@ -135,7 +141,13 @@ export async function postWriteFailureAudit(
   action: EhrAuditAction,
   errorMessage: string,
 ): Promise<EhrAuditResult> {
-  const result = await auditFHIRFailure(ctx, resourceType, resourceId, action, errorMessage)
+  const result = await auditFHIRFailure(
+    ctx,
+    resourceType,
+    resourceId,
+    action,
+    errorMessage,
+  )
   checkAuditResult(result, `failure ${action}`)
   return result
 }

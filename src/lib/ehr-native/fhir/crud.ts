@@ -185,8 +185,7 @@ export async function createResource(
     }
 
     // 4. Generate resource ID if not present
-    resourceId =
-      (validatedResource['id'] as string | undefined) ?? randomUUID()
+    resourceId = (validatedResource['id'] as string | undefined) ?? randomUUID()
     validatedResource['id'] = resourceId
 
     // 5. Persist to database
@@ -247,7 +246,13 @@ export async function createResource(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Create failed'
     const auditCtx = buildEhrAuditContext(context)
-    await postWriteFailureAudit(auditCtx, resourceType, resourceId ?? 'unknown', 'create', message)
+    await postWriteFailureAudit(
+      auditCtx,
+      resourceType,
+      resourceId ?? 'unknown',
+      'create',
+      message,
+    )
     return internalServerError(message)
   }
 }
@@ -458,7 +463,13 @@ export async function updateResource(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Update failed'
     const auditCtx = buildEhrAuditContext(context)
-    await postWriteFailureAudit(auditCtx, resourceType, resourceId, 'update', message)
+    await postWriteFailureAudit(
+      auditCtx,
+      resourceType,
+      resourceId,
+      'update',
+      message,
+    )
     return internalServerError(message)
   }
 }
@@ -556,7 +567,13 @@ export async function deleteResource(
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Delete failed'
     const auditCtx = buildEhrAuditContext(context)
-    await postWriteFailureAudit(auditCtx, resourceType, resourceId, 'delete', message)
+    await postWriteFailureAudit(
+      auditCtx,
+      resourceType,
+      resourceId,
+      'delete',
+      message,
+    )
     return internalServerError(message)
   }
 }
