@@ -14,11 +14,6 @@
  */
 
 import type { FHIRRequestContext, FHIRResourceType } from '../fhir/types.js'
-import type {
-  EhrAuditAction,
-  EhrAuditContext,
-  EhrAuditResult,
-} from './types.js'
 import {
   auditFHIRCreate,
   auditFHIRDelete,
@@ -26,6 +21,11 @@ import {
   auditFHIRRead,
   auditFHIRUpdate,
 } from './ehr-audit-bridge.js'
+import type {
+  EhrAuditAction,
+  EhrAuditContext,
+  EhrAuditResult,
+} from './types.js'
 
 /**
  * Log a warning when an audit result indicates failure.

@@ -62,6 +62,7 @@ vi.mock('@/lib/audit/logger', () => ({
 
 // --- Imports (after mocks are set up) ---
 
+import type { FHIRRequestContext } from '../../fhir/types.js'
 import {
   auditFHIRCreate,
   auditFHIRUpdate,
@@ -80,7 +81,6 @@ import {
   readAudit,
 } from '../middleware.js'
 import type { EhrAuditContext } from '../types.js'
-import type { FHIRRequestContext } from '../../fhir/types.js'
 
 // --- Test fixtures ---
 
