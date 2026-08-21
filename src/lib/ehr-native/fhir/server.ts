@@ -61,8 +61,20 @@ function extractContext(headers: Headers): FHIRRequestContext | null {
     }
   }
 
-  const ipAddress =
-    headers.get('x-forwarded-for') ?? headers.get('x-real-ip') ?? null
+  const rawForwardedFor = headers.get('x-forwarded-for')
+  let ipAddress: string | null = null
+
+  if (rawForwardedFor) {
+    const firstForwarded = rawForwardedFor.split(',')[0]?.trim()
+    if (firstForwarded) {
+      ipAddress = firstForwarded
+    }
+  }
+
+  if (!ipAddress) {
+    ipAddress = headers.get('x-real-ip')
+  }
+
   const userAgent = headers.get('user-agent')
   const sessionId = headers.get('x-session-id')
 
