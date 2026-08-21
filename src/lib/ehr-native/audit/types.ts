@@ -37,11 +37,7 @@ export interface EhrAuditContext {
  * - read   → AuditEventType.ACCESS (both enums)
  */
 export type EhrAuditAction =
-  | 'create'
-  | 'update'
-  | 'delete'
-  | 'read'
-  | 'break-glass'
+  'create' | 'update' | 'delete' | 'read' | 'break-glass'
 
 /**
  * Result of an audit operation.
