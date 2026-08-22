@@ -1,13 +1,13 @@
 import { z } from 'zod';
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  periodSchema,
-  referenceSchema,
-  contactPointSchema,
-  addressSchema,
-  backboneElementSchema,
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirPeriodSchema,
+  fhirReferenceSchema,
+  fhirContactPointSchema,
+  fhirAddressSchema,
+  fhirBackboneElementSchema,
 } from './base';
 
 /**
@@ -15,22 +15,22 @@ import {
  * Roles/positions that a practitioner may perform at an organization.
  * @see http://hl7.org/fhir/R4/practitionerrole.html
  */
-export const practitionerRoleSchema = domainResourceSchema.extend({
+export const practitionerRoleSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('PractitionerRole'),
-  identifier: z.array(identifierSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
   active: z.boolean().optional(),
-  period: periodSchema.optional(),
-  practitioner: referenceSchema.optional(),
-  organization: referenceSchema.optional(),
-  code: z.array(codeableConceptSchema).optional(),
-  specialty: z.array(codeableConceptSchema).optional(),
-  location: z.array(referenceSchema).optional(),
-  healthcareService: z.array(referenceSchema).optional(),
-  telecom: z.array(contactPointSchema).optional(),
+  period: fhirPeriodSchema.optional(),
+  practitioner: fhirReferenceSchema.optional(),
+  organization: fhirReferenceSchema.optional(),
+  code: z.array(fhirCodeableConceptSchema).optional(),
+  specialty: z.array(fhirCodeableConceptSchema).optional(),
+  location: z.array(fhirReferenceSchema).optional(),
+  healthcareService: z.array(fhirReferenceSchema).optional(),
+  telecom: z.array(fhirContactPointSchema).optional(),
   availableTime: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         daysOfWeek: z
           .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))
           .optional(),
@@ -43,14 +43,14 @@ export const practitionerRoleSchema = domainResourceSchema.extend({
   notAvailable: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         description: z.string(),
-        during: periodSchema.optional(),
+        during: fhirPeriodSchema.optional(),
       }),
     )
     .optional(),
   availabilityExceptions: z.string().optional(),
-  endpoint: z.array(referenceSchema).optional(),
+  endpoint: z.array(fhirReferenceSchema).optional(),
 });
 
 export type PractitionerRole = z.infer<typeof practitionerRoleSchema>;

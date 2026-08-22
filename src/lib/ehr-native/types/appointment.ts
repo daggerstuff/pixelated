@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  referenceSchema,
-  periodSchema,
-  backboneElementSchema,
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
+  fhirPeriodSchema,
+  fhirBackboneElementSchema,
 } from './base';
 
 /**
@@ -13,9 +13,9 @@ import {
  * A booking of a healthcare event among patient(s), practitioner(s), person(s) and/or device(s).
  * @see http://hl7.org/fhir/R4/appointment.html
  */
-export const appointmentSchema = domainResourceSchema.extend({
+export const appointmentSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Appointment'),
-  identifier: z.array(identifierSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
   status: z.enum([
     'proposed',
     'booked',
@@ -29,30 +29,30 @@ export const appointmentSchema = domainResourceSchema.extend({
     'checked-in',
     'no-show',
   ]),
-  cancelationReason: codeableConceptSchema.optional(),
-  serviceCategory: z.array(codeableConceptSchema).optional(),
-  serviceType: z.array(codeableConceptSchema).optional(),
-  specialty: z.array(codeableConceptSchema).optional(),
-  appointmentType: codeableConceptSchema.optional(),
-  reasonCode: z.array(codeableConceptSchema).optional(),
-  reasonReference: z.array(referenceSchema).optional(),
+  cancelationReason: fhirCodeableConceptSchema.optional(),
+  serviceCategory: z.array(fhirCodeableConceptSchema).optional(),
+  serviceType: z.array(fhirCodeableConceptSchema).optional(),
+  specialty: z.array(fhirCodeableConceptSchema).optional(),
+  appointmentType: fhirCodeableConceptSchema.optional(),
+  reasonCode: z.array(fhirCodeableConceptSchema).optional(),
+  reasonReference: z.array(fhirReferenceSchema).optional(),
   priority: z.number().int().optional(),
   description: z.string().optional(),
-  supportingInformation: z.array(referenceSchema).optional(),
+  supportingInformation: z.array(fhirReferenceSchema).optional(),
   start: z.string().optional(),
   end: z.string().optional(),
   minutesDuration: z.number().int().nonnegative().optional(),
-  slot: z.array(referenceSchema).optional(),
+  slot: z.array(fhirReferenceSchema).optional(),
   created: z.string().optional(),
   comment: z.string().optional(),
   patientInstruction: z.string().optional(),
-  basedOn: z.array(referenceSchema).optional(),
+  basedOn: z.array(fhirReferenceSchema).optional(),
   participant: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        type: z.array(codeableConceptSchema).optional(),
-        actor: referenceSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        type: z.array(fhirCodeableConceptSchema).optional(),
+        actor: fhirReferenceSchema.optional(),
         required: z.enum(['required', 'optional', 'information-only']).optional(),
         status: z.enum([
           'accepted',
@@ -63,7 +63,7 @@ export const appointmentSchema = domainResourceSchema.extend({
       }),
     )
     .min(1),
-  requestedPeriod: z.array(periodSchema).optional(),
+  requestedPeriod: z.array(fhirPeriodSchema).optional(),
 });
 
 export type Appointment = z.infer<typeof appointmentSchema>;

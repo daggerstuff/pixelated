@@ -1,11 +1,11 @@
 import { z } from 'zod';
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  referenceSchema,
-  periodSchema,
-  backboneElementSchema,
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
+  fhirPeriodSchema,
+  fhirBackboneElementSchema,
 } from './base';
 
 /**
@@ -14,21 +14,21 @@ import {
  * that has risen to a level of concern.
  * @see http://hl7.org/fhir/R4/condition.html
  */
-export const conditionSchema = domainResourceSchema.extend({
+export const conditionSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Condition'),
-  identifier: z.array(identifierSchema).optional(),
-  clinicalStatus: codeableConceptSchema.optional(),
-  verificationStatus: codeableConceptSchema.optional(),
-  category: z.array(codeableConceptSchema).optional(),
-  severity: codeableConceptSchema.optional(),
-  code: codeableConceptSchema.optional(),
-  bodySite: z.array(codeableConceptSchema).optional(),
-  subject: referenceSchema,
-  encounter: referenceSchema.optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  clinicalStatus: fhirCodeableConceptSchema.optional(),
+  verificationStatus: fhirCodeableConceptSchema.optional(),
+  category: z.array(fhirCodeableConceptSchema).optional(),
+  severity: fhirCodeableConceptSchema.optional(),
+  code: fhirCodeableConceptSchema.optional(),
+  bodySite: z.array(fhirCodeableConceptSchema).optional(),
+  subject: fhirReferenceSchema,
+  encounter: fhirReferenceSchema.optional(),
   onsetDateTime: z.string().optional(),
   onsetAge: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       value: z.number().optional(),
       comparator: z.enum(['<', '<=', '>=', '>']).optional(),
       unit: z.string().optional(),
@@ -36,13 +36,13 @@ export const conditionSchema = domainResourceSchema.extend({
       code: z.string().optional(),
     })
     .optional(),
-  onsetPeriod: periodSchema.optional(),
+  onsetPeriod: fhirPeriodSchema.optional(),
   onsetRange: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       low: z
         .object({
-          ...backboneElementSchema.shape,
+          ...fhirBackboneElementSchema.shape,
           value: z.number().optional(),
           unit: z.string().optional(),
           system: z.string().optional(),
@@ -51,7 +51,7 @@ export const conditionSchema = domainResourceSchema.extend({
         .optional(),
       high: z
         .object({
-          ...backboneElementSchema.shape,
+          ...fhirBackboneElementSchema.shape,
           value: z.number().optional(),
           unit: z.string().optional(),
           system: z.string().optional(),
@@ -64,7 +64,7 @@ export const conditionSchema = domainResourceSchema.extend({
   abatementDateTime: z.string().optional(),
   abatementAge: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       value: z.number().optional(),
       comparator: z.enum(['<', '<=', '>=', '>']).optional(),
       unit: z.string().optional(),
@@ -72,13 +72,13 @@ export const conditionSchema = domainResourceSchema.extend({
       code: z.string().optional(),
     })
     .optional(),
-  abatementPeriod: periodSchema.optional(),
+  abatementPeriod: fhirPeriodSchema.optional(),
   abatementRange: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       low: z
         .object({
-          ...backboneElementSchema.shape,
+          ...fhirBackboneElementSchema.shape,
           value: z.number().optional(),
           unit: z.string().optional(),
           system: z.string().optional(),
@@ -87,7 +87,7 @@ export const conditionSchema = domainResourceSchema.extend({
         .optional(),
       high: z
         .object({
-          ...backboneElementSchema.shape,
+          ...fhirBackboneElementSchema.shape,
           value: z.number().optional(),
           unit: z.string().optional(),
           system: z.string().optional(),
@@ -98,32 +98,32 @@ export const conditionSchema = domainResourceSchema.extend({
     .optional(),
   abatementString: z.string().optional(),
   recordedDate: z.string().optional(),
-  recorder: referenceSchema.optional(),
-  asserter: referenceSchema.optional(),
+  recorder: fhirReferenceSchema.optional(),
+  asserter: fhirReferenceSchema.optional(),
   stage: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        summary: codeableConceptSchema.optional(),
-        assessment: z.array(referenceSchema).optional(),
-        type: codeableConceptSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        summary: fhirCodeableConceptSchema.optional(),
+        assessment: z.array(fhirReferenceSchema).optional(),
+        type: fhirCodeableConceptSchema.optional(),
       }),
     )
     .optional(),
   evidence: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        code: z.array(codeableConceptSchema).optional(),
-        detail: z.array(referenceSchema).optional(),
+        ...fhirBackboneElementSchema.shape,
+        code: z.array(fhirCodeableConceptSchema).optional(),
+        detail: z.array(fhirReferenceSchema).optional(),
       }),
     )
     .optional(),
   note: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        authorReference: referenceSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        authorReference: fhirReferenceSchema.optional(),
         authorString: z.string().optional(),
         time: z.string().optional(),
         text: z.string(),

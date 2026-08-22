@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import {
   // Base type schemas
-  humanNameSchema,
-  addressSchema,
-  codingSchema,
-  codeableConceptSchema,
-  referenceSchema,
+  fhirHumanNameSchema,
+  fhirAddressSchema,
+  fhirCodingSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
   // Resource schemas
   patientSchema,
   practitionerSchema,
@@ -30,62 +30,62 @@ import {
 // Base FHIR R4 type schemas
 // ---------------------------------------------------------------------------
 
-describe('humanNameSchema', () => {
+describe('fhirHumanNameSchema', () => {
   it('parses a valid HumanName', () => {
     const valid = { family: 'Smith', given: ['John'] }
-    expect(humanNameSchema.parse(valid)).toEqual(valid)
+    expect(fhirHumanNameSchema.parse(valid)).toEqual(valid)
   })
 
   it('fails safeParse on invalid use enum', () => {
-    const result = humanNameSchema.safeParse({ use: 'invalid-use' })
+    const result = fhirHumanNameSchema.safeParse({ use: 'invalid-use' })
     expect(result.success).toBe(false)
   })
 })
 
-describe('addressSchema', () => {
+describe('fhirAddressSchema', () => {
   it('parses a valid Address', () => {
     const valid = { line: ['123 Main St'], city: 'Springfield' }
-    expect(addressSchema.parse(valid)).toEqual(valid)
+    expect(fhirAddressSchema.parse(valid)).toEqual(valid)
   })
 
   it('fails safeParse on invalid use enum', () => {
-    const result = addressSchema.safeParse({ use: 'invalid-use' })
+    const result = fhirAddressSchema.safeParse({ use: 'invalid-use' })
     expect(result.success).toBe(false)
   })
 })
 
-describe('codingSchema', () => {
+describe('fhirCodingSchema', () => {
   it('parses a valid Coding', () => {
     const valid = { system: 'http://example.com', code: 'active' }
-    expect(codingSchema.parse(valid)).toEqual(valid)
+    expect(fhirCodingSchema.parse(valid)).toEqual(valid)
   })
 
   it('fails safeParse on wrong type for userSelected', () => {
-    const result = codingSchema.safeParse({ userSelected: 'yes' })
+    const result = fhirCodingSchema.safeParse({ userSelected: 'yes' })
     expect(result.success).toBe(false)
   })
 })
 
-describe('codeableConceptSchema', () => {
+describe('fhirCodeableConceptSchema', () => {
   it('parses a valid CodeableConcept', () => {
     const valid = { text: 'Some concept', coding: [{ code: 'active' }] }
-    expect(codeableConceptSchema.parse(valid)).toEqual(valid)
+    expect(fhirCodeableConceptSchema.parse(valid)).toEqual(valid)
   })
 
   it('fails safeParse when coding is not an array', () => {
-    const result = codeableConceptSchema.safeParse({ coding: 'not-an-array' })
+    const result = fhirCodeableConceptSchema.safeParse({ coding: 'not-an-array' })
     expect(result.success).toBe(false)
   })
 })
 
-describe('referenceSchema', () => {
+describe('fhirReferenceSchema', () => {
   it('parses a valid Reference', () => {
     const valid = { reference: 'Patient/123' }
-    expect(referenceSchema.parse(valid)).toEqual(valid)
+    expect(fhirReferenceSchema.parse(valid)).toEqual(valid)
   })
 
   it('fails safeParse when reference is not a string', () => {
-    const result = referenceSchema.safeParse({ reference: 123 })
+    const result = fhirReferenceSchema.safeParse({ reference: 123 })
     expect(result.success).toBe(false)
   })
 })
@@ -222,6 +222,9 @@ describe('claimSchema', () => {
       use: 'claim',
       patient: {},
       provider: {},
+      priority: {},
+      created: '2026-01-01',
+      insurance: [{ sequence: 1, focal: true, coverage: {} }],
     }
     expect(claimSchema.parse(valid)).toEqual(valid)
   })
