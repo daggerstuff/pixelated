@@ -21,7 +21,6 @@ import {
   type CreateConsentInput,
 } from './repository'
 import {
-  DEFAULT_STATE_RULES,
   getStateRules,
   requiresHigherConsent,
   type StateConsentRules,
@@ -86,25 +85,19 @@ export class ConsentService {
     stateCode?: string,
     treatmentCategory?: string,
   ): Promise<ConsentVerificationResult> {
-    // Phase 1: delegate baseline check to SQL function
-    const sqlResult = await query<{
-      has_consent: boolean
-      consent_level: string
-    }>(`SELECT * FROM ehr_patient_has_consent($1, $2, $3)`, [
-      patientId,
-      tenantId,
-      minimumLevel,
-    ])
+    // Phase 1: delegate baseline check to SQL function (returns boolean)
+    const sqlResult = await query<{ ehr_patient_has_consent: boolean }>(
+      `SELECT ehr_patient_has_consent($1, $2, $3)`,
+      [patientId, tenantId, minimumLevel],
+    )
+    const hasConsent = Boolean(sqlResult.rows[0]?.['ehr_patient_has_consent'])
 
-    const row = sqlResult.rows[0]
-    const hasConsent = row?.['has_consent'] ?? false
-    const dbConsentLevel = (row?.['consent_level'] ?? 'none') as ConsentLevel
-
-    // Check expiry from FHIR resource period
+    // Get consent level from the active consent record
     const activeConsent = await this.repository.getActiveByPatient(
       patientId,
       tenantId,
     )
+    const dbConsentLevel = (activeConsent?.consent_level ?? 'none') as ConsentLevel
     const expired = this.isConsentExpired(activeConsent)
 
     // Apply state rules if stateCode provided
@@ -227,10 +220,16 @@ export class ConsentService {
    */
   private isConsentExpired(consent: ConsentRow | null): boolean {
     if (!consent) return true
-    if (!consent.period_end) return false
-    const periodEnd = new Date(consent.period_end)
     const today = new Date()
     today.setHours(0, 0, 0, 0)
+    // Check period_start — consent not yet in effect
+    if (consent.period_start) {
+      const periodStart = new Date(consent.period_start)
+      if (periodStart > today) return true
+    }
+    // Check period_end — consent has expired
+    if (!consent.period_end) return false
+    const periodEnd = new Date(consent.period_end)
     return periodEnd < today
   }
 
@@ -244,8 +243,8 @@ export class ConsentService {
     stateRulesPass: boolean,
   ): string {
     if (verified) return 'Consent verified'
+    if (!hasConsent) return 'No active consent record found'
     if (expired) return 'Consent has expired'
-    if (!hasConsent) return 'Patient does not have sufficient consent'
     if (!stateRulesPass) return 'State-specific consent requirements not met'
     return 'Consent verification failed'
   }
