@@ -109,17 +109,18 @@ const organizationSchema = {
 
           <form id="contact-form" class="space-y-6" novalidate>
             <div
-              id="error-message"
-              class="hidden rounded-lg p-4"
-              style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;"
-              role="alert"
-            >
+               id="error-message"
+               class="hidden rounded-lg p-4"
+               style="background: var(--np-elevated); border: 1px solid var(--np-line-strong); color: var(--np-text);"
+               role="alert"
+               aria-live="assertive"
+             >
               <p id="error-text"></p>
             </div>
 
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label for="name" class="eyebrow-text mb-2 block">
+                <label for="name" class="marketing-eyebrow">
                   Name <span style="color: var(--accent-primary);">*</span>
                 </label>
                 <input
@@ -131,7 +132,7 @@ const organizationSchema = {
                   class="marketing-input"
                   placeholder="Your name"
                 />
-                <div class="mt-1 hidden text-xs text-red-400" id="name-error">
+                <div class="mt-1 hidden text-xs form-error-text" id="name-error">
                 </div>
               </div>
 
@@ -148,13 +149,13 @@ const organizationSchema = {
                   class="marketing-input"
                   placeholder="you@example.com"
                 />
-                <div class="mt-1 hidden text-xs text-red-400" id="email-error">
+                <div class="mt-1 hidden text-xs form-error-text" id="email-error">
                 </div>
               </div>
             </div>
 
             <div>
-              <label for="subject" class="eyebrow-text mb-2 block">
+              <label for="subject" class="marketing-eyebrow">
                 Subject <span style="color: var(--accent-primary);">*</span>
               </label>
               <input
@@ -166,12 +167,12 @@ const organizationSchema = {
                 class="marketing-input"
                 placeholder="Pilot, demo, trust review, or something else"
               />
-              <div class="mt-1 hidden text-xs text-red-400" id="subject-error">
+              <div class="mt-1 hidden text-xs form-error-text" id="subject-error">
               </div>
             </div>
 
             <div>
-              <label for="message" class="eyebrow-text mb-2 block">
+              <label for="message" class="marketing-eyebrow">
                 Message <span style="color: var(--accent-primary);">*</span>
               </label>
               <textarea
@@ -184,7 +185,7 @@ const organizationSchema = {
                 placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."
               ></textarea>
               <div class="mt-1 flex items-center justify-between">
-                <div class="hidden text-xs text-red-400" id="message-error">
+                <div class="hidden text-xs form-error-text" id="message-error">
                 </div>
                 <div class="text-xs" style="color: var(--text-muted);">
                   <span id="message-count">0</span>/2000
@@ -229,8 +230,9 @@ const organizationSchema = {
           <div
             id="success-message"
             class="mt-6 hidden rounded-lg p-6"
-            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);"
+            style="background: var(--np-elevated); border: 1px solid var(--np-line-strong);"
             role="alert"
+            aria-live="polite"
           >
             <h3
               class="mb-2 font-semibold"
@@ -315,7 +317,7 @@ const organizationSchema = {
       errorElement: HTMLElement,
       message: string,
     ) {
-      input.style.borderColor = 'rgba(239, 68, 68, 0.5)'
+      input.style.borderColor = 'var(--np-line-strong)'
       errorElement.textContent = message
       errorElement.classList.remove('hidden')
     }
@@ -473,6 +475,10 @@ const organizationSchema = {
 
     .contact-form-card {
       padding: 1.5rem;
+    }
+
+    .form-error-text {
+      color: var(--np-text);
     }
   </style>
 </BaseLayout>

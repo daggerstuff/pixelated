@@ -708,6 +708,9 @@ importers:
       '@iconify-json/uil':
         specifier: latest
         version: 1.2.3
+      '@neon/config':
+        specifier: ^1.0.1
+        version: 1.0.1
       '@playwright/test':
         specifier: 1.62.1
         version: 1.62.1
@@ -3956,6 +3959,14 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1 || ^2.0.0-alpha.4
       '@emnapi/runtime': ^1.7.1 || ^2.0.0-alpha.4
+
+  '@neon/config@1.0.1':
+    resolution: {integrity: sha512-yQhCTbTmpzu4lwChyZSa6Mh923SU+EmVo/PDHCdweqY1ZxpRv5+Xx344yG4m5WTLQOMq5FXfF72NChcFV5EXCA==}
+    engines: {node: '>=20.19.0'}
+
+  '@neon/sdk@2.1.0':
+    resolution: {integrity: sha512-TBTDbDTjgW9ygh+qAlOMkc35/ITBJAV1IQTR7vstix7xMdxgb45qmmYPVoB3Kdbtx8swf+49y3UzqVwHoHdW7g==}
+    engines: {node: '>=20.19.0'}
 
   '@neondatabase/serverless@1.1.0':
     resolution: {integrity: sha512-r3ZZhRjEcfEdKIZnoB1RusNgvHuaBRqfCzV4Gi+5A9yUX0S4HTws/ASWqt13wL4y4I+0rqsWGdA2w7EQXHi3+Q==}
@@ -18290,6 +18301,14 @@ snapshots:
       '@emnapi/runtime': 1.11.3
       '@tybys/wasm-util': 0.10.3
     optional: true
+
+  '@neon/config@1.0.1':
+    dependencies:
+      '@neon/sdk': 2.1.0
+      jiti: 2.7.0
+      zod: 4.4.3
+
+  '@neon/sdk@2.1.0': {}
 
   '@neondatabase/serverless@1.1.0': {}
 
