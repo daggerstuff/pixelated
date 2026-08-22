@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# pre-push guard: block pushing commits with dangling submodule pointers.
+# Enable repo-wide:  git config core.hooksPath scripts/devops/hooks
+set -euo pipefail
+exec bash "$(dirname "$0")/../check-submodule-pointers.sh" HEAD
