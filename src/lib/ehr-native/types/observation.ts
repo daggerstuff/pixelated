@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  referenceSchema,
-  periodSchema,
-  quantitySchema,
-  backboneElementSchema,
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
+  fhirPeriodSchema,
+  fhirQuantitySchema,
+  fhirBackboneElementSchema,
 } from './base';
 
 /**
@@ -14,11 +14,11 @@ import {
  * Measurements and simple assertions made about a patient, device, or other subject.
  * @see http://hl7.org/fhir/R4/observation.html
  */
-export const observationSchema = domainResourceSchema.extend({
+export const observationSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Observation'),
-  identifier: z.array(identifierSchema).optional(),
-  basedOn: z.array(referenceSchema).optional(),
-  partOf: z.array(referenceSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  basedOn: z.array(fhirReferenceSchema).optional(),
+  partOf: z.array(fhirReferenceSchema).optional(),
   status: z.enum([
     'registered',
     'preliminary',
@@ -29,38 +29,38 @@ export const observationSchema = domainResourceSchema.extend({
     'entered-in-error',
     'unknown',
   ]),
-  category: z.array(codeableConceptSchema).optional(),
-  code: codeableConceptSchema,
-  subject: referenceSchema.optional(),
-  focus: z.array(referenceSchema).optional(),
-  encounter: referenceSchema.optional(),
+  category: z.array(fhirCodeableConceptSchema).optional(),
+  code: fhirCodeableConceptSchema,
+  subject: fhirReferenceSchema.optional(),
+  focus: z.array(fhirReferenceSchema).optional(),
+  encounter: fhirReferenceSchema.optional(),
   effectiveDateTime: z.string().optional(),
-  effectivePeriod: periodSchema.optional(),
+  effectivePeriod: fhirPeriodSchema.optional(),
   issued: z.string().optional(),
-  performer: z.array(referenceSchema).optional(),
-  valueQuantity: quantitySchema.optional(),
-  valueCodeableConcept: codeableConceptSchema.optional(),
+  performer: z.array(fhirReferenceSchema).optional(),
+  valueQuantity: fhirQuantitySchema.optional(),
+  valueCodeableConcept: fhirCodeableConceptSchema.optional(),
   valueString: z.string().optional(),
   valueBoolean: z.boolean().optional(),
   valueInteger: z.number().int().optional(),
   valueRange: z
     .object({
-      ...backboneElementSchema.shape,
-      low: quantitySchema.optional(),
-      high: quantitySchema.optional(),
+      ...fhirBackboneElementSchema.shape,
+      low: fhirQuantitySchema.optional(),
+      high: fhirQuantitySchema.optional(),
     })
     .optional(),
   valueRatio: z
     .object({
-      ...backboneElementSchema.shape,
-      numerator: quantitySchema.optional(),
-      denominator: quantitySchema.optional(),
+      ...fhirBackboneElementSchema.shape,
+      numerator: fhirQuantitySchema.optional(),
+      denominator: fhirQuantitySchema.optional(),
     })
     .optional(),
   valueSampledData: z
     .object({
-      ...backboneElementSchema.shape,
-      origin: quantitySchema,
+      ...fhirBackboneElementSchema.shape,
+      origin: fhirQuantitySchema,
       period: z.number(),
       factor: z.number().optional(),
       lowerLimit: z.number().optional(),
@@ -71,73 +71,73 @@ export const observationSchema = domainResourceSchema.extend({
     .optional(),
   valueTime: z.string().optional(),
   valueDateTime: z.string().optional(),
-  valuePeriod: periodSchema.optional(),
-  dataAbsentReason: codeableConceptSchema.optional(),
-  interpretation: z.array(codeableConceptSchema).optional(),
+  valuePeriod: fhirPeriodSchema.optional(),
+  dataAbsentReason: fhirCodeableConceptSchema.optional(),
+  interpretation: z.array(fhirCodeableConceptSchema).optional(),
   note: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        authorReference: referenceSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        authorReference: fhirReferenceSchema.optional(),
         authorString: z.string().optional(),
         time: z.string().optional(),
         text: z.string(),
       }),
     )
     .optional(),
-  bodySite: codeableConceptSchema.optional(),
-  method: codeableConceptSchema.optional(),
-  specimen: z.array(referenceSchema).optional(),
-  device: referenceSchema.optional(),
+  bodySite: fhirCodeableConceptSchema.optional(),
+  method: fhirCodeableConceptSchema.optional(),
+  specimen: z.array(fhirReferenceSchema).optional(),
+  device: fhirReferenceSchema.optional(),
   referenceRange: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        low: quantitySchema.optional(),
-        high: quantitySchema.optional(),
-        type: codeableConceptSchema.optional(),
-        appliesTo: z.array(codeableConceptSchema).optional(),
+        ...fhirBackboneElementSchema.shape,
+        low: fhirQuantitySchema.optional(),
+        high: fhirQuantitySchema.optional(),
+        type: fhirCodeableConceptSchema.optional(),
+        appliesTo: z.array(fhirCodeableConceptSchema).optional(),
         age: z
           .object({
-            ...backboneElementSchema.shape,
-            low: quantitySchema.optional(),
-            high: quantitySchema.optional(),
+            ...fhirBackboneElementSchema.shape,
+            low: fhirQuantitySchema.optional(),
+            high: fhirQuantitySchema.optional(),
           })
           .optional(),
         text: z.string().optional(),
       }),
     )
     .optional(),
-  hasMember: z.array(referenceSchema).optional(),
-  derivedFrom: z.array(referenceSchema).optional(),
+  hasMember: z.array(fhirReferenceSchema).optional(),
+  derivedFrom: z.array(fhirReferenceSchema).optional(),
   component: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        code: codeableConceptSchema,
-        valueQuantity: quantitySchema.optional(),
-        valueCodeableConcept: codeableConceptSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        code: fhirCodeableConceptSchema,
+        valueQuantity: fhirQuantitySchema.optional(),
+        valueCodeableConcept: fhirCodeableConceptSchema.optional(),
         valueString: z.string().optional(),
         valueBoolean: z.boolean().optional(),
         valueInteger: z.number().int().optional(),
         valueRange: z
           .object({
-            ...backboneElementSchema.shape,
-            low: quantitySchema.optional(),
-            high: quantitySchema.optional(),
+            ...fhirBackboneElementSchema.shape,
+            low: fhirQuantitySchema.optional(),
+            high: fhirQuantitySchema.optional(),
           })
           .optional(),
         valueRatio: z
           .object({
-            ...backboneElementSchema.shape,
-            numerator: quantitySchema.optional(),
-            denominator: quantitySchema.optional(),
+            ...fhirBackboneElementSchema.shape,
+            numerator: fhirQuantitySchema.optional(),
+            denominator: fhirQuantitySchema.optional(),
           })
           .optional(),
         valueSampledData: z
           .object({
-            ...backboneElementSchema.shape,
-            origin: quantitySchema,
+            ...fhirBackboneElementSchema.shape,
+            origin: fhirQuantitySchema,
             period: z.number(),
             factor: z.number().optional(),
             lowerLimit: z.number().optional(),
@@ -148,22 +148,22 @@ export const observationSchema = domainResourceSchema.extend({
           .optional(),
         valueTime: z.string().optional(),
         valueDateTime: z.string().optional(),
-        valuePeriod: periodSchema.optional(),
-        dataAbsentReason: codeableConceptSchema.optional(),
-        interpretation: z.array(codeableConceptSchema).optional(),
+        valuePeriod: fhirPeriodSchema.optional(),
+        dataAbsentReason: fhirCodeableConceptSchema.optional(),
+        interpretation: z.array(fhirCodeableConceptSchema).optional(),
         referenceRange: z
           .array(
             z.object({
-              ...backboneElementSchema.shape,
-              low: quantitySchema.optional(),
-              high: quantitySchema.optional(),
-              type: codeableConceptSchema.optional(),
-              appliesTo: z.array(codeableConceptSchema).optional(),
+              ...fhirBackboneElementSchema.shape,
+              low: fhirQuantitySchema.optional(),
+              high: fhirQuantitySchema.optional(),
+              type: fhirCodeableConceptSchema.optional(),
+              appliesTo: z.array(fhirCodeableConceptSchema).optional(),
               age: z
                 .object({
-                  ...backboneElementSchema.shape,
-                  low: quantitySchema.optional(),
-                  high: quantitySchema.optional(),
+                  ...fhirBackboneElementSchema.shape,
+                  low: fhirQuantitySchema.optional(),
+                  high: fhirQuantitySchema.optional(),
                 })
                 .optional(),
               text: z.string().optional(),

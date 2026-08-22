@@ -1,16 +1,16 @@
 import { z } from 'zod';
 import {
-  domainResourceSchema,
-  humanNameSchema,
-  contactPointSchema,
-  addressSchema,
-  identifierSchema,
-  attachmentSchema,
-  codeableConceptSchema,
-  periodSchema,
-  referenceSchema,
-  extensionSchema,
-  backboneElementSchema,
+  fhirDomainResourceSchema,
+  fhirHumanNameSchema,
+  fhirContactPointSchema,
+  fhirAddressSchema,
+  fhirIdentifierSchema,
+  fhirAttachmentSchema,
+  fhirCodeableConceptSchema,
+  fhirPeriodSchema,
+  fhirReferenceSchema,
+  fhirExtensionSchema,
+  fhirBackboneElementSchema,
 } from './base';
 
 /**
@@ -18,51 +18,51 @@ import {
  * Demographics and administrative information about a person receiving care.
  * @see http://hl7.org/fhir/R4/patient.html
  */
-export const patientSchema = domainResourceSchema.extend({
+export const patientSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Patient'),
-  identifier: z.array(identifierSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
   active: z.boolean().optional(),
-  name: z.array(humanNameSchema).optional(),
-  telecom: z.array(contactPointSchema).optional(),
+  name: z.array(fhirHumanNameSchema).optional(),
+  telecom: z.array(fhirContactPointSchema).optional(),
   gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
   birthDate: z.string().optional(),
   deceasedBoolean: z.boolean().optional(),
   deceasedDateTime: z.string().optional(),
-  address: z.array(addressSchema).optional(),
-  maritalStatus: codeableConceptSchema.optional(),
+  address: z.array(fhirAddressSchema).optional(),
+  maritalStatus: fhirCodeableConceptSchema.optional(),
   multipleBirthBoolean: z.boolean().optional(),
   multipleBirthInteger: z.number().int().nonnegative().optional(),
-  photo: z.array(attachmentSchema).optional(),
+  photo: z.array(fhirAttachmentSchema).optional(),
   contact: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        relationship: z.array(codeableConceptSchema).optional(),
-        name: humanNameSchema.optional(),
-        telecom: z.array(contactPointSchema).optional(),
-        address: addressSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        relationship: z.array(fhirCodeableConceptSchema).optional(),
+        name: fhirHumanNameSchema.optional(),
+        telecom: z.array(fhirContactPointSchema).optional(),
+        address: fhirAddressSchema.optional(),
         gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
-        organization: referenceSchema.optional(),
-        period: periodSchema.optional(),
+        organization: fhirReferenceSchema.optional(),
+        period: fhirPeriodSchema.optional(),
       }),
     )
     .optional(),
   communication: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        language: codeableConceptSchema,
+        ...fhirBackboneElementSchema.shape,
+        language: fhirCodeableConceptSchema,
         preferred: z.boolean().optional(),
       }),
     )
     .optional(),
-  generalPractitioner: z.array(referenceSchema).optional(),
-  managingOrganization: referenceSchema.optional(),
+  generalPractitioner: z.array(fhirReferenceSchema).optional(),
+  managingOrganization: fhirReferenceSchema.optional(),
   link: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        other: referenceSchema,
+        ...fhirBackboneElementSchema.shape,
+        other: fhirReferenceSchema,
         type: z.enum(['replaced-by', 'replaces', 'refer', 'seealso']),
       }),
     )
