@@ -114,7 +114,8 @@ export class PatientRepository extends BaseRepository<Patient> {
     limit = 20,
     offset = 0,
   ): Promise<Patient[]> {
-    const pattern = `%${nameQuery}%`
+    const escapedName = nameQuery.replace(/[%_\\]/g, "\\$&")
+    const pattern = `%${escapedName}%`
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Patient }>(
         `SELECT fhir_resource FROM ehr_patient

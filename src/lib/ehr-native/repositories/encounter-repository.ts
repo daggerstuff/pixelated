@@ -28,10 +28,11 @@ export class EncounterRepository extends BaseRepository<Encounter> {
     const patientId =
       validated.subject?.reference?.replace('Patient/', '') ?? null
     const practitionerId =
-      validated.participant?.[0]?.individual?.reference?.replace(
-        'Practitioner/',
-        '',
-      ) ?? null
+      validated.participant
+        ?.find((p) => p.individual?.reference?.startsWith('Practitioner/'))
+        ?.individual?.reference?.replace('Practitioner/', '') ?? null
+    const periodStart = validated.period?.start ?? null
+    const periodEnd = validated.period?.end ?? null
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(
         `INSERT INTO ehr_encounter (tenant_id, patient_id, practitioner_id, status, class, period_start, period_end, fhir_resource)
@@ -43,8 +44,8 @@ export class EncounterRepository extends BaseRepository<Encounter> {
           practitionerId,
           validated.status ?? 'planned',
           validated.class?.code ?? null,
-          null,
-          null,
+          periodStart,
+          periodEnd,
           JSON.stringify(validated),
         ],
       )
@@ -68,10 +69,11 @@ export class EncounterRepository extends BaseRepository<Encounter> {
     })
     const patientId = merged.subject?.reference?.replace('Patient/', '') ?? null
     const practitionerId =
-      merged.participant?.[0]?.individual?.reference?.replace(
-        'Practitioner/',
-        '',
-      ) ?? null
+      merged.participant
+        ?.find((p) => p.individual?.reference?.startsWith('Practitioner/'))
+        ?.individual?.reference?.replace('Practitioner/', '') ?? null
+    const periodStart = merged.period?.start ?? null
+    const periodEnd = merged.period?.end ?? null
 
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(

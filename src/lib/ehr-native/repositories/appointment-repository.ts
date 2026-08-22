@@ -26,8 +26,9 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   async create(appointment: unknown): Promise<Appointment> {
     const validated = appointmentSchema.parse(appointment)
     const patientId =
-      validated.participant?.[0]?.actor?.reference?.replace('Patient/', '') ??
-      null
+      validated.participant
+        ?.find((p) => p.actor?.reference?.startsWith('Patient/'))
+        ?.actor?.reference?.replace('Patient/', '') ?? null
     const practitionerId =
       validated.participant
         ?.find((p) => p.actor?.reference?.startsWith('Practitioner/'))
