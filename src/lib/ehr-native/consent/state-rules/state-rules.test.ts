@@ -270,12 +270,15 @@ describe('consent state-rules', () => {
 
   describe('validateConsent callback', () => {
     it('allows custom validation logic', () => {
-      const validateConsent = vi.fn((patientId, consentLevel, treatmentCategory) => {
-        // Reject 'none' consent always, allow 'full' for mental_health
-        if (consentLevel === 'none') return false
-        if (treatmentCategory === 'mental_health' && consentLevel !== 'full') return false
-        return true
-      })
+      const validateConsent = vi.fn(
+        (patientId, consentLevel, treatmentCategory) => {
+          // Reject 'none' consent always, allow 'full' for mental_health
+          if (consentLevel === 'none') return false
+          if (treatmentCategory === 'mental_health' && consentLevel !== 'full')
+            return false
+          return true
+        },
+      )
       const rules: StateConsentRules = {
         ...DEFAULT_STATE_RULES,
         validateConsent,

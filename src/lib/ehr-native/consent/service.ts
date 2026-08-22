@@ -87,10 +87,14 @@ export class ConsentService {
     treatmentCategory?: string,
   ): Promise<ConsentVerificationResult> {
     // Phase 1: delegate baseline check to SQL function
-    const sqlResult = await query<{ has_consent: boolean; consent_level: string }>(
-      `SELECT * FROM ehr_patient_has_consent($1, $2, $3)`,
-      [patientId, tenantId, minimumLevel],
-    )
+    const sqlResult = await query<{
+      has_consent: boolean
+      consent_level: string
+    }>(`SELECT * FROM ehr_patient_has_consent($1, $2, $3)`, [
+      patientId,
+      tenantId,
+      minimumLevel,
+    ])
 
     const row = sqlResult.rows[0]
     const hasConsent = row?.['has_consent'] ?? false
@@ -184,9 +188,7 @@ export class ConsentService {
   /**
    * Create a new consent record.
    */
-  async createConsent(
-    options: CreateConsentOptions,
-  ): Promise<ConsentRow> {
+  async createConsent(options: CreateConsentOptions): Promise<ConsentRow> {
     const input: CreateConsentInput = {
       tenantId: options.tenantId,
       patientId: options.patientId,

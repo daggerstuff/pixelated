@@ -86,7 +86,10 @@ export class ConsentRepository {
   /**
    * Get a consent record by ID.
    */
-  async getById(consentId: string, tenantId: string): Promise<ConsentRow | null> {
+  async getById(
+    consentId: string,
+    tenantId: string,
+  ): Promise<ConsentRow | null> {
     const result = await query<ConsentRow>(
       `SELECT * FROM ehr_consent
        WHERE consent_id = $1 AND tenant_id = $2`,
@@ -196,7 +199,10 @@ export class ConsentRepository {
    * Revoke (mark inactive) a consent record.
    * Uses a transaction to ensure atomicity.
    */
-  async revoke(consentId: string, tenantId: string): Promise<ConsentRow | null> {
+  async revoke(
+    consentId: string,
+    tenantId: string,
+  ): Promise<ConsentRow | null> {
     return await transaction(async (client) => {
       const result = await client.query<ConsentRow>(
         `UPDATE ehr_consent

@@ -47,7 +47,12 @@ import { ConsentService, type ConsentVerificationResult } from './service'
 import type { ConsentRow } from './repository'
 import type { Consent } from '../types/consent'
 import type { ConsentLevel } from '@/lib/research/types/research-types'
-import { clearStateRules, registerStateRules, DEFAULT_STATE_RULES, type StateConsentRules } from './state-rules'
+import {
+  clearStateRules,
+  registerStateRules,
+  DEFAULT_STATE_RULES,
+  type StateConsentRules,
+} from './state-rules'
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -71,7 +76,10 @@ function makeConsentRow(overrides: Partial<ConsentRow> = {}): ConsentRow {
   }
 }
 
-function mockSqlResult(hasConsent: boolean, consentLevel: string = 'minimal'): void {
+function mockSqlResult(
+  hasConsent: boolean,
+  consentLevel: string = 'minimal',
+): void {
   mockQuery.mockResolvedValue({
     rows: [{ has_consent: hasConsent, consent_level: consentLevel }],
     rowCount: 1,
@@ -98,9 +106,15 @@ describe('ConsentService', () => {
   describe('verifyConsent', () => {
     it('returns verified=true when SQL function says consent is sufficient and not expired', async () => {
       mockSqlResult(true, 'full')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'full' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'full' }),
+      )
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+      )
 
       expect(result.verified).toBe(true)
       expect(result.consentLevel).toBe('full')
@@ -112,7 +126,11 @@ describe('ConsentService', () => {
       mockSqlResult(false, 'none')
       mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow())
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'full')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'full',
+      )
 
       expect(result.verified).toBe(false)
       expect(result.consentLevel).toBe('none')
@@ -124,7 +142,11 @@ describe('ConsentService', () => {
       const expiredRow = makeConsentRow({ period_end: '2020-01-01' })
       mockRepo.getActiveByPatient.mockResolvedValue(expiredRow)
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+      )
 
       expect(result.verified).toBe(false)
       expect(result.expired).toBe(true)
@@ -135,7 +157,11 @@ describe('ConsentService', () => {
       mockSqlResult(false, 'none')
       mockRepo.getActiveByPatient.mockResolvedValue(null)
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+      )
 
       expect(result.expired).toBe(true)
       expect(result.verified).toBe(false)
@@ -146,7 +172,11 @@ describe('ConsentService', () => {
       const noEndRow = makeConsentRow({ period_end: null })
       mockRepo.getActiveByPatient.mockResolvedValue(noEndRow)
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+      )
 
       expect(result.expired).toBe(false)
       expect(result.verified).toBe(true)
@@ -171,9 +201,16 @@ describe('ConsentService', () => {
   describe('verifyConsent with state rules', () => {
     it('applies state rules when stateCode is provided and passes', async () => {
       mockSqlResult(true, 'full')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'full' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'full' }),
+      )
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal', 'CA')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+      )
 
       expect(result.verified).toBe(true)
       expect(result.stateRules).toBeDefined()
@@ -182,7 +219,9 @@ describe('ConsentService', () => {
 
     it('fails when state override requires higher consent than patient has', async () => {
       mockSqlResult(true, 'minimal')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'minimal' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'minimal' }),
+      )
 
       const caRules: StateConsentRules = {
         ...DEFAULT_STATE_RULES,
@@ -190,7 +229,12 @@ describe('ConsentService', () => {
       }
       registerStateRules('CA', caRules)
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal', 'CA')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+      )
 
       expect(result.verified).toBe(false)
       expect(result.reason).toBe('State-specific consent requirements not met')
@@ -198,7 +242,9 @@ describe('ConsentService', () => {
 
     it('passes when state override matches patient consent level', async () => {
       mockSqlResult(true, 'limited')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'limited' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'limited' }),
+      )
 
       const caRules: StateConsentRules = {
         ...DEFAULT_STATE_RULES,
@@ -206,17 +252,28 @@ describe('ConsentService', () => {
       }
       registerStateRules('CA', caRules)
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal', 'CA')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+      )
 
       expect(result.verified).toBe(true)
     })
 
     it('requires limited consent for mental_health treatment when state requires it', async () => {
       mockSqlResult(true, 'minimal')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'minimal' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'minimal' }),
+      )
 
       const result = await service.verifyConsent(
-        'patient-1', 'tenant-1', 'minimal', 'CA', 'mental_health',
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+        'mental_health',
       )
 
       expect(result.verified).toBe(false)
@@ -225,10 +282,16 @@ describe('ConsentService', () => {
 
     it('passes mental health check when consent level is limited or higher', async () => {
       mockSqlResult(true, 'limited')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'limited' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'limited' }),
+      )
 
       const result = await service.verifyConsent(
-        'patient-1', 'tenant-1', 'minimal', 'CA', 'mental_health',
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+        'mental_health',
       )
 
       expect(result.verified).toBe(true)
@@ -236,10 +299,16 @@ describe('ConsentService', () => {
 
     it('requires limited consent for substance_use_disorder treatment', async () => {
       mockSqlResult(true, 'minimal')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'minimal' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'minimal' }),
+      )
 
       const result = await service.verifyConsent(
-        'patient-1', 'tenant-1', 'minimal', 'CA', 'substance_use_disorder',
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+        'substance_use_disorder',
       )
 
       expect(result.verified).toBe(false)
@@ -247,10 +316,16 @@ describe('ConsentService', () => {
 
     it('passes SUD check when consent level is limited or higher', async () => {
       mockSqlResult(true, 'limited')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'limited' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'limited' }),
+      )
 
       const result = await service.verifyConsent(
-        'patient-1', 'tenant-1', 'minimal', 'CA', 'substance_use_disorder',
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+        'substance_use_disorder',
       )
 
       expect(result.verified).toBe(true)
@@ -258,7 +333,9 @@ describe('ConsentService', () => {
 
     it('invokes custom validateConsent callback when present', async () => {
       mockSqlResult(true, 'full')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'full' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'full' }),
+      )
 
       const validateConsent = vi.fn(() => false)
       const caRules: StateConsentRules = {
@@ -268,17 +345,27 @@ describe('ConsentService', () => {
       registerStateRules('CA', caRules)
 
       const result = await service.verifyConsent(
-        'patient-1', 'tenant-1', 'minimal', 'CA', 'mental_health',
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+        'mental_health',
       )
 
       expect(result.verified).toBe(false)
       expect(validateConsent).toHaveBeenCalledTimes(1)
-      expect(validateConsent).toHaveBeenCalledWith('patient-1', 'full', 'mental_health')
+      expect(validateConsent).toHaveBeenCalledWith(
+        'patient-1',
+        'full',
+        'mental_health',
+      )
     })
 
     it('state rules can elevate but not lower the minimum consent', async () => {
       mockSqlResult(true, 'minimal')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'minimal' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'minimal' }),
+      )
 
       // Override sets minimum to 'minimal' but patient has 'minimal' - should pass
       const caRules: StateConsentRules = {
@@ -288,7 +375,12 @@ describe('ConsentService', () => {
       }
       registerStateRules('CA', caRules)
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal', 'CA')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+        'CA',
+      )
 
       expect(result.verified).toBe(true)
     })
@@ -297,7 +389,11 @@ describe('ConsentService', () => {
       mockSqlResult(true, 'minimal')
       mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow())
 
-      const result = await service.verifyConsent('patient-1', 'tenant-1', 'minimal')
+      const result = await service.verifyConsent(
+        'patient-1',
+        'tenant-1',
+        'minimal',
+      )
 
       expect(result.stateRules).toBeUndefined()
       expect(result.verified).toBe(true)
@@ -314,16 +410,25 @@ describe('ConsentService', () => {
         makeConsentRow({ consent_level: 'full' }),
       )
 
-      const result = await service.getEffectiveConsentLevel('patient-1', 'tenant-1')
+      const result = await service.getEffectiveConsentLevel(
+        'patient-1',
+        'tenant-1',
+      )
 
       expect(result).toBe('full')
-      expect(mockRepo.getActiveByPatient).toHaveBeenCalledWith('patient-1', 'tenant-1')
+      expect(mockRepo.getActiveByPatient).toHaveBeenCalledWith(
+        'patient-1',
+        'tenant-1',
+      )
     })
 
     it('returns none when no active consent exists', async () => {
       mockRepo.getActiveByPatient.mockResolvedValue(null)
 
-      const result = await service.getEffectiveConsentLevel('patient-1', 'tenant-1')
+      const result = await service.getEffectiveConsentLevel(
+        'patient-1',
+        'tenant-1',
+      )
 
       expect(result).toBe('none')
     })
@@ -332,16 +437,25 @@ describe('ConsentService', () => {
       const expiredRow = makeConsentRow({ period_end: '2020-01-01' })
       mockRepo.getActiveByPatient.mockResolvedValue(expiredRow)
 
-      const result = await service.getEffectiveConsentLevel('patient-1', 'tenant-1')
+      const result = await service.getEffectiveConsentLevel(
+        'patient-1',
+        'tenant-1',
+      )
 
       expect(result).toBe('none')
     })
 
     it('returns consent level when period_end is null (no expiry)', async () => {
-      const noEndRow = makeConsentRow({ consent_level: 'limited', period_end: null })
+      const noEndRow = makeConsentRow({
+        consent_level: 'limited',
+        period_end: null,
+      })
       mockRepo.getActiveByPatient.mockResolvedValue(noEndRow)
 
-      const result = await service.getEffectiveConsentLevel('patient-1', 'tenant-1')
+      const result = await service.getEffectiveConsentLevel(
+        'patient-1',
+        'tenant-1',
+      )
 
       expect(result).toBe('limited')
     })
@@ -433,7 +547,10 @@ describe('ConsentService', () => {
       const result = await service.getActiveConsent('patient-1', 'tenant-1')
 
       expect(result).toEqual(row)
-      expect(mockRepo.getActiveByPatient).toHaveBeenCalledWith('patient-1', 'tenant-1')
+      expect(mockRepo.getActiveByPatient).toHaveBeenCalledWith(
+        'patient-1',
+        'tenant-1',
+      )
     })
 
     it('returns null when no active consent exists', async () => {
@@ -481,10 +598,16 @@ describe('ConsentService', () => {
 
     it('returns "State-specific consent requirements not met" when state rules fail', async () => {
       mockSqlResult(true, 'minimal')
-      mockRepo.getActiveByPatient.mockResolvedValue(makeConsentRow({ consent_level: 'minimal' }))
+      mockRepo.getActiveByPatient.mockResolvedValue(
+        makeConsentRow({ consent_level: 'minimal' }),
+      )
 
       const result = await service.verifyConsent(
-        'p1', 't1', 'minimal', 'CA', 'mental_health',
+        'p1',
+        't1',
+        'minimal',
+        'CA',
+        'mental_health',
       )
 
       expect(result.reason).toBe('State-specific consent requirements not met')

@@ -22,7 +22,11 @@ vi.mock('@/lib/db', () => ({
 }))
 
 // Import after mocks are set up
-import { ConsentRepository, type ConsentRow, type CreateConsentInput } from './repository'
+import {
+  ConsentRepository,
+  type ConsentRow,
+  type CreateConsentInput,
+} from './repository'
 import type { Consent } from '../types/consent'
 
 // ---------------------------------------------------------------------------
@@ -43,7 +47,14 @@ function makeConsentRow(overrides: Partial<ConsentRow> = {}): ConsentRow {
     fhir_resource: {
       resourceType: 'Consent',
       status: 'active',
-      scope: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/consentscope', code: 'patient-privacy' }] },
+      scope: {
+        coding: [
+          {
+            system: 'http://terminology.hl7.org/CodeSystem/consentscope',
+            code: 'patient-privacy',
+          },
+        ],
+      },
       category: [{ coding: [{ system: 'http://loinc.org', code: '59284-0' }] }],
       patient: { reference: 'Patient/patient-456' },
       dateTime: '2025-01-01',
@@ -58,7 +69,14 @@ function makeConsentResource(): Consent {
   return {
     resourceType: 'Consent',
     status: 'active',
-    scope: { coding: [{ system: 'http://terminology.hl7.org/CodeSystem/consentscope', code: 'patient-privacy' }] },
+    scope: {
+      coding: [
+        {
+          system: 'http://terminology.hl7.org/CodeSystem/consentscope',
+          code: 'patient-privacy',
+        },
+      ],
+    },
     category: [{ coding: [{ system: 'http://loinc.org', code: '59284-0' }] }],
     patient: { reference: 'Patient/patient-456' },
     dateTime: '2025-01-01',
@@ -259,7 +277,10 @@ describe('ConsentRepository', () => {
 
   describe('update', () => {
     it('updates specified fields and returns the updated row', async () => {
-      const updatedRow = makeConsentRow({ status: 'inactive', consent_level: 'full' })
+      const updatedRow = makeConsentRow({
+        status: 'inactive',
+        consent_level: 'full',
+      })
       mockQuery.mockResolvedValue({ rows: [updatedRow], rowCount: 1 })
 
       const result = await repo.update('consent-123', 'tenant-abc', {
@@ -333,10 +354,16 @@ describe('ConsentRepository', () => {
   describe('revoke', () => {
     it('marks consent as inactive within a transaction', async () => {
       const revokedRow = makeConsentRow({ status: 'inactive' })
-      const clientQuery = vi.fn().mockResolvedValue({ rows: [revokedRow], rowCount: 1 })
-      mockTransaction.mockImplementation(async (cb: (client: { query: typeof clientQuery }) => Promise<unknown>) => {
-        return cb({ query: clientQuery })
-      })
+      const clientQuery = vi
+        .fn()
+        .mockResolvedValue({ rows: [revokedRow], rowCount: 1 })
+      mockTransaction.mockImplementation(
+        async (
+          cb: (client: { query: typeof clientQuery }) => Promise<unknown>,
+        ) => {
+          return cb({ query: clientQuery })
+        },
+      )
 
       const result = await repo.revoke('consent-123', 'tenant-abc')
 
@@ -350,9 +377,13 @@ describe('ConsentRepository', () => {
 
     it('returns null when consent not found', async () => {
       const clientQuery = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 })
-      mockTransaction.mockImplementation(async (cb: (client: { query: typeof clientQuery }) => Promise<unknown>) => {
-        return cb({ query: clientQuery })
-      })
+      mockTransaction.mockImplementation(
+        async (
+          cb: (client: { query: typeof clientQuery }) => Promise<unknown>,
+        ) => {
+          return cb({ query: clientQuery })
+        },
+      )
 
       const result = await repo.revoke('nonexistent', 'tenant-abc')
 
@@ -367,9 +398,13 @@ describe('ConsentRepository', () => {
   describe('delete', () => {
     it('permanently deletes the consent record and returns true', async () => {
       const clientQuery = vi.fn().mockResolvedValue({ rows: [], rowCount: 1 })
-      mockTransaction.mockImplementation(async (cb: (client: { query: typeof clientQuery }) => Promise<unknown>) => {
-        return cb({ query: clientQuery })
-      })
+      mockTransaction.mockImplementation(
+        async (
+          cb: (client: { query: typeof clientQuery }) => Promise<unknown>,
+        ) => {
+          return cb({ query: clientQuery })
+        },
+      )
 
       const result = await repo.delete('consent-123', 'tenant-abc')
 
@@ -382,9 +417,13 @@ describe('ConsentRepository', () => {
 
     it('returns false when no row was deleted', async () => {
       const clientQuery = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 })
-      mockTransaction.mockImplementation(async (cb: (client: { query: typeof clientQuery }) => Promise<unknown>) => {
-        return cb({ query: clientQuery })
-      })
+      mockTransaction.mockImplementation(
+        async (
+          cb: (client: { query: typeof clientQuery }) => Promise<unknown>,
+        ) => {
+          return cb({ query: clientQuery })
+        },
+      )
 
       const result = await repo.delete('nonexistent', 'tenant-abc')
 
@@ -392,10 +431,16 @@ describe('ConsentRepository', () => {
     })
 
     it('returns false when rowCount is null', async () => {
-      const clientQuery = vi.fn().mockResolvedValue({ rows: [], rowCount: null })
-      mockTransaction.mockImplementation(async (cb: (client: { query: typeof clientQuery }) => Promise<unknown>) => {
-        return cb({ query: clientQuery })
-      })
+      const clientQuery = vi
+        .fn()
+        .mockResolvedValue({ rows: [], rowCount: null })
+      mockTransaction.mockImplementation(
+        async (
+          cb: (client: { query: typeof clientQuery }) => Promise<unknown>,
+        ) => {
+          return cb({ query: clientQuery })
+        },
+      )
 
       const result = await repo.delete('consent-123', 'tenant-abc')
 
