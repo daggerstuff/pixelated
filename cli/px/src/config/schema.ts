@@ -27,14 +27,22 @@ export const HookEventSchema = z.enum([
   'pr-merge',
 ])
 
+export const WorkspaceConfigSchema = z.object({
+  endpoint: z.string().url(),
+  token: z.string().optional(),
+  timeout: z.number().int().positive().default(30000),
+})
+
 export const PxConfigSchema = z.object({
   agents: z.record(z.string(), AgentConfigSchema),
   slack: SlackConfigSchema.optional(),
   hooks: z.record(z.string(), HookConfigSchema).optional(),
+  workspace: WorkspaceConfigSchema.optional(),
 })
 
 export type AgentConfig = z.infer<typeof AgentConfigSchema>
 export type SlackConfig = z.infer<typeof SlackConfigSchema>
 export type HookConfig = z.infer<typeof HookConfigSchema>
 export type HookEvent = z.infer<typeof HookEventSchema>
+export type WorkspaceConfig = z.infer<typeof WorkspaceConfigSchema>
 export type PxConfig = z.infer<typeof PxConfigSchema>
