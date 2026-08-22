@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -7,7 +7,7 @@ import {
   fhirPeriodSchema,
   fhirBackboneElementSchema,
   fhirAttachmentSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 Claim resource schema.
@@ -188,7 +188,7 @@ export const claimSchema = fhirDomainResourceSchema.extend({
             currency: z.string().optional(),
           })
           .optional(),
-       udi: z.array(fhirReferenceSchema).optional(),
+        udi: z.array(fhirReferenceSchema).optional(),
         bodySite: fhirCodeableConceptSchema.optional(),
         subSite: z.array(fhirCodeableConceptSchema).optional(),
         encounter: z.array(fhirReferenceSchema).optional(),
@@ -278,6 +278,6 @@ export const claimSchema = fhirDomainResourceSchema.extend({
       currency: z.string().optional(),
     })
     .optional(),
-});
+})
 
-export type Claim = z.infer<typeof claimSchema>;
+export type Claim = z.infer<typeof claimSchema>

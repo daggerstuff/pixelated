@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -8,7 +8,7 @@ import {
   fhirContactPointSchema,
   fhirAddressSchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 PractitionerRole resource schema.
@@ -51,6 +51,6 @@ export const practitionerRoleSchema = fhirDomainResourceSchema.extend({
     .optional(),
   availabilityExceptions: z.string().optional(),
   endpoint: z.array(fhirReferenceSchema).optional(),
-});
+})
 
-export type PractitionerRole = z.infer<typeof practitionerRoleSchema>;
+export type PractitionerRole = z.infer<typeof practitionerRoleSchema>

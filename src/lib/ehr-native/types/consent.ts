@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -6,7 +6,7 @@ import {
   fhirReferenceSchema,
   fhirPeriodSchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 Consent resource schema.
@@ -17,26 +17,35 @@ import {
 export const consentSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Consent'),
   identifier: z.array(fhirIdentifierSchema).optional(),
-  status: z.enum(['draft', 'active', 'inactive', 'not-done', 'entered-in-error', 'rejected']),
+  status: z.enum([
+    'draft',
+    'active',
+    'inactive',
+    'not-done',
+    'entered-in-error',
+    'rejected',
+  ]),
   scope: fhirCodeableConceptSchema,
   category: z.array(fhirCodeableConceptSchema),
   patient: fhirReferenceSchema.optional(),
   dateTime: z.string().optional(),
   performer: z.array(fhirReferenceSchema).optional(),
   organization: z.array(fhirReferenceSchema).optional(),
-  sourceAttachment: z.array(
-    z.object({
-      ...fhirBackboneElementSchema.shape,
-      contentType: z.string().optional(),
-      language: z.string().optional(),
-      data: z.string().optional(),
-      url: z.string().optional(),
-      size: z.number().int().nonnegative().optional(),
-      hash: z.string().optional(),
-      title: z.string().optional(),
-      creation: z.string().optional(),
-    }),
-  ).optional(),
+  sourceAttachment: z
+    .array(
+      z.object({
+        ...fhirBackboneElementSchema.shape,
+        contentType: z.string().optional(),
+        language: z.string().optional(),
+        data: z.string().optional(),
+        url: z.string().optional(),
+        size: z.number().int().nonnegative().optional(),
+        hash: z.string().optional(),
+        title: z.string().optional(),
+        creation: z.string().optional(),
+      }),
+    )
+    .optional(),
   sourceReference: z.array(fhirReferenceSchema).optional(),
   policy: z
     .array(
@@ -83,7 +92,12 @@ export const consentSchema = fhirDomainResourceSchema.extend({
           .array(
             z.object({
               ...fhirBackboneElementSchema.shape,
-              meaning: z.enum(['instance', 'related', 'dependents', 'authoredby']),
+              meaning: z.enum([
+                'instance',
+                'related',
+                'dependents',
+                'authoredby',
+              ]),
               reference: fhirReferenceSchema,
             }),
           )
@@ -92,7 +106,7 @@ export const consentSchema = fhirDomainResourceSchema.extend({
       }),
     )
     .optional(),
-});
+})
 
 const consentProvisionSchema = z.object({
   ...fhirBackboneElementSchema.shape,
@@ -122,7 +136,7 @@ const consentProvisionSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
-export type Consent = z.infer<typeof consentSchema>;
-export type ConsentProvision = z.infer<typeof consentProvisionSchema>;
+export type Consent = z.infer<typeof consentSchema>
+export type ConsentProvision = z.infer<typeof consentProvisionSchema>

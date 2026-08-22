@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -7,7 +7,7 @@ import {
   fhirPeriodSchema,
   fhirQuantitySchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 Observation resource schema.
@@ -173,6 +173,6 @@ export const observationSchema = fhirDomainResourceSchema.extend({
       }),
     )
     .optional(),
-});
+})
 
-export type Observation = z.infer<typeof observationSchema>;
+export type Observation = z.infer<typeof observationSchema>
