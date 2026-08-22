@@ -1,0 +1,318 @@
+/* ==================================================
+   AUTH FORMS — bridges legacy component class names
+   (btn, form-label, input-wrapper, etc.) onto the NP
+   Neutral Precision token system.
+   ================================================== */
+
+/* === Buttons ===
+   .btn / .btn-primary / .btn-outline / .btn-secondary
+   map onto the NP button language defined in np-landing.css
+   so auth, register, and reset pages match the rest of the site. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--np-font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  min-height: 48px;
+  border: 1px solid var(--np-line-strong);
+  border-radius: var(--np-radius-button);
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.15s ease-out,
+    color 0.15s ease-out,
+    border-color 0.15s ease-out;
+  background: transparent;
+  color: var(--np-text);
+  position: relative;
+}
+
+.btn-primary {
+  background: var(--np-text);
+  color: var(--np-bg);
+  border: 1px solid var(--np-text);
+}
+
+.btn-primary:hover {
+  background: var(--np-bg);
+  color: var(--np-text);
+  border-color: var(--np-text);
+}
+
+.btn-primary:active {
+  background: var(--np-surface);
+  transform: translateY(1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--np-text);
+  border: 1px solid var(--np-line);
+}
+
+.btn-outline:hover {
+  background: var(--np-elevated);
+  border-color: var(--np-text);
+}
+
+.btn-secondary {
+  background: var(--np-surface);
+  color: var(--np-text);
+  border: 1px solid var(--np-line);
+}
+
+.btn-secondary:hover {
+  background: var(--np-elevated);
+  border-color: var(--np-text);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--np-mid);
+  outline-offset: 3px;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-responsive {
+  width: 100%;
+}
+
+.touch-focus:focus-visible {
+  outline: 2px solid var(--np-mid);
+  outline-offset: 2px;
+}
+
+/* === Text responsive variants === */
+
+.text-responsive--small {
+  font-family: var(--np-font-body);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--np-text);
+}
+
+.text-responsive--heading {
+  font-family: var(--np-font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--np-text);
+}
+
+.text-responsive--body {
+  font-family: var(--np-font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--np-text);
+}
+
+.text-responsive--caption {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+.text-gradient {
+  color: var(--np-text);
+}
+
+/* === Form layout === */
+
+.auth-form-container,
+.form-container,
+.form-responsive,
+.responsive-auth-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--np-space-3);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--np-space-4);
+}
+
+.form-group,
+.form-group-responsive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--np-space-2);
+}
+
+.form-label {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--np-muted);
+}
+
+/* === Input fields === */
+
+.form-input,
+.input-responsive {
+  width: 100%;
+  padding: 12px 16px;
+  font-family: var(--np-font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--np-text);
+  background: var(--np-surface);
+  border: 1px solid var(--np-line);
+  border-radius: var(--np-radius-input);
+  transition: border-color var(--np-duration-fast) var(--np-ease);
+}
+
+.form-input:focus-visible,
+.input-responsive:focus-visible {
+  outline: 2px solid var(--np-mid);
+  outline-offset: 2px;
+  border-color: var(--np-mid);
+}
+
+.form-input.error,
+.form-input.border-destructive,
+.input-wrapper.error .form-input,
+.input-wrapper.error .input-responsive {
+  border-color: var(--np-text);
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--np-space-2);
+}
+
+.input-wrapper.error {
+  border-color: var(--np-text);
+}
+
+/* === Error messages === */
+
+.error-message {
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--np-text);
+  padding: 4px 0;
+}
+
+/* === Auth separator / links === */
+
+.auth-separator {
+  margin: var(--np-space-4) 0;
+  text-align: center;
+  color: var(--np-muted);
+  font-family: var(--np-font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-separator hr {
+  border: 0;
+  border-top: 1px solid var(--np-line);
+  margin: var(--np-space-4) 0;
+}
+
+.auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--np-space-3);
+}
+
+/* === Checkbox === */
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: var(--np-space-2);
+  cursor: pointer;
+}
+
+.checkbox-label {
+  font-family: var(--np-font-body);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--np-text);
+}
+
+.remember-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--np-text);
+}
+
+/* === Loading spinner === */
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--np-text);
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: np-spin 0.8s linear infinite;
+}
+
+@keyframes np-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* === Success state === */
+
+.auth-success {
+  padding: 16px;
+  border: 1px solid var(--np-line-strong);
+  background: var(--np-elevated);
+}
+
+.auth-success h2 {
+  font-family: var(--np-font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--np-text);
+  margin: 0 0 12px;
+}
+
+.auth-success p {
+  font-family: var(--np-font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--np-muted);
+  margin: 0;
+}
+
+/* === Reduced motion === */
+
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none;
+  }
+  .btn:active {
+    transform: none;
+  }
+  .loading-spinner {
+    animation: none;
+  }
+}
