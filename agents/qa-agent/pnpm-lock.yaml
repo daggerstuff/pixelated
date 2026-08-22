@@ -15,13 +15,13 @@ importers:
         version: 1.29.0(supports-color@7.2.0)(zod@4.4.3)
       '@vercel/connect':
         specifier: 0.2.2
-        version: 0.2.2(ai@7.0.0-beta.178(zod@4.4.3))(eve@0.18.2(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2)))
+        version: 0.2.2(ai@7.0.0-beta.178(zod@4.4.3))(eve@0.38.3(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.4.3)
       eve:
-        specifier: ^0.18.1
-        version: 0.18.2(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2))
+        specifier: ^0.38.3
+        version: 0.38.3(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2))
       workers-ai-provider:
         specifier: ^3.2.0
         version: 3.2.0(@ai-sdk/provider@3.0.14)(ai@7.0.0-beta.178(zod@4.4.3))
@@ -660,13 +660,13 @@ packages:
     resolution: {integrity: sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==}
     engines: {node: '>= 0.6'}
 
-  eve@0.18.2:
-    resolution: {integrity: sha512-/VDImI+XvP72MekIlQHamo8AJ/V/HD7ybRz90SapxcCHJSz9GORLecI9CP+07J9d9R+P5xgt8nqaqmpAyCM7Iw==}
+  eve@0.38.3:
+    resolution: {integrity: sha512-Ds942WB9JyhKZYCEG60fxRpsDbzsByPwbW/8iMxFP3xYe9TpKdGBiOxmqukI8KsdoKdyudXWnHY2KMVeSd3Iig==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.0.0
-      ai: ^7.0.0
+      ai: ^7.0.58
       braintrust: ^3.0.0
       just-bash: ^3.0.0
       microsandbox: ^0.5.0
@@ -1226,6 +1226,10 @@ packages:
   undici-types@7.18.2:
     resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
+  undici@8.9.0:
+    resolution: {integrity: sha512-aWZpUj7XoGonMClx4gdDRfgBjqeA+F473aDmROQQbM9n6PRfK/u1q/a0X4wMTgcHfT8H6fpbt98PFuDUwFg2YA==}
+    engines: {node: '>=22.19.0'}
+
   unenv@2.0.0-rc.24:
     resolution: {integrity: sha512-i7qRCmY42zmCwnYlh9H2SvLEypEFGye5iRmEMKjcGi7zk9UquigRjFtTLz0TYqr0ZGLZhaMHl/foy1bZR+Cwlw==}
 
@@ -1728,12 +1732,12 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/connect@0.2.2(ai@7.0.0-beta.178(zod@4.4.3))(eve@0.18.2(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2)))':
+  '@vercel/connect@0.2.2(ai@7.0.0-beta.178(zod@4.4.3))(eve@0.38.3(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2)))':
     dependencies:
       '@vercel/oidc': 3.6.1
     optionalDependencies:
       ai: 7.0.0-beta.178(zod@4.4.3)
-      eve: 0.18.2(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2))
+      eve: 0.38.3(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2))
 
   '@vercel/oidc@3.2.0': {}
 
@@ -1935,10 +1939,11 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eve@0.18.2(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2)):
+  eve@0.38.3(ai@7.0.0-beta.178(zod@4.4.3))(vite@8.0.16(@types/node@24.13.2)):
     dependencies:
       ai: 7.0.0-beta.178(zod@4.4.3)
       nitro: 3.0.260610-beta(vite@8.0.16(@types/node@24.13.2))
+      undici: 8.9.0
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -2535,6 +2540,8 @@ snapshots:
       mime-types: 3.0.2
 
   undici-types@7.18.2: {}
+
+  undici@8.9.0: {}
 
   unenv@2.0.0-rc.24:
     dependencies:
