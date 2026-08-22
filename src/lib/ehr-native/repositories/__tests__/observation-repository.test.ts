@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { PoolClient } from 'pg'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 vi.mock('@/lib/db', () => ({
   query: vi.fn(),
