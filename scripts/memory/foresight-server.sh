@@ -35,6 +35,7 @@ find_uv() {
   local candidates=(
     "${REPO_ROOT}/.venv/bin/uv"
     "${REPO_ROOT}/ai/.venv/bin/uv"
+    "${HOME}/.local/bin/uv"
     "${HOME}/.venv/bin/uv"
     "${HOME}/.gemini/tools/bin/uv"
     /usr/local/bin/uv
