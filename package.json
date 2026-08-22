@@ -323,6 +323,7 @@
     "jigsawstack": "latest",
     "jotai": "latest",
     "jsonwebtoken": "^9.0.3",
+    "langsmith": "^0.9.0",
     "lucide-react": "latest",
     "markdown-table-prettify": "^4.1.0",
     "medium-zoom": "latest",
@@ -374,7 +375,7 @@
     "vue": "latest",
     "workers-ai-provider": "^4.0.0",
     "ws": "^8.21.3",
-    "zod": "^4.4.3",
+    "zod": "^4.3.2",
     "zustand": "latest"
   },
   "devDependencies": {

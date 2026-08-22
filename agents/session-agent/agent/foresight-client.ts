@@ -1,7 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 
-import { createLazyMcpClient } from '@/lib/context/optimization.js'
+import { createLazyMcpClient } from './lib/lazy-mcp-client.js'
 
 import { registerProcessShutdown } from './lib/process-shutdown.js'
 

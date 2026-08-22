@@ -1,20 +1,7 @@
 import { defineAgent } from 'eve'
-
-import { profileAndLogAgentStartup } from '../../lib/context/startup-profiler.js'
-import {
-  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
-  agentModel,
-} from './lib/workers-ai.js'
-
-profileAndLogAgentStartup({
-  agentName: 'intake-agent',
-  agentDir: import.meta.dirname,
-  // Foresight is accessed directly via agent/foresight-client.ts.
-})
-
 export default defineAgent({
-  model: agentModel,
-  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  model: 'zai/glm-5.2', // Free for eve agents through Aug 27 via Blackbox on AI Gateway
+  modelContextWindowTokens: 1_000_000, // GLM 5.2 has 1M context window
   compaction: {
     thresholdPercent: 0.7,
   },

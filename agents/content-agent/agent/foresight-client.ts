@@ -1,7 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js'
 
-import { createLazyMcpClient } from '@/lib/context/optimization.js'
+import { createLazyMcpClient } from './lib/lazy-mcp-client.js'
 
 const FORESIGHT_URL = process.env.FORESIGHT_URL ?? 'http://127.0.0.1:8764/mcp'
 
