@@ -394,7 +394,6 @@
     "@graphql-codegen/typescript-operations": "^6.1.6",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
-    "@neon/config": "^1.0.1",
     "@playwright/test": "1.62.1",
     "@stoplight/spectral-cli": "^6.16.3",
     "@testing-library/dom": "latest",
