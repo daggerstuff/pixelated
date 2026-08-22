@@ -54,10 +54,46 @@ export const GET = async ({
       token: token.substring(0, 8) + '...',
     })
 
-    // TODO: Replace with actual verification implementation
-    // For now, return success to prevent build errors
+    // Verify token against database and validate against expected type
+    // Pattern: check token hash, validate type, return user or error
+    const { getPool } = await import('../../../lib/db')
+    const pool = getPool()
+
+    const [rows] = await pool.query<{
+      id: string
+      email: string
+      type: string
+      is_valid: boolean
+    }>(
+      "SELECT id, email, type, is_valid FROM verification_tokens WHERE token_hash = $1 AND created_at > NOW() - INTERVAL '24 hours'",
+      [token],
+    )
+
+    if (!rows?.is_valid || rows.type !== type) {
+      logger.warn('Verification invalid', {
+        tokenPrefix: token.substring(0, 8),
+        type,
+      })
+      return new Response(
+        JSON.stringify({
+          success: false,
+          message: 'Invalid or expired verification token',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+
+    // Mark token as used
+    await pool.query(
+      'UPDATE verification_tokens SET is_valid = FALSE WHERE id = $1',
+      [rows.id],
+    )
+
     const result = {
-      data: { user: null },
+      data: { user: { id: rows.id, email: rows.email } },
       error: null,
     }
 
