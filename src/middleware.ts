@@ -25,7 +25,6 @@ const internalOnlyRoutes = new Set([
   '/test-sentry',
   '/admin-test',
   '/nightmare-fuel-demo',
-  '/brutalist-demo',
   '/style-guide',
   '/search-demo',
   '/therapy-chat-plan',
