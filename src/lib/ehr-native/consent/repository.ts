@@ -9,6 +9,7 @@
 
 import type { QueryResultRow } from '@/lib/db'
 import { query, transaction } from '@/lib/db'
+
 import type { Consent } from '../types/consent'
 
 // ---------------------------------------------------------------------------

@@ -17,7 +17,6 @@ import { consentManagementService } from '@/lib/research/services/ConsentManagem
 import type { ConsentLevel } from '@/lib/research/types/research-types'
 
 import { consentService } from '../consent/service'
-
 import { roleHasPermission } from './role-permissions'
 import type {
   BreakGlassParams,

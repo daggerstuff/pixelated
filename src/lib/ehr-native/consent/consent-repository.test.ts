@@ -5,6 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+
 import type { QueryResultRow } from '@/lib/db'
 
 // ---------------------------------------------------------------------------
@@ -21,13 +22,13 @@ vi.mock('@/lib/db', () => ({
   transaction: mockTransaction,
 }))
 
+import type { Consent } from '../types/consent'
 // Import after mocks are set up
 import {
   ConsentRepository,
   type ConsentRow,
   type CreateConsentInput,
 } from './repository'
-import type { Consent } from '../types/consent'
 
 // ---------------------------------------------------------------------------
 // Helpers

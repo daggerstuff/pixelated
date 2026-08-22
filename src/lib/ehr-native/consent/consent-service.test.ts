@@ -42,11 +42,12 @@ vi.mock('./repository', () => ({
   },
 }))
 
+import type { ConsentLevel } from '@/lib/research/types/research-types'
+
+import type { Consent } from '../types/consent'
+import type { ConsentRow } from './repository'
 // Import after mocks
 import { ConsentService, type ConsentVerificationResult } from './service'
-import type { ConsentRow } from './repository'
-import type { Consent } from '../types/consent'
-import type { ConsentLevel } from '@/lib/research/types/research-types'
 import {
   clearStateRules,
   registerStateRules,
