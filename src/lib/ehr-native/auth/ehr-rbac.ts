@@ -16,6 +16,8 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { consentManagementService } from '@/lib/research/services/ConsentManagementService'
 import type { ConsentLevel } from '@/lib/research/types/research-types'
 
+import { consentService } from '../consent/service'
+
 import { roleHasPermission } from './role-permissions'
 import type {
   BreakGlassParams,
@@ -106,21 +108,41 @@ function requiresConsentCheck(permission: EHRPermission): boolean {
 /**
  * Verify that a patient has sufficient consent for a given permission.
  *
- * Delegates to `ConsentManagementService.getConsentLevel()`. Returns `null`
- * when consent is not applicable (bypass permissions), `false` when consent
- * is missing/expired/withdrawn or insufficient, and `true` when consent is
- * active and meets the minimum level.
+ * When `tenantId` is provided, delegates to the EHR-native `ConsentService`
+ * which uses the `ehr_patient_has_consent` SQL function and state-specific
+ * consent rules. When `tenantId` is not provided, falls back to the legacy
+ * `ConsentManagementService.getConsentLevel()` path for backward compatibility.
+ *
+ * Returns `null` when consent is not applicable (bypass permissions),
+ * `false` when consent is missing/expired/withdrawn or insufficient,
+ * and `true` when consent is active and meets the minimum level.
  *
  * @param patientId - The patient whose consent to verify.
  * @param permission - The permission being exercised.
+ * @param tenantId - Optional tenant ID for EHR-native consent verification.
+ * @param stateCode - Optional U.S. state code for state-specific rules.
  * @returns A consent verification result, or `null` if not applicable.
  */
 export async function verifyPatientConsent(
   patientId: string,
   permission: EHRPermission,
+  tenantId?: string,
+  stateCode?: string,
 ): Promise<boolean | null> {
   if (!requiresConsentCheck(permission)) {
     return null
+  }
+
+  const required = MINIMUM_CONSENT[permission]
+
+  if (tenantId) {
+    const result = await consentService.verifyConsent(
+      patientId,
+      tenantId,
+      required,
+      stateCode,
+    )
+    return result.verified
   }
 
   const consentLevel = await consentManagementService.getConsentLevel(patientId)
@@ -128,7 +150,6 @@ export async function verifyPatientConsent(
     return false
   }
 
-  const required = MINIMUM_CONSENT[permission]
   return consentSatisfies(consentLevel, required)
 }
 
