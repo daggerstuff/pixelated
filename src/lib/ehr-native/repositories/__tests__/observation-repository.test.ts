@@ -76,7 +76,7 @@ describe('ObservationRepository', () => {
 
     it('rejects invalid observation schema', async () => {
       await expect(
-        repo.create({ ...validObservation, resourceType: 'NotObservation' })
+        repo.create({ ...validObservation, resourceType: 'NotObservation' }),
       ).rejects.toThrow()
     })
 
@@ -141,7 +141,9 @@ describe('ObservationRepository', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({
-          rows: [{ fhir_resource: { ...existing, status: 'amended' as const } }],
+          rows: [
+            { fhir_resource: { ...existing, status: 'amended' as const } },
+          ],
           rowCount: 1,
         })
 
@@ -203,7 +205,13 @@ describe('ObservationRepository', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [], rowCount: 0 })
 
-      await repo.findByPatientAndDateRange('p-1', '2025-01-01', '2025-01-31', 50, 0)
+      await repo.findByPatientAndDateRange(
+        'p-1',
+        '2025-01-01',
+        '2025-01-31',
+        50,
+        0,
+      )
 
       const selectCall = mockQuery.mock.calls[2]
       expect(selectCall[0]).toContain('patient_id = $1')

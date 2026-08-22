@@ -25,8 +25,13 @@ export class EncounterRepository extends BaseRepository<Encounter> {
    */
   async create(encounter: unknown): Promise<Encounter> {
     const validated = encounterSchema.parse(encounter)
-    const patientId = validated.subject?.reference?.replace('Patient/', '') ?? null
-    const practitionerId = validated.participant?.[0]?.individual?.reference?.replace('Practitioner/', '') ?? null
+    const patientId =
+      validated.subject?.reference?.replace('Patient/', '') ?? null
+    const practitionerId =
+      validated.participant?.[0]?.individual?.reference?.replace(
+        'Practitioner/',
+        '',
+      ) ?? null
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(
         `INSERT INTO ehr_encounter (tenant_id, patient_id, practitioner_id, status, class, period_start, period_end, fhir_resource)
@@ -41,7 +46,7 @@ export class EncounterRepository extends BaseRepository<Encounter> {
           null,
           null,
           JSON.stringify(validated),
-        ]
+        ],
       )
       return res.rows[0].fhir_resource
     })
@@ -50,12 +55,23 @@ export class EncounterRepository extends BaseRepository<Encounter> {
   /**
    * Updates an existing encounter's FHIR resource and denormalized columns.
    */
-  async update(id: string, encounter: Partial<Encounter>): Promise<Encounter | null> {
+  async update(
+    id: string,
+    encounter: Partial<Encounter>,
+  ): Promise<Encounter | null> {
     const existing = await this.findById(id)
     if (!existing) return null
-    const merged = encounterSchema.parse({ ...existing, ...encounter, resourceType: 'Encounter' })
+    const merged = encounterSchema.parse({
+      ...existing,
+      ...encounter,
+      resourceType: 'Encounter',
+    })
     const patientId = merged.subject?.reference?.replace('Patient/', '') ?? null
-    const practitionerId = merged.participant?.[0]?.individual?.reference?.replace('Practitioner/', '') ?? null
+    const practitionerId =
+      merged.participant?.[0]?.individual?.reference?.replace(
+        'Practitioner/',
+        '',
+      ) ?? null
 
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(
@@ -73,7 +89,7 @@ export class EncounterRepository extends BaseRepository<Encounter> {
           null,
           null,
           JSON.stringify(merged),
-        ]
+        ],
       )
       return res.rows[0]?.fhir_resource ?? null
     })
@@ -82,14 +98,18 @@ export class EncounterRepository extends BaseRepository<Encounter> {
   /**
    * Finds encounters by status within the tenant.
    */
-  async findByStatus(status: string, limit = 50, offset = 0): Promise<Encounter[]> {
+  async findByStatus(
+    status: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Encounter[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(
         `SELECT fhir_resource FROM ehr_encounter
          WHERE status = $1
          ORDER BY period_start DESC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [status, limit, offset]
+        [status, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -98,14 +118,19 @@ export class EncounterRepository extends BaseRepository<Encounter> {
   /**
    * Finds encounters within a date range.
    */
-  async findByDateRange(start: string, end: string, limit = 50, offset = 0): Promise<Encounter[]> {
+  async findByDateRange(
+    start: string,
+    end: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Encounter[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(
         `SELECT fhir_resource FROM ehr_encounter
          WHERE period_start >= $1 AND (period_end <= $2 OR period_end IS NULL)
          ORDER BY period_start DESC
          LIMIT $3 OFFSET $4`,
-        [start, end, limit, offset]
+        [start, end, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -114,14 +139,18 @@ export class EncounterRepository extends BaseRepository<Encounter> {
   /**
    * Finds encounters by practitioner ID.
    */
-  async findByPractitioner(practitionerId: string, limit = 50, offset = 0): Promise<Encounter[]> {
+  async findByPractitioner(
+    practitionerId: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Encounter[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Encounter }>(
         `SELECT fhir_resource FROM ehr_encounter
          WHERE practitioner_id = $1
          ORDER BY period_start DESC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [practitionerId, limit, offset]
+        [practitionerId, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })

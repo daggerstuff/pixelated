@@ -41,7 +41,9 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
       role: this.rlsContext.role,
       break_glass: this.rlsContext.breakGlass ?? false,
     })
-    await client.query(`SET LOCAL app.tenant_id = $1`, [this.rlsContext.tenantId])
+    await client.query(`SET LOCAL app.tenant_id = $1`, [
+      this.rlsContext.tenantId,
+    ])
     await client.query(`SET LOCAL request.jwt.claims = $1`, [claims])
   }
 
@@ -49,7 +51,7 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
    * Runs a callback within a transaction that has RLS context set.
    */
   protected async withRLS<TResult>(
-    callback: (client: PoolClient) => Promise<TResult>
+    callback: (client: PoolClient) => Promise<TResult>,
   ): Promise<TResult> {
     return transaction(async (client) => {
       await this.setRLSContext(client)
@@ -65,7 +67,7 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
     const result = await this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: TResource }>(
         `SELECT fhir_resource FROM ${this.tableName} WHERE ${this.idColumn} = $1`,
-        [id]
+        [id],
       )
       return res.rows[0]?.fhir_resource ?? null
     })
@@ -75,14 +77,18 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
   /**
    * Retrieves all resources for a given patient, ordered by most recent first.
    */
-  async findByPatient(patientId: string, limit = 50, offset = 0): Promise<TResource[]> {
+  async findByPatient(
+    patientId: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<TResource[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: TResource }>(
         `SELECT fhir_resource FROM ${this.tableName}
          WHERE patient_id = $1
          ORDER BY created_at DESC
          LIMIT $2 OFFSET $3`,
-        [patientId, limit, offset]
+        [patientId, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -95,7 +101,7 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
     return this.withRLS(async (client) => {
       const res = await client.query(
         `DELETE FROM ${this.tableName} WHERE ${this.idColumn} = $1`,
-        [id]
+        [id],
       )
       return (res.rowCount ?? 0) > 0
     })
@@ -108,7 +114,7 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ count: string }>(
         `SELECT COUNT(*)::text as count FROM ${this.tableName} WHERE patient_id = $1`,
-        [patientId]
+        [patientId],
       )
       return parseInt(res.rows[0]?.count ?? '0', 10)
     })
@@ -119,10 +125,13 @@ export abstract class BaseRepository<TResource extends { id?: string }> {
    */
   protected async queryWithRLS<TResult extends QueryResultRow>(
     text: string,
-    params: unknown[]
+    params: unknown[],
   ): Promise<DbQueryResult<TResult>> {
     return this.withRLS(async (client) => {
-      return client.query<TResult>(text, params) as unknown as DbQueryResult<TResult>
+      return client.query<TResult>(
+        text,
+        params,
+      ) as unknown as DbQueryResult<TResult>
     })
   }
 }

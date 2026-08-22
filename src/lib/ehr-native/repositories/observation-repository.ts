@@ -25,9 +25,12 @@ export class ObservationRepository extends BaseRepository<Observation> {
    */
   async create(observation: unknown): Promise<Observation> {
     const validated = observationSchema.parse(observation)
-    const patientId = validated.subject?.reference?.replace('Patient/', '') ?? null
-    const encounterId = validated.encounter?.reference?.replace('Encounter/', '') ?? null
-    const code = validated.code?.coding?.[0]?.code ?? validated.code?.text ?? null
+    const patientId =
+      validated.subject?.reference?.replace('Patient/', '') ?? null
+    const encounterId =
+      validated.encounter?.reference?.replace('Encounter/', '') ?? null
+    const code =
+      validated.code?.coding?.[0]?.code ?? validated.code?.text ?? null
     const effectiveDate = validated.effectiveDateTime ?? null
 
     return this.withRLS(async (client) => {
@@ -43,7 +46,7 @@ export class ObservationRepository extends BaseRepository<Observation> {
           code,
           effectiveDate,
           JSON.stringify(validated),
-        ]
+        ],
       )
       return res.rows[0].fhir_resource
     })
@@ -52,12 +55,20 @@ export class ObservationRepository extends BaseRepository<Observation> {
   /**
    * Updates an existing observation's FHIR resource and denormalized columns.
    */
-  async update(id: string, observation: Partial<Observation>): Promise<Observation | null> {
+  async update(
+    id: string,
+    observation: Partial<Observation>,
+  ): Promise<Observation | null> {
     const existing = await this.findById(id)
     if (!existing) return null
-    const merged = observationSchema.parse({ ...existing, ...observation, resourceType: 'Observation' })
+    const merged = observationSchema.parse({
+      ...existing,
+      ...observation,
+      resourceType: 'Observation',
+    })
     const patientId = merged.subject?.reference?.replace('Patient/', '') ?? null
-    const encounterId = merged.encounter?.reference?.replace('Encounter/', '') ?? null
+    const encounterId =
+      merged.encounter?.reference?.replace('Encounter/', '') ?? null
     const code = merged.code?.coding?.[0]?.code ?? merged.code?.text ?? null
     const effectiveDate = merged.effectiveDateTime ?? null
 
@@ -76,7 +87,7 @@ export class ObservationRepository extends BaseRepository<Observation> {
           code,
           effectiveDate,
           JSON.stringify(merged),
-        ]
+        ],
       )
       return res.rows[0]?.fhir_resource ?? null
     })
@@ -85,14 +96,18 @@ export class ObservationRepository extends BaseRepository<Observation> {
   /**
    * Finds observations by status within the tenant.
    */
-  async findByStatus(status: string, limit = 50, offset = 0): Promise<Observation[]> {
+  async findByStatus(
+    status: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Observation[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Observation }>(
         `SELECT fhir_resource FROM ehr_observation
          WHERE status = $1
          ORDER BY effective_date DESC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [status, limit, offset]
+        [status, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -101,14 +116,18 @@ export class ObservationRepository extends BaseRepository<Observation> {
   /**
    * Finds observations by LOINC code (e.g., "2951-2" for sodium).
    */
-  async findByCode(code: string, limit = 50, offset = 0): Promise<Observation[]> {
+  async findByCode(
+    code: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Observation[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Observation }>(
         `SELECT fhir_resource FROM ehr_observation
          WHERE code = $1
          ORDER BY effective_date DESC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [code, limit, offset]
+        [code, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -122,7 +141,7 @@ export class ObservationRepository extends BaseRepository<Observation> {
     start: string,
     end: string,
     limit = 50,
-    offset = 0
+    offset = 0,
   ): Promise<Observation[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Observation }>(
@@ -130,7 +149,7 @@ export class ObservationRepository extends BaseRepository<Observation> {
          WHERE patient_id = $1 AND effective_date >= $2 AND effective_date <= $3
          ORDER BY effective_date DESC
          LIMIT $4 OFFSET $5`,
-        [patientId, start, end, limit, offset]
+        [patientId, start, end, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -139,14 +158,18 @@ export class ObservationRepository extends BaseRepository<Observation> {
   /**
    * Finds observations by encounter ID.
    */
-  async findByEncounter(encounterId: string, limit = 100, offset = 0): Promise<Observation[]> {
+  async findByEncounter(
+    encounterId: string,
+    limit = 100,
+    offset = 0,
+  ): Promise<Observation[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Observation }>(
         `SELECT fhir_resource FROM ehr_observation
          WHERE encounter_id = $1
          ORDER BY effective_date DESC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [encounterId, limit, offset]
+        [encounterId, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })

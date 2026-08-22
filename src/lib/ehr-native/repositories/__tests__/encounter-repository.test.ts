@@ -27,7 +27,10 @@ const rlsContext: RLSContext = {
 const validEncounter = {
   resourceType: 'Encounter' as const,
   status: 'in-progress' as const,
-  class: { system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB' },
+  class: {
+    system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+    code: 'AMB',
+  },
   subject: { reference: 'Patient/p-1' },
   participant: [
     {
@@ -70,7 +73,7 @@ describe('EncounterRepository', () => {
 
     it('rejects invalid encounter schema', async () => {
       await expect(
-        repo.create({ ...validEncounter, resourceType: 'NotEncounter' })
+        repo.create({ ...validEncounter, resourceType: 'NotEncounter' }),
       ).rejects.toThrow()
     })
   })
@@ -116,7 +119,9 @@ describe('EncounterRepository', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({
-          rows: [{ fhir_resource: { ...existing, status: 'finished' as const } }],
+          rows: [
+            { fhir_resource: { ...existing, status: 'finished' as const } },
+          ],
           rowCount: 1,
         })
 

@@ -67,7 +67,7 @@ describe('PatientRepository', () => {
 
     it('rejects an invalid patient schema', async () => {
       await expect(
-        repo.create({ ...validPatient, resourceType: 'NotPatient' })
+        repo.create({ ...validPatient, resourceType: 'NotPatient' }),
       ).rejects.toThrow()
     })
   })
@@ -230,7 +230,10 @@ describe('PatientRepository', () => {
       mockQuery
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
-        .mockResolvedValueOnce({ rows: [{ fhir_resource: validPatient }], rowCount: 1 })
+        .mockResolvedValueOnce({
+          rows: [{ fhir_resource: validPatient }],
+          rowCount: 1,
+        })
 
       await repo.findById('p-1')
 

@@ -25,10 +25,13 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
    */
   async create(appointment: unknown): Promise<Appointment> {
     const validated = appointmentSchema.parse(appointment)
-    const patientId = validated.participant?.[0]?.actor?.reference?.replace('Patient/', '') ?? null
-    const practitionerId = validated.participant?.find(
-      (p) => p.actor?.reference?.startsWith('Practitioner/')
-    )?.actor?.reference?.replace('Practitioner/', '') ?? null
+    const patientId =
+      validated.participant?.[0]?.actor?.reference?.replace('Patient/', '') ??
+      null
+    const practitionerId =
+      validated.participant
+        ?.find((p) => p.actor?.reference?.startsWith('Practitioner/'))
+        ?.actor?.reference?.replace('Practitioner/', '') ?? null
     const startTime = validated.start ?? null
     const endTime = validated.end ?? null
 
@@ -45,7 +48,7 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
           startTime,
           endTime,
           JSON.stringify(validated),
-        ]
+        ],
       )
       return res.rows[0].fhir_resource
     })
@@ -54,14 +57,23 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   /**
    * Updates an existing appointment's FHIR resource and denormalized columns.
    */
-  async update(id: string, appointment: Partial<Appointment>): Promise<Appointment | null> {
+  async update(
+    id: string,
+    appointment: Partial<Appointment>,
+  ): Promise<Appointment | null> {
     const existing = await this.findById(id)
     if (!existing) return null
-    const merged = appointmentSchema.parse({ ...existing, ...appointment, resourceType: 'Appointment' })
-    const patientId = merged.participant?.[0]?.actor?.reference?.replace('Patient/', '') ?? null
-    const practitionerId = merged.participant?.find(
-      (p) => p.actor?.reference?.startsWith('Practitioner/')
-    )?.actor?.reference?.replace('Practitioner/', '') ?? null
+    const merged = appointmentSchema.parse({
+      ...existing,
+      ...appointment,
+      resourceType: 'Appointment',
+    })
+    const patientId =
+      merged.participant?.[0]?.actor?.reference?.replace('Patient/', '') ?? null
+    const practitionerId =
+      merged.participant
+        ?.find((p) => p.actor?.reference?.startsWith('Practitioner/'))
+        ?.actor?.reference?.replace('Practitioner/', '') ?? null
     const startTime = merged.start ?? null
     const endTime = merged.end ?? null
 
@@ -80,7 +92,7 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
           startTime,
           endTime,
           JSON.stringify(merged),
-        ]
+        ],
       )
       return res.rows[0]?.fhir_resource ?? null
     })
@@ -89,14 +101,18 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   /**
    * Finds appointments by status within the tenant.
    */
-  async findByStatus(status: string, limit = 50, offset = 0): Promise<Appointment[]> {
+  async findByStatus(
+    status: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Appointment[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Appointment }>(
         `SELECT fhir_resource FROM ehr_appointment
          WHERE status = $1
          ORDER BY start_time ASC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [status, limit, offset]
+        [status, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -105,14 +121,19 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   /**
    * Finds appointments within a date range (by start_time).
    */
-  async findByDateRange(start: string, end: string, limit = 50, offset = 0): Promise<Appointment[]> {
+  async findByDateRange(
+    start: string,
+    end: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Appointment[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Appointment }>(
         `SELECT fhir_resource FROM ehr_appointment
          WHERE start_time >= $1 AND start_time <= $2
          ORDER BY start_time ASC
          LIMIT $3 OFFSET $4`,
-        [start, end, limit, offset]
+        [start, end, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -121,14 +142,18 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   /**
    * Finds upcoming appointments for a practitioner.
    */
-  async findUpcomingByPractitioner(practitionerId: string, limit = 20, offset = 0): Promise<Appointment[]> {
+  async findUpcomingByPractitioner(
+    practitionerId: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Appointment[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Appointment }>(
         `SELECT fhir_resource FROM ehr_appointment
          WHERE practitioner_id = $1 AND start_time >= NOW()
          ORDER BY start_time ASC
          LIMIT $2 OFFSET $3`,
-        [practitionerId, limit, offset]
+        [practitionerId, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -137,14 +162,18 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   /**
    * Finds appointments for a specific patient.
    */
-  override async findByPatient(patientId: string, limit = 50, offset = 0): Promise<Appointment[]> {
+  override async findByPatient(
+    patientId: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Appointment[]> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Appointment }>(
         `SELECT fhir_resource FROM ehr_appointment
          WHERE patient_id = $1
          ORDER BY start_time DESC NULLS LAST
          LIMIT $2 OFFSET $3`,
-        [patientId, limit, offset]
+        [patientId, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })

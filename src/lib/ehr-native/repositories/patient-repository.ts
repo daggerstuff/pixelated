@@ -39,7 +39,7 @@ export class PatientRepository extends BaseRepository<Patient> {
           validated.birthDate ?? null,
           validated.gender ?? null,
           JSON.stringify(validated),
-        ]
+        ],
       )
       return res.rows[0].fhir_resource
     })
@@ -51,7 +51,11 @@ export class PatientRepository extends BaseRepository<Patient> {
   async update(id: string, patient: Partial<Patient>): Promise<Patient | null> {
     const existing = await this.findById(id)
     if (!existing) return null
-    const merged = patientSchema.parse({ ...existing, ...patient, resourceType: 'Patient' })
+    const merged = patientSchema.parse({
+      ...existing,
+      ...patient,
+      resourceType: 'Patient',
+    })
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Patient }>(
         `UPDATE ehr_patient
@@ -68,7 +72,7 @@ export class PatientRepository extends BaseRepository<Patient> {
           merged.birthDate ?? null,
           merged.gender ?? null,
           JSON.stringify(merged),
-        ]
+        ],
       )
       return res.rows[0]?.fhir_resource ?? null
     })
@@ -81,7 +85,7 @@ export class PatientRepository extends BaseRepository<Patient> {
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Patient }>(
         `SELECT fhir_resource FROM ehr_patient WHERE mrn = $1`,
-        [mrn]
+        [mrn],
       )
       return res.rows[0]?.fhir_resource ?? null
     })
@@ -96,7 +100,7 @@ export class PatientRepository extends BaseRepository<Patient> {
         `SELECT fhir_resource FROM ehr_patient WHERE active = true
          ORDER BY family_name, given_name
          LIMIT $1 OFFSET $2`,
-        [limit, offset]
+        [limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })
@@ -105,7 +109,11 @@ export class PatientRepository extends BaseRepository<Patient> {
   /**
    * Searches patients by name (family or given), case-insensitive partial match.
    */
-  async searchByName(nameQuery: string, limit = 20, offset = 0): Promise<Patient[]> {
+  async searchByName(
+    nameQuery: string,
+    limit = 20,
+    offset = 0,
+  ): Promise<Patient[]> {
     const pattern = `%${nameQuery}%`
     return this.withRLS(async (client) => {
       const res = await client.query<{ fhir_resource: Patient }>(
@@ -113,7 +121,7 @@ export class PatientRepository extends BaseRepository<Patient> {
          WHERE family_name ILIKE $1 OR given_name ILIKE $1
          ORDER BY family_name, given_name
          LIMIT $2 OFFSET $3`,
-        [pattern, limit, offset]
+        [pattern, limit, offset],
       )
       return res.rows.map((r) => r.fhir_resource)
     })

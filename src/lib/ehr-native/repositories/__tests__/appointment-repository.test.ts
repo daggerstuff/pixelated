@@ -74,7 +74,7 @@ describe('AppointmentRepository', () => {
 
     it('rejects invalid appointment schema', async () => {
       await expect(
-        repo.create({ ...validAppointment, resourceType: 'NotAppointment' })
+        repo.create({ ...validAppointment, resourceType: 'NotAppointment' }),
       ).rejects.toThrow()
     })
   })
@@ -120,7 +120,9 @@ describe('AppointmentRepository', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({
-          rows: [{ fhir_resource: { ...existing, status: 'cancelled' as const } }],
+          rows: [
+            { fhir_resource: { ...existing, status: 'cancelled' as const } },
+          ],
           rowCount: 1,
         })
 
