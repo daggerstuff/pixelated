@@ -97,7 +97,8 @@ export class ConsentService {
       patientId,
       tenantId,
     )
-    const dbConsentLevel = (activeConsent?.consent_level ?? 'none') as ConsentLevel
+    const dbConsentLevel = (activeConsent?.consent_level ??
+      'none') as ConsentLevel
     const expired = this.isConsentExpired(activeConsent)
 
     // Apply state rules if stateCode provided
