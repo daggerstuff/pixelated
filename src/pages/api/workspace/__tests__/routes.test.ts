@@ -39,7 +39,6 @@ function request(
   })
 }
 
-
 function invoke(
   handler: (ctx: never) => Promise<Response>,
   ctx: object,
@@ -284,7 +283,9 @@ describe('GET /api/workspace/gmail', () => {
     mockGetCurrentUser.mockResolvedValue(OWNER)
     mockQuery.mockResolvedValue({ rows: [] })
 
-    await invoke(gmailList, { request: request('/api/workspace/gmail?limit=10') })
+    await invoke(gmailList, {
+      request: request('/api/workspace/gmail?limit=10'),
+    })
 
     const [sql, params] = mockQuery.mock.calls[0]
     expect(sql).toContain('WHERE owner_id = $1')
@@ -296,7 +297,9 @@ describe('GET /api/workspace/gmail', () => {
     mockGetCurrentUser.mockResolvedValue(OWNER)
     mockQuery.mockResolvedValue({ rows: [] })
 
-    await invoke(gmailList, { request: request('/api/workspace/gmail?unread=true') })
+    await invoke(gmailList, {
+      request: request('/api/workspace/gmail?unread=true'),
+    })
 
     const [sql] = mockQuery.mock.calls[0]
     expect(sql).toContain('read_at IS NULL')
