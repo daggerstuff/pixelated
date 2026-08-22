@@ -11,3 +11,21 @@
 
 // Type system (F1.0)
 export type {} from './types'
+
+// Consent engine (F1.4)
+export {
+  ConsentRepository,
+  ConsentService,
+  consentService,
+  DEFAULT_STATE_RULES,
+  getStateRules,
+  registerStateRules,
+  clearStateRules,
+  requiresHigherConsent,
+  type ConsentRow,
+  type CreateConsentInput,
+  type UpdateConsentInput,
+  type ConsentVerificationResult,
+  type CreateConsentOptions,
+  type StateConsentRules,
+} from './consent'
