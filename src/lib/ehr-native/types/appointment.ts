@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -6,7 +6,7 @@ import {
   fhirReferenceSchema,
   fhirPeriodSchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 Appointment resource schema.
@@ -53,17 +53,14 @@ export const appointmentSchema = fhirDomainResourceSchema.extend({
         ...fhirBackboneElementSchema.shape,
         type: z.array(fhirCodeableConceptSchema).optional(),
         actor: fhirReferenceSchema.optional(),
-        required: z.enum(['required', 'optional', 'information-only']).optional(),
-        status: z.enum([
-          'accepted',
-          'declined',
-          'tentative',
-          'needs-action',
-        ]),
+        required: z
+          .enum(['required', 'optional', 'information-only'])
+          .optional(),
+        status: z.enum(['accepted', 'declined', 'tentative', 'needs-action']),
       }),
     )
     .min(1),
   requestedPeriod: z.array(fhirPeriodSchema).optional(),
-});
+})
 
-export type Appointment = z.infer<typeof appointmentSchema>;
+export type Appointment = z.infer<typeof appointmentSchema>

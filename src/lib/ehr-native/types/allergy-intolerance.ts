@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -6,7 +6,7 @@ import {
   fhirReferenceSchema,
   fhirPeriodSchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 AllergyIntolerance resource schema.
@@ -19,7 +19,9 @@ export const allergyIntoleranceSchema = fhirDomainResourceSchema.extend({
   clinicalStatus: fhirCodeableConceptSchema.optional(),
   verificationStatus: fhirCodeableConceptSchema.optional(),
   type: z.enum(['allergy', 'intolerance']).optional(),
-  category: z.array(z.enum(['food', 'medication', 'environment', 'biologic'])).optional(),
+  category: z
+    .array(z.enum(['food', 'medication', 'environment', 'biologic']))
+    .optional(),
   criticality: z.enum(['low', 'high', 'unable-to-assess']).optional(),
   code: fhirCodeableConceptSchema.optional(),
   patient: fhirReferenceSchema,
@@ -98,6 +100,6 @@ export const allergyIntoleranceSchema = fhirDomainResourceSchema.extend({
       }),
     )
     .optional(),
-});
+})
 
-export type AllergyIntolerance = z.infer<typeof allergyIntoleranceSchema>;
+export type AllergyIntolerance = z.infer<typeof allergyIntoleranceSchema>

@@ -73,7 +73,9 @@ describe('fhirCodeableConceptSchema', () => {
   })
 
   it('fails safeParse when coding is not an array', () => {
-    const result = fhirCodeableConceptSchema.safeParse({ coding: 'not-an-array' })
+    const result = fhirCodeableConceptSchema.safeParse({
+      coding: 'not-an-array',
+    })
     expect(result.success).toBe(false)
   })
 })

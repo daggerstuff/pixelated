@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -7,7 +7,7 @@ import {
   fhirPeriodSchema,
   fhirQuantitySchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 ServiceRequest resource schema.
@@ -31,7 +31,16 @@ export const serviceRequestSchema = fhirDomainResourceSchema.extend({
     'entered-in-error',
     'unknown',
   ]),
-  intent: z.enum(['proposal', 'plan', 'order', 'original-order', 'reflex-order', 'filler-order', 'instance-order', 'option']),
+  intent: z.enum([
+    'proposal',
+    'plan',
+    'order',
+    'original-order',
+    'reflex-order',
+    'filler-order',
+    'instance-order',
+    'option',
+  ]),
   category: z.array(fhirCodeableConceptSchema).optional(),
   priority: z.enum(['routine', 'urgent', 'asap', 'stat']).optional(),
   doNotPerform: z.boolean().optional(),
@@ -68,13 +77,19 @@ export const serviceRequestSchema = fhirDomainResourceSchema.extend({
           countMax: z.number().int().positive().optional(),
           duration: z.number().optional(),
           durationMax: z.number().optional(),
-          durationUnit: z.enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a']).optional(),
+          durationUnit: z
+            .enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a'])
+            .optional(),
           frequency: z.number().int().nonnegative().optional(),
           frequencyMax: z.number().int().nonnegative().optional(),
           period: z.number().optional(),
           periodMax: z.number().optional(),
-          periodUnit: z.enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a']).optional(),
-          dayOfWeek: z.array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])).optional(),
+          periodUnit: z
+            .enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a'])
+            .optional(),
+          dayOfWeek: z
+            .array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']))
+            .optional(),
           timeOfDay: z.array(z.string()).optional(),
           when: z.array(z.string()).optional(),
           offset: z.number().int().nonnegative().optional(),
@@ -110,6 +125,6 @@ export const serviceRequestSchema = fhirDomainResourceSchema.extend({
     .optional(),
   patientInstruction: z.string().optional(),
   relevantHistory: z.array(fhirReferenceSchema).optional(),
-});
+})
 
-export type ServiceRequest = z.infer<typeof serviceRequestSchema>;
+export type ServiceRequest = z.infer<typeof serviceRequestSchema>

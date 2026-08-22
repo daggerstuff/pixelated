@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -6,7 +6,7 @@ import {
   fhirReferenceSchema,
   fhirPeriodSchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 Condition resource schema.
@@ -130,6 +130,6 @@ export const conditionSchema = fhirDomainResourceSchema.extend({
       }),
     )
     .optional(),
-});
+})
 
-export type Condition = z.infer<typeof conditionSchema>;
+export type Condition = z.infer<typeof conditionSchema>

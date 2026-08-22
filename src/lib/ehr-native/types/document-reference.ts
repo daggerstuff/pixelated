@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -7,7 +7,7 @@ import {
   fhirPeriodSchema,
   fhirAttachmentSchema,
   fhirBackboneElementSchema,
-} from './base';
+} from './base'
 
 /**
  * FHIR R4 DocumentReference resource schema.
@@ -18,17 +18,10 @@ export const documentReferenceSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('DocumentReference'),
   masterIdentifier: fhirIdentifierSchema.optional(),
   identifier: z.array(fhirIdentifierSchema).optional(),
-  status: z.enum([
-    'current',
-    'superseded',
-    'entered-in-error',
-  ]),
-  docStatus: z.enum([
-    'preliminary',
-    'final',
-    'amended',
-    'entered-in-error',
-  ]).optional(),
+  status: z.enum(['current', 'superseded', 'entered-in-error']),
+  docStatus: z
+    .enum(['preliminary', 'final', 'amended', 'entered-in-error'])
+    .optional(),
   type: fhirCodeableConceptSchema.optional(),
   category: z.array(fhirCodeableConceptSchema).optional(),
   subject: fhirReferenceSchema.optional(),
@@ -83,6 +76,6 @@ export const documentReferenceSchema = fhirDomainResourceSchema.extend({
         .optional(),
     })
     .optional(),
-});
+})
 
-export type DocumentReference = z.infer<typeof documentReferenceSchema>;
+export type DocumentReference = z.infer<typeof documentReferenceSchema>
