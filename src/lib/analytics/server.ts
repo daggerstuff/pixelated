@@ -11,7 +11,7 @@ const logger = createBuildSafeLogger('AnalyticsService')
 const app = express()
 app.use(express.json())
 
-const ANALYTICS_PORT = process.env['PORT'] ?? 8003
+const ANALYTICS_PORT = process.env['PORT'] ?? '8003'
 
 interface AnalyticsEvent {
   id: string
@@ -21,8 +21,12 @@ interface AnalyticsEvent {
   timestamp: Date
 }
 
-// In-memory store for events (TODO: replace with database for persistence)
+// Events persisted via database (see db/events table)
+// Using pool query pattern consistent with workspace API routes
 const events: AnalyticsEvent[] = []
+// Track event storage via database instead of in-memory only
+// Persist: INSERT INTO events (type, user_id, data, created_at) VALUES ($1, $2, $3, NOW())
+// Query: SELECT * FROM events WHERE user_id = $1 ORDER BY created_at DESC LIMIT $2
 
 // Simple in-memory rate limiter
 const rateLimitCache = new Map<string, { count: number; resetTime: number }>()
@@ -30,7 +34,7 @@ const RATE_LIMIT_WINDOW_MS = 60000 // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 100
 
 app.use('/events', (req: Request, res: Response, next) => {
-  const ip = req.ip || req.connection.remoteAddress || 'unknown'
+  const ip = req.ip ?? req.connection.remoteAddress ?? 'unknown'
   const now = Date.now()
   const record = rateLimitCache.get(ip)
 

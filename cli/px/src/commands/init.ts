@@ -113,6 +113,12 @@ const DEFAULT_CONFIG = {
   slack: {
     channel: '#px-agent-results',
   },
+  workspace: {
+    endpoint: 'http://127.0.0.1:4321',
+    // Set via `px workspace` --token or PX_WORKSPACE_TOKEN; kept out of the
+    // committed default on purpose.
+    timeout: 30000,
+  },
   hooks: {
     'pre-commit': {
       agent: 'content',
