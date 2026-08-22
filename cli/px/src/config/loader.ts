@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from 'node:fs'
 import { resolve, join } from 'node:path'
 
 import type { PxConfig, AgentConfig } from './schema.js'
+import { WorkspaceConfigSchema } from './schema.js'
 
 const DEFAULT_CONFIG_PATH = 'agents/px.config.json'
 const REPO_LOCAL_OVERRIDE = '.px/config.json'
@@ -19,7 +20,7 @@ function findRepoRoot(start: string): string | null {
 function readJsonSafe(path: string): Record<string, unknown> | null {
   if (!existsSync(path)) return null
   try {
-    return JSON.parse(readFileSync(path, 'utf-8'))
+    return JSON.parse(readFileSync(path, 'utf-8')) as Record<string, unknown>
   } catch {
     return null
   }
@@ -41,12 +42,18 @@ function mergeConfigs(base: PxConfig, override: Partial<PxConfig>): PxConfig {
     agents: base.agents,
     slack: override.slack ?? base.slack,
     hooks: base.hooks,
+    workspace: override.workspace ?? base.workspace,
   }
   if (override.agents) {
     merged.agents = mergeAgents(base.agents, override.agents)
   }
   if (base.hooks && override.hooks) {
     merged.hooks = { ...base.hooks, ...override.hooks }
+  }
+  // Validate workspace config after merge
+  if (merged.workspace) {
+    const parsed = WorkspaceConfigSchema.parse(merged.workspace)
+    merged.workspace = parsed
   }
   return merged
 }

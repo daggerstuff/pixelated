@@ -43,11 +43,18 @@ export async function shutdownApplication(): Promise<void> {
     const { shutdownTracing } = await import('./tracing')
     await shutdownTracing()
 
-    // TODO: Add proper shutdown logic for:
-    // - Close database connections
-    // - Stop background services
-    // - Save any pending data
-    // - Clean up resources
+    // Close database connections
+    const dbModule = await import('./db')
+    await dbModule.closePool()
+    // Stop background services
+    const workerModule = await import('./jobs/worker')
+    await workerModule.shutdown?.()
+    // Save any pending data
+    const notifModule = await import('./services/notification')
+    await notifModule.flushPending?.()
+    // Clean up resources
+    const securityModule = await import('./security')
+    await securityModule.cleanup?.()
 
     logger.info('Application shutdown complete')
   } catch (error: unknown) {

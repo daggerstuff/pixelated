@@ -1,5 +1,7 @@
 // Stub AI Models Registry - Phase 5.0 Reconstruction
-// TODO: Replace with actual AI infrastructure integration
+// Integrate with AI infrastructure: Workers AI gateway (GLM 5.2),
+// Anthropic/OpenAI via provider configs. See agents/*/agent/lib/workers-ai.ts
+// for gateway model routing. Populate from DB or env on startup.
 
 import type { AIModel } from './types'
 
