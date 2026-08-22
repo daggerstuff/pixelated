@@ -142,7 +142,12 @@ recover_failed_submodules() {
     status_line=$(git submodule status -- "${path}" 2>/dev/null || true)
     local status_char="${status_line:0:1}"
 
-    if [[ "${status_char}" == "-" ]]; then
+    # '-' = registered but never fetched/checked out; '+' = fetched but the
+    # worktree sha does not match the recorded gitlink (the #5743 ghost-pin
+    # signature: fetch succeeds, checkout of the missing pin fails, leaving a
+    # broken tree that the old code reported as recovered). Both states mean
+    # the tree does NOT contain what the superproject records -> recover.
+    if [[ "${status_char}" == "-" || "${status_char}" == "+" ]]; then
       if ! recover_submodule "${name}" "${path}" "${url}" "${branch}"; then
         all_recovered=false
       fi
@@ -161,6 +166,29 @@ recover_failed_submodules() {
 # Main Execution
 # ---------------------------------------------------------------------------
 configure_credentials
+
+# ---------------------------------------------------------------------------
+# Pointer Guard (strict by default)
+# ---------------------------------------------------------------------------
+# Fail fast BEFORE touching submodules when a pinned gitlink cannot be served
+# by its upstream remote. Prevents the #5743 class of incident: a ghost pin
+# lands on a shared branch while recovery logic masks it as success.
+# Emergencies only:  SUBMODULE_PIN_STRICT=false ./scripts/devops/init-submodules.sh
+# ---------------------------------------------------------------------------
+GUARD_SCRIPT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/check-submodule-pointers.sh"
+if [[ -f "${GUARD_SCRIPT}" ]]; then
+  if [[ "${SUBMODULE_PIN_STRICT:-true}" == "true" ]]; then
+    echo "Validating submodule pointers..."
+    if ! bash "${GUARD_SCRIPT}" HEAD; then
+      echo "##[error]Submodule pointer validation FAILED - refusing to initialize against unresolvable pins."
+      echo "##[error]Fix the pointer(s) above (push missing commits or repoint the gitlink),"
+      echo "##[error]or export SUBMODULE_PIN_STRICT=false to bypass (discouraged, masks breakage)."
+      exit 1
+    fi
+  else
+    echo "[skip-guard] SUBMODULE_PIN_STRICT=false - pointer validation skipped (legacy fallback mode)."
+  fi
+fi
 
 # 1. Pre-initialize submodules to register them in .git/config
 echo "📦 Initializing submodules..."
