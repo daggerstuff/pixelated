@@ -47,7 +47,7 @@
   --np-weight-data: 400;
 
   /* Scale — terminal: commanding display, compact reading ramp */
-  --np-text-display: clamp(2.8rem, 7vw, 6rem);
+  --np-text-display: clamp(2.25rem, 4.4vw, 3.6rem);
   --np-text-headline: clamp(1.5rem, 3vw, 2.2rem);
   --np-text-title: 1.125rem;
   --np-text-body: 1rem;
@@ -57,7 +57,7 @@
   --np-text-caption: 0.6875rem;
 
   /* Line heights — tighter for display, open for reading */
-  --np-leading-display: 0.92;
+  --np-leading-display: 1.04;
   --np-leading-headline: 1.05;
   --np-leading-title: 1.2;
   --np-leading-body: 1.65;
@@ -65,7 +65,7 @@
   --np-leading-label: 1.3;
 
   /* Letter spacing — tight display, tracked labels */
-  --np-tracking-display: -0.04em;
+  --np-tracking-display: -0.03em;
   --np-tracking-headline: -0.035em;
   --np-tracking-label: 0.04em;
 
