@@ -31,6 +31,8 @@ export interface ReportTemplate {
   controlIds: string[]
   /** Generate findings from the collected data. */
   generateFindings: (data: unknown) => ComplianceFinding[]
+  /** Template version for change control tracking. */
+  version: string
 }
 
 /** Helper: create a finding with sensible defaults. */
@@ -459,6 +461,7 @@ export const REPORT_TEMPLATES: Record<ReportType, ReportTemplate> = {
     framework: 'HIPAA',
     controlIds: ['§164.312(b)', '§164.312(a)(2)(iv)', '§164.308(a)(1)(ii)(B)', '§164.506', '§164.508'],
     generateFindings: hipaaAuditFindings,
+    version: '1.0.0',
   },
   'soc2-security': {
     type: 'soc2-security',
@@ -468,6 +471,7 @@ export const REPORT_TEMPLATES: Record<ReportType, ReportTemplate> = {
     framework: 'SOC 2',
     controlIds: ['CC6.1', 'CC6.7', 'CC7.3', 'CC6.1'],
     generateFindings: soc2SecurityFindings,
+    version: '1.0.0',
   },
   'soc2-availability': {
     type: 'soc2-availability',
@@ -477,6 +481,7 @@ export const REPORT_TEMPLATES: Record<ReportType, ReportTemplate> = {
     framework: 'SOC 2',
     controlIds: ['A1.1', 'A1.2', 'A1.3'],
     generateFindings: soc2AvailabilityFindings,
+    version: '1.0.0',
   },
   'consent-compliance': {
     type: 'consent-compliance',
@@ -486,6 +491,7 @@ export const REPORT_TEMPLATES: Record<ReportType, ReportTemplate> = {
     framework: 'HIPAA',
     controlIds: ['§164.506', '§164.508'],
     generateFindings: consentComplianceFindings,
+    version: '1.0.0',
   },
   'access-review': {
     type: 'access-review',
@@ -495,5 +501,6 @@ export const REPORT_TEMPLATES: Record<ReportType, ReportTemplate> = {
     framework: 'SOC 2',
     controlIds: ['CC6.1', 'CC6.3'],
     generateFindings: accessReviewFindings,
+    version: '1.0.0',
   },
 }

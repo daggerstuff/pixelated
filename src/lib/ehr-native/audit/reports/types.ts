@@ -259,6 +259,8 @@ export interface ComplianceReport {
   data: ReportData
   /** Audit chain verification (if applicable). */
   chainVerification?: ChainVerificationResult
+  /** When the report was scheduled to generate (for scheduled/automated reports). */
+  scheduledAt?: string
 }
 
 /** Parameters for generating a compliance report. */

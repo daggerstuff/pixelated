@@ -194,10 +194,10 @@ export function ConsentBanner({ patientId }: ConsentBannerProps) {
       aria-live="polite"
       data-testid="consent-banner"
     >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-start gap-3 min-w-0">
           <svg
-            className={`h-5 w-5 ${getIconClasses(state.status)}`}
+            className={`h-5 w-5 shrink-0 ${getIconClasses(state.status)}`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -210,8 +210,8 @@ export function ConsentBanner({ patientId }: ConsentBannerProps) {
               d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <div>
-            <p className="text-sm font-medium" data-testid="consent-banner-message">
+          <div className="min-w-0">
+            <p className="text-sm font-medium break-words" data-testid="consent-banner-message">
               {state.message}
             </p>
             {expiryDate && (
@@ -225,7 +225,7 @@ export function ConsentBanner({ patientId }: ConsentBannerProps) {
           type="button"
           onClick={handleDismiss}
           onKeyDown={handleKeyDown}
-          className="text-muted-foreground hover:text-foreground rounded p-1 focus:outline-none focus:ring-2 focus:ring-offset-2"
+          className="text-muted-foreground hover:text-foreground rounded p-1 min-h-[44px] min-w-[44px] flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2"
           aria-label="Dismiss consent banner"
         >
           <svg

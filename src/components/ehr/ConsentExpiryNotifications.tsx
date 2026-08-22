@@ -125,7 +125,7 @@ export function ConsentExpiryNotifications({
         <button
           type="button"
           onClick={() => void fetchNotifications()}
-          className="mt-2 text-sm text-blue-600 hover:text-blue-700 underline"
+          className="mt-2 text-sm text-blue-600 hover:text-blue-700 underline min-h-[44px] inline-flex items-center"
         >
           Retry
         </button>
@@ -177,9 +177,9 @@ export function ConsentExpiryNotifications({
             className={`border rounded-lg p-3 ${getStatusClasses(notification.status)}`}
             role="listitem"
           >
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${getStatusBadgeClasses(notification.status)}`}
                   >
@@ -197,7 +197,7 @@ export function ConsentExpiryNotifications({
               </div>
               <a
                 href={`/admin/consent-management?patient=${encodeURIComponent(notification.patientId)}`}
-                className="flex-shrink-0 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="flex-shrink-0 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 min-h-[44px] flex items-center justify-center w-full sm:w-auto text-center"
                 aria-label={`Renew consent for ${notification.patientName}`}
               >
                 Renew Consent
@@ -208,12 +208,12 @@ export function ConsentExpiryNotifications({
       </ul>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4" role="navigation" aria-label="Pagination">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mt-4" role="navigation" aria-label="Pagination">
           <button
             type="button"
             onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
             disabled={currentPage === 0}
-            className="px-3 py-1.5 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent"
+            className="px-3 py-1.5 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent min-h-[44px] w-full sm:w-auto"
             aria-label="Previous page"
           >
             Previous
@@ -225,7 +225,7 @@ export function ConsentExpiryNotifications({
             type="button"
             onClick={() => setCurrentPage((p) => Math.min(totalPages - 1, p + 1))}
             disabled={currentPage >= totalPages - 1}
-            className="px-3 py-1.5 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent"
+            className="px-3 py-1.5 text-sm border rounded-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-accent min-h-[44px] w-full sm:w-auto"
             aria-label="Next page"
           >
             Next

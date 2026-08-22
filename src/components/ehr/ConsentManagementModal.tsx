@@ -418,12 +418,13 @@ export function ConsentManagementModal({
               {renewalError}
             </p>
           )}
-          <div className="flex gap-2 justify-end">
+          <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
             <Button
               variant="outline"
               size="sm"
               onClick={() => setShowRenewForm(null)}
               disabled={submitting}
+              className="min-h-[44px] w-full sm:w-auto"
             >
               Cancel
             </Button>
@@ -431,6 +432,7 @@ export function ConsentManagementModal({
               size="sm"
               onClick={() => void handleRenewSubmit(consent.id)}
               disabled={submitting}
+              className="min-h-[44px] w-full sm:w-auto"
             >
               {submitting && (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -451,6 +453,8 @@ export function ConsentManagementModal({
         title="Consent Management"
         maxWidth="lg"
         aria-label="Consent management dialog"
+        className="max-w-full sm:max-w-lg h-full sm:h-auto sm:max-h-[90vh] rounded-none sm:rounded-lg"
+        backdropClassName="p-0 sm:p-4"
       >
         {loading && (
           <div className="flex items-center justify-center py-8">
@@ -487,7 +491,7 @@ export function ConsentManagementModal({
 
         {!loading && !error && consents.length > 0 && (
           <div className="space-y-2">
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
               <p className="text-sm text-muted-foreground">
                 {consents.length} consent record(s) for patient{' '}
                 <span className="font-mono">{patientId}</span>
@@ -497,6 +501,7 @@ export function ConsentManagementModal({
                 size="sm"
                 onClick={() => void fetchConsents()}
                 aria-label="Refresh consent records"
+                className="min-h-[44px] w-full sm:w-auto"
               >
                 <RefreshCw className="h-3 w-3" />
                 Refresh
@@ -523,7 +528,7 @@ export function ConsentManagementModal({
                         <td className="py-2 px-2">
                           <button
                             onClick={() => toggleExpand(consent.id)}
-                            className="p-1 rounded hover:bg-gray-100"
+                            className="p-1 rounded hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
                             aria-label={
                               expandedId === consent.id
                                 ? 'Collapse details'
@@ -564,10 +569,10 @@ export function ConsentManagementModal({
                           {formatDate(consent.grantedAt)}
                         </td>
                         <td className="py-2 px-2">
-                          <div className="flex gap-1">
+                          <div className="flex flex-wrap gap-1">
                             {consent.status === 'active' && (
                               <button
-                                className="px-2 py-1 text-xs border rounded text-red-600 hover:bg-red-50"
+                                className="px-2 py-1 text-xs border rounded text-red-600 hover:bg-red-50 min-h-[44px]"
                                 onClick={() => setWithdrawTarget(consent)}
                                 aria-label={`Withdraw consent ${consent.id}`}
                               >
@@ -575,14 +580,14 @@ export function ConsentManagementModal({
                               </button>
                             )}
                             <button
-                              className="px-2 py-1 text-xs border rounded hover:bg-accent"
+                              className="px-2 py-1 text-xs border rounded hover:bg-accent min-h-[44px]"
                               onClick={() => startRenew(consent)}
                               aria-label={`Renew consent ${consent.id}`}
                             >
                               Renew
                             </button>
                             <button
-                              className="px-2 py-1 text-xs border rounded hover:bg-accent"
+                              className="px-2 py-1 text-xs border rounded hover:bg-accent min-h-[44px]"
                               onClick={() => toggleExpand(consent.id)}
                               aria-label={`View details for consent ${consent.id}`}
                               aria-expanded={expandedId === consent.id}

@@ -263,7 +263,7 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold">Audit Log Viewer</h2>
           <p className="text-sm text-muted-foreground">
@@ -279,6 +279,7 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
             onClick={handleExport}
             disabled={filteredEntries.length === 0}
             aria-label="Export filtered results as CSV"
+            className="min-h-[44px] flex-1 sm:flex-none"
           >
             <Download className="h-3 w-3" />
             Export CSV
@@ -288,6 +289,7 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
             size="sm"
             onClick={() => void fetchAuditLogs()}
             aria-label="Refresh audit logs"
+            className="min-h-[44px] flex-1 sm:flex-none"
           >
             <RotateCcw className="h-3 w-3" />
             Refresh
@@ -454,6 +456,7 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
             size="sm"
             onClick={handleClearFilters}
             aria-label="Clear all filters"
+            className="min-h-[44px]"
           >
             Clear Filters
           </Button>
@@ -539,7 +542,7 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
                       <td className="py-1 px-2">
                         <button
                           onClick={() => toggleExpand(entry.id)}
-                          className="p-1 rounded hover:bg-gray-100"
+                          className="p-1 rounded hover:bg-gray-100 min-h-[44px] min-w-[44px] flex items-center justify-center"
                           aria-label={
                             expandedId === entry.id
                               ? 'Collapse entry details'
@@ -619,19 +622,20 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
           </div>
 
           {/* Pagination */}
-          <div className="flex items-center justify-between border-t px-4 py-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2 border-t px-4 py-2">
             <span className="text-xs text-muted-foreground">
               Showing {safePage * PAGE_SIZE + 1}-
               {Math.min((safePage + 1) * PAGE_SIZE, filteredEntries.length)} of{' '}
               {filteredEntries.length}
             </span>
-            <div className="flex gap-1">
+            <div className="flex gap-1 w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
                 disabled={safePage === 0}
                 aria-label="Previous page"
+                className="min-h-[44px] flex-1 sm:flex-none"
               >
                 Previous
               </Button>
@@ -646,6 +650,7 @@ export function AuditLogViewer({ patientId }: AuditLogViewerProps) {
                 }
                 disabled={safePage >= totalPages - 1}
                 aria-label="Next page"
+                className="min-h-[44px] flex-1 sm:flex-none"
               >
                 Next
               </Button>

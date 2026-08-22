@@ -170,7 +170,7 @@ export function ProvenanceChainDisplay({
             <div
               className={`border rounded-lg p-3 ${colorClass}`}
             >
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="px-2 py-0.5 rounded text-xs font-medium bg-white">
                     {activityType}
@@ -181,7 +181,7 @@ export function ProvenanceChainDisplay({
                 </div>
                 <button
                   onClick={() => toggleExpand(entry.id)}
-                  className="p-1 rounded hover:bg-white/50 shrink-0"
+                  className="p-1 rounded hover:bg-white/50 shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
                   aria-label={
                     isExpanded
                       ? 'Collapse provenance details'
@@ -262,7 +262,7 @@ export function ProvenanceChainDisplay({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold">Provenance Chain</h2>
           <p className="text-sm text-muted-foreground">
@@ -278,6 +278,7 @@ export function ProvenanceChainDisplay({
             onClick={() => void handleVerifyChain()}
             disabled={verifying || entries.length === 0}
             aria-label="Verify provenance chain integrity"
+            className="min-h-[44px] flex-1 sm:flex-none"
           >
             {verifying ? (
               <Loader2 className="h-3 w-3 animate-spin" />
@@ -291,6 +292,7 @@ export function ProvenanceChainDisplay({
             size="sm"
             onClick={() => void fetchProvenance()}
             aria-label="Refresh provenance records"
+            className="min-h-[44px] flex-1 sm:flex-none"
           >
             Refresh
           </Button>

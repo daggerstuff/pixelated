@@ -205,7 +205,7 @@ export function ComplianceReportManager() {
             type="button"
             onClick={() => void handleGenerate()}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-1.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] w-full sm:w-auto"
             aria-label="Generate compliance report"
           >
             {loading ? (
@@ -247,10 +247,10 @@ export function ComplianceReportManager() {
         <div className="space-y-4">
           {/* Report Meta */}
           <div className="border rounded-lg p-4">
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
               <div>
                 <h3 className="text-base font-semibold">{report.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-muted-foreground mt-1 break-words">
                   Report ID: <span className="font-mono">{report.id}</span>
                   {' | '}
                   Generated: {formatDate(report.generatedAt)}
@@ -327,19 +327,19 @@ export function ComplianceReportManager() {
 
           {/* Findings Table */}
           <div className="border rounded-lg overflow-hidden">
-            <div className="border-b px-4 py-2 flex items-center justify-between">
+            <div className="border-b px-4 py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <h3 className="text-sm font-semibold">
                 Findings ({summary.totalFindings})
               </h3>
               {/* Export Buttons */}
-              <div className="flex gap-1">
+              <div className="flex gap-1 w-full sm:w-auto">
                 {EXPORT_FORMATS.map((fmt) => (
                   <button
                     key={fmt}
                     type="button"
                     onClick={() => void handleExport(fmt)}
                     disabled={exporting !== null}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 border rounded-md text-xs font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center justify-center gap-1 px-2.5 py-1 border rounded-md text-xs font-medium hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] flex-1 sm:flex-none"
                     aria-label={`Export report as ${fmt.toUpperCase()}`}
                   >
                     {exporting === fmt ? (

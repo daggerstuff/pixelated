@@ -36,10 +36,10 @@ export function BreakGlassIndicator({
       aria-live="assertive"
       data-testid="break-glass-indicator"
       title={tooltipText || undefined}
-      className="inline-flex items-center gap-2 rounded-full bg-red-100 border border-red-300 px-3 py-1"
+      className="inline-flex items-center gap-2 rounded-full bg-red-100 border border-red-300 px-3 py-1 min-h-[44px] flex-wrap"
     >
       <span
-        className="relative flex h-3 w-3"
+        className="relative flex h-3 w-3 shrink-0"
         aria-hidden="true"
       >
         <span
@@ -50,7 +50,7 @@ export function BreakGlassIndicator({
           className="relative inline-flex h-3 w-3 rounded-full bg-red-500"
         />
       </span>
-      <span className="text-xs font-semibold text-red-700 uppercase tracking-wide">
+      <span className="text-xs font-semibold text-red-700 uppercase tracking-wide break-words">
         Break-Glass Access Active
       </span>
       {reason && (

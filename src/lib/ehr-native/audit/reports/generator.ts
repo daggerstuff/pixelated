@@ -351,10 +351,12 @@ export async function generateReport(
   let chainVerification: ChainVerificationResult | undefined
 
   switch (params.type) {
-    case 'hipaa-audit':
-      data = await collectHipaaAuditData(params, inputData?.auditEvents)
-      chainVerification = (data as HipaaAuditData).chainVerification
+    case 'hipaa-audit': {
+      const hipaaData = await collectHipaaAuditData(params, inputData?.auditEvents)
+      data = hipaaData
+      chainVerification = hipaaData.chainVerification
       break
+    }
     case 'soc2-security':
       data = await collectSoc2SecurityData(params, inputData?.soc2Security)
       break
@@ -368,7 +370,7 @@ export async function generateReport(
       data = await collectAccessReviewData(params, inputData?.accessReview)
       break
     default:
-      throw new Error(`Unsupported report type: ${params.type}`)
+      throw new Error(`Unsupported report type: ${String(params.type)}`)
   }
 
   // Generate findings from template
@@ -385,6 +387,7 @@ export async function generateReport(
     periodStart: params.periodStart,
     periodEnd: params.periodEnd,
     generatedAt: new Date().toISOString(),
+    scheduledAt: new Date().toISOString(),
     generatedBy: params.generatedBy,
     organization: params.organization,
     summary,
