@@ -1,21 +1,22 @@
-import { z } from 'zod';
+import { z } from 'zod'
+
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  referenceSchema,
-  periodSchema,
-  backboneElementSchema,
-} from './base';
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
+  fhirPeriodSchema,
+  fhirBackboneElementSchema,
+} from './base'
 
 /**
  * FHIR R4 Encounter resource schema.
  * An interaction between a patient and healthcare provider(s).
  * @see http://hl7.org/fhir/R4/encounter.html
  */
-export const encounterSchema = domainResourceSchema.extend({
+export const encounterSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Encounter'),
-  identifier: z.array(identifierSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
   status: z.enum([
     'planned',
     'arrived',
@@ -30,7 +31,7 @@ export const encounterSchema = domainResourceSchema.extend({
   statusHistory: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         status: z.enum([
           'planned',
           'arrived',
@@ -42,12 +43,12 @@ export const encounterSchema = domainResourceSchema.extend({
           'entered-in-error',
           'unknown',
         ]),
-        period: periodSchema,
+        period: fhirPeriodSchema,
       }),
     )
     .optional(),
   class: z.object({
-    ...backboneElementSchema.shape,
+    ...fhirBackboneElementSchema.shape,
     system: z.string().optional(),
     code: z.string(),
     display: z.string().optional(),
@@ -55,38 +56,38 @@ export const encounterSchema = domainResourceSchema.extend({
   classHistory: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         class: z.object({
-          ...backboneElementSchema.shape,
+          ...fhirBackboneElementSchema.shape,
           system: z.string().optional(),
           code: z.string(),
           display: z.string().optional(),
         }),
-        period: periodSchema,
+        period: fhirPeriodSchema,
       }),
     )
     .optional(),
-  type: z.array(codeableConceptSchema).optional(),
-  serviceType: codeableConceptSchema.optional(),
-  priority: codeableConceptSchema.optional(),
-  subject: referenceSchema.optional(),
-  episodeOfCare: z.array(referenceSchema).optional(),
-  basedOn: z.array(referenceSchema).optional(),
+  type: z.array(fhirCodeableConceptSchema).optional(),
+  serviceType: fhirCodeableConceptSchema.optional(),
+  priority: fhirCodeableConceptSchema.optional(),
+  subject: fhirReferenceSchema.optional(),
+  episodeOfCare: z.array(fhirReferenceSchema).optional(),
+  basedOn: z.array(fhirReferenceSchema).optional(),
   participant: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        type: z.array(codeableConceptSchema).optional(),
-        period: periodSchema.optional(),
-        individual: referenceSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        type: z.array(fhirCodeableConceptSchema).optional(),
+        period: fhirPeriodSchema.optional(),
+        individual: fhirReferenceSchema.optional(),
       }),
     )
     .optional(),
-  appointment: z.array(referenceSchema).optional(),
-  period: periodSchema.optional(),
+  appointment: z.array(fhirReferenceSchema).optional(),
+  period: fhirPeriodSchema.optional(),
   length: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       value: z.number().optional(),
       comparator: z.enum(['<', '<=', '>=', '>']).optional(),
       unit: z.string().optional(),
@@ -94,46 +95,48 @@ export const encounterSchema = domainResourceSchema.extend({
       code: z.string().optional(),
     })
     .optional(),
-  reasonCode: z.array(codeableConceptSchema).optional(),
-  reasonReference: z.array(referenceSchema).optional(),
+  reasonCode: z.array(fhirCodeableConceptSchema).optional(),
+  reasonReference: z.array(fhirReferenceSchema).optional(),
   diagnosis: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        condition: referenceSchema,
-        use: codeableConceptSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        condition: fhirReferenceSchema,
+        use: fhirCodeableConceptSchema.optional(),
         rank: z.number().int().positive().optional(),
       }),
     )
     .optional(),
-  account: z.array(referenceSchema).optional(),
+  account: z.array(fhirReferenceSchema).optional(),
   hospitalization: z
     .object({
-      ...backboneElementSchema.shape,
-      preAdmissionIdentifier: identifierSchema.optional(),
-      origin: referenceSchema.optional(),
-      admitSource: codeableConceptSchema.optional(),
-      reAdmission: codeableConceptSchema.optional(),
-      dietPreference: z.array(codeableConceptSchema).optional(),
-      specialCourtesy: z.array(codeableConceptSchema).optional(),
-      specialArrangement: z.array(codeableConceptSchema).optional(),
-      destination: referenceSchema.optional(),
-      dischargeDisposition: codeableConceptSchema.optional(),
+      ...fhirBackboneElementSchema.shape,
+      preAdmissionIdentifier: fhirIdentifierSchema.optional(),
+      origin: fhirReferenceSchema.optional(),
+      admitSource: fhirCodeableConceptSchema.optional(),
+      reAdmission: fhirCodeableConceptSchema.optional(),
+      dietPreference: z.array(fhirCodeableConceptSchema).optional(),
+      specialCourtesy: z.array(fhirCodeableConceptSchema).optional(),
+      specialArrangement: z.array(fhirCodeableConceptSchema).optional(),
+      destination: fhirReferenceSchema.optional(),
+      dischargeDisposition: fhirCodeableConceptSchema.optional(),
     })
     .optional(),
   location: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        location: referenceSchema,
-        status: z.enum(['planned', 'active', 'reserved', 'completed']).optional(),
-        physicalType: codeableConceptSchema.optional(),
-        period: periodSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        location: fhirReferenceSchema,
+        status: z
+          .enum(['planned', 'active', 'reserved', 'completed'])
+          .optional(),
+        physicalType: fhirCodeableConceptSchema.optional(),
+        period: fhirPeriodSchema.optional(),
       }),
     )
     .optional(),
-  serviceProvider: referenceSchema.optional(),
-  partOf: referenceSchema.optional(),
-});
+  serviceProvider: fhirReferenceSchema.optional(),
+  partOf: fhirReferenceSchema.optional(),
+})
 
-export type Encounter = z.infer<typeof encounterSchema>;
+export type Encounter = z.infer<typeof encounterSchema>

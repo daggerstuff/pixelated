@@ -35,3 +35,58 @@ export * from './billing.js'
 // ---------------------------------------------------------------------------
 
 export * from './communication.js'
+
+// ---------------------------------------------------------------------------
+// Individual Resource Schemas (not covered by aggregate files)
+// ---------------------------------------------------------------------------
+
+export * from './consent.js'
+export * from './service-request.js'
+
+// ---------------------------------------------------------------------------
+// EHR Resource Discriminated Union + Helpers
+// ---------------------------------------------------------------------------
+
+import { z } from 'zod'
+
+import { claimSchema } from './billing.js'
+import {
+  patientSchema,
+  practitionerSchema,
+  practitionerRoleSchema,
+  encounterSchema,
+  observationSchema,
+  conditionSchema,
+  allergyIntoleranceSchema,
+  medicationRequestSchema,
+} from './clinical.js'
+import { documentReferenceSchema } from './communication.js'
+import { consentSchema } from './consent.js'
+import { appointmentSchema } from './scheduling.js'
+import { serviceRequestSchema } from './service-request.js'
+
+export const ehrResourceSchema = z.discriminatedUnion('resourceType', [
+  patientSchema,
+  practitionerSchema,
+  practitionerRoleSchema,
+  encounterSchema,
+  observationSchema,
+  conditionSchema,
+  allergyIntoleranceSchema,
+  medicationRequestSchema,
+  appointmentSchema,
+  claimSchema,
+  documentReferenceSchema,
+  consentSchema,
+  serviceRequestSchema,
+])
+
+export type EHRResource = z.infer<typeof ehrResourceSchema>
+
+export function validateEHRResource(data: unknown): EHRResource {
+  return ehrResourceSchema.parse(data)
+}
+
+export function safeValidateEHRResource(data: unknown) {
+  return ehrResourceSchema.safeParse(data)
+}

@@ -107,9 +107,10 @@ function print(
   if (asJson) {
     console.log(JSON.stringify(data, null, 2))
   } else if (result.status >= 400) {
-    const errMsg = typeof record.error === 'string'
-      ? record.error
-      : `request failed (${result.status})`
+    const errMsg =
+      typeof record.error === 'string'
+        ? record.error
+        : `request failed (${result.status})`
     console.error(`px: ${errMsg}`)
   } else {
     const list =
