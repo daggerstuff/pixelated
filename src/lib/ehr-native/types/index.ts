@@ -48,6 +48,8 @@ export * from './service-request.js'
 // ---------------------------------------------------------------------------
 
 import { z } from 'zod'
+
+import { claimSchema } from './billing.js'
 import {
   patientSchema,
   practitionerSchema,
@@ -58,10 +60,9 @@ import {
   allergyIntoleranceSchema,
   medicationRequestSchema,
 } from './clinical.js'
-import { appointmentSchema } from './scheduling.js'
-import { claimSchema } from './billing.js'
 import { documentReferenceSchema } from './communication.js'
 import { consentSchema } from './consent.js'
+import { appointmentSchema } from './scheduling.js'
 import { serviceRequestSchema } from './service-request.js'
 
 export const ehrResourceSchema = z.discriminatedUnion('resourceType', [
