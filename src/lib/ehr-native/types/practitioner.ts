@@ -1,44 +1,45 @@
-import { z } from 'zod';
+import { z } from 'zod'
+
 import {
-  domainResourceSchema,
-  humanNameSchema,
-  contactPointSchema,
-  addressSchema,
-  identifierSchema,
-  attachmentSchema,
-  codeableConceptSchema,
-  periodSchema,
-  referenceSchema,
-  backboneElementSchema,
-} from './base';
+  fhirDomainResourceSchema,
+  fhirHumanNameSchema,
+  fhirContactPointSchema,
+  fhirAddressSchema,
+  fhirIdentifierSchema,
+  fhirAttachmentSchema,
+  fhirCodeableConceptSchema,
+  fhirPeriodSchema,
+  fhirReferenceSchema,
+  fhirBackboneElementSchema,
+} from './base'
 
 /**
  * FHIR R4 Practitioner resource schema.
  * A person who is directly or indirectly involved in the provisioning of healthcare.
  * @see http://hl7.org/fhir/R4/practitioner.html
  */
-export const practitionerSchema = domainResourceSchema.extend({
+export const practitionerSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Practitioner'),
-  identifier: z.array(identifierSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
   active: z.boolean().optional(),
-  name: z.array(humanNameSchema).optional(),
-  telecom: z.array(contactPointSchema).optional(),
-  address: z.array(addressSchema).optional(),
+  name: z.array(fhirHumanNameSchema).optional(),
+  telecom: z.array(fhirContactPointSchema).optional(),
+  address: z.array(fhirAddressSchema).optional(),
   gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
   birthDate: z.string().optional(),
-  photo: z.array(attachmentSchema).optional(),
+  photo: z.array(fhirAttachmentSchema).optional(),
   qualification: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        identifier: z.array(identifierSchema).optional(),
-        code: codeableConceptSchema,
-        period: periodSchema.optional(),
-        issuer: referenceSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        identifier: z.array(fhirIdentifierSchema).optional(),
+        code: fhirCodeableConceptSchema,
+        period: fhirPeriodSchema.optional(),
+        issuer: fhirReferenceSchema.optional(),
       }),
     )
     .optional(),
-  communication: z.array(codeableConceptSchema).optional(),
-});
+  communication: z.array(fhirCodeableConceptSchema).optional(),
+})
 
-export type Practitioner = z.infer<typeof practitionerSchema>;
+export type Practitioner = z.infer<typeof practitionerSchema>

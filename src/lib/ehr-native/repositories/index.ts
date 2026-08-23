@@ -4,18 +4,18 @@
  * Data access layer for FHIR R4 resources stored as JSONB in Postgres.
  * Each repository handles a single FHIR resource type with:
  * - CRUD operations (create, read, update, delete)
- * - Version history (via _history table triggers)
  * - Tenant isolation (via RLS — see ADR-001)
  * - Audit emission (via audit module — see ADR-006)
  *
- * Planned repositories:
+ * Repositories:
  * - PatientRepository
  * - EncounterRepository
  * - AppointmentRepository
- * - DocumentReferenceRepository (clinical notes)
- * - ClaimRepository
- * - ConsentRepository
  * - ObservationRepository
  */
 
-export {}
+export { BaseRepository, type RLSContext } from './base-repository'
+export { PatientRepository } from './patient-repository'
+export { EncounterRepository } from './encounter-repository'
+export { AppointmentRepository } from './appointment-repository'
+export { ObservationRepository } from './observation-repository'

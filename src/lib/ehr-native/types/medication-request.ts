@@ -1,22 +1,23 @@
-import { z } from 'zod';
+import { z } from 'zod'
+
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  referenceSchema,
-  periodSchema,
-  quantitySchema,
-  backboneElementSchema,
-} from './base';
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
+  fhirPeriodSchema,
+  fhirQuantitySchema,
+  fhirBackboneElementSchema,
+} from './base'
 
 /**
  * FHIR R4 MedicationRequest resource schema.
  * An order or request for supply of a medication and instructions for administration.
  * @see http://hl7.org/fhir/R4/medicationrequest.html
  */
-export const medicationRequestSchema = domainResourceSchema.extend({
+export const medicationRequestSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('MedicationRequest'),
-  identifier: z.array(identifierSchema).optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
   status: z.enum([
     'active',
     'on-hold',
@@ -27,36 +28,45 @@ export const medicationRequestSchema = domainResourceSchema.extend({
     'draft',
     'unknown',
   ]),
-  statusReason: codeableConceptSchema.optional(),
-  intent: z.enum(['proposal', 'plan', 'order', 'original-order', 'reflex-order', 'filler-order', 'instance-order', 'option']),
-  category: z.array(codeableConceptSchema).optional(),
+  statusReason: fhirCodeableConceptSchema.optional(),
+  intent: z.enum([
+    'proposal',
+    'plan',
+    'order',
+    'original-order',
+    'reflex-order',
+    'filler-order',
+    'instance-order',
+    'option',
+  ]),
+  category: z.array(fhirCodeableConceptSchema).optional(),
   priority: z.enum(['routine', 'urgent', 'asap', 'stat']).optional(),
   doNotPerform: z.boolean().optional(),
   reportedBoolean: z.boolean().optional(),
-  reportedReference: referenceSchema.optional(),
-  medicationCodeableConcept: codeableConceptSchema.optional(),
-  medicationReference: referenceSchema.optional(),
-  subject: referenceSchema,
-  encounter: referenceSchema.optional(),
-  supportingInformation: z.array(referenceSchema).optional(),
+  reportedReference: fhirReferenceSchema.optional(),
+  medicationCodeableConcept: fhirCodeableConceptSchema.optional(),
+  medicationReference: fhirReferenceSchema.optional(),
+  subject: fhirReferenceSchema,
+  encounter: fhirReferenceSchema.optional(),
+  supportingInformation: z.array(fhirReferenceSchema).optional(),
   authoredOn: z.string().optional(),
-  requester: referenceSchema.optional(),
-  performer: referenceSchema.optional(),
-  performerType: codeableConceptSchema.optional(),
-  recorder: referenceSchema.optional(),
-  reasonCode: z.array(codeableConceptSchema).optional(),
-  reasonReference: z.array(referenceSchema).optional(),
+  requester: fhirReferenceSchema.optional(),
+  performer: fhirReferenceSchema.optional(),
+  performerType: fhirCodeableConceptSchema.optional(),
+  recorder: fhirReferenceSchema.optional(),
+  reasonCode: z.array(fhirCodeableConceptSchema).optional(),
+  reasonReference: z.array(fhirReferenceSchema).optional(),
   instantiatesCanonical: z.array(z.string()).optional(),
   instantiatesUri: z.array(z.string()).optional(),
-  basedOn: z.array(referenceSchema).optional(),
-  groupIdentifier: identifierSchema.optional(),
-  courseOfTherapyType: codeableConceptSchema.optional(),
-  insurance: z.array(referenceSchema).optional(),
+  basedOn: z.array(fhirReferenceSchema).optional(),
+  groupIdentifier: fhirIdentifierSchema.optional(),
+  courseOfTherapyType: fhirCodeableConceptSchema.optional(),
+  insurance: z.array(fhirReferenceSchema).optional(),
   note: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        authorReference: referenceSchema.optional(),
+        ...fhirBackboneElementSchema.shape,
+        authorReference: fhirReferenceSchema.optional(),
         authorString: z.string().optional(),
         time: z.string().optional(),
         text: z.string(),
@@ -66,69 +76,77 @@ export const medicationRequestSchema = domainResourceSchema.extend({
   dosageInstruction: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         sequence: z.number().int().nonnegative().optional(),
         text: z.string().optional(),
-        additionalInstruction: z.array(codeableConceptSchema).optional(),
+        additionalInstruction: z.array(fhirCodeableConceptSchema).optional(),
         patientInstruction: z.string().optional(),
         timing: z
           .object({
-            ...backboneElementSchema.shape,
+            ...fhirBackboneElementSchema.shape,
             event: z.array(z.string()).optional(),
             repeat: z
               .object({
-                ...backboneElementSchema.shape,
-                boundsPeriod: periodSchema.optional(),
+                ...fhirBackboneElementSchema.shape,
+                boundsPeriod: fhirPeriodSchema.optional(),
                 count: z.number().int().positive().optional(),
                 countMax: z.number().int().positive().optional(),
                 duration: z.number().optional(),
                 durationMax: z.number().optional(),
-                durationUnit: z.enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a']).optional(),
+                durationUnit: z
+                  .enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a'])
+                  .optional(),
                 frequency: z.number().int().nonnegative().optional(),
                 frequencyMax: z.number().int().nonnegative().optional(),
                 period: z.number().optional(),
                 periodMax: z.number().optional(),
-                periodUnit: z.enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a']).optional(),
-                dayOfWeek: z.array(z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'])).optional(),
+                periodUnit: z
+                  .enum(['s', 'min', 'h', 'd', 'wk', 'mo', 'a'])
+                  .optional(),
+                dayOfWeek: z
+                  .array(
+                    z.enum(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']),
+                  )
+                  .optional(),
                 timeOfDay: z.array(z.string()).optional(),
                 when: z.array(z.string()).optional(),
                 offset: z.number().int().nonnegative().optional(),
               })
               .optional(),
-            code: codeableConceptSchema.optional(),
+            code: fhirCodeableConceptSchema.optional(),
           })
           .optional(),
         asNeededBoolean: z.boolean().optional(),
-        asNeededCodeableConcept: codeableConceptSchema.optional(),
-        site: codeableConceptSchema.optional(),
-        route: codeableConceptSchema.optional(),
-        method: codeableConceptSchema.optional(),
+        asNeededCodeableConcept: fhirCodeableConceptSchema.optional(),
+        site: fhirCodeableConceptSchema.optional(),
+        route: fhirCodeableConceptSchema.optional(),
+        method: fhirCodeableConceptSchema.optional(),
         doseAndRate: z
           .array(
             z.object({
-              ...backboneElementSchema.shape,
-              type: codeableConceptSchema.optional(),
-              doseQuantity: quantitySchema.optional(),
+              ...fhirBackboneElementSchema.shape,
+              type: fhirCodeableConceptSchema.optional(),
+              doseQuantity: fhirQuantitySchema.optional(),
               doseRange: z
                 .object({
-                  ...backboneElementSchema.shape,
-                  low: quantitySchema.optional(),
-                  high: quantitySchema.optional(),
+                  ...fhirBackboneElementSchema.shape,
+                  low: fhirQuantitySchema.optional(),
+                  high: fhirQuantitySchema.optional(),
                 })
                 .optional(),
-              rateQuantity: quantitySchema.optional(),
+              rateQuantity: fhirQuantitySchema.optional(),
               rateRatio: z
                 .object({
-                  ...backboneElementSchema.shape,
-                  numerator: quantitySchema.optional(),
-                  denominator: quantitySchema.optional(),
+                  ...fhirBackboneElementSchema.shape,
+                  numerator: fhirQuantitySchema.optional(),
+                  denominator: fhirQuantitySchema.optional(),
                 })
                 .optional(),
               rateRange: z
                 .object({
-                  ...backboneElementSchema.shape,
-                  low: quantitySchema.optional(),
-                  high: quantitySchema.optional(),
+                  ...fhirBackboneElementSchema.shape,
+                  low: fhirQuantitySchema.optional(),
+                  high: fhirQuantitySchema.optional(),
                 })
                 .optional(),
             }),
@@ -136,45 +154,45 @@ export const medicationRequestSchema = domainResourceSchema.extend({
           .optional(),
         maxDosePerPeriod: z
           .object({
-            ...backboneElementSchema.shape,
-            numerator: quantitySchema.optional(),
-            denominator: quantitySchema.optional(),
+            ...fhirBackboneElementSchema.shape,
+            numerator: fhirQuantitySchema.optional(),
+            denominator: fhirQuantitySchema.optional(),
           })
           .optional(),
-        maxDosePerAdministration: quantitySchema.optional(),
-        maxDosePerLifetime: quantitySchema.optional(),
+        maxDosePerAdministration: fhirQuantitySchema.optional(),
+        maxDosePerLifetime: fhirQuantitySchema.optional(),
       }),
     )
     .optional(),
   dispenseRequest: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       initialFill: z
         .object({
-          ...backboneElementSchema.shape,
-          quantity: quantitySchema.optional(),
-          duration: periodSchema.optional(),
+          ...fhirBackboneElementSchema.shape,
+          quantity: fhirQuantitySchema.optional(),
+          duration: fhirPeriodSchema.optional(),
         })
         .optional(),
-      dispenseInterval: periodSchema.optional(),
-      validityPeriod: periodSchema.optional(),
+      dispenseInterval: fhirPeriodSchema.optional(),
+      validityPeriod: fhirPeriodSchema.optional(),
       numberOfRepeatsAllowed: z.number().int().nonnegative().optional(),
-      quantity: quantitySchema.optional(),
-      expectedSupplyDuration: periodSchema.optional(),
-      performer: referenceSchema.optional(),
+      quantity: fhirQuantitySchema.optional(),
+      expectedSupplyDuration: fhirPeriodSchema.optional(),
+      performer: fhirReferenceSchema.optional(),
     })
     .optional(),
   substitution: z
     .object({
-      ...backboneElementSchema.shape,
+      ...fhirBackboneElementSchema.shape,
       allowedBoolean: z.boolean().optional(),
-      allowedCodeableConcept: codeableConceptSchema.optional(),
-      reason: codeableConceptSchema.optional(),
+      allowedCodeableConcept: fhirCodeableConceptSchema.optional(),
+      reason: fhirCodeableConceptSchema.optional(),
     })
     .optional(),
-  priorPrescription: referenceSchema.optional(),
-  detectedIssue: z.array(referenceSchema).optional(),
-  eventHistory: z.array(referenceSchema).optional(),
-});
+  priorPrescription: fhirReferenceSchema.optional(),
+  detectedIssue: z.array(fhirReferenceSchema).optional(),
+  eventHistory: z.array(fhirReferenceSchema).optional(),
+})
 
-export type MedicationRequest = z.infer<typeof medicationRequestSchema>;
+export type MedicationRequest = z.infer<typeof medicationRequestSchema>

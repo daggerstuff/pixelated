@@ -11,3 +11,13 @@
 
 // Type system (F1.0)
 export type {} from './types'
+
+// Repositories (F1.4)
+export {
+  BaseRepository,
+  type RLSContext,
+  PatientRepository,
+  EncounterRepository,
+  AppointmentRepository,
+  ObservationRepository,
+} from './repositories'

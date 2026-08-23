@@ -1,12 +1,13 @@
-import { z } from 'zod';
+import { z } from 'zod'
+
 import {
-  domainResourceSchema,
-  identifierSchema,
-  codeableConceptSchema,
-  referenceSchema,
-  periodSchema,
-  backboneElementSchema,
-} from './base';
+  fhirDomainResourceSchema,
+  fhirIdentifierSchema,
+  fhirCodeableConceptSchema,
+  fhirReferenceSchema,
+  fhirPeriodSchema,
+  fhirBackboneElementSchema,
+} from './base'
 
 /**
  * FHIR R4 Consent resource schema.
@@ -14,46 +15,55 @@ import {
  * to perform actions for purposes over the consumer's information.
  * @see http://hl7.org/fhir/R4/consent.html
  */
-export const consentSchema = domainResourceSchema.extend({
+export const consentSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Consent'),
-  identifier: z.array(identifierSchema).optional(),
-  status: z.enum(['draft', 'active', 'inactive', 'not-done', 'entered-in-error', 'rejected']),
-  scope: codeableConceptSchema,
-  category: z.array(codeableConceptSchema),
-  patient: referenceSchema.optional(),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  status: z.enum([
+    'draft',
+    'active',
+    'inactive',
+    'not-done',
+    'entered-in-error',
+    'rejected',
+  ]),
+  scope: fhirCodeableConceptSchema,
+  category: z.array(fhirCodeableConceptSchema),
+  patient: fhirReferenceSchema.optional(),
   dateTime: z.string().optional(),
-  performer: z.array(referenceSchema).optional(),
-  organization: z.array(referenceSchema).optional(),
-  sourceAttachment: z.array(
-    z.object({
-      ...backboneElementSchema.shape,
-      contentType: z.string().optional(),
-      language: z.string().optional(),
-      data: z.string().optional(),
-      url: z.string().optional(),
-      size: z.number().int().nonnegative().optional(),
-      hash: z.string().optional(),
-      title: z.string().optional(),
-      creation: z.string().optional(),
-    }),
-  ).optional(),
-  sourceReference: z.array(referenceSchema).optional(),
+  performer: z.array(fhirReferenceSchema).optional(),
+  organization: z.array(fhirReferenceSchema).optional(),
+  sourceAttachment: z
+    .array(
+      z.object({
+        ...fhirBackboneElementSchema.shape,
+        contentType: z.string().optional(),
+        language: z.string().optional(),
+        data: z.string().optional(),
+        url: z.string().optional(),
+        size: z.number().int().nonnegative().optional(),
+        hash: z.string().optional(),
+        title: z.string().optional(),
+        creation: z.string().optional(),
+      }),
+    )
+    .optional(),
+  sourceReference: z.array(fhirReferenceSchema).optional(),
   policy: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         authority: z.string().optional(),
         uri: z.string().optional(),
       }),
     )
     .optional(),
-  policyRule: codeableConceptSchema.optional(),
+  policyRule: fhirCodeableConceptSchema.optional(),
   verification: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         verified: z.boolean(),
-        verifiedWith: referenceSchema.optional(),
+        verifiedWith: fhirReferenceSchema.optional(),
         verificationDate: z.string().optional(),
       }),
     )
@@ -61,30 +71,35 @@ export const consentSchema = domainResourceSchema.extend({
   provision: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         type: z.enum(['permit', 'deny']).optional(),
-        period: periodSchema.optional(),
+        period: fhirPeriodSchema.optional(),
         actor: z
           .array(
             z.object({
-              ...backboneElementSchema.shape,
-              reference: referenceSchema.optional(),
-              role: codeableConceptSchema,
+              ...fhirBackboneElementSchema.shape,
+              reference: fhirReferenceSchema.optional(),
+              role: fhirCodeableConceptSchema,
             }),
           )
           .optional(),
-        action: z.array(codeableConceptSchema).optional(),
-        securityLabel: z.array(codeableConceptSchema).optional(),
-        purpose: z.array(codeableConceptSchema).optional(),
-        class: z.array(codeableConceptSchema).optional(),
-        code: z.array(codeableConceptSchema).optional(),
-        dataPeriod: periodSchema.optional(),
+        action: z.array(fhirCodeableConceptSchema).optional(),
+        securityLabel: z.array(fhirCodeableConceptSchema).optional(),
+        purpose: z.array(fhirCodeableConceptSchema).optional(),
+        class: z.array(fhirCodeableConceptSchema).optional(),
+        code: z.array(fhirCodeableConceptSchema).optional(),
+        dataPeriod: fhirPeriodSchema.optional(),
         data: z
           .array(
             z.object({
-              ...backboneElementSchema.shape,
-              meaning: z.enum(['instance', 'related', 'dependents', 'authoredby']),
-              reference: referenceSchema,
+              ...fhirBackboneElementSchema.shape,
+              meaning: z.enum([
+                'instance',
+                'related',
+                'dependents',
+                'authoredby',
+              ]),
+              reference: fhirReferenceSchema,
             }),
           )
           .optional(),
@@ -92,37 +107,37 @@ export const consentSchema = domainResourceSchema.extend({
       }),
     )
     .optional(),
-});
+})
 
 const consentProvisionSchema = z.object({
-  ...backboneElementSchema.shape,
+  ...fhirBackboneElementSchema.shape,
   type: z.enum(['permit', 'deny']).optional(),
-  period: periodSchema.optional(),
+  period: fhirPeriodSchema.optional(),
   actor: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
-        reference: referenceSchema.optional(),
-        role: codeableConceptSchema,
+        ...fhirBackboneElementSchema.shape,
+        reference: fhirReferenceSchema.optional(),
+        role: fhirCodeableConceptSchema,
       }),
     )
     .optional(),
-  action: z.array(codeableConceptSchema).optional(),
-  securityLabel: z.array(codeableConceptSchema).optional(),
-  purpose: z.array(codeableConceptSchema).optional(),
-  class: z.array(codeableConceptSchema).optional(),
-  code: z.array(codeableConceptSchema).optional(),
-  dataPeriod: periodSchema.optional(),
+  action: z.array(fhirCodeableConceptSchema).optional(),
+  securityLabel: z.array(fhirCodeableConceptSchema).optional(),
+  purpose: z.array(fhirCodeableConceptSchema).optional(),
+  class: z.array(fhirCodeableConceptSchema).optional(),
+  code: z.array(fhirCodeableConceptSchema).optional(),
+  dataPeriod: fhirPeriodSchema.optional(),
   data: z
     .array(
       z.object({
-        ...backboneElementSchema.shape,
+        ...fhirBackboneElementSchema.shape,
         meaning: z.enum(['instance', 'related', 'dependents', 'authoredby']),
-        reference: referenceSchema,
+        reference: fhirReferenceSchema,
       }),
     )
     .optional(),
-});
+})
 
-export type Consent = z.infer<typeof consentSchema>;
-export type ConsentProvision = z.infer<typeof consentProvisionSchema>;
+export type Consent = z.infer<typeof consentSchema>
+export type ConsentProvision = z.infer<typeof consentProvisionSchema>
