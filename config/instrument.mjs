@@ -252,11 +252,14 @@ Sentry.init({
     }
 
     // Drop events originating from a local server (localhost / 127.0.0.1)
-    // so that dev-only errors never appear in Sentry, regardless of which
-    // NODE_ENV was set locally for testing.
-    // Skip this filter if PUBLIC_SENTRY_ALLOW_LOCALHOST is set to '1' for testing.
+    // so that dev-only errors never appear in Sentry.
+    // In production, skip this filter — reverse proxies (nginx, Docker, K8s)
+    // may route internal requests via localhost even for real production traffic,
+    // which would cause ALL server-side errors to be silently dropped.
+    // Also skip if PUBLIC_SENTRY_ALLOW_LOCALHOST is set to '1' for testing.
     const allowLocalhost = process.env.PUBLIC_SENTRY_ALLOW_LOCALHOST === '1'
-    if (!allowLocalhost && isRecord(event) && isRecord(event.request)) {
+    const isProduction = process.env.NODE_ENV === 'production'
+    if (!allowLocalhost && !isProduction && isRecord(event) && isRecord(event.request)) {
       const url = /** @type {Record<string, unknown>} */ (event.request).url
       if (typeof url === 'string') {
         try {
