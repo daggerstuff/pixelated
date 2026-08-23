@@ -148,15 +148,23 @@ export class PatientService {
     } = params
 
     if (nameQuery) {
-      return this.patientRepo.searchByName(nameQuery, limit, offset)
+      if (nameQuery.length > 200) {
+        throw new Error('nameQuery exceeds maximum length of 200 characters')
+      }
+      const results = await this.patientRepo.searchByName(
+        nameQuery,
+        limit,
+        offset,
+      )
+      return activeOnly
+        ? results.filter((p) => p.active === true)
+        : results
     }
 
     if (activeOnly) {
       return this.patientRepo.findActive(limit, offset)
     }
 
-    // When not filtering by active and no name query, use searchByName
-    // with an empty string to return all patients (ILIKE '%%' matches all).
     return this.patientRepo.searchByName('', limit, offset)
   }
 
@@ -271,30 +279,81 @@ export class PatientService {
   /**
    * Creates a new encounter for a patient.
    *
+   * @param patientId - UUID of the patient this encounter belongs to
    * @param encounter - The FHIR Encounter resource to create
    * @returns The created Encounter resource
    */
-  async createEncounter(encounter: unknown): Promise<Encounter> {
+  async createEncounter(
+    patientId: string,
+    encounter: unknown,
+  ): Promise<Encounter> {
+    const resource = encounter as Record<string, unknown>
+    const subjectRef = (
+      resource.subject as { reference?: string } | undefined
+    )?.reference
+    if (
+      !subjectRef ||
+      subjectRef.replace('Patient/', '') !== patientId
+    ) {
+      throw new Error(
+        'Encounter subject.reference does not match the provided patientId',
+      )
+    }
     return this.encounterRepo.create(encounter)
   }
 
   /**
    * Creates a new appointment for a patient.
    *
+   * @param patientId - UUID of the patient this appointment belongs to
    * @param appointment - The FHIR Appointment resource to create
    * @returns The created Appointment resource
    */
-  async createAppointment(appointment: unknown): Promise<Appointment> {
+  async createAppointment(
+    patientId: string,
+    appointment: unknown,
+  ): Promise<Appointment> {
+    const resource = appointment as Record<string, unknown>
+    const participants = resource.participant as
+      | Array<{ actor?: { reference?: string } }>
+      | undefined
+    const patientRef = participants?.find((p) =>
+      p.actor?.reference?.startsWith('Patient/'),
+    )?.actor?.reference
+    if (
+      !patientRef ||
+      patientRef.replace('Patient/', '') !== patientId
+    ) {
+      throw new Error(
+        'Appointment participant patient reference does not match the provided patientId',
+      )
+    }
     return this.appointmentRepo.create(appointment)
   }
 
   /**
    * Creates a new clinical observation for a patient.
    *
+   * @param patientId - UUID of the patient this observation belongs to
    * @param observation - The FHIR Observation resource to create
    * @returns The created Observation resource
    */
-  async createObservation(observation: unknown): Promise<Observation> {
+  async createObservation(
+    patientId: string,
+    observation: unknown,
+  ): Promise<Observation> {
+    const resource = observation as Record<string, unknown>
+    const subjectRef = (
+      resource.subject as { reference?: string } | undefined
+    )?.reference
+    if (
+      !subjectRef ||
+      subjectRef.replace('Patient/', '') !== patientId
+    ) {
+      throw new Error(
+        'Observation subject.reference does not match the provided patientId',
+      )
+    }
     return this.observationRepo.create(observation)
   }
 }
