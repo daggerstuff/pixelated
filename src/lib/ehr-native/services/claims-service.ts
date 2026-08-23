@@ -11,12 +11,12 @@
  * computing totals, and managing claim status transitions.
  */
 
-import { claimSchema, type Claim } from '../types/claim'
 import type {
   FHIRCodeableConcept,
   FHIRReference,
   FHIRPeriod,
 } from '../types/base'
+import { claimSchema, type Claim } from '../types/claim'
 
 // ---------------------------------------------------------------------------
 // Types
