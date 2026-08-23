@@ -134,7 +134,9 @@ export class SchedulingService {
    * @returns The Appointment resource, or null if not found
    */
   async getAppointment(appointmentId: string): Promise<Appointment | null> {
-    return this.appointmentRepo.findById(validateId(appointmentId, 'appointment ID'))
+    return this.appointmentRepo.findById(
+      validateId(appointmentId, 'appointment ID'),
+    )
   }
 
   /**
@@ -167,7 +169,8 @@ export class SchedulingService {
   ): Promise<Appointment | null> {
     const update: Partial<Appointment> = { status: 'cancelled' }
     if (cancelationReason) {
-      update.cancelationReason = cancelationReason as Appointment['cancelationReason']
+      update.cancelationReason =
+        cancelationReason as Appointment['cancelationReason']
     }
     return this.appointmentRepo.update(
       validateId(appointmentId, 'appointment ID'),
@@ -218,7 +221,9 @@ export class SchedulingService {
    * @param appointmentId - UUID of the appointment
    * @returns The updated (fulfilled) Appointment resource, or null if not found
    */
-  async completeAppointment(appointmentId: string): Promise<Appointment | null> {
+  async completeAppointment(
+    appointmentId: string,
+  ): Promise<Appointment | null> {
     return this.appointmentRepo.update(
       validateId(appointmentId, 'appointment ID'),
       { status: 'fulfilled' },
@@ -420,8 +425,7 @@ export class SchedulingService {
     // Filter to this practitioner
     const practitionerAppts = appointments.filter((appt) => {
       return appt.participant?.some(
-        (p) =>
-          p.actor?.reference === `Practitioner/${safePractitionerId}`,
+        (p) => p.actor?.reference === `Practitioner/${safePractitionerId}`,
       )
     })
 
@@ -445,12 +449,10 @@ export class SchedulingService {
       practitionerId: safePractitionerId,
       totalAppointments: practitionerAppts.length,
       byStatus,
-      firstAppointment: firstStart !== null
-        ? new Date(firstStart).toISOString()
-        : null,
-      lastAppointment: lastEnd !== null
-        ? new Date(lastEnd).toISOString()
-        : null,
+      firstAppointment:
+        firstStart !== null ? new Date(firstStart).toISOString() : null,
+      lastAppointment:
+        lastEnd !== null ? new Date(lastEnd).toISOString() : null,
     }
   }
 }
