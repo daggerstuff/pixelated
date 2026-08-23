@@ -12,4 +12,11 @@
  * - ClaimsService (F1.10) — clearinghouse API claims tracking
  */
 
-export { PatientService, type PatientChart, type PatientChartSummary, type PatientSearchParams, type CreatePatientInput, type UpdatePatientInput } from './patient-service'
+export {
+  PatientService,
+  type PatientChart,
+  type PatientChartSummary,
+  type PatientSearchParams,
+  type CreatePatientInput,
+  type UpdatePatientInput,
+} from './patient-service'
