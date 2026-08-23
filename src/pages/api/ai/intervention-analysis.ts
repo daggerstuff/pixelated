@@ -3,6 +3,7 @@ import { aiRepository } from '@/lib/db/ai'
 // Import the type expected by InterventionAnalysisService
 import { InterventionAnalysisService } from '../../../lib/ai/services/intervention-analysis'
 import { createLLMService } from '../../../lib/ai/services/llm-provider'
+import { DEFAULT_LLM_MODEL } from '../../../lib/ai/constants'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 
@@ -70,7 +71,7 @@ export const POST = async ({ request }: { request: Request }) => {
     })
 
     // Use the model from the request or the default model
-    const modelId = model ?? 'minimaxai/minimax-m2.7'
+    const modelId = model ?? DEFAULT_LLM_MODEL
 
     // Create intervention analysis service
     const interventionService = new InterventionAnalysisService({
