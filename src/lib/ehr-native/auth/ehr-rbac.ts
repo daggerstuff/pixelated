@@ -194,7 +194,12 @@ export async function checkPermission(
   let consentVerified: boolean | null = null
 
   if (patientId !== undefined) {
-    consentVerified = await verifyPatientConsent(patientId, permission, tenantId, stateCode)
+    consentVerified = await verifyPatientConsent(
+      patientId,
+      permission,
+      tenantId,
+      stateCode,
+    )
 
     if (consentVerified === false) {
       logger.debug('Permission denied by consent check', {
@@ -413,7 +418,13 @@ export async function checkPermissionWithBreakGlass(
   tenantId?: string,
   stateCode?: string,
 ): Promise<EHRPermissionCheckResult> {
-  const baseCheck = await checkPermission(role, permission, patientId, tenantId, stateCode)
+  const baseCheck = await checkPermission(
+    role,
+    permission,
+    patientId,
+    tenantId,
+    stateCode,
+  )
 
   if (baseCheck.granted) {
     return baseCheck
