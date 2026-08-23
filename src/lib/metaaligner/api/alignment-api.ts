@@ -9,6 +9,7 @@ import type {
   AIServiceOptions,
   AICompletion,
 } from '../../ai/models/ai-types'
+import { DEFAULT_LLM_MODEL } from '../../ai/constants'
 
 // Define AIServiceResponse and AIStreamOptions locally if not available
 export interface AIServiceResponse {
@@ -109,7 +110,7 @@ export class MetaAlignerAPI {
       enableResponseEnhancement: true,
       enhancementThreshold: 0.7,
       maxEnhancementAttempts: 2,
-      model: 'minimaxai/minimax-m2.7',
+      model: DEFAULT_LLM_MODEL,
       temperature: 0.7,
       ...config,
     }
