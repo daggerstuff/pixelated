@@ -31,10 +31,13 @@ import type { Patient, Encounter, Appointment, Observation } from '../types'
  * and limiting length to prevent injection and resource exhaustion.
  */
 function sanitizeSearchInput(input: string, maxLength = 256): string {
-  return input
-    .replace(/[\x00-\x1f\x7f]/g, '')
-    .trim()
-    .slice(0, maxLength)
+  const filtered = Array.from(input)
+    .filter((c) => {
+      const code = c.charCodeAt(0)
+      return code >= 32 && code !== 127
+    })
+    .join('')
+  return filtered.trim().slice(0, maxLength)
 }
 
 /**
