@@ -22,3 +22,13 @@ export {
   type CreatePatientInput,
   type UpdatePatientInput,
 } from './patient-service'
+
+export {
+  NoteTemplateService,
+  noteTemplateService,
+  type NoteModality,
+  type NoteSection,
+  type NoteTemplate,
+  type CreateNoteFromTemplateInput,
+  type NoteTemplateValidationResult,
+} from './note-template-service'
