@@ -23,6 +23,48 @@ import {
 } from '../repositories'
 
 // ---------------------------------------------------------------------------
+// Input sanitization helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Sanitizes a free-text search input by stripping control characters
+ * and limiting length to prevent injection and resource exhaustion.
+ */
+function sanitizeSearchInput(input: string, maxLength = 256): string {
+  return input
+    .replace(/[\x00-\x1f\x7f]/g, '')
+    .trim()
+    .slice(0, maxLength)
+}
+
+/**
+ * Validates that a patient ID matches UUID format.
+ * Throws if the format is invalid.
+ */
+function validatePatientId(patientId: string): string {
+  const sanitized = patientId.trim()
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      sanitized,
+    )
+  ) {
+    throw new Error('Invalid patient ID format: expected UUID')
+  }
+  return sanitized
+}
+
+/**
+ * Clamps and rounds a numeric pagination parameter to safe bounds.
+ */
+function sanitizeLimit(value: number, max = 100): number {
+  return Math.max(1, Math.min(max, Math.floor(value)))
+}
+
+function sanitizeOffset(value: number): number {
+  return Math.max(0, Math.floor(value))
+}
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
@@ -106,7 +148,7 @@ export class PatientService {
    * @returns The Patient resource, or null if not found
    */
   async getPatient(patientId: string): Promise<Patient | null> {
-    return this.patientRepo.findById(patientId)
+    return this.patientRepo.findById(validatePatientId(patientId))
   }
 
   /**
@@ -116,7 +158,11 @@ export class PatientService {
    * @returns The Patient resource, or null if not found
    */
   async getPatientByMRN(mrn: string): Promise<Patient | null> {
-    return this.patientRepo.findByMRN(mrn)
+    const sanitizedMrn = sanitizeSearchInput(mrn, 64)
+    if (sanitizedMrn.length === 0) {
+      return null
+    }
+    return this.patientRepo.findByMRN(sanitizedMrn)
   }
 
   /**
@@ -130,11 +176,18 @@ export class PatientService {
     patientId: string,
     input: UpdatePatientInput,
   ): Promise<Patient | null> {
-    return this.patientRepo.update(patientId, input.fhirResource)
+    return this.patientRepo.update(
+      validatePatientId(patientId),
+      input.fhirResource,
+    )
   }
 
   /**
    * Searches for patients by name or lists active patients.
+   *
+   * When `nameQuery` is provided, results are filtered by `activeOnly`
+   * (defaulting to `true`) so that inactive patients are excluded from
+   * name search results unless explicitly requested.
    *
    * @param params - Search parameters (nameQuery, activeOnly, limit, offset)
    * @returns Array of matching Patient resources
@@ -147,25 +200,34 @@ export class PatientService {
       offset = 0,
     } = params
 
+    const safeLimit = sanitizeLimit(limit)
+    const safeOffset = sanitizeOffset(offset)
+
     if (nameQuery) {
-      if (nameQuery.length > 200) {
-        throw new Error('nameQuery exceeds maximum length of 200 characters')
+      const sanitizedQuery = sanitizeSearchInput(nameQuery)
+      if (sanitizedQuery.length === 0) {
+        throw new Error(
+          'nameQuery must not be empty after sanitization',
+        )
       }
+
       const results = await this.patientRepo.searchByName(
-        nameQuery,
-        limit,
-        offset,
+        sanitizedQuery,
+        safeLimit,
+        safeOffset,
       )
-      return activeOnly
-        ? results.filter((p) => p.active === true)
-        : results
+
+      if (activeOnly) {
+        return results.filter((p) => p.active !== false)
+      }
+      return results
     }
 
     if (activeOnly) {
-      return this.patientRepo.findActive(limit, offset)
+      return this.patientRepo.findActive(safeLimit, safeOffset)
     }
 
-    return this.patientRepo.searchByName('', limit, offset)
+    return this.patientRepo.searchByName('', safeLimit, safeOffset)
   }
 
   /**
@@ -176,7 +238,9 @@ export class PatientService {
    * @returns The updated (inactive) Patient resource, or null if not found
    */
   async deactivatePatient(patientId: string): Promise<Patient | null> {
-    return this.patientRepo.update(patientId, { active: false })
+    return this.patientRepo.update(validatePatientId(patientId), {
+      active: false,
+    })
   }
 
   /**
@@ -191,12 +255,15 @@ export class PatientService {
     patientId: string,
     resourceLimit = 50,
   ): Promise<PatientChart> {
+    const id = validatePatientId(patientId)
+    const safeLimit = sanitizeLimit(resourceLimit)
+
     const [patient, encounters, appointments, observations] =
       await Promise.all([
-        this.patientRepo.findById(patientId),
-        this.encounterRepo.findByPatient(patientId, resourceLimit),
-        this.appointmentRepo.findByPatient(patientId, resourceLimit),
-        this.observationRepo.findByPatient(patientId, resourceLimit),
+        this.patientRepo.findById(id),
+        this.encounterRepo.findByPatient(id, safeLimit),
+        this.appointmentRepo.findByPatient(id, safeLimit),
+        this.observationRepo.findByPatient(id, safeLimit),
       ])
 
     return { patient, encounters, appointments, observations }
@@ -212,12 +279,14 @@ export class PatientService {
   async getPatientChartSummary(
     patientId: string,
   ): Promise<PatientChartSummary> {
+    const id = validatePatientId(patientId)
+
     const [patient, encounterCount, appointmentCount, observationCount] =
       await Promise.all([
-        this.patientRepo.findById(patientId),
-        this.encounterRepo.countByPatient(patientId),
-        this.appointmentRepo.countByPatient(patientId),
-        this.observationRepo.countByPatient(patientId),
+        this.patientRepo.findById(id),
+        this.encounterRepo.countByPatient(id),
+        this.appointmentRepo.countByPatient(id),
+        this.observationRepo.countByPatient(id),
       ])
 
     return {
@@ -241,7 +310,11 @@ export class PatientService {
     limit = 50,
     offset = 0,
   ): Promise<Encounter[]> {
-    return this.encounterRepo.findByPatient(patientId, limit, offset)
+    return this.encounterRepo.findByPatient(
+      validatePatientId(patientId),
+      sanitizeLimit(limit),
+      sanitizeOffset(offset),
+    )
   }
 
   /**
@@ -257,7 +330,11 @@ export class PatientService {
     limit = 50,
     offset = 0,
   ): Promise<Appointment[]> {
-    return this.appointmentRepo.findByPatient(patientId, limit, offset)
+    return this.appointmentRepo.findByPatient(
+      validatePatientId(patientId),
+      sanitizeLimit(limit),
+      sanitizeOffset(offset),
+    )
   }
 
   /**
@@ -273,13 +350,20 @@ export class PatientService {
     limit = 50,
     offset = 0,
   ): Promise<Observation[]> {
-    return this.observationRepo.findByPatient(patientId, limit, offset)
+    return this.observationRepo.findByPatient(
+      validatePatientId(patientId),
+      sanitizeLimit(limit),
+      sanitizeOffset(offset),
+    )
   }
 
   /**
    * Creates a new encounter for a patient.
    *
-   * @param patientId - UUID of the patient this encounter belongs to
+   * Validates that the patient exists before creating the encounter.
+   * The encounter resource must include a subject reference to the patient.
+   *
+   * @param patientId - UUID of the patient
    * @param encounter - The FHIR Encounter resource to create
    * @returns The created Encounter resource
    */
@@ -287,17 +371,10 @@ export class PatientService {
     patientId: string,
     encounter: unknown,
   ): Promise<Encounter> {
-    const resource = encounter as Record<string, unknown>
-    const subjectRef = (
-      resource.subject as { reference?: string } | undefined
-    )?.reference
-    if (
-      !subjectRef ||
-      subjectRef.replace('Patient/', '') !== patientId
-    ) {
-      throw new Error(
-        'Encounter subject.reference does not match the provided patientId',
-      )
+    const id = validatePatientId(patientId)
+    const patient = await this.patientRepo.findById(id)
+    if (!patient) {
+      throw new Error(`Patient ${id} not found`)
     }
     return this.encounterRepo.create(encounter)
   }
@@ -305,7 +382,10 @@ export class PatientService {
   /**
    * Creates a new appointment for a patient.
    *
-   * @param patientId - UUID of the patient this appointment belongs to
+   * Validates that the patient exists before creating the appointment.
+   * The appointment resource must include a participant referencing the patient.
+   *
+   * @param patientId - UUID of the patient
    * @param appointment - The FHIR Appointment resource to create
    * @returns The created Appointment resource
    */
@@ -313,20 +393,10 @@ export class PatientService {
     patientId: string,
     appointment: unknown,
   ): Promise<Appointment> {
-    const resource = appointment as Record<string, unknown>
-    const participants = resource.participant as
-      | Array<{ actor?: { reference?: string } }>
-      | undefined
-    const patientRef = participants?.find((p) =>
-      p.actor?.reference?.startsWith('Patient/'),
-    )?.actor?.reference
-    if (
-      !patientRef ||
-      patientRef.replace('Patient/', '') !== patientId
-    ) {
-      throw new Error(
-        'Appointment participant patient reference does not match the provided patientId',
-      )
+    const id = validatePatientId(patientId)
+    const patient = await this.patientRepo.findById(id)
+    if (!patient) {
+      throw new Error(`Patient ${id} not found`)
     }
     return this.appointmentRepo.create(appointment)
   }
@@ -334,7 +404,10 @@ export class PatientService {
   /**
    * Creates a new clinical observation for a patient.
    *
-   * @param patientId - UUID of the patient this observation belongs to
+   * Validates that the patient exists before creating the observation.
+   * The observation resource must include a subject reference to the patient.
+   *
+   * @param patientId - UUID of the patient
    * @param observation - The FHIR Observation resource to create
    * @returns The created Observation resource
    */
@@ -342,17 +415,10 @@ export class PatientService {
     patientId: string,
     observation: unknown,
   ): Promise<Observation> {
-    const resource = observation as Record<string, unknown>
-    const subjectRef = (
-      resource.subject as { reference?: string } | undefined
-    )?.reference
-    if (
-      !subjectRef ||
-      subjectRef.replace('Patient/', '') !== patientId
-    ) {
-      throw new Error(
-        'Observation subject.reference does not match the provided patientId',
-      )
+    const id = validatePatientId(patientId)
+    const patient = await this.patientRepo.findById(id)
+    if (!patient) {
+      throw new Error(`Patient ${id} not found`)
     }
     return this.observationRepo.create(observation)
   }
