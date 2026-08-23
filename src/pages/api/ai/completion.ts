@@ -8,6 +8,7 @@ import type { Session } from "@/lib/auth/session";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 import { validateRequestBody } from "@/lib/validation/index";
 import { CompletionRequestSchema } from "@/lib/validation/schemas";
+import { DEFAULT_LLM_MODEL, NEON_ENABLED_MODELS } from "@/lib/ai/constants";
 import { CompletionService } from "@/lib/ai/services/completion-service";
 
 // Initialize logger
@@ -93,7 +94,7 @@ export const GET: APIRoute = async ({ request }: APIContext) => {
           anonymous: "10 requests/minute",
         },
         maxPayloadSize: "50KB",
-        supportedModels: ["gpt-4", "claude-3"],
+        supportedModels: [...NEON_ENABLED_MODELS],
         features: ["streaming", "caching", "rate-limiting"],
       }),
       {
