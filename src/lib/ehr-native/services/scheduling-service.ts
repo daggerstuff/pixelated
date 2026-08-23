@@ -39,7 +39,11 @@ function validateId(id: string, label: string): string {
 
 function validateIsoTimestamp(timestamp: string, label: string): string {
   const trimmed = timestamp.trim()
-  if (!Number.isNaN(Date.parse(trimmed))) {
+  if (
+    /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:\d{2})?)?$/.test(
+      trimmed,
+    )
+  ) {
     return trimmed
   }
   throw new Error(`Invalid ${label}: expected ISO 8601 timestamp`)
