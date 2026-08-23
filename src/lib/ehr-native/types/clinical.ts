@@ -1,7 +1,5 @@
 /**
- * FHIR R4 Clinical Resource Types — Barrel Export
- *
- * Re-exports all clinical resource schemas and types.
+ * FHIR R4 Clinical Resource Types - Barrel export
  */
 export * from './patient.js'
 export * from './practitioner.js'

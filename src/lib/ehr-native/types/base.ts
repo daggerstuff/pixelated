@@ -444,13 +444,6 @@ export const fhirAttachmentSchema = z.object({
   url: fhirUrlSchema.optional(),
   size: fhirIntegerSchema.optional(),
   title: fhirStringSchema.optional(),
-  hashes: z
-    .array(
-      z.object({
-        algorithm: fhirStringSchema,
-        value: fhirStringSchema,
-      }),
-    )
-    .optional(),
+  hash: fhirStringSchema.optional(),
 })
 export type FHIRAttachment = z.infer<typeof fhirAttachmentSchema>
