@@ -1,122 +1,112 @@
 # AGENTS.md
 
-## Runtime & Local Services
-
-**Pixelated Empathy** — clinical AI platform: Astro 6 + React 19 (TypeScript) frontend/SSR; Express/FastAPI/Flask backend.
-
-### Runtime Versions
-
-See manifests: `.nvmrc` (Node), `package.json` (pnpm), `.python-version` (Python).
-
-### Required Services
-
-Start databases w/ Docker before running local services:
-
-- **Astro dev**: `5173` → `pnpm dev`
-- **MongoDB**: `27017` (container `mongo:latest`)
-- **Redis**: `6379` (container `redis:latest`)
-- **PostgreSQL**: `5432` (container `postgres:17`)
-
-Override env vars for local integration tests against local DBs:
-
-```bash
-REDIS_URL=redis://localhost:6379/0 UPSTASH_REDIS_REST_URL=redis://localhost:6379/0 \
-  pnpm vitest run -c config/vitest.config.ts
-```
-
-### Key Commands
-
-- **Submodules** (after clone/pull, before `pnpm install`): `git submodule init && git submodule update`
-- **Lint**: `pnpm lint` | **Typecheck**: `pnpm typecheck` | **Tests**: `pnpm vitest run -c config/vitest.config.ts`
-- **All Services**: `pnpm dev:all-services` | **Build**: `pnpm build`
+> Universal Agent Operating Protocol for **Pixelated Empathy** and **Foresight**.
 
 ---
 
-## Core Developer Rules
+## 1. ⚡ Mandatory Session Lifecycle (Foresight Memory Protocol)
+
+Every agent session touching real work must follow this streamlined continuity lifecycle:
+
+```mermaid
+flowchart LR
+    A["Session Start"] --> B["1. inject_context(query)"]
+    B --> C["2. Apply Guidance & Execute Surgically"]
+    C --> D["3. Capture Preferences & Decisions"]
+    D --> E["4. Update pending_items & Wrap Up"]
+```
+
+### A. Session Startup (Mandatory)
+Before writing code, making a plan, or exploring the repo, run a **single unified context injection**:
+- **MCP Tool**: `inject_context(conversation_text="<user's initial request or task description>")`
+- **Output**: Automatically surfaces relevant memories, active project directives, `user_preferences`, and `pending_items`.
+- **Action**: Silently incorporate retrieved context into your reasoning and approach.
+
+### B. In-Session Continuity & Capture
+- **When user states a preference or rule** (*"prefer X over Y"*, *"always do Z"*):
+  Call `manage_context_blocks(action="update", label="user_preferences", content="<new preference>")` immediately.
+- **When key decisions or facts are finalized**:
+  Call `manage_memories(action="store", category="decision"|"fact", content="<concise distilled statement>")`.
+
+### C. Session Wrap-Up
+Before ending substantial work:
+- Update `pending_items` block: `manage_context_blocks(action="update", label="pending_items", content="...")` marking finished tasks and listing follow-ups.
+- For long multi-turn sessions: Call `process_session_transcript(session_id="...", messages=[...])` to trigger background distillation.
+
+---
+
+## 2. 🚀 Runtime Services & Key Commands
+
+### Stack
+- **Frontend / SSR**: Astro 6 + React 19 (TypeScript, Tailwind CSS)
+- **Backend / AI Services**: FastAPI / Express / Flask (Python 3.12+ via `uv`, Node v24 via `pnpm`)
+- **Databases**: PostgreSQL 17 + pgvector (`5432`), MongoDB (`27017`), Redis (`6379`)
+
+### Essential Execution Matrix
+
+| Domain | Action | Command |
+|---|---|---|
+| **Submodules** | Init & sync (first step) | `git submodule update --init --recursive` |
+| **Node / TS** | Dev Server | `pnpm dev` *(port 5173)* or `pnpm dev:all-services` |
+| | Typecheck | `pnpm typecheck` |
+| | Lint & Format | `pnpm lint` / `pnpm format` |
+| | Unit & Integration Tests | `pnpm vitest run -c config/vitest.config.ts` |
+| | Production Build | `pnpm build` |
+| **Python** | Run script / module | `uv run python <script.py>` / `uv run python -m <pkg>` |
+| | Pytest Test Suite | `uv run pytest` |
+| | Lint & Format | `uv run ruff check .` / `uv run ruff format .` |
+| **Foresight** | System Health | `foresight doctor` / `foresight security status` |
+| | Run Proof Benchmark | `foresight prove` |
+
+---
+
+## 3. 🛡️ Core Developer Rules & Anti-Suppression Policy
 
 ### ✅ Always
+- **Zero Project-Level Config Pollution**: Agent-specific configs/dotfiles belong strictly in global `~/.<agent_name>`. Never commit agent dotfiles into project roots.
+- **Surgical Edits**: Keep changes minimal, tightly scoped, and clean. Remove only code your changes make obsolete.
+- **Clinical Privacy & HIPAA Compliance**: Preserve therapeutic gating and data isolation. Never expose clinical PHI or sensitive keys.
+- **Verify Explicitly**: Validate every code change with real test/lint execution before marking done.
 
-- **Config Hygiene**: Keep agent-specific dotfiles at `~/.<agent_name>`. Never create or commit agent-specific config at project level.
-- **Surgical Edits**: Keep changes minimal, safe, tightly scoped. Write clear, self-documenting code. Remove only what your edits make obsolete.
-- **Privacy & Safety Gating**: Preserve therapeutic, privacy, and HIPAA-compliant boundaries for client/patient-facing workflows. Clinical health data is paramount.
-- **Verify Explicitly**: Validate edits w/ concrete commands (tests, lint, typecheck) before completion.
-  Restate what was requested, review diffs for suppression comments, report results and residual risks.
-
-### ⚠️ Ask First
-
-- Modifying authentication, security controls, or clinical gating.
-- Modifying public API contracts, routing architectures, or CI/CD pipelines.
-
-### 🚫 Never (Strict Anti-Suppression Policy)
-
+### 🚫 Strict Anti-Suppression Policy (Zero Tolerance)
 > [!IMPORTANT]
-> **No suppression.** Never mask linter errors, TypeScript errors, compile warnings, or test failures. Fix the issue—never hide it.
+> **Never suppress errors or warnings to fake a passing build. Fix root causes.**
 
-- **TypeScript**: `@ts-ignore` `@ts-nocheck` `@ts-expect-error` (unless strictly required in pre-existing test mock files).
-- **Python**: `# noqa` `# type: ignore` (do not bypass linting or pyright checks).
-- **JavaScript / ESLint**: `/* eslint-disable */` or file-level/block-level rule exclusions to cover up new warning flags.
-- **Config Bypasses**: Modifying `tsconfig.json` `.eslintrc` `.oxlintrc` or test configs to lower strictness or hide failures.
-- **Secrets & PHI**: Hardcoding credentials, API tokens, passwords, or patient-identifiable details in codebase, fixtures, or test environments.
-
----
-
-## Coding Standards
-
-Follow conventions in `.agents/rules/`:
-
-- `typescript.md` — TypeScript and React patterns
-- `astro.md` — Astro 6 component, routing, and SSR rules
-- `python.md` — Python/uv toolchain and ruff/pyright conventions
-- `testing.md` — Vitest, Playwright, and pytest patterns
-- `security.md` — HIPAA, secrets, auth/gating, threat modeling
+- **TypeScript**: No `@ts-ignore`, `@ts-nocheck`, or `@ts-expect-error` (unless pre-existing in mock fixtures).
+- **Python**: No `# noqa`, `# type: ignore`, or blanket `# pylint: disable`.
+- **JavaScript / ESLint**: No `/* eslint-disable */` or scoped rule bypasses.
+- **Config Downgrades**: Never alter `tsconfig.json`, `.eslintrc`, or test configs to lower strictness.
+- **Secrets**: Never hardcode credentials, API tokens, passwords, or patient-identifiable data in code, tests, or mock fixtures.
 
 ---
 
-## SkillRoute — Skill Discovery & Routing
+## 4. 🧠 Foresight Tooling & API Reference
 
-SkillRoute (`erichare/skill-route`) provides semantic skill routing for ambiguous or multi-domain tasks.
+| MCP Tool | Purpose | Primary Arguments |
+|---|---|---|
+| `inject_context` | Single-roundtrip context retrieval | `conversation_text`, `max_memories=5` |
+| `manage_memories` | Store, update, delete, archive memories | `action="store"`, `category`, `content` |
+| `search_memories` | Keyword, semantic, hybrid search | `query`, `use_hybrid=True`, `limit` |
+| `manage_context_blocks` | Standing guidance & user preferences | `action="get"\|"update"`, `label`, `content` |
+| `manage_encryption` | AES-256-GCM security controls | `action="status"\|"rotate_key"\|"encrypt_all"` |
+| `process_session_transcript` | End-of-session auto-distillation | `session_id`, `messages` |
+| `get_system_status` | Health, cache, and encryption telemetry | `include_trends=True` |
+
+---
+
+## 5. 🧭 Skill Discovery with SkillRoute
+
+When facing complex, cross-domain, or unfamiliar tasks, discover the optimal skill:
 
 ```bash
-skillroute route "<task description>"  # Route to best skill
-skillroute search "<query>"            # Search available skills
+skillroute route "<task description>"  # Determine best matching skill
+skillroute search "<keyword>"          # Search skill catalog
 ```
 
-Installed at `~/.skillroute/skill-route`. Requires `SKILLROUTE_CATALOG_PATH` env var (already in shell config).
-
-When the next step is unclear: run `skillroute route`, read confidence scores, load recommended skill(s) via the Skill tool.
+Read confidence scores and activate the recommended skill before implementation.
 
 ---
 
-## Foresight Memory & Continuity System
+## 6. 🎨 Aesthetic & Design Judgment
 
-Foresight is a persistent memory layer for AI agents — shared across all machines via Ghost Postgres.
-
-### Session Startup Gate (mandatory)
-
-Every session touching real work MUST run Foresight continuity read as its **first action** — before any code edit, exploration, or planning.
-
-1. Call `manage_context_blocks` w/ `action: "get"` for both `project_context` and `pending_items`.
-2. Call `search_memories` w/ keywords related to your task.
-3. In your first reply, state what blocks returned (entry count + one-line summary each).
-4. Use findings to inform your approach — if memory contradicts your plan, say so before editing.
-
-**Skipping this gate is not permitted without naming it.** If it doesn't apply (pure conversation, no code), say so explicitly and why.
-
-### Session End Gate (mandatory)
-
-Every session that touched real work MUST run the Foresight capture pipeline before ending:
-
-1. Call `process_session_transcript` w/ `session_id` and `messages`.
-2. Call `manage_memories` (`store`) for new decisions, lessons, or preferences — store distilled facts, not transcripts.
-3. Call `manage_context_blocks` (`update`, `pending_items`) — mark completed items, add follow-ups, remove stale entries.
-4. Update `user_preferences` or `project_context` blocks if scope shifted.
-
-**Skipping this gate is not permitted without naming it.** If the session produced no durable context, say so explicitly and why.
-
----
-
-## Aesthetic Judgment
-
-When doing design, creative, or artistic work — UI design, visual assets, layouts, color choices,
-typography, animation, branding, or creative direction — read `TASTES.md` if it exists
-and apply its constraints to your output.
+When working on UI/UX, layouts, styling, animation, typography, or visual branding, inspect `TASTES.md` (if present) and apply its design principles and visual hierarchy.
