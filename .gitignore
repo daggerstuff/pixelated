@@ -82,7 +82,6 @@ openhands/
 .autobots-state/
 autobots.toml
 agents.toml
-GEMINI.md
 CLAUDE.md
 DESIGN.md
 hackathon/
