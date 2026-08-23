@@ -1,6 +1,7 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions, AIUsage } from './models/ai-types'
 import { createLLMService } from './services/llm-provider'
+import { DEFAULT_LLM_MODEL } from './constants'
 
 const appLogger = createBuildSafeLogger('ai-providers')
 
@@ -59,7 +60,7 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
   },
     llm: {
       name: 'LLM API',
-      defaultModel: 'minimaxai/minimax-m2.7',
+      defaultModel: DEFAULT_LLM_MODEL,
       capabilities: ['chat', 'analysis', 'crisis-detection'],
     },
     nvidia: {

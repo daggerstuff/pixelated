@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { DEFAULT_LLM_MODEL } from '../constants'
 
 const appLogger = createBuildSafeLogger('app')
 import type { AIMessage, AIService, AIServiceOptions } from '../models/ai-types'
@@ -46,7 +47,7 @@ export class InterventionAnalysisService {
   constructor(config: InterventionAnalysisServiceConfig) {
     const {
       aiService,
-      model = 'minimaxai/minimax-m2.7',
+      model = DEFAULT_LLM_MODEL,
       systemPrompt = 'You are an expert mental-health assistant. Return ONLY valid JSON with the requested keys, no markdown or additional commentary.',
     } = config
 
