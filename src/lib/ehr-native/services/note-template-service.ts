@@ -12,8 +12,11 @@
  *
  * @see types/document-reference for the DocumentReference FHIR schema
  * @see https://loinc.org/ for LOINC document type codes
+ * @see https://hl7.org/fhir/us/core/STU6.1/CodeSystem-us-core-documentreference-category.html
+ *     for the US Core DocumentReference category code system
  */
 
+import { browserBuffer } from '../../browser/crypto-polyfill'
 import type { DocumentReference } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -92,6 +95,25 @@ export interface NoteTemplateValidationResult {
 }
 
 // ---------------------------------------------------------------------------
+// Input sanitization helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Validates that a template ID matches the expected kebab-case identifier
+ * format used by built-in note templates (lowercase ASCII letters, digits,
+ * and hyphens). Throws if the format is invalid.
+ */
+function sanitizeTemplateId(templateId: string): string {
+  const sanitized = templateId.trim()
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(sanitized)) {
+    throw new Error(
+      'Invalid template ID format: expected kebab-case identifier',
+    )
+  }
+  return sanitized
+}
+
+// ---------------------------------------------------------------------------
 // Static template definitions
 // ---------------------------------------------------------------------------
 
@@ -104,14 +126,49 @@ const INDIVIDUAL_THERAPY_PROGRESS: NoteTemplate = {
   category: 'progress-note',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'chief_complaint', label: 'Chief Complaint', loincCode: '10154-3', required: true },
-    { key: 'symptom_review', label: 'Symptom Review', loincCode: '11498-0', required: true },
-    { key: 'mental_status_exam', label: 'Mental Status Examination', loincCode: '11158E', required: true },
-    { key: 'interventions', label: 'Interventions', loincCode: '62390-0', required: true },
-    { key: 'response_to_treatment', label: 'Response to Treatment', loincCode: '8716-3', required: true },
-    { key: 'risk_assessment', label: 'Risk Assessment', loincCode: '75328-6', required: true },
+    {
+      key: 'chief_complaint',
+      label: 'Chief Complaint',
+      loincCode: '10154-3',
+      required: true,
+    },
+    {
+      key: 'symptom_review',
+      label: 'Symptom Review',
+      loincCode: '11498-0',
+      required: true,
+    },
+    {
+      key: 'mental_status_exam',
+      label: 'Mental Status Examination',
+      loincCode: '11158E',
+      required: true,
+    },
+    {
+      key: 'interventions',
+      label: 'Interventions',
+      loincCode: '62390-0',
+      required: true,
+    },
+    {
+      key: 'response_to_treatment',
+      label: 'Response to Treatment',
+      loincCode: '8716-3',
+      required: true,
+    },
+    {
+      key: 'risk_assessment',
+      label: 'Risk Assessment',
+      loincCode: '75328-6',
+      required: true,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
-    { key: 'homework', label: 'Homework / Next Session', loincCode: '81246-7', required: false },
+    {
+      key: 'homework',
+      label: 'Homework / Next Session',
+      loincCode: '81246-7',
+      required: false,
+    },
   ],
 }
 
@@ -124,12 +181,42 @@ const GROUP_THERAPY_PROGRESS: NoteTemplate = {
   category: 'progress-note',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'group_info', label: 'Group Information', loincCode: '29771-3', required: true },
-    { key: 'attendance', label: 'Attendance', loincCode: '61144-5', required: true },
-    { key: 'topics_covered', label: 'Topics Covered', loincCode: '48767-8', required: true },
-    { key: 'member_participation', label: 'Member Participation', loincCode: '11853-6', required: true },
-    { key: 'interventions', label: 'Interventions', loincCode: '62390-0', required: true },
-    { key: 'group_dynamics', label: 'Group Dynamics', loincCode: '81244-2', required: false },
+    {
+      key: 'group_info',
+      label: 'Group Information',
+      loincCode: '29771-3',
+      required: true,
+    },
+    {
+      key: 'attendance',
+      label: 'Attendance',
+      loincCode: '61144-5',
+      required: true,
+    },
+    {
+      key: 'topics_covered',
+      label: 'Topics Covered',
+      loincCode: '48767-8',
+      required: true,
+    },
+    {
+      key: 'member_participation',
+      label: 'Member Participation',
+      loincCode: '11853-6',
+      required: true,
+    },
+    {
+      key: 'interventions',
+      label: 'Interventions',
+      loincCode: '62390-0',
+      required: true,
+    },
+    {
+      key: 'group_dynamics',
+      label: 'Group Dynamics',
+      loincCode: '81244-2',
+      required: false,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
   ],
 }
@@ -143,17 +230,67 @@ const PSYCHIATRIC_EVALUATION: NoteTemplate = {
   category: 'evaluation',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'chief_complaint', label: 'Chief Complaint', loincCode: '10154-3', required: true },
-    { key: 'history_present_illness', label: 'History of Present Illness', loincCode: '10164-2', required: true },
-    { key: 'psychiatric_history', label: 'Psychiatric History', loincCode: '10157-6', required: true },
-    { key: 'medical_history', label: 'Medical History', loincCode: '11344-9', required: true },
-    { key: 'social_history', label: 'Social History', loincCode: '29762-2', required: true },
-    { key: 'family_history', label: 'Family History', loincCode: '57175-9', required: true },
-    { key: 'mental_status_exam', label: 'Mental Status Examination', loincCode: '11158E', required: true },
-    { key: 'diagnostic_impression', label: 'Diagnostic Impression', loincCode: '11487-3', required: true },
-    { key: 'risk_assessment', label: 'Risk Assessment', loincCode: '75328-6', required: true },
+    {
+      key: 'chief_complaint',
+      label: 'Chief Complaint',
+      loincCode: '10154-3',
+      required: true,
+    },
+    {
+      key: 'history_present_illness',
+      label: 'History of Present Illness',
+      loincCode: '10164-2',
+      required: true,
+    },
+    {
+      key: 'psychiatric_history',
+      label: 'Psychiatric History',
+      loincCode: '10157-6',
+      required: true,
+    },
+    {
+      key: 'medical_history',
+      label: 'Medical History',
+      loincCode: '11344-9',
+      required: true,
+    },
+    {
+      key: 'social_history',
+      label: 'Social History',
+      loincCode: '29762-2',
+      required: true,
+    },
+    {
+      key: 'family_history',
+      label: 'Family History',
+      loincCode: '57175-9',
+      required: true,
+    },
+    {
+      key: 'mental_status_exam',
+      label: 'Mental Status Examination',
+      loincCode: '11158E',
+      required: true,
+    },
+    {
+      key: 'diagnostic_impression',
+      label: 'Diagnostic Impression',
+      loincCode: '11487-3',
+      required: true,
+    },
+    {
+      key: 'risk_assessment',
+      label: 'Risk Assessment',
+      loincCode: '75328-6',
+      required: true,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
-    { key: 'medications', label: 'Medications', loincCode: '10160-0', required: false },
+    {
+      key: 'medications',
+      label: 'Medications',
+      loincCode: '10160-0',
+      required: false,
+    },
   ],
 }
 
@@ -166,13 +303,48 @@ const CRISIS_ASSESSMENT: NoteTemplate = {
   category: 'assessment',
   defaultDocStatus: 'final',
   sections: [
-    { key: 'presenting_situation', label: 'Presenting Situation', loincCode: '75310-4', required: true },
-    { key: 'mental_status_exam', label: 'Mental Status Examination', loincCode: '11158E', required: true },
-    { key: 'risk_assessment', label: 'Risk Assessment', loincCode: '75328-6', required: true },
-    { key: 'safety_plan', label: 'Safety Plan', loincCode: '75311-2', required: true },
-    { key: 'interventions', label: 'Interventions', loincCode: '62390-0', required: true },
-    { key: 'disposition', label: 'Disposition', loincCode: '81250-9', required: true },
-    { key: 'follow_up', label: 'Follow-Up Plan', loincCode: '18776-5', required: true },
+    {
+      key: 'presenting_situation',
+      label: 'Presenting Situation',
+      loincCode: '75310-4',
+      required: true,
+    },
+    {
+      key: 'mental_status_exam',
+      label: 'Mental Status Examination',
+      loincCode: '11158E',
+      required: true,
+    },
+    {
+      key: 'risk_assessment',
+      label: 'Risk Assessment',
+      loincCode: '75328-6',
+      required: true,
+    },
+    {
+      key: 'safety_plan',
+      label: 'Safety Plan',
+      loincCode: '75311-2',
+      required: true,
+    },
+    {
+      key: 'interventions',
+      label: 'Interventions',
+      loincCode: '62390-0',
+      required: true,
+    },
+    {
+      key: 'disposition',
+      label: 'Disposition',
+      loincCode: '81250-9',
+      required: true,
+    },
+    {
+      key: 'follow_up',
+      label: 'Follow-Up Plan',
+      loincCode: '18776-5',
+      required: true,
+    },
   ],
 }
 
@@ -185,18 +357,78 @@ const INTAKE_ASSESSMENT: NoteTemplate = {
   category: 'assessment',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'chief_complaint', label: 'Chief Complaint', loincCode: '10154-3', required: true },
-    { key: 'history_present_illness', label: 'History of Present Illness', loincCode: '10164-2', required: true },
-    { key: 'psychiatric_history', label: 'Psychiatric History', loincCode: '10157-6', required: true },
-    { key: 'medical_history', label: 'Medical History', loincCode: '11344-9', required: true },
-    { key: 'social_history', label: 'Social History', loincCode: '29762-2', required: true },
-    { key: 'family_history', label: 'Family History', loincCode: '57175-9', required: true },
-    { key: 'substance_history', label: 'Substance Use History', loincCode: '81248-3', required: false },
-    { key: 'trauma_history', label: 'Trauma History', loincCode: '74465-6', required: false },
-    { key: 'mental_status_exam', label: 'Mental Status Examination', loincCode: '11158E', required: true },
-    { key: 'diagnostic_impression', label: 'Diagnostic Impression', loincCode: '11487-3', required: true },
-    { key: 'risk_assessment', label: 'Risk Assessment', loincCode: '75328-6', required: true },
-    { key: 'treatment_goals', label: 'Treatment Goals', loincCode: '81251-7', required: true },
+    {
+      key: 'chief_complaint',
+      label: 'Chief Complaint',
+      loincCode: '10154-3',
+      required: true,
+    },
+    {
+      key: 'history_present_illness',
+      label: 'History of Present Illness',
+      loincCode: '10164-2',
+      required: true,
+    },
+    {
+      key: 'psychiatric_history',
+      label: 'Psychiatric History',
+      loincCode: '10157-6',
+      required: true,
+    },
+    {
+      key: 'medical_history',
+      label: 'Medical History',
+      loincCode: '11344-9',
+      required: true,
+    },
+    {
+      key: 'social_history',
+      label: 'Social History',
+      loincCode: '29762-2',
+      required: true,
+    },
+    {
+      key: 'family_history',
+      label: 'Family History',
+      loincCode: '57175-9',
+      required: true,
+    },
+    {
+      key: 'substance_history',
+      label: 'Substance Use History',
+      loincCode: '81248-3',
+      required: false,
+    },
+    {
+      key: 'trauma_history',
+      label: 'Trauma History',
+      loincCode: '74465-6',
+      required: false,
+    },
+    {
+      key: 'mental_status_exam',
+      label: 'Mental Status Examination',
+      loincCode: '11158E',
+      required: true,
+    },
+    {
+      key: 'diagnostic_impression',
+      label: 'Diagnostic Impression',
+      loincCode: '11487-3',
+      required: true,
+    },
+    {
+      key: 'risk_assessment',
+      label: 'Risk Assessment',
+      loincCode: '75328-6',
+      required: true,
+    },
+    {
+      key: 'treatment_goals',
+      label: 'Treatment Goals',
+      loincCode: '81251-7',
+      required: true,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
   ],
 }
@@ -210,14 +442,49 @@ const COUPLES_THERAPY_PROGRESS: NoteTemplate = {
   category: 'progress-note',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'session_focus', label: 'Session Focus', loincCode: '48767-8', required: true },
-    { key: 'partner1_presentation', label: 'Partner 1 Presentation', loincCode: '11853-6', required: true },
-    { key: 'partner2_presentation', label: 'Partner 2 Presentation', loincCode: '11853-6', required: true },
-    { key: 'interaction_patterns', label: 'Interaction Patterns', loincCode: '81244-2', required: true },
-    { key: 'interventions', label: 'Interventions', loincCode: '62390-0', required: true },
-    { key: 'response_to_treatment', label: 'Response to Treatment', loincCode: '8716-3', required: true },
+    {
+      key: 'session_focus',
+      label: 'Session Focus',
+      loincCode: '48767-8',
+      required: true,
+    },
+    {
+      key: 'partner1_presentation',
+      label: 'Partner 1 Presentation',
+      loincCode: '11853-6',
+      required: true,
+    },
+    {
+      key: 'partner2_presentation',
+      label: 'Partner 2 Presentation',
+      loincCode: '11853-6',
+      required: true,
+    },
+    {
+      key: 'interaction_patterns',
+      label: 'Interaction Patterns',
+      loincCode: '81244-2',
+      required: true,
+    },
+    {
+      key: 'interventions',
+      label: 'Interventions',
+      loincCode: '62390-0',
+      required: true,
+    },
+    {
+      key: 'response_to_treatment',
+      label: 'Response to Treatment',
+      loincCode: '8716-3',
+      required: true,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
-    { key: 'homework', label: 'Homework / Next Session', loincCode: '81246-7', required: false },
+    {
+      key: 'homework',
+      label: 'Homework / Next Session',
+      loincCode: '81246-7',
+      required: false,
+    },
   ],
 }
 
@@ -230,13 +497,43 @@ const FAMILY_THERAPY_PROGRESS: NoteTemplate = {
   category: 'progress-note',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'session_focus', label: 'Session Focus', loincCode: '48767-8', required: true },
-    { key: 'family_members', label: 'Family Members Present', loincCode: '61144-5', required: true },
-    { key: 'interaction_patterns', label: 'Family Interaction Patterns', loincCode: '81244-2', required: true },
-    { key: 'interventions', label: 'Interventions', loincCode: '62390-0', required: true },
-    { key: 'response_to_treatment', label: 'Response to Treatment', loincCode: '8716-3', required: true },
+    {
+      key: 'session_focus',
+      label: 'Session Focus',
+      loincCode: '48767-8',
+      required: true,
+    },
+    {
+      key: 'family_members',
+      label: 'Family Members Present',
+      loincCode: '61144-5',
+      required: true,
+    },
+    {
+      key: 'interaction_patterns',
+      label: 'Family Interaction Patterns',
+      loincCode: '81244-2',
+      required: true,
+    },
+    {
+      key: 'interventions',
+      label: 'Interventions',
+      loincCode: '62390-0',
+      required: true,
+    },
+    {
+      key: 'response_to_treatment',
+      label: 'Response to Treatment',
+      loincCode: '8716-3',
+      required: true,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
-    { key: 'homework', label: 'Homework / Next Session', loincCode: '81246-7', required: false },
+    {
+      key: 'homework',
+      label: 'Homework / Next Session',
+      loincCode: '81246-7',
+      required: false,
+    },
   ],
 }
 
@@ -249,13 +546,48 @@ const MEDICATION_MANAGEMENT: NoteTemplate = {
   category: 'progress-note',
   defaultDocStatus: 'preliminary',
   sections: [
-    { key: 'chief_complaint', label: 'Chief Complaint', loincCode: '10154-3', required: true },
-    { key: 'symptom_review', label: 'Symptom Review', loincCode: '11498-0', required: true },
-    { key: 'medication_review', label: 'Medication Review', loincCode: '10160-0', required: true },
-    { key: 'side_effects', label: 'Side Effects', loincCode: '75315-3', required: true },
-    { key: 'adherence', label: 'Medication Adherence', loincCode: '75314-6', required: true },
-    { key: 'mental_status_exam', label: 'Mental Status Examination', loincCode: '11158E', required: true },
-    { key: 'risk_assessment', label: 'Risk Assessment', loincCode: '75328-6', required: false },
+    {
+      key: 'chief_complaint',
+      label: 'Chief Complaint',
+      loincCode: '10154-3',
+      required: true,
+    },
+    {
+      key: 'symptom_review',
+      label: 'Symptom Review',
+      loincCode: '11498-0',
+      required: true,
+    },
+    {
+      key: 'medication_review',
+      label: 'Medication Review',
+      loincCode: '10160-0',
+      required: true,
+    },
+    {
+      key: 'side_effects',
+      label: 'Side Effects',
+      loincCode: '75315-3',
+      required: true,
+    },
+    {
+      key: 'adherence',
+      label: 'Medication Adherence',
+      loincCode: '75314-6',
+      required: true,
+    },
+    {
+      key: 'mental_status_exam',
+      label: 'Mental Status Examination',
+      loincCode: '11158E',
+      required: true,
+    },
+    {
+      key: 'risk_assessment',
+      label: 'Risk Assessment',
+      loincCode: '75328-6',
+      required: false,
+    },
     { key: 'plan', label: 'Plan', loincCode: '18776-5', required: true },
   ],
 }
@@ -269,17 +601,6 @@ const ALL_TEMPLATES: readonly NoteTemplate[] = [
   COUPLES_THERAPY_PROGRESS,
   FAMILY_THERAPY_PROGRESS,
   MEDICATION_MANAGEMENT,
-]
-
-const MODALITIES: readonly NoteModality[] = [
-  'individual-therapy',
-  'group-therapy',
-  'psychiatric-evaluation',
-  'crisis-assessment',
-  'intake-assessment',
-  'couples-therapy',
-  'family-therapy',
-  'medication-management',
 ]
 
 // ---------------------------------------------------------------------------
@@ -315,11 +636,18 @@ export class NoteTemplateService {
 
   /**
    * Gets a specific note template by its identifier.
+   *
+   * The template ID is validated against the kebab-case identifier format
+   * used by built-in templates to prevent malformed lookup keys from
+   * reaching the underlying comparison.
+   *
    * @param templateId - The template identifier (e.g. "individual-therapy-progress").
    * @returns The template, or null if not found.
+   * @throws {Error} If the template ID format is invalid.
    */
   getTemplate(templateId: string): NoteTemplate | null {
-    return this.templates.find((t) => t.id === templateId) ?? null
+    const sanitized = sanitizeTemplateId(templateId)
+    return this.templates.find((t) => t.id === sanitized) ?? null
   }
 
   /**
@@ -342,20 +670,24 @@ export class NoteTemplateService {
    * - status "current"
    * - docStatus from the template default or input override
    * - type set to the template's LOINC code
-   * - category set to the template's category
+   * - category set to the US Core DocumentReference category code system
+   *   (`clinical-note`), with the modality-specific category in `display`
    * - subject set to the patient reference
    * - author set to the author reference
    * - context.encounter set when an encounter reference is provided
-   * - content[0].attachment.data containing the serialized note content
+   * - content[0].attachment.data containing the base64-encoded note content
    *
    * @param input - The note creation input.
    * @returns A FHIR R4 DocumentReference resource.
-   * @throws {Error} If the template ID is not found.
+   * @throws {Error} If the template ID is not found or has an invalid format.
    */
-  createNoteFromTemplate(input: CreateNoteFromTemplateInput): DocumentReference {
-    const template = this.getTemplate(input.templateId)
+  createNoteFromTemplate(
+    input: CreateNoteFromTemplateInput,
+  ): DocumentReference {
+    const templateId = sanitizeTemplateId(input.templateId)
+    const template = this.getTemplate(templateId)
     if (template === null) {
-      throw new Error(`Note template not found: ${input.templateId}`)
+      throw new Error(`Note template not found: ${templateId}`)
     }
 
     const docStatus = input.docStatus ?? template.defaultDocStatus
@@ -393,8 +725,9 @@ export class NoteTemplateService {
         {
           coding: [
             {
-              system: 'http://loinc.org',
-              code: template.category,
+              system:
+                'http://hl7.org/fhir/us/core/CodeSystem/us-core-documentreference-category',
+              code: 'clinical-note',
               display: template.category.replace(/-/g, ' '),
             },
           ],
@@ -407,7 +740,10 @@ export class NoteTemplateService {
         {
           attachment: {
             contentType: 'application/json',
-            data: Buffer.from(attachmentData).toString('base64'),
+            data: browserBuffer.toString(
+              browserBuffer.from(attachmentData),
+              'base64',
+            ),
             title: `${template.name} - ${now}`,
           },
         },
@@ -433,13 +769,25 @@ export class NoteTemplateService {
     templateId: string,
     content: Record<string, string>,
   ): NoteTemplateValidationResult {
-    const template = this.getTemplate(templateId)
+    let sanitizedId: string
+    try {
+      sanitizedId = sanitizeTemplateId(templateId)
+    } catch {
+      return {
+        valid: false,
+        missingSections: [],
+        extraSections: [],
+        errors: [`Invalid template ID format: ${templateId}`],
+      }
+    }
+
+    const template = this.getTemplate(sanitizedId)
     if (template === null) {
       return {
         valid: false,
         missingSections: [],
         extraSections: [],
-        errors: [`Note template not found: ${templateId}`],
+        errors: [`Note template not found: ${sanitizedId}`],
       }
     }
 
@@ -465,19 +813,13 @@ export class NoteTemplateService {
 
     const errors: string[] = []
     if (missingSections.length > 0) {
-      errors.push(
-        `Missing required sections: ${missingSections.join(', ')}`,
-      )
+      errors.push(`Missing required sections: ${missingSections.join(', ')}`)
     }
     if (extraSections.length > 0) {
-      errors.push(
-        `Sections not in template: ${extraSections.join(', ')}`,
-      )
+      errors.push(`Sections not in template: ${extraSections.join(', ')}`)
     }
     if (emptyRequired.length > 0) {
-      errors.push(
-        `Required sections are empty: ${emptyRequired.join(', ')}`,
-      )
+      errors.push(`Required sections are empty: ${emptyRequired.join(', ')}`)
     }
 
     return {
@@ -494,7 +836,13 @@ export class NoteTemplateService {
    * @returns Array of required section keys, or empty if template not found.
    */
   getRequiredSections(templateId: string): readonly string[] {
-    const template = this.getTemplate(templateId)
+    let sanitized: string
+    try {
+      sanitized = sanitizeTemplateId(templateId)
+    } catch {
+      return []
+    }
+    const template = this.getTemplate(sanitized)
     if (template === null) {
       return []
     }
