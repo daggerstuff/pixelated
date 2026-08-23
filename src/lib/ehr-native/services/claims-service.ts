@@ -23,11 +23,7 @@ import type {
 // ---------------------------------------------------------------------------
 
 /** Claim lifecycle status, extended beyond FHIR's four values to track submission. */
-export type ClaimStatus =
-  | 'draft'
-  | 'active'
-  | 'cancelled'
-  | 'entered-in-error'
+export type ClaimStatus = 'draft' | 'active' | 'cancelled' | 'entered-in-error'
 
 /** Claim use category per FHIR R4. */
 export type ClaimUse = 'claim' | 'preauthorization' | 'predetermination'
@@ -197,7 +193,10 @@ interface ClaimObj {
   total?: { value: number; currency: string }
 }
 
-function buildClaimItem(item: CreateClaimItemInput, index: number): ClaimItemObj {
+function buildClaimItem(
+  item: CreateClaimItemInput,
+  index: number,
+): ClaimItemObj {
   const lineItem: ClaimItemObj = {
     sequence: index + 1,
     productOrService: item.productOrService,
@@ -232,10 +231,15 @@ function buildClaimItem(item: CreateClaimItemInput, index: number): ClaimItemObj
   return lineItem
 }
 
-function buildDiagnosis(diag: CreateClaimDiagnosisInput, index: number): ClaimDiagnosisObj {
+function buildDiagnosis(
+  diag: CreateClaimDiagnosisInput,
+  index: number,
+): ClaimDiagnosisObj {
   const entry: ClaimDiagnosisObj = { sequence: index + 1 }
   if (diag.diagnosisReference) {
-    entry.diagnosisReference = { reference: diag.diagnosisReference } as FHIRReference
+    entry.diagnosisReference = {
+      reference: diag.diagnosisReference,
+    } as FHIRReference
   }
   if (diag.diagnosisCodeableConcept) {
     entry.diagnosisCodeableConcept = diag.diagnosisCodeableConcept
@@ -249,10 +253,15 @@ function buildDiagnosis(diag: CreateClaimDiagnosisInput, index: number): ClaimDi
   return entry
 }
 
-function buildProcedure(proc: CreateClaimProcedureInput, index: number): ClaimProcedureObj {
+function buildProcedure(
+  proc: CreateClaimProcedureInput,
+  index: number,
+): ClaimProcedureObj {
   const entry: ClaimProcedureObj = { sequence: index + 1 }
   if (proc.procedureReference) {
-    entry.procedureReference = { reference: proc.procedureReference } as FHIRReference
+    entry.procedureReference = {
+      reference: proc.procedureReference,
+    } as FHIRReference
   }
   if (proc.procedureCodeableConcept) {
     entry.procedureCodeableConcept = proc.procedureCodeableConcept
@@ -265,9 +274,9 @@ function buildProcedure(proc: CreateClaimProcedureInput, index: number): ClaimPr
 // ---------------------------------------------------------------------------
 
 const VALID_TRANSITIONS: Record<ClaimStatus, ClaimStatus[]> = {
-  draft: ['active', 'cancelled', 'entered-in-error'],
-  active: ['cancelled', 'entered-in-error'],
-  cancelled: ['entered-in-error'],
+  'draft': ['active', 'cancelled', 'entered-in-error'],
+  'active': ['cancelled', 'entered-in-error'],
+  'cancelled': ['entered-in-error'],
   'entered-in-error': [],
 }
 
@@ -284,6 +293,10 @@ export class ClaimsService {
    * @throws {Error} If the generated claim fails FHIR validation
    */
   createClaim(input: CreateClaimInput): Claim {
+    if (!input.items || input.items.length === 0) {
+      throw new Error('Claim must have at least one line item')
+    }
+
     const items = input.items.map((item, index) => buildClaimItem(item, index))
 
     const claim: ClaimObj = {
@@ -310,11 +323,15 @@ export class ClaimsService {
     }
 
     if (input.diagnoses && input.diagnoses.length > 0) {
-      claim.diagnosis = input.diagnoses.map((d, index) => buildDiagnosis(d, index))
+      claim.diagnosis = input.diagnoses.map((d, index) =>
+        buildDiagnosis(d, index),
+      )
     }
 
     if (input.procedures && input.procedures.length > 0) {
-      claim.procedure = input.procedures.map((p, index) => buildProcedure(p, index))
+      claim.procedure = input.procedures.map((p, index) =>
+        buildProcedure(p, index),
+      )
     }
 
     if (input.insurance && input.insurance.length > 0) {
@@ -323,7 +340,9 @@ export class ClaimsService {
         focal: ins.focal,
         coverage: { reference: ins.coverage } as FHIRReference,
         ...(ins.preAuthRef ? { preAuthRef: ins.preAuthRef } : {}),
-        ...(ins.businessArrangement ? { businessArrangement: ins.businessArrangement } : {}),
+        ...(ins.businessArrangement
+          ? { businessArrangement: ins.businessArrangement }
+          : {}),
       }))
     }
 
@@ -359,14 +378,21 @@ export class ClaimsService {
       errors.push('Claim must have at least one line item')
     }
 
-    if (validClaim.use === 'claim' && (!validClaim.insurance || validClaim.insurance.length === 0)) {
-      errors.push('A claim with use=claim must have at least one insurance entry')
+    if (
+      validClaim.use === 'claim' &&
+      (!validClaim.insurance || validClaim.insurance.length === 0)
+    ) {
+      errors.push(
+        'A claim with use=claim must have at least one insurance entry',
+      )
     }
 
     if (validClaim.insurance) {
       const focalCount = validClaim.insurance.filter((i) => i.focal).length
       if (focalCount === 0) {
-        warnings.push('No focal insurance identified; defaulting to first insurance as focal')
+        warnings.push(
+          'No focal insurance identified; defaulting to first insurance as focal',
+        )
       } else if (focalCount > 1) {
         errors.push('Only one insurance entry can be marked as focal')
       }
@@ -392,7 +418,11 @@ export class ClaimsService {
       if (!item.productOrService) {
         errors.push(`Item ${index + 1}: productOrService is required`)
       }
-      if (item.quantity && item.quantity.value !== undefined && item.quantity.value <= 0) {
+      if (
+        item.quantity &&
+        item.quantity.value !== undefined &&
+        item.quantity.value <= 0
+      ) {
         warnings.push(`Item ${index + 1}: quantity should be positive`)
       }
     }
@@ -414,14 +444,22 @@ export class ClaimsService {
     let total = 0
     let currency = 'USD'
 
+    const currencies = new Set<string>()
     for (const item of claim.item ?? []) {
       const qty = item.quantity?.value ?? 1
       const unitPrice = item.unitPrice?.value ?? 0
       const factor = item.factor ?? 1
       if (item.unitPrice?.currency) {
         currency = item.unitPrice.currency
+        currencies.add(item.unitPrice.currency)
       }
       total += qty * unitPrice * factor
+    }
+
+    if (currencies.size > 1) {
+      throw new Error(
+        `Cannot calculate total: claim contains items with mixed currencies (${[...currencies].join(', ')})`,
+      )
     }
 
     return { value: Math.round(total * 100) / 100, currency }
@@ -541,13 +579,15 @@ export class ClaimsService {
     const byUse: Record<string, number> = {}
     let totalBilled = 0
     let currency = 'USD'
+    let currencySet = false
 
     for (const claim of claims) {
       byStatus[claim.status] = (byStatus[claim.status] ?? 0) + 1
       byUse[claim.use] = (byUse[claim.use] ?? 0) + 1
 
-      if (claim.total?.currency) {
+      if (claim.total?.currency && !currencySet) {
         currency = claim.total.currency
+        currencySet = true
       }
       if (claim.total?.value) {
         totalBilled += claim.total.value
