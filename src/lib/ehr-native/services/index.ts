@@ -1,7 +1,9 @@
 /**
- * EHR Native — Domain Services
+ * EHR Native — Services
  *
- * Business logic services for the EHR module.
+ * Domain services orchestrate multiple repositories to provide
+ * higher-level operations for the EHR application.
+ *
  * Services are stateless; they depend on repositories for persistence
  * and the audit module for write-path logging.
  *
