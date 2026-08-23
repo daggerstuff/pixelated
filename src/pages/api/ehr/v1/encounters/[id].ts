@@ -1,7 +1,13 @@
+import {
+  resolveTenantId,
+  requireEHRPermission,
+  ehrSuccess,
+  ehrValidationError,
+  ehrNotFound,
+} from '@/lib/ehr-native/api'
+import { EncounterRepository } from '@/lib/ehr-native/repositories'
 /** EHR Native — Encounter Item API (F1.6) */
 import { withV1Contract } from '@/lib/middleware/with-v1-contract'
-import { resolveTenantId, requireEHRPermission, ehrSuccess, ehrValidationError, ehrNotFound } from '@/lib/ehr-native/api'
-import { EncounterRepository } from '@/lib/ehr-native/repositories'
 
 /**
  * GET /api/ehr/v1/encounters/[id]
@@ -12,8 +18,14 @@ export const GET = withV1Contract('getEncounter', async (ctx, caller) => {
   const encounterId = ctx.params?.['id']
   if (!encounterId) return ehrValidationError('Encounter ID is required.')
   const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'read_encounter', caller.user.id, tenantId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for EHR access.')
+  const perm = await requireEHRPermission(
+    caller.user.role,
+    'read_encounter',
+    caller.user.id,
+    tenantId,
+  )
   if (!perm.allowed) return perm.response
   const repo = new EncounterRepository(perm.rlsContext)
 
@@ -31,8 +43,14 @@ export const PATCH = withV1Contract('updateEncounter', async (ctx, caller) => {
   const encounterId = ctx.params?.['id']
   if (!encounterId) return ehrValidationError('Encounter ID is required.')
   const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'write_encounter', caller.user.id, tenantId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for EHR access.')
+  const perm = await requireEHRPermission(
+    caller.user.role,
+    'write_encounter',
+    caller.user.id,
+    tenantId,
+  )
   if (!perm.allowed) return perm.response
   const repo = new EncounterRepository(perm.rlsContext)
 

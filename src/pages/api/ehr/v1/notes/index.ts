@@ -1,8 +1,14 @@
-/** EHR Native — Notes Collection API (F1.6) */
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
-import { resolveTenantId, requireEHRPermission, ehrSuccess, ehrCreated, ehrValidationError } from '@/lib/ehr-native/api'
+import {
+  resolveTenantId,
+  requireEHRPermission,
+  ehrSuccess,
+  ehrCreated,
+  ehrValidationError,
+} from '@/lib/ehr-native/api'
 import { noteTemplateService } from '@/lib/ehr-native/services'
 import type { NoteModality } from '@/lib/ehr-native/services'
+/** EHR Native — Notes Collection API (F1.6) */
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/ehr/v1/notes
@@ -11,15 +17,23 @@ import type { NoteModality } from '@/lib/ehr-native/services'
  */
 export const GET = withV1Contract('listNoteTemplates', async (ctx, caller) => {
   const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'read_clinical_note', caller.user.id, tenantId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for EHR access.')
+  const perm = await requireEHRPermission(
+    caller.user.role,
+    'read_clinical_note',
+    caller.user.id,
+    tenantId,
+  )
   if (!perm.allowed) return perm.response
 
   const url = new URL(ctx.request.url)
   const modality = url.searchParams.get('modality') ?? undefined
 
   if (modality) {
-    const templates = noteTemplateService.listTemplates(modality as NoteModality)
+    const templates = noteTemplateService.listTemplates(
+      modality as NoteModality,
+    )
     return ehrSuccess(templates)
   }
   const templates = noteTemplateService.listTemplates()
@@ -34,12 +48,19 @@ export const GET = withV1Contract('listNoteTemplates', async (ctx, caller) => {
  */
 export const POST = withV1Contract('createNote', async (ctx, caller) => {
   const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'write_clinical_note', caller.user.id, tenantId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for EHR access.')
+  const perm = await requireEHRPermission(
+    caller.user.role,
+    'write_clinical_note',
+    caller.user.id,
+    tenantId,
+  )
   if (!perm.allowed) return perm.response
 
   const raw = await ctx.request.json().catch(() => null)
-  if (!raw || typeof raw !== 'object') return ehrValidationError('Request body must be a JSON object.')
+  if (!raw || typeof raw !== 'object')
+    return ehrValidationError('Request body must be a JSON object.')
 
   const body = raw as Record<string, unknown>
   const templateId = body['templateId'] as string | undefined
@@ -59,6 +80,10 @@ export const POST = withV1Contract('createNote', async (ctx, caller) => {
     } as never)
     return ehrCreated(note)
   } catch (err) {
-    return ehrValidationError(err instanceof Error ? err.message : 'Failed to create note from template.')
+    return ehrValidationError(
+      err instanceof Error
+        ? err.message
+        : 'Failed to create note from template.',
+    )
   }
 })

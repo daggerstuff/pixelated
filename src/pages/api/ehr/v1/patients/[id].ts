@@ -1,8 +1,14 @@
-/** EHR Native — Patient Item API (F1.6) */
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
-import { resolveTenantId, requireEHRPermission, ehrSuccess, ehrValidationError, ehrNotFound } from '@/lib/ehr-native/api'
+import {
+  resolveTenantId,
+  requireEHRPermission,
+  ehrSuccess,
+  ehrValidationError,
+  ehrNotFound,
+} from '@/lib/ehr-native/api'
 import { PatientService } from '@/lib/ehr-native/services'
 import type { Patient } from '@/lib/ehr-native/types'
+/** EHR Native — Patient Item API (F1.6) */
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/ehr/v1/patients/[id]
@@ -15,8 +21,15 @@ export const GET = withV1Contract('getPatient', async (ctx, caller) => {
   const patientId = ctx.params?.['id']
   if (!patientId) return ehrValidationError('Patient ID is required.')
   const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'read_patient', caller.user.id, tenantId, patientId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for EHR access.')
+  const perm = await requireEHRPermission(
+    caller.user.role,
+    'read_patient',
+    caller.user.id,
+    tenantId,
+    patientId,
+  )
   if (!perm.allowed) return perm.response
   const service = new PatientService(perm.rlsContext)
 
@@ -36,20 +49,32 @@ export const PATCH = withV1Contract('updatePatient', async (ctx, caller) => {
   const patientId = ctx.params?.['id']
   if (!patientId) return ehrValidationError('Patient ID is required.')
   const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'write_patient', caller.user.id, tenantId, patientId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for EHR access.')
+  const perm = await requireEHRPermission(
+    caller.user.role,
+    'write_patient',
+    caller.user.id,
+    tenantId,
+    patientId,
+  )
   if (!perm.allowed) return perm.response
   const service = new PatientService(perm.rlsContext)
 
   const raw = await ctx.request.json().catch(() => null)
-  if (!raw || typeof raw !== 'object') return ehrValidationError('Request body must be a JSON object.')
+  if (!raw || typeof raw !== 'object')
+    return ehrValidationError('Request body must be a JSON object.')
 
   try {
-    const patient = await service.updatePatient(patientId, { fhirResource: raw as Partial<Patient> })
+    const patient = await service.updatePatient(patientId, {
+      fhirResource: raw as Partial<Patient>,
+    })
     if (!patient) return ehrNotFound('Patient', patientId)
     return ehrSuccess(patient)
   } catch (err) {
-    return ehrValidationError(err instanceof Error ? err.message : 'Invalid patient update data.')
+    return ehrValidationError(
+      err instanceof Error ? err.message : 'Invalid patient update data.',
+    )
   }
 })
 
@@ -60,16 +85,26 @@ export const PATCH = withV1Contract('updatePatient', async (ctx, caller) => {
  * @param caller - Authenticated caller
  * @returns 200 with deactivated patient, or 403/404
  */
-export const DELETE = withV1Contract('deactivatePatient', async (ctx, caller) => {
-  const patientId = ctx.params?.['id']
-  if (!patientId) return ehrValidationError('Patient ID is required.')
-  const tenantId = resolveTenantId(caller.user.accountId)
-  if (!tenantId) return ehrValidationError('Tenant association required for EHR access.')
-  const perm = await requireEHRPermission(caller.user.role, 'write_patient', caller.user.id, tenantId, patientId)
-  if (!perm.allowed) return perm.response
-  const service = new PatientService(perm.rlsContext)
+export const DELETE = withV1Contract(
+  'deactivatePatient',
+  async (ctx, caller) => {
+    const patientId = ctx.params?.['id']
+    if (!patientId) return ehrValidationError('Patient ID is required.')
+    const tenantId = resolveTenantId(caller.user.accountId)
+    if (!tenantId)
+      return ehrValidationError('Tenant association required for EHR access.')
+    const perm = await requireEHRPermission(
+      caller.user.role,
+      'write_patient',
+      caller.user.id,
+      tenantId,
+      patientId,
+    )
+    if (!perm.allowed) return perm.response
+    const service = new PatientService(perm.rlsContext)
 
-  const patient = await service.deactivatePatient(patientId)
-  if (!patient) return ehrNotFound('Patient', patientId)
-  return ehrSuccess(patient)
-})
+    const patient = await service.deactivatePatient(patientId)
+    if (!patient) return ehrNotFound('Patient', patientId)
+    return ehrSuccess(patient)
+  },
+)

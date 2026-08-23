@@ -88,7 +88,8 @@ export async function requireEHRPermission(
         JSON.stringify({
           error: {
             code: 'forbidden',
-            message: result.reason ?? 'Insufficient permissions for this operation.',
+            message:
+              result.reason ?? 'Insufficient permissions for this operation.',
           },
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } },
@@ -121,7 +122,10 @@ export async function requireEHRPermissionWithBreakGlass(
   userId: string,
   tenantId: string,
   patientId: string,
-  breakGlassParams?: Omit<BreakGlassParams, 'role' | 'patientId' | 'permission'>,
+  breakGlassParams?: Omit<
+    BreakGlassParams,
+    'role' | 'patientId' | 'permission'
+  >,
   stateCode?: string,
 ): Promise<EHRPermissionResult> {
   const result = await checkPermissionWithBreakGlass(
@@ -140,7 +144,8 @@ export async function requireEHRPermissionWithBreakGlass(
         JSON.stringify({
           error: {
             code: 'forbidden',
-            message: result.reason ?? 'Insufficient permissions for this operation.',
+            message:
+              result.reason ?? 'Insufficient permissions for this operation.',
           },
         }),
         { status: 403, headers: { 'Content-Type': 'application/json' } },
@@ -150,8 +155,93 @@ export async function requireEHRPermissionWithBreakGlass(
 
   return {
     allowed: true,
-    rlsContext: createEHRRLSContext(userId, role, tenantId, result.breakGlassActivated),
+    rlsContext: createEHRRLSContext(
+      userId,
+      role,
+      tenantId,
+      result.breakGlassActivated,
+    ),
   }
+}
+
+// ---------------------------------------------------------------------------
+// Input sanitization for FHIR search endpoints
+// ---------------------------------------------------------------------------
+
+/**
+ * Validate and sanitize a FHIR resource ID. Only allows alphanumeric
+ * characters and hyphens, up to 128 characters. Throws on invalid input.
+ *
+ * @param id - The raw ID from a URL path or query parameter.
+ * @param label - Field label for error messages.
+ * @returns The sanitized ID.
+ */
+export function sanitizeFhirId(id: string, label = 'ID'): string {
+  const trimmed = id.trim()
+  if (!trimmed) throw new Error(`${label} is required.`)
+  if (!/^[a-zA-Z0-9_-]{1,128}$/.test(trimmed)) {
+    throw new Error(
+      `Invalid ${label}: must be alphanumeric with hyphens, max 128 chars.`,
+    )
+  }
+  return trimmed
+}
+
+/**
+ * Sanitize a free-text search parameter by stripping control characters
+ * and limiting length. Used for FHIR search query parameters.
+ *
+ * @param value - The raw value from a URL query parameter.
+ * @param maxLength - Maximum allowed length (default 256).
+ * @returns The sanitized value.
+ */
+export function sanitizeSearchParam(value: string, maxLength = 256): string {
+  return value
+    .replace(/[\x00-\x1f\x7f]/g, '')
+    .slice(0, maxLength)
+    .trim()
+}
+
+/**
+ * Clamp a pagination limit to a safe range.
+ *
+ * @param limit - The raw limit value (may be NaN or undefined).
+ * @param max - Maximum allowed limit (default 200).
+ * @returns The clamped limit (default 50).
+ */
+export function sanitizeLimitParam(limit: number, max = 200): number {
+  return Math.min(Math.max(limit || 50, 1), max)
+}
+
+/**
+ * Clamp a pagination offset to a non-negative integer.
+ *
+ * @param offset - The raw offset value (may be NaN or undefined).
+ * @returns The clamped offset (default 0).
+ */
+export function sanitizeOffsetParam(offset: number): number {
+  return Math.max(offset || 0, 0)
+}
+
+/**
+ * Validate an ISO 8601 timestamp string. Rejects non-ISO formats.
+ *
+ * @param ts - The raw timestamp string.
+ * @param label - Field label for error messages.
+ * @returns The validated timestamp string.
+ */
+export function sanitizeIsoTimestamp(ts: string, label = 'timestamp'): string {
+  const trimmed = ts.trim()
+  if (
+    !/^\d{4}-\d{2}-\d{2}([Tt]\d{2}:\d{2}:\d{2}(\.\d+)?([Zz]|[+-]\d{2}:?\d{2})?)?$/.test(
+      trimmed,
+    )
+  ) {
+    throw new Error(
+      `Invalid ${label}: must be a valid ISO 8601 date or timestamp.`,
+    )
+  }
+  return trimmed
 }
 
 // ---------------------------------------------------------------------------
@@ -198,7 +288,9 @@ export function ehrValidationError(message: string): Response {
  */
 export function ehrNotFound(resource: string, id: string): Response {
   return new Response(
-    JSON.stringify({ error: { code: 'not_found', message: `${resource} ${id} not found.` } }),
+    JSON.stringify({
+      error: { code: 'not_found', message: `${resource} ${id} not found.` },
+    }),
     { status: 404, headers: { 'Content-Type': 'application/json' } },
   )
 }
