@@ -7,10 +7,11 @@ const logger = createBuildSafeLogger('utils') /**
  *
  * Metrics API: https://docs.sentry.io/platforms/javascript/guides/astro/metrics/
  *
- * IMPORTANT: Do NOT import '@sentry/astro' at runtime in browser code.
- * Some pages (e.g. docs) include plain module scripts which must not contain
- * bare module specifiers. We instead use a safe global shim when available.
+ * The bundled @sentry/astro SDK is the primary Sentry interface. We also
+ * check window.Sentry as a fallback for pages that load the SDK via a
+ * standalone script tag.
  */
+import * as SentrySDK from '@sentry/astro'
 
 const IS_DEV = import.meta?.env
   ? import.meta.env.DEV
@@ -59,6 +60,11 @@ type SentryShim = {
 }
 
 function getSentry(): SentryShim | null {
+  // Primary: use the bundled @sentry/astro SDK
+  if (SentrySDK && typeof (SentrySDK as any).captureException === 'function') {
+    return SentrySDK as unknown as SentryShim
+  }
+  // Fallback: window.Sentry global (for pages that load Sentry via script tag)
   try {
     if ((window as any)?.Sentry) {
       return (window as any).Sentry as SentryShim

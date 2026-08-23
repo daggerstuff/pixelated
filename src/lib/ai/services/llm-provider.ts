@@ -13,6 +13,7 @@ import type {
   AIStreamChunk,
 } from '../models/ai-types'
 import { getArizeTracer } from '../tracing/arize-setup'
+import { DEFAULT_LLM_MODEL } from '../constants'
 
 const appLogger = createBuildSafeLogger('app')
 const tracer = getArizeTracer()
@@ -447,7 +448,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
             }
 
             const model =
-              options?.model ?? 'minimaxai/minimax-m2.7'
+              options?.model ?? DEFAULT_LLM_MODEL
             const requestBody = normalizeToolCallPayload({
               model,
               messages,
@@ -563,7 +564,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
       return {
         id: `llm-${Date.now()}`,
         created: Date.now(),
-        model: options?.model ?? 'minimaxai/minimax-m2.7',
+        model: options?.model ?? DEFAULT_LLM_MODEL,
         choices: [
           {
             message: {
@@ -593,7 +594,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
           throw new LLMServiceError('LLM API key is not configured')
         }
 
-        const model = options?.model ?? 'minimaxai/minimax-m2.7'
+        const model = options?.model ?? DEFAULT_LLM_MODEL
         const requestBody = normalizeToolCallPayload({
           model,
           messages,
