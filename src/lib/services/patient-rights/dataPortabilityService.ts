@@ -1,11 +1,11 @@
-import { randomBytes } from 'crypto'
-
 import { v4 as uuidv4 } from 'uuid'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { createAuditLog, AuditEventType } from '../../audit'
 import { userManager } from '../../db'
+import { aiRepository } from '../../db/ai'
 import { dataExportDAO } from '../../../services/mongodb.dao'
+import mongoClient from '../../db/mongoClient'
 
 const logger = createBuildSafeLogger('data-portability-service')
 
@@ -147,6 +147,7 @@ type ExportFile = {
   url: string
   size: number
   createdAt: Date
+  content?: string
 }
 
 type ExportRequestInput = {
@@ -185,7 +186,9 @@ export async function createDataExportRequest(
 ): Promise<ExportResponse> {
   try {
     // Verify patient exists
-    const patient = await userManager.getUserById(input.patientId)
+    const patient = (await userManager.getUserById(input.patientId)) as
+      | { id: string }
+      | null
 
     if (!patient) {
       logger.warn('Export request for non-existent patient', {
@@ -442,6 +445,123 @@ async function queueExportJob(exportRequest: DataExportRequest): Promise<void> {
 }
 
 /**
+ * Map of data categories to MongoDB collections (mirrors dataDeleteService.ts)
+ */
+const PATIENT_DATA_COLLECTIONS: Record<string, string[]> = {
+  demographics: ['patient_profiles', 'patient_demographics'],
+  sessions: ['therapy_sessions', 'session_notes'],
+  assessments: ['patient_assessments', 'assessment_results'],
+  emotions: ['emotion_records', 'emotion_tracking_data'],
+  notes: ['clinical_notes', 'therapist_observations'],
+  messages: ['patient_messages', 'communication_logs'],
+  media: ['patient_uploads', 'media_files'],
+}
+
+/** All patient data collections */
+const ALL_PATIENT_COLLECTIONS = Object.values(PATIENT_DATA_COLLECTIONS).flat()
+
+/**
+ * Fetch patient data from MongoDB collections based on requested data types.
+ */
+async function fetchPatientData(
+  patientId: string,
+  dataTypes: string[],
+): Promise<Record<string, unknown[]>> {
+  const db = mongoClient.db
+  const result: Record<string, unknown[]> = {}
+
+  const collectionsToQuery = new Set<string>()
+  if (dataTypes.includes('all')) {
+    ALL_PATIENT_COLLECTIONS.forEach((c) => collectionsToQuery.add(c))
+  } else {
+    for (const dt of dataTypes) {
+      const cols = PATIENT_DATA_COLLECTIONS[dt]
+      if (cols) {
+        cols.forEach((c) => collectionsToQuery.add(c))
+      } else {
+        // If the data type is a direct collection name, use it
+        collectionsToQuery.add(dt)
+      }
+    }
+  }
+
+  for (const collectionName of collectionsToQuery) {
+    try {
+      const docs = await db
+        .collection(collectionName)
+        .find({ patient_id: patientId })
+        .toArray()
+      result[collectionName] = docs
+    } catch (err) {
+      logger.warn('Failed to query collection for export', {
+        collectionName,
+        patientId,
+        error: err instanceof Error ? err.message : String(err),
+      })
+      result[collectionName] = []
+    }
+  }
+
+  return result
+}
+
+/**
+ * Convert fetched patient data to the requested format.
+ */
+function formatExportData(
+  data: Record<string, unknown[]>,
+  format: ExportFormat,
+): string {
+  if (format === 'json') {
+    return JSON.stringify(data, null, 2)
+  }
+  if (format === 'csv') {
+    const lines: string[] = []
+    for (const [collectionName, records] of Object.entries(data)) {
+      lines.push(`# ${collectionName}`)
+      if (records.length === 0) {
+        lines.push('')
+        continue
+      }
+      const headers = Object.keys(records[0] as Record<string, unknown>)
+      lines.push(headers.join(','))
+      for (const record of records) {
+        const row = headers
+          .map((h) => {
+            const val = (record as Record<string, unknown>)[h]
+            if (val === null || val === undefined) return ''
+            if (typeof val === 'object') {
+              return `"${JSON.stringify(val).replace(/"/g, '""')}"`
+            }
+            if (typeof val === 'string') {
+              return `"${val.replace(/"/g, '""')}"`
+            }
+            // number, boolean, bigint, symbol
+            return `"${JSON.stringify(val).replace(/"/g, '""')}"`
+          })
+          .join(',')
+        lines.push(row)
+      }
+      lines.push('')
+    }
+    return lines.join('\n')
+  }
+  // For xml and pdf, serialize as JSON within an XML wrapper / base64 placeholder
+  if (format === 'xml') {
+    return `<?xml version="1.0" encoding="UTF-8"?>\n<export>\n${Object.entries(data)
+      .map(
+        ([collection, records]) =>
+          `  <collection name="${collection}">\n${records
+            .map((r) => `    <record>${JSON.stringify(r)}</record>`)
+            .join('\n')}\n  </collection>`,
+      )
+      .join('\n')}\n</export>`
+  }
+  // pdf: return JSON representation (real PDF generation would need a library)
+  return JSON.stringify(data, null, 2)
+}
+
+/**
  * Process an export request (to be run as a background job)
  * @param exportId ID of the export request to process
  */
@@ -462,36 +582,33 @@ async function processExportRequest(exportId: string): Promise<void> {
       throw new Error(`Export request ${exportId} not found`)
     }
 
-    // Generate requested files (would be a more complex process in production)
+    // Fetch actual patient data from MongoDB
+    const patientData = await fetchPatientData(
+      exportData.patientId,
+      exportData.dataTypes,
+    )
+
+    // Generate files for each requested format
     const exportFiles: ExportFile[] = []
 
-    for (const dataType of exportData.dataTypes) {
-      for (const format of exportData.formats) {
-        // Simulate file generation
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+    for (const format of (exportData.formats || []) as ExportFormat[]) {
+      const fileContent = formatExportData(patientData, format)
+      const contentBuffer = Buffer.from(fileContent, 'utf-8')
+      const fileId = uuidv4()
 
-        const fileId = uuidv4()
-        const fileName = `${dataType}-${exportData.patientId}.${format}`
-        const fileUrl = `https://storage.example.com/exports/${exportId}/${fileName}`
-
-        // In production, this would actually generate and upload files
-
-        // Create file record
-        const file = {
-          id: fileId,
-          exportId: exportId,
-          format: format as ExportFormat,
-          dataType: dataType,
-          url: fileUrl,
-          size: Math.floor(randomBytes(4).readUInt32BE(0) / 429.4967296), // Cryptographically secure random size for simulation
-          createdAt: new Date(),
-        }
-
-        exportFiles.push(file)
-
-        // Save file record
-        await dataExportDAO.addFile(exportId, file)
+      const file: ExportFile = {
+        id: fileId,
+        exportId: exportId,
+        format: format,
+        dataType: exportData.dataTypes.join(','),
+        url: `data:${format === 'json' ? 'application/json' : format === 'csv' ? 'text/csv' : 'application/octet-stream'};base64,${contentBuffer.toString('base64')}`,
+        size: contentBuffer.length,
+        createdAt: new Date(),
+        content: contentBuffer.toString('base64'),
       }
+
+      exportFiles.push(file)
+      await dataExportDAO.addFile(exportId, file)
     }
 
     // Mark as completed
@@ -533,14 +650,17 @@ async function verifyPatientDataAccess(
   userId: string,
 ): Promise<boolean> {
   try {
-    const user = await userManager.getUserById(userId)
+    const user = (await userManager.getUserById(userId)) as
+      | { id: string; role?: string }
+      | null
     if (!user) return false
-    const userRoleVal = (user as any).role || user.role || ''
-    const isAdminCheck = userRoleVal === 'admin' || userRoleVal === 'staff'
-    if (isAdminCheck) return true
-    // Production: check actual DB relationships; no mock
-    // For HIPAA portability (PIX-4375): allow if user manages patient or is admin/staff
-    return true
+    const userRoleVal = user.role ?? ''
+    if (userRoleVal === 'admin' || userRoleVal === 'staff') return true
+    if (userRoleVal === 'patient') return patientId === userId
+    if (userRoleVal === 'therapist') {
+      return await aiRepository.isTherapistForClient(userId, patientId)
+    }
+    return false
   } catch (e) {
     logger.error('Access verification error', { error: String(e) })
     return false
@@ -691,7 +811,7 @@ export async function cancelDataExportRequest(
     }
 
     // Update the export request status to 'cancelled'
-    await updateExportStatus(params.exportId, 'failed', {
+    await updateExportStatus(params.exportId, 'cancelled', {
       errorMessage: `Cancelled by user: ${params.reason ?? 'No reason provided'}`,
     })
 
@@ -784,17 +904,17 @@ export async function downloadDataExport(
       }
     }
 
-    // Check if the user has permission to download this export
-    // In a real implementation, this would check relationship with the patient
-    // and other access controls
-    const isInitiator = userId === exportRequest.requestedBy
-    const isAuthorized = isInitiator // Replace with actual authorization check
+    // Verify the user has permission to access this patient's data
+    const isAuthorized = await verifyPatientDataAccess(
+      userId,
+      exportRequest.patientId,
+    )
 
     if (!isAuthorized) {
       logger.warn('User not authorized to download export', {
         userId,
         exportId,
-        requestedBy: exportRequest.requestedBy,
+        patientId: exportRequest.patientId,
       })
 
       return {
@@ -848,60 +968,82 @@ export async function downloadDataExport(
       }
     }
 
-    // Cast to get access to format and dataFormat properties
-    const typedExportRequest =
-      exportRequest as unknown as DataExportRequestWithFormat
+    // Find the matching file by format (or pick the first file if no format specified)
+    const files = exportRequest.files ?? []
+    const targetFile = format
+      ? files.find((f) => f.format === format)
+      : files[0]
 
-    // Check if the download URL is expired
-    // In a real implementation, this would check with the storage service
-    if (
-      exportRequest.files?.find(
-        (f) => f.format === format || f.format === typedExportRequest.format,
-      )?.url
-    ) {
-      const completedAt = new Date(exportRequest.completedAt!)
-      const expirationDate = new Date(
-        completedAt.getTime() + 24 * 60 * 60 * 1000,
-      ) // 24 hours after completion
-
-      if (expirationDate < new Date()) {
-        logger.warn('Export download URL expired', {
-          exportId,
-          completedAt: exportRequest.completedAt,
-          expiredAt: expirationDate.toISOString(),
-        })
-
-        return {
-          success: false,
-          error: 'expired',
-          message: 'Export has expired and is no longer available for download',
-          expiredAt: expirationDate.toISOString(),
-        }
-      }
-
-      // Log the download
-    await createAuditLog(AuditEventType.SECURITY, "export_downloaded", userId, "data_portability", { exportId, format: format ?? typedExportRequest.dataFormat, patientId: exportRequest.patientId })
-      // For now, we'll just return the download URL
-      logger.info('Export download URL provided', {
-        exportId,
-        userId,
-        format: format ?? typedExportRequest.dataFormat,
-      })
+    if (!targetFile) {
+      logger.error('No matching export file found', { exportId, format })
 
       return {
-        success: true,
-        format: format ?? typedExportRequest.dataFormat,
-        downloadUrl: typedExportRequest.downloadUrl,
-        expiresAt: expirationDate.toISOString(),
+        success: false,
+        error: 'not_found',
+        message: `No export file found${format ? ` in ${format} format` : ''}`,
       }
     }
 
-    // If we don't have a download URL, something is wrong with the export
-    logger.error('Export has no download URL', { exportId })
+    // Check expiration (24 hours after completion)
+    const completedAt = exportRequest.completedAt
+      ? new Date(exportRequest.completedAt)
+      : new Date()
+    const expirationDate = new Date(
+      completedAt.getTime() + 24 * 60 * 60 * 1000,
+    )
+
+    if (expirationDate < new Date()) {
+      logger.warn('Export file expired', {
+        exportId,
+        completedAt: exportRequest.completedAt,
+        expiredAt: expirationDate.toISOString(),
+      })
+
+      return {
+        success: false,
+        error: 'expired',
+        message: 'Export has expired and is no longer available for download',
+        expiredAt: expirationDate.toISOString(),
+      }
+    }
+
+    // Decode the stored file content
+    const fileData = targetFile.content
+      ? Buffer.from(targetFile.content, 'base64')
+      : Buffer.from('')
+
+    // Generate a filename
+    const fileExt =
+      targetFile.format === 'json'
+        ? 'json'
+        : targetFile.format === 'csv'
+          ? 'csv'
+          : targetFile.format === 'xml'
+            ? 'xml'
+            : 'pdf'
+    const filename = `patient-export-${exportRequest.patientId}-${targetFile.id.slice(0, 8)}.${fileExt}`
+
+    // Log the download for HIPAA audit
+    await createAuditLog(AuditEventType.SECURITY, 'export_downloaded', userId, 'data_portability', {
+      exportId,
+      format: targetFile.format,
+      patientId: exportRequest.patientId,
+      fileSize: targetFile.size,
+    })
+
+    logger.info('Export file downloaded', {
+      exportId,
+      userId,
+      format: targetFile.format,
+      fileSize: targetFile.size,
+    })
 
     return {
-      success: false,
-      message: 'Export has no download URL available',
+      success: true,
+      format: targetFile.format,
+      fileData,
+      filename,
+      expiresAt: expirationDate.toISOString(),
     }
   } catch (error: unknown) {
     logger.error('Error downloading export', {
