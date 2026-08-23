@@ -42,3 +42,18 @@ export {
   type PractitionerScheduleParams,
   type ScheduleSummary,
 } from './scheduling-service'
+
+export {
+  ClaimsService,
+  claimsService,
+  type ClaimStatus,
+  type ClaimUse,
+  type CreateClaimInput,
+  type CreateClaimItemInput,
+  type CreateClaimDiagnosisInput,
+  type CreateClaimProcedureInput,
+  type CreateClaimInsuranceInput,
+  type ClaimValidationResult,
+  type ClaimSummary,
+  type ClaimStatusTransition,
+} from './claims-service'
