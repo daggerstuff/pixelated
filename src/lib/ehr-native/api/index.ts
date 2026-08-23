@@ -196,10 +196,12 @@ export function sanitizeFhirId(id: string, label = 'ID'): string {
  * @returns The sanitized value.
  */
 export function sanitizeSearchParam(value: string, maxLength = 256): string {
-  return value
-    .replace(/[\x00-\x1f\x7f]/g, '')
-    .slice(0, maxLength)
-    .trim()
+  let result = ''
+  for (let i = 0; i < value.length; i++) {
+    const code = value.charCodeAt(i)
+    if (code > 0x1f && code !== 0x7f) result += value[i]
+  }
+  return result.slice(0, maxLength).trim()
 }
 
 /**

@@ -97,6 +97,7 @@ export const PATCH = withV1Contract(
         case 'no-show':
           appointment = await service.markNoShow(appointmentId)
           break
+        case undefined:
         default:
           appointment = await service.updateAppointment(
             appointmentId,
