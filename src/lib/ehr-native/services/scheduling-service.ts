@@ -415,25 +415,20 @@ export class SchedulingService {
     const dayStartStr = dayStart.toISOString()
     const dayEndStr = dayEnd.toISOString()
 
-    const appointments = await this.appointmentRepo.findByDateRange(
-      dayStartStr,
-      dayEndStr,
-      100,
-      0,
-    )
-
-    // Filter to this practitioner
-    const practitionerAppts = appointments.filter((appt) => {
-      return appt.participant?.some(
-        (p) => p.actor?.reference === `Practitioner/${safePractitionerId}`,
+    const appointments =
+      await this.appointmentRepo.findByDateRangeAndPractitioner(
+        dayStartStr,
+        dayEndStr,
+        safePractitionerId,
+        100,
+        0,
       )
-    })
 
     const byStatus: Record<string, number> = {}
     let firstStart: number | null = null
     let lastEnd: number | null = null
 
-    for (const appt of practitionerAppts) {
+    for (const appt of appointments) {
       byStatus[appt.status] = (byStatus[appt.status] ?? 0) + 1
       if (appt.start) {
         const s = Date.parse(appt.start)
@@ -447,7 +442,7 @@ export class SchedulingService {
 
     return {
       practitionerId: safePractitionerId,
-      totalAppointments: practitionerAppts.length,
+      totalAppointments: appointments.length,
       byStatus,
       firstAppointment:
         firstStart !== null ? new Date(firstStart).toISOString() : null,
