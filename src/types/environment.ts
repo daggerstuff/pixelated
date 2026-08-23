@@ -72,6 +72,13 @@ export interface AIEnvironmentVariables {
   readonly HUGGING_FACE_API_KEY?: ApiKey | undefined
   readonly AI_SERVICE_URL?: Url | undefined
   readonly AI_SERVICE_API_KEY?: ApiKey | undefined
+  readonly LLM_API_KEY?: ApiKey | undefined
+  readonly LLM_BASE_URL?: Url | undefined
+  readonly NEON_AI_GATEWAY_TOKEN?: ApiKey | undefined
+  readonly NEON_AI_GATEWAY_BASE_URL?: Url | undefined
+  readonly LLM_DEFAULT_MODEL?: string | undefined
+  readonly LLM_PRIMARY_MODEL?: string | undefined
+  readonly LLM_SECONDARY_MODEL?: string | undefined
 }
 
 /** Analytics and monitoring environment variables */

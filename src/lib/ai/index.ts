@@ -26,11 +26,12 @@ export type { CrisisDetectionResult } from './crisis/types'
 
 // Re-export common AI utilities
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { DEFAULT_LLM_MODEL } from './constants'
 export const aiLogger = createBuildSafeLogger('ai')
 
 // Default configurations
 export const AI_CONFIG = {
-  defaultModel: 'minimaxai/minimax-m2.7',
+  defaultModel: DEFAULT_LLM_MODEL,
   maxTokens: 2048,
   temperature: 0.7,
   timeout: 30000,

@@ -1,4 +1,5 @@
 import z from 'zod'
+import { DEFAULT_LLM_MODEL } from '../ai/constants'
 
 /**
  * Chat message schema with security validations
@@ -48,7 +49,7 @@ export const ChatMessageSchema = z.object({
  * AI completion request schema
  */
 export const CompletionRequestSchema = z.object({
-  model: z.string().min(1).default('minimaxai/minimax-m2.7'),
+  model: z.string().min(1).default(DEFAULT_LLM_MODEL),
   messages: z.array(ChatMessageSchema).min(1).max(100),
   temperature: z.number().min(0).max(2).default(0.7),
   max_tokens: z.number().min(1).max(4096).default(1024),
@@ -80,7 +81,7 @@ export const UsageStatsRequestSchema = z.object({
  */
 export const SentimentRequestSchema = z.object({
   text: z.string().min(1).max(5000),
-  model: z.string().default('minimaxai/minimax-m2.7').optional(),
+  model: z.string().default(DEFAULT_LLM_MODEL).optional(),
   includeReasoning: z.boolean().default(false).optional(),
 })
 
@@ -100,7 +101,7 @@ export const CrisisDetectionRequestSchema = z.object({
 export const ResponseGenerationRequestSchema = z.object({
   messages: z.array(ChatMessageSchema).min(1).max(100),
   userId: z.string().optional(),
-  model: z.string().default('minimaxai/minimax-m2.7').optional(),
+  model: z.string().default(DEFAULT_LLM_MODEL).optional(),
   includeAnalysis: z.boolean().default(false).optional(),
   safety: z
     .object({
