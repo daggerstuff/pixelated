@@ -1,5 +1,4 @@
 {
-  "model": "z-ai/glm-5.2",
   "reasoning_effort": "medium",
   "log_level": "warning",
   "auto_update": true,
