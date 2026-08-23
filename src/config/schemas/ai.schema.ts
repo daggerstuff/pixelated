@@ -12,6 +12,15 @@ export const aiEnvSchema = z.object({
   GOOGLE_API_KEY: z.string().optional(),
   REPLICATE_API_TOKEN: z.string().optional(),
 
+  // Neon AI Gateway (free during beta)
+  NEON_AI_GATEWAY_TOKEN: z.string().optional(),
+  NEON_AI_GATEWAY_BASE_URL: z.url().optional(),
+
+  // Default LLM model — env-configurable for Neon or any OpenAI-compatible provider
+  LLM_DEFAULT_MODEL: z.string().optional(),
+  LLM_PRIMARY_MODEL: z.string().optional(),
+  LLM_SECONDARY_MODEL: z.string().optional(),
+
   // Azure OpenAI
   AZURE_OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_ENDPOINT: z.url().optional(),
