@@ -404,3 +404,46 @@ export type FHIRHumanName = z.infer<typeof fhirHumanNameSchema>
 
 export const fhirExtensionListSchema = z.array(fhirExtensionSchema)
 export type FHIRExtensionList = z.infer<typeof fhirExtensionListSchema>
+
+// ---------------------------------------------------------------------------
+// FHIRBackboneElement — base for nested elements within resources
+// ---------------------------------------------------------------------------
+
+export const fhirBackboneElementSchema = z.object({
+  id: fhirStringSchema.optional(),
+  extension: fhirExtensionListSchema.optional(),
+  modifierExtension: fhirExtensionListSchema.optional(),
+})
+export type FHIRBackboneElement = z.infer<typeof fhirBackboneElementSchema>
+
+// ---------------------------------------------------------------------------
+// FHIRDomainResource — base for all FHIR domain resources
+// ---------------------------------------------------------------------------
+
+export const fhirDomainResourceSchema = z.object({
+  text: z
+    .object({
+      status: fhirNarrativeStatusSchema,
+      div: fhirStringSchema,
+    })
+    .optional(),
+  contained: z.array(z.record(z.unknown())).optional(),
+  extension: fhirExtensionListSchema.optional(),
+  modifierExtension: fhirExtensionListSchema.optional(),
+})
+export type FHIRDomainResource = z.infer<typeof fhirDomainResourceSchema>
+
+// ---------------------------------------------------------------------------
+// FHIRAttachment — for binary attachments (documents, images, etc.)
+// ---------------------------------------------------------------------------
+
+export const fhirAttachmentSchema = z.object({
+  contentType: fhirStringSchema.optional(),
+  language: fhirStringSchema.optional(),
+  data: fhirStringSchema.optional(),
+  url: fhirUrlSchema.optional(),
+  size: fhirIntegerSchema.optional(),
+  title: fhirStringSchema.optional(),
+  hash: fhirStringSchema.optional(),
+})
+export type FHIRAttachment = z.infer<typeof fhirAttachmentSchema>
