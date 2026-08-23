@@ -161,6 +161,26 @@ export class AppointmentRepository extends BaseRepository<Appointment> {
   }
 
   /**
+   * Finds all appointments for a specific practitioner (no time constraint).
+   */
+  async findByPractitioner(
+    practitionerId: string,
+    limit = 50,
+    offset = 0,
+  ): Promise<Appointment[]> {
+    return this.withRLS(async (client) => {
+      const res = await client.query<{ fhir_resource: Appointment }>(
+        `SELECT fhir_resource FROM ehr_appointment
+         WHERE practitioner_id = $1
+         ORDER BY start_time DESC NULLS LAST
+         LIMIT $2 OFFSET $3`,
+        [practitionerId, limit, offset],
+      )
+      return res.rows.map((r) => r.fhir_resource)
+    })
+  }
+
+  /**
    * Finds appointments for a specific patient.
    */
   override async findByPatient(

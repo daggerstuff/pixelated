@@ -32,3 +32,13 @@ export {
   type CreateNoteFromTemplateInput,
   type NoteTemplateValidationResult,
 } from './note-template-service'
+
+export {
+  SchedulingService,
+  type CreateAppointmentInput,
+  type UpdateAppointmentInput,
+  type ScheduleSearchParams,
+  type DateRangeParams,
+  type PractitionerScheduleParams,
+  type ScheduleSummary,
+} from './scheduling-service'
