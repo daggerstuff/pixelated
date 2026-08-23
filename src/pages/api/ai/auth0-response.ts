@@ -9,6 +9,7 @@ import type {
 } from '@/lib/ai/models/ai-types'
 import { ResponseGenerationService } from '@/lib/ai/services/response-generation'
 import { createLLMService } from '@/lib/ai/services/llm-provider'
+import { DEFAULT_LLM_MODEL, NEON_ENABLED_MODELS } from '@/lib/ai/constants'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { aiRepository } from '@/lib/db/ai'
@@ -110,9 +111,7 @@ export const GET: APIRoute = async ({ request }) => {
         status: 'active',
         authentication: 'required',
         supportedModels: [
-          'minimaxai/minimax-m2.7',
-          'gpt-4',
-          'claude-3',
+          ...NEON_ENABLED_MODELS,
         ],
         parameters: {
           required: ['messages or currentMessage'],
@@ -129,7 +128,7 @@ export const GET: APIRoute = async ({ request }) => {
           'audit logging',
           'token usage tracking',
         ],
-        defaultModel: 'minimaxai/minimax-m2.7',
+        defaultModel: DEFAULT_LLM_MODEL,
         maxTokens: 1024,
       }),
       {
@@ -236,7 +235,7 @@ export const POST: APIRoute = async ({ request }) => {
     })
 
     // Use the model from the request or the default
-    const modelId = model ?? 'minimaxai/minimax-m2.7'
+    const modelId = model ?? DEFAULT_LLM_MODEL
 
     // Create an adapter for the AI service
     const serviceAdapter: AIService = {
