@@ -189,11 +189,22 @@ export class TelehealthService {
 
       try {
         const created = await this.encounterRepo.create(encounterResource)
-        if (created) {
-          encounterId = (created as { id?: string }).id
+        const createdId = (created as Record<string, unknown> | null)?.['id'] as string | undefined
+        if (createdId) {
+          encounterId = createdId
         }
-      } catch {
-        // Encounter creation failure — record but continue with session
+      } catch (err) {
+        await this.auditService.logTelehealthAccess(
+          EHRAuditAction.START_TELEHEALTH_SESSION,
+          {
+            userId,
+            status: 'failure',
+            errorMessage: `Encounter creation failed: ${err instanceof Error ? err.message : 'unknown error'}`,
+            sessionId: 'pending',
+            patientId,
+            practitionerId,
+          },
+        )
       }
     }
 
@@ -275,24 +286,25 @@ export class TelehealthService {
       joinedAt,
     }
 
-    // Audit join
+    const isPatient = input.role === 'patient'
+    const auditPatientId = isPatient ? participantId : undefined
+    const auditPractitionerId = isPatient ? undefined : participantId
+
     await this.auditService.logTelehealthAccess(
       EHRAuditAction.JOIN_TELEHEALTH_SESSION,
       {
         userId,
         status: 'success',
         sessionId,
-        patientId: participantId,
-        practitionerId: participantId,
+        patientId: auditPatientId,
+        practitionerId: auditPractitionerId,
       },
     )
 
-    // Return a session reflecting the join (in production, this would be
-    // persisted and retrieved from a session store)
     const session: TelehealthSession = {
       id: sessionId,
-      patientId: participantId,
-      practitionerId: participantId,
+      patientId: auditPatientId ?? '',
+      practitionerId: auditPractitionerId ?? '',
       providerType: 'webrtc',
       status: 'active',
       startedAt: joinedAt,
@@ -317,7 +329,7 @@ export class TelehealthService {
     input: EndSessionInput,
   ): Promise<TelehealthSession | null> {
     const sessionId = validateId(input.sessionId, 'sessionId')
-    const endedAt = validateIsoTimestamp(input.endedAt, 'endedAt')
+    validateIsoTimestamp(input.endedAt, 'endedAt')
 
     // Update FHIR Encounter to 'finished' if linked
     // In production, this would fetch the session from a store to get encounterId.
@@ -338,20 +350,7 @@ export class TelehealthService {
       },
     )
 
-    const session: TelehealthSession = {
-      id: sessionId,
-      patientId: '',
-      practitionerId: '',
-      providerType: 'webrtc',
-      status: 'ended',
-      startedAt: '',
-      endedAt,
-      recordingEnabled: false,
-      recordingConsent: false,
-      participants: [],
-    }
-
-    return session
+    return null
   }
 
   /**
@@ -499,19 +498,7 @@ export class TelehealthService {
       },
     )
 
-    const session: TelehealthSession = {
-      id: validatedSessionId,
-      patientId: '',
-      practitionerId: '',
-      providerType: 'webrtc',
-      status: 'active',
-      startedAt: '',
-      recordingEnabled: false,
-      recordingConsent: false,
-      participants: [],
-    }
-
-    return session
+    return null
   }
 
   /**

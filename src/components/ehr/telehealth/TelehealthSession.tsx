@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 
 import type { TelehealthProvider } from '@/lib/ehr-native/types';
 
@@ -21,6 +21,8 @@ export interface TelehealthSessionProps {
   zoomJoinUrl?: string;
   onSessionStart?: (provider: TelehealthProvider) => void;
   onSessionEnd?: () => void;
+  onStartRecording?: (consentGiven: boolean) => void;
+  onStopRecording?: () => void;
 }
 
 type SessionPhase = 'pre-check' | 'connecting' | 'active' | 'ended' | 'failed';
@@ -74,16 +76,28 @@ function openZoom(url: string): void {
 
 export function TelehealthSession({
   appointmentId,
-  patientId: _patientId,
-  practitionerId: _practitionerId,
+  patientId,
+  practitionerId,
   patientName,
   providerType = 'webrtc',
   zoomJoinUrl,
   onSessionStart,
   onSessionEnd,
+  onStartRecording,
+  onStopRecording,
 }: TelehealthSessionProps) {
   const [state, setState] = useState<SessionState>(createInitialSessionState);
   const localVideoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
+    };
+  }, []);
 
   const handleDeviceCheckComplete = useCallback(
     async (_result: ComponentDeviceCheckResult) => {
@@ -111,6 +125,7 @@ export function TelehealthSession({
             video: true,
             audio: true,
           });
+          streamRef.current = stream;
           if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
           }
@@ -151,10 +166,11 @@ export function TelehealthSession({
   );
 
   const handleEndSession = useCallback(() => {
-    // Stop local video stream
-    if (localVideoRef.current?.srcObject) {
-      const stream = localVideoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach((track) => track.stop());
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    if (localVideoRef.current) {
       localVideoRef.current.srcObject = null;
     }
     setState((prev) => ({ ...prev, phase: 'ended', isRecording: false }));
@@ -171,7 +187,8 @@ export function TelehealthSession({
       isRecording: true,
       showConsentGate: false,
     }));
-  }, []);
+    onStartRecording?.(true);
+  }, [onStartRecording]);
 
   const handleCancelRecording = useCallback(() => {
     setState((prev) => ({ ...prev, showConsentGate: false }));
@@ -179,7 +196,8 @@ export function TelehealthSession({
 
   const handleStopRecording = useCallback(() => {
     setState((prev) => ({ ...prev, isRecording: false }));
-  }, []);
+    onStopRecording?.();
+  }, [onStopRecording]);
 
   return (
     <div

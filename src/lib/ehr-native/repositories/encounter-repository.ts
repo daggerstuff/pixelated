@@ -34,10 +34,10 @@ export class EncounterRepository extends BaseRepository<Encounter> {
     const periodStart = validated.period?.start ?? null
     const periodEnd = validated.period?.end ?? null
     return this.withRLS(async (client) => {
-      const res = await client.query<{ fhir_resource: Encounter }>(
+      const res = await client.query<{ encounter_id: string; fhir_resource: Encounter }>(
         `INSERT INTO ehr_encounter (tenant_id, patient_id, practitioner_id, status, class, period_start, period_end, fhir_resource)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         RETURNING fhir_resource`,
+         RETURNING encounter_id, fhir_resource`,
         [
           this.rlsContext.tenantId,
           patientId,
@@ -49,7 +49,13 @@ export class EncounterRepository extends BaseRepository<Encounter> {
           JSON.stringify(validated),
         ],
       )
-      return res.rows[0].fhir_resource
+      const row = res.rows[0]
+      // Set the FHIR resource id from the DB-generated encounter_id
+      const resource = row.fhir_resource as Record<string, unknown>
+      if (resource && !resource['id']) {
+        resource['id'] = row.encounter_id
+      }
+      return row.fhir_resource
     })
   }
 
