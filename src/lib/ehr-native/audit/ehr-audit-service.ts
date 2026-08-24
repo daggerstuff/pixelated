@@ -202,7 +202,8 @@ export class EHRAuditService {
       action.startsWith('reschedule_') ||
       action.startsWith('submit_') ||
       action === EHRAuditAction.CHECK_IN_APPOINTMENT ||
-      action === EHRAuditAction.COMPLETE_APPOINTMENT
+      action === EHRAuditAction.COMPLETE_APPOINTMENT ||
+      action.startsWith('close_')
     )
       return EHRSeverity.UPDATE
     if (
@@ -475,6 +476,9 @@ export class EHRAuditService {
           permission: input.permission,
         },
       },
+      // Break-glass events are always HIGH severity — including failed
+      // attempts, which would otherwise be downgraded to FAILED_ACCESS.
+      EHRSeverity.BREAK_GLASS,
     )
   }
 

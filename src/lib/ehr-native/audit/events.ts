@@ -94,7 +94,8 @@ export const EHRAuditAction = {
   BREAK_GLASS_ACCESS: 'break_glass_access',
 } as const
 
-export type EHRAuditActionType = (typeof EHRAuditAction)[keyof typeof EHRAuditAction]
+export type EHRAuditActionType =
+  (typeof EHRAuditAction)[keyof typeof EHRAuditAction]
 
 // ---------------------------------------------------------------------------
 // EHR resource types
@@ -112,7 +113,8 @@ export const EHRResourceType = {
   COVERAGE: 'Coverage',
 } as const
 
-export type EHRResourceTypeValue = (typeof EHRResourceType)[keyof typeof EHRResourceType]
+export type EHRResourceTypeValue =
+  (typeof EHRResourceType)[keyof typeof EHRResourceType]
 
 // ---------------------------------------------------------------------------
 // Severity conventions for EHR events
@@ -195,16 +197,41 @@ export interface EHRAuditMetadata {
 export function ehrActionToEventType(
   action: EHRAuditActionType,
 ): AuditEventType {
+  // Exact appointment write actions are checked before the read-oriented
+  // prefixes so check_in/complete classify as updates consistently with
+  // defaultSeverity.
+  if (
+    action === EHRAuditAction.CHECK_IN_APPOINTMENT ||
+    action === EHRAuditAction.COMPLETE_APPOINTMENT
+  ) {
+    return AuditEventType.UPDATE
+  }
   if (action.startsWith('view_') || action.startsWith('check_')) {
     return AuditEventType.ACCESS
   }
-  if (action.startsWith('create_') || action.startsWith('book_') || action.startsWith('prescribe_')) {
+  if (
+    action.startsWith('create_') ||
+    action.startsWith('book_') ||
+    action.startsWith('prescribe_')
+  ) {
     return AuditEventType.CREATE
   }
-  if (action.startsWith('update_') || action.startsWith('amend_') || action.startsWith('sign_') || action.startsWith('reschedule_') || action.startsWith('submit_')) {
+  if (
+    action.startsWith('update_') ||
+    action.startsWith('amend_') ||
+    action.startsWith('sign_') ||
+    action.startsWith('reschedule_') ||
+    action.startsWith('submit_') ||
+    action.startsWith('close_')
+  ) {
     return AuditEventType.UPDATE
   }
-  if (action.startsWith('cancel_') || action.startsWith('deactivate_') || action.startsWith('revoke_') || action.startsWith('no_show')) {
+  if (
+    action.startsWith('cancel_') ||
+    action.startsWith('deactivate_') ||
+    action.startsWith('revoke_') ||
+    action.startsWith('no_show')
+  ) {
     return AuditEventType.DELETE
   }
   if (action.startsWith('hie_') || action.startsWith('clearinghouse_')) {
