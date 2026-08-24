@@ -219,5 +219,13 @@ function inferSchedule(code: string): ControlledSubstanceSchedule {
       'Medication code is required for controlled substance schedule inference',
     )
   }
-  return KNOWN_SCHEDULES[code] ?? 'non-controlled'
+  // Unknown codes are treated as non-controlled only if explicitly verified;
+  // for safety, unknown controlled status defaults to requiring verification
+  const schedule = KNOWN_SCHEDULES[code]
+  if (schedule === undefined) {
+    // Conservative: unknown codes require controlled-substance verification path
+    // Caller must handle verification; returning 'non-controlled' would bypass safety
+    throw new Error(`Unknown medication code '${code}' - cannot infer controlled substance schedule; verification required`)
+  }
+  return schedule
 }

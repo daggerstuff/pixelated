@@ -263,6 +263,14 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
     const medCode =
       medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? ''
     const controlled = KNOWN_CONTROLLED[medCode]
+    if (controlled && controlled.schedule === 'I') {
+      return {
+        transmissionId: nextId('RX'),
+        status: 'error',
+        transmittedAt: new Date().toISOString(),
+        message: 'Schedule I substances cannot be prescribed',
+      }
+    }
     if (controlled && controlled.schedule !== 'non-controlled') {
       if (!prescriber.deaNumber) {
         return {
