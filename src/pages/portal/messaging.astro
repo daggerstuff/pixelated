@@ -1,0 +1,12 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import { PortalShell, MessagingWidget } from '@/components/ehr/portal'
+
+export const prerender = false
+---
+
+<Layout title="Messaging — Client Portal" description="Secure messaging with your care team">
+  <PortalShell activeFeature="messaging" client:load>
+    <MessagingWidget client:load />
+  </PortalShell>
+</Layout>
