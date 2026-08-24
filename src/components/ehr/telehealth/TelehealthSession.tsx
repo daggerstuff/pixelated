@@ -53,17 +53,18 @@ async function tryWebRTC(): Promise<boolean> {
   if (typeof RTCPeerConnection === 'undefined') {
     return false;
   }
+  let pc: RTCPeerConnection | undefined;
   try {
-    const pc = new RTCPeerConnection({
+    pc = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
     });
-    // Create a minimal offer to verify the API works
     const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
     await pc.setLocalDescription(offer);
-    pc.close();
     return true;
   } catch {
     return false;
+  } finally {
+    pc?.close();
   }
 }
 

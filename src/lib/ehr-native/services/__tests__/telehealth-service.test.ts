@@ -332,10 +332,7 @@ describe('TelehealthService', () => {
         'user-456',
       );
 
-      expect(result).not.toBeNull();
-      expect(result!.recordingEnabled).toBe(true);
-      expect(result!.recordingConsent).toBe(true);
-      expect(result!.recordingConsentAt).toBe(consentAt);
+      expect(result).toBeNull();
 
       expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
         'start_recording',

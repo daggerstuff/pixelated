@@ -190,9 +190,21 @@ export class TelehealthService {
       try {
         const created = await this.encounterRepo.create(encounterResource)
         const createdId = (created as Record<string, unknown> | null)?.['id'] as string | undefined
-        if (createdId) {
-          encounterId = createdId
+        if (!createdId) {
+          await this.auditService.logTelehealthAccess(
+            EHRAuditAction.START_TELEHEALTH_SESSION,
+            {
+              userId,
+              status: 'failure',
+              errorMessage: 'Encounter creation returned no ID',
+              sessionId: 'pending',
+              patientId,
+              practitionerId,
+            },
+          )
+          return null
         }
+        encounterId = createdId
       } catch (err) {
         await this.auditService.logTelehealthAccess(
           EHRAuditAction.START_TELEHEALTH_SESSION,
@@ -451,20 +463,8 @@ export class TelehealthService {
       },
     )
 
-    const session: TelehealthSession = {
-      id: sessionId,
-      patientId,
-      practitionerId,
-      providerType: 'webrtc',
-      status: 'active',
-      startedAt: consentAt,
-      recordingEnabled: true,
-      recordingConsent: true,
-      recordingConsentAt: consentAt,
-      participants: [],
-    }
-
-    return session
+    // No session store wired — cannot return a valid session.
+    return null
   }
 
   /**
