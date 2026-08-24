@@ -173,10 +173,10 @@ describe('PatientService', () => {
 
   describe('searchPatients', () => {
     it('delegates to repository search with pagination', async () => {
-      mockPatientRepo.findActive.mockResolvedValue([validPatient])
-      const result = await service.searchPatients({ name: 'Doe', limit: 10, offset: 0 })
+      mockPatientRepo.searchByName.mockResolvedValue([validPatient])
+      const result = await service.searchPatients({ nameQuery: 'Doe', limit: 10, offset: 0 })
       expect(result).toEqual([validPatient])
-      expect(mockPatientRepo.findActive).toHaveBeenCalled()
+      expect(mockPatientRepo.searchByName).toHaveBeenCalledWith('Doe', 10, 0)
     })
   })
 
