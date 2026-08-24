@@ -323,15 +323,6 @@ export class TelehealthService {
     const sessionId = validateId(input.sessionId, 'sessionId')
     validateIsoTimestamp(input.endedAt, 'endedAt')
 
-    // Update FHIR Encounter to 'finished' if linked
-    // In production, this would fetch the session from a store to get encounterId.
-    // The encounter update is best-effort — session end proceeds regardless.
-    try {
-      // Encounter update would happen here in full implementation
-    } catch {
-      // Best-effort encounter update
-    }
-
     // Audit session end
     await this.auditService.logTelehealthAccess(
       EHRAuditAction.END_TELEHEALTH_SESSION,
