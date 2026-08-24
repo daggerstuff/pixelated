@@ -34,9 +34,14 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
   private trackingCounter = 0
 
   /** In-memory store of submitted claims keyed by tracking ID. */
-  private readonly submittedClaims = new Map<string, { submittedAt: string; claimId: string }>()
+  private readonly submittedClaims = new Map<
+    string,
+    { submittedAt: string; claimId: string }
+  >()
 
-  async verifyEligibility(request: EligibilityRequest): Promise<EligibilityResponse> {
+  async verifyEligibility(
+    request: EligibilityRequest,
+  ): Promise<EligibilityResponse> {
     if (!request.memberId) {
       return {
         eligible: false,
@@ -60,7 +65,9 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
     }
   }
 
-  async submitClaim(request: ClaimSubmissionRequest): Promise<ClaimSubmissionResponse> {
+  async submitClaim(
+    request: ClaimSubmissionRequest,
+  ): Promise<ClaimSubmissionResponse> {
     if (request.claim.status !== 'active') {
       return {
         accepted: false,
@@ -100,7 +107,9 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
     }
   }
 
-  async checkClaimStatus(request: ClaimStatusRequest): Promise<ClaimStatusResponse> {
+  async checkClaimStatus(
+    request: ClaimStatusRequest,
+  ): Promise<ClaimStatusResponse> {
     const record = this.submittedClaims.get(request.trackingId)
     if (!record) {
       return {
@@ -142,7 +151,9 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
       updatedAt: new Date().toISOString(),
       paidAmount,
       patientResponsibility,
-      messages: [`Status checked via stub adapter (${minutes.toFixed(1)} min since submission)`],
+      messages: [
+        `Status checked via stub adapter (${minutes.toFixed(1)} min since submission)`,
+      ],
     }
   }
 
@@ -152,15 +163,20 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
     // trackingId|payerClaimId|patientId|billedAmount|paidAmount|patientResponsibility|adjustmentCode|adjustmentReason|status
     const lines = rawRemittance.trim().split('\n')
     if (lines.length < 2) {
-      throw new Error('Remittance advice must have a header line and at least one claim line')
+      throw new Error(
+        'Remittance advice must have a header line and at least one claim line',
+      )
     }
 
     const headerParts = lines[0].split('|')
     if (headerParts.length < 5) {
-      throw new Error('Remittance header must have: payerId|payerName|adviceNumber|remittanceDate|totalPaid')
+      throw new Error(
+        'Remittance header must have: payerId|payerName|adviceNumber|remittanceDate|totalPaid',
+      )
     }
 
-    const [payerId, payerName, adviceNumber, remittanceDate, totalPaidStr] = headerParts
+    const [payerId, payerName, adviceNumber, remittanceDate, totalPaidStr] =
+      headerParts
 
     const lines_data: RemittanceAdvice['lines'] = []
     for (let i = 1; i < lines.length; i++) {
@@ -215,7 +231,9 @@ const ADJUDICATION_STATUSES: ReadonlySet<string> = new Set([
  * Type guard validating a raw remittance status string against the
  * ClaimAdjudicationStatus union before it is trusted downstream.
  */
-function isClaimAdjudicationStatus(value: string): value is ClaimAdjudicationStatus {
+function isClaimAdjudicationStatus(
+  value: string,
+): value is ClaimAdjudicationStatus {
   return ADJUDICATION_STATUSES.has(value)
 }
 
