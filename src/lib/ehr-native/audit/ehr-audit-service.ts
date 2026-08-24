@@ -110,6 +110,15 @@ export interface BreakGlassAuditInput extends EHRAuditInput {
   permission: string
 }
 
+/** Input for telehealth-related audit events (F1.12). */
+export interface TelehealthAuditInput extends EHRAuditInput {
+  sessionId: string
+  patientId?: string
+  practitionerId?: string
+  encounterId?: string
+  providerType?: 'webrtc' | 'zoom'
+}
+
 // ---------------------------------------------------------------------------
 // EHRAuditService
 // ---------------------------------------------------------------------------
@@ -484,6 +493,40 @@ export class EHRAuditService {
       // Break-glass events are always HIGH severity — including failed
       // attempts, which would otherwise be downgraded to FAILED_ACCESS.
       EHRSeverity.BREAK_GLASS,
+    )
+  }
+
+  // -------------------------------------------------------------------------
+  // Telehealth audit builders (F1.12)
+  // -------------------------------------------------------------------------
+
+  async logTelehealthAccess(
+    action:
+      | typeof EHRAuditAction.START_TELEHEALTH_SESSION
+      | typeof EHRAuditAction.JOIN_TELEHEALTH_SESSION
+      | typeof EHRAuditAction.END_TELEHEALTH_SESSION
+      | typeof EHRAuditAction.START_RECORDING
+      | typeof EHRAuditAction.STOP_RECORDING
+      | typeof EHRAuditAction.CHECK_DEVICES,
+    input: TelehealthAuditInput,
+  ): Promise<string> {
+    return this.log(
+      action,
+      EHRResourceType.TELEHEALTH_SESSION,
+      input.sessionId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          sessionId: input.sessionId,
+          patientId: input.patientId,
+          practitionerId: input.practitionerId,
+          encounterId: input.encounterId,
+          providerType: input.providerType,
+          resourceType: EHRResourceType.TELEHEALTH_SESSION,
+          resourceId: input.sessionId,
+        },
+      },
     )
   }
 

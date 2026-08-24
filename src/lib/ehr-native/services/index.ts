@@ -15,6 +15,7 @@
  * - PortalMessagingService (F1.11) — secure patient messaging
  * - PortalHomeworkService (F1.11) — therapy homework assignments
  * - PortalStatementService (F1.11) — patient financial statements
+ * - TelehealthService (F1.12) — native telehealth sessions
  */
 
 export {
@@ -86,3 +87,22 @@ export {
   type StatementSearchParams,
   type StatementDownload,
 } from './portal-statement-service'
+
+export {
+  TelehealthService,
+  type StartRecordingInput,
+  type EndSessionInput,
+} from './telehealth-service'
+
+export type {
+  TelehealthSession,
+  StartSessionInput,
+  JoinSessionInput,
+  DeviceCheckResult,
+  WebRTCConfig,
+  IceServer,
+  TelehealthProvider,
+  TelehealthSessionStatus,
+  RecordingConsent,
+  SessionParticipant,
+} from '../types'

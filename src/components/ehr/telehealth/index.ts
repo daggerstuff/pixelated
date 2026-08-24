@@ -5,4 +5,6 @@
  * WebRTC-first, Zoom fallback. No separate login required.
  */
 
-export {}
+export { TelehealthSession, type TelehealthSessionProps } from './TelehealthSession';
+export { PreCallCheck, type PreCallCheckProps, type DeviceCheckResult } from './PreCallCheck';
+export { RecordingConsentGate, type RecordingConsentGateProps } from './RecordingConsentGate';
