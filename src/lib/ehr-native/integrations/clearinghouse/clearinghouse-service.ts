@@ -40,7 +40,9 @@ export class ClearinghouseService {
    * @param request - Eligibility verification parameters
    * @returns Eligibility response with coverage details
    */
-  async verifyEligibility(request: EligibilityRequest): Promise<EligibilityResponse> {
+  async verifyEligibility(
+    request: EligibilityRequest,
+  ): Promise<EligibilityResponse> {
     return this.adapter.verifyEligibility(request)
   }
 
@@ -52,10 +54,10 @@ export class ClearinghouseService {
    * clearinghouse). If the clearinghouse rejects the claim, the claim
    * remains in "active" status locally — only the submission failed.
    *
-   * @param claim - The draft claim to prepare and submit
-   * @param payerId - Optional payer routing override
-   * @returns Prepared claim and submission response with tracking ID
-   */
+    * @param claim - The draft claim to prepare and submit
+    * @param payerId - Optional payer routing override
+    * @returns Prepared claim and submission response with tracking ID
+    */
   async prepareAndSubmit(
     claim: Claim,
     payerId?: string,
@@ -118,7 +120,10 @@ export class ClearinghouseService {
    * @param line - The remittance line item with adjudication results
    * @returns Updated claim, or the original claim if no transition applies
    */
-  applyRemittanceLine(claim: Claim, line: RemittanceAdvice['lines'][number]): Claim {
+  applyRemittanceLine(
+    claim: Claim,
+    line: RemittanceAdvice['lines'][number],
+  ): Claim {
     // Remittance statuses map to local claim status transitions.
     // The local Claim FHIR resource only supports: active, cancelled,
     // draft, entered-in-error. Adjudication results are informational
