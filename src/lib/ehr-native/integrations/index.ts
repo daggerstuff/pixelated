@@ -11,4 +11,4 @@
  * @see docs/adr/ADR-004-eprescribing-vendor.md
  */
 
-export * from './e-prescribing'
+export * from './hie'
