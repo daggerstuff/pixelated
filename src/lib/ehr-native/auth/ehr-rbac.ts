@@ -163,12 +163,16 @@ export async function verifyPatientConsent(
  * @param role - The clinical role of the requesting user.
  * @param permission - The permission being requested.
  * @param patientId - The patient whose data is being accessed (optional for non-patient operations).
+ * @param tenantId - Optional tenant identifier for multi-tenant consent lookup.
+ * @param stateCode - Optional state code for jurisdiction-aware consent rules.
  * @returns A detailed permission check result.
  */
 export async function checkPermission(
   role: ClinicalRole,
   permission: EHRPermission,
   patientId?: string,
+  tenantId?: string,
+  stateCode?: string,
 ): Promise<EHRPermissionCheckResult> {
   // Step 1: Role-based permission check
   if (!roleHasPermission(role, permission)) {
@@ -190,7 +194,12 @@ export async function checkPermission(
   let consentVerified: boolean | null = null
 
   if (patientId !== undefined) {
-    consentVerified = await verifyPatientConsent(patientId, permission)
+    consentVerified = await verifyPatientConsent(
+      patientId,
+      permission,
+      tenantId,
+      stateCode,
+    )
 
     if (consentVerified === false) {
       logger.debug('Permission denied by consent check', {
@@ -394,6 +403,8 @@ export async function activateBreakGlass(
  * @param permission - The permission being requested.
  * @param patientId - The patient whose data is being accessed.
  * @param breakGlassParams - Optional parameters for break-glass fallback.
+ * @param tenantId - Optional tenant identifier for multi-tenant consent lookup.
+ * @param stateCode - Optional state code for jurisdiction-aware consent rules.
  * @returns A detailed permission check result, potentially with break-glass activated.
  */
 export async function checkPermissionWithBreakGlass(
@@ -404,8 +415,16 @@ export async function checkPermissionWithBreakGlass(
     BreakGlassParams,
     'role' | 'patientId' | 'permission'
   >,
+  tenantId?: string,
+  stateCode?: string,
 ): Promise<EHRPermissionCheckResult> {
-  const baseCheck = await checkPermission(role, permission, patientId)
+  const baseCheck = await checkPermission(
+    role,
+    permission,
+    patientId,
+    tenantId,
+    stateCode,
+  )
 
   if (baseCheck.granted) {
     return baseCheck
