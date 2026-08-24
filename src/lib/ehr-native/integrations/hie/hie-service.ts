@@ -97,15 +97,22 @@ export class HIEService {
   async discoverPatient(
     request: PatientDiscoveryRequest,
   ): Promise<PatientDiscoveryResult> {
+    const sanitizedFamily = sanitizeBoundedText(request.familyName) ?? ''
+    if (!sanitizedFamily || sanitizedFamily.trim().length === 0) {
+      throw new Error('Invalid familyName: must be a non-empty string')
+    }
     const sanitized: PatientDiscoveryRequest = {
       ...request,
       givenName: sanitizeBoundedText(request.givenName) ?? '',
-      familyName: sanitizeBoundedText(request.familyName) ?? '',
+      familyName: sanitizedFamily,
       dateOfBirth: sanitizeIsoDate(request.dateOfBirth, 'dateOfBirth') ?? '',
-      gender:
-        request.gender === undefined
-          ? undefined
-          : request.gender.trim().toLowerCase(),
+      gender: (() => {
+        if (request.gender === undefined) return undefined
+        const g = request.gender.trim().toLowerCase()
+        const allowed = new Set(['male','female','other','unknown','administrative'])
+        if (!allowed.has(g)) throw new Error(`Invalid gender: expected one of male, female, other, unknown, administrative` )
+        return g
+      })(),
     }
     return this.adapter.discoverPatient(sanitized)
   }

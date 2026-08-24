@@ -101,6 +101,9 @@ export class StubHIEAdapter implements HIEAdapter {
   async discoverPatient(
     request: PatientDiscoveryRequest,
   ): Promise<PatientDiscoveryResult> {
+    if (!request.familyName || request.familyName.trim().length === 0) {
+      throw new Error('Invalid familyName: must be non-empty')
+    }
     // Simulate finding patients with common names. Normalize the family
     // name so the generated registry key always satisfies HIE_ID_PATTERN
     // (spaces are not valid identifier characters).
@@ -269,6 +272,10 @@ export class StubHIEAdapter implements HIEAdapter {
 
     if (request.type) {
       orgs = orgs.filter((o) => o.type === request.type)
+    }
+    if (request.state) {
+      const stateLower = request.state.toLowerCase()
+      orgs = orgs.filter((o) => (o as any).state?.toLowerCase() === stateLower || o.id.toLowerCase().includes(stateLower))
     }
     if (request.name) {
       const lower = request.name.toLowerCase()
