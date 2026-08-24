@@ -190,27 +190,34 @@ function sanitizeZipCode(zipCode: string): string {
  * Infer controlled substance schedule from medication code.
  * Uses the same known controlled substance map as the stub adapter.
  */
+const KNOWN_SCHEDULES: Record<string, ControlledSubstanceSchedule> = {
+  '1043400': 'II',
+  '1043402': 'II',
+  '1043560': 'II',
+  '1043620': 'II',
+  '1043700': 'II',
+  '1043800': 'II',
+  '1043450': 'III',
+  '1043500': 'III',
+  '1043600': 'IV',
+  '1043650': 'IV',
+  '1043670': 'IV',
+  '1043705': 'IV',
+  '1043750': 'V',
+}
+
+/**
+ * Infer controlled substance schedule from medication code.
+ *
+ * A medication with NO code throws so the transmission path can never
+ * bypass controlled-substance safety checks on missing data. Codes outside
+ * the known formulary are treated as non-controlled.
+ */
 function inferSchedule(code: string): ControlledSubstanceSchedule {
-  const KNOWN: Record<string, string> = {
-    '1043400': 'II',
-    '1043402': 'II',
-    '1043560': 'II',
-    '1043620': 'II',
-    '1043700': 'II',
-    '1043800': 'II',
-    '1043450': 'III',
-    '1043500': 'III',
-    '1043600': 'IV',
-    '1043650': 'IV',
-    '1043670': 'IV',
-    '1043705': 'IV',
-    '1043750': 'V',
+  if (!code) {
+    throw new Error(
+      'Medication code is required for controlled substance schedule inference',
+    )
   }
-  const schedule = KNOWN[code]
-  if (schedule === 'I') return 'I'
-  if (schedule === 'II') return 'II'
-  if (schedule === 'III') return 'III'
-  if (schedule === 'IV') return 'IV'
-  if (schedule === 'V') return 'V'
-  return 'non-controlled'
+  return KNOWN_SCHEDULES[code] ?? 'non-controlled'
 }

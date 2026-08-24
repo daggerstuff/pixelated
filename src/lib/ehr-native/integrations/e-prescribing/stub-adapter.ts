@@ -338,7 +338,9 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
       }
     }
 
-    if (record.status === 'filled') {
+    // Recompute from transmittedAt: a stale stored status must not let an
+    // already-filled prescription be cancelled.
+    if (computeStatus(record.transmittedAt, new Date()) === 'filled') {
       return {
         transmissionId: request.transmissionId,
         cancelled: false,
