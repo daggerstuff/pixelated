@@ -219,11 +219,12 @@ export class StubHIEAdapter implements HIEAdapter {
     }
 
     const limit = request.limit ?? 50
+    const total = orgs.length
     orgs = orgs.slice(0, limit)
 
     return {
       organizations: orgs,
-      total: orgs.length,
+      total,
     }
   }
 }
