@@ -53,6 +53,7 @@
     "src/lib/research/services/*.ts",
     "src/lib/auth/index.ts",
     "src/lib/ehr-native/types/*.ts",
-    "src/lib/ehr-native/types/**/*.ts"
+    "src/lib/ehr-native/types/**/*.ts",
+    "src/lib/ehr-native/api/index.ts"
   ]
 }

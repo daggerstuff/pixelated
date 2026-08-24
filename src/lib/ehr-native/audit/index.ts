@@ -1,12 +1,41 @@
 /**
- * EHR Native — Audit Extension (F1.3)
+ * EHR Native — Audit Extension (F2.4)
  *
- * Extends the existing hash-chain audit log (src/lib/audit/) to cover
- * all EHR write events. Every EHR write path emits an audit event.
+ * Structured EHR audit logging that extends the existing SHA-256
+ * hash-chain audit trail (src/lib/audit/) with EHR-specific event
+ * types, actions, resource types, and typed builders.
+ *
+ * Every EHR write path and sensitive read path should emit an audit
+ * event through EHRAuditService, which persists events into the
+ * tamper-evident hash chain via AuditLogger.
  *
  * @see docs/adr/ADR-006-audit-chain-ehr.md
- * @see src/lib/audit/logger.ts for existing audit infrastructure
- * @see src/lib/audit/types.ts for AuditMetadata, AuditResource, DbAuditLog
+ * @see src/lib/audit/logger.ts for AuditLogger hash-chain persistence
+ * @see src/lib/audit/events.ts for base AuditEvent, AuditEventType, AuditSeverity
  */
 
-export {}
+export {
+  EHRAuditAction,
+  EHRResourceType,
+  EHRSeverity,
+  ehrActionToEventType,
+  type EHRAuditActionType,
+  type EHRResourceTypeValue,
+  type EHRAuditMetadata,
+} from './events'
+
+export {
+  EHRAuditService,
+  ehrAuditService,
+  type EHRAuditInput,
+  type PatientAuditInput,
+  type EncounterAuditInput,
+  type AppointmentAuditInput,
+  type ObservationAuditInput,
+  type NoteAuditInput,
+  type ClaimAuditInput,
+  type ConsentAuditInput,
+  type MedicationAuditInput,
+  type IntegrationAuditInput,
+  type BreakGlassAuditInput,
+} from './ehr-audit-service'
