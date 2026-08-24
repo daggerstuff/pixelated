@@ -110,24 +110,34 @@ const KNOWN_CONTROLLED: Record<string, { schedule: string; name: string }> = {
 }
 
 /** Known drug interactions (simplified). Each drug can have multiple interactions. */
-const KNOWN_INTERACTIONS: Record<string, { interactsWith: string; severity: DrugInteractionAlert['severity']; description: string }[]> = {
+const KNOWN_INTERACTIONS: Record<
+  string,
+  {
+    interactsWith: string
+    severity: DrugInteractionAlert['severity']
+    description: string
+  }[]
+> = {
   '1043620': [
     {
       interactsWith: '1043400',
       severity: 'major',
-      description: 'Fentanyl and oxycodone: increased risk of respiratory depression when combined.',
+      description:
+        'Fentanyl and oxycodone: increased risk of respiratory depression when combined.',
     },
     {
       interactsWith: '1043670',
       severity: 'major',
-      description: 'Fentanyl and diazepam: concomitant use increases risk of fatal respiratory depression.',
+      description:
+        'Fentanyl and diazepam: concomitant use increases risk of fatal respiratory depression.',
     },
   ],
   '1043400': [
     {
       interactsWith: '1043670',
       severity: 'major',
-      description: 'Oxycodone and diazepam: concomitant opioid and benzodiazepine use increases risk of fatal respiratory depression.',
+      description:
+        'Oxycodone and diazepam: concomitant opioid and benzodiazepine use increases risk of fatal respiratory depression.',
     },
   ],
 }
@@ -144,10 +154,12 @@ function computeStatus(transmittedAt: string, now: Date): PrescriptionStatus {
 }
 
 export class StubEPrescribingAdapter implements EPrescribingAdapter {
-  async searchPharmacies(request: PharmacySearchRequest): Promise<PharmacySearchResponse> {
+  async searchPharmacies(
+    request: PharmacySearchRequest,
+  ): Promise<PharmacySearchResponse> {
     const limit = request.limit ?? 10
-    let results = SIMULATED_PHARMACIES.filter(
-      (p) => p.zipCode.startsWith(request.zipCode.substring(0, 3)),
+    let results = SIMULATED_PHARMACIES.filter((p) =>
+      p.zipCode.startsWith(request.zipCode.substring(0, 3)),
     )
     if (request.type) {
       results = results.filter((p) => p.type === request.type)
@@ -158,7 +170,9 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
     }
   }
 
-  async checkControlledSubstance(request: ControlledSubstanceCheckRequest): Promise<ControlledSubstanceCheckResult> {
+  async checkControlledSubstance(
+    request: ControlledSubstanceCheckRequest,
+  ): Promise<ControlledSubstanceCheckResult> {
     const { medication } = request
 
     if (medication.schedule === 'non-controlled') {
@@ -208,7 +222,9 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
     }
   }
 
-  async checkDrugInteractions(request: DrugInteractionCheckRequest): Promise<DrugInteractionCheckResponse> {
+  async checkDrugInteractions(
+    request: DrugInteractionCheckRequest,
+  ): Promise<DrugInteractionCheckResponse> {
     const alerts: DrugInteractionAlert[] = []
     const { medication, activeMedications } = request
 
@@ -222,7 +238,10 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
             alerts.push({
               severity: interaction.severity,
               description: interaction.description,
-              interactingDrugs: [medication.name, active.medicationCodeableConcept?.text ?? 'unknown'],
+              interactingDrugs: [
+                medication.name,
+                active.medicationCodeableConcept?.text ?? 'unknown',
+              ],
             })
           }
         }
@@ -235,11 +254,14 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
     }
   }
 
-  async transmitPrescription(request: PrescriptionTransmissionRequest): Promise<PrescriptionTransmissionResponse> {
+  async transmitPrescription(
+    request: PrescriptionTransmissionRequest,
+  ): Promise<PrescriptionTransmissionResponse> {
     const { medicationRequest, pharmacy, prescriber } = request
 
     // Validate controlled substance requirements
-    const medCode = medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? ''
+    const medCode =
+      medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? ''
     const controlled = KNOWN_CONTROLLED[medCode]
     if (controlled && controlled.schedule !== 'non-controlled') {
       if (!prescriber.deaNumber) {
@@ -254,7 +276,8 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
 
     const transmissionId = nextId('RX')
     const transmittedAt = new Date().toISOString()
-    const medName = medicationRequest.medicationCodeableConcept?.text ?? 'Unknown medication'
+    const medName =
+      medicationRequest.medicationCodeableConcept?.text ?? 'Unknown medication'
 
     transmissions.set(transmissionId, {
       transmissionId,
@@ -272,7 +295,9 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
     }
   }
 
-  async checkPrescriptionStatus(request: PrescriptionStatusRequest): Promise<PrescriptionStatusResponse> {
+  async checkPrescriptionStatus(
+    request: PrescriptionStatusRequest,
+  ): Promise<PrescriptionStatusResponse> {
     const record = transmissions.get(request.transmissionId)
     if (!record) {
       return {
@@ -293,11 +318,16 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
       transmissionId: record.transmissionId,
       status,
       updatedAt: now.toISOString(),
-      message: status === 'filled' ? `Prescription filled at ${record.ncpdpId}` : undefined,
+      message:
+        status === 'filled'
+          ? `Prescription filled at ${record.ncpdpId}`
+          : undefined,
     }
   }
 
-  async cancelPrescription(request: PrescriptionCancelRequest): Promise<PrescriptionCancelResponse> {
+  async cancelPrescription(
+    request: PrescriptionCancelRequest,
+  ): Promise<PrescriptionCancelResponse> {
     const record = transmissions.get(request.transmissionId)
     if (!record) {
       return {
@@ -317,7 +347,10 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
       }
     }
 
-    transmissions.set(request.transmissionId, { ...record, status: 'cancelled' })
+    transmissions.set(request.transmissionId, {
+      ...record,
+      status: 'cancelled',
+    })
 
     return {
       transmissionId: request.transmissionId,

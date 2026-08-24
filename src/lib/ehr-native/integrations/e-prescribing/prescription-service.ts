@@ -32,8 +32,16 @@ export class PrescriptionService {
   /**
    * Search for pharmacies near a ZIP code.
    */
-  async searchPharmacies(zipCode: string, limit?: number, type?: PharmacySearchRequest['type']): Promise<PharmacySearchResponse> {
-    return this.adapter.searchPharmacies({ zipCode, limit, type })
+  async searchPharmacies(
+    zipCode: string,
+    limit?: number,
+    type?: PharmacySearchRequest['type'],
+  ): Promise<PharmacySearchResponse> {
+    return this.adapter.searchPharmacies({
+      zipCode: sanitizeZipCode(zipCode),
+      limit,
+      type,
+    })
   }
 
   /**
@@ -82,10 +90,13 @@ export class PrescriptionService {
       readonly name: string
       readonly deaNumber?: string
     },
+    activeMedications: readonly MedicationRequest[] = [],
   ): Promise<PrescriptionTransmissionResponse> {
     // Extract medication info from MedicationRequest
-    const medCode = medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? ''
-    const medName = medicationRequest.medicationCodeableConcept?.text ?? 'Unknown medication'
+    const medCode =
+      medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? ''
+    const medName =
+      medicationRequest.medicationCodeableConcept?.text ?? 'Unknown medication'
 
     // Determine schedule from known controlled substances (simplified)
     const schedule: ControlledSubstanceSchedule = inferSchedule(medCode)
@@ -98,39 +109,39 @@ export class PrescriptionService {
       prescriberNPI: prescriber.npi,
     }
 
-    const patientId = medicationRequest.subject?.reference?.replace('Patient/', '') ?? ''
+    const patientId = medicationRequest.subject?.reference ?? ''
 
-    // Safety check: verify controlled substance requirements before transmission
-    if (schedule !== 'non-controlled') {
-      const csResult = await this.adapter.checkControlledSubstance({
-        medication,
-        patientId,
-        prescriberNPI: prescriber.npi,
-      })
-      if (!csResult.allowed) {
-        return {
-          transmissionId: '',
-          status: 'error' as const,
-          transmittedAt: new Date().toISOString(),
-          message: `Controlled substance check failed: ${csResult.reason ?? 'Not allowed'}`,
-        }
-      }
-    }
-
-    // Safety check: verify drug interactions before transmission
-    const interactionResult = await this.adapter.checkDrugInteractions({
+    // Safety gate: controlled substance eligibility must pass before any
+    // transmission (DEA/EPCS/PDMP requirements).
+    const controlledResult = await this.checkControlledSubstance(
       medication,
       patientId,
-      activeMedications: [],
-    })
-    const severeInteractions = interactionResult.alerts.filter(a => a.severity === 'critical' || a.severity === 'major')
-    if (severeInteractions.length > 0) {
-      return {
-        transmissionId: '',
-        status: 'error' as const,
-        transmittedAt: new Date().toISOString(),
-        message: `Drug interaction alert: ${severeInteractions[0].description}`,
-      }
+    )
+    if (!controlledResult.allowed) {
+      throw new Error(
+        `Transmission blocked by controlled substance check: ${
+          controlledResult.reason ?? 'not allowed'
+        }`,
+      )
+    }
+
+    // Safety gate: critical or major drug interactions prevent transmission;
+    // moderate/minor alerts are surfaced to reviewers but do not block.
+    const interactionResult = await this.checkDrugInteractions(
+      medication,
+      patientId,
+      activeMedications,
+    )
+    const blockingAlerts = interactionResult.alerts.filter(
+      (alert) => alert.severity === 'critical' || alert.severity === 'major',
+    )
+    if (blockingAlerts.length > 0) {
+      const details = blockingAlerts
+        .map((alert) => alert.description)
+        .join('; ')
+      throw new Error(
+        `Transmission blocked by ${blockingAlerts.length} major/critical drug interaction(s): ${details}`,
+      )
     }
 
     const request: PrescriptionTransmissionRequest = {
@@ -144,16 +155,35 @@ export class PrescriptionService {
   /**
    * Check the status of a transmitted prescription.
    */
-  async checkPrescriptionStatus(transmissionId: string): Promise<PrescriptionStatusResponse> {
+  async checkPrescriptionStatus(
+    transmissionId: string,
+  ): Promise<PrescriptionStatusResponse> {
     return this.adapter.checkPrescriptionStatus({ transmissionId })
   }
 
   /**
    * Cancel a transmitted prescription.
    */
-  async cancelPrescription(transmissionId: string, reason: string): Promise<PrescriptionCancelResponse> {
+  async cancelPrescription(
+    transmissionId: string,
+    reason: string,
+  ): Promise<PrescriptionCancelResponse> {
     return this.adapter.cancelPrescription({ transmissionId, reason })
   }
+}
+
+/**
+ * Validate a US ZIP code (5 digits or ZIP+4) before adapter search so
+ * unsanitized input never reaches FHIR/pharmacy lookup paths.
+ */
+function sanitizeZipCode(zipCode: string): string {
+  const trimmed = zipCode.trim()
+  if (!/^\d{5}(-\d{4})?$/.test(trimmed)) {
+    throw new Error(
+      'Invalid ZIP code: expected 5 digits or ZIP+4 (e.g. 45202 or 45202-1234)',
+    )
+  }
+  return trimmed
 }
 
 /**
@@ -162,10 +192,18 @@ export class PrescriptionService {
  */
 function inferSchedule(code: string): ControlledSubstanceSchedule {
   const KNOWN: Record<string, string> = {
-    '1043400': 'II', '1043402': 'II', '1043560': 'II', '1043620': 'II',
-    '1043700': 'II', '1043800': 'II',
-    '1043450': 'III', '1043500': 'III',
-    '1043600': 'IV', '1043650': 'IV', '1043670': 'IV', '1043705': 'IV',
+    '1043400': 'II',
+    '1043402': 'II',
+    '1043560': 'II',
+    '1043620': 'II',
+    '1043700': 'II',
+    '1043800': 'II',
+    '1043450': 'III',
+    '1043500': 'III',
+    '1043600': 'IV',
+    '1043650': 'IV',
+    '1043670': 'IV',
+    '1043705': 'IV',
     '1043750': 'V',
   }
   const schedule = KNOWN[code]
