@@ -157,10 +157,14 @@ export class EHRAuditService {
     resourceType: EHRResourceTypeValue | undefined,
     resourceId: string | undefined,
     input: EHRAuditInput,
-    overrideSeverity?: AuditSeverity,
+    severityOverride?: AuditSeverity,
   ): Promise<string> {
     const type = ehrActionToEventType(action)
-    const severity = overrideSeverity ?? (input.status === 'failure' ? EHRSeverity.FAILED_ACCESS : this.defaultSeverity(action))
+    const severity =
+      severityOverride ??
+      (input.status === 'failure'
+        ? EHRSeverity.FAILED_ACCESS
+        : this.defaultSeverity(action))
 
     const event: Omit<AuditEvent, 'id' | 'timestamp'> = {
       userId: input.userId,
@@ -183,13 +187,34 @@ export class EHRAuditService {
    * Determine default severity for a successful action.
    */
   private defaultSeverity(action: EHRAuditActionType): AuditSeverity {
-    if (action.startsWith('check_in_') || action.startsWith('complete_')) return EHRSeverity.UPDATE
-    if (action.startsWith('view_') || action.startsWith('check_')) return EHRSeverity.READ
-    if (action.startsWith('create_') || action.startsWith('book_') || action.startsWith('prescribe_')) return EHRSeverity.CREATE
-    if (action.startsWith('update_') || action.startsWith('amend_') || action.startsWith('sign_') || action.startsWith('reschedule_') || action.startsWith('submit_')) return EHRSeverity.UPDATE
-    if (action.startsWith('cancel_') || action.startsWith('deactivate_') || action.startsWith('revoke_') || action.startsWith('no_show')) return EHRSeverity.DELETE
+    if (action.startsWith('view_') || action.startsWith('check_'))
+      return EHRSeverity.READ
+    if (
+      action.startsWith('create_') ||
+      action.startsWith('book_') ||
+      action.startsWith('prescribe_')
+    )
+      return EHRSeverity.CREATE
+    if (
+      action.startsWith('update_') ||
+      action.startsWith('amend_') ||
+      action.startsWith('sign_') ||
+      action.startsWith('reschedule_') ||
+      action.startsWith('submit_') ||
+      action === EHRAuditAction.CHECK_IN_APPOINTMENT ||
+      action === EHRAuditAction.COMPLETE_APPOINTMENT
+    )
+      return EHRSeverity.UPDATE
+    if (
+      action.startsWith('cancel_') ||
+      action.startsWith('deactivate_') ||
+      action.startsWith('revoke_') ||
+      action.startsWith('no_show')
+    )
+      return EHRSeverity.DELETE
     if (action.startsWith('break_glass')) return EHRSeverity.BREAK_GLASS
-    if (action.startsWith('hie_') || action.startsWith('clearinghouse_')) return EHRSeverity.INTEGRATION
+    if (action.startsWith('hie_') || action.startsWith('clearinghouse_'))
+      return EHRSeverity.INTEGRATION
     return EHRSeverity.READ
   }
 
@@ -198,7 +223,11 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logPatientAccess(
-    action: typeof EHRAuditAction.VIEW_PATIENT | typeof EHRAuditAction.CREATE_PATIENT | typeof EHRAuditAction.UPDATE_PATIENT | typeof EHRAuditAction.DEACTIVATE_PATIENT,
+    action:
+      | typeof EHRAuditAction.VIEW_PATIENT
+      | typeof EHRAuditAction.CREATE_PATIENT
+      | typeof EHRAuditAction.UPDATE_PATIENT
+      | typeof EHRAuditAction.DEACTIVATE_PATIENT,
     input: PatientAuditInput,
   ): Promise<string> {
     return this.log(action, EHRResourceType.PATIENT, input.patientId, {
@@ -217,7 +246,11 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logEncounterAccess(
-    action: typeof EHRAuditAction.VIEW_ENCOUNTER | typeof EHRAuditAction.CREATE_ENCOUNTER | typeof EHRAuditAction.UPDATE_ENCOUNTER | typeof EHRAuditAction.CLOSE_ENCOUNTER,
+    action:
+      | typeof EHRAuditAction.VIEW_ENCOUNTER
+      | typeof EHRAuditAction.CREATE_ENCOUNTER
+      | typeof EHRAuditAction.UPDATE_ENCOUNTER
+      | typeof EHRAuditAction.CLOSE_ENCOUNTER,
     input: EncounterAuditInput,
   ): Promise<string> {
     return this.log(action, EHRResourceType.ENCOUNTER, input.encounterId, {
@@ -237,7 +270,14 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logAppointmentAccess(
-    action: typeof EHRAuditAction.VIEW_SCHEDULE | typeof EHRAuditAction.BOOK_APPOINTMENT | typeof EHRAuditAction.CANCEL_APPOINTMENT | typeof EHRAuditAction.RESCHEDULE_APPOINTMENT | typeof EHRAuditAction.CHECK_IN_APPOINTMENT | typeof EHRAuditAction.COMPLETE_APPOINTMENT | typeof EHRAuditAction.NO_SHOW_APPOINTMENT,
+    action:
+      | typeof EHRAuditAction.VIEW_SCHEDULE
+      | typeof EHRAuditAction.BOOK_APPOINTMENT
+      | typeof EHRAuditAction.CANCEL_APPOINTMENT
+      | typeof EHRAuditAction.RESCHEDULE_APPOINTMENT
+      | typeof EHRAuditAction.CHECK_IN_APPOINTMENT
+      | typeof EHRAuditAction.COMPLETE_APPOINTMENT
+      | typeof EHRAuditAction.NO_SHOW_APPOINTMENT,
     input: AppointmentAuditInput,
   ): Promise<string> {
     return this.log(action, EHRResourceType.APPOINTMENT, input.appointmentId, {
@@ -257,7 +297,10 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logObservationAccess(
-    action: typeof EHRAuditAction.VIEW_OBSERVATION | typeof EHRAuditAction.CREATE_OBSERVATION | typeof EHRAuditAction.UPDATE_OBSERVATION,
+    action:
+      | typeof EHRAuditAction.VIEW_OBSERVATION
+      | typeof EHRAuditAction.CREATE_OBSERVATION
+      | typeof EHRAuditAction.UPDATE_OBSERVATION,
     input: ObservationAuditInput,
   ): Promise<string> {
     return this.log(action, EHRResourceType.OBSERVATION, input.observationId, {
@@ -276,7 +319,11 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logNoteAccess(
-    action: typeof EHRAuditAction.VIEW_NOTE | typeof EHRAuditAction.CREATE_NOTE | typeof EHRAuditAction.SIGN_NOTE | typeof EHRAuditAction.AMEND_NOTE,
+    action:
+      | typeof EHRAuditAction.VIEW_NOTE
+      | typeof EHRAuditAction.CREATE_NOTE
+      | typeof EHRAuditAction.SIGN_NOTE
+      | typeof EHRAuditAction.AMEND_NOTE,
     input: NoteAuditInput,
   ): Promise<string> {
     return this.log(action, EHRResourceType.DOCUMENT_REFERENCE, input.noteId, {
@@ -296,7 +343,12 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logClaimAccess(
-    action: typeof EHRAuditAction.VIEW_CLAIM | typeof EHRAuditAction.CREATE_CLAIM | typeof EHRAuditAction.SUBMIT_CLAIM | typeof EHRAuditAction.CANCEL_CLAIM | typeof EHRAuditAction.UPDATE_CLAIM_STATUS,
+    action:
+      | typeof EHRAuditAction.VIEW_CLAIM
+      | typeof EHRAuditAction.CREATE_CLAIM
+      | typeof EHRAuditAction.SUBMIT_CLAIM
+      | typeof EHRAuditAction.CANCEL_CLAIM
+      | typeof EHRAuditAction.UPDATE_CLAIM_STATUS,
     input: ClaimAuditInput,
   ): Promise<string> {
     return this.log(action, EHRResourceType.CLAIM, input.claimId, {
@@ -315,21 +367,31 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logConsentAccess(
-    action: typeof EHRAuditAction.VIEW_CONSENT | typeof EHRAuditAction.VERIFY_CONSENT | typeof EHRAuditAction.REVOKE_CONSENT,
+    action:
+      | typeof EHRAuditAction.VIEW_CONSENT
+      | typeof EHRAuditAction.VERIFY_CONSENT
+      | typeof EHRAuditAction.REVOKE_CONSENT,
     input: ConsentAuditInput,
   ): Promise<string> {
-    const severity = input.status === 'failure' && action === EHRAuditAction.VERIFY_CONSENT
-      ? EHRSeverity.CONSENT_FAILURE
-      : undefined
-    return this.log(action, EHRResourceType.CONSENT, input.consentId, {
-      ...input,
-      metadata: {
-        ...input.metadata,
-        patientId: input.patientId,
-        resourceType: EHRResourceType.CONSENT,
-        resourceId: input.consentId,
+    const severity =
+      input.status === 'failure' && action === EHRAuditAction.VERIFY_CONSENT
+        ? EHRSeverity.CONSENT_FAILURE
+        : undefined
+    return this.log(
+      action,
+      EHRResourceType.CONSENT,
+      input.consentId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          patientId: input.patientId,
+          resourceType: EHRResourceType.CONSENT,
+          resourceId: input.consentId,
+        },
       },
-    }, severity)
+      severity,
+    )
   }
 
   // -------------------------------------------------------------------------
@@ -337,18 +399,27 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logMedicationAccess(
-    action: typeof EHRAuditAction.VIEW_MEDICATION | typeof EHRAuditAction.PRESCRIBE_MEDICATION | typeof EHRAuditAction.CANCEL_PRESCRIPTION | typeof EHRAuditAction.CHECK_DRUG_INTERACTION,
+    action:
+      | typeof EHRAuditAction.VIEW_MEDICATION
+      | typeof EHRAuditAction.PRESCRIBE_MEDICATION
+      | typeof EHRAuditAction.CANCEL_PRESCRIPTION
+      | typeof EHRAuditAction.CHECK_DRUG_INTERACTION,
     input: MedicationAuditInput,
   ): Promise<string> {
-    return this.log(action, EHRResourceType.MEDICATION_REQUEST, input.medicationRequestId, {
-      ...input,
-      metadata: {
-        ...input.metadata,
-        patientId: input.patientId,
-        resourceType: EHRResourceType.MEDICATION_REQUEST,
-        resourceId: input.medicationRequestId,
+    return this.log(
+      action,
+      EHRResourceType.MEDICATION_REQUEST,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          patientId: input.patientId,
+          resourceType: EHRResourceType.MEDICATION_REQUEST,
+          resourceId: input.medicationRequestId,
+        },
       },
-    })
+    )
   }
 
   // -------------------------------------------------------------------------
@@ -356,7 +427,15 @@ export class EHRAuditService {
   // -------------------------------------------------------------------------
 
   async logIntegration(
-    action: typeof EHRAuditAction.HIE_PATIENT_DISCOVERY | typeof EHRAuditAction.HIE_DOCUMENT_QUERY | typeof EHRAuditAction.HIE_DOCUMENT_RETRIEVE | typeof EHRAuditAction.HIE_DOCUMENT_SUBMIT | typeof EHRAuditAction.CLEARINGHOUSE_ELIGIBILITY | typeof EHRAuditAction.CLEARINGHOUSE_SUBMIT_CLAIM | typeof EHRAuditAction.CLEARINGHOUSE_CHECK_STATUS | typeof EHRAuditAction.CLEARINGHOUSE_REMITTANCE,
+    action:
+      | typeof EHRAuditAction.HIE_PATIENT_DISCOVERY
+      | typeof EHRAuditAction.HIE_DOCUMENT_QUERY
+      | typeof EHRAuditAction.HIE_DOCUMENT_RETRIEVE
+      | typeof EHRAuditAction.HIE_DOCUMENT_SUBMIT
+      | typeof EHRAuditAction.CLEARINGHOUSE_ELIGIBILITY
+      | typeof EHRAuditAction.CLEARINGHOUSE_SUBMIT_CLAIM
+      | typeof EHRAuditAction.CLEARINGHOUSE_CHECK_STATUS
+      | typeof EHRAuditAction.CLEARINGHOUSE_REMITTANCE,
     input: IntegrationAuditInput,
   ): Promise<string> {
     return this.log(action, undefined, undefined, {
@@ -407,7 +486,11 @@ export class EHRAuditService {
    * Retrieve audit events for a specific user.
    * Delegates to AuditLogger.getUserEvents.
    */
-  async getUserEvents(userId: string, limit = 100, offset = 0): Promise<AuditEvent[]> {
+  async getUserEvents(
+    userId: string,
+    limit = 100,
+    offset = 0,
+  ): Promise<AuditEvent[]> {
     return this.logger.getUserEvents(userId, limit, offset)
   }
 }
