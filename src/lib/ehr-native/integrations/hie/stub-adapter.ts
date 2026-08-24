@@ -28,12 +28,48 @@ import type { HIEAdapter } from './adapter'
 
 /** Simulated organizations on the HIE network */
 const STUB_ORGANIZATIONS: HIEOrganization[] = [
-  { id: 'org-001', name: 'Riverside General Hospital', npi: '1234567890', type: 'hospital', endpoint: 'direct:riverside@hie.example.org' },
-  { id: 'org-002', name: 'Westview Family Clinic', npi: '2345678901', type: 'clinic', endpoint: 'direct:westview@hie.example.org' },
-  { id: 'org-003', name: 'Northshore Imaging Center', npi: '3456789012', type: 'imaging', endpoint: 'direct:northshore@hie.example.org' },
-  { id: 'org-004', name: 'Central Laboratory Services', npi: '4567890123', type: 'lab', endpoint: 'direct:centrallab@hie.example.org' },
-  { id: 'org-005', name: 'Eastside Behavioral Health', npi: '5678901234', type: 'behavioral', endpoint: 'direct:eastsidebh@hie.example.org' },
-  { id: 'org-006', name: 'Summit Pharmacy Network', npi: '6789012345', type: 'pharmacy', endpoint: 'direct:summitrx@hie.example.org' },
+  {
+    id: 'org-001',
+    name: 'Riverside General Hospital',
+    npi: '1234567890',
+    type: 'hospital',
+    endpoint: 'direct:riverside@hie.example.org',
+  },
+  {
+    id: 'org-002',
+    name: 'Westview Family Clinic',
+    npi: '2345678901',
+    type: 'clinic',
+    endpoint: 'direct:westview@hie.example.org',
+  },
+  {
+    id: 'org-003',
+    name: 'Northshore Imaging Center',
+    npi: '3456789012',
+    type: 'imaging',
+    endpoint: 'direct:northshore@hie.example.org',
+  },
+  {
+    id: 'org-004',
+    name: 'Central Laboratory Services',
+    npi: '4567890123',
+    type: 'lab',
+    endpoint: 'direct:centrallab@hie.example.org',
+  },
+  {
+    id: 'org-005',
+    name: 'Eastside Behavioral Health',
+    npi: '5678901234',
+    type: 'behavioral',
+    endpoint: 'direct:eastsidebh@hie.example.org',
+  },
+  {
+    id: 'org-006',
+    name: 'Summit Pharmacy Network',
+    npi: '6789012345',
+    type: 'pharmacy',
+    endpoint: 'direct:summitrx@hie.example.org',
+  },
 ]
 
 /** Simulated document store keyed by patient ID */
@@ -43,7 +79,10 @@ interface StoredDocument {
 }
 
 const documentStore = new Map<string, StoredDocument[]>()
-const patientRegistry = new Map<string, { organizations: HIEOrganization[]; demographics: PatientDiscoveryRequest }>()
+const patientRegistry = new Map<
+  string,
+  { organizations: HIEOrganization[]; demographics: PatientDiscoveryRequest }
+>()
 
 /** Counter for generating document IDs */
 let docCounter = 0
@@ -115,20 +154,28 @@ export class StubHIEAdapter implements HIEAdapter {
   async queryDocuments(
     request: DocumentQueryRequest,
   ): Promise<DocumentQueryResult> {
+    assertHieId(request.patientId, 'patientId')
     const docs = documentStore.get(request.patientId) ?? []
     let filtered = docs
 
     if (request.documentType) {
-      filtered = filtered.filter(d => d.reference.documentType === request.documentType)
+      filtered = filtered.filter(
+        (d) => d.reference.documentType === request.documentType,
+      )
     }
     if (request.authorOrganizationId) {
-      filtered = filtered.filter(d => d.reference.authorOrganization.id === request.authorOrganizationId)
+      filtered = filtered.filter(
+        (d) =>
+          d.reference.authorOrganization.id === request.authorOrganizationId,
+      )
     }
     if (request.fromDate) {
-      filtered = filtered.filter(d => d.reference.created >= request.fromDate!)
+      filtered = filtered.filter(
+        (d) => d.reference.created >= request.fromDate!,
+      )
     }
     if (request.toDate) {
-      filtered = filtered.filter(d => d.reference.created <= request.toDate!)
+      filtered = filtered.filter((d) => d.reference.created <= request.toDate!)
     }
 
     const limit = request.limit ?? 50
@@ -137,7 +184,7 @@ export class StubHIEAdapter implements HIEAdapter {
     const hasMore = offset + limit < filtered.length
 
     return {
-      documents: paged.map(d => d.reference),
+      documents: paged.map((d) => d.reference),
       total: filtered.length,
       hasMore,
     }
@@ -146,8 +193,10 @@ export class StubHIEAdapter implements HIEAdapter {
   async retrieveDocument(
     request: DocumentRetrievalRequest,
   ): Promise<DocumentRetrievalResult> {
+    assertHieId(request.documentId, 'documentId')
+    assertHieId(request.patientId, 'patientId')
     const docs = documentStore.get(request.patientId) ?? []
-    const doc = docs.find(d => d.reference.documentId === request.documentId)
+    const doc = docs.find((d) => d.reference.documentId === request.documentId)
 
     if (!doc) {
       return {
@@ -178,8 +227,12 @@ export class StubHIEAdapter implements HIEAdapter {
   async submitDocument(
     request: DocumentSubmissionRequest,
   ): Promise<DocumentSubmissionResult> {
+    assertHieId(request.patientId, 'patientId')
+    assertHieId(request.authorOrganizationId, 'authorOrganizationId')
     const docId = `doc-${++docCounter}`
-    const org = STUB_ORGANIZATIONS.find(o => o.id === request.authorOrganizationId)
+    const org = STUB_ORGANIZATIONS.find(
+      (o) => o.id === request.authorOrganizationId,
+    )
     const authorOrg = org ?? STUB_ORGANIZATIONS[0]
 
     const reference: HIEDocumentReference = {
@@ -211,11 +264,11 @@ export class StubHIEAdapter implements HIEAdapter {
     let orgs = [...STUB_ORGANIZATIONS]
 
     if (request.type) {
-      orgs = orgs.filter(o => o.type === request.type)
+      orgs = orgs.filter((o) => o.type === request.type)
     }
     if (request.name) {
       const lower = request.name.toLowerCase()
-      orgs = orgs.filter(o => o.name.toLowerCase().includes(lower))
+      orgs = orgs.filter((o) => o.name.toLowerCase().includes(lower))
     }
 
     const limit = request.limit ?? 50
@@ -229,14 +282,39 @@ export class StubHIEAdapter implements HIEAdapter {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Input validation (defense in depth — the service layer also sanitizes)
+// ---------------------------------------------------------------------------
+
+/** HIE identifier token: alphanumeric start, internal . _ : - separators. */
+const HIE_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/
+
+function assertHieId(value: string, field: string): void {
+  if (!HIE_ID_PATTERN.test(value.trim())) {
+    throw new Error(`Invalid ${field}: expected an HIE identifier token`)
+  }
+}
+
 /** Seed initial documents for a discovered patient */
 function seedDocuments(patientId: string, orgs: HIEOrganization[]): void {
   const docs: StoredDocument[] = []
   const now = Date.now()
 
-  const seedTypes: Array<{ type: HIEDocumentType; title: string; daysAgo: number }> = [
-    { type: 'summary-of-care-ccd', title: 'Summary of Care (CCD)', daysAgo: 30 },
-    { type: 'discharge-summary', title: 'Hospital Discharge Summary', daysAgo: 15 },
+  const seedTypes: Array<{
+    type: HIEDocumentType
+    title: string
+    daysAgo: number
+  }> = [
+    {
+      type: 'summary-of-care-ccd',
+      title: 'Summary of Care (CCD)',
+      daysAgo: 30,
+    },
+    {
+      type: 'discharge-summary',
+      title: 'Hospital Discharge Summary',
+      daysAgo: 15,
+    },
     { type: 'progress-note', title: 'Clinical Progress Note', daysAgo: 7 },
     { type: 'lab-results', title: 'Laboratory Results Panel', daysAgo: 5 },
     { type: 'medication-list', title: 'Current Medication List', daysAgo: 3 },
@@ -262,7 +340,9 @@ function seedDocuments(patientId: string, orgs: HIEOrganization[]): void {
         hash: `sha256:${simpleHash(seed.title + created).toString(16)}`,
         language: 'en',
       },
-      content: btoa(`<ClinicalDocument>${seed.title} for ${patientId}</ClinicalDocument>`),
+      content: btoa(
+        `<ClinicalDocument>${seed.title} for ${patientId}</ClinicalDocument>`,
+      ),
     })
   }
 
