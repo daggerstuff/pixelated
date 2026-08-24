@@ -53,14 +53,22 @@ export class ClearinghouseService {
    *
    * @param claim - The draft claim to prepare and submit
    * @param payerId - Optional payer routing override
-   * @returns Submission response with tracking ID
+   * @returns The submission response with tracking ID, plus the prepared
+   *   (active) claim so callers retain the post-transition state
    */
   async prepareAndSubmit(
     claim: Claim,
     payerId?: string,
-  ): Promise<ClaimSubmissionResponse> {
+  ): Promise<{
+    submissionResponse: ClaimSubmissionResponse
+    preparedClaim: Claim
+  }> {
     const prepared = this.claimsService.prepareForSubmission(claim)
-    return this.adapter.submitClaim({ claim: prepared, payerId })
+    const submissionResponse = await this.adapter.submitClaim({
+      claim: prepared,
+      payerId,
+    })
+    return { submissionResponse, preparedClaim: prepared }
   }
 
   /**

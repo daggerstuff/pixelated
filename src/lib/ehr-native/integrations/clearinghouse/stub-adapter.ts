@@ -167,6 +167,13 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
       const parts = lines[i].split('|')
       if (parts.length < 9) continue
 
+      const rawStatus = parts[8]
+      if (!isClaimAdjudicationStatus(rawStatus)) {
+        // Skip lines whose status we cannot trust rather than silently
+        // mis-typing them into the parsed result.
+        continue
+      }
+
       lines_data.push({
         trackingId: parts[0],
         payerClaimId: parts[1],
@@ -176,7 +183,7 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
         patientResponsibility: parseInt(parts[5], 10),
         adjustmentCode: parts[6] || undefined,
         adjustmentReason: parts[7] || undefined,
-        status: parts[8] as ClaimAdjudicationStatus,
+        status: rawStatus,
       })
     }
 
@@ -190,6 +197,26 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
       lines: lines_data,
     }
   }
+}
+
+/** All valid adjudication statuses, for runtime validation of external data. */
+const ADJUDICATION_STATUSES: ReadonlySet<string> = new Set([
+  'received',
+  'in-review',
+  'adjudicated',
+  'paid',
+  'denied',
+  'partially-paid',
+  'pended',
+  'cancelled',
+])
+
+/**
+ * Type guard validating a raw remittance status string against the
+ * ClaimAdjudicationStatus union before it is trusted downstream.
+ */
+function isClaimAdjudicationStatus(value: string): value is ClaimAdjudicationStatus {
+  return ADJUDICATION_STATUSES.has(value)
 }
 
 /** Singleton stub adapter instance for development use. */
