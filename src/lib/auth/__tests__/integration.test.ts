@@ -78,6 +78,21 @@ vi.mock('../auth0-jwt-service', () => mockJwtService)
 vi.mock('../../mcp/phase6-integration', () => mockPhase6)
 vi.mock('../../redis', () => mockRedis)
 vi.mock('../../security', () => mockSecurity)
+
+// Mock database pool — verify.ts dynamically imports getPool() which throws
+// "Database not initialized" when no real DB is available in CI
+vi.mock('../../db', () => ({
+  getPool: vi.fn(() => ({
+    query: vi.fn().mockResolvedValue([
+      {
+        id: 'test-user-id',
+        email: 'test@example.com',
+        type: 'email_verification',
+        is_valid: true,
+      },
+    ]),
+  })),
+}))
 vi.mock('../user-identity', () => ({
   resolveIdentity: vi.fn(),
 }))
