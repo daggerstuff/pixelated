@@ -101,8 +101,12 @@ export class StubHIEAdapter implements HIEAdapter {
   async discoverPatient(
     request: PatientDiscoveryRequest,
   ): Promise<PatientDiscoveryResult> {
-    // Simulate finding patients with common names
-    const key = `${request.familyName.toLowerCase()}:${request.dateOfBirth}`
+    // Simulate finding patients with common names. Normalize the family
+    // name so the generated registry key always satisfies HIE_ID_PATTERN
+    // (spaces are not valid identifier characters).
+    const key =
+      `${request.familyName.toLowerCase().replace(/\s+/g, '-').slice(0, 80)}:` +
+      `${request.dateOfBirth}`
     const existing = patientRegistry.get(key)
 
     if (existing) {
