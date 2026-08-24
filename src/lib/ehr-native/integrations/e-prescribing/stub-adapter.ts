@@ -111,7 +111,7 @@ const KNOWN_CONTROLLED: Record<string, { schedule: string; name: string }> = {
 
 /** Known drug interactions (simplified). Each drug can have multiple interactions. */
 const KNOWN_INTERACTIONS: Record<string, { interactsWith: string; severity: DrugInteractionAlert['severity']; description: string }[]> = {
-  '1043600': [
+  '1043620': [
     {
       interactsWith: '1043400',
       severity: 'major',

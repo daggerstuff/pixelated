@@ -98,6 +98,41 @@ export class PrescriptionService {
       prescriberNPI: prescriber.npi,
     }
 
+    const patientId = medicationRequest.subject?.reference?.replace('Patient/', '') ?? ''
+
+    // Safety check: verify controlled substance requirements before transmission
+    if (schedule !== 'non-controlled') {
+      const csResult = await this.adapter.checkControlledSubstance({
+        medication,
+        patientId,
+        prescriberNPI: prescriber.npi,
+      })
+      if (!csResult.allowed) {
+        return {
+          transmissionId: '',
+          status: 'error' as const,
+          transmittedAt: new Date().toISOString(),
+          message: `Controlled substance check failed: ${csResult.reason ?? 'Not allowed'}`,
+        }
+      }
+    }
+
+    // Safety check: verify drug interactions before transmission
+    const interactionResult = await this.adapter.checkDrugInteractions({
+      medication,
+      patientId,
+      activeMedications: [],
+    })
+    const severeInteractions = interactionResult.alerts.filter(a => a.severity === 'critical' || a.severity === 'major')
+    if (severeInteractions.length > 0) {
+      return {
+        transmissionId: '',
+        status: 'error' as const,
+        transmittedAt: new Date().toISOString(),
+        message: `Drug interaction alert: ${severeInteractions[0].description}`,
+      }
+    }
+
     const request: PrescriptionTransmissionRequest = {
       medicationRequest,
       pharmacy,
