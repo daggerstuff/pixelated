@@ -205,6 +205,8 @@ export class TelehealthService {
             practitionerId,
           },
         )
+        // Encounter creation is required for acceptance #5 — do not continue.
+        return null
       }
     }
 
@@ -301,19 +303,8 @@ export class TelehealthService {
       },
     )
 
-    const session: TelehealthSession = {
-      id: sessionId,
-      patientId: auditPatientId ?? '',
-      practitionerId: auditPractitionerId ?? '',
-      providerType: 'webrtc',
-      status: 'active',
-      startedAt: joinedAt,
-      recordingEnabled: false,
-      recordingConsent: false,
-      participants: [participant],
-    }
-
-    return session
+    // No session store wired — cannot return a valid session.
+    return null
   }
 
   /**

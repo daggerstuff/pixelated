@@ -205,10 +205,34 @@ describe('TelehealthService', () => {
         ),
       ).rejects.toThrow('Invalid practitionerId format: expected UUID');
     });
+
+    it('returns null when FHIR Encounter creation fails', async () => {
+      mockEncounterRepo.create.mockRejectedValue(new Error('DB connection lost'));
+
+      const result = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      );
+
+      expect(result).toBeNull();
+
+      expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
+        'start_telehealth_session',
+        expect.objectContaining({
+          status: 'failure',
+          errorMessage: 'Encounter creation failed: DB connection lost',
+        }),
+      );
+    });
   });
 
   describe('joinSession', () => {
-    it('joins a session and audits the join', async () => {
+    it('audits the join and returns null (no session store wired)', async () => {
       const result = await service.joinSession(
         {
           sessionId: validSessionId,
@@ -218,17 +242,13 @@ describe('TelehealthService', () => {
         'user-456',
       );
 
-      expect(result).not.toBeNull();
-      expect(result!.id).toBe(validSessionId);
-      expect(result!.status).toBe('active');
-      expect(result!.participants).toHaveLength(1);
-      expect(result!.participants[0].participantId).toBe(validPatientId);
-      expect(result!.participants[0].role).toBe('patient');
+      expect(result).toBeNull();
 
       expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
         'join_telehealth_session',
         expect.objectContaining({
           sessionId: validSessionId,
+          patientId: validPatientId,
         }),
       );
     });
