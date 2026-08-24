@@ -68,8 +68,8 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
       coinsurancePercent: 20,
       deductibleRemaining: 75000,
       visitLimitRemaining: 12,
-      planYearStart: new Date(new Date().getFullYear(), 0, 1).toISOString(),
-      planYearEnd: new Date(new Date().getFullYear(), 11, 31).toISOString(),
+      planYearStart: new Date(Date.UTC(new Date().getFullYear(), 0, 1)).toISOString(),
+      planYearEnd: new Date(Date.UTC(new Date().getFullYear(), 11, 31, 23, 59, 59, 999)).toISOString(),
       messages: ['Coverage verified via stub adapter'],
       errors: [],
     }
@@ -189,14 +189,14 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
       headerParts
 
     const lines_data: RemittanceAdvice['lines'] = []
+    const skippedLines: number[] = []
     for (let i = 1; i < lines.length; i++) {
       const parts = lines[i].split('|')
-      if (parts.length < 9) continue
+      if (parts.length < 9) { skippedLines.push(i + 1); continue }
 
       const rawStatus = parts[8]
       if (!isClaimAdjudicationStatus(rawStatus)) {
-        // Skip lines whose status we cannot trust rather than silently
-        // mis-typing them into the parsed result.
+        skippedLines.push(i + 1);
         continue
       }
 
