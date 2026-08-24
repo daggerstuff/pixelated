@@ -100,6 +100,12 @@ export function TelehealthSession({
     };
   }, []);
 
+  useEffect(() => {
+    if (state.phase === 'active' && streamRef.current && localVideoRef.current) {
+      localVideoRef.current.srcObject = streamRef.current;
+    }
+  }, [state.phase]);
+
   const handleDeviceCheckComplete = useCallback(
     async (_result: ComponentDeviceCheckResult) => {
       setState((prev) => ({ ...prev, phase: 'connecting' }));

@@ -28,7 +28,6 @@ import type {
   DeviceCheckResult,
   WebRTCConfig,
   TelehealthProvider,
-  SessionParticipant,
 } from '../types'
 
 // ---------------------------------------------------------------------------
@@ -289,16 +288,6 @@ export class TelehealthService {
   ): Promise<TelehealthSession | null> {
     const sessionId = validateId(input.sessionId, 'sessionId')
     const participantId = validateId(input.participantId, 'participantId')
-
-    // In a full implementation, this would fetch from a session store.
-    // For now, we construct the updated session and audit the join.
-    const joinedAt = new Date().toISOString()
-
-    const participant: SessionParticipant = {
-      participantId,
-      role: input.role,
-      joinedAt,
-    }
 
     const isPatient = input.role === 'patient'
     const auditPatientId = isPatient ? participantId : undefined
