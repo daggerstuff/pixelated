@@ -123,8 +123,10 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
       content: [
         {
           attachment: {
-            contentType: 'text/plain',
-            data: Buffer.from(initialMessage).toString('base64'),
+            contentType: 'application/json',
+            data: Buffer.from(
+              JSON.stringify({ body: initialMessage, sender: senderRef, recipient: practitionerRef, sentAt: now }),
+            ).toString('base64'),
             title: 'Initial message',
           },
         },
@@ -167,8 +169,10 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
       ...(existing.content || []),
       {
         attachment: {
-          contentType: 'text/plain',
-          data: Buffer.from(body).toString('base64'),
+          contentType: 'application/json',
+          data: Buffer.from(
+            JSON.stringify({ body, sender: senderRef, recipient: recipientRef, sentAt: now }),
+          ).toString('base64'),
           title: `Message from ${senderRef}`,
         },
       },
@@ -371,16 +375,44 @@ export class PortalMessagingService {
 
   private toThread(docRef: DocumentReference, patientId: string): MessageThread {
     const docRefId = (docRef as DocumentReference & { id?: string }).id ?? ''
-    const messages: ThreadMessage[] = (docRef.content || []).map((c, i) => ({
-      id: `${docRefId}-msg-${i}`,
-      senderReference: (docRef.author?.[0] as { reference?: string } | undefined)?.reference ?? `Patient/${patientId}`,
-      recipientReference: docRef.context?.related?.[0]?.ref?.reference ?? '',
-      body: c.attachment?.data
-        ? Buffer.from(c.attachment.data, 'base64').toString('utf-8')
-        : '',
-      sentAt: docRef.date ?? new Date().toISOString(),
-      status: 'delivered' as const,
-    }))
+    const messages: ThreadMessage[] = (docRef.content || []).map((c, i) => {
+      let body = ''
+      let senderReference: string | undefined
+      let recipientReference: string | undefined
+      let sentAt: string | undefined
+      if (c.attachment?.data) {
+        const decoded = Buffer.from(c.attachment.data, 'base64').toString('utf-8')
+        try {
+          const parsed = JSON.parse(decoded) as {
+            body?: string
+            sender?: string
+            recipient?: string
+            sentAt?: string
+          }
+          if (parsed && typeof parsed.body === 'string') {
+            body = parsed.body
+            senderReference = parsed.sender
+            recipientReference = parsed.recipient
+            sentAt = parsed.sentAt
+          } else {
+            body = decoded
+          }
+        } catch {
+          body = decoded
+        }
+      }
+      return {
+        id: `${docRefId}-msg-${i}`,
+        senderReference:
+          senderReference ??
+          (docRef.author?.[0] as { reference?: string } | undefined)?.reference ??
+          `Patient/${patientId}`,
+        recipientReference: recipientReference ?? docRef.context?.related?.[0]?.ref?.reference ?? '',
+        body,
+        sentAt: sentAt ?? docRef.date ?? new Date().toISOString(),
+        status: 'delivered' as const,
+      }
+    })
 
     const participants: Array<{ reference: string; display?: string }> = [
       ...(docRef.author ?? []).map((a) => ({

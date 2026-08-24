@@ -194,7 +194,7 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
       const params: unknown[] = [patientId, limit, offset]
 
       if (statusFilter) {
-        query += ` AND fhir_resource->'content'->0->'attachment'->'data' ILIKE $4`
+        query += ` AND fhir_resource->'content'->0->'attachment'->>'data' ILIKE $4`
         // Decode base64 data to filter by status — approximate with SQL ILIKE on encoded payload
         const statusPattern = `%${statusFilter}%`
         params.push(statusPattern)
