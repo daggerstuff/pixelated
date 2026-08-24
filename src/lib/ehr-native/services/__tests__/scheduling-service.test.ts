@@ -158,32 +158,42 @@ describe('SchedulingService', () => {
 
   describe('checkInAppointment', () => {
     it('checks in a booked appointment', async () => {
-      const checkedIn = { ...validAppointment, status: 'arrived' as const }
+      const checkedIn = { ...validAppointment, status: 'checked-in' as const }
       mockAppointmentRepo.findById.mockResolvedValue(validAppointment)
       mockAppointmentRepo.update.mockResolvedValue(checkedIn)
       const result = await service.checkInAppointment(validAppointmentId)
-      expect(result?.status).toBe('arrived')
+      expect(result?.status).toBe('checked-in')
+      expect(mockAppointmentRepo.update).toHaveBeenCalledWith(
+        validAppointmentId,
+        { status: 'checked-in' },
+      )
     })
   })
 
   describe('completeAppointment', () => {
-    it('completes an arrived appointment', async () => {
-      const arrived = { ...validAppointment, status: 'arrived' as const }
+    it('completes a checked-in appointment', async () => {
       const completed = { ...validAppointment, status: 'fulfilled' as const }
-      mockAppointmentRepo.findById.mockResolvedValue(arrived)
       mockAppointmentRepo.update.mockResolvedValue(completed)
       const result = await service.completeAppointment(validAppointmentId)
       expect(result?.status).toBe('fulfilled')
+      expect(mockAppointmentRepo.update).toHaveBeenCalledWith(
+        validAppointmentId,
+        { status: 'fulfilled' },
+      )
     })
   })
 
   describe('markNoShow', () => {
     it('marks a booked appointment as no-show', async () => {
-      const noShow = { ...validAppointment, status: 'noshow' as const }
+      const noShow = { ...validAppointment, status: 'no-show' as const }
       mockAppointmentRepo.findById.mockResolvedValue(validAppointment)
       mockAppointmentRepo.update.mockResolvedValue(noShow)
       const result = await service.markNoShow(validAppointmentId)
-      expect(result?.status).toBe('noshow')
+      expect(result?.status).toBe('no-show')
+      expect(mockAppointmentRepo.update).toHaveBeenCalledWith(
+        validAppointmentId,
+        { status: 'no-show' },
+      )
     })
   })
 
