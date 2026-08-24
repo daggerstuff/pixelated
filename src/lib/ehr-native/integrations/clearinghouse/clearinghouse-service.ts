@@ -15,6 +15,7 @@ import type {
   ClaimSubmissionResponse,
   ClaimStatusRequest,
   ClaimStatusResponse,
+  PrepareAndSubmitResult,
   RemittanceAdvice,
 } from './types'
 import type { Claim } from '../../types/claim'
@@ -53,14 +54,15 @@ export class ClearinghouseService {
    *
    * @param claim - The draft claim to prepare and submit
    * @param payerId - Optional payer routing override
-   * @returns Submission response with tracking ID
+   * @returns Prepared claim and submission response with tracking ID
    */
   async prepareAndSubmit(
     claim: Claim,
     payerId?: string,
-  ): Promise<ClaimSubmissionResponse> {
+  ): Promise<PrepareAndSubmitResult> {
     const prepared = this.claimsService.prepareForSubmission(claim)
-    return this.adapter.submitClaim({ claim: prepared, payerId })
+    const submissionResponse = await this.adapter.submitClaim({ claim: prepared, payerId })
+    return { preparedClaim: prepared, submissionResponse }
   }
 
   /**

@@ -86,6 +86,14 @@ export interface ClaimSubmissionResponse {
   messages: string[]
 }
 
+/** Result of preparing and submitting a claim in one step. */
+export interface PrepareAndSubmitResult {
+  /** The prepared claim (status transitioned to 'active'). */
+  readonly preparedClaim: Claim
+  /** The clearinghouse submission response. */
+  readonly submissionResponse: ClaimSubmissionResponse
+}
+
 /** Status of a submitted claim. */
 export type SubmissionStatus =
   | 'accepted'

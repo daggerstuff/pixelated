@@ -1,3 +1,13 @@
+const VALID_ADJUDICATION_STATUSES = new Set<string>([
+  'received', 'in-review', 'adjudicated', 'paid', 'denied', 'partially-paid', 'pended', 'cancelled',
+])
+
+function parseAdjudicationStatus(value: string): ClaimAdjudicationStatus {
+  return VALID_ADJUDICATION_STATUSES.has(value)
+    ? value as ClaimAdjudicationStatus
+    : 'received'
+}
+
 /**
  * Stub Clearinghouse Adapter
  *
@@ -176,7 +186,7 @@ export class StubClearinghouseAdapter implements ClearinghouseAdapter {
         patientResponsibility: parseInt(parts[5], 10),
         adjustmentCode: parts[6] || undefined,
         adjustmentReason: parts[7] || undefined,
-        status: parts[8] as ClaimAdjudicationStatus,
+        status: parseAdjudicationStatus(parts[8]),
       })
     }
 
