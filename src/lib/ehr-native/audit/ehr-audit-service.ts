@@ -157,9 +157,10 @@ export class EHRAuditService {
     resourceType: EHRResourceTypeValue | undefined,
     resourceId: string | undefined,
     input: EHRAuditInput,
+    overrideSeverity?: AuditSeverity,
   ): Promise<string> {
     const type = ehrActionToEventType(action)
-    const severity = input.status === 'failure' ? EHRSeverity.FAILED_ACCESS : this.defaultSeverity(action)
+    const severity = overrideSeverity ?? (input.status === 'failure' ? EHRSeverity.FAILED_ACCESS : this.defaultSeverity(action))
 
     const event: Omit<AuditEvent, 'id' | 'timestamp'> = {
       userId: input.userId,
@@ -182,6 +183,7 @@ export class EHRAuditService {
    * Determine default severity for a successful action.
    */
   private defaultSeverity(action: EHRAuditActionType): AuditSeverity {
+    if (action.startsWith('check_in_') || action.startsWith('complete_')) return EHRSeverity.UPDATE
     if (action.startsWith('view_') || action.startsWith('check_')) return EHRSeverity.READ
     if (action.startsWith('create_') || action.startsWith('book_') || action.startsWith('prescribe_')) return EHRSeverity.CREATE
     if (action.startsWith('update_') || action.startsWith('amend_') || action.startsWith('sign_') || action.startsWith('reschedule_') || action.startsWith('submit_')) return EHRSeverity.UPDATE
@@ -327,7 +329,7 @@ export class EHRAuditService {
         resourceType: EHRResourceType.CONSENT,
         resourceId: input.consentId,
       },
-    })
+    }, severity)
   }
 
   // -------------------------------------------------------------------------
