@@ -261,82 +261,82 @@ jobs:
           LINEAR_AGENT_ACCESS_TOKEN: ${{ secrets.LINEAR_AGENT_ACCESS_TOKEN }}
           LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
         run: |
-         # Install Traefik CRDs first
-         helm repo add traefik https://helm.traefik.io/traefik 2>/dev/null || true
-         helm template traefik/traefik --name-template traefik --set crds.enabled=true 2>/dev/null | kubectl apply -f - --validate=false || \
-         helm show crds traefik/traefik | kubectl apply -f - --validate=false
-         
-          kubectl apply -f k8s/civo/namespace.yaml
+          # Install Traefik CRDs first
+          helm repo add traefik https://helm.traefik.io/traefik 2>/dev/null || true
+          helm template traefik/traefik --name-template traefik --set crds.enabled=true 2>/dev/null | kubectl apply -f - --validate=false || \
+          helm show crds traefik/traefik | kubectl apply -f - --validate=false
 
-          # Create dockerhub-registry-credentials imagePullSecret
-          # Required by deployment imagePullSecrets to pull from Docker Hub
-          kubectl create secret docker-registry dockerhub-registry-credentials \
-            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
-            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
+           kubectl apply -f k8s/civo/namespace.yaml
+
+           # Create dockerhub-registry-credentials imagePullSecret
+           # Required by deployment imagePullSecrets to pull from Docker Hub
+           kubectl create secret docker-registry dockerhub-registry-credentials \
+             --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
+             --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
+             -n pixelated-empathy \
+             --dry-run=client -o yaml | kubectl apply -f -
+
+           kubectl create secret generic cloudflare-workers-ai \
+            --from-literal=account-id="${CLOUDFLARE_ACCOUNT_ID:-}" \
+            --from-literal=api-key="${CLOUDFLARE_AI_API_KEY:-}" \
             -n pixelated-empathy \
             --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic slack-agent \
+            --from-literal=bot-token="${SLACK_BOT_TOKEN:-}" \
+            --from-literal=signing-secret="${SLACK_SIGNING_SECRET:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic linear-agent \
+            --from-literal=access-token="${LINEAR_AGENT_ACCESS_TOKEN:-}" \
+            --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -k k8s/civo
+           kubectl apply -f agents/session-agent/k8s/deployment.yaml
+           kubectl apply -f agents/qa-agent/k8s/deployment.yaml
+           kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
+           # Delete orphaned deployment (not in kustomization, stale spec)
+           kubectl delete deployment/pixelated-empathy -n pixelated-empathy --ignore-not-found
 
-          kubectl create secret generic cloudflare-workers-ai \
-           --from-literal=account-id="${CLOUDFLARE_ACCOUNT_ID:-}" \
-           --from-literal=api-key="${CLOUDFLARE_AI_API_KEY:-}" \
-           -n pixelated-empathy \
-           --dry-run=client -o yaml | kubectl apply -f -
-         kubectl create secret generic slack-agent \
-           --from-literal=bot-token="${SLACK_BOT_TOKEN:-}" \
-           --from-literal=signing-secret="${SLACK_SIGNING_SECRET:-}" \
-           -n pixelated-empathy \
-           --dry-run=client -o yaml | kubectl apply -f -
-         kubectl create secret generic linear-agent \
-           --from-literal=access-token="${LINEAR_AGENT_ACCESS_TOKEN:-}" \
-           --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
-           -n pixelated-empathy \
-           --dry-run=client -o yaml | kubectl apply -f -
-         kubectl apply -k k8s/civo
-          kubectl apply -f agents/session-agent/k8s/deployment.yaml
-          kubectl apply -f agents/qa-agent/k8s/deployment.yaml
-          kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
-          # Delete orphaned deployment (not in kustomization, stale spec)
-          kubectl delete deployment/pixelated-empathy -n pixelated-empathy --ignore-not-found
+           # Target blue (active slot — Service routes to slot: blue)
+           kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
+           kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
+           kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
+           kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
-          # Target blue (active slot — Service routes to slot: blue)
-          kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
-          kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
-          kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
-          kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
+           echo "Waiting for rollout..."
+           kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+           kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
+           kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
+           kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
 
-          echo "Waiting for rollout..."
-          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
-          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
-          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
-          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
+           echo "Waiting for old pods to fully terminate before smoke test..."
+           # kubectl rollout status exits when new pods are Ready, but Terminating old
+           # pods may still be in the LB rotation. Terminating pods remain phase=Running
+           # in k8s, so we must grep the STATUS column directly.
+           for i in $(seq 1 18); do
+             TERMINATING=$(kubectl get pods -n pixelated-empathy --no-headers 2>/dev/null | grep -c Terminating || true)
+             if [[ "${TERMINATING}" == "0" ]]; then
+               echo "All pods healthy, no Terminating pods remaining."
+               break
+             fi
+             echo "  ${TERMINATING} pod(s) still Terminating, waiting... (${i}/18)"
+             sleep 5
+           done
 
-          echo "Waiting for old pods to fully terminate before smoke test..."
-          # kubectl rollout status exits when new pods are Ready, but Terminating old
-          # pods may still be in the LB rotation. Terminating pods remain phase=Running
-          # in k8s, so we must grep the STATUS column directly.
-          for i in $(seq 1 18); do
-            TERMINATING=$(kubectl get pods -n pixelated-empathy --no-headers 2>/dev/null | grep -c Terminating || true)
-            if [[ "${TERMINATING}" == "0" ]]; then
-              echo "All pods healthy, no Terminating pods remaining."
-              break
-            fi
-            echo "  ${TERMINATING} pod(s) still Terminating, waiting... (${i}/18)"
-            sleep 5
-          done
-
-          echo "Verifying new image is running on at least one pod..."
-          EXPECTED_DIGEST="${{ needs.build-and-push.outputs.app_digest }}"
-          RUNNING_IMAGE=$(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy,slot=blue -o jsonpath='{.items[*].spec.containers[0].image}' | tr ' ' '\n' | head -n 1)
-          if [[ "${RUNNING_IMAGE}" != *"${EXPECTED_DIGEST}"* ]]; then
-            echo "⚠️ Image mismatch: expected digest '${EXPECTED_DIGEST}' but running '${RUNNING_IMAGE}'"
-            echo "This can happen when concurrent deployments overwrite the same tag."
-            kubectl get pods -n pixelated-empathy -o wide
-            # Soft-fail: don't exit 1 here because concurrent deployments to the same
-            # tag (e.g., staging) can legitimately cause a digest mismatch even though
-            # the rollout itself succeeded.
-          else
-            echo "✅ New image digest '${EXPECTED_DIGEST}' confirmed running."
-          fi
+           echo "Verifying new image is running on at least one pod..."
+           EXPECTED_DIGEST="${{ needs.build-and-push.outputs.app_digest }}"
+           RUNNING_IMAGE=$(kubectl get pods -n pixelated-empathy -l app=pixelated-empathy,slot=blue -o jsonpath='{.items[*].spec.containers[0].image}' | tr ' ' '\n' | head -n 1)
+           if [[ "${RUNNING_IMAGE}" != *"${EXPECTED_DIGEST}"* ]]; then
+             echo "⚠️ Image mismatch: expected digest '${EXPECTED_DIGEST}' but running '${RUNNING_IMAGE}'"
+             echo "This can happen when concurrent deployments overwrite the same tag."
+             kubectl get pods -n pixelated-empathy -o wide
+             # Soft-fail: don't exit 1 here because concurrent deployments to the same
+             # tag (e.g., staging) can legitimately cause a digest mismatch even though
+             # the rollout itself succeeded.
+           else
+             echo "✅ New image digest '${EXPECTED_DIGEST}' confirmed running."
+           fi
 
       - name: Verify deployment
         run: |
