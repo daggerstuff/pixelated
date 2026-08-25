@@ -208,7 +208,9 @@ export class EHRAuditService {
     if (
       action.startsWith('create_') ||
       action.startsWith('book_') ||
-      action.startsWith('prescribe_')
+      action.startsWith('prescribe_') ||
+      action.startsWith('start_') ||
+      action.startsWith('join_')
     )
       return EHRSeverity.CREATE
     if (
@@ -217,7 +219,9 @@ export class EHRAuditService {
       action.startsWith('sign_') ||
       action.startsWith('reschedule_') ||
       action.startsWith('submit_') ||
-      action.startsWith('close_')
+      action.startsWith('close_') ||
+      action.startsWith('end_') ||
+      action.startsWith('stop_')
     )
       return EHRSeverity.UPDATE
     if (

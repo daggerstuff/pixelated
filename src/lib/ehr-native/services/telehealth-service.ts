@@ -297,7 +297,8 @@ export class TelehealthService {
       EHRAuditAction.JOIN_TELEHEALTH_SESSION,
       {
         userId,
-        status: 'success',
+        status: 'failure',
+        errorMessage: 'Session store not available',
         sessionId,
         patientId: auditPatientId,
         practitionerId: auditPractitionerId,
@@ -328,7 +329,8 @@ export class TelehealthService {
       EHRAuditAction.END_TELEHEALTH_SESSION,
       {
         userId: input.userId,
-        status: 'success',
+        status: 'failure',
+        errorMessage: 'Session store not available',
         sessionId,
       },
     )

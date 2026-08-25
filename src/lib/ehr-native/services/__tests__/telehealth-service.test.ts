@@ -282,7 +282,8 @@ describe('TelehealthService', () => {
         'end_telehealth_session',
         expect.objectContaining({
           sessionId: validSessionId,
-          status: 'success',
+          status: 'failure',
+          errorMessage: 'Session store not available',
         }),
       );
     });
