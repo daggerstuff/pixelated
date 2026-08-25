@@ -1,18 +1,22 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import { describe, expect, it, afterEach, vi, beforeEach } from 'vitest'
-import '@testing-library/jest-dom/vitest'
 
-import { TelehealthWidget } from '../portal/TelehealthWidget'
-import { SchedulingWidget } from '../portal/SchedulingWidget'
 import { MessagingWidget } from '../portal/MessagingWidget'
+import { SchedulingWidget } from '../portal/SchedulingWidget'
+import { TelehealthWidget } from '../portal/TelehealthWidget'
+
+import '@testing-library/jest-dom/vitest'
 
 // Empty data responses so widgets render their empty/loading states
 function mockFetchSuccess() {
   const mockResponse = {
     ok: true,
     status: 200,
-    json: async () => ({ data: [], pagination: { limit: 10, offset: 0, total: 0 } }),
+    json: async () => ({
+      data: [],
+      pagination: { limit: 10, offset: 0, total: 0 },
+    }),
     text: async () => '',
   } as Response
 

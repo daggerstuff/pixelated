@@ -194,10 +194,16 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         <script type="text/javascript" set:html={mixpanelScript} />
       )
     }
-    <script is:inline nonce={cspNonce} define:vars={{ serviceWorkerUrl, serviceWorkerScope }}>
+    <script
+      is:inline
+      nonce={cspNonce}
+      define:vars={{ serviceWorkerUrl, serviceWorkerScope }}
+    >
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope }).catch(() => {})
+          navigator.serviceWorker
+            .register(serviceWorkerUrl, { scope: serviceWorkerScope })
+            .catch(() => {})
         })
       }
     </script>

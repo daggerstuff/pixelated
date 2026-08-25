@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import { describe, expect, it, afterEach, vi, beforeEach } from 'vitest'
+
 import '@testing-library/jest-dom/vitest'
 
 // Mock useResponsive before importing components that depend on it
@@ -13,10 +14,18 @@ vi.mock('@/components/layout/ResponsiveUtils', () => ({
     width: 1024,
     height: 768,
   })),
-  BREAKPOINTS: { xs: 0, sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 },
+  BREAKPOINTS: {
+    'xs': 0,
+    'sm': 640,
+    'md': 768,
+    'lg': 1024,
+    'xl': 1280,
+    '2xl': 1536,
+  },
 }))
 
 import { useResponsive } from '@/components/layout/ResponsiveUtils'
+
 import { EHRResponsiveShell } from '../EHRResponsiveShell'
 import type { EHRRNavItem } from '../EHRResponsiveShell'
 
@@ -24,8 +33,16 @@ const mockUseResponsive = vi.mocked(useResponsive)
 
 const navItems: EHRRNavItem[] = [
   { id: 'notes', label: 'Notes', icon: <span data-testid="icon-notes" /> },
-  { id: 'scheduling', label: 'Scheduling', icon: <span data-testid="icon-scheduling" /> },
-  { id: 'messaging', label: 'Messaging', icon: <span data-testid="icon-messaging" /> },
+  {
+    id: 'scheduling',
+    label: 'Scheduling',
+    icon: <span data-testid="icon-scheduling" />,
+  },
+  {
+    id: 'messaging',
+    label: 'Messaging',
+    icon: <span data-testid="icon-messaging" />,
+  },
 ]
 
 function setViewport(isDesktop: boolean) {
@@ -61,7 +78,11 @@ describe('EHRResponsiveShell', () => {
     setViewport(false)
 
     render(
-      <EHRResponsiveShell category="desktop-optimized" activeView="chart" navItems={navItems}>
+      <EHRResponsiveShell
+        category="desktop-optimized"
+        activeView="chart"
+        navItems={navItems}
+      >
         <div data-testid="content">Chart content</div>
       </EHRResponsiveShell>,
     )
@@ -75,7 +96,11 @@ describe('EHRResponsiveShell', () => {
     setViewport(true)
 
     render(
-      <EHRResponsiveShell category="mobile-first" activeView="notes" navItems={navItems}>
+      <EHRResponsiveShell
+        category="mobile-first"
+        activeView="notes"
+        navItems={navItems}
+      >
         <div data-testid="content">Notes content</div>
       </EHRResponsiveShell>,
     )
@@ -89,7 +114,11 @@ describe('EHRResponsiveShell', () => {
     setViewport(false)
 
     render(
-      <EHRResponsiveShell category="mobile-first" activeView="notes" navItems={navItems}>
+      <EHRResponsiveShell
+        category="mobile-first"
+        activeView="notes"
+        navItems={navItems}
+      >
         <div data-testid="content">Notes content</div>
       </EHRResponsiveShell>,
     )
@@ -98,20 +127,28 @@ describe('EHRResponsiveShell', () => {
       expect(screen.queryByText('EHR')).not.toBeInTheDocument(),
     )
     expect(screen.getByTestId('content')).toBeInTheDocument()
-    expect(screen.getByRole('navigation', { name: 'EHR navigation' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('navigation', { name: 'EHR navigation' }),
+    ).toBeInTheDocument()
   })
 
   it('mobile layout nav items have 44px minimum touch targets', async () => {
     setViewport(false)
 
     render(
-      <EHRResponsiveShell category="mobile-first" activeView="notes" navItems={navItems}>
+      <EHRResponsiveShell
+        category="mobile-first"
+        activeView="notes"
+        navItems={navItems}
+      >
         <div>Content</div>
       </EHRResponsiveShell>,
     )
 
     await waitFor(() =>
-      expect(screen.getAllByRole('link')[0].className).toContain('min-h-[44px]'),
+      expect(screen.getAllByRole('link')[0].className).toContain(
+        'min-h-[44px]',
+      ),
     )
 
     const navLinks = screen.getAllByRole('link')
@@ -124,7 +161,11 @@ describe('EHRResponsiveShell', () => {
     setViewport(false)
 
     render(
-      <EHRResponsiveShell category="mobile-first" activeView="scheduling" navItems={navItems}>
+      <EHRResponsiveShell
+        category="mobile-first"
+        activeView="scheduling"
+        navItems={navItems}
+      >
         <div>Content</div>
       </EHRResponsiveShell>,
     )
@@ -140,7 +181,11 @@ describe('EHRResponsiveShell', () => {
     setViewport(true)
 
     render(
-      <EHRResponsiveShell category="desktop-optimized" activeView="chart" navItems={navItems}>
+      <EHRResponsiveShell
+        category="desktop-optimized"
+        activeView="chart"
+        navItems={navItems}
+      >
         <div>Chart</div>
       </EHRResponsiveShell>,
     )
@@ -154,7 +199,11 @@ describe('EHRResponsiveShell', () => {
     setViewport(false)
 
     render(
-      <EHRResponsiveShell category="mobile-first" activeView="notes" navItems={navItems}>
+      <EHRResponsiveShell
+        category="mobile-first"
+        activeView="notes"
+        navItems={navItems}
+      >
         <div>Content</div>
       </EHRResponsiveShell>,
     )
@@ -173,7 +222,11 @@ describe('EHRResponsiveShell', () => {
     ]
 
     render(
-      <EHRResponsiveShell category="mobile-first" activeView="notes" navItems={itemsWithClick}>
+      <EHRResponsiveShell
+        category="mobile-first"
+        activeView="notes"
+        navItems={itemsWithClick}
+      >
         <div>Content</div>
       </EHRResponsiveShell>,
     )
