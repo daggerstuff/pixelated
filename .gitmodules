@@ -2,10 +2,6 @@
 	path = ai
 	url = https://github.com/daggerstuff/ai.git
 	branch = staging
-[submodule "docs"]
-	path = docs
-	url = https://github.com/daggerstuff/docs.git
-	branch = master
 [submodule "foresight"]
 	path = foresight
 	url = https://github.com/daggerstuff/foresight.git
