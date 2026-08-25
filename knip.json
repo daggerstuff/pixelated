@@ -56,6 +56,8 @@
     "src/lib/ehr-native/types/*.ts",
     "src/lib/ehr-native/types/**/*.ts",
     "src/lib/ehr-native/api/index.ts",
-    "src/lib/ehr-native/audit/ehr-audit-service.ts"
+    "src/lib/ehr-native/audit/ehr-audit-service.ts",
+    "src/utils/serviceWorkerRegistration.ts",
+    "src/components/ehr/EHRResponsiveShell.tsx"
   ]
 }
