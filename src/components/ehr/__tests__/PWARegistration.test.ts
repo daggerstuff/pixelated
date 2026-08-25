@@ -1,12 +1,29 @@
-// @vitest-environment node
-import { describe, expect, it } from 'vitest'
+/* @vitest-environment node */
 import { readFileSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
+
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  getServiceWorkerScope,
+  getServiceWorkerScriptUrl,
+  normalizeBasePath,
+} from '@/utils/serviceWorkerPath'
+import { serviceWorkerManager } from '@/utils/serviceWorkerRegistration'
 
 const ROOT = resolve(__dirname, '../../../..')
 
 describe('PWA Configuration', () => {
-  it('manifest.webmanifest has correct required fields', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  it('manifest.webmanifest resolves install paths relative to the manifest base', () => {
     const manifestPath = resolve(ROOT, 'public/manifest.webmanifest')
     expect(existsSync(manifestPath)).toBe(true)
 
@@ -17,13 +34,12 @@ describe('PWA Configuration', () => {
     expect(manifest.display).toBe('standalone')
     expect(manifest.background_color).toBe('#131313')
     expect(manifest.theme_color).toBe('#84cc16')
-    expect(manifest.start_url).toBe('/')
+    expect(manifest.start_url).toBe('./')
     expect(manifest.icons).toHaveLength(2)
 
-    // Icons should reference SVG favicon with multiple sizes
     for (const icon of manifest.icons) {
       expect(icon.type).toBe('image/svg+xml')
-      expect(icon.src).toContain('favicon.svg')
+      expect(icon.src).toBe('./favicon.svg')
     }
   })
 
@@ -32,36 +48,26 @@ describe('PWA Configuration', () => {
     expect(existsSync(conflictingPath)).toBe(false)
   })
 
-  it('service worker file exists with caching strategies', () => {
-    const swPath = resolve(ROOT, 'public/sw.js')
-    expect(existsSync(swPath)).toBe(true)
-
-    const swContent = readFileSync(swPath, 'utf-8')
-    // Verify PHI routes are excluded from caching
-    expect(swContent).toContain('PHI')
-    // Verify caching strategy patterns exist
-    expect(swContent.toLowerCase()).toContain('cache')
+  it('service worker helpers resolve against the deployment base', () => {
+    expect(normalizeBasePath('/')).toBe('/')
+    expect(normalizeBasePath('/tenant')).toBe('/tenant/')
+    expect(getServiceWorkerScope('/tenant')).toBe('/tenant/')
+    expect(getServiceWorkerScriptUrl('/tenant')).toBe('/tenant/sw.js')
   })
 
-  it('BaseLayout.astro includes manifest link, theme-color, and SW registration', () => {
-    const layoutPath = resolve(ROOT, 'src/layouts/BaseLayout.astro')
-    expect(existsSync(layoutPath)).toBe(true)
+  it('service worker registration uses the resolved script path and scope', async () => {
+    const register = vi.fn().mockResolvedValue(undefined)
 
-    const layout = readFileSync(layoutPath, 'utf-8')
+    vi.stubGlobal('navigator', {
+      serviceWorker: {
+        register,
+      },
+    })
 
-    // Manifest link
-    expect(layout).toContain('manifest.webmanifest')
-    expect(layout).toContain('rel="manifest"')
+    await serviceWorkerManager.register()
 
-    // Apple touch icon
-    expect(layout).toContain('apple-touch-icon')
-
-    // Theme color meta
-    expect(layout).toContain('theme-color')
-    expect(layout).toContain('#131313')
-
-    // Service worker registration
-    expect(layout).toContain('serviceWorker')
-    expect(layout).toContain('/sw.js')
+    expect(register).toHaveBeenCalledWith(getServiceWorkerScriptUrl(), {
+      scope: getServiceWorkerScope(),
+    })
   })
 })

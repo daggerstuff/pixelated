@@ -1,9 +1,16 @@
 // Service Worker Registration — PIX-4061
 // Registers SW with update detection. On new SW version: skipWaiting + reload.
 if ('serviceWorker' in navigator) {
+  const scriptUrl =
+    document.currentScript instanceof HTMLScriptElement
+      ? document.currentScript.src
+      : window.location.href
+
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js', { updateViaCache: 'none' })
+      .register(new URL('../sw.js', scriptUrl).toString(), {
+        updateViaCache: 'none',
+      })
       .then((registration) => {
         // Listen for new SW installations
         registration.addEventListener('updatefound', () => {

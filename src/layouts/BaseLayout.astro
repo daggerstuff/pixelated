@@ -10,6 +10,10 @@ import '@/styles/np-tokens.css'
 import '@/styles/marketing.css'
 import ThemeSwitcher from '@/components/ThemeSwitcher.astro'
 import { withBasePath } from '@/utils/path'
+import {
+  getServiceWorkerScope,
+  getServiceWorkerScriptUrl,
+} from '@/utils/serviceWorkerPath'
 import { SITE } from '@/config'
 
 interface Props {
@@ -73,6 +77,8 @@ const isActive = (href: string) => {
 }
 
 const cspNonce = Astro.locals.cspNonce ?? ''
+const serviceWorkerUrl = getServiceWorkerScriptUrl()
+const serviceWorkerScope = getServiceWorkerScope()
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -183,10 +189,10 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         <script type="text/javascript" set:html={mixpanelScript} />
       )
     }
-    <script is:inline nonce={cspNonce}>
+    <script is:inline nonce={cspNonce} define:vars={{ serviceWorkerUrl, serviceWorkerScope }}>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {})
+          navigator.serviceWorker.register(serviceWorkerUrl, { scope: serviceWorkerScope }).catch(() => {})
         })
       }
     </script>

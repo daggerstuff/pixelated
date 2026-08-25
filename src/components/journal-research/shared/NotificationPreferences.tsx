@@ -22,6 +22,10 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import {
+  getServiceWorkerScope,
+  getServiceWorkerScriptUrl,
+} from '@/utils/serviceWorkerPath'
 
 export type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'never'
 
@@ -154,9 +158,14 @@ export function NotificationPreferences({
       // Register service worker
       let registration: ServiceWorkerRegistration | null = null
       try {
-        registration = await navigator.serviceWorker.register('/sw.js')
+        registration = await navigator.serviceWorker.register(
+          getServiceWorkerScriptUrl(),
+        )
       } catch {
-        registration = (await navigator.serviceWorker.getRegistration()) ?? null
+        registration =
+          (await navigator.serviceWorker.getRegistration(
+            getServiceWorkerScope(),
+          )) ?? null
       }
 
       if (!registration) {
