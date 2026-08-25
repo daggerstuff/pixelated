@@ -9,6 +9,7 @@ metadata:
     slot: blue
 spec:
   replicas: 2
+  progressDeadlineSeconds: 600
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -55,8 +56,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: pixelated-empathy-config
+                optional: true
             - secretRef:
                 name: pixelated-empathy-secrets
+                optional: true
           volumeMounts:
             - name: cloudflare-tls
               mountPath: /etc/ssl/cloudflare
@@ -112,5 +115,6 @@ spec:
         - name: cloudflare-tls
           secret:
             secretName: cloudflare-origin-tls
+            optional: true
         - name: tmp
           emptyDir: {}
