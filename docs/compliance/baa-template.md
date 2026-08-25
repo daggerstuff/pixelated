@@ -1,12 +1,8 @@
 # BAA Template — NIM on Hetzner
 
-#
-
-# Reference template for Business Associate Agreements covering AI inference
-
-# services that process Protected Health Information (PHI) within Pixelated
-
-# Empathy. Adapt with legal counsel before signing.
+Reference template for Business Associate Agreements covering AI inference
+services that process Protected Health Information (PHI) within Pixelated
+Empathy. Adapt with legal counsel before signing.
 
 ---
 
