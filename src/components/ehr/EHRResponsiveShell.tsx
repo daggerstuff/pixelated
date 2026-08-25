@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react'
+import { useEffect, useState, type FC, type ReactNode } from 'react'
 import { useResponsive } from '@/components/layout/ResponsiveUtils'
 
 import { EHRMobileLayout } from './EHRMobileLayout'
@@ -50,13 +50,14 @@ export const EHRResponsiveShell: FC<EHRResponsiveShellProps> = ({
   navItems = [],
 }) => {
   const { isDesktop } = useResponsive()
+  const [isMounted, setIsMounted] = useState(false)
 
-  // SSR safety: useResponsive defaults width=1024 on server, so isDesktop=true.
-  // On client hydration, it picks up the real viewport width.
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
-  // Desktop-optimized views always use desktop layout regardless of viewport.
-  // Mobile-first views use mobile layout when viewport < 1024px.
-  const useDesktopLayout = isDesktop || category === 'desktop-optimized'
+  const useDesktopLayout =
+    category === 'desktop-optimized' || !isMounted || isDesktop
 
   if (useDesktopLayout) {
     return (

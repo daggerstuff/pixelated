@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import { describe, expect, it, afterEach, vi, beforeEach } from 'vitest'
 import '@testing-library/jest-dom/vitest'
 
@@ -85,7 +85,7 @@ describe('EHRResponsiveShell', () => {
     expect(screen.getByTestId('content')).toBeInTheDocument()
   })
 
-  it('renders mobile layout for mobile-first category when viewport < 1024px', () => {
+  it('renders mobile layout for mobile-first category when viewport < 1024px', async () => {
     setViewport(false)
 
     render(
@@ -94,13 +94,14 @@ describe('EHRResponsiveShell', () => {
       </EHRResponsiveShell>,
     )
 
-    // Mobile layout has bottom nav, no sidebar "EHR" heading
-    expect(screen.queryByText('EHR')).not.toBeInTheDocument()
+    await waitFor(() =>
+      expect(screen.queryByText('EHR')).not.toBeInTheDocument(),
+    )
     expect(screen.getByTestId('content')).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'EHR navigation' })).toBeInTheDocument()
   })
 
-  it('mobile layout nav items have 44px minimum touch targets', () => {
+  it('mobile layout nav items have 44px minimum touch targets', async () => {
     setViewport(false)
 
     render(
@@ -109,8 +110,11 @@ describe('EHRResponsiveShell', () => {
       </EHRResponsiveShell>,
     )
 
+    await waitFor(() =>
+      expect(screen.getAllByRole('link')[0].className).toContain('min-h-[44px]'),
+    )
+
     const navLinks = screen.getAllByRole('link')
-    // Nav items should have min-h-[44px] class
     for (const link of navLinks) {
       expect(link.className).toContain('min-h-[44px]')
     }

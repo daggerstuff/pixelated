@@ -4,40 +4,43 @@ if ('serviceWorker' in navigator) {
   const scriptUrl =
     document.currentScript instanceof HTMLScriptElement
       ? document.currentScript.src
-      : window.location.href
+      : document.querySelector(
+          'script[src$="/js/service-worker-registration.js"]',
+        )?.src
 
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register(new URL('../sw.js', scriptUrl).toString(), {
-        updateViaCache: 'none',
-      })
-      .then((registration) => {
-        // Listen for new SW installations
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing
-          if (!newWorker) return
+  if (!scriptUrl) {
+    console.error('ServiceWorker registration failed: script URL unavailable')
+  } else {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker
+        .register(new URL('../sw.js', scriptUrl).toString(), {
+          updateViaCache: 'none',
+        })
+        .then((registration) => {
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing
+            if (!newWorker) return
 
-          newWorker.addEventListener('statechange', () => {
-            if (
-              newWorker.state === 'installed' &&
-              navigator.serviceWorker.controller
-            ) {
-              // New SW is waiting — tell it to skip waiting
-              newWorker.postMessage('SKIP_WAITING')
-            }
+            newWorker.addEventListener('statechange', () => {
+              if (
+                newWorker.state === 'installed' &&
+                navigator.serviceWorker.controller
+              ) {
+                newWorker.postMessage('SKIP_WAITING')
+              }
+            })
           })
         })
-      })
-      .catch((error) => {
-        console.error('ServiceWorker registration failed:', error)
-      })
+        .catch((error) => {
+          console.error('ServiceWorker registration failed:', error)
+        })
 
-    // Reload once when controller changes (new SW took over)
-    let refreshing = false
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return
-      refreshing = true
-      window.location.reload()
+      let refreshing = false
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return
+        refreshing = true
+        window.location.reload()
+      })
     })
-  })
+  }
 }
