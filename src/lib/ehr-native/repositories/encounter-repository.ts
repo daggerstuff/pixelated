@@ -53,6 +53,9 @@ export class EncounterRepository extends BaseRepository<Encounter> {
         ],
       )
       const row = res.rows[0]
+      if (!row) {
+        throw new Error('Failed to create encounter: no row returned')
+      }
       // Stamp the DB-generated encounter_id into the stored fhir_resource JSONB
       // so subsequent reads return a complete FHIR resource with its id.
       const updateRes = await client.query<{ fhir_resource: Encounter }>(

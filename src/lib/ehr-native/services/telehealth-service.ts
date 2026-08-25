@@ -15,6 +15,8 @@
  * @see audit/ehr-audit-service.ts for audit trail
  */
 
+import { randomUUID } from 'node:crypto'
+
 import { EHRAuditService } from '../audit/ehr-audit-service'
 import { EHRAuditAction } from '../audit/events'
 import { type RLSContext, EncounterRepository } from '../repositories'
@@ -33,12 +35,10 @@ import type {
 
 function validateId(id: string, label: string): string {
   const sanitized = id.trim()
-  if (
-    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      sanitized,
+  if (!/^[A-Za-z0-9\-.]{1,64}$/.test(sanitized)) {
+    throw new Error(
+      `Invalid ${label} format: expected FHIR id (1-64 chars, A-Z, a-z, 0-9, -, .)`,
     )
-  ) {
-    throw new Error(`Invalid ${label} format: expected UUID`)
   }
   return sanitized
 }
@@ -193,7 +193,7 @@ export class TelehealthService {
               userId,
               status: 'failure',
               errorMessage: 'Encounter creation returned no ID',
-              sessionId: 'pending',
+              sessionId: randomUUID(),
               patientId,
               practitionerId,
             },
@@ -208,7 +208,7 @@ export class TelehealthService {
             userId,
             status: 'failure',
             errorMessage: `Encounter creation failed: ${err instanceof Error ? err.message : 'unknown error'}`,
-            sessionId: 'pending',
+            sessionId: randomUUID(),
             patientId,
             practitionerId,
           },
@@ -279,6 +279,11 @@ export class TelehealthService {
    * Adds the participant to the session's participant list and audits the join.
    *
    * @returns The updated TelehealthSession, or null if not found.
+   */
+  /**
+   * Join a telehealth session — currently a stub.
+   * Session store not yet wired; always returns null and audits with failure.
+   * TODO: Implement session store integration when available (F1.12 stub).
    */
   async joinSession(
     input: JoinSessionInput,
@@ -393,7 +398,7 @@ export class TelehealthService {
     await this.auditService.logTelehealthAccess(EHRAuditAction.CHECK_DEVICES, {
       userId,
       status: result.canProceed ? 'success' : 'failure',
-      sessionId: 'device-check',
+      sessionId: randomUUID(),
     })
 
     return result
@@ -414,7 +419,7 @@ export class TelehealthService {
     const sessionId = validateId(input.sessionId, 'sessionId')
     const patientId = validateId(input.patientId, 'patientId')
     const practitionerId = validateId(input.practitionerId, 'practitionerId')
-    const consentAt = validateIsoTimestamp(input.consentAt, 'consentAt')
+    validateIsoTimestamp(input.consentAt, 'consentAt')
 
     // Consent gate — recording requires explicit consent
     if (!input.consentGiven) {
@@ -440,6 +445,8 @@ export class TelehealthService {
         sessionId,
         patientId,
         practitionerId,
+        // Include consent timestamp for HIPAA audit trail
+        metadata: { consentAt: input.consentAt },
       },
     )
 
