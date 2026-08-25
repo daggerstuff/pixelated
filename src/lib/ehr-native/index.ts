@@ -21,3 +21,14 @@ export {
   AppointmentRepository,
   ObservationRepository,
 } from './repositories'
+
+// Services (F1.7–F1.12)
+export { TelehealthService } from './services'
+export type {
+  TelehealthSession,
+  StartSessionInput,
+  JoinSessionInput,
+  DeviceCheckResult,
+  WebRTCConfig,
+  TelehealthProvider,
+} from './types'

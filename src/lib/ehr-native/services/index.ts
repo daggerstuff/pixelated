@@ -15,74 +15,31 @@
  * - PortalMessagingService (F1.11) — secure patient messaging
  * - PortalHomeworkService (F1.11) — therapy homework assignments
  * - PortalStatementService (F1.11) — patient financial statements
+ * - TelehealthService (F1.12) — native telehealth sessions
  */
 
-export {
-  PatientService,
-  type PatientChart,
-  type PatientChartSummary,
-  type PatientSearchParams,
-  type CreatePatientInput,
-  type UpdatePatientInput,
-} from './patient-service'
+export { PatientService } from './patient-service'
 
 export {
   NoteTemplateService,
   noteTemplateService,
-  type NoteModality,
-  type NoteSection,
-  type NoteTemplate,
-  type CreateNoteFromTemplateInput,
-  type NoteTemplateValidationResult,
 } from './note-template-service'
 
-export {
-  SchedulingService,
-  type CreateAppointmentInput,
-  type UpdateAppointmentInput,
-  type ScheduleSearchParams,
-  type DateRangeParams,
-  type PractitionerScheduleParams,
-  type ScheduleSummary,
-} from './scheduling-service'
+export { SchedulingService } from './scheduling-service'
 
-export {
-  ClaimsService,
-  claimsService,
-  type ClaimStatus,
-  type ClaimUse,
-  type CreateClaimInput,
-  type CreateClaimItemInput,
-  type CreateClaimDiagnosisInput,
-  type CreateClaimProcedureInput,
-  type CreateClaimInsuranceInput,
-  type ClaimValidationResult,
-  type ClaimSummary,
-  type ClaimStatusTransition,
-} from './claims-service'
+export { ClaimsService, claimsService } from './claims-service'
 
 export {
   PortalMessagingService,
-  type MessageThread,
-  type ThreadMessage,
   type CreateThreadInput,
   type CreateMessageInput,
-  type ThreadSearchParams,
-  type ThreadSummary,
 } from './portal-messaging-service'
 
 export {
   PortalHomeworkService,
-  type HomeworkAssignment,
-  type HomeworkSummary,
   type UpdateHomeworkInput,
-  type HomeworkSearchParams,
 } from './portal-homework-service'
 
-export {
-  PortalStatementService,
-  type PatientStatement,
-  type StatementSummary,
-  type StatementSearchParams,
-  type StatementDownload,
-} from './portal-statement-service'
+export { PortalStatementService } from './portal-statement-service'
+
+export { TelehealthService } from './telehealth-service'

@@ -42,6 +42,7 @@ export * from './communication.js'
 
 export * from './consent.js'
 export * from './service-request.js'
+export * from './telehealth.js'
 
 // ---------------------------------------------------------------------------
 // EHR Resource Discriminated Union + Helpers
