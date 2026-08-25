@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 /**
  * Pre-call device check component.
@@ -119,6 +119,7 @@ async function runDeviceChecks(): Promise<DeviceCheckResult> {
 
 export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
   const [state, setState] = useState<DeviceState>(createInitialDeviceState);
+  const hasCheckedRef = useRef(false);
 
   const checkDevices = useCallback(async () => {
     setState((prev) => ({ ...prev, checking: true }));
@@ -127,6 +128,8 @@ export function PreCallCheck({ onComplete, onCancel }: PreCallCheckProps) {
   }, []);
 
   useEffect(() => {
+    if (hasCheckedRef.current) return;
+    hasCheckedRef.current = true;
     void checkDevices();
   }, [checkDevices]);
 
