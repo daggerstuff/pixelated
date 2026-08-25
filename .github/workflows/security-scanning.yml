@@ -16,13 +16,10 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   GHA_LOCAL_RUN: 'false'
 
+# Disabled — all jobs consolidated into .github/workflows/security.yml
+# Kept for historical reference only. Do not re-enable; add new jobs to security.yml.
 on:
-  push:
-    branches: [main, master, staging]
-  pull_request:
-    branches: [main, master, staging]
-  schedule:
-    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   security-scan:
