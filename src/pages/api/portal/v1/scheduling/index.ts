@@ -61,13 +61,18 @@ export const GET = withV1Contract(
     const result = await service.getPatientAppointments(patientId, {
       limit,
       offset,
-      ...(status ? { status } : {}),
     })
 
-    return ehrPaginated(result, {
+    // Filter by status in application code — SchedulingService.getPatientAppointments
+    // does not support status filtering in its ScheduleSearchParams type.
+    const filtered = status
+      ? result.filter((apt) => apt.status === status)
+      : result
+
+    return ehrPaginated(filtered, {
       limit,
       offset,
-      total: result.length,
+      total: filtered.length,
     })
   },
 )
@@ -99,9 +104,36 @@ export const POST = withV1Contract(
     const body = raw as Record<string, unknown>
 
     // Ensure the FHIR resource references the authenticated patient
-    const fhirResource = body['fhirResource'] as Record<string, unknown> | undefined
+    const fhirResource = body['fhirResource'] as Record<
+      string,
+      unknown
+    > | undefined
     if (!fhirResource)
       return ehrValidationError('fhirResource is required.')
+
+    // Security: Override patient participant reference with authenticated user's ID
+    // to prevent IDOR — patients can only schedule appointments for themselves.
+    const patientRef = `Patient/${patientId}`
+    if (Array.isArray(fhirResource['participant'])) {
+      let foundPatient = false
+      for (const p of fhirResource['participant'] as Array<Record<string, unknown>>) {
+        const actor = p['actor'] as Record<string, unknown> | undefined
+        if (
+          actor &&
+          typeof actor['reference'] === 'string' &&
+          actor['reference'].startsWith('Patient/')
+        ) {
+          actor['reference'] = patientRef
+          foundPatient = true
+        }
+      }
+      if (!foundPatient) {
+        ;(fhirResource['participant'] as Array<Record<string, unknown>>).push({
+          actor: { reference: patientRef },
+          status: 'needs-action',
+        })
+      }
+    }
 
     const service = new SchedulingService(guard.rlsContext)
 

@@ -472,7 +472,7 @@ export class PortalMessagingService {
       subject: docRef.description ?? 'Untitled thread',
       participantReferences: participants,
       messages,
-      createdAt: docRef.date ?? new Date().toISOString(),
+      createdAt: messages[0]?.sentAt ?? docRef.date ?? new Date().toISOString(),
       updatedAt: docRef.date ?? new Date().toISOString(),
     }
   }

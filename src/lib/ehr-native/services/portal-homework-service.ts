@@ -225,13 +225,6 @@ class HomeworkRepository extends BaseRepository<
           AND fhir_resource->'category' @> '[{"coding":[{"code":"homework"}]}]'`
       const params: unknown[] = [patientId, limit, offset]
 
-      if (statusFilter) {
-        query += ` AND fhir_resource->'content'->0->'attachment'->>'data' ILIKE $4`
-        // Decode base64 data to filter by status — approximate with SQL ILIKE on encoded payload
-        const statusPattern = `%${statusFilter}%`
-        params.push(statusPattern)
-      }
-
       query += ` ORDER BY updated_at DESC LIMIT $2 OFFSET $3`
       const result = await client.query(query, params)
       return (result.rows as Array<{ fhir_resource: DocumentReference }>).map(
@@ -288,11 +281,16 @@ export class PortalHomeworkService {
     const offset = sanitizeOffset(params.offset)
 
     const [docRefs, total] = await Promise.all([
-      this.homeworkRepo.findByPatient(patientId, limit, offset, params.status),
+      this.homeworkRepo.findByPatient(patientId, limit, offset),
       this.homeworkRepo.countByPatient(patientId),
     ])
 
-    const assignments = docRefs.map((dr) => this.toAssignment(dr))
+    let assignments = docRefs.map((dr) => this.toAssignment(dr))
+    // Filter by status in application code — status is stored in base64-encoded JSON payload,
+    // so SQL ILIKE on the raw data column cannot match plaintext status values.
+    if (params.status) {
+      assignments = assignments.filter((a) => a.status === params.status)
+    }
     return { assignments, total }
   }
 
