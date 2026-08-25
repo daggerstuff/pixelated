@@ -12,6 +12,9 @@
  * - NoteTemplateService (F1.8) — modality-specific note templates
  * - SchedulingService (F1.9) — appointment management
  * - ClaimsService (F1.10) — clearinghouse API claims tracking
+ * - PortalMessagingService (F1.11) — secure patient messaging
+ * - PortalHomeworkService (F1.11) — therapy homework assignments
+ * - PortalStatementService (F1.11) — patient financial statements
  */
 
 export {
@@ -57,3 +60,29 @@ export {
   type ClaimSummary,
   type ClaimStatusTransition,
 } from './claims-service'
+
+export {
+  PortalMessagingService,
+  type MessageThread,
+  type ThreadMessage,
+  type CreateThreadInput,
+  type CreateMessageInput,
+  type ThreadSearchParams,
+  type ThreadSummary,
+} from './portal-messaging-service'
+
+export {
+  PortalHomeworkService,
+  type HomeworkAssignment,
+  type HomeworkSummary,
+  type UpdateHomeworkInput,
+  type HomeworkSearchParams,
+} from './portal-homework-service'
+
+export {
+  PortalStatementService,
+  type PatientStatement,
+  type StatementSummary,
+  type StatementSearchParams,
+  type StatementDownload,
+} from './portal-statement-service'
