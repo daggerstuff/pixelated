@@ -15,7 +15,7 @@ import tempfile
 from pathlib import Path
 from unittest import mock
 
-from skills.monthly_llm_driver.dispatch_resume_gate import (
+from scripts.services.monthly_llm_driver.dispatch_resume_gate import (
     _read_pids_from_redis,
     register_dispatch_pid,
 )
@@ -45,11 +45,11 @@ def test_redis_set_sadd_and_expire() -> None:
 
         with (
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
                 str(pids_file),
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
                 return_value=mock_bundle,
             ),
         ):
@@ -83,7 +83,7 @@ def test_redis_set_smembers_reads_pids() -> None:
     mock_bundle.close = mock.MagicMock()
 
     with mock.patch(
-        "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+        "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
         return_value=mock_bundle,
     ):
         result = _read_pids_from_redis(month)
@@ -122,11 +122,11 @@ def test_redis_set_deduplication() -> None:
 
         with (
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
                 str(pids_file),
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
                 return_value=mock_bundle,
             ),
         ):
