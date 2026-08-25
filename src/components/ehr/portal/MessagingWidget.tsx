@@ -336,7 +336,7 @@ export function MessagingWidget() {
             <button
               type="submit"
               disabled={sendingMessage || !messageBody.trim()}
-              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded transition-colors disabled:opacity-50"
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium rounded transition-colors disabled:opacity-50 min-h-[44px]"
               style={{ background: 'var(--np-text)', color: 'var(--np-bg)' }}
             >
               <Send className="w-4 h-4" />
@@ -377,7 +377,7 @@ export function MessagingWidget() {
         </div>
         <button
           onClick={() => setShowNewModal(true)}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors min-h-[44px]"
           style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
         >
           <Plus className="w-4 h-4" />

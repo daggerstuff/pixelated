@@ -1,3 +1,8 @@
+import {
+  getServiceWorkerScope,
+  getServiceWorkerScriptUrl,
+} from './serviceWorkerPath'
+
 /**
  * Service Worker Registration Utility
  * This file provides utilities for managing the service worker
@@ -9,7 +14,7 @@ const defaultConfig = {
   debug: {
     enabled: false,
   },
-  scope: '/',
+  scope: getServiceWorkerScope(),
   backgroundSync: {
     enabled: false,
     queueName: 'sync-queue',
@@ -53,9 +58,12 @@ export class ServiceWorkerManager {
     }
 
     try {
-      this.registration = await navigator.serviceWorker.register('/sw.js', {
-        scope: this.config.scope,
-      })
+      this.registration = await navigator.serviceWorker.register(
+        getServiceWorkerScriptUrl(),
+        {
+          scope: this.config.scope,
+        },
+      )
 
       if (this.debug) {
         console.warn('Service Worker registered successfully')

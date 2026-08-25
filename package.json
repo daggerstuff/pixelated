@@ -199,9 +199,12 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
+    "@ai-sdk/harness": "^1.0.87",
+    "@ai-sdk/harness-fx": "^1.0.0",
     "@ai-sdk/mcp": "latest",
     "@ai-sdk/openai": "^4.0.37",
     "@ai-sdk/provider": "^4.0.7",
+    "@ai-sdk/sandbox-vercel": "^1.0.87",
     "@astrojs/node": "^11.1.0",
     "@astrojs/react": "latest",
     "@astrojs/vercel": "11.0.7",
