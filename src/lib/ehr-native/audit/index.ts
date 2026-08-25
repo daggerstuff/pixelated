@@ -26,7 +26,6 @@ export {
 
 export {
   EHRAuditService,
-  ehrAuditService,
   type EHRAuditInput,
   type PatientAuditInput,
   type EncounterAuditInput,
@@ -38,4 +37,5 @@ export {
   type MedicationAuditInput,
   type IntegrationAuditInput,
   type BreakGlassAuditInput,
+  type TelehealthAuditInput,
 } from './ehr-audit-service'
