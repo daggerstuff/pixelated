@@ -90,6 +90,14 @@ export const EHRAuditAction = {
   CLEARINGHOUSE_CHECK_STATUS: 'clearinghouse_check_status',
   CLEARINGHOUSE_REMITTANCE: 'clearinghouse_remittance',
 
+  // Telehealth (F1.12)
+  START_TELEHEALTH_SESSION: 'start_telehealth_session',
+  JOIN_TELEHEALTH_SESSION: 'join_telehealth_session',
+  END_TELEHEALTH_SESSION: 'end_telehealth_session',
+  START_RECORDING: 'start_recording',
+  STOP_RECORDING: 'stop_recording',
+  CHECK_DEVICES: 'check_devices',
+
   // Break-glass
   BREAK_GLASS_ACCESS: 'break_glass_access',
 } as const
@@ -111,6 +119,7 @@ export const EHRResourceType = {
   CONSENT: 'Consent',
   MEDICATION_REQUEST: 'MedicationRequest',
   COVERAGE: 'Coverage',
+  TELEHEALTH_SESSION: 'TelehealthSession',
 } as const
 
 export type EHRResourceTypeValue =
@@ -212,7 +221,9 @@ export function ehrActionToEventType(
   if (
     action.startsWith('create_') ||
     action.startsWith('book_') ||
-    action.startsWith('prescribe_')
+    action.startsWith('prescribe_') ||
+    action.startsWith('start_') ||
+    action.startsWith('join_')
   ) {
     return AuditEventType.CREATE
   }
@@ -222,7 +233,9 @@ export function ehrActionToEventType(
     action.startsWith('sign_') ||
     action.startsWith('reschedule_') ||
     action.startsWith('submit_') ||
-    action.startsWith('close_')
+    action.startsWith('close_') ||
+    action.startsWith('end_') ||
+    action.startsWith('stop_')
   ) {
     return AuditEventType.UPDATE
   }
