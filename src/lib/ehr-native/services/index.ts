@@ -18,49 +18,16 @@
  * - TelehealthService (F1.12) — native telehealth sessions
  */
 
-export {
-  PatientService,
-  type PatientChart,
-  type PatientChartSummary,
-  type PatientSearchParams,
-  type CreatePatientInput,
-  type UpdatePatientInput,
-} from './patient-service'
+export { PatientService } from './patient-service'
 
 export {
   NoteTemplateService,
   noteTemplateService,
-  type NoteModality,
-  type NoteSection,
-  type NoteTemplate,
-  type CreateNoteFromTemplateInput,
-  type NoteTemplateValidationResult,
 } from './note-template-service'
 
-export {
-  SchedulingService,
-  type CreateAppointmentInput,
-  type UpdateAppointmentInput,
-  type ScheduleSearchParams,
-  type DateRangeParams,
-  type PractitionerScheduleParams,
-  type ScheduleSummary,
-} from './scheduling-service'
+export { SchedulingService } from './scheduling-service'
 
-export {
-  ClaimsService,
-  claimsService,
-  type ClaimStatus,
-  type ClaimUse,
-  type CreateClaimInput,
-  type CreateClaimItemInput,
-  type CreateClaimDiagnosisInput,
-  type CreateClaimProcedureInput,
-  type CreateClaimInsuranceInput,
-  type ClaimValidationResult,
-  type ClaimSummary,
-  type ClaimStatusTransition,
-} from './claims-service'
+export { ClaimsService, claimsService } from './claims-service'
 
 export {
   PortalMessagingService,

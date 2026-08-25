@@ -550,9 +550,3 @@ export class EHRAuditService {
     return this.logger.getUserEvents(userId, limit, offset)
   }
 }
-
-// ---------------------------------------------------------------------------
-// Singleton export
-// ---------------------------------------------------------------------------
-
-export const ehrAuditService = EHRAuditService.getInstance()
