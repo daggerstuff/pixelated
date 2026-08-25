@@ -34,10 +34,13 @@ export class EncounterRepository extends BaseRepository<Encounter> {
     const periodStart = validated.period?.start ?? null
     const periodEnd = validated.period?.end ?? null
     return this.withRLS(async (client) => {
-      const res = await client.query<{ fhir_resource: Encounter }>(
+      const res = await client.query<{
+        encounter_id: string
+        fhir_resource: Encounter
+      }>(
         `INSERT INTO ehr_encounter (tenant_id, patient_id, practitioner_id, status, class, period_start, period_end, fhir_resource)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         RETURNING fhir_resource`,
+         RETURNING encounter_id, fhir_resource`,
         [
           this.rlsContext.tenantId,
           patientId,
@@ -49,7 +52,20 @@ export class EncounterRepository extends BaseRepository<Encounter> {
           JSON.stringify(validated),
         ],
       )
-      return res.rows[0].fhir_resource
+      const row = res.rows[0]
+      if (!row) {
+        throw new Error('Failed to create encounter: no row returned')
+      }
+      // Stamp the DB-generated encounter_id into the stored fhir_resource JSONB
+      // so subsequent reads return a complete FHIR resource with its id.
+      const updateRes = await client.query<{ fhir_resource: Encounter }>(
+        `UPDATE ehr_encounter
+         SET fhir_resource = jsonb_set(fhir_resource, '{id}', to_jsonb($2))
+         WHERE encounter_id = $1
+         RETURNING fhir_resource`,
+        [row.encounter_id, row.encounter_id],
+      )
+      return updateRes.rows[0]?.fhir_resource ?? row.fhir_resource
     })
   }
 
