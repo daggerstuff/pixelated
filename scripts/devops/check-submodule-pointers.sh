@@ -39,9 +39,15 @@ for name in "${NAMES[@]}"; do
   path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
   url="$(git config -f .gitmodules --get "submodule.${name}.url")"
 
-  pinned="$(git ls-tree "${COMMITISH}" -- "${path}" | awk '{print $3}')"
+  ls_line="$(git ls-tree "${COMMITISH}" -- "${path}")"
+  mode="$(printf '%s' "${ls_line}" | awk '{print $1}')"
+  pinned="$(printf '%s' "${ls_line}" | awk '{print $3}')"
   if [[ -z "${pinned}" ]]; then
     echo "WARN: submodule '${name}' (${path}) absent from ${COMMITISH}; skipping."
+    continue
+  fi
+  if [[ "${mode}" != "160000" ]]; then
+    echo "WARN: '${name}' (${path}) is mode ${mode} in ${COMMITISH}, not a submodule (160000); skipping."
     continue
   fi
 
