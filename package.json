@@ -437,7 +437,7 @@
     "del-cli": "latest",
     "dotenv": "latest",
     "esbuild": "^0.28.2",
-    "eslint": "^10.8.1",
+    "eslint": "^10.9.0",
     "eslint-plugin-astro": "latest",
     "eslint-plugin-jsx-a11y": "latest",
     "eslint-plugin-n": "latest",
