@@ -1,5 +1,5 @@
 import { CheckCircle, AlertCircle } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -22,6 +22,10 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
+import {
+  getServiceWorkerScope,
+  getServiceWorkerScriptUrl,
+} from '@/utils/serviceWorkerPath'
 
 export type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'never'
 
@@ -113,18 +117,15 @@ export function NotificationPreferences({
   className,
 }: NotificationPreferencesProps) {
   const { preferences, setPreferences } = useNotificationPreferencesStore()
-  const [pushPermission, setPushPermission] =
-    useState<NotificationPermission>('default')
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>(
+    typeof window !== 'undefined' && 'Notification' in window
+      ? Notification.permission
+      : 'default',
+  )
   const [pushSubscription, setPushSubscription] =
     useState<PushSubscription | null>(null)
   const [isRequestingPush, setIsRequestingPush] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPushPermission(Notification.permission)
-    }
-  }, [])
 
   const requestPushPermission = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
@@ -154,9 +155,14 @@ export function NotificationPreferences({
       // Register service worker
       let registration: ServiceWorkerRegistration | null = null
       try {
-        registration = await navigator.serviceWorker.register('/sw.js')
+        registration = await navigator.serviceWorker.register(
+          getServiceWorkerScriptUrl(),
+        )
       } catch {
-        registration = (await navigator.serviceWorker.getRegistration()) ?? null
+        registration =
+          (await navigator.serviceWorker.getRegistration(
+            getServiceWorkerScope(),
+          )) ?? null
       }
 
       if (!registration) {
