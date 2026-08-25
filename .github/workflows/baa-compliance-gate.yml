@@ -31,7 +31,7 @@ jobs:
       # BAA confirmation env vars — set by the deployment environment.
       # In CI, these are set to confirm BAA is in place before PRs touching
       # AI/EHR paths can merge. Missing or false causes the gate to fail closed.
-      BAA_NIM_HETZER_CONFIRMED: 'true'
+      BAA_NIM_HETZNER_CONFIRMED: 'true'
       BAA_NVIDIA_CONFIRMED: 'true'
       BAA_EMBEDDING_CONFIRMED: 'true'
       BAA_TRANSCRIPTION_CONFIRMED: 'true'
