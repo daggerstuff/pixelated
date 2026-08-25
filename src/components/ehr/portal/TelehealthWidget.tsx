@@ -72,7 +72,10 @@ export function TelehealthWidget() {
       <div className="flex items-center justify-center py-12">
         <div
           className="w-6 h-6 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--np-muted)', borderTopColor: 'var(--np-text)' }}
+          style={{
+            borderColor: 'var(--np-muted)',
+            borderTopColor: 'var(--np-text)',
+          }}
         />
       </div>
     )
@@ -81,7 +84,10 @@ export function TelehealthWidget() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+        <h2
+          className="text-xl font-semibold"
+          style={{ color: 'var(--np-text)' }}
+        >
           Telehealth
         </h2>
         <p className="text-sm mt-1" style={{ color: 'var(--np-muted)' }}>
@@ -92,7 +98,11 @@ export function TelehealthWidget() {
       {error && (
         <div
           className="p-4 text-sm rounded"
-          style={{ background: 'var(--np-surface)', color: 'var(--np-text)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            color: 'var(--np-text)',
+            border: '1px solid var(--np-line)',
+          }}
         >
           {error}
         </div>
@@ -101,11 +111,18 @@ export function TelehealthWidget() {
       {appointments.length === 0 ? (
         <div
           className="text-center py-12 rounded"
-          style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            border: '1px solid var(--np-line)',
+          }}
         >
-          <Video className="w-8 h-8 mx-auto mb-3" style={{ color: 'var(--np-muted)' }} />
+          <Video
+            className="w-8 h-8 mx-auto mb-3"
+            style={{ color: 'var(--np-muted)' }}
+          />
           <p className="text-sm" style={{ color: 'var(--np-muted)' }}>
-            No upcoming telehealth appointments. Schedule one from the Scheduling page.
+            No upcoming telehealth appointments. Schedule one from the
+            Scheduling page.
           </p>
         </div>
       ) : (
@@ -117,35 +134,61 @@ export function TelehealthWidget() {
               <div
                 key={apt.id}
                 className="p-4 rounded"
-                style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+                style={{
+                  background: 'var(--np-surface)',
+                  border: '1px solid var(--np-line)',
+                }}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <Video className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--np-muted)' }} />
-                      <span className="text-sm font-medium" style={{ color: 'var(--np-text)' }}>
+                      <Video
+                        className="w-4 h-4 flex-shrink-0"
+                        style={{ color: 'var(--np-muted)' }}
+                      />
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: 'var(--np-text)' }}
+                      >
                         {formatTime(apt.start)}
                       </span>
                       {isLive && (
                         <span
                           className="text-xs px-2 py-0.5 rounded animate-pulse"
-                          style={{ background: 'var(--np-danger, #ef4444)', color: '#fff' }}
+                          style={{
+                            background: 'var(--np-danger, #ef4444)',
+                            color: '#fff',
+                          }}
                         >
                           LIVE
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-sm" style={{ color: 'var(--np-muted)' }}>
+                    <div
+                      className="flex items-center gap-3 text-sm"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
                       <span className="flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
-                        {new Date(apt.start).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        {new Date(apt.start).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
                         {' – '}
-                        {new Date(apt.end).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}
+                        {new Date(apt.end).toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
                       </span>
-                      {apt.practitionerName && <span>{apt.practitionerName}</span>}
+                      {apt.practitionerName && (
+                        <span>{apt.practitionerName}</span>
+                      )}
                     </div>
                     {apt.reason && (
-                      <p className="text-sm mt-2" style={{ color: 'var(--np-muted)' }}>
+                      <p
+                        className="text-sm mt-2"
+                        style={{ color: 'var(--np-muted)' }}
+                      >
                         {apt.reason}
                       </p>
                     )}
@@ -160,8 +203,14 @@ export function TelehealthWidget() {
                         onClick={() => setJoinedId(apt.id)}
                         className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors"
                         style={{
-                          background: joinedId === apt.id ? 'var(--np-elevated)' : 'var(--np-text)',
-                          color: joinedId === apt.id ? 'var(--np-text)' : 'var(--np-bg)',
+                          background:
+                            joinedId === apt.id
+                              ? 'var(--np-elevated)'
+                              : 'var(--np-text)',
+                          color:
+                            joinedId === apt.id
+                              ? 'var(--np-text)'
+                              : 'var(--np-bg)',
                         }}
                       >
                         <Video className="w-4 h-4" />
@@ -171,7 +220,10 @@ export function TelehealthWidget() {
                     ) : (
                       <span
                         className="text-xs px-3 py-2 rounded"
-                        style={{ background: 'var(--np-elevated)', color: 'var(--np-muted)' }}
+                        style={{
+                          background: 'var(--np-elevated)',
+                          color: 'var(--np-muted)',
+                        }}
                       >
                         Joining available 10 min before start
                       </span>

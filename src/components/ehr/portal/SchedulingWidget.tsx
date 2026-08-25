@@ -85,7 +85,9 @@ export function SchedulingWidget() {
       const result = (await res.json()) as PaginatedResponse<Appointment>
       setAppointments(result.data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load appointments')
+      setError(
+        err instanceof Error ? err.message : 'Failed to load appointments',
+      )
     } finally {
       setLoading(false)
     }
@@ -105,17 +107,23 @@ export function SchedulingWidget() {
           if (!cancelled) setAppointments(result.data)
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load appointments')
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : 'Failed to load appointments',
+          )
       } finally {
         if (!cancelled) setLoading(false)
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedDate || !selectedTime || !selectedPractitioner || !reason) return
+    if (!selectedDate || !selectedTime || !selectedPractitioner || !reason)
+      return
 
     setSubmitting(true)
     try {
@@ -182,7 +190,10 @@ export function SchedulingWidget() {
       <div className="flex items-center justify-center py-12">
         <div
           className="w-6 h-6 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--np-muted)', borderTopColor: 'var(--np-text)' }}
+          style={{
+            borderColor: 'var(--np-muted)',
+            borderTopColor: 'var(--np-text)',
+          }}
         />
       </div>
     )
@@ -192,7 +203,10 @@ export function SchedulingWidget() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+          <h2
+            className="text-xl font-semibold"
+            style={{ color: 'var(--np-text)' }}
+          >
             Appointments
           </h2>
           <p className="text-sm mt-1" style={{ color: 'var(--np-muted)' }}>
@@ -225,9 +239,15 @@ export function SchedulingWidget() {
       {appointments.length === 0 ? (
         <div
           className="text-center py-12 rounded"
-          style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            border: '1px solid var(--np-line)',
+          }}
         >
-          <Calendar className="w-8 h-8 mx-auto mb-3" style={{ color: 'var(--np-muted)' }} />
+          <Calendar
+            className="w-8 h-8 mx-auto mb-3"
+            style={{ color: 'var(--np-muted)' }}
+          />
           <p className="text-sm" style={{ color: 'var(--np-muted)' }}>
             No appointments scheduled. Click "Schedule New" to book a session.
           </p>
@@ -238,31 +258,51 @@ export function SchedulingWidget() {
             <div
               key={apt.id}
               className="p-4 rounded"
-              style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+              style={{
+                background: 'var(--np-surface)',
+                border: '1px solid var(--np-line)',
+              }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <Calendar className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--np-muted)' }} />
-                    <span className="text-sm font-medium" style={{ color: 'var(--np-text)' }}>
+                    <Calendar
+                      className="w-4 h-4 flex-shrink-0"
+                      style={{ color: 'var(--np-muted)' }}
+                    />
+                    <span
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--np-text)' }}
+                    >
                       {formatDate(apt.start)}
                     </span>
                     <span
                       className="text-xs px-2 py-0.5 rounded"
-                      style={{ background: 'var(--np-elevated)', color: 'var(--np-muted)' }}
+                      style={{
+                        background: 'var(--np-elevated)',
+                        color: 'var(--np-muted)',
+                      }}
                     >
                       {apt.status}
                     </span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--np-muted)' }}>
+                  <div
+                    className="flex items-center gap-4 text-sm"
+                    style={{ color: 'var(--np-muted)' }}
+                  >
                     <span className="flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
                       {formatTime(apt.start)} – {formatTime(apt.end)}
                     </span>
-                    {apt.practitionerName && <span>{apt.practitionerName}</span>}
+                    {apt.practitionerName && (
+                      <span>{apt.practitionerName}</span>
+                    )}
                   </div>
                   {apt.reason && (
-                    <p className="text-sm mt-2" style={{ color: 'var(--np-muted)' }}>
+                    <p
+                      className="text-sm mt-2"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
                       {apt.reason}
                     </p>
                   )}
@@ -293,11 +333,17 @@ export function SchedulingWidget() {
         >
           <div
             className="w-full max-w-md rounded-lg p-6 max-h-[90vh] overflow-y-auto"
-            style={{ background: 'var(--np-elevated)', border: '1px solid var(--np-line)' }}
+            style={{
+              background: 'var(--np-elevated)',
+              border: '1px solid var(--np-line)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--np-text)' }}>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: 'var(--np-text)' }}
+              >
                 Schedule Appointment
               </h3>
               <button
@@ -311,7 +357,10 @@ export function SchedulingWidget() {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Date
                 </label>
                 <input
@@ -320,12 +369,18 @@ export function SchedulingWidget() {
                   onChange={(e) => setSelectedDate(e.target.value)}
                   required
                   className="w-full px-3 py-2 text-sm rounded border-0"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-text)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-text)',
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Time Slot
                 </label>
                 <div className="grid grid-cols-4 gap-2">
@@ -337,8 +392,13 @@ export function SchedulingWidget() {
                       className="px-2 py-1.5 text-xs rounded transition-colors"
                       style={{
                         background:
-                          selectedTime === slot ? 'var(--np-text)' : 'var(--np-surface)',
-                        color: selectedTime === slot ? 'var(--np-bg)' : 'var(--np-muted)',
+                          selectedTime === slot
+                            ? 'var(--np-text)'
+                            : 'var(--np-surface)',
+                        color:
+                          selectedTime === slot
+                            ? 'var(--np-bg)'
+                            : 'var(--np-muted)',
                       }}
                     >
                       {slot}
@@ -348,7 +408,10 @@ export function SchedulingWidget() {
               </div>
 
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Practitioner
                 </label>
                 <select
@@ -356,7 +419,10 @@ export function SchedulingWidget() {
                   onChange={(e) => setSelectedPractitioner(e.target.value)}
                   required
                   className="w-full px-3 py-2 text-sm rounded border-0"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-text)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-text)',
+                  }}
                 >
                   <option value="">Select practitioner</option>
                   {PRACTITIONERS.map((p) => (
@@ -368,7 +434,10 @@ export function SchedulingWidget() {
               </div>
 
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Reason for Visit
                 </label>
                 <textarea
@@ -377,7 +446,10 @@ export function SchedulingWidget() {
                   required
                   rows={3}
                   className="w-full px-3 py-2 text-sm rounded border-0 resize-none"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-text)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-text)',
+                  }}
                   placeholder="Briefly describe what you'd like to discuss..."
                 />
               </div>
@@ -387,7 +459,10 @@ export function SchedulingWidget() {
                   type="button"
                   onClick={() => setShowModal(false)}
                   className="px-4 py-2 text-sm rounded transition-colors"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-muted)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-muted)',
+                  }}
                 >
                   Cancel
                 </button>
@@ -395,7 +470,10 @@ export function SchedulingWidget() {
                   type="submit"
                   disabled={submitting}
                   className="px-4 py-2 text-sm font-medium rounded transition-colors disabled:opacity-50"
-                  style={{ background: 'var(--np-text)', color: 'var(--np-bg)' }}
+                  style={{
+                    background: 'var(--np-text)',
+                    color: 'var(--np-bg)',
+                  }}
                 >
                   {submitting ? 'Scheduling...' : 'Schedule'}
                 </button>

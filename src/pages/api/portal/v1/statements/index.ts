@@ -6,6 +6,7 @@
  * GET /api/portal/v1/statements  — list patient statements
  */
 
+import type { UserRole } from '@/lib/auth/roles'
 import {
   resolveTenantId,
   sanitizeLimitParam,
@@ -14,13 +15,12 @@ import {
   ehrValidationError,
   ehrPaginated,
 } from '@/lib/ehr-native/api'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   requirePortalClient,
   resolvePortalPatientId,
 } from '@/lib/ehr-native/auth/portal-guard'
 import { PortalStatementService } from '@/lib/ehr-native/services'
-import type { UserRole } from '@/lib/auth/roles'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/portal/v1/statements
@@ -32,7 +32,9 @@ export const GET = withV1Contract(
   async (ctx, caller) => {
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -50,9 +52,7 @@ export const GET = withV1Contract(
     const offset = sanitizeOffsetParam(
       Number(url.searchParams.get('offset') ?? '0'),
     )
-    const status = sanitizeSearchParam(
-      url.searchParams.get('status') ?? '',
-    )
+    const status = sanitizeSearchParam(url.searchParams.get('status') ?? '')
 
     const service = new PortalStatementService(guard.rlsContext)
     const result = await service.listStatements(patientId, {

@@ -1,38 +1,71 @@
 ---
 import Layout from '@/layouts/Layout.astro'
-import { PortalShell, SchedulingWidget, MessagingWidget, HomeworkWidget, TelehealthWidget, StatementWidget } from '@/components/ehr/portal'
+import {
+  PortalShell,
+  SchedulingWidget,
+  MessagingWidget,
+  HomeworkWidget,
+  TelehealthWidget,
+  StatementWidget,
+} from '@/components/ehr/portal'
 
 export const prerender = false
 ---
 
-<Layout title="Client Portal — Pixelated Empathy" description="Patient portal dashboard">
+<Layout
+  title="Client Portal — Pixelated Empathy"
+  description="Patient portal dashboard"
+>
   <PortalShell activeFeature="dashboard" client:load>
     <div class="space-y-6">
       <div>
-        <h2 class="text-xl font-semibold" style="color: var(--np-text)">Welcome to Your Portal</h2>
+        <h2 class="text-xl font-semibold" style="color: var(--np-text)">
+          Welcome to Your Portal
+        </h2>
         <p class="text-sm mt-1" style="color: var(--np-muted)">
-          Manage your appointments, messages, homework, and statements in one place.
+          Manage your appointments, messages, homework, and statements in one
+          place.
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="p-4 rounded" style="background: var(--np-surface); border: 1px solid var(--np-line)">
-          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">Upcoming Appointments</h3>
+        <div
+          class="p-4 rounded"
+          style="background: var(--np-surface); border: 1px solid var(--np-line)"
+        >
+          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">
+            Upcoming Appointments
+          </h3>
           <SchedulingWidget client:load />
         </div>
 
-        <div class="p-4 rounded" style="background: var(--np-surface); border: 1px solid var(--np-line)">
-          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">Recent Messages</h3>
+        <div
+          class="p-4 rounded"
+          style="background: var(--np-surface); border: 1px solid var(--np-line)"
+        >
+          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">
+            Recent Messages
+          </h3>
           <MessagingWidget client:load />
         </div>
 
-        <div class="p-4 rounded" style="background: var(--np-surface); border: 1px solid var(--np-line)">
-          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">Homework</h3>
+        <div
+          class="p-4 rounded"
+          style="background: var(--np-surface); border: 1px solid var(--np-line)"
+        >
+          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">
+            Homework
+          </h3>
           <HomeworkWidget client:load />
         </div>
 
-        <div class="p-4 rounded" style="background: var(--np-surface); border: 1px solid var(--np-line)">
-          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">Statements</h3>
+        <div
+          class="p-4 rounded"
+          style="background: var(--np-surface); border: 1px solid var(--np-line)"
+        >
+          <h3 class="text-sm font-semibold mb-2" style="color: var(--np-text)">
+            Statements
+          </h3>
           <StatementWidget client:load />
         </div>
       </div>

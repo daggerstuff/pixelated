@@ -5,7 +5,10 @@ import { PortalShell, HomeworkWidget } from '@/components/ehr/portal'
 export const prerender = false
 ---
 
-<Layout title="Homework — Client Portal" description="Complete homework assignments">
+<Layout
+  title="Homework — Client Portal"
+  description="Complete homework assignments"
+>
   <PortalShell activeFeature="homework" client:load>
     <HomeworkWidget client:load />
   </PortalShell>

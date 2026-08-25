@@ -6,13 +6,13 @@
  * POST   /api/portal/v1/messaging/[threadId]  — add message to thread
  */
 
+import type { UserRole } from '@/lib/auth/roles'
 import {
   resolveTenantId,
   ehrSuccess,
   ehrValidationError,
   ehrNotFound,
 } from '@/lib/ehr-native/api'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   requirePortalClient,
   resolvePortalPatientId,
@@ -21,38 +21,35 @@ import {
   PortalMessagingService,
   type CreateMessageInput,
 } from '@/lib/ehr-native/services'
-import type { UserRole } from '@/lib/auth/roles'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/portal/v1/messaging/[threadId]
  * Get a specific thread with all messages.
  * @returns 200 with thread, or 403/404
  */
-export const GET = withV1Contract(
-  'portalGetThread',
-  async (ctx, caller) => {
-    const threadId = ctx.params?.['threadId']
-    if (!threadId) return ehrValidationError('Thread ID is required.')
+export const GET = withV1Contract('portalGetThread', async (ctx, caller) => {
+  const threadId = ctx.params?.['threadId']
+  if (!threadId) return ehrValidationError('Thread ID is required.')
 
-    const tenantId = resolveTenantId(caller.user.accountId)
-    if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+  const tenantId = resolveTenantId(caller.user.accountId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for portal access.')
 
-    const guard = requirePortalClient(
-      caller.user.role as UserRole,
-      caller.user.id,
-      tenantId,
-    )
-    if (!guard.allowed) return guard.response
+  const guard = requirePortalClient(
+    caller.user.role as UserRole,
+    caller.user.id,
+    tenantId,
+  )
+  if (!guard.allowed) return guard.response
 
-    const patientId = resolvePortalPatientId(caller.user.id)
-    const service = new PortalMessagingService(guard.rlsContext)
-    const thread = await service.getThread(threadId, patientId)
-    if (!thread) return ehrNotFound('Thread', threadId)
+  const patientId = resolvePortalPatientId(caller.user.id)
+  const service = new PortalMessagingService(guard.rlsContext)
+  const thread = await service.getThread(threadId, patientId)
+  if (!thread) return ehrNotFound('Thread', threadId)
 
-    return ehrSuccess(thread)
-  },
-)
+  return ehrSuccess(thread)
+})
 
 /**
  * DELETE /api/portal/v1/messaging/[threadId]
@@ -67,7 +64,9 @@ export const DELETE = withV1Contract(
 
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -90,50 +89,47 @@ export const DELETE = withV1Contract(
  * Add a message to an existing thread.
  * @returns 201 with updated thread, or 403/404/400
  */
-export const POST = withV1Contract(
-  'portalAddMessage',
-  async (ctx, caller) => {
-    const threadId = ctx.params?.['threadId']
-    if (!threadId) return ehrValidationError('Thread ID is required.')
+export const POST = withV1Contract('portalAddMessage', async (ctx, caller) => {
+  const threadId = ctx.params?.['threadId']
+  if (!threadId) return ehrValidationError('Thread ID is required.')
 
-    const tenantId = resolveTenantId(caller.user.accountId)
-    if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+  const tenantId = resolveTenantId(caller.user.accountId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for portal access.')
 
-    const guard = requirePortalClient(
-      caller.user.role as UserRole,
-      caller.user.id,
-      tenantId,
+  const guard = requirePortalClient(
+    caller.user.role as UserRole,
+    caller.user.id,
+    tenantId,
+  )
+  if (!guard.allowed) return guard.response
+
+  const raw = await ctx.request.json().catch(() => null)
+  if (!raw || typeof raw !== 'object')
+    return ehrValidationError('Request body must be a JSON object.')
+
+  const body = raw as Record<string, unknown>
+  const messageBody = body['body'] as string | undefined
+  if (!messageBody) return ehrValidationError('body is required for message.')
+
+  const patientId = resolvePortalPatientId(caller.user.id)
+  const input: CreateMessageInput = {
+    threadId,
+    senderReference: `Patient/${patientId}`,
+    recipientReference:
+      (body['recipientReference'] as string | undefined) ?? '',
+    body: messageBody,
+  }
+
+  const service = new PortalMessagingService(guard.rlsContext)
+
+  try {
+    const thread = await service.addMessage(input)
+    if (!thread) return ehrNotFound('Thread', threadId)
+    return ehrSuccess(thread)
+  } catch (err) {
+    return ehrValidationError(
+      err instanceof Error ? err.message : 'Failed to add message.',
     )
-    if (!guard.allowed) return guard.response
-
-    const raw = await ctx.request.json().catch(() => null)
-    if (!raw || typeof raw !== 'object')
-      return ehrValidationError('Request body must be a JSON object.')
-
-    const body = raw as Record<string, unknown>
-    const messageBody = body['body'] as string | undefined
-    if (!messageBody)
-      return ehrValidationError('body is required for message.')
-
-    const patientId = resolvePortalPatientId(caller.user.id)
-    const input: CreateMessageInput = {
-      threadId,
-      senderReference: `Patient/${patientId}`,
-      recipientReference: body['recipientReference'] as string | undefined ?? '',
-      body: messageBody,
-    }
-
-    const service = new PortalMessagingService(guard.rlsContext)
-
-    try {
-      const thread = await service.addMessage(input)
-      if (!thread) return ehrNotFound('Thread', threadId)
-      return ehrSuccess(thread)
-    } catch (err) {
-      return ehrValidationError(
-        err instanceof Error ? err.message : 'Failed to add message.',
-      )
-    }
-  },
-)
+  }
+})

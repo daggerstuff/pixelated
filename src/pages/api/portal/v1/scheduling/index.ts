@@ -8,6 +8,7 @@
  * POST /api/portal/v1/scheduling       — create new appointment (self-schedule)
  */
 
+import type { UserRole } from '@/lib/auth/roles'
 import {
   resolveTenantId,
   sanitizeLimitParam,
@@ -17,13 +18,12 @@ import {
   ehrPaginated,
   ehrCreated,
 } from '@/lib/ehr-native/api'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   requirePortalClient,
   resolvePortalPatientId,
 } from '@/lib/ehr-native/auth/portal-guard'
-import type { UserRole } from '@/lib/auth/roles'
 import { SchedulingService } from '@/lib/ehr-native/services'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/portal/v1/scheduling
@@ -35,7 +35,9 @@ export const GET = withV1Contract(
   async (ctx, caller) => {
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -53,9 +55,7 @@ export const GET = withV1Contract(
     const offset = sanitizeOffsetParam(
       Number(url.searchParams.get('offset') ?? '0'),
     )
-    const status = sanitizeSearchParam(
-      url.searchParams.get('status') ?? '',
-    )
+    const status = sanitizeSearchParam(url.searchParams.get('status') ?? '')
 
     const service = new SchedulingService(guard.rlsContext)
     const result = await service.getPatientAppointments(patientId, {
@@ -87,7 +87,9 @@ export const POST = withV1Contract(
   async (ctx, caller) => {
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -104,19 +106,19 @@ export const POST = withV1Contract(
     const body = raw as Record<string, unknown>
 
     // Ensure the FHIR resource references the authenticated patient
-    const fhirResource = body['fhirResource'] as Record<
-      string,
-      unknown
-    > | undefined
-    if (!fhirResource)
-      return ehrValidationError('fhirResource is required.')
+    const fhirResource = body['fhirResource'] as
+      | Record<string, unknown>
+      | undefined
+    if (!fhirResource) return ehrValidationError('fhirResource is required.')
 
     // Security: Override patient participant reference with authenticated user's ID
     // to prevent IDOR — patients can only schedule appointments for themselves.
     const patientRef = `Patient/${patientId}`
     if (Array.isArray(fhirResource['participant'])) {
       let foundPatient = false
-      for (const p of fhirResource['participant'] as Array<Record<string, unknown>>) {
+      for (const p of fhirResource['participant'] as Array<
+        Record<string, unknown>
+      >) {
         const actor = p['actor'] as Record<string, unknown> | undefined
         if (
           actor &&
@@ -144,9 +146,7 @@ export const POST = withV1Contract(
       return ehrCreated(appointment)
     } catch (err) {
       return ehrValidationError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to create appointment.',
+        err instanceof Error ? err.message : 'Failed to create appointment.',
       )
     }
   },

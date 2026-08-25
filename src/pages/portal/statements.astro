@@ -5,7 +5,10 @@ import { PortalShell, StatementWidget } from '@/components/ehr/portal'
 export const prerender = false
 ---
 
-<Layout title="Statements — Client Portal" description="View and download patient statements">
+<Layout
+  title="Statements — Client Portal"
+  description="View and download patient statements"
+>
   <PortalShell activeFeature="statements" client:load>
     <StatementWidget client:load />
   </PortalShell>

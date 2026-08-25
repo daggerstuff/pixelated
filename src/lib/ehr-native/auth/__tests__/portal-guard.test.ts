@@ -1,15 +1,18 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import type { UserRole } from '@/lib/auth/roles'
 
 // Mock createEHRRLSContext
 vi.mock('@/lib/ehr-native/api', () => ({
-  createEHRRLSContext: vi.fn((userId: string, role: string, tenantId: string, breakGlass = false) => ({
-    tenantId,
-    userId,
-    role,
-    breakGlass,
-  })),
+  createEHRRLSContext: vi.fn(
+    (userId: string, role: string, tenantId: string, breakGlass = false) => ({
+      tenantId,
+      userId,
+      role,
+      breakGlass,
+    }),
+  ),
 }))
 
 const { requirePortalClient, resolvePortalPatientId, PORTAL_CLIENT_ROLE } =
@@ -87,7 +90,9 @@ describe('portal-guard', () => {
       const result = requirePortalClient('therapist', userId, tenantId)
       expect(result.allowed).toBe(false)
       if (!result.allowed) {
-        expect(result.response.headers.get('Content-Type')).toBe('application/json')
+        expect(result.response.headers.get('Content-Type')).toBe(
+          'application/json',
+        )
       }
     })
 
@@ -108,7 +113,14 @@ describe('portal-guard', () => {
   })
 
   describe('all UserRole values', () => {
-    const roles: UserRole[] = ['admin', 'therapist', 'patient', 'researcher', 'support', 'guest']
+    const roles: UserRole[] = [
+      'admin',
+      'therapist',
+      'patient',
+      'researcher',
+      'support',
+      'guest',
+    ]
     const allowedRoles: UserRole[] = ['patient', 'admin']
 
     for (const role of roles) {

@@ -9,8 +9,8 @@
  */
 
 import type { UserRole } from '@/lib/auth/roles'
-import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 import { createEHRRLSContext } from '@/lib/ehr-native/api'
+import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 
 /** Auth0 role name for client portal access. */
 export const PORTAL_CLIENT_ROLE = 'ehr:client' as const

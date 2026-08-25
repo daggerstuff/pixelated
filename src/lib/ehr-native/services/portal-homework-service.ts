@@ -223,9 +223,17 @@ class HomeworkRepository extends BaseRepository<
       let query = `SELECT fhir_resource FROM ${this.tableName}
         WHERE patient_id = $1
           AND fhir_resource->'category' @> '[{"coding":[{"code":"homework"}]}]'`
-      const params: unknown[] = [patientId, limit, offset]
+      const params: unknown[] = [patientId]
+      let paramIdx = 2
 
-      query += ` ORDER BY updated_at DESC LIMIT $2 OFFSET $3`
+      if (statusFilter) {
+        query += ` AND convert_from(decode(fhir_resource->'content'->0->'attachment'->>'data', 'base64'), 'UTF8')::jsonb->>'status' = $${paramIdx}`
+        params.push(statusFilter)
+        paramIdx += 1
+      }
+
+      query += ` ORDER BY updated_at DESC LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`
+      params.push(limit, offset)
       const result = await client.query(query, params)
       return (result.rows as Array<{ fhir_resource: DocumentReference }>).map(
         (r) => r.fhir_resource,
@@ -233,14 +241,20 @@ class HomeworkRepository extends BaseRepository<
     })
   }
 
-  override async countByPatient(patientId: string): Promise<number> {
+  override async countByPatient(
+    patientId: string,
+    statusFilter?: string,
+  ): Promise<number> {
     return this.withRLS(async (client) => {
-      const result = await client.query(
-        `SELECT COUNT(*)::int as count FROM ${this.tableName}
+      let query = `SELECT COUNT(*)::int as count FROM ${this.tableName}
          WHERE patient_id = $1
-           AND fhir_resource->'category' @> '[{"coding":[{"code":"homework"}]}]'`,
-        [patientId],
-      )
+           AND fhir_resource->'category' @> '[{"coding":[{"code":"homework"}]}]'`
+      const params: unknown[] = [patientId]
+      if (statusFilter) {
+        query += ` AND convert_from(decode(fhir_resource->'content'->0->'attachment'->>'data', 'base64'), 'UTF8')::jsonb->>'status' = $2`
+        params.push(statusFilter)
+      }
+      const result = await client.query(query, params)
       return (result.rows[0] as { count?: number } | undefined)?.count ?? 0
     })
   }
@@ -281,16 +295,11 @@ export class PortalHomeworkService {
     const offset = sanitizeOffset(params.offset)
 
     const [docRefs, total] = await Promise.all([
-      this.homeworkRepo.findByPatient(patientId, limit, offset),
-      this.homeworkRepo.countByPatient(patientId),
+      this.homeworkRepo.findByPatient(patientId, limit, offset, params.status),
+      this.homeworkRepo.countByPatient(patientId, params.status),
     ])
 
-    let assignments = docRefs.map((dr) => this.toAssignment(dr))
-    // Filter by status in application code — status is stored in base64-encoded JSON payload,
-    // so SQL ILIKE on the raw data column cannot match plaintext status values.
-    if (params.status) {
-      assignments = assignments.filter((a) => a.status === params.status)
-    }
+    const assignments = docRefs.map((dr) => this.toAssignment(dr))
     return { assignments, total }
   }
 
@@ -361,9 +370,10 @@ export class PortalHomeworkService {
    */
   async getSummary(patientId: string): Promise<HomeworkSummary> {
     validateId(patientId, 'patientId')
-    const { assignments } = await this.listAssignments(patientId, {
-      limit: 200,
-    })
+    // Fetch all assignments for summary to avoid pagination truncation.
+    // Use repository directly with large limit to ensure complete summary.
+    const docRefs = await this.homeworkRepo.findByPatient(patientId, 1000, 0)
+    const assignments = docRefs.map((dr) => this.toAssignment(dr))
 
     const now = new Date()
     return {

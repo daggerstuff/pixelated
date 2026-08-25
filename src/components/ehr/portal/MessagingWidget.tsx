@@ -48,7 +48,8 @@ function formatTime(dateStr: string): string {
 
 function senderDisplay(ref: string): string {
   if (ref.startsWith('Patient/')) return 'You'
-  if (ref.startsWith('Practitioner/')) return ref.replace('Practitioner/', 'Dr. ')
+  if (ref.startsWith('Practitioner/'))
+    return ref.replace('Practitioner/', 'Dr. ')
   return ref
 }
 
@@ -100,12 +101,17 @@ export function MessagingWidget() {
           if (!cancelled) setThreads(result.data)
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load threads')
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : 'Failed to load threads',
+          )
       } finally {
         if (!cancelled) setLoading(false)
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const openThread = async (threadId: string) => {
@@ -170,7 +176,8 @@ export function MessagingWidget() {
 
   const handleCreateThread = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!subject.trim() || !practitionerRef.trim() || !initialMessage.trim()) return
+    if (!subject.trim() || !practitionerRef.trim() || !initialMessage.trim())
+      return
     setSubmitting(true)
     try {
       const res = await fetch('/api/portal/v1/messaging', {
@@ -207,7 +214,10 @@ export function MessagingWidget() {
       <div className="flex items-center justify-center py-12">
         <div
           className="w-6 h-6 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--np-muted)', borderTopColor: 'var(--np-text)' }}
+          style={{
+            borderColor: 'var(--np-muted)',
+            borderTopColor: 'var(--np-text)',
+          }}
         />
       </div>
     )
@@ -227,7 +237,10 @@ export function MessagingWidget() {
           <button
             onClick={() => void handleDeleteThread(activeThread.id)}
             className="flex items-center gap-1 text-xs px-3 py-1.5 rounded transition-colors"
-            style={{ background: 'var(--np-elevated)', color: 'var(--np-muted)' }}
+            style={{
+              background: 'var(--np-elevated)',
+              color: 'var(--np-muted)',
+            }}
           >
             <Trash2 className="w-3.5 h-3.5" />
             Delete
@@ -236,21 +249,36 @@ export function MessagingWidget() {
 
         <div
           className="rounded"
-          style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            border: '1px solid var(--np-line)',
+          }}
         >
-          <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--np-line)' }}>
-            <h3 className="text-base font-semibold" style={{ color: 'var(--np-text)' }}>
+          <div
+            className="px-4 py-3 border-b"
+            style={{ borderColor: 'var(--np-line)' }}
+          >
+            <h3
+              className="text-base font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
               {activeThread.subject}
             </h3>
           </div>
 
           <div className="max-h-[50vh] overflow-y-auto px-4 py-4 space-y-3">
             {threadLoading ? (
-              <p className="text-sm text-center" style={{ color: 'var(--np-muted)' }}>
+              <p
+                className="text-sm text-center"
+                style={{ color: 'var(--np-muted)' }}
+              >
                 Loading messages...
               </p>
             ) : activeThread.messages.length === 0 ? (
-              <p className="text-sm text-center" style={{ color: 'var(--np-muted)' }}>
+              <p
+                className="text-sm text-center"
+                style={{ color: 'var(--np-muted)' }}
+              >
                 No messages yet.
               </p>
             ) : (
@@ -258,7 +286,11 @@ export function MessagingWidget() {
                 <div
                   key={msg.id}
                   className="flex flex-col"
-                  style={{ alignItems: msg.senderReference.startsWith('Patient/') ? 'flex-end' : 'flex-start' }}
+                  style={{
+                    alignItems: msg.senderReference.startsWith('Patient/')
+                      ? 'flex-end'
+                      : 'flex-start',
+                  }}
                 >
                   <div
                     className="max-w-[75%] px-3 py-2 rounded-lg text-sm"
@@ -271,8 +303,12 @@ export function MessagingWidget() {
                     }}
                   >
                     <p className="mb-1">{msg.body}</p>
-                    <span className="text-xs" style={{ color: 'var(--np-muted)' }}>
-                      {senderDisplay(msg.senderReference)} · {formatTime(msg.sentAt)}
+                    <span
+                      className="text-xs"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
+                      {senderDisplay(msg.senderReference)} ·{' '}
+                      {formatTime(msg.sentAt)}
                     </span>
                   </div>
                 </div>
@@ -292,7 +328,10 @@ export function MessagingWidget() {
               onChange={(e) => setMessageBody(e.target.value)}
               placeholder="Type a message..."
               className="flex-1 min-w-0 px-3 py-2 text-sm rounded border-0"
-              style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
+              style={{
+                background: 'var(--np-elevated)',
+                color: 'var(--np-text)',
+              }}
             />
             <button
               type="submit"
@@ -309,7 +348,11 @@ export function MessagingWidget() {
         {error && (
           <div
             className="p-3 text-sm rounded"
-            style={{ background: 'var(--np-surface)', color: 'var(--np-text)', border: '1px solid var(--np-line)' }}
+            style={{
+              background: 'var(--np-surface)',
+              color: 'var(--np-text)',
+              border: '1px solid var(--np-line)',
+            }}
           >
             {error}
           </div>
@@ -322,7 +365,10 @@ export function MessagingWidget() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+          <h2
+            className="text-xl font-semibold"
+            style={{ color: 'var(--np-text)' }}
+          >
             Secure Messages
           </h2>
           <p className="text-sm mt-1" style={{ color: 'var(--np-muted)' }}>
@@ -342,7 +388,11 @@ export function MessagingWidget() {
       {error && (
         <div
           className="p-4 text-sm rounded"
-          style={{ background: 'var(--np-surface)', color: 'var(--np-text)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            color: 'var(--np-text)',
+            border: '1px solid var(--np-line)',
+          }}
         >
           {error}
         </div>
@@ -351,9 +401,15 @@ export function MessagingWidget() {
       {threads.length === 0 ? (
         <div
           className="text-center py-12 rounded"
-          style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            border: '1px solid var(--np-line)',
+          }}
         >
-          <MessageSquare className="w-8 h-8 mx-auto mb-3" style={{ color: 'var(--np-muted)' }} />
+          <MessageSquare
+            className="w-8 h-8 mx-auto mb-3"
+            style={{ color: 'var(--np-muted)' }}
+          />
           <p className="text-sm" style={{ color: 'var(--np-muted)' }}>
             No message threads. Click "New Thread" to start a conversation.
           </p>
@@ -365,18 +421,31 @@ export function MessagingWidget() {
               key={thread.threadId}
               onClick={() => void openThread(thread.threadId)}
               className="w-full text-left p-4 rounded transition-colors"
-              style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+              style={{
+                background: 'var(--np-surface)',
+                border: '1px solid var(--np-line)',
+              }}
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium truncate" style={{ color: 'var(--np-text)' }}>
+                  <h3
+                    className="text-sm font-medium truncate"
+                    style={{ color: 'var(--np-text)' }}
+                  >
                     {thread.subject}
                   </h3>
-                  <p className="text-xs mt-1" style={{ color: 'var(--np-muted)' }}>
-                    {thread.messageCount} messages · Last: {formatTime(thread.lastMessageAt)}
+                  <p
+                    className="text-xs mt-1"
+                    style={{ color: 'var(--np-muted)' }}
+                  >
+                    {thread.messageCount} messages · Last:{' '}
+                    {formatTime(thread.lastMessageAt)}
                   </p>
                 </div>
-                <MessageSquare className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--np-muted)' }} />
+                <MessageSquare
+                  className="w-4 h-4 flex-shrink-0"
+                  style={{ color: 'var(--np-muted)' }}
+                />
               </div>
             </button>
           ))}
@@ -391,21 +460,34 @@ export function MessagingWidget() {
         >
           <div
             className="w-full max-w-md rounded-lg p-6 max-h-[90vh] overflow-y-auto"
-            style={{ background: 'var(--np-elevated)', border: '1px solid var(--np-line)' }}
+            style={{
+              background: 'var(--np-elevated)',
+              border: '1px solid var(--np-line)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--np-text)' }}>
+              <h3
+                className="text-lg font-semibold"
+                style={{ color: 'var(--np-text)' }}
+              >
                 New Message Thread
               </h3>
-              <button onClick={() => setShowNewModal(false)} style={{ color: 'var(--np-muted)' }} aria-label="Close">
+              <button
+                onClick={() => setShowNewModal(false)}
+                style={{ color: 'var(--np-muted)' }}
+                aria-label="Close"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleCreateThread} className="space-y-4">
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Subject
                 </label>
                 <input
@@ -415,13 +497,19 @@ export function MessagingWidget() {
                   required
                   maxLength={200}
                   className="w-full px-3 py-2 text-sm rounded border-0"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-text)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-text)',
+                  }}
                   placeholder="Message subject"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Practitioner ID
                 </label>
                 <input
@@ -430,13 +518,19 @@ export function MessagingWidget() {
                   onChange={(e) => setPractitionerRef(e.target.value)}
                   required
                   className="w-full px-3 py-2 text-sm rounded border-0"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-text)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-text)',
+                  }}
                   placeholder="e.g. practitioner-uuid"
                 />
               </div>
 
               <div>
-                <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                <label
+                  className="block text-sm mb-1.5"
+                  style={{ color: 'var(--np-muted)' }}
+                >
                   Message
                 </label>
                 <textarea
@@ -445,7 +539,10 @@ export function MessagingWidget() {
                   required
                   rows={4}
                   className="w-full px-3 py-2 text-sm rounded border-0 resize-none"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-text)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-text)',
+                  }}
                   placeholder="Type your message..."
                 />
               </div>
@@ -455,7 +552,10 @@ export function MessagingWidget() {
                   type="button"
                   onClick={() => setShowNewModal(false)}
                   className="px-4 py-2 text-sm rounded transition-colors"
-                  style={{ background: 'var(--np-surface)', color: 'var(--np-muted)' }}
+                  style={{
+                    background: 'var(--np-surface)',
+                    color: 'var(--np-muted)',
+                  }}
                 >
                   Cancel
                 </button>
@@ -463,7 +563,10 @@ export function MessagingWidget() {
                   type="submit"
                   disabled={submitting}
                   className="px-4 py-2 text-sm font-medium rounded transition-colors disabled:opacity-50"
-                  style={{ background: 'var(--np-text)', color: 'var(--np-bg)' }}
+                  style={{
+                    background: 'var(--np-text)',
+                    color: 'var(--np-bg)',
+                  }}
                 >
                   {submitting ? 'Creating...' : 'Create Thread'}
                 </button>

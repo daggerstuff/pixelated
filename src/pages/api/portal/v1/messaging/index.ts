@@ -7,6 +7,7 @@
  * POST /api/portal/v1/messaging     — create new thread
  */
 
+import type { UserRole } from '@/lib/auth/roles'
 import {
   resolveTenantId,
   sanitizeLimitParam,
@@ -15,7 +16,6 @@ import {
   ehrPaginated,
   ehrCreated,
 } from '@/lib/ehr-native/api'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   requirePortalClient,
   resolvePortalPatientId,
@@ -24,47 +24,44 @@ import {
   PortalMessagingService,
   type CreateThreadInput,
 } from '@/lib/ehr-native/services'
-import type { UserRole } from '@/lib/auth/roles'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/portal/v1/messaging
  * List the authenticated patient's message threads.
  * @returns 200 with paginated threads, or 403/400
  */
-export const GET = withV1Contract(
-  'portalListThreads',
-  async (ctx, caller) => {
-    const tenantId = resolveTenantId(caller.user.accountId)
-    if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+export const GET = withV1Contract('portalListThreads', async (ctx, caller) => {
+  const tenantId = resolveTenantId(caller.user.accountId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for portal access.')
 
-    const guard = requirePortalClient(
-      caller.user.role as UserRole,
-      caller.user.id,
-      tenantId,
-    )
-    if (!guard.allowed) return guard.response
+  const guard = requirePortalClient(
+    caller.user.role as UserRole,
+    caller.user.id,
+    tenantId,
+  )
+  if (!guard.allowed) return guard.response
 
-    const patientId = resolvePortalPatientId(caller.user.id)
-    const url = new URL(ctx.request.url)
-    const limit = sanitizeLimitParam(
-      Number(url.searchParams.get('limit') ?? '50'),
-      100,
-    )
-    const offset = sanitizeOffsetParam(
-      Number(url.searchParams.get('offset') ?? '0'),
-    )
+  const patientId = resolvePortalPatientId(caller.user.id)
+  const url = new URL(ctx.request.url)
+  const limit = sanitizeLimitParam(
+    Number(url.searchParams.get('limit') ?? '50'),
+    100,
+  )
+  const offset = sanitizeOffsetParam(
+    Number(url.searchParams.get('offset') ?? '0'),
+  )
 
-    const service = new PortalMessagingService(guard.rlsContext)
-    const result = await service.listThreads(patientId, { limit, offset })
+  const service = new PortalMessagingService(guard.rlsContext)
+  const result = await service.listThreads(patientId, { limit, offset })
 
-    return ehrPaginated(result.threads, {
-      limit,
-      offset,
-      total: result.total,
-    })
-  },
-)
+  return ehrPaginated(result.threads, {
+    limit,
+    offset,
+    total: result.total,
+  })
+})
 
 /**
  * POST /api/portal/v1/messaging
@@ -76,7 +73,9 @@ export const POST = withV1Contract(
   async (ctx, caller) => {
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -93,8 +92,7 @@ export const POST = withV1Contract(
     const patientId = resolvePortalPatientId(caller.user.id)
 
     const subject = body['subject'] as string | undefined
-    if (!subject)
-      return ehrValidationError('subject is required.')
+    if (!subject) return ehrValidationError('subject is required.')
 
     const practitionerReference = body['practitionerReference'] as
       | string

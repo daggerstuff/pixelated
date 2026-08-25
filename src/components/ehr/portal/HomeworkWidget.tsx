@@ -33,15 +33,19 @@ interface ErrorResponse {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  assigned: 'var(--np-muted)',
+  'assigned': 'var(--np-muted)',
   'in-progress': 'var(--np-text)',
-  completed: 'var(--np-success, #22c55e)',
-  overdue: 'var(--np-danger, #ef4444)',
+  'completed': 'var(--np-success, #22c55e)',
+  'overdue': 'var(--np-danger, #ef4444)',
 }
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 export function HomeworkWidget() {
@@ -76,14 +80,19 @@ export function HomeworkWidget() {
     try {
       const res = await fetch('/api/portal/v1/homework')
       if (res.ok) {
-        const result = (await res.json()) as PaginatedResponse<HomeworkAssignment>
+        const result =
+          (await res.json()) as PaginatedResponse<HomeworkAssignment>
         const all = result.data
         setSummary({
           totalAssigned: all.length,
           completed: all.filter((a) => a.status === 'completed').length,
-          pending: all.filter((a) => a.status === 'assigned' || a.status === 'in-progress').length,
+          pending: all.filter(
+            (a) => a.status === 'assigned' || a.status === 'in-progress',
+          ).length,
           overdue: all.filter((a) => a.status === 'overdue').length,
-          upcoming: all.filter((a) => a.dueDate && new Date(a.dueDate) > new Date()).length,
+          upcoming: all.filter(
+            (a) => a.dueDate && new Date(a.dueDate) > new Date(),
+          ).length,
         })
       }
     } catch {
@@ -103,11 +112,15 @@ export function HomeworkWidget() {
           throw new Error(err.error?.message ?? 'Failed to load homework')
         }
         if (!cancelled) {
-          const result = (await res.json()) as PaginatedResponse<HomeworkAssignment>
+          const result =
+            (await res.json()) as PaginatedResponse<HomeworkAssignment>
           if (!cancelled) setAssignments(result.data)
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load homework')
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : 'Failed to load homework',
+          )
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -116,15 +129,20 @@ export function HomeworkWidget() {
       try {
         const res = await fetch('/api/portal/v1/homework')
         if (!cancelled && res.ok) {
-          const result = (await res.json()) as PaginatedResponse<HomeworkAssignment>
+          const result =
+            (await res.json()) as PaginatedResponse<HomeworkAssignment>
           if (!cancelled) {
             const all = result.data
             setSummary({
               totalAssigned: all.length,
               completed: all.filter((a) => a.status === 'completed').length,
-              pending: all.filter((a) => a.status === 'assigned' || a.status === 'in-progress').length,
+              pending: all.filter(
+                (a) => a.status === 'assigned' || a.status === 'in-progress',
+              ).length,
               overdue: all.filter((a) => a.status === 'overdue').length,
-              upcoming: all.filter((a) => a.dueDate && new Date(a.dueDate) > new Date()).length,
+              upcoming: all.filter(
+                (a) => a.dueDate && new Date(a.dueDate) > new Date(),
+              ).length,
             })
           }
         }
@@ -132,7 +150,9 @@ export function HomeworkWidget() {
         // Summary is best-effort
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [statusFilter])
 
   const handleComplete = async (assignmentId: string) => {
@@ -141,7 +161,9 @@ export function HomeworkWidget() {
       const res = await fetch(`/api/portal/v1/homework/${assignmentId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patientNotes: patientNotes.trim() || undefined }),
+        body: JSON.stringify({
+          patientNotes: patientNotes.trim() || undefined,
+        }),
       })
       if (!res.ok) {
         const err = (await res.json()) as ErrorResponse
@@ -183,7 +205,10 @@ export function HomeworkWidget() {
       <div className="flex items-center justify-center py-12">
         <div
           className="w-6 h-6 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--np-muted)', borderTopColor: 'var(--np-text)' }}
+          style={{
+            borderColor: 'var(--np-muted)',
+            borderTopColor: 'var(--np-text)',
+          }}
         />
       </div>
     )
@@ -192,7 +217,10 @@ export function HomeworkWidget() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+        <h2
+          className="text-xl font-semibold"
+          style={{ color: 'var(--np-text)' }}
+        >
           Homework Assignments
         </h2>
         <p className="text-sm mt-1" style={{ color: 'var(--np-muted)' }}>
@@ -202,47 +230,111 @@ export function HomeworkWidget() {
 
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3 rounded text-center" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
-            <p className="text-2xl font-semibold" style={{ color: 'var(--np-text)' }}>{summary.totalAssigned}</p>
-            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>Total</p>
+          <div
+            className="p-3 rounded text-center"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
+            <p
+              className="text-2xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
+              {summary.totalAssigned}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>
+              Total
+            </p>
           </div>
-          <div className="p-3 rounded text-center" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
-            <p className="text-2xl font-semibold" style={{ color: 'var(--np-text)' }}>{summary.completed}</p>
-            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>Completed</p>
+          <div
+            className="p-3 rounded text-center"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
+            <p
+              className="text-2xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
+              {summary.completed}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>
+              Completed
+            </p>
           </div>
-          <div className="p-3 rounded text-center" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
-            <p className="text-2xl font-semibold" style={{ color: 'var(--np-text)' }}>{summary.pending}</p>
-            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>Pending</p>
+          <div
+            className="p-3 rounded text-center"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
+            <p
+              className="text-2xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
+              {summary.pending}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>
+              Pending
+            </p>
           </div>
-          <div className="p-3 rounded text-center" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
-            <p className="text-2xl font-semibold" style={{ color: 'var(--np-text)' }}>{summary.overdue}</p>
-            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>Overdue</p>
+          <div
+            className="p-3 rounded text-center"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
+            <p
+              className="text-2xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
+              {summary.overdue}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--np-muted)' }}>
+              Overdue
+            </p>
           </div>
         </div>
       )}
 
       <div className="flex gap-2 flex-wrap">
-        {['', 'assigned', 'in-progress', 'completed', 'overdue'].map((status) => (
-          <button
-            key={status || 'all'}
-            onClick={() => setStatusFilter(status)}
-            className="px-3 py-1.5 text-xs rounded transition-colors capitalize"
-            style={{
-              background: statusFilter === status ? 'var(--np-elevated)' : 'var(--np-surface)',
-              color: statusFilter === status ? 'var(--np-text)' : 'var(--np-muted)',
-              border: '1px solid var(--np-line)',
-              fontWeight: statusFilter === status ? 600 : 400,
-            }}
-          >
-            {status || 'All'}
-          </button>
-        ))}
+        {['', 'assigned', 'in-progress', 'completed', 'overdue'].map(
+          (status) => (
+            <button
+              key={status || 'all'}
+              onClick={() => setStatusFilter(status)}
+              className="px-3 py-1.5 text-xs rounded transition-colors capitalize"
+              style={{
+                background:
+                  statusFilter === status
+                    ? 'var(--np-elevated)'
+                    : 'var(--np-surface)',
+                color:
+                  statusFilter === status
+                    ? 'var(--np-text)'
+                    : 'var(--np-muted)',
+                border: '1px solid var(--np-line)',
+                fontWeight: statusFilter === status ? 600 : 400,
+              }}
+            >
+              {status || 'All'}
+            </button>
+          ),
+        )}
       </div>
 
       {error && (
         <div
           className="p-4 text-sm rounded"
-          style={{ background: 'var(--np-surface)', color: 'var(--np-text)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            color: 'var(--np-text)',
+            border: '1px solid var(--np-line)',
+          }}
         >
           {error}
         </div>
@@ -251,9 +343,15 @@ export function HomeworkWidget() {
       {assignments.length === 0 ? (
         <div
           className="text-center py-12 rounded"
-          style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            border: '1px solid var(--np-line)',
+          }}
         >
-          <ClipboardList className="w-8 h-8 mx-auto mb-3" style={{ color: 'var(--np-muted)' }} />
+          <ClipboardList
+            className="w-8 h-8 mx-auto mb-3"
+            style={{ color: 'var(--np-muted)' }}
+          />
           <p className="text-sm" style={{ color: 'var(--np-muted)' }}>
             No homework assignments.
           </p>
@@ -264,21 +362,36 @@ export function HomeworkWidget() {
             <div
               key={hw.id}
               className="rounded"
-              style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+              style={{
+                background: 'var(--np-surface)',
+                border: '1px solid var(--np-line)',
+              }}
             >
               <div className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium" style={{ color: 'var(--np-text)' }}>
+                    <h3
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--np-text)' }}
+                    >
                       {hw.title}
                     </h3>
-                    <p className="text-sm mt-1" style={{ color: 'var(--np-muted)' }}>
+                    <p
+                      className="text-sm mt-1"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
                       {hw.description}
                     </p>
-                    <div className="flex items-center gap-3 mt-2 text-xs" style={{ color: 'var(--np-muted)' }}>
+                    <div
+                      className="flex items-center gap-3 mt-2 text-xs"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
                       <span
                         className="px-2 py-0.5 rounded"
-                        style={{ background: 'var(--np-elevated)', color: STATUS_COLORS[hw.status] ?? 'var(--np-muted)' }}
+                        style={{
+                          background: 'var(--np-elevated)',
+                          color: STATUS_COLORS[hw.status] ?? 'var(--np-muted)',
+                        }}
                       >
                         {hw.status}
                       </span>
@@ -305,7 +418,10 @@ export function HomeworkWidget() {
                         }
                       }}
                       className="flex-shrink-0 text-xs px-3 py-1.5 rounded transition-colors"
-                      style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
+                      style={{
+                        background: 'var(--np-elevated)',
+                        color: 'var(--np-text)',
+                      }}
                     >
                       {expandedId === hw.id ? 'Cancel' : 'Complete'}
                     </button>
@@ -313,27 +429,51 @@ export function HomeworkWidget() {
                 </div>
 
                 {hw.instructions && (
-                  <p className="text-sm mt-3 pt-3 border-t" style={{ color: 'var(--np-muted)', borderColor: 'var(--np-line)' }}>
-                    <strong style={{ color: 'var(--np-text)' }}>Instructions:</strong> {hw.instructions}
+                  <p
+                    className="text-sm mt-3 pt-3 border-t"
+                    style={{
+                      color: 'var(--np-muted)',
+                      borderColor: 'var(--np-line)',
+                    }}
+                  >
+                    <strong style={{ color: 'var(--np-text)' }}>
+                      Instructions:
+                    </strong>{' '}
+                    {hw.instructions}
                   </p>
                 )}
 
                 {hw.patientNotes && hw.status === 'completed' && (
-                  <p className="text-sm mt-2" style={{ color: 'var(--np-muted)' }}>
-                    <strong style={{ color: 'var(--np-text)' }}>Your notes:</strong> {hw.patientNotes}
+                  <p
+                    className="text-sm mt-2"
+                    style={{ color: 'var(--np-muted)' }}
+                  >
+                    <strong style={{ color: 'var(--np-text)' }}>
+                      Your notes:
+                    </strong>{' '}
+                    {hw.patientNotes}
                   </p>
                 )}
 
                 {hw.completedAt && (
-                  <p className="text-xs mt-2 flex items-center gap-1" style={{ color: 'var(--np-muted)' }}>
+                  <p
+                    className="text-xs mt-2 flex items-center gap-1"
+                    style={{ color: 'var(--np-muted)' }}
+                  >
                     <CheckCircle className="w-3 h-3" />
                     Completed: {formatDate(hw.completedAt)}
                   </p>
                 )}
 
                 {expandedId === hw.id && hw.status !== 'completed' && (
-                  <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--np-line)' }}>
-                    <label className="block text-sm mb-1.5" style={{ color: 'var(--np-muted)' }}>
+                  <div
+                    className="mt-3 pt-3 border-t"
+                    style={{ borderColor: 'var(--np-line)' }}
+                  >
+                    <label
+                      className="block text-sm mb-1.5"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
                       Notes (optional)
                     </label>
                     <textarea
@@ -341,16 +481,24 @@ export function HomeworkWidget() {
                       onChange={(e) => setPatientNotes(e.target.value)}
                       rows={3}
                       className="w-full px-3 py-2 text-sm rounded border-0 resize-none"
-                      style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
+                      style={{
+                        background: 'var(--np-elevated)',
+                        color: 'var(--np-text)',
+                      }}
                       placeholder="Add any notes about this assignment..."
                     />
                     <div className="flex gap-2 mt-2">
                       {hw.status === 'assigned' && (
                         <button
-                          onClick={() => void handleUpdateStatus(hw.id, 'in-progress')}
+                          onClick={() =>
+                            void handleUpdateStatus(hw.id, 'in-progress')
+                          }
                           disabled={actionLoading === hw.id}
                           className="text-xs px-3 py-1.5 rounded transition-colors disabled:opacity-50"
-                          style={{ background: 'var(--np-surface)', color: 'var(--np-muted)' }}
+                          style={{
+                            background: 'var(--np-surface)',
+                            color: 'var(--np-muted)',
+                          }}
                         >
                           Mark In Progress
                         </button>
@@ -359,9 +507,14 @@ export function HomeworkWidget() {
                         onClick={() => void handleComplete(hw.id)}
                         disabled={actionLoading === hw.id}
                         className="text-xs px-3 py-1.5 rounded transition-colors disabled:opacity-50"
-                        style={{ background: 'var(--np-text)', color: 'var(--np-bg)' }}
+                        style={{
+                          background: 'var(--np-text)',
+                          color: 'var(--np-bg)',
+                        }}
                       >
-                        {actionLoading === hw.id ? 'Completing...' : 'Mark Complete'}
+                        {actionLoading === hw.id
+                          ? 'Completing...'
+                          : 'Mark Complete'}
                       </button>
                     </div>
                   </div>

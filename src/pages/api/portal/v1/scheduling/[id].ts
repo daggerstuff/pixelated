@@ -5,19 +5,19 @@
  * POST /api/portal/v1/scheduling/[id]     — cancel or reschedule (via action body)
  */
 
+import type { UserRole } from '@/lib/auth/roles'
 import {
   resolveTenantId,
   ehrSuccess,
   ehrValidationError,
   ehrNotFound,
 } from '@/lib/ehr-native/api'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   requirePortalClient,
   resolvePortalPatientId,
 } from '@/lib/ehr-native/auth/portal-guard'
-import type { UserRole } from '@/lib/auth/roles'
 import { SchedulingService } from '@/lib/ehr-native/services'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/portal/v1/scheduling/[id]
@@ -28,12 +28,13 @@ export const GET = withV1Contract(
   'portalGetAppointment',
   async (ctx, caller) => {
     const appointmentId = ctx.params?.['id']
-    if (!appointmentId)
-      return ehrValidationError('Appointment ID is required.')
+    if (!appointmentId) return ehrValidationError('Appointment ID is required.')
 
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -59,12 +60,13 @@ export const POST = withV1Contract(
   'portalUpdateAppointment',
   async (ctx, caller) => {
     const appointmentId = ctx.params?.['id']
-    if (!appointmentId)
-      return ehrValidationError('Appointment ID is required.')
+    if (!appointmentId) return ehrValidationError('Appointment ID is required.')
 
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -95,9 +97,7 @@ export const POST = withV1Contract(
           const start = body['start'] as string | undefined
           const end = body['end'] as string | undefined
           if (!start || !end)
-            return ehrValidationError(
-              'Reschedule requires start and end.',
-            )
+            return ehrValidationError('Reschedule requires start and end.')
           appointment = await service.rescheduleAppointment(
             appointmentId,
             start,

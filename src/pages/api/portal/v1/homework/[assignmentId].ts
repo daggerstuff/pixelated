@@ -6,13 +6,13 @@
  * POST  /api/portal/v1/homework/[assignmentId]  — mark assignment complete
  */
 
+import type { UserRole } from '@/lib/auth/roles'
 import {
   resolveTenantId,
   ehrSuccess,
   ehrValidationError,
   ehrNotFound,
 } from '@/lib/ehr-native/api'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   requirePortalClient,
   resolvePortalPatientId,
@@ -21,39 +21,35 @@ import {
   PortalHomeworkService,
   type UpdateHomeworkInput,
 } from '@/lib/ehr-native/services'
-import type { UserRole } from '@/lib/auth/roles'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
  * GET /api/portal/v1/homework/[assignmentId]
  * Get a specific homework assignment.
  * @returns 200 with assignment, or 403/404
  */
-export const GET = withV1Contract(
-  'portalGetHomework',
-  async (ctx, caller) => {
-    const assignmentId = ctx.params?.['assignmentId']
-    if (!assignmentId)
-      return ehrValidationError('Assignment ID is required.')
+export const GET = withV1Contract('portalGetHomework', async (ctx, caller) => {
+  const assignmentId = ctx.params?.['assignmentId']
+  if (!assignmentId) return ehrValidationError('Assignment ID is required.')
 
-    const tenantId = resolveTenantId(caller.user.accountId)
-    if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+  const tenantId = resolveTenantId(caller.user.accountId)
+  if (!tenantId)
+    return ehrValidationError('Tenant association required for portal access.')
 
-    const guard = requirePortalClient(
-      caller.user.role as UserRole,
-      caller.user.id,
-      tenantId,
-    )
-    if (!guard.allowed) return guard.response
+  const guard = requirePortalClient(
+    caller.user.role as UserRole,
+    caller.user.id,
+    tenantId,
+  )
+  if (!guard.allowed) return guard.response
 
-    const patientId = resolvePortalPatientId(caller.user.id)
-    const service = new PortalHomeworkService(guard.rlsContext)
-    const assignment = await service.getAssignment(assignmentId, patientId)
-    if (!assignment) return ehrNotFound('Homework', assignmentId)
+  const patientId = resolvePortalPatientId(caller.user.id)
+  const service = new PortalHomeworkService(guard.rlsContext)
+  const assignment = await service.getAssignment(assignmentId, patientId)
+  if (!assignment) return ehrNotFound('Homework', assignmentId)
 
-    return ehrSuccess(assignment)
-  },
-)
+  return ehrSuccess(assignment)
+})
 
 /**
  * PATCH /api/portal/v1/homework/[assignmentId]
@@ -64,12 +60,13 @@ export const PATCH = withV1Contract(
   'portalUpdateHomework',
   async (ctx, caller) => {
     const assignmentId = ctx.params?.['assignmentId']
-    if (!assignmentId)
-      return ehrValidationError('Assignment ID is required.')
+    if (!assignmentId) return ehrValidationError('Assignment ID is required.')
 
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -86,7 +83,8 @@ export const PATCH = withV1Contract(
     const updates: UpdateHomeworkInput = {}
 
     const status = (raw as Record<string, unknown>)['status']
-    if (typeof status === 'string') updates.status = status as 'assigned' | 'in-progress' | 'completed'
+    if (typeof status === 'string')
+      updates.status = status as 'assigned' | 'in-progress' | 'completed'
 
     const patientNotes = (raw as Record<string, unknown>)['patientNotes']
     if (typeof patientNotes === 'string') updates.patientNotes = patientNotes
@@ -118,12 +116,13 @@ export const POST = withV1Contract(
   'portalCompleteHomework',
   async (ctx, caller) => {
     const assignmentId = ctx.params?.['assignmentId']
-    if (!assignmentId)
-      return ehrValidationError('Assignment ID is required.')
+    if (!assignmentId) return ehrValidationError('Assignment ID is required.')
 
     const tenantId = resolveTenantId(caller.user.accountId)
     if (!tenantId)
-      return ehrValidationError('Tenant association required for portal access.')
+      return ehrValidationError(
+        'Tenant association required for portal access.',
+      )
 
     const guard = requirePortalClient(
       caller.user.role as UserRole,
@@ -135,7 +134,9 @@ export const POST = withV1Contract(
     const raw = await ctx.request.json().catch(() => null)
     const patientNotes =
       raw && typeof raw === 'object'
-        ? ((raw as Record<string, unknown>)['patientNotes'] as string | undefined)
+        ? ((raw as Record<string, unknown>)['patientNotes'] as
+            | string
+            | undefined)
         : undefined
 
     const patientId = resolvePortalPatientId(caller.user.id)

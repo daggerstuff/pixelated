@@ -5,7 +5,10 @@ import { PortalShell, TelehealthWidget } from '@/components/ehr/portal'
 export const prerender = false
 ---
 
-<Layout title="Telehealth — Client Portal" description="Join telehealth appointments">
+<Layout
+  title="Telehealth — Client Portal"
+  description="Join telehealth appointments"
+>
   <PortalShell activeFeature="telehealth" client:load>
     <TelehealthWidget client:load />
   </PortalShell>

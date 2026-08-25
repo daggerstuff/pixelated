@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 
 // Mock client.query — the private CommunicationRepository overrides call this.withRLS(client => client.query(...))
@@ -12,7 +13,9 @@ const mockFindById = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   query: vi.fn(),
-  transaction: vi.fn(async (cb: (client: unknown) => Promise<unknown>) => cb(mockClient)),
+  transaction: vi.fn(async (cb: (client: unknown) => Promise<unknown>) =>
+    cb(mockClient),
+  ),
 }))
 
 vi.mock('@/lib/ehr-native/repositories/base-repository', () => ({
@@ -24,7 +27,9 @@ vi.mock('@/lib/ehr-native/repositories/base-repository', () => ({
     constructor(rlsContext: RLSContext) {
       this.rlsContext = rlsContext
     }
-    withRLS = vi.fn(async (cb: (client: unknown) => Promise<unknown>) => cb(mockClient))
+    withRLS = vi.fn(async (cb: (client: unknown) => Promise<unknown>) =>
+      cb(mockClient),
+    )
     findById = mockFindById
   },
 }))
@@ -42,11 +47,15 @@ const VALID_THREAD_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
 const VALID_PATIENT_ID = 'ffffffff-1111-2222-3333-444444444444'
 
 // Mock DocumentReference — must match what toThread() accesses
-function makeMockDocRef(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+function makeMockDocRef(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
   return {
     resourceType: 'DocumentReference',
     status: 'current',
-    category: [{ coding: [{ code: 'communication' }], text: 'Secure Message Thread' }],
+    category: [
+      { coding: [{ code: 'communication' }], text: 'Secure Message Thread' },
+    ],
     subject: { reference: `Patient/${VALID_PATIENT_ID}` },
     description: 'Test Thread',
     date: '2024-01-01T00:00:00.000Z',
@@ -78,10 +87,16 @@ describe('PortalMessagingService', () => {
       const mockDocRef = makeMockDocRef()
       // findByPatient query runs first (Promise.all order), then countByPatient
       mockClientQuery
-        .mockResolvedValueOnce({ rows: [{ fhir_resource: mockDocRef }], rowCount: 1 })
+        .mockResolvedValueOnce({
+          rows: [{ fhir_resource: mockDocRef }],
+          rowCount: 1,
+        })
         .mockResolvedValueOnce({ rows: [{ count: 1 }] })
 
-      const result = await service.listThreads(VALID_PATIENT_ID, { limit: 20, offset: 0 })
+      const result = await service.listThreads(VALID_PATIENT_ID, {
+        limit: 20,
+        offset: 0,
+      })
       expect(result.threads).toHaveLength(1)
       expect(result.total).toBe(1)
     })
@@ -91,7 +106,10 @@ describe('PortalMessagingService', () => {
         .mockResolvedValueOnce({ rows: [], rowCount: 0 })
         .mockResolvedValueOnce({ rows: [{ count: 0 }] })
 
-      const result = await service.listThreads(VALID_PATIENT_ID, { limit: 20, offset: 0 })
+      const result = await service.listThreads(VALID_PATIENT_ID, {
+        limit: 20,
+        offset: 0,
+      })
       expect(result.threads).toHaveLength(0)
       expect(result.total).toBe(0)
     })
@@ -101,7 +119,10 @@ describe('PortalMessagingService', () => {
     it('creates a new thread with initial message', async () => {
       const mockDocRef = makeMockDocRef()
       // CommunicationRepository.createThread calls documentReferenceSchema.parse then withRLS → client.query(INSERT...RETURNING)
-      mockClientQuery.mockResolvedValueOnce({ rows: [{ fhir_resource: mockDocRef }], rowCount: 1 })
+      mockClientQuery.mockResolvedValueOnce({
+        rows: [{ fhir_resource: mockDocRef }],
+        rowCount: 1,
+      })
 
       const result = await service.createThread({
         patientId: VALID_PATIENT_ID,
@@ -141,13 +162,19 @@ describe('PortalMessagingService', () => {
       // delete override calls withRLS → client.query(DELETE...)
       mockClientQuery.mockResolvedValueOnce({ rowCount: 1 })
 
-      const result = await service.deleteThread(VALID_THREAD_ID, VALID_PATIENT_ID)
+      const result = await service.deleteThread(
+        VALID_THREAD_ID,
+        VALID_PATIENT_ID,
+      )
       expect(result).toBe(true)
     })
 
     it('returns false when thread not found', async () => {
       mockFindById.mockResolvedValue(null)
-      const result = await service.deleteThread(VALID_THREAD_ID, VALID_PATIENT_ID)
+      const result = await service.deleteThread(
+        VALID_THREAD_ID,
+        VALID_PATIENT_ID,
+      )
       expect(result).toBe(false)
     })
   })

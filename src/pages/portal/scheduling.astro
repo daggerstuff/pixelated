@@ -5,7 +5,10 @@ import { PortalShell, SchedulingWidget } from '@/components/ehr/portal'
 export const prerender = false
 ---
 
-<Layout title="Scheduling — Client Portal" description="Schedule and manage appointments">
+<Layout
+  title="Scheduling — Client Portal"
+  description="Schedule and manage appointments"
+>
   <PortalShell activeFeature="scheduling" client:load>
     <SchedulingWidget client:load />
   </PortalShell>

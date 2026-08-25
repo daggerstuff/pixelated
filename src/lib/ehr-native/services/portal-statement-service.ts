@@ -13,7 +13,11 @@ import { claimSchema, type Claim } from '@/lib/ehr-native/types'
 
 function validateId(id: string, label: string): string {
   const sanitized = id.trim()
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sanitized)) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      sanitized,
+    )
+  ) {
     throw new Error(`Invalid ${label} format: expected UUID`)
   }
   return sanitized
@@ -40,8 +44,19 @@ export interface PatientStatement {
   totalAmount: number
   currency: string
   diagnosis: Array<{ description?: string; code?: string }>
-  items: Array<{ sequence: number; description?: string; serviceCode?: string; quantity?: number; unitPrice?: number; net?: number }>
-  insurance: Array<{ coverage?: string; focal?: boolean; preauthRef?: string[] }>
+  items: Array<{
+    sequence: number
+    description?: string
+    serviceCode?: string
+    quantity?: number
+    unitPrice?: number
+    net?: number
+  }>
+  insurance: Array<{
+    coverage?: string
+    focal?: boolean
+    preauthRef?: string[]
+  }>
 }
 
 export interface StatementSummary {
@@ -50,7 +65,12 @@ export interface StatementSummary {
   totalPaid: number
   totalOutstanding: number
   currency: string
-  recentStatements: Array<{ id: string; created: string; totalAmount: number; status: string }>
+  recentStatements: Array<{
+    id: string
+    created: string
+    totalAmount: number
+    status: string
+  }>
 }
 
 export interface StatementSearchParams {
@@ -92,11 +112,16 @@ class StatementRepository extends BaseRepository<Claim & { id?: string }> {
       params.push(limit, offset)
 
       const result = await client.query(query, params)
-      return (result.rows as Array<{ fhir_resource: Claim }>).map((r) => r.fhir_resource)
+      return (result.rows as Array<{ fhir_resource: Claim }>).map(
+        (r) => r.fhir_resource,
+      )
     })
   }
 
-  override async countByPatient(patientId: string, statusFilter?: string): Promise<number> {
+  override async countByPatient(
+    patientId: string,
+    statusFilter?: string,
+  ): Promise<number> {
     return this.withRLS(async (client) => {
       let query = `SELECT COUNT(*)::int as count FROM ${this.tableName} WHERE patient_id = $1`
       const params: unknown[] = [patientId]
@@ -179,7 +204,9 @@ export class PortalStatementService {
       .filter((s) => s.status === 'active' && s.use === 'claim')
       .reduce((sum, s) => sum + s.totalAmount, 0)
     const totalOutstanding = statements
-      .filter((s) => s.status !== 'cancelled' && s.status !== 'entered-in-error')
+      .filter(
+        (s) => s.status !== 'cancelled' && s.status !== 'entered-in-error',
+      )
       .reduce((sum, s) => sum + s.totalAmount, 0)
 
     return {
@@ -219,7 +246,14 @@ export class PortalStatementService {
       ['Total Amount', `${statement.totalAmount} ${statement.currency}`],
       ['', ''],
       ['Line Items', ''],
-      ['Sequence', 'Description', 'Service Code', 'Quantity', 'Unit Price', 'Net'],
+      [
+        'Sequence',
+        'Description',
+        'Service Code',
+        'Quantity',
+        'Unit Price',
+        'Net',
+      ],
       ...statement.items.map((i) => [
         String(i.sequence),
         i.description ?? '',
@@ -240,7 +274,11 @@ export class PortalStatementService {
       ]),
     ]
 
-    const csv = rows.map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n')
+    const csv = rows
+      .map((row) =>
+        row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','),
+      )
+      .join('\n')
     const filename = `statement-${statement.id}.csv`
 
     return {

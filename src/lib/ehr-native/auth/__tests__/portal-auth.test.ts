@@ -13,24 +13,61 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import type { UserRole } from '@/lib/auth/roles'
 
 // Mock createEHRRLSContext
 vi.mock('@/lib/ehr-native/api', () => ({
-  createEHRRLSContext: vi.fn((userId: string, role: string, tenantId: string, breakGlass = false) => ({
-    tenantId,
-    userId,
-    role,
-    breakGlass,
-  })),
+  createEHRRLSContext: vi.fn(
+    (userId: string, role: string, tenantId: string, breakGlass = false) => ({
+      tenantId,
+      userId,
+      role,
+      breakGlass,
+    }),
+  ),
   resolveTenantId: vi.fn(() => 'tenant-123'),
-  sanitizeLimitParam: vi.fn((v: string) => Math.min(200, Math.max(1, parseInt(v, 10) || 20))),
+  sanitizeLimitParam: vi.fn((v: string) =>
+    Math.min(200, Math.max(1, parseInt(v, 10) || 20)),
+  ),
   sanitizeOffsetParam: vi.fn((v: string) => Math.max(0, parseInt(v, 10) || 0)),
-  ehrValidationError: vi.fn((msg: string) => new Response(JSON.stringify({ error: { code: 'validation_error', message: msg } }), { status: 400, headers: { 'Content-Type': 'application/json' } })),
-  ehrNotFound: vi.fn((resource: string, id: string) => new Response(JSON.stringify({ error: { code: 'not_found', message: `${resource} ${id} not found` } }), { status: 404, headers: { 'Content-Type': 'application/json' } })),
-  ehrSuccess: vi.fn(<T>(data: T) => new Response(JSON.stringify({ data }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
-  ehrCreated: vi.fn(<T>(data: T) => new Response(JSON.stringify({ data }), { status: 201, headers: { 'Content-Type': 'application/json' } })),
-  ehrPaginated: vi.fn(<T>(data: T[], _pagination: unknown) => new Response(JSON.stringify({ data }), { status: 200, headers: { 'Content-Type': 'application/json' } })),
+  ehrValidationError: vi.fn(
+    (msg: string) =>
+      new Response(
+        JSON.stringify({ error: { code: 'validation_error', message: msg } }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } },
+      ),
+  ),
+  ehrNotFound: vi.fn(
+    (resource: string, id: string) =>
+      new Response(
+        JSON.stringify({
+          error: { code: 'not_found', message: `${resource} ${id} not found` },
+        }),
+        { status: 404, headers: { 'Content-Type': 'application/json' } },
+      ),
+  ),
+  ehrSuccess: vi.fn(
+    <T>(data: T) =>
+      new Response(JSON.stringify({ data }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+  ),
+  ehrCreated: vi.fn(
+    <T>(data: T) =>
+      new Response(JSON.stringify({ data }), {
+        status: 201,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+  ),
+  ehrPaginated: vi.fn(
+    <T>(data: T[], _pagination: unknown) =>
+      new Response(JSON.stringify({ data }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+  ),
 }))
 
 const { requirePortalClient, resolvePortalPatientId } =
@@ -42,7 +79,12 @@ describe('Portal API route auth integration', () => {
 
   describe('Acceptance criterion #6: Auth0 ehr:client enforces access', () => {
     describe('Wrong role denied (403)', () => {
-      const deniedRoles: UserRole[] = ['therapist', 'researcher', 'support', 'guest']
+      const deniedRoles: UserRole[] = [
+        'therapist',
+        'researcher',
+        'support',
+        'guest',
+      ]
 
       for (const role of deniedRoles) {
         it(`denies ${role} access to portal scheduling`, () => {

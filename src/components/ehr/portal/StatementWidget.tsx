@@ -12,7 +12,14 @@ interface PatientStatement {
   totalAmount: number
   currency: string
   diagnosis: Array<{ description?: string; code?: string }>
-  items: Array<{ sequence: number; description?: string; serviceCode?: string; quantity?: number; unitPrice?: number; net?: number }>
+  items: Array<{
+    sequence: number
+    description?: string
+    serviceCode?: string
+    quantity?: number
+    unitPrice?: number
+    net?: number
+  }>
   insurance: Array<{ coverage?: string; focal?: boolean; preauthRef?: string }>
 }
 
@@ -22,7 +29,12 @@ interface StatementSummary {
   totalPaid: number
   totalOutstanding: number
   currency: string
-  recentStatements: Array<{ id: string; created: string; totalAmount: number; status: string }>
+  recentStatements: Array<{
+    id: string
+    created: string
+    totalAmount: number
+    status: string
+  }>
 }
 
 interface PaginatedResponse<T> {
@@ -35,11 +47,17 @@ interface ErrorResponse {
 }
 
 function formatCurrency(amount: number, currency: string): string {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(
+    amount,
+  )
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 export function StatementWidget() {
@@ -77,7 +95,9 @@ export function StatementWidget() {
         const result = (await res.json()) as PaginatedResponse<PatientStatement>
         const all = result.data
         const totalBilled = all.reduce((sum, s) => sum + s.totalAmount, 0)
-        const totalPaid = all.filter((s) => s.status === 'adjudicated').reduce((sum, s) => sum + s.totalAmount, 0)
+        const totalPaid = all
+          .filter((s) => s.status === 'adjudicated')
+          .reduce((sum, s) => sum + s.totalAmount, 0)
         setSummary({
           totalStatements: all.length,
           totalBilled,
@@ -103,17 +123,23 @@ export function StatementWidget() {
       try {
         const params = new URLSearchParams()
         if (statusFilter) params.set('status', statusFilter)
-        const res = await fetch(`/api/portal/v1/statements?${params.toString()}`)
+        const res = await fetch(
+          `/api/portal/v1/statements?${params.toString()}`,
+        )
         if (!cancelled && !res.ok) {
           const err = (await res.json()) as ErrorResponse
           throw new Error(err.error?.message ?? 'Failed to load statements')
         }
         if (!cancelled) {
-          const result = (await res.json()) as PaginatedResponse<PatientStatement>
+          const result =
+            (await res.json()) as PaginatedResponse<PatientStatement>
           if (!cancelled) setStatements(result.data)
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load statements')
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : 'Failed to load statements',
+          )
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -122,11 +148,14 @@ export function StatementWidget() {
       try {
         const res = await fetch('/api/portal/v1/statements')
         if (!cancelled && res.ok) {
-          const result = (await res.json()) as PaginatedResponse<PatientStatement>
+          const result =
+            (await res.json()) as PaginatedResponse<PatientStatement>
           if (!cancelled) {
             const all = result.data
             const totalBilled = all.reduce((sum, s) => sum + s.totalAmount, 0)
-            const totalPaid = all.filter((s) => s.status === 'adjudicated').reduce((sum, s) => sum + s.totalAmount, 0)
+            const totalPaid = all
+              .filter((s) => s.status === 'adjudicated')
+              .reduce((sum, s) => sum + s.totalAmount, 0)
             setSummary({
               totalStatements: all.length,
               totalBilled,
@@ -146,13 +175,17 @@ export function StatementWidget() {
         // Best-effort
       }
     })()
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [statusFilter])
 
   const handleDownload = async (statementId: string) => {
     setDownloading(statementId)
     try {
-      const res = await fetch(`/api/portal/v1/statements/${statementId}?format=csv`)
+      const res = await fetch(
+        `/api/portal/v1/statements/${statementId}?format=csv`,
+      )
       if (!res.ok) {
         const err = (await res.json()) as ErrorResponse
         throw new Error(err.error?.message ?? 'Failed to download')
@@ -184,7 +217,10 @@ export function StatementWidget() {
       <div className="flex items-center justify-center py-12">
         <div
           className="w-6 h-6 border-2 rounded-full animate-spin"
-          style={{ borderColor: 'var(--np-muted)', borderTopColor: 'var(--np-text)' }}
+          style={{
+            borderColor: 'var(--np-muted)',
+            borderTopColor: 'var(--np-text)',
+          }}
         />
       </div>
     )
@@ -193,7 +229,10 @@ export function StatementWidget() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+        <h2
+          className="text-xl font-semibold"
+          style={{ color: 'var(--np-text)' }}
+        >
           Patient Statements
         </h2>
         <p className="text-sm mt-1" style={{ color: 'var(--np-muted)' }}>
@@ -203,37 +242,95 @@ export function StatementWidget() {
 
       {summary && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3 rounded" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
+          <div
+            className="p-3 rounded"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
             <div className="flex items-center gap-2 mb-1">
-              <FileText className="w-4 h-4" style={{ color: 'var(--np-muted)' }} />
-              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>Statements</span>
+              <FileText
+                className="w-4 h-4"
+                style={{ color: 'var(--np-muted)' }}
+              />
+              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>
+                Statements
+              </span>
             </div>
-            <p className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>{summary.totalStatements}</p>
+            <p
+              className="text-xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
+              {summary.totalStatements}
+            </p>
           </div>
-          <div className="p-3 rounded" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
+          <div
+            className="p-3 rounded"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="w-4 h-4" style={{ color: 'var(--np-muted)' }} />
-              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>Billed</span>
+              <DollarSign
+                className="w-4 h-4"
+                style={{ color: 'var(--np-muted)' }}
+              />
+              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>
+                Billed
+              </span>
             </div>
-            <p className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+            <p
+              className="text-xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
               {formatCurrency(summary.totalBilled, summary.currency)}
             </p>
           </div>
-          <div className="p-3 rounded" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
+          <div
+            className="p-3 rounded"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="w-4 h-4" style={{ color: 'var(--np-muted)' }} />
-              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>Paid</span>
+              <DollarSign
+                className="w-4 h-4"
+                style={{ color: 'var(--np-muted)' }}
+              />
+              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>
+                Paid
+              </span>
             </div>
-            <p className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+            <p
+              className="text-xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
               {formatCurrency(summary.totalPaid, summary.currency)}
             </p>
           </div>
-          <div className="p-3 rounded" style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}>
+          <div
+            className="p-3 rounded"
+            style={{
+              background: 'var(--np-surface)',
+              border: '1px solid var(--np-line)',
+            }}
+          >
             <div className="flex items-center gap-2 mb-1">
-              <DollarSign className="w-4 h-4" style={{ color: 'var(--np-muted)' }} />
-              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>Outstanding</span>
+              <DollarSign
+                className="w-4 h-4"
+                style={{ color: 'var(--np-muted)' }}
+              />
+              <span className="text-xs" style={{ color: 'var(--np-muted)' }}>
+                Outstanding
+              </span>
             </div>
-            <p className="text-xl font-semibold" style={{ color: 'var(--np-text)' }}>
+            <p
+              className="text-xl font-semibold"
+              style={{ color: 'var(--np-text)' }}
+            >
               {formatCurrency(summary.totalOutstanding, summary.currency)}
             </p>
           </div>
@@ -247,8 +344,12 @@ export function StatementWidget() {
             onClick={() => setStatusFilter(status)}
             className="px-3 py-1.5 text-xs rounded transition-colors capitalize"
             style={{
-              background: statusFilter === status ? 'var(--np-elevated)' : 'var(--np-surface)',
-              color: statusFilter === status ? 'var(--np-text)' : 'var(--np-muted)',
+              background:
+                statusFilter === status
+                  ? 'var(--np-elevated)'
+                  : 'var(--np-surface)',
+              color:
+                statusFilter === status ? 'var(--np-text)' : 'var(--np-muted)',
               border: '1px solid var(--np-line)',
               fontWeight: statusFilter === status ? 600 : 400,
             }}
@@ -261,7 +362,11 @@ export function StatementWidget() {
       {error && (
         <div
           className="p-4 text-sm rounded"
-          style={{ background: 'var(--np-surface)', color: 'var(--np-text)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            color: 'var(--np-text)',
+            border: '1px solid var(--np-line)',
+          }}
         >
           {error}
         </div>
@@ -270,9 +375,15 @@ export function StatementWidget() {
       {statements.length === 0 ? (
         <div
           className="text-center py-12 rounded"
-          style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+          style={{
+            background: 'var(--np-surface)',
+            border: '1px solid var(--np-line)',
+          }}
         >
-          <FileText className="w-8 h-8 mx-auto mb-3" style={{ color: 'var(--np-muted)' }} />
+          <FileText
+            className="w-8 h-8 mx-auto mb-3"
+            style={{ color: 'var(--np-muted)' }}
+          />
           <p className="text-sm" style={{ color: 'var(--np-muted)' }}>
             No statements available.
           </p>
@@ -283,29 +394,49 @@ export function StatementWidget() {
             <div
               key={stmt.id}
               className="rounded"
-              style={{ background: 'var(--np-surface)', border: '1px solid var(--np-line)' }}
+              style={{
+                background: 'var(--np-surface)',
+                border: '1px solid var(--np-line)',
+              }}
             >
               <button
-                onClick={() => setExpandedId(expandedId === stmt.id ? null : stmt.id)}
+                onClick={() =>
+                  setExpandedId(expandedId === stmt.id ? null : stmt.id)
+                }
                 className="w-full text-left p-4"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <FileText className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--np-muted)' }} />
-                      <span className="text-sm font-medium" style={{ color: 'var(--np-text)' }}>
+                      <FileText
+                        className="w-4 h-4 flex-shrink-0"
+                        style={{ color: 'var(--np-muted)' }}
+                      />
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: 'var(--np-text)' }}
+                      >
                         Statement · {formatDate(stmt.created)}
                       </span>
                       <span
                         className="text-xs px-2 py-0.5 rounded capitalize"
-                        style={{ background: 'var(--np-elevated)', color: 'var(--np-muted)' }}
+                        style={{
+                          background: 'var(--np-elevated)',
+                          color: 'var(--np-muted)',
+                        }}
                       >
                         {stmt.status}
                       </span>
                     </div>
-                    <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--np-muted)' }}>
+                    <div
+                      className="flex items-center gap-4 text-sm"
+                      style={{ color: 'var(--np-muted)' }}
+                    >
                       <span>{stmt.provider}</span>
-                      <span className="font-medium" style={{ color: 'var(--np-text)' }}>
+                      <span
+                        className="font-medium"
+                        style={{ color: 'var(--np-text)' }}
+                      >
                         {formatCurrency(stmt.totalAmount, stmt.currency)}
                       </span>
                     </div>
@@ -317,7 +448,10 @@ export function StatementWidget() {
                     }}
                     disabled={downloading === stmt.id}
                     className="flex-shrink-0 flex items-center gap-1 text-xs px-3 py-1.5 rounded transition-colors disabled:opacity-50"
-                    style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
+                    style={{
+                      background: 'var(--np-elevated)',
+                      color: 'var(--np-text)',
+                    }}
                   >
                     <Download className="w-3.5 h-3.5" />
                     {downloading === stmt.id ? 'Downloading...' : 'CSV'}
@@ -328,14 +462,28 @@ export function StatementWidget() {
               {expandedId === stmt.id && (
                 <div className="px-4 pb-4 space-y-3">
                   {stmt.diagnosis.length > 0 && (
-                    <div className="pt-3 border-t" style={{ borderColor: 'var(--np-line)' }}>
-                      <h4 className="text-xs font-semibold uppercase mb-2" style={{ color: 'var(--np-muted)' }}>
+                    <div
+                      className="pt-3 border-t"
+                      style={{ borderColor: 'var(--np-line)' }}
+                    >
+                      <h4
+                        className="text-xs font-semibold uppercase mb-2"
+                        style={{ color: 'var(--np-muted)' }}
+                      >
                         Diagnoses
                       </h4>
                       <ul className="space-y-1">
                         {stmt.diagnosis.map((d, i) => (
-                          <li key={i} className="text-sm" style={{ color: 'var(--np-text)' }}>
-                            {d.code && <span style={{ color: 'var(--np-muted)' }}>{d.code}: </span>}
+                          <li
+                            key={i}
+                            className="text-sm"
+                            style={{ color: 'var(--np-text)' }}
+                          >
+                            {d.code && (
+                              <span style={{ color: 'var(--np-muted)' }}>
+                                {d.code}:{' '}
+                              </span>
+                            )}
                             {d.description ?? 'N/A'}
                           </li>
                         ))}
@@ -344,8 +492,14 @@ export function StatementWidget() {
                   )}
 
                   {stmt.items.length > 0 && (
-                    <div className="pt-3 border-t" style={{ borderColor: 'var(--np-line)' }}>
-                      <h4 className="text-xs font-semibold uppercase mb-2" style={{ color: 'var(--np-muted)' }}>
+                    <div
+                      className="pt-3 border-t"
+                      style={{ borderColor: 'var(--np-line)' }}
+                    >
+                      <h4
+                        className="text-xs font-semibold uppercase mb-2"
+                        style={{ color: 'var(--np-muted)' }}
+                      >
                         Line Items
                       </h4>
                       <table className="w-full text-sm">
@@ -359,12 +513,21 @@ export function StatementWidget() {
                         </thead>
                         <tbody>
                           {stmt.items.map((item) => (
-                            <tr key={item.sequence} style={{ color: 'var(--np-text)' }}>
+                            <tr
+                              key={item.sequence}
+                              style={{ color: 'var(--np-text)' }}
+                            >
                               <td className="py-1">{item.sequence}</td>
-                              <td className="py-1">{item.description ?? item.serviceCode ?? 'N/A'}</td>
-                              <td className="py-1 text-right">{item.quantity ?? 1}</td>
+                              <td className="py-1">
+                                {item.description ?? item.serviceCode ?? 'N/A'}
+                              </td>
                               <td className="py-1 text-right">
-                                {item.net != null ? formatCurrency(item.net, stmt.currency) : '—'}
+                                {item.quantity ?? 1}
+                              </td>
+                              <td className="py-1 text-right">
+                                {item.net != null
+                                  ? formatCurrency(item.net, stmt.currency)
+                                  : '—'}
                               </td>
                             </tr>
                           ))}
@@ -374,15 +537,32 @@ export function StatementWidget() {
                   )}
 
                   {stmt.insurance.length > 0 && (
-                    <div className="pt-3 border-t" style={{ borderColor: 'var(--np-line)' }}>
-                      <h4 className="text-xs font-semibold uppercase mb-2" style={{ color: 'var(--np-muted)' }}>
+                    <div
+                      className="pt-3 border-t"
+                      style={{ borderColor: 'var(--np-line)' }}
+                    >
+                      <h4
+                        className="text-xs font-semibold uppercase mb-2"
+                        style={{ color: 'var(--np-muted)' }}
+                      >
                         Insurance
                       </h4>
                       <ul className="space-y-1">
                         {stmt.insurance.map((ins, i) => (
-                          <li key={i} className="text-sm" style={{ color: 'var(--np-text)' }}>
+                          <li
+                            key={i}
+                            className="text-sm"
+                            style={{ color: 'var(--np-text)' }}
+                          >
                             {ins.coverage ?? 'N/A'}
-                            {ins.focal && <span className="ml-2 text-xs" style={{ color: 'var(--np-muted)' }}>(primary)</span>}
+                            {ins.focal && (
+                              <span
+                                className="ml-2 text-xs"
+                                style={{ color: 'var(--np-muted)' }}
+                              >
+                                (primary)
+                              </span>
+                            )}
                           </li>
                         ))}
                       </ul>

@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 
 // Mock client.query — private HomeworkRepository overrides call this.withRLS(client => client.query(...))
@@ -12,7 +13,9 @@ const mockFindById = vi.fn()
 
 vi.mock('@/lib/db', () => ({
   query: vi.fn(),
-  transaction: vi.fn(async (cb: (client: unknown) => Promise<unknown>) => cb(mockClient)),
+  transaction: vi.fn(async (cb: (client: unknown) => Promise<unknown>) =>
+    cb(mockClient),
+  ),
 }))
 
 vi.mock('@/lib/ehr-native/repositories/base-repository', () => ({
@@ -24,7 +27,9 @@ vi.mock('@/lib/ehr-native/repositories/base-repository', () => ({
     constructor(rlsContext: RLSContext) {
       this.rlsContext = rlsContext
     }
-    withRLS = vi.fn(async (cb: (client: unknown) => Promise<unknown>) => cb(mockClient))
+    withRLS = vi.fn(async (cb: (client: unknown) => Promise<unknown>) =>
+      cb(mockClient),
+    )
     findById = mockFindById
   },
 }))
@@ -42,7 +47,9 @@ const VALID_ASSIGNMENT_ID = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee'
 const VALID_PATIENT_ID = 'ffffffff-1111-2222-3333-444444444444'
 
 // Build a mock DocumentReference for homework with base64-encoded JSON payload
-function makeMockHomeworkDocRef(payloadOverrides: Record<string, unknown> = {}): Record<string, unknown> {
+function makeMockHomeworkDocRef(
+  payloadOverrides: Record<string, unknown> = {},
+): Record<string, unknown> {
   const payload = {
     description: 'CBT exercise description',
     instructions: 'Do this exercise daily',
@@ -54,7 +61,9 @@ function makeMockHomeworkDocRef(payloadOverrides: Record<string, unknown> = {}):
   return {
     resourceType: 'DocumentReference',
     status: 'current',
-    category: [{ coding: [{ code: 'homework' }], text: 'Therapy Homework Assignment' }],
+    category: [
+      { coding: [{ code: 'homework' }], text: 'Therapy Homework Assignment' },
+    ],
     subject: { reference: `Patient/${VALID_PATIENT_ID}` },
     description: 'CBT exercise',
     date: '2024-01-01T00:00:00.000Z',
@@ -85,10 +94,16 @@ describe('PortalHomeworkService', () => {
       const mockDocRef = makeMockHomeworkDocRef()
       // findByPatient query first (Promise.all order), then countByPatient
       mockClientQuery
-        .mockResolvedValueOnce({ rows: [{ fhir_resource: mockDocRef }], rowCount: 1 })
+        .mockResolvedValueOnce({
+          rows: [{ fhir_resource: mockDocRef }],
+          rowCount: 1,
+        })
         .mockResolvedValueOnce({ rows: [{ count: 1 }] })
 
-      const result = await service.listAssignments(VALID_PATIENT_ID, { limit: 20, offset: 0 })
+      const result = await service.listAssignments(VALID_PATIENT_ID, {
+        limit: 20,
+        offset: 0,
+      })
       expect(result.assignments).toHaveLength(1)
       expect(result.total).toBe(1)
     })
@@ -98,7 +113,10 @@ describe('PortalHomeworkService', () => {
         .mockResolvedValueOnce({ rows: [], rowCount: 0 })
         .mockResolvedValueOnce({ rows: [{ count: 0 }] })
 
-      const result = await service.listAssignments(VALID_PATIENT_ID, { limit: 20, offset: 0 })
+      const result = await service.listAssignments(VALID_PATIENT_ID, {
+        limit: 20,
+        offset: 0,
+      })
       expect(result.assignments).toHaveLength(0)
       expect(result.total).toBe(0)
     })
@@ -110,14 +128,20 @@ describe('PortalHomeworkService', () => {
       // findById override calls super.findById → mockFindById
       mockFindById.mockResolvedValue(mockDocRef)
 
-      const result = await service.getAssignment(VALID_ASSIGNMENT_ID, VALID_PATIENT_ID)
+      const result = await service.getAssignment(
+        VALID_ASSIGNMENT_ID,
+        VALID_PATIENT_ID,
+      )
       expect(result).not.toBeNull()
       expect(result?.patientId).toBe(VALID_PATIENT_ID)
     })
 
     it('returns null when assignment not found', async () => {
       mockFindById.mockResolvedValue(null)
-      const result = await service.getAssignment(VALID_ASSIGNMENT_ID, VALID_PATIENT_ID)
+      const result = await service.getAssignment(
+        VALID_ASSIGNMENT_ID,
+        VALID_PATIENT_ID,
+      )
       expect(result).toBeNull()
     })
   })
@@ -134,9 +158,15 @@ describe('PortalHomeworkService', () => {
       // updateAssignment calls findById twice: once in getAssignment, once in homeworkRepo.updateAssignment
       mockFindById.mockResolvedValue(mockDocRef)
       // homeworkRepo.updateAssignment calls withRLS → client.query(UPDATE...RETURNING)
-      mockClientQuery.mockResolvedValueOnce({ rows: [{ fhir_resource: mockUpdatedDocRef }] })
+      mockClientQuery.mockResolvedValueOnce({
+        rows: [{ fhir_resource: mockUpdatedDocRef }],
+      })
 
-      const result = await service.completeAssignment(VALID_ASSIGNMENT_ID, VALID_PATIENT_ID, 'Completed')
+      const result = await service.completeAssignment(
+        VALID_ASSIGNMENT_ID,
+        VALID_PATIENT_ID,
+        'Completed',
+      )
       expect(mockClientQuery).toHaveBeenCalledOnce()
       expect(result).not.toBeNull()
       expect(result?.status).toBe('completed')
@@ -151,7 +181,10 @@ describe('PortalHomeworkService', () => {
       // getSummary → listAssignments → findByPatient (1st query) + countByPatient (2nd query)
       mockClientQuery
         .mockResolvedValueOnce({
-          rows: [{ fhir_resource: mockCompleted }, { fhir_resource: mockAssigned }],
+          rows: [
+            { fhir_resource: mockCompleted },
+            { fhir_resource: mockAssigned },
+          ],
           rowCount: 2,
         })
         .mockResolvedValueOnce({ rows: [{ count: 2 }] })
