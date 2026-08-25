@@ -64,45 +64,15 @@ export {
 
 export {
   PortalMessagingService,
-  type MessageThread,
-  type ThreadMessage,
   type CreateThreadInput,
   type CreateMessageInput,
-  type ThreadSearchParams,
-  type ThreadSummary,
 } from './portal-messaging-service'
 
 export {
   PortalHomeworkService,
-  type HomeworkAssignment,
-  type HomeworkSummary,
   type UpdateHomeworkInput,
-  type HomeworkSearchParams,
 } from './portal-homework-service'
 
-export {
-  PortalStatementService,
-  type PatientStatement,
-  type StatementSummary,
-  type StatementSearchParams,
-  type StatementDownload,
-} from './portal-statement-service'
+export { PortalStatementService } from './portal-statement-service'
 
-export {
-  TelehealthService,
-  type StartRecordingInput,
-  type EndSessionInput,
-} from './telehealth-service'
-
-export type {
-  TelehealthSession,
-  StartSessionInput,
-  JoinSessionInput,
-  DeviceCheckResult,
-  WebRTCConfig,
-  IceServer,
-  TelehealthProvider,
-  TelehealthSessionStatus,
-  RecordingConsent,
-  SessionParticipant,
-} from '../types'
+export { TelehealthService } from './telehealth-service'
