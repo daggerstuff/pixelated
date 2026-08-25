@@ -18,6 +18,7 @@ const mockPatientRepo = {
   findById: vi.fn(),
   findByMRN: vi.fn(),
   search: vi.fn(),
+  searchByName: vi.fn(),
   findActive: vi.fn(),
   update: vi.fn(),
   deactivate: vi.fn(),
@@ -52,6 +53,7 @@ vi.mock('@/lib/ehr-native/repositories/patient-repository', () => ({
     findById = mockPatientRepo.findById
     findByMRN = mockPatientRepo.findByMRN
     search = mockPatientRepo.search
+    searchByName = mockPatientRepo.searchByName
     findActive = mockPatientRepo.findActive
     update = mockPatientRepo.update
     deactivate = mockPatientRepo.deactivate
@@ -109,7 +111,10 @@ const validPatient = {
 const validEncounter = {
   resourceType: 'Encounter' as const,
   status: 'finished' as const,
-  class: { system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode', code: 'AMB' },
+  class: {
+    system: 'http://terminology.hl7.org/CodeSystem/v3-ActCode',
+    code: 'AMB',
+  },
   subject: { reference: 'Patient/patient-001' },
 }
 
@@ -174,7 +179,11 @@ describe('PatientService', () => {
   describe('searchPatients', () => {
     it('delegates to repository search with pagination', async () => {
       mockPatientRepo.searchByName.mockResolvedValue([validPatient])
-      const result = await service.searchPatients({ nameQuery: 'Doe', limit: 10, offset: 0 })
+      const result = await service.searchPatients({
+        nameQuery: 'Doe',
+        limit: 10,
+        offset: 0,
+      })
       expect(result).toEqual([validPatient])
       expect(mockPatientRepo.searchByName).toHaveBeenCalledWith('Doe', 10, 0)
     })
@@ -192,7 +201,9 @@ describe('PatientService', () => {
     it('throws when patient does not exist', async () => {
       const patientId = validPatientId
       mockPatientRepo.findById.mockResolvedValue(null)
-      await expect(service.createEncounter(patientId, validEncounter)).rejects.toThrow()
+      await expect(
+        service.createEncounter(patientId, validEncounter),
+      ).rejects.toThrow()
     })
   })
 
