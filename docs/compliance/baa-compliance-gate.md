@@ -114,7 +114,7 @@ environment variable is set to `true`.
 
 | Service | BAA Env Var | Requirement |
 |---|---|---|
-| NIM on Hetzner | `BAA_NIM_HETZER_CONFIRMED` | Must be `true` |
+| NIM on Hetzner | `BAA_NIM_HETZNER_CONFIRMED` | Must be `true` |
 | NIM (NVIDIA) | `BAA_NVIDIA_CONFIRMED` | Must be `true` if NVIDIA processes PHI |
 | Embedding service | `BAA_EMBEDDING_CONFIRMED` | Must be `true` if service processes PHI |
 | Transcription service | `BAA_TRANSCRIPTION_CONFIRMED` | Must be `true` if service processes PHI |
