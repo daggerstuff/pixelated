@@ -165,7 +165,7 @@ export function TelehealthWidget() {
                       )}
                     </div>
                     <div
-                      className="flex items-center gap-3 text-sm"
+                      className="flex flex-wrap items-center gap-3 text-sm"
                       style={{ color: 'var(--np-muted)' }}
                     >
                       <span className="flex items-center gap-1">
@@ -201,7 +201,7 @@ export function TelehealthWidget() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => setJoinedId(apt.id)}
-                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors min-h-[44px]"
                         style={{
                           background:
                             joinedId === apt.id

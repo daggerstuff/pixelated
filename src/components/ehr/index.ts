@@ -7,4 +7,11 @@
  * @see docs/plans/ehr-module-build-plan.md
  */
 
-export {}
+// Responsive layout shell (F1.13)
+export { EHRResponsiveShell, type EHRResponsiveShellProps, type EHRViewCategory, type EHRRNavItem } from './EHRResponsiveShell'
+export { EHRMobileLayout } from './EHRMobileLayout'
+export { EHRDesktopLayout } from './EHRDesktopLayout'
+
+// Submodule exports
+export * from './portal'
+export * from './telehealth'

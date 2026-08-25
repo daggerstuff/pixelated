@@ -139,6 +139,9 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href={withBasePath('/favicon.svg')} />
     <link rel="icon" href={withBasePath('/favicon.ico')} />
+    <link rel="manifest" href={withBasePath('/manifest.webmanifest')} />
+    <link rel="apple-touch-icon" href={withBasePath('/favicon.svg')} />
+    <meta name="theme-color" content="#131313" />
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
     <link rel="stylesheet" href={withBasePath('/css/style.css')} />
@@ -180,6 +183,13 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         <script type="text/javascript" set:html={mixpanelScript} />
       )
     }
+    <script is:inline nonce={cspNonce}>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {})
+        })
+      }
+    </script>
   </head>
   <body>
     <a class="np-skip-link" href="#main-content">Skip to main content</a>

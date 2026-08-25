@@ -215,7 +215,7 @@ export function SchedulingWidget() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors"
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded transition-colors min-h-[44px]"
           style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
         >
           <Plus className="w-4 h-4" />
@@ -287,7 +287,7 @@ export function SchedulingWidget() {
                     </span>
                   </div>
                   <div
-                    className="flex items-center gap-4 text-sm"
+                    className="flex flex-wrap items-center gap-2 gap-y-1 text-sm"
                     style={{ color: 'var(--np-muted)' }}
                   >
                     <span className="flex items-center gap-1">
@@ -383,13 +383,13 @@ export function SchedulingWidget() {
                 >
                   Time Slot
                 </label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {TIME_SLOTS.map((slot) => (
                     <button
                       key={slot}
                       type="button"
                       onClick={() => setSelectedTime(slot)}
-                      className="px-2 py-1.5 text-xs rounded transition-colors"
+                      className="px-2 py-1.5 text-xs rounded transition-colors min-h-[44px]"
                       style={{
                         background:
                           selectedTime === slot
