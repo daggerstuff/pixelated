@@ -16,7 +16,7 @@ from __future__ import annotations
 
 import time
 
-from skills.monthly_llm_driver.orch_db import ConnectionBundle
+from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Test 1: MongoDB roundtrip
