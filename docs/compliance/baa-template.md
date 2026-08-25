@@ -1,7 +1,11 @@
 # BAA Template — NIM on Hetzner
+
 #
+
 # Reference template for Business Associate Agreements covering AI inference
+
 # services that process Protected Health Information (PHI) within Pixelated
+
 # Empathy. Adapt with legal counsel before signing.
 
 ---
@@ -11,11 +15,13 @@
 This Business Associate Agreement ("**BAA**") is entered into by and between:
 
 **Covered Entity:**
+
 > Pixelated Empathy ("Covered Entity")
 > [Legal Address]
 > Represented by: [Name, Title]
 
 **Business Associate:**
+
 > [Business Associate Legal Name] ("Business Associate")
 > [Legal Address]
 > Represented by: [Name, Title]
@@ -55,20 +61,22 @@ or required by this BAA or as Required by Law.
 
 2.2. Business Associate may use PHI only for the purpose of providing AI
 inference services on behalf of Covered Entity, including:
-   - Processing clinical notes, transcripts, and therapeutic session content
-   - Generating AI-assisted clinical insights and recommendations
-   - Operating NVIDIA NIM inference infrastructure
+
+- Processing clinical notes, transcripts, and therapeutic session content
+- Generating AI-assisted clinical insights and recommendations
+- Operating NVIDIA NIM inference infrastructure
 
 2.3. Business Associate shall not use PHI for any independent commercial
 purpose, including:
-   - Training or fine-tuning AI models on PHI without explicit written consent
-   - Selling, licensing, or distributing PHI to third parties
-   - Using PHI for the Business Associate's own marketing, research, or
-     product development
+
+- Training or fine-tuning AI models on PHI without explicit written consent
+- Selling, licensing, or distributing PHI to third parties
+- Using PHI for the Business Associate's own marketing, research, or
+  product development
 
 2.4. Business Associate shall not disclose PHI to any subcontractor without
-   the prior written consent of Covered Entity and a written agreement binding
-   the subcontractor to the same restrictions and conditions.
+the prior written consent of Covered Entity and a written agreement binding
+the subcontractor to the same restrictions and conditions.
 
 ---
 
@@ -81,12 +89,12 @@ Security Rule (45 CFR §164.308–§164.312).
 
 3.2. **Encryption Requirements:**
 
-   | Layer | Standard | Minimum Configuration |
-   |---|---|---|
-   | Data in transit | TLS 1.3 | TLS 1.2 rejected; AEAD cipher suites only |
-   | Data at rest (database) | AES-256-GCM | TDE or pgcrypto; KMS-managed keys |
-   | Data at rest (volumes) | AES-256-XTS | LUKS2 full-disk encryption |
-   | Key management | AES-256 | HSM-backed KMS; rotation every 90 days |
+| Layer                   | Standard    | Minimum Configuration                     |
+| ----------------------- | ----------- | ----------------------------------------- |
+| Data in transit         | TLS 1.3     | TLS 1.2 rejected; AEAD cipher suites only |
+| Data at rest (database) | AES-256-GCM | TDE or pgcrypto; KMS-managed keys         |
+| Data at rest (volumes)  | AES-256-XTS | LUKS2 full-disk encryption                |
+| Key management          | AES-256     | HSM-backed KMS; rotation every 90 days    |
 
 3.3. Business Associate shall ensure that all systems processing PHI meet or
 exceed the encryption standards above.
@@ -103,10 +111,11 @@ Unsecured PHI without unreasonable delay and **no later than 24 hours** after
 discovery of the Breach.
 
 4.2. Notification shall include:
-   - The nature of the PHI involved (identifiers, elements)
-   - The unauthorized person who used or received the PHI
-   - What Business Associate is doing to investigate and mitigate the Breach
-   - Steps individuals should take to protect themselves
+
+- The nature of the PHI involved (identifiers, elements)
+- The unauthorized person who used or received the PHI
+- What Business Associate is doing to investigate and mitigate the Breach
+- Steps individuals should take to protect themselves
 
 4.3. Business Associate shall cooperate with Covered Entity in the
 investigation and notification of the Breach, including notification to
@@ -152,9 +161,10 @@ or destroy all PHI received from, or created or received by Business Associate
 on behalf of, Covered Entity.
 
 7.2. If return or destruction is infeasible, Business Associate shall:
-   - Provide certification to Covered Entity that return/destruction is infeasible
-   - Extend the protections of this BAA to the PHI
-   - Limit further uses and disclosures to those that make return or destruction infeasible
+
+- Provide certification to Covered Entity that return/destruction is infeasible
+- Extend the protections of this BAA to the PHI
+- Limit further uses and disclosures to those that make return or destruction infeasible
 
 7.3. Covered Entity may terminate this BAA immediately upon written notice if
 Business Associate breaches a material term of this BAA and fails to cure such
@@ -215,32 +225,32 @@ survive termination.
 
 ## Execution
 
-| Party | Signature | Name | Date |
-|---|---|---|---|
+| Party                                  | Signature         | Name          | Date   |
+| -------------------------------------- | ----------------- | ------------- | ------ |
 | **Covered Entity** (Pixelated Empathy) | _________________ | [Name, Title] | [Date] |
-| **Business Associate** ([Entity]) | _________________ | [Name, Title] | [Date] |
+| **Business Associate** ([Entity])      | _________________ | [Name, Title] | [Date] |
 
 ---
 
 ## Appendix A — Covered Services
 
-| Service | Description | PHI Processed |
-|---|---|---|
+| Service       | Description                           | PHI Processed                     |
+| ------------- | ------------------------------------- | --------------------------------- |
 | NIM Inference | NVIDIA NIM on Hetzner dedicated hosts | Yes — clinical notes, transcripts |
-| Model Hosting | Containerized model serving | Yes — inference inputs/outputs |
-| Logging | Inference audit logs | Yes — PHI-bearing |
+| Model Hosting | Containerized model serving           | Yes — inference inputs/outputs    |
+| Logging       | Inference audit logs                  | Yes — PHI-bearing                 |
 
 ## Appendix B — Renewal Cadence
 
-| Item | Cadence |
-|---|---|
-| BAA contract review | Annually |
-| BAA renewal | On contract expiry (typically 3 years) |
-| Encryption key rotation | Every 90 days |
-| Risk assessment | Annually |
+| Item                    | Cadence                                |
+| ----------------------- | -------------------------------------- |
+| BAA contract review     | Annually                               |
+| BAA renewal             | On contract expiry (typically 3 years) |
+| Encryption key rotation | Every 90 days                          |
+| Risk assessment         | Annually                               |
 
 ---
 
-*This template is provided as a reference starting point. It must be
+_This template is provided as a reference starting point. It must be
 reviewed and approved by qualified legal counsel before execution. It does
-not constitute legal advice.*
+not constitute legal advice._
