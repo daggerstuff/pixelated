@@ -50,12 +50,16 @@ export class EncounterRepository extends BaseRepository<Encounter> {
         ],
       )
       const row = res.rows[0]
-      // Set the FHIR resource id from the DB-generated encounter_id
-      const resource = row.fhir_resource as Record<string, unknown>
-      if (resource && !resource['id']) {
-        resource['id'] = row.encounter_id
-      }
-      return row.fhir_resource
+      // Stamp the DB-generated encounter_id into the stored fhir_resource JSONB
+      // so subsequent reads return a complete FHIR resource with its id.
+      const updateRes = await client.query<{ fhir_resource: Encounter }>(
+        `UPDATE ehr_encounter
+         SET fhir_resource = jsonb_set(fhir_resource, '{id}', to_jsonb($2))
+         WHERE encounter_id = $1
+         RETURNING fhir_resource`,
+        [row.encounter_id, row.encounter_id],
+      )
+      return updateRes.rows[0]?.fhir_resource ?? row.fhir_resource
     })
   }
 
