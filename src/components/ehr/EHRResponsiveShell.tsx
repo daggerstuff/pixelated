@@ -1,4 +1,4 @@
-import { useEffect, useState, type FC, type ReactNode } from 'react'
+import { type FC, type ReactNode } from 'react'
 import { useResponsive } from '@/components/layout/ResponsiveUtils'
 
 import { EHRMobileLayout } from './EHRMobileLayout'
@@ -50,14 +50,8 @@ export const EHRResponsiveShell: FC<EHRResponsiveShellProps> = ({
   navItems = [],
 }) => {
   const { isDesktop } = useResponsive()
-  const [isMounted, setIsMounted] = useState(false)
 
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const useDesktopLayout =
-    category === 'desktop-optimized' || !isMounted || isDesktop
+  const useDesktopLayout = category === 'desktop-optimized' || isDesktop
 
   if (useDesktopLayout) {
     return (
