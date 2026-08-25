@@ -1,5 +1,5 @@
 import { CheckCircle, AlertCircle } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -117,18 +117,15 @@ export function NotificationPreferences({
   className,
 }: NotificationPreferencesProps) {
   const { preferences, setPreferences } = useNotificationPreferencesStore()
-  const [pushPermission, setPushPermission] =
-    useState<NotificationPermission>('default')
+  const [pushPermission, setPushPermission] = useState<NotificationPermission>(
+    typeof window !== 'undefined' && 'Notification' in window
+      ? Notification.permission
+      : 'default',
+  )
   const [pushSubscription, setPushSubscription] =
     useState<PushSubscription | null>(null)
   const [isRequestingPush, setIsRequestingPush] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'Notification' in window) {
-      setPushPermission(Notification.permission)
-    }
-  }, [])
 
   const requestPushPermission = async () => {
     if (typeof window === 'undefined' || !('Notification' in window)) {
