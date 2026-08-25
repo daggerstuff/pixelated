@@ -266,8 +266,17 @@ jobs:
          helm template traefik/traefik --name-template traefik --set crds.enabled=true 2>/dev/null | kubectl apply -f - --validate=false || \
          helm show crds traefik/traefik | kubectl apply -f - --validate=false
          
-         kubectl apply -f k8s/civo/namespace.yaml
-         kubectl create secret generic cloudflare-workers-ai \
+          kubectl apply -f k8s/civo/namespace.yaml
+
+          # Create dockerhub-registry-credentials imagePullSecret
+          # Required by deployment imagePullSecrets to pull from Docker Hub
+          kubectl create secret docker-registry dockerhub-registry-credentials \
+            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
+            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic cloudflare-workers-ai \
            --from-literal=account-id="${CLOUDFLARE_ACCOUNT_ID:-}" \
            --from-literal=api-key="${CLOUDFLARE_AI_API_KEY:-}" \
            -n pixelated-empathy \
