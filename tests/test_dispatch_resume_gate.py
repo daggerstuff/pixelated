@@ -20,7 +20,7 @@ import time
 from pathlib import Path
 from unittest import mock
 
-from skills.monthly_llm_driver.dispatch_resume_gate import (
+from scripts.services.monthly_llm_driver.dispatch_resume_gate import (
     _read_pids_from_disk,
     _read_pids_from_redis,
     heartbeat_age_seconds,
@@ -28,7 +28,7 @@ from skills.monthly_llm_driver.dispatch_resume_gate import (
     register_dispatch_pid,
     scan,
 )
-from skills.monthly_llm_driver.orch_db import ConnectionBundle
+from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Test 1: mock_pid_kills_match
@@ -48,13 +48,13 @@ def test_mock_pid_kills_match() -> None:
 
         # Mock the on-disk reader to return our test PIDs.
         with mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
             return_value=test_pids,
         ):
             # Mock the Redis reader to return a subset (one duplicate, one unique).
             redis_pids = [12345, 99999]
             with mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
                 return_value=redis_pids,
             ):
                 # Mock os.kill to track which PIDs were killed.
@@ -88,11 +88,11 @@ def test_no_pid_registry_is_clean_noop() -> None:
     # Mock both readers to return empty lists.
     with (
         mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
             return_value=[],
         ),
         mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
             return_value=[],
         ),
         mock.patch("os.kill") as mock_kill,
@@ -124,11 +124,11 @@ def test_register_without_redis_still_works() -> None:
         # Mock _PIDS_FILE_TEMPLATE to point to our temp directory.
         with (
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
                 str(pids_file),
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
                 side_effect=Exception("Redis connection failed"),
             ),
         ):
@@ -169,7 +169,7 @@ def test_read_pids_from_disk_missing_file() -> None:
         pids_file = Path(tmpdir) / f"dispatch_pids_{month}.json"
 
         with mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate._PIDS_FILE_TEMPLATE",
             str(pids_file),
         ):
             result = _read_pids_from_disk(month)
@@ -187,7 +187,7 @@ def test_read_pids_from_redis_connection_failure() -> None:
 
     # Mock ConnectionBundle.from_env to raise an exception.
     with mock.patch(
-        "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+        "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
         side_effect=Exception("Redis connection failed"),
     ):
         result = _read_pids_from_redis(month)
@@ -207,11 +207,11 @@ def test_kill_stale_dispatch_handles_process_lookup_error() -> None:
     # Mock both readers to return test PIDs.
     with (
         mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
             return_value=test_pids,
         ),
         mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
             return_value=[],
         ),
     ):
@@ -276,7 +276,7 @@ def test_scan_mongo_first_when_both_populated() -> None:
 
         # Patch ConnectionBundle.from_env to return our mock
         with mock.patch(
-            "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+            "scripts.services.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
             return_value=mock_bundle,
         ):
             result = scan(month, chunks_dir)
@@ -325,19 +325,19 @@ def test_writes_registry_empty_log_line() -> None:
 
         with (
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
                 return_value=[],
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
                 return_value=[],
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._ps_find_dispatch_processes",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._ps_find_dispatch_processes",
                 return_value=[],
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._KILLS_LOG",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._KILLS_LOG",
                 kills_log,
             ),
         ):
@@ -367,26 +367,28 @@ def test_warns_when_ps_alive_but_registry_empty() -> None:
     dispatch_<month> argv pattern."""
     month = "2025-10-test9"
     fake_pid = 123456
-    fake_argv = "/usr/bin/python /home/vivi/pixelated/skills/monthly_llm_driver/dispatch_2025-10.py 2025-10 650 800"
+    fake_argv = (
+        "/usr/bin/python /home/vivi/pixelated/scripts/services/monthly_llm_driver/dispatch_2025-10.py 2025-10 650 800"
+    )
 
     with tempfile.TemporaryDirectory() as tmpdir:
         kills_log = Path(tmpdir) / "dispatch_resume_gate_kills.log"
 
         with (
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
                 return_value=[],
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
                 return_value=[],
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._ps_find_dispatch_processes",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._ps_find_dispatch_processes",
                 return_value=[(fake_pid, fake_argv[:120])],
             ),
             mock.patch(
-                "skills.monthly_llm_driver.dispatch_resume_gate._KILLS_LOG",
+                "scripts.services.monthly_llm_driver.dispatch_resume_gate._KILLS_LOG",
                 kills_log,
             ),
         ):
