@@ -1,4 +1,4 @@
-"""Tests for ``skills.monthly_llm_driver.orch_db_postgres_tables``.
+"""Tests for ``scripts.services.monthly_llm_driver.orch_db_postgres_tables``.
 
 Verifies the Postgres table setup used by the monthly LLM pipeline
 orchestrator.  All tests require PostgreSQL to be reachable on
@@ -12,7 +12,7 @@ Test cases:
 
 import pytest
 
-from skills.monthly_llm_driver.orch_db_postgres_tables import (
+from scripts.services.monthly_llm_driver.orch_db_postgres_tables import (
     setup_postgres_tables,
     verify_postgres_tables,
 )
@@ -26,7 +26,7 @@ def pg_conn():
     ``CREATE TABLE IF NOT EXISTS``).  Tests verify the setup is safe to
     call multiple times.
     """
-    from skills.monthly_llm_driver.orch_db import ConnectionBundle
+    from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
     bundle = ConnectionBundle.from_env()
     yield bundle.pg_conn

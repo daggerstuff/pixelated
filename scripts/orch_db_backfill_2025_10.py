@@ -28,8 +28,8 @@ _script_dir = Path(__file__).parent.resolve()
 _project_root = _script_dir.parent
 sys.path.insert(0, str(_project_root))
 
-from skills.monthly_llm_driver.dispatch_resume_gate import scan
-from skills.monthly_llm_driver.orch_db import ConnectionBundle
+from scripts.services.monthly_llm_driver.dispatch_resume_gate import scan
+from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
 CHUNKS_DIR = Path("/tmp/wayfarer_smoke/chunks")
 MONTH = "2025-10"

@@ -1,4 +1,4 @@
-"""Tests for ``skills.monthly_llm_driver.orch_db_collections``.
+"""Tests for ``scripts.services.monthly_llm_driver.orch_db_collections``.
 
 Verifies the Mongo collection + index setup used by the monthly LLM
 pipeline orchestrator.  All tests require MongoDB to be reachable on
@@ -15,7 +15,7 @@ import contextlib
 import pymongo
 import pytest
 
-from skills.monthly_llm_driver.orch_db_collections import (
+from scripts.services.monthly_llm_driver.orch_db_collections import (
     setup_collections,
     verify_collections,
 )

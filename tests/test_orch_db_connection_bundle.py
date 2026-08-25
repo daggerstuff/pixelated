@@ -1,4 +1,4 @@
-"""Tests for ``skills.monthly_llm_driver.orch_db.ConnectionBundle``.
+"""Tests for ``scripts.services.monthly_llm_driver.orch_db.ConnectionBundle``.
 
 Verifies the three-DB connection helper used by the monthly LLM pipeline
 orchestrator.  All tests require the three database services to be
@@ -21,7 +21,7 @@ import redis
 # ---------------------------------------------------------------------------
 # Import the module (now snake_case — direct from-import works)
 # ---------------------------------------------------------------------------
-from skills.monthly_llm_driver.orch_db import ConnectionBundle
+from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Test 1: from_env() returns 3 connected clients

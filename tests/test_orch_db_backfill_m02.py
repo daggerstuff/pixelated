@@ -21,7 +21,7 @@ _test_dir = Path(__file__).parent.resolve()
 _project_root = _test_dir.parent
 sys.path.insert(0, str(_project_root))
 
-from skills.monthly_llm_driver.orch_db import ConnectionBundle
+from scripts.services.monthly_llm_driver.orch_db import ConnectionBundle
 
 # Import the backfill script functions
 sys.path.insert(0, str(_project_root / "scripts"))
