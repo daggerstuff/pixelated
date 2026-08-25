@@ -15,9 +15,9 @@
  * @see audit/ehr-audit-service.ts for audit trail
  */
 
-import { type RLSContext, EncounterRepository } from '../repositories'
 import { EHRAuditService } from '../audit/ehr-audit-service'
 import { EHRAuditAction } from '../audit/events'
+import { type RLSContext, EncounterRepository } from '../repositories'
 import type {
   TelehealthSession,
   StartSessionInput,

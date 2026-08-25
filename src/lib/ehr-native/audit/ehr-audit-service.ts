@@ -14,9 +14,9 @@
  * @see src/lib/audit/logger.ts for AuditLogger
  */
 
-import { AuditLogger } from '../../audit/logger'
 import type { AuditEvent } from '../../audit/events'
 import { AuditSeverity } from '../../audit/events'
+import { AuditLogger } from '../../audit/logger'
 import {
   EHRAuditAction,
   EHRResourceType,
