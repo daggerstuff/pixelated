@@ -14,9 +14,9 @@
  * @see src/lib/audit/logger.ts for AuditLogger
  */
 
-import { AuditLogger } from '../../audit/logger'
 import type { AuditEvent } from '../../audit/events'
 import { AuditSeverity } from '../../audit/events'
+import { AuditLogger } from '../../audit/logger'
 import {
   EHRAuditAction,
   EHRResourceType,
@@ -110,6 +110,15 @@ export interface BreakGlassAuditInput extends EHRAuditInput {
   permission: string
 }
 
+/** Input for telehealth-related audit events (F1.12). */
+export interface TelehealthAuditInput extends EHRAuditInput {
+  sessionId: string
+  patientId?: string
+  practitionerId?: string
+  encounterId?: string
+  providerType?: 'webrtc' | 'zoom'
+}
+
 // ---------------------------------------------------------------------------
 // EHRAuditService
 // ---------------------------------------------------------------------------
@@ -199,7 +208,9 @@ export class EHRAuditService {
     if (
       action.startsWith('create_') ||
       action.startsWith('book_') ||
-      action.startsWith('prescribe_')
+      action.startsWith('prescribe_') ||
+      action.startsWith('start_') ||
+      action.startsWith('join_')
     )
       return EHRSeverity.CREATE
     if (
@@ -208,7 +219,9 @@ export class EHRAuditService {
       action.startsWith('sign_') ||
       action.startsWith('reschedule_') ||
       action.startsWith('submit_') ||
-      action.startsWith('close_')
+      action.startsWith('close_') ||
+      action.startsWith('end_') ||
+      action.startsWith('stop_')
     )
       return EHRSeverity.UPDATE
     if (
@@ -488,6 +501,40 @@ export class EHRAuditService {
   }
 
   // -------------------------------------------------------------------------
+  // Telehealth audit builders (F1.12)
+  // -------------------------------------------------------------------------
+
+  async logTelehealthAccess(
+    action:
+      | typeof EHRAuditAction.START_TELEHEALTH_SESSION
+      | typeof EHRAuditAction.JOIN_TELEHEALTH_SESSION
+      | typeof EHRAuditAction.END_TELEHEALTH_SESSION
+      | typeof EHRAuditAction.START_RECORDING
+      | typeof EHRAuditAction.STOP_RECORDING
+      | typeof EHRAuditAction.CHECK_DEVICES,
+    input: TelehealthAuditInput,
+  ): Promise<string> {
+    return this.log(
+      action,
+      EHRResourceType.TELEHEALTH_SESSION,
+      input.sessionId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          sessionId: input.sessionId,
+          patientId: input.patientId,
+          practitionerId: input.practitionerId,
+          encounterId: input.encounterId,
+          providerType: input.providerType,
+          resourceType: EHRResourceType.TELEHEALTH_SESSION,
+          resourceId: input.sessionId,
+        },
+      },
+    )
+  }
+
+  // -------------------------------------------------------------------------
   // Query helpers (delegate to AuditLogger)
   // -------------------------------------------------------------------------
 
@@ -503,9 +550,3 @@ export class EHRAuditService {
     return this.logger.getUserEvents(userId, limit, offset)
   }
 }
-
-// ---------------------------------------------------------------------------
-// Singleton export
-// ---------------------------------------------------------------------------
-
-export const ehrAuditService = EHRAuditService.getInstance()
