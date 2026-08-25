@@ -11,6 +11,7 @@ import '@/styles/marketing.css'
 import ThemeSwitcher from '@/components/ThemeSwitcher.astro'
 import { withBasePath } from '@/utils/path'
 import { SITE } from '@/config'
+import SpeedInsights from '@vercel/speed-insights/astro'
 
 interface Props {
   title?: string
@@ -479,6 +480,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
 
       document.addEventListener('astro:page-load', initSearch)
     </script>
+    <SpeedInsights />
   </body>
 </html>
 
