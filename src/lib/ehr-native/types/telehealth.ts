@@ -38,7 +38,9 @@ export const telehealthSessionStatusSchema = z.enum([
   'failed',
 ])
 
-export type TelehealthSessionStatus = z.infer<typeof telehealthSessionStatusSchema>
+export type TelehealthSessionStatus = z.infer<
+  typeof telehealthSessionStatusSchema
+>
 
 // ---------------------------------------------------------------------------
 // WebRTC Configuration

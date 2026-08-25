@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from 'react'
 
 /**
  * Recording consent gate component.
@@ -7,17 +7,17 @@ import { useState, useCallback } from 'react';
  */
 
 export interface RecordingConsentGateProps {
-  patientName: string;
-  onConsent: () => void;
-  onCancel: () => void;
+  patientName: string
+  onConsent: () => void
+  onCancel: () => void
 }
 
 interface ConsentState {
-  checked: boolean;
+  checked: boolean
 }
 
 function createInitialConsentState(): ConsentState {
-  return { checked: false };
+  return { checked: false }
 }
 
 export function RecordingConsentGate({
@@ -25,11 +25,11 @@ export function RecordingConsentGate({
   onConsent,
   onCancel,
 }: RecordingConsentGateProps) {
-  const [state, setState] = useState<ConsentState>(createInitialConsentState);
+  const [state, setState] = useState<ConsentState>(createInitialConsentState)
 
   const handleConsent = useCallback(() => {
-    onConsent();
-  }, [onConsent]);
+    onConsent()
+  }, [onConsent])
 
   return (
     <div
@@ -44,13 +44,12 @@ export function RecordingConsentGate({
         </h2>
         <p className="mt-2 text-sm text-gray-600">
           You are about to start recording this telehealth session with{' '}
-          <span className="font-medium">{patientName}</span>. Recording
-          requires explicit patient consent.
+          <span className="font-medium">{patientName}</span>. Recording requires
+          explicit patient consent.
         </p>
         <p className="mt-2 text-sm text-gray-600">
-          The recording will be stored securely and an audit trail entry will
-          be created. The patient has the right to withdraw consent at any
-          time.
+          The recording will be stored securely and an audit trail entry will be
+          created. The patient has the right to withdraw consent at any time.
         </p>
 
         <label className="mt-4 flex items-start gap-3">
@@ -89,5 +88,5 @@ export function RecordingConsentGate({
         </div>
       </div>
     </div>
-  );
+  )
 }

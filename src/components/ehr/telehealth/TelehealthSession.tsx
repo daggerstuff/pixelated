@@ -1,9 +1,12 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react'
 
-import type { TelehealthProvider } from '@/lib/ehr-native/types';
+import type { TelehealthProvider } from '@/lib/ehr-native/types'
 
-import { PreCallCheck, type DeviceCheckResult as ComponentDeviceCheckResult } from './PreCallCheck';
-import { RecordingConsentGate } from './RecordingConsentGate';
+import {
+  PreCallCheck,
+  type DeviceCheckResult as ComponentDeviceCheckResult,
+} from './PreCallCheck'
+import { RecordingConsentGate } from './RecordingConsentGate'
 
 /**
  * Main telehealth session component.
@@ -13,26 +16,26 @@ import { RecordingConsentGate } from './RecordingConsentGate';
  */
 
 export interface TelehealthSessionProps {
-  appointmentId: string;
-  patientId: string;
-  practitionerId: string;
-  patientName: string;
-  providerType?: TelehealthProvider;
-  zoomJoinUrl?: string;
-  onSessionStart?: (provider: TelehealthProvider) => void;
-  onSessionEnd?: () => void;
-  onStartRecording?: (consentGiven: boolean) => void;
-  onStopRecording?: () => void;
+  appointmentId: string
+  patientId: string
+  practitionerId: string
+  patientName: string
+  providerType?: TelehealthProvider
+  zoomJoinUrl?: string
+  onSessionStart?: (provider: TelehealthProvider) => void
+  onSessionEnd?: () => void
+  onStartRecording?: (consentGiven: boolean) => void
+  onStopRecording?: () => void
 }
 
-type SessionPhase = 'pre-check' | 'connecting' | 'active' | 'ended' | 'failed';
+type SessionPhase = 'pre-check' | 'connecting' | 'active' | 'ended' | 'failed'
 
 interface SessionState {
-  phase: SessionPhase;
-  provider: TelehealthProvider | null;
-  isRecording: boolean;
-  showConsentGate: boolean;
-  errorMessage: string | null;
+  phase: SessionPhase
+  provider: TelehealthProvider | null
+  isRecording: boolean
+  showConsentGate: boolean
+  errorMessage: string | null
 }
 
 function createInitialSessionState(): SessionState {
@@ -42,7 +45,7 @@ function createInitialSessionState(): SessionState {
     isRecording: false,
     showConsentGate: false,
     errorMessage: null,
-  };
+  }
 }
 
 /**
@@ -51,20 +54,23 @@ function createInitialSessionState(): SessionState {
  */
 async function tryWebRTC(): Promise<boolean> {
   if (typeof RTCPeerConnection === 'undefined') {
-    return false;
+    return false
   }
-  let pc: RTCPeerConnection | undefined;
+  let pc: RTCPeerConnection | undefined
   try {
     pc = new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-    });
-    const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
-    await pc.setLocalDescription(offer);
-    return true;
+    })
+    const offer = await pc.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    })
+    await pc.setLocalDescription(offer)
+    return true
   } catch {
-    return false;
+    return false
   } finally {
-    pc?.close();
+    pc?.close()
   }
 }
 
@@ -72,7 +78,7 @@ async function tryWebRTC(): Promise<boolean> {
  * Open Zoom join URL in a new window.
  */
 function openZoom(url: string): void {
-  window.open(url, '_blank', 'noopener,noreferrer');
+  window.open(url, '_blank', 'noopener,noreferrer')
 }
 
 export function TelehealthSession({
@@ -87,43 +93,47 @@ export function TelehealthSession({
   onStartRecording,
   onStopRecording,
 }: TelehealthSessionProps) {
-  const [state, setState] = useState<SessionState>(createInitialSessionState);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const [state, setState] = useState<SessionState>(createInitialSessionState)
+  const localVideoRef = useRef<HTMLVideoElement>(null)
+  const streamRef = useRef<MediaStream | null>(null)
 
   useEffect(() => {
     return () => {
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
+        streamRef.current.getTracks().forEach((track) => track.stop())
+        streamRef.current = null
       }
-    };
-  }, []);
+    }
+  }, [])
 
   useEffect(() => {
-    if (state.phase === 'active' && streamRef.current && localVideoRef.current) {
-      localVideoRef.current.srcObject = streamRef.current;
+    if (
+      state.phase === 'active' &&
+      streamRef.current &&
+      localVideoRef.current
+    ) {
+      localVideoRef.current.srcObject = streamRef.current
     }
-  }, [state.phase]);
+  }, [state.phase])
 
   const handleDeviceCheckComplete = useCallback(
     async (_result: ComponentDeviceCheckResult) => {
-      setState((prev) => ({ ...prev, phase: 'connecting' }));
+      setState((prev) => ({ ...prev, phase: 'connecting' }))
 
       // If a specific provider was requested, use it directly
       if (providerType === 'zoom' && zoomJoinUrl) {
-        openZoom(zoomJoinUrl);
+        openZoom(zoomJoinUrl)
         setState((prev) => ({
           ...prev,
           phase: 'active',
           provider: 'zoom',
-        }));
-        onSessionStart?.('zoom');
-        return;
+        }))
+        onSessionStart?.('zoom')
+        return
       }
 
       // Try WebRTC first
-      const webRtcOk = await tryWebRTC();
+      const webRtcOk = await tryWebRTC()
 
       if (webRtcOk) {
         // Get local media stream for video preview
@@ -131,10 +141,10 @@ export function TelehealthSession({
           const stream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: true,
-          });
-          streamRef.current = stream;
+          })
+          streamRef.current = stream
           if (localVideoRef.current) {
-            localVideoRef.current.srcObject = stream;
+            localVideoRef.current.srcObject = stream
           }
         } catch {
           // Video preview failed but session can proceed (audio-only)
@@ -144,21 +154,21 @@ export function TelehealthSession({
           ...prev,
           phase: 'active',
           provider: 'webrtc',
-        }));
-        onSessionStart?.('webrtc');
-        return;
+        }))
+        onSessionStart?.('webrtc')
+        return
       }
 
       // WebRTC failed — fall back to Zoom
       if (zoomJoinUrl) {
-        openZoom(zoomJoinUrl);
+        openZoom(zoomJoinUrl)
         setState((prev) => ({
           ...prev,
           phase: 'active',
           provider: 'zoom',
-        }));
-        onSessionStart?.('zoom');
-        return;
+        }))
+        onSessionStart?.('zoom')
+        return
       }
 
       // Both providers failed
@@ -167,44 +177,44 @@ export function TelehealthSession({
         phase: 'failed',
         errorMessage:
           'Unable to establish WebRTC connection and no Zoom fallback URL provided.',
-      }));
+      }))
     },
     [providerType, zoomJoinUrl, onSessionStart],
-  );
+  )
 
   const handleEndSession = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+      streamRef.current.getTracks().forEach((track) => track.stop())
+      streamRef.current = null
     }
     if (localVideoRef.current) {
-      localVideoRef.current.srcObject = null;
+      localVideoRef.current.srcObject = null
     }
-    setState((prev) => ({ ...prev, phase: 'ended', isRecording: false }));
-    onSessionEnd?.();
-  }, [onSessionEnd]);
+    setState((prev) => ({ ...prev, phase: 'ended', isRecording: false }))
+    onSessionEnd?.()
+  }, [onSessionEnd])
 
   const handleStartRecording = useCallback(() => {
-    setState((prev) => ({ ...prev, showConsentGate: true }));
-  }, []);
+    setState((prev) => ({ ...prev, showConsentGate: true }))
+  }, [])
 
   const handleConsentGiven = useCallback(() => {
     setState((prev) => ({
       ...prev,
       isRecording: true,
       showConsentGate: false,
-    }));
-    onStartRecording?.(true);
-  }, [onStartRecording]);
+    }))
+    onStartRecording?.(true)
+  }, [onStartRecording])
 
   const handleCancelRecording = useCallback(() => {
-    setState((prev) => ({ ...prev, showConsentGate: false }));
-  }, []);
+    setState((prev) => ({ ...prev, showConsentGate: false }))
+  }, [])
 
   const handleStopRecording = useCallback(() => {
-    setState((prev) => ({ ...prev, isRecording: false }));
-    onStopRecording?.();
-  }, [onStopRecording]);
+    setState((prev) => ({ ...prev, isRecording: false }))
+    onStopRecording?.()
+  }, [onStopRecording])
 
   return (
     <div
@@ -330,5 +340,5 @@ export function TelehealthSession({
         />
       )}
     </div>
-  );
+  )
 }

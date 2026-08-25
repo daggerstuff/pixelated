@@ -15,10 +15,7 @@
  * @see audit/ehr-audit-service.ts for audit trail
  */
 
-import {
-  type RLSContext,
-  EncounterRepository,
-} from '../repositories'
+import { type RLSContext, EncounterRepository } from '../repositories'
 import { EHRAuditService } from '../audit/ehr-audit-service'
 import { EHRAuditAction } from '../audit/events'
 import type {
@@ -80,9 +77,7 @@ export interface EndSessionInput {
 // Default WebRTC configuration
 // ---------------------------------------------------------------------------
 
-const DEFAULT_ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
-]
+const DEFAULT_ICE_SERVERS = [{ urls: 'stun:stun.l.google.com:19302' }]
 
 const DEFAULT_WEBRTC_CONFIG: WebRTCConfig = {
   iceServers: DEFAULT_ICE_SERVERS,
@@ -188,7 +183,9 @@ export class TelehealthService {
 
       try {
         const created = await this.encounterRepo.create(encounterResource)
-        const createdId = (created as Record<string, unknown> | null)?.['id'] as string | undefined
+        const createdId = (created as Record<string, unknown> | null)?.[
+          'id'
+        ] as string | undefined
         if (!createdId) {
           await this.auditService.logTelehealthAccess(
             EHRAuditAction.START_TELEHEALTH_SESSION,
@@ -228,9 +225,10 @@ export class TelehealthService {
           ? 'webrtc'
           : 'zoom'
 
-    const webRtcConfig = providerType === 'webrtc'
-      ? (input.webRtcConfig ?? DEFAULT_WEBRTC_CONFIG)
-      : undefined
+    const webRtcConfig =
+      providerType === 'webrtc'
+        ? (input.webRtcConfig ?? DEFAULT_WEBRTC_CONFIG)
+        : undefined
 
     const sessionId = crypto.randomUUID()
     const startedAt = new Date().toISOString()
@@ -318,9 +316,7 @@ export class TelehealthService {
    *
    * @returns The ended TelehealthSession, or null if not found.
    */
-  async endSession(
-    input: EndSessionInput,
-  ): Promise<TelehealthSession | null> {
+  async endSession(input: EndSessionInput): Promise<TelehealthSession | null> {
     const sessionId = validateId(input.sessionId, 'sessionId')
     validateIsoTimestamp(input.endedAt, 'endedAt')
 
@@ -358,7 +354,8 @@ export class TelehealthService {
       typeof globalThis.navigator.mediaDevices?.enumerateDevices === 'function'
     ) {
       try {
-        const devices = await globalThis.navigator.mediaDevices.enumerateDevices()
+        const devices =
+          await globalThis.navigator.mediaDevices.enumerateDevices()
         const videoDevices = devices.filter((d) => d.kind === 'videoinput')
         const audioDevices = devices.filter((d) => d.kind === 'audioinput')
 
@@ -366,14 +363,18 @@ export class TelehealthService {
         microphoneAvailable = audioDevices.length > 0
 
         if (!cameraAvailable) {
-          cameraError = 'No camera detected. Please connect a camera and try again.'
+          cameraError =
+            'No camera detected. Please connect a camera and try again.'
         }
         if (!microphoneAvailable) {
-          microphoneError = 'No microphone detected. Please connect a microphone and try again.'
+          microphoneError =
+            'No microphone detected. Please connect a microphone and try again.'
         }
       } catch {
-        cameraError = 'Unable to access camera. Please check browser permissions.'
-        microphoneError = 'Unable to access microphone. Please check browser permissions.'
+        cameraError =
+          'Unable to access camera. Please check browser permissions.'
+        microphoneError =
+          'Unable to access microphone. Please check browser permissions.'
       }
     } else {
       cameraError = 'Camera check unavailable in this environment.'
@@ -389,14 +390,11 @@ export class TelehealthService {
     }
 
     // Audit device check
-    await this.auditService.logTelehealthAccess(
-      EHRAuditAction.CHECK_DEVICES,
-      {
-        userId,
-        status: result.canProceed ? 'success' : 'failure',
-        sessionId: 'device-check',
-      },
-    )
+    await this.auditService.logTelehealthAccess(EHRAuditAction.CHECK_DEVICES, {
+      userId,
+      status: result.canProceed ? 'success' : 'failure',
+      sessionId: 'device-check',
+    })
 
     return result
   }
@@ -462,14 +460,11 @@ export class TelehealthService {
   ): Promise<TelehealthSession | null> {
     const validatedSessionId = validateId(sessionId, 'sessionId')
 
-    await this.auditService.logTelehealthAccess(
-      EHRAuditAction.STOP_RECORDING,
-      {
-        userId,
-        status: 'success',
-        sessionId: validatedSessionId,
-      },
-    )
+    await this.auditService.logTelehealthAccess(EHRAuditAction.STOP_RECORDING, {
+      userId,
+      status: 'success',
+      sessionId: validatedSessionId,
+    })
 
     return null
   }
