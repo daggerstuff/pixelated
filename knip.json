@@ -25,6 +25,7 @@
     "src/lib/governance/policy-engine.ts",
     "src/lib/middleware/csrf.ts",
     "src/lib/research/services/*.ts",
+    "src/lib/ehr-native/services/*.ts",
     "src/lib/fhe/exports.ts",
     "src/lib/fhe/operations.ts",
     "src/utils/offline/offlineManager.ts"
