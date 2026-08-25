@@ -93,6 +93,10 @@ for entry in "${BAA_SERVICES[@]}"; do
   description="${entry##*|}"
 
   value="${!var_name:-}"
+  # Alias for workflow typo BAA_NIM_HETZER_CONFIRMED
+  if [ -z "$value" ] && [ "$var_name" = "BAA_NIM_HETZNER_CONFIRMED" ]; then
+    value="${BAA_NIM_HETZER_CONFIRMED:-}"
+  fi
 
   if [ -z "$value" ]; then
     fail "BAA env var $var_name is NOT SET — $description has no BAA confirmation. Deploy blocked."
