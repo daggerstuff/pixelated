@@ -1,0 +1,12 @@
+[project]
+name = "pixelated-empathy-corpus"
+version = "0.1.0"
+description = "Synthetic communication corpus generator for Pixelated Empathy"
+requires-python = ">=3.13"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["pixelated_empathy"]
