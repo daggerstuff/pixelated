@@ -670,10 +670,26 @@ export default defineConfig({
               org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
               project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
               authToken: process.env.SENTRY_AUTH_TOKEN,
-              // Upload sourcemaps through scoped Vite plugins so each Astro
-              // build phase only uploads the files it actually emitted.
+              // Tag uploaded files with the current release so server
+              // events that carry a matching SENTRY_RELEASE can be
+              // symbolicated against the uploaded maps.
+              release: sentryRelease
+                ? { name: sentryRelease }
+                : undefined,
+              // Upload client + server sourcemaps. Without this, every
+              // captured event arrives in Sentry as the bundled filename
+              // and is unsymbolicated (no useful stack traces).
               sourcemaps: {
-                disable: true,
+                assets: [
+                  './dist/client/_astro/**/*.js',
+                  './dist/client/_astro/**/*.js.map',
+                  './dist/server/**/*.mjs',
+                  './dist/server/**/*.mjs.map',
+                ],
+                filesToDeleteAfterUpload: [
+                  './dist/client/_astro/**/*.map',
+                  './dist/server/**/*.map',
+                ],
               },
             }),
           ]
