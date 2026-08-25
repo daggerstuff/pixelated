@@ -10,13 +10,20 @@
 
 import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 import { BaseRepository } from '@/lib/ehr-native/repositories/base-repository'
-import { documentReferenceSchema, type DocumentReference } from '@/lib/ehr-native/types'
+import {
+  documentReferenceSchema,
+  type DocumentReference,
+} from '@/lib/ehr-native/types'
 
 // ── Validation helpers (local, matching pattern in scheduling-service.ts) ──
 
 function validateId(id: string, label: string): string {
   const sanitized = id.trim()
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sanitized)) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      sanitized,
+    )
+  ) {
     throw new Error(`Invalid ${label} format: expected UUID`)
   }
   return sanitized
@@ -67,7 +74,9 @@ export interface HomeworkSearchParams {
 
 // ── Repository ──────────────────────────────────────────────────────────────
 
-class HomeworkRepository extends BaseRepository<DocumentReference & { id?: string }> {
+class HomeworkRepository extends BaseRepository<
+  DocumentReference & { id?: string }
+> {
   protected readonly tableName = 'ehr_document_reference'
   protected readonly idColumn = 'document_reference_id'
   protected readonly resourceType = 'DocumentReference'
@@ -82,7 +91,13 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
       resourceType: 'DocumentReference',
       status: 'current',
       type: {
-        coding: [{ system: 'http://loinc.org', code: '77826-2', display: 'Questionnaire' }],
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '77826-2',
+            display: 'Questionnaire',
+          },
+        ],
         text: 'Homework Assignment',
       },
       category: [
@@ -132,9 +147,16 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
           (tenant_id, patient_id, status, date, fhir_resource)
          VALUES ($1, $2, $3, $4, $5)
          RETURNING fhir_resource`,
-        [this.rlsContext.tenantId, patientId, 'current', now, JSON.stringify(parsed)],
+        [
+          this.rlsContext.tenantId,
+          patientId,
+          'current',
+          now,
+          JSON.stringify(parsed),
+        ],
       )
-      return (result.rows[0] as { fhir_resource: DocumentReference }).fhir_resource
+      return (result.rows[0] as { fhir_resource: DocumentReference })
+        .fhir_resource
     })
   }
 
@@ -149,8 +171,12 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
     const updatedPayload = {
       ...payload,
       ...(updates.status !== undefined && { status: updates.status }),
-      ...(updates.patientNotes !== undefined && { patientNotes: updates.patientNotes }),
-      ...(updates.status === 'completed' && { completedAt: new Date().toISOString() }),
+      ...(updates.patientNotes !== undefined && {
+        patientNotes: updates.patientNotes,
+      }),
+      ...(updates.status === 'completed' && {
+        completedAt: new Date().toISOString(),
+      }),
     }
 
     const now = new Date().toISOString()
@@ -161,8 +187,11 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
         {
           attachment: {
             contentType: 'application/json',
-            data: Buffer.from(JSON.stringify(updatedPayload)).toString('base64'),
-            title: existing.content?.[0]?.attachment?.title ?? 'Homework Assignment',
+            data: Buffer.from(JSON.stringify(updatedPayload)).toString(
+              'base64',
+            ),
+            title:
+              existing.content?.[0]?.attachment?.title ?? 'Homework Assignment',
           },
         },
       ],
@@ -177,7 +206,10 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
          RETURNING fhir_resource`,
         [id, JSON.stringify(parsed)],
       )
-      return (result.rows[0] as { fhir_resource?: DocumentReference } | undefined)?.fhir_resource ?? null
+      return (
+        (result.rows[0] as { fhir_resource?: DocumentReference } | undefined)
+          ?.fhir_resource ?? null
+      )
     })
   }
 
@@ -202,7 +234,9 @@ class HomeworkRepository extends BaseRepository<DocumentReference & { id?: strin
 
       query += ` ORDER BY updated_at DESC LIMIT $2 OFFSET $3`
       const result = await client.query(query, params)
-      return (result.rows as Array<{ fhir_resource: DocumentReference }>).map((r) => r.fhir_resource)
+      return (result.rows as Array<{ fhir_resource: DocumentReference }>).map(
+        (r) => r.fhir_resource,
+      )
     })
   }
 
@@ -301,7 +335,10 @@ export class PortalHomeworkService {
       throw new Error('Patient notes must be 2000 characters or less')
     }
 
-    const updated = await this.homeworkRepo.updateAssignment(assignmentId, updates)
+    const updated = await this.homeworkRepo.updateAssignment(
+      assignmentId,
+      updates,
+    )
     if (!updated) return null
 
     return this.toAssignment(updated)
@@ -326,18 +363,24 @@ export class PortalHomeworkService {
    */
   async getSummary(patientId: string): Promise<HomeworkSummary> {
     validateId(patientId, 'patientId')
-    const { assignments } = await this.listAssignments(patientId, { limit: 200 })
+    const { assignments } = await this.listAssignments(patientId, {
+      limit: 200,
+    })
 
     const now = new Date()
     return {
       totalAssigned: assignments.length,
       completed: assignments.filter((a) => a.status === 'completed').length,
-      pending: assignments.filter((a) => a.status === 'assigned' || a.status === 'in-progress').length,
+      pending: assignments.filter(
+        (a) => a.status === 'assigned' || a.status === 'in-progress',
+      ).length,
       overdue: assignments.filter(
-        (a) => a.dueDate && new Date(a.dueDate) < now && a.status !== 'completed',
+        (a) =>
+          a.dueDate && new Date(a.dueDate) < now && a.status !== 'completed',
       ).length,
       upcoming: assignments.filter(
-        (a) => a.dueDate && new Date(a.dueDate) > now && a.status !== 'completed',
+        (a) =>
+          a.dueDate && new Date(a.dueDate) > now && a.status !== 'completed',
       ).length,
     }
   }
@@ -359,7 +402,10 @@ export class PortalHomeworkService {
       description: (payload['description'] as string) ?? '',
       instructions: (payload['instructions'] as string) ?? '',
       dueDate: payload['dueDate'] as string | undefined,
-      assignedAt: (payload['assignedAt'] as string) ?? docRef.date ?? new Date().toISOString(),
+      assignedAt:
+        (payload['assignedAt'] as string) ??
+        docRef.date ??
+        new Date().toISOString(),
       completedAt: payload['completedAt'] as string | undefined,
       status: (payload['status'] as HomeworkAssignment['status']) ?? 'assigned',
       patientNotes: payload['patientNotes'] as string | undefined,

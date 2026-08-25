@@ -10,13 +10,20 @@
 
 import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 import { BaseRepository } from '@/lib/ehr-native/repositories/base-repository'
-import { documentReferenceSchema, type DocumentReference } from '@/lib/ehr-native/types'
+import {
+  documentReferenceSchema,
+  type DocumentReference,
+} from '@/lib/ehr-native/types'
 
 // ── Validation helpers (local, matching pattern in scheduling-service.ts) ──
 
 function validateId(id: string, label: string): string {
   const sanitized = id.trim()
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sanitized)) {
+  if (
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      sanitized,
+    )
+  ) {
     throw new Error(`Invalid ${label} format: expected UUID`)
   }
   return sanitized
@@ -84,7 +91,9 @@ export interface ThreadSummary {
  * Lightweight repository for communication threads stored as DocumentReference
  * resources with category "communication". Uses the existing ehr_document_reference table.
  */
-class CommunicationRepository extends BaseRepository<DocumentReference & { id?: string }> {
+class CommunicationRepository extends BaseRepository<
+  DocumentReference & { id?: string }
+> {
   protected readonly tableName = 'ehr_document_reference'
   protected readonly idColumn = 'document_reference_id'
   protected readonly resourceType = 'DocumentReference'
@@ -101,7 +110,13 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
       resourceType: 'DocumentReference',
       status: 'current',
       type: {
-        coding: [{ system: 'http://loinc.org', code: '82373-0', display: 'Clinical note' }],
+        coding: [
+          {
+            system: 'http://loinc.org',
+            code: '82373-0',
+            display: 'Clinical note',
+          },
+        ],
         text: 'Portal Communication',
       },
       category: [
@@ -125,7 +140,12 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
           attachment: {
             contentType: 'application/json',
             data: Buffer.from(
-              JSON.stringify({ body: initialMessage, sender: senderRef, recipient: practitionerRef, sentAt: now }),
+              JSON.stringify({
+                body: initialMessage,
+                sender: senderRef,
+                recipient: practitionerRef,
+                sentAt: now,
+              }),
             ).toString('base64'),
             title: 'Initial message',
           },
@@ -151,7 +171,8 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
           JSON.stringify(parsed),
         ],
       )
-      return (result.rows[0] as { fhir_resource: DocumentReference }).fhir_resource
+      return (result.rows[0] as { fhir_resource: DocumentReference })
+        .fhir_resource
     })
   }
 
@@ -171,7 +192,12 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
         attachment: {
           contentType: 'application/json',
           data: Buffer.from(
-            JSON.stringify({ body, sender: senderRef, recipient: recipientRef, sentAt: now }),
+            JSON.stringify({
+              body,
+              sender: senderRef,
+              recipient: recipientRef,
+              sentAt: now,
+            }),
           ).toString('base64'),
           title: `Message from ${senderRef}`,
         },
@@ -193,7 +219,8 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
          RETURNING fhir_resource`,
         [threadId, JSON.stringify(parsed)],
       )
-      return (result.rows[0] as { fhir_resource: DocumentReference }).fhir_resource
+      return (result.rows[0] as { fhir_resource: DocumentReference })
+        .fhir_resource
     })
   }
 
@@ -211,7 +238,9 @@ class CommunicationRepository extends BaseRepository<DocumentReference & { id?: 
          LIMIT $2 OFFSET $3`,
         [patientId, limit, offset],
       )
-      return (result.rows as Array<{ fhir_resource: DocumentReference }>).map((r) => r.fhir_resource)
+      return (result.rows as Array<{ fhir_resource: DocumentReference }>).map(
+        (r) => r.fhir_resource,
+      )
     })
   }
 
@@ -304,7 +333,10 @@ export class PortalMessagingService {
   /**
    * Get a single thread by ID.
    */
-  async getThread(threadId: string, patientId: string): Promise<MessageThread | null> {
+  async getThread(
+    threadId: string,
+    patientId: string,
+  ): Promise<MessageThread | null> {
     validateId(threadId, 'threadId')
     validateId(patientId, 'patientId')
 
@@ -373,7 +405,10 @@ export class PortalMessagingService {
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  private toThread(docRef: DocumentReference, patientId: string): MessageThread {
+  private toThread(
+    docRef: DocumentReference,
+    patientId: string,
+  ): MessageThread {
     const docRefId = (docRef as DocumentReference & { id?: string }).id ?? ''
     const messages: ThreadMessage[] = (docRef.content || []).map((c, i) => {
       let body = ''
@@ -381,7 +416,9 @@ export class PortalMessagingService {
       let recipientReference: string | undefined
       let sentAt: string | undefined
       if (c.attachment?.data) {
-        const decoded = Buffer.from(c.attachment.data, 'base64').toString('utf-8')
+        const decoded = Buffer.from(c.attachment.data, 'base64').toString(
+          'utf-8',
+        )
         try {
           const parsed = JSON.parse(decoded) as {
             body?: string
@@ -405,9 +442,13 @@ export class PortalMessagingService {
         id: `${docRefId}-msg-${i}`,
         senderReference:
           senderReference ??
-          (docRef.author?.[0] as { reference?: string } | undefined)?.reference ??
+          (docRef.author?.[0] as { reference?: string } | undefined)
+            ?.reference ??
           `Patient/${patientId}`,
-        recipientReference: recipientReference ?? docRef.context?.related?.[0]?.ref?.reference ?? '',
+        recipientReference:
+          recipientReference ??
+          docRef.context?.related?.[0]?.ref?.reference ??
+          '',
         body,
         sentAt: sentAt ?? docRef.date ?? new Date().toISOString(),
         status: 'delivered' as const,
