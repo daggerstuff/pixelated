@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from ai.pkg_mera.core.utils.transcript_corrector import TranscriptCorrector
+from ai.tools.utilities.core.utils.transcript_corrector import TranscriptCorrector
 
 # Sample test data
 SAMPLE_TERMS = {
@@ -26,7 +26,7 @@ class TestTranscriptCorrector:
         corrector = TranscriptCorrector(config_path=mock_config_file)
         assert corrector.terms == SAMPLE_TERMS
 
-    @patch("ai.pkg_mera.core.utils.transcript_corrector.Path.exists")
+    @patch("ai.tools.utilities.core.utils.transcript_corrector.Path.exists")
     def test_initialization_missing_file(self, mock_exists):
         # Force both primary and fallback paths to not exist
         mock_exists.return_value = False

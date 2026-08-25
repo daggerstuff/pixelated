@@ -15,12 +15,12 @@ from pathlib import Path
 
 import pytest
 
-from ai.pkg_mera.core.pipelines.processing.dataset_slicer import (
+from ai.tools.utilities.core.pipelines.processing.dataset_slicer import (
     DatasetSlicer,
     SliceManifest,
     SliceResult,
 )
-from ai.pkg_mera.core.pipelines.processing.stage_classifier import (
+from ai.tools.utilities.core.pipelines.processing.stage_classifier import (
     ClassificationResult,
     Stage,
     StageClassifier,
