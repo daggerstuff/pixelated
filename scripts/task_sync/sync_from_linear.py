@@ -117,7 +117,13 @@ def normalize_linear_state(state_name: str) -> str:
 
 
 def get_priority_label(priority: int) -> str:
-    return {0: "none", 1: "urgent", 2: "high", 3: "medium", 4: "low"}.get(priority, "none")
+    return {0: "urgent", 1: "high", 2: "medium", 3: "low", 4: "none"}.get(priority, "none")
+
+
+def get_linear_labels(issue: dict) -> list[str]:
+    """Extract label names from a Linear issue node."""
+    label_nodes = issue.get("labels", {}).get("nodes") or []
+    return [str(n.get("name") or "").strip() for n in label_nodes if n.get("name")]
 
 
 # ---------------------------------------------------------------------------
@@ -153,6 +159,7 @@ query($after: String) {
       description
       priority
       url
+      labels { nodes { name } }
       state { name }
     }
   }
@@ -244,21 +251,21 @@ def apply_gitlab_action(action: dict) -> str | None:
 # ---------------------------------------------------------------------------
 
 
-def build_sync_metadata_block(  # noqa: PLR0913
-    sync_key: str, status: str, linear_id: str, linear_url: str, linear_identifier: str, provider_ids: dict[str, str]
+def build_sync_metadata_block(
+    sync_key: str, status: str, linear_issue: dict, provider_ids: dict[str, str]
 ) -> str:
     lines = [
         SYNC_BLOCK_START,
         f"key: {sync_key}",
         f"status: {status}",
         "source-provider: linear",
-        f"source-id: {linear_id}",
-        f"linear-url: {linear_url}",
-        f"linear-id: {linear_identifier}",
+        f"source-id: {linear_issue['id']}",
+        f"linear-url: {linear_issue['url']}",
+        f"linear-id: {linear_issue['identifier']}",
     ]
     # Add all provider mappings
     all_mappings = dict(provider_ids)
-    all_mappings["linear"] = linear_id
+    all_mappings["linear"] = linear_issue["id"]
     for prov, p_id in sorted(all_mappings.items()):
         if p_id:
             lines.append(f"{prov}: {p_id}")
@@ -389,6 +396,7 @@ def main():  # noqa: PLR0912, PLR0915
         li_clean = clean_title(li_title)
         li_state = normalize_linear_state(li["state"]["name"])
         li_priority = get_priority_label(li["priority"])
+        li_labels = get_linear_labels(li)
 
         # Build base sync metadata fields
         sync_key = slugify(li_title)
@@ -431,9 +439,7 @@ def main():  # noqa: PLR0912, PLR0915
 
             # Format the body
             clean_body = task_body_without_sync_block(li["description"] or "")
-            metadata_block = build_sync_metadata_block(
-                sync_key, li_state, lid, li["url"], li["identifier"], provider_ids
-            )
+            metadata_block = build_sync_metadata_block(sync_key, li_state, li, provider_ids)
             body_with_meta = f"{clean_body}\n\n{metadata_block}"
 
             action = None
@@ -446,7 +452,7 @@ def main():  # noqa: PLR0912, PLR0915
                     "body": body_with_meta,
                     "status": li_state,
                     "priority_label": li_priority,
-                    "labels": [],
+                    "labels": li_labels,
                     "linear_id": lid,
                 }
             else:
@@ -481,7 +487,7 @@ def main():  # noqa: PLR0912, PLR0915
                         "body": body_with_meta,
                         "status": li_state,
                         "priority_label": li_priority,
-                        "labels": [],
+                        "labels": li_labels,
                         "linear_id": lid,
                     }
             if action:

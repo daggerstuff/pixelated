@@ -7,6 +7,7 @@ import type { Connection } from 'mongoose'
 import { Pool, PoolClient } from 'pg'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { getPool as getDbPool, initializeDatabase } from '../db'
 const logger = createBuildSafeLogger('connection')
 
 // ============================================================================
@@ -73,17 +74,10 @@ export async function connectPostgreSQL(): Promise<Pool> {
   }
 
   try {
-    const postgresUri = process.env['DATABASE_URL']
-    if (!postgresUri) {
-      throw new Error('DATABASE_URL is not defined in environment variables')
-    }
-
-    postgresPool = new Pool({
-      connectionString: postgresUri,
-      max: 20, // Maximum number of connections in pool
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000,
-    })
+    // Initialize shared db pool from src/lib/db to avoid duplicate pools
+    initializeDatabase()
+    const sharedPool = getDbPool()
+    postgresPool = sharedPool
 
     // Test connection
     const client = await postgresPool.connect()

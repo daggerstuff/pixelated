@@ -124,6 +124,7 @@ JIRA_PRIORITY_TO_CANONICAL: dict[str, str] = {
     "High": "high",
     "Medium": "medium",
     "Low": "low",
+    "Lowest": "none",
     "None": "none",
 }
 
