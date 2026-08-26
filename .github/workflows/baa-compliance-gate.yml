@@ -10,10 +10,10 @@ on:
   pull_request:
     paths:
       - 'ai/**'
-      - 'src/lib/ai/**'
-      - 'src/lib/ehr/**'
-      - 'src/pages/api/ehr/**'
-      - 'src/components/ehr/**'
+      - 'apps/web/src/lib/ai/**'
+      - 'apps/web/src/lib/ehr/**'
+      - 'apps/web/src/pages/api/ehr/**'
+      - 'apps/web/src/components/ehr/**'
       - 'tests/ai/**'
       - 'tests/unit/ai/**'
       - 'docs/compliance/**'

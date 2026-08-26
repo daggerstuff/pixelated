@@ -30,10 +30,10 @@ check_service() {
 echo "📄 Checking configuration files..."
 
 # Loki configuration
-if [[ -f "docker/loki/config.yml" ]]; then
+if [[ -f "infra/infra/docker/loki/config.yml" ]]; then
 	echo "✅ Loki configuration file exists"
 	# Check for key configuration items
-	if grep -q "instance_addr: 0.0.0.0" docker/loki/config.yml; then
+	if grep -q "instance_addr: 0.0.0.0" infra/docker/loki/config.yml; then
 		echo "✅ Loki instance_addr configured correctly"
 	else
 		echo "❌ Loki instance_addr not configured correctly"
@@ -43,10 +43,10 @@ else
 fi
 
 # Promtail configuration
-if [[ -f "docker/promtail/config.yml" ]]; then
+if [[ -f "infra/infra/docker/promtail/config.yml" ]]; then
 	echo "✅ Promtail configuration file exists"
 	# Check for key configuration items
-	if grep -q "job_name: pixelated-app-logs" docker/promtail/config.yml; then
+	if grep -q "job_name: pixelated-app-logs" infra/docker/promtail/config.yml; then
 		echo "✅ Promtail docker service discovery configured"
 	else
 		echo "❌ Promtail docker service discovery not configured"
@@ -56,9 +56,9 @@ else
 fi
 
 # Grafana datasource configuration
-if [[ -f "docker/grafana/provisioning/datasources/loki.yml" ]]; then
+if [[ -f "infra/infra/docker/grafana/provisioning/datasources/loki.yml" ]]; then
 	echo "✅ Grafana Loki datasource configuration exists"
-	if grep -q "url: http://loki:3100" docker/grafana/provisioning/datasources/loki.yml; then
+	if grep -q "url: http://loki:3100" infra/docker/grafana/provisioning/datasources/loki.yml; then
 		echo "✅ Grafana Loki datasource URL configured correctly"
 	else
 		echo "❌ Grafana Loki datasource URL not configured correctly"
@@ -74,7 +74,7 @@ echo "🐳 Checking running services..."
 overall_ok=true
 
 # Check if monitoring stack is running
-if monitoring_ps_output="$(docker compose -f docker/docker-compose.monitoring.yml ps 2>/dev/null)"; then
+if monitoring_ps_output="$(docker compose -f infra/docker/docker-compose.monitoring.yml ps 2>/dev/null)"; then
 	if echo "${monitoring_ps_output}" | grep -q "Up"; then
 		echo "✅ Monitoring stack is running"
 
@@ -108,7 +108,7 @@ if monitoring_ps_output="$(docker compose -f docker/docker-compose.monitoring.ym
 
 else
 	echo "❌ Unable to query monitoring stack with docker compose"
-	echo "💡 Ensure Docker is running and compose file exists: docker/docker-compose.monitoring.yml"
+	echo "💡 Ensure Docker is running and compose file exists: infra/docker/docker-compose.monitoring.yml"
 	overall_ok=false
 fi
 
@@ -116,10 +116,10 @@ fi
 echo ""
 echo "🏭 Checking production stack..."
 
-if production_ps_output="$(docker compose -f docker/docker-compose.production.yml ps 2>/dev/null)"; then
+if production_ps_output="$(docker compose -f infra/docker/docker-compose.production.yml ps 2>/dev/null)"; then
 	if echo "${production_ps_output}" | grep -q "loki"; then
 		echo "✅ Loki service defined in production stack"
-		if production_loki_ps_output="$(docker compose -f docker/docker-compose.production.yml ps loki 2>/dev/null)"; then
+		if production_loki_ps_output="$(docker compose -f infra/docker/docker-compose.production.yml ps loki 2>/dev/null)"; then
 			if echo "${production_loki_ps_output}" | grep -q "Up"; then
 				echo "✅ Loki service is running in production stack"
 			else
@@ -134,7 +134,7 @@ if production_ps_output="$(docker compose -f docker/docker-compose.production.ym
 
 	if echo "${production_ps_output}" | grep -q "promtail"; then
 		echo "✅ Promtail service defined in production stack"
-		if production_promtail_ps_output="$(docker compose -f docker/docker-compose.production.yml ps promtail 2>/dev/null)"; then
+		if production_promtail_ps_output="$(docker compose -f infra/docker/docker-compose.production.yml ps promtail 2>/dev/null)"; then
 			if echo "${production_promtail_ps_output}" | grep -q "Up"; then
 				echo "✅ Promtail service is running in production stack"
 			else

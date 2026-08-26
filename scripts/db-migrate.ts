@@ -11,8 +11,8 @@
  * DB_USER, DB_PASSWORD).
  */
 
-import { closeDatabase, initializeDatabase, migrations } from '../src/lib/db/index.ts'
-import { parseDatabaseUrl } from '../src/lib/db/parse-database-url'
+import { closeDatabase, initializeDatabase, migrations } from '../apps/web/src/lib/db/index.ts'
+import { parseDatabaseUrl } from '../apps/web/src/lib/db/parse-database-url'
 
 const DEFAULT_MIGRATIONS_DIR = './db/migrations'
 

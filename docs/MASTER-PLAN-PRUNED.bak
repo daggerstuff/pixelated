@@ -1,0 +1,200 @@
+# Master Plan — PRUNED & VERIFIED
+
+> Generated: 2026-08-01
+> Method: Every item from the raw list was verified against the actual codebase.
+> Items marked DONE were confirmed by file existence or code content.
+> Items marked OPEN were confirmed missing or incomplete.
+
+---
+
+## STATUS LEGEND
+
+- ✅ DONE — Verified in codebase
+- 🔲 OPEN — Confirmed not yet implemented
+- ⏸ BLOCKED — Blocked on external dependency
+- 🗑 STALE — Plan item no longer relevant (superseded, canceled, or was never actionable)
+- 📋 STRATEGIC — Business/compliance roadmap, not code tasks
+
+---
+
+## CATEGORY A: CODEBASE — OPEN WORK
+
+### A1. CI Federation — Remaining Items (from RFC CI-OPERATING-MODEL.md)
+
+|| # | Item | Source | Status | Notes |
+||---|------|--------|--------|-------
+|| A1.1 | ci.yml SOFT→HARD gates | RFC §8 | 🔲 OPEN | `continue-on-error` present |
+|| A1.2 | Weekly CI review | RFC §8 | 🔲 OPEN | No workflow exists |
+|| A1.3 | Readiness aggregator pre-deploy | RFC §8 | 🔲 OPEN | Script not wired |
+
+### A2. Session Progress Tracking (PIX-3916)
+
+| # | Item | Source | Status | Notes |
+|---|------|--------|--------|-------|
+| A2.1 | Phase 1: Database Connection Pool Integration | docs/superpowers/specs/2026-07-18 | 🔲 OPEN | API routes still may use redundant pools. Needs verification. |
+| A2.2 | Phase 2: Defense Metrics API Endpoint | docs/superpowers/specs/2026-07-18 | 🔲 OPEN | `src/pages/api/defense.ts` does NOT exist. |
+| A2.3 | Phase 3: React Components (5 components) | docs/superpowers/specs/2026-07-18 | 🔲 OPEN | None of the 5 components exist: MultiSessionProgression, BeliefChangeTracker, DefenseMechanismAdaptation, GoalAttainmentScale, updated SessionTimeline. |
+| A2.4 | Phase 4: Enhanced Dashboard & Progress Page | docs/superpowers/specs/2026-07-18 | 🔲 OPEN | `src/pages/dashboard/session-progress.astro` does NOT exist. |
+
+### A3. Task Sync Cross-System Gaps (scripts/task_sync/GAP_MATRIX.md)
+
+| # | Item | Severity | Status | Notes |
+|---|------|----------|--------|-------|
+| A3.1 | Add `review` canonical state to STATUS_ALIASES | High | ✅ DONE | tri_sync.py now maps "in review" → "review". |
+| A3.2 | Priority sync between Linear and Jira | High | 🔲 OPEN | No priority mapping code exists. |
+| A3.3 | Label sync between providers | Medium | 🔲 OPEN | Labels not in TaskRecord data model. |
+| A3.4 | Per-project status mappings | High | 🔲 OPEN | STATUS_ALIASES is still global, no per-project override. |
+| A3.5 | Map 162 unmapped Linear-only issues to Jira | Medium | 🔲 OPEN | Training Pipeline + Memory May-Hem still invisible to Jira. |
+| A3.6 | Jira→Linear reverse map | Low | 🔲 OPEN | One-directional only. |
+| A3.7 | Fix circular import (tri_sync ↔ provider_bridge) | Low | 🔲 OPEN | Still imports from each other. |
+| A3.8 | Automated sync daemon / cron runner | High | 🔲 OPEN | Must run manually. |
+
+### A4. Deterministic Batching & Corpus Fidelity (docs/superpowers/specs/2026-06-29)
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| A4.1 | surgical_fix_2025_09.py | 🗑 STALE | One-off fix for 2025-09 batch. Batch is old; fix is no longer relevant. |
+| A4.2 | Update monthly_pipeline.py for Postgres+Redis deterministic batching | 🔲 OPEN | `scripts/corpus/monthly_pipeline.py` does NOT exist. Either never created or moved. Needs investigation. |
+| A4.3 | Modify monthly_llm_prompt templates for deterministic assignments | 🔲 OPEN | Depends on A4.2. |
+
+### A5. Integration Test Plan (src/content-store/docs/testing/integration-test-plan.md)
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| A5.1 | Implement test framework setup | 🔲 OPEN | Plan lists 7 steps, none verified as implemented. |
+| A5.2 | Create initial test scenarios | 🔲 OPEN | |
+| A5.3 | Set up CI/CD integration for integration tests | 🔲 OPEN | |
+| A5.4 | Create test data management system | 🔲 OPEN | |
+| A5.5 | Implement performance testing infrastructure | 🔲 OPEN | |
+| A5.6 | Set up security testing tools | 🔲 OPEN | |
+| A5.7 | Configure HIPAA compliance validation | 🔲 OPEN | |
+
+### A6. Test Coverage Baseline (docs/plans/PIX-1901-test-coverage-baseline-plan-02.md)
+
+| # | Item | Status | Notes |
+|---|------|--------|-------|
+| A6.1 | Phase 1: Infrastructure (PIX-160, PIX-3762) | 🔲 OPEN | Plan says "Implementation Ready" but no evidence of execution. |
+| A6.2 | Phase 2: Critical Path (10 P0/P1 modules) | 🔲 OPEN | |
+| A6.3 | Phase 3: Supporting Modules (4 P2 modules) | 🔲 OPEN | |
+| A6.4 | Phase 4: Scale Modules (4 P3 modules) | 🔲 OPEN | |
+| A6.5 | Phase 5: Baseline Lock | 🔲 OPEN | |
+
+---
+
+## CATEGORY B: COMPLIANCE REMEDIATION ROADMAPS
+
+### B1. HIPAA Compliance (docs/enterprise/hipaa-compliance-gap-assessment.md)
+
+16-week remediation plan, all items OPEN. Estimated cost: $62-110K first year.
+
+| Phase | Weeks | Items | Status |
+|-------|-------|-------|--------|
+| B1.1 | 1-4 | Governance | B1.1 | 1-4 | Governance | 🔲 OPEN | Risk | 🔲 OPEN |
+| B1.2 | 5-8 | Breach | B1.1 | 1-4 | Governance | 🔲 OPEN | BAA | 🔲 OPEN |
+| B1.3 | 9-12 | Procedures | B1.1 | 1-4 | Governance | 🔲 OPEN | Training | 🔲 OPEN |
+| B1.4 | 13-16 | Documentation | B1.1 | 1-4 | Governance | 🔲 OPEN | Audit | 🔲 OPEN |
+
+### B2. SOC2 Readiness (docs/enterprise/soc2-readiness-gap-assessment.md)
+
+16-week remediation plan, all items OPEN. Estimated cost: $120-170K first year.
+
+| Phase | Weeks | Items | Status |
+|-------|-------|-------|--------|
+| B2.1 Foundation (Critical Policies) | 1-4 | InfoSec policy, access control, IRP, change mgmt | 🔲 OPEN |
+| B2.2 Data & Privacy | 5-8 | Classification, retention, disposal, privacy notice | 🔲 OPEN |
+| B2.3 Vendor & Monitoring | 9-12 | VRA-3 completion, monitoring program, tabletop | 🔲 OPEN |
+| B2.4 Audit Preparation | 13-16 | Evidence collection, pre-audit review | 🔲 OPEN |
+
+---
+
+## CATEGORY C: BUSINESS STRATEGY (Non-Code)
+
+### C1. Expansion Roadmap (business-strategy/06-expansion-roadmap.md)
+
+4-phase, 48-month market expansion plan. 📋 STRATEGIC — not code tasks.
+
+| Phase | Timeline | Focus | Status |
+|-------|----------|-------|--------|
+| C1.1 Market Validation | Months 1-12 | US/Canada, 3-5 pilot institutions | 📋 STRATEGIC |
+| C1.2 Market Expansion | Months 13-24 | UK/Australia/NZ, 100+ institutions | 📋 STRATEGIC |
+| C1.3 Market Leadership | Months 25-36 | Europe/Asia-Pacific, 300+ institutions | 📋 STRATEGIC |
+| C1.4 Global Leadership | Months 37-48 | Global, $10M ARR | 📋 STRATEGIC |
+
+### C2. Pilot Program Framework (business-strategy/pilot-program-framework.md)
+
+6-month institutional validation program. 📋 STRATEGIC.
+
+---
+
+## CATEGORY D: VERIFIED DONE (No Action Needed)
+
+These items appeared in plans but are confirmed complete in the codebase.
+
+| Item | Source | Verification |
+|------|--------|--------------|
+| D1. Vertical Fidelity Stack — all 3 primitives + INT-1 through INT-5 | IMPLEMENTATION_PLAN.md | All files exist: receipt.py, triggers.py, event_bus.py, jit_scenario_injector.py, persistence.py. EventBus events emitted from orchestrator. receipt_root_hash wired through. Per-clinician grouping implemented. |
+| D2. PAL Framework Phases 1-5 | ai/PAL_MEDDIES_IMPLEMENTATION_PLAN.md | All files exist: meddies_to_pal.py, generate_selection_dataset.py, generate_dpo_pairs.py, inference_wrapper.py, pal_persona_consistency_eval.py, meddies_synthesizer.py |
+| D3. Unified Backend Docker Compose (10 tasks) | .omo/plans/unify-pixelated-backend.md | docker-compose.backend.yml, .env.backend.example, backend-health-check.sh all exist. |
+| D4. Enterprise Readiness Program (all 38 issues) | Linear | All marked Done in Linear. Supporting docs exist in docs/enterprise/. |
+| D5. CI Federation & Release Readiness (17 done, 2 canceled) | Linear | Promotion gate test workflow exists. RFC approved. |
+| D6. ML & Platform Remediation Sprint (8 done, 1 canceled) | Linear | All code files exist. |
+| D7. Training Pipeline v2 | Linear | Completed. |
+| D8. AI Research-Clinical Integration | Linear | Completed. |
+| D9. Foresight Memory Architecture | Linear | Completed. |
+| D10. Churnmeon Reliability | Linear | Completed. |
+| D11. Monitoring FIXME items (PIX-4100) | monitoring/FIXME.md | All 5 items triaged with documented decisions. |
+| D12. Linear Workspace Audit (7 acceptance criteria) | docs/linear-audit/linear_audit.md | All 7 criteria met. 39 remediations applied. |
+| D13. Task sync: `review` canonical state | scripts/task_sync/GAP_MATRIX.md | tri_sync.py now maps "in review" → "review". |
+| D14. Task sync: aggregate-readiness.py | docs/rfc/CI-OPERATING-MODEL.md | Script exists at scripts/devops/aggregate-readiness.py. |
+
+---
+
+## CATEGORY E: BLOCKED (External Dependencies)
+
+| Item | Linear | Blocker |
+|------|--------|---------|
+| E1. Remove @babel/core override | PIX-4164 | Waiting for ecosystem patch |
+| E2. Remove react-router monitoring workaround | PIX-4165 | Waiting for upstream fix |
+| E3. Remove accepted localstack risk | PIX-4166 | Waiting for patched release |
+
+---
+
+## CATEGORY F: STALE / SUPERSEDED
+
+| Item | Source | Reason |
+|------|--------|--------|
+| F1. IMPLEMENTATION_PLAN.md "Remaining Work" section | IMPLEMENTATION_PLAN.md §Remaining Work | All 6 items are DONE in codebase. The "Remaining Work" section was never updated after completion. The Linear tickets section at bottom correctly shows all [x]. Plan is STALE — should be updated or archived. |
+| F2. surgical_fix_2025_09.py | docs/superpowers/specs/2026-06-29 | One-off fix for old batch. No longer relevant. |
+| F3. 26 Linear issues without project assignment | docs/linear-audit/linear_audit.md | Hygiene follow-up, not a plan item. Low priority. |
+
+---
+
+## PRIORITY SUMMARY
+
+### Immediate Code Work (A items)
+| Priority | Count | Description |
+|----------|-------|-------------|
+| HIGH | 5 | CI HARD gates (A1.1), Session Progress Phases 2-4 (A2.2-A2.4), Task sync automated daemon (A3.8), Task sync per-project mappings (A3.4) |
+| MEDIUM | 8 | CI weekly review (A1.2), readiness aggregator automation (A1.3), Session Progress Phase 1 (A2.1), priority sync (A3.2), label sync (A3.3), unmapped issues (A3.5), integration test plan (A5.1-A5.7 as group), test coverage baseline (A6.1-A6.5 as group) |
+| LOW | 3 | Jira→Linear reverse map (A3.6), circular import fix (A3.7), deterministic batching (A4.2-A4.3) |
+
+### Compliance (B items) — Human-driven, not code
+- HIPAA: 16-week plan, $62-110K
+- SOC2: 16-week plan, $120-170K
+
+### Strategic (C items) — Business execution
+- 48-month expansion roadmap
+- Pilot program framework
+
+### Blocked (E items) — 3 dependency waits
+### Stale (F items) — 3 items need cleanup/archival
+
+---
+
+## RECOMMENDED NEXT ACTIONS
+
+1. **Clean up IMPLEMENTATION_PLAN.md** — Update or archive. The "Remaining Work" section is misleading since everything is done.
+2. **CI HARD gates (A1.1)** — Remove `continue-on-error: true` from ci.yml. This is the single highest-impact code task.
+3. **Session Progress Tracking (A2)** — 4 phases, all unstarted. Good candidate for a focused sprint.
+4. **Task sync automation (A3.8)** — The sync daemon would make the entire task_sync system actually useful.
+5. **Test coverage baseline (A6)** — 9-week plan, already designed and "Implementation Ready". Low-hanging fruit if prioritized.

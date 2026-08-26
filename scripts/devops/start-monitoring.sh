@@ -22,16 +22,16 @@ echo "🚀 Starting Pixelated Monitoring Stack..."
 cd "$(dirname "$0")/.."
 
 # Create necessary directories
-mkdir -p docker/loki/chunks
-mkdir -p docker/loki/rules
-mkdir -p docker/prometheus/data
-mkdir -p docker/grafana/data
+mkdir -p infra/docker/loki/chunks
+mkdir -p infra/docker/loki/rules
+mkdir -p infra/docker/prometheus/data
+mkdir -p infra/docker/grafana/data
 
 echo "📁 Created necessary directories"
 
 # Start monitoring services
 echo "🐳 Starting monitoring containers..."
-docker compose -f docker/docker-compose.monitoring.yml -f docker/docker-compose.production.yml up -d loki promtail prometheus grafana alertmanager
+docker compose -f infra/docker/docker-compose.monitoring.yml -f infra/docker/docker-compose.production.yml up -d loki promtail prometheus grafana alertmanager
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to initialize..."
@@ -39,7 +39,7 @@ sleep 10
 
 # Check if services are running
 echo "🔍 Checking service status..."
-docker compose -f docker/docker-compose.monitoring.yml -f docker/docker-compose.production.yml ps
+docker compose -f infra/docker/docker-compose.monitoring.yml -f infra/docker/docker-compose.production.yml ps
 
 # Test Loki connectivity
 echo "🧪 Testing Loki connectivity..."

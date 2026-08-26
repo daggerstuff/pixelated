@@ -1,0 +1,122 @@
+# Docker Compose for Axolotl GPU training (Enhanced).
+#
+# Blueprint Appendix D: "docker-compose -f docker-compose.yml
+#   -f docker-compose.gpu.override.yml up -d"
+#
+# Supports three training profiles via TRAINING_MODE:
+#   - axolotl (default): single-GPU SFT/DPO/ORPO via `axolotl train`
+#   - accelerate: multi-GPU via `accelerate launch --num_processes N`
+#   - custom: arbitrary command (pass as command override)
+#
+# Usage:
+#   # Single-GPU SFT (default config)
+#   docker compose -f infra/docker/docker-compose.axolotl.yml up axolotl-train
+#
+#   # ORPO training
+#   TRAINING_CONFIG=ai/training/configs/orpo_axolotl.yaml \
+#     docker compose -f infra/docker/docker-compose.axolotl.yml up axolotl-train
+#
+#   # Multi-GPU (8x H100) with DeepSpeed ZeRO-3
+#   NUM_GPUS=8 TRAINING_MODE=accelerate \
+#     docker compose -f infra/docker/docker-compose.axolotl.yml up axolotl-train
+#
+#   # Custom command
+#   docker compose -f infra/docker/docker-compose.axolotl.yml run --rm \
+#     axolotl-train python -m ai.training.orpo_trainer --help
+
+services:
+  axolotl-train:
+    build:
+      context: ../..
+      dockerfile: infra/docker/axolotl-train.Dockerfile
+      args:
+        BUILD_DATE: ${BUILD_DATE:-}
+        GIT_COMMIT: ${GIT_COMMIT:-}
+        GIT_BRANCH: ${GIT_BRANCH:-}
+        VERSION: ${VERSION:-latest}
+    image: pixelated-axolotl-train:${VERSION:-latest}
+    container_name: pixelated-axolotl-train
+    restart: "no"  # Training jobs are one-shot
+
+    # GPU configuration — use `count: all` or `count: ${NUM_GPUS}`.
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+        limits:
+          memory: 128G  # Prevent OOM-killer from killing the training process.
+
+    # Environment — training configuration.
+    environment:
+      # Training mode selection.
+      - TRAINING_MODE=${TRAINING_MODE:-auto}
+      - TRAINING_CONFIG=${TRAINING_CONFIG:-ai/training/configs/axolotl.yaml}
+      - NUM_GPUS=${NUM_GPUS:-1}
+      # CUDA / PyTorch.
+      - CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0,1,2,3,4,5,6,7}
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
+      - OMP_NUM_THREADS=8
+      # NCCL / distributed (multi-GPU).
+      - NCCL_DEBUG=INFO
+      - NCCL_IB_DISABLE=0
+      - NCCL_NET_GDR_LEVEL=2
+      # WandB experiment tracking.
+      - WANDB_MODE=${WANDB_MODE:-offline}
+      - WANDB_PROJECT=${WANDB_PROJECT:-pixelated-empathy}
+      - WANDB_ENTITY=${WANDB_ENTITY:-}
+      - WANDB_API_KEY=${WANDB_API_KEY:-}
+      # HuggingFace cache.
+      - HF_HOME=/workspace/.cache/huggingface
+      - TRANSFORMERS_CACHE=/workspace/.cache/transformers
+      - TORCH_HOME=/workspace/.cache/torch
+      # HuggingFace Hub (for gated models like Qwen).
+      - HF_TOKEN=${HF_TOKEN:-}
+
+    # Volumes — repo root mounted as /workspace.
+    volumes:
+      # Repo root mounted as /workspace so configs and data are available.
+      - ../..:/workspace:rw
+      # Shared memory for multi-GPU NCCL — critical for distributed training.
+      - /dev/shm:/dev/shm:rw
+      # Persistent cache (model weights, tokenizers, datasets).
+      - axolotl_hf_cache:/workspace/.cache/huggingface
+      - axolotl_transformers_cache:/workspace/.cache/transformers
+      - axolotl_torch_cache:/workspace/.cache/torch
+      # Checkpoint and model output directories.
+      - axolotl_checkpoints:/workspace/checkpoints
+      - axolotl_models:/workspace/models
+
+    # Shared memory size — critical for NCCL all-reduce operations.
+    shm_size: 16g
+
+    # Logging.
+    logging:
+      driver: json-file
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+    # Networks.
+    networks:
+      - training-net
+
+    # Healthcheck inherits from Dockerfile.
+
+volumes:
+  axolotl_hf_cache:
+    driver: local
+  axolotl_transformers_cache:
+    driver: local
+  axolotl_torch_cache:
+    driver: local
+  axolotl_checkpoints:
+    driver: local
+  axolotl_models:
+    driver: local
+
+networks:
+  training-net:
+    driver: bridge

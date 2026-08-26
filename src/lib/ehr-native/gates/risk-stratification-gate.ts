@@ -260,8 +260,9 @@ export function interceptRiskScore(
  */
 async function canApproveRiskScore(
   role: ClinicalRole,
+  patientId: string,
 ): Promise<EHRPermissionCheckResult> {
-  return checkPermission(role, 'write_patient')
+  return checkPermission(role, 'write_patient', patientId)
 }
 
 /**
@@ -295,7 +296,7 @@ export async function reviewRiskScore(
   }
 
   // RBAC check — clinician must have write_patient permission
-  const permResult = await canApproveRiskScore(params.clinicianRole)
+  const permResult = await canApproveRiskScore(params.clinicianRole, review.patientId)
 
   if (!permResult.granted) {
     return {

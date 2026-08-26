@@ -7,9 +7,9 @@ permissions:
 on:
   pull_request:
     paths:
-      - 'src/content-store/docs/api-reference/**'
-      - 'src/pages/docs/api/**'
-      - 'src/content-store/docs/api/**'
+      - 'apps/web/src/content-store/docs/api-reference/**'
+      - 'apps/web/src/pages/docs/api/**'
+      - 'apps/web/src/content-store/docs/api/**'
       - 'docs/api/**'
       - 'ai/docs/api/**'
       - '.spectral.yaml'
@@ -19,9 +19,9 @@ on:
       - main
       - staging
     paths:
-      - 'src/content-store/docs/api-reference/**'
-      - 'src/pages/docs/api/**'
-      - 'src/content-store/docs/api/**'
+      - 'apps/web/src/content-store/docs/api-reference/**'
+      - 'apps/web/src/pages/docs/api/**'
+      - 'apps/web/src/content-store/docs/api/**'
       - 'docs/api/**'
       - 'ai/docs/api/**'
       - '.spectral.yaml'
@@ -65,7 +65,7 @@ jobs:
       - name: Validate api-reference OpenAPI spec
         if: always()
         run: |
-          npx @stoplight/spectral-cli lint src/content-store/docs/api-reference/openapi.yaml \
+          npx @stoplight/spectral-cli lint apps/web/src/content-store/docs/api-reference/openapi.yaml \
             --ruleset .spectral.yaml \
             --format json > spectral-results.json || true
 
@@ -114,8 +114,8 @@ jobs:
           if [ -f ai/requirements-voice.txt ]; then
             uv pip install --system -r ai/requirements-voice.txt 2>/dev/null || true
           fi
-          if [ -f src/lib/ai/bias-detection/python-service/requirements.txt ]; then
-            uv pip install --system -r src/lib/ai/bias-detection/python-service/requirements.txt 2>/dev/null || true
+          if [ -f apps/web/src/lib/ai/bias-detection/python-service/requirements.txt ]; then
+            uv pip install --system -r apps/web/src/lib/ai/bias-detection/python-service/requirements.txt 2>/dev/null || true
           fi
 
       - name: Export FastAPI schemas
@@ -171,8 +171,8 @@ jobs:
         with:
           name: openapi-spec-latest
           path: |
-            src/content-store/docs/api-reference/openapi.yaml
-            src/pages/docs/api/_openapi.yaml
-            src/content-store/docs/api/openapi/openapi.yaml
+            apps/web/src/content-store/docs/api-reference/openapi.yaml
+            apps/web/src/pages/docs/api/_openapi.yaml
+            apps/web/src/content-store/docs/api/openapi/openapi.yaml
             docs/api/memory-v1.openapi.yaml
           retention-days: 90

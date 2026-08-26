@@ -1,4 +1,9 @@
-import { httpBasic, localDev, placeholderAuth, vercelOidc } from 'eve/channels/auth'
+import {
+  httpBasic,
+  localDev,
+  placeholderAuth,
+  vercelOidc,
+} from 'eve/channels/auth'
 import { eveChannel } from 'eve/channels/eve'
 
 const authUsername = process.env.EVE_AUTH_USERNAME
