@@ -1,17 +1,22 @@
-import { defineTool } from 'eve/tools'
-import { z } from 'zod'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+
+import { defineTool } from 'eve/tools'
+import { z } from 'zod'
 
 const execFileAsync = promisify(execFile)
 
 const SCHEMA = z.object({
   record_ids: z
     .array(z.string())
-    .describe('List of record IDs to target for synthetic regeneration or quality repair.'),
+    .describe(
+      'List of record IDs to target for synthetic regeneration or quality repair.',
+    ),
   target_file: z
     .string()
-    .describe('Corpus file path containing the records (e.g. final/_source/pixelated_email_dump_combined.json).'),
+    .describe(
+      'Corpus file path containing the records (e.g. final/_source/pixelated_email_dump_combined.json).',
+    ),
 })
 
 interface RegenerateRecordInput {
@@ -25,9 +30,13 @@ export default defineTool({
   inputSchema: SCHEMA,
   async execute(input: RegenerateRecordInput) {
     try {
-      const { stdout } = await execFileAsync('uv', ['run', 'python', 'scripts/fix/repair_upgraded_v2.py'], {
-        cwd: '/home/vivi/pixelated/hackathon',
-      })
+      const { stdout } = await execFileAsync(
+        'uv',
+        ['run', 'python', 'scripts/fix/repair_upgraded_v2.py'],
+        {
+          cwd: '/home/vivi/pixelated/hackathon',
+        },
+      )
 
       return {
         success: true,

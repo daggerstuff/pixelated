@@ -1,0 +1,114 @@
+---
+import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const operatingProfile = [
+  {
+    label: 'Company stage',
+    title: 'Founder-led build',
+    body: 'Product, implementation, and customer conversations are still tightly connected so the workflow stays grounded in real evaluation questions.',
+  },
+  {
+    label: 'Best fit',
+    title: 'Teams that need repeatable supervision',
+    body: 'Clinical educators, supervisors, and training leads who want to compare judgment against the same difficult case.',
+  },
+  {
+    label: 'Rollout style',
+    title: 'Start small, judge fast',
+    body: 'The intended path is a focused pilot, not a long procurement maze built on promises alone.',
+  },
+]
+---
+
+<BaseLayout
+  title="Company Overview"
+  description="Pixelated Empathy's operating profile: founder-led, United States, focused on clinical simulation for therapist training and sensitive supervision workflows."
+  fullWidthMain
+>
+  <MarketingPageHero
+    eyebrow="Company"
+    title="A founder-led company building clearer supervision tools."
+    lede="Pixelated Empathy is focused on one problem: helping training teams run difficult therapy cases in a way that leaves behind better evidence for coaching."
+    note="Built for training teams first, not generic wellness traffic"
+    trustLine={['United States', 'Founder-led', 'Sensitive-workflow focus']}
+    primaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    secondaryCTA={{ text: 'Talk to the team', href: '/contact' }}
+    proof={{
+      label: 'Operating profile',
+      body: `<p><strong>Stage.</strong> Founder-led build (2025, United States).</p>
+        <p><strong>Focus.</strong> Clinical simulation for therapist training, supervision, and review.</p>
+        <p><strong>Rollout.</strong> Start small, judge fast. A focused pilot, not a long procurement maze.</p>
+        <p><strong>Primary ask.</strong> One hard case — enough to prove whether coaching gets clearer.</p>`,
+      caption: 'How the company is set up to stay close to the workflow',
+    }}
+  />
+
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-section-header">
+        <span class="marketing-eyebrow">Operating profile</span>
+        <h2 class="marketing-title marketing-title--medium">
+          The company is set up to stay close to the workflow.
+        </h2>
+      </div>
+
+      <div class="marketing-grid marketing-grid--3">
+        {
+          operatingProfile.map((item) => (
+            <article class="marketing-card">
+              <span class="marketing-card__label">{item.label}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="marketing-section marketing-section--soft">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2">
+        <article class="marketing-card">
+          <span class="marketing-card__label">What we provide</span>
+          <h2 class="marketing-title marketing-title--medium">
+            A training environment teams can actually review.
+          </h2>
+          <p>
+            The product helps teams rehearse crisis assessment, rupture repair,
+            trauma disclosure, resistance, and other sessions that are hard to
+            stage consistently in live training.
+          </p>
+        </article>
+
+        <article class="marketing-card marketing-card--accent">
+          <span class="marketing-card__label">How teams use it</span>
+          <h2 class="marketing-title marketing-title--medium">
+            Run, compare, and coach from one shared case.
+          </h2>
+          <p>
+            Programs can assign the same scenario to multiple trainees, compare
+            how the room shifted, and coach from transcripts and structured
+            review instead of vague recollection alone.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <MarketingCTA
+    eyebrow="Bring a real evaluation question"
+    title="The fastest way to understand the company is to look at the workflow."
+    body="If you want to know whether Pixelated Empathy fits your training program, start with the demo and bring the supervision problem you are actually trying to solve."
+    checklist={[
+      'A difficult therapy conversation your team already uses for training',
+      'The review or supervision pain point you want to improve first',
+      'Any privacy, retention, or rollout constraints you need addressed early',
+    ]}
+    primaryCTA={{ text: 'Talk to the team', href: '/contact' }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    note="The intended decision path is practical: see it, pressure-test it, then decide."
+  />
+</BaseLayout>

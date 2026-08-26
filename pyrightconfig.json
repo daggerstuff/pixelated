@@ -1,8 +1,8 @@
 {
-  "include": ["src", "tests", "ai"],
+  "include": ["apps/web/src", "tests", "ai"],
   "exclude": [
     "**/node_modules/**",
-    "business-strategy-cms/node_modules",
+    "apps/business-strategy-cms/node_modules",
     "stubs",
     "**/venv/**",
     "**/.venv/**",

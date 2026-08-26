@@ -23,7 +23,7 @@ export default tseslint.config(
     ignores: [
       'dist/**',
       'node_modules/**',
-      'public/**',
+      'apps/web/public/**',
       '.oxlintrc.json',
       'coverage/**',
       'playwright-report/**',
@@ -250,7 +250,7 @@ export default tseslint.config(
 
   // Bias detection files override (matching OXC config)
   {
-    files: ['src/lib/ai/bias-detection/**/*.{ts,tsx}'],
+    files: ['apps/web/src/lib/ai/bias-detection/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
@@ -312,8 +312,8 @@ export default tseslint.config(
   // Multi-region modules allow typed interoperability while we migrate legacy interfaces
   {
     files: [
-      'src/lib/deployment/multi-region/AutomatedFailoverOrchestrator.ts',
-      'src/lib/deployment/multi-region/CrossRegionDataSyncManager.ts',
+      'apps/web/src/lib/deployment/multi-region/AutomatedFailoverOrchestrator.ts',
+      'apps/web/src/lib/deployment/multi-region/CrossRegionDataSyncManager.ts',
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',

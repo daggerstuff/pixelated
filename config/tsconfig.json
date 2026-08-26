@@ -9,13 +9,13 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "~/*": ["./src/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@components/*": ["./src/components/*"],
-      "@layouts/*": ["./src/layouts/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@types/*": ["./src/types/*"]
+      "@/*": ["./apps/web/src/*"],
+      "~/*": ["./apps/web/src/*"],
+      "@lib/*": ["./apps/web/src/lib/*"],
+      "@components/*": ["./apps/web/src/components/*"],
+      "@layouts/*": ["./apps/web/src/layouts/*"],
+      "@utils/*": ["./apps/web/src/utils/*"],
+      "@types/*": ["./apps/web/src/types/*"]
     },
     "allowJs": true,
     "resolveJsonModule": true,
@@ -51,8 +51,8 @@
     "typeRoots": [
       "../node_modules/@types",
       "./node_modules/@types",
-      "../src/types",
-      "./src/types"
+      "../apps/web/src/types",
+      "./apps/web/src/types"
     ],
     "plugins": [
       {
@@ -61,22 +61,21 @@
     ]
   },
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx",
-    "./src/**/*.astro",
-    "./src/types/**/*.d.ts",
+    "./apps/web/src/**/*.ts",
+    "./apps/web/src/**/*.tsx",
+    "./apps/web/src/**/*.astro",
+    "./apps/web/src/types/**/*.d.ts",
     "./*.config.js",
     "./*.config.ts",
     "./api/**/*.ts",
     "./plugins/**/*.ts",
-    "./types/**/*.d.ts",
     "./.astro-env.d.ts"
   ],
   "exclude": [
     "./dist",
     "./node_modules",
     "./**/node_modules/**",
-    "./src/scripts",
+    "./apps/web/src/scripts",
     "./.astro",
     "./.local",
     "./**/test-results/**",

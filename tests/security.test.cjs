@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../src/server.prod')
+const app = require('../apps/web/src/server.prod')
 
 describe('Security Tests', () => {
   describe('Rate Limiting', () => {

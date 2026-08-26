@@ -40,7 +40,7 @@ plan/
 .roomodes
 .oracle_deployment
 checkpoints/
-business-strategy-cms/
+apps/business-strategy-cms/
 
 # Environment and config files
 .env*
@@ -193,18 +193,20 @@ acontext_server/
 
 # Monitoring and analysis
 reports/
-monitoring/
+infra/monitoring/
 audit/
 performance/
 verbose/
 
 # Container and deployment files (keep only essential)
 docker-compose*.yml
-!docker-compose.yml
+!infra/docker-compose.yml
 Dockerfile.*
-!Dockerfile
-!Dockerfile.production
-k8s/
+!infra/Dockerfile
+!infra/docker/Dockerfile.production
+infra/k8s/
+infra/deploy/
+infra/metoro-exporter/
 helm/
 terraform/
 clusters/
@@ -281,8 +283,8 @@ tsconfig*.json
 
 # Keep only essential files for build
 !package.json
-!src/
-!public/
+!apps/web/src/
+!apps/web/public/
 !astro.config.mjs
 !tsconfig.json
 !tailwind.config.*
@@ -291,7 +293,7 @@ tsconfig*.json
 !patches/
 !.npmrc
 # Workspace member package.json files needed for pnpm workspace resolution
-!business-strategy-cms/package.json
+!apps/business-strategy-cms/package.json
 
 # Exclude deployment backups from Docker context
 deployment-backup*/

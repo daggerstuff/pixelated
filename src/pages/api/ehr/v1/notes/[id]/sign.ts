@@ -13,6 +13,7 @@
 import {
   resolveTenantId,
   requireEHRPermission,
+  requireEHRPermissionWithBreakGlass,
   sanitizeFhirId,
   ehrSuccess,
   ehrValidationError,
@@ -31,6 +32,8 @@ const signRequestSchema = z.object({
   encounter_id: z.string().min(1).max(128).optional(),
   /** FHIR reference for the signer (e.g., 'Practitioner/{uuid}') */
   signer_ref: z.string().min(1).max(256),
+  breakGlassActivated: z.boolean().optional(),
+  breakGlassReason: z.string().optional(),
 })
 
 export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
@@ -68,7 +71,7 @@ export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
       `Invalid request body: ${parsed.error.issues.map((i) => i.message).join('; ')}`,
     )
 
-  const { note, patient_id, encounter_id, signer_ref } = parsed.data
+  const { note, patient_id, encounter_id, signer_ref, breakGlassActivated, breakGlassReason } = parsed.data as any
 
   // Verify the note ID in the URL matches the note in the body
   const bodyNoteId = (note as Record<string, unknown>)['id']
@@ -82,12 +85,14 @@ export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
     return ehrNotFound('ai-draft', noteId)
 
   // Check RBAC permission: signer must have sign_clinical_note
-  const perm = await requireEHRPermission(
+  const perm = await requireEHRPermissionWithBreakGlass(
     caller.user.role,
     'sign_clinical_note',
     caller.user.id,
     tenantId,
     patient_id,
+    breakGlassActivated,
+    breakGlassReason,
   )
   if (!perm.allowed) return perm.response
 
@@ -100,6 +105,7 @@ export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
     signerUserId: caller.user.id,
     signerRef: signer_ref,
     rlsContext: perm.rlsContext,
+    breakGlassActivated: breakGlassActivated ?? false,
   })
 
   if (!result.success) return ehrValidationError(result.error)

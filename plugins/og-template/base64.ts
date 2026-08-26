@@ -1,4 +1,4 @@
-import type { BgType } from '../../src/types'
+import type { BgType } from '../../apps/web/src/types'
 
 type BackgroundBase64 = Partial<Record<BgType, string>>
 

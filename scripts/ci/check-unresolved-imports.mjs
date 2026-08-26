@@ -26,7 +26,7 @@ import { glob } from 'glob'
 // Configuration
 // ---------------------------------------------------------------------------
 
-const SCAN_GLOB = '{src,frontend/src,business-strategy-cms/src}/**/*.{ts,tsx,js,jsx}'
+const SCAN_GLOB = '{src,business-strategy-cms/src}/**/*.{ts,tsx,js,jsx}'
 
 const SCAN_IGNORE = [
   '**/node_modules/**',

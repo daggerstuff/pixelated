@@ -1,0 +1,461 @@
+# ADR: GraphQL Federation Layer
+
+- **Status**: Accepted
+- **Date**: 2026-07-22
+- **Linear**: PIX-3928, PIX-4064, PIX-4065, PIX-4066
+- **Depends on**: PIX-3925 (dual-mode auth), PIX-3926 (AI processing
+  microservice)
+
+## 1. Context
+
+PIX-3928 requires a GraphQL API layer for the Pixelated Empathy platform. The
+platform currently exposes REST API routes under `/api/` and `/api/v1/`. GraphQL
+provides a unified query interface for clients needing nested data (e.g.,
+session → emotions → metadata) in a single round trip.
+
+ADR-0001
+(`src/content-store/docs/architecture/decisions/0001-core-architecture.md`)
+mentioned "GraphQL API with federation" but it was never executed. This ADR
+delivers the initial implementation.
+
+### Goals
+
+- GraphQL endpoint at `/api/graphql` (POST for queries/mutations, GET for
+  GraphiQL in dev, subscriptions via graphql-ws)
+- Root types: Session, ConversationTurn, EmotionAnalysis, InterventionRecord,
+  AnonymizedMetrics
+- Auth-gated resolvers using existing dual-mode auth (JWT or API key)
+- Depth limit (10) and complexity limit (1000) for query security
+- Introspection disabled in production, GraphiQL enabled in development
+- Real-time subscriptions: sessionUpdated, emotionAnalysisCreated,
+  conversationTurnAdded
+
+### Non-Goals
+
+- Apollo Federation / subgraph stitching (deferred — see §6)
+
+## 2. Decision
+
+### Server: graphql-yoga v5
+
+Chosen over Apollo Server 4 because:
+
+- Lighter dependency footprint, edge-ready
+- Native Astro integration via `handle(request)` API
+- Built-in GraphiQL, health check, CORS
+- Envelop plugin system for validation rules
+- No Express dependency (Apollo Server 4 requires Express or similar)
+
+### Schema Architecture: Modular Monolithic
+
+A single SDL schema with clear ownership boundaries, ready to split into
+federated subgraphs later. Not using `@apollo/subgraph` directives yet — the
+schema is consumed directly by graphql-yoga.
+
+**Ownership boundaries** (for future federation split):
+
+| Type               | Owner                | Data Source                                                                       |
+| ------------------ | -------------------- | --------------------------------------------------------------------------------- |
+| Session            | Main app             | `AIRepository.getSessions` (MongoDB `therapy_sessions`)                           |
+| EmotionAnalysis    | ai-inference-service | `AIRepository.getEmotionsForSession` (MongoDB `ai_emotion_analyses`)              |
+| ConversationTurn   | Main app             | In-memory only (no DB store)                                                      |
+| InterventionRecord | ai-inference-service | `AIRepository.getInterventionAnalysisByUser` (MongoDB `ai_intervention_analysis`) |
+| AnonymizedMetrics  | Research platform    | `AnonymizationService` + `AIRepository` (consent-gated, k-anonymity=5)            |
+
+### Auth Model
+
+- **Strategy**: `either` (JWT or API key via X-API-Key header)
+- **Context**: `getCurrentUser(request)` from existing `@/lib/auth/index.ts`
+- **Enforcement**: Dual-layer — field-level `@auth` directive (PIX-4065) +
+  manual `requireAuth(context)` as defense-in-depth
+- **Route config**: Added to `ROUTE_CONFIGS` in `src/lib/auth/route-config.ts`
+  with `strategy: "either"`, `family: "public"`, `requiredScopes: []`
+- **Scope checking**: `@auth(scope: "admin")` directive on `anonymizedMetrics`
+  field — admin role bypasses, API-key users checked against
+  `keyRecord.scopes[]`, JWT users without scopes pass non-admin scope checks
+
+### Security: Depth & Complexity Limits
+
+| Rule             | Limit    | Library                                           |
+| ---------------- | -------- | ------------------------------------------------- |
+| Depth limit      | 10       | `graphql-depth-limit@1.1.0`                       |
+| Complexity limit | 1000     | Custom rule (replaces `graphql-query-complexity`) |
+| Introspection    | Dev only | `isIntrospectionEnabled()` checks `NODE_ENV`      |
+
+**Complexity calculator**: Custom rule in `src/lib/graphql/security.ts`. List
+fields cost `LIST_BASE_COST (10) × limit_arg`. Scalar fields cost 1. Total
+complexity must not exceed `MAX_COMPLEXITY (1000)`.
+
+**Validation rules applied via envelop `onValidate` hook** (not
+`validationRules` option, which doesn't exist in graphql-yoga v5):
+
+```typescript
+plugins: [
+  {
+    onValidate: ({ addValidationRule }) => {
+      addValidationRule(depthLimitRule());
+      addValidationRule(complexityLimitRule(schema));
+    },
+  },
+],
+```
+
+### ESM/CJS Dual-Package Hazard Mitigation
+
+`graphql@16` and `@graphql-tools/schema@10` can create a schema whose
+`instanceof GraphQLSchema` check fails in vitest's ESM context due to dual
+module realms. Mitigations:
+
+1. **Tests use `yoga.handle(request)` HTTP interface** instead of raw
+   `graphql()` / `validate()` — avoids `assertSchema()` instanceof check
+2. **Complexity rule uses `Symbol.toStringTag`** instead of `isListType` /
+   `getNullableType` (which use `instanceof` internally)
+3. **Depth test uses `buildSchema` + `validate`** from the same `graphql` import
+   (avoids cross-package instanceof hazard with @graphql-tools/schema)
+4. **graphql downgraded to v16** from v17 (graphql-yoga v5 peerDep is
+   `^15.2.0 || ^16.0.0`)
+
+## 3. Implementation
+
+### Files Created
+
+| File                                        | Lines | Purpose                                                                                                          |
+| ------------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------- |
+| `src/lib/graphql/schema.ts`                 | 180   | SDL typeDefs — all root types, enums, scalars (JSON, DateTime), Query, Subscription                              |
+| `src/lib/graphql/resolvers.ts`              | 376   | Resolver map — Query, Subscription, field resolvers (Session.emotions, Session.turns), custom scalars, mappers   |
+| `src/lib/graphql/security.ts`               | 151   | Depth limit, complexity limit, introspection gate, error formatter                                               |
+| `src/lib/graphql/server.ts`                 | 148   | graphql-yoga `createYoga` setup — schema, context, plugins, CORS, health check, GraphiQL                         |
+| `src/lib/graphql/redis-pubsub.ts`           | 276   | Redis-backed PubSub adapter with in-memory fallback — subscriptions via ioredis duplicate connections            |
+| `src/lib/graphql/persisted-queries.ts`      | 108   | Persisted operations store + `usePersistedOperations` plugin — production query allowlist                        |
+| `src/lib/graphql/anonymized-metrics.ts`     | 363   | Real AnonymizedMetrics resolver — AnonymizationService + AIRepository, k-anonymity=5, consent gating             |
+| `src/lib/graphql/auth-directive.ts`         | 120   | `@auth(scope)` and `@requireRole(role)` schema transformer — wraps resolvers with auth + scope checks (PIX-4065) |
+| `src/lib/graphql/schema.graphql`            | 330   | Extracted SDL for graphql-codegen input — includes @auth/@requireRole directive definitions                      |
+| `codegen.ts`                                | 30    | graphql-codegen config — schema, documents, plugins (typescript + typescript-operations)                         |
+| `src/lib/graphql/operations/*.graphql`      | 100   | Operation documents — Health, Sessions, Emotions, Interventions, AnonymizedMetrics, Subscriptions                |
+| `src/lib/graphql/generated/types.ts`        | 392   | Generated typed operations + schema types (deduplicated enum declarations)                                       |
+| `src/lib/graphql/client.ts`                 | 450   | Type-safe SDK client using graphql-request — dual-mode auth, all queries, subscription document strings          |
+| `src/lib/graphql/README.md`                 | 80    | SDK documentation — quick start, auth, subscriptions, browser usage, regeneration instructions                   |
+| `src/pages/api/graphql.ts`                  | 20    | Astro API route — GET/POST/OPTIONS → `yoga.handle(request)`                                                      |
+| `src/lib/graphql/__tests__/graphql.test.ts` | 380   | 32 server tests via `yoga.handle()` HTTP interface — includes directive auth tests (PIX-4065)                    |
+| `src/lib/graphql/__tests__/client.test.ts`  | 400   | 21 SDK client tests — client creation, queries, auth headers, subscriptions, errors (PIX-4066)                   |
+
+### Files Modified
+
+| File                           | Change                                                                                                                                                                                              |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/auth/route-config.ts` | Added `/api/graphql` route config + developer memory route configs (strategy: either, family: public/developer)                                                                                     |
+| `src/lib/auth/index.ts`        | Extended `getCurrentUser` + `validateApiKeyAndGetUser` to return `scopes[]` for directive scope checking (PIX-4065)                                                                                 |
+| `config/vitest.config.ts`      | Added graphql packages to `optimizeDeps.include`, added test files to `baseNodeTestGlobs`                                                                                                           |
+| `package.json`                 | Added graphql, graphql-yoga, graphql-ws, graphql-depth-limit, graphql-query-complexity, @graphql-tools/schema, @graphql-tools/utils, graphql-request, @graphql-codegen/* + `codegen:graphql` script |
+
+### Schema Definition (SDL Summary)
+
+```graphql
+enum SessionType {
+  INDIVIDUAL
+  GROUP
+  FAMILY
+  CRISIS
+}
+enum SessionStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+enum RiskAssessment {
+  LOW
+  MEDIUM
+  HIGH
+}
+enum EmotionSource {
+  TEXT
+  VOICE
+  MULTIMODAL
+}
+enum ConversationRole {
+  USER
+  ASSISTANT
+}
+enum PersonaMode {
+  THERAPY
+  ASSISTANT
+}
+enum TrendDirection {
+  INCREASING
+  DECREASING
+  STABLE
+}
+
+scalar JSON
+scalar DateTime
+
+type EmotionVector {
+  joy: Float!
+  sadness: Float!
+  anger: Float!
+  fear: Float!
+  surprise: Float!
+  disgust: Float!
+  trust: Float!
+  anticipation: Float!
+}
+type EmotionDimensions {
+  valence: Float!
+  arousal: Float!
+  dominance: Float!
+}
+type EmotionConfidence {
+  overall: Float!
+  perEmotion: EmotionVector!
+}
+type EmotionMetadata {
+  source: EmotionSource!
+  processingTime: Int
+  modelVersion: String
+  confidence: EmotionConfidence
+}
+type EmotionAnalysis {
+  id: ID!
+  sessionId: ID!
+  timestamp: DateTime!
+  emotions: EmotionVector!
+  dimensions: EmotionDimensions!
+  confidence: Float!
+  metadata: EmotionMetadata
+}
+
+type EQScores {
+  emotional_awareness: Float
+  empathy_recognition: Float
+  emotional_regulation: Float
+  social_cognition: Float
+  interpersonal_skills: Float
+  overall_eq: Float
+}
+type ConversationMetadata {
+  detected_techniques: [String!]!
+  technique_consistency: Float
+  bias_score: Float
+  safety_score: Float
+  crisis_signals: [String!]
+  therapeutic_effectiveness_score: Float
+}
+type PixelMetrics {
+  response: String!
+  inference_time_ms: Int!
+  eq_scores: EQScores
+  conversation_metadata: ConversationMetadata
+  persona_mode: PersonaMode!
+  confidence: Float!
+}
+type ConversationTurn {
+  id: ID!
+  role: ConversationRole!
+  content: String!
+  timestamp: DateTime!
+  pixel_metrics: PixelMetrics
+}
+
+type SessionAIAnalysis {
+  emotional_state: [String!]!
+  techniques: [String!]!
+  recommendations: [String!]!
+  risk_assessment: RiskAssessment!
+}
+type Session {
+  id: ID!
+  clientId: ID!
+  therapistId: ID
+  startTime: DateTime!
+  endTime: DateTime
+  session_type: SessionType
+  status: SessionStatus
+  notes: String
+  transcript: String
+  metadata: JSON
+  ai_analysis: SessionAIAnalysis
+  emotions: [EmotionAnalysis!]!
+  turns: [ConversationTurn!]!
+}
+
+type InterventionRecord {
+  id: ID!
+  userId: ID!
+  conversation: JSON
+  intervention: JSON
+  user_response: JSON
+  effectiveness: Float
+  insights: String
+  recommended_follow_up: String
+  metadata: JSON
+}
+
+type StatSummary {
+  mean: Float!
+  median: Float!
+  std_dev: Float!
+  count: Int!
+}
+type TechniqueStat {
+  mean: Float!
+  median: Float!
+  std_dev: Float!
+  count: Int!
+  confidence_interval: [Float!]!
+}
+type DemographicBreakdown {
+  count: Int!
+  percentage: Float!
+}
+type TrendPoint {
+  mean: Float!
+  trend: TrendDirection!
+  slope: Float!
+}
+type TemporalTrend {
+  emotion_trends: JSON
+  technique_trends: JSON
+}
+type PrivacyMetrics {
+  k_anonymity: Int!
+  differential_privacy_epsilon: Float!
+  reidentification_risk: Float!
+}
+type AnonymizedMetrics {
+  aggregate_emotion_scores: JSON!
+  technique_effectiveness: JSON!
+  demographic_breakdown: JSON!
+  temporal_trends: JSON!
+  privacy_metrics: PrivacyMetrics!
+}
+
+type Query {
+  session(id: ID!): Session
+  sessions(filters: SessionFilters): [Session!]!
+  emotions(sessionId: ID!): [EmotionAnalysis!]!
+  interventions(userId: ID!): [InterventionRecord!]!
+  anonymized_metrics: AnonymizedMetrics!
+  health: String!
+}
+type Subscription {
+  session_updated: Session!
+  emotion_analysis_created: EmotionAnalysis!
+  conversation_turn_added: ConversationTurn!
+}
+```
+
+### Resolver Data Sources
+
+| Resolver                   | Source                 | Method                                                                                                                                                                               |
+| -------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `Query.session`            | `AIRepository`         | `getSessionsByIds([id])`                                                                                                                                                             |
+| `Query.sessions`           | `AIRepository`         | `getSessions(filter)` — non-admin defaults to `therapistId = user.id`                                                                                                                |
+| `Query.emotions`           | `AIRepository`         | `getEmotionsForSession(sessionId)`                                                                                                                                                   |
+| `Query.interventions`      | `AIRepository`         | `getInterventionAnalysisByUser(userId)` — non-admin can only query own                                                                                                               |
+| `Query.anonymized_metrics` | `AnonymizationService` | `resolveAnonymizedMetrics()` — fetches sessions+emotions, maps to `ResearchDataPoint[]`, anonymizes, aggregates. Admin-only. Error path returns kAnonymity=0, reidentificationRisk=1 |
+| `Query.health`             | —                      | Returns `"ok"`                                                                                                                                                                       |
+| `Session.emotions`         | `AIRepository`         | `getEmotionsForSession(parent.id)`                                                                                                                                                   |
+| `Session.turns`            | —                      | Returns `[]` (no DB store for conversation turns)                                                                                                                                    |
+| `Subscription.*`           | `graphqlPubSub`        | Redis pub/sub (ioredis duplicate connections), auth-gated. Falls back to in-memory `EventEmitter` when Redis unavailable                                                             |
+
+### Test Coverage
+
+25 integration tests covering:
+
+- Health query (1)
+- Session queries — auth, empty, by ID (4)
+- Emotion queries — auth, empty (2)
+- Intervention queries — auth, empty (2)
+- AnonymizedMetrics — real privacy metrics from AnonymizationService, auth (2)
+- Depth limit — rejects deep queries, accepts valid depth (2)
+- Complexity limit — rejects high-cost queries, accepts simple queries (2)
+- Session field resolvers — emotions, turns (2)
+- Auth enforcement across all query types (5)
+- Subscription auth enforcement (3)
+
+## 4. Packages
+
+| Package                                     | Version  | Purpose                                                    |
+| ------------------------------------------- | -------- | ---------------------------------------------------------- |
+| `graphql`                                   | ^16.0.0  | Core GraphQL spec (downgraded from v17 for yoga v5 compat) |
+| `graphql-yoga`                              | ^5.21.2  | GraphQL server (createYoga)                                |
+| `graphql-ws`                                | ^6.1.0   | WebSocket subscription protocol (future use)               |
+| `graphql-depth-limit`                       | ^1.1.0   | Depth limit validation rule                                |
+| `graphql-query-complexity`                  | ^1.1.1   | Installed but replaced by custom rule (ESM compat)         |
+| `@graphql-tools/schema`                     | ^10.0.38 | `makeExecutableSchema` for SDL + resolvers                 |
+| `@graphql-yoga/plugin-persisted-operations` | latest   | Persisted operations plugin for production query allowlist |
+
+## 5. Consequences
+
+### Positive
+
+- Unified query interface for nested data (session → emotions → metadata)
+- Real-time subscriptions via Redis pub/sub with in-memory fallback
+- Persisted query allowlist for production (only approved queries accepted)
+- AnonymizedMetrics wired to AnonymizationService with k-anonymity and consent
+  gating
+- Strong security: depth + complexity limits, auth gating, introspection off in
+  production
+- Clear ownership boundaries ready for future federation split
+- Minimal new dependencies (graphql-yoga is lightweight)
+
+### Negative
+
+- ESM/CJS dual-package hazard in vitest requires workarounds (HTTP interface
+  tests, Symbol.toStringTag type detection)
+- ConversationTurn has no DB store — resolver returns empty array
+- `graphql-query-complexity` installed but unused (custom rule replaces it due
+  to ESM instanceof issues)
+- RedisClient type unresolvable in oxlint — produces warnings (ioredis type
+  resolution issue, not a runtime problem)
+
+### Neutral
+
+- graphql downgraded from v17 to v16 for graphql-yoga v5 compatibility
+- Schema is modular monolithic, not federated — can split later without breaking
+  changes
+
+## 6. Future Work
+
+| Item                | Linear | Description                                                           |
+| ------------------- | ------ | --------------------------------------------------------------------- |
+| Federation split    | Future | Split schema into subgraphs when ai-inference-service is extracted    |
+| WebSocket transport | Future | graphql-ws server for browser subscriptions (currently HTTP/SSE only) |
+
+## 7. Verification
+
+- ✅ 53/53 tests passing (32 server tests + 21 SDK client tests)
+- ✅ LSP diagnostics: zero errors on all files
+- ✅ Lint: zero errors (warnings only from unresolvable RedisClient type)
+- ✅ Route config added to `ROUTE_CONFIGS`
+- ✅ GraphQL endpoint at `/api/graphql` (GET/POST/OPTIONS)
+- ✅ Depth limit (10) enforced
+- ✅ Complexity limit (1000) enforced
+- ✅ Introspection disabled in production
+- ✅ Auth gating on all resolvers
+- ✅ Subscriptions wired to Redis pub/sub with in-memory fallback
+- ✅ Persisted queries enabled in production (query allowlist)
+- ✅ AnonymizedMetrics wired to AnonymizationService (k-anonymity=5, consent
+  gating)
+- ✅ `@auth(scope)` and `@requireRole(role)` directives functional (PIX-4065)
+- ✅ `@auth(scope: "admin")` on `anonymizedMetrics` enforces scope-based authz
+- ✅ graphql-codegen produces typed SDK client from SDL + operation documents
+  (PIX-4066)
+- ✅ Generated SDK client usable in Node and browser via `graphql-request`
+  (PIX-4066)
+- ✅ SDK documentation auto-generated at `src/lib/graphql/README.md` (PIX-4066)
+
+## 8. References
+
+- PIX-3928: GraphQL Federation Layer (parent epic)
+- PIX-4064: GraphQL Schema Design & Server Setup (this implementation)
+- PIX-4065: GraphQL Auth Integration & Field-Level Security
+- PIX-4066: GraphQL Code Generation & SDK Client
+- PIX-3925: Dual-mode auth and API key infrastructure
+- PIX-3926: AI Processing Microservice Isolation
+- ADR-0001: Core Architecture
+  (`src/content-store/docs/architecture/decisions/0001-core-architecture.md`)
+- `docs/architecture/auth-boundaries.md`: Dual-mode auth design
+- `src/lib/graphql/`: Implementation directory
+- `src/lib/db/ai/repository.ts`: AIRepository data access layer
