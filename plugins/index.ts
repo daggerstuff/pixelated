@@ -10,7 +10,7 @@ import rehypeExternalLinks from 'rehype-external-links'
 import remarkImgattr from 'remark-imgattr'
 import { visit } from 'unist-util-visit'
 
-import { UI } from '../src/config'
+import { UI } from '../apps/web/src/config'
 import remarkReadingTime from './remark-reading-time'
 
 export const remarkPlugins: RemarkPlugins = [

@@ -3,8 +3,8 @@
 This document is the integration spec for promoting **Brené Brown** to a
 permanent fourth monthly adversarial reviewer, co-located with the existing
 in-tree 3-persona monthly path
-(`monthly_adversarial_llm_review.py` runs Pied Piper, Man In Black, and LLM
-Fidelity Engineer for the same month). The 4-persona monthly review is
+(`monthly_adversarial_llm_review.py` runs Voice Fidelity Auditor, Clinical
+Accuracy Reviewer, and Training Signal Engineer for the same month). The 4-persona monthly review is
 additive only: the existing script is unchanged, the existing CLI surface
 is extended, and the existing report shape is mirrored.
 
@@ -15,12 +15,11 @@ proves the contract on a single month.
 
 ## Purpose
 
-The in-tree 3-persona path is voice-and-fidelity centric: Pied Piper checks
-that each persona sounds like themselves, Man In Black looks for the telltale
-signals that betray AI-generated artifacts, and LLM Fidelity Engineer audits
-training-signal quality. The path deliberately avoids "clinical realism"
-questions — the assumption has been that the corpus is a startup
-communications corpus, not a clinical-fiction training corpus.
+The in-tree 3-persona path is voice-and-fidelity centric: Voice Fidelity Auditor checks
+that each persona sounds like themselves, Clinical Accuracy Reviewer looks for clinical
+errors and safety violations, and Training Signal Engineer audits
+training-signal quality. The path evaluates clinical training communications
+for the Pixelated Empathy platform — a clinical AI training corpus.
 
 The Brené Brown persona is a vulnerability / storytelling ethicist whose
 anti-signals are clinically weighted: she asks whether the specific emotion
@@ -42,7 +41,7 @@ advancing month-over-month.
 ## Persona descriptor binding
 
 This spec binds to the canonical persona descriptor at
-`hackathon/personas/quadit/brene_brown.toml`. That file is the single source
+`pixelated_empathy/brene_brown.toml` (co-located with this package). That file is the single source
 of truth for the persona's voice, anti-signal taxonomy, sample-finding
 template, signature strings, and severity rubric. The reviewer MUST NOT
 duplicate any of these into the implementation; the implementation MUST
@@ -75,7 +74,7 @@ summary's `taxonomy` field is a non-regression violation.
 ## CLI surface
 
 The spec extends the existing `corpus` CLI (defined in
-`hackathon/corpus/corpus-generator/pixelated_empathy/cli.py`) with a new
+`pixelated_empathy/cli.py`) with a new
 subcommand:
 
 ```
@@ -116,7 +115,7 @@ the three-persona-shape mirrored to a single-persona shape).
 
 The 5 anti-signal categories are the descriptor's
 `auditor_anti_signals` list, loaded verbatim from
-`hackathon/personas/quadit/brene_brown.toml`:
+`pixelated_empathy/brene_brown.toml`:
 
 1. `armoring-as-strong-leadership` — categorical voice that paints
    numbing, perfectionism, hustling, cool, or cynicism as professional
@@ -171,8 +170,8 @@ N=200-per-stage sample because the monthly path is more frequent (every
 month vs. every wave) and the Brené Brown reviewer's cost-per-prompt is
 roughly 3-7 seconds. Stratification by sender is necessary because the
 reviewer's armoring-as-strong-leadership anti-signal is most loud on
-sender-day subsections where one persona dominates (e.g. Chad-em-dash on a
-late-quarter deck-prep day).
+sender-day subsections where one persona dominates (e.g. Ada-em-dash on a
+gate-review day).
 
 Stratification algorithm:
 

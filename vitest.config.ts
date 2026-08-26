@@ -12,38 +12,38 @@ const memorySchemaAlias = {
   replacement: path.resolve(projectRoot, 'packages/memory-schema/src/index.ts'),
 }
 const baseNodeTestGlobs = [
-  'src/tests/health-monitor.test.ts',
-  'src/tests/hipaa-compliance.test.ts',
-  'src/lib/logging/__tests__/audit-logger.test.ts',
-  'src/pages/api/**/*.test.ts',
-  'src/pages/api/**/*.spec.ts',
-  'src/pages/api/**/__tests__/**/*.test.ts',
-  'src/api/routes/__tests__/**/*.test.ts',
-  'src/api/middleware/__tests__/**/*.test.ts',
-  'src/api/memory/__tests__/**/*.test.ts',
-  'src/lib/auth/**/*.test.ts',
-  'src/lib/shared/**/*.test.ts',
-  'src/lib/services/product-memory-gateway.test.ts',
-  'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
+  'apps/web/src/tests/health-monitor.test.ts',
+  'apps/web/src/tests/hipaa-compliance.test.ts',
+  'apps/web/src/lib/logging/__tests__/audit-logger.test.ts',
+  'apps/web/src/pages/api/**/*.test.ts',
+  'apps/web/src/pages/api/**/*.spec.ts',
+  'apps/web/src/pages/api/**/__tests__/**/*.test.ts',
+  'apps/web/src/api/routes/__tests__/**/*.test.ts',
+  'apps/web/src/api/middleware/__tests__/**/*.test.ts',
+  'apps/web/src/api/memory/__tests__/**/*.test.ts',
+  'apps/web/src/lib/auth/**/*.test.ts',
+  'apps/web/src/lib/shared/**/*.test.ts',
+  'apps/web/src/lib/services/product-memory-gateway.test.ts',
+  'apps/web/src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
   'tests/unit/auth0/**/*.test.ts',
   'tests/integration/auth0/**/*.test.ts',
-  'src/lib/redis.test.ts',
-  'src/lib/services/notification/__tests__/NotificationService.test.ts',
-  'src/lib/__tests__/security-implementation.test.ts',
-  'src/lib/ai/__tests__/getAIService.test.ts',
-  'src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
-  'src/lib/graphql/__tests__/graphql.test.ts',
-  'src/lib/graphql/__tests__/client.test.ts',
+  'apps/web/src/lib/redis.test.ts',
+  'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
+  'apps/web/src/lib/__tests__/security-implementation.test.ts',
+  'apps/web/src/lib/ai/__tests__/getAIService.test.ts',
+  'apps/web/src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
+  'apps/web/src/lib/graphql/__tests__/graphql.test.ts',
+  'apps/web/src/lib/graphql/__tests__/client.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
   ? [
       'tests/integration/auth0/**/*.test.ts',
       'tests/integration/patient-psi-crisis.test.ts',
-      'src/lib/ai/services/PatientResponseService.test.ts',
-      'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
-      'src/lib/services/redis/__tests__/Analytics.integration.test.ts',
-      'src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
+      'apps/web/src/lib/ai/services/PatientResponseService.test.ts',
+      'apps/web/src/lib/services/redis/__tests__/RedisService.integration.test.ts',
+      'apps/web/src/lib/services/redis/__tests__/Analytics.integration.test.ts',
+      'apps/web/src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts',
       'tests/integration/bias-detection-api.integration.test.ts',
     ]
   : []
@@ -51,8 +51,8 @@ const ciNodeTestGlobs = process.env['CI']
 // CPU-bound load/performance tests excluded from default runs
 // Run them explicitly with: VITEST_TARGET_TESTS="<path>" pnpm vitest run -c vitest.config.ts
 const cpuBoundNodeTestExcludes = [
-  'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
-  'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.performance.test.ts',
+  'apps/web/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
+  'apps/web/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.performance.test.ts',
 ]
 
 const nodeTestGlobs: string[] = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
@@ -110,7 +110,7 @@ export default defineConfig({
   resolve: {
     alias: [
       memorySchemaAlias,
-      { find: '@/', replacement: `${path.resolve(process.cwd(), 'src')}/` },
+      { find: '@/', replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/` },
       {
         find: 'react-dom/test-utils',
         replacement: path.resolve(
@@ -122,7 +122,7 @@ export default defineConfig({
         find: /@testing-library\/react\/dist\/act-compat\.js$/,
         replacement: path.resolve(
           projectRoot,
-          'src/test/testing-library-act-compat.ts',
+          'apps/web/src/test/testing-library-act-compat.ts',
         ),
       },
       {
@@ -149,7 +149,7 @@ export default defineConfig({
     maxWorkers: process.env['CI'] ? 1 : 8,
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./apps/web/src/test/setup.ts'],
     css: {
       modules: {
         classNameStrategy: 'non-scoped' as const,
@@ -159,18 +159,18 @@ export default defineConfig({
       targetedTestGlobs.length > 0
         ? targetedTestGlobs
         : [
-            'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+            'apps/web/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
             'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
           ],
     exclude: [
       '**/node_modules/**',
-      'src/tests/simple-browser-compatibility.test.ts',
-      'src/tests/browser-compatibility.test.ts',
-      'src/tests/mobile-compatibility.test.ts',
-      'src/tests/cross-browser-compatibility.test.ts',
-      'src/e2e/breach-notification.spec.ts',
-      'src/tests/performance.test.ts',
-      'src/tests/responsive-navigation.test.js',
+      'apps/web/src/tests/simple-browser-compatibility.test.ts',
+      'apps/web/src/tests/browser-compatibility.test.ts',
+      'apps/web/src/tests/mobile-compatibility.test.ts',
+      'apps/web/src/tests/cross-browser-compatibility.test.ts',
+      'apps/web/src/e2e/breach-notification.spec.ts',
+      'apps/web/src/tests/performance.test.ts',
+      'apps/web/src/tests/responsive-navigation.test.js',
       'tests/integration/complete-system.integration.test.ts',
       'tests/e2e/**/*',
       'tests/browser/**/*',
@@ -191,7 +191,7 @@ export default defineConfig({
             memorySchemaAlias,
             {
               find: '@/',
-              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+              replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/`,
             },
             {
               find: 'react-dom/test-utils',
@@ -204,7 +204,7 @@ export default defineConfig({
               find: /@testing-library\/react\/dist\/act-compat\.js$/,
               replacement: path.resolve(
                 process.cwd(),
-                'src/test/testing-library-act-compat.ts',
+                'apps/web/src/test/testing-library-act-compat.ts',
               ),
             },
             {
@@ -233,13 +233,13 @@ export default defineConfig({
         },
         test: {
           globals: true,
-          setupFiles: ['./src/test/setup.ts'],
+          setupFiles: ['./apps/web/src/test/setup.ts'],
           name: 'jsdom',
           include:
             targetedTestGlobs.length > 0
               ? targetedJsdomTestGlobs
               : [
-                  'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                  'apps/web/src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                   'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                 ],
           environment: 'jsdom',
@@ -253,29 +253,28 @@ export default defineConfig({
           exclude: [
             '**/node_modules/**',
             ...nodeTestGlobs,
-            'src/lib/security/__tests__/**/*.test.ts',
-            'src/lib/ehr/__tests__/**/*.test.ts',
-            'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
-            'src/lib/redis.test.ts',
-            'src/lib/services/notification/__tests__/NotificationService.test.ts',
-            'src/lib/__tests__/security-implementation.test.ts',
+            'apps/web/src/lib/security/__tests__/**/*.test.ts',
+            'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'apps/web/src/lib/redis.test.ts',
+            'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
+            'apps/web/src/lib/__tests__/security-implementation.test.ts',
             'tests/integration/complete-system.integration.test.ts',
-            'src/tests/simple-browser-compatibility.test.ts',
-            'src/tests/browser-compatibility.test.ts',
-            'src/tests/mobile-compatibility.test.ts',
-            'src/tests/cross-browser-compatibility.test.ts',
-            'src/e2e/breach-notification.spec.ts',
-            'src/tests/performance.test.ts',
-            'src/tests/responsive-navigation.test.js',
+            'apps/web/src/tests/simple-browser-compatibility.test.ts',
+            'apps/web/src/tests/browser-compatibility.test.ts',
+            'apps/web/src/tests/mobile-compatibility.test.ts',
+            'apps/web/src/tests/cross-browser-compatibility.test.ts',
+            'apps/web/src/e2e/breach-notification.spec.ts',
+            'apps/web/src/tests/performance.test.ts',
+            'apps/web/src/tests/responsive-navigation.test.js',
             'tests/e2e/**/*',
             'tests/browser/**/*',
             'tests/accessibility/**/*',
             'tests/performance/**/*',
             'tests/security/**/*',
-            'src/api/routes/__tests__/**/*.test.ts',
-            'src/api/middleware/__tests__/**/*.test.ts',
-            'src/lib/services/redis/__tests__/*.integration.test.ts',
-            'src/tests/integration/dream-consolidation.integration.test.ts',
+            'apps/web/src/api/routes/__tests__/**/*.test.ts',
+            'apps/web/src/api/middleware/__tests__/**/*.test.ts',
+            'apps/web/src/lib/services/redis/__tests__/*.integration.test.ts',
+            'apps/web/src/tests/integration/dream-consolidation.integration.test.ts',
             'backups/**',
             'backups/**/*',
             'worktrees/**',
@@ -290,24 +289,23 @@ export default defineConfig({
             memorySchemaAlias,
             {
               find: '@/',
-              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+              replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/`,
             },
           ],
         },
         test: {
           globals: true,
-          setupFiles: ['./src/test/setup-node.ts'],
+          setupFiles: ['./apps/web/src/test/setup-node.ts'],
           name: 'node',
           include:
             targetedTestGlobs.length > 0
               ? targetedNodeTestGlobs
               : [
                   ...nodeTestGlobs,
-                  'src/lib/security/__tests__/**/*.test.ts',
-                  'src/lib/ehr/__tests__/allscripts.test.ts',
-                  'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
-                  'src/tests/auth.test.ts',
-                  'src/tests/integration/dream-consolidation.integration.test.ts',
+                  'apps/web/src/lib/security/__tests__/**/*.test.ts',
+                  'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'apps/web/src/tests/auth.test.ts',
+                  'apps/web/src/tests/integration/dream-consolidation.integration.test.ts',
                 ],
           exclude: [
             '**/node_modules/**',

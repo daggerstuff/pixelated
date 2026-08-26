@@ -76,20 +76,20 @@ function runHipaaTests() {
   }
 
   // TypeScript HIPAA tests
-  if (fileExists('src/test/hipaa-compliance.test.ts')) {
+  if (fileExists('apps/web/src/test/hipaa-compliance.test.ts')) {
     tests.push(
       runCommand(
-        'NODE_ENV=test pnpm vitest run src/test/hipaa-compliance.test.ts --reporter=verbose',
+        'NODE_ENV=test pnpm vitest run apps/web/src/test/hipaa-compliance.test.ts --reporter=verbose',
         'TypeScript HIPAA compliance tests'
       )
     )
   } else {
-    console.log('⚠️  src/test/hipaa-compliance.test.ts not found - skipping TypeScript HIPAA tests')
+    console.log('⚠️  apps/web/src/test/hipaa-compliance.test.ts not found - skipping TypeScript HIPAA tests')
   }
 
   // Verify audit logging exists
   console.log('\n📋 Verifying audit logging infrastructure...')
-  if (fileExists('src/lib/security/audit.logging.ts')) {
+  if (fileExists('apps/web/src/lib/security/audit.logging.ts')) {
     console.log('✓ Audit logging module exists')
   } else {
     console.log('⚠️  Audit logging module not found')
@@ -97,7 +97,7 @@ function runHipaaTests() {
 
   // Verify encryption exists
   console.log('\n🔐 Verifying encryption infrastructure...')
-  if (fileExists('src/lib/fhe/seal-service.ts')) {
+  if (fileExists('apps/web/src/lib/fhe/seal-service.ts')) {
     console.log('✓ FHE/SEAL encryption service exists')
   } else {
     console.log('⚠️  FHE/SEAL encryption service not found')
@@ -131,10 +131,10 @@ function runSecurityTests() {
 
   // TypeScript security tests
   const tsSecurityTests = [
-    'src/lib/security/__tests__/phiDetection.test.ts',
-    'src/lib/security/__tests__/dlp.test.ts',
-    'src/lib/security/__tests__/token.encryption.test.ts',
-    'src/lib/security/__tests__/audit.logging.test.ts',
+    'apps/web/src/lib/security/__tests__/phiDetection.test.ts',
+    'apps/web/src/lib/security/__tests__/dlp.test.ts',
+    'apps/web/src/lib/security/__tests__/token.encryption.test.ts',
+    'apps/web/src/lib/security/__tests__/audit.logging.test.ts',
   ]
 
   const existingTests = tsSecurityTests.filter((f) => fileExists(f))
@@ -185,10 +185,10 @@ function runCryptoTests() {
 
   // TypeScript crypto/FHE tests
   const tsCryptoTests = [
-    'src/lib/fhe/__tests__/key-rotation.test.ts',
-    'src/lib/fhe/__tests__/parameter-optimizer.test.ts',
-    'src/lib/fhe/__tests__/multi-tenant-isolation.test.ts',
-    'src/lib/security/__tests__/token.encryption.test.ts',
+    'apps/web/src/lib/fhe/__tests__/key-rotation.test.ts',
+    'apps/web/src/lib/fhe/__tests__/parameter-optimizer.test.ts',
+    'apps/web/src/lib/fhe/__tests__/multi-tenant-isolation.test.ts',
+    'apps/web/src/lib/security/__tests__/token.encryption.test.ts',
   ]
 
   const existingTests = tsCryptoTests.filter((f) => fileExists(f))
@@ -206,11 +206,11 @@ function runCryptoTests() {
   }
 
   // Test FHE service directly
-  if (fileExists('src/lib/fhe/test-seal-integration.ts')) {
+  if (fileExists('apps/web/src/lib/fhe/test-seal-integration.ts')) {
     console.log('\n🔬 Running SEAL integration test...')
     tests.push(
       runCommand(
-        'NODE_ENV=test pnpm tsx src/lib/fhe/test-seal-integration.ts',
+        'NODE_ENV=test pnpm tsx apps/web/src/lib/fhe/test-seal-integration.ts',
         'SEAL encryption integration test'
       )
     )

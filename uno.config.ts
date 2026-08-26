@@ -8,7 +8,7 @@ export default defineConfig({
         /node_modules/,
         /dist/,
         /content-store/,
-        /business-strategy-cms/,
+        /apps\/business-strategy-cms/,
         /docs\//,
         /tests?\//,
         /public\//,
@@ -23,7 +23,8 @@ export default defineConfig({
     fontFamily: {
       sans: 'var(--np-font-body, "Switzer", ui-sans-serif, system-ui, sans-serif)',
       mono: 'var(--np-font-mono, "IoskeleyMono", ui-monospace, monospace)',
-      display: 'var(--np-font-display, "IoskeleyMono", ui-monospace, monospace)',
+      display:
+        'var(--np-font-display, "IoskeleyMono", ui-monospace, monospace)',
     },
   },
   presets: [

@@ -1,4 +1,0 @@
-services:
-  ai-service:
-    volumes:
-      - ../ai/api:/app/api

@@ -67,20 +67,26 @@ export async function saveSessionHeader(
   try {
     const d = await connect()
     const now = new Date().toISOString()
-    const result = await d.collection<SessionDoc>(SESSIONS_COLLECTION).updateOne(
-      { session_id: sessionId },
-      {
-        $set: {
-          session_id: sessionId,
-          trainee_id: traineeId,
-          scenario_id: scenarioId,
-          state,
-          updated_at: now,
+    const result = await d
+      .collection<SessionDoc>(SESSIONS_COLLECTION)
+      .updateOne(
+        { session_id: sessionId },
+        {
+          $set: {
+            session_id: sessionId,
+            trainee_id: traineeId,
+            scenario_id: scenarioId,
+            state,
+            updated_at: now,
+          },
+          $setOnInsert: {
+            started_at: now,
+            transcripts: [],
+            emotion_rollups: [],
+          },
         },
-        $setOnInsert: { started_at: now, transcripts: [], emotion_rollups: [] },
-      },
-      { upsert: true },
-    )
+        { upsert: true },
+      )
     return result.upsertedId?.toString() ?? sessionId
   } catch (err) {
     console.error('[mongo-client] saveSessionHeader failed:', err)

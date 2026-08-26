@@ -1,7 +1,8 @@
-import { defineTool } from 'eve/tools'
-import { z } from 'zod'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+
+import { defineTool } from 'eve/tools'
+import { z } from 'zod'
 
 const execFileAsync = promisify(execFile)
 
@@ -13,9 +14,13 @@ export default defineTool({
   inputSchema: SCHEMA,
   async execute() {
     try {
-      const { stdout } = await execFileAsync('uv', ['run', 'python', 'scripts/fix/verify_repairs.py'], {
-        cwd: '/home/vivi/pixelated/hackathon',
-      })
+      const { stdout } = await execFileAsync(
+        'uv',
+        ['run', 'python', 'scripts/fix/verify_repairs.py'],
+        {
+          cwd: '/home/vivi/pixelated/hackathon',
+        },
+      )
 
       return {
         success: true,

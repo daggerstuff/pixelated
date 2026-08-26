@@ -6,7 +6,7 @@ import type {
   ActionFeedbackPair as LocalActionFeedbackPair,
   ReflexionResult as LocalReflexionResult,
   VerbalReflection as LocalVerbalReflection,
-} from '../../../src/lib/memory/reflection/reflexion'
+} from '../../../apps/web/src/lib/memory/reflection/reflexion'
 import type {
   ActionFeedbackPair,
   ReflexionResult,

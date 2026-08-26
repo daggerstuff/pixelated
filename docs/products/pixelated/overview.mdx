@@ -1,0 +1,124 @@
+---
+title: 'Pixelated — Platform Overview'
+description:
+  'The main orchestrator of the Pixelated Empathy ecosystem — app surfaces,
+  clinical dashboards, API routes, and shared product logic.'
+---
+
+## What Is Pixelated?
+
+**Pixelated** is the primary application that users interact with. It is the
+main orchestrator of the Pixelated Empathy ecosystem — handling the web
+frontend, clinical dashboards, API routes, authentication, and the integration
+layer that connects the AI cognitive engine and the Foresight memory system.
+
+The platform is built with **Astro** for content-heavy pages, **React 19** for
+interactive components, **TypeScript** throughout, **Express** for API routes,
+and **Python** for AI pipelines. Data is stored across **MongoDB**, **Redis**,
+**PostgreSQL**, and vector stores.
+
+<Info>
+  **Repository:**
+  [github.com/daggerstuff/pixelated](https://github.com/daggerstuff/pixelated)
+</Info>
+
+---
+
+## Architecture Overview
+
+```text
+                    ┌─────────────────────────────────┐
+                    │           User (browser)         │
+                    └────────────┬────────────────────┘
+                                 │
+                    ┌────────────▼────────────────────┐
+                    │      Pixelated Frontend          │
+                    │    (Astro + React 19 + WS)       │
+                    └────────────┬────────────────────┘
+                                 │
+                    ┌────────────▼────────────────────┐
+                    │       Express API Routes          │
+                    │  (auth, sessions, analytics,      │
+                    │   bias, crisis, supervisor)        │
+                    └──┬─────────┬──────────┬──────────┘
+                       │         │          │
+              ┌────────▼──┐ ┌────▼─────┐ ┌──▼──────────┐
+              │  AI Engine │ │ Foresight │ │  MongoDB    │
+              │  (Python) │ │ (Memory)  │ │  Redis      │
+              └───────────┘ └──────────┘ │  PostgreSQL  │
+                                         │  Vector DB   │
+                                         └─────────────┘
+```
+
+---
+
+## Key Components
+
+### Frontend
+
+The frontend is built with **Astro** for static content and SEO-optimised pages,
+with **React 19** islands for interactive components like the Empathy Gym
+simulator, dashboards, and real-time feedback displays.
+
+- **Astro pages** — Landing, documentation, marketing
+- **React islands** — Simulator, dashboards, session viewer, feedback reports
+- **WebSockets** — Real-time session streaming and live scoring
+
+### API Routes
+
+Express-based REST and GraphQL API routes handle:
+
+- **Authentication** — Dual-mode auth (JWT via Auth0 + API keys). See
+  [Auth Boundaries](/reference/architecture/auth-boundaries).
+- **Session management** — Creating, streaming, and storing training sessions
+- **Bias analysis** — Real-time and post-session bias detection
+- **Analytics** — Progress tracking, cohort analytics, skill progression
+- **Crisis detection** — Real-time crisis signal monitoring and escalation
+- **Supervisor** — Cohort management, programme configuration, progress
+  monitoring
+
+### Data Layer
+
+The platform uses a polyglot persistence strategy:
+
+| Store          | What it holds                                       |
+| -------------- | --------------------------------------------------- |
+| **MongoDB**    | Session transcripts, scenario data, user profiles   |
+| **Redis**      | Caching, rate limiting, real-time session state     |
+| **PostgreSQL** | Relational data — users, organisations, cohorts     |
+| **Vector DB**  | Embeddings for semantic search, similarity matching |
+
+---
+
+## How It Connects
+
+Pixelated is the central hub. It calls the **AI Engine** for inference (emotion
+detection, response generation, client simulation, crisis monitoring) and uses
+**Foresight** for persistent memory across sessions.
+
+<CardGroup cols={2}>
+  <Card title="AI Engine" icon="brain" href="/products/ai/overview">
+    The cognitive engine that powers emotion detection, response generation, and
+    crisis monitoring.
+  </Card>
+  <Card title="Foresight" icon="database" href="/products/foresight/overview">
+    The persistent memory system that maintains continuity across training
+    sessions.
+  </Card>
+</CardGroup>
+
+---
+
+## Development
+
+See the [Developer Setup tutorial](/getting-started/developer-setup) to get the
+platform running locally.
+
+Key commands:
+
+| Command         | Description      |
+| --------------- | ---------------- |
+| `pnpm dev`      | Start dev server |
+| `pnpm build`    | Production build |
+| `pnpm test`     | Run tests        |
+| `pnpm test:e2e` | End-to-end tests |

@@ -25,9 +25,9 @@ import {
   RetentionPolicy,
   MemoryApiScope,
   MemoryApiRole,
-} from "../src/lib/memory/contract/v1.js";
+} from "../apps/web/src/lib/memory/contract/v1.js";
 
-import { MemoryApiErrorCode } from "../src/lib/memory/contract/errors.js";
+import { MemoryApiErrorCode } from "../apps/web/src/lib/memory/contract/errors.js";
 
 // ---------------------------------------------------------------------------
 // Helpers

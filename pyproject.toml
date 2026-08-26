@@ -52,6 +52,15 @@ dependencies = [
   "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
   "torch==2.13.0", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
+  # Stage 1 QA pipeline — PII scrubbing, language detection, toxicity, dedup (blueprint 1B/2A)
+  "presidio-analyzer>=2.2.35",
+  "presidio-anonymizer>=2.0.55",
+  "fasttext-langdetect>=1.0.3",
+  "detoxify>=0.5.2",
+  "datasketch>=1.6.5",
+  # Ingest router — HTML parsing and web text extraction (blueprint 1A)
+  "selectolax>=0.3.21",
+  "trafilatura>=1.12.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
   "sentry-sdk>=2.68.0",
@@ -165,12 +174,7 @@ test = [
   "types-requests",
   "hypothesis>=6.165.9",
 ]
-video-emotion = [
-  "pydantic>=2",
-  "numpy",
-  "opencv-python",
-  "pandas",
-]
+video-emotion = ["pydantic>=2", "numpy", "opencv-python", "pandas"]
 dev = [
   "black",
   "isort",

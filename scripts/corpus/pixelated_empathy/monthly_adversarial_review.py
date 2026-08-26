@@ -2,7 +2,9 @@
 
 Rejects:
 - Repeated normalized lines across bursts (Jaccard similarity above threshold)
-- Stock phrases: "circle back", "double-click", "synergize"
+- Stock phrases: corporate ("circle back", "double-click", "synergize") and
+  clinical wellness cliches ("hold space", "lean into", "name it to tame it",
+  "healing is not linear", "you are enough")
 - Formulaic openers: "I hope this finds you well"
 - Chat lines that just restate the parent message (cosine/overlap heuristic)
 - Empty/placeholder bodies: "-m", "-c", "short natural subject"
@@ -34,7 +36,15 @@ from pixelated_empathy.schemas import (
 STOCK_PHRASES_RE = re.compile(
     r"\b(circle back|double.click|synergize|synergies|leverage|per my last email"
     r"|going forward|reach out|touch base|move the needle|deep.dive"
-    r"|bandwidth|unpack|ideate|deliverables|actionable|paradigm.shift)\b",
+    r"|bandwidth|unpack|ideate|deliverables|actionable|paradigm.shift)\b"
+    r"|"
+    r"\b(hold space|lean into|sit with|name it to tame it|feel your feelings"
+    r"|do the work|trust the process|it'?s a journey|growth mindset"
+    r"|resilience is key|every emotion is valid|healing is not linear"
+    r"|you are enough|self.care is not selfish|trigger warning"
+    r"|practice self.compassion|be gentle with yourself"
+    r"|radical acceptance|mindful awareness|emotional regulation"
+    r"|trauma.informed approach|safe space|brave space)\b",
     re.IGNORECASE,
 )
 
