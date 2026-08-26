@@ -6,11 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { NoteSigningService } from '../note-signing-service'
-import {
-  EHRAuditService,
-  EHRAuditAction,
-  EHRResourceType,
-} from '../../audit'
+import { EHRAuditService, EHRAuditAction, EHRResourceType } from '../../audit'
 import type { DocumentReference } from '../../types'
 import type { RLSContext } from '../../repositories'
 
@@ -98,10 +94,7 @@ describe('NoteSigningService', () => {
     })
 
     it('rejects array (batch) requests', () => {
-      const result = service.validateManualSign([
-        { note: {} },
-        { note: {} },
-      ])
+      const result = service.validateManualSign([{ note: {} }, { note: {} }])
 
       expect(result.isAutomated).toBe(true)
       expect(result.reason).toContain('Batch signing')
