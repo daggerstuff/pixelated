@@ -8,7 +8,6 @@
  * PIX-4426 G2.1 — AI No Auto-Sign Gate
  */
 
-import type { DocumentReference } from '../types'
 import {
   EHRAuditService,
   EHRAuditAction,
@@ -16,6 +15,7 @@ import {
   type EHRAuditMetadata,
 } from '../audit'
 import type { RLSContext } from '../repositories'
+import type { DocumentReference } from '../types'
 
 // ---------------------------------------------------------------------------
 // Types

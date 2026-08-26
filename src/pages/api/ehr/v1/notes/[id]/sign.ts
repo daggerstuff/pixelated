@@ -10,6 +10,8 @@
  * - Logs full audit trail: note_id, drafter (AI), signer (clinician), signed_at
  */
 
+import { z } from 'zod'
+
 import {
   resolveTenantId,
   requireEHRPermission,
@@ -21,7 +23,6 @@ import {
 } from '@/lib/ehr-native/api'
 import { noteSigningService } from '@/lib/ehr-native/services'
 import { withV1Contract } from '@/lib/middleware/with-v1-contract'
-import { z } from 'zod'
 
 const signRequestSchema = z.object({
   /** The AI-drafted note to sign (FHIR DocumentReference) */
@@ -71,7 +72,14 @@ export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
       `Invalid request body: ${parsed.error.issues.map((i) => i.message).join('; ')}`,
     )
 
-  const { note, patient_id, encounter_id, signer_ref, breakGlassActivated, breakGlassReason } = parsed.data as any
+  const {
+    note,
+    patient_id,
+    encounter_id,
+    signer_ref,
+    breakGlassActivated,
+    breakGlassReason,
+  } = parsed.data as any
 
   // Verify the note ID in the URL matches the note in the body
   const bodyNoteId = (note as Record<string, unknown>)['id']
