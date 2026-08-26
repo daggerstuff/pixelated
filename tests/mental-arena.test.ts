@@ -8,11 +8,11 @@ import {
   DisorderCategory,
   validateConversation,
   VERSION,
-} from '../src/lib/ai/mental-arena'
+} from '../apps/web/src/lib/ai/mental-arena'
 import type {
   MentalArenaProvider,
   FHEService,
-} from '../src/lib/ai/mental-arena/MentalArenaAdapter'
+} from '../apps/web/src/lib/ai/mental-arena/MentalArenaAdapter'
 
 // Mock provider for testing
 class TestMentalArenaProvider {

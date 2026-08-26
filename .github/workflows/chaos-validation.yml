@@ -79,16 +79,16 @@ jobs:
             echo "Running all scenarios sequentially..."
             for exp in pod-kill network-latency network-partition http-chaos postgres foresight-mcp; do
               echo "=== Running $exp ==="
-              kubectl apply -f "k8s/chaos/${exp}-experiment.yaml"
+              kubectl apply -f "infra/k8s/chaos/${exp}-experiment.yaml"
               sleep $((DURATION / 4))
-              kubectl delete -f "k8s/chaos/${exp}-experiment.yaml" --ignore-not-found=true
+              kubectl delete -f "infra/k8s/chaos/${exp}-experiment.yaml" --ignore-not-found=true
               sleep 60
             done
           else
             echo "Running $SCENARIO for ${DURATION}s..."
-            kubectl apply -f "k8s/chaos/${SCENARIO}-experiment.yaml"
+            kubectl apply -f "infra/k8s/chaos/${SCENARIO}-experiment.yaml"
             sleep "$DURATION"
-            kubectl delete -f "k8s/chaos/${SCENARIO}-experiment.yaml" --ignore-not-found=true
+            kubectl delete -f "infra/k8s/chaos/${SCENARIO}-experiment.yaml" --ignore-not-found=true
           fi
 
       - name: Monitor experiment

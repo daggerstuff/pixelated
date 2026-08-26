@@ -47,7 +47,7 @@ const ZOD_4_REPLACEMENT = {
 }
 
 /** Files to scan. */
-const SCAN_GLOB = 'src/**/*.{ts,tsx}'
+const SCAN_GLOB = 'apps/web/src/**/*.{ts,tsx}'
 
 /** Files to ignore even if they match the scan glob. */
 const SCAN_IGNORE = [

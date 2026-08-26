@@ -8,14 +8,14 @@ import type { SatoriOptions } from 'satori'
 import satori from 'satori'
 import type { VFile } from 'vfile'
 
-import { FEATURES } from '../src/config'
-import type { BgType } from '../src/types'
+import { FEATURES } from '../apps/web/src/config'
+import type { BgType } from '../apps/web/src/types'
 import {
   checkFileExistsInDir,
   unescapeHTML,
   type VNode,
-} from '../src/utils/common'
-import { getCurrentFormattedTime } from '../src/utils/datetime'
+} from '../apps/web/src/utils/common'
+import { getCurrentFormattedTime } from '../apps/web/src/utils/datetime'
 import { ogImageMarkup } from './og-template/markup'
 
 interface AstroFrontmatter {
@@ -91,7 +91,7 @@ function remarkGenerateOgImage() {
   return async function processFile(file: VFile & { data: AstroData }) {
     // regenerate fallback
     const fallbackExists = await checkFileExistsInDir(
-      'public/og-images',
+      'apps/web/public/og-images',
       'og-image.png',
     )
     if (!fallbackExists) {
@@ -99,7 +99,7 @@ function remarkGenerateOgImage() {
         authorOrBrand,
         fallbackTitle,
         fallbackBgType,
-        'public/og-images/og-image.png',
+        'apps/web/public/og-images/og-image.png',
       )
     }
 
@@ -136,7 +136,7 @@ function remarkGenerateOgImage() {
     }
 
     const existingImage = await checkFileExistsInDir(
-      'public/og-images',
+      'apps/web/public/og-images',
       `${nameWithoutExt}.png`,
     )
     if (existingImage) {
@@ -146,7 +146,7 @@ function remarkGenerateOgImage() {
     // check if it has been assigned & actually exists
     if (pageOgImage && pageOgImage !== true) {
       const assignedImageExists = await checkFileExistsInDir(
-        'public/og-images',
+        'apps/web/public/og-images',
         basename(pageOgImage),
       )
       if (assignedImageExists) {
@@ -167,7 +167,7 @@ function remarkGenerateOgImage() {
       authorOrBrand,
       title.trim(),
       bgType,
-      `public/og-images/${nameWithoutExt}.png`,
+      `apps/web/public/og-images/${nameWithoutExt}.png`,
     )
   }
 }

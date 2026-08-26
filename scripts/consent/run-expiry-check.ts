@@ -3,9 +3,9 @@
  * Consent expiry check script for CI.
  * Runs the expiry check and outputs results.
  */
-import { getConsentExpiryService, resetConsentExpiryService } from "../../src/lib/consent";
-import { initializeDatabase } from "../../src/lib/db";
-import { parseDatabaseUrl } from "../../src/lib/db/parse-database-url";
+import { getConsentExpiryService, resetConsentExpiryService } from "../../apps/web/src/lib/consent";
+import { initializeDatabase } from "../../apps/web/src/lib/db";
+import { parseDatabaseUrl } from "../../apps/web/src/lib/db/parse-database-url";
 
 async function main() {
   // Initialize the connection pool so the consent queries run against a real

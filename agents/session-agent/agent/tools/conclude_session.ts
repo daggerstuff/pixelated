@@ -1,8 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { updateSessionState } from '../mongo-client.js'
 import { storeMemory } from '../foresight-client.js'
+import { updateSessionState } from '../mongo-client.js'
 
 // Finalize a session: stop accepting new turns, persist the closing state,
 // emit a session.closed event. This is the durable boundary marker for

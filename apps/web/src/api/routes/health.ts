@@ -1,0 +1,146 @@
+// Health Check Routes
+// Service status and connectivity monitoring
+
+import express, { Router, Request, Response } from 'express'
+
+import {
+  getMongoConnection,
+  getPostgresPool,
+  getRedisClient,
+} from '../../lib/db/connection'
+
+const router: Router = express.Router()
+
+// ============================================================================
+// BASIC HEALTH CHECK
+// ============================================================================
+
+router.get('/', (_req: Request, res: Response) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env['NODE_ENV'] ?? 'development',
+  })
+})
+
+// ============================================================================
+// DETAILED HEALTH CHECK
+// ============================================================================
+
+router.get('/detailed', async (_req: Request, res: Response) => {
+  const health: any = {
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    services: {},
+  }
+
+  // Check MongoDB
+  try {
+    const mongoConn = getMongoConnection()
+    const adminDbConnection = mongoConn.db
+    if (!adminDbConnection) {
+      throw new Error('MongoDB admin database is not initialized')
+    }
+    const adminDb = adminDbConnection.admin()
+    const serverStatus = await adminDb.serverStatus()
+    health.services.mongodb = {
+      status: 'connected',
+      uptime: serverStatus['uptime'],
+    }
+  } catch (error: unknown) {
+    health.services.mongodb = {
+      status: 'disconnected',
+      error: (error as Error).message,
+    }
+    health.status = 'degraded'
+  }
+
+  // Check PostgreSQL
+  try {
+    const pool = getPostgresPool()
+    const client = await pool.connect()
+    const result = await client.query('SELECT NOW() as now')
+    client.release()
+    health.services.postgresql = {
+      status: 'connected',
+      timestamp:
+        (result.rows[0] as { now?: unknown } | undefined)?.now ?? new Date(),
+    }
+  } catch (error: unknown) {
+    health.services.postgresql = {
+      status: 'disconnected',
+      error: (error as Error).message,
+    }
+    health.status = 'degraded'
+  }
+
+  // Check Redis
+  try {
+    const redis = getRedisClient()
+    const pong = await redis.ping()
+    health.services.redis = {
+      status: 'connected',
+      response: pong,
+    }
+  } catch (error: unknown) {
+    health.services.redis = {
+      status: 'disconnected',
+      error: (error as Error).message,
+    }
+    health.status = 'degraded'
+  }
+
+  const statusCode = health.status === 'ok' ? 200 : 503
+  res.status(statusCode).json(health)
+})
+
+// ============================================================================
+// READINESS CHECK (for Kubernetes)
+// ============================================================================
+
+router.get(
+  '/ready',
+  async (_req: Request, res: Response): Promise<Response> => {
+    try {
+      // Check all critical services
+      const mongo = getMongoConnection()
+      const postgres = getPostgresPool()
+
+      if (!mongo || !postgres) {
+        return res.status(503).json({
+          ready: false,
+          reason: 'Database connections not initialized',
+        })
+      }
+
+      // Test PostgreSQL
+      const client = await postgres.connect()
+      await client.query('SELECT 1')
+      client.release()
+
+      return res.json({
+        ready: true,
+        timestamp: new Date().toISOString(),
+      })
+    } catch (error: unknown) {
+      return res.status(503).json({
+        ready: false,
+        error: (error as Error).message,
+      })
+    }
+  },
+)
+
+// ============================================================================
+// LIVENESS CHECK (for Kubernetes)
+// ============================================================================
+
+router.get('/live', (_req: Request, res: Response) => {
+  res.json({
+    alive: true,
+    timestamp: new Date().toISOString(),
+  })
+})
+
+export default router

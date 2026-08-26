@@ -60,19 +60,19 @@ check-all: ## Run all checks (typecheck + lint + format)
 # ── Docker ──────────────────────────────────────────────
 
 docker-up: ## Start database containers
-	docker compose -f docker/docker-compose.db.yml up -d
+	docker compose -f infra/docker/docker-compose.db.yml up -d
 
 docker-down: ## Stop database containers
-	docker compose -f docker/docker-compose.db.yml down
+	docker compose -f infra/docker/docker-compose.db.yml down
 
 docker-logs: ## Tail database container logs
-	docker compose -f docker/docker-compose.db.yml logs -f
+	docker compose -f infra/docker/docker-compose.db.yml logs -f
 
 # ── Unified Backend Stack ─────────────────────────────────
 
 # Sources .env.backend into the shell so compose interpolation sees
 # POSTGRES_PASSWORD / REDIS_PASSWORD / etc., then runs compose.
-BACKEND_COMPOSE := set -a; . ./.env.backend; set +a; docker compose -f docker/docker-compose.backend.yml
+BACKEND_COMPOSE := set -a; . ./.env.backend; set +a; docker compose -f infra/docker/docker-compose.backend.yml
 
 backend-up: ## Start the full backend stack (databases + APIs + services + monitoring)
 	$(BACKEND_COMPOSE) up -d

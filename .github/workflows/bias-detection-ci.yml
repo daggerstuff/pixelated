@@ -12,17 +12,17 @@ on:
   push:
     branches: [main, master, staging]
     paths:
-      - src/lib/ai/bias-detection/**
-      - src/components/admin/bias-detection/**
-      - src/pages/api/bias-detection/**
+      - apps/web/src/lib/ai/bias-detection/**
+      - apps/web/src/components/admin/bias-detection/**
+      - apps/web/src/pages/api/bias-detection/**
       - tests/**/*bias-detection*
       - .github/workflows/bias-detection-ci.yml
   pull_request:
     branches: [main, master, staging]
     paths:
-      - src/lib/ai/bias-detection/**
-      - src/components/admin/bias-detection/**
-      - src/pages/api/bias-detection/**
+      - apps/web/src/lib/ai/bias-detection/**
+      - apps/web/src/components/admin/bias-detection/**
+      - apps/web/src/pages/api/bias-detection/**
       - tests/**/*bias-detection*
       - .github/workflows/bias-detection-ci.yml
 
@@ -140,7 +140,8 @@ jobs:
       - name: Check formatting
         continue-on-error: true
         env:
-          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA:
+            ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -155,7 +156,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     needs: [security-scan, code-quality]
-    if: ${{ needs.security-scan.result == 'success' && needs.code-quality.result
+    if:
+      ${{ needs.security-scan.result == 'success' && needs.code-quality.result
       == 'success' }}
     services:
       postgres:
@@ -205,7 +207,7 @@ jobs:
       - name: Run unit tests
         run: |
           export NODE_OPTIONS="${NODE_OPTIONS//--experimental-wasm-exnref/}"
-          VITEST_TARGET_TESTS="src/lib/ai/bias-detection/__tests__/*.test.ts;src/components/admin/bias-detection/**/*.test.ts;src/components/admin/bias-detection/**/*.test.tsx" \
+          VITEST_TARGET_TESTS="apps/web/src/lib/ai/bias-detection/__tests__/*.test.ts;apps/web/src/components/admin/bias-detection/**/*.test.ts;apps/web/src/components/admin/bias-detection/**/*.test.tsx" \
           VITEST_COVERAGE_ENABLED=false \
           npx vitest run -c config/vitest.config.ts
         env:
@@ -292,11 +294,11 @@ jobs:
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
         with:
-          service-dir: src/lib/ai/bias-detection/python-service
+          service-dir: apps/web/src/lib/ai/bias-detection/python-service
 
       - name: Sync CI constraints from pinned requirements
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
           REQUIREMENTS_FILE="../requirements.txt"
           if [ ! -f "${REQUIREMENTS_FILE}" ]; then
             echo "Error: ${REQUIREMENTS_FILE} not found"
@@ -335,22 +337,23 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
+          key:
+            ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
             hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
 
       - name: Install Python dependencies
         run: |
-          if [ ! -d "src/lib/ai/bias-detection/python-service" ]; then
+          if [ ! -d "apps/web/src/lib/ai/bias-detection/python-service" ]; then
             echo "Error: Python service directory not found"
-            ls -la src/lib/ai/bias-detection/
+            ls -la apps/web/src/lib/ai/bias-detection/
             exit 1
           fi
 
           # Prepare uv venv using the composite action, then use its output
           # NOTE: composite actions run as steps, so this shell block only performs installs after the action has run.
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
 
           # Use the use-system output if set
           USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
@@ -364,7 +367,7 @@ jobs:
       - name: Run Python linting
         continue-on-error: true
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
           uv pip install flake8 black isort
           # Check formatting with black
           uv run black --check --diff --exclude '.venv' .
@@ -375,7 +378,7 @@ jobs:
 
       - name: Run Python tests
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
           uv run python -m pytest tests/test_bias_detection_service.py -v --cov=bias_detection_service --cov-report=xml --cov-fail-under=25
         env:
           DEBUG: 'false'
@@ -391,7 +394,7 @@ jobs:
       - name: Upload Python coverage
         uses: codecov/codecov-action@v7.0.0
         with:
-          files: ./src/lib/ai/bias-detection/python-service/coverage.xml
+          files: ./apps/web/src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python
           name: python-coverage
 
@@ -448,11 +451,11 @@ jobs:
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
         with:
-          service-dir: src/lib/ai/bias-detection/python-service
+          service-dir: apps/web/src/lib/ai/bias-detection/python-service
 
       - name: Sync CI constraints from pinned requirements
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
           REQUIREMENTS_FILE="../requirements.txt"
           if [ ! -f "${REQUIREMENTS_FILE}" ]; then
             echo "Error: ${REQUIREMENTS_FILE} not found"
@@ -489,7 +492,7 @@ jobs:
 
       - name: Install Python ML dependencies
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
 
           USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
 
@@ -523,7 +526,7 @@ jobs:
 
       - name: Start Python ML service
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
           uv run python bias_detection_service.py &
           PYTHON_PID=$!
           echo "Started Python service with PID: $PYTHON_PID"

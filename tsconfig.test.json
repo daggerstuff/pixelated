@@ -4,16 +4,16 @@
     "types": ["node", "react", "react-dom", "vitest/globals"]
   },
   "include": [
-    "./src/**/*.test.ts",
-    "./src/**/*.test.tsx",
-    "./src/**/*.spec.ts",
-    "./src/**/*.spec.tsx",
+    "./apps/web/src/**/*.test.ts",
+    "./apps/web/src/**/*.test.tsx",
+    "./apps/web/src/**/*.spec.ts",
+    "./apps/web/src/**/*.spec.tsx",
     "./tests/**/*.ts",
     "./tests/**/*.tsx",
     "./tests/**/*.spec.ts",
     "./tests/**/*.test.ts",
-    "./src/types/**/*.d.ts",
-    "./src/types/**/*.ts",
+    "./apps/web/src/types/**/*.d.ts",
+    "./apps/web/src/types/**/*.ts",
     "./types/**/*.d.ts",
     "./types/**/*.ts"
   ]

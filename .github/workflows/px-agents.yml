@@ -17,7 +17,7 @@ on:
   push:
     branches: [staging]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'ai/**'
       - 'cli/**'
       - 'agents/**'
@@ -54,10 +54,10 @@ jobs:
         env:
           PX_LOCAL: '1'
         run: |
-          node cli/px/dist/index.mjs serve --port 2000 &
+          node tools/px/dist/index.mjs serve --port 2000 &
           SERVE_PID=$!
           sleep 2
-          node cli/px/dist/index.mjs advisor review --json > advisor-review.json
+          node tools/px/dist/index.mjs advisor review --json > advisor-review.json
           kill $SERVE_PID
           cat advisor-review.json
 
@@ -128,10 +128,10 @@ jobs:
         env:
           PX_LOCAL: '1'
         run: |
-          node cli/px/dist/index.mjs serve --port 2000 &
+          node tools/px/dist/index.mjs serve --port 2000 &
           SERVE_PID=$!
           sleep 2
-          node cli/px/dist/index.mjs qa score --json > qa-score.json
+          node tools/px/dist/index.mjs qa score --json > qa-score.json
           kill $SERVE_PID
           cat qa-score.json
 

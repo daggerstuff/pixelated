@@ -6,14 +6,15 @@ Three deployment options for the 8-agent Pixelated Empathy fleet.
 
 - Node.js 24.x (agents use Eve framework)
 - Each agent must be built: `cd agents/<agent>-agent && pnpm exec eve build`
-- Cloudflare Workers AI credentials (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_AI_API_KEY`)
+- Cloudflare Workers AI credentials (`CLOUDFLARE_ACCOUNT_ID`,
+  `CLOUDFLARE_AI_API_KEY`)
 - Foresight MCP server running and reachable (streamable HTTP at `/mcp`)
 - MongoDB for session-agent persistence
 
 ## Port Assignments
 
-| Agent    | Port |
-|----------|------|
+| Agent      | Port |
+| ---------- | ---- |
 | supervisor | 2000 |
 | advisor    | 2005 |
 | content    | 2010 |
@@ -51,6 +52,7 @@ curl http://127.0.0.1:2000/eve/v1/health
 ```
 
 Uninstall:
+
 ```bash
 sudo bash agents/deploy/systemd/install.sh --uninstall
 ```
@@ -101,13 +103,15 @@ curl http://127.0.0.1:8080/eve/v1/health
 ## Health Check
 
 All agents expose `GET /eve/v1/health` returning:
+
 ```json
-{"ok": true, "status": "ready", "workflowId": "workflow//eve//workflowEntry"}
+{ "ok": true, "status": "ready", "workflowId": "workflow//eve//workflowEntry" }
 ```
 
 ## Session API
 
 All agents accept conversational sessions via:
+
 - `POST /eve/v1/session` — create a session (requires HTTP Basic auth)
 - `GET /eve/v1/session/:sessionId/stream` — SSE stream of session events
 
@@ -116,13 +120,14 @@ All agents accept conversational sessions via:
 Three agents have cron schedules (handled automatically on Vercel; on
 bare-metal/k8s, point the host scheduler at the POST endpoint):
 
-| Agent    | Schedule        | Endpoint                                |
-|----------|-----------------|-----------------------------------------|
-| qa       | `30 23 * * *`   | `POST /eve/v1/dev/schedules/daily-review` |
-| advisor  | `0 9 * * 1`     | `POST /eve/v1/dev/schedules/weekly-review` |
-| pipeline | `0 9 * * 1`     | `POST /eve/v1/dev/schedules/weekly-train` |
+| Agent    | Schedule      | Endpoint                                   |
+| -------- | ------------- | ------------------------------------------ |
+| qa       | `30 23 * * *` | `POST /eve/v1/dev/schedules/daily-review`  |
+| advisor  | `0 9 * * 1`   | `POST /eve/v1/dev/schedules/weekly-review` |
+| pipeline | `0 9 * * 1`   | `POST /eve/v1/dev/schedules/weekly-train`  |
 
 Example crontab entry:
+
 ```cron
 30 23 * * *  curl -s -u admin:secret -X POST http://127.0.0.1:2030/eve/v1/dev/schedules/daily-review
  0  9 * * 1  curl -s -u admin:secret -X POST http://127.0.0.1:2005/eve/v1/dev/schedules/weekly-review

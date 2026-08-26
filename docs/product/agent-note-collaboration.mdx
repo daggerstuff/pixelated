@@ -1,0 +1,193 @@
+---
+title: 'Agent Note Collaboration'
+description: >
+  Build an agent-native collaboration layer where LLM agents pass work through
+  structured, traceable notes and converge through explicit
+  propose-counter-synthesize-handoff cycles.
+sidebarTitle: 'Agent Note Collaboration'
+---
+
+You can run meaningful multi-agent work without forcing direct file editing.
+This page defines a product concept where autonomous agents collaborate through
+typed, auditable notes and only commit final, governed decisions.
+
+## What this product is
+
+You can think of the platform as an **Agent Commons**.
+
+The commons is a shared collaboration space where every agent turn is a
+structured note in a persistent **Turn Log**. Agents can critique, improve, and
+extend ideas without stepping on each other’s code changes.
+
+<CardGroup cols={2}>
+  <Card title="Problem" icon="triangle-alert">
+    Agents lose context when they hand work between each other or when state is
+    scattered across ad-hoc messages.
+  </Card>
+  <Card title="Solution" icon="sparkles">
+    A typed note-led protocol that makes reasoning, disagreement, consensus, and
+    escalation explicit.
+  </Card>
+  <Card title="Outcome" icon="route">
+    Faster problem solving and cleaner outputs because every claim is debated,
+    validated, and traceable.
+  </Card>
+  <Card title="Why now" icon="clock">
+    Better observability for AI collaboration creates trust and lowers the cost
+    of supervision.
+  </Card>
+</CardGroup>
+
+## Core model
+
+### 1) Turn log (typed ledger)
+
+The Turn Log is the central artifact. Each row is one agent turn.
+
+- `turnId`: stable unique id
+- `artifactId`: target project, file, or conversation id
+- `role`: `scribe`, `critic`, `synthesizer`, `human-reviser`, `router`
+- `phase`: `Observe`, `Propose`, `Counter`, `Synthesize`, `Handoff`
+- `confidence`: `0.0` to `1.0`
+- `assumptions`: assumptions the turn depends on
+- `openQuestions`: explicit unknowns blocking finalization
+- `decision`: what the agent is recommending
+- `citations`: links to evidence, tool outputs, or earlier turns
+- `requestedAction`: commit, escalate, ask-human, merge, or defer
+- `replyTo`: predecessor turn id
+- `expiresAt`: optional review deadline
+
+### 2) Collaboration protocol
+
+The protocol is a strict but flexible loop:
+
+- **Observe**: read current state and map constraints.
+- **Propose**: add a concrete suggestion with rationale.
+- **Counter**: challenge assumptions and run adversarial review.
+- **Synthesize**: merge good points into a stronger version.
+- **Handoff**: move ownership to the best agent, implementation engine, or
+  human.
+
+Each phase is auditable. No silent state changes are allowed.
+
+### 3) Governance guardrails
+
+Every turn must include:
+
+- `confidence` score
+- at least one `assumption` and one `openQuestion`
+- source-backed `evidence` where possible
+- escalation metadata when confidence is low or policy limits trigger
+
+If a turn has unresolved safety risks, a separate **Escalation Thread** is
+created with mandatory review before any handoff.
+
+## Why this is different
+
+Most systems have orchestration and handoffs.
+
+This approach makes the _interaction itself_ the product surface: every debate,
+revision, and consensus event is visible and replayable.
+
+This is useful when you need:
+
+- cross-functional agents (research, coding, QA, design, security) iterating in
+  public
+- reproducibility for compliance and quality audits
+- transparent AI behavior for teams reviewing high-stakes changes
+
+## Minimal architecture
+
+### Agent responsibilities
+
+1. **Observation Agent** keeps context continuity and reads the latest artifact
+   state.
+1. **Proposal Agents** generate candidate changes and alternatives.
+1. **Critic Agents** run consistency, policy, and safety checks.
+1. **Synthesis Agent** merges compatible proposals and resolves minor conflicts.
+1. **Router Agent** selects final path and creates the next handoff target.
+1. **Human or implementation engine** consumes approved handoff turns.
+
+### Data structure (reference)
+
+```json
+{
+  "turnId": "urn:agentturn:2026-03-02T12:00:00Z:tx-001",
+  "artifactId": "file://src/components/assessment-form.tsx",
+  "phase": "Counter",
+  "role": "critic",
+  "agentId": "agent-crispr",
+  "confidence": 0.91,
+  "assumptions": [
+    "The current helper API supports cancellation tokens.",
+    "No runtime regression is acceptable for patient-facing latency."
+  ],
+  "openQuestions": [
+    "Should we keep backward-compatible return types for v1 clients?"
+  ],
+  "decision": "Reject proposal until fallback path added.",
+  "evidence": ["docs/internal/sla.md", "runtime-benchmarks#turn-112"],
+  "requestedAction": "handoff",
+  "replyTo": "urn:agentturn:2026-03-02T11:54:22Z:tx-089"
+}
+```
+
+### Handoff contract (machine-readable)
+
+```ts
+export type HandoffResult = {
+  nextAgent: string
+  summary: string
+  requiredContext: string[]
+  mustKeepOpen: string[]
+  constraints: string[]
+  nextPhase: 'Observe' | 'Propose' | 'Counter' | 'Synthesize' | 'Handoff'
+}
+```
+
+## Example workflow
+
+1. The Proposal Agent reviews unresolved bug reports and creates a patch idea in
+   the Turn Log.
+1. A Critic Agent counters with a risk: the change may break backward
+   compatibility.
+1. A second Critic adds a safer alternative architecture.
+1. The Synthesis Agent merges the strongest points and sets confidence.
+1. The Router Agent hands the final decision to the implementation engine.
+
+You end up with a decision that includes who agreed, who objected, and why.
+
+## MVP rollout
+
+### Sprint 1 — Protocol foundation
+
+- Persist Turn Log entries with schema validation.
+- Implement phase transitions and required metadata.
+- Build a web view showing live thread activity and unresolved questions.
+
+### Sprint 2 — Opinionated quality loop
+
+- Add parallel counter agents for policy, code quality, and product consistency.
+- Add confidence thresholds and escalation rules.
+- Add deterministic replay of full turn history.
+
+### Sprint 3 — Handoff integration
+
+- Connect Router Agent to tool calls and external execution endpoints.
+- Add optional human-in-the-loop review step.
+- Add export format for audit and compliance.
+
+## Open questions for your implementation
+
+- Which artifact types should enter the commons first: planning docs, code
+  files, tests, or PR comments?
+- Do you want strict phase-time budgets to prevent stalled debates?
+- Should unresolved questions auto-escalate to humans or stay in-loop longer?
+
+## Next steps
+
+- Confirm your preferred artifact scope (coding, documentation, incident
+  response, or all).
+- Choose the first policy set to pilot (quality, safety, and cost controls).
+- Wire the first Router + Critic pair to one low-risk use case and compare it
+  against current handoff workflows.

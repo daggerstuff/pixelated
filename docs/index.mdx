@@ -1,0 +1,125 @@
+---
+title: 'Pixelated Empathy Documentation'
+description:
+  'Documentation for Pixelated Empathy — the clinical mental health AI platform
+  that trains professionals through simulated therapeutic practice.'
+---
+
+## Pixelated Empathy
+
+Pixelated Empathy is a clinical mental health AI platform. It provides training
+infrastructure for mental health professionals to practise difficult therapeutic
+conversations against AI clients, with real-time feedback on empathy, technique,
+bias, and crisis response.
+
+The platform is not a chatbot or a therapy replacement. It is empathy
+infrastructure — a gym where clinicians build and refine therapeutic skills
+through repeated, scored practice.
+
+<Note>
+  Pixelated Empathy is a proprietary, Early Access product. Visit
+  [pixelatedempathy.com](https://pixelatedempathy.com) for access.
+</Note>
+
+---
+
+## What's Here
+
+<CardGroup cols={2}>
+  <Card
+    title="Getting Started"
+    icon="rocket"
+    href="/getting-started/therapist-first-session"
+  >
+    Step-by-step tutorials for therapists, supervisors, and developers. Learn by
+    doing.
+  </Card>
+  <Card
+    title="Guides"
+    icon="book-open"
+    href="/guides/therapists/response-style"
+  >
+    How-to guides for working with the platform in real scenarios.
+  </Card>
+  <Card title="Reference" icon="code" href="/reference/api/introduction">
+    API documentation, architecture references, compliance, and enterprise
+    materials.
+  </Card>
+  <Card title="Concepts" icon="brain" href="/concepts">
+    The psychological frameworks, scoring models, and AI systems behind the
+    platform.
+  </Card>
+  <Card title="Products" icon="cube" href="/products/pixelated/overview">
+    Documentation for the three components: Pixelated, the AI engine, and
+    Foresight.
+  </Card>
+</CardGroup>
+
+---
+
+## The Ecosystem
+
+Pixelated Empathy consists of three interconnected components:
+
+| Component     | Role                                                                    | Stack                                        |
+| ------------- | ----------------------------------------------------------------------- | -------------------------------------------- |
+| **Pixelated** | Main orchestrator — app surfaces, clinical dashboards, API routes       | Astro, React 19, TypeScript, Express, Python |
+| **AI Engine** | Cognitive engine — model training, inference, emotional signal analysis | Python, PyTorch, SFT/DPO/GRPO                |
+| **Foresight** | Continuity and memory — persistent memory for AI agents                 | Python, PostgreSQL, MCP server               |
+
+Each component has its own repository and product overview under
+[Products](/products/pixelated/overview).
+
+---
+
+## Core Capabilities
+
+- **FHE-Based Security** — Strict HIPAA compliance via Fully Homomorphic
+  Encryption. Patient data remains encrypted even during model inference.
+- **The Empathy Gym** — 410+ validated therapeutic scenarios across 15+ cultural
+  contexts with real-time feedback.
+- **Real-Time Bias Detection** — 40+ bias categories monitored during sessions
+  with equitable AI guardrails.
+- **Crisis Detection** — Five signal categories with five-level risk
+  classification and escalation protocols.
+- **Foresight Continuity** — Longitudinal memory via MCP architecture for
+  multi-session therapeutic arcs.
+
+---
+
+## Audiences
+
+<CardGroup cols={2}>
+  <Card
+    title="For Therapists"
+    icon="heart-pulse"
+    href="/getting-started/therapist-first-session"
+  >
+    Practise therapeutic conversations against AI clients with scored feedback
+    on empathy, technique, and safety.
+  </Card>
+  <Card
+    title="For Supervisors"
+    icon="user-shield"
+    href="/getting-started/supervisor-onboarding"
+  >
+    Configure training programmes, monitor trainee progress, and set competency
+    thresholds.
+  </Card>
+  <Card
+    title="For Developers"
+    icon="code"
+    href="/getting-started/developer-setup"
+  >
+    Set up the platform locally, integrate via API, or extend the cognitive
+    engine.
+  </Card>
+  <Card
+    title="For Organisations"
+    icon="building"
+    href="/reference/enterprise/overview"
+  >
+    Enterprise deployment, compliance documentation, SLAs, and vendor
+    management.
+  </Card>
+</CardGroup>

@@ -30,10 +30,10 @@ from pixelated_empathy.schemas import (
 
 VALID_CHAT_ROOMS = {
     "#general",
-    "#engineering",
     "#clinical",
-    "#product",
-    "#design",
+    "#supervision",
+    "#engineering",
+    "#scenarios",
     "#infra",
     "#random",
     "#announcements",

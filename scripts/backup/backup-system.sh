@@ -105,9 +105,9 @@ backup_monitoring_data() {
 
 	# Backup Grafana dashboards and Prometheus data
 	tar -czf "${backup_file}" \
-		monitoring/dashboards/ \
-		monitoring/grafana/ \
-		monitoring/prometheus/ 2>/dev/null || true
+		infra/monitoring/dashboards/ \
+		infra/monitoring/grafana/ \
+		infra/monitoring/prometheus/ 2>/dev/null || true
 
 	if [[ -f ${backup_file} ]]; then
 		log_success "Monitoring data backup completed: ${backup_file}"

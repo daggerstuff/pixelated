@@ -9,8 +9,8 @@
 
 import { writeFileSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { getBiasAuditRunner } from '../../src/lib/ai/bias-detection/audit-runner'
-import type { TherapeuticSession } from '../../src/lib/ai/bias-detection/types'
+import { getBiasAuditRunner } from '../../apps/web/src/lib/ai/bias-detection/audit-runner'
+import type { TherapeuticSession } from '../../apps/web/src/lib/ai/bias-detection/types'
 
 const month = process.argv[2] ?? new Date().toISOString().slice(0, 7)
 

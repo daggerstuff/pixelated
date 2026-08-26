@@ -259,7 +259,12 @@ Sentry.init({
     // Also skip if PUBLIC_SENTRY_ALLOW_LOCALHOST is set to '1' for testing.
     const allowLocalhost = process.env.PUBLIC_SENTRY_ALLOW_LOCALHOST === '1'
     const isProduction = process.env.NODE_ENV === 'production'
-    if (!allowLocalhost && !isProduction && isRecord(event) && isRecord(event.request)) {
+    if (
+      !allowLocalhost &&
+      !isProduction &&
+      isRecord(event) &&
+      isRecord(event.request)
+    ) {
       const url = /** @type {Record<string, unknown>} */ (event.request).url
       if (typeof url === 'string') {
         try {

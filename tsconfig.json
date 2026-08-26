@@ -9,13 +9,13 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "~/*": ["./src/*"],
-      "@lib/*": ["./src/lib/*"],
-      "@components/*": ["./src/components/*"],
-      "@layouts/*": ["./src/layouts/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@types/*": ["./src/types/*"],
+      "@/*": ["./apps/web/src/*"],
+      "~/*": ["./apps/web/src/*"],
+      "@lib/*": ["./apps/web/src/lib/*"],
+      "@components/*": ["./apps/web/src/components/*"],
+      "@layouts/*": ["./apps/web/src/layouts/*"],
+      "@utils/*": ["./apps/web/src/utils/*"],
+      "@types/*": ["./apps/web/src/types/*"],
       "@pixelated/memory-schema": ["./packages/memory-schema/src"]
     },
     "allowJs": true,
@@ -50,7 +50,7 @@
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
     "types": ["node", "react", "react-dom"],
-    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "typeRoots": ["./node_modules/@types", "./apps/web/src/types"],
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"
@@ -58,11 +58,11 @@
     ]
   },
   "include": [
-    "./src/**/*.ts",
-    "./src/**/*.tsx",
-    "./src/**/*.astro",
-    "./src/types/**/*.ts",
-    "./src/types/**/*.d.ts",
+    "./apps/web/src/**/*.ts",
+    "./apps/web/src/**/*.tsx",
+    "./apps/web/src/**/*.astro",
+    "./apps/web/src/types/**/*.ts",
+    "./apps/web/src/types/**/*.d.ts",
     "./*.config.js",
     "./*.config.ts",
     "./*.config.mjs",
@@ -71,17 +71,16 @@
     "./api/**/*.ts",
     "./plugins/**/*.ts",
     "./packages/memory-schema/src/**/*.ts",
-    "./types/**/*.d.ts",
     "./.astro-env.d.ts",
-    "./src/types/declarations.d.ts",
-    "./src/types/astro-components.d.ts",
-    "./src/types/npm-packages.d.ts"
+    "./apps/web/src/types/declarations.d.ts",
+    "./apps/web/src/types/astro-components.d.ts",
+    "./apps/web/src/types/npm-packages.d.ts"
   ],
   "exclude": [
     "./dist",
     "./node_modules",
     "./**/node_modules/**",
-    "./src/scripts",
+    "./apps/web/src/scripts",
     "./.astro",
     "./.local",
     "./**/test-results/**",

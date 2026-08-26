@@ -5,6 +5,7 @@ Migration SQL files for the EHR native module.
 ## Structure
 
 All EHR tables follow the multi-tenant RLS pattern established in ADR-001:
+
 - `tenant_id UUID NOT NULL` column
 - RLS policy: `(tenant_id = current_setting('app.tenant_id')::UUID)`
 - FHIR R4 resources stored as JSONB (see ADR-002)

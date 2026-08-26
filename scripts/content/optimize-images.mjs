@@ -11,11 +11,11 @@ import { extname } from 'path'
 import {
   ALLOWED_DIRECTORIES,
   safeJoin,
-} from '../src/utils/path-security.ts'
+} from '../apps/web/src/utils/path-security.ts'
 import {
   imageOptimizer,
   generateOptimizationReport,
-} from '../src/lib/utils/image-optimizer.ts'
+} from '../apps/web/src/lib/utils/image-optimizer.ts'
 
 // Configuration
 const CONFIG = {

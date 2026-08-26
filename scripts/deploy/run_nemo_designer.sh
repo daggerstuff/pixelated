@@ -25,14 +25,14 @@ This script:
 USAGE
 }
 
-COMPOSE_FILE="docker/docker-compose.training.yml"
+COMPOSE_FILE="infra/docker/docker-compose.training.yml"
 SERVICE_NAME="nemo-data-designer"
 
 if [[ "${1:-}" == "--help" ]]; then
   usage
   exit 0
 elif [[ "${1:-}" == "--standalone" ]]; then
-  COMPOSE_FILE="docker/docker-compose.nemo-data-designer.yml"
+  COMPOSE_FILE="infra/docker/docker-compose.nemo-data-designer.yml"
 fi
 
 if [[ ! -f "$COMPOSE_FILE" ]]; then

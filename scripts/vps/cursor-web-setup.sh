@@ -254,8 +254,8 @@ start_databases() {
     export REDIS_PASSWORD="$redis_pass"
 
     # Run docker compose using absolute or relative paths
-    docker compose -f docker/docker-compose.db.yml up -d
-    docker compose -f docker/docker-compose.local-mongo.yml up -d
+    docker compose -f infra/docker/docker-compose.db.yml up -d
+    docker compose -f infra/docker/docker-compose.local-mongo.yml up -d
 
     log_success "Database containers are running:"
     docker ps --format "table {{.Names}}\t{{.Ports}}\t{{.Status}}"

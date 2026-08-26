@@ -6,11 +6,11 @@ const path = require('path')
 const localRunner = path.resolve(__dirname, './local-test-runner.cjs')
 
 const blockingTests = [
-  'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts',
-  'src/lib/auth/__tests__/middleware.test.ts',
-  'src/lib/auth/__tests__/multi-role-auth.test.ts',
-  'src/components/admin/bias-detection/BiasDashboard.test.tsx',
-  'src/tests/admin/system-health.test.ts',
+  'apps/web/src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.test.ts',
+  'apps/web/src/lib/auth/__tests__/middleware.test.ts',
+  'apps/web/src/lib/auth/__tests__/multi-role-auth.test.ts',
+  'apps/web/src/components/admin/bias-detection/BiasDashboard.test.tsx',
+  'apps/web/src/tests/admin/system-health.test.ts',
   'tests/integration/auth0/auth0-integration.test.ts',
 ]
 

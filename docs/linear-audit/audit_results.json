@@ -1,0 +1,1200 @@
+{
+  "summary": {
+    "total_issues": 537,
+    "duplicates_found": 34,
+    "unassigned_count": 3,
+    "missing_descriptions": 0,
+    "estimate_coverage_pct": 75.0,
+    "flagged_projects": 8,
+    "completed_not_archived": 23,
+    "status_distribution": {
+      "Triage": 5,
+      "Done": 396,
+      "In Progress": 12,
+      "Backlog": 20,
+      "Canceled": 97,
+      "Todo": 7
+    },
+    "status_type_distribution": {
+      "triage": 5,
+      "completed": 396,
+      "started": 12,
+      "backlog": 20,
+      "canceled": 97,
+      "unstarted": 7
+    }
+  },
+  "duplicates": [
+    {
+      "issue_a": {
+        "id": "PIX-4023",
+        "identifier": "PIX-4023",
+        "title": "Generate Q4 2025 Corpus Batch (Oct - Dec)",
+        "url": "https://linear.app/pixelated/issue/PIX-4023/generate-q4-2025-corpus-batch-oct-dec"
+      },
+      "issue_b": {
+        "id": "PIX-4022",
+        "identifier": "PIX-4022",
+        "title": "Generate Q3 2025 Corpus Batch (Jul - Sep)",
+        "url": "https://linear.app/pixelated/issue/PIX-4022/generate-q3-2025-corpus-batch-jul-sep"
+      },
+      "title_similarity": 0.854,
+      "description_similarity": 0.063
+    },
+    {
+      "issue_a": {
+        "id": "PIX-4000",
+        "identifier": "PIX-4000",
+        "title": "Error: Target container is not a DOM element.",
+        "url": "https://linear.app/pixelated/issue/PIX-4000/error-target-container-is-not-a-dom-element"
+      },
+      "issue_b": {
+        "id": "PIX-3999",
+        "identifier": "PIX-3999",
+        "title": "Error: Target container is not a DOM element.",
+        "url": "https://linear.app/pixelated/issue/PIX-3999/error-target-container-is-not-a-dom-element"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.5
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3998",
+        "identifier": "PIX-3998",
+        "title": "ReferenceError: Buffer is not defined",
+        "url": "https://linear.app/pixelated/issue/PIX-3998/referenceerror-buffer-is-not-defined"
+      },
+      "issue_b": {
+        "id": "PIX-3943",
+        "identifier": "PIX-3943",
+        "title": "ReferenceError: Buffer is not defined",
+        "url": "https://linear.app/pixelated/issue/PIX-3943/referenceerror-buffer-is-not-defined"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.5
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3959",
+        "identifier": "PIX-3959",
+        "title": "[Droid] Pipeline Agent \u2014 Eve scaffold + full AC",
+        "url": "https://linear.app/pixelated/issue/PIX-3959/droid-pipeline-agent-eve-scaffold-full-ac"
+      },
+      "issue_b": {
+        "id": "PIX-3958",
+        "identifier": "PIX-3958",
+        "title": "[Droid] QA Agent \u2014 Eve scaffold + full AC",
+        "url": "https://linear.app/pixelated/issue/PIX-3958/droid-qa-agent-eve-scaffold-full-ac"
+      },
+      "title_similarity": 0.886,
+      "description_similarity": 0.53
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3865",
+        "identifier": "PIX-3865",
+        "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete"
+      },
+      "issue_b": {
+        "id": "PIX-3796",
+        "identifier": "PIX-3796",
+        "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3796/320-checkpoint-phase-6-complete"
+      },
+      "title_similarity": 0.941,
+      "description_similarity": 0.026
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3865",
+        "identifier": "PIX-3865",
+        "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete"
+      },
+      "issue_b": {
+        "id": "PIX-3793",
+        "identifier": "PIX-3793",
+        "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3793/260-checkpoint-phase-4-complete"
+      },
+      "title_similarity": 0.941,
+      "description_similarity": 0.102
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3865",
+        "identifier": "PIX-3865",
+        "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete"
+      },
+      "issue_b": {
+        "id": "PIX-3711",
+        "identifier": "PIX-3711",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3711/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.045
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3865",
+        "identifier": "PIX-3865",
+        "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete"
+      },
+      "issue_b": {
+        "id": "PIX-464",
+        "identifier": "PIX-464",
+        "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-464/230-checkpoint-phase-3-complete"
+      },
+      "title_similarity": 0.941,
+      "description_similarity": 0.073
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3865",
+        "identifier": "PIX-3865",
+        "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete"
+      },
+      "issue_b": {
+        "id": "PIX-454",
+        "identifier": "PIX-454",
+        "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete"
+      },
+      "title_similarity": 0.912,
+      "description_similarity": 0.073
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3865",
+        "identifier": "PIX-3865",
+        "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3865/290-checkpoint-phase-5-complete"
+      },
+      "issue_b": {
+        "id": "PIX-430",
+        "identifier": "PIX-430",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-430/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.034
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3864",
+        "identifier": "PIX-3864",
+        "title": "28.0 Integration test \u2014 GRPO end-to-end",
+        "url": "https://linear.app/pixelated/issue/PIX-3864/280-integration-test-grpo-end-to-end"
+      },
+      "issue_b": {
+        "id": "PIX-3705",
+        "identifier": "PIX-3705",
+        "title": "25.0 Integration test \u2014 DPO end-to-end",
+        "url": "https://linear.app/pixelated/issue/PIX-3705/250-integration-test-dpo-end-to-end"
+      },
+      "title_similarity": 0.935,
+      "description_similarity": 0.105
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3799",
+        "identifier": "PIX-3799",
+        "title": "*30.2 Property test \u2014 crisis safety failure detection (Prop 14)",
+        "url": "https://linear.app/pixelated/issue/PIX-3799/302-property-test-crisis-safety-failure-detection-prop-14"
+      },
+      "issue_b": {
+        "id": "PIX-3701",
+        "identifier": "PIX-3701",
+        "title": "*30.2 Property test \u2014 crisis safety failure detection (Prop 14)",
+        "url": "https://linear.app/pixelated/issue/PIX-3701/302-property-test-crisis-safety-failure-detection-prop-14"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 1.0
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3796",
+        "identifier": "PIX-3796",
+        "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3796/320-checkpoint-phase-6-complete"
+      },
+      "issue_b": {
+        "id": "PIX-3793",
+        "identifier": "PIX-3793",
+        "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3793/260-checkpoint-phase-4-complete"
+      },
+      "title_similarity": 0.941,
+      "description_similarity": 0.049
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3796",
+        "identifier": "PIX-3796",
+        "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3796/320-checkpoint-phase-6-complete"
+      },
+      "issue_b": {
+        "id": "PIX-3711",
+        "identifier": "PIX-3711",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3711/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.17
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3796",
+        "identifier": "PIX-3796",
+        "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3796/320-checkpoint-phase-6-complete"
+      },
+      "issue_b": {
+        "id": "PIX-464",
+        "identifier": "PIX-464",
+        "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-464/230-checkpoint-phase-3-complete"
+      },
+      "title_similarity": 0.941,
+      "description_similarity": 0.028
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3796",
+        "identifier": "PIX-3796",
+        "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3796/320-checkpoint-phase-6-complete"
+      },
+      "issue_b": {
+        "id": "PIX-454",
+        "identifier": "PIX-454",
+        "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete"
+      },
+      "title_similarity": 0.912,
+      "description_similarity": 0.024
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3796",
+        "identifier": "PIX-3796",
+        "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3796/320-checkpoint-phase-6-complete"
+      },
+      "issue_b": {
+        "id": "PIX-430",
+        "identifier": "PIX-430",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-430/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.134
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3798",
+        "identifier": "PIX-3798",
+        "title": "*30.1 Property test \u2014 eval metrics completeness (Prop 13)",
+        "url": "https://linear.app/pixelated/issue/PIX-3798/301-property-test-eval-metrics-completeness-prop-13"
+      },
+      "issue_b": {
+        "id": "PIX-3702",
+        "identifier": "PIX-3702",
+        "title": "*30.1 Property test \u2014 eval metrics completeness (Prop 13)",
+        "url": "https://linear.app/pixelated/issue/PIX-3702/301-property-test-eval-metrics-completeness-prop-13"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.23
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3793",
+        "identifier": "PIX-3793",
+        "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3793/260-checkpoint-phase-4-complete"
+      },
+      "issue_b": {
+        "id": "PIX-3711",
+        "identifier": "PIX-3711",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3711/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.035
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3793",
+        "identifier": "PIX-3793",
+        "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3793/260-checkpoint-phase-4-complete"
+      },
+      "issue_b": {
+        "id": "PIX-464",
+        "identifier": "PIX-464",
+        "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-464/230-checkpoint-phase-3-complete"
+      },
+      "title_similarity": 0.941,
+      "description_similarity": 0.591
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3793",
+        "identifier": "PIX-3793",
+        "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3793/260-checkpoint-phase-4-complete"
+      },
+      "issue_b": {
+        "id": "PIX-454",
+        "identifier": "PIX-454",
+        "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete"
+      },
+      "title_similarity": 0.912,
+      "description_similarity": 0.576
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3793",
+        "identifier": "PIX-3793",
+        "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3793/260-checkpoint-phase-4-complete"
+      },
+      "issue_b": {
+        "id": "PIX-430",
+        "identifier": "PIX-430",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-430/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.039
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3833",
+        "identifier": "PIX-3833",
+        "title": "Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory",
+        "url": "https://linear.app/pixelated/issue/PIX-3833/rewire-product-apimemory-routes-to-the-gateway-and-retire-app-local"
+      },
+      "issue_b": {
+        "id": "PIX-328",
+        "identifier": "PIX-328",
+        "title": "Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory",
+        "url": "https://linear.app/pixelated/issue/PIX-328/rewire-product-apimemory-routes-to-the-gateway-and-retire-app-local"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.898
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3712",
+        "identifier": "PIX-3712",
+        "title": "*1.1 Property test \u2014 token length stats correctness (Prop 6)",
+        "url": "https://linear.app/pixelated/issue/PIX-3712/11-property-test-token-length-stats-correctness-prop-6"
+      },
+      "issue_b": {
+        "id": "PIX-420",
+        "identifier": "PIX-420",
+        "title": "*1.1 Property test \u2014 token length stats correctness (Prop 6)",
+        "url": "https://linear.app/pixelated/issue/PIX-420/11-property-test-token-length-stats-correctness-prop-6"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 1.0
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3711",
+        "identifier": "PIX-3711",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3711/50-checkpoint-phase-1-complete"
+      },
+      "issue_b": {
+        "id": "PIX-464",
+        "identifier": "PIX-464",
+        "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-464/230-checkpoint-phase-3-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.031
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3711",
+        "identifier": "PIX-3711",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3711/50-checkpoint-phase-1-complete"
+      },
+      "issue_b": {
+        "id": "PIX-454",
+        "identifier": "PIX-454",
+        "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.045
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3711",
+        "identifier": "PIX-3711",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-3711/50-checkpoint-phase-1-complete"
+      },
+      "issue_b": {
+        "id": "PIX-430",
+        "identifier": "PIX-430",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-430/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.709
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3710",
+        "identifier": "PIX-3710",
+        "title": "\u202113.0 Execute book conversion \u2014 priority titles",
+        "url": "https://linear.app/pixelated/issue/PIX-3710/130-execute-book-conversion-priority-titles"
+      },
+      "issue_b": {
+        "id": "PIX-3709",
+        "identifier": "PIX-3709",
+        "title": "\u202114.0 Execute book conversion \u2014 remaining titles",
+        "url": "https://linear.app/pixelated/issue/PIX-3709/140-execute-book-conversion-remaining-titles"
+      },
+      "title_similarity": 0.863,
+      "description_similarity": 0.447
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3708",
+        "identifier": "PIX-3708",
+        "title": "16.0 Implement data audit script",
+        "url": "https://linear.app/pixelated/issue/PIX-3708/160-implement-data-audit-script"
+      },
+      "issue_b": {
+        "id": "PIX-452",
+        "identifier": "PIX-452",
+        "title": "16.0 Implement data audit script",
+        "url": "https://linear.app/pixelated/issue/PIX-452/160-implement-data-audit-script"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 1.0
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3703",
+        "identifier": "PIX-3703",
+        "title": "30.0 Implement mental health evaluation suite",
+        "url": "https://linear.app/pixelated/issue/PIX-3703/300-implement-mental-health-evaluation-suite"
+      },
+      "issue_b": {
+        "id": "PIX-479",
+        "identifier": "PIX-479",
+        "title": "30.0 Implement mental health evaluation suite",
+        "url": "https://linear.app/pixelated/issue/PIX-479/300-implement-mental-health-evaluation-suite"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.704
+    },
+    {
+      "issue_a": {
+        "id": "PIX-3829",
+        "identifier": "PIX-3829",
+        "title": "[GAP-3] Implement in-context memory injection",
+        "url": "https://linear.app/pixelated/issue/PIX-3829/gap-3-implement-in-context-memory-injection"
+      },
+      "issue_b": {
+        "id": "PIX-2079",
+        "identifier": "PIX-2079",
+        "title": "[GAP-3] Implement in-context memory injection",
+        "url": "https://linear.app/pixelated/issue/PIX-2079/gap-3-implement-in-context-memory-injection"
+      },
+      "title_similarity": 1.0,
+      "description_similarity": 0.845
+    },
+    {
+      "issue_a": {
+        "id": "PIX-464",
+        "identifier": "PIX-464",
+        "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-464/230-checkpoint-phase-3-complete"
+      },
+      "issue_b": {
+        "id": "PIX-454",
+        "identifier": "PIX-454",
+        "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete"
+      },
+      "title_similarity": 0.912,
+      "description_similarity": 0.654
+    },
+    {
+      "issue_a": {
+        "id": "PIX-464",
+        "identifier": "PIX-464",
+        "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-464/230-checkpoint-phase-3-complete"
+      },
+      "issue_b": {
+        "id": "PIX-430",
+        "identifier": "PIX-430",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-430/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.099
+    },
+    {
+      "issue_a": {
+        "id": "PIX-454",
+        "identifier": "PIX-454",
+        "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-454/170-checkpoint-phase-2-complete"
+      },
+      "issue_b": {
+        "id": "PIX-430",
+        "identifier": "PIX-430",
+        "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+        "url": "https://linear.app/pixelated/issue/PIX-430/50-checkpoint-phase-1-complete"
+      },
+      "title_similarity": 0.925,
+      "description_similarity": 0.079
+    }
+  ],
+  "unassigned": [
+    {
+      "id": "PIX-4166",
+      "identifier": "PIX-4166",
+      "title": "Remove @babel/core override once ecosystem no longer resolves 7.28.0",
+      "status": "Triage",
+      "statusType": "triage",
+      "url": "https://linear.app/pixelated/issue/PIX-4166/remove-babelcore-override-once-ecosystem-no-longer-resolves-7280"
+    },
+    {
+      "id": "PIX-4165",
+      "identifier": "PIX-4165",
+      "title": "Monitor and prevent reintroduction of vulnerable react-router",
+      "status": "Triage",
+      "statusType": "triage",
+      "url": "https://linear.app/pixelated/issue/PIX-4165/monitor-and-prevent-reintroduction-of-vulnerable-react-router"
+    },
+    {
+      "id": "PIX-4164",
+      "identifier": "PIX-4164",
+      "title": "Remove accepted localstack risk once patched version is released",
+      "status": "Triage",
+      "statusType": "triage",
+      "url": "https://linear.app/pixelated/issue/PIX-4164/remove-accepted-localstack-risk-once-patched-version-is-released"
+    }
+  ],
+  "missing_descriptions": [],
+  "estimate_coverage": {
+    "total_active": 52,
+    "with_estimate": 39,
+    "without_estimate": 13,
+    "coverage_pct": 75.0,
+    "missing": [
+      {
+        "id": "PIX-4166",
+        "identifier": "PIX-4166",
+        "title": "Remove @babel/core override once ecosystem no longer resolves 7.28.0",
+        "status": "Triage",
+        "assignee": null
+      },
+      {
+        "id": "PIX-4165",
+        "identifier": "PIX-4165",
+        "title": "Monitor and prevent reintroduction of vulnerable react-router",
+        "status": "Triage",
+        "assignee": null
+      },
+      {
+        "id": "PIX-4164",
+        "identifier": "PIX-4164",
+        "title": "Remove accepted localstack risk once patched version is released",
+        "status": "Triage",
+        "assignee": null
+      },
+      {
+        "id": "PIX-4158",
+        "identifier": "PIX-4158",
+        "title": "Quarterly Workspace Audit \u2014 Linear Hygiene Check",
+        "status": "In Progress",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4131",
+        "identifier": "PIX-4131",
+        "title": "EPIC: Enterprise Readiness \u2014 Close All Enterprise Gaps",
+        "status": "Triage",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4130",
+        "identifier": "PIX-4130",
+        "title": "Enterprise Gap: SOC2 / HIPAA Certification Readiness",
+        "status": "Backlog",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4129",
+        "identifier": "PIX-4129",
+        "title": "Enterprise Gap: Vendor Risk Assessment & Third-Party Audit",
+        "status": "Backlog",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4128",
+        "identifier": "PIX-4128",
+        "title": "Enterprise Gap: Chaos Engineering & Resilience Testing",
+        "status": "Backlog",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4127",
+        "identifier": "PIX-4127",
+        "title": "Enterprise Gap: SLA/SLO Definitions & Error Budgets",
+        "status": "Backlog",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4126",
+        "identifier": "PIX-4126",
+        "title": "Enterprise Gap: Penetration Testing & External Security Assessment",
+        "status": "In Progress",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4125",
+        "identifier": "PIX-4125",
+        "title": "Enterprise Gap: Disaster Recovery & Business Continuity Plan",
+        "status": "Backlog",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4037",
+        "identifier": "PIX-4037",
+        "title": "Error: Unable to resolve [/vercel/path0/src/components/MentalHealthChatDemo.astro]",
+        "status": "Done",
+        "assignee": "Chad"
+      },
+      {
+        "id": "PIX-4031",
+        "identifier": "PIX-4031",
+        "title": "TypeError: Cannot read properties of undefined (reading 'startsWith')",
+        "status": "Done",
+        "assignee": "Chad"
+      }
+    ]
+  },
+  "projects": [
+    {
+      "id": "29c133a2-9195-42d3-b53e-31154d47ea7d",
+      "name": "Enterprise Readiness Program",
+      "description": "",
+      "state": null,
+      "issue_count": 40,
+      "completed_count": 14,
+      "archived_count": 13,
+      "descriptions_filled": 40
+    },
+    {
+      "id": "9c3fdb40-ef2d-4004-97b9-e6c6547253dd",
+      "name": "Training Pipeline v2 \u2014 Audit Remediation",
+      "description": "",
+      "state": null,
+      "issue_count": 3,
+      "completed_count": 3,
+      "archived_count": 3,
+      "descriptions_filled": 3,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "f04d49cb-6a28-463e-9b06-3a79481fc1c6",
+      "name": "PAL Framework Implementation",
+      "description": "",
+      "state": null,
+      "issue_count": 11,
+      "completed_count": 11,
+      "archived_count": 11,
+      "descriptions_filled": 11,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "ee73097d-78e0-4b53-a76b-7332fc66b3d4",
+      "name": "Infrastructure & Performance",
+      "description": "",
+      "state": null,
+      "issue_count": 15,
+      "completed_count": 15,
+      "archived_count": 15,
+      "descriptions_filled": 15,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "9a80eb9a-607c-4caf-b5a6-cd3592b84a8f",
+      "name": "Developer API & SDK",
+      "description": "",
+      "state": null,
+      "issue_count": 12,
+      "completed_count": 12,
+      "archived_count": 12,
+      "descriptions_filled": 12,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "8d44acfa-c81e-4f61-876f-070fb6c15810",
+      "name": "AI Quality & Ethics",
+      "description": "",
+      "state": null,
+      "issue_count": 27,
+      "completed_count": 22,
+      "archived_count": 27,
+      "descriptions_filled": 27
+    },
+    {
+      "id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+      "name": "Platform Foundations & Operations",
+      "description": "",
+      "state": null,
+      "issue_count": 41,
+      "completed_count": 37,
+      "archived_count": 41,
+      "descriptions_filled": 41
+    },
+    {
+      "id": "91bb41eb-dc9b-45f7-9418-1a200100810c",
+      "name": "Clinical UX & Simulation",
+      "description": "",
+      "state": null,
+      "issue_count": 10,
+      "completed_count": 10,
+      "archived_count": 10,
+      "descriptions_filled": 10,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "e9605179-de93-4312-ba5f-45528fe06713",
+      "name": "Corpus Simulation Engine",
+      "description": "",
+      "state": null,
+      "issue_count": 9,
+      "completed_count": 7,
+      "archived_count": 9,
+      "descriptions_filled": 9
+    },
+    {
+      "id": "c77ba1c2-451a-45cc-9d77-cdde6737aba8",
+      "name": "Foresight",
+      "description": "",
+      "state": null,
+      "issue_count": 103,
+      "completed_count": 63,
+      "archived_count": 103,
+      "descriptions_filled": 103
+    },
+    {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements",
+      "description": "",
+      "state": null,
+      "issue_count": 86,
+      "completed_count": 69,
+      "archived_count": 86,
+      "descriptions_filled": 86
+    },
+    {
+      "id": "97409cfb-e01c-4094-9728-577c79bf53ae",
+      "name": "Test Coverage & Security Baseline",
+      "description": "",
+      "state": null,
+      "issue_count": 10,
+      "completed_count": 9,
+      "archived_count": 10,
+      "descriptions_filled": 10
+    },
+    {
+      "id": "97b72bac-e84b-46e4-a82e-dc657030dcb9",
+      "name": "Checkmate",
+      "description": "",
+      "state": null,
+      "issue_count": 6,
+      "completed_count": 4,
+      "archived_count": 6,
+      "descriptions_filled": 6
+    },
+    {
+      "id": "80cb9c3f-78c7-4535-a673-48dc50d74941",
+      "name": "Eve AI Agent Workflows",
+      "description": "",
+      "state": null,
+      "issue_count": 26,
+      "completed_count": 26,
+      "archived_count": 26,
+      "descriptions_filled": 26,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "189cf547-5d6f-44c3-95ad-7480a1bf8534",
+      "name": "AI Research-Clinical Integration",
+      "description": "",
+      "state": null,
+      "issue_count": 8,
+      "completed_count": 8,
+      "archived_count": 0,
+      "descriptions_filled": 8,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+      "name": "Data Governance & Compliance",
+      "description": "",
+      "state": null,
+      "issue_count": 11,
+      "completed_count": 10,
+      "archived_count": 11,
+      "descriptions_filled": 11
+    },
+    {
+      "id": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+      "name": "Astro 7 Platform Modernization & API Extraction",
+      "description": "",
+      "state": null,
+      "issue_count": 5,
+      "completed_count": 4,
+      "archived_count": 5,
+      "descriptions_filled": 5
+    },
+    {
+      "id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+      "name": "CI Federation & Release Readiness",
+      "description": "",
+      "state": null,
+      "issue_count": 20,
+      "completed_count": 14,
+      "archived_count": 20,
+      "descriptions_filled": 20
+    },
+    {
+      "id": "7fb7fc08-8b19-4210-8215-f73f3b559a46",
+      "name": "Churnmeon Reliability",
+      "description": "",
+      "state": null,
+      "issue_count": 17,
+      "completed_count": 16,
+      "archived_count": 5,
+      "descriptions_filled": 17
+    },
+    {
+      "id": "dd29a94c-6283-4c13-9eef-0f7546321f1d",
+      "name": "Modern Dataset Project",
+      "description": "",
+      "state": null,
+      "issue_count": 5,
+      "completed_count": 4,
+      "archived_count": 5,
+      "descriptions_filled": 5
+    },
+    {
+      "id": "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
+      "name": "Discovery & Backlog",
+      "description": "",
+      "state": null,
+      "issue_count": 3,
+      "completed_count": 1,
+      "archived_count": 3,
+      "descriptions_filled": 3
+    },
+    {
+      "id": "07810eff-50bb-4518-974a-07b4938f3264",
+      "name": "Data Pipeline Recovery & External Integrations",
+      "description": "",
+      "state": null,
+      "issue_count": 2,
+      "completed_count": 2,
+      "archived_count": 2,
+      "descriptions_filled": 2,
+      "flags": ["all_issues_completed"]
+    }
+  ],
+  "flagged_projects": [
+    {
+      "id": "9c3fdb40-ef2d-4004-97b9-e6c6547253dd",
+      "name": "Training Pipeline v2 \u2014 Audit Remediation",
+      "description": "",
+      "state": null,
+      "issue_count": 3,
+      "completed_count": 3,
+      "archived_count": 3,
+      "descriptions_filled": 3,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "f04d49cb-6a28-463e-9b06-3a79481fc1c6",
+      "name": "PAL Framework Implementation",
+      "description": "",
+      "state": null,
+      "issue_count": 11,
+      "completed_count": 11,
+      "archived_count": 11,
+      "descriptions_filled": 11,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "ee73097d-78e0-4b53-a76b-7332fc66b3d4",
+      "name": "Infrastructure & Performance",
+      "description": "",
+      "state": null,
+      "issue_count": 15,
+      "completed_count": 15,
+      "archived_count": 15,
+      "descriptions_filled": 15,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "9a80eb9a-607c-4caf-b5a6-cd3592b84a8f",
+      "name": "Developer API & SDK",
+      "description": "",
+      "state": null,
+      "issue_count": 12,
+      "completed_count": 12,
+      "archived_count": 12,
+      "descriptions_filled": 12,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "91bb41eb-dc9b-45f7-9418-1a200100810c",
+      "name": "Clinical UX & Simulation",
+      "description": "",
+      "state": null,
+      "issue_count": 10,
+      "completed_count": 10,
+      "archived_count": 10,
+      "descriptions_filled": 10,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "80cb9c3f-78c7-4535-a673-48dc50d74941",
+      "name": "Eve AI Agent Workflows",
+      "description": "",
+      "state": null,
+      "issue_count": 26,
+      "completed_count": 26,
+      "archived_count": 26,
+      "descriptions_filled": 26,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "189cf547-5d6f-44c3-95ad-7480a1bf8534",
+      "name": "AI Research-Clinical Integration",
+      "description": "",
+      "state": null,
+      "issue_count": 8,
+      "completed_count": 8,
+      "archived_count": 0,
+      "descriptions_filled": 8,
+      "flags": ["all_issues_completed"]
+    },
+    {
+      "id": "07810eff-50bb-4518-974a-07b4938f3264",
+      "name": "Data Pipeline Recovery & External Integrations",
+      "description": "",
+      "state": null,
+      "issue_count": 2,
+      "completed_count": 2,
+      "archived_count": 2,
+      "descriptions_filled": 2,
+      "flags": ["all_issues_completed"]
+    }
+  ],
+  "archived_completeness": {
+    "total_completed": 396,
+    "archived": 373,
+    "not_archived": 23,
+    "not_archived_list": [
+      {
+        "id": "PIX-4037",
+        "identifier": "PIX-4037",
+        "title": "Error: Unable to resolve [/vercel/path0/src/components/MentalHealthChatDemo.astro]",
+        "completedAt": "2026-07-16T05:00:28.342Z",
+        "url": "https://linear.app/pixelated/issue/PIX-4037/error-unable-to-resolve"
+      },
+      {
+        "id": "PIX-4034",
+        "identifier": "PIX-4034",
+        "title": "Full history sterilization for old hackathon secret-bearing commits",
+        "completedAt": "2026-07-16T05:02:48.102Z",
+        "url": "https://linear.app/pixelated/issue/PIX-4034/full-history-sterilization-for-old-hackathon-secret-bearing-commits"
+      },
+      {
+        "id": "PIX-4031",
+        "identifier": "PIX-4031",
+        "title": "TypeError: Cannot read properties of undefined (reading 'startsWith')",
+        "completedAt": "2026-07-15T22:18:36.592Z",
+        "url": "https://linear.app/pixelated/issue/PIX-4031/typeerror-cannot-read-properties-of-undefined-reading-startswith"
+      },
+      {
+        "id": "PIX-3913",
+        "identifier": "PIX-3913",
+        "title": "Cross-Cutting: Infrastructure, Monitoring & Deployment",
+        "completedAt": "2026-07-27T19:05:59.707Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3913/cross-cutting-infrastructure-monitoring-and-deployment"
+      },
+      {
+        "id": "PIX-3912",
+        "identifier": "PIX-3912",
+        "title": "[Mera] Hierarchical Clinical Prediction with Memorize & Rank",
+        "completedAt": "2026-07-29T01:59:01.186Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3912/mera-hierarchical-clinical-prediction-with-memorize-and-rank"
+      },
+      {
+        "id": "PIX-3911",
+        "identifier": "PIX-3911",
+        "title": "[Mental-LLM] Instruction Fine-Tuning for Mental Health Prediction",
+        "completedAt": "2026-07-29T05:31:17.111Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3911/mental-llm-instruction-fine-tuning-for-mental-health-prediction"
+      },
+      {
+        "id": "PIX-3910",
+        "identifier": "PIX-3910",
+        "title": "[MedSSR] Self-Supervised RL Training Pipeline with Synthetic Data",
+        "completedAt": "2026-07-29T00:37:59.178Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3910/medssr-self-supervised-rl-training-pipeline-with-synthetic-data"
+      },
+      {
+        "id": "PIX-3909",
+        "identifier": "PIX-3909",
+        "title": "[DiagnosisArena] Comprehensive Diagnostic Evaluation Suite",
+        "completedAt": "2026-07-28T17:29:52.882Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3909/diagnosisarena-comprehensive-diagnostic-evaluation-suite"
+      },
+      {
+        "id": "PIX-3908",
+        "identifier": "PIX-3908",
+        "title": "[Inquiry-Diagnosis] Patient Simulator & Diagnostic Quality Framework",
+        "completedAt": "2026-07-29T00:38:11.365Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3908/inquiry-diagnosis-patient-simulator-and-diagnostic-quality-framework"
+      },
+      {
+        "id": "PIX-3907",
+        "identifier": "PIX-3907",
+        "title": "[DeepRare] Multi-Agent Rare Disease Diagnosis Architecture",
+        "completedAt": "2026-07-27T11:34:32.161Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3907/deeprare-multi-agent-rare-disease-diagnosis-architecture"
+      },
+      {
+        "id": "PIX-3906",
+        "identifier": "PIX-3906",
+        "title": "[Patient-\u03a8] CCD-Based Cognitive Patient Simulation Engine",
+        "completedAt": "2026-07-03T17:40:07.141Z",
+        "url": "https://linear.app/pixelated/issue/PIX-3906/patient-ps-ccd-based-cognitive-patient-simulation-engine"
+      },
+      {
+        "id": "PIX-352",
+        "identifier": "PIX-352",
+        "title": "C6: Dashboard integration \u2014 live workflow status",
+        "completedAt": "2026-07-28T18:02:28.229Z",
+        "url": "https://linear.app/pixelated/issue/PIX-352/c6-dashboard-integration-live-workflow-status"
+      },
+      {
+        "id": "PIX-351",
+        "identifier": "PIX-351",
+        "title": "C5: Learning loop \u2014 improve decisions from historical outcomes",
+        "completedAt": "2026-07-29T02:41:50.569Z",
+        "url": "https://linear.app/pixelated/issue/PIX-351/c5-learning-loop-improve-decisions-from-historical-outcomes"
+      },
+      {
+        "id": "PIX-350",
+        "identifier": "PIX-350",
+        "title": "C2: Post processing summary comment on each PR",
+        "completedAt": "2026-07-28T18:02:29.243Z",
+        "url": "https://linear.app/pixelated/issue/PIX-350/c2-post-processing-summary-comment-on-each-pr"
+      },
+      {
+        "id": "PIX-349",
+        "identifier": "PIX-349",
+        "title": "C3: Human-in-the-loop escalation",
+        "completedAt": "2026-07-28T18:02:29.549Z",
+        "url": "https://linear.app/pixelated/issue/PIX-349/c3-human-in-the-loop-escalation"
+      },
+      {
+        "id": "PIX-345",
+        "identifier": "PIX-345",
+        "title": "B3: Smart bot comment filtering (pattern-based, not hardcoded)",
+        "completedAt": "2026-07-29T02:41:45.071Z",
+        "url": "https://linear.app/pixelated/issue/PIX-345/b3-smart-bot-comment-filtering-pattern-based-not-hardcoded"
+      },
+      {
+        "id": "PIX-344",
+        "identifier": "PIX-344",
+        "title": "A4: Fix comment resolution \u2014 track processed comments locally",
+        "completedAt": "2026-07-28T18:02:27.852Z",
+        "url": "https://linear.app/pixelated/issue/PIX-344/a4-fix-comment-resolution-track-processed-comments-locally"
+      },
+      {
+        "id": "PIX-343",
+        "identifier": "PIX-343",
+        "title": "B2: LLM timeout handling and fallback for large files",
+        "completedAt": "2026-07-28T18:02:30.301Z",
+        "url": "https://linear.app/pixelated/issue/PIX-343/b2-llm-timeout-handling-and-fallback-for-large-files"
+      },
+      {
+        "id": "PIX-342",
+        "identifier": "PIX-342",
+        "title": "B1: Test suite validation in E2B sandbox before merge",
+        "completedAt": "2026-07-22T03:14:56.123Z",
+        "url": "https://linear.app/pixelated/issue/PIX-342/b1-test-suite-validation-in-e2b-sandbox-before-merge"
+      },
+      {
+        "id": "PIX-341",
+        "identifier": "PIX-341",
+        "title": "B4: Smart conflict resolution strategy per PR type",
+        "completedAt": "2026-07-22T03:14:43.724Z",
+        "url": "https://linear.app/pixelated/issue/PIX-341/b4-smart-conflict-resolution-strategy-per-pr-type"
+      },
+      {
+        "id": "PIX-337",
+        "identifier": "PIX-337",
+        "title": "A3: Fast-path for clean PRs (no actionable comments \u2192 immediate merge)",
+        "completedAt": "2026-07-28T18:02:27.569Z",
+        "url": "https://linear.app/pixelated/issue/PIX-337/a3-fast-path-for-clean-prs-no-actionable-comments-immediate-merge"
+      },
+      {
+        "id": "PIX-335",
+        "identifier": "PIX-335",
+        "title": "Churnmeon AI \u2014 Workflow Expansion & Improvement",
+        "completedAt": "2026-07-29T12:55:27.979Z",
+        "url": "https://linear.app/pixelated/issue/PIX-335/churnmeon-ai-workflow-expansion-and-improvement"
+      },
+      {
+        "id": "PIX-330",
+        "identifier": "PIX-330",
+        "title": "Phase 1: Fix the Bleeding \u2014 Auto-rebase, fast-path, commit messages, error recovery",
+        "completedAt": "2026-07-28T19:51:29.047Z",
+        "url": "https://linear.app/pixelated/issue/PIX-330/phase-1-fix-the-bleeding-auto-rebase-fast-path-commit-messages-error"
+      }
+    ]
+  },
+  "targets": {
+    "duplicates": 0,
+    "unassigned": 0,
+    "missing_descriptions": 0,
+    "estimate_coverage_pct": 80
+  },
+  "acceptance_criteria_met": {
+    "all_issues_have_descriptions": true,
+    "all_issues_assigned": false,
+    "no_done_done_duplicates": false,
+    "estimate_coverage_gt_80": false,
+    "completed_project_issues_archived": false
+  }
+}

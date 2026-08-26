@@ -1,0 +1,315 @@
+/* ================================================
+   NP TOKENS — Neutral Precision Design Token System
+   Source: DESIGN.md ("The Quiet Instrument")
+   ================================================ */
+
+:root {
+  color-scheme: dark;
+
+  /* =============================================
+     ZERO-CHROMA GRAYSCALE PALETTE (Dark — Primary)
+     All colors at oklch C = 0 (zero chroma)
+     ============================================= */
+  --np-bg: oklch(0.1 0 0); /* #1a1a1a — Primary canvas */
+  --np-surface: oklch(0.14 0 0); /* #242424 — Cards, containers */
+  --np-elevated: oklch(0.18 0 0); /* #2e2e2e — Modals, dropdowns */
+  --np-hover: oklch(0.22 0 0); /* #383838 — Hover states */
+  --np-active: oklch(0.16 0 0); /* #292929 — Active/pressed */
+  --np-text: oklch(0.93 0 0); /* #ededed — Body, headings */
+  /* Lightness floor set by contrast, not taste: 0.62 is the lowest value that
+     clears WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
+  --np-muted: oklch(0.62 0 0); /* Labels, captions */
+  --np-mid: oklch(0.7 0 0); /* #b3b3b3 — Enhanced muted */
+  --np-line: color-mix(
+    in srgb,
+    var(--ink, #fff) 6%,
+    transparent
+  ); /* Borders, dividers */
+  --np-line-strong: color-mix(in srgb, var(--ink, #fff) 12%, transparent);
+  --np-overlay: rgba(0, 0, 0, 0.75);
+  --np-selection: color-mix(in srgb, var(--ink, #fff) 8%, transparent);
+  --np-selection-text: var(--ink, oklch(0.93 0 0));
+
+  /* =============================================
+      TYPOGRAPHY — Terminal instrument.
+      IoskeleyMono carries display and mono roles (hero headline,
+      labels, data tables, clinical audit logs) — the terminal face.
+      Switzer carries the body reading role (subtitles, prose, UI text) —
+      a Söhne alternative for clean, neutral body text.
+      Weight, size, and tracking carry all hierarchy within each face.
+      ============================================= */
+  --np-font-display: 'IoskeleyMono', ui-monospace, monospace;
+  --np-font-body:
+    'Switzer', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  --np-font-mono: 'IoskeleyMono', ui-monospace, monospace;
+
+  /* Weights — weight carries hierarchy (The Content-is-Type Rule) */
+  --np-weight-display: 400;
+  --np-weight-headline: 600;
+  --np-weight-title: 700;
+  --np-weight-body: 400;
+  --np-weight-label: 500;
+  --np-weight-data: 400;
+
+  /* Scale — terminal: commanding display, compact reading ramp */
+  --np-text-display: clamp(2.25rem, 4.4vw, 3.6rem);
+  --np-text-headline: clamp(1.5rem, 3vw, 2.2rem);
+  --np-text-title: 1.125rem;
+  --np-text-body: 1rem;
+  --np-text-small: 0.9375rem;
+  --np-text-label: 0.75rem;
+  --np-text-data: 0.8125rem;
+  --np-text-caption: 0.6875rem;
+
+  /* Line heights — tighter for display, open for reading */
+  --np-leading-display: 1.04;
+  --np-leading-headline: 1.05;
+  --np-leading-title: 1.2;
+  --np-leading-body: 1.65;
+  --np-leading-data: 1.55;
+  --np-leading-label: 1.3;
+
+  /* Letter spacing — tight display, tracked labels */
+  --np-tracking-display: -0.03em;
+  --np-tracking-headline: -0.035em;
+  --np-tracking-label: 0.04em;
+
+  /* =============================================
+     FLAT BY DESIGN
+     ============================================= */
+  /* Flat by doctrine, but interactive elements carry astro-palette's 4px radius */
+  --np-radius: 0px;
+  --np-radius-button: 4px;
+  --np-radius-card: 0px;
+  --np-radius-input: 4px;
+
+  /* No shadows — tonal layering is the depth system */
+  --np-shadow: none;
+  --np-shadow-elevated: none;
+
+  /* =============================================
+     LAYOUT
+     ============================================= */
+  --np-content: 76rem;
+  --np-content-narrow: 55rem;
+  --np-gap: 24px;
+  --np-gap-sm: 16px;
+  --np-gap-lg: 40px;
+  --np-pad: clamp(1rem, 3vw, 2rem);
+  --np-section-y: clamp(4rem, 8vw, 5.5rem);
+
+  /* Spacing scale (4px / 16px / 36px unit roots) */
+  --np-space-1: 4px;
+  --np-space-2: 8px;
+  --np-space-3: 12px;
+  --np-space-4: 16px;
+  --np-space-5: 20px;
+  --np-space-6: 24px;
+  --np-space-8: 32px;
+  --np-space-10: 40px;
+  --np-space-12: 48px;
+  --np-space-16: 64px;
+  --np-space-20: 80px;
+
+  /* =============================================
+     TRANSITIONS — The Quiet Instrument motion language
+     State changes only, no choreography.
+     Tactile: 150ms.   Layout: 300ms.   Arrival: 400ms.
+     ============================================= */
+  --np-duration-fast: 0.15s;
+  --np-duration-normal: 0.2s;
+  --np-duration-slow: 0.3s;
+  --np-duration-arrive: 0.4s;
+  --np-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --np-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --np-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --np-transition: var(--np-duration-normal) var(--np-ease);
+  --np-transition-slow: var(--np-duration-slow) var(--np-ease);
+
+  /* Entrance curve — slow start, fast finish */
+  --np-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* =============================================
+     Z-INDEX
+     ============================================= */
+  --np-z-base: 1;
+  --np-z-elevated: 10;
+  --np-z-sticky: 50;
+  --np-z-overlay: 200;
+  --np-z-modal: 300;
+}
+
+/* =============================================
+   LIGHT MODE — Accessibility fallback
+   Flatter, cooler, designed to be less interesting
+   ============================================= */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --np-bg: oklch(0.98 0 0); /* #fafafa */
+  --np-surface: oklch(0.95 0 0); /* #f2f2f2 */
+  --np-elevated: oklch(0.92 0 0); /* #ebebeb */
+  --np-hover: oklch(0.89 0 0);
+  --np-active: oklch(0.93 0 0);
+  --np-text: oklch(0.15 0 0); /* #262626 */
+  /* Lightness ceiling set by contrast: 0.48 is the highest value that clears
+     WCAG AA (>=4.5:1) against bg, surface, elevated, and hover. */
+  --np-muted: oklch(0.48 0 0);
+  --np-mid: oklch(0.45 0 0);
+  --np-line: color-mix(in srgb, var(--ink, #000) 8%, transparent);
+  --np-line-strong: color-mix(in srgb, var(--ink, #000) 16%, transparent);
+  --np-overlay: rgba(0, 0, 0, 0.4);
+  --np-selection: rgba(0, 0, 0, 0.08);
+  --np-selection-text: oklch(0.15 0 0);
+
+  /* Legacy alias (see compatibility block): --np-text as rgb() triplet */
+  --accent-primary-rgb: 38, 38, 38;
+}
+
+/* =============================================
+   BASE RESETS (apply tokens to document)
+   ============================================= */
+html {
+  background-color: var(--np-bg) !important;
+  color: var(--np-text);
+  font-family: var(--np-font-body);
+  font-size: 16px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--np-bg) !important;
+}
+
+::selection {
+  background: var(--np-selection);
+  color: var(--np-selection-text);
+}
+
+/* =============================================
+   THE ZERO-CHROMA RULE — Enforced at token level
+   =============================================
+   No color enters the system through design tokens.
+   Not as an accent, not as a background tint, not as a hover state.
+   The only color in the interface is the content.
+   ============================================= */
+
+/* =============================================
+   LEGACY COMPATIBILITY ALIASES (charliecreates PR #4932)
+   Layouts still consumed: BrutalistLayout, BlogLayout, TailusLayout,
+   ChatLayout, DocumentationLayout. Map the historical variable names
+   onto the Neutral Precision ramp so the consumers stay renderable
+   without importing additional stylesheets. All values resolve to
+   zero-chroma NP tokens at the canonical elevation steps; no
+   accent/glass/shadow effects re-enter the system through this block.
+   ============================================= */
+:root {
+  /* Accent (legacy) -> muted NP — preserves contrast on Brutalist scroll
+     progress while removing hue. */
+  --accent-primary: var(--np-text);
+  --accent-primary-dim: var(--np-muted);
+  --accent-primary-glow: transparent;
+
+  /* Surface refresh */
+  --bg-primary: var(--np-bg);
+  --bg-secondary: var(--np-surface);
+  --bg-elevated: var(--np-elevated);
+  --bg-glass: var(--np-surface);
+  --bg-surface-ghost: var(--np-surface);
+
+  /* Text scale */
+  --text-primary: var(--np-text);
+  --text-secondary: var(--np-muted);
+  --text-muted: var(--np-muted);
+
+  /* Borders / dividers */
+  --border-subtle: var(--np-line);
+  --border-primary: var(--np-line-strong);
+  --divider-dotted: var(--np-line);
+  --divider-weak: var(--np-surface);
+
+  /* Hairline radii (zero-radius doctrine — preserve names, set to 0) */
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+
+  /* Type family */
+  --font-mono: var(--np-font-mono);
+  --font-body: var(--np-font-body);
+  --font-sans: var(--np-font-body);
+  --font-label: var(--np-font-mono);
+  --font-display: var(--np-font-display);
+
+  /* Fluid text scale (from removed typography.css) */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
+  --text-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.4rem + 0.5vw, 1.875rem);
+  --text-3xl: clamp(1.875rem, 1.7rem + 0.875vw, 2.25rem);
+  --text-4xl: clamp(2.25rem, 2rem + 1.25vw, 3rem);
+  --text-5xl: clamp(3rem, 2.5rem + 2.5vw, 4.5rem);
+  --text-6xl: clamp(3.75rem, 3rem + 3.75vw, 6rem);
+
+  /* Motion (state-only, neutral) */
+  --duration-fast: var(--np-duration-fast);
+
+  /* Compatibility shim for Brutalist scroll-progress + ChatLayout skip link */
+  --z-sticky: var(--np-z-sticky);
+  --focus-ring: 0 0 0 3px var(--np-mid);
+
+  /* Container for layouts that previously expected an 80rem-ish shell */
+  --container-refined: 76rem;
+
+  /* Legacy color tokens (used by fhe-dashboard) */
+  --color-background: var(--np-bg);
+  --color-background-card: var(--np-elevated);
+  --color-border: var(--np-line);
+  --color-error: var(--np-text);
+  --color-error-bg: var(--np-surface);
+  --color-heading: var(--np-text);
+  --color-primary: var(--np-text);
+  --color-success: var(--np-text);
+  --color-success-bg: var(--np-surface);
+  --color-text-muted: var(--np-muted);
+  --color-warning: var(--np-muted);
+  --color-warning-bg: var(--np-surface);
+}
+
+/* ==============================================
+   PALETTE → NP TOKEN BRIDGE
+   Maps astro-palette's --bg/--ink/--bg-elevated/etc.
+   (defined in public/css/style.css) onto the --np-*
+   equivalents so all NP components and legacy aliases
+   respond to palette switches. Uses var() which
+   resolves at use-time, so the specific palette
+   rule's values are picked up regardless of source
+   order.
+   ============================================== */
+:root[data-palette] {
+  --np-bg: var(--bg);
+  --np-text: var(--ink);
+  --np-surface: var(--bg-elevated);
+  --np-elevated: var(--bg-elevated);
+  --np-hover: var(--bg-elevated);
+  --np-active: var(--bg-elevated);
+  --np-line: var(--line);
+  --np-line-strong: var(--line-strong);
+  --np-mid: var(--accent);
+  --np-muted: var(--muted);
+  --np-selection: color-mix(in srgb, var(--ink) 8%, transparent);
+  --np-selection-text: var(--ink);
+  /* Compatibility aliases for code that uses --surface directly */
+  --surface: var(--bg-elevated);
+  --surface-elevated: var(--bg-elevated);
+  /* Flat by doctrine, but interactive elements carry astro-palette's radius */
+  --np-radius: 0px;
+  --np-radius-button: var(--radius-sm, 4px);
+  --np-radius-card: 0px;
+  --np-radius-input: var(--radius-sm, 4px);
+}

@@ -8,9 +8,9 @@ on:
   push:
     branches: [main, master, staging]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'Dockerfile'
-      - 'docker/**'
+      - 'infra/docker/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/sentry-build.yml'

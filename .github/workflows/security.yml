@@ -5,6 +5,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GHA_LOCAL_RUN: 'false'
   NODE_VERSION: 24.16.0
   PYTHON_VERSION: 3.13.13
 
@@ -34,7 +35,8 @@ jobs:
       security-events: write
       actions: write
     concurrency:
-      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
+      group:
+        codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
@@ -100,7 +102,8 @@ jobs:
 
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+        run:
+          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
           --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
@@ -119,16 +122,17 @@ jobs:
         id: prepare-uv
         uses: ./.github/actions/prepare-uv-venv
         with:
-          service-dir: src/lib/ai/bias-detection/python-service
+          service-dir: apps/web/src/lib/ai/bias-detection/python-service
 
       - name: Install Python dependencies
         if: matrix.language == 'python'
         env:
-          VIRTUAL_ENV: ${{ github.workspace
-            }}/src/lib/ai/bias-detection/python-service/.venv
+          VIRTUAL_ENV:
+            ${{ github.workspace
+            }}/apps/web/src/lib/ai/bias-detection/python-service/.venv
         run: |
-          if [ -d "src/lib/ai/bias-detection/python-service" ]; then
-            cd src/lib/ai/bias-detection/python-service
+          if [ -d "apps/web/src/lib/ai/bias-detection/python-service" ]; then
+            cd apps/web/src/lib/ai/bias-detection/python-service
             USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
             uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
             uv pip install ${USE_SYSTEM} -r requirements.txt || true
@@ -138,7 +142,7 @@ jobs:
             -not -path "*/node_modules/*" \
             -not -path "*/.venv/*" \
             -not -path "*/site-packages/*" \
-            -not -path "*/src/lib/ai/bias-detection/*" \
+            -not -path "*/apps/web/src/lib/ai/bias-detection/*" \
             -not -path "*/ai/data/*" \
             | head -5 | while read req; do
             dir=$(dirname "$req")
@@ -258,7 +262,7 @@ jobs:
           framework: terraform,terraform_plan,bicep
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
-          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,infra/docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -333,7 +337,8 @@ jobs:
           category: checkov-helm
 
       - name: Upload Checkov artifacts
-        if: always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
+        if:
+          always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
           steps.checkov_helm_sarif.outputs.found == 'true')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -403,7 +408,8 @@ jobs:
           fi
 
       - name: Enforce high+ vulnerability threshold
-        run: node scripts/utils/check-pnpm-audit.js --fail-on high
+        run:
+          node scripts/utils/check-pnpm-audit.js --fail-on high
           audit-results.json
 
       - name: Upload audit results
@@ -463,16 +469,16 @@ jobs:
         id: pip_audit_bias
         continue-on-error: true
         run: |
-          cd src/lib/ai/bias-detection/python-service
+          cd apps/web/src/lib/ai/bias-detection/python-service
           pip-audit -r requirements.txt --format json -o ../../../pip-audit-bias.json || true
 
       - name: Scan Python dependencies (multimodal)
         id: pip_audit_multimodal
         continue-on-error: true
         run: |
-          if [ -d "src/lib/ai/multimodal-bias-detection/python-service" ] && \
-             [ -f "src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml" ]; then
-            cd src/lib/ai/multimodal-bias-detection/python-service
+          if [ -d "apps/web/src/lib/ai/multimodal-bias-detection/python-service" ] && \
+             [ -f "apps/web/src/lib/ai/multimodal-bias-detection/python-service/pyproject.toml" ]; then
+            cd apps/web/src/lib/ai/multimodal-bias-detection/python-service
             pip-audit --format json -o ../../../pip-audit-multimodal.json || true
           else
             echo '{"dependencies":[],"vulnerabilities":[]}' > pip-audit-multimodal.json
@@ -558,19 +564,19 @@ jobs:
           - image: node:24-bookworm-slim
             dockerfile: Dockerfile
           - image: node:24-bookworm-slim
-            dockerfile: docker/Dockerfile.production
+            dockerfile: infra/docker/Dockerfile.production
           - image: node:24-alpine
-            dockerfile: docker/Dockerfile.prod
+            dockerfile: infra/docker/Dockerfile.prod
           - image: python:3.13-slim
-            dockerfile: docker/backend.Dockerfile
+            dockerfile: infra/infra/infra/docker/backend.Dockerfile
           - image: mcr.microsoft.com/playwright:v1.60.0-jammy
-            dockerfile: docker/Dockerfile.playwright
+            dockerfile: infra/docker/Dockerfile.playwright
           - image: debian:bookworm-slim
-            dockerfile: docker/traefik/Dockerfile
+            dockerfile: infra/docker/traefik/Dockerfile
           - image: nvcr.io/nvidia/pytorch:26.07-py3
             dockerfile: ai/Dockerfile
           - image: nvidia/cuda:12.8.1-runtime-ubuntu24.04
-            dockerfile: docker/training-service/Dockerfile
+            dockerfile: infra/infra/docker/training-service/Dockerfile
           - image: nvidia/cuda:12.9.2-runtime-ubuntu24.04
             dockerfile: ai/nemo/gpu/Dockerfile
     steps:

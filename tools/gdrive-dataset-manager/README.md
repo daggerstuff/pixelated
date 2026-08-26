@@ -44,8 +44,13 @@ uv run --package gdrive-dataset-manager gdrive-status status
 ## Notes
 
 - Incremental: files are skipped when `modified_time` matches the indexed row.
-- Crash-resumable: per-file transactions; stale `processing` rows reset on start.
-- Downloads spool to `DRIVE_INDEX_TMPDIR` (capped at `DRIVE_INDEX_MAX_DOWNLOAD_BYTES`), never held in memory.
-- Media: ffmpeg + faster-whisper `small` int8 on CPU (~2-4x realtime); switch `WHISPER_MODEL=base` for speed.
-- Audio/video transcription requires `ffmpeg` (`sudo apt-get install -y ffmpeg`).
-- The clinical `pixelated-postgres` is untouched; this tool uses its own container on port 5433.
+- Crash-resumable: per-file transactions; stale `processing` rows reset on
+  start.
+- Downloads spool to `DRIVE_INDEX_TMPDIR` (capped at
+  `DRIVE_INDEX_MAX_DOWNLOAD_BYTES`), never held in memory.
+- Media: ffmpeg + faster-whisper `small` int8 on CPU (~2-4x realtime); switch
+  `WHISPER_MODEL=base` for speed.
+- Audio/video transcription requires `ffmpeg`
+  (`sudo apt-get install -y ffmpeg`).
+- The clinical `pixelated-postgres` is untouched; this tool uses its own
+  container on port 5433.

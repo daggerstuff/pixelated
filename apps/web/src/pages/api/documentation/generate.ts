@@ -1,0 +1,164 @@
+import type { APIRoute } from 'astro'
+
+import {
+  AIMessage,
+  AIServiceOptions,
+  createLLMService,
+} from '@/lib/ai/AIService'
+import { getCurrentUser } from '@/lib/auth'
+import { AIRepository } from '@/lib/db/ai/repository'
+import { DocumentationSystem as DocumentationService } from '@/lib/documentation/DocumentationSystem'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('documentation-api')
+
+// Instantiate dependencies for DocumentationService
+const repository = new AIRepository()
+
+function resolveSafeLlmBaseUrl(): string | undefined {
+  return (
+    process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL'] ??
+    process.env['OPENAI_BASE_URL'] ??
+    'https://api.openai.com/v1'
+  )
+}
+const llmConfig = {
+  apiKey: process.env['LLM_API_KEY'] ?? 'dummy-key',
+  baseUrl: resolveSafeLlmBaseUrl(),
+}
+// Create the base service
+const baseAiService = createLLMService(llmConfig)
+// Add a stub getModelInfo to satisfy the AIService interface
+const aiService = {
+  ...baseAiService,
+  getModelInfo: () => ({
+    id: 'dummy-model',
+    name: 'Dummy Model',
+    provider: 'llm',
+    capabilities: ['chat'],
+    contextWindow: 2048,
+    maxTokens: 1024,
+  }),
+  generateCompletion: async (
+    messages: AIMessage[],
+    options: AIServiceOptions | undefined,
+  ) => {
+    const result = await baseAiService.generateCompletion(messages, options)
+    if ('id' in result) {
+      return result
+    }
+    // Convert plain result to minimal AICompletion
+    return {
+      id: 'dummy-completion',
+      created: Date.now(),
+      model: 'dummy-model',
+      choices: [
+        {
+          message: {
+            role: 'assistant' as const,
+            content: result.content,
+          },
+          finishReason: 'stop' as const,
+        },
+      ],
+      usage: result.usage ?? {
+        promptTokens: 0,
+        completionTokens: 0,
+        totalTokens: 0,
+      },
+      provider: 'llm',
+      content: result.content,
+    } as import('@/lib/ai/models/ai-types').AICompletion
+  },
+}
+const documentationService = new DocumentationService(repository, aiService)
+
+interface GenerateDocRequestBody {
+  section?: string
+  options?: Parameters<typeof documentationService.generateDocumentation>[1]
+}
+
+export const POST: APIRoute = async ({ request }) => {
+  try {
+    // Authenticate request
+    const user = await getCurrentUser(request)
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: 'Unauthorized',
+          message: 'You must be authenticated to access this endpoint',
+        }),
+        {
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+    }
+
+    // Check admin permission
+    if (user.role !== 'admin') {
+      return new Response(
+        JSON.stringify({
+          error: 'Forbidden',
+          message: 'You do not have permission to generate documentation',
+        }),
+        {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+    }
+
+    // Parse request body
+    const body = (await request.json()) as GenerateDocRequestBody
+    const { section, options } = body
+
+    if (!section) {
+      return new Response(
+        JSON.stringify({
+          error: 'Bad Request',
+          message: 'section parameter is required',
+        }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+    }
+
+    // Generate documentation
+    const result = await documentationService.generateDocumentation(
+      section,
+      options,
+    )
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+  } catch (error: unknown) {
+    logger.error('Error generating documentation:', error)
+
+    return new Response(
+      JSON.stringify({
+        error: 'Internal Server Error',
+        message: error instanceof Error ? String(error) : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    )
+  }
+}

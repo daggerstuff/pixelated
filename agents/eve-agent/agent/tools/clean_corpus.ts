@@ -1,14 +1,17 @@
-import { defineTool } from 'eve/tools'
-import { z } from 'zod'
 import { execFile } from 'node:child_process'
 import { promisify } from 'node:util'
+
+import { defineTool } from 'eve/tools'
+import { z } from 'zod'
 
 const execFileAsync = promisify(execFile)
 
 const SCHEMA = z.object({
   input_path: z
     .string()
-    .describe('Path to the target corpus JSON dump (e.g. final/_source/pixelated_email_dump_combined.json).'),
+    .describe(
+      'Path to the target corpus JSON dump (e.g. final/_source/pixelated_email_dump_combined.json).',
+    ),
   output_path: z
     .string()
     .optional()
@@ -31,7 +34,14 @@ export default defineTool({
     'Runs the email filter pipeline across the specified corpus dump to clean up slop, formatting errors, excessive letters, and orphaned punctuation.',
   inputSchema: SCHEMA,
   async execute(input: CleanCorpusInput) {
-    const args = ['run', 'python', 'scripts/fix/email_filters/pipeline/pipeline_cli.py', 'run', '--input', input.input_path]
+    const args = [
+      'run',
+      'python',
+      'scripts/fix/email_filters/pipeline/pipeline_cli.py',
+      'run',
+      '--input',
+      input.input_path,
+    ]
     if (input.output_path) {
       args.push('--output', input.output_path)
     }

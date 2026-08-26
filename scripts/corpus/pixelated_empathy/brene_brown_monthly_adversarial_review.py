@@ -3,20 +3,20 @@
 Co-review path that runs alongside the existing 3-persona monthly path
 defined in `monthly_adversarial_llm_review.py`. This module is strictly
 ADDITIVE — it does not modify the existing 3-persona path; it loads the
-Brené Brown persona descriptor from `hackathon/personas/quadit/brene_brown.toml`
-and emits a per-month adversarial-audit summary in the same shape as
-`monthly_adversarial_llm_review.review()`'s output.
+Brené Brown persona descriptor from `brene_brown.toml` (located alongside
+this package) and emits a per-month adversarial-audit summary in the same
+shape as `monthly_adversarial_llm_review.review()`'s output.
 
 Run:
 
-    uv run --project hackathon/corpus/corpus-generator python -m \\
+    uv run --project scripts/corpus python -m \\
         pixelated_empathy.brene_brown_monthly_adversarial_review \\
         --month 2026-06 --n 50 --work-dir monthly_work
 
 Or as a script with the venv python directly:
 
-    PYTHONPATH=hackathon/corpus/corpus-generator hackathon/.venv/bin/python \\
-        hackathon/corpus/corpus-generator/pixelated_empathy/brene_brown_monthly_adversarial_review.py \\
+    PYTHONPATH=scripts/corpus python \\
+        scripts/corpus/pixelated_empathy/brene_brown_monthly_adversarial_review.py \\
         --month 2026-06 --n 50
 
 The implementation tries to call Qwen headless via the existing Qwen runner
@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_N_SAMPLE = 50
 DEFAULT_WORK_DIR = Path("monthly_work")
-DEFAULT_PERSONA_PATH = Path("hackathon/personas/quadit/brene_brown.toml")
+DEFAULT_PERSONA_PATH = Path(__file__).parent / "brene_brown.toml"
 
 # Severity weights aligned with the descriptor's `auditor_severity_rubric`.
 # The weight on a critical finding flips the summary to FAIL; warnings
@@ -496,8 +496,7 @@ def _try_qwen_invoke(
 ) -> list[dict[str, Any]] | None:
     """Best-effort Qwen headless invocation.
 
-    The existing Qwen runner is `hackathon/llm/qwen_email_gap_fill.py`
-    and reads credentials from `.env`. This scratch implementation does
+    The existing Qwen runner reads credentials from `.env`. This scratch implementation does
     not have a hard dependency on that file being importable in the
     scratch invocation environment, so the function returns None the
     moment any runtime guard closes. Callers MUST handle `None` as
@@ -602,7 +601,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--persona",
         type=Path,
         default=DEFAULT_PERSONA_PATH,
-        help="Persona descriptor TOML path (default hackathon/personas/quadit/brene_brown.toml).",
+        help="Persona descriptor TOML path (default: co-located brene_brown.toml).",
     )
     return parser.parse_args(argv)
 

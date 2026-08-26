@@ -119,7 +119,7 @@ deploy_services() {
     log "Deploying services to ${ENVIRONMENT}..."
 
     # Stop existing services
-    $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml down
+    $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f infra/docker/docker-compose.yml down
 
 
     # Backup current deployment (if exists)
@@ -133,7 +133,7 @@ deploy_services() {
 
 
     # Start services with health checks
-    $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml up -d
+    $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f infra/docker/docker-compose.yml up -d
 
     # Wait for services to be ready
     log "Waiting for services to start..."
@@ -212,13 +212,13 @@ rollback() {
 
     if [[ -d "deployment-backup" ]]; then
         # Stop current services
-        $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml down
+        $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f infra/docker/docker-compose.yml down
 
         # Restore from backup
         cp -r deployment-backup/* .
 
         # Restart services
-        $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f docker/docker-compose.yml up -d
+        $DOCKER_COMPOSE --env-file ".env.${ENVIRONMENT}" -f infra/docker/docker-compose.yml up -d
 
         success "Rollback completed"
     else

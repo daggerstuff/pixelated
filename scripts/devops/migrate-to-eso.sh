@@ -13,7 +13,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-K8S_DIR="$REPO_ROOT/k8s/base"
+K8S_DIR="$REPO_ROOT/infra/k8s/base"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'

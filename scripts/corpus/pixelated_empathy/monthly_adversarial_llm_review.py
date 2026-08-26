@@ -1,9 +1,9 @@
-"""Monthly adversarial LLM review — 3-persona judge.
+"""Monthly adversarial LLM review — 3-persona clinical judge.
 
-Three personas evaluate the corpus:
-  1. "Pied Piper" — voice fidelity: "Does each character sound like themselves?"
-  2. "Man In Black" — edge-case detector: "What's the one thing that would reveal this is generated?"
-  3. "LLM Fidelity Engineer" — quality reviewer: "What would a model evaluator flag?"
+Three clinical personas evaluate the corpus:
+  1. "Voice Fidelity Auditor" — voice fidelity: "Does each team member sound like themselves?"
+  2. "Clinical Accuracy Reviewer" — clinical accuracy: "Are there clinical errors, wrong terminology, or safety violations?"
+  3. "Training Signal Engineer" — quality reviewer: "Would training data generated from this corpus produce a clinically competent model?"
 
 A month passes if all 3 personas pass (score >= 0.7 and no critical flags).
 """
@@ -72,7 +72,7 @@ def _format_email_samples(emails: list[EmailRecord], n: int = SAMPLE_SIZE_EMAILS
     for email in sample:
         blocks.append(
             f"[{email.id}]\n"
-            f"From: {email.sender} → {', '.join(email.recipients)}\n"
+            f"From: {email.sender} -> {', '.join(email.recipients)}\n"
             f"Subject: {email.subject}\n"
             f"{email.body[:400]}"
         )
@@ -92,26 +92,27 @@ def _format_chat_samples(chats: list[ChatBurst], n: int = SAMPLE_SIZE_CHATS) -> 
     return "\n\n---\n\n".join(blocks)
 
 
-def _pied_piper_prompt(email_samples: str, chat_samples: str) -> str:
-    return f"""You are the "Pied Piper" — a sharp script editor who has memorized the voice of each of the 9 personas at Pixelated Empathy. Your job is to evaluate whether each character sounds like themselves.
+def _voice_fidelity_prompt(email_samples: str, chat_samples: str) -> str:
+    return f"""You are the "Voice Fidelity Auditor" — a clinical communication expert who has memorized the voice of each of the 9 personas at Pixelated Empathy. Your job is to evaluate whether each team member sounds like themselves.
 
 The 9 personas:
-- Chad (CEO): Short emails, metrics-obsessed, no wasted words.
-- Marcus (CTO): Technical precision, dry humor, pushes back on hype.
-- Ada (Head of Clinical): Careful, formal, patient-first, writes in full paragraphs.
-- London (Head of Product): Energetic, customer-centric, em dashes and parentheticals.
-- Adaora (Senior Engineer): Direct, ships fast, short declarative emails.
-- Naomi (Clinical Lead): Empathetic, detail-oriented, longer than she intends.
-- Lin (Designer): Casual, lowercase, links to Figma instead of explaining.
-- Ren (DevOps): Terse, 3-word emails, system-focused.
-- Mira (Founding Clinician): Early months—brief; later months—philosophical and long.
+- Ada (Clinical Director): Formal, precise, regulatory-minded. Grounds decisions in evidence and policy. Never uses superlatives. Writes in full paragraphs.
+- Marcus (AI Systems Lead): Technical, dry humor, pushes back on hype. Quantifies tradeoffs. Bridges engineering and clinical requirements.
+- Naomi (Senior Supervisor): Empathetic, detail-oriented, trainee-focused. Grounds feedback in specific therapeutic modalities (MI, CBT, DBT, EMDR). Writes longer than she intends.
+- London (Training Program Coordinator): Energetic, trainee-centric. Em dashes and parentheticals. References curriculum milestones and completion rates.
+- Adaora (Clinical Research Engineer): Direct, ships fast. References specific outcome measures (PHQ-9, GAD-7, OQ-45). Short declarative emails.
+- Mira (Founding Clinician): Early months—brief and uncertain; later months—philosophical and long. References Rogers, Yalom, Brown.
+- Lin (Scenario Designer): Casual, lowercase, links to Figma. Designs patient personas and branching narratives.
+- Ren (Platform Engineer): Terse, 3-word emails. System-focused. Manages PHI encryption and audit logs.
+- Sam (Trainee/Resident): Early months—deferential, asks for approval; later months—confident, pushes back. Always uses de-identified case codes.
 
 HARD CONSTRAINTS (flag any violation as CRITICAL):
-- Chad never writes more than 8 sentences in a non-board email.
 - Ada never uses "amazing", "incredible", "game-changing".
 - Nobody uses: "circle back", "double-click", "synergize", "I hope this finds you well".
-- Ren does not engage in feature discussions.
+- Ren does not engage in clinical discussions — redirects to infra/security.
 - No job-title signatures in internal emails.
+- All patient references must use de-identified case codes, never real names.
+- Sam's voice must evolve: deferential in early months, confident in later months.
 
 EMAIL SAMPLES TO EVALUATE:
 {email_samples}
@@ -132,16 +133,16 @@ Respond ONLY with the JSON. No markdown.
 """
 
 
-def _man_in_black_prompt(email_samples: str, chat_samples: str) -> str:
-    return f"""You are the "Man In Black" — a language model forensics expert. Your job is to find the ONE thing that would reveal this corpus is AI-generated, not real human communication.
+def _clinical_accuracy_prompt(email_samples: str, chat_samples: str) -> str:
+    return f"""You are the "Clinical Accuracy Reviewer" — a licensed clinical psychologist evaluating the clinical accuracy of synthetic training communications. Your job is to find clinical errors, safety violations, or misrepresentations of therapeutic practice.
 
 You are looking for:
-- Statistical uniformity (all messages same length, all openers different, all subjects follow a template)
-- Overly cooperative tone (nobody ever stonewalls, sarcasm is always gentle, disagreements are resolved too cleanly)
-- Missing texture (no typos, no incomplete thoughts, no ellipsis trails, no "oops, wrong thread")
-- Temporal impossibility (emails sent at suspiciously round times, nobody ever writes at 11pm before a big demo)
-- False realism (too many anchors, every email has a meeting reference, every chat ends with action items)
-- Cross-character uniformity (Chad's email sounds like Ada's email after persona names are stripped)
+- Incorrect use of clinical terminology (wrong DSM-5-TR criteria, misnamed therapeutic techniques, wrong assessment tools)
+- Safety violations (patient identifying information, breach of confidentiality, inappropriate clinical advice)
+- Misrepresentation of therapeutic modalities (CBT, DBT, MI, EMDR, TF-CBT described incorrectly)
+- Risk assessment errors (wrong protocol, incorrect risk stratification, missing safety planning steps)
+- Ethical violations (boundary crossings, dual relationships, inappropriate supervisor-trainee dynamics)
+- Clinical plausibility (would a real clinical team communicate this way about these cases?)
 
 EMAIL SAMPLES:
 {email_samples}
@@ -151,26 +152,27 @@ CHAT SAMPLES:
 
 Respond in JSON:
 {{
-  "score": <float 0.0-1.0 — higher is MORE authentic, NOT more generated>,
+  "score": <float 0.0-1.0 — higher is MORE clinically accurate>,
   "passed": <bool — pass if score >= 0.7>,
-  "notes": "<your single sharpest forensic observation + 1-2 secondary findings>",
-  "flagged_ids": ["<id of the artifact most likely to betray generation>"]
+  "notes": "<your sharpest clinical accuracy finding + 1-2 secondary observations>",
+  "flagged_ids": ["<id of the artifact with the worst clinical accuracy>"]
 }}
 
-Score >= 0.7 = authentic enough to pass. Respond ONLY with JSON. No markdown.
+Score >= 0.7 = clinically accurate enough to pass. Respond ONLY with JSON. No markdown.
 """
 
 
-def _fidelity_engineer_prompt(email_samples: str, chat_samples: str) -> str:
-    return f"""You are the "LLM Fidelity Engineer" — a technical evaluator who assesses synthetic corpus quality for AI training purposes. Your job is to identify quality issues that would degrade a model trained on this data.
+def _training_signal_prompt(email_samples: str, chat_samples: str) -> str:
+    return f"""You are the "Training Signal Engineer" — a technical evaluator who assesses synthetic corpus quality for AI clinical training purposes. Your job is to identify quality issues that would degrade a model trained on this data.
 
 You are checking for:
 - Training signal pollution (repeated patterns that would overfit a model)
 - Label leakage (artifacts that reveal their own generation — e.g. LLM-style hedging, over-explanation)
-- Semantic diversity (are different personas discussing different things, or is there topic monoculture?)
-- Hallucination artifacts (names of tools, people, or events that don't exist in the company's world)
+- Semantic diversity (are different personas discussing different clinical topics, or is there topic monoculture?)
+- Hallucination artifacts (names of tools, people, or events that don't exist in the clinical program)
 - Format consistency (IDs follow naming conventions, dates are parseable, required fields present)
-- Balance (email-to-chat ratio appropriate, no one persona dominating)
+- Clinical balance (email-to-chat ratio appropriate, no one persona dominating, clinical topics distributed across tiers)
+- De-identification compliance (all patient references use case codes, no real patient names)
 
 EMAIL SAMPLES:
 {email_samples}
@@ -272,7 +274,7 @@ def review(
                     notes="No artifacts to review",
                     flagged_ids=[],
                 )
-                for name in ["Pied Piper", "Man In Black", "LLM Fidelity Engineer"]
+                for name in ["Voice Fidelity Auditor", "Clinical Accuracy Reviewer", "Training Signal Engineer"]
             ],
         )
         (work_dir / "adversarial_llm_review_report.json").write_text(
@@ -285,18 +287,18 @@ def review(
 
     results: list[PersonaJudgeResult] = [
         _call_judge(
-            "Pied Piper",
-            _pied_piper_prompt(email_samples, chat_samples),
+            "Voice Fidelity Auditor",
+            _voice_fidelity_prompt(email_samples, chat_samples),
             model,
         ),
         _call_judge(
-            "Man In Black",
-            _man_in_black_prompt(email_samples, chat_samples),
+            "Clinical Accuracy Reviewer",
+            _clinical_accuracy_prompt(email_samples, chat_samples),
             model,
         ),
         _call_judge(
-            "LLM Fidelity Engineer",
-            _fidelity_engineer_prompt(email_samples, chat_samples),
+            "Training Signal Engineer",
+            _training_signal_prompt(email_samples, chat_samples),
             model,
         ),
     ]

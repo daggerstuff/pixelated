@@ -117,7 +117,6 @@ const preferredPort = (() => {
   return 4321
 })()
 
-
 const adapter = (() => {
   if (isVercelDeploy) {
     console.log('▲ Using Vercel adapter for Vercel deployment')
@@ -140,6 +139,8 @@ const adapter = (() => {
 
 // https://astro.build/config
 export default defineConfig({
+  srcDir: './apps/web/src',
+  publicDir: './apps/web/public',
   site: normalizeSiteUrl(process.env.PUBLIC_SITE_URL),
   output: 'server',
   adapter,
@@ -154,8 +155,8 @@ export default defineConfig({
     sourcemap: hasSentryDSN ? 'hidden' : !isProduction,
     copy: [
       {
-        from: 'templates/email',
-        to: 'templates/email',
+        from: 'content/templates/email',
+        to: 'content/templates/email',
       },
     ],
   },
@@ -214,7 +215,9 @@ export default defineConfig({
             (warning.code === 'SOURCEMAP_BROKEN' ||
               warning.code === 'SOURCEMAP_ERROR' ||
               (typeof warning.message === 'string' &&
-                warning.message.includes('Sourcemap is likely to be incorrect')))
+                warning.message.includes(
+                  'Sourcemap is likely to be incorrect',
+                )))
 
           if (isAstroInternalSourcemapWarning) {
             return
@@ -407,18 +410,18 @@ export default defineConfig({
     ].filter(Boolean),
     resolve: {
       alias: {
-        '~': path.resolve('./src'),
-        '@': path.resolve('./src'),
-        '@components': path.resolve('./src/components'),
-        '@layouts': path.resolve('./src/layouts'),
-        '@utils': path.resolve('./src/utils'),
-        '@lib': path.resolve('./src/lib'),
-        'framer-motion': path.resolve('./src/lib/shims/framer-motion.tsx'),
+        '~': path.resolve('./apps/web/src'),
+        '@': path.resolve('./apps/web/src'),
+        '@components': path.resolve('./apps/web/src/components'),
+        '@layouts': path.resolve('./apps/web/src/layouts'),
+        '@utils': path.resolve('./apps/web/src/utils'),
+        '@lib': path.resolve('./apps/web/src/lib'),
+        'framer-motion': path.resolve('./apps/web/src/lib/shims/framer-motion.tsx'),
         '@radix-ui/react-tooltip': path.resolve(
-          './src/lib/shims/radix-tooltip.tsx',
+          './apps/web/src/lib/shims/radix-tooltip.tsx',
         ),
         'astro-icon/components': path.resolve(
-          './src/components/ui/astro-icon-components.ts',
+          './apps/web/src/components/ui/astro-icon-components.ts',
         ),
         'stream': 'stream-browserify',
         'zlib': 'browserify-zlib',
@@ -522,10 +525,10 @@ export default defineConfig({
       // This prevents "externalized for browser compatibility" noise from files
       // that legitimately import Node built-ins (crypto, fs, path, …).
       entries: [
-        'src/pages/**/*.{ts,tsx,js,jsx,astro}',
-        'src/layouts/**/*.{ts,tsx,js,jsx,astro}',
-        'src/components/**/*.{ts,tsx,js,jsx,astro}',
-        'src/middleware.ts',
+        'apps/web/src/pages/**/*.{ts,tsx,js,jsx,astro}',
+        'apps/web/src/layouts/**/*.{ts,tsx,js,jsx,astro}',
+        'apps/web/src/components/**/*.{ts,tsx,js,jsx,astro}',
+        'apps/web/src/middleware.ts',
       ],
       // Explicitly pre-bundle zod so Vite always produces a stable dep chunk.
       // Without this, zod (pulled in transitively via @pixelated/memory-schema)
@@ -535,23 +538,23 @@ export default defineConfig({
       include: ['zod'],
       exclude: [
         // ── Server-only source directories ─────────────────────────────────
-        'src/lib/security',
-        'src/lib/crypto',
-        'src/lib/server',
-        'src/lib/server-only',
-        'src/lib/auth',
-        'src/lib/websocket',
-        'src/lib/agent-note-collab',
-        'src/lib/logging',
-        'src/lib/middleware',
-        'src/lib/monitoring',
-        'src/lib/backup',
-        'src/lib/fhe',
-        'src/lib/threat-detection',
-        'src/lib/threat-intelligence',
-        'src/lib/visual-regression',
-        'src/scripts',
-        'src/server.prod.ts',
+        'apps/web/src/lib/security',
+        'apps/web/src/lib/crypto',
+        'apps/web/src/lib/server',
+        'apps/web/src/lib/server-only',
+        'apps/web/src/lib/auth',
+        'apps/web/src/lib/websocket',
+        'apps/web/src/lib/agent-note-collab',
+        'apps/web/src/lib/logging',
+        'apps/web/src/lib/middleware',
+        'apps/web/src/lib/monitoring',
+        'apps/web/src/lib/backup',
+        'apps/web/src/lib/fhe',
+        'apps/web/src/lib/security/threat-detection',
+        'apps/web/src/lib/security/threat-intelligence',
+        'apps/web/src/lib/visual-regression',
+        'apps/web/src/scripts',
+        'apps/web/src/server.prod.ts',
         // ── Node built-ins (never pre-bundle) ──────────────────────────────
         'node:async_hooks',
         'node:buffer',
@@ -799,8 +802,8 @@ export default defineConfig({
     fs: {
       strict: true,
       allow: [
-        path.resolve('./src'),
-        path.resolve('./public'),
+        path.resolve('./apps/web/src'),
+        path.resolve('./apps/web/public'),
         path.resolve('./.astro'),
       ],
       deny: [

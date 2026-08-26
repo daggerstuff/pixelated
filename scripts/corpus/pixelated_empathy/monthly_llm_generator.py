@@ -26,7 +26,7 @@ from pixelated_empathy.schemas import (
     BatchSpec,
     ChatBurst,
     ChatMessage,
-    CompanyEvent,
+    ClinicalEvent,
     EmailRecord,
     GateTier,
     MonthEnrichment,
@@ -40,11 +40,11 @@ logger = logging.getLogger(__name__)
 
 MODEL_BY_TIER: dict[GateTier, str] = {
     GateTier.FOUNDATION: "wayfarer2:latest",
-    GateTier.PRESSURE: "wayfarer2:latest",
-    GateTier.RESET: "wayfarer2:latest",
-    GateTier.TRACTION: "qwen2.5:32b",
-    GateTier.STRICT_CANON: "qwen2.5:32b",
-    GateTier.LAUNCH_CRUCIBLE: "qwen2.5:32b",
+    GateTier.ASSESSMENT: "wayfarer2:latest",
+    GateTier.CRISIS: "qwen2.5:32b",
+    GateTier.RUPTURE_REPAIR: "qwen2.5:32b",
+    GateTier.COMPLEX: "qwen2.5:32b",
+    GateTier.CERTIFICATION: "qwen2.5:32b",
 }
 
 MAX_RETRIES = 3
@@ -171,7 +171,7 @@ def _repair_chat_burst(burst: dict[str, Any], month: str) -> dict[str, Any]:
 def _validate_email_quality(
     email: EmailRecord,
     month: str,
-    events: list[CompanyEvent],
+    events: list[ClinicalEvent],
 ) -> list[str]:
     """Return a list of quality issues, empty if clean."""
     issues: list[str] = []
@@ -204,7 +204,7 @@ def _validate_email_quality(
 def _validate_chat_quality(
     burst: ChatBurst,
     month: str,
-    events: list[CompanyEvent],
+    events: list[ClinicalEvent],
 ) -> list[str]:
     issues: list[str] = []
     year, mon = (int(x) for x in month.split("-"))
@@ -233,7 +233,7 @@ def _validate_chat_quality(
 def _email_prompt(
     batch_spec: BatchSpec,
     enrichment: MonthEnrichment,
-    events: list[CompanyEvent],
+    events: list[ClinicalEvent],
     reference_examples: list[dict[str, Any]],
 ) -> str:
     persona_blocks = "\n\n".join(
@@ -260,10 +260,20 @@ def _email_prompt(
 
     topic_list = ", ".join(batch_spec.topics[:10])
 
-    return f"""You are generating a synthetic email corpus for a fictional 9-person mental health AI startup called "Pixelated Empathy" (month: {batch_spec.month}).
+    return f"""You are generating a synthetic clinical training corpus for the Pixelated Empathy platform (month: {batch_spec.month}).
 
-COMPANY CONTEXT:
-Pixelated Empathy builds HIPAA-compliant clinical AI for mental-health training. The 9 personas are Chad (CEO), Marcus (CTO), Ada (Head of Clinical), London (Head of Product), Adaora (Senior Engineer), Naomi (Clinical Lead), Lin (Designer), Ren (DevOps), Mira (Founding Clinician).
+CLINICAL CONTEXT:
+Pixelated Empathy is a clinical AI training platform where a 9-person clinical team practices and supervises mental health
+skills through AI-powered patient simulations. The 9 personas are:
+- Ada (Clinical Director): Formal, precise, regulatory-minded, grounds decisions in evidence and policy.
+- Marcus (AI Systems Lead): Technical, dry humor, pushes back on hype, bridges engineering and clinical requirements.
+- Naomi (Senior Supervisor): Empathetic, detail-oriented, trainee-focused, grounds feedback in specific therapeutic modalities.
+- London (Training Program Coordinator): Energetic, trainee-centric, thinks in curriculum milestones and training outcomes.
+- Adaora (Clinical Research Engineer): Direct, ships fast, references specific outcome measures (PHQ-9, GAD-7, OQ-45).
+- Mira (Founding Clinician): Visionary, philosophical, integrates clinical theory with AI implications.
+- Lin (Scenario Designer): Visual thinker, casual, designs patient personas and branching narrative scripts.
+- Ren (Platform Engineer): Terse, system-focused, manages PHI encryption and audit logs.
+- Sam (Trainee/Resident): Evolves from deferential and uncertain to confident and independent across the 12-month curriculum.
 
 MONTH EVENTS (anchor every email to one of these):
 {event_summaries}
@@ -274,12 +284,14 @@ PERSONAS INVOLVED:
 {persona_blocks}
 
 VOICE RULES:
-- Let people be friendly, tired, sarcastic, and competent. This is a trusted 9-person startup, not an HR training module.
+- Let people be professional but human — tired, frustrated, caring, sometimes sarcastic. This is a clinical training team, not an HR module.
 - No job-title signatures in internal emails unless the context is formal/external.
-- Every work thread must carry a real anchor: a metric, a customer, a bug, a deadline, an artifact, a calendar pressure, or an office-life detail.
+- Every communication thread must carry a real clinical anchor: a case code, a supervision observation, a training metric, a patient persona, a protocol reference, or a curriculum milestone.
 - Emails should vary in length, opener style, and register across senders.
 - No stock phrases: "circle back", "double-click", "synergize", "I hope this finds you well", "per my last email", "going forward".
 - No formulaic closers: every email should close in the sender's natural voice.
+- All patient references must use de-identified case codes (e.g., "Case 2025-07-003"). Never use real patient names.
+- Clinical terminology should be used accurately — DSM-5-TR criteria, therapeutic modalities (CBT, DBT, MI, EMDR, TF-CBT), assessment tools (PHQ-9, GAD-7, Columbia Protocol).
 
 REFERENCE EXAMPLES (do NOT include these in output — study the style only):
 {ref_block}
@@ -294,7 +306,8 @@ TASK: Generate exactly {batch_spec.target_count} email records as a JSON array. 
   "subject": "<subject line>",
   "body": "<email body — minimum 30 words>",
   "event_id": "<EVT-YYYY-NNN or null>",
-  "topic": "<topic string>"
+  "topic": "<topic string>",
+  "communication_type": "supervision|case_consult|care_coordination|training|admin"
 }}
 
 CONSTRAINTS:
@@ -311,7 +324,7 @@ OUTPUT: Only the JSON array. No commentary, no markdown fences, no explanation.
 def _chat_prompt(
     batch_spec: BatchSpec,
     enrichment: MonthEnrichment,
-    events: list[CompanyEvent],
+    events: list[ClinicalEvent],
     reference_examples: list[dict[str, Any]],
 ) -> str:
     event_summaries = "\n".join(
@@ -330,10 +343,10 @@ def _chat_prompt(
 
     topic_list = ", ".join(batch_spec.topics[:10])
 
-    return f"""You are generating synthetic Google Chat bursts for Pixelated Empathy (month: {batch_spec.month}).
+    return f"""You are generating synthetic clinical team chat bursts for the Pixelated Empathy platform (month: {batch_spec.month}).
 
-COMPANY CONTEXT:
-9-person mental health AI startup. Channels: #general, #engineering, #clinical, #product, #design, #infra, #random.
+CLINICAL CONTEXT:
+9-person clinical training team. Channels: #general, #clinical, #supervision, #engineering, #scenarios, #infra, #random, #leadership, #data, #announcements.
 
 MONTH EVENTS (anchor each burst to one):
 {event_summaries}
@@ -342,11 +355,12 @@ TOPICS THIS BATCH: {topic_list}
 
 CHAT VOICE RULES:
 - Chats should have off-topic texture, controlled disagreement, and cross-artifact callbacks — not just task reporting.
-- Each burst is 3–12 messages. Messages should feel like real Slack/chat messages.
+- Each burst is 3–12 messages. Messages should feel like real Slack/chat messages between clinical team members.
 - Mix quick reactions (👍, "on it", "done") with substantive exchanges.
-- Room assignments must be appropriate: technical in #engineering, clinical in #clinical, etc.
-- Do NOT have every burst be a celebration or a crisis. Most chats are mundane coordination.
+- Room assignments must be appropriate: clinical discussions in #clinical, supervision in #supervision, technical in #engineering, scenario design in #scenarios, infrastructure in #infra.
+- Do NOT have every burst be a celebration or a crisis. Most chats are mundane clinical coordination.
 - No message should just restate the previous message.
+- All patient references must use de-identified case codes. Never use real patient names.
 
 REFERENCE EXAMPLES (study the style, do NOT output):
 {ref_block}
@@ -358,6 +372,7 @@ TASK: Generate exactly {batch_spec.target_count} chat burst records as a JSON ar
   "room": "#<channel>",
   "date": "YYYY-MM-DDTHH:MM:SSZ",
   "topic": "<topic string>",
+  "discussion_type": "debrief|case_conference|huddle|supervision|crisis_response",
   "messages": [
     {{"sender": "<name>", "text": "<message text>"}},
     ...

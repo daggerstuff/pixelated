@@ -22,24 +22,24 @@ const ROOT = resolve(import.meta.dirname, '../..')
 // Modules to audit — each entry maps a name to a glob pattern under src/
 // Error results are filtered to only production source files (test files excluded)
 const MODULES: { name: string; pattern: string }[] = [
-  { name: 'lib/auth',          pattern: 'src/lib/auth/**/*.ts' },
-  { name: 'lib/audit',         pattern: 'src/lib/audit/**/*.ts' },
-  { name: 'lib/security',      pattern: 'src/lib/security/**/*.ts' },
-  { name: 'lib/encryption',    pattern: 'src/lib/encryption.ts' },
-  { name: 'lib/ai',            pattern: 'src/lib/ai/**/*.ts' },
-  { name: 'lib/ehr',           pattern: 'src/lib/ehr/**/*.ts' },
-  { name: 'lib/fhe',           pattern: 'src/lib/fhe/**/*.ts' },
-  { name: 'lib/logging',       pattern: 'src/lib/logging/**/*.ts' },
-  { name: 'lib/services',      pattern: 'src/lib/services/**/*.ts' },
-  { name: 'lib/memory',        pattern: 'src/lib/memory/**/*.ts' },
-  { name: 'lib/db',            pattern: 'src/lib/db/**/*.ts' },
-  { name: 'utils',             pattern: 'src/utils/**/*.ts' },
-  { name: 'hooks',             pattern: 'src/hooks/**/*.ts' },
-  { name: 'components',        pattern: 'src/components/**/*.ts' },
-  { name: 'pages/api',         pattern: 'src/pages/api/**/*.ts' },
-  { name: 'middleware',        pattern: 'src/middleware/**/*.ts' },
-  { name: 'config',            pattern: 'src/config/**/*.ts' },
-  { name: 'types',             pattern: 'src/types/**/*.ts' },
+  { name: 'lib/auth',          pattern: 'apps/web/src/lib/auth/**/*.ts' },
+  { name: 'lib/audit',         pattern: 'apps/web/src/lib/audit/**/*.ts' },
+  { name: 'lib/security',      pattern: 'apps/web/src/lib/security/**/*.ts' },
+  { name: 'lib/encryption',    pattern: 'apps/web/src/lib/encryption.ts' },
+  { name: 'lib/ai',            pattern: 'apps/web/src/lib/ai/**/*.ts' },
+  { name: 'lib/ehr-native',    pattern: 'apps/web/src/lib/ehr-native/**/*.ts' },
+  { name: 'lib/fhe',           pattern: 'apps/web/src/lib/fhe/**/*.ts' },
+  { name: 'lib/logging',       pattern: 'apps/web/src/lib/logging/**/*.ts' },
+  { name: 'lib/services',      pattern: 'apps/web/src/lib/services/**/*.ts' },
+  { name: 'lib/memory',        pattern: 'apps/web/src/lib/memory/**/*.ts' },
+  { name: 'lib/db',            pattern: 'apps/web/src/lib/db/**/*.ts' },
+  { name: 'utils',             pattern: 'apps/web/src/utils/**/*.ts' },
+  { name: 'hooks',             pattern: 'apps/web/src/hooks/**/*.ts' },
+  { name: 'components',        pattern: 'apps/web/src/components/**/*.ts' },
+  { name: 'pages/api',         pattern: 'apps/web/src/pages/api/**/*.ts' },
+  { name: 'middleware',        pattern: 'apps/web/src/middleware/**/*.ts' },
+  { name: 'config',            pattern: 'apps/web/src/config/**/*.ts' },
+  { name: 'types',             pattern: 'apps/web/src/types/**/*.ts' },
 ]
 
 interface ModuleResult {
@@ -68,7 +68,7 @@ function runCombinedCheck(): ModuleResult[] {
       strict: true,
       skipLibCheck: true,
     },
-    include: ['../src/**/*.ts', '../src/**/*.tsx'],
+    include: ['../apps/web/src/**/*.ts', '../apps/web/src/**/*.tsx'],
     exclude: ['**/*.test.ts', '**/*.spec.ts', '**/__tests__/**', '**/node_modules/**'],
   }
 
@@ -98,7 +98,7 @@ function runCombinedCheck(): ModuleResult[] {
   // Count production files per module and classify errors
   const results: ModuleResult[] = MODULES.map((mod) => {
     const dirPrefix = mod.pattern
-      .replace(/^src\//, '')
+      .replace(/^apps\/web\/src\//, '')
       .replace(/\/\*\*\/\*\.ts$/, '')
       .replace(/\.ts$/, '')
       .replace(/\/\*$/, '')
@@ -106,14 +106,14 @@ function runCombinedCheck(): ModuleResult[] {
     // Find errors that start with this module's directory path
     const modErrors = errorLines.filter((l) => {
       const filePath = l.split('(')[0]?.trim() ?? ''
-      return filePath.startsWith(`src/${dirPrefix}`)
+      return filePath.startsWith(`apps/web/src/${dirPrefix}`)
     })
 
     // Count production source files in this module (recursive, excluding tests)
     let fileCount = 0
     try {
       const findOut = execSync(
-        `find src/${dirPrefix} -name '*.ts' -not -name '*.test.ts' -not -name '*.spec.ts' -not -path '*/__tests__/*' 2>/dev/null | wc -l`,
+        `find apps/web/src/${dirPrefix} -name '*.ts' -not -name '*.test.ts' -not -name '*.spec.ts' -not -path '*/__tests__/*' 2>/dev/null | wc -l`,
         { cwd: ROOT, encoding: 'utf8' },
       )
       fileCount = Number.parseInt(findOut.trim(), 10) || 0

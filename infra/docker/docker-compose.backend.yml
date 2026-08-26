@@ -1,0 +1,350 @@
+# ============================================================================
+# Pixelated Empathy — Unified Backend Stack
+# ============================================================================
+# One-command local backend: databases + API servers + microservices + monitoring
+#
+# Usage:
+#   cp .env.backend.example .env.backend  # then edit values
+#   make backend-up                        # start everything
+#   make backend-health                    # check all services
+#   make backend-logs                      # tail logs
+#   make backend-down                      # stop
+# ============================================================================
+
+services:
+  # ── Databases ──────────────────────────────────────────────────────────
+
+  postgres:
+    image: postgres:17
+    container_name: pe-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pixelated_empathy}
+      POSTGRES_USER: ${POSTGRES_USER:-pixelated}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ['CMD-SHELL', "pg_isready -U ${POSTGRES_USER:-pixelated} -d ${POSTGRES_DB:-pixelated_empathy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: pe-redis
+    command: redis-server --bind 0.0.0.0 --appendonly yes --requirepass ${REDIS_PASSWORD:?REDIS_PASSWORD is required} --protected-mode yes
+    ports:
+      - '127.0.0.1:6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD-SHELL', "redis-cli -a \"${REDIS_PASSWORD}\" ping | grep -q PONG"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  mongo:
+    image: mongo:7
+    container_name: pe-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-local_dev_mongo_password}
+      MONGO_INITDB_DATABASE: pixelated_empathy
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD-SHELL', "mongosh --quiet --eval 'db.runCommand({ping:1}).ok' | grep -q 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  # ── API Servers ─────────────────────────────────────────────────────────
+
+  express-api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/express-api.Dockerfile
+    container_name: pe-express-api
+    env_file:
+      - ../../.env.backend
+    environment:
+      - PORT=5000
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - MONGODB_URI=mongodb://mongo:27017/pixelated_empathy?authSource=admin
+    ports:
+      - '5000:5000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', "curl -sf http://localhost:5000/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  pe-backend:
+    build:
+      context: ../..
+      dockerfile: infra/docker/pe.Dockerfile
+    container_name: pe-fastapi
+    env_file:
+      - ../../.env.backend
+    environment:
+      - PE_DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
+      - PE_REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    ports:
+      - '8000:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  # ── Microservices ──────────────────────────────────────────────────────
+
+  bias-detection:
+    build:
+      context: ../..
+      dockerfile: infra/docker/bias-detection.Dockerfile
+    container_name: pe-bias-detection
+    env_file:
+      - ../../.env.backend
+    environment:
+      - PORT=8001
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    ports:
+      - '8001:8001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', "curl -sf http://localhost:8001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  ai-service:
+    build:
+      context: ../..
+      dockerfile: infra/docker/ai-service.Dockerfile
+    container_name: pe-ai-service
+    env_file:
+      - ../../.env.backend
+    environment:
+      - PORT=8002
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    ports:
+      - '8002:8002'
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', "curl -sf http://localhost:8002/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  websocket-server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/websocket-server.Dockerfile
+    container_name: pe-websocket
+    env_file:
+      - ../../.env.backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    ports:
+      - '3001:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', "curl -sf http://localhost:3001/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/worker.Dockerfile
+    container_name: pe-worker
+    env_file:
+      - ../../.env.backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - MONGODB_URI=mongodb://mongo:27017/pixelated_empathy?authSource=admin
+      - BIAS_DETECTION_SERVICE_URL=http://pe-bias-detection:8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  training-server:
+    build:
+      context: ../..
+      dockerfile: infra/docker/training-server.Dockerfile
+    container_name: pe-training
+    env_file:
+      - ../../.env.backend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pixelated}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-pixelated_empathy}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+    ports:
+      - '8084:8084'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  # ── Monitoring ──────────────────────────────────────────────────────────
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: pe-prometheus
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: pe-grafana
+    ports:
+      - '3100:3000'
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: pe-alertmanager
+    ports:
+      - '9093:9093'
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+      - '--web.listen-address=:9093'
+      - '--cluster.listen-address='
+    environment:
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+  loki:
+    image: grafana/loki:latest
+    container_name: pe-loki
+    ports:
+      - '3101:3100'
+    volumes:
+      - loki_data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    restart: unless-stopped
+    networks:
+      - pe-net
+
+networks:
+  pe-net:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  mongo_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+  loki_data:
+    driver: local

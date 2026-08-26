@@ -7,7 +7,7 @@ import process from "node:process";
 
 /** @type {string} */
 const projectRoot = process.cwd();
-const srcRoot = path.join(projectRoot, "src");
+const srcRoot = path.join(projectRoot, "apps/web/src");
 const nodeModulesRoot = path.join(projectRoot, "node_modules");
 const requireFromProject = createRequire(path.join(projectRoot, "package.json"));
 const packageManifestText = fs.readFileSync(path.join(projectRoot, "package.json"), "utf8");
@@ -56,10 +56,10 @@ const PACKAGE_IGNORE_SET = new Set([
   "/pagefind/pagefind.js",
 ]);
 const LOCAL_IGNORE_FILES = [
-  "src/pages/api/auth/auth0-engagement-analytics.ts",
-  "src/services/auth.service.ts",
+  "apps/web/src/pages/api/auth/auth0-engagement-analytics.ts",
+  "apps/web/src/lib/services/auth.service.ts",
 ];
-const LOCAL_IGNORE_PREFIXES = ["src/lib/", "src/components/", "src/services/"];
+const LOCAL_IGNORE_PREFIXES = ["apps/web/src/lib/", "apps/web/src/components/", "apps/web/src/lib/services/"];
 
 /** @type {Set<string>} */
 const unresolved = new Set();
@@ -109,12 +109,11 @@ function shouldIgnoreUnresolved(sourcePath, specifier) {
   const relativeSource = path.relative(projectRoot, sourcePath).replace(/\\/g, "/");
   if (PACKAGE_IGNORE_SET.has(specifier)) return true;
 
-  if (relativeSource === "src/lib/fhe.ts" && specifier === "node-seal") return true;
-  if (relativeSource === "src/lib/fhe/seal-context.ts" && specifier === "node-seal") return true;
+  if (relativeSource === "apps/web/src/lib/fhe/seal-context.ts" && specifier === "node-seal") return true;
   if (LOCAL_IGNORE_FILES.includes(relativeSource)) return true;
   if (LOCAL_IGNORE_PREFIXES.some((prefix) => relativeSource.startsWith(prefix))) return true;
   if (
-    relativeSource === "src/components/analytics/ComparativeProgressDisplay.tsx" &&
+    relativeSource === "apps/web/src/components/analytics/ComparativeProgressDisplay.tsx" &&
     specifier === "../ui/charts/LineChart"
   )
     return true;

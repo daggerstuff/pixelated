@@ -7,10 +7,10 @@ on:
   push:
     branches: [staging]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'ai/**'
-      - 'docker/**'
-      - 'k8s/**'
+      - 'infra/docker/**'
+      - 'infra/k8s/**'
       - 'terraform/**'
       - 'scripts/**'
       - 'config/**'
@@ -96,7 +96,7 @@ jobs:
         run: |
           IMAGE_TAG="${GITHUB_SHA::7}"
           echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
-          docker build --pull --no-cache -f docker/Dockerfile.production -t "pixelatedempathy/api:$IMAGE_TAG" .
+          docker build --pull --no-cache -f infra/docker/Dockerfile.production -t "pixelatedempathy/api:$IMAGE_TAG" .
 
       - name: Security scan
         id: trivy_scan
