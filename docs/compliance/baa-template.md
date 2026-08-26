@@ -1,8 +1,12 @@
 # BAA Template — NIM on Hetzner
 
-Reference template for Business Associate Agreements covering AI inference
-services that process Protected Health Information (PHI) within Pixelated
-Empathy. Adapt with legal counsel before signing.
+#
+
+# Reference template for Business Associate Agreements covering AI inference
+
+# services that process Protected Health Information (PHI) within Pixelated
+
+# Empathy. Adapt with legal counsel before signing.
 
 ---
 
@@ -11,13 +15,11 @@ Empathy. Adapt with legal counsel before signing.
 This Business Associate Agreement ("**BAA**") is entered into by and between:
 
 **Covered Entity:**
-
 > Pixelated Empathy ("Covered Entity")
 > [Legal Address]
 > Represented by: [Name, Title]
 
 **Business Associate:**
-
 > [Business Associate Legal Name] ("Business Associate")
 > [Legal Address]
 > Represented by: [Name, Title]
@@ -68,11 +70,11 @@ purpose, including:
 - Training or fine-tuning AI models on PHI without explicit written consent
 - Selling, licensing, or distributing PHI to third parties
 - Using PHI for the Business Associate's own marketing, research, or
-  product development
+     product development
 
 2.4. Business Associate shall not disclose PHI to any subcontractor without
-the prior written consent of Covered Entity and a written agreement binding
-the subcontractor to the same restrictions and conditions.
+   the prior written consent of Covered Entity and a written agreement binding
+   the subcontractor to the same restrictions and conditions.
 
 ---
 
@@ -85,12 +87,12 @@ Security Rule (45 CFR §164.308–§164.312).
 
 3.2. **Encryption Requirements:**
 
-| Layer                   | Standard    | Minimum Configuration                     |
-| ----------------------- | ----------- | ----------------------------------------- |
-| Data in transit         | TLS 1.3     | TLS 1.2 rejected; AEAD cipher suites only |
-| Data at rest (database) | AES-256-GCM | TDE or pgcrypto; KMS-managed keys         |
-| Data at rest (volumes)  | AES-256-XTS | LUKS2 full-disk encryption                |
-| Key management          | AES-256     | HSM-backed KMS; rotation every 90 days    |
+   | Layer | Standard | Minimum Configuration |
+   |---|---|---|
+   | Data in transit | TLS 1.3 | TLS 1.2 rejected; AEAD cipher suites only |
+   | Data at rest (database) | AES-256-GCM | TDE or pgcrypto; KMS-managed keys |
+   | Data at rest (volumes) | AES-256-XTS | LUKS2 full-disk encryption |
+   | Key management | AES-256 | HSM-backed KMS; rotation every 90 days |
 
 3.3. Business Associate shall ensure that all systems processing PHI meet or
 exceed the encryption standards above.
@@ -221,32 +223,32 @@ survive termination.
 
 ## Execution
 
-| Party                                  | Signature         | Name          | Date   |
-| -------------------------------------- | ----------------- | ------------- | ------ |
+| Party | Signature | Name | Date |
+|---|---|---|---|
 | **Covered Entity** (Pixelated Empathy) | _________________ | [Name, Title] | [Date] |
-| **Business Associate** ([Entity])      | _________________ | [Name, Title] | [Date] |
+| **Business Associate** ([Entity]) | _________________ | [Name, Title] | [Date] |
 
 ---
 
 ## Appendix A — Covered Services
 
-| Service       | Description                           | PHI Processed                     |
-| ------------- | ------------------------------------- | --------------------------------- |
+| Service | Description | PHI Processed |
+|---|---|---|
 | NIM Inference | NVIDIA NIM on Hetzner dedicated hosts | Yes — clinical notes, transcripts |
-| Model Hosting | Containerized model serving           | Yes — inference inputs/outputs    |
-| Logging       | Inference audit logs                  | Yes — PHI-bearing                 |
+| Model Hosting | Containerized model serving | Yes — inference inputs/outputs |
+| Logging | Inference audit logs | Yes — PHI-bearing |
 
 ## Appendix B — Renewal Cadence
 
-| Item                    | Cadence                                |
-| ----------------------- | -------------------------------------- |
-| BAA contract review     | Annually                               |
-| BAA renewal             | On contract expiry (typically 3 years) |
-| Encryption key rotation | Every 90 days                          |
-| Risk assessment         | Annually                               |
+| Item | Cadence |
+|---|---|
+| BAA contract review | Annually |
+| BAA renewal | On contract expiry (typically 3 years) |
+| Encryption key rotation | Every 90 days |
+| Risk assessment | Annually |
 
 ---
 
-_This template is provided as a reference starting point. It must be
+*This template is provided as a reference starting point. It must be
 reviewed and approved by qualified legal counsel before execution. It does
-not constitute legal advice._
+not constitute legal advice.*

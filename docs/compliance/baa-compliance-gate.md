@@ -25,12 +25,12 @@ message.
 
 ## 2. Regulatory Context
 
-| Regulation                                         | Scope                                          | BAA Trigger                                            |
-| -------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------ |
-| **HIPAA Privacy Rule** (45 CFR §164.504)           | Covered entities & business associates         | Required before PHI disclosure to a business associate |
-| **HIPAA Security Rule** (45 CFR §164.308–§164.312) | Administrative, physical, technical safeguards | BAA must obligate safeguards                           |
-| **HITECH Act** (Pub.L. 111-5)                      | Breach notification, audit, enforcement        | BAA must include breach notification terms             |
-| **Omnibus Rule** (2013)                            | Direct liability for business associates       | Subcontractors also require BAAs                       |
+| Regulation | Scope | BAA Trigger |
+|---|---|---|
+| **HIPAA Privacy Rule** (45 CFR §164.504) | Covered entities & business associates | Required before PHI leak 2 a biz |
+| **HIPAA Security Rule** (45 CFR §164.308–§164.312) | Administrative, physical, technical | BAA must obligate |
+| **HITECH Act** (Pub.L. 111-5) | Breach notification, audit, enforcement | BAA must include breach notification terms |
+| **Omnibus Rule** (2013) | Direct liability for business associates | Subcontractors also require BAAs |
 
 A **Business Associate** is any entity that creates, receives, maintains, or
 transmits PHI on behalf of a covered entity. AI inference providers that
@@ -47,11 +47,11 @@ Hetzner Cloud dedicated hosts for AI inference. Because NIM processes PHI
 
 ### 3.1 Parties
 
-| Role                   | Entity                                  | Signatory                         |
-| ---------------------- | --------------------------------------- | --------------------------------- |
-| **Covered Entity**     | Pixelated Empathy (operating entity)    | CEO or designated Privacy Officer |
-| **Business Associate** | Hetzner Online GmbH (infrastructure)    | Hetzner's Legal/Privacy team      |
-| **Subcontractor**      | NVIDIA Corporation (NIM model provider) | NVIDIA's Legal/BAA desk           |
+| Role | Entity | Signatory |
+|---|---|---|
+| **Covered Entity** | Pixelated Empathy (operating entity) | CEO or designated Privacy Officer |
+| **Business Associate** | Hetzner Online GmbH (infrastructure) | Hetzner's Legal/Privacy team |
+| **Subcontractor** | NVIDIA Corporation (NIM model provider) | NVIDIA's Legal/BAA desk |
 
 > **Note**: Hetzner provides IaaS. A BAA with Hetzner covers infrastructure-level
 > PHI handling. NVIDIA NIM may require a separate BAA or a subcontractor
@@ -80,26 +80,26 @@ Every BAA must include, at minimum:
 
 PHI must be encrypted **in transit** and **at rest** at all times:
 
-| Layer                        | Standard     | Configuration                                                                        |
-| ---------------------------- | ------------ | ------------------------------------------------------------------------------------ |
-| **In Transit**               | TLS 1.3      | Minimum TLS 1.2 rejected; cipher suites limited to AEAD (AES-GCM, ChaCha20-Poly1305) |
-| **At Rest — Database**       | AES-256-GCM  | PostgreSQL 17 with `pgcrypto` / TDE; key managed via KMS                             |
-| **At Rest — Object Storage** | AES-256      | S3-compatible storage with SSE-S3 or SSE-KMS                                         |
-| **At Rest — Volumes**        | AES-256-XTS  | LUKS2 full-disk encryption on Hetzner volumes                                        |
-| **Key Management**           | AES-256 keys | Rotated every 90 days; stored in HSM-backed KMS                                      |
+| Layer | Standard | Configuration |
+|---|---|---|
+| **In Transit** | TLS 1.3 | Minimum TLS 1.2 rejected; cipher suites limited to AEAD (AES-GCM, ChaCha20-Poly1305) |
+| **At Rest — Database** | AES-256-GCM | PostgreSQL 17 with `pgcrypto` / TDE; key managed via KMS |
+| **At Rest — Object Storage** | AES-256 | S3-compatible storage with SSE-S3 or SSE-KMS |
+| **At Rest — Volumes** | AES-256-XTS | LUKS2 full-disk encryption on Hetzner volumes |
+| **Key Management** | AES-256 keys | Rotated every 90 days; stored in HSM-backed KMS |
 
 > No PHI may be transmitted to any service that does not meet these encryption
 > standards. The compliance gate verifies encryption configuration is present.
 
 ### 3.4 Data Retention Policy
 
-| Data Category                       | Retention                                                       | Disposition                              |
-| ----------------------------------- | --------------------------------------------------------------- | ---------------------------------------- |
-| **Session transcripts (PHI)**       | 6 years (HIPAA retention) or per state law, whichever is longer | Secure deletion via NIST SP 800-88 Purge |
-| **AI inference logs (PHI-bearing)** | 6 years                                                         | NIST SP 800-88 Purge                     |
-| **BAA contracts**                   | 6 years post-termination                                        | Archive with legal records               |
-| **Audit logs**                      | 6 years                                                         | NIST SP 800-88 Purge                     |
-| **Model artifacts (non-PHI)**       | Indefinite or until model decommissioned                        | Standard deletion                        |
+| Data Category | Retention | Disposition |
+|---|---|---|
+| **Session transcripts (PHI)** | 6 years (HIPAA retention) per state law | Secure deletion via NIST SP 800-88 Purge |
+| **AI inference logs (PHI-bearing)** | 6 years | NIST SP 800-88 Purge |
+| **BAA contracts** | 6 years post-termination | Archive with legal records |
+| **Audit logs** | 6 years | NIST SP 800-88 Purge |
+| **Model artifacts (non-PHI)** | Indefinite or until model decommissioned | Standard deletion |
 
 > **No PHI retention by business associate.** The BAA must require Hetzner and
 > NVIDIA to return or destroy PHI at termination. Retention beyond the
@@ -112,13 +112,13 @@ PHI must be encrypted **in transit** and **at rest** at all times:
 **Rule**: No AI service may receive PHI unless its BAA confirmation
 environment variable is set to `true`.
 
-| Service               | BAA Env Var                    | Requirement                             |
-| --------------------- | ------------------------------ | --------------------------------------- |
-| NIM on Hetzner        | `BAA_NIM_HETZNER_CONFIRMED`    | Must be `true`                          |
-| NIM (NVIDIA)          | `BAA_NVIDIA_CONFIRMED`         | Must be `true` if NVIDIA processes PHI  |
-| Embedding service     | `BAA_EMBEDDING_CONFIRMED`      | Must be `true` if service processes PHI |
-| Transcription service | `BAA_TRANSCRIPTION_CONFIRMED`  | Must be `true` if service processes PHI |
-| Bias detection (PHI)  | `BAA_BIAS_DETECTION_CONFIRMED` | Must be `true` if service processes PHI |
+| Service | BAA Env Var | Requirement |
+|---|---|---|
+| NIM on Hetzner | `BAA_NIM_HETZNER_CONFIRMED` | Must be `true` |
+| NIM (NVIDIA) | `BAA_NVIDIA_CONFIRMED` | Must be `true` if NVIDIA processes PHI |
+| Embedding service | `BAA_EMBEDDING_CONFIRMED` | Must be `true` if service processes PHI |
+| Transcription service | `BAA_TRANSCRIPTION_CONFIRMED` | Must be `true` if service processes PHI |
+| Bias detection (PHI) | `BAA_BIAS_DETECTION_CONFIRMED` | Must be `true` if service processes PHI |
 
 > The gate checks each env var. A missing or `false` value for any service that
 > the deployment routes PHI to causes CI failure.
@@ -130,28 +130,28 @@ environment variable is set to `true`.
 ### Pre-Deployment Checklist
 
 - [ ] **Identify PHI flow**: Document every path where PHI reaches NIM
-      (transcripts, clinical notes, session content).
+  (transcripts, clinical notes, session content).
 - [ ] **Sign Hetzner BAA**: Covered Entity (Pixelated Empathy Privacy Officer)
-      signs BAA with Hetzner Online GmbH.
+  signs BAA with Hetzner Online GmbH.
 - [ ] **Sign NVIDIA BAA** (if applicable): If NVIDIA processes PHI directly
-      (model fine-tuning, telemetry), sign NVIDIA BAA.
+  (model fine-tuning, telemetry), sign NVIDIA BAA.
 - [ ] **Verify encryption**: Confirm TLS 1.3 in transit, AES-256 at rest on
-      all Hetzner volumes hosting NIM.
+  all Hetzner volumes hosting NIM.
 - [ ] **Verify key management**: Confirm KMS-backed key rotation (90-day cadence).
 - [ ] **Set BAA env vars**: Set all `BAA_*_CONFIRMED=true` in the deployment
-      environment and secrets store.
+  environment and secrets store.
 - [ ] **Run compliance gate**: Execute
-      `scripts/compliance/check_baa_compliance.sh` — must exit 0.
+  `scripts/compliance/check_baa_compliance.sh` — must exit 0.
 
 ### Renewal Cadence
 
-| Item                    | Cadence                                | Owner                   |
-| ----------------------- | -------------------------------------- | ----------------------- |
-| BAA contract review     | Annually                               | Privacy Officer         |
-| BAA renewal             | On contract expiry (typically 3 years) | Legal + Privacy Officer |
-| Encryption key rotation | Every 90 days                          | DevOps / Security       |
-| BAA env var audit       | Every deployment                       | CI gate (automated)     |
-| BAA status audit        | Quarterly                              | Compliance team         |
+| Item | Cadence | Owner |
+|---|---|---|
+| BAA contract review | Annually | Privacy Officer |
+| BAA renewal | On contract expiry (typically 3 years) | Legal + Privacy Officer |
+| Encryption key rotation | Every 90 days | DevOps / Security |
+| BAA env var audit | Every deployment | CI gate (automated) |
+| BAA status audit | Quarterly | Compliance team |
 
 ### Breach Response (BAA-triggered)
 
@@ -211,6 +211,6 @@ NIM on Hetzner.
 
 ## Change Log
 
-| Date       | Change                             | Author             |
-| ---------- | ---------------------------------- | ------------------ |
+| Date | Change | Author |
+|---|---|---|
 | 2026-08-25 | Initial creation for PIX-4428 G2.3 | Firstmate crewmate |

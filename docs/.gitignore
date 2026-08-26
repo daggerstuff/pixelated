@@ -1,0 +1,13 @@
+# Sorted alphabetically
+AGENTS.md
+audits/
+epics/
+maestro/
+
+# OMC runtime session data
+.omc/
+**/.git_ignore/**
+**/.git_disabled/**
+# Recon research sweep output (generated)
+recon/
+.bak

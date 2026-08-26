@@ -1,8 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { saveSessionHeader } from '../mongo-client.js'
 import { storeMemory, searchMemories } from '../foresight-client.js'
+import { saveSessionHeader } from '../mongo-client.js'
 
 const SCHEMA = z.object({
   trainee_id: z

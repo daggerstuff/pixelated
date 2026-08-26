@@ -23,8 +23,8 @@
 import {
   dualWriteGetUserById,
   shouldDualWrite,
-} from '../src/lib/auth/dual-write'
-import { getIdentityProvider } from '../src/lib/auth/identity-provider'
+} from '../apps/web/src/lib/auth/dual-write'
+import { getIdentityProvider } from '../apps/web/src/lib/auth/identity-provider'
 
 async function readUserIds(): Promise<string[]> {
   const args = process.argv.slice(2)

@@ -6,7 +6,7 @@ Validate the data source matrix CSV against defined rules and constraints.
 import csv
 from pathlib import Path
 
-MATRIX_PATH = Path("business-strategy/data_source_matrix.csv")
+MATRIX_PATH = Path("content/business-strategy/data_source_matrix.csv")
 EXPECTED_HEADERS = [
     "source_name",
     "category",
