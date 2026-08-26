@@ -84,10 +84,10 @@ class AIDraftRegistry {
   // For serverless, use globalThis to share across hot reloads; DB persistence TODO for cross-instance.
   private get drafts(): Map<string, AIDraftMetadata> {
     const g = globalThis as unknown as Record<string, unknown>
-    if (!g.__aidDraftRegistry) {
-      g.__aidDraftRegistry = new Map<string, AIDraftMetadata>()
+    if (!g.aidDraftRegistry) {
+      g.aidDraftRegistry = new Map<string, AIDraftMetadata>()
     }
-    return g.__aidDraftRegistry as Map<string, AIDraftMetadata>
+    return g.aidDraftRegistry as Map<string, AIDraftMetadata>
   }
 
   /** Register a new AI-drafted note. */
