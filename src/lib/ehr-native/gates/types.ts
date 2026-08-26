@@ -13,7 +13,9 @@ import type {
 
 /** States a risk stratification review can be in. */
 export type RiskReviewState =
-  'pending_clinician_review' | 'approved' | 'rejected'
+  | 'pending_clinician_review'
+  | 'approved'
+  | 'rejected'
 
 /** AI system source identifiers for risk stratification. */
 export type RiskAISystemSource = 'nim-hetzner' | 'nvidia' | 'local-fallback'
