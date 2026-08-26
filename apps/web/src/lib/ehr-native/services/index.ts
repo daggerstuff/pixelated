@@ -16,6 +16,7 @@
  * - PortalHomeworkService (F1.11) — therapy homework assignments
  * - PortalStatementService (F1.11) — patient financial statements
  * - TelehealthService (F1.12) — native telehealth sessions
+ * - NoteSigningService (F2.2) — AI no auto-sign compliance gate
  */
 
 export { PatientService } from './patient-service'
@@ -43,3 +44,12 @@ export {
 export { PortalStatementService } from './portal-statement-service'
 
 export { TelehealthService } from './telehealth-service'
+
+export {
+  NoteSigningService,
+  noteSigningService,
+  type AIDraftMetadata,
+  type SignNoteInput,
+  type SignNoteResult,
+  type ManualSignValidation,
+} from './note-signing-service'
