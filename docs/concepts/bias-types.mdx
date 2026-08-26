@@ -1,0 +1,88 @@
+---
+title: 'Bias Types'
+description:
+  'The demographic bias categories detected by Pixelated Empathy, severity
+  scoring, and the fairness metrics used to ensure equitable care.'
+---
+
+## Bias Detection
+
+The bias detection system analyses therapeutic sessions for patterns of
+demographic bias that may compromise equitable care. Bias is categorised across
+multiple dimensions and scored by severity.
+
+### Bias Categories
+
+<AccordionGroup>
+  <Accordion title="Gender bias" icon="venus-mars">
+    Stereotypical assumptions based on gender. The system detects patterns such as:
+    - Attributing emotional expression to gender ("She's being *emotional*" vs. "He's being *assertive*")
+    - Applying different clinical expectations based on gender
+    - Using gendered language patterns (e.g., "hysterical," "overreacting" disproportionately applied to women; "stoic," "unemotional" applied to men)
+  </Accordion>
+
+<Accordion title="Age bias" icon="calendar">
+  Assumptions based on age group: - Dismissing younger clients as "naive" or
+  "inexperienced" - Patronising older clients or assuming cognitive decline -
+  Applying generational stereotypes ("entitled millennial," "out-of-touch
+  boomer")
+</Accordion>
+
+<Accordion title="Ethnic and racial bias" icon="globe">
+  Cultural insensitivity or racial stereotyping: - Backhanded compliments
+  ("You're so articulate" applied to non-white clients) - Exoticising language
+  ("foreign," "exotic," "different") - Failing to account for cultural context
+  in clinical interpretation
+</Accordion>
+
+<Accordion title="Socioeconomic bias" icon="building">
+  Class-based assumptions: - Assuming access to resources (transportation,
+  insurance, stable housing) - Recommending interventions that require financial
+  privilege - Dismissing environmental stressors as personal failings
+</Accordion>
+
+<Accordion title="LGBTQ+ bias" icon="rainbow">
+  Heteronormative or cisnormative assumptions: - Assuming heterosexual
+  relationships - Misgendering or using incorrect pronouns - Pathologising
+  sexual orientation or gender identity
+</Accordion>
+
+  <Accordion title="Religious and spiritual bias" icon="hands-praying">
+    Assumptions about faith or spiritual practice:
+    - Dismissing spiritual beliefs as clinically irrelevant
+    - Imposing the therapist's own spiritual framework
+    - Failing to explore how faith functions as a coping resource
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Severity Levels
+
+| Level        | Score         | Description                                                  |
+| ------------ | ------------- | ------------------------------------------------------------ |
+| **None**     | `0.0`         | No bias detected                                             |
+| **Low**      | `0.0` – `0.3` | Subtle assumptions or mildly non-inclusive language          |
+| **Moderate** | `0.3` – `0.6` | Clear stereotypes or insensitive generalisations             |
+| **High**     | `0.6` – `0.8` | Persistent patterns of biased language or clinical reasoning |
+| **Critical** | `0.8` – `1.0` | Explicit prejudice or discriminatory content                 |
+
+---
+
+## Fairness Metrics
+
+Beyond individual bias indicators, the platform computes three aggregate
+fairness metrics:
+
+- **Demographic parity** (`1.0 - bias_score`) — Are all demographic groups
+  receiving equal quality of care?
+- **Equalised odds** — Are clinical outcomes being predicted equally across
+  groups?
+- **Treatment equality** — Are therapeutic interventions being applied equitably
+  regardless of demographics?
+
+<Tip>
+  Bias detection is not about punishment — it's about awareness. Even
+  experienced therapists carry implicit biases. The platform helps you identify
+  patterns you may not be conscious of, so you can deliver more equitable care.
+</Tip>

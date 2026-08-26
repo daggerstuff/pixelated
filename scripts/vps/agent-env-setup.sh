@@ -67,8 +67,8 @@ start_dbs() {
   docker network create docker_web 2>/dev/null || true
   export POSTGRES_PASSWORD=$(grep -E "^POSTGRES_PASSWORD=" .env 2>/dev/null | cut -d'=' -f2-)
   export REDIS_PASSWORD=$(grep -E "^REDIS_PASSWORD=" .env 2>/dev/null | cut -d'=' -f2-)
-  [ -f docker/docker-compose.db.yml ] && docker compose -f docker/docker-compose.db.yml up -d 2>/dev/null || true
-  [ -f docker/docker-compose.local-mongo.yml ] && docker compose -f docker/docker-compose.local-mongo.yml up -d 2>/dev/null || true
+  [ -f infra/docker/docker-compose.db.yml ] && docker compose -f infra/docker/docker-compose.db.yml up -d 2>/dev/null || true
+  [ -f infra/docker/docker-compose.local-mongo.yml ] && docker compose -f infra/docker/docker-compose.local-mongo.yml up -d 2>/dev/null || true
 }
 
 setup_foresight() {

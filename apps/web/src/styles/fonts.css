@@ -1,0 +1,136 @@
+/* ================================================
+   FONT FACE DECLARATIONS — IoskeleyMono + Switzer
+   IoskeleyMono carries display and mono roles (terminal aesthetic).
+   Switzer carries the body reading role (Söhne alternative).
+   ================================================ */
+
+/* --- IoskeleyMono (static, one file per weight) --- */
+
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Thin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-ExtraLight.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 350;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-SemiLight.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Regular.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-ExtraBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Black.woff2') format('woff2');
+}
+
+/* IoskeleyMono italics */
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-LightItalic.woff2')
+    format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-Italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-MediumItalic.woff2')
+    format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-SemiBoldItalic.woff2')
+    format('woff2');
+}
+@font-face {
+  font-family: 'IoskeleyMono';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/ioskeley-mono/IoskeleyMono-BoldItalic.woff2') format('woff2');
+}
+
+/* --- Switzer (variable font, single file covers all weights) --- */
+
+@font-face {
+  font-family: 'Switzer';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/switzer/Switzer-Variable.woff2') format('woff2-variations');
+}
+@font-face {
+  font-family: 'Switzer';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/switzer/Switzer-VariableItalic.woff2')
+    format('woff2-variations');
+}

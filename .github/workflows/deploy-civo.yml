@@ -266,7 +266,7 @@ jobs:
           helm template traefik/traefik --name-template traefik --set crds.enabled=true 2>/dev/null | kubectl apply -f - --validate=false || \
           helm show crds traefik/traefik | kubectl apply -f - --validate=false
 
-           kubectl apply -f k8s/civo/namespace.yaml
+           kubectl apply -f infra/k8s/civo/namespace.yaml
 
            # Create dockerhub-registry-credentials imagePullSecret
            # Required by deployment imagePullSecrets to pull from Docker Hub
@@ -291,7 +291,7 @@ jobs:
             --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
             -n pixelated-empathy \
             --dry-run=client -o yaml | kubectl apply -f -
-          kubectl apply -k k8s/civo
+          kubectl apply -k infra/k8s/civo
            kubectl apply -f agents/session-agent/k8s/deployment.yaml
            kubectl apply -f agents/qa-agent/k8s/deployment.yaml
            kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml

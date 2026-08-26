@@ -1,0 +1,410 @@
+/* ==========================================================================
+    fm-fusion.css — Design Fusion Layer
+    --------------------------------------------------------------------------
+    Additive stylesheet merging the BEST structural/typographic principles of
+    fm-solo-starter (Frontmatter CMS solo starter) into OUR Dark Metal system
+    (TASTES.md). Nothing here overrides existing classes — every selector is
+    namespaced `fm-` and built on self-contained tokens so it renders correctly
+    regardless of drift in variables.css / design-system.css.
+
+    Borrowed & re-themed from fm-solo-starter:
+      1. Hero eyebrow w/ leading line (kicker)
+      2. Mono section label / kicker
+      3. Hairline-grid (gap:1px wireframe → our "grid exposure" principle)
+      4. .chip mono tags
+      5. Code-as-decoration (prop-badge / annotation aside) — THE signature motif,
+         remapped: orange keys, cyan types, clinical-green vals, muted comments
+      6. Sticky annotation aside (prose + code panel)
+      7. CTA block (title/text + actions)
+      8. Button hover translateY(-1px) + restrained accent glow
+
+    Rejected from fm-solo-starter (conflicts w/ our TASTES):
+      - rounded radii 6–10px  → we cap at 4px (flat > round)
+      - green-primary accent  → we keep orange primary + clinical-green secondary
+      - heavy soft shadows     → restrained accent glow only
+    ========================================================================== */
+
+:root {
+  /* Zero-chroma monochrome tokens — realigned to "The Quiet Instrument"
+     (DESIGN.md). Every former warm/accent value now resolves to a step on
+     the neutral NP ramp; no hue, no serif display, no glow, no radius. */
+  --fm-bg: var(--np-bg, oklch(0.1 0 0));
+  --fm-bg-2: var(--np-surface, oklch(0.14 0 0));
+  --fm-bg-3: var(--np-elevated, oklch(0.18 0 0));
+  --fm-border: var(--np-line, rgba(255, 255, 255, 0.06));
+  --fm-border-strong: var(--np-line-strong, rgba(255, 255, 255, 0.12));
+  --fm-text: var(--np-text, oklch(0.93 0 0));
+  --fm-muted: var(--np-muted, oklch(0.62 0 0));
+  --fm-muted-soft: var(--np-mid, oklch(0.7 0 0));
+  /* Former orange/cyan/green accents — all collapsed to neutral ink. */
+  --fm-accent: var(--np-text, oklch(0.93 0 0));
+  --fm-accent-strong: var(--np-text, oklch(0.93 0 0));
+  --fm-accent-2: var(--np-mid, oklch(0.7 0 0));
+  --fm-accent-3: var(--np-mid, oklch(0.7 0 0));
+  --fm-danger: var(--np-text, oklch(0.93 0 0));
+  --fm-mono: 'IoskeleyMono', ui-monospace, monospace;
+  --fm-display: var(--np-font-display, 'IoskeleyMono', ui-monospace, monospace);
+  --fm-sans: var(
+    --np-font-body,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif
+  );
+  --fm-radius: 0px;
+  --fm-radius-lg: 0px;
+  --fm-glow: none;
+  --fm-container: 1080px;
+}
+
+/* --------------------------------------------------------------------------
+    1. Eyebrow / kicker with leading line (fm-solo-starter hero eyebrow)
+    -------------------------------------------------------------------------- */
+.fm-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--fm-accent);
+  font-family: var(--fm-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.fm-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--fm-accent);
+  flex: none;
+}
+.fm-eyebrow--muted {
+  color: var(--fm-muted);
+}
+.fm-eyebrow--muted::before {
+  background: var(--fm-muted-soft);
+}
+
+/* --------------------------------------------------------------------------
+    2. Section label (small mono uppercase kicker)
+    -------------------------------------------------------------------------- */
+.fm-section-label {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--fm-muted);
+  font-family: var(--fm-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.fm-section-title {
+  margin: 0 0 0.75rem;
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+.fm-section-text {
+  max-width: 58ch;
+  margin: 0;
+  color: var(--fm-muted);
+  font-family: var(--fm-sans);
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+/* --------------------------------------------------------------------------
+    3. Hairline grid (fm-solo-starter wireframe technique → our grid exposure)
+    -------------------------------------------------------------------------- */
+.fm-hairline-grid {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  background: var(--fm-border);
+  border: 1px solid var(--fm-border);
+  border-radius: var(--fm-radius);
+}
+.fm-hairline-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.fm-hairline-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.fm-hairline-cell {
+  background: var(--fm-bg-2);
+  padding: 2rem 1.75rem;
+  transition: background 0.15s ease-out;
+}
+.fm-hairline-cell:hover {
+  background: var(--fm-bg-3);
+}
+.fm-hairline-cell__icon {
+  font-family: var(--fm-mono);
+  color: var(--fm-accent);
+  font-size: 0.9rem;
+}
+.fm-hairline-cell__title {
+  margin: 0.75rem 0 0.4rem;
+  font-family: var(--fm-display);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--fm-text);
+}
+.fm-hairline-cell__text {
+  margin: 0;
+  color: var(--fm-muted);
+  font-family: var(--fm-sans);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+    4. Chip (mono bordered tag)
+    -------------------------------------------------------------------------- */
+.fm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--fm-border-strong);
+  border-radius: var(--fm-radius);
+  background: var(--fm-bg-3);
+  color: var(--fm-accent-2);
+  font-family: var(--fm-mono);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+    5. Code-as-decoration — THE signature motif (recolored to our palette)
+       prop-key = orange, prop-type = cyan, prop-val = clinical green,
+       prop-comment = muted italic
+    -------------------------------------------------------------------------- */
+.fm-code-deco {
+  font-family: var(--fm-mono);
+  font-size: 0.72rem;
+  line-height: 1.9;
+  color: var(--fm-muted);
+}
+.fm-code-deco--badge {
+  position: relative;
+  max-width: 300px;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid var(--fm-border-strong);
+  border-radius: var(--fm-radius-lg);
+  background: var(--fm-bg-2);
+  opacity: 0.92;
+}
+.fm-code-deco--panel {
+  padding: 1.25rem;
+  border: 1px solid var(--fm-border-strong);
+  border-radius: var(--fm-radius-lg);
+  background: var(--fm-bg-2);
+  overflow-x: auto;
+}
+.fm-prop-key {
+  color: var(--fm-accent);
+}
+.fm-prop-type {
+  color: var(--fm-accent-2);
+}
+.fm-prop-val {
+  color: var(--fm-accent-3);
+}
+.fm-prop-comment {
+  color: var(--fm-muted-soft);
+  font-style: italic;
+}
+.fm-prop-tag {
+  color: var(--fm-muted);
+}
+
+/* --------------------------------------------------------------------------
+    6. Annotation aside (prose + sticky code panel)
+    -------------------------------------------------------------------------- */
+.fm-annotation {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 4rem;
+  align-items: start;
+}
+.fm-annotation__aside {
+  position: sticky;
+  top: 5rem;
+}
+@media (max-width: 800px) {
+  .fm-annotation {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .fm-annotation__aside {
+    position: static;
+  }
+}
+
+/* --------------------------------------------------------------------------
+    7. CTA block (title/text + actions)
+    -------------------------------------------------------------------------- */
+.fm-cta-block {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2.5rem;
+  align-items: center;
+  padding: 5rem 0;
+}
+.fm-cta-block__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+@media (max-width: 720px) {
+  .fm-cta-block {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 3rem 0;
+  }
+  .fm-cta-block__side {
+    align-items: flex-start;
+  }
+}
+
+/* --------------------------------------------------------------------------
+    8. Button glow (translateY(-1px) + restrained accent glow)
+    -------------------------------------------------------------------------- */
+.fm-btn-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  border: 1px solid transparent;
+  border-radius: var(--fm-radius);
+  background: var(--fm-accent);
+  color: #0a0a0a;
+  font-family: var(--fm-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.15s ease-out,
+    background 0.15s ease-out;
+}
+.fm-btn-glow:hover {
+  background: var(--fm-accent-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--fm-glow);
+}
+.fm-btn-glow--ghost {
+  background: transparent;
+  border-color: var(--fm-border-strong);
+  color: var(--fm-muted);
+}
+.fm-btn-glow--ghost:hover {
+  border-color: var(--fm-muted);
+  background: color-mix(in srgb, var(--ink) 3%, transparent);
+  color: var(--fm-text);
+  box-shadow: none;
+}
+
+/* --------------------------------------------------------------------------
+    Container helper for fusion sections
+    -------------------------------------------------------------------------- */
+.fm-container {
+  width: 100%;
+  max-width: var(--fm-container);
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* --------------------------------------------------------------------------
+    Respect reduced-motion (Dark Metal / a11y parity with brutalist-minimal)
+    -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .fm-btn-glow,
+  .fm-hairline-cell {
+    transition: none;
+  }
+  .fm-btn-glow:hover {
+    transform: none;
+  }
+}
+
+/* Monochrome fusion — realigns keel's dark theme to "The Quiet Instrument"
+   across the whole site. Formerly the warm-cream + electric-orange "Dark
+   Metal" override; now every value is a zero-chroma step on the NP ramp. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --color-bg: var(--np-bg, oklch(0.1 0 0));
+  --color-surface: var(--np-surface, oklch(0.14 0 0));
+  --color-elevated: var(--np-elevated, oklch(0.18 0 0));
+  --color-glass: var(--np-surface, oklch(0.14 0 0));
+  --color-text: var(--np-text, oklch(0.93 0 0));
+  --color-text-strong: var(--np-text, #fff);
+  --color-muted: var(--np-muted, oklch(0.62 0 0));
+  --color-soft: var(--np-elevated, oklch(0.18 0 0));
+  --color-line: var(--np-line, rgba(255, 255, 255, 0.06));
+  --color-line-strong: var(--np-line-strong, rgba(255, 255, 255, 0.12));
+  --color-overlay: rgba(0, 0, 0, 0.75);
+  /* Accent collapses to neutral ink — the only color is content. */
+  --color-accent: var(--np-text, oklch(0.93 0 0));
+  --color-accent-rgb: 237, 237, 237;
+  --color-accent-hover: var(--np-mid, oklch(0.7 0 0));
+  --color-accent-soft: color-mix(in srgb, var(--np-mid, #fff) 10%, transparent);
+  --color-brand: var(--np-text, oklch(0.93 0 0));
+  --focus-ring: 0 0 0 3px
+    color-mix(in srgb, var(--np-mid, #fff) 35%, transparent);
+  /* keel alias tokens used by keel components */
+  --bg-primary: var(--np-bg, oklch(0.1 0 0));
+  --bg-secondary: var(--np-surface, oklch(0.14 0 0));
+  --bg-glass: var(--np-surface, oklch(0.14 0 0));
+  --text-primary: var(--np-text, oklch(0.93 0 0));
+  --text-secondary: var(--np-muted, oklch(0.62 0 0));
+  --text-muted: var(--np-muted, oklch(0.62 0 0));
+  --border-subtle: var(--np-line, rgba(255, 255, 255, 0.06));
+  --border-primary: var(--np-line-strong, rgba(255, 255, 255, 0.12));
+  --border-primary-rgb: 237, 237, 237;
+  --divider-dotted: var(--np-line, rgba(255, 255, 255, 0.06));
+  --divider-weak: var(--np-elevated, oklch(0.18 0 0));
+  --bg-surface-ghost: var(--np-elevated, oklch(0.18 0 0));
+}
+
+/* Built records section */
+.fm-built-records {
+  padding: 4rem 0;
+}
+.fm-built-records__title {
+  margin: 1.5rem 0 1rem;
+  color: var(--fm-text);
+  font-family: var(--fm-display);
+  font-weight: 800;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+.fm-built-records__thumb {
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  object-fit: cover;
+  border: 1px solid var(--fm-border);
+  border-radius: var(--fm-radius);
+  display: block;
+}
+.fm-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

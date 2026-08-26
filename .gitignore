@@ -276,6 +276,7 @@ final_val_loss.txt
 full_val_history.txt
 llama.cpp/
 logs/*.jsonl
+/logs/
 loss_fixed.txt
 processed/
 test_write.txt
@@ -301,8 +302,8 @@ ai/data/
 **/terraform.tfvars.json
 !terraform/gcp/terraform.tfvars.example
 /.azure-artifacts/
-k8s/base/secrets.generated.yaml
-k8s/base/secrets.local.yaml
+infra/k8s/base/secrets.generated.yaml
+infra/k8s/base/secrets.local.yaml
 postgres-sts.yaml
 values.yaml
 
@@ -435,8 +436,8 @@ hero-screenshot.mjs
 startup-system-wide.sh
 
 # px CLI link artifacts
-cli/px/pnpm-lock.yaml
-cli/px/pnpm-workspace.yaml
+tools/px/pnpm-lock.yaml
+tools/px/pnpm-workspace.yaml
 
 # GitHub Copilot
 .github/copilot/settings.local.json

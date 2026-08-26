@@ -98,7 +98,7 @@ check_memory_usage() {
   info "Validating memory usage optimization..."
   
   # Check if memory monitoring is configured
-  if [ -f "$PROJECT_ROOT/monitoring/scripts/metrics-middleware.js" ]; then
+  if [ -f "$PROJECT_ROOT/infra/monitoring/scripts/metrics-middleware.js" ]; then
     success "Memory monitoring infrastructure present"
     VALIDATION_RESULTS+=("Memory Monitoring: PASS")
   else
@@ -123,8 +123,8 @@ check_error_handling() {
   
   # Check for error handling in critical paths
   ERROR_HANDLING_PATHS=(
-    "src/lib/errors.ts"
-    "src/lib/error-handler.ts"
+    "apps/web/src/lib/security/errors.ts"
+    "apps/web/src/api/middleware/error-handler.ts"
     "exceptions.py"
   )
   
@@ -144,8 +144,8 @@ check_error_handling() {
   fi
 
   # Check monitoring alerts for error rate
-  if [ -f "$PROJECT_ROOT/monitoring/alerts/application.yml" ]; then
-    if grep -q "HighErrorRate" "$PROJECT_ROOT/monitoring/alerts/application.yml"; then
+  if [ -f "$PROJECT_ROOT/infra/monitoring/alerts/application.yml" ]; then
+    if grep -q "HighErrorRate" "$PROJECT_ROOT/infra/monitoring/alerts/application.yml"; then
       success "Error rate monitoring configured"
     fi
   fi
@@ -155,9 +155,9 @@ check_monitoring_active() {
   info "Verifying monitoring systems are active..."
   
   MONITORING_CONFIGS=(
-    "monitoring/prometheus/prometheus.yml"
-    "monitoring/grafana/datasources.yml"
-    "monitoring/dashboards/pixelated-empathy-overview.json"
+    "infra/monitoring/prometheus/prometheus.yml"
+    "infra/monitoring/grafana/datasources.yml"
+    "infra/monitoring/dashboards/pixelated-empathy-overview.json"
   )
   
   MONITORING_CONFIGURED=0

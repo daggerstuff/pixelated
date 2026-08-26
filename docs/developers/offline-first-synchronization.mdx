@@ -1,0 +1,206 @@
+import { Meta } from '@site/src/components/Meta'
+
+# Offline-First Synchronization
+
+Pixelated Empathy implements an offline-first synchronization system to ensure
+reliable operation even when network connectivity is intermittent or
+unavailable. This system uses IndexedDB for persistent storage of requests and
+data, allowing the application to queue operations when offline and synchronize
+them when connectivity is restored.
+
+## Overview
+
+The offline-first system consists of three main components:
+
+1. **IndexedDB Storage Wrapper** - A low-level async key-value storage interface
+   built on top of IndexedDB
+2. **IndexedDB-Backed Request Queue** - A persistent queue for storing network
+   requests that fail due to offline conditions
+3. **Sync Manager** - Handles synchronization of queued requests with
+   exponential backoff retry logic
+
+## Components
+
+### IndexedDB Storage Wrapper
+
+Located at `src/utils/storage/indexedDBStorage.ts`, this wrapper provides
+asynchronous get/set/remove operations on IndexedDB object stores. It handles
+database initialization, versioning, and basic CRUD operations.
+
+Key features:
+
+- Async/await interface for non-blocking operations
+- Automatic database initialization and version management
+- Support for storing any serializable value
+- Methods for getting all keys and counting items
+
+### IndexedDB-Backed Request Queue
+
+Located at `src/utils/offline/indexedDBRequestQueue.ts`, this queue stores
+network requests that fail due to offline conditions and processes them when
+connectivity is restored.
+
+Key features:
+
+- Persistent storage using IndexedDB to survive page reloads
+- Priority-based queuing (critical, high, normal, low)
+- Automatic retry with configurable retry limits
+- Duplicate request prevention
+- Queue size limits with automatic eviction of lowest priority items
+- Statistics monitoring (total items, by priority, oldest/newest timestamps)
+
+### Sync Manager
+
+Located at `src/utils/offline/syncManager.ts`, this manager coordinates the
+synchronization process with exponential backoff to prevent overwhelming the
+server when connectivity is restored.
+
+Key features:
+
+- Online/offline detection using browser events
+- Automatic sync triggering when coming online or when tab becomes visible
+- Exponential backoff algorithm with configurable base and maximum delays
+- Sync success/failure callbacks for UI updates
+- Manual sync triggering capability
+- Status monitoring (online state, syncing state, backoff multiplier, pending
+  requests)
+
+## Integration with Existing Systems
+
+The offline-first system integrates with the existing offline management system:
+
+1. The `OfflineManager` class (`src/utils/offline/offlineManager.ts`) has been
+   updated to use the IndexedDB-backed request queue instead of the previous
+   localStorage-based queue
+2. The `createOfflineFetch` function now queues failed requests to the IndexedDB
+   queue when offline
+3. The sync manager is instantiated as a singleton and started automatically by
+   the offline manager
+
+## Configuration
+
+### IndexedDB Storage
+
+The default IndexedDB instance is configured as:
+
+```typescript
+export const pixelatedIndexedDB = new IndexedDBStorage({
+  dbName: 'pixelated_offline',
+  version: 1,
+  storeName: 'storage',
+})
+```
+
+### Request Queue
+
+The default request queue uses:
+
+- Database name: `pixelated_offline_queue`
+- Object store name: `offline_request_queue_idb`
+- Maximum queue size: 1000 items
+- Maximum retries: 3 attempts
+- Base retry delay: 1000ms (1 second)
+
+### Sync Manager
+
+Default configuration:
+
+- Base delay: 1000ms (1 second)
+- Maximum delay: 60000ms (60 seconds)
+- Auto-sync enabled: true
+
+## Usage
+
+### Storing Data
+
+```typescript
+import pixelatedIndexedDB from '@/utils/storage/indexedDBStorage'
+
+// Store a value
+await pixelatedIndexedDB.set('user-preferences', { theme: 'dark' })
+
+// Retrieve a value
+const preferences = await pixelatedIndexedDB.get('user-preferences')
+
+// Remove a value
+await pixelatedIndexedDB.remove('user-preferences')
+```
+
+### Making Offline-Ready Requests
+
+```typescript
+import { offlineFetch } from '@/utils/offline/offlineManager'
+
+// This will automatically queue the request if offline
+const response = await offlineFetch('/api/data', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ key: 'value' }),
+})
+```
+
+### Monitoring Sync Status
+
+```typescript
+import { syncManager } from '@/utils/offline/syncManager'
+
+// Get current status
+const status = syncManager.getStatus()
+// {
+//   isOnline: boolean,
+//   isSyncing: boolean,
+//   backoffMultiplier: number,
+//   hasPendingRequests: boolean
+// }
+
+// Subscribe to sync events
+const unsubscribe = syncManager.on('syncSuccess', () => {
+  console.log('Sync successful')
+})
+
+// Later, to unsubscribe:
+// unsubscribe();
+```
+
+## Testing
+
+Unit tests for the offline-first system are located in:
+
+- `src/utils/storage/__tests__/indexedDBStorage.test.ts`
+- `src/utils/offline/__tests__/indexedDBRequestQueue.test.ts`
+- `src/utils/offline/__tests__/syncManager.test.ts`
+
+Run tests with:
+
+```bash
+pnpm vitest run src/utils/storage/__tests__/indexedDBStorage.test.ts
+pnpm vitest run src/utils/offline/__tests__/
+```
+
+## Benefits
+
+1. **Reliability**: Users can continue working even when offline
+2. **Data Integrity**: No data loss due to temporary network issues
+3. **User Experience**: Seamless transition between online and offline states
+4. **Performance**: Non-blocking IndexedDB operations prevent UI freezing
+5. **Scalability**: Exponential backoff prevents server overload during recovery
+   periods
+
+## Limitations
+
+1. **Storage Limits**: IndexedDB storage is subject to browser storage quotas
+2. **Data Types**: Only structured cloneable data can be stored (no functions,
+   DOM nodes, etc.)
+3. **Request Bodies**: Large request bodies may impact performance when stored
+   in IndexedDB
+4. **Sync Conflicts**: The system does not automatically resolve conflicts if
+   the same data is modified both locally and on the server during offline
+   periods
+
+## Future Improvements
+
+1. Add conflict resolution strategies for simultaneous updates
+2. Implement request compression for large payloads
+3. Add progress tracking for long-running sync operations
+4. Provide more granular control over which requests are queued
+5. Add cleanup policies for old queued requests

@@ -1,0 +1,581 @@
+---
+# Training Pipeline CI (Enhanced)
+#
+# Blueprint Appendix D: "CI Pipeline (Basic)" — expanded to cover all training
+# configs, dataset validation, trainer unit + integration tests, Dockerfile
+# validation, and config cross-referencing.
+#
+# Triggers on changes to:
+#   - ai/training/ (trainers, configs, tests)
+#   - ai/configs/requirements_training.txt
+#   - infra/docker/axolotl-train.Dockerfile
+#   - infra/docker/docker-compose.axolotl.yml
+#   - infra/docker/axolotl-entrypoint.sh
+#   - .github/workflows/training-pipeline.yml
+#
+# Jobs:
+#   1. validate-configs    — YAML/JSON syntax + schema checks + cross-validation
+#   2. validate-dataset    — DVC pull + dataset quality gate (min-quality 0.85)
+#   3. trainer-unit-tests  — Unit tests for DPO, GRPO, ORPO, and shared config
+#   4. trainer-integration  — Integration tests with mocked model loading
+#   5. docker-validate     — Dockerfile lint + docker-compose validation
+#   6. shellcheck           — Lint the entrypoint script
+#   7. requirements-check   — Verify requirements_training.txt pins are valid
+
+name: Training Pipeline CI
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ai/training/**
+      - ai/configs/requirements_training.txt
+      - infra/docker/axolotl-train.Dockerfile
+      - infra/docker/docker-compose.axolotl.yml
+      - infra/docker/axolotl-entrypoint.sh
+      - .github/workflows/training-pipeline.yml
+  push:
+    branches:
+      - main
+      - staging
+    paths:
+      - ai/training/**
+      - ai/configs/requirements_training.txt
+      - infra/docker/axolotl-train.Dockerfile
+      - infra/docker/docker-compose.axolotl.yml
+      - infra/docker/axolotl-entrypoint.sh
+      - .github/workflows/training-pipeline.yml
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PYTHON_VERSION: '3.13'
+
+concurrency:
+  group: training-pipeline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Validate all training config files (YAML + JSON + cross-validation)
+  # ---------------------------------------------------------------------------
+  validate-configs:
+    name: Validate Training Configs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: pip install pyyaml jsonschema
+
+      - name: Validate YAML configs
+        run: |
+          set -e
+          echo "=== Validating Axolotl YAML configs ==="
+          for f in ai/training/configs/*.yaml; do
+            echo "Checking $f ..."
+            python -c "import yaml; yaml.safe_load(open('$f'))" || exit 1
+            echo "  ✓ $f"
+          done
+
+      - name: Validate JSON configs
+        run: |
+          set -e
+          echo "=== Validating JSON configs ==="
+          for f in ai/training/configs/*.json; do
+            echo "Checking $f ..."
+            python -c "import json; json.load(open('$f'))" || exit 1
+            echo "  ✓ $f"
+          done
+
+      - name: Validate DeepSpeed config schema
+        run: |
+          set -e
+          echo "=== Validating DeepSpeed ZeRO-3 config ==="
+          python -c "
+          import json
+          cfg = json.load(open('ai/training/configs/ds_config_zero3.json'))
+          assert cfg['bf16']['enabled'] is True, 'bf16 must be enabled'
+          assert cfg['zero_optimization']['stage'] == 3, 'must be ZeRO stage 3'
+          assert 'offload_optimizer' in cfg['zero_optimization'], 'optimizer offload required'
+          assert 'offload_param' in cfg['zero_optimization'], 'param offload required'
+          assert cfg['zero_optimization']['overlap_comm'] is True, 'overlap_comm must be true'
+          assert 'gradient_clipping' in cfg, 'gradient_clipping must be set'
+          assert 'optimizer' in cfg, 'optimizer config must be present'
+          assert 'scheduler' in cfg, 'scheduler config must be present'
+          print('  ✓ DeepSpeed ZeRO-3 config valid')
+          "
+
+      - name: Validate ORPO config has required keys
+        run: |
+          set -e
+          echo "=== Validating ORPO Axolotl config ==="
+          python -c "
+          import yaml
+          cfg = yaml.safe_load(open('ai/training/configs/orpo_axolotl.yaml'))
+          # Required keys.
+          assert cfg['base_model'], 'base_model must be set'
+          assert cfg['load_in_4bit'] is True, 'ORPO config must use 4-bit quantization'
+          assert cfg['adapter'] == 'qlora', 'ORPO config must use QLoRA adapter'
+          assert 'orpo_beta' in cfg, 'orpo_beta must be present in ORPO config'
+          assert cfg['orpo_beta'] == 0.1, 'orpo_beta must match Appendix C default (0.1)'
+          # Enhanced keys.
+          assert cfg['gradient_checkpointing'] is True, 'gradient_checkpointing should be enabled'
+          assert cfg['flash_attention'] is True, 'flash_attention should be enabled'
+          assert cfg['warmup_ratio'] == 0.1, 'warmup_ratio must be 0.1 (Appendix C)'
+          assert cfg['lr_scheduler'] == 'cosine', 'lr_scheduler must be cosine (Appendix C)'
+          assert cfg['early_stopping_patience'] == 2, 'early_stopping_patience should be 2 (Appendix E)'
+          assert cfg['save_total_limit'] == 3, 'save_total_limit should be 3'
+          assert cfg['deepspeed'], 'DeepSpeed config path must be set'
+          assert cfg['wandb_project'], 'WandB project must be set'
+          # LoRA targets must cover all attention + MLP modules.
+          expected_targets = {'q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj'}
+          actual_targets = set(cfg['lora_target_modules'])
+          assert actual_targets == expected_targets, f'LoRA targets mismatch: {actual_targets} != {expected_targets}'
+          print('  ✓ ORPO Axolotl config valid (enhanced)')
+          "
+
+      - name: Validate SFT config has required keys
+        run: |
+          set -e
+          echo "=== Validating SFT Axolotl config ==="
+          python -c "
+          import yaml
+          cfg = yaml.safe_load(open('ai/training/configs/axolotl.yaml'))
+          assert cfg['base_model'], 'base_model must be set'
+          assert cfg['load_in_4bit'] is True, 'SFT config must use 4-bit quantization'
+          assert cfg['adapter'] == 'qlora', 'SFT config must use QLoRA adapter'
+          assert cfg['deepspeed'], 'DeepSpeed config path must be set'
+          assert cfg['bf16'] is True, 'bf16 must be enabled'
+          assert cfg['flash_attention'] is True, 'flash_attention should be enabled'
+          print('  ✓ SFT Axolotl config valid')
+          "
+
+      - name: Cross-validate config references
+        run: |
+          set -e
+          echo "=== Cross-validating config references ==="
+          python -c "
+          import json, yaml, pathlib
+          # All Axolotl YAML configs that reference a DeepSpeed config should
+          # point to a file that exists in the repo.
+          configs_dir = pathlib.Path('ai/training/configs')
+          for yaml_path in configs_dir.glob('*.yaml'):
+              cfg = yaml.safe_load(open(yaml_path))
+              ds_path = cfg.get('deepspeed')
+              if ds_path:
+                  resolved = pathlib.Path(ds_path)
+                  if not resolved.exists():
+                      print(f'✗ {yaml_path}: deepspeed path {ds_path} does not exist')
+                      exit(1)
+                  # Verify it's valid JSON.
+                  json.load(open(resolved))
+                  print(f'  ✓ {yaml_path.name} → deepspeed: {ds_path}')
+          print('  ✓ All config references valid')
+          "
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Dataset validation (DVC pull + quality gate)
+  # ---------------------------------------------------------------------------
+  validate-dataset:
+    name: Validate Dataset (DVC + Quality Gate)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    continue-on-error: true  # DVC remote may not be accessible in CI
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install DVC
+        run: pip install 'dvc[s3]'
+
+      - name: Pull dataset from DVC remote
+        continue-on-error: true
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CIVO_S3_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CIVO_S3_SECRET_KEY }}
+        run: |
+          cd ai
+          dvc pull || echo "⚠ DVC pull failed (remote may be unavailable in CI)"
+
+      - name: Validate dataset quality
+        run: |
+          set -e
+          echo "=== Dataset quality validation ==="
+          if [ -d ai/data/curated ]; then
+            echo "Curated data directory found — running quality checks"
+            python -c "
+          import json, pathlib, sys
+          curated = pathlib.Path('ai/data/curated')
+          jsonl_files = list(curated.rglob('*.jsonl'))
+          if not jsonl_files:
+              print('⚠ No JSONL files found in ai/data/curated/')
+              sys.exit(0)
+          total = 0
+          low_quality = 0
+          for f in jsonl_files:
+              for line in open(f, encoding='utf-8'):
+                  try:
+                      rec = json.loads(line)
+                      total += 1
+                      qs = rec.get('quality_score', 1.0)
+                      if qs < 0.85:
+                          low_quality += 1
+                  except json.JSONDecodeError:
+                      continue
+          if total == 0:
+              print('⚠ No samples found')
+              sys.exit(0)
+          pct = (low_quality / total) * 100
+          print(f'Total samples: {total}')
+          print(f'Low quality (<0.85): {low_quality} ({pct:.1f}%)')
+          if pct > 15:
+              print(f'✗ Too many low-quality samples ({pct:.1f}% > 15%)')
+              sys.exit(1)
+          print('✓ Dataset quality gate passed')
+          "
+          else
+            echo "⚠ Curated data directory not found (DVC pull may have failed) — skipping quality check"
+          fi
+
+  # ---------------------------------------------------------------------------
+  # Job 3: Trainer unit tests (DPO, GRPO, ORPO, shared config)
+  # ---------------------------------------------------------------------------
+  trainer-unit-tests:
+    name: Trainer Unit Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install training dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r ai/configs/requirements_training.txt || true
+          pip install pytest hypothesis
+
+      - name: Run ORPO trainer unit tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_orpo_trainer.py -v --no-header --tb=short
+
+      - name: Run DPO trainer unit tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_dpo_trainer.py -v --no-header --tb=short
+
+      - name: Run GRPO trainer unit tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_grpo_trainer.py -v --no-header --tb=short
+
+      - name: Run shared config tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_shared_config.py -v --no-header --tb=short
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trainer-unit-test-results
+          path: ai/**/.pytest_cache/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # ---------------------------------------------------------------------------
+  # Job 4: Trainer integration tests (mocked model loading)
+  # ---------------------------------------------------------------------------
+  trainer-integration:
+    name: Trainer Integration Tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install training dependencies
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r ai/configs/requirements_training.txt || true
+          pip install pytest hypothesis
+
+      - name: Run ORPO integration tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_orpo_integration.py -v --no-header --tb=short
+
+      - name: Run DPO integration tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_dpo_integration.py -v --no-header --tb=short
+
+      - name: Run GRPO integration tests
+        run: |
+          cd ai
+          python -m pytest training/tests/test_grpo_integration.py -v --no-header --tb=short
+
+  # ---------------------------------------------------------------------------
+  # Job 5: Dockerfile + docker-compose validation
+  # ---------------------------------------------------------------------------
+  docker-validate:
+    name: Validate Docker Config
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install PyYAML
+        run: pip install pyyaml
+
+      - name: Validate Dockerfile syntax and structure
+        run: |
+          set -e
+          echo "=== Checking Axolotl Dockerfile ==="
+          if [ ! -f infra/docker/axolotl-train.Dockerfile ]; then
+            echo "✗ axolotl-train.Dockerfile not found"
+            exit 1
+          fi
+          echo "  ✓ axolotl-train.Dockerfile exists"
+
+          # Check base image is CUDA devel.
+          if ! grep -q "nvidia/cuda.*devel" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ Base image must be nvidia/cuda:*-devel-*"
+            exit 1
+          fi
+          echo "  ✓ Base image is CUDA devel"
+
+          # Check multi-stage build.
+          if ! grep -q "^FROM .* AS " infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ Dockerfile should use multi-stage build"
+            exit 1
+          fi
+          echo "  ✓ Multi-stage build detected"
+
+          # Check Python 3.11 is installed.
+          if ! grep -q "python3.11" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ Python 3.11 must be installed (blueprint §6)"
+            exit 1
+          fi
+          echo "  ✓ Python 3.11 specified"
+
+          # Check axolotl is installed.
+          if ! grep -q "axolotl" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ Axolotl must be installed"
+            exit 1
+          fi
+          echo "  ✓ Axolotl install step present"
+
+          # Check requirements_training.txt is copied.
+          if ! grep -q "requirements_training.txt" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ requirements_training.txt must be copied into image"
+            exit 1
+          fi
+          echo "  ✓ requirements_training.txt copied"
+
+          # Check non-root user.
+          if ! grep -q "USER axolotl" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ Non-root user must be set"
+            exit 1
+          fi
+          echo "  ✓ Non-root user configured"
+
+          # Check healthcheck.
+          if ! grep -q "HEALTHCHECK" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ HEALTHCHECK must be present"
+            exit 1
+          fi
+          echo "  ✓ HEALTHCHECK present"
+
+          # Check entrypoint script.
+          if ! grep -q "axolotl-entrypoint.sh" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ Entrypoint script must be copied"
+            exit 1
+          fi
+          echo "  ✓ Entrypoint script referenced"
+
+          # Check OCI labels.
+          if ! grep -q "org.opencontainers.image" infra/docker/axolotl-train.Dockerfile; then
+            echo "✗ OCI image labels should be present"
+            exit 1
+          fi
+          echo "  ✓ OCI labels present"
+
+          echo "✓ Axolotl Dockerfile validation passed"
+
+      - name: Validate docker-compose.axolotl.yml
+        run: |
+          set -e
+          echo "=== Checking docker-compose.axolotl.yml ==="
+          if [ ! -f infra/docker/docker-compose.axolotl.yml ]; then
+            echo "✗ docker-compose.axolotl.yml not found"
+            exit 1
+          fi
+          echo "  ✓ docker-compose.axolotl.yml exists"
+
+          # Validate YAML syntax.
+          python -c "import yaml; yaml.safe_load(open('infra/docker/docker-compose.axolotl.yml'))"
+          echo "  ✓ YAML syntax valid"
+
+          # Check GPU configuration.
+          if ! grep -q "nvidia" infra/docker/docker-compose.axolotl.yml; then
+            echo "✗ GPU configuration must be present"
+            exit 1
+          fi
+          echo "  ✓ GPU configuration present"
+
+          # Check volume mount for workspace.
+          if ! grep -q "/workspace" infra/docker/docker-compose.axolotl.yml; then
+            echo "✗ Workspace volume mount must be present"
+            exit 1
+          fi
+          echo "  ✓ Workspace volume mount present"
+
+          # Check shared memory.
+          if ! grep -q "shm_size" infra/docker/docker-compose.axolotl.yml; then
+            echo "✗ shm_size must be set for NCCL"
+            exit 1
+          fi
+          echo "  ✓ shm_size configured"
+
+          # Check logging configuration.
+          if ! grep -q "max-size" infra/docker/docker-compose.axolotl.yml; then
+            echo "✗ Logging limits should be configured"
+            exit 1
+          fi
+          echo "  ✓ Logging limits configured"
+
+          # Check environment variables.
+          for env_var in TRAINING_CONFIG TRAINING_MODE NUM_GPUS WANDB_MODE NCCL_DEBUG; do
+            if ! grep -q "$env_var" infra/docker/docker-compose.axolotl.yml; then
+              echo "✗ Environment variable $env_var must be present"
+              exit 1
+            fi
+            echo "  ✓ $env_var present"
+          done
+
+          echo "✓ docker-compose.axolotl.yml validation passed"
+
+  # ---------------------------------------------------------------------------
+  # Job 6: Shellcheck the entrypoint script
+  # ---------------------------------------------------------------------------
+  shellcheck-entrypoint:
+    name: ShellCheck Entrypoint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install shellcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck on entrypoint
+        run: |
+          echo "::group::ShellCheck results"
+          shellcheck --severity=warning infra/docker/axolotl-entrypoint.sh
+          echo "::endgroup::"
+          echo "✅ Entrypoint script passed shellcheck (severity ≥ warning)"
+
+  # ---------------------------------------------------------------------------
+  # Job 7: Verify requirements_training.txt pins are installable
+  # ---------------------------------------------------------------------------
+  requirements-check:
+    name: Verify Requirements
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Verify requirements file exists and is non-empty
+        run: |
+          set -e
+          if [ ! -f ai/configs/requirements_training.txt ]; then
+            echo "✗ requirements_training.txt not found"
+            exit 1
+          fi
+          LINE_COUNT=$(wc -l < ai/configs/requirements_training.txt)
+          if [ "$LINE_COUNT" -lt 5 ]; then
+            echo "✗ requirements_training.txt has only $LINE_COUNT lines — expected at least 5"
+            exit 1
+          fi
+          echo "  ✓ requirements_training.txt has $LINE_COUNT lines"
+
+      - name: Verify key packages are listed
+        run: |
+          set -e
+          echo "=== Checking key packages in requirements_training.txt ==="
+          for pkg in torch transformers datasets accelerate peft trl bitsandbytes deepspeed; do
+            if ! grep -qi "^${pkg}" ai/configs/requirements_training.txt; then
+              echo "✗ Package '$pkg' not found in requirements_training.txt"
+              exit 1
+            fi
+            echo "  ✓ $pkg present"
+          done
+
+      - name: Dry-run pip install (CPU-only torch)
+        continue-on-error: true  # Some packages may not have CPU wheels.
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install --dry-run -r ai/configs/requirements_training.txt 2>&1 | tail -20

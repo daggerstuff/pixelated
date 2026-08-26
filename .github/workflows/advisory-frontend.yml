@@ -4,20 +4,20 @@ permissions:
 'on':
   push:
     branches:
-    - main
-    - master
-    - staging
+      - main
+      - master
+      - staging
     paths:
-    - src/**
-    - tests/**
-    - package.json
-    - pnpm-lock.yaml
-    - .github/workflows/advisory-frontend.yml
+      - apps/web/src/**
+      - tests/**
+      - package.json
+      - pnpm-lock.yaml
+      - .github/workflows/advisory-frontend.yml
   pull_request:
     branches:
-    - main
-    - master
-    - staging
+      - main
+      - master
+      - staging
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
 jobs:
@@ -28,37 +28,38 @@ jobs:
       fail-fast: false
       matrix:
         bucket:
-        - frontend-components
-        - frontend-hooks
-        - frontend-utils
+          - frontend-components
+          - frontend-hooks
+          - frontend-utils
     env:
       VITEST_SUITE: advisory
       VITEST_BUCKET: ${{ matrix.bucket }}
     steps:
-    - uses: actions/checkout@v7
-      with:
-        fetch-depth: 0
-        persist-credentials: false
-        submodules: false
-    - name: Init submodules
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: bash scripts/devops/init-submodules.sh
-    - uses: ./.github/actions/setup-node-pnpm
-      with:
-        node-version: 24.16.0
-    - name: Run advisory (${{ matrix.bucket }})
-      id: test-run
-      continue-on-error: true
-      run: 'set -o pipefail
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: 24.16.0
+      - name: Run advisory (${{ matrix.bucket }})
+        id: test-run
+        continue-on-error: true
+        run: 'set -o pipefail
 
-        timeout 20m pnpm test:advisory 2>&1 | tee "advisory-test-${{ matrix.bucket
-        }}.log"'
-    - name: Upload log (${{ matrix.bucket }})
-      if: always() && hashFiles(format('advisory-test-{0}.log', matrix.bucket)) !=
-        ''
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
-      with:
-        name: advisory-test-log-${{ matrix.bucket }}
-        path: advisory-test-${{ matrix.bucket }}.log
-        retention-days: 14
+          timeout 20m pnpm test:advisory 2>&1 | tee "advisory-test-${{
+          matrix.bucket }}.log"'
+      - name: Upload log (${{ matrix.bucket }})
+        if:
+          always() && hashFiles(format('advisory-test-{0}.log', matrix.bucket))
+          != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: advisory-test-log-${{ matrix.bucket }}
+          path: advisory-test-${{ matrix.bucket }}.log
+          retention-days: 14

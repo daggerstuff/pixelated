@@ -1,0 +1,494 @@
+---
+import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  'name': 'Pixelated Empathy',
+  'url': 'https://pixelatedempathy.com',
+  'contactPoint': {
+    '@type': 'ContactPoint',
+    'email': 'info@pixelatedempathy.com',
+    'contactType': 'Customer Service',
+    'areaServed': 'Worldwide',
+  },
+}
+---
+
+<BaseLayout
+  title="Contact"
+  description="Talk to the Pixelated Empathy team about a demo, a pilot, or a security and rollout review. Founder-led replies, typically within two business days."
+  fullWidthMain
+>
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(organizationSchema)
+      .replace(/</g, '\\u003c')
+      .replace(/>/g, '\\u003e')}
+  />
+
+  <MarketingPageHero
+    eyebrow="Contact"
+    title="Bring the pilot question, the hard case, or the trust review."
+    lede="Reach out if you want to evaluate the platform, talk through a pilot, ask security questions, or figure out whether the workflow fits your training program."
+    note="The fastest conversations start with the actual supervision problem."
+    trustLine={[
+      'Founder-led replies',
+      'Response target: two business days',
+      'United States',
+    ]}
+    primaryCTA={{
+      text: 'Email the team',
+      href: 'mailto:info@pixelatedempathy.com',
+    }}
+    secondaryCTA={{ text: 'See the product demo', href: '/demo-hub' }}
+    proof={{
+      label: 'What helps us reply usefully',
+      body: `<p><strong>The case or supervision workflow you want to improve.</strong></p>
+        <p>Whether you want a demo, pilot discussion, or security review.</p>
+        <p>Any rollout, retention, or deployment constraints that matter early.</p>
+        <p>Founder-led replies. Response target: two business days. United States.</p>`,
+      caption: 'Form below, or email info@pixelatedempathy.com directly',
+    }}
+  />
+
+  <section class="marketing-section">
+    <div class="marketing-shell">
+      <div class="marketing-grid marketing-grid--2 contact-grid">
+        <div class="contact-grid__details">
+          <article class="marketing-card">
+            <span class="marketing-card__label">Best first message</span>
+            <ul class="marketing-list">
+              <li>The case or supervision workflow you want to improve</li>
+              <li>
+                Whether you want a demo, pilot discussion, or security review
+              </li>
+              <li>
+                Any rollout, retention, or deployment constraints that matter
+                early
+              </li>
+            </ul>
+          </article>
+
+          <article class="marketing-card marketing-card--accent">
+            <span class="marketing-card__label">Direct contact</span>
+            <p>
+              <a
+                class="marketing-inline-link"
+                href="mailto:info@pixelatedempathy.com"
+                >info@pixelatedempathy.com</a
+              >
+            </p>
+            <p>United States</p>
+            <p>Founded 2025 • Founder-led</p>
+          </article>
+
+          <article class="marketing-card">
+            <span class="marketing-card__label">Elsewhere</span>
+            <div class="marketing-inline-links">
+              <a
+                href="https://twitter.com/pixelatedempathy"
+                class="marketing-inline-link"
+                target="_blank"
+                rel="noopener noreferrer">Twitter</a
+              >
+              <a
+                href="https://github.com/nochadisfaction/pixelated"
+                class="marketing-inline-link"
+                target="_blank"
+                rel="noopener noreferrer">GitHub</a
+              >
+            </div>
+          </article>
+        </div>
+
+        <div class="marketing-card contact-form-card">
+          <span class="marketing-card__label">Send a message</span>
+
+          <form id="contact-form" class="space-y-6" novalidate>
+            <div
+              id="error-message"
+              class="hidden rounded-lg p-4"
+              style="background: var(--np-elevated); border: 1px solid var(--np-line-strong); color: var(--np-text);"
+              role="alert"
+              aria-live="assertive"
+            >
+              <p id="error-text"></p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <label for="name" class="marketing-eyebrow">
+                  Name <span style="color: var(--accent-primary);">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  required
+                  maxlength="100"
+                  class="marketing-input"
+                  placeholder="Your name"
+                />
+                <div
+                  class="mt-1 hidden text-xs form-error-text"
+                  id="name-error"
+                >
+                </div>
+              </div>
+
+              <div>
+                <label for="email" class="marketing-eyebrow">
+                  Email <span style="color: var(--accent-primary);">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  maxlength="100"
+                  class="marketing-input"
+                  placeholder="you@example.com"
+                />
+                <div
+                  class="mt-1 hidden text-xs form-error-text"
+                  id="email-error"
+                >
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label for="subject" class="marketing-eyebrow">
+                Subject <span style="color: var(--accent-primary);">*</span>
+              </label>
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                required
+                maxlength="200"
+                class="marketing-input"
+                placeholder="Pilot, demo, trust review, or something else"
+              />
+              <div
+                class="mt-1 hidden text-xs form-error-text"
+                id="subject-error"
+              >
+              </div>
+            </div>
+
+            <div>
+              <label for="message" class="marketing-eyebrow">
+                Message <span style="color: var(--accent-primary);">*</span>
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                rows="6"
+                required
+                maxlength="2000"
+                class="marketing-input resize-none"
+                placeholder="Tell us the case type, evaluation question, or rollout constraint you want to discuss."
+              ></textarea>
+              <div class="mt-1 flex items-center justify-between">
+                <div class="hidden text-xs form-error-text" id="message-error">
+                </div>
+                <div class="text-xs" style="color: var(--text-muted);">
+                  <span id="message-count">0</span>/2000
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+              <button
+                type="submit"
+                id="submit-button"
+                class="marketing-button marketing-button--primary"
+              >
+                <span id="submit-text">Send Message</span>
+                <svg
+                  id="loading-spinner"
+                  class="ml-2 hidden h-4 w-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </button>
+              <span class="text-xs" style="color: var(--text-muted);">
+                * Required
+              </span>
+            </div>
+          </form>
+
+          <div
+            id="success-message"
+            class="mt-6 hidden rounded-lg p-6"
+            style="background: var(--np-elevated); border: 1px solid var(--np-line-strong);"
+            role="alert"
+            aria-live="polite"
+          >
+            <h3
+              class="mb-2 font-semibold"
+              style="color: var(--accent-primary);"
+            >
+              Message sent successfully!
+            </h3>
+            <p
+              class="text-sm"
+              style="color: var(--text-secondary);"
+              id="success-text"
+            >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const form = document.getElementById('contact-form')!
+    const submitButton = document.getElementById(
+      'submit-button',
+    ) as HTMLButtonElement
+
+    const submitText = document.getElementById('submit-text')
+    const loadingSpinner = document.getElementById('loading-spinner')!
+    const successMessage = document.getElementById('success-message')!
+    const errorMessage = document.getElementById('error-message')!
+    const errorText = document.getElementById('error-text')!
+
+    const nameInput = document.getElementById('name')! as HTMLInputElement
+    const emailInput = document.getElementById('email')! as HTMLInputElement
+    const subjectInput = document.getElementById('subject')! as HTMLInputElement
+    const messageInput = document.getElementById(
+      'message',
+    )! as HTMLTextAreaElement
+    const messageCount = document.getElementById('message-count')!
+
+    const nameError = document.getElementById('name-error')!
+    const emailError = document.getElementById('email-error')!
+    const subjectError = document.getElementById('subject-error')!
+    const messageError = document.getElementById('message-error')!
+
+    messageInput?.addEventListener('input', () => {
+      const length = messageInput.value.length
+      messageCount.textContent = length.toString()
+    })
+
+    function validateName(name: string): string | null {
+      if (!name.trim()) return 'Name is required'
+      if (name.length < 2) return 'Name must be at least 2 characters'
+      if (name.length > 100) return 'Name must not exceed 100 characters'
+      return null
+    }
+
+    function validateEmail(email: string): string | null {
+      if (!email.trim()) return 'Email is required'
+      if (email.length > 100) return 'Email must not exceed 100 characters'
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) return 'Please enter a valid email address'
+      return null
+    }
+
+    function validateSubject(subject: string): string | null {
+      if (!subject.trim()) return 'Subject is required'
+      if (subject.length < 3) return 'Subject must be at least 3 characters'
+      if (subject.length > 200) return 'Subject must not exceed 200 characters'
+      return null
+    }
+
+    function validateMessage(message: string): string | null {
+      if (!message.trim()) return 'Message is required'
+      if (message.length < 10) return 'Message must be at least 10 characters'
+      if (message.length > 2000)
+        return 'Message must not exceed 2000 characters'
+      return null
+    }
+
+    function showFieldError(
+      input: HTMLElement,
+      errorElement: HTMLElement,
+      message: string,
+    ) {
+      input.style.borderColor = 'var(--np-line-strong)'
+      errorElement.textContent = message
+      errorElement.classList.remove('hidden')
+    }
+
+    function clearFieldError(input: HTMLElement, errorElement: HTMLElement) {
+      input.style.borderColor = ''
+      errorElement.classList.add('hidden')
+    }
+
+    function showError(message: string) {
+      errorText.textContent = message
+      errorMessage.classList.remove('hidden')
+      errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    function hideMessages() {
+      errorMessage.classList.add('hidden')
+      successMessage.classList.add('hidden')
+    }
+
+    function setLoading(loading: boolean) {
+      if (loading) {
+        submitButton.disabled = true
+        if (submitText) submitText.textContent = 'Sending...'
+        loadingSpinner.classList.remove('hidden')
+      } else {
+        submitButton.disabled = false
+        if (submitText) submitText.textContent = 'Send Message'
+        loadingSpinner.classList.add('hidden')
+      }
+    }
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      hideMessages()
+
+      const nameValidation = validateName(nameInput.value)
+      const emailValidation = validateEmail(emailInput.value)
+      const subjectValidation = validateSubject(subjectInput.value)
+      const messageValidation = validateMessage(messageInput.value)
+
+      clearFieldError(nameInput, nameError)
+      clearFieldError(emailInput, emailError)
+      clearFieldError(subjectInput, subjectError)
+      clearFieldError(messageInput, messageError)
+
+      let hasErrors = false
+      if (nameValidation) {
+        showFieldError(nameInput, nameError, nameValidation)
+        hasErrors = true
+      }
+      if (emailValidation) {
+        showFieldError(emailInput, emailError, emailValidation)
+        hasErrors = true
+      }
+      if (subjectValidation) {
+        showFieldError(subjectInput, subjectError, subjectValidation)
+        hasErrors = true
+      }
+      if (messageValidation) {
+        showFieldError(messageInput, messageError, messageValidation)
+        hasErrors = true
+      }
+
+      if (hasErrors) {
+        showError('Please correct the errors above and try again.')
+        return
+      }
+
+      setLoading(true)
+
+      try {
+        const formData = {
+          name: nameInput.value.trim(),
+          email: emailInput.value.trim().toLowerCase(),
+          subject: subjectInput.value.trim(),
+          message: messageInput.value.trim(),
+        }
+
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          const successTextEl = document.getElementById('success-text')
+          if (successTextEl) successTextEl.textContent = result.message
+          successMessage.classList.remove('hidden')
+          form.style.display = 'none'
+          successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        } else {
+          showError(
+            result.message || 'An error occurred while sending your message.',
+          )
+        }
+      } catch (error: unknown) {
+        console.error('Contact form submission error:', String(error))
+        showError('Network error: Please check your connection and try again.')
+      } finally {
+        setLoading(false)
+      }
+    })
+
+    nameInput?.addEventListener('blur', () => {
+      const error = validateName(nameInput.value)
+      if (error) {
+        showFieldError(nameInput, nameError, error)
+      } else {
+        clearFieldError(nameInput, nameError)
+      }
+    })
+
+    emailInput?.addEventListener('blur', () => {
+      const error = validateEmail(emailInput.value)
+      if (error) {
+        showFieldError(emailInput, emailError, error)
+      } else {
+        clearFieldError(emailInput, emailError)
+      }
+    })
+
+    subjectInput?.addEventListener('blur', () => {
+      const error = validateSubject(subjectInput.value)
+      if (error) {
+        showFieldError(subjectInput, subjectError, error)
+      } else {
+        clearFieldError(subjectInput, subjectError)
+      }
+    })
+
+    messageInput?.addEventListener('blur', () => {
+      const error = validateMessage(messageInput.value)
+      if (error) {
+        showFieldError(messageInput, messageError, error)
+      } else {
+        clearFieldError(messageInput, messageError)
+      }
+    })
+  </script>
+
+  <style>
+    .contact-grid {
+      align-items: start;
+    }
+
+    .contact-grid__details {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .contact-form-card {
+      padding: 1.5rem;
+    }
+
+    .form-error-text {
+      color: var(--np-text);
+    }
+  </style>
+</BaseLayout>
+t> t> t>

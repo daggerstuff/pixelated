@@ -389,10 +389,10 @@ Implement real-time monitoring for clinical validity pass rate, pipeline through
 - **Metrics**: `clinical_validity_pass_rate`, `pipeline_throughput_records_per_hour`, `annotation_queue_depth`
 - **Stack**: Prometheus metrics endpoint in training script + Grafana dashboard JSON
 - **Alert**: Slack webhook when `clinical_validity_pass_rate` drops >10% week-over-week
-- **Dashboard Location**: `monitoring/dashboards/clinical-validity.json`
+- **Dashboard Location**: `infra/monitoring/dashboards/clinical-validity.json`
 
 ### Atlassian & Code Linkages
-- **Dashboard File**: `monitoring/dashboards/clinical-validity.json` [NEW]
+- **Dashboard File**: `infra/monitoring/dashboards/clinical-validity.json` [NEW]
 - **Source Plan**: CONSOLIDATED-MODERN-PLAN-2026-05-08.md
 
 ### Verification & Testing Checklist

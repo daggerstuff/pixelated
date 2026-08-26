@@ -18,7 +18,7 @@ from pixelated_empathy.company_events import get_event_spine
 from pixelated_empathy.monthly_gate import get_accepted_months
 from pixelated_empathy.personas import PERSONAS, persona_voice_summary
 from pixelated_empathy.schemas import (
-    CompanyEvent,
+    ClinicalEvent,
     MonthBible,
     MonthEnrichment,
     PersonaVoiceContext,
@@ -32,61 +32,71 @@ from pixelated_empathy.schemas import (
 _REFERENCE_EMAILS: list[dict[str, object]] = [
     {
         "__type": "reference_non_output",
-        "sender": "Chad",
-        "recipients": ["Marcus"],
-        "subject": "Re: WebSocket timeline",
+        "sender": "Naomi",
+        "recipients": ["Sam"],
+        "subject": "Re: Supervision session 2 — reflective listening feedback",
         "body": (
-            "Need this by Thursday or the Westbrook demo falls apart. "
-            "What's blocking you specifically — I can clear the way."
+            "I've been reviewing the recording from yesterday's session with Case 2025-07-002. "
+            "Your reflective listening is strong — you mirrored the patient's affect accurately three times "
+            "in the first ten minutes. What I want you to work on is the pause. You're rushing to reflect "
+            "before the patient has finished processing. Try counting to three silently before you respond. "
+            "It feels like an eternity. It isn't.\n\n"
+            "Let's debrief this in our next supervision session.\n\n— Naomi"
         ),
-        "note": "Chad voice: direct ask, clears blockers, no preamble",
+        "note": "Naomi voice: specific session observation, grounded in technique, actionable feedback",
     },
     {
         "__type": "reference_non_output",
         "sender": "Marcus",
-        "recipients": ["Chad", "Adaora"],
-        "subject": "Re: LLM cold start — root cause",
+        "recipients": ["Adaora", "Ada"],
+        "subject": "Re: Empathy scoring model — bias detection results",
         "body": (
-            "Going to be direct: the warm-pool approach Adaora suggested is the right call. "
-            "It adds $60/month to infra but drops cold-start from 4.2s to under 800ms. "
-            "Happy to pair on the implementation if the timeline is tight."
+            "Going to be direct: the scoring model is under-predicting empathy for non-native English speakers "
+            "by 12%. Adaora's bias detection pipeline caught it. The root cause is the training data — 78% of "
+            "the reference sessions are from native English-speaking clinicians. I can retrain with weighted "
+            "sampling, but that drops our reference pool from 400 to 180 sessions. Tradeoff: better fairness, "
+            "worse calibration. I need a clinical call from Ada on whether we accept the calibration hit.\n\n"
+            "— M"
         ),
-        "note": "Marcus voice: acknowledges colleague's idea, quantifies tradeoff precisely",
+        "note": "Marcus voice: quantifies tradeoff precisely, flags dependency, asks for clinical decision",
     },
     {
         "__type": "reference_non_output",
         "sender": "Ada",
-        "recipients": ["London", "Chad"],
-        "subject": "Re: Westbrook pilot proposal — HIPAA section",
+        "recipients": ["London", "Naomi"],
+        "subject": "Re: Foundation tier gate review — Sam's readiness",
         "body": (
-            "I've reviewed the proposal carefully. The HIPAA section needs three changes before "
-            "I can sign off: the BAA language should reference 45 CFR Part 164 specifically, "
-            "the data retention schedule is missing a destruction clause, and the breach notification "
-            "timeline is stated as 90 days — federal requirement is 60. I've marked these in the "
-            "shared doc. I can turn around a revised draft within 24 hours once you let me know "
-            "which sections I own.\n\nThank you for looping me in.\n\nAda"
+            "I've reviewed the supervision notes, the outcome measures, and the session recordings. "
+            "Sam has met all foundation competencies: rapport building (WAI-SR score 5.2/7), active listening "
+            "(supervisor rating 4/5), and therapeutic frame adherence (no boundary violations across 7 sessions). "
+            "The one area I want to flag is session pacing — Sam still tends to rush the opening. This is a "
+            "developmental note, not a gate criterion. My recommendation is that Sam proceeds to the assessment "
+            "tier.\n\n"
+            "I'll have the written evaluation to you by end of day.\n\n"
+            "Thank you,\nAda"
         ),
-        "note": "Ada voice: formal, precise, flags specific issues with regulatory citations",
+        "note": "Ada voice: formal, precise, grounds decision in specific metrics, references regulatory framework",
     },
     {
         "__type": "reference_non_output",
         "sender": "Ren",
         "recipients": ["Marcus"],
         "subject": "Deployed.",
-        "body": "Warm pool live. p99 at 780ms. See dashboard.",
+        "body": "Session recording encryption updated. AES-256 at rest. Audit logs immutable. See dashboard.",
         "note": "Ren voice: minimal, states facts, links to evidence",
     },
     {
         "__type": "reference_non_output",
         "sender": "Lin",
         "recipients": ["London"],
-        "subject": "Re: dashboard feedback",
+        "subject": "Re: new patient persona design",
         "body": (
-            "ok so i looked at the flow again and i think the issue isn't the layout — "
-            "it's that the confidence meter label is too small at mobile. updated the figma. "
+            "ok so i looked at the scenario flow again and i think the issue isn't the branching — "
+            "it's that the risk assessment prompt is too subtle for a foundation-tier trainee. "
+            "updated the figma. the patient now gives two explicit warning signs before the implicit one. "
             "lmk if that works"
         ),
-        "note": "Lin voice: casual, visual-first, lowercase, Figma as evidence",
+        "note": "Lin voice: casual, visual-first, lowercase, Figma as evidence, thinks about trainee experience",
     },
 ]
 
@@ -94,44 +104,41 @@ _REFERENCE_CHATS: list[dict[str, object]] = [
     {
         "__type": "reference_non_output",
         "room": "#engineering",
-        "topic": "WebSocket latency",
+        "topic": "Empathy scoring latency",
         "messages": [
-            {"sender": "Marcus", "text": "Adaora — the reconnect handling PR looks good except line 142. The backoff is linear, should be exponential."},
+            {"sender": "Marcus", "text": "Adaora — the real-time scoring PR looks good except line 142. The debounce is 500ms, should be 200ms for live feedback."},
             {"sender": "Adaora", "text": "On it. Fixing now."},
-            {"sender": "Ren", "text": "👍"},
+            {"sender": "Ren", "text": "ack"},
             {"sender": "Marcus", "text": "Thanks. ETA?"},
-            {"sender": "Adaora", "text": "20 min."},
+            {"sender": "Adaora", "text": "20 min. Also found a race condition in the WAI-SR calculation. Filing a separate PR."},
         ],
-        "note": "Engineering channel: terse, focused, specific line numbers",
-    },
-    {
-        "__type": "reference_non_output",
-        "room": "#general",
-        "topic": "Hargrove signing celebration",
-        "messages": [
-            {"sender": "Chad", "text": "It's signed. $48k. Ren can you provision the tenant now?"},
-            {"sender": "Ren", "text": "On it."},
-            {"sender": "London", "text": "WE DID IT!!! 🎉🎉🎉"},
-            {"sender": "Lin", "text": "ok i'm crying a little"},
-            {"sender": "Naomi", "text": "This is what we've been working toward. Congratulations, everyone."},
-            {"sender": "Marcus", "text": "Nice. Now let's not mess up the onboarding."},
-            {"sender": "Adaora", "text": "Marcus 😂"},
-            {"sender": "Ren", "text": "Provisioned. Hargrove tenant is live."},
-        ],
-        "note": "#general: mixed registers, celebration with Marcus tempering it",
+        "note": "#engineering: terse, focused, specific line numbers, clinical tool references",
     },
     {
         "__type": "reference_non_output",
         "room": "#clinical",
-        "topic": "Session debrief observation",
+        "topic": "Crisis module debrief observation",
         "messages": [
-            {"sender": "Naomi", "text": "so I was just thinking about something Ada said in session 1 — the residents are engaging with the patient, but they're not *listening*. they're preparing their next response."},
-            {"sender": "Ada", "text": "Yes. That's the core training challenge. The AI patient creates the opportunity; the debrief is where the actual learning happens."},
-            {"sender": "Mira", "text": "I noticed the same thing. The simulation is almost too comfortable for them. Real patients resist."},
-            {"sender": "Naomi", "text": "so maybe we need to add more... friction? controlled unpredictability?"},
+            {"sender": "Naomi", "text": "so I was just thinking about something Ada said in the gate review — Sam is engaging with the crisis scenarios, but they're not *feeling* the weight. they're performing the protocol."},
+            {"sender": "Ada", "text": "Yes. That's the core challenge of crisis training. The protocol creates the structure; the debrief is where the emotional processing happens."},
+            {"sender": "Mira", "text": "I noticed the same thing. The simulation is almost too safe for them. Real crisis doesn't have a pause button."},
+            {"sender": "Naomi", "text": "so maybe we need to add more... unpredictability? not danger, but things that don't follow the script?"},
             {"sender": "Ada", "text": "That's the persona variability discussion we've been circling. I think it's time to open it formally."},
         ],
         "note": "#clinical: thoughtful, builds on each other, Mira adds philosophical depth",
+    },
+    {
+        "__type": "reference_non_output",
+        "room": "#supervision",
+        "topic": "Sam's session with Case 2025-10-003",
+        "messages": [
+            {"sender": "Naomi", "text": "Sam's risk assessment was clinically sound but the engagement was too clinical. The patient needed presence, not protocol."},
+            {"sender": "Mira", "text": "This is the tension we keep coming back to. Competence vs. connection."},
+            {"sender": "Naomi", "text": "I'm going to focus the next supervision on therapeutic presence. Not technique — presence."},
+            {"sender": "Sam", "text": "I've been thinking about this since the session. I think I was so focused on getting the Columbia Protocol right that I forgot to actually be with the patient."},
+            {"sender": "Naomi", "text": "That's exactly the insight I wanted you to reach. ✓"},
+        ],
+        "note": "#supervision: reflective, Sam shows self-awareness, Naomi affirms",
     },
 ]
 

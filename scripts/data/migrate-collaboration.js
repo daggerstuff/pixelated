@@ -46,7 +46,7 @@ async function runMigrations() {
 
     // Test DocumentService integration
     const { DocumentService } =
-      await import('../src/services/DocumentService.js')
+      await import('../apps/web/src/lib/services/DocumentService.js')
     const Redis = await import('ioredis')
 
     const redis = new Redis.default(
