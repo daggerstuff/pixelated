@@ -224,7 +224,7 @@ export class NoteSigningService {
     }
 
     // Validate note is in draft (preliminary) status
-    if (note.docStatus && note.docStatus !== 'preliminary') {
+    if (note.docStatus !== 'preliminary') {
       return {
         success: false,
         error: `Note is not in draft status (current: ${note.docStatus}). Only preliminary notes can be signed.`,

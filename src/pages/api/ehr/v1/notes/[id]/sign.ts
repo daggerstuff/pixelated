@@ -43,7 +43,14 @@ export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
   if (!rawNoteId)
     return ehrValidationError('Note ID is required in the URL path.')
 
-  const noteId = sanitizeFhirId(rawNoteId, 'noteId')
+  let noteId: string
+  try {
+    noteId = sanitizeFhirId(rawNoteId, 'noteId')
+  } catch (err) {
+    return ehrValidationError(
+      `Invalid note ID: ${err instanceof Error ? err.message : 'validation failed'}`,
+    )
+  }
 
   // Parse and validate request body
   const raw = await ctx.request.json().catch(() => null)
