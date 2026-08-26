@@ -5,10 +5,11 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { NoteSigningService } from '../note-signing-service'
+
 import { EHRAuditService, EHRAuditAction, EHRResourceType } from '../../audit'
-import type { DocumentReference } from '../../types'
 import type { RLSContext } from '../../repositories'
+import type { DocumentReference } from '../../types'
+import { NoteSigningService } from '../note-signing-service'
 
 function makeDraftNote(): DocumentReference {
   return {
