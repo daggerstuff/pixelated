@@ -134,7 +134,7 @@ export const POST = withV1Contract('riskStratificationGate', async (ctx, caller)
     )
     if (!perm.allowed) return perm.response
 
-    const result = reviewRiskScore({
+    const result = await reviewRiskScore({
       reviewId: body.reviewId,
       clinicianId: caller.user.id,
       clinicianRole: caller.user.role,

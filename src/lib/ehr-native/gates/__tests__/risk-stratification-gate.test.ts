@@ -23,16 +23,15 @@ import {
   resetGateStateForTests,
 } from '../risk-stratification-gate'
 
-// Mock the audit log module so we don't hit the real audit system
 vi.mock('@/lib/audit/log', () => ({
   logAuditEvent: vi.fn().mockResolvedValue(undefined),
 }))
 import { logAuditEvent } from '@/lib/audit/log'
 const logAuditEventMock = vi.mocked(logAuditEvent)
 
-// Mock the RBAC module to control permission outcomes
+// Must return a Promise to match the real async checkPermission signature
 vi.mock('@/lib/ehr-native/auth/ehr-rbac', () => ({
-  checkPermission: vi.fn((role: string, _permission: string) => ({
+  checkPermission: vi.fn(async (role: string, _permission: string) => ({
     granted: role === 'physician' || role === 'nurse',
     permission: 'write_patient',
     role,
@@ -111,7 +110,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
   // -------------------------------------------------------------------------
 
   describe('reviewRiskScore — clinician approval', () => {
-    it('approves a pending risk score and updates the audit trail', () => {
+    it('approves a pending risk score and updates the audit trail', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-002',
         tenantId: 'tenant-001',
@@ -124,7 +123,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
 
       const reviewId = intercept.data!.id
 
-      const result = reviewRiskScore({
+      const result = await reviewRiskScore({
         reviewId,
         clinicianId: 'dr-smith',
         clinicianRole: 'physician',
@@ -138,12 +137,11 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       expect(result.data!.reviewingClinicianRole).toBe('physician')
       expect(result.data!.rejectionReason).toBeNull()
 
-      // Verify the review record was updated
       const updated = getReview(reviewId)
       expect(updated!.state).toBe('approved')
     })
 
-    it('records an audit trail entry on approval', () => {
+    it('records an audit trail entry on approval', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-003',
         tenantId: 'tenant-001',
@@ -155,7 +153,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
 
       const reviewId = intercept.data!.id
 
-      reviewRiskScore({
+      await reviewRiskScore({
         reviewId,
         clinicianId: 'dr-jones',
         clinicianRole: 'physician',
@@ -163,7 +161,6 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       })
 
       const trail = getAuditTrail(reviewId)
-      // Should have at least 2: submission + approval
       expect(trail.length).toBeGreaterThanOrEqual(2)
 
       const approvalEntry = trail.find((e) => e.action === 'approved')
@@ -201,7 +198,6 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
     })
 
     it('returns non-compliant when BAA_NIM_HETZNER_CONFIRMED is missing', () => {
-      // Ensure env var is not set
       vi.stubEnv('BAA_NIM_HETZNER_CONFIRMED', '')
       const result = checkBAACompliance('nim-hetzner')
       expect(result.compliant).toBe(false)
@@ -241,8 +237,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       expect(result.data).toBeNull()
       expect(result.error).toContain('BAA_NIM_HETZNER_CONFIRMED')
 
-      // Verify no review record was created
-      expect(getReview).toBeDefined() // sanity check
+      expect(getReview).toBeDefined()
 
       vi.unstubAllEnvs()
     })
@@ -250,8 +245,6 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
     it('records a blocked_non_baa audit entry when BAA check fails', () => {
       vi.stubEnv('BAA_NVIDIA_CONFIRMED', '')
 
-      // We can't get the reviewId from interceptRiskScore since it returns error,
-      // but the audit entry is still recorded internally.
       logAuditEventMock.mockClear()
 
       interceptRiskScore({
@@ -284,7 +277,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
   // -------------------------------------------------------------------------
 
   describe('audit trail', () => {
-    it('records patient_id, risk_score, AI system source, reviewing clinician, and approved_at', () => {
+    it('records patient_id, risk_score, AI system source, reviewing clinician, and approved_at', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-006',
         tenantId: 'tenant-001',
@@ -295,7 +288,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       })
       const reviewId = intercept.data!.id
 
-      reviewRiskScore({
+      await reviewRiskScore({
         reviewId,
         clinicianId: 'dr-wilson',
         clinicianRole: 'physician',
@@ -304,23 +297,20 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
 
       const trail = getAuditTrail(reviewId)
 
-      // Verify submission entry
       const submission = trail.find((e) => e.action === 'submitted')
       expect(submission).toBeDefined()
       expect(submission!.patientId).toBe('patient-006')
       expect(submission!.riskScore).toBe(0.73)
       expect(submission!.aiSystemSource).toBe('local-fallback')
 
-      // Verify approval entry — acceptance criterion: records patient_id, risk_score,
-      // AI system source, reviewing clinician, approved_at
       const approval = trail.find((e) => e.action === 'approved')
       expect(approval).toBeDefined()
       expect(approval!.patientId).toBe('patient-006')
       expect(approval!.riskScore).toBe(0.73)
       expect(approval!.aiSystemSource).toBe('local-fallback')
-      expect(approval!.userId).toBe('dr-wilson') // reviewing clinician
+      expect(approval!.userId).toBe('dr-wilson')
       expect(approval!.metadata['reviewingClinicianId']).toBe('dr-wilson')
-      expect(approval!.metadata['reviewedAt']).toBeDefined() // approved_at
+      expect(approval!.metadata['reviewedAt']).toBeDefined()
     })
   })
 
@@ -329,7 +319,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
   // -------------------------------------------------------------------------
 
   describe('reviewRiskScore — rejection', () => {
-    it('rejects a pending risk score and records the rejection reason', () => {
+    it('rejects a pending risk score and records the rejection reason', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-007',
         tenantId: 'tenant-001',
@@ -340,7 +330,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       })
       const reviewId = intercept.data!.id
 
-      const result = reviewRiskScore({
+      const result = await reviewRiskScore({
         reviewId,
         clinicianId: 'dr-brown',
         clinicianRole: 'physician',
@@ -364,7 +354,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       )
     })
 
-    it('fails when rejecting without a reason', () => {
+    it('fails when rejecting without a reason', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-008',
         tenantId: 'tenant-001',
@@ -374,7 +364,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
         submittedByUserId: 'system',
       })
 
-      const result = reviewRiskScore({
+      const result = await reviewRiskScore({
         reviewId: intercept.data!.id,
         clinicianId: 'dr-green',
         clinicianRole: 'physician',
@@ -391,7 +381,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
   // -------------------------------------------------------------------------
 
   describe('reviewRiskScore — double-review prevention', () => {
-    it('prevents reviewing an already-approved risk score', () => {
+    it('prevents reviewing an already-approved risk score', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-009',
         tenantId: 'tenant-001',
@@ -402,7 +392,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       })
       const reviewId = intercept.data!.id
 
-      const first = reviewRiskScore({
+      const first = await reviewRiskScore({
         reviewId,
         clinicianId: 'dr-one',
         clinicianRole: 'physician',
@@ -410,7 +400,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       })
       expect(first.ok).toBe(true)
 
-      const second = reviewRiskScore({
+      const second = await reviewRiskScore({
         reviewId,
         clinicianId: 'dr-two',
         clinicianRole: 'physician',
@@ -420,8 +410,8 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       expect(second.error).toContain('already approved')
     })
 
-    it('returns error for non-existent review', () => {
-      const result = reviewRiskScore({
+    it('returns error for non-existent review', async () => {
+      const result = await reviewRiskScore({
         reviewId: 'nonexistent-id',
         clinicianId: 'dr-x',
         clinicianRole: 'physician',
@@ -438,7 +428,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
   // -------------------------------------------------------------------------
 
   describe('reviewRiskScore — RBAC enforcement', () => {
-    it('blocks approval from a role without write_patient permission', () => {
+    it('blocks approval from a role without write_patient permission', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-010',
         tenantId: 'tenant-001',
@@ -448,7 +438,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
         submittedByUserId: 'system',
       })
 
-      const result = reviewRiskScore({
+      const result = await reviewRiskScore({
         reviewId: intercept.data!.id,
         clinicianId: 'front-desk-user',
         clinicianRole: 'frontDesk',
@@ -459,7 +449,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       expect(result.error).toContain('lacks permission')
     })
 
-    it('allows approval from a physician', () => {
+    it('allows approval from a physician', async () => {
       const intercept = interceptRiskScore({
         patientId: 'patient-011',
         tenantId: 'tenant-001',
@@ -469,7 +459,7 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
         submittedByUserId: 'system',
       })
 
-      const result = reviewRiskScore({
+      const result = await reviewRiskScore({
         reviewId: intercept.data!.id,
         clinicianId: 'dr-lee',
         clinicianRole: 'physician',

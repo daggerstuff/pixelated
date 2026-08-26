@@ -258,7 +258,9 @@ export function interceptRiskScore(
  * Verifies that the clinician role has permission to write to patient charts.
  * Only physicians and certain roles can approve risk scores for chart entry.
  */
-function canApproveRiskScore(role: ClinicalRole): EHRPermissionCheckResult {
+async function canApproveRiskScore(
+  role: ClinicalRole,
+): Promise<EHRPermissionCheckResult> {
   return checkPermission(role, 'write_patient')
 }
 
@@ -271,9 +273,9 @@ function canApproveRiskScore(role: ClinicalRole): EHRPermissionCheckResult {
  * - On approval: state → `approved`, audit records reviewing clinician + approved_at.
  * - On rejection: state → `rejected`, audit records rejection reason.
  */
-export function reviewRiskScore(
+export async function reviewRiskScore(
   params: ReviewRiskScoreParams,
-): RiskGateResult<RiskStratificationReview> {
+): Promise<RiskGateResult<RiskStratificationReview>> {
   const review = reviewStore.get(params.reviewId)
 
   if (!review) {
@@ -293,7 +295,7 @@ export function reviewRiskScore(
   }
 
   // RBAC check — clinician must have write_patient permission
-  const permResult = canApproveRiskScore(params.clinicianRole)
+  const permResult = await canApproveRiskScore(params.clinicianRole)
 
   if (!permResult.granted) {
     return {
