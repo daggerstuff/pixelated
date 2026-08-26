@@ -12,6 +12,13 @@
  * 4. Record audit trail: patient_id, risk_score, AI system source, reviewing clinician, approved_at.
  */
 
+import { logAuditEvent } from '@/lib/audit/log'
+import { checkPermission } from '@/lib/ehr-native/auth/ehr-rbac'
+import type {
+  ClinicalRole,
+  EHRPermissionCheckResult,
+} from '@/lib/ehr-native/auth/types'
+
 import type {
   BAAComplianceCheck,
   InterceptRiskScoreParams,
@@ -21,12 +28,6 @@ import type {
   RiskStratificationReview,
   ReviewRiskScoreParams,
 } from './types'
-import type {
-  ClinicalRole,
-  EHRPermissionCheckResult,
-} from '@/lib/ehr-native/auth/types'
-import { checkPermission } from '@/lib/ehr-native/auth/ehr-rbac'
-import { logAuditEvent } from '@/lib/audit/log'
 
 // ---------------------------------------------------------------------------
 // In-memory store (production would use a persistent store with RLS)
@@ -296,7 +297,10 @@ export async function reviewRiskScore(
   }
 
   // RBAC check — clinician must have write_patient permission
-  const permResult = await canApproveRiskScore(params.clinicianRole, review.patientId)
+  const permResult = await canApproveRiskScore(
+    params.clinicianRole,
+    review.patientId,
+  )
 
   if (!permResult.granted) {
     return {
