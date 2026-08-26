@@ -21,7 +21,10 @@ import type {
   RiskStratificationReview,
   ReviewRiskScoreParams,
 } from './types'
-import type { ClinicalRole, EHRPermissionCheckResult } from '@/lib/ehr-native/auth/types'
+import type {
+  ClinicalRole,
+  EHRPermissionCheckResult,
+} from '@/lib/ehr-native/auth/types'
 import { checkPermission } from '@/lib/ehr-native/auth/ehr-rbac'
 import { logAuditEvent } from '@/lib/audit/log'
 
@@ -81,7 +84,9 @@ function baaEnvVarForSource(source: RiskAISystemSource): string | null {
  *
  * Per G2.3 (PIX-4428), the gate fails closed: missing/false env var → blocked.
  */
-export function checkBAACompliance(source: RiskAISystemSource): BAAComplianceCheck {
+export function checkBAACompliance(
+  source: RiskAISystemSource,
+): BAAComplianceCheck {
   const envVar = baaEnvVarForSource(source)
 
   if (envVar === null) {
@@ -272,7 +277,11 @@ export function reviewRiskScore(
   const review = reviewStore.get(params.reviewId)
 
   if (!review) {
-    return { ok: false, data: null, error: 'Risk stratification review not found.' }
+    return {
+      ok: false,
+      data: null,
+      error: 'Risk stratification review not found.',
+    }
   }
 
   if (review.state !== 'pending_clinician_review') {
@@ -351,7 +360,9 @@ export function getReview(reviewId: string): RiskStratificationReview | null {
 /**
  * Returns all reviews for a given patient (within the gate's in-memory store).
  */
-export function getReviewsForPatient(patientId: string): RiskStratificationReview[] {
+export function getReviewsForPatient(
+  patientId: string,
+): RiskStratificationReview[] {
   const results: RiskStratificationReview[] = []
   for (const review of reviewStore.values()) {
     if (review.patientId === patientId) {
@@ -369,7 +380,7 @@ export function getReviewsForPatient(patientId: string): RiskStratificationRevie
  * Clears all in-memory review and audit records.
  * Intended for use in unit test setup/teardown only.
  */
-export function _resetGateStateForTests(): void {
+export function resetGateStateForTests(): void {
   reviewStore.clear()
   auditStore.clear()
   reviewCounter = 0

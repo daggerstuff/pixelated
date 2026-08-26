@@ -20,7 +20,7 @@ import {
   checkBAACompliance,
   getReview,
   getAuditTrail,
-  _resetGateStateForTests,
+  resetGateStateForTests,
 } from '../risk-stratification-gate'
 
 // Mock the audit log module so we don't hit the real audit system
@@ -36,7 +36,10 @@ vi.mock('@/lib/ehr-native/auth/ehr-rbac', () => ({
     granted: role === 'physician' || role === 'nurse',
     permission: 'write_patient',
     role,
-    reason: role === 'physician' || role === 'nurse' ? '' : 'Insufficient permissions',
+    reason:
+      role === 'physician' || role === 'nurse'
+        ? ''
+        : 'Insufficient permissions',
     breakGlassActivated: false,
     consentVerified: null,
   })),
@@ -44,12 +47,12 @@ vi.mock('@/lib/ehr-native/auth/ehr-rbac', () => ({
 
 describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
   beforeEach(() => {
-    _resetGateStateForTests()
+    resetGateStateForTests()
     vi.clearAllMocks()
   })
 
   afterEach(() => {
-    _resetGateStateForTests()
+    resetGateStateForTests()
     vi.restoreAllMocks()
   })
 
@@ -170,7 +173,9 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
       expect(approvalEntry!.aiSystemSource).toBe('local-fallback')
       expect(approvalEntry!.userId).toBe('dr-jones')
       expect(approvalEntry!.metadata['reviewingClinicianId']).toBe('dr-jones')
-      expect(approvalEntry!.metadata['reviewingClinicianRole']).toBe('physician')
+      expect(approvalEntry!.metadata['reviewingClinicianRole']).toBe(
+        'physician',
+      )
       expect(approvalEntry!.metadata['reviewedAt']).toBeDefined()
     })
   })
@@ -340,7 +345,8 @@ describe('Risk Stratification Gate (G2.2 / PIX-4427)', () => {
         clinicianId: 'dr-brown',
         clinicianRole: 'physician',
         approved: false,
-        rejectionReason: 'Risk model output inconsistent with clinical assessment.',
+        rejectionReason:
+          'Risk model output inconsistent with clinical assessment.',
       })
 
       expect(result.ok).toBe(true)

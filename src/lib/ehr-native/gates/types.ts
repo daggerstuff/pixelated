@@ -6,10 +6,14 @@
  * Acceptance criterion: risk scores cannot be written to patient chart without clinician approval.
  */
 
-import type { ClinicalRole, EHRPermissionCheckResult } from '@/lib/ehr-native/auth/types'
+import type {
+  ClinicalRole,
+  EHRPermissionCheckResult,
+} from '@/lib/ehr-native/auth/types'
 
 /** States a risk stratification review can be in. */
-export type RiskReviewState = 'pending_clinician_review' | 'approved' | 'rejected'
+export type RiskReviewState =
+  'pending_clinician_review' | 'approved' | 'rejected'
 
 /** AI system source identifiers for risk stratification. */
 export type RiskAISystemSource = 'nim-hetzner' | 'nvidia' | 'local-fallback'
