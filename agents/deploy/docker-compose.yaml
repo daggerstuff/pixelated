@@ -15,7 +15,7 @@ services:
   mongo:
     image: mongo:latest
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongo-data:/data/db
     restart: unless-stopped
@@ -23,7 +23,7 @@ services:
   redis:
     image: redis:latest
     ports:
-      - "6379:6379"
+      - '6379:6379'
     restart: unless-Stopped
 
   # --- Agent fleet ---
@@ -35,7 +35,7 @@ services:
       args:
         AGENT_DIR: agents/supervisor-agent
     ports:
-      - "2000:2000"
+      - '2000:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -51,7 +51,7 @@ services:
       args:
         AGENT_DIR: agents/advisor-agent
     ports:
-      - "2005:2000"
+      - '2005:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -66,7 +66,7 @@ services:
       args:
         AGENT_DIR: agents/content-agent
     ports:
-      - "2010:2000"
+      - '2010:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -81,7 +81,7 @@ services:
       args:
         AGENT_DIR: agents/eve-agent
     ports:
-      - "2015:2000"
+      - '2015:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -96,7 +96,7 @@ services:
       args:
         AGENT_DIR: agents/intake-agent
     ports:
-      - "2020:2000"
+      - '2020:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -111,7 +111,7 @@ services:
       args:
         AGENT_DIR: agents/pipeline-agent
     ports:
-      - "2025:2000"
+      - '2025:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -126,7 +126,7 @@ services:
       args:
         AGENT_DIR: agents/qa-agent
     ports:
-      - "2030:2000"
+      - '2030:2000'
     env_file: .env.agents
     environment:
       - PORT=2000
@@ -141,7 +141,7 @@ services:
       args:
         AGENT_DIR: agents/session-agent
     ports:
-      - "2035:2000"
+      - '2035:2000'
     env_file: .env.agents
     environment:
       - PORT=2000

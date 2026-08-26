@@ -40,7 +40,7 @@ import { glob } from "glob";
 
 const INDEX_PATH = resolve(".cache/knip-index.json");
 const INDEX_VERSION = 3;
-const SCAN_GLOB = "{src,frontend/src,business-strategy-cms/src}/**/*.{ts,tsx,js,jsx,astro}";
+const SCAN_GLOB = "{apps/web/src,apps/business-strategy-cms/src}/**/*.{ts,tsx,js,jsx,astro}";
 const SCAN_IGNORE = [
   "**/node_modules/**",
   "**/dist/**",
@@ -49,14 +49,14 @@ const SCAN_IGNORE = [
   "**/*.spec.{ts,tsx,js,jsx}",
   "**/*.generated.*",
   "**/*.d.ts",
-  "src/lib/governance/policy-engine.ts",
-  "src/lib/middleware/csrf.ts",
-  "src/lib/research/services/*.ts",
-  "src/lib/ai/bias-detection/BiasDetectionEngine.ts",
-  "src/lib/ai/services/*.ts",
-  "src/lib/crypto.ts",
-  "src/lib/fhe/fhe-service.ts",
-  "src/lib/redis.ts",
+  "apps/web/src/lib/governance/policy-engine.ts",
+  "apps/web/src/lib/middleware/csrf.ts",
+  "apps/web/src/lib/research/services/*.ts",
+  "apps/web/src/lib/ai/bias-detection/BiasDetectionEngine.ts",
+  "apps/web/src/lib/ai/services/*.ts",
+  "apps/web/src/lib/crypto.ts",
+  "apps/web/src/lib/fhe/fhe-service.ts",
+  "apps/web/src/lib/redis.ts",
 ];
 
 // ---------------------------------------------------------------------------
@@ -153,7 +153,7 @@ function resolveWithExtensions(filePath) {
  * Mirrors the logic in check-unresolved-imports.mjs and supports tsconfig paths aliases.
  */
 function resolveImport(importSource, fileDir) {
-  // Try tsconfig alias resolution first (e.g. '@/lib/encryption' -> './src/lib/encryption')
+  // Try tsconfig alias resolution first (e.g. '@/lib/encryption' -> './apps/web/src/lib/encryption')
   for (const alias of ALIAS_PATTERNS) {
     const match = importSource.match(alias.regex);
     if (!match) continue;

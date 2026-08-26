@@ -1,0 +1,175 @@
+---
+title: 'Emotion Model'
+description: 'How Pixelated Empathy models emotions using Plutchik\'s Wheel, emotional dyads, and a normalised scoring system for intensity, valence, and arousal.'
+---
+
+## Plutchik's Wheel of Emotions
+
+Pixelated Empathy uses **Robert Plutchik's Wheel of Emotions** as its primary
+emotional taxonomy. This model provides a structured, dimensional approach to
+classifying the complex emotional states that arise in therapeutic
+conversations.
+
+### The Eight Primary Emotions
+
+Plutchik identified eight primary emotions arranged in opposing pairs:
+
+<CardGroup cols={2}>
+  <Card title="Joy ↔ Sadness" icon="face-smile">
+    **Joy** ranges from serenity (low intensity) through joy (moderate) to
+    ecstasy (high intensity). **Sadness** ranges from pensiveness through
+    sadness to grief.
+  </Card>
+  <Card title="Trust ↔ Disgust" icon="handshake">
+    **Trust** ranges from acceptance through trust to admiration. **Disgust**
+    ranges from boredom through disgust to loathing.
+  </Card>
+  <Card title="Fear ↔ Anger" icon="shield">
+    **Fear** ranges from apprehension through fear to terror. **Anger** ranges
+    from annoyance through anger to rage.
+  </Card>
+  <Card title="Surprise ↔ Anticipation" icon="bolt">
+    **Surprise** ranges from distraction through surprise to amazement.
+    **Anticipation** ranges from interest through anticipation to vigilance.
+  </Card>
+</CardGroup>
+
+### Intensity Levels
+
+Each primary emotion exists at three intensity levels, moving from mild to
+extreme:
+
+```text text
+Low Intensity          Medium Intensity       High Intensity
+─────────────────      ─────────────────      ─────────────────
+Serenity           →   Joy                →   Ecstasy
+Acceptance         →   Trust              →   Admiration
+Apprehension       →   Fear               →   Terror
+Distraction        →   Surprise           →   Amazement
+Pensiveness        →   Sadness            →   Grief
+Boredom            →   Disgust            →   Loathing
+Annoyance          →   Anger              →   Rage
+Interest           →   Anticipation       →   Vigilance
+```
+
+---
+
+## Emotional Dyads
+
+When two primary emotions co-occur, they form a **dyad** — a complex emotional
+state. Pixelated Empathy's Emotional Cartography engine identifies three types
+of dyads:
+
+<AccordionGroup>
+  <Accordion title="Primary dyads (adjacent emotions)" icon="circle-nodes">
+    Formed by combining two emotions that sit next to each other on the wheel:
+
+    | Emotion 1 | Emotion 2 | Dyad |
+    |---|---|---|
+    | Joy | Trust | **Love** |
+    | Trust | Fear | **Submission** |
+    | Fear | Surprise | **Awe** |
+    | Surprise | Sadness | **Disapproval** |
+    | Sadness | Disgust | **Remorse** |
+    | Disgust | Anger | **Contempt** |
+    | Anger | Anticipation | **Aggressiveness** |
+    | Anticipation | Joy | **Optimism** |
+
+  </Accordion>
+
+  <Accordion title="Secondary dyads (one apart)" icon="circle-nodes">
+    Formed by combining two emotions separated by one position:
+
+    | Emotion 1 | Emotion 2 | Dyad |
+    |---|---|---|
+    | Joy | Fear | **Guilt** |
+    | Trust | Surprise | **Curiosity** |
+    | Fear | Sadness | **Despair** |
+    | Surprise | Disgust | **Unbelief** |
+    | Sadness | Anger | **Envy** |
+    | Disgust | Anticipation | **Cynicism** |
+    | Anger | Joy | **Pride** |
+    | Anticipation | Trust | **Fatalism** |
+
+  </Accordion>
+
+  <Accordion title="Tertiary dyads (two apart)" icon="circle-nodes">
+    Formed by combining two emotions separated by two positions — often representing internal conflict:
+
+    | Emotion 1 | Emotion 2 | Dyad |
+    |---|---|---|
+    | Joy | Surprise | **Delight** |
+    | Trust | Sadness | **Sentimentality** |
+    | Fear | Disgust | **Shame** |
+    | Surprise | Anger | **Outrage** |
+    | Sadness | Anticipation | **Pessimism** |
+    | Disgust | Joy | **Morbidness** |
+    | Anger | Trust | **Dominance** |
+    | Anticipation | Fear | **Anxiety** |
+
+  </Accordion>
+</AccordionGroup>
+
+<Info>
+  **Why this matters for therapists:** Recognising that a client is experiencing
+  "despair" (Fear + Sadness) rather than simple sadness changes the therapeutic
+  approach. Dyad identification helps you target interventions more precisely
+  and demonstrates advanced emotional literacy in your feedback reports.
+</Info>
+
+---
+
+## Emotion Scoring
+
+All emotional measurements in Pixelated Empathy use a **normalised 0.0 to 1.0
+scale** for consistency across the platform.
+
+### Core Dimensions
+
+Every detected emotional state is characterised by three dimensions:
+
+| Dimension     | Range          | Description                                                                                    |
+| ------------- | -------------- | ---------------------------------------------------------------------------------------------- |
+| **Intensity** | `0.0` – `1.0`  | How strongly the emotion is experienced. `0.1` = very mild, `1.0` = overwhelming.              |
+| **Valence**   | `-1.0` – `1.0` | The positive/negative quality. `-1.0` = very negative, `0.0` = neutral, `1.0` = very positive. |
+| **Arousal**   | `0.0` – `1.0`  | The energy level. `0.0` = calm/lethargic, `1.0` = high energy/panic.                           |
+
+<Warning>
+  **Valence is not the same as arousal.** A client can experience high-arousal
+  positive emotion (excitement, `valence: 0.8, arousal: 0.9`) or low-arousal
+  negative emotion (sadness, `valence: -0.6, arousal: 0.2`). Both dimensions are
+  clinically meaningful.
+</Warning>
+
+### Scoring Example
+
+Here's how a client statement might be scored:
+
+```json text
+{
+  "statement": "I can't believe she said that to me. I'm shaking. I don't even know what to do.",
+  "primary_emotion": "anger",
+  "intensity": 0.82,
+  "valence": -0.7,
+  "arousal": 0.88,
+  "secondary_emotion": "fear",
+  "dyad": "Outrage",
+  "confidence": 0.91
+}
+```
+
+The `confidence` field (`0.0`–`1.0`) indicates how certain the model is in its
+classification. Scores below `0.7` are flagged for human review in annotation
+pipelines.
+
+### Therapeutic Response Scoring
+
+The platform also scores the _therapist's_ responses:
+
+| Metric                | Scale         | Description                                            |
+| --------------------- | ------------- | ------------------------------------------------------ |
+| **Empathy score**     | `0.0` – `1.0` | Emotional attunement and validation quality            |
+| **Engagement**        | `1` – `5`     | How effectively the therapist kept the client involved |
+| **Progress**          | `1` – `5`     | Whether the response moved toward a therapeutic goal   |
+| **Alliance**          | `1` – `5`     | Strength of the perceived therapeutic bond             |
+| **Safety compliance** | Pass / Fail   | Whether safety protocols were followed                 |

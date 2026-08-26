@@ -7,7 +7,7 @@ on:
   push:
     branches: [main, master, staging]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'tests/browser/**'
       - 'config/playwright.config.ts'
       - 'package.json'
@@ -16,7 +16,7 @@ on:
   pull_request:
     branches: [main, master, staging]
     paths:
-      - 'src/**'
+      - 'apps/web/src/**'
       - 'tests/browser/**'
       - 'config/playwright.config.ts'
       - 'package.json'

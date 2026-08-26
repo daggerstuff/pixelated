@@ -62,7 +62,7 @@ done
 echo "🔨 Building Docker image..."
 cd "$PROJECT_ROOT"
 docker build \
-  -f docker/journal-research-api/Dockerfile \
+  -f infra/docker/journal-research-api/Dockerfile \
   -t journal-research-api:latest \
   -t "journal-research-api:${ENVIRONMENT}" \
   .

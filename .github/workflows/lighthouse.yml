@@ -8,8 +8,8 @@ on:
   pull_request:
     branches: [staging]
     paths:
-      - 'src/**'
-      - 'public/**'
+      - 'apps/web/src/**'
+      - 'apps/web/public/**'
       - 'astro.config.mjs'
       - 'package.json'
       - 'pnpm-lock.yaml'

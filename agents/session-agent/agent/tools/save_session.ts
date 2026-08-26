@@ -1,8 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { saveSessionTranscript } from '../mongo-client.js'
 import { storeMemory } from '../foresight-client.js'
+import { saveSessionTranscript } from '../mongo-client.js'
 
 // Persist a durable session artifact: the final transcript, a summary
 // record, and the latest emotion rollups. Conforms to the requirement that

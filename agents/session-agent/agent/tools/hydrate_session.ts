@@ -1,8 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { hydrateSession, type TranscriptTurn } from '../mongo-client.js'
 import { searchMemories } from '../foresight-client.js'
+import { hydrateSession, type TranscriptTurn } from '../mongo-client.js'
 
 const SCHEMA = z.object({
   session_id: z.string().uuid(),

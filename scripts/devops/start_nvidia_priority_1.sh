@@ -139,14 +139,14 @@ run_entity_store_migrations() {
 }
 
 compose_files=(
-  docker/docker-compose.nemo-infra.yml
+  infra/docker/docker-compose.nemo-infra.yml
 )
 
 main_compose_files=(
-  docker/docker-compose.nemo-infra.yml
-  docker/docker-compose.nemo-customizer.yml
-  docker/docker-compose.nemo-evaluator.yml
-  docker/docker-compose.nemo-retriever.yml
+  infra/docker/docker-compose.nemo-infra.yml
+  infra/docker/docker-compose.nemo-customizer.yml
+  infra/docker/docker-compose.nemo-evaluator.yml
+  infra/docker/docker-compose.nemo-retriever.yml
 )
 
 legacy_containers=(
@@ -165,7 +165,7 @@ if [[ "${NEMO_ENABLE_CURATOR:-0}" == "1" ]]; then
 fi
 
 if [[ "${NEMO_ENABLE_CURATOR:-0}" == "1" ]] && check_image "${NEMO_CURATOR_IMAGE:-nvcr.io/nvidia/nemo-curator:25.09}"; then
-  main_compose_files+=(docker/docker-compose.nemo-curator.yml)
+  main_compose_files+=(infra/docker/docker-compose.nemo-curator.yml)
 else
   warn "⚠️ Curator disabled (set NEMO_ENABLE_CURATOR=1 with a valid image) to enable."
 fi

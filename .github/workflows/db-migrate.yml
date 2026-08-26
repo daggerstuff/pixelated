@@ -7,7 +7,7 @@ on:
       - staging
     paths:
       - 'db/migrations/**'
-      - 'src/lib/db/**'
+      - 'apps/web/src/lib/db/**'
       - 'scripts/db-migrate.ts'
       - '.github/workflows/db-migrate.yml'
   schedule:

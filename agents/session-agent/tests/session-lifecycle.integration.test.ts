@@ -58,7 +58,11 @@ async function startSession(input: z.infer<typeof startSessionSchema>) {
     persisted_at: new Date().toISOString(),
     resume_token: `${sessionId}:${new Date().toISOString()}`,
     foresight_memory: { memory_id: null },
-    mongo: { collection: 'rehearsal_sessions', document_id: sessionId, persisted: false },
+    mongo: {
+      collection: 'rehearsal_sessions',
+      document_id: sessionId,
+      persisted: false,
+    },
   }
 }
 

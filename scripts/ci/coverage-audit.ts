@@ -23,24 +23,24 @@ const ROOT = resolve(import.meta.dirname, '../..')
 const COVERAGE_FILE = resolve(ROOT, 'coverage/coverage-final.json')
 
 const MODULES = [
-  { name: 'lib/encryption', pattern: 'src/lib/encryption', priority: 'P0' },
-  { name: 'lib/security', pattern: 'src/lib/security', priority: 'P0' },
-  { name: 'lib/logging', pattern: 'src/lib/logging', priority: 'P0' },
-  { name: 'middleware', pattern: 'src/middleware', priority: 'P0' },
-  { name: 'config', pattern: 'src/config', priority: 'P0' },
-  { name: 'lib/auth', pattern: 'src/lib/auth', priority: 'P1' },
-  { name: 'lib/audit', pattern: 'src/lib/audit', priority: 'P1' },
-  { name: 'lib/db', pattern: 'src/lib/db', priority: 'P1' },
-  { name: 'lib/memory', pattern: 'src/lib/memory', priority: 'P1' },
-  { name: 'types', pattern: 'src/types', priority: 'P1' },
-  { name: 'lib/ehr', pattern: 'src/lib/ehr', priority: 'P2' },
-  { name: 'lib/fhe', pattern: 'src/lib/fhe', priority: 'P2' },
-  { name: 'hooks', pattern: 'src/hooks', priority: 'P2' },
-  { name: 'utils', pattern: 'src/utils', priority: 'P2' },
-  { name: 'lib/ai', pattern: 'src/lib/ai', priority: 'P3' },
-  { name: 'lib/services', pattern: 'src/lib/services', priority: 'P3' },
-  { name: 'components', pattern: 'src/components', priority: 'P3' },
-  { name: 'pages/api', pattern: 'src/pages/api', priority: 'P3' },
+  { name: 'lib/encryption', pattern: 'apps/web/src/lib/encryption', priority: 'P0' },
+  { name: 'lib/security', pattern: 'apps/web/src/lib/security', priority: 'P0' },
+  { name: 'lib/logging', pattern: 'apps/web/src/lib/logging', priority: 'P0' },
+  { name: 'middleware', pattern: 'apps/web/src/middleware', priority: 'P0' },
+  { name: 'config', pattern: 'apps/web/src/config', priority: 'P0' },
+  { name: 'lib/auth', pattern: 'apps/web/src/lib/auth', priority: 'P1' },
+  { name: 'lib/audit', pattern: 'apps/web/src/lib/audit', priority: 'P1' },
+  { name: 'lib/db', pattern: 'apps/web/src/lib/db', priority: 'P1' },
+  { name: 'lib/memory', pattern: 'apps/web/src/lib/memory', priority: 'P1' },
+  { name: 'types', pattern: 'apps/web/src/types', priority: 'P1' },
+  { name: 'lib/ehr-native', pattern: 'apps/web/src/lib/ehr-native', priority: 'P2' },
+  { name: 'lib/fhe', pattern: 'apps/web/src/lib/fhe', priority: 'P2' },
+  { name: 'hooks', pattern: 'apps/web/src/hooks', priority: 'P2' },
+  { name: 'utils', pattern: 'apps/web/src/utils', priority: 'P2' },
+  { name: 'lib/ai', pattern: 'apps/web/src/lib/ai', priority: 'P3' },
+  { name: 'lib/services', pattern: 'apps/web/src/lib/services', priority: 'P3' },
+  { name: 'components', pattern: 'apps/web/src/components', priority: 'P3' },
+  { name: 'pages/api', pattern: 'apps/web/src/pages/api', priority: 'P3' },
 ]
 
 interface ModuleCoverage {
@@ -99,7 +99,7 @@ function calculateModuleCoverage(
     total > 0 ? Math.round((covered / total) * 1000) / 10 : 0
 
   return {
-    name: modulePattern.replace('src/', ''),
+    name: modulePattern.replace('apps/web/src/', ''),
     priority: MODULES.find((m) => m.pattern === modulePattern)?.priority ?? 'P3',
     files: moduleFiles.length,
     statements: {
