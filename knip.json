@@ -65,6 +65,8 @@
     "apps/web/src/lib/ai/AIService.ts",
     "apps/web/src/lib/ai/mental-llama/index.ts",
     "apps/web/src/lib/services/mongodb.dao.ts",
-    "apps/web/src/lib/documentation/DocumentationSystem.ts"
+    "apps/web/src/lib/documentation/DocumentationSystem.ts",
+    "apps/web/src/lib/ai/providers.ts",
+    "apps/web/src/lib/services/auth0.service.ts"
   ]
 }
