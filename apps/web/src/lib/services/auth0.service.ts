@@ -7,7 +7,7 @@
 
 import { ManagementClient, AuthenticationClient, UserInfoClient } from 'auth0'
 
-import type { AuthRole } from '../config/auth.config'
+import type { AuthRole } from '../../config/auth.config'
 
 // Type alias for auth0 v5+ compatibility
 // ManagementClientOptionsWithClientCredentials was removed in v5
@@ -75,16 +75,16 @@ import type {
   MFAChallenge,
   MFAVerification,
 } from '../auth/auth0-mfa-service'
-import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
+import { auth0WebAuthnService } from '../auth/auth0-webauthn-service'
 import type {
   WebAuthnCredential,
   WebAuthnRegistrationOptions,
   WebAuthnAuthenticationOptions,
   WebAuthnCredentialCreationOptions,
   WebAuthnCredentialRequestOptions,
-} from '../lib/auth/auth0-webauthn-service'
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
-import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
+} from '../auth/auth0-webauthn-service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
