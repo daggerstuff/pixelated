@@ -58,6 +58,15 @@
     "apps/web/src/lib/ehr-native/audit/ehr-audit-service.ts",
     "apps/web/src/utils/serviceWorkerRegistration.ts",
     "apps/web/src/components/ehr/EHRResponsiveShell.tsx",
-    "apps/web/src/lib/services/auth0.service.ts"
+    "apps/web/src/lib/services/auth0.service.ts",
+    "apps/web/src/lib/auth/auth0-adaptive-mfa-service.ts",
+    "apps/web/src/lib/services/mongodb.dao.ts",
+    "apps/web/src/lib/services/patient-rights/dataPortabilityService.ts",
+    "apps/web/src/lib/cache/invalidation.ts",
+    "apps/web/src/lib/documentation/DocumentationSystem.ts",
+    "apps/web/src/lib/ai/mental-llama/index.ts",
+    "apps/web/src/lib/auth/dual-write.ts",
+    "apps/web/src/lib/auth/middleware.ts",
+    "apps/web/src/lib/ai/AIService.ts"
   ]
 }
