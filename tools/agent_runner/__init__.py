@@ -1,5 +1,12 @@
 """Linear Multi-Agent Coordination Runner package."""
 
+import contextlib
+
+with contextlib.suppress(ImportError):
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
 from tools.agent_runner.action_parser import ActionParser
 from tools.agent_runner.adapters import AgentAdapter, get_agent_adapter
 from tools.agent_runner.client import LinearClient
