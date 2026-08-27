@@ -26,7 +26,7 @@ import type {
  *
  * @see https://hl7.org/fhir/R4/questionnaire.html
  */
-export function createPHQ9Questionnaire(): Questionnaire {
+function createPHQ9Questionnaire(): Questionnaire {
   const items = Array.from({ length: 9 }, (_, i) => ({
     linkId: `phq9-${String(i + 1).padStart(2, '0')}`,
     text: `PHQ-9 Question ${i + 1}`,
@@ -58,7 +58,7 @@ export function createPHQ9Questionnaire(): Questionnaire {
  * GAD-7 (Generalized Anxiety Disorder-7) — 7 items, each scored 0-3,
  * total range 0-21.
  */
-export function createGAD7Questionnaire(): Questionnaire {
+function createGAD7Questionnaire(): Questionnaire {
   const items = Array.from({ length: 7 }, (_, i) => ({
     linkId: `gad7-${String(i + 1).padStart(2, '0')}`,
     text: `GAD-7 Question ${i + 1}`,
@@ -90,7 +90,7 @@ export function createGAD7Questionnaire(): Questionnaire {
  * OQ-45 (Outcome Questionnaire-45) — 45 items, each scored 0-4,
  * total range 0-180. Some items are reverse-scored.
  */
-export function createOQ45Questionnaire(): Questionnaire {
+function createOQ45Questionnaire(): Questionnaire {
   // Items marked as reverse-scored per OQ-45 manual
   const reverseScored = new Set([
     'oq45-01',
