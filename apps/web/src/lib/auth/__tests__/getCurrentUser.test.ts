@@ -15,7 +15,7 @@ vi.mock('../../../config/auth.config', () => ({
   },
 }))
 
-vi.mock('../../../lib/services/auth0.service', () => ({
+vi.mock('../../../services/auth0.service', () => ({
   getUserById: vi.fn(),
 }))
 

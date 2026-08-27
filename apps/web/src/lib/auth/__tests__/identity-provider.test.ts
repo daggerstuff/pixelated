@@ -44,7 +44,7 @@ vi.mock('../auth0-jwt-service', () => ({
   validateToken: mockValidateToken,
 }))
 
-vi.mock('../../../lib/services/auth0.service', () => ({
+vi.mock('../../services/auth0.service', () => ({
   auth0UserService: {
     getUserById: mockAuth0GetUserById,
   },

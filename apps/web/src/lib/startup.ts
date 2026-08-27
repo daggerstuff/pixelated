@@ -51,7 +51,7 @@ export async function shutdownApplication(): Promise<void> {
     await workerModule.shutdown?.()
     // Save any pending data
     const notifModule =
-      await import('./lib/services/notification/NotificationService')
+      await import('./services/notification/NotificationService')
     await notifModule.flushPending?.()
     // Clean up resources
     const securityModule = await import('./security')

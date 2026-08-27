@@ -13,4 +13,4 @@ export type {
 } from './models/ai-types'
 
 // Main AIService implementation
-export { createLLMService } from './lib/services/llm-provider'
+export { createLLMService } from './services/llm-provider'

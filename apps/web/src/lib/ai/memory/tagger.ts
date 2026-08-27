@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
-import { AnomalyDetector } from '../lib/services/anomaly-detector';
+import { AnomalyDetector } from '../services/anomaly-detector';
 import type { MemoryObject } from './types';
 
 const appLogger = createBuildSafeLogger('memory-tagger');

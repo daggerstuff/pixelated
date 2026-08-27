@@ -20,7 +20,7 @@ const { mockLogger } = vi.hoisted(() => ({
   },
 }))
 
-vi.mock('../../../../lib/logging/build-safe-logger', () => ({
+vi.mock('../../../../logging/build-safe-logger', () => ({
   createBuildSafeLogger: vi.fn(() => mockLogger),
 }))
 

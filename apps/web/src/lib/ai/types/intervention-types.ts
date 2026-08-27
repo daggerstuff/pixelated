@@ -4,12 +4,12 @@
  */
 
 // Re-export from InterventionAnalysisService for consistency
-import type { InterventionEffectivenessResult } from '../lib/services/InterventionAnalysisService'
+import type { InterventionEffectivenessResult } from '../services/InterventionAnalysisService'
 export type {
   InterventionEffectivenessResult,
   InterventionContext,
   PatientResponse,
-} from '../lib/services/InterventionAnalysisService'
+} from '../services/InterventionAnalysisService'
 
 // Additional intervention-related types
 export interface InterventionRecommendation {

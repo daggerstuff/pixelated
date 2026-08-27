@@ -7,7 +7,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { getCacheService } from '../../lib/services/cacheService'
+import { getCacheService } from '../../services/cacheService'
 import {
   CacheEntry,
   CacheStats,

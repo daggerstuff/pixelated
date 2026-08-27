@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { buildMemorySkeleton } from '@pixelated/memory-schema';
 import { MemorySystem } from '../index';
-import { CrisisDetectionService } from '../../lib/services/crisis-detection';
+import { CrisisDetectionService } from '../../services/crisis-detection';
 import type { MemoryObject } from '../types';
 
 // Mock the dependencies
-vi.mock('../../lib/services/crisis-detection');
+vi.mock('../../services/crisis-detection');
 vi.mock('../../logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => ({
     info: vi.fn(),

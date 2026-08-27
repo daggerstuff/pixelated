@@ -1,4 +1,4 @@
-import { ClaimsService } from '../../lib/services/claims-service'
+import { ClaimsService } from '../../services/claims-service'
 import type { Claim } from '../../types/claim'
 /**
  * Clearinghouse Service

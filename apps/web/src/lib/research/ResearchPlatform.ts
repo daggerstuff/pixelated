@@ -12,21 +12,21 @@ import {
 } from '@/lib/research/types/research-types'
 import { getLogger } from '@/lib/utils/logger'
 
-import { AnonymizationService } from './lib/services/AnonymizationService'
+import { AnonymizationService } from './services/AnonymizationService'
 import {
   ConsentManagementService,
   type ConsentUpdate,
-} from './lib/services/ConsentManagementService'
+} from './services/ConsentManagementService'
 import {
   EvidenceGenerationService,
   type EvidenceRequest,
-} from './lib/services/EvidenceGenerationService'
-import { HIPAADataService } from './lib/services/HIPAADataService'
+} from './services/EvidenceGenerationService'
+import { HIPAADataService } from './services/HIPAADataService'
 import {
   PatternDiscoveryService,
   type DiscoveryRequest,
-} from './lib/services/PatternDiscoveryService'
-import { ResearchQueryEngine } from './lib/services/ResearchQueryEngine'
+} from './services/PatternDiscoveryService'
+import { ResearchQueryEngine } from './services/ResearchQueryEngine'
 
 const logger = getLogger('ResearchPlatform')
 

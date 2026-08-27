@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import {
   isSyntheticSentryTestEvent,
   sentryEventTitles,
-} from '../../../config/sentry-event-filter.mjs'
+} from '../../../../../config/sentry-event-filter.mjs'
 
 describe('Sentry event filtering', () => {
   it('extracts message and exception titles from events', () => {

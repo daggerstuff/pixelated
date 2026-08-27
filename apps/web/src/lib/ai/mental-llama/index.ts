@@ -1,8 +1,8 @@
 import { getHipaaCompliantLogger } from '@/lib/logging/standardized-logger.ts'
 
 import { getEnv } from '../../../config/env.config.ts'
-import type { ICrisisNotificationHandler } from '../../lib/services/notification/NotificationService.ts'
-import { SlackNotificationService } from '../../lib/services/notification/SlackNotificationService.ts'
+import type { ICrisisNotificationHandler } from '../../services/notification/NotificationService.ts'
+import { SlackNotificationService } from '../../services/notification/SlackNotificationService.ts'
 import { MentalLLaMAAdapter } from './adapter/MentalLLaMAAdapter.ts'
 import { createMentalLLaMAPythonBridge } from './bridge/server.ts'
 import { MentalLLaMAModelProvider } from './models/MentalLLaMAModelProvider.ts'
