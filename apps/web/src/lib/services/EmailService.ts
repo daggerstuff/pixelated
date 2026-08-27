@@ -1,6 +1,6 @@
 import { createTransport, type Transporter } from 'nodemailer'
 
-import { productionConfig } from '../config/production.js'
+import { productionConfig } from '../../config/production.js'
 
 export interface EmailTemplate {
   subject: string
