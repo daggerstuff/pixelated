@@ -52,10 +52,7 @@ class PullRequestBridge:
         description: str = "",
         context: dict[str, Any] | None = None,
     ) -> PRCreationResult:
-        """Commit changes in worktree, push branch, and open GitHub PR."""
-        if not self.enabled:
-            return PRCreationResult(success=True, pr_url="", error="PR creation disabled.")
-
+        """Commit changes in worktree, and optionally push branch and open GitHub PR."""
         try:
             # Check if there are changes to commit
             status_res = subprocess.run(
@@ -84,6 +81,9 @@ class PullRequestBridge:
                 check=True,
             )
             commit_sha = sha_res.stdout.strip()
+
+            if not self.enabled:
+                return PRCreationResult(success=True, commit_sha=commit_sha, error="")
 
             # Push branch
             branch_name = context.get("branch_name") if context else None
