@@ -5,7 +5,7 @@ import type {
   Db,
 } from 'mongodb'
 
-import type { ExportFile } from '../types/mongodb.types'
+import type { ExportFile } from '../../types/mongodb.types'
 
 // Runtime shape of our MongoDB wrapper (from src/config/mongodb.config.ts)
 type MongoRuntime = {
@@ -64,7 +64,7 @@ import type {
   Todo,
   TreatmentPlan,
   DataExport,
-} from '../types/mongodb.types'
+} from '../../types/mongodb.types'
 
 export class DataExportDAO {
   private async getCollection(): Promise<MongoCollection<DataExport>> {
@@ -216,7 +216,7 @@ export class TodoDAO {
   }
 }
 
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const mongoLogger = createBuildSafeLogger('mongodb-dao')
 
@@ -447,12 +447,12 @@ export class TreatmentPlanDAO {
     goalId: string,
     goalUpdates: Partial<
       Omit<
-        import('../types/mongodb.types').TreatmentPlanGoal,
+        import('../../types/mongodb.types').TreatmentPlanGoal,
         'id' | 'milestones' | 'metrics'
       >
     > & {
-      milestones?: import('../types/mongodb.types').TreatmentPlanMilestone[]
-      metrics?: import('../types/mongodb.types').TreatmentPlanGoalMetrics
+      milestones?: import('../../types/mongodb.types').TreatmentPlanMilestone[]
+      metrics?: import('../../types/mongodb.types').TreatmentPlanGoalMetrics
     },
   ): Promise<TreatmentPlan | null> {
     const collection = await this.getCollection()
@@ -488,7 +488,7 @@ export class TreatmentPlanDAO {
     goalId: string,
     milestoneId: string,
     milestoneUpdates: Partial<
-      Omit<import('../types/mongodb.types').TreatmentPlanMilestone, 'id'>
+      Omit<import('../../types/mongodb.types').TreatmentPlanMilestone, 'id'>
     >,
   ): Promise<TreatmentPlan | null> {
     const collection = await this.getCollection()
