@@ -75,11 +75,30 @@ const IMPROVEMENT_THRESHOLD: Record<OutcomeMeasureType, number> = {
 
 /** OQ-45 items that are reverse-scored (per OQ-45 manual). */
 const OQ45_REVERSE_SCORED = new Set([
-  'oq45-01', 'oq45-04', 'oq45-07', 'oq45-10', 'oq45-12',
-  'oq45-13', 'oq45-16', 'oq45-18', 'oq45-20', 'oq45-21',
-  'oq45-24', 'oq45-27', 'oq45-28', 'oq45-29', 'oq45-31',
-  'oq45-32', 'oq45-34', 'oq45-36', 'oq45-38', 'oq45-40',
-  'oq45-41', 'oq45-42', 'oq45-44', 'oq45-45',
+  'oq45-01',
+  'oq45-04',
+  'oq45-07',
+  'oq45-10',
+  'oq45-12',
+  'oq45-13',
+  'oq45-16',
+  'oq45-18',
+  'oq45-20',
+  'oq45-21',
+  'oq45-24',
+  'oq45-27',
+  'oq45-28',
+  'oq45-29',
+  'oq45-31',
+  'oq45-32',
+  'oq45-34',
+  'oq45-36',
+  'oq45-38',
+  'oq45-40',
+  'oq45-41',
+  'oq45-42',
+  'oq45-44',
+  'oq45-45',
 ])
 
 // ---------------------------------------------------------------------------
@@ -158,9 +177,7 @@ interface ResponseItem {
 /**
  * Extracts the numeric answer value from a QuestionnaireResponse item.
  */
-function extractAnswerValue(
-  item: ResponseItem,
-): number {
+function extractAnswerValue(item: ResponseItem): number {
   const answer = item.answer?.[0]
   if (!answer) {
     throw new Error(`No answer provided for item ${item.linkId}`)
@@ -184,9 +201,7 @@ function extractAnswerValue(
 function scorePHQ9(response: QuestionnaireResponse): number {
   const items = (response.item ?? []) as ResponseItem[]
   if (items.length !== 9) {
-    throw new Error(
-      `PHQ-9 requires exactly 9 items, got ${items.length}`,
-    )
+    throw new Error(`PHQ-9 requires exactly 9 items, got ${items.length}`)
   }
   return items.reduce((sum, item) => {
     const value = extractAnswerValue(item)
@@ -207,9 +222,7 @@ function scorePHQ9(response: QuestionnaireResponse): number {
 function scoreGAD7(response: QuestionnaireResponse): number {
   const items = (response.item ?? []) as ResponseItem[]
   if (items.length !== 7) {
-    throw new Error(
-      `GAD-7 requires exactly 7 items, got ${items.length}`,
-    )
+    throw new Error(`GAD-7 requires exactly 7 items, got ${items.length}`)
   }
   return items.reduce((sum, item) => {
     const value = extractAnswerValue(item)
@@ -231,9 +244,7 @@ function scoreGAD7(response: QuestionnaireResponse): number {
 function scoreOQ45(response: QuestionnaireResponse): number {
   const items = (response.item ?? []) as ResponseItem[]
   if (items.length !== 45) {
-    throw new Error(
-      `OQ-45 requires exactly 45 items, got ${items.length}`,
-    )
+    throw new Error(`OQ-45 requires exactly 45 items, got ${items.length}`)
   }
   return items.reduce((sum, item) => {
     const rawValue = extractAnswerValue(item)
@@ -284,7 +295,7 @@ function getSeverity(
       throw new Error(`Unknown measure type: ${String(exhaustive)}`)
     }
   }
-
+}
 
 /**
  * Detects significant change between consecutive administrations.
@@ -348,7 +359,7 @@ function scoreResponse(
       throw new Error(`Unknown measure type: ${String(exhaustive)}`)
     }
   }
-
+}
 
 /**
  * Builds a FHIR QuestionnaireResponse from a submit input.
@@ -408,9 +419,7 @@ export class OutcomesService {
    * Ensures the canonical questionnaire for a measure type is persisted.
    * Returns the stored Questionnaire if it exists, or creates it.
    */
-  async ensureQuestionnaire(
-    measureType: OutcomeMeasureType,
-  ): Promise<void> {
+  async ensureQuestionnaire(measureType: OutcomeMeasureType): Promise<void> {
     const url = QUESTIONNAIRE_URLS[measureType]
     const existing = await this.questionnaireRepo.findByUrl(url)
     if (existing) return
@@ -424,9 +433,7 @@ export class OutcomesService {
    * significant change from the previous administration, stores the
    * QuestionnaireResponse and scored Observation, and returns the results.
    */
-  async submitMeasure(
-    input: SubmitMeasureInput,
-  ): Promise<SubmitMeasureResult> {
+  async submitMeasure(input: SubmitMeasureInput): Promise<SubmitMeasureResult> {
     validatePatientId(input.patientId)
 
     // Ensure the questionnaire definition is persisted
@@ -434,8 +441,7 @@ export class OutcomesService {
 
     // Build and store the QuestionnaireResponse
     const questionnaireResponse = buildQuestionnaireResponse(input)
-    const storedResponse =
-      await this.responseRepo.create(questionnaireResponse)
+    const storedResponse = await this.responseRepo.create(questionnaireResponse)
 
     // Score the response
     const totalScore = scoreResponse(input.measureType, storedResponse)
@@ -466,8 +472,7 @@ export class OutcomesService {
     })
 
     // Store the scored Observation
-    const storedObservation =
-      await this.observationRepo.create(observation)
+    const storedObservation = await this.observationRepo.create(observation)
 
     // Build the OutcomeScore
     const score: OutcomeScore = {
@@ -534,11 +539,10 @@ export class OutcomesService {
 
     const points: OutcomeTrendPoint[] = measureObservations.map((obs) => {
       const totalScore = obs.valueQuantity?.value ?? 0
-      const severity = (obs.interpretation?.[0]?.coding?.[0]
-        ?.code ?? 'minimal') as SeverityLevel
-      const alertFlag = obs.note?.some((n) =>
-        n.text?.includes('Significant'),
-      ) ?? false
+      const severity = (obs.interpretation?.[0]?.coding?.[0]?.code ??
+        'minimal') as SeverityLevel
+      const alertFlag =
+        obs.note?.some((n) => n.text?.includes('Significant')) ?? false
       const alertReason = obs.note?.[0]?.text
 
       // Read changeFromPrevious from the FHIR component (stored at submit time)
@@ -568,8 +572,7 @@ export class OutcomesService {
             administeredAt: points[points.length - 1].administeredAt,
             alertFlag: points[points.length - 1].alertFlag,
             alertReason: points[points.length - 1].alertReason,
-            changeFromPrevious:
-              points[points.length - 1].changeFromPrevious,
+            changeFromPrevious: points[points.length - 1].changeFromPrevious,
           }
         : undefined
 
@@ -685,10 +688,7 @@ export class OutcomesService {
         measureType,
         cadence: 'weekly',
         active: true,
-        nextDueDate: this.calculateNextDueDate(
-          lastAdministeredDate,
-          'weekly',
-        ),
+        nextDueDate: this.calculateNextDueDate(lastAdministeredDate, 'weekly'),
         lastAdministeredDate,
       })
     }
@@ -699,15 +699,10 @@ export class OutcomesService {
   /**
    * Configures a measure for a patient and persists the configuration.
    */
-  async configureMeasure(
-    input: MeasureConfigInput,
-  ): Promise<MeasureConfig> {
+  async configureMeasure(input: MeasureConfigInput): Promise<MeasureConfig> {
     validatePatientId(input.patientId)
 
-    const trend = await this.getTrend(
-      input.patientId,
-      input.measureType,
-    )
+    const trend = await this.getTrend(input.patientId, input.measureType)
     const lastAdministeredDate =
       trend.points.length > 0
         ? trend.points[trend.points.length - 1].administeredAt
