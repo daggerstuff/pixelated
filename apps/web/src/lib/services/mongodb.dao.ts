@@ -40,7 +40,7 @@ async function initializeDependencies() {
   if (typeof window === 'undefined') {
     serverDepsPromise = (async () => {
       try {
-        const mod = await import('../config/mongodb.config')
+        const mod = await import('../../config/mongodb.config')
         mongodb = mod.default as unknown as MongoRuntime
         const mongodbLib = await import('mongodb')
         ObjectId = mongodbLib.ObjectId
@@ -447,12 +447,12 @@ export class TreatmentPlanDAO {
     goalId: string,
     goalUpdates: Partial<
       Omit<
-        import('../types/mongodb.types').TreatmentPlanGoal,
+        import('../../types/mongodb.types').TreatmentPlanGoal,
         'id' | 'milestones' | 'metrics'
       >
     > & {
-      milestones?: import('../types/mongodb.types').TreatmentPlanMilestone[]
-      metrics?: import('../types/mongodb.types').TreatmentPlanGoalMetrics
+      milestones?: import('../../types/mongodb.types').TreatmentPlanMilestone[]
+      metrics?: import('../../types/mongodb.types').TreatmentPlanGoalMetrics
     },
   ): Promise<TreatmentPlan | null> {
     const collection = await this.getCollection()
@@ -488,7 +488,7 @@ export class TreatmentPlanDAO {
     goalId: string,
     milestoneId: string,
     milestoneUpdates: Partial<
-      Omit<import('../types/mongodb.types').TreatmentPlanMilestone, 'id'>
+      Omit<import('../../types/mongodb.types').TreatmentPlanMilestone, 'id'>
     >,
   ): Promise<TreatmentPlan | null> {
     const collection = await this.getCollection()
