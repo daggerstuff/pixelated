@@ -59,7 +59,7 @@ const { mockRedisStore } = vi.hoisted(() => {
   };
 });
 
-vi.mock("../../../lib/services/cacheService", () => ({
+vi.mock("../../../services/cacheService", () => ({
   getCacheService: () => mockRedisStore,
 }));
 

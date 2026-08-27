@@ -207,7 +207,7 @@
     "@ai-sdk/sandbox-vercel": "^1.0.87",
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "latest",
-    "@astrojs/vercel": "11.0.7",
+    "@astrojs/vercel": "11.0.8",
     "@auth0/auth0-react": "latest",
     "@aws-sdk/client-dynamodb": "latest",
     "@aws-sdk/client-ec2": "latest",
@@ -344,7 +344,7 @@
     "otplib": "^13.5.0",
     "p5": "latest",
     "path-browserify": "latest",
-    "pdfkit": "^0.19.1",
+    "pdfkit": "^0.20.1",
     "pg": "^8.23.0",
     "piccolore": "latest",
     "postgres": "latest",
@@ -424,7 +424,7 @@
     "@unocss/astro": "^66.8.1",
     "@unocss/core": "^66.8.1",
     "@unocss/reset": "^66.8.1",
-    "@vitejs/plugin-react": "^5.2.0",
+    "@vitejs/plugin-react": "^6.1.0",
     "@vitest/coverage-v8": "^4.1.11",
     "@vitest/eslint-plugin": "latest",
     "astro": "^7.2.7",
@@ -506,13 +506,13 @@
     "utf-8-validate": "^6.0.6",
     "vfile": "latest",
     "viewerjs": "latest",
-    "vite": "^7.3.6",
+    "vite": "^8.2.2",
     "vite-tsconfig-paths": "latest",
     "vitest": "^4.1.11",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
     "wrangler": "^4.126.0",
-    "yaml": "2.8.4"
+    "yaml": "2.9.0"
   },
   "peerDependencies": {
     "hono": "^4.12.14"
