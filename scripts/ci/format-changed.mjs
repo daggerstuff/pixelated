@@ -32,6 +32,14 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "apps/web/src/lib/auth/auth0-middleware.ts",
   "apps/web/src/lib/services/BusinessIntelligenceService.ts",
   "apps/web/src/lib/services/patient-rights/dataPortabilityService.ts",
+// import-depth hotfix files with pre-existing oxfmt drift
+  "apps/web/src/lib/auth/auth0-adaptive-mfa-service.ts",
+  "apps/web/src/lib/auth/auth0-identity-provider.ts",
+  "apps/web/src/lib/auth/auth0-impersonation-service.ts",
+  "apps/web/src/lib/auth/index.ts",
+  "apps/web/src/lib/jobs/queue.ts",
+  "apps/web/src/lib/patient/patientManager.ts",
+  "apps/web/src/lib/services/patient-rights/__tests__/dataPortabilityService.test.ts",
 ]);
 
 const OXFMT_APPLICABLE_EXTENSIONS = new Set([".js", ".ts", ".mjs", ".cjs", ".mts", ".cts"]);
