@@ -176,6 +176,172 @@ DO $$ BEGIN
     END IF;
 END $$;
 
+-- ============================================================================
+-- ehr_questionnaire: FHIR R4 Questionnaire definitions (PHQ-9, GAD-7, OQ-45)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ehr_questionnaire (
+  questionnaire_id    UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id          TEXT          NOT NULL,
+  name               TEXT,
+  url                TEXT,
+  version           TEXT,
+  status             TEXT          NOT NULL DEFAULT 'active',
+  fhir_resource      JSONB         NOT NULL,
+  created_at         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at         TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_tenant
+  ON ehr_questionnaire (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_url
+  ON ehr_questionnaire (tenant_id, url) WHERE url IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_status
+  ON ehr_questionnaire (tenant_id, status);
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_name
+  ON ehr_questionnaire (tenant_id, name) WHERE name IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_fhir
+  ON ehr_questionnaire USING GIN (fhir_resource);
+
+ALTER TABLE ehr_questionnaire ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_tenant_isolation
+  ON ehr_questionnaire FOR ALL
+  USING (tenant_id = current_setting('app.tenant_id', true));
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_select
+  ON ehr_questionnaire FOR SELECT
+  USING (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'billingSpecialist',
+          'complianceOfficer', 'healthInformationManager', 'systemAdmin'
+      )
+  );
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_insert
+  ON ehr_questionnaire FOR INSERT
+  WITH CHECK (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'systemAdmin'
+      )
+  );
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_update
+  ON ehr_questionnaire FOR UPDATE
+  USING (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'systemAdmin'
+      )
+  )
+  WITH CHECK (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'systemAdmin'
+      )
+  );
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_delete
+  ON ehr_questionnaire FOR DELETE
+  USING (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
+  );
+
+-- ============================================================================
+-- ehr_questionnaire_response: FHIR R4 QuestionnaireResponse (client-completed)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS ehr_questionnaire_response (
+  questionnaire_response_id  UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id                  TEXT          NOT NULL,
+  patient_id                 TEXT          NOT NULL,
+  questionnaire              TEXT,
+  status                     TEXT          NOT NULL DEFAULT 'completed',
+  authored                   TIMESTAMP WITH TIME ZONE,
+  fhir_resource              JSONB         NOT NULL,
+  created_at                 TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at                 TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_response_tenant
+  ON ehr_questionnaire_response (tenant_id);
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_response_patient
+  ON ehr_questionnaire_response (tenant_id, patient_id);
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_response_questionnaire
+  ON ehr_questionnaire_response (tenant_id, patient_id, questionnaire) WHERE questionnaire IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_response_status
+  ON ehr_questionnaire_response (tenant_id, status);
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_response_authored
+  ON ehr_questionnaire_response (tenant_id, patient_id, authored DESC);
+CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_response_fhir
+  ON ehr_questionnaire_response USING GIN (fhir_resource);
+
+ALTER TABLE ehr_questionnaire_response ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_response_select_consent
+  ON ehr_questionnaire_response FOR SELECT
+  USING (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'billingSpecialist',
+          'complianceOfficer', 'healthInformationManager', 'systemAdmin'
+      )
+      AND (
+          ehr_patient_has_consent(patient_id, tenant_id, 'minimal')
+          OR current_setting('request.jwt.claims', true)::jsonb->>'break_glass' = 'true'
+          OR current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+              'complianceOfficer', 'systemAdmin'
+          )
+      )
+  );
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_response_insert
+  ON ehr_questionnaire_response FOR INSERT
+  WITH CHECK (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'systemAdmin'
+      )
+  );
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_response_update
+  ON ehr_questionnaire_response FOR UPDATE
+  USING (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'systemAdmin'
+      )
+      AND (
+          ehr_patient_has_consent(patient_id, tenant_id, 'minimal')
+          OR current_setting('request.jwt.claims', true)::jsonb->>'break_glass' = 'true'
+          OR current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+              'complianceOfficer', 'systemAdmin'
+          )
+      )
+  )
+  WITH CHECK (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+          'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+          'technician', 'therapist', 'careCoordinator', 'systemAdmin'
+      )
+  );
+
+CREATE POLICY IF NOT EXISTS ehr_questionnaire_response_delete
+  ON ehr_questionnaire_response FOR DELETE
+  USING (
+      tenant_id = current_setting('app.tenant_id', true)
+      AND current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
+  );
+
 -- Audit trigger on ehr_measure_config: log INSERT/UPDATE/DELETE to audit table
 CREATE OR REPLACE FUNCTION ehr_measure_config_audit_trigger()
 RETURNS TRIGGER AS $$

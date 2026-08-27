@@ -1190,6 +1190,43 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
 
+  foresight/cli:
+    dependencies:
+      '@clack/prompts':
+        specifier: ^0.7.0
+        version: 0.7.0
+      commander:
+        specifier: ^12.1.0
+        version: 12.1.0
+      ioredis:
+        specifier: ^5.4.1
+        version: 5.11.1(supports-color@10.2.2)
+      ora:
+        specifier: ^8.1.1
+        version: 8.2.0
+      pg:
+        specifier: ^8.13.0
+        version: 8.23.0
+      picocolors:
+        specifier: ^1.1.0
+        version: 1.1.1
+    devDependencies:
+      '@types/node':
+        specifier: ^22.9.0
+        version: 22.20.1
+      '@types/pg':
+        specifier: ^8.11.10
+        version: 8.21.0
+      tsup:
+        specifier: ^8.3.5
+        version: 8.5.1(jiti@2.7.0)(postcss@8.5.26)(supports-color@10.2.2)(tsx@4.23.12)(typescript@5.7.3)(yaml@2.8.4)
+      typescript:
+        specifier: ^5.7.2
+        version: 5.7.3
+      vitest:
+        specifier: ^4.1.10
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.11(vitest@4.1.11))(jsdom@30.0.1(@noble/hashes@2.3.0))(msw@2.15.0(@types/node@22.20.1)(typescript@5.7.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.8.4))
+
   packages/memory-schema:
     dependencies:
       zod:
