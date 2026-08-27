@@ -151,8 +151,7 @@ export async function verifyAdmin(
   try {
     // Check if session exists and has admin role
     const session = context.session as
-      | { user?: { roles?: string[] } }
-      | undefined
+      { user?: { roles?: string[] } } | undefined
     if (!session?.user) {
       return new Response(
         JSON.stringify({ error: 'Authentication required' }),
@@ -926,8 +925,7 @@ export async function authenticateRequest(
     authenticatedRequest.sessionId = sid
     authenticatedRequest.authMode = 'jwt'
     authenticatedRequest.scopes = validation.payload?.['permissions'] as
-      | string[]
-      | undefined
+      string[] | undefined
 
     return { success: true, request: authenticatedRequest }
   }
