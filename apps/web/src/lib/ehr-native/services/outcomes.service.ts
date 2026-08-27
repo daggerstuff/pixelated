@@ -19,6 +19,7 @@ import {
   QuestionnaireRepository,
   QuestionnaireResponseRepository,
   ObservationRepository,
+  MeasureConfigRepository,
 } from '../repositories/index.js'
 import type {
   QuestionnaireResponse,
@@ -394,11 +395,13 @@ export class OutcomesService {
   private readonly questionnaireRepo: QuestionnaireRepository
   private readonly responseRepo: QuestionnaireResponseRepository
   private readonly observationRepo: ObservationRepository
+  private readonly measureConfigRepo: MeasureConfigRepository
 
   constructor(rlsContext: RLSContext) {
     this.questionnaireRepo = new QuestionnaireRepository(rlsContext)
     this.responseRepo = new QuestionnaireResponseRepository(rlsContext)
     this.observationRepo = new ObservationRepository(rlsContext)
+    this.measureConfigRepo = new MeasureConfigRepository(rlsContext)
   }
 
   /**
@@ -493,33 +496,18 @@ export class OutcomesService {
     patientId: string,
     measureType: OutcomeMeasureType,
   ): Promise<number | null> {
-    const observations = await this.observationRepo.findByPatient(
+    const loincCode = LOINC_CODES[measureType]
+    const observations = await this.observationRepo.findByPatientAndCode(
       patientId,
-      100,
+      loincCode,
+      1,
       0,
     )
 
-    const loincCode = LOINC_CODES[measureType]
-    const measureObservations = observations
-      .filter((obs) => {
-        const code = obs.code?.coding?.[0]?.code
-        return code === loincCode
-      })
-      .sort((a, b) => {
-        const dateA = a.effectiveDateTime ?? ''
-        const dateB = b.effectiveDateTime ?? ''
-        return dateB.localeCompare(dateA)
-      })
+    if (observations.length < 1) return null
 
-    if (measureObservations.length < 2) {
-      // Need at least 2: the current one (just submitted) and a previous one
-      // But since we query BEFORE storing the current observation,
-      // we just need at least 1 previous observation
-      if (measureObservations.length < 1) return null
-    }
-
-    const previous = measureObservations[0]
-    if (!previous?.valueQuantity?.value) return null
+    const previous = observations[0]
+    if (previous?.valueQuantity?.value == null) return null
     return previous.valueQuantity.value
   }
 
@@ -533,23 +521,16 @@ export class OutcomesService {
   ): Promise<OutcomeTrendResult> {
     validatePatientId(patientId)
 
-    const observations = await this.observationRepo.findByPatient(
+    const loincCode = LOINC_CODES[measureType]
+    const observations = await this.observationRepo.findByPatientAndCode(
       patientId,
+      loincCode,
       500,
       0,
     )
 
-    const loincCode = LOINC_CODES[measureType]
-    const measureObservations = observations
-      .filter((obs) => {
-        const code = obs.code?.coding?.[0]?.code
-        return code === loincCode
-      })
-      .sort((a, b) => {
-        const dateA = a.effectiveDateTime ?? ''
-        const dateB = b.effectiveDateTime ?? ''
-        return dateA.localeCompare(dateB) // chronological order
-      })
+    // Already sorted DESC by effective_date from the DB query; reverse for chronological
+    const measureObservations = [...observations].reverse()
 
     const points: OutcomeTrendPoint[] = measureObservations.map((obs) => {
       const totalScore = obs.valueQuantity?.value ?? 0
@@ -559,10 +540,13 @@ export class OutcomesService {
         n.text?.includes('Significant'),
       ) ?? false
       const alertReason = obs.note?.[0]?.text
-      const changeMatch = alertReason?.match(/(-?\d+) points/)
-      const changeFromPrevious = changeMatch
-        ? parseInt(changeMatch[1], 10)
-        : undefined
+
+      // Read changeFromPrevious from the FHIR component (stored at submit time)
+      const changeComponent = obs.component?.find(
+        (c) => c.code?.coding?.[0]?.code === 'change-from-previous',
+      )
+      const changeFromPrevious =
+        changeComponent?.valueQuantity?.value ?? undefined
 
       return {
         administeredAt: obs.effectiveDateTime ?? '',
@@ -656,14 +640,35 @@ export class OutcomesService {
   }
 
   /**
-   * Returns the default measure configuration for a patient.
-   * All three measures are active by default with weekly cadence.
+   * Returns measure configurations for a patient.
    *
-   * Note: Per-client persistence requires a DB migration to add an
-   * `ehr_measure_config` table. Until then, defaults are returned.
+   * If persisted configs exist in the database, those are returned (enriched
+   * with the latest administration date and next due date from trend data).
+   * Otherwise, default configs are computed for all three measures.
    */
   async getMeasureConfigs(patientId: string): Promise<MeasureConfig[]> {
     validatePatientId(patientId)
+
+    const persisted = await this.measureConfigRepo.findByPatient(patientId)
+    if (persisted.length > 0) {
+      const enriched: MeasureConfig[] = []
+      for (const config of persisted) {
+        const trend = await this.getTrend(patientId, config.measureType)
+        const lastAdministeredDate =
+          trend.points.length > 0
+            ? trend.points[trend.points.length - 1].administeredAt
+            : undefined
+        enriched.push({
+          ...config,
+          nextDueDate: this.calculateNextDueDate(
+            lastAdministeredDate,
+            config.cadence,
+          ),
+          lastAdministeredDate,
+        })
+      }
+      return enriched
+    }
 
     const measureTypes: OutcomeMeasureType[] = ['phq-9', 'gad-7', 'oq-45']
     const configs: MeasureConfig[] = []
@@ -692,11 +697,7 @@ export class OutcomesService {
   }
 
   /**
-   * Configures a measure for a patient.
-   *
-   * Note: Per-client persistence requires a DB migration to add an
-   * `ehr_measure_config` table. Until then, this returns the config
-   * without persisting it.
+   * Configures a measure for a patient and persists the configuration.
    */
   async configureMeasure(
     input: MeasureConfigInput,
@@ -712,7 +713,7 @@ export class OutcomesService {
         ? trend.points[trend.points.length - 1].administeredAt
         : undefined
 
-    return {
+    const config: MeasureConfig = {
       patientId: input.patientId,
       measureType: input.measureType,
       cadence: input.cadence,
@@ -723,6 +724,8 @@ export class OutcomesService {
       ),
       lastAdministeredDate,
     }
+
+    return this.measureConfigRepo.upsert(config)
   }
 
   /**

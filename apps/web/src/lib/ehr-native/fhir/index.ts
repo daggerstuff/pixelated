@@ -215,5 +215,24 @@ export function buildOutcomeObservation(params: {
         },
       ],
     }),
+    ...(params.changeFromPrevious != null && {
+      component: [
+        {
+          code: {
+            coding: [
+              {
+                system: 'http://example.org/fhir/CodeSystem/outcome-measure',
+                code: 'change-from-previous',
+                display: 'Change from Previous Administration',
+              },
+            ],
+          },
+          valueQuantity: {
+            value: params.changeFromPrevious,
+            unit: 'points',
+          },
+        },
+      ],
+    }),
   }
 }

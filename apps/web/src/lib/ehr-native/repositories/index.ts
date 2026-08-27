@@ -25,3 +25,4 @@ export {
   QuestionnaireRepository,
   QuestionnaireResponseRepository,
 } from './questionnaire-repository'
+export { MeasureConfigRepository } from './measure-config-repository'
