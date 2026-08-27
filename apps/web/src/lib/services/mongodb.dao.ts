@@ -40,7 +40,7 @@ async function initializeDependencies() {
   if (typeof window === 'undefined') {
     serverDepsPromise = (async () => {
       try {
-        const mod = await import('../config/mongodb.config')
+        const mod = await import('../../config/mongodb.config')
         mongodb = mod.default as unknown as MongoRuntime
         const mongodbLib = await import('mongodb')
         ObjectId = mongodbLib.ObjectId
