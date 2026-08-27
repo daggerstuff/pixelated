@@ -1,0 +1,121 @@
+{
+  "server_label": "srv:<hostname>",
+  "poll_seconds": 60,
+  "triage_state": "Triage",
+  "backlog_state": "Backlog",
+  "ready_state": "Todo",
+  "active_state": "In Progress",
+  "done_state": "In Review",
+  "max_concurrent_workers": 4,
+  "enable_git_branching": false,
+  "enable_git_pr_creation": false,
+  "enable_foresight_memory": true,
+  "enable_langchain_tracing": true,
+  "langchain_project": "linear-agent-runner",
+  "verification": {
+    "enabled": true,
+    "auto_repair": true,
+    "max_repair_attempts": 2,
+    "commands": [
+      "uv run pytest tests/agent_runner/ -q"
+    ],
+    "timeout_seconds": 300,
+    "block_on_suppression": true
+  },
+  "guardrails": {
+    "phi_redaction": true,
+    "secret_leak_prevention": true,
+    "anti_suppression_enforcement": true,
+    "allowed_file_patterns": [],
+    "blocked_file_patterns": [
+      ".env*",
+      "*secret*",
+      "*private_key*"
+    ]
+  },
+  "projects": [
+    {
+      "team_key": "PIX",
+      "default_repo": "main",
+      "coordination_title": "Multi-Agent Coordination & Architecture Discussion",
+      "repos": {
+        "main": "/path/to/pixelated"
+      },
+      "auto_create_coordination_ticket": true,
+      "topic_channels": {
+        "architecture": "PIX-ARCH",
+        "security": "PIX-SEC"
+      }
+    }
+  ],
+  "triage_rules": [
+    {
+      "keywords": ["security", "hipaa", "audit", "auth", "phi", "rbac", "encryption"],
+      "preferred_agent": "agy",
+      "required_role": "security_sentinel",
+      "additional_labels": ["security"]
+    },
+    {
+      "keywords": ["refactor", "bug", "fix", "feature", "backend", "api", "endpoint", "split", "version"],
+      "preferred_agent": "opencode",
+      "required_role": "backend_engineer",
+      "additional_labels": []
+    },
+    {
+      "keywords": ["test", "e2e", "coverage", "playwright", "vitest", "pytest", "benchmark"],
+      "preferred_agent": "agy",
+      "required_role": "qa_automator",
+      "additional_labels": ["testing"]
+    },
+    {
+      "keywords": ["lint", "format", "quick-fix", "clean", "debt"],
+      "preferred_agent": "fx",
+      "required_role": "refactor_specialist",
+      "additional_labels": ["maintenance"]
+    },
+    {
+      "keywords": ["workflow", "agent", "mastra", "tools", "db", "integration"],
+      "preferred_agent": "mastracode",
+      "required_role": "backend_engineer",
+      "additional_labels": []
+    }
+  ],
+  "agents": [
+    {
+      "name": "opencode",
+      "label": "agent:opencode",
+      "role": "backend_engineer",
+      "cmd": ["opencode", "run", "{prompt_file}"],
+      "capabilities": ["code", "refactor", "feature", "backend", "frontend"]
+    },
+    {
+      "name": "agy",
+      "label": "agent:agy",
+      "role": "security_sentinel",
+      "cmd": ["agy", "--print", "{prompt_file}"],
+      "capabilities": ["architecture", "review", "security", "design", "audit", "testing"]
+    },
+    {
+      "name": "mastracode",
+      "label": "agent:mastracode",
+      "role": "backend_engineer",
+      "cmd": ["mastracode", "run", "{prompt_file}"],
+      "capabilities": ["workflow", "integration", "backend"]
+    },
+    {
+      "name": "fx",
+      "label": "agent:fx",
+      "role": "refactor_specialist",
+      "cmd": ["fx", "run", "{prompt_file}"],
+      "capabilities": ["refactor", "lint", "format"]
+    },
+    {
+      "name": "skeptic",
+      "label": "agent:skeptic",
+      "role": "skeptic_critic",
+      "cmd": ["agy", "--print", "{prompt_file}"],
+      "watch": "coordination",
+      "capabilities": ["review", "critique", "threat_modeling"]
+    }
+  ]
+}
