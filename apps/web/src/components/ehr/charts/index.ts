@@ -5,4 +5,4 @@
  * treatment history timeline.
  */
 
-export {}
+export { OutcomeTrendChart } from './outcomes'

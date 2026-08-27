@@ -16,7 +16,7 @@
  * primary result (from the provider) is always returned.
  */
 
-import { auth0UserService } from '../../lib/services/auth0.service'
+import { auth0UserService } from '../services/auth0.service'
 import type {
   IdentityProvider,
   IdentityProviderUser,

@@ -262,7 +262,7 @@ scheduling, claims tracking, consent, audit, client portal v1, telehealth.
     approves.
   - **Dep:** F2.4.
 
-- [ ] **F2.4 Outcome measure trending** — `src/components/ehr/portal/` +
+- [x] **F2.4 Outcome measure trending** — `src/components/ehr/portal/` +
       `src/lib/ehr-native/services/outcomes.service.ts`
   - Client-facing visualization of PHQ-9, GAD-7, OQ-45 trending over time
     (creative's key differentiation).
