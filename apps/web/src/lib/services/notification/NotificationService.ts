@@ -5,10 +5,10 @@ import { config } from '../../../config/env.config'
 // RoutingContext is used only in the CrisisAlertContext interface which extends it
 // The interface will be used structurally without requiring the named export
 type RoutingContext = Record<string, unknown>
-import { EmailService, type EmailConfig } from '../../../lib/email'
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { redis } from '../../../lib/redis'
-import { asRedisOps } from '../../../lib/redis-ops'
+import { EmailService, type EmailConfig } from '../../email'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { redis } from '../../redis'
+import { asRedisOps } from '../../redis-ops'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
 import type { PushSubscription } from './pushUtils'
 import { sendSMS, isValidPhoneNumber } from './smsUtils'

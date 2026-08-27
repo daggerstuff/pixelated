@@ -5,13 +5,13 @@
 
 import { KVStore } from '../../db/KVStore'
 import { EmotionSynthesizer } from '../emotions/EmotionSynthesizer'
-import type { BeliefConsistencyService } from '../lib/services/BeliefConsistencyService'
-import { PatientProfileService } from '../lib/services/PatientProfileService'
-import type { PatientResponseService } from '../lib/services/PatientResponseService'
+import type { BeliefConsistencyService } from '../services/BeliefConsistencyService'
+import { PatientProfileService } from '../services/PatientProfileService'
+import type { PatientResponseService } from '../services/PatientResponseService'
 import {
   createPatientResponseService,
   createTestPatientResponseService,
-} from '../lib/services/PatientResponseService'
+} from '../services/PatientResponseService'
 
 // Example 1: Using the factory function for production code
 export function createProductionService(): PatientResponseService {
