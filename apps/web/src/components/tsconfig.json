@@ -1,5 +1,5 @@
 {
-  "extends": "../../../config/tsconfigs/strict.json",
+  "extends": "../../../../config/tsconfigs/strict.json",
   "compilerOptions": {
     "module": "ESNext",
     "target": "ESNext",
