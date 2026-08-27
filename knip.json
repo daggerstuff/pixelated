@@ -57,7 +57,7 @@
     "apps/web/src/lib/ehr-native/api/index.ts",
     "apps/web/src/lib/ehr-native/audit/ehr-audit-service.ts",
     "apps/web/src/utils/serviceWorkerRegistration.ts",
-    "apps/web/src/components/ehr/EHRResponsiveShell.tsx"
+    "apps/web/src/components/ehr/EHRResponsiveShell.tsx",
     "apps/web/src/lib/services/auth0.service.ts"
   ]
 }
