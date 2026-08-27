@@ -21,7 +21,8 @@ Thumbs.db
 .agents/
 .antigravitycli/
 .art/
-.baselines/
+.baselines/*
+!.baselines/astro-hints.json
 .claude/
 .claude-octopus/
 .clawhub
@@ -449,9 +450,13 @@ ai/PAL_MEDDIES_IMPLEMENTATION_PLAN.md
 tasks/
 "Copy of CLAUDE.md"
 
-.junieconfig/agent_runner_config.json
-moe_ep_trial_output/
-scripts/linear-agent-runner.py
-scripts/systemd/linear-agent-runner.service
-tests/agent_runner/
-tools/agent_runner/
+# === LOCAL WORKSPACE & PRIVATE ASSETS ===
+/.dvc/
+/.dvcignore
+/.junie/
+/settings.local.json
+/business-strategy/
+/business-strategy-cms/
+/moe_ep_trial_output/
+/config/agent_runner_config.json
+!/config/agent_runner_config.example.json
