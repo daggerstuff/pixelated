@@ -281,10 +281,10 @@ function getSeverity(
 
     default: {
       const exhaustive: never = measureType
-      throw new Error(`Unknown measure type: ${exhaustive}`)
+      throw new Error(`Unknown measure type: ${String(exhaustive)}`)
     }
   }
-}
+
 
 /**
  * Detects significant change between consecutive administrations.
@@ -345,10 +345,10 @@ function scoreResponse(
       return scoreOQ45(response)
     default: {
       const exhaustive: never = measureType
-      throw new Error(`Unknown measure type: ${exhaustive}`)
+      throw new Error(`Unknown measure type: ${String(exhaustive)}`)
     }
   }
-}
+
 
 /**
  * Builds a FHIR QuestionnaireResponse from a submit input.

@@ -138,7 +138,7 @@ export function getCanonicalQuestionnaire(measureType: 'phq-9' | 'gad-7' | 'oq-4
     case 'oq-45':
       return createOQ45Questionnaire()
     default:
-      throw new Error(`Unknown measure type: ${measureType}`)
+      throw new Error(`Unknown measure type: ${String(measureType)}`)
   }
 }
 

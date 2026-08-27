@@ -45,7 +45,7 @@ export const POST = withV1Contract('submitOutcomeMeasure', async (ctx, caller) =
   if (!tenantId)
     return ehrValidationError('Tenant association required for EHR access.')
 
-  const raw = await ctx.request.json().catch(() => null)
+  const raw: unknown = await ctx.request.json().catch(() => null)
   if (!raw) return ehrValidationError('Request body must be valid JSON.')
 
   const { patientId, measureType, responses, authored } = raw as {
