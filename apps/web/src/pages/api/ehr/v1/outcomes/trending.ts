@@ -36,7 +36,9 @@ export const GET = withV1Contract('getOutcomeTrend', async (ctx, caller) => {
   const validMeasureTypes: OutcomeMeasureType[] = ['phq-9', 'gad-7', 'oq-45']
   const measure = sanitizeSearchParam(rawMeasure, 16)
   if (!validMeasureTypes.includes(measure as OutcomeMeasureType))
-    return ehrValidationError(`measure must be one of: ${validMeasureTypes.join(', ')}`)
+    return ehrValidationError(
+      `measure must be one of: ${validMeasureTypes.join(', ')}`,
+    )
 
   const patientId = sanitizeFhirId(rawPatientId, 'patient ID')
 
@@ -52,7 +54,10 @@ export const GET = withV1Contract('getOutcomeTrend', async (ctx, caller) => {
   const service = new OutcomesService(perm.rlsContext)
 
   try {
-    const trend = await service.getTrend(patientId, measure as OutcomeMeasureType)
+    const trend = await service.getTrend(
+      patientId,
+      measure as OutcomeMeasureType,
+    )
     return ehrSuccess(trend)
   } catch (err) {
     return ehrValidationError(

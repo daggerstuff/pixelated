@@ -57,7 +57,9 @@ export class MeasureConfigRepository extends BaseRepository<MeasureConfig> {
     `
     return this.withRLS(async (client) => {
       const res = await client.query(query, [patientId])
-      return (res.rows as { fhir_resource: MeasureConfig }[]).map((row) => row.fhir_resource)
+      return (res.rows as { fhir_resource: MeasureConfig }[]).map(
+        (row) => row.fhir_resource,
+      )
     })
   }
 

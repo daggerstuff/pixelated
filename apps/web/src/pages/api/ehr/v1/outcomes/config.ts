@@ -47,7 +47,9 @@ export const GET = withV1Contract('getMeasureConfigs', async (ctx, caller) => {
     return ehrSuccess(configs)
   } catch (err) {
     return ehrValidationError(
-      err instanceof Error ? err.message : 'Failed to retrieve measure configurations.',
+      err instanceof Error
+        ? err.message
+        : 'Failed to retrieve measure configurations.',
     )
   }
 })
@@ -75,13 +77,23 @@ export const POST = withV1Contract('configureMeasure', async (ctx, caller) => {
   }
 
   if (typeof patientId !== 'string' || patientId.trim() === '')
-    return ehrValidationError('patientId is required and must be a non-empty string.')
+    return ehrValidationError(
+      'patientId is required and must be a non-empty string.',
+    )
 
   const validMeasureTypes: OutcomeMeasureType[] = ['phq-9', 'gad-7', 'oq-45']
-  if (typeof measureType !== 'string' || !validMeasureTypes.includes(measureType as OutcomeMeasureType))
-    return ehrValidationError(`measureType must be one of: ${validMeasureTypes.join(', ')}`)
+  if (
+    typeof measureType !== 'string' ||
+    !validMeasureTypes.includes(measureType as OutcomeMeasureType)
+  )
+    return ehrValidationError(
+      `measureType must be one of: ${validMeasureTypes.join(', ')}`,
+    )
 
-  if (typeof cadence !== 'string' || (cadence !== 'weekly' && cadence !== 'biweekly'))
+  if (
+    typeof cadence !== 'string' ||
+    (cadence !== 'weekly' && cadence !== 'biweekly')
+  )
     return ehrValidationError('cadence must be "weekly" or "biweekly".')
 
   const sanitizedPatientId = sanitizeFhirId(patientId, 'patient ID')

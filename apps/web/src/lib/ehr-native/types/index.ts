@@ -64,7 +64,10 @@ import {
 } from './clinical.js'
 import { documentReferenceSchema } from './communication.js'
 import { consentSchema } from './consent.js'
-import { questionnaireSchema, questionnaireResponseSchema } from './questionnaire.js'
+import {
+  questionnaireSchema,
+  questionnaireResponseSchema,
+} from './questionnaire.js'
 import { appointmentSchema } from './scheduling.js'
 import { serviceRequestSchema } from './service-request.js'
 

@@ -149,7 +149,9 @@ export class QuestionnaireResponseRepository extends BaseRepository<Questionnair
       )
       const row = res.rows[0]
       if (!row) {
-        throw new Error('Failed to create questionnaire response: no row returned')
+        throw new Error(
+          'Failed to create questionnaire response: no row returned',
+        )
       }
       // Stamp the DB-generated id into the stored fhir_resource JSONB
       const updateRes = await client.query<{

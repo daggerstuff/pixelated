@@ -377,7 +377,9 @@ describe('buildQuestionnaireResponse', () => {
       responses,
     })
     expect(result.authored).toBeDefined()
-    expect(new Date(result.authored ?? '').getTime()).toBeLessThanOrEqual(Date.now())
+    expect(new Date(result.authored ?? '').getTime()).toBeLessThanOrEqual(
+      Date.now(),
+    )
   })
 })
 
@@ -387,12 +389,18 @@ describe('buildQuestionnaireResponse', () => {
 
 describe('extractAnswerValue', () => {
   it('extracts valueInteger from item', () => {
-    const item: ResponseItem = { linkId: 'test-01', answer: [{ valueInteger: 3 }] }
+    const item: ResponseItem = {
+      linkId: 'test-01',
+      answer: [{ valueInteger: 3 }],
+    }
     expect(extractAnswerValue(item)).toBe(3)
   })
 
   it('extracts valueDecimal from item', () => {
-    const item: ResponseItem = { linkId: 'test-02', answer: [{ valueDecimal: 2.5 }] }
+    const item: ResponseItem = {
+      linkId: 'test-02',
+      answer: [{ valueDecimal: 2.5 }],
+    }
     expect(extractAnswerValue(item)).toBe(2.5)
   })
 
@@ -402,7 +410,10 @@ describe('extractAnswerValue', () => {
   })
 
   it('throws for item with non-numeric answer', () => {
-    const item: ResponseItem = { linkId: 'test-04', answer: [{ valueString: 'text' }] }
+    const item: ResponseItem = {
+      linkId: 'test-04',
+      answer: [{ valueString: 'text' }],
+    }
     expect(() => extractAnswerValue(item)).toThrow()
   })
 })

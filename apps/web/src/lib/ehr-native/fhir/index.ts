@@ -12,7 +12,10 @@
 // Questionnaire / QuestionnaireResponse helpers
 // ---------------------------------------------------------------------------
 
-import type { Questionnaire, QuestionnaireResponse } from '../types/questionnaire.js'
+import type {
+  Questionnaire,
+  QuestionnaireResponse,
+} from '../types/questionnaire.js'
 import type { Observation } from '../types/observation.js'
 
 /**
@@ -90,11 +93,30 @@ export function createGAD7Questionnaire(): Questionnaire {
 export function createOQ45Questionnaire(): Questionnaire {
   // Items marked as reverse-scored per OQ-45 manual
   const reverseScored = new Set([
-    'oq45-01', 'oq45-04', 'oq45-07', 'oq45-10', 'oq45-12',
-    'oq45-13', 'oq45-16', 'oq45-18', 'oq45-20', 'oq45-21',
-    'oq45-24', 'oq45-27', 'oq45-28', 'oq45-29', 'oq45-31',
-    'oq45-32', 'oq45-34', 'oq45-36', 'oq45-38', 'oq45-40',
-    'oq45-41', 'oq45-42', 'oq45-44', 'oq45-45',
+    'oq45-01',
+    'oq45-04',
+    'oq45-07',
+    'oq45-10',
+    'oq45-12',
+    'oq45-13',
+    'oq45-16',
+    'oq45-18',
+    'oq45-20',
+    'oq45-21',
+    'oq45-24',
+    'oq45-27',
+    'oq45-28',
+    'oq45-29',
+    'oq45-31',
+    'oq45-32',
+    'oq45-34',
+    'oq45-36',
+    'oq45-38',
+    'oq45-40',
+    'oq45-41',
+    'oq45-42',
+    'oq45-44',
+    'oq45-45',
   ])
 
   const items = Array.from({ length: 45 }, (_, i) => {
@@ -129,7 +151,9 @@ export function createOQ45Questionnaire(): Questionnaire {
 /**
  * Gets the canonical Questionnaire for a given measure type.
  */
-export function getCanonicalQuestionnaire(measureType: 'phq-9' | 'gad-7' | 'oq-45'): Questionnaire {
+export function getCanonicalQuestionnaire(
+  measureType: 'phq-9' | 'gad-7' | 'oq-45',
+): Questionnaire {
   switch (measureType) {
     case 'phq-9':
       return createPHQ9Questionnaire()
@@ -171,7 +195,8 @@ export function buildOutcomeObservation(params: {
       {
         coding: [
           {
-            system: 'http://terminology.hl7.org/CodeSystem/observation-category',
+            system:
+              'http://terminology.hl7.org/CodeSystem/observation-category',
             code: 'survey',
             display: 'Survey',
           },
@@ -211,7 +236,9 @@ export function buildOutcomeObservation(params: {
     ...(params.alertFlag && {
       note: [
         {
-          text: params.alertReason ?? `Significant change detected: ${params.changeFromPrevious ?? 0} points from previous administration`,
+          text:
+            params.alertReason ??
+            `Significant change detected: ${params.changeFromPrevious ?? 0} points from previous administration`,
         },
       ],
     }),

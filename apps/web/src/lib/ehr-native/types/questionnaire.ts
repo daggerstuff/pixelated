@@ -8,7 +8,7 @@
  * @see https://hl7.org/fhir/R4/questionnaireresponse.html
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -24,7 +24,7 @@ import {
   fhirInstantSchema,
   fhirIntegerSchema,
   fhirPositiveIntSchema,
-} from './base.js';
+} from './base.js'
 
 // ---------------------------------------------------------------------------
 // Questionnaire item answer option types
@@ -40,19 +40,27 @@ const answerOptionValueSchema = z.union([
   z.object({ valueString: fhirStringSchema }),
   z.object({ valueCoding: fhirCodingSchema }),
   z.object({ valueReference: fhirReferenceSchema }),
-]);
+])
 
 /** A single answer option in a Questionnaire item. */
-export const questionnaireAnswerOptionSchema = fhirBackboneElementSchema.extend({
-  valueInteger: fhirIntegerSchema.optional(),
-  valueDecimal: z.number().optional(),
-  valueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  valueTime: z.string().regex(/^\d{2}:\d{2}:\d{2}/).optional(),
-  valueDateTime: fhirDateTimeSchema.optional(),
-  valueString: fhirStringSchema.optional(),
-  valueCoding: fhirCodingSchema.optional(),
-  valueReference: fhirReferenceSchema.optional(),
-});
+export const questionnaireAnswerOptionSchema = fhirBackboneElementSchema.extend(
+  {
+    valueInteger: fhirIntegerSchema.optional(),
+    valueDecimal: z.number().optional(),
+    valueDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    valueTime: z
+      .string()
+      .regex(/^\d{2}:\d{2}:\d{2}/)
+      .optional(),
+    valueDateTime: fhirDateTimeSchema.optional(),
+    valueString: fhirStringSchema.optional(),
+    valueCoding: fhirCodingSchema.optional(),
+    valueReference: fhirReferenceSchema.optional(),
+  },
+)
 
 /** EnableWhen condition for conditional item display. */
 export const questionnaireEnableWhenSchema = fhirBackboneElementSchema.extend({
@@ -60,15 +68,18 @@ export const questionnaireEnableWhenSchema = fhirBackboneElementSchema.extend({
   operator: z.enum(['exists', '=', '!=', '>', '<', '>=', '<=']),
   answerInteger: fhirIntegerSchema.optional(),
   answerDecimal: z.number().optional(),
-  answerDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  answerDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   answerDateTime: fhirDateTimeSchema.optional(),
   answerString: fhirStringSchema.optional(),
   answerCoding: fhirCodingSchema.optional(),
   answerReference: fhirReferenceSchema.optional(),
-});
+})
 
 /** Answer constraint for questionnaire items. */
-export const questionnaireEnableBehaviorSchema = z.enum(['all', 'any']);
+export const questionnaireEnableBehaviorSchema = z.enum(['all', 'any'])
 
 /** Item type per FHIR R4 Questionnaire.item.type. */
 export const questionTypeSchema = z.enum([
@@ -88,7 +99,7 @@ export const questionTypeSchema = z.enum([
   'attachment',
   'reference',
   'quantity',
-]);
+])
 
 // ---------------------------------------------------------------------------
 // Questionnaire item (recursive)
@@ -115,7 +126,7 @@ export const questionnaireItemSchema: z.ZodType = z.lazy(() =>
     answerValueSet: fhirCanonicalSchema.optional(),
     item: z.array(questionnaireItemSchema).optional(),
   }),
-);
+)
 
 // ---------------------------------------------------------------------------
 // Questionnaire resource
@@ -141,7 +152,9 @@ export const questionnaireSchema = fhirDomainResourceSchema.extend({
         telecom: z
           .array(
             fhirBackboneElementSchema.extend({
-              system: z.enum(['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other']).optional(),
+              system: z
+                .enum(['phone', 'fax', 'email', 'pager', 'url', 'sms', 'other'])
+                .optional(),
               value: fhirStringSchema.optional(),
               use: z.enum(['home', 'work', 'temp', 'old', 'mobile']).optional(),
               rank: fhirPositiveIntSchema.optional(),
@@ -157,8 +170,14 @@ export const questionnaireSchema = fhirDomainResourceSchema.extend({
   jurisdiction: z.array(fhirCodeableConceptSchema).optional(),
   purpose: fhirStringSchema.optional(),
   copyright: fhirStringSchema.optional(),
-  approvalDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  lastReviewDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  approvalDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  lastReviewDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
   effectivePeriod: z
     .object({
       start: fhirDateTimeSchema.optional(),
@@ -167,26 +186,33 @@ export const questionnaireSchema = fhirDomainResourceSchema.extend({
     .optional(),
   code: z.array(fhirCodingSchema).optional(),
   item: z.array(questionnaireItemSchema).optional(),
-});
+})
 
-export type Questionnaire = z.infer<typeof questionnaireSchema>;
+export type Questionnaire = z.infer<typeof questionnaireSchema>
 
 // ---------------------------------------------------------------------------
 // QuestionnaireResponse item + answer
 // ---------------------------------------------------------------------------
 
 /** A single answer in a QuestionnaireResponse. */
-export const questionnaireResponseAnswerSchema = fhirBackboneElementSchema.extend({
-  valueDecimal: z.number().optional(),
-  valueInteger: fhirIntegerSchema.optional(),
-  valueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
-  valueDateTime: fhirDateTimeSchema.optional(),
-  valueTime: z.string().regex(/^\d{2}:\d{2}:\d{2}/).optional(),
-  valueString: fhirStringSchema.optional(),
-  valueBoolean: z.boolean().optional(),
-  valueCoding: fhirCodingSchema.optional(),
-  valueReference: fhirReferenceSchema.optional(),
-});
+export const questionnaireResponseAnswerSchema =
+  fhirBackboneElementSchema.extend({
+    valueDecimal: z.number().optional(),
+    valueInteger: fhirIntegerSchema.optional(),
+    valueDate: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
+    valueDateTime: fhirDateTimeSchema.optional(),
+    valueTime: z
+      .string()
+      .regex(/^\d{2}:\d{2}:\d{2}/)
+      .optional(),
+    valueString: fhirStringSchema.optional(),
+    valueBoolean: z.boolean().optional(),
+    valueCoding: fhirCodingSchema.optional(),
+    valueReference: fhirReferenceSchema.optional(),
+  })
 
 /** Recursive response item. */
 export const questionnaireResponseItemSchema: z.ZodType = z.lazy(() =>
@@ -197,7 +223,7 @@ export const questionnaireResponseItemSchema: z.ZodType = z.lazy(() =>
     answer: z.array(questionnaireResponseAnswerSchema).optional(),
     item: z.array(questionnaireResponseItemSchema).optional(),
   }),
-);
+)
 
 // ---------------------------------------------------------------------------
 // QuestionnaireResponse resource
@@ -209,24 +235,30 @@ export const questionnaireResponseSchema = fhirDomainResourceSchema.extend({
   basedOn: z.array(fhirReferenceSchema).optional(),
   partOf: z.array(fhirReferenceSchema).optional(),
   questionnaire: fhirCanonicalSchema.optional(),
-  status: z.enum(['in-progress', 'completed', 'amended', 'entered-in-error', 'stopped']),
+  status: z.enum([
+    'in-progress',
+    'completed',
+    'amended',
+    'entered-in-error',
+    'stopped',
+  ]),
   subject: fhirReferenceSchema.optional(),
   encounter: fhirReferenceSchema.optional(),
   authored: fhirDateTimeSchema.optional(),
   author: fhirReferenceSchema.optional(),
   source: fhirReferenceSchema.optional(),
   item: z.array(questionnaireResponseItemSchema).optional(),
-});
+})
 
-export type QuestionnaireResponse = z.infer<typeof questionnaireResponseSchema>;
+export type QuestionnaireResponse = z.infer<typeof questionnaireResponseSchema>
 
 // ---------------------------------------------------------------------------
 // Outcome measure specific types
 // ---------------------------------------------------------------------------
 
 /** Supported standardized outcome measure identifiers. */
-export const outcomeMeasureTypeSchema = z.enum(['phq-9', 'gad-7', 'oq-45']);
-export type OutcomeMeasureType = z.infer<typeof outcomeMeasureTypeSchema>;
+export const outcomeMeasureTypeSchema = z.enum(['phq-9', 'gad-7', 'oq-45'])
+export type OutcomeMeasureType = z.infer<typeof outcomeMeasureTypeSchema>
 
 /** Severity level for an outcome measure score. */
 export const severityLevelSchema = z.enum([
@@ -235,12 +267,12 @@ export const severityLevelSchema = z.enum([
   'moderate',
   'moderately-severe',
   'severe',
-]);
-export type SeverityLevel = z.infer<typeof severityLevelSchema>;
+])
+export type SeverityLevel = z.infer<typeof severityLevelSchema>
 
 /** Cadence for measure administration. */
-export const measureCadenceSchema = z.enum(['weekly', 'biweekly']);
-export type MeasureCadence = z.infer<typeof measureCadenceSchema>;
+export const measureCadenceSchema = z.enum(['weekly', 'biweekly'])
+export type MeasureCadence = z.infer<typeof measureCadenceSchema>
 
 /**
  * Configuration for a measure assigned to a patient.
@@ -253,9 +285,9 @@ export const measureConfigSchema = z.object({
   active: z.boolean().default(true),
   nextDueDate: fhirDateTimeSchema.optional(),
   lastAdministeredDate: fhirDateTimeSchema.optional(),
-});
+})
 
-export type MeasureConfig = z.infer<typeof measureConfigSchema>;
+export type MeasureConfig = z.infer<typeof measureConfigSchema>
 
 /**
  * Scored outcome result with severity interpretation.
@@ -270,6 +302,6 @@ export const outcomeScoreSchema = z.object({
   alertFlag: z.boolean().default(false),
   alertReason: fhirStringSchema.optional(),
   changeFromPrevious: fhirIntegerSchema.optional(),
-});
+})
 
-export type OutcomeScore = z.infer<typeof outcomeScoreSchema>;
+export type OutcomeScore = z.infer<typeof outcomeScoreSchema>
