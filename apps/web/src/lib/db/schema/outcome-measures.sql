@@ -28,11 +28,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_measure_config_patient_measure_unique
 -- Enable Row Level Security
 ALTER TABLE ehr_measure_config ENABLE ROW LEVEL SECURITY;
 
--- RLS policy: users can only access rows for their tenant
-CREATE POLICY IF NOT EXISTS ehr_measure_config_tenant_isolation
-  ON ehr_measure_config
-  FOR ALL
-  USING (tenant_id = current_setting('app.tenant_id', true));
+-- RLS policies: per-command tenant isolation + role/consent gating
+-- (no FOR ALL policy — would bypass consent-gated SELECT via PostgreSQL OR semantics)
 
 -- RLS policy: SELECT requires active patient consent OR break-glass OR complianceOfficer/systemAdmin
 -- Mirrors ehr_observation consent gating from 015_ehr_native_tables.sql
@@ -203,10 +200,6 @@ CREATE INDEX IF NOT EXISTS idx_ehr_questionnaire_fhir
   ON ehr_questionnaire USING GIN (fhir_resource);
 
 ALTER TABLE ehr_questionnaire ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY IF NOT EXISTS ehr_questionnaire_tenant_isolation
-  ON ehr_questionnaire FOR ALL
-  USING (tenant_id = current_setting('app.tenant_id', true));
 
 CREATE POLICY IF NOT EXISTS ehr_questionnaire_select
   ON ehr_questionnaire FOR SELECT
