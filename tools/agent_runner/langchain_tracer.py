@@ -23,8 +23,8 @@ except ImportError:
 class LangChainAgentTracer:
     """Manages LangSmith RunTree traces across coordinator ticks, ticket executions, and verification spans."""
 
-    def __init__(self, project_name: str = "linear-agent-runner", enabled: bool = True, traces_dir: str | None = None):
-        self.project_name = project_name
+    def __init__(self, project_name: str | None = None, enabled: bool = True, traces_dir: str | None = None):
+        self.project_name = project_name or os.environ.get("LANGSMITH_PROJECT", "tracer")
         self.enabled = enabled
         default_dir = os.path.expanduser("~/.local/state/agent-runner/traces")
         self.traces_dir = os.path.abspath(traces_dir or default_dir)
@@ -65,9 +65,15 @@ class LangChainAgentTracer:
                     inputs=inputs,
                 )
                 tree.post()
+                logger.info(
+                    "LangSmith RunTree root trace started: %s (id: %s, project: %s)",
+                    tree.name,
+                    tree.id,
+                    self.project_name,
+                )
                 return tree
             except Exception as e:
-                logger.debug("Error starting LangSmith RunTree: %s", e)
+                logger.warning("Error starting LangSmith RunTree: %s", e)
 
         return {"name": f"Coordinator-Tick-{server_label}", "inputs": inputs, "children": []}
 
@@ -121,9 +127,10 @@ class LangChainAgentTracer:
                     inputs=inputs,
                 )
                 child.post()
+                logger.info("LangSmith RunTree child span started: %s (id: %s)", child.name, child.id)
                 return child
             except Exception as e:
-                logger.debug("Error creating LangSmith child RunTree: %s", e)
+                logger.warning("Error creating LangSmith child RunTree: %s", e)
 
         return {"name": f"Execute-{issue.identifier}-{agent.name}", "inputs": inputs, "steps": []}
 
