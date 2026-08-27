@@ -65,7 +65,8 @@ export const POST = withV1Contract('submitOutcomeMeasure', async (ctx, caller) =
   if (typeof responses !== 'object' || responses === null || Array.isArray(responses))
     return ehrValidationError('responses must be an object mapping linkId to numeric answer value.')
 
-  const sanitizedPatientId = sanitizeFhirId(patientId, 'patient ID')
+  const resolvedPatientId = patientId.trim() === 'me' ? caller.user.id : patientId
+  const sanitizedPatientId = sanitizeFhirId(resolvedPatientId, 'patient ID')
 
   const perm = await requireEHRPermission(
     caller.user.role,

@@ -201,7 +201,7 @@ export function buildOutcomeObservation(params: {
       {
         coding: [
           {
-            system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation',
+            system: 'http://example.org/fhir/CodeSystem/outcome-severity',
             code: params.severity,
             display: params.severity,
           },
