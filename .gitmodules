@@ -6,3 +6,7 @@
 	path = foresight
 	url = https://github.com/daggerstuff/foresight.git
 	branch = master
+[submodule "docs"]
+	path = docs
+	url = https://github.com/daggerstuff/docs.git
+	branch = master
