@@ -22,7 +22,7 @@ const { mockGetUserById } = vi.hoisted(() => ({
   mockGetUserById: vi.fn(),
 }))
 
-vi.mock('../../../services/auth0.service', () => ({
+vi.mock('../../services/auth0.service', () => ({
   auth0UserService: { getUserById: mockGetUserById },
 }))
 

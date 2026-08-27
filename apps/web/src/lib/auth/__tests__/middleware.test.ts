@@ -25,7 +25,7 @@ vi.mock('../auth0-jwt-service', () => ({
   validateToken: vi.fn(),
 }))
 
-vi.mock('../../../services/auth0.service', () => ({
+vi.mock('../../services/auth0.service', () => ({
   auth0UserService: {
     getUserById: vi.fn(),
     userHasMFA: vi.fn(),
