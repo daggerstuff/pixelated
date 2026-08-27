@@ -68,13 +68,13 @@ function isExtendedAuthenticationClient(
 type ExtendedUserInfoClient = Omit<UserInfoClient, 'getUserInfo'> & {
   getUserInfo: (token: string) => Promise<{ data: unknown }>
 }
-import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
+import { auth0MFAService } from '../auth/auth0-mfa-service'
 import type {
   MFAFactor,
   MFAEnrollment,
   MFAChallenge,
   MFAVerification,
-} from '../lib/auth/auth0-mfa-service'
+} from '../auth/auth0-mfa-service'
 import { auth0WebAuthnService } from '../lib/auth/auth0-webauthn-service'
 import type {
   WebAuthnCredential,
