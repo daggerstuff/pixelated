@@ -580,7 +580,7 @@ class MultiAgentCoordinator:
             return result
 
         finally:
-            self.state_mgr.release_claim(issue.identifier)
+            self.state_mgr.remove_claim(issue.identifier)
             if worktree_lease:
                 self.worktree_pool.release_worktree(worktree_lease)
 
