@@ -22,6 +22,8 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "apps/web/src/tests/api/session/skills-api.test.ts",
   "apps/web/src/tests/api/v1/health.test.ts",
   "apps/web/src/lib/services/auth0.service.ts",
+  "apps/web/src/lib/access-control.ts",
+  "apps/web/src/lib/services/BusinessIntelligenceService.ts",
   "apps/web/src/types/index.ts",
   "tests/unit/auth0/auth0-jwt-service.test.ts",
   "packages/sdk-typescript/src/runtime.ts",
