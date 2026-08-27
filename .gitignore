@@ -449,4 +449,9 @@ ai/PAL_MEDDIES_IMPLEMENTATION_PLAN.md
 tasks/
 "Copy of CLAUDE.md"
 
-.junie
+.junieconfig/agent_runner_config.json
+moe_ep_trial_output/
+scripts/linear-agent-runner.py
+scripts/systemd/linear-agent-runner.service
+tests/agent_runner/
+tools/agent_runner/
