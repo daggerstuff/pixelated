@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   getStatisticalTestService,
   resetStatisticalTestService,
-} from '../lib/services/StatisticalTestService'
+} from '../services/StatisticalTestService'
 
 describe('StatisticalTestService', () => {
   let service: ReturnType<typeof getStatisticalTestService>

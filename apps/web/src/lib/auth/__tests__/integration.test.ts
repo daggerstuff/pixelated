@@ -70,7 +70,7 @@ const {
   },
 }))
 
-vi.mock('../../../lib/services/auth0.service', () => ({
+vi.mock('../../services/auth0.service', () => ({
   auth0UserService: mockAuth0UserService,
   verifyToken: mockAuth0UserService.verifyAuthToken,
 }))
