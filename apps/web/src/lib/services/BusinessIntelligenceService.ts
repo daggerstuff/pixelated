@@ -4,13 +4,7 @@ import { Pool } from 'pg'
 type UnknownRecord = Record<string, unknown>
 
 type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | UnknownRecord
-  | Date
+  string | number | boolean | null | JsonValue[] | UnknownRecord | Date
 
 interface YahooChartResponse {
   chart?: {

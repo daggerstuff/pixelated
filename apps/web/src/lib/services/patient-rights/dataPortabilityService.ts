@@ -53,12 +53,7 @@ interface PatientProfile {
 
 // Define the export status types
 type ExportStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'expired'
-  | 'cancelled'
+  'pending' | 'processing' | 'completed' | 'failed' | 'expired' | 'cancelled'
 
 // Define the export formats
 export type ExportFormat = 'json' | 'csv' | 'pdf' | 'xml'
@@ -119,11 +114,7 @@ interface ExportDownloadSuccessResponse {
 interface ExportDownloadErrorResponse {
   success: false
   error:
-    | 'not_found'
-    | 'unauthorized'
-    | 'not_ready'
-    | 'expired'
-    | 'internal_error'
+    'not_found' | 'unauthorized' | 'not_ready' | 'expired' | 'internal_error'
   message?: string
   status?: ExportStatus
   progress?: number
@@ -133,8 +124,7 @@ interface ExportDownloadErrorResponse {
 
 // Combined type for download responses
 type ExportDownloadResponse =
-  | ExportDownloadSuccessResponse
-  | ExportDownloadErrorResponse
+  ExportDownloadSuccessResponse | ExportDownloadErrorResponse
 
 type ExportPriority = 'normal' | 'high'
 
