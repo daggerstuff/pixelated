@@ -9,12 +9,12 @@ export * from './types'
 export * from './services'
 
 // Core services
-export { MarketResearchService } from './lib/services/market-research'
-export { CompetitiveIntelligenceService } from './lib/services/competitive-intelligence'
-export { GrassrootsMarketingService } from './lib/services/grassroots-marketing'
-export { DocumentManagementService } from './lib/services/document-management'
-export { UserManagementService } from './lib/services/user-management'
-export { WorkflowEngineService } from './lib/services/workflow-engine'
+export { MarketResearchService } from './services/market-research'
+export { CompetitiveIntelligenceService } from './services/competitive-intelligence'
+export { GrassrootsMarketingService } from './services/grassroots-marketing'
+export { DocumentManagementService } from './services/document-management'
+export { UserManagementService } from './services/user-management'
+export { WorkflowEngineService } from './services/workflow-engine'
 
 // Types
 export type {

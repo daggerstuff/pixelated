@@ -18,7 +18,7 @@ export * from './datasets/prepare-fine-tuning'
 export * from './datasets/merge-datasets'
 
 // Web Scraping
-export * from './lib/services/jigsawstack-web-scraper'
+export * from './services/jigsawstack-web-scraper'
 
 // Mental Health AI
 export type { AIMessage } from './types'

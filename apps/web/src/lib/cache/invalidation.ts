@@ -2,7 +2,7 @@ import Redis from 'ioredis'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { type MultiOps } from '../redis-ops'
-import { RedisService } from '../lib/services/redis/RedisService'
+import { RedisService } from '../services/redis/RedisService'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
