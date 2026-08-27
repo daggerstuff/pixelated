@@ -207,7 +207,7 @@
     "@ai-sdk/sandbox-vercel": "^1.0.87",
     "@astrojs/node": "^11.1.4",
     "@astrojs/react": "latest",
-    "@astrojs/vercel": "11.0.7",
+    "@astrojs/vercel": "11.0.8",
     "@auth0/auth0-react": "latest",
     "@aws-sdk/client-dynamodb": "latest",
     "@aws-sdk/client-ec2": "latest",
