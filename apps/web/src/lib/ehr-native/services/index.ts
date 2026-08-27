@@ -17,6 +17,7 @@
  * - PortalStatementService (F1.11) — patient financial statements
  * - TelehealthService (F1.12) — native telehealth sessions
  * - NoteSigningService (F2.2) — AI no auto-sign compliance gate
+ * - OutcomesService (F2.4) — outcome measure trending (PHQ-9, GAD-7, OQ-45)
  */
 
 export { PatientService } from './patient-service'
@@ -53,3 +54,12 @@ export {
   type SignNoteResult,
   type ManualSignValidation,
 } from './note-signing-service'
+
+export {
+  OutcomesService,
+  type MeasureConfigInput,
+  type SubmitMeasureInput,
+  type OutcomeTrendResult,
+  type OutcomeTrendPoint,
+  type OutcomeAlertResult,
+} from './outcomes.service'
