@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events'
 
-import { mongoClient } from '../../../../db/mongoClient'
+import { mongoClient } from '../../../db/mongoClient'
 import { createBuildSafeLogger } from '../../../logger'
 import { redis } from '../../../redis'
 import { asRedisOps } from '../../../redis-ops'
