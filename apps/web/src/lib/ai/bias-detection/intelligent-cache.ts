@@ -13,7 +13,7 @@ import { promisify } from "util";
 import * as zlib from "zlib";
 
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
-import { getCacheService } from "../../lib/services/cacheService";
+import { getCacheService } from "../../services/cacheService";
 import type { CacheOptions } from "./cache";
 import { getRedisPoolManager } from "./redis-pool-manager";
 import type {

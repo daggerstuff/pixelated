@@ -7,8 +7,8 @@ import type {
   ModelInfo,
   TrainingJobSummary,
 } from "../FineTuningAIService";
-import type { CacheClient } from "../../../lib/services/cacheService";
-import { GestaltClient } from "../../../lib/services/ai/GestaltClient";
+import type { CacheClient } from "../../../services/cacheService";
+import { GestaltClient } from "../../../services/ai/GestaltClient";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
