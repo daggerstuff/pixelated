@@ -3,7 +3,7 @@ import { subtle } from 'crypto'
 import {
   base64ToUint8Array,
   uint8ArrayToBase64,
-} from '../../../lib/utils/encoding'
+} from '../../../utils/encoding'
 
 export interface PushSubscription {
   endpoint: string

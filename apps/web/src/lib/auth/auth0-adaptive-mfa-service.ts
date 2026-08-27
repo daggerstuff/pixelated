@@ -13,7 +13,7 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-import { auth0UserService } from '../../lib/services/auth0.service'
+import { auth0UserService } from '../../services/auth0.service'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'

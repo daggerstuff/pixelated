@@ -6,7 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { auth0UserService } from '../../../lib/services/auth0.service'
+import { auth0UserService } from '../../../services/auth0.service'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 import { logSecurityEvent } from '../../security'
 import { validateToken } from '../auth0-jwt-service'
@@ -25,7 +25,7 @@ vi.mock('../auth0-jwt-service', () => ({
   validateToken: vi.fn(),
 }))
 
-vi.mock('../../../lib/services/auth0.service', () => ({
+vi.mock('../../../services/auth0.service', () => ({
   auth0UserService: {
     getUserById: vi.fn(),
     userHasMFA: vi.fn(),

@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // All paths resolve relative to this test file:
 //   src/lib/services/patient-rights/__tests__/dataPortabilityService.test.ts
 //   ../ → patient-rights/, ../../ → services/, ../../../ → lib/, ../../../../ → src/
-vi.mock('../../../../lib/db/mongoClient', () => {
+vi.mock('../../../../db/mongoClient', () => {
   const collectionMock = {
     find: vi.fn().mockReturnValue({
       toArray: vi.fn().mockResolvedValue([]),
@@ -22,7 +22,7 @@ vi.mock('../../../../lib/db/mongoClient', () => {
   }
 })
 
-vi.mock('../../../../lib/services/mongodb.dao', () => ({
+vi.mock('../../../../services/mongodb.dao', () => ({
   dataExportDAO: {
     create: vi.fn().mockResolvedValue(undefined),
     findById: vi.fn().mockResolvedValue(null),
@@ -62,7 +62,7 @@ vi.mock('uuid', () => ({
   v4: vi.fn().mockReturnValue('test-uuid-1234'),
 }))
 
-import { dataExportDAO } from '../../../../lib/services/mongodb.dao'
+import { dataExportDAO } from '../../../../services/mongodb.dao'
 import { createAuditLog } from '../../../audit'
 import { userManager } from '../../../db'
 import { aiRepository } from '../../../db/ai'
