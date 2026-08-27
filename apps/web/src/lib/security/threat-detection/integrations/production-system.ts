@@ -5,10 +5,10 @@
 
 import { EventEmitter } from 'events'
 
-import { mongoClient } from '../../db/mongoClient'
-import { createBuildSafeLogger } from '../../logger'
-import { redis } from '../../redis'
-import { asRedisOps } from '../../redis-ops'
+import { mongoClient } from '../../../../db/mongoClient'
+import { createBuildSafeLogger } from '../../../logger'
+import { redis } from '../../../redis'
+import { asRedisOps } from '../../../redis-ops'
 
 const logger = createBuildSafeLogger('threat-detection-system')
 
