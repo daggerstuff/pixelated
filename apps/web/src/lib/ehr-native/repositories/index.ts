@@ -16,7 +16,7 @@
  * - QuestionnaireResponseRepository (F2.4) — client-completed measures
  */
 
-export { BaseRepository, type RLSContext } from './base-repository'
+export { type RLSContext } from './base-repository'
 export { PatientRepository } from './patient-repository'
 export { EncounterRepository } from './encounter-repository'
 export { AppointmentRepository } from './appointment-repository'
