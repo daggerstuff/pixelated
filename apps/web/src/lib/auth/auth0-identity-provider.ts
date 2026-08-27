@@ -10,7 +10,7 @@ import { randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
-import { auth0UserService } from '../../services/auth0.service'
+import { auth0UserService } from '../services/auth0.service'
 import { query } from '../db'
 import { validateToken } from './auth0-jwt-service'
 import type {

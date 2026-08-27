@@ -1,6 +1,6 @@
 import type { AstroCookies } from 'astro'
 
-import { createAuditLog, AuditEventType } from '../audit'
+import { createAuditLog, AuditEventType } from './audit'
 import { getCurrentUser, hasRole } from './auth'
 
 // Define permission types

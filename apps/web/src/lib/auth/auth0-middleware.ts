@@ -3,7 +3,7 @@
  * Provides request authentication validation with Auth0 integration
  */
 
-import { auth0UserService } from '../../services/auth0.service'
+import { auth0UserService } from '../services/auth0.service'
 import { developerApiKeyManager } from '../db/developer-api-keys'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'

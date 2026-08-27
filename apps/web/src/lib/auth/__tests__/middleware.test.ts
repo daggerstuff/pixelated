@@ -6,7 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { auth0UserService } from '../../../services/auth0.service'
+import { auth0UserService } from '../services/auth0.service'
 import { updatePhase6AuthenticationProgress } from '../../mcp/phase6-integration'
 import { logSecurityEvent } from '../../security'
 import { validateToken } from '../auth0-jwt-service'

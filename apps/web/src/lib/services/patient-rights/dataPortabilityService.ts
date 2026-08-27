@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 
-import { dataExportDAO } from '../../../services/mongodb.dao'
+import { dataExportDAO } from '../mongodb.dao'
 import { createAuditLog, AuditEventType } from '../../audit'
 import { userManager } from '../../db'
 import { aiRepository } from '../../db/ai'

@@ -1,4 +1,4 @@
-import { auth0UserService } from '../../services/auth0.service'
+import { auth0UserService } from '../services/auth0.service'
 
 /**
  * Legacy utility for authentication checks.

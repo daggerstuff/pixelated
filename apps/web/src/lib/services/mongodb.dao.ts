@@ -5,7 +5,7 @@ import type {
   Db,
 } from 'mongodb'
 
-import type { ExportFile } from '../types/mongodb.types'
+import type { ExportFile } from '../../types/mongodb.types'
 
 // Runtime shape of our MongoDB wrapper (from src/config/mongodb.config.ts)
 type MongoRuntime = {
@@ -64,7 +64,7 @@ import type {
   Todo,
   TreatmentPlan,
   DataExport,
-} from '../types/mongodb.types'
+} from '../../types/mongodb.types'
 
 export class DataExportDAO {
   private async getCollection(): Promise<MongoCollection<DataExport>> {

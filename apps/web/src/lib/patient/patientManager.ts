@@ -7,7 +7,7 @@ import {
   encryptPHIFields,
   decryptPHIFields,
   PHI_FIELDS,
-} from '../../fhe/field-encryption'
+} from '../fhe/field-encryption'
 import type {
   PatientProfile,
   TreatmentPlan,
