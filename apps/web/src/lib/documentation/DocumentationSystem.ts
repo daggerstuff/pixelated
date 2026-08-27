@@ -24,7 +24,7 @@ import { EventEmitter } from 'node:events'
 import type { AIService } from '../ai/AIService'
 import type { FHIRClient } from '../ehr-native/legacy/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { RedisService } from '../lib/services/redis'
+import { RedisService } from '../services/redis'
 import {
   EHRIntegration,
   type EHRExportOptions,

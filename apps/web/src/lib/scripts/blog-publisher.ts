@@ -12,7 +12,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import {
   BlogPublishingService,
   PostStatus,
-} from '../lib/services/BlogPublishingService'
+} from '../services/BlogPublishingService'
 
 const logger = createBuildSafeLogger('blog-publisher')
 

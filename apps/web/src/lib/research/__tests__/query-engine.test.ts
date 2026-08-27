@@ -5,7 +5,7 @@ import {
   getQueryAuditService,
   resetQueryAuditService,
   type QueryAuditEntry,
-} from '../lib/services/QueryAuditService'
+} from '../services/QueryAuditService'
 import type { ResearchQuery, QueryResult } from '../types/research-types'
 
 vi.mock('@/lib/utils/logger', () => ({
@@ -529,7 +529,7 @@ describe('QueryOutputFormatter', () => {
 
   beforeEach(async () => {
     const { getQueryOutputFormatter, resetQueryOutputFormatter } =
-      await import('../lib/services/QueryOutputFormatter')
+      await import('../services/QueryOutputFormatter')
     resetQueryOutputFormatter()
     formatter = getQueryOutputFormatter()
   })
@@ -652,12 +652,12 @@ describe('QueryOutputFormatter', () => {
 describe('QueryDSL', () => {
   beforeEach(async () => {
     const { resetQueryAuditService } =
-      await import('../lib/services/QueryAuditService')
+      await import('../services/QueryAuditService')
     resetQueryAuditService()
   })
 
   it('should convert DSL to SQL with filters', async () => {
-    const { dslToSQL } = await import('../lib/services/QueryDSL')
+    const { dslToSQL } = await import('../services/QueryDSL')
 
     const sql = dslToSQL({
       filters: {
@@ -687,7 +687,7 @@ describe('QueryDSL', () => {
   })
 
   it('should create query from request with per-query epsilon', async () => {
-    const { createQueryFromRequest } = await import('../lib/services/QueryDSL')
+    const { createQueryFromRequest } = await import('../services/QueryDSL')
 
     const query = createQueryFromRequest(
       {
@@ -714,7 +714,7 @@ describe('QueryDSL', () => {
   })
 
   it('should use default values when not specified', async () => {
-    const { createQueryFromRequest } = await import('../lib/services/QueryDSL')
+    const { createQueryFromRequest } = await import('../services/QueryDSL')
 
     const query = createQueryFromRequest(
       { description: 'Minimal query' },
@@ -728,7 +728,7 @@ describe('QueryDSL', () => {
   })
 
   it('should generate SQL with all filter types', async () => {
-    const { dslToSQL } = await import('../lib/services/QueryDSL')
+    const { dslToSQL } = await import('../services/QueryDSL')
 
     const sql = dslToSQL({
       filters: {

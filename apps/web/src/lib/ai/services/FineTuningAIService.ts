@@ -17,7 +17,7 @@
  *   so behaviour stays consistent with the rest of the app.
  */
 
-import { getCacheService, type CacheClient } from "../../lib/services/cacheService";
+import { getCacheService, type CacheClient } from "../../services/cacheService";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 import type { AIServiceStatus } from "../index";
 

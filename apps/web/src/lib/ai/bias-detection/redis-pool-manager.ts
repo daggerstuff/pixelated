@@ -9,8 +9,8 @@
  */
 
 import { getBiasDetectionLogger } from '../../logging/standardized-logger'
-import { RedisService } from '../../lib/services/redis/RedisService'
-import type { RedisServiceConfig } from '../../lib/services/redis/types'
+import { RedisService } from '../../services/redis/RedisService'
+import type { RedisServiceConfig } from '../../services/redis/types'
 
 const logger = getBiasDetectionLogger('redis-pool-manager')
 

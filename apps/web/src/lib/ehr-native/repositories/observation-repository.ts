@@ -134,6 +134,28 @@ export class ObservationRepository extends BaseRepository<Observation> {
   }
 
   /**
+   * Finds observations for a specific patient filtered by LOINC code.
+   * Used for outcome measure queries (e.g., all PHQ-9 observations for a patient).
+   */
+  async findByPatientAndCode(
+    patientId: string,
+    code: string,
+    limit = 100,
+    offset = 0,
+  ): Promise<Observation[]> {
+    return this.withRLS(async (client) => {
+      const res = await client.query<{ fhir_resource: Observation }>(
+        `SELECT fhir_resource FROM ehr_observation
+         WHERE patient_id = $1 AND code = $2
+         ORDER BY effective_date DESC NULLS LAST
+         LIMIT $3 OFFSET $4`,
+        [patientId, code, limit, offset],
+      )
+      return res.rows.map((r) => r.fhir_resource)
+    })
+  }
+
+  /**
    * Finds observations for a patient within a date range.
    */
   async findByPatientAndDateRange(

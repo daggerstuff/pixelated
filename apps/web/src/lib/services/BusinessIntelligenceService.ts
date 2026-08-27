@@ -4,13 +4,7 @@ import { Pool } from 'pg'
 type UnknownRecord = Record<string, unknown>
 
 type JsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | JsonValue[]
-  | UnknownRecord
-  | Date
+  string | number | boolean | null | JsonValue[] | UnknownRecord | Date
 
 interface YahooChartResponse {
   chart?: {
@@ -141,7 +135,7 @@ type MarketForecast = {
   confidence: number
 }
 
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const biLogger = createBuildSafeLogger('business-intelligence')
 

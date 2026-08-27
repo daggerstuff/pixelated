@@ -1,6 +1,6 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions, AIUsage } from './models/ai-types'
-import { createLLMService } from './lib/services/llm-provider'
+import { createLLMService } from './services/llm-provider'
 import { DEFAULT_LLM_MODEL } from './constants'
 
 const appLogger = createBuildSafeLogger('ai-providers')

@@ -35,7 +35,7 @@ interface DocumentRow {
   is_public: boolean
 }
 
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const docLogger = createBuildSafeLogger('document-service')
 

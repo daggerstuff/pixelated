@@ -50,7 +50,7 @@ const mockProjectState = vi.hoisted(() => ({
   nextProjectId: 0,
 }))
 
-vi.mock('../../lib/services/project-service', async () => {
+vi.mock('../../services/project-service', async () => {
   const { ValidationError, NotFoundError, ForbiddenError } =
     await import('../../middleware/error-handler')
 

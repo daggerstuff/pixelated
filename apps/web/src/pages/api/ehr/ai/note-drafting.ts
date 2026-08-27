@@ -5,6 +5,7 @@ import {
   ehrValidationError,
   ehrNotFound,
 } from '@/lib/ehr-native/api'
+import { noteSigningService } from '@/lib/ehr-native/services'
 import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import { z } from 'zod'
 
@@ -93,7 +94,32 @@ export const POST = withV1Contract('draftClinicalNote', async (ctx, caller) => {
     }
 
     const data = await upstream.json()
-    return ehrSuccess(data)
+
+    // Tag AI-drafted note with draft status and register for sign-off tracking
+    // PIX-4426 G2.1: AI notes must be 'preliminary' and cannot be auto-signed
+    const noteId =
+      (data as Record<string, unknown>)['id'] as string | undefined ??
+      crypto.randomUUID()
+    const taggedData = {
+      ...data,
+      id: noteId,
+      docStatus: 'preliminary',
+      aiOrigin: {
+        drafter: 'note-drafting-service',
+        draftedAt: new Date().toISOString(),
+      },
+    }
+
+    noteSigningService.registerAIDraft({
+      noteId,
+      drafter: 'note-drafting-service',
+      patientId: parsed.data.patient_id,
+      encounterId: parsed.data.session_id,
+      draftedAt: taggedData.aiOrigin.draftedAt,
+      tenantId,
+    })
+
+    return ehrSuccess(taggedData)
   } catch (err) {
     const message =
       err instanceof Error ? err.message : 'Unknown error calling note drafting service.'

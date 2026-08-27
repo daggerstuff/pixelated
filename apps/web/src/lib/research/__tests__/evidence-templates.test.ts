@@ -6,12 +6,12 @@ import {
   getEvidenceReportGenerator,
   resetEvidenceReportGenerator,
   type TemplateId,
-} from '../lib/services/EvidenceReportTemplates'
+} from '../services/EvidenceReportTemplates'
 import {
   IRBExportService,
   getIRBExportService,
   resetIRBExportService,
-} from '../lib/services/IRBExportService'
+} from '../services/IRBExportService'
 
 describe('EvidenceReportTemplates', () => {
   describe('REPORT_TEMPLATES', () => {

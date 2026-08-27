@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { GET } from './export'
 
 // Mock logger
-vi.mock('../../../../lib/logging/build-safe-logger', () => ({
+vi.mock('../../../../logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => ({
     info: vi.fn(),
     error: vi.fn(),

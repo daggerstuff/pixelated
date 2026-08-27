@@ -55,7 +55,7 @@ const mockOptimizedBiasDetectionService = {
   getBiasSummary: vi.fn().mockResolvedValue(mockBiasSummary),
 };
 
-vi.mock("../../../lib/services/bias-detection-optimized", () => ({
+vi.mock("../../../services/bias-detection-optimized", () => ({
   OptimizedBiasDetectionService: {
     getInstance: vi.fn(() => mockOptimizedBiasDetectionService),
   },

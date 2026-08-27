@@ -6,7 +6,7 @@ import { SocraticGate } from './gate';
 import { MemoryCrisisTagger } from './tagger';
 import { MemorySynthesizer } from './synthesizer';
 import { MemoryLinker } from './linker';
-import { CrisisDetectionService } from '../lib/services/crisis-detection';
+import { CrisisDetectionService } from '../services/crisis-detection';
 
 const appLogger = createBuildSafeLogger('memory-system');
 
