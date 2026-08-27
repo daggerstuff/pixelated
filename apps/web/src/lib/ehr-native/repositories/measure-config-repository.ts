@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
-import { BaseRepository, type RLSContext } from './base-repository.js'
 import type { MeasureConfig } from '../types/index.js'
+import { BaseRepository, type RLSContext } from './base-repository.js'
 
 /**
  * Repository for persisting outcome measure configurations (F2.4).

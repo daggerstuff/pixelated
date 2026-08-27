@@ -15,6 +15,10 @@
  */
 
 import {
+  getCanonicalQuestionnaire,
+  buildOutcomeObservation,
+} from '../fhir/index.js'
+import {
   type RLSContext,
   QuestionnaireRepository,
   QuestionnaireResponseRepository,
@@ -29,10 +33,6 @@ import type {
   MeasureConfig,
   OutcomeScore,
 } from '../types/index.js'
-import {
-  getCanonicalQuestionnaire,
-  buildOutcomeObservation,
-} from '../fhir/index.js'
 
 // ---------------------------------------------------------------------------
 // Constants

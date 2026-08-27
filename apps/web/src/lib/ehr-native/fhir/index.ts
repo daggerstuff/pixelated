@@ -12,11 +12,11 @@
 // Questionnaire / QuestionnaireResponse helpers
 // ---------------------------------------------------------------------------
 
+import type { Observation } from '../types/observation.js'
 import type {
   Questionnaire,
   QuestionnaireResponse,
 } from '../types/questionnaire.js'
-import type { Observation } from '../types/observation.js'
 
 /**
  * Creates the canonical FHIR Questionnaire resource for PHQ-9.
