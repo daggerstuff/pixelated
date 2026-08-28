@@ -31,7 +31,7 @@ from tools.agent_runner.models import (
     RunnerConfig,
 )
 from tools.agent_runner.personas import get_role_prompt
-from tools.agent_runner.pr_bridge import PullRequestBridge
+from tools.agent_runner.pr_bridge import PRCreationResult, PullRequestBridge
 from tools.agent_runner.self_evolution import SelfEvolutionEngine
 from tools.agent_runner.sensor_hooks import SensorHookEngine
 from tools.agent_runner.skeptic import SkepticReviewer
@@ -424,11 +424,14 @@ class MultiAgentCoordinator:
         team: LinearTeam,
         agent: AgentConfig,
         result: ExecutionResult,
+        pr_res: PRCreationResult | None = None,
     ) -> None:
         done_state_id = team.states.get(self.config.done_state)
+        has_file_changes = bool(result.git_diff_summary or (pr_res and pr_res.commit_sha))
         overall_success = (
             result.success
             and result.verification_passed
+            and has_file_changes
             and (not result.guardrail_violations or not self.config.guardrails.anti_suppression_enforcement)
         )
 
@@ -572,7 +575,7 @@ class MultiAgentCoordinator:
 
             action_ctx = {"team": team, "workdir": active_workdir}
             self._handle_execution_actions(result, project, agent, issue, action_ctx)
-            self._finalize_ticket_state(issue, team, agent, result)
+            self._finalize_ticket_state(issue, team, agent, result, pr_res=pr_res)
 
             self.telemetry.end_span(span, success=result.success, verification_passed=result.verification_passed)
             self.tracer.end_ticket_execution_trace(ticket_trace, result, {"pr_url": pr_res.pr_url if pr_res else ""})

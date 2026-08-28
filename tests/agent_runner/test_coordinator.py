@@ -27,7 +27,11 @@ def test_coordinator_tick_workflow(monkeypatch):
 
     mock_adapter = MagicMock()
     mock_adapter.run.return_value = ExecutionResult(
-        success=True, agent_name="opencode", ticket_identifier="PIX-10", output="RESULT: Work done."
+        success=True,
+        agent_name="opencode",
+        ticket_identifier="PIX-10",
+        output="RESULT: Work done.",
+        git_diff_summary="M file.py",
     )
 
     monkeypatch.setattr("tools.agent_runner.coordinator.get_agent_adapter", lambda _agent: mock_adapter)
@@ -39,6 +43,10 @@ def test_coordinator_tick_workflow(monkeypatch):
 
         cfg = RunnerConfig(
             server_label="srv:test",
+            enable_git_branching=False,
+            enable_foresight_memory=False,
+            enable_langchain_tracing=False,
+            enable_git_pr_creation=False,
             projects=[ProjectConfig(team_key="PIX", default_repo="main", repos={"main": "."})],
             agents=[AgentConfig(name="opencode", label="agent:opencode", cmd=["opencode", "run"])],
         )
