@@ -38,7 +38,12 @@ const rlsContext: RLSContext = {
 
 const validInput = {
   patientId: 'patient-001',
-  icd10Codes: [{ code: 'F32.2', description: 'Major depressive disorder, recurrent, moderate' }],
+  icd10Codes: [
+    {
+      code: 'F32.2',
+      description: 'Major depressive disorder, recurrent, moderate',
+    },
+  ],
 }
 
 const apiSuccessResponse = {
@@ -145,7 +150,12 @@ describe('TreatmentPlanService', () => {
           body: JSON.stringify({
             patient_id: 'patient-001',
             session_id: 'tenant-001',
-            icd10_codes: [{ code: 'F32.2', description: 'Major depressive disorder, recurrent, moderate' }],
+            icd10_codes: [
+              {
+                code: 'F32.2',
+                description: 'Major depressive disorder, recurrent, moderate',
+              },
+            ],
             outcome_trends: [],
             treatment_history: [],
             preferred_modalities: [],
@@ -169,10 +179,19 @@ describe('TreatmentPlanService', () => {
         patientId: 'patient-002',
         icd10Codes: [{ code: 'F41.1' }],
         outcomeTrends: [
-          { measure: 'PHQ-9', score: 14, measured_at: '2026-08-01', trend: 'stable' },
+          {
+            measure: 'PHQ-9',
+            score: 14,
+            measured_at: '2026-08-01',
+            trend: 'stable',
+          },
         ],
         treatmentHistory: [
-          { modality: 'CBT', start_date: '2026-01-01', outcome: 'partial response' },
+          {
+            modality: 'CBT',
+            start_date: '2026-01-01',
+            outcome: 'partial response',
+          },
         ],
         preferredModalities: ['CBT', 'DBT'],
         clinicianNotes: 'Patient prefers structured approaches.',
@@ -183,7 +202,9 @@ describe('TreatmentPlanService', () => {
       expect(body['outcome_trends']).toHaveLength(1)
       expect(body['treatment_history']).toHaveLength(1)
       expect(body['preferred_modalities']).toEqual(['CBT', 'DBT'])
-      expect(body['clinician_notes']).toBe('Patient prefers structured approaches.')
+      expect(body['clinician_notes']).toBe(
+        'Patient prefers structured approaches.',
+      )
     })
   })
 
@@ -198,7 +219,15 @@ describe('TreatmentPlanService', () => {
         status: 200,
         json: async () => ({
           ...apiSuccessResponse,
-          interventions: [{ modality: 'NotAModality', intervention: 'x', rationale: 'y', frequency: 'z', target_goals: [] }],
+          interventions: [
+            {
+              modality: 'NotAModality',
+              intervention: 'x',
+              rationale: 'y',
+              frequency: 'z',
+              target_goals: [],
+            },
+          ],
         }),
       })
 
@@ -215,7 +244,17 @@ describe('TreatmentPlanService', () => {
         status: 200,
         json: async () => ({
           ...apiSuccessResponse,
-          goals: [{ goal: 'g', specific: 's', measurable: 'm', achievable: 'a', relevant: 'r', time_bound: 't', status: 'unknown-status' }],
+          goals: [
+            {
+              goal: 'g',
+              specific: 's',
+              measurable: 'm',
+              achievable: 'a',
+              relevant: 'r',
+              time_bound: 't',
+              status: 'unknown-status',
+            },
+          ],
         }),
       })
 
@@ -232,7 +271,9 @@ describe('TreatmentPlanService', () => {
         status: 200,
         json: async () => ({
           ...apiSuccessResponse,
-          objectives: [{ objective: 'o', target_date: '2026-09-30', status: 'weird' }],
+          objectives: [
+            { objective: 'o', target_date: '2026-09-30', status: 'weird' },
+          ],
         }),
       })
 
@@ -272,7 +313,10 @@ describe('TreatmentPlanService', () => {
       const { TreatmentPlanService, TreatmentPlanError } = await importService()
       const service = new TreatmentPlanService(rlsContext)
       await expect(
-        service.getSuggestions({ patientId: '  ', icd10Codes: [{ code: 'F32.2' }] }),
+        service.getSuggestions({
+          patientId: '  ',
+          icd10Codes: [{ code: 'F32.2' }],
+        }),
       ).rejects.toMatchObject({
         name: 'TreatmentPlanError',
         code: 'VALIDATION_ERROR',
@@ -303,7 +347,10 @@ describe('TreatmentPlanService', () => {
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
       await expect(
-        service.getSuggestions({ patientId: 'p1', icd10Codes: [{ code: '   ' }] }),
+        service.getSuggestions({
+          patientId: 'p1',
+          icd10Codes: [{ code: '   ' }],
+        }),
       ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' })
       expect(mockFetch).not.toHaveBeenCalled()
     })
@@ -352,9 +399,7 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
         name: 'TreatmentPlanError',
         code: 'BAA_GATE',
         message: 'BAA not confirmed for provider',
@@ -370,9 +415,9 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({ code: 'VALIDATION_ERROR' })
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
+        code: 'VALIDATION_ERROR',
+      })
     })
 
     it('maps 502 to NIM_UNAVAILABLE', async () => {
@@ -384,9 +429,9 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({ code: 'NIM_UNAVAILABLE' })
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
+        code: 'NIM_UNAVAILABLE',
+      })
     })
 
     it('maps 503 to SERVICE_UNAVAILABLE', async () => {
@@ -398,9 +443,9 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({ code: 'SERVICE_UNAVAILABLE' })
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
+        code: 'SERVICE_UNAVAILABLE',
+      })
     })
 
     it('maps 500 to SERVICE_ERROR', async () => {
@@ -412,9 +457,9 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({ code: 'SERVICE_ERROR' })
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
+        code: 'SERVICE_ERROR',
+      })
     })
 
     it('uses default detail when body is not JSON', async () => {
@@ -428,9 +473,7 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
         code: 'SERVICE_ERROR',
         message: 'Treatment plan service returned 500',
       })
@@ -454,9 +497,9 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({ code: 'TIMEOUT' })
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
+        code: 'TIMEOUT',
+      })
     })
 
     it('throws SERVICE_UNAVAILABLE on network failure', async () => {
@@ -464,9 +507,9 @@ describe('TreatmentPlanService', () => {
 
       const { TreatmentPlanService } = await importService()
       const service = new TreatmentPlanService(rlsContext)
-      await expect(
-        service.getSuggestions(validInput),
-      ).rejects.toMatchObject({ code: 'SERVICE_UNAVAILABLE' })
+      await expect(service.getSuggestions(validInput)).rejects.toMatchObject({
+        code: 'SERVICE_UNAVAILABLE',
+      })
     })
 
     it('re-throws TreatmentPlanError unchanged (no double-wrapping)', async () => {
