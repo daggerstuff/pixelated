@@ -25,7 +25,7 @@ from tools.agent_runner.triage import AutoTriageEngine
 try:
     from dotenv import load_dotenv  # type: ignore[import-untyped]
 
-    load_dotenv()
+    load_dotenv(override=True)
 except ImportError:
     pass
 

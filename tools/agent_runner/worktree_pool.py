@@ -50,6 +50,28 @@ class GitWorktreePool:
                 if os.path.exists(worktree_path):
                     shutil.rmtree(worktree_path, ignore_errors=True)
 
+            # Check if target branch is currently checked out in any other worktree
+            wt_res = subprocess.run(
+                ["git", "worktree", "list", "--porcelain"],
+                cwd=repo_path,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if wt_res.returncode == 0:
+                current_wt = ""
+                for line in wt_res.stdout.splitlines():
+                    if line.startswith("worktree "):
+                        current_wt = line.split(" ", 1)[1]
+                    elif line.startswith("branch ") and branch_name in line and current_wt and current_wt != repo_path:
+                        subprocess.run(
+                            ["git", "worktree", "remove", "--force", current_wt],
+                            cwd=repo_path,
+                            capture_output=True,
+                            check=False,
+                        )
+
+            subprocess.run(["git", "worktree", "prune"], cwd=repo_path, capture_output=True, check=False)
             logger.info("Provisioning isolated worktree for %s at %s...", ticket_identifier, worktree_path)
 
             # Check if branch exists
@@ -82,6 +104,15 @@ class GitWorktreePool:
                     worktree_path=repo_path,
                     original_repo=repo_path,
                 )
+
+            # Initialize submodules in worktree so submodule edits remain isolated
+            subprocess.run(
+                ["git", "submodule", "update", "--init", "--recursive"],
+                cwd=worktree_path,
+                capture_output=True,
+                check=False,
+                timeout=60,
+            )
 
             return WorktreeLease(
                 ticket_identifier=ticket_identifier,

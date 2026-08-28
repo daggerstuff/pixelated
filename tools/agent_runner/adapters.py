@@ -36,6 +36,39 @@ class AgentAdapter(ABC):
 class GenericCLIAdapter(AgentAdapter):
     """Invokes arbitrary CLI tools with interpolated prompt files or standard arguments."""
 
+    def _build_command(self, prompt: str, prompt_file: str, workdir: str) -> list[str]:
+        cmd = []
+        has_file_placeholder = False
+        for part in self.config.cmd:
+            if "{prompt_file}" in part:
+                cmd.append(part.replace("{prompt_file}", prompt_file))
+                has_file_placeholder = True
+            elif "{prompt}" in part:
+                cmd.append(part.replace("{prompt}", prompt))
+                has_file_placeholder = True
+            else:
+                cmd.append(part)
+
+        if not has_file_placeholder:
+            cmd.append(prompt)
+
+        # Ensure auto-approval flag is enabled for interactive-capable CLIs
+        if cmd and cmd[0] in ("opencode", "mastracode", "fx") and "--auto" not in cmd:
+            if len(cmd) > 1 and cmd[1] == "run":
+                cmd.insert(2, "--auto")
+            else:
+                cmd.append("--auto")
+
+        # Explicitly enforce worktree directory isolation
+        if cmd and cmd[0] == "opencode" and "--dir" not in cmd:
+            if len(cmd) > 1 and cmd[1] == "run":
+                cmd.insert(2, workdir)
+                cmd.insert(2, "--dir")
+            else:
+                cmd.extend(["--dir", workdir])
+
+        return cmd
+
     def run(
         self,
         prompt: str,
@@ -50,21 +83,7 @@ class GenericCLIAdapter(AgentAdapter):
             prompt_file = tf.name
 
         try:
-            cmd = []
-            has_file_placeholder = False
-            for part in self.config.cmd:
-                if "{prompt_file}" in part:
-                    cmd.append(part.replace("{prompt_file}", prompt_file))
-                    has_file_placeholder = True
-                elif "{prompt}" in part:
-                    cmd.append(part.replace("{prompt}", prompt))
-                    has_file_placeholder = True
-                else:
-                    cmd.append(part)
-
-            if not has_file_placeholder:
-                cmd.append(prompt)
-
+            cmd = self._build_command(prompt, prompt_file, workdir)
             logger.info(
                 "Running agent '%s' on %s in '%s' (timeout: %ds)...",
                 self.config.name,
