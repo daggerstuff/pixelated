@@ -39,7 +39,7 @@ const RESOURCE_INTERACTIONS: Record<
   Appointment: { read: true, search: true, create: true, update: true, delete: false },
   Claim: { read: true, search: true, create: true, update: true, delete: false },
   DocumentReference: { read: true, search: true, create: true, update: true, delete: false },
-  Consent: { read: true, search: true, create: true, update: false, delete: false },
+  Consent: { read: true, search: false, create: false, update: false, delete: false },
 };
 
 /**
@@ -76,11 +76,6 @@ const SEARCH_PARAMS: Partial<Record<FhirResourceType, Array<{ name: string; type
     { name: 'patient', type: 'reference' },
     { name: 'status', type: 'token' },
     { name: 'use', type: 'token' },
-  ],
-  Consent: [
-    { name: 'patient', type: 'reference' },
-    { name: 'status', type: 'token' },
-    { name: 'category', type: 'token' },
   ],
 };
 

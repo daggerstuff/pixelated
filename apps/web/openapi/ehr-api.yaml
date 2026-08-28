@@ -717,6 +717,69 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Analytics]
+      summary: Delete a saved analytics view
+      operationId: deleteSavedView
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the saved view to delete
+      responses:
+        '200':
+          description: View deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: string
+                        description: ID of the deleted view
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags: [Analytics]
+      summary: Set a saved view as default
+      operationId: setDefaultView
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the saved view to set as default
+      responses:
+        '200':
+          description: Default view updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      views:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SavedView'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
   /analytics/export/pdf:
     post:
@@ -1134,32 +1197,39 @@ paths:
   /consents:
     get:
       tags: [Consents]
-      summary: Search consents
-      operationId: searchConsents
+      summary: Verify consent for a patient
+      description: Verifies whether a patient has consent at the specified minimum level. This is a consent verification operation, not a FHIR Consent resource search.
+      operationId: verifyConsent
       parameters:
         - name: patientId
           in: query
+          required: true
           schema:
             type: string
+          description: Patient ID to verify consent for
         - name: minimumLevel
           in: query
           schema:
             type: string
+            default: general
+          description: Minimum consent level required (e.g. general, mental_health, substance_abuse)
         - name: stateCode
           in: query
           schema:
             type: string
+          description: Optional state code for jurisdiction-specific consent rules
         - name: treatmentCategory
           in: query
           schema:
             type: string
+          description: Optional treatment category filter
       responses:
         '200':
-          description: List of consents
+          description: Consent verification result
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConsentListResponse'
+                $ref: '#/components/schemas/ConsentVerificationResult'
         '400':
           $ref: '#/components/responses/ValidationError'
         '401':
@@ -1168,40 +1238,67 @@ paths:
           $ref: '#/components/responses/Forbidden'
     post:
       tags: [Consents]
-      summary: Create a consent
-      operationId: createConsent
+      summary: Check consent for a patient
+      description: Verifies consent for a specific patient and minimum consent level. This is a consent verification operation, not a FHIR Consent resource create.
+      operationId: checkConsent
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConsentCreate'
+              $ref: '#/components/schemas/ConsentVerificationRequest'
       responses:
-        '201':
-          description: Consent created
+        '200':
+          description: Consent verification result
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConsentResponse'
+                $ref: '#/components/schemas/ConsentVerificationResult'
         '400':
           $ref: '#/components/responses/ValidationError'
 
   /consents/{id}:
     get:
       tags: [Consents]
-      summary: Get a consent by ID
-      operationId: getConsent
+      summary: Verify consent for a patient by ID
+      description: Verifies consent for the patient identified by the path parameter (id = patientId). This is a consent verification operation, not a FHIR Consent resource read.
+      operationId: verifyConsentById
       parameters:
-        - $ref: '#/components/parameters/ResourceId'
+        - name: id
+          in: path
+          required: true
+          description: Patient ID
+          schema:
+            type: string
+        - name: minimumLevel
+          in: query
+          schema:
+            type: string
+            default: general
+          description: Minimum consent level required
+        - name: stateCode
+          in: query
+          schema:
+            type: string
+          description: Optional state code
+        - name: treatmentCategory
+          in: query
+          schema:
+            type: string
+          description: Optional treatment category filter
       responses:
         '200':
-          description: Consent resource
+          description: Consent verification result
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ConsentResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
+                $ref: '#/components/schemas/ConsentVerificationResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
 
 components:
   securitySchemes:
@@ -1919,23 +2016,41 @@ components:
         meta:
           $ref: '#/components/schemas/Meta'
 
-    ConsentCreate:
-      allOf:
-        - $ref: '#/components/schemas/Consent'
-        - required: [status, scope, patient]
+    ConsentVerificationRequest:
+      type: object
+      required: [patientId, minimumLevel]
+      properties:
+        patientId:
+          type: string
+          description: Patient ID to verify consent for
+        minimumLevel:
+          type: string
+          description: Minimum consent level required (e.g. general, mental_health, substance_abuse)
+        stateCode:
+          type: string
+          description: Optional state code for jurisdiction-specific consent rules
+        treatmentCategory:
+          type: string
+          description: Optional treatment category filter
 
-    ConsentResponse:
+    ConsentVerificationResult:
       type: object
       properties:
         data:
-          $ref: '#/components/schemas/Consent'
-
-    ConsentListResponse:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Consent'
+          type: object
+          description: Consent verification result (granted/denied status, consent level, and details)
+          properties:
+            granted:
+              type: boolean
+              description: Whether consent is granted at the requested level
+            level:
+              type: string
+              description: The consent level that was verified
+            patientId:
+              type: string
+              description: Patient ID that was checked
+            details:
+              type: object
+              description: Additional verification details (jurisdiction, category, etc.)
         pagination:
           $ref: '#/components/schemas/Pagination'
