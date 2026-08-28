@@ -271,12 +271,23 @@ paths:
             type: string
             enum: [planned, arrived, triaged, in-progress, finished, cancelled]
           example: "finished"
-        - name: date
+        - name: practitioner
           in: query
-          description: Date range filter (e.g., gt2024-01-01&lt2024-12-31)
+          description: Practitioner ID filter
           schema:
             type: string
-          example: "gt2024-01-01"
+        - name: start
+          in: query
+          description: Start of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: "2024-01-01T00:00:00Z"
+        - name: end
+          in: query
+          description: End of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: "2024-12-31T23:59:59Z"
         - name: limit
           in: query
           schema:
@@ -409,12 +420,18 @@ paths:
           schema:
             type: string
             enum: [registered, preliminary, final, amended, corrected, cancelled]
-        - name: date
+        - name: start
           in: query
-          description: Date range filter (ISO 8601 prefix format)
+          description: Start of date range filter (ISO 8601 timestamp)
           schema:
             type: string
-          example: "gt2024-01-01T00:00:00Z"
+          example: "2024-01-01T00:00:00Z"
+        - name: end
+          in: query
+          description: End of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: "2024-12-31T23:59:59Z"
         - name: limit
           in: query
           schema:
@@ -1010,10 +1027,26 @@ paths:
           schema:
             type: string
             enum: [proposed, booked, arrived, fulfilled, cancelled, noshow]
-        - name: date
+        - name: practitioner
           in: query
+          description: Practitioner ID filter
           schema:
             type: string
+        - name: start
+          in: query
+          description: Start of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+        - name: end
+          in: query
+          description: End of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+        - name: upcoming
+          in: query
+          description: Filter for upcoming appointments only
+          schema:
+            type: boolean
         - name: limit
           in: query
           schema:
@@ -1102,35 +1135,30 @@ paths:
   /claims:
     get:
       tags: [Claims]
-      summary: Search claims
-      operationId: searchClaims
-      parameters:
-        - name: status
-          in: query
-          schema:
-            type: string
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
-            default: 20
-        - name: offset
-          in: query
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
+      summary: Get claim reference data
+      description: Returns available claim statuses and use types (static reference data)
+      operationId: getClaimReferenceData
       responses:
         '200':
-          description: Paginated list of claims
+          description: Claim reference data (statuses and use types)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClaimListResponse'
-        '400':
-          $ref: '#/components/responses/ValidationError'
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      statuses:
+                        type: array
+                        items:
+                          type: string
+                        example: ["draft", "ready", "submitted", "accepted", "rejected", "paid", "denied"]
+                      useTypes:
+                        type: array
+                        items:
+                          type: string
+                        example: ["claim", "preauthorization", "estimate"]
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':

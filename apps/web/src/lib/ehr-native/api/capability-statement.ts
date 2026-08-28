@@ -37,7 +37,7 @@ const RESOURCE_INTERACTIONS: Record<
   Encounter: { read: true, search: true, create: true, update: true, delete: false },
   Observation: { read: true, search: true, create: true, update: true, delete: false },
   Appointment: { read: true, search: true, create: true, update: true, delete: false },
-  Claim: { read: true, search: true, create: true, update: true, delete: false },
+  Claim: { read: true, search: false, create: true, update: true, delete: false },
   DocumentReference: { read: true, search: true, create: true, update: true, delete: false },
   Consent: { read: true, search: false, create: false, update: false, delete: false },
 };
@@ -48,34 +48,31 @@ const RESOURCE_INTERACTIONS: Record<
  */
 const SEARCH_PARAMS: Partial<Record<FhirResourceType, Array<{ name: string; type: string; definition?: string }>>> = {
   Patient: [
-    { name: 'name', type: 'string' },
+    { name: 'q', type: 'string' },
     { name: 'active', type: 'token' },
-    { name: 'identifier', type: 'token' },
-    { name: 'birthdate', type: 'date' },
   ],
   Encounter: [
     { name: 'patient', type: 'reference' },
     { name: 'status', type: 'token' },
-    { name: 'date', type: 'date' },
-    { name: 'class', type: 'token' },
+    { name: 'practitioner', type: 'reference' },
+    { name: 'start', type: 'date' },
+    { name: 'end', type: 'date' },
   ],
   Observation: [
     { name: 'patient', type: 'reference' },
     { name: 'encounter', type: 'reference' },
     { name: 'code', type: 'token' },
     { name: 'status', type: 'token' },
-    { name: 'date', type: 'date' },
+    { name: 'start', type: 'date' },
+    { name: 'end', type: 'date' },
   ],
   Appointment: [
     { name: 'patient', type: 'reference' },
     { name: 'status', type: 'token' },
-    { name: 'date', type: 'date' },
     { name: 'practitioner', type: 'reference' },
-  ],
-  Claim: [
-    { name: 'patient', type: 'reference' },
-    { name: 'status', type: 'token' },
-    { name: 'use', type: 'token' },
+    { name: 'start', type: 'date' },
+    { name: 'end', type: 'date' },
+    { name: 'upcoming', type: 'token' },
   ],
 };
 
