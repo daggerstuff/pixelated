@@ -2,7 +2,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions, AIUsage } from './models/ai-types'
 import { createLLMService } from './services/llm-provider'
 import { DEFAULT_LLM_MODEL } from './constants'
-import { acquireRateLimit, RateLimitError } from './rate-limiter'
+import { acquireRateLimit } from './rate-limiter'
 import {
   executeWithFallback,
   executeStreamingWithFallback,
@@ -56,7 +56,7 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
   },
   openai: {
     name: 'OpenAI GPT',
-    baseUrl: 'https://api.openai.com/v1',
+    baseUrl: 'https://api.openai.com',
     defaultModel: 'gpt-4',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
@@ -503,7 +503,9 @@ function createAnthropicServiceAdapter(config: AIProviderConfig): AIService {
 }
 
 function createOpenAIServiceAdapter(config: AIProviderConfig): AIService {
-  const baseUrl = config.baseUrl ?? 'https://api.openai.com'
+  const rawBaseUrl = config.baseUrl ?? 'https://api.openai.com'
+  // Normalize: strip a trailing /v1 so `${baseUrl}/v1/...` never doubles the segment.
+  const baseUrl = rawBaseUrl.replace(/\/v1\/?$/, '')
 
   const createChatCompletion = async (
     messages: AIMessage[],
@@ -900,12 +902,27 @@ function createLocalServiceAdapter(config: AIProviderConfig): AIService {
 export async function createChatCompletionWithFallback(
   primary: AIProviderType,
   messages: AIMessage[],
-  options?: AIServiceOptions,
+  options?: AIServiceOptions &
+    Partial<Pick<FallbackConfig, 'maxRetries' | 'initialBackoffMs' | 'maxBackoffMs' | 'jitterFactor'>>,
 ): Promise<AICompletion> {
   const available = getAvailableProviders()
   const chain = buildFallbackChain(primary, available)
   const resolver: ServiceResolver = (provider) => getAIServiceByProvider(provider)
-  return executeWithFallback(resolver, { providers: chain }, messages, options)
+  const {
+    maxRetries,
+    initialBackoffMs,
+    maxBackoffMs,
+    jitterFactor,
+    ...aiOptions
+  } = options ?? {}
+  const fallbackConfig: FallbackConfig = {
+    providers: chain,
+    ...(maxRetries !== undefined && { maxRetries }),
+    ...(initialBackoffMs !== undefined && { initialBackoffMs }),
+    ...(maxBackoffMs !== undefined && { maxBackoffMs }),
+    ...(jitterFactor !== undefined && { jitterFactor }),
+  }
+  return executeWithFallback(resolver, fallbackConfig, messages, aiOptions)
 }
 
 /**
@@ -914,12 +931,32 @@ export async function createChatCompletionWithFallback(
 export async function createStreamingChatCompletionWithFallback(
   primary: AIProviderType,
   messages: AIMessage[],
-  options?: AIServiceOptions,
+  options?: AIServiceOptions &
+    Partial<Pick<FallbackConfig, 'maxRetries' | 'initialBackoffMs' | 'maxBackoffMs' | 'jitterFactor'>>,
 ): Promise<AsyncGenerator<AIStreamChunk, void, void>> {
   const available = getAvailableProviders()
   const chain = buildFallbackChain(primary, available)
   const resolver: ServiceResolver = (provider) => getAIServiceByProvider(provider)
-  return executeStreamingWithFallback(resolver, { providers: chain }, messages, options)
+  const {
+    maxRetries,
+    initialBackoffMs,
+    maxBackoffMs,
+    jitterFactor,
+    ...aiOptions
+  } = options ?? {}
+  const fallbackConfig: FallbackConfig = {
+    providers: chain,
+    ...(maxRetries !== undefined && { maxRetries }),
+    ...(initialBackoffMs !== undefined && { initialBackoffMs }),
+    ...(maxBackoffMs !== undefined && { maxBackoffMs }),
+    ...(jitterFactor !== undefined && { jitterFactor }),
+  }
+  return executeStreamingWithFallback(
+    resolver,
+    fallbackConfig,
+    messages,
+    aiOptions,
+  )
 }
 
 // Initialize providers on module load

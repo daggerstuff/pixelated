@@ -61,6 +61,9 @@ export function isRetryableError(error: unknown): boolean {
     return true
   }
 
+  // 4xx client errors (except 429, handled above) are non-retryable
+  if (/\b4\d\d\b/.test(msg)) return false
+
   // Default: retry on unknown errors (safer fallback)
   return true
 }

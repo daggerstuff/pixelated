@@ -237,6 +237,7 @@ export function resetAllRateLimiters(): void {
   for (const limiter of limiters.values()) {
     limiter.reset()
   }
+  limiters.clear()
 }
 
 /** Create a rate limiter with explicit options (for testing). */
