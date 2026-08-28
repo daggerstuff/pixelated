@@ -5,10 +5,13 @@
  * Integrates with the SQL function `ehr_patient_has_consent` and
  * state-specific consent rules (state-rules module).
  *
- * Phase 1: default ruleset + per-state override hook
- * Phase 3: per-state rules with legal sign-off (versioned JSON config)
+ * Phase 3: delegates state-rule evaluation to StateConsentRulesEngine,
+ * which reads versioned, legally-approved rules from PostgreSQL (cached
+ * in Redis) and falls back to Phase 1 in-memory defaults when no versioned
+ * rule exists.
  *
- * @see docs/adr/ADR-007-consent-state-rules.md
+ * @see ./state-rules/engine.ts (Phase 3 runtime evaluator)
+ * @see ./state-rules/index.ts (Phase 1 in-memory fallback)
  */
 
 import { query } from '@/lib/db'
@@ -20,11 +23,11 @@ import {
   type ConsentRow,
   type CreateConsentInput,
 } from './repository'
+import { type StateConsentRules } from './state-rules'
 import {
-  getStateRules,
-  requiresHigherConsent,
-  type StateConsentRules,
-} from './state-rules'
+  stateConsentRulesEngine,
+  type PatientConsentContext,
+} from './state-rules/engine'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -101,53 +104,25 @@ export class ConsentService {
       'none') as ConsentLevel
     const expired = this.isConsentExpired(activeConsent)
 
-    // Apply state rules if stateCode provided
+    // Apply state rules via Phase 3 engine (falls back to Phase 1 in-memory)
     let stateRules: StateConsentRules | undefined
     let stateRulesPass = true
 
     if (stateCode) {
-      stateRules = getStateRules(stateCode)
-
-      // State rules can elevate but not lower the minimum
-      const effectiveMinimum =
-        stateRules.overrideConsentLevel ?? stateRules.minimumConsentLevel
-      if (
-        requiresHigherConsent(effectiveMinimum, minimumLevel) &&
-        !requiresHigherConsent(dbConsentLevel, effectiveMinimum)
-      ) {
-        stateRulesPass = false
+      const context: PatientConsentContext = {
+        stateCode,
+        treatmentCategory,
+        tenantId,
+        patientId,
       }
 
-      // Mental health consent requirement
-      if (
-        stateRulesPass &&
-        stateRules.requiresMentalHealthConsent &&
-        treatmentCategory === 'mental_health'
-      ) {
-        if (!requiresHigherConsent(dbConsentLevel, 'limited')) {
-          stateRulesPass = false
-        }
-      }
-
-      // SUD consent requirement
-      if (
-        stateRulesPass &&
-        stateRules.requiresSUDConsent &&
-        treatmentCategory === 'substance_use_disorder'
-      ) {
-        if (!requiresHigherConsent(dbConsentLevel, 'limited')) {
-          stateRulesPass = false
-        }
-      }
-
-      // Custom validation callback
-      if (stateRulesPass && stateRules.validateConsent) {
-        stateRulesPass = stateRules.validateConsent(
-          patientId,
-          dbConsentLevel,
-          treatmentCategory,
-        )
-      }
+      const engineResult = await stateConsentRulesEngine.evaluateConsent(
+        dbConsentLevel,
+        minimumLevel,
+        context,
+      )
+      stateRules = engineResult.stateRules
+      stateRulesPass = engineResult.verified
     }
 
     const verified = hasConsent && !expired && stateRulesPass

@@ -343,7 +343,7 @@
     "medium-zoom": "latest",
     "mixpanel-browser": "^2.82.1",
     "mongo-sanitize": "^1.1.0",
-    "mongodb": "7.5.0",
+    "mongodb": "7.6.0",
     "mongodb-query-validator": "^1.4.0",
     "mongoose": "^9.9.4",
     "morgan": "^1.11.0",
