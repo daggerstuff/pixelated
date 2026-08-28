@@ -162,9 +162,8 @@ export class TreatmentPlanService {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs)
 
-    let response: Response
     try {
-      response = await fetch(`${this.apiUrl}/suggest`, {
+      const response = await fetch(`${this.apiUrl}/suggest`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -172,7 +171,15 @@ export class TreatmentPlanService {
         body: JSON.stringify(payload),
         signal: controller.signal,
       })
+
+      if (!response.ok) {
+        throw await this.handleError(response)
+      }
+
+      const data = (await response.json()) as RawSuggestionResponse
+      return this.normalizeResponse(data)
     } catch (error) {
+      if (error instanceof TreatmentPlanError) throw error
       if (error instanceof Error && error.name === 'AbortError') {
         throw new TreatmentPlanError(
           'Treatment plan service timed out',
@@ -187,13 +194,6 @@ export class TreatmentPlanService {
     } finally {
       clearTimeout(timeoutId)
     }
-
-    if (!response.ok) {
-      throw await this.handleError(response)
-    }
-
-    const data = (await response.json()) as RawSuggestionResponse
-    return this.normalizeResponse(data)
   }
 
   /**
