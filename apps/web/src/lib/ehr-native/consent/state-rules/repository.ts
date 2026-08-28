@@ -53,7 +53,7 @@ export interface StateConsentRuleRow extends QueryResultRow {
 
 export interface StateRuleAuditRow extends QueryResultRow {
   audit_id: string
-  rule_id: string
+  rule_id: string | null
   tenant_id: string | null
   state_code: string
   version: number

@@ -254,7 +254,7 @@ export const ArchiveRuleInputSchema = z.object({
 
 export const StateRuleAuditRecordSchema = z.object({
   auditId: z.string().uuid(),
-  ruleId: z.string().uuid(),
+  ruleId: z.string().uuid().nullable(),
   tenantId: z.string().uuid().nullable(),
   stateCode: StateCodeSchema,
   version: z.number().int().min(1),
