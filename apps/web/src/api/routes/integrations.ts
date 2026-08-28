@@ -101,7 +101,7 @@ router.get(
         return res.status(400).json({ error: 'tenantId is required' })
       }
       const dashboard = buildMarketplaceDashboard(tenantId)
-      return res.json(dashboard)
+      return res.json({ dashboard })
     } catch (error: unknown) {
       return res.status(500).json({
         error: 'Failed to build dashboard',

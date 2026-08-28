@@ -263,7 +263,7 @@ export const ConnectionStatusService = {
       status,
       connectedAt: connectedAt ?? existing?.connectedAt,
       lastWebhookReceivedAt: existing?.lastWebhookReceivedAt,
-      lastError: lastError ?? (status === 'error' ? lastError : undefined),
+      lastError: lastError ?? (status === 'error' ? 'Unknown error' : undefined),
       featureFlag: FeatureFlagService.get(tenantId, provider),
     };
     connectionStore.set(connectionKey(tenantId, provider), updated);

@@ -134,8 +134,6 @@ export function verifyWebhookSignature(
     }
 
     case 'twilio': {
-      // Twilio signs the full URL + sorted POST params concatenated.
-      // For JSON bodies, the "params" are empty so we just sign the URL.
       if (!requestUrl) return false;
       const expected = computeHmacSha256(requestUrl, config.secret);
       // Twilio signatures are base64, not hex.
