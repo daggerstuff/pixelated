@@ -480,7 +480,7 @@ describe('TwilioService', () => {
     })
 
     it('returns duplicate=true when event already processed', async () => {
-      mockRedisSet.mockResolvedValueOnce(null) // duplicate
+      mockRedisGet.mockResolvedValueOnce('1') // duplicate
       const event = makeWebhookEvent()
       const result = await service.processWebhook(event, 'tenant-1', 'user-1', REQUEST_URL)
       expect(result.processed).toBe(false)

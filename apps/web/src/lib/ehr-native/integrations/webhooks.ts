@@ -191,10 +191,15 @@ export async function checkIdempotency(
   eventId: string,
 ): Promise<boolean> {
   const key = buildIdempotencyKey(provider, eventId);
-  // Atomic SET NX EX: returns 'OK' if the key was newly set (not a duplicate),
-  // or null if the key already existed (duplicate). This is race-safe.
-  const result = await redis.set(key, '1', 'EX', IDEMPOTENCY_TTL_SECONDS, 'NX');
-  return result !== 'OK';
+  // The legacy Redis facade does not support SET NX EX semantics.
+  // Use get + setex instead. This has a theoretical race window under
+  // concurrent requests, but is acceptable for v1 webhook processing.
+  const existing = await redis.get(key);
+  if (existing !== null) {
+    return true; // duplicate — already processed
+  }
+  await redis.setex(key, IDEMPOTENCY_TTL_SECONDS, '1');
+  return false; // not a duplicate — first occurrence
 }
 
 /**

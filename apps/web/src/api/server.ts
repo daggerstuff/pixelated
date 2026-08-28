@@ -88,7 +88,13 @@ app.use(express.json({
     (req as express.Request & { rawBody?: string }).rawBody = buf.toString('utf8');
   },
 }))
-app.use(express.urlencoded({ limit: '10mb', extended: true }))
+app.use(express.urlencoded({
+  limit: '10mb',
+  extended: true,
+  verify: (req: express.Request, _res: express.Response, buf: Buffer) => {
+    (req as express.Request & { rawBody?: string }).rawBody = buf.toString('utf8');
+  },
+}))
 app.use(compression())
 
 // ============================================================================

@@ -497,7 +497,7 @@ describe('StripeService', () => {
     })
 
     it('returns duplicate=true when event already processed', async () => {
-      mockRedisSet.mockResolvedValueOnce(null) // simulate existing key (duplicate)
+      mockRedisGet.mockResolvedValueOnce('1') // simulate existing key (duplicate)
       const event = makeWebhookEvent()
       const result = await service.processWebhook(event, 'tenant-1', 'user-1')
       expect(result.processed).toBe(false)

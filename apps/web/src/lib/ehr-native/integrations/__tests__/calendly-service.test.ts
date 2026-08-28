@@ -449,7 +449,7 @@ describe('CalendlyService', () => {
     it('returns 200 with duplicate=true on duplicate event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisSet.mockResolvedValueOnce(null) // duplicate
+      mockRedisGet.mockResolvedValueOnce('1') // duplicate
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(result.processed).toBe(false)
@@ -462,7 +462,7 @@ describe('CalendlyService', () => {
     it('returns 200 with processed=true on valid first-time event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisSet.mockResolvedValueOnce('OK') // not duplicate
+      mockRedisGet.mockResolvedValueOnce(null) // not duplicate
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(result.processed).toBe(true)
@@ -477,18 +477,18 @@ describe('CalendlyService', () => {
     it('sets idempotency key in redis on first-time event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisSet.mockResolvedValueOnce('OK')
+      mockRedisGet.mockResolvedValueOnce(null)
       const event = makeWebhookEvent({ rawBody, signature, eventId: 'unique-evt' })
       await service.processWebhook(event, TENANT_ID, USER_ID)
-      expect(mockRedisSet).toHaveBeenCalledTimes(1)
-      const [key] = mockRedisSet.mock.calls[0]
+      expect(mockRedisSetex).toHaveBeenCalledTimes(1)
+      const [key] = mockRedisSetex.mock.calls[0]
       expect(key).toContain('webhook:idempotency:calendly:unique-evt')
     })
 
     it('passes requestUrl for signature verification', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisSet.mockResolvedValueOnce('OK')
+      mockRedisGet.mockResolvedValueOnce(null)
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(
         event,
