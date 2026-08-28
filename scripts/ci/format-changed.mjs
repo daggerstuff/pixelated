@@ -17,6 +17,7 @@ const EXCLUDED_FROM_OXFMT = new Set([
   "apps/web/src/lib/auth/index.ts",
   "apps/web/src/lib/ehr-native/gates/types.ts",
   "apps/web/src/lib/ehr-native/services/patient-service.ts",
+  "apps/web/src/lib/ehr-native/services/treatment-plan.service.ts",
   "apps/web/src/lib/encryption.ts",
   "apps/web/src/lib/fhe/encrypted-memory.ts",
   "apps/web/src/lib/graphql/redis-pubsub.ts",
