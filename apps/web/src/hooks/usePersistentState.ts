@@ -63,7 +63,10 @@ export function usePersistentState<T>(
         ...storageOptions,
       })
 
-      setState(storedValue)
+      // Preserve user-initiated updates that landed before the load
+      // completed (Sentry 16297366/1): only apply the stored value when the
+      // state still holds the untouched default.
+      setState((prev) => (prev === defaultValue ? storedValue : prev))
       lastStoredValueRef.current = storedValue
       setIsLoaded(true)
     })
