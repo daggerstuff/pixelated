@@ -16,17 +16,10 @@ export const IMPLEMENTED_FHIR_RESOURCES = [
   'Patient',
   'Encounter',
   'Observation',
-  'Condition',
-  'AllergyIntolerance',
-  'MedicationRequest',
   'Appointment',
   'Claim',
   'DocumentReference',
   'Consent',
-  'ServiceRequest',
-  'Questionnaire',
-  'QuestionnaireResponse',
-  'CarePlan',
 ] as const;
 
 export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number];
@@ -41,19 +34,12 @@ const RESOURCE_INTERACTIONS: Record<
   { read: boolean; search: boolean; create: boolean; update: boolean; delete: boolean }
 > = {
   Patient: { read: true, search: true, create: true, update: true, delete: true },
-  Encounter: { read: true, search: true, create: true, update: true, delete: true },
-  Observation: { read: true, search: true, create: true, update: true, delete: true },
-  Condition: { read: true, search: true, create: true, update: true, delete: false },
-  AllergyIntolerance: { read: true, search: true, create: true, update: true, delete: false },
-  MedicationRequest: { read: true, search: true, create: true, update: true, delete: false },
-  Appointment: { read: true, search: true, create: true, update: true, delete: true },
-  Claim: { read: true, search: true, create: true, update: true, delete: true },
+  Encounter: { read: true, search: true, create: true, update: true, delete: false },
+  Observation: { read: true, search: true, create: true, update: true, delete: false },
+  Appointment: { read: true, search: true, create: true, update: true, delete: false },
+  Claim: { read: true, search: true, create: true, update: true, delete: false },
   DocumentReference: { read: true, search: true, create: true, update: true, delete: false },
   Consent: { read: true, search: true, create: true, update: true, delete: false },
-  ServiceRequest: { read: true, search: true, create: true, update: true, delete: false },
-  Questionnaire: { read: true, search: true, create: true, update: true, delete: false },
-  QuestionnaireResponse: { read: true, search: true, create: true, update: true, delete: false },
-  CarePlan: { read: true, search: true, create: true, update: true, delete: false },
 };
 
 /**
@@ -140,7 +126,7 @@ function buildResourceEntry(type: FhirResourceType) {
  * Generates a FHIR R4 CapabilityStatement for the Pixelated EHR module.
  *
  * The statement declares:
- * - Only the 14 implemented FHIR R4 resource types
+ * - Only the 7 implemented FHIR R4 resource types
  * - Only the interactions actually supported (read, search-type, create, update, delete)
  * - Only the search parameters actually accepted by the API routes
  * - Patient compartment
