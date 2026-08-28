@@ -29,7 +29,9 @@ class PullRequestBridge:
         clean_title = title.strip()
         prefix = "feat"
         lower_t = clean_title.lower()
-        if "fix" in lower_t or "bug" in lower_t:
+        if "security" in lower_t or "audit" in lower_t:
+            prefix = "sec"
+        elif "fix" in lower_t or "bug" in lower_t:
             prefix = "fix"
         elif "refactor" in lower_t or "clean" in lower_t:
             prefix = "refactor"
@@ -37,8 +39,6 @@ class PullRequestBridge:
             prefix = "test"
         elif "docs" in lower_t:
             prefix = "docs"
-        elif "security" in lower_t or "audit" in lower_t:
-            prefix = "sec"
 
         summary = f"{prefix}({ticket_identifier}): {clean_title}"
         body = f"{description.strip()}\n\nCloses {ticket_identifier}" if description else f"Closes {ticket_identifier}"

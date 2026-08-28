@@ -63,3 +63,21 @@ export {
   type OutcomeTrendPoint,
   type OutcomeAlertResult,
 } from './outcomes.service'
+
+export {
+  OfflineSyncService,
+  offlineSyncService,
+  InMemoryStorageAdapter,
+  EncryptedLocalStorageAdapter,
+  type DraftNote,
+  type QueuedAppointmentAction,
+  type QueuedMessage,
+  type QueuedOutcomeSubmission,
+  type OfflineSyncStatus,
+  type SyncOptions,
+  type SyncResult,
+  type SyncStatus,
+  type ConflictStrategy,
+  type SecureStorageAdapter,
+} from './offline-sync.service'
+

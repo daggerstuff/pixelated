@@ -29,6 +29,7 @@ export const appointmentSchema = fhirDomainResourceSchema.extend({
     'entered-in-error',
     'checked-in',
     'no-show',
+    'noshow',
   ]),
   cancelationReason: fhirCodeableConceptSchema.optional(),
   serviceCategory: z.array(fhirCodeableConceptSchema).optional(),

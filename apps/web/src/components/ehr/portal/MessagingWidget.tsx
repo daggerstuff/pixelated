@@ -1,5 +1,10 @@
-import { MessageSquare, Plus, Send, Trash2, X } from 'lucide-react'
+import { CloudOff, MessageSquare, Plus, Send, Trash2, X } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
+
+import {
+  offlineSyncService,
+  type QueuedMessage,
+} from '@/lib/ehr-native/services/offline-sync.service'
 
 interface ThreadMessage {
   id: string
@@ -63,6 +68,8 @@ export function MessagingWidget() {
   const [submitting, setSubmitting] = useState(false)
   const [messageBody, setMessageBody] = useState('')
   const [sendingMessage, setSendingMessage] = useState(false)
+  const [isOnline, setIsOnline] = useState(true)
+  const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([])
 
   // New thread form state
   const [subject, setSubject] = useState('')
@@ -81,13 +88,20 @@ export function MessagingWidget() {
       const result = (await res.json()) as PaginatedResponse<ThreadSummary>
       setThreads(result.data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load threads')
+      // If offline, preserve any cached/optimistic threads
+      if (navigator.onLine) {
+        setError(err instanceof Error ? err.message : 'Failed to load threads')
+      }
     } finally {
       setLoading(false)
     }
   }, [])
 
   useEffect(() => {
+    const status = offlineSyncService.getStatus()
+    setIsOnline(status.isOnline)
+    setQueuedMessages(offlineSyncService.getQueuedMessages())
+
     let cancelled = false
     void (async () => {
       try {
@@ -101,7 +115,7 @@ export function MessagingWidget() {
           if (!cancelled) setThreads(result.data)
         }
       } catch (err) {
-        if (!cancelled)
+        if (!cancelled && navigator.onLine)
           setError(
             err instanceof Error ? err.message : 'Failed to load threads',
           )
@@ -109,10 +123,23 @@ export function MessagingWidget() {
         if (!cancelled) setLoading(false)
       }
     })()
+
+    const unsubOnline = offlineSyncService.on('online', () => {
+      setIsOnline(true)
+      void fetchThreads()
+    })
+    const unsubOffline = offlineSyncService.on('offline', () => setIsOnline(false))
+    const unsubQueue = offlineSyncService.on('itemQueued', () => {
+      setQueuedMessages(offlineSyncService.getQueuedMessages())
+    })
+
     return () => {
       cancelled = true
+      unsubOnline()
+      unsubOffline()
+      unsubQueue()
     }
-  }, [])
+  }, [fetchThreads])
 
   const openThread = async (threadId: string) => {
     setThreadLoading(true)
@@ -136,12 +163,17 @@ export function MessagingWidget() {
     e.preventDefault()
     if (!messageBody.trim() || !activeThread) return
     setSendingMessage(true)
+    const text = messageBody.trim()
+
     try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        throw new Error('Offline')
+      }
       const res = await fetch(`/api/portal/v1/messaging/${activeThread.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          body: messageBody.trim(),
+          body: text,
         }),
       })
       if (!res.ok) {
@@ -151,8 +183,32 @@ export function MessagingWidget() {
       const result = (await res.json()) as { data: MessageThread }
       setActiveThread(result.data)
       setMessageBody('')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send message')
+    } catch {
+      // Offline fallback: queue message and update optimistic state
+      await offlineSyncService.queueMessage({
+        threadId: activeThread.id,
+        recipientReference:
+          activeThread.participantReferences[0]?.reference ??
+          'Practitioner/assigned',
+        senderReference: 'Patient/current',
+        body: text,
+      })
+      const optimisticMsg: ThreadMessage = {
+        id: `offline_msg_${Date.now()}`,
+        senderReference: 'Patient/current',
+        recipientReference:
+          activeThread.participantReferences[0]?.reference ??
+          'Practitioner/assigned',
+        body: text,
+        sentAt: new Date().toISOString(),
+        status: 'pending',
+      }
+      setActiveThread({
+        ...activeThread,
+        messages: [...activeThread.messages, optimisticMsg],
+      })
+      setMessageBody('')
+      setQueuedMessages(offlineSyncService.getQueuedMessages())
     } finally {
       setSendingMessage(false)
     }
@@ -179,14 +235,21 @@ export function MessagingWidget() {
     if (!subject.trim() || !practitionerRef.trim() || !initialMessage.trim())
       return
     setSubmitting(true)
+    const subj = subject.trim()
+    const pracRef = practitionerRef.trim()
+    const msg = initialMessage.trim()
+
     try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        throw new Error('Offline')
+      }
       const res = await fetch('/api/portal/v1/messaging', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          subject: subject.trim(),
-          practitionerReference: `Practitioner/${practitionerRef.trim()}`,
-          initialMessage: initialMessage.trim(),
+          subject: subj,
+          practitionerReference: `Practitioner/${pracRef}`,
+          initialMessage: msg,
         }),
       })
       if (!res.ok) {
@@ -198,8 +261,28 @@ export function MessagingWidget() {
       setPractitionerRef('')
       setInitialMessage('')
       await fetchThreads()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create thread')
+    } catch {
+      // Offline fallback: queue thread creation
+      await offlineSyncService.queueMessage({
+        subject: subj,
+        recipientReference: `Practitioner/${pracRef}`,
+        senderReference: 'Patient/current',
+        body: msg,
+      })
+      setShowNewModal(false)
+      setSubject('')
+      setPractitionerRef('')
+      setInitialMessage('')
+
+      const optimisticThread: ThreadSummary = {
+        threadId: `offline_th_${Date.now()}`,
+        subject: subj,
+        messageCount: 1,
+        lastMessageAt: new Date().toISOString(),
+        participants: [{ reference: `Practitioner/${pracRef}` }],
+      }
+      setThreads((prev) => [optimisticThread, ...prev])
+      setQueuedMessages(offlineSyncService.getQueuedMessages())
     } finally {
       setSubmitting(false)
     }
@@ -229,14 +312,14 @@ export function MessagingWidget() {
         <div className="flex items-center justify-between">
           <button
             onClick={() => setActiveThread(null)}
-            className="text-sm"
+            className="flex min-h-[44px] items-center text-sm"
             style={{ color: 'var(--np-muted)' }}
           >
             ← Back to threads
           </button>
           <button
             onClick={() => void handleDeleteThread(activeThread.id)}
-            className="flex items-center gap-1 rounded px-3 py-1.5 text-xs transition-colors"
+            className="flex min-h-[44px] items-center gap-1 rounded px-3 py-1.5 text-xs transition-colors"
             style={{
               background: 'var(--np-elevated)',
               color: 'var(--np-muted)',
@@ -309,6 +392,7 @@ export function MessagingWidget() {
                     >
                       {senderDisplay(msg.senderReference)} ·{' '}
                       {formatTime(msg.sentAt)}
+                      {msg.status === 'pending' && ' (Queued offline)'}
                     </span>
                   </div>
                 </div>
@@ -327,7 +411,7 @@ export function MessagingWidget() {
               value={messageBody}
               onChange={(e) => setMessageBody(e.target.value)}
               placeholder="Type a message..."
-              className="min-w-0 flex-1 rounded border-0 px-3 py-2 text-sm"
+              className="min-h-[44px] min-w-0 flex-1 rounded border-0 px-3 py-2 text-sm"
               style={{
                 background: 'var(--np-elevated)',
                 color: 'var(--np-text)',
@@ -336,11 +420,12 @@ export function MessagingWidget() {
             <button
               type="submit"
               disabled={sendingMessage || !messageBody.trim()}
-              className="flex min-h-[44px] items-center gap-1 rounded px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center gap-1 rounded px-3 py-2 text-sm font-medium transition-colors disabled:opacity-50"
               style={{ background: 'var(--np-text)', color: 'var(--np-bg)' }}
+              aria-label="Send message"
             >
               <Send className="h-4 w-4" />
-              Send
+              <span>Send</span>
             </button>
           </form>
         </div>
@@ -371,17 +456,28 @@ export function MessagingWidget() {
           >
             Secure Messages
           </h2>
-          <p className="mt-1 text-sm" style={{ color: 'var(--np-muted)' }}>
-            Communicate with your care team
-          </p>
+          <div className="mt-1 flex items-center gap-2 text-sm" style={{ color: 'var(--np-muted)' }}>
+            <span>Communicate with your care team</span>
+            {!isOnline && (
+              <span className="flex items-center gap-1 text-xs text-amber-400 font-medium">
+                <CloudOff className="h-3.5 w-3.5" /> Offline Mode
+              </span>
+            )}
+            {queuedMessages.length > 0 && (
+              <span className="text-xs text-amber-400 font-medium">
+                ({queuedMessages.length} queued)
+              </span>
+            )}
+          </div>
         </div>
         <button
           onClick={() => setShowNewModal(true)}
-          className="flex min-h-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors"
+          className="flex min-h-[44px] min-w-[44px] items-center gap-2 rounded px-4 py-2 text-sm font-medium transition-colors"
           style={{ background: 'var(--np-elevated)', color: 'var(--np-text)' }}
+          aria-label="New Message Thread"
         >
           <Plus className="h-4 w-4" />
-          New Thread
+          <span>New Thread</span>
         </button>
       </div>
 
@@ -420,7 +516,7 @@ export function MessagingWidget() {
             <button
               key={thread.threadId}
               onClick={() => void openThread(thread.threadId)}
-              className="w-full rounded p-4 text-left transition-colors"
+              className="min-h-[44px] w-full rounded p-4 text-left transition-colors"
               style={{
                 background: 'var(--np-surface)',
                 border: '1px solid var(--np-line)',
@@ -476,6 +572,7 @@ export function MessagingWidget() {
               <button
                 onClick={() => setShowNewModal(false)}
                 style={{ color: 'var(--np-muted)' }}
+                className="min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -496,7 +593,7 @@ export function MessagingWidget() {
                   onChange={(e) => setSubject(e.target.value)}
                   required
                   maxLength={200}
-                  className="w-full rounded border-0 px-3 py-2 text-sm"
+                  className="min-h-[44px] w-full rounded border-0 px-3 py-2 text-sm"
                   style={{
                     background: 'var(--np-surface)',
                     color: 'var(--np-text)',
@@ -517,7 +614,7 @@ export function MessagingWidget() {
                   value={practitionerRef}
                   onChange={(e) => setPractitionerRef(e.target.value)}
                   required
-                  className="w-full rounded border-0 px-3 py-2 text-sm"
+                  className="min-h-[44px] w-full rounded border-0 px-3 py-2 text-sm"
                   style={{
                     background: 'var(--np-surface)',
                     color: 'var(--np-text)',
@@ -551,7 +648,7 @@ export function MessagingWidget() {
                 <button
                   type="button"
                   onClick={() => setShowNewModal(false)}
-                  className="rounded px-4 py-2 text-sm transition-colors"
+                  className="min-h-[44px] rounded px-4 py-2 text-sm transition-colors"
                   style={{
                     background: 'var(--np-surface)',
                     color: 'var(--np-muted)',
@@ -562,7 +659,7 @@ export function MessagingWidget() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="rounded px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
+                  className="min-h-[44px] rounded px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50"
                   style={{
                     background: 'var(--np-text)',
                     color: 'var(--np-bg)',
