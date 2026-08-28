@@ -81,7 +81,7 @@ jobs:
         run: pnpm run build
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-          JWT_SECRET: test-jwt-secret-for-ci-only-do-not-use-in-production
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Validate browser test targets
         run: |
@@ -165,7 +165,7 @@ jobs:
           export DISABLE_PLAYWRIGHT_WEBSERVER=true
           export DISABLE_WEB_FONTS=true
           export SKIP_MSW=true
-          export JWT_SECRET=test-jwt-secret-for-ci-only-do-not-use-in-production
+          export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           export BASE_URL="${PREVIEW_URL}"
         env:
           CI: true
