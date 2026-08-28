@@ -222,8 +222,8 @@ jobs:
           helm repo add traefik https://traefik.github.io/charts --force-update
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
           helm repo add grafana https://grafana.github.io/helm-charts --force-update
-          helm dep update ai/helm/pixel-voice
-          helm dep update ai/infrastructure/helm/pixelated-empathy
+          helm dep update ai/inference/deployment/pixel-voice
+          helm dep update ai/inference/deployment/helm/pixelated-empathy
 
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
@@ -259,7 +259,7 @@ jobs:
           framework: terraform,terraform_plan,bicep
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
-          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,infra/docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/inference/deployment/pixel-voice,infra/docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -269,7 +269,7 @@ jobs:
         id: checkov_helm
         uses: bridgecrewio/checkov-action@v12.3119.0
         with:
-          directory: ai/helm/pixel-voice
+          directory: ai/inference/deployment/pixel-voice
           framework: kubernetes,helm
           output_format: sarif
           output_file_path: checkov-helm-results.sarif
