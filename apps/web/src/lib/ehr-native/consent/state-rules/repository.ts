@@ -10,6 +10,7 @@
  * @see db/migrations/016_state_consent_rules.sql
  */
 
+import type { PoolClient } from 'pg'
 import type { QueryResultRow } from '@/lib/db'
 import { query, transaction } from '@/lib/db'
 
@@ -746,12 +747,7 @@ export class StateConsentRulesRepository {
    * Must be called within a transaction.
    */
   private async insertAuditLog(
-    client: {
-      query: <T extends QueryResultRow = QueryResultRow>(
-        text: string,
-        params?: unknown[],
-      ) => Promise<{ rows: T[] }>
-    },
+    client: PoolClient,
     entry: {
       ruleId: string
       tenantId: string | null
