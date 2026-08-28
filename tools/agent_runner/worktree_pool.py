@@ -25,9 +25,7 @@ class GitWorktreePool:
     """Manages ephemeral git worktrees ensuring agents never race on working directories."""
 
     def __init__(self, worktrees_dir: str | None = None):
-        default_dir = os.path.expanduser("~/.local/state/agent-runner/worktrees")
-        self.worktrees_dir = os.path.abspath(worktrees_dir or default_dir)
-        os.makedirs(self.worktrees_dir, exist_ok=True)
+        self.worktrees_dir = os.path.abspath(worktrees_dir) if worktrees_dir else None
         self._lock = threading.Lock()
 
     def acquire_worktree(self, repo_path: str, ticket_identifier: str, agent_name: str) -> WorktreeLease:
@@ -35,7 +33,9 @@ class GitWorktreePool:
         with self._lock:
             clean_ticket = ticket_identifier.lower().replace(":", "_").replace("/", "_")
             branch_name = f"agent/{agent_name}/{clean_ticket}"
-            worktree_path = os.path.join(self.worktrees_dir, f"{clean_ticket}_{agent_name}")
+            base_dir = self.worktrees_dir or os.path.join(repo_path, ".worktrees")
+            os.makedirs(base_dir, exist_ok=True)
+            worktree_path = os.path.join(base_dir, f"{clean_ticket}_{agent_name}")
 
             # Clean up existing worktree if present
             if os.path.exists(worktree_path):
