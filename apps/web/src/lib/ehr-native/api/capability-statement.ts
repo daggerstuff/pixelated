@@ -39,7 +39,7 @@ const RESOURCE_INTERACTIONS: Record<
   Appointment: { read: true, search: true, create: true, update: true, delete: false },
   Claim: { read: true, search: true, create: true, update: true, delete: false },
   DocumentReference: { read: true, search: true, create: true, update: true, delete: false },
-  Consent: { read: true, search: true, create: true, update: true, delete: false },
+  Consent: { read: true, search: true, create: true, update: false, delete: false },
 };
 
 /**

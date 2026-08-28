@@ -208,7 +208,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-    put:
+    patch:
       tags: [Patients]
       summary: Update a patient
       operationId: updatePatient
@@ -355,7 +355,7 @@ paths:
                 $ref: '#/components/schemas/EncounterResponse'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags: [Encounters]
       summary: Update an encounter
       operationId: updateEncounter
@@ -376,17 +376,6 @@ paths:
                 $ref: '#/components/schemas/EncounterResponse'
         '400':
           $ref: '#/components/responses/ValidationError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags: [Encounters]
-      summary: Delete an encounter
-      operationId: deleteEncounter
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      responses:
-        '204':
-          description: Encounter deleted
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -527,7 +516,7 @@ paths:
                 $ref: '#/components/schemas/ObservationResponse'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags: [Observations]
       summary: Update an observation
       operationId: updateObservation
@@ -548,17 +537,6 @@ paths:
                 $ref: '#/components/schemas/ObservationResponse'
         '400':
           $ref: '#/components/responses/ValidationError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags: [Observations]
-      summary: Delete an observation
-      operationId: deleteObservation
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      responses:
-        '204':
-          description: Observation deleted
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -887,7 +865,7 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-    put:
+    post:
       tags: [Outcomes]
       summary: Update outcome configuration for a patient
       operationId: updateOutcomeConfig
@@ -1033,7 +1011,7 @@ paths:
                 $ref: '#/components/schemas/AppointmentResponse'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags: [Appointments]
       summary: Update an appointment
       operationId: updateAppointment
@@ -1054,17 +1032,6 @@ paths:
                 $ref: '#/components/schemas/AppointmentResponse'
         '400':
           $ref: '#/components/responses/ValidationError'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags: [Appointments]
-      summary: Cancel an appointment
-      operationId: deleteAppointment
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      responses:
-        '204':
-          description: Appointment cancelled
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1141,7 +1108,7 @@ paths:
                 $ref: '#/components/schemas/ClaimResponse'
         '404':
           $ref: '#/components/responses/NotFound'
-    put:
+    patch:
       tags: [Claims]
       summary: Update a claim
       operationId: updateClaim
@@ -1160,17 +1127,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ClaimResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags: [Claims]
-      summary: Withdraw a claim
-      operationId: deleteClaim
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      responses:
-        '204':
-          description: Claim withdrawn
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -1244,38 +1200,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConsentResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    put:
-      tags: [Consents]
-      summary: Update a consent
-      operationId: updateConsent
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ConsentCreate'
-      responses:
-        '200':
-          description: Consent updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConsentResponse'
-        '404':
-          $ref: '#/components/responses/NotFound'
-    delete:
-      tags: [Consents]
-      summary: Revoke a consent
-      operationId: deleteConsent
-      parameters:
-        - $ref: '#/components/parameters/ResourceId'
-      responses:
-        '204':
-          description: Consent revoked
         '404':
           $ref: '#/components/responses/NotFound'
 
