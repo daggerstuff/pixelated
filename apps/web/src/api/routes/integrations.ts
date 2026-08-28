@@ -398,6 +398,9 @@ router.post(
       (body['id'] as string) ??
       (body['event_id'] as string) ??
       (body['uuid'] as string) ??
+      (body['MessageSid'] as string) ??
+      (body['SmsSid'] as string) ??
+      (body['CallSid'] as string) ??
       crypto.randomUUID()
 
     const eventType =
