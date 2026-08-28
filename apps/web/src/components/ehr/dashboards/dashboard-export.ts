@@ -123,7 +123,12 @@ export async function exportDashboardPDF(
   const res = await fetch(PDF_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data, options }),
+    body: JSON.stringify({
+      type: data.dashboard,
+      filter: data.filters,
+      title: data.title,
+      options,
+    }),
   });
   if (!res.ok) {
     throw new Error(`PDF export failed: ${res.status} ${res.statusText}`);

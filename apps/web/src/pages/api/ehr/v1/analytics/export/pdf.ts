@@ -57,9 +57,9 @@ export const POST = withV1Contract('exportDashboardPDF', async (ctx, caller) => 
   if (!perm.allowed) return perm.response
 
   const filter: DashboardFilter = raw.filter ?? {}
-  if (filter.provider) filter.provider = sanitizeSearchParam(filter.provider, 64)
-  if (filter.location) filter.location = sanitizeSearchParam(filter.location, 64)
-  if (filter.payer) filter.payer = sanitizeSearchParam(filter.payer, 64)
+  if (filter.providerId) filter.providerId = sanitizeSearchParam(filter.providerId, 64)
+  if (filter.siteId) filter.siteId = sanitizeSearchParam(filter.siteId, 64)
+  if (filter.payerId) filter.payerId = sanitizeSearchParam(filter.payerId, 64)
 
   const service = new AnalyticsService(perm.rlsContext)
 

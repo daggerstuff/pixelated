@@ -76,9 +76,9 @@ export const GET = withV1Contract('getDashboard', async (ctx, caller) => {
   if (startDate && endDate) {
     filter.timeRange = { start: startDate, end: endDate }
   }
-  if (provider) filter.provider = sanitizeSearchParam(provider, 64)
-  if (location) filter.location = sanitizeSearchParam(location, 64)
-  if (payer) filter.payer = sanitizeSearchParam(payer, 64)
+  if (provider) filter.providerId = sanitizeSearchParam(provider, 64)
+  if (location) filter.siteId = sanitizeSearchParam(location, 64)
+  if (payer) filter.payerId = sanitizeSearchParam(payer, 64)
 
   const service = new AnalyticsService(perm.rlsContext)
 

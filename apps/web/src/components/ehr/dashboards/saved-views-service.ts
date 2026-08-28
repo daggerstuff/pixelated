@@ -59,7 +59,7 @@ async function saveViewToAPI(userId: string, view: DashboardLayout): Promise<Das
   const res = await fetch(`${API_BASE}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, view }),
+    body: JSON.stringify({ ...view, ownerId: userId }),
   });
   if (!res.ok) throw new Error(`Failed to save view: ${res.status}`);
   const body = (await res.json()) as { view: DashboardLayout };
@@ -67,14 +67,14 @@ async function saveViewToAPI(userId: string, view: DashboardLayout): Promise<Das
 }
 
 async function deleteViewFromAPI(userId: string, viewId: string): Promise<void> {
-  const res = await fetch(`${API_BASE}?userId=${encodeURIComponent(userId)}&viewId=${encodeURIComponent(viewId)}`, {
+  const res = await fetch(`${API_BASE}?id=${encodeURIComponent(viewId)}`, {
     method: 'DELETE',
   });
   if (!res.ok) throw new Error(`Failed to delete view: ${res.status}`);
 }
 
 async function setDefaultViewAPI(userId: string, dashboard: DashboardType, viewId: string): Promise<void> {
-  const res = await fetch(`${API_BASE}/default`, {
+  const res = await fetch(`${API_BASE}?id=${encodeURIComponent(viewId)}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, dashboard, viewId }),
