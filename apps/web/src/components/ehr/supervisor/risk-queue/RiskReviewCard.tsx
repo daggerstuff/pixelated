@@ -31,7 +31,7 @@ const RISK_LEVEL_STYLES: Record<string, string> = {
 
 const AI_SOURCE_LABELS: Record<string, string> = {
   'nim-hetzner': 'NIM (Hetzner)',
-  nvidia: 'NVIDIA NIM',
+  'nvidia': 'NVIDIA NIM',
   'local-fallback': 'Local Fallback',
 }
 
@@ -42,7 +42,8 @@ export function RiskReviewCard({
   disabled = false,
 }: RiskReviewCardProps) {
   const riskStyle = RISK_LEVEL_STYLES[review.riskLevel] ?? RISK_LEVEL_STYLES.low
-  const aiLabel = AI_SOURCE_LABELS[review.aiSystemSource] ?? review.aiSystemSource
+  const aiLabel =
+    AI_SOURCE_LABELS[review.aiSystemSource] ?? review.aiSystemSource
   const isPending = review.state === 'pending_clinician_review'
 
   return (
@@ -62,9 +63,7 @@ export function RiskReviewCard({
             Score: {review.riskScore.toFixed(2)}
           </span>
         </div>
-        <span className="text-xs text-gray-400">
-          {aiLabel}
-        </span>
+        <span className="text-xs text-gray-400">{aiLabel}</span>
       </div>
 
       <div className="mt-3 space-y-1 text-sm text-gray-600">

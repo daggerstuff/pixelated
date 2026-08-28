@@ -6,11 +6,5 @@
  * (Supervisor Review Queue).
  */
 
-export {
-  RiskReviewQueue,
-  type RiskReviewQueueProps,
-} from './RiskReviewQueue'
-export {
-  RiskReviewCard,
-  type RiskReviewCardProps,
-} from './RiskReviewCard'
+export { RiskReviewQueue, type RiskReviewQueueProps } from './RiskReviewQueue'
+export { RiskReviewCard, type RiskReviewCardProps } from './RiskReviewCard'

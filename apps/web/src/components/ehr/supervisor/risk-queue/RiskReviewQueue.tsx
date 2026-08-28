@@ -42,9 +42,7 @@ export function RiskReviewQueue({
     setLoading(true)
     setError(null)
     try {
-      const loaded = patientId
-        ? service.getReviewsForPatient(patientId)
-        : []
+      const loaded = patientId ? service.getReviewsForPatient(patientId) : []
       // Filter to pending reviews only — full queue will have filters in F3.2
       setReviews(loaded.filter((r) => r.state === 'pending_clinician_review'))
     } catch (e) {
@@ -54,27 +52,18 @@ export function RiskReviewQueue({
     }
   }, [service, patientId])
 
-  const handleApprove = useCallback(
-    (_reviewId: string) => {
-      // Stub: F3.2 will call service.reviewRiskScore({ approved: true })
-      // and refresh the queue
-    },
-    [],
-  )
+  const handleApprove = useCallback((_reviewId: string) => {
+    // Stub: F3.2 will call service.reviewRiskScore({ approved: true })
+    // and refresh the queue
+  }, [])
 
-  const handleReject = useCallback(
-    (_reviewId: string, _reason: string) => {
-      // Stub: F3.2 will call service.reviewRiskScore({ approved: false, rejectionReason })
-      // and refresh the queue
-    },
-    [],
-  )
+  const handleReject = useCallback((_reviewId: string, _reason: string) => {
+    // Stub: F3.2 will call service.reviewRiskScore({ approved: false, rejectionReason })
+    // and refresh the queue
+  }, [])
 
   return (
-    <div
-      className="space-y-4"
-      data-testid="risk-review-queue"
-    >
+    <div className="space-y-4" data-testid="risk-review-queue">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
           Risk Review Queue
@@ -121,8 +110,8 @@ export function RiskReviewQueue({
 
       {/* Stub notice: full implementation in F3.2 */}
       <p className="text-xs text-gray-400">
-        Supervisor review queue — stub for F3.2. Full filtering, pagination,
-        and clinician notification will be implemented in F3.2.
+        Supervisor review queue — stub for F3.2. Full filtering, pagination, and
+        clinician notification will be implemented in F3.2.
       </p>
     </div>
   )

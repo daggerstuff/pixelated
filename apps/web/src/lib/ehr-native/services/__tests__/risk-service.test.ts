@@ -102,7 +102,10 @@ const crisisRiskResponse = {
   confidence_score: 0.91,
   requires_supervisor_review: true,
   requires_crisis_protocol: true,
-  recommended_actions: ['Emergency protocol activation', '988 crisis line referral'],
+  recommended_actions: [
+    'Emergency protocol activation',
+    '988 crisis line referral',
+  ],
   audit_entry_id: 'audit-003',
 }
 
@@ -267,7 +270,9 @@ describe('RiskStratificationService', () => {
       const result = await service.stratifyRisk(validRequest)
 
       expect(result.gateAccepted).toBe(false)
-      expect(result.gateError).toBe('BAA not confirmed for provider nim-hetzner')
+      expect(result.gateError).toBe(
+        'BAA not confirmed for provider nim-hetzner',
+      )
       expect(result.gateReview).toBeNull()
     })
 
@@ -402,9 +407,7 @@ describe('RiskStratificationService', () => {
 
       const { RiskStratificationService } = await importService()
       const service = new RiskStratificationService(rlsContext)
-      await expect(service.checkHealth()).rejects.toThrow(
-        /Health check failed/,
-      )
+      await expect(service.checkHealth()).rejects.toThrow(/Health check failed/)
     })
 
     it('should call /health endpoint', async () => {
