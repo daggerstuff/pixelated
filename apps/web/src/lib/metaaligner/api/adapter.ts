@@ -105,6 +105,7 @@ export class LLMAdapter {
       content: rawOutput.content,
       metadata: {
         ...rawOutput.metadata,
+        provider: 'MentalLLaMA',
         finishReason: rawOutput.finishReason,
         tokenUsage: rawOutput.tokenUsage,
         model: rawOutput.model,
