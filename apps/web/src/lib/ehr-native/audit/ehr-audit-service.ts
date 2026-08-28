@@ -582,7 +582,10 @@ export class EHRAuditService {
     return this.log(
       action,
       resourceType,
-      resourceId ?? input.reviewId ?? input.flagId ?? input.noteId ??
+      resourceId ??
+        input.reviewId ??
+        input.flagId ??
+        input.noteId ??
         input.sessionId,
       {
         ...input,
@@ -597,8 +600,11 @@ export class EHRAuditService {
           sessionId: input.sessionId,
           resourceType,
           resourceId:
-            resourceId ?? input.reviewId ?? input.flagId ?? input.noteId ??
-              input.sessionId,
+            resourceId ??
+            input.reviewId ??
+            input.flagId ??
+            input.noteId ??
+            input.sessionId,
         },
       },
     )
