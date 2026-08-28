@@ -4,6 +4,7 @@ import {
   stateConsentRulesRepository,
   type ActorContext,
 } from '@/lib/ehr-native/consent/state-rules/repository'
+import { stateConsentRulesCache } from '@/lib/ehr-native/consent/state-rules/cache'
 
 export const prerender = false
 
@@ -46,7 +47,7 @@ export const POST = async ({ request, cookies, params }: BaseAPIContext) => {
 
     const actor: ActorContext = {
       userId: admin.userId,
-      role: 'complianceOfficer',
+      role: admin.role,
     }
 
     const rule = await stateConsentRulesRepository.activate(ruleId, actor, notes)
@@ -59,6 +60,8 @@ export const POST = async ({ request, cookies, params }: BaseAPIContext) => {
         },
       )
     }
+
+    await stateConsentRulesCache.invalidate(rule.stateCode, rule.tenantId)
 
     return new Response(JSON.stringify({ rule }), {
       status: 200,

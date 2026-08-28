@@ -256,16 +256,30 @@ export class StateConsentRulesRepository {
   }
 
   /**
-   * Get the active rule for a state, using the SQL function.
+   * Get the active rule for a state.
    * Tries tenant-specific first, falls back to global (NULL tenant).
    */
   async getActiveRule(
     stateCode: string,
     tenantId?: string | null,
   ): Promise<StateConsentRuleRecord | null> {
+    if (tenantId) {
+      const tenantResult = await query<StateConsentRuleRow>(
+        `SELECT * FROM ehr_state_consent_rules
+         WHERE state_code = $1 AND status = 'active' AND tenant_id = $2
+         ORDER BY version DESC LIMIT 1`,
+        [stateCode, tenantId],
+      )
+      if (tenantResult.rows[0]) {
+        return mapRuleRow(tenantResult.rows[0] as StateConsentRuleRow)
+      }
+    }
+
     const result = await query<StateConsentRuleRow>(
-      `SELECT * FROM ehr_get_active_state_consent_rules($1, $2)`,
-      [stateCode, tenantId ?? null],
+      `SELECT * FROM ehr_state_consent_rules
+       WHERE state_code = $1 AND status = 'active' AND tenant_id IS NULL
+       ORDER BY version DESC LIMIT 1`,
+      [stateCode],
     )
     return result.rows[0] ? mapRuleRow(result.rows[0] as StateConsentRuleRow) : null
   }
@@ -540,9 +554,12 @@ export class StateConsentRulesRepository {
     actor: ActorContext,
     notes?: string,
   ): Promise<StateConsentRuleRecord | null> {
+    const rule = await this.getById(ruleId)
+    if (!rule || rule.status === 'active') return null
+
     return await this.transitionStatus(
       ruleId,
-      null, // allow from any non-active status
+      rule.status,
       'archived',
       'archive',
       actor,
@@ -572,32 +589,24 @@ export class StateConsentRulesRepository {
       if (!ruleResult.rows[0]) return false
       const row = ruleResult.rows[0] as StateConsentRuleRow
 
+      await this.insertAuditLog(client, {
+        ruleId: row.rule_id,
+        tenantId: row.tenant_id,
+        stateCode: row.state_code,
+        version: row.version,
+        action: 'delete',
+        actorId: actor.userId,
+        actorRole: actor.role,
+        oldStatus: 'draft',
+        newStatus: null,
+        changes: { deleted: true },
+      })
+
       const result = await client.query(
         `DELETE FROM ehr_state_consent_rules
          WHERE rule_id = $1 AND status = 'draft'`,
         [ruleId],
       )
-
-      if ((result.rowCount ?? 0) > 0) {
-        // Audit log (audit table has ON DELETE CASCADE, so we log before the delete cascades)
-        // Actually the audit entry survives because it's in a separate table with CASCADE
-        // But the rule is deleted, so we need to insert audit BEFORE deleting
-        // The CASCADE will handle existing audit entries, but we want to log the delete action
-        // Since audit table references rule_id with ON DELETE CASCADE, and the rule is deleted,
-        // we can't insert audit after delete. Let's insert before.
-        await this.insertAuditLog(client, {
-          ruleId: row.rule_id,
-          tenantId: row.tenant_id,
-          stateCode: row.state_code,
-          version: row.version,
-          action: 'delete',
-          actorId: actor.userId,
-          actorRole: actor.role,
-          oldStatus: 'draft',
-          newStatus: null,
-          changes: { deleted: true },
-        })
-      }
 
       return (result.rowCount ?? 0) > 0
     })

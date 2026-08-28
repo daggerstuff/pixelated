@@ -16,10 +16,10 @@ const JSON_HEADERS = {
   'Cache-Control': 'no-store, no-cache, must-revalidate',
 }
 
-function buildActor(admin: { userId: string }): ActorContext {
+function buildActor(admin: { userId: string; role: string }): ActorContext {
   return {
     userId: admin.userId,
-    role: 'complianceOfficer',
+    role: admin.role,
   }
 }
 
