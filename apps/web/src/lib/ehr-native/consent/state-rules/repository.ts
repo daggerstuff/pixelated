@@ -234,7 +234,7 @@ export class StateConsentRulesRepository {
 
     if (filters.stateCode) {
       conditions.push(`state_code = $${paramIdx++}`)
-      params.push(filters.stateCode)
+      params.push(filters.stateCode.toUpperCase())
     }
     if (filters.status) {
       conditions.push(`status = $${paramIdx++}`)
@@ -660,7 +660,7 @@ export class StateConsentRulesRepository {
        WHERE state_code = $1
        ORDER BY timestamp DESC
        LIMIT $2`,
-      [stateCode, limit],
+      [stateCode.toUpperCase(), limit],
     )
     return result.rows.map((row) => mapAuditRow(row as StateRuleAuditRow))
   }

@@ -39,7 +39,7 @@ export const GET = async ({ request, cookies }: BaseAPIContext) => {
 
     const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') ?? '50', 10)))
 
-    const entries = await stateConsentRulesRepository.getAuditLogByState(stateCode, limit)
+    const entries = await stateConsentRulesRepository.getAuditLogByState(stateCode.toUpperCase(), limit)
 
     return new Response(
       JSON.stringify({

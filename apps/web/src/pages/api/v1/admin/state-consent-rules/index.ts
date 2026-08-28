@@ -42,7 +42,7 @@ export const GET = async ({ request, cookies }: BaseAPIContext) => {
 
   try {
     const searchParams = new URL(request.url).searchParams
-    const stateCode = searchParams.get('stateCode') ?? undefined
+    const stateCode = searchParams.get('stateCode')?.toUpperCase() ?? undefined
     const statusParam = searchParams.get('status') ?? undefined
     const tenantId = searchParams.get('tenantId')
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
