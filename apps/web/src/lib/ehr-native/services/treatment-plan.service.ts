@@ -28,7 +28,11 @@ export type TreatmentModality =
   | 'Integrative'
   | 'Supportive'
 
-export type GoalStatus = 'proposed' | 'in_progress' | 'achieved' | 'discontinued'
+export type GoalStatus =
+  | 'proposed'
+  | 'in_progress'
+  | 'achieved'
+  | 'discontinued'
 
 export type ObjectiveStatus =
   | 'not_started'
@@ -106,8 +110,9 @@ export interface SuggestionResponseResult {
 const TREATMENT_PLAN_API_URL =
   process.env['TREATMENT_PLAN_API_URL'] ?? 'http://localhost:8101'
 
-const TREATMENT_PLAN_TIMEOUT_MS =
-  Number(process.env['TREATMENT_PLAN_TIMEOUT_MS'] ?? '30000')
+const TREATMENT_PLAN_TIMEOUT_MS = Number(
+  process.env['TREATMENT_PLAN_TIMEOUT_MS'] ?? '30000',
+)
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /* Service */
@@ -227,10 +232,7 @@ export class TreatmentPlanService {
     } catch (error) {
       if (error instanceof TreatmentPlanError) throw error
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new TreatmentPlanError(
-          'Health check timed out',
-          'TIMEOUT',
-        )
+        throw new TreatmentPlanError('Health check timed out', 'TIMEOUT')
       }
       throw new TreatmentPlanError(
         'Unable to reach treatment plan service',
@@ -247,10 +249,7 @@ export class TreatmentPlanService {
 
   private validateInput(input: SuggestionRequestInput): void {
     if (!input.patientId || input.patientId.trim().length === 0) {
-      throw new TreatmentPlanError(
-        'patientId is required',
-        'VALIDATION_ERROR',
-      )
+      throw new TreatmentPlanError('patientId is required', 'VALIDATION_ERROR')
     }
     if (!input.icd10Codes || input.icd10Codes.length === 0) {
       throw new TreatmentPlanError(
@@ -334,11 +333,7 @@ export class TreatmentPlanError extends Error {
   readonly code: TreatmentPlanErrorCode
   override readonly cause?: unknown
 
-  constructor(
-    message: string,
-    code: TreatmentPlanErrorCode,
-    cause?: unknown,
-  ) {
+  constructor(message: string, code: TreatmentPlanErrorCode, cause?: unknown) {
     super(message)
     this.name = 'TreatmentPlanError'
     this.code = code
@@ -406,7 +401,9 @@ function normalizeObjective(raw: RawMeasurableObjective): MeasurableObjective {
   }
 }
 
-function normalizeIntervention(raw: RawModalityIntervention): ModalityIntervention {
+function normalizeIntervention(
+  raw: RawModalityIntervention,
+): ModalityIntervention {
   return {
     modality: normalizeModality(raw.modality),
     intervention: raw.intervention ?? '',

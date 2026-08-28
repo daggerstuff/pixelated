@@ -53,6 +53,7 @@ export * from './telehealth.js'
 import { z } from 'zod'
 
 import { claimSchema } from './billing.js'
+import { carePlanSchema } from './care-plan.js'
 import {
   patientSchema,
   practitionerSchema,
@@ -63,7 +64,6 @@ import {
   allergyIntoleranceSchema,
   medicationRequestSchema,
 } from './clinical.js'
-import { carePlanSchema } from './care-plan.js'
 import { documentReferenceSchema } from './communication.js'
 import { consentSchema } from './consent.js'
 import {

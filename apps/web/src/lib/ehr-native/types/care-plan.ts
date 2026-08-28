@@ -69,7 +69,16 @@ export const carePlanSchema = fhirDomainResourceSchema.extend({
           .object({
             ...fhirBackboneElementSchema.shape,
             kind: z
-              .enum(['Appointment', 'Communication', 'DeviceRequest', 'MedicationRequest', 'NutritionOrder', 'Task', 'ServiceRequest', 'VisionPrescription'])
+              .enum([
+                'Appointment',
+                'Communication',
+                'DeviceRequest',
+                'MedicationRequest',
+                'NutritionOrder',
+                'Task',
+                'ServiceRequest',
+                'VisionPrescription',
+              ])
               .optional(),
             instantiatesCanonical: z.array(z.string()).optional(),
             instantiatesUri: z.array(z.string()).optional(),
