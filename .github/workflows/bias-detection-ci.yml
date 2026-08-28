@@ -60,8 +60,8 @@ jobs:
           helm repo add traefik https://traefik.github.io/charts --force-update
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
           helm repo add grafana https://grafana.github.io/helm-charts --force-update
-          helm dep update ai/helm/pixel-voice
-          helm dep update ai/infrastructure/helm/pixelated-empathy
+          helm dep update ai/inference/deployment/pixel-voice
+          helm dep update ai/inference/deployment/helm/pixelated-empathy
 
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
@@ -140,8 +140,7 @@ jobs:
       - name: Check formatting
         continue-on-error: true
         env:
-          PR_BASE_SHA:
-            ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -156,8 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     needs: [security-scan, code-quality]
-    if:
-      ${{ needs.security-scan.result == 'success' && needs.code-quality.result
+    if: ${{ needs.security-scan.result == 'success' && needs.code-quality.result
       == 'success' }}
     services:
       postgres:
@@ -337,8 +335,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ~/.cache/pip
-          key:
-            ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
+          key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
             hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
