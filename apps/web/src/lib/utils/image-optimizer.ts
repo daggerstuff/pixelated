@@ -4,7 +4,10 @@
  */
 
 import { existsSync, statSync } from 'fs'
-import { readFile, mkdir } from 'fs/promises'
+import { readdir, readFile, mkdir, writeFile } from 'fs/promises'
+import { join, extname } from 'path'
+
+import sharp from 'sharp'
 
 import {
   ALLOWED_DIRECTORIES,
@@ -47,14 +50,14 @@ const IMAGE_CONFIG = {
     SMALL_FILE: 10 * 1024, // 10KB
   },
 
-  // Output directories
+  // Output directories (relative to ALLOWED_DIRECTORIES.PUBLIC = PROJECT_ROOT/public)
   OUTPUT_DIRS: {
     optimized: validatePath(
-      'public/assets/optimized',
+      'assets/optimized',
       ALLOWED_DIRECTORIES.PUBLIC,
     ),
-    webp: validatePath('public/assets/webp', ALLOWED_DIRECTORIES.PUBLIC),
-    avif: validatePath('public/assets/avif', ALLOWED_DIRECTORIES.PUBLIC),
+    webp: validatePath('assets/webp', ALLOWED_DIRECTORIES.PUBLIC),
+    avif: validatePath('assets/avif', ALLOWED_DIRECTORIES.PUBLIC),
   },
 }
 
@@ -108,7 +111,9 @@ export class ImageOptimizer {
   async optimizeImage(imagePath: string): Promise<OptimizationResult> {
     // Validate path to prevent traversal attacks
     try {
-      validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT)
+      validatePath(imagePath, ALLOWED_DIRECTORIES.PROJECT_ROOT, {
+        allowAbsolutePath: true,
+      })
     } catch (error: unknown) {
       throw new Error(
         `Invalid image path: ${error instanceof Error ? error.message : String(error)}`,
@@ -119,7 +124,9 @@ export class ImageOptimizer {
 
     try {
       // Security: Validate path is within public assets
-      validatePath(imagePath, ALLOWED_DIRECTORIES.PUBLIC)
+      validatePath(imagePath, ALLOWED_DIRECTORIES.PUBLIC, {
+        allowAbsolutePath: true,
+      })
 
       // Check if file exists
       if (!existsSync(imagePath)) {
@@ -180,19 +187,26 @@ export class ImageOptimizer {
         }
       }
 
-      // Calculate total savings
-      const totalOptimizedSize = (result.webpSize ?? 0) + (result.avifSize ?? 0)
-      if (totalOptimizedSize > 0) {
-        result.savings = originalSize - totalOptimizedSize / 2 // Average savings
-        result.compressionRatio = originalSize / (totalOptimizedSize / 2)
-      }
+      // Calculate total savings — use the smallest optimized version as the
+      // effective serving size (browsers pick AVIF or WebP via <picture>)
+      const optimizedSizes = [
+        result.webpSize,
+        result.avifSize,
+        result.optimizedSize,
+      ].filter((s): s is number => s !== undefined && s > 0)
+
+      const bestOptimizedSize =
+        optimizedSizes.length > 0 ? Math.min(...optimizedSizes) : originalSize
+
+      result.savings = originalSize - bestOptimizedSize
+      result.compressionRatio = bestOptimizedSize > 0 ? originalSize / bestOptimizedSize : 1
 
       const processingTime = Date.now() - startTime
 
       logger.info('Image optimization completed', {
         imagePath,
         originalSize,
-        totalOptimizedSize,
+        bestOptimizedSize,
         savings: result.savings,
         compressionRatio: Math.round(result.compressionRatio * 100) / 100,
         processingTime,
@@ -243,33 +257,38 @@ export class ImageOptimizer {
   }
 
   /**
-   * Generate WebP version of image
+   * Generate WebP version of image using sharp
    */
   private async generateWebP(
     imagePath: string,
     buffer: Buffer,
   ): Promise<{ path: string; size: number } | null> {
     try {
-      // This would use sharp or similar library for actual conversion
-      // For now, return a placeholder implementation
-
       const outputPath = safeJoin(
         IMAGE_CONFIG.OUTPUT_DIRS.webp,
         this.getOptimizedFilename(imagePath, 'webp'),
       )
 
-      // Placeholder: in real implementation, would convert to WebP
-      const estimatedSize = Math.round(buffer.length * 0.75) // WebP typically 25% smaller
+      const webpBuffer = await sharp(buffer)
+        .webp({
+          quality: IMAGE_CONFIG.FORMATS.webp.quality,
+          effort: IMAGE_CONFIG.FORMATS.webp.effort,
+          lossless: IMAGE_CONFIG.FORMATS.webp.lossless,
+        })
+        .toBuffer()
+
+      await writeFile(outputPath, webpBuffer)
 
       logger.info('WebP generation completed', {
         inputPath: imagePath,
         outputPath,
-        estimatedSize,
+        originalSize: buffer.length,
+        webpSize: webpBuffer.length,
       })
 
       return {
         path: outputPath,
-        size: estimatedSize,
+        size: webpBuffer.length,
       }
     } catch (error: unknown) {
       logger.warn('WebP generation failed', {
@@ -281,33 +300,37 @@ export class ImageOptimizer {
   }
 
   /**
-   * Generate AVIF version of image
+   * Generate AVIF version of image using sharp
    */
   private async generateAVIF(
     imagePath: string,
     buffer: Buffer,
   ): Promise<{ path: string; size: number } | null> {
     try {
-      // This would use sharp or similar library for actual conversion
-      // For now, return a placeholder implementation
-
       const outputPath = safeJoin(
         IMAGE_CONFIG.OUTPUT_DIRS.avif,
         this.getOptimizedFilename(imagePath, 'avif'),
       )
 
-      // Placeholder: in real implementation, would convert to AVIF
-      const estimatedSize = Math.round(buffer.length * 0.6) // AVIF typically 40% smaller
+      const avifBuffer = await sharp(buffer)
+        .avif({
+          quality: IMAGE_CONFIG.FORMATS.avif.quality,
+          effort: IMAGE_CONFIG.FORMATS.avif.effort,
+        })
+        .toBuffer()
+
+      await writeFile(outputPath, avifBuffer)
 
       logger.info('AVIF generation completed', {
         inputPath: imagePath,
         outputPath,
-        estimatedSize,
+        originalSize: buffer.length,
+        avifSize: avifBuffer.length,
       })
 
       return {
         path: outputPath,
-        size: estimatedSize,
+        size: avifBuffer.length,
       }
     } catch (error: unknown) {
       logger.warn('AVIF generation failed', {
@@ -360,10 +383,13 @@ export class ImageOptimizer {
       (sum, r) => sum + r.originalSize,
       0,
     )
-    const totalOptimizedSize = results.reduce(
-      (sum, r) => sum + (r.webpSize ?? r.originalSize),
-      0,
-    )
+    const totalOptimizedSize = results.reduce((sum, r) => {
+      const sizes = [r.webpSize, r.avifSize, r.optimizedSize].filter(
+        (s): s is number => s !== undefined && s > 0,
+      )
+      const best = sizes.length > 0 ? Math.min(...sizes) : r.originalSize
+      return sum + best
+    }, 0)
     const totalSavings = totalOriginalSize - totalOptimizedSize
 
     logger.info('Batch image optimization completed', {
@@ -424,10 +450,13 @@ export class ImageOptimizer {
       (sum, r) => sum + r.originalSize,
       0,
     )
-    const totalOptimizedSize =
-      results.reduce((sum, r) => {
-        return sum + (r.webpSize ?? r.originalSize) + (r.avifSize ?? 0)
-      }, 0) / 2 // Average of available formats
+    const totalOptimizedSize = results.reduce((sum, r) => {
+      const sizes = [r.webpSize, r.avifSize, r.optimizedSize].filter(
+        (s): s is number => s !== undefined && s > 0,
+      )
+      const best = sizes.length > 0 ? Math.min(...sizes) : r.originalSize
+      return sum + best
+    }, 0)
 
     const totalSavings = totalOriginalSize - totalOptimizedSize
 
@@ -458,17 +487,50 @@ export const imageOptimizer = new ImageOptimizer()
 /**
  * Optimize all images in public directory
  */
-export async function optimizePublicImages(): Promise<void> {
+export async function optimizePublicImages(): Promise<OptimizationResult[]> {
   logger.info('Starting public image optimization')
 
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.webp', '.avif']
   const imagePaths: string[] = []
 
-  // Recursively find all images (this would need a proper implementation)
-  // For now, we'll work with a placeholder
+  async function findImages(dir: string): Promise<void> {
+    const entries = await readdir(dir, { withFileTypes: true })
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name)
+      if (entry.isDirectory()) {
+        if (
+          entry.name === 'node_modules' ||
+          entry.name === '.git' ||
+          entry.name === 'dist' ||
+          entry.name === 'build' ||
+          entry.name === 'optimized' ||
+          entry.name === 'webp' ||
+          entry.name === 'avif'
+        ) {
+          continue
+        }
+        await findImages(fullPath)
+      } else if (
+        imageExtensions.includes(extname(entry.name).toLowerCase()) &&
+        statSync(fullPath).size >= IMAGE_CONFIG.THRESHOLDS.SMALL_FILE
+      ) {
+        imagePaths.push(fullPath)
+      }
+    }
+  }
+
+  const publicDir = ALLOWED_DIRECTORIES.PUBLIC
+  await findImages(publicDir)
+
+  logger.info('Found images to optimize', { count: imagePaths.length })
+
+  const results = await imageOptimizer.optimizeImages(imagePaths)
 
   logger.info('Public image optimization completed', {
-    optimized: imagePaths.length,
+    optimized: results.length,
   })
+
+  return results
 }
 
 /**
