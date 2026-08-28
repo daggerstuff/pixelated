@@ -30,7 +30,7 @@ def test_format_commit_message():
 def test_pr_bridge_disabled(monkeypatch):
     bridge = PullRequestBridge(enabled=False)
 
-    def fake_subprocess_run(cmd, *args, **kwargs):
+    def fake_subprocess_run(cmd, *_args, **_kwargs):
         if "status" in cmd:
             return subprocess.CompletedProcess(args=cmd, returncode=0, stdout=" M file.py\n", stderr="")
         if "rev-parse" in cmd:
@@ -60,7 +60,7 @@ def test_pr_bridge_disabled_no_changes(monkeypatch):
 def test_pr_bridge_enabled_success(monkeypatch):
     bridge = PullRequestBridge(enabled=True)
 
-    def fake_subprocess_run(cmd, *args, **kwargs):
+    def fake_subprocess_run(cmd, *_args, **_kwargs):
         if "status" in cmd:
             return subprocess.CompletedProcess(args=cmd, returncode=0, stdout=" M file.py\n", stderr="")
         if "rev-parse" in cmd and "HEAD" in cmd:
@@ -86,7 +86,7 @@ def test_pr_bridge_enabled_success(monkeypatch):
 def test_pr_bridge_git_push_failure(monkeypatch):
     bridge = PullRequestBridge(enabled=True)
 
-    def fake_subprocess_run(cmd, *args, **kwargs):
+    def fake_subprocess_run(cmd, *_args, **_kwargs):
         if "status" in cmd:
             return subprocess.CompletedProcess(args=cmd, returncode=0, stdout=" M file.py\n", stderr="")
         if "rev-parse" in cmd and "HEAD" in cmd:

@@ -60,8 +60,8 @@ jobs:
           helm repo add traefik https://traefik.github.io/charts --force-update
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
           helm repo add grafana https://grafana.github.io/helm-charts --force-update
-          helm dep update ai/helm/pixel-voice
-          helm dep update ai/infrastructure/helm/pixelated-empathy
+          helm dep update ai/inference/deployment/pixel-voice
+          helm dep update ai/inference/deployment/helm/pixelated-empathy
 
       - name: Run Trivy vulnerability scanner
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
