@@ -100,6 +100,20 @@ export const EHRAuditAction = {
 
   // Break-glass
   BREAK_GLASS_ACCESS: 'break_glass_access',
+
+  // Supervisor Operations (F3.2)
+  VIEW_SUPERVISOR_CASELOAD: 'view_supervisor_caseload',
+  VIEW_REVIEW_QUEUE: 'view_review_queue',
+  VIEW_NOTE_REVIEW: 'view_note_review',
+  COSIGN_NOTE: 'cosign_note',
+  REJECT_NOTE: 'reject_note',
+  REQUEST_NOTE_CHANGES: 'request_note_changes',
+  VIEW_RISK_QUEUE: 'view_risk_queue',
+  ACKNOWLEDGE_RISK_FLAG: 'acknowledge_risk_flag',
+  RESOLVE_RISK_FLAG: 'resolve_risk_flag',
+  OBSERVE_SESSION: 'observe_session',
+  LEAVE_SESSION_OBSERVATION: 'leave_session_observation',
+  VIEW_SUPERVISOR_METRICS: 'view_supervisor_metrics',
 } as const
 
 export type EHRAuditActionType =
@@ -120,6 +134,9 @@ export const EHRResourceType = {
   MEDICATION_REQUEST: 'MedicationRequest',
   COVERAGE: 'Coverage',
   TELEHEALTH_SESSION: 'TelehealthSession',
+  PROVENANCE: 'Provenance',
+  SUPERVISOR_REVIEW: 'SupervisorReview',
+  RISK_FLAG: 'RiskFlag',
 } as const
 
 export type EHRResourceTypeValue =
@@ -213,6 +230,23 @@ export function ehrActionToEventType(
     action === EHRAuditAction.CHECK_IN_APPOINTMENT ||
     action === EHRAuditAction.COMPLETE_APPOINTMENT
   ) {
+    return AuditEventType.UPDATE
+  }
+  // Supervisor (F3.2) oversight actions are clinical write operations;
+  // classify explicitly so they never fall through to the read-access default.
+  if (
+    action === EHRAuditAction.COSIGN_NOTE ||
+    action === EHRAuditAction.REJECT_NOTE ||
+    action === EHRAuditAction.REQUEST_NOTE_CHANGES ||
+    action === EHRAuditAction.ACKNOWLEDGE_RISK_FLAG ||
+    action === EHRAuditAction.RESOLVE_RISK_FLAG
+  ) {
+    return AuditEventType.UPDATE
+  }
+  if (action === EHRAuditAction.OBSERVE_SESSION) {
+    return AuditEventType.CREATE
+  }
+  if (action === EHRAuditAction.LEAVE_SESSION_OBSERVATION) {
     return AuditEventType.UPDATE
   }
   if (action.startsWith('view_') || action.startsWith('check_')) {
