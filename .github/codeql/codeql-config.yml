@@ -14,9 +14,9 @@ query-filters:
 
 # Specify which paths to analyze
 paths:
-  - src
   - ai
   - scripts
+  - apps/web/src
 
 # Exclude generated code, dependencies, and test files
 paths-ignore:

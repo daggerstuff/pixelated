@@ -6,7 +6,7 @@
 
 import type { BaseAPIContext } from '../auth/apiRouteTypes'
 import type { AdminPermission } from './index'
-import { AdminService } from './index'
+import { AdminRole, AdminService } from './index'
 
 /**
  * Verify that the request is from an authenticated admin user
@@ -16,6 +16,7 @@ export async function verifyAdmin(
   requiredPermission?: AdminPermission,
 ): Promise<{
   userId: string
+  role: AdminRole
   isAdmin: boolean
   hasPermission: boolean
 } | null> {
@@ -51,6 +52,7 @@ export async function verifyAdmin(
 
     return {
       userId: admin.userId,
+      role: admin.role,
       isAdmin: true,
       hasPermission,
     }
