@@ -26,20 +26,20 @@ export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number];
 
 /**
  * The interactions supported per resource type.
- * Most resources support: read, search-type, create, update.
+ * Most resources support: read, search-type, create, patch.
  * Notes (DocumentReference) also support a custom "sign" operation.
  */
 const RESOURCE_INTERACTIONS: Record<
   FhirResourceType,
-  { read: boolean; search: boolean; create: boolean; update: boolean; delete: boolean }
+  { read: boolean; search: boolean; create: boolean; update: boolean; patch: boolean; delete: boolean }
 > = {
-  Patient: { read: true, search: true, create: true, update: true, delete: true },
-  Encounter: { read: true, search: true, create: true, update: true, delete: false },
-  Observation: { read: true, search: true, create: true, update: true, delete: false },
-  Appointment: { read: true, search: true, create: true, update: true, delete: false },
-  Claim: { read: true, search: false, create: true, update: true, delete: false },
-  DocumentReference: { read: true, search: true, create: true, update: true, delete: false },
-  Consent: { read: true, search: false, create: false, update: false, delete: false },
+  Patient: { read: true, search: true, create: true, update: false, patch: true, delete: true },
+  Encounter: { read: true, search: true, create: true, update: false, patch: true, delete: false },
+  Observation: { read: true, search: true, create: true, update: false, patch: true, delete: false },
+  Appointment: { read: true, search: true, create: true, update: false, patch: true, delete: false },
+  Claim: { read: true, search: false, create: true, update: false, patch: true, delete: false },
+  DocumentReference: { read: true, search: true, create: true, update: false, patch: false, delete: false },
+  Consent: { read: true, search: false, create: false, update: false, patch: false, delete: false },
 };
 
 /**
@@ -94,6 +94,7 @@ function buildResourceEntry(type: FhirResourceType) {
   if (config.search) interactions.push({ code: 'search-type' });
   if (config.create) interactions.push({ code: 'create' });
   if (config.update) interactions.push({ code: 'update' });
+  if (config.patch) interactions.push({ code: 'patch' });
   if (config.delete) interactions.push({ code: 'delete' });
 
   const entry: Record<string, unknown> = {
@@ -153,8 +154,8 @@ export function generateCapabilityStatement(): Record<string, unknown> {
       {
         mode: 'server',
         documentation:
-          'Pixelated Empathy EHR FHIR R4 API. Supports read, search, create, and update ' +
-          'operations for clinical resources with multi-tenant isolation (RLS), ' +
+           'Pixelated Empathy EHR FHIR R4 API. Supports read, search, create, and patch ' +
+           'operations for clinical resources with multi-tenant isolation (RLS), ' +
           'audit hash chaining, and consent-gated access.',
         security: {
           cors: true,
