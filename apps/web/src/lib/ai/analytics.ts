@@ -32,7 +32,7 @@ export interface AIUsageEvent {
 }
 
 /** Per-model usage breakdown. */
-export interface ModelUsageStats {
+interface ModelUsageStats {
   model: string
   totalRequests: number
   successfulRequests: number
