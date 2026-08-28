@@ -1,0 +1,225 @@
+/**
+ * FHIR R4 CapabilityStatement Generator
+ *
+ * Generates a FHIR R4 CapabilityStatement that declares ONLY the resources
+ * and operations actually implemented in the EHR module.
+ *
+ * Per ADR-002: FHIR R4 validated with Zod.
+ * Per task PIX-4408: CapabilityStatement must validate against FHIR R4 profile.
+ */
+
+/**
+ * The implemented FHIR R4 resource types in the EHR module.
+ * Each type maps to a repository + API route pair.
+ */
+export const IMPLEMENTED_FHIR_RESOURCES = [
+  'Patient',
+  'Encounter',
+  'Observation',
+  'Condition',
+  'AllergyIntolerance',
+  'MedicationRequest',
+  'Appointment',
+  'Claim',
+  'DocumentReference',
+  'Consent',
+  'ServiceRequest',
+  'Questionnaire',
+  'QuestionnaireResponse',
+  'CarePlan',
+] as const;
+
+export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number];
+
+/**
+ * The interactions supported per resource type.
+ * Most resources support: read, search-type, create, update.
+ * Notes (DocumentReference) also support a custom "sign" operation.
+ */
+const RESOURCE_INTERACTIONS: Record<
+  FhirResourceType,
+  { read: boolean; search: boolean; create: boolean; update: boolean; delete: boolean }
+> = {
+  Patient: { read: true, search: true, create: true, update: true, delete: true },
+  Encounter: { read: true, search: true, create: true, update: true, delete: true },
+  Observation: { read: true, search: true, create: true, update: true, delete: true },
+  Condition: { read: true, search: true, create: true, update: true, delete: false },
+  AllergyIntolerance: { read: true, search: true, create: true, update: true, delete: false },
+  MedicationRequest: { read: true, search: true, create: true, update: true, delete: false },
+  Appointment: { read: true, search: true, create: true, update: true, delete: true },
+  Claim: { read: true, search: true, create: true, update: true, delete: true },
+  DocumentReference: { read: true, search: true, create: true, update: true, delete: false },
+  Consent: { read: true, search: true, create: true, update: true, delete: false },
+  ServiceRequest: { read: true, search: true, create: true, update: true, delete: false },
+  Questionnaire: { read: true, search: true, create: true, update: true, delete: false },
+  QuestionnaireResponse: { read: true, search: true, create: true, update: true, delete: false },
+  CarePlan: { read: true, search: true, create: true, update: true, delete: false },
+};
+
+/**
+ * Search parameters per resource type.
+ * Only parameters actually supported by the API routes are declared.
+ */
+const SEARCH_PARAMS: Partial<Record<FhirResourceType, Array<{ name: string; type: string; definition?: string }>>> = {
+  Patient: [
+    { name: 'name', type: 'string' },
+    { name: 'active', type: 'token' },
+    { name: 'identifier', type: 'token' },
+    { name: 'birthdate', type: 'date' },
+  ],
+  Encounter: [
+    { name: 'patient', type: 'reference' },
+    { name: 'status', type: 'token' },
+    { name: 'date', type: 'date' },
+    { name: 'class', type: 'token' },
+  ],
+  Observation: [
+    { name: 'patient', type: 'reference' },
+    { name: 'encounter', type: 'reference' },
+    { name: 'code', type: 'token' },
+    { name: 'status', type: 'token' },
+    { name: 'date', type: 'date' },
+  ],
+  Appointment: [
+    { name: 'patient', type: 'reference' },
+    { name: 'status', type: 'token' },
+    { name: 'date', type: 'date' },
+    { name: 'practitioner', type: 'reference' },
+  ],
+  Claim: [
+    { name: 'patient', type: 'reference' },
+    { name: 'status', type: 'token' },
+    { name: 'use', type: 'token' },
+  ],
+  Consent: [
+    { name: 'patient', type: 'reference' },
+    { name: 'status', type: 'token' },
+    { name: 'category', type: 'token' },
+  ],
+};
+
+/**
+ * The canonical FHIR R4 profile URL for a resource type.
+ */
+function fhirProfile(type: FhirResourceType): string {
+  return `http://hl7.org/fhir/StructureDefinition/${type}`;
+}
+
+/**
+ * Builds a single resource entry for the CapabilityStatement rest.resources array.
+ */
+function buildResourceEntry(type: FhirResourceType) {
+  const config = RESOURCE_INTERACTIONS[type];
+  const interactions: Array<{ code: string }> = [];
+
+  if (config.read) interactions.push({ code: 'read' });
+  if (config.search) interactions.push({ code: 'search-type' });
+  if (config.create) interactions.push({ code: 'create' });
+  if (config.update) interactions.push({ code: 'update' });
+  if (config.delete) interactions.push({ code: 'delete' });
+
+  const entry: Record<string, unknown> = {
+    type,
+    profile: fhirProfile(type),
+    interaction: interactions,
+  };
+
+  const searchParams = SEARCH_PARAMS[type];
+  if (searchParams && searchParams.length > 0) {
+    entry.searchParam = searchParams.map((p) => ({
+      name: p.name,
+      type: p.type,
+      ...(p.definition ? { definition: p.definition } : {}),
+    }));
+  }
+
+  return entry;
+}
+
+/**
+ * Generates a FHIR R4 CapabilityStatement for the Pixelated EHR module.
+ *
+ * The statement declares:
+ * - Only the 14 implemented FHIR R4 resource types
+ * - Only the interactions actually supported (read, search-type, create, update, delete)
+ * - Only the search parameters actually accepted by the API routes
+ * - Patient compartment
+ * - SMART-on-FHIR security with API key alternative
+ *
+ * @returns A FHIR R4 CapabilityStatement resource as a plain object
+ */
+export function generateCapabilityStatement(): Record<string, unknown> {
+  const resources = IMPLEMENTED_FHIR_RESOURCES.map(buildResourceEntry);
+
+  return {
+    resourceType: 'CapabilityStatement',
+    id: 'pixelated-ehr',
+    status: 'active',
+    date: new Date().toISOString().split('T')[0],
+    publisher: 'Pixelated Empathy',
+    name: 'PixelatedEHR',
+    title: 'Pixelated EHR FHIR R4 Capability Statement',
+    kind: 'instance',
+    software: {
+      name: 'Pixelated EHR',
+      version: '1.0.0',
+    },
+    fhirVersion: '4.0.1',
+    format: ['json'],
+    patchFormat: 'application/fhir+json',
+    implementation: {
+      description: 'Pixelated Empathy EHR Module',
+      url: 'https://api.pixelatedempathy.com',
+    },
+    rest: [
+      {
+        mode: 'server',
+        documentation:
+          'Pixelated Empathy EHR FHIR R4 API. Supports read, search, create, and update ' +
+          'operations for clinical resources with multi-tenant isolation (RLS), ' +
+          'audit hash chaining, and consent-gated access.',
+        security: {
+          cors: true,
+          service: [
+            {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/restful-security-service',
+                  code: 'SMART-on-FHIR',
+                  display: 'SMART-on-FHIR',
+                },
+              ],
+              text: 'SMART-on-FHIR OAuth2',
+            },
+            {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/restful-security-service',
+                  code: 'API-Key',
+                  display: 'API Key',
+                },
+              ],
+              text: 'API Key authentication via X-API-Key header',
+            },
+          ],
+          description:
+            'Authentication via SMART-on-FHIR OAuth2 bearer token or API key (X-API-Key header). ' +
+            'API keys are SHA-256 hashed at rest with scopes (read, write, admin). ' +
+            'Multi-tenant isolation enforced via PostgreSQL Row-Level Security.',
+        },
+        resource: resources,
+        interaction: [
+          {
+            code: 'search-system',
+            documentation: 'System-level search across all resource types is not supported. Use resource-level search.',
+          },
+        ],
+        compartment: [
+          {
+            name: 'Patient',
+          },
+        ],
+      },
+    ],
+  };
+}
