@@ -214,6 +214,18 @@ export class EHRAuditService {
       action === EHRAuditAction.COMPLETE_APPOINTMENT
     )
       return EHRSeverity.UPDATE
+    // Supervisor (F3.2) oversight actions are write operations (Sentry 16294287/0).
+    if (
+      action === EHRAuditAction.COSIGN_NOTE ||
+      action === EHRAuditAction.REJECT_NOTE ||
+      action === EHRAuditAction.REQUEST_NOTE_CHANGES ||
+      action === EHRAuditAction.ACKNOWLEDGE_RISK_FLAG ||
+      action === EHRAuditAction.RESOLVE_RISK_FLAG
+    )
+      return EHRSeverity.UPDATE
+    if (action === EHRAuditAction.OBSERVE_SESSION) return EHRSeverity.CREATE
+    if (action === EHRAuditAction.LEAVE_SESSION_OBSERVATION)
+      return EHRSeverity.UPDATE
     if (action.startsWith('view_') || action.startsWith('check_'))
       return EHRSeverity.READ
     if (

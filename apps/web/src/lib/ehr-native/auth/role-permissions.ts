@@ -377,7 +377,7 @@ export const CLINICAL_ROLE_DEFINITIONS: Record<
       'break_glass',
       'audit_access',
     ],
-    inherits: ['therapist'],
+    inherits: [],
   },
   socialWorker: {
     name: 'socialWorker',

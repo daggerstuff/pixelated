@@ -183,6 +183,10 @@ describe('resolveRolePermissions (inheritance)', () => {
     expect(supervisorPerms.has('read_clinical_note')).toBe(true)
     expect(supervisorPerms.has('read_patient')).toBe(true)
     expect(supervisorPerms.has('audit_access')).toBe(true)
+    // Regression (Sentry 16291190/0): supervisor must NOT transitively gain
+    // medication/procedure write authority via the therapist -> nurse chain.
+    expect(supervisorPerms.has('write_medication')).toBe(false)
+    expect(supervisorPerms.has('write_procedure')).toBe(false)
   })
 
   it('systemAdmin inherits physician permissions', () => {

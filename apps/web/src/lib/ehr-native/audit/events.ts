@@ -232,6 +232,23 @@ export function ehrActionToEventType(
   ) {
     return AuditEventType.UPDATE
   }
+  // Supervisor (F3.2) oversight actions are clinical write operations;
+  // classify explicitly so they never fall through to the read-access default.
+  if (
+    action === EHRAuditAction.COSIGN_NOTE ||
+    action === EHRAuditAction.REJECT_NOTE ||
+    action === EHRAuditAction.REQUEST_NOTE_CHANGES ||
+    action === EHRAuditAction.ACKNOWLEDGE_RISK_FLAG ||
+    action === EHRAuditAction.RESOLVE_RISK_FLAG
+  ) {
+    return AuditEventType.UPDATE
+  }
+  if (action === EHRAuditAction.OBSERVE_SESSION) {
+    return AuditEventType.CREATE
+  }
+  if (action === EHRAuditAction.LEAVE_SESSION_OBSERVATION) {
+    return AuditEventType.UPDATE
+  }
   if (action.startsWith('view_') || action.startsWith('check_')) {
     return AuditEventType.ACCESS
   }
