@@ -41,16 +41,22 @@ class VerificationEngine:
             )
             files = [line.strip().split()[-1] for line in status_res.stdout.splitlines() if line.strip()]
 
-            # Target only the modified TypeScript/React/Astro files for oxlint
-            ts_files = [f for f in files if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx"))]
+            # Auto-format modified files with prettier before linting
+            ts_files = [f for f in files if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx", ".json"))]
             if ts_files:
+                subprocess.run(
+                    ["pnpm", "exec", "prettier", "--write"] + ts_files,
+                    cwd=workdir,
+                    capture_output=True,
+                    check=False,
+                )
                 ts_args = " ".join(ts_files)
                 checks.append(f"pnpm exec oxlint --type-aware -c .oxlintrc.json {ts_args}")
                 checks.append("pnpm lint:no-suppressions")
 
             test_ts_files = [f for f in files if f.endswith((".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"))]
             for tf in test_ts_files:
-                checks.append(f"pnpm vitest run -c config/vitest.config.ts {tf}")
+                checks.append(f"pnpm vitest run --coverage.enabled=false -c config/vitest.config.ts {tf}")
 
             # Target only the modified Python files for ruff
             py_files = [f for f in files if f.endswith(".py")]
