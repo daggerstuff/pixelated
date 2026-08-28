@@ -18,7 +18,7 @@
  * - TelehealthService (F1.12) — native telehealth sessions
  * - NoteSigningService (F2.2) — AI no auto-sign compliance gate
  * - OutcomesService (F2.4) — outcome measure trending (PHQ-9, GAD-7, OQ-45)
- * - TreatmentPlanService (F2.3) — AI-assisted treatment plan suggestions
+ * - AnalyticsService (PIX-4413) — customizable dashboard metrics, RBAC, and saved views
  */
 
 export { PatientService } from './patient-service'
@@ -80,18 +80,19 @@ export {
 } from './risk.service'
 
 export {
-  TreatmentPlanService,
-  type SuggestionRequestInput,
-  type SuggestionResponseResult,
-  type SmartGoal,
-  type MeasurableObjective,
-  type ModalityIntervention,
-  type ICD10Code,
-  type OutcomeTrendPoint,
-  type TreatmentHistoryEntry,
-  type TreatmentModality,
-  type GoalStatus,
-  type ObjectiveStatus,
-  type TreatmentPlanErrorCode,
-  TreatmentPlanError,
-} from './treatment-plan.service'
+  AnalyticsService,
+  type DashboardType,
+  type DashboardFilter,
+  type TimeRange,
+  type PracticeMetrics,
+  type OutcomesMetrics,
+  type UtilizationMetrics,
+  type BillingMetrics,
+  type ComplianceMetrics,
+  type DashboardMetrics,
+  type AnalyticsRepository,
+  canAccessDashboard,
+  getAccessibleDashboards,
+  DASHBOARD_TYPES,
+  DASHBOARD_RBAC,
+} from './analytics.service'
