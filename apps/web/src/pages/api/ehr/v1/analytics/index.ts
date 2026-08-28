@@ -34,8 +34,7 @@ export const GET = withV1Contract('getDashboard', async (ctx, caller) => {
 
   const url = new URL(ctx.request.url)
   const rawType = url.searchParams.get('type') ?? undefined
-  if (!rawType)
-    return ehrValidationError('type query parameter is required.')
+  if (!rawType) return ehrValidationError('type query parameter is required.')
 
   const type = sanitizeSearchParam(rawType, 20) as DashboardType
   if (!DASHBOARD_TYPES.includes(type))

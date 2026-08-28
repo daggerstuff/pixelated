@@ -1,21 +1,32 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react'
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts';
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts'
 
 export interface PieChartWidgetProps {
-  data: Array<{ name: string; value: number; color?: string }>;
-  innerRadius?: number;
-  outerRadius?: number;
-  showLegend?: boolean;
-  showLabels?: boolean;
-  unit?: string;
+  data: Array<{ name: string; value: number; color?: string }>
+  innerRadius?: number
+  outerRadius?: number
+  showLegend?: boolean
+  showLabels?: boolean
+  unit?: string
 }
 
 const DEFAULT_COLORS = [
-  '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
-  '#8b5cf6', '#ec4899', '#06b6d4', '#f97316',
-];
+  '#3b82f6',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#ec4899',
+  '#06b6d4',
+  '#f97316',
+]
 
 export const PieChartWidget: FC<PieChartWidgetProps> = ({
   data,
@@ -26,11 +37,12 @@ export const PieChartWidget: FC<PieChartWidgetProps> = ({
   unit,
 }) => {
   const colors = useMemo(
-    () => data.map((d, i) => d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]),
+    () =>
+      data.map((d, i) => d.color ?? DEFAULT_COLORS[i % DEFAULT_COLORS.length]),
     [data],
-  );
+  )
 
-  const isDonut = innerRadius > 0;
+  const isDonut = innerRadius > 0
 
   return (
     <div style={{ width: '100%', height: '100%', minHeight: 200 }}>
@@ -45,14 +57,24 @@ export const PieChartWidget: FC<PieChartWidgetProps> = ({
             paddingAngle={isDonut ? 2 : 1}
             dataKey="value"
             nameKey="name"
-            label={showLabels ? {
-              fill: 'var(--np-text)',
-              fontSize: 11,
-              formatter: (value: number) => unit ? `${value}${unit}` : String(value),
-            } : false}
+            label={
+              showLabels
+                ? {
+                    fill: 'var(--np-text)',
+                    fontSize: 11,
+                    formatter: (value: number) =>
+                      unit ? `${value}${unit}` : String(value),
+                  }
+                : false
+            }
           >
             {data.map((_, idx) => (
-              <Cell key={idx} fill={colors[idx]} stroke="var(--np-surface)" strokeWidth={2} />
+              <Cell
+                key={idx}
+                fill={colors[idx]}
+                stroke="var(--np-surface)"
+                strokeWidth={2}
+              />
             ))}
           </Pie>
           <Tooltip
@@ -77,12 +99,12 @@ export const PieChartWidget: FC<PieChartWidgetProps> = ({
         </PieChart>
       </ResponsiveContainer>
     </div>
-  );
-};
+  )
+}
 
 /** Convenience alias for donut charts */
-export const DonutChartWidget: FC<Omit<PieChartWidgetProps, 'innerRadius'>> = (props) => (
-  <PieChartWidget {...props} innerRadius={40} outerRadius={80} />
-);
+export const DonutChartWidget: FC<Omit<PieChartWidgetProps, 'innerRadius'>> = (
+  props,
+) => <PieChartWidget {...props} innerRadius={40} outerRadius={80} />
 
-export default PieChartWidget;
+export default PieChartWidget

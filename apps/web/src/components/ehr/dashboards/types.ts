@@ -5,18 +5,14 @@
  * @module ehr/dashboards
  */
 
-import type { ClinicalRole, EHRPermission } from '@/lib/ehr-native/auth';
+import type { ClinicalRole, EHRPermission } from '@/lib/ehr-native/auth'
 
 // ---------------------------------------------------------------------------
 // Dashboard Types
 // ---------------------------------------------------------------------------
 
 export type DashboardType =
-  | 'practice'
-  | 'outcomes'
-  | 'utilization'
-  | 'billing'
-  | 'compliance';
+  'practice' | 'outcomes' | 'utilization' | 'billing' | 'compliance'
 
 export const DASHBOARD_TYPES: readonly DashboardType[] = [
   'practice',
@@ -24,7 +20,7 @@ export const DASHBOARD_TYPES: readonly DashboardType[] = [
   'utilization',
   'billing',
   'compliance',
-] as const;
+] as const
 
 export const DASHBOARD_LABELS: Record<DashboardType, string> = {
   practice: 'Practice Overview',
@@ -32,7 +28,7 @@ export const DASHBOARD_LABELS: Record<DashboardType, string> = {
   utilization: 'Utilization',
   billing: 'Billing & Claims',
   compliance: 'Compliance & Audit',
-};
+}
 
 // ---------------------------------------------------------------------------
 // Dashboard-level RBAC
@@ -44,46 +40,40 @@ export const DASHBOARD_RBAC: Record<DashboardType, EHRPermission[]> = {
   utilization: ['read_encounter', 'read_patient'],
   billing: ['read_claim', 'submit_claim'],
   compliance: ['audit_access', 'read_patient'],
-};
+}
 
 // ---------------------------------------------------------------------------
 // Widget Types
 // ---------------------------------------------------------------------------
 
-export type WidgetSize = 'small' | 'medium' | 'large' | 'wide' | 'tall';
+export type WidgetSize = 'small' | 'medium' | 'large' | 'wide' | 'tall'
 
-export type WidgetCategory = 'metric' | 'chart' | 'table' | 'list';
+export type WidgetCategory = 'metric' | 'chart' | 'table' | 'list'
 
 export type ChartType =
-  | 'line'
-  | 'area'
-  | 'bar'
-  | 'pie'
-  | 'radar'
-  | 'donut'
-  | 'metric-card';
+  'line' | 'area' | 'bar' | 'pie' | 'radar' | 'donut' | 'metric-card'
 
 export interface WidgetDefinition {
   /** Unique widget identifier (e.g. 'practice.appointments-today') */
-  id: string;
+  id: string
   /** Display label */
-  title: string;
+  title: string
   /** Short description shown in widget picker */
-  description: string;
+  description: string
   /** Which dashboard this widget belongs to */
-  dashboard: DashboardType;
+  dashboard: DashboardType
   /** Widget category for grouping in picker UI */
-  category: WidgetCategory;
+  category: WidgetCategory
   /** Default size on the grid */
-  defaultSize: WidgetSize;
+  defaultSize: WidgetSize
   /** Chart type for chart widgets */
-  chartType?: ChartType;
+  chartType?: ChartType
   /** Icon name from lucide-react */
-  icon: string;
+  icon: string
   /** Required permissions to view this widget */
-  requiredPermissions: EHRPermission[];
+  requiredPermissions: EHRPermission[]
   /** If true, requires MFA to render (e.g. PHI exports, break-glass audit) */
-  requiresMFA?: boolean;
+  requiresMFA?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -531,19 +521,24 @@ export const WIDGET_REGISTRY: WidgetDefinition[] = [
     icon: 'Users',
     requiredPermissions: ['audit_access'],
   },
-];
+]
 
 // ---------------------------------------------------------------------------
 // Widget RBAC helpers
 // ---------------------------------------------------------------------------
 
-import { roleHasPermission } from '@/lib/ehr-native/auth';
+import { roleHasPermission } from '@/lib/ehr-native/auth'
 
 /**
  * Check whether a role can view a specific widget.
  */
-export function canViewWidget(role: ClinicalRole, widget: WidgetDefinition): boolean {
-  return widget.requiredPermissions.every((perm) => roleHasPermission(role, perm));
+export function canViewWidget(
+  role: ClinicalRole,
+  widget: WidgetDefinition,
+): boolean {
+  return widget.requiredPermissions.every((perm) =>
+    roleHasPermission(role, perm),
+  )
 }
 
 /**
@@ -551,11 +546,11 @@ export function canViewWidget(role: ClinicalRole, widget: WidgetDefinition): boo
  */
 export function getAccessibleWidgets(
   role: ClinicalRole,
-  dashboard: DashboardType
+  dashboard: DashboardType,
 ): WidgetDefinition[] {
   return WIDGET_REGISTRY.filter(
-    (w) => w.dashboard === dashboard && canViewWidget(role, w)
-  );
+    (w) => w.dashboard === dashboard && canViewWidget(role, w),
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -565,51 +560,54 @@ export function getAccessibleWidgets(
 /** Grid position for a widget instance */
 export interface WidgetPosition {
   /** Widget definition ID from WIDGET_REGISTRY */
-  widgetId: string;
+  widgetId: string
   /** Grid column span (1-12) */
-  colSpan: number;
+  colSpan: number
   /** Grid row span (1-N) */
-  rowSpan: number;
+  rowSpan: number
   /** Sort order within the layout (0-based) */
-  order: number;
+  order: number
 }
 
 export interface DashboardLayout {
   /** Unique identifier */
-  id: string;
+  id: string
   /** Display name */
-  name: string;
+  name: string
   /** Which dashboard this layout applies to */
-  dashboard: DashboardType;
+  dashboard: DashboardType
   /** Whether this is the user's default for this dashboard type */
-  isDefault: boolean;
+  isDefault: boolean
   /** Whether this layout is shared with other users */
-  isShared: boolean;
+  isShared: boolean
   /** User ID who created/owns this layout */
-  ownerId: string;
+  ownerId: string
   /** Widget positions in this layout */
-  widgets: WidgetPosition[];
+  widgets: WidgetPosition[]
   /** Time range filter to apply on load (ISO dates) */
-  timeRange?: { start: string; end: string };
+  timeRange?: { start: string; end: string }
   /** ISO timestamp of creation */
-  createdAt: string;
+  createdAt: string
   /** ISO timestamp of last update */
-  updatedAt: string;
+  updatedAt: string
 }
 
 // ---------------------------------------------------------------------------
 // Grid Layout Configuration
 // ---------------------------------------------------------------------------
 
-export const GRID_COLUMNS = 12;
+export const GRID_COLUMNS = 12
 
-export const WIDGET_SIZE_SPANS: Record<WidgetSize, { colSpan: number; rowSpan: number }> = {
+export const WIDGET_SIZE_SPANS: Record<
+  WidgetSize,
+  { colSpan: number; rowSpan: number }
+> = {
   small: { colSpan: 3, rowSpan: 1 },
   medium: { colSpan: 6, rowSpan: 2 },
   large: { colSpan: 6, rowSpan: 3 },
   wide: { colSpan: 12, rowSpan: 2 },
   tall: { colSpan: 3, rowSpan: 3 },
-};
+}
 
 export const DEFAULT_LAYOUTS: Record<DashboardType, string[]> = {
   practice: [
@@ -661,29 +659,29 @@ export const DEFAULT_LAYOUTS: Record<DashboardType, string[]> = {
     'compliance.audit-by-category',
     'compliance.training-by-role',
   ],
-};
+}
 
 /**
  * Generate a default layout from the registry defaults.
  */
 export function createDefaultLayout(
   dashboard: DashboardType,
-  userId: string
+  userId: string,
 ): DashboardLayout {
-  const widgetIds = DEFAULT_LAYOUTS[dashboard];
+  const widgetIds = DEFAULT_LAYOUTS[dashboard]
   const widgets: WidgetPosition[] = widgetIds.map((widgetId, index) => {
-    const def = WIDGET_REGISTRY.find((w) => w.id === widgetId);
-    const size = def?.defaultSize ?? 'small';
-    const spans = WIDGET_SIZE_SPANS[size];
+    const def = WIDGET_REGISTRY.find((w) => w.id === widgetId)
+    const size = def?.defaultSize ?? 'small'
+    const spans = WIDGET_SIZE_SPANS[size]
     return {
       widgetId,
       colSpan: spans.colSpan,
       rowSpan: spans.rowSpan,
       order: index,
-    };
-  });
+    }
+  })
 
-  const now = new Date().toISOString();
+  const now = new Date().toISOString()
   return {
     id: `default-${dashboard}`,
     name: 'Default',
@@ -694,5 +692,5 @@ export function createDefaultLayout(
     widgets,
     createdAt: now,
     updatedAt: now,
-  };
+  }
 }

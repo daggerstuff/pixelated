@@ -18,6 +18,7 @@
  * - TelehealthService (F1.12) — native telehealth sessions
  * - NoteSigningService (F2.2) — AI no auto-sign compliance gate
  * - OutcomesService (F2.4) — outcome measure trending (PHQ-9, GAD-7, OQ-45)
+ * - AnalyticsService (PIX-4413) — customizable dashboard metrics, RBAC, and saved views
  */
 
 export { PatientService } from './patient-service'

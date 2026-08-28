@@ -6,16 +6,17 @@
  * @module ehr/dashboards
  */
 
-import React, { type FC } from 'react';
-import { DashboardGrid, type DashboardGridProps } from './DashboardGrid';
+import React, { type FC } from 'react'
 
-export type BillingDashboardProps = Omit<DashboardGridProps, 'dashboard'>;
+import { DashboardGrid, type DashboardGridProps } from './DashboardGrid'
+
+export type BillingDashboardProps = Omit<DashboardGridProps, 'dashboard'>
 
 /**
  * Billing & Claims dashboard wrapper.
  */
 const BillingDashboard: FC<BillingDashboardProps> = (props) => {
-  return <DashboardGrid dashboard="billing" {...props} />;
-};
+  return <DashboardGrid dashboard="billing" {...props} />
+}
 
-export default BillingDashboard;
+export default BillingDashboard

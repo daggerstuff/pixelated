@@ -1,7 +1,30 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+vi.mock('@/lib/ehr-native/auth/ehr-rbac', () => ({
+  verifyPatientConsent: vi.fn(),
+  checkPermission: vi.fn(),
+  activateBreakGlass: vi.fn(),
+  checkPermissionWithBreakGlass: vi.fn(),
+  logEHRAccess: vi.fn(),
+}))
+
+import type { ClinicalRole } from '@/lib/ehr-native/auth'
+import {
+  canAccessDashboard,
+  getAccessibleDashboards,
+  AnalyticsService,
+} from '@/lib/ehr-native/services/analytics.service'
+import type {
+  DashboardType,
+  DashboardFilter,
+  AnalyticsRepository,
+} from '@/lib/ehr-native/services/analytics.service'
+
+import { dashboardToCSV, exportDashboardCSV } from '../dashboard-export'
+import { savedViewsService } from '../saved-views-service'
 import {
   DASHBOARD_TYPES,
   DASHBOARD_RBAC,
@@ -9,16 +32,7 @@ import {
   canViewWidget,
   getAccessibleWidgets,
   createDefaultLayout,
-} from '../types';
-import { dashboardToCSV, exportDashboardCSV } from '../dashboard-export';
-import { savedViewsService } from '../saved-views-service';
-import {
-  canAccessDashboard,
-  getAccessibleDashboards,
-  AnalyticsService,
-} from '@/lib/ehr-native/services/analytics.service';
-import type { ClinicalRole } from '@/lib/ehr-native/auth';
-import type { DashboardType, DashboardFilter, AnalyticsRepository } from '@/lib/ehr-native/services/analytics.service';
+} from '../types'
 
 // ─── helpers ──────────────────────────────────────────────
 function createMockRepo(): AnalyticsRepository {
@@ -39,20 +53,28 @@ function createMockRepo(): AnalyticsRepository {
       { date: '2025-01-01', count: 20 },
       { date: '2025-01-02', count: 25 },
     ]),
-    getOutcomeScores: vi.fn().mockResolvedValue({ average: 12, change: -3, trend: [{ date: '2025-01-01', score: 15 }] }),
+    getOutcomeScores: vi.fn().mockResolvedValue({
+      average: 12,
+      change: -3,
+      trend: [{ date: '2025-01-01', score: 15 }],
+    }),
     countAssessments: vi.fn().mockResolvedValue(50),
     countImprovedPatients: vi.fn().mockResolvedValue(15),
     countDeterioratedPatients: vi.fn().mockResolvedValue(5),
     countEncounters: vi.fn().mockResolvedValue(200),
-    countEncountersByType: vi.fn().mockResolvedValue({ inPerson: 140, telehealth: 60 }),
+    countEncountersByType: vi
+      .fn()
+      .mockResolvedValue({ inPerson: 140, telehealth: 60 }),
     getAverageVisitDuration: vi.fn().mockResolvedValue(20),
     getRoomUtilization: vi.fn().mockResolvedValue(0.75),
-    getEncounterTrend: vi.fn().mockResolvedValue([
-      { date: '2025-01-01', inPerson: 10, telehealth: 5 },
-    ]),
-    getDepartmentBreakdown: vi.fn().mockResolvedValue([
-      { department: 'Cardiology', encounters: 50, utilizationRate: 0.8 },
-    ]),
+    getEncounterTrend: vi
+      .fn()
+      .mockResolvedValue([{ date: '2025-01-01', inPerson: 10, telehealth: 5 }]),
+    getDepartmentBreakdown: vi
+      .fn()
+      .mockResolvedValue([
+        { department: 'Cardiology', encounters: 50, utilizationRate: 0.8 },
+      ]),
     getTotalCharges: vi.fn().mockResolvedValue(150000),
     getTotalCollections: vi.fn().mockResolvedValue(127500),
     getOutstandingAR: vi.fn().mockResolvedValue(22500),
@@ -64,33 +86,39 @@ function createMockRepo(): AnalyticsRepository {
       { status: 'approved', count: 30, amount: 7500 },
       { status: 'pending', count: 10, amount: 2500 },
     ]),
-    getTopPayers: vi.fn().mockResolvedValue([
-      { payerId: 'p1', payerName: 'Aetna', charges: 50000, payments: 42500 },
-    ]),
-    getRevenueTrend: vi.fn().mockResolvedValue([
-      { month: '2025-01', charges: 50000, collections: 42500 },
-    ]),
+    getTopPayers: vi
+      .fn()
+      .mockResolvedValue([
+        { payerId: 'p1', payerName: 'Aetna', charges: 50000, payments: 42500 },
+      ]),
+    getRevenueTrend: vi
+      .fn()
+      .mockResolvedValue([
+        { month: '2025-01', charges: 50000, collections: 42500 },
+      ]),
     countAuditEvents: vi.fn().mockResolvedValue(500),
     countAccessViolations: vi.fn().mockResolvedValue(3),
     countBreakGlassEvents: vi.fn().mockResolvedValue(2),
     countPhiExports: vi.fn().mockResolvedValue(10),
     getConsentCoverage: vi.fn().mockResolvedValue(0.98),
-    getTrainingCompletion: vi.fn().mockResolvedValue({ completion: 0.88, overdue: 0.12 }),
-    getAuditByCategory: vi.fn().mockResolvedValue([
-      { category: 'login', count: 200 },
-    ]),
-    getViolationTrend: vi.fn().mockResolvedValue([
-      { date: '2025-01-01', count: 1 },
-    ]),
-    getTrainingByRole: vi.fn().mockResolvedValue([
-      { role: 'physician', completed: 8, required: 10 },
-    ]),
-  };
+    getTrainingCompletion: vi
+      .fn()
+      .mockResolvedValue({ completion: 0.88, overdue: 0.12 }),
+    getAuditByCategory: vi
+      .fn()
+      .mockResolvedValue([{ category: 'login', count: 200 }]),
+    getViolationTrend: vi
+      .fn()
+      .mockResolvedValue([{ date: '2025-01-01', count: 1 }]),
+    getTrainingByRole: vi
+      .fn()
+      .mockResolvedValue([{ role: 'physician', completed: 8, required: 10 }]),
+  }
 }
 
 const defaultFilter: DashboardFilter = {
   timeRange: { start: '2025-01-01', end: '2025-12-31' },
-};
+}
 
 function makeView(
   id: string,
@@ -112,7 +140,7 @@ function makeView(
     })),
     createdAt: '2025-01-01T00:00:00Z',
     updatedAt: '2025-01-01T00:00:00Z',
-  };
+  }
 }
 
 // ─── RBAC integration ──────────────────────────────────────
@@ -125,46 +153,48 @@ describe('Dashboard RBAC integration', () => {
       'billingSpecialist',
       'complianceOfficer',
       'systemAdmin',
-    ];
+    ]
     for (const role of roles) {
-      const accessible = getAccessibleDashboards(role);
+      const accessible = getAccessibleDashboards(role)
       // systemAdmin should access all dashboards
       if (role === 'systemAdmin') {
-        expect(accessible).toEqual(expect.arrayContaining(DASHBOARD_TYPES));
+        expect(accessible).toEqual(expect.arrayContaining(DASHBOARD_TYPES))
       }
       // billingSpecialist should access billing dashboard
       if (role === 'billingSpecialist') {
-        expect(accessible).toContain('billing');
+        expect(accessible).toContain('billing')
       }
       // complianceOfficer should access compliance dashboard
       if (role === 'complianceOfficer') {
-        expect(accessible).toContain('compliance');
+        expect(accessible).toContain('compliance')
       }
       // Every role should access at least one dashboard
-      expect(accessible.length).toBeGreaterThan(0);
+      expect(accessible.length).toBeGreaterThan(0)
     }
-  });
+  })
 
   it('enforces widget-level RBAC consistently with dashboard access', () => {
-    const role: ClinicalRole = 'billingSpecialist';
-    const accessibleDashboards = getAccessibleDashboards(role);
+    const role: ClinicalRole = 'billingSpecialist'
+    const accessibleDashboards = getAccessibleDashboards(role)
     for (const widget of WIDGET_REGISTRY) {
-      const canView = canViewWidget(role, widget);
-      const canAccessDashboard = accessibleDashboards.includes(widget.dashboard);
+      const canView = canViewWidget(role, widget)
+      const canAccessDashboard = accessibleDashboards.includes(widget.dashboard)
       if (!canAccessDashboard) {
-        expect(canView).toBe(false);
+        expect(canView).toBe(false)
       }
     }
-  });
+  })
 
   it('filters accessible widgets by role for each dashboard', () => {
     for (const dashboard of DASHBOARD_TYPES) {
-      const physicianWidgets = getAccessibleWidgets('physician', dashboard);
-      const adminWidgets = getAccessibleWidgets('systemAdmin', dashboard);
-      expect(adminWidgets.length).toBeGreaterThanOrEqual(physicianWidgets.length);
+      const physicianWidgets = getAccessibleWidgets('physician', dashboard)
+      const adminWidgets = getAccessibleWidgets('systemAdmin', dashboard)
+      expect(adminWidgets.length).toBeGreaterThanOrEqual(
+        physicianWidgets.length,
+      )
     }
-  });
-});
+  })
+})
 
 // ─── Export round-trip ─────────────────────────────────────
 describe('Export round-trip integration', () => {
@@ -199,16 +229,16 @@ describe('Export round-trip integration', () => {
           ],
         },
       ],
-    };
-    const csv = dashboardToCSV(exportData);
-    expect(csv).toContain('Practice Dashboard');
-    expect(csv).toContain('Key Metrics');
-    expect(csv).toContain('Active Patients');
-    expect(csv).toContain('120');
-    expect(csv).toContain('Provider Utilization');
-    expect(csv).toContain('Dr. Smith');
-    expect(csv).toContain('90%');
-  });
+    }
+    const csv = dashboardToCSV(exportData)
+    expect(csv).toContain('Practice Dashboard')
+    expect(csv).toContain('Key Metrics')
+    expect(csv).toContain('Active Patients')
+    expect(csv).toContain('120')
+    expect(csv).toContain('Provider Utilization')
+    expect(csv).toContain('Dr. Smith')
+    expect(csv).toContain('90%')
+  })
 
   it('handles all 5 dashboard types in export', () => {
     for (const type of DASHBOARD_TYPES) {
@@ -224,105 +254,127 @@ describe('Export round-trip integration', () => {
             rows: [{ a: 'val' }],
           },
         ],
-      };
-      const csv = exportDashboardCSV(data);
-      expect(csv).toContain(type);
-      expect(csv).toContain('Test');
-      expect(csv).toContain('val');
+      }
+      const csv = dashboardToCSV(data)
+      expect(csv).toContain(type)
+      expect(csv).toContain('Test')
+      expect(csv).toContain('val')
     }
-  });
-});
+  })
+})
 
 // ─── Saved views lifecycle ────────────────────────────────
 describe('Saved views lifecycle integration', () => {
   beforeEach(() => {
-    localStorage.clear();
-    vi.restoreAllMocks();
-  });
+    const store = new Map<string, string>()
+    Object.defineProperty(window, 'localStorage', {
+      value: {
+        getItem: (key: string) => store.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          store.set(key, value)
+        },
+        removeItem: (key: string) => {
+          store.delete(key)
+        },
+        clear: () => {
+          store.clear()
+        },
+        length: 0,
+        key: (index: number) => Array.from(store.keys())[index] ?? null,
+      },
+      writable: true,
+      configurable: true,
+    })
+    vi.restoreAllMocks()
+  })
 
   it('full save → load → setDefault → delete lifecycle', async () => {
-    const userId = 'user-1';
-    const dashboard = 'practice';
+    const userId = 'user-1'
+    const dashboard = 'practice'
 
-    const initial = await savedViewsService.loadViews(userId, dashboard);
-    expect(initial).toEqual([]);
+    const initial = await savedViewsService.loadViews(userId, dashboard)
+    expect(initial).toEqual([])
 
-    const view1 = makeView('v1', dashboard);
-    await savedViewsService.saveView(userId, dashboard, view1);
+    const view1 = makeView('v1', dashboard)
+    await savedViewsService.saveView(userId, dashboard, view1)
 
-    const loaded1 = await savedViewsService.loadViews(userId, dashboard);
-    expect(loaded1).toHaveLength(1);
-    expect(loaded1[0].id).toBe('v1');
+    const loaded1 = await savedViewsService.loadViews(userId, dashboard)
+    expect(loaded1).toHaveLength(1)
+    expect(loaded1[0].id).toBe('v1')
 
-    const view2 = makeView('v2', dashboard);
-    await savedViewsService.saveView(userId, dashboard, view2);
-    const loaded2 = await savedViewsService.loadViews(userId, dashboard);
-    expect(loaded2).toHaveLength(2);
+    const view2 = makeView('v2', dashboard)
+    await savedViewsService.saveView(userId, dashboard, view2)
+    const loaded2 = await savedViewsService.loadViews(userId, dashboard)
+    expect(loaded2).toHaveLength(2)
 
-    await savedViewsService.setDefaultView(userId, dashboard, 'v1');
-    const loaded3 = await savedViewsService.loadViews(userId, dashboard);
-    const defaultView = loaded3.find((v) => v.id === 'v1');
-    const otherView = loaded3.find((v) => v.id === 'v2');
-    expect(defaultView?.isDefault).toBe(true);
-    expect(otherView?.isDefault).toBe(false);
+    await savedViewsService.setDefaultView(userId, dashboard, 'v1')
+    const loaded3 = await savedViewsService.loadViews(userId, dashboard)
+    const defaultView = loaded3.find((v) => v.id === 'v1')
+    const otherView = loaded3.find((v) => v.id === 'v2')
+    expect(defaultView?.isDefault).toBe(true)
+    expect(otherView?.isDefault).toBe(false)
 
-    await savedViewsService.deleteView(userId, dashboard, 'v2');
-    const loaded4 = await savedViewsService.loadViews(userId, dashboard);
-    expect(loaded4).toHaveLength(1);
-    expect(loaded4[0].id).toBe('v1');
-  });
+    await savedViewsService.deleteView(userId, dashboard, 'v2')
+    const loaded4 = await savedViewsService.loadViews(userId, dashboard)
+    expect(loaded4).toHaveLength(1)
+    expect(loaded4[0].id).toBe('v1')
+  })
 
   it('isolates saved views per dashboard type', async () => {
-    const userId = 'user-1';
-    const practiceView = makeView('pv1', 'practice' as DashboardType);
-    const billingView = makeView('bv1', 'billing' as DashboardType);
+    const userId = 'user-1'
+    const practiceView = makeView('pv1', 'practice' as DashboardType)
+    const billingView = makeView('bv1', 'billing' as DashboardType)
 
-    await savedViewsService.saveView(userId, 'practice', practiceView);
-    await savedViewsService.saveView(userId, 'billing', billingView);
+    await savedViewsService.saveView(userId, 'practice', practiceView)
+    await savedViewsService.saveView(userId, 'billing', billingView)
 
-    const practiceViews = await savedViewsService.loadViews(userId, 'practice');
-    const billingViews = await savedViewsService.loadViews(userId, 'billing');
+    const practiceViews = await savedViewsService.loadViews(userId, 'practice')
+    const billingViews = await savedViewsService.loadViews(userId, 'billing')
 
-    expect(practiceViews).toHaveLength(1);
-    expect(practiceViews[0].id).toBe('pv1');
-    expect(billingViews).toHaveLength(1);
-    expect(billingViews[0].id).toBe('bv1');
-  });
-});
+    expect(practiceViews).toHaveLength(1)
+    expect(practiceViews[0].id).toBe('pv1')
+    expect(billingViews).toHaveLength(1)
+    expect(billingViews[0].id).toBe('bv1')
+  })
+})
 
 // ─── Analytics service end-to-end ──────────────────────────
 describe('AnalyticsService integration', () => {
   it('returns valid metrics for all dashboard types', async () => {
-    const repo = createMockRepo();
-    const service = new AnalyticsService(repo);
+    const repo = createMockRepo()
+    const service = new AnalyticsService(repo)
 
     for (const type of DASHBOARD_TYPES) {
-      const result = await service.getDashboard(type, 'systemAdmin', defaultFilter);
-      expect(result).toBeDefined();
+      const result = await service.getDashboard(
+        type,
+        'systemAdmin',
+        defaultFilter,
+      )
+      expect(result).toBeDefined()
     }
-  });
+  })
 
   it('throws on unauthorized dashboard access', async () => {
-    const repo = createMockRepo();
-    const service = new AnalyticsService(repo);
+    const repo = createMockRepo()
+    const service = new AnalyticsService(repo)
 
     await expect(
       service.getDashboard('compliance', 'frontDesk', defaultFilter),
-    ).rejects.toThrow();
-  });
+    ).rejects.toThrow()
+  })
 
   it('createDefaultLayout produces valid layout for each dashboard', () => {
     for (const type of DASHBOARD_TYPES) {
-      const layout = createDefaultLayout(type, 'user-1');
-      expect(layout.dashboard).toBe(type);
-      expect(layout.ownerId).toBe('user-1');
-      expect(layout.isDefault).toBe(true);
-      expect(layout.widgets.length).toBeGreaterThan(0);
+      const layout = createDefaultLayout(type, 'user-1')
+      expect(layout.dashboard).toBe(type)
+      expect(layout.ownerId).toBe('user-1')
+      expect(layout.isDefault).toBe(true)
+      expect(layout.widgets.length).toBeGreaterThan(0)
       for (const w of layout.widgets) {
-        expect(w.colSpan).toBeGreaterThan(0);
-        expect(w.rowSpan).toBeGreaterThan(0);
-        expect(w.order).toBeGreaterThanOrEqual(0);
+        expect(w.colSpan).toBeGreaterThan(0)
+        expect(w.rowSpan).toBeGreaterThan(0)
+        expect(w.order).toBeGreaterThanOrEqual(0)
       }
     }
-  });
-});
+  })
+})

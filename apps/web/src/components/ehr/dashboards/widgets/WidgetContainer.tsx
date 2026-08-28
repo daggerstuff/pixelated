@@ -4,27 +4,28 @@
  * resize, title bar, and loading/error states.
  */
 
-import { type ReactNode, useCallback, useState } from 'react';
-import { GripVertical, Maximize2, Minimize2, X, RefreshCw } from 'lucide-react';
-import type { WidgetDefinition } from '../types';
+import { GripVertical, Maximize2, Minimize2, X, RefreshCw } from 'lucide-react'
+import { type ReactNode, useCallback, useState } from 'react'
+
+import type { WidgetDefinition } from '../types'
 
 export interface WidgetContainerProps {
-  widget: WidgetDefinition;
+  widget: WidgetDefinition
   /** Render-prop or children function for the widget body */
-  children: ReactNode;
+  children: ReactNode
   /** Loading state */
-  loading?: boolean;
+  loading?: boolean
   /** Error message if data fetch failed */
-  error?: string | null;
+  error?: string | null
   /** Callback when user requests data refresh */
-  onRefresh?: () => void;
+  onRefresh?: () => void
   /** Callback when user removes widget from layout */
-  onRemove?: () => void;
+  onRemove?: () => void
   /** Whether this widget is currently being dragged */
-  isDragging?: boolean;
+  isDragging?: boolean
   /** Draggable handler — sets the drag data */
-  onDragStart?: (e: React.DragEvent) => void;
-  onDragEnd?: (e: React.DragEvent) => void;
+  onDragStart?: (e: React.DragEvent) => void
+  onDragEnd?: (e: React.DragEvent) => void
 }
 
 export function WidgetContainer({
@@ -38,11 +39,11 @@ export function WidgetContainer({
   onDragStart,
   onDragEnd,
 }: WidgetContainerProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
   const handleRefresh = useCallback(() => {
-    onRefresh?.();
-  }, [onRefresh]);
+    onRefresh?.()
+  }, [onRefresh])
 
   return (
     <div
@@ -156,7 +157,7 @@ export function WidgetContainer({
         )}
       </div>
     </div>
-  );
+  )
 }
 
 const iconBtnStyle: React.CSSProperties = {
@@ -170,7 +171,7 @@ const iconBtnStyle: React.CSSProperties = {
   justifyContent: 'center',
   color: 'var(--np-muted)',
   transition: 'background 0.15s',
-};
+}
 
 const loadingStyle: React.CSSProperties = {
   display: 'flex',
@@ -180,7 +181,7 @@ const loadingStyle: React.CSSProperties = {
   gap: '8px',
   height: '100%',
   minHeight: '100px',
-};
+}
 
 const errorStyle: React.CSSProperties = {
   display: 'flex',
@@ -188,4 +189,4 @@ const errorStyle: React.CSSProperties = {
   justifyContent: 'center',
   height: '100%',
   minHeight: '80px',
-};
+}

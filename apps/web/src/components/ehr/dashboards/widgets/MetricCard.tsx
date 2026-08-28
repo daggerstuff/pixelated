@@ -3,26 +3,26 @@
  * @description Displays a single metric value with optional delta indicator.
  */
 
-import { type FC, useMemo } from 'react';
-import { ArrowUp, ArrowDown, Minus } from 'lucide-react';
+import { ArrowUp, ArrowDown, Minus } from 'lucide-react'
+import { type FC, useMemo } from 'react'
 
 export interface MetricCardProps {
   /** Current value */
-  value: number | string;
+  value: number | string
   /** Label shown above the value */
-  label: string;
+  label: string
   /** Previous value for delta calculation (optional) */
-  previousValue?: number;
+  previousValue?: number
   /** Unit suffix (e.g. '%', '$', 'min') */
-  unit?: string;
+  unit?: string
   /** Whether a lower value is better (affects delta color) */
-  lowerIsBetter?: boolean;
+  lowerIsBetter?: boolean
   /** Number of decimal places for numeric formatting */
-  decimals?: number;
+  decimals?: number
   /** Optional icon node */
-  icon?: React.ReactNode;
+  icon?: React.ReactNode
   /** Optional subtext shown below the value */
-  subtext?: string;
+  subtext?: string
 }
 
 export const MetricCard: FC<MetricCardProps> = function MetricCard({
@@ -37,13 +37,13 @@ export const MetricCard: FC<MetricCardProps> = function MetricCard({
 }) {
   const { delta, deltaPct, isPositive } = useMemo(() => {
     if (previousValue === undefined || typeof value !== 'number') {
-      return { delta: undefined, deltaPct: undefined, isPositive: false };
+      return { delta: undefined, deltaPct: undefined, isPositive: false }
     }
-    const d = value - previousValue;
-    const pct = previousValue !== 0 ? (d / Math.abs(previousValue)) * 100 : 0;
-    const positive = d > 0;
-    return { delta: d, deltaPct: pct, isPositive: positive };
-  }, [value, previousValue]);
+    const d = value - previousValue
+    const pct = previousValue !== 0 ? (d / Math.abs(previousValue)) * 100 : 0
+    const positive = d > 0
+    return { delta: d, deltaPct: pct, isPositive: positive }
+  }, [value, previousValue])
 
   const displayValue =
     typeof value === 'number'
@@ -51,15 +51,15 @@ export const MetricCard: FC<MetricCardProps> = function MetricCard({
           minimumFractionDigits: decimals,
           maximumFractionDigits: decimals,
         })
-      : value;
+      : value
 
   const deltaColor = useMemo(() => {
-    if (delta === undefined || delta === 0) return 'var(--np-muted)';
+    if (delta === undefined || delta === 0) return 'var(--np-muted)'
     if (lowerIsBetter) {
-      return delta > 0 ? 'var(--np-danger)' : 'var(--np-success)';
+      return delta > 0 ? 'var(--np-danger)' : 'var(--np-success)'
     }
-    return delta > 0 ? 'var(--np-success)' : 'var(--np-danger)';
-  }, [delta, lowerIsBetter]);
+    return delta > 0 ? 'var(--np-success)' : 'var(--np-danger)'
+  }, [delta, lowerIsBetter])
 
   return (
     <div
@@ -95,13 +95,17 @@ export const MetricCard: FC<MetricCardProps> = function MetricCard({
       >
         {displayValue}
         {unit && (
-          <span style={{ fontSize: '1rem', fontWeight: 500, marginLeft: '4px' }}>
+          <span
+            style={{ fontSize: '1rem', fontWeight: 500, marginLeft: '4px' }}
+          >
             {unit}
           </span>
         )}
       </div>
       {subtext && (
-        <div style={{ fontSize: '0.75rem', color: 'var(--np-muted)' }}>{subtext}</div>
+        <div style={{ fontSize: '0.75rem', color: 'var(--np-muted)' }}>
+          {subtext}
+        </div>
       )}
       {deltaPct !== undefined && (
         <div
@@ -125,5 +129,5 @@ export const MetricCard: FC<MetricCardProps> = function MetricCard({
         </div>
       )}
     </div>
-  );
-};
+  )
+}

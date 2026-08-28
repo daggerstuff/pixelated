@@ -8,15 +8,6 @@
  * @module ehr/dashboards
  */
 
-import React, {
-  useCallback,
-  useMemo,
-  useRef,
-  useState,
-  type DragEvent,
-  type FC,
-  type ReactNode,
-} from 'react';
 import {
   LayoutDashboard,
   Plus,
@@ -27,16 +18,26 @@ import {
   ChevronDown,
   ChevronUp,
   X,
-} from 'lucide-react';
+} from 'lucide-react'
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type DragEvent,
+  type FC,
+  type ReactNode,
+} from 'react'
 
-import type { ClinicalRole } from '@/lib/ehr-native/auth';
+import type { ClinicalRole } from '@/lib/ehr-native/auth'
+
 import type {
   DashboardType,
   DashboardLayout,
   WidgetDefinition,
   WidgetPosition,
   WidgetSize,
-} from './types';
+} from './types'
 import {
   DASHBOARD_LABELS,
   GRID_COLUMNS,
@@ -45,15 +46,15 @@ import {
   canViewWidget,
   createDefaultLayout,
   getAccessibleWidgets,
-} from './types';
-import { WidgetContainer } from './widgets';
-import { MetricCard } from './widgets/MetricCard';
-import { LineChartWidget } from './widgets/LineChartWidget';
-import { AreaChartWidget } from './widgets/AreaChartWidget';
-import { BarChartWidget } from './widgets/BarChartWidget';
-import { PieChartWidget } from './widgets/PieChartWidget';
-import { DonutChartWidget } from './widgets/PieChartWidget';
-import { TableWidget } from './widgets/TableWidget';
+} from './types'
+import { WidgetContainer } from './widgets'
+import { AreaChartWidget } from './widgets/AreaChartWidget'
+import { BarChartWidget } from './widgets/BarChartWidget'
+import { LineChartWidget } from './widgets/LineChartWidget'
+import { MetricCard } from './widgets/MetricCard'
+import { PieChartWidget } from './widgets/PieChartWidget'
+import { DonutChartWidget } from './widgets/PieChartWidget'
+import { TableWidget } from './widgets/TableWidget'
 
 // ---------------------------------------------------------------------------
 // Widget data prop — each widget receives its slice of dashboard data
@@ -61,13 +62,13 @@ import { TableWidget } from './widgets/TableWidget';
 
 export interface WidgetData {
   /** The widget definition */
-  definition: WidgetDefinition;
+  definition: WidgetDefinition
   /** Arbitrary payload from the dashboard API */
-  data: unknown;
+  data: unknown
   /** Loading flag */
-  loading?: boolean;
+  loading?: boolean
   /** Error message */
-  error?: string;
+  error?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -78,99 +79,156 @@ function renderWidgetContent(
   widget: WidgetDefinition,
   data: unknown,
   loading?: boolean,
-  error?: string
+  error?: string,
 ): ReactNode {
   if (loading) {
     return (
       <div
-        style={{ padding: '24px', textAlign: 'center', color: 'var(--np-muted)' }}
+        style={{
+          padding: '24px',
+          textAlign: 'center',
+          color: 'var(--np-muted)',
+        }}
         role="status"
         aria-live="polite"
       >
         Loading…
       </div>
-    );
+    )
   }
 
   if (error) {
     return (
       <div
-        style={{ padding: '24px', textAlign: 'center', color: 'var(--np-danger)' }}
+        style={{
+          padding: '24px',
+          textAlign: 'center',
+          color: 'var(--np-danger)',
+        }}
         role="alert"
       >
         {error}
       </div>
-    );
+    )
   }
 
   // Metric cards
   if (widget.chartType === 'metric-card') {
     const metric = data as {
-      value?: number | string;
-      unit?: string;
-      delta?: number;
-      deltaLabel?: string;
-      subtext?: string;
-      lowerIsBetter?: boolean;
-    };
-    return <MetricCard label={widget.title} value={metric.value ?? 0} unit={metric.unit} subtext={metric.subtext} lowerIsBetter={metric.lowerIsBetter} />;
+      value?: number | string
+      unit?: string
+      delta?: number
+      deltaLabel?: string
+      subtext?: string
+      lowerIsBetter?: boolean
+    }
+    return (
+      <MetricCard
+        label={widget.title}
+        value={metric.value ?? 0}
+        unit={metric.unit}
+        subtext={metric.subtext}
+        lowerIsBetter={metric.lowerIsBetter}
+      />
+    )
   }
 
   // Line chart
   if (widget.chartType === 'line') {
-    const chartData = data as { data: Record<string, unknown>[]; xKey: string; series: { key: string; label: string; color?: string }[] };
-    return <LineChartWidget widget={widget} data={chartData.data as Array<Record<string, string | number | null>>} xKey={chartData.xKey} yKeys={chartData.series.map(s => s.key)} />;
+    const chartData = data as {
+      data: Record<string, unknown>[]
+      xKey: string
+      series: { key: string; label: string; color?: string }[]
+    }
+    return (
+      <LineChartWidget
+        widget={widget}
+        data={chartData.data as Array<Record<string, string | number | null>>}
+        xKey={chartData.xKey}
+        yKeys={chartData.series.map((s) => s.key)}
+      />
+    )
   }
 
   // Area chart
   if (widget.chartType === 'area') {
-    const chartData = data as { data: Record<string, unknown>[]; xKey: string; series: { key: string; label: string; color?: string }[]; stacked?: boolean };
-    return <AreaChartWidget data={chartData.data as Array<Record<string, string | number | null>>} xKey={chartData.xKey} yKeys={chartData.series.map(s => s.key)} stacked={chartData.stacked} />;
+    const chartData = data as {
+      data: Record<string, unknown>[]
+      xKey: string
+      series: { key: string; label: string; color?: string }[]
+      stacked?: boolean
+    }
+    return (
+      <AreaChartWidget
+        data={chartData.data as Array<Record<string, string | number | null>>}
+        xKey={chartData.xKey}
+        yKeys={chartData.series.map((s) => s.key)}
+        stacked={chartData.stacked}
+      />
+    )
   }
 
   // Bar chart
   if (widget.chartType === 'bar') {
     const chartData = data as {
-      data: Record<string, unknown>[];
-      xKey: string;
-      series: { key: string; label: string; color?: string }[];
-      horizontal?: boolean;
-      stacked?: boolean;
-      statusColors?: Record<string, string>;
-    };
-    return <BarChartWidget data={chartData.data as Array<Record<string, string | number | null>>} xKey={chartData.xKey} yKeys={chartData.series.map(s => s.key)} horizontal={chartData.horizontal} stacked={chartData.stacked} />;
+      data: Record<string, unknown>[]
+      xKey: string
+      series: { key: string; label: string; color?: string }[]
+      horizontal?: boolean
+      stacked?: boolean
+      statusColors?: Record<string, string>
+    }
+    return (
+      <BarChartWidget
+        data={chartData.data as Array<Record<string, string | number | null>>}
+        xKey={chartData.xKey}
+        yKeys={chartData.series.map((s) => s.key)}
+        horizontal={chartData.horizontal}
+        stacked={chartData.stacked}
+      />
+    )
   }
 
   // Pie / donut chart
   if (widget.chartType === 'pie' || widget.chartType === 'donut') {
     const chartData = data as {
-      data: Record<string, unknown>[];
-      dataKey: string;
-      nameKey: string;
-      colors?: string[];
-    };
-    const pieData = chartData.data as Array<{ name: string; value: number; color?: string }>;
-    if (widget.chartType === 'donut') {
-      return <DonutChartWidget data={pieData} />;
+      data: Record<string, unknown>[]
+      dataKey: string
+      nameKey: string
+      colors?: string[]
     }
-    return <PieChartWidget data={pieData} />;
+    const pieData = chartData.data as Array<{
+      name: string
+      value: number
+      color?: string
+    }>
+    if (widget.chartType === 'donut') {
+      return <DonutChartWidget data={pieData} />
+    }
+    return <PieChartWidget data={pieData} />
   }
 
   // Table widget
   if (widget.category === 'table') {
     const tableData = data as {
-      rows: Record<string, unknown>[];
-      columns: { key: string; label: string; align?: 'left' | 'right' | 'center'; format?: (v: unknown) => string; sortable?: boolean }[];
-      pageSize?: number;
-    };
-    return <TableWidget {...tableData} />;
+      rows: Record<string, unknown>[]
+      columns: {
+        key: string
+        label: string
+        align?: 'left' | 'right' | 'center'
+        format?: (v: unknown) => string
+        sortable?: boolean
+      }[]
+      pageSize?: number
+    }
+    return <TableWidget {...tableData} />
   }
 
   return (
     <div style={{ padding: '16px', color: 'var(--np-muted)' }}>
       No renderer for chart type: {widget.chartType}
     </div>
-  );
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -178,42 +236,42 @@ function renderWidgetContent(
 // ---------------------------------------------------------------------------
 
 interface ResizeHandleProps {
-  onResize: (deltaRows: number) => void;
-  currentRows: number;
+  onResize: (deltaRows: number) => void
+  currentRows: number
 }
 
 const ResizeHandle: FC<ResizeHandleProps> = ({ onResize, currentRows }) => {
-  const startY = useRef(0);
-  const startRows = useRef(currentRows);
-  const [isResizing, setIsResizing] = useState(false);
+  const startY = useRef(0)
+  const startRows = useRef(currentRows)
+  const [isResizing, setIsResizing] = useState(false)
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      startY.current = e.clientY;
-      startRows.current = currentRows;
-      setIsResizing(true);
+      e.preventDefault()
+      e.stopPropagation()
+      startY.current = e.clientY
+      startRows.current = currentRows
+      setIsResizing(true)
 
       const handleMouseMove = (ev: MouseEvent) => {
-        const delta = ev.clientY - startY.current;
-        const deltaRows = Math.round(delta / 60); // 60px per grid row
+        const delta = ev.clientY - startY.current
+        const deltaRows = Math.round(delta / 60) // 60px per grid row
         if (deltaRows !== 0) {
-          onResize(startRows.current + deltaRows - currentRows);
+          onResize(startRows.current + deltaRows - currentRows)
         }
-      };
+      }
 
       const handleMouseUp = () => {
-        setIsResizing(false);
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-      };
+        setIsResizing(false)
+        window.removeEventListener('mousemove', handleMouseMove)
+        window.removeEventListener('mouseup', handleMouseUp)
+      }
 
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('mousemove', handleMouseMove)
+      window.addEventListener('mouseup', handleMouseUp)
     },
-    [onResize, currentRows]
-  );
+    [onResize, currentRows],
+  )
 
   return (
     <div
@@ -242,19 +300,19 @@ const ResizeHandle: FC<ResizeHandleProps> = ({ onResize, currentRows }) => {
         <circle cx="8" cy="8" r="1" fill="var(--np-muted)" />
       </svg>
     </div>
-  );
-};
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Widget picker — add new widgets to the grid
 // ---------------------------------------------------------------------------
 
 interface WidgetPickerProps {
-  dashboard: DashboardType;
-  role: ClinicalRole;
-  activeWidgetIds: string[];
-  onAdd: (widgetId: string) => void;
-  onClose: () => void;
+  dashboard: DashboardType
+  role: ClinicalRole
+  activeWidgetIds: string[]
+  onAdd: (widgetId: string) => void
+  onClose: () => void
 }
 
 const WidgetPicker: FC<WidgetPickerProps> = ({
@@ -265,13 +323,19 @@ const WidgetPicker: FC<WidgetPickerProps> = ({
   onClose,
 }) => {
   const available = useMemo(() => {
-    const accessible = getAccessibleWidgets(role, dashboard);
-    return accessible.filter((w) => !activeWidgetIds.includes(w.id));
-  }, [dashboard, role, activeWidgetIds]);
+    const accessible = getAccessibleWidgets(role, dashboard)
+    return accessible.filter((w) => !activeWidgetIds.includes(w.id))
+  }, [dashboard, role, activeWidgetIds])
 
   if (available.length === 0) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center', color: 'var(--np-muted)' }}>
+      <div
+        style={{
+          padding: '24px',
+          textAlign: 'center',
+          color: 'var(--np-muted)',
+        }}
+      >
         <p>No additional widgets available for your role.</p>
         <button
           onClick={onClose}
@@ -288,7 +352,7 @@ const WidgetPicker: FC<WidgetPickerProps> = ({
           Close
         </button>
       </div>
-    );
+    )
   }
 
   return (
@@ -347,8 +411,8 @@ const WidgetPicker: FC<WidgetPickerProps> = ({
             <button
               key={widget.id}
               onClick={() => {
-                onAdd(widget.id);
-                onClose();
+                onAdd(widget.id)
+                onClose()
               }}
               style={{
                 display: 'flex',
@@ -364,10 +428,12 @@ const WidgetPicker: FC<WidgetPickerProps> = ({
                 transition: 'background 0.15s',
               }}
               onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'var(--np-hover)';
+                ;(e.currentTarget as HTMLElement).style.background =
+                  'var(--np-hover)'
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.background = 'var(--np-bg)';
+                ;(e.currentTarget as HTMLElement).style.background =
+                  'var(--np-bg)'
               }}
             >
               <span style={{ fontWeight: 600, color: 'var(--np-text)' }}>
@@ -381,8 +447,8 @@ const WidgetPicker: FC<WidgetPickerProps> = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Main DashboardGrid Component
@@ -390,33 +456,33 @@ const WidgetPicker: FC<WidgetPickerProps> = ({
 
 export interface DashboardGridProps {
   /** Dashboard type */
-  dashboard: DashboardType;
+  dashboard: DashboardType
   /** User's clinical role for RBAC */
-  role: ClinicalRole;
+  role: ClinicalRole
   /** User ID for layout ownership */
-  userId: string;
+  userId: string
   /** Saved layout (optional — defaults to createDefaultLayout) */
-  layout?: DashboardLayout;
+  layout?: DashboardLayout
   /** Widget data keyed by widgetId */
-  widgetData: Record<string, unknown>;
+  widgetData: Record<string, unknown>
   /** Loading state per widget (keyed by widgetId) */
-  widgetLoading?: Record<string, boolean>;
+  widgetLoading?: Record<string, boolean>
   /** Error state per widget (keyed by widgetId) */
-  widgetErrors?: Record<string, string>;
+  widgetErrors?: Record<string, string>
   /** Callback when layout changes (drag, resize, add, remove) */
-  onLayoutChange?: (layout: DashboardLayout) => void;
+  onLayoutChange?: (layout: DashboardLayout) => void
   /** Callback to refresh a widget's data */
-  onRefreshWidget?: (widgetId: string) => void;
+  onRefreshWidget?: (widgetId: string) => void
   /** Callback to save the current layout */
-  onSaveLayout?: () => void;
+  onSaveLayout?: () => void
   /** Callback to export the dashboard */
-  onExport?: (format: 'pdf' | 'csv') => void;
+  onExport?: (format: 'pdf' | 'csv') => void
   /** Callback to load a saved view */
-  onLoadView?: (layoutId: string) => void;
+  onLoadView?: (layoutId: string) => void
   /** Available saved views */
-  savedViews?: DashboardLayout[];
+  savedViews?: DashboardLayout[]
   /** Whether save/export buttons are disabled */
-  busy?: boolean;
+  busy?: boolean
 }
 
 export const DashboardGrid: FC<DashboardGridProps> = ({
@@ -437,23 +503,23 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
 }) => {
   // --- Layout state ---------------------------------------------------------
   const [layout, setLayout] = useState<DashboardLayout>(
-    () => savedLayout ?? createDefaultLayout(dashboard, userId)
-  );
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [showPicker, setShowPicker] = useState(false);
-  const [showViewMenu, setShowViewMenu] = useState(false);
+    () => savedLayout ?? createDefaultLayout(dashboard, userId),
+  )
+  const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null)
+  const [showPicker, setShowPicker] = useState(false)
+  const [showViewMenu, setShowViewMenu] = useState(false)
 
   // --- RBAC: filter widgets by role ----------------------------------------
   const accessibleWidgets = useMemo(
     () => getAccessibleWidgets(role, dashboard),
-    [role, dashboard]
-  );
+    [role, dashboard],
+  )
 
   const accessibleWidgetIds = useMemo(
     () => new Set(accessibleWidgets.map((w) => w.id)),
-    [accessibleWidgets]
-  );
+    [accessibleWidgets],
+  )
 
   // Filter layout to only include widgets the role can see
   const visiblePositions = useMemo(
@@ -461,8 +527,8 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
       layout.widgets
         .filter((w) => accessibleWidgetIds.has(w.widgetId))
         .sort((a, b) => a.order - b.order),
-    [layout.widgets, accessibleWidgetIds]
-  );
+    [layout.widgets, accessibleWidgetIds],
+  )
 
   // --- Emit layout changes -------------------------------------------------
   const emitLayoutChange = useCallback(
@@ -471,127 +537,135 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
         ...layout,
         widgets: newWidgets,
         updatedAt: new Date().toISOString(),
-      };
-      setLayout(updated);
-      onLayoutChange?.(updated);
+      }
+      setLayout(updated)
+      onLayoutChange?.(updated)
     },
-    [layout, onLayoutChange]
-  );
+    [layout, onLayoutChange],
+  )
 
   // --- Drag and Drop handlers ----------------------------------------------
   const handleDragStart = useCallback(
     (e: DragEvent<HTMLDivElement>, index: number) => {
-      setDragIndex(index);
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', String(index));
+      setDragIndex(index)
+      e.dataTransfer.effectAllowed = 'move'
+      e.dataTransfer.setData('text/plain', String(index))
     },
-    []
-  );
+    [],
+  )
 
   const handleDragOver = useCallback(
     (e: DragEvent<HTMLDivElement>, index: number) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'move'
       if (dragIndex !== null && dragIndex !== index) {
-        setDragOverIndex(index);
+        setDragOverIndex(index)
       }
     },
-    [dragIndex]
-  );
+    [dragIndex],
+  )
 
   const handleDrop = useCallback(
     (e: DragEvent<HTMLDivElement>, dropIndex: number) => {
-      e.preventDefault();
+      e.preventDefault()
       if (dragIndex === null || dragIndex === dropIndex) {
-        setDragIndex(null);
-        setDragOverIndex(null);
-        return;
+        setDragIndex(null)
+        setDragOverIndex(null)
+        return
       }
 
-      const positions = [...visiblePositions];
-      const [moved] = positions.splice(dragIndex, 1);
-      positions.splice(dropIndex, 0, moved);
+      const positions = [...visiblePositions]
+      const [moved] = positions.splice(dragIndex, 1)
+      positions.splice(dropIndex, 0, moved)
 
       // Reassign order values
-      const reordered = positions.map((pos, i) => ({ ...pos, order: i }));
+      const reordered = positions.map((pos, i) => ({ ...pos, order: i }))
 
       // Merge back into full layout (preserving hidden widgets)
       const hiddenWidgets = layout.widgets.filter(
-        (w) => !accessibleWidgetIds.has(w.widgetId)
-      );
-      emitLayoutChange([...reordered, ...hiddenWidgets]);
-      setDragIndex(null);
-      setDragOverIndex(null);
+        (w) => !accessibleWidgetIds.has(w.widgetId),
+      )
+      emitLayoutChange([...reordered, ...hiddenWidgets])
+      setDragIndex(null)
+      setDragOverIndex(null)
     },
-    [dragIndex, visiblePositions, layout.widgets, accessibleWidgetIds, emitLayoutChange]
-  );
+    [
+      dragIndex,
+      visiblePositions,
+      layout.widgets,
+      accessibleWidgetIds,
+      emitLayoutChange,
+    ],
+  )
 
   const handleDragEnd = useCallback(() => {
-    setDragIndex(null);
-    setDragOverIndex(null);
-  }, []);
+    setDragIndex(null)
+    setDragOverIndex(null)
+  }, [])
 
   // --- Resize handler ------------------------------------------------------
   const handleResize = useCallback(
     (index: number, newRowCount: number) => {
-      const targetId = visiblePositions[index]?.widgetId;
-      if (!targetId) return;
+      const targetId = visiblePositions[index]?.widgetId
+      if (!targetId) return
       const positions = layout.widgets.map((p) =>
-        p.widgetId === targetId ? { ...p, rowSpan: Math.max(1, Math.min(6, newRowCount)) } : p
-      );
-      emitLayoutChange(positions);
+        p.widgetId === targetId
+          ? { ...p, rowSpan: Math.max(1, Math.min(6, newRowCount)) }
+          : p,
+      )
+      emitLayoutChange(positions)
     },
-    [layout.widgets, visiblePositions, emitLayoutChange]
-  );
+    [layout.widgets, visiblePositions, emitLayoutChange],
+  )
 
   // --- Add/Remove widget ---------------------------------------------------
   const handleAddWidget = useCallback(
     (widgetId: string) => {
-      const def = WIDGET_REGISTRY.find((w) => w.id === widgetId);
-      if (!def) return;
-      const spans = WIDGET_SIZE_SPANS[def.defaultSize];
+      const def = WIDGET_REGISTRY.find((w) => w.id === widgetId)
+      if (!def) return
+      const spans = WIDGET_SIZE_SPANS[def.defaultSize]
       const newPos: WidgetPosition = {
         widgetId,
         colSpan: spans.colSpan,
         rowSpan: spans.rowSpan,
         order: layout.widgets.length,
-      };
-      emitLayoutChange([...layout.widgets, newPos]);
+      }
+      emitLayoutChange([...layout.widgets, newPos])
     },
-    [layout.widgets, emitLayoutChange]
-  );
+    [layout.widgets, emitLayoutChange],
+  )
 
   const handleRemoveWidget = useCallback(
     (widgetId: string) => {
-      const filtered = layout.widgets.filter((w) => w.widgetId !== widgetId);
+      const filtered = layout.widgets.filter((w) => w.widgetId !== widgetId)
       // Re-order remaining
       const reordered = filtered
         .sort((a, b) => a.order - b.order)
-        .map((w, i) => ({ ...w, order: i }));
-      emitLayoutChange(reordered);
+        .map((w, i) => ({ ...w, order: i }))
+      emitLayoutChange(reordered)
     },
-    [layout.widgets, emitLayoutChange]
-  );
+    [layout.widgets, emitLayoutChange],
+  )
 
   // --- Reset to default ----------------------------------------------------
   const handleReset = useCallback(() => {
-    const def = createDefaultLayout(dashboard, userId);
-    setLayout(def);
-    onLayoutChange?.(def);
-  }, [dashboard, userId, onLayoutChange]);
+    const def = createDefaultLayout(dashboard, userId)
+    setLayout(def)
+    onLayoutChange?.(def)
+  }, [dashboard, userId, onLayoutChange])
 
   // --- Load saved view -----------------------------------------------------
   const handleLoadView = useCallback(
     (layoutId: string) => {
-      const view = savedViews.find((v) => v.id === layoutId);
+      const view = savedViews.find((v) => v.id === layoutId)
       if (view) {
-        setLayout(view);
-        onLayoutChange?.(view);
+        setLayout(view)
+        onLayoutChange?.(view)
       }
-      setShowViewMenu(false);
+      setShowViewMenu(false)
     },
-    [savedViews, onLayoutChange]
-  );
+    [savedViews, onLayoutChange],
+  )
 
   // --- Grid style ----------------------------------------------------------
   const gridStyle: React.CSSProperties = {
@@ -600,7 +674,7 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
     gap: 16,
     padding: 16,
     minHeight: 200,
-  };
+  }
 
   return (
     <div
@@ -628,7 +702,14 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
           </h2>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            flexWrap: 'wrap',
+          }}
+        >
           {/* Saved views dropdown */}
           {savedViews.length > 0 && (
             <div style={{ position: 'relative' }}>
@@ -674,15 +755,23 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
                         fontSize: 14,
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = 'var(--np-hover)';
+                        ;(e.currentTarget as HTMLElement).style.background =
+                          'var(--np-hover)'
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLElement).style.background = 'none';
+                        ;(e.currentTarget as HTMLElement).style.background =
+                          'none'
                       }}
                     >
                       {view.name}
                       {view.isDefault && (
-                        <span style={{ color: 'var(--np-muted)', marginLeft: 8, fontSize: 12 }}>
+                        <span
+                          style={{
+                            color: 'var(--np-muted)',
+                            marginLeft: 8,
+                            fontSize: 12,
+                          }}
+                        >
                           (default)
                         </span>
                       )}
@@ -762,7 +851,10 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
             }}
           >
             <p style={{ marginBottom: 16 }}>No widgets on this dashboard.</p>
-            <button onClick={() => setShowPicker(true)} style={toolbarButtonStyle}>
+            <button
+              onClick={() => setShowPicker(true)}
+              style={toolbarButtonStyle}
+            >
               <Plus size={16} />
               Add your first widget
             </button>
@@ -770,14 +862,14 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
         )}
 
         {visiblePositions.map((pos, index) => {
-          const widget = WIDGET_REGISTRY.find((w) => w.id === pos.widgetId);
-          if (!widget) return null;
+          const widget = WIDGET_REGISTRY.find((w) => w.id === pos.widgetId)
+          if (!widget) return null
 
-          const isDragging = dragIndex === index;
-          const isDragOver = dragOverIndex === index && dragIndex !== null;
-          const data = widgetData[pos.widgetId];
-          const loading = widgetLoading[pos.widgetId];
-          const error = widgetErrors[pos.widgetId];
+          const isDragging = dragIndex === index
+          const isDragOver = dragOverIndex === index && dragIndex !== null
+          const data = widgetData[pos.widgetId]
+          const loading = widgetLoading[pos.widgetId]
+          const error = widgetErrors[pos.widgetId]
 
           return (
             <div
@@ -805,7 +897,11 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
                 widget={widget}
                 loading={loading}
                 error={error}
-                onRefresh={onRefreshWidget ? () => onRefreshWidget(pos.widgetId) : undefined}
+                onRefresh={
+                  onRefreshWidget
+                    ? () => onRefreshWidget(pos.widgetId)
+                    : undefined
+                }
                 onRemove={() => handleRemoveWidget(pos.widgetId)}
                 isDragging={isDragging}
               >
@@ -813,11 +909,13 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
               </WidgetContainer>
 
               <ResizeHandle
-                onResize={(delta) => handleResize(index, visiblePositions[index].rowSpan + delta)}
+                onResize={(delta) =>
+                  handleResize(index, visiblePositions[index].rowSpan + delta)
+                }
                 currentRows={pos.rowSpan}
               />
             </div>
-          );
+          )
         })}
       </div>
 
@@ -832,8 +930,8 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
         />
       )}
     </div>
-  );
-};
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Shared styles
@@ -851,6 +949,6 @@ const toolbarButtonStyle: React.CSSProperties = {
   fontSize: 14,
   cursor: 'pointer',
   transition: 'background 0.15s, opacity 0.15s',
-};
+}
 
-export default DashboardGrid;
+export default DashboardGrid

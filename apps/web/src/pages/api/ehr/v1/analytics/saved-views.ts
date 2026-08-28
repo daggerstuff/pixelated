@@ -1,11 +1,14 @@
 import {
+  getOrCreateUserSettings,
+  updateUserSettings,
+} from '@/lib/db/user-settings'
+import {
   resolveTenantId,
   requireEHRPermission,
   ehrValidationError,
   ehrSuccess,
   ehrCreated,
 } from '@/lib/ehr-native/api'
-import { getOrCreateUserSettings, updateUserSettings } from '@/lib/db/user-settings'
 import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 /**
@@ -166,8 +169,7 @@ export const DELETE = withV1Contract('deleteView', async (ctx, caller) => {
 
   const url = new URL(ctx.request.url)
   const viewId = url.searchParams.get('id')
-  if (!viewId)
-    return ehrValidationError('id query parameter is required.')
+  if (!viewId) return ehrValidationError('id query parameter is required.')
 
   const settings = await getOrCreateUserSettings(caller.user.id)
   const existing = (settings.preferences?.[VIEWS_KEY] as SavedView[]) ?? []
@@ -203,14 +205,12 @@ export const PUT = withV1Contract('setDefaultView', async (ctx, caller) => {
 
   const url = new URL(ctx.request.url)
   const viewId = url.searchParams.get('id')
-  if (!viewId)
-    return ehrValidationError('id query parameter is required.')
+  if (!viewId) return ehrValidationError('id query parameter is required.')
 
   const settings = await getOrCreateUserSettings(caller.user.id)
   const existing = (settings.preferences?.[VIEWS_KEY] as SavedView[]) ?? []
   const target = existing.find((v) => v.id === viewId)
-  if (!target)
-    return ehrValidationError('Saved view not found.')
+  if (!target) return ehrValidationError('Saved view not found.')
 
   const updated = existing.map((v) => {
     if (v.dashboard !== target.dashboard) return v

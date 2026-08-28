@@ -5,15 +5,19 @@
  * @module ehr/dashboards
  */
 
-import React, { type FC } from 'react';
-import type { ClinicalRole } from '@/lib/ehr-native/auth';
-import { DashboardGrid, type DashboardGridProps } from './DashboardGrid';
-import type { DashboardType } from './types';
+import React, { type FC } from 'react'
 
-export interface PracticeDashboardProps
-  extends Omit<DashboardGridProps, 'dashboard'> {
+import type { ClinicalRole } from '@/lib/ehr-native/auth'
+
+import { DashboardGrid, type DashboardGridProps } from './DashboardGrid'
+import type { DashboardType } from './types'
+
+export interface PracticeDashboardProps extends Omit<
+  DashboardGridProps,
+  'dashboard'
+> {
   /** Allows overriding dashboard type (defaults to 'practice') */
-  dashboardType?: DashboardType;
+  dashboardType?: DashboardType
 }
 
 /**
@@ -24,7 +28,7 @@ const PracticeDashboard: FC<PracticeDashboardProps> = ({
   dashboardType = 'practice',
   ...props
 }) => {
-  return <DashboardGrid dashboard={dashboardType} {...props} />;
-};
+  return <DashboardGrid dashboard={dashboardType} {...props} />
+}
 
-export default PracticeDashboard;
+export default PracticeDashboard

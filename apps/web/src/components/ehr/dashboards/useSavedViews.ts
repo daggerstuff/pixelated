@@ -7,94 +7,111 @@
  * @module useSavedViews
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react'
 
-import type { DashboardLayout, DashboardType } from './types';
-import { savedViewsService } from './saved-views-service';
+import { savedViewsService } from './saved-views-service'
+import type { DashboardLayout, DashboardType } from './types'
 
 export interface UseSavedViewsResult {
-  views: DashboardLayout[];
-  loading: boolean;
-  error: string | null;
-  saveView: (view: DashboardLayout) => Promise<DashboardLayout>;
-  deleteView: (viewId: string) => Promise<void>;
-  setDefaultView: (viewId: string) => Promise<void>;
-  refresh: () => void;
+  views: DashboardLayout[]
+  loading: boolean
+  error: string | null
+  saveView: (view: DashboardLayout) => Promise<DashboardLayout>
+  deleteView: (viewId: string) => Promise<void>
+  setDefaultView: (viewId: string) => Promise<void>
+  refresh: () => void
 }
 
-export function useSavedViews(userId: string, dashboard: DashboardType): UseSavedViewsResult {
-  const [views, setViews] = useState<DashboardLayout[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+export function useSavedViews(
+  userId: string,
+  dashboard: DashboardType,
+): UseSavedViewsResult {
+  const [views, setViews] = useState<DashboardLayout[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
-      const loaded = await savedViewsService.loadViews(userId, dashboard);
-      setViews(loaded);
+      const loaded = await savedViewsService.loadViews(userId, dashboard)
+      setViews(loaded)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load saved views');
+      setError(
+        err instanceof Error ? err.message : 'Failed to load saved views',
+      )
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [userId, dashboard]);
+  }, [userId, dashboard])
 
   useEffect(() => {
-    let cancelled = false;
+    let cancelled = false
     void (async () => {
       try {
-        const loaded = await savedViewsService.loadViews(userId, dashboard);
+        const loaded = await savedViewsService.loadViews(userId, dashboard)
         if (!cancelled) {
-          setViews(loaded);
+          setViews(loaded)
         }
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load saved views');
+          setError(
+            err instanceof Error ? err.message : 'Failed to load saved views',
+          )
         }
       } finally {
         if (!cancelled) {
-          setLoading(false);
+          setLoading(false)
         }
       }
-    })();
+    })()
     return () => {
-      cancelled = true;
-    };
-  }, [userId, dashboard]);
+      cancelled = true
+    }
+  }, [userId, dashboard])
 
   const saveView = useCallback(
     async (view: DashboardLayout): Promise<DashboardLayout> => {
-      const saved = await savedViewsService.saveView(userId, dashboard, view);
+      const saved = await savedViewsService.saveView(userId, dashboard, view)
       setViews((prev) => {
-        const idx = prev.findIndex((v) => v.id === saved.id);
+        const idx = prev.findIndex((v) => v.id === saved.id)
         if (idx >= 0) {
-          const next = [...prev];
-          next[idx] = saved;
-          return next;
+          const next = [...prev]
+          next[idx] = saved
+          return next
         }
-        return [...prev, saved];
-      });
-      return saved;
+        return [...prev, saved]
+      })
+      return saved
     },
     [userId, dashboard],
-  );
+  )
 
   const deleteView = useCallback(
     async (viewId: string): Promise<void> => {
-      await savedViewsService.deleteView(userId, dashboard, viewId);
-      setViews((prev) => prev.filter((v) => v.id !== viewId));
+      await savedViewsService.deleteView(userId, dashboard, viewId)
+      setViews((prev) => prev.filter((v) => v.id !== viewId))
     },
     [userId, dashboard],
-  );
+  )
 
   const setDefaultView = useCallback(
     async (viewId: string): Promise<void> => {
-      await savedViewsService.setDefaultView(userId, dashboard, viewId);
-      setViews((prev) => prev.map((v) => ({ ...v, isDefault: v.id === viewId })));
+      await savedViewsService.setDefaultView(userId, dashboard, viewId)
+      setViews((prev) =>
+        prev.map((v) => ({ ...v, isDefault: v.id === viewId })),
+      )
     },
     [userId, dashboard],
-  );
+  )
 
-  return { views, loading, error, saveView, deleteView, setDefaultView, refresh };
+  return {
+    views,
+    loading,
+    error,
+    saveView,
+    deleteView,
+    setDefaultView,
+    refresh,
+  }
 }

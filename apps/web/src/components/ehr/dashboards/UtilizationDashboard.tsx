@@ -5,16 +5,17 @@
  * @module ehr/dashboards
  */
 
-import React, { type FC } from 'react';
-import { DashboardGrid, type DashboardGridProps } from './DashboardGrid';
+import React, { type FC } from 'react'
 
-export type UtilizationDashboardProps = Omit<DashboardGridProps, 'dashboard'>;
+import { DashboardGrid, type DashboardGridProps } from './DashboardGrid'
+
+export type UtilizationDashboardProps = Omit<DashboardGridProps, 'dashboard'>
 
 /**
  * Utilization dashboard wrapper.
  */
 const UtilizationDashboard: FC<UtilizationDashboardProps> = (props) => {
-  return <DashboardGrid dashboard="utilization" {...props} />;
-};
+  return <DashboardGrid dashboard="utilization" {...props} />
+}
 
-export default UtilizationDashboard;
+export default UtilizationDashboard

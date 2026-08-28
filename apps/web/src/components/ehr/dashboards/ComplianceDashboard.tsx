@@ -6,16 +6,17 @@
  * @module ehr/dashboards
  */
 
-import React, { type FC } from 'react';
-import { DashboardGrid, type DashboardGridProps } from './DashboardGrid';
+import React, { type FC } from 'react'
 
-export type ComplianceDashboardProps = Omit<DashboardGridProps, 'dashboard'>;
+import { DashboardGrid, type DashboardGridProps } from './DashboardGrid'
+
+export type ComplianceDashboardProps = Omit<DashboardGridProps, 'dashboard'>
 
 /**
  * Compliance & Audit dashboard wrapper.
  */
 const ComplianceDashboard: FC<ComplianceDashboardProps> = (props) => {
-  return <DashboardGrid dashboard="compliance" {...props} />;
-};
+  return <DashboardGrid dashboard="compliance" {...props} />
+}
 
-export default ComplianceDashboard;
+export default ComplianceDashboard

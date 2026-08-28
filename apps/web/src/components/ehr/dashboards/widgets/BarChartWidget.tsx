@@ -1,17 +1,24 @@
-import React, { FC, useMemo } from 'react';
+import React, { FC, useMemo } from 'react'
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  Legend, Cell,
-} from 'recharts';
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  Cell,
+} from 'recharts'
 
 export interface BarChartWidgetProps {
-  data: Array<Record<string, string | number | null>>;
-  xKey?: string;
-  yKeys?: string[];
-  yUnit?: string;
-  horizontal?: boolean;
-  colors?: string[];
-  stacked?: boolean;
+  data: Array<Record<string, string | number | null>>
+  xKey?: string
+  yKeys?: string[]
+  yUnit?: string
+  horizontal?: boolean
+  colors?: string[]
+  stacked?: boolean
 }
 
 export const BarChartWidget: FC<BarChartWidgetProps> = ({
@@ -26,8 +33,8 @@ export const BarChartWidget: FC<BarChartWidgetProps> = ({
   const defaultColors = useMemo(
     () => ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
     [],
-  );
-  const barColors = colors ?? defaultColors;
+  )
+  const barColors = colors ?? defaultColors
 
   return (
     <div style={{ width: '100%', height: '100%', minHeight: 200 }}>
@@ -37,14 +44,20 @@ export const BarChartWidget: FC<BarChartWidgetProps> = ({
           layout={horizontal ? 'vertical' : 'horizontal'}
           margin={{ top: 8, right: 16, bottom: 8, left: horizontal ? 40 : 0 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--np-line)" opacity={0.4} />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="var(--np-line)"
+            opacity={0.4}
+          />
           {horizontal ? (
             <>
               <XAxis
                 type="number"
                 tick={{ fill: 'var(--np-muted)', fontSize: 11 }}
                 axisLine={{ stroke: 'var(--np-line)' }}
-                tickFormatter={(v: number) => yUnit ? `${v}${yUnit}` : String(v)}
+                tickFormatter={(v: number) =>
+                  yUnit ? `${v}${yUnit}` : String(v)
+                }
               />
               <YAxis
                 type="category"
@@ -65,7 +78,9 @@ export const BarChartWidget: FC<BarChartWidgetProps> = ({
               <YAxis
                 tick={{ fill: 'var(--np-muted)', fontSize: 11 }}
                 axisLine={{ stroke: 'var(--np-line)' }}
-                tickFormatter={(v: number) => yUnit ? `${v}${yUnit}` : String(v)}
+                tickFormatter={(v: number) =>
+                  yUnit ? `${v}${yUnit}` : String(v)
+                }
               />
             </>
           )}
@@ -90,21 +105,22 @@ export const BarChartWidget: FC<BarChartWidgetProps> = ({
               radius={[4, 4, 0, 0]}
               stackId={stacked ? '1' : undefined}
             >
-              {yKeys.length === 1 && data.map((_, cellIdx) => {
-                const value = data[cellIdx] as Record<string, unknown>;
-                const status = (value['status'] as string) ?? '';
-                let cellColor = barColors[idx % barColors.length];
-                if (status === 'critical') cellColor = 'var(--np-danger)';
-                else if (status === 'warning') cellColor = '#f59e0b';
-                else if (status === 'good') cellColor = 'var(--np-success)';
-                return <Cell key={cellIdx} fill={cellColor} />;
-              })}
+              {yKeys.length === 1 &&
+                data.map((_, cellIdx) => {
+                  const value = data[cellIdx] as Record<string, unknown>
+                  const status = (value['status'] as string) ?? ''
+                  let cellColor = barColors[idx % barColors.length]
+                  if (status === 'critical') cellColor = 'var(--np-danger)'
+                  else if (status === 'warning') cellColor = '#f59e0b'
+                  else if (status === 'good') cellColor = 'var(--np-success)'
+                  return <Cell key={cellIdx} fill={cellColor} />
+                })}
             </Bar>
           ))}
         </BarChart>
       </ResponsiveContainer>
     </div>
-  );
-};
+  )
+}
 
-export default BarChartWidget;
+export default BarChartWidget

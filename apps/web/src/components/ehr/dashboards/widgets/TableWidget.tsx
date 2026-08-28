@@ -1,22 +1,22 @@
-import React, { FC, useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react'
+import React, { FC, useState, useMemo } from 'react'
 
 export interface TableColumn {
-  key: string;
-  label: string;
-  align?: 'left' | 'center' | 'right';
-  width?: string;
-  format?: (value: unknown) => string;
-  sortable?: boolean;
+  key: string
+  label: string
+  align?: 'left' | 'center' | 'right'
+  width?: string
+  format?: (value: unknown) => string
+  sortable?: boolean
 }
 
 export interface TableWidgetProps {
-  columns: TableColumn[];
-  rows: Array<Record<string, unknown>>;
-  pageSize?: number;
-  maxRows?: number;
-  showHeader?: boolean;
-  emptyMessage?: string;
+  columns: TableColumn[]
+  rows: Array<Record<string, unknown>>
+  pageSize?: number
+  maxRows?: number
+  showHeader?: boolean
+  emptyMessage?: string
 }
 
 export const TableWidget: FC<TableWidgetProps> = ({
@@ -27,46 +27,46 @@ export const TableWidget: FC<TableWidgetProps> = ({
   showHeader = true,
   emptyMessage = 'No data available',
 }) => {
-  const [sortKey, setSortKey] = useState<string | null>(null);
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
-  const [page, setPage] = useState(0);
+  const [sortKey, setSortKey] = useState<string | null>(null)
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
+  const [page, setPage] = useState(0)
 
   const displayRows = useMemo(() => {
-    let result = [...rows];
+    let result = [...rows]
     if (maxRows && result.length > maxRows) {
-      result = result.slice(0, maxRows);
+      result = result.slice(0, maxRows)
     }
     if (sortKey) {
-      const col = columns.find((c) => c.key === sortKey);
+      const col = columns.find((c) => c.key === sortKey)
       result.sort((a, b) => {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
-        let cmp = 0;
+        const aVal = a[sortKey]
+        const bVal = b[sortKey]
+        let cmp = 0
         if (typeof aVal === 'number' && typeof bVal === 'number') {
-          cmp = aVal - bVal;
+          cmp = aVal - bVal
         } else {
-          cmp = String(aVal ?? '').localeCompare(String(bVal ?? ''));
+          cmp = String(aVal ?? '').localeCompare(String(bVal ?? ''))
         }
-        return sortDir === 'asc' ? cmp : -cmp;
-      });
+        return sortDir === 'asc' ? cmp : -cmp
+      })
     }
     if (pageSize > 0) {
-      result = result.slice(page * pageSize, (page + 1) * pageSize);
+      result = result.slice(page * pageSize, (page + 1) * pageSize)
     }
-    return result;
-  }, [rows, sortKey, sortDir, page, pageSize, maxRows, columns]);
+    return result
+  }, [rows, sortKey, sortDir, page, pageSize, maxRows, columns])
 
-  const totalPages = Math.ceil(rows.length / pageSize);
+  const totalPages = Math.ceil(rows.length / pageSize)
 
   const handleSort = (col: TableColumn) => {
-    if (!col.sortable) return;
+    if (!col.sortable) return
     if (sortKey === col.key) {
-      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      setSortDir((prev) => (prev === 'asc' ? 'desc' : 'asc'))
     } else {
-      setSortKey(col.key);
-      setSortDir('asc');
+      setSortKey(col.key)
+      setSortDir('asc')
     }
-  };
+  }
 
   const cellStyle = (align: TableColumn['align']): React.CSSProperties => ({
     textAlign: align ?? 'left',
@@ -74,22 +74,24 @@ export const TableWidget: FC<TableWidgetProps> = ({
     fontSize: 12,
     color: 'var(--np-text)',
     borderBottom: '1px solid var(--np-line)',
-  });
+  })
 
   if (rows.length === 0) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-        minHeight: 120,
-        color: 'var(--np-muted)',
-        fontSize: 13,
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          minHeight: 120,
+          color: 'var(--np-muted)',
+          fontSize: 13,
+        }}
+      >
         {emptyMessage}
       </div>
-    );
+    )
   }
 
   return (
@@ -114,15 +116,21 @@ export const TableWidget: FC<TableWidgetProps> = ({
                     userSelect: 'none',
                   }}
                 >
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
                     {col.label}
-                    {col.sortable && sortKey === col.key && (
-                      sortDir === 'asc' ? (
+                    {col.sortable &&
+                      sortKey === col.key &&
+                      (sortDir === 'asc' ? (
                         <ChevronUp size={12} />
                       ) : (
                         <ChevronDown size={12} />
-                      )
-                    )}
+                      ))}
                   </span>
                 </th>
               ))}
@@ -135,34 +143,38 @@ export const TableWidget: FC<TableWidgetProps> = ({
               key={rowIdx}
               style={{ transition: 'background-color 0.15s' }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--np-hover)';
+                e.currentTarget.style.backgroundColor = 'var(--np-hover)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.backgroundColor = 'transparent'
               }}
             >
               {columns.map((col) => {
-                const value = row[col.key];
-                const display = col.format ? col.format(value) : value?.toString() ?? '';
+                const value = row[col.key]
+                const display = col.format
+                  ? col.format(value)
+                  : (value?.toString() ?? '')
                 return (
                   <td key={col.key} style={cellStyle(col.align)}>
                     {display}
                   </td>
-                );
+                )
               })}
             </tr>
           ))}
         </tbody>
       </table>
       {totalPages > 1 && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '8px 12px',
-          fontSize: 11,
-          color: 'var(--np-muted)',
-        }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '8px 12px',
+            fontSize: 11,
+            color: 'var(--np-muted)',
+          }}
+        >
           <span>
             Page {page + 1} of {totalPages}
           </span>
@@ -202,7 +214,7 @@ export const TableWidget: FC<TableWidgetProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default TableWidget;
+export default TableWidget

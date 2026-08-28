@@ -5,16 +5,17 @@
  * @module ehr/dashboards
  */
 
-import React, { type FC } from 'react';
-import { DashboardGrid, type DashboardGridProps } from './DashboardGrid';
+import React, { type FC } from 'react'
 
-export type OutcomesDashboardProps = Omit<DashboardGridProps, 'dashboard'>;
+import { DashboardGrid, type DashboardGridProps } from './DashboardGrid'
+
+export type OutcomesDashboardProps = Omit<DashboardGridProps, 'dashboard'>
 
 /**
  * Clinical Outcomes dashboard wrapper.
  */
 const OutcomesDashboard: FC<OutcomesDashboardProps> = (props) => {
-  return <DashboardGrid dashboard="outcomes" {...props} />;
-};
+  return <DashboardGrid dashboard="outcomes" {...props} />
+}
 
-export default OutcomesDashboard;
+export default OutcomesDashboard
