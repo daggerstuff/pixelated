@@ -2038,19 +2038,45 @@ components:
       properties:
         data:
           type: object
-          description: Consent verification result (granted/denied status, consent level, and details)
+          description: Consent verification result
           properties:
-            granted:
+            verified:
               type: boolean
-              description: Whether consent is granted at the requested level
-            level:
+              description: Whether consent is sufficient for the requested operation
+            consentLevel:
               type: string
-              description: The consent level that was verified
-            patientId:
+              enum: [none, minimal, limited, full]
+              description: The effective consent level of the patient
+            expired:
+              type: boolean
+              description: Whether the consent has expired
+            stateRules:
+              $ref: '#/components/schemas/StateConsentRules'
+            reason:
               type: string
-              description: Patient ID that was checked
-            details:
-              type: object
-              description: Additional verification details (jurisdiction, category, etc.)
-        pagination:
-          $ref: '#/components/schemas/Pagination'
+              description: Reason for the verification outcome
+
+    StateConsentRules:
+      type: object
+      description: State-specific consent rules applied during verification
+      properties:
+        minimumConsentLevel:
+          type: string
+          enum: [none, minimal, limited, full]
+          description: Minimum consent level required for general treatment
+        overrideConsentLevel:
+          type: string
+          enum: [none, minimal, limited, full]
+          description: Optional elevated consent level that overrides the minimum for specific operations
+        requiresMentalHealthConsent:
+          type: boolean
+          description: Whether mental health treatment requires separate or explicit consent
+        requiresSUDConsent:
+          type: boolean
+          description: Whether substance use disorder treatment requires separate consent
+        requiresMinorParentalConsent:
+          type: boolean
+          description: Whether minors need parental consent
+        ageOfMajority:
+          type: integer
+          description: The age at which a patient is considered an adult for consent purposes
