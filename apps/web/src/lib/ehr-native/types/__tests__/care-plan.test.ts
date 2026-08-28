@@ -211,6 +211,27 @@ describe('carePlanSchema', () => {
     expect(result.success).toBe(false)
   })
 
+  // PIX-4412 follow-up: FHIR R4 cardinality 1..1 — detail.status is required
+  // when detail is present. Pre-fix this was `.optional()` and parsed.
+  it('rejects activity.detail with missing required status (FHIR R4 1..1)', () => {
+    const result = carePlanSchema.safeParse({
+      ...validCarePlan,
+      activity: [
+        {
+          detail: { kind: 'ServiceRequest' },
+        },
+      ],
+    })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      const statusIssue = result.error.issues.find(
+        (issue) => issue.path.join('.') === 'activity.0.detail.status',
+      )
+      expect(statusIssue).toBeDefined()
+      expect(['invalid_type', 'invalid_value']).toContain(statusIssue?.code)
+    }
+  })
+
   it('infers the CarePlan TypeScript type', () => {
     // Type-level assertion: carePlanSchema.parse returns CarePlan
     const parsed = carePlanSchema.parse(validCarePlan)

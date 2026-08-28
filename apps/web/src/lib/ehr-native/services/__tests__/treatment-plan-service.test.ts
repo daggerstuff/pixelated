@@ -38,6 +38,7 @@ const rlsContext: RLSContext = {
 
 const validInput = {
   patientId: 'patient-001',
+  sessionId: 'session-001',
   icd10Codes: [
     {
       code: 'F32.2',
@@ -131,7 +132,7 @@ describe('TreatmentPlanService', () => {
       expect(result.warnings).toEqual(['Monitor suicidality given F32.2'])
     })
 
-    it('sends POST to /suggest with snake_case payload and RLS session_id', async () => {
+    it('sends POST to /suggest with snake_case payload and caller-provided session_id', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -149,7 +150,7 @@ describe('TreatmentPlanService', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             patient_id: 'patient-001',
-            session_id: 'tenant-001',
+            session_id: 'session-001',
             icd10_codes: [
               {
                 code: 'F32.2',

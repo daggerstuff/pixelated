@@ -85,6 +85,7 @@ export interface ModalityIntervention {
 
 export interface SuggestionRequestInput {
   patientId: string
+  sessionId: string
   icd10Codes: ICD10Code[]
   outcomeTrends?: OutcomeTrendPoint[]
   treatmentHistory?: TreatmentHistoryEntry[]
@@ -150,7 +151,7 @@ export class TreatmentPlanService {
 
     const payload = {
       patient_id: input.patientId,
-      session_id: this.rlsContext.tenantId,
+      session_id: input.sessionId,
       icd10_codes: input.icd10Codes.map((c) => ({
         code: c.code,
         description: c.description,
