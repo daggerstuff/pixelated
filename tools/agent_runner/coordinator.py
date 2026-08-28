@@ -40,6 +40,7 @@ from tools.agent_runner.state_manager import StateManager
 from tools.agent_runner.subagent_harness import SubAgentHarness
 from tools.agent_runner.telemetry import TelemetryCollector
 from tools.agent_runner.triage import AutoTriageEngine
+from tools.agent_runner.trace_analyzer import TraceAnalyzer
 from tools.agent_runner.verifier import VerificationEngine, VerificationOutcome
 from tools.agent_runner.worktree_pool import GitWorktreePool
 
@@ -137,6 +138,7 @@ class MultiAgentCoordinator:
         )
         self.loop_auditor = WorkLoopAuditor()
         self.sensor_engine = SensorHookEngine()
+        self.trace_analyzer = TraceAnalyzer(config.langchain_project)
         self.lineage = comps.lineage_tracker or LineageTracker()
         self.evolution = comps.self_evolution or SelfEvolutionEngine(self.foresight, self.event_bus)
         self._shutdown_requested = False
@@ -551,9 +553,19 @@ class MultiAgentCoordinator:
                     ),
                 )
 
+            # Active Trace Audit & Anomaly Detection
+            trace_summary = self.trace_analyzer.analyze_ticket_trace(issue.identifier)
+            if trace_summary and trace_summary.anomalies:
+                for anomaly in trace_summary.anomalies:
+                    logger.warning("Trace anomaly detected for %s: %s", issue.identifier, anomaly)
+                    result.guardrail_violations.append(f"Trace Anomaly: {anomaly}")
+                    if "mock data generator" in anomaly or "anti-suppression" in anomaly or "Zero file modifications" in anomaly:
+                        result.verification_passed = False
+
             # Post-Flight Sensors & Work Loop 5D Audit
             self.sensor_engine.run_post_flight_sensors(active_workdir)
             audit_report = self.loop_auditor.evaluate_execution(issue, result, is_sandboxed=bool(worktree_lease))
+            self.evolution.process_execution_friction(issue, agent.name, result)
 
             pr_res = None
             if worktree_lease and result.verification_passed:
