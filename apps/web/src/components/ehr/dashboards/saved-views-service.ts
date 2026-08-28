@@ -51,8 +51,8 @@ async function fetchViewsFromAPI(userId: string, dashboard: DashboardType): Prom
     headers: { 'Content-Type': 'application/json' },
   });
   if (!res.ok) throw new Error(`Failed to fetch saved views: ${res.status}`);
-  const body = (await res.json()) as { views: DashboardLayout[] };
-  return body.views ?? [];
+  const body = (await res.json()) as { data: { views: DashboardLayout[] } };
+  return body.data?.views ?? [];
 }
 
 async function saveViewToAPI(userId: string, view: DashboardLayout): Promise<DashboardLayout> {
@@ -62,8 +62,8 @@ async function saveViewToAPI(userId: string, view: DashboardLayout): Promise<Das
     body: JSON.stringify({ ...view, ownerId: userId }),
   });
   if (!res.ok) throw new Error(`Failed to save view: ${res.status}`);
-  const body = (await res.json()) as { view: DashboardLayout };
-  return body.view;
+  const body = (await res.json()) as { data: DashboardLayout };
+  return body.data;
 }
 
 async function deleteViewFromAPI(userId: string, viewId: string): Promise<void> {

@@ -46,7 +46,7 @@ describe('savedViewsService', () => {
       const mockViews = [createLayout('v1'), createLayout('v2')];
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ views: mockViews }),
+        json: async () => ({ data: { views: mockViews } }),
       }) as never;
 
       const views = await savedViewsService.loadViews('user-1', 'practice');
@@ -77,7 +77,7 @@ describe('savedViewsService', () => {
     it('returns empty array when API returns ok but no views', async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ views: [] }),
+        json: async () => ({ data: { views: [] } }),
       }) as never;
       const views = await savedViewsService.loadViews('user-1', 'practice');
       expect(views).toEqual([]);
@@ -91,7 +91,7 @@ describe('savedViewsService', () => {
       const view = createLayout('new-1');
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ view }),
+        json: async () => ({ data: view }),
       }) as never;
 
       const result = await savedViewsService.saveView('user-1', 'practice', view);
@@ -116,7 +116,7 @@ describe('savedViewsService', () => {
       const updated = { ...existing, name: 'Updated' };
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
-        json: async () => ({ view: updated }),
+        json: async () => ({ data: updated }),
       }) as never;
 
       await savedViewsService.saveView('user-1', 'practice', updated);

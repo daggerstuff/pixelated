@@ -212,14 +212,13 @@ export const PUT = withV1Contract('setDefaultView', async (ctx, caller) => {
   if (!target)
     return ehrValidationError('Saved view not found.')
 
-  const updated = existing.map((v) => ({
-    ...v,
-    isDefault:
-      v.id === viewId ||
-      (v.dashboard === target.dashboard && v.isDefault)
-        ? v.id === viewId
-        : false,
-  }))
+  const updated = existing.map((v) => {
+    if (v.dashboard !== target.dashboard) return v
+    return {
+      ...v,
+      isDefault: v.id === viewId,
+    }
+  })
 
   await updateUserSettings(caller.user.id, {
     [`preferences.${VIEWS_KEY}`]: updated,
