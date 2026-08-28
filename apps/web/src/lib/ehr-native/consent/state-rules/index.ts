@@ -1,12 +1,12 @@
 /**
- * EHR Native — Consent State Rules (F1.4 / Phase 3 prep: F3.3)
+ * EHR Native — Consent State Rules (F1.4 + F3.3)
  *
- * Default + override architecture for per-state consent rules.
+ * Phase 1: in-memory default ruleset (DEFAULT_STATE_RULES) + override hook.
+ * Used as the fallback when no Phase 3 versioned rule exists.
  *
- * Phase 1: single configurable ruleset (DEFAULT_STATE_RULES) + override hook.
- * Phase 3: per-state rules loaded from versioned JSON config files.
- *
- * @see docs/adr/ADR-007-consent-state-rules.md
+ * Phase 3: per-state rules with legal sign-off, stored as versioned JSONB
+ * in PostgreSQL (ehr_state_consent_rules) with Redis caching.
+ * See ./engine.ts for the runtime evaluator and ./repository.ts for persistence.
  */
 
 import type { ConsentLevel } from '@/lib/research/types/research-types'
