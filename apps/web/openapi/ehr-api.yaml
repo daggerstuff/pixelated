@@ -4,36 +4,36 @@ info:
   version: 1.0.0
   description: |
     Clinical EHR (Electronic Health Record) API for the Pixelated platform.
-    
+
     Provides FHIR R4-aligned REST endpoints for managing patients, encounters,
     observations, clinical notes, analytics, and outcomes measurement.
-    
+
     ## Authentication
-    
+
     All requests require either:
     - `X-API-Key` header with a valid developer API key (see API Key Management)
     - `Authorization: Bearer <token>` header with a valid OAuth2 access token (SMART-on-FHIR)
-    
+
     ## Multi-Tenancy
-    
+
     Tenant isolation is enforced via PostgreSQL Row-Level Security (RLS).
     All requests are scoped to the tenant identified by the authenticated context.
-    
+
     ## Rate Limiting
-    
+
     - Default: 1000 requests/minute per API key
     - Configurable per key up to 10,000 requests/minute
     - Rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
-    
+
     ## Pagination
-    
+
     List endpoints support cursor-based pagination:
     - `limit`: Maximum results per page (default: 20, max: 100)
     - `offset`: Number of results to skip (default: 0)
     - Response includes `pagination` object with `limit`, `offset`, and `total`
-    
+
     ## Errors
-    
+
     All errors use the standard envelope: `{ "error": { "code": string, "message": string } }`
   contact:
     name: Pixelated Developer Support
@@ -90,7 +90,7 @@ paths:
           description: Name search query (matches family or given name)
           schema:
             type: string
-          example: "Smith"
+          example: 'Smith'
         - name: active
           in: query
           description: Filter by active status
@@ -124,12 +124,12 @@ paths:
                   value:
                     data:
                       - resourceType: Patient
-                        id: "patient-001"
+                        id: 'patient-001'
                         name:
                           - family: Smith
                             given: [John]
                         active: true
-                        birthDate: "1980-01-15"
+                        birthDate: '1980-01-15'
                         gender: male
                     pagination:
                       limit: 20
@@ -157,23 +157,23 @@ paths:
                 value:
                   resourceType: Patient
                   identifier:
-                    - system: "http://pixelated.com/patient-id"
-                      value: "MRN-12345"
+                    - system: 'http://pixelated.com/patient-id'
+                      value: 'MRN-12345'
                   name:
                     - family: Smith
                       given: [Jane]
                       use: official
-                  birthDate: "1990-05-20"
+                  birthDate: '1990-05-20'
                   gender: female
                   active: true
                   telecom:
                     - system: phone
-                      value: "+1-555-0100"
+                      value: '+1-555-0100'
                   address:
-                    - line: ["123 Main St"]
+                    - line: ['123 Main St']
                       city: Springfield
                       state: IL
-                      postalCode: "62701"
+                      postalCode: '62701'
       responses:
         '201':
           description: Patient created
@@ -263,14 +263,14 @@ paths:
           description: Patient ID filter
           schema:
             type: string
-          example: "patient-001"
+          example: 'patient-001'
         - name: status
           in: query
           description: Encounter status (planned|arrived|triaged|in-progress|finished|cancelled)
           schema:
             type: string
             enum: [planned, arrived, triaged, in-progress, finished, cancelled]
-          example: "finished"
+          example: 'finished'
         - name: practitioner
           in: query
           description: Practitioner ID filter
@@ -281,13 +281,13 @@ paths:
           description: Start of date range filter (ISO 8601 timestamp)
           schema:
             type: string
-          example: "2024-01-01T00:00:00Z"
+          example: '2024-01-01T00:00:00Z'
         - name: end
           in: query
           description: End of date range filter (ISO 8601 timestamp)
           schema:
             type: string
-          example: "2024-12-31T23:59:59Z"
+          example: '2024-12-31T23:59:59Z'
         - name: limit
           in: query
           schema:
@@ -333,9 +333,9 @@ paths:
                     code: AMB
                     display: ambulatory
                   subject:
-                    reference: "Patient/patient-001"
+                    reference: 'Patient/patient-001'
                   period:
-                    start: "2024-06-15T10:00:00Z"
+                    start: '2024-06-15T10:00:00Z'
       responses:
         '201':
           description: Encounter created
@@ -413,25 +413,26 @@ paths:
           description: LOINC code filter
           schema:
             type: string
-          example: "85354-9"
+          example: '85354-9'
         - name: status
           in: query
           description: Observation status
           schema:
             type: string
-            enum: [registered, preliminary, final, amended, corrected, cancelled]
+            enum:
+              [registered, preliminary, final, amended, corrected, cancelled]
         - name: start
           in: query
           description: Start of date range filter (ISO 8601 timestamp)
           schema:
             type: string
-          example: "2024-01-01T00:00:00Z"
+          example: '2024-01-01T00:00:00Z'
         - name: end
           in: query
           description: End of date range filter (ISO 8601 timestamp)
           schema:
             type: string
-          example: "2024-12-31T23:59:59Z"
+          example: '2024-12-31T23:59:59Z'
         - name: limit
           in: query
           schema:
@@ -476,33 +477,33 @@ paths:
                   status: final
                   code:
                     coding:
-                      - system: "http://loinc.org"
-                        code: "85354-9"
-                        display: "Blood pressure panel"
+                      - system: 'http://loinc.org'
+                        code: '85354-9'
+                        display: 'Blood pressure panel'
                   subject:
-                    reference: "Patient/patient-001"
-                  effectiveDateTime: "2024-06-15T10:30:00Z"
+                    reference: 'Patient/patient-001'
+                  effectiveDateTime: '2024-06-15T10:30:00Z'
                   component:
                     - code:
                         coding:
-                          - system: "http://loinc.org"
-                            code: "8480-6"
-                            display: "Systolic blood pressure"
+                          - system: 'http://loinc.org'
+                            code: '8480-6'
+                            display: 'Systolic blood pressure'
                       valueQuantity:
                         value: 120
-                        unit: "mmHg"
-                        system: "http://unitsofmeasure.org"
-                        code: "mm[Hg]"
+                        unit: 'mmHg'
+                        system: 'http://unitsofmeasure.org'
+                        code: 'mm[Hg]'
                     - code:
                         coding:
-                          - system: "http://loinc.org"
-                            code: "8462-4"
-                            display: "Diastolic blood pressure"
+                          - system: 'http://loinc.org'
+                            code: '8462-4'
+                            display: 'Diastolic blood pressure'
                       valueQuantity:
                         value: 80
-                        unit: "mmHg"
-                        system: "http://unitsofmeasure.org"
-                        code: "mm[Hg]"
+                        unit: 'mmHg'
+                        system: 'http://unitsofmeasure.org'
+                        code: 'mm[Hg]'
       responses:
         '201':
           description: Observation created
@@ -569,7 +570,8 @@ paths:
           description: Filter by note modality
           schema:
             type: string
-            enum: [progress, consultation, discharge, procedure, nursing, therapy]
+            enum:
+              [progress, consultation, discharge, procedure, nursing, therapy]
       responses:
         '200':
           description: List of note templates
@@ -1153,12 +1155,21 @@ paths:
                         type: array
                         items:
                           type: string
-                        example: ["draft", "ready", "submitted", "accepted", "rejected", "paid", "denied"]
+                        example:
+                          [
+                            'draft',
+                            'ready',
+                            'submitted',
+                            'accepted',
+                            'rejected',
+                            'paid',
+                            'denied',
+                          ]
                       useTypes:
                         type: array
                         items:
                           type: string
-                        example: ["claim", "preauthorization", "estimate"]
+                        example: ['claim', 'preauthorization', 'estimate']
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1350,7 +1361,7 @@ components:
       schema:
         type: string
         pattern: '^[A-Za-z0-9\-\.]{1,64}$'
-      example: "patient-001"
+      example: 'patient-001'
 
   responses:
     ValidationError:
@@ -1362,7 +1373,7 @@ components:
           example:
             error:
               code: validation_failed
-              message: "Invalid date format in birthDate field"
+              message: 'Invalid date format in birthDate field'
     Unauthorized:
       description: Authentication required
       content:
@@ -1372,7 +1383,7 @@ components:
           example:
             error:
               code: unauthorized
-              message: "Valid API key or bearer token required"
+              message: 'Valid API key or bearer token required'
     Forbidden:
       description: Insufficient permissions
       content:
@@ -1392,7 +1403,7 @@ components:
           example:
             error:
               code: not_found
-              message: "Patient not found"
+              message: 'Patient not found'
 
   schemas:
     # ─── Common ──────────────────────────────────────────
@@ -1406,7 +1417,15 @@ components:
           properties:
             code:
               type: string
-              examples: [validation_failed, unauthorized, forbidden, not_found, rate_limited, internal_error]
+              examples:
+                [
+                  validation_failed,
+                  unauthorized,
+                  forbidden,
+                  not_found,
+                  rate_limited,
+                  internal_error,
+                ]
             message:
               type: string
 

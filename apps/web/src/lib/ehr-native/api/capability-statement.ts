@@ -20,9 +20,9 @@ export const IMPLEMENTED_FHIR_RESOURCES = [
   'Claim',
   'DocumentReference',
   'Consent',
-] as const;
+] as const
 
-export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number];
+export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number]
 
 /**
  * The interactions supported per resource type.
@@ -31,22 +31,83 @@ export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number];
  */
 const RESOURCE_INTERACTIONS: Record<
   FhirResourceType,
-  { read: boolean; search: boolean; create: boolean; update: boolean; patch: boolean; delete: boolean }
+  {
+    read: boolean
+    search: boolean
+    create: boolean
+    update: boolean
+    patch: boolean
+    delete: boolean
+  }
 > = {
-  Patient: { read: true, search: true, create: true, update: false, patch: true, delete: true },
-  Encounter: { read: true, search: true, create: true, update: false, patch: true, delete: false },
-  Observation: { read: true, search: true, create: true, update: false, patch: true, delete: false },
-  Appointment: { read: true, search: true, create: true, update: false, patch: true, delete: false },
-  Claim: { read: true, search: false, create: true, update: false, patch: true, delete: false },
-  DocumentReference: { read: true, search: true, create: true, update: false, patch: false, delete: false },
-  Consent: { read: true, search: false, create: false, update: false, patch: false, delete: false },
-};
+  Patient: {
+    read: true,
+    search: true,
+    create: true,
+    update: false,
+    patch: true,
+    delete: true,
+  },
+  Encounter: {
+    read: true,
+    search: true,
+    create: true,
+    update: false,
+    patch: true,
+    delete: false,
+  },
+  Observation: {
+    read: true,
+    search: true,
+    create: true,
+    update: false,
+    patch: true,
+    delete: false,
+  },
+  Appointment: {
+    read: true,
+    search: true,
+    create: true,
+    update: false,
+    patch: true,
+    delete: false,
+  },
+  Claim: {
+    read: true,
+    search: false,
+    create: true,
+    update: false,
+    patch: true,
+    delete: false,
+  },
+  DocumentReference: {
+    read: true,
+    search: true,
+    create: true,
+    update: false,
+    patch: false,
+    delete: false,
+  },
+  Consent: {
+    read: true,
+    search: false,
+    create: false,
+    update: false,
+    patch: false,
+    delete: false,
+  },
+}
 
 /**
  * Search parameters per resource type.
  * Only parameters actually supported by the API routes are declared.
  */
-const SEARCH_PARAMS: Partial<Record<FhirResourceType, Array<{ name: string; type: string; definition?: string }>>> = {
+const SEARCH_PARAMS: Partial<
+  Record<
+    FhirResourceType,
+    Array<{ name: string; type: string; definition?: string }>
+  >
+> = {
   Patient: [
     { name: 'q', type: 'string' },
     { name: 'active', type: 'token' },
@@ -74,45 +135,45 @@ const SEARCH_PARAMS: Partial<Record<FhirResourceType, Array<{ name: string; type
     { name: 'end', type: 'date' },
     { name: 'upcoming', type: 'token' },
   ],
-};
+}
 
 /**
  * The canonical FHIR R4 profile URL for a resource type.
  */
 function fhirProfile(type: FhirResourceType): string {
-  return `http://hl7.org/fhir/StructureDefinition/${type}`;
+  return `http://hl7.org/fhir/StructureDefinition/${type}`
 }
 
 /**
  * Builds a single resource entry for the CapabilityStatement rest.resources array.
  */
 function buildResourceEntry(type: FhirResourceType) {
-  const config = RESOURCE_INTERACTIONS[type];
-  const interactions: Array<{ code: string }> = [];
+  const config = RESOURCE_INTERACTIONS[type]
+  const interactions: Array<{ code: string }> = []
 
-  if (config.read) interactions.push({ code: 'read' });
-  if (config.search) interactions.push({ code: 'search-type' });
-  if (config.create) interactions.push({ code: 'create' });
-  if (config.update) interactions.push({ code: 'update' });
-  if (config.patch) interactions.push({ code: 'patch' });
-  if (config.delete) interactions.push({ code: 'delete' });
+  if (config.read) interactions.push({ code: 'read' })
+  if (config.search) interactions.push({ code: 'search-type' })
+  if (config.create) interactions.push({ code: 'create' })
+  if (config.update) interactions.push({ code: 'update' })
+  if (config.patch) interactions.push({ code: 'patch' })
+  if (config.delete) interactions.push({ code: 'delete' })
 
   const entry: Record<string, unknown> = {
     type,
     profile: fhirProfile(type),
     interaction: interactions,
-  };
+  }
 
-  const searchParams = SEARCH_PARAMS[type];
+  const searchParams = SEARCH_PARAMS[type]
   if (searchParams && searchParams.length > 0) {
     entry.searchParam = searchParams.map((p) => ({
       name: p.name,
       type: p.type,
       ...(p.definition ? { definition: p.definition } : {}),
-    }));
+    }))
   }
 
-  return entry;
+  return entry
 }
 
 /**
@@ -128,7 +189,7 @@ function buildResourceEntry(type: FhirResourceType) {
  * @returns A FHIR R4 CapabilityStatement resource as a plain object
  */
 export function generateCapabilityStatement(): Record<string, unknown> {
-  const resources = IMPLEMENTED_FHIR_RESOURCES.map(buildResourceEntry);
+  const resources = IMPLEMENTED_FHIR_RESOURCES.map(buildResourceEntry)
 
   return {
     resourceType: 'CapabilityStatement',
@@ -154,8 +215,8 @@ export function generateCapabilityStatement(): Record<string, unknown> {
       {
         mode: 'server',
         documentation:
-           'Pixelated Empathy EHR FHIR R4 API. Supports read, search, create, and patch ' +
-           'operations for clinical resources with multi-tenant isolation (RLS), ' +
+          'Pixelated Empathy EHR FHIR R4 API. Supports read, search, create, and patch ' +
+          'operations for clinical resources with multi-tenant isolation (RLS), ' +
           'audit hash chaining, and consent-gated access.',
         security: {
           cors: true,
@@ -163,7 +224,8 @@ export function generateCapabilityStatement(): Record<string, unknown> {
             {
               coding: [
                 {
-                  system: 'http://terminology.hl7.org/CodeSystem/restful-security-service',
+                  system:
+                    'http://terminology.hl7.org/CodeSystem/restful-security-service',
                   code: 'SMART-on-FHIR',
                   display: 'SMART-on-FHIR',
                 },
@@ -173,7 +235,8 @@ export function generateCapabilityStatement(): Record<string, unknown> {
             {
               coding: [
                 {
-                  system: 'http://terminology.hl7.org/CodeSystem/restful-security-service',
+                  system:
+                    'http://terminology.hl7.org/CodeSystem/restful-security-service',
                   code: 'API-Key',
                   display: 'API Key',
                 },
@@ -190,7 +253,8 @@ export function generateCapabilityStatement(): Record<string, unknown> {
         interaction: [
           {
             code: 'search-system',
-            documentation: 'System-level search across all resource types is not supported. Use resource-level search.',
+            documentation:
+              'System-level search across all resource types is not supported. Use resource-level search.',
           },
         ],
         compartment: [
@@ -200,5 +264,5 @@ export function generateCapabilityStatement(): Record<string, unknown> {
         ],
       },
     ],
-  };
+  }
 }
