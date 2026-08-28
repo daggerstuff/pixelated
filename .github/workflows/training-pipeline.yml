@@ -70,6 +70,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
+
       - name: Setup Python
         uses: actions/setup-python@v7.0.0
         with:
@@ -196,6 +199,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Python
         uses: actions/setup-python@v7.0.0
@@ -542,6 +548,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Python
         uses: actions/setup-python@v7.0.0
