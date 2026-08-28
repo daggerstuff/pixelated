@@ -19,7 +19,6 @@
  * @see apps/web/src/lib/ehr-native/gates/risk-stratification-gate.ts — G2.2 gate
  */
 
-import type { RLSContext } from '../repositories/base-repository'
 import {
   interceptRiskScore,
   getReview,
@@ -30,6 +29,7 @@ import {
   type RiskAISystemSource,
   type RiskGateAuditEntry,
 } from '../gates/risk-stratification-gate'
+import type { RLSContext } from '../repositories/base-repository'
 
 // ---------------------------------------------------------------------------
 // Types — mirror the Python FastAPI models (ai/ehr/risk_stratification/models.py)

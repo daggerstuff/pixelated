@@ -5,12 +5,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
+
 import type {
   RiskStratificationReview,
   RiskGateResult,
   RiskGateAuditEntry,
 } from '@/lib/ehr-native/gates/types'
+import type { RLSContext } from '@/lib/ehr-native/repositories/base-repository'
 
 // ---------------------------------------------------------------------------
 // Gate mocks
