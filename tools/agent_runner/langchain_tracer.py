@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import os
@@ -45,6 +46,12 @@ class LangChainAgentTracer:
         except Exception as e:
             logger.warning("Could not persist trace locally: %s", e)
 
+    def _flush_tree(self, tree: Any | None) -> None:
+        """Force flush LangSmith HTTP client queue immediately."""
+        if tree and hasattr(tree, "client") and hasattr(tree.client, "flush"):
+            with contextlib.suppress(Exception):
+                tree.client.flush()
+
     def start_tick_trace(self, server_label: str, projects: list[ProjectConfig]) -> Any | None:
         """Create a root RunTree span for a coordinator polling tick."""
         if not self.enabled:
@@ -65,6 +72,7 @@ class LangChainAgentTracer:
                     inputs=inputs,
                 )
                 tree.post()
+                self._flush_tree(tree)
                 logger.info(
                     "LangSmith RunTree root trace started: %s (id: %s, project: %s)",
                     tree.name,
@@ -86,6 +94,7 @@ class LangChainAgentTracer:
             try:
                 tree.end(outputs=stats)
                 tree.patch()
+                self._flush_tree(tree)
                 # Persist copy locally
                 tree_dump = tree.model_dump() if hasattr(tree, "model_dump") else tree.dict()
                 self._persist_trace_locally(tree.name, tree_dump)
@@ -127,6 +136,7 @@ class LangChainAgentTracer:
                     inputs=inputs,
                 )
                 child.post()
+                self._flush_tree(child)
                 logger.info("LangSmith RunTree child span started: %s (id: %s)", child.name, child.id)
                 return child
             except Exception as e:
@@ -161,6 +171,7 @@ class LangChainAgentTracer:
                 retriever_child.post()
                 retriever_child.end(outputs=outputs)
                 retriever_child.patch()
+                self._flush_tree(retriever_child)
                 return
             except Exception as e:
                 logger.debug("Error recording LangSmith retrieval child: %s", e)
@@ -200,6 +211,7 @@ class LangChainAgentTracer:
                 llm_child.post()
                 llm_child.end(outputs=outputs)
                 llm_child.patch()
+                self._flush_tree(llm_child)
                 return
             except Exception as e:
                 logger.debug("Error recording LangSmith agent CLI child: %s", e)
@@ -235,6 +247,7 @@ class LangChainAgentTracer:
                 tool_child.post()
                 tool_child.end(outputs=outputs)
                 tool_child.patch()
+                self._flush_tree(tool_child)
                 return
             except Exception as e:
                 logger.debug("Error recording LangSmith verification child: %s", e)
@@ -268,6 +281,7 @@ class LangChainAgentTracer:
             try:
                 ticket_tree.end(outputs=outputs)
                 ticket_tree.patch()
+                self._flush_tree(ticket_tree)
                 tree_dump = ticket_tree.model_dump() if hasattr(ticket_tree, "model_dump") else ticket_tree.dict()
                 self._persist_trace_locally(ticket_tree.name, tree_dump)
                 return

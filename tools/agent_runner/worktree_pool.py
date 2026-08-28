@@ -33,7 +33,7 @@ class GitWorktreePool:
         with self._lock:
             clean_ticket = ticket_identifier.lower().replace(":", "_").replace("/", "_")
             branch_name = f"agent/{agent_name}/{clean_ticket}"
-            base_dir = self.worktrees_dir or os.path.join(repo_path, ".worktrees")
+            base_dir = self.worktrees_dir or os.path.join(repo_path, "worktrees")
             os.makedirs(base_dir, exist_ok=True)
             worktree_path = os.path.join(base_dir, f"{clean_ticket}_{agent_name}")
 
