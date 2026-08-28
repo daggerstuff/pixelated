@@ -23,12 +23,12 @@ export const SUPERVISOR_ALLOWED_ROLES: ReadonlySet<string> = new Set<string>([
   'physician',
 ])
 
-export interface SupervisorGuardResult {
+interface SupervisorGuardResult {
   allowed: true
   rlsContext: RLSContext
 }
 
-export interface SupervisorGuardDenied {
+interface SupervisorGuardDenied {
   allowed: false
   response: Response
 }
