@@ -534,12 +534,12 @@ export const DashboardGrid: FC<DashboardGridProps> = ({
   // --- Resize handler ------------------------------------------------------
   const handleResize = useCallback(
     (index: number, newRowCount: number) => {
-      const positions = [...layout.widgets];
-      const pos = positions.find((p) => p.widgetId === visiblePositions[index].widgetId);
-      if (pos) {
-        pos.rowSpan = Math.max(1, Math.min(6, newRowCount));
-        emitLayoutChange(positions);
-      }
+      const targetId = visiblePositions[index]?.widgetId;
+      if (!targetId) return;
+      const positions = layout.widgets.map((p) =>
+        p.widgetId === targetId ? { ...p, rowSpan: Math.max(1, Math.min(6, newRowCount)) } : p
+      );
+      emitLayoutChange(positions);
     },
     [layout.widgets, visiblePositions, emitLayoutChange]
   );
