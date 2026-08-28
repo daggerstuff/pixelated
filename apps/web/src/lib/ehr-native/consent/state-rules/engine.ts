@@ -125,7 +125,9 @@ export class StateConsentRulesEngine {
     let effectiveRequired = requiredConsentLevel
 
     // Apply state minimum consent level (elevate if needed)
-    if (requiresHigherConsent(stateRules.minimumConsentLevel, effectiveRequired)) {
+    if (
+      requiresHigherConsent(stateRules.minimumConsentLevel, effectiveRequired)
+    ) {
       effectiveRequired = stateRules.minimumConsentLevel
     }
 
@@ -137,7 +139,9 @@ export class StateConsentRulesEngine {
     // Apply treatment-category overrides
     if (context.treatmentCategory && ruleRecord) {
       const categoryOverride =
-        ruleRecord.ruleConfig.treatmentCategoryOverrides?.[context.treatmentCategory]
+        ruleRecord.ruleConfig.treatmentCategoryOverrides?.[
+          context.treatmentCategory
+        ]
       if (categoryOverride) {
         if (
           requiresHigherConsent(
@@ -165,14 +169,23 @@ export class StateConsentRulesEngine {
     }
 
     // 3. Check base consent level
-    const hasConsent = requiresHigherConsent(actualConsentLevel, effectiveRequired)
+    const hasConsent = requiresHigherConsent(
+      actualConsentLevel,
+      effectiveRequired,
+    )
 
     if (!hasConsent) {
       return {
         verified: false,
         consentLevel: actualConsentLevel,
         stateRules,
-        reason: this.buildReason(false, false, false, stateRules, effectiveRequired),
+        reason: this.buildReason(
+          false,
+          false,
+          false,
+          stateRules,
+          effectiveRequired,
+        ),
         evaluatedStateCode,
         ruleSource,
       }
@@ -195,7 +208,8 @@ export class StateConsentRulesEngine {
     }
 
     if (
-      context.treatmentCategory === SPECIAL_TREATMENT_CATEGORIES.substanceUseDisorder &&
+      context.treatmentCategory ===
+        SPECIAL_TREATMENT_CATEGORIES.substanceUseDisorder &&
       stateRules.requiresSUDConsent &&
       !requiresHigherConsent(actualConsentLevel, 'limited')
     ) {
@@ -216,7 +230,10 @@ export class StateConsentRulesEngine {
       context.age < stateRules.ageOfMajority
     ) {
       // Check if this treatment category is exempt for minors
-      const minorExempt = this.isMinorExempt(context.treatmentCategory, ruleRecord?.ruleConfig)
+      const minorExempt = this.isMinorExempt(
+        context.treatmentCategory,
+        ruleRecord?.ruleConfig,
+      )
       if (!minorExempt) {
         return {
           verified: false,
@@ -253,7 +270,13 @@ export class StateConsentRulesEngine {
       verified: true,
       consentLevel: actualConsentLevel,
       stateRules,
-      reason: this.buildReason(true, true, false, stateRules, effectiveRequired),
+      reason: this.buildReason(
+        true,
+        true,
+        false,
+        stateRules,
+        effectiveRequired,
+      ),
       evaluatedStateCode,
       ruleSource,
     }
@@ -281,7 +304,9 @@ export class StateConsentRulesEngine {
 
     let effectiveRequired = requiredConsentLevel
 
-    if (requiresHigherConsent(stateRules.minimumConsentLevel, effectiveRequired)) {
+    if (
+      requiresHigherConsent(stateRules.minimumConsentLevel, effectiveRequired)
+    ) {
       effectiveRequired = stateRules.minimumConsentLevel
     }
 
@@ -291,10 +316,15 @@ export class StateConsentRulesEngine {
 
     if (context.treatmentCategory && ruleRecord) {
       const categoryOverride =
-        ruleRecord.ruleConfig.treatmentCategoryOverrides?.[context.treatmentCategory]
+        ruleRecord.ruleConfig.treatmentCategoryOverrides?.[
+          context.treatmentCategory
+        ]
       if (categoryOverride) {
         if (
-          requiresHigherConsent(categoryOverride.minimumConsentLevel, effectiveRequired)
+          requiresHigherConsent(
+            categoryOverride.minimumConsentLevel,
+            effectiveRequired,
+          )
         ) {
           effectiveRequired = categoryOverride.minimumConsentLevel
         }
@@ -307,7 +337,10 @@ export class StateConsentRulesEngine {
     if (context.providerType && ruleRecord) {
       const providerRestriction =
         ruleRecord.ruleConfig.providerTypeRestrictions?.[context.providerType]
-      if (providerRestriction && requiresHigherConsent(providerRestriction, effectiveRequired)) {
+      if (
+        providerRestriction &&
+        requiresHigherConsent(providerRestriction, effectiveRequired)
+      ) {
         effectiveRequired = providerRestriction
       }
     }
@@ -344,7 +377,9 @@ export class StateConsentRulesEngine {
     if (!treatmentCategory || !config?.minorConsentCategories) {
       return false
     }
-    return config.minorConsentCategories.some((cat) => cat === treatmentCategory)
+    return config.minorConsentCategories.some(
+      (cat) => cat === treatmentCategory,
+    )
   }
 
   /**

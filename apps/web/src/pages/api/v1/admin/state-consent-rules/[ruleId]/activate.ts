@@ -51,7 +51,11 @@ export const POST = async ({ request, cookies, params }: BaseAPIContext) => {
       role: mapAdminRoleToEhrRole(admin.role),
     }
 
-    const rule = await stateConsentRulesRepository.activate(ruleId, actor, notes)
+    const rule = await stateConsentRulesRepository.activate(
+      ruleId,
+      actor,
+      notes,
+    )
     if (!rule) {
       return new Response(
         JSON.stringify({ error: 'Rule not found or not in approved status' }),

@@ -180,7 +180,7 @@ export class StateConsentRulesRepository {
         ],
       )
 
-      const row = result.rows[0] as StateConsentRuleRow
+      const row = result.rows[0]
       const record = mapRuleRow(row)
 
       // Audit log
@@ -213,7 +213,7 @@ export class StateConsentRulesRepository {
       `SELECT * FROM ehr_state_consent_rules WHERE rule_id = $1`,
       [ruleId],
     )
-    return result.rows[0] ? mapRuleRow(result.rows[0] as StateConsentRuleRow) : null
+    return result.rows[0] ? mapRuleRow(result.rows[0]) : null
   }
 
   /**
@@ -263,7 +263,7 @@ export class StateConsentRulesRepository {
        LIMIT $${paramIdx++} OFFSET $${paramIdx++}`,
       params,
     )
-    return result.rows.map((row) => mapRuleRow(row as StateConsentRuleRow))
+    return result.rows.map((row) => mapRuleRow(row))
   }
 
   /**
@@ -284,7 +284,7 @@ export class StateConsentRulesRepository {
         [upperStateCode, tenantId],
       )
       if (tenantResult.rows[0]) {
-        return mapRuleRow(tenantResult.rows[0] as StateConsentRuleRow)
+        return mapRuleRow(tenantResult.rows[0])
       }
     }
 
@@ -295,7 +295,7 @@ export class StateConsentRulesRepository {
        ORDER BY version DESC LIMIT 1`,
       [upperStateCode],
     )
-    return result.rows[0] ? mapRuleRow(result.rows[0] as StateConsentRuleRow) : null
+    return result.rows[0] ? mapRuleRow(result.rows[0]) : null
   }
 
   /**
@@ -308,7 +308,7 @@ export class StateConsentRulesRepository {
          AND (expiry_date IS NULL OR expiry_date >= CURRENT_DATE)
        ORDER BY state_code ASC`,
     )
-    return result.rows.map((row) => mapRuleRow(row as StateConsentRuleRow))
+    return result.rows.map((row) => mapRuleRow(row))
   }
 
   /**
@@ -369,9 +369,7 @@ export class StateConsentRulesRepository {
           `SELECT * FROM ehr_state_consent_rules WHERE rule_id = $1`,
           [ruleId],
         )
-        return row.rows[0]
-          ? mapRuleRow(row.rows[0] as StateConsentRuleRow)
-          : null
+        return row.rows[0] ? mapRuleRow(row.rows[0]) : null
       }
 
       params.push(ruleId)
@@ -385,7 +383,7 @@ export class StateConsentRulesRepository {
       )
 
       if (!result.rows[0]) return null
-      const row = result.rows[0] as StateConsentRuleRow
+      const row = result.rows[0]
       const record = mapRuleRow(row)
 
       // Audit log
@@ -481,7 +479,7 @@ export class StateConsentRulesRepository {
         [ruleId],
       )
       if (!ruleResult.rows[0]) return null
-      const rule = ruleResult.rows[0] as StateConsentRuleRow
+      const rule = ruleResult.rows[0]
 
       // Find and supersede any currently active rule for the same state_code + tenant
       const activeResult = await client.query<StateConsentRuleRow>(
@@ -494,7 +492,7 @@ export class StateConsentRulesRepository {
       )
 
       const supersededRules: string[] = []
-      for (const activeRow of activeResult.rows as StateConsentRuleRow[]) {
+      for (const activeRow of activeResult.rows) {
         await client.query(
           `UPDATE ehr_state_consent_rules
            SET status = 'superseded', superseded_by = $1, updated_at = NOW()
@@ -539,7 +537,7 @@ export class StateConsentRulesRepository {
       )
 
       if (!result.rows[0]) return null
-      const row = result.rows[0] as StateConsentRuleRow
+      const row = result.rows[0]
       const record = mapRuleRow(row)
 
       // Audit log for activation
@@ -590,10 +588,7 @@ export class StateConsentRulesRepository {
    * Permanently delete a draft rule.
    * Only draft rules can be deleted. Uses audit log.
    */
-  async delete(
-    ruleId: string,
-    actor: ActorContext,
-  ): Promise<boolean> {
+  async delete(ruleId: string, actor: ActorContext): Promise<boolean> {
     return await transaction(async (client) => {
       // Get the rule first for audit logging
       const ruleResult = await client.query<StateConsentRuleRow>(
@@ -602,7 +597,7 @@ export class StateConsentRulesRepository {
         [ruleId],
       )
       if (!ruleResult.rows[0]) return false
-      const row = ruleResult.rows[0] as StateConsentRuleRow
+      const row = ruleResult.rows[0]
 
       await this.insertAuditLog(client, {
         ruleId: row.rule_id,
@@ -645,7 +640,7 @@ export class StateConsentRulesRepository {
        LIMIT $2`,
       [ruleId, limit],
     )
-    return result.rows.map((row) => mapAuditRow(row as StateRuleAuditRow))
+    return result.rows.map((row) => mapAuditRow(row))
   }
 
   /**
@@ -662,7 +657,7 @@ export class StateConsentRulesRepository {
        LIMIT $2`,
       [stateCode.toUpperCase(), limit],
     )
-    return result.rows.map((row) => mapAuditRow(row as StateRuleAuditRow))
+    return result.rows.map((row) => mapAuditRow(row))
   }
 
   // -------------------------------------------------------------------------
@@ -725,7 +720,7 @@ export class StateConsentRulesRepository {
       )
 
       if (!result.rows[0]) return null
-      const row = result.rows[0] as StateConsentRuleRow
+      const row = result.rows[0]
       const record = mapRuleRow(row)
 
       // Audit log
@@ -751,10 +746,12 @@ export class StateConsentRulesRepository {
    * Must be called within a transaction.
    */
   private async insertAuditLog(
-    client: { query: <T extends QueryResultRow = QueryResultRow>(
-      text: string,
-      params?: unknown[],
-    ) => Promise<{ rows: T[] }> },
+    client: {
+      query: <T extends QueryResultRow = QueryResultRow>(
+        text: string,
+        params?: unknown[],
+      ) => Promise<{ rows: T[] }>
+    },
     entry: {
       ruleId: string
       tenantId: string | null

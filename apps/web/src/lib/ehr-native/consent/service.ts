@@ -10,7 +10,8 @@
  * in Redis) and falls back to Phase 1 in-memory defaults when no versioned
  * rule exists.
  *
- * @see docs/adr/ADR-007-consent-state-rules.md
+ * @see ./state-rules/engine.ts (Phase 3 runtime evaluator)
+ * @see ./state-rules/index.ts (Phase 1 in-memory fallback)
  */
 
 import { query } from '@/lib/db'

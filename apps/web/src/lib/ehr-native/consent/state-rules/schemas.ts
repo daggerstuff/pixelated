@@ -45,11 +45,56 @@ export type AuditAction = z.infer<typeof AuditActionSchema>
 
 const US_STATE_CODES = [
   // 50 states
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  'AL',
+  'AK',
+  'AZ',
+  'AR',
+  'CA',
+  'CO',
+  'CT',
+  'DE',
+  'FL',
+  'GA',
+  'HI',
+  'ID',
+  'IL',
+  'IN',
+  'IA',
+  'KS',
+  'KY',
+  'LA',
+  'ME',
+  'MD',
+  'MA',
+  'MI',
+  'MN',
+  'MS',
+  'MO',
+  'MT',
+  'NE',
+  'NV',
+  'NH',
+  'NJ',
+  'NM',
+  'NY',
+  'NC',
+  'ND',
+  'OH',
+  'OK',
+  'OR',
+  'PA',
+  'RI',
+  'SC',
+  'SD',
+  'TN',
+  'TX',
+  'UT',
+  'VT',
+  'VA',
+  'WA',
+  'WV',
+  'WI',
+  'WY',
   // DC
   'DC',
   // Territories
@@ -64,9 +109,13 @@ export const StateCodeSchema = z
   .string()
   .length(2)
   .toUpperCase()
-  .refine((code) => US_STATE_CODES.includes(code as (typeof US_STATE_CODES)[number]), {
-    message: 'Invalid US state code. Must be one of the 50 states, DC, or US territories.',
-  })
+  .refine(
+    (code) => US_STATE_CODES.includes(code as (typeof US_STATE_CODES)[number]),
+    {
+      message:
+        'Invalid US state code. Must be one of the 50 states, DC, or US territories.',
+    },
+  )
 
 export const US_STATE_CODE_LIST = [...US_STATE_CODES] as string[]
 
@@ -107,7 +156,9 @@ export const MinorConsentCategorySchema = z.enum([
 export const MinorConsentCategoriesSchema = z
   .array(MinorConsentCategorySchema)
   .optional()
-  .describe('Treatment categories where minors can consent without parental involvement')
+  .describe(
+    'Treatment categories where minors can consent without parental involvement',
+  )
 
 // ---------------------------------------------------------------------------
 // Legal metadata — references for legal review tracking
@@ -141,10 +192,14 @@ export const StateRuleConfigSchema = z
     ),
     requiresMentalHealthConsent: z
       .boolean()
-      .describe('Whether mental health treatment requires separate/explicit consent'),
+      .describe(
+        'Whether mental health treatment requires separate/explicit consent',
+      ),
     requiresSUDConsent: z
       .boolean()
-      .describe('Whether substance use disorder treatment requires separate/explicit consent'),
+      .describe(
+        'Whether substance use disorder treatment requires separate/explicit consent',
+      ),
     requiresMinorParentalConsent: z
       .boolean()
       .describe('Whether minors need parental consent'),
@@ -153,7 +208,9 @@ export const StateRuleConfigSchema = z
       .int()
       .min(16, 'Age of majority must be at least 16')
       .max(21, 'Age of majority cannot exceed 21')
-      .describe('The age at which a patient is considered an adult for consent purposes'),
+      .describe(
+        'The age at which a patient is considered an adult for consent purposes',
+      ),
     minorConsentCategories: MinorConsentCategoriesSchema,
     providerTypeRestrictions: ProviderTypeRestrictionsSchema.optional(),
     treatmentCategoryOverrides: TreatmentCategoryOverridesSchema.optional(),
@@ -192,16 +249,21 @@ export const StateConsentRuleRecordSchema = z.object({
   updatedAt: z.string().datetime(),
 })
 
-export type StateConsentRuleRecord = z.infer<typeof StateConsentRuleRecordSchema>
+export type StateConsentRuleRecord = z.infer<
+  typeof StateConsentRuleRecordSchema
+>
 
 // ---------------------------------------------------------------------------
 // Create rule input — for creating new draft rules
 // ---------------------------------------------------------------------------
 
 export const CreateStateRuleInputSchema = z.object({
-  tenantId: z.string().uuid().nullable().optional().describe(
-    'Tenant ID for tenant-specific rules. NULL for global rules.',
-  ),
+  tenantId: z
+    .string()
+    .uuid()
+    .nullable()
+    .optional()
+    .describe('Tenant ID for tenant-specific rules. NULL for global rules.'),
   stateCode: StateCodeSchema,
   ruleConfig: StateRuleConfigSchema,
   effectiveDate: z.string().date().optional(),

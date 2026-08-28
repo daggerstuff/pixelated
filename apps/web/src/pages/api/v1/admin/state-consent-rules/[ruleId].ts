@@ -128,7 +128,11 @@ export const PATCH = async ({ request, cookies, params }: BaseAPIContext) => {
 
     const actor = buildActor(admin)
 
-    const rule = await stateConsentRulesRepository.updateDraft(ruleId, updates, actor)
+    const rule = await stateConsentRulesRepository.updateDraft(
+      ruleId,
+      updates,
+      actor,
+    )
     if (!rule) {
       return new Response(
         JSON.stringify({ error: 'Rule not found or not in draft status' }),

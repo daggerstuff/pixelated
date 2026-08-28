@@ -87,10 +87,7 @@ export class StateConsentRulesCache {
    * Invalidate the cache for a state code.
    * Should be called whenever a rule is activated, superseded, or archived.
    */
-  async invalidate(
-    stateCode: string,
-    tenantId?: string | null,
-  ): Promise<void> {
+  async invalidate(stateCode: string, tenantId?: string | null): Promise<void> {
     const cacheKey = buildCacheKey(stateCode, tenantId)
     await removeFromCache(cacheKey)
   }
@@ -116,12 +113,62 @@ export class StateConsentRulesCache {
     // so we invalidate all known state codes (global only).
     // Tenant-specific caches expire naturally via TTL.
     const stateCodes = [
-      'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-      'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-      'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-      'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-      'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
-      'DC', 'PR', 'GU', 'VI', 'AS', 'MP',
+      'AL',
+      'AK',
+      'AZ',
+      'AR',
+      'CA',
+      'CO',
+      'CT',
+      'DE',
+      'FL',
+      'GA',
+      'HI',
+      'ID',
+      'IL',
+      'IN',
+      'IA',
+      'KS',
+      'KY',
+      'LA',
+      'ME',
+      'MD',
+      'MA',
+      'MI',
+      'MN',
+      'MS',
+      'MO',
+      'MT',
+      'NE',
+      'NV',
+      'NH',
+      'NJ',
+      'NM',
+      'NY',
+      'NC',
+      'ND',
+      'OH',
+      'OK',
+      'OR',
+      'PA',
+      'RI',
+      'SC',
+      'SD',
+      'TN',
+      'TX',
+      'UT',
+      'VT',
+      'VA',
+      'WA',
+      'WV',
+      'WI',
+      'WY',
+      'DC',
+      'PR',
+      'GU',
+      'VI',
+      'AS',
+      'MP',
     ]
 
     for (const code of stateCodes) {

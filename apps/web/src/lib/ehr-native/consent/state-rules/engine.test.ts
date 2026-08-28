@@ -16,7 +16,11 @@ import {
 } from './engine'
 import type { StateConsentRuleRecord, StateRuleConfig } from './schemas'
 import { stateConsentRulesCache } from './cache'
-import { clearStateRules, registerStateRules, DEFAULT_STATE_RULES } from './index'
+import {
+  clearStateRules,
+  registerStateRules,
+  DEFAULT_STATE_RULES,
+} from './index'
 
 // ---------------------------------------------------------------------------
 // Mock data
@@ -107,8 +111,12 @@ describe('F3.3 StateConsentRulesEngine', () => {
   describe('SPECIAL_TREATMENT_CATEGORIES', () => {
     it('defines expected treatment categories', () => {
       expect(SPECIAL_TREATMENT_CATEGORIES.mentalHealth).toBe('mental_health')
-      expect(SPECIAL_TREATMENT_CATEGORIES.substanceUseDisorder).toBe('substance_use_disorder')
-      expect(SPECIAL_TREATMENT_CATEGORIES.reproductiveHealth).toBe('reproductive_health')
+      expect(SPECIAL_TREATMENT_CATEGORIES.substanceUseDisorder).toBe(
+        'substance_use_disorder',
+      )
+      expect(SPECIAL_TREATMENT_CATEGORIES.reproductiveHealth).toBe(
+        'reproductive_health',
+      )
       expect(SPECIAL_TREATMENT_CATEGORIES.sexualHealth).toBe('sexual_health')
       expect(SPECIAL_TREATMENT_CATEGORIES.prenatalCare).toBe('prenatal_care')
     })
@@ -126,7 +134,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
       expect(result.verified).toBe(true)
       expect(result.ruleSource).toBe('default')
       expect(result.evaluatedStateCode).toBeNull()
-      expect(result.stateRules.minimumConsentLevel).toBe(DEFAULT_STATE_RULES.minimumConsentLevel)
+      expect(result.stateRules.minimumConsentLevel).toBe(
+        DEFAULT_STATE_RULES.minimumConsentLevel,
+      )
     })
 
     it('uses default rules when stateCode has no versioned rule', async () => {
@@ -162,7 +172,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
 
   describe('evaluateConsent with active rule', () => {
     it('uses global rule when available', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockRuleRecord,
+      )
 
       const context: PatientConsentContext = { stateCode: 'CA' }
       const result = await engine.evaluateConsent('full', 'minimal', context)
@@ -173,9 +185,14 @@ describe('F3.3 StateConsentRulesEngine', () => {
     })
 
     it('uses tenant-specific rule when available', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockTenantRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockTenantRuleRecord,
+      )
 
-      const context: PatientConsentContext = { stateCode: 'CA', tenantId: '550e8400-e29b-41d4-a716-446655440099' }
+      const context: PatientConsentContext = {
+        stateCode: 'CA',
+        tenantId: '550e8400-e29b-41d4-a716-446655440099',
+      }
       const result = await engine.evaluateConsent('full', 'minimal', context)
 
       expect(result.ruleSource).toBe('tenant')
@@ -183,9 +200,14 @@ describe('F3.3 StateConsentRulesEngine', () => {
     })
 
     it('elevates required consent when state minimum is higher', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockTenantRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockTenantRuleRecord,
+      )
 
-      const context: PatientConsentContext = { stateCode: 'CA', tenantId: 'tenant-1' }
+      const context: PatientConsentContext = {
+        stateCode: 'CA',
+        tenantId: 'tenant-1',
+      }
       // Tenant rule requires 'limited', patient has 'minimal', required is 'minimal'
       const result = await engine.evaluateConsent('minimal', 'minimal', context)
 
@@ -194,9 +216,14 @@ describe('F3.3 StateConsentRulesEngine', () => {
     })
 
     it('verifies when patient consent meets elevated requirement', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockTenantRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockTenantRuleRecord,
+      )
 
-      const context: PatientConsentContext = { stateCode: 'CA', tenantId: 'tenant-1' }
+      const context: PatientConsentContext = {
+        stateCode: 'CA',
+        tenantId: 'tenant-1',
+      }
       // Patient has 'full', required is 'minimal', but tenant requires 'limited'
       const result = await engine.evaluateConsent('full', 'minimal', context)
 
@@ -210,7 +237,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
 
   describe('evaluateConsent treatment categories', () => {
     it('blocks mental health treatment when consent below limited and requiresMentalHealthConsent is true', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -219,11 +248,15 @@ describe('F3.3 StateConsentRulesEngine', () => {
       const result = await engine.evaluateConsent('minimal', 'minimal', context)
 
       expect(result.verified).toBe(false)
-      expect(result.reason).toContain('Mental health treatment requires limited consent or higher')
+      expect(result.reason).toContain(
+        'Mental health treatment requires limited consent or higher',
+      )
     })
 
     it('blocks SUD treatment when consent below limited and requiresSUDConsent is true', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -232,11 +265,15 @@ describe('F3.3 StateConsentRulesEngine', () => {
       const result = await engine.evaluateConsent('minimal', 'minimal', context)
 
       expect(result.verified).toBe(false)
-      expect(result.reason).toContain('Substance use disorder treatment requires limited consent or higher')
+      expect(result.reason).toContain(
+        'Substance use disorder treatment requires limited consent or higher',
+      )
     })
 
     it('passes SUD check when requiresSUDConsent is false', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockTenantRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockTenantRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -254,7 +291,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
 
   describe('evaluateConsent minor consent', () => {
     it('blocks minors when requiresMinorParentalConsent is true', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -267,7 +306,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
     })
 
     it('passes for adults at ageOfMajority', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -286,7 +327,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
           minorConsentCategories: ['reproductive_health'],
         },
       }
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(exemptRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        exemptRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -299,7 +342,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
     })
 
     it('passes when requiresMinorParentalConsent is false', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockTenantRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockTenantRuleRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -328,7 +373,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
           },
         },
       }
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(overrideRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        overrideRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -354,7 +401,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
           },
         },
       }
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(overrideRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        overrideRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -385,7 +434,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
           },
         },
       }
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(restrictedRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        restrictedRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -411,7 +462,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
           },
         },
       }
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(restrictedRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        restrictedRecord,
+      )
 
       const context: PatientConsentContext = {
         stateCode: 'CA',
@@ -457,9 +510,14 @@ describe('F3.3 StateConsentRulesEngine', () => {
     })
 
     it('elevates to state minimum when higher', async () => {
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(mockTenantRuleRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        mockTenantRuleRecord,
+      )
 
-      const context: PatientConsentContext = { stateCode: 'CA', tenantId: 'tenant-1' }
+      const context: PatientConsentContext = {
+        stateCode: 'CA',
+        tenantId: 'tenant-1',
+      }
       const result = await engine.getEffectiveRequiredLevel('minimal', context)
 
       expect(result).toBe('limited')
@@ -473,7 +531,9 @@ describe('F3.3 StateConsentRulesEngine', () => {
           overrideConsentLevel: 'full',
         },
       }
-      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(overrideRecord)
+      vi.mocked(stateConsentRulesCache.getActiveRule).mockResolvedValue(
+        overrideRecord,
+      )
 
       const context: PatientConsentContext = { stateCode: 'CA' }
       const result = await engine.getEffectiveRequiredLevel('minimal', context)

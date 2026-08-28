@@ -50,7 +50,11 @@ export const POST = async ({ request, cookies, params }: BaseAPIContext) => {
       role: mapAdminRoleToEhrRole(admin.role),
     }
 
-    const rule = await stateConsentRulesRepository.submitForReview(ruleId, actor, notes)
+    const rule = await stateConsentRulesRepository.submitForReview(
+      ruleId,
+      actor,
+      notes,
+    )
     if (!rule) {
       return new Response(
         JSON.stringify({ error: 'Rule not found or not in draft status' }),
@@ -70,7 +74,10 @@ export const POST = async ({ request, cookies, params }: BaseAPIContext) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return new Response(
-      JSON.stringify({ error: 'Failed to submit rule for review', detail: message }),
+      JSON.stringify({
+        error: 'Failed to submit rule for review',
+        detail: message,
+      }),
       {
         status: 500,
         headers: JSON_HEADERS,

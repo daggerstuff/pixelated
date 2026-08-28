@@ -18,7 +18,10 @@ const JSON_HEADERS = {
   'Cache-Control': 'no-store, no-cache, must-revalidate',
 }
 
-function buildActor(admin: { userId: string; role: string }, tenantId?: string | null): ActorContext {
+function buildActor(
+  admin: { userId: string; role: string },
+  tenantId?: string | null,
+): ActorContext {
   return {
     userId: admin.userId,
     role: mapAdminRoleToEhrRole(admin.role),
@@ -46,7 +49,10 @@ export const GET = async ({ request, cookies }: BaseAPIContext) => {
     const statusParam = searchParams.get('status') ?? undefined
     const tenantId = searchParams.get('tenantId')
     const page = Math.max(1, parseInt(searchParams.get('page') ?? '1', 10))
-    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') ?? '50', 10)))
+    const limit = Math.min(
+      100,
+      Math.max(1, parseInt(searchParams.get('limit') ?? '50', 10)),
+    )
 
     const status = statusParam as RuleStatus | undefined
 
@@ -73,7 +79,10 @@ export const GET = async ({ request, cookies }: BaseAPIContext) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return new Response(
-      JSON.stringify({ error: 'Failed to list state consent rules', detail: message }),
+      JSON.stringify({
+        error: 'Failed to list state consent rules',
+        detail: message,
+      }),
       {
         status: 500,
         headers: JSON_HEADERS,
@@ -148,7 +157,10 @@ export const POST = async ({ request, cookies }: BaseAPIContext) => {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'
     return new Response(
-      JSON.stringify({ error: 'Failed to create state consent rule', detail: message }),
+      JSON.stringify({
+        error: 'Failed to create state consent rule',
+        detail: message,
+      }),
       {
         status: 500,
         headers: JSON_HEADERS,

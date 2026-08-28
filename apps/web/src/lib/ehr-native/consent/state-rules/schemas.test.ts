@@ -63,7 +63,14 @@ describe('F3.3 schemas', () => {
 
   describe('RuleStatusSchema', () => {
     it('accepts all workflow statuses', () => {
-      const statuses = ['draft', 'review', 'approved', 'active', 'superseded', 'archived']
+      const statuses = [
+        'draft',
+        'review',
+        'approved',
+        'active',
+        'superseded',
+        'archived',
+      ]
       for (const status of statuses) {
         expect(RuleStatusSchema.parse(status)).toBe(status)
       }
@@ -109,11 +116,56 @@ describe('F3.3 schemas', () => {
   describe('StateCodeSchema', () => {
     it('accepts all 50 state codes', () => {
       const stateCodes = [
-        'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-        'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-        'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-        'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-        'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+        'AL',
+        'AK',
+        'AZ',
+        'AR',
+        'CA',
+        'CO',
+        'CT',
+        'DE',
+        'FL',
+        'GA',
+        'HI',
+        'ID',
+        'IL',
+        'IN',
+        'IA',
+        'KS',
+        'KY',
+        'LA',
+        'ME',
+        'MD',
+        'MA',
+        'MI',
+        'MN',
+        'MS',
+        'MO',
+        'MT',
+        'NE',
+        'NV',
+        'NH',
+        'NJ',
+        'NM',
+        'NY',
+        'NC',
+        'ND',
+        'OH',
+        'OK',
+        'OR',
+        'PA',
+        'RI',
+        'SC',
+        'SD',
+        'TN',
+        'TX',
+        'UT',
+        'VT',
+        'VA',
+        'WA',
+        'WV',
+        'WI',
+        'WY',
       ]
       for (const code of stateCodes) {
         expect(StateCodeSchema.parse(code)).toBe(code)
@@ -225,10 +277,12 @@ describe('F3.3 schemas', () => {
 
     it('accepts boundary ages 16 and 21', () => {
       expect(
-        StateRuleConfigSchema.parse({ ...validRuleConfig, ageOfMajority: 16 }).ageOfMajority,
+        StateRuleConfigSchema.parse({ ...validRuleConfig, ageOfMajority: 16 })
+          .ageOfMajority,
       ).toBe(16)
       expect(
-        StateRuleConfigSchema.parse({ ...validRuleConfig, ageOfMajority: 21 }).ageOfMajority,
+        StateRuleConfigSchema.parse({ ...validRuleConfig, ageOfMajority: 21 })
+          .ageOfMajority,
       ).toBe(21)
     })
 
