@@ -551,7 +551,7 @@ class MultiAgentCoordinator:
             audit_report = self.loop_auditor.evaluate_execution(issue, result, is_sandboxed=bool(worktree_lease))
 
             pr_res = None
-            if self.config.enable_git_pr_creation and worktree_lease and result.verification_passed:
+            if worktree_lease and result.verification_passed:
                 pr_res = self.pr_bridge.commit_and_create_pr(
                     worktree_path=active_workdir,
                     ticket_identifier=issue.identifier,
