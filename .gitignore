@@ -459,5 +459,6 @@ tasks/
 /business-strategy-cms/
 /moe_ep_trial_output/
 /.worktrees/
+/worktrees/
 /config/agent_runner_config.json
 !/config/agent_runner_config.example.json
