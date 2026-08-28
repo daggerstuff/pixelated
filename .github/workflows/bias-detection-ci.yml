@@ -578,6 +578,7 @@ jobs:
         env:
           NODE_ENV: test
           E2E_TEST_AUTH: '1'
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
           DATABASE_URL: postgresql://postgres@localhost:5432/test_db
           PGUSER: postgres
           PGDATABASE: test_db
