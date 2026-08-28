@@ -13,12 +13,14 @@ import { createHmac } from 'node:crypto'
 
 const mockRedisGet = vi.fn()
 const mockRedisSetex = vi.fn()
+const mockRedisSet = vi.fn()
 
 vi.mock('@/lib/redis', () => ({
   redis: {
     get: mockRedisGet,
     setex: mockRedisSetex,
-    set: vi.fn(),
+    set: mockRedisSet,
+    del: vi.fn().mockResolvedValue(1),
   },
 }))
 
@@ -112,6 +114,7 @@ describe('CalendlyService', () => {
     vi.clearAllMocks()
     mockRedisGet.mockResolvedValue(null)
     mockRedisSetex.mockResolvedValue('OK')
+    mockRedisSet.mockResolvedValue('OK')
     mockAuditLog.mockResolvedValue('audit-log-id')
 
     adapter = new StubCalendlyAdapter()
@@ -446,7 +449,7 @@ describe('CalendlyService', () => {
     it('returns 200 with duplicate=true on duplicate event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce('1') // duplicate
+      mockRedisSet.mockResolvedValueOnce(null) // duplicate
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(result.processed).toBe(false)
@@ -459,7 +462,7 @@ describe('CalendlyService', () => {
     it('returns 200 with processed=true on valid first-time event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce(null) // not duplicate
+      mockRedisSet.mockResolvedValueOnce('OK') // not duplicate
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(result.processed).toBe(true)
@@ -474,18 +477,18 @@ describe('CalendlyService', () => {
     it('sets idempotency key in redis on first-time event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce(null)
+      mockRedisSet.mockResolvedValueOnce('OK')
       const event = makeWebhookEvent({ rawBody, signature, eventId: 'unique-evt' })
       await service.processWebhook(event, TENANT_ID, USER_ID)
-      expect(mockRedisSetex).toHaveBeenCalledTimes(1)
-      const [key] = mockRedisSetex.mock.calls[0]
+      expect(mockRedisSet).toHaveBeenCalledTimes(1)
+      const [key] = mockRedisSet.mock.calls[0]
       expect(key).toContain('webhook:idempotency:calendly:unique-evt')
     })
 
     it('passes requestUrl for signature verification', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce(null)
+      mockRedisSet.mockResolvedValueOnce('OK')
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(
         event,

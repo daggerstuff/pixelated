@@ -17,9 +17,10 @@ const { mockAuditLog, mockAuditService } = vi.hoisted(() => {
   return { mockAuditLog, mockAuditService }
 })
 
-const { mockRedisGet, mockRedisSetex } = vi.hoisted(() => ({
+const { mockRedisGet, mockRedisSetex, mockRedisSet } = vi.hoisted(() => ({
   mockRedisGet: vi.fn().mockResolvedValue(null),
   mockRedisSetex: vi.fn().mockResolvedValue('OK'),
+  mockRedisSet: vi.fn().mockResolvedValue('OK'),
 }))
 
 // ---------------------------------------------------------------------------
@@ -27,7 +28,7 @@ const { mockRedisGet, mockRedisSetex } = vi.hoisted(() => ({
 // ---------------------------------------------------------------------------
 
 vi.mock('@/lib/redis', () => ({
-  redis: { get: mockRedisGet, set: vi.fn(), setex: mockRedisSetex },
+  redis: { get: mockRedisGet, set: mockRedisSet, setex: mockRedisSetex, del: vi.fn().mockResolvedValue(1) },
 }))
 
 vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
@@ -99,9 +100,11 @@ describe('TwilioService', () => {
     mockAuditLog.mockClear()
     mockRedisGet.mockClear()
     mockRedisSetex.mockClear()
+    mockRedisSet.mockClear()
     mockAuditLog.mockResolvedValue('audit-id')
     mockRedisGet.mockResolvedValue(null)
     mockRedisSetex.mockResolvedValue('OK')
+    mockRedisSet.mockResolvedValue('OK')
 
     const stubMod = await import('../twilio/stub-adapter')
     StubTwilioAdapter = stubMod.StubTwilioAdapter
@@ -477,7 +480,7 @@ describe('TwilioService', () => {
     })
 
     it('returns duplicate=true when event already processed', async () => {
-      mockRedisGet.mockResolvedValueOnce('1')
+      mockRedisSet.mockResolvedValueOnce(null) // duplicate
       const event = makeWebhookEvent()
       const result = await service.processWebhook(event, 'tenant-1', 'user-1', REQUEST_URL)
       expect(result.processed).toBe(false)

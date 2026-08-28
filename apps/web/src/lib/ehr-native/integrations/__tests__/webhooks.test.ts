@@ -6,10 +6,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Mock redis before importing the module under test
 vi.mock('@/lib/redis', () => ({
   redis: {
-    get: vi.fn(),
-    set: vi.fn(),
-    setex: vi.fn(),
-    del: vi.fn(),
+    get: vi.fn().mockResolvedValue(null),
+    set: vi.fn().mockResolvedValue('OK'),
+    setex: vi.fn().mockResolvedValue('OK'),
+    del: vi.fn().mockResolvedValue(1),
   },
 }))
 
@@ -434,37 +434,43 @@ describe('verifyZoomSignature', () => {
 describe('checkIdempotency', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(redis.set).mockResolvedValue('OK')
   })
 
-  it('returns false (not duplicate) when key does not exist in Redis', async () => {
-    vi.mocked(redis.get).mockResolvedValue(null)
-    vi.mocked(redis.setex).mockResolvedValue('OK')
+  it('returns false (not duplicate) when key is newly set in Redis', async () => {
+    vi.mocked(redis.set).mockResolvedValue('OK')
 
     const isDuplicate = await checkIdempotency('calendly', 'evt_new')
     expect(isDuplicate).toBe(false)
-    expect(redis.get).toHaveBeenCalledWith('webhook:idempotency:calendly:evt_new')
-    expect(redis.setex).toHaveBeenCalledWith(
+    expect(redis.set).toHaveBeenCalledWith(
       'webhook:idempotency:calendly:evt_new',
-      86_400,
       '1',
+      'EX',
+      86_400,
+      'NX',
     )
   })
 
   it('returns true (duplicate) when key already exists in Redis', async () => {
-    vi.mocked(redis.get).mockResolvedValue('1')
+    vi.mocked(redis.set).mockResolvedValue(null)
 
     const isDuplicate = await checkIdempotency('stripe', 'evt_dup')
     expect(isDuplicate).toBe(true)
-    expect(redis.get).toHaveBeenCalledWith('webhook:idempotency:stripe:evt_dup')
-    expect(redis.setex).not.toHaveBeenCalled()
+    expect(redis.set).toHaveBeenCalledWith(
+      'webhook:idempotency:stripe:evt_dup',
+      '1',
+      'EX',
+      86_400,
+      'NX',
+    )
   })
 
   it('uses the correct TTL of 86400 seconds', async () => {
-    vi.mocked(redis.get).mockResolvedValue(null)
-    vi.mocked(redis.setex).mockResolvedValue('OK')
+    vi.mocked(redis.set).mockResolvedValue('OK')
 
     await checkIdempotency('zoom', 'evt_ttl')
-    const [, ttl] = vi.mocked(redis.setex).mock.calls[0]
+    const callArgs = vi.mocked(redis.set).mock.calls[0]
+    const ttl = callArgs[3]
     expect(ttl).toBe(86_400)
   })
 })
@@ -500,8 +506,7 @@ describe('processWebhook', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(redis.get).mockResolvedValue(null)
-    vi.mocked(redis.setex).mockResolvedValue('OK')
+    vi.mocked(redis.set).mockResolvedValue('OK')
   })
 
   it('processes a valid, non-duplicate webhook successfully', async () => {
@@ -528,7 +533,7 @@ describe('processWebhook', () => {
   })
 
   it('skips a duplicate webhook (200, duplicate=true)', async () => {
-    vi.mocked(redis.get).mockResolvedValue('1')
+    vi.mocked(redis.set).mockResolvedValue(null)
 
     const result = await processWebhook(baseEvent, hmacConfig, tenantId, userId)
 
@@ -544,7 +549,7 @@ describe('processWebhook', () => {
     }
     await processWebhook(event, hmacConfig, tenantId, userId)
 
-    expect(redis.get).not.toHaveBeenCalled()
+    expect(redis.set).not.toHaveBeenCalled()
   })
 
   it('passes requestUrl to signature verification for twilio', async () => {

@@ -214,8 +214,8 @@ export const FeatureFlagService = {
    */
   listForTenant(tenantId: string): IntegrationFeatureFlag[] {
     const flags: IntegrationFeatureFlag[] = [];
-    for (const [key, flag] of featureFlagStore.entries()) {
-      if (key.startsWith(`${tenantId}:`)) {
+    for (const [, flag] of featureFlagStore.entries()) {
+      if (flag.tenantId === tenantId) {
         flags.push(flag);
       }
     }
@@ -293,8 +293,8 @@ export const ConnectionStatusService = {
    */
   listForTenant(tenantId: string): TenantProviderStatus[] {
     const statuses: TenantProviderStatus[] = [];
-    for (const [key, status] of connectionStore.entries()) {
-      if (key.startsWith(`${tenantId}:`)) {
+    for (const [, status] of connectionStore.entries()) {
+      if (status.tenantId === tenantId) {
         statuses.push(status);
       }
     }
@@ -311,6 +311,7 @@ export function buildMarketplaceDashboard(tenantId: string): MarketplaceDashboar
     const connection = ConnectionStatusService.get(tenantId, provider.provider);
     const featureFlag = FeatureFlagService.get(tenantId, provider.provider);
     return {
+      tenantId,
       ...provider,
       status: connection?.status ?? 'disconnected',
       connectedAt: connection?.connectedAt,

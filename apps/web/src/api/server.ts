@@ -82,7 +82,12 @@ app.use(
 // BODY PARSING & COMPRESSION
 // ============================================================================
 
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({
+  limit: '10mb',
+  verify: (req: express.Request, _res: express.Response, buf: Buffer) => {
+    (req as express.Request & { rawBody?: string }).rawBody = buf.toString('utf8');
+  },
+}))
 app.use(express.urlencoded({ limit: '10mb', extended: true }))
 app.use(compression())
 

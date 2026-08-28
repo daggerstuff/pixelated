@@ -4,6 +4,7 @@
 import express, { Router, Request, Response } from 'express'
 import crypto from 'crypto'
 
+import { redis } from '../../lib/redis'
 import { EHRAuditService } from '../../lib/ehr-native/audit/ehr-audit-service'
 import {
   EHRAuditAction,
@@ -116,7 +117,7 @@ router.get(
 
 router.get(
   '/oauth/:provider/authorize',
-  (req: Request, res: Response): Response => {
+  async (req: Request, res: Response): Promise<Response> => {
     const provider = parseProvider(req.params['provider'])
     if (!provider) {
       return res.status(400).json({ error: 'Invalid or unknown provider' })
@@ -131,9 +132,13 @@ router.get(
 
     const tenantId = (req.query['tenantId'] as string | undefined) ?? ''
     const returnUrl = (req.query['returnUrl'] as string | undefined) ?? ''
+    const nonce = crypto.randomUUID()
     const state = Buffer.from(
-      JSON.stringify({ tenantId, provider, returnUrl, ts: Date.now() }),
+      JSON.stringify({ tenantId, provider, returnUrl, ts: Date.now(), nonce }),
     ).toString('base64url')
+
+    const STATE_TTL_SECONDS = 600
+    await redis.setex(`oauth:state:${nonce}`, STATE_TTL_SECONDS, state)
 
     const params = new URLSearchParams({
       client_id: config.clientId,
@@ -182,13 +187,28 @@ router.get(
         .json({ error: 'Missing code or state parameter' })
     }
 
-    let stateData: { tenantId: string; returnUrl?: string }
+    let stateData: { tenantId: string; returnUrl?: string; nonce?: string }
     try {
       stateData = JSON.parse(
         Buffer.from(state, 'base64url').toString('utf8'),
-      ) as { tenantId: string; returnUrl?: string }
+      ) as { tenantId: string; returnUrl?: string; nonce?: string }
     } catch {
       return res.status(400).json({ error: 'Invalid state parameter' })
+    }
+
+    if (!stateData.nonce) {
+      return res.status(400).json({ error: 'Missing CSRF token in state' })
+    }
+
+    const stateKey = `oauth:state:${stateData.nonce}`
+    const storedState = await redis.get(stateKey)
+    if (!storedState) {
+      return res.status(400).json({ error: 'Invalid or expired OAuth state' })
+    }
+    await redis.del(stateKey)
+
+    if (storedState !== state) {
+      return res.status(400).json({ error: 'OAuth state mismatch' })
     }
 
     const config = getOAuthConfig(provider)
@@ -371,7 +391,7 @@ router.post(
         .json({ error: 'Missing webhook signature header' })
     }
 
-    const rawBody = JSON.stringify(req.body)
+    const rawBody = (req as Request & { rawBody?: string }).rawBody ?? JSON.stringify(req.body)
     const body = req.body as Record<string, unknown>
 
     const eventId =

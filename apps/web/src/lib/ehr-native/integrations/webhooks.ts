@@ -118,8 +118,11 @@ export function verifyWebhookSignature(
 ): boolean {
   switch (config.format) {
     case 'hmac': {
+      // Zoom prefixes the signature with "v0=" — strip it before comparison.
+      // This format is currently only used by Zoom, so the prefix is safe to strip.
+      const sig = signatureHeader.startsWith('v0=') ? signatureHeader.slice(3) : signatureHeader;
       const expected = computeHmacSha256(rawBody, config.secret);
-      return safeHexEqual(expected, signatureHeader);
+      return safeHexEqual(expected, sig);
     }
 
     case 'stripe-composite': {
@@ -190,10 +193,10 @@ export async function checkIdempotency(
   eventId: string,
 ): Promise<boolean> {
   const key = buildIdempotencyKey(provider, eventId);
-  const existing = await redis.get(key);
-  if (existing !== null) return true;
-  await redis.setex(key, IDEMPOTENCY_TTL_SECONDS, '1');
-  return false;
+  // Atomic SET NX EX: returns 'OK' if the key was newly set (not a duplicate),
+  // or null if the key already existed (duplicate). This is race-safe.
+  const result = await redis.set(key, '1', 'EX', IDEMPOTENCY_TTL_SECONDS, 'NX');
+  return result !== 'OK';
 }
 
 /**
