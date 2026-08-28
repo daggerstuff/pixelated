@@ -63,3 +63,17 @@ export {
   type OutcomeTrendPoint,
   type OutcomeAlertResult,
 } from './outcomes.service'
+
+export {
+  RiskStratificationService,
+  type RiskStratificationRequest,
+  type RiskStratificationResponse,
+  type RiskStratificationResult,
+  type RiskLevel,
+  type RiskScoreBreakdown,
+  type RiskServiceHealth,
+  type PHQ9Scores,
+  type GAD7Scores,
+  type CSSRSScreen,
+  type ClinicalContext,
+} from './risk.service'
