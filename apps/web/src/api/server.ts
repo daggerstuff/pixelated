@@ -39,6 +39,7 @@ import { rateLimiter } from './middleware/rate-limiter'
 import authRoutes from './routes/auth'
 import documentRoutes from './routes/documents'
 import healthRoutes from './routes/health'
+import integrationRoutes from './routes/integrations'
 import marketResearchRoutes from './routes/market-research'
 import projectRoutes from './routes/projects'
 import readinessRoutes from './routes/readiness'
@@ -145,6 +146,7 @@ app.use('/api/projects', projectRoutes)
 app.use('/api/strategic-plans', strategicPlanRoutes)
 app.use('/api/market-research', marketResearchRoutes)
 app.use('/api/sales-opportunities', salesOpportunitiesRoutes)
+app.use('/api/integrations', integrationRoutes)
 app.use('/api/users', userRoutes)
 
 // ============================================================================

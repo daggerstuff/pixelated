@@ -114,6 +114,13 @@ export const EHRAuditAction = {
   OBSERVE_SESSION: 'observe_session',
   LEAVE_SESSION_OBSERVATION: 'leave_session_observation',
   VIEW_SUPERVISOR_METRICS: 'view_supervisor_metrics',
+
+  // Integration Marketplace (F2.5)
+  INTEGRATION_CONNECT: 'integration_connect',
+  INTEGRATION_DISCONNECT: 'integration_disconnect',
+  INTEGRATION_WEBHOOK_RECEIVED: 'integration_webhook_received',
+  INTEGRATION_OAUTH_CALLBACK: 'integration_oauth_callback',
+  INTEGRATION_TOKEN_REFRESH: 'integration_token_refresh',
 } as const
 
 export type EHRAuditActionType =
@@ -137,6 +144,7 @@ export const EHRResourceType = {
   PROVENANCE: 'Provenance',
   SUPERVISOR_REVIEW: 'SupervisorReview',
   RISK_FLAG: 'RiskFlag',
+  INTEGRATION: 'Integration',
 } as const
 
 export type EHRResourceTypeValue =
@@ -281,7 +289,7 @@ export function ehrActionToEventType(
   ) {
     return AuditEventType.DELETE
   }
-  if (action.startsWith('hie_') || action.startsWith('clearinghouse_')) {
+  if (action.startsWith('hie_') || action.startsWith('clearinghouse_') || action.startsWith('integration_')) {
     return AuditEventType.SYSTEM
   }
   if (action.startsWith('break_glass')) {
