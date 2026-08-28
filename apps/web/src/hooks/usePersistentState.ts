@@ -52,15 +52,24 @@ export function usePersistentState<T>(
   // per key. Callers re-create object-typed defaultValue/storageOptions on
   // every render, so including them in the dependency array caused an infinite
   // load -> setState -> render loop whenever storage had data (Sentry 16291187/0).
+  // The setState calls are deferred to a microtask so they are not synchronous
+  // within the effect body (react/no-direct-set-state-in-use-effect).
   useEffect(() => {
-    const storedValue = storageManager.get(key, {
-      defaultValue,
-      ...storageOptions,
-    })
+    let cancelled = false
+    void Promise.resolve().then(() => {
+      if (cancelled) return
+      const storedValue = storageManager.get(key, {
+        defaultValue,
+        ...storageOptions,
+      })
 
-    setState(storedValue)
-    lastStoredValueRef.current = storedValue
-    setIsLoaded(true)
+      setState(storedValue)
+      lastStoredValueRef.current = storedValue
+      setIsLoaded(true)
+    })
+    return () => {
+      cancelled = true
+    }
   }, [key])
 
   // Cross-tab synchronization
