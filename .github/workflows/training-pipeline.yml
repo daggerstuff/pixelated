@@ -191,7 +191,7 @@ jobs:
     name: Validate Dataset (DVC + Quality Gate)
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    continue-on-error: true  # DVC remote may not be accessible in CI
+    continue-on-error: true # DVC remote may not be accessible in CI
 
     steps:
       - name: Checkout
@@ -308,7 +308,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: trainer-unit-test-results
           path: ai/**/.pytest_cache/
@@ -575,7 +575,7 @@ jobs:
           done
 
       - name: Dry-run pip install (CPU-only torch)
-        continue-on-error: true  # Some packages may not have CPU wheels.
+        continue-on-error: true # Some packages may not have CPU wheels.
         run: |
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install --dry-run -r ai/configs/requirements_training.txt 2>&1 | tail -20
