@@ -55,8 +55,13 @@ const OAUTH_CONFIG = {
 function makeTwilioSignature(
   requestUrl: string = REQUEST_URL,
   secret: string = WEBHOOK_SECRET,
+  body: string = 'MessageSid=SM001&MessageStatus=delivered',
 ): string {
-  return createHmac('sha256', secret).update(requestUrl, 'utf8').digest('base64')
+  const params = new URLSearchParams(body)
+  const sortedKeys = Array.from(params.keys()).sort()
+  const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('')
+  const dataToSign = `${requestUrl}${postParams}`
+  return createHmac('sha256', secret).update(dataToSign, 'utf8').digest('base64')
 }
 
 function makeWebhookEvent(overrides: Partial<{
@@ -65,7 +70,7 @@ function makeWebhookEvent(overrides: Partial<{
   rawBody: string
   signature: string
 }> = {}) {
-  const rawBody = overrides.rawBody ?? '{"MessageSid":"SM001","MessageStatus":"delivered"}'
+  const rawBody = overrides.rawBody ?? 'MessageSid=SM001&MessageStatus=delivered'
   return {
     provider: 'twilio' as const,
     eventId: overrides.eventId ?? 'evt_tw_001',

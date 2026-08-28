@@ -135,8 +135,11 @@ export function verifyWebhookSignature(
 
     case 'twilio': {
       if (!requestUrl) return false;
-      const expected = computeHmacSha256(requestUrl, config.secret);
-      // Twilio signatures are base64, not hex.
+      const params = new URLSearchParams(rawBody);
+      const sortedKeys = Array.from(params.keys()).sort();
+      const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('');
+      const dataToSign = `${requestUrl}${postParams}`;
+      const expected = computeHmacSha256(dataToSign, config.secret);
       const aBuf = Buffer.from(expected, 'hex');
       let bBuf: Buffer;
       try {

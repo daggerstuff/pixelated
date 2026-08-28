@@ -144,6 +144,12 @@ app.use(rateLimiter)
 app.use('/api/auth', authRoutes)
 app.use('/api/readiness', readinessRoutes)
 
+// Integration routes must be mounted before authMiddleware — webhook endpoints
+// receive server-to-server POSTs from external providers (Calendly, Zoom, Stripe,
+// Twilio) that carry only webhook signature headers, and OAuth authorize/callback
+// endpoints are accessed by the browser during the OAuth redirect flow.
+app.use('/api/integrations', integrationRoutes)
+
 // ============================================================================
 // PROTECTED ROUTES (AUTH REQUIRED)
 // ============================================================================
@@ -157,7 +163,6 @@ app.use('/api/projects', projectRoutes)
 app.use('/api/strategic-plans', strategicPlanRoutes)
 app.use('/api/market-research', marketResearchRoutes)
 app.use('/api/sales-opportunities', salesOpportunitiesRoutes)
-app.use('/api/integrations', integrationRoutes)
 app.use('/api/users', userRoutes)
 
 // ============================================================================

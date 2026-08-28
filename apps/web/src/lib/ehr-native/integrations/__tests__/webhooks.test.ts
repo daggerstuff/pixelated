@@ -291,11 +291,19 @@ describe('verifyWebhookSignature (stripe-composite format)', () => {
 describe('verifyWebhookSignature (twilio format)', () => {
   const secret = 'twilio_secret'
   const requestUrl = 'https://example.com/webhook/twilio'
-  const rawBody = '{"Body":"Hello"}'
+  const rawBody = 'Body=Hello&From=%2B1234567890'
+
+  function makeTwilioSig(url: string, body: string, key: string): string {
+    const params = new URLSearchParams(body)
+    const sortedKeys = Array.from(params.keys()).sort()
+    const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('')
+    const dataToSign = `${url}${postParams}`
+    const expectedHex = computeHmacSha256(dataToSign, key)
+    return Buffer.from(expectedHex, 'hex').toString('base64')
+  }
 
   it('returns true for a valid base64 Twilio signature', () => {
-    const expectedHex = computeHmacSha256(requestUrl, secret)
-    const expectedBase64 = Buffer.from(expectedHex, 'hex').toString('base64')
+    const sig = makeTwilioSig(requestUrl, rawBody, secret)
     const config: WebhookSignatureConfig = {
       provider: 'twilio',
       headerName: 'X-Twilio-Signature',
@@ -303,7 +311,7 @@ describe('verifyWebhookSignature (twilio format)', () => {
       secret,
       format: 'twilio',
     }
-    expect(verifyWebhookSignature(config, rawBody, expectedBase64, requestUrl)).toBe(true)
+    expect(verifyWebhookSignature(config, rawBody, sig, requestUrl)).toBe(true)
   })
 
   it('returns false for an invalid base64 signature', () => {
@@ -329,8 +337,7 @@ describe('verifyWebhookSignature (twilio format)', () => {
   })
 
   it('returns false for a signature computed with wrong secret', () => {
-    const expectedHex = computeHmacSha256(requestUrl, 'wrong-secret')
-    const expectedBase64 = Buffer.from(expectedHex, 'hex').toString('base64')
+    const sig = makeTwilioSig(requestUrl, rawBody, 'wrong-secret')
     const config: WebhookSignatureConfig = {
       provider: 'twilio',
       headerName: 'X-Twilio-Signature',
@@ -338,7 +345,7 @@ describe('verifyWebhookSignature (twilio format)', () => {
       secret,
       format: 'twilio',
     }
-    expect(verifyWebhookSignature(config, rawBody, expectedBase64, requestUrl)).toBe(false)
+    expect(verifyWebhookSignature(config, rawBody, sig, requestUrl)).toBe(false)
   })
 })
 
@@ -551,8 +558,12 @@ describe('processWebhook', () => {
   it('passes requestUrl to signature verification for twilio', async () => {
     const twilioSecret = 'twilio_secret'
     const url = 'https://example.com/webhook/twilio'
-    const twilioBody = '{"Body":"hi"}'
-    const expectedHex = computeHmacSha256(url, twilioSecret)
+    const twilioBody = 'Body=hi&From=%2B1234567890'
+    const params = new URLSearchParams(twilioBody)
+    const sortedKeys = Array.from(params.keys()).sort()
+    const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('')
+    const dataToSign = `${url}${postParams}`
+    const expectedHex = computeHmacSha256(dataToSign, twilioSecret)
     const expectedBase64 = Buffer.from(expectedHex, 'hex').toString('base64')
 
     const twilioEvent: WebhookEvent = {
