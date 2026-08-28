@@ -16,6 +16,7 @@ from tools.agent_runner.cluster_registry import ClusterRegistry
 from tools.agent_runner.compactor import ThreadCompactor
 from tools.agent_runner.deliberation import DeliberationEngine
 from tools.agent_runner.event_bus import EventBus, EventType
+from tools.agent_runner.execution_harness import AgentExecutionHarness, HarnessRunReport
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
@@ -141,6 +142,13 @@ class MultiAgentCoordinator:
         self.trace_analyzer = TraceAnalyzer(config.langchain_project)
         self.lineage = comps.lineage_tracker or LineageTracker()
         self.evolution = comps.self_evolution or SelfEvolutionEngine(self.foresight, self.event_bus)
+        self.harness = AgentExecutionHarness(
+            config=config,
+            foresight=self.foresight,
+            tracer=self.tracer,
+            event_bus=self.event_bus,
+            self_evolution=self.evolution,
+        )
         self._shutdown_requested = False
 
     def request_shutdown(self) -> None:
@@ -528,44 +536,20 @@ class MultiAgentCoordinator:
                 skills_matched=matching_skills,
             )
 
-            adapter = get_agent_adapter(agent)
-            raw_result = adapter.run(
-                prompt=prompt,
+            # Execute through the rigorous 6-stage Execution Harness
+            result, harness_report = self.harness.run_harness(
+                agent_cfg=agent,
+                issue=issue,
                 workdir=active_workdir,
-                ticket_identifier=issue.identifier,
-                enable_branching=False,
+                prompt=prompt,
+                parent_trace=ticket_trace,
             )
-
-            self.tracer.record_agent_cli(ticket_trace, agent, prompt, raw_result)
-            suppression_violations = self.guardrails.audit_code_diff_for_suppressions(raw_result.git_diff_summary)
-            raw_result.guardrail_violations.extend(suppression_violations)
-
-            result = self._run_verification_and_repair(adapter, active_workdir, issue, agent, raw_result)
-
-            if self.config.verification.enabled:
-                self.tracer.record_verification(
-                    ticket_trace,
-                    VerificationOutcome(
-                        passed=result.verification_passed,
-                        summary=result.verification_logs,
-                        command_results=[],
-                        duration_seconds=0.0,
-                    ),
-                )
-
-            # Active Trace Audit & Anomaly Detection
-            trace_summary = self.trace_analyzer.analyze_ticket_trace(issue.identifier)
-            if trace_summary and trace_summary.anomalies:
-                for anomaly in trace_summary.anomalies:
-                    logger.warning("Trace anomaly detected for %s: %s", issue.identifier, anomaly)
-                    result.guardrail_violations.append(f"Trace Anomaly: {anomaly}")
-                    if "mock data generator" in anomaly or "anti-suppression" in anomaly or "Zero file modifications" in anomaly:
-                        result.verification_passed = False
 
             # Post-Flight Sensors & Work Loop 5D Audit
             self.sensor_engine.run_post_flight_sensors(active_workdir)
-            audit_report = self.loop_auditor.evaluate_execution(issue, result, is_sandboxed=bool(worktree_lease))
-            self.evolution.process_execution_friction(issue, agent.name, result)
+            audit_report = harness_report.audit_report or self.loop_auditor.evaluate_execution(
+                issue, result, is_sandboxed=bool(worktree_lease)
+            )
 
             pr_res = None
             if worktree_lease and result.verification_passed:

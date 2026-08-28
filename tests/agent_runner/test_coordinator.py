@@ -43,6 +43,7 @@ def test_coordinator_tick_workflow(monkeypatch):
     )
 
     monkeypatch.setattr("tools.agent_runner.coordinator.get_agent_adapter", lambda _agent: mock_adapter)
+    monkeypatch.setattr("tools.agent_runner.execution_harness.get_agent_adapter", lambda _agent: mock_adapter)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         state_mgr = StateManager(os.path.join(tmp_dir, "state.json"))
