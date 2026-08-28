@@ -66,25 +66,27 @@ DESCRIPTION:
 SHARED COORDINATION BLACKBOARD:
 {coord_thread}
 
-OPERATING RAILS & PROTOCOLS:
-1. Verify every fact and modification directly against the actual codebase.
-2. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */.
-3. Test your changes locally before concluding.
-4. If this task creates follow-up work or subtasks, declare them using:
+MANDATORY OPERATING RAILS & PROTOCOLS:
+1. READ AGENTS.MD: You MUST read and strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
+2. NO HOLLOW / FAKE WORK: You MUST implement the actual production classes, interfaces, services, and endpoints requested. Never submit empty stubs, mock random number generators, or tests that only test fake mock objects while leaving the actual production code unimplemented.
+3. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
+4. TEST REAL CODE: Write and run real tests verifying your actual production implementation against real exports.
+5. AUTO-FORMAT: Ensure all modified files adhere to Prettier and oxlint standards.
+6. If this task creates follow-up work or subtasks, declare them using:
    CREATE TICKET: <title> | <description> | labels: <labels>
    or
    SUBTASK: <title> | <description>
-5. If scoping complex multi-step work, declare a task graph:
+7. If scoping complex multi-step work, declare a task graph:
    TASK_GRAPH:
    - id: 1, title: <step 1>, agent: <agent>
    - id: 2, title: <step 2>, agent: <agent>, depends: [1]
-6. If delegating to a specialist sub-agent, use:
+8. If delegating to a specialist sub-agent, use:
    DELEGATE: <agent_name> | <subtask directive>
-7. If an architectural decision or fact was made, declare it using:
+9. If an architectural decision or fact was made, declare it using:
    STORE MEMORY: decision | <concise statement>
-8. If you have an update or proposal for other agents, declare it using:
+10. If you have an update or proposal for other agents, declare it using:
    BROADCAST: <message> or PROPOSE: <title> | <details>
-9. Conclude with a final summary line:
+11. Conclude with a final summary line:
    RESULT: <one concise sentence describing the outcome>
 """
 
