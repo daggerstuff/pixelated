@@ -77,3 +77,21 @@ export {
   type CSSRSScreen,
   type ClinicalContext,
 } from './risk.service'
+
+export {
+  AnalyticsService,
+  type DashboardType,
+  type DashboardFilter,
+  type TimeRange,
+  type PracticeMetrics,
+  type OutcomesMetrics,
+  type UtilizationMetrics,
+  type BillingMetrics,
+  type ComplianceMetrics,
+  type DashboardMetrics,
+  type AnalyticsRepository,
+  canAccessDashboard,
+  getAccessibleDashboards,
+  DASHBOARD_TYPES,
+  DASHBOARD_RBAC,
+} from './analytics.service'
