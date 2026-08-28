@@ -40,6 +40,7 @@ export * from './communication.js'
 // Individual Resource Schemas (not covered by aggregate files)
 // ---------------------------------------------------------------------------
 
+export * from './care-plan.js'
 export * from './consent.js'
 export * from './questionnaire.js'
 export * from './service-request.js'
@@ -62,6 +63,7 @@ import {
   allergyIntoleranceSchema,
   medicationRequestSchema,
 } from './clinical.js'
+import { carePlanSchema } from './care-plan.js'
 import { documentReferenceSchema } from './communication.js'
 import { consentSchema } from './consent.js'
 import {
@@ -87,6 +89,7 @@ export const ehrResourceSchema = z.discriminatedUnion('resourceType', [
   serviceRequestSchema,
   questionnaireSchema,
   questionnaireResponseSchema,
+  carePlanSchema,
 ])
 
 export type EHRResource = z.infer<typeof ehrResourceSchema>
