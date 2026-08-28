@@ -210,7 +210,9 @@ export async function getAIUsageStats(
   const uniqueSessions = new Set(filtered.map((e) => e.sessionId)).size
   const uniqueModels = new Set(filtered.map((e) => e.model)).size
   const successRate = Math.round((successfulRequests / totalRequests) * 1000) / 10 // 1 decimal
-  const errorRate = Math.round((failedRequests / totalRequests) * 1000) / 10
+  // Derive errorRate from successRate so the two always sum to exactly 100
+  // (independent rounding could otherwise drift; Sentry 16298767/0).
+  const errorRate = 100 - successRate
 
   const modelBreakdown = computeModelBreakdown(filtered)
 
