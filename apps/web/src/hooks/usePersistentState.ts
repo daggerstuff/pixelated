@@ -47,7 +47,11 @@ export function usePersistentState<T>(
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
   const lastStoredValueRef = useRef<T>(defaultValue)
 
-  // Load initial value from storage
+  // Load initial value from storage.
+  // Deps are intentionally scoped to `key`: the persisted value is loaded once
+  // per key. Callers re-create object-typed defaultValue/storageOptions on
+  // every render, so including them in the dependency array caused an infinite
+  // load -> setState -> render loop whenever storage had data (Sentry 16291187/0).
   useEffect(() => {
     const storedValue = storageManager.get(key, {
       defaultValue,
@@ -57,7 +61,7 @@ export function usePersistentState<T>(
     setState(storedValue)
     lastStoredValueRef.current = storedValue
     setIsLoaded(true)
-  }, [key, defaultValue, storageOptions])
+  }, [key])
 
   // Cross-tab synchronization
   useEffect(() => {

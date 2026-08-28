@@ -589,7 +589,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
     const handleSubmit = (e: FormEvent) => {
       e.preventDefault()
       const pub: Publication = {
-        id: editingId ?? Date.now().toString(),
+        id: editingId ?? crypto.randomUUID(),
         title: formData.title,
         authors: formData.authors
           .split(',')
@@ -599,10 +599,14 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
         doi: formData.doi || undefined,
         status: formData.status,
         abstract: formData.abstract,
-        keywords: formData.keywords
-          .split(',')
-          .map((k) => k.trim())
-          .filter(Boolean),
+        keywords: [
+          ...new Set(
+            formData.keywords
+              .split(',')
+              .map((k) => k.trim())
+              .filter(Boolean),
+          ),
+        ],
         publicationDate: formData.publicationDate,
       }
       if (editingId) {
