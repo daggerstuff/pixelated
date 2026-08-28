@@ -125,6 +125,17 @@ export interface ActorContext {
   tenantId?: string | null
 }
 
+const ADMIN_ROLE_TO_EHR_ROLE: Record<string, string> = {
+  super_admin: 'systemAdmin',
+  clinical_admin: 'complianceOfficer',
+  security_admin: 'complianceOfficer',
+  support_admin: 'healthInformationManager',
+}
+
+export function mapAdminRoleToEhrRole(role: string): string {
+  return ADMIN_ROLE_TO_EHR_ROLE[role] ?? role
+}
+
 // ---------------------------------------------------------------------------
 // Repository
 // ---------------------------------------------------------------------------
@@ -263,12 +274,14 @@ export class StateConsentRulesRepository {
     stateCode: string,
     tenantId?: string | null,
   ): Promise<StateConsentRuleRecord | null> {
+    const upperStateCode = stateCode.toUpperCase()
     if (tenantId) {
       const tenantResult = await query<StateConsentRuleRow>(
         `SELECT * FROM ehr_state_consent_rules
          WHERE state_code = $1 AND status = 'active' AND tenant_id = $2
+           AND (expiry_date IS NULL OR expiry_date >= CURRENT_DATE)
          ORDER BY version DESC LIMIT 1`,
-        [stateCode, tenantId],
+        [upperStateCode, tenantId],
       )
       if (tenantResult.rows[0]) {
         return mapRuleRow(tenantResult.rows[0] as StateConsentRuleRow)
@@ -278,8 +291,9 @@ export class StateConsentRulesRepository {
     const result = await query<StateConsentRuleRow>(
       `SELECT * FROM ehr_state_consent_rules
        WHERE state_code = $1 AND status = 'active' AND tenant_id IS NULL
+         AND (expiry_date IS NULL OR expiry_date >= CURRENT_DATE)
        ORDER BY version DESC LIMIT 1`,
-      [stateCode],
+      [upperStateCode],
     )
     return result.rows[0] ? mapRuleRow(result.rows[0] as StateConsentRuleRow) : null
   }
@@ -291,6 +305,7 @@ export class StateConsentRulesRepository {
     const result = await query<StateConsentRuleRow>(
       `SELECT * FROM ehr_state_consent_rules
        WHERE status = 'active'
+         AND (expiry_date IS NULL OR expiry_date >= CURRENT_DATE)
        ORDER BY state_code ASC`,
     )
     return result.rows.map((row) => mapRuleRow(row as StateConsentRuleRow))

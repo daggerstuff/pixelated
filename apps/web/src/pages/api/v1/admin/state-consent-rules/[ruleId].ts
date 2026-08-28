@@ -2,6 +2,7 @@ import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 import { verifyAdmin } from '@/lib/admin/middleware'
 import {
   stateConsentRulesRepository,
+  mapAdminRoleToEhrRole,
   type ActorContext,
 } from '@/lib/ehr-native/consent/state-rules/repository'
 import {
@@ -19,7 +20,7 @@ const JSON_HEADERS = {
 function buildActor(admin: { userId: string; role: string }): ActorContext {
   return {
     userId: admin.userId,
-    role: admin.role,
+    role: mapAdminRoleToEhrRole(admin.role),
   }
 }
 

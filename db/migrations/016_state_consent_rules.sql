@@ -126,7 +126,7 @@ CREATE POLICY ehr_state_consent_rules_delete ON ehr_state_consent_rules FOR DELE
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS ehr_state_consent_rules_audit (
     audit_id     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    rule_id      UUID NOT NULL,
+    rule_id      UUID,           -- nullable so ON DELETE SET NULL preserves audit entries when rules are deleted
     tenant_id    UUID,
     state_code   TEXT NOT NULL,
     version      INTEGER NOT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS ehr_state_consent_rules_audit (
     timestamp    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_state_consent_rules_audit_rule_id
-        FOREIGN KEY (rule_id) REFERENCES ehr_state_consent_rules(rule_id) ON DELETE CASCADE,
+        FOREIGN KEY (rule_id) REFERENCES ehr_state_consent_rules(rule_id) ON DELETE SET NULL,
     CONSTRAINT chk_state_consent_rules_audit_action CHECK (
         action IN ('create', 'update', 'submit_for_review', 'approve', 'activate',
                     'supersede', 'archive', 'delete')
