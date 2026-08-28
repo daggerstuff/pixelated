@@ -119,6 +119,17 @@ export interface TelehealthAuditInput extends EHRAuditInput {
   providerType?: 'webrtc' | 'zoom'
 }
 
+/** Input for supervisor-related audit events (F3.2). */
+export interface SupervisorAuditInput extends EHRAuditInput {
+  supervisorId?: string
+  clinicianId?: string
+  patientId?: string
+  noteId?: string
+  reviewId?: string
+  flagId?: string
+  sessionId?: string
+}
+
 // ---------------------------------------------------------------------------
 // EHRAuditService
 // ---------------------------------------------------------------------------
@@ -529,6 +540,51 @@ export class EHRAuditService {
           providerType: input.providerType,
           resourceType: EHRResourceType.TELEHEALTH_SESSION,
           resourceId: input.sessionId,
+        },
+      },
+    )
+  }
+
+  // -------------------------------------------------------------------------
+  // Supervisor audit builders (F3.2)
+  // -------------------------------------------------------------------------
+
+  async logSupervisorAccess(
+    action:
+      | typeof EHRAuditAction.VIEW_SUPERVISOR_CASELOAD
+      | typeof EHRAuditAction.VIEW_REVIEW_QUEUE
+      | typeof EHRAuditAction.VIEW_NOTE_REVIEW
+      | typeof EHRAuditAction.COSIGN_NOTE
+      | typeof EHRAuditAction.REJECT_NOTE
+      | typeof EHRAuditAction.REQUEST_NOTE_CHANGES
+      | typeof EHRAuditAction.VIEW_RISK_QUEUE
+      | typeof EHRAuditAction.ACKNOWLEDGE_RISK_FLAG
+      | typeof EHRAuditAction.RESOLVE_RISK_FLAG
+      | typeof EHRAuditAction.OBSERVE_SESSION
+      | typeof EHRAuditAction.LEAVE_SESSION_OBSERVATION
+      | typeof EHRAuditAction.VIEW_SUPERVISOR_METRICS,
+    input: SupervisorAuditInput,
+    resourceType: EHRResourceTypeValue = EHRResourceType.SUPERVISOR_REVIEW,
+    resourceId?: string,
+  ): Promise<string> {
+    return this.log(
+      action,
+      resourceType,
+      resourceId ?? input.reviewId ?? input.flagId ?? input.noteId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          supervisorId: input.supervisorId,
+          clinicianId: input.clinicianId,
+          patientId: input.patientId,
+          noteId: input.noteId,
+          reviewId: input.reviewId,
+          flagId: input.flagId,
+          sessionId: input.sessionId,
+          resourceType,
+          resourceId:
+            resourceId ?? input.reviewId ?? input.flagId ?? input.noteId,
         },
       },
     )

@@ -21,6 +21,7 @@ export type ClinicalRole =
   | 'medicalAssistant'
   | 'technician'
   | 'therapist'
+  | 'supervisor'
   | 'socialWorker'
   | 'careCoordinator'
   | 'frontDesk'
@@ -39,6 +40,7 @@ export const CLINICAL_ROLES: readonly ClinicalRole[] = [
   'medicalAssistant',
   'technician',
   'therapist',
+  'supervisor',
   'socialWorker',
   'careCoordinator',
   'frontDesk',
