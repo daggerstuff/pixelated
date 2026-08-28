@@ -192,6 +192,7 @@ paths:
     get:
       tags: [Patients]
       summary: Get a patient by ID
+      description: Retrieve a single patient resource by its unique identifier.
       operationId: getPatient
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -211,6 +212,7 @@ paths:
     patch:
       tags: [Patients]
       summary: Update a patient
+      description: Update an existing patient resource by ID. Supports partial updates via PATCH.
       operationId: updatePatient
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -238,6 +240,7 @@ paths:
     delete:
       tags: [Patients]
       summary: Delete a patient
+      description: Delete a patient resource by its unique identifier.
       operationId: deletePatient
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -256,6 +259,7 @@ paths:
     get:
       tags: [Encounters]
       summary: Search encounters
+      description: Search for encounter resources with optional filtering by date range and practitioner.
       operationId: searchEncounters
       parameters:
         - name: patient
@@ -317,6 +321,7 @@ paths:
     post:
       tags: [Encounters]
       summary: Create an encounter
+      description: Create a new encounter resource linking a patient, practitioner, and period.
       operationId: createEncounter
       requestBody:
         required: true
@@ -354,6 +359,7 @@ paths:
     get:
       tags: [Encounters]
       summary: Get an encounter by ID
+      description: Retrieve a single encounter resource by its unique identifier.
       operationId: getEncounter
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -369,6 +375,7 @@ paths:
     patch:
       tags: [Encounters]
       summary: Update an encounter
+      description: Update an existing encounter resource by ID. Supports partial updates via PATCH.
       operationId: updateEncounter
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -462,6 +469,7 @@ paths:
     post:
       tags: [Observations]
       summary: Create an observation
+      description: Create a new observation resource for a patient encounter.
       operationId: createObservation
       requestBody:
         required: true
@@ -522,6 +530,7 @@ paths:
     get:
       tags: [Observations]
       summary: Get an observation by ID
+      description: Retrieve a single observation resource by its unique identifier.
       operationId: getObservation
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -537,6 +546,7 @@ paths:
     patch:
       tags: [Observations]
       summary: Update an observation
+      description: Update an existing observation resource by ID. Supports partial updates via PATCH.
       operationId: updateObservation
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -563,6 +573,7 @@ paths:
     get:
       tags: [Notes]
       summary: List clinical note templates
+      description: List available clinical note templates for the authenticated practitioner.
       operationId: listNoteTemplates
       parameters:
         - name: modality
@@ -591,6 +602,7 @@ paths:
     post:
       tags: [Notes]
       summary: Create a clinical note
+      description: Create a new clinical note from a template for a patient encounter.
       operationId: createNote
       requestBody:
         required: true
@@ -639,6 +651,7 @@ paths:
     get:
       tags: [Analytics]
       summary: Get analytics data
+      description: Retrieve analytics data with optional filtering by metric type and date range.
       operationId: getAnalytics
       parameters:
         - name: type
@@ -694,6 +707,7 @@ paths:
     get:
       tags: [Analytics]
       summary: List saved analytics views
+      description: List all saved analytics view configurations for the authenticated user.
       operationId: listSavedViews
       responses:
         '200':
@@ -716,6 +730,7 @@ paths:
     post:
       tags: [Analytics]
       summary: Create a saved analytics view
+      description: Create a new saved analytics view configuration.
       operationId: createSavedView
       requestBody:
         required: true
@@ -739,6 +754,7 @@ paths:
     delete:
       tags: [Analytics]
       summary: Delete a saved analytics view
+      description: Delete a saved analytics view by its unique identifier.
       operationId: deleteSavedView
       parameters:
         - name: id
@@ -770,6 +786,7 @@ paths:
     put:
       tags: [Analytics]
       summary: Set a saved view as default
+      description: Set a saved analytics view as the default for the authenticated user.
       operationId: setDefaultView
       parameters:
         - name: id
@@ -804,6 +821,7 @@ paths:
     post:
       tags: [Analytics]
       summary: Export analytics as PDF
+      description: Export analytics data as a downloadable PDF document.
       operationId: exportAnalyticsPdf
       requestBody:
         required: true
@@ -847,6 +865,7 @@ paths:
     get:
       tags: [Outcomes]
       summary: List outcome measures
+      description: List outcome measures with optional filtering by patient and date range.
       operationId: listOutcomeMeasures
       responses:
         '200':
@@ -869,6 +888,7 @@ paths:
     post:
       tags: [Outcomes]
       summary: Record an outcome measure
+      description: Record a new outcome measure score for a patient.
       operationId: createOutcomeMeasure
       requestBody:
         required: true
@@ -894,6 +914,7 @@ paths:
     get:
       tags: [Outcomes]
       summary: Get outcome alerts for a patient
+      description: Retrieve outcome alerts for a specific patient based on threshold breaches.
       operationId: getOutcomeAlerts
       parameters:
         - name: patient
@@ -924,6 +945,7 @@ paths:
     get:
       tags: [Outcomes]
       summary: Get outcome configuration for a patient
+      description: Retrieve outcome measurement configuration for a specific patient.
       operationId: getOutcomeConfig
       parameters:
         - name: patient
@@ -950,6 +972,7 @@ paths:
     post:
       tags: [Outcomes]
       summary: Update outcome configuration for a patient
+      description: Update outcome measurement configuration for a specific patient.
       operationId: updateOutcomeConfig
       parameters:
         - name: patient
@@ -984,6 +1007,7 @@ paths:
     get:
       tags: [Outcomes]
       summary: Get outcome trending data for a patient
+      description: Retrieve outcome trending data for a specific patient over time.
       operationId: getOutcomeTrending
       parameters:
         - name: patient
@@ -1018,6 +1042,7 @@ paths:
     get:
       tags: [Appointments]
       summary: Search appointments
+      description: Search for appointment resources with optional filtering by date range, practitioner, and upcoming status.
       operationId: searchAppointments
       parameters:
         - name: patient
@@ -1076,6 +1101,7 @@ paths:
     post:
       tags: [Appointments]
       summary: Create an appointment
+      description: Create a new appointment resource linking a patient and practitioner.
       operationId: createAppointment
       requestBody:
         required: true
@@ -1097,6 +1123,7 @@ paths:
     get:
       tags: [Appointments]
       summary: Get an appointment by ID
+      description: Retrieve a single appointment resource by its unique identifier.
       operationId: getAppointment
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -1112,6 +1139,7 @@ paths:
     patch:
       tags: [Appointments]
       summary: Update an appointment
+      description: Update an existing appointment resource by ID. Supports partial updates via PATCH.
       operationId: updateAppointment
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -1177,6 +1205,7 @@ paths:
     post:
       tags: [Claims]
       summary: Create a claim
+      description: Create a new claim resource for billing submission.
       operationId: createClaim
       requestBody:
         required: true
@@ -1198,6 +1227,7 @@ paths:
     get:
       tags: [Claims]
       summary: Get a claim by ID
+      description: Retrieve a single claim resource by its unique identifier.
       operationId: getClaim
       parameters:
         - $ref: '#/components/parameters/ResourceId'
@@ -1213,6 +1243,7 @@ paths:
     patch:
       tags: [Claims]
       summary: Update a claim
+      description: Update an existing claim resource by ID. Supports partial updates via PATCH.
       operationId: updateClaim
       parameters:
         - $ref: '#/components/parameters/ResourceId'
