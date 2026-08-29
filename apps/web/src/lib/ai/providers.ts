@@ -2,6 +2,14 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions, AIUsage } from './models/ai-types'
 import { createLLMService } from './services/llm-provider'
 import { DEFAULT_LLM_MODEL } from './constants'
+import { acquireRateLimit } from './rate-limiter'
+import {
+  executeWithFallback,
+  executeStreamingWithFallback,
+  buildFallbackChain,
+  type FallbackConfig,
+  type ServiceResolver,
+} from './fallback'
 
 const appLogger = createBuildSafeLogger('ai-providers')
 
@@ -48,7 +56,7 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
   },
   openai: {
     name: 'OpenAI GPT',
-    baseUrl: 'https://api.openai.com/v1',
+    baseUrl: 'https://api.openai.com',
     defaultModel: 'gpt-4',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
@@ -203,22 +211,22 @@ export function getAIServiceByProvider(
     let service: AIService | null = null
     switch (providerType) {
       case 'llm':
-        service = createLLMServiceAdapter(config)
+        service = withRateLimit(providerType, createLLMServiceAdapter(config))
         break
       case 'nvidia':
-        service = createLLMServiceAdapter(config)
+        service = withRateLimit(providerType, createLLMServiceAdapter(config))
         break
       case 'anthropic':
-        service = createAnthropicServiceAdapter(config)
+        service = withRateLimit(providerType, createAnthropicServiceAdapter(config))
         break
       case 'openai':
-        service = createOpenAIServiceAdapter(config)
+        service = withRateLimit(providerType, createOpenAIServiceAdapter(config))
         break
       case 'huggingface':
-        service = createHuggingFaceServiceAdapter(config)
+        service = withRateLimit(providerType, createHuggingFaceServiceAdapter(config))
         break
       case 'local':
-        service = createLocalServiceAdapter(config)
+        service = withRateLimit(providerType, createLocalServiceAdapter(config))
         break
       case "azure-openai": { throw new Error('Not implemented yet: "azure-openai" case') }
       default:
@@ -262,7 +270,47 @@ export function getProviderConfig(
   return providers.get(providerType) ?? null
 }
 
+/** Reset provider registry and service cache (for testing). */
+export function resetProvidersForTesting(): void {
+  providers.clear()
+  serviceCache.clear()
+}
+
+/** Force-set a provider config (for testing). */
+export function setProviderForTesting(
+  providerType: AIProviderType,
+  config: AIProviderConfig,
+): void {
+  providers.set(providerType, config)
+}
+
 // Provider-specific service adapters
+
+/**
+ * Wrap an AIService with per-provider rate limiting.
+ * Each call to createChatCompletion or createStreamingChatCompletion
+ * acquires a rate-limit token before delegating to the underlying service.
+ */
+function withRateLimit(provider: AIProviderType, service: AIService): AIService {
+  return {
+    createChatCompletion: async (messages, options) => {
+      await acquireRateLimit(provider)
+      return service.createChatCompletion(messages, options)
+    },
+    createStreamingChatCompletion: async (messages, options) => {
+      await acquireRateLimit(provider)
+      return service.createStreamingChatCompletion(messages, options)
+    },
+    getModelInfo: service.getModelInfo.bind(service),
+    ...(service.createChatCompletionWithTracking
+      ? { createChatCompletionWithTracking: service.createChatCompletionWithTracking.bind(service) }
+      : {}),
+    ...(service.generateCompletion
+      ? { generateCompletion: service.generateCompletion.bind(service) }
+      : {}),
+    dispose: service.dispose.bind(service),
+  }
+}
 
 function createLLMServiceAdapter(config: AIProviderConfig): AIService {
   const llmService = createLLMService({
@@ -455,7 +503,9 @@ function createAnthropicServiceAdapter(config: AIProviderConfig): AIService {
 }
 
 function createOpenAIServiceAdapter(config: AIProviderConfig): AIService {
-  const baseUrl = config.baseUrl ?? 'https://api.openai.com'
+  const rawBaseUrl = config.baseUrl ?? 'https://api.openai.com'
+  // Normalize: strip a trailing /v1 so `${baseUrl}/v1/...` never doubles the segment.
+  const baseUrl = rawBaseUrl.replace(/\/v1\/?$/, '')
 
   const createChatCompletion = async (
     messages: AIMessage[],
@@ -844,6 +894,69 @@ function createLocalServiceAdapter(config: AIProviderConfig): AIService {
     }),
     dispose: () => {},
   }
+}
+
+/**
+ * Create a fallback-aware completion by trying providers in chain order.
+ */
+export async function createChatCompletionWithFallback(
+  primary: AIProviderType,
+  messages: AIMessage[],
+  options?: AIServiceOptions &
+    Partial<Pick<FallbackConfig, 'maxRetries' | 'initialBackoffMs' | 'maxBackoffMs' | 'jitterFactor'>>,
+): Promise<AICompletion> {
+  const available = getAvailableProviders()
+  const chain = buildFallbackChain(primary, available)
+  const resolver: ServiceResolver = (provider) => getAIServiceByProvider(provider)
+  const {
+    maxRetries,
+    initialBackoffMs,
+    maxBackoffMs,
+    jitterFactor,
+    ...aiOptions
+  } = options ?? {}
+  const fallbackConfig: FallbackConfig = {
+    providers: chain,
+    ...(maxRetries !== undefined && { maxRetries }),
+    ...(initialBackoffMs !== undefined && { initialBackoffMs }),
+    ...(maxBackoffMs !== undefined && { maxBackoffMs }),
+    ...(jitterFactor !== undefined && { jitterFactor }),
+  }
+  return executeWithFallback(resolver, fallbackConfig, messages, aiOptions)
+}
+
+/**
+ * Create a fallback-aware streaming completion.
+ */
+export async function createStreamingChatCompletionWithFallback(
+  primary: AIProviderType,
+  messages: AIMessage[],
+  options?: AIServiceOptions &
+    Partial<Pick<FallbackConfig, 'maxRetries' | 'initialBackoffMs' | 'maxBackoffMs' | 'jitterFactor'>>,
+): Promise<AsyncGenerator<AIStreamChunk, void, void>> {
+  const available = getAvailableProviders()
+  const chain = buildFallbackChain(primary, available)
+  const resolver: ServiceResolver = (provider) => getAIServiceByProvider(provider)
+  const {
+    maxRetries,
+    initialBackoffMs,
+    maxBackoffMs,
+    jitterFactor,
+    ...aiOptions
+  } = options ?? {}
+  const fallbackConfig: FallbackConfig = {
+    providers: chain,
+    ...(maxRetries !== undefined && { maxRetries }),
+    ...(initialBackoffMs !== undefined && { initialBackoffMs }),
+    ...(maxBackoffMs !== undefined && { maxBackoffMs }),
+    ...(jitterFactor !== undefined && { jitterFactor }),
+  }
+  return executeStreamingWithFallback(
+    resolver,
+    fallbackConfig,
+    messages,
+    aiOptions,
+  )
 }
 
 // Initialize providers on module load

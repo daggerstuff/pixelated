@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     // Perform crisis detection
     const crisisOptions: CrisisDetectionOptions = {
       sensitivityLevel: 'medium',
-      userId: userId,
+      userId: userId ?? 'anonymous',
       source: 'auth0-api',
       metadata: { sessionId, context },
     }
