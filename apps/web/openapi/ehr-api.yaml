@@ -1,0 +1,2160 @@
+openapi: 3.1.0
+info:
+  title: Pixelated EHR API
+  version: 1.0.0
+  description: |
+    Clinical EHR (Electronic Health Record) API for the Pixelated platform.
+
+    Provides FHIR R4-aligned REST endpoints for managing patients, encounters,
+    observations, clinical notes, analytics, and outcomes measurement.
+
+    ## Authentication
+
+    All requests require either:
+    - `X-API-Key` header with a valid developer API key (see API Key Management)
+    - `Authorization: Bearer <token>` header with a valid OAuth2 access token (SMART-on-FHIR)
+
+    ## Multi-Tenancy
+
+    Tenant isolation is enforced via PostgreSQL Row-Level Security (RLS).
+    All requests are scoped to the tenant identified by the authenticated context.
+
+    ## Rate Limiting
+
+    - Default: 1000 requests/minute per API key
+    - Configurable per key up to 10,000 requests/minute
+    - Rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
+
+    ## Pagination
+
+    List endpoints support cursor-based pagination:
+    - `limit`: Maximum results per page (default: 20, max: 100)
+    - `offset`: Number of results to skip (default: 0)
+    - Response includes `pagination` object with `limit`, `offset`, and `total`
+
+    ## Errors
+
+    All errors use the standard envelope: `{ "error": { "code": string, "message": string } }`
+  contact:
+    name: Pixelated Developer Support
+    url: https://docs.pixelated.com/developers
+  license:
+    name: Proprietary
+    url: https://docs.pixelated.com/license
+
+servers:
+  - url: https://api.pixelated.com/ehr/v1
+    description: Production
+  - url: https://staging-api.pixelated.com/ehr/v1
+    description: Staging
+  - url: https://api.pixelated.local/ehr/v1
+    description: Local Development
+
+security:
+  - ApiKeyAuth: []
+  - BearerAuth: []
+
+tags:
+  - name: Patients
+    description: Patient resource management (FHIR Patient)
+  - name: Encounters
+    description: Encounter resource management (FHIR Encounter)
+  - name: Observations
+    description: Observation resource management (FHIR Observation)
+  - name: Notes
+    description: Clinical notes and documentation
+  - name: Analytics
+    description: Practice analytics and reporting
+  - name: Outcomes
+    description: Outcomes measurement and tracking
+  - name: Appointments
+    description: Appointment scheduling (FHIR Appointment)
+  - name: Claims
+    description: Insurance claims management (FHIR Claim)
+  - name: Consents
+    description: Patient consent management (FHIR Consent)
+  - name: API Keys
+    description: Developer API key management
+
+paths:
+  # ─── Patients ──────────────────────────────────────────
+  /patients:
+    get:
+      tags: [Patients]
+      summary: Search patients
+      description: Search patients by name, active status, with pagination
+      operationId: searchPatients
+      parameters:
+        - name: q
+          in: query
+          description: Name search query (matches family or given name)
+          schema:
+            type: string
+          example: 'Smith'
+        - name: active
+          in: query
+          description: Filter by active status
+          schema:
+            type: boolean
+          example: true
+        - name: limit
+          in: query
+          description: Maximum results per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          description: Number of results to skip
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of patients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientListResponse'
+              examples:
+                default:
+                  value:
+                    data:
+                      - resourceType: Patient
+                        id: 'patient-001'
+                        name:
+                          - family: Smith
+                            given: [John]
+                        active: true
+                        birthDate: '1980-01-15'
+                        gender: male
+                    pagination:
+                      limit: 20
+                      offset: 0
+                      total: 1
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Patients]
+      summary: Create a patient
+      description: Create a new FHIR Patient resource
+      operationId: createPatient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientCreate'
+            examples:
+              default:
+                value:
+                  resourceType: Patient
+                  identifier:
+                    - system: 'http://pixelated.com/patient-id'
+                      value: 'MRN-12345'
+                  name:
+                    - family: Smith
+                      given: [Jane]
+                      use: official
+                  birthDate: '1990-05-20'
+                  gender: female
+                  active: true
+                  telecom:
+                    - system: phone
+                      value: '+1-555-0100'
+                  address:
+                    - line: ['123 Main St']
+                      city: Springfield
+                      state: IL
+                      postalCode: '62701'
+      responses:
+        '201':
+          description: Patient created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /patients/{id}:
+    get:
+      tags: [Patients]
+      summary: Get a patient by ID
+      description: Retrieve a single patient resource by its unique identifier.
+      operationId: getPatient
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Patient resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    patch:
+      tags: [Patients]
+      summary: Update a patient
+      description: Update an existing patient resource by ID. Supports partial updates via PATCH.
+      operationId: updatePatient
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientCreate'
+      responses:
+        '200':
+          description: Patient updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Patients]
+      summary: Delete a patient
+      description: Delete a patient resource by its unique identifier.
+      operationId: deletePatient
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '204':
+          description: Patient deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─── Encounters ─────────────────────────────────────────
+  /encounters:
+    get:
+      tags: [Encounters]
+      summary: Search encounters
+      description: Search for encounter resources with optional filtering by date range and practitioner.
+      operationId: searchEncounters
+      parameters:
+        - name: patient
+          in: query
+          description: Patient ID filter
+          schema:
+            type: string
+          example: 'patient-001'
+        - name: status
+          in: query
+          description: Encounter status (planned|arrived|triaged|in-progress|finished|cancelled)
+          schema:
+            type: string
+            enum: [planned, arrived, triaged, in-progress, finished, cancelled]
+          example: 'finished'
+        - name: practitioner
+          in: query
+          description: Practitioner ID filter
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Start of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: '2024-01-01T00:00:00Z'
+        - name: end
+          in: query
+          description: End of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: '2024-12-31T23:59:59Z'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of encounters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterListResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Encounters]
+      summary: Create an encounter
+      description: Create a new encounter resource linking a patient, practitioner, and period.
+      operationId: createEncounter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EncounterCreate'
+            examples:
+              default:
+                value:
+                  resourceType: Encounter
+                  status: planned
+                  class:
+                    code: AMB
+                    display: ambulatory
+                  subject:
+                    reference: 'Patient/patient-001'
+                  period:
+                    start: '2024-06-15T10:00:00Z'
+      responses:
+        '201':
+          description: Encounter created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /encounters/{id}:
+    get:
+      tags: [Encounters]
+      summary: Get an encounter by ID
+      description: Retrieve a single encounter resource by its unique identifier.
+      operationId: getEncounter
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Encounter resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Encounters]
+      summary: Update an encounter
+      description: Update an existing encounter resource by ID. Supports partial updates via PATCH.
+      operationId: updateEncounter
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EncounterCreate'
+      responses:
+        '200':
+          description: Encounter updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EncounterResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─── Observations ──────────────────────────────────────
+  /observations:
+    get:
+      tags: [Observations]
+      summary: Search observations
+      description: Requires at least one filter parameter (patient, encounter, or code)
+      operationId: searchObservations
+      parameters:
+        - name: patient
+          in: query
+          description: Patient ID filter
+          schema:
+            type: string
+        - name: encounter
+          in: query
+          description: Encounter ID filter
+          schema:
+            type: string
+        - name: code
+          in: query
+          description: LOINC code filter
+          schema:
+            type: string
+          example: '85354-9'
+        - name: status
+          in: query
+          description: Observation status
+          schema:
+            type: string
+            enum:
+              [registered, preliminary, final, amended, corrected, cancelled]
+        - name: start
+          in: query
+          description: Start of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: '2024-01-01T00:00:00Z'
+        - name: end
+          in: query
+          description: End of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+          example: '2024-12-31T23:59:59Z'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of observations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationListResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Observations]
+      summary: Create an observation
+      description: Create a new observation resource for a patient encounter.
+      operationId: createObservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationCreate'
+            examples:
+              bloodPressure:
+                summary: Blood pressure observation
+                value:
+                  resourceType: Observation
+                  status: final
+                  code:
+                    coding:
+                      - system: 'http://loinc.org'
+                        code: '85354-9'
+                        display: 'Blood pressure panel'
+                  subject:
+                    reference: 'Patient/patient-001'
+                  effectiveDateTime: '2024-06-15T10:30:00Z'
+                  component:
+                    - code:
+                        coding:
+                          - system: 'http://loinc.org'
+                            code: '8480-6'
+                            display: 'Systolic blood pressure'
+                      valueQuantity:
+                        value: 120
+                        unit: 'mmHg'
+                        system: 'http://unitsofmeasure.org'
+                        code: 'mm[Hg]'
+                    - code:
+                        coding:
+                          - system: 'http://loinc.org'
+                            code: '8462-4'
+                            display: 'Diastolic blood pressure'
+                      valueQuantity:
+                        value: 80
+                        unit: 'mmHg'
+                        system: 'http://unitsofmeasure.org'
+                        code: 'mm[Hg]'
+      responses:
+        '201':
+          description: Observation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /observations/{id}:
+    get:
+      tags: [Observations]
+      summary: Get an observation by ID
+      description: Retrieve a single observation resource by its unique identifier.
+      operationId: getObservation
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Observation resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Observations]
+      summary: Update an observation
+      description: Update an existing observation resource by ID. Supports partial updates via PATCH.
+      operationId: updateObservation
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationCreate'
+      responses:
+        '200':
+          description: Observation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─── Notes ─────────────────────────────────────────────
+  /notes:
+    get:
+      tags: [Notes]
+      summary: List clinical note templates
+      description: List available clinical note templates for the authenticated practitioner.
+      operationId: listNoteTemplates
+      parameters:
+        - name: modality
+          in: query
+          description: Filter by note modality
+          schema:
+            type: string
+            enum:
+              [progress, consultation, discharge, procedure, nursing, therapy]
+      responses:
+        '200':
+          description: List of note templates
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/NoteTemplate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Notes]
+      summary: Create a clinical note
+      description: Create a new clinical note from a template for a patient encounter.
+      operationId: createNote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteCreate'
+      responses:
+        '201':
+          description: Note created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /notes/{id}/sign:
+    post:
+      tags: [Notes]
+      summary: Sign a clinical note
+      description: Electronically sign a clinical note, locking it from further edits
+      operationId: signNote
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Note signed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─── Analytics ─────────────────────────────────────────
+  /analytics:
+    get:
+      tags: [Analytics]
+      summary: Get analytics data
+      description: Retrieve analytics data with optional filtering by metric type and date range.
+      operationId: getAnalytics
+      parameters:
+        - name: type
+          in: query
+          required: true
+          description: Analytics domain
+          schema:
+            type: string
+            enum: [practice, outcomes, utilization, billing, compliance]
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: provider
+          in: query
+          schema:
+            type: string
+        - name: location
+          in: query
+          schema:
+            type: string
+        - name: payer
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    description: Analytics result set (structure varies by type)
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /analytics/saved-views:
+    get:
+      tags: [Analytics]
+      summary: List saved analytics views
+      description: List all saved analytics view configurations for the authenticated user.
+      operationId: listSavedViews
+      responses:
+        '200':
+          description: List of saved views
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SavedView'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Analytics]
+      summary: Create a saved analytics view
+      description: Create a new saved analytics view configuration.
+      operationId: createSavedView
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SavedViewCreate'
+      responses:
+        '201':
+          description: Saved view created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedView'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    delete:
+      tags: [Analytics]
+      summary: Delete a saved analytics view
+      description: Delete a saved analytics view by its unique identifier.
+      operationId: deleteSavedView
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the saved view to delete
+      responses:
+        '200':
+          description: View deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      deleted:
+                        type: string
+                        description: ID of the deleted view
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    put:
+      tags: [Analytics]
+      summary: Set a saved view as default
+      description: Set a saved analytics view as the default for the authenticated user.
+      operationId: setDefaultView
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: ID of the saved view to set as default
+      responses:
+        '200':
+          description: Default view updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      views:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SavedView'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /analytics/export/pdf:
+    post:
+      tags: [Analytics]
+      summary: Export analytics as PDF
+      description: Export analytics data as a downloadable PDF document.
+      operationId: exportAnalyticsPdf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [practice, outcomes, utilization, billing, compliance]
+                startDate:
+                  type: string
+                  format: date
+                endDate:
+                  type: string
+                  format: date
+                provider:
+                  type: string
+                location:
+                  type: string
+                payer:
+                  type: string
+      responses:
+        '200':
+          description: PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─── Outcomes ──────────────────────────────────────────
+  /outcomes:
+    get:
+      tags: [Outcomes]
+      summary: List outcome measures
+      description: List outcome measures with optional filtering by patient and date range.
+      operationId: listOutcomeMeasures
+      responses:
+        '200':
+          description: List of outcome measures
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OutcomeMeasure'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Outcomes]
+      summary: Record an outcome measure
+      description: Record a new outcome measure score for a patient.
+      operationId: createOutcomeMeasure
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutcomeMeasureCreate'
+      responses:
+        '201':
+          description: Outcome measure recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutcomeMeasure'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /outcomes/alerts:
+    get:
+      tags: [Outcomes]
+      summary: Get outcome alerts for a patient
+      description: Retrieve outcome alerts for a specific patient based on threshold breaches.
+      operationId: getOutcomeAlerts
+      parameters:
+        - name: patient
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Outcome alerts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/OutcomeAlert'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /outcomes/config:
+    get:
+      tags: [Outcomes]
+      summary: Get outcome configuration for a patient
+      description: Retrieve outcome measurement configuration for a specific patient.
+      operationId: getOutcomeConfig
+      parameters:
+        - name: patient
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Outcome configuration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OutcomeConfig'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Outcomes]
+      summary: Update outcome configuration for a patient
+      description: Update outcome measurement configuration for a specific patient.
+      operationId: updateOutcomeConfig
+      parameters:
+        - name: patient
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OutcomeConfigUpdate'
+      responses:
+        '200':
+          description: Configuration updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OutcomeConfig'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /outcomes/trending:
+    get:
+      tags: [Outcomes]
+      summary: Get outcome trending data for a patient
+      description: Retrieve outcome trending data for a specific patient over time.
+      operationId: getOutcomeTrending
+      parameters:
+        - name: patient
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: measure
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Trending data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/OutcomeTrend'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  # ─── Appointments ─────────────────────────────────────
+  /appointments:
+    get:
+      tags: [Appointments]
+      summary: Search appointments
+      description: Search for appointment resources with optional filtering by date range, practitioner, and upcoming status.
+      operationId: searchAppointments
+      parameters:
+        - name: patient
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [proposed, booked, arrived, fulfilled, cancelled, noshow]
+        - name: practitioner
+          in: query
+          description: Practitioner ID filter
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Start of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+        - name: end
+          in: query
+          description: End of date range filter (ISO 8601 timestamp)
+          schema:
+            type: string
+        - name: upcoming
+          in: query
+          description: Filter for upcoming appointments only
+          schema:
+            type: boolean
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Paginated list of appointments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Appointments]
+      summary: Create an appointment
+      description: Create a new appointment resource linking a patient and practitioner.
+      operationId: createAppointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCreate'
+      responses:
+        '201':
+          description: Appointment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /appointments/{id}:
+    get:
+      tags: [Appointments]
+      summary: Get an appointment by ID
+      description: Retrieve a single appointment resource by its unique identifier.
+      operationId: getAppointment
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Appointment resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Appointments]
+      summary: Update an appointment
+      description: Update an existing appointment resource by ID. Supports partial updates via PATCH.
+      operationId: updateAppointment
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCreate'
+      responses:
+        '200':
+          description: Appointment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppointmentResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─── Claims ────────────────────────────────────────────
+  /claims:
+    get:
+      tags: [Claims]
+      summary: Get claim reference data
+      description: Returns available claim statuses and use types (static reference data)
+      operationId: getClaimReferenceData
+      responses:
+        '200':
+          description: Claim reference data (statuses and use types)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      statuses:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          [
+                            'draft',
+                            'ready',
+                            'submitted',
+                            'accepted',
+                            'rejected',
+                            'paid',
+                            'denied',
+                          ]
+                      useTypes:
+                        type: array
+                        items:
+                          type: string
+                        example: ['claim', 'preauthorization', 'estimate']
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Claims]
+      summary: Create a claim
+      description: Create a new claim resource for billing submission.
+      operationId: createClaim
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimCreate'
+      responses:
+        '201':
+          description: Claim created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /claims/{id}:
+    get:
+      tags: [Claims]
+      summary: Get a claim by ID
+      description: Retrieve a single claim resource by its unique identifier.
+      operationId: getClaim
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      responses:
+        '200':
+          description: Claim resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags: [Claims]
+      summary: Update a claim
+      description: Update an existing claim resource by ID. Supports partial updates via PATCH.
+      operationId: updateClaim
+      parameters:
+        - $ref: '#/components/parameters/ResourceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClaimCreate'
+      responses:
+        '200':
+          description: Claim updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─── Consents ──────────────────────────────────────────
+  /consents:
+    get:
+      tags: [Consents]
+      summary: Verify consent for a patient
+      description: Verifies whether a patient has consent at the specified minimum level. This is a consent verification operation, not a FHIR Consent resource search.
+      operationId: verifyConsent
+      parameters:
+        - name: patientId
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Patient ID to verify consent for
+        - name: minimumLevel
+          in: query
+          schema:
+            type: string
+            default: general
+          description: Minimum consent level required (e.g. general, mental_health, substance_abuse)
+        - name: stateCode
+          in: query
+          schema:
+            type: string
+          description: Optional state code for jurisdiction-specific consent rules
+        - name: treatmentCategory
+          in: query
+          schema:
+            type: string
+          description: Optional treatment category filter
+      responses:
+        '200':
+          description: Consent verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentVerificationResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Consents]
+      summary: Check consent for a patient
+      description: Verifies consent for a specific patient and minimum consent level. This is a consent verification operation, not a FHIR Consent resource create.
+      operationId: checkConsent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConsentVerificationRequest'
+      responses:
+        '200':
+          description: Consent verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentVerificationResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+
+  /consents/{id}:
+    get:
+      tags: [Consents]
+      summary: Verify consent for a patient by ID
+      description: Verifies consent for the patient identified by the path parameter (id = patientId). This is a consent verification operation, not a FHIR Consent resource read.
+      operationId: verifyConsentById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Patient ID
+          schema:
+            type: string
+        - name: minimumLevel
+          in: query
+          schema:
+            type: string
+            default: general
+          description: Minimum consent level required
+        - name: stateCode
+          in: query
+          schema:
+            type: string
+          description: Optional state code
+        - name: treatmentCategory
+          in: query
+          schema:
+            type: string
+          description: Optional treatment category filter
+      responses:
+        '200':
+          description: Consent verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsentVerificationResult'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Developer API key (SHA-256 hashed at rest)
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth2 access token (SMART-on-FHIR)
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      description: Resource ID
+      schema:
+        type: string
+        pattern: '^[A-Za-z0-9\-\.]{1,64}$'
+      example: 'patient-001'
+
+  responses:
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: validation_failed
+              message: 'Invalid date format in birthDate field'
+    Unauthorized:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: unauthorized
+              message: 'Valid API key or bearer token required'
+    Forbidden:
+      description: Insufficient permissions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: forbidden
+              message: "Role 'viewer' does not have permission 'write_patient'"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: not_found
+              message: 'Patient not found'
+
+  schemas:
+    # ─── Common ──────────────────────────────────────────
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              examples:
+                [
+                  validation_failed,
+                  unauthorized,
+                  forbidden,
+                  not_found,
+                  rate_limited,
+                  internal_error,
+                ]
+            message:
+              type: string
+
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+
+    Meta:
+      type: object
+      properties:
+        versionId:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+
+    Coding:
+      type: object
+      properties:
+        system:
+          type: string
+        code:
+          type: string
+        display:
+          type: string
+
+    CodeableConcept:
+      type: object
+      properties:
+        coding:
+          type: array
+          items:
+            $ref: '#/components/schemas/Coding'
+        text:
+          type: string
+
+    Reference:
+      type: object
+      properties:
+        reference:
+          type: string
+        display:
+          type: string
+
+    Identifier:
+      type: object
+      properties:
+        system:
+          type: string
+        value:
+          type: string
+
+    HumanName:
+      type: object
+      properties:
+        use:
+          type: string
+        family:
+          type: string
+        given:
+          type: array
+          items:
+            type: string
+        prefix:
+          type: array
+          items:
+            type: string
+
+    Address:
+      type: object
+      properties:
+        line:
+          type: array
+          items:
+            type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+
+    ContactPoint:
+      type: object
+      properties:
+        system:
+          type: string
+        value:
+          type: string
+        use:
+          type: string
+
+    Quantity:
+      type: object
+      properties:
+        value:
+          type: number
+        unit:
+          type: string
+        system:
+          type: string
+        code:
+          type: string
+
+    # ─── Patient ─────────────────────────────────────────
+    Patient:
+      type: object
+      required: [resourceType]
+      properties:
+        resourceType:
+          type: string
+          const: Patient
+        id:
+          type: string
+        identifier:
+          type: array
+          items:
+            $ref: '#/components/schemas/Identifier'
+        name:
+          type: array
+          items:
+            $ref: '#/components/schemas/HumanName'
+        birthDate:
+          type: string
+        gender:
+          type: string
+          enum: [male, female, other, unknown]
+        telecom:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactPoint'
+        address:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        active:
+          type: boolean
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    PatientCreate:
+      allOf:
+        - $ref: '#/components/schemas/Patient'
+        - required: [name]
+
+    PatientResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Patient'
+
+    PatientListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Patient'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── Encounter ───────────────────────────────────────
+    Encounter:
+      type: object
+      required: [resourceType]
+      properties:
+        resourceType:
+          type: string
+          const: Encounter
+        id:
+          type: string
+        status:
+          type: string
+          enum: [planned, arrived, triaged, in-progress, finished, cancelled]
+        class:
+          $ref: '#/components/schemas/Coding'
+        subject:
+          $ref: '#/components/schemas/Reference'
+        participant:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CodeableConcept'
+              individual:
+                $ref: '#/components/schemas/Reference'
+        period:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        reasonCode:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeableConcept'
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    EncounterCreate:
+      allOf:
+        - $ref: '#/components/schemas/Encounter'
+        - required: [status, subject]
+
+    EncounterResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Encounter'
+
+    EncounterListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Encounter'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── Observation ─────────────────────────────────────
+    Observation:
+      type: object
+      required: [resourceType]
+      properties:
+        resourceType:
+          type: string
+          const: Observation
+        id:
+          type: string
+        status:
+          type: string
+          enum: [registered, preliminary, final, amended, corrected, cancelled]
+        code:
+          $ref: '#/components/schemas/CodeableConcept'
+        subject:
+          $ref: '#/components/schemas/Reference'
+        encounter:
+          $ref: '#/components/schemas/Reference'
+        effectiveDateTime:
+          type: string
+          format: date-time
+        effectivePeriod:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date-time
+            end:
+              type: string
+              format: date-time
+        valueQuantity:
+          $ref: '#/components/schemas/Quantity'
+        valueString:
+          type: string
+        component:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                $ref: '#/components/schemas/CodeableConcept'
+              valueQuantity:
+                $ref: '#/components/schemas/Quantity'
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    ObservationCreate:
+      allOf:
+        - $ref: '#/components/schemas/Observation'
+        - required: [status, code, subject]
+
+    ObservationResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Observation'
+
+    ObservationListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Observation'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── Notes ──────────────────────────────────────────
+    NoteTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+        modality:
+          type: string
+        title:
+          type: string
+        sections:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+
+    NoteCreate:
+      type: object
+      properties:
+        encounterId:
+          type: string
+        patientId:
+          type: string
+        modality:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        sections:
+          type: array
+          items:
+            type: object
+
+    NoteResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+            encounterId:
+              type: string
+            patientId:
+              type: string
+            modality:
+              type: string
+            title:
+              type: string
+            content:
+              type: string
+            signed:
+              type: boolean
+            signedAt:
+              type: string
+              format: date-time
+            signedBy:
+              type: string
+            meta:
+              $ref: '#/components/schemas/Meta'
+
+    # ─── Analytics ──────────────────────────────────────
+    SavedView:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        filters:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+
+    SavedViewCreate:
+      type: object
+      required: [name, type]
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        filters:
+          type: object
+
+    # ─── Outcomes ───────────────────────────────────────
+    OutcomeMeasure:
+      type: object
+      properties:
+        id:
+          type: string
+        patientId:
+          type: string
+        measure:
+          type: string
+        score:
+          type: number
+        recordedAt:
+          type: string
+          format: date-time
+
+    OutcomeMeasureCreate:
+      type: object
+      required: [patientId, measure, score]
+      properties:
+        patientId:
+          type: string
+        measure:
+          type: string
+        score:
+          type: number
+
+    OutcomeAlert:
+      type: object
+      properties:
+        id:
+          type: string
+        patientId:
+          type: string
+        measure:
+          type: string
+        threshold:
+          type: number
+        current:
+          type: number
+        severity:
+          type: string
+        triggeredAt:
+          type: string
+          format: date-time
+
+    OutcomeConfig:
+      type: object
+      properties:
+        patientId:
+          type: string
+        measures:
+          type: array
+          items:
+            type: object
+            properties:
+              measure:
+                type: string
+              enabled:
+                type: boolean
+              threshold:
+                type: number
+
+    OutcomeConfigUpdate:
+      type: object
+      properties:
+        measures:
+          type: array
+          items:
+            type: object
+            properties:
+              measure:
+                type: string
+              enabled:
+                type: boolean
+              threshold:
+                type: number
+
+    OutcomeTrend:
+      type: object
+      properties:
+        patientId:
+          type: string
+        measure:
+          type: string
+        dataPoints:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              value:
+                type: number
+
+    # ─── Appointment ────────────────────────────────────
+    Appointment:
+      type: object
+      required: [resourceType]
+      properties:
+        resourceType:
+          type: string
+          const: Appointment
+        id:
+          type: string
+        status:
+          type: string
+          enum: [proposed, booked, arrived, fulfilled, cancelled, noshow]
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        participant:
+          type: array
+          items:
+            type: object
+            properties:
+              actor:
+                $ref: '#/components/schemas/Reference'
+              status:
+                type: string
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    AppointmentCreate:
+      allOf:
+        - $ref: '#/components/schemas/Appointment'
+        - required: [status, start, participant]
+
+    AppointmentResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Appointment'
+
+    AppointmentListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Appointment'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── Claim ──────────────────────────────────────────
+    Claim:
+      type: object
+      required: [resourceType]
+      properties:
+        resourceType:
+          type: string
+          const: Claim
+        id:
+          type: string
+        status:
+          type: string
+          enum: [active, cancelled, draft, entered-in-error]
+        type:
+          $ref: '#/components/schemas/CodeableConcept'
+        patient:
+          $ref: '#/components/schemas/Reference'
+        provider:
+          $ref: '#/components/schemas/Reference'
+        insurer:
+          $ref: '#/components/schemas/Reference'
+        billablePeriod:
+          type: object
+          properties:
+            start:
+              type: string
+              format: date
+            end:
+              type: string
+              format: date
+        total:
+          type: number
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    ClaimCreate:
+      allOf:
+        - $ref: '#/components/schemas/Claim'
+        - required: [status, patient, provider]
+
+    ClaimResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Claim'
+
+    ClaimListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Claim'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    # ─── Consent ────────────────────────────────────────
+    Consent:
+      type: object
+      required: [resourceType]
+      properties:
+        resourceType:
+          type: string
+          const: Consent
+        id:
+          type: string
+        status:
+          type: string
+          enum: [draft, active, inactive, entered-in-error, rejected]
+        scope:
+          $ref: '#/components/schemas/CodeableConcept'
+        category:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodeableConcept'
+        patient:
+          $ref: '#/components/schemas/Reference'
+        dateTime:
+          type: string
+          format: date-time
+        provision:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              action:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CodeableConcept'
+        meta:
+          $ref: '#/components/schemas/Meta'
+
+    ConsentVerificationRequest:
+      type: object
+      required: [patientId, minimumLevel]
+      properties:
+        patientId:
+          type: string
+          description: Patient ID to verify consent for
+        minimumLevel:
+          type: string
+          description: Minimum consent level required (e.g. general, mental_health, substance_abuse)
+        stateCode:
+          type: string
+          description: Optional state code for jurisdiction-specific consent rules
+        treatmentCategory:
+          type: string
+          description: Optional treatment category filter
+
+    ConsentVerificationResult:
+      type: object
+      properties:
+        data:
+          type: object
+          description: Consent verification result
+          properties:
+            verified:
+              type: boolean
+              description: Whether consent is sufficient for the requested operation
+            consentLevel:
+              type: string
+              enum: [none, minimal, limited, full]
+              description: The effective consent level of the patient
+            expired:
+              type: boolean
+              description: Whether the consent has expired
+            stateRules:
+              $ref: '#/components/schemas/StateConsentRules'
+            reason:
+              type: string
+              description: Reason for the verification outcome
+
+    StateConsentRules:
+      type: object
+      description: State-specific consent rules applied during verification
+      properties:
+        minimumConsentLevel:
+          type: string
+          enum: [none, minimal, limited, full]
+          description: Minimum consent level required for general treatment
+        overrideConsentLevel:
+          type: string
+          enum: [none, minimal, limited, full]
+          description: Optional elevated consent level that overrides the minimum for specific operations
+        requiresMentalHealthConsent:
+          type: boolean
+          description: Whether mental health treatment requires separate or explicit consent
+        requiresSUDConsent:
+          type: boolean
+          description: Whether substance use disorder treatment requires separate consent
+        requiresMinorParentalConsent:
+          type: boolean
+          description: Whether minors need parental consent
+        ageOfMajority:
+          type: integer
+          description: The age at which a patient is considered an adult for consent purposes
