@@ -111,7 +111,7 @@ export function checkBAACompliance(
 
   const rawValue =
     (import.meta.env?.[envVar] as string | undefined) ??
-    (process.env?.[envVar]) ??
+    process.env?.[envVar] ??
     ''
 
   if (rawValue.toLowerCase() === 'true') {
