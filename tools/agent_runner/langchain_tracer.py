@@ -110,7 +110,7 @@ class LangChainAgentTracer:
     def start_ticket_execution_trace(
         self,
         parent_tree: Any | None,
-        project: ProjectConfig,
+        project: ProjectConfig | None,
         agent: AgentConfig,
         issue: LinearIssue,
     ) -> Any | None:
@@ -118,8 +118,9 @@ class LangChainAgentTracer:
         if not self.enabled:
             return None
 
+        team_key = project.team_key if project else (issue.identifier.split("-")[0] if "-" in issue.identifier else "")
         inputs = {
-            "team_key": project.team_key,
+            "team_key": team_key,
             "agent_name": agent.name,
             "agent_role": agent.role.value,
             "ticket_identifier": issue.identifier,
