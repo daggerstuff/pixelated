@@ -6,8 +6,23 @@
  *       application-level validation before calling adapter methods.
  */
 
-import { z } from 'zod';
-import type { StripeAdapter } from './adapter';
+import { z } from 'zod'
+
+import { EHRAuditService } from '../../audit/ehr-audit-service'
+import { EHRAuditAction, EHRResourceType } from '../../audit/events'
+import type {
+  OAuthTokenResponse,
+  WebhookEvent,
+  WebhookResult,
+  WebhookSignatureConfig,
+} from '../types'
+import { oAuthTokenResponseSchema } from '../types'
+import {
+  verifyWebhookSignature,
+  checkIdempotency,
+  buildSignatureConfig,
+} from '../webhooks'
+import type { StripeAdapter } from './adapter'
 import type {
   StripeCustomer,
   StripeCharge,
@@ -15,7 +30,7 @@ import type {
   StripeInvoice,
   StripeCheckoutSession,
   StripeOAuthConfig,
-} from './types';
+} from './types'
 import {
   stripeCustomerSchema,
   stripeChargeSchema,
@@ -23,17 +38,7 @@ import {
   stripeInvoiceSchema,
   stripeCheckoutSessionSchema,
   stripeOAuthConfigSchema,
-} from './types';
-import type {
-  OAuthTokenResponse,
-  WebhookEvent,
-  WebhookResult,
-  WebhookSignatureConfig,
-} from '../types';
-import { oAuthTokenResponseSchema } from '../types';
-import { EHRAuditService } from '../../audit/ehr-audit-service';
-import { EHRAuditAction, EHRResourceType } from '../../audit/events';
-import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '../webhooks';
+} from './types'
 
 // ---------------------------------------------------------------------------
 // Service configuration
@@ -43,9 +48,9 @@ import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '
  * Configuration for the StripeService.
  */
 export interface StripeServiceConfig {
-  adapter: StripeAdapter;
-  oauthConfig: StripeOAuthConfig;
-  webhookSecret: string;
+  adapter: StripeAdapter
+  oauthConfig: StripeOAuthConfig
+  webhookSecret: string
 }
 
 // ---------------------------------------------------------------------------
@@ -62,16 +67,16 @@ export interface StripeServiceConfig {
  * - Process webhook events with signature verification and idempotency
  */
 export class StripeService {
-  private readonly adapter: StripeAdapter;
-  private readonly oauthConfig: StripeOAuthConfig;
-  private readonly webhookSecret: string;
-  private readonly auditService: EHRAuditService;
+  private readonly adapter: StripeAdapter
+  private readonly oauthConfig: StripeOAuthConfig
+  private readonly webhookSecret: string
+  private readonly auditService: EHRAuditService
 
   constructor(config: StripeServiceConfig) {
-    this.adapter = config.adapter;
-    this.oauthConfig = stripeOAuthConfigSchema.parse(config.oauthConfig);
-    this.webhookSecret = config.webhookSecret;
-    this.auditService = EHRAuditService.getInstance();
+    this.adapter = config.adapter
+    this.oauthConfig = stripeOAuthConfigSchema.parse(config.oauthConfig)
+    this.webhookSecret = config.webhookSecret
+    this.auditService = EHRAuditService.getInstance()
   }
 
   // -----------------------------------------------------------------------
@@ -90,8 +95,8 @@ export class StripeService {
       response_type: 'code',
       scope: this.oauthConfig.scopes.join(' '),
       state,
-    });
-    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`;
+    })
+    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`
   }
 
   /**
@@ -104,7 +109,7 @@ export class StripeService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
@@ -113,15 +118,17 @@ export class StripeService {
         redirect_uri: this.oauthConfig.redirectUri,
         code,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Stripe token exchange failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Stripe token exchange failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   /**
@@ -133,7 +140,7 @@ export class StripeService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
@@ -141,15 +148,17 @@ export class StripeService {
         client_secret: this.oauthConfig.clientSecret,
         refresh_token: refreshToken,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Stripe token refresh failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Stripe token refresh failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   // -----------------------------------------------------------------------
@@ -165,8 +174,8 @@ export class StripeService {
     userId: string,
     customerId: string,
   ): Promise<StripeCustomer> {
-    const raw = await this.adapter.getCustomer(accessToken, customerId);
-    const validated = stripeCustomerSchema.parse(raw);
+    const raw = await this.adapter.getCustomer(accessToken, customerId)
+    const validated = stripeCustomerSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -181,9 +190,9 @@ export class StripeService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -195,8 +204,8 @@ export class StripeService {
     userId: string,
     params?: Parameters<StripeAdapter['listCustomers']>[1],
   ): Promise<{ data: StripeCustomer[]; has_more: boolean }> {
-    const raw = await this.adapter.listCustomers(accessToken, params);
-    const validatedData = z.array(stripeCustomerSchema).parse(raw.data);
+    const raw = await this.adapter.listCustomers(accessToken, params)
+    const validatedData = z.array(stripeCustomerSchema).parse(raw.data)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -211,9 +220,9 @@ export class StripeService {
           count: validatedData.length,
         },
       },
-    );
+    )
 
-    return { data: validatedData, has_more: raw.has_more };
+    return { data: validatedData, has_more: raw.has_more }
   }
 
   /**
@@ -225,8 +234,8 @@ export class StripeService {
     userId: string,
     data: Parameters<StripeAdapter['createCustomer']>[1],
   ): Promise<StripeCustomer> {
-    const raw = await this.adapter.createCustomer(accessToken, data);
-    const validated = stripeCustomerSchema.parse(raw);
+    const raw = await this.adapter.createCustomer(accessToken, data)
+    const validated = stripeCustomerSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -241,9 +250,9 @@ export class StripeService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -256,8 +265,12 @@ export class StripeService {
     customerId: string,
     updates: Parameters<StripeAdapter['updateCustomer']>[2],
   ): Promise<StripeCustomer> {
-    const raw = await this.adapter.updateCustomer(accessToken, customerId, updates);
-    const validated = stripeCustomerSchema.parse(raw);
+    const raw = await this.adapter.updateCustomer(
+      accessToken,
+      customerId,
+      updates,
+    )
+    const validated = stripeCustomerSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -272,9 +285,9 @@ export class StripeService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -286,8 +299,8 @@ export class StripeService {
     userId: string,
     chargeId: string,
   ): Promise<StripeCharge> {
-    const raw = await this.adapter.getCharge(accessToken, chargeId);
-    const validated = stripeChargeSchema.parse(raw);
+    const raw = await this.adapter.getCharge(accessToken, chargeId)
+    const validated = stripeChargeSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -302,9 +315,9 @@ export class StripeService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -316,8 +329,8 @@ export class StripeService {
     userId: string,
     params?: Parameters<StripeAdapter['listCharges']>[1],
   ): Promise<{ data: StripeCharge[]; has_more: boolean }> {
-    const raw = await this.adapter.listCharges(accessToken, params);
-    const validatedData = z.array(stripeChargeSchema).parse(raw.data);
+    const raw = await this.adapter.listCharges(accessToken, params)
+    const validatedData = z.array(stripeChargeSchema).parse(raw.data)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -332,9 +345,9 @@ export class StripeService {
           count: validatedData.length,
         },
       },
-    );
+    )
 
-    return { data: validatedData, has_more: raw.has_more };
+    return { data: validatedData, has_more: raw.has_more }
   }
 
   /**
@@ -346,8 +359,8 @@ export class StripeService {
     userId: string,
     data: Parameters<StripeAdapter['createRefund']>[1],
   ): Promise<StripeCharge> {
-    const raw = await this.adapter.createRefund(accessToken, data);
-    const validated = stripeChargeSchema.parse(raw);
+    const raw = await this.adapter.createRefund(accessToken, data)
+    const validated = stripeChargeSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -363,9 +376,9 @@ export class StripeService {
           action: 'refund',
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -377,8 +390,8 @@ export class StripeService {
     userId: string,
     intentId: string,
   ): Promise<StripePaymentIntent> {
-    const raw = await this.adapter.getPaymentIntent(accessToken, intentId);
-    const validated = stripePaymentIntentSchema.parse(raw);
+    const raw = await this.adapter.getPaymentIntent(accessToken, intentId)
+    const validated = stripePaymentIntentSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -393,9 +406,9 @@ export class StripeService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -407,8 +420,8 @@ export class StripeService {
     userId: string,
     invoiceId: string,
   ): Promise<StripeInvoice> {
-    const raw = await this.adapter.getInvoice(accessToken, invoiceId);
-    const validated = stripeInvoiceSchema.parse(raw);
+    const raw = await this.adapter.getInvoice(accessToken, invoiceId)
+    const validated = stripeInvoiceSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -423,9 +436,9 @@ export class StripeService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -437,8 +450,8 @@ export class StripeService {
     userId: string,
     params?: Parameters<StripeAdapter['listInvoices']>[1],
   ): Promise<{ data: StripeInvoice[]; has_more: boolean }> {
-    const raw = await this.adapter.listInvoices(accessToken, params);
-    const validatedData = z.array(stripeInvoiceSchema).parse(raw.data);
+    const raw = await this.adapter.listInvoices(accessToken, params)
+    const validatedData = z.array(stripeInvoiceSchema).parse(raw.data)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -453,9 +466,9 @@ export class StripeService {
           count: validatedData.length,
         },
       },
-    );
+    )
 
-    return { data: validatedData, has_more: raw.has_more };
+    return { data: validatedData, has_more: raw.has_more }
   }
 
   /**
@@ -467,8 +480,8 @@ export class StripeService {
     userId: string,
     data: Parameters<StripeAdapter['createCheckoutSession']>[1],
   ): Promise<StripeCheckoutSession> {
-    const raw = await this.adapter.createCheckoutSession(accessToken, data);
-    const validated = stripeCheckoutSessionSchema.parse(raw);
+    const raw = await this.adapter.createCheckoutSession(accessToken, data)
+    const validated = stripeCheckoutSessionSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -484,9 +497,9 @@ export class StripeService {
           action: 'checkout_session',
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   // -----------------------------------------------------------------------
@@ -498,7 +511,7 @@ export class StripeService {
    * Stripe uses the stripe-composite format (t=...,v1=...).
    */
   getWebhookSignatureConfig(): WebhookSignatureConfig {
-    return buildSignatureConfig('stripe', this.webhookSecret);
+    return buildSignatureConfig('stripe', this.webhookSecret)
   }
 
   /**
@@ -511,7 +524,7 @@ export class StripeService {
     userId: string,
     requestUrl?: string,
   ): Promise<WebhookResult> {
-    const sigConfig = this.getWebhookSignatureConfig();
+    const sigConfig = this.getWebhookSignatureConfig()
 
     // 1) Verify signature
     const isValid = verifyWebhookSignature(
@@ -519,7 +532,7 @@ export class StripeService {
       event.rawBody,
       event.signature,
       requestUrl,
-    );
+    )
     if (!isValid) {
       await this.auditService.log(
         EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -535,25 +548,25 @@ export class StripeService {
             resourceId: event.eventId,
           },
         },
-      );
+      )
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: false,
         error: 'Signature verification failed',
         httpStatus: 401,
-      };
+      }
     }
 
     // 2) Check idempotency
-    const isDuplicate = await checkIdempotency('stripe', event.eventId);
+    const isDuplicate = await checkIdempotency('stripe', event.eventId)
     if (isDuplicate) {
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: true,
         httpStatus: 200,
-      };
+      }
     }
 
     // 3) Audit log
@@ -571,13 +584,13 @@ export class StripeService {
           eventType: event.eventType,
         },
       },
-    );
+    )
 
     return {
       processed: true,
       eventId: event.eventId,
       duplicate: false,
       httpStatus: 200,
-    };
+    }
   }
 }

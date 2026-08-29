@@ -4,8 +4,9 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createHmac } from 'node:crypto'
+
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ---------------------------------------------------------------------------
 // Hoisted mock fixtures (available inside vi.mock factories)
@@ -28,7 +29,12 @@ const { mockRedisGet, mockRedisSetex, mockRedisSet } = vi.hoisted(() => ({
 // ---------------------------------------------------------------------------
 
 vi.mock('@/lib/redis', () => ({
-  redis: { get: mockRedisGet, set: mockRedisSet, setex: mockRedisSetex, del: vi.fn().mockResolvedValue(1) },
+  redis: {
+    get: mockRedisGet,
+    set: mockRedisSet,
+    setex: mockRedisSetex,
+    del: vi.fn().mockResolvedValue(1),
+  },
 }))
 
 vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
@@ -59,18 +65,25 @@ function makeTwilioSignature(
 ): string {
   const params = new URLSearchParams(body)
   const sortedKeys = Array.from(params.keys()).sort()
-  const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('')
+  const postParams = sortedKeys
+    .map((k) => `${k}${params.get(k) ?? ''}`)
+    .join('')
   const dataToSign = `${requestUrl}${postParams}`
-  return createHmac('sha256', secret).update(dataToSign, 'utf8').digest('base64')
+  return createHmac('sha256', secret)
+    .update(dataToSign, 'utf8')
+    .digest('base64')
 }
 
-function makeWebhookEvent(overrides: Partial<{
-  eventId: string
-  eventType: string
-  rawBody: string
-  signature: string
-}> = {}) {
-  const rawBody = overrides.rawBody ?? 'MessageSid=SM001&MessageStatus=delivered'
+function makeWebhookEvent(
+  overrides: Partial<{
+    eventId: string
+    eventType: string
+    rawBody: string
+    signature: string
+  }> = {},
+) {
+  const rawBody =
+    overrides.rawBody ?? 'MessageSid=SM001&MessageStatus=delivered'
   return {
     provider: 'twilio' as const,
     eventId: overrides.eventId ?? 'evt_tw_001',
@@ -87,7 +100,11 @@ function mockFetchResponse(body: unknown, ok = true, status = 200) {
     ok,
     status,
     json: vi.fn().mockResolvedValue(body),
-    text: vi.fn().mockResolvedValue(typeof body === 'string' ? body : JSON.stringify(body)),
+    text: vi
+      .fn()
+      .mockResolvedValue(
+        typeof body === 'string' ? body : JSON.stringify(body),
+      ),
   }
 }
 
@@ -96,7 +113,9 @@ function mockFetchResponse(body: unknown, ok = true, status = 200) {
 // ---------------------------------------------------------------------------
 
 describe('TwilioService', () => {
-  let service: InstanceType<typeof import('../twilio/twilio-service').TwilioService>
+  let service: InstanceType<
+    typeof import('../twilio/twilio-service').TwilioService
+  >
   let StubTwilioAdapter: typeof import('../twilio/stub-adapter').StubTwilioAdapter
   let TwilioService: typeof import('../twilio/twilio-service').TwilioService
 
@@ -211,7 +230,10 @@ describe('TwilioService', () => {
         expires_in: 3600,
         refresh_token: 'tw_refresh_tok',
       }
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)))
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)),
+      )
 
       const result = await service.exchangeCodeForToken('tw_auth_code')
       expect(result.access_token).toBe('tw_access_tok')
@@ -237,15 +259,19 @@ describe('TwilioService', () => {
     })
 
     it('sends correct form-encoded body', async () => {
-      const mockFetch = vi.fn().mockResolvedValue(
-        mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
-      )
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValue(
+          mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
+        )
       vi.stubGlobal('fetch', mockFetch)
 
       await service.exchangeCodeForToken('my_code')
       const [, init] = mockFetch.mock.calls[0]
       expect(init.method).toBe('POST')
-      expect(init.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
+      expect(init.headers['Content-Type']).toBe(
+        'application/x-www-form-urlencoded',
+      )
       const bodyStr = init.body.toString()
       expect(bodyStr).toContain('grant_type=authorization_code')
       expect(bodyStr).toContain('client_id=tw_client_id')
@@ -264,7 +290,10 @@ describe('TwilioService', () => {
         token_type: 'Bearer',
         expires_in: 7200,
       }
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)))
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)),
+      )
 
       const result = await service.refreshToken('old_rt')
       expect(result.access_token).toBe('tw_new_access')
@@ -281,9 +310,11 @@ describe('TwilioService', () => {
     })
 
     it('sends refresh_token grant type', async () => {
-      const mockFetch = vi.fn().mockResolvedValue(
-        mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
-      )
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValue(
+          mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
+        )
       vi.stubGlobal('fetch', mockFetch)
 
       await service.refreshToken('rt_abc')
@@ -300,7 +331,12 @@ describe('TwilioService', () => {
 
   describe('getAccount', () => {
     it('returns a validated account and logs audit', async () => {
-      const result = await service.getAccount('tok', 'AC123', 'tenant-1', 'user-1')
+      const result = await service.getAccount(
+        'tok',
+        'AC123',
+        'tenant-1',
+        'user-1',
+      )
       expect(result.sid).toBe('AC123')
       expect(result.status).toBe('active')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -330,7 +366,12 @@ describe('TwilioService', () => {
 
   describe('getMessage', () => {
     it('returns a validated message and logs audit', async () => {
-      const result = await service.getMessage('tok', 'tenant-1', 'user-1', 'SMstub-message-001')
+      const result = await service.getMessage(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'SMstub-message-001',
+      )
       expect(result.sid).toBe('SMstub-message-001')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
     })
@@ -373,7 +414,12 @@ describe('TwilioService', () => {
 
   describe('getCall', () => {
     it('returns a validated call and logs audit', async () => {
-      const result = await service.getCall('tok', 'tenant-1', 'user-1', 'CAstub-call-001')
+      const result = await service.getCall(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'CAstub-call-001',
+      )
       expect(result.sid).toBe('CAstub-call-001')
       expect(result.status).toBe('completed')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -401,7 +447,12 @@ describe('TwilioService', () => {
 
   describe('getPhoneNumber', () => {
     it('returns a validated phone number and logs audit', async () => {
-      const result = await service.getPhoneNumber('tok', 'tenant-1', 'user-1', 'PNstub-phone-001')
+      const result = await service.getPhoneNumber(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'PNstub-phone-001',
+      )
       expect(result.sid).toBe('PNstub-phone-001')
       expect(result.phoneNumber).toBe('+15551234567')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -422,9 +473,14 @@ describe('TwilioService', () => {
     })
 
     it('filters by phoneNumber', async () => {
-      const result = await service.listPhoneNumbers('tok', 'tenant-1', 'user-1', {
-        phoneNumber: '+15551234567',
-      })
+      const result = await service.listPhoneNumbers(
+        'tok',
+        'tenant-1',
+        'user-1',
+        {
+          phoneNumber: '+15551234567',
+        },
+      )
       expect(result.data).toHaveLength(1)
     })
   })
@@ -447,7 +503,12 @@ describe('TwilioService', () => {
   describe('processWebhook', () => {
     it('processes a valid webhook and returns success', async () => {
       const event = makeWebhookEvent()
-      const result = await service.processWebhook(event, 'tenant-1', 'user-1', REQUEST_URL)
+      const result = await service.processWebhook(
+        event,
+        'tenant-1',
+        'user-1',
+        REQUEST_URL,
+      )
       expect(result.processed).toBe(true)
       expect(result.duplicate).toBe(false)
       expect(result.httpStatus).toBe(200)
@@ -457,7 +518,12 @@ describe('TwilioService', () => {
 
     it('returns 401 when signature verification fails', async () => {
       const event = makeWebhookEvent({ signature: 'invalid-base64-signature' })
-      const result = await service.processWebhook(event, 'tenant-1', 'user-1', REQUEST_URL)
+      const result = await service.processWebhook(
+        event,
+        'tenant-1',
+        'user-1',
+        REQUEST_URL,
+      )
       expect(result.processed).toBe(false)
       expect(result.duplicate).toBe(false)
       expect(result.httpStatus).toBe(401)
@@ -487,7 +553,12 @@ describe('TwilioService', () => {
     it('returns duplicate=true when event already processed', async () => {
       mockRedisGet.mockResolvedValueOnce('1') // duplicate
       const event = makeWebhookEvent()
-      const result = await service.processWebhook(event, 'tenant-1', 'user-1', REQUEST_URL)
+      const result = await service.processWebhook(
+        event,
+        'tenant-1',
+        'user-1',
+        REQUEST_URL,
+      )
       expect(result.processed).toBe(false)
       expect(result.duplicate).toBe(true)
       expect(result.httpStatus).toBe(200)

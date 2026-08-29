@@ -4,8 +4,9 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createHmac } from 'node:crypto'
+
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ---------------------------------------------------------------------------
 // Mocks — must be set up before importing the service
@@ -97,7 +98,11 @@ function makeFetchResponse(body: unknown, ok = true, status = 200) {
   return {
     ok,
     status,
-    text: vi.fn().mockResolvedValue(typeof body === 'string' ? body : JSON.stringify(body)),
+    text: vi
+      .fn()
+      .mockResolvedValue(
+        typeof body === 'string' ? body : JSON.stringify(body),
+      ),
     json: vi.fn().mockResolvedValue(body),
   }
 }
@@ -229,7 +234,9 @@ describe('ZoomService', () => {
       const [url, init] = mockFetch.mock.calls[0]
       expect(url).toBe('https://zoom.us/oauth/token')
       expect(init.method).toBe('POST')
-      expect(init.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
+      expect(init.headers['Content-Type']).toBe(
+        'application/x-www-form-urlencoded',
+      )
       const body = init.body.toString()
       expect(body).toContain('grant_type=authorization_code')
       expect(body).toContain('code=auth-code-456')
@@ -238,14 +245,18 @@ describe('ZoomService', () => {
     })
 
     it('throws on non-ok response', async () => {
-      mockFetch.mockResolvedValueOnce(makeFetchResponse('invalid_grant', false, 400))
+      mockFetch.mockResolvedValueOnce(
+        makeFetchResponse('invalid_grant', false, 400),
+      )
       await expect(service.exchangeCodeForToken('bad-code')).rejects.toThrow(
         'Zoom token exchange failed (400)',
       )
     })
 
     it('throws on schema validation failure', async () => {
-      mockFetch.mockResolvedValueOnce(makeFetchResponse({ invalid: 'response' }))
+      mockFetch.mockResolvedValueOnce(
+        makeFetchResponse({ invalid: 'response' }),
+      )
       await expect(service.exchangeCodeForToken('code')).rejects.toThrow()
     })
   })
@@ -289,11 +300,16 @@ describe('ZoomService', () => {
 
   describe('getCurrentUser', () => {
     it('returns validated user and logs audit', async () => {
-      const user = await service.getCurrentUser(ACCESS_TOKEN, TENANT_ID, USER_ID)
+      const user = await service.getCurrentUser(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
       expect(user.id).toBe('stub-user-001')
       expect(user.email).toBe('stub@example.com')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
-      const [action, resourceType, resourceId, input] = mockAuditLog.mock.calls[0]
+      const [action, resourceType, resourceId, input] =
+        mockAuditLog.mock.calls[0]
       expect(action).toBe('integration_connect')
       expect(resourceType).toBe('Integration')
       expect(resourceId).toBe(user.id)
@@ -310,16 +326,25 @@ describe('ZoomService', () => {
 
   describe('listMeetings', () => {
     it('returns validated meetings with pagination', async () => {
-      const result = await service.listMeetings(ACCESS_TOKEN, TENANT_ID, USER_ID)
+      const result = await service.listMeetings(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
       expect(result.data).toHaveLength(2)
       expect(result.pagination.count).toBe(2)
       expect(result.data[0].topic).toContain('Therapy Session')
     })
 
     it('passes params to adapter', async () => {
-      const result = await service.listMeetings(ACCESS_TOKEN, TENANT_ID, USER_ID, {
-        type: 'scheduled',
-      })
+      const result = await service.listMeetings(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        {
+          type: 'scheduled',
+        },
+      )
       expect(result.data.every((m) => m.type === 2)).toBe(true)
     })
   })
@@ -390,7 +415,13 @@ describe('ZoomService', () => {
   describe('updateMeeting', () => {
     it('updates meeting and logs audit', async () => {
       const updates: UpdateMeetingInput = { topic: 'Updated Topic' }
-      await service.updateMeeting(ACCESS_TOKEN, TENANT_ID, USER_ID, SEEDED_MEETING_ID_1, updates)
+      await service.updateMeeting(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        SEEDED_MEETING_ID_1,
+        updates,
+      )
       const meeting = await service.getMeeting(
         ACCESS_TOKEN,
         TENANT_ID,
@@ -405,16 +436,22 @@ describe('ZoomService', () => {
     })
 
     it('updates settings', async () => {
-      await service.updateMeeting(ACCESS_TOKEN, TENANT_ID, USER_ID, SEEDED_MEETING_ID_1, {
-        settings: {
-          host_video: false,
-          participant_video: true,
-          join_before_host: true,
-          mute_upon_entry: false,
-          waiting_room: false,
-          auto_recording: 'none',
+      await service.updateMeeting(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        SEEDED_MEETING_ID_1,
+        {
+          settings: {
+            host_video: false,
+            participant_video: true,
+            join_before_host: true,
+            mute_upon_entry: false,
+            waiting_room: false,
+            auto_recording: 'none',
+          },
         },
-      })
+      )
       const meeting = await service.getMeeting(
         ACCESS_TOKEN,
         TENANT_ID,
@@ -432,7 +469,12 @@ describe('ZoomService', () => {
 
   describe('deleteMeeting', () => {
     it('deletes meeting and logs audit', async () => {
-      await service.deleteMeeting(ACCESS_TOKEN, TENANT_ID, USER_ID, SEEDED_MEETING_ID_1)
+      await service.deleteMeeting(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        SEEDED_MEETING_ID_1,
+      )
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
       const [action, , resourceId] = mockAuditLog.mock.calls[0]
       expect(action).toBe('integration_webhook_received')
@@ -440,9 +482,19 @@ describe('ZoomService', () => {
     })
 
     it('deleted meeting is no longer retrievable', async () => {
-      await service.deleteMeeting(ACCESS_TOKEN, TENANT_ID, USER_ID, SEEDED_MEETING_ID_1)
+      await service.deleteMeeting(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        SEEDED_MEETING_ID_1,
+      )
       await expect(
-        service.getMeeting(ACCESS_TOKEN, TENANT_ID, USER_ID, SEEDED_MEETING_ID_1),
+        service.getMeeting(
+          ACCESS_TOKEN,
+          TENANT_ID,
+          USER_ID,
+          SEEDED_MEETING_ID_1,
+        ),
       ).rejects.toThrow('meeting not found')
     })
   })
@@ -453,16 +505,25 @@ describe('ZoomService', () => {
 
   describe('listRecordings', () => {
     it('returns validated recordings with pagination', async () => {
-      const result = await service.listRecordings(ACCESS_TOKEN, TENANT_ID, USER_ID)
+      const result = await service.listRecordings(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
       expect(result.data).toHaveLength(1)
       expect(result.pagination.count).toBe(1)
       expect(result.data[0].id).toBe('stub-recording-001')
     })
 
     it('passes params to adapter', async () => {
-      const result = await service.listRecordings(ACCESS_TOKEN, TENANT_ID, USER_ID, {
-        from: '2025-06-01T00:00:00.000Z',
-      })
+      const result = await service.listRecordings(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        {
+          from: '2025-06-01T00:00:00.000Z',
+        },
+      )
       expect(result.data).toHaveLength(1)
     })
   })
@@ -543,7 +604,11 @@ describe('ZoomService', () => {
       const rawBody = '{"test":"body"}'
       const signature = makeZoomSignature(rawBody, WEBHOOK_SECRET)
       mockRedisGet.mockResolvedValueOnce(null)
-      const event = makeWebhookEvent({ rawBody, signature, eventId: 'unique-zoom-evt' })
+      const event = makeWebhookEvent({
+        rawBody,
+        signature,
+        eventId: 'unique-zoom-evt',
+      })
       await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(mockRedisSetex).toHaveBeenCalledTimes(1)
       const [key] = mockRedisSetex.mock.calls[0]

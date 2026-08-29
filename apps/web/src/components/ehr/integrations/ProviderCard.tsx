@@ -174,7 +174,14 @@ const ProviderCard: FC<ProviderCardProps> = ({
           flexWrap: 'wrap',
         }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            minWidth: 0,
+          }}
+        >
           <div
             style={{
               display: 'flex',
@@ -238,7 +245,8 @@ const ProviderCard: FC<ProviderCardProps> = ({
             color: 'var(--np-danger, #dc2626)',
             padding: '8px 12px',
             borderRadius: 6,
-            background: 'color-mix(in srgb, var(--np-danger, #dc2626) 8%, transparent)',
+            background:
+              'color-mix(in srgb, var(--np-danger, #dc2626) 8%, transparent)',
           }}
           role="alert"
         >
@@ -290,7 +298,11 @@ const ProviderCard: FC<ProviderCardProps> = ({
           aria-label={`Toggle ${PROVIDER_DISPLAY_NAMES[providerInfo.provider]} integration`}
         />
         {togglePending ? (
-          <Loader2 size={14} className="animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+          <Loader2
+            size={14}
+            className="animate-spin"
+            style={{ animation: 'spin 1s linear infinite' }}
+          />
         ) : null}
         <span>Enable for this tenant</span>
       </label>
@@ -316,7 +328,14 @@ const ProviderCard: FC<ProviderCardProps> = ({
               opacity: busy ? 0.6 : 1,
             }}
           >
-            {busy ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Plug size={16} />}
+            {busy ? (
+              <Loader2
+                size={16}
+                style={{ animation: 'spin 1s linear infinite' }}
+              />
+            ) : (
+              <Plug size={16} />
+            )}
             Connect
           </button>
         ) : (
@@ -338,7 +357,14 @@ const ProviderCard: FC<ProviderCardProps> = ({
               opacity: busy ? 0.6 : 1,
             }}
           >
-            {busy ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <PlugUnplug size={16} />}
+            {busy ? (
+              <Loader2
+                size={16}
+                style={{ animation: 'spin 1s linear infinite' }}
+              />
+            ) : (
+              <PlugUnplug size={16} />
+            )}
             Disconnect
           </button>
         )}

@@ -10,7 +10,7 @@
  * Postgres RLS. This module is the application-level orchestrator.
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 import {
   type IntegrationProvider,
@@ -24,7 +24,7 @@ import {
   tenantProviderStatusSchema,
   integrationFeatureFlagSchema,
   PROVIDER_DISPLAY_NAMES,
-} from './types';
+} from './types'
 
 /**
  * Static registry of all supported marketplace providers.
@@ -34,7 +34,8 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
   {
     provider: 'calendly',
     displayName: 'Calendly',
-    description: 'Patient scheduling and appointment booking with calendar sync.',
+    description:
+      'Patient scheduling and appointment booking with calendar sync.',
     category: 'scheduling',
     logoUrl: undefined,
     documentationUrl: 'https://developer.calendly.com/',
@@ -54,7 +55,8 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
   {
     provider: 'zoom',
     displayName: 'Zoom',
-    description: 'Telehealth video sessions and meeting integration for virtual encounters.',
+    description:
+      'Telehealth video sessions and meeting integration for virtual encounters.',
     category: 'video',
     logoUrl: undefined,
     documentationUrl: 'https://developers.zoom.us/docs/api/',
@@ -76,7 +78,8 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
   {
     provider: 'stripe',
     displayName: 'Stripe',
-    description: 'Payment processing for patient billing, copays, and insurance payments.',
+    description:
+      'Payment processing for patient billing, copays, and insurance payments.',
     category: 'payments',
     logoUrl: undefined,
     documentationUrl: 'https://stripe.com/docs/api',
@@ -100,15 +103,12 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
   {
     provider: 'twilio',
     displayName: 'Twilio',
-    description: 'SMS and voice communications for appointment reminders and notifications.',
+    description:
+      'SMS and voice communications for appointment reminders and notifications.',
     category: 'communications',
     logoUrl: undefined,
     documentationUrl: 'https://www.twilio.com/docs/usage/api',
-    defaultScopes: [
-      'sms',
-      'voice',
-      'verify',
-    ],
+    defaultScopes: ['sms', 'voice', 'verify'],
     webhookEvents: [
       'message.received',
       'message.sent',
@@ -117,34 +117,37 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
       'call.completed',
     ],
   },
-] as const;
+] as const
 
 /**
  * Provider lookup map for O(1) access.
  */
-const PROVIDER_MAP: ReadonlyMap<IntegrationProvider, MarketplaceProvider> = new Map(
-  MARKETPLACE_PROVIDERS.map((p) => [p.provider, p] as const),
-);
+const PROVIDER_MAP: ReadonlyMap<IntegrationProvider, MarketplaceProvider> =
+  new Map(MARKETPLACE_PROVIDERS.map((p) => [p.provider, p] as const))
 
 /**
  * Get a provider's marketplace metadata by provider key.
  */
-export function getProviderMetadata(provider: IntegrationProvider): MarketplaceProvider | undefined {
-  return PROVIDER_MAP.get(provider);
+export function getProviderMetadata(
+  provider: IntegrationProvider,
+): MarketplaceProvider | undefined {
+  return PROVIDER_MAP.get(provider)
 }
 
 /**
  * Get all available marketplace providers.
  */
 export function getAllProviders(): readonly MarketplaceProvider[] {
-  return MARKETPLACE_PROVIDERS;
+  return MARKETPLACE_PROVIDERS
 }
 
 /**
  * Get providers filtered by category.
  */
-export function getProvidersByCategory(category: MarketplaceProvider['category']): MarketplaceProvider[] {
-  return MARKETPLACE_PROVIDERS.filter((p) => p.category === category);
+export function getProvidersByCategory(
+  category: MarketplaceProvider['category'],
+): MarketplaceProvider[] {
+  return MARKETPLACE_PROVIDERS.filter((p) => p.category === category)
 }
 
 /**
@@ -153,10 +156,13 @@ export function getProvidersByCategory(category: MarketplaceProvider['category']
  * For F2.5 v1, we use an in-memory Map keyed by `{tenantId}:{provider}`.
  * The API routes persist this to Postgres via the existing repository layer.
  */
-const featureFlagStore = new Map<string, IntegrationFeatureFlag>();
+const featureFlagStore = new Map<string, IntegrationFeatureFlag>()
 
-function featureFlagKey(tenantId: string, provider: IntegrationProvider): string {
-  return `${tenantId}:${provider}`;
+function featureFlagKey(
+  tenantId: string,
+  provider: IntegrationProvider,
+): string {
+  return `${tenantId}:${provider}`
 }
 
 /**
@@ -168,16 +174,19 @@ export const FeatureFlagService = {
    * Returns `true` by default if no flag has been set (opt-out model).
    */
   isEnabled(tenantId: string, provider: IntegrationProvider): boolean {
-    const flag = featureFlagStore.get(featureFlagKey(tenantId, provider));
-    if (!flag) return true;
-    return flag.enabled;
+    const flag = featureFlagStore.get(featureFlagKey(tenantId, provider))
+    if (!flag) return true
+    return flag.enabled
   },
 
   /**
    * Get the full feature flag for a tenant + provider.
    */
-  get(tenantId: string, provider: IntegrationProvider): IntegrationFeatureFlag | undefined {
-    return featureFlagStore.get(featureFlagKey(tenantId, provider));
+  get(
+    tenantId: string,
+    provider: IntegrationProvider,
+  ): IntegrationFeatureFlag | undefined {
+    return featureFlagStore.get(featureFlagKey(tenantId, provider))
   },
 
   /**
@@ -197,41 +206,44 @@ export const FeatureFlagService = {
       capabilities: capabilities ?? undefined,
       updatedAt: new Date().toISOString(),
       updatedBy,
-    };
-    featureFlagStore.set(featureFlagKey(tenantId, provider), flag);
-    return flag;
+    }
+    featureFlagStore.set(featureFlagKey(tenantId, provider), flag)
+    return flag
   },
 
   /**
    * Remove a feature flag (revert to default enabled=true).
    */
   remove(tenantId: string, provider: IntegrationProvider): void {
-    featureFlagStore.delete(featureFlagKey(tenantId, provider));
+    featureFlagStore.delete(featureFlagKey(tenantId, provider))
   },
 
   /**
    * List all feature flags for a tenant.
    */
   listForTenant(tenantId: string): IntegrationFeatureFlag[] {
-    const flags: IntegrationFeatureFlag[] = [];
+    const flags: IntegrationFeatureFlag[] = []
     for (const [, flag] of featureFlagStore.entries()) {
       if (flag.tenantId === tenantId) {
-        flags.push(flag);
+        flags.push(flag)
       }
     }
-    return flags;
+    return flags
   },
-} as const;
+} as const
 
 /**
  * In-memory connection status store.
  * In production, this is backed by Postgres (tenant_integration_connections table).
  * Keyed by `{tenantId}:{provider}`.
  */
-const connectionStore = new Map<string, TenantProviderStatus>();
+const connectionStore = new Map<string, TenantProviderStatus>()
 
-function connectionKey(tenantId: string, provider: IntegrationProvider): string {
-  return `${tenantId}:${provider}`;
+function connectionKey(
+  tenantId: string,
+  provider: IntegrationProvider,
+): string {
+  return `${tenantId}:${provider}`
 }
 
 /**
@@ -241,8 +253,11 @@ export const ConnectionStatusService = {
   /**
    * Get the connection status for a tenant + provider.
    */
-  get(tenantId: string, provider: IntegrationProvider): TenantProviderStatus | undefined {
-    return connectionStore.get(connectionKey(tenantId, provider));
+  get(
+    tenantId: string,
+    provider: IntegrationProvider,
+  ): TenantProviderStatus | undefined {
+    return connectionStore.get(connectionKey(tenantId, provider))
   },
 
   /**
@@ -256,28 +271,33 @@ export const ConnectionStatusService = {
     lastError?: string,
     connectedBy?: string,
   ): TenantProviderStatus {
-    const existing = connectionStore.get(connectionKey(tenantId, provider));
+    const existing = connectionStore.get(connectionKey(tenantId, provider))
     const updated: TenantProviderStatus = {
       tenantId,
       provider,
       status,
       connectedAt: connectedAt ?? existing?.connectedAt,
       lastWebhookReceivedAt: existing?.lastWebhookReceivedAt,
-      lastError: lastError ?? (status === 'error' ? 'Unknown error' : undefined),
+      lastError:
+        lastError ?? (status === 'error' ? 'Unknown error' : undefined),
       featureFlag: FeatureFlagService.get(tenantId, provider),
-    };
-    connectionStore.set(connectionKey(tenantId, provider), updated);
-    return updated;
+    }
+    connectionStore.set(connectionKey(tenantId, provider), updated)
+    return updated
   },
 
   /**
    * Record a webhook received timestamp.
    */
-  recordWebhook(tenantId: string, provider: IntegrationProvider, timestamp: string): void {
-    const existing = connectionStore.get(connectionKey(tenantId, provider));
+  recordWebhook(
+    tenantId: string,
+    provider: IntegrationProvider,
+    timestamp: string,
+  ): void {
+    const existing = connectionStore.get(connectionKey(tenantId, provider))
     if (existing) {
-      existing.lastWebhookReceivedAt = timestamp;
-      connectionStore.set(connectionKey(tenantId, provider), existing);
+      existing.lastWebhookReceivedAt = timestamp
+      connectionStore.set(connectionKey(tenantId, provider), existing)
     }
   },
 
@@ -285,31 +305,33 @@ export const ConnectionStatusService = {
    * Remove a connection (disconnect).
    */
   remove(tenantId: string, provider: IntegrationProvider): void {
-    connectionStore.delete(connectionKey(tenantId, provider));
+    connectionStore.delete(connectionKey(tenantId, provider))
   },
 
   /**
    * List all connection statuses for a tenant.
    */
   listForTenant(tenantId: string): TenantProviderStatus[] {
-    const statuses: TenantProviderStatus[] = [];
+    const statuses: TenantProviderStatus[] = []
     for (const [, status] of connectionStore.entries()) {
       if (status.tenantId === tenantId) {
-        statuses.push(status);
+        statuses.push(status)
       }
     }
-    return statuses;
+    return statuses
   },
-} as const;
+} as const
 
 /**
  * Build the marketplace dashboard for a tenant.
  * Aggregates all available providers with the tenant's connection/feature flag state.
  */
-export function buildMarketplaceDashboard(tenantId: string): MarketplaceDashboard {
+export function buildMarketplaceDashboard(
+  tenantId: string,
+): MarketplaceDashboard {
   const providers = MARKETPLACE_PROVIDERS.map((provider) => {
-    const connection = ConnectionStatusService.get(tenantId, provider.provider);
-    const featureFlag = FeatureFlagService.get(tenantId, provider.provider);
+    const connection = ConnectionStatusService.get(tenantId, provider.provider)
+    const featureFlag = FeatureFlagService.get(tenantId, provider.provider)
     return {
       tenantId,
       ...provider,
@@ -318,46 +340,57 @@ export function buildMarketplaceDashboard(tenantId: string): MarketplaceDashboar
       lastWebhookReceivedAt: connection?.lastWebhookReceivedAt,
       lastError: connection?.lastError,
       featureFlag,
-    } satisfies TenantProviderStatus & MarketplaceProvider;
-  });
+    } satisfies TenantProviderStatus & MarketplaceProvider
+  })
 
-  const totalConnected = providers.filter((p) => p.status === 'connected').length;
+  const totalConnected = providers.filter(
+    (p) => p.status === 'connected',
+  ).length
 
   return {
     tenantId,
     providers,
     totalConnected,
     totalAvailable: MARKETPLACE_PROVIDERS.length,
-  };
+  }
 }
 
 /**
  * Validate a marketplace provider configuration against the Zod schema.
  * Throws on invalid input.
  */
-export function validateMarketplaceProvider(input: unknown): MarketplaceProvider {
-  return marketplaceProviderSchema.parse(input);
+export function validateMarketplaceProvider(
+  input: unknown,
+): MarketplaceProvider {
+  return marketplaceProviderSchema.parse(input)
 }
 
 /**
  * Validate a tenant provider status against the Zod schema.
  */
-export function validateTenantProviderStatus(input: unknown): TenantProviderStatus {
-  return tenantProviderStatusSchema.parse(input);
+export function validateTenantProviderStatus(
+  input: unknown,
+): TenantProviderStatus {
+  return tenantProviderStatusSchema.parse(input)
 }
 
 /**
  * Validate an integration feature flag against the Zod schema.
  */
 export function validateFeatureFlag(input: unknown): IntegrationFeatureFlag {
-  return integrationFeatureFlagSchema.parse(input);
+  return integrationFeatureFlagSchema.parse(input)
 }
 
 /**
  * Validate an integration status value.
  */
 export function validateIntegrationStatus(input: string): IntegrationStatus {
-  return integrationStatusSchema.parse(input);
+  return integrationStatusSchema.parse(input)
 }
 
-export { MARKETPLACE_PROVIDERS as INTEGRATION_PROVIDERS, PROVIDER_MAP, FeatureFlagService as featureFlags, ConnectionStatusService as connections };
+export {
+  MARKETPLACE_PROVIDERS as INTEGRATION_PROVIDERS,
+  PROVIDER_MAP,
+  FeatureFlagService as featureFlags,
+  ConnectionStatusService as connections,
+}

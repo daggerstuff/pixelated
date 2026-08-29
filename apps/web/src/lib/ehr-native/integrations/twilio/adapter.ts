@@ -12,71 +12,71 @@ import type {
   TwilioMessage,
   TwilioCall,
   TwilioPhoneNumber,
-} from './types';
+} from './types'
 
 /**
  * Parameters for listing messages.
  */
 export interface ListMessagesParams {
-  to?: string;
-  from?: string;
-  dateSent?: string;
-  pageSize?: number;
-  pageToken?: string;
+  to?: string
+  from?: string
+  dateSent?: string
+  pageSize?: number
+  pageToken?: string
 }
 
 /**
  * Parameters for listing calls.
  */
 export interface ListCallsParams {
-  to?: string;
-  from?: string;
-  startTime?: string;
-  status?: string;
-  pageSize?: number;
-  pageToken?: string;
+  to?: string
+  from?: string
+  startTime?: string
+  status?: string
+  pageSize?: number
+  pageToken?: string
 }
 
 /**
  * Parameters for listing phone numbers.
  */
 export interface ListPhoneNumbersParams {
-  phoneNumber?: string;
-  friendlyName?: string;
-  pageSize?: number;
-  pageToken?: string;
+  phoneNumber?: string
+  friendlyName?: string
+  pageSize?: number
+  pageToken?: string
 }
 
 /**
  * Input for sending a new message.
  */
 export interface SendMessageInput {
-  to: string;
-  from: string;
-  body: string;
-  mediaUrl?: string;
+  to: string
+  from: string
+  body: string
+  mediaUrl?: string
 }
 
 /**
  * Input for making a new call.
  */
 export interface MakeCallInput {
-  to: string;
-  from: string;
-  url: string;
-  timeout?: number;
-  method?: 'GET' | 'POST';
+  to: string
+  from: string
+  url: string
+  timeout?: number
+  method?: 'GET' | 'POST'
 }
 
 /**
  * Paginated response wrapper for Twilio API list endpoints.
  */
 export interface PaginatedResponse<T> {
-  data: T[];
+  data: T[]
   pagination: {
-    count: number;
-    nextPageToken?: string;
-  };
+    count: number
+    nextPageToken?: string
+  }
 }
 
 /**
@@ -90,13 +90,13 @@ export interface PaginatedResponse<T> {
  */
 export interface TwilioAdapter {
   /** Adapter identifier — 'twilio' for production, 'stub-twilio' for stub. */
-  readonly name: string;
+  readonly name: string
 
   /**
    * Retrieve the account details for the given account SID.
    * @see https://www.twilio.com/docs/usage/api/account
    */
-  getAccount(accessToken: string, accountSid: string): Promise<TwilioAccount>;
+  getAccount(accessToken: string, accountSid: string): Promise<TwilioAccount>
 
   /**
    * List messages for an account.
@@ -105,19 +105,22 @@ export interface TwilioAdapter {
   listMessages(
     accessToken: string,
     params?: ListMessagesParams,
-  ): Promise<PaginatedResponse<TwilioMessage>>;
+  ): Promise<PaginatedResponse<TwilioMessage>>
 
   /**
    * Retrieve a single message by SID.
    * @see https://www.twilio.com/docs/sms/api/message-resource
    */
-  getMessage(accessToken: string, messageSid: string): Promise<TwilioMessage>;
+  getMessage(accessToken: string, messageSid: string): Promise<TwilioMessage>
 
   /**
    * Send a new message.
    * @see https://www.twilio.com/docs/sms/api/message-resource
    */
-  sendMessage(accessToken: string, data: SendMessageInput): Promise<TwilioMessage>;
+  sendMessage(
+    accessToken: string,
+    data: SendMessageInput,
+  ): Promise<TwilioMessage>
 
   /**
    * List calls for an account.
@@ -126,19 +129,19 @@ export interface TwilioAdapter {
   listCalls(
     accessToken: string,
     params?: ListCallsParams,
-  ): Promise<PaginatedResponse<TwilioCall>>;
+  ): Promise<PaginatedResponse<TwilioCall>>
 
   /**
    * Retrieve a single call by SID.
    * @see https://www.twilio.com/docs/voice/api/call-resource
    */
-  getCall(accessToken: string, callSid: string): Promise<TwilioCall>;
+  getCall(accessToken: string, callSid: string): Promise<TwilioCall>
 
   /**
    * Make a new call.
    * @see https://www.twilio.com/docs/voice/api/call-resource
    */
-  makeCall(accessToken: string, data: MakeCallInput): Promise<TwilioCall>;
+  makeCall(accessToken: string, data: MakeCallInput): Promise<TwilioCall>
 
   /**
    * Retrieve a phone number by SID.
@@ -147,7 +150,7 @@ export interface TwilioAdapter {
   getPhoneNumber(
     accessToken: string,
     phoneNumberSid: string,
-  ): Promise<TwilioPhoneNumber>;
+  ): Promise<TwilioPhoneNumber>
 
   /**
    * List phone numbers for an account.
@@ -156,5 +159,5 @@ export interface TwilioAdapter {
   listPhoneNumbers(
     accessToken: string,
     params?: ListPhoneNumbersParams,
-  ): Promise<PaginatedResponse<TwilioPhoneNumber>>;
+  ): Promise<PaginatedResponse<TwilioPhoneNumber>>
 }

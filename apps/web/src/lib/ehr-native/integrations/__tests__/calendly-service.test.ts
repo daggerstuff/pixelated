@@ -4,8 +4,9 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createHmac } from 'node:crypto'
+
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ---------------------------------------------------------------------------
 // Mocks — must be set up before importing the service
@@ -60,7 +61,8 @@ const OAUTH_CONFIG = {
   tokenUrl: 'https://auth.calendly.com/oauth/token',
 }
 
-const SEEDED_EVENT_URI = 'https://api.calendly.com/scheduled_events/stub-event-001'
+const SEEDED_EVENT_URI =
+  'https://api.calendly.com/scheduled_events/stub-event-001'
 
 function makeTokenResponse(overrides: Record<string, unknown> = {}) {
   return {
@@ -77,15 +79,25 @@ function makeFetchResponse(body: unknown, ok = true, status = 200) {
   return {
     ok,
     status,
-    text: vi.fn().mockResolvedValue(typeof body === 'string' ? body : JSON.stringify(body)),
+    text: vi
+      .fn()
+      .mockResolvedValue(
+        typeof body === 'string' ? body : JSON.stringify(body),
+      ),
     json: vi.fn().mockResolvedValue(body),
   }
 }
 
 /** Build a valid Calendly webhook signature header (stripe-composite format). */
-function makeCalendlySignature(rawBody: string, secret: string, timestamp = '1700000000'): string {
+function makeCalendlySignature(
+  rawBody: string,
+  secret: string,
+  timestamp = '1700000000',
+): string {
   const dataToSign = `${timestamp}.${rawBody}`
-  const signature = createHmac('sha256', secret).update(dataToSign, 'utf8').digest('hex')
+  const signature = createHmac('sha256', secret)
+    .update(dataToSign, 'utf8')
+    .digest('hex')
   return `t=${timestamp},v1=${signature}`
 }
 
@@ -188,7 +200,9 @@ describe('CalendlyService', () => {
 
     it('starts with the authorizeUrl', () => {
       const url = service.buildAuthorizeUrl('state')
-      expect(url.startsWith('https://auth.calendly.com/oauth/authorize?')).toBe(true)
+      expect(url.startsWith('https://auth.calendly.com/oauth/authorize?')).toBe(
+        true,
+      )
     })
   })
 
@@ -212,7 +226,9 @@ describe('CalendlyService', () => {
       const [url, init] = mockFetch.mock.calls[0]
       expect(url).toBe('https://auth.calendly.com/oauth/token')
       expect(init.method).toBe('POST')
-      expect(init.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
+      expect(init.headers['Content-Type']).toBe(
+        'application/x-www-form-urlencoded',
+      )
       const body = init.body.toString()
       expect(body).toContain('grant_type=authorization_code')
       expect(body).toContain('code=auth-code-123')
@@ -221,14 +237,18 @@ describe('CalendlyService', () => {
     })
 
     it('throws on non-ok response', async () => {
-      mockFetch.mockResolvedValueOnce(makeFetchResponse('invalid_grant', false, 400))
+      mockFetch.mockResolvedValueOnce(
+        makeFetchResponse('invalid_grant', false, 400),
+      )
       await expect(service.exchangeCodeForToken('bad-code')).rejects.toThrow(
         'Calendly token exchange failed (400)',
       )
     })
 
     it('throws on schema validation failure', async () => {
-      mockFetch.mockResolvedValueOnce(makeFetchResponse({ invalid: 'response' }))
+      mockFetch.mockResolvedValueOnce(
+        makeFetchResponse({ invalid: 'response' }),
+      )
       await expect(service.exchangeCodeForToken('code')).rejects.toThrow()
     })
   })
@@ -272,11 +292,16 @@ describe('CalendlyService', () => {
 
   describe('getCurrentUser', () => {
     it('returns validated user and logs audit', async () => {
-      const user = await service.getCurrentUser(ACCESS_TOKEN, TENANT_ID, USER_ID)
+      const user = await service.getCurrentUser(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
       expect(user.uri).toBe('https://api.calendly.com/users/stub-user-001')
       expect(user.email).toBe('stub@example.com')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
-      const [action, resourceType, resourceId, input] = mockAuditLog.mock.calls[0]
+      const [action, resourceType, resourceId, input] =
+        mockAuditLog.mock.calls[0]
       expect(action).toBe('integration_connect')
       expect(resourceType).toBe('Integration')
       expect(resourceId).toBe(user.uri)
@@ -293,16 +318,25 @@ describe('CalendlyService', () => {
 
   describe('listEventTypes', () => {
     it('returns validated event types with pagination', async () => {
-      const result = await service.listEventTypes(ACCESS_TOKEN, TENANT_ID, USER_ID)
+      const result = await service.listEventTypes(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
       expect(result.data).toHaveLength(1)
       expect(result.pagination.count).toBe(1)
       expect(result.data[0].name).toBe('30 Minute Meeting')
     })
 
     it('passes params to adapter', async () => {
-      const result = await service.listEventTypes(ACCESS_TOKEN, TENANT_ID, USER_ID, {
-        active: true,
-      })
+      const result = await service.listEventTypes(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        {
+          active: true,
+        },
+      )
       expect(result.data).toHaveLength(1)
     })
   })
@@ -334,15 +368,24 @@ describe('CalendlyService', () => {
 
   describe('listScheduledEvents', () => {
     it('returns validated events with pagination', async () => {
-      const result = await service.listScheduledEvents(ACCESS_TOKEN, TENANT_ID, USER_ID)
+      const result = await service.listScheduledEvents(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
       expect(result.data.length).toBeGreaterThan(0)
       expect(result.pagination.count).toBe(result.data.length)
     })
 
     it('passes params to adapter', async () => {
-      const result = await service.listScheduledEvents(ACCESS_TOKEN, TENANT_ID, USER_ID, {
-        status: 'active',
-      })
+      const result = await service.listScheduledEvents(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+        {
+          status: 'active',
+        },
+      )
       expect(result.data.every((e) => e.status === 'active')).toBe(true)
     })
   })
@@ -478,7 +521,11 @@ describe('CalendlyService', () => {
       const rawBody = '{"test":"body"}'
       const signature = makeCalendlySignature(rawBody, WEBHOOK_SECRET)
       mockRedisGet.mockResolvedValueOnce(null)
-      const event = makeWebhookEvent({ rawBody, signature, eventId: 'unique-evt' })
+      const event = makeWebhookEvent({
+        rawBody,
+        signature,
+        eventId: 'unique-evt',
+      })
       await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(mockRedisSetex).toHaveBeenCalledTimes(1)
       const [key] = mockRedisSetex.mock.calls[0]

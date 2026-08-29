@@ -12,13 +12,13 @@ import type {
   ListInviteesParams,
   ListEventTypesParams,
   PaginatedResponse,
-} from './adapter';
+} from './adapter'
 import type {
   CalendlyUser,
   CalendlyEventType,
   CalendlyScheduledEvent,
   CalendlyInvitee,
-} from './types';
+} from './types'
 
 /**
  * In-memory stub implementation of the Calendly adapter.
@@ -27,15 +27,16 @@ import type {
  * All responses match the Zod schemas defined in types.ts.
  */
 export class StubCalendlyAdapter implements CalendlyAdapter {
-  readonly name = 'stub-calendly';
+  readonly name = 'stub-calendly'
 
-  private readonly eventTypes: Map<string, CalendlyEventType> = new Map();
-  private readonly scheduledEvents: Map<string, CalendlyScheduledEvent> = new Map();
-  private readonly invitees: Map<string, CalendlyInvitee[]> = new Map();
-  private idCounter = 0;
+  private readonly eventTypes: Map<string, CalendlyEventType> = new Map()
+  private readonly scheduledEvents: Map<string, CalendlyScheduledEvent> =
+    new Map()
+  private readonly invitees: Map<string, CalendlyInvitee[]> = new Map()
+  private idCounter = 0
 
   constructor() {
-    this.seedTestData();
+    this.seedTestData()
   }
 
   /**
@@ -54,8 +55,8 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
       profile_type: 'User',
       created_at: '2025-01-01T00:00:00.000Z',
       updated_at: '2025-01-01T00:00:00.000Z',
-    };
-    this.eventTypes.set(eventType.uri, eventType);
+    }
+    this.eventTypes.set(eventType.uri, eventType)
 
     const event: CalendlyScheduledEvent = {
       uri: 'https://api.calendly.com/scheduled_events/stub-event-001',
@@ -67,8 +68,8 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
       invitees_counter: { total: 1, active: 1, limit: 1 },
       created_at: '2025-06-01T00:00:00.000Z',
       updated_at: '2025-06-01T00:00:00.000Z',
-    };
-    this.scheduledEvents.set(event.uri, event);
+    }
+    this.scheduledEvents.set(event.uri, event)
 
     const invitee: CalendlyInvitee = {
       uri: 'https://api.calendly.com/scheduled_events/stub-event-001/invitees/stub-invitee-001',
@@ -78,18 +79,18 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
       event: event.uri,
       created_at: '2025-06-01T00:00:00.000Z',
       updated_at: '2025-06-01T00:00:00.000Z',
-    };
-    this.invitees.set(event.uri, [invitee]);
+    }
+    this.invitees.set(event.uri, [invitee])
   }
 
   private nextId(prefix: string): string {
-    this.idCounter += 1;
-    return `${prefix}-${this.idCounter.toString().padStart(3, '0')}`;
+    this.idCounter += 1
+    return `${prefix}-${this.idCounter.toString().padStart(3, '0')}`
   }
 
   async getCurrentUser(accessToken: string): Promise<CalendlyUser> {
     if (!accessToken) {
-      throw new Error('StubCalendlyAdapter: accessToken is required');
+      throw new Error('StubCalendlyAdapter: accessToken is required')
     }
     return {
       uri: 'https://api.calendly.com/users/stub-user-001',
@@ -100,46 +101,48 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
       timezone: 'America/New_York',
       created_at: '2025-01-01T00:00:00.000Z',
       updated_at: '2025-01-01T00:00:00.000Z',
-    };
+    }
   }
 
   async listEventTypes(
     _accessToken: string,
     params?: ListEventTypesParams,
   ): Promise<PaginatedResponse<CalendlyEventType>> {
-    let items = [...this.eventTypes.values()];
+    let items = [...this.eventTypes.values()]
     if (params?.active !== undefined) {
-      items = items.filter((et) => et.active === params.active);
+      items = items.filter((et) => et.active === params.active)
     }
     return {
       data: items,
       pagination: { count: items.length },
-    };
+    }
   }
 
   async getScheduledEvent(
     _accessToken: string,
     eventUri: string,
   ): Promise<CalendlyScheduledEvent> {
-    const event = this.scheduledEvents.get(eventUri);
+    const event = this.scheduledEvents.get(eventUri)
     if (!event) {
-      throw new Error(`StubCalendlyAdapter: scheduled event not found: ${eventUri}`);
+      throw new Error(
+        `StubCalendlyAdapter: scheduled event not found: ${eventUri}`,
+      )
     }
-    return event;
+    return event
   }
 
   async listScheduledEvents(
     _accessToken: string,
     params?: ListScheduledEventsParams,
   ): Promise<PaginatedResponse<CalendlyScheduledEvent>> {
-    let items = [...this.scheduledEvents.values()];
+    let items = [...this.scheduledEvents.values()]
     if (params?.status) {
-      items = items.filter((e) => e.status === params.status);
+      items = items.filter((e) => e.status === params.status)
     }
     return {
       data: items,
       pagination: { count: items.length },
-    };
+    }
   }
 
   async listInvitees(
@@ -147,14 +150,14 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
     eventUri: string,
     params?: ListInviteesParams,
   ): Promise<PaginatedResponse<CalendlyInvitee>> {
-    let items = this.invitees.get(eventUri) ?? [];
+    let items = this.invitees.get(eventUri) ?? []
     if (params?.status) {
-      items = items.filter((i) => i.status === params.status);
+      items = items.filter((i) => i.status === params.status)
     }
     return {
       data: items,
       pagination: { count: items.length },
-    };
+    }
   }
 
   async cancelScheduledEvent(
@@ -162,9 +165,11 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
     eventUri: string,
     cancellationReason?: string,
   ): Promise<{ canceled: boolean; eventUri: string }> {
-    const event = this.scheduledEvents.get(eventUri);
+    const event = this.scheduledEvents.get(eventUri)
     if (!event) {
-      throw new Error(`StubCalendlyAdapter: scheduled event not found: ${eventUri}`);
+      throw new Error(
+        `StubCalendlyAdapter: scheduled event not found: ${eventUri}`,
+      )
     }
     const canceled: CalendlyScheduledEvent = {
       ...event,
@@ -172,13 +177,13 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
       cancellation_reason: cancellationReason,
       canceler_name: 'Stub User',
       updated_at: new Date().toISOString(),
-    };
-    this.scheduledEvents.set(eventUri, canceled);
-    return { canceled: true, eventUri };
+    }
+    this.scheduledEvents.set(eventUri, canceled)
+    return { canceled: true, eventUri }
   }
 }
 
 /**
  * Singleton stub instance for development and testing.
  */
-export const stubCalendlyAdapter = new StubCalendlyAdapter();
+export const stubCalendlyAdapter = new StubCalendlyAdapter()

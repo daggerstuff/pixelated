@@ -32,9 +32,9 @@ describe('StubStripeAdapter', () => {
     })
 
     it('throws when customer not found', async () => {
-      await expect(adapter.getCustomer('token', 'cus_nonexistent')).rejects.toThrow(
-        'customer not found: cus_nonexistent',
-      )
+      await expect(
+        adapter.getCustomer('token', 'cus_nonexistent'),
+      ).rejects.toThrow('customer not found: cus_nonexistent')
     })
   })
 
@@ -178,9 +178,9 @@ describe('StubStripeAdapter', () => {
     })
 
     it('throws when charge not found', async () => {
-      await expect(adapter.getCharge('token', 'ch_nonexistent')).rejects.toThrow(
-        'charge not found: ch_nonexistent',
-      )
+      await expect(
+        adapter.getCharge('token', 'ch_nonexistent'),
+      ).rejects.toThrow('charge not found: ch_nonexistent')
     })
   })
 
@@ -268,9 +268,9 @@ describe('StubStripeAdapter', () => {
     })
 
     it('throws when invoice not found', async () => {
-      await expect(adapter.getInvoice('token', 'in_nonexistent')).rejects.toThrow(
-        'invoice not found: in_nonexistent',
-      )
+      await expect(
+        adapter.getInvoice('token', 'in_nonexistent'),
+      ).rejects.toThrow('invoice not found: in_nonexistent')
     })
   })
 

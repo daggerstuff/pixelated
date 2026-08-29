@@ -6,13 +6,13 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 
+import type { CreateMeetingInput } from '../zoom/adapter'
 import { StubZoomAdapter } from '../zoom/stub-adapter'
 import {
   zoomUserSchema,
   zoomMeetingSchema,
   zoomRecordingSchema,
 } from '../zoom/types'
-import type { CreateMeetingInput } from '../zoom/adapter'
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -230,7 +230,10 @@ describe('StubZoomAdapter', () => {
     })
 
     it('preserves unmodified fields', async () => {
-      const original = await adapter.getMeeting(VALID_TOKEN, SEEDED_MEETING_ID_1)
+      const original = await adapter.getMeeting(
+        VALID_TOKEN,
+        SEEDED_MEETING_ID_1,
+      )
       await adapter.updateMeeting(VALID_TOKEN, SEEDED_MEETING_ID_1, {
         topic: 'Changed',
       })

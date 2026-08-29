@@ -10,21 +10,21 @@
  *       and the adapter interface contract.
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
 // Provider constants
 // ---------------------------------------------------------------------------
 
-export const ZOOM_PROVIDER_NAME = 'zoom' as const;
+export const ZOOM_PROVIDER_NAME = 'zoom' as const
 
-export const ZOOM_API_BASE_URL = 'https://api.zoom.us/v2' as const;
+export const ZOOM_API_BASE_URL = 'https://api.zoom.us/v2' as const
 
 export const ZOOM_OAUTH_SCOPES = [
   'meeting:read',
   'meeting:write',
   'user:read',
-] as const;
+] as const
 
 export const ZOOM_WEBHOOK_EVENTS = [
   'meeting.created',
@@ -33,7 +33,7 @@ export const ZOOM_WEBHOOK_EVENTS = [
   'meeting.started',
   'meeting.ended',
   'recording.completed',
-] as const;
+] as const
 
 // ---------------------------------------------------------------------------
 // Zoom API response schemas
@@ -62,9 +62,9 @@ export const zoomUserSchema = z.object({
   language: z.string().optional(),
   phone_number: z.string().optional(),
   status: z.enum(['active', 'inactive', 'pending']).optional(),
-});
+})
 
-export type ZoomUser = z.infer<typeof zoomUserSchema>;
+export type ZoomUser = z.infer<typeof zoomUserSchema>
 
 /**
  * Zoom meeting settings — per-meeting configuration options.
@@ -91,9 +91,9 @@ export const zoomMeetingSettingsSchema = z.object({
   allow_multiple_devices: z.boolean().optional(),
   waiting_room: z.boolean().optional(),
   request_permission_to_unmute_participants: z.boolean().optional(),
-});
+})
 
-export type ZoomMeetingSettings = z.infer<typeof zoomMeetingSettingsSchema>;
+export type ZoomMeetingSettings = z.infer<typeof zoomMeetingSettingsSchema>
 
 /**
  * Zoom meeting — a scheduled or instant meeting.
@@ -135,9 +135,9 @@ export const zoomMeetingSchema = z.object({
       }),
     )
     .optional(),
-});
+})
 
-export type ZoomMeeting = z.infer<typeof zoomMeetingSchema>;
+export type ZoomMeeting = z.infer<typeof zoomMeetingSchema>
 
 /**
  * Zoom recording file — a single file within a recording.
@@ -167,9 +167,9 @@ export const zoomRecordingFileSchema = z.object({
       'timeline',
     ])
     .optional(),
-});
+})
 
-export type ZoomRecordingFile = z.infer<typeof zoomRecordingFileSchema>;
+export type ZoomRecordingFile = z.infer<typeof zoomRecordingFileSchema>
 
 /**
  * Zoom recording — cloud recording for a meeting.
@@ -188,9 +188,9 @@ export const zoomRecordingSchema = z.object({
   account_id: z.string().optional(),
   created_at: z.string().datetime().optional(),
   updated_at: z.string().datetime().optional(),
-});
+})
 
-export type ZoomRecording = z.infer<typeof zoomRecordingSchema>;
+export type ZoomRecording = z.infer<typeof zoomRecordingSchema>
 
 // ---------------------------------------------------------------------------
 // Webhook event schemas
@@ -221,9 +221,9 @@ export const zoomWebhookPayloadSchema = z.object({
       })
       .optional(),
   }),
-});
+})
 
-export type ZoomWebhookPayload = z.infer<typeof zoomWebhookPayloadSchema>;
+export type ZoomWebhookPayload = z.infer<typeof zoomWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -236,9 +236,9 @@ export const zoomOAuthConfigSchema = z.object({
   scopes: z.array(z.string()).default([...ZOOM_OAUTH_SCOPES]),
   authorizeUrl: z.string().url().default('https://zoom.us/oauth/authorize'),
   tokenUrl: z.string().url().default('https://zoom.us/oauth/token'),
-});
+})
 
-export type ZoomOAuthConfig = z.infer<typeof zoomOAuthConfigSchema>;
+export type ZoomOAuthConfig = z.infer<typeof zoomOAuthConfigSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific webhook signature config
@@ -250,11 +250,11 @@ export const zoomWebhookSignatureConfigSchema = z.object({
   secret: z.string().min(1),
   format: z.literal('hmac').default('hmac'),
   algorithm: z.literal('sha256').default('sha256'),
-});
+})
 
 export type ZoomWebhookSignatureConfig = z.infer<
   typeof zoomWebhookSignatureConfigSchema
->;
+>
 
 // ---------------------------------------------------------------------------
 // Enumerations for typed webhook events
@@ -267,6 +267,6 @@ export const zoomWebhookEventTypeSchema = z.enum([
   'meeting.started',
   'meeting.ended',
   'recording.completed',
-]);
+])
 
-export type ZoomWebhookEventType = z.infer<typeof zoomWebhookEventTypeSchema>;
+export type ZoomWebhookEventType = z.infer<typeof zoomWebhookEventTypeSchema>

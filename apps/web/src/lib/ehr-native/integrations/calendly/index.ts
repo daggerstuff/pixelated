@@ -6,7 +6,7 @@
  *       and API routes.
  */
 
-export * from './types';
-export * from './adapter';
-export * from './stub-adapter';
-export * from './calendly-service';
+export * from './types'
+export * from './adapter'
+export * from './stub-adapter'
+export * from './calendly-service'

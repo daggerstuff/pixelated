@@ -16,14 +16,14 @@ import type {
   CreateRefundInput,
   CreateCheckoutSessionInput,
   PaginatedResponse,
-} from './adapter';
+} from './adapter'
 import type {
   StripeCustomer,
   StripeCharge,
   StripePaymentIntent,
   StripeInvoice,
   StripeCheckoutSession,
-} from './types';
+} from './types'
 
 /**
  * In-memory stub implementation of the Stripe adapter.
@@ -32,15 +32,15 @@ import type {
  * All responses match the Zod schemas defined in types.ts.
  */
 export class StubStripeAdapter implements StripeAdapter {
-  readonly name = 'stub-stripe';
+  readonly name = 'stub-stripe'
 
-  private readonly customers: Map<string, StripeCustomer> = new Map();
-  private readonly charges: Map<string, StripeCharge> = new Map();
-  private readonly invoices: Map<string, StripeInvoice> = new Map();
-  private idCounter = 0;
+  private readonly customers: Map<string, StripeCustomer> = new Map()
+  private readonly charges: Map<string, StripeCharge> = new Map()
+  private readonly invoices: Map<string, StripeInvoice> = new Map()
+  private idCounter = 0
 
   constructor() {
-    this.seedTestData();
+    this.seedTestData()
   }
 
   /**
@@ -70,8 +70,8 @@ export class StubStripeAdapter implements StripeAdapter {
       created: 1717200000,
       livemode: false,
       tax_exempt: 'none',
-    };
-    this.customers.set(customer1.id, customer1);
+    }
+    this.customers.set(customer1.id, customer1)
 
     const customer2: StripeCustomer = {
       id: 'cus_stub002',
@@ -95,8 +95,8 @@ export class StubStripeAdapter implements StripeAdapter {
       created: 1717286400,
       livemode: false,
       tax_exempt: 'none',
-    };
-    this.customers.set(customer2.id, customer2);
+    }
+    this.customers.set(customer2.id, customer2)
 
     const charge1: StripeCharge = {
       id: 'ch_stub001',
@@ -127,8 +127,8 @@ export class StubStripeAdapter implements StripeAdapter {
         seller_message: 'Payment complete.',
         type: 'authorized',
       },
-    };
-    this.charges.set(charge1.id, charge1);
+    }
+    this.charges.set(charge1.id, charge1)
 
     const charge2: StripeCharge = {
       id: 'ch_stub002',
@@ -159,8 +159,8 @@ export class StubStripeAdapter implements StripeAdapter {
         seller_message: 'Payment complete.',
         type: 'authorized',
       },
-    };
-    this.charges.set(charge2.id, charge2);
+    }
+    this.charges.set(charge2.id, charge2)
 
     const invoice1: StripeInvoice = {
       id: 'in_stub001',
@@ -202,48 +202,48 @@ export class StubStripeAdapter implements StripeAdapter {
       metadata: { tenantId: 'stub-tenant-001' },
       created: 1717286400,
       livemode: false,
-    };
-    this.invoices.set(invoice1.id, invoice1);
+    }
+    this.invoices.set(invoice1.id, invoice1)
   }
 
   private nextId(prefix: string): string {
-    this.idCounter += 1;
-    return `${prefix}_stub${this.idCounter.toString().padStart(3, '0')}`;
+    this.idCounter += 1
+    return `${prefix}_stub${this.idCounter.toString().padStart(3, '0')}`
   }
 
   async getCustomer(
     _accessToken: string,
     customerId: string,
   ): Promise<StripeCustomer> {
-    const customer = this.customers.get(customerId);
+    const customer = this.customers.get(customerId)
     if (!customer) {
-      throw new Error(`StubStripeAdapter: customer not found: ${customerId}`);
+      throw new Error(`StubStripeAdapter: customer not found: ${customerId}`)
     }
-    return customer;
+    return customer
   }
 
   async listCustomers(
     _accessToken: string,
     params?: ListCustomersParams,
   ): Promise<PaginatedResponse<StripeCustomer>> {
-    let items = [...this.customers.values()];
+    let items = [...this.customers.values()]
     if (params?.email) {
-      items = items.filter((c) => c.email === params.email);
+      items = items.filter((c) => c.email === params.email)
     }
     if (params?.limit) {
-      items = items.slice(0, params.limit);
+      items = items.slice(0, params.limit)
     }
     return {
       data: items,
       has_more: false,
-    };
+    }
   }
 
   async createCustomer(
     _accessToken: string,
     data: CreateCustomerInput,
   ): Promise<StripeCustomer> {
-    const id = this.nextId('cus');
+    const id = this.nextId('cus')
     const customer: StripeCustomer = {
       id,
       object: 'customer',
@@ -268,9 +268,9 @@ export class StubStripeAdapter implements StripeAdapter {
       created: Math.floor(Date.now() / 1000),
       livemode: false,
       tax_exempt: data.tax_exempt,
-    };
-    this.customers.set(id, customer);
-    return customer;
+    }
+    this.customers.set(id, customer)
+    return customer
   }
 
   async updateCustomer(
@@ -278,9 +278,9 @@ export class StubStripeAdapter implements StripeAdapter {
     customerId: string,
     updates: UpdateCustomerInput,
   ): Promise<StripeCustomer> {
-    const customer = this.customers.get(customerId);
+    const customer = this.customers.get(customerId)
     if (!customer) {
-      throw new Error(`StubStripeAdapter: customer not found: ${customerId}`);
+      throw new Error(`StubStripeAdapter: customer not found: ${customerId}`)
     }
     const updated: StripeCustomer = {
       ...customer,
@@ -302,64 +302,64 @@ export class StubStripeAdapter implements StripeAdapter {
         : customer.address,
       metadata: updates.metadata ?? customer.metadata,
       tax_exempt: updates.tax_exempt ?? customer.tax_exempt,
-    };
-    this.customers.set(customerId, updated);
-    return updated;
+    }
+    this.customers.set(customerId, updated)
+    return updated
   }
 
   async getCharge(
     _accessToken: string,
     chargeId: string,
   ): Promise<StripeCharge> {
-    const charge = this.charges.get(chargeId);
+    const charge = this.charges.get(chargeId)
     if (!charge) {
-      throw new Error(`StubStripeAdapter: charge not found: ${chargeId}`);
+      throw new Error(`StubStripeAdapter: charge not found: ${chargeId}`)
     }
-    return charge;
+    return charge
   }
 
   async listCharges(
     _accessToken: string,
     params?: ListChargesParams,
   ): Promise<PaginatedResponse<StripeCharge>> {
-    let items = [...this.charges.values()];
+    let items = [...this.charges.values()]
     if (params?.customer) {
-      items = items.filter((c) => c.customer === params.customer);
+      items = items.filter((c) => c.customer === params.customer)
     }
     if (params?.limit) {
-      items = items.slice(0, params.limit);
+      items = items.slice(0, params.limit)
     }
     return {
       data: items,
       has_more: false,
-    };
+    }
   }
 
   async createRefund(
     _accessToken: string,
     data: CreateRefundInput,
   ): Promise<StripeCharge> {
-    let charge: StripeCharge | undefined;
+    let charge: StripeCharge | undefined
     if (data.charge) {
-      charge = this.charges.get(data.charge);
+      charge = this.charges.get(data.charge)
     } else if (data.payment_intent) {
       charge = [...this.charges.values()].find(
         (c) => c.payment_intent === data.payment_intent,
-      );
+      )
     }
     if (!charge) {
       throw new Error(
         `StubStripeAdapter: charge not found for refund: ${data.charge ?? data.payment_intent}`,
-      );
+      )
     }
-    const refundAmount = data.amount ?? charge.amount;
+    const refundAmount = data.amount ?? charge.amount
     const updated: StripeCharge = {
       ...charge,
       amount_refunded: refundAmount,
       refunded: refundAmount >= charge.amount,
-    };
-    this.charges.set(charge.id, updated);
-    return updated;
+    }
+    this.charges.set(charge.id, updated)
+    return updated
   }
 
   async getPaymentIntent(
@@ -368,11 +368,11 @@ export class StubStripeAdapter implements StripeAdapter {
   ): Promise<StripePaymentIntent> {
     const charge = [...this.charges.values()].find(
       (c) => c.payment_intent === intentId,
-    );
+    )
     if (!charge) {
       throw new Error(
         `StubStripeAdapter: payment intent not found: ${intentId}`,
-      );
+      )
     }
     return {
       id: intentId,
@@ -392,45 +392,45 @@ export class StubStripeAdapter implements StripeAdapter {
       created: charge.created,
       livemode: false,
       receipt_email: charge.receipt_email,
-    };
+    }
   }
 
   async getInvoice(
     _accessToken: string,
     invoiceId: string,
   ): Promise<StripeInvoice> {
-    const invoice = this.invoices.get(invoiceId);
+    const invoice = this.invoices.get(invoiceId)
     if (!invoice) {
-      throw new Error(`StubStripeAdapter: invoice not found: ${invoiceId}`);
+      throw new Error(`StubStripeAdapter: invoice not found: ${invoiceId}`)
     }
-    return invoice;
+    return invoice
   }
 
   async listInvoices(
     _accessToken: string,
     params?: ListInvoicesParams,
   ): Promise<PaginatedResponse<StripeInvoice>> {
-    let items = [...this.invoices.values()];
+    let items = [...this.invoices.values()]
     if (params?.customer) {
-      items = items.filter((i) => i.customer === params.customer);
+      items = items.filter((i) => i.customer === params.customer)
     }
     if (params?.status) {
-      items = items.filter((i) => i.status === params.status);
+      items = items.filter((i) => i.status === params.status)
     }
     if (params?.limit) {
-      items = items.slice(0, params.limit);
+      items = items.slice(0, params.limit)
     }
     return {
       data: items,
       has_more: false,
-    };
+    }
   }
 
   async createCheckoutSession(
     _accessToken: string,
     data: CreateCheckoutSessionInput,
   ): Promise<StripeCheckoutSession> {
-    const id = this.nextId('cs');
+    const id = this.nextId('cs')
     const session: StripeCheckoutSession = {
       id,
       object: 'checkout.session',
@@ -442,17 +442,13 @@ export class StubStripeAdapter implements StripeAdapter {
       amount_total: data.line_items?.reduce(
         (sum, item) =>
           sum +
-          (item.price_data
-            ? item.price_data.unit_amount * item.quantity
-            : 0),
+          (item.price_data ? item.price_data.unit_amount * item.quantity : 0),
         0,
       ),
       amount_subtotal: data.line_items?.reduce(
         (sum, item) =>
           sum +
-          (item.price_data
-            ? item.price_data.unit_amount * item.quantity
-            : 0),
+          (item.price_data ? item.price_data.unit_amount * item.quantity : 0),
         0,
       ),
       currency: data.line_items?.[0]?.price_data?.currency ?? 'usd',
@@ -465,12 +461,12 @@ export class StubStripeAdapter implements StripeAdapter {
       created: Math.floor(Date.now() / 1000),
       expires_at: Math.floor(Date.now() / 1000) + 1800,
       livemode: false,
-    };
-    return session;
+    }
+    return session
   }
 }
 
 /**
  * Singleton stub instance for development and testing.
  */
-export const stubStripeAdapter = new StubStripeAdapter();
+export const stubStripeAdapter = new StubStripeAdapter()

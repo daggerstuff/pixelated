@@ -107,7 +107,9 @@ describe('oAuthTokenResponseSchema', () => {
   })
 
   it('rejects missing access_token', () => {
-    expect(() => oAuthTokenResponseSchema.parse({ token_type: 'Bearer' })).toThrow()
+    expect(() =>
+      oAuthTokenResponseSchema.parse({ token_type: 'Bearer' }),
+    ).toThrow()
   })
 
   it('rejects non-positive expires_in', () => {
@@ -127,7 +129,10 @@ describe('oAuthTokenResponseSchema', () => {
 
   it('rejects invalid expires_at datetime', () => {
     expect(() =>
-      oAuthTokenResponseSchema.parse({ access_token: 'tok', expires_at: 'not-a-date' }),
+      oAuthTokenResponseSchema.parse({
+        access_token: 'tok',
+        expires_at: 'not-a-date',
+      }),
     ).toThrow()
   })
 })
@@ -163,7 +168,9 @@ describe('oAuthConfigSchema', () => {
   })
 
   it('rejects invalid provider', () => {
-    expect(() => oAuthConfigSchema.parse({ ...valid, provider: 'slack' })).toThrow()
+    expect(() =>
+      oAuthConfigSchema.parse({ ...valid, provider: 'slack' }),
+    ).toThrow()
   })
 
   it('rejects empty clientId', () => {
@@ -171,11 +178,15 @@ describe('oAuthConfigSchema', () => {
   })
 
   it('rejects empty clientSecret', () => {
-    expect(() => oAuthConfigSchema.parse({ ...valid, clientSecret: '' })).toThrow()
+    expect(() =>
+      oAuthConfigSchema.parse({ ...valid, clientSecret: '' }),
+    ).toThrow()
   })
 
   it('rejects non-URL redirectUri', () => {
-    expect(() => oAuthConfigSchema.parse({ ...valid, redirectUri: 'not-a-url' })).toThrow()
+    expect(() =>
+      oAuthConfigSchema.parse({ ...valid, redirectUri: 'not-a-url' }),
+    ).toThrow()
   })
 
   it('rejects empty scopes array', () => {
@@ -183,11 +194,15 @@ describe('oAuthConfigSchema', () => {
   })
 
   it('rejects non-URL authorizeUrl', () => {
-    expect(() => oAuthConfigSchema.parse({ ...valid, authorizeUrl: 'bad' })).toThrow()
+    expect(() =>
+      oAuthConfigSchema.parse({ ...valid, authorizeUrl: 'bad' }),
+    ).toThrow()
   })
 
   it('rejects non-URL tokenUrl', () => {
-    expect(() => oAuthConfigSchema.parse({ ...valid, tokenUrl: 'bad' })).toThrow()
+    expect(() =>
+      oAuthConfigSchema.parse({ ...valid, tokenUrl: 'bad' }),
+    ).toThrow()
   })
 
   it('rejects non-URL refreshTokenUrl', () => {
@@ -229,11 +244,15 @@ describe('oAuthStateSchema', () => {
   })
 
   it('rejects invalid provider', () => {
-    expect(() => oAuthStateSchema.parse({ ...valid, provider: 'foo' })).toThrow()
+    expect(() =>
+      oAuthStateSchema.parse({ ...valid, provider: 'foo' }),
+    ).toThrow()
   })
 
   it('rejects invalid createdAt', () => {
-    expect(() => oAuthStateSchema.parse({ ...valid, createdAt: 'bad' })).toThrow()
+    expect(() =>
+      oAuthStateSchema.parse({ ...valid, createdAt: 'bad' }),
+    ).toThrow()
   })
 })
 
@@ -274,15 +293,21 @@ describe('oAuthConnectionSchema', () => {
   })
 
   it('rejects empty accessToken', () => {
-    expect(() => oAuthConnectionSchema.parse({ ...valid, accessToken: '' })).toThrow()
+    expect(() =>
+      oAuthConnectionSchema.parse({ ...valid, accessToken: '' }),
+    ).toThrow()
   })
 
   it('rejects empty connectedBy', () => {
-    expect(() => oAuthConnectionSchema.parse({ ...valid, connectedBy: '' })).toThrow()
+    expect(() =>
+      oAuthConnectionSchema.parse({ ...valid, connectedBy: '' }),
+    ).toThrow()
   })
 
   it('rejects invalid connectedAt', () => {
-    expect(() => oAuthConnectionSchema.parse({ ...valid, connectedAt: 'bad' })).toThrow()
+    expect(() =>
+      oAuthConnectionSchema.parse({ ...valid, connectedAt: 'bad' }),
+    ).toThrow()
   })
 
   it('rejects invalid expiresAt', () => {
@@ -328,19 +353,27 @@ describe('webhookEventSchema', () => {
   })
 
   it('rejects empty eventType', () => {
-    expect(() => webhookEventSchema.parse({ ...valid, eventType: '' })).toThrow()
+    expect(() =>
+      webhookEventSchema.parse({ ...valid, eventType: '' }),
+    ).toThrow()
   })
 
   it('rejects empty signature', () => {
-    expect(() => webhookEventSchema.parse({ ...valid, signature: '' })).toThrow()
+    expect(() =>
+      webhookEventSchema.parse({ ...valid, signature: '' }),
+    ).toThrow()
   })
 
   it('rejects invalid provider', () => {
-    expect(() => webhookEventSchema.parse({ ...valid, provider: 'foo' })).toThrow()
+    expect(() =>
+      webhookEventSchema.parse({ ...valid, provider: 'foo' }),
+    ).toThrow()
   })
 
   it('rejects invalid receivedAt', () => {
-    expect(() => webhookEventSchema.parse({ ...valid, receivedAt: 'bad' })).toThrow()
+    expect(() =>
+      webhookEventSchema.parse({ ...valid, receivedAt: 'bad' }),
+    ).toThrow()
   })
 })
 
@@ -382,29 +415,47 @@ describe('webhookResultSchema', () => {
 
   it('rejects httpStatus below 100', () => {
     expect(() =>
-      webhookResultSchema.parse({ processed: true, eventId: 'e', httpStatus: 99 }),
+      webhookResultSchema.parse({
+        processed: true,
+        eventId: 'e',
+        httpStatus: 99,
+      }),
     ).toThrow()
   })
 
   it('rejects httpStatus above 599', () => {
     expect(() =>
-      webhookResultSchema.parse({ processed: true, eventId: 'e', httpStatus: 600 }),
+      webhookResultSchema.parse({
+        processed: true,
+        eventId: 'e',
+        httpStatus: 600,
+      }),
     ).toThrow()
   })
 
   it('rejects non-integer httpStatus', () => {
     expect(() =>
-      webhookResultSchema.parse({ processed: true, eventId: 'e', httpStatus: 200.5 }),
+      webhookResultSchema.parse({
+        processed: true,
+        eventId: 'e',
+        httpStatus: 200.5,
+      }),
     ).toThrow()
   })
 
   it('rejects missing processed', () => {
-    expect(() => webhookResultSchema.parse({ eventId: 'e', httpStatus: 200 })).toThrow()
+    expect(() =>
+      webhookResultSchema.parse({ eventId: 'e', httpStatus: 200 }),
+    ).toThrow()
   })
 
   it('rejects empty eventId', () => {
     expect(() =>
-      webhookResultSchema.parse({ processed: true, eventId: '', httpStatus: 200 }),
+      webhookResultSchema.parse({
+        processed: true,
+        eventId: '',
+        httpStatus: 200,
+      }),
     ).toThrow()
   })
 })
@@ -463,7 +514,9 @@ describe('webhookSignatureConfigSchema', () => {
   })
 
   it('rejects empty secret', () => {
-    expect(() => webhookSignatureConfigSchema.parse({ ...valid, secret: '' })).toThrow()
+    expect(() =>
+      webhookSignatureConfigSchema.parse({ ...valid, secret: '' }),
+    ).toThrow()
   })
 
   it('rejects invalid provider', () => {
@@ -479,7 +532,12 @@ describe('webhookSignatureConfigSchema', () => {
 
 describe('integrationStatusSchema', () => {
   it('accepts all valid statuses', () => {
-    for (const s of ['connected', 'disconnected', 'error', 'pending'] as const) {
+    for (const s of [
+      'connected',
+      'disconnected',
+      'error',
+      'pending',
+    ] as const) {
       expect(integrationStatusSchema.parse(s)).toBe(s)
     }
   })
@@ -598,7 +656,12 @@ describe('marketplaceProviderSchema', () => {
   })
 
   it('accepts all valid categories', () => {
-    for (const c of ['scheduling', 'video', 'payments', 'communications'] as const) {
+    for (const c of [
+      'scheduling',
+      'video',
+      'payments',
+      'communications',
+    ] as const) {
       expect(
         marketplaceProviderSchema.parse({ ...valid, category: c }).category,
       ).toBe(c)
@@ -681,7 +744,12 @@ describe('tenantProviderStatusSchema', () => {
     expect(() =>
       tenantProviderStatusSchema.parse({
         ...valid,
-        featureFlag: { tenantId: '', provider: 'zoom', updatedAt: 'x', updatedBy: 'u' },
+        featureFlag: {
+          tenantId: '',
+          provider: 'zoom',
+          updatedAt: 'x',
+          updatedBy: 'u',
+        },
       }),
     ).toThrow()
   })
@@ -800,10 +868,12 @@ describe('integrationAuditMetadataSchema', () => {
 
   it('accepts all valid statuses', () => {
     expect(
-      integrationAuditMetadataSchema.parse({ ...valid, status: 'failure' }).status,
+      integrationAuditMetadataSchema.parse({ ...valid, status: 'failure' })
+        .status,
     ).toBe('failure')
     expect(
-      integrationAuditMetadataSchema.parse({ ...valid, status: 'success' }).status,
+      integrationAuditMetadataSchema.parse({ ...valid, status: 'success' })
+        .status,
     ).toBe('success')
   })
 

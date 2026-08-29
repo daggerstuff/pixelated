@@ -6,14 +6,31 @@
  *       application-level validation before calling adapter methods.
  */
 
-import { z } from 'zod';
-import type { ZoomAdapter } from './adapter';
+import { z } from 'zod'
+
+import { EHRAuditService } from '../../audit/ehr-audit-service'
+import { EHRAuditAction, EHRResourceType } from '../../audit/events'
+import type {
+  OAuthTokenResponse,
+  OAuthConfig,
+  OAuthConnection,
+  WebhookEvent,
+  WebhookResult,
+  WebhookSignatureConfig,
+} from '../types'
+import { oAuthTokenResponseSchema } from '../types'
+import {
+  verifyWebhookSignature,
+  checkIdempotency,
+  buildSignatureConfig,
+} from '../webhooks'
+import type { ZoomAdapter } from './adapter'
 import type {
   ZoomUser,
   ZoomMeeting,
   ZoomRecording,
   ZoomOAuthConfig,
-} from './types';
+} from './types'
 import {
   zoomUserSchema,
   zoomMeetingSchema,
@@ -25,19 +42,7 @@ import {
   ZOOM_PROVIDER_NAME,
   ZOOM_OAUTH_SCOPES,
   ZOOM_WEBHOOK_EVENTS,
-} from './types';
-import type {
-  OAuthTokenResponse,
-  OAuthConfig,
-  OAuthConnection,
-  WebhookEvent,
-  WebhookResult,
-  WebhookSignatureConfig,
-} from '../types';
-import { oAuthTokenResponseSchema } from '../types';
-import { EHRAuditService } from '../../audit/ehr-audit-service';
-import { EHRAuditAction, EHRResourceType } from '../../audit/events';
-import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '../webhooks';
+} from './types'
 
 // ---------------------------------------------------------------------------
 // Service configuration
@@ -47,9 +52,9 @@ import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '
  * Configuration for the ZoomService.
  */
 export interface ZoomServiceConfig {
-  adapter: ZoomAdapter;
-  oauthConfig: ZoomOAuthConfig;
-  webhookSecret: string;
+  adapter: ZoomAdapter
+  oauthConfig: ZoomOAuthConfig
+  webhookSecret: string
 }
 
 // ---------------------------------------------------------------------------
@@ -66,16 +71,16 @@ export interface ZoomServiceConfig {
  * - Process webhook events with signature verification and idempotency
  */
 export class ZoomService {
-  private readonly adapter: ZoomAdapter;
-  private readonly oauthConfig: ZoomOAuthConfig;
-  private readonly webhookSecret: string;
-  private readonly auditService: EHRAuditService;
+  private readonly adapter: ZoomAdapter
+  private readonly oauthConfig: ZoomOAuthConfig
+  private readonly webhookSecret: string
+  private readonly auditService: EHRAuditService
 
   constructor(config: ZoomServiceConfig) {
-    this.adapter = config.adapter;
-    this.oauthConfig = zoomOAuthConfigSchema.parse(config.oauthConfig);
-    this.webhookSecret = config.webhookSecret;
-    this.auditService = EHRAuditService.getInstance();
+    this.adapter = config.adapter
+    this.oauthConfig = zoomOAuthConfigSchema.parse(config.oauthConfig)
+    this.webhookSecret = config.webhookSecret
+    this.auditService = EHRAuditService.getInstance()
   }
 
   // -----------------------------------------------------------------------
@@ -94,8 +99,8 @@ export class ZoomService {
       response_type: 'code',
       scope: this.oauthConfig.scopes.join(' '),
       state,
-    });
-    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`;
+    })
+    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`
   }
 
   /**
@@ -108,7 +113,7 @@ export class ZoomService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
@@ -117,15 +122,17 @@ export class ZoomService {
         redirect_uri: this.oauthConfig.redirectUri,
         code,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Zoom token exchange failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Zoom token exchange failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   /**
@@ -137,7 +144,7 @@ export class ZoomService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
@@ -145,15 +152,17 @@ export class ZoomService {
         client_secret: this.oauthConfig.clientSecret,
         refresh_token: refreshToken,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Zoom token refresh failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Zoom token refresh failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   // -----------------------------------------------------------------------
@@ -168,8 +177,8 @@ export class ZoomService {
     tenantId: string,
     userId: string,
   ): Promise<ZoomUser> {
-    const raw = await this.adapter.getCurrentUser(accessToken);
-    const validated = zoomUserSchema.parse(raw);
+    const raw = await this.adapter.getCurrentUser(accessToken)
+    const validated = zoomUserSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -184,9 +193,9 @@ export class ZoomService {
           resourceId: validated.id,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -198,10 +207,10 @@ export class ZoomService {
     userId: string,
     params?: Parameters<ZoomAdapter['listMeetings']>[1],
   ): Promise<{ data: ZoomMeeting[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listMeetings(accessToken, params);
-    const validatedData = z.array(zoomMeetingSchema).parse(raw.data);
+    const raw = await this.adapter.listMeetings(accessToken, params)
+    const validatedData = z.array(zoomMeetingSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   /**
@@ -213,8 +222,8 @@ export class ZoomService {
     userId: string,
     meetingId: string,
   ): Promise<ZoomMeeting> {
-    const raw = await this.adapter.getMeeting(accessToken, meetingId);
-    const validated = zoomMeetingSchema.parse(raw);
+    const raw = await this.adapter.getMeeting(accessToken, meetingId)
+    const validated = zoomMeetingSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -229,9 +238,9 @@ export class ZoomService {
           resourceId: meetingId,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -243,8 +252,8 @@ export class ZoomService {
     userId: string,
     meetingData: Parameters<ZoomAdapter['createMeeting']>[1],
   ): Promise<ZoomMeeting> {
-    const raw = await this.adapter.createMeeting(accessToken, meetingData);
-    const validated = zoomMeetingSchema.parse(raw);
+    const raw = await this.adapter.createMeeting(accessToken, meetingData)
+    const validated = zoomMeetingSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -259,9 +268,9 @@ export class ZoomService {
           resourceId: String(validated.id),
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -274,7 +283,7 @@ export class ZoomService {
     meetingId: string,
     updates: Parameters<ZoomAdapter['updateMeeting']>[2],
   ): Promise<void> {
-    await this.adapter.updateMeeting(accessToken, meetingId, updates);
+    await this.adapter.updateMeeting(accessToken, meetingId, updates)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -289,7 +298,7 @@ export class ZoomService {
           resourceId: meetingId,
         },
       },
-    );
+    )
   }
 
   /**
@@ -301,7 +310,7 @@ export class ZoomService {
     userId: string,
     meetingId: string,
   ): Promise<void> {
-    await this.adapter.deleteMeeting(accessToken, meetingId);
+    await this.adapter.deleteMeeting(accessToken, meetingId)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -316,7 +325,7 @@ export class ZoomService {
           resourceId: meetingId,
         },
       },
-    );
+    )
   }
 
   /**
@@ -328,10 +337,10 @@ export class ZoomService {
     userId: string,
     params?: Parameters<ZoomAdapter['listRecordings']>[1],
   ): Promise<{ data: ZoomRecording[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listRecordings(accessToken, params);
-    const validatedData = z.array(zoomRecordingSchema).parse(raw.data);
+    const raw = await this.adapter.listRecordings(accessToken, params)
+    const validatedData = z.array(zoomRecordingSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   // -----------------------------------------------------------------------
@@ -342,7 +351,7 @@ export class ZoomService {
    * Build the webhook signature config for Zoom.
    */
   getWebhookSignatureConfig(): WebhookSignatureConfig {
-    return buildSignatureConfig(ZOOM_PROVIDER_NAME, this.webhookSecret);
+    return buildSignatureConfig(ZOOM_PROVIDER_NAME, this.webhookSecret)
   }
 
   /**
@@ -355,7 +364,7 @@ export class ZoomService {
     userId: string,
     requestUrl?: string,
   ): Promise<WebhookResult> {
-    const sigConfig = this.getWebhookSignatureConfig();
+    const sigConfig = this.getWebhookSignatureConfig()
 
     // 1) Verify signature
     const isValid = verifyWebhookSignature(
@@ -363,7 +372,7 @@ export class ZoomService {
       event.rawBody,
       event.signature,
       requestUrl,
-    );
+    )
     if (!isValid) {
       await this.auditService.log(
         EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -379,25 +388,28 @@ export class ZoomService {
             resourceId: event.eventId,
           },
         },
-      );
+      )
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: false,
         error: 'Signature verification failed',
         httpStatus: 401,
-      };
+      }
     }
 
     // 2) Check idempotency
-    const isDuplicate = await checkIdempotency(ZOOM_PROVIDER_NAME, event.eventId);
+    const isDuplicate = await checkIdempotency(
+      ZOOM_PROVIDER_NAME,
+      event.eventId,
+    )
     if (isDuplicate) {
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: true,
         httpStatus: 200,
-      };
+      }
     }
 
     // 3) Audit log
@@ -415,13 +427,13 @@ export class ZoomService {
           eventType: event.eventType,
         },
       },
-    );
+    )
 
     return {
       processed: true,
       eventId: event.eventId,
       duplicate: false,
       httpStatus: 200,
-    };
+    }
   }
 }

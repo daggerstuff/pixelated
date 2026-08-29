@@ -49,7 +49,9 @@ describe('MARKETPLACE_PROVIDERS', () => {
   })
 
   it('calendly has scheduling category', () => {
-    const calendly = MARKETPLACE_PROVIDERS.find((p) => p.provider === 'calendly')
+    const calendly = MARKETPLACE_PROVIDERS.find(
+      (p) => p.provider === 'calendly',
+    )
     expect(calendly?.category).toBe('scheduling')
   })
 
@@ -232,13 +234,10 @@ describe('FeatureFlagService', () => {
     })
 
     it('stores capabilities when provided', () => {
-      const flag = FeatureFlagService.set(
-        tenantId,
-        provider,
-        true,
-        'user-1',
-        ['booking', 'cancellation'],
-      )
+      const flag = FeatureFlagService.set(tenantId, provider, true, 'user-1', [
+        'booking',
+        'cancellation',
+      ])
       expect(flag.capabilities).toEqual(['booking', 'cancellation'])
     })
 
@@ -318,7 +317,12 @@ describe('ConnectionStatusService', () => {
     })
 
     it('returns the connection after setting', () => {
-      ConnectionStatusService.set(tenantId, provider, 'connected', '2025-01-15T10:00:00Z')
+      ConnectionStatusService.set(
+        tenantId,
+        provider,
+        'connected',
+        '2025-01-15T10:00:00Z',
+      )
       const conn = ConnectionStatusService.get(tenantId, provider)
       expect(conn).toBeDefined()
       expect(conn?.status).toBe('connected')
@@ -340,15 +344,29 @@ describe('ConnectionStatusService', () => {
     })
 
     it('preserves connectedAt from existing when not provided', () => {
-      ConnectionStatusService.set(tenantId, provider, 'connected', '2025-01-15T10:00:00Z')
+      ConnectionStatusService.set(
+        tenantId,
+        provider,
+        'connected',
+        '2025-01-15T10:00:00Z',
+      )
       const updated = ConnectionStatusService.set(tenantId, provider, 'error')
       expect(updated.connectedAt).toBe('2025-01-15T10:00:00Z')
       expect(updated.status).toBe('error')
     })
 
     it('preserves lastWebhookReceivedAt from existing', () => {
-      ConnectionStatusService.set(tenantId, provider, 'connected', '2025-01-15T10:00:00Z')
-      ConnectionStatusService.recordWebhook(tenantId, provider, '2025-06-15T10:00:00Z')
+      ConnectionStatusService.set(
+        tenantId,
+        provider,
+        'connected',
+        '2025-01-15T10:00:00Z',
+      )
+      ConnectionStatusService.recordWebhook(
+        tenantId,
+        provider,
+        '2025-06-15T10:00:00Z',
+      )
       const updated = ConnectionStatusService.set(tenantId, provider, 'error')
       expect(updated.lastWebhookReceivedAt).toBe('2025-06-15T10:00:00Z')
     })
@@ -380,14 +398,22 @@ describe('ConnectionStatusService', () => {
   describe('recordWebhook', () => {
     it('updates lastWebhookReceivedAt on existing connection', () => {
       ConnectionStatusService.set(tenantId, provider, 'connected')
-      ConnectionStatusService.recordWebhook(tenantId, provider, '2025-07-01T12:00:00Z')
+      ConnectionStatusService.recordWebhook(
+        tenantId,
+        provider,
+        '2025-07-01T12:00:00Z',
+      )
       const conn = ConnectionStatusService.get(tenantId, provider)
       expect(conn?.lastWebhookReceivedAt).toBe('2025-07-01T12:00:00Z')
     })
 
     it('does nothing when no connection exists', () => {
       expect(() =>
-        ConnectionStatusService.recordWebhook(tenantId, 'stripe', '2025-07-01T12:00:00Z'),
+        ConnectionStatusService.recordWebhook(
+          tenantId,
+          'stripe',
+          '2025-07-01T12:00:00Z',
+        ),
       ).not.toThrow()
       expect(ConnectionStatusService.get(tenantId, 'stripe')).toBeUndefined()
     })
@@ -401,7 +427,9 @@ describe('ConnectionStatusService', () => {
     })
 
     it('does not throw when removing non-existent connection', () => {
-      expect(() => ConnectionStatusService.remove(tenantId, 'twilio')).not.toThrow()
+      expect(() =>
+        ConnectionStatusService.remove(tenantId, 'twilio'),
+      ).not.toThrow()
     })
   })
 
@@ -472,7 +500,12 @@ describe('buildMarketplaceDashboard', () => {
   })
 
   it('reflects connected status when a connection is set', () => {
-    ConnectionStatusService.set(tenantId, 'calendly', 'connected', '2025-01-15T10:00:00Z')
+    ConnectionStatusService.set(
+      tenantId,
+      'calendly',
+      'connected',
+      '2025-01-15T10:00:00Z',
+    )
     const dash = buildMarketplaceDashboard(tenantId)
     expect(dash.totalConnected).toBe(1)
     const calendly = dash.providers.find((p) => p.provider === 'calendly')
@@ -498,14 +531,24 @@ describe('buildMarketplaceDashboard', () => {
 
   it('includes lastWebhookReceivedAt when recorded', () => {
     ConnectionStatusService.set(tenantId, 'zoom', 'connected')
-    ConnectionStatusService.recordWebhook(tenantId, 'zoom', '2025-07-01T12:00:00Z')
+    ConnectionStatusService.recordWebhook(
+      tenantId,
+      'zoom',
+      '2025-07-01T12:00:00Z',
+    )
     const dash = buildMarketplaceDashboard(tenantId)
     const zoom = dash.providers.find((p) => p.provider === 'zoom')
     expect(zoom?.lastWebhookReceivedAt).toBe('2025-07-01T12:00:00Z')
   })
 
   it('includes lastError when set', () => {
-    ConnectionStatusService.set(tenantId, 'stripe', 'error', undefined, 'timeout')
+    ConnectionStatusService.set(
+      tenantId,
+      'stripe',
+      'error',
+      undefined,
+      'timeout',
+    )
     const dash = buildMarketplaceDashboard(tenantId)
     const stripe = dash.providers.find((p) => p.provider === 'stripe')
     expect(stripe?.status).toBe('error')

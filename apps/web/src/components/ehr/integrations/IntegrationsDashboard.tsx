@@ -31,10 +31,7 @@ interface ProvidersApiResponse {
   providers: MarketplaceProvider[]
 }
 
-async function fetchJson<T>(
-  url: string,
-  options?: RequestInit,
-): Promise<T> {
+async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
@@ -76,7 +73,9 @@ const IntegrationsDashboard: FC<IntegrationsDashboardProps> = ({
   const [providers, setProviders] = useState<MarketplaceProvider[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [busyProvider, setBusyProvider] = useState<IntegrationProvider | null>(null)
+  const [busyProvider, setBusyProvider] = useState<IntegrationProvider | null>(
+    null,
+  )
 
   // --- Fetch dashboard + providers -----------------------------------------
 
@@ -89,7 +88,9 @@ const IntegrationsDashboard: FC<IntegrationsDashboardProps> = ({
       setDashboard(marketplaceDashboardSchema.parse(dashRes.dashboard))
       setProviders(provRes.providers)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load integrations')
+      setError(
+        err instanceof Error ? err.message : 'Failed to load integrations',
+      )
     } finally {
       setLoading(false)
     }
@@ -115,7 +116,9 @@ const IntegrationsDashboard: FC<IntegrationsDashboardProps> = ({
         setProviders(provRes.providers)
       } catch (err) {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : 'Failed to load integrations')
+          setError(
+            err instanceof Error ? err.message : 'Failed to load integrations',
+          )
         }
       } finally {
         if (!cancelled) setLoading(false)
@@ -171,10 +174,13 @@ const IntegrationsDashboard: FC<IntegrationsDashboardProps> = ({
         if (onToggleFeatureFlag) {
           onToggleFeatureFlag(provider, enabled)
         } else {
-          await fetchJson(`${apiBaseUrl}/feature-flags/${tenantId}/${provider}`, {
-            method: 'PUT',
-            body: JSON.stringify({ enabled }),
-          })
+          await fetchJson(
+            `${apiBaseUrl}/feature-flags/${tenantId}/${provider}`,
+            {
+              method: 'PUT',
+              body: JSON.stringify({ enabled }),
+            },
+          )
         }
         await loadDashboard()
       } catch (err) {
@@ -278,7 +284,10 @@ const IntegrationsDashboard: FC<IntegrationsDashboardProps> = ({
           aria-label="Refresh dashboard"
         >
           {loading ? (
-            <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+            <Loader2
+              size={16}
+              style={{ animation: 'spin 1s linear infinite' }}
+            />
           ) : (
             <RefreshCw size={16} />
           )}
@@ -325,7 +334,8 @@ const IntegrationsDashboard: FC<IntegrationsDashboardProps> = ({
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
+          gridTemplateColumns:
+            'repeat(auto-fill, minmax(min(100%, 340px), 1fr))',
           gap: 16,
           padding: 16,
         }}

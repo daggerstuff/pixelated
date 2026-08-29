@@ -13,12 +13,8 @@ import type {
   CreateMeetingInput,
   UpdateMeetingInput,
   PaginatedResponse,
-} from './adapter';
-import type {
-  ZoomUser,
-  ZoomMeeting,
-  ZoomRecording,
-} from './types';
+} from './adapter'
+import type { ZoomUser, ZoomMeeting, ZoomRecording } from './types'
 
 /**
  * In-memory stub implementation of the Zoom adapter.
@@ -27,14 +23,14 @@ import type {
  * All responses match the Zod schemas defined in types.ts.
  */
 export class StubZoomAdapter implements ZoomAdapter {
-  readonly name = 'stub-zoom';
+  readonly name = 'stub-zoom'
 
-  private readonly meetings: Map<string, ZoomMeeting> = new Map();
-  private readonly recordings: Map<string, ZoomRecording> = new Map();
-  private idCounter = 0;
+  private readonly meetings: Map<string, ZoomMeeting> = new Map()
+  private readonly recordings: Map<string, ZoomRecording> = new Map()
+  private idCounter = 0
 
   constructor() {
-    this.seedTestData();
+    this.seedTestData()
   }
 
   /**
@@ -63,8 +59,8 @@ export class StubZoomAdapter implements ZoomAdapter {
         waiting_room: true,
         auto_recording: 'cloud',
       },
-    };
-    this.meetings.set(String(meeting1.id), meeting1);
+    }
+    this.meetings.set(String(meeting1.id), meeting1)
 
     const meeting2: ZoomMeeting = {
       id: 100000002,
@@ -88,8 +84,8 @@ export class StubZoomAdapter implements ZoomAdapter {
         waiting_room: true,
         auto_recording: 'none',
       },
-    };
-    this.meetings.set(String(meeting2.id), meeting2);
+    }
+    this.meetings.set(String(meeting2.id), meeting2)
 
     const recording1: ZoomRecording = {
       id: 'stub-recording-001',
@@ -117,18 +113,18 @@ export class StubZoomAdapter implements ZoomAdapter {
       account_id: 'stub-account-001',
       created_at: '2025-06-15T10:45:00.000Z',
       updated_at: '2025-06-15T10:45:00.000Z',
-    };
-    this.recordings.set(recording1.id, recording1);
+    }
+    this.recordings.set(recording1.id, recording1)
   }
 
   private nextId(prefix: string): string {
-    this.idCounter += 1;
-    return `${prefix}-${this.idCounter.toString().padStart(3, '0')}`;
+    this.idCounter += 1
+    return `${prefix}-${this.idCounter.toString().padStart(3, '0')}`
   }
 
   async getCurrentUser(accessToken: string): Promise<ZoomUser> {
     if (!accessToken) {
-      throw new Error('StubZoomAdapter: accessToken is required');
+      throw new Error('StubZoomAdapter: accessToken is required')
     }
     return {
       id: 'stub-user-001',
@@ -145,47 +141,47 @@ export class StubZoomAdapter implements ZoomAdapter {
       status: 'active',
       created_at: '2025-01-01T00:00:00.000Z',
       last_login_time: '2025-06-01T00:00:00.000Z',
-    };
+    }
   }
 
   async listMeetings(
     _accessToken: string,
     params?: ListMeetingsParams,
   ): Promise<PaginatedResponse<ZoomMeeting>> {
-    let items = [...this.meetings.values()];
+    let items = [...this.meetings.values()]
     if (params?.type) {
       // Zoom meeting type 2 = scheduled; stub treats all as scheduled
       if (params.type === 'scheduled') {
-        items = items.filter((m) => m.type === 2);
+        items = items.filter((m) => m.type === 2)
       } else if (params.type === 'live') {
-        items = items.filter((m) => m.type === 1);
+        items = items.filter((m) => m.type === 1)
       } else if (params.type === 'upcoming') {
-        items = items.filter((m) => m.type === 2);
+        items = items.filter((m) => m.type === 2)
       }
     }
     return {
       data: items,
       pagination: { count: items.length },
-    };
+    }
   }
 
   async getMeeting(
     _accessToken: string,
     meetingId: string,
   ): Promise<ZoomMeeting> {
-    const meeting = this.meetings.get(meetingId);
+    const meeting = this.meetings.get(meetingId)
     if (!meeting) {
-      throw new Error(`StubZoomAdapter: meeting not found: ${meetingId}`);
+      throw new Error(`StubZoomAdapter: meeting not found: ${meetingId}`)
     }
-    return meeting;
+    return meeting
   }
 
   async createMeeting(
     _accessToken: string,
     meetingData: CreateMeetingInput,
   ): Promise<ZoomMeeting> {
-    const id = this.nextId('meeting');
-    const numericId = 200000000 + this.idCounter;
+    const id = this.nextId('meeting')
+    const numericId = 200000000 + this.idCounter
     const meeting: ZoomMeeting = {
       id: numericId,
       topic: meetingData.topic,
@@ -210,9 +206,9 @@ export class StubZoomAdapter implements ZoomAdapter {
             auto_recording: meetingData.settings.auto_recording,
           }
         : undefined,
-    };
-    this.meetings.set(String(meeting.id), meeting);
-    return meeting;
+    }
+    this.meetings.set(String(meeting.id), meeting)
+    return meeting
   }
 
   async updateMeeting(
@@ -220,9 +216,9 @@ export class StubZoomAdapter implements ZoomAdapter {
     meetingId: string,
     updates: UpdateMeetingInput,
   ): Promise<void> {
-    const meeting = this.meetings.get(meetingId);
+    const meeting = this.meetings.get(meetingId)
     if (!meeting) {
-      throw new Error(`StubZoomAdapter: meeting not found: ${meetingId}`);
+      throw new Error(`StubZoomAdapter: meeting not found: ${meetingId}`)
     }
     const updated: ZoomMeeting = {
       ...meeting,
@@ -244,39 +240,36 @@ export class StubZoomAdapter implements ZoomAdapter {
           }
         : meeting.settings,
       updated_at: new Date().toISOString(),
-    };
-    this.meetings.set(meetingId, updated);
+    }
+    this.meetings.set(meetingId, updated)
   }
 
-  async deleteMeeting(
-    _accessToken: string,
-    meetingId: string,
-  ): Promise<void> {
+  async deleteMeeting(_accessToken: string, meetingId: string): Promise<void> {
     if (!this.meetings.has(meetingId)) {
-      throw new Error(`StubZoomAdapter: meeting not found: ${meetingId}`);
+      throw new Error(`StubZoomAdapter: meeting not found: ${meetingId}`)
     }
-    this.meetings.delete(meetingId);
+    this.meetings.delete(meetingId)
   }
 
   async listRecordings(
     _accessToken: string,
     params?: ListRecordingsParams,
   ): Promise<PaginatedResponse<ZoomRecording>> {
-    let items = [...this.recordings.values()];
+    let items = [...this.recordings.values()]
     if (params?.from) {
-      items = items.filter((r) => r.start_time >= params.from!);
+      items = items.filter((r) => r.start_time >= params.from!)
     }
     if (params?.to) {
-      items = items.filter((r) => r.start_time <= params.to!);
+      items = items.filter((r) => r.start_time <= params.to!)
     }
     return {
       data: items,
       pagination: { count: items.length },
-    };
+    }
   }
 }
 
 /**
  * Singleton stub instance for development and testing.
  */
-export const stubZoomAdapter = new StubZoomAdapter();
+export const stubZoomAdapter = new StubZoomAdapter()

@@ -4,8 +4,9 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createHmac } from 'node:crypto'
+
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // ---------------------------------------------------------------------------
 // Hoisted mock fixtures (available inside vi.mock factories)
@@ -28,7 +29,12 @@ const { mockRedisGet, mockRedisSetex, mockRedisSet } = vi.hoisted(() => ({
 // ---------------------------------------------------------------------------
 
 vi.mock('@/lib/redis', () => ({
-  redis: { get: mockRedisGet, set: mockRedisSet, setex: mockRedisSetex, del: vi.fn().mockResolvedValue(1) },
+  redis: {
+    get: mockRedisGet,
+    set: mockRedisSet,
+    setex: mockRedisSetex,
+    del: vi.fn().mockResolvedValue(1),
+  },
 }))
 
 vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
@@ -57,17 +63,22 @@ function makeStripeSignature(
   timestamp: number = 1717200000,
 ): string {
   const dataToSign = `${timestamp}.${rawBody}`
-  const signature = createHmac('sha256', secret).update(dataToSign, 'utf8').digest('hex')
+  const signature = createHmac('sha256', secret)
+    .update(dataToSign, 'utf8')
+    .digest('hex')
   return `t=${timestamp},v1=${signature}`
 }
 
-function makeWebhookEvent(overrides: Partial<{
-  eventId: string
-  eventType: string
-  rawBody: string
-  signature: string
-}> = {}) {
-  const rawBody = overrides.rawBody ?? '{"id":"evt_001","type":"payment_intent.succeeded"}'
+function makeWebhookEvent(
+  overrides: Partial<{
+    eventId: string
+    eventType: string
+    rawBody: string
+    signature: string
+  }> = {},
+) {
+  const rawBody =
+    overrides.rawBody ?? '{"id":"evt_001","type":"payment_intent.succeeded"}'
   return {
     provider: 'stripe' as const,
     eventId: overrides.eventId ?? 'evt_001',
@@ -84,7 +95,11 @@ function mockFetchResponse(body: unknown, ok = true, status = 200) {
     ok,
     status,
     json: vi.fn().mockResolvedValue(body),
-    text: vi.fn().mockResolvedValue(typeof body === 'string' ? body : JSON.stringify(body)),
+    text: vi
+      .fn()
+      .mockResolvedValue(
+        typeof body === 'string' ? body : JSON.stringify(body),
+      ),
   }
 }
 
@@ -93,7 +108,9 @@ function mockFetchResponse(body: unknown, ok = true, status = 200) {
 // ---------------------------------------------------------------------------
 
 describe('StripeService', () => {
-  let service: InstanceType<typeof import('../stripe/stripe-service').StripeService>
+  let service: InstanceType<
+    typeof import('../stripe/stripe-service').StripeService
+  >
   let StubStripeAdapter: typeof import('../stripe/stub-adapter').StubStripeAdapter
   let StripeService: typeof import('../stripe/stripe-service').StripeService
 
@@ -199,7 +216,9 @@ describe('StripeService', () => {
 
     it('uses the configured authorizeUrl as base', () => {
       const url = service.buildAuthorizeUrl('s')
-      expect(url.startsWith('https://connect.stripe.com/oauth/authorize')).toBe(true)
+      expect(url.startsWith('https://connect.stripe.com/oauth/authorize')).toBe(
+        true,
+      )
     })
   })
 
@@ -216,7 +235,10 @@ describe('StripeService', () => {
         refresh_token: 'tok_refresh_456',
         scope: 'read_only',
       }
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)))
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)),
+      )
 
       const result = await service.exchangeCodeForToken('auth_code_abc')
       expect(result.access_token).toBe('tok_access_123')
@@ -228,7 +250,9 @@ describe('StripeService', () => {
     it('throws on non-ok response', async () => {
       vi.stubGlobal(
         'fetch',
-        vi.fn().mockResolvedValue(mockFetchResponse('invalid_grant', false, 400)),
+        vi
+          .fn()
+          .mockResolvedValue(mockFetchResponse('invalid_grant', false, 400)),
       )
       await expect(service.exchangeCodeForToken('bad_code')).rejects.toThrow(
         'Stripe token exchange failed (400)',
@@ -244,16 +268,20 @@ describe('StripeService', () => {
     })
 
     it('sends correct form-encoded body', async () => {
-      const mockFetch = vi.fn().mockResolvedValue(
-        mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
-      )
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValue(
+          mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
+        )
       vi.stubGlobal('fetch', mockFetch)
 
       await service.exchangeCodeForToken('my_code')
       expect(mockFetch).toHaveBeenCalledTimes(1)
       const [, init] = mockFetch.mock.calls[0]
       expect(init.method).toBe('POST')
-      expect(init.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
+      expect(init.headers['Content-Type']).toBe(
+        'application/x-www-form-urlencoded',
+      )
       const bodyStr = init.body.toString()
       expect(bodyStr).toContain('grant_type=authorization_code')
       expect(bodyStr).toContain('client_id=ca_test_client')
@@ -273,7 +301,10 @@ describe('StripeService', () => {
         expires_in: 7200,
         refresh_token: 'tok_new_refresh',
       }
-      vi.stubGlobal('fetch', vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)))
+      vi.stubGlobal(
+        'fetch',
+        vi.fn().mockResolvedValue(mockFetchResponse(tokenResponse)),
+      )
 
       const result = await service.refreshToken('old_refresh_token')
       expect(result.access_token).toBe('tok_new_access')
@@ -291,9 +322,11 @@ describe('StripeService', () => {
     })
 
     it('sends refresh_token grant type', async () => {
-      const mockFetch = vi.fn().mockResolvedValue(
-        mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
-      )
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValue(
+          mockFetchResponse({ access_token: 'tok', token_type: 'Bearer' }),
+        )
       vi.stubGlobal('fetch', mockFetch)
 
       await service.refreshToken('rt_123')
@@ -310,7 +343,12 @@ describe('StripeService', () => {
 
   describe('getCustomer', () => {
     it('returns a validated customer and logs audit', async () => {
-      const result = await service.getCustomer('tok', 'tenant-1', 'user-1', 'cus_stub001')
+      const result = await service.getCustomer(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'cus_stub001',
+      )
       expect(result.id).toBe('cus_stub001')
       expect(result.email).toBe('patient1@example.com')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -368,7 +406,12 @@ describe('StripeService', () => {
 
   describe('getCharge', () => {
     it('returns a validated charge and logs audit', async () => {
-      const result = await service.getCharge('tok', 'tenant-1', 'user-1', 'ch_stub001')
+      const result = await service.getCharge(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'ch_stub001',
+      )
       expect(result.id).toBe('ch_stub001')
       expect(result.amount).toBe(15000)
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -404,7 +447,12 @@ describe('StripeService', () => {
 
   describe('getPaymentIntent', () => {
     it('returns a validated payment intent and logs audit', async () => {
-      const result = await service.getPaymentIntent('tok', 'tenant-1', 'user-1', 'pi_stub001')
+      const result = await service.getPaymentIntent(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'pi_stub001',
+      )
       expect(result.id).toBe('pi_stub001')
       expect(result.amount).toBe(15000)
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -413,7 +461,12 @@ describe('StripeService', () => {
 
   describe('getInvoice', () => {
     it('returns a validated invoice and logs audit', async () => {
-      const result = await service.getInvoice('tok', 'tenant-1', 'user-1', 'in_stub001')
+      const result = await service.getInvoice(
+        'tok',
+        'tenant-1',
+        'user-1',
+        'in_stub001',
+      )
       expect(result.id).toBe('in_stub001')
       expect(result.status).toBe('paid')
       expect(mockAuditLog).toHaveBeenCalledTimes(1)
@@ -431,21 +484,26 @@ describe('StripeService', () => {
 
   describe('createCheckoutSession', () => {
     it('creates a checkout session and logs audit', async () => {
-      const result = await service.createCheckoutSession('tok', 'tenant-1', 'user-1', {
-        mode: 'payment',
-        success_url: 'https://example.com/success',
-        cancel_url: 'https://example.com/cancel',
-        line_items: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: { name: 'Therapy' },
-              unit_amount: 15000,
+      const result = await service.createCheckoutSession(
+        'tok',
+        'tenant-1',
+        'user-1',
+        {
+          mode: 'payment',
+          success_url: 'https://example.com/success',
+          cancel_url: 'https://example.com/cancel',
+          line_items: [
+            {
+              price_data: {
+                currency: 'usd',
+                product_data: { name: 'Therapy' },
+                unit_amount: 15000,
+              },
+              quantity: 1,
             },
-            quantity: 1,
-          },
-        ],
-      })
+          ],
+        },
+      )
       expect(result.id).toMatch(/^cs_stub/)
       expect(result.mode).toBe('payment')
       expect(result.amount_total).toBe(15000)

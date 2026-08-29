@@ -19,7 +19,8 @@ import {
 // ---------------------------------------------------------------------------
 
 const VALID_TOKEN = 'stub-access-token'
-const SEEDED_EVENT_URI = 'https://api.calendly.com/scheduled_events/stub-event-001'
+const SEEDED_EVENT_URI =
+  'https://api.calendly.com/scheduled_events/stub-event-001'
 const SEEDED_EVENT_TYPE_URI = 'https://api.calendly.com/event_types/stub-30min'
 
 // ---------------------------------------------------------------------------
@@ -84,7 +85,9 @@ describe('StubCalendlyAdapter', () => {
     })
 
     it('filters by active=false returns empty', async () => {
-      const result = await adapter.listEventTypes(VALID_TOKEN, { active: false })
+      const result = await adapter.listEventTypes(VALID_TOKEN, {
+        active: false,
+      })
       expect(result.data).toHaveLength(0)
       expect(result.pagination.count).toBe(0)
     })
@@ -101,18 +104,22 @@ describe('StubCalendlyAdapter', () => {
 
   describe('getScheduledEvent', () => {
     it('returns seeded event by URI', async () => {
-      const event = await adapter.getScheduledEvent(VALID_TOKEN, SEEDED_EVENT_URI)
+      const event = await adapter.getScheduledEvent(
+        VALID_TOKEN,
+        SEEDED_EVENT_URI,
+      )
       const parsed = calendlyScheduledEventSchema.parse(event)
       expect(parsed.uri).toBe(SEEDED_EVENT_URI)
       expect(parsed.status).toBe('active')
     })
 
     it('throws for unknown event URI', async () => {
+      await expect(adapter.getCurrentUser(VALID_TOKEN)).resolves.toBeDefined()
       await expect(
-        adapter.getCurrentUser(VALID_TOKEN),
-      ).resolves.toBeDefined()
-      await expect(
-        adapter.getScheduledEvent(VALID_TOKEN, 'https://api.calendly.com/scheduled_events/nonexistent'),
+        adapter.getScheduledEvent(
+          VALID_TOKEN,
+          'https://api.calendly.com/scheduled_events/nonexistent',
+        ),
       ).rejects.toThrow('scheduled event not found')
     })
   })
@@ -198,7 +205,10 @@ describe('StubCalendlyAdapter', () => {
       expect(result.eventUri).toBe(SEEDED_EVENT_URI)
 
       // Verify state mutation
-      const event = await adapter.getScheduledEvent(VALID_TOKEN, SEEDED_EVENT_URI)
+      const event = await adapter.getScheduledEvent(
+        VALID_TOKEN,
+        SEEDED_EVENT_URI,
+      )
       expect(event.status).toBe('canceled')
       expect(event.cancellation_reason).toBe('Patient requested cancellation')
       expect(event.canceler_name).toBe('Stub User')
@@ -210,7 +220,10 @@ describe('StubCalendlyAdapter', () => {
         SEEDED_EVENT_URI,
       )
       expect(result.canceled).toBe(true)
-      const event = await adapter.getScheduledEvent(VALID_TOKEN, SEEDED_EVENT_URI)
+      const event = await adapter.getScheduledEvent(
+        VALID_TOKEN,
+        SEEDED_EVENT_URI,
+      )
       expect(event.status).toBe('canceled')
     })
 
@@ -251,7 +264,10 @@ describe('StubCalendlyAdapter', () => {
     })
 
     it('getScheduledEvent passes calendlyScheduledEventSchema', async () => {
-      const event = await adapter.getScheduledEvent(VALID_TOKEN, SEEDED_EVENT_URI)
+      const event = await adapter.getScheduledEvent(
+        VALID_TOKEN,
+        SEEDED_EVENT_URI,
+      )
       expect(() => calendlyScheduledEventSchema.parse(event)).not.toThrow()
     })
 

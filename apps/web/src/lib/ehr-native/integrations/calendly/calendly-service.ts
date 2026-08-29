@@ -6,22 +6,10 @@
  *       application-level validation before calling adapter methods.
  */
 
-import { z } from 'zod';
-import type { CalendlyAdapter } from './adapter';
-import type {
-  CalendlyUser,
-  CalendlyEventType,
-  CalendlyScheduledEvent,
-  CalendlyInvitee,
-  CalendlyOAuthConfig,
-} from './types';
-import {
-  calendlyUserSchema,
-  calendlyEventTypeSchema,
-  calendlyScheduledEventSchema,
-  calendlyInviteeSchema,
-  calendlyOAuthConfigSchema,
-} from './types';
+import { z } from 'zod'
+
+import { EHRAuditService } from '../../audit/ehr-audit-service'
+import { EHRAuditAction, EHRResourceType } from '../../audit/events'
 import type {
   OAuthTokenResponse,
   OAuthConfig,
@@ -29,11 +17,28 @@ import type {
   WebhookEvent,
   WebhookResult,
   WebhookSignatureConfig,
-} from '../types';
-import { oAuthTokenResponseSchema } from '../types';
-import { EHRAuditService } from '../../audit/ehr-audit-service';
-import { EHRAuditAction, EHRResourceType } from '../../audit/events';
-import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '../webhooks';
+} from '../types'
+import { oAuthTokenResponseSchema } from '../types'
+import {
+  verifyWebhookSignature,
+  checkIdempotency,
+  buildSignatureConfig,
+} from '../webhooks'
+import type { CalendlyAdapter } from './adapter'
+import type {
+  CalendlyUser,
+  CalendlyEventType,
+  CalendlyScheduledEvent,
+  CalendlyInvitee,
+  CalendlyOAuthConfig,
+} from './types'
+import {
+  calendlyUserSchema,
+  calendlyEventTypeSchema,
+  calendlyScheduledEventSchema,
+  calendlyInviteeSchema,
+  calendlyOAuthConfigSchema,
+} from './types'
 
 // ---------------------------------------------------------------------------
 // Service configuration
@@ -43,9 +48,9 @@ import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '
  * Configuration for the CalendlyService.
  */
 export interface CalendlyServiceConfig {
-  adapter: CalendlyAdapter;
-  oauthConfig: CalendlyOAuthConfig;
-  webhookSecret: string;
+  adapter: CalendlyAdapter
+  oauthConfig: CalendlyOAuthConfig
+  webhookSecret: string
 }
 
 // ---------------------------------------------------------------------------
@@ -62,16 +67,16 @@ export interface CalendlyServiceConfig {
  * - Process webhook events with signature verification and idempotency
  */
 export class CalendlyService {
-  private readonly adapter: CalendlyAdapter;
-  private readonly oauthConfig: CalendlyOAuthConfig;
-  private readonly webhookSecret: string;
-  private readonly auditService: EHRAuditService;
+  private readonly adapter: CalendlyAdapter
+  private readonly oauthConfig: CalendlyOAuthConfig
+  private readonly webhookSecret: string
+  private readonly auditService: EHRAuditService
 
   constructor(config: CalendlyServiceConfig) {
-    this.adapter = config.adapter;
-    this.oauthConfig = calendlyOAuthConfigSchema.parse(config.oauthConfig);
-    this.webhookSecret = config.webhookSecret;
-    this.auditService = EHRAuditService.getInstance();
+    this.adapter = config.adapter
+    this.oauthConfig = calendlyOAuthConfigSchema.parse(config.oauthConfig)
+    this.webhookSecret = config.webhookSecret
+    this.auditService = EHRAuditService.getInstance()
   }
 
   // -----------------------------------------------------------------------
@@ -90,8 +95,8 @@ export class CalendlyService {
       response_type: 'code',
       scope: this.oauthConfig.scopes.join(' '),
       state,
-    });
-    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`;
+    })
+    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`
   }
 
   /**
@@ -104,7 +109,7 @@ export class CalendlyService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
@@ -113,15 +118,17 @@ export class CalendlyService {
         redirect_uri: this.oauthConfig.redirectUri,
         code,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Calendly token exchange failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Calendly token exchange failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   /**
@@ -133,7 +140,7 @@ export class CalendlyService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
@@ -141,15 +148,17 @@ export class CalendlyService {
         client_secret: this.oauthConfig.clientSecret,
         refresh_token: refreshToken,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Calendly token refresh failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Calendly token refresh failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   // -----------------------------------------------------------------------
@@ -164,8 +173,8 @@ export class CalendlyService {
     tenantId: string,
     userId: string,
   ): Promise<CalendlyUser> {
-    const raw = await this.adapter.getCurrentUser(accessToken);
-    const validated = calendlyUserSchema.parse(raw);
+    const raw = await this.adapter.getCurrentUser(accessToken)
+    const validated = calendlyUserSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -180,9 +189,9 @@ export class CalendlyService {
           resourceId: validated.uri,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -194,10 +203,10 @@ export class CalendlyService {
     userId: string,
     params?: Parameters<CalendlyAdapter['listEventTypes']>[1],
   ): Promise<{ data: CalendlyEventType[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listEventTypes(accessToken, params);
-    const validatedData = z.array(calendlyEventTypeSchema).parse(raw.data);
+    const raw = await this.adapter.listEventTypes(accessToken, params)
+    const validatedData = z.array(calendlyEventTypeSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   /**
@@ -209,8 +218,8 @@ export class CalendlyService {
     userId: string,
     eventUri: string,
   ): Promise<CalendlyScheduledEvent> {
-    const raw = await this.adapter.getScheduledEvent(accessToken, eventUri);
-    const validated = calendlyScheduledEventSchema.parse(raw);
+    const raw = await this.adapter.getScheduledEvent(accessToken, eventUri)
+    const validated = calendlyScheduledEventSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -225,9 +234,9 @@ export class CalendlyService {
           resourceId: eventUri,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -238,11 +247,14 @@ export class CalendlyService {
     tenantId: string,
     userId: string,
     params?: Parameters<CalendlyAdapter['listScheduledEvents']>[1],
-  ): Promise<{ data: CalendlyScheduledEvent[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listScheduledEvents(accessToken, params);
-    const validatedData = z.array(calendlyScheduledEventSchema).parse(raw.data);
+  ): Promise<{
+    data: CalendlyScheduledEvent[]
+    pagination: { count: number }
+  }> {
+    const raw = await this.adapter.listScheduledEvents(accessToken, params)
+    const validatedData = z.array(calendlyScheduledEventSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   /**
@@ -255,10 +267,10 @@ export class CalendlyService {
     eventUri: string,
     params?: Parameters<CalendlyAdapter['listInvitees']>[2],
   ): Promise<{ data: CalendlyInvitee[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listInvitees(accessToken, eventUri, params);
-    const validatedData = z.array(calendlyInviteeSchema).parse(raw.data);
+    const raw = await this.adapter.listInvitees(accessToken, eventUri, params)
+    const validatedData = z.array(calendlyInviteeSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   /**
@@ -275,7 +287,7 @@ export class CalendlyService {
       accessToken,
       eventUri,
       cancellationReason,
-    );
+    )
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -290,9 +302,9 @@ export class CalendlyService {
           resourceId: eventUri,
         },
       },
-    );
+    )
 
-    return result;
+    return result
   }
 
   // -----------------------------------------------------------------------
@@ -303,7 +315,7 @@ export class CalendlyService {
    * Build the webhook signature config for Calendly.
    */
   getWebhookSignatureConfig(): WebhookSignatureConfig {
-    return buildSignatureConfig('calendly', this.webhookSecret);
+    return buildSignatureConfig('calendly', this.webhookSecret)
   }
 
   /**
@@ -316,7 +328,7 @@ export class CalendlyService {
     userId: string,
     requestUrl?: string,
   ): Promise<WebhookResult> {
-    const sigConfig = this.getWebhookSignatureConfig();
+    const sigConfig = this.getWebhookSignatureConfig()
 
     // 1) Verify signature
     const isValid = verifyWebhookSignature(
@@ -324,7 +336,7 @@ export class CalendlyService {
       event.rawBody,
       event.signature,
       requestUrl,
-    );
+    )
     if (!isValid) {
       await this.auditService.log(
         EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -340,25 +352,25 @@ export class CalendlyService {
             resourceId: event.eventId,
           },
         },
-      );
+      )
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: false,
         error: 'Signature verification failed',
         httpStatus: 401,
-      };
+      }
     }
 
     // 2) Check idempotency
-    const isDuplicate = await checkIdempotency('calendly', event.eventId);
+    const isDuplicate = await checkIdempotency('calendly', event.eventId)
     if (isDuplicate) {
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: true,
         httpStatus: 200,
-      };
+      }
     }
 
     // 3) Audit log
@@ -376,13 +388,13 @@ export class CalendlyService {
           eventType: event.eventType,
         },
       },
-    );
+    )
 
     return {
       processed: true,
       eventId: event.eventId,
       duplicate: false,
       httpStatus: 200,
-    };
+    }
   }
 }

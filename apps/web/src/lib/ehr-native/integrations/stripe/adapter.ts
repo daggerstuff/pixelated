@@ -13,145 +13,145 @@ import type {
   StripePaymentIntent,
   StripeInvoice,
   StripeCheckoutSession,
-} from './types';
+} from './types'
 
 /**
  * Parameters for listing customers.
  */
 export interface ListCustomersParams {
-  email?: string;
-  limit?: number;
-  starting_after?: string;
-  ending_before?: string;
+  email?: string
+  limit?: number
+  starting_after?: string
+  ending_before?: string
   created?: {
-    gt?: number;
-    gte?: number;
-    lt?: number;
-    lte?: number;
-  };
+    gt?: number
+    gte?: number
+    lt?: number
+    lte?: number
+  }
 }
 
 /**
  * Input for creating a new customer.
  */
 export interface CreateCustomerInput {
-  email?: string;
-  name?: string;
-  phone?: string;
-  description?: string;
-  currency?: string;
+  email?: string
+  name?: string
+  phone?: string
+  description?: string
+  currency?: string
   address?: {
-    city?: string;
-    country?: string;
-    line1?: string;
-    line2?: string;
-    postal_code?: string;
-    state?: string;
-  };
-  metadata?: Record<string, string>;
-  invoice_prefix?: string;
-  tax_exempt?: 'none' | 'exempt' | 'reverse';
+    city?: string
+    country?: string
+    line1?: string
+    line2?: string
+    postal_code?: string
+    state?: string
+  }
+  metadata?: Record<string, string>
+  invoice_prefix?: string
+  tax_exempt?: 'none' | 'exempt' | 'reverse'
 }
 
 /**
  * Input for updating an existing customer.
  */
 export interface UpdateCustomerInput {
-  email?: string;
-  name?: string;
-  phone?: string;
-  description?: string;
-  currency?: string;
+  email?: string
+  name?: string
+  phone?: string
+  description?: string
+  currency?: string
   address?: {
-    city?: string;
-    country?: string;
-    line1?: string;
-    line2?: string;
-    postal_code?: string;
-    state?: string;
-  };
-  metadata?: Record<string, string>;
-  invoice_prefix?: string;
-  tax_exempt?: 'none' | 'exempt' | 'reverse';
+    city?: string
+    country?: string
+    line1?: string
+    line2?: string
+    postal_code?: string
+    state?: string
+  }
+  metadata?: Record<string, string>
+  invoice_prefix?: string
+  tax_exempt?: 'none' | 'exempt' | 'reverse'
 }
 
 /**
  * Parameters for listing charges.
  */
 export interface ListChargesParams {
-  customer?: string;
-  limit?: number;
-  starting_after?: string;
-  ending_before?: string;
+  customer?: string
+  limit?: number
+  starting_after?: string
+  ending_before?: string
   created?: {
-    gt?: number;
-    gte?: number;
-    lt?: number;
-    lte?: number;
-  };
+    gt?: number
+    gte?: number
+    lt?: number
+    lte?: number
+  }
 }
 
 /**
  * Input for creating a refund.
  */
 export interface CreateRefundInput {
-  charge?: string;
-  payment_intent?: string;
-  amount?: number;
-  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';
-  metadata?: Record<string, string>;
+  charge?: string
+  payment_intent?: string
+  amount?: number
+  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer'
+  metadata?: Record<string, string>
 }
 
 /**
  * Parameters for listing invoices.
  */
 export interface ListInvoicesParams {
-  customer?: string;
-  status?: 'draft' | 'open' | 'paid' | 'uncollectible' | 'void';
-  limit?: number;
-  starting_after?: string;
-  ending_before?: string;
+  customer?: string
+  status?: 'draft' | 'open' | 'paid' | 'uncollectible' | 'void'
+  limit?: number
+  starting_after?: string
+  ending_before?: string
   created?: {
-    gt?: number;
-    gte?: number;
-    lt?: number;
-    lte?: number;
-  };
+    gt?: number
+    gte?: number
+    lt?: number
+    lte?: number
+  }
 }
 
 /**
  * Input for creating a checkout session.
  */
 export interface CreateCheckoutSessionInput {
-  mode: 'payment' | 'setup' | 'subscription';
-  success_url: string;
-  cancel_url: string;
+  mode: 'payment' | 'setup' | 'subscription'
+  success_url: string
+  cancel_url: string
   line_items?: Array<{
-    price?: string;
+    price?: string
     price_data?: {
-      currency: string;
+      currency: string
       product_data: {
-        name: string;
-        description?: string;
-      };
-      unit_amount: number;
-    };
-    quantity: number;
-  }>;
-  customer?: string;
-  customer_email?: string;
-  metadata?: Record<string, string>;
-  payment_method_types?: string[];
-  expires_at?: number;
+        name: string
+        description?: string
+      }
+      unit_amount: number
+    }
+    quantity: number
+  }>
+  customer?: string
+  customer_email?: string
+  metadata?: Record<string, string>
+  payment_method_types?: string[]
+  expires_at?: number
 }
 
 /**
  * Paginated response wrapper for Stripe API list endpoints.
  */
 export interface PaginatedResponse<T> {
-  data: T[];
-  has_more: boolean;
-  url?: string;
+  data: T[]
+  has_more: boolean
+  url?: string
 }
 
 /**
@@ -165,13 +165,13 @@ export interface PaginatedResponse<T> {
  */
 export interface StripeAdapter {
   /** Adapter identifier — 'stripe' for production, 'stub-stripe' for stub. */
-  readonly name: string;
+  readonly name: string
 
   /**
    * Retrieve a customer by ID.
    * @see https://docs.stripe.com/api/customers/retrieve
    */
-  getCustomer(accessToken: string, customerId: string): Promise<StripeCustomer>;
+  getCustomer(accessToken: string, customerId: string): Promise<StripeCustomer>
 
   /**
    * List customers with optional filtering.
@@ -180,7 +180,7 @@ export interface StripeAdapter {
   listCustomers(
     accessToken: string,
     params?: ListCustomersParams,
-  ): Promise<PaginatedResponse<StripeCustomer>>;
+  ): Promise<PaginatedResponse<StripeCustomer>>
 
   /**
    * Create a new customer.
@@ -189,7 +189,7 @@ export interface StripeAdapter {
   createCustomer(
     accessToken: string,
     data: CreateCustomerInput,
-  ): Promise<StripeCustomer>;
+  ): Promise<StripeCustomer>
 
   /**
    * Update an existing customer.
@@ -199,13 +199,13 @@ export interface StripeAdapter {
     accessToken: string,
     customerId: string,
     updates: UpdateCustomerInput,
-  ): Promise<StripeCustomer>;
+  ): Promise<StripeCustomer>
 
   /**
    * Retrieve a charge by ID.
    * @see https://docs.stripe.com/api/charges/retrieve
    */
-  getCharge(accessToken: string, chargeId: string): Promise<StripeCharge>;
+  getCharge(accessToken: string, chargeId: string): Promise<StripeCharge>
 
   /**
    * List charges with optional filtering.
@@ -214,7 +214,7 @@ export interface StripeAdapter {
   listCharges(
     accessToken: string,
     params?: ListChargesParams,
-  ): Promise<PaginatedResponse<StripeCharge>>;
+  ): Promise<PaginatedResponse<StripeCharge>>
 
   /**
    * Create a refund for a charge or payment intent.
@@ -223,7 +223,7 @@ export interface StripeAdapter {
   createRefund(
     accessToken: string,
     data: CreateRefundInput,
-  ): Promise<StripeCharge>;
+  ): Promise<StripeCharge>
 
   /**
    * Retrieve a payment intent by ID.
@@ -232,13 +232,13 @@ export interface StripeAdapter {
   getPaymentIntent(
     accessToken: string,
     intentId: string,
-  ): Promise<StripePaymentIntent>;
+  ): Promise<StripePaymentIntent>
 
   /**
    * Retrieve an invoice by ID.
    * @see https://docs.stripe.com/api/invoices/retrieve
    */
-  getInvoice(accessToken: string, invoiceId: string): Promise<StripeInvoice>;
+  getInvoice(accessToken: string, invoiceId: string): Promise<StripeInvoice>
 
   /**
    * List invoices with optional filtering.
@@ -247,7 +247,7 @@ export interface StripeAdapter {
   listInvoices(
     accessToken: string,
     params?: ListInvoicesParams,
-  ): Promise<PaginatedResponse<StripeInvoice>>;
+  ): Promise<PaginatedResponse<StripeInvoice>>
 
   /**
    * Create a checkout session.
@@ -256,5 +256,5 @@ export interface StripeAdapter {
   createCheckoutSession(
     accessToken: string,
     data: CreateCheckoutSessionInput,
-  ): Promise<StripeCheckoutSession>;
+  ): Promise<StripeCheckoutSession>
 }

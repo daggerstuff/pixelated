@@ -1,10 +1,10 @@
 // Integration Marketplace Routes
 // OAuth callbacks, webhook endpoints, status dashboard, feature flags
 
-import express, { Router, Request, Response } from 'express'
 import crypto from 'crypto'
 
-import { redis } from '../../lib/redis'
+import express, { Router, Request, Response } from 'express'
+
 import { EHRAuditService } from '../../lib/ehr-native/audit/ehr-audit-service'
 import {
   EHRAuditAction,
@@ -28,6 +28,7 @@ import {
   buildSignatureConfig,
   processWebhook,
 } from '../../lib/ehr-native/integrations/webhooks'
+import { redis } from '../../lib/redis'
 
 const router: Router = express.Router()
 
@@ -182,9 +183,7 @@ router.get(
         .json({ error: 'OAuth authorization denied', detail: error })
     }
     if (!code || !state) {
-      return res
-        .status(400)
-        .json({ error: 'Missing code or state parameter' })
+      return res.status(400).json({ error: 'Missing code or state parameter' })
     }
 
     let stateData: { tenantId: string; returnUrl?: string; nonce?: string }
@@ -223,7 +222,7 @@ router.get(
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Basic ${Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64')}`,
+          'Authorization': `Basic ${Buffer.from(`${config.clientId}:${config.clientSecret}`).toString('base64')}`,
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
@@ -386,12 +385,12 @@ router.post(
             : (req.headers['x-twilio-signature'] as string)
 
     if (!signatureHeader) {
-      return res
-        .status(401)
-        .json({ error: 'Missing webhook signature header' })
+      return res.status(401).json({ error: 'Missing webhook signature header' })
     }
 
-    const rawBody = (req as Request & { rawBody?: string }).rawBody ?? JSON.stringify(req.body)
+    const rawBody =
+      (req as Request & { rawBody?: string }).rawBody ??
+      JSON.stringify(req.body)
     const body = req.body as Record<string, unknown>
 
     const eventId =
@@ -404,9 +403,7 @@ router.post(
       crypto.randomUUID()
 
     const eventType =
-      (body['event'] as string) ??
-      (body['type'] as string) ??
-      'unknown'
+      (body['event'] as string) ?? (body['type'] as string) ?? 'unknown'
 
     const event: WebhookEvent = {
       provider,

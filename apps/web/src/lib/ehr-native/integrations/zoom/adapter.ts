@@ -7,79 +7,79 @@
  *       adapter would make real HTTP calls to the Zoom API.
  */
 
-import type { ZoomUser, ZoomMeeting, ZoomRecording } from './types';
+import type { ZoomUser, ZoomMeeting, ZoomRecording } from './types'
 
 /**
  * Parameters for listing meetings.
  */
 export interface ListMeetingsParams {
-  type?: 'scheduled' | 'live' | 'upcoming';
-  page_size?: number;
-  next_page_token?: string;
+  type?: 'scheduled' | 'live' | 'upcoming'
+  page_size?: number
+  next_page_token?: string
 }
 
 /**
  * Parameters for listing recordings.
  */
 export interface ListRecordingsParams {
-  from?: string;
-  to?: string;
-  page_size?: number;
-  next_page_token?: string;
-  trash?: boolean;
+  from?: string
+  to?: string
+  page_size?: number
+  next_page_token?: string
+  trash?: boolean
 }
 
 /**
  * Input for creating a new meeting.
  */
 export interface CreateMeetingInput {
-  topic: string;
-  type: number;
-  start_time?: string;
-  duration?: number;
-  timezone?: string;
-  password?: string;
-  agenda?: string;
+  topic: string
+  type: number
+  start_time?: string
+  duration?: number
+  timezone?: string
+  password?: string
+  agenda?: string
   settings?: {
-    host_video?: boolean;
-    participant_video?: boolean;
-    join_before_host?: boolean;
-    mute_upon_entry?: boolean;
-    waiting_room?: boolean;
-    auto_recording?: 'local' | 'cloud' | 'none';
-  };
+    host_video?: boolean
+    participant_video?: boolean
+    join_before_host?: boolean
+    mute_upon_entry?: boolean
+    waiting_room?: boolean
+    auto_recording?: 'local' | 'cloud' | 'none'
+  }
 }
 
 /**
  * Input for updating an existing meeting.
  */
 export interface UpdateMeetingInput {
-  topic?: string;
-  type?: number;
-  start_time?: string;
-  duration?: number;
-  timezone?: string;
-  password?: string;
-  agenda?: string;
+  topic?: string
+  type?: number
+  start_time?: string
+  duration?: number
+  timezone?: string
+  password?: string
+  agenda?: string
   settings?: {
-    host_video?: boolean;
-    participant_video?: boolean;
-    join_before_host?: boolean;
-    mute_upon_entry?: boolean;
-    waiting_room?: boolean;
-    auto_recording?: 'local' | 'cloud' | 'none';
-  };
+    host_video?: boolean
+    participant_video?: boolean
+    join_before_host?: boolean
+    mute_upon_entry?: boolean
+    waiting_room?: boolean
+    auto_recording?: 'local' | 'cloud' | 'none'
+  }
 }
 
 /**
  * Paginated response wrapper for Zoom API list endpoints.
  */
 export interface PaginatedResponse<T> {
-  data: T[];
+  data: T[]
   pagination: {
-    count: number;
-    next_page_token?: string;
-  };
+    count: number
+    next_page_token?: string
+  }
 }
 
 /**
@@ -93,13 +93,13 @@ export interface PaginatedResponse<T> {
  */
 export interface ZoomAdapter {
   /** Adapter identifier — 'zoom' for production, 'stub-zoom' for stub. */
-  readonly name: string;
+  readonly name: string
 
   /**
    * Retrieve the authenticated user's profile.
    * @see https://developers.zoom.us/docs/api/rest/reference/user/methods#operation/getUser
    */
-  getCurrentUser(accessToken: string): Promise<ZoomUser>;
+  getCurrentUser(accessToken: string): Promise<ZoomUser>
 
   /**
    * List meetings for a user.
@@ -108,13 +108,13 @@ export interface ZoomAdapter {
   listMeetings(
     accessToken: string,
     params?: ListMeetingsParams,
-  ): Promise<PaginatedResponse<ZoomMeeting>>;
+  ): Promise<PaginatedResponse<ZoomMeeting>>
 
   /**
    * Retrieve a single meeting by ID.
    * @see https://developers.zoom.us/docs/api/rest/reference/meeting/methods#operation/meeting
    */
-  getMeeting(accessToken: string, meetingId: string): Promise<ZoomMeeting>;
+  getMeeting(accessToken: string, meetingId: string): Promise<ZoomMeeting>
 
   /**
    * Create a new meeting.
@@ -123,7 +123,7 @@ export interface ZoomAdapter {
   createMeeting(
     accessToken: string,
     meetingData: CreateMeetingInput,
-  ): Promise<ZoomMeeting>;
+  ): Promise<ZoomMeeting>
 
   /**
    * Update an existing meeting.
@@ -133,13 +133,13 @@ export interface ZoomAdapter {
     accessToken: string,
     meetingId: string,
     updates: UpdateMeetingInput,
-  ): Promise<void>;
+  ): Promise<void>
 
   /**
    * Delete a meeting.
    * @see https://developers.zoom.us/docs/api/rest/reference/meeting/methods#operation/deleteMeeting
    */
-  deleteMeeting(accessToken: string, meetingId: string): Promise<void>;
+  deleteMeeting(accessToken: string, meetingId: string): Promise<void>
 
   /**
    * List cloud recordings for a user.
@@ -148,5 +148,5 @@ export interface ZoomAdapter {
   listRecordings(
     accessToken: string,
     params?: ListRecordingsParams,
-  ): Promise<PaginatedResponse<ZoomRecording>>;
+  ): Promise<PaginatedResponse<ZoomRecording>>
 }

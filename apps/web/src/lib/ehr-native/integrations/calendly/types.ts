@@ -10,27 +10,23 @@
  *       and the adapter interface contract.
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
 // Provider constants
 // ---------------------------------------------------------------------------
 
-export const CALENDLY_PROVIDER_NAME = 'calendly' as const;
+export const CALENDLY_PROVIDER_NAME = 'calendly' as const
 
-export const CALENDLY_API_BASE_URL = 'https://api.calendly.com' as const;
+export const CALENDLY_API_BASE_URL = 'https://api.calendly.com' as const
 
-export const CALENDLY_OAUTH_SCOPES = [
-  'openid',
-  'profile',
-  'email',
-] as const;
+export const CALENDLY_OAUTH_SCOPES = ['openid', 'profile', 'email'] as const
 
 export const CALENDLY_WEBHOOK_EVENTS = [
   'invitee.created',
   'invitee.canceled',
   'routing_form_submission.created',
-] as const;
+] as const
 
 // ---------------------------------------------------------------------------
 // OAuth types (re-export from shared types for convenience)
@@ -54,9 +50,9 @@ export const calendlyUserSchema = z.object({
   avatar_url: z.string().url().optional(),
   created_at: z.string().datetime().optional(),
   updated_at: z.string().datetime().optional(),
-});
+})
 
-export type CalendlyUser = z.infer<typeof calendlyUserSchema>;
+export type CalendlyUser = z.infer<typeof calendlyUserSchema>
 
 /**
  * Calendly event type — a configurable meeting template.
@@ -77,7 +73,13 @@ export const calendlyEventTypeSchema = z.object({
     .array(
       z.object({
         name: z.string(),
-        type: z.enum(['text', 'textarea', 'phone_number', 'checkboxes', 'radio_buttons']),
+        type: z.enum([
+          'text',
+          'textarea',
+          'phone_number',
+          'checkboxes',
+          'radio_buttons',
+        ]),
         required: z.boolean(),
         answer_choices: z.array(z.string()).optional(),
       }),
@@ -85,14 +87,12 @@ export const calendlyEventTypeSchema = z.object({
     .optional(),
   profile_name: z.string().optional(),
   profile_type: z.string().optional(),
-  scheduling_links: z
-    .array(z.object({ url: z.string().url() }))
-    .optional(),
+  scheduling_links: z.array(z.object({ url: z.string().url() })).optional(),
   created_at: z.string().datetime().optional(),
   updated_at: z.string().datetime().optional(),
-});
+})
 
-export type CalendlyEventType = z.infer<typeof calendlyEventTypeSchema>;
+export type CalendlyEventType = z.infer<typeof calendlyEventTypeSchema>
 
 /**
  * Calendly scheduled event — a booked meeting.
@@ -107,7 +107,13 @@ export const calendlyScheduledEventSchema = z.object({
   event_type: z.string().url(),
   location: z
     .object({
-      type: z.enum(['physical', 'google_conference', 'zoom', 'microsoft_teams_conference', 'custom']),
+      type: z.enum([
+        'physical',
+        'google_conference',
+        'zoom',
+        'microsoft_teams_conference',
+        'custom',
+      ]),
       location: z.string().optional(),
       status: z.enum(['active', 'trying', 'failed']).optional(),
       join_url: z.string().url().optional(),
@@ -141,9 +147,11 @@ export const calendlyScheduledEventSchema = z.object({
   updated_at: z.string().datetime().optional(),
   cancellation_reason: z.string().optional(),
   canceler_name: z.string().optional(),
-});
+})
 
-export type CalendlyScheduledEvent = z.infer<typeof calendlyScheduledEventSchema>;
+export type CalendlyScheduledEvent = z.infer<
+  typeof calendlyScheduledEventSchema
+>
 
 /**
  * Calendly invitee — a person invited to a scheduled event.
@@ -185,9 +193,9 @@ export const calendlyInviteeSchema = z.object({
     .optional(),
   payment_method: z.string().optional(),
   text_notifications: z.boolean().optional(),
-});
+})
 
-export type CalendlyInvitee = z.infer<typeof calendlyInviteeSchema>;
+export type CalendlyInvitee = z.infer<typeof calendlyInviteeSchema>
 
 // ---------------------------------------------------------------------------
 // Webhook event schemas
@@ -237,9 +245,11 @@ export const calendlyWebhookPayloadSchema = z.object({
     cancellation_reason: z.string().optional(),
     canceler_name: z.string().optional(),
   }),
-});
+})
 
-export type CalendlyWebhookPayload = z.infer<typeof calendlyWebhookPayloadSchema>;
+export type CalendlyWebhookPayload = z.infer<
+  typeof calendlyWebhookPayloadSchema
+>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -250,11 +260,14 @@ export const calendlyOAuthConfigSchema = z.object({
   clientSecret: z.string().min(1),
   redirectUri: z.string().url(),
   scopes: z.array(z.string()).default([...CALENDLY_OAUTH_SCOPES]),
-  authorizeUrl: z.string().url().default('https://auth.calendly.com/oauth/authorize'),
+  authorizeUrl: z
+    .string()
+    .url()
+    .default('https://auth.calendly.com/oauth/authorize'),
   tokenUrl: z.string().url().default('https://auth.calendly.com/oauth/token'),
-});
+})
 
-export type CalendlyOAuthConfig = z.infer<typeof calendlyOAuthConfigSchema>;
+export type CalendlyOAuthConfig = z.infer<typeof calendlyOAuthConfigSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific webhook signature config
@@ -266,11 +279,11 @@ export const calendlyWebhookSignatureConfigSchema = z.object({
   secret: z.string().min(1),
   format: z.literal('stripe-composite').default('stripe-composite'),
   algorithm: z.literal('sha256').default('sha256'),
-});
+})
 
 export type CalendlyWebhookSignatureConfig = z.infer<
   typeof calendlyWebhookSignatureConfigSchema
->;
+>
 
 // ---------------------------------------------------------------------------
 // Enumerations for typed webhook events
@@ -280,6 +293,8 @@ export const calendlyWebhookEventTypeSchema = z.enum([
   'invitee.created',
   'invitee.canceled',
   'routing_form_submission.created',
-]);
+])
 
-export type CalendlyWebhookEventType = z.infer<typeof calendlyWebhookEventTypeSchema>;
+export type CalendlyWebhookEventType = z.infer<
+  typeof calendlyWebhookEventTypeSchema
+>

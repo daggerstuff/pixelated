@@ -289,7 +289,11 @@ export function ehrActionToEventType(
   ) {
     return AuditEventType.DELETE
   }
-  if (action.startsWith('hie_') || action.startsWith('clearinghouse_') || action.startsWith('integration_')) {
+  if (
+    action.startsWith('hie_') ||
+    action.startsWith('clearinghouse_') ||
+    action.startsWith('integration_')
+  ) {
     return AuditEventType.SYSTEM
   }
   if (action.startsWith('break_glass')) {

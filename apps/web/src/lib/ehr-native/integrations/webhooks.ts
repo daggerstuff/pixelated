@@ -11,84 +11,90 @@
  * `tenantId` field validated before processing.
  */
 
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import { redis } from '@/lib/redis';
+import { redis } from '@/lib/redis'
 
-import { EHRAuditService } from '../audit/ehr-audit-service';
-import { EHRAuditAction, EHRResourceType, EHRSeverity } from '../audit/events';
-import type { EHRAuditMetadata } from '../audit/events';
-
+import { EHRAuditService } from '../audit/ehr-audit-service'
+import { EHRAuditAction, EHRResourceType, EHRSeverity } from '../audit/events'
+import type { EHRAuditMetadata } from '../audit/events'
 import type {
   IntegrationProvider,
   WebhookEvent,
   WebhookResult,
   WebhookSignatureConfig,
-} from './types';
+} from './types'
 
 /** TTL (seconds) for idempotency keys in Redis. 24h covers most replay windows. */
-const IDEMPOTENCY_TTL_SECONDS = 86_400;
+const IDEMPOTENCY_TTL_SECONDS = 86_400
 
 /** Redis key prefix for webhook idempotency entries. */
-const IDEMPOTENCY_KEY_PREFIX = 'webhook:idempotency';
+const IDEMPOTENCY_KEY_PREFIX = 'webhook:idempotency'
 
 /**
  * Build a Redis key for idempotency dedup.
  * Format: `webhook:idempotency:{provider}:{eventId}`
  */
-function buildIdempotencyKey(provider: IntegrationProvider, eventId: string): string {
-  return `${IDEMPOTENCY_KEY_PREFIX}:${provider}:${eventId}`;
+function buildIdempotencyKey(
+  provider: IntegrationProvider,
+  eventId: string,
+): string {
+  return `${IDEMPOTENCY_KEY_PREFIX}:${provider}:${eventId}`
 }
 
 /**
  * Compute HMAC-SHA256 digest and return hex string.
  */
 function computeHmacSha256(data: string, secret: string): string {
-  return createHmac('sha256', secret).update(data, 'utf8').digest('hex');
+  return createHmac('sha256', secret).update(data, 'utf8').digest('hex')
 }
 
 /**
  * Constant-time hex string comparison. Both values must be same length.
  */
 function safeHexEqual(a: string, b: string): boolean {
-  const aBuf = Buffer.from(a, 'hex');
-  const bBuf = Buffer.from(b, 'hex');
-  if (aBuf.length !== bBuf.length) return false;
-  return timingSafeEqual(aBuf, bBuf);
+  const aBuf = Buffer.from(a, 'hex')
+  const bBuf = Buffer.from(b, 'hex')
+  if (aBuf.length !== bBuf.length) return false
+  return timingSafeEqual(aBuf, bBuf)
 }
 
 /**
  * Parse the Calendly signature header.
  * Format: `t=<unix-timestamp>,v1=<hex-signature>`
  */
-function parseCalendlySignature(header: string): { timestamp: string; signature: string } | null {
-  const parts = header.split(',');
-  let timestamp = '';
-  let signature = '';
+function parseCalendlySignature(
+  header: string,
+): { timestamp: string; signature: string } | null {
+  const parts = header.split(',')
+  let timestamp = ''
+  let signature = ''
   for (const part of parts) {
-    const [key, value] = part.split('=');
-    if (key === 't') timestamp = value;
-    if (key === 'v1') signature = value;
+    const [key, value] = part.split('=')
+    if (key === 't') timestamp = value
+    if (key === 'v1') signature = value
   }
-  if (!timestamp || !signature) return null;
-  return { timestamp, signature };
+  if (!timestamp || !signature) return null
+  return { timestamp, signature }
 }
 
 /**
  * Parse the Stripe signature header.
  * Format: `t=<unix-timestamp>,v1=<hex-signature>`
  */
-function parseStripeSignature(header: string): { timestamp: string; signature: string } | null {
-  const parts = header.split(',');
-  let timestamp = '';
-  let signature = '';
+function parseStripeSignature(
+  header: string,
+): { timestamp: string; signature: string } | null {
+  const parts = header.split(',')
+  let timestamp = ''
+  let signature = ''
   for (const part of parts) {
-    const [key, value] = part.split('=');
-    if (key === 't') timestamp = value;
-    if (key === 'v1') signature = value;
+    const [key, value] = part.split('=')
+    if (key === 't') timestamp = value
+    if (key === 'v1') signature = value
   }
-  if (!timestamp || !signature) return null;
-  return { timestamp, signature };
+  if (!timestamp || !signature) return null
+  return { timestamp, signature }
 }
 
 /**
@@ -96,9 +102,9 @@ function parseStripeSignature(header: string): { timestamp: string; signature: s
  * Format: `v0=<hex-signature>`
  */
 function parseZoomSignature(header: string): { signature: string } | null {
-  const [key, value] = header.split('=');
-  if (key === 'v0' && value) return { signature: value };
-  return null;
+  const [key, value] = header.split('=')
+  if (key === 'v0' && value) return { signature: value }
+  return null
 }
 
 /**
@@ -120,39 +126,45 @@ export function verifyWebhookSignature(
     case 'hmac': {
       // Zoom prefixes the signature with "v0=" — strip it before comparison.
       // This format is currently only used by Zoom, so the prefix is safe to strip.
-      const sig = signatureHeader.startsWith('v0=') ? signatureHeader.slice(3) : signatureHeader;
-      const expected = computeHmacSha256(rawBody, config.secret);
-      return safeHexEqual(expected, sig);
+      const sig = signatureHeader.startsWith('v0=')
+        ? signatureHeader.slice(3)
+        : signatureHeader
+      const expected = computeHmacSha256(rawBody, config.secret)
+      return safeHexEqual(expected, sig)
     }
 
     case 'stripe-composite': {
-      const parsed = parseCalendlySignature(signatureHeader);
-      if (!parsed) return false;
-      const dataToSign = `${parsed.timestamp}.${rawBody}`;
-      const expected = computeHmacSha256(dataToSign, config.secret);
-      return safeHexEqual(expected, parsed.signature);
+      const parsed = parseCalendlySignature(signatureHeader)
+      if (!parsed) return false
+      const dataToSign = `${parsed.timestamp}.${rawBody}`
+      const expected = computeHmacSha256(dataToSign, config.secret)
+      return safeHexEqual(expected, parsed.signature)
     }
 
     case 'twilio': {
-      if (!requestUrl) return false;
-      const params = new URLSearchParams(rawBody);
-      const sortedKeys = Array.from(params.keys()).sort();
-      const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('');
-      const dataToSign = `${requestUrl}${postParams}`;
-      const expected = createHmac('sha1', config.secret).update(dataToSign).digest('base64');
-      const aBuf = Buffer.from(expected, 'base64');
-      let bBuf: Buffer;
+      if (!requestUrl) return false
+      const params = new URLSearchParams(rawBody)
+      const sortedKeys = Array.from(params.keys()).sort()
+      const postParams = sortedKeys
+        .map((k) => `${k}${params.get(k) ?? ''}`)
+        .join('')
+      const dataToSign = `${requestUrl}${postParams}`
+      const expected = createHmac('sha1', config.secret)
+        .update(dataToSign)
+        .digest('base64')
+      const aBuf = Buffer.from(expected, 'base64')
+      let bBuf: Buffer
       try {
-        bBuf = Buffer.from(signatureHeader, 'base64');
+        bBuf = Buffer.from(signatureHeader, 'base64')
       } catch {
-        return false;
+        return false
       }
-      if (aBuf.length !== bBuf.length) return false;
-      return timingSafeEqual(aBuf, bBuf);
+      if (aBuf.length !== bBuf.length) return false
+      return timingSafeEqual(aBuf, bBuf)
     }
 
     default:
-      return false;
+      return false
   }
 }
 
@@ -165,21 +177,25 @@ export function verifyStripeSignature(
   rawBody: string,
   signatureHeader: string,
 ): boolean {
-  const parsed = parseStripeSignature(signatureHeader);
-  if (!parsed) return false;
-  const dataToSign = `${parsed.timestamp}.${rawBody}`;
-  const expected = computeHmacSha256(dataToSign, secret);
-  return safeHexEqual(expected, parsed.signature);
+  const parsed = parseStripeSignature(signatureHeader)
+  if (!parsed) return false
+  const dataToSign = `${parsed.timestamp}.${rawBody}`
+  const expected = computeHmacSha256(dataToSign, secret)
+  return safeHexEqual(expected, parsed.signature)
 }
 
 /**
  * Zoom uses a simple HMAC of the raw body.
  */
-export function verifyZoomSignature(secret: string, rawBody: string, signatureHeader: string): boolean {
-  const parsed = parseZoomSignature(signatureHeader);
-  if (!parsed) return false;
-  const expected = computeHmacSha256(rawBody, secret);
-  return safeHexEqual(expected, parsed.signature);
+export function verifyZoomSignature(
+  secret: string,
+  rawBody: string,
+  signatureHeader: string,
+): boolean {
+  const parsed = parseZoomSignature(signatureHeader)
+  if (!parsed) return false
+  const expected = computeHmacSha256(rawBody, secret)
+  return safeHexEqual(expected, parsed.signature)
 }
 
 /**
@@ -193,16 +209,16 @@ export async function checkIdempotency(
   provider: IntegrationProvider,
   eventId: string,
 ): Promise<boolean> {
-  const key = buildIdempotencyKey(provider, eventId);
+  const key = buildIdempotencyKey(provider, eventId)
   // The legacy Redis facade does not support SET NX EX semantics.
   // Use get + setex instead. This has a theoretical race window under
   // concurrent requests, but is acceptable for v1 webhook processing.
-  const existing = await redis.get(key);
+  const existing = await redis.get(key)
   if (existing !== null) {
-    return true; // duplicate — already processed
+    return true // duplicate — already processed
   }
-  await redis.setex(key, IDEMPOTENCY_TTL_SECONDS, '1');
-  return false; // not a duplicate — first occurrence
+  await redis.setex(key, IDEMPOTENCY_TTL_SECONDS, '1')
+  return false // not a duplicate — first occurrence
 }
 
 /**
@@ -225,7 +241,7 @@ function buildWebhookAuditMetadata(
     status,
     errorMessage,
     eventType,
-  };
+  }
 }
 
 /**
@@ -241,8 +257,15 @@ async function logWebhookAudit(
   errorMessage?: string,
   ipAddress?: string,
 ): Promise<void> {
-  const auditService = EHRAuditService.getInstance();
-  const metadata = buildWebhookAuditMetadata(tenantId, provider, eventId, eventType, status, errorMessage);
+  const auditService = EHRAuditService.getInstance()
+  const metadata = buildWebhookAuditMetadata(
+    tenantId,
+    provider,
+    eventId,
+    eventType,
+    status,
+    errorMessage,
+  )
   await auditService.log(
     EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
     EHRResourceType.INTEGRATION,
@@ -255,7 +278,7 @@ async function logWebhookAudit(
       metadata,
     },
     status === 'success' ? EHRSeverity.INTEGRATION : EHRSeverity.FAILED_ACCESS,
-  );
+  )
 }
 
 /**
@@ -278,7 +301,12 @@ export async function processWebhook(
   requestUrl?: string,
 ): Promise<WebhookResult> {
   // 1. Signature verification
-  const valid = verifyWebhookSignature(config, event.rawBody, event.signature, requestUrl);
+  const valid = verifyWebhookSignature(
+    config,
+    event.rawBody,
+    event.signature,
+    requestUrl,
+  )
   if (!valid) {
     await logWebhookAudit(
       tenantId,
@@ -288,25 +316,25 @@ export async function processWebhook(
       'failure',
       'system',
       'Invalid webhook signature',
-    );
+    )
     return {
       processed: false,
       eventId: event.eventId,
       duplicate: false,
       error: 'Invalid signature',
       httpStatus: 401,
-    };
+    }
   }
 
   // 2. Idempotency check
-  const isDuplicate = await checkIdempotency(event.provider, event.eventId);
+  const isDuplicate = await checkIdempotency(event.provider, event.eventId)
   if (isDuplicate) {
     return {
       processed: false,
       eventId: event.eventId,
       duplicate: true,
       httpStatus: 200,
-    };
+    }
   }
 
   // 3. Audit log
@@ -317,7 +345,7 @@ export async function processWebhook(
     event.eventType,
     'success',
     userId,
-  );
+  )
 
   // 4. Return success — caller dispatches to provider handler
   return {
@@ -325,7 +353,7 @@ export async function processWebhook(
     eventId: event.eventId,
     duplicate: false,
     httpStatus: 200,
-  };
+  }
 }
 
 /**
@@ -345,7 +373,7 @@ export function buildSignatureConfig(
         algorithm: 'sha256',
         secret: webhookSecret,
         format: 'stripe-composite',
-      };
+      }
     case 'zoom':
       return {
         provider,
@@ -353,7 +381,7 @@ export function buildSignatureConfig(
         algorithm: 'sha256',
         secret: webhookSecret,
         format: 'hmac',
-      };
+      }
     case 'stripe':
       return {
         provider,
@@ -361,7 +389,7 @@ export function buildSignatureConfig(
         algorithm: 'sha256',
         secret: webhookSecret,
         format: 'stripe-composite',
-      };
+      }
     case 'twilio':
       return {
         provider,
@@ -369,12 +397,12 @@ export function buildSignatureConfig(
         algorithm: 'sha256',
         secret: webhookSecret,
         format: 'twilio',
-      };
+      }
     default: {
-      const exhaustive: never = provider;
-      throw new Error(`Unknown provider: ${String(exhaustive)}`);
+      const exhaustive: never = provider
+      throw new Error(`Unknown provider: ${String(exhaustive)}`)
     }
   }
 }
 
-export { buildIdempotencyKey, computeHmacSha256, safeHexEqual };
+export { buildIdempotencyKey, computeHmacSha256, safeHexEqual }

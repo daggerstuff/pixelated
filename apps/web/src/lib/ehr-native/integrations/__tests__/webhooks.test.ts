@@ -38,6 +38,7 @@ vi.mock('../audit/events', () => ({
 
 import { redis } from '@/lib/redis'
 
+import type { WebhookEvent, WebhookSignatureConfig } from '../types'
 import {
   verifyWebhookSignature,
   verifyStripeSignature,
@@ -50,8 +51,6 @@ import {
   safeHexEqual,
 } from '../webhooks'
 
-import type { WebhookEvent, WebhookSignatureConfig } from '../types'
-
 // ---------------------------------------------------------------------------
 // computeHmacSha256
 // ---------------------------------------------------------------------------
@@ -63,15 +62,21 @@ describe('computeHmacSha256', () => {
   })
 
   it('produces the same output for the same inputs', () => {
-    expect(computeHmacSha256('body', 'key')).toBe(computeHmacSha256('body', 'key'))
+    expect(computeHmacSha256('body', 'key')).toBe(
+      computeHmacSha256('body', 'key'),
+    )
   })
 
   it('produces different output for different data', () => {
-    expect(computeHmacSha256('body1', 'key')).not.toBe(computeHmacSha256('body2', 'key'))
+    expect(computeHmacSha256('body1', 'key')).not.toBe(
+      computeHmacSha256('body2', 'key'),
+    )
   })
 
   it('produces different output for different secrets', () => {
-    expect(computeHmacSha256('body', 'key1')).not.toBe(computeHmacSha256('body', 'key2'))
+    expect(computeHmacSha256('body', 'key1')).not.toBe(
+      computeHmacSha256('body', 'key2'),
+    )
   })
 
   it('handles empty data', () => {
@@ -194,7 +199,9 @@ describe('verifyWebhookSignature (hmac format)', () => {
       secret,
       format: 'hmac',
     }
-    expect(verifyWebhookSignature(config, rawBody, 'invalid-signature')).toBe(false)
+    expect(verifyWebhookSignature(config, rawBody, 'invalid-signature')).toBe(
+      false,
+    )
   })
 
   it('returns false for a signature computed with a different secret', () => {
@@ -296,7 +303,9 @@ describe('verifyWebhookSignature (twilio format)', () => {
   function makeTwilioSig(url: string, body: string, key: string): string {
     const params = new URLSearchParams(body)
     const sortedKeys = Array.from(params.keys()).sort()
-    const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('')
+    const postParams = sortedKeys
+      .map((k) => `${k}${params.get(k) ?? ''}`)
+      .join('')
     const dataToSign = `${url}${postParams}`
     const expectedHex = computeHmacSha256(dataToSign, key)
     return Buffer.from(expectedHex, 'hex').toString('base64')
@@ -322,7 +331,14 @@ describe('verifyWebhookSignature (twilio format)', () => {
       secret,
       format: 'twilio',
     }
-    expect(verifyWebhookSignature(config, rawBody, 'not-valid-base64!!!', requestUrl)).toBe(false)
+    expect(
+      verifyWebhookSignature(
+        config,
+        rawBody,
+        'not-valid-base64!!!',
+        requestUrl,
+      ),
+    ).toBe(false)
   })
 
   it('returns false when requestUrl is not provided', () => {
@@ -450,7 +466,9 @@ describe('checkIdempotency', () => {
 
     const isDuplicate = await checkIdempotency('calendly', 'evt_new')
     expect(isDuplicate).toBe(false)
-    expect(redis.get).toHaveBeenCalledWith('webhook:idempotency:calendly:evt_new')
+    expect(redis.get).toHaveBeenCalledWith(
+      'webhook:idempotency:calendly:evt_new',
+    )
     expect(redis.setex).toHaveBeenCalledWith(
       'webhook:idempotency:calendly:evt_new',
       86_400,
@@ -561,7 +579,9 @@ describe('processWebhook', () => {
     const twilioBody = 'Body=hi&From=%2B1234567890'
     const params = new URLSearchParams(twilioBody)
     const sortedKeys = Array.from(params.keys()).sort()
-    const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('')
+    const postParams = sortedKeys
+      .map((k) => `${k}${params.get(k) ?? ''}`)
+      .join('')
     const dataToSign = `${url}${postParams}`
     const expectedHex = computeHmacSha256(dataToSign, twilioSecret)
     const expectedBase64 = Buffer.from(expectedHex, 'hex').toString('base64')
@@ -583,7 +603,13 @@ describe('processWebhook', () => {
       format: 'twilio',
     }
 
-    const result = await processWebhook(twilioEvent, twilioConfig, tenantId, userId, url)
+    const result = await processWebhook(
+      twilioEvent,
+      twilioConfig,
+      tenantId,
+      userId,
+      url,
+    )
     expect(result.processed).toBe(true)
   })
 
@@ -601,7 +627,12 @@ describe('processWebhook', () => {
       signature: 'some-sig',
     }
 
-    const result = await processWebhook(twilioEvent, twilioConfig, tenantId, userId)
+    const result = await processWebhook(
+      twilioEvent,
+      twilioConfig,
+      tenantId,
+      userId,
+    )
     expect(result.processed).toBe(false)
     expect(result.httpStatus).toBe(401)
   })
@@ -631,7 +662,12 @@ describe('processWebhook', () => {
       format: 'stripe-composite',
     }
 
-    const result = await processWebhook(stripeEvent, stripeConfig, tenantId, userId)
+    const result = await processWebhook(
+      stripeEvent,
+      stripeConfig,
+      tenantId,
+      userId,
+    )
     expect(result.processed).toBe(true)
     expect(result.httpStatus).toBe(200)
   })

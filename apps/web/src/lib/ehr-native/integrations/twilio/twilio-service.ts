@@ -6,32 +6,37 @@
  *       application-level validation before calling adapter methods.
  */
 
-import { z } from 'zod';
-import type { TwilioAdapter } from './adapter';
+import { z } from 'zod'
+
+import { EHRAuditService } from '../../audit/ehr-audit-service'
+import { EHRAuditAction, EHRResourceType } from '../../audit/events'
+import type {
+  OAuthTokenResponse,
+  WebhookEvent,
+  WebhookResult,
+  WebhookSignatureConfig,
+} from '../types'
+import { oAuthTokenResponseSchema } from '../types'
+import {
+  verifyWebhookSignature,
+  checkIdempotency,
+  buildSignatureConfig,
+} from '../webhooks'
+import type { TwilioAdapter } from './adapter'
 import type {
   TwilioAccount,
   TwilioMessage,
   TwilioCall,
   TwilioPhoneNumber,
   TwilioOAuthConfig,
-} from './types';
+} from './types'
 import {
   twilioAccountSchema,
   twilioMessageSchema,
   twilioCallSchema,
   twilioPhoneNumberSchema,
   twilioOAuthConfigSchema,
-} from './types';
-import type {
-  OAuthTokenResponse,
-  WebhookEvent,
-  WebhookResult,
-  WebhookSignatureConfig,
-} from '../types';
-import { oAuthTokenResponseSchema } from '../types';
-import { EHRAuditService } from '../../audit/ehr-audit-service';
-import { EHRAuditAction, EHRResourceType } from '../../audit/events';
-import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '../webhooks';
+} from './types'
 
 // ---------------------------------------------------------------------------
 // Service configuration
@@ -41,9 +46,9 @@ import { verifyWebhookSignature, checkIdempotency, buildSignatureConfig } from '
  * Configuration for the TwilioService.
  */
 export interface TwilioServiceConfig {
-  adapter: TwilioAdapter;
-  oauthConfig: TwilioOAuthConfig;
-  webhookSecret: string;
+  adapter: TwilioAdapter
+  oauthConfig: TwilioOAuthConfig
+  webhookSecret: string
 }
 
 // ---------------------------------------------------------------------------
@@ -60,16 +65,16 @@ export interface TwilioServiceConfig {
  * - Process webhook events with signature verification and idempotency
  */
 export class TwilioService {
-  private readonly adapter: TwilioAdapter;
-  private readonly oauthConfig: TwilioOAuthConfig;
-  private readonly webhookSecret: string;
-  private readonly auditService: EHRAuditService;
+  private readonly adapter: TwilioAdapter
+  private readonly oauthConfig: TwilioOAuthConfig
+  private readonly webhookSecret: string
+  private readonly auditService: EHRAuditService
 
   constructor(config: TwilioServiceConfig) {
-    this.adapter = config.adapter;
-    this.oauthConfig = twilioOAuthConfigSchema.parse(config.oauthConfig);
-    this.webhookSecret = config.webhookSecret;
-    this.auditService = EHRAuditService.getInstance();
+    this.adapter = config.adapter
+    this.oauthConfig = twilioOAuthConfigSchema.parse(config.oauthConfig)
+    this.webhookSecret = config.webhookSecret
+    this.auditService = EHRAuditService.getInstance()
   }
 
   // -----------------------------------------------------------------------
@@ -88,8 +93,8 @@ export class TwilioService {
       response_type: 'code',
       scope: this.oauthConfig.scopes.join(' '),
       state,
-    });
-    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`;
+    })
+    return `${this.oauthConfig.authorizeUrl}?${params.toString()}`
   }
 
   /**
@@ -102,7 +107,7 @@ export class TwilioService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
@@ -111,15 +116,17 @@ export class TwilioService {
         redirect_uri: this.oauthConfig.redirectUri,
         code,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Twilio token exchange failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Twilio token exchange failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   /**
@@ -131,7 +138,7 @@ export class TwilioService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
+        'Accept': 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
@@ -139,15 +146,17 @@ export class TwilioService {
         client_secret: this.oauthConfig.clientSecret,
         refresh_token: refreshToken,
       }),
-    });
+    })
 
     if (!tokenResponse.ok) {
-      const body = await tokenResponse.text();
-      throw new Error(`Twilio token refresh failed (${tokenResponse.status}): ${body}`);
+      const body = await tokenResponse.text()
+      throw new Error(
+        `Twilio token refresh failed (${tokenResponse.status}): ${body}`,
+      )
     }
 
-    const json: unknown = await tokenResponse.json();
-    return oAuthTokenResponseSchema.parse(json);
+    const json: unknown = await tokenResponse.json()
+    return oAuthTokenResponseSchema.parse(json)
   }
 
   // -----------------------------------------------------------------------
@@ -163,8 +172,8 @@ export class TwilioService {
     tenantId: string,
     userId: string,
   ): Promise<TwilioAccount> {
-    const raw = await this.adapter.getAccount(accessToken, accountSid);
-    const validated = twilioAccountSchema.parse(raw);
+    const raw = await this.adapter.getAccount(accessToken, accountSid)
+    const validated = twilioAccountSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -179,9 +188,9 @@ export class TwilioService {
           resourceId: validated.sid,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -193,10 +202,10 @@ export class TwilioService {
     userId: string,
     params?: Parameters<TwilioAdapter['listMessages']>[1],
   ): Promise<{ data: TwilioMessage[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listMessages(accessToken, params);
-    const validatedData = z.array(twilioMessageSchema).parse(raw.data);
+    const raw = await this.adapter.listMessages(accessToken, params)
+    const validatedData = z.array(twilioMessageSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   /**
@@ -208,8 +217,8 @@ export class TwilioService {
     userId: string,
     messageSid: string,
   ): Promise<TwilioMessage> {
-    const raw = await this.adapter.getMessage(accessToken, messageSid);
-    const validated = twilioMessageSchema.parse(raw);
+    const raw = await this.adapter.getMessage(accessToken, messageSid)
+    const validated = twilioMessageSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -224,9 +233,9 @@ export class TwilioService {
           resourceId: messageSid,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -238,8 +247,8 @@ export class TwilioService {
     userId: string,
     data: Parameters<TwilioAdapter['sendMessage']>[1],
   ): Promise<TwilioMessage> {
-    const raw = await this.adapter.sendMessage(accessToken, data);
-    const validated = twilioMessageSchema.parse(raw);
+    const raw = await this.adapter.sendMessage(accessToken, data)
+    const validated = twilioMessageSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -254,9 +263,9 @@ export class TwilioService {
           resourceId: validated.sid,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -268,10 +277,10 @@ export class TwilioService {
     userId: string,
     params?: Parameters<TwilioAdapter['listCalls']>[1],
   ): Promise<{ data: TwilioCall[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listCalls(accessToken, params);
-    const validatedData = z.array(twilioCallSchema).parse(raw.data);
+    const raw = await this.adapter.listCalls(accessToken, params)
+    const validatedData = z.array(twilioCallSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   /**
@@ -283,8 +292,8 @@ export class TwilioService {
     userId: string,
     callSid: string,
   ): Promise<TwilioCall> {
-    const raw = await this.adapter.getCall(accessToken, callSid);
-    const validated = twilioCallSchema.parse(raw);
+    const raw = await this.adapter.getCall(accessToken, callSid)
+    const validated = twilioCallSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -299,9 +308,9 @@ export class TwilioService {
           resourceId: callSid,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -313,8 +322,8 @@ export class TwilioService {
     userId: string,
     data: Parameters<TwilioAdapter['makeCall']>[1],
   ): Promise<TwilioCall> {
-    const raw = await this.adapter.makeCall(accessToken, data);
-    const validated = twilioCallSchema.parse(raw);
+    const raw = await this.adapter.makeCall(accessToken, data)
+    const validated = twilioCallSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_CONNECT,
@@ -329,9 +338,9 @@ export class TwilioService {
           resourceId: validated.sid,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -343,8 +352,8 @@ export class TwilioService {
     userId: string,
     phoneNumberSid: string,
   ): Promise<TwilioPhoneNumber> {
-    const raw = await this.adapter.getPhoneNumber(accessToken, phoneNumberSid);
-    const validated = twilioPhoneNumberSchema.parse(raw);
+    const raw = await this.adapter.getPhoneNumber(accessToken, phoneNumberSid)
+    const validated = twilioPhoneNumberSchema.parse(raw)
 
     await this.auditService.log(
       EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -359,9 +368,9 @@ export class TwilioService {
           resourceId: phoneNumberSid,
         },
       },
-    );
+    )
 
-    return validated;
+    return validated
   }
 
   /**
@@ -373,10 +382,10 @@ export class TwilioService {
     userId: string,
     params?: Parameters<TwilioAdapter['listPhoneNumbers']>[1],
   ): Promise<{ data: TwilioPhoneNumber[]; pagination: { count: number } }> {
-    const raw = await this.adapter.listPhoneNumbers(accessToken, params);
-    const validatedData = z.array(twilioPhoneNumberSchema).parse(raw.data);
+    const raw = await this.adapter.listPhoneNumbers(accessToken, params)
+    const validatedData = z.array(twilioPhoneNumberSchema).parse(raw.data)
 
-    return { data: validatedData, pagination: raw.pagination };
+    return { data: validatedData, pagination: raw.pagination }
   }
 
   // -----------------------------------------------------------------------
@@ -387,7 +396,7 @@ export class TwilioService {
    * Build the webhook signature config for Twilio.
    */
   getWebhookSignatureConfig(): WebhookSignatureConfig {
-    return buildSignatureConfig('twilio', this.webhookSecret);
+    return buildSignatureConfig('twilio', this.webhookSecret)
   }
 
   /**
@@ -400,7 +409,7 @@ export class TwilioService {
     userId: string,
     requestUrl?: string,
   ): Promise<WebhookResult> {
-    const sigConfig = this.getWebhookSignatureConfig();
+    const sigConfig = this.getWebhookSignatureConfig()
 
     // 1) Verify signature
     const isValid = verifyWebhookSignature(
@@ -408,7 +417,7 @@ export class TwilioService {
       event.rawBody,
       event.signature,
       requestUrl,
-    );
+    )
     if (!isValid) {
       await this.auditService.log(
         EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
@@ -424,25 +433,25 @@ export class TwilioService {
             resourceId: event.eventId,
           },
         },
-      );
+      )
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: false,
         error: 'Signature verification failed',
         httpStatus: 401,
-      };
+      }
     }
 
     // 2) Check idempotency
-    const isDuplicate = await checkIdempotency('twilio', event.eventId);
+    const isDuplicate = await checkIdempotency('twilio', event.eventId)
     if (isDuplicate) {
       return {
         processed: false,
         eventId: event.eventId,
         duplicate: true,
         httpStatus: 200,
-      };
+      }
     }
 
     // 3) Audit log
@@ -460,13 +469,13 @@ export class TwilioService {
           eventType: event.eventType,
         },
       },
-    );
+    )
 
     return {
       processed: true,
       eventId: event.eventId,
       duplicate: false,
       httpStatus: 200,
-    };
+    }
   }
 }

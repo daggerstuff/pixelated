@@ -10,20 +10,17 @@
  *       and the adapter interface contract.
  */
 
-import { z } from 'zod';
+import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
 // Provider constants
 // ---------------------------------------------------------------------------
 
-export const TWILIO_PROVIDER_NAME = 'twilio' as const;
+export const TWILIO_PROVIDER_NAME = 'twilio' as const
 
-export const TWILIO_API_BASE_URL = 'https://api.twilio.com/2010-04-01' as const;
+export const TWILIO_API_BASE_URL = 'https://api.twilio.com/2010-04-01' as const
 
-export const TWILIO_OAUTH_SCOPES = [
-  'scope:read_only',
-  'scope:write',
-] as const;
+export const TWILIO_OAUTH_SCOPES = ['scope:read_only', 'scope:write'] as const
 
 export const TWILIO_WEBHOOK_EVENTS = [
   'message.received',
@@ -33,7 +30,7 @@ export const TWILIO_WEBHOOK_EVENTS = [
   'call.ringing',
   'call.answered',
   'call.completed',
-] as const;
+] as const
 
 // ---------------------------------------------------------------------------
 // Twilio API response schemas
@@ -50,9 +47,9 @@ export const twilioAccountSchema = z.object({
   type: z.string().optional(),
   dateCreated: z.string().datetime().optional(),
   dateUpdated: z.string().datetime().optional(),
-});
+})
 
-export type TwilioAccount = z.infer<typeof twilioAccountSchema>;
+export type TwilioAccount = z.infer<typeof twilioAccountSchema>
 
 /**
  * Twilio message resource — an SMS or MMS message.
@@ -81,9 +78,9 @@ export const twilioMessageSchema = z.object({
   price: z.string().optional(),
   errorCode: z.number().int().optional(),
   errorMessage: z.string().optional(),
-});
+})
 
-export type TwilioMessage = z.infer<typeof twilioMessageSchema>;
+export type TwilioMessage = z.infer<typeof twilioMessageSchema>
 
 /**
  * Twilio call resource — a voice call.
@@ -111,9 +108,9 @@ export const twilioCallSchema = z.object({
   direction: z.string().optional(),
   price: z.string().optional(),
   errorCode: z.number().int().optional(),
-});
+})
 
-export type TwilioCall = z.infer<typeof twilioCallSchema>;
+export type TwilioCall = z.infer<typeof twilioCallSchema>
 
 /**
  * Twilio phone number resource — an incoming phone number.
@@ -133,9 +130,9 @@ export const twilioPhoneNumberSchema = z.object({
     .optional(),
   dateCreated: z.string().datetime().optional(),
   dateUpdated: z.string().datetime().optional(),
-});
+})
 
-export type TwilioPhoneNumber = z.infer<typeof twilioPhoneNumberSchema>;
+export type TwilioPhoneNumber = z.infer<typeof twilioPhoneNumberSchema>
 
 // ---------------------------------------------------------------------------
 // Webhook event schemas
@@ -155,9 +152,9 @@ export const twilioWebhookPayloadSchema = z.object({
   MessageStatus: z.string().optional(),
   CallStatus: z.string().optional(),
   Direction: z.string().optional(),
-});
+})
 
-export type TwilioWebhookPayload = z.infer<typeof twilioWebhookPayloadSchema>;
+export type TwilioWebhookPayload = z.infer<typeof twilioWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -170,9 +167,9 @@ export const twilioOAuthConfigSchema = z.object({
   scopes: z.array(z.string()).default([...TWILIO_OAUTH_SCOPES]),
   authorizeUrl: z.string().url().default('https://www.twilio.com/authorize'),
   tokenUrl: z.string().url().default('https://www.twilio.com/oauth/token'),
-});
+})
 
-export type TwilioOAuthConfig = z.infer<typeof twilioOAuthConfigSchema>;
+export type TwilioOAuthConfig = z.infer<typeof twilioOAuthConfigSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific webhook signature config
@@ -184,11 +181,11 @@ export const twilioWebhookSignatureConfigSchema = z.object({
   secret: z.string().min(1),
   format: z.literal('twilio').default('twilio'),
   algorithm: z.literal('sha256').default('sha256'),
-});
+})
 
 export type TwilioWebhookSignatureConfig = z.infer<
   typeof twilioWebhookSignatureConfigSchema
->;
+>
 
 // ---------------------------------------------------------------------------
 // Enumerations for typed webhook events
@@ -202,6 +199,8 @@ export const twilioWebhookEventTypeSchema = z.enum([
   'call.ringing',
   'call.answered',
   'call.completed',
-]);
+])
 
-export type TwilioWebhookEventType = z.infer<typeof twilioWebhookEventTypeSchema>;
+export type TwilioWebhookEventType = z.infer<
+  typeof twilioWebhookEventTypeSchema
+>

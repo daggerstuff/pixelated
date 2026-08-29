@@ -7,49 +7,54 @@
  *       adapter would make real HTTP calls to the Calendly API.
  */
 
-import type { CalendlyUser, CalendlyEventType, CalendlyScheduledEvent, CalendlyInvitee } from './types';
+import type {
+  CalendlyUser,
+  CalendlyEventType,
+  CalendlyScheduledEvent,
+  CalendlyInvitee,
+} from './types'
 
 /**
  * Parameters for listing scheduled events.
  */
 export interface ListScheduledEventsParams {
-  user?: string;
-  status?: 'active' | 'canceled';
-  min_start_time?: string;
-  max_start_time?: string;
-  cursor?: string;
-  count?: number;
+  user?: string
+  status?: 'active' | 'canceled'
+  min_start_time?: string
+  max_start_time?: string
+  cursor?: string
+  count?: number
 }
 
 /**
  * Parameters for listing invitees for a scheduled event.
  */
 export interface ListInviteesParams {
-  status?: 'active' | 'canceled';
-  cursor?: string;
-  count?: number;
+  status?: 'active' | 'canceled'
+  cursor?: string
+  count?: number
 }
 
 /**
  * Parameters for listing event types.
  */
 export interface ListEventTypesParams {
-  user?: string;
-  active?: boolean;
-  cursor?: string;
-  count?: number;
+  user?: string
+  active?: boolean
+  cursor?: string
+  count?: number
 }
 
 /**
  * Paginated response wrapper for Calendly API list endpoints.
  */
 export interface PaginatedResponse<T> {
-  data: T[];
+  data: T[]
   pagination: {
-    count: number;
-    next_page?: string;
-    previous_page?: string;
-  };
+    count: number
+    next_page?: string
+    previous_page?: string
+  }
 }
 
 /**
@@ -63,13 +68,13 @@ export interface PaginatedResponse<T> {
  */
 export interface CalendlyAdapter {
   /** Adapter identifier — 'calendly' for production, 'stub-calendly' for stub. */
-  readonly name: string;
+  readonly name: string
 
   /**
    * Retrieve the authenticated user's profile.
    * @see https://developer.calendly.com/api-docs/v2-0-reference/rest-v2/get-user
    */
-  getCurrentUser(accessToken: string): Promise<CalendlyUser>;
+  getCurrentUser(accessToken: string): Promise<CalendlyUser>
 
   /**
    * List event types (meeting templates) for a user.
@@ -78,7 +83,7 @@ export interface CalendlyAdapter {
   listEventTypes(
     accessToken: string,
     params?: ListEventTypesParams,
-  ): Promise<PaginatedResponse<CalendlyEventType>>;
+  ): Promise<PaginatedResponse<CalendlyEventType>>
 
   /**
    * Retrieve a single scheduled event by URI.
@@ -87,7 +92,7 @@ export interface CalendlyAdapter {
   getScheduledEvent(
     accessToken: string,
     eventUri: string,
-  ): Promise<CalendlyScheduledEvent>;
+  ): Promise<CalendlyScheduledEvent>
 
   /**
    * List scheduled events for a user.
@@ -96,7 +101,7 @@ export interface CalendlyAdapter {
   listScheduledEvents(
     accessToken: string,
     params?: ListScheduledEventsParams,
-  ): Promise<PaginatedResponse<CalendlyScheduledEvent>>;
+  ): Promise<PaginatedResponse<CalendlyScheduledEvent>>
 
   /**
    * List invitees for a specific scheduled event.
@@ -106,7 +111,7 @@ export interface CalendlyAdapter {
     accessToken: string,
     eventUri: string,
     params?: ListInviteesParams,
-  ): Promise<PaginatedResponse<CalendlyInvitee>>;
+  ): Promise<PaginatedResponse<CalendlyInvitee>>
 
   /**
    * Cancel a scheduled event (meeting).
@@ -116,5 +121,5 @@ export interface CalendlyAdapter {
     accessToken: string,
     eventUri: string,
     cancellationReason?: string,
-  ): Promise<{ canceled: boolean; eventUri: string }>;
+  ): Promise<{ canceled: boolean; eventUri: string }>
 }
