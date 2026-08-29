@@ -27,7 +27,7 @@ export interface FallbackConfig {
 }
 
 /** Error wrapping a failed provider attempt. */
-export class ProviderError extends Error {
+class ProviderError extends Error {
   constructor(
     message: string,
     public readonly provider: AIProviderType,
@@ -45,7 +45,7 @@ export class ProviderError extends Error {
  * Retryable: network errors, 429, 5xx, rate limit errors.
  * Non-retryable: 4xx (except 429), validation errors.
  */
-export function isRetryableError(error: unknown): boolean {
+function isRetryableError(error: unknown): boolean {
   if (error instanceof ProviderError) return error.isRetryable
 
   const msg = error instanceof Error ? error.message : String(error)

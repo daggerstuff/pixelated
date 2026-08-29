@@ -17,7 +17,7 @@ import type {
 /**
  * Permission metadata — descriptions, categories, audit/MFA requirements.
  */
-export const EHR_PERMISSION_DEFINITIONS: Record<
+const EHR_PERMISSION_DEFINITIONS: Record<
   EHRPermission,
   EHRPermissionDefinition
 > = {
@@ -205,325 +205,324 @@ export const EHR_PERMISSION_DEFINITIONS: Record<
  * Inheritance is transitive: if A inherits from B and B inherits from C,
  * A gets C's permissions too. Cycle detection is enforced at lookup time.
  */
-export const CLINICAL_ROLE_DEFINITIONS: Record<
-  ClinicalRole,
-  ClinicalRoleDefinition
-> = {
-  physician: {
-    name: 'physician',
-    displayName: 'Physician',
-    description:
-      'Licensed physician with full clinical data access and note-signing authority',
-    hierarchyLevel: 90,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'write_encounter',
-      'read_observation',
-      'write_observation',
-      'read_condition',
-      'write_condition',
-      'read_medication',
-      'write_medication',
-      'read_procedure',
-      'write_procedure',
-      'read_clinical_note',
-      'write_clinical_note',
-      'sign_clinical_note',
-      'cosign_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-      'manage_consent',
-      'break_glass',
-      'export_phi',
-    ],
-    inherits: ['nurse'],
-  },
-  nurse: {
-    name: 'nurse',
-    displayName: 'Nurse',
-    description:
-      'Registered nurse with clinical data access and note-writing authority',
-    hierarchyLevel: 70,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'write_encounter',
-      'read_observation',
-      'write_observation',
-      'read_condition',
-      'read_medication',
-      'write_medication',
-      'read_procedure',
-      'write_procedure',
-      'read_clinical_note',
-      'write_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-      'break_glass',
-    ],
-    inherits: ['medicalAssistant'],
-  },
-  pharmacist: {
-    name: 'pharmacist',
-    displayName: 'Pharmacist',
-    description:
-      'Licensed pharmacist with medication management and read access to clinical data',
-    hierarchyLevel: 75,
-    permissions: [
-      'read_patient',
-      'read_encounter',
-      'read_observation',
-      'read_condition',
-      'read_medication',
-      'write_medication',
-      'read_clinical_note',
-      'write_clinical_note',
-      'read_schedule',
-      'break_glass',
-    ],
-    inherits: [],
-  },
-  medicalAssistant: {
-    name: 'medicalAssistant',
-    displayName: 'Medical Assistant',
-    description:
-      'Medical assistant with limited clinical data access and scheduling',
-    hierarchyLevel: 50,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'read_observation',
-      'read_condition',
-      'read_medication',
-      'read_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-    ],
-    inherits: ['frontDesk'],
-  },
-  technician: {
-    name: 'technician',
-    displayName: 'Technician',
-    description:
-      'Clinical technician with observation recording and procedure access',
-    hierarchyLevel: 45,
-    permissions: [
-      'read_patient',
-      'read_encounter',
-      'read_observation',
-      'write_observation',
-      'read_procedure',
-      'write_procedure',
-      'read_clinical_note',
-      'read_schedule',
-    ],
-    inherits: ['frontDesk'],
-  },
-  therapist: {
-    name: 'therapist',
-    displayName: 'Therapist',
-    description:
-      'Licensed therapist with clinical note authority and condition/encounter access',
-    hierarchyLevel: 80,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'write_encounter',
-      'read_observation',
-      'read_condition',
-      'write_condition',
-      'read_medication',
-      'read_procedure',
-      'read_clinical_note',
-      'write_clinical_note',
-      'sign_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-      'manage_consent',
-      'break_glass',
-    ],
-    inherits: ['nurse'],
-  },
-  supervisor: {
-    name: 'supervisor',
-    displayName: 'Clinical Supervisor',
-    description:
-      'Clinical supervisor with oversight of clinicians, note co-signing, risk queue review, and performance metrics',
-    hierarchyLevel: 85,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'write_encounter',
-      'read_observation',
-      'write_observation',
-      'read_condition',
-      'write_condition',
-      'read_medication',
-      'read_procedure',
-      'read_clinical_note',
-      'write_clinical_note',
-      'sign_clinical_note',
-      'cosign_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-      'read_claim',
-      'manage_consent',
-      'break_glass',
-      'audit_access',
-    ],
-    inherits: [],
-  },
-  socialWorker: {
-    name: 'socialWorker',
-    displayName: 'Social Worker',
-    description:
-      'Clinical social worker with patient data and note-writing access',
-    hierarchyLevel: 60,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'read_condition',
-      'read_clinical_note',
-      'write_clinical_note',
-      'read_schedule',
-      'break_glass',
-    ],
-    inherits: ['careCoordinator'],
-  },
-  careCoordinator: {
-    name: 'careCoordinator',
-    displayName: 'Care Coordinator',
-    description: 'Care coordinator with patient and schedule management access',
-    hierarchyLevel: 55,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'read_condition',
-      'read_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-    ],
-    inherits: ['frontDesk'],
-  },
-  frontDesk: {
-    name: 'frontDesk',
-    displayName: 'Front Desk',
-    description:
-      'Front desk staff with scheduling and basic patient demographics access',
-    hierarchyLevel: 30,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_schedule',
-      'manage_schedule',
-    ],
-    inherits: [],
-  },
-  billingSpecialist: {
-    name: 'billingSpecialist',
-    displayName: 'Billing Specialist',
-    description: 'Billing specialist with claim and financial record access',
-    hierarchyLevel: 40,
-    permissions: [
-      'read_patient',
-      'read_encounter',
-      'read_claim',
-      'submit_claim',
-      'read_schedule',
-    ],
-    inherits: [],
-  },
-  complianceOfficer: {
-    name: 'complianceOfficer',
-    displayName: 'Compliance Officer',
-    description:
-      'Compliance officer with audit access and read-only clinical data access',
-    hierarchyLevel: 85,
-    permissions: [
-      'read_patient',
-      'read_encounter',
-      'read_observation',
-      'read_condition',
-      'read_medication',
-      'read_procedure',
-      'read_clinical_note',
-      'read_claim',
-      'audit_access',
-      'export_phi',
-    ],
-    inherits: [],
-  },
-  healthInformationManager: {
-    name: 'healthInformationManager',
-    displayName: 'Health Information Manager',
-    description:
-      'HIM professional with clinical data management and export authority',
-    hierarchyLevel: 65,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'read_observation',
-      'read_condition',
-      'read_medication',
-      'read_procedure',
-      'read_clinical_note',
-      'write_clinical_note',
-      'read_claim',
-      'export_phi',
-      'audit_access',
-    ],
-    inherits: [],
-  },
-  systemAdmin: {
-    name: 'systemAdmin',
-    displayName: 'System Administrator',
-    description:
-      'System administrator with full EHR configuration and audit access',
-    hierarchyLevel: 100,
-    permissions: [
-      'read_patient',
-      'write_patient',
-      'read_encounter',
-      'write_encounter',
-      'read_observation',
-      'write_observation',
-      'read_condition',
-      'write_condition',
-      'read_medication',
-      'write_medication',
-      'read_procedure',
-      'write_procedure',
-      'read_clinical_note',
-      'write_clinical_note',
-      'sign_clinical_note',
-      'cosign_clinical_note',
-      'read_schedule',
-      'manage_schedule',
-      'read_claim',
-      'submit_claim',
-      'adjudicate_claim',
-      'manage_consent',
-      'break_glass',
-      'export_phi',
-      'audit_access',
-    ],
-    inherits: [
-      'physician',
-      'pharmacist',
-      'complianceOfficer',
-      'healthInformationManager',
-    ],
-  },
-}
+const CLINICAL_ROLE_DEFINITIONS: Record<ClinicalRole, ClinicalRoleDefinition> =
+  {
+    physician: {
+      name: 'physician',
+      displayName: 'Physician',
+      description:
+        'Licensed physician with full clinical data access and note-signing authority',
+      hierarchyLevel: 90,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'write_encounter',
+        'read_observation',
+        'write_observation',
+        'read_condition',
+        'write_condition',
+        'read_medication',
+        'write_medication',
+        'read_procedure',
+        'write_procedure',
+        'read_clinical_note',
+        'write_clinical_note',
+        'sign_clinical_note',
+        'cosign_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+        'manage_consent',
+        'break_glass',
+        'export_phi',
+      ],
+      inherits: ['nurse'],
+    },
+    nurse: {
+      name: 'nurse',
+      displayName: 'Nurse',
+      description:
+        'Registered nurse with clinical data access and note-writing authority',
+      hierarchyLevel: 70,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'write_encounter',
+        'read_observation',
+        'write_observation',
+        'read_condition',
+        'read_medication',
+        'write_medication',
+        'read_procedure',
+        'write_procedure',
+        'read_clinical_note',
+        'write_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+        'break_glass',
+      ],
+      inherits: ['medicalAssistant'],
+    },
+    pharmacist: {
+      name: 'pharmacist',
+      displayName: 'Pharmacist',
+      description:
+        'Licensed pharmacist with medication management and read access to clinical data',
+      hierarchyLevel: 75,
+      permissions: [
+        'read_patient',
+        'read_encounter',
+        'read_observation',
+        'read_condition',
+        'read_medication',
+        'write_medication',
+        'read_clinical_note',
+        'write_clinical_note',
+        'read_schedule',
+        'break_glass',
+      ],
+      inherits: [],
+    },
+    medicalAssistant: {
+      name: 'medicalAssistant',
+      displayName: 'Medical Assistant',
+      description:
+        'Medical assistant with limited clinical data access and scheduling',
+      hierarchyLevel: 50,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'read_observation',
+        'read_condition',
+        'read_medication',
+        'read_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+      ],
+      inherits: ['frontDesk'],
+    },
+    technician: {
+      name: 'technician',
+      displayName: 'Technician',
+      description:
+        'Clinical technician with observation recording and procedure access',
+      hierarchyLevel: 45,
+      permissions: [
+        'read_patient',
+        'read_encounter',
+        'read_observation',
+        'write_observation',
+        'read_procedure',
+        'write_procedure',
+        'read_clinical_note',
+        'read_schedule',
+      ],
+      inherits: ['frontDesk'],
+    },
+    therapist: {
+      name: 'therapist',
+      displayName: 'Therapist',
+      description:
+        'Licensed therapist with clinical note authority and condition/encounter access',
+      hierarchyLevel: 80,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'write_encounter',
+        'read_observation',
+        'read_condition',
+        'write_condition',
+        'read_medication',
+        'read_procedure',
+        'read_clinical_note',
+        'write_clinical_note',
+        'sign_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+        'manage_consent',
+        'break_glass',
+      ],
+      inherits: ['nurse'],
+    },
+    supervisor: {
+      name: 'supervisor',
+      displayName: 'Clinical Supervisor',
+      description:
+        'Clinical supervisor with oversight of clinicians, note co-signing, risk queue review, and performance metrics',
+      hierarchyLevel: 85,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'write_encounter',
+        'read_observation',
+        'write_observation',
+        'read_condition',
+        'write_condition',
+        'read_medication',
+        'read_procedure',
+        'read_clinical_note',
+        'write_clinical_note',
+        'sign_clinical_note',
+        'cosign_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+        'read_claim',
+        'manage_consent',
+        'break_glass',
+        'audit_access',
+      ],
+      inherits: [],
+    },
+    socialWorker: {
+      name: 'socialWorker',
+      displayName: 'Social Worker',
+      description:
+        'Clinical social worker with patient data and note-writing access',
+      hierarchyLevel: 60,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'read_condition',
+        'read_clinical_note',
+        'write_clinical_note',
+        'read_schedule',
+        'break_glass',
+      ],
+      inherits: ['careCoordinator'],
+    },
+    careCoordinator: {
+      name: 'careCoordinator',
+      displayName: 'Care Coordinator',
+      description:
+        'Care coordinator with patient and schedule management access',
+      hierarchyLevel: 55,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'read_condition',
+        'read_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+      ],
+      inherits: ['frontDesk'],
+    },
+    frontDesk: {
+      name: 'frontDesk',
+      displayName: 'Front Desk',
+      description:
+        'Front desk staff with scheduling and basic patient demographics access',
+      hierarchyLevel: 30,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_schedule',
+        'manage_schedule',
+      ],
+      inherits: [],
+    },
+    billingSpecialist: {
+      name: 'billingSpecialist',
+      displayName: 'Billing Specialist',
+      description: 'Billing specialist with claim and financial record access',
+      hierarchyLevel: 40,
+      permissions: [
+        'read_patient',
+        'read_encounter',
+        'read_claim',
+        'submit_claim',
+        'read_schedule',
+      ],
+      inherits: [],
+    },
+    complianceOfficer: {
+      name: 'complianceOfficer',
+      displayName: 'Compliance Officer',
+      description:
+        'Compliance officer with audit access and read-only clinical data access',
+      hierarchyLevel: 85,
+      permissions: [
+        'read_patient',
+        'read_encounter',
+        'read_observation',
+        'read_condition',
+        'read_medication',
+        'read_procedure',
+        'read_clinical_note',
+        'read_claim',
+        'audit_access',
+        'export_phi',
+      ],
+      inherits: [],
+    },
+    healthInformationManager: {
+      name: 'healthInformationManager',
+      displayName: 'Health Information Manager',
+      description:
+        'HIM professional with clinical data management and export authority',
+      hierarchyLevel: 65,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'read_observation',
+        'read_condition',
+        'read_medication',
+        'read_procedure',
+        'read_clinical_note',
+        'write_clinical_note',
+        'read_claim',
+        'export_phi',
+        'audit_access',
+      ],
+      inherits: [],
+    },
+    systemAdmin: {
+      name: 'systemAdmin',
+      displayName: 'System Administrator',
+      description:
+        'System administrator with full EHR configuration and audit access',
+      hierarchyLevel: 100,
+      permissions: [
+        'read_patient',
+        'write_patient',
+        'read_encounter',
+        'write_encounter',
+        'read_observation',
+        'write_observation',
+        'read_condition',
+        'write_condition',
+        'read_medication',
+        'write_medication',
+        'read_procedure',
+        'write_procedure',
+        'read_clinical_note',
+        'write_clinical_note',
+        'sign_clinical_note',
+        'cosign_clinical_note',
+        'read_schedule',
+        'manage_schedule',
+        'read_claim',
+        'submit_claim',
+        'adjudicate_claim',
+        'manage_consent',
+        'break_glass',
+        'export_phi',
+        'audit_access',
+      ],
+      inherits: [
+        'physician',
+        'pharmacist',
+        'complianceOfficer',
+        'healthInformationManager',
+      ],
+    },
+  }
 
 /**
  * Resolve the full set of permissions for a role, including inherited
@@ -532,7 +531,7 @@ export const CLINICAL_ROLE_DEFINITIONS: Record<
  * @param role - The clinical role to resolve permissions for.
  * @returns A deduplicated set of all permissions (direct + inherited).
  */
-export function resolveRolePermissions(role: ClinicalRole): Set<EHRPermission> {
+function resolveRolePermissions(role: ClinicalRole): Set<EHRPermission> {
   const result = new Set<EHRPermission>()
   const visited = new Set<ClinicalRole>()
 
@@ -573,7 +572,7 @@ export function roleHasPermission(
 /**
  * Get the category for a given permission.
  */
-export function getPermissionCategory(
+function getPermissionCategory(
   permission: EHRPermission,
 ): EHRPermissionCategory {
   return EHR_PERMISSION_DEFINITIONS[permission].category
@@ -582,20 +581,20 @@ export function getPermissionCategory(
 /**
  * Check if a permission requires audit logging when exercised.
  */
-export function permissionRequiresAudit(permission: EHRPermission): boolean {
+function permissionRequiresAudit(permission: EHRPermission): boolean {
   return EHR_PERMISSION_DEFINITIONS[permission].auditRequired
 }
 
 /**
  * Check if a permission requires MFA before being exercised.
  */
-export function permissionRequiresMFA(permission: EHRPermission): boolean {
+function permissionRequiresMFA(permission: EHRPermission): boolean {
   return EHR_PERMISSION_DEFINITIONS[permission].requiresMFA
 }
 
 /**
  * Get all permissions for a role as a sorted array (convenience).
  */
-export function getRolePermissions(role: ClinicalRole): EHRPermission[] {
+function getRolePermissions(role: ClinicalRole): EHRPermission[] {
   return Array.from(resolveRolePermissions(role)).sort()
 }

@@ -15,7 +15,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('ai-rate-limiter')
 
-export interface RateLimiterConfig {
+interface RateLimiterConfig {
   /** Maximum tokens the bucket can hold (burst capacity). */
   capacity: number
   /** Tokens added per millisecond. */
@@ -24,7 +24,7 @@ export interface RateLimiterConfig {
   maxWaitMs: number
 }
 
-export interface RateLimitOptions {
+interface RateLimitOptions {
   /** Requests per minute. Default 60. */
   requestsPerMinute?: number
   /** Burst capacity. Defaults to requestsPerMinute. */
@@ -34,7 +34,7 @@ export interface RateLimitOptions {
 }
 
 /** Custom error so callers can distinguish rate-limit rejections. */
-export class RateLimitError extends Error {
+class RateLimitError extends Error {
   constructor(
     message: string,
     public readonly provider: string,
@@ -48,7 +48,7 @@ export class RateLimitError extends Error {
 /**
  * Token-bucket rate limiter. Thread-safe via async mutex on `acquire`.
  */
-export class TokenBucketRateLimiter {
+class TokenBucketRateLimiter {
   private tokens: number
   private lastRefillTime: number
   private readonly config: RateLimiterConfig
@@ -222,18 +222,18 @@ export async function acquireRateLimit(provider: string): Promise<void> {
  * Try to acquire a rate-limit token without waiting.
  * Returns true on success, false if the bucket is empty.
  */
-export function tryAcquireRateLimit(provider: string): boolean {
+function tryAcquireRateLimit(provider: string): boolean {
   const limiter = getLimiter(provider)
   return limiter.tryAcquire()
 }
 
 /** Get the rate limiter instance for a provider (for testing). */
-export function getRateLimiter(provider: string): TokenBucketRateLimiter {
+function getRateLimiter(provider: string): TokenBucketRateLimiter {
   return getLimiter(provider)
 }
 
 /** Reset all limiters (for testing). */
-export function resetAllRateLimiters(): void {
+function resetAllRateLimiters(): void {
   for (const limiter of limiters.values()) {
     limiter.reset()
   }
@@ -241,7 +241,7 @@ export function resetAllRateLimiters(): void {
 }
 
 /** Create a rate limiter with explicit options (for testing). */
-export function createRateLimiter(provider: string, options: RateLimitOptions): TokenBucketRateLimiter {
+function createRateLimiter(provider: string, options: RateLimitOptions): TokenBucketRateLimiter {
   const rpm = options.requestsPerMinute ?? 60
   const burst = options.burst ?? rpm
   const maxWaitMs = options.maxWaitMs ?? 30_000
