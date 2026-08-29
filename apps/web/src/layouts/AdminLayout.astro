@@ -3,7 +3,7 @@ import { SITE } from '../config'
 import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
 import '@/lib/fonts'
 import '@/styles/np-tokens.css'
-import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import { ADMIN_NAV_ITEMS } from '@/components/admin/admin-nav'
 import SpeedInsights from '@vercel/speed-insights/astro'
 
@@ -69,7 +69,7 @@ const { cspNonce } = Astro.locals
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={image} />
 
-    <RybbitAnalytics nonce={cspNonce} />
+    <UmamiAnalytics nonce={cspNonce} />
   </head>
   <body
     class="enhanced-dark-theme min-h-screen"
