@@ -186,4 +186,4 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
 /**
  * Singleton stub instance for development and testing.
  */
-export const stubCalendlyAdapter = new StubCalendlyAdapter()
+const stubCalendlyAdapter = new StubCalendlyAdapter()

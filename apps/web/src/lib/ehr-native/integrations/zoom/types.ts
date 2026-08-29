@@ -18,7 +18,7 @@ import { z } from 'zod'
 
 export const ZOOM_PROVIDER_NAME = 'zoom' as const
 
-export const ZOOM_API_BASE_URL = 'https://api.zoom.us/v2' as const
+const ZOOM_API_BASE_URL = 'https://api.zoom.us/v2' as const
 
 export const ZOOM_OAUTH_SCOPES = [
   'meeting:read',
@@ -70,7 +70,7 @@ export type ZoomUser = z.infer<typeof zoomUserSchema>
  * Zoom meeting settings — per-meeting configuration options.
  * @see https://developers.zoom.us/docs/api/rest/reference/meeting/methods#operation/createMeeting
  */
-export const zoomMeetingSettingsSchema = z.object({
+const zoomMeetingSettingsSchema = z.object({
   host_video: z.boolean().optional(),
   participant_video: z.boolean().optional(),
   cn_meeting: z.boolean().optional(),
@@ -93,7 +93,7 @@ export const zoomMeetingSettingsSchema = z.object({
   request_permission_to_unmute_participants: z.boolean().optional(),
 })
 
-export type ZoomMeetingSettings = z.infer<typeof zoomMeetingSettingsSchema>
+type ZoomMeetingSettings = z.infer<typeof zoomMeetingSettingsSchema>
 
 /**
  * Zoom meeting — a scheduled or instant meeting.
@@ -143,7 +143,7 @@ export type ZoomMeeting = z.infer<typeof zoomMeetingSchema>
  * Zoom recording file — a single file within a recording.
  * @see https://developers.zoom.us/docs/api/rest/reference/cloud-recording/methods#operation/recordingGet
  */
-export const zoomRecordingFileSchema = z.object({
+const zoomRecordingFileSchema = z.object({
   id: z.string().optional(),
   meeting_id: z.number().int().optional(),
   recording_start: z.string().datetime().optional(),
@@ -169,7 +169,7 @@ export const zoomRecordingFileSchema = z.object({
     .optional(),
 })
 
-export type ZoomRecordingFile = z.infer<typeof zoomRecordingFileSchema>
+type ZoomRecordingFile = z.infer<typeof zoomRecordingFileSchema>
 
 /**
  * Zoom recording — cloud recording for a meeting.
@@ -223,7 +223,7 @@ export const zoomWebhookPayloadSchema = z.object({
   }),
 })
 
-export type ZoomWebhookPayload = z.infer<typeof zoomWebhookPayloadSchema>
+type ZoomWebhookPayload = z.infer<typeof zoomWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -252,7 +252,7 @@ export const zoomWebhookSignatureConfigSchema = z.object({
   algorithm: z.literal('sha256').default('sha256'),
 })
 
-export type ZoomWebhookSignatureConfig = z.infer<
+type ZoomWebhookSignatureConfig = z.infer<
   typeof zoomWebhookSignatureConfigSchema
 >
 
@@ -269,4 +269,4 @@ export const zoomWebhookEventTypeSchema = z.enum([
   'recording.completed',
 ])
 
-export type ZoomWebhookEventType = z.infer<typeof zoomWebhookEventTypeSchema>
+type ZoomWebhookEventType = z.infer<typeof zoomWebhookEventTypeSchema>

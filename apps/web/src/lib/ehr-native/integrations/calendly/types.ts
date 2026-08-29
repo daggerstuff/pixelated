@@ -16,13 +16,13 @@ import { z } from 'zod'
 // Provider constants
 // ---------------------------------------------------------------------------
 
-export const CALENDLY_PROVIDER_NAME = 'calendly' as const
+const CALENDLY_PROVIDER_NAME = 'calendly' as const
 
-export const CALENDLY_API_BASE_URL = 'https://api.calendly.com' as const
+const CALENDLY_API_BASE_URL = 'https://api.calendly.com' as const
 
-export const CALENDLY_OAUTH_SCOPES = ['openid', 'profile', 'email'] as const
+const CALENDLY_OAUTH_SCOPES = ['openid', 'profile', 'email'] as const
 
-export const CALENDLY_WEBHOOK_EVENTS = [
+const CALENDLY_WEBHOOK_EVENTS = [
   'invitee.created',
   'invitee.canceled',
   'routing_form_submission.created',
@@ -205,7 +205,7 @@ export type CalendlyInvitee = z.infer<typeof calendlyInviteeSchema>
  * Calendly webhook payload — the body sent to our webhook endpoint.
  * @see https://developer.calendly.com/api-docs/v2-0-reference/webhooks
  */
-export const calendlyWebhookPayloadSchema = z.object({
+const calendlyWebhookPayloadSchema = z.object({
   event: z.string(),
   time: z.string().datetime(),
   payload: z.object({
@@ -247,7 +247,7 @@ export const calendlyWebhookPayloadSchema = z.object({
   }),
 })
 
-export type CalendlyWebhookPayload = z.infer<
+type CalendlyWebhookPayload = z.infer<
   typeof calendlyWebhookPayloadSchema
 >
 
@@ -273,7 +273,7 @@ export type CalendlyOAuthConfig = z.infer<typeof calendlyOAuthConfigSchema>
 // Provider-specific webhook signature config
 // ---------------------------------------------------------------------------
 
-export const calendlyWebhookSignatureConfigSchema = z.object({
+const calendlyWebhookSignatureConfigSchema = z.object({
   provider: z.literal(CALENDLY_PROVIDER_NAME),
   headerName: z.string().default('calendly-webhook-signature'),
   secret: z.string().min(1),
@@ -281,7 +281,7 @@ export const calendlyWebhookSignatureConfigSchema = z.object({
   algorithm: z.literal('sha256').default('sha256'),
 })
 
-export type CalendlyWebhookSignatureConfig = z.infer<
+type CalendlyWebhookSignatureConfig = z.infer<
   typeof calendlyWebhookSignatureConfigSchema
 >
 
@@ -289,12 +289,12 @@ export type CalendlyWebhookSignatureConfig = z.infer<
 // Enumerations for typed webhook events
 // ---------------------------------------------------------------------------
 
-export const calendlyWebhookEventTypeSchema = z.enum([
+const calendlyWebhookEventTypeSchema = z.enum([
   'invitee.created',
   'invitee.canceled',
   'routing_form_submission.created',
 ])
 
-export type CalendlyWebhookEventType = z.infer<
+type CalendlyWebhookEventType = z.infer<
   typeof calendlyWebhookEventTypeSchema
 >

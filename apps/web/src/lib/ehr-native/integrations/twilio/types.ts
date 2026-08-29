@@ -16,13 +16,13 @@ import { z } from 'zod'
 // Provider constants
 // ---------------------------------------------------------------------------
 
-export const TWILIO_PROVIDER_NAME = 'twilio' as const
+const TWILIO_PROVIDER_NAME = 'twilio' as const
 
-export const TWILIO_API_BASE_URL = 'https://api.twilio.com/2010-04-01' as const
+const TWILIO_API_BASE_URL = 'https://api.twilio.com/2010-04-01' as const
 
-export const TWILIO_OAUTH_SCOPES = ['scope:read_only', 'scope:write'] as const
+const TWILIO_OAUTH_SCOPES = ['scope:read_only', 'scope:write'] as const
 
-export const TWILIO_WEBHOOK_EVENTS = [
+const TWILIO_WEBHOOK_EVENTS = [
   'message.received',
   'message.sent',
   'message.delivered',
@@ -142,7 +142,7 @@ export type TwilioPhoneNumber = z.infer<typeof twilioPhoneNumberSchema>
  * Twilio webhook payload — the body sent to our webhook endpoint.
  * @see https://www.twilio.com/docs/usage/webhooks
  */
-export const twilioWebhookPayloadSchema = z.object({
+const twilioWebhookPayloadSchema = z.object({
   MessageSid: z.string().optional(),
   CallSid: z.string().optional(),
   AccountSid: z.string().optional(),
@@ -154,7 +154,7 @@ export const twilioWebhookPayloadSchema = z.object({
   Direction: z.string().optional(),
 })
 
-export type TwilioWebhookPayload = z.infer<typeof twilioWebhookPayloadSchema>
+type TwilioWebhookPayload = z.infer<typeof twilioWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -175,7 +175,7 @@ export type TwilioOAuthConfig = z.infer<typeof twilioOAuthConfigSchema>
 // Provider-specific webhook signature config
 // ---------------------------------------------------------------------------
 
-export const twilioWebhookSignatureConfigSchema = z.object({
+const twilioWebhookSignatureConfigSchema = z.object({
   provider: z.literal(TWILIO_PROVIDER_NAME),
   headerName: z.string().default('X-Twilio-Signature'),
   secret: z.string().min(1),
@@ -183,7 +183,7 @@ export const twilioWebhookSignatureConfigSchema = z.object({
   algorithm: z.literal('sha256').default('sha256'),
 })
 
-export type TwilioWebhookSignatureConfig = z.infer<
+type TwilioWebhookSignatureConfig = z.infer<
   typeof twilioWebhookSignatureConfigSchema
 >
 
@@ -191,7 +191,7 @@ export type TwilioWebhookSignatureConfig = z.infer<
 // Enumerations for typed webhook events
 // ---------------------------------------------------------------------------
 
-export const twilioWebhookEventTypeSchema = z.enum([
+const twilioWebhookEventTypeSchema = z.enum([
   'message.received',
   'message.sent',
   'message.delivered',
@@ -201,6 +201,6 @@ export const twilioWebhookEventTypeSchema = z.enum([
   'call.completed',
 ])
 
-export type TwilioWebhookEventType = z.infer<
+type TwilioWebhookEventType = z.infer<
   typeof twilioWebhookEventTypeSchema
 >

@@ -67,7 +67,7 @@ export const oAuthStateSchema = z.object({
   createdAt: z.string().datetime(),
   returnUrl: z.string().optional(),
 })
-export type OAuthState = z.infer<typeof oAuthStateSchema>
+type OAuthState = z.infer<typeof oAuthStateSchema>
 
 /** Stored OAuth connection (after successful authorization). */
 export const oAuthConnectionSchema = z.object({
@@ -208,6 +208,6 @@ export const integrationAuditMetadataSchema = z.object({
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
 })
-export type IntegrationAuditMetadata = z.infer<
+type IntegrationAuditMetadata = z.infer<
   typeof integrationAuditMetadataSchema
 >

@@ -469,4 +469,4 @@ export class StubStripeAdapter implements StripeAdapter {
 /**
  * Singleton stub instance for development and testing.
  */
-export const stubStripeAdapter = new StubStripeAdapter()
+const stubStripeAdapter = new StubStripeAdapter()

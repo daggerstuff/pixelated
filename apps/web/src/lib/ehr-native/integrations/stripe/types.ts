@@ -16,13 +16,13 @@ import { z } from 'zod'
 // Provider constants
 // ---------------------------------------------------------------------------
 
-export const STRIPE_PROVIDER_NAME = 'stripe' as const
+const STRIPE_PROVIDER_NAME = 'stripe' as const
 
-export const STRIPE_API_BASE_URL = 'https://api.stripe.com/v1' as const
+const STRIPE_API_BASE_URL = 'https://api.stripe.com/v1' as const
 
-export const STRIPE_OAUTH_SCOPES = ['read_only', 'read_write'] as const
+const STRIPE_OAUTH_SCOPES = ['read_only', 'read_write'] as const
 
-export const STRIPE_WEBHOOK_EVENTS = [
+const STRIPE_WEBHOOK_EVENTS = [
   'payment_intent.succeeded',
   'payment_intent.payment_failed',
   'charge.refunded',
@@ -293,7 +293,7 @@ export type StripeCheckoutSession = z.infer<typeof stripeCheckoutSessionSchema>
  * Stripe webhook payload — the body sent to our webhook endpoint.
  * @see https://docs.stripe.com/webhooks
  */
-export const stripeWebhookPayloadSchema = z.object({
+const stripeWebhookPayloadSchema = z.object({
   id: z.string(),
   object: z.literal('event').default('event'),
   api_version: z.string().optional(),
@@ -313,7 +313,7 @@ export const stripeWebhookPayloadSchema = z.object({
   }),
 })
 
-export type StripeWebhookPayload = z.infer<typeof stripeWebhookPayloadSchema>
+type StripeWebhookPayload = z.infer<typeof stripeWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -337,7 +337,7 @@ export type StripeOAuthConfig = z.infer<typeof stripeOAuthConfigSchema>
 // Provider-specific webhook signature config
 // ---------------------------------------------------------------------------
 
-export const stripeWebhookSignatureConfigSchema = z.object({
+const stripeWebhookSignatureConfigSchema = z.object({
   provider: z.literal(STRIPE_PROVIDER_NAME),
   headerName: z.string().default('Stripe-Signature'),
   secret: z.string().min(1),
@@ -345,7 +345,7 @@ export const stripeWebhookSignatureConfigSchema = z.object({
   algorithm: z.literal('sha256').default('sha256'),
 })
 
-export type StripeWebhookSignatureConfig = z.infer<
+type StripeWebhookSignatureConfig = z.infer<
   typeof stripeWebhookSignatureConfigSchema
 >
 
@@ -353,7 +353,7 @@ export type StripeWebhookSignatureConfig = z.infer<
 // Enumerations for typed webhook events
 // ---------------------------------------------------------------------------
 
-export const stripeWebhookEventTypeSchema = z.enum([
+const stripeWebhookEventTypeSchema = z.enum([
   'payment_intent.succeeded',
   'payment_intent.payment_failed',
   'charge.refunded',
@@ -364,6 +364,6 @@ export const stripeWebhookEventTypeSchema = z.enum([
   'checkout.session.completed',
 ])
 
-export type StripeWebhookEventType = z.infer<
+type StripeWebhookEventType = z.infer<
   typeof stripeWebhookEventTypeSchema
 >
