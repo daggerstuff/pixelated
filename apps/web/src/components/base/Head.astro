@@ -3,7 +3,7 @@ import SpeedInsights from '@vercel/speed-insights/astro'
 import { ClientRouter } from 'astro:transitions'
 import { basename } from 'node:path'
 
-import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import { SITE } from '@/config'
 import { withBasePath } from '@/utils/path'
 
@@ -192,7 +192,7 @@ const webPageData = {
   shouldRenderAnalytics && (
     <>
       {isVercelDeploy && <SpeedInsights />}
-      <RybbitAnalytics nonce={cspNonce} trackPageTransitions />
+      <UmamiAnalytics nonce={cspNonce} trackPageTransitions />
     </>
   )
 }

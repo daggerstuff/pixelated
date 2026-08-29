@@ -256,8 +256,8 @@ export const config = {
     apiUrl: (): string | undefined => env().VITE_API_URL,
     mongoCluster: (): string | undefined => env().VITE_MONGODB_CLUSTER,
     trainingWsUrl: (): string | undefined => env().PUBLIC_TRAINING_WS_URL,
-    rybbitScriptUrl: (): string | undefined => env().PUBLIC_RYBBIT_SCRIPT_URL,
-    rybbitSiteId: (): string | undefined => env().PUBLIC_RYBBIT_SITE_ID,
+    umamiScriptUrl: (): string | undefined => env().PUBLIC_UMAMI_SCRIPT_URL,
+    umamiWebsiteId: (): string | undefined => env().PUBLIC_UMAMI_WEBSITE_ID,
   },
 
   notifications: {
