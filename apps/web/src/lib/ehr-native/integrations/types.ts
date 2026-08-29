@@ -67,7 +67,6 @@ export const oAuthStateSchema = z.object({
   createdAt: z.iso.datetime(),
   returnUrl: z.string().optional(),
 })
-export type OAuthState = z.infer<typeof oAuthStateSchema>
 
 /** Stored OAuth connection (after successful authorization). */
 export const oAuthConnectionSchema = z.object({
