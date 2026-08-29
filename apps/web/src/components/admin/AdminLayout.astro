@@ -7,7 +7,7 @@ import { getUser } from '../../lib/auth/sessionUtils'
 import { ClientRouter } from 'astro:transitions'
 import AdminPortalShell from '@/components/admin/AdminPortalShell.astro'
 import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
-import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import { ADMIN_NAV_ITEMS } from '@/components/admin/admin-nav'
 
 interface Props {
@@ -61,7 +61,7 @@ if (!isLoggedIn || !isAdmin) {
     <ClientRouter />
     {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
 
-    <RybbitAnalytics nonce={cspNonce} />
+    <UmamiAnalytics nonce={cspNonce} />
   </head>
   <body class="bg-gray-100 dark:bg-gray-900 min-h-screen">
     <!-- Skip to content link for accessibility -->

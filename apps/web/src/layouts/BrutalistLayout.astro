@@ -7,7 +7,7 @@ import '@/styles/np-tokens.css'
 import '@/lib/fonts'
 import BrutalistHeader from '@/components/BrutalistHeader.astro'
 import BrutalistFooter from '@/components/BrutalistFooter.astro'
-import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import SpeedInsights from '@vercel/speed-insights/astro'
 import Analytics from '@vercel/analytics/astro'
 
@@ -79,7 +79,7 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
       crossorigin
     />
 
-    <RybbitAnalytics nonce={cspNonce} />
+    <UmamiAnalytics nonce={cspNonce} />
   </head>
   <body>
     <!-- Skip Link -->

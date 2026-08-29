@@ -26,6 +26,6 @@ export const clientEnvSchema = z.object({
       },
     )
     .optional(),
-  PUBLIC_RYBBIT_SCRIPT_URL: z.url().optional(),
-  PUBLIC_RYBBIT_SITE_ID: z.string().optional(),
+  PUBLIC_UMAMI_SCRIPT_URL: z.url().optional(),
+  PUBLIC_UMAMI_WEBSITE_ID: z.string().optional(),
 })

@@ -209,8 +209,8 @@ describe('config object getters', () => {
       VITE_API_URL: undefined,
       VITE_MONGODB_CLUSTER: undefined,
       PUBLIC_TRAINING_WS_URL: undefined,
-      PUBLIC_RYBBIT_SCRIPT_URL: undefined,
-      PUBLIC_RYBBIT_SITE_ID: undefined,
+      PUBLIC_UMAMI_SCRIPT_URL: undefined,
+      PUBLIC_UMAMI_WEBSITE_ID: undefined,
       VAPID_PUBLIC_KEY: undefined,
       VAPID_PRIVATE_KEY: undefined,
       VAPID_SUBJECT: undefined,
@@ -355,8 +355,8 @@ describe('config object getters', () => {
     expect(config.client.apiUrl()).toBeUndefined()
     expect(config.client.mongoCluster()).toBeUndefined()
     expect(config.client.trainingWsUrl()).toBeUndefined()
-    expect(config.client.rybbitScriptUrl()).toBeUndefined()
-    expect(config.client.rybbitSiteId()).toBeUndefined()
+    expect(config.client.umamiScriptUrl()).toBeUndefined()
+    expect(config.client.umamiWebsiteId()).toBeUndefined()
   })
 
   it('returns undefined for all optional notification credentials', () => {
