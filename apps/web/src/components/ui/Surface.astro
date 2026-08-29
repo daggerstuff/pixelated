@@ -1,10 +1,4 @@
 ---
-interface Props {
-  as?: string
-  elevated?: boolean
-  class?: string
-}
-
 const { as = 'div', elevated = false, class: className = '' } = Astro.props
 const Tag = as as any
 ---

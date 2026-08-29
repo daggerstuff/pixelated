@@ -29,6 +29,13 @@ import type {
   ReviewRiskScoreParams,
 } from './types'
 
+export type {
+  RiskAISystemSource,
+  RiskGateAuditEntry,
+  RiskGateResult,
+  RiskStratificationReview,
+}
+
 // ---------------------------------------------------------------------------
 // In-memory store (production would use a persistent store with RLS)
 // ---------------------------------------------------------------------------
@@ -74,6 +81,8 @@ function baaEnvVarForSource(source: RiskAISystemSource): string | null {
     case 'local-fallback':
       // Local fallback doesn't involve an external AI provider — no BAA needed
       return null
+    default:
+      return null
   }
 }
 
@@ -102,7 +111,7 @@ export function checkBAACompliance(
 
   const rawValue =
     (import.meta.env?.[envVar] as string | undefined) ??
-    (process.env?.[envVar] as string | undefined) ??
+    process.env?.[envVar] ??
     ''
 
   if (rawValue.toLowerCase() === 'true') {
@@ -154,7 +163,7 @@ function recordAudit(
   // Also push to the centralized audit system (fire-and-forget)
   void logAuditEvent(
     userId,
-    `risk_gate_${action}` as never,
+    `risk_gate_${action}`,
     reviewId,
     'risk_stratification_review',
     {
