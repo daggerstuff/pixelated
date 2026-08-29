@@ -11,27 +11,27 @@
  * All data is synthetic. No real PHI is used.
  */
 
-import { transaction } from '../../db';
-import { patientSchema } from '../types/patient';
-import { encounterSchema } from '../types/encounter';
-import { observationSchema } from '../types/observation';
-import type { RLSContext } from '../repositories';
+import { transaction } from '../../db'
+import type { RLSContext } from '../repositories'
+import { encounterSchema } from '../types/encounter'
+import { observationSchema } from '../types/observation'
+import { patientSchema } from '../types/patient'
 
 // ─── Types ──────────────────────────────────────────────
 
 export interface SandboxSeedOptions {
-  tenantId: string;
-  reset?: boolean;
+  tenantId: string
+  reset?: boolean
 }
 
 export interface SandboxSeedResult {
-  tenantId: string;
-  patientsCreated: number;
-  encountersCreated: number;
-  observationsCreated: number;
-  patientIds: string[];
-  encounterIds: string[];
-  observationIds: string[];
+  tenantId: string
+  patientsCreated: number
+  encountersCreated: number
+  observationsCreated: number
+  patientIds: string[]
+  encounterIds: string[]
+  observationIds: string[]
 }
 
 // ─── Synthetic Data ────────────────────────────────────
@@ -42,66 +42,119 @@ export interface SandboxSeedResult {
  */
 const SYNTHETIC_PATIENTS = [
   {
-    identifier: [{ system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-001' }],
+    identifier: [
+      { system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-001' },
+    ],
     name: [{ family: 'Anderson', given: ['Alice'], use: 'official' }],
     birthDate: '1985-03-15',
     gender: 'female' as const,
     active: true,
     telecom: [{ system: 'phone' as const, value: '+1-555-0101' }],
-    address: [{ line: ['100 Sandbox Ln'], city: 'Springfield', state: 'IL', postalCode: '62701' }],
+    address: [
+      {
+        line: ['100 Sandbox Ln'],
+        city: 'Springfield',
+        state: 'IL',
+        postalCode: '62701',
+      },
+    ],
   },
   {
-    identifier: [{ system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-002' }],
+    identifier: [
+      { system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-002' },
+    ],
     name: [{ family: 'Baker', given: ['Bob'], use: 'official' }],
     birthDate: '1972-07-22',
     gender: 'male' as const,
     active: true,
     telecom: [{ system: 'phone' as const, value: '+1-555-0102' }],
-    address: [{ line: ['200 Test Ave'], city: 'Springfield', state: 'IL', postalCode: '62702' }],
+    address: [
+      {
+        line: ['200 Test Ave'],
+        city: 'Springfield',
+        state: 'IL',
+        postalCode: '62702',
+      },
+    ],
   },
   {
-    identifier: [{ system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-003' }],
+    identifier: [
+      { system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-003' },
+    ],
     name: [{ family: 'Chen', given: ['Carol'], use: 'official' }],
     birthDate: '1990-11-08',
     gender: 'female' as const,
     active: true,
     telecom: [{ system: 'email' as const, value: 'carol.sandbox@example.com' }],
-    address: [{ line: ['300 Demo St'], city: 'Portland', state: 'OR', postalCode: '97201' }],
+    address: [
+      {
+        line: ['300 Demo St'],
+        city: 'Portland',
+        state: 'OR',
+        postalCode: '97201',
+      },
+    ],
   },
   {
-    identifier: [{ system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-004' }],
+    identifier: [
+      { system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-004' },
+    ],
     name: [{ family: 'Davis', given: ['David'], use: 'official' }],
     birthDate: '1965-04-30',
     gender: 'male' as const,
     active: true,
     telecom: [{ system: 'phone' as const, value: '+1-555-0104' }],
-    address: [{ line: ['400 Sample Rd'], city: 'Austin', state: 'TX', postalCode: '73301' }],
+    address: [
+      {
+        line: ['400 Sample Rd'],
+        city: 'Austin',
+        state: 'TX',
+        postalCode: '73301',
+      },
+    ],
   },
   {
-    identifier: [{ system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-005' }],
+    identifier: [
+      { system: 'http://pixelated.com/mrn', value: 'SANDBOX-MRN-005' },
+    ],
     name: [{ family: 'Evans', given: ['Eve'], use: 'official' }],
     birthDate: '1998-09-14',
     gender: 'female' as const,
     active: true,
     telecom: [{ system: 'phone' as const, value: '+1-555-0105' }],
-    address: [{ line: ['500 Example Blvd'], city: 'Denver', state: 'CO', postalCode: '80201' }],
+    address: [
+      {
+        line: ['500 Example Blvd'],
+        city: 'Denver',
+        state: 'CO',
+        postalCode: '80201',
+      },
+    ],
   },
-];
+]
 
 /**
  * Synthetic encounters (2 per patient = 10 total).
  * Mix of statuses and encounter classes.
  */
-function buildSyntheticEncounters(patientIds: string[]): Array<Record<string, unknown>> {
-  const encounters: Array<Record<string, unknown>> = [];
-  const statuses = ['finished', 'finished', 'in-progress', 'finished', 'finished'] as const;
+function buildSyntheticEncounters(
+  patientIds: string[],
+): Array<Record<string, unknown>> {
+  const encounters: Array<Record<string, unknown>> = []
+  const statuses = [
+    'finished',
+    'finished',
+    'in-progress',
+    'finished',
+    'finished',
+  ] as const
   const classes = [
     { code: 'AMB', display: 'ambulatory' },
     { code: 'AMB', display: 'ambulatory' },
     { code: 'HH', display: 'home health' },
     { code: 'AMB', display: 'ambulatory' },
     { code: 'IMP', display: 'inpatient' },
-  ];
+  ]
 
   for (let i = 0; i < SYNTHETIC_PATIENTS.length; i++) {
     // Encounter 1: past visit
@@ -120,12 +173,13 @@ function buildSyntheticEncounters(patientIds: string[]): Array<Record<string, un
             {
               system: 'http://snomed.info/sct',
               code: '185349003',
-              display: i === 4 ? 'Encounter for check-up' : 'Encounter for symptom',
+              display:
+                i === 4 ? 'Encounter for check-up' : 'Encounter for symptom',
             },
           ],
         },
       ],
-    });
+    })
 
     // Encounter 2: follow-up
     encounters.push({
@@ -148,10 +202,10 @@ function buildSyntheticEncounters(patientIds: string[]): Array<Record<string, un
           ],
         },
       ],
-    });
+    })
   }
 
-  return encounters;
+  return encounters
 }
 
 /**
@@ -162,10 +216,10 @@ function buildSyntheticObservations(
   patientIds: string[],
   encounterIds: string[],
 ): Array<Record<string, unknown>> {
-  const observations: Array<Record<string, unknown>> = [];
+  const observations: Array<Record<string, unknown>> = []
 
   for (let i = 0; i < SYNTHETIC_PATIENTS.length; i++) {
-    const encounterId = encounterIds[i * 2];
+    const encounterId = encounterIds[i * 2]
 
     // Blood pressure (panel)
     observations.push({
@@ -187,21 +241,39 @@ function buildSyntheticObservations(
         {
           code: {
             coding: [
-              { system: 'http://loinc.org', code: '8480-6', display: 'Systolic blood pressure' },
+              {
+                system: 'http://loinc.org',
+                code: '8480-6',
+                display: 'Systolic blood pressure',
+              },
             ],
           },
-          valueQuantity: { value: 110 + i * 4, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' },
+          valueQuantity: {
+            value: 110 + i * 4,
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]',
+          },
         },
         {
           code: {
             coding: [
-              { system: 'http://loinc.org', code: '8462-4', display: 'Diastolic blood pressure' },
+              {
+                system: 'http://loinc.org',
+                code: '8462-4',
+                display: 'Diastolic blood pressure',
+              },
             ],
           },
-          valueQuantity: { value: 70 + i * 3, unit: 'mmHg', system: 'http://unitsofmeasure.org', code: 'mm[Hg]' },
+          valueQuantity: {
+            value: 70 + i * 3,
+            unit: 'mmHg',
+            system: 'http://unitsofmeasure.org',
+            code: 'mm[Hg]',
+          },
         },
       ],
-    });
+    })
 
     // Heart rate
     observations.push({
@@ -215,8 +287,13 @@ function buildSyntheticObservations(
       subject: { reference: `Patient/${patientIds[i]}` },
       encounter: { reference: `Encounter/${encounterId}` },
       effectiveDateTime: `2024-0${(i % 9) + 1}-1${i}T09:20:00Z`,
-      valueQuantity: { value: 68 + i * 2, unit: 'beats/minute', system: 'http://unitsofmeasure.org', code: '/min' },
-    });
+      valueQuantity: {
+        value: 68 + i * 2,
+        unit: 'beats/minute',
+        system: 'http://unitsofmeasure.org',
+        code: '/min',
+      },
+    })
 
     // Body temperature
     observations.push({
@@ -224,17 +301,26 @@ function buildSyntheticObservations(
       status: 'final',
       code: {
         coding: [
-          { system: 'http://loinc.org', code: '8310-5', display: 'Body temperature' },
+          {
+            system: 'http://loinc.org',
+            code: '8310-5',
+            display: 'Body temperature',
+          },
         ],
       },
       subject: { reference: `Patient/${patientIds[i]}` },
       encounter: { reference: `Encounter/${encounterId}` },
       effectiveDateTime: `2024-0${(i % 9) + 1}-1${i}T09:25:00Z`,
-      valueQuantity: { value: 36.5 + i * 0.2, unit: 'degrees Celsius', system: 'http://unitsofmeasure.org', code: 'Cel' },
-    });
+      valueQuantity: {
+        value: 36.5 + i * 0.2,
+        unit: 'degrees Celsius',
+        system: 'http://unitsofmeasure.org',
+        code: 'Cel',
+      },
+    })
   }
 
-  return observations;
+  return observations
 }
 
 // ─── RLS Helper ────────────────────────────────────────
@@ -247,9 +333,9 @@ async function setRLSContext(
     sub: rlsContext.userId,
     role: rlsContext.role,
     break_glass: rlsContext.breakGlass ?? false,
-  });
-  await client.query(`SET LOCAL app.tenant_id = $1`, [rlsContext.tenantId]);
-  await client.query(`SET LOCAL request.jwt.claims = $1`, [claims]);
+  })
+  await client.query(`SET LOCAL app.tenant_id = $1`, [rlsContext.tenantId])
+  await client.query(`SET LOCAL request.jwt.claims = $1`, [claims])
 }
 
 // ─── Seed Function ─────────────────────────────────────
@@ -266,8 +352,10 @@ async function setRLSContext(
  * console.log(`Created ${result.patientsCreated} patients, ${result.encountersCreated} encounters`);
  * ```
  */
-export async function seedSandboxTenant(options: SandboxSeedOptions): Promise<SandboxSeedResult> {
-  const { tenantId, reset = false } = options;
+export async function seedSandboxTenant(
+  options: SandboxSeedOptions,
+): Promise<SandboxSeedResult> {
+  const { tenantId, reset = false } = options
 
   const result: SandboxSeedResult = {
     tenantId,
@@ -277,28 +365,37 @@ export async function seedSandboxTenant(options: SandboxSeedOptions): Promise<Sa
     patientIds: [],
     encounterIds: [],
     observationIds: [],
-  };
+  }
 
   const rlsContext: RLSContext = {
     tenantId,
     userId: 'system-sandbox-seeder',
     role: 'system',
-  };
+  }
 
   await transaction(async (client) => {
-    await setRLSContext(client, rlsContext);
+    await setRLSContext(client, rlsContext)
 
     // Optionally clear existing sandbox data
     if (reset) {
-      await client.query(`DELETE FROM ehr_observation WHERE tenant_id = $1`, [tenantId]);
-      await client.query(`DELETE FROM ehr_encounter WHERE tenant_id = $1`, [tenantId]);
-      await client.query(`DELETE FROM ehr_patient WHERE tenant_id = $1`, [tenantId]);
+      await client.query(`DELETE FROM ehr_observation WHERE tenant_id = $1`, [
+        tenantId,
+      ])
+      await client.query(`DELETE FROM ehr_encounter WHERE tenant_id = $1`, [
+        tenantId,
+      ])
+      await client.query(`DELETE FROM ehr_patient WHERE tenant_id = $1`, [
+        tenantId,
+      ])
     }
 
     // Seed patients — DB generates UUIDs via DEFAULT gen_random_uuid()
-    const patientIds: string[] = [];
+    const patientIds: string[] = []
     for (const patientData of SYNTHETIC_PATIENTS) {
-      const validated = patientSchema.parse({ ...patientData, resourceType: 'Patient' });
+      const validated = patientSchema.parse({
+        ...patientData,
+        resourceType: 'Patient',
+      })
       const res = await client.query<{ patient_id: string }>(
         `INSERT INTO ehr_patient (tenant_id, mrn, active, family_name, given_name, birth_date, gender, fhir_resource)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -313,24 +410,24 @@ export async function seedSandboxTenant(options: SandboxSeedOptions): Promise<Sa
           validated.gender ?? null,
           JSON.stringify(validated),
         ],
-      );
-      const patientId = res.rows[0].patient_id;
-      patientIds.push(patientId);
-      result.patientIds.push(patientId);
-      result.patientsCreated++;
+      )
+      const patientId = res.rows[0].patient_id
+      patientIds.push(patientId)
+      result.patientIds.push(patientId)
+      result.patientsCreated++
     }
 
     // Seed encounters — reference patients by DB-generated UUID
-    const encounters = buildSyntheticEncounters(patientIds);
-    const encounterIds: string[] = [];
+    const encounters = buildSyntheticEncounters(patientIds)
+    const encounterIds: string[] = []
     for (const encounterData of encounters) {
-      const validated = encounterSchema.parse(encounterData);
+      const validated = encounterSchema.parse(encounterData)
       const patientId =
-        validated.subject?.reference?.replace('Patient/', '') ?? null;
+        validated.subject?.reference?.replace('Patient/', '') ?? null
       const practitionerId =
         validated.participant
           ?.find((p) => p.individual?.reference?.startsWith('Practitioner/'))
-          ?.individual?.reference?.replace('Practitioner/', '') ?? null;
+          ?.individual?.reference?.replace('Practitioner/', '') ?? null
       const res = await client.query<{ encounter_id: string }>(
         `INSERT INTO ehr_encounter (tenant_id, patient_id, practitioner_id, status, class, period_start, period_end, fhir_resource)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -345,23 +442,23 @@ export async function seedSandboxTenant(options: SandboxSeedOptions): Promise<Sa
           validated.period?.end ?? null,
           JSON.stringify(validated),
         ],
-      );
-      const encounterId = res.rows[0].encounter_id;
-      encounterIds.push(encounterId);
-      result.encounterIds.push(encounterId);
-      result.encountersCreated++;
+      )
+      const encounterId = res.rows[0].encounter_id
+      encounterIds.push(encounterId)
+      result.encounterIds.push(encounterId)
+      result.encountersCreated++
     }
 
     // Seed observations — reference patients and encounters by DB-generated UUIDs
-    const observations = buildSyntheticObservations(patientIds, encounterIds);
+    const observations = buildSyntheticObservations(patientIds, encounterIds)
     for (const observationData of observations) {
-      const validated = observationSchema.parse(observationData);
+      const validated = observationSchema.parse(observationData)
       const patientId =
-        validated.subject?.reference?.replace('Patient/', '') ?? null;
+        validated.subject?.reference?.replace('Patient/', '') ?? null
       const encounterId =
-        validated.encounter?.reference?.replace('Encounter/', '') ?? null;
+        validated.encounter?.reference?.replace('Encounter/', '') ?? null
       const code =
-        validated.code?.coding?.[0]?.code ?? validated.code?.text ?? null;
+        validated.code?.coding?.[0]?.code ?? validated.code?.text ?? null
       const res = await client.query<{ observation_id: string }>(
         `INSERT INTO ehr_observation (tenant_id, patient_id, encounter_id, status, code, effective_date, fhir_resource)
          VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -375,91 +472,96 @@ export async function seedSandboxTenant(options: SandboxSeedOptions): Promise<Sa
           validated.effectiveDateTime ?? null,
           JSON.stringify(validated),
         ],
-      );
-      const observationId = res.rows[0].observation_id;
-      result.observationIds.push(observationId);
-      result.observationsCreated++;
+      )
+      const observationId = res.rows[0].observation_id
+      result.observationIds.push(observationId)
+      result.observationsCreated++
     }
-  });
+  })
 
-  return result;
+  return result
 }
 
 /**
  * Clears all sandbox data for a tenant.
  */
 export async function clearSandboxData(tenantId: string): Promise<number> {
-  let deleted = 0;
+  let deleted = 0
   await transaction(async (client) => {
     const obsRes = await client.query(
       `DELETE FROM ehr_observation WHERE tenant_id = $1`,
       [tenantId],
-    );
-    deleted += obsRes.rowCount ?? 0;
+    )
+    deleted += obsRes.rowCount ?? 0
     const encRes = await client.query(
       `DELETE FROM ehr_encounter WHERE tenant_id = $1`,
       [tenantId],
-    );
-    deleted += encRes.rowCount ?? 0;
+    )
+    deleted += encRes.rowCount ?? 0
     const patRes = await client.query(
       `DELETE FROM ehr_patient WHERE tenant_id = $1 RETURNING patient_id`,
       [tenantId],
-    );
-    deleted += patRes.rowCount ?? 0;
-  });
+    )
+    deleted += patRes.rowCount ?? 0
+  })
 
-  return deleted;
+  return deleted
 }
 
 /**
  * Checks if a tenant has sandbox data seeded.
  */
 export async function isSandboxSeeded(tenantId: string): Promise<boolean> {
-  let exists = false;
+  let exists = false
   await transaction(async (client) => {
     const res = await client.query(
       `SELECT EXISTS(SELECT 1 FROM ehr_patient WHERE tenant_id = $1 LIMIT 1)`,
       [tenantId],
-    );
-    exists = Boolean(res.rows[0]?.exists);
-  });
-  return exists;
+    )
+    exists = Boolean(res.rows[0]?.exists)
+  })
+  return exists
 }
 
 // ─── CLI Entry Point ───────────────────────────────────
 
 async function main() {
-  const args = process.argv.slice(2);
-  const tenantIdx = args.indexOf('--tenant');
-  const resetIdx = args.indexOf('--reset');
+  const args = process.argv.slice(2)
+  const tenantIdx = args.indexOf('--tenant')
+  const resetIdx = args.indexOf('--reset')
 
   if (tenantIdx === -1 || !args[tenantIdx + 1]) {
-    console.error('Usage: sandbox-seed.ts --tenant <tenant-id> [--reset]');
-    process.exit(1);
+    console.error('Usage: sandbox-seed.ts --tenant <tenant-id> [--reset]')
+    process.exit(1)
   }
 
-  const tenantId = args[tenantIdx + 1];
-  const reset = resetIdx !== -1;
+  const tenantId = args[tenantIdx + 1]
+  const reset = resetIdx !== -1
 
-  console.log(`[sandbox-seed] Seeding tenant: ${tenantId}${reset ? ' (reset mode)' : ''}`);
+  console.log(
+    `[sandbox-seed] Seeding tenant: ${tenantId}${reset ? ' (reset mode)' : ''}`,
+  )
 
   try {
-    const result = await seedSandboxTenant({ tenantId, reset });
+    const result = await seedSandboxTenant({ tenantId, reset })
     console.log('[sandbox-seed] Complete:', {
       patientsCreated: result.patientsCreated,
       encountersCreated: result.encountersCreated,
       observationsCreated: result.observationsCreated,
-    });
-    console.log('[sandbox-seed] Patient IDs:', result.patientIds.join(', '));
-    console.log('[sandbox-seed] Encounter IDs:', result.encounterIds.join(', '));
-    console.log('[sandbox-seed] Observation IDs:', result.observationIds.join(', '));
+    })
+    console.log('[sandbox-seed] Patient IDs:', result.patientIds.join(', '))
+    console.log('[sandbox-seed] Encounter IDs:', result.encounterIds.join(', '))
+    console.log(
+      '[sandbox-seed] Observation IDs:',
+      result.observationIds.join(', '),
+    )
   } catch (err) {
-    console.error('[sandbox-seed] FAILED:', err);
-    process.exit(1);
+    console.error('[sandbox-seed] FAILED:', err)
+    process.exit(1)
   }
 }
 
 // Run if invoked directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-  void main();
+  void main()
 }

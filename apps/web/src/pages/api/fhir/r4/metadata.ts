@@ -9,7 +9,7 @@
  * Per ADR-002: FHIR R4 validated with Zod.
  * Per task PIX-4408: Must validate against FHIR R4 profile.
  */
-import { generateCapabilityStatement } from '@/lib/ehr-native/api/capability-statement';
+import { generateCapabilityStatement } from '@/lib/ehr-native/api/capability-statement'
 
 /**
  * GET /api/fhir/r4/metadata
@@ -18,7 +18,7 @@ import { generateCapabilityStatement } from '@/lib/ehr-native/api/capability-sta
  * It returns the server's capabilities as a CapabilityStatement resource.
  */
 export async function GET(): Promise<Response> {
-  const statement = generateCapabilityStatement();
+  const statement = generateCapabilityStatement()
 
   return new Response(JSON.stringify(statement), {
     status: 200,
@@ -26,5 +26,5 @@ export async function GET(): Promise<Response> {
       'Content-Type': 'application/fhir+json',
       'Cache-Control': 'public, max-age=3600',
     },
-  });
+  })
 }
