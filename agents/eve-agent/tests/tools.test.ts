@@ -3,7 +3,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const execFileMock = vi.fn()
 vi.mock('node:child_process', () => ({
-  execFile: (cmd: string, args: string[], opts: unknown, cb: (err: Error | null, res: { stdout: string; stderr: string }) => void) => {
+  execFile: (
+    cmd: string,
+    args: string[],
+    opts: unknown,
+    cb: (err: Error | null, res: { stdout: string; stderr: string }) => void,
+  ) => {
     execFileMock(cmd, args, opts, cb)
   },
 }))
@@ -22,7 +27,10 @@ describe('eve-agent tools', () => {
   describe('clean_corpus tool', () => {
     it('executes pipeline with target path and returns stdout summary', async () => {
       execFileMock.mockImplementation((cmd, args, opts, cb) => {
-        cb(null, { stdout: 'Filtered 150 slop items successfully.', stderr: '' })
+        cb(null, {
+          stdout: 'Filtered 150 slop items successfully.',
+          stderr: '',
+        })
       })
 
       const result = await cleanCorpus.execute(
@@ -58,7 +66,10 @@ describe('eve-agent tools', () => {
 
     it('handles process execution failure cleanly', async () => {
       execFileMock.mockImplementation((cmd, args, opts, cb) => {
-        cb(new Error('Process exited with code 1: File not found'), { stdout: '', stderr: '' })
+        cb(new Error('Process exited with code 1: File not found'), {
+          stdout: '',
+          stderr: '',
+        })
       })
 
       const result = await cleanCorpus.execute(
@@ -84,7 +95,10 @@ describe('eve-agent tools', () => {
 
     it('returns fail verdict when verify_repairs encounters errors', async () => {
       execFileMock.mockImplementation((cmd, args, opts, cb) => {
-        cb(new Error('Gate 3 Failed: 2 predicate violations'), { stdout: '', stderr: '' })
+        cb(new Error('Gate 3 Failed: 2 predicate violations'), {
+          stdout: '',
+          stderr: '',
+        })
       })
 
       const result = await evaluateCorpusGate.execute({}, ctx)
