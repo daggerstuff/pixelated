@@ -78,6 +78,13 @@ export const EHRAuditAction = {
   CANCEL_PRESCRIPTION: 'cancel_prescription',
   CHECK_DRUG_INTERACTION: 'check_drug_interaction',
 
+  // E-Prescribing
+  EPRESCRIBE_NEW_RX: 'eprescribe_new_rx',
+  EPRESCRIBE_REFILL: 'eprescribe_refill',
+  EPRESCRIBE_CANCEL: 'eprescribe_cancel',
+  EPRESCRIBE_MEDICATION_HISTORY: 'eprescribe_medication_history',
+  EPRESCRIBE_DRUG_INTERACTION_CHECK: 'eprescribe_drug_interaction_check',
+
   // HIE / Integration
   HIE_PATIENT_DISCOVERY: 'hie_patient_discovery',
   HIE_DOCUMENT_QUERY: 'hie_document_query',
@@ -139,6 +146,7 @@ export const EHRResourceType = {
   CLAIM: 'Claim',
   CONSENT: 'Consent',
   MEDICATION_REQUEST: 'MedicationRequest',
+  EPRESCRIPTION: 'EPrescription',
   COVERAGE: 'Coverage',
   TELEHEALTH_SESSION: 'TelehealthSession',
   PROVENANCE: 'Provenance',
@@ -295,6 +303,23 @@ export function ehrActionToEventType(
     action.startsWith('integration_')
   ) {
     return AuditEventType.SYSTEM
+  }
+  // E-prescribing: new/refill are create operations, cancel is a delete,
+  // medication history and drug interaction checks are read accesses.
+  if (
+    action === EHRAuditAction.EPRESCRIBE_NEW_RX ||
+    action === EHRAuditAction.EPRESCRIBE_REFILL
+  ) {
+    return AuditEventType.CREATE
+  }
+  if (action === EHRAuditAction.EPRESCRIBE_CANCEL) {
+    return AuditEventType.DELETE
+  }
+  if (
+    action === EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY ||
+    action === EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK
+  ) {
+    return AuditEventType.ACCESS
   }
   if (action.startsWith('break_glass')) {
     return AuditEventType.SECURITY

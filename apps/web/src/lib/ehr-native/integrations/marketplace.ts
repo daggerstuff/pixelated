@@ -114,6 +114,39 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
       'call.completed',
     ],
   },
+  {
+    provider: 'carequality',
+    displayName: 'Carequality',
+    description:
+      'Nationwide health information network exchange for patient discovery and document sharing.',
+    category: 'hie',
+    logoUrl: undefined,
+    documentationUrl: 'https://sequoiaproject.org/carequality/',
+    defaultScopes: ['patient_discovery', 'document_query', 'document_retrieve', 'document_submit'],
+    webhookEvents: [],
+  },
+  {
+    provider: 'directtrust',
+    displayName: 'DirectTrust',
+    description:
+      'Direct Secure Messaging for sending and receiving clinical documents.',
+    category: 'hie',
+    logoUrl: undefined,
+    documentationUrl: 'https://directtrust.org/',
+    defaultScopes: ['send_document', 'receive_document'],
+    webhookEvents: [],
+  },
+  {
+    provider: 'dosespot',
+    displayName: 'DoseSpot',
+    description:
+      'E-prescribing for new prescriptions, refills, cancellations, medication history, and drug interaction checks.',
+    category: 'eprescribing',
+    logoUrl: undefined,
+    documentationUrl: 'https://dosespot.com/api',
+    defaultScopes: ['prescribe', 'pharmacy_search', 'medication_history', 'drug_interactions'],
+    webhookEvents: [],
+  },
 ] as const
 
 /**

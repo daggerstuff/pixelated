@@ -12,6 +12,7 @@
  */
 
 export * from './hie'
+export * from './e-prescribing'
 export * from './types'
 export * from './calendly'
 export * from './zoom'
