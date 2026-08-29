@@ -135,7 +135,33 @@ export type ZoomMeeting = z.infer<typeof zoomMeetingSchema>
  * Zoom recording — cloud recording for a meeting.
  * @see https://developers.zoom.us/docs/api/rest/reference/cloud-recording/methods#operation/recordingsList
  */
-export const zoomRecordingSchema = z.object({
+const zoomRecordingFileSchema = z.object({
+  id: z.string().optional(),
+  meeting_id: z.number().int().optional(),
+  recording_start: z.iso.datetime().optional(),
+  recording_end: z.iso.datetime().optional(),
+  file_type: z.enum(['MP4', 'M4A', 'CHAT', 'TRANSCRIPT', 'CC']),
+  file_size: z.number().int().nonnegative().optional(),
+  play_url: z.url().optional(),
+  download_url: z.url().optional(),
+  status: z.enum(['completed', 'processing', 'failed']).optional(),
+  recording_type: z
+    .enum([
+      'shared_screen_with_speaker_view',
+      'shared_screen_with_gallery_view',
+      'speaker_view',
+      'gallery_view',
+      'shared_screen',
+      'audio_only',
+      'audio_transcript',
+      'chat_file',
+      'closed_caption',
+      'timeline',
+    ])
+    .optional(),
+})
+
+const zoomRecordingSchema = z.object({
   id: z.string(),
   meeting_id: z.number().int(),
   topic: z.string(),

@@ -29,6 +29,13 @@ import type {
   ReviewRiskScoreParams,
 } from './types'
 
+export type {
+  RiskAISystemSource,
+  RiskGateAuditEntry,
+  RiskGateResult,
+  RiskStratificationReview,
+}
+
 // ---------------------------------------------------------------------------
 // In-memory store (production would use a persistent store with RLS)
 // ---------------------------------------------------------------------------
