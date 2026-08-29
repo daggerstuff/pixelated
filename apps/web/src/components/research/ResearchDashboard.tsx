@@ -1,5 +1,5 @@
-import type { FC } from 'react'
-import { useMemo, useCallback, memo } from 'react'
+import type { FC, SubmitEventHandler } from 'react'
+import { useMemo, useCallback, useState, memo } from 'react'
 
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
 import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'
@@ -43,6 +43,101 @@ interface DatasetInfo {
   lastUpdated: Date
 }
 
+type PublicationStatus =
+  'draft' | 'submitted' | 'in-review' | 'published' | 'rejected'
+
+interface Publication {
+  id: string
+  title: string
+  authors: string[]
+  journal: string
+  doi?: string
+  status: PublicationStatus
+  abstract: string
+  keywords: string[]
+  publicationDate: string
+}
+
+interface PublicationFormData {
+  title: string
+  authors: string
+  journal: string
+  doi: string
+  status: PublicationStatus
+  abstract: string
+  keywords: string
+  publicationDate: string
+}
+
+const initialPublications: Publication[] = [
+  {
+    id: 'pub-1',
+    title:
+      'AI-Assisted Cognitive Behavioral Therapy: A Randomized Controlled Trial',
+    authors: ['Dr. Sarah Chen', 'Dr. Michael Rodriguez', 'Dr. Emily Park'],
+    journal: 'Journal of Medical Internet Research',
+    doi: '10.2196/jmir.2024.45678',
+    status: 'published',
+    abstract:
+      'This study examines the efficacy of AI-assisted CBT interventions across 245 participants over 12 months, showing significant improvement in treatment outcomes compared to traditional therapy.',
+    keywords: ['AI therapy', 'CBT', 'randomized trial', 'digital health'],
+    publicationDate: '2024-01-15',
+  },
+  {
+    id: 'pub-2',
+    title: 'Federated Learning for Privacy-Preserving Mental Health Analytics',
+    authors: ['Dr. James Liu', 'Dr. Anna Kowalski'],
+    journal: 'IEEE Transactions on Biomedical Engineering',
+    doi: '10.1109/tbme.2024.123456',
+    status: 'in-review',
+    abstract:
+      'We propose a federated learning framework enabling privacy-preserving mental health data analysis across institutions without sharing raw patient data.',
+    keywords: ['federated learning', 'privacy', 'mental health', 'distributed'],
+    publicationDate: '2024-03-20',
+  },
+  {
+    id: 'pub-3',
+    title: 'Real-Time Sentiment Analysis in Therapy Sessions',
+    authors: ['Dr. Patricia Gomez', 'Dr. Kevin Wu', 'Dr. Linda Martinez'],
+    journal: 'Computers in Human Behavior',
+    doi: undefined,
+    status: 'submitted',
+    abstract:
+      'This paper explores real-time sentiment analysis techniques during therapy sessions to provide clinicians with immediate feedback on patient emotional states.',
+    keywords: ['sentiment analysis', 'therapy', 'NLP', 'real-time'],
+    publicationDate: '2024-05-10',
+  },
+  {
+    id: 'pub-4',
+    title: 'Therapeutic Alliance in AI-Mediated Therapy Sessions',
+    authors: ['Dr. Robert Taylor'],
+    journal: 'Cyberpsychology, Behavior, and Social Networking',
+    doi: undefined,
+    status: 'draft',
+    abstract:
+      'An examination of therapeutic alliance quality when AI systems mediate between therapist and patient, with implications for AI system design in mental health.',
+    keywords: ['therapeutic alliance', 'AI therapy', 'session quality'],
+    publicationDate: '2024-06-01',
+  },
+  {
+    id: 'pub-5',
+    title: 'Longitudinal Outcomes of Digital Mental Health Interventions',
+    authors: [
+      'Dr. Maria Santos',
+      'Dr. David Kim',
+      "Dr. Fiona O'Brien",
+      'Dr. Hassan Ali',
+    ],
+    journal: 'The Lancet Digital Health',
+    doi: '10.1016/s2589-7500(24)00078-9',
+    status: 'published',
+    abstract:
+      'A 24-month longitudinal study tracking outcomes of digital mental health interventions across 1,200 participants, demonstrating sustained efficacy and engagement.',
+    keywords: ['longitudinal', 'digital health', 'outcomes', 'follow-up'],
+    publicationDate: '2024-02-28',
+  },
+]
+
 /**
  * Comprehensive Research Dashboard for Mental Health Researchers
  */
@@ -58,6 +153,14 @@ export const ResearchDashboard: FC = () => {
     'research_selected_studies',
     [],
   )
+  const [publications, setPublications] = usePersistentState<Publication[]>(
+    'research_publications',
+    initialPublications,
+  )
+  const [pubSearch, setPubSearch] = useState('')
+  const [pubFilterStatus, setPubFilterStatus] = useState<
+    PublicationStatus | 'all'
+  >('all')
   const dashboardTabs = [
     { id: 'overview', label: 'Overview', icon: 'chart' },
     { id: 'studies', label: 'Studies', icon: '🔬' },
@@ -72,11 +175,11 @@ export const ResearchDashboard: FC = () => {
       totalStudies: 47,
       activeStudies: 12,
       totalParticipants: 8934,
-      publications: 23,
+      publications: publications.length,
       avgEffectSize: 0.67,
       dataQuality: 94,
     }),
-    [],
+    [publications],
   )
 
   const studies: ResearchStudy[] = useMemo(
@@ -180,6 +283,27 @@ export const ResearchDashboard: FC = () => {
       )
     },
     [setSelectedStudies],
+  )
+
+  const handleAddPublication = useCallback(
+    (pub: Publication) => {
+      setPublications((prev) => [...prev, pub])
+    },
+    [setPublications],
+  )
+
+  const handleUpdatePublication = useCallback(
+    (pub: Publication) => {
+      setPublications((prev) => prev.map((p) => (p.id === pub.id ? pub : p)))
+    },
+    [setPublications],
+  )
+
+  const handleDeletePublication = useCallback(
+    (id: string) => {
+      setPublications((prev) => prev.filter((p) => p.id !== id))
+    },
+    [setPublications],
   )
 
   return (
@@ -316,7 +440,18 @@ export const ResearchDashboard: FC = () => {
             <AnalyticsTab data={analyticsData} />
           )}
 
-          {dashboardView === 'publications' && <PublicationsTab />}
+          {dashboardView === 'publications' && (
+            <PublicationsTab
+              publications={publications}
+              onAdd={handleAddPublication}
+              onUpdate={handleUpdatePublication}
+              onDelete={handleDeletePublication}
+              search={pubSearch}
+              onSearchChange={setPubSearch}
+              filterStatus={pubFilterStatus}
+              onFilterChange={setPubFilterStatus}
+            />
+          )}
         </main>
       </div>
     </ResponsiveContainer>
@@ -359,10 +494,447 @@ const AnalyticsTab: FC<{ data: any[] }> = memo(({ data }) => (
   />
 ))
 
-const PublicationsTab: FC = memo(() => (
-  <div className="text-gray-500 py-12 text-center">
-    Publications management coming soon...
-  </div>
-))
+interface PublicationsTabProps {
+  publications: Publication[]
+  onAdd: (pub: Publication) => void
+  onUpdate: (pub: Publication) => void
+  onDelete: (id: string) => void
+  search: string
+  onSearchChange: (value: string) => void
+  filterStatus: PublicationStatus | 'all'
+  onFilterChange: (value: PublicationStatus | 'all') => void
+}
+
+const statusBadgeColors: Record<PublicationStatus, string> = {
+  'draft': 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+  'submitted':
+    'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
+  'in-review':
+    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
+  'published':
+    'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
+  'rejected': 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+}
+
+const PublicationsTab: FC<PublicationsTabProps> = memo(
+  ({
+    publications,
+    onAdd,
+    onUpdate,
+    onDelete,
+    search,
+    onSearchChange,
+    filterStatus,
+    onFilterChange,
+  }) => {
+    const [showForm, setShowForm] = useState(false)
+    const [editingId, setEditingId] = useState<string | null>(null)
+    const [deletingId, setDeletingId] = useState<string | null>(null)
+    const [formData, setFormData] = useState<PublicationFormData>({
+      title: '',
+      authors: '',
+      journal: '',
+      doi: '',
+      status: 'draft',
+      abstract: '',
+      keywords: '',
+      publicationDate: new Date().toISOString().split('T')[0],
+    })
+
+    const filteredPublications = useMemo(() => {
+      return publications.filter((pub) => {
+        const matchesSearch =
+          !search ||
+          pub.title.toLowerCase().includes(search.toLowerCase()) ||
+          pub.authors.some((a) =>
+            a.toLowerCase().includes(search.toLowerCase()),
+          ) ||
+          pub.journal.toLowerCase().includes(search.toLowerCase())
+        const matchesFilter =
+          filterStatus === 'all' || pub.status === filterStatus
+        return matchesSearch && matchesFilter
+      })
+    }, [publications, search, filterStatus])
+
+    const handleOpenAdd = () => {
+      setEditingId(null)
+      setFormData({
+        title: '',
+        authors: '',
+        journal: '',
+        doi: '',
+        status: 'draft',
+        abstract: '',
+        keywords: '',
+        publicationDate: new Date().toISOString().split('T')[0],
+      })
+      setShowForm(true)
+    }
+
+    const handleOpenEdit = (pub: Publication) => {
+      setEditingId(pub.id)
+      setFormData({
+        title: pub.title,
+        authors: pub.authors.join(', '),
+        journal: pub.journal,
+        doi: pub.doi ?? '',
+        status: pub.status,
+        abstract: pub.abstract,
+        keywords: pub.keywords.join(', '),
+        publicationDate: pub.publicationDate,
+      })
+      setShowForm(true)
+    }
+
+    const handleSubmit: SubmitEventHandler = (e) => {
+      e.preventDefault()
+      const pub: Publication = {
+        id: editingId ?? crypto.randomUUID(),
+        title: formData.title,
+        authors: formData.authors
+          .split(',')
+          .map((a) => a.trim())
+          .filter(Boolean),
+        journal: formData.journal,
+        doi: formData.doi || undefined,
+        status: formData.status,
+        abstract: formData.abstract,
+        keywords: [
+          ...new Set(
+            formData.keywords
+              .split(',')
+              .map((k) => k.trim())
+              .filter(Boolean),
+          ),
+        ],
+        publicationDate: formData.publicationDate,
+      }
+      if (editingId) {
+        onUpdate(pub)
+      } else {
+        onAdd(pub)
+      }
+      setShowForm(false)
+      setEditingId(null)
+    }
+
+    const handleConfirmDelete = () => {
+      if (deletingId) {
+        onDelete(deletingId)
+        setDeletingId(null)
+      }
+    }
+
+    const deletingPublication = deletingId
+      ? publications.find((p) => p.id === deletingId)
+      : null
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-1 items-center gap-3">
+            <input
+              type="text"
+              placeholder="Search publications..."
+              value={search}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+            />
+            <select
+              value={filterStatus}
+              onChange={(e) => {
+                const val = e.target.value
+                if (
+                  val === 'all' ||
+                  val === 'draft' ||
+                  val === 'submitted' ||
+                  val === 'in-review' ||
+                  val === 'published' ||
+                  val === 'rejected'
+                ) {
+                  onFilterChange(val)
+                }
+              }}
+              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm"
+            >
+              <option value="all">All Statuses</option>
+              <option value="draft">Draft</option>
+              <option value="submitted">Submitted</option>
+              <option value="in-review">In Review</option>
+              <option value="published">Published</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <button
+            onClick={handleOpenAdd}
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap"
+          >
+            Add Publication
+          </button>
+        </div>
+
+        {filteredPublications.length === 0 ? (
+          <div className="text-gray-500 py-12 text-center">
+            No publications found. Click &ldquo;Add Publication&rdquo; to create
+            one.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            {filteredPublications.map((pub) => (
+              <Card key={pub.id} className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-2 flex items-center gap-2">
+                      <span
+                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeColors[pub.status]}`}
+                      >
+                        {pub.status}
+                      </span>
+                    </div>
+                    <h3 className="text-gray-900 dark:text-white font-semibold truncate">
+                      {pub.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm">
+                      {pub.authors.join(', ')}
+                    </p>
+                    <p className="text-gray-500 dark:text-gray-500 mt-1 text-sm italic">
+                      {pub.journal}
+                    </p>
+                    {pub.doi && (
+                      <p className="text-gray-400 mt-1 text-xs">
+                        DOI: {pub.doi}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="text-gray-600 dark:text-gray-400 mt-3 line-clamp-2 text-sm">
+                  {pub.abstract}
+                </p>
+                {pub.keywords.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {pub.keywords.map((kw) => (
+                      <span
+                        key={kw}
+                        className="bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-0.5 text-xs"
+                      >
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-gray-200 dark:border-gray-700 mt-4 border-t pt-3">
+                  <span className="text-gray-500 text-xs">
+                    {pub.publicationDate}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleOpenEdit(pub)}
+                      className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setDeletingId(pub.id)}
+                      className="text-red-600 dark:text-red-400 text-sm font-medium hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {showForm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white dark:bg-gray-800 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg p-6">
+              <h2 className="text-gray-900 dark:text-white mb-4 text-xl font-bold">
+                {editingId ? 'Edit Publication' : 'Add Publication'}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.title}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
+                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    Authors (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.authors}
+                    onChange={(e) =>
+                      setFormData({ ...formData, authors: e.target.value })
+                    }
+                    placeholder="Dr. Jane Smith, Dr. John Doe"
+                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                      Journal
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.journal}
+                      onChange={(e) =>
+                        setFormData({ ...formData, journal: e.target.value })
+                      }
+                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                      DOI
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.doi}
+                      onChange={(e) =>
+                        setFormData({ ...formData, doi: e.target.value })
+                      }
+                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                      Status
+                    </label>
+                    <select
+                      value={formData.status}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          status: e.target.value as PublicationStatus,
+                        })
+                      }
+                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="submitted">Submitted</option>
+                      <option value="in-review">In Review</option>
+                      <option value="published">Published</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                      Publication Date
+                    </label>
+                    <input
+                      type="date"
+                      required
+                      value={formData.publicationDate}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          publicationDate: e.target.value,
+                        })
+                      }
+                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    Abstract
+                  </label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={formData.abstract}
+                    onChange={(e) =>
+                      setFormData({ ...formData, abstract: e.target.value })
+                    }
+                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    Keywords (comma-separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.keywords}
+                    onChange={(e) =>
+                      setFormData({ ...formData, keywords: e.target.value })
+                    }
+                    placeholder="AI therapy, CBT, digital health"
+                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowForm(false)
+                      setEditingId(null)
+                    }}
+                    className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  >
+                    {editingId ? 'Update' : 'Add'} Publication
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {deletingPublication && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-lg p-6">
+              <h2 className="text-gray-900 dark:text-white text-lg font-bold">
+                Delete Publication
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
+                Are you sure you want to delete &ldquo;
+                {deletingPublication.title}&rdquo;? This action cannot be
+                undone.
+              </p>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setDeletingId(null)}
+                  className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  },
+)
 
 export default ResearchDashboard

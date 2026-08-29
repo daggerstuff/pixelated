@@ -15,7 +15,6 @@ import {
   EHR_PERMISSIONS,
   isClinicalRole,
   isEHRPermission,
-  type ClinicalRole,
   type EHRPermission,
 } from './types'
 
@@ -32,8 +31,8 @@ describe('ClinicalRole type guards', () => {
     expect(isClinicalRole('admin')).toBe(false)
   })
 
-  it('has exactly 13 clinical roles', () => {
-    expect(CLINICAL_ROLES).toHaveLength(13)
+  it('has exactly 14 clinical roles', () => {
+    expect(CLINICAL_ROLES).toHaveLength(14)
   })
 })
 
@@ -174,6 +173,19 @@ describe('resolveRolePermissions (inheritance)', () => {
     const therapistPerms = resolveRolePermissions('therapist')
     // therapist -> nurse -> medicalAssistant -> frontDesk
     expect(therapistPerms.has('read_schedule')).toBe(true)
+  })
+
+  it('supervisor inherits therapist and has cosign_clinical_note', () => {
+    const supervisorPerms = resolveRolePermissions('supervisor')
+    expect(supervisorPerms.has('cosign_clinical_note')).toBe(true)
+    expect(supervisorPerms.has('sign_clinical_note')).toBe(true)
+    expect(supervisorPerms.has('read_clinical_note')).toBe(true)
+    expect(supervisorPerms.has('read_patient')).toBe(true)
+    expect(supervisorPerms.has('audit_access')).toBe(true)
+    // Regression (Sentry 16291190/0): supervisor must NOT transitively gain
+    // medication/procedure write authority via the therapist -> nurse chain.
+    expect(supervisorPerms.has('write_medication')).toBe(false)
+    expect(supervisorPerms.has('write_procedure')).toBe(false)
   })
 
   it('systemAdmin inherits physician permissions', () => {

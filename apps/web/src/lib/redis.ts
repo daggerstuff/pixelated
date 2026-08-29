@@ -71,6 +71,7 @@ export interface LegacyRedisClient {
   del(key: string): Promise<number>
   exists(key: string): Promise<number>
   setex(key: string, seconds: number, value: string): Promise<unknown>
+  setNx(key: string, value: string, ttlSeconds: number): Promise<boolean>
   expire(key: string, seconds: number): Promise<number>
   ping(): Promise<string>
   on(event: string, handler: (...args: unknown[]) => void): void
@@ -123,7 +124,7 @@ export interface LegacyRedisClient {
   ttl?(key: string): Promise<number>
 }
 
-const redisClient: LegacyRedisClient = {
+export const redisClient: LegacyRedisClient = {
   get: async (key: string) => {
     try {
       await ensureConnected()
@@ -145,6 +146,18 @@ const redisClient: LegacyRedisClient = {
       return 'OK'
     } catch {
       return null
+    }
+  },
+
+  setNx: async (key: string, value: string, ttlSeconds: number) => {
+    try {
+      await ensureConnected()
+      const client = service.getClient()
+      if (!client) return false
+      const result = await client.set(key, value, 'EX', ttlSeconds, 'NX')
+      return result === 'OK'
+    } catch {
+      return false
     }
   },
 
@@ -511,7 +524,7 @@ export async function removeFromCache(key: string): Promise<boolean> {
 }
 
 export function getRedisClient() {
-  return redis
+  return redisClient
 }
 
 /**
