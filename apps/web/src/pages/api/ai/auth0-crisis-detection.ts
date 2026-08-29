@@ -34,7 +34,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request)
+    const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
       return new Response(
@@ -98,7 +98,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     // Initialize crisis detection service with required config
     // Configuration flag for detector selection per deployment
-    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] ?? 'mental_health'
+    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] || 'mental_health'
     const crisisDetectionService = detectorType === 'mental_health'
       ? new CrisisDetectionService({
           aiService,
@@ -112,7 +112,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     // Perform crisis detection
     const crisisOptions: CrisisDetectionOptions = {
       sensitivityLevel: 'medium',
-      userId: userId,
+      userId: userId ?? 'anonymous',
       source: 'auth0-api',
       metadata: { sessionId, context },
     }

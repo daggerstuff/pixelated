@@ -1,15 +1,7 @@
 /* @vitest-environment node */
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from "vitest";
-
-// HuggingFaceTrainingBackend reads AI_SERVICE_API_KEY from env into a module-level
-// const at import time, so the key must be present BEFORE the backend module is
-// evaluated. A side-effect import placed ahead of the orchestrator import runs
-// first (ESM evaluates imports in source order) and seeds the env in time, so the
-// backend proceeds to the network call instead of throwing "API key required".
-import "./training-orchestrator.test-env";
-
+import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { FineTuningOrchestrator } from "./training-orchestrator";
 
 function writeDatasetFile(content: string): string {
@@ -161,19 +153,14 @@ describe("FineTuningOrchestrator", () => {
   });
 
   describe("error backends", () => {
-    beforeEach(() => {
-      // Ensure the backend proceeds past its API-key guard to the network call.
-      process.env["AI_SERVICE_API_KEY"] = "test-key";
-    });
-
-    test("huggingface backend throws when microservice unreachable", async () => {
+    test("huggingface backend throws when script missing", async () => {
       const orch = new FineTuningOrchestrator();
       await expect(
         orch.startFromPrepared(
           { openai: openaiPath, huggingface: huggingfacePath },
           { model: "meta-llama/Llama-2-7b", nEpochs: 3, backend: "huggingface" },
         ),
-      ).rejects.toThrow(/fetch failed|Connection refused|ECONNREFUSED|returned \d{3}/);
+      ).rejects.toThrow(/HuggingFace backend script not found/);
     });
 
     test("local backend returns failed job when unreachable", async () => {
@@ -183,8 +170,7 @@ describe("FineTuningOrchestrator", () => {
         { model: "local-model", nEpochs: 3, backend: "local" },
       );
       expect(job.status).toBe("failed");
-      expect(job.error).toBeDefined();
-      expect(typeof job.error).toBe("string");
+      expect(job.error).toContain("returned 404");
     });
   });
 });
