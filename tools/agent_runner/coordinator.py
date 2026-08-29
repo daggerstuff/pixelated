@@ -10,13 +10,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-from tools.agent_runner.adapters import get_agent_adapter
 from tools.agent_runner.client import LinearClient
 from tools.agent_runner.cluster_registry import ClusterRegistry
 from tools.agent_runner.compactor import ThreadCompactor
 from tools.agent_runner.deliberation import DeliberationEngine
 from tools.agent_runner.event_bus import EventBus, EventType
-from tools.agent_runner.execution_harness import AgentExecutionHarness, HarnessRunReport
+from tools.agent_runner.execution_harness import AgentExecutionHarness
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
@@ -40,9 +39,9 @@ from tools.agent_runner.skills_bridge import SkillsBridge
 from tools.agent_runner.state_manager import StateManager
 from tools.agent_runner.subagent_harness import SubAgentHarness
 from tools.agent_runner.telemetry import TelemetryCollector
-from tools.agent_runner.triage import AutoTriageEngine
 from tools.agent_runner.trace_analyzer import TraceAnalyzer
-from tools.agent_runner.verifier import VerificationEngine, VerificationOutcome
+from tools.agent_runner.triage import AutoTriageEngine
+from tools.agent_runner.verifier import VerificationEngine
 from tools.agent_runner.worktree_pool import GitWorktreePool
 
 logger = logging.getLogger("agent_runner.coordinator")

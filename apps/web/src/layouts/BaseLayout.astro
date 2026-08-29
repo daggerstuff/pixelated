@@ -81,6 +81,10 @@ const cspNonce = Astro.locals.cspNonce ?? ''
 const serviceWorkerUrl = getServiceWorkerScriptUrl()
 const serviceWorkerScope = getServiceWorkerScope()
 
+// Speed Insights routes (/_vercel/speed-insights/*) only exist on Vercel.
+// Skip on primary self-hosted builds to avoid dead script fetches.
+const isVercelDeploy = !!process.env['VERCEL']
+
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
@@ -569,7 +573,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
 
       document.addEventListener('astro:page-load', initSearch)
     </script>
-    <SpeedInsights />
+    {isVercelDeploy && <SpeedInsights />}
   </body>
 </html>
 

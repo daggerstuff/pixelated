@@ -18,7 +18,7 @@ import { z } from 'zod'
 interface GateInput {
   last_audit_pass: boolean
   last_audit_blocking_count: number
-  scenario_ids: string[]
+  scenario_ids?: string[]
   dry_run?: boolean
 }
 
@@ -34,8 +34,9 @@ const SCHEMA = z.object({
     .min(0)
     .describe('Blocking finding count from the most recent audit_corpus run.'),
   scenario_ids: z
-    .array(z.string().min(1))
-    .min(1)
+    .array(z.string())
+    .optional()
+    .default([])
     .describe('Scenario IDs requesting publishing to the library.'),
   dry_run: z
     .boolean()
@@ -57,11 +58,12 @@ export default defineTool({
   async execute(input: GateInput) {
     const auditCleared =
       input.last_audit_pass && input.last_audit_blocking_count === 0
+    const scenarioCount = input.scenario_ids?.length ?? 0
 
     if (!auditCleared) {
       return {
         authorized: false,
-        scenario_count: input.scenario_ids.length,
+        scenario_count: scenarioCount,
         reason:
           'Audit not cleared: ' +
           `${input.last_audit_blocking_count} blocking finding(s). ` +
@@ -81,7 +83,7 @@ export default defineTool({
 
     return {
       authorized,
-      scenario_count: input.scenario_ids.length,
+      scenario_count: scenarioCount,
       reason: authorized
         ? 'Audit cleared and human approved — safe to publish scenarios to the library.'
         : 'Audit cleared. Awaiting human approval of this gate to authorize publishing.',
