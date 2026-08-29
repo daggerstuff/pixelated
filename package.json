@@ -468,7 +468,8 @@
     "vscode-jsonrpc": "9.0.0",
     "wait-on": "latest",
     "wrangler": "^4.101.0",
-    "yaml": "2.9.0"
+    "yaml": "2.9.0",
+    "knip": "^6.32.2"
   },
   "peerDependencies": {
     "hono": "^4.12.14"
