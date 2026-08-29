@@ -482,7 +482,11 @@ router.post(
       }
 
       if (result.processed || result.duplicate) {
-        ConnectionStatusService.recordWebhook(tenantId, provider, new Date().toISOString())
+        ConnectionStatusService.recordWebhook(
+          tenantId,
+          provider,
+          new Date().toISOString(),
+        )
       }
 
       return res.status(result.httpStatus).json(result)
