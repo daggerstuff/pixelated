@@ -108,7 +108,7 @@ function parseZoomSignature(header: string): { signature: string } | null {
  * - **Calendly**: `HMAC-SHA256(timestamp.body, secret)` in header `Calendly-Webhook-Signature`
  * - **Zoom**: `HMAC-SHA256(body, secret)` in header `x-zm-signature` (prefixed `v0=`)
  * - **Stripe**: `HMAC-SHA256(timestamp.body, secret)` in header `Stripe-Signature`
- * - **Twilio**: `HMAC-SHA256(url + sortedParams, secret)` in header `X-Twilio-Signature`
+ * - **Twilio**: `HMAC-SHA1(url + sortedParams, secret)`, base64, in header `X-Twilio-Signature`
  */
 export function verifyWebhookSignature(
   config: WebhookSignatureConfig,
@@ -139,8 +139,8 @@ export function verifyWebhookSignature(
       const sortedKeys = Array.from(params.keys()).sort();
       const postParams = sortedKeys.map((k) => `${k}${params.get(k) ?? ''}`).join('');
       const dataToSign = `${requestUrl}${postParams}`;
-      const expected = computeHmacSha256(dataToSign, config.secret);
-      const aBuf = Buffer.from(expected, 'hex');
+      const expected = createHmac('sha1', config.secret).update(dataToSign).digest('base64');
+      const aBuf = Buffer.from(expected, 'base64');
       let bBuf: Buffer;
       try {
         bBuf = Buffer.from(signatureHeader, 'base64');
