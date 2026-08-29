@@ -44,9 +44,10 @@ function runAstroCheck() {
     },
     maxBuffer: 20 * 1024 * 1024, // 20 MB — astro check output can be large
   })
-  const stdout = result.stdout ?? ''
-  const stderr = result.stderr ?? ''
-  return { output: stdout + stderr, status: result.status }
+  const raw = (result.stdout ?? '') + (result.stderr ?? '')
+  // Strip ANSI color codes so downstream line filters match reliably in CI.
+  const output = raw.replace(/\x1b\[[0-9;]*m/g, '')
+  return { output, status: result.status }
 }
 
 /**
@@ -216,8 +217,18 @@ async function main() {
         `\n    node scripts/ci/check-astro-hints.mjs --update-baseline` +
         `\n`,
     )
+    let diagCount = 0
     for (const line of output.split('\n')) {
-      if (/ - (error|warning) /.test(line)) console.log(`DIAG ${line}`)
+      if (/ - (error|warning) /.test(line)) {
+        console.log(`DIAG ${line}`)
+        diagCount++
+      }
+    }
+    if (diagCount === 0) {
+      console.error(
+        `\nDIAG-NONE: no per-diagnostic lines matched; raw astro output sample (first 3000 chars):`,
+      )
+      console.error(output.slice(0, 3000))
     }
     process.exit(1)
   }
