@@ -71,6 +71,7 @@ export interface LegacyRedisClient {
   del(key: string): Promise<number>
   exists(key: string): Promise<number>
   setex(key: string, seconds: number, value: string): Promise<unknown>
+  setNx(key: string, value: string, ttlSeconds: number): Promise<boolean>
   expire(key: string, seconds: number): Promise<number>
   ping(): Promise<string>
   on(event: string, handler: (...args: unknown[]) => void): void
@@ -145,6 +146,16 @@ const redisClient: LegacyRedisClient = {
       return 'OK'
     } catch {
       return null
+    }
+  },
+
+  setNx: async (key: string, value: string, ttlSeconds: number) => {
+    try {
+      await ensureConnected()
+      const result = await service.set(key, value, 'NX', 'EX', ttlSeconds)
+      return result === 'OK'
+    } catch {
+      return false
     }
   },
 

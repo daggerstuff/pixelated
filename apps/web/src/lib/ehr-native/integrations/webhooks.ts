@@ -210,15 +210,8 @@ export async function checkIdempotency(
   eventId: string,
 ): Promise<boolean> {
   const key = buildIdempotencyKey(provider, eventId)
-  // The legacy Redis facade does not support SET NX EX semantics.
-  // Use get + setex instead. This has a theoretical race window under
-  // concurrent requests, but is acceptable for v1 webhook processing.
-  const existing = await redis.get(key)
-  if (existing !== null) {
-    return true // duplicate — already processed
-  }
-  await redis.setex(key, IDEMPOTENCY_TTL_SECONDS, '1')
-  return false // not a duplicate — first occurrence
+  const wasNewlySet = await redis.setNx(key, '1', IDEMPOTENCY_TTL_SECONDS)
+  return !wasNewlySet
 }
 
 /**
@@ -247,7 +240,7 @@ function buildWebhookAuditMetadata(
 /**
  * Log a webhook event to the EHR audit service (MongoDB SHA-256 hash chain).
  */
-async function logWebhookAudit(
+export async function logWebhookAudit(
   tenantId: string,
   provider: IntegrationProvider,
   eventId: string,
@@ -337,17 +330,8 @@ export async function processWebhook(
     }
   }
 
-  // 3. Audit log
-  await logWebhookAudit(
-    tenantId,
-    event.provider,
-    event.eventId,
-    event.eventType,
-    'success',
-    userId,
-  )
-
-  // 4. Return success — caller dispatches to provider handler
+  // 3. Return success — caller is responsible for dispatching to the
+  //    provider handler and logging the audit after processing completes.
   return {
     processed: true,
     eventId: event.eventId,

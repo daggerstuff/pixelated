@@ -373,23 +373,6 @@ export class CalendlyService {
       }
     }
 
-    // 3) Audit log
-    await this.auditService.log(
-      EHRAuditAction.INTEGRATION_WEBHOOK_RECEIVED,
-      EHRResourceType.INTEGRATION,
-      event.eventId,
-      {
-        userId,
-        status: 'success',
-        metadata: {
-          tenantId,
-          integrationSource: 'calendly',
-          resourceId: event.eventId,
-          eventType: event.eventType,
-        },
-      },
-    )
-
     return {
       processed: true,
       eventId: event.eventId,

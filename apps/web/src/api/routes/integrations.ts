@@ -22,12 +22,15 @@ import {
   oAuthConfigSchema,
   type IntegrationProvider,
   type OAuthConfig,
+  type OAuthConnection,
   type WebhookEvent,
 } from '../../lib/ehr-native/integrations/types'
 import {
   buildSignatureConfig,
+  logWebhookAudit,
   processWebhook,
 } from '../../lib/ehr-native/integrations/webhooks'
+import { oauthCredentials } from '../../lib/ehr-native/integrations/oauth-credentials'
 import { redis } from '../../lib/redis'
 
 const router: Router = express.Router()
@@ -152,18 +155,6 @@ router.get(
       state,
     })
 
-    const auditService = EHRAuditService.getInstance()
-    void auditService.log(
-      EHRAuditAction.INTEGRATION_CONNECT,
-      EHRResourceType.INTEGRATION,
-      provider,
-      {
-        userId: req.headers['x-user-id'] ?? 'system',
-        status: 'success',
-        metadata: { tenantId, integrationSource: provider },
-      },
-    )
-
     return res.redirect(`${config.authorizeUrl}?${params.toString()}`)
   },
 )
@@ -245,7 +236,24 @@ router.get(
 
       const tokenData = (await tokenResp.json()) as Record<string, unknown>
 
-      // Record connection
+      const expiresIn = tokenData['expires_in'] as number | undefined
+      const expiresAt = expiresIn
+        ? new Date(Date.now() + expiresIn * 1000).toISOString()
+        : undefined
+
+      const connection: OAuthConnection = {
+        tenantId: stateData.tenantId,
+        provider,
+        accessToken: tokenData['access_token'] as string,
+        refreshToken: tokenData['refresh_token'] as string | undefined,
+        tokenType: (tokenData['token_type'] as string) ?? 'Bearer',
+        expiresAt,
+        scope: tokenData['scope'] as string | undefined,
+        connectedAt: new Date().toISOString(),
+        connectedBy: (req.headers['x-user-id'] as string) ?? 'system',
+      }
+      await oauthCredentials.store(connection)
+
       connections.set(
         stateData.tenantId,
         provider,
@@ -336,6 +344,17 @@ router.post(
 
       const tokenData = (await tokenResp.json()) as Record<string, unknown>
 
+      const expiresIn = tokenData['expires_in'] as number | undefined
+      const expiresAt = expiresIn
+        ? new Date(Date.now() + expiresIn * 1000).toISOString()
+        : undefined
+
+      await oauthCredentials.updateTokens(tenantId, provider, {
+        accessToken: tokenData['access_token'] as string,
+        refreshToken: tokenData['refresh_token'] as string | undefined,
+        expiresAt,
+      })
+
       const auditService = EHRAuditService.getInstance()
       void auditService.log(
         EHRAuditAction.INTEGRATION_TOKEN_REFRESH,
@@ -402,6 +421,9 @@ router.post(
       (body['id'] as string) ??
       (body['event_id'] as string) ??
       (body['uuid'] as string) ??
+      ((body['payload'] as Record<string, unknown> | undefined)?.['uri'] as
+        | string
+        | undefined) ??
       (body['MessageSid'] as string) ??
       (body['SmsSid'] as string) ??
       (body['CallSid'] as string) ??
@@ -421,7 +443,15 @@ router.post(
     }
 
     const requestUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`
-    const tenantId = (req.query['tenantId'] as string) ?? 'unknown'
+    const tenantId =
+      (req.query['tenantId'] as string) ??
+      (body['tenant_id'] as string) ??
+      (body['tenantId'] as string)
+    if (!tenantId) {
+      return res
+        .status(400)
+        .json({ error: 'tenantId is required for webhook processing' })
+    }
     const userId = (req.headers['x-user-id'] as string) ?? 'webhook-system'
 
     try {
@@ -432,6 +462,17 @@ router.post(
         userId,
         requestUrl,
       )
+
+      if (result.processed) {
+        await logWebhookAudit(
+          tenantId,
+          provider,
+          eventId,
+          eventType,
+          'success',
+          userId,
+        )
+      }
 
       if (result.processed || result.duplicate) {
         connections.recordWebhook(tenantId, provider, new Date().toISOString())

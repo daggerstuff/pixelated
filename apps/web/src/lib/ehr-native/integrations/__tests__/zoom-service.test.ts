@@ -14,12 +14,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockRedisGet = vi.fn()
 const mockRedisSetex = vi.fn()
+const mockRedisSetNx = vi.fn().mockResolvedValue(true)
 const mockRedisSet = vi.fn()
 
 vi.mock('@/lib/redis', () => ({
   redis: {
     get: mockRedisGet,
     setex: mockRedisSetex,
+    setNx: mockRedisSetNx,
     set: mockRedisSet,
     del: vi.fn().mockResolvedValue(1),
   },
@@ -135,8 +137,9 @@ describe('ZoomService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockRedisGet.mockResolvedValue(null)
-    mockRedisSetex.mockResolvedValue('OK')
+  mockRedisGet.mockResolvedValue(null)
+  mockRedisSetex.mockResolvedValue('OK')
+  mockRedisSetNx.mockResolvedValue(true)
     mockRedisSet.mockResolvedValue('OK')
     mockAuditLog.mockResolvedValue('audit-log-id')
 
@@ -576,7 +579,7 @@ describe('ZoomService', () => {
     it('returns 200 with duplicate=true on duplicate event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeZoomSignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce('1') // duplicate
+      mockRedisSetNx.mockResolvedValueOnce(false) // duplicate
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(result.processed).toBe(false)
@@ -588,7 +591,7 @@ describe('ZoomService', () => {
     it('returns 200 with processed=true on valid first-time event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeZoomSignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce(null) // not duplicate
+      mockRedisSetNx.mockResolvedValueOnce(true) // not duplicate
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(event, TENANT_ID, USER_ID)
       expect(result.processed).toBe(true)
@@ -603,22 +606,22 @@ describe('ZoomService', () => {
     it('sets idempotency key in redis on first-time event', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeZoomSignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce(null)
+      mockRedisSetNx.mockResolvedValueOnce(true)
       const event = makeWebhookEvent({
         rawBody,
         signature,
-        eventId: 'unique-zoom-evt',
+        eventId: 'unique-evt',
       })
       await service.processWebhook(event, TENANT_ID, USER_ID)
-      expect(mockRedisSetex).toHaveBeenCalledTimes(1)
-      const [key] = mockRedisSetex.mock.calls[0]
-      expect(key).toContain('webhook:idempotency:zoom:unique-zoom-evt')
+      expect(mockRedisSetNx).toHaveBeenCalledTimes(1)
+      const [key] = mockRedisSetNx.mock.calls[0]
+      expect(key).toContain('webhook:idempotency:zoom:unique-evt')
     })
 
     it('passes requestUrl for signature verification', async () => {
       const rawBody = '{"test":"body"}'
       const signature = makeZoomSignature(rawBody, WEBHOOK_SECRET)
-      mockRedisGet.mockResolvedValueOnce(null)
+      mockRedisSetNx.mockResolvedValueOnce(true)
       const event = makeWebhookEvent({ rawBody, signature })
       const result = await service.processWebhook(
         event,
