@@ -1,4 +1,4 @@
-import type { FC, FormEvent } from 'react'
+import type { FC, SubmitEventHandler } from 'react'
 import { useMemo, useCallback, useState, memo } from 'react'
 
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
@@ -586,7 +586,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
       setShowForm(true)
     }
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit: SubmitEventHandler = (e) => {
       e.preventDefault()
       const pub: Publication = {
         id: editingId ?? crypto.randomUUID(),

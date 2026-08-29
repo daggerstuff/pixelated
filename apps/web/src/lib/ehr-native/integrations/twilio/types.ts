@@ -18,19 +18,7 @@ import { z } from 'zod'
 
 const TWILIO_PROVIDER_NAME = 'twilio' as const
 
-const TWILIO_API_BASE_URL = 'https://api.twilio.com/2010-04-01' as const
-
 const TWILIO_OAUTH_SCOPES = ['scope:read_only', 'scope:write'] as const
-
-const TWILIO_WEBHOOK_EVENTS = [
-  'message.received',
-  'message.sent',
-  'message.delivered',
-  'call.initiated',
-  'call.ringing',
-  'call.answered',
-  'call.completed',
-] as const
 
 // ---------------------------------------------------------------------------
 // Twilio API response schemas
@@ -45,8 +33,8 @@ export const twilioAccountSchema = z.object({
   friendlyName: z.string(),
   status: z.enum(['active', 'suspended', 'closed']),
   type: z.string().optional(),
-  dateCreated: z.string().datetime().optional(),
-  dateUpdated: z.string().datetime().optional(),
+  dateCreated: z.iso.datetime().optional(),
+  dateUpdated: z.iso.datetime().optional(),
 })
 
 export type TwilioAccount = z.infer<typeof twilioAccountSchema>
@@ -71,9 +59,9 @@ export const twilioMessageSchema = z.object({
     'failed',
     'canceled',
   ]),
-  dateSent: z.string().datetime().optional(),
-  dateCreated: z.string().datetime().optional(),
-  dateUpdated: z.string().datetime().optional(),
+  dateSent: z.iso.datetime().optional(),
+  dateCreated: z.iso.datetime().optional(),
+  dateUpdated: z.iso.datetime().optional(),
   direction: z.string().optional(),
   price: z.string().optional(),
   errorCode: z.number().int().optional(),
@@ -101,10 +89,10 @@ export const twilioCallSchema = z.object({
     'canceled',
   ]),
   duration: z.string().optional(),
-  startTime: z.string().datetime().optional(),
-  endTime: z.string().datetime().optional(),
-  dateCreated: z.string().datetime().optional(),
-  dateUpdated: z.string().datetime().optional(),
+  startTime: z.iso.datetime().optional(),
+  endTime: z.iso.datetime().optional(),
+  dateCreated: z.iso.datetime().optional(),
+  dateUpdated: z.iso.datetime().optional(),
   direction: z.string().optional(),
   price: z.string().optional(),
   errorCode: z.number().int().optional(),
@@ -128,8 +116,8 @@ export const twilioPhoneNumberSchema = z.object({
       fax: z.boolean().optional(),
     })
     .optional(),
-  dateCreated: z.string().datetime().optional(),
-  dateUpdated: z.string().datetime().optional(),
+  dateCreated: z.iso.datetime().optional(),
+  dateUpdated: z.iso.datetime().optional(),
 })
 
 export type TwilioPhoneNumber = z.infer<typeof twilioPhoneNumberSchema>
@@ -142,19 +130,6 @@ export type TwilioPhoneNumber = z.infer<typeof twilioPhoneNumberSchema>
  * Twilio webhook payload — the body sent to our webhook endpoint.
  * @see https://www.twilio.com/docs/usage/webhooks
  */
-const twilioWebhookPayloadSchema = z.object({
-  MessageSid: z.string().optional(),
-  CallSid: z.string().optional(),
-  AccountSid: z.string().optional(),
-  From: z.string().optional(),
-  To: z.string().optional(),
-  Body: z.string().optional(),
-  MessageStatus: z.string().optional(),
-  CallStatus: z.string().optional(),
-  Direction: z.string().optional(),
-})
-
-type TwilioWebhookPayload = z.infer<typeof twilioWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -163,10 +138,10 @@ type TwilioWebhookPayload = z.infer<typeof twilioWebhookPayloadSchema>
 export const twilioOAuthConfigSchema = z.object({
   clientId: z.string().min(1),
   clientSecret: z.string().min(1),
-  redirectUri: z.string().url(),
+  redirectUri: z.url(),
   scopes: z.array(z.string()).default([...TWILIO_OAUTH_SCOPES]),
-  authorizeUrl: z.string().url().default('https://www.twilio.com/authorize'),
-  tokenUrl: z.string().url().default('https://www.twilio.com/oauth/token'),
+  authorizeUrl: z.url().default('https://www.twilio.com/authorize'),
+  tokenUrl: z.url().default('https://www.twilio.com/oauth/token'),
 })
 
 export type TwilioOAuthConfig = z.infer<typeof twilioOAuthConfigSchema>
@@ -175,30 +150,6 @@ export type TwilioOAuthConfig = z.infer<typeof twilioOAuthConfigSchema>
 // Provider-specific webhook signature config
 // ---------------------------------------------------------------------------
 
-const twilioWebhookSignatureConfigSchema = z.object({
-  provider: z.literal(TWILIO_PROVIDER_NAME),
-  headerName: z.string().default('X-Twilio-Signature'),
-  secret: z.string().min(1),
-  format: z.literal('twilio').default('twilio'),
-  algorithm: z.literal('sha256').default('sha256'),
-})
-
-type TwilioWebhookSignatureConfig = z.infer<
-  typeof twilioWebhookSignatureConfigSchema
->
-
 // ---------------------------------------------------------------------------
 // Enumerations for typed webhook events
 // ---------------------------------------------------------------------------
-
-const twilioWebhookEventTypeSchema = z.enum([
-  'message.received',
-  'message.sent',
-  'message.delivered',
-  'call.initiated',
-  'call.ringing',
-  'call.answered',
-  'call.completed',
-])
-
-type TwilioWebhookEventType = z.infer<typeof twilioWebhookEventTypeSchema>

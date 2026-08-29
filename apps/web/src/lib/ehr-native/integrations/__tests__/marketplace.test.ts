@@ -18,7 +18,7 @@ import {
   validateFeatureFlag,
   validateIntegrationStatus,
 } from '../marketplace'
-import type { IntegrationProvider, MarketplaceProvider } from '../types'
+import type { IntegrationProvider } from '../types'
 
 // ---------------------------------------------------------------------------
 // MARKETPLACE_PROVIDERS / INTEGRATION_PROVIDERS

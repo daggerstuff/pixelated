@@ -10,8 +10,6 @@
  * Postgres RLS. This module is the application-level orchestrator.
  */
 
-import { z } from 'zod'
-
 import {
   type IntegrationProvider,
   type MarketplaceDashboard,
@@ -23,7 +21,6 @@ import {
   marketplaceProviderSchema,
   tenantProviderStatusSchema,
   integrationFeatureFlagSchema,
-  PROVIDER_DISPLAY_NAMES,
 } from './types'
 
 /**
@@ -269,13 +266,24 @@ export const ConnectionStatusService = {
     status: IntegrationStatus,
     connectedAt?: string,
     lastError?: string,
-    connectedBy?: string,
+    _connectedBy?: string,
   ): TenantProviderStatus {
     const existing = connectionStore.get(connectionKey(tenantId, provider))
+    const meta = PROVIDER_MAP.get(provider)
+    if (!meta) {
+      throw new Error(`Unknown marketplace provider: ${provider}`)
+    }
     const updated: TenantProviderStatus = {
       tenantId,
       provider,
       status,
+      displayName: meta.displayName,
+      description: meta.description,
+      category: meta.category,
+      logoUrl: meta.logoUrl,
+      documentationUrl: meta.documentationUrl,
+      defaultScopes: meta.defaultScopes,
+      webhookEvents: meta.webhookEvents,
       connectedAt: connectedAt ?? existing?.connectedAt,
       lastWebhookReceivedAt: existing?.lastWebhookReceivedAt,
       lastError:
@@ -389,3 +397,7 @@ export function validateIntegrationStatus(input: string): IntegrationStatus {
 }
 
 export { MARKETPLACE_PROVIDERS as INTEGRATION_PROVIDERS, PROVIDER_MAP }
+export {
+  ConnectionStatusService as connections,
+  FeatureFlagService as featureFlags,
+}

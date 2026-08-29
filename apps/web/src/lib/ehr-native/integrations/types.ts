@@ -42,7 +42,7 @@ export const oAuthTokenResponseSchema = z.object({
   refresh_token: z.string().min(1).optional(),
   scope: z.string().optional(),
   id_token: z.string().optional(),
-  expires_at: z.string().datetime().optional(),
+  expires_at: z.iso.datetime().optional(),
 })
 export type OAuthTokenResponse = z.infer<typeof oAuthTokenResponseSchema>
 
@@ -51,11 +51,11 @@ export const oAuthConfigSchema = z.object({
   provider: integrationProviderSchema,
   clientId: z.string().min(1),
   clientSecret: z.string().min(1),
-  redirectUri: z.string().url(),
+  redirectUri: z.url(),
   scopes: z.array(z.string()).min(1),
-  authorizeUrl: z.string().url(),
-  tokenUrl: z.string().url(),
-  refreshTokenUrl: z.string().url().optional(),
+  authorizeUrl: z.url(),
+  tokenUrl: z.url(),
+  refreshTokenUrl: z.url().optional(),
 })
 export type OAuthConfig = z.infer<typeof oAuthConfigSchema>
 
@@ -64,10 +64,9 @@ export const oAuthStateSchema = z.object({
   state: z.string().min(16),
   tenantId: z.string().min(1),
   provider: integrationProviderSchema,
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
   returnUrl: z.string().optional(),
 })
-type OAuthState = z.infer<typeof oAuthStateSchema>
 
 /** Stored OAuth connection (after successful authorization). */
 export const oAuthConnectionSchema = z.object({
@@ -76,11 +75,11 @@ export const oAuthConnectionSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().optional(),
   tokenType: z.string().default('Bearer'),
-  expiresAt: z.string().datetime().optional(),
+  expiresAt: z.iso.datetime().optional(),
   scope: z.string().optional(),
-  connectedAt: z.string().datetime(),
+  connectedAt: z.iso.datetime(),
   connectedBy: z.string().min(1),
-  lastRefreshedAt: z.string().datetime().optional(),
+  lastRefreshedAt: z.iso.datetime().optional(),
 })
 export type OAuthConnection = z.infer<typeof oAuthConnectionSchema>
 
@@ -95,7 +94,7 @@ export const webhookEventSchema = z.object({
   eventType: z.string().min(1),
   payload: z.unknown(),
   signature: z.string().min(1),
-  receivedAt: z.string().datetime(),
+  receivedAt: z.iso.datetime(),
   rawBody: z.string(),
 })
 export type WebhookEvent = z.infer<typeof webhookEventSchema>
@@ -144,7 +143,7 @@ export const integrationFeatureFlagSchema = z.object({
   enabled: z.boolean().default(false),
   /** Optional capabilities subset (e.g. ['booking', 'cancellation'] for Calendly). */
   capabilities: z.array(z.string()).optional(),
-  updatedAt: z.string().datetime(),
+  updatedAt: z.iso.datetime(),
   updatedBy: z.string().min(1),
 })
 export type IntegrationFeatureFlag = z.infer<
@@ -157,8 +156,8 @@ export const marketplaceProviderSchema = z.object({
   displayName: z.string(),
   description: z.string(),
   category: z.enum(['scheduling', 'video', 'payments', 'communications']),
-  logoUrl: z.string().url().optional(),
-  documentationUrl: z.string().url().optional(),
+  logoUrl: z.url().optional(),
+  documentationUrl: z.url().optional(),
   defaultScopes: z.array(z.string()),
   webhookEvents: z.array(z.string()).optional(),
 })
@@ -169,8 +168,8 @@ export const tenantProviderStatusSchema = z.object({
   tenantId: z.string().min(1),
   provider: integrationProviderSchema,
   status: integrationStatusSchema,
-  connectedAt: z.string().datetime().optional(),
-  lastWebhookReceivedAt: z.string().datetime().optional(),
+  connectedAt: z.iso.datetime().optional(),
+  lastWebhookReceivedAt: z.iso.datetime().optional(),
   lastError: z.string().optional(),
   featureFlag: integrationFeatureFlagSchema.optional(),
   // Provider metadata (mirrors MarketplaceProvider) must survive dashboard
@@ -178,8 +177,8 @@ export const tenantProviderStatusSchema = z.object({
   displayName: z.string(),
   description: z.string(),
   category: z.enum(['scheduling', 'video', 'payments', 'communications']),
-  logoUrl: z.string().url().optional(),
-  documentationUrl: z.string().url().optional(),
+  logoUrl: z.url().optional(),
+  documentationUrl: z.url().optional(),
   defaultScopes: z.array(z.string()),
   webhookEvents: z.array(z.string()).optional(),
 })
@@ -217,4 +216,3 @@ export const integrationAuditMetadataSchema = z.object({
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
 })
-type IntegrationAuditMetadata = z.infer<typeof integrationAuditMetadataSchema>

@@ -12,8 +12,6 @@ import { EHRAuditService } from '../../audit/ehr-audit-service'
 import { EHRAuditAction, EHRResourceType } from '../../audit/events'
 import type {
   OAuthTokenResponse,
-  OAuthConfig,
-  OAuthConnection,
   WebhookEvent,
   WebhookResult,
   WebhookSignatureConfig,
@@ -35,13 +33,8 @@ import {
   zoomUserSchema,
   zoomMeetingSchema,
   zoomRecordingSchema,
-  zoomWebhookPayloadSchema,
   zoomOAuthConfigSchema,
-  zoomWebhookSignatureConfigSchema,
-  zoomWebhookEventTypeSchema,
   ZOOM_PROVIDER_NAME,
-  ZOOM_OAUTH_SCOPES,
-  ZOOM_WEBHOOK_EVENTS,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -203,8 +196,8 @@ export class ZoomService {
    */
   async listMeetings(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<ZoomAdapter['listMeetings']>[1],
   ): Promise<{ data: ZoomMeeting[]; pagination: { count: number } }> {
     const raw = await this.adapter.listMeetings(accessToken, params)
@@ -333,8 +326,8 @@ export class ZoomService {
    */
   async listRecordings(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<ZoomAdapter['listRecordings']>[1],
   ): Promise<{ data: ZoomRecording[]; pagination: { count: number } }> {
     const raw = await this.adapter.listRecordings(accessToken, params)

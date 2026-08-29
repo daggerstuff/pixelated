@@ -18,12 +18,13 @@ const { mockAuditLog, mockAuditService } = vi.hoisted(() => {
   return { mockAuditLog, mockAuditService }
 })
 
-const { mockRedisGet, mockRedisSetex, mockRedisSet, mockRedisSetNx } = vi.hoisted(() => ({
-  mockRedisGet: vi.fn().mockResolvedValue(null),
-  mockRedisSetex: vi.fn().mockResolvedValue('OK'),
-  mockRedisSet: vi.fn().mockResolvedValue('OK'),
-  mockRedisSetNx: vi.fn().mockResolvedValue(true),
-}))
+const { mockRedisGet, mockRedisSetex, mockRedisSet, mockRedisSetNx } =
+  vi.hoisted(() => ({
+    mockRedisGet: vi.fn().mockResolvedValue(null),
+    mockRedisSetex: vi.fn().mockResolvedValue('OK'),
+    mockRedisSet: vi.fn().mockResolvedValue('OK'),
+    mockRedisSetNx: vi.fn().mockResolvedValue(true),
+  }))
 
 // ---------------------------------------------------------------------------
 // Module mocks
@@ -58,6 +59,9 @@ const OAUTH_CONFIG = {
   clientId: 'tw_client_id',
   clientSecret: 'tw_client_secret',
   redirectUri: 'https://app.example.com/oauth/twilio/callback',
+  scopes: ['openid'],
+  authorizeUrl: 'https://api.twilio.com/oauth/authorize',
+  tokenUrl: 'https://api.twilio.com/oauth/token',
 }
 
 function makeTwilioSignature(
@@ -124,14 +128,14 @@ describe('TwilioService', () => {
   beforeEach(async () => {
     vi.restoreAllMocks()
     mockAuditLog.mockClear()
-  mockRedisGet.mockClear()
-  mockRedisSetex.mockClear()
-  mockRedisSetNx.mockClear()
+    mockRedisGet.mockClear()
+    mockRedisSetex.mockClear()
+    mockRedisSetNx.mockClear()
     mockRedisSet.mockClear()
     mockAuditLog.mockResolvedValue('audit-id')
-  mockRedisGet.mockResolvedValue(null)
-  mockRedisSetex.mockResolvedValue('OK')
-  mockRedisSetNx.mockResolvedValue(true)
+    mockRedisGet.mockResolvedValue(null)
+    mockRedisSetex.mockResolvedValue('OK')
+    mockRedisSetNx.mockResolvedValue(true)
     mockRedisSet.mockResolvedValue('OK')
 
     const stubMod = await import('../twilio/stub-adapter')

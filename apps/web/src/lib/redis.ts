@@ -124,7 +124,7 @@ export interface LegacyRedisClient {
   ttl?(key: string): Promise<number>
 }
 
-const redisClient: LegacyRedisClient = {
+export const redisClient: LegacyRedisClient = {
   get: async (key: string) => {
     try {
       await ensureConnected()
@@ -154,7 +154,7 @@ const redisClient: LegacyRedisClient = {
       await ensureConnected()
       const client = service.getClient()
       if (!client) return false
-      const result = await client.set(key, value, 'NX', 'EX', ttlSeconds)
+      const result = await client.set(key, value, 'EX', ttlSeconds, 'NX')
       return result === 'OK'
     } catch {
       return false
@@ -524,7 +524,7 @@ export async function removeFromCache(key: string): Promise<boolean> {
 }
 
 export function getRedisClient() {
-  return redis
+  return redisClient
 }
 
 /**

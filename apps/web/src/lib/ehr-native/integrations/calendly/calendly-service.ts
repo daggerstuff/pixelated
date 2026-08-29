@@ -12,8 +12,6 @@ import { EHRAuditService } from '../../audit/ehr-audit-service'
 import { EHRAuditAction, EHRResourceType } from '../../audit/events'
 import type {
   OAuthTokenResponse,
-  OAuthConfig,
-  OAuthConnection,
   WebhookEvent,
   WebhookResult,
   WebhookSignatureConfig,
@@ -199,8 +197,8 @@ export class CalendlyService {
    */
   async listEventTypes(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<CalendlyAdapter['listEventTypes']>[1],
   ): Promise<{ data: CalendlyEventType[]; pagination: { count: number } }> {
     const raw = await this.adapter.listEventTypes(accessToken, params)
@@ -244,8 +242,8 @@ export class CalendlyService {
    */
   async listScheduledEvents(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<CalendlyAdapter['listScheduledEvents']>[1],
   ): Promise<{
     data: CalendlyScheduledEvent[]
@@ -262,8 +260,8 @@ export class CalendlyService {
    */
   async listInvitees(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     eventUri: string,
     params?: Parameters<CalendlyAdapter['listInvitees']>[2],
   ): Promise<{ data: CalendlyInvitee[]; pagination: { count: number } }> {

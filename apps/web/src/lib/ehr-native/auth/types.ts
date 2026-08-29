@@ -33,7 +33,7 @@ export type ClinicalRole =
 /**
  * Runtime list of all clinical roles — useful for iteration and validation.
  */
-const CLINICAL_ROLES: readonly ClinicalRole[] = [
+export const CLINICAL_ROLES: readonly ClinicalRole[] = [
   'physician',
   'nurse',
   'pharmacist',
@@ -86,7 +86,7 @@ export type EHRPermission =
 /**
  * Runtime list of all EHR permissions.
  */
-const EHR_PERMISSIONS: readonly EHRPermission[] = [
+export const EHR_PERMISSIONS: readonly EHRPermission[] = [
   'read_patient',
   'write_patient',
   'read_encounter',
@@ -201,13 +201,13 @@ export interface BreakGlassResult {
 /**
  * A type guard checking that a string is a valid `ClinicalRole`.
  */
-function isClinicalRole(value: string): value is ClinicalRole {
+export function isClinicalRole(value: string): value is ClinicalRole {
   return (CLINICAL_ROLES as readonly string[]).includes(value)
 }
 
 /**
  * A type guard checking that a string is a valid `EHRPermission`.
  */
-function isEHRPermission(value: string): value is EHRPermission {
+export function isEHRPermission(value: string): value is EHRPermission {
   return (EHR_PERMISSIONS as readonly string[]).includes(value)
 }

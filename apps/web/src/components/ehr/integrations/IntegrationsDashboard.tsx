@@ -7,7 +7,7 @@
  */
 
 import { RefreshCw, Loader2, LayoutGrid } from 'lucide-react'
-import React, { type FC, useCallback, useEffect, useState } from 'react'
+import { type FC, useCallback, useEffect, useState } from 'react'
 
 import {
   marketplaceDashboardSchema,

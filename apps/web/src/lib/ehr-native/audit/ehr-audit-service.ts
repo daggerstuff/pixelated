@@ -207,7 +207,7 @@ export class EHRAuditService {
    * Determine default severity for a successful action.
    */
   private defaultSeverity(action: EHRAuditActionType): AuditSeverity {
-    if (action === 'verify_consent' || action === EHRAuditAction.VERIFY_CONSENT)
+    if (action === EHRAuditAction.VERIFY_CONSENT)
       return EHRSeverity.CONSENT_FAILURE
     if (
       action === EHRAuditAction.CHECK_IN_APPOINTMENT ||

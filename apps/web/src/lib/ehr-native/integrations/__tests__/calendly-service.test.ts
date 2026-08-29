@@ -122,13 +122,13 @@ function makeWebhookEvent(overrides: Record<string, unknown> = {}) {
 
 describe('CalendlyService', () => {
   let service: InstanceType<typeof CalendlyService>
-  let adapter: StubCalendlyAdapter
+  let adapter: InstanceType<typeof StubCalendlyAdapter>
 
   beforeEach(() => {
     vi.clearAllMocks()
-  mockRedisGet.mockResolvedValue(null)
-  mockRedisSetex.mockResolvedValue('OK')
-  mockRedisSetNx.mockResolvedValue(true)
+    mockRedisGet.mockResolvedValue(null)
+    mockRedisSetex.mockResolvedValue('OK')
+    mockRedisSetNx.mockResolvedValue(true)
     mockRedisSet.mockResolvedValue('OK')
     mockAuditLog.mockResolvedValue('audit-log-id')
 
@@ -178,6 +178,9 @@ describe('CalendlyService', () => {
           clientId: 'c',
           clientSecret: 's',
           redirectUri: 'https://app.example.com/callback',
+          scopes: ['openid'],
+          authorizeUrl: 'https://auth.calendly.com/oauth/authorize',
+          tokenUrl: 'https://auth.calendly.com/oauth/token',
         },
         webhookSecret: WEBHOOK_SECRET,
       })

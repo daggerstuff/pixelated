@@ -17,6 +17,7 @@ import {
   MARKETPLACE_PROVIDERS,
   PROVIDER_MAP,
 } from '../../lib/ehr-native/integrations/marketplace'
+import { oauthCredentials } from '../../lib/ehr-native/integrations/oauth-credentials'
 import {
   integrationProviderSchema,
   oAuthConfigSchema,
@@ -30,8 +31,7 @@ import {
   logWebhookAudit,
   processWebhook,
 } from '../../lib/ehr-native/integrations/webhooks'
-import { oauthCredentials } from '../../lib/ehr-native/integrations/oauth-credentials'
-import { redis } from '../../lib/redis'
+import { redisClient } from '../../lib/redis'
 
 const router: Router = express.Router()
 
@@ -98,11 +98,15 @@ function getWebhookSecret(provider: IntegrationProvider): string {
 // STATUS DASHBOARD
 // ============================================================================
 
+function asString(value: unknown): string {
+  return typeof value === 'string' ? value : ''
+}
+
 router.get(
   '/status/:tenantId',
   async (req: Request, res: Response): Promise<Response> => {
     try {
-      const tenantId = req.params['tenantId']
+      const tenantId = asString(req.params['tenantId'])
       if (!tenantId) {
         return res.status(400).json({ error: 'tenantId is required' })
       }
@@ -124,7 +128,7 @@ router.get(
 router.get(
   '/oauth/:provider/authorize',
   async (req: Request, res: Response): Promise<Response> => {
-    const provider = parseProvider(req.params['provider'])
+    const provider = parseProvider(asString(req.params['provider']))
     if (!provider) {
       return res.status(400).json({ error: 'Invalid or unknown provider' })
     }
@@ -145,7 +149,7 @@ router.get(
     ).toString('base64url')
 
     const STATE_TTL_SECONDS = 600
-    await redis.setex(`oauth:state:${nonce}`, STATE_TTL_SECONDS, state)
+    await redisClient.setex(`oauth:state:${nonce}`, STATE_TTL_SECONDS, state)
 
     const params = new URLSearchParams({
       client_id: config.clientId,
@@ -155,14 +159,15 @@ router.get(
       state,
     })
 
-    return res.redirect(`${config.authorizeUrl}?${params.toString()}`)
+    res.redirect(`${config.authorizeUrl}?${params.toString()}`)
+    return res
   },
 )
 
 router.get(
   '/oauth/:provider/callback',
   async (req: Request, res: Response): Promise<Response> => {
-    const provider = parseProvider(req.params['provider'])
+    const provider = parseProvider(asString(req.params['provider']))
     if (!provider) {
       return res.status(400).json({ error: 'Invalid or unknown provider' })
     }
@@ -194,11 +199,11 @@ router.get(
     }
 
     const stateKey = `oauth:state:${stateData.nonce}`
-    const storedState = await redis.get(stateKey)
+    const storedState = await redisClient.get(stateKey)
     if (!storedState) {
       return res.status(400).json({ error: 'Invalid or expired OAuth state' })
     }
-    await redis.del(stateKey)
+    await redisClient.del(stateKey)
 
     if (storedState !== state) {
       return res.status(400).json({ error: 'OAuth state mismatch' })
@@ -269,7 +274,7 @@ router.get(
         EHRResourceType.INTEGRATION,
         provider,
         {
-          userId: req.headers['x-user-id'] ?? 'system',
+          userId: asString(req.headers['x-user-id']) || 'system',
           status: 'success',
           metadata: {
             tenantId: stateData.tenantId,
@@ -280,7 +285,8 @@ router.get(
       )
 
       if (stateData.returnUrl) {
-        return res.redirect(stateData.returnUrl)
+        res.redirect(stateData.returnUrl)
+        return res
       }
       return res.json({
         status: 'connected',
@@ -299,7 +305,7 @@ router.get(
 router.post(
   '/oauth/:provider/refresh',
   async (req: Request, res: Response): Promise<Response> => {
-    const provider = parseProvider(req.params['provider'])
+    const provider = parseProvider(asString(req.params['provider']))
     if (!provider) {
       return res.status(400).json({ error: 'Invalid or unknown provider' })
     }
@@ -361,7 +367,7 @@ router.post(
         EHRResourceType.INTEGRATION,
         provider,
         {
-          userId: req.headers['x-user-id'] ?? 'system',
+          userId: asString(req.headers['x-user-id']) || 'system',
           status: 'success',
           metadata: { tenantId, integrationSource: provider },
         },
@@ -390,7 +396,7 @@ router.post(
 router.post(
   '/webhooks/:provider',
   async (req: Request, res: Response): Promise<Response> => {
-    const provider = parseProvider(req.params['provider'])
+    const provider = parseProvider(asString(req.params['provider']))
     if (!provider) {
       return res.status(400).json({ error: 'Invalid or unknown provider' })
     }
@@ -417,13 +423,14 @@ router.post(
       JSON.stringify(req.body)
     const body = req.body as Record<string, unknown>
 
+    const payloadUri = (
+      body['payload'] as Record<string, unknown> | undefined
+    )?.['uri'] as string | undefined
     const eventId =
       (body['id'] as string) ??
       (body['event_id'] as string) ??
       (body['uuid'] as string) ??
-      ((body['payload'] as Record<string, unknown> | undefined)?.['uri'] as
-        | string
-        | undefined) ??
+      payloadUri ??
       (body['MessageSid'] as string) ??
       (body['SmsSid'] as string) ??
       (body['CallSid'] as string) ??
@@ -499,7 +506,7 @@ router.post(
 router.get(
   '/feature-flags/:tenantId',
   (req: Request, res: Response): Response => {
-    const tenantId = req.params['tenantId']
+    const tenantId = asString(req.params['tenantId'])
     if (!tenantId) {
       return res.status(400).json({ error: 'tenantId is required' })
     }
@@ -511,8 +518,8 @@ router.get(
 router.put(
   '/feature-flags/:tenantId/:provider',
   (req: Request, res: Response): Response => {
-    const tenantId = req.params['tenantId']
-    const provider = parseProvider(req.params['provider'])
+    const tenantId = asString(req.params['tenantId'])
+    const provider = parseProvider(asString(req.params['provider']))
     if (!tenantId || !provider) {
       return res
         .status(400)
@@ -553,8 +560,8 @@ router.put(
 router.post(
   '/disconnect/:tenantId/:provider',
   async (req: Request, res: Response): Promise<Response> => {
-    const tenantId = req.params['tenantId']
-    const provider = parseProvider(req.params['provider'])
+    const tenantId = asString(req.params['tenantId'])
+    const provider = parseProvider(asString(req.params['provider']))
     if (!tenantId || !provider) {
       return res
         .status(400)
@@ -578,7 +585,7 @@ router.post(
       EHRResourceType.INTEGRATION,
       provider,
       {
-        userId: req.headers['x-user-id'] ?? 'system',
+        userId: asString(req.headers['x-user-id']) || 'system',
         status: 'success',
         metadata: { tenantId, integrationSource: provider },
       },

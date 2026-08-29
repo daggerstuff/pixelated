@@ -13,7 +13,7 @@
 
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-import { redis } from '@/lib/redis'
+import { redisClient } from '@/lib/redis'
 
 import { EHRAuditService } from '../audit/ehr-audit-service'
 import { EHRAuditAction, EHRResourceType, EHRSeverity } from '../audit/events'
@@ -57,25 +57,6 @@ function safeHexEqual(a: string, b: string): boolean {
   const bBuf = Buffer.from(b, 'hex')
   if (aBuf.length !== bBuf.length) return false
   return timingSafeEqual(aBuf, bBuf)
-}
-
-/**
- * Parse the Calendly signature header.
- * Format: `t=<unix-timestamp>,v1=<hex-signature>`
- */
-function parseCalendlySignature(
-  header: string,
-): { timestamp: string; signature: string } | null {
-  const parts = header.split(',')
-  let timestamp = ''
-  let signature = ''
-  for (const part of parts) {
-    const [key, value] = part.split('=')
-    if (key === 't') timestamp = value
-    if (key === 'v1') signature = value
-  }
-  if (!timestamp || !signature) return null
-  return { timestamp, signature }
 }
 
 /**
@@ -210,7 +191,7 @@ export async function checkIdempotency(
   eventId: string,
 ): Promise<boolean> {
   const key = buildIdempotencyKey(provider, eventId)
-  const wasNewlySet = await redis.setNx(key, '1', IDEMPOTENCY_TTL_SECONDS)
+  const wasNewlySet = await redisClient.setNx(key, '1', IDEMPOTENCY_TTL_SECONDS)
   return !wasNewlySet
 }
 
@@ -290,7 +271,7 @@ export async function processWebhook(
   event: WebhookEvent,
   config: WebhookSignatureConfig,
   tenantId: string,
-  userId: string,
+  _userId: string,
   requestUrl?: string,
 ): Promise<WebhookResult> {
   // 1. Signature verification

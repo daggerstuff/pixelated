@@ -34,7 +34,7 @@ interface RateLimitOptions {
 }
 
 /** Custom error so callers can distinguish rate-limit rejections. */
-class RateLimitError extends Error {
+export class RateLimitError extends Error {
   constructor(
     message: string,
     public readonly provider: string,
@@ -48,7 +48,7 @@ class RateLimitError extends Error {
 /**
  * Token-bucket rate limiter. Thread-safe via async mutex on `acquire`.
  */
-class TokenBucketRateLimiter {
+export class TokenBucketRateLimiter {
   private tokens: number
   private lastRefillTime: number
   private readonly config: RateLimiterConfig
@@ -222,18 +222,15 @@ export async function acquireRateLimit(provider: string): Promise<void> {
  * Try to acquire a rate-limit token without waiting.
  * Returns true on success, false if the bucket is empty.
  */
-function tryAcquireRateLimit(provider: string): boolean {
+export function tryAcquireRateLimit(provider: string): boolean {
   const limiter = getLimiter(provider)
   return limiter.tryAcquire()
 }
 
 /** Get the rate limiter instance for a provider (for testing). */
-function getRateLimiter(provider: string): TokenBucketRateLimiter {
-  return getLimiter(provider)
-}
 
 /** Reset all limiters (for testing). */
-function resetAllRateLimiters(): void {
+export function resetAllRateLimiters(): void {
   for (const limiter of limiters.values()) {
     limiter.reset()
   }
@@ -241,7 +238,7 @@ function resetAllRateLimiters(): void {
 }
 
 /** Create a rate limiter with explicit options (for testing). */
-function createRateLimiter(provider: string, options: RateLimitOptions): TokenBucketRateLimiter {
+export function createRateLimiter(provider: string, options: RateLimitOptions): TokenBucketRateLimiter {
   const rpm = options.requestsPerMinute ?? 60
   const burst = options.burst ?? rpm
   const maxWaitMs = options.maxWaitMs ?? 30_000

@@ -13,7 +13,6 @@ import {
   resetProvidersForTesting,
   setProviderForTesting,
   createChatCompletionWithFallback,
-  createStreamingChatCompletionWithFallback,
   type AIProviderType,
   type AIProviderConfig,
 } from '../providers'
@@ -22,7 +21,6 @@ import {
   RateLimitError,
   acquireRateLimit,
   tryAcquireRateLimit,
-  getRateLimiter,
   resetAllRateLimiters,
   createRateLimiter,
 } from '../rate-limiter'
@@ -61,7 +59,7 @@ function mockFetchResponse(body: unknown, status = 200, ok = true): Response {
   } as Response
 }
 
-function mockStreamResponse(chunks: Array<{ data: string }>): Response {
+function mockStreamResponse(chunks: Array<Record<string, unknown>>): Response {
   const encoder = new TextEncoder()
   const lines = chunks.map((c) => `data: ${JSON.stringify(c)}\n`)
   lines.push('data: [DONE]\n')
@@ -501,7 +499,7 @@ describe('Provider adapters with mocked fetch', () => {
     const svc = getAIServiceByProvider('openai')
     await svc!.createChatCompletion([{ role: 'user', content: 'hi' }])
     const headers = fetchMock.mock.calls[0][1]?.headers as Record<string, string>
-    expect(headers.Authorization).toBe('Bearer sk-secret')
+    expect(headers['Authorization']).toBe('Bearer sk-secret')
   })
 
   it('OpenAI adapter: throws on error status', async () => {
@@ -736,7 +734,7 @@ describe('Fallback integration with providers', () => {
   })
 
   it('createChatCompletionWithFallback falls over when primary fails', async () => {
-    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL, _init?: RequestInit) => {
       const url = typeof input === 'string' ? input : input.toString()
       // OpenAI endpoint returns 500
       if (url.includes('openai.com') || url.includes('api.openai.com')) {

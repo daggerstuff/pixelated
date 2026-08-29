@@ -18,20 +18,7 @@ import { z } from 'zod'
 
 const STRIPE_PROVIDER_NAME = 'stripe' as const
 
-const STRIPE_API_BASE_URL = 'https://api.stripe.com/v1' as const
-
 const STRIPE_OAUTH_SCOPES = ['read_only', 'read_write'] as const
-
-const STRIPE_WEBHOOK_EVENTS = [
-  'payment_intent.succeeded',
-  'payment_intent.payment_failed',
-  'charge.refunded',
-  'customer.created',
-  'customer.updated',
-  'invoice.paid',
-  'invoice.payment_failed',
-  'checkout.session.completed',
-] as const
 
 // ---------------------------------------------------------------------------
 // Stripe API response schemas
@@ -44,7 +31,7 @@ const STRIPE_WEBHOOK_EVENTS = [
 export const stripeCustomerSchema = z.object({
   id: z.string(),
   object: z.literal('customer').default('customer'),
-  email: z.string().email().optional(),
+  email: z.email().optional(),
   name: z.string().optional(),
   phone: z.string().optional(),
   description: z.string().optional(),
@@ -127,7 +114,7 @@ export const stripeChargeSchema = z.object({
   failure_code: z.string().nullable().optional(),
   failure_message: z.string().nullable().optional(),
   receipt_email: z.string().nullable().optional(),
-  receipt_url: z.string().url().nullable().optional(),
+  receipt_url: z.url().nullable().optional(),
   source: z.unknown().optional(),
   metadata: z.record(z.string(), z.string()).default({}),
   created: z.number().int(),
@@ -193,7 +180,7 @@ export const stripeInvoiceSchema = z.object({
   id: z.string(),
   object: z.literal('invoice').default('invoice'),
   customer: z.string(),
-  customer_email: z.string().email().optional(),
+  customer_email: z.email().optional(),
   customer_name: z.string().optional(),
   currency: z.string(),
   status: z.enum(['draft', 'open', 'paid', 'uncollectible', 'void']),
@@ -205,8 +192,8 @@ export const stripeInvoiceSchema = z.object({
   total: z.number().int(),
   tax: z.number().int().optional(),
   description: z.string().nullable().optional(),
-  invoice_pdf: z.string().url().nullable().optional(),
-  hosted_invoice_url: z.string().url().nullable().optional(),
+  invoice_pdf: z.url().nullable().optional(),
+  hosted_invoice_url: z.url().nullable().optional(),
   number: z.string().optional(),
   paid: z.boolean().default(false),
   attempt_count: z.number().int().optional(),
@@ -251,10 +238,10 @@ export const stripeCheckoutSessionSchema = z.object({
   status: z.enum(['open', 'complete', 'expired']).optional(),
   payment_status: z.enum(['paid', 'unpaid', 'no_payment_required']).optional(),
   customer: z.string().nullable().optional(),
-  customer_email: z.string().email().nullable().optional(),
+  customer_email: z.email().nullable().optional(),
   customer_details: z
     .object({
-      email: z.string().email().nullable().optional(),
+      email: z.email().nullable().optional(),
       name: z.string().nullable().optional(),
       phone: z.string().nullable().optional(),
       address: z
@@ -272,9 +259,9 @@ export const stripeCheckoutSessionSchema = z.object({
   amount_total: z.number().int().optional(),
   amount_subtotal: z.number().int().optional(),
   currency: z.string().optional(),
-  url: z.string().url().nullable().optional(),
-  success_url: z.string().url().optional(),
-  cancel_url: z.string().url().optional(),
+  url: z.url().nullable().optional(),
+  success_url: z.url().optional(),
+  cancel_url: z.url().optional(),
   payment_intent: z.string().nullable().optional(),
   subscription: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.string()).default({}),
@@ -293,27 +280,6 @@ export type StripeCheckoutSession = z.infer<typeof stripeCheckoutSessionSchema>
  * Stripe webhook payload — the body sent to our webhook endpoint.
  * @see https://docs.stripe.com/webhooks
  */
-const stripeWebhookPayloadSchema = z.object({
-  id: z.string(),
-  object: z.literal('event').default('event'),
-  api_version: z.string().optional(),
-  created: z.number().int(),
-  type: z.string(),
-  livemode: z.boolean(),
-  pending_webhooks: z.number().int().optional(),
-  request: z
-    .object({
-      id: z.string().nullable().optional(),
-      idempotency_key: z.string().nullable().optional(),
-    })
-    .optional(),
-  data: z.object({
-    object: z.unknown(),
-    previous_attributes: z.unknown().optional(),
-  }),
-})
-
-type StripeWebhookPayload = z.infer<typeof stripeWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -322,13 +288,10 @@ type StripeWebhookPayload = z.infer<typeof stripeWebhookPayloadSchema>
 export const stripeOAuthConfigSchema = z.object({
   clientId: z.string().min(1),
   clientSecret: z.string().min(1),
-  redirectUri: z.string().url(),
+  redirectUri: z.url(),
   scopes: z.array(z.string()).default([...STRIPE_OAUTH_SCOPES]),
-  authorizeUrl: z
-    .string()
-    .url()
-    .default('https://connect.stripe.com/oauth/authorize'),
-  tokenUrl: z.string().url().default('https://connect.stripe.com/oauth/token'),
+  authorizeUrl: z.url().default('https://connect.stripe.com/oauth/authorize'),
+  tokenUrl: z.url().default('https://connect.stripe.com/oauth/token'),
 })
 
 export type StripeOAuthConfig = z.infer<typeof stripeOAuthConfigSchema>
@@ -337,31 +300,6 @@ export type StripeOAuthConfig = z.infer<typeof stripeOAuthConfigSchema>
 // Provider-specific webhook signature config
 // ---------------------------------------------------------------------------
 
-const stripeWebhookSignatureConfigSchema = z.object({
-  provider: z.literal(STRIPE_PROVIDER_NAME),
-  headerName: z.string().default('Stripe-Signature'),
-  secret: z.string().min(1),
-  format: z.literal('stripe-composite').default('stripe-composite'),
-  algorithm: z.literal('sha256').default('sha256'),
-})
-
-type StripeWebhookSignatureConfig = z.infer<
-  typeof stripeWebhookSignatureConfigSchema
->
-
 // ---------------------------------------------------------------------------
 // Enumerations for typed webhook events
 // ---------------------------------------------------------------------------
-
-const stripeWebhookEventTypeSchema = z.enum([
-  'payment_intent.succeeded',
-  'payment_intent.payment_failed',
-  'charge.refunded',
-  'customer.created',
-  'customer.updated',
-  'invoice.paid',
-  'invoice.payment_failed',
-  'checkout.session.completed',
-])
-
-type StripeWebhookEventType = z.infer<typeof stripeWebhookEventTypeSchema>

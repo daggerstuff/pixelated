@@ -65,7 +65,6 @@ const OAUTH_CONFIG = {
 }
 
 const SEEDED_MEETING_ID_1 = '100000001'
-const SEEDED_MEETING_ID_2 = '100000002'
 
 const baseMeetingInput: CreateMeetingInput = {
   topic: 'New Therapy Session',
@@ -133,13 +132,13 @@ function makeWebhookEvent(overrides: Record<string, unknown> = {}) {
 
 describe('ZoomService', () => {
   let service: InstanceType<typeof ZoomService>
-  let adapter: StubZoomAdapter
+  let adapter: InstanceType<typeof StubZoomAdapter>
 
   beforeEach(() => {
     vi.clearAllMocks()
-  mockRedisGet.mockResolvedValue(null)
-  mockRedisSetex.mockResolvedValue('OK')
-  mockRedisSetNx.mockResolvedValue(true)
+    mockRedisGet.mockResolvedValue(null)
+    mockRedisSetex.mockResolvedValue('OK')
+    mockRedisSetNx.mockResolvedValue(true)
     mockRedisSet.mockResolvedValue('OK')
     mockAuditLog.mockResolvedValue('audit-log-id')
 
@@ -189,6 +188,9 @@ describe('ZoomService', () => {
           clientId: 'c',
           clientSecret: 's',
           redirectUri: 'https://app.example.com/callback',
+          scopes: ['meeting:read'],
+          authorizeUrl: 'https://zoom.us/oauth/authorize',
+          tokenUrl: 'https://zoom.us/oauth/token',
         },
         webhookSecret: WEBHOOK_SECRET,
       })

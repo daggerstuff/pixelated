@@ -198,8 +198,8 @@ export class TwilioService {
    */
   async listMessages(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<TwilioAdapter['listMessages']>[1],
   ): Promise<{ data: TwilioMessage[]; pagination: { count: number } }> {
     const raw = await this.adapter.listMessages(accessToken, params)
@@ -273,8 +273,8 @@ export class TwilioService {
    */
   async listCalls(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<TwilioAdapter['listCalls']>[1],
   ): Promise<{ data: TwilioCall[]; pagination: { count: number } }> {
     const raw = await this.adapter.listCalls(accessToken, params)
@@ -378,8 +378,8 @@ export class TwilioService {
    */
   async listPhoneNumbers(
     accessToken: string,
-    tenantId: string,
-    userId: string,
+    _tenantId: string,
+    _userId: string,
     params?: Parameters<TwilioAdapter['listPhoneNumbers']>[1],
   ): Promise<{ data: TwilioPhoneNumber[]; pagination: { count: number } }> {
     const raw = await this.adapter.listPhoneNumbers(accessToken, params)

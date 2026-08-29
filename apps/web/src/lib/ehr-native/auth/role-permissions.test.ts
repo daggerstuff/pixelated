@@ -15,7 +15,6 @@ import {
   EHR_PERMISSIONS,
   isClinicalRole,
   isEHRPermission,
-  type ClinicalRole,
   type EHRPermission,
 } from './types'
 

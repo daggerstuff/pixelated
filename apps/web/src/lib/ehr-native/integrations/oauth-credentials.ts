@@ -1,6 +1,10 @@
-import { redis } from '@/lib/redis'
+import { redisClient } from '@/lib/redis'
 
-import { oAuthConnectionSchema, type IntegrationProvider, type OAuthConnection } from './types'
+import {
+  oAuthConnectionSchema,
+  type IntegrationProvider,
+  type OAuthConnection,
+} from './types'
 
 const OAUTH_CREDENTIAL_TTL_SECONDS = 90 * 24 * 60 * 60
 const keyPrefix = 'oauth:connection'
@@ -13,12 +17,19 @@ export const oauthCredentials = {
   async store(connection: OAuthConnection): Promise<void> {
     const validated = oAuthConnectionSchema.parse(connection)
     const key = buildKey(validated.tenantId, validated.provider)
-    await redis.setex(key, OAUTH_CREDENTIAL_TTL_SECONDS, JSON.stringify(validated))
+    await redisClient.setex(
+      key,
+      OAUTH_CREDENTIAL_TTL_SECONDS,
+      JSON.stringify(validated),
+    )
   },
 
-  async get(tenantId: string, provider: IntegrationProvider): Promise<OAuthConnection | null> {
+  async get(
+    tenantId: string,
+    provider: IntegrationProvider,
+  ): Promise<OAuthConnection | null> {
     const key = buildKey(tenantId, provider)
-    const raw = await redis.get(key)
+    const raw = await redisClient.get(key)
     if (!raw) return null
     try {
       const parsed = JSON.parse(raw) as unknown
@@ -30,7 +41,7 @@ export const oauthCredentials = {
 
   async delete(tenantId: string, provider: IntegrationProvider): Promise<void> {
     const key = buildKey(tenantId, provider)
-    await redis.del(key)
+    await redisClient.del(key)
   },
 
   async updateTokens(
@@ -52,6 +63,10 @@ export const oauthCredentials = {
       lastRefreshedAt: new Date().toISOString(),
     }
     const key = buildKey(tenantId, provider)
-    await redis.setex(key, OAUTH_CREDENTIAL_TTL_SECONDS, JSON.stringify(updated))
+    await redisClient.setex(
+      key,
+      OAUTH_CREDENTIAL_TTL_SECONDS,
+      JSON.stringify(updated),
+    )
   },
 }
