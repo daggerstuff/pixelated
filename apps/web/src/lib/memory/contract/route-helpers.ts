@@ -17,7 +17,8 @@ import {
 
 import { errorBody, mapGatewayError } from './errors'
 import { MEMORY_API_CONTRACT_VERSION, PublicMemory } from './v1'
-const logger = createBuildSafeLogger('route-helpers')
+
+const logger = createBuildSafeLogger('memory-api-v1')
 
 // ---------------------------------------------------------------------------
 // Response helpers — every v1 route returns one of these two shapes.
@@ -45,12 +46,12 @@ export function jsonError(mapping: {
 // Zod validation helpers.
 // ---------------------------------------------------------------------------
 
-export interface ValidationFailure {
+interface ValidationFailure {
   ok: false
   response: Response
 }
 
-export interface ValidationSuccess<T> {
+interface ValidationSuccess<T> {
   ok: true
   data: T
 }

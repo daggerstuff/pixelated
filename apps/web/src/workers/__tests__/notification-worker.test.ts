@@ -3,9 +3,9 @@ import { env } from '../../config/env.config'
 import { NotificationService } from '../../lib/services/notification/NotificationService'
 
 // Extend the WebSocketServer interface for testing
-// `shutdown` is already declared in the WebSocketServer interface — only augment missing members
 declare module '../../lib/services/notification/WebSocketServer' {
   interface WebSocketServer {
+    shutdown: () => void
     emit: (event: string, ...args: any[]) => void
   }
 }
