@@ -217,7 +217,7 @@ async function main() {
         `\n`,
     )
     for (const line of output.split('\n')) {
-      if (/ - (error|warning) ts\(/.test(line)) console.log(`DIAG ${line}`)
+      if (/ - (error|warning) /.test(line)) console.log(`DIAG ${line}`)
     }
     process.exit(1)
   }
