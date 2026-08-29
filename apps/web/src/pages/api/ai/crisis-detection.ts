@@ -108,7 +108,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     // Configuration flag for detector selection per deployment
-    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] ?? 'mental_health'
+    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] || 'mental_health'
     const crisisService = detectorType === 'mental_health'
       ? new CrisisDetectionService({
           aiService,
@@ -214,12 +214,12 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       aiResource.id, // resource is a string
       {
         // details instead of metadata
-        modelName: aiService.getModelInfo?.('default')?.name || 'unknown',
+        modelName: aiService.getModelInfo('default')?.name || 'unknown',
         sensitivityLevel,
         batchSize: batch ? batch.length : 0,
         textLength: text ? text.length : 0,
         resourceType: aiResource.type,
-      },
+      } as AuditDetails,
       AuditEventStatus.SUCCESS,
     )
 
@@ -231,13 +231,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       aiResource.id, // resource is a string
       {
         // details instead of metadata
-        modelName: aiService.getModelInfo?.('default')?.name || 'unknown',
+        modelName: aiService.getModelInfo('default')?.name || 'unknown',
         resultCount: Array.isArray(result) ? result.length : 1,
         crisisDetected,
         latencyMs: Date.now() - startTime,
         priority: crisisDetected ? 'high' : 'normal',
         resourceType: aiResource.type,
-      },
+      } as AuditDetails,
       AuditEventStatus.SUCCESS,
     )
 
@@ -273,7 +273,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         stack: error instanceof Error ? (error)?.stack : undefined,
         status: 'error', // This can go into details
         resourceType: aiResource.type,
-      },
+      } as AuditDetails,
       AuditEventStatus.FAILURE,
     )
 
