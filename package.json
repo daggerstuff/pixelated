@@ -175,7 +175,14 @@
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",
-    "mcp:manage": "node scripts/mcp-manager.js"
+    "mcp:manage": "node scripts/mcp-manager.js",
+    "lint:shellcheck": "shellcheck --severity=warning scripts/backup/*.sh scripts/deploy/install-backup-home-vivi-service.sh",
+    "lint:actionlint": "bash scripts/ci/run-actionlint.sh",
+    "lint:ci:imports": "node scripts/ci/lint-changed.mjs --imports",
+    "lint:imports": "node scripts/ci/check-unresolved-imports.mjs",
+    "lint:unused-exports": "node scripts/ci/check-unused-exports.mjs",
+    "lint:unused-exports:build-index": "node scripts/ci/check-unused-exports.mjs --build-index",
+    "lint:ci:unused-exports": "node scripts/ci/lint-changed.mjs --unused-exports"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
