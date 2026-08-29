@@ -42,6 +42,7 @@ export * from './communication.js'
 
 export * from './care-plan.js'
 export * from './consent.js'
+export * from './provenance.js'
 export * from './questionnaire.js'
 export * from './service-request.js'
 export * from './telehealth.js'
@@ -66,6 +67,7 @@ import {
 } from './clinical.js'
 import { documentReferenceSchema } from './communication.js'
 import { consentSchema } from './consent.js'
+import { provenanceSchema } from './provenance.js'
 import {
   questionnaireSchema,
   questionnaireResponseSchema,
@@ -86,6 +88,7 @@ export const ehrResourceSchema = z.discriminatedUnion('resourceType', [
   claimSchema,
   documentReferenceSchema,
   consentSchema,
+  provenanceSchema,
   serviceRequestSchema,
   questionnaireSchema,
   questionnaireResponseSchema,

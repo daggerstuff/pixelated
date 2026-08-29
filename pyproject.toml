@@ -5,66 +5,53 @@ description = "Pixelated Empathy - AI-powered bias detection and mental health p
 authors = [
   { name = "Pixelated Empathy Team", email = "team@pixelatedempathy.com" },
 ]
-requires-python = ">=3.13,<3.14" # Only 3.13 resolves the dev graph (data-designer family caps); CI runs 3.13.13
+requires-python = ">=3.13"
 dependencies = [
-  "flask[async]", # self-bundle (`asgiref` adds async to `flask`); NOT a flat-deps marker — see IMPORTANT note
+  "flask[async]",
   "flask-cors>=6.0.2", # Updated to latest secure version
   "pandas",
   "numpy",
   "scikit-learn",
-  "pyjwt>=2.13.0",
-  # Security: Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
-  "werkzeug>=3.1.4",
+  "pyjwt",
+  "werkzeug>=3.1.4", # Fixes GHSA-hgf8-39gv-g3f2 (Windows special device names vulnerability)
   "fairlearn",
   "shap>=0.41.0",
   "lime",
   "scikit-image>=0.26.0",
   "spacy>=3.8.14", # Updated to latest secure version
-  # Security: Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip) and GHSA-7p94-766c-hgjp
-  "nltk>=3.10.3",
+  "nltk>=3.9.4", # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip) and GHSA-7p94-766c-hgjp
   "evaluate",
-  "cryptography>=46.0.6,<51", # Upper bound matches data-designer-engine 0.6.x/0.7.x; dependabot bumps stay within 46.x
-  # Security: Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
-  "requests>=2.33.0",
+  "cryptography>=46.0.6", # Updated to latest secure version
+  "requests>=2.33.0", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "python-dotenv>=1.2.1", # Updated to latest secure version
   "numba>=0.63.1",
-  "faiss-cpu>=1.15.0",
+  "faiss-cpu>=1.11.0",
   "matplotlib>=3.10.3",
   "psutil>=7.0.0",
   "chardet>=5.2.0,<8.0.0",
   "pydub>=0.25.1",
-  "pyarrow>=22.0.0,<26", # Upper bound <23 required by data-designer-config 0.6.x/0.7.x
-  "hatch>=1.18.0",
-  # Security: Fixes GHSA-5239-wwwm-4pmq (ReDoS)
-  "Pygments>=2.20.0",
+  "pyarrow>=22.0.0",
+  "hatch>=1.14.1",
+  "Pygments>=2.20.0", # Fixes GHSA-5239-wwwm-4pmq (ReDoS)
   "textstat>=0.7.8",
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
-  "wandb>=0.28.2",
+  "wandb>=0.21.1",
   "tqdm>=4.67.0", # Progress bar for data processing scripts
   # Training dependencies
   "datasets>=2.19.0",
   "sentencepiece>=0.2.0",
   "einops>=0.8.0",
-  "sentence-transformers>=5.7.0", # For semantic similarity in deduplication
+  "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
-  "huggingface-hub>=1.26.0",
+  "huggingface-hub>=0.24.0",
   "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
-  "torch==2.13.0", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
+  "torch==2.12.1", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
-  # Stage 1 QA pipeline — PII scrubbing, language detection, toxicity, dedup (blueprint 1B/2A)
-  "presidio-analyzer>=2.2.35",
-  "presidio-anonymizer>=2.0.55",
-  "fasttext-langdetect>=1.0.3",
-  "detoxify>=0.5.2",
-  "datasketch>=1.6.5",
-  # Ingest router — HTML parsing and web text extraction (blueprint 1A)
-  "selectolax>=0.3.21",
-  "trafilatura>=1.12.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
-  "sentry-sdk>=2.68.0",
-  "openai>=3.1.0",
+  "sentry-sdk>=2.44.0",
+  "openai>=1.107.2",
   "ffmpeg>=1.4",
   "s3cmd>=2.4.0",
   "authlib>=1.6.11", # Updated to latest secure version
@@ -73,55 +60,46 @@ dependencies = [
   "redis>=6.4.0",
   "bcrypt>=4.3.0",
   "email-validator>=2.3.0",
-  "python-socketio>=5.16.4",
+  "python-socketio>=5.16.1",
   "flask-socketio>=5.3.6",
   "httpx>=0.28.1",
   "pyyaml>=6.0.3",
   "neo4j>=6.1,<6.3",
-  # Security: Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
-  "fastmcp>=3.4.6",
-  # Security: Fixes GHSA-7f5h-v6xp-fcq8, CVE-2026-48710 (BadHost)
-  "starlette>=1.4.1",
+  # Security: Pin transitive dependencies to secure versions
+  "fastmcp>=2.14.0", # Fixes GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5 (updated to 2.14.0)
+  "starlette>=1.0.1", # Fixes GHSA-7f5h-v6xp-fcq8, CVE-2026-48710 (BadHost)
   "h11>=0.15.0",
-  # Security: Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
-  "keras>=3.12.0",
-  # Security: Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability, updated to 4.61.1)
-  "fonttools>=4.61.1",
-  # Security: Fixes GHSA-9h52-p55h-vw2f
-  "mcp[cli]>=1.23.0", # self-bundle (`typer`+`python-dotenv` add CLI to `mcp`); NOT a flat-deps marker — see IMPORTANT note
-  # Security: Fixes CVE-2026-0994
-  "protobuf>=6.33.5",
-  # Security: Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
-  "urllib3>=2.7.0",
-  # Security: Fixes CVE-2026-34519, CVE-2026-34518, CVE-2026-34515 and earlier CVEs
-  "aiohttp>=3.14.0",
-  "aiofiles>=23.2.1",
-  # Security: Fixes CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
+  "keras>=3.12.0", # Fixes GHSA-mq84-hjqx-cwf2, GHSA-28jp-44vh-q42h
+  "fonttools>=4.61.1", # Fixes GHSA-768j-98cg-p3fv (Arbitrary File Write and XML injection vulnerability, updated to 4.61.1)
+  "mcp[cli]>=1.23.0", # Fixes GHSA-9h52-p55h-vw2f
+  "protobuf>=6.33.5", # Fixes CVE-2026-0994
+  "urllib3>=2.7.0", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+  "aiohttp>=3.14.0", # Fixes CVE-2026-34519, CVE-2026-34518, CVE-2026-34515 and earlier CVEs
+  # Security: Pin pillow to fix CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "pillow>=12.1.1",
   # NVIDIA NeMo Data Designer for synthetic dataset generation
-  "nemo-microservices[data-designer]>=1.0.0", # IMPORTANT: extra does NOT install `data-designer`; direct `data-designer` pin below pulls duckdb/faker/lxml/marko/sqlfluff; the extra doesn't pull them
+  "nemo-microservices[data-designer]>=1.0.0",
   "kaggle>=1.8.2",
   "youtube-transcript-api>=0.6.0",
-  "boto3>=1.43.72", # Keep compatible with checkov
+  "boto3>=1.40.75", # Keep compatible with checkov
   # Google Drive API for direct Drive-to-Drive transfers
   "google-api-python-client>=2.150.0",
-  "google-auth-httplib2>=0.4.1",
+  "google-auth-httplib2>=0.2.0",
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
-  "ngcsdk>=4.34.10",
-  # Security: Fixes GHSA-hqmj-h5c6-369m, GHSA-p433-9wv8-28xj, GHSA-cmw6-hcpp-c6jp
-  "onnx>=1.22.0",
+  "ngcsdk>=4.16.0",
+  "onnx>=1.21.0", # Fixes GHSA-hqmj-h5c6-369m, GHSA-p433-9wv8-28xj, GHSA-cmw6-hcpp-c6jp
   "onnxscript>=0.6.2",
   "fastapi>=0.124.4",
-  "uvicorn>=0.52.3",
+  "uvicorn>=0.44.0",
   "minio>=7.2.20",
-  "librosa>=1.0.0",
+  "librosa>=0.11.0",
   "langsmith-fetch>=0.3.1",
   "ray>=2.55.0",
   "pydantic>=2.12.5",
   "clickhouse-driver>=0.2.10",
   "nest-asyncio>=1.6.0",
-  "google-genai>=2.18.1",
+  "google-genai>=1.61.0",
   "e2b>=2.6.1",
   "lancedb>=0.30.2",
   "openai-whisper>=20250625",
@@ -129,13 +107,13 @@ dependencies = [
   "kernels>=0.12.1,<0.17",
   "peft>=0.10.0",
   "accelerate>=0.28.0",
-  "bitsandbytes>=0.50.1",
+  "bitsandbytes>=0.43.0",
   "lightning>=2.1.0",
   "lightning-sdk>=2025.12.2",
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
-  "gitpython>=3.1.58",
-  "modal>=1.5.4",
+  "gitpython>=3.1.43",
+  "modal>=1.4.1",
   "gradient-adk>=0.2.11",
   "virtualenv>=21.2.0",
   "voyageai>=0.3.7",
@@ -144,25 +122,16 @@ dependencies = [
   "webdriver-manager>=4.0.2",
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
+  "localstack>=2026.5.0",
   "python-telegram-bot>=22.7",
-  "anthropic>=0.122.0",
+  "anthropic>=0.107.1",
   "libcst>=1.8.6",
-  "data-designer>=0.9.1,<0.10", # Upper bound <0.8 prevents silent 0.8.x cryptography/pyarrow cap changes; required independently of `nemo-microservices[data-designer]` extra above
+  "data-designer>=0.6.1",
   "nemoguardrails>=0.22.0",
   "pinecone-client>=6.0.0",
   "ruff>=0.15.17",
   "beautifulsoup4>=4.15.0",
-  "sqlalchemy>=2.0.52",
-  "ebooklib>=0.20",
-  "pypdf>=6.16.1",
-  "mobi>=0.4.1",
-  "aiofiles>=25.1.0",
-  "openpipe-art>=0.5.18",
-  "pynvml>=13.0.1",
-  "tavily-cli>=0.1.6",
-  "celery>=5.6.3",
-  "langchain-nvidia-ai-endpoints>=1.4.3",
-  "deepagents>=0.6.8",
+  "sqlalchemy>=2.0.51",
 ]
 [project.optional-dependencies]
 test = [
@@ -172,9 +141,8 @@ test = [
   "pytest-asyncio",
   "coverage",
   "types-requests",
-  "hypothesis>=6.165.9",
+  "hypothesis>=6.152.9",
 ]
-video-emotion = ["pydantic>=2", "numpy", "opencv-python", "pandas"]
 dev = [
   "black",
   "isort",
@@ -196,7 +164,7 @@ dev = [
 [project.scripts]
 process-priority-5 = "ai.scripts.process_priority_5:main"
 [build-system]
-requires = ["setuptools>=78.1.1", "wheel>=0.48.0"]
+requires = ["setuptools>=78.1.1", "wheel>=0.38.1"]
 build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["."]
@@ -271,28 +239,27 @@ select = [
 ]
 ignore = ["E501", "UP017", "PLR2004"]
 [tool.ruff.lint.per-file-ignores]
-"scripts/diagnose-llm.py" = ["E402", "T201"]
 "scripts/verify_stage2_persona_quality.py" = ["E402", "PLC0415"]
-"tests/integration/test_persona_llm_path.py" = ["PLC0415"]
 "scripts/task_sync/sync_from_linear.py" = ["T201"]
-"scripts/task_sync/auto_close_from_merge.py" = ["T201"]
 "scripts/categorize.py" = ["T201"]
 "scripts/categorize_errors.py" = ["T201"]
-"tools/agent_runner/cli.py" = ["T201"]
-"scripts/linear-agent-runner.py" = ["T201", "N999"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
-"hackathon/colab/notebooks/*.ipynb" = ["T201", "F404", "PLW1510"]
-"foresight/foresight/server.py" = ["PLR0911", "PLR0912", "PLR0913", "PLR0915"]
-"foresight/tests/test_*.py" = [
+"foresight-mcp/foresight_mcp/server.py" = [
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+]
+"foresight-mcp/tests/test_*.py" = [
   "PLC0415",
   "ARG001",
   "PLR0913",
   "SIM115",
   "ARG005",
 ]
-"foresight/foresight/llm_client.py" = ["PLR0913"]
-"foresight/foresight/tenant_middleware.py" = ["PLR0912"]
+"foresight-mcp/foresight_mcp/llm_client.py" = ["PLR0913"]
+"foresight-mcp/foresight_mcp/tenant_middleware.py" = ["PLR0912"]
 [tool.ruff.lint.isort]
 known-first-party = ["ai", "src"]
 combine-as-imports = true
@@ -309,8 +276,8 @@ combine_as_imports = true
 force_single_line = false
 [tool.pytest.ini_options]
 addopts = "-ra --strict-markers"
-testpaths = ["tests"]
-norecursedirs = []
+testpaths = ["tests", "ai/core/tests"]
+norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
 asyncio_default_fixture_loop_scope = "function"
 markers = [
   "integration: marks tests as integration tests (require external services)",
@@ -340,9 +307,6 @@ exclude = ["ai"]
 # across different OS/arch combinations (e.g., cross-platform wheels).
 index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
-# Security: Override openpipe-art's litellm cap (<=1.82.0) to fix CVE-2026-35030 and 9 other critical vulnerabilities
-override-dependencies = ["litellm>=1.83.0"]
-environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
 # Note: Increase timeout via environment variable: UV_HTTP_TIMEOUT=300 uv sync
 # Note: nvidia-nim and ngc-python-cli require NVIDIA NGC authentication
 # Install them manually with: uv pip install --extra-index-url https://pypi.ngc.nvidia.com nvidia-nim ngc-python-cli
@@ -351,10 +315,10 @@ environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
 [dependency-groups]
 dev = [
   "black>=25.12.0",
-  "coverage>=7.15.3",
+  "coverage>=7.13.4",
   "flake8>=7.3.0",
   "isort>=6.0.1",
-  "mypy>=2.3.1",
+  "mypy>=1.16.1",
   "nbqa>=1.9.1",
   "pip-audit>=2.9.0",
   "pytest-asyncio>=1.0.0",
@@ -367,7 +331,7 @@ dev = [
   "sourcery>=1.37.0; sys_platform == 'darwin'",
   "types-requests>=2.32.4.20260107",
   "asyncpg>=0.31.0",
-  "hypothesis>=6.165.9",
+  "hypothesis>=6.155.2",
 ]
 
 [[tool.uv.index]]

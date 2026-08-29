@@ -8,8 +8,11 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
+    "baseUrl": ".",
     "paths": {
-      "@/lib/*": ["../../src/lib/*"]
+      "@/lib/*": ["../../src/lib/*"],
+      "eve": ["../../.eve/types/eve-modules.d.ts"],
+      "eve/*": ["../../.eve/types/eve-modules.d.ts"]
     }
   },
   "include": ["agent/**/*.ts", "evals/**/*.ts", ".eve/**/*.d.ts"]
