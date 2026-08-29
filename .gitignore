@@ -141,7 +141,7 @@ __mocks__
 MANIFEST
 
 # === NODE.JS & FRONTEND ===
-*.tsbuildinfo
+*.tsbuildinfo*
 .nyc_output/
 .pnpm-store/
 /node_modules/
@@ -164,6 +164,7 @@ verbose/coverage/
 *.node
 *.spec
 /.astro
+**/.astro/
 /.bin
 /.output
 /.python
