@@ -7,7 +7,6 @@ import logging
 import os
 import subprocess
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from typing import Any
 
 logger = logging.getLogger("agent_runner.trace_analyzer")
@@ -56,18 +55,20 @@ class TraceAnalyzer:
             try:
                 runs = list(self.client.list_runs(project_name=self.project_name, execution_order=1, limit=limit))
                 for r in runs:
-                    traces.append({
-                        "id": str(r.id),
-                        "name": r.name,
-                        "run_type": r.run_type,
-                        "status": r.status,
-                        "start_time": r.start_time.isoformat() if r.start_time else None,
-                        "end_time": r.end_time.isoformat() if r.end_time else None,
-                        "total_tokens": r.total_tokens or 0,
-                        "error": r.error,
-                        "inputs": r.inputs,
-                        "outputs": r.outputs,
-                    })
+                    traces.append(
+                        {
+                            "id": str(r.id),
+                            "name": r.name,
+                            "run_type": r.run_type,
+                            "status": r.status,
+                            "start_time": r.start_time.isoformat() if r.start_time else None,
+                            "end_time": r.end_time.isoformat() if r.end_time else None,
+                            "total_tokens": r.total_tokens or 0,
+                            "error": r.error,
+                            "inputs": r.inputs,
+                            "outputs": r.outputs,
+                        }
+                    )
                 return traces
             except Exception as e:
                 logger.debug("LangSmith SDK list_runs failed, falling back to CLI: %s", e)
@@ -116,7 +117,7 @@ class TraceAnalyzer:
         status = trace_data.get("status", "completed")
         start_time = str(trace_data.get("start_time", ""))
         end_time = str(trace_data.get("end_time", "")) if trace_data.get("end_time") else None
-        
+
         prompt_tokens = trace_data.get("prompt_tokens", 0) or 0
         completion_tokens = trace_data.get("completion_tokens", 0) or 0
         total_tokens = trace_data.get("total_tokens", prompt_tokens + completion_tokens) or 0
@@ -131,7 +132,7 @@ class TraceAnalyzer:
         tool_count = sum(1 for c in tool_calls if c.get("run_type") == "tool")
 
         outputs = str(trace_data.get("outputs", ""))
-        
+
         # Anomaly Check 2: Fake / Mock cheating detection in output
         if "seededRandom" in outputs or "Math.random" in outputs:
             anomalies.append("Detected pseudo-random / mock data generator in execution output")

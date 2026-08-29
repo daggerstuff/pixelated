@@ -34,11 +34,12 @@ const SCHEMA = z.object({
 })
 
 async function execute(input: z.infer<typeof SCHEMA>) {
+  const parsedInput = SCHEMA.parse(input)
   const changedAt = new Date().toISOString()
   let previousValue: number | string | null = null
 
   const previousAdjustments = await searchMemoriesMock({
-    query: `threshold:${input.threshold_type}`,
+    query: `threshold:${parsedInput.threshold_type}`,
     limit: 1,
     tag_filter: ['threshold_change'],
   })
@@ -58,11 +59,11 @@ async function execute(input: z.infer<typeof SCHEMA>) {
 
   const record = {
     type: 'threshold_change',
-    threshold_type: input.threshold_type,
-    new_value: input.new_value,
+    threshold_type: parsedInput.threshold_type,
+    new_value: parsedInput.new_value,
     previous_value: previousValue,
-    reason: input.reason,
-    scope: input.scope,
+    reason: parsedInput.reason,
+    scope: parsedInput.scope,
     changed_by: 'supervisor-agent',
     changed_at: changedAt,
   }
@@ -70,23 +71,23 @@ async function execute(input: z.infer<typeof SCHEMA>) {
   const stored = await storeMemoryMock({
     content: JSON.stringify(record),
     category: 'threshold',
-    scope: input.scope,
+    scope: parsedInput.scope,
     retention: 'long_term',
     importance: 0.8,
     tags: [
       'threshold_change',
-      `threshold:${input.threshold_type}`,
-      `scope:${input.scope}`,
+      `threshold:${parsedInput.threshold_type}`,
+      `scope:${parsedInput.scope}`,
       'supervisor_action',
     ],
   })
 
   return {
-    threshold_type: input.threshold_type,
+    threshold_type: parsedInput.threshold_type,
     previous_value: previousValue,
-    new_value: input.new_value,
-    scope: input.scope,
-    reason: input.reason,
+    new_value: parsedInput.new_value,
+    scope: parsedInput.scope,
+    reason: parsedInput.reason,
     changed_at: changedAt,
   }
 }

@@ -24,15 +24,16 @@ export default defineTool({
     'and QA scores.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
+    const parsedInput = SCHEMA.parse(input)
     const allMemories = await searchMemories({
-      query: `trainee:${input.trainee_id}`,
+      query: `trainee:${parsedInput.trainee_id}`,
       limit: 200,
-      tag_filter: [`trainee:${input.trainee_id}`],
+      tag_filter: [`trainee:${parsedInput.trainee_id}`],
     })
 
     if (!allMemories || allMemories.length === 0) {
       return {
-        trainee_id: input.trainee_id,
+        trainee_id: parsedInput.trainee_id,
         events: [],
         summary: { note: 'No records found for this trainee.' },
       }
@@ -69,12 +70,12 @@ export default defineTool({
             events.push({ type: 'curriculum', timestamp: ts, detail: parsed })
             break
           case 'session_header':
-            if (input.include_sessions) {
+            if (parsedInput.include_sessions) {
               events.push({ type: 'session', timestamp: ts, detail: parsed })
             }
             break
           default:
-            if (parsed.state === 'REVIEWED' && input.include_scores) {
+            if (parsed.state === 'REVIEWED' && parsedInput.include_scores) {
               events.push({ type: 'qa_score', timestamp: ts, detail: parsed })
             }
             break
@@ -91,7 +92,7 @@ export default defineTool({
     )
 
     return {
-      trainee_id: input.trainee_id,
+      trainee_id: parsedInput.trainee_id,
       events,
       summary: {
         total_events: events.length,
