@@ -16,6 +16,13 @@ resources:
   - middleware-cors.yaml
   - middleware-rate-limit.yaml
   - middleware-request-size-limit.yaml
+  # Self-hosted Umami analytics (replaced Rybbit SaaS)
+  - umami-deployment.yaml
+  - umami-service.yaml
+  - umami-ingress.yaml
+  # umami-secrets is created by CI (deploy-civo.yml) from GH secrets
+  # UMAMI_DATABASE_URL / UMAMI_APP_SECRET — ESO/Vault path documented in
+  # umami-external-secret.yaml for future migration.
 
 # Rewrite `pixelatedempathy/api:latest` placeholder in deployment.yaml.
 # Tag must match the deployed build (see CI IMAGE_TAG).

@@ -291,6 +291,14 @@ jobs:
             --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
             -n pixelated-empathy \
             --dry-run=client -o yaml | kubectl apply -f -
+          # Umami analytics secrets (self-hosted Umami replaced Rybbit).
+          # UMAMI_DATABASE_URL: postgres connection string for the umami DB.
+          # UMAMI_APP_SECRET: random 32+ byte string (session/data signing).
+          kubectl create secret generic umami-secrets \
+            --from-literal=DATABASE_URL="${{ secrets.UMAMI_DATABASE_URL }}" \
+            --from-literal=APP_SECRET="${{ secrets.UMAMI_APP_SECRET }}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -k infra/k8s/civo
            kubectl apply -f agents/session-agent/k8s/deployment.yaml
            kubectl apply -f agents/qa-agent/k8s/deployment.yaml
