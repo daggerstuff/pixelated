@@ -16,7 +16,7 @@ import {
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getUserById } from '@/services/auth0.service'
+import { getUserById } from '@/lib/services/auth0.service'
 
 // Initialize scoped logger for this module
 const logger = createBuildSafeLogger('crisis-detection')
