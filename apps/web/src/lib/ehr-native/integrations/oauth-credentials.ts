@@ -13,7 +13,7 @@ export const oauthCredentials = {
   async store(connection: OAuthConnection): Promise<void> {
     const validated = oAuthConnectionSchema.parse(connection)
     const key = buildKey(validated.tenantId, validated.provider)
-    await redis.set(key, JSON.stringify(validated), OAUTH_CREDENTIAL_TTL_SECONDS)
+    await redis.setex(key, OAUTH_CREDENTIAL_TTL_SECONDS, JSON.stringify(validated))
   },
 
   async get(tenantId: string, provider: IntegrationProvider): Promise<OAuthConnection | null> {
@@ -52,6 +52,6 @@ export const oauthCredentials = {
       lastRefreshedAt: new Date().toISOString(),
     }
     const key = buildKey(tenantId, provider)
-    await redis.set(key, JSON.stringify(updated), OAUTH_CREDENTIAL_TTL_SECONDS)
+    await redis.setex(key, OAUTH_CREDENTIAL_TTL_SECONDS, JSON.stringify(updated))
   },
 }

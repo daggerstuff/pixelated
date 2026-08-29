@@ -152,7 +152,9 @@ const redisClient: LegacyRedisClient = {
   setNx: async (key: string, value: string, ttlSeconds: number) => {
     try {
       await ensureConnected()
-      const result = await service.set(key, value, 'NX', 'EX', ttlSeconds)
+      const client = service.getClient()
+      if (!client) return false
+      const result = await client.set(key, value, 'NX', 'EX', ttlSeconds)
       return result === 'OK'
     } catch {
       return false
