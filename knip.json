@@ -11,6 +11,7 @@
     "config/instrument.mjs",
     "apps/web/src/pages/**/*.astro",
     "apps/web/src/pages/**/*.ts",
+    "apps/web/src/api/routes/**/*.ts",
     "apps/web/src/main.js",
     "apps/web/src/client-entry.js",
     "apps/web/src/client-inject.js",

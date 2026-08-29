@@ -57,7 +57,6 @@ export const oAuthConfigSchema = z.object({
   tokenUrl: z.url(),
   refreshTokenUrl: z.url().optional(),
 })
-export type OAuthConfig = z.infer<typeof oAuthConfigSchema>
 
 /** OAuth state parameter for CSRF protection during authorization flow. */
 export const oAuthStateSchema = z.object({
@@ -81,7 +80,6 @@ export const oAuthConnectionSchema = z.object({
   connectedBy: z.string().min(1),
   lastRefreshedAt: z.iso.datetime().optional(),
 })
-export type OAuthConnection = z.infer<typeof oAuthConnectionSchema>
 
 // ---------------------------------------------------------------------------
 // Webhook handling

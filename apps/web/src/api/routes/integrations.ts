@@ -12,8 +12,8 @@ import {
 } from '../../lib/ehr-native/audit/events'
 import {
   buildMarketplaceDashboard,
-  connections,
-  featureFlags,
+  ConnectionStatusService,
+  FeatureFlagService,
   MARKETPLACE_PROVIDERS,
   PROVIDER_MAP,
 } from '../../lib/ehr-native/integrations/marketplace'
@@ -259,7 +259,7 @@ router.get(
       }
       await oauthCredentials.store(connection)
 
-      connections.set(
+      ConnectionStatusService.set(
         stateData.tenantId,
         provider,
         'connected',
@@ -482,7 +482,7 @@ router.post(
       }
 
       if (result.processed || result.duplicate) {
-        connections.recordWebhook(tenantId, provider, new Date().toISOString())
+        ConnectionStatusService.recordWebhook(tenantId, provider, new Date().toISOString())
       }
 
       return res.status(result.httpStatus).json(result)
@@ -510,7 +510,7 @@ router.get(
     if (!tenantId) {
       return res.status(400).json({ error: 'tenantId is required' })
     }
-    const flags = featureFlags.listForTenant(tenantId)
+    const flags = FeatureFlagService.listForTenant(tenantId)
     return res.json({ tenantId, featureFlags: flags })
   },
 )
@@ -536,7 +536,7 @@ router.put(
       return res.status(400).json({ error: 'enabled (boolean) is required' })
     }
 
-    featureFlags.set(
+    FeatureFlagService.set(
       tenantId,
       provider,
       enabled,
@@ -568,7 +568,7 @@ router.post(
         .json({ error: 'tenantId and valid provider are required' })
     }
 
-    connections.set(
+    ConnectionStatusService.set(
       tenantId,
       provider,
       'disconnected',

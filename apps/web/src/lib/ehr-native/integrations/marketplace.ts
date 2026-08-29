@@ -397,7 +397,3 @@ export function validateIntegrationStatus(input: string): IntegrationStatus {
 }
 
 export { MARKETPLACE_PROVIDERS as INTEGRATION_PROVIDERS, PROVIDER_MAP }
-export {
-  ConnectionStatusService as connections,
-  FeatureFlagService as featureFlags,
-}
