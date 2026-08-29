@@ -23,13 +23,19 @@ describe('advisor-agent tools', () => {
     })
 
     it('blocks path traversal outside root', async () => {
-      const result = await readFile.execute({ path: '../../../../etc/passwd' }, ctx)
+      const result = await readFile.execute(
+        { path: '../../../../etc/passwd' },
+        ctx,
+      )
       expect(typeof result).toBe('string')
       expect(result).toContain('path escapes the workspace root')
     })
 
     it('returns error when file not found', async () => {
-      const result = await readFile.execute({ path: 'nonexistent-file.xyz' }, ctx)
+      const result = await readFile.execute(
+        { path: 'nonexistent-file.xyz' },
+        ctx,
+      )
       expect(typeof result).toBe('string')
       expect(result).toContain('File not found')
     })
