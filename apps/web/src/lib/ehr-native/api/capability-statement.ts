@@ -12,7 +12,7 @@
  * The implemented FHIR R4 resource types in the EHR module.
  * Each type maps to a repository + API route pair.
  */
-export const IMPLEMENTED_FHIR_RESOURCES = [
+const IMPLEMENTED_FHIR_RESOURCES = [
   'Patient',
   'Encounter',
   'Observation',
@@ -22,7 +22,7 @@ export const IMPLEMENTED_FHIR_RESOURCES = [
   'Consent',
 ] as const
 
-export type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number]
+type FhirResourceType = (typeof IMPLEMENTED_FHIR_RESOURCES)[number]
 
 /**
  * The interactions supported per resource type.

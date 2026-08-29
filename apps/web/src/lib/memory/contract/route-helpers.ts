@@ -46,12 +46,12 @@ export function jsonError(mapping: {
 // Zod validation helpers.
 // ---------------------------------------------------------------------------
 
-export interface ValidationFailure {
+interface ValidationFailure {
   ok: false
   response: Response
 }
 
-export interface ValidationSuccess<T> {
+interface ValidationSuccess<T> {
   ok: true
   data: T
 }
