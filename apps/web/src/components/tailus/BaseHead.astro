@@ -1,5 +1,5 @@
 ---
-import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts'
 
 export interface Props {
@@ -48,4 +48,4 @@ const {
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
-<RybbitAnalytics nonce={cspNonce} />
+<UmamiAnalytics nonce={cspNonce} />

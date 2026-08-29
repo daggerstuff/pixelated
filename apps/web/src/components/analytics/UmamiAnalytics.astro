@@ -1,0 +1,43 @@
+---
+import { config } from '@/config/env.config'
+
+interface Props {
+  nonce?: string
+  trackPageTransitions?: boolean
+}
+
+const { nonce, trackPageTransitions = true } = Astro.props
+const scriptUrl =
+  config.client.umamiScriptUrl() ?? 'https://analytics.pixelatedempathy.com/script.js'
+const websiteId = config.client.umamiWebsiteId()
+const shouldRender = Boolean(scriptUrl && websiteId)
+const pageTransitionScript = `
+  const triggerUmamiPageview = () => {
+    if (typeof window === 'undefined') return
+    if (typeof window.umami?.track === 'function') {
+      window.umami.track()
+    }
+  }
+
+  document.addEventListener('astro:after-swap', () => {
+    triggerUmamiPageview()
+  })
+`
+---
+
+{
+  shouldRender && (
+    <>
+      <script
+        src={scriptUrl}
+        data-website-id={websiteId}
+        data-domains="pixelatedempathy.com,www.pixelatedempathy.com"
+        defer
+        nonce={nonce}
+      />
+      {trackPageTransitions && (
+        <script is:inline nonce={nonce} set:html={pageTransitionScript} />
+      )}
+    </>
+  )
+}

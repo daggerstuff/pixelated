@@ -1,0 +1,34 @@
+# ---------------------------------------------------------------------------
+# Umami ingress — analytics.pixelatedempathy.com
+#
+# Separate host from the main app so the analytics CSP scope stays clean and
+# the app's security middlewares (rate-limit, CORS, request-size) don't apply
+# to tracker traffic. TLS via the cluster's standard websecure entrypoint.
+# ---------------------------------------------------------------------------
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: umami-ingress
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: umami
+    app.kubernetes.io/component: analytics
+    app.kubernetes.io/part-of: pixelated-empathy
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: 'true'
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: analytics.pixelatedempathy.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: umami
+                port:
+                  number: 80
