@@ -216,6 +216,9 @@ async function main() {
         `\n    node scripts/ci/check-astro-hints.mjs --update-baseline` +
         `\n`,
     )
+    for (const line of output.split('\n')) {
+      if (/ - (error|warning) ts\(/.test(line)) console.log(`DIAG ${line}`)
+    }
     process.exit(1)
   }
 
