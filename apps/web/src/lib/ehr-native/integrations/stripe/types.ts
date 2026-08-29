@@ -364,6 +364,4 @@ const stripeWebhookEventTypeSchema = z.enum([
   'checkout.session.completed',
 ])
 
-type StripeWebhookEventType = z.infer<
-  typeof stripeWebhookEventTypeSchema
->
+type StripeWebhookEventType = z.infer<typeof stripeWebhookEventTypeSchema>

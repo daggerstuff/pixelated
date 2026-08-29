@@ -208,6 +208,4 @@ export const integrationAuditMetadataSchema = z.object({
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
 })
-type IntegrationAuditMetadata = z.infer<
-  typeof integrationAuditMetadataSchema
->
+type IntegrationAuditMetadata = z.infer<typeof integrationAuditMetadataSchema>

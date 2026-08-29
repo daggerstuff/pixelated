@@ -247,9 +247,7 @@ const calendlyWebhookPayloadSchema = z.object({
   }),
 })
 
-type CalendlyWebhookPayload = z.infer<
-  typeof calendlyWebhookPayloadSchema
->
+type CalendlyWebhookPayload = z.infer<typeof calendlyWebhookPayloadSchema>
 
 // ---------------------------------------------------------------------------
 // Provider-specific OAuth config
@@ -295,6 +293,4 @@ const calendlyWebhookEventTypeSchema = z.enum([
   'routing_form_submission.created',
 ])
 
-type CalendlyWebhookEventType = z.infer<
-  typeof calendlyWebhookEventTypeSchema
->
+type CalendlyWebhookEventType = z.infer<typeof calendlyWebhookEventTypeSchema>

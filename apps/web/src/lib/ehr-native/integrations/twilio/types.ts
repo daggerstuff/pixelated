@@ -201,6 +201,4 @@ const twilioWebhookEventTypeSchema = z.enum([
   'call.completed',
 ])
 
-type TwilioWebhookEventType = z.infer<
-  typeof twilioWebhookEventTypeSchema
->
+type TwilioWebhookEventType = z.infer<typeof twilioWebhookEventTypeSchema>

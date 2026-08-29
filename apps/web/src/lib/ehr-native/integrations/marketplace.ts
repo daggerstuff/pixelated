@@ -388,7 +388,4 @@ export function validateIntegrationStatus(input: string): IntegrationStatus {
   return integrationStatusSchema.parse(input)
 }
 
-export {
-  MARKETPLACE_PROVIDERS as INTEGRATION_PROVIDERS,
-  PROVIDER_MAP,
-}
+export { MARKETPLACE_PROVIDERS as INTEGRATION_PROVIDERS, PROVIDER_MAP }
