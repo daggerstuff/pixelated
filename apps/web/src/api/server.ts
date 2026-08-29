@@ -39,6 +39,7 @@ import { rateLimiter } from './middleware/rate-limiter'
 import authRoutes from './routes/auth'
 import documentRoutes from './routes/documents'
 import healthRoutes from './routes/health'
+import integrationRoutes from './routes/integrations'
 import marketResearchRoutes from './routes/market-research'
 import projectRoutes from './routes/projects'
 import readinessRoutes from './routes/readiness'
@@ -81,8 +82,25 @@ app.use(
 // BODY PARSING & COMPRESSION
 // ============================================================================
 
-app.use(express.json({ limit: '10mb' }))
-app.use(express.urlencoded({ limit: '10mb', extended: true }))
+app.use(
+  express.json({
+    limit: '10mb',
+    verify: (req: express.Request, _res: express.Response, buf: Buffer) => {
+      ;(req as express.Request & { rawBody?: string }).rawBody =
+        buf.toString('utf8')
+    },
+  }),
+)
+app.use(
+  express.urlencoded({
+    limit: '10mb',
+    extended: true,
+    verify: (req: express.Request, _res: express.Response, buf: Buffer) => {
+      ;(req as express.Request & { rawBody?: string }).rawBody =
+        buf.toString('utf8')
+    },
+  }),
+)
 app.use(compression())
 
 // ============================================================================
@@ -131,6 +149,12 @@ app.use(rateLimiter)
 
 app.use('/api/auth', authRoutes)
 app.use('/api/readiness', readinessRoutes)
+
+// Integration routes must be mounted before authMiddleware — webhook endpoints
+// receive server-to-server POSTs from external providers (Calendly, Zoom, Stripe,
+// Twilio) that carry only webhook signature headers, and OAuth authorize/callback
+// endpoints are accessed by the browser during the OAuth redirect flow.
+app.use('/api/integrations', integrationRoutes)
 
 // ============================================================================
 // PROTECTED ROUTES (AUTH REQUIRED)

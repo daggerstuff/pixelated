@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 
 import { emotionalWeight } from '@/lib/memory/importance-scorer'
 import {
@@ -45,7 +45,7 @@ function toMemoryBlock(entry: MemoryEntry): MemoryBlock {
 
   return {
     id: entry.id,
-    tenantId: meta.userId ?? 'unknown',
+    tenantId: meta.userId ?? 'unauthenticated-user',
     sessionId: meta.sessionId ?? 'unknown',
     content: entry.content,
     timestamp: ts,
@@ -292,12 +292,9 @@ export function useChatWithMemory(
     autoLoad: true,
   })
 
-  // Reverie engine instance — persists across renders
-  const reverieRef = useRef<ReverieEngine | null>(null)
-  reverieRef.current ??= new ReverieEngine(
-    options.reverieConfig ?? DEFAULT_REVERIE_CONFIG,
+  const [reverie] = useState(
+    () => new ReverieEngine(options.reverieConfig ?? DEFAULT_REVERIE_CONFIG),
   )
-  const reverie = reverieRef.current
 
   useEffect(() => {
     reverie.clear()

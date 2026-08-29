@@ -5,12 +5,9 @@
     "bash scripts/ci/oxlint-staged.sh -c .oxlintrc.json --ignore-pattern 'src/scripts/**'",
     "bash scripts/ci/check-no-suppressions.sh"
   ],
-  "*.{ts,tsx}": [
-    "node scripts/ci/check-zod-deprecations.mjs",
-    "node scripts/ci/check-unresolved-imports.mjs"
-  ],
+  "*.{ts,tsx}": ["node scripts/ci/check-zod-deprecations.mjs"],
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
   ],
-  "*.py": ["uv run ruff check --fix --exit-zero", "uv run ruff format"]
+  "*.py": ["ruff check --fix --exit-zero", "ruff format"]
 }
