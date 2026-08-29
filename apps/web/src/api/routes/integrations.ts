@@ -552,7 +552,7 @@ router.put(
 
 router.post(
   '/disconnect/:tenantId/:provider',
-  (req: Request, res: Response): Response => {
+  async (req: Request, res: Response): Promise<Response> => {
     const tenantId = req.params['tenantId']
     const provider = parseProvider(req.params['provider'])
     if (!tenantId || !provider) {
@@ -569,6 +569,8 @@ router.post(
       undefined,
       req.headers['x-user-id'] as string | undefined,
     )
+
+    await oauthCredentials.delete(tenantId, provider)
 
     const auditService = EHRAuditService.getInstance()
     void auditService.log(
