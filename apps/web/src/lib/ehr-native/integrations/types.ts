@@ -173,6 +173,15 @@ export const tenantProviderStatusSchema = z.object({
   lastWebhookReceivedAt: z.string().datetime().optional(),
   lastError: z.string().optional(),
   featureFlag: integrationFeatureFlagSchema.optional(),
+  // Provider metadata (mirrors MarketplaceProvider) must survive dashboard
+  // validation; stripping it broke UI consumers (Sentry 16312900/0).
+  displayName: z.string(),
+  description: z.string(),
+  category: z.enum(['scheduling', 'video', 'payments', 'communications']),
+  logoUrl: z.string().url().optional(),
+  documentationUrl: z.string().url().optional(),
+  defaultScopes: z.array(z.string()),
+  webhookEvents: z.array(z.string()).optional(),
 })
 export type TenantProviderStatus = z.infer<typeof tenantProviderStatusSchema>
 

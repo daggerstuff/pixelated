@@ -82,11 +82,13 @@ const OAUTH_TOKEN_URLS: Record<IntegrationProvider, string> = {
   twilio: 'https://accounts.twilio.com/oauth/token',
 }
 
-const WEBHOOK_SECRETS: Record<IntegrationProvider, string> = {
-  calendly: process.env['CALENDLY_WEBHOOK_SECRET'] ?? 'test-secret',
-  zoom: process.env['ZOOM_WEBHOOK_SECRET'] ?? 'test-secret',
-  stripe: process.env['STRIPE_WEBHOOK_SECRET'] ?? 'test-secret',
-  twilio: process.env['TWILIO_WEBHOOK_SECRET'] ?? 'test-secret',
+function getWebhookSecret(provider: IntegrationProvider): string {
+  const key = `${provider.toUpperCase()}_WEBHOOK_SECRET`
+  const secret = process.env[key]
+  if (!secret) {
+    throw new Error(`Missing required environment variable: ${key}`)
+  }
+  return secret
 }
 
 // ============================================================================
@@ -126,9 +128,10 @@ router.get(
 
     const config = getOAuthConfig(provider)
     if (!config) {
-      return res
-        .status(500)
-        .json({ error: `OAuth not configured for ${provider}` })
+      return res.status(503).json({
+        error: `OAuth is not configured for ${provider}`,
+        hint: `Set ${provider.toUpperCase()}_CLIENT_ID and ${provider.toUpperCase()}_CLIENT_SECRET`,
+      })
     }
 
     const tenantId = (req.query['tenantId'] as string | undefined) ?? ''
@@ -212,9 +215,10 @@ router.get(
 
     const config = getOAuthConfig(provider)
     if (!config) {
-      return res
-        .status(500)
-        .json({ error: `OAuth not configured for ${provider}` })
+      return res.status(503).json({
+        error: `OAuth is not configured for ${provider}`,
+        hint: `Set ${provider.toUpperCase()}_CLIENT_ID and ${provider.toUpperCase()}_CLIENT_SECRET`,
+      })
     }
 
     try {
@@ -304,9 +308,10 @@ router.post(
 
     const config = getOAuthConfig(provider)
     if (!config) {
-      return res
-        .status(500)
-        .json({ error: `OAuth not configured for ${provider}` })
+      return res.status(503).json({
+        error: `OAuth is not configured for ${provider}`,
+        hint: `Set ${provider.toUpperCase()}_CLIENT_ID and ${provider.toUpperCase()}_CLIENT_SECRET`,
+      })
     }
 
     try {
@@ -371,7 +376,7 @@ router.post(
       return res.status(400).json({ error: 'Invalid or unknown provider' })
     }
 
-    const secret = WEBHOOK_SECRETS[provider]
+    const secret = getWebhookSecret(provider)
     const sigConfig = buildSignatureConfig(provider, secret)
 
     // Determine signature header per provider

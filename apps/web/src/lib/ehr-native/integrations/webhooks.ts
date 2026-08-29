@@ -84,17 +84,17 @@ function parseCalendlySignature(
  */
 function parseStripeSignature(
   header: string,
-): { timestamp: string; signature: string } | null {
+): { timestamp: string; signatures: string[] } | null {
   const parts = header.split(',')
   let timestamp = ''
-  let signature = ''
+  const signatures: string[] = []
   for (const part of parts) {
     const [key, value] = part.split('=')
     if (key === 't') timestamp = value
-    if (key === 'v1') signature = value
+    if (key === 'v1') signatures.push(value)
   }
-  if (!timestamp || !signature) return null
-  return { timestamp, signature }
+  if (!timestamp || signatures.length === 0) return null
+  return { timestamp, signatures }
 }
 
 /**
@@ -134,11 +134,11 @@ export function verifyWebhookSignature(
     }
 
     case 'stripe-composite': {
-      const parsed = parseCalendlySignature(signatureHeader)
+      const parsed = parseStripeSignature(signatureHeader)
       if (!parsed) return false
       const dataToSign = `${parsed.timestamp}.${rawBody}`
       const expected = computeHmacSha256(dataToSign, config.secret)
-      return safeHexEqual(expected, parsed.signature)
+      return parsed.signatures.some((sig) => safeHexEqual(expected, sig))
     }
 
     case 'twilio': {
@@ -181,7 +181,7 @@ export function verifyStripeSignature(
   if (!parsed) return false
   const dataToSign = `${parsed.timestamp}.${rawBody}`
   const expected = computeHmacSha256(dataToSign, secret)
-  return safeHexEqual(expected, parsed.signature)
+  return parsed.signatures.some((sig) => safeHexEqual(expected, sig))
 }
 
 /**
