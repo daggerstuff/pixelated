@@ -34,15 +34,16 @@ export default defineTool({
     'with long_term retention for audit trail. Affects future evaluations only.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
+    const parsedInput = SCHEMA.parse(input)
     const changedAt = new Date().toISOString()
 
     const record = {
       type: 'threshold_change',
-      threshold_type: input.threshold_type,
-      new_value: input.new_value,
+      threshold_type: parsedInput.threshold_type,
+      new_value: parsedInput.new_value,
       previous_value: null as number | string | null,
-      reason: input.reason,
-      scope: input.scope,
+      reason: parsedInput.reason,
+      scope: parsedInput.scope,
       changed_by: 'supervisor-agent',
       changed_at: changedAt,
     }
@@ -51,7 +52,7 @@ export default defineTool({
     const previousAdjustments = await (async () => {
       const { searchMemories } = await import('../foresight-client.js')
       return searchMemories({
-        query: `threshold:${input.threshold_type}`,
+        query: `threshold:${parsedInput.threshold_type}`,
         limit: 1,
         tag_filter: ['threshold_change'],
       })
@@ -71,23 +72,23 @@ export default defineTool({
     const stored = await storeMemory({
       content: JSON.stringify(record),
       category: 'threshold',
-      scope: input.scope,
+      scope: parsedInput.scope,
       retention: 'long_term',
       importance: 0.8,
       tags: [
         'threshold_change',
-        `threshold:${input.threshold_type}`,
-        `scope:${input.scope}`,
+        `threshold:${parsedInput.threshold_type}`,
+        `scope:${parsedInput.scope}`,
         'supervisor_action',
       ],
     })
 
     return {
-      threshold_type: input.threshold_type,
+      threshold_type: parsedInput.threshold_type,
       previous_value: record.previous_value,
-      new_value: input.new_value,
-      scope: input.scope,
-      reason: input.reason,
+      new_value: parsedInput.new_value,
+      scope: parsedInput.scope,
+      reason: parsedInput.reason,
       changed_at: changedAt,
       foresight_memory: stored ?? {
         memory_id: null,

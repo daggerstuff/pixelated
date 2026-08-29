@@ -45,7 +45,7 @@ class VerificationEngine:
             ts_files = [f for f in files if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx", ".json"))]
             if ts_files:
                 subprocess.run(
-                    ["pnpm", "exec", "prettier", "--write"] + ts_files,
+                    ["pnpm", "exec", "prettier", "--write", *ts_files],
                     cwd=workdir,
                     capture_output=True,
                     check=False,
