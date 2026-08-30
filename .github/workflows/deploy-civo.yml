@@ -409,6 +409,23 @@ jobs:
           echo "=== Ingress status ==="
           kubectl get ingress -n pixelated-empathy
 
+          echo "=== Umami ingress detail (host-rule routing check) ==="
+          kubectl get ingress umami-ingress -n pixelated-empathy -o yaml || true
+
+          echo "=== Traefik entrypoints (dashboard API) ==="
+          TRAEFIK_POD=$(kubectl get pods -A -l app.kubernetes.io/name=traefik -o jsonpath='{.items[0].metadata.name}' 2>/dev/null)
+          TRAEFIK_NS=$(kubectl get pods -A -l app.kubernetes.io/name=traefik -o jsonpath='{.items[0].metadata.namespace}' 2>/dev/null)
+          if [ -n "$TRAEFIK_POD" ]; then
+            kubectl exec -n "$TRAEFIK_NS" "$TRAEFIK_POD" -- wget -qO- http://localhost:9000/api/http/routers 2>/dev/null \
+              | python3 -c "import json,sys; [print(r.get('entryPoints'), r.get('rule'), '->', r.get('service'), r.get('status')) for r in json.load(sys.stdin)]" || true
+          else
+            echo "(traefik pod not found via label app.kubernetes.io/name=traefik)"
+          fi
+
+          echo "=== Umami routing smoke test (analytics subdomain) ==="
+          curl -s -o /dev/null -w "analytics /api/heartbeat: %{http_code}\n" https://analytics.pixelatedempathy.com/api/heartbeat || true
+          curl -s -o /dev/null -w "analytics /script.js: %{http_code}\n" https://analytics.pixelatedempathy.com/script.js || true
+
           echo "=== Live site smoke test ==="
           SITE_URL="https://pixelatedempathy.com"
           bash scripts/deploy/verify-deployment.sh "${SITE_URL}/api/health" "${SITE_URL}"
