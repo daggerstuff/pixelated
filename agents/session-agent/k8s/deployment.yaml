@@ -117,6 +117,8 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            - name: eve-data
+              mountPath: /agent/.eve
           resources:
             requests:
               cpu: 100m
@@ -126,6 +128,8 @@ spec:
               memory: 1Gi
       volumes:
         - name: tmp
+          emptyDir: {}
+        - name: eve-data
           emptyDir: {}
 ---
 apiVersion: v1
