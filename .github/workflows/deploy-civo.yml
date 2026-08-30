@@ -352,6 +352,11 @@ jobs:
                kubectl describe pods -n pixelated-empathy 2>/dev/null | awk '/^Name:/{name=$2} /Events:/{show=1} show && name!=last{print "### "name; last=name} show' | head -60 || true
                echo "--- Umami logs ---"
                kubectl logs -n pixelated-empathy -l app.kubernetes.io/name=umami --all-containers --tail=30 --prefix --ignore-errors || true
+               echo "--- Agent pod logs (session/qa/pipeline) ---"
+               for d in session-agent qa-agent pipeline-agent; do
+                 echo "### $d"
+                 kubectl logs -n pixelated-empathy -l app=$d --all-containers --tail=25 --prefix --ignore-errors || true
+               done
                echo "--- Blue pod logs ---"
                kubectl logs -n pixelated-empathy -l app=pixelated-empathy,slot=blue --all-containers --tail=40 --prefix --ignore-errors || true
              done
