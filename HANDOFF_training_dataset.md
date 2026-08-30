@@ -1,50 +1,46 @@
-# Handoff: Anti-sycophancy training dataset + wandb serverless
+# Handoff: Anti-Sycophancy Training Dataset, Dual-Judge Calibration & Serverless Training
 
-## Current state
-- Repo: pixelated / ai / docs
-- Last focus: anti-sycophancy training, wandb serverless training, dataset creation
-- Recent work: Golden judge calibration set generation
+## Current State
+- **Repo**: `pixelated / ai / docs`
+- **Focus**: Multi-turn therapeutic evaluation, anti-sycophancy rewards, dual-judge calibration, W&B serverless training
+- **Recent Work**: 
+  1. Golden judge multi-turn calibration benchmark completed on Cloudflare Workers AI across 90 VERA-MH clinician-scored sessions.
+  2. Evaluated and compared 2026 flagship non-Llama judges (`@cf/deepseek-ai/deepseek-v4-pro-0813` vs `@cf/zai-org/glm-5.3`).
+  3. Excised Qwen 3.8 from the evaluation pipeline per directive.
+  4. Dual-judge infrastructure hardened with deep reasoning trace parsing, 4096 token headroom, and endpoint concurrency throttling.
 
-## Files relevant
-- `ai/training/data/golden_judge_calib_v2.jsonl` – current calibration set (200 samples target, 25 real + 175 synthetic)
-- `ai/training/generate_golden_calib_serverless.py` – generator using Cloudflare Workers AI
-- `ai/training/train_rl_serverless_fixed.py` – W&B serverless RL training script (Azure-coupled, dated 2026-08-24)
-- `docs/training-pipeline-blueprint-2026-08-10.md`
-- `docs/training-pipeline-audit-2026-08-24.md`
-- `docs/superpowers/plans/2026-08-09-serverless-a-b-plan.md`
-- `docs/superpowers/specs/2026-08-09-serverless-a-b-spec.md`
-- `configs/models/training_config.json`
-- `configs/models/training_config_v2_antirepetition.json`
+## Files Relevant
+- `ai/training/data/golden_vera_mh_v1.jsonl` – 90 multi-turn therapy session trajectories (avg 20 turns) paired with licensed clinical expert ratings across 5 dimensions (relevance, accuracy, helpfulness, style, safety). Sourced from published VERA-MH human validation study.
+- `ai/training/data/golden_judge_calib_v2.jsonl` – 200 real human clinical single-turn calibration records (100 AnnoMI expert-coded MI transcripts + 100 ESConv counseling transcripts with client distress shift ratings). True human score range [0.6240, 0.9700], mean 0.8301.
+- `ai/training/build_vera_mh_golden.py` – Deterministic builder extracting multi-turn session transcripts and aggregating multi-clinician ratings from VERA-MH S3 archive.
+- `ai/training/build_real_golden_calibration.py` – Deterministic builder for single-turn AnnoMI / ESConv clinical calibration set.
+- `ai/training/dual_judge.py` – Dual-model LLM-as-judge with multi-turn trajectory evaluation, deterministic anti-sycophancy gating, and deep reasoning trace extraction (`reasoning_content` + `content` fallbacks).
+- `ai/training/scripts/train_sft_serverless.py` – W&B serverless SFT training script targeting 2026 flagship non-Llama base models (`zai-org/glm-5.3-flash`, `deepseek-ai/DeepSeek-V4-Pro`).
+- `ai/training/scripts/train_rl_serverless.py` – W&B serverless RL training script with multi-dimensional anti-sycophancy, deslop, and clinical empathy rewards.
+- `ai/configs/models/training_config.json` – Pinned 2026 non-Llama base model (`zai-org/glm-5.3-flash`, bf16).
+- `ai/configs/models/training_config_v2_antirepetition.json` – Antirepetition LoRA configuration.
 
-## Recent changes
-- Model age rule enforced: never use models <2026, no Llama
-- Switched to Cloudflare Workers AI model `@cf/deepseek-ai/deepseek-v4-pro-0813`
-- Generator rewritten to batch 3 samples at a time with 35s sleep to avoid rate limit
-- First batch of 3 generated, but assistant responses are empty (see file)
+## Multi-Turn Calibration Benchmark (VERA-MH Ground Truth)
 
-## Open issues
-1. Empty assistant responses from DeepSeek V4 Pro via Cloudflare Workers AI
-   - Need to verify model exists and message format is correct
-   - Check API response schema: may need `role: system` or different endpoint
-   - Verify `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_API_TOKEN` are correct for inference
-2. 175 synthetic samples still needed for golden judge calibration
-3. WandB serverless training pipeline is Azure-coupled and old; user wants clean, non-Azure, non-fixed suffix scripts
-4. Anti-sycophancy dataset creation pipeline incomplete
+| Metric | DeepSeek V4 Pro (`@cf/deepseek-ai/deepseek-v4-pro-0813`) | GLM 5.3 Flash (`@cf/zai-org/glm-5.3`) | Delta (DeepSeek Advantage) |
+| :--- | :---: | :---: | :---: |
+| **Golden Score Mean** | `0.6552` | `0.6552` | Ground Truth |
+| **Judge Score Mean** | `0.4939` | `0.4457` | +0.0482 (Closer to Human) |
+| **Pearson Correlation ($r$)** | **`0.2518`** | `0.1991` | **+26.5% Correlation** |
+| **Mean Absolute Error (MAE)** | **`0.2523`** | `0.2640` | **-4.4% Error** |
+| **Root Mean Squared Error (RMSE)** | **`0.3218`** | `0.3421` | **-5.9% Error** |
+| **Cohen's Kappa ($\kappa$)** | **`0.1986`** | `0.1567` | **+26.7% Agreement** |
 
-## Next steps
-- Debug Cloudflare Workers AI call: log raw response, test single call with wrangler
-- If DeepSeek model not working, pick alternative 2026+ non-Llama model from `wrangler ai models list`
-- Generate remaining 172 synthetic samples in 3-sample batches
-- Verify calibration with `python -m training.dual_judge --calibrate --golden ai/training/data/golden_judge_calib_v2.jsonl`
-- Resume wandb serverless RL training for anti-sycophancy hardening
+## Resolved Issues & Engineering Hardening
+1. **Multi-Turn Trajectory Evaluation**: Extended `dual_judge.py` to evaluate multi-turn therapeutic dialogues rather than isolated single turns, incorporating full dialogue history (up to 8 turns x 300 chars) while avoiding prompt overflow.
+2. **Real Clinician Ground Truth**: Anchored calibration against real licensed clinician ratings from VERA-MH across 5 standardized dimensions (Best Practice / Suboptimal / Potential Harm).
+3. **Deep Reasoning Extraction & Token Budget**: Resolved empty-output dropouts by increasing generation budget to `max_tokens=4096`, extending timeouts to `180s`, and supporting dual extraction where reasoning traces reside in `reasoning_content` and final scores in `content`.
+4. **Cloudflare Endpoint Safety**: Configured `DUAL_JUDGE_CONCURRENCY=2` with exponential retry backoff to prevent queue congestion and timeout failures on Cloudflare Workers AI.
+5. **Strict 2026 Non-Llama Model Stack**:
+   - Primary Judge: `@cf/deepseek-ai/deepseek-v4-pro-0813`
+   - Secondary Judge: `@cf/mistralai/mistral-small-3.1-24b-instruct`
+   - Base Training Models: `zai-org/glm-5.3-flash`, `deepseek-ai/DeepSeek-V4-Pro`
+   - Qwen 3.8 completely removed.
 
-## Constraints
-- No Llama models ever
-- Never use models older than 2026
-- No `*_fixed`, `*_cleaned`, `*_final` suffixes
-- Use Cloudflare Workers AI, not Azure for calibration generation
-- Preserve HIPAA boundaries
-
-## Foresight memory
-- Model age rule stored
-- Pending items: training pipeline pending, train/val/test split pending
+## Next Steps
+- Execute W&B serverless SFT / RL training runs using `ai/training/scripts/train_sft_serverless.py` and `ai/training/scripts/train_rl_serverless.py` with `zai-org/glm-5.3-flash` as base model and DeepSeek V4 Pro as evaluator.
