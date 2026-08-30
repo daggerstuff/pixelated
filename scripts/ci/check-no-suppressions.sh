@@ -71,10 +71,11 @@ set -euo pipefail
 # Configuration
 # ---------------------------------------------------------------------------
 
-# Files in scope: TS/JS family. `.d.ts` excluded — declaration files rarely
+# Files in scope: TS/JS family, plus Astro (frontmatter is TS and can carry
+# suppression tokens). `.d.ts` excluded — declaration files rarely
 # carry suppression tokens and excluding them avoids surprises with ambient
 # type augmentations.
-SCAN_EXTENSIONS=(ts tsx js jsx mjs cjs)
+SCAN_EXTENSIONS=(ts tsx js jsx mjs cjs astro)
 
 # Path-exclusion globs. Each must match anywhere in the absolute or
 # relative path (GNU find's `-path` accepts `*` anywhere, including
