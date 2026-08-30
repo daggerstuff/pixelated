@@ -270,8 +270,3 @@ export class StubTwilioAdapter implements TwilioAdapter {
     }
   }
 }
-
-/**
- * Singleton stub instance for development and testing.
- */
-const stubTwilioAdapter = new StubTwilioAdapter()

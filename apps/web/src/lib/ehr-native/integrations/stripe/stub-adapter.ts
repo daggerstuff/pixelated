@@ -465,8 +465,3 @@ export class StubStripeAdapter implements StripeAdapter {
     return session
   }
 }
-
-/**
- * Singleton stub instance for development and testing.
- */
-const stubStripeAdapter = new StubStripeAdapter()
