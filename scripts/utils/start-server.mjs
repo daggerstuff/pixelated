@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import process from "process";
-import { createServer } from "http";
+import { createServer, request as httpRequest } from "http";
 import { createServer as createHttpsServer } from "https";
 import { readFileSync, existsSync } from "fs";
 import path from "path";
@@ -72,10 +72,10 @@ await loadSentryModule();
 function createStubSentry() {
   /** @type {SentryInstance} */
   return {
-      captureException: () => {},
-      init: () => {},
-      close: async () => {},
-    };
+    captureException: () => {},
+    init: () => {},
+    close: async () => {},
+  };
 }
 
 import { getPortFallbackPolicy, resolveSsrEntryModuleUrl } from "./start-server-config.mjs";
@@ -107,9 +107,7 @@ const clientDist = existsSync(path.join(__dirname, "dist/client"))
   : path.resolve(__dirname, "../../dist/client");
 // Rooted prefix (with trailing separator) so sibling directories cannot
 // match the clientDist prefix during the traversal check below.
-const clientDistRoot = clientDist.endsWith(path.sep)
-  ? clientDist
-  : `${clientDist}${path.sep}`;
+const clientDistRoot = clientDist.endsWith(path.sep) ? clientDist : `${clientDist}${path.sep}`;
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -163,8 +161,88 @@ function resolveStaticFile(urlPath) {
   return null;
 }
 
+// ── Analytics (umami) host-based reverse proxy ──────────────────────────
+// analytics.pixelatedempathy.com is a CNAME to pixelatedempathy.com, so its
+// traffic arrives at this server (the main app's LoadBalancer) — NOT at the
+// separate Traefik ingress. Without routing, the umami tracking script
+// (script.js) request fell through to a full Astro SSR render on every page
+// load. Proxy that host to the umami service so the dashboard + tracking
+// script are served fast and correctly.
+const UMAMI_ANALYTICS_HOST = (
+  process.env.UMAMI_ANALYTICS_HOST ?? "analytics.pixelatedempathy.com"
+).toLowerCase();
+const UMAMI_UPSTREAM =
+  process.env.UMAMI_UPSTREAM ?? "http://umami.pixelated-empathy.svc.cluster.local:80";
+
+/** @type {URL | null} */
+let umamiUpstream = null;
+try {
+  umamiUpstream = new URL(UMAMI_UPSTREAM);
+} catch {
+  console.error(`Invalid UMAMI_UPSTREAM URL: ${UMAMI_UPSTREAM}. Analytics proxy disabled.`);
+}
+
+/** @param {string | undefined} hostHeader @returns {boolean} */
+function isUmamiAnalyticsHost(hostHeader) {
+  if (!hostHeader) return false;
+  // Strip an optional port (e.g. "analytics.pixelatedempathy.com:443").
+  return hostHeader.split(":")[0].toLowerCase() === UMAMI_ANALYTICS_HOST;
+}
+
+/** @param {import('http').IncomingMessage} req @param {import('http').ServerResponse} res @returns {boolean} */
+function proxyToUmami(req, res) {
+  if (!umamiUpstream || !isUmamiAnalyticsHost(req.headers.host)) {
+    return false;
+  }
+
+  const upstreamReq = httpRequest(
+    {
+      hostname: umamiUpstream.hostname,
+      port: umamiUpstream.port || 80,
+      method: req.method,
+      path: req.url,
+      headers: {
+        ...req.headers,
+        // Preserve the external host so umami builds correct absolute URLs.
+        host: req.headers.host ?? UMAMI_ANALYTICS_HOST,
+        "x-forwarded-proto": req.socket.encrypted ? "https" : "http",
+        "x-forwarded-host": req.headers.host ?? UMAMI_ANALYTICS_HOST,
+      },
+    },
+    (upstreamRes) => {
+      const headers = { ...upstreamRes.headers };
+      // Let Node manage framing — drop hop-by-hop headers.
+      delete headers["connection"];
+      delete headers["keep-alive"];
+      delete headers["transfer-encoding"];
+      delete headers["upgrade"];
+      delete headers["te"];
+      delete headers["trailer"];
+      delete headers["proxy-authenticate"];
+      delete headers["proxy-authorization"];
+      res.writeHead(upstreamRes.statusCode ?? 502, headers);
+      upstreamRes.pipe(res);
+    },
+  );
+
+  upstreamReq.on("error", (err) => {
+    console.error("Umami proxy error:", err);
+    if (!res.headersSent) {
+      res.writeHead(502, { "Content-Type": "text/plain; charset=utf-8" });
+    }
+    res.end("Bad Gateway");
+  });
+
+  req.pipe(upstreamReq);
+  return true;
+}
+
 /** @type {import('http').RequestListener} */
 function staticAwareHandler(req, res) {
+  if (proxyToUmami(req, res)) {
+    return;
+  }
+
   if (req.method !== "GET" && req.method !== "HEAD") {
     return ssrHandler(req, res);
   }
