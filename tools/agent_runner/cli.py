@@ -377,6 +377,11 @@ def cmd_evolution(args: argparse.Namespace) -> int:
         )
         print(f"   🔍 Root Cause: {les.root_cause_summary}")
         print(f"   💡 Distilled Rule: {les.actionable_rule}\n")
+def cmd_hitl(args: argparse.Namespace) -> int:
+    """Run interactive Human-in-the-Loop CLI Proxy Listener."""
+    from tools.agent_runner.hitl_proxy import EscalationStore, cli_proxy_listen
+    store = EscalationStore()
+    cli_proxy_listen(store)
     return 0
 
 
@@ -400,6 +405,8 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("init-config", help="Generate an initial configuration tailored to this server")
     subparsers.add_parser("status", help="Show runner state and execution statistics")
     subparsers.add_parser("dashboard", help="Display live cluster observability monitor")
+    subparsers.add_parser("hitl", help="Interactive Human-in-the-Loop CLI Proxy Listener")
+    subparsers.add_parser("escalations", help="Interactive Human-in-the-Loop CLI Proxy Listener")
 
     events_parser = subparsers.add_parser("events", help="Show recent immutable state events")
     events_parser.add_argument("-n", "--limit", type=int, default=25, help="Number of events to display")
@@ -449,6 +456,8 @@ def main() -> int:
         "evolution": cmd_evolution,
         "triage": cmd_triage,
         "skeptic": cmd_skeptic,
+        "hitl": cmd_hitl,
+        "escalations": cmd_hitl,
         "run": cmd_run,
     }
 
