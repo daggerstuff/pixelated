@@ -268,8 +268,3 @@ export class StubZoomAdapter implements ZoomAdapter {
     }
   }
 }
-
-/**
- * Singleton stub instance for development and testing.
- */
-const stubZoomAdapter = new StubZoomAdapter()
