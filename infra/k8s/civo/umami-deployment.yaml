@@ -55,7 +55,11 @@ spec:
             capabilities:
               drop:
                 - ALL
-            readOnlyRootFilesystem: true
+            # readOnlyRootFilesystem must stay off: umami's `check-db` step
+            # runs `prisma migrate deploy`, which writes to the Prisma engines
+            # dir under /app/node_modules at startup. With a read-only rootfs
+            # the migration step dies with EACCES (run 33287620306) even
+            # though the DB itself is reachable.
           # Pinned immutable semver. GHCR org is umami-software (not umami-so —
           # that legacy org 404s on manifests). Do not use :latest.
           image: ghcr.io/umami-software/umami:postgresql-v2.19.0
