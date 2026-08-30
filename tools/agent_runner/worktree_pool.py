@@ -106,13 +106,14 @@ class GitWorktreePool:
                 )
 
             # Initialize submodules in worktree so submodule edits remain isolated
-            subprocess.run(
-                ["git", "submodule", "update", "--init", "--recursive"],
-                cwd=worktree_path,
-                capture_output=True,
-                check=False,
-                timeout=60,
-            )
+            with contextlib.suppress(Exception):
+                subprocess.run(
+                    ["git", "submodule", "update", "--init"],
+                    cwd=worktree_path,
+                    capture_output=True,
+                    check=False,
+                    timeout=15,
+                )
 
             return WorktreeLease(
                 ticket_identifier=ticket_identifier,

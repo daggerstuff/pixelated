@@ -131,7 +131,7 @@ class ReviewerNode:
             logger.warning("❌ Reviewer found failures in %s:\n%s", state["task_id"], verification_outcome.summary)
             feedback_entry = (
                 f"VERIFICATION FAILED:\n{verification_outcome.summary}\n"
-                f"Commands failed: {[c.command for c in verification_outcome.command_results if not c.passed]}"
+                f"Commands failed: {[c.get('command', '') for c in verification_outcome.command_results if not c.get('passed', False)]}"
             )
             state["reviewer_feedback"].append(feedback_entry)
             state["status"] = "in_progress"
@@ -164,7 +164,7 @@ class CodingStateGraph:
         escalation_store: Any | None = None,
     ):
         self.developer_cfg = developer_cfg
-        self.reviewer_cfg = reviewer_cfg or AgentConfig(name="qa_reviewer", label="agent:qa")
+        self.reviewer_cfg = reviewer_cfg or AgentConfig(name="qa_reviewer", label="agent:qa", cmd=["echo"])
         dev_adapter = get_agent_adapter(developer_cfg)
         self.developer_node = DeveloperNode(adapter=dev_adapter, agent_cfg=developer_cfg)
         self.reviewer_node = ReviewerNode(verifier=verifier or VerificationEngine())
