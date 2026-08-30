@@ -409,38 +409,6 @@ jobs:
           echo "=== Ingress status ==="
           kubectl get ingress -n pixelated-empathy
 
-          echo "=== Umami ingress detail (host-rule routing check) ==="
-          kubectl get ingress umami-ingress -n pixelated-empathy -o yaml || true
-
-          echo "=== Traefik entrypoints (dashboard API) ==="
-          TRAEFIK_POD=$(kubectl get pods -A -o json 2>/dev/null | python3 -c "
-import json, sys
-for p in json.load(sys.stdin)['items']:
-    if 'traefik' in p['metadata']['name'].lower():
-        print(p['metadata']['namespace'], p['metadata']['name'])
-        break
-")
-          if [ -n "$TRAEFIK_POD" ]; then
-            TRAEFIK_NS=$(echo "$TRAEFIK_POD" | awk '{print $1}')
-            TRAEFIK_POD=$(echo "$TRAEFIK_POD" | awk '{print $2}')
-            echo "traefik pod: $TRAEFIK_NS/$TRAEFIK_POD"
-            kubectl get pod -n "$TRAEFIK_NS" "$TRAEFIK_POD" -o jsonpath='{.spec.containers[0].args}' || true
-            echo
-            kubectl exec -n "$TRAEFIK_NS" "$TRAEFIK_POD" -- sh -c 'command -v wget >/dev/null && wget -qO- http://localhost:9000/api/http/routers || command -v curl >/dev/null && curl -s http://localhost:9000/api/http/routers' > /tmp/traefik-routers.json 2>/dev/null || true
-            head -c 200 /tmp/traefik-routers.json; echo
-            python3 -c "import json; [print(r.get('entryPoints'), r.get('rule'), '->', r.get('service'), r.get('status')) for r in json.load(open('/tmp/traefik-routers.json'))]" 2>/dev/null || echo "(router dump unavailable)"
-          else
-            echo "(no traefik pod found in any namespace)"
-          fi
-
-          echo "=== Umami routing smoke test (analytics subdomain + direct LB) ==="
-          curl -s -o /dev/null -w "analytics via CF /api/heartbeat: %{http_code}\n" https://analytics.pixelatedempathy.com/api/heartbeat || true
-          curl -s -o /dev/null -w "analytics via CF /script.js: %{http_code}\n" https://analytics.pixelatedempathy.com/script.js || true
-          LB_IP=$(kubectl get svc pixelated-empathy -n pixelated-empathy -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-          echo "LB IP: $LB_IP"
-          curl -sk --resolve analytics.pixelatedempathy.com:443:"$LB_IP" -o /dev/null -w "direct LB host=analytics /api/heartbeat: %{http_code}\n" https://analytics.pixelatedempathy.com/api/heartbeat || true
-          curl -sk --resolve analytics.pixelatedempathy.com:443:"$LB_IP" -o /dev/null -w "direct LB host=analytics /script.js: %{http_code}\n" https://analytics.pixelatedempathy.com/script.js || true
-
           echo "=== Live site smoke test ==="
           SITE_URL="https://pixelatedempathy.com"
           bash scripts/deploy/verify-deployment.sh "${SITE_URL}/api/health" "${SITE_URL}"
