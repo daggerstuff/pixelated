@@ -9,6 +9,7 @@
  * @see docs/adr/ADR-005-security-rbac.md
  */
 
+import { secureEphiUrl, secureSend } from '../transport'
 import type { HIEAdapter } from './adapter'
 import type {
   PatientDiscoveryRequest,
@@ -83,14 +84,11 @@ export class DirectTrustAdapter implements HIEAdapter {
       ...(request.identifier ? { identifier: request.identifier } : {}),
     }
 
-    const response = await this.fetchWithTimeout(
-      `${this.baseUrl}/patients/resolve`,
-      {
-        method: 'POST',
-        headers: this.jsonHeaders(),
-        body: JSON.stringify(body),
-      },
-    )
+    const response = await this.transmit(`${this.baseUrl}/patients/resolve`, {
+      method: 'POST',
+      headers: this.jsonHeaders(),
+      body: JSON.stringify(body),
+    })
 
     if (!response.ok) {
       return {
@@ -132,7 +130,7 @@ export class DirectTrustAdapter implements HIEAdapter {
     if (request.limit) params.set('_count', String(request.limit))
     if (request.offset) params.set('_offset', String(request.offset))
 
-    const response = await this.fetchWithTimeout(
+    const response = await this.transmit(
       `${this.baseUrl}/messages/received?${params.toString()}`,
       {
         method: 'GET',
@@ -177,7 +175,7 @@ export class DirectTrustAdapter implements HIEAdapter {
   async retrieveDocument(
     request: DocumentRetrievalRequest,
   ): Promise<DocumentRetrievalResult> {
-    const response = await this.fetchWithTimeout(
+    const response = await this.transmit(
       `${this.baseUrl}/messages/${encodeURIComponent(request.documentId)}/content?patientId=${encodeURIComponent(request.patientId)}`,
       {
         method: 'GET',
@@ -251,14 +249,11 @@ export class DirectTrustAdapter implements HIEAdapter {
       },
     }
 
-    const response = await this.fetchWithTimeout(
-      `${this.baseUrl}/messages/send`,
-      {
-        method: 'POST',
-        headers: this.jsonHeaders(),
-        body: JSON.stringify(body),
-      },
-    )
+    const response = await this.transmit(`${this.baseUrl}/messages/send`, {
+      method: 'POST',
+      headers: this.jsonHeaders(),
+      body: JSON.stringify(body),
+    })
 
     if (!response.ok) {
       return {
@@ -285,7 +280,7 @@ export class DirectTrustAdapter implements HIEAdapter {
     if (request.name) params.set('name', request.name)
     if (request.limit) params.set('_count', String(request.limit))
 
-    const response = await this.fetchWithTimeout(
+    const response = await this.transmit(
       `${this.baseUrl}/directory?${params.toString()}`,
       {
         method: 'GET',
@@ -320,20 +315,20 @@ export class DirectTrustAdapter implements HIEAdapter {
 
   private jsonHeaders(): Record<string, string> {
     return {
-      Authorization: `Bearer ${this.authToken}`,
+      'Authorization': `Bearer ${this.authToken}`,
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Accept': 'application/json',
     }
   }
 
-  private async fetchWithTimeout(
-    url: string,
-    init: RequestInit,
-  ): Promise<Response> {
+  private async transmit(url: string, init: RequestInit): Promise<Response> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
     try {
-      return await fetch(url, { ...init, signal: controller.signal })
+      return await secureSend(secureEphiUrl(url, 'DirectTrust'), {
+        ...init,
+        signal: controller.signal,
+      })
     } finally {
       clearTimeout(timer)
     }

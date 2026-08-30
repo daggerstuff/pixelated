@@ -9,8 +9,19 @@
  * @see docs/adr/ADR-005-hie-implementation.md
  */
 
+import { consentService } from '../../security/consent/ConsentService'
+import { EHRAuditService } from '../audit/ehr-audit-service'
+import type { IntegrationAuditInput } from '../audit/ehr-audit-service'
+import { EHRAuditAction } from '../audit/events'
 import type { HIEAdapter } from '../integrations/hie/adapter'
-import { HIEService } from '../integrations/hie/hie-service'
+import {
+  HIEService,
+  clampLimit,
+  clampOffset,
+  requireHieId,
+  sanitizeBoundedText,
+  sanitizeIsoDate,
+} from '../integrations/hie/hie-service'
 import type {
   PatientDiscoveryRequest,
   PatientDiscoveryResult,
@@ -23,10 +34,6 @@ import type {
   OrganizationDirectoryRequest,
   OrganizationDirectoryResult,
 } from '../integrations/hie/types'
-import { consentService } from '../../security/consent/ConsentService'
-import { EHRAuditService } from '../audit/ehr-audit-service'
-import { EHRAuditAction } from '../audit/events'
-import type { IntegrationAuditInput } from '../audit/ehr-audit-service'
 
 /** Consent type IDs for HIE data access */
 export const HIE_CONSENT_TYPE_ID = 'hie_data_access'
@@ -111,8 +118,23 @@ export class HIEOrchestrationService {
     const action = EHRAuditAction.HIE_DOCUMENT_QUERY
     let result: DocumentQueryResult
 
+    // Validate FHIR query inputs at the orchestration trust boundary before
+    // they reach the HIE service / adapter layer.
+    const validated: DocumentQueryRequest = {
+      ...request,
+      patientId: requireHieId(request.patientId, 'patientId'),
+      authorOrganizationId:
+        request.authorOrganizationId === undefined
+          ? undefined
+          : requireHieId(request.authorOrganizationId, 'authorOrganizationId'),
+      fromDate: sanitizeIsoDate(request.fromDate, 'fromDate'),
+      toDate: sanitizeIsoDate(request.toDate, 'toDate'),
+      limit: clampLimit(request.limit),
+      offset: clampOffset(request.offset),
+    }
+
     try {
-      result = await this.hieService.queryDocuments(request)
+      result = await this.hieService.queryDocuments(validated)
     } catch (error) {
       await this.auditError(action, userId, error, {
         integrationSource: 'hie',
@@ -156,7 +178,10 @@ export class HIEOrchestrationService {
     await this.auditSuccess(action, userId, {
       integrationSource: 'hie',
       patientId: request.patientId,
-      metadata: { retrieved: result.retrieved, contentType: result.contentType },
+      metadata: {
+        retrieved: result.retrieved,
+        contentType: result.contentType,
+      },
     })
 
     return result
@@ -188,7 +213,10 @@ export class HIEOrchestrationService {
     await this.auditSuccess(action, userId, {
       integrationSource: 'hie',
       patientId: request.patientId,
-      metadata: { submitted: result.submitted, documentId: result.documentId ?? null },
+      metadata: {
+        submitted: result.submitted,
+        documentId: result.documentId ?? null,
+      },
     })
 
     return result
@@ -205,8 +233,16 @@ export class HIEOrchestrationService {
     const action = EHRAuditAction.HIE_DOCUMENT_QUERY // reuse for directory lookup
     let result: OrganizationDirectoryResult
 
+    const validated: OrganizationDirectoryRequest = {
+      ...request,
+      type: sanitizeBoundedText(request.type),
+      state: sanitizeBoundedText(request.state),
+      name: sanitizeBoundedText(request.name),
+      limit: clampLimit(request.limit),
+    }
+
     try {
-      result = await this.hieService.queryOrganizationDirectory(request)
+      result = await this.hieService.queryOrganizationDirectory(validated)
     } catch (error) {
       await this.auditError(action, userId, error, {
         integrationSource: 'hie',
@@ -229,7 +265,10 @@ export class HIEOrchestrationService {
    * @throws {ConsentDeniedError} if consent is not active
    */
   private async requireConsent(userId: string): Promise<void> {
-    const hasConsent = await consentService.hasActiveConsent(userId, HIE_CONSENT_TYPE_ID)
+    const hasConsent = await consentService.hasActiveConsent(
+      userId,
+      HIE_CONSENT_TYPE_ID,
+    )
     if (!hasConsent) {
       throw new ConsentDeniedError(userId, HIE_CONSENT_TYPE_ID)
     }

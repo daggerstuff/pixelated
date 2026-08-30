@@ -9,9 +9,15 @@
  * @see docs/adr/ADR-004-eprescribing-vendor.md
  */
 
-import type { MedicationRequest } from '../types/medication-request'
+import { consentService } from '../../security/consent/ConsentService'
+import { EHRAuditService } from '../audit/ehr-audit-service'
+import type { EPrescribeAuditInput } from '../audit/ehr-audit-service'
+import { EHRAuditAction } from '../audit/events'
 import type { EPrescribingAdapter } from '../integrations/e-prescribing/adapter'
-import { PrescriptionService } from '../integrations/e-prescribing/prescription-service'
+import {
+  PrescriptionService,
+  sanitizeZipCode,
+} from '../integrations/e-prescribing/prescription-service'
 import type {
   PharmacySearchRequest,
   PharmacySearchResponse,
@@ -23,10 +29,7 @@ import type {
   PrescriptionStatusResponse,
   PrescriptionCancelResponse,
 } from '../integrations/e-prescribing/types'
-import { consentService } from '../../security/consent/ConsentService'
-import { EHRAuditService } from '../audit/ehr-audit-service'
-import { EHRAuditAction } from '../audit/events'
-import type { EPrescribeAuditInput } from '../audit/ehr-audit-service'
+import type { MedicationRequest } from '../types/medication-request'
 
 /** Consent type ID for e-prescribing operations */
 export const EPRESCRIBING_CONSENT_TYPE_ID = 'eprescribing'
@@ -87,7 +90,14 @@ export class EPrescribingOrchestrationService {
     limit?: number,
     type?: PharmacySearchRequest['type'],
   ): Promise<PharmacySearchResponse> {
-    return this.prescriptionService.searchPharmacies(zipCode, limit, type)
+    const validatedZip = sanitizeZipCode(zipCode)
+    const validatedLimit =
+      limit === undefined ? undefined : Math.max(1, Math.min(limit, 100))
+    return this.prescriptionService.searchPharmacies(
+      validatedZip,
+      validatedLimit,
+      type,
+    )
   }
 
   /**
@@ -164,7 +174,10 @@ export class EPrescribingOrchestrationService {
       EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK,
       userId,
       patientId,
-      { hasInteractions: result.hasInteractions, alertCount: result.alerts.length },
+      {
+        hasInteractions: result.hasInteractions,
+        alertCount: result.alerts.length,
+      },
     )
 
     return result
@@ -199,7 +212,10 @@ export class EPrescribingOrchestrationService {
         userId,
         patientId,
         error,
-        { medicationRequestId: this.extractMedicationRequestId(medicationRequest) },
+        {
+          medicationRequestId:
+            this.extractMedicationRequestId(medicationRequest),
+        },
       )
       throw error
     }
@@ -231,7 +247,8 @@ export class EPrescribingOrchestrationService {
 
     let result: PrescriptionStatusResponse
     try {
-      result = await this.prescriptionService.checkPrescriptionStatus(transmissionId)
+      result =
+        await this.prescriptionService.checkPrescriptionStatus(transmissionId)
     } catch (error) {
       await this.auditError(
         EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY,
@@ -266,7 +283,10 @@ export class EPrescribingOrchestrationService {
 
     let result: PrescriptionCancelResponse
     try {
-      result = await this.prescriptionService.cancelPrescription(transmissionId, reason)
+      result = await this.prescriptionService.cancelPrescription(
+        transmissionId,
+        reason,
+      )
     } catch (error) {
       await this.auditError(
         EHRAuditAction.EPRESCRIBE_CANCEL,
@@ -293,10 +313,19 @@ export class EPrescribingOrchestrationService {
    * Verify the user has active e-prescribing consent for this patient.
    * @throws {EPrescribeConsentDeniedError} if consent is not active
    */
-  private async requireConsent(userId: string, patientId: string): Promise<void> {
-    const hasConsent = await consentService.hasActiveConsent(userId, EPRESCRIBING_CONSENT_TYPE_ID)
+  private async requireConsent(
+    userId: string,
+    patientId: string,
+  ): Promise<void> {
+    const hasConsent = await consentService.hasActiveConsent(
+      userId,
+      EPRESCRIBING_CONSENT_TYPE_ID,
+    )
     if (!hasConsent) {
-      throw new EPrescribeConsentDeniedError(userId, EPRESCRIBING_CONSENT_TYPE_ID)
+      throw new EPrescribeConsentDeniedError(
+        userId,
+        EPRESCRIBING_CONSENT_TYPE_ID,
+      )
     }
   }
 
@@ -320,7 +349,9 @@ export class EPrescribingOrchestrationService {
    * Extract the medication request ID from a FHIR R4 MedicationRequest.
    * The id field is an array of {value} objects.
    */
-  private extractMedicationRequestId(medicationRequest: MedicationRequest): string | undefined {
+  private extractMedicationRequestId(
+    medicationRequest: MedicationRequest,
+  ): string | undefined {
     const idEntry = medicationRequest.id?.[0]
     return idEntry?.value
   }

@@ -40,7 +40,7 @@ const ISO_TIMESTAMP_PATTERN =
 /** Free-text field cap bounding input size before it reaches the adapter. */
 const MAX_TEXT_LENGTH = 200
 
-function requireHieId(value: string, field: string): string {
+export function requireHieId(value: string, field: string): string {
   const trimmed = value.trim()
   if (!HIE_ID_PATTERN.test(trimmed)) {
     throw new Error(`Invalid ${field}: expected an HIE identifier token`)
@@ -55,7 +55,7 @@ function optionalHieId(
   return value === undefined ? undefined : requireHieId(value, field)
 }
 
-function sanitizeIsoDate(
+export function sanitizeIsoDate(
   value: string | undefined,
   field: string,
 ): string | undefined {
@@ -67,17 +67,19 @@ function sanitizeIsoDate(
   return trimmed
 }
 
-function sanitizeBoundedText(value: string | undefined): string | undefined {
+export function sanitizeBoundedText(
+  value: string | undefined,
+): string | undefined {
   if (value === undefined) return undefined
   return value.trim().slice(0, MAX_TEXT_LENGTH)
 }
 
-function clampLimit(limit: number | undefined): number | undefined {
+export function clampLimit(limit: number | undefined): number | undefined {
   if (limit === undefined || !Number.isFinite(limit)) return undefined
   return Math.min(Math.max(Math.trunc(limit), 1), 1000)
 }
 
-function clampOffset(offset: number | undefined): number | undefined {
+export function clampOffset(offset: number | undefined): number | undefined {
   if (offset === undefined || !Number.isFinite(offset)) return undefined
   return Math.max(Math.trunc(offset), 0)
 }

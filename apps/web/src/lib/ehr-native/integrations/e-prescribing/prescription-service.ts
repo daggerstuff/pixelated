@@ -176,7 +176,7 @@ export class PrescriptionService {
  * Validate a US ZIP code (5 digits or ZIP+4) before adapter search so
  * unsanitized input never reaches FHIR/pharmacy lookup paths.
  */
-function sanitizeZipCode(zipCode: string): string {
+export function sanitizeZipCode(zipCode: string): string {
   const trimmed = zipCode.trim()
   if (!/^\d{5}(-\d{4})?$/.test(trimmed)) {
     throw new Error(

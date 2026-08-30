@@ -9,6 +9,7 @@
  * @see https://dosespot.com/api
  */
 
+import { secureEphiUrl, secureSend } from '../transport'
 import type { EPrescribingAdapter } from './adapter'
 import type {
   PharmacySearchRequest,
@@ -119,17 +120,6 @@ function parsePrescriptionStatus(status: string): PrescriptionStatus {
   }
 }
 
-function parseSchedule(schedule: string): 'I' | 'II' | 'III' | 'IV' | 'V' | 'non-controlled' {
-  const lower = schedule.toLowerCase().trim()
-  if (lower === 'non-controlled' || lower === 'noncontrolled' || lower === '') return 'non-controlled'
-  if (lower === '1' || lower === 'i') return 'I'
-  if (lower === '2' || lower === 'ii') return 'II'
-  if (lower === '3' || lower === 'iii') return 'III'
-  if (lower === '4' || lower === 'iv') return 'IV'
-  if (lower === '5' || lower === 'v') return 'V'
-  return 'non-controlled'
-}
-
 function mapPharmacy(raw: DoseSpotPharmacy): PharmacyInfo {
   const address = [raw.Address1, raw.Address2].filter(Boolean) as string[]
   return {
@@ -174,10 +164,10 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
 
   private get headers(): Record<string, string> {
     return {
-      Authorization: `Bearer ${this.config.apiKey}`,
+      'Authorization': `Bearer ${this.config.apiKey}`,
       'X-Clinic-Key': this.config.clinicKey,
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Accept': 'application/json',
     }
   }
 
@@ -193,11 +183,14 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs)
 
     try {
-      const response = await fetch(`${this.baseUrl}${path}`, {
-        ...options,
-        headers: { ...this.headers, ...options.headers },
-        signal: controller.signal,
-      })
+      const response = await secureSend(
+        secureEphiUrl(`${this.baseUrl}${path}`, 'DoseSpot'),
+        {
+          ...options,
+          headers: { ...this.headers, ...options.headers },
+          signal: controller.signal,
+        },
+      )
 
       if (!response.ok) {
         const body = await response.text().catch(() => '')
@@ -225,9 +218,10 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
       params.set('type', request.type)
     }
 
-    const data = await this.makeRequest<{ pharmacies: DoseSpotPharmacy[]; total: number }>(
-      `/api/pharmacies?${params.toString()}`,
-    )
+    const data = await this.makeRequest<{
+      pharmacies: DoseSpotPharmacy[]
+      total: number
+    }>(`/api/pharmacies?${params.toString()}`)
 
     return {
       pharmacies: data.pharmacies.map(mapPharmacy),
@@ -309,8 +303,11 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
         id: request.medicationRequest.id?.[0]?.value ?? '',
         status: request.medicationRequest.status,
         intent: request.medicationRequest.intent,
-        medicationCode: request.medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? '',
-        medicationName: request.medicationRequest.medicationCodeableConcept?.text ?? '',
+        medicationCode:
+          request.medicationRequest.medicationCodeableConcept?.coding?.[0]
+            ?.code ?? '',
+        medicationName:
+          request.medicationRequest.medicationCodeableConcept?.text ?? '',
         authoredOn: request.medicationRequest.authoredOn ?? '',
       },
       pharmacy: {

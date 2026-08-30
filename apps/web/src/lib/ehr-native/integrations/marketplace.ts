@@ -122,7 +122,12 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
     category: 'hie',
     logoUrl: undefined,
     documentationUrl: 'https://sequoiaproject.org/carequality/',
-    defaultScopes: ['patient_discovery', 'document_query', 'document_retrieve', 'document_submit'],
+    defaultScopes: [
+      'patient_discovery',
+      'document_query',
+      'document_retrieve',
+      'document_submit',
+    ],
     webhookEvents: [],
   },
   {
@@ -144,7 +149,12 @@ export const MARKETPLACE_PROVIDERS: readonly MarketplaceProvider[] = [
     category: 'eprescribing',
     logoUrl: undefined,
     documentationUrl: 'https://dosespot.com/api',
-    defaultScopes: ['prescribe', 'pharmacy_search', 'medication_history', 'drug_interactions'],
+    defaultScopes: [
+      'prescribe',
+      'pharmacy_search',
+      'medication_history',
+      'drug_interactions',
+    ],
     webhookEvents: [],
   },
 ] as const
