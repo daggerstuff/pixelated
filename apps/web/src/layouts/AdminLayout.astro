@@ -44,6 +44,36 @@ const { cspNonce } = Astro.locals
       transform: translateX(0);
     }
   }
+
+  /* Refined admin sidebar nav links — uses NP token variables */
+  .nav-link-refined {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1.5rem;
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-secondary, #6b6b66);
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    transition: background var(--np-duration-fast, 0.15s) var(--np-ease, ease-out);
+  }
+
+  .nav-link-refined:hover {
+    background: var(--np-hover, #383838);
+    color: var(--text-primary, #ededed);
+  }
+
+  .nav-link-refined--active {
+    color: var(--text-primary, #ededed);
+    border-left-color: var(--np-text, #ededed);
+  }
+
+  .nav-link-refined:focus-visible {
+    outline: 2px solid var(--np-mid, #b3b3b3);
+    outline-offset: 2px;
+  }
 </style>
 
 <html lang={SITE.lang} class="enhanced-dark-theme">
@@ -86,6 +116,7 @@ const { cspNonce } = Astro.locals
     <div class="flex min-h-screen">
       <!-- Sidebar -->
       <aside
+        id="admin-sidebar"
         class="w-64 hidden md:block glass-panel"
         style="border-right: 1px solid var(--border-primary);"
       >
@@ -120,7 +151,11 @@ const { cspNonce } = Astro.locals
         >
           <div class="flex items-center justify-between">
             <button
-              class="md:hidden text-gray-500 dark:text-gray-400 focus:outline-none"
+              id="mobile-menu-button"
+              class="md:hidden text-gray-500 dark:text-gray-400 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500"
+              aria-label="Toggle navigation menu"
+              aria-controls="admin-sidebar"
+              aria-expanded="false"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +174,8 @@ const { cspNonce } = Astro.locals
 
             <div class="flex items-center">
               <button
-                class="text-gray-500 dark:text-gray-400 focus:outline-none mr-4"
+                class="text-gray-500 dark:text-gray-400 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500 mr-4"
+                aria-label="Notifications"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +195,7 @@ const { cspNonce } = Astro.locals
 
               <div class="relative">
                 <button
-                  class="flex items-center text-gray-700 dark:text-gray-300 focus:outline-none"
+                  class="flex items-center text-gray-700 dark:text-gray-300 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 dark:focus-visible:ring-gray-500"
                 >
                   <img
                     class="h-8 w-8 rounded-full object-cover"
@@ -190,6 +226,33 @@ const { cspNonce } = Astro.locals
         </div>
       </main>
     </div>
+    <script>
+      // Mobile sidebar toggle — astro:page-load for client-side nav compatibility
+      document.addEventListener('astro:page-load', () => {
+        const button = document.getElementById('mobile-menu-button')
+        const sidebar = document.getElementById('admin-sidebar')
+        if (!button || !sidebar) return
+
+        button.addEventListener('click', () => {
+          const expanded = button.getAttribute('aria-expanded') === 'true'
+          button.setAttribute('aria-expanded', String(!expanded))
+          sidebar.classList.toggle('hidden')
+          if (!expanded) {
+            const firstLink = sidebar.querySelector('a') as HTMLElement
+            firstLink?.focus()
+          }
+        })
+
+        // Close on Escape
+        button.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+            button.setAttribute('aria-expanded', 'false')
+            sidebar.classList.add('hidden')
+            button.focus()
+          }
+        })
+      })
+    </script>
     <SpeedInsights />
   </body>
 </html>
