@@ -1,0 +1,46 @@
+# ============================================================================
+# Foresight Memory Service - Hybrid Infrastructure Compose Stack
+# ============================================================================
+# Database (PostgreSQL 17 + pgvector) and Cache (Redis) run in Docker, while
+# the Foresight Python service runs on host via uv/systemd for instant hot-reloading.
+# ============================================================================
+
+services:
+  foresight-postgres:
+    image: pgvector/pgvector:pg17
+    container_name: foresight-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: foresight_user
+      POSTGRES_PASSWORD: foresight_secure_pass_2026
+      POSTGRES_DB: foresight
+    ports:
+      - "0.0.0.0:5432:5432"
+    volumes:
+      - foresight_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foresight_user -d foresight"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pixelated-redis:
+    image: redis:latest
+    container_name: pixelated-redis
+    command: redis-server --requirepass dev_redis_password
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "dev_redis_password", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  foresight_pgdata:
+    external: true
+  redis_data:
+    external: true
