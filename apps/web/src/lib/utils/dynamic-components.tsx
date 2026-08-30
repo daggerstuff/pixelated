@@ -122,7 +122,10 @@ export const DynamicTherapyChatSystem = (props: Record<string, unknown>) => (
 
 // Dynamic imports for large data processing components
 const FHEDemo = React.lazy(async () => {
-  const module = await import('../../components/security/FHEDemo')
+  // Explicit `.tsx` extension: `components/security/` also contains `FHEDemo.astro`,
+  // and Vite resolves the extensionless specifier to the `.astro` file first
+  // (resolve.extensions orders `.astro` before `.tsx`), which breaks React.lazy.
+  const module = await import('../../components/security/FHEDemo.tsx')
   return { default: module.default }
 })
 
@@ -133,7 +136,7 @@ export const DynamicFHEDemo = (props: Record<string, unknown>) => (
 )
 
 const DemoFHEDemo = React.lazy(async () => {
-  const module = await import('../../components/demo/FHEDemo')
+  const module = await import('../../components/demo/FHEDemo.tsx')
   return { default: module.default }
 })
 
