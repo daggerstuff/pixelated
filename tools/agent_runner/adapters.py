@@ -170,4 +170,7 @@ class GenericCLIAdapter(AgentAdapter):
 
 def get_agent_adapter(config: AgentConfig) -> AgentAdapter:
     """Factory creating appropriate adapter for agent configuration."""
+    if "eve" in config.name.lower() or (config.cmd and "eve" in config.cmd[0].lower()):
+        from tools.agent_runner.eve_adapter import EveAgentAdapter
+        return EveAgentAdapter(config)
     return GenericCLIAdapter(config)
