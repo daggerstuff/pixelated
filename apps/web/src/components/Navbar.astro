@@ -125,7 +125,7 @@ function isActive(href: string) {
       <ThemeSwitcher />
       <button
         id="mobile-menu-button"
-        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
+        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:text-gray-300 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-400 dark:focus:ring-gray-500"
         aria-controls="mobile-menu"
         aria-expanded="false"
         aria-label="Open main menu"
@@ -184,7 +184,7 @@ function isActive(href: string) {
                     class:list={[
                       'block py-2 transition-colors',
                       active
-                        ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
+                        ? 'text-accent-primary font-medium border-l-2 border-accent-primary pl-3'
                         : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
                     ]}
                     aria-current={active ? 'page' : undefined}
@@ -205,7 +205,7 @@ function isActive(href: string) {
               class:list={[
                 'block py-2 transition-colors',
                 isActive('/login')
-                  ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
+                  ? 'text-accent-primary font-medium border-l-2 border-accent-primary pl-3'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
               ]}
               aria-current={isActive('/login') ? 'page' : undefined}
@@ -220,7 +220,7 @@ function isActive(href: string) {
               class:list={[
                 'block py-2 transition-colors',
                 isActive('/register')
-                  ? 'text-teal-600 font-medium border-l-2 border-teal-600 pl-3'
+                  ? 'text-accent-primary font-medium border-l-2 border-accent-primary pl-3'
                   : 'text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white pl-0',
               ]}
               aria-current={isActive('/register') ? 'page' : undefined}
@@ -333,7 +333,7 @@ function isActive(href: string) {
 
   /* Enhanced focus styles for accessibility */
   a:focus-visible {
-    outline: 2px solid theme('colors.teal.500');
+    outline: 2px solid var(--np-mid, #6b6b66);
     outline-offset: 2px;
     border-radius: 0.25rem;
   }

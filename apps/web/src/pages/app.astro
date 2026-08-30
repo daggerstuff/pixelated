@@ -82,12 +82,103 @@ async function handleShutdown() {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Application</title>
+    <title>Application Status | Pixelated Empathy</title>
+    <meta name="description" content="Pixelated Empathy application status. Server-side services have been initialized." />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style is:global>
+      body {
+        margin: 0;
+        background: var(--bg-primary, #1a1a18);
+        color: var(--text-primary, #ededed);
+        font-family: var(--body, ui-sans-serif, system-ui, sans-serif);
+      }
+      .skip-link {
+        position: absolute;
+        top: -100%;
+        left: 16px;
+        z-index: 100;
+        padding: 8px 16px;
+        background: var(--bg-elevated, #2e2e2e);
+        color: var(--text-primary, #ededed);
+        border: 1px solid var(--line-strong, #c4c2bb);
+        font-family: var(--mono, monospace);
+        font-size: 0.75rem;
+        text-decoration: none;
+      }
+      .skip-link:focus {
+        top: 8px;
+      }
+      .status-page {
+        max-width: 60rem;
+        margin: 0 auto;
+        padding: 4rem 1.5rem;
+      }
+      .status-page h1 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+      }
+      .status-page p {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0 0 1.5rem;
+        color: var(--muted, #6b6b66);
+      }
+      .status-nav {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      .status-nav a {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        font-family: var(--mono, monospace);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-decoration: none;
+        border: 1px solid var(--line, #d8d6d0);
+        border-radius: 0.25rem;
+        color: var(--text-primary, #ededed);
+        background: transparent;
+      }
+      .status-nav a:hover {
+        background: var(--bg-elevated, #2e2e2e);
+        border-color: var(--text-primary, #ededed);
+      }
+      .status-nav a:focus-visible {
+        outline: 2px solid var(--accent, #4a9eff);
+        outline-offset: 2px;
+      }
+      .status-kicker {
+        font-family: var(--mono, monospace);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted, #6b6b66);
+        margin-bottom: 0.5rem;
+      }
+    </style>
   </head>
   <body>
-    <main>
+    <!-- Skip to content link for accessibility -->
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <main id="main-content" class="status-page">
+      <span class="status-kicker">System Status</span>
       <h1>Application Status</h1>
       <p>The server-side application has been initialized.</p>
+
+      <nav aria-label="Primary navigation">
+        <div class="status-nav">
+          <a href="/">Home</a>
+          <a href="/dashboard">Dashboard</a>
+          <a href="/login">Log in</a>
+          <a href="/trust">Trust Center</a>
+        </div>
+      </nav>
     </main>
   </body>
 </html>
