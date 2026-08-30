@@ -8,7 +8,8 @@ interface Props {
 
 const { nonce, trackPageTransitions = true } = Astro.props
 const scriptUrl =
-  config.client.umamiScriptUrl() ?? 'https://analytics.pixelatedempathy.com/script.js'
+  config.client.umamiScriptUrl() ??
+  'https://analytics.pixelatedempathy.com/script.js'
 const websiteId = config.client.umamiWebsiteId()
 const shouldRender = Boolean(scriptUrl && websiteId)
 const pageTransitionScript = `
