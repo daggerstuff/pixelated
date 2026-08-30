@@ -39,12 +39,12 @@ spec:
       terminationGracePeriodSeconds: 30
       securityContext:
         runAsNonRoot: true
-        # Umami image runs as user `node` (uid 1000). Forcing 1001 makes
-        # every write (cache, /tmp) fail with EACCES before startup
-        # finishes — the crashloop we saw in run 33285750276.
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        # Image runs as `nextjs` (uid 1001) per the upstream Dockerfile
+        # (`adduser --system --uid 1001 nextjs`, `USER nextjs`). Must match
+        # or file ownership / startup writes break.
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -55,11 +55,11 @@ spec:
             capabilities:
               drop:
                 - ALL
-            # readOnlyRootFilesystem must stay off: umami's `check-db` step
-            # runs `prisma migrate deploy`, which writes to the Prisma engines
-            # dir under /app/node_modules at startup. With a read-only rootfs
-            # the migration step dies with EACCES (run 33287620306) even
-            # though the DB itself is reachable.
+            # Must be false: the umami postgresql image does not bundle the
+            # Prisma schema-engine. `prisma migrate deploy` downloads it at
+            # startup (binaries.prisma.sh); a read-only rootfs blocks that
+            # write → "Could not find schema-engine binary" → CrashLoopBackOff.
+            readOnlyRootFilesystem: false
           # Pinned immutable semver. GHCR org is umami-software (not umami-so —
           # that legacy org 404s on manifests). Do not use :latest.
           image: ghcr.io/umami-software/umami:postgresql-v2.19.0
@@ -94,13 +94,6 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
-            # Next.js writes its image/cache dirs under the app root; with a
-            # read-only rootfs those must be writable tmpfs or startup dies
-            # with EROFS before the server ever binds its port.
-            - name: cache
-              mountPath: /home/node/.next/cache
-            - name: app-tmp
-              mountPath: /app/.next
           resources:
             requests:
               cpu: "50m"
@@ -137,8 +130,4 @@ spec:
             failureThreshold: 3
       volumes:
         - name: tmp
-          emptyDir: {}
-        - name: cache
-          emptyDir: {}
-        - name: app-tmp
           emptyDir: {}
