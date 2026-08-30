@@ -53,9 +53,9 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
-          # Pinned immutable semver — the deploy pipeline substitutes the
-          # digest. Do not use :latest (see deployment.yaml rationale).
-          image: ghcr.io/umami-so/umami:postgresql-v2.19.0
+          # Pinned immutable semver. GHCR org is umami-software (not umami-so —
+          # that legacy org 404s on manifests). Do not use :latest.
+          image: ghcr.io/umami-software/umami:postgresql-v2.19.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
