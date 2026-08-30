@@ -1,4 +1,7 @@
 # Blue-green deployment for Civo — Green slot (inactive by default)
+# Scaled to 0 replicas: green sits idle, and idle pods starve the 2-node
+# cluster of resources during blue rollouts (maxSurge pod couldn't schedule,
+# progress deadline exceeded). CI flips green replicas up at switch time.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -8,7 +11,7 @@ metadata:
     app: pixelated-empathy
     slot: green
 spec:
-  replicas: 2
+  replicas: 0
   progressDeadlineSeconds: 600
   strategy:
     type: RollingUpdate
