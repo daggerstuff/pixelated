@@ -260,6 +260,7 @@ jobs:
           SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
           LINEAR_AGENT_ACCESS_TOKEN: ${{ secrets.LINEAR_AGENT_ACCESS_TOKEN }}
           LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: |
           # Install Traefik CRDs first
           helm repo add traefik https://helm.traefik.io/traefik 2>/dev/null || true
@@ -297,6 +298,14 @@ jobs:
           kubectl create secret generic umami-secrets \
             --from-literal=DATABASE_URL="${{ secrets.UMAMI_DATABASE_URL }}" \
             --from-literal=APP_SECRET="${{ secrets.UMAMI_APP_SECRET }}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          # App runtime secrets consumed via envFrom (deployment-blue/green).
+          # JWT_SECRET is strictly required by apps/web/src/lib/auth/config.ts —
+          # without it the new pod crashloops and the blue rollout stalls at
+          # its progress deadline.
+          kubectl create secret generic pixelated-empathy-secrets \
+            --from-literal=JWT_SECRET="${JWT_SECRET}" \
             -n pixelated-empathy \
             --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -k infra/k8s/civo
