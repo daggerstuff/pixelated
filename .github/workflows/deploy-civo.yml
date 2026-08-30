@@ -313,7 +313,23 @@ jobs:
            kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
            echo "Waiting for rollout..."
+           # Dump pod diagnostics in parallel with rollout wait so a stalled
+           # rollout still produces logs/events in the run output. The wait
+           # below fails hard on timeout; this loop only reports.
+           (
+             for i in $(seq 1 20); do
+               sleep 30
+               echo "=== Diagnostics t+${i}m ==="
+               kubectl get pods -n pixelated-empathy -o wide || true
+               kubectl describe pods -n pixelated-empathy -l app=pixelated-empathy,slot=blue | sed -n '/Events:/,$p' | head -20 || true
+               kubectl logs -n pixelated-empathy -l app=pixelated-empathy,slot=blue --all-containers --tail=40 --prefix --ignore-errors || true
+             done
+           ) &
+           DIAG_PID=$!
+           trap 'kill $DIAG_PID 2>/dev/null || true' EXIT
+
            kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+           kill $DIAG_PID 2>/dev/null || true
            kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
            kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
            kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
