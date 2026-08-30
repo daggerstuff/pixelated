@@ -33,7 +33,6 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
   private readonly scheduledEvents: Map<string, CalendlyScheduledEvent> =
     new Map()
   private readonly invitees: Map<string, CalendlyInvitee[]> = new Map()
-  private idCounter = 0
 
   constructor() {
     this.seedTestData()
@@ -81,11 +80,6 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
       updated_at: '2025-06-01T00:00:00.000Z',
     }
     this.invitees.set(event.uri, [invitee])
-  }
-
-  private nextId(prefix: string): string {
-    this.idCounter += 1
-    return `${prefix}-${this.idCounter.toString().padStart(3, '0')}`
   }
 
   async getCurrentUser(accessToken: string): Promise<CalendlyUser> {
@@ -182,8 +176,3 @@ export class StubCalendlyAdapter implements CalendlyAdapter {
     return { canceled: true, eventUri }
   }
 }
-
-/**
- * Singleton stub instance for development and testing.
- */
-const stubCalendlyAdapter = new StubCalendlyAdapter()
