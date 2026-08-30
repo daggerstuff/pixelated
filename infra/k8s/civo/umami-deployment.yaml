@@ -39,9 +39,12 @@ spec:
       terminationGracePeriodSeconds: 30
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1001
-        runAsGroup: 1001
-        fsGroup: 1001
+        # Umami image runs as user `node` (uid 1000). Forcing 1001 makes
+        # every write (cache, /tmp) fail with EACCES before startup
+        # finishes — the crashloop we saw in run 33285750276.
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
       containers:
@@ -87,6 +90,13 @@ spec:
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+            # Next.js writes its image/cache dirs under the app root; with a
+            # read-only rootfs those must be writable tmpfs or startup dies
+            # with EROFS before the server ever binds its port.
+            - name: cache
+              mountPath: /home/node/.next/cache
+            - name: app-tmp
+              mountPath: /app/.next
           resources:
             requests:
               cpu: "50m"
@@ -123,4 +133,8 @@ spec:
             failureThreshold: 3
       volumes:
         - name: tmp
+          emptyDir: {}
+        - name: cache
+          emptyDir: {}
+        - name: app-tmp
           emptyDir: {}
