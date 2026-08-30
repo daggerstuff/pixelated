@@ -55,9 +55,8 @@ const mockUser = {
   }
 
   .card {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: var(--bg-elevated, #2e2e2e);
+    border: 1px solid var(--border-primary, #383838);
     padding: 1.5rem;
     margin-top: 2rem;
   }
@@ -73,18 +72,19 @@ const mockUser = {
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    background-color: #f9f9f9;
-    border-radius: 4px;
+    background: var(--bg, #1a1a18);
+    border: 1px solid var(--border-primary, #383838);
   }
 
   .metric-label {
     font-size: 0.875rem;
-    color: #666;
+    color: var(--text-muted, #6b6b66);
   }
 
   .metric-value {
     font-size: 1.5rem;
-    font-weight: bold;
+    font-weight: 700;
     margin-top: 0.5rem;
+    color: var(--text-primary, #ededed);
   }
 </style>
