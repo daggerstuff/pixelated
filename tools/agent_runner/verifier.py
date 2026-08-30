@@ -72,6 +72,10 @@ class VerificationEngine:
             logger.debug("Error detecting dynamic checks: %s", e)
         return checks
 
+    def verify(self, workdir: str, extra_commands: list[str] | None = None) -> VerificationOutcome:
+        """Alias for run_checks to support state graph Reviewer interface."""
+        return self.run_checks(workdir, extra_commands)
+
     def run_checks(self, workdir: str, extra_commands: list[str] | None = None) -> VerificationOutcome:
         """Run all configured verification commands in workdir."""
         if not self.config.enabled:
