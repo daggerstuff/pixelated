@@ -22,14 +22,16 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from tools.agent_runner.adapters import get_agent_adapter
+from tools.agent_runner.adapters import AgentAdapter, get_agent_adapter
 from tools.agent_runner.event_bus import EventBus, EventType
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
+from tools.agent_runner.hitl_proxy import EscalationStore
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
 from tools.agent_runner.loop_auditor import WorkLoopAuditor, WorkLoopAuditReport
-from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, RunnerConfig
+from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, ProjectConfig, RunnerConfig
 from tools.agent_runner.self_evolution import SelfEvolutionEngine
+from tools.agent_runner.state_graph import AgentState, CodingStateGraph
 from tools.agent_runner.trace_analyzer import TraceAnalyzer, TraceSummary
 from tools.agent_runner.verifier import VerificationEngine
 
@@ -82,6 +84,7 @@ class AgentExecutionHarness:
         self.loop_auditor = WorkLoopAuditor()
         self.trace_analyzer = TraceAnalyzer(config.langchain_project)
         self.verifier = VerificationEngine(config=config.verification)
+        self.escalation_store = EscalationStore()
 
     def run_harness(
         self,
@@ -186,6 +189,29 @@ class AgentExecutionHarness:
                 raw_result.verification_passed = False
                 report.overall_passed = False
                 execution_result = raw_result
+
+                # Human-in-the-Loop Breakpoint: Serialize state snapshot for terminal intervention
+                esc_state = AgentState(
+                    task_id=issue.identifier,
+                    task_description=f"{issue.title}\n{issue.description or ''}",
+                    file_paths=modified_files,
+                    current_code=raw_result.git_diff_summary,
+                    reviewer_feedback=failures,
+                    iteration_count=attempt + 1,
+                    max_iterations=max_repairs + 1,
+                    status="escalated",
+                    active_agent=agent_cfg.name,
+                    developer_agent=agent_cfg.name,
+                    reviewer_agent="QA_Reviewer",
+                    escalation_id=None,
+                    metadata={"issue_id": issue.id},
+                )
+                esc_id = self.escalation_store.create_escalation(esc_state)
+                logger.warning(
+                    "🚨 Human-in-the-Loop Breakpoint: task %s escalated to EscalationStore (ID: %s)",
+                    issue.identifier,
+                    esc_id,
+                )
 
         # Post-execution audit and trace analysis
         report.trace_summary = self.trace_analyzer.analyze_ticket_trace(issue.identifier)
