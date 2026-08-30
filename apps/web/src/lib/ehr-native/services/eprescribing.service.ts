@@ -85,7 +85,7 @@ export class EPrescribingOrchestrationService {
    * No patient data involved — consent not required.
    */
   async searchPharmacies(
-    userId: string,
+    _userId: string,
     zipCode: string,
     limit?: number,
     type?: PharmacySearchRequest['type'],
@@ -108,7 +108,7 @@ export class EPrescribingOrchestrationService {
     userId: string,
     medication: MedicationInfo,
     patientId: string,
-    prescriberNPI: string,
+    _prescriberNPI: string,
     priorPrescriptions?: MedicationRequest[],
   ): Promise<ControlledSubstanceCheckResult> {
     await this.requireConsent(userId, patientId)
@@ -118,7 +118,6 @@ export class EPrescribingOrchestrationService {
       result = await this.prescriptionService.checkControlledSubstance(
         medication,
         patientId,
-        prescriberNPI,
         priorPrescriptions,
       )
     } catch (error) {
@@ -315,7 +314,7 @@ export class EPrescribingOrchestrationService {
    */
   private async requireConsent(
     userId: string,
-    patientId: string,
+    _patientId: string,
   ): Promise<void> {
     const hasConsent = await consentService.hasActiveConsent(
       userId,
@@ -347,12 +346,12 @@ export class EPrescribingOrchestrationService {
 
   /**
    * Extract the medication request ID from a FHIR R4 MedicationRequest.
-   * The id field is an array of {value} objects.
+   * The identifier field is an array of {value} objects.
    */
   private extractMedicationRequestId(
     medicationRequest: MedicationRequest,
   ): string | undefined {
-    const idEntry = medicationRequest.id?.[0]
+    const idEntry = medicationRequest.identifier?.[0]
     return idEntry?.value
   }
 

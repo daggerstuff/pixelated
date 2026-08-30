@@ -22,7 +22,7 @@ import type {
   DocumentSubmissionResult,
   OrganizationDirectoryRequest,
   OrganizationDirectoryResult,
-  HIEOrganization,
+  HIEDocumentReference,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -151,7 +151,8 @@ export class DirectTrustAdapter implements HIEAdapter {
     return {
       documents: raw.messages.map((m) => ({
         documentId: m.id,
-        documentType: m.metadata?.type ?? 'progress-note',
+        documentType: (m.metadata?.type ??
+          'progress-note') as HIEDocumentReference['documentType'],
         title: m.subject,
         created: m.receivedAt,
         authorOrganization: {

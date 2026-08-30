@@ -55,13 +55,6 @@ interface DoseSpotPharmacy {
   Is24Hour?: boolean
 }
 
-interface DoseSpotMedication {
-  MedicationId: string
-  MedicationName: string
-  Schedule: string
-  NdcCode: string
-}
-
 interface DoseSpotInteraction {
   Severity: string
   Description: string
@@ -241,7 +234,7 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
       patientId: request.patientId,
       prescriberNPI: request.prescriberNPI,
       priorPrescriptions: request.priorPrescriptions?.map((rx) => ({
-        id: rx.id?.[0]?.value ?? '',
+        id: rx.identifier?.[0]?.value ?? '',
         medicationCode: rx.medicationCodeableConcept?.coding?.[0]?.code ?? '',
       })),
     }
@@ -276,7 +269,7 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
       },
       patientId: request.patientId,
       activeMedications: request.activeMedications.map((rx) => ({
-        id: rx.id?.[0]?.value ?? '',
+        id: rx.identifier?.[0]?.value ?? '',
         medicationCode: rx.medicationCodeableConcept?.coding?.[0]?.code ?? '',
       })),
     }
@@ -300,7 +293,7 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
   ): Promise<PrescriptionTransmissionResponse> {
     const body = {
       medicationRequest: {
-        id: request.medicationRequest.id?.[0]?.value ?? '',
+        id: request.medicationRequest.identifier?.[0]?.value ?? '',
         status: request.medicationRequest.status,
         intent: request.medicationRequest.intent,
         medicationCode:

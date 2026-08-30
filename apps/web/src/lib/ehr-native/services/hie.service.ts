@@ -99,7 +99,7 @@ export class HIEOrchestrationService {
 
     await this.auditSuccess(action, userId, {
       integrationSource: 'hie',
-      metadata: { found: result.found, patientId: result.patientId ?? null },
+      metadata: { found: result.found, patientId: result.patientId },
     })
 
     return result
@@ -275,7 +275,7 @@ export class HIEOrchestrationService {
   }
 
   private async auditSuccess(
-    action: (typeof EHRAuditAction)[keyof typeof EHRAuditAction],
+    action: Parameters<EHRAuditService['logIntegration']>[0],
     userId: string,
     input: Omit<IntegrationAuditInput, 'userId' | 'status'>,
   ): Promise<void> {
@@ -287,7 +287,7 @@ export class HIEOrchestrationService {
   }
 
   private async auditError(
-    action: (typeof EHRAuditAction)[keyof typeof EHRAuditAction],
+    action: Parameters<EHRAuditService['logIntegration']>[0],
     userId: string,
     error: unknown,
     input: Omit<IntegrationAuditInput, 'userId' | 'status'>,

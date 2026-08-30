@@ -13,7 +13,7 @@ import type { DocumentReference } from '@/lib/ehr-native/types'
 /** HIE network identifiers */
 export type HIENetwork =
   | 'carequality'
-  | 'directrust'
+  | 'directtrust'
   | 'ehealthexchange'
   | 'local'
 
