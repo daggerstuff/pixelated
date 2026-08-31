@@ -16,6 +16,13 @@ from tools.agent_runner.verifier import VerificationOutcome
 logger = logging.getLogger("agent_runner.langchain")
 
 try:
+    from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+    load_dotenv(override=True)
+except ImportError:
+    pass
+
+try:
     from langsmith.run_trees import RunTree  # type: ignore[import-untyped]
 except ImportError:
     RunTree = None
