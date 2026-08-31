@@ -64,30 +64,34 @@ DESCRIPTION:
 
 {foresight_context}
 
+{lessons_context}
+
 SHARED COORDINATION BLACKBOARD:
 {coord_thread}
 
 MANDATORY OPERATING RAILS & PROTOCOLS:
-1. READ AGENTS.MD: You MUST read and strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
-2. NO HOLLOW / FAKE WORK: You MUST implement the actual production classes, interfaces, services, and endpoints requested. Never submit empty stubs, mock random number generators, or tests that only test fake mock objects while leaving the actual production code unimplemented.
-3. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
-4. TEST REAL CODE: Write and run real tests verifying your actual production implementation against real exports.
-5. AUTO-FORMAT: Ensure all modified files adhere to Prettier and oxlint standards.
-6. If this task creates follow-up work or subtasks, declare them using:
+1. READ AGENTS.MD: Strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
+2. SURGICAL & DIRECT EXECUTION: Work directly on target files. Avoid sprawling whole-repo file indexing or reading massive documentation files that trigger context exhaustion.
+3. NO HOLLOW / FAKE WORK: Implement real production classes, interfaces, and utilities. Never submit empty stubs or mocks testing only mocks.
+4. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
+5. PYTHON & LINT IDIOMS: For Python datetime handling, construct timezone-aware UTC datetimes (`datetime.now(timezone.utc)`) or use `datetime.fromisoformat()` for naive test cases to satisfy strict Ruff DTZ rules without `# noqa`.
+6. TEST REAL CODE: Write and run real tests verifying your actual production implementation with pytest / vitest.
+7. AUTO-FORMAT: Ensure all modified files adhere to Prettier and ruff/oxlint standards.
+8. If this task creates follow-up work or subtasks, declare them using:
    CREATE TICKET: <title> | <description> | labels: <labels>
    or
    SUBTASK: <title> | <description>
-7. If scoping complex multi-step work, declare a task graph:
+9. If scoping complex multi-step work, declare a task graph:
    TASK_GRAPH:
    - id: 1, title: <step 1>, agent: <agent>
    - id: 2, title: <step 2>, agent: <agent>, depends: [1]
-8. If delegating to a specialist sub-agent, use:
+10. If delegating to a specialist sub-agent, use:
    DELEGATE: <agent_name> | <subtask directive>
-9. If an architectural decision or fact was made, declare it using:
+11. If an architectural decision or fact was made, declare it using:
    STORE MEMORY: decision | <concise statement>
-10. If you have an update or proposal for other agents, declare it using:
+12. If you have an update or proposal for other agents, declare it using:
    BROADCAST: <message> or PROPOSE: <title> | <details>
-11. Conclude with a final summary line:
+13. Conclude with a final summary line:
    RESULT: <one concise sentence describing the outcome>
 """
 
@@ -191,6 +195,7 @@ class MultiAgentCoordinator:
             skill_lines = [f"- **{name}**: {desc}" for name, desc in matching_skills]
             skills_text = "RECOMMENDED LOCAL SKILLS:\n" + "\n".join(skill_lines)
 
+        lessons_text = self.evolution.format_lessons_for_prompt(limit=5)
         role_prompt = agent.system_prompt_override or get_role_prompt(agent.role)
 
         return TICKET_PROMPT_TEMPLATE.format(
@@ -205,6 +210,7 @@ class MultiAgentCoordinator:
             description=issue.description or "(No description provided)",
             skills_context=skills_text,
             foresight_context=foresight_text,
+            lessons_context=lessons_text,
             coord_thread=coord_thread_digest,
         )
 
