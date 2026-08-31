@@ -1,6 +1,7 @@
 /**
  * @name Insecure FHIR Search
- * @description Detects potentially insecure FHIR search operations
+ * @description Detects FHIR search operations without input sanitization.
+ *              Restricted to FHIR module files to prevent false positives.
  * @kind problem
  * @problem.severity warning
  * @security-severity 6.5
@@ -13,31 +14,41 @@
 
 import javascript
 
-/** Matches call expressions that look like FHIR search/query operations. */
+/**
+ * Restricts analysis to FHIR/EHR module files where FHIR search
+ * operations actually occur. This prevents false positives from
+ * unrelated code using common method names like .find() or .search()
+ * (dream-worker.ts, ResistanceMonitor.tsx, SlackNotificationService.ts, etc.).
+ */
+predicate isFHIRFile(File f) {
+  f.getAbsolutePath().matches("%apps/web/src/lib/ehr-native/%") or
+  f.getAbsolutePath().matches("%apps/web/src/lib/documentation/ehrIntegration%")
+}
+
+/**
+ * Matches actual FHIR search operations within FHIR modules.
+ * Targets the specific FHIR client method name "searchResources"
+ * rather than generic substring patterns like "%search%" or "%find%"
+ * that match every Array.find(), Array.filter(), or querySelector() call.
+ */
 predicate isFHIRSearch(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%search%") or
-      name.matches("%find%") or
-      name.matches("%query%")
-    )
-  )
+  isFHIRFile(call.getFile()) and
+  call.getCalleeName() = "searchResources"
 }
 
 /**
  * Returns true if any argument passed to `call` has been through a
- * sanitization/validation/escaping call somewhere in its data flow.
+ * sanitization/validation/escaping call. The sanitized result must
+ * flow into the search call's arguments via proper data flow.
  */
 predicate hasInputSanitization(CallExpr call) {
-  exists(CallExpr sanitizeCall, int i |
+  exists(CallExpr sanitizeCall |
     (
       sanitizeCall.getCalleeName().matches("%sanitize%") or
       sanitizeCall.getCalleeName().matches("%escape%") or
       sanitizeCall.getCalleeName().matches("%validate%")
     ) and
-    // The sanitized result flows into one of the search call's arguments
-    sanitizeCall.getAChild*() = call.getArgument(i)
+    DataFlow::exprNode(sanitizeCall).getASuccessor*() = DataFlow::exprNode(call.getAnArgument())
   )
 }
 
