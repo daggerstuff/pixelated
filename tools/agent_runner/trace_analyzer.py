@@ -12,6 +12,13 @@ from typing import Any
 logger = logging.getLogger("agent_runner.trace_analyzer")
 
 try:
+    from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+    load_dotenv(override=True)
+except ImportError:
+    pass
+
+try:
     from langsmith import Client as LangSmithClient  # type: ignore[import-untyped]
 except ImportError:
     LangSmithClient = None
