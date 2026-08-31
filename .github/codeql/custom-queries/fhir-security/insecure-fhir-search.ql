@@ -42,17 +42,17 @@ predicate isFHIRSearch(CallExpr call) {
  * result flows into that SAME argument. Sanitizing an unrelated argument
  * (e.g. a constant resource-type string) does not suppress the finding
  * for an unsanitized user-controlled search value. Calls whose arguments
- * are all compile-time constants carry no user input and are never flagged.
+ * are all literals carry no user input and are never flagged.
  */
 predicate hasInputSanitization(CallExpr call) {
   not exists(DataFlow::Node arg |
     arg = DataFlow::exprNode(call.getAnArgument()) and
-    not arg.asExpr().isCompileTimeConst()
+    not arg.asExpr() instanceof Literal
   )
   or
   forall(DataFlow::Node arg |
     arg = DataFlow::exprNode(call.getAnArgument()) and
-    not arg.asExpr().isCompileTimeConst()
+    not arg.asExpr() instanceof Literal
     implies
     exists(CallExpr sanitizeCall |
       (
