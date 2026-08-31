@@ -103,6 +103,12 @@ export interface IntegrationAuditInput extends EHRAuditInput {
   patientId?: string
 }
 
+/** Input for e-prescribing audit events. */
+export interface EPrescribeAuditInput extends IntegrationAuditInput {
+  medicationRequestId?: string
+  patientId: string
+}
+
 /** Input for break-glass audit events. */
 export interface BreakGlassAuditInput extends EHRAuditInput {
   patientId: string
@@ -197,7 +203,7 @@ export class EHRAuditService {
       errorMessage: input.errorMessage,
       ipAddress: input.ipAddress,
       userAgent: input.userAgent,
-      metadata: input.metadata as Record<string, unknown> | undefined,
+      metadata: input.metadata,
     }
 
     return this.logger.logEvent(event)
@@ -257,6 +263,17 @@ export class EHRAuditService {
     if (action.startsWith('break_glass')) return EHRSeverity.BREAK_GLASS
     if (action.startsWith('hie_') || action.startsWith('clearinghouse_'))
       return EHRSeverity.INTEGRATION
+    if (
+      action.startsWith('eprescribe_new_') ||
+      action.startsWith('eprescribe_refill')
+    )
+      return EHRSeverity.CREATE
+    if (action.startsWith('eprescribe_cancel')) return EHRSeverity.DELETE
+    if (
+      action.startsWith('eprescribe_medication_history') ||
+      action.startsWith('eprescribe_drug_interaction')
+    )
+      return EHRSeverity.READ
     return EHRSeverity.READ
   }
 
@@ -489,6 +506,144 @@ export class EHRAuditService {
         patientId: input.patientId,
       },
     })
+  }
+
+  // -------------------------------------------------------------------------
+  // E-prescribing audit builders
+  // -------------------------------------------------------------------------
+
+  async logEPrescribeNewRx(input: EPrescribeAuditInput): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_NEW_RX,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeRefill(input: EPrescribeAuditInput): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_REFILL,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeCancel(input: EPrescribeAuditInput): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_CANCEL,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribePrescriptionStatusCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeMedicationHistory(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeControlledSubstanceCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeDrugInteractionCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
   }
 
   // -------------------------------------------------------------------------
