@@ -82,11 +82,12 @@ class ForesightBridge:
         try:
             cmd = [
                 "foresight",
-                "memory",
-                "add",
+                "store",
                 full_content,
                 "--category",
                 category,
+                "--importance",
+                "0.8",
             ]
             res = subprocess.run(
                 cmd,
