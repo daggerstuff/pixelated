@@ -30,10 +30,18 @@ predicate isFHIRFile(File f) {
  * Targets the specific FHIR client method name "searchResources"
  * rather than generic substring patterns like "%search%" or "%find%"
  * that match every Array.find(), Array.filter(), or querySelector() call.
+ * Handles both direct calls and member-method calls on FHIR client objects.
  */
 predicate isFHIRSearch(CallExpr call) {
   isFHIRFile(call.getFile()) and
-  call.getCalleeName() = "searchResources"
+  (
+    call.getCallee().(VarRef).getName() = "searchResources"
+    or
+    exists(PropAccess pa |
+      call.getCallee() = pa and
+      pa.getPropertyName() = "searchResources"
+    )
+  )
 }
 
 /**
@@ -53,7 +61,7 @@ predicate hasInputSanitization(CallExpr call) {
   forall(DataFlow::Node arg |
     arg = DataFlow::exprNode(call.getAnArgument()) and
     not arg.asExpr() instanceof Literal
-    implies
+  |
     exists(CallExpr sanitizeCall |
       (
         sanitizeCall.getCalleeName().matches("%sanitize%") or
