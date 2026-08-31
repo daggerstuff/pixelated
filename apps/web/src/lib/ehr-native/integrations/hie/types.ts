@@ -8,8 +8,6 @@
  * @see docs/adr/ADR-005-security-rbac.md
  */
 
-import type { DocumentReference } from '@/lib/ehr-native/types'
-
 /** HIE network identifiers */
 export type HIENetwork =
   'carequality' | 'directtrust' | 'ehealthexchange' | 'local'

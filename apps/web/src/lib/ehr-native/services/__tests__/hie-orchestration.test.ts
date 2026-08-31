@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { EHRAuditService } from '../../audit/ehr-audit-service'
-import { EHRAuditAction } from '../../audit/events'
 import type { HIEAdapter } from '../../integrations/hie/adapter'
 import type {
   DocumentRetrievalRequest,

@@ -17,12 +17,10 @@ import type { HIEAdapter } from '../integrations/hie/adapter'
 import {
   HIEService,
   clampLimit,
-  clampOffset,
   requireHieId,
   sanitizeDocumentQuery,
   sanitizeBoundedText,
   sanitizeDirectAddress,
-  sanitizeIsoDate,
 } from '../integrations/hie/hie-service'
 import type {
   PatientDiscoveryRequest,

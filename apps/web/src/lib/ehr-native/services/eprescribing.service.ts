@@ -452,8 +452,10 @@ export class EPrescribingOrchestrationService {
         return this.auditService.logEPrescribeControlledSubstanceCheck(input)
       case EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK:
         return this.auditService.logEPrescribeDrugInteractionCheck(input)
+      default: {
+        const exhaustive: never = action
+        throw new Error(`Unsupported audit action: ${String(exhaustive)}`)
+      }
     }
-
-    throw new Error('Unsupported e-prescribing audit action')
   }
 }
