@@ -39,6 +39,9 @@ spec:
       terminationGracePeriodSeconds: 30
       securityContext:
         runAsNonRoot: true
+        # Image runs as `nextjs` (uid 1001) per the upstream Dockerfile
+        # (`adduser --system --uid 1001 nextjs`, `USER nextjs`). Must match
+        # or file ownership / startup writes break.
         runAsUser: 1001
         runAsGroup: 1001
         fsGroup: 1001
@@ -52,7 +55,11 @@ spec:
             capabilities:
               drop:
                 - ALL
-            readOnlyRootFilesystem: true
+            # Must be false: the umami postgresql image does not bundle the
+            # Prisma schema-engine. `prisma migrate deploy` downloads it at
+            # startup (binaries.prisma.sh); a read-only rootfs blocks that
+            # write → "Could not find schema-engine binary" → CrashLoopBackOff.
+            readOnlyRootFilesystem: false
           # Pinned immutable semver. GHCR org is umami-software (not umami-so —
           # that legacy org 404s on manifests). Do not use :latest.
           image: ghcr.io/umami-software/umami:postgresql-v2.19.0

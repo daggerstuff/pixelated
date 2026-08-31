@@ -2,6 +2,7 @@ minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - eve
 allowBuilds:
+  protobufjs: false
   sharp: false
 # Compatibility for eve releases with an incomplete runtime manifest.
 packageExtensions:

@@ -377,6 +377,38 @@ def cmd_evolution(args: argparse.Namespace) -> int:
         )
         print(f"   🔍 Root Cause: {les.root_cause_summary}")
         print(f"   💡 Distilled Rule: {les.actionable_rule}\n")
+def cmd_hitl(args: argparse.Namespace) -> int:
+    """Run interactive Human-in-the-Loop CLI Proxy Listener."""
+    from tools.agent_runner.hitl_proxy import EscalationStore, cli_proxy_listen
+    store = EscalationStore()
+    cli_proxy_listen(store)
+    return 0
+
+
+def cmd_onboard(args: argparse.Namespace) -> int:
+    """Run interactive setup and agent discovery wizard."""
+    from tools.agent_runner.onboarding import OnboardingWizard
+    wizard = OnboardingWizard()
+    wizard.run_interactive_setup()
+    return 0
+
+
+def cmd_monitor(args: argparse.Namespace) -> int:
+    """Run modern live cluster TUI and telemetry stream."""
+    setup_logging(args.verbose)
+    cfg_path = resolve_config_path(args.config)
+    config = load_config(cfg_path)
+    state_mgr = StateManager(args.state)
+    event_bus = EventBus()
+
+    from tools.agent_runner.monitor import LiveClusterMonitor
+    monitor = LiveClusterMonitor(config=config, state_mgr=state_mgr, event_bus=event_bus)
+
+    if getattr(args, "serve_http", False) or getattr(args, "port", None):
+        port = args.port or 8888
+        monitor.start_http_streamer(port=port)
+
+    monitor.run_live_tui(refresh_interval=args.interval)
     return 0
 
 
@@ -398,8 +430,18 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("skeptic", help="Run skeptic check on coordination threads")
     subparsers.add_parser("doctor", help="Inspect system health, API access, and agent CLIs")
     subparsers.add_parser("init-config", help="Generate an initial configuration tailored to this server")
+    subparsers.add_parser("onboard", help="Run interactive setup, health checks, and AI agent discovery wizard")
+    subparsers.add_parser("init", help="Run interactive setup, health checks, and AI agent discovery wizard")
     subparsers.add_parser("status", help="Show runner state and execution statistics")
     subparsers.add_parser("dashboard", help="Display live cluster observability monitor")
+
+    monitor_parser = subparsers.add_parser("monitor", help="Launch live-refreshing modern TUI cluster monitor")
+    monitor_parser.add_argument("-i", "--interval", type=int, default=2, help="TUI refresh interval in seconds")
+    monitor_parser.add_argument("-p", "--port", type=int, default=8888, help="Port to serve live JSON telemetry on HTTP")
+    monitor_parser.add_argument("--serve-http", action="store_true", help="Start background HTTP telemetry streamer")
+
+    subparsers.add_parser("hitl", help="Interactive Human-in-the-Loop CLI Proxy Listener")
+    subparsers.add_parser("escalations", help="Interactive Human-in-the-Loop CLI Proxy Listener")
 
     events_parser = subparsers.add_parser("events", help="Show recent immutable state events")
     events_parser.add_argument("-n", "--limit", type=int, default=25, help="Number of events to display")
@@ -441,14 +483,19 @@ def main() -> int:
     handlers = {
         "doctor": cmd_doctor,
         "init-config": cmd_init_config,
+        "onboard": cmd_onboard,
+        "init": cmd_onboard,
         "status": cmd_status,
         "dashboard": cmd_dashboard,
+        "monitor": cmd_monitor,
         "events": cmd_events,
         "plan": cmd_plan,
         "lineage": cmd_lineage,
         "evolution": cmd_evolution,
         "triage": cmd_triage,
         "skeptic": cmd_skeptic,
+        "hitl": cmd_hitl,
+        "escalations": cmd_hitl,
         "run": cmd_run,
     }
 

@@ -3,76 +3,179 @@ import AdminLayout from '../../components/admin/AdminLayout.astro'
 ---
 
 <AdminLayout title="Admin Dashboard" activeItem="dashboard">
-  <div class="container mx-auto p-4">
-    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
-    <p>
-      Welcome to the Admin Dashboard. Use the controls below to manage system
-      operations.
-    </p>
-    <div class="admin-controls mt-6">
-      <!-- Admin controls and widgets will be rendered here -->
-      <ul>
-        <li>
-          <a href="/admin/users" class="underline text-blue-600">Manage Users</a
-          >
-        </li>
-        <li>
-          <a href="/admin/audit-logs" class="underline text-blue-600"
-            >View Audit Logs</a
-          >
-        </li>
-        <li>
-          <a href="/admin/performance-dashboard" class="underline text-blue-600"
-            >Performance Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="/admin/ai/evidence-assistant" class="underline text-blue-600"
-            >AI Evidence Assistant</a
-          >
-        </li>
-        <li>
-          <a href="/admin/cache" class="underline text-blue-600"
-            >Cache Performance Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="/admin/ai-explainability" class="underline text-blue-600">
-            AI Explainability Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="/admin/oversight" class="underline text-blue-600">
-            Human Oversight Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="/admin/consent-management" class="underline text-blue-600">
-            Consent Management Dashboard</a
-          >
-        </li>
-        <li>
-          <a href="/admin/research-query" class="underline text-blue-600">
-            Research Query Engine</a
-          >
-        </li>
-        <li>
-          <a href="/admin/evidence-reports" class="underline text-blue-600">
-            Evidence Reports</a
-          >
-        </li>
-        <li>
-          <a href="/admin/api-keys" class="underline text-blue-600">
-            API Key Management</a
-          >
-        </li>
-        <li>
-          <a href="/admin/rate-limits" class="underline text-blue-600">
-            Rate Limits & Quota</a
-          >
-        </li>
-        <!-- Add more admin links as needed -->
-      </ul>
+  <div class="admin-dashboard p-6 md:p-8">
+    <div class="mb-8">
+      <span class="admin-kicker">Admin Dashboard</span>
+      <h1 class="admin-title">System overview</h1>
+      <p class="admin-subtitle">
+        Manage users, security, AI performance, and operational controls.
+      </p>
+    </div>
+
+    <div class="admin-cta mb-8">
+      <a
+        href="/admin/users"
+        class="admin-btn admin-btn--primary"
+        aria-label="Manage users — primary action"
+      >
+        Manage Users
+      </a>
+    </div>
+
+    <div class="admin-grid">
+      <section class="admin-section">
+        <h2 class="admin-section__title">Team Management</h2>
+        <ul class="admin-list">
+          <li><a href="/admin/users" class="admin-link">Manage Users</a></li>
+          <li><a href="/admin/api-keys" class="admin-link">API Key Management</a></li>
+          <li><a href="/admin/rate-limits" class="admin-link">Rate Limits &amp; Quota</a></li>
+        </ul>
+      </section>
+
+      <section class="admin-section">
+        <h2 class="admin-section__title">Security &amp; Compliance</h2>
+        <ul class="admin-list">
+          <li><a href="/admin/audit-logs" class="admin-link">View Audit Logs</a></li>
+          <li><a href="/admin/security-dashboard" class="admin-link">Security Dashboard</a></li>
+          <li><a href="/admin/security-settings" class="admin-link">Security Settings</a></li>
+          <li><a href="/admin/data-retention" class="admin-link">Data Retention</a></li>
+          <li><a href="/admin/consent-management" class="admin-link">Consent Management</a></li>
+          <li><a href="/admin/patient-rights" class="admin-link">Patient Rights</a></li>
+          <li><a href="/admin/data-transfer" class="admin-link">Data Transfer</a></li>
+          <li><a href="/admin/backup-security" class="admin-link">Backup Security</a></li>
+        </ul>
+      </section>
+
+      <section class="admin-section">
+        <h2 class="admin-section__title">AI &amp; Analytics</h2>
+        <ul class="admin-list">
+          <li><a href="/admin/ai/evidence-assistant" class="admin-link">AI Evidence Assistant</a></li>
+          <li><a href="/admin/ai-explainability" class="admin-link">AI Explainability Dashboard</a></li>
+          <li><a href="/admin/ai-performance" class="admin-link">AI Performance</a></li>
+          <li><a href="/admin/bias-detection" class="admin-link">Bias Detection</a></li>
+          <li><a href="/admin/evidence-reports" class="admin-link">Evidence Reports</a></li>
+          <li><a href="/admin/oversight" class="admin-link">Human Oversight</a></li>
+        </ul>
+      </section>
+
+      <section class="admin-section">
+        <h2 class="admin-section__title">Operations</h2>
+        <ul class="admin-list">
+          <li><a href="/admin/performance-dashboard" class="admin-link">Performance Dashboard</a></li>
+          <li><a href="/admin/cache" class="admin-link">Cache Performance</a></li>
+          <li><a href="/admin/compatibility-dashboard" class="admin-link">Compatibility Dashboard</a></li>
+          <li><a href="/admin/research-query" class="admin-link">Research Query Engine</a></li>
+          <li><a href="/admin/therapeutic" class="admin-link">Therapeutic Oversight</a></li>
+          <li><a href="/admin/state-consent-rules" class="admin-link">State Consent Rules</a></li>
+        </ul>
+      </section>
     </div>
   </div>
+
+  <style is:global>
+    .admin-dashboard {
+      background: var(--bg-primary, #1a1a18);
+      color: var(--text-primary, #ededed);
+      min-height: calc(100vh - 4rem);
+    }
+    .admin-kicker {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted, #6b6b66);
+    }
+    .admin-title {
+      font-family: var(--np-font-display, monospace);
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0.25rem 0 0.5rem;
+    }
+    .admin-subtitle {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text-muted, #6b6b66);
+      max-width: 60ch;
+    }
+    .admin-cta {
+      margin: 2rem 0;
+    }
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      font-family: var(--font-mono, monospace);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border: 1px solid var(--border-primary, #383838);
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: background 0.15s ease-out, border-color 0.15s ease-out;
+    }
+    .admin-btn--primary {
+      background: var(--text-primary, #ededed);
+      color: var(--bg-primary, #1a1a18);
+    }
+    .admin-btn--primary:hover {
+      background: var(--surface, #242424);
+    }
+    .admin-btn--primary:focus-visible {
+      outline: 2px solid var(--np-mid, #b3b3b3);
+      outline-offset: 2px;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .admin-section {
+      border-top: 1px solid var(--border-primary, #383838);
+      padding: 1.5rem 0;
+    }
+    .admin-section:first-child {
+      border-top: none;
+    }
+    .admin-section__title {
+      font-family: var(--font-mono, monospace);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted, #6b6b66);
+      margin: 0 0 1rem;
+    }
+    .admin-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .admin-link {
+      display: block;
+      padding: 0.5rem 0;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      color: var(--text-primary, #ededed);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-primary, #383838);
+    }
+    .admin-link:hover {
+      color: var(--np-mid, #b3b3b3);
+    }
+    .admin-link:focus-visible {
+      outline: 2px solid var(--np-mid, #b3b3b3);
+      outline-offset: 2px;
+      border-radius: 0.25rem;
+    }
+    @media (max-width: 640px) {
+      .admin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </AdminLayout>
