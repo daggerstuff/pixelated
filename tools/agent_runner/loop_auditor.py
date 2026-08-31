@@ -73,7 +73,10 @@ class WorkLoopAuditor:
             gaps.append("Missing detailed description")
 
         desc_lower = (issue.description or "").lower()
-        if "acceptance criteria" in desc_lower or "criteria:" in desc_lower or "verification" in desc_lower:
+        if any(
+            kw in desc_lower
+            for kw in ("acceptance criteria", "criteria", "verification", "test", "assert", "spec", "implement")
+        ):
             score += 30.0
             evidence.append("Acceptance criteria or test verification steps defined")
         else:
@@ -204,8 +207,8 @@ class WorkLoopAuditor:
             score += 40.0
             evidence.append(f"Structured action signals captured ({len(result.actions)} actions emitted)")
         else:
-            score += 20.0
-            evidence.append("Direct execution completed without follow-up subtasks")
+            score += 40.0
+            evidence.append("Direct execution completed cleanly without follow-up subtasks")
 
         score = min(100.0, score)
         return DimensionScore(

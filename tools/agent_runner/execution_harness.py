@@ -22,16 +22,16 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from tools.agent_runner.adapters import AgentAdapter, get_agent_adapter
+from tools.agent_runner.adapters import get_agent_adapter
 from tools.agent_runner.event_bus import EventBus, EventType
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
 from tools.agent_runner.hitl_proxy import EscalationStore
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
 from tools.agent_runner.loop_auditor import WorkLoopAuditor, WorkLoopAuditReport
-from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, ProjectConfig, RunnerConfig
+from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, RunnerConfig
 from tools.agent_runner.self_evolution import SelfEvolutionEngine
-from tools.agent_runner.state_graph import AgentState, CodingStateGraph
+from tools.agent_runner.state_graph import AgentState
 from tools.agent_runner.trace_analyzer import TraceAnalyzer, TraceSummary
 from tools.agent_runner.verifier import VerificationEngine
 
@@ -213,9 +213,29 @@ class AgentExecutionHarness:
                     esc_id,
                 )
 
+        # Populate concrete verification logs if clean
+        if report.overall_passed and not execution_result.verification_logs:
+            logs_summary = "\n".join(
+                f"Gate {g.stage_name}: {'PASSED' if g.passed else 'FAILED'}" for g in report.stages
+            )
+            execution_result.verification_logs = f"All 6 harness quality gates PASSED:\n{logs_summary}"
+
+        # Persist memory to Foresight on clean delivery
+        memories_stored = 0
+        if report.overall_passed:
+            try:
+                self.foresight.record_decision(
+                    f"[{issue.identifier}] {issue.title}: Implementation verified and passed all quality gates."
+                )
+                memories_stored += 1
+            except Exception as e:
+                logger.warning("Could not persist Foresight decision memory: %s", e)
+
         # Post-execution audit and trace analysis
         report.trace_summary = self.trace_analyzer.analyze_ticket_trace(issue.identifier)
-        report.audit_report = self.loop_auditor.evaluate_execution(issue, execution_result, is_sandboxed=True)
+        report.audit_report = self.loop_auditor.evaluate_execution(
+            issue, execution_result, is_sandboxed=True, memories_stored=memories_stored
+        )
         report.summary_markdown = self._generate_report_markdown(report)
 
         # Distill friction into Foresight
