@@ -27,6 +27,8 @@
     "apps/web/src/lib/middleware/csrf.ts",
     "apps/web/src/lib/research/services/*.ts",
     "apps/web/src/lib/ehr-native/services/*.ts",
+    "apps/web/src/lib/ehr-native/integrations/hie/*.ts",
+    "apps/web/src/lib/ehr-native/integrations/e-prescribing/*.ts",
     "apps/web/src/lib/fhe/exports.ts",
     "apps/web/src/lib/fhe/operations.ts",
     "apps/web/src/utils/offline/offlineManager.ts"

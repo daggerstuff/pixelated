@@ -363,6 +363,16 @@ export function buildSignatureConfig(
         secret: webhookSecret,
         format: 'twilio',
       }
+    case 'carequality':
+    case 'directtrust':
+    case 'dosespot':
+      return {
+        provider,
+        headerName: 'X-Webhook-Signature',
+        algorithm: 'sha256',
+        secret: webhookSecret,
+        format: 'hmac',
+      }
     default: {
       const exhaustive: never = provider
       throw new Error(`Unknown provider: ${String(exhaustive)}`)

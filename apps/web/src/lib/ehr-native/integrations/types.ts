@@ -19,6 +19,9 @@ export const integrationProviderSchema = z.enum([
   'zoom',
   'stripe',
   'twilio',
+  'carequality',
+  'directtrust',
+  'dosespot',
 ])
 export type IntegrationProvider = z.infer<typeof integrationProviderSchema>
 
@@ -28,6 +31,9 @@ export const PROVIDER_DISPLAY_NAMES: Record<IntegrationProvider, string> = {
   zoom: 'Zoom',
   stripe: 'Stripe',
   twilio: 'Twilio',
+  carequality: 'Carequality',
+  directtrust: 'DirectTrust',
+  dosespot: 'DoseSpot',
 }
 
 // ---------------------------------------------------------------------------
@@ -155,7 +161,14 @@ export const marketplaceProviderSchema = z.object({
   provider: integrationProviderSchema,
   displayName: z.string(),
   description: z.string(),
-  category: z.enum(['scheduling', 'video', 'payments', 'communications']),
+  category: z.enum([
+    'scheduling',
+    'video',
+    'payments',
+    'communications',
+    'hie',
+    'eprescribing',
+  ]),
   logoUrl: z.url().optional(),
   documentationUrl: z.url().optional(),
   defaultScopes: z.array(z.string()),
@@ -176,7 +189,14 @@ export const tenantProviderStatusSchema = z.object({
   // validation; stripping it broke UI consumers (Sentry 16312900/0).
   displayName: z.string(),
   description: z.string(),
-  category: z.enum(['scheduling', 'video', 'payments', 'communications']),
+  category: z.enum([
+    'scheduling',
+    'video',
+    'payments',
+    'communications',
+    'hie',
+    'eprescribing',
+  ]),
   logoUrl: z.url().optional(),
   documentationUrl: z.url().optional(),
   defaultScopes: z.array(z.string()),

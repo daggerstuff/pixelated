@@ -18,9 +18,7 @@ import type {
   DrugInteractionCheckResponse,
   PrescriptionTransmissionRequest,
   PrescriptionTransmissionResponse,
-  PrescriptionStatusRequest,
   PrescriptionStatusResponse,
-  PrescriptionCancelRequest,
   PrescriptionCancelResponse,
   MedicationInfo,
   ControlledSubstanceSchedule,
@@ -109,7 +107,7 @@ export class PrescriptionService {
       prescriberNPI: prescriber.npi,
     }
 
-    const patientId = medicationRequest.subject?.reference ?? ''
+    const patientId = extractPatientId(medicationRequest)
 
     // Safety gate: controlled substance eligibility must pass before any
     // transmission (DEA/EPCS/PDMP requirements).
@@ -173,10 +171,35 @@ export class PrescriptionService {
 }
 
 /**
+ * Extract the bare patient ID from a FHIR R4 subject reference.
+ *
+ * The subject reference is formatted as "Patient/{id}". Extracting here (not
+ * passing the raw reference through) keeps the patient identifier format
+ * consistent across the safety gates, the adapter, and the orchestration
+ * consent gate — DoseSpot must receive the same bare patient ID the rest of
+ * the orchestration flow uses. Throws (fail closed) on missing or malformed
+ * references so patient lookup / PDMP checks never run against an
+ * identifier like "Patient/123".
+ */
+export function extractPatientId(
+  medicationRequest: Pick<MedicationRequest, 'subject'>,
+): string {
+  const ref = medicationRequest.subject?.reference
+  if (!ref) {
+    throw new Error('MedicationRequest.subject.reference is required')
+  }
+  const match = ref.match(/^Patient\/(.+)$/)
+  if (!match) {
+    throw new Error(`Invalid subject reference: ${ref}`)
+  }
+  return match[1]
+}
+
+/**
  * Validate a US ZIP code (5 digits or ZIP+4) before adapter search so
  * unsanitized input never reaches FHIR/pharmacy lookup paths.
  */
-function sanitizeZipCode(zipCode: string): string {
+export function sanitizeZipCode(zipCode: string): string {
   const trimmed = zipCode.trim()
   if (!/^\d{5}(-\d{4})?$/.test(trimmed)) {
     throw new Error(
@@ -209,9 +232,14 @@ const KNOWN_SCHEDULES: Record<string, ControlledSubstanceSchedule> = {
 /**
  * Infer controlled substance schedule from medication code.
  *
- * A medication with NO code throws so the transmission path can never
- * bypass controlled-substance safety checks on missing data. Codes outside
- * the known formulary are treated as non-controlled.
+ * Fails closed: a missing code, or a code outside the known formulary,
+ * throws so transmission can never proceed on unverified schedule data.
+ * Defaulting unknown codes to 'non-controlled' would let unlisted
+ * controlled substances bypass the DEA/EPCS/PDMP gate, because the
+ * adapter's check trusts the supplied schedule instead of looking the
+ * drug up itself. Unknown medications are treated as potentially
+ * controlled and must be verified against the drug database before
+ * prescribing.
  */
 function inferSchedule(code: string): ControlledSubstanceSchedule {
   if (!code) {
@@ -219,12 +247,8 @@ function inferSchedule(code: string): ControlledSubstanceSchedule {
       'Medication code is required for controlled substance schedule inference',
     )
   }
-  // Unknown codes are treated as non-controlled only if explicitly verified;
-  // for safety, unknown controlled status defaults to requiring verification
   const schedule = KNOWN_SCHEDULES[code]
   if (schedule === undefined) {
-    // Conservative: unknown codes require controlled-substance verification path
-    // Caller must handle verification; returning 'non-controlled' would bypass safety
     throw new Error(
       `Unknown medication code '${code}' - cannot infer controlled substance schedule; verification required`,
     )

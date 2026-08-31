@@ -76,6 +76,9 @@ const OAUTH_AUTHORIZE_URLS: Record<IntegrationProvider, string> = {
   zoom: 'https://zoom.us/oauth/authorize',
   stripe: 'https://connect.stripe.com/oauth/authorize',
   twilio: 'https://accounts.twilio.com/oauth/authorize',
+  carequality: 'https://api.carequality.org/oauth/authorize',
+  directtrust: 'https://directtrust.org/oauth/authorize',
+  dosespot: 'https://api.dosespot.com/oauth/authorize',
 }
 
 const OAUTH_TOKEN_URLS: Record<IntegrationProvider, string> = {
@@ -83,6 +86,9 @@ const OAUTH_TOKEN_URLS: Record<IntegrationProvider, string> = {
   zoom: 'https://zoom.us/oauth/token',
   stripe: 'https://connect.stripe.com/oauth/token',
   twilio: 'https://accounts.twilio.com/oauth/token',
+  carequality: 'https://api.carequality.org/oauth/token',
+  directtrust: 'https://directtrust.org/oauth/token',
+  dosespot: 'https://api.dosespot.com/oauth/token',
 }
 
 function getWebhookSecret(provider: IntegrationProvider): string {

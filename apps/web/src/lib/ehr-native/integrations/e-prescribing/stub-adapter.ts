@@ -175,11 +175,22 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
   ): Promise<ControlledSubstanceCheckResult> {
     const { medication } = request
 
-    if (medication.schedule === 'non-controlled') {
+    // Defense in depth: classification never trusts the caller-supplied
+    // schedule. Codes present in the stub's own drug database use the
+    // database's schedule regardless of the caller's claim. A code the
+    // database cannot classify is treated as potentially controlled until
+    // verified, so a forged 'non-controlled' claim can never bypass the
+    // DEA/EPCS/PDMP gate.
+    const known = KNOWN_CONTROLLED[medication.code]
+    const schedule = known?.schedule ?? medication.schedule
+
+    if (!known && medication.schedule === 'non-controlled') {
       return {
-        allowed: true,
+        allowed: false,
+        reason:
+          'Unverified medication: schedule must be confirmed against the drug database before prescribing',
         pdmpChecked: false,
-        epcsRequired: false,
+        epcsRequired: true,
       }
     }
 
@@ -204,7 +215,7 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
         : `Patient has ${priorCount} prior prescriptions on file`
 
     // Simulate Schedule I restriction (not prescribable)
-    if (medication.schedule === 'I') {
+    if (schedule === 'I') {
       return {
         allowed: false,
         reason: 'Schedule I substances cannot be prescribed',
@@ -263,7 +274,7 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
     const medCode =
       medicationRequest.medicationCodeableConcept?.coding?.[0]?.code ?? ''
     const controlled = KNOWN_CONTROLLED[medCode]
-    if (controlled && controlled.schedule === 'I') {
+    if (controlled?.schedule === 'I') {
       return {
         transmissionId: nextId('RX'),
         status: 'error',
@@ -271,14 +282,16 @@ export class StubEPrescribingAdapter implements EPrescribingAdapter {
         message: 'Schedule I substances cannot be prescribed',
       }
     }
-    if (controlled && controlled.schedule !== 'non-controlled') {
-      if (!prescriber.deaNumber) {
-        return {
-          transmissionId: nextId('RX'),
-          status: 'error',
-          transmittedAt: new Date().toISOString(),
-          message: 'DEA number required for controlled substance prescription',
-        }
+    if (
+      controlled &&
+      controlled.schedule !== 'non-controlled' &&
+      !prescriber.deaNumber
+    ) {
+      return {
+        transmissionId: nextId('RX'),
+        status: 'error',
+        transmittedAt: new Date().toISOString(),
+        message: 'DEA number required for controlled substance prescription',
       }
     }
 
