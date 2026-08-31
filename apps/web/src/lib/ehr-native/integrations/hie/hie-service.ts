@@ -40,10 +40,35 @@ const ISO_TIMESTAMP_PATTERN =
 /** Free-text field cap bounding input size before it reaches the adapter. */
 const MAX_TEXT_LENGTH = 200
 
+/**
+ * Direct address per RFC 5598: local@domain with a public suffix domain.
+ * Local part limited to unreserved characters; domain requires at least
+ * one dot to prevent bare-host placeholders like `@localhost`.
+ */
+const DIRECT_ADDRESS_PATTERN =
+  /^[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+$/
+
 export function requireHieId(value: string, field: string): string {
   const trimmed = value.trim()
   if (!HIE_ID_PATTERN.test(trimmed)) {
     throw new Error(`Invalid ${field}: expected an HIE identifier token`)
+  }
+  return trimmed
+}
+
+export function sanitizeDirectAddress(
+  value: string | undefined,
+  field: string,
+): string | undefined {
+  if (value === undefined) return undefined
+  const trimmed = value.trim().toLowerCase()
+  if (
+    trimmed.length > MAX_TEXT_LENGTH ||
+    !DIRECT_ADDRESS_PATTERN.test(trimmed)
+  ) {
+    throw new Error(
+      `Invalid ${field}: expected a Direct address (local@domain)`,
+    )
   }
   return trimmed
 }
@@ -82,6 +107,23 @@ export function clampLimit(limit: number | undefined): number | undefined {
 export function clampOffset(offset: number | undefined): number | undefined {
   if (offset === undefined || !Number.isFinite(offset)) return undefined
   return Math.max(Math.trunc(offset), 0)
+}
+
+export function sanitizeDocumentQuery(
+  request: DocumentQueryRequest,
+): DocumentQueryRequest {
+  return {
+    ...request,
+    patientId: requireHieId(request.patientId, 'patientId'),
+    authorOrganizationId: optionalHieId(
+      request.authorOrganizationId,
+      'authorOrganizationId',
+    ),
+    fromDate: sanitizeIsoDate(request.fromDate, 'fromDate'),
+    toDate: sanitizeIsoDate(request.toDate, 'toDate'),
+    limit: clampLimit(request.limit),
+    offset: clampOffset(request.offset),
+  }
 }
 
 /**
@@ -135,19 +177,7 @@ export class HIEService {
   async queryDocuments(
     request: DocumentQueryRequest,
   ): Promise<DocumentQueryResult> {
-    const sanitized: DocumentQueryRequest = {
-      ...request,
-      patientId: requireHieId(request.patientId, 'patientId'),
-      authorOrganizationId: optionalHieId(
-        request.authorOrganizationId,
-        'authorOrganizationId',
-      ),
-      fromDate: sanitizeIsoDate(request.fromDate, 'fromDate'),
-      toDate: sanitizeIsoDate(request.toDate, 'toDate'),
-      limit: clampLimit(request.limit),
-      offset: clampOffset(request.offset),
-    }
-    return this.adapter.queryDocuments(sanitized)
+    return this.adapter.queryDocuments(sanitizeDocumentQuery(request))
   }
 
   /**
@@ -171,6 +201,10 @@ export class HIEService {
   async submitDocument(
     request: DocumentSubmissionRequest,
   ): Promise<DocumentSubmissionResult> {
+    const recipientDirectAddress = sanitizeDirectAddress(
+      request.recipientDirectAddress,
+      'recipientDirectAddress',
+    )
     const sanitized: DocumentSubmissionRequest = {
       ...request,
       patientId: requireHieId(request.patientId, 'patientId'),
@@ -183,6 +217,7 @@ export class HIEService {
         request.authorPractitionerId,
         'authorPractitionerId',
       ),
+      recipientDirectAddress,
     }
     return this.adapter.submitDocument(sanitized)
   }

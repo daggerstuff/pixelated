@@ -39,7 +39,9 @@ type EPrescribeAction =
   | typeof EHRAuditAction.EPRESCRIBE_NEW_RX
   | typeof EHRAuditAction.EPRESCRIBE_REFILL
   | typeof EHRAuditAction.EPRESCRIBE_CANCEL
+  | typeof EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK
   | typeof EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY
+  | typeof EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK
   | typeof EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK
 
 /**
@@ -59,6 +61,20 @@ export class EPrescribeConsentDeniedError extends Error {
   ) {
     super(`Consent denied for user ${userId} (consent type: ${consentTypeId})`)
     this.name = 'EPrescribeConsentDeniedError'
+  }
+}
+
+export class EPrescribeAuditWriteError extends Error {
+  readonly auditWriteError: unknown
+  readonly operationError?: unknown
+
+  constructor(auditWriteError: unknown, operationError?: unknown) {
+    super('E-prescribing audit write failed', { cause: auditWriteError })
+    this.name = 'EPrescribeAuditWriteError'
+    this.auditWriteError = auditWriteError
+    if (operationError !== undefined) {
+      this.operationError = operationError
+    }
   }
 }
 
@@ -122,7 +138,7 @@ export class EPrescribingOrchestrationService {
       )
     } catch (error) {
       await this.auditError(
-        EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK,
+        EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK,
         userId,
         patientId,
         error,
@@ -131,7 +147,7 @@ export class EPrescribingOrchestrationService {
     }
 
     await this.auditSuccess(
-      EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK,
+      EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK,
       userId,
       patientId,
       { allowed: result.allowed, epcsRequired: result.epcsRequired },
@@ -250,7 +266,7 @@ export class EPrescribingOrchestrationService {
         await this.prescriptionService.checkPrescriptionStatus(transmissionId)
     } catch (error) {
       await this.auditError(
-        EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY,
+        EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK,
         userId,
         patientId,
         error,
@@ -259,7 +275,7 @@ export class EPrescribingOrchestrationService {
     }
 
     await this.auditSuccess(
-      EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY,
+      EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK,
       userId,
       patientId,
       { transmissionId: result.transmissionId, status: result.status },
@@ -370,7 +386,11 @@ export class EPrescribingOrchestrationService {
       medicationRequestId: extra?.medicationRequestId,
       metadata,
     }
-    this.routeAudit(action, input)
+    try {
+      await this.routeAudit(action, input)
+    } catch (auditWriteError) {
+      throw new EPrescribeAuditWriteError(auditWriteError)
+    }
   }
 
   private async auditError(
@@ -388,32 +408,38 @@ export class EPrescribingOrchestrationService {
       integrationSource: 'dosespot',
       medicationRequestId: extra?.medicationRequestId,
     }
-    this.routeAudit(action, input)
+    try {
+      await this.routeAudit(action, input)
+    } catch (auditWriteError) {
+      throw new EPrescribeAuditWriteError(auditWriteError, error)
+    }
   }
 
   /**
-   * Route the audit call to the appropriate builder method.
+   * Route and await the audit call so an operation cannot report success
+   * before its audit event is persisted.
    */
-  private routeAudit(
+  private async routeAudit(
     action: EPrescribeAction,
     input: EPrescribeAuditInput,
-  ): void {
+  ): Promise<string> {
     switch (action) {
       case EHRAuditAction.EPRESCRIBE_NEW_RX:
-        void this.auditService.logEPrescribeNewRx(input)
-        break
+        return this.auditService.logEPrescribeNewRx(input)
       case EHRAuditAction.EPRESCRIBE_REFILL:
-        void this.auditService.logEPrescribeRefill(input)
-        break
+        return this.auditService.logEPrescribeRefill(input)
       case EHRAuditAction.EPRESCRIBE_CANCEL:
-        void this.auditService.logEPrescribeCancel(input)
-        break
+        return this.auditService.logEPrescribeCancel(input)
+      case EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK:
+        return this.auditService.logEPrescribePrescriptionStatusCheck(input)
       case EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY:
-        void this.auditService.logEPrescribeMedicationHistory(input)
-        break
+        return this.auditService.logEPrescribeMedicationHistory(input)
+      case EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK:
+        return this.auditService.logEPrescribeControlledSubstanceCheck(input)
       case EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK:
-        void this.auditService.logEPrescribeDrugInteractionCheck(input)
-        break
+        return this.auditService.logEPrescribeDrugInteractionCheck(input)
     }
+
+    throw new Error('Unsupported e-prescribing audit action')
   }
 }

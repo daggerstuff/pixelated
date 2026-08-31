@@ -566,11 +566,51 @@ export class EHRAuditService {
     )
   }
 
+  async logEPrescribePrescriptionStatusCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
   async logEPrescribeMedicationHistory(
     input: EPrescribeAuditInput,
   ): Promise<string> {
     return this.log(
       EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeControlledSubstanceCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK,
       EHRResourceType.EPRESCRIPTION,
       input.medicationRequestId,
       {

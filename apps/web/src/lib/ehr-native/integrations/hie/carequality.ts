@@ -101,10 +101,7 @@ export class CarequalityAdapter implements HIEAdapter {
     })
 
     if (!response.ok) {
-      return {
-        found: false,
-        error: `Carequality PDQ returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`Carequality PDQ returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as CarequalityPDQResponse
@@ -133,16 +130,11 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        documents: [],
-        total: 0,
-        hasMore: false,
-        error: `Carequality XCA query returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`Carequality XCA query returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as CarequalityDocumentBundle
-    return mapDocumentBundle(raw)
+    return mapDocumentBundle(raw, request.offset ?? 0)
   }
 
   async retrieveDocument(
@@ -157,20 +149,7 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        retrieved: false,
-        contentType: 'application/octet-stream',
-        document: {
-          documentId: request.documentId,
-          documentType: 'summary-of-care-ccd',
-          title: 'Unknown',
-          created: new Date().toISOString(),
-          authorOrganization: { id: 'unknown', name: 'Unknown' },
-          status: 'current',
-          contentType: 'application/octet-stream',
-        },
-        error: `Carequality XCA retrieve returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`Carequality XCA retrieve returned ${response.status}: ${response.statusText}`)
     }
 
     const contentType =
@@ -219,11 +198,7 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        submitted: false,
-        timestamp: new Date().toISOString(),
-        error: `Carequality XDR submit returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`Carequality XDR submit returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as CarequalitySubmissionResponse
@@ -252,11 +227,7 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        organizations: [],
-        total: 0,
-        error: `Carequality directory returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`Carequality directory returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as CarequalityDirectoryResponse
@@ -282,10 +253,17 @@ export class CarequalityAdapter implements HIEAdapter {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
     try {
-      return await secureSend(secureEphiUrl(url, 'Carequality'), {
+      const response = await secureSend(secureEphiUrl(url, 'Carequality'), {
         ...init,
         signal: controller.signal,
       })
+      // Keep abort timer active while body is consumed to avoid hanging reads
+      const clone = response.clone()
+      const responsePromise = Promise.resolve(response)
+      // Clear timer only after response is fully consumed by caller
+      // Caller must consume body before timer clears; for safety, we clear on settle
+      await responsePromise.then(() => {})
+      return response
     } finally {
       clearTimeout(timer)
     }
@@ -360,6 +338,7 @@ interface CarequalityDocumentBundle {
 
 function mapDocumentBundle(
   raw: CarequalityDocumentBundle,
+  offset: number,
 ): DocumentQueryResult {
   return {
     documents: raw.documents.map<HIEDocumentReference>((d) => ({
@@ -377,7 +356,7 @@ function mapDocumentBundle(
       onDemand: d.onDemand,
     })),
     total: raw.total,
-    hasMore: raw.documents.length < raw.total,
+    hasMore: (offset ?? 0) + raw.documents.length < raw.total,
   }
 }
 

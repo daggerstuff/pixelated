@@ -19,7 +19,9 @@ import {
   clampLimit,
   clampOffset,
   requireHieId,
+  sanitizeDocumentQuery,
   sanitizeBoundedText,
+  sanitizeDirectAddress,
   sanitizeIsoDate,
 } from '../integrations/hie/hie-service'
 import type {
@@ -97,10 +99,13 @@ export class HIEOrchestrationService {
       throw error
     }
 
-    await this.auditSuccess(action, userId, {
-      integrationSource: 'hie',
-      metadata: { found: result.found, patientId: result.patientId },
-    })
+    await this.auditResultOutcome(
+      action,
+      userId,
+      result,
+      { integrationSource: 'hie' },
+      { found: result.found, patientId: result.patientId },
+    )
 
     return result
   }
@@ -118,23 +123,10 @@ export class HIEOrchestrationService {
     const action = EHRAuditAction.HIE_DOCUMENT_QUERY
     let result: DocumentQueryResult
 
-    // Validate FHIR query inputs at the orchestration trust boundary before
-    // they reach the HIE service / adapter layer.
-    const validated: DocumentQueryRequest = {
-      ...request,
-      patientId: requireHieId(request.patientId, 'patientId'),
-      authorOrganizationId:
-        request.authorOrganizationId === undefined
-          ? undefined
-          : requireHieId(request.authorOrganizationId, 'authorOrganizationId'),
-      fromDate: sanitizeIsoDate(request.fromDate, 'fromDate'),
-      toDate: sanitizeIsoDate(request.toDate, 'toDate'),
-      limit: clampLimit(request.limit),
-      offset: clampOffset(request.offset),
-    }
-
     try {
-      result = await this.hieService.queryDocuments(validated)
+      result = await this.hieService.queryDocuments(
+        sanitizeDocumentQuery(request),
+      )
     } catch (error) {
       await this.auditError(action, userId, error, {
         integrationSource: 'hie',
@@ -143,11 +135,13 @@ export class HIEOrchestrationService {
       throw error
     }
 
-    await this.auditSuccess(action, userId, {
-      integrationSource: 'hie',
-      patientId: request.patientId,
-      metadata: { total: result.total, hasMore: result.hasMore },
-    })
+    await this.auditResultOutcome(
+      action,
+      userId,
+      result,
+      { integrationSource: 'hie', patientId: request.patientId },
+      { total: result.total, hasMore: result.hasMore },
+    )
 
     return result
   }
@@ -175,14 +169,16 @@ export class HIEOrchestrationService {
       throw error
     }
 
-    await this.auditSuccess(action, userId, {
-      integrationSource: 'hie',
-      patientId: request.patientId,
-      metadata: {
+    await this.auditResultOutcome(
+      action,
+      userId,
+      result,
+      { integrationSource: 'hie', patientId: request.patientId },
+      {
         retrieved: result.retrieved,
         contentType: result.contentType,
       },
-    })
+    )
 
     return result
   }
@@ -200,8 +196,23 @@ export class HIEOrchestrationService {
     const action = EHRAuditAction.HIE_DOCUMENT_SUBMIT
     let result: DocumentSubmissionResult
 
+    // Validate recipient Direct address at the orchestration trust boundary
+    // before it reaches the HIE service / adapter layer.
+    const validated: DocumentSubmissionRequest = {
+      ...request,
+      patientId: requireHieId(request.patientId, 'patientId'),
+      authorOrganizationId: requireHieId(
+        request.authorOrganizationId,
+        'authorOrganizationId',
+      ),
+      recipientDirectAddress: sanitizeDirectAddress(
+        request.recipientDirectAddress,
+        'recipientDirectAddress',
+      ),
+    }
+
     try {
-      result = await this.hieService.submitDocument(request)
+      result = await this.hieService.submitDocument(validated)
     } catch (error) {
       await this.auditError(action, userId, error, {
         integrationSource: 'hie',
@@ -210,14 +221,16 @@ export class HIEOrchestrationService {
       throw error
     }
 
-    await this.auditSuccess(action, userId, {
-      integrationSource: 'hie',
-      patientId: request.patientId,
-      metadata: {
+    await this.auditResultOutcome(
+      action,
+      userId,
+      result,
+      { integrationSource: 'hie', patientId: request.patientId },
+      {
         submitted: result.submitted,
         documentId: result.documentId ?? null,
       },
-    })
+    )
 
     return result
   }
@@ -250,10 +263,13 @@ export class HIEOrchestrationService {
       throw error
     }
 
-    await this.auditSuccess(action, userId, {
-      integrationSource: 'hie',
-      metadata: { total: result.total },
-    })
+    await this.auditResultOutcome(
+      action,
+      userId,
+      result,
+      { integrationSource: 'hie' },
+      { total: result.total },
+    )
 
     return result
   }
@@ -284,6 +300,28 @@ export class HIEOrchestrationService {
       userId,
       status: 'success',
     })
+  }
+
+  /**
+   * Audit a completed adapter call based on its result object, not just
+   * whether it threw. Adapters signal remote failures either by throwing
+   * or by returning a result carrying an `error` message or an
+   * unsuccessful flag (`found: false` on error, `retrieved: false`,
+   * `submitted: false`). Both paths must land as audit failures so
+   * failed HIE operations are never logged as successes.
+   */
+  private async auditResultOutcome(
+    action: Parameters<EHRAuditService['logIntegration']>[0],
+    userId: string,
+    result: { error?: string },
+    input: Omit<IntegrationAuditInput, 'userId' | 'status'>,
+    metadata: Record<string, unknown>,
+  ): Promise<void> {
+    if (result.error !== undefined) {
+      await this.auditError(action, userId, new Error(result.error), input)
+      return
+    }
+    await this.auditSuccess(action, userId, { ...input, metadata })
   }
 
   private async auditError(

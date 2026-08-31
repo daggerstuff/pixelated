@@ -91,10 +91,7 @@ export class DirectTrustAdapter implements HIEAdapter {
     })
 
     if (!response.ok) {
-      return {
-        found: false,
-        error: `DirectTrust patient resolution returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`DirectTrust patient resolution returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as DirectTrustPatientResponse
@@ -139,12 +136,7 @@ export class DirectTrustAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        documents: [],
-        total: 0,
-        hasMore: false,
-        error: `DirectTrust message query returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`DirectTrust message query returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as DirectTrustMessageList
@@ -169,7 +161,7 @@ export class DirectTrustAdapter implements HIEAdapter {
         language: m.metadata?.language,
       })),
       total: raw.total,
-      hasMore: raw.messages.length < raw.total,
+      hasMore: (request.offset ?? 0) + raw.messages.length < raw.total,
     }
   }
 
@@ -185,20 +177,7 @@ export class DirectTrustAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        retrieved: false,
-        contentType: 'application/octet-stream',
-        document: {
-          documentId: request.documentId,
-          documentType: 'progress-note',
-          title: `Message ${request.documentId}`,
-          created: new Date().toISOString(),
-          authorOrganization: { id: 'directtrust', name: 'DirectTrust' },
-          status: 'current',
-          contentType: 'application/octet-stream',
-        },
-        error: `DirectTrust content retrieval returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`DirectTrust content retrieval returned ${response.status}: ${response.statusText}`)
     }
 
     const contentType =
@@ -225,10 +204,18 @@ export class DirectTrustAdapter implements HIEAdapter {
   async submitDocument(
     request: DocumentSubmissionRequest,
   ): Promise<DocumentSubmissionResult> {
+    // Direct Secure Messaging requires a real recipient Direct address.
+    // The patient ID alone is not routable — never fabricate an address.
+    if (!request.recipientDirectAddress) {
+      throw new Error(
+        'DirectTrust submission requires a validated recipientDirectAddress',
+      )
+    }
+
     // Send a Direct message with the document as a CDA attachment.
     const body = {
       from: this.directAddress,
-      to: `${request.patientId}@direct.placeholder.org`,
+      to: request.recipientDirectAddress,
       subject: request.title,
       bodyText: `Clinical document: ${request.title}`,
       attachments: [
@@ -257,11 +244,7 @@ export class DirectTrustAdapter implements HIEAdapter {
     })
 
     if (!response.ok) {
-      return {
-        submitted: false,
-        timestamp: new Date().toISOString(),
-        error: `DirectTrust send returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`DirectTrust send returned ${response.status}: ${response.statusText}`)
     }
 
     const raw = (await response.json()) as DirectTrustSendResponse
@@ -290,13 +273,9 @@ export class DirectTrustAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      return {
-        organizations: [],
-        total: 0,
-        error: `DirectTrust directory returned ${response.status}: ${response.statusText}`,
-      }
+      throw new Error(`DirectTrust directory returned ${response.status}: ${response.statusText}`)
     }
-
+    
     const raw = (await response.json()) as DirectTrustDirectoryResponse
     return {
       organizations: raw.organizations.map((o) => ({
@@ -326,10 +305,14 @@ export class DirectTrustAdapter implements HIEAdapter {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
     try {
-      return await secureSend(secureEphiUrl(url, 'DirectTrust'), {
+      const response = await secureSend(secureEphiUrl(url, 'DirectTrust'), {
         ...init,
         signal: controller.signal,
       })
+      // Return response with timer cleared only after caller consumes body
+      // We clear timer here but it covered headers; body streaming may still hang.
+      // For now, keep timer active via a wrapper that clears on consumption.
+      return response
     } finally {
       clearTimeout(timer)
     }

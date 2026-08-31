@@ -82,7 +82,10 @@ export const EHRAuditAction = {
   EPRESCRIBE_NEW_RX: 'eprescribe_new_rx',
   EPRESCRIBE_REFILL: 'eprescribe_refill',
   EPRESCRIBE_CANCEL: 'eprescribe_cancel',
+  EPRESCRIBE_PRESCRIPTION_STATUS_CHECK: 'eprescribe_prescription_status_check',
   EPRESCRIBE_MEDICATION_HISTORY: 'eprescribe_medication_history',
+  EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK:
+    'eprescribe_controlled_substance_check',
   EPRESCRIBE_DRUG_INTERACTION_CHECK: 'eprescribe_drug_interaction_check',
 
   // HIE / Integration
@@ -316,7 +319,9 @@ export function ehrActionToEventType(
     return AuditEventType.DELETE
   }
   if (
+    action === EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK ||
     action === EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY ||
+    action === EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK ||
     action === EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK
   ) {
     return AuditEventType.ACCESS

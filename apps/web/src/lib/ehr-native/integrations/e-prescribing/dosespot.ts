@@ -148,6 +148,21 @@ function mapInteraction(raw: DoseSpotInteraction): DrugInteractionAlert {
   }
 }
 
+function extractPatientId(
+  medicationRequest: PrescriptionTransmissionRequest['medicationRequest'],
+): string {
+  const reference = medicationRequest.subject?.reference
+  const match = reference?.match(/^Patient\/([^/]+)$/)
+
+  if (!match) {
+    throw new Error(
+      `Invalid MedicationRequest.subject.reference: ${reference ?? 'missing'}`,
+    )
+  }
+
+  return match[1]
+}
+
 export class DoseSpotAdapter implements EPrescribingAdapter {
   private readonly timeoutMs: number
 
@@ -291,7 +306,10 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
   async transmitPrescription(
     request: PrescriptionTransmissionRequest,
   ): Promise<PrescriptionTransmissionResponse> {
+    const patientId = extractPatientId(request.medicationRequest)
+
     const body = {
+      patientId,
       medicationRequest: {
         id: request.medicationRequest.identifier?.[0]?.value ?? '',
         status: request.medicationRequest.status,

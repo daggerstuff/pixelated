@@ -185,6 +185,13 @@ export interface DocumentSubmissionRequest {
   authorOrganizationId: string
   /** Authoring practitioner identifier */
   authorPractitionerId?: string
+  /**
+   * Validated recipient Direct address (e.g. clinic@direct.example.org).
+   * Required for Direct Secure Messaging networks (DirectTrust) — messages
+   * are addressed to this recipient, never inferred from the patient ID.
+   * Optional for push networks (Carequality XDR) that route by patient/org.
+   */
+  recipientDirectAddress?: string
   /** ISO 8601 creation timestamp (defaults to now) */
   created?: string
   /** Document language code (default 'en') */
