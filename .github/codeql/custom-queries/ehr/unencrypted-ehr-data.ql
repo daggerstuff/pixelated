@@ -25,16 +25,40 @@ predicate isEHRFile(File f) {
 }
 
 /**
+ * Identifies expressions that represent HTTP client objects based on
+ * variable naming conventions common in EHR modules. Combined with the
+ * EHR file restriction and the method-name check, this precisely targets
+ * network transmission calls and avoids false positives from non-HTTP
+ * objects (Map.get, redisClient.get, etc.).
+ */
+predicate isHttpClientReceiver(Expr receiver) {
+  receiver.(VarRef).getName().matches("%axios%") or
+  receiver.(VarRef).getName().matches("%request%") or
+  receiver.(VarRef).getName().matches("%http%") or
+  receiver.(VarRef).getName().matches("%api%") or
+  receiver.(VarRef).getName().matches("%fetch%")
+}
+
+/**
  * Matches actual network transmission calls within EHR modules.
- * Covers both direct invocations (`fetch(...)`, `axios(...)`, `request(...)`)
- * and member-method invocations on HTTP clients (`axios.post(...)`,
- * `request.get(...)`, etc.), whose CodeQL callee name is the member method
- * rather than the client object.
+ * Handles direct function invocations (fetch, axios, request) and
+ * member-method invocations on HTTP client objects (axios.post, api.get,
+ * etc.). Member calls are restricted to HTTP client receivers via
+ * isHttpClientReceiver to prevent false positives from non-HTTP objects.
  */
 predicate isDataTransmissionCall(CallExpr call) {
   isEHRFile(call.getFile()) and
-  call.getCalleeName() =
-    ["fetch", "axios", "request", "post", "get", "put", "patch", "delete"]
+  (
+    // Direct function calls: fetch(...), axios(...), request(...)
+    call.getCallee().(VarRef).getName() = ["fetch", "axios", "request"]
+    or
+    // Member method calls on HTTP client objects: axios.post(...), etc.
+    exists(PropAccess pa |
+      call.getCallee() = pa and
+      pa.getPropertyName() = ["post", "get", "put", "patch", "delete"] and
+      isHttpClientReceiver(pa.getBase())
+    )
+  )
 }
 
 /**
