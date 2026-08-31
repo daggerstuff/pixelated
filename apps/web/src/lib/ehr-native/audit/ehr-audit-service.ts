@@ -203,7 +203,7 @@ export class EHRAuditService {
       errorMessage: input.errorMessage,
       ipAddress: input.ipAddress,
       userAgent: input.userAgent,
-      metadata: input.metadata as Record<string, unknown> | undefined,
+      metadata: input.metadata,
     }
 
     return this.logger.logEvent(event)

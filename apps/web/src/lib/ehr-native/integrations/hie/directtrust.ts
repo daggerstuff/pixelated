@@ -84,19 +84,15 @@ export class DirectTrustAdapter implements HIEAdapter {
       ...(request.identifier ? { identifier: request.identifier } : {}),
     }
 
-    const response = await this.transmit(`${this.baseUrl}/patients/resolve`, {
-      method: 'POST',
-      headers: this.jsonHeaders(),
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      throw new Error(
-        `DirectTrust patient resolution returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as DirectTrustPatientResponse
+    const raw = await this.transmitJson<DirectTrustPatientResponse>(
+      `${this.baseUrl}/patients/resolve`,
+      {
+        method: 'POST',
+        headers: this.jsonHeaders(),
+        body: JSON.stringify(body),
+      },
+      'DirectTrust patient resolution returned',
+    )
     return {
       found: raw.found,
       patientId: raw.patientId,
@@ -129,21 +125,14 @@ export class DirectTrustAdapter implements HIEAdapter {
     if (request.limit) params.set('_count', String(request.limit))
     if (request.offset) params.set('_offset', String(request.offset))
 
-    const response = await this.transmit(
+    const raw = await this.transmitJson<DirectTrustMessageList>(
       `${this.baseUrl}/messages/received?${params.toString()}`,
       {
         method: 'GET',
         headers: this.jsonHeaders(),
       },
+      'DirectTrust message query returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `DirectTrust message query returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as DirectTrustMessageList
     return {
       documents: raw.messages.map((m) => ({
         documentId: m.id,
@@ -172,24 +161,14 @@ export class DirectTrustAdapter implements HIEAdapter {
   async retrieveDocument(
     request: DocumentRetrievalRequest,
   ): Promise<DocumentRetrievalResult> {
-    const response = await this.transmit(
+    const { contentType, content } = await this.transmitBinary(
       `${this.baseUrl}/messages/${encodeURIComponent(request.documentId)}/content?patientId=${encodeURIComponent(request.patientId)}`,
       {
         method: 'GET',
         headers: this.jsonHeaders(),
       },
+      'DirectTrust content retrieval returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `DirectTrust content retrieval returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const contentType =
-      response.headers.get('Content-Type') ?? 'application/octet-stream'
-    const arrayBuffer = await response.arrayBuffer()
-    const content = uint8ArrayToBase64(new Uint8Array(arrayBuffer))
 
     return {
       retrieved: true,
@@ -243,19 +222,15 @@ export class DirectTrustAdapter implements HIEAdapter {
       },
     }
 
-    const response = await this.transmit(`${this.baseUrl}/messages/send`, {
-      method: 'POST',
-      headers: this.jsonHeaders(),
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      throw new Error(
-        `DirectTrust send returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as DirectTrustSendResponse
+    const raw = await this.transmitJson<DirectTrustSendResponse>(
+      `${this.baseUrl}/messages/send`,
+      {
+        method: 'POST',
+        headers: this.jsonHeaders(),
+        body: JSON.stringify(body),
+      },
+      'DirectTrust send returned',
+    )
     return {
       submitted: true,
       documentId: raw.messageId,
@@ -272,21 +247,14 @@ export class DirectTrustAdapter implements HIEAdapter {
     if (request.name) params.set('name', request.name)
     if (request.limit) params.set('_count', String(request.limit))
 
-    const response = await this.transmit(
+    const raw = await this.transmitJson<DirectTrustDirectoryResponse>(
       `${this.baseUrl}/directory?${params.toString()}`,
       {
         method: 'GET',
         headers: this.jsonHeaders(),
       },
+      'DirectTrust directory returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `DirectTrust directory returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as DirectTrustDirectoryResponse
     return {
       organizations: raw.organizations.map((o) => ({
         id: o.id,
@@ -311,18 +279,63 @@ export class DirectTrustAdapter implements HIEAdapter {
     }
   }
 
-  private async transmit(url: string, init: RequestInit): Promise<Response> {
+  /**
+   * Send a request and consume the JSON body inside the abort-timeout
+   * window. The timer must cover body streaming, not just headers, or a
+   * server that sends headers and stalls the body would hang past the
+   * configured timeout.
+   */
+  private async transmitJson<T>(
+    url: string,
+    init: RequestInit,
+    errorMessage: string,
+  ): Promise<T> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
     try {
-      // `return await` (not a bare return) is deliberate: the finally block
-      // must only clear the abort timer once the request has settled.
-      // The timer covers the request up to headers; body streaming is
-      // currently unguarded.
-      return await secureSend(secureEphiUrl(url, 'DirectTrust'), {
+      const response = await secureSend(secureEphiUrl(url, 'DirectTrust'), {
         ...init,
         signal: controller.signal,
       })
+      if (!response.ok) {
+        throw new Error(
+          `${errorMessage} ${response.status}: ${response.statusText}`,
+        )
+      }
+      return (await response.json()) as T
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
+  /**
+   * Send a request and consume a binary body inside the abort-timeout
+   * window. Returns the content type and base64-encoded content.
+   */
+  private async transmitBinary(
+    url: string,
+    init: RequestInit,
+    errorMessage: string,
+  ): Promise<{ contentType: string; content: string }> {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs)
+    try {
+      const response = await secureSend(secureEphiUrl(url, 'DirectTrust'), {
+        ...init,
+        signal: controller.signal,
+      })
+      if (!response.ok) {
+        throw new Error(
+          `${errorMessage} ${response.status}: ${response.statusText}`,
+        )
+      }
+      const contentType =
+        response.headers.get('Content-Type') ?? 'application/octet-stream'
+      const arrayBuffer = await response.arrayBuffer()
+      return {
+        contentType,
+        content: uint8ArrayToBase64(new Uint8Array(arrayBuffer)),
+      }
     } finally {
       clearTimeout(timer)
     }

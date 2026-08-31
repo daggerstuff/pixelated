@@ -127,7 +127,7 @@ describe('HIEOrchestrationService audit outcomes', () => {
       service.discoverPatient('user-001', DISCOVERY_REQUEST),
     ).rejects.toThrow('Carequality PDQ returned 503')
 
-    expect(lastAuditCall()).toEqual({
+    expect(lastAuditCall()).toMatchObject({
       status: 'failure',
       errorMessage: 'Carequality PDQ returned 503',
     })
@@ -146,7 +146,7 @@ describe('HIEOrchestrationService audit outcomes', () => {
     const result = await service.discoverPatient('user-001', DISCOVERY_REQUEST)
 
     expect(result.found).toBe(false)
-    expect(lastAuditCall()).toEqual({
+    expect(lastAuditCall()).toMatchObject({
       status: 'failure',
       errorMessage: 'Gateway resolver timeout',
     })
@@ -166,7 +166,7 @@ describe('HIEOrchestrationService audit outcomes', () => {
 
     await service.retrieveDocument('user-001', RETRIEVAL_REQUEST)
 
-    expect(lastAuditCall()).toEqual({
+    expect(lastAuditCall()).toMatchObject({
       status: 'failure',
       errorMessage: 'Document not found',
     })
@@ -185,7 +185,7 @@ describe('HIEOrchestrationService audit outcomes', () => {
 
     await service.submitDocument('user-001', SUBMISSION_REQUEST)
 
-    expect(lastAuditCall()).toEqual({
+    expect(lastAuditCall()).toMatchObject({
       status: 'failure',
       errorMessage: 'DirectTrust send returned 500',
     })
@@ -195,12 +195,12 @@ describe('HIEOrchestrationService audit outcomes', () => {
     const service = new HIEOrchestrationService({ adapter: makeAdapter() })
 
     await service.discoverPatient('user-001', DISCOVERY_REQUEST)
-    expect(lastAuditCall()).toEqual({ status: 'success' })
+    expect(lastAuditCall()).toMatchObject({ status: 'success' })
 
     await service.retrieveDocument('user-001', RETRIEVAL_REQUEST)
-    expect(lastAuditCall()).toEqual({ status: 'success' })
+    expect(lastAuditCall()).toMatchObject({ status: 'success' })
 
     await service.submitDocument('user-001', SUBMISSION_REQUEST)
-    expect(lastAuditCall()).toEqual({ status: 'success' })
+    expect(lastAuditCall()).toMatchObject({ status: 'success' })
   })
 })

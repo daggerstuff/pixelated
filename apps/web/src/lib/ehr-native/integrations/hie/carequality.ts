@@ -94,19 +94,15 @@ export class CarequalityAdapter implements HIEAdapter {
       ],
     }
 
-    const response = await this.transmit(`${this.baseUrl}/pdq/Patient/$match`, {
-      method: 'POST',
-      headers: this.jsonHeaders(),
-      body: JSON.stringify(body),
-    })
-
-    if (!response.ok) {
-      throw new Error(
-        `Carequality PDQ returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as CarequalityPDQResponse
+    const raw = await this.transmitJson<CarequalityPDQResponse>(
+      `${this.baseUrl}/pdq/Patient/$match`,
+      {
+        method: 'POST',
+        headers: this.jsonHeaders(),
+        body: JSON.stringify(body),
+      },
+      'Carequality PDQ returned',
+    )
     return mapPDQResponse(raw)
   }
 
@@ -123,45 +119,28 @@ export class CarequalityAdapter implements HIEAdapter {
     if (request.limit) params.set('_count', String(request.limit))
     if (request.offset) params.set('_offset', String(request.offset))
 
-    const response = await this.transmit(
+    const raw = await this.transmitJson<CarequalityDocumentBundle>(
       `${this.baseUrl}/xca/DocumentReference?${params.toString()}`,
       {
         method: 'GET',
         headers: this.jsonHeaders(),
       },
+      'Carequality XCA query returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `Carequality XCA query returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as CarequalityDocumentBundle
     return mapDocumentBundle(raw, request.offset ?? 0)
   }
 
   async retrieveDocument(
     request: DocumentRetrievalRequest,
   ): Promise<DocumentRetrievalResult> {
-    const response = await this.transmit(
+    const { contentType, content } = await this.transmitBinary(
       `${this.baseUrl}/xca/Document/${request.documentId}?patientId=${encodeURIComponent(request.patientId)}`,
       {
         method: 'GET',
         headers: this.jsonHeaders(),
       },
+      'Carequality XCA retrieve returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `Carequality XCA retrieve returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const contentType =
-      response.headers.get('Content-Type') ?? 'application/octet-stream'
-    const arrayBuffer = await response.arrayBuffer()
-    const content = uint8ArrayToBase64(new Uint8Array(arrayBuffer))
     const docMeta = parseDocumentMeta(request.documentId, contentType)
 
     return {
@@ -194,22 +173,15 @@ export class CarequalityAdapter implements HIEAdapter {
       language: request.language ?? 'en',
     }
 
-    const response = await this.transmit(
+    const raw = await this.transmitJson<CarequalitySubmissionResponse>(
       `${this.baseUrl}/xdr/DocumentSubmission`,
       {
         method: 'POST',
         headers: this.jsonHeaders(),
         body: JSON.stringify(body),
       },
+      'Carequality XDR submit returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `Carequality XDR submit returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as CarequalitySubmissionResponse
     return {
       submitted: true,
       documentId: raw.documentId,
@@ -226,21 +198,14 @@ export class CarequalityAdapter implements HIEAdapter {
     if (request.name) params.set('name', request.name)
     if (request.limit) params.set('_count', String(request.limit))
 
-    const response = await this.transmit(
+    const raw = await this.transmitJson<CarequalityDirectoryResponse>(
       `${this.baseUrl}/directory/Organization?${params.toString()}`,
       {
         method: 'GET',
         headers: this.jsonHeaders(),
       },
+      'Carequality directory returned',
     )
-
-    if (!response.ok) {
-      throw new Error(
-        `Carequality directory returned ${response.status}: ${response.statusText}`,
-      )
-    }
-
-    const raw = (await response.json()) as CarequalityDirectoryResponse
     return {
       organizations: raw.organizations.map(mapOrganization),
       total: raw.total,
@@ -259,7 +224,17 @@ export class CarequalityAdapter implements HIEAdapter {
     }
   }
 
-  private async transmit(url: string, init: RequestInit): Promise<Response> {
+  /**
+   * Send a request and consume the JSON body inside the abort-timeout
+   * window. The timer must cover body streaming, not just headers, or a
+   * server that sends headers and stalls the body would hang past the
+   * configured timeout.
+   */
+  private async transmitJson<T>(
+    url: string,
+    init: RequestInit,
+    errorMessage: string,
+  ): Promise<T> {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
     try {
@@ -267,13 +242,45 @@ export class CarequalityAdapter implements HIEAdapter {
         ...init,
         signal: controller.signal,
       })
-      // Keep abort timer active while body is consumed to avoid hanging reads
-      const clone = response.clone()
-      const responsePromise = Promise.resolve(response)
-      // Clear timer only after response is fully consumed by caller
-      // Caller must consume body before timer clears; for safety, we clear on settle
-      await responsePromise.then(() => {})
-      return response
+      if (!response.ok) {
+        throw new Error(
+          `${errorMessage} ${response.status}: ${response.statusText}`,
+        )
+      }
+      return (await response.json()) as T
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+
+  /**
+   * Send a request and consume a binary body inside the abort-timeout
+   * window. Returns the content type and base64-encoded content.
+   */
+  private async transmitBinary(
+    url: string,
+    init: RequestInit,
+    errorMessage: string,
+  ): Promise<{ contentType: string; content: string }> {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), this.timeoutMs)
+    try {
+      const response = await secureSend(secureEphiUrl(url, 'Carequality'), {
+        ...init,
+        signal: controller.signal,
+      })
+      if (!response.ok) {
+        throw new Error(
+          `${errorMessage} ${response.status}: ${response.statusText}`,
+        )
+      }
+      const contentType =
+        response.headers.get('Content-Type') ?? 'application/octet-stream'
+      const arrayBuffer = await response.arrayBuffer()
+      return {
+        contentType,
+        content: uint8ArrayToBase64(new Uint8Array(arrayBuffer)),
+      }
     } finally {
       clearTimeout(timer)
     }

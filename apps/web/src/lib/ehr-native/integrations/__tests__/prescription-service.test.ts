@@ -54,16 +54,16 @@ function makeMedicationRequest(
     status: 'active',
     intent: 'order',
     subject: { reference: 'Patient/patient-001' },
-    ...(code !== undefined
-      ? {
+    ...(code === undefined
+      ? {}
+      : {
           medicationCodeableConcept: {
             coding: [
               { system: 'http://www.nlm.nih.gov/research/rxnorm', code },
             ],
             text: 'Test medication',
           },
-        }
-      : {}),
+        }),
     ...overrides,
   }
 }

@@ -58,8 +58,13 @@ export class EPrescribeConsentDeniedError extends Error {
   constructor(
     readonly userId: string,
     readonly consentTypeId: string,
+    readonly patientId?: string,
   ) {
-    super(`Consent denied for user ${userId} (consent type: ${consentTypeId})`)
+    super(
+      `Consent denied for user ${userId}${
+        patientId ? ` (patient ${patientId})` : ''
+      } (consent type: ${consentTypeId})`,
+    )
     this.name = 'EPrescribeConsentDeniedError'
   }
 }
@@ -325,12 +330,20 @@ export class EPrescribingOrchestrationService {
   // ─── Private helpers ───────────────────────────────────────────
 
   /**
-   * Verify the user has active e-prescribing consent for this patient.
+   * Verify the user has active e-prescribing consent before touching
+   * patient data.
+   *
+   * Scoping note: `consentService.hasActiveConsent` is user-scoped — the
+   * consenting party is the user themselves, so `EPRESCRIBING_CONSENT_TYPE_ID`
+   * is deliberately user-wide rather than per-patient. The `patientId`
+   * argument keeps the consent boundary explicit at every patient-data
+   * call site and is surfaced in denial errors for audit clarity.
+   *
    * @throws {EPrescribeConsentDeniedError} if consent is not active
    */
   private async requireConsent(
     userId: string,
-    _patientId: string,
+    patientId: string,
   ): Promise<void> {
     const hasConsent = await consentService.hasActiveConsent(
       userId,
@@ -340,6 +353,7 @@ export class EPrescribingOrchestrationService {
       throw new EPrescribeConsentDeniedError(
         userId,
         EPRESCRIBING_CONSENT_TYPE_ID,
+        patientId,
       )
     }
   }

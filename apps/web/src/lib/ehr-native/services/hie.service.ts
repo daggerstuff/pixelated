@@ -54,8 +54,13 @@ export class ConsentDeniedError extends Error {
   constructor(
     readonly userId: string,
     readonly consentTypeId: string,
+    readonly patientId?: string,
   ) {
-    super(`Consent denied for user ${userId} (consent type: ${consentTypeId})`)
+    super(
+      `Consent denied for user ${userId}${
+        patientId ? ` (patient ${patientId})` : ''
+      } (consent type: ${consentTypeId})`,
+    )
     this.name = 'ConsentDeniedError'
   }
 }
@@ -85,6 +90,8 @@ export class HIEOrchestrationService {
     userId: string,
     request: PatientDiscoveryRequest,
   ): Promise<PatientDiscoveryResult> {
+    // Discovery targets a not-yet-known patient, so only the user-level
+    // consent gate applies here.
     await this.requireConsent(userId)
 
     const action = EHRAuditAction.HIE_PATIENT_DISCOVERY
@@ -118,7 +125,7 @@ export class HIEOrchestrationService {
     userId: string,
     request: DocumentQueryRequest,
   ): Promise<DocumentQueryResult> {
-    await this.requireConsent(userId)
+    await this.requireConsent(userId, request.patientId)
 
     const action = EHRAuditAction.HIE_DOCUMENT_QUERY
     let result: DocumentQueryResult
@@ -154,7 +161,7 @@ export class HIEOrchestrationService {
     userId: string,
     request: DocumentRetrievalRequest,
   ): Promise<DocumentRetrievalResult> {
-    await this.requireConsent(userId)
+    await this.requireConsent(userId, request.patientId)
 
     const action = EHRAuditAction.HIE_DOCUMENT_RETRIEVE
     let result: DocumentRetrievalResult
@@ -191,7 +198,7 @@ export class HIEOrchestrationService {
     userId: string,
     request: DocumentSubmissionRequest,
   ): Promise<DocumentSubmissionResult> {
-    await this.requireConsent(userId)
+    await this.requireConsent(userId, request.patientId)
 
     const action = EHRAuditAction.HIE_DOCUMENT_SUBMIT
     let result: DocumentSubmissionResult
@@ -277,16 +284,29 @@ export class HIEOrchestrationService {
   // ─── Private helpers ───────────────────────────────────────────
 
   /**
-   * Verify the user has active HIE data access consent.
+   * Verify the user has active HIE data access consent before touching
+   * patient data.
+   *
+   * Scoping note: `consentService.hasActiveConsent` is user-scoped — the
+   * consenting party is the user themselves granting access to their own
+   * records, so `HIE_CONSENT_TYPE_ID` is deliberately user-wide rather
+   * than per-patient. The `patientId` argument is still required so every
+   * patient-data call site passes the patient explicitly, keeping the
+   * consent boundary visible (and ready for patient-scoped consent if the
+   * store gains it).
+   *
    * @throws {ConsentDeniedError} if consent is not active
    */
-  private async requireConsent(userId: string): Promise<void> {
+  private async requireConsent(
+    userId: string,
+    patientId?: string,
+  ): Promise<void> {
     const hasConsent = await consentService.hasActiveConsent(
       userId,
       HIE_CONSENT_TYPE_ID,
     )
     if (!hasConsent) {
-      throw new ConsentDeniedError(userId, HIE_CONSENT_TYPE_ID)
+      throw new ConsentDeniedError(userId, HIE_CONSENT_TYPE_ID, patientId)
     }
   }
 
