@@ -224,8 +224,10 @@ class AgentExecutionHarness:
         memories_stored = 0
         if report.overall_passed:
             try:
-                self.foresight.record_decision(
-                    f"[{issue.identifier}] {issue.title}: Implementation verified and passed all quality gates."
+                self.foresight.store_decision(
+                    category="decision",
+                    content=f"{issue.title}: Implementation verified and passed all quality gates.",
+                    ticket_ref=issue.identifier,
                 )
                 memories_stored += 1
             except Exception as e:
