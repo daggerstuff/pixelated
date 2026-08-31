@@ -77,8 +77,9 @@ function makeAdapter(overrides: Partial<HIEAdapter> = {}): HIEAdapter {
   }
 }
 
-function lastAuditCall():
-  { status?: string; errorMessage?: string } | undefined {
+type AuditPayload = { status?: string; errorMessage?: string }
+
+function lastAuditCall(): AuditPayload | undefined {
   const { calls } = mockAuditService.logIntegration.mock
   return calls[calls.length - 1]?.[1]
 }

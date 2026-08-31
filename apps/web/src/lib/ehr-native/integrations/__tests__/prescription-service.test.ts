@@ -10,14 +10,14 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
+import type { MedicationRequest } from '../../../types/medication-request'
 import type { EPrescribingAdapter } from '../adapter'
+import { PrescriptionService } from '../e-prescribing/prescription-service'
 import type {
   ControlledSubstanceCheckResult,
   DrugInteractionCheckResponse,
   PrescriptionTransmissionResponse,
 } from '../types'
-import { PrescriptionService } from '../e-prescribing/prescription-service'
-import type { MedicationRequest } from '../../../types/medication-request'
 
 // ---------------------------------------------------------------------------
 // Fixtures
