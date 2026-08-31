@@ -101,7 +101,9 @@ export class CarequalityAdapter implements HIEAdapter {
     })
 
     if (!response.ok) {
-      throw new Error(`Carequality PDQ returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `Carequality PDQ returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as CarequalityPDQResponse
@@ -130,7 +132,9 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`Carequality XCA query returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `Carequality XCA query returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as CarequalityDocumentBundle
@@ -149,7 +153,9 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`Carequality XCA retrieve returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `Carequality XCA retrieve returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const contentType =
@@ -198,7 +204,9 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`Carequality XDR submit returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `Carequality XDR submit returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as CarequalitySubmissionResponse
@@ -227,7 +235,9 @@ export class CarequalityAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`Carequality directory returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `Carequality directory returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as CarequalityDirectoryResponse

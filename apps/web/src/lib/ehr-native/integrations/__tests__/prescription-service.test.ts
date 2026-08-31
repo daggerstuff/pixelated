@@ -57,7 +57,9 @@ function makeMedicationRequest(
     ...(code !== undefined
       ? {
           medicationCodeableConcept: {
-            coding: [{ system: 'http://www.nlm.nih.gov/research/rxnorm', code }],
+            coding: [
+              { system: 'http://www.nlm.nih.gov/research/rxnorm', code },
+            ],
             text: 'Test medication',
           },
         }
@@ -162,7 +164,11 @@ describe('PrescriptionService.transmitPrescription', () => {
 
     it('throws (fail closed) when medication has no code', async () => {
       await expect(
-        service.transmitPrescription(makeMedicationRequest(undefined), PHARMACY, PRESCRIBER),
+        service.transmitPrescription(
+          makeMedicationRequest(undefined),
+          PHARMACY,
+          PRESCRIBER,
+        ),
       ).rejects.toThrow('Medication code is required')
       expect(adapter.transmitPrescription).not.toHaveBeenCalled()
     })

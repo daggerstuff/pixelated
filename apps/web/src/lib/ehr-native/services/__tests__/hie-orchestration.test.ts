@@ -58,9 +58,7 @@ const SUBMISSION_RESULT: DocumentSubmissionResult = {
   timestamp: '2026-08-30T16:00:00.000Z',
 }
 
-function makeAdapter(
-  overrides: Partial<HIEAdapter> = {},
-): HIEAdapter {
+function makeAdapter(overrides: Partial<HIEAdapter> = {}): HIEAdapter {
   return {
     network: 'carequality',
     discoverPatient: vi.fn().mockResolvedValue(DISCOVERY_RESULT),
@@ -80,8 +78,7 @@ function makeAdapter(
 }
 
 function lastAuditCall():
-  | { status?: string; errorMessage?: string }
-  | undefined {
+  { status?: string; errorMessage?: string } | undefined {
   const { calls } = mockAuditService.logIntegration.mock
   return calls[calls.length - 1]?.[1]
 }

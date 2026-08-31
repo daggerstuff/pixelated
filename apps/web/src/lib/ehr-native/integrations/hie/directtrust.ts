@@ -91,7 +91,9 @@ export class DirectTrustAdapter implements HIEAdapter {
     })
 
     if (!response.ok) {
-      throw new Error(`DirectTrust patient resolution returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `DirectTrust patient resolution returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as DirectTrustPatientResponse
@@ -136,7 +138,9 @@ export class DirectTrustAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`DirectTrust message query returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `DirectTrust message query returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as DirectTrustMessageList
@@ -177,7 +181,9 @@ export class DirectTrustAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`DirectTrust content retrieval returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `DirectTrust content retrieval returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const contentType =
@@ -244,7 +250,9 @@ export class DirectTrustAdapter implements HIEAdapter {
     })
 
     if (!response.ok) {
-      throw new Error(`DirectTrust send returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `DirectTrust send returned ${response.status}: ${response.statusText}`,
+      )
     }
 
     const raw = (await response.json()) as DirectTrustSendResponse
@@ -273,9 +281,11 @@ export class DirectTrustAdapter implements HIEAdapter {
     )
 
     if (!response.ok) {
-      throw new Error(`DirectTrust directory returned ${response.status}: ${response.statusText}`)
+      throw new Error(
+        `DirectTrust directory returned ${response.status}: ${response.statusText}`,
+      )
     }
-    
+
     const raw = (await response.json()) as DirectTrustDirectoryResponse
     return {
       organizations: raw.organizations.map((o) => ({

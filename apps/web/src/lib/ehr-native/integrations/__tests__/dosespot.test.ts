@@ -95,9 +95,9 @@ describe('DoseSpotAdapter.transmitPrescription', () => {
   })
 
   it('fails closed for an invalid patient reference', async () => {
-    await expect(
-      adapter.transmitPrescription(makeRequest({})),
-    ).rejects.toThrow('Invalid MedicationRequest.subject.reference: missing')
+    await expect(adapter.transmitPrescription(makeRequest({}))).rejects.toThrow(
+      'Invalid MedicationRequest.subject.reference: missing',
+    )
     expect(secureSend).not.toHaveBeenCalled()
   })
 })
