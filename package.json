@@ -464,7 +464,7 @@
     "globby": "latest",
     "gray-matter": "latest",
     "hastscript": "latest",
-    "headroom-ai": "^0.36.5",
+    "headroom-ai": "^0.37.0",
     "hono": "^4.13.4",
     "html-entities": "latest",
     "ioredis-mock": "latest",
@@ -522,7 +522,7 @@
     "vitest": "^4.1.11",
     "vscode-jsonrpc": "9.0.1",
     "wait-on": "latest",
-    "wrangler": "^4.126.0",
+    "wrangler": "^4.127.0",
     "yaml": "2.9.0"
   },
   "peerDependencies": {
