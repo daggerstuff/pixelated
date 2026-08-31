@@ -114,6 +114,14 @@ class GitWorktreePool:
                     check=False,
                     timeout=15,
                 )
+                # Ensure isolated worktree starts completely clean
+                subprocess.run(
+                    ["git", "clean", "-fd"],
+                    cwd=worktree_path,
+                    capture_output=True,
+                    check=False,
+                    timeout=10,
+                )
 
             return WorktreeLease(
                 ticket_identifier=ticket_identifier,

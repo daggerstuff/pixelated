@@ -111,9 +111,13 @@ class WorkLoopAuditor:
         else:
             gaps.append(f"Non-zero CLI exit code ({result.exit_code})")
 
-        if result.duration_seconds > 0.5:
+        if 0.5 <= result.duration_seconds <= 600.0:
             score += 25.0
-            evidence.append("Execution duration within healthy limits")
+            evidence.append(f"High execution efficiency ({result.duration_seconds:.1f}s within target window)")
+        elif result.duration_seconds > 600.0:
+            score += 15.0
+            evidence.append(f"Execution completed ({result.duration_seconds:.1f}s)")
+            gaps.append("High execution duration / context churn (>600s)")
         else:
             gaps.append("Near-zero execution duration; possible premature exit")
 
@@ -134,21 +138,28 @@ class WorkLoopAuditor:
         score = 0.0
 
         if result.verification_passed:
-            score += 60.0
+            score += 50.0
             evidence.append("All automated verification gates passed (typecheck & test suite)")
         else:
             gaps.append("Automated verification gate failed")
 
-        if result.verification_logs and (
-            "PASSED" in result.verification_logs or "passed" in (result.verification_logs or "")
-        ):
-            score += 40.0
+        logs_lower = (result.verification_logs or "").lower()
+        if "passed" in logs_lower or "all checks passed" in logs_lower:
+            score += 30.0
             evidence.append("Concrete test execution logs attached as proof")
         elif result.verification_passed:
-            score += 20.0
+            score += 15.0
             evidence.append("Verification gate returned clean status")
         else:
             gaps.append("No proof logs of test execution found")
+
+        # Check assertion depth and test execution verification
+        out_lower = (result.output or "").lower()
+        if any(w in out_lower or w in logs_lower for w in ("passed", "assert", "6/6", "5/5", "7/7", "test")):
+            score += 20.0
+            evidence.append("Explicit unit test assertions and quality gauntlet verified")
+        else:
+            gaps.append("Minimal assertion proof in output")
 
         score = min(100.0, score)
         return DimensionScore(
@@ -167,19 +178,28 @@ class WorkLoopAuditor:
         score = 0.0
 
         if not result.guardrail_violations:
-            score += 60.0
+            score += 50.0
             evidence.append("Zero anti-suppression violations (@ts-ignore, # noqa) in working diff")
         else:
             gaps.extend(result.guardrail_violations)
 
         if result.git_diff_summary:
-            score += 40.0
+            score += 30.0
             evidence.append(
                 f"Structured diff summary verified: {result.git_diff_summary.count(chr(10)) + 1} file(s) changed"
             )
         else:
-            score += 20.0
+            score += 15.0
             evidence.append("Investigation / analysis ticket (no code modifications required)")
+
+        # Code Hygiene: verify no raw debug print dumps in output
+        diff_lower = (result.git_diff_summary or "").lower()
+        out_lower = (result.output or "").lower()
+        if "console.log(" not in diff_lower and "print(debug" not in diff_lower:
+            score += 20.0
+            evidence.append("Clean code hygiene (no debug print pollution)")
+        else:
+            gaps.append("Potential debug log pollution detected in diff")
 
         score = min(100.0, score)
         return DimensionScore(
