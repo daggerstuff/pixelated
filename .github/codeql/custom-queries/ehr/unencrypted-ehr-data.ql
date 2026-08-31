@@ -26,19 +26,15 @@ predicate isEHRFile(File f) {
 
 /**
  * Matches actual network transmission calls within EHR modules.
- * Only matches well-known network API names, not substring patterns
- * like "%http%" that match every HTTP-related call.
+ * Covers both direct invocations (`fetch(...)`, `axios(...)`, `request(...)`)
+ * and member-method invocations on HTTP clients (`axios.post(...)`,
+ * `request.get(...)`, etc.), whose CodeQL callee name is the member method
+ * rather than the client object.
  */
 predicate isDataTransmissionCall(CallExpr call) {
   isEHRFile(call.getFile()) and
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name = "fetch" or
-      name = "axios" or
-      name = "request"
-    )
-  )
+  call.getCalleeName() =
+    ["fetch", "axios", "request", "post", "get", "put", "patch", "delete"]
 }
 
 /**
@@ -46,11 +42,22 @@ predicate isDataTransmissionCall(CallExpr call) {
  * Uses specific clinical/FHIR data type names rather than
  * common English words like "health" or "record" that appear
  * in non-EHR files (dream-worker.ts, ResistanceMonitor.tsx, etc.).
+ * Handles both expression nodes and function parameter nodes: a parameter
+ * has no underlying expression to stringify, so its EHR classification
+ * must come from the parameter's own name and file.
  */
 predicate isEHRData(DataFlow::Node node) {
-  isEHRFile(node.asExpr().getFile()) and
   exists(string name |
-    name = node.asExpr().toString().toLowerCase() and
+    (
+      isEHRFile(node.asExpr().getFile()) and
+      name = node.asExpr().toString().toLowerCase()
+      or
+      exists(Parameter p |
+        node = DataFlow::parameterNode(p) and
+        isEHRFile(p.getFile()) and
+        name = p.getName().toLowerCase()
+      )
+    ) and
     (
       name.matches("%patient%") or
       name.matches("%clinical%") or
@@ -63,25 +70,28 @@ predicate isEHRData(DataFlow::Node node) {
 }
 
 /**
- * Checks whether `src` data is encrypted before flowing into `call`.
- * The encryption call must be on the data flow path from src to the
- * transmission call's argument — not just anywhere in the codebase.
+ * Checks whether `src` data is encrypted before flowing into `sinkArg` —
+ * the specific argument of the transmission call that the source reaches.
+ * Binding the source, the encryption result, and the sink to the SAME
+ * argument prevents an unrelated encrypted argument from suppressing an
+ * alert for EHR data flowing through a different argument.
  */
-predicate isEncryptedBeforeCall(DataFlow::Node src, CallExpr call) {
+predicate isEncryptedBeforeCall(DataFlow::Node src, DataFlow::Node sinkArg) {
   exists(CallExpr encryptCall |
     encryptCall.getCalleeName().matches("%encrypt%") and
     src.getASuccessor*() = DataFlow::exprNode(encryptCall.getAnArgument()) and
-    DataFlow::exprNode(encryptCall).getASuccessor*() = DataFlow::exprNode(call.getAnArgument())
+    DataFlow::exprNode(encryptCall).getASuccessor*() = sinkArg
   )
 }
 
-from DataFlow::Node src, CallExpr call
+from DataFlow::Node src, DataFlow::Node sinkArg, CallExpr call
 where
   isDataTransmissionCall(call) and
+  sinkArg = DataFlow::exprNode(call.getAnArgument()) and
   isEHRData(src) and
   // Real data flow: EHR data must actually flow into the call's argument
-  src.getASuccessor*() = DataFlow::exprNode(call.getAnArgument()) and
+  src.getASuccessor*() = sinkArg and
   // Encryption must be LOCAL to this data flow path
-  not isEncryptedBeforeCall(src, call)
+  not isEncryptedBeforeCall(src, sinkArg)
 select call,
   "Potential unencrypted EHR data transmission detected. HIPAA requires encryption of PHI in transit."

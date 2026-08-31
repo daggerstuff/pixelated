@@ -37,18 +37,31 @@ predicate isFHIRSearch(CallExpr call) {
 }
 
 /**
- * Returns true if any argument passed to `call` has been through a
- * sanitization/validation/escaping call. The sanitized result must
- * flow into the search call's arguments via proper data flow.
+ * Returns true when every user-controlled (non-constant) argument of
+ * `call` has been through a sanitization/validation/escaping call whose
+ * result flows into that SAME argument. Sanitizing an unrelated argument
+ * (e.g. a constant resource-type string) does not suppress the finding
+ * for an unsanitized user-controlled search value. Calls whose arguments
+ * are all compile-time constants carry no user input and are never flagged.
  */
 predicate hasInputSanitization(CallExpr call) {
-  exists(CallExpr sanitizeCall |
-    (
-      sanitizeCall.getCalleeName().matches("%sanitize%") or
-      sanitizeCall.getCalleeName().matches("%escape%") or
-      sanitizeCall.getCalleeName().matches("%validate%")
-    ) and
-    DataFlow::exprNode(sanitizeCall).getASuccessor*() = DataFlow::exprNode(call.getAnArgument())
+  not exists(DataFlow::Node arg |
+    arg = DataFlow::exprNode(call.getAnArgument()) and
+    not arg.asExpr().isCompileTimeConst()
+  )
+  or
+  forall(DataFlow::Node arg |
+    arg = DataFlow::exprNode(call.getAnArgument()) and
+    not arg.asExpr().isCompileTimeConst()
+    implies
+    exists(CallExpr sanitizeCall |
+      (
+        sanitizeCall.getCalleeName().matches("%sanitize%") or
+        sanitizeCall.getCalleeName().matches("%escape%") or
+        sanitizeCall.getCalleeName().matches("%validate%")
+      ) and
+      DataFlow::exprNode(sanitizeCall).getASuccessor*() = arg
+    )
   )
 }
 
