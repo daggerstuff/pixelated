@@ -315,14 +315,14 @@ export class DirectTrustAdapter implements HIEAdapter {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), this.timeoutMs)
     try {
-      const response = await secureSend(secureEphiUrl(url, 'DirectTrust'), {
+      // `return await` (not a bare return) is deliberate: the finally block
+      // must only clear the abort timer once the request has settled.
+      // The timer covers the request up to headers; body streaming is
+      // currently unguarded.
+      return await secureSend(secureEphiUrl(url, 'DirectTrust'), {
         ...init,
         signal: controller.signal,
       })
-      // Return response with timer cleared only after caller consumes body
-      // We clear timer here but it covered headers; body streaming may still hang.
-      // For now, keep timer active via a wrapper that clears on consumption.
-      return response
     } finally {
       clearTimeout(timer)
     }

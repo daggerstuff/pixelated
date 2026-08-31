@@ -234,12 +234,14 @@ const KNOWN_SCHEDULES: Record<string, ControlledSubstanceSchedule> = {
 /**
  * Infer controlled substance schedule from medication code.
  *
- * A medication with NO code fails closed: it is escalated to the
- * adapter's controlled-substance gate instead of being silently treated
- * as non-controlled, so the transmission path can never bypass
- * controlled-substance safety checks on missing data. Codes outside the
- * known formulary are also routed through the adapter's gate, which uses
- * real drug data to catch unlisted controlled substances.
+ * Fails closed: a missing code, or a code outside the known formulary,
+ * throws so transmission can never proceed on unverified schedule data.
+ * Defaulting unknown codes to 'non-controlled' would let unlisted
+ * controlled substances bypass the DEA/EPCS/PDMP gate, because the
+ * adapter's check trusts the supplied schedule instead of looking the
+ * drug up itself. Unknown medications are treated as potentially
+ * controlled and must be verified against the drug database before
+ * prescribing.
  */
 function inferSchedule(code: string): ControlledSubstanceSchedule {
   if (!code) {
@@ -247,5 +249,11 @@ function inferSchedule(code: string): ControlledSubstanceSchedule {
       'Medication code is required for controlled substance schedule inference',
     )
   }
-  return KNOWN_SCHEDULES[code] ?? 'non-controlled'
+  const schedule = KNOWN_SCHEDULES[code]
+  if (schedule === undefined) {
+    throw new Error(
+      `Unknown medication code '${code}' - cannot infer controlled substance schedule; verification required`,
+    )
+  }
+  return schedule
 }

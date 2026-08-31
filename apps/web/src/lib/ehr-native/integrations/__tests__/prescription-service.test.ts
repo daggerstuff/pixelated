@@ -10,14 +10,14 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-import type { MedicationRequest } from '../../../types/medication-request'
-import type { EPrescribingAdapter } from '../adapter'
+import type { MedicationRequest } from '../../types/medication-request'
+import type { EPrescribingAdapter } from '../e-prescribing/adapter'
 import { PrescriptionService } from '../e-prescribing/prescription-service'
 import type {
   ControlledSubstanceCheckResult,
   DrugInteractionCheckResponse,
   PrescriptionTransmissionResponse,
-} from '../types'
+} from '../e-prescribing/types'
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -65,7 +65,7 @@ function makeMedicationRequest(
         }
       : {}),
     ...overrides,
-  } as MedicationRequest
+  }
 }
 
 const TRANSMIT_RESPONSE: PrescriptionTransmissionResponse = {
@@ -79,9 +79,21 @@ const NO_INTERACTIONS: DrugInteractionCheckResponse = {
   alerts: [],
 }
 
+/**
+ * Adapter double with every method exposed as a typed vitest mock, so
+ * assertions reference the mock values directly (keeps oxc unbound-method
+ * quiet while preserving call-signature typing).
+ */
+type MockedEPrescribingAdapter = {
+  [K in keyof EPrescribingAdapter]: ReturnType<
+    typeof vi.fn<EPrescribingAdapter[K]>
+  >
+}
+
 function makeAdapter(
   controlledResult: ControlledSubstanceCheckResult,
-): EPrescribingAdapter {
+  overrides: Partial<MockedEPrescribingAdapter> = {},
+): MockedEPrescribingAdapter {
   return {
     searchPharmacies: vi.fn(),
     checkControlledSubstance: vi.fn().mockResolvedValue(controlledResult),
@@ -89,6 +101,7 @@ function makeAdapter(
     transmitPrescription: vi.fn().mockResolvedValue(TRANSMIT_RESPONSE),
     checkPrescriptionStatus: vi.fn(),
     cancelPrescription: vi.fn(),
+    ...overrides,
   }
 }
 
@@ -111,7 +124,7 @@ const BLOCKED = {
 
 describe('PrescriptionService.transmitPrescription', () => {
   let service: PrescriptionService
-  let adapter: EPrescribingAdapter
+  let adapter: MockedEPrescribingAdapter
 
   beforeEach(() => {
     adapter = makeAdapter(ALLOWED)
@@ -119,21 +132,18 @@ describe('PrescriptionService.transmitPrescription', () => {
   })
 
   describe('schedule inference', () => {
-    it('treats unknown medication code (e.g. ibuprofen) as non-controlled and transmits', async () => {
-      const result = await service.transmitPrescription(
-        makeMedicationRequest('111111'), // not in known formulary
-        PHARMACY,
-        PRESCRIBER_NO_DEA,
+    it('fails closed on unknown medication code pending manual verification', async () => {
+      await expect(
+        service.transmitPrescription(
+          makeMedicationRequest('111111'), // not in known formulary
+          PHARMACY,
+          PRESCRIBER_NO_DEA,
+        ),
+      ).rejects.toThrow(
+        "Unknown medication code '111111' - cannot infer controlled substance schedule; verification required",
       )
-      expect(result).toEqual(TRANSMIT_RESPONSE)
-      expect(adapter.checkControlledSubstance).toHaveBeenCalledWith(
-        expect.objectContaining({
-          medication: expect.objectContaining({
-            code: '111111',
-            schedule: 'non-controlled',
-          }),
-        }),
-      )
+      expect(adapter.checkControlledSubstance).not.toHaveBeenCalled()
+      expect(adapter.transmitPrescription).not.toHaveBeenCalled()
     })
 
     it('treats known Schedule II code as controlled', async () => {
@@ -247,8 +257,7 @@ describe('PrescriptionService.transmitPrescription', () => {
 
   describe('drug interaction safety gate', () => {
     it('blocks transmission on a critical interaction', async () => {
-      const adapterWithAlerts = {
-        ...makeAdapter(ALLOWED),
+      const adapterWithAlerts = makeAdapter(ALLOWED, {
         checkDrugInteractions: vi.fn().mockResolvedValue({
           hasInteractions: true,
           alerts: [
@@ -259,12 +268,12 @@ describe('PrescriptionService.transmitPrescription', () => {
             },
           ],
         }),
-      } as EPrescribingAdapter
+      })
       const alertService = new PrescriptionService(adapterWithAlerts)
 
       await expect(
         alertService.transmitPrescription(
-          makeMedicationRequest('111111'),
+          makeMedicationRequest('1043620'), // known code so schedule inference passes
           PHARMACY,
           PRESCRIBER,
         ),
@@ -273,8 +282,7 @@ describe('PrescriptionService.transmitPrescription', () => {
     })
 
     it('does not block on minor/moderate alerts', async () => {
-      const adapterWithMinor = {
-        ...makeAdapter(ALLOWED),
+      const adapterWithMinor = makeAdapter(ALLOWED, {
         checkDrugInteractions: vi.fn().mockResolvedValue({
           hasInteractions: true,
           alerts: [
@@ -285,11 +293,11 @@ describe('PrescriptionService.transmitPrescription', () => {
             },
           ],
         }),
-      } as EPrescribingAdapter
+      })
       const minorService = new PrescriptionService(adapterWithMinor)
 
       const result = await minorService.transmitPrescription(
-        makeMedicationRequest('111111'),
+        makeMedicationRequest('1043620'), // known code so schedule inference passes
         PHARMACY,
         PRESCRIBER,
       )

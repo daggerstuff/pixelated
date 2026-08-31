@@ -190,12 +190,21 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), this.timeoutMs)
 
+    // HeadersInit may be an array of pairs or a Headers instance, so merge
+    // via Headers rather than object spread to avoid index-key corruption.
+    const headers = new Headers(this.headers)
+    if (options.headers) {
+      new Headers(options.headers).forEach((value, key) => {
+        headers.set(key, value)
+      })
+    }
+
     try {
       const response = await secureSend(
         secureEphiUrl(`${this.baseUrl}${path}`, 'DoseSpot'),
         {
           ...options,
-          headers: { ...this.headers, ...options.headers },
+          headers,
           signal: controller.signal,
         },
       )
@@ -240,6 +249,22 @@ export class DoseSpotAdapter implements EPrescribingAdapter {
   async checkControlledSubstance(
     request: ControlledSubstanceCheckRequest,
   ): Promise<ControlledSubstanceCheckResult> {
+    // Defense in depth: a caller-asserted 'non-controlled' classification
+    // is never forwarded to the remote check. The adapter has no local
+    // drug database to confirm it, and letting the claim reach DoseSpot
+    // would let unlisted controlled substances bypass PDMP/EPCS
+    // verification. Unverified medications are treated as potentially
+    // controlled until verified.
+    if (request.medication.schedule === 'non-controlled') {
+      return {
+        allowed: false,
+        reason:
+          'Unverified medication: schedule must be confirmed against the drug database before prescribing',
+        pdmpChecked: false,
+        epcsRequired: true,
+      }
+    }
+
     const body = {
       medication: {
         code: request.medication.code,

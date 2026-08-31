@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { EHRAuditService } from '../../audit/ehr-audit-service'
 import { EHRAuditAction } from '../../audit/events'
 import type { HIEAdapter } from '../../integrations/hie/adapter'
 import type {
@@ -14,7 +15,10 @@ import { HIEOrchestrationService } from '../hie.service'
 
 const { mockAuditService, mockConsentService } = vi.hoisted(() => ({
   mockAuditService: {
-    logIntegration: vi.fn(async () => 'audit-id'),
+    logIntegration: vi.fn(
+      async (..._args: Parameters<EHRAuditService['logIntegration']>) =>
+        'audit-id',
+    ),
   },
   mockConsentService: {
     hasActiveConsent: vi.fn(async () => true),

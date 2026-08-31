@@ -250,7 +250,7 @@ describe('EPrescribingOrchestrationService audit actions', () => {
 
     expect(auditWriteError).toBeInstanceOf(EPrescribeAuditWriteError)
     if (auditWriteError instanceof EPrescribeAuditWriteError) {
-      const operationError = auditWriteError.operationError
+      const { operationError } = auditWriteError
       expect(operationError).toBeInstanceOf(Error)
       if (operationError instanceof Error) {
         expect(operationError.message).toBe('PDMP unavailable')

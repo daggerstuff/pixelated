@@ -4,6 +4,20 @@ import type { HIEAdapter } from '../adapter'
 import { HIEService, sanitizeDocumentQuery } from '../hie-service'
 import type { DocumentQueryRequest, DocumentQueryResult } from '../types'
 
+/** Constraint helper for mapping adapter methods to typed vitest mocks. */
+type AdapterMethod = (...args: never[]) => unknown
+
+/**
+ * Adapter double with every method exposed as a typed vitest mock, so
+ * assertions reference the mock values directly (keeps oxc unbound-method
+ * quiet while preserving call-signature typing).
+ */
+type MockedHIEAdapter = {
+  [K in keyof HIEAdapter]: Extract<HIEAdapter[K], AdapterMethod> extends never
+    ? HIEAdapter[K]
+    : ReturnType<typeof vi.fn<Extract<HIEAdapter[K], AdapterMethod>>>
+}
+
 const request: DocumentQueryRequest = {
   patientId: ' patient-001 ',
   authorOrganizationId: ' org-001 ',
@@ -19,7 +33,7 @@ const result: DocumentQueryResult = {
   hasMore: false,
 }
 
-function makeAdapter(): HIEAdapter {
+function makeAdapter(): MockedHIEAdapter {
   return {
     network: 'carequality',
     discoverPatient: vi.fn(),

@@ -101,3 +101,63 @@ describe('DoseSpotAdapter.transmitPrescription', () => {
     expect(secureSend).not.toHaveBeenCalled()
   })
 })
+
+describe('DoseSpotAdapter.checkControlledSubstance', () => {
+  const adapter = new DoseSpotAdapter({
+    apiKey: 'test-api-key',
+    clinicKey: 'test-clinic-key',
+    baseUrl: 'http://127.0.0.1',
+  })
+
+  beforeEach(() => {
+    secureSend.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          allowed: true,
+          pdmpChecked: true,
+          epcsRequired: true,
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      ),
+    )
+  })
+
+  afterEach(() => {
+    secureSend.mockReset()
+  })
+
+  it('fails closed for a caller-asserted non-controlled schedule', async () => {
+    const result = await adapter.checkControlledSubstance({
+      medication: {
+        code: '111111',
+        name: 'Test medication',
+        schedule: 'non-controlled',
+        prescriberNPI: '1234567890',
+      },
+      patientId: 'patient-001',
+      prescriberNPI: '1234567890',
+    })
+
+    expect(result.allowed).toBe(false)
+    expect(result.reason).toContain('Unverified medication')
+    // The unverified claim must never reach the remote check.
+    expect(secureSend).not.toHaveBeenCalled()
+  })
+
+  it('forwards controlled-schedule checks to the remote verification', async () => {
+    const result = await adapter.checkControlledSubstance({
+      medication: {
+        code: '1043400',
+        name: 'oxycodone',
+        schedule: 'II',
+        deaNumber: 'AB1234563',
+        prescriberNPI: '1234567890',
+      },
+      patientId: 'patient-001',
+      prescriberNPI: '1234567890',
+    })
+
+    expect(result.allowed).toBe(true)
+    expect(secureSend).toHaveBeenCalledTimes(1)
+  })
+})
