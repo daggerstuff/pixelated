@@ -1,6 +1,7 @@
 /**
  * @name Insecure FHIR Search
- * @description Detects potentially insecure FHIR search operations
+ * @description Detects FHIR search operations without input sanitization.
+ *              Restricted to FHIR module files to prevent false positives.
  * @kind problem
  * @problem.severity warning
  * @security-severity 6.5
@@ -13,31 +14,62 @@
 
 import javascript
 
-/** Matches call expressions that look like FHIR search/query operations. */
+/**
+ * Restricts analysis to FHIR/EHR module files where FHIR search
+ * operations actually occur. This prevents false positives from
+ * unrelated code using common method names like .find() or .search()
+ * (dream-worker.ts, ResistanceMonitor.tsx, SlackNotificationService.ts, etc.).
+ */
+predicate isFHIRFile(File f) {
+  f.getAbsolutePath().matches("%apps/web/src/lib/ehr-native/%") or
+  f.getAbsolutePath().matches("%apps/web/src/lib/documentation/ehrIntegration%")
+}
+
+/**
+ * Matches actual FHIR search operations within FHIR modules.
+ * Targets the specific FHIR client method name "searchResources"
+ * rather than generic substring patterns like "%search%" or "%find%"
+ * that match every Array.find(), Array.filter(), or querySelector() call.
+ * Handles both direct calls and member-method calls on FHIR client objects.
+ */
 predicate isFHIRSearch(CallExpr call) {
-  exists(string name |
-    name = call.getCalleeName() and
-    (
-      name.matches("%search%") or
-      name.matches("%find%") or
-      name.matches("%query%")
+  isFHIRFile(call.getFile()) and
+  (
+    call.getCallee().(VarRef).getName() = "searchResources"
+    or
+    exists(PropAccess pa |
+      call.getCallee() = pa and
+      pa.getPropertyName() = "searchResources"
     )
   )
 }
 
 /**
- * Returns true if any argument passed to `call` has been through a
- * sanitization/validation/escaping call somewhere in its data flow.
+ * Returns true when every user-controlled (non-constant) argument of
+ * `call` has been through a sanitization/validation/escaping call whose
+ * result flows into that SAME argument. Sanitizing an unrelated argument
+ * (e.g. a constant resource-type string) does not suppress the finding
+ * for an unsanitized user-controlled search value. Calls whose arguments
+ * are all literals carry no user input and are never flagged.
  */
 predicate hasInputSanitization(CallExpr call) {
-  exists(CallExpr sanitizeCall, int i |
-    (
-      sanitizeCall.getCalleeName().matches("%sanitize%") or
-      sanitizeCall.getCalleeName().matches("%escape%") or
-      sanitizeCall.getCalleeName().matches("%validate%")
-    ) and
-    // The sanitized result flows into one of the search call's arguments
-    sanitizeCall.getAChild*() = call.getArgument(i)
+  not exists(DataFlow::Node arg |
+    arg = DataFlow::exprNode(call.getAnArgument()) and
+    not arg.asExpr() instanceof Literal
+  )
+  or
+  forall(DataFlow::Node arg |
+    arg = DataFlow::exprNode(call.getAnArgument()) and
+    not arg.asExpr() instanceof Literal
+  |
+    exists(CallExpr sanitizeCall |
+      (
+        sanitizeCall.getCalleeName().matches("%sanitize%") or
+        sanitizeCall.getCalleeName().matches("%escape%") or
+        sanitizeCall.getCalleeName().matches("%validate%")
+      ) and
+      DataFlow::exprNode(sanitizeCall).getASuccessor*() = arg
+    )
   )
 }
 
