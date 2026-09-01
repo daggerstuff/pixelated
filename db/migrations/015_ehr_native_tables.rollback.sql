@@ -3,10 +3,7 @@
 -- Drops tables in reverse dependency order.
 -- ============================================================================
 
--- Drop consent helper function first (references ehr_consent)
-DROP FUNCTION IF EXISTS ehr_patient_has_consent(uuid, uuid, text);
-
--- Drop tables in reverse dependency order
+-- Drop tables first (this drops their RLS policies that depend on the function)
 DROP TABLE IF EXISTS ehr_audit_history;
 DROP TABLE IF EXISTS ehr_service_request;
 DROP TABLE IF EXISTS ehr_claim;
@@ -18,5 +15,6 @@ DROP TABLE IF EXISTS ehr_consent;
 DROP TABLE IF EXISTS ehr_patient;
 DROP TABLE IF EXISTS ehr_practitioner;
 
--- Drop shared trigger function (all triggers dropped with their tables)
+-- Now safe to drop functions (table policies that referenced them are gone)
+DROP FUNCTION IF EXISTS ehr_patient_has_consent(uuid, uuid, text);
 DROP FUNCTION IF EXISTS ehr_update_updated_at();

@@ -65,14 +65,26 @@ class PullRequestBridge:
             if not status_res.stdout.strip():
                 return PRCreationResult(success=True, pr_url="", error="No file changes detected to commit.")
 
-            # Stage all changes
-            subprocess.run(["git", "add", "-A"], cwd=worktree_path, check=False)
+            # Format commit
+            commit_msg = self.format_commit_message(ticket_identifier, title, description)
 
-            # Check if there are staged changes to commit
-            diff_cached = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=worktree_path, check=False)
-            if diff_cached.returncode != 0:
-                commit_msg = self.format_commit_message(ticket_identifier, title, description)
-                subprocess.run(["git", "commit", "--no-verify", "-m", commit_msg], cwd=worktree_path, check=True)
+            # Stage and commit in any modified submodules first
+            subprocess.run(
+                [
+                    "git",
+                    "submodule",
+                    "foreach",
+                    "--recursive",
+                    f"git add -A && git commit --no-verify -m {json.dumps(commit_msg)} || true",
+                ],
+                cwd=worktree_path,
+                capture_output=True,
+                check=False,
+            )
+
+            # Stage all changes (including updated submodule pointers)
+            subprocess.run(["git", "add", "-A"], cwd=worktree_path, check=True)
+            subprocess.run(["git", "commit", "--no-verify", "-m", commit_msg], cwd=worktree_path, check=True)
 
             # Get commit sha
             sha_res = subprocess.run(
@@ -101,15 +113,6 @@ class PullRequestBridge:
 
             push_res = subprocess.run(
                 ["git", "push", "-u", "origin", branch_name],
-                cwd=worktree_path,
-                capture_output=True,
-                text=True,
-                check=False,
-                timeout=60,
-            )
-            # Also push to gitlab
-            subprocess.run(
-                ["git", "push", "-u", "gitlab", f"{branch_name}:{branch_name}"],
                 cwd=worktree_path,
                 capture_output=True,
                 text=True,

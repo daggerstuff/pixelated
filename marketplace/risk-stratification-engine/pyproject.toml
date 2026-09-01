@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risk-stratification-engine"
+version = "1.0.0"
+description = "Clinical Risk Stratification Engine — PHQ-9, GAD-7, C-SSRS scoring with optional NIM augmentation for suicide risk assessment"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.11"
+authors = [
+    { name = "Pixelated Clinical AI" },
+]
+keywords = ["healthcare", "clinical", "risk-stratification", "phq9", "gad7", "cssrs", "suicide-prevention", "fastapi"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Framework :: FastAPI",
+]
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.0",
+    "pydantic-settings>=2.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+risk-stratification = "app.main:main"
+
+[tool.setuptools]
+packages = ["app"]

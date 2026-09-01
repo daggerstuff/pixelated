@@ -9,7 +9,7 @@ on:
     branches: [main, master, staging]
     paths:
       - 'apps/web/src/**'
-      - 'Dockerfile'
+      - 'infra/Dockerfile'
       - 'infra/docker/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
@@ -71,7 +71,7 @@ jobs:
         uses: docker/build-push-action@v7.2.0
         with:
           context: .
-          file: ./Dockerfile
+          file: ./infra/Dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
