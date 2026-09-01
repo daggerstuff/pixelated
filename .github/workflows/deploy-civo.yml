@@ -59,7 +59,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: ./Dockerfile
+          file: ./infra/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{

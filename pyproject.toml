@@ -279,6 +279,11 @@ addopts = "-ra --strict-markers"
 testpaths = ["tests", "ai/core/tests"]
 norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
 asyncio_default_fixture_loop_scope = "function"
+filterwarnings = [
+    # PyTorch 2.x emits this from its own torch/jit/_script.py:365 — third-party,
+    # not actionable from our code. Remove when PyTorch drops script_method.
+    "ignore::DeprecationWarning:torch.jit._script",
+]
 markers = [
   "integration: marks tests as integration tests (require external services)",
   "slow: marks tests as slow running",
