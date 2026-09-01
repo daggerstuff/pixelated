@@ -303,7 +303,6 @@ exclude_lines = [
 members = [
     "./",
     "tools/gdrive-dataset-manager",
-    "deep-agent",
 ]
 exclude = ["ai"]
 [tool.uv]
