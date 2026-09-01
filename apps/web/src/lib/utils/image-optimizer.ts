@@ -52,13 +52,42 @@ const IMAGE_CONFIG = {
 
   // Output directories (relative to ALLOWED_DIRECTORIES.PUBLIC = PROJECT_ROOT/public)
   OUTPUT_DIRS: {
-    optimized: validatePath(
-      'assets/optimized',
-      ALLOWED_DIRECTORIES.PUBLIC,
-    ),
+    optimized: validatePath('assets/optimized', ALLOWED_DIRECTORIES.PUBLIC),
     webp: validatePath('assets/webp', ALLOWED_DIRECTORIES.PUBLIC),
     avif: validatePath('assets/avif', ALLOWED_DIRECTORIES.PUBLIC),
+    resized: validatePath('assets/resized', ALLOWED_DIRECTORIES.PUBLIC),
   },
+
+  // Responsive resize breakpoints (width in pixels)
+  RESIZE: {
+    thumbnail: { width: 150, suffix: 'thumb' },
+    small: { width: 480, suffix: 'small' },
+    medium: { width: 800, suffix: 'medium' },
+    large: { width: 1200, suffix: 'large' },
+  } as const,
+}
+
+export interface ResizeVariant {
+  name: string
+  width: number
+  path: string
+  size: number
+}
+
+export interface BufferVariant {
+  buffer: Buffer
+  size: number
+  mimetype: string
+}
+
+export interface BufferOptimizationResult {
+  original: BufferVariant
+  optimized?: BufferVariant
+  webp?: BufferVariant
+  avif?: BufferVariant
+  thumbnail?: BufferVariant
+  resizeVariants: BufferVariant[]
+  savings: number
 }
 
 /**
@@ -73,6 +102,7 @@ export interface OptimizationResult {
   webpSize?: number
   avifPath?: string
   avifSize?: number
+  resizeVariants: ResizeVariant[]
   savings: number
   compressionRatio: number
 }
@@ -88,6 +118,7 @@ export class ImageOptimizer {
       IMAGE_CONFIG.OUTPUT_DIRS.optimized,
       IMAGE_CONFIG.OUTPUT_DIRS.webp,
       IMAGE_CONFIG.OUTPUT_DIRS.avif,
+      IMAGE_CONFIG.OUTPUT_DIRS.resized,
     ]
     void this.ensureOutputDirectories()
   }
@@ -157,6 +188,7 @@ export class ImageOptimizer {
         return {
           originalPath: imagePath,
           originalSize,
+          resizeVariants: [],
           savings: 0,
           compressionRatio: 1,
         }
@@ -166,12 +198,24 @@ export class ImageOptimizer {
       const result: OptimizationResult = {
         originalPath: imagePath,
         originalSize,
+        resizeVariants: [],
         savings: 0,
         compressionRatio: 1,
       }
 
       // Generate optimized versions
       if (format === 'jpeg' || format === 'png') {
+        // Re-compress original format
+        const optimizedResult = await this.optimizeOriginalFormat(
+          imagePath,
+          imageBuffer,
+          format,
+        )
+        if (optimizedResult) {
+          result.optimizedPath = optimizedResult.path
+          result.optimizedSize = optimizedResult.size
+        }
+
         // Generate WebP version
         const webpResult = await this.generateWebP(imagePath, imageBuffer)
         if (webpResult) {
@@ -185,6 +229,9 @@ export class ImageOptimizer {
           result.avifPath = avifResult.path
           result.avifSize = avifResult.size
         }
+
+        // Generate responsive resize variants
+        result.resizeVariants = await this.resizeImage(imagePath, imageBuffer)
       }
 
       // Calculate total savings — use the smallest optimized version as the
@@ -199,7 +246,8 @@ export class ImageOptimizer {
         optimizedSizes.length > 0 ? Math.min(...optimizedSizes) : originalSize
 
       result.savings = originalSize - bestOptimizedSize
-      result.compressionRatio = bestOptimizedSize > 0 ? originalSize / bestOptimizedSize : 1
+      result.compressionRatio =
+        bestOptimizedSize > 0 ? originalSize / bestOptimizedSize : 1
 
       const processingTime = Date.now() - startTime
 
@@ -342,6 +390,146 @@ export class ImageOptimizer {
   }
 
   /**
+   * Generate responsive resize variants for an image
+   */
+  private async resizeImage(
+    imagePath: string,
+    buffer: Buffer,
+  ): Promise<ResizeVariant[]> {
+    const variants: ResizeVariant[] = []
+    const basename =
+      imagePath
+        .split('/')
+        .pop()
+        ?.replace(/\.[^/.]+$/, '') ?? 'image'
+    const ext = extname(imagePath).toLowerCase().replace('.', '') || 'jpeg'
+
+    try {
+      const metadata = await sharp(buffer).metadata()
+      const originalWidth = metadata.width ?? 0
+
+      for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
+        // Skip if original is smaller than target width
+        if (originalWidth > 0 && originalWidth <= config.width) {
+          continue
+        }
+
+        try {
+          const outputFilename = `${basename}-${config.suffix}.${ext}`
+          const outputPath = safeJoin(
+            IMAGE_CONFIG.OUTPUT_DIRS.resized,
+            outputFilename,
+          )
+
+          const resizedBuffer = await sharp(buffer)
+            .resize({ width: config.width, withoutEnlargement: true })
+            .toBuffer()
+
+          await writeFile(outputPath, resizedBuffer)
+
+          variants.push({
+            name,
+            width: config.width,
+            path: outputPath,
+            size: resizedBuffer.length,
+          })
+
+          logger.info('Resize variant generated', {
+            inputPath: imagePath,
+            variant: name,
+            width: config.width,
+            size: resizedBuffer.length,
+          })
+        } catch (error: unknown) {
+          logger.warn('Resize variant failed', {
+            imagePath,
+            variant: name,
+            error: error instanceof Error ? error.message : String(error),
+          })
+        }
+      }
+    } catch (error: unknown) {
+      logger.warn('Resize image failed', {
+        imagePath,
+        error: error instanceof Error ? error.message : String(error),
+      })
+    }
+
+    return variants
+  }
+
+  /**
+   * Optimize original format (re-compress JPEG/PNG)
+   */
+  private async optimizeOriginalFormat(
+    imagePath: string,
+    buffer: Buffer,
+    format: string,
+  ): Promise<{ path: string; size: number } | null> {
+    if (format !== 'jpeg' && format !== 'png') {
+      return null
+    }
+
+    try {
+      const ext = format === 'jpeg' ? 'jpg' : 'png'
+      const outputPath = safeJoin(
+        IMAGE_CONFIG.OUTPUT_DIRS.optimized,
+        this.getOptimizedFilename(imagePath, ext),
+      )
+
+      let optimizedBuffer: Buffer
+
+      if (format === 'jpeg') {
+        optimizedBuffer = await sharp(buffer)
+          .jpeg({
+            quality: IMAGE_CONFIG.FORMATS.jpeg.quality,
+            progressive: IMAGE_CONFIG.FORMATS.jpeg.progressive,
+            mozjpeg: IMAGE_CONFIG.FORMATS.jpeg.mozjpeg,
+          })
+          .toBuffer()
+      } else {
+        optimizedBuffer = await sharp(buffer)
+          .png({
+            quality: IMAGE_CONFIG.FORMATS.png.quality,
+            compressionLevel: IMAGE_CONFIG.FORMATS.png.compressionLevel,
+            palette: IMAGE_CONFIG.FORMATS.png.palette,
+          })
+          .toBuffer()
+      }
+
+      // Only keep if smaller than original
+      if (optimizedBuffer.length >= buffer.length) {
+        logger.info('Optimized format not smaller than original, skipping', {
+          imagePath,
+          originalSize: buffer.length,
+          optimizedSize: optimizedBuffer.length,
+        })
+        return null
+      }
+
+      await writeFile(outputPath, optimizedBuffer)
+
+      logger.info('Original format optimization completed', {
+        inputPath: imagePath,
+        outputPath,
+        originalSize: buffer.length,
+        optimizedSize: optimizedBuffer.length,
+      })
+
+      return {
+        path: outputPath,
+        size: optimizedBuffer.length,
+      }
+    } catch (error: unknown) {
+      logger.warn('Original format optimization failed', {
+        imagePath,
+        error: error instanceof Error ? error.message : String(error),
+      })
+      return null
+    }
+  }
+
+  /**
    * Generate optimized filename
    */
   private getOptimizedFilename(originalPath: string, format: string): string {
@@ -405,7 +593,184 @@ export class ImageOptimizer {
   }
 
   /**
-   * Generate responsive image HTML
+   * Optimize an image from a buffer (for upload pipeline)
+   * Returns optimized buffers without writing to filesystem
+   */
+  async optimizeBuffer(
+    buffer: Buffer,
+    filename: string,
+    mimetype: string,
+  ): Promise<BufferOptimizationResult> {
+    const startTime = Date.now()
+    const format = this.detectImageFormat(filename, buffer)
+
+    const result: BufferOptimizationResult = {
+      original: { buffer, size: buffer.length, mimetype },
+      resizeVariants: [],
+      savings: 0,
+    }
+
+    if (buffer.length < IMAGE_CONFIG.THRESHOLDS.SMALL_FILE) {
+      logger.info('Skipping buffer optimization for small file', {
+        filename,
+        size: buffer.length,
+      })
+      return result
+    }
+
+    if (format === 'jpeg' || format === 'png') {
+      // Re-compress original format
+      try {
+        let optimizedBuffer: Buffer
+        if (format === 'jpeg') {
+          optimizedBuffer = await sharp(buffer)
+            .jpeg({
+              quality: IMAGE_CONFIG.FORMATS.jpeg.quality,
+              progressive: IMAGE_CONFIG.FORMATS.jpeg.progressive,
+              mozjpeg: IMAGE_CONFIG.FORMATS.jpeg.mozjpeg,
+            })
+            .toBuffer()
+        } else {
+          optimizedBuffer = await sharp(buffer)
+            .png({
+              quality: IMAGE_CONFIG.FORMATS.png.quality,
+              compressionLevel: IMAGE_CONFIG.FORMATS.png.compressionLevel,
+              palette: IMAGE_CONFIG.FORMATS.png.palette,
+            })
+            .toBuffer()
+        }
+
+        if (optimizedBuffer.length < buffer.length) {
+          result.optimized = {
+            buffer: optimizedBuffer,
+            size: optimizedBuffer.length,
+            mimetype,
+          }
+        }
+      } catch (error: unknown) {
+        logger.warn('Buffer original format optimization failed', {
+          filename,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+
+      // Generate WebP
+      try {
+        const webpBuffer = await sharp(buffer)
+          .webp({
+            quality: IMAGE_CONFIG.FORMATS.webp.quality,
+            effort: IMAGE_CONFIG.FORMATS.webp.effort,
+            lossless: IMAGE_CONFIG.FORMATS.webp.lossless,
+          })
+          .toBuffer()
+
+        result.webp = {
+          buffer: webpBuffer,
+          size: webpBuffer.length,
+          mimetype: 'image/webp',
+        }
+      } catch (error: unknown) {
+        logger.warn('Buffer WebP generation failed', {
+          filename,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+
+      // Generate AVIF
+      try {
+        const avifBuffer = await sharp(buffer)
+          .avif({
+            quality: IMAGE_CONFIG.FORMATS.avif.quality,
+            effort: IMAGE_CONFIG.FORMATS.avif.effort,
+          })
+          .toBuffer()
+
+        result.avif = {
+          buffer: avifBuffer,
+          size: avifBuffer.length,
+          mimetype: 'image/avif',
+        }
+      } catch (error: unknown) {
+        logger.warn('Buffer AVIF generation failed', {
+          filename,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+
+      // Generate thumbnail
+      try {
+        const thumbBuffer = await sharp(buffer)
+          .resize({
+            width: IMAGE_CONFIG.RESIZE.thumbnail.width,
+            withoutEnlargement: true,
+          })
+          .jpeg({ quality: 80 })
+          .toBuffer()
+
+        result.thumbnail = {
+          buffer: thumbBuffer,
+          size: thumbBuffer.length,
+          mimetype: 'image/jpeg',
+        }
+      } catch (error: unknown) {
+        logger.warn('Buffer thumbnail generation failed', {
+          filename,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+
+      // Generate resize variants
+      const metadata = await sharp(buffer).metadata()
+      const originalWidth = metadata.width ?? 0
+
+      for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
+        if (originalWidth > 0 && originalWidth <= config.width) {
+          continue
+        }
+
+        try {
+          const resizedBuffer = await sharp(buffer)
+            .resize({ width: config.width, withoutEnlargement: true })
+            .toBuffer()
+
+          result.resizeVariants.push({
+            buffer: resizedBuffer,
+            size: resizedBuffer.length,
+            mimetype,
+          })
+        } catch (error: unknown) {
+          logger.warn('Buffer resize variant failed', {
+            filename,
+            variant: name,
+            error: error instanceof Error ? error.message : String(error),
+          })
+        }
+      }
+    }
+
+    // Calculate savings — use smallest optimized version
+    const optimizedSizes = [
+      result.optimized?.size,
+      result.webp?.size,
+      result.avif?.size,
+    ].filter((s): s is number => s !== undefined && s > 0)
+
+    const bestSize =
+      optimizedSizes.length > 0 ? Math.min(...optimizedSizes) : buffer.length
+    result.savings = buffer.length - bestSize
+
+    logger.info('Buffer optimization completed', {
+      filename,
+      originalSize: buffer.length,
+      bestSize,
+      savings: result.savings,
+      processingTime: Date.now() - startTime,
+    })
+
+    return result
+  }
+  /**
+   * Generate responsive image HTML with srcset for resize variants
    */
   generateResponsiveImage(result: OptimizationResult): string {
     const alt =
@@ -417,22 +782,39 @@ export class ImageOptimizer {
     let html = `<!-- Responsive image: ${alt} -->\n`
     html += `<picture>\n`
 
-    // AVIF for modern browsers (smallest file size)
     if (result.avifPath) {
-      html += `  <source srcset="${result.avifPath}" type="image/avif">\n`
+      const srcset = this.buildSrcset(result.avifPath, result.resizeVariants)
+      html += `  <source srcset="${srcset}" type="image/avif">\n`
     }
 
-    // WebP for better compression
     if (result.webpPath) {
-      html += `  <source srcset="${result.webpPath}" type="image/webp">\n`
+      const srcset = this.buildSrcset(result.webpPath, result.resizeVariants)
+      html += `  <source srcset="${srcset}" type="image/webp">\n`
     }
 
-    // Original format as fallback
     const fallbackPath = result.optimizedPath ?? result.originalPath
     html += `  <img src="${fallbackPath}" alt="${alt}" loading="lazy">\n`
     html += `</picture>`
 
     return html
+  }
+
+  private buildSrcset(basePath: string, variants: ResizeVariant[]): string {
+    const parts = [basePath]
+    for (const variant of variants) {
+      const suffix =
+        variant.name === 'thumbnail'
+          ? 'thumb'
+          : (IMAGE_CONFIG.RESIZE[
+              variant.name as keyof typeof IMAGE_CONFIG.RESIZE
+            ]?.suffix ?? variant.name)
+      const variantPath = basePath.replace(
+        /-optimized\.[^.]+$/,
+        `-${suffix}.$&`,
+      )
+      parts.push(`${variantPath} ${variant.width}w`)
+    }
+    return parts.join(', ')
   }
 
   /**
@@ -445,6 +827,7 @@ export class ImageOptimizer {
     totalSavings: number
     avgCompressionRatio: number
     formatBreakdown: Record<string, number>
+    totalResizeVariants: number
   } {
     const totalOriginalSize = results.reduce(
       (sum, r) => sum + r.originalSize,
@@ -461,11 +844,15 @@ export class ImageOptimizer {
     const totalSavings = totalOriginalSize - totalOptimizedSize
 
     const formatBreakdown: Record<string, number> = {}
+    let totalResizeVariants = 0
     results.forEach((result) => {
       if (result.webpSize)
         formatBreakdown['webp'] = (formatBreakdown['webp'] ?? 0) + 1
       if (result.avifSize)
         formatBreakdown['avif'] = (formatBreakdown['avif'] ?? 0) + 1
+      if (result.optimizedSize)
+        formatBreakdown['optimized'] = (formatBreakdown['optimized'] ?? 0) + 1
+      totalResizeVariants += result.resizeVariants.length
     })
 
     return {
@@ -475,6 +862,7 @@ export class ImageOptimizer {
       totalSavings,
       avgCompressionRatio: totalOriginalSize / Math.max(totalOptimizedSize, 1),
       formatBreakdown,
+      totalResizeVariants,
     }
   }
 }
@@ -505,7 +893,8 @@ export async function optimizePublicImages(): Promise<OptimizationResult[]> {
           entry.name === 'build' ||
           entry.name === 'optimized' ||
           entry.name === 'webp' ||
-          entry.name === 'avif'
+          entry.name === 'avif' ||
+          entry.name === 'resized'
         ) {
           continue
         }

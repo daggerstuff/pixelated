@@ -76,6 +76,7 @@ describe('ImageOptimizer', () => {
       join(process.cwd(), 'public', 'assets', 'webp'),
       join(process.cwd(), 'public', 'assets', 'avif'),
       join(process.cwd(), 'public', 'assets', 'optimized'),
+      join(process.cwd(), 'public', 'assets', 'resized'),
     ]
     for (const dir of outputDirs) {
       const testFiles = ['test-optimized.webp', 'test-optimized.avif']
@@ -187,6 +188,7 @@ describe('ImageOptimizer', () => {
           originalSize: 100000,
           webpSize: 70000,
           avifSize: 50000,
+          resizeVariants: [],
           savings: 50000,
           compressionRatio: 2,
         },
@@ -195,6 +197,7 @@ describe('ImageOptimizer', () => {
           originalSize: 200000,
           webpSize: 150000,
           avifSize: 120000,
+          resizeVariants: [],
           savings: 80000,
           compressionRatio: 1.67,
         },
@@ -219,6 +222,7 @@ describe('ImageOptimizer', () => {
         {
           originalPath: 'small.gif',
           originalSize: 5000,
+          resizeVariants: [],
           savings: 0,
           compressionRatio: 1,
         },
@@ -243,6 +247,7 @@ describe('ImageOptimizer', () => {
         webpSize: 70000,
         avifPath: '/public/assets/avif/test-optimized.avif',
         avifSize: 50000,
+        resizeVariants: [],
         savings: 50000,
         compressionRatio: 2,
       }
@@ -260,6 +265,7 @@ describe('ImageOptimizer', () => {
       const result: OptimizationResult = {
         originalPath: '/public/assets/test.jpg',
         originalSize: 5000,
+        resizeVariants: [],
         savings: 0,
         compressionRatio: 1,
       }
@@ -281,6 +287,7 @@ describe('ImageOptimizer', () => {
           originalSize: 102400,
           webpSize: 71680,
           avifSize: 51200,
+          resizeVariants: [],
           savings: 51200,
           compressionRatio: 2,
         },
@@ -294,5 +301,163 @@ describe('ImageOptimizer', () => {
       expect(report).toContain('WEBP')
       expect(report).toContain('AVIF')
     })
+  })
+
+  describe('resizeImage (via optimizeImage)', () => {
+    it('should generate resize variants for images wider than breakpoints', async () => {
+      const rawNoise = Buffer.alloc(1300 * 800 * 3)
+      for (let i = 0; i < rawNoise.length; i += 3) {
+        rawNoise[i] = Math.floor(Math.random() * 256)
+        rawNoise[i + 1] = Math.floor(Math.random() * 256)
+        rawNoise[i + 2] = Math.floor(Math.random() * 256)
+      }
+      const wideBuffer = await sharp(rawNoise, {
+        raw: { width: 1300, height: 800, channels: 3 },
+      })
+        .jpeg({ quality: 85 })
+        .toBuffer()
+      const widePath = join(TMP_DIR, 'wide.jpg')
+      await writeFile(widePath, wideBuffer)
+
+      const result = await imageOptimizer.optimizeImage(widePath)
+
+      expect(result.resizeVariants.length).toBeGreaterThan(0)
+      for (const variant of result.resizeVariants) {
+        expect(variant.width).toBeGreaterThan(0)
+        expect(variant.size).toBeGreaterThan(0)
+        expect(existsSync(variant.path)).toBe(true)
+        expect(statSync(variant.path).size).toBe(variant.size)
+      }
+    }, 30000)
+
+    it('should not generate resize variants larger than the original width', async () => {
+      const result = await imageOptimizer.optimizeImage(TEST_IMAGES.jpeg)
+      const originalMeta = await sharp(TEST_IMAGES.jpeg).metadata()
+      const originalWidth = originalMeta.width ?? 0
+
+      for (const variant of result.resizeVariants) {
+        expect(variant.width).toBeLessThan(originalWidth)
+      }
+    })
+  })
+
+  describe('optimizeOriginalFormat (via optimizeImage)', () => {
+    it('should re-compress JPEG and populate optimizedPath/optimizedSize', async () => {
+      const result = await imageOptimizer.optimizeImage(TEST_IMAGES.jpeg)
+
+      expect(result.optimizedPath).toBeDefined()
+      expect(result.optimizedSize).toBeDefined()
+      if (result.optimizedPath && result.optimizedSize) {
+        expect(existsSync(result.optimizedPath)).toBe(true)
+        expect(statSync(result.optimizedPath).size).toBe(result.optimizedSize)
+        expect(result.optimizedSize).toBeLessThanOrEqual(result.originalSize)
+      }
+    })
+  })
+
+  describe('optimizeBuffer', () => {
+    it('should optimize a JPEG buffer and return all variants', async () => {
+      const rawNoise = Buffer.alloc(400 * 300 * 3)
+      for (let i = 0; i < rawNoise.length; i += 3) {
+        rawNoise[i] = Math.floor(Math.random() * 256)
+        rawNoise[i + 1] = Math.floor(Math.random() * 256)
+        rawNoise[i + 2] = Math.floor(Math.random() * 256)
+      }
+      const jpegBuffer = await sharp(rawNoise, {
+        raw: { width: 400, height: 300, channels: 3 },
+      })
+        .jpeg({ quality: 90 })
+        .toBuffer()
+
+      const result = await imageOptimizer.optimizeBuffer(
+        jpegBuffer,
+        'test.jpg',
+        'image/jpeg',
+      )
+
+      expect(result.original.buffer).toBe(jpegBuffer)
+      expect(result.original.size).toBe(jpegBuffer.length)
+      expect(result.original.mimetype).toBe('image/jpeg')
+      expect(result.webp).toBeDefined()
+      expect(result.webp?.mimetype).toBe('image/webp')
+      expect(result.avif).toBeDefined()
+      expect(result.avif?.mimetype).toBe('image/avif')
+      expect(result.thumbnail).toBeDefined()
+      expect(result.thumbnail?.mimetype).toBe('image/jpeg')
+      expect(result.resizeVariants.length).toBeGreaterThan(0)
+      expect(result.savings).toBeGreaterThanOrEqual(0)
+    }, 30000)
+
+    it('should optimize a PNG buffer', async () => {
+      const rawNoise = Buffer.alloc(400 * 300 * 4)
+      for (let i = 0; i < rawNoise.length; i += 4) {
+        rawNoise[i] = Math.floor(Math.random() * 256)
+        rawNoise[i + 1] = Math.floor(Math.random() * 256)
+        rawNoise[i + 2] = Math.floor(Math.random() * 256)
+        rawNoise[i + 3] = 255
+      }
+      const pngBuffer = await sharp(rawNoise, {
+        raw: { width: 400, height: 300, channels: 4 },
+      })
+        .png()
+        .toBuffer()
+
+      const result = await imageOptimizer.optimizeBuffer(
+        pngBuffer,
+        'test.png',
+        'image/png',
+      )
+
+      expect(result.original.mimetype).toBe('image/png')
+      expect(result.webp).toBeDefined()
+      expect(result.avif).toBeDefined()
+    }, 30000)
+
+    it('should skip optimization for buffers below small file threshold', async () => {
+      const tinyBuffer = await sharp({
+        create: {
+          width: 10,
+          height: 10,
+          channels: 3,
+          background: { r: 128, g: 128, b: 128 },
+        },
+      })
+        .jpeg({ quality: 30 })
+        .toBuffer()
+
+      const result = await imageOptimizer.optimizeBuffer(
+        tinyBuffer,
+        'tiny.jpg',
+        'image/jpeg',
+      )
+
+      expect(result.savings).toBe(0)
+      expect(result.webp).toBeUndefined()
+      expect(result.avif).toBeUndefined()
+    })
+
+    it('should return optimized original only if smaller than input', async () => {
+      const rawNoise = Buffer.alloc(400 * 300 * 3)
+      for (let i = 0; i < rawNoise.length; i += 3) {
+        rawNoise[i] = Math.floor(Math.random() * 256)
+        rawNoise[i + 1] = Math.floor(Math.random() * 256)
+        rawNoise[i + 2] = Math.floor(Math.random() * 256)
+      }
+      const jpegBuffer = await sharp(rawNoise, {
+        raw: { width: 400, height: 300, channels: 3 },
+      })
+        .jpeg({ quality: 90 })
+        .toBuffer()
+
+      const result = await imageOptimizer.optimizeBuffer(
+        jpegBuffer,
+        'test.jpg',
+        'image/jpeg',
+      )
+
+      if (result.optimized) {
+        expect(result.optimized.size).toBeLessThan(jpegBuffer.length)
+      }
+    }, 30000)
   })
 })

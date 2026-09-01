@@ -10,6 +10,8 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { v4 as uuidv4 } from 'uuid'
 
+import { imageOptimizer } from '../utils/image-optimizer'
+
 export interface FileMetadata {
   id: string
   originalName: string
@@ -81,25 +83,117 @@ export class FileStorageService {
     // Validate file
     this.validateFile(file, config)
 
+    // Optimize image if the file is an image
+    const isImage = file.mimetype.startsWith('image/')
+    let uploadBuffer = file.buffer
+    let uploadContentType = file.mimetype
+    let uploadSize = file.size
+    let thumbnailUrl: string | undefined
+    const optimizationMeta: Record<string, unknown> = {}
+
+    if (isImage) {
+      try {
+        const optimization = await imageOptimizer.optimizeBuffer(
+          file.buffer,
+          file.originalname,
+          file.mimetype,
+        )
+
+        // Use the optimized original if it's smaller
+        if (
+          optimization.optimized &&
+          optimization.optimized.size < uploadSize
+        ) {
+          uploadBuffer = optimization.optimized.buffer
+          uploadContentType = optimization.optimized.mimetype
+          uploadSize = optimization.optimized.size
+        }
+
+        // Upload thumbnail if generated
+        if (optimization.thumbnail) {
+          const thumbKey = `${key}-thumb.jpg`
+          await this.s3Client.send(
+            new PutObjectCommand({
+              Bucket: this.bucketName,
+              Key: thumbKey,
+              Body: optimization.thumbnail.buffer,
+              ContentType: 'image/jpeg',
+              ACL: config.isPublic ? 'public-read' : 'private',
+              Metadata: {
+                'uploaded-by': userId,
+                'original-name': file.originalname,
+                'variant': 'thumbnail',
+              },
+            }),
+          )
+          thumbnailUrl = this.cloudFrontDomain
+            ? `https://${this.cloudFrontDomain}/${thumbKey}`
+            : `https://${this.bucketName}.s3.amazonaws.com/${thumbKey}`
+        }
+
+        if (optimization.webp) {
+          const webpKey = `${key}.webp`
+          await this.s3Client.send(
+            new PutObjectCommand({
+              Bucket: this.bucketName,
+              Key: webpKey,
+              Body: optimization.webp.buffer,
+              ContentType: 'image/webp',
+              ACL: config.isPublic ? 'public-read' : 'private',
+              Metadata: {
+                'uploaded-by': userId,
+                'original-name': file.originalname,
+                'variant': 'webp',
+              },
+            }),
+          )
+        }
+
+        if (optimization.avif) {
+          const avifKey = `${key}.avif`
+          await this.s3Client.send(
+            new PutObjectCommand({
+              Bucket: this.bucketName,
+              Key: avifKey,
+              Body: optimization.avif.buffer,
+              ContentType: 'image/avif',
+              ACL: config.isPublic ? 'public-read' : 'private',
+              Metadata: {
+                'uploaded-by': userId,
+                'original-name': file.originalname,
+                'variant': 'avif',
+              },
+            }),
+          )
+        }
+
+        optimizationMeta['optimized'] = true
+        optimizationMeta['savings'] = optimization.savings
+        optimizationMeta['hasWebP'] = !!optimization.webp
+        optimizationMeta['hasAVIF'] = !!optimization.avif
+        optimizationMeta['resizeVariants'] = optimization.resizeVariants.length
+      } catch (error: unknown) {
+        // If optimization fails, continue with original file
+        optimizationMeta['optimized'] = false
+        optimizationMeta['error'] =
+          error instanceof Error ? error.message : String(error)
+      }
+    }
+
     // Upload to S3
-    const uploadParams: Record<string, unknown> = {
-      Bucket: this.bucketName,
-      Key: key,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-      Metadata: {
-        'uploaded-by': userId,
-        'original-name': file.originalname,
-      },
-    }
-
-    if (!config.isPublic) {
-      uploadParams['ACL'] = 'private'
-    } else {
-      uploadParams['ACL'] = 'public-read'
-    }
-
-    await this.s3Client.send(new PutObjectCommand(uploadParams as any))
+    await this.s3Client.send(
+      new PutObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+        Body: uploadBuffer,
+        ContentType: uploadContentType,
+        ACL: config.isPublic ? 'public-read' : 'private',
+        Metadata: {
+          'uploaded-by': userId,
+          'original-name': file.originalname,
+        },
+      }),
+    )
 
     const url = this.cloudFrontDomain
       ? `https://${this.cloudFrontDomain}/${key}`
@@ -110,15 +204,16 @@ export class FileStorageService {
       originalName: file.originalname,
       fileName,
       mimeType: file.mimetype,
-      size: file.size,
+      size: uploadSize,
       url,
+      thumbnailUrl,
       uploadedBy: userId,
       uploadedAt: new Date(),
       folderId: config.folder,
       version: 1,
       isPublic: config.isPublic ?? false,
       tags: config.tags ?? [],
-      metadata: {},
+      metadata: optimizationMeta,
     }
 
     return metadata
@@ -264,9 +359,20 @@ export class FileStorageService {
     return urlParts.slice(urlParts.indexOf(this.bucketName) + 1).join('/')
   }
 
-  async generateThumbnail(_file: Express.Multer.File): Promise<Buffer | null> {
-    // This would require sharp for image processing
-    // For now, return null - implement later if needed
-    return null
+  async generateThumbnail(file: Express.Multer.File): Promise<Buffer | null> {
+    if (!file.mimetype.startsWith('image/')) {
+      return null
+    }
+
+    try {
+      const result = await imageOptimizer.optimizeBuffer(
+        file.buffer,
+        file.originalname,
+        file.mimetype,
+      )
+      return result.thumbnail?.buffer ?? null
+    } catch {
+      return null
+    }
   }
 }
