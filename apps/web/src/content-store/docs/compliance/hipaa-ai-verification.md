@@ -1,6 +1,5 @@
 ---
-description:
-  HIPAA Compliance Verification Checklist for AI Components documentation
+description: HIPAA Compliance Verification Checklist for AI Components documentation
 title: HIPAA Compliance Verification Checklist for AI Components
 pubDate: '2026-05-09'
 ---

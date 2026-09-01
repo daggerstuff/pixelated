@@ -66,13 +66,10 @@ interface Props {
 
 ```astro
 ---
-import BaseLayout from '@/layouts/BaseLayout.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro'
 ---
 
-<BaseLayout
-  title="Page Title"
-  description="A brief description of the page."
->
+<BaseLayout title="Page Title" description="A brief description of the page.">
   <!-- Page content goes here -->
   <h1>Hello, world!</h1>
 </BaseLayout>
@@ -109,14 +106,10 @@ interface Props {
 
 ```astro
 ---
-import DashboardLayout from '@/layouts/DashboardLayout.astro';
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
 ---
 
-<DashboardLayout
-  title="User Dashboard"
-  requiresAuth={true}
-  showSidebar={true}
->
+<DashboardLayout title="User Dashboard" requiresAuth={true} showSidebar={true}>
   <div>
     <h1>Dashboard</h1>
     <p>Your dashboard content goes here.</p>
@@ -157,15 +150,15 @@ interface Props {
 
 ```astro
 ---
-import BlogLayout from '@/layouts/BlogLayout.astro';
+import BlogLayout from '@/layouts/BlogLayout.astro'
 ---
 
 <BlogLayout
   title="Understanding Mental Health"
   description="A comprehensive guide to mental health awareness"
-  publishDate={new Date("2025-03-15")}
+  publishDate={new Date('2025-03-15')}
   author="Dr. Jane Smith"
-  tags={["mental health", "wellness", "therapy"]}
+  tags={['mental health', 'wellness', 'therapy']}
 >
   <article>
     <p>Blog content goes here...</p>
@@ -202,13 +195,10 @@ interface Props {
 
 ```astro
 ---
-import AdminLayout from '@/layouts/AdminLayout.astro';
+import AdminLayout from '@/layouts/AdminLayout.astro'
 ---
 
-<AdminLayout
-  title="User Management"
-  requiredPermission="manage_users"
->
+<AdminLayout title="User Management" requiredPermission="manage_users">
   <div>
     <h1>User Management</h1>
     <p>Admin content goes here...</p>
@@ -246,12 +236,12 @@ interface Props extends HTMLAttributes<'div'> {
 
 ```astro
 ---
-import Card from '@/components/ui/Card.astro';
-import CardHeader from '@/components/ui/CardHeader.astro';
-import CardTitle from '@/components/ui/CardTitle.astro';
-import CardDescription from '@/components/ui/CardDescription.astro';
-import CardContent from '@/components/ui/CardContent.astro';
-import CardFooter from '@/components/ui/CardFooter.astro';
+import Card from '@/components/ui/Card.astro'
+import CardHeader from '@/components/ui/CardHeader.astro'
+import CardTitle from '@/components/ui/CardTitle.astro'
+import CardDescription from '@/components/ui/CardDescription.astro'
+import CardContent from '@/components/ui/CardContent.astro'
+import CardFooter from '@/components/ui/CardFooter.astro'
 ---
 
 <Card>
@@ -301,7 +291,7 @@ interface Props {
 
 ```astro
 ---
-import Alert from '@/components/ui/Alert.astro';
+import Alert from '@/components/ui/Alert.astro'
 ---
 
 <Alert
@@ -343,7 +333,7 @@ interface Props extends HTMLAttributes<'button'> {
 
 ```astro
 ---
-import Button from '@/components/ui/Button.astro';
+import Button from '@/components/ui/Button.astro'
 ---
 
 <!-- As a button -->
@@ -392,7 +382,7 @@ interface Props {
 
 ```astro
 ---
-import ThemeToggle from '@/components/ui/ThemeToggle.astro';
+import ThemeToggle from '@/components/ui/ThemeToggle.astro'
 ---
 
 <ThemeToggle />
@@ -429,16 +419,12 @@ interface Props {
 
 ```astro
 ---
-import Link from '@/components/base/Link.astro';
+import Link from '@/components/base/Link.astro'
 ---
 
 <Link href="/about">About Us</Link>
 
-<Link
-  href="https://example.com"
-  external={true}
-  enableNewTabWarning={true}
->
+<Link href="https://example.com" external={true} enableNewTabWarning={true}>
   External Link
 </Link>
 ```
@@ -469,7 +455,7 @@ None. This component fetches and displays system metrics automatically.
 
 ```astro
 ---
-import AdminDashboard from '@/components/admin/AdminDashboard.astro';
+import AdminDashboard from '@/components/admin/AdminDashboard.astro'
 ---
 
 <AdminDashboard />
@@ -497,7 +483,7 @@ None. This component fetches and displays security events automatically.
 
 ```astro
 ---
-import SecurityDashboard from '@/components/security/SecurityDashboard.astro';
+import SecurityDashboard from '@/components/security/SecurityDashboard.astro'
 ---
 
 <SecurityDashboard />
@@ -534,7 +520,7 @@ interface Props {
 
 ```astro
 ---
-import ErrorBoundary from '@/components/base/ErrorBoundary.astro';
+import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
 ---
 
 <ErrorBoundary fallback="Something went wrong. Please try again later.">
@@ -709,7 +695,7 @@ interface Props {
 
 ```astro
 ---
-import AuthCard from '@/components/auth/AuthCard.astro';
+import AuthCard from '@/components/auth/AuthCard.astro'
 ---
 
 <AuthCard
@@ -752,8 +738,8 @@ interface Props {
 
 ```astro
 ---
-import PageTransitions from '@/components/transitions/PageTransitions.astro';
-import BaseLayout from '@/layouts/BaseLayout.astro';
+import PageTransitions from '@/components/transitions/PageTransitions.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 ---
 
 <BaseLayout title="My Page">
@@ -806,16 +792,20 @@ Use Astro's template syntax for conditional rendering:
 
 ```astro
 ---
-const { showHeader = true, user } = Astro.props;
+const { showHeader = true, user } = Astro.props
 ---
 
 {showHeader && <header>Site Header</header>}
 
-{user ? (
-  <p>Welcome back, {user.name}!</p>
-) : (
-  <p>Please <Link href="/login">log in</Link></p>
-)}
+{
+  user ? (
+    <p>Welcome back, {user.name}!</p>
+  ) : (
+    <p>
+      Please <Link href="/login">log in</Link>
+    </p>
+  )
+}
 ```
 
 ### Using Slots
@@ -856,12 +846,15 @@ When integrating React components, use the appropriate client directive:
 
 ```astro
 ---
-import ReactComponent from './ReactComponent.jsx';
+import ReactComponent from './ReactComponent.jsx'
 ---
 
-<ReactComponent client:load /> <!-- Load immediately -->
-<ReactComponent client:visible /> <!-- Load when visible -->
-<ReactComponent client:idle /> <!-- Load during browser idle time -->
+<ReactComponent client:load />
+<!-- Load immediately -->
+<ReactComponent client:visible />
+<!-- Load when visible -->
+<ReactComponent client:idle />
+<!-- Load during browser idle time -->
 ```
 
 ## Testing Components

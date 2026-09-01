@@ -79,11 +79,11 @@ export function Card({ title, isActive = false }: CardProps) {
 ```astro
 ---
 interface Props {
-  title: string;
-  isActive?: boolean;
+  title: string
+  isActive?: boolean
 }
 
-const { title, isActive = false } = Astro.props as Props;
+const { title, isActive = false } = Astro.props as Props
 ---
 
 <article class:list={['card', isActive && 'active']}>
@@ -122,8 +122,9 @@ Example:
 
 ```astro
 ---
-import MessageForm from '../components/MessageForm.jsx';
+import MessageForm from '../components/MessageForm.jsx'
 ---
+
 <MessageForm client:visible />
 ```
 

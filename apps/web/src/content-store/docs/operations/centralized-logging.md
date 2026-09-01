@@ -1,6 +1,5 @@
 ---
-description:
-  Comprehensive documentation for our ELK-based centralized logging
+description: Comprehensive documentation for our ELK-based centralized logging
   infrastructure
 title: Centralized Logging System
 pubDate: '2026-05-09'

@@ -1,7 +1,6 @@
 ---
 title: Authentication
-description:
-  Learn about Pixelated Health's authentication system and security features
+description: Learn about Pixelated Health's authentication system and security features
 pubDate: '2026-05-09'
 ---
 

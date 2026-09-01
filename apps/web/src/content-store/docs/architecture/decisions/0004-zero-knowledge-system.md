@@ -1,6 +1,5 @@
 ---
-description:
-  '[ADR-0004] Zero-Knowledge Proof System for Data Pipeline Integrity'
+description: '[ADR-0004] Zero-Knowledge Proof System for Data Pipeline Integrity'
 pubDate: '2026-07-22'
 author: Pixelated Team
 tags:

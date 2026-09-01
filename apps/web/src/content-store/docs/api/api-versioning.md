@@ -1,7 +1,6 @@
 ---
 title: API Versioning Policy
-description:
-  How Pixelated Empathy versions its public API and manages backward
+description: How Pixelated Empathy versions its public API and manages backward
   compatibility
 pubDate: 2026-07-23
 author: Platform Team

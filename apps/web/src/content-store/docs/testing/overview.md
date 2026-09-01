@@ -1,6 +1,5 @@
 ---
-description:
-  Comprehensive guide to Pixelated testing infrastructure and practices
+description: Comprehensive guide to Pixelated testing infrastructure and practices
 title: Testing Overview
 pubDate: '2026-05-09'
 ---

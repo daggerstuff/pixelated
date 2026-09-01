@@ -1,6 +1,5 @@
 ---
-description:
-  Detailed documentation of all security measures implemented in the application
+description: Detailed documentation of all security measures implemented in the application
 title: Comprehensive Security Measures
 pubDate: '2026-05-09'
 ---

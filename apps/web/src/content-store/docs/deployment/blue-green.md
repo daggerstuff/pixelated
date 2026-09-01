@@ -1,6 +1,5 @@
 ---
-description:
-  Blue-green deployment strategy for zero-downtime production releases
+description: Blue-green deployment strategy for zero-downtime production releases
 pubDate: '2026-07-23'
 author: Pixelated Team
 tags:
