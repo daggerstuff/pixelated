@@ -1,0 +1,405 @@
+---
+export const prerender = false
+import AdminLayout from '@/components/admin/AdminLayout.astro'
+import { requirePageAuth } from '@/lib/auth/serverAuth'
+import { Icon } from 'astro-icon/components'
+
+await requirePageAuth(Astro, 'admin')
+---
+
+<AdminLayout
+  title="State Consent Rule Details"
+  description="View and manage individual state consent rule"
+  activeItem="state-consent-rules"
+>
+  <div class="space-y-6">
+    <!-- Back link -->
+    <div>
+      <a
+        href="/admin/state-consent-rules"
+        class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+      >
+        <Icon name="tabler:arrow-left" class="w-4 h-4 mr-1" />
+        Back to State Consent Rules
+      </a>
+    </div>
+
+    <!-- Rule Header -->
+    <div id="rule-header" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 id="rule-title" class="text-2xl font-bold text-gray-900 dark:text-white">
+            Loading...
+          </h1>
+          <p id="rule-subtitle" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          </p>
+        </div>
+        <div id="rule-status-badge" class="px-3 py-1 text-sm font-medium rounded-full">
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div id="action-bar" class="flex flex-wrap gap-3 hidden">
+      <button
+        id="btn-submit-review"
+        type="button"
+        class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 text-sm flex items-center hidden"
+      >
+        <Icon name="tabler:eye-check" class="w-4 h-4 mr-2" />
+        Submit for Review
+      </button>
+      <button
+        id="btn-approve"
+        type="button"
+        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm flex items-center hidden"
+      >
+        <Icon name="tabler:check" class="w-4 h-4 mr-2" />
+        Approve
+      </button>
+      <button
+        id="btn-activate"
+        type="button"
+        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm flex items-center hidden"
+      >
+        <Icon name="tabler:bolt" class="w-4 h-4 mr-2" />
+        Activate
+      </button>
+      <button
+        id="btn-archive"
+        type="button"
+        class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm flex items-center hidden"
+      >
+        <Icon name="tabler:archive" class="w-4 h-4 mr-2" />
+        Archive
+      </button>
+      <button
+        id="btn-delete"
+        type="button"
+        class="px-4 py-2 border border-red-300 text-red-600 rounded-md hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20 text-sm flex items-center hidden"
+      >
+        <Icon name="tabler:trash" class="w-4 h-4 mr-2" />
+        Delete Draft
+      </button>
+    </div>
+
+    <!-- Rule Details -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        Rule Configuration
+      </h2>
+      <div id="rule-config" class="space-y-3">
+        <p class="text-gray-400">Loading...</p>
+      </div>
+    </div>
+
+    <!-- Metadata -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Rule Metadata
+        </h2>
+        <dl id="rule-metadata" class="space-y-2 text-sm">
+          <p class="text-gray-400">Loading...</p>
+        </dl>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          Workflow History
+        </h2>
+        <dl id="rule-workflow" class="space-y-2 text-sm">
+          <p class="text-gray-400">Loading...</p>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Audit History -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+          Audit History
+        </h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead class="bg-gray-50 dark:bg-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Action
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Actor
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                From
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                To
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Timestamp
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            id="audit-tbody"
+            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"
+          >
+            <tr>
+              <td colspan="5" class="px-6 py-8 text-center text-gray-400">
+                Loading audit history...
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</AdminLayout>
+
+<script>
+  const STATUS_COLORS: Record<string, string> = {
+    draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
+    review: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+    approved: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
+    active: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
+    superseded: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
+    archived: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
+  }
+
+  function formatDate(dateStr: string | null): string {
+    if (!dateStr) return '—'
+    try {
+      return new Date(dateStr).toLocaleString()
+    } catch {
+      return dateStr
+    }
+  }
+
+  function renderConfig(config: Record<string, unknown>): string {
+    const fields: Array<{ label: string; value: string }> = [
+      { label: 'Minimum Consent Level', value: String(config.minimumConsentLevel ?? '—') },
+      { label: 'Override Consent Level', value: String(config.overrideConsentLevel ?? '—') },
+      { label: 'Requires Mental Health Consent', value: config.requiresMentalHealthConsent ? 'Yes' : 'No' },
+      { label: 'Requires SUD Consent', value: config.requiresSUDConsent ? 'Yes' : 'No' },
+      { label: 'Requires Minor Parental Consent', value: config.requiresMinorParentalConsent ? 'Yes' : 'No' },
+      { label: 'Age of Majority', value: String(config.ageOfMajority ?? '—') },
+    ]
+
+    if (config.minorConsentCategories && Array.isArray(config.minorConsentCategories)) {
+      fields.push({ label: 'Minor Consent Categories', value: (config.minorConsentCategories as string[]).join(', ') })
+    }
+
+    if (config.providerTypeRestrictions && typeof config.providerTypeRestrictions === 'object') {
+      fields.push({ label: 'Provider Type Restrictions', value: JSON.stringify(config.providerTypeRestrictions) })
+    }
+
+    if (config.treatmentCategoryOverrides && typeof config.treatmentCategoryOverrides === 'object') {
+      fields.push({ label: 'Treatment Category Overrides', value: JSON.stringify(config.treatmentCategoryOverrides) })
+    }
+
+    if (config.legalMetadata && typeof config.legalMetadata === 'object') {
+      const lm = config.legalMetadata as Record<string, string>
+      if (lm.legalReference) fields.push({ label: 'Legal Reference', value: lm.legalReference })
+      if (lm.lastLegalReviewDate) fields.push({ label: 'Last Legal Review', value: lm.lastLegalReviewDate })
+      if (lm.nextReviewDueDate) fields.push({ label: 'Next Review Due', value: lm.nextReviewDueDate })
+      if (lm.reviewedBy) fields.push({ label: 'Reviewed By', value: lm.reviewedBy })
+    }
+
+    return fields
+      .map(
+        (f) => `
+        <div class="flex justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+          <dt class="text-sm font-medium text-gray-600 dark:text-gray-400">${f.label}</dt>
+          <dd class="text-sm text-gray-900 dark:text-white">${f.value}</dd>
+        </div>
+      `,
+      )
+      .join('')
+  }
+
+  async function loadRule() {
+    const pathParts = window.location.pathname.split('/')
+    const ruleId = pathParts[pathParts.length - 1]
+
+    if (!ruleId) {
+      showError('No rule ID found in URL')
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/v1/admin/state-consent-rules/${ruleId}`)
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }))
+        showError(err.error || 'Failed to load rule')
+        return
+      }
+
+      const data = await res.json()
+      const rule = data.rule
+      const auditLog = data.auditLog || []
+
+      // Header
+      const titleEl = document.getElementById('rule-title')
+      const subtitleEl = document.getElementById('rule-subtitle')
+      const statusBadge = document.getElementById('rule-status-badge')
+
+      titleEl!.textContent = `${rule.stateCode} — Version ${rule.version}`
+      subtitleEl!.textContent = `Rule ID: ${rule.ruleId}`
+
+      const statusClass = STATUS_COLORS[rule.status] || STATUS_COLORS.draft
+      statusBadge!.className = `px-3 py-1 text-sm font-medium rounded-full ${statusClass}`
+      statusBadge!.textContent = rule.status
+
+      // Config
+      const configEl = document.getElementById('rule-config')
+      configEl!.innerHTML = renderConfig(rule.ruleConfig)
+
+      // Metadata
+      const metadataEl = document.getElementById('rule-metadata')
+      metadataEl!.innerHTML = `
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Rule ID</dt><dd class="text-gray-900 dark:text-white font-mono text-xs">${rule.ruleId}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Tenant ID</dt><dd class="text-gray-900 dark:text-white">${rule.tenantId || 'Global'}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">State Code</dt><dd class="text-gray-900 dark:text-white">${rule.stateCode}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Version</dt><dd class="text-gray-900 dark:text-white">v${rule.version}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Effective Date</dt><dd class="text-gray-900 dark:text-white">${formatDate(rule.effectiveDate)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Expiry Date</dt><dd class="text-gray-900 dark:text-white">${formatDate(rule.expiryDate)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Notes</dt><dd class="text-gray-900 dark:text-white">${rule.notes || '—'}</dd></div>
+      `
+
+      // Workflow
+      const workflowEl = document.getElementById('rule-workflow')
+      workflowEl!.innerHTML = `
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Created By</dt><dd class="text-gray-900 dark:text-white">${rule.createdByRole || rule.createdBy.substring(0, 8)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Created At</dt><dd class="text-gray-900 dark:text-white">${formatDate(rule.createdAt)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Reviewed By</dt><dd class="text-gray-900 dark:text-white">${rule.reviewedByRole || '—'}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Reviewed At</dt><dd class="text-gray-900 dark:text-white">${formatDate(rule.reviewedAt)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Approved By</dt><dd class="text-gray-900 dark:text-white">${rule.approvedByRole || '—'}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Approved At</dt><dd class="text-gray-900 dark:text-white">${formatDate(rule.approvedAt)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Activated At</dt><dd class="text-gray-900 dark:text-white">${formatDate(rule.activatedAt)}</dd></div>
+        <div class="flex justify-between"><dt class="text-gray-600 dark:text-gray-400">Superseded By</dt><dd class="text-gray-900 dark:text-white">${rule.supersededBy || '—'}</dd></div>
+      `
+
+      // Action buttons
+      const actionBar = document.getElementById('action-bar')
+      actionBar?.classList.remove('hidden')
+
+      const btnSubmitReview = document.getElementById('btn-submit-review')
+      const btnApprove = document.getElementById('btn-approve')
+      const btnActivate = document.getElementById('btn-activate')
+      const btnArchive = document.getElementById('btn-archive')
+      const btnDelete = document.getElementById('btn-delete')
+
+      if (rule.status === 'draft') {
+        btnSubmitReview?.classList.remove('hidden')
+        btnDelete?.classList.remove('hidden')
+      }
+      if (rule.status === 'review') {
+        btnApprove?.classList.remove('hidden')
+      }
+      if (rule.status === 'approved') {
+        btnActivate?.classList.remove('hidden')
+      }
+      if (rule.status !== 'active' && rule.status !== 'archived') {
+        btnArchive?.classList.remove('hidden')
+      }
+
+      // Audit table
+      const auditTbody = document.getElementById('audit-tbody')
+      if (auditLog.length === 0) {
+        auditTbody!.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">No audit entries</td></tr>'
+      } else {
+        auditTbody!.innerHTML = auditLog
+          .map(
+            (entry: { action: string; actorId: string; actorRole: string; oldStatus: string | null; newStatus: string | null; timestamp: string }) => `
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                ${entry.action.replace(/_/g, ' ')}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                ${entry.actorRole || entry.actorId.substring(0, 8)}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                ${entry.oldStatus || '—'}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                ${entry.newStatus || '—'}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                ${formatDate(entry.timestamp)}
+              </td>
+            </tr>
+          `,
+          )
+          .join('')
+      }
+
+      // Wire up action buttons
+      btnSubmitReview?.addEventListener('click', () => doAction('submit-review'))
+      btnApprove?.addEventListener('click', () => doAction('approve'))
+      btnActivate?.addEventListener('click', () => doAction('activate'))
+      btnArchive?.addEventListener('click', () => doAction('archive'))
+      btnDelete?.addEventListener('click', () => doDelete())
+    } catch (err) {
+      showError('Failed to load rule')
+    }
+  }
+
+  async function doAction(action: string) {
+    if (!confirm(`Are you sure you want to ${action.replace('-', ' ')} this rule?`)) return
+
+    const pathParts = window.location.pathname.split('/')
+    const ruleId = pathParts[pathParts.length - 1]
+
+    try {
+      const res = await fetch(`/api/v1/admin/state-consent-rules/${ruleId}/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }))
+        alert(err.error || `Failed to ${action}`)
+        return
+      }
+
+      window.location.reload()
+    } catch (err) {
+      alert('Network error occurred')
+    }
+  }
+
+  async function doDelete() {
+    if (!confirm('Are you sure you want to permanently delete this draft rule? This cannot be undone.')) return
+
+    const pathParts = window.location.pathname.split('/')
+    const ruleId = pathParts[pathParts.length - 1]
+
+    try {
+      const res = await fetch(`/api/v1/admin/state-consent-rules/${ruleId}`, {
+        method: 'DELETE',
+      })
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Request failed' }))
+        alert(err.error || 'Failed to delete')
+        return
+      }
+
+      window.location.href = '/admin/state-consent-rules'
+    } catch (err) {
+      alert('Network error occurred')
+    }
+  }
+
+  function showError(msg: string) {
+    const titleEl = document.getElementById('rule-title')
+    titleEl!.textContent = 'Error'
+    const configEl = document.getElementById('rule-config')
+    configEl!.innerHTML = `<p class="text-red-500">${msg}</p>`
+  }
+
+  document.addEventListener('DOMContentLoaded', loadRule)
+</script>

@@ -32,3 +32,14 @@ export type {
   WebRTCConfig,
   TelehealthProvider,
 } from './types'
+
+// Risk Stratification (F2.2 / PIX-4411)
+export { RiskStratificationService } from './services'
+export type {
+  RiskStratificationRequest,
+  RiskStratificationResponse,
+  RiskStratificationResult,
+  RiskLevel,
+  RiskScoreBreakdown,
+  RiskServiceHealth,
+} from './services'

@@ -27,6 +27,55 @@ class VerificationEngine:
     def __init__(self, config: VerificationConfig | None = None):
         self.config = config or VerificationConfig()
 
+    def _detect_dynamic_checks(self, workdir: str) -> list[str]:
+        """Infer target verification commands based on modified file types in workdir."""
+        checks: list[str] = []
+        try:
+            status_res = subprocess.run(
+                ["git", "status", "--porcelain"],
+                cwd=workdir,
+                capture_output=True,
+                text=True,
+                check=False,
+                timeout=10,
+            )
+            files = [line.strip().split()[-1] for line in status_res.stdout.splitlines() if line.strip()]
+
+            # Auto-format modified files with prettier before linting
+            ts_files = [f for f in files if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx", ".json"))]
+            if ts_files:
+                subprocess.run(
+                    ["pnpm", "exec", "prettier", "--write", *ts_files],
+                    cwd=workdir,
+                    capture_output=True,
+                    check=False,
+                )
+                ts_args = " ".join(ts_files)
+                checks.append(f"pnpm exec oxlint --type-aware -c .oxlintrc.json {ts_args}")
+                checks.append("pnpm lint:no-suppressions")
+
+            test_ts_files = [f for f in files if f.endswith((".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"))]
+            for tf in test_ts_files:
+                checks.append(f"pnpm vitest run --coverage.enabled=false -c config/vitest.config.ts {tf}")
+
+            # Target only the modified Python files for ruff
+            py_files = [f for f in files if f.endswith(".py")]
+            if py_files:
+                py_args = " ".join(py_files)
+                checks.append(f"uv run ruff check {py_args}")
+
+            test_py_files = [f for f in files if f.endswith(".py") and ("test" in f or "tests" in f)]
+            for pf in test_py_files:
+                checks.append(f"uv run pytest {pf} -q")
+
+        except Exception as e:
+            logger.debug("Error detecting dynamic checks: %s", e)
+        return checks
+
+    def verify(self, workdir: str, extra_commands: list[str] | None = None) -> VerificationOutcome:
+        """Alias for run_checks to support state graph Reviewer interface."""
+        return self.run_checks(workdir, extra_commands)
+
     def run_checks(self, workdir: str, extra_commands: list[str] | None = None) -> VerificationOutcome:
         """Run all configured verification commands in workdir."""
         if not self.config.enabled:
@@ -35,6 +84,11 @@ class VerificationEngine:
         commands = list(self.config.commands)
         if extra_commands:
             commands.extend(extra_commands)
+
+        if workdir != ".":
+            for dc in self._detect_dynamic_checks(workdir):
+                if dc not in commands:
+                    commands.append(dc)
 
         if not commands:
             return VerificationOutcome(

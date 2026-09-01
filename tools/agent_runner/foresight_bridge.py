@@ -15,10 +15,35 @@ class ForesightBridge:
         self.enabled = enabled
 
     def get_relevant_context(self, query: str, limit: int = 5) -> str:
-        """Query Foresight for relevant memories, preferences, and directives."""
+        """Query Foresight for relevant memories, user preferences, and directives."""
         if not self.enabled or not query:
             return ""
 
+        context_parts: list[str] = []
+
+        # 1. Fetch user preferences block
+        try:
+            res_pref = subprocess.run(
+                ["foresight", "blocks", "get", "user_preferences"],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                check=False,
+            )
+            if res_pref.returncode == 0 and res_pref.stdout.strip():
+                # Filter out server log lines
+                pref_lines = [
+                    line
+                    for line in res_pref.stdout.splitlines()
+                    if not line.startswith("2026-") and "[foresight_server]" not in line
+                ]
+                clean_pref = "\n".join(pref_lines).strip()
+                if clean_pref:
+                    context_parts.append(f"### Standing User Preferences & Directives:\n{clean_pref}")
+        except Exception as e:
+            logger.debug("Foresight blocks get failed: %s", e)
+
+        # 2. Semantic search for ticket-relevant architectural memories
         try:
             cmd = [
                 "foresight",
@@ -35,11 +60,18 @@ class ForesightBridge:
                 check=False,
             )
             if res.returncode == 0 and res.stdout.strip():
-                return res.stdout.strip()
+                mem_lines = [
+                    line
+                    for line in res.stdout.splitlines()
+                    if not line.startswith("2026-") and "[foresight_server]" not in line
+                ]
+                clean_mem = "\n".join(mem_lines).strip()
+                if clean_mem:
+                    context_parts.append(f"### Relevant Architectural Memories:\n{clean_mem}")
         except Exception as e:
-            logger.debug("Foresight CLI query skipped or failed: %s", e)
+            logger.debug("Foresight search failed: %s", e)
 
-        return ""
+        return "\n\n".join(context_parts)
 
     def store_decision(self, category: str, content: str, ticket_ref: str | None = None) -> bool:
         """Persist architectural decision or memory to Foresight."""
@@ -50,11 +82,12 @@ class ForesightBridge:
         try:
             cmd = [
                 "foresight",
-                "memory",
-                "add",
+                "store",
                 full_content,
                 "--category",
                 category,
+                "--importance",
+                "0.8",
             ]
             res = subprocess.run(
                 cmd,

@@ -1,0 +1,50 @@
+{
+  "releaseId": "release-staging-34e04cc",
+  "commit": "34e04cc9134313a90889c591847cb95a87d8e271",
+  "timestamp": "2026-08-29T01:25:37.695295+00:00",
+  "overallStatus": "ready",
+  "overallScore": 100.0,
+  "providers": {
+    "github": {
+      "status": "pass",
+      "pipelineUrl": "https://github.com/daggerstuff/pixelated/actions/runs/123456",
+      "checks": {
+        "build": "pass",
+        "ai-validation": "pass",
+        "security-scanning": "pass",
+        "bias-detection": "pass"
+      }
+    },
+    "gitlab": {
+      "status": "pass",
+      "pipelineUrl": "https://gitlab.com/daggerstuff/pixelated/-/pipelines/789012",
+      "checks": {
+        "validate:dependencies": "pass",
+        "validate:lint": "pass",
+        "validate:typecheck": "pass"
+      }
+    },
+    "bitbucket": {
+      "status": "pass",
+      "pipelineUrl": "https://bitbucket.org/daggerstuff/pixelated/addon/pipelines/home#/results/345",
+      "checks": {
+        "governance-validate": "pass",
+        "ingestion-stub-check": "pass",
+        "quality-scoring-test": "pass",
+        "sonarcloud-scan": "pass"
+      }
+    }
+  },
+  "qualityGates": {
+    "testCoverage": {
+      "status": "pass",
+      "value": 92.5,
+      "target": 90.0
+    },
+    "securityVulnerabilities": {
+      "status": "pass",
+      "value": 0,
+      "target": 0
+    }
+  }
+}

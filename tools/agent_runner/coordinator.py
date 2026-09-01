@@ -10,12 +10,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-from tools.agent_runner.adapters import get_agent_adapter
 from tools.agent_runner.client import LinearClient
 from tools.agent_runner.cluster_registry import ClusterRegistry
 from tools.agent_runner.compactor import ThreadCompactor
 from tools.agent_runner.deliberation import DeliberationEngine
 from tools.agent_runner.event_bus import EventBus, EventType
+from tools.agent_runner.execution_harness import AgentExecutionHarness
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
@@ -39,8 +39,9 @@ from tools.agent_runner.skills_bridge import SkillsBridge
 from tools.agent_runner.state_manager import StateManager
 from tools.agent_runner.subagent_harness import SubAgentHarness
 from tools.agent_runner.telemetry import TelemetryCollector
+from tools.agent_runner.trace_analyzer import TraceAnalyzer
 from tools.agent_runner.triage import AutoTriageEngine
-from tools.agent_runner.verifier import VerificationEngine, VerificationOutcome
+from tools.agent_runner.verifier import VerificationEngine
 from tools.agent_runner.worktree_pool import GitWorktreePool
 
 logger = logging.getLogger("agent_runner.coordinator")
@@ -63,29 +64,37 @@ DESCRIPTION:
 
 {foresight_context}
 
+{lessons_context}
+
 SHARED COORDINATION BLACKBOARD:
 {coord_thread}
 
-OPERATING RAILS & PROTOCOLS:
-1. Verify every fact and modification directly against the actual codebase.
-2. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */.
-3. Test your changes locally before concluding.
-4. If this task creates follow-up work or subtasks, declare them using:
-   CREATE TICKET: <title> | <description> | labels: <labels>
-   or
-   SUBTASK: <title> | <description>
-5. If scoping complex multi-step work, declare a task graph:
-   TASK_GRAPH:
-   - id: 1, title: <step 1>, agent: <agent>
-   - id: 2, title: <step 2>, agent: <agent>, depends: [1]
-6. If delegating to a specialist sub-agent, use:
-   DELEGATE: <agent_name> | <subtask directive>
-7. If an architectural decision or fact was made, declare it using:
-   STORE MEMORY: decision | <concise statement>
-8. If you have an update or proposal for other agents, declare it using:
-   BROADCAST: <message> or PROPOSE: <title> | <details>
-9. Conclude with a final summary line:
-   RESULT: <one concise sentence describing the outcome>
+MANDATORY OPERATING RAILS & PROTOCOLS:
+1. READ AGENTS.MD: Strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
+2. SURGICAL & DIRECT EXECUTION: Work directly on target files. Avoid sprawling whole-repo file indexing or reading massive documentation files that trigger context exhaustion.
+3. BLAST RADIUS CAP — CRITICAL: Your diff MUST touch ≤30 files for feature/fix tickets. For config-only or skeptic-review tickets, ≤10 files. If you find yourself editing >30 files, STOP, revert unrelated changes, and focus only on files directly required by the ticket. Breadth is NOT quality — surgical precision is.
+4. SCOPED TYPECHECK: After code changes, run `pnpm typecheck 2>&1 | tail -30` to check only relevant errors. DO NOT run workspace-wide typecheck repeatedly for unrelated files. If errors appear in unrelated files, ignore them — only fix errors in files you modified.
+5. NO HOLLOW / FAKE WORK: Implement real production classes, interfaces, and utilities. Never submit empty stubs or mocks testing only mocks.
+6. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
+7. PYTHON & LINT IDIOMS: For Python datetime handling, construct timezone-aware UTC datetimes (`datetime.now(timezone.utc)`) or use `datetime.fromisoformat()` for naive test cases to satisfy strict Ruff DTZ rules without `# noqa`.
+8. TEST REAL CODE: Write and run real tests verifying your actual production implementation with pytest / vitest.
+9. AUTO-FORMAT: Ensure all modified files adhere to Prettier and ruff/oxlint standards.
+10. If this task creates follow-up work or subtasks, declare them using:
+    CREATE TICKET: <title> | <description> | labels: <labels>
+    or
+    SUBTASK: <title> | <description>
+11. If scoping complex multi-step work, declare a task graph:
+    TASK_GRAPH:
+    - id: 1, title: <step 1>, agent: <agent>
+    - id: 2, title: <step 2>, agent: <agent>, depends: [1]
+12. If delegating to a specialist sub-agent, use:
+    DELEGATE: <agent_name> | <subtask directive>
+13. If an architectural decision or fact was made, declare it using:
+    STORE MEMORY: decision | <concise statement>
+14. If you have an update or proposal for other agents, declare it using:
+    BROADCAST: <message> or PROPOSE: <title> | <details>
+15. Conclude with a final summary line:
+    RESULT: <one concise sentence describing the outcome>
 """
 
 
@@ -135,8 +144,16 @@ class MultiAgentCoordinator:
         )
         self.loop_auditor = WorkLoopAuditor()
         self.sensor_engine = SensorHookEngine()
+        self.trace_analyzer = TraceAnalyzer(config.langchain_project)
         self.lineage = comps.lineage_tracker or LineageTracker()
         self.evolution = comps.self_evolution or SelfEvolutionEngine(self.foresight, self.event_bus)
+        self.harness = AgentExecutionHarness(
+            config=config,
+            foresight=self.foresight,
+            tracer=self.tracer,
+            event_bus=self.event_bus,
+            self_evolution=self.evolution,
+        )
         self._shutdown_requested = False
 
     def request_shutdown(self) -> None:
@@ -180,6 +197,7 @@ class MultiAgentCoordinator:
             skill_lines = [f"- **{name}**: {desc}" for name, desc in matching_skills]
             skills_text = "RECOMMENDED LOCAL SKILLS:\n" + "\n".join(skill_lines)
 
+        lessons_text = self.evolution.format_lessons_for_prompt(limit=5)
         role_prompt = agent.system_prompt_override or get_role_prompt(agent.role)
 
         return TICKET_PROMPT_TEMPLATE.format(
@@ -194,6 +212,7 @@ class MultiAgentCoordinator:
             description=issue.description or "(No description provided)",
             skills_context=skills_text,
             foresight_context=foresight_text,
+            lessons_context=lessons_text,
             coord_thread=coord_thread_digest,
         )
 
@@ -524,34 +543,20 @@ class MultiAgentCoordinator:
                 skills_matched=matching_skills,
             )
 
-            adapter = get_agent_adapter(agent)
-            raw_result = adapter.run(
-                prompt=prompt,
+            # Execute through the rigorous 6-stage Execution Harness
+            result, harness_report = self.harness.run_harness(
+                agent_cfg=agent,
+                issue=issue,
                 workdir=active_workdir,
-                ticket_identifier=issue.identifier,
-                enable_branching=False,
+                prompt=prompt,
+                parent_trace=ticket_trace,
             )
-
-            self.tracer.record_agent_cli(ticket_trace, agent, prompt, raw_result)
-            suppression_violations = self.guardrails.audit_code_diff_for_suppressions(raw_result.git_diff_summary)
-            raw_result.guardrail_violations.extend(suppression_violations)
-
-            result = self._run_verification_and_repair(adapter, active_workdir, issue, agent, raw_result)
-
-            if self.config.verification.enabled:
-                self.tracer.record_verification(
-                    ticket_trace,
-                    VerificationOutcome(
-                        passed=result.verification_passed,
-                        summary=result.verification_logs,
-                        command_results=[],
-                        duration_seconds=0.0,
-                    ),
-                )
 
             # Post-Flight Sensors & Work Loop 5D Audit
             self.sensor_engine.run_post_flight_sensors(active_workdir)
-            audit_report = self.loop_auditor.evaluate_execution(issue, result, is_sandboxed=bool(worktree_lease))
+            audit_report = harness_report.audit_report or self.loop_auditor.evaluate_execution(
+                issue, result, is_sandboxed=bool(worktree_lease)
+            )
 
             pr_res = None
             if worktree_lease and result.verification_passed:

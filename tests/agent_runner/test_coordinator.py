@@ -5,7 +5,15 @@ from unittest.mock import MagicMock
 from tools.agent_runner.coordinator import CoordinatorComponents, MultiAgentCoordinator
 from tools.agent_runner.event_bus import EventBus
 from tools.agent_runner.lineage import LineageTracker
-from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, LinearTeam, ProjectConfig, RunnerConfig
+from tools.agent_runner.models import (
+    AgentConfig,
+    ExecutionResult,
+    LinearIssue,
+    LinearTeam,
+    ProjectConfig,
+    RunnerConfig,
+    VerificationConfig,
+)
 from tools.agent_runner.state_manager import StateManager
 
 
@@ -34,7 +42,7 @@ def test_coordinator_tick_workflow(monkeypatch):
         git_diff_summary="M file.py",
     )
 
-    monkeypatch.setattr("tools.agent_runner.coordinator.get_agent_adapter", lambda _agent: mock_adapter)
+    monkeypatch.setattr("tools.agent_runner.execution_harness.get_agent_adapter", lambda _agent: mock_adapter)
 
     with tempfile.TemporaryDirectory() as tmp_dir:
         state_mgr = StateManager(os.path.join(tmp_dir, "state.json"))
@@ -47,6 +55,7 @@ def test_coordinator_tick_workflow(monkeypatch):
             enable_foresight_memory=False,
             enable_langchain_tracing=False,
             enable_git_pr_creation=False,
+            verification=VerificationConfig(enabled=False),
             projects=[ProjectConfig(team_key="PIX", default_repo="main", repos={"main": "."})],
             agents=[AgentConfig(name="opencode", label="agent:opencode", cmd=["opencode", "run"])],
         )

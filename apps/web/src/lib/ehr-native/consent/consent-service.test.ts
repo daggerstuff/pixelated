@@ -42,6 +42,18 @@ vi.mock('./repository', () => ({
   },
 }))
 
+vi.mock('./state-rules/cache', () => ({
+  stateConsentRulesCache: {
+    getActiveRule: vi.fn().mockResolvedValue(null),
+    getRuleConfig: vi.fn().mockResolvedValue(null),
+    invalidate: vi.fn().mockResolvedValue(undefined),
+    invalidateState: vi.fn().mockResolvedValue(undefined),
+    invalidateAll: vi.fn().mockResolvedValue(undefined),
+    warmCache: vi.fn().mockResolvedValue(undefined),
+  },
+  StateConsentRulesCache: vi.fn(),
+}))
+
 import type { ConsentLevel } from '@/lib/research/types/research-types'
 
 import type { Consent } from '../types/consent'

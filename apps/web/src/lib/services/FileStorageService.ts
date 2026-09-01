@@ -171,7 +171,36 @@ export class FileStorageService {
         optimizationMeta['savings'] = optimization.savings
         optimizationMeta['hasWebP'] = !!optimization.webp
         optimizationMeta['hasAVIF'] = !!optimization.avif
-        optimizationMeta['resizeVariants'] = optimization.resizeVariants.length
+        // Upload resize variants for responsive images
+        const uploadedVariantKeys: string[] = []
+        for (const variant of optimization.resizeVariants) {
+          const suffix =
+            (variant as unknown as { name?: string }).name ??
+            `w${(variant as unknown as { width?: number }).width ?? 'unknown'}`
+          const variantKey = `${key}-${suffix}${variant.mimetype === 'image/jpeg' ? '.jpg' : variant.mimetype === 'image/png' ? '.png' : '.jpg'}`
+          try {
+            await this.s3Client.send(
+              new PutObjectCommand({
+                Bucket: this.bucketName,
+                Key: variantKey,
+                Body: variant.buffer,
+                ContentType: variant.mimetype,
+                ACL: config.isPublic ? 'public-read' : 'private',
+                Metadata: {
+                  'uploaded-by': userId,
+                  'original-name': file.originalname,
+                  'variant': suffix,
+                },
+              }),
+            )
+            uploadedVariantKeys.push(variantKey)
+          } catch (variantError: unknown) {
+            // Log variant failure but continue with other variants and original upload
+            console.warn(`Failed to upload variant ${suffix}`, variantError)
+          }
+        }
+        optimizationMeta['resizeVariants'] = uploadedVariantKeys.length
+        optimizationMeta['variantKeys'] = uploadedVariantKeys
       } catch (error: unknown) {
         // If optimization fails, continue with original file
         optimizationMeta['optimized'] = false

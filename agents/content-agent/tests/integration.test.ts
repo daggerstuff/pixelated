@@ -9,7 +9,7 @@ import gateInjection from '../agent/tools/gate_injection.js'
 
 const CORPUS = fileURLToPath(
   new URL(
-    '../../../hackathon/monthly_work/2025-08/generated_emails.json',
+    '../../../hackathon/pixelated_email_dump_combined.json',
     import.meta.url,
   ),
 )

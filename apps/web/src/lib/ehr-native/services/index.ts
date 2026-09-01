@@ -18,6 +18,7 @@
  * - TelehealthService (F1.12) — native telehealth sessions
  * - NoteSigningService (F2.2) — AI no auto-sign compliance gate
  * - OutcomesService (F2.4) — outcome measure trending (PHQ-9, GAD-7, OQ-45)
+ * - AnalyticsService (PIX-4413) — customizable dashboard metrics, RBAC, and saved views
  */
 
 export { PatientService } from './patient-service'
@@ -63,3 +64,35 @@ export {
   type OutcomeTrendPoint,
   type OutcomeAlertResult,
 } from './outcomes.service'
+
+export {
+  RiskStratificationService,
+  type RiskStratificationRequest,
+  type RiskStratificationResponse,
+  type RiskStratificationResult,
+  type RiskLevel,
+  type RiskScoreBreakdown,
+  type RiskServiceHealth,
+  type PHQ9Scores,
+  type GAD7Scores,
+  type CSSRSScreen,
+  type ClinicalContext,
+} from './risk.service'
+
+export {
+  AnalyticsService,
+  type DashboardType,
+  type DashboardFilter,
+  type TimeRange,
+  type PracticeMetrics,
+  type OutcomesMetrics,
+  type UtilizationMetrics,
+  type BillingMetrics,
+  type ComplianceMetrics,
+  type DashboardMetrics,
+  type AnalyticsRepository,
+  canAccessDashboard,
+  getAccessibleDashboards,
+  DASHBOARD_TYPES,
+  DASHBOARD_RBAC,
+} from './analytics.service'

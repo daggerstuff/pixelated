@@ -20,3 +20,6 @@ export { EHRDesktopLayout } from './EHRDesktopLayout'
 // Submodule exports
 export * from './portal'
 export * from './telehealth'
+export * from './supervisor/risk-queue'
+export * from './dashboards'
+export * from './integrations'

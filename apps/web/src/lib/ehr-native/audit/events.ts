@@ -78,6 +78,16 @@ export const EHRAuditAction = {
   CANCEL_PRESCRIPTION: 'cancel_prescription',
   CHECK_DRUG_INTERACTION: 'check_drug_interaction',
 
+  // E-Prescribing
+  EPRESCRIBE_NEW_RX: 'eprescribe_new_rx',
+  EPRESCRIBE_REFILL: 'eprescribe_refill',
+  EPRESCRIBE_CANCEL: 'eprescribe_cancel',
+  EPRESCRIBE_PRESCRIPTION_STATUS_CHECK: 'eprescribe_prescription_status_check',
+  EPRESCRIBE_MEDICATION_HISTORY: 'eprescribe_medication_history',
+  EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK:
+    'eprescribe_controlled_substance_check',
+  EPRESCRIBE_DRUG_INTERACTION_CHECK: 'eprescribe_drug_interaction_check',
+
   // HIE / Integration
   HIE_PATIENT_DISCOVERY: 'hie_patient_discovery',
   HIE_DOCUMENT_QUERY: 'hie_document_query',
@@ -100,6 +110,27 @@ export const EHRAuditAction = {
 
   // Break-glass
   BREAK_GLASS_ACCESS: 'break_glass_access',
+
+  // Supervisor Operations (F3.2)
+  VIEW_SUPERVISOR_CASELOAD: 'view_supervisor_caseload',
+  VIEW_REVIEW_QUEUE: 'view_review_queue',
+  VIEW_NOTE_REVIEW: 'view_note_review',
+  COSIGN_NOTE: 'cosign_note',
+  REJECT_NOTE: 'reject_note',
+  REQUEST_NOTE_CHANGES: 'request_note_changes',
+  VIEW_RISK_QUEUE: 'view_risk_queue',
+  ACKNOWLEDGE_RISK_FLAG: 'acknowledge_risk_flag',
+  RESOLVE_RISK_FLAG: 'resolve_risk_flag',
+  OBSERVE_SESSION: 'observe_session',
+  LEAVE_SESSION_OBSERVATION: 'leave_session_observation',
+  VIEW_SUPERVISOR_METRICS: 'view_supervisor_metrics',
+
+  // Integration Marketplace (F2.5)
+  INTEGRATION_CONNECT: 'integration_connect',
+  INTEGRATION_DISCONNECT: 'integration_disconnect',
+  INTEGRATION_WEBHOOK_RECEIVED: 'integration_webhook_received',
+  INTEGRATION_OAUTH_CALLBACK: 'integration_oauth_callback',
+  INTEGRATION_TOKEN_REFRESH: 'integration_token_refresh',
 } as const
 
 export type EHRAuditActionType =
@@ -118,8 +149,13 @@ export const EHRResourceType = {
   CLAIM: 'Claim',
   CONSENT: 'Consent',
   MEDICATION_REQUEST: 'MedicationRequest',
+  EPRESCRIPTION: 'EPrescription',
   COVERAGE: 'Coverage',
   TELEHEALTH_SESSION: 'TelehealthSession',
+  PROVENANCE: 'Provenance',
+  SUPERVISOR_REVIEW: 'SupervisorReview',
+  RISK_FLAG: 'RiskFlag',
+  INTEGRATION: 'Integration',
 } as const
 
 export type EHRResourceTypeValue =
@@ -215,6 +251,23 @@ export function ehrActionToEventType(
   ) {
     return AuditEventType.UPDATE
   }
+  // Supervisor (F3.2) oversight actions are clinical write operations;
+  // classify explicitly so they never fall through to the read-access default.
+  if (
+    action === EHRAuditAction.COSIGN_NOTE ||
+    action === EHRAuditAction.REJECT_NOTE ||
+    action === EHRAuditAction.REQUEST_NOTE_CHANGES ||
+    action === EHRAuditAction.ACKNOWLEDGE_RISK_FLAG ||
+    action === EHRAuditAction.RESOLVE_RISK_FLAG
+  ) {
+    return AuditEventType.UPDATE
+  }
+  if (action === EHRAuditAction.OBSERVE_SESSION) {
+    return AuditEventType.CREATE
+  }
+  if (action === EHRAuditAction.LEAVE_SESSION_OBSERVATION) {
+    return AuditEventType.UPDATE
+  }
   if (action.startsWith('view_') || action.startsWith('check_')) {
     return AuditEventType.ACCESS
   }
@@ -247,8 +300,31 @@ export function ehrActionToEventType(
   ) {
     return AuditEventType.DELETE
   }
-  if (action.startsWith('hie_') || action.startsWith('clearinghouse_')) {
+  if (
+    action.startsWith('hie_') ||
+    action.startsWith('clearinghouse_') ||
+    action.startsWith('integration_')
+  ) {
     return AuditEventType.SYSTEM
+  }
+  // E-prescribing: new/refill are create operations, cancel is a delete,
+  // medication history and drug interaction checks are read accesses.
+  if (
+    action === EHRAuditAction.EPRESCRIBE_NEW_RX ||
+    action === EHRAuditAction.EPRESCRIBE_REFILL
+  ) {
+    return AuditEventType.CREATE
+  }
+  if (action === EHRAuditAction.EPRESCRIBE_CANCEL) {
+    return AuditEventType.DELETE
+  }
+  if (
+    action === EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK ||
+    action === EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY ||
+    action === EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK ||
+    action === EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK
+  ) {
+    return AuditEventType.ACCESS
   }
   if (action.startsWith('break_glass')) {
     return AuditEventType.SECURITY

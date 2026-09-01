@@ -37,7 +37,7 @@ export const cspConfig: CSPConfig = {
     'https://cdn.pixelatedempathy.com',
     'https://www.googletagmanager.com',
     'https://js.sentry-cdn.com',
-    'https://app.rybbit.io',
+    'https://analytics.pixelatedempathy.com',
     'data:',
   ],
 
@@ -77,7 +77,7 @@ export const cspConfig: CSPConfig = {
     // Analytics & monitoring
     'https://www.googletagmanager.com',
     'https://js.sentry-cdn.com',
-    'https://app.rybbit.io',
+    'https://analytics.pixelatedempathy.com',
     // Authentication
     'https://accounts.google.com',
     // External APIs

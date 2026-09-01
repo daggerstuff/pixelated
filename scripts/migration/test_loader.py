@@ -11,7 +11,7 @@ from pathlib import Path
 # Add ai submodule to path
 sys.path.append(str(Path(__file__).parents[2]))
 
-from ai.tools.utilities.core.utils.s3_dataset_loader import load_dataset_from_s3
+from utils.s3_dataset_loader import load_dataset_from_s3
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("s3_loader_test")

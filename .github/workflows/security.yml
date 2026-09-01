@@ -35,8 +35,7 @@ jobs:
       security-events: write
       actions: write
     concurrency:
-      group:
-        codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
+      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
@@ -102,8 +101,7 @@ jobs:
 
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run:
-          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
           --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
@@ -127,8 +125,7 @@ jobs:
       - name: Install Python dependencies
         if: matrix.language == 'python'
         env:
-          VIRTUAL_ENV:
-            ${{ github.workspace
+          VIRTUAL_ENV: ${{ github.workspace
             }}/apps/web/src/lib/ai/bias-detection/python-service/.venv
         run: |
           if [ -d "apps/web/src/lib/ai/bias-detection/python-service" ]; then
@@ -256,7 +253,7 @@ jobs:
       - name: Run Checkov infrastructure scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_infra
-        uses: bridgecrewio/checkov-action@v12.3119.0
+        uses: bridgecrewio/checkov-action@v12.3121.0
         with:
           directory: .
           framework: terraform,terraform_plan,bicep
@@ -270,7 +267,7 @@ jobs:
       - name: Run Checkov Helm scan
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
         id: checkov_helm
-        uses: bridgecrewio/checkov-action@v12.3119.0
+        uses: bridgecrewio/checkov-action@v12.3121.0
         with:
           directory: ai/inference/deployment/pixel-voice
           framework: kubernetes,helm
@@ -337,8 +334,7 @@ jobs:
           category: checkov-helm
 
       - name: Upload Checkov artifacts
-        if:
-          always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
+        if: always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
           steps.checkov_helm_sarif.outputs.found == 'true')
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -408,8 +404,7 @@ jobs:
           fi
 
       - name: Enforce high+ vulnerability threshold
-        run:
-          node scripts/utils/check-pnpm-audit.js --fail-on high
+        run: node scripts/utils/check-pnpm-audit.js --fail-on high
           audit-results.json
 
       - name: Upload audit results

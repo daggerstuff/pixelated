@@ -55,6 +55,20 @@ class SelfEvolutionEngine:
                 "NEVER insert @ts-ignore, @ts-nocheck, # noqa, or # type: ignore. Always fix underlying type definitions.",
             )
 
+        if "dtz" in logs_lower or "naive datetime" in logs_lower:
+            return (
+                "lint_datetime",
+                "Ruff DTZ rule violation on naive datetime construction.",
+                "Construct timezone-aware datetimes with timezone.utc or use datetime.fromisoformat() without # noqa.",
+            )
+
+        if "ruff" in logs_lower or "eslint" in logs_lower or "oxlint" in logs_lower or "lint" in logs_lower:
+            return (
+                "lint_violation",
+                "Linter rule violation during code verification.",
+                "Run 'uv run ruff check --fix' or 'pnpm lint' and fix root cause without suppression comments.",
+            )
+
         if "ts(" in logs or "type error" in logs_lower or "cannot find module" in logs_lower:
             match = re.search(r"error TS\d+:\s*([^\n]+)", logs)
             detail = match.group(1) if match else "TypeScript compilation error"
@@ -78,11 +92,32 @@ class SelfEvolutionEngine:
                 "Decompose long-running batch modifications into smaller atomic subtasks using TASK_GRAPH.",
             )
 
+        if "blast radius exceeded" in logs_lower or (
+            "files changed" in logs_lower and any(f"{n} files" in logs_lower for n in range(50, 500))
+        ):
+            return (
+                "blast_radius",
+                "Diff touched too many files — over-scoped execution beyond ticket boundaries.",
+                "BLAST RADIUS CAP: Feature tickets ≤30 files, config/skeptic tickets ≤10 files. "
+                "When editing config or performing a review, only touch files the ticket explicitly describes. "
+                "Do NOT propagate changes to unrelated files. Run 'git diff --name-only' before committing to verify scope.",
+            )
+
         return (
             "general_friction",
             "Execution completed with diagnostic failures.",
             "Verify all files and commands against the repository structure before completing tasks.",
         )
+
+    def format_lessons_for_prompt(self, limit: int = 5) -> str:
+        """Format recent systemic lessons for injection into agent prompts."""
+        lessons = self.get_recent_lessons(limit=limit)
+        if not lessons:
+            return ""
+        lines = ["RECENT SYSTEMIC LESSONS & PREVENTATIVE RULES:"]
+        for les in lessons:
+            lines.append(f"- **[{les.failure_category.upper()}]**: {les.actionable_rule}")
+        return "\n".join(lines)
 
     def process_execution_friction(
         self,
@@ -92,7 +127,18 @@ class SelfEvolutionEngine:
         repair_attempts: int = 0,
     ) -> DistilledLesson | None:
         """Analyze failed execution or high-friction auto-repair and distill persistent lesson."""
-        if result.success and result.verification_passed and not result.guardrail_violations and repair_attempts == 0:
+        has_internal_friction = (
+            "flags" in (result.output or "").lower()
+            or "fixing" in (result.output or "").lower()
+            or "retry" in (result.output or "").lower()
+        )
+        if (
+            result.success
+            and result.verification_passed
+            and not result.guardrail_violations
+            and repair_attempts == 0
+            and not has_internal_friction
+        ):
             return None
 
         combined_logs = f"{result.stderr}\n{result.verification_logs}\n{result.output}"

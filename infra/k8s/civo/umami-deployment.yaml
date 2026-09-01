@@ -1,0 +1,133 @@
+# ---------------------------------------------------------------------------
+# Umami Analytics — self-hosted web analytics (umami-so/umami)
+#
+# Replaces Rybbit (client + backend + ClickHouse + Postgres + Redis ≈ 2.5GB)
+# with a single container (~200MB) sharing the existing Postgres instance.
+#
+# Secrets (DATABASE_URL for the umami DB, UMAMI_APP_SECRET) are synced by
+# External Secrets Operator — see external-secret.yaml.
+#
+# @see https://umami.is/docs/run-umami
+# ---------------------------------------------------------------------------
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umami
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: umami
+    app.kubernetes.io/component: analytics
+    app.kubernetes.io/part-of: pixelated-empathy
+spec:
+  replicas: 1
+  # Single replica: umami tracks are idempotent, and the shared Postgres
+  # connection budget is limited on the small node. Scale to 2 only after
+  # verifying Postgres max_connections headroom.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: umami
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: umami
+        app.kubernetes.io/component: analytics
+        app.kubernetes.io/part-of: pixelated-empathy
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        runAsNonRoot: true
+        # Image runs as `nextjs` (uid 1001) per the upstream Dockerfile
+        # (`adduser --system --uid 1001 nextjs`, `USER nextjs`). Must match
+        # or file ownership / startup writes break.
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: umami
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            # Must be false: the umami postgresql image does not bundle the
+            # Prisma schema-engine. `prisma migrate deploy` downloads it at
+            # startup (binaries.prisma.sh); a read-only rootfs blocks that
+            # write → "Could not find schema-engine binary" → CrashLoopBackOff.
+            readOnlyRootFilesystem: false
+          # Pinned immutable semver. GHCR org is umami-software (not umami-so —
+          # that legacy org 404s on manifests). Do not use :latest.
+          image: ghcr.io/umami-software/umami:postgresql-v2.19.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "3000"
+            - name: HOSTNAME
+              value: "0.0.0.0"
+            - name: DATABASE_TYPE
+              value: "postgresql"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: umami-secrets
+                  key: DATABASE_URL
+            - name: APP_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: umami-secrets
+                  key: APP_SECRET
+            - name: DISABLE_TELEMETRY
+              value: "1"
+            - name: FORCE_SSL
+              value: "1"
+            - name: TRUST_USER_AGENT
+              value: "1"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "300m"
+              memory: "256Mi"
+          startupProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/heartbeat
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+      volumes:
+        - name: tmp
+          emptyDir: {}

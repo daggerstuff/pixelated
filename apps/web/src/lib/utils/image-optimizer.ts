@@ -244,10 +244,11 @@ export class ImageOptimizer {
 
       const bestOptimizedSize =
         optimizedSizes.length > 0 ? Math.min(...optimizedSizes) : originalSize
+      const effectiveSize = Math.min(originalSize, bestOptimizedSize)
 
-      result.savings = originalSize - bestOptimizedSize
+      result.savings = originalSize - effectiveSize
       result.compressionRatio =
-        bestOptimizedSize > 0 ? originalSize / bestOptimizedSize : 1
+        effectiveSize > 0 ? originalSize / effectiveSize : 1
 
       const processingTime = Date.now() - startTime
 
@@ -405,8 +406,14 @@ export class ImageOptimizer {
     const ext = extname(imagePath).toLowerCase().replace('.', '') || 'jpeg'
 
     try {
-      const metadata = await sharp(buffer).metadata()
-      const originalWidth = metadata.width ?? 0
+      let metadata
+      let originalWidth = 0
+      try {
+        metadata = await sharp(buffer).metadata()
+        originalWidth = metadata.width ?? 0
+      } catch {
+        return result
+      }
 
       for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
         // Skip if original is smaller than target width
@@ -720,8 +727,14 @@ export class ImageOptimizer {
       }
 
       // Generate resize variants
-      const metadata = await sharp(buffer).metadata()
-      const originalWidth = metadata.width ?? 0
+      let metadata
+      let originalWidth = 0
+      try {
+        metadata = await sharp(buffer).metadata()
+        originalWidth = metadata.width ?? 0
+      } catch {
+        return result
+      }
 
       for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
         if (originalWidth > 0 && originalWidth <= config.width) {
@@ -757,7 +770,8 @@ export class ImageOptimizer {
 
     const bestSize =
       optimizedSizes.length > 0 ? Math.min(...optimizedSizes) : buffer.length
-    result.savings = buffer.length - bestSize
+    const effectiveSize = Math.min(buffer.length, bestSize)
+    result.savings = buffer.length - effectiveSize
 
     logger.info('Buffer optimization completed', {
       filename,
@@ -809,8 +823,8 @@ export class ImageOptimizer {
               variant.name as keyof typeof IMAGE_CONFIG.RESIZE
             ]?.suffix ?? variant.name)
       const variantPath = basePath.replace(
-        /-optimized\.[^.]+$/,
-        `-${suffix}.$&`,
+        /-optimized\.([^.]+)$/,
+        `-${suffix}.$1`,
       )
       parts.push(`${variantPath} ${variant.width}w`)
     }

@@ -103,6 +103,12 @@ export interface IntegrationAuditInput extends EHRAuditInput {
   patientId?: string
 }
 
+/** Input for e-prescribing audit events. */
+export interface EPrescribeAuditInput extends IntegrationAuditInput {
+  medicationRequestId?: string
+  patientId: string
+}
+
 /** Input for break-glass audit events. */
 export interface BreakGlassAuditInput extends EHRAuditInput {
   patientId: string
@@ -117,6 +123,17 @@ export interface TelehealthAuditInput extends EHRAuditInput {
   practitionerId?: string
   encounterId?: string
   providerType?: 'webrtc' | 'zoom'
+}
+
+/** Input for supervisor-related audit events (F3.2). */
+export interface SupervisorAuditInput extends EHRAuditInput {
+  supervisorId?: string
+  clinicianId?: string
+  patientId?: string
+  noteId?: string
+  reviewId?: string
+  flagId?: string
+  sessionId?: string
 }
 
 // ---------------------------------------------------------------------------
@@ -186,7 +203,7 @@ export class EHRAuditService {
       errorMessage: input.errorMessage,
       ipAddress: input.ipAddress,
       userAgent: input.userAgent,
-      metadata: input.metadata as Record<string, unknown> | undefined,
+      metadata: input.metadata,
     }
 
     return this.logger.logEvent(event)
@@ -196,12 +213,24 @@ export class EHRAuditService {
    * Determine default severity for a successful action.
    */
   private defaultSeverity(action: EHRAuditActionType): AuditSeverity {
-    if (action === 'verify_consent' || action === EHRAuditAction.VERIFY_CONSENT)
+    if (action === EHRAuditAction.VERIFY_CONSENT)
       return EHRSeverity.CONSENT_FAILURE
     if (
       action === EHRAuditAction.CHECK_IN_APPOINTMENT ||
       action === EHRAuditAction.COMPLETE_APPOINTMENT
     )
+      return EHRSeverity.UPDATE
+    // Supervisor (F3.2) oversight actions are write operations (Sentry 16294287/0).
+    if (
+      action === EHRAuditAction.COSIGN_NOTE ||
+      action === EHRAuditAction.REJECT_NOTE ||
+      action === EHRAuditAction.REQUEST_NOTE_CHANGES ||
+      action === EHRAuditAction.ACKNOWLEDGE_RISK_FLAG ||
+      action === EHRAuditAction.RESOLVE_RISK_FLAG
+    )
+      return EHRSeverity.UPDATE
+    if (action === EHRAuditAction.OBSERVE_SESSION) return EHRSeverity.CREATE
+    if (action === EHRAuditAction.LEAVE_SESSION_OBSERVATION)
       return EHRSeverity.UPDATE
     if (action.startsWith('view_') || action.startsWith('check_'))
       return EHRSeverity.READ
@@ -234,6 +263,17 @@ export class EHRAuditService {
     if (action.startsWith('break_glass')) return EHRSeverity.BREAK_GLASS
     if (action.startsWith('hie_') || action.startsWith('clearinghouse_'))
       return EHRSeverity.INTEGRATION
+    if (
+      action.startsWith('eprescribe_new_') ||
+      action.startsWith('eprescribe_refill')
+    )
+      return EHRSeverity.CREATE
+    if (action.startsWith('eprescribe_cancel')) return EHRSeverity.DELETE
+    if (
+      action.startsWith('eprescribe_medication_history') ||
+      action.startsWith('eprescribe_drug_interaction')
+    )
+      return EHRSeverity.READ
     return EHRSeverity.READ
   }
 
@@ -469,6 +509,144 @@ export class EHRAuditService {
   }
 
   // -------------------------------------------------------------------------
+  // E-prescribing audit builders
+  // -------------------------------------------------------------------------
+
+  async logEPrescribeNewRx(input: EPrescribeAuditInput): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_NEW_RX,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeRefill(input: EPrescribeAuditInput): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_REFILL,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeCancel(input: EPrescribeAuditInput): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_CANCEL,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribePrescriptionStatusCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_PRESCRIPTION_STATUS_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeMedicationHistory(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_MEDICATION_HISTORY,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeControlledSubstanceCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_CONTROLLED_SUBSTANCE_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  async logEPrescribeDrugInteractionCheck(
+    input: EPrescribeAuditInput,
+  ): Promise<string> {
+    return this.log(
+      EHRAuditAction.EPRESCRIBE_DRUG_INTERACTION_CHECK,
+      EHRResourceType.EPRESCRIPTION,
+      input.medicationRequestId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          integrationSource: input.integrationSource,
+          externalTransactionId: input.externalTransactionId,
+          patientId: input.patientId,
+          medicationRequestId: input.medicationRequestId,
+        },
+      },
+    )
+  }
+
+  // -------------------------------------------------------------------------
   // Break-glass audit
   // -------------------------------------------------------------------------
 
@@ -529,6 +707,59 @@ export class EHRAuditService {
           providerType: input.providerType,
           resourceType: EHRResourceType.TELEHEALTH_SESSION,
           resourceId: input.sessionId,
+        },
+      },
+    )
+  }
+
+  // -------------------------------------------------------------------------
+  // Supervisor audit builders (F3.2)
+  // -------------------------------------------------------------------------
+
+  async logSupervisorAccess(
+    action:
+      | typeof EHRAuditAction.VIEW_SUPERVISOR_CASELOAD
+      | typeof EHRAuditAction.VIEW_REVIEW_QUEUE
+      | typeof EHRAuditAction.VIEW_NOTE_REVIEW
+      | typeof EHRAuditAction.COSIGN_NOTE
+      | typeof EHRAuditAction.REJECT_NOTE
+      | typeof EHRAuditAction.REQUEST_NOTE_CHANGES
+      | typeof EHRAuditAction.VIEW_RISK_QUEUE
+      | typeof EHRAuditAction.ACKNOWLEDGE_RISK_FLAG
+      | typeof EHRAuditAction.RESOLVE_RISK_FLAG
+      | typeof EHRAuditAction.OBSERVE_SESSION
+      | typeof EHRAuditAction.LEAVE_SESSION_OBSERVATION
+      | typeof EHRAuditAction.VIEW_SUPERVISOR_METRICS,
+    input: SupervisorAuditInput,
+    resourceType: EHRResourceTypeValue = EHRResourceType.SUPERVISOR_REVIEW,
+    resourceId?: string,
+  ): Promise<string> {
+    return this.log(
+      action,
+      resourceType,
+      resourceId ??
+        input.reviewId ??
+        input.flagId ??
+        input.noteId ??
+        input.sessionId,
+      {
+        ...input,
+        metadata: {
+          ...input.metadata,
+          supervisorId: input.supervisorId,
+          clinicianId: input.clinicianId,
+          patientId: input.patientId,
+          noteId: input.noteId,
+          reviewId: input.reviewId,
+          flagId: input.flagId,
+          sessionId: input.sessionId,
+          resourceType,
+          resourceId:
+            resourceId ??
+            input.reviewId ??
+            input.flagId ??
+            input.noteId ??
+            input.sessionId,
         },
       },
     )

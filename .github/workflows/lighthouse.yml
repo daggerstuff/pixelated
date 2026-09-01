@@ -3,6 +3,7 @@ name: Lighthouse CI
 permissions:
   contents: read
   pull-requests: write
+  statuses: write
 
 on:
   pull_request:
@@ -51,7 +52,7 @@ jobs:
         run: pnpm run build
         env:
           NODE_OPTIONS: --max-old-space-size=8192
-          JWT_SECRET: test-jwt-secret-for-ci-only-do-not-use-in-production
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.15.x
@@ -59,7 +60,7 @@ jobs:
       - name: Start preview server
         run: |
           nohup env HOST=127.0.0.1 PORT="${LHCI_PORT}" WEBSITES_PORT="${LHCI_PORT}" \
-            JWT_SECRET=test-jwt-secret-for-ci-only-do-not-use-in-production \
+            JWT_SECRET="${{ secrets.JWT_SECRET }}" \
             pnpm run start > /tmp/pixelated-preview.log 2>&1 &
           echo "PREVIEW_PID=$!" >> "$GITHUB_ENV"
 
@@ -80,7 +81,7 @@ jobs:
       - name: Run Lighthouse CI
         run: lhci autorun
         env:
-          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Stop preview server
         if: always()

@@ -260,6 +260,10 @@ jobs:
           SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
           LINEAR_AGENT_ACCESS_TOKEN: ${{ secrets.LINEAR_AGENT_ACCESS_TOKEN }}
           LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          EVE_AUTH_USERNAME: ${{ secrets.EVE_AUTH_USERNAME }}
+          EVE_AUTH_PASSWORD: ${{ secrets.EVE_AUTH_PASSWORD }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
         run: |
           # Install Traefik CRDs first
           helm repo add traefik https://helm.traefik.io/traefik 2>/dev/null || true
@@ -291,6 +295,35 @@ jobs:
             --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
             -n pixelated-empathy \
             --dry-run=client -o yaml | kubectl apply -f -
+          # Umami analytics secrets (self-hosted Umami replaced Rybbit).
+          # UMAMI_DATABASE_URL: postgres connection string for the umami DB.
+          # UMAMI_APP_SECRET: random 32+ byte string (session/data signing).
+          kubectl create secret generic umami-secrets \
+            --from-literal=DATABASE_URL="${{ secrets.UMAMI_DATABASE_URL }}" \
+            --from-literal=APP_SECRET="${{ secrets.UMAMI_APP_SECRET }}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          # App runtime secrets consumed via envFrom (deployment-blue/green).
+          # JWT_SECRET is strictly required by apps/web/src/lib/auth/config.ts —
+          # without it the new pod crashloops and the blue rollout stalls at
+          # its progress deadline.
+          kubectl create secret generic pixelated-empathy-secrets \
+            --from-literal=JWT_SECRET="${JWT_SECRET}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          # Agent fleet secrets. EVE auth falls back to placeholderAuth (401)
+          # when unset, but the k8s env bindings fail hard on a missing
+          # Secret object, so provision the objects with empty values rather
+          # than letting pod creation fail (CreateContainerConfigError).
+          kubectl create secret generic eve-auth \
+            --from-literal=username="${EVE_AUTH_USERNAME:-}" \
+            --from-literal=password="${EVE_AUTH_PASSWORD:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+          kubectl create secret generic mongodb \
+            --from-literal=uri="${MONGODB_URI:-}" \
+            -n pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
           kubectl apply -k infra/k8s/civo
            kubectl apply -f agents/session-agent/k8s/deployment.yaml
            kubectl apply -f agents/qa-agent/k8s/deployment.yaml
@@ -305,7 +338,34 @@ jobs:
            kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
            echo "Waiting for rollout..."
+           # Dump pod diagnostics in parallel with rollout wait so a stalled
+           # rollout still produces logs/events in the run output. The wait
+           # below fails hard on timeout; this loop only reports.
+           (
+             for i in $(seq 1 20); do
+               sleep 30
+               echo "=== Diagnostics t+${i}m ==="
+               kubectl get pods -n pixelated-empathy -o wide || true
+               echo "--- Namespace events (recent) ---"
+               kubectl get events -n pixelated-empathy --sort-by=.lastTimestamp 2>/dev/null | tail -30 || true
+               echo "--- Non-running pods (describe) ---"
+               kubectl describe pods -n pixelated-empathy 2>/dev/null | awk '/^Name:/{name=$2} /Events:/{show=1} show && name!=last{print "### "name; last=name} show' | head -60 || true
+               echo "--- Umami logs ---"
+               kubectl logs -n pixelated-empathy -l app.kubernetes.io/name=umami --all-containers --tail=30 --prefix --ignore-errors || true
+               echo "--- Agent pod logs (session/qa/pipeline) ---"
+               for d in session-agent qa-agent pipeline-agent; do
+                 echo "### $d"
+                 kubectl logs -n pixelated-empathy -l app=$d --all-containers --tail=25 --prefix --ignore-errors || true
+               done
+               echo "--- Blue pod logs ---"
+               kubectl logs -n pixelated-empathy -l app=pixelated-empathy,slot=blue --all-containers --tail=40 --prefix --ignore-errors || true
+             done
+           ) &
+           DIAG_PID=$!
+           trap 'kill $DIAG_PID 2>/dev/null || true' EXIT
+
            kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+           kill $DIAG_PID 2>/dev/null || true
            kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
            kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
            kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m

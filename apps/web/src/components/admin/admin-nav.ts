@@ -63,6 +63,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     href: '/admin/patient-rights',
     icon: 'user',
   },
+  {
+    id: 'state-consent-rules',
+    label: 'State Consent Rules',
+    href: '/admin/state-consent-rules',
+    icon: 'map',
+  },
 ]
 
 export const SIMPLE_ADMIN_NAV_ITEMS: AdminNavItem[] = ADMIN_NAV_ITEMS.filter(

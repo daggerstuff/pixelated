@@ -553,6 +553,32 @@ export default defineTool({
       }
     }
 
+    // (e) duplicate subjects across distinct threads
+    const subjectsByThread = new Map<string, Set<string>>()
+    const subjectOccurrences = new Map<string, string[]>()
+    for (const em of emails) {
+      const subj = cleanSubject(em.subject ?? '')
+      if (!subj) continue
+      const tid = em.thread_id ?? em.id ?? '__loose__'
+      const threads = subjectsByThread.get(subj) ?? new Set<string>()
+      threads.add(tid)
+      subjectsByThread.set(subj, threads)
+      const ids = subjectOccurrences.get(subj) ?? []
+      ids.push(em.id ?? 'unknown')
+      subjectOccurrences.set(subj, ids)
+    }
+    for (const [subj, threads] of subjectsByThread) {
+      if (threads.size >= 3) {
+        const ids = subjectOccurrences.get(subj) ?? []
+        findings.push({
+          class: 'duplicate_subject',
+          severity: 'blocking',
+          message: `Subject "${subj}" repeated across ${threads.size} threads (${ids.length} emails).`,
+          refs: ids.slice(0, 10),
+        })
+      }
+    }
+
     const blocking = findings.filter((f) => f.severity === 'blocking')
 
     return {

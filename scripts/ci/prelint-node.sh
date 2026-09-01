@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # scripts/ci/prelint-node.sh
 #
 # Pre-lint hook: source nvm (best-effort), switch to the version pinned in
@@ -101,13 +101,6 @@ if [ -n "$NVM_SH" ]; then
     # (scripts/devops/jules-setup.sh:17). Errors are swallowed here so
     # the version check below can give actionable guidance.
     nvm use --silent >/dev/null 2>&1 || true
-fi
-
-# Vercel may be pinned to Node 22. Standard oxlint works on Node 22.
-if [ "${VERCEL:-}" = "1" ] && [ "$MIN_MAJOR" -gt 22 ]; then
-    MIN_MAJOR=22
-    MIN_SOURCE="vercel-override"
-    SOURCE_SUFFIX=""
 fi
 
 ACTUAL_MAJOR="$(node -p "parseInt(process.versions.node.split('.')[0], 10)")"

@@ -1,9 +1,9 @@
 import { existsSync, statSync } from 'fs'
 import { mkdir, rm, writeFile } from 'fs/promises'
 import { join } from 'path'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import sharp from 'sharp'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import {
   generateOptimizationReport,
@@ -79,10 +79,16 @@ describe('ImageOptimizer', () => {
       join(process.cwd(), 'public', 'assets', 'resized'),
     ]
     for (const dir of outputDirs) {
-      const testFiles = ['test-optimized.webp', 'test-optimized.avif']
-      for (const f of testFiles) {
-        const p = join(dir, f)
-        if (existsSync(p)) await rm(p, { force: true })
+      if (existsSync(dir)) {
+        const files = await import('node:fs/promises').then((m) =>
+          m.readdir(dir).catch(() => [] as string[]),
+        )
+        for (const f of files as string[]) {
+          if (f.startsWith('test-') || f.startsWith('wide-')) {
+            const p = join(dir, f)
+            if (existsSync(p)) await rm(p, { force: true })
+          }
+        }
       }
     }
   })

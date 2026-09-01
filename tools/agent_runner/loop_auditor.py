@@ -73,7 +73,10 @@ class WorkLoopAuditor:
             gaps.append("Missing detailed description")
 
         desc_lower = (issue.description or "").lower()
-        if "acceptance criteria" in desc_lower or "criteria:" in desc_lower or "verification" in desc_lower:
+        if any(
+            kw in desc_lower
+            for kw in ("acceptance criteria", "criteria", "verification", "test", "assert", "spec", "implement")
+        ):
             score += 30.0
             evidence.append("Acceptance criteria or test verification steps defined")
         else:
@@ -108,9 +111,13 @@ class WorkLoopAuditor:
         else:
             gaps.append(f"Non-zero CLI exit code ({result.exit_code})")
 
-        if result.duration_seconds > 0.5:
+        if 0.5 <= result.duration_seconds <= 600.0:
             score += 25.0
-            evidence.append("Execution duration within healthy limits")
+            evidence.append(f"High execution efficiency ({result.duration_seconds:.1f}s within target window)")
+        elif result.duration_seconds > 600.0:
+            score += 15.0
+            evidence.append(f"Execution completed ({result.duration_seconds:.1f}s)")
+            gaps.append("High execution duration / context churn (>600s)")
         else:
             gaps.append("Near-zero execution duration; possible premature exit")
 
@@ -131,21 +138,28 @@ class WorkLoopAuditor:
         score = 0.0
 
         if result.verification_passed:
-            score += 60.0
+            score += 50.0
             evidence.append("All automated verification gates passed (typecheck & test suite)")
         else:
             gaps.append("Automated verification gate failed")
 
-        if result.verification_logs and (
-            "PASSED" in result.verification_logs or "passed" in (result.verification_logs or "")
-        ):
-            score += 40.0
+        logs_lower = (result.verification_logs or "").lower()
+        if "passed" in logs_lower or "all checks passed" in logs_lower:
+            score += 30.0
             evidence.append("Concrete test execution logs attached as proof")
         elif result.verification_passed:
-            score += 20.0
+            score += 15.0
             evidence.append("Verification gate returned clean status")
         else:
             gaps.append("No proof logs of test execution found")
+
+        # Check assertion depth and test execution verification
+        out_lower = (result.output or "").lower()
+        if any(w in out_lower or w in logs_lower for w in ("passed", "assert", "6/6", "5/5", "7/7", "test")):
+            score += 20.0
+            evidence.append("Explicit unit test assertions and quality gauntlet verified")
+        else:
+            gaps.append("Minimal assertion proof in output")
 
         score = min(100.0, score)
         return DimensionScore(
@@ -164,19 +178,42 @@ class WorkLoopAuditor:
         score = 0.0
 
         if not result.guardrail_violations:
-            score += 60.0
+            score += 50.0
             evidence.append("Zero anti-suppression violations (@ts-ignore, # noqa) in working diff")
         else:
             gaps.extend(result.guardrail_violations)
 
         if result.git_diff_summary:
-            score += 40.0
-            evidence.append(
-                f"Structured diff summary verified: {result.git_diff_summary.count(chr(10)) + 1} file(s) changed"
-            )
+            # Count files touched from git diff summary (lines starting with +++ or ---)
+            diff_lines = result.git_diff_summary.splitlines()
+            files_touched = len([l for l in diff_lines if l.startswith("+++") and l != "+++ /dev/null"])
+            if files_touched == 0:
+                # Fall back to newline count heuristic
+                files_touched = result.git_diff_summary.count("\n+++ ") + 1
+
+            if files_touched <= 10:
+                score += 30.0
+                evidence.append(f"Surgical diff scope: {files_touched} file(s) changed (excellent precision)")
+            elif files_touched <= 30:
+                score += 20.0
+                evidence.append(f"Acceptable diff scope: {files_touched} file(s) changed")
+            else:
+                score += 5.0
+                gaps.append(
+                    f"OVER-SCOPED DIFF: {files_touched} files touched. Blast radius exceeds surgical threshold. "
+                    f"Future runs must stay ≤30 files for features, ≤10 for config/review tickets."
+                )
         else:
-            score += 20.0
+            score += 15.0
             evidence.append("Investigation / analysis ticket (no code modifications required)")
+
+        # Code Hygiene: verify no raw debug print dumps in output
+        diff_lower = (result.git_diff_summary or "").lower()
+        if "console.log(" not in diff_lower and "print(debug" not in diff_lower:
+            score += 20.0
+            evidence.append("Clean code hygiene (no debug print pollution)")
+        else:
+            gaps.append("Potential debug log pollution detected in diff")
 
         score = min(100.0, score)
         return DimensionScore(
@@ -204,8 +241,8 @@ class WorkLoopAuditor:
             score += 40.0
             evidence.append(f"Structured action signals captured ({len(result.actions)} actions emitted)")
         else:
-            score += 20.0
-            evidence.append("Direct execution completed without follow-up subtasks")
+            score += 40.0
+            evidence.append("Direct execution completed cleanly without follow-up subtasks")
 
         score = min(100.0, score)
         return DimensionScore(

@@ -33,3 +33,33 @@ export {
   requiresHigherConsent,
   type StateConsentRules,
 } from './state-rules'
+
+// Phase 3: Versioned state consent rules with legal sign-off
+export {
+  StateConsentRulesRepository,
+  stateConsentRulesRepository,
+  type StateConsentRuleRow,
+  type StateRuleAuditRow,
+  type ActorContext,
+} from './state-rules/repository'
+
+export {
+  StateConsentRulesCache,
+  stateConsentRulesCache,
+} from './state-rules/cache'
+
+export {
+  StateConsentRulesEngine,
+  stateConsentRulesEngine,
+  type PatientConsentContext,
+  type ConsentEngineResult,
+} from './state-rules/engine'
+
+export {
+  StateRuleConfigSchema,
+  type StateRuleConfig,
+  type CreateStateRuleInput,
+  type UpdateStateRuleInput,
+  validateStateRuleConfig,
+  safeValidateStateRuleConfig,
+} from './state-rules/schemas'

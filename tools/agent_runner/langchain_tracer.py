@@ -16,6 +16,13 @@ from tools.agent_runner.verifier import VerificationOutcome
 logger = logging.getLogger("agent_runner.langchain")
 
 try:
+    from dotenv import load_dotenv  # type: ignore[import-untyped]
+
+    load_dotenv(override=True)
+except ImportError:
+    pass
+
+try:
     from langsmith.run_trees import RunTree  # type: ignore[import-untyped]
 except ImportError:
     RunTree = None
@@ -110,7 +117,7 @@ class LangChainAgentTracer:
     def start_ticket_execution_trace(
         self,
         parent_tree: Any | None,
-        project: ProjectConfig,
+        project: ProjectConfig | None,
         agent: AgentConfig,
         issue: LinearIssue,
     ) -> Any | None:
@@ -118,8 +125,9 @@ class LangChainAgentTracer:
         if not self.enabled:
             return None
 
+        team_key = project.team_key if project else (issue.identifier.split("-")[0] if "-" in issue.identifier else "")
         inputs = {
-            "team_key": project.team_key,
+            "team_key": team_key,
             "agent_name": agent.name,
             "agent_role": agent.role.value,
             "ticket_identifier": issue.identifier,
