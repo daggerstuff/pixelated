@@ -726,15 +726,22 @@ export class ImageOptimizer {
         })
       }
 
-      // Generate thumbnail
+      // Generate thumbnail (explicit — excluded from RESIZE loop below)
       try {
-        const thumbBuffer = await sharp(buffer)
-          .resize({
-            width: IMAGE_CONFIG.RESIZE.thumbnail.width,
-            withoutEnlargement: true,
-          })
-          .jpeg({ quality: 80 })
-          .toBuffer()
+        const thumbPipeline = sharp(buffer).resize({
+          width: IMAGE_CONFIG.RESIZE.thumbnail.width,
+          withoutEnlargement: true,
+        })
+
+        // Flatten PNG transparency onto white before JPEG conversion
+        // to prevent black backgrounds in thumbnails
+        const thumbBuffer =
+          format === 'png'
+            ? await thumbPipeline
+                .flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } })
+                .jpeg({ quality: 80 })
+                .toBuffer()
+            : await thumbPipeline.jpeg({ quality: 80 }).toBuffer()
 
         result.thumbnail = {
           buffer: thumbBuffer,
@@ -748,7 +755,7 @@ export class ImageOptimizer {
         })
       }
 
-      // Generate resize variants
+      // Generate resize variants (skip 'thumbnail' — handled above)
       let metadata
       let originalWidth = 0
       try {
@@ -759,6 +766,7 @@ export class ImageOptimizer {
       }
 
       for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
+        if (name === 'thumbnail') continue
         if (originalWidth > 0 && originalWidth <= config.width) {
           continue
         }
