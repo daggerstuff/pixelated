@@ -403,11 +403,10 @@ export class ImageOptimizer {
     buffer: Buffer,
   ): Promise<ResizeVariant[]> {
     const variants: ResizeVariant[] = []
-    const basename =
-      imagePath
-        .split('/')
-        .pop()
-        ?.replace(/\.[^/.]+$/, '') ?? 'image'
+    const pathParts = imagePath.split('/')
+    const basename = pathParts.pop()?.replace(/\.[^/.]+$/, '') ?? 'image'
+    const parentDir = pathParts[pathParts.length - 1] ?? ''
+    const filePrefix = parentDir ? `${parentDir}-${basename}` : basename
     const ext = extname(imagePath).toLowerCase().replace('.', '') || 'jpeg'
 
     try {
@@ -421,13 +420,12 @@ export class ImageOptimizer {
       }
 
       for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
-        if (name === 'thumbnail') continue
         if (originalWidth > 0 && originalWidth <= config.width) {
           continue
         }
 
         try {
-          const outputFilename = `${basename}-${config.suffix}.${ext}`
+          const outputFilename = `${filePrefix}-${config.suffix}.${ext}`
           const outputPath = safeJoin(
             IMAGE_CONFIG.OUTPUT_DIRS.resized,
             outputFilename,
@@ -639,6 +637,33 @@ export class ImageOptimizer {
       savings: 0,
     }
 
+    if (format === 'jpeg' || format === 'png') {
+      try {
+        const thumbPipeline = sharp(buffer).resize({
+          width: IMAGE_CONFIG.RESIZE.thumbnail.width,
+          withoutEnlargement: true,
+        })
+        const thumbBuffer =
+          format === 'png'
+            ? await thumbPipeline
+                .flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } })
+                .jpeg({ quality: 80 })
+                .toBuffer()
+            : await thumbPipeline.jpeg({ quality: 80 }).toBuffer()
+
+        result.thumbnail = {
+          buffer: thumbBuffer,
+          size: thumbBuffer.length,
+          mimetype: 'image/jpeg',
+        }
+      } catch (error: unknown) {
+        logger.warn('Buffer thumbnail generation failed', {
+          filename,
+          error: error instanceof Error ? error.message : String(error),
+        })
+      }
+    }
+
     if (buffer.length < IMAGE_CONFIG.THRESHOLDS.SMALL_FILE) {
       logger.info('Skipping buffer optimization for small file', {
         filename,
@@ -673,7 +698,7 @@ export class ImageOptimizer {
           result.optimized = {
             buffer: optimizedBuffer,
             size: optimizedBuffer.length,
-            mimetype,
+            mimetype: format === 'png' ? 'image/png' : 'image/jpeg',
           }
         }
       } catch (error: unknown) {
@@ -721,35 +746,6 @@ export class ImageOptimizer {
         }
       } catch (error: unknown) {
         logger.warn('Buffer AVIF generation failed', {
-          filename,
-          error: error instanceof Error ? error.message : String(error),
-        })
-      }
-
-      // Generate thumbnail (explicit — excluded from RESIZE loop below)
-      try {
-        const thumbPipeline = sharp(buffer).resize({
-          width: IMAGE_CONFIG.RESIZE.thumbnail.width,
-          withoutEnlargement: true,
-        })
-
-        // Flatten PNG transparency onto white before JPEG conversion
-        // to prevent black backgrounds in thumbnails
-        const thumbBuffer =
-          format === 'png'
-            ? await thumbPipeline
-                .flatten({ background: { r: 255, g: 255, b: 255, alpha: 1 } })
-                .jpeg({ quality: 80 })
-                .toBuffer()
-            : await thumbPipeline.jpeg({ quality: 80 }).toBuffer()
-
-        result.thumbnail = {
-          buffer: thumbBuffer,
-          size: thumbBuffer.length,
-          mimetype: 'image/jpeg',
-        }
-      } catch (error: unknown) {
-        logger.warn('Buffer thumbnail generation failed', {
           filename,
           error: error instanceof Error ? error.message : String(error),
         })
