@@ -6,9 +6,9 @@
  * threat detection across the entire application.
  */
 
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { RateLimitResult } from '../../../rate-limit/distributed-types'
 import { DistributedRateLimiter } from '../../../rate-limit/rate-limiter'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import type {
   ThreatData,

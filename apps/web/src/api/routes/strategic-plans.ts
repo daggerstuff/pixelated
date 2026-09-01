@@ -1,6 +1,8 @@
 // Strategic Plans Routes
 import express, { Router, Request, Response } from 'express'
 
+import { authMiddleware } from '../middleware/auth'
+import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import {
   listStrategicPlans,
   createStrategicPlan,
@@ -9,9 +11,7 @@ import {
   deleteStrategicPlan,
   alignProjectToPlan,
   updatePlanStatus,
-} from '../lib/services/strategic-plan-service'
-import { authMiddleware } from '../middleware/auth'
-import { asyncHandler, ValidationError } from '../middleware/error-handler'
+} from '../services/strategic-plan-service'
 
 interface StrategicPlanBody {
   title?: string
