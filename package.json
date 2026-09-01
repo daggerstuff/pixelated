@@ -317,7 +317,7 @@
     "events": "latest",
     "express": "^5.2.1",
     "express-openid-connect": "^3.4.0",
-    "express-rate-limit": "^8.6.2",
+    "express-rate-limit": "^8.7.0",
     "express-session": "^1.19.0",
     "flexsearch": "latest",
     "framer-motion": "^13.1.1",
