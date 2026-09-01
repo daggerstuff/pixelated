@@ -57,9 +57,66 @@ export enum AdminPermission {
  * Interface for therapy session data
  */
 export interface SessionsResult {
-  sessions: unknown[] // Replace with proper session type when available
+  sessions: MockSession[]
   total: number
 }
+
+/**
+ * Mock session status type
+ */
+export type MockSessionStatus = 'active' | 'completed' | 'cancelled'
+
+/**
+ * Mock session record for in-memory admin operations.
+ * In a production system these would be DB rows; the admin module
+ * currently uses mock data throughout (see getMockAdminUser, getSystemMetrics).
+ */
+export interface MockSession {
+  sessionId: string
+  clientId: string
+  therapistId: string
+  startTime: string
+  endTime?: string
+  status: MockSessionStatus
+  locked: boolean
+  archived: boolean
+}
+
+/**
+ * In-memory session store seeded with mock data.
+ * This mirrors the mock-data pattern used by getMockAdminUser and getSystemMetrics.
+ * A real implementation would query the sessions table via `../db/index`.
+ */
+const mockSessions: MockSession[] = [
+  {
+    sessionId: 'session-001',
+    clientId: 'client-001',
+    therapistId: 'therapist-001',
+    startTime: '2026-08-15T10:00:00Z',
+    endTime: '2026-08-15T11:00:00Z',
+    status: 'completed',
+    locked: false,
+    archived: false,
+  },
+  {
+    sessionId: 'session-002',
+    clientId: 'client-002',
+    therapistId: 'therapist-001',
+    startTime: '2026-08-20T14:00:00Z',
+    status: 'active',
+    locked: false,
+    archived: false,
+  },
+  {
+    sessionId: 'session-003',
+    clientId: 'client-003',
+    therapistId: 'therapist-002',
+    startTime: '2026-08-25T09:00:00Z',
+    status: 'active',
+    locked: false,
+    archived: false,
+  },
+]
 
 /**
  * Role-based permissions matrix
@@ -119,7 +176,8 @@ export class AdminService {
   }
 
   /**
-   * Get therapy sessions with filtering options
+   * Get therapy sessions with filtering options.
+   * Returns sessions from the in-memory mock store, excluding archived sessions.
    */
   async getSessions(options: {
     limit: number
@@ -129,36 +187,92 @@ export class AdminService {
     startDate?: Date
     endDate?: Date
   }): Promise<SessionsResult> {
-    // For now, return empty result. Log options to avoid unused variable warning.
     console.debug('getSessions called with options:', options)
-    return {
-      sessions: [], // Your sessions array here
-      total: 0, // Total count of all sessions matching the filter
+    try {
+      let filtered = mockSessions.filter((s) => !s.archived)
+
+      if (options.therapistId) {
+        filtered = filtered.filter((s) => s.therapistId === options.therapistId)
+      }
+      if (options.clientId) {
+        filtered = filtered.filter((s) => s.clientId === options.clientId)
+      }
+      if (options.startDate) {
+        const startMs = options.startDate.getTime()
+        filtered = filtered.filter(
+          (s) => new Date(s.startTime).getTime() >= startMs,
+        )
+      }
+      if (options.endDate) {
+        const endMs = options.endDate.getTime()
+        filtered = filtered.filter(
+          (s) => new Date(s.startTime).getTime() <= endMs,
+        )
+      }
+
+      const total = filtered.length
+      const offset = Math.max(0, options.offset)
+      const limit = Math.max(0, options.limit)
+      const paginated = filtered.slice(offset, offset + limit)
+
+      return { sessions: paginated, total }
+    } catch (error: unknown) {
+      logger.error('Error getting sessions:', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
+      return { sessions: [], total: 0 }
     }
   }
 
   /**
-   * Lock a therapy session
+   * Lock a therapy session.
+   * Sets `locked = true` on the session in the in-memory store.
+   * Throws if the session is not found or already archived.
    */
   async lockSession(sessionId: string): Promise<void> {
     console.debug('lockSession called for:', sessionId)
-    throw new Error('Method not implemented.')
+    const session = mockSessions.find((s) => s.sessionId === sessionId)
+    if (!session) {
+      throw new Error(`Session not found: ${sessionId}`)
+    }
+    if (session.archived) {
+      throw new Error(`Cannot lock archived session: ${sessionId}`)
+    }
+    session.locked = true
   }
 
   /**
-   * Unlock a therapy session
+   * Unlock a therapy session.
+   * Sets `locked = false` on the session in the in-memory store.
+   * Throws if the session is not found or already archived.
    */
   async unlockSession(sessionId: string): Promise<void> {
     console.debug('unlockSession called for:', sessionId)
-    throw new Error('Method not implemented.')
+    const session = mockSessions.find((s) => s.sessionId === sessionId)
+    if (!session) {
+      throw new Error(`Session not found: ${sessionId}`)
+    }
+    if (session.archived) {
+      throw new Error(`Cannot unlock archived session: ${sessionId}`)
+    }
+    session.locked = false
   }
 
   /**
-   * Archive a therapy session
+   * Archive a therapy session.
+   * Sets `archived = true` on the session in the in-memory store.
+   * Throws if the session is not found or already archived.
    */
   async archiveSession(sessionId: string): Promise<void> {
     console.debug('archiveSession called for:', sessionId)
-    throw new Error('Method not implemented.')
+    const session = mockSessions.find((s) => s.sessionId === sessionId)
+    if (!session) {
+      throw new Error(`Session not found: ${sessionId}`)
+    }
+    if (session.archived) {
+      throw new Error(`Session already archived: ${sessionId}`)
+    }
+    session.archived = true
   }
 
   /**
