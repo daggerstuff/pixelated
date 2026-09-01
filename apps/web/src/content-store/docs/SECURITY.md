@@ -1,6 +1,8 @@
 ---
 title: Security Policy
-description: Security guidelines, vulnerability reporting procedures, and compliance requirements for the Pixelated project.
+description:
+  Security guidelines, vulnerability reporting procedures, and compliance
+  requirements for the Pixelated project.
 pubDate: '2025-03-01'
 author: Security Team
 tags:

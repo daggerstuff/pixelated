@@ -6,7 +6,8 @@ pubDate: '2026-05-09'
 
 # React to Astro Conversion Guide
 
-Use this checklist when converting a React component into an Astro-friendly implementation.
+Use this checklist when converting a React component into an Astro-friendly
+implementation.
 
 ## 1) Classify component behavior
 
@@ -14,7 +15,8 @@ Before editing code, classify each component as:
 
 - **Static render only**: can be server rendered entirely.
 - **Interactive**: needs JavaScript in the browser.
-- **Client-only**: relies on browser-only APIs or third-party UI libraries that must not run during SSR.
+- **Client-only**: relies on browser-only APIs or third-party UI libraries that
+  must not run during SSR.
 
 Prefer server-rendered output whenever possible to keep hydration budgets low.
 
@@ -24,15 +26,17 @@ Use the following target layout pattern when migrating:
 
 - Keep static UI building blocks in `.astro` files.
 - Keep behavior-heavy widgets in React islands.
-- Preserve folder grouping from the source component library so imports stay discoverable.
+- Preserve folder grouping from the source component library so imports stay
+  discoverable.
 
 Example structure used in docs-driven migrations:
 
 - `src/components/<category>/<Component>.astro`
 - `src/components/<category>/<Component>.jsx` (or `.tsx`) for React islands
 
-If you are migrating a component that already has tests, keep tests near the destination component.
-Use the same test path convention as existing files so traceability is preserved.
+If you are migrating a component that already has tests, keep tests near the
+destination component. Use the same test path convention as existing files so
+traceability is preserved.
 
 ## 2) Start by stripping React-specific logic
 
@@ -42,22 +46,23 @@ Identify and remove assumptions that are specific to React internals:
 - Custom hooks that only use browser APIs for initialization
 - `children` patterns where static markup can be passed as Astro slots/props
 
-If state/effect is still required, plan to keep the component as a **React island** and use an Astro directive for hydration.
+If state/effect is still required, plan to keep the component as a **React
+island** and use an Astro directive for hydration.
 
 ## 3) Convert file structure
 
 ### From React
 
 ```tsx
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 
 export interface CardProps {
-  title: string;
-  isActive?: boolean;
+  title: string
+  isActive?: boolean
 }
 
 export function Card({ title, isActive = false }: CardProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
   return (
     <article className={isActive ? 'active' : ''}>
       <h2>{title}</h2>
@@ -65,7 +70,7 @@ export function Card({ title, isActive = false }: CardProps) {
         {expanded ? 'Hide' : 'Show'}
       </button>
     </article>
-  );
+  )
 }
 ```
 
@@ -86,11 +91,13 @@ const { title, isActive = false } = Astro.props as Props;
 </article>
 ```
 
-If interactivity is required, keep the original React component and render it as a **React island** instead.
+If interactivity is required, keep the original React component and render it as
+a **React island** instead.
 
 ### Keep API boundaries stable
 
-When migrating, preserve prop names and event callback contracts as much as possible.
+When migrating, preserve prop names and event callback contracts as much as
+possible.
 
 - Same prop casing (`title`, `isActive`, `onX` handlers).
 - Minimal shape changes; prefer adapters at call sites when names must differ.
@@ -124,19 +131,21 @@ import MessageForm from '../components/MessageForm.jsx';
 
 Choose the lightest directive that still meets UX requirements:
 
-| Use case | Recommended directive |
-| --- | --- |
-| Above-the-fold, critical interaction | `client:load` |
-| Scroll-driven or section-based interaction | `client:visible` |
-| Optional, low-priority behavior | `client:idle` |
-| Needs CSS/media-query-only boot conditions | `client:media` |
-| React-dependent rendering only | `client:only` |
+| Use case                                   | Recommended directive |
+| ------------------------------------------ | --------------------- |
+| Above-the-fold, critical interaction       | `client:load`         |
+| Scroll-driven or section-based interaction | `client:visible`      |
+| Optional, low-priority behavior            | `client:idle`         |
+| Needs CSS/media-query-only boot conditions | `client:media`        |
+| React-dependent rendering only             | `client:only`         |
 
-If an interactive component depends on router state or context, prefer a single isolated island over global hydration of the parent page.
+If an interactive component depends on router state or context, prefer a single
+isolated island over global hydration of the parent page.
 
 ## 5) Data loading and props
 
-Move fetch/IO logic into an Astro `load` context or page-level script whenever possible.
+Move fetch/IO logic into an Astro `load` context or page-level script whenever
+possible.
 
 - Keep API calls out of component render logic.
 - Pass only primitive props or serializable objects into React islands.
@@ -146,13 +155,15 @@ Move fetch/IO logic into an Astro `load` context or page-level script whenever p
 
 - Prefer component-scoped `<style>` in `.astro` for static components.
 - Keep design-system classes centralized and reuse existing utility patterns.
-- Migrate React CSS imports by validating build tool support for each asset type.
+- Migrate React CSS imports by validating build tool support for each asset
+  type.
 
 When migrating style dependencies, verify:
 
 - CSS module names still resolve after file extension changes.
 - Shared theme tokens continue to come from the existing source of truth.
-- Accessibility states remain present (`:focus-visible`, `aria-*`) in static and interactive versions.
+- Accessibility states remain present (`:focus-visible`, `aria-*`) in static and
+  interactive versions.
 
 ## 7) Verification checklist
 
@@ -162,8 +173,8 @@ When migrating style dependencies, verify:
 4. Add or update tests for interaction and snapshots.
 5. Update usage examples in the destination docs.
 
-This process aligns with the [Component Testing Guide](./component-testing.md) and the conventions in
-the [Component Library](./component-library.md).
+This process aligns with the [Component Testing Guide](./component-testing.md)
+and the conventions in the [Component Library](./component-library.md).
 
 ## 8) Common migration risks
 

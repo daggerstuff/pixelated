@@ -5,7 +5,6 @@ duration: 8min
 description: >-
   Deep dive into the technical challenges and solutions for detecting emotions
   from text in mental health contexts
-
 ---
 
 Emotion detection is one of the core technologies powering modern mental health

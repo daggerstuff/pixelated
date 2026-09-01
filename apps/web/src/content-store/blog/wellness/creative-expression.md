@@ -1,7 +1,8 @@
 ---
 title: Creative Expression for Mental Wellness
 description: >-
-  _Next in our series, we'll explore how connecting with nature can be a powerful
+  _Next in our series, we'll explore how connecting with nature can be a
+  powerful
 author: Wellness Team
 pubDate: 2024-05-18T00:00:00.000Z
 draft: false
@@ -13,8 +14,8 @@ tags:
   - emotional-health
 series: Everyday Joy
 seriesOrder: 3
-
 ---
+
 # Creative Expression for Mental Wellness
 
 ## Introduction

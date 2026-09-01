@@ -61,7 +61,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+          tags:
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.IMAGE_NAME }}:latest
           cache-from: type=gha
@@ -77,7 +78,8 @@ jobs:
           build-args: |
             AGENT_DIR=agents/session-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
+          tags:
+            ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.SESSION_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=session-agent
@@ -93,7 +95,8 @@ jobs:
           build-args: |
             AGENT_DIR=agents/qa-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
+          tags:
+            ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.QA_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=qa-agent
@@ -109,7 +112,8 @@ jobs:
           build-args: |
             AGENT_DIR=agents/pipeline-agent
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
+          tags:
+            ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{
             env.PIPELINE_AGENT_IMAGE_NAME }}:latest
           cache-from: type=gha,scope=pipeline-agent

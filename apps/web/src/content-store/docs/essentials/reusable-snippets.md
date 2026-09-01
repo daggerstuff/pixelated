@@ -10,5 +10,7 @@ title: Reusable Snippets
 ---
 
 Lorem ipsum dolor sit amet.
+
 ```
 
+```

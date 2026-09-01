@@ -4,10 +4,7 @@
 // Project Service Unit Tests
 // Tests for project-service.ts functions
 
-import {
-  getMongoConnection,
-  getPostgresPool,
-} from '../../../lib/db/connection'
+import { getMongoConnection, getPostgresPool } from '../../../lib/db/connection'
 import { NotFoundError, ForbiddenError } from '../../middleware/error-handler'
 import * as projectService from '../project-service'
 

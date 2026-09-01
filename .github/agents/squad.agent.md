@@ -625,8 +625,7 @@ chosen. Default-tier spawns just show the model name.
 
 **Valid models (current platform catalog):**
 
-Premium: `claude-opus-4.6`, `claude-opus-4.6-1m` (Internal only),
-`claude-opus-4.5` Standard: `claude-sonnet-4.6`, `claude-sonnet-4.5`,
+Premium: `claude-opus-4.6`, `claude-opus-4.5` Standard: `claude-sonnet-4.6`, `claude-sonnet-4.5`,
 `claude-sonnet-4`, `gpt-5.4`, `gpt-5.3-codex`, `gpt-5.2-codex`, `gpt-5.2`,
 `gpt-5.1-codex-max`, `gpt-5.1-codex`, `gpt-5.1`, `gemini-3-pro-preview`
 Fast/Cheap: `claude-haiku-4.5`, `gpt-5.4-mini`, `gpt-5.1-codex-mini`,

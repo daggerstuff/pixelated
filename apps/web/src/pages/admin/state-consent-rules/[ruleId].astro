@@ -25,16 +25,28 @@ await requirePageAuth(Astro, 'admin')
     </div>
 
     <!-- Rule Header -->
-    <div id="rule-header" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+    <div
+      id="rule-header"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+    >
       <div class="flex items-center justify-between">
         <div>
-          <h1 id="rule-title" class="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1
+            id="rule-title"
+            class="text-2xl font-bold text-gray-900 dark:text-white"
+          >
             Loading...
           </h1>
-          <p id="rule-subtitle" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p
+            id="rule-subtitle"
+            class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+          >
           </p>
         </div>
-        <div id="rule-status-badge" class="px-3 py-1 text-sm font-medium rounded-full">
+        <div
+          id="rule-status-badge"
+          class="px-3 py-1 text-sm font-medium rounded-full"
+        >
         </div>
       </div>
     </div>
@@ -125,19 +137,29 @@ await requirePageAuth(Astro, 'admin')
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Action
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Actor
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 From
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 To
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+              >
                 Timestamp
               </th>
             </tr>
@@ -161,10 +183,12 @@ await requirePageAuth(Astro, 'admin')
 <script>
   const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-    review: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+    review:
+      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
     approved: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
     active: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-    superseded: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
+    superseded:
+      'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
     archived: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
   }
 
@@ -179,32 +203,72 @@ await requirePageAuth(Astro, 'admin')
 
   function renderConfig(config: Record<string, unknown>): string {
     const fields: Array<{ label: string; value: string }> = [
-      { label: 'Minimum Consent Level', value: String(config.minimumConsentLevel ?? '—') },
-      { label: 'Override Consent Level', value: String(config.overrideConsentLevel ?? '—') },
-      { label: 'Requires Mental Health Consent', value: config.requiresMentalHealthConsent ? 'Yes' : 'No' },
-      { label: 'Requires SUD Consent', value: config.requiresSUDConsent ? 'Yes' : 'No' },
-      { label: 'Requires Minor Parental Consent', value: config.requiresMinorParentalConsent ? 'Yes' : 'No' },
+      {
+        label: 'Minimum Consent Level',
+        value: String(config.minimumConsentLevel ?? '—'),
+      },
+      {
+        label: 'Override Consent Level',
+        value: String(config.overrideConsentLevel ?? '—'),
+      },
+      {
+        label: 'Requires Mental Health Consent',
+        value: config.requiresMentalHealthConsent ? 'Yes' : 'No',
+      },
+      {
+        label: 'Requires SUD Consent',
+        value: config.requiresSUDConsent ? 'Yes' : 'No',
+      },
+      {
+        label: 'Requires Minor Parental Consent',
+        value: config.requiresMinorParentalConsent ? 'Yes' : 'No',
+      },
       { label: 'Age of Majority', value: String(config.ageOfMajority ?? '—') },
     ]
 
-    if (config.minorConsentCategories && Array.isArray(config.minorConsentCategories)) {
-      fields.push({ label: 'Minor Consent Categories', value: (config.minorConsentCategories as string[]).join(', ') })
+    if (
+      config.minorConsentCategories &&
+      Array.isArray(config.minorConsentCategories)
+    ) {
+      fields.push({
+        label: 'Minor Consent Categories',
+        value: (config.minorConsentCategories as string[]).join(', '),
+      })
     }
 
-    if (config.providerTypeRestrictions && typeof config.providerTypeRestrictions === 'object') {
-      fields.push({ label: 'Provider Type Restrictions', value: JSON.stringify(config.providerTypeRestrictions) })
+    if (
+      config.providerTypeRestrictions &&
+      typeof config.providerTypeRestrictions === 'object'
+    ) {
+      fields.push({
+        label: 'Provider Type Restrictions',
+        value: JSON.stringify(config.providerTypeRestrictions),
+      })
     }
 
-    if (config.treatmentCategoryOverrides && typeof config.treatmentCategoryOverrides === 'object') {
-      fields.push({ label: 'Treatment Category Overrides', value: JSON.stringify(config.treatmentCategoryOverrides) })
+    if (
+      config.treatmentCategoryOverrides &&
+      typeof config.treatmentCategoryOverrides === 'object'
+    ) {
+      fields.push({
+        label: 'Treatment Category Overrides',
+        value: JSON.stringify(config.treatmentCategoryOverrides),
+      })
     }
 
     if (config.legalMetadata && typeof config.legalMetadata === 'object') {
       const lm = config.legalMetadata as Record<string, string>
-      if (lm.legalReference) fields.push({ label: 'Legal Reference', value: lm.legalReference })
-      if (lm.lastLegalReviewDate) fields.push({ label: 'Last Legal Review', value: lm.lastLegalReviewDate })
-      if (lm.nextReviewDueDate) fields.push({ label: 'Next Review Due', value: lm.nextReviewDueDate })
-      if (lm.reviewedBy) fields.push({ label: 'Reviewed By', value: lm.reviewedBy })
+      if (lm.legalReference)
+        fields.push({ label: 'Legal Reference', value: lm.legalReference })
+      if (lm.lastLegalReviewDate)
+        fields.push({
+          label: 'Last Legal Review',
+          value: lm.lastLegalReviewDate,
+        })
+      if (lm.nextReviewDueDate)
+        fields.push({ label: 'Next Review Due', value: lm.nextReviewDueDate })
+      if (lm.reviewedBy)
+        fields.push({ label: 'Reviewed By', value: lm.reviewedBy })
     }
 
     return fields
@@ -308,11 +372,19 @@ await requirePageAuth(Astro, 'admin')
       // Audit table
       const auditTbody = document.getElementById('audit-tbody')
       if (auditLog.length === 0) {
-        auditTbody!.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">No audit entries</td></tr>'
+        auditTbody!.innerHTML =
+          '<tr><td colspan="5" class="px-6 py-8 text-center text-gray-400">No audit entries</td></tr>'
       } else {
         auditTbody!.innerHTML = auditLog
           .map(
-            (entry: { action: string; actorId: string; actorRole: string; oldStatus: string | null; newStatus: string | null; timestamp: string }) => `
+            (entry: {
+              action: string
+              actorId: string
+              actorRole: string
+              oldStatus: string | null
+              newStatus: string | null
+              timestamp: string
+            }) => `
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                 ${entry.action.replace(/_/g, ' ')}
@@ -336,7 +408,9 @@ await requirePageAuth(Astro, 'admin')
       }
 
       // Wire up action buttons
-      btnSubmitReview?.addEventListener('click', () => doAction('submit-review'))
+      btnSubmitReview?.addEventListener('click', () =>
+        doAction('submit-review'),
+      )
       btnApprove?.addEventListener('click', () => doAction('approve'))
       btnActivate?.addEventListener('click', () => doAction('activate'))
       btnArchive?.addEventListener('click', () => doAction('archive'))
@@ -347,17 +421,25 @@ await requirePageAuth(Astro, 'admin')
   }
 
   async function doAction(action: string) {
-    if (!confirm(`Are you sure you want to ${action.replace('-', ' ')} this rule?`)) return
+    if (
+      !confirm(
+        `Are you sure you want to ${action.replace('-', ' ')} this rule?`,
+      )
+    )
+      return
 
     const pathParts = window.location.pathname.split('/')
     const ruleId = pathParts[pathParts.length - 1]
 
     try {
-      const res = await fetch(`/api/v1/admin/state-consent-rules/${ruleId}/${action}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      })
+      const res = await fetch(
+        `/api/v1/admin/state-consent-rules/${ruleId}/${action}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        },
+      )
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Request failed' }))
@@ -372,7 +454,12 @@ await requirePageAuth(Astro, 'admin')
   }
 
   async function doDelete() {
-    if (!confirm('Are you sure you want to permanently delete this draft rule? This cannot be undone.')) return
+    if (
+      !confirm(
+        'Are you sure you want to permanently delete this draft rule? This cannot be undone.',
+      )
+    )
+      return
 
     const pathParts = window.location.pathname.split('/')
     const ruleId = pathParts[pathParts.length - 1]

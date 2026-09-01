@@ -45,9 +45,14 @@ recognition
 
 1. Setup Environment
    ```bash
-# Install dependencies
-   pnpm install --no-frozen-lockfile
+
    ```
+
+# Install dependencies
+
+pnpm install --no-frozen-lockfile
+
+```
 
 # Start Redis server
 
@@ -57,9 +62,10 @@ docker run -d -p 6379:6379 redis:latest
 
 REDIS_URL=redis://localhost:6379 REDIS_KEY_PREFIX="test:"
 
-````
+```
 
 2. Run Test Suites
+
 ```bash
 # Run all tests
 pnpm test:redis:all
@@ -74,13 +80,18 @@ pnpm test:redis:coverage
 
 # Watch mode for development
 pnpm test:redis:watch
-````
+```
 
 3. View Results
    ```bash
-# Open coverage report
-   open coverage/lcov-report/index.html
+
    ```
+
+# Open coverage report
+
+open coverage/lcov-report/index.html
+
+````
 
 ## Test Configuration
 
@@ -89,29 +100,29 @@ pnpm test:redis:watch
 ```typescript
 // .config.ts
 {
-  preset: 'ts-vitest',
-  testEnvironment: 'node',
-  testMatch: [
-    '<rootDir>/**/*.test.ts',
-    '<rootDir>/**/*.perf.test.ts',
-    '<rootDir>/**/*.integration.test.ts',
-  ],
-  setupFilesAfterEnv: ['<rootDir>/.setup.ts'],
-  globalSetup: '<rootDir>/.global.setup.ts',
-  globalTeardown: '<rootDir>/.global.teardown.ts',
-  testTimeout: 30000,
-  maxWorkers: 4,
-  collectCoverage: true,
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80,
-    },
-  },
+preset: 'ts-vitest',
+testEnvironment: 'node',
+testMatch: [
+ '<rootDir>/**/*.test.ts',
+ '<rootDir>/**/*.perf.test.ts',
+ '<rootDir>/**/*.integration.test.ts',
+],
+setupFilesAfterEnv: ['<rootDir>/.setup.ts'],
+globalSetup: '<rootDir>/.global.setup.ts',
+globalTeardown: '<rootDir>/.global.teardown.ts',
+testTimeout: 30000,
+maxWorkers: 4,
+collectCoverage: true,
+coverageThreshold: {
+ global: {
+   branches: 80,
+   functions: 80,
+   lines: 80,
+   statements: 80,
+ },
+},
 }
-```
+````
 
 ### Environment Setup
 
@@ -280,41 +291,55 @@ jobs:
 1. Connection Failures
 
    ```bash
+
+   ```
+
 # Verify Redis is running
-   docker ps | grep redis
+
+docker ps | grep redis
 
 # Check Redis logs
-   docker logs redis
+
+docker logs redis
 
 # Test connection
-   redis-cli ping
-   ```
+
+redis-cli ping
+
+````
 
 2. Performance Issues
 
-   ```bash
+```bash
 # Monitor Redis metrics
-   redis-cli info
+redis-cli info
 
 # Check system resources
-   top -n 1
+top -n 1
 
 # View test metrics
-   pnpm test:redis:perf
-   ```
+pnpm test:redis:perf
+````
 
 3. Test Failures
 
    ```bash
+
+   ```
+
 # Run specific test
-   pnpm test:redis:unit -t "test name"
+
+pnpm test:redis:unit -t "test name"
 
 # Debug test
-   NODE_OPTIONS=--inspect pnpm test:redis:unit
+
+NODE_OPTIONS=--inspect pnpm test:redis:unit
 
 # View detailed logs
-   DEBUG=true pnpm test:redis:all
-   ```
+
+DEBUG=true pnpm test:redis:all
+
+```
 
 ## Support
 
@@ -324,3 +349,4 @@ For issues and questions:
 - Documentation: [Redis Service API](./redis-service.mdx)
 - Slack: #redis-service channel
 
+```

@@ -10,14 +10,9 @@ draft: false
 toc: true
 ---
 
-  status: 'success',
-  userId: session.user?.id,
-  details: {
-    model: completion.model,
-    contentLength: completion.content.length,
-    tokenUsage: completion.usage,
-  },
-})
+status: 'success', userId: session.user?.id, details: { model: completion.model,
+contentLength: completion.content.length, tokenUsage: completion.usage, }, })
+
 ```
 
 ## Best Practices
@@ -59,3 +54,4 @@ Security is an ongoing process:
 4. **Update Security Measures**: Continuously improve security measures
 5. **Conduct Security Training**: Train developers on security best practices
 
+```

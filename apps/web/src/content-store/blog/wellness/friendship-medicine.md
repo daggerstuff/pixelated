@@ -12,8 +12,8 @@ tags:
   - emotional-health
 series: Everyday Joy
 seriesOrder: 2
-
 ---
+
 # Friendship as Medicine: Nurturing Social Wellness
 
 ## Introduction

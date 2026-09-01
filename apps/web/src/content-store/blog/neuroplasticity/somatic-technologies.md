@@ -13,8 +13,8 @@ tags:
   - innovation
 series: Neuroplasticity & Trauma
 seriesOrder: 3
-
 ---
+
 # Advanced Somatic Technologies in Trauma Treatment
 
 ## Introduction

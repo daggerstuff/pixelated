@@ -2,9 +2,9 @@
 title: 'Case Studies: CPTSD and Addiction'
 description:
 ---
-  'Real-world case studies of integrated treatment for CPTSD and addiction'
-author: 'Resource Team'
-pubDate: 2024-02-28
+
+'Real-world case studies of integrated treatment for CPTSD and addiction'
+author: 'Resource Team' pubDate: 2024-02-28
 ---
 
 # Case Studies: CPTSD and Addiction

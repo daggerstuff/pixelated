@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto'
+
 import axios from 'axios'
 import { Pool } from 'pg'
 
@@ -5,6 +7,11 @@ type UnknownRecord = Record<string, unknown>
 
 type JsonValue =
   string | number | boolean | null | JsonValue[] | UnknownRecord | Date
+
+/** Cryptographically secure random number in [0, 1) range, replacing cryptoRandom() */
+function cryptoRandom(): number {
+  return randomBytes(4).readUInt32BE(0) / 0x100000000
+}
 
 interface YahooChartResponse {
   chart?: {
@@ -457,11 +464,11 @@ export class BusinessIntelligenceService {
     return {
       symbol,
       name: `${symbol} Corporation`,
-      price: 150 + Math.random() * 50,
-      change: (Math.random() - 0.5) * 10,
-      changePercent: (Math.random() - 0.5) * 5,
-      volume: 1000000 + Math.random() * 5000000,
-      marketCap: 1000000000 + Math.random() * 9000000000,
+      price: 150 + cryptoRandom() * 50,
+      change: (cryptoRandom() - 0.5) * 10,
+      changePercent: (cryptoRandom() - 0.5) * 5,
+      volume: 1000000 + cryptoRandom() * 5000000,
+      marketCap: 1000000000 + cryptoRandom() * 9000000000,
       timestamp: new Date(),
     }
   }
@@ -530,14 +537,14 @@ export class BusinessIntelligenceService {
     const quarters = quarter ? [quarter] : ['Q1', 'Q2', 'Q3', 'Q4']
 
     return quarters.map((q) => ({
-      revenue: 1000000 + Math.random() * 500000,
-      growthRate: 10 + Math.random() * 20,
-      customerAcquisitionCost: 50 + Math.random() * 30,
-      customerLifetimeValue: 500 + Math.random() * 200,
-      churnRate: 5 + Math.random() * 5,
-      netPromoterScore: 50 + Math.random() * 30,
-      marketShare: 5 + Math.random() * 10,
-      employeeCount: 50 + Math.floor(Math.random() * 50),
+      revenue: 1000000 + cryptoRandom() * 500000,
+      growthRate: 10 + cryptoRandom() * 20,
+      customerAcquisitionCost: 50 + cryptoRandom() * 30,
+      customerLifetimeValue: 500 + cryptoRandom() * 200,
+      churnRate: 5 + cryptoRandom() * 5,
+      netPromoterScore: 50 + cryptoRandom() * 30,
+      marketShare: 5 + cryptoRandom() * 10,
+      employeeCount: 50 + Math.floor(cryptoRandom() * 50),
       quarter: q,
       year: currentYear,
     }))
@@ -586,14 +593,14 @@ export class BusinessIntelligenceService {
     for (let i = 0; i < days; i++) {
       predictions.push({
         date: new Date(Date.now() + i * 86400000),
-        predictedPrice: 150 + Math.sin(i / 10) * 20 + Math.random() * 10,
-        confidence: 0.7 + Math.random() * 0.2,
+        predictedPrice: 150 + Math.sin(i / 10) * 20 + cryptoRandom() * 10,
+        confidence: 0.7 + cryptoRandom() * 0.2,
       })
     }
 
     return {
       predictions,
-      trend: Math.random() > 0.5 ? 'up' : 'down',
+      trend: cryptoRandom() > 0.5 ? 'up' : 'down',
       confidence: 0.75,
     }
   }
@@ -601,9 +608,9 @@ export class BusinessIntelligenceService {
   private getDemoIndustryAnalysis(industry: string) {
     return {
       overview: `${industry} industry analysis with comprehensive market overview`,
-      growthRate: 15 + Math.random() * 20,
+      growthRate: 15 + cryptoRandom() * 20,
       keyPlayers: ['Company A', 'Company B', 'Company C'],
-      marketSize: 1000000000 + Math.random() * 9000000000,
+      marketSize: 1000000000 + cryptoRandom() * 9000000000,
       trends: ['AI integration', 'Sustainability', 'Digital transformation'],
       risks: ['Regulatory changes', 'Economic downturn', 'Competition'],
     }

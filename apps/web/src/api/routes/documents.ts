@@ -5,12 +5,12 @@ import express, { Router, Request, Response } from 'express'
 
 import { getPostgresPool } from '../../lib/db/connection'
 import { BusinessDocument } from '../../lib/db/mongodb/schemas'
+import * as documentService from '../lib/services/document-service'
 import {
   asyncHandler,
   NotFoundError,
   ValidationError,
 } from '../middleware/error-handler'
-import * as documentService from '../lib/services/document-service'
 
 // Temporary placeholder middleware - auth handled at Astro layer
 const requirePermission =

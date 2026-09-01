@@ -1,6 +1,8 @@
 ---
 title: The Dance of Minds - When AI and Human Psychology Collide
-description: 'What happens when algorithms start messing with our heads (and why we might be letting them)'
+description:
+  'What happens when algorithms start messing with our heads (and why we might
+  be letting them)'
 pubDate: 2025-03-15
 lastModDate: 2025-04-11
 author: 'Vivi'

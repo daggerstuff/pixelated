@@ -332,12 +332,7 @@ A versatile button component that supports different variants and sizes.
 interface Props extends HTMLAttributes<'button'> {
   href?: string
   variant?:
-    | 'default'
-    | 'destructive'
-    | 'outline'
-    | 'secondary'
-    | 'ghost'
-    | 'link'
+    'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
   size?: 'default' | 'sm' | 'lg' | 'icon'
   loading?: boolean
   loadingText?: string
@@ -581,7 +576,7 @@ interface LoginFormProps {
 ```tsx
 import { LoginForm } from '@/components/auth/LoginForm'
 ;<LoginForm
-  redirectTo='/dashboard'
+  redirectTo="/dashboard"
   showSignup={true}
   showResetPassword={true}
 />
@@ -617,7 +612,7 @@ interface ResetPasswordFormProps {
 
 ```tsx
 import { ResetPasswordForm } from '@/components/auth/ResetPasswordForm'
-;<ResetPasswordForm redirectTo='/login' />
+;<ResetPasswordForm redirectTo="/login" />
 ```
 
 **Features:**
@@ -649,7 +644,7 @@ interface PasswordResetRequestFormProps {
 ```tsx
 import { PasswordResetRequestForm } from '@/components/auth/PasswordResetRequestForm'
 ;<PasswordResetRequestForm
-  redirectTo='/login'
+  redirectTo="/login"
   onSuccess={() => console.log('Reset email sent')}
 />
 ```
@@ -680,7 +675,7 @@ interface RegisterFormProps {
 
 ```tsx
 import { RegisterForm } from '@/components/auth/RegisterForm'
-;<RegisterForm redirectTo='/dashboard' />
+;<RegisterForm redirectTo="/dashboard" />
 ```
 
 **Features:**

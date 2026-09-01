@@ -16,10 +16,9 @@ title: API Gateway Hardening Guide
 
 ## Overview
 
-This document describes the production hardening configuration for the
-Pixelated Empathy API gateway layer. The gateway sits in front of all
-application services and enforces security, rate limiting, and traffic
-management policies.
+This document describes the production hardening configuration for the Pixelated
+Empathy API gateway layer. The gateway sits in front of all application services
+and enforces security, rate limiting, and traffic management policies.
 
 ## Architecture
 
@@ -89,8 +88,8 @@ Authorization, Content-Type, X-API-Key, X-Request-Id
 
 ### Preflight Handling
 
-OPTIONS requests receive a 204 response with CORS headers. No
-backend processing for preflight requests.
+OPTIONS requests receive a 204 response with CORS headers. No backend processing
+for preflight requests.
 
 ## Request Body Size Limits
 
@@ -174,7 +173,8 @@ See: `src/lib/rate-limit/` for implementation.
 
 ### Circuit Breaker
 
-- Triggers when: `NetworkErrorRatio() > 0.3 || ResponseCodeRatio(500, 600, 0, 600) > 0.3`
+- Triggers when:
+  `NetworkErrorRatio() > 0.3 || ResponseCodeRatio(500, 600, 0, 600) > 0.3`
 - Effect: stops routing to failing backend
 
 ### Retry
@@ -201,8 +201,8 @@ Cloudflare sits in front of the gateway for:
 - Bot management
 - TLS termination (optional — can pass through to gateway)
 
-Cloudflare trusted proxy IPs are configured in Caddy. Traefik
-receives traffic from Cloudflare via the DNS challenge provider.
+Cloudflare trusted proxy IPs are configured in Caddy. Traefik receives traffic
+from Cloudflare via the DNS challenge provider.
 
 ## Verification
 

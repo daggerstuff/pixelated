@@ -2,10 +2,9 @@
 title: Holistic and Alternative Treatment Options
 description:
 ---
-  'Comprehensive guide for mental health professionals and individuals in
-  recovery'
-author: 'Resource Team'
-pubDate: 2024-02-28
+
+'Comprehensive guide for mental health professionals and individuals in
+recovery' author: 'Resource Team' pubDate: 2024-02-28
 ---
 
 Living with Complex Post-Traumatic Stress Disorder (CPTSD) can be an incredibly

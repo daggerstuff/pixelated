@@ -8,8 +8,8 @@
 
 import { Request, Response, NextFunction } from 'express'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { RateLimitResult } from '../../../rate-limit/distributed-types'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { ThreatResponse } from '../response-orchestration'
 import { RateLimitingBridge } from './rate-limiting-bridge'
 

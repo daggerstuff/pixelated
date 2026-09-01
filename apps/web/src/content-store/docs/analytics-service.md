@@ -1,15 +1,16 @@
 ---
 title: Analytics Service
 description: >-
-  Guide to Pixelated Healths analytics service for data processing and insights' share: true lastModDate: 2025-03-25
-  tags: ['anal
+  Guide to Pixelated Healths analytics service for data processing and insights'
+  share: true lastModDate: 2025-03-25 tags: ['anal
 pubDate: '2026-05-09'
 ---
 
     type: 'daily',
-  },
-})
-```
+
+}, })
+
+````
 
 ### WebSocket Integration
 
@@ -32,7 +33,7 @@ ws.on('message', (data) => {
     console.log('New event:', message.event)
   }
 })
-```
+````
 
 ## Configuration
 

@@ -13,8 +13,8 @@ tags:
   - mental-health
 series: Neuroplasticity & Trauma
 seriesOrder: 4
-
 ---
+
 # Psychedelic Medicine & Neuroplasticity in Trauma Treatment
 
 ## Introduction

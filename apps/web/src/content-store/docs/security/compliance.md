@@ -1,6 +1,7 @@
 ---
 title: Compliance & Standards
-description: Learn about Pixelated Healths compliance framework and security standards
+description:
+  Learn about Pixelated Healths compliance framework and security standards
 pubDate: '2026-05-09'
 ---
 

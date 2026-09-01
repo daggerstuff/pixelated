@@ -2,10 +2,9 @@
 title: Detox and Rehab
 description:
 ---
-  'Comprehensive guide for mental health professionals and individuals in
-  recovery'
-author: 'Resource Team'
-pubDate: 2024-02-28
+
+'Comprehensive guide for mental health professionals and individuals in
+recovery' author: 'Resource Team' pubDate: 2024-02-28
 ---
 
 Addiction is a challenging journey, one that affects not just the individual,

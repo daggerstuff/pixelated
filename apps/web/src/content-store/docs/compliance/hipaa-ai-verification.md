@@ -1,5 +1,6 @@
 ---
-description: HIPAA Compliance Verification Checklist for AI Components documentation
+description:
+  HIPAA Compliance Verification Checklist for AI Components documentation
 title: HIPAA Compliance Verification Checklist for AI Components
 pubDate: '2026-05-09'
 ---
@@ -90,7 +91,8 @@ validating that our AI implementation meets all necessary HIPAA requirements.
 - [ ] Confirm that the BAA covers all required HIPAA provisions
 - [ ] Review LLM provider's security practices and compliance documentation
 - [ ] Verify that LLM provider does not store or use patient data for training
-- [ ] Confirm that LLM provider's data handling practices meet HIPAA requirements
+- [ ] Confirm that LLM provider's data handling practices meet HIPAA
+      requirements
 
 ### Other Service Providers
 

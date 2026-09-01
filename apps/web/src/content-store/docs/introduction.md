@@ -1,7 +1,7 @@
 ---
 description: >-
-  Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental health research and innovation' tags:
-  ['introduction', 'ove
+  Welcome to Pixelated Empathy - A comprehensive AI-powered platform for mental
+  health research and innovation' tags: ['introduction', 'ove
 title: Welcome to Pixelated Empathy
 pubDate: '2026-05-09'
 ---

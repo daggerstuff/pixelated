@@ -1,6 +1,8 @@
 ---
 title: Security Overview
-description: Learn about Pixelated Healths comprehensive security features and compliance measures
+description:
+  Learn about Pixelated Healths comprehensive security features and compliance
+  measures
 pubDate: '2026-05-09'
 ---
 

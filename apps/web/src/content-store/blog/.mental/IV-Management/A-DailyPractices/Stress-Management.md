@@ -2,10 +2,9 @@
 title: Stress Management Techniques
 description:
 ---
-  'Comprehensive guide for mental health professionals and individuals in
-  recovery'
-author: 'Resource Team'
-pubDate: 2024-02-28
+
+'Comprehensive guide for mental health professionals and individuals in
+recovery' author: 'Resource Team' pubDate: 2024-02-28
 ---
 
 **Practicing Stress Management Techniques: A Daily Practice for Self-Care and

@@ -1,5 +1,6 @@
 ---
-description: Documentation of known accessibility issues and their resolution status
+description:
+  Documentation of known accessibility issues and their resolution status
 title: Known Accessibility Issues
 pubDate: '2026-05-09'
 ---

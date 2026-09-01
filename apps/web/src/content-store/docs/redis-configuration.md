@@ -1,8 +1,8 @@
 ---
 title: Redis Configuration
 description: >-
-  Detailed guide to configuring Redis for Pixelated Healths caching and queue system' share: true lastModDate:
-  2025-03-25 tags: [
+  Detailed guide to configuring Redis for Pixelated Healths caching and queue
+  system' share: true lastModDate: 2025-03-25 tags: [
 pubDate: '2026-05-09'
 ---
 

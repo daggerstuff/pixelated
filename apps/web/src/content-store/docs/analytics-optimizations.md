@@ -1,7 +1,7 @@
 ---
 description: >-
-  Comprehensive optimizations for the thread analytics system including materialized views, caching strategies, and
-  performance improvements
+  Comprehensive optimizations for the thread analytics system including
+  materialized views, caching strategies, and performance improvements
 title: Thread Analytics Optimizations
 pubDate: '2026-05-09'
 ---

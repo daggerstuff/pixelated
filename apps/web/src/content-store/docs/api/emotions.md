@@ -26,6 +26,7 @@ identify emotions, sentiment, and other affective aspects of communication.
   `GET /api/emotions/multidimensional-map`
 - [Real-Time Analysis](#real-time-analysis) -
   `POST /api/emotions/real-time-analysis`
+
 ---
 
 ## Analyze Text Emotions
@@ -86,6 +87,7 @@ Analyzes text to detect emotions and sentiment.
   }
 }
 ```
+
 ---
 
 ## Analyze Speech Emotions
@@ -138,6 +140,7 @@ Analyzes audio data to detect emotions from voice patterns.
   }
 }
 ```
+
 ---
 
 ## Get Multidimensional Map
@@ -178,6 +181,7 @@ dimensions.
   ]
 }
 ```
+
 ---
 
 ## Real-Time Analysis
@@ -269,6 +273,7 @@ The real-time analysis endpoint is optimized for:
 - `405 Method Not Allowed`: Wrong HTTP method
 - `429 Too Many Requests`: Rate limit exceeded
 - `500 Internal Server Error`: Server-side processing error
+
 ---
 
 ## Models and Algorithms

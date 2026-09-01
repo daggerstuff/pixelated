@@ -9,7 +9,8 @@ title: Authentication
 ---
 
 }
-```
+
+````
 
 ## Error Handling
 
@@ -37,7 +38,7 @@ try {
 } catch (err) {
   // Handle unexpected errors
 }
-```
+````
 
 ## Security Best Practices
 

@@ -3,6 +3,8 @@
  * Implements risk-based authentication triggers using Auth0 Signals and contextual analysis
  */
 
+import { randomBytes } from 'node:crypto'
+
 import { ManagementClient } from 'auth0'
 
 // Type alias for auth0 v5+ compatibility
@@ -13,14 +15,18 @@ export type ManagementClientOptionsWithClientCredentials = {
   audience?: string
 }
 
-import { auth0UserService } from '../services/auth0.service'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
+import { auth0UserService } from '../services/auth0.service'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 import { retry } from './utils'
 const logger = createBuildSafeLogger('auth0-adaptive-mfa-service')
+
+function cryptoRandom(): number {
+  return randomBytes(4).readUInt32BE(0) / 0x100000000
+}
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -318,7 +324,7 @@ export class Auth0AdaptiveMFAService {
           2,
           500,
         )
-        if (user?.lastLogin && Math.random() < 0.1) {
+        if (user?.lastLogin && cryptoRandom() < 0.1) {
           triggered = true
           description = `New or unusual IP address for user`
         }
@@ -370,7 +376,7 @@ export class Auth0AdaptiveMFAService {
         2,
         500,
       )
-      if (user && Math.random() < 0.05 && location.country) {
+      if (user && cryptoRandom() < 0.05 && location.country) {
         triggered = true
         description = `Unusual location change detected`
         value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
@@ -551,7 +557,7 @@ export class Auth0AdaptiveMFAService {
         }
 
         // Check for automated tools (simulated)
-        if (Math.random() < 0.02) {
+        if (cryptoRandom() < 0.02) {
           // 2% chance for demonstration
           triggered = true
           description = `Potential automated tool detected`

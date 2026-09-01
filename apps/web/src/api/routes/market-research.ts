@@ -1,13 +1,13 @@
 // Market Research Routes
 import express, { Router, Request, Response } from 'express'
 
-import { authMiddleware } from '../middleware/auth'
-import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import {
   createMarketResearch,
   listMarketResearch,
   getMarketResearch,
 } from '../lib/services/market-research-service'
+import { authMiddleware } from '../middleware/auth'
+import { asyncHandler, ValidationError } from '../middleware/error-handler'
 
 const router: Router = express.Router()
 

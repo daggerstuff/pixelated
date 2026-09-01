@@ -1,7 +1,7 @@
 ---
 description: >-
-  Guide to Pixelated Healths email service implementation and configuration' share: true lastModDate: 2025-03-25 tags:
-  ['email',
+  Guide to Pixelated Healths email service implementation and configuration'
+  share: true lastModDate: 2025-03-25 tags: ['email',
 title: Email Service
 pubDate: '2026-05-09'
 ---

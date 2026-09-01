@@ -2,7 +2,6 @@
 // Intentionally left without exports to avoid duplicate route definitions.
 import express, { Router, Request, Response } from 'express'
 
-import { asyncHandler, ValidationError } from '../middleware/error-handler'
 import {
   getProject,
   updateProject,
@@ -11,6 +10,7 @@ import {
   searchProjects,
   shareProject,
 } from '../lib/services/project-service'
+import { asyncHandler, ValidationError } from '../middleware/error-handler'
 
 const router: Router = express.Router()
 

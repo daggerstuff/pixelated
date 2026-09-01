@@ -1,5 +1,6 @@
 ---
-description: Comprehensive guides for setting up testing environments for Pixelated
+description:
+  Comprehensive guides for setting up testing environments for Pixelated
 title: Test Database Configuration
 pubDate: '2026-05-09'
 ---

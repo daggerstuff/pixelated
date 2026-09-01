@@ -2,10 +2,9 @@
 title: Books on CPTSD and Addiction
 description:
 ---
-  'Comprehensive guide for mental health professionals and individuals in
-  recovery'
-author: 'Resource Team'
-pubDate: 2024-02-28
+
+'Comprehensive guide for mental health professionals and individuals in
+recovery' author: 'Resource Team' pubDate: 2024-02-28
 ---
 
 Based on expert recommendations and popular reviews, here's a list of top-notch

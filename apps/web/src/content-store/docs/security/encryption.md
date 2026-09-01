@@ -1,14 +1,15 @@
 ---
 title: Encryption & Zero-Knowledge System
-description: Learn about Pixelated Empathy's encryption architecture and zero-knowledge implementation
+description:
+  Learn about Pixelated Empathy's encryption architecture and zero-knowledge
+  implementation
 pubDate: '2026-05-09'
 ---
 
 ## Encryption & Zero-Knowledge System
 
 Pixelated Empathy's encryption system provides end-to-end security through
-zero-knowledge proofs, homomorphic encryption, and comprehensive key
-management.
+zero-knowledge proofs, homomorphic encryption, and comprehensive key management.
 
 ## Architecture Overview
 
@@ -60,9 +61,9 @@ const zkService = getZKProofService()
 
 // Generate proof for an FHE operation pipeline
 const proof = await zkService.generateProof(
-  inputData,        // pre-encryption plaintext
-  'fhe-summarize',  // FHE operation type
-  outputData,       // post-decryption result
+  inputData, // pre-encryption plaintext
+  'fhe-summarize', // FHE operation type
+  outputData, // post-decryption result
 )
 
 // Proof artifact contains:
@@ -94,25 +95,25 @@ const valid = await zkService.verifyProof(
 ### Benchmark Results
 
 | Payload Size | Hash Commitment (ms) | Merkle Root (ms) | Total (ms) | Target Met |
-|---|---|---|---|---|
-| 1 KB | 0.12 | 0.08 | 0.20 | Yes (<5s) |
-| 10 KB | 0.31 | 0.15 | 0.46 | Yes (<5s) |
-| 100 KB | 1.84 | 0.92 | 2.76 | Yes (<5s) |
-| 1 MB | 12.43 | 7.81 | 20.24 | Yes (<5s) |
+| ------------ | -------------------- | ---------------- | ---------- | ---------- |
+| 1 KB         | 0.12                 | 0.08             | 0.20       | Yes (<5s)  |
+| 10 KB        | 0.31                 | 0.15             | 0.46       | Yes (<5s)  |
+| 100 KB       | 1.84                 | 0.92             | 2.76       | Yes (<5s)  |
+| 1 MB         | 12.43                | 7.81             | 20.24      | Yes (<5s)  |
 
 ### Library Selection
 
-| Criterion | SP1 (selected) | RISC Zero | MP-SPDZ (rejected) |
-|---|---|---|---|
-| Type | zkVM (RISC-V) | zkVM (RISC-V) | MPC framework |
-| ZK proofs | Yes | Yes | No |
-| TypeScript SDK | Yes (`sp1-sdk`) | Yes (`@risczero/bonsai-sdk`) | No |
-| Proving speed | ~2s (GPU Turbo) | ~3.7s (CPU) | N/A |
-| License | MIT + Apache-2.0 | Apache-2.0 | Research-grade |
+| Criterion      | SP1 (selected)   | RISC Zero                    | MP-SPDZ (rejected) |
+| -------------- | ---------------- | ---------------------------- | ------------------ |
+| Type           | zkVM (RISC-V)    | zkVM (RISC-V)                | MPC framework      |
+| ZK proofs      | Yes              | Yes                          | No                 |
+| TypeScript SDK | Yes (`sp1-sdk`)  | Yes (`@risczero/bonsai-sdk`) | No                 |
+| Proving speed  | ~2s (GPU Turbo)  | ~3.7s (CPU)                  | N/A                |
+| License        | MIT + Apache-2.0 | Apache-2.0                   | Research-grade     |
 
-**MP-SPDZ was rejected** because it is a Multi-Party Computation framework,
-not a Zero-Knowledge Proof system. ADR-0001's reference to MP-SPDZ was based
-on a misunderstanding of its capabilities. See ADR-0004 for full evaluation.
+**MP-SPDZ was rejected** because it is a Multi-Party Computation framework, not
+a Zero-Knowledge Proof system. ADR-0001's reference to MP-SPDZ was based on a
+misunderstanding of its capabilities. See ADR-0004 for full evaluation.
 
 ## Key Management
 
@@ -225,8 +226,10 @@ const decapsulated = await quantumResistant.decapsulate({
 
 - Fully homomorphic encryption via Microsoft SEAL (node-seal WASM)
 - BFV scheme with polyModulusDegree 8192
-- Operations: Addition, Subtraction, Multiplication, Negation, Polynomial, Rotation, Square
-- Text operations: Summarize, Sentiment, Categorize, Tokenize, Filter (simulation mode)
+- Operations: Addition, Subtraction, Multiplication, Negation, Polynomial,
+  Rotation, Square
+- Text operations: Summarize, Sentiment, Categorize, Tokenize, Filter
+  (simulation mode)
 
 ### Implementation
 

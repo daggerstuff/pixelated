@@ -1,5 +1,5 @@
 ---
-title: "AI in Therapy: Promise, Pitfalls, Reality"
+title: 'AI in Therapy: Promise, Pitfalls, Reality'
 description: >
   What it actually looks like when algorithms enter the most vulnerable human
   spaces

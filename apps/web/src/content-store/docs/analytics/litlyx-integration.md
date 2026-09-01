@@ -59,8 +59,8 @@ For self-hosted Litlyx instances, you can provide additional parameters:
 ```jsx
 <LitlyxScript
   projectId={LITLYX_PROJECT_ID}
-  host='your-host-name'
-  port='your-port'
+  host="your-host-name"
+  port="your-port"
   secure={true}
 />
 ```
@@ -127,8 +127,8 @@ directly in your code:
 window.Lit.event('click_on_buy_item', {
   metadata: {
     'product-name': 'Product Name',
-    price: 19.99,
-    currency: 'USD',
+    'price': 19.99,
+    'currency': 'USD',
   },
 })
 ```
@@ -183,9 +183,9 @@ To connect to your self-hosted instance:
 2. With the script tag approach, use the additional props:
    ```jsx
    <LitlyxScript
-     projectId='your-project-id'
-     host='your-host-name'
-     port='your-port'
+     projectId="your-project-id"
+     host="your-host-name"
+     port="your-port"
      secure={true}
    />
    ```

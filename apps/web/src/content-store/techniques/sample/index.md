@@ -12,9 +12,8 @@ steps:
     'Step 2: Apply the technique',
     'Step 3: Evaluate results',
 ---
-  ]
-references: ['Sample Reference, 2023']
-created: 2023-10-15
+
+] references: ['Sample Reference, 2023'] created: 2023-10-15
 ---
 
 # Sample Technique

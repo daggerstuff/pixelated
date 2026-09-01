@@ -175,7 +175,7 @@ import { vi } from 'vitest'
 // Mock the lazy-loaded component
 vi.mock('./HeavyComponent', () => ({
   default: () => (
-    <div data-testid='heavy-component'>Heavy Component Content</div>
+    <div data-testid="heavy-component">Heavy Component Content</div>
   ),
 }))
 
@@ -183,7 +183,7 @@ const HeavyComponent = lazy(() => import('./HeavyComponent'))
 
 test('renders lazy component with loading state', async () => {
   render(
-    <Suspense fallback={<div data-testid='loading'>Loading...</div>}>
+    <Suspense fallback={<div data-testid="loading">Loading...</div>}>
       <HeavyComponent />
     </Suspense>,
   )

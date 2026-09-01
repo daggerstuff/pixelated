@@ -12,8 +12,8 @@ tags:
   - daily-practices
 series: Everyday Joy
 seriesOrder: 1
-
 ---
+
 # The Art of Micro-Joys: Finding Happiness in Small Moments
 
 ## Introduction
