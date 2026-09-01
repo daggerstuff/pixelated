@@ -212,9 +212,12 @@ CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences(user
 CREATE INDEX IF NOT EXISTS idx_user_preferences_industries ON user_preferences USING GIN(industries);
 CREATE INDEX IF NOT EXISTS idx_user_preferences_symbols ON user_preferences USING GIN(symbols);
 
--- Triggers for updated_at timestamps
+-- Triggers for updated_at timestamps (drop first for idempotency)
+DROP TRIGGER IF EXISTS update_market_opportunities_updated_at ON market_opportunities;
 CREATE TRIGGER update_market_opportunities_updated_at BEFORE UPDATE ON market_opportunities FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_company_profiles_updated_at ON company_profiles;
 CREATE TRIGGER update_company_profiles_updated_at BEFORE UPDATE ON company_profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_user_preferences_updated_at ON user_preferences;
 CREATE TRIGGER update_user_preferences_updated_at BEFORE UPDATE ON user_preferences FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to clean up expired alerts

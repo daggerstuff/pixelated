@@ -65,10 +65,23 @@ Setup (one-time, by a repo admin):
 2. Repo -> Settings -> Secrets and variables -> Actions -> New repository secret
    -> name: `WORKFLOW_PAT`, value: <paste token>.
 
-Until `WORKFLOW_PAT` is configured, the Create Pull Request step fails with a
-pre-flight warning pointing at the `permissions:` block of the caller workflow.
-The workflow registers as success so CI dashboards don't show a red run for an
-unconfigured-repo state.
+The pre-flight check validates the token in two stages:
+
+1. **Presence**: `[[ -z "$WORKFLOW_PAT" ]]` -- aborts early if the secret is
+   unset. Uses `env:` mapping (not `${{ }}` template expansion) to avoid
+   leaking the token into logs.
+2. **Validity**: `curl -sf -o /dev/null -w '%{http_code}' -H "Authorization:
+   token $WORKFLOW_PAT" https://api.github.com/user` -- confirms the token is
+   not expired or revoked. A non-200 response sets `has_pat=false` and emits a
+   warning, so the job exits cleanly instead of falling through to
+   `peter-evans/create-pull-request` where the bad token causes a cryptic
+   `fatal: could not read Username for 'https://github.com'` (ENXIO on the
+   interactive git prompt in a TTY-less CI runner).
+
+Until `WORKFLOW_PAT` is configured and valid, the Create Pull Request step is
+skipped with a pre-flight warning pointing at the `permissions:` block of the
+caller workflow. The workflow registers as success so CI dashboards don't show
+a red run for an unconfigured-repo or expired-token state.
 
 ## Cross-references
 

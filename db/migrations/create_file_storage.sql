@@ -142,8 +142,11 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_files_updated_at ON files;
 CREATE TRIGGER update_files_updated_at BEFORE UPDATE ON files FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-CREATE TRIGGER update_folders_updated_at BEFORE UPDATE ON folders FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+DROP TRIGGER IF EXISTS update_folders_updated_at ON folders;
+CREATE TRIGGER update_folders_updated_at BEFORE UPDATE ON folders FOR EACH ROW EXECUTE FUNCTION update_folders_updated_at();
+DROP TRIGGER IF EXISTS update_document_templates_updated_at ON document_templates;
 CREATE TRIGGER update_document_templates_updated_at BEFORE UPDATE ON document_templates FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to automatically set is_current for file versions
@@ -162,6 +165,7 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS set_file_version_current ON file_versions;
 CREATE TRIGGER set_file_version_current AFTER INSERT ON file_versions FOR EACH ROW EXECUTE FUNCTION set_current_file_version();
 
 -- Function to update file version count
@@ -177,4 +181,5 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
+DROP TRIGGER IF EXISTS update_file_version_count ON file_versions;
 CREATE TRIGGER update_file_version_count AFTER INSERT OR DELETE ON file_versions FOR EACH ROW EXECUTE FUNCTION update_file_version_count();
