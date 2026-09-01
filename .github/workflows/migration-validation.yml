@@ -89,6 +89,9 @@ jobs:
           # by earlier ones. Each file piped through cat avoids shell variable
           # expansion of $ signs in SQL literals (e.g. bcrypt hashes).
           # -- FILE: markers help trace psql line errors back to source files.
+          # set -o pipefail ensures the pipeline exits non-zero if psql fails,
+          # instead of masking errors behind grep's exit code.
+          set -o pipefail
           if ! { echo 'BEGIN;'; for f in $MIGRATIONS; do echo "-- FILE: $(basename "$f")"; cat "$f"; done; echo 'ROLLBACK;'; } | psql -v ON_ERROR_STOP=1 -q 2>&1 | grep -v '^BEGIN$' | grep -v '^ROLLBACK$' | grep -v '^-- FILE:'; then
             echo "::error::Dry-run failed"
             exit 1

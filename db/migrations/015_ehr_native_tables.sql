@@ -129,67 +129,8 @@ DO $$ BEGIN
     END IF;
 END $$;
 
-ALTER TABLE ehr_patient ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY ehr_patient_select
-    ON ehr_patient FOR SELECT
-    USING (
-        tenant_id = current_setting('app.tenant_id')::uuid
-        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
-            'physician', 'nurse', 'pharmacist', 'medicalAssistant',
-            'technician', 'therapist', 'socialWorker', 'careCoordinator',
-            'frontDesk', 'billingSpecialist', 'complianceOfficer',
-            'healthInformationManager', 'systemAdmin'
-        )
-        AND (
-            ehr_patient_has_consent(patient_id, tenant_id, 'minimal')
-            OR current_setting('request.jwt.claims', true)::jsonb->>'break_glass' = 'true'
-            OR current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
-                'complianceOfficer', 'systemAdmin'
-            )
-        )
-    );
-
-CREATE POLICY ehr_patient_insert
-    ON ehr_patient FOR INSERT
-    WITH CHECK (
-        tenant_id = current_setting('app.tenant_id')::uuid
-        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
-            'physician', 'nurse', 'medicalAssistant', 'careCoordinator',
-            'frontDesk', 'healthInformationManager', 'systemAdmin'
-        )
-    );
-
-CREATE POLICY ehr_patient_update
-    ON ehr_patient FOR UPDATE
-    USING (
-        tenant_id = current_setting('app.tenant_id')::uuid
-        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
-            'physician', 'nurse', 'medicalAssistant', 'careCoordinator',
-            'healthInformationManager', 'systemAdmin'
-        )
-        AND (
-            ehr_patient_has_consent(patient_id, tenant_id, 'minimal')
-            OR current_setting('request.jwt.claims', true)::jsonb->>'break_glass' = 'true'
-            OR current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
-                'complianceOfficer', 'systemAdmin'
-            )
-        )
-    )
-    WITH CHECK (
-        tenant_id = current_setting('app.tenant_id')::uuid
-        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
-            'physician', 'nurse', 'medicalAssistant', 'careCoordinator',
-            'healthInformationManager', 'systemAdmin'
-        )
-    );
-
-CREATE POLICY ehr_patient_delete
-    ON ehr_patient FOR DELETE
-    USING (
-        tenant_id = current_setting('app.tenant_id')::uuid
-        AND current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
-    );
+-- ehr_patient RLS policies deferred until after ehr_patient_has_consent function
+-- (see "ehr_patient RLS policies" section below)
 
 -- ============================================================================
 -- 3. ehr_consent
@@ -299,6 +240,71 @@ CREATE OR REPLACE FUNCTION ehr_patient_has_consent(
     );
 $$ LANGUAGE sql STABLE SECURITY DEFINER
 SET search_path = public;
+
+-- ============================================================================
+-- 2b. ehr_patient RLS policies (deferred from section 2 — requires ehr_patient_has_consent)
+-- ============================================================================
+ALTER TABLE ehr_patient ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY ehr_patient_select
+    ON ehr_patient FOR SELECT
+    USING (
+        tenant_id = current_setting('app.tenant_id')::uuid
+        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+            'physician', 'nurse', 'pharmacist', 'medicalAssistant',
+            'technician', 'therapist', 'socialWorker', 'careCoordinator',
+            'frontDesk', 'billingSpecialist', 'complianceOfficer',
+            'healthInformationManager', 'systemAdmin'
+        )
+        AND (
+            ehr_patient_has_consent(patient_id, tenant_id, 'minimal')
+            OR current_setting('request.jwt.claims', true)::jsonb->>'break_glass' = 'true'
+            OR current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+                'complianceOfficer', 'systemAdmin'
+            )
+        )
+    );
+
+CREATE POLICY ehr_patient_insert
+    ON ehr_patient FOR INSERT
+    WITH CHECK (
+        tenant_id = current_setting('app.tenant_id')::uuid
+        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+            'physician', 'nurse', 'medicalAssistant', 'careCoordinator',
+            'frontDesk', 'healthInformationManager', 'systemAdmin'
+        )
+    );
+
+CREATE POLICY ehr_patient_update
+    ON ehr_patient FOR UPDATE
+    USING (
+        tenant_id = current_setting('app.tenant_id')::uuid
+        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+            'physician', 'nurse', 'medicalAssistant', 'careCoordinator',
+            'healthInformationManager', 'systemAdmin'
+        )
+        AND (
+            ehr_patient_has_consent(patient_id, tenant_id, 'minimal')
+            OR current_setting('request.jwt.claims', true)::jsonb->>'break_glass' = 'true'
+            OR current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+                'complianceOfficer', 'systemAdmin'
+            )
+        )
+    )
+    WITH CHECK (
+        tenant_id = current_setting('app.tenant_id')::uuid
+        AND current_setting('request.jwt.claims', true)::jsonb->>'role' IN (
+            'physician', 'nurse', 'medicalAssistant', 'careCoordinator',
+            'healthInformationManager', 'systemAdmin'
+        )
+    );
+
+CREATE POLICY ehr_patient_delete
+    ON ehr_patient FOR DELETE
+    USING (
+        tenant_id = current_setting('app.tenant_id')::uuid
+        AND current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
+    );
 
 -- ============================================================================
 -- 4. ehr_encounter
@@ -976,7 +982,7 @@ CREATE POLICY ehr_audit_history_insert
         AND current_setting('request.jwt.claims', true)::jsonb->>'role' IS NOT NULL
         AND actor_role = current_setting('request.jwt.claims', true)::jsonb->>'role'
         AND (
-            actor_id = current_setting('request.jwt.claims', true)::jsonb->>'sub'
+            actor_id = (current_setting('request.jwt.claims', true)::jsonb->>'sub')::uuid
             OR current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
         )
     );
