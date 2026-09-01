@@ -8,23 +8,23 @@
 # ///
 
 """
-High-Speed OVHcloud L40s 80GB GPU vLLM + Triple-Key NVIDIA NIM Generator
-========================================================================
+High-Speed OVHcloud L40s 80GB GPU vLLM + NVIDIA NIM Generator
+=============================================================
 
 Architecture:
 1. Local vLLM Engine on L40s GPU (http://localhost:8000/v1):
-   - Serves Wayfarer-2 / Llama-3 locally on-GPU at 400+ tokens/sec.
+   - Serves Wayfarer-2 / self-after-dark locally on-GPU at 400+ tokens/sec.
    - Zero network latency, zero rate limits, sub-second 5-session batch output.
-2. Triple Active NVIDIA NIM Key Pool (Fallback / Augmentation):
-   - Key 1: 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
-   - Key 2: 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
-   - Key 3: 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
+2. NVIDIA NIM Key Pool (Fallback / Augmentation):
+   - Keys are resolved from the environment (NVIDIA_API_KEYS comma-separated
+     or NVIDIA_API_KEY single). Never hardcoded in source; rotate if leaked.
 3. 5-Session Array Batching & Global Thread Queue:
    - High-throughput parallel worker execution pushing output to /workspace/data.
 """
 
 import json
 import logging
+import os
 import random
 import threading
 from collections import deque
@@ -52,12 +52,21 @@ _KEY_LOCK = threading.Lock()
 # 1. Local vLLM Engine Client (L40s 80GB GPU)
 VLLM_CLIENT = OpenAI(api_key="vllm", base_url="http://localhost:8000/v1")
 
-# 2. Triple NVIDIA NIM Key Rotation Pool
-NVIDIA_KEYS = [
-    "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",
-    "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",
-    "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",
+# 2. NVIDIA NIM Key Pool — resolved from env, never hardcoded.
+#    NVIDIA_API_KEYS = comma-separated list (rotating pool) or
+#    NVIDIA_API_KEY = single key. If neither is set, the NIM track is disabled
+#    and requests fall back to local vLLM / Ollama only.
+_RAW_NIM_KEYS = os.environ.get("NVIDIA_API_KEYS", os.environ.get("NVIDIA_API_KEY", ""))
+NVIDIA_KEYS = [k.strip() for k in _RAW_NIM_KEYS.split(",") if k.strip()]
+
+# Allowed NIM fallback models (non-Llama — GLM/Qwen/Mistral families only).
+NIM_MODELS = [
+    "qwen/qwen2.5-7b-instruct",
+    "mistralai/mistral-7b-instruct-v0.3",
 ]
+for _m in NIM_MODELS:
+    if "llama" in _m.lower():
+        raise ValueError(f"never-Llama violation in NIM_MODELS: {_m!r}")
 
 NIM_CLIENTS = [OpenAI(api_key=k, base_url="https://integrate.api.nvidia.com/v1") for k in NVIDIA_KEYS]
 
@@ -66,10 +75,16 @@ OLLAMA_REMOTE_CLIENT = OpenAI(
 )
 
 
-def get_next_nim_client() -> OpenAI:
-    """Gets the next NVIDIA NIM client in round-robin order across 3 keys."""
+def get_next_nim_client() -> OpenAI | None:
+    """Gets the next NVIDIA NIM client in round-robin order across the key pool.
+
+    Returns ``None`` when no ``NVIDIA_API_KEYS`` / ``NVIDIA_API_KEY`` are set,
+    so callers can skip the NIM track cleanly.
+    """
     global _KEY_INDEX
     with _KEY_LOCK:
+        if not NIM_CLIENTS:
+            return None
         client = NIM_CLIENTS[_KEY_INDEX % len(NIM_CLIENTS)]
         _KEY_INDEX += 1
         return client
@@ -92,8 +107,11 @@ def execute_vllm_local(prompt: str) -> str:
 
 
 def execute_nim_request(model: str, prompt: str) -> str:
-    """Executes request across triple-key NVIDIA NIM pool."""
+    """Executes request across the NVIDIA NIM key pool."""
     client = get_next_nim_client()
+    if client is None:
+        logger.debug("No NVIDIA NIM keys configured — skipping NIM track")
+        return ""
     try:
         res = client.chat.completions.create(
             model=model,
@@ -138,9 +156,9 @@ def generate_curated_session(row: dict) -> dict:
     # 2. Try Local L40s vLLM GPU Server First
     raw_payload = execute_vllm_local(batch_prompt)
 
-    # 3. Fallback to Triple NVIDIA NIM Key Pool if vLLM warming up
+    # 3. Fallback to NVIDIA NIM Key Pool if vLLM warming up
     if not raw_payload:
-        nim_m = random.choice(["meta/llama-3.1-8b-instruct", "nvidia/llama-3.1-nemotron-70b-instruct"])
+        nim_m = random.choice(NIM_MODELS)
         raw_payload = execute_nim_request(nim_m, batch_prompt)
 
     parsed_sessions = []
