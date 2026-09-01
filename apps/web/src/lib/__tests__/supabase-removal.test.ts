@@ -14,10 +14,7 @@ import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
 
 describe('Supabase client wrapper removal', () => {
-  const supabaseClientPath = join(
-    process.cwd(),
-    'apps/web/src/lib/supabase.ts',
-  )
+  const supabaseClientPath = join(process.cwd(), 'apps/web/src/lib/supabase.ts')
 
   it('does not ship a Supabase client wrapper', () => {
     expect(existsSync(supabaseClientPath)).toBe(false)
@@ -29,6 +26,6 @@ describe('Supabase client wrapper removal', () => {
       'apps/web/src/types/declarations.d.ts',
     )
     const content = readFileSync(declarationsPath, 'utf-8')
-    expect(content).not.toContain("@supabase/supabase-js")
+    expect(content).not.toContain('@supabase/supabase-js')
   })
 })
