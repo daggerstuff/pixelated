@@ -920,7 +920,7 @@ importers:
         version: 0.49.1(supports-color@10.2.2)
       mcp-remote:
         specifier: latest
-        version: 0.8.2(supports-color@10.2.2)
+        version: 0.8.3(supports-color@10.2.2)
       mdast-util-directive:
         specifier: latest
         version: 3.1.0(supports-color@10.2.2)
@@ -1190,46 +1190,6 @@ importers:
         specifier: ~5.7.3
         version: 5.7.3
 
-<<<<<<< HEAD
-=======
-  foresight/cli:
-    dependencies:
-      '@clack/prompts':
-        specifier: ^0.7.0
-        version: 0.7.0
-      commander:
-        specifier: ^12.1.0
-        version: 12.1.0
-      ioredis:
-        specifier: ^5.4.1
-        version: 5.11.1(supports-color@10.2.2)
-      ora:
-        specifier: ^8.1.1
-        version: 8.2.0
-      pg:
-        specifier: ^8.13.0
-        version: 8.23.0
-      picocolors:
-        specifier: ^1.1.0
-        version: 1.1.1
-    devDependencies:
-      '@types/node':
-        specifier: ^22.9.0
-        version: 22.20.1
-      '@types/pg':
-        specifier: ^8.11.10
-        version: 8.23.1
-      tsup:
-        specifier: ^8.3.5
-        version: 8.5.1(jiti@2.7.0)(postcss@8.5.26)(supports-color@10.2.2)(tsx@4.23.13)(typescript@5.7.3)(yaml@2.8.4)
-      typescript:
-        specifier: ^5.7.2
-        version: 5.7.3
-      vitest:
-        specifier: ^4.1.10
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0))(msw@2.15.0(@types/node@22.20.1)(typescript@5.7.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))
-
->>>>>>> origin/staging
   packages/memory-schema:
     dependencies:
       zod:
@@ -11381,8 +11341,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mcp-remote@0.8.2:
-    resolution: {integrity: sha512-8wGCVQckLvW+ONz0tc11henp73lbbrt7QOTH7w6qusCpcY+zNSKwBfXF1Mx2xu6z8ncLqLxE1H1CMBCJCx9lcA==}
+  mcp-remote@0.8.3:
+    resolution: {integrity: sha512-oEwD8z8DfRjpYm5a9X3spxuESBMoQ2ph3AiiSUQGD2OoBsWewWZsjAb93MsS8/T5e4P0p2gOW7IBw0znEUSlOg==}
     hasBin: true
 
   md5@2.3.0:
@@ -22154,20 +22114,7 @@ snapshots:
       msw: 2.15.0(@types/node@26.3.0)(typescript@5.7.3)
       vite: 7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4)
 
-<<<<<<< HEAD
-  '@vitest/mocker@4.1.11(msw@2.15.0(@types/node@24.13.3)(typescript@5.7.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.8.4))':
-=======
-  '@vitest/mocker@4.1.11(msw@2.15.0(@types/node@22.20.1)(typescript@5.7.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))':
-    dependencies:
-      '@vitest/spy': 4.1.11
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      msw: 2.15.0(@types/node@22.20.1)(typescript@5.7.3)
-      vite: 7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4)
-
   '@vitest/mocker@4.1.11(msw@2.15.0(@types/node@24.13.3)(typescript@5.7.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))':
->>>>>>> origin/staging
     dependencies:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
@@ -26473,7 +26420,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mcp-remote@0.8.2(supports-color@10.2.2):
+  mcp-remote@0.8.3(supports-color@10.2.2):
     dependencies:
       express: 5.2.1(supports-color@10.2.2)
       open: 10.2.0
@@ -29944,28 +29891,7 @@ snapshots:
       - supports-color
       - typescript
 
-<<<<<<< HEAD
-  vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.8.4):
-=======
-  vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4):
-    dependencies:
-      esbuild: 0.28.2
-      fdir: 6.5.0(picomatch@4.0.7)
-      picomatch: 4.0.7
-      postcss: 8.5.26
-      rollup: 4.63.0
-      tinyglobby: 0.2.17
-    optionalDependencies:
-      '@types/node': 22.20.1
-      fsevents: 2.3.3
-      jiti: 2.7.0
-      lightningcss: 1.33.0
-      terser: 5.50.0
-      tsx: 4.23.13
-      yaml: 2.8.4
-
   vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4):
->>>>>>> origin/staging
     dependencies:
       esbuild: 0.28.2
       fdir: 6.5.0(picomatch@4.0.7)
@@ -30080,41 +30006,7 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-<<<<<<< HEAD
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0))(msw@2.15.0(@types/node@24.13.3)(typescript@5.7.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.12)(yaml@2.8.4)):
-=======
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0))(msw@2.15.0(@types/node@22.20.1)(typescript@5.7.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4)):
-    dependencies:
-      '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(msw@2.15.0(@types/node@22.20.1)(typescript@5.7.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))
-      '@vitest/pretty-format': 4.1.11
-      '@vitest/runner': 4.1.11
-      '@vitest/snapshot': 4.1.11
-      '@vitest/spy': 4.1.11
-      '@vitest/utils': 4.1.11
-      es-module-lexer: 2.3.2
-      expect-type: 1.4.0
-      magic-string: 0.30.21
-      obug: 2.1.4
-      pathe: 2.0.3
-      picomatch: 4.0.7
-      std-env: 4.2.0
-      tinybench: 2.9.0
-      tinyexec: 1.3.0
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.1.1
-      vite: 7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.1
-      '@types/node': 22.20.1
-      '@vitest/coverage-v8': 4.1.11(vitest@4.1.11)
-      jsdom: 30.0.1(@noble/hashes@2.3.0)
-    transitivePeerDependencies:
-      - msw
-
   vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0))(msw@2.15.0(@types/node@24.13.3)(typescript@5.7.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4)):
->>>>>>> origin/staging
     dependencies:
       '@vitest/expect': 4.1.11
       '@vitest/mocker': 4.1.11(msw@2.15.0(@types/node@24.13.3)(typescript@5.7.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))
