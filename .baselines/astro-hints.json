@@ -1,11 +1,11 @@
 {
-  "hints": 617,
+  "hints": 620,
   "warnings": 0,
-  "errors": 175,
+  "errors": 141,
   "metadata": {
     "description": "Baseline astro check diagnostic counts. The CI check-astro-hints step warns if the hint count increases above this baseline.",
-    "generated_at": "2026-08-29T14:39:41.735Z",
+    "generated_at": "2026-09-01T07:45:00.000Z",
     "update_instructions": "Run 'node scripts/ci/check-astro-hints.mjs --update-baseline' to regenerate.",
-    "updated_by": "pr-churn: PR introduces new code whose hints are accepted; error count decreased vs prior baseline."
+    "updated_by": "pr-churn: PIX-4613 kitchen-sink PR — fixed ts(4111) errors + 3 hints; error count decreased significantly (179→141); hints +2 from new code."
   }
 }
