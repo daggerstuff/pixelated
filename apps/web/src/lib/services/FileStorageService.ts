@@ -174,6 +174,7 @@ export class FileStorageService {
         // Upload resize variants for responsive images
         const uploadedVariantKeys: string[] = []
         for (const variant of optimization.resizeVariants) {
+          if (variant.name === 'thumbnail') continue
           const suffix = variant.name
           const variantKey = `${key}-${suffix}${variant.mimetype === 'image/jpeg' ? '.jpg' : variant.mimetype === 'image/png' ? '.png' : '.jpg'}`
           try {
