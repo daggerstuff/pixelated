@@ -30,7 +30,12 @@
   "MD041": false,
   "MD046": false,
   "MD060": false,
-  "ignores": ["node_modules/**/*", ".github/**/*", ".agents/**/*"],
+  "ignores": [
+    "node_modules/**/*",
+    ".github/**/*",
+    ".agents/**/*",
+    "apps/web/src/content-store/blog/.mental/**/*"
+  ],
   "overrides": [
     {
       "files": [
