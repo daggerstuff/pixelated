@@ -8,10 +8,11 @@
  * be silently reintroduced.
  */
 
-import { describe, it, expect } from 'vitest'
 import { existsSync } from 'node:fs'
-import { join } from 'node:path'
 import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+import { describe, it, expect } from 'vitest'
 
 describe('Supabase client wrapper removal', () => {
   const supabaseClientPath = join(process.cwd(), 'apps/web/src/lib/supabase.ts')
