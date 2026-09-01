@@ -188,38 +188,39 @@ export class AdminService {
     endDate?: Date
   }): Promise<SessionsResult> {
     console.debug('getSessions called with options:', options)
-      let filtered = mockSessions.filter((s) => !s.archived)
+    let filtered = mockSessions.filter((s) => !s.archived)
 
-      if (options.therapistId) {
-        filtered = filtered.filter((s) => s.therapistId === options.therapistId)
-      }
-      if (options.clientId) {
-        filtered = filtered.filter((s) => s.clientId === options.clientId)
-      }
-      if (options.startDate) {
-        const startMs = options.startDate.getTime()
-        filtered = filtered.filter(
-          (s) => new Date(s.startTime).getTime() >= startMs,
-        )
-      }
-      if (options.endDate) {
-        const endMs = options.endDate.getTime()
-        filtered = filtered.filter(
-          (s) => new Date(s.startTime).getTime() <= endMs,
-        )
-      }
+    if (options.therapistId) {
+      filtered = filtered.filter((s) => s.therapistId === options.therapistId)
+    }
+    if (options.clientId) {
+      filtered = filtered.filter((s) => s.clientId === options.clientId)
+    }
+    if (options.startDate) {
+      const startMs = options.startDate.getTime()
+      filtered = filtered.filter(
+        (s) => new Date(s.startTime).getTime() >= startMs,
+      )
+    }
+    if (options.endDate) {
+      const endMs = options.endDate.getTime()
+      filtered = filtered.filter(
+        (s) => new Date(s.startTime).getTime() <= endMs,
+      )
+    }
 
-      const total = filtered.length
-      const offset = Number.isFinite(options.offset)
-        ? Math.max(0, options.offset)
-        : 0
-      const limit = Number.isFinite(options.limit)
-        ? Math.max(0, options.limit)
-        : 0
-      const paginated = filtered.slice(offset, offset + limit).map((s) => ({ ...s }))
+    const total = filtered.length
+    const offset = Number.isFinite(options.offset)
+      ? Math.max(0, options.offset)
+      : 0
+    const limit = Number.isFinite(options.limit)
+      ? Math.max(0, options.limit)
+      : 0
+    const paginated = filtered
+      .slice(offset, offset + limit)
+      .map((s) => ({ ...s }))
 
-      return { sessions: paginated, total }
-
+    return { sessions: paginated, total }
   }
 
   /**
