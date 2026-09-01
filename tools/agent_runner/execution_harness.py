@@ -265,7 +265,7 @@ class AgentExecutionHarness:
                 try:
                     with open(full_path, encoding="utf-8", errors="ignore") as f:
                         content = f.read()
-                        if ("seededRandom" in content or "Math.random()" in content) and "test" not in fpath:
+                        if ("seededRandom" in content or "Math.random()") and "test" not in fpath:
                             failures.append(f"Fake pseudo-random generator detected in production file {fpath}.")
                         if "placeholder implementation" in content.lower() or "todo: implement" in content.lower():
                             failures.append(f"Unimplemented placeholder stub detected in {fpath}.")
@@ -285,10 +285,33 @@ class AgentExecutionHarness:
                 "Hollow PR detected: Only test files were added/modified for a feature implementation ticket."
             )
 
+        # Stage 1B: Blast Radius Cap — surgical precision enforcement
+        title_lower = issue.title.lower()
+        is_config_or_skeptic = any(
+            kw in title_lower for kw in ("skeptic", "config", "configuration", "fix agent", "review", "audit")
+        )
+        file_count = len(all_touched)
+        if is_config_or_skeptic and file_count > 10:
+            failures.append(
+                f"BLAST RADIUS EXCEEDED: Config/skeptic-review ticket touched {file_count} files "
+                f"(limit: 10). Revert changes unrelated to the ticket scope."
+            )
+        elif not is_config_or_skeptic and file_count > 30:
+            failures.append(
+                f"BLAST RADIUS EXCEEDED: Feature ticket touched {file_count} files "
+                f"(limit: 30). Surgical precision required — revert files unrelated to the ticket's scope."
+            )
+        elif file_count > 20:
+            logger.warning(
+                "⚠️  Blast radius warning: %s modified %d files. Consider scoping more tightly.",
+                issue.identifier,
+                file_count,
+            )
+
         return GateResult(
             stage_name="Stage 1: Anti-Hollow & Anti-Cheating Gate",
             passed=len(failures) == 0,
-            details="Passed anti-mock and substantiveness validation."
+            details="Passed anti-mock, substantiveness, and blast-radius validation."
             if not failures
             else "Failed anti-hollow validation.",
             duration_seconds=time.time() - s_start,

@@ -92,6 +92,17 @@ class SelfEvolutionEngine:
                 "Decompose long-running batch modifications into smaller atomic subtasks using TASK_GRAPH.",
             )
 
+        if "blast radius exceeded" in logs_lower or (
+            "files changed" in logs_lower and any(f"{n} files" in logs_lower for n in range(50, 500))
+        ):
+            return (
+                "blast_radius",
+                "Diff touched too many files — over-scoped execution beyond ticket boundaries.",
+                "BLAST RADIUS CAP: Feature tickets ≤30 files, config/skeptic tickets ≤10 files. "
+                "When editing config or performing a review, only touch files the ticket explicitly describes. "
+                "Do NOT propagate changes to unrelated files. Run 'git diff --name-only' before committing to verify scope.",
+            )
+
         return (
             "general_friction",
             "Execution completed with diagnostic failures.",

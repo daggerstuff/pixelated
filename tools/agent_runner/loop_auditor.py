@@ -184,17 +184,31 @@ class WorkLoopAuditor:
             gaps.extend(result.guardrail_violations)
 
         if result.git_diff_summary:
-            score += 30.0
-            evidence.append(
-                f"Structured diff summary verified: {result.git_diff_summary.count(chr(10)) + 1} file(s) changed"
-            )
+            # Count files touched from git diff summary (lines starting with +++ or ---)
+            diff_lines = result.git_diff_summary.splitlines()
+            files_touched = len([l for l in diff_lines if l.startswith("+++") and l != "+++ /dev/null"])
+            if files_touched == 0:
+                # Fall back to newline count heuristic
+                files_touched = result.git_diff_summary.count("\n+++ ") + 1
+
+            if files_touched <= 10:
+                score += 30.0
+                evidence.append(f"Surgical diff scope: {files_touched} file(s) changed (excellent precision)")
+            elif files_touched <= 30:
+                score += 20.0
+                evidence.append(f"Acceptable diff scope: {files_touched} file(s) changed")
+            else:
+                score += 5.0
+                gaps.append(
+                    f"OVER-SCOPED DIFF: {files_touched} files touched. Blast radius exceeds surgical threshold. "
+                    f"Future runs must stay ≤30 files for features, ≤10 for config/review tickets."
+                )
         else:
             score += 15.0
             evidence.append("Investigation / analysis ticket (no code modifications required)")
 
         # Code Hygiene: verify no raw debug print dumps in output
         diff_lower = (result.git_diff_summary or "").lower()
-        out_lower = (result.output or "").lower()
         if "console.log(" not in diff_lower and "print(debug" not in diff_lower:
             score += 20.0
             evidence.append("Clean code hygiene (no debug print pollution)")

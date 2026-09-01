@@ -72,27 +72,29 @@ SHARED COORDINATION BLACKBOARD:
 MANDATORY OPERATING RAILS & PROTOCOLS:
 1. READ AGENTS.MD: Strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
 2. SURGICAL & DIRECT EXECUTION: Work directly on target files. Avoid sprawling whole-repo file indexing or reading massive documentation files that trigger context exhaustion.
-3. NO HOLLOW / FAKE WORK: Implement real production classes, interfaces, and utilities. Never submit empty stubs or mocks testing only mocks.
-4. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
-5. PYTHON & LINT IDIOMS: For Python datetime handling, construct timezone-aware UTC datetimes (`datetime.now(timezone.utc)`) or use `datetime.fromisoformat()` for naive test cases to satisfy strict Ruff DTZ rules without `# noqa`.
-6. TEST REAL CODE: Write and run real tests verifying your actual production implementation with pytest / vitest.
-7. AUTO-FORMAT: Ensure all modified files adhere to Prettier and ruff/oxlint standards.
-8. If this task creates follow-up work or subtasks, declare them using:
-   CREATE TICKET: <title> | <description> | labels: <labels>
-   or
-   SUBTASK: <title> | <description>
-9. If scoping complex multi-step work, declare a task graph:
-   TASK_GRAPH:
-   - id: 1, title: <step 1>, agent: <agent>
-   - id: 2, title: <step 2>, agent: <agent>, depends: [1]
-10. If delegating to a specialist sub-agent, use:
-   DELEGATE: <agent_name> | <subtask directive>
-11. If an architectural decision or fact was made, declare it using:
-   STORE MEMORY: decision | <concise statement>
-12. If you have an update or proposal for other agents, declare it using:
-   BROADCAST: <message> or PROPOSE: <title> | <details>
-13. Conclude with a final summary line:
-   RESULT: <one concise sentence describing the outcome>
+3. BLAST RADIUS CAP — CRITICAL: Your diff MUST touch ≤30 files for feature/fix tickets. For config-only or skeptic-review tickets, ≤10 files. If you find yourself editing >30 files, STOP, revert unrelated changes, and focus only on files directly required by the ticket. Breadth is NOT quality — surgical precision is.
+4. SCOPED TYPECHECK: After code changes, run `pnpm typecheck 2>&1 | tail -30` to check only relevant errors. DO NOT run workspace-wide typecheck repeatedly for unrelated files. If errors appear in unrelated files, ignore them — only fix errors in files you modified.
+5. NO HOLLOW / FAKE WORK: Implement real production classes, interfaces, and utilities. Never submit empty stubs or mocks testing only mocks.
+6. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
+7. PYTHON & LINT IDIOMS: For Python datetime handling, construct timezone-aware UTC datetimes (`datetime.now(timezone.utc)`) or use `datetime.fromisoformat()` for naive test cases to satisfy strict Ruff DTZ rules without `# noqa`.
+8. TEST REAL CODE: Write and run real tests verifying your actual production implementation with pytest / vitest.
+9. AUTO-FORMAT: Ensure all modified files adhere to Prettier and ruff/oxlint standards.
+10. If this task creates follow-up work or subtasks, declare them using:
+    CREATE TICKET: <title> | <description> | labels: <labels>
+    or
+    SUBTASK: <title> | <description>
+11. If scoping complex multi-step work, declare a task graph:
+    TASK_GRAPH:
+    - id: 1, title: <step 1>, agent: <agent>
+    - id: 2, title: <step 2>, agent: <agent>, depends: [1]
+12. If delegating to a specialist sub-agent, use:
+    DELEGATE: <agent_name> | <subtask directive>
+13. If an architectural decision or fact was made, declare it using:
+    STORE MEMORY: decision | <concise statement>
+14. If you have an update or proposal for other agents, declare it using:
+    BROADCAST: <message> or PROPOSE: <title> | <details>
+15. Conclude with a final summary line:
+    RESULT: <one concise sentence describing the outcome>
 """
 
 
