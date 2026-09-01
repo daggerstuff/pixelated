@@ -64,7 +64,7 @@ export interface SessionsResult {
 /**
  * Mock session status type
  */
-export type MockSessionStatus = 'active' | 'completed' | 'cancelled'
+type MockSessionStatus = 'active' | 'completed' | 'cancelled'
 
 /**
  * Mock session record for in-memory admin operations.
@@ -188,7 +188,6 @@ export class AdminService {
     endDate?: Date
   }): Promise<SessionsResult> {
     console.debug('getSessions called with options:', options)
-    try {
       let filtered = mockSessions.filter((s) => !s.archived)
 
       if (options.therapistId) {
@@ -211,17 +210,16 @@ export class AdminService {
       }
 
       const total = filtered.length
-      const offset = Math.max(0, options.offset)
-      const limit = Math.max(0, options.limit)
-      const paginated = filtered.slice(offset, offset + limit)
+      const offset = Number.isFinite(options.offset)
+        ? Math.max(0, options.offset)
+        : 0
+      const limit = Number.isFinite(options.limit)
+        ? Math.max(0, options.limit)
+        : 0
+      const paginated = filtered.slice(offset, offset + limit).map((s) => ({ ...s }))
 
       return { sessions: paginated, total }
-    } catch (error: unknown) {
-      logger.error('Error getting sessions:', {
-        error: error instanceof Error ? String(error) : String(error),
-      })
-      return { sessions: [], total: 0 }
-    }
+
   }
 
   /**
