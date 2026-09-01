@@ -497,7 +497,7 @@
     "rehype-external-links": "latest",
     "remark-code-import": "latest",
     "remark-imgattr": "latest",
-    "rollup": "^4.63.0",
+    "rollup": "^4.63.1",
     "rollup-plugin-visualizer": "latest",
     "satori": "latest",
     "satori-html": "latest",
@@ -520,7 +520,7 @@
     "vite": "^8.2.2",
     "vite-tsconfig-paths": "latest",
     "vitest": "^4.1.11",
-    "vscode-jsonrpc": "9.0.1",
+    "vscode-jsonrpc": "9.0.2",
     "wait-on": "latest",
     "wrangler": "^4.127.1",
     "yaml": "2.9.0"
