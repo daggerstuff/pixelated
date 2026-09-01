@@ -66,22 +66,37 @@ jobs:
 
           echo "Waiting for preview server on port ${LHCI_PORT}..."
           for attempt in $(seq 1 60); do
-            if curl -sS --connect-timeout 2 --max-time 5 \
-                "http://127.0.0.1:${LHCI_PORT}/" > /dev/null 2>&1; then
-              echo "Preview server ready at http://127.0.0.1:${LHCI_PORT}"
+            http_code=$(curl -sS --connect-timeout 2 --max-time 5 \
+                -o /dev/null -w '%{http_code}' \
+                "http://127.0.0.1:${LHCI_PORT}/" 2>/dev/null || echo "000")
+            if [[ "${http_code}" == "200" ]]; then
+              echo "Preview server ready at http://127.0.0.1:${LHCI_PORT} (HTTP 200)"
               exit 0
             fi
             sleep 1
           done
 
-          echo "Preview server failed to start within 60s"
+          echo "Preview server not ready within 60s (last HTTP code: ${http_code})"
+          echo "=== Server log (last 80 lines) ==="
           tail -n 80 /tmp/pixelated-preview.log || true
           exit 1
 
       - name: Run Lighthouse CI
+        id: lhci
+        continue-on-error: true
         run: lhci autorun
         env:
           LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Capture server logs on failure
+        if: steps.lhci.outcome == 'failure'
+        run: |
+          echo "=== Lighthouse CI failed — dumping server logs ==="
+          tail -n 200 /tmp/pixelated-preview.log || true
+
+      - name: Fail job if LHCI failed
+        if: steps.lhci.outcome == 'failure'
+        run: exit 1
 
       - name: Stop preview server
         if: always()
