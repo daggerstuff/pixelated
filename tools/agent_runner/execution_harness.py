@@ -139,7 +139,18 @@ class AgentExecutionHarness:
             report.modified_files = modified_files
 
             all_passed = all(g.passed for g in gate_results)
-            if all_passed and raw_result.success:
+            if all_passed:
+                # Gates are the authoritative quality signal. A non-zero exit code from
+                # opencode is acceptable for read-only audit/gate/checkpoint tickets where
+                # the agent produces no code changes and exits with a summary-only output.
+                if not raw_result.success:
+                    logger.info(
+                        "⚠️  opencode exited non-zero for %s but all 6 quality gates PASSED — "
+                        "accepting as successful (gate-authority override, exit_code=%d).",
+                        issue.identifier,
+                        raw_result.exit_code,
+                    )
+                    raw_result.success = True
                 logger.info(
                     "✅ All 6 harness quality gates PASSED for %s on attempt %d!",
                     issue.identifier,

@@ -164,7 +164,7 @@ class LinearClient:
                     state: { id: { eq: $stateId } }
                 }
                 first: $first
-                orderBy: updatedAt
+                orderBy: createdAt
             ) {
                 nodes {
                     id
