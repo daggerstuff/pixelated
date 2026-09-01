@@ -88,9 +88,17 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get inst
 # Copy all dependencies from builder (includes workspace packages)
 COPY --from=builder /app/node_modules ./node_modules
 
+<<<<<<< HEAD
 # Copy built output and public assets from builder
 COPY --from=builder --chown=node:node /app/dist ./dist
 COPY --from=builder --chown=node:node /app/public ./public
+=======
+# Copy built output and public assets from builder.
+# Astro config uses publicDir './apps/web/public' (repo restructure 2026-08-26),
+# so public assets live at /app/apps/web/public in the builder stage.
+COPY --from=builder --chown=node:node /app/dist ./dist
+COPY --from=builder --chown=node:node /app/apps/web/public ./public
+>>>>>>> origin/staging
 COPY --from=builder --chown=node:node /app/templates ./templates
 COPY --from=builder --chown=node:node /app/start-server.mjs ./start-server.mjs
 COPY --from=builder --chown=node:node /app/start-server-config.mjs ./start-server-config.mjs

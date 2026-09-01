@@ -20,9 +20,10 @@ RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
 COPY ${AGENT_DIR}/ ./
  # Copy shared lib files needed by agent path aliases (@/lib/context/*)
  # tsconfig resolves @/lib/* -> ../../src/lib/* relative to /agent/tsconfig.json = /src/lib/*
- COPY src/lib/context/ /src/lib/context/
+ # (repo restructure 2026-08-26 moved src/lib -> apps/web/src/lib)
+ COPY apps/web/src/lib/context/ /src/lib/context/
  # Also copy to /lib/context/ for relative imports like '../../lib/context/startup-profiler.js'
- COPY src/lib/context/ /lib/context/
+ COPY apps/web/src/lib/context/ /lib/context/
  RUN pnpm build
 
 FROM node:24.16.0-bookworm-slim AS runtime

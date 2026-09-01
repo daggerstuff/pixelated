@@ -30,9 +30,11 @@ const baseNodeTestGlobs = [
   'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
   'apps/web/src/lib/__tests__/security-implementation.test.ts',
   'apps/web/src/lib/ai/__tests__/getAIService.test.ts',
+  'apps/web/src/lib/ai/__tests__/providers.test.ts',
   'apps/web/src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
   'apps/web/src/lib/graphql/__tests__/graphql.test.ts',
   'apps/web/src/lib/graphql/__tests__/client.test.ts',
+  'apps/web/src/lib/admin/__tests__/**/*.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']

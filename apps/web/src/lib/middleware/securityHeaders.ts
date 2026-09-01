@@ -26,7 +26,7 @@ export const securityHeaders: MiddlewareHandler = async (
     'https://*.sentry.io',
     'https://cdn.jsdelivr.net',
     'https://giscus.app',
-    'https://app.rybbit.io',
+    'https://analytics.pixelatedempathy.com',
     'https://ajax.cloudflare.com',
     'https://cdnjs.cloudflare.com',
   ].filter(Boolean)
@@ -43,7 +43,7 @@ export const securityHeaders: MiddlewareHandler = async (
     "base-uri 'self'",
     "form-action 'self'",
     // Network endpoints allowed (XHR/fetch/WebSocket if needed)
-    "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net https://app.rybbit.io",
+    "connect-src 'self' https://*.sentry.io https://pixelatedempathy.com https://cdn.pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net https://analytics.pixelatedempathy.com",
     "img-src 'self' data: blob: https:",
     "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
     // Mixed content protections
@@ -70,7 +70,7 @@ export const securityHeaders: MiddlewareHandler = async (
       ),
       "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
       'connect-src *', // Allow any connection in dev
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://app.rybbit.io https://ajax.cloudflare.com https://cdnjs.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.sentry.io https://cdn.jsdelivr.net https://giscus.app https://analytics.pixelatedempathy.com https://ajax.cloudflare.com https://cdnjs.cloudflare.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://ajax.cloudflare.com https://cdnjs.cloudflare.com",
     ]
   } else {

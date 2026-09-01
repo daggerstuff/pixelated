@@ -545,7 +545,7 @@ export const SearchResultSchema: z.ZodType<SearchResult> = z.object({
 
   // 3a. Add zod import.
   {
-    file: 'apps/web/src/lib/sdk/index.ts',
+    file: 'src/lib/sdk/index.ts',
     find: `import { MemoryApiClient } from '../memory/memory-api-client'
 import { ForesightClient } from './foresight'`,
     replace: `import { z } from 'zod'
@@ -556,7 +556,7 @@ import { ForesightClient } from './foresight'`,
 
   // 3b. Add UserProfileSchema after UserProfileUpdate interface.
   {
-    file: 'apps/web/src/lib/sdk/index.ts',
+    file: 'src/lib/sdk/index.ts',
     find: `export interface UserProfileUpdate {
   fullName?: string
   avatarUrl?: string
@@ -589,7 +589,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 3c. request() — add schema parameter, thread to response.json(z.parse).
   {
-    file: 'apps/web/src/lib/sdk/index.ts',
+    file: 'src/lib/sdk/index.ts',
     find: `  private async request(path: string, options: RequestInit = {}) {
     const url = \`\${this.baseUrl}\${path}\`
     const headers: Record<string, string> = {
@@ -665,7 +665,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 3d. user.getProfile: pass UserProfileSchema (single profile, not wrapped).
   {
-    file: 'apps/web/src/lib/sdk/index.ts',
+    file: 'src/lib/sdk/index.ts',
     find: `      getProfile: async () => {
         return this.request('/profile')
       },`,
@@ -676,7 +676,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 3e. user.updateProfile: pass UserProfileSchema.
   {
-    file: 'apps/web/src/lib/sdk/index.ts',
+    file: 'src/lib/sdk/index.ts',
     find: `      updateProfile: async (updates: UserProfileUpdate) => {
         return this.request('/profile', {
           method: 'PUT',
@@ -701,7 +701,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 4a. post<T>(endpoint, data, schema): require schema.
   {
-    file: 'apps/web/src/lib/api/therapeutic.ts',
+    file: 'src/lib/api/therapeutic.ts',
     find: `  private async post<T>(endpoint: string, data: unknown): Promise<T> {
     try {
       const response = await fetch(\`\${this.baseUrl}\${endpoint}\`, {
@@ -750,7 +750,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 4b. validateEmotion: pass ValidationResultSchema.
   {
-    file: 'apps/web/src/lib/api/therapeutic.ts',
+    file: 'src/lib/api/therapeutic.ts',
     find: `  async validateEmotion(data: EmotionData): Promise<ValidationResult> {
     return this.post<ValidationResult>('/api/emotion/validate', data)
   }`,
@@ -765,7 +765,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 4c. detectCrisis: pass CrisisResultSchema.
   {
-    file: 'apps/web/src/lib/api/therapeutic.ts',
+    file: 'src/lib/api/therapeutic.ts',
     find: `  async detectCrisis(text: string, sessionId?: string): Promise<CrisisResult> {
     return this.post<CrisisResult>('/api/security/detect-crisis', {
       text,
@@ -783,7 +783,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 4d. analyzeBias: pass BiasResultSchema.
   {
-    file: 'apps/web/src/lib/api/therapeutic.ts',
+    file: 'src/lib/api/therapeutic.ts',
     find: `  async analyzeBias(data: Record<string, unknown>): Promise<BiasResult> {
     return this.post<BiasResult>('/api/bias/analyze-session', data)
   }`,
@@ -798,7 +798,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 4e. scrubPII: pass PIIScrubResultSchema.
   {
-    file: 'apps/web/src/lib/api/therapeutic.ts',
+    file: 'src/lib/api/therapeutic.ts',
     find: `  async scrubPII(text: string, sessionId?: string): Promise<PIIScrubResult> {
     return this.post<PIIScrubResult>('/api/security/scrub-pii', {
       text,
@@ -816,7 +816,7 @@ export const UserProfileSchema: z.ZodType<{
 
   // 4f. healthCheck: define a HealthResponse schema + use it.
   {
-    file: 'apps/web/src/lib/api/therapeutic.ts',
+    file: 'src/lib/api/therapeutic.ts',
     find: `  async healthCheck(): Promise<{
     status: string
     service: string

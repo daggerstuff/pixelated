@@ -2,7 +2,7 @@
 // A simple, lightweight admin layout without any complex dependencies
 import AdminPortalShell from '@/components/admin/AdminPortalShell.astro'
 import AdminSidebarNav from '@/components/admin/AdminSidebarNav.astro'
-import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import UmamiAnalytics from '@/components/analytics/UmamiAnalytics.astro'
 import { SIMPLE_ADMIN_NAV_ITEMS } from '@/components/admin/admin-nav'
 
 interface Props {
@@ -11,26 +11,30 @@ interface Props {
 }
 
 const { title = 'Admin Dashboard', activeItem = 'dashboard' } = Astro.props
-const { cspNonce } = Astro.locals
+const cspNonce = (Astro.locals as { cspNonce?: string }).cspNonce
 ---
 
-<head>
-  <title>{title}</title>
-  <meta
-    name="description"
-    content={title + ' page for Pixelated Empathy admin.'}
-  />
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
+<html lang="en">
+  <head>
+    <title>{title}</title>
+    <meta
+      name="description"
+      content={title + ' page for Pixelated Empathy admin.'}
+    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {cspNonce && <meta name="csp-nonce" content={cspNonce} />}
 
-  <RybbitAnalytics nonce={cspNonce} />
-</head>
+    <UmamiAnalytics nonce={cspNonce} />
+  </head>
 
-<AdminPortalShell {title}>
-  <Fragment slot="sidebar">
-    <AdminSidebarNav items={SIMPLE_ADMIN_NAV_ITEMS} {activeItem} />
-  </Fragment>
-  <slot />
-</AdminPortalShell>
+  <body>
+    <AdminPortalShell {title}>
+      <Fragment slot="sidebar">
+        <AdminSidebarNav items={SIMPLE_ADMIN_NAV_ITEMS} {activeItem} />
+      </Fragment>
+      <slot />
+    </AdminPortalShell>
+  </body>
+</html>

@@ -10,13 +10,12 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
-from tools.agent_runner.adapters import get_agent_adapter
 from tools.agent_runner.client import LinearClient
 from tools.agent_runner.cluster_registry import ClusterRegistry
 from tools.agent_runner.compactor import ThreadCompactor
 from tools.agent_runner.deliberation import DeliberationEngine
 from tools.agent_runner.event_bus import EventBus, EventType
-from tools.agent_runner.execution_harness import AgentExecutionHarness, HarnessRunReport
+from tools.agent_runner.execution_harness import AgentExecutionHarness
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
@@ -40,9 +39,9 @@ from tools.agent_runner.skills_bridge import SkillsBridge
 from tools.agent_runner.state_manager import StateManager
 from tools.agent_runner.subagent_harness import SubAgentHarness
 from tools.agent_runner.telemetry import TelemetryCollector
-from tools.agent_runner.triage import AutoTriageEngine
 from tools.agent_runner.trace_analyzer import TraceAnalyzer
-from tools.agent_runner.verifier import VerificationEngine, VerificationOutcome
+from tools.agent_runner.triage import AutoTriageEngine
+from tools.agent_runner.verifier import VerificationEngine
 from tools.agent_runner.worktree_pool import GitWorktreePool
 
 logger = logging.getLogger("agent_runner.coordinator")
@@ -65,31 +64,37 @@ DESCRIPTION:
 
 {foresight_context}
 
+{lessons_context}
+
 SHARED COORDINATION BLACKBOARD:
 {coord_thread}
 
 MANDATORY OPERATING RAILS & PROTOCOLS:
-1. READ AGENTS.MD: You MUST read and strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
-2. NO HOLLOW / FAKE WORK: You MUST implement the actual production classes, interfaces, services, and endpoints requested. Never submit empty stubs, mock random number generators, or tests that only test fake mock objects while leaving the actual production code unimplemented.
-3. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
-4. TEST REAL CODE: Write and run real tests verifying your actual production implementation against real exports.
-5. AUTO-FORMAT: Ensure all modified files adhere to Prettier and oxlint standards.
-6. If this task creates follow-up work or subtasks, declare them using:
-   CREATE TICKET: <title> | <description> | labels: <labels>
-   or
-   SUBTASK: <title> | <description>
-7. If scoping complex multi-step work, declare a task graph:
-   TASK_GRAPH:
-   - id: 1, title: <step 1>, agent: <agent>
-   - id: 2, title: <step 2>, agent: <agent>, depends: [1]
-8. If delegating to a specialist sub-agent, use:
-   DELEGATE: <agent_name> | <subtask directive>
-9. If an architectural decision or fact was made, declare it using:
-   STORE MEMORY: decision | <concise statement>
-10. If you have an update or proposal for other agents, declare it using:
-   BROADCAST: <message> or PROPOSE: <title> | <details>
-11. Conclude with a final summary line:
-   RESULT: <one concise sentence describing the outcome>
+1. READ AGENTS.MD: Strictly adhere to `AGENTS.md` and repository guidelines in `{workdir}/AGENTS.md`.
+2. SURGICAL & DIRECT EXECUTION: Work directly on target files. Avoid sprawling whole-repo file indexing or reading massive documentation files that trigger context exhaustion.
+3. BLAST RADIUS CAP — CRITICAL: Your diff MUST touch ≤30 files for feature/fix tickets. For config-only or skeptic-review tickets, ≤10 files. If you find yourself editing >30 files, STOP, revert unrelated changes, and focus only on files directly required by the ticket. Breadth is NOT quality — surgical precision is.
+4. SCOPED TYPECHECK: After code changes, run `pnpm typecheck 2>&1 | tail -30` to check only relevant errors. DO NOT run workspace-wide typecheck repeatedly for unrelated files. If errors appear in unrelated files, ignore them — only fix errors in files you modified.
+5. NO HOLLOW / FAKE WORK: Implement real production classes, interfaces, and utilities. Never submit empty stubs or mocks testing only mocks.
+6. STRICT ZERO-TOLERANCE ANTI-SUPPRESSION: No @ts-ignore, no @ts-nocheck, no # noqa, no # type: ignore, no /* eslint-disable */. Fix all underlying root causes.
+7. PYTHON & LINT IDIOMS: For Python datetime handling, construct timezone-aware UTC datetimes (`datetime.now(timezone.utc)`) or use `datetime.fromisoformat()` for naive test cases to satisfy strict Ruff DTZ rules without `# noqa`.
+8. TEST REAL CODE: Write and run real tests verifying your actual production implementation with pytest / vitest.
+9. AUTO-FORMAT: Ensure all modified files adhere to Prettier and ruff/oxlint standards.
+10. If this task creates follow-up work or subtasks, declare them using:
+    CREATE TICKET: <title> | <description> | labels: <labels>
+    or
+    SUBTASK: <title> | <description>
+11. If scoping complex multi-step work, declare a task graph:
+    TASK_GRAPH:
+    - id: 1, title: <step 1>, agent: <agent>
+    - id: 2, title: <step 2>, agent: <agent>, depends: [1]
+12. If delegating to a specialist sub-agent, use:
+    DELEGATE: <agent_name> | <subtask directive>
+13. If an architectural decision or fact was made, declare it using:
+    STORE MEMORY: decision | <concise statement>
+14. If you have an update or proposal for other agents, declare it using:
+    BROADCAST: <message> or PROPOSE: <title> | <details>
+15. Conclude with a final summary line:
+    RESULT: <one concise sentence describing the outcome>
 """
 
 
@@ -192,6 +197,7 @@ class MultiAgentCoordinator:
             skill_lines = [f"- **{name}**: {desc}" for name, desc in matching_skills]
             skills_text = "RECOMMENDED LOCAL SKILLS:\n" + "\n".join(skill_lines)
 
+        lessons_text = self.evolution.format_lessons_for_prompt(limit=5)
         role_prompt = agent.system_prompt_override or get_role_prompt(agent.role)
 
         return TICKET_PROMPT_TEMPLATE.format(
@@ -206,6 +212,7 @@ class MultiAgentCoordinator:
             description=issue.description or "(No description provided)",
             skills_context=skills_text,
             foresight_context=foresight_text,
+            lessons_context=lessons_text,
             coord_thread=coord_thread_digest,
         )
 

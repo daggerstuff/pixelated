@@ -45,7 +45,7 @@ class VerificationEngine:
             ts_files = [f for f in files if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx", ".json"))]
             if ts_files:
                 subprocess.run(
-                    ["pnpm", "exec", "prettier", "--write"] + ts_files,
+                    ["pnpm", "exec", "prettier", "--write", *ts_files],
                     cwd=workdir,
                     capture_output=True,
                     check=False,
@@ -71,6 +71,10 @@ class VerificationEngine:
         except Exception as e:
             logger.debug("Error detecting dynamic checks: %s", e)
         return checks
+
+    def verify(self, workdir: str, extra_commands: list[str] | None = None) -> VerificationOutcome:
+        """Alias for run_checks to support state graph Reviewer interface."""
+        return self.run_checks(workdir, extra_commands)
 
     def run_checks(self, workdir: str, extra_commands: list[str] | None = None) -> VerificationOutcome:
         """Run all configured verification commands in workdir."""

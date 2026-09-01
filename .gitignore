@@ -141,7 +141,7 @@ __mocks__
 MANIFEST
 
 # === NODE.JS & FRONTEND ===
-*.tsbuildinfo
+*.tsbuildinfo*
 .nyc_output/
 .pnpm-store/
 /node_modules/
@@ -164,6 +164,7 @@ verbose/coverage/
 *.node
 *.spec
 /.astro
+**/.astro/
 /.bin
 /.output
 /.python
@@ -462,3 +463,12 @@ tasks/
 /worktrees/
 /config/agent_runner_config.json
 !/config/agent_runner_config.example.json
+
+.github/agents
+.github/cookbook/copilot-sdk
+.github/instructions
+.github/plugins
+.github/prompts
+.github/scripts
+.github/hooks
+AGENT_HANDOFF.md

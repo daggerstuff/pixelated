@@ -33,8 +33,9 @@ class ForesightBridge:
             if res_pref.returncode == 0 and res_pref.stdout.strip():
                 # Filter out server log lines
                 pref_lines = [
-                    l for l in res_pref.stdout.splitlines()
-                    if not l.startswith("2026-") and "[foresight_server]" not in l
+                    line
+                    for line in res_pref.stdout.splitlines()
+                    if not line.startswith("2026-") and "[foresight_server]" not in line
                 ]
                 clean_pref = "\n".join(pref_lines).strip()
                 if clean_pref:
@@ -60,8 +61,9 @@ class ForesightBridge:
             )
             if res.returncode == 0 and res.stdout.strip():
                 mem_lines = [
-                    l for l in res.stdout.splitlines()
-                    if not l.startswith("2026-") and "[foresight_server]" not in l
+                    line
+                    for line in res.stdout.splitlines()
+                    if not line.startswith("2026-") and "[foresight_server]" not in line
                 ]
                 clean_mem = "\n".join(mem_lines).strip()
                 if clean_mem:
@@ -80,11 +82,12 @@ class ForesightBridge:
         try:
             cmd = [
                 "foresight",
-                "memory",
-                "add",
+                "store",
                 full_content,
                 "--category",
                 category,
+                "--importance",
+                "0.8",
             ]
             res = subprocess.run(
                 cmd,

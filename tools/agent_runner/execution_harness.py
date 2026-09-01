@@ -17,22 +17,23 @@ from __future__ import annotations
 
 import logging
 import os
-import re
 import subprocess
 import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from tools.agent_runner.adapters import AgentAdapter, get_agent_adapter
+from tools.agent_runner.adapters import get_agent_adapter
 from tools.agent_runner.event_bus import EventBus, EventType
 from tools.agent_runner.foresight_bridge import ForesightBridge
 from tools.agent_runner.guardrails import GuardrailsEngine
+from tools.agent_runner.hitl_proxy import EscalationStore
 from tools.agent_runner.langchain_tracer import LangChainAgentTracer
 from tools.agent_runner.loop_auditor import WorkLoopAuditor, WorkLoopAuditReport
-from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, ProjectConfig, RunnerConfig
+from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue, RunnerConfig
 from tools.agent_runner.self_evolution import SelfEvolutionEngine
+from tools.agent_runner.state_graph import AgentState
 from tools.agent_runner.trace_analyzer import TraceAnalyzer, TraceSummary
-from tools.agent_runner.verifier import VerificationEngine, VerificationOutcome
+from tools.agent_runner.verifier import VerificationEngine
 
 logger = logging.getLogger("agent_runner.harness")
 
@@ -83,6 +84,7 @@ class AgentExecutionHarness:
         self.loop_auditor = WorkLoopAuditor()
         self.trace_analyzer = TraceAnalyzer(config.langchain_project)
         self.verifier = VerificationEngine(config=config.verification)
+        self.escalation_store = EscalationStore()
 
     def run_harness(
         self,
@@ -94,7 +96,7 @@ class AgentExecutionHarness:
     ) -> tuple[ExecutionResult, HarnessRunReport]:
         """Execute agent in worktree and evaluate through all 6 quality gates with auto-repair."""
         adapter = get_agent_adapter(agent_cfg)
-        ticket_trace = self.tracer.start_ticket_execution_trace(parent_trace, None, agent_cfg, issue)  # type: ignore[arg-type]
+        ticket_trace = parent_trace or self.tracer.start_ticket_execution_trace(None, None, agent_cfg, issue)
 
         report = HarnessRunReport(
             ticket_identifier=issue.identifier,
@@ -115,16 +117,20 @@ class AgentExecutionHarness:
 
         for attempt in range(max_repairs + 1):
             report.repair_attempts = attempt
-            logger.info("Executing harness attempt %d/%d for %s with agent %s...", attempt + 1, max_repairs + 1, issue.identifier, agent_cfg.name)
+            logger.info(
+                "Executing harness attempt %d/%d for %s with agent %s...",
+                attempt + 1,
+                max_repairs + 1,
+                issue.identifier,
+                agent_cfg.name,
+            )
 
-            exec_start = time.time()
             raw_result = adapter.run(
                 prompt=current_prompt,
                 workdir=workdir,
                 ticket_identifier=issue.identifier,
                 enable_branching=False,
             )
-            raw_duration = time.time() - exec_start
             self.tracer.record_agent_cli(ticket_trace, agent_cfg, current_prompt, raw_result)
 
             # Evaluate all 6 quality gates
@@ -134,7 +140,11 @@ class AgentExecutionHarness:
 
             all_passed = all(g.passed for g in gate_results)
             if all_passed and raw_result.success:
-                logger.info("✅ All 6 harness quality gates PASSED for %s on attempt %d!", issue.identifier, attempt + 1)
+                logger.info(
+                    "✅ All 6 harness quality gates PASSED for %s on attempt %d!",
+                    issue.identifier,
+                    attempt + 1,
+                )
                 raw_result.verification_passed = True
                 report.overall_passed = True
                 execution_result = raw_result
@@ -146,10 +156,18 @@ class AgentExecutionHarness:
                 if not g.passed:
                     failures.extend(g.failures)
 
-            logger.warning("❌ Harness gates failed for %s on attempt %d: %s", issue.identifier, attempt + 1, failures[:3])
+            logger.warning(
+                "❌ Harness gates failed for %s on attempt %d: %s",
+                issue.identifier,
+                attempt + 1,
+                failures[:3],
+            )
 
             if attempt < max_repairs:
-                logger.info("🔄 Formulating targeted diagnostic repair prompt for attempt %d...", attempt + 2)
+                logger.info(
+                    "🔄 Formulating targeted diagnostic repair prompt for attempt %d...",
+                    attempt + 2,
+                )
                 repair_details = "\n".join(f"- {f}" for f in failures)
                 current_prompt = (
                     f"PREVIOUS ATTEMPT FAILED QUALITY GATES (Attempt {attempt + 1}/{max_repairs + 1}):\n\n"
@@ -172,9 +190,54 @@ class AgentExecutionHarness:
                 report.overall_passed = False
                 execution_result = raw_result
 
+                # Human-in-the-Loop Breakpoint: Serialize state snapshot for terminal intervention
+                esc_state = AgentState(
+                    task_id=issue.identifier,
+                    task_description=f"{issue.title}\n{issue.description or ''}",
+                    file_paths=modified_files,
+                    current_code=raw_result.git_diff_summary,
+                    reviewer_feedback=failures,
+                    iteration_count=attempt + 1,
+                    max_iterations=max_repairs + 1,
+                    status="escalated",
+                    active_agent=agent_cfg.name,
+                    developer_agent=agent_cfg.name,
+                    reviewer_agent="QA_Reviewer",
+                    escalation_id=None,
+                    metadata={"issue_id": issue.id},
+                )
+                esc_id = self.escalation_store.create_escalation(esc_state)
+                logger.warning(
+                    "🚨 Human-in-the-Loop Breakpoint: task %s escalated to EscalationStore (ID: %s)",
+                    issue.identifier,
+                    esc_id,
+                )
+
+        # Populate concrete verification logs if clean
+        if report.overall_passed and not execution_result.verification_logs:
+            logs_summary = "\n".join(
+                f"Gate {g.stage_name}: {'PASSED' if g.passed else 'FAILED'}" for g in report.stages
+            )
+            execution_result.verification_logs = f"All 6 harness quality gates PASSED:\n{logs_summary}"
+
+        # Persist memory to Foresight on clean delivery
+        memories_stored = 0
+        if report.overall_passed:
+            try:
+                self.foresight.store_decision(
+                    category="decision",
+                    content=f"{issue.title}: Implementation verified and passed all quality gates.",
+                    ticket_ref=issue.identifier,
+                )
+                memories_stored += 1
+            except Exception as e:
+                logger.warning("Could not persist Foresight decision memory: %s", e)
+
         # Post-execution audit and trace analysis
         report.trace_summary = self.trace_analyzer.analyze_ticket_trace(issue.identifier)
-        report.audit_report = self.loop_auditor.evaluate_execution(issue, execution_result, is_sandboxed=True)
+        report.audit_report = self.loop_auditor.evaluate_execution(
+            issue, execution_result, is_sandboxed=True, memories_stored=memories_stored
+        )
         report.summary_markdown = self._generate_report_markdown(report)
 
         # Distill friction into Foresight
@@ -188,167 +251,166 @@ class AgentExecutionHarness:
 
         return execution_result, report
 
-    def _run_quality_gauntlet(
-        self,
-        workdir: str,
-        result: ExecutionResult,
-        issue: LinearIssue,
-    ) -> tuple[list[GateResult], list[str]]:
-        """Run the comprehensive 6-stage verification gauntlet."""
-        gates: list[GateResult] = []
-
-        if not self.config.verification.enabled:
-            return [
-                GateResult(
-                    stage_name="All Quality Gates (Disabled)",
-                    passed=True,
-                    details="Verification explicitly disabled in configuration.",
-                )
-            ], []
-
-        # Get changed files against base
-        status_res = subprocess.run(["git", "status", "--porcelain"], cwd=workdir, capture_output=True, text=True, check=False)
-        changed_files = [line.strip().split()[-1] for line in status_res.stdout.splitlines() if line.strip()]
-        
-        diff_res = subprocess.run(["git", "diff", "HEAD", "--name-only"], cwd=workdir, capture_output=True, text=True, check=False)
-        all_touched = list(set(changed_files + [f.strip() for f in diff_res.stdout.splitlines() if f.strip()]))
-
-        # =========================================================================
-        # Stage 1: Anti-Hollow & Anti-Cheating Gate
-        # =========================================================================
-        s1_start = time.time()
-        s1_failures = []
+    def _stage1_anti_hollow(
+        self, workdir: str, all_touched: list[str], result: ExecutionResult, issue: LinearIssue
+    ) -> GateResult:
+        s_start = time.time()
+        failures = []
         if not all_touched and result.success:
-            s1_failures.append("Zero files modified in worktree despite claiming completion.")
+            failures.append("Zero files modified in worktree despite claiming completion.")
 
-        # Check for fake mock generators in touched code
         for fpath in all_touched:
             full_path = os.path.join(workdir, fpath)
             if os.path.isfile(full_path) and fpath.endswith((".ts", ".tsx", ".js", ".py")):
                 try:
-                    with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+                    with open(full_path, encoding="utf-8", errors="ignore") as f:
                         content = f.read()
-                        if "seededRandom" in content or "Math.random()" in content:
-                            if "test" not in fpath:
-                                s1_failures.append(f"Fake pseudo-random generator detected in production file {fpath}.")
+                        if ("seededRandom" in content or "Math.random()") and "test" not in fpath:
+                            failures.append(f"Fake pseudo-random generator detected in production file {fpath}.")
                         if "placeholder implementation" in content.lower() or "todo: implement" in content.lower():
-                            s1_failures.append(f"Unimplemented placeholder stub detected in {fpath}.")
+                            failures.append(f"Unimplemented placeholder stub detected in {fpath}.")
                 except Exception as e:
                     logger.debug("Could not inspect file %s: %s", fpath, e)
 
-        # Check implementation-to-test ratio
         test_files = [f for f in all_touched if "test" in f or "spec" in f]
-        prod_files = [f for f in all_touched if "test" not in f and "spec" not in f and f.endswith((".ts", ".tsx", ".py"))]
-        if test_files and not prod_files and any(kw in issue.title.lower() for kw in ["implement", "add", "build", "create", "feature"]):
-            s1_failures.append("Hollow PR detected: Only test files were added/modified for a feature implementation ticket.")
-
-        gates.append(
-            GateResult(
-                stage_name="Stage 1: Anti-Hollow & Anti-Cheating Gate",
-                passed=len(s1_failures) == 0,
-                details="Passed anti-mock and substantiveness validation." if not s1_failures else "Failed anti-hollow validation.",
-                duration_seconds=time.time() - s1_start,
-                failures=s1_failures,
+        prod_files = [
+            f for f in all_touched if "test" not in f and "spec" not in f and f.endswith((".ts", ".tsx", ".py"))
+        ]
+        if (
+            test_files
+            and not prod_files
+            and any(kw in issue.title.lower() for kw in ["implement", "add", "build", "create", "feature"])
+        ):
+            failures.append(
+                "Hollow PR detected: Only test files were added/modified for a feature implementation ticket."
             )
+
+        # Stage 1B: Blast Radius Cap — surgical precision enforcement
+        title_lower = issue.title.lower()
+        is_config_or_skeptic = any(
+            kw in title_lower for kw in ("skeptic", "config", "configuration", "fix agent", "review", "audit")
+        )
+        file_count = len(all_touched)
+        if is_config_or_skeptic and file_count > 10:
+            failures.append(
+                f"BLAST RADIUS EXCEEDED: Config/skeptic-review ticket touched {file_count} files "
+                f"(limit: 10). Revert changes unrelated to the ticket scope."
+            )
+        elif not is_config_or_skeptic and file_count > 30:
+            failures.append(
+                f"BLAST RADIUS EXCEEDED: Feature ticket touched {file_count} files "
+                f"(limit: 30). Surgical precision required — revert files unrelated to the ticket's scope."
+            )
+        elif file_count > 20:
+            logger.warning(
+                "⚠️  Blast radius warning: %s modified %d files. Consider scoping more tightly.",
+                issue.identifier,
+                file_count,
+            )
+
+        return GateResult(
+            stage_name="Stage 1: Anti-Hollow & Anti-Cheating Gate",
+            passed=len(failures) == 0,
+            details="Passed anti-mock, substantiveness, and blast-radius validation."
+            if not failures
+            else "Failed anti-hollow validation.",
+            duration_seconds=time.time() - s_start,
+            failures=failures,
         )
 
-        # =========================================================================
-        # Stage 2: Strict Anti-Suppression Gate
-        # =========================================================================
-        s2_start = time.time()
-        s2_failures = self.guardrails.audit_code_diff_for_suppressions(result.git_diff_summary)
+    def _stage2_anti_suppression(self, workdir: str, all_touched: list[str], result: ExecutionResult) -> GateResult:
+        s_start = time.time()
+        failures = self.guardrails.audit_code_diff_for_suppressions(result.git_diff_summary)
         for fpath in all_touched:
             full_path = os.path.join(workdir, fpath)
             if os.path.isfile(full_path):
                 try:
-                    with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
+                    with open(full_path, encoding="utf-8", errors="ignore") as f:
                         lines = f.readlines()
                         for i, line in enumerate(lines, 1):
-                            if any(bad in line for bad in ["@ts-ignore", "@ts-nocheck", "@ts-expect-error", "# noqa", "# type: ignore", "/* eslint-disable"]):
-                                s2_failures.append(f"{fpath}:{i} Contains forbidden suppression tag: {line.strip()}")
+                            if any(
+                                bad in line
+                                for bad in [
+                                    "@ts-ignore",
+                                    "@ts-nocheck",
+                                    "@ts-expect-error",
+                                    "# noqa",
+                                    "# type: ignore",
+                                    "/* eslint-disable",
+                                ]
+                            ):
+                                failures.append(f"{fpath}:{i} Contains forbidden suppression tag: {line.strip()}")
                 except Exception as e:
                     logger.debug("Could not audit file %s: %s", fpath, e)
 
-        gates.append(
-            GateResult(
-                stage_name="Stage 2: Strict Anti-Suppression Gate",
-                passed=len(s2_failures) == 0,
-                details="Zero suppression tags found." if not s2_failures else f"{len(s2_failures)} suppression violations detected.",
-                duration_seconds=time.time() - s2_start,
-                failures=s2_failures,
-            )
+        return GateResult(
+            stage_name="Stage 2: Strict Anti-Suppression Gate",
+            passed=len(failures) == 0,
+            details="Zero suppression tags found."
+            if not failures
+            else f"{len(failures)} suppression violations detected.",
+            duration_seconds=time.time() - s_start,
+            failures=failures,
         )
 
-        # =========================================================================
-        # Stage 3: Auto-Formatting Gate (Prettier & oxfmt)
-        # =========================================================================
-        s3_start = time.time()
-        s3_failures = []
-        ts_files = [f for f in all_touched if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx", ".json"))]
+    def _stage3_auto_formatting(self, workdir: str, ts_files: list[str]) -> GateResult:
+        s_start = time.time()
+        failures = []
         if ts_files:
             fmt_res = subprocess.run(
-                ["pnpm", "exec", "prettier", "--write"] + ts_files,
+                ["pnpm", "exec", "prettier", "--write", *ts_files],
                 cwd=workdir,
                 capture_output=True,
                 text=True,
                 check=False,
             )
             if fmt_res.returncode != 0:
-                s3_failures.append(f"Prettier formatting failed: {fmt_res.stderr[:200]}")
+                failures.append(f"Prettier formatting failed: {fmt_res.stderr[:200]}")
 
-        gates.append(
-            GateResult(
-                stage_name="Stage 3: Auto-Formatting Gate",
-                passed=len(s3_failures) == 0,
-                details="All modified files formatted to project standard." if not s3_failures else "Formatting check failed.",
-                duration_seconds=time.time() - s3_start,
-                failures=s3_failures,
-            )
+        return GateResult(
+            stage_name="Stage 3: Auto-Formatting Gate",
+            passed=len(failures) == 0,
+            details="All modified files formatted to project standard." if not failures else "Formatting check failed.",
+            duration_seconds=time.time() - s_start,
+            failures=failures,
         )
 
-        # =========================================================================
-        # Stage 4: Type-Aware Linter Gate (oxlint --type-aware & ruff)
-        # =========================================================================
-        s4_start = time.time()
-        s4_failures = []
+    def _stage4_type_linting(self, workdir: str, ts_files: list[str], py_files: list[str]) -> GateResult:
+        s_start = time.time()
+        failures = []
         if ts_files:
             lint_res = subprocess.run(
-                ["pnpm", "exec", "oxlint", "--type-aware", "-c", ".oxlintrc.json"] + ts_files,
+                ["pnpm", "exec", "oxlint", "--type-aware", "-c", ".oxlintrc.json", *ts_files],
                 cwd=workdir,
                 capture_output=True,
                 text=True,
                 check=False,
             )
             if lint_res.returncode != 0:
-                s4_failures.append(f"oxlint failed:\n{lint_res.stderr or lint_res.stdout[:500]}")
+                failures.append(f"oxlint failed:\n{lint_res.stderr or lint_res.stdout[:500]}")
 
-        py_files = [f for f in all_touched if f.endswith(".py")]
         if py_files:
             ruff_res = subprocess.run(
-                ["uv", "run", "ruff", "check"] + py_files,
+                ["uv", "run", "ruff", "check", *py_files],
                 cwd=workdir,
                 capture_output=True,
                 text=True,
                 check=False,
             )
             if ruff_res.returncode != 0:
-                s4_failures.append(f"ruff check failed:\n{ruff_res.stdout[:500]}")
+                failures.append(f"ruff check failed:\n{ruff_res.stdout[:500]}")
 
-        gates.append(
-            GateResult(
-                stage_name="Stage 4: Type-Aware Linter Gate",
-                passed=len(s4_failures) == 0,
-                details="0 linter errors across all modified files." if not s4_failures else "Linting errors detected.",
-                duration_seconds=time.time() - s4_start,
-                failures=s4_failures,
-            )
+        return GateResult(
+            stage_name="Stage 4: Type-Aware Linter Gate",
+            passed=len(failures) == 0,
+            details="0 linter errors across all modified files." if not failures else "Linting errors detected.",
+            duration_seconds=time.time() - s_start,
+            failures=failures,
         )
 
-        # =========================================================================
-        # Stage 5: Unit & Integration Testing Gate (vitest & pytest)
-        # =========================================================================
-        s5_start = time.time()
-        s5_failures = []
+    def _stage5_testing(self, workdir: str, all_touched: list[str]) -> GateResult:
+        s_start = time.time()
+        failures = []
         test_ts = [f for f in all_touched if f.endswith((".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx"))]
         for tf in test_ts:
             vitest_res = subprocess.run(
@@ -359,7 +421,7 @@ class AgentExecutionHarness:
                 check=False,
             )
             if vitest_res.returncode != 0:
-                s5_failures.append(f"Vitest test suite failed for {tf}:\n{vitest_res.stdout[-600:]}")
+                failures.append(f"Vitest test suite failed for {tf}:\n{vitest_res.stdout[-600:]}")
 
         test_py = [f for f in all_touched if f.endswith(".py") and ("test" in f or "tests" in f)]
         for pf in test_py:
@@ -371,36 +433,71 @@ class AgentExecutionHarness:
                 check=False,
             )
             if pytest_res.returncode != 0:
-                s5_failures.append(f"Pytest suite failed for {pf}:\n{pytest_res.stdout[-600:]}")
+                failures.append(f"Pytest suite failed for {pf}:\n{pytest_res.stdout[-600:]}")
 
-        gates.append(
-            GateResult(
-                stage_name="Stage 5: Unit & Integration Testing Gate",
-                passed=len(s5_failures) == 0,
-                details=f"All {len(test_ts) + len(test_py)} test suites passed." if not s5_failures else "Test failures encountered.",
-                duration_seconds=time.time() - s5_start,
-                failures=s5_failures,
-            )
+        return GateResult(
+            stage_name="Stage 5: Unit & Integration Testing Gate",
+            passed=len(failures) == 0,
+            details=f"All {len(test_ts) + len(test_py)} test suites passed."
+            if not failures
+            else "Test failures encountered.",
+            duration_seconds=time.time() - s_start,
+            failures=failures,
         )
 
-        # =========================================================================
-        # Stage 6: LangSmith Trace & Telemetry Gate
-        # =========================================================================
-        s6_start = time.time()
-        s6_failures = []
+    def _stage6_trace_telemetry(self, issue: LinearIssue) -> GateResult:
+        s_start = time.time()
+        failures = []
         trace_sum = self.trace_analyzer.analyze_ticket_trace(issue.identifier)
         if trace_sum and trace_sum.anomalies:
-            s6_failures.extend(trace_sum.anomalies)
+            failures.extend(trace_sum.anomalies)
 
-        gates.append(
-            GateResult(
-                stage_name="Stage 6: LangSmith Trace & Telemetry Gate",
-                passed=len(s6_failures) == 0,
-                details="Trace execution verified clean without anomalies." if not s6_failures else "Trace anomalies detected.",
-                duration_seconds=time.time() - s6_start,
-                failures=s6_failures,
-            )
+        return GateResult(
+            stage_name="Stage 6: LangSmith Trace & Telemetry Gate",
+            passed=len(failures) == 0,
+            details="Trace execution verified clean without anomalies."
+            if not failures
+            else "Trace anomalies detected.",
+            duration_seconds=time.time() - s_start,
+            failures=failures,
         )
+
+    def _run_quality_gauntlet(
+        self,
+        workdir: str,
+        result: ExecutionResult,
+        issue: LinearIssue,
+    ) -> tuple[list[GateResult], list[str]]:
+        """Run the comprehensive 6-stage verification gauntlet."""
+        if not self.config.verification.enabled:
+            return [
+                GateResult(
+                    stage_name="All Quality Gates (Disabled)",
+                    passed=True,
+                    details="Verification explicitly disabled in configuration.",
+                )
+            ], []
+
+        status_res = subprocess.run(
+            ["git", "status", "--porcelain"], cwd=workdir, capture_output=True, text=True, check=False
+        )
+        changed_files = [line.strip().split()[-1] for line in status_res.stdout.splitlines() if line.strip()]
+        diff_res = subprocess.run(
+            ["git", "diff", "HEAD", "--name-only"], cwd=workdir, capture_output=True, text=True, check=False
+        )
+        all_touched = list(set(changed_files + [f.strip() for f in diff_res.stdout.splitlines() if f.strip()]))
+
+        ts_files = [f for f in all_touched if f.endswith((".ts", ".tsx", ".astro", ".js", ".jsx", ".json"))]
+        py_files = [f for f in all_touched if f.endswith(".py")]
+
+        gates = [
+            self._stage1_anti_hollow(workdir, all_touched, result, issue),
+            self._stage2_anti_suppression(workdir, all_touched, result),
+            self._stage3_auto_formatting(workdir, ts_files),
+            self._stage4_type_linting(workdir, ts_files, py_files),
+            self._stage5_testing(workdir, all_touched),
+            self._stage6_trace_telemetry(issue),
+        ]
 
         return gates, all_touched
 
