@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  hipaa-validator:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - "./data:/app/data"
+    environment:
+      - HIPAA_ENCRYPTION_PASSWORD=CHANGE_ME_TO_A_STRONG_PASSWORD
+      - HIPAA_ENCRYPTION_SALT=CHANGE_ME_TO_A_UNIQUE_SALT
+      - HIPAA_DB_PATH=/app/data/hipaa_compliance.db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

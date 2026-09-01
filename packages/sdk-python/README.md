@@ -3,7 +3,7 @@
 Auto-generated Python SDK for the Pixelated Empathy API.
 
 > **Note**: This SDK is generated from the OpenAPI specification at
-> `src/content-store/docs/api-reference/openapi.yaml`. Do not edit generated
+> `apps/web/src/content-store/docs/api-reference/openapi.yaml`. Do not edit generated
 > code manually. Run `scripts/ci/generate-sdks.sh` to regenerate.
 
 ## Installation

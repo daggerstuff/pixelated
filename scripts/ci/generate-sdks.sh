@@ -7,7 +7,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-SPEC_FILE="$ROOT_DIR/src/content-store/docs/api-reference/openapi.yaml"
+SPEC_FILE="$ROOT_DIR/apps/web/src/content-store/docs/api-reference/openapi.yaml"
 TS_OUTPUT="$ROOT_DIR/packages/sdk-typescript"
 PY_OUTPUT="$ROOT_DIR/packages/sdk-python"
 GENERATOR_VERSION="7.12.0"
