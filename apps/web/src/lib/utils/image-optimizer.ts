@@ -80,13 +80,18 @@ export interface BufferVariant {
   mimetype: string
 }
 
+export interface BufferResizeVariant extends BufferVariant {
+  name: string
+  width: number
+}
+
 export interface BufferOptimizationResult {
   original: BufferVariant
   optimized?: BufferVariant
   webp?: BufferVariant
   avif?: BufferVariant
   thumbnail?: BufferVariant
-  resizeVariants: BufferVariant[]
+  resizeVariants: BufferResizeVariant[]
   savings: number
 }
 
@@ -412,7 +417,7 @@ export class ImageOptimizer {
         metadata = await sharp(buffer).metadata()
         originalWidth = metadata.width ?? 0
       } catch {
-        return result
+        return variants
       }
 
       for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
@@ -540,12 +545,13 @@ export class ImageOptimizer {
    * Generate optimized filename
    */
   private getOptimizedFilename(originalPath: string, format: string): string {
-    const basename =
-      originalPath
-        .split('/')
-        .pop()
-        ?.replace(/\.[^/.]+$/, '') ?? 'image'
-    return `${basename}-optimized.${format}`
+    const parts = originalPath.split('/')
+    const basename = parts.pop()?.replace(/\.[^/.]+$/, '') ?? 'image'
+    const parentDir = parts[parts.length - 1] ?? ''
+    // Include parent directory to prevent collisions between files
+    // with the same basename in different directories
+    const prefix = parentDir ? `${parentDir}-` : ''
+    return `${prefix}${basename}-optimized.${format}`
   }
 
   /**
@@ -563,7 +569,23 @@ export class ImageOptimizer {
     for (let i = 0; i < imagePaths.length; i += batchSize) {
       const batch = imagePaths.slice(i, i + batchSize)
 
-      const batchPromises = batch.map(async (path) => this.optimizeImage(path))
+      const batchPromises = batch.map(async (imagePath) => {
+        try {
+          return await this.optimizeImage(imagePath)
+        } catch (error: unknown) {
+          logger.warn('Image optimization failed in batch, skipping', {
+            imagePath,
+            error: error instanceof Error ? error.message : String(error),
+          })
+          return {
+            originalPath: imagePath,
+            originalSize: 0,
+            resizeVariants: [],
+            savings: 0,
+            compressionRatio: 1,
+          } as OptimizationResult
+        }
+      })
       const batchResults = await Promise.all(batchPromises)
 
       results.push(...batchResults)
@@ -750,6 +772,8 @@ export class ImageOptimizer {
             buffer: resizedBuffer,
             size: resizedBuffer.length,
             mimetype,
+            name,
+            width: config.width,
           })
         } catch (error: unknown) {
           logger.warn('Buffer resize variant failed', {
@@ -816,17 +840,7 @@ export class ImageOptimizer {
   private buildSrcset(basePath: string, variants: ResizeVariant[]): string {
     const parts = [basePath]
     for (const variant of variants) {
-      const suffix =
-        variant.name === 'thumbnail'
-          ? 'thumb'
-          : (IMAGE_CONFIG.RESIZE[
-              variant.name as keyof typeof IMAGE_CONFIG.RESIZE
-            ]?.suffix ?? variant.name)
-      const variantPath = basePath.replace(
-        /-optimized\.([^.]+)$/,
-        `-${suffix}.$1`,
-      )
-      parts.push(`${variantPath} ${variant.width}w`)
+      parts.push(`${variant.path} ${variant.width}w`)
     }
     return parts.join(', ')
   }

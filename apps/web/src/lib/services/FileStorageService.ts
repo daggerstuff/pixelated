@@ -174,9 +174,7 @@ export class FileStorageService {
         // Upload resize variants for responsive images
         const uploadedVariantKeys: string[] = []
         for (const variant of optimization.resizeVariants) {
-          const suffix =
-            (variant as unknown as { name?: string }).name ??
-            `w${(variant as unknown as { width?: number }).width ?? 'unknown'}`
+          const suffix = variant.name
           const variantKey = `${key}-${suffix}${variant.mimetype === 'image/jpeg' ? '.jpg' : variant.mimetype === 'image/png' ? '.png' : '.jpg'}`
           try {
             await this.s3Client.send(
