@@ -300,7 +300,11 @@ exclude_lines = [
   "@abstractmethod",
 ]
 [tool.uv.workspace]
-members = ["./", "tools/gdrive-dataset-manager"]
+members = [
+    "./",
+    "tools/gdrive-dataset-manager",
+    "deep-agent",
+]
 exclude = ["ai"]
 [tool.uv]
 # Prefer best-available version over newest-first for more deterministic resolution
