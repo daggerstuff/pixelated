@@ -424,6 +424,7 @@ await requirePageAuth(Astro, 'admin')
     status: string
     createdBy: string
     createdAt: string
+    createdByRole?: string
   }> = []
 
   // Populate state dropdowns
@@ -492,7 +493,7 @@ await requirePageAuth(Astro, 'admin')
         tbody.innerHTML = currentRules
           .map((rule) => {
             const statusClass =
-              STATUS_COLORS[rule.status] || STATUS_COLORS.draft
+              STATUS_COLORS[rule.status] || STATUS_COLORS['draft']
             const createdDate = new Date(rule.createdAt).toLocaleDateString()
             return `
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">

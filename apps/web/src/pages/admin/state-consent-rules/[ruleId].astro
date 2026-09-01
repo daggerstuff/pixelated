@@ -205,70 +205,79 @@ await requirePageAuth(Astro, 'admin')
     const fields: Array<{ label: string; value: string }> = [
       {
         label: 'Minimum Consent Level',
-        value: String(config.minimumConsentLevel ?? '—'),
+        value: String(config['minimumConsentLevel'] ?? '—'),
       },
       {
         label: 'Override Consent Level',
-        value: String(config.overrideConsentLevel ?? '—'),
+        value: String(config['overrideConsentLevel'] ?? '—'),
       },
       {
         label: 'Requires Mental Health Consent',
-        value: config.requiresMentalHealthConsent ? 'Yes' : 'No',
+        value: config['requiresMentalHealthConsent'] ? 'Yes' : 'No',
       },
       {
         label: 'Requires SUD Consent',
-        value: config.requiresSUDConsent ? 'Yes' : 'No',
+        value: config['requiresSUDConsent'] ? 'Yes' : 'No',
       },
       {
         label: 'Requires Minor Parental Consent',
-        value: config.requiresMinorParentalConsent ? 'Yes' : 'No',
+        value: config['requiresMinorParentalConsent'] ? 'Yes' : 'No',
       },
-      { label: 'Age of Majority', value: String(config.ageOfMajority ?? '—') },
+      {
+        label: 'Age of Majority',
+        value: String(config['ageOfMajority'] ?? '—'),
+      },
     ]
 
     if (
-      config.minorConsentCategories &&
-      Array.isArray(config.minorConsentCategories)
+      config['minorConsentCategories'] &&
+      Array.isArray(config['minorConsentCategories'])
     ) {
       fields.push({
         label: 'Minor Consent Categories',
-        value: (config.minorConsentCategories as string[]).join(', '),
+        value: (config['minorConsentCategories'] as string[]).join(', '),
       })
     }
 
     if (
-      config.providerTypeRestrictions &&
-      typeof config.providerTypeRestrictions === 'object'
+      config['providerTypeRestrictions'] &&
+      typeof config['providerTypeRestrictions'] === 'object'
     ) {
       fields.push({
         label: 'Provider Type Restrictions',
-        value: JSON.stringify(config.providerTypeRestrictions),
+        value: JSON.stringify(config['providerTypeRestrictions']),
       })
     }
 
     if (
-      config.treatmentCategoryOverrides &&
-      typeof config.treatmentCategoryOverrides === 'object'
+      config['treatmentCategoryOverrides'] &&
+      typeof config['treatmentCategoryOverrides'] === 'object'
     ) {
       fields.push({
         label: 'Treatment Category Overrides',
-        value: JSON.stringify(config.treatmentCategoryOverrides),
+        value: JSON.stringify(config['treatmentCategoryOverrides']),
       })
     }
 
-    if (config.legalMetadata && typeof config.legalMetadata === 'object') {
-      const lm = config.legalMetadata as Record<string, string>
-      if (lm.legalReference)
-        fields.push({ label: 'Legal Reference', value: lm.legalReference })
-      if (lm.lastLegalReviewDate)
+    if (
+      config['legalMetadata'] &&
+      typeof config['legalMetadata'] === 'object'
+    ) {
+      const lm = config['legalMetadata'] as Record<string, string>
+      if (lm['legalReference'])
+        fields.push({ label: 'Legal Reference', value: lm['legalReference'] })
+      if (lm['lastLegalReviewDate'])
         fields.push({
           label: 'Last Legal Review',
-          value: lm.lastLegalReviewDate,
+          value: lm['lastLegalReviewDate'],
         })
-      if (lm.nextReviewDueDate)
-        fields.push({ label: 'Next Review Due', value: lm.nextReviewDueDate })
-      if (lm.reviewedBy)
-        fields.push({ label: 'Reviewed By', value: lm.reviewedBy })
+      if (lm['nextReviewDueDate'])
+        fields.push({
+          label: 'Next Review Due',
+          value: lm['nextReviewDueDate'],
+        })
+      if (lm['reviewedBy'])
+        fields.push({ label: 'Reviewed By', value: lm['reviewedBy'] })
     }
 
     return fields
@@ -312,7 +321,7 @@ await requirePageAuth(Astro, 'admin')
       titleEl!.textContent = `${rule.stateCode} — Version ${rule.version}`
       subtitleEl!.textContent = `Rule ID: ${rule.ruleId}`
 
-      const statusClass = STATUS_COLORS[rule.status] || STATUS_COLORS.draft
+      const statusClass = STATUS_COLORS[rule.status] || STATUS_COLORS['draft']
       statusBadge!.className = `px-3 py-1 text-sm font-medium rounded-full ${statusClass}`
       statusBadge!.textContent = rule.status
 
