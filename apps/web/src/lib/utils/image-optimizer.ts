@@ -770,8 +770,18 @@ export class ImageOptimizer {
 
       if (metadataAvailable) {
         for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
-          if (name === 'thumbnail') continue
           if (originalWidth > 0 && originalWidth <= config.width) {
+            continue
+          }
+
+          if (name === 'thumbnail' && result.thumbnail) {
+            result.resizeVariants.push({
+              buffer: result.thumbnail.buffer,
+              size: result.thumbnail.size,
+              mimetype: result.thumbnail.mimetype,
+              name,
+              width: config.width,
+            })
             continue
           }
 
