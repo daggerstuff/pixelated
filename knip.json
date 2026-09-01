@@ -78,6 +78,8 @@
     "apps/web/src/utils/serviceWorkerRegistration.ts",
     "infra/docker/**",
     "infra/k8s/**",
-    "scripts/**"
+    "scripts/**",
+    "apps/web/src/lib/utils/image-optimizer.ts",
+    "apps/web/src/lib/utils/image-optimizer.test.ts"
   ]
 }
