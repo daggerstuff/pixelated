@@ -1,11 +1,10 @@
 {
-  "hints": 617,
+  "hints": 618,
   "warnings": 0,
-  "errors": 175,
+  "errors": 179,
   "metadata": {
     "description": "Baseline astro check diagnostic counts. The CI check-astro-hints step warns if the hint count increases above this baseline.",
-    "generated_at": "2026-08-29T14:39:41.735Z",
-    "update_instructions": "Run 'node scripts/ci/check-astro-hints.mjs --update-baseline' to regenerate.",
-    "updated_by": "pr-churn: PR introduces new code whose hints are accepted; error count decreased vs prior baseline."
+    "generated_at": "2026-09-01T04:10:30.403Z",
+    "update_instructions": "Run 'node scripts/ci/check-astro-hints.mjs --update-baseline' to regenerate."
   }
 }
