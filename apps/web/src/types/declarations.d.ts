@@ -137,37 +137,6 @@ declare module 'aws-sdk' {
   }
 }
 
-// @supabase/supabase-js
-declare module '@supabase/supabase-js' {
-  export function createClient(
-    url: string,
-    key: string,
-    options?: unknown,
-  ): {
-    from(table: string): {
-      select(): {
-        eq(
-          key: string,
-          value: unknown,
-        ): Promise<{ data: unknown[]; error: unknown }>
-      }
-      insert(data: unknown): Promise<{ data: unknown; error: unknown }>
-      update(data: unknown): {
-        eq(
-          key: string,
-          value: unknown,
-        ): Promise<{ data: unknown; error: unknown }>
-      }
-      delete(): {
-        eq(
-          key: string,
-          value: unknown,
-        ): Promise<{ data: unknown; error: unknown }>
-      }
-    }
-  }
-}
-
 // OpenAI
 declare module 'openai' {
   export interface OpenAI {
