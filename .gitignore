@@ -463,3 +463,12 @@ tasks/
 /worktrees/
 /config/agent_runner_config.json
 !/config/agent_runner_config.example.json
+
+.github/agents
+.github/cookbook/copilot-sdk
+.github/instructions
+.github/plugins
+.github/prompts
+.github/scripts
+.github/hooks
+AGENT_HANDOFF.md
