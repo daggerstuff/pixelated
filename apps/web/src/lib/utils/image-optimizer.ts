@@ -821,28 +821,24 @@ export class ImageOptimizer {
     html += `<picture>\n`
 
     if (result.avifPath) {
-      const srcset = this.buildSrcset(result.avifPath, result.resizeVariants)
-      html += `  <source srcset="${srcset}" type="image/avif">\n`
+      html += `  <source srcset="${result.avifPath}" type="image/avif">\n`
     }
 
     if (result.webpPath) {
-      const srcset = this.buildSrcset(result.webpPath, result.resizeVariants)
-      html += `  <source srcset="${srcset}" type="image/webp">\n`
+      html += `  <source srcset="${result.webpPath}" type="image/webp">\n`
     }
 
     const fallbackPath = result.optimizedPath ?? result.originalPath
-    html += `  <img src="${fallbackPath}" alt="${alt}" loading="lazy">\n`
+    const fallbackSrcset = this.buildSrcset(fallbackPath, result.resizeVariants)
+    const srcsetAttribute = fallbackSrcset ? ` srcset="${fallbackSrcset}"` : ''
+    html += `  <img src="${fallbackPath}"${srcsetAttribute} alt="${alt}" loading="lazy">\n`
     html += `</picture>`
 
     return html
   }
 
-  private buildSrcset(basePath: string, variants: ResizeVariant[]): string {
-    const parts = [basePath]
-    for (const variant of variants) {
-      parts.push(`${variant.path} ${variant.width}w`)
-    }
-    return parts.join(', ')
+  private buildSrcset(_basePath: string, variants: ResizeVariant[]): string {
+    return variants.map((v) => `${v.path} ${v.width}w`).join(', ')
   }
 
   /**
