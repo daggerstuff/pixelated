@@ -421,7 +421,7 @@ export class ImageOptimizer {
       }
 
       for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
-        // Skip if original is smaller than target width
+        if (name === 'thumbnail') continue
         if (originalWidth > 0 && originalWidth <= config.width) {
           continue
         }
@@ -755,40 +755,45 @@ export class ImageOptimizer {
         })
       }
 
-      // Generate resize variants (skip 'thumbnail' — handled above)
       let metadata
       let originalWidth = 0
+      let metadataAvailable = false
       try {
         metadata = await sharp(buffer).metadata()
         originalWidth = metadata.width ?? 0
+        metadataAvailable = true
       } catch {
-        return result
+        logger.warn('Buffer metadata fetch failed, skipping resize variants', {
+          filename,
+        })
       }
 
-      for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
-        if (name === 'thumbnail') continue
-        if (originalWidth > 0 && originalWidth <= config.width) {
-          continue
-        }
+      if (metadataAvailable) {
+        for (const [name, config] of Object.entries(IMAGE_CONFIG.RESIZE)) {
+          if (name === 'thumbnail') continue
+          if (originalWidth > 0 && originalWidth <= config.width) {
+            continue
+          }
 
-        try {
-          const resizedBuffer = await sharp(buffer)
-            .resize({ width: config.width, withoutEnlargement: true })
-            .toBuffer()
+          try {
+            const resizedBuffer = await sharp(buffer)
+              .resize({ width: config.width, withoutEnlargement: true })
+              .toBuffer()
 
-          result.resizeVariants.push({
-            buffer: resizedBuffer,
-            size: resizedBuffer.length,
-            mimetype,
-            name,
-            width: config.width,
-          })
-        } catch (error: unknown) {
-          logger.warn('Buffer resize variant failed', {
-            filename,
-            variant: name,
-            error: error instanceof Error ? error.message : String(error),
-          })
+            result.resizeVariants.push({
+              buffer: resizedBuffer,
+              size: resizedBuffer.length,
+              mimetype,
+              name,
+              width: config.width,
+            })
+          } catch (error: unknown) {
+            logger.warn('Buffer resize variant failed', {
+              filename,
+              variant: name,
+              error: error instanceof Error ? error.message : String(error),
+            })
+          }
         }
       }
     }
