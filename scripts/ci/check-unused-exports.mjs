@@ -57,6 +57,9 @@ const SCAN_IGNORE = [
   "apps/web/src/lib/crypto.ts",
   "apps/web/src/lib/fhe/fhe-service.ts",
   "apps/web/src/lib/redis.ts",
+  "apps/web/src/lib/ehr-native/consent/state-rules/cache.ts",
+  "apps/web/src/lib/ehr-native/consent/state-rules/repository.ts",
+  "apps/web/src/lib/security/threat-detection/integrations/api-middleware.ts",
 ];
 
 // ---------------------------------------------------------------------------

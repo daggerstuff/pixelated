@@ -146,7 +146,7 @@ export async function updateStrategicPlan(
 /**
  * Add KPI to strategic plan
  */
-export async function addKPI(
+async function addKPI(
   planId: string,
   userId: string,
   kpi: {
@@ -195,7 +195,7 @@ export async function addKPI(
 /**
  * Submit plan for approval
  */
-export async function submitForApproval(
+async function submitForApproval(
   planId: string,
   userId: string,
   approvers: string[],
@@ -280,7 +280,7 @@ export async function listStrategicPlans(
 /**
  * Share strategic plan
  */
-export async function shareStrategicPlan(
+async function shareStrategicPlan(
   planId: string,
   ownerId: string,
   targetUserId: string,
