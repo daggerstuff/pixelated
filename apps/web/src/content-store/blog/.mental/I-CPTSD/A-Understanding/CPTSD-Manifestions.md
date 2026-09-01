@@ -7,10 +7,10 @@ author: 'Dr. James Wilson'
 pubDate: 2024-02-05
 readingTime: 10
 tags:
-  - CPTSD
-  - trauma
-  - mental health
-  - symptoms
+- CPTSD
+- trauma
+- mental health
+- symptoms
 series: 'Complex PTSD'
 seriesOrder: 2
 image:

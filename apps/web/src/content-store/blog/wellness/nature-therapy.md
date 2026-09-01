@@ -1,8 +1,7 @@
 ---
-title: "Nature's Therapy: Outdoor Wellness Practices"
+title: 'Nature''s Therapy: Outdoor Wellness Practices'
 description: >-
-  _Next in our series, we'll explore how to create joy and mental wellness in
-  the
+  _Next in our series, we'll explore how to create joy and mental wellness in the
 author: Wellness Team
 pubDate: 2024-05-25T00:00:00.000Z
 draft: false
@@ -14,8 +13,8 @@ tags:
   - mindfulness
 series: Everyday Joy
 seriesOrder: 4
----
 
+---
 # Nature's Therapy: Outdoor Wellness Practices
 
 ## Introduction

@@ -1,8 +1,6 @@
 ---
 title: Navigation
-description:
-  The navigation field in mint.json defines the pages that go in the navigation
-  menu
+description: The navigation field in mint.json defines the pages that go in the navigation menu
 pubDate: '2026-05-09'
 ---
 

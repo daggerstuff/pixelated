@@ -2,9 +2,10 @@
 title: Causes and Risk Factors
 description:
 ---
-
-'Comprehensive guide for mental health professionals and individuals in
-recovery' author: 'Resource Team' pubDate: 2024-02-28
+  'Comprehensive guide for mental health professionals and individuals in
+  recovery'
+author: 'Resource Team'
+pubDate: 2024-02-28
 ---
 
 Hey there! Let's talk about something pretty heavy but important: Complex

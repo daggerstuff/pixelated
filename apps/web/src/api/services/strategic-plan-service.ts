@@ -1,7 +1,10 @@
 import { v4 as uuid } from 'uuid'
 
 // Strategic Plans Service Layer
-import { getMongoConnection, getPostgresPool } from '../../lib/db/connection'
+import {
+  getMongoConnection,
+  getPostgresPool,
+} from '../../lib/db/connection'
 import { slug } from '../../utils/common'
 import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 
@@ -146,7 +149,7 @@ export async function updateStrategicPlan(
 /**
  * Add KPI to strategic plan
  */
-async function addKPI(
+export async function addKPI(
   planId: string,
   userId: string,
   kpi: {
@@ -195,7 +198,7 @@ async function addKPI(
 /**
  * Submit plan for approval
  */
-async function submitForApproval(
+export async function submitForApproval(
   planId: string,
   userId: string,
   approvers: string[],
@@ -280,7 +283,7 @@ export async function listStrategicPlans(
 /**
  * Share strategic plan
  */
-async function shareStrategicPlan(
+export async function shareStrategicPlan(
   planId: string,
   ownerId: string,
   targetUserId: string,

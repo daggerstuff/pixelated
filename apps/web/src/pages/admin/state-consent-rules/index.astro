@@ -14,9 +14,7 @@ await requirePageAuth(Astro, 'admin')
 >
   <div class="space-y-6">
     <!-- Header -->
-    <div
-      class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-    >
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
           State Consent Rules
@@ -50,10 +48,7 @@ await requirePageAuth(Astro, 'admin')
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
       <form id="filter-form" class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-          <label
-            for="filter-state"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label for="filter-state" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             State
           </label>
           <select
@@ -64,10 +59,7 @@ await requirePageAuth(Astro, 'admin')
           </select>
         </div>
         <div>
-          <label
-            for="filter-status"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label for="filter-status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Status
           </label>
           <select
@@ -84,10 +76,7 @@ await requirePageAuth(Astro, 'admin')
           </select>
         </div>
         <div>
-          <label
-            for="filter-search"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label for="filter-search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Search
           </label>
           <input
@@ -114,34 +103,22 @@ await requirePageAuth(Astro, 'admin')
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 State
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Version
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Status
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Created By
               </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Created At
               </th>
-              <th
-                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-              >
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
@@ -164,10 +141,7 @@ await requirePageAuth(Astro, 'admin')
         id="pagination-bar"
         class="px-6 py-3 bg-gray-50 dark:bg-gray-700 flex items-center justify-between hidden"
       >
-        <div
-          id="pagination-info"
-          class="text-sm text-gray-600 dark:text-gray-300"
-        >
+        <div id="pagination-info" class="text-sm text-gray-600 dark:text-gray-300">
         </div>
         <div class="flex items-center gap-2">
           <button
@@ -178,10 +152,7 @@ await requirePageAuth(Astro, 'admin')
           >
             Previous
           </button>
-          <span
-            id="page-indicator"
-            class="text-sm text-gray-600 dark:text-gray-300">1</span
-          >
+          <span id="page-indicator" class="text-sm text-gray-600 dark:text-gray-300">1</span>
           <button
             id="btn-next"
             type="button"
@@ -200,9 +171,7 @@ await requirePageAuth(Astro, 'admin')
     id="create-modal"
     class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-50"
   >
-    <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
-    >
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
           Create New State Consent Rule
@@ -210,10 +179,7 @@ await requirePageAuth(Astro, 'admin')
       </div>
       <form id="create-form" class="px-6 py-4 space-y-4">
         <div>
-          <label
-            for="create-state"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label for="create-state" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             State Code <span class="text-red-500">*</span>
           </label>
           <select
@@ -227,10 +193,7 @@ await requirePageAuth(Astro, 'admin')
         </div>
 
         <div>
-          <label
-            for="create-consent-level"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label for="create-consent-level" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Minimum Consent Level <span class="text-red-500">*</span>
           </label>
           <select
@@ -248,46 +211,25 @@ await requirePageAuth(Astro, 'admin')
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label
-              class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
-            >
-              <input
-                type="checkbox"
-                name="requiresMentalHealthConsent"
-                class="rounded"
-              />
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input type="checkbox" name="requiresMentalHealthConsent" class="rounded" />
               Requires Mental Health Consent
             </label>
           </div>
           <div>
-            <label
-              class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
-            >
-              <input
-                type="checkbox"
-                name="requiresSUDConsent"
-                class="rounded"
-              />
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input type="checkbox" name="requiresSUDConsent" class="rounded" />
               Requires SUD Consent
             </label>
           </div>
           <div>
-            <label
-              class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300"
-            >
-              <input
-                type="checkbox"
-                name="requiresMinorParentalConsent"
-                class="rounded"
-              />
+            <label class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+              <input type="checkbox" name="requiresMinorParentalConsent" class="rounded" />
               Requires Minor Parental Consent
             </label>
           </div>
           <div>
-            <label
-              for="create-age-majority"
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
+            <label for="create-age-majority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Age of Majority <span class="text-red-500">*</span>
             </label>
             <input
@@ -304,10 +246,7 @@ await requirePageAuth(Astro, 'admin')
         </div>
 
         <div>
-          <label
-            for="create-notes"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
+          <label for="create-notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Notes
           </label>
           <textarea
@@ -315,14 +254,11 @@ await requirePageAuth(Astro, 'admin')
             name="notes"
             rows="3"
             class="w-full rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Optional notes for this rule..."></textarea>
+            placeholder="Optional notes for this rule..."
+          ></textarea>
         </div>
 
-        <div
-          id="create-error"
-          class="hidden text-sm text-red-600 dark:text-red-400"
-        >
-        </div>
+        <div id="create-error" class="hidden text-sm text-red-600 dark:text-red-400"></div>
 
         <div class="flex justify-end gap-3 pt-2">
           <button
@@ -346,95 +282,29 @@ await requirePageAuth(Astro, 'admin')
 
 <script>
   const US_STATES = [
-    'AL',
-    'AK',
-    'AZ',
-    'AR',
-    'CA',
-    'CO',
-    'CT',
-    'DE',
-    'FL',
-    'GA',
-    'HI',
-    'ID',
-    'IL',
-    'IN',
-    'IA',
-    'KS',
-    'KY',
-    'LA',
-    'ME',
-    'MD',
-    'MA',
-    'MI',
-    'MN',
-    'MS',
-    'MO',
-    'MT',
-    'NE',
-    'NV',
-    'NH',
-    'NJ',
-    'NM',
-    'NY',
-    'NC',
-    'ND',
-    'OH',
-    'OK',
-    'OR',
-    'PA',
-    'RI',
-    'SC',
-    'SD',
-    'TN',
-    'TX',
-    'UT',
-    'VT',
-    'VA',
-    'WA',
-    'WV',
-    'WI',
-    'WY',
-    'DC',
-    'PR',
-    'GU',
-    'VI',
-    'AS',
-    'MP',
+    'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+    'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+    'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+    'VA','WA','WV','WI','WY','DC','PR','GU','VI','AS','MP',
   ]
 
   const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-    review:
-      'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
+    review: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300',
     approved: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
     active: 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300',
-    superseded:
-      'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
+    superseded: 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-300',
     archived: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300',
   }
 
   let currentPage = 1
   let currentLimit = 20
-  let currentRules: Array<{
-    ruleId: string
-    stateCode: string
-    version: number
-    status: string
-    createdBy: string
-    createdAt: string
-    createdByRole?: string
-  }> = []
+  let currentRules: Array<{ ruleId: string; stateCode: string; version: number; status: string; createdBy: string; createdAt: string }> = []
 
   // Populate state dropdowns
   function populateStates() {
-    const filterState = document.getElementById(
-      'filter-state',
-    ) as HTMLSelectElement
-    const createState = document.getElementById(
-      'create-state',
-    ) as HTMLSelectElement
+    const filterState = document.getElementById('filter-state') as HTMLSelectElement
+    const createState = document.getElementById('create-state') as HTMLSelectElement
 
     for (const code of US_STATES) {
       const opt1 = document.createElement('option')
@@ -450,21 +320,12 @@ await requirePageAuth(Astro, 'admin')
   }
 
   async function fetchRules() {
-    const tbody = document.getElementById(
-      'rules-tbody',
-    ) as HTMLTableSectionElement
-    tbody.innerHTML =
-      '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">Loading rules...</td></tr>'
+    const tbody = document.getElementById('rules-tbody') as HTMLTableSectionElement
+    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">Loading rules...</td></tr>'
 
-    const filterState = (
-      document.getElementById('filter-state') as HTMLSelectElement
-    ).value
-    const filterStatus = (
-      document.getElementById('filter-status') as HTMLSelectElement
-    ).value
-    const filterSearch = (
-      document.getElementById('filter-search') as HTMLInputElement
-    ).value
+    const filterState = (document.getElementById('filter-state') as HTMLSelectElement).value
+    const filterStatus = (document.getElementById('filter-status') as HTMLSelectElement).value
+    const filterSearch = (document.getElementById('filter-search') as HTMLInputElement).value
 
     const params = new URLSearchParams()
     if (filterState) params.set('stateCode', filterState)
@@ -474,9 +335,7 @@ await requirePageAuth(Astro, 'admin')
     params.set('limit', String(currentLimit))
 
     try {
-      const res = await fetch(
-        `/api/v1/admin/state-consent-rules?${params.toString()}`,
-      )
+      const res = await fetch(`/api/v1/admin/state-consent-rules?${params.toString()}`)
       if (!res.ok) {
         const err = await res.json().catch(() => ({ error: 'Request failed' }))
         tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">${err.error || 'Failed to load'}</td></tr>`
@@ -487,15 +346,12 @@ await requirePageAuth(Astro, 'admin')
       currentRules = data.rules || []
 
       if (currentRules.length === 0) {
-        tbody.innerHTML =
-          '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">No rules found</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-8 text-center text-gray-400">No rules found</td></tr>'
       } else {
-        tbody.innerHTML = currentRules
-          .map((rule) => {
-            const statusClass =
-              STATUS_COLORS[rule.status] || STATUS_COLORS['draft']
-            const createdDate = new Date(rule.createdAt).toLocaleDateString()
-            return `
+        tbody.innerHTML = currentRules.map((rule) => {
+          const statusClass = STATUS_COLORS[rule.status] || STATUS_COLORS.draft
+          const createdDate = new Date(rule.createdAt).toLocaleDateString()
+          return `
             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                 ${rule.stateCode}
@@ -521,8 +377,7 @@ await requirePageAuth(Astro, 'admin')
               </td>
             </tr>
           `
-          })
-          .join('')
+        }).join('')
       }
 
       // Pagination
@@ -577,15 +432,10 @@ await requirePageAuth(Astro, 'admin')
       const formData = new FormData(form)
       const stateCode = formData.get('stateCode') as string
       const minimumConsentLevel = formData.get('minimumConsentLevel') as string
-      const ageOfMajority = parseInt(
-        formData.get('ageOfMajority') as string,
-        10,
-      )
-      const requiresMentalHealthConsent =
-        formData.get('requiresMentalHealthConsent') === 'on'
+      const ageOfMajority = parseInt(formData.get('ageOfMajority') as string, 10)
+      const requiresMentalHealthConsent = formData.get('requiresMentalHealthConsent') === 'on'
       const requiresSUDConsent = formData.get('requiresSUDConsent') === 'on'
-      const requiresMinorParentalConsent =
-        formData.get('requiresMinorParentalConsent') === 'on'
+      const requiresMinorParentalConsent = formData.get('requiresMinorParentalConsent') === 'on'
       const notes = (formData.get('notes') as string) || undefined
 
       const ruleConfig = {
@@ -604,11 +454,8 @@ await requirePageAuth(Astro, 'admin')
         })
 
         if (!res.ok) {
-          const err = await res
-            .json()
-            .catch(() => ({ error: 'Request failed' }))
-          errorDiv!.textContent =
-            err.error || err.details?.[0]?.message || 'Failed to create rule'
+          const err = await res.json().catch(() => ({ error: 'Request failed' }))
+          errorDiv!.textContent = err.error || err.details?.[0]?.message || 'Failed to create rule'
           errorDiv?.classList.remove('hidden')
           return
         }
@@ -635,9 +482,7 @@ await requirePageAuth(Astro, 'admin')
       fetchRules()
     })
 
-    document
-      .getElementById('btn-refresh')
-      ?.addEventListener('click', fetchRules)
+    document.getElementById('btn-refresh')?.addEventListener('click', fetchRules)
 
     document.getElementById('btn-prev')?.addEventListener('click', () => {
       if (currentPage > 1) {

@@ -22,7 +22,7 @@ vi.mock('../../../../db/mongoClient', () => {
   }
 })
 
-vi.mock('../../mongodb.dao', () => ({
+vi.mock('../../../../services/mongodb.dao', () => ({
   dataExportDAO: {
     create: vi.fn().mockResolvedValue(undefined),
     findById: vi.fn().mockResolvedValue(null),
@@ -62,10 +62,10 @@ vi.mock('uuid', () => ({
   v4: vi.fn().mockReturnValue('test-uuid-1234'),
 }))
 
+import { dataExportDAO } from '../../mongodb.dao'
 import { createAuditLog } from '../../../audit'
 import { userManager } from '../../../db'
 import { aiRepository } from '../../../db/ai'
-import { dataExportDAO } from '../../mongodb.dao'
 import {
   createDataExportRequest,
   getDataExportDetails,

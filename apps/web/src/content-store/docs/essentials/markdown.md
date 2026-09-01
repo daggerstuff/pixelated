@@ -33,11 +33,11 @@ of contents on the right.
 We support most markdown formatting. Simply add `**`, `_`, or `~` around text to
 format it.
 
-| Style         | How to write it   | Result            |
-| ------------- | ----------------- | ----------------- |
-| Bold          | `**bold**`        | **bold**          |
-| Italic        | `_italic_`        | _italic_          |
-| Strikethrough | `~strikethrough~` | ~~strikethrough~~ |
+| Style         | How to write it   | Result          |
+| ------------- | ----------------- | --------------- |
+| Bold          | `**bold**`        | **bold**        |
+| Italic        | `_italic_`        | _italic_        |
+| Strikethrough | `~strikethrough~` | ~strikethrough~ |
 
 You can combine these. For example, write `**_bold and italic_**` to get **_bold
 and italic_** text.

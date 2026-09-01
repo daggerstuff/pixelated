@@ -1,11 +1,9 @@
 ---
 title: External Secrets Operator Migration
-description:
-  Migrating file-based secrets to External Secrets Operator (ESO) backed by
-  Vault
+description: Migrating file-based secrets to External Secrets Operator (ESO) backed by Vault
 pubDate: 2026-07-23
 author: Platform Team
-tags: ['security', 'infrastructure', 'kubernetes', 'secrets']
+tags: ["security", "infrastructure", "kubernetes", "secrets"]
 draft: false
 toc: true
 ---
@@ -13,20 +11,18 @@ toc: true
 ## Overview
 
 This document describes the migration from file-based secrets
-(`config/secrets/`) to External Secrets Operator (ESO) backed by a secret
-manager (Vault, AWS Secrets Manager, or Doppler).
+(`config/secrets/`) to External Secrets Operator (ESO) backed by a
+secret manager (Vault, AWS Secrets Manager, or Doppler).
 
 ## Why Migrate?
 
 **Before:**
-
 - Secrets stored as plain files in `config/secrets/`
 - No rotation, no audit trail, no central management
 - K8s `secrets.yaml` used placeholder templates
 - Docker Compose used file-based secrets
 
 **After:**
-
 - Secrets managed centrally in Vault/AWS Secrets Manager/Doppler
 - ESO syncs secrets into K8s automatically
 - Automatic rotation supported by backend
@@ -49,14 +45,14 @@ manager (Vault, AWS Secrets Manager, or Doppler).
 
 ## Files
 
-| File                               | Purpose                                                 |
-| ---------------------------------- | ------------------------------------------------------- |
-| `k8s/base/secret-store.yaml`       | ClusterSecretStore CRDs for Vault, AWS, Doppler         |
-| `k8s/base/external-secrets.yaml`   | ExternalSecret CRDs — maps remote secrets to K8s Secret |
-| `k8s/base/eso-install.yaml`        | Helm values for ESO installation                        |
-| `k8s/base/secrets.yaml`            | DEPRECATED — static template, kept for CI fallback      |
-| `scripts/devops/migrate-to-eso.sh` | Migration automation script                             |
-| `config/secrets/`                  | Dev-only secret files (untracked, not committed)        |
+| File | Purpose |
+|------|---------|
+| `k8s/base/secret-store.yaml` | ClusterSecretStore CRDs for Vault, AWS, Doppler |
+| `k8s/base/external-secrets.yaml` | ExternalSecret CRDs — maps remote secrets to K8s Secret |
+| `k8s/base/eso-install.yaml` | Helm values for ESO installation |
+| `k8s/base/secrets.yaml` | DEPRECATED — static template, kept for CI fallback |
+| `scripts/devops/migrate-to-eso.sh` | Migration automation script |
+| `config/secrets/` | Dev-only secret files (untracked, not committed) |
 
 ## Backend Configuration
 
@@ -164,8 +160,8 @@ Docker Compose continues to use file-based secrets for local dev.
 
 With ESO, rotation is handled by the backend:
 
-- **Vault**: Use `vault kv put` to update the secret value. ESO syncs within
-  `refreshInterval` (1h by default).
+- **Vault**: Use `vault kv put` to update the secret value. ESO syncs
+  within `refreshInterval` (1h by default).
 - **AWS Secrets Manager**: Use rotation Lambda functions.
 - **Doppler**: Update in Doppler dashboard; ESO syncs automatically.
 
@@ -193,8 +189,8 @@ vault audit list
 
 ## Backward Compatibility
 
-The deprecated `k8s/base/secrets.yaml` is retained for CI/testing fallback. The
-`k8s/base/kustomization.yaml` now includes `secret-store.yaml` and
+The deprecated `k8s/base/secrets.yaml` is retained for CI/testing fallback.
+The `k8s/base/kustomization.yaml` now includes `secret-store.yaml` and
 `external-secrets.yaml` instead of `secrets.yaml`.
 
 To use the static template for CI:

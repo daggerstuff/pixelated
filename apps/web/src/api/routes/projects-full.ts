@@ -10,7 +10,7 @@ import {
   listProjects,
   searchProjects,
   shareProject,
-} from '../services/project-service'
+} from '../lib/services/project-service'
 
 const router: Router = express.Router()
 

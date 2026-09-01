@@ -3,18 +3,16 @@
  * Comprehensive patient data management with privacy and security
  */
 
-import { randomUUID } from 'node:crypto'
-
-import type {
-  PatientProfile,
-  TreatmentPlan,
-  ProgressMetrics,
-} from '../../types/patient'
 import {
   encryptPHIFields,
   decryptPHIFields,
   PHI_FIELDS,
 } from '../fhe/field-encryption'
+import type {
+  PatientProfile,
+  TreatmentPlan,
+  ProgressMetrics,
+} from '../../types/patient'
 
 export interface PatientSearchCriteria {
   name?: string
@@ -106,7 +104,7 @@ class PatientManager {
   }
 
   private generatePatientId(): string {
-    return `P${Date.now()}${randomUUID().substring(0, 5).toUpperCase()}`
+    return `P${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`
   }
 
   /**
@@ -364,7 +362,7 @@ class PatientManager {
       throw new Error(`Patient not found: ${patientId}`)
     }
 
-    const reportId = `report_${Date.now()}_${randomUUID().substring(0, 5)}`
+    const reportId = `report_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     const sections: ReportSection[] = []
 

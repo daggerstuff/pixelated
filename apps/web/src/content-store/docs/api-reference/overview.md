@@ -308,7 +308,7 @@ function MessagesComponent({ conversationId }) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ content, recipientId: 'user123' }),
       })
@@ -337,27 +337,26 @@ Astro components can fetch data during server-side rendering:
 
 ```astro
 ---
-const token = Astro.cookies.get('auth-token')?.value
+const token = Astro.cookies.get('auth-token')?.value;
 
-let messages = []
+let messages = [];
 if (token) {
   try {
-    const response = await fetch(
-      `${Astro.url.origin}/api/messages?conversationId=123`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    )
-    const data = await response.json()
-    messages = data.messages
+    const response = await fetch(`${Astro.url.origin}/api/messages?conversationId=123`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await response.json();
+    messages = data.messages;
   } catch (error) {
-    console.error('Failed to fetch messages:', error)
+    console.error('Failed to fetch messages:', error);
   }
 }
 ---
 
 <div>
-  {messages.map((message) => <div>{message.content}</div>)}
+  {messages.map(message => (
+    <div>{message.content}</div>
+  ))}
 </div>
 ```
 

@@ -11,7 +11,6 @@
  */
 
 import type { PoolClient } from 'pg'
-
 import type { QueryResultRow } from '@/lib/db'
 import { query, transaction } from '@/lib/db'
 

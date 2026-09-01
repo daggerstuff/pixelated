@@ -7,9 +7,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { redis } from '../../redis'
 import { defaultRateLimitConfig } from '../config'
-import type { RateLimitRule } from '../distributed-types'
 import { DistributedRateLimiter } from '../rate-limiter'
 import { createRateLimiter } from '../rate-limiter'
+import type { RateLimitRule } from '../distributed-types'
 
 // Mock Redis with stateful implementation
 vi.mock('../../redis', () => {
@@ -76,8 +76,8 @@ describe('DistributedRateLimiter', () => {
 
   beforeEach(() => {
     // Clear redis store for each test
-    type RedisMock = typeof redis & { _store?: Map<string, string> }
-    ;(redis as RedisMock)._store?.clear()
+    // @ts-expect-error - _store is a mock-only property
+    redis._store?.clear()
     rateLimiter = createRateLimiter(defaultRateLimitConfig)
   })
 

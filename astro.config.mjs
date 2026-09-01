@@ -416,9 +416,7 @@ export default defineConfig({
         '@layouts': path.resolve('./apps/web/src/layouts'),
         '@utils': path.resolve('./apps/web/src/utils'),
         '@lib': path.resolve('./apps/web/src/lib'),
-        'framer-motion': path.resolve(
-          './apps/web/src/lib/shims/framer-motion.tsx',
-        ),
+        'framer-motion': path.resolve('./apps/web/src/lib/shims/framer-motion.tsx'),
         '@radix-ui/react-tooltip': path.resolve(
           './apps/web/src/lib/shims/radix-tooltip.tsx',
         ),
@@ -678,7 +676,9 @@ export default defineConfig({
               // Tag uploaded files with the current release so server
               // events that carry a matching SENTRY_RELEASE can be
               // symbolicated against the uploaded maps.
-              release: sentryRelease ? { name: sentryRelease } : undefined,
+              release: sentryRelease
+                ? { name: sentryRelease }
+                : undefined,
               // Upload client + server sourcemaps. Without this, every
               // captured event arrives in Sentry as the bundled filename
               // and is unsymbolicated (no useful stack traces).

@@ -1,7 +1,5 @@
 ---
-description:
-  Technical architecture overview of the Pixelated Empathy mental health
-  platform
+description: Technical architecture overview of the Pixelated Empathy mental health platform
 title: Pixelated Empathy Architecture
 pubDate: '2026-05-09'
 ---

@@ -2,9 +2,9 @@
 title: 'Mental Health Resources'
 description:
 ---
-
-'Comprehensive guide to mental health resources and treatment approaches'
-author: 'Clinical Resources Team' pubDate: 2024-02-28
+  'Comprehensive guide to mental health resources and treatment approaches'
+author: 'Clinical Resources Team'
+pubDate: 2024-02-28
 ---
 
 # Mental Health Resources

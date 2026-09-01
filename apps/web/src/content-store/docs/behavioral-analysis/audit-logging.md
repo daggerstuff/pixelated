@@ -60,7 +60,11 @@ interface AuditLogEntry {
 }
 
 type ActorType =
-  'user' | 'service' | 'system' | 'external-integration' | 'anonymous'
+  | 'user'
+  | 'service'
+  | 'system'
+  | 'external-integration'
+  | 'anonymous'
 
 type ActionType =
   | 'read'

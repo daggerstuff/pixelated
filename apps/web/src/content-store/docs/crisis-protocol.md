@@ -308,7 +308,6 @@ node -e "console.log(require('./src/config/env.config.ts').config.notifications.
 - Technical Issues: DevOps Team
 - Clinical Issues: Mental Health Clinical Team
 - System Outages: On-call Engineer
-
 ---
 
 _Last Updated: 2025-01-17_ _Version: 1.0.0_

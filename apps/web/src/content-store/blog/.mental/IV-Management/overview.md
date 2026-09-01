@@ -2,9 +2,9 @@
 title: 'Management Strategies Overview'
 description:
 ---
-
-'Overview of management strategies for CPTSD and addiction recovery' author:
-'Resource Team' pubDate: 2024-02-28
+  'Overview of management strategies for CPTSD and addiction recovery'
+author: 'Resource Team'
+pubDate: 2024-02-28
 ---
 
 # Management Strategies Overview

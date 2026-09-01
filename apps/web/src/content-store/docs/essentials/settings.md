@@ -1,6 +1,5 @@
 ---
-description: Mintlify gives you complete control over the look and feel of your
-  documentation using the mint.json file
+description: Mintlify gives you complete control over the look and feel of your documentation using the mint.json file
 title: Settings
 pubDate: '2026-05-09'
 ---

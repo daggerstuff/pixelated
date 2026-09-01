@@ -207,92 +207,78 @@ title: Troubleshooting Guide
 2. Collect Debug Information
 
    ```bash
-
-   ```
-
 # Get application logs
-
-aws logs get-log-events \
---log-group-name /aws/ecs/your-app \
---log-stream-name container-log-stream
+   aws logs get-log-events \
+     --log-group-name /aws/ecs/your-app \
+     --log-stream-name container-log-stream
 
 # Get container metrics
-
-aws cloudwatch get-metric-data \
---metric-data-queries file://metric-query.json \
---start-time $(date -u -v-1H +%FT%TZ) \
+   aws cloudwatch get-metric-data \
+     --metric-data-queries file://metric-query.json \
+     --start-time $(date -u -v-1H +%FT%TZ) \
      --end-time $(date -u +%FT%TZ)
 
 # Check network connectivity
-
-aws ec2 describe-network-interfaces \
---filters Name=description,Values="ECS task*"
-
-````
+   aws ec2 describe-network-interfaces \
+     --filters Name=description,Values="ECS task*"
+   ```
 
 3. Analyze Debug Data
-- Review error patterns
-- Check timing issues
-- Analyze resource usage
-- Verify configuration
+   - Review error patterns
+   - Check timing issues
+   - Analyze resource usage
+   - Verify configuration
 
 ### 2. Infrastructure Debug
 
 1. Check Service Health
 
-```bash
+   ```bash
 # ECS service status
-aws ecs describe-services \
-  --cluster your-cluster \
-  --services your-service
+   aws ecs describe-services \
+     --cluster your-cluster \
+     --services your-service
 
 # ALB target health
-aws elbv2 describe-target-health \
-  --target-group-arn your-target-group
+   aws elbv2 describe-target-health \
+     --target-group-arn your-target-group
 
 # Container insights
-aws cloudwatch get-metric-data \
-  --metric-data-queries file://container-metrics.json
-````
+   aws cloudwatch get-metric-data \
+     --metric-data-queries file://container-metrics.json
+   ```
 
 2. Verify Network Configuration
 
    ```bash
-
-   ```
-
 # Security group rules
-
-aws ec2 describe-security-groups \
---group-ids your-security-group
+   aws ec2 describe-security-groups \
+     --group-ids your-security-group
 
 # VPC flow logs
-
-aws ec2 describe-flow-logs \
---filter Name=resource-id,Values=your-vpc
+   aws ec2 describe-flow-logs \
+     --filter Name=resource-id,Values=your-vpc
 
 # Route tables
-
-aws ec2 describe-route-tables \
---filters Name=vpc-id,Values=your-vpc
-
-````
+   aws ec2 describe-route-tables \
+     --filters Name=vpc-id,Values=your-vpc
+   ```
 
 3. Test Connectivity
 
-```bash
+   ```bash
 # DNS resolution
-dig +short your-domain
+   dig +short your-domain
 
 # Load balancer health
-curl -I https://your-alb-dns
+   curl -I https://your-alb-dns
 
 # Internal services
-aws ssm send-command \
-  --document-name AWS-RunShellScript \
-  --targets Key=tag:Name,Values=your-instance \
-  --parameters commands=['curl -v internal-service:port']
-````
+   aws ssm send-command \
+     --document-name AWS-RunShellScript \
+     --targets Key=tag:Name,Values=your-instance \
+     --parameters commands=['curl -v internal-service:port']
+   ```
 
 ## Recovery Steps
 
@@ -301,103 +287,85 @@ aws ssm send-command \
 1. Rollback Deployment
 
    ```bash
-
-   ```
-
 # Stop current deployment
-
-aws deploy stop-deployment \
---deployment-id deployment-id
+   aws deploy stop-deployment \
+     --deployment-id deployment-id
 
 # Create rollback deployment
-
-aws deploy create-deployment \
---application-name your-app \
---deployment-group-name your-group \
---revision previousRevisionLocation
-
-````
+   aws deploy create-deployment \
+     --application-name your-app \
+     --deployment-group-name your-group \
+     --revision previousRevisionLocation
+   ```
 
 2. Scale Services
 
-```bash
+   ```bash
 # Adjust service count
-aws ecs update-service \
-  --cluster your-cluster \
-  --service your-service \
-  --desired-count 2
+   aws ecs update-service \
+     --cluster your-cluster \
+     --service your-service \
+     --desired-count 2
 
 # Update capacity provider
-aws ecs put-cluster-capacity-providers \
-  --cluster your-cluster \
-  --capacity-providers FARGATE FARGATE_SPOT
-````
+   aws ecs put-cluster-capacity-providers \
+     --cluster your-cluster \
+     --capacity-providers FARGATE FARGATE_SPOT
+   ```
 
 3. Reset Configuration
 
    ```bash
-
-   ```
-
 # Update task definition
-
-aws ecs register-task-definition \
---cli-input-json file://task-definition.json
+   aws ecs register-task-definition \
+     --cli-input-json file://task-definition.json
 
 # Update service
-
-aws ecs update-service \
---cluster your-cluster \
---service your-service \
---task-definition your-task:1
-
-````
+   aws ecs update-service \
+     --cluster your-cluster \
+     --service your-service \
+     --task-definition your-task:1
+   ```
 
 ### 2. Data Recovery
 
 1. Restore Backups
 
-```bash
+   ```bash
 # List available backups
-aws backup list-recovery-points-by-backup-vault \
-  --backup-vault-name your-vault
+   aws backup list-recovery-points-by-backup-vault \
+     --backup-vault-name your-vault
 
 # Start restore job
-aws backup start-restore-job \
-  --recovery-point-arn arn:aws:backup:region:account:recovery-point:ID
-````
+   aws backup start-restore-job \
+     --recovery-point-arn arn:aws:backup:region:account:recovery-point:ID
+   ```
 
 2. Verify Data
 
    ```bash
-
-   ```
-
 # Check database status
-
-aws rds describe-db-instances \
---db-instance-identifier your-db
+   aws rds describe-db-instances \
+     --db-instance-identifier your-db
 
 # Verify S3 objects
-
-aws s3 ls s3://your-bucket/path/ \
---recursive \
---human-readable
-
-````
+   aws s3 ls s3://your-bucket/path/ \
+     --recursive \
+     --human-readable
+   ```
 
 3. Validate Recovery
 
-```bash
+   ```bash
 # Run health checks
-curl https://your-app/health
+   curl https://your-app/health
 
 # Verify metrics
-aws cloudwatch get-metric-statistics \
-  --namespace AWS/RDS \
-  --metric-name ReadIOPS \
-  --dimensions Name=DBInstanceIdentifier,Value=your-db
-````
+   aws cloudwatch get-metric-statistics \
+     --namespace AWS/RDS \
+     --metric-name ReadIOPS \
+     --dimensions Name=DBInstanceIdentifier,Value=your-db
+   ```
 
 ## Support Escalation
 

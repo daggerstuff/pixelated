@@ -374,7 +374,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
             </thead>
             <tbody>
               {
-                data.weeklyTrend.map((day) => {
+                data.weeklyTrend.map((day, index) => {
                   const passRatePercent = (day.passRate * 100).toFixed(1)
                   let status = 'Good'
                   let statusColor = 'text-green-500'

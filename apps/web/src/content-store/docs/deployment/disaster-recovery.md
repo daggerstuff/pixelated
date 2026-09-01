@@ -32,14 +32,9 @@ types of failures and outages.
 3. **Initial Recovery Steps**
    - If the issue is with the latest deployment, initiate a rollback:
      ```bash
-
-     ```
-
 # Trigger rollback workflow in GitHub Actions
-
      gh workflow run rollback.yml -f environment=production
      ```
-
 - If DNS issue, check domain registrar DNS settings
 
 ### Database Issues
@@ -56,21 +51,14 @@ types of failures and outages.
    - If database corruption is suspected, restore from the latest backup:
 
      ```bash
-
-     ```
-
 # List available backups in MongoDB Atlas
-
 # Use Atlas CLI or web interface
 
 # Download the latest backup
-
 # mongorestore command for local restoration
-
      mongorestore --uri="mongodb+srv://username:password@cluster.mongodb.net/dbname" /path/to/backup
 
 # Or use Atlas automated backup restoration via web interface
-
      ```
 
 ### API Issues
@@ -110,28 +98,19 @@ If an immediate backup is needed:
 2. Or create a manual backup:
 
    ```bash
-
-   ```
-
 # Set environment variables
-
-export PGPASSWORD=[PASSWORD] export TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+   export PGPASSWORD=[PASSWORD]
+   export TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 # Create backup
-
-pg_dump -h [HOST] -U [USER] -d [DATABASE] -F p >
-supabase_backup_${TIMESTAMP}.sql
+   pg_dump -h [HOST] -U [USER] -d [DATABASE] -F p > supabase_backup_${TIMESTAMP}.sql
 
 # Compress
-
-gzip supabase_backup_${TIMESTAMP}.sql
+   gzip supabase_backup_${TIMESTAMP}.sql
 
 # Upload to S3
-
-aws s3 cp supabase_backup_${TIMESTAMP}.sql.gz
-s3://[BACKUP_BUCKET]/database-backups/ --profile gradiant
-
-````
+   aws s3 cp supabase_backup_${TIMESTAMP}.sql.gz s3://[BACKUP_BUCKET]/database-backups/ --profile gradiant
+   ```
 
 ### Restore Procedure
 
@@ -139,30 +118,22 @@ To restore a database from backup:
 
 1. Identify the backup to restore:
 
-```bash
-aws s3 ls s3://[BACKUP_BUCKET]/database-backups/ --profile gradiant
-````
+   ```bash
+   aws s3 ls s3://[BACKUP_BUCKET]/database-backups/ --profile gradiant
+   ```
 
 2. Download and restore:
 
    ```bash
-
-   ```
-
 # Download
-
-aws s3 cp s3://[BACKUP_BUCKET]/database-backups/[BACKUP_FILENAME] ./ --profile
-gradiant
+   aws s3 cp s3://[BACKUP_BUCKET]/database-backups/[BACKUP_FILENAME] ./ --profile gradiant
 
 # Decompress
-
-gunzip [BACKUP_FILENAME]
+   gunzip [BACKUP_FILENAME]
 
 # Restore
-
-PGPASSWORD=[PASSWORD] psql -h [HOST] -U [USER] -d [DATABASE] < [BACKUP_SQL_FILE]
-
-````
+   PGPASSWORD=[PASSWORD] psql -h [HOST] -U [USER] -d [DATABASE] < [BACKUP_SQL_FILE]
+   ```
 
 ## Deployment Rollback
 
@@ -184,10 +155,10 @@ If GitHub Actions is unavailable:
 1. Check out the repository locally
 2. View available deployment tags:
 
-```bash
-git fetch --tags
-git tag -l "production-*" --sort=-committerdate
-````
+   ```bash
+   git fetch --tags
+   git tag -l "production-*" --sort=-committerdate
+   ```
 
 3. Check out the last stable deployment:
 
@@ -198,22 +169,15 @@ git tag -l "production-*" --sort=-committerdate
 4. Build and deploy manually:
 
    ```bash
-
-   ```
-
 # Install dependencies
-
-pnpm install --no-frozen-lockfile
+   pnpm install --no-frozen-lockfile
 
 # Build
-
-NODE_ENV=production pnpm build
+   NODE_ENV=production pnpm build
 
 # Deploy using AWS CLI
-
-./scripts/deploy-aws.sh
-
-```
+   ./scripts/deploy-aws.sh
+   ```
 
 ## Incident Response Protocol
 
@@ -227,29 +191,29 @@ NODE_ENV=production pnpm build
 ### Response Procedures
 
 1. **Identification**
-- Determine severity level
-- Document initial findings
-- Notify appropriate team members
+   - Determine severity level
+   - Document initial findings
+   - Notify appropriate team members
 
 2. **Containment**
-- Implement immediate mitigation (e.g., rollback)
-- Isolate affected components
-- Prevent further damage
+   - Implement immediate mitigation (e.g., rollback)
+   - Isolate affected components
+   - Prevent further damage
 
 3. **Eradication**
-- Identify and fix the root cause
-- Deploy and test fixes
-- Verify security of all components
+   - Identify and fix the root cause
+   - Deploy and test fixes
+   - Verify security of all components
 
 4. **Recovery**
-- Restore service to normal operation
-- Verify data integrity
-- Monitor for any recurring issues
+   - Restore service to normal operation
+   - Verify data integrity
+   - Monitor for any recurring issues
 
 5. **Post-Incident**
-- Conduct thorough analysis
-- Document lessons learned
-- Implement preventative measures
+   - Conduct thorough analysis
+   - Document lessons learned
+   - Implement preventative measures
 
 ## Contact Information
 
@@ -282,7 +246,7 @@ In case primary access methods are unavailable:
 1. Contact the DevOps and Security leads
 2. Use emergency credentials stored in the company password manager
 3. All "break glass" access is logged, audited, and requires post-incident
-review
+   review
 
 ## Recovery Testing
 
@@ -335,4 +299,3 @@ For planned maintenance:
 4. Have rollback plan prepared
 5. Verify all systems after maintenance
 
-```

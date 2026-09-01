@@ -35,7 +35,11 @@ interface CachingLayer {
 }
 
 type CacheLayerType =
-  'memory' | 'localStorage' | 'indexedDB' | 'serviceWorker' | 'server'
+  | 'memory'
+  | 'localStorage'
+  | 'indexedDB'
+  | 'serviceWorker'
+  | 'server'
 ```
 
 ### 2. Cache Management Service

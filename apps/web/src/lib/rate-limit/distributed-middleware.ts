@@ -7,6 +7,7 @@ import type { APIRoute, APIContext } from 'astro'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getMergedConfig, defaultRuleSets, defaultBypassRules } from './config'
+import { createRateLimiter } from './rate-limiter'
 import type {
   RateLimitMiddlewareConfig,
   RateLimitContext,
@@ -16,7 +17,6 @@ import type {
   RateLimitBypassRule,
   BetterAuthRateLimitConfig,
 } from './distributed-types'
-import { createRateLimiter } from './rate-limiter'
 
 const logger = createBuildSafeLogger('rate-limit-middleware')
 

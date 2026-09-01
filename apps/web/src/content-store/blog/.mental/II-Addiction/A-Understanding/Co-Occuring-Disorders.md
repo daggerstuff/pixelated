@@ -2,9 +2,10 @@
 title: Co-Occurring Disorders
 description:
 ---
-
-'Comprehensive guide for mental health professionals and individuals in
-recovery' author: 'Resource Team' pubDate: 2024-02-28
+  'Comprehensive guide for mental health professionals and individuals in
+  recovery'
+author: 'Resource Team'
+pubDate: 2024-02-28
 ---
 
 Life can be incredibly challenging, especially when we're dealing with multiple

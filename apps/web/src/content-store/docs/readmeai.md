@@ -51,11 +51,9 @@ title: ReadmeAI (Truncated Version)
 - [Contributing](#features)
 - [License](#features)
 - [Acknowledgments](#features)
-
 ---
 
 ## Overview
-
 ---
 
 ## Features

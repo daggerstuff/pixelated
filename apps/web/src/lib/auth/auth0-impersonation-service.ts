@@ -3,14 +3,12 @@
  * Implements secure user impersonation with comprehensive audit logging
  */
 
-import { randomUUID } from 'node:crypto'
-
 import { ManagementClient } from 'auth0'
 
+import { auth0UserService } from '../services/auth0.service'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
-import { auth0UserService } from '../services/auth0.service'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 const logger = createBuildSafeLogger('auth0-impersonation-service')
@@ -189,7 +187,7 @@ export class Auth0ImpersonationService {
       }
 
       // Create impersonation session
-      const sessionId = `impersonation-${Date.now()}-${randomUUID()}`
+      const sessionId = `impersonation-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
       const session: ImpersonationSession = {
         id: sessionId,
         adminUserId: request.adminUserId,
@@ -220,7 +218,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${randomUUID()}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         eventType: 'START',
         adminUserId: request.adminUserId,
@@ -305,7 +303,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${randomUUID()}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         eventType: 'END',
         adminUserId: adminUserId,
@@ -438,7 +436,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${randomUUID()}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         eventType: 'EXTEND',
         adminUserId: adminUserId,

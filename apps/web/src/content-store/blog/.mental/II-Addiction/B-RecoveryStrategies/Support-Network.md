@@ -2,9 +2,10 @@
 title: Support Networks
 description:
 ---
-
-'Comprehensive guide for mental health professionals and individuals in
-recovery' author: 'Resource Team' pubDate: 2024-02-28
+  'Comprehensive guide for mental health professionals and individuals in
+  recovery'
+author: 'Resource Team'
+pubDate: 2024-02-28
 ---
 
 Hey there, friend. If you're reading this, you're likely on a journey that can

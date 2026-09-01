@@ -2,9 +2,10 @@
 title: Relapse Prevention Tips
 description:
 ---
-
-'Comprehensive guide for mental health professionals and individuals in
-recovery' author: 'Resource Team' pubDate: 2024-02-28
+  'Comprehensive guide for mental health professionals and individuals in
+  recovery'
+author: 'Resource Team'
+pubDate: 2024-02-28
 ---
 
 Hey there, recovery warrior! Let's talk about something that's on many of our

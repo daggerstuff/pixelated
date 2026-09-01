@@ -2,9 +2,9 @@
 title: 'Therapy Options'
 description:
 ---
-
-'Comprehensive guide to therapy options for CPTSD and addiction recovery'
-author: 'Resource Team' pubDate: 2024-02-28
+  'Comprehensive guide to therapy options for CPTSD and addiction recovery'
+author: 'Resource Team'
+pubDate: 2024-02-28
 ---
 
 # Therapy Options

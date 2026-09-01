@@ -10,11 +10,7 @@ import helmet from 'helmet'
 import Redis from 'ioredis'
 import { Pool } from 'pg'
 
-import {
-  closeSentry,
-  Sentry,
-  sentryMiddleware,
-} from '../../../config/instrument.mjs'
+import { closeSentry, Sentry, sentryMiddleware } from '../../../config/instrument.mjs'
 import healthRoutes from './api/routes/health.js'
 import { productionConfig } from './config/production.js'
 import {
@@ -28,9 +24,9 @@ import {
   hasSentryExpressErrorHandler,
   registerSentryExpressErrorHandler,
 } from './lib/sentry/express.js'
-import { SocketService } from './lib/services/socketService.js'
 import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
+import { SocketService } from './lib/services/socketService.js'
 
 const app = express()
 const sentryHandlers = getSentryExpressHandlers(Sentry)

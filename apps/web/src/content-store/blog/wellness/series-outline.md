@@ -1,13 +1,12 @@
 ---
 title: series outline
 description: >-
-  _This series aims to bring light and joy to mental wellness through
-  accessible,
+  _This series aims to bring light and joy to mental wellness through accessible,
 author: 'Wellness Team'
 pubDate: 2024-04-19
 draft: false
----
 
+---
 # 🌟 Everyday Joy Series
 
 ## Series Blueprint 📋

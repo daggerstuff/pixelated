@@ -12,8 +12,8 @@ tags:
   - treatment
 series: Neuroplasticity & Trauma
 seriesOrder: 1
----
 
+---
 # The Neuroscience Revolution in Trauma Treatment
 
 ## Introduction
@@ -275,8 +275,7 @@ biology and trauma healing._
 
 ## References
 
-Include detailed references to support the research findings and clinical
-applications discussed.
+Include detailed references to support the research findings and clinical applications discussed.
 
 ---
 

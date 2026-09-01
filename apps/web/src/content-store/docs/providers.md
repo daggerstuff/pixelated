@@ -1,7 +1,7 @@
 ---
 description: >-
-  Comprehensive guide to Pixelated Healths provider system for managing global
-  state and functionality' share: true lastModDate:
+  Comprehensive guide to Pixelated Healths provider system for managing global state and functionality' share: true
+  lastModDate:
 title: Provider System
 pubDate: '2026-05-09'
 ---

@@ -7,7 +7,7 @@ import {
   createMarketResearch,
   listMarketResearch,
   getMarketResearch,
-} from '../services/market-research-service'
+} from '../lib/services/market-research-service'
 
 const router: Router = express.Router()
 

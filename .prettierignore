@@ -42,6 +42,3 @@ prs.mdx
 # avoid whitespace affecting style
 Link.astro
 packages/sdk-typescript/src/runtime.ts
-
-# workflow files: can't be pushed via OAuth tokens without workflow scope
-.github/workflows/

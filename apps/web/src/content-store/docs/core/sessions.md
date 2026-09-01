@@ -10,10 +10,11 @@ title: Sessions
 
     messageCount: number
     responseTime: number
-
-} created_at: string updated_at: string }
-
-````
+  }
+  created_at: string
+  updated_at: string
+}
+```
 
 ## State Management
 
@@ -32,7 +33,7 @@ const SessionContext = createContext<{
   sendMessage: (content: string) => void
   updateStatus: (status: SessionStatus) => void
 }>()
-````
+```
 
 ### Message Queue
 

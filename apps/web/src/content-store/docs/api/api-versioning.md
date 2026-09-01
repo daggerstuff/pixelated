@@ -1,7 +1,6 @@
 ---
 title: API Versioning Policy
-description: How Pixelated Empathy versions its public API and manages backward
-  compatibility
+description: How Pixelated Empathy versions its public API and manages backward compatibility
 pubDate: 2026-07-23
 author: Platform Team
 tags: [api, versioning, policy]
@@ -11,9 +10,9 @@ toc: true
 
 ## Overview
 
-The Pixelated Empathy API uses **URL path-based versioning** (`/v1/`, `/v2/`) as
-the primary versioning scheme, supplemented by the `X-API-Version` response
-header on all API responses.
+The Pixelated Empathy API uses **URL path-based versioning** (`/v1/`, `/v2/`) as the
+primary versioning scheme, supplemented by the `X-API-Version` response header on
+all API responses.
 
 ## Version Identification
 
@@ -29,8 +28,8 @@ GET  /api/v1/admin/cache-stats
 
 ### Response Header
 
-All `/api/*` responses include the `X-API-Version` header indicating which
-version served the request:
+All `/api/*` responses include the `X-API-Version` header indicating which version
+served the request:
 
 ```
 X-API-Version: 1
@@ -47,29 +46,25 @@ Accept-Version: 1
 
 ## Version Lifecycle
 
-| Status       | Meaning                                                        |
-| ------------ | -------------------------------------------------------------- |
-| `active`     | Current version. Fully supported, receives new features.       |
-| `deprecated` | Still functional but no new features. Sunset date announced.   |
-| `sunset`     | No longer available. Returns 410 Gone with migration guidance. |
-| `retired`    | Removed from the codebase. No response served.                 |
+| Status       | Meaning                                                          |
+| ------------ | ---------------------------------------------------------------- |
+| `active`     | Current version. Fully supported, receives new features.        |
+| `deprecated` | Still functional but no new features. Sunset date announced.     |
+| `sunset`     | No longer available. Returns 410 Gone with migration guidance.  |
+| `retired`    | Removed from the codebase. No response served.                   |
 
 ## Deprecation Process
 
 When a new major version is released:
 
-1. **Announcement**: The previous version is marked `deprecated` with a
-   `Deprecation` response header (IETF draft format) and a `Sunset` header
-   indicating the removal date.
-2. **Notice Period**: Minimum **6 months** between deprecation announcement and
-   removal.
-3. **Migration Guide**: A migration guide is published at
-   `/docs/api/migration/v{N}-to-v{N+1}`.
-4. **Monitoring**: Usage of deprecated endpoints is tracked. If significant
-   traffic remains 30 days before sunset, the sunset date is extended by 3
-   months.
-5. **Sunset**: After the sunset date, the endpoint returns `410 Gone` with a
-   JSON body containing the migration guide URL and replacement version.
+1. **Announcement**: The previous version is marked `deprecated` with a `Deprecation`
+   response header (IETF draft format) and a `Sunset` header indicating the removal date.
+2. **Notice Period**: Minimum **6 months** between deprecation announcement and removal.
+3. **Migration Guide**: A migration guide is published at `/docs/api/migration/v{N}-to-v{N+1}`.
+4. **Monitoring**: Usage of deprecated endpoints is tracked. If significant traffic
+   remains 30 days before sunset, the sunset date is extended by 3 months.
+5. **Sunset**: After the sunset date, the endpoint returns `410 Gone` with a JSON body
+   containing the migration guide URL and replacement version.
 
 ### Deprecation Headers
 
@@ -101,11 +96,11 @@ X-API-Replacement-Version: 2
 
 ## Three Backend Surfaces
 
-| Surface         | Technology | Versioning Applied                       |
-| --------------- | ---------- | ---------------------------------------- |
-| Primary API     | Astro/TS   | URL path + `X-API-Version` header        |
-| Backend service | FastAPI    | `X-API-Version` header via middleware    |
-| AI services     | Flask      | `X-API-Version` header via after_request |
+| Surface          | Technology | Versioning Applied                      |
+| ---------------- | ---------- | --------------------------------------- |
+| Primary API      | Astro/TS   | URL path + `X-API-Version` header       |
+| Backend service  | FastAPI    | `X-API-Version` header via middleware   |
+| AI services      | Flask      | `X-API-Version` header via after_request |
 
 All three surfaces report the same `X-API-Version` value.
 
@@ -115,8 +110,7 @@ All three surfaces report the same `X-API-Version` value.
 
 ## Versioning in OpenAPI Specs
 
-All OpenAPI 3.1 specifications include the `X-API-Version` in the `info`
-section:
+All OpenAPI 3.1 specifications include the `X-API-Version` in the `info` section:
 
 ```yaml
 info:

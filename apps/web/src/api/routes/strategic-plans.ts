@@ -11,7 +11,7 @@ import {
   deleteStrategicPlan,
   alignProjectToPlan,
   updatePlanStatus,
-} from '../services/strategic-plan-service'
+} from '../lib/services/strategic-plan-service'
 
 interface StrategicPlanBody {
   title?: string

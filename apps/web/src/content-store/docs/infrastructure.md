@@ -1,8 +1,8 @@
 ---
 title: Core Infrastructure
 description: >-
-  Documentation of Pixelated Healths core infrastructure components, security,
-  and configuration' share: true lastModDate: 2025-0
+  Documentation of Pixelated Healths core infrastructure components, security, and configuration' share: true
+  lastModDate: 2025-0
 pubDate: '2026-05-09'
 ---
 

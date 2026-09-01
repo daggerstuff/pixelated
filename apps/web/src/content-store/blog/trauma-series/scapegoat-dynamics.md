@@ -1,8 +1,7 @@
 ---
 title: scapegoat dynamics
 description: >-
-  In family systems affected by dysfunction, certain roles often emerge as
-  coping
+  In family systems affected by dysfunction, certain roles often emerge as coping
 author: 'Dr. James Wilson'
 pubDate: 2024-02-20
 tags:

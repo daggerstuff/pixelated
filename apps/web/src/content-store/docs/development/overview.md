@@ -116,9 +116,8 @@ for code formatting.
   </Accordion>
 
   <Accordion title="Issue: Encountering an unknown error">
-
+  
     Solution: Go to the root of your device and delete the \~/.mintlify folder. Afterwards, run `mintlify dev` again.
-
   </Accordion>
 </AccordionGroup>
 

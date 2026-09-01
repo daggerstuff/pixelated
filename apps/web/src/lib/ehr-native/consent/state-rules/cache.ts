@@ -13,8 +13,8 @@
 
 import { getFromCache, removeFromCache, setInCache } from '@/lib/redis'
 
-import { stateConsentRulesRepository } from './repository'
 import type { StateConsentRuleRecord, StateRuleConfig } from './schemas'
+import { stateConsentRulesRepository } from './repository'
 
 // ---------------------------------------------------------------------------
 // Cache configuration

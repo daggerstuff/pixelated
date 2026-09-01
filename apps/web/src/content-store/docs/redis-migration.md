@@ -32,28 +32,27 @@ maintaining system stability.
 2. Configure Environment Variables
 
    ```bash
-
-   ```
-
 # .env
-
-REDIS_URL=redis://localhost:6379 REDIS_KEY_PREFIX="gradiant:"
-REDIS_MAX_RETRIES=3 REDIS_RETRY_DELAY=1000 REDIS_CONNECT_TIMEOUT=5000
-REDIS_MAX_CONNECTIONS=10 REDIS_MIN_CONNECTIONS=2
-REDIS_HEALTH_CHECK_INTERVAL=30000
-
-````
+   REDIS_URL=redis://localhost:6379
+   REDIS_KEY_PREFIX="gradiant:"
+   REDIS_MAX_RETRIES=3
+   REDIS_RETRY_DELAY=1000
+   REDIS_CONNECT_TIMEOUT=5000
+   REDIS_MAX_CONNECTIONS=10
+   REDIS_MIN_CONNECTIONS=2
+   REDIS_HEALTH_CHECK_INTERVAL=30000
+   ```
 
 3. Initialize the Redis Service
 
-```typescript
-const redis = new RedisService({
-  url: process.env.REDIS_URL,
-  keyPrefix: process.env.REDIS_KEY_PREFIX,
-})
+   ```typescript
+   const redis = new RedisService({
+     url: process.env.REDIS_URL,
+     keyPrefix: process.env.REDIS_KEY_PREFIX,
+   })
 
-await redis.connect()
-````
+   await redis.connect()
+   ```
 
 ## Service-Specific Migration Guides
 

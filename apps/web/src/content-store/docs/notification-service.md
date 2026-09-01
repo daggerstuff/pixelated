@@ -1,16 +1,15 @@
 ---
 title: Notification Service
 description: >-
-  Documentation for Pixelated Healths notification system and real-time alerts'
-  share: true lastModDate: 2025-03-27 tags: ['notif
+  Documentation for Pixelated Healths notification system and real-time alerts' share: true lastModDate: 2025-03-27
+  tags: ['notif
 pubDate: '2026-05-09'
 ---
 
     time: '2:00 PM',
-
-}, })
-
-````
+  },
+})
+```
 
 ### Handling WebSocket Connections
 
@@ -25,7 +24,7 @@ ws.send(
     token: 'user-auth-token',
   }),
 )
-````
+```
 
 ### Marking Notifications as Read
 

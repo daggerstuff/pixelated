@@ -6,8 +6,8 @@
 import type { AstroCookies } from 'astro'
 
 import { authConfig } from '../../config/auth.config'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getUserById as getAuth0UserById } from '../services/auth0.service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
 const logger = createBuildSafeLogger('index')

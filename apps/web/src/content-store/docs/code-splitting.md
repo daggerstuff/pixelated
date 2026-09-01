@@ -99,21 +99,20 @@ and dynamic imports:
 <script>
   // Client-side dynamic import
   document.addEventListener('DOMContentLoaded', async () => {
-    const container = document.getElementById('component-container')
-    const placeholder = document.getElementById('loading-placeholder')
+    const container = document.getElementById('component-container');
+    const placeholder = document.getElementById('loading-placeholder');
 
     try {
-      const { default: HeavyComponent } =
-        await import('../components/HeavyComponent')
+      const { default: HeavyComponent } = await import('../components/HeavyComponent');
 
       // Replace placeholder with component
-      if (placeholder) placeholder.style.display = 'none'
+      if (placeholder) placeholder.style.display = 'none';
       // Render with client hydration framework (React in this example)
       // Implementation depends on the component framework
     } catch (error) {
-      console.error('Failed to load component:', error)
+      console.error('Failed to load component:', error);
     }
-  })
+  });
 </script>
 ```
 
@@ -176,7 +175,7 @@ import { vi } from 'vitest'
 // Mock the lazy-loaded component
 vi.mock('./HeavyComponent', () => ({
   default: () => (
-    <div data-testid="heavy-component">Heavy Component Content</div>
+    <div data-testid='heavy-component'>Heavy Component Content</div>
   ),
 }))
 
@@ -184,7 +183,7 @@ const HeavyComponent = lazy(() => import('./HeavyComponent'))
 
 test('renders lazy component with loading state', async () => {
   render(
-    <Suspense fallback={<div data-testid="loading">Loading...</div>}>
+    <Suspense fallback={<div data-testid='loading'>Loading...</div>}>
       <HeavyComponent />
     </Suspense>,
   )
@@ -249,10 +248,9 @@ client:only:
 
 <script>
   document.addEventListener('DOMContentLoaded', async () => {
-    const { default: MentalHealthChatDemoReact } =
-      await import('./MentalHealthChatDemoReact')
+    const { default: MentalHealthChatDemoReact } = await import('./MentalHealthChatDemoReact');
     // Render component and hide placeholder
-  })
+  });
 </script>
 ```
 

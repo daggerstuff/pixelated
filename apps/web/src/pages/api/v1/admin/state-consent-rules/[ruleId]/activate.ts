@@ -1,11 +1,11 @@
-import { verifyAdmin } from '@/lib/admin/middleware'
 import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
-import { stateConsentRulesCache } from '@/lib/ehr-native/consent/state-rules/cache'
+import { verifyAdmin } from '@/lib/admin/middleware'
 import {
   stateConsentRulesRepository,
   mapAdminRoleToEhrRole,
   type ActorContext,
 } from '@/lib/ehr-native/consent/state-rules/repository'
+import { stateConsentRulesCache } from '@/lib/ehr-native/consent/state-rules/cache'
 
 export const prerender = false
 

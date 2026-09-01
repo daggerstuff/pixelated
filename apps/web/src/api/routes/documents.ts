@@ -10,7 +10,7 @@ import {
   NotFoundError,
   ValidationError,
 } from '../middleware/error-handler'
-import * as documentService from '../services/document-service'
+import * as documentService from '../lib/services/document-service'
 
 // Temporary placeholder middleware - auth handled at Astro layer
 const requirePermission =

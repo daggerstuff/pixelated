@@ -1,8 +1,7 @@
 ---
 title: trauma bonds
 description: >-
-  Why don't they just leave?" It's a question often asked about people in
-  abusive
+  Why don't they just leave?" It's a question often asked about people in abusive
 author: 'Dr. Sarah Chen'
 pubDate: 2024-03-19
 tags:

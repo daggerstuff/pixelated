@@ -12,8 +12,8 @@ tags:
   - healing
 series: Neuroplasticity & Trauma
 seriesOrder: 2
----
 
+---
 # Quantum Biology & Trauma: A New Frontier
 
 ## Introduction
@@ -354,8 +354,7 @@ in trauma healing._
 
 ## References
 
-Include detailed references to support the research findings and clinical
-applications discussed.
+Include detailed references to support the research findings and clinical applications discussed.
 
 ---
 

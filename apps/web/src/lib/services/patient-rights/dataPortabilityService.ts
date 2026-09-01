@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 
+import { dataExportDAO } from '../mongodb.dao'
 import { createAuditLog, AuditEventType } from '../../audit'
 import { userManager } from '../../db'
 import { aiRepository } from '../../db/ai'
 import mongoClient from '../../db/mongoClient'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { dataExportDAO } from '../mongodb.dao'
 
 const logger = createBuildSafeLogger('data-portability-service')
 

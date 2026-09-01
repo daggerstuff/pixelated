@@ -1,8 +1,7 @@
 ---
 title: healing inner child
 description: >-
-  Within each of us lives the child we once were—carrying all the joy, wonder,
-  and
+  Within each of us lives the child we once were—carrying all the joy, wonder, and
 author: 'Dr. Sarah Chen'
 pubDate: 2024-03-05
 tags:

@@ -8,7 +8,7 @@ import {
   createMarketResearch,
   searchMarketResearch,
   shareMarketResearch,
-} from '../services/market-research-service'
+} from '../lib/services/market-research-service'
 
 const router: Router = express.Router()
 

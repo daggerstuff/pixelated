@@ -2,4 +2,3 @@ node_modules
 .github
 .agent
 metoro-exporter/
-apps/web/src/content-store/blog/.mental/

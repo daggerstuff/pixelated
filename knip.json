@@ -76,11 +76,10 @@
     "apps/web/src/lib/services/patient-rights/dataPortabilityService.ts",
     "apps/web/src/scripts/**",
     "apps/web/src/utils/serviceWorkerRegistration.ts",
-    "apps/web/src/lib/ehr-native/consent/state-rules/cache.ts",
-    "apps/web/src/lib/ehr-native/consent/state-rules/repository.ts",
-    "apps/web/src/lib/security/threat-detection/integrations/api-middleware.ts",
     "infra/docker/**",
     "infra/k8s/**",
-    "scripts/**"
+    "scripts/**",
+    "apps/web/src/lib/utils/image-optimizer.ts",
+    "apps/web/src/lib/utils/image-optimizer.test.ts"
   ]
 }
