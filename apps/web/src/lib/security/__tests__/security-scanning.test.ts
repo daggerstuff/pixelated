@@ -40,7 +40,7 @@ describe('Security Scanning Configuration', () => {
     })
 
     it('should have security library with core functions', () => {
-      const securityLibPath = path.join(process.cwd(), 'src/lib/security')
+      const securityLibPath = path.join(process.cwd(), 'apps/web/src/lib/security')
 
       expect(fs.existsSync(securityLibPath)).toBe(true)
 
