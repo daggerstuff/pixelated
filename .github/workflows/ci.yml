@@ -72,6 +72,9 @@ jobs:
       - name: Check for unresolved imports
         run: pnpm lint:ci:imports
 
+      - name: Guard root README
+        run: pnpm lint:root-readme
+
       - name: Lint code
         run: pnpm lint:ci
 

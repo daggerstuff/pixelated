@@ -9,5 +9,6 @@
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
   ],
+  "README.md": ["node scripts/ci/check-root-readme.mjs"],
   "*.py": ["ruff check --fix --exit-zero", "ruff format"]
 }

@@ -42,6 +42,7 @@
     "prelint:ci:type-aware:all": "bash scripts/ci/prelint-node.sh",
     "lint": "oxlint -c .oxlintrc.json . && pnpm lint:no-suppressions",
     "lint:full": "oxlint --type-aware -c .oxlintrc.json .",
+    "lint:root-readme": "node scripts/ci/check-root-readme.mjs",
     "lint:markdown": "node scripts/ci/lint-markdown-targets.mjs",
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
     "lint:shellcheck": "shellcheck --severity=warning scripts/backup/*.sh scripts/deploy/install-backup-home-vivi-service.sh",

@@ -151,3 +151,13 @@ if [ -s "$MARKDOWNLINT_VIOLATIONS" ]; then
 fi
 
 rm -f "$MD_FILES" "$MARKDOWNLINT_VIOLATIONS"
+
+# E. Block accidental GWS CLI README overwrite
+if git diff --cached --name-only --diff-filter=ACM -- 'README.md' | grep -qx 'README.md'; then
+  if [ -f scripts/ci/check-root-readme.mjs ]; then
+    echo "🛡️ Checking root README guard..."
+    node scripts/ci/check-root-readme.mjs
+  else
+    echo -e "${YELLOW}⚠️  [Hook] Root README guard script not found; skipping.${NC}"
+  fi
+fi
