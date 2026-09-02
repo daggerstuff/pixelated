@@ -243,7 +243,7 @@ networkx==3.6.1
     # via
     #   scikit-image
     #   torch
-nltk==3.10.0
+nltk==3.10.3
     # via
     #   bias-detection-service (pyproject.toml)
     #   textblob
