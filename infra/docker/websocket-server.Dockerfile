@@ -27,4 +27,4 @@ HEALTHCHECK --interval=15s --timeout=5s --retries=3 --start-period=20s \
 
 EXPOSE 3001
 
-CMD ["npx", "tsx", "src/server.ts"]
+CMD ["npx", "tsx", "apps/web/src/server.ts"]

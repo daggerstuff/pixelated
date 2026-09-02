@@ -3,8 +3,8 @@ import { test, expect, describe, beforeEach } from 'vitest'
 import {
   CrisisDetector,
   crisisDetector,
-} from '../../../src/lib/memory/gates/crisis-detector'
-import type { CrisisTier } from '../../../src/lib/memory/gates/crisis-detector'
+} from '../../../apps/web/src/lib/memory/gates/crisis-detector'
+import type { CrisisTier } from '../../../apps/web/src/lib/memory/gates/crisis-detector'
 
 describe('CrisisDetector', () => {
   let detector: CrisisDetector

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import * as auth0JwtService from '../../../src/lib/auth/auth0-jwt-service'
+import * as auth0JwtService from '../../../apps/web/src/lib/auth/auth0-jwt-service'
 
 const mockRedis = vi.hoisted(() => ({
   getFromCache: vi.fn(),
@@ -40,12 +40,12 @@ vi.mock('auth0', () => {
 })
 
 // Mock redis functions
-vi.mock('../../../src/lib/redis', () => {
+vi.mock('../../../apps/web/src/lib/redis', () => {
   return mockRedis
 })
 
 // Mock security logging
-vi.mock('../../../src/lib/security/index', () => {
+vi.mock('../../../apps/web/src/lib/security/index', () => {
   return {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
@@ -58,7 +58,7 @@ vi.mock('../../../src/lib/security/index', () => {
 })
 
 // Mock MCP integration
-vi.mock('../../../src/lib/mcp/phase6-integration', () => {
+vi.mock('../../../apps/web/src/lib/mcp/phase6-integration', () => {
   return {
     updatePhase6AuthenticationProgress: vi.fn(),
   }

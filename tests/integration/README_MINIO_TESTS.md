@@ -36,7 +36,7 @@ Start MinIO using the existing docker-compose configuration:
 docker-compose -f docker-compose.milvus.yml up -d minio
 
 # Or use the multimodal service docker-compose
-docker-compose -f src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml up -d minio
+docker-compose -f apps/web/src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml up -d minio
 
 # Wait for MinIO to be ready (health check)
 sleep 5
@@ -162,9 +162,9 @@ If tests timeout:
 
 ## Related Files
 
-- `src/lib/ai/training/requirements.txt` - MinIO version specification
+- `apps/web/src/lib/ai/training/requirements.txt` - MinIO version specification
 - `docker-compose.milvus.yml` - MinIO service configuration
-- `src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml` -
+- `apps/web/src/lib/ai/multimodal-bias-detection/python-service/docker-compose.yml` -
   Alternative MinIO config
 
 ## Notes

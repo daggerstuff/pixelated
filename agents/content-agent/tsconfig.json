@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "@/lib/*": ["../../src/lib/*"]
+      "@/lib/*": ["../../apps/web/src/lib/*"]
     }
   },
   "include": ["agent/**/*.ts", "evals/**/*.ts", ".eve/**/*.d.ts"]

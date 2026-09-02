@@ -48,7 +48,7 @@ COPY config/package/.npmrc ./.npmrc
 # Copy workspace member package.jsons so pnpm can resolve the workspace
 COPY packages/pixelated-sdk/package.json ./packages/pixelated-sdk/package.json
 COPY packages/memory-schema/package.json ./packages/memory-schema/package.json
-COPY business-strategy-cms/package.json ./business-strategy-cms/package.json
+COPY apps/business-strategy-cms/package.json ./apps/business-strategy-cms/package.json
 
 # Install all dependencies (dev + prod) required for build
 # Retry with --no-frozen-lockfile if --frozen-lockfile fails (lockfile drift in CI)
@@ -88,9 +88,11 @@ RUN apt-get update && apt-get upgrade -y --no-install-recommends && apt-get inst
 # Copy all dependencies from builder (includes workspace packages)
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy built output and public assets from builder
+# Copy built output and public assets from builder.
+# Astro config uses publicDir './apps/web/public' (repo restructure 2026-08-26),
+# so public assets live at /app/apps/web/public in the builder stage.
 COPY --from=builder --chown=node:node /app/dist ./dist
-COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/apps/web/public ./public
 COPY --from=builder --chown=node:node /app/templates ./templates
 COPY --from=builder --chown=node:node /app/start-server.mjs ./start-server.mjs
 COPY --from=builder --chown=node:node /app/start-server-config.mjs ./start-server-config.mjs

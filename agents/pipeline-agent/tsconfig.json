@@ -10,7 +10,7 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/lib/*": ["../../src/lib/*"],
+      "@/lib/*": ["../../apps/web/src/lib/*"],
       "eve": ["../../.eve/types/eve-modules.d.ts"],
       "eve/*": ["../../.eve/types/eve-modules.d.ts"]
     }
