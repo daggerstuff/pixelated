@@ -13,7 +13,7 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { useMultimodalPixel } from '../../src/hooks/useMultimodalPixel'
+import { useMultimodalPixel } from '../../apps/web/src/hooks/useMultimodalPixel'
 const createMockResponse = (
   body: unknown,
   init: ResponseInit = {},

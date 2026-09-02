@@ -21,4 +21,4 @@ RUN pnpm install --frozen-lockfile --ignore-scripts 2>/dev/null || \
 COPY apps/web/src/ ./src/
 COPY config/ ./config/
 
-CMD ["npx", "tsx", "src/lib/jobs/worker.ts"]
+CMD ["npx", "tsx", "apps/web/src/lib/jobs/worker.ts"]

@@ -26,4 +26,4 @@ HEALTHCHECK --interval=15s --timeout=5s --retries=3 --start-period=20s \
 
 EXPOSE 8002
 
-CMD ["npx", "tsx", "src/lib/ai/services/server.ts"]
+CMD ["npx", "tsx", "apps/web/src/lib/ai/services/server.ts"]

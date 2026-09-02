@@ -75,34 +75,34 @@ function getChunkName(id) {
 
   const normalizedId = id.replace(/\\/g, "/");
 
-  if (normalizedId.includes("/src/components/three/MultidimensionalEmotionChart")) {
+  if (normalizedId.includes("/apps/web/src/components/three/MultidimensionalEmotionChart")) {
     return "feature-three-emotion";
   }
-  if (normalizedId.includes("/src/components/three/Particle")) {
+  if (normalizedId.includes("/apps/web/src/components/three/Particle")) {
     return "feature-three-particle";
   }
-  if (normalizedId.includes("/src/components/analytics/EnhancedChartComponent")) {
+  if (normalizedId.includes("/apps/web/src/components/analytics/EnhancedChartComponent")) {
     return "feature-enhanced-chart";
   }
-  if (normalizedId.includes("/src/components/ui/SwiperCarousel")) {
+  if (normalizedId.includes("/apps/web/src/components/ui/SwiperCarousel")) {
     return "feature-swiper";
   }
   if (
-    normalizedId.includes("/src/components/treatment/TreatmentPlanManager") ||
-    normalizedId.includes("/src/components/therapy/TreatmentPlanManager")
+    normalizedId.includes("/apps/web/src/components/treatment/TreatmentPlanManager") ||
+    normalizedId.includes("/apps/web/src/components/therapy/TreatmentPlanManager")
   ) {
     return "feature-treatment-plan";
   }
-  if (normalizedId.includes("/src/components/security/FHEDemo")) {
+  if (normalizedId.includes("/apps/web/src/components/security/FHEDemo")) {
     return "feature-fhe";
   }
-  if (normalizedId.includes("/src/components/demo/FHEDemo")) {
+  if (normalizedId.includes("/apps/web/src/components/demo/FHEDemo")) {
     return "feature-fhe-demo";
   }
-  if (normalizedId.includes("/src/components/chat/TherapyChatSystem")) {
+  if (normalizedId.includes("/apps/web/src/components/chat/TherapyChatSystem")) {
     return "feature-therapy-chat";
   }
-  if (normalizedId.includes("/src/components/session/EmotionTemporalAnalysisChart")) {
+  if (normalizedId.includes("/apps/web/src/components/session/EmotionTemporalAnalysisChart")) {
     return "feature-emotion-temporal";
   }
 
@@ -296,14 +296,14 @@ export default defineConfig({
     ].filter(Boolean),
     resolve: {
       alias: {
-        "~": path.resolve("./src"),
-        "@": path.resolve("./src"),
-        "@components": path.resolve("./src/components"),
-        "@layouts": path.resolve("./src/layouts"),
-        "@utils": path.resolve("./src/utils"),
-        "@lib": path.resolve("./src/lib"),
-        "astro-icon/components": path.resolve("./src/components/ui/astro-icon-components.ts"),
-        "src/": path.resolve("./src"),
+        "~": path.resolve("./apps/web/src"),
+        "@": path.resolve("./apps/web/src"),
+        "@components": path.resolve("./apps/web/src/components"),
+        "@layouts": path.resolve("./apps/web/src/layouts"),
+        "@utils": path.resolve("./apps/web/src/utils"),
+        "@lib": path.resolve("./apps/web/src/lib"),
+        "astro-icon/components": path.resolve("./apps/web/src/components/ui/astro-icon-components.ts"),
+        "src/": path.resolve("./apps/web/src"),
       },
       extensions: [".astro", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".json"],
       preserveSymlinks: false,

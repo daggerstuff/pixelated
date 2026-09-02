@@ -17,4 +17,4 @@
  * the upstream module is also available locally without re-editing this
  * stub.
  */
-export * from '../../../src/lib/context/startup-profiler.js'
+export * from '../../../apps/web/src/lib/context/startup-profiler.js'

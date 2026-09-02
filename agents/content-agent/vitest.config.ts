@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   resolve: {
     alias: {
-      '@/lib': path.resolve(__dirname, '../../src/lib'),
+      '@/lib': path.resolve(__dirname, '../../apps/web/src/lib'),
     },
   },
   test: {

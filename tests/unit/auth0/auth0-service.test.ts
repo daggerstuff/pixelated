@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { Auth0UserService } from '../../../src/services/auth0.service'
+import { Auth0UserService } from '../../../apps/web/src/lib/services/auth0.service'
 
 type MockAuthMethod = ReturnType<typeof vi.fn<(...args: unknown[]) => unknown>>
 

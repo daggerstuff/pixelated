@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 
-import { ContextualEnhancer } from '../../src/lib/ai/services/contextual-enhancer'
-import { RealTimeAnalyzer } from '../../src/lib/ai/services/real-time-analyzer'
-import { EmotionState } from '../../src/lib/ai/types/emotional'
-import { PatientPsiProfile } from '../../src/lib/ai/types/patient-psi'
+import { ContextualEnhancer } from '../../apps/web/src/lib/ai/services/contextual-enhancer'
+import { RealTimeAnalyzer } from '../../apps/web/src/lib/ai/services/real-time-analyzer'
+import { EmotionState } from '../../apps/web/src/lib/ai/types/emotional'
+import { PatientPsiProfile } from '../../apps/web/src/lib/ai/types/patient-psi'
 
 describe('Patient-Psi Crisis Integration Tests', () => {
   let contextualEnhancer: ContextualEnhancer

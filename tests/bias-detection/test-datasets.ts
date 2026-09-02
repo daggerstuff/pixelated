@@ -7,7 +7,7 @@ import type {
   ParticipantDemographics,
   TrainingScenario,
   SessionContent,
-} from '../../src/lib/ai/bias-detection/types'
+} from '../../apps/web/src/lib/ai/bias-detection/types'
 
 export type {
   TherapeuticSession,

@@ -88,7 +88,7 @@ RCLONE_FILTER_ARGS=(
   # Log noise
   "--exclude=**/*.log"
   # Specific oversized file known to cause issues
-  "--exclude=pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
+  "--exclude=pixelated/apps/web/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
   # Git objects (large, reconstructable from remote)
   "--exclude=**/.git/objects/**"
 )

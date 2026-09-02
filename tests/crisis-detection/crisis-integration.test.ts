@@ -14,9 +14,9 @@ import process from 'node:process'
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { CrisisProtocol } from '../../src/lib/ai/crisis/CrisisProtocol'
-import { PixelCrisisDetector } from '../../src/lib/ai/crisis/PixelCrisisDetector'
-import type { CrisisProtocolConfig } from '../../src/lib/ai/crisis/types'
+import { CrisisProtocol } from '../../apps/web/src/lib/ai/crisis/CrisisProtocol'
+import { PixelCrisisDetector } from '../../apps/web/src/lib/ai/crisis/PixelCrisisDetector'
+import type { CrisisProtocolConfig } from '../../apps/web/src/lib/ai/crisis/types'
 import {
   ALL_CRISIS_TEST_CASES,
   SUICIDAL_IDEATION_TESTS,

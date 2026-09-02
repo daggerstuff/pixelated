@@ -3,7 +3,7 @@ import { test, expect, describe, beforeEach } from 'vitest'
 import {
   PiiRedactor,
   piiRedactor,
-} from '../../../src/lib/memory/gates/pii-redactor'
+} from '../../../apps/web/src/lib/memory/gates/pii-redactor'
 
 describe('PiiRedactor', () => {
   let redactor: PiiRedactor

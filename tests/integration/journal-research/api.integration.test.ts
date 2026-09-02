@@ -9,7 +9,7 @@ import {
   deleteSession,
   type CreateSessionPayload,
   type UpdateSessionPayload,
-} from '../../../src/lib/api/journal-research'
+} from '../../../apps/web/src/lib/api/journal-research'
 
 /**
  * Integration tests for Journal Research API

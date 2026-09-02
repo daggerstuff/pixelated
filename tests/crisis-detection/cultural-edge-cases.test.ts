@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { CrisisDetectionService } from '../../src/lib/ai/services/crisis-detection'
+import { CrisisDetectionService } from '../../apps/web/src/lib/ai/services/crisis-detection'
 
 // Minimal AI service stub; performAIAnalysis will fallback to null
 const aiStub: any = {}

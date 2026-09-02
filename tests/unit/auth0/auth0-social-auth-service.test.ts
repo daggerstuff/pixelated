@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { Auth0SocialAuthService } from '../../../src/lib/auth/auth0-social-auth-service'
-import * as securityModule from '../../../src/lib/security/index'
+import { Auth0SocialAuthService } from '../../../apps/web/src/lib/auth/auth0-social-auth-service'
+import * as securityModule from '../../../apps/web/src/lib/security/index'
 
 const TEST_AUTH0_DOMAIN = 'test-domain.auth0.com'
 const TEST_AUTH0_CLIENT_ID = 'test-client-id'
@@ -89,7 +89,7 @@ vi.mock('auth0', () => {
 })
 
 // Mock security logging
-vi.mock('../../../src/lib/security/index', () => {
+vi.mock('../../../apps/web/src/lib/security/index', () => {
   return {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
@@ -101,7 +101,7 @@ vi.mock('../../../src/lib/security/index', () => {
 })
 
 // Mock MCP integration
-vi.mock('../../../src/lib/mcp/phase6-integration', () => {
+vi.mock('../../../apps/web/src/lib/mcp/phase6-integration', () => {
   return {
     updatePhase6AuthenticationProgress: vi.fn(),
   }

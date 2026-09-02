@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import * as auth0RbacService from '../../../src/lib/auth/auth0-rbac-service'
+import * as auth0RbacService from '../../../apps/web/src/lib/auth/auth0-rbac-service'
 
 // Mock the auth0 module
 const mockManagementClient = vi.hoisted(() => ({
@@ -25,7 +25,7 @@ vi.mock('auth0', () => {
 const getMockManagementClient = () => mockManagementClient
 
 // Mock security logging
-vi.mock('../../../src/lib/security/index', () => {
+vi.mock('../../../apps/web/src/lib/security/index', () => {
   return {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
@@ -36,7 +36,7 @@ vi.mock('../../../src/lib/security/index', () => {
 })
 
 // Mock MCP integration
-vi.mock('../../../src/lib/mcp/phase6-integration', () => {
+vi.mock('../../../apps/web/src/lib/mcp/phase6-integration', () => {
   return {
     updatePhase6AuthenticationProgress: vi.fn(),
   }
