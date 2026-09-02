@@ -22,7 +22,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('evidence-assistant')
 const evidenceIndex = new EvidenceSearchIndex()
-const CONTENT_ROOT = path.resolve(process.cwd(), 'src/content-store')
+const CONTENT_ROOT = path.resolve(process.cwd(), 'apps/web/src/content-store')
 const PROVIDER_TYPES = ['anthropic', 'openai', 'azure-openai', 'llm', 'huggingface', 'local'] as const
 
 let isIndexed = false
