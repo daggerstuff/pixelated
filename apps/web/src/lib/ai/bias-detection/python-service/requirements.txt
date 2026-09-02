@@ -85,7 +85,7 @@ confection==1.3.3
     #   weasel
 contourpy==1.3.3
     # via matplotlib
-cryptography==50.0.0
+cryptography==50.0.1
     # via bias-detection-service (pyproject.toml)
 cuda-bindings==13.2.0
     # via torch
@@ -243,7 +243,7 @@ networkx==3.6.1
     # via
     #   scikit-image
     #   torch
-nltk==3.10.0
+nltk==3.10.3
     # via
     #   bias-detection-service (pyproject.toml)
     #   textblob
@@ -438,7 +438,7 @@ scipy==1.15.3
     #   shap
 sentry-sdk==2.60.0
     # via bias-detection-service (pyproject.toml)
-setuptools==83.0.0
+setuptools==84.0.0
     # via
     #   spacy
     #   thinc
@@ -500,7 +500,7 @@ tqdm==4.67.3
     #   shap
     #   spacy
     #   transformers
-transformers==5.9.0
+transformers==5.10.1
     # via bias-detection-service (pyproject.toml)
 triton==3.7.1
     # via torch
