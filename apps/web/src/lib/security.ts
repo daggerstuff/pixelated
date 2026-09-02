@@ -15,6 +15,20 @@ import { atomWithStorage } from 'jotai/utils'
 import { secureRandomHex } from './security/random'
 
 /**
+ * Constant-time string comparison to prevent timing attacks on signatures.
+ * Works in both browser and Node (no node:crypto dependency needed).
+ * Returns true iff the strings are byte-for-byte identical.
+ */
+function constantTimeEqual(a: string, b: string): boolean {
+  if (a.length !== b.length) return false
+  let result = 0
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i)
+  }
+  return result === 0
+}
+
+/**
  * Minimal typed view of the crypto-js surface used by this module. The ambient
  * `declare module 'crypto-js'` in src/types/crypto-js.d.ts leaves every export
  * typed as `any`, which makes `no-unsafe-call`/`no-unsafe-return` fire on every
@@ -165,7 +179,7 @@ export function createSignature(payload: unknown): string {
 export function verifySignature(payload: unknown, signature: string): boolean {
   try {
     const expected = createSignature(payload)
-    return signature === expected
+    return constantTimeEqual(signature, expected)
   } catch {
     return false
   }
@@ -233,7 +247,7 @@ export function verifySecureToken(token: string): unknown {
 
     // Verify signature first
     const expectedSignature = createSignature(encodedData)
-    if (signature !== expectedSignature) return null
+    if (!constantTimeEqual(signature, expectedSignature)) return null
 
     // Decode and parse the data
     const dataString =

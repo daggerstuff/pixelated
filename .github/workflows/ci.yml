@@ -86,10 +86,10 @@ jobs:
 
       - name: Run unit tests
         run: |
-          # Sharded advisory suite runs in advisory-tests.yml. Run only the core
-          # bucket here as a fast smoke — the full unbucketed corpus hangs without
-          # Redis/Mongo/Auth0 and exceeds the timeout (run 30737434511, exit 124).
-          VITEST_BUCKET=core timeout 15m pnpm test:advisory
+          # Blocking suite — fails CI on test failures. The full unbucketed
+          # corpus hangs without Redis/Mongo/Auth0 (run 30737434511, exit 124)
+          # so only the core bucket runs here as a fast smoke.
+          VITEST_BUCKET=core timeout 15m pnpm test:blocking
 
       - name: Build Docker image
         id: build-image
@@ -110,7 +110,7 @@ jobs:
             pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
-          exit-code: '0'
+          exit-code: '1'
           ignore-unfixed: true
           scanners: 'vuln'
           severity: 'CRITICAL,HIGH'
