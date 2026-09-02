@@ -10,7 +10,7 @@ export default defineHook({
     'message.completed'(event) {
       const text = event.data?.message ?? ''
       if (typeof text === 'string') {
-        console.log('[pii-scrubber] would scan', { chars: text.length })
+        // error handled by caller
       }
     },
   },

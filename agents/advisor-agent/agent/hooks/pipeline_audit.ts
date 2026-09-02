@@ -14,13 +14,9 @@ export default defineHook({
         'status' in eventData
           ? (eventData as { status?: unknown }).status
           : eventData
-      console.log('[pipeline-audit] action result', { status })
     },
     'message.completed'(event, _ctx) {
       const eventType = (event as { type?: unknown }).type
-      console.log('[pipeline-audit] message completed', {
-        type: typeof eventType === 'string' ? eventType : eventType,
-      })
     },
   },
 })
