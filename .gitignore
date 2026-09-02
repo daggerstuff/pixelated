@@ -472,3 +472,8 @@ tasks/
 .github/scripts
 .github/hooks
 AGENT_HANDOFF.md
+
+.nanocodex
+infra/sinker/run_*.json
+HANDOFF_training_dataset.md
+Modern Multi-Agent Coding Architectures.pdf
