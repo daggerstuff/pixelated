@@ -130,7 +130,7 @@ importers:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: latest
-        version: 4.0.47(zod@4.5.4)
+        version: 4.0.47(zod@4.5.2)
       '@ai-sdk/harness':
         specifier: ^1.0.87
         version: 1.0.87(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4)
@@ -139,7 +139,7 @@ importers:
         version: 1.0.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4)
       '@ai-sdk/mcp':
         specifier: latest
-        version: 2.0.42(zod@4.5.4)
+        version: 2.0.42(zod@4.5.2)
       '@ai-sdk/openai':
         specifier: ^4.0.47
         version: 4.0.47(zod@4.5.4)
@@ -193,13 +193,13 @@ importers:
         version: 4.0.2(supports-color@10.2.2)
       '@cloudflare/ai-chat':
         specifier: ^0.11.0
-        version: 0.11.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(react@19.2.8)
+        version: 0.11.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(react@19.2.8)
       '@cloudflare/shell':
         specifier: ^0.4.3
-        version: 0.4.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)
+        version: 0.4.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)
       '@cloudflare/think':
         specifier: ^0.17.0
-        version: 0.17.0(@ai-sdk/provider@4.0.8)(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(react@19.2.8)(supports-color@10.2.2)(zod@4.5.4)
+        version: 0.17.0(@ai-sdk/provider@4.0.8)(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(react@19.2.8)(supports-color@10.2.2)(zod@4.5.2)
       '@cloudflare/workers-types':
         specifier: 4.20260611.1
         version: 4.20260611.1
@@ -208,7 +208,7 @@ importers:
         version: 0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4)
       '@composio/vercel':
         specifier: latest
-        version: 0.11.2(@composio/core@0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4))(ai@7.0.89(zod@4.5.4))
+        version: 0.11.2(@composio/core@0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.2))(ai@7.0.89(zod@4.5.2))
       '@fastify/otel':
         specifier: latest
         version: 0.20.1(@opentelemetry/api@1.9.1)(supports-color@10.2.2)
@@ -232,7 +232,7 @@ importers:
         version: 2.2.0(react@19.2.8)
       '@hookform/resolvers':
         specifier: ^5.9.1
-        version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.1)(joi@17.13.4)(react-hook-form@7.87.0(react@19.2.8))(zod@4.5.4)
+        version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.1)(joi@17.13.4)(react-hook-form@7.87.0(react@19.2.8))(zod@4.5.2)
       '@iconify-json/lucide':
         specifier: ^1.2.127
         version: 1.2.127
@@ -370,10 +370,10 @@ importers:
         version: 2.0.0(react@19.2.8)(vue@3.5.42(typescript@5.7.3))
       agents:
         specifier: ^0.22.0
-        version: 0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4)
+        version: 0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2)
       ai:
         specifier: latest
-        version: 7.0.89(zod@4.5.4)
+        version: 7.0.89(zod@4.5.2)
       archiver:
         specifier: latest
         version: 8.0.0
@@ -442,7 +442,7 @@ importers:
         version: 2.3.2
       eve:
         specifier: ^0.47.3
-        version: 0.47.3(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.3)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(ai@7.0.89(zod@4.5.4))(aws4fetch@1.0.20)(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.3)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0))(rollup@4.63.1)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.127.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.3.0)(bufferutil@4.1.0)(utf-8-validate@6.0.6))
+        version: 0.47.3(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.3)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(ai@7.0.89(zod@4.5.2))(aws4fetch@1.0.20)(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.3)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0))(rollup@4.63.1)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.127.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.3.0)(bufferutil@4.1.0)(utf-8-validate@6.0.6))
       events:
         specifier: latest
         version: 3.3.0
@@ -454,7 +454,7 @@ importers:
         version: 3.4.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       express-rate-limit:
         specifier: '>=8.2.2'
-        version: 8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+        version: 8.7.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       express-session:
         specifier: ^1.19.0
         version: 1.19.0(supports-color@10.2.2)
@@ -664,7 +664,7 @@ importers:
         version: 3.5.42(typescript@5.7.3)
       workers-ai-provider:
         specifier: ^4.0.0
-        version: 4.0.0(@ai-sdk/anthropic@4.0.47(zod@4.5.4))(@ai-sdk/openai@4.0.47(zod@4.5.4))(@ai-sdk/provider@4.0.8)(ai@7.0.89(zod@4.5.4))
+        version: 4.0.0(@ai-sdk/anthropic@4.0.47(zod@4.5.2))(@ai-sdk/openai@4.0.47(zod@4.5.2))(@ai-sdk/provider@4.0.8)(ai@7.0.89(zod@4.5.2))
       ws:
         specifier: '>=8.21.0'
         version: 8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)
@@ -890,7 +890,7 @@ importers:
         version: 9.0.1
       headroom-ai:
         specifier: ^0.37.0
-        version: 0.37.0(@ai-sdk/provider@4.0.8)(@anthropic-ai/sdk@0.39.0)(ai@7.0.89(zod@4.5.4))(openai@6.37.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4))
+        version: 0.37.0(@ai-sdk/provider@4.0.8)(@anthropic-ai/sdk@0.39.0)(ai@7.0.89(zod@4.5.2))(openai@6.37.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.2))
       hono:
         specifier: ^4.12.14
         version: 4.13.4
@@ -1097,7 +1097,7 @@ importers:
         version: 5.2.1(supports-color@10.2.2)
       express-rate-limit:
         specifier: '>=8.2.2'
-        version: 8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+        version: 8.7.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -9797,8 +9797,8 @@ packages:
     peerDependencies:
       express: '>=4.20.0'
 
-  express-rate-limit@8.6.2:
-    resolution: {integrity: sha512-YH4ru+eOJxQABscKFfRCy9R7x9QFGdezclVMwwgFFndzS2Xnm0uo6B0ABZsLhcpeptGv2qvuJVWlQr9gQZoC3A==}
+  express-rate-limit@8.7.0:
+    resolution: {integrity: sha512-hOwV7WOxXfjRpAM1DSJWZDXx3GhplwD8IfwuwvogD8i1Qnkgosw/H45s4ZnFAUHDAhPjlY9hLBvJhKmGMyY26g==}
     engines: {node: '>= 16'}
     peerDependencies:
       express: '>=4.20.0'
@@ -15106,11 +15106,11 @@ snapshots:
 
   '@adobe/css-tools@4.5.0': {}
 
-  '@ai-sdk/anthropic@4.0.47(zod@4.5.4)':
+  '@ai-sdk/anthropic@4.0.47(zod@4.5.2)':
     dependencies:
       '@ai-sdk/provider': 4.0.10
-      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.4)
-      zod: 4.5.4
+      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.2)
+      zod: 4.5.2
 
   '@ai-sdk/gateway@4.0.46(zod@4.5.4)':
     dependencies:
@@ -15127,10 +15127,10 @@ snapshots:
       '@vercel/oidc': 3.7.1
       zod: 4.5.4
 
-  '@ai-sdk/gateway@4.0.71(zod@4.5.4)':
+  '@ai-sdk/gateway@4.0.71(zod@4.5.2)':
     dependencies:
       '@ai-sdk/provider': 4.0.10
-      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.4)
+      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.2)
       '@vercel/oidc': 3.7.1
       zod: 4.5.4
 
@@ -15172,10 +15172,10 @@ snapshots:
       zod: 4.5.4
     optional: true
 
-  '@ai-sdk/mcp@2.0.42(zod@4.5.4)':
+  '@ai-sdk/mcp@2.0.42(zod@4.5.2)':
     dependencies:
       '@ai-sdk/provider': 4.0.10
-      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.4)
+      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.2)
       cross-spawn: 7.0.6
       pkce-challenge: 5.0.1
       zod: 4.5.4
@@ -15205,7 +15205,7 @@ snapshots:
       undici: 7.29.0
       zod: 4.5.4
 
-  '@ai-sdk/provider-utils@5.0.35(zod@4.5.4)':
+  '@ai-sdk/provider-utils@5.0.35(zod@4.5.2)':
     dependencies:
       '@ai-sdk/provider': 4.0.10
       '@standard-schema/spec': 1.1.0
@@ -15231,9 +15231,9 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4)':
+  '@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2)':
     dependencies:
-      '@ai-sdk/mcp': 2.0.29(zod@4.5.4)
+      '@ai-sdk/mcp': 2.0.29(zod@4.5.2)
       '@ai-sdk/provider': 4.0.7
       '@ai-sdk/provider-utils': 5.0.25(zod@4.5.4)
       ai: 7.0.58(zod@4.5.4)
@@ -16485,29 +16485,29 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
-  '@cloudflare/ai-chat@0.11.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(react@19.2.8)':
+  '@cloudflare/ai-chat@0.11.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(react@19.2.8)':
     dependencies:
-      agents: 0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4)
-      ai: 7.0.89(zod@4.5.4)
+      agents: 0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2)
+      ai: 7.0.89(zod@4.5.2)
       nanoid: 5.1.16
     optionalDependencies:
       '@ai-sdk/react': 4.0.61(react@19.2.8)(zod@4.5.4)
       react: 19.2.8
 
-  '@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)':
+  '@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)':
     dependencies:
       '@types/json-schema': 7.0.15
       acorn: 8.18.0
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4)
-      ai: 7.0.89(zod@4.5.4)
-      zod: 4.5.4
+      '@modelcontextprotocol/sdk': 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2)
+      ai: 7.0.89(zod@4.5.2)
+      zod: 4.5.2
 
   '@cloudflare/kv-asset-handler@0.5.0': {}
 
-  '@cloudflare/shell@0.4.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)':
+  '@cloudflare/shell@0.4.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)':
     dependencies:
-      '@cloudflare/codemode': 0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)
+      '@cloudflare/codemode': 0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)
       isomorphic-git: 1.41.9
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
@@ -16515,18 +16515,18 @@ snapshots:
       - ai
       - zod
 
-  '@cloudflare/think@0.17.0(@ai-sdk/provider@4.0.8)(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(react@19.2.8)(supports-color@10.2.2)(zod@4.5.4)':
+  '@cloudflare/think@0.17.0(@ai-sdk/provider@4.0.8)(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(react@19.2.8)(supports-color@10.2.2)(zod@4.5.2)':
     dependencies:
-      '@ai-sdk/anthropic': 4.0.47(zod@4.5.4)
-      '@ai-sdk/openai': 4.0.47(zod@4.5.4)
-      '@cloudflare/codemode': 0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)
-      '@cloudflare/shell': 0.4.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)
-      agents: 0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4)
-      ai: 7.0.89(zod@4.5.4)
-      chat: 4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4)
+      '@ai-sdk/anthropic': 4.0.47(zod@4.5.2)
+      '@ai-sdk/openai': 4.0.47(zod@4.5.2)
+      '@cloudflare/codemode': 0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)
+      '@cloudflare/shell': 0.4.3(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)
+      agents: 0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2)
+      ai: 7.0.89(zod@4.5.2)
+      chat: 4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2)
       just-bash: 3.4.2(supports-color@10.2.2)
-      workers-ai-provider: 4.0.0(@ai-sdk/anthropic@4.0.47(zod@4.5.4))(@ai-sdk/openai@4.0.47(zod@4.5.4))(@ai-sdk/provider@4.0.8)(ai@7.0.89(zod@4.5.4))
-      zod: 4.5.4
+      workers-ai-provider: 4.0.0(@ai-sdk/anthropic@4.0.47(zod@4.5.2))(@ai-sdk/openai@4.0.47(zod@4.5.2))(@ai-sdk/provider@4.0.8)(ai@7.0.89(zod@4.5.2))
+      zod: 4.5.2
     optionalDependencies:
       '@ai-sdk/react': 4.0.61(react@19.2.8)(zod@4.5.4)
       react: 19.2.8
@@ -16585,10 +16585,10 @@ snapshots:
     dependencies:
       zod: 4.5.4
 
-  '@composio/vercel@0.11.2(@composio/core@0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4))(ai@7.0.89(zod@4.5.4))':
+  '@composio/vercel@0.11.2(@composio/core@0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.2))(ai@7.0.89(zod@4.5.2))':
     dependencies:
-      '@composio/core': 0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4)
-      ai: 7.0.89(zod@4.5.4)
+      '@composio/core': 0.18.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.2)
+      ai: 7.0.89(zod@4.5.2)
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -17432,7 +17432,7 @@ snapshots:
     dependencies:
       hono: 4.13.4
 
-  '@hookform/resolvers@5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.1)(joi@17.13.4)(react-hook-form@7.87.0(react@19.2.8))(zod@4.5.4)':
+  '@hookform/resolvers@5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.1)(joi@17.13.4)(react-hook-form@7.87.0(react@19.2.8))(zod@4.5.2)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.87.0(react@19.2.8)
@@ -18222,7 +18222,7 @@ snapshots:
       eventsource: 3.0.7
       eventsource-parser: 3.1.1
       express: 5.2.1(supports-color@10.2.2)
-      express-rate-limit: 8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
+      express-rate-limit: 8.7.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2)
       hono: 4.13.4
       jose: 6.2.10
       json-schema-typed: 8.0.2
@@ -22766,7 +22766,7 @@ snapshots:
     dependencies:
       humanize-ms: 1.2.1
 
-  agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.4))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.4))(chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.4):
+  agents@0.22.0(@ai-sdk/react@4.0.61(react@19.2.8)(zod@4.5.2))(@babel/core@7.29.7(supports-color@10.2.2))(@babel/runtime@8.0.0)(@cloudflare/codemode@0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2))(@modelcontextprotocol/client@2.0.0)(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(@modelcontextprotocol/server@2.0.0)(ai@7.0.89(zod@4.5.2))(chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2))(just-bash@3.4.2(supports-color@10.2.2))(react@19.2.8)(rolldown@1.2.5)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(zod@4.5.2):
     dependencies:
       '@babel/plugin-proposal-decorators': 8.0.2(@babel/core@7.29.7(supports-color@10.2.2))
       '@cfworker/json-schema': 4.1.1
@@ -22782,10 +22782,10 @@ snapshots:
       yaml: 2.8.4
       zod: 4.5.4
     optionalDependencies:
-      '@ai-sdk/react': 4.0.61(react@19.2.8)(zod@4.5.4)
-      '@cloudflare/codemode': 0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4))(ai@7.0.89(zod@4.5.4))(zod@4.5.4)
-      ai: 7.0.89(zod@4.5.4)
-      chat: 4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4)
+      '@ai-sdk/react': 4.0.61(react@19.2.8)(zod@4.5.2)
+      '@cloudflare/codemode': 0.5.1(@modelcontextprotocol/sdk@1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.2))(ai@7.0.89(zod@4.5.2))(zod@4.5.2)
+      ai: 7.0.89(zod@4.5.2)
+      chat: 4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2)
       just-bash: 3.4.2(supports-color@10.2.2)
       react: 19.2.8
       vite: 7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4)
@@ -22810,12 +22810,12 @@ snapshots:
       '@ai-sdk/provider-utils': 5.0.30(zod@4.5.4)
       zod: 4.5.4
 
-  ai@7.0.89(zod@4.5.4):
+  ai@7.0.89(zod@4.5.2):
     dependencies:
-      '@ai-sdk/gateway': 4.0.71(zod@4.5.4)
+      '@ai-sdk/gateway': 4.0.71(zod@4.5.2)
       '@ai-sdk/provider': 4.0.10
-      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.4)
-      zod: 4.5.4
+      '@ai-sdk/provider-utils': 5.0.35(zod@4.5.2)
+      zod: 4.5.2
 
   ajv-draft-04@1.0.0(ajv@8.20.0):
     optionalDependencies:
@@ -23502,7 +23502,7 @@ snapshots:
     dependencies:
       '@kurkle/color': 0.3.4
 
-  chat@4.38.1(ai@7.0.89(zod@4.5.4))(supports-color@10.2.2)(zod@4.5.4):
+  chat@4.38.1(ai@7.0.89(zod@4.5.2))(supports-color@10.2.2)(zod@4.5.2):
     dependencies:
       '@workflow/serde': 4.1.0-beta.2
       mdast-util-to-string: 4.0.0
@@ -23512,8 +23512,8 @@ snapshots:
       remend: 1.3.0
       unified: 11.0.5
     optionalDependencies:
-      ai: 7.0.89(zod@4.5.4)
-      zod: 4.5.4
+      ai: 7.0.89(zod@4.5.2)
+      zod: 4.5.2
     transitivePeerDependencies:
       - supports-color
 
@@ -24550,9 +24550,9 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eve@0.47.3(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.3)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(ai@7.0.89(zod@4.5.4))(aws4fetch@1.0.20)(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.3)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0))(rollup@4.63.1)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.127.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.3.0)(bufferutil@4.1.0)(utf-8-validate@6.0.6)):
+  eve@0.47.3(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.3)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(ai@7.0.89(zod@4.5.2))(aws4fetch@1.0.20)(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.3)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0))(rollup@4.63.1)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.127.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.3.0)(bufferutil@4.1.0)(utf-8-validate@6.0.6)):
     dependencies:
-      ai: 7.0.89(zod@4.5.4)
+      ai: 7.0.89(zod@4.5.2)
       nitro: 3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.3)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6)))(aws4fetch@1.0.20)(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.3)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0))(rollup@4.63.1)(vite@7.3.6(@types/node@26.3.0)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.50.0)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.127.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.3.0)(bufferutil@4.1.0)(utf-8-validate@6.0.6))
       undici: 7.29.0
     optionalDependencies:
@@ -24676,7 +24676,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  express-rate-limit@8.6.2(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2):
+  express-rate-limit@8.7.0(express@5.2.1(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       debug: 4.4.3(supports-color@10.2.2)
       express: 5.2.1(supports-color@10.2.2)
@@ -25409,12 +25409,12 @@ snapshots:
       '@types/set-cookie-parser': 2.4.10
       set-cookie-parser: 3.1.2
 
-  headroom-ai@0.37.0(@ai-sdk/provider@4.0.8)(@anthropic-ai/sdk@0.39.0)(ai@7.0.89(zod@4.5.4))(openai@6.37.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4)):
+  headroom-ai@0.37.0(@ai-sdk/provider@4.0.8)(@anthropic-ai/sdk@0.39.0)(ai@7.0.89(zod@4.5.2))(openai@6.37.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.2)):
     optionalDependencies:
       '@ai-sdk/provider': 4.0.8
       '@anthropic-ai/sdk': 0.39.0
-      ai: 7.0.89(zod@4.5.4)
-      openai: 6.37.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.4)
+      ai: 7.0.89(zod@4.5.2)
+      openai: 6.37.0(ws@8.21.3(bufferutil@4.1.0)(utf-8-validate@6.0.6))(zod@4.5.2)
 
   helmet@8.3.0: {}
 
@@ -30888,13 +30888,13 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260828.1
       '@cloudflare/workerd-windows-64': 1.20260828.1
 
-  workers-ai-provider@4.0.0(@ai-sdk/anthropic@4.0.47(zod@4.5.4))(@ai-sdk/openai@4.0.47(zod@4.5.4))(@ai-sdk/provider@4.0.8)(ai@7.0.89(zod@4.5.4)):
+  workers-ai-provider@4.0.0(@ai-sdk/anthropic@4.0.47(zod@4.5.2))(@ai-sdk/openai@4.0.47(zod@4.5.2))(@ai-sdk/provider@4.0.8)(ai@7.0.89(zod@4.5.2)):
     dependencies:
       '@ai-sdk/provider': 4.0.8
-      ai: 7.0.89(zod@4.5.4)
+      ai: 7.0.89(zod@4.5.2)
     optionalDependencies:
-      '@ai-sdk/anthropic': 4.0.47(zod@4.5.4)
-      '@ai-sdk/openai': 4.0.47(zod@4.5.4)
+      '@ai-sdk/anthropic': 4.0.47(zod@4.5.2)
+      '@ai-sdk/openai': 4.0.47(zod@4.5.2)
 
   wrangler@4.127.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.3.0)(bufferutil@4.1.0)(utf-8-validate@6.0.6):
     dependencies:
