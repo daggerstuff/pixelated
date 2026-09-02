@@ -18,7 +18,7 @@
 
 <br />
 
-### ✦ The Vision
+## The Vision
 
 Pixelated Empathy is fundamentally reshaping the mental health landscape. Historically, the clinical world
 has pushed back against integrating deeply with the digital realm—often out of valid concerns for safety,
@@ -34,30 +34,177 @@ the digital realm, we can unlock new paradigms for training, healing, and connec
 
 ---
 
-### ✦ The Ecosystem
+## Quick Start
+
+### Prerequisites
+
+| Requirement | Version | Check |
+|---|---|---|
+| Node.js | >= 24 | `node --version` |
+| pnpm | 11.24.0 | `pnpm --version` |
+| Python | 3.12+ | `python3 --version` |
+| uv | latest | `uv --version` |
+| PostgreSQL | 17+ | `psql --version` |
+| Redis | 7+ | `redis-cli --version` |
+| Docker | latest | `docker --version` |
+
+### Setup
+
+```bash
+# 1. Clone with submodules (or init them after cloning)
+git clone --recursive https://github.com/daggerstuff/pixelated.git
+cd pixelated
+
+# If already cloned without --recursive:
+git submodule update --init --recursive
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Start the dev server
+pnpm dev
+```
+
+The app runs at **http://localhost:5173**.
+
+> **Submodule Note:** This repo uses three git submodules (`ai/`, `foresight/`, `docs/`).
+> After any clone or pull, run `git submodule update --init --recursive` to sync them.
+> Without this step, those directories will be empty — including all 1,969 docs files.
+
+### All Services
+
+To run the full stack (web + AI services + bias detection + analytics + worker):
+
+```bash
+pnpm dev:all-services
+```
+
+See [WALKTHROUGH.md](WALKTHROUGH.md) for the complete developer guide.
+
+---
+
+## The Ecosystem
 
 This platform operates as a cohesive unit across four primary repositories. Together, they form the
 secure, intelligent backbone of our clinical AI engine:
 
-* **[pixelated](https://github.com/daggerstuff/pixelated) (Main Core):** The primary orchestrator. It
-houses the application surfaces, clinical dashboards, API routes, and shared product logic that bind
-the entire experience together.
-* **[ai](ai/) (Cognitive Engine):** Our dedicated model research and training environment. This submodule
-handles inference, emotional signal analysis, and the clinical validity pipelines that ensure our
-interactions remain safe and effective.
-* **[foresight-mcp](foresight-mcp/) (Continuity & Memory):** The persistent "brain" of our AI agents.
-This submodule manages contextual memory, allowing the system to learn, adapt, and maintain continuity
-across complex, longitudinal therapeutic simulations.
-* **[docs](docs/) (Knowledge Base):** The central nervous system for all our system documentation. Because
-we operate in a highly regulated space, maintaining strict, transparent records of our HIPAA compliance,
-security posture, and clinical feedback loops is non-negotiable.
+| Repository | Role |
+|---|---|
+| **[pixelated](https://github.com/daggerstuff/pixelated)** (Main Core) | Primary orchestrator: application surfaces, clinical dashboards, API routes, shared product logic. |
+| **[ai](ai/)** (Cognitive Engine) | Model research and training: inference, emotional signal analysis, clinical validity pipelines. |
+| **[foresight](foresight/)** (Continuity & Memory) | Persistent contextual memory for AI agents across longitudinal therapeutic simulations. |
+| **[docs](docs/)** (Knowledge Base) | HIPAA compliance, security posture, clinical feedback loops, architecture decisions. |
 
-**How They Interact:**
-The **Main Core** drives the user experience and platform routing, calling upon the **Cognitive Engine**
-for real-time emotional analysis and simulation generation. Simultaneously, the core system relies on
-**Foresight MCP** to retrieve and inject deep, contextual memory into those interactions so the AI always
-"remembers" the patient's history. Every architectural boundary, compliance mandate, and operational protocol
-guiding this interplay is strictly codified within our **Knowledge Base**.
+`ai/`, `foresight/`, and `docs/` are **git submodules** — run `git submodule update --init --recursive`
+after cloning to populate them.
+
+---
+
+## Project Structure
+
+```
+pixelated/
+├── apps/
+│   ├── web/                    # Main Astro 6 + React 19 application
+│   └── business-strategy-cms/  # Business strategy CMS
+├── ai/                         # Submodule: AI inference & training (Python)
+├── foresight/                  # Submodule: Foresight MCP memory server (Python)
+├── docs/                       # Submodule: Documentation knowledge base
+├── agents/                     # AI agent packages (advisor, content, eve, intake, pipeline)
+├── packages/                   # Shared workspace packages
+├── config/                     # Vitest, Playwright, and other configs
+├── content/                    # Astro content collections
+├── data/                       # Seed data and fixtures
+├── infra/                      # Infrastructure (Docker, K8s)
+├── scripts/                    # DevOps and utility scripts
+└── tests/                      # Integration and E2E tests
+```
+
+---
+
+## Development
+
+### Common Commands
+
+```bash
+pnpm dev                  # Start dev server (port 5173)
+pnpm dev:all-services     # Start all services concurrently
+pnpm build                # Production build
+pnpm lint                 # Lint (oxlint, type-aware)
+pnpm format               # Format code (oxfmt + prettier)
+pnpm test:unit            # Unit tests (Vitest)
+pnpm test:integration     # Integration tests
+pnpm e2e                  # End-to-end tests (Playwright)
+pnpm e2e:ui               # Interactive E2E
+```
+
+### Python (ai/ and foresight/ submodules)
+
+```bash
+uv run pytest             # Run Python tests
+uv run ruff check .       # Lint Python
+uv run ruff format .      # Format Python
+```
+
+### Submodule Management
+
+```bash
+git submodule update --init --recursive   # Init after fresh clone
+pnpm submodules:sync                      # Re-sync after pull
+```
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend / SSR | Astro 6 + React 19 (TypeScript, Tailwind CSS) |
+| Backend / AI | FastAPI / Express / Flask (Python 3.12+ via `uv`) |
+| Database | PostgreSQL 17 + pgvector |
+| Caching | Redis |
+| State | Zustand |
+| Package Manager | pnpm 11.24.0 |
+| Runtime | Node.js >= 24 |
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, commit conventions, testing, and security rules.
+See [WALKTHROUGH.md](WALKTHROUGH.md) for the full developer walkthrough.
+
+### Key Rules
+
+- **No error suppression**: Never use `@ts-ignore`, `@ts-nocheck`, `# noqa`, or `# type: ignore`
+- **No credentials in code**: Never commit API keys, passwords, or patient data
+- **Lint before push**: Run `pnpm lint` and `pnpm format:check` before pushing
+- **AI assistants**: See `AGENTS.md` for AI coding assistant conventions
+
+---
+
+## Documentation
+
+The `docs/` submodule contains 1,969 files across 27 subdirectories. See [`DOCS.md`](DOCS.md) for a full index of all subdirectories, or browse the key areas below:
+
+- **[Getting Started](docs/getting-started/)** — Onboarding guides
+- **[Architecture](docs/architecture/)** — System design and ADRs
+- **[API Reference](docs/api-reference/)** — API documentation
+- **[Compliance](docs/compliance/)** — HIPAA, security, threat models
+- **[Clinical Validity](docs/clinical-validity/)** — Clinical evaluation protocols
+- **[Database](docs/database/)** — Schema and migration docs
+- **[Operations](docs/operations/)** — Runbooks and deployment guides
+- **[Guides](docs/guides/)** — Developer tutorials
+
+> Run `git submodule update --init --recursive` first if `docs/` is empty.
+
+---
+
+## Security
+
+Report vulnerabilities to [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com).
+
+See [docs/SECURITY.md](docs/SECURITY.md) and [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) for details.
 
 ---
 
@@ -69,7 +216,7 @@ guiding this interplay is strictly codified within our **Knowledge Base**.
   <a href="https://pixelatedempathy.com/contact">Enterprise Access</a> •
   <a href="https://pixelatedempathy.com/case-studies">Case Studies</a> •
   <a href="https://pixelatedempathy.com/team">Our Team</a>
-  
+
   <br><br>
   <code>© 2026 Pixelated Empathy. All rights reserved.</code>
 </div>
