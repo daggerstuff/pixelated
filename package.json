@@ -244,7 +244,7 @@
     "@graphql-yoga/plugin-persisted-operations": "^3.22.0",
     "@heroicons/react": "latest",
     "@hookform/resolvers": "^5.9.1",
-    "@iconify-json/lucide": "^1.2.126",
+    "@iconify-json/lucide": "^1.2.127",
     "@microsoft/clarity": "latest",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "@opentelemetry/api": "^1.9.1",
@@ -355,7 +355,7 @@
     "otplib": "^13.5.0",
     "p5": "latest",
     "path-browserify": "latest",
-    "pdfkit": "^0.20.1",
+    "pdfkit": "^0.20.2",
     "pg": "^8.23.0",
     "piccolore": "latest",
     "postgres": "latest",
@@ -389,7 +389,7 @@
     "vue": "latest",
     "workers-ai-provider": "^4.0.0",
     "ws": "^8.21.3",
-    "zod": "^4.5.2",
+    "zod": "^4.5.4",
     "zustand": "latest"
   },
   "devDependencies": {
