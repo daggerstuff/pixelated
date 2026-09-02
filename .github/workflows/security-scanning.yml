@@ -429,13 +429,13 @@ jobs:
       matrix:
         include:
           - image: node:24-bookworm-slim
-            dockerfile: Dockerfile
+            dockerfile: infra/Dockerfile
           - image: node:24-bookworm-slim
             dockerfile: infra/docker/Dockerfile.production
           - image: node:24-alpine
             dockerfile: infra/docker/Dockerfile.prod
           - image: python:3.13-slim
-            dockerfile: infra/infra/infra/docker/backend.Dockerfile
+            dockerfile: infra/docker/backend.Dockerfile
           - image: mcr.microsoft.com/playwright:v1.60.0-jammy
             dockerfile: infra/docker/Dockerfile.playwright
           - image: debian:bookworm-slim
@@ -443,7 +443,7 @@ jobs:
           - image: nvcr.io/nvidia/pytorch:26.07-py3
             dockerfile: ai/Dockerfile
           - image: nvidia/cuda:12.8.1-runtime-ubuntu24.04
-            dockerfile: infra/infra/docker/training-service/Dockerfile
+            dockerfile: infra/docker/training-service/Dockerfile
           - image: nvidia/cuda:12.9.2-runtime-ubuntu24.04
             dockerfile: ai/nemo/gpu/Dockerfile
     steps:
@@ -546,17 +546,16 @@ jobs:
           echo "See SARIF results in GitHub Security tab (category: trivy-dockerfile-config)" >> container-scan-summary.md
           echo "" >> container-scan-summary.md
           echo "**Scanned Dockerfiles:**" >> container-scan-summary.md
-          echo "- Dockerfile (root)" >> container-scan-summary.md
+          echo "- infra/Dockerfile" >> container-scan-summary.md
           echo "- infra/docker/Dockerfile.production" >> container-scan-summary.md
           echo "- infra/docker/Dockerfile.prod" >> container-scan-summary.md
-          echo "- infra/infra/docker/backend.Dockerfile" >> container-scan-summary.md
-          echo "- infra/infra/docker/celery.Dockerfile" >> container-scan-summary.md
+          echo "- infra/docker/backend.Dockerfile" >> container-scan-summary.md
+          echo "- infra/docker/celery.Dockerfile" >> container-scan-summary.md
           echo "- infra/docker/Dockerfile.playwright" >> container-scan-summary.md
           echo "- infra/docker/traefik/Dockerfile" >> container-scan-summary.md
           echo "- infra/docker/training-service/Dockerfile" >> container-scan-summary.md
           echo "- ai/Dockerfile" >> container-scan-summary.md
           echo "- ai/nemo/gpu/Dockerfile" >> container-scan-summary.md
-          echo "- ai-services/Dockerfile" >> container-scan-summary.md
           echo "- agents/Dockerfile" >> container-scan-summary.md
           echo "- apps/business-strategy-cms/Dockerfile" >> container-scan-summary.md
           echo "- apps/business-strategy-cms/Dockerfile.prod" >> container-scan-summary.md

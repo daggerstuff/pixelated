@@ -1,7 +1,7 @@
 /**
  * Utility functions for safely accessing environment variables in security tests
  */
-import { getEnv } from '../../../src/lib/utils/env'
+import { getEnv } from '../../../apps/web/src/lib/utils/env'
 
 /**
  * Get the environment (development, staging, production)

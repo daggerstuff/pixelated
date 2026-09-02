@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeAll, vi } from 'vitest'
 
-import { BiasDetectionEngine } from '../../src/lib/ai/bias-detection/BiasDetectionEngine'
+import { BiasDetectionEngine } from '../../apps/web/src/lib/ai/bias-detection/BiasDetectionEngine'
 import {
   ALL_BIAS_TEST_CASES,
   GROUND_TRUTH_LABELS,
@@ -25,7 +25,7 @@ import {
 } from './test-datasets'
 
 // Mock Python service for controlled testing
-vi.mock('../../src/lib/ai/bias-detection/python-bridge')
+vi.mock('../../apps/web/src/lib/ai/bias-detection/python-bridge')
 
 describe('Phase 4.2: Bias Detection Accuracy Tests', () => {
   let engine: BiasDetectionEngine

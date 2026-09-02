@@ -100,7 +100,7 @@ EXCLUDE_GLOBS=(
 
 # Source roots scanned when no CLI files are passed. Missing directories
 # are tolerated.
-SOURCE_ROOTS=(src agents ai-services packages frontend backend tests)
+SOURCE_ROOTS=(apps/web/src agents apps/business-strategy-cms packages tools tests)
 
 # Pattern regex covers all four forbidden tokens. In TS/JS only the first
 # two (`@ts-ignore`, `eslint-disable`) are realistic; the Python-shaped

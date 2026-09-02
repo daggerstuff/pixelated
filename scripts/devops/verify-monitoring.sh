@@ -30,7 +30,7 @@ check_service() {
 echo "📄 Checking configuration files..."
 
 # Loki configuration
-if [[ -f "infra/infra/docker/loki/config.yml" ]]; then
+if [[ -f "infra/docker/loki/config.yml" ]]; then
 	echo "✅ Loki configuration file exists"
 	# Check for key configuration items
 	if grep -q "instance_addr: 0.0.0.0" infra/docker/loki/config.yml; then
@@ -43,7 +43,7 @@ else
 fi
 
 # Promtail configuration
-if [[ -f "infra/infra/docker/promtail/config.yml" ]]; then
+if [[ -f "infra/docker/promtail/config.yml" ]]; then
 	echo "✅ Promtail configuration file exists"
 	# Check for key configuration items
 	if grep -q "job_name: pixelated-app-logs" infra/docker/promtail/config.yml; then
@@ -56,7 +56,7 @@ else
 fi
 
 # Grafana datasource configuration
-if [[ -f "infra/infra/docker/grafana/provisioning/datasources/loki.yml" ]]; then
+if [[ -f "infra/docker/grafana/provisioning/datasources/loki.yml" ]]; then
 	echo "✅ Grafana Loki datasource configuration exists"
 	if grep -q "url: http://loki:3100" infra/docker/grafana/provisioning/datasources/loki.yml; then
 		echo "✅ Grafana Loki datasource URL configured correctly"
