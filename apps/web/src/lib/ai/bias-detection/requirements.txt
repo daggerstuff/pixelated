@@ -106,7 +106,7 @@ contourpy==1.3.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   matplotlib
-cryptography==50.0.0
+cryptography==50.0.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
@@ -814,7 +814,7 @@ scipy==1.15.3
     #   shap
 seaborn==0.13.2
     # via -r src/lib/ai/bias-detection/requirements.txt
-setuptools==83.0.0
+setuptools==84.0.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   dash
