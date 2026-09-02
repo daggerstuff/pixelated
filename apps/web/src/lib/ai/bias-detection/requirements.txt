@@ -447,7 +447,7 @@ networkx==3.6.1
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   scikit-image
     #   torch
-nltk==3.10.0
+nltk==3.10.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   textblob
@@ -912,7 +912,7 @@ toolz==1.1.0
     #   altair
 torch==2.13.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-tornado==6.5.7
+tornado==6.5.8
     # via -r src/lib/ai/bias-detection/requirements.txt
 tqdm==4.67.1
     # via
