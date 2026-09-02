@@ -48,10 +48,17 @@ def cmd_list(args: argparse.Namespace) -> None:
     active = manifest.get("active_run_id")
 
     if not checkpoints:
+        print("No checkpoints registered.")
         return
 
     for cp in sorted(checkpoints, key=lambda x: x.get("timestamp", ""), reverse=True):
-        "*" if cp["run_id"] == active else ""
+        marker = "*" if cp["run_id"] == active else " "
+        print(
+            f"{marker} {cp['run_id']}  {cp.get('base_model', '?')}  "
+            f"dataset={cp.get('dataset_version', '?')}  "
+            f"score={cp.get('clinical_validity_score', 0.0)}  "
+            f"{cp.get('timestamp', '')}"
+        )
 
 
 def cmd_tag(args: argparse.Namespace) -> None:
@@ -125,6 +132,9 @@ def cmd_show(args: argparse.Namespace) -> None:
     if not matching:
         logger.error("Run ID %r not found in registry.", run_id)
         sys.exit(1)
+
+    cp = matching[0]
+    print(json.dumps(cp, indent=2))
 
 
 def build_parser() -> argparse.ArgumentParser:
