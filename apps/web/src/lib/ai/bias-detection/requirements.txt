@@ -932,7 +932,7 @@ traitlets==5.14.3
     #   ipython
     #   ipywidgets
     #   matplotlib-inline
-transformers==5.8.0
+transformers==5.10.1
     # via -r src/lib/ai/bias-detection/requirements.txt
 triton==3.7.1
     # via
