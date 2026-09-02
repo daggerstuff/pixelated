@@ -477,3 +477,4 @@ AGENT_HANDOFF.md
 infra/sinker/run_*.json
 HANDOFF_training_dataset.md
 Modern Multi-Agent Coding Architectures.pdf
+*.bak
