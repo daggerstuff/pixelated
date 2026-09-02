@@ -25,7 +25,7 @@ public/polyfills/
 *.min.js
 
 # ignore large markdown content stores that fail formatting
-src/content-store/
+apps/web/src/content-store/
 session-ses_*.md
 tests/AGENTS.md
 tests/test-results/

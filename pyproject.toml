@@ -46,7 +46,7 @@ dependencies = [
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
   "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
-  "torch==2.13.0", # Matches ai-services/requirements.txt and src/lib/ai/training/requirements.txt
+  "torch==2.13.0", # Matches apps/web/src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",
   "textblob>=0.19.0",
@@ -340,6 +340,10 @@ dev = [
   "types-requests>=2.32.4.20260107",
   "asyncpg>=0.31.0",
   "hypothesis>=6.155.2",
+  # Direct dev dependency workaround for dependabot-core#14118: without this,
+  # setuptools exists only in [build-system].requires + as a transitive dep in
+  # uv.lock, and the uv updater raises "No files have changed!" on security bumps.
+  "setuptools>=83.0.0",
 ]
 
 [[tool.uv.index]]
