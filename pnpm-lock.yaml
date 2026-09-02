@@ -363,8 +363,8 @@ importers:
         specifier: ^1.38.3
         version: 1.38.3
       '@vercel/analytics':
-        specifier: ^1.6.1
-        version: 1.6.1(react@19.2.8)(vue@3.5.42(typescript@5.7.3))
+        specifier: ^2.0.1
+        version: 2.0.1(react@19.2.8)(vue@3.5.42(typescript@5.7.3))
       '@vercel/speed-insights':
         specifier: ^2.0.0
         version: 2.0.0(react@19.2.8)(vue@3.5.42(typescript@5.7.3))
@@ -396,8 +396,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       buffer:
-        specifier: ^5.6.0
-        version: 5.7.1
+        specifier: ^6.0.3
+        version: 6.0.3
       chart.js:
         specifier: ^4.5.1
         version: 4.5.1
@@ -489,8 +489,8 @@ importers:
         specifier: ^8.3.0
         version: 8.3.0
       html-escaper:
-        specifier: ^2.0.2
-        version: 2.0.2
+        specifier: ^3.0.3
+        version: 3.0.3
       i18next:
         specifier: ^26.4.0
         version: 26.4.0(typescript@5.7.3)
@@ -826,8 +826,8 @@ importers:
         specifier: ^4.13.0
         version: 4.13.0
       chalk:
-        specifier: ^4.1.2
-        version: 4.1.2
+        specifier: ^6.0.0
+        version: 6.0.0
       class-transformer:
         specifier: ^0.5.1
         version: 0.5.1
@@ -877,11 +877,11 @@ importers:
         specifier: ^13.0.0
         version: 13.0.6
       globals:
-        specifier: ^15.15.0
-        version: 15.15.0
+        specifier: ^17.11.0
+        version: 17.11.0
       globby:
-        specifier: ^11.1.0
-        version: 11.1.0
+        specifier: ^16.2.4
+        version: 16.2.4
       gray-matter:
         specifier: ^4.0.3
         version: 4.0.3
@@ -1042,8 +1042,8 @@ importers:
         specifier: ^6.0.6
         version: 6.0.6
       vfile:
-        specifier: ^4.2.1
-        version: 4.2.1
+        specifier: ^6.0.3
+        version: 6.0.3
       viewerjs:
         specifier: ^1.12.0
         version: 1.12.0
@@ -6527,6 +6527,10 @@ packages:
     resolution: {integrity: sha512-LtoMMhxAlorcGhmFYI+LhPgbPZCkgP6ra1YL604EeF6U98pLlQ3iWIGMdWSC+vWmPBWBNgmDBAhnAobLROJmwg==}
     engines: {node: '>=18'}
 
+  '@sindresorhus/merge-streams@4.0.0':
+    resolution: {integrity: sha512-tlqY9xq5ukxTUZBmoOp+m61cqwQD5pHJtFY3Mn8CA8ps6yghLH/Hw8UPdqg4OLmFW3IFlcXnQNmo/dh8HzXYIQ==}
+    engines: {node: '>=18'}
+
   '@sinonjs/commons@3.0.1':
     resolution: {integrity: sha512-K3mCHKQ9sVh8o1C9cxkwxaOmXoAMlDxC1mYyHrjqOWEcBjYr76t96zL2zlj5dUGZ3HSw240X1qgH3Mjf1yJWpQ==}
 
@@ -7538,6 +7542,35 @@ packages:
       vue-router:
         optional: true
 
+  '@vercel/analytics@2.0.1':
+    resolution: {integrity: sha512-MTQG6V9qQrt1tsDeF+2Uoo5aPjqbVPys1xvnIftXSJYG2SrwXRHnqEvVoYID7BTruDz4lCd2Z7rM1BdkUehk2g==}
+    peerDependencies:
+      '@remix-run/react': ^2
+      '@sveltejs/kit': ^1 || ^2
+      next: '>= 13'
+      nuxt: '>= 3'
+      react: ^19.2.4
+      svelte: '>= 4'
+      vue: ^3
+      vue-router: ^4
+    peerDependenciesMeta:
+      '@remix-run/react':
+        optional: true
+      '@sveltejs/kit':
+        optional: true
+      next:
+        optional: true
+      nuxt:
+        optional: true
+      react:
+        optional: true
+      svelte:
+        optional: true
+      vue:
+        optional: true
+      vue-router:
+        optional: true
+
   '@vercel/cli-config@0.2.0':
     resolution: {integrity: sha512-fJRRRB7734BDuXZ89yBEaA2ncYhH7bWX30mk04W80J6VAfQc+4iB8lyzAdaGpFV3/vNlkt9VZt+/uoQoWX6UsQ==}
 
@@ -8429,6 +8462,10 @@ packages:
   chalk@5.6.2:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
+
+  chalk@6.0.0:
+    resolution: {integrity: sha512-2uNTXIuTTxk7ciZgAU1BQcgnchcG0xXnrs6jzkQfj9SsRa9M2s5zE8WT96hS6KmG4MzWHSrvH43DF1m4XRkrFg==}
+    engines: {node: '>=22'}
 
   change-case-all@2.1.0:
     resolution: {integrity: sha512-v6b0WWWkZUMHVuYk82l+WROgkUm4qEN2w5hKRNWtEOYwWqUGoi8C6xH0l1RLF1EoWqDFK6MFclmN3od6ws3/uw==}
@@ -10046,6 +10083,10 @@ packages:
   globby@14.1.0:
     resolution: {integrity: sha512-0Ia46fDOaT7k4og1PDW4YbodWWr3scS2vAr2lTbsplOt2WkKp0vQbkI9wKis/T5LV/dqPjO3bpS/z6GTJB82LA==}
     engines: {node: '>=18'}
+
+  globby@16.2.4:
+    resolution: {integrity: sha512-c8B/VNLmxRcmqqenRA9t+9IyOjf9+V6lTxPaUJLqOCONdQkWZ0ETYgX0qbtJqPsgCNusT9MZ5Jeidw8Eb9tn2g==}
+    engines: {node: '>=20'}
 
   globrex@0.1.2:
     resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
@@ -14013,6 +14054,10 @@ packages:
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
+
+  unicorn-magic@0.4.0:
+    resolution: {integrity: sha512-wH590V9VNgYH9g3lH9wWjTrUoKsjLF6sGLjhR4sH1LWpLmCOH0Zf7PukhDA8BiS7KHe4oPNkcTHqYkj7SOGUOw==}
+    engines: {node: '>=20'}
 
   unified@11.0.5:
     resolution: {integrity: sha512-xKvGhPWw3k84Qjh8bI3ZeJjqnyadK+GEFtazSfZv/rKeTkTjOJho6mFqh2SM96iIcZokxiOpg78GazTSg8+KHA==}
@@ -20650,6 +20695,8 @@ snapshots:
 
   '@sindresorhus/merge-streams@2.3.0': {}
 
+  '@sindresorhus/merge-streams@4.0.0': {}
+
   '@sinonjs/commons@3.0.1':
     dependencies:
       type-detect: 4.0.8
@@ -21592,8 +21639,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.68.0(supports-color@10.2.2)(typescript@5.7.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.69.0(typescript@5.7.3)
-      '@typescript-eslint/types': 8.69.0
+      '@typescript-eslint/tsconfig-utils': 8.68.0(typescript@5.7.3)
+      '@typescript-eslint/types': 8.68.0
       debug: 4.4.3(supports-color@10.2.2)
       typescript: 5.7.3
     transitivePeerDependencies:
@@ -22004,6 +22051,11 @@ snapshots:
       uncrypto: 0.1.3
 
   '@vercel/analytics@1.6.1(react@19.2.8)(vue@3.5.42(typescript@5.7.3))':
+    optionalDependencies:
+      react: 19.2.8
+      vue: 3.5.42(typescript@5.7.3)
+
+  '@vercel/analytics@2.0.1(react@19.2.8)(vue@3.5.42(typescript@5.7.3))':
     optionalDependencies:
       react: 19.2.8
       vue: 3.5.42(typescript@5.7.3)
@@ -23053,6 +23105,7 @@ snapshots:
     dependencies:
       base64-js: 1.5.1
       ieee754: 1.2.1
+    optional: true
 
   buffer@6.0.3:
     dependencies:
@@ -23126,6 +23179,8 @@ snapshots:
       supports-color: 7.2.0
 
   chalk@5.6.2: {}
+
+  chalk@6.0.0: {}
 
   change-case-all@2.1.0:
     dependencies:
@@ -24555,7 +24610,7 @@ snapshots:
     dependencies:
       magic-string: 0.30.21
       mlly: 1.8.2
-      rollup: 4.63.0
+      rollup: 4.63.1
 
   flat-cache@4.0.1:
     dependencies:
@@ -24819,6 +24874,16 @@ snapshots:
       path-type: 6.0.0
       slash: 5.1.0
       unicorn-magic: 0.3.0
+
+  globby@16.2.4:
+    dependencies:
+      '@sindresorhus/merge-streams': 4.0.0
+      fast-glob: 3.3.3
+      ignore: 7.0.6
+      is-path-inside: 4.0.0
+      micromatch: 4.0.8
+      slash: 5.1.0
+      unicorn-magic: 0.4.0
 
   globrex@0.1.2: {}
 
@@ -29723,6 +29788,8 @@ snapshots:
       tiny-inflate: 1.0.3
 
   unicorn-magic@0.3.0: {}
+
+  unicorn-magic@0.4.0: {}
 
   unified@11.0.5:
     dependencies:
