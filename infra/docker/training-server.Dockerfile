@@ -23,4 +23,4 @@ COPY config/ ./config/
 
 EXPOSE 8004
 
-CMD ["npx", "tsx", "src/lib/services/training/server.ts"]
+CMD ["npx", "tsx", "apps/web/src/lib/services/training/server.ts"]

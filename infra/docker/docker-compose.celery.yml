@@ -2,7 +2,7 @@ services:
   # Celery Worker for bias analysis tasks
   celery-worker-bias-analysis:
     build:
-      context: ./src/lib/ai/bias-detection/python-service
+      context: ./apps/web/src/lib/ai/bias-detection/python-service
       dockerfile: Dockerfile
     container_name: pixelated-celery-bias-worker
     command:
@@ -19,7 +19,7 @@ services:
       - POSTGRES_USER=pixelated
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./apps/web/src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
     depends_on:
       redis:
@@ -42,7 +42,7 @@ services:
   # Celery Worker for batch processing tasks
   celery-worker-batch-processing:
     build:
-      context: ./src/lib/ai/bias-detection/python-service
+      context: ./apps/web/src/lib/ai/bias-detection/python-service
       dockerfile: Dockerfile
     container_name: pixelated-celery-batch-worker
     command:
@@ -59,7 +59,7 @@ services:
       - POSTGRES_USER=pixelated
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./apps/web/src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
     depends_on:
       redis:
@@ -82,7 +82,7 @@ services:
   # Celery Worker for quality validation tasks
   celery-worker-quality-validation:
     build:
-      context: ./src/lib/ai/bias-detection/python-service
+      context: ./apps/web/src/lib/ai/bias-detection/python-service
       dockerfile: Dockerfile
     container_name: pixelated-celery-quality-worker
     command:
@@ -99,7 +99,7 @@ services:
       - POSTGRES_USER=pixelated
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./apps/web/src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
     depends_on:
       redis:
@@ -122,7 +122,7 @@ services:
   # Celery Worker for export processing tasks
   celery-worker-export-processing:
     build:
-      context: ./src/lib/ai/bias-detection/python-service
+      context: ./apps/web/src/lib/ai/bias-detection/python-service
       dockerfile: Dockerfile
     container_name: pixelated-celery-export-worker
     command:
@@ -139,7 +139,7 @@ services:
       - POSTGRES_USER=pixelated
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./apps/web/src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
       - ./ai/dataset_pipeline:/app/dataset_pipeline
     depends_on:
@@ -163,7 +163,7 @@ services:
   # Celery Beat scheduler for periodic tasks
   celery-beat:
     build:
-      context: ./src/lib/ai/bias-detection/python-service
+      context: ./apps/web/src/lib/ai/bias-detection/python-service
       dockerfile: Dockerfile
     container_name: pixelated-celery-beat
     command:
@@ -180,7 +180,7 @@ services:
       - POSTGRES_USER=pixelated
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./apps/web/src/lib/ai/bias-detection/python-service:/app
       - ./bias_detection.log:/app/bias_detection.log
     depends_on:
       redis:
@@ -203,7 +203,7 @@ services:
   # Flower monitoring dashboard for Celery
   celery-flower:
     build:
-      context: ./src/lib/ai/bias-detection/python-service
+      context: ./apps/web/src/lib/ai/bias-detection/python-service
       dockerfile: Dockerfile
     container_name: pixelated-celery-flower
     command: celery -A celery_config flower --address=0.0.0.0 --port=5555
@@ -220,7 +220,7 @@ services:
       - POSTGRES_USER=pixelated
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./src/lib/ai/bias-detection/python-service:/app
+      - ./apps/web/src/lib/ai/bias-detection/python-service:/app
     depends_on:
       redis:
         condition: service_healthy

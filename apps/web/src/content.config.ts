@@ -29,7 +29,7 @@ import {
  */
 
 // Move content to src/content-store/ to avoid legacy auto-generation warnings
-const baseDir = path.resolve(process.cwd(), 'src/content-store')
+const baseDir = path.resolve(process.cwd(), 'apps/web/src/content-store')
 
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: `${baseDir}/blog` }),

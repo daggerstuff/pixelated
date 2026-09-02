@@ -26,7 +26,7 @@ import type {
   validateToken,
   refreshAccessToken,
   revokeToken,
-} from '../../../src/lib/auth/auth0-jwt-service'
+} from '../../../apps/web/src/lib/auth/auth0-jwt-service'
 import type {
   assignRoleToUser,
   removeRoleFromUser,
@@ -35,14 +35,14 @@ import type {
   userHasPermission,
   userHasRole,
   validateRoleTransition,
-} from '../../../src/lib/auth/auth0-rbac-service'
-import type { Auth0SocialAuthService } from '../../../src/lib/auth/auth0-social-auth-service'
+} from '../../../apps/web/src/lib/auth/auth0-rbac-service'
+import type { Auth0SocialAuthService } from '../../../apps/web/src/lib/auth/auth0-social-auth-service'
 // Static imports removed to allow dynamic loading with env vars
-// import { Auth0UserService } from '../../../src/services/auth0.service'
-// import { Auth0SocialAuthService } from '../../../src/lib/auth/auth0-social-auth-service'
-// import * as auth0JwtService from '../../../src/lib/auth/auth0-jwt-service'
-// import * as auth0RbacService from '../../../src/lib/auth/auth0-rbac-service'
-import type { Auth0UserService } from '../../../src/services/auth0.service'
+// import { Auth0UserService } from '../../../apps/web/src/lib/services/auth0.service'
+// import { Auth0SocialAuthService } from '../../../apps/web/src/lib/auth/auth0-social-auth-service'
+// import * as auth0JwtService from '../../../apps/web/src/lib/auth/auth0-jwt-service'
+// import * as auth0RbacService from '../../../apps/web/src/lib/auth/auth0-rbac-service'
+import type { Auth0UserService } from '../../../apps/web/src/lib/services/auth0.service'
 
 type UnknownRecord = Record<string, unknown>
 
@@ -202,7 +202,7 @@ vi.mock('auth0', () => {
 })
 
 // Mock the mongodb config
-vi.mock('../../../src/config/mongodb.config', () => {
+vi.mock('../../../apps/web/src/config/mongodb.config', () => {
   return {
     mongodb: {
       connect: vi.fn().mockResolvedValue({
@@ -217,7 +217,7 @@ vi.mock('../../../src/config/mongodb.config', () => {
 })
 
 // Mock redis functions
-vi.mock('../../../src/lib/redis', () => {
+vi.mock('../../../apps/web/src/lib/redis', () => {
   return {
     getFromCache: vi.fn(),
     setInCache: vi.fn(),
@@ -226,7 +226,7 @@ vi.mock('../../../src/lib/redis', () => {
 })
 
 // Mock security logging
-vi.mock('../../../src/lib/security/index', () => {
+vi.mock('../../../apps/web/src/lib/security/index', () => {
   return {
     logSecurityEvent: vi.fn(),
     SecurityEventType: {
@@ -244,7 +244,7 @@ vi.mock('../../../src/lib/security/index', () => {
 })
 
 // Mock MCP integration
-vi.mock('../../../src/lib/mcp/phase6-integration', () => {
+vi.mock('../../../apps/web/src/lib/mcp/phase6-integration', () => {
   return {
     updatePhase6AuthenticationProgress: vi.fn(),
   }
@@ -274,19 +274,19 @@ describe('Auth0 Integration Tests', () => {
 
     // Dynamic imports
     const auth0ServiceMod =
-      (await import('../../../src/services/auth0.service')) as {
+      (await import('../../../apps/web/src/lib/services/auth0.service')) as {
         Auth0UserService: Auth0UserServiceCtor
       }
     Auth0UserServiceClass = auth0ServiceMod.Auth0UserService
 
     const socialAuthMod =
-      (await import('../../../src/lib/auth/auth0-social-auth-service')) as {
+      (await import('../../../apps/web/src/lib/auth/auth0-social-auth-service')) as {
         Auth0SocialAuthService: Auth0SocialAuthServiceCtor
       }
     Auth0SocialAuthServiceClass = socialAuthMod.Auth0SocialAuthService
 
-    auth0JwtService = await import('../../../src/lib/auth/auth0-jwt-service')
-    auth0RbacService = await import('../../../src/lib/auth/auth0-rbac-service')
+    auth0JwtService = await import('../../../apps/web/src/lib/auth/auth0-jwt-service')
+    auth0RbacService = await import('../../../apps/web/src/lib/auth/auth0-rbac-service')
   })
 
   afterAll(() => {
@@ -402,7 +402,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -615,7 +615,7 @@ describe('Auth0 Integration Tests', () => {
       expect(typeof result.user.createdAt).toBe('string')
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -727,7 +727,7 @@ describe('Auth0 Integration Tests', () => {
     })
 
     it('should revoke token successfully', async () => {
-      const redisModule = await import('../../../src/lib/redis')
+      const redisModule = await import('../../../apps/web/src/lib/redis')
       // Use vi.mocked to properly type the mock
       vi.mocked(redisModule.setInCache).mockResolvedValue(true)
 
@@ -786,7 +786,7 @@ describe('Auth0 Integration Tests', () => {
       })
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
@@ -902,7 +902,7 @@ describe('Auth0 Integration Tests', () => {
       await auth0UserService.signIn('test@example.com', 'password123')
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.LOGIN,
         null,
@@ -929,7 +929,7 @@ describe('Auth0 Integration Tests', () => {
       await auth0RbacService.assignRoleToUser('auth0|user123', 'therapist')
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ROLE_ASSIGNED,
         null,
@@ -962,7 +962,7 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_VALIDATED,
         null,
@@ -1001,7 +1001,7 @@ describe('Auth0 Integration Tests', () => {
       await auth0JwtService.refreshAccessToken('valid-refresh-token', {})
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.TOKEN_REFRESHED,
         null,
@@ -1099,7 +1099,7 @@ describe('Auth0 Integration Tests', () => {
       )
 
       // Verify security event was logged
-      const securityModule = await import('../../../src/lib/security/index')
+      const securityModule = await import('../../../apps/web/src/lib/security/index')
       expect(securityModule.logSecurityEvent).toHaveBeenCalledWith(
         securityModule.SecurityEventType.ACCOUNT_LINKED,
         null,

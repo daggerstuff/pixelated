@@ -23,11 +23,11 @@ BACKUP_RCLONE_FAST_LIST="${BACKUP_RCLONE_FAST_LIST:-true}"
 BACKUP_RCLONE_STATS="${BACKUP_RCLONE_STATS:-8s}"
 BACKUP_RCLONE_EXTRA_ARGS="${BACKUP_RCLONE_EXTRA_ARGS:-}"
 BACKUP_RCLONE_EXCLUDE_EXTRA="${BACKUP_RCLONE_EXCLUDE_EXTRA:-}"
-if [[ "${BACKUP_RCLONE_EXCLUDE_EXTRA}" != *"pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"* ]]; then
+if [[ "${BACKUP_RCLONE_EXCLUDE_EXTRA}" != *"pixelated/apps/web/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"* ]]; then
   if [[ -n "${BACKUP_RCLONE_EXCLUDE_EXTRA}" ]]; then
     BACKUP_RCLONE_EXCLUDE_EXTRA+=","
   fi
-  BACKUP_RCLONE_EXCLUDE_EXTRA+="pixelated/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
+  BACKUP_RCLONE_EXCLUDE_EXTRA+="pixelated/apps/web/src/lib/deployment/multi-region/ServiceDiscoveryManager.ts"
 fi
 if [[ "${BACKUP_SKIP_SECTIONS}" != *".claude"* ]]; then
   BACKUP_SKIP_SECTIONS+=" .claude"

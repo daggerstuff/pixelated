@@ -389,7 +389,7 @@ export REDIS_URL={os.getenv("REDIS_URL", "redis://localhost:6379/0")}
 
 # Start bias detection service
 echo "Starting Bias Detection Service on port {self.deployment_config["services"]["bias_detection"]["port"]}..."
-cd {self.project_root}/src/lib/ai/bias-detection/python-service
+cd {self.project_root}/apps/web/src/lib/ai/bias-detection/python-service
 uvicorn bias_detection_service:app --host 0.0.0.0 --port {self.deployment_config["services"]["bias_detection"]["port"]} --workers {self.deployment_config["services"]["bias_detection"]["workers"]} &
 
 # Start training service
