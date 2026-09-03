@@ -5,131 +5,14 @@
 
 import type { AIService } from '../../ai/models/ai-types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { EducationalType, TopicArea, ResourceType } from './educational-context-recognizer.types'
+import type { EducationalContextResult, EducationalRecognizerConfig, UserProfile } from './educational-context-recognizer.types'
+import { EDUCATIONAL_RECOGNITION_PROMPT } from './educational-context-recognizer.prompt'
+export { EducationalType, TopicArea, ResourceType }
+export type { EducationalContextResult, EducationalRecognizerConfig, UserProfile }
 
 const logger = createBuildSafeLogger('educational-context-recognizer')
 
-export interface EducationalContextResult {
-  isEducational: boolean
-  confidence: number
-  educationalType: EducationalType
-  complexity: 'basic' | 'intermediate' | 'advanced'
-  topicArea: TopicArea
-  learningObjectives: string[]
-  recommendedResources: ResourceType[]
-  priorKnowledgeRequired: string[]
-  metadata: {
-    conceptualDepth: number // 0-1 scale
-    practicalApplications: string[]
-    relatedTopics: string[]
-    ageAppropriateness?: 'child' | 'adolescent' | 'adult' | 'all'
-    [key: string]: unknown
-  }
-}
-
-export enum EducationalType {
-  DEFINITION = 'definition', // "What is depression?"
-  EXPLANATION = 'explanation', // "How does therapy work?"
-  COMPARISON = 'comparison', // "What's the difference between anxiety and panic attacks?"
-  MECHANISM = 'mechanism', // "Why do antidepressants take time to work?"
-  SYMPTOMS = 'symptoms', // "What are the symptoms of PTSD?"
-  CAUSES = 'causes', // "What causes bipolar disorder?"
-  TREATMENT = 'treatment', // "What are treatment options for anxiety?"
-  PREVENTION = 'prevention', // "How can I prevent panic attacks?"
-  RESEARCH = 'research', // "What does research say about CBT?"
-  STATISTICS = 'statistics', // "How common is depression?"
-  MYTH_BUSTING = 'myth_busting', // "Is it true that..."
-  DEVELOPMENTAL = 'developmental', // "How does depression affect children?"
-}
-
-export enum TopicArea {
-  DEPRESSION = 'depression',
-  ANXIETY = 'anxiety',
-  TRAUMA_PTSD = 'trauma_ptsd',
-  BIPOLAR = 'bipolar',
-  PERSONALITY_DISORDERS = 'personality_disorders',
-  EATING_DISORDERS = 'eating_disorders',
-  ADDICTION = 'addiction',
-  THERAPY = 'therapy',
-  MEDICATION = 'medication',
-  COPING_SKILLS = 'coping_skills',
-  RELATIONSHIPS = 'relationships',
-  STIGMA = 'stigma',
-  NEURODEVELOPMENTAL = 'neurodevelopmental',
-  GENERAL_MENTAL_HEALTH = 'general_mental_health',
-}
-
-export enum ResourceType {
-  SCIENTIFIC_ARTICLES = 'scientific_articles',
-  EDUCATIONAL_VIDEOS = 'educational_videos',
-  INTERACTIVE_TOOLS = 'interactive_tools',
-  BOOKS = 'books',
-  INFOGRAPHICS = 'infographics',
-  WORKSHEETS = 'worksheets',
-  SELF_ASSESSMENT = 'self_assessment',
-  PODCASTS = 'podcasts',
-  ONLINE_COURSES = 'online_courses',
-  SUPPORT_GROUPS = 'support_groups',
-}
-
-export interface EducationalRecognizerConfig {
-  aiService: AIService
-  model?: string
-  includeResourceRecommendations?: boolean
-  adaptToUserLevel?: boolean
-  enableTopicMapping?: boolean
-}
-
-export interface UserProfile {
-  educationLevel?: 'high_school' | 'undergraduate' | 'graduate' | 'professional'
-  priorMentalHealthKnowledge?: 'none' | 'basic' | 'intermediate' | 'advanced'
-  preferredLearningStyle?: 'visual' | 'auditory' | 'kinesthetic' | 'reading'
-}
-
-/**
- * System prompt for educational context recognition
- */
-const EDUCATIONAL_RECOGNITION_PROMPT = `You are an educational content classifier specializing in mental health education. Analyze the user's query to determine if it's seeking educational information and classify it appropriately.
-
-Your task is to:
-1. Determine if the query is primarily educational (seeking to learn/understand)
-2. Classify the type of educational question
-3. Identify the topic area and complexity level
-4. Suggest appropriate learning objectives and resources
-
-Educational Types:
-- definition: Asking what something is
-- explanation: Seeking how something works
-- comparison: Comparing concepts/treatments
-- mechanism: Understanding why/how processes work
-- symptoms: Learning about signs/symptoms
-- causes: Understanding what causes conditions
-- treatment: Learning about interventions
-- prevention: How to prevent/manage
-- research: What research/evidence shows
-- statistics: Epidemiological information
-- myth_busting: Correcting misconceptions
-- developmental: Age/stage specific information
-
-Topic Areas:
-depression, anxiety, trauma_ptsd, bipolar, personality_disorders, eating_disorders, addiction, therapy, medication, coping_skills, relationships, stigma, neurodevelopmental, general_mental_health
-
-Complexity Levels:
-- basic: Simple definitions, general concepts
-- intermediate: Detailed explanations, mechanisms
-- advanced: Research findings, complex interactions
-
-Respond in JSON format with:
-- isEducational: boolean
-- confidence: number (0-1)
-- educationalType: one of the types above
-- complexity: basic/intermediate/advanced
-- topicArea: one of the topic areas above
-- learningObjectives: array of specific learning goals
-- recommendedResources: array of appropriate resource types
-- priorKnowledgeRequired: array of prerequisite concepts
-- metadata: object with additional educational context
-
-Focus on accuracy and educational value.`
 
 /**
  * Educational Context Recognition Engine
