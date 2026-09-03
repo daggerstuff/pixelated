@@ -70,6 +70,19 @@ interface UsageAnalytics {
   monthlyActiveUsers: number
 }
 
+function enterpriseSecureRandom() {
+  const array = new Uint32Array(1)
+  window.crypto.getRandomValues(array)
+  return (array[0] ?? 0) / (0xffffffff + 1)
+}
+
+function generateTimeSeriesData(points: number, min: number, max: number) {
+  return Array.from({ length: points }, (_, i) => ({
+    timestamp: Date.now() - (points - i) * 60000,
+    value: min + enterpriseSecureRandom() * (max - min),
+  }))
+}
+
 export default function EnterpriseMonitoringDashboard() {
   const [performanceMetrics, setPerformanceMetrics] = useState<
     PerformanceMetric[]
@@ -241,21 +254,6 @@ export default function EnterpriseMonitoringDashboard() {
 
     return () => clearInterval(interval)
   }, [])
-
-  // Cryptographically secure random number generator for browser
-  const secureRandom = () => {
-    const array = new Uint32Array(1)
-    window.crypto.getRandomValues(array)
-    // Defensive: array is always length 1, but TypeScript may warn
-    return (array?.[0] ?? 0) / (0xffffffff + 1)
-  }
-
-  const generateTimeSeriesData = (points: number, min: number, max: number) => {
-    return Array.from({ length: points }, (_, i) => ({
-      timestamp: Date.now() - (points - i) * 60000,
-      value: min + secureRandom() * (max - min),
-    }))
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -99,9 +99,9 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       datasets: [
         {
           label: 'Correlation Analysis',
-          data: Array.from({ length: 50 }, () => ({
-            x: Math.random() * 100,
-            y: Math.random() * 100,
+          data: Array.from({ length: 50 }, (_, i) => ({
+            x: (i * 37) % 100,
+            y: (i * 61) % 100,
           })),
           backgroundColor: 'rgba(59, 130, 246, 0.6)',
         },
@@ -164,10 +164,12 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
       }, 500)
       return () => clearTimeout(timer)
     } else {
-      setChartData(data)
-      setIsLoading(false)
+      const timer = window.setTimeout(() => {
+        setChartData(data)
+        setIsLoading(false)
+      }, 0)
+      return () => window.clearTimeout(timer)
     }
-    return undefined
   }, [data, type])
 
   const mergedOptions = { ...defaultOptions, ...options }

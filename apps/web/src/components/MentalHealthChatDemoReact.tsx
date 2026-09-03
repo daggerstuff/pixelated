@@ -71,7 +71,7 @@ export default function MentalHealthChatDemoReact({
   showSettingsPanel = true,
   showAnalysisPanel = true,
 }: MentalHealthChatDemoReactProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: '1',
       role: 'assistant',
@@ -100,9 +100,12 @@ export default function MentalHealthChatDemoReact({
       analysisMinimumLength: 15,
     })
 
-    setMentalHealthChat(chat)
+    const timer = window.setTimeout(() => {
+      setMentalHealthChat(chat)
+    }, 0)
 
     return () => {
+      window.clearTimeout(timer)
       // Clean up if needed
     }
   }, [settings.enableAnalysis, settings.useExpertGuidance])

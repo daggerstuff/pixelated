@@ -493,7 +493,7 @@ const OverviewTab: FC<{
                         Success Rate:
                       </span>
                       <span className="ml-2 font-medium">
-                        {Math.floor(Math.random() * 20) + 75}%
+                        {87}%
                       </span>
                     </div>
                     <div>
@@ -501,7 +501,7 @@ const OverviewTab: FC<{
                         Last Active:
                       </span>
                       <span className="ml-2 font-medium">
-                        {Math.floor(Math.random() * 3) + 1}h ago
+                        {1}h ago
                       </span>
                     </div>
                   </div>
@@ -725,7 +725,7 @@ const TherapistsTab: FC<{
                         Success Rate:
                       </span>
                       <span className="ml-2 font-medium">
-                        {Math.floor(Math.random() * 20) + 75}%
+                        {87}%
                       </span>
                     </div>
                     <div>
@@ -733,7 +733,7 @@ const TherapistsTab: FC<{
                         Last Active:
                       </span>
                       <span className="ml-2 font-medium">
-                        {Math.floor(Math.random() * 3) + 1}h ago
+                        {1}h ago
                       </span>
                     </div>
                   </div>
@@ -1015,7 +1015,7 @@ const SystemTab: FC<{
                 Active Sessions
               </span>
               <span className="text-blue-600 font-bold">
-                {Math.floor(Math.random() * 50) + 20}
+                {34}
               </span>
             </div>
             <div className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 flex items-center justify-between rounded-lg border p-3">

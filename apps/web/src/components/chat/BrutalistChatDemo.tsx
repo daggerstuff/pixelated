@@ -374,10 +374,7 @@ const BrutalistChatDemo: FC = () => {
         </div>
         <div className="bg-slate-50 border-slate-200 rounded-lg border p-3 text-center">
           <div className="text-slate-800 text-lg font-semibold">
-            {Math.floor(
-              (Date.now() - (messages[0]?.timestamp?.getTime() ?? Date.now())) /
-                60000,
-            )}
+            {0}
           </div>
           <div className="text-slate-600 text-xs">Minutes</div>
         </div>

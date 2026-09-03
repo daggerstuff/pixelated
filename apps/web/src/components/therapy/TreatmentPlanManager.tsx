@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useCallback,
   useId,
+  useRef,
   FC,
   SyntheticEvent,
 } from 'react'
@@ -191,6 +192,7 @@ const TreatmentPlanManager: FC = () => {
   const [plans, setPlans] = useState<TreatmentPlan[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const tempIdRef = useRef(0)
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [newPlanData, setNewPlanData] = useState<FormNewPlanData>(
@@ -230,7 +232,10 @@ const TreatmentPlanManager: FC = () => {
   }, [])
 
   useEffect(() => {
-    void fetchPlans()
+    const timer = window.setTimeout(() => {
+      void fetchPlans()
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [fetchPlans])
 
   const handleInputChange = (
@@ -262,7 +267,7 @@ const TreatmentPlanManager: FC = () => {
       description: '',
       status: 'Not Started',
       objectives: [],
-      tempId: `goal-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      tempId: `goal-${++tempIdRef.current}`,
     }
     if (isEdit) {
       setEditingPlanData((prev) => {
@@ -328,7 +333,7 @@ const TreatmentPlanManager: FC = () => {
     const baseObjective: ClientSideNewObjective = {
       description: '',
       status: 'Not Started',
-      tempId: `obj-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      tempId: `obj-${++tempIdRef.current}`,
     }
 
     if (isEdit) {

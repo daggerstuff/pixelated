@@ -102,7 +102,7 @@ class EncryptedJotaiStorage<Value> {
 
     if (this.options.encrypt) {
       try {
-        serialized = await encrypt(serialized)
+        serialized = encrypt(serialized)
       } catch (error: unknown) {
         logger.error('Failed to encrypt state:', error)
         throw new Error('Failed to encrypt state for storage', { cause: error })
@@ -119,7 +119,7 @@ class EncryptedJotaiStorage<Value> {
       // Try to decrypt if it looks like encrypted data
       if (this.options.encrypt || serialized.startsWith('enc:')) {
         try {
-          decrypted = await decrypt(serialized)
+          decrypted = decrypt(serialized)
         } catch (error: unknown) {
           logger.warn(
             'Failed to decrypt stored state, treating as plain text:',

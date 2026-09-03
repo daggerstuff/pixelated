@@ -141,9 +141,9 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
       datasets: [
         {
           label: 'Correlation Analysis',
-          data: Array.from({ length: 30 }, () => ({
-            x: Math.random() * 100,
-            y: Math.random() * 100,
+          data: Array.from({ length: 30 }, (_, i) => ({
+            x: (i * 37) % 100,
+            y: (i * 61) % 100,
           })),
           backgroundColor: 'rgba(59, 130, 246, 0.6)',
         },
@@ -160,17 +160,19 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
 
   // Handle backend errors gracefully
   useEffect(() => {
-    if (backendError && useBackend) {
-      console.warn(
-        'Backend chart data unavailable, falling back to demo data:',
-        backendError,
-      )
-      setError('Live data temporarily unavailable')
-      // Optionally fall back to demo data
-      setUseBackend(false)
-    } else if (error && !backendError && useBackend) {
-      setError(null)
-    }
+    const timer = window.setTimeout(() => {
+      if (backendError && useBackend) {
+        console.warn(
+          'Backend chart data unavailable, falling back to demo data:',
+          backendError,
+        )
+        setError('Live data temporarily unavailable')
+        setUseBackend(false)
+      } else if (error && !backendError && useBackend) {
+        setError(null)
+      }
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [backendError, useBackend, error])
 
   // Default chart options with therapy-specific styling

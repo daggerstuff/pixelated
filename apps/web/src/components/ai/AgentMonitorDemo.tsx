@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Play, Pause, Plus, Trash2, Zap, Send, Loader2, Download, RotateCcw } from 'lucide-react';
 import { MultiAgentThoughtUI } from './MultiAgentThoughtUI';
 import { AgentPerformanceHeatmap, type AgentMetric } from './AgentPerformanceHeatmap';
@@ -50,7 +50,7 @@ export const AgentMonitorDemo: React.FC = () => {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   
   // Unique session ID for the current "Live" session
-  const sessionTurnId = useMemo(() => Math.random().toString(36).substring(2, 15), []);
+  const [sessionTurnId] = useState(() => `session-${Math.random().toString(36).substring(2, 15)}`);
   
   // Performance stats state
   const [stats, setStats] = useState<Record<string, AgentMetric>>({});

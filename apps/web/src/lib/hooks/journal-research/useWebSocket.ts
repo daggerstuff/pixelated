@@ -151,7 +151,7 @@ export const useJournalResearchWebSocket = ({
     [onMessage, onError],
   )
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function connect() {
     if (typeof window === 'undefined') {
       return
     }

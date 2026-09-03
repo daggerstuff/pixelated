@@ -221,7 +221,7 @@ export function SkeletonChartBar({ className }: SkeletonProps) {
   return (
     <div className={cn('flex h-40 items-end gap-2', className)}>
       {Array.from({ length: 7 }).map((_, i) => {
-        const randomHeight = Math.floor(Math.random() * 100) + 20
+        const randomHeight = 20 + ((i * 37) % 80)
         return (
           <div
             key={`chart-bar-${i}`}

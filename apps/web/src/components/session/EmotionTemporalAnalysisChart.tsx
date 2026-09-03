@@ -356,7 +356,7 @@ export default function EmotionTemporalAnalysisChart({
           <Tooltip
             contentStyle={tooltipStyle}
             formatter={
-              ((value: ValueType, name: NameType) => {
+              (value: ValueType, name: NameType) => {
                 if (name === 'slope') {
                   const numericValue = toNumber(value)
                   return [
@@ -371,7 +371,7 @@ export default function EmotionTemporalAnalysisChart({
                   return [formatNumber(value, 2), 'Significance']
                 }
                 return [value, name]
-              }}
+              }
             }
           />
 
@@ -514,7 +514,7 @@ export default function EmotionTemporalAnalysisChart({
           <Tooltip
             contentStyle={tooltipStyle}
             formatter={
-              ((value: ValueType, name: NameType) => {
+              (value: ValueType, name: NameType) => {
                 if (name === 'frequency') {
                   return [value, 'Frequency']
                 }
@@ -522,7 +522,7 @@ export default function EmotionTemporalAnalysisChart({
                   return [formatNumber(value, 1), 'Avg Duration (min)']
                 }
                 return [value, name]
-              }}
+              }
             }
           />
 
@@ -560,15 +560,12 @@ export default function EmotionTemporalAnalysisChart({
         <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
         <Tooltip
           contentStyle={tooltipStyle}
-            formatter={
-              (value: ValueType, name: NameType) => {
-              if (name === 'correlation') {
-                return [formatNumber(value, 2), 'Correlation']
-              }
-                return [value, name]
-              }
+          formatter={(value: ValueType, name: NameType) => {
+            if (name === 'correlation') {
+              return [formatNumber(value, 2), 'Correlation']
             }
-          }
+            return [value, name]
+          }}
         />
         <Legend />
         <ReferenceLine y={0} stroke="var(--np-muted)" />

@@ -13,7 +13,7 @@ import { createRequire } from 'module'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-import { globby } from 'globby'
+import globby from 'globby'
 const require = createRequire(import.meta.url)
 const matter = require('gray-matter')
 import simpleGit from 'simple-git'

@@ -1,6 +1,6 @@
 import type { APIContext } from 'astro'
 import { z } from 'zod'
-import { validateRequestBody } from '../../lib/validation/validateRequestBody'
+import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
 
 export const prerender = false
 

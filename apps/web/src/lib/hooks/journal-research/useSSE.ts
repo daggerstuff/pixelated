@@ -105,7 +105,7 @@ export const useJournalResearchSSE = ({
     [onMessage, onError],
   )
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function connect() {
     if (typeof window === 'undefined') {
       return
     }
