@@ -12,6 +12,8 @@ import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { loadEnv, createLogger } from 'vite'
 
+import { rewriteSentrySource } from './config/sentry-source-map.mjs'
+
 /** @typedef {import("rollup").RollupLog} RollupLog */
 // ECS Fargate requires the Node adapter.
 // Force the Node adapter regardless of any Vercel-provided env vars
@@ -64,6 +66,7 @@ function createScopedSentryVitePlugins({
     sourcemaps: {
       assets,
       ignore: ['**/node_modules/**'],
+      rewriteSources: rewriteSentrySource,
       filesToDeleteAfterUpload,
     },
   }).map((plugin) => ({
@@ -416,7 +419,9 @@ export default defineConfig({
         '@layouts': path.resolve('./apps/web/src/layouts'),
         '@utils': path.resolve('./apps/web/src/utils'),
         '@lib': path.resolve('./apps/web/src/lib'),
-        'framer-motion': path.resolve('./apps/web/src/lib/shims/framer-motion.tsx'),
+        'framer-motion': path.resolve(
+          './apps/web/src/lib/shims/framer-motion.tsx',
+        ),
         '@radix-ui/react-tooltip': path.resolve(
           './apps/web/src/lib/shims/radix-tooltip.tsx',
         ),
@@ -676,23 +681,12 @@ export default defineConfig({
               // Tag uploaded files with the current release so server
               // events that carry a matching SENTRY_RELEASE can be
               // symbolicated against the uploaded maps.
-              release: sentryRelease
-                ? { name: sentryRelease }
-                : undefined,
-              // Upload client + server sourcemaps. Without this, every
-              // captured event arrives in Sentry as the bundled filename
-              // and is unsymbolicated (no useful stack traces).
+              release: sentryRelease ? { name: sentryRelease } : undefined,
+              // Sourcemaps are uploaded by the scoped Sentry Vite plugins
+              // above. Keep the SDK integration enabled without running a
+              // second broad uploader over Astro's virtual module paths.
               sourcemaps: {
-                assets: [
-                  './dist/client/_astro/**/*.js',
-                  './dist/client/_astro/**/*.js.map',
-                  './dist/server/**/*.mjs',
-                  './dist/server/**/*.mjs.map',
-                ],
-                filesToDeleteAfterUpload: [
-                  './dist/client/_astro/**/*.map',
-                  './dist/server/**/*.map',
-                ],
+                disable: true,
               },
             }),
           ]
