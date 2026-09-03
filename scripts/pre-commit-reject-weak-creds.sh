@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Colors
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Ensure the correct Node version from nvm is available in the hook environment
+if [ -z "${NVM_DIR:-}" ]; then
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.nvm"
+  elif [ -s "$HOME/.config/nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.config/nvm"
+  fi
+fi
+
+if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+  if [ -f .nvmrc ]; then
+    if ! nvm use --silent >/dev/null; then
+      # Handle patch version mismatch gracefully if the major version matches
+      target_node_version=$(cat .nvmrc | tr -d '[:space:]')
+      current_major=$(node -v 2>/dev/null | cut -d'.' -f1 | tr -d 'v' || echo "")
+      target_major=$(echo "$target_node_version" | cut -d'.' -f1)
+      if [ -n "$current_major" ] && [ "$current_major" = "$target_major" ]; then
+        echo -e "${YELLOW}⚠️  [Hook] Exact Node version $target_node_version not active, but compatible version $(node -v) is active. Continuing...${NC}"
+      else
+        RED_COLOR='\033[0;31m'
+        echo -e "${RED_COLOR}❌ [Hook] Unable to activate Node from .nvmrc ($target_node_version) and no compatible version was found. Install it with 'nvm install'.${NC}"
+        exit 1
+      fi
+    fi
+  fi
+fi
+
+# Defensive PATH normalization: nvm's `use` prepends its bin to PATH, but
+# user-level shell configs (e.g. `export PATH="$PNPM_HOME/bin:$PATH"` in
+# ~/.bashrc / ~/.zshrc) commonly re-prepend a global pnpm shim ahead of it.
+# That shim is a /bin/sh wrapper that `exec node`, which can resolve to a
+# system Node v20 missing `node:sqlite` — breaking pnpm >= 11.3.0 (which
+# requires Node >= 22.13). Re-pin the nvm-resolved node + pnpm to the front
+# of PATH and override PNPM_HOME for child processes so the correct toolchain
+# is always used by `pnpm` invocations in this hook and any subprocesses
+# (e.g. `pnpm exec lint-staged`, `bash scripts/devops/check-lockfiles-pre-commit.sh`).
+if [ -n "${NVM_DIR:-}" ]; then
+  _nvm_node_dir="$(nvm which current 2>/dev/null | xargs -r dirname || true)"
+  if [ -n "${_nvm_node_dir:-}" ] && [ -x "${_nvm_node_dir}/node" ]; then
+    # Drop any other pnpm-bearing bins so the nvm-resolved pnpm wins.
+    _clean_path=""
+    IFS=':' read -r -a _path_parts <<< "$PATH"
+    for _p in "${_path_parts[@]}"; do
+      case ":${_p}:" in
+        *":${PNPM_HOME:-/nonexistent}/bin:"*) continue ;;
+      esac
+      _clean_path="${_clean_path:+${_clean_path}:}${_p}"
+    done
+    export PATH="${_nvm_node_dir}:${_clean_path}"
+    # Force the global pnpm shim (if any) to resolve to the nvm node, so
+    # pnpm/PnP/lockfile scripts don't fall back to a system node.
+    export npm_config_node="${_nvm_node_dir}/node"
+    unset _nvm_node_dir _clean_path _path_parts _p
+  fi
+fi
+
+echo -e "${BLUE}🔍 [Hook] Running pre-commit checks...${NC}"
+
+# Guard: prevent install-git-hooks.sh from overwriting this file mid-execution.
+# pnpm exec lint-staged triggers pnpm prepare → install-git-hooks.sh → cp,
+# which corrupts the running script because bash reads files line-by-line.
+export PIXELATED_PRECOMMIT_HOOK=1
+
+# A. Secret scanning (Catch potential leaks before they leave)
+echo "🔒 Scanning for secrets..."
+# Check for staged files matching sensitive filename patterns (exclude .env.example/.sample)
+EXPR="(\.env$|\.env\.(local|production|development|staging|prod|dev|test)$|config/secrets|\.pem|id_rsa|id_ed25519|.*\.key|.*\.p12|.*\.pfx)"
+if git diff --cached --name-only | grep -E "$EXPR" >/dev/null 2>&1; then
+  SENSITIVE_FILES=$(git diff --cached --name-only | grep -E "$EXPR")
+  echo -e "${RED}❌ ERROR: Potential sensitive file found in staged changes:${NC}"
+  echo "$SENSITIVE_FILES"
+  exit 1
+fi
+
+# Delegate content-level secret scanning to the dedicated scanner
+# Allowlist suppresses false positives: env-var reads, docs examples, function-call returns.
+# Uses a heredoc so double and single quotes inside entries need no escaping.
+read -r SECRETS_ALLOWLIST <<'ALLOWLIST_EOF'
+_strip_env,os.getenv,process.env,rootroot,secure_password,localhost,APIFY_TOKEN,wJalr,user:pass@host,user:pass@remote,prod-server/myapp,192.168.1.1:8080,redis:6379/0,line.split,get_supadata_api_key,resolve_asana_token,resolve_github_token,"type": "service_account",user:password@postgres,<USERNAME>,<CLUSTER>,this.API_KEY,resolve_jira_token,extractTokenFromRequest,next_page_token,os.environ.get,payload.get,= getString,.redis.password,credentials.client_secret,subscription.apiKey,this.config.redis.password,redis://localhost:6379,mongodb://localhost:27017/threat_feeds,client_secret: clientSecret,token: refreshToken,api_key: DeveloperApiKey,password: restToken,password = fs.readFileSync,password = password,password: password,token: tokenResponse.access_token,password: newPassword,SecurePassword123,SecurePass123,admin:password@127.0.0.1,cookie-based,token = authHeader,client_secret: credentials,password: 'password,password: subscription,postgresql://neondb_owner:npg_,password: 'Password123,token: 'valid-token,password: 'wrong-password,AKIAIOSFODNN7EXAMPLE
+ALLOWLIST_EOF
+
+# Resolve repo root: --show-superproject-toplevel returns the literal flag
+# name (not empty) in some git versions when not inside a submodule, so
+# validate the result is an actual directory before using it.
+_repo_root="$(git rev-parse --show-superproject-toplevel 2>/dev/null || true)"
+if [ -z "$_repo_root" ] || [ ! -d "$_repo_root" ]; then
+  _repo_root="$(git rev-parse --show-toplevel 2>/dev/null || true)"
+fi
+_scanner_path="$_repo_root/.github/hooks/secrets-scanner/scan-secrets.sh"
+if [ -n "$_repo_root" ] && [ -f "$_scanner_path" ]; then
+  SECRETS_ALLOWLIST="$SECRETS_ALLOWLIST" SCAN_MODE=block SCAN_SCOPE=staged bash "$_scanner_path"
+else
+  echo -e "${YELLOW}⚠️  [Hook] Secrets scanner not found at $_scanner_path, skipping content scan${NC}"
+fi
+unset _repo_root _scanner_path
+
+# B. Check lockfile synchronization
+if [ -f scripts/devops/check-lockfiles-pre-commit.sh ]; then
+  echo "🔗 Checking lockfile synchronization..."
+  bash scripts/devops/check-lockfiles-pre-commit.sh
+fi
+
+# C. Run linting via lint-staged (Fix Issue #2: performant linting only on staged files)
+if command -v pnpm >/dev/null 2>&1 && [ -f .lintstagedrc.json ]; then
+  echo -e "${GREEN}✨ Running linting via lint-staged (verbose, only on changed files)...${NC}"
+  # Verbose: omit --quiet so each linter's real output streams inline.
+  # This surfaces the offending file+rule+line the moment a check fails,
+  # instead of a bare ✖ that forces a manual reproduction to diagnose.
+  if ! pnpm exec lint-staged; then
+    echo -e "${RED}❌ [Hook] lint-staged found failures above. See the per-command output (file, rule, line) to fix them.${NC}"
+    echo -e "${YELLOW}   Re-run a specific linter directly, e.g.:${NC}"
+    echo -e "${YELLOW}     pnpm exec oxlint -c .oxlintrc.json <file>${NC}"
+    echo -e "${YELLOW}     pnpm exec ruff check --fix <file> && pnpm exec ruff format <file>${NC}"
+    exit 1
+  fi
+else
+  echo -e "${YELLOW}✨ Running full project linting (consider setting up lint-staged)...${NC}"
+  pnpm run lint
+fi
+
+# D. Block markdownlint suppression comments in staged Markdown files
+MARKDOWNLINT_MARKER='<!-- markdownlint-disable -->'
+MD_FILES=$(mktemp)
+MARKDOWNLINT_VIOLATIONS=$(mktemp)
+
+git diff --cached --name-only --diff-filter=ACM -- '*.md' > "$MD_FILES"
+
+while IFS= read -r FILE; do
+  [ -z "$FILE" ] && continue
+  if [ -f "$FILE" ] && grep -nF "$MARKDOWNLINT_MARKER" "$FILE" >/dev/null 2>&1; then
+    echo "$FILE" >> "$MARKDOWNLINT_VIOLATIONS"
+  fi
+done < "$MD_FILES"
+
+if [ -s "$MARKDOWNLINT_VIOLATIONS" ]; then
+  echo -e "${RED}❌ Error: markdownlint suppression markers found in staged Markdown files:"
+  cat "$MARKDOWNLINT_VIOLATIONS"
+  rm -f "$MD_FILES" "$MARKDOWNLINT_VIOLATIONS"
+  exit 1
+fi
+
+rm -f "$MD_FILES" "$MARKDOWNLINT_VIOLATIONS"

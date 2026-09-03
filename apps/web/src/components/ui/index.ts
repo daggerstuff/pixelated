@@ -42,3 +42,11 @@ export {
 export { Switch } from './switch'
 
 export { Textarea } from './textarea'
+
+export { Alert } from './alert'
+
+export { Badge } from './badge/badge'
+
+export { Progress, ProgressCircular } from './progress'
+
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'

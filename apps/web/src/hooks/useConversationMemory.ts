@@ -101,8 +101,8 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   })
 
   // Extracted session timing and metrics logic
-  const sessionStartTimeRef = useRef<number>(Date.now())
-  const lastActiveTimeRef = useRef<number>(Date.now())
+  const sessionStartTimeRef = useRef<number | null>(null)
+  const lastActiveTimeRef = useRef<number | null>(null)
   // Lazily track the timestamp of the last message. Start as null so the initial
   // mount -> first-message interval isn't treated as a response time.
   const lastMessageTimeRef = useRef<number | null>(null)
@@ -130,16 +130,19 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
   // let's just inline the active time update effect here for clarity and correct state management.
 
   useEffect(() => {
+    sessionStartTimeRef.current ??= Date.now()
+    lastActiveTimeRef.current ??= Date.now()
+
     if (baseMemory.sessionState !== 'active') {
       return
     }
 
     const interval = setInterval(() => {
       const duration = Math.floor(
-        (Date.now() - sessionStartTimeRef.current) / 1000,
+        (Date.now() - (sessionStartTimeRef.current ?? 0)) / 1000,
       )
       const additionalActive = Math.floor(
-        (Date.now() - lastActiveTimeRef.current) / 1000,
+        (Date.now() - (lastActiveTimeRef.current ?? 0)) / 1000,
       )
 
       setProgressState({
@@ -221,7 +224,7 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
         (state === 'paused' || state === 'ended')
       ) {
         const now = Date.now()
-        const elapsed = Math.floor((now - lastActiveTimeRef.current) / 1000)
+        const elapsed = Math.floor((now - (lastActiveTimeRef.current ?? 0)) / 1000)
 
         const metricsUpdate: Partial<SessionProgressMetrics> = {
           activeTime: (progressMetrics.activeTime ?? 0) + elapsed,
@@ -229,7 +232,7 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
 
         if (state === 'ended') {
           metricsUpdate.sessionDuration = Math.floor(
-            (now - sessionStartTimeRef.current) / 1000,
+            (now - (sessionStartTimeRef.current ?? 0)) / 1000,
           )
         }
 
