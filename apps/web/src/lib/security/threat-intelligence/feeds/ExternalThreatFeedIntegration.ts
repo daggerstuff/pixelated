@@ -5,12 +5,11 @@
 
 import { EventEmitter } from 'events'
 
-import axios, { AxiosInstance } from 'axios'
+import type { AxiosInstance } from 'axios'
 import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { asRedisOps } from '../../redis-ops'
 import {
   FeedConfig,
   FeedItem,
@@ -19,6 +18,17 @@ import {
   FeedProcessingResult,
   GlobalThreatIntelligence,
 } from '../global/types'
+import {
+  buildFeedRequestConfig,
+  calculateNextFetchTime,
+  createThreatFeedHttpClient,
+  deduplicateFeedItems,
+  filterFeedItems,
+  generateItemKey,
+  generateSubscriptionId,
+  getFeedProcessingInterval,
+  validateFeedConfig,
+} from './feed-helpers'
 import {
   type FeedProcessor,
   MISPFeedProcessor,
@@ -89,61 +99,15 @@ export class ExternalThreatFeedIntegrationCore
   private redis!: Redis
   private mongoClient!: MongoClient
   private db!: Db
-  private httpClient!: AxiosInstance
+  private readonly httpClient!: AxiosInstance
   private readonly subscriptions: Map<string, FeedSubscription> = new Map()
   private readonly feedProcessors: Map<string, FeedProcessor> = new Map()
   private readonly activeTimers: Map<string, NodeJS.Timeout> = new Map()
 
   constructor(_config: FeedConfig) {
     super()
-    this.initializeHttpClient()
+    this.httpClient = createThreatFeedHttpClient()
     this.initializeFeedProcessors()
-  }
-
-  private initializeHttpClient(): void {
-    this.httpClient = axios.create({
-      timeout: 30000,
-      headers: {
-        'User-Agent': 'Pixelated-Threat-Feed-Integration/1.0',
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-    })
-
-    // Add request/response interceptors for logging
-    this.httpClient.interceptors.request.use(
-      (config) => {
-        logger.debug('HTTP request', {
-          method: config.method,
-          url: config.url,
-          headers: config.headers,
-        })
-        return config
-      },
-      async (error) => {
-        logger.error('HTTP request error', { error })
-        return Promise.reject(error)
-      },
-    )
-
-    this.httpClient.interceptors.response.use(
-      (response) => {
-        logger.debug('HTTP response', {
-          status: response.status,
-          statusText: response.statusText,
-          url: response.config.url,
-        })
-        return response
-      },
-      async (error) => {
-        logger.error('HTTP response error', {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          status: error.response?.status,
-          url: error.config?.url,
-        })
-        return Promise.reject(error)
-      },
-    )
   }
 
   private initializeFeedProcessors(): void {
@@ -267,7 +231,7 @@ export class ExternalThreatFeedIntegrationCore
       })
 
       // Validate feed configuration
-      this.validateFeedConfig(feedConfig)
+      validateFeedConfig(feedConfig)
 
       // Create subscription
       const subscription = await this.createSubscription(feedConfig)
@@ -290,54 +254,10 @@ export class ExternalThreatFeedIntegrationCore
     }
   }
 
-  private validateFeedConfig(feedConfig: FeedConfig): void {
-    if (!feedConfig.feedId) {
-      throw new Error('Feed ID is required')
-    }
-
-    if (!feedConfig.provider) {
-      throw new Error('Feed provider is required')
-    }
-
-    if (!feedConfig.feedType) {
-      throw new Error('Feed type is required')
-    }
-
-    if (!feedConfig.endpoint) {
-      throw new Error('Feed endpoint is required')
-    }
-
-    if (!feedConfig.apiKey && feedConfig.requiresAuth) {
-      throw new Error('API key is required for authenticated feeds')
-    }
-
-    // Validate feed type
-    const validFeedTypes = [
-      'stix',
-      'taxii',
-      'misp',
-      'otx',
-      'virustotal',
-      'generic',
-    ]
-    if (!validFeedTypes.includes(feedConfig.feedType)) {
-      throw new Error(`Invalid feed type: ${feedConfig.feedType}`)
-    }
-
-    // Validate update frequency
-    const validFrequencies = ['real-time', 'hourly', 'daily', 'weekly']
-    if (
-      feedConfig.updateFrequency &&
-      !validFrequencies.includes(feedConfig.updateFrequency)
-    ) {
-      throw new Error(`Invalid update frequency: ${feedConfig.updateFrequency}`)
-    }
-  }
-
   private async createSubscription(
     feedConfig: FeedConfig,
   ): Promise<FeedSubscription> {
-    const subscriptionId = this.generateSubscriptionId()
+    const subscriptionId = generateSubscriptionId()
 
     return {
       subscriptionId,
@@ -377,7 +297,7 @@ export class ExternalThreatFeedIntegrationCore
     subscription: FeedSubscription,
   ): Promise<void> {
     try {
-      const interval = this.getFeedProcessingInterval(
+      const interval = getFeedProcessingInterval(
         subscription.updateFrequency,
       )
 
@@ -403,17 +323,6 @@ export class ExternalThreatFeedIntegrationCore
         error,
       })
     }
-  }
-
-  private getFeedProcessingInterval(updateFrequency: string): number {
-    const intervals: Record<string, number> = {
-      'real-time': 5 * 60 * 1000, // 5 minutes
-      'hourly': 60 * 60 * 1000, // 1 hour
-      'daily': 24 * 60 * 60 * 1000, // 24 hours
-      'weekly': 7 * 24 * 60 * 60 * 1000, // 7 days
-    }
-
-    return intervals[updateFrequency] ?? 60 * 60 * 1000 // Default to hourly
   }
 
   private async processFeedForSubscription(
@@ -492,7 +401,7 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       // Build request configuration
-      const requestConfig = await this.buildFeedRequestConfig(subscription)
+      const requestConfig = await buildFeedRequestConfig(subscription)
 
       // Fetch feed data
       const response = await this.httpClient.request(requestConfig)
@@ -501,15 +410,16 @@ export class ExternalThreatFeedIntegrationCore
       const feedItems = await processor.parseFeed(response.data, subscription)
 
       // Filter items based on subscription filters
-      const filteredItems = this.filterFeedItems(
+      const filteredItems = filterFeedItems(
         feedItems,
         subscription.filters,
       )
 
       // Deduplicate items
-      const deduplicatedItems = await this.deduplicateFeedItems(
+      const deduplicatedItems = await deduplicateFeedItems(
         filteredItems,
         subscription,
+        this.redis,
       )
 
       return deduplicatedItems
@@ -522,147 +432,8 @@ export class ExternalThreatFeedIntegrationCore
     }
   }
 
-  private async buildFeedRequestConfig(
-    subscription: FeedSubscription,
-  ): Promise<Record<string, unknown>> {
-    const subConfig: Partial<FeedConfig> & FeedSubscriptionRequestConfig =
-      subscription.config ?? {}
-    const headers = {
-      ...subConfig.headers,
-    } as Record<string, string>
-    const config: Record<string, unknown> = {
-      method: subConfig.method ?? 'GET',
-      url: subscription.endpoint,
-      headers,
-    }
-
-    // Add authentication
-    if (subscription.apiKey) {
-      switch (subConfig.authType) {
-        case 'api_key':
-          headers['X-API-Key'] = subscription.apiKey
-          break
-        case 'bearer':
-          headers['Authorization'] = `Bearer ${subscription.apiKey}`
-          break
-        case 'basic':
-          config['auth'] = {
-            username: subConfig.username ?? '',
-            password: subscription.apiKey,
-          }
-          break
-        case undefined: {
-          throw new Error('Not implemented yet: undefined case')
-        }
-      }
-    }
-
-    // Add query parameters
-    if (subConfig.queryParams) {
-      config['params'] = subConfig.queryParams
-    }
-
-    // Add request body for POST requests
-    if (config['method'] === 'POST' && subConfig.requestBody) {
-      config['data'] = subConfig.requestBody
-    }
-
-    return config
-  }
-
   private getFeedProcessor(feedType: string): FeedProcessor | undefined {
     return this.feedProcessors.get(feedType)
-  }
-
-  private filterFeedItems(
-    items: FeedItem[],
-    filters: Record<string, unknown>,
-  ): FeedItem[] {
-    if (!filters || Object.keys(filters).length === 0) {
-      return items
-    }
-
-    return items.filter((item) => {
-      // Apply severity filter
-      if (filters['severity'] && item.severity !== filters['severity']) {
-        return false
-      }
-
-      // Apply confidence filter
-      if (
-        filters['minConfidence'] &&
-        item.confidence < (filters['minConfidence'] as number)
-      ) {
-        return false
-      }
-
-      // Apply time filter
-      if (filters['maxAge']) {
-        const itemAge = Date.now() - new Date(item.timestamp).getTime()
-        if (itemAge > (filters['maxAge'] as number)) {
-          return false
-        }
-      }
-
-      // Apply custom filter function if provided
-      if (
-        filters['customFilter'] &&
-        typeof filters['customFilter'] === 'function'
-      ) {
-        return filters['customFilter'](item)
-      }
-
-      return true
-    })
-  }
-
-  private async deduplicateFeedItems(
-    items: FeedItem[],
-    subscription: FeedSubscription,
-  ): Promise<FeedItem[]> {
-    try {
-      const seenItems = new Set<string>()
-      const deduplicatedItems: FeedItem[] = []
-
-      // Get recently processed item IDs from Redis
-      const cacheKey = `feed_dedup:${subscription.subscriptionId}`
-      const recentItemIds = await this.redis.smembers(cacheKey)
-      recentItemIds.forEach((id) => seenItems.add(id))
-
-      for (const item of items) {
-        const itemKey = this.generateItemKey(item)
-
-        if (!seenItems.has(itemKey)) {
-          deduplicatedItems.push(item)
-          seenItems.add(itemKey)
-
-          // Add to Redis cache with expiration
-          await this.redis.sadd(cacheKey, itemKey)
-        }
-      }
-
-      // Set expiration on the deduplication set (24 hours)
-      if (this.redis && typeof asRedisOps(this.redis).expire === 'function') {
-        await asRedisOps(this.redis).expire(cacheKey, 24 * 60 * 60)
-      }
-
-      return deduplicatedItems
-    } catch (error: unknown) {
-      logger.error('Failed to deduplicate feed items:', { error })
-      return items // Return original items if deduplication fails
-    }
-  }
-
-  private generateItemKey(item: FeedItem): string {
-    // Generate a unique key based on item characteristics
-    const keyParts = [
-      item.itemId || '',
-      item.indicator || '',
-      item.indicatorType || '',
-      item.timestamp || '',
-    ]
-
-    return keyParts.join('|')
   }
 
   async processFeedItems(
@@ -879,7 +650,7 @@ export class ExternalThreatFeedIntegrationCore
         throw new Error(`Subscription not found: ${subscriptionId}`)
       }
 
-      const nextFetchTime = this.calculateNextFetchTime(subscription)
+      const nextFetchTime = calculateNextFetchTime(subscription)
 
       return {
         subscriptionId: subscription.subscriptionId,
@@ -895,15 +666,6 @@ export class ExternalThreatFeedIntegrationCore
       logger.error('Failed to get feed status:', { error, subscriptionId })
       throw error
     }
-  }
-
-  private calculateNextFetchTime(subscription: FeedSubscription): Date {
-    const interval = this.getFeedProcessingInterval(
-      subscription.updateFrequency,
-    )
-    const lastFetch = subscription.lastFetchTime ?? new Date()
-
-    return new Date(lastFetch.getTime() + interval)
   }
 
   async getAllSubscriptions(): Promise<FeedSubscription[]> {
@@ -940,7 +702,7 @@ export class ExternalThreatFeedIntegrationCore
       } as FeedConfig & FeedSubscriptionRequestConfig
 
       // Validate updated configuration (requires required fields to be present)
-      this.validateFeedConfig(updatedConfig)
+      validateFeedConfig(updatedConfig)
 
       subscription.config = updatedConfig
 
@@ -1187,10 +949,6 @@ export class ExternalThreatFeedIntegrationCore
       logger.error('MongoDB health check failed:', { error })
       return false
     }
-  }
-
-  private generateSubscriptionId(): string {
-    return `feed_sub_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
   }
 
   registerFeedProcessor(feedType: string, processor: FeedProcessor): void {
