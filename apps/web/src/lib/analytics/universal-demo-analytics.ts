@@ -410,20 +410,16 @@ export class UniversalDemoAnalytics {
     }
 
     // Send to custom analytics endpoint
-    try {
-      const response = await fetch('/api/analytics/demo-tracking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(eventData),
-      })
+    const response = await fetch('/api/analytics/demo-tracking', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(eventData),
+    })
 
-      if (!response.ok) {
-        throw new Error(`Analytics API error: ${response.status}`)
-      }
-    } catch (error: unknown) {
-      throw error
+    if (!response.ok) {
+      throw new Error(`Analytics API error: ${response.status}`)
     }
   }
 

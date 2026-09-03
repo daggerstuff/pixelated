@@ -86,6 +86,7 @@ const LoadingAnalytics = () => (
 function ProfessionalTherapistWorkspace() {
   // State
   const [messages, setMessages] = useState<ExtendedMessage[]>([])
+  const [now] = useState(() => Date.now())
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [showScenarios, setShowScenarios] = useState(false)
@@ -304,7 +305,7 @@ function ProfessionalTherapistWorkspace() {
             Array.isArray(analysis.scores['supportingEvidence'])
               ? (analysis.scores['supportingEvidence'] as string[])
               : [],
-          timestamp: Date.now(),
+          timestamp: now,
           expertGuided: riskAssessment.requiresExpert,
           emotions: emotions.primaryEmotion
             ? [emotions.primaryEmotion, ...emotions.secondaryEmotions]
@@ -312,8 +313,10 @@ function ProfessionalTherapistWorkspace() {
           riskFactors: riskAssessment.factors,
         }
 
-        // Update user message with analysis
-        userMessage.mentalHealthAnalysis = mentalHealthAnalysis
+        const analyzedUserMessage: ExtendedMessage = {
+          ...userMessage,
+          mentalHealthAnalysis,
+        }
 
         // Check if intervention is needed
         const interventionConfig: InterventionConfig = {
@@ -358,13 +361,13 @@ function ProfessionalTherapistWorkspace() {
         } else {
           // Fallback to normal response if patient simulation fails
           aiResponse = await getAIResponse(
-            JSON.stringify([...messages, userMessage]),
+            JSON.stringify([...messages, analyzedUserMessage]),
           )
         }
       } else {
         // Use regular AI response
         aiResponse = await getAIResponse(
-          JSON.stringify([...messages, userMessage]),
+          JSON.stringify([...messages, analyzedUserMessage]),
         )
       }
 
@@ -740,7 +743,7 @@ function ProfessionalTherapistWorkspace() {
                     confidence: 0,
                     explanation: 'No data available',
                     supportingEvidence: [],
-                    timestamp: Date.now(),
+                    timestamp: now,
                     expertGuided: false,
                     emotions: [],
                     riskFactors: [],

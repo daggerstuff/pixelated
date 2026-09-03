@@ -352,12 +352,8 @@ export class WebRTCService implements WebRTCServiceInterface {
       return
     }
 
-    try {
-      // Create and send an offer
-      await this.createAndSendOffer()
-    } catch (error: unknown) {
-      throw error
-    }
+    // Create and send an offer
+    await this.createAndSendOffer()
   }
 
   /**
@@ -368,22 +364,18 @@ export class WebRTCService implements WebRTCServiceInterface {
       return
     }
 
-    try {
-      // Create offer with audio/video capabilities
-      const offer = await this.peerConnection.createOffer({
-        offerToReceiveAudio: true,
-        offerToReceiveVideo: true,
-      })
+    // Create offer with audio/video capabilities
+    const offer = await this.peerConnection.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    })
 
-      // Set local description
-      await this.peerConnection.setLocalDescription(offer)
+    // Set local description
+    await this.peerConnection.setLocalDescription(offer)
 
-      // In a production system, send this offer to the signaling server
-      // For this implementation, we'll use a local signaling mechanism
-      this.sendOfferToSignalingServer(offer)
-    } catch (error: unknown) {
-      throw error
-    }
+    // In a production system, send this offer to the signaling server
+    // For this implementation, we'll use a local signaling mechanism
+    this.sendOfferToSignalingServer(offer)
   }
 
   /**
@@ -437,12 +429,8 @@ export class WebRTCService implements WebRTCServiceInterface {
       return
     }
 
-    try {
-      // Set the remote description using the received answer
-      await this.peerConnection.setRemoteDescription(answer)
-    } catch (error: unknown) {
-      throw error
-    }
+    // Set the remote description using the received answer
+    await this.peerConnection.setRemoteDescription(answer)
   }
 
   /**
@@ -681,4 +669,3 @@ export class WebRTCService implements WebRTCServiceInterface {
 }
 
 // Example PHI audit logging - uncomment and customize as needed
-

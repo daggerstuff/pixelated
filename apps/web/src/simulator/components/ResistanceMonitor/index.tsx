@@ -278,25 +278,32 @@ export function ResistanceMonitor({
 
   // Timestamp of the most recent update (rendered as "last seen" label).
   const [lastUpdateTime, setLastUpdateTime] = useState<number | null>(null)
+  const [now, setNow] = useState(() => Date.now())
 
   useEffect(() => {
-    if (latestPayload) setLastUpdateTime(Date.now())
+    const timer = window.setTimeout(() => {
+      if (latestPayload) setLastUpdateTime(Date.now())
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [latestPayload])
 
   // Keep formattedLastSeen ticking without causing re-renders on every tick.
   const [tick, setTick] = useState(0)
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => t + 1), 5_000)
+    const id = setInterval(() => {
+      setTick((t) => t + 1)
+      setNow(Date.now())
+    }, 5_000)
     return () => clearInterval(id)
   }, [])
 
   const formattedLastSeen = useMemo(() => {
     if (!lastUpdateTime) return '—'
-    const diff = Math.round((Date.now() - lastUpdateTime) / 1_000)
+    const diff = Math.round((now - lastUpdateTime) / 1_000)
     if (diff < 5) return 'just now'
     if (diff < 60) return `${diff}s ago`
     return `${Math.round(diff / 60)}m ago`
-  }, [lastUpdateTime, tick])
+  }, [lastUpdateTime, now])
 
   // Human-readable status dot class.
   const dotClass = useCallback((status: typeof connectionStatus) => {

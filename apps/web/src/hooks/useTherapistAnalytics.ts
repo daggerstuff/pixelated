@@ -123,6 +123,43 @@ export function useTherapistAnalytics(
   // Refs for cleanup and refresh loop
   const refreshIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  function applyAnalyticsFilters(
+    allSessions: TherapistSession[],
+    filters: AnalyticsFilters,
+  ) {
+    let out = [...allSessions]
+
+    if (filters?.timeRange) {
+      const now = Date.now()
+      const cutoff = ((): number => {
+        switch (filters.timeRange) {
+          case '7d':
+            return now - 7 * 24 * 60 * 60 * 1000
+          case '30d':
+            return now - 30 * 24 * 60 * 60 * 1000
+          case '90d':
+            return now - 90 * 24 * 60 * 60 * 1000
+          case '1y':
+            return now - 365 * 24 * 60 * 60 * 1000
+          default:
+            return 0
+        }
+      })()
+      out = out.filter((s) => new Date(s.startTime).getTime() >= cutoff)
+    }
+
+    if (filters?.skillCategory && filters.skillCategory !== 'all') {
+      out = out.filter((s) => {
+        const scores = s.progressMetrics?.skillScores ?? {}
+        return Object.keys(scores).some((sk) =>
+          sk.toLowerCase().includes(filters.skillCategory!),
+        )
+      })
+    }
+
+    return out
+  }
+
   /**
    * Transform session data for therapist analytics
    */
@@ -208,53 +245,6 @@ export function useTherapistAnalytics(
     },
     [],
   )
-
-  /**
-   * Lightweight filter applier - keeps hook decoupled from filter shape.
-   * Currently supports timeRange and skillCategory from AnalyticsFilters.
-   */
-  const applyAnalyticsFilters = (
-    allSessions: TherapistSession[],
-    filters: AnalyticsFilters,
-  ) => {
-    // Clone input
-    let out = [...allSessions]
-
-    // Time range filter - quick heuristic
-    if (filters?.timeRange) {
-      const now = Date.now()
-      const cutoff = ((): number => {
-        switch (filters.timeRange) {
-          case '7d':
-            return now - 7 * 24 * 60 * 60 * 1000
-          case '30d':
-            return now - 30 * 24 * 60 * 60 * 1000
-          case '90d':
-            return now - 90 * 24 * 60 * 60 * 1000
-          case '1y':
-            return now - 365 * 24 * 60 * 60 * 1000
-          default:
-            return 0
-        }
-      })()
-      out = out.filter((s) => {
-        const t = new Date(s.startTime).getTime()
-        return t >= cutoff
-      })
-    }
-
-    // skillCategory placeholder - if provided, filter sessions practicing skills in that category.
-    if (filters?.skillCategory && filters.skillCategory !== 'all') {
-      out = out.filter((s) => {
-        const scores = s.progressMetrics?.skillScores ?? {}
-        return Object.keys(scores).some((sk) =>
-          sk.toLowerCase().includes(filters.skillCategory!),
-        )
-      })
-    }
-
-    return out
-  }
 
   /**
    * Transform summary stats for therapist analytics
@@ -462,7 +452,10 @@ export function useTherapistAnalytics(
    */
   useEffect(() => {
     // Always load data, even if sessions is empty (will result in empty data structure)
-    void loadData(true)
+    const timer = window.setTimeout(() => {
+      void loadData(true)
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [sessions, loadData])
 
   // Auto-refresh (silent) based on options passed in via filters.config (if present)

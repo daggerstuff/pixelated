@@ -150,11 +150,17 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
 
   // Auto-refresh effect
   useEffect(() => {
-    void fetchDashboardData()
+    const timer = window.setTimeout(() => {
+      void fetchDashboardData()
+    }, 0)
     if (autoRefresh && refreshInterval > 0) {
       const interval = setInterval(() => void fetchDashboardData(), refreshInterval)
-      return () => clearInterval(interval)
+      return () => {
+        window.clearTimeout(timer)
+        clearInterval(interval)
+      }
     }
+    return () => window.clearTimeout(timer)
   }, [fetchDashboardData, autoRefresh, refreshInterval])
 
   return {
@@ -189,6 +195,9 @@ export function useAlertActions(params: UseAlertActionsParams) {
   const [selectedAlerts, setSelectedAlerts] = useState<Set<string>>(new Set())
   const [alertActions, setAlertActions] = useState<Map<string, AlertAction[]>>(new Map())
   const [alertNotes, setAlertNotes] = useState<Map<string, string>>(new Map())
+  const [dashboardDataProxy, setDashboardDataProxy] = useState<BiasDashboardData | null>(
+    params.dashboardData,
+  )
 
   const handleAlertAction = useCallback(
     async (alertId: string, action: AlertAction['type'], notes?: string) => {
@@ -233,12 +242,11 @@ export function useAlertActions(params: UseAlertActionsParams) {
     [],
   )
 
-  // Proxy to update dashboard data alerts — used internally by handleAlertAction
-  const [dashboardDataProxy, setDashboardDataProxy] = useState<BiasDashboardData | null>(
-    params.dashboardData,
-  )
   useEffect(() => {
-    setDashboardDataProxy(params.dashboardData)
+    const timer = window.setTimeout(() => {
+      setDashboardDataProxy(params.dashboardData)
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [params.dashboardData])
 
   const handleBulkAlertAction = useCallback(
@@ -412,8 +420,10 @@ export function useAccessibility() {
   )
 
   useEffect(() => {
-    updateScreenSize()
-    checkAccessibilityPreferences()
+    const timer = window.setTimeout(() => {
+      updateScreenSize()
+      checkAccessibilityPreferences()
+    }, 0)
     window.addEventListener('resize', updateScreenSize)
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const contrastQuery = window.matchMedia('(prefers-contrast: more)')
@@ -421,6 +431,7 @@ export function useAccessibility() {
     contrastQuery.addEventListener('change', checkAccessibilityPreferences)
     document.addEventListener('keydown', handleKeyDown)
     return () => {
+      window.clearTimeout(timer)
       window.removeEventListener('resize', updateScreenSize)
       motionQuery.removeEventListener('change', checkAccessibilityPreferences)
       contrastQuery.removeEventListener('change', checkAccessibilityPreferences)
@@ -457,10 +468,10 @@ interface UseExportDataParams {
 export function useExportData(params: UseExportDataParams) {
   const [showExportDialog, setShowExportDialog] = useState(false)
   const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'pdf'>('json')
-  const [exportDateRange, setExportDateRange] = useState<{ start: Date; end: Date }>({
+  const [exportDateRange, setExportDateRange] = useState<{ start: Date; end: Date }>(() => ({
     start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     end: new Date(),
-  })
+  }))
   const [exportDataTypes, setExportDataTypes] = useState({
     summary: true,
     alerts: true,
@@ -621,10 +632,10 @@ export function useFilters() {
   const [selectedDemographicFilter, setSelectedDemographicFilter] = useState('all')
   const [biasScoreFilter, setBiasScoreFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all')
   const [alertLevelFilter, setAlertLevelFilter] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all')
-  const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date }>({
+  const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date }>(() => ({
     start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     end: new Date(),
-  })
+  }))
 
   return {
     selectedTimeRange,
