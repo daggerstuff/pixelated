@@ -166,7 +166,7 @@ function buildResourceEntry(type: FhirResourceType) {
 
   const searchParams = SEARCH_PARAMS[type]
   if (searchParams && searchParams.length > 0) {
-    entry.searchParam = searchParams.map((p) => ({
+    entry['searchParam'] = searchParams.map((p) => ({
       name: p.name,
       type: p.type,
       ...(p.definition ? { definition: p.definition } : {}),
