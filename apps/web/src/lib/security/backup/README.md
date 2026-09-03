@@ -45,7 +45,7 @@ Import the `getStorageProvider` function to create an instance of a storage
 provider:
 
 ```typescript
-import { getStorageProvider } from './storage-providers'
+import { getStorageProvider } from './storage-providers-wrapper'
 
 // Create a File System Storage Provider
 const fileStorage = getStorageProvider('file', {
