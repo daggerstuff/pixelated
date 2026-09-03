@@ -283,7 +283,9 @@ export class TelehealthService {
   /**
    * Join a telehealth session — currently a stub.
    * Session store not yet wired; always returns null and audits with failure.
-   * TODO: Implement session store integration when available (F1.12 stub).
+   * Deferred: wire the session store (F1.12) to persist participant joins
+   * across instances — currently the in-memory map is the only source of
+   * truth and is lost on restart.
    */
   async joinSession(
     input: JoinSessionInput,

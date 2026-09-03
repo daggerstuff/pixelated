@@ -93,37 +93,6 @@ export const put: APIRoute = async ({ request }) => {
 
     const validatedData = validationResult.data
 
-    // In a real implementation, you would retrieve the existing export request
-    // const existingExport = await db.exportRequests.findUnique({ where: { id: validatedData.exportId } });
-
-    // if (!existingExport) {
-    //   return new Response(
-    //     JSON.stringify({ success: false, message: 'Export request not found' }),
-    //     { status: 404, headers: { 'Content-Type': 'application/json' } }
-    //   );
-    // }
-
-    // Check for valid status transitions
-    // This ensures status changes follow a logical flow
-    // const validTransitions = {
-    //   pending: ['processing', 'cancelled'],
-    //   processing: ['completed', 'failed'],
-    //   completed: ['delivered'],
-    //   failed: ['pending'],
-    //   cancelled: [],
-    //   delivered: []
-    // };
-
-    // if (!validTransitions[existingExport.status].includes(validatedData.status)) {
-    //   return new Response(
-    //     JSON.stringify({
-    //       success: false,
-    //       message: `Invalid status transition from ${existingExport.status} to ${validatedData.status}`
-    //     }),
-    //     { status: 400, headers: { 'Content-Type': 'application/json' } }
-    //   );
-    // }
-
     // Required fields for specific status transitions
     if (
       validatedData.status === 'completed' &&
@@ -138,19 +107,6 @@ export const put: APIRoute = async ({ request }) => {
       )
     }
 
-    // Update the export request
-    // In a real implementation, you would update the record in your database
-    // const updatedExport = await db.exportRequests.update({
-    //   where: { id: validatedData.exportId },
-    //   data: {
-    //     status: validatedData.status,
-    //     notes: validatedData.notes,
-    //     completionDetails: validatedData.completionDetails,
-    //     lastUpdatedBy: user.id,
-    //     lastUpdatedAt: new Date().toISOString()
-    //   }
-    // });
-
     // Log the update for audit purposes
     logger.info('Export request updated', {
       exportId: validatedData.exportId,
@@ -158,11 +114,6 @@ export const put: APIRoute = async ({ request }) => {
       newStatus: validatedData.status,
       hasCompletionDetails: !!validatedData.completionDetails,
     })
-
-    // If status changed to 'delivered', send notification to patient/recipient
-    // if (validatedData.status === 'delivered') {
-    //   await notificationService.sendExportDeliveryNotification(validatedData.exportId);
-    // }
 
     return new Response(
       JSON.stringify({

@@ -27,10 +27,6 @@ const chalk = {
 export function remarkGenerateOgImage() {
   return (tree: Root, file: any) => {
     // Simple implementation - just log the processing
-    console.log(
-      chalk.blue('Processing OG image generation for:'),
-      file?.path ?? 'unknown file',
-    )
 
     // Add metadata for OG image generation
     if (file?.data) {

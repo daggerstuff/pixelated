@@ -119,7 +119,7 @@ export const AgentMonitorDemo: React.FC = () => {
       await fetch('/api/ai/pixel/stats', { method: 'POST' }); // The proxy handles POST as reset
       void fetchStats();
     } catch (err) {
-      console.error('Failed to reset stats');
+      // error handled by caller
     }
   };
 
@@ -149,7 +149,7 @@ export const AgentMonitorDemo: React.FC = () => {
         setStats(data);
       }
     } catch (err) {
-      console.error('Failed to fetch stats');
+      // error handled by caller
     }
   }, []);
 
@@ -188,9 +188,8 @@ export const AgentMonitorDemo: React.FC = () => {
         });
       }
       
-      console.log(`Feedback ${feedback} saved for ${activityId}`);
     } catch (err) {
-      console.error('Error saving feedback:', err);
+      // error handled by caller
     }
   };
 

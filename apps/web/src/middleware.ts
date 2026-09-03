@@ -70,9 +70,22 @@ const routeAuthConfig: RouteConfig[] = [
     requiredScopes: ['api:read'],
   },
   { pattern: /\/api\/protected(.*)/, strategy: 'jwtOnly' },
-  { pattern: /\/api\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research API endpoints
-  { pattern: /\/api\/agent-notes(.*)/, strategy: 'jwtOnly' }, // Protect agent note collaboration APIs
-  { pattern: /\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research pages
+  { pattern: /\/api\/journal-research(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/agent-notes(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/chat(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/patient-rights(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/treatment-plans(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/crisis(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/mental-health(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/bias-detection(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/therapy(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/sessions(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/emotions(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/interventions(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/users\/(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/consent(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/audit(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/journal-research(.*)/, strategy: 'jwtOnly' },
 ]
 
 function getRouteConfig(request: Request): RouteConfig | null {

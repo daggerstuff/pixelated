@@ -2,29 +2,17 @@ import { anthropic } from '@ai-sdk/anthropic'
 import { streamText } from 'ai'
 import type { ModelMessage } from 'ai'
 import type { APIRoute } from 'astro'
+import { z } from 'zod'
 
 import { verifyAuthToken } from '../../utils/auth'
+import { validateRequestBody } from '../../lib/validation/validateRequestBody'
 
 export const prerender = false
 
-type MessageRequestBody = {
-  userId: string
-  message: string
-}
-
-const isObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value)
-
-const toMessageRequestBody = (value: unknown): MessageRequestBody | null => {
-  if (!isObject(value)) return null
-
-  const { userId, message } = value
-  if (typeof userId !== 'string' || typeof message !== 'string') {
-    return null
-  }
-
-  return { userId, message }
-}
+const chatSchema = z.object({
+  userId: z.string().min(1, 'userId is required'),
+  message: z.string().min(1, 'message is required'),
+})
 
 export const POST: APIRoute = async ({ request }) => {
   const authHeader = request.headers.get('Authorization')
@@ -52,12 +40,16 @@ export const POST: APIRoute = async ({ request }) => {
     })
   }
 
-  const requestBody = toMessageRequestBody(await request.json())
-  if (!requestBody) {
+  const [requestBody, validationError] = await validateRequestBody(
+    request,
+    chatSchema,
+  )
+  if (validationError) {
+    const firstError = Object.values(validationError.details)[0] ?? 'Invalid request format'
     return new Response(
       JSON.stringify({
         success: false,
-        message: 'Invalid request format',
+        message: firstError,
       }),
       {
         status: 400,

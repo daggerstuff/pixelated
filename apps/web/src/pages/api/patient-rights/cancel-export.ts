@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { protectApi } from '../../../lib/auth/apiAuth'
-// import type { APIRoute } from 'astro'
 import { cancelDataExportRequest } from '../../../lib/services/patient-rights/dataPortabilityService'
 
 const logger = createBuildSafeLogger('api-cancel-export')

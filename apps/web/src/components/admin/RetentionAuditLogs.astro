@@ -373,12 +373,6 @@ const getStatusBadge = (status: string) => {
           .value
 
         // In a real implementation, we would use these values to filter the logs
-        console.log('Applying filters:', {
-          actionFilter,
-          categoryFilter,
-          dateFrom,
-          dateTo,
-        })
 
         // For demonstration, show an alert
         alert(
@@ -394,7 +388,6 @@ const getStatusBadge = (status: string) => {
         const logId = button.getAttribute('data-log-id')
 
         // In a real implementation, we would show a modal with details
-        console.log('Viewing details for log:', logId)
 
         // For demonstration, show an alert
         alert(

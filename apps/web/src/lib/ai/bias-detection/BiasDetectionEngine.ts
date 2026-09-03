@@ -183,7 +183,6 @@ export class BiasDetectionEngine {
     validateWeights(this.config.layerWeights);
 
     // Initialize cache manager with config - cache instances are created internally
-    // const cacheManager = getCacheManager() // Removed unused variable
     // Cache instances are managed internally by the cache manager
 
     this.pythonService = new PythonBiasDetectionBridge(
@@ -1140,7 +1139,6 @@ export class BiasDetectionEngine {
 
     // Store batch processing metrics
     // Note: recordAnalysis expects individual analysis results, not batch metrics
-    // await this.metricsCollector.recordAnalysis?.()
 
     return {
       results: analysisResults,

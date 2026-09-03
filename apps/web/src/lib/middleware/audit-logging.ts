@@ -309,7 +309,7 @@ export const auditLoggingMiddleware = defineMiddleware(
     // Create an audit log
     try {
       await createResourceAuditLog(
-        eventType as unknown as any,
+        eventType as string,
         userId,
         {
           id: path,

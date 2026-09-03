@@ -73,7 +73,6 @@ export async function runBenchmarkSuite(): Promise<BenchmarkSuite> {
     },
   }
 
-  console.log('\n🚀 Starting Dynamic Weighting Benchmark Suite\n')
 
   // Benchmark 1: Single context calculations
   suite.results.push(await benchmarkSingleContext())
@@ -289,7 +288,7 @@ async function generateVisualizationData(): Promise<VisualizationData> {
       iteration: i,
       context: contextType,
       updateTimeMs: result.updateTimeMs,
-      weights: result.weights as any,
+      weights: result.weights as Record<string, number>,
       blendingApplied: result.blendingApplied,
       oscillationDetected: result.oscillationDetected,
     })
@@ -395,43 +394,22 @@ function calculatePerformanceDistribution(
 }
 
 function printBenchmarkSummary(suite: BenchmarkSuite): void {
-  console.log('\n📊 Benchmark Results Summary')
-  console.log('═'.repeat(80))
-  console.log(
-    `${'Test Name'.padEnd(30)} | ${'Avg (ms)'.padEnd(10)} | ${'P50'.padEnd(8)} | ${'P95'.padEnd(8)} | ${'P99'.padEnd(8)} | Pass`,
-  )
-  console.log('─'.repeat(80))
 
   for (const result of suite.results) {
     const passIcon = result.passedThreshold ? '✅' : '❌'
-    console.log(
-      `${result.testName.padEnd(30)} | ${result.avgTimeMs.toFixed(2).padEnd(10)} | ${result.p50TimeMs.toFixed(2).padEnd(8)} | ${result.p95TimeMs.toFixed(2).padEnd(8)} | ${result.p99TimeMs.toFixed(2).padEnd(8)} | ${passIcon}`,
-    )
   }
 
-  console.log('═'.repeat(80))
 
   const allPassed = suite.results.every((r) => r.passedThreshold)
-  console.log(
-    `\n${allPassed ? '✅ All tests passed 250ms threshold!' : '⚠️  Some tests exceeded 250ms threshold'}`,
-  )
 
-  console.log('\n📈 Performance Distribution:')
   const dist = suite.visualizationData.performanceDistribution
-  console.log(`  Mean: ${dist.mean.toFixed(2)}ms`)
-  console.log(`  Std Dev: ${dist.stdDev.toFixed(2)}ms`)
-  console.log('\n  Distribution:')
   for (const bucket of dist.buckets) {
     const percentage =
       (bucket.count / (suite?.results[0]?.iterations ?? 1)) * 100
     const barLength = Math.floor(percentage / 2)
     const bar = '█'.repeat(barLength)
-    console.log(
-      `    ${bucket.min}-${bucket.max === Infinity ? '250+' : bucket.max}ms: ${bar} ${percentage.toFixed(1)}%`,
-    )
   }
 
-  console.log('\n')
 }
 
 /**
@@ -463,15 +441,10 @@ const isMainModule = (require('module') as { main: unknown })['main'] === module
 if (isMainModule) {
   runBenchmarkSuite()
     .then((_suite) => {
-      console.log('\n📁 Visualization data available (JSON):')
-      console.log(
-        '   Save to file for graphing with tools like Python/matplotlib or Chart.js',
-      )
       // Optionally write to file
       // fs.writeFileSync('benchmark-results.json', jsonData)
     })
     .catch((error) => {
-      console.error('Benchmark failed:', error)
       process.exit(1)
     })
 }

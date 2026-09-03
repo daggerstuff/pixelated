@@ -531,32 +531,16 @@ async function main() {
   const resetIdx = args.indexOf('--reset')
 
   if (tenantIdx === -1 || !args[tenantIdx + 1]) {
-    console.error('Usage: sandbox-seed.ts --tenant <tenant-id> [--reset]')
     process.exit(1)
   }
 
   const tenantId = args[tenantIdx + 1]
   const reset = resetIdx !== -1
 
-  console.log(
-    `[sandbox-seed] Seeding tenant: ${tenantId}${reset ? ' (reset mode)' : ''}`,
-  )
 
   try {
     const result = await seedSandboxTenant({ tenantId, reset })
-    console.log('[sandbox-seed] Complete:', {
-      patientsCreated: result.patientsCreated,
-      encountersCreated: result.encountersCreated,
-      observationsCreated: result.observationsCreated,
-    })
-    console.log('[sandbox-seed] Patient IDs:', result.patientIds.join(', '))
-    console.log('[sandbox-seed] Encounter IDs:', result.encounterIds.join(', '))
-    console.log(
-      '[sandbox-seed] Observation IDs:',
-      result.observationIds.join(', '),
-    )
   } catch (err) {
-    console.error('[sandbox-seed] FAILED:', err)
     process.exit(1)
   }
 }

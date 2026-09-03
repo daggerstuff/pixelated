@@ -2,9 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 
 import type { SecurityLevel } from '../../hooks/useSecurity'
 import type { Message } from '../../types/chat'
-// Dynamic imports for FHE to reduce bundle size
-// import { fheService } from '../../lib/fhe'
-// import { AnalyticsType, fheAnalytics } from '../../lib/fhe/analytics'
 
 // Dynamic FHE imports
 async function loadFHE() {

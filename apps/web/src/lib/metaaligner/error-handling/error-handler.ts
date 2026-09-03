@@ -71,7 +71,25 @@ export class ErrorHandler implements IErrorHandler {
     return {
       enhancedResponse: 'Error: Could not process the response.',
       originalResponse: '',
-      alignment: {} as any,
+      alignment: {
+        evaluation: {
+          overallScore: 0,
+          objectiveResults: {},
+          weights: {},
+          normalizedScores: {},
+          aggregationMethod: 'weighted' as const,
+          evaluationContext: {} as never,
+          timestamp: new Date(),
+        },
+        metrics: {
+          overallScore: 0,
+          dimensionScores: {},
+          confidence: 0,
+          timestamp: new Date(),
+        },
+        enhanced: false,
+        enhancementAttempts: 0,
+      },
       errors: [
         {
           message: error instanceof Error ? error.message : 'Unknown error',
@@ -87,7 +105,25 @@ export class ErrorHandler implements IErrorHandler {
     return {
       enhancedResponse: 'Error: Invalid request format.',
       originalResponse: '',
-      alignment: {} as any,
+      alignment: {
+        evaluation: {
+          overallScore: 0,
+          objectiveResults: {},
+          weights: {},
+          normalizedScores: {},
+          aggregationMethod: 'weighted' as const,
+          evaluationContext: {} as never,
+          timestamp: new Date(),
+        },
+        metrics: {
+          overallScore: 0,
+          dimensionScores: {},
+          confidence: 0,
+          timestamp: new Date(),
+        },
+        enhanced: false,
+        enhancementAttempts: 0,
+      },
       errors: [
         {
           message: error instanceof Error ? error.message : 'Unknown error',
@@ -103,7 +139,25 @@ export class ErrorHandler implements IErrorHandler {
     return {
       enhancedResponse: 'Error: Could not enhance the response.',
       originalResponse: '',
-      alignment: {} as any,
+      alignment: {
+        evaluation: {
+          overallScore: 0,
+          objectiveResults: {},
+          weights: {},
+          normalizedScores: {},
+          aggregationMethod: 'weighted' as const,
+          evaluationContext: {} as never,
+          timestamp: new Date(),
+        },
+        metrics: {
+          overallScore: 0,
+          dimensionScores: {},
+          confidence: 0,
+          timestamp: new Date(),
+        },
+        enhanced: false,
+        enhancementAttempts: 0,
+      },
       errors: [
         {
           message: error instanceof Error ? error.message : 'Unknown error',
@@ -117,7 +171,25 @@ export class ErrorHandler implements IErrorHandler {
     return {
       enhancedResponse: 'An unexpected error occurred.',
       originalResponse: '',
-      alignment: {} as any,
+      alignment: {
+        evaluation: {
+          overallScore: 0,
+          objectiveResults: {},
+          weights: {},
+          normalizedScores: {},
+          aggregationMethod: 'weighted' as const,
+          evaluationContext: {} as never,
+          timestamp: new Date(),
+        },
+        metrics: {
+          overallScore: 0,
+          dimensionScores: {},
+          confidence: 0,
+          timestamp: new Date(),
+        },
+        enhanced: false,
+        enhancementAttempts: 0,
+      },
       errors: [
         {
           message: error instanceof Error ? error.message : 'Unknown error',

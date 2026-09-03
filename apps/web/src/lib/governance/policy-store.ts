@@ -45,7 +45,7 @@ export class PolicyStore {
         _id: policy.id,
         version: policy.version,
         rules: policy.rules,
-      } as any,
+      } as Record<string, unknown>,
       { upsert: true },
     )
 
@@ -65,7 +65,7 @@ export class PolicyStore {
     }
 
     const collection = this.db.collection(POLICIES_COLLECTION)
-    const doc = await collection.findOne({ _id: policyId } as any)
+    const doc = await collection.findOne({ _id: policyId } as Record<string, unknown>)
 
     if (doc) {
       const { _id, ...rest } = doc

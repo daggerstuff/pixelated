@@ -198,7 +198,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       },
     )
   }
-}) as any
+}) as unknown
 
 /**
  * POST endpoint for real-time particle updates
@@ -285,7 +285,7 @@ export const POST: APIRoute = protectRoute()(
       )
     }
   },
-) as any
+) as unknown
 
 // Helper functions
 function calculateEmotionProfile(

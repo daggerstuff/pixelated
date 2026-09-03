@@ -80,13 +80,8 @@ export class UniversalDemoAnalytics {
 
       this.isInitialized = true
 
-      console.log(`Universal Demo Analytics initialized for ${this.pageName}`, {
-        sessionId: this.sessionId,
-        variant: this.abTestVariant,
-        pageConfig: this.pageConfig,
-      })
     } catch (error: unknown) {
-      console.error('Failed to initialize analytics:', error)
+      // error handled by caller
     }
   }
 
@@ -393,7 +388,6 @@ export class UniversalDemoAnalytics {
     try {
       await this.sendEvents(eventsToSend)
     } catch (error: unknown) {
-      console.warn('Failed to send analytics events:', error)
       // Re-queue events for retry
       this.eventQueue.unshift(...eventsToSend)
     }
@@ -429,7 +423,6 @@ export class UniversalDemoAnalytics {
         throw new Error(`Analytics API error: ${response.status}`)
       }
     } catch (error: unknown) {
-      console.warn('Failed to send to custom analytics:', error)
       throw error
     }
   }

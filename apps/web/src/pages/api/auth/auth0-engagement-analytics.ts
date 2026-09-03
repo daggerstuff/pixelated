@@ -87,8 +87,10 @@ export const GET: APIRoute = async ({ request }) => {
       )
     }
 
-    // TODO: Replace with real data fetching logic
-    // For now, return static/mock data
+    // Placeholder: real data source not yet wired.
+    // To implement: query the Auth0 management API or a downstream analytics
+    // store (e.g., Postgres or ClickHouse) for session engagement metrics and
+    // map them to the ChartData shape expected by the dashboard.
     const sessionTrends: ChartData = {
       labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       series: [
@@ -203,7 +205,6 @@ export const GET: APIRoute = async ({ request }) => {
     })
   } catch (error: unknown) {
     // Log error securely (avoid leaking sensitive info)
-    console.error('Engagement metrics API error:', error)
 
     // Create audit log for the error
     await createAuditLog(

@@ -123,7 +123,7 @@ export const GET = async ({
 
     // Log successful verification
     if (result.data.user) {
-      const user = result.data.user as any
+      const user = result.data.user as Record<string, unknown>
 
       logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
         action: 'user_verified',

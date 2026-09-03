@@ -29,7 +29,7 @@ function loadGeneratedKeywords(): {
 } {
   try {
     // Use require for synchronous loading (Astro/build-time compatible)
-    const generated = (globalThis as any).require('./generated.keywords.ts')
+    const generated = (globalThis as typeof globalThis & { require?: (id: string) => unknown }).require('./generated.keywords.ts')
     return {
       euphemisms: Array.isArray(generated.SUICIDE_EUPHEMISMS)
         ? generated.SUICIDE_EUPHEMISMS

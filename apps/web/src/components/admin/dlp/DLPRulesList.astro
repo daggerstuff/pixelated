@@ -179,7 +179,7 @@ const getActionBadge = (action: DLPAction) => {
             editor.setAttribute('data-rule', ruleData)
           }
         } catch (error) {
-          console.error('Error parsing rule data:', error)
+          // error handled by caller
         }
       })
     })

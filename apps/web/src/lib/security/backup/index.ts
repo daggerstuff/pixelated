@@ -55,14 +55,14 @@ const getCrypto = async () => {
         iv: Uint8Array,
       ): Promise<{ encryptedData: Uint8Array; authTag: Uint8Array }> => {
         const { subtle } = window.crypto
-        const importedKey = await (subtle.importKey as any)(
+        const importedKey = await subtle.importKey(
           'raw',
           key,
           { name: 'AES-GCM' },
           false,
           ['encrypt'],
         )
-        const encrypted = await (subtle.encrypt as any)(
+        const encrypted = await subtle.encrypt(
           { name: 'AES-GCM', iv },
           importedKey,
           data,
@@ -80,7 +80,7 @@ const getCrypto = async () => {
         authTag: Uint8Array,
       ): Promise<Uint8Array> => {
         const { subtle } = window.crypto
-        const importedKey = await (subtle.importKey as any)(
+        const importedKey = await subtle.importKey(
           'raw',
           key,
           { name: 'AES-GCM' },
@@ -94,7 +94,7 @@ const getCrypto = async () => {
         // Create a new ArrayBuffer to ensure proper typing
         const combinedBuffer = new ArrayBuffer(combined.byteLength)
         new Uint8Array(combinedBuffer).set(combined)
-        const decrypted = await (subtle.decrypt as any)(
+        const decrypted = await subtle.decrypt(
           { name: 'AES-GCM', iv },
           importedKey,
           combinedBuffer,

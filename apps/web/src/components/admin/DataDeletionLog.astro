@@ -570,7 +570,6 @@ const getScopeBadgeClass = (scope: DeletionRequest['dataScope']): string => {
             }
           }
         } catch (error) {
-          console.error(`Error ${action}ing deletion request:`, error)
 
           // Show error message
           if (window.toast) {

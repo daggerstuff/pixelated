@@ -45,7 +45,7 @@ export class ContextInjector implements IContextInjector {
       context: {
         ...transformedContext,
         detectedContext,
-      } as any,
+      } as Record<string, unknown>,
     }
   }
 

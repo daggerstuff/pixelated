@@ -94,7 +94,7 @@ export class EnhancedCacheService implements CacheClient {
   async keys(pattern: string): Promise<string[]> {
     // For memory cache, we need to implement keys functionality
     if (this.baseService instanceof MemoryCacheService) {
-      const memoryService = this.baseService as any
+      const memoryService = this.baseService as Record<string, unknown>
       const allKeys: string[] = Array.from(memoryService.cache.keys())
       // Convert wildcard pattern (with '*') into a safe RegExp.
       // Escape regex special chars except '*' then replace '*' with '.*'

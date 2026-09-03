@@ -51,9 +51,6 @@ function handleRuleUpdated(event: Event): void {
   }
 
   const { id, name, isActive } = detail
-  console.log(
-    `Rule updated: ${name} (${id}) is now ${isActive ? 'active' : 'inactive'}`,
-  )
 }
 
 // Function to handle rule deletions
@@ -67,7 +64,6 @@ function handleRuleDeleted(event: Event): void {
   }
 
   const { id, name } = detail
-  console.log(`Rule deleted: ${name} (${id})`)
 
   // Find and remove the deleted rule element
   const ruleElement = document.querySelector(`[data-rule-id="${id}"]`)

@@ -42,12 +42,9 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
   let crisisDetected = false
   let session: Session | null = null
 
-  // DEBUG LOG: POST handler invoked
-  console.log('[crisis-detection.ts] POST handler invoked')
-
   try {
     // Get session for authentication
-    session = await (getSession as any)()
+    session = await getSession(request)
 
     // Check if user is authenticated
     if (!session?.user) {

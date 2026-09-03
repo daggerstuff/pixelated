@@ -60,7 +60,7 @@ export function createEnhancedRateLimiter(
 
     try {
       // Cast redis to any to call runtime methods that may not be present on union type
-      const r = redis as any
+      const r = redis as unknown
       // Use Redis transaction to ensure atomic operations
       const multi = r.multi()
       multi.get(key)

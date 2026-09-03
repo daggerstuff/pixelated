@@ -12,6 +12,14 @@ import {
 import { updatePhase6AuthenticationProgress } from '../../../lib/mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../../../lib/security'
 import { auth0UserService } from '../../../lib/services/auth0.service'
+import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
+import { z } from 'zod'
+
+const signupSchema = z.object({
+  email: z.string().min(1, 'Email is required'),
+  password: z.string().min(1, 'Password is required'),
+  role: z.string().optional(),
+})
 
 /**
  * Unified Sign up endpoint using Auth0
@@ -53,11 +61,15 @@ export const POST = async ({
       return rateLimitResult.response!
     }
 
-    // Parse and validate request body
-    const body = await request.json()
-    if (!body.email || !body.password) {
+    // Parse and validate request body with Zod
+    const [body, validationError] = await validateRequestBody(
+      request,
+      signupSchema,
+    )
+    if (validationError) {
+      const firstError = Object.values(validationError.details)[0] ?? 'Email and password are required'
       return new Response(
-        JSON.stringify({ error: 'Email and password are required' }),
+        JSON.stringify({ error: firstError }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -134,7 +146,6 @@ export const POST = async ({
       },
     )
   } catch (error: any) {
-    console.error('Sign up error:', error)
 
     logSecurityEvent('error', null, {
       error: error instanceof Error ? error.message : 'Unknown error',

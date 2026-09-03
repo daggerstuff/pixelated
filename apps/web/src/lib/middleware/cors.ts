@@ -120,7 +120,6 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
 
   const config = getConfig()
   const origin = getRequestHeader(request, 'Origin')
-  const hasApiKey = getRequestHeader(request, 'X-API-Key') !== undefined
 
   try {
     // Process the request first to catch any errors
@@ -128,11 +127,11 @@ export const corsMiddleware = defineMiddleware(async ({ request }, next) => {
 
     // Apply CORS headers if origin is present
     if (origin) {
-      // Same-origin, allowlisted, or API-key-authenticated requests are permitted.
+      // Same-origin or allowlisted origins are permitted.
+      // API-key requests must still pass origin validation to prevent
+      // cross-origin credential theft via API key header.
       const allowed =
-        hasApiKey ||
-        isSameOrigin(request, origin) ||
-        isOriginAllowed(origin, config)
+        isSameOrigin(request, origin) || isOriginAllowed(origin, config)
 
       if (allowed) {
         response.headers.set('Access-Control-Allow-Origin', origin)

@@ -52,7 +52,7 @@ export const post = async ({ request }: { request: Request }) => {
     const context = collectContext({
       session: { ...session, sessionId: session.id },
       chatSession,
-      recentEmotionState: recentEmotionState as any,
+      recentEmotionState: recentEmotionState as Record<string, unknown>,
       recentInterventions,
       ...(userPreferences !== undefined ? { userPreferences } : {}),
       mentalHealthAnalysis,
@@ -75,7 +75,6 @@ export const post = async ({ request }: { request: Request }) => {
     )
   } catch (err: unknown) {
     // Log securely (avoid leaking sensitive data)
-    console.error('Treatment forecast API error:', err)
     return new Response(
       JSON.stringify({ success: false, error: 'Internal server error' }),
       {

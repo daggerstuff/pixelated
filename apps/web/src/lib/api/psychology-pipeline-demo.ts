@@ -131,14 +131,6 @@ export const generateClientScenario = async (
   // Simulate API call to client scenario generator service
   const startTime = Date.now()
 
-  // In production, this would be:
-  // const response = await fetch('/api/psychology-pipeline/generate-scenario', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(validatedRequest)
-  // });
-  // const data = await response.json();
-
   // For demo purposes, simulate processing time and generate response
   await new Promise((resolve) =>
     setTimeout(resolve, 1500 + Math.random() * 1000),
@@ -457,7 +449,7 @@ export const convertKnowledgeToConversation = async (
   const generatedDialogue = generateKnowledgeBasedDialogue(validatedRequest)
 
   // Calculate quality metrics
-  const qualityMetrics = calculateConversationQuality(validatedRequest as any)
+  const qualityMetrics = calculateConversationQuality(validatedRequest as ConversationRequest)
 
   // Map knowledge sources to dialogue turns
   const knowledgeMapping = mapKnowledgeToDialogue(generatedDialogue)
@@ -506,7 +498,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Therapeutic engagement best practices',
       confidence: 0.95,
     },
-  } as any)
+  })
 
   // Client response based on profile
   dialogue.push({
@@ -525,7 +517,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Presenting problem and demographics',
       confidence: 0.9,
     },
-  } as any)
+  })
 
   // Therapist intervention based on DSM-5 and techniques
   dialogue.push({
@@ -544,7 +536,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Evidence-based intervention protocols',
       confidence: 0.88,
     },
-  } as any)
+  })
 
   // Client processing response
   dialogue.push({
@@ -561,7 +553,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Client engagement and processing indicators',
       confidence: 0.85,
     },
-  } as any)
+  })
 
   // Follow-up therapist response
   dialogue.push({
@@ -577,7 +569,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Progressive intervention strategies',
       confidence: 0.92,
     },
-  } as any)
+  })
 
   return dialogue
 }
@@ -725,7 +717,7 @@ function calculateConversationQuality(request: ConversationRequest): any {
     therapeuticAccuracy: Math.round(therapeuticAccuracy),
     knowledgeIntegration: Math.round(knowledgeIntegration),
     conversationFlow: Math.round(conversationFlow),
-  } as any
+  }
 }
 
 function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): Array<{

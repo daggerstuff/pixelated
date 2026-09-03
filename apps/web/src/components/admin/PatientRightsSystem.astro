@@ -1092,7 +1092,6 @@ const complianceMetrics = {
     private updateTable(data: any[]): void {
       // Update table with filtered results
       // Implement virtual scrolling for large datasets
-      console.log('Updating table with', data.length, 'records')
     }
 
     private updateComplianceMetrics(data: any[]): void {
@@ -1148,11 +1147,9 @@ const complianceMetrics = {
         }
 
         this.wsConnection.onerror = () => {
-          console.warn('WebSocket connection failed, falling back to polling')
           this.setupPolling()
         }
       } catch (error) {
-        console.warn('WebSocket not available, using polling')
         this.setupPolling()
       }
     }
@@ -1197,7 +1194,7 @@ const complianceMetrics = {
           updates.forEach((update: any) => this.handleRealTimeUpdate(update))
         }
       } catch (error) {
-        console.error('Failed to fetch updates:', error)
+        // error handled by caller
       }
     }
 

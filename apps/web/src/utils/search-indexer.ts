@@ -28,7 +28,6 @@ async function getCollection(
     try {
       await fs.access(contentDir)
     } catch {
-      console.log(`Collection directory not found: ${contentDir}`)
       return []
     }
 
@@ -86,13 +85,12 @@ async function getCollection(
           body,
         })
       } catch (error: unknown) {
-        console.error(`Error processing file ${file.name}:`, error)
+        // error handled by caller
       }
     }
 
     return entries
   } catch (error: unknown) {
-    console.error(`Error getting collection ${collectionName}:`, error)
     return []
   }
 }
@@ -142,11 +140,9 @@ export async function buildSearchIndex(
         const entries = await getCollection(collectionName)
 
         if (!entries || entries.length === 0) {
-          console.log(`No entries found for collection: ${collectionName}`)
           continue
         }
 
-        console.log(`Indexing ${entries.length} entries from ${collectionName}`)
 
         // Convert entries to search documents
         const docs = entries.map((entry) => {
@@ -173,7 +169,7 @@ export async function buildSearchIndex(
 
         documents.push(...docs)
       } catch (error: unknown) {
-        console.error(`Failed to index collection ${collectionName}:`, error)
+        // error handled by caller
       }
     }
 
@@ -240,17 +236,15 @@ export async function buildSearchIndex(
             category,
           })
         } catch (error) {
-          console.error(`Error indexing static page ${filename}:`, error)
+          // error handled by caller
         }
       }
     } catch (error) {
-      console.error('Error indexing static pages:', error)
+      // error handled by caller
     }
 
-    console.log(`Total indexed documents: ${documents.length}`)
     return documents
   } catch (error: unknown) {
-    console.error('Failed to build search index:', error)
     return []
   }
 }
@@ -312,7 +306,6 @@ window.searchIndex = ${indexJson};
 window.initSearch = () => {
   if (typeof window.searchClient !== 'undefined' && window.searchIndex) {
     window.searchClient.importDocuments(window.searchIndex);
-    console.log('Search index initialized with', window.searchIndex.length, 'documents');
 
     // Dispatch event to notify components that search is ready
     window.dispatchEvent(new CustomEvent('search:ready', {

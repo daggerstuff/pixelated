@@ -81,7 +81,7 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
 
     // Perform emotion analysis
     const analysisStartTime = Date.now()
-    const emotionResult = await (emotionMapper as any).analyzeText(text, {
+    const emotionResult = await (emotionMapper as { analyzeText?: (...args: unknown[]) => Promise<unknown> }).analyzeText(text, {
       depth: analysisDepth,
       includeHistory,
       sessionId,

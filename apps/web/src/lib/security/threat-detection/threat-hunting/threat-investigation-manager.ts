@@ -122,7 +122,7 @@ export class ThreatInvestigationManager extends EventEmitter {
         case 'generate_report':
           const report = this.reportGenerator.generateHuntReport(
             investigation.huntId ?? 'manual',
-            investigation.findings as any[],
+            investigation.findings as unknown[],
           )
           this.emit('report_generated', { investigationId, report })
 

@@ -375,7 +375,6 @@ const deletionReasons = [
       !form ||
       !cancelButton
     ) {
-      console.error('Required DOM elements not found')
       return
     }
 
@@ -509,7 +508,6 @@ const deletionReasons = [
           submitButton.innerHTML = originalButtonText
         }
       } catch (error) {
-        console.error('Error submitting deletion request:', error)
 
         // Show error message
         if (window.toast) {

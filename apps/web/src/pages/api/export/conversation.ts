@@ -114,7 +114,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Initialize export service
-    const exportService = ExportService.getInstance(fheService as any)
+    const exportService = ExportService.getInstance(fheService as unknown)
     await exportService.initialize()
 
     // Map format and encryption mode
@@ -179,7 +179,6 @@ async function checkSessionAccess(
 async function getSessionMessages(sessionId: string): Promise<ChatMessage[]> {
   // In a real implementation, this would fetch messages from the database
   // For this example, we'll return sample messages
-  console.log(`Fetching messages for session ${sessionId}`)
   return [
     {
       id: '1',

@@ -670,7 +670,7 @@ export function getReducedMotionVariant(variants: Variants): Variants {
     }
 
     reducedVariants[key] = {
-      opacity: (variant as any)['opacity'] ?? 1,
+      opacity: (variant as { opacity?: number })['opacity'] ?? 1,
       transition: { duration: 0.1 },
     }
   })

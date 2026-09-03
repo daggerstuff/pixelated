@@ -143,7 +143,7 @@ class PerformanceMonitor {
 
   private async measureMemoryUsage(): Promise<number> {
     if ('memory' in performance) {
-      const memInfo = (performance as any).memory
+      const memInfo = (performance as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number } }).memory
       return (memInfo.usedJSHeapSize / memInfo.jsHeapSizeLimit) * 100
     }
     return Math.random() * 100 // Mock data
@@ -160,7 +160,7 @@ class PerformanceMonitor {
     if (recentMetrics.length === 0) return 0
 
     const totalErrors = recentMetrics.reduce(
-      (sum, m) => sum + ((m as any).errorCount ?? 0),
+      (sum, m) => sum + ((m as { errorCount?: number }).errorCount ?? 0),
       0,
     )
     const totalRequests = recentMetrics.reduce(

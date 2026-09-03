@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-// import { LineChart } from '../ui/charts/LineChart'
-// import { PieChart } from '../ui/charts/PieChart'
 
 interface AuditMetrics {
   accessByTime: {
@@ -64,22 +62,12 @@ export function AuditDashboard() {
       {/* PHI Access Over Time */}
       <div className="bg-white rounded-lg p-6 shadow">
         <h2 className="mb-4 text-xl font-semibold">PHI Access Patterns</h2>
-        {/* <LineChart
-          data={metrics.accessByTime.data}
-          labels={metrics.accessByTime.labels}
-          label="Access Count"
-          color="#4f46e5"
-        /> */}
       </div>
 
       {/* Access by Type Distribution */}
       <div className="bg-white rounded-lg p-6 shadow">
         <h2 className="mb-4 text-xl font-semibold">Access Type Distribution</h2>
         <div className="h-[300px]">
-          {/* <PieChart
-            data={metrics.accessByType.data}
-            labels={metrics.accessByType.labels}
-          /> */}
         </div>
       </div>
 

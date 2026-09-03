@@ -76,7 +76,9 @@ if (typeof window === "undefined") {
       };
     };
 }
-// TODO: Create these service interfaces when services are implemented
+// Service interfaces defined ahead of implementation. These describe the
+// shape of feedback data the AI services will produce; concrete service
+// classes should be created when the corresponding analytics features land.
 interface EfficacyFeedback {
   recommendationId: string;
   clientId: string;
@@ -1097,7 +1099,10 @@ export class AIRepository {
     dailyTrends: Array<{ date: string; count: number; avgBias: number }>;
   }> {
     // Use the materialized view for better performance
-    // TODO: Implement MongoDB aggregation for bias analysis summary
+    // Deferred: implement a MongoDB aggregation pipeline that groups bias
+    // analyses by day, computes average bias scores, and distributes alerts
+    // across severity buckets. The materialized view `bias_analysis_summary`
+    // should be queried once available.
     return {
       totalAnalyses: 0,
       averageBiasScore: 0,

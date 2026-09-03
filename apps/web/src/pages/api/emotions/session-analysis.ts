@@ -130,4 +130,4 @@ export const GET: APIRoute = protectRoute()(async ({ locals, request }) => {
       },
     )
   }
-}) as any
+}) as unknown

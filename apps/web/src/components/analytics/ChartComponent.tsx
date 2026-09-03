@@ -183,8 +183,8 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
 
   const renderChart = () => {
     // chartData stored as unknown (default + incoming data flow); cast to any for dynamic chart rendering.
-    const data = chartData as any
-    const options = mergedOptions as any
+    const data = chartData as unknown
+    const options = mergedOptions as unknown
     switch (type) {
       case 'bar':
         return (

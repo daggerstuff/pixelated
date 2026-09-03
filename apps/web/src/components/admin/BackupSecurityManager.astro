@@ -270,7 +270,6 @@ const mockBackupConfig: BackupConfig = {
 // In a production environment, these would call the actual backup manager APIs
 const handleCreateBackup = async (type: BackupType): Promise<Backup> => {
   // In production this would call backupManager.createBackup(type)
-  console.log(`Creating ${type} backup`)
   return (
     mockBackups[0] || {
       id: 'default-backup',
@@ -288,13 +287,11 @@ const handleCreateBackup = async (type: BackupType): Promise<Backup> => {
 
 const handleVerifyBackup = async (backupId: string): Promise<boolean> => {
   // In production this would call backupManager.verifyBackup(backupId)
-  console.log(`Verifying backup ${backupId}`)
   return true // Mock return
 }
 
 const handleUpdateConfig = (config: BackupConfig): void => {
   // In production this would update the backup manager configuration
-  console.log('Updating backup configuration', config)
 }
 ---
 

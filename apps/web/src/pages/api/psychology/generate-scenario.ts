@@ -263,7 +263,7 @@ function selectClientProfile(
   return {
     ...baseProfile,
     ...clientProfile,
-  } as any
+  } as Record<string, unknown>
 }
 
 function generateSessionContext(
@@ -476,7 +476,7 @@ export const POST = async ({ request }: { request: Request }) => {
         background: clientProfile.background,
         presentingConcern: clientProfile.presentingConcern,
         history: clientProfile.history,
-        currentSituation: `Client presents for session ${sessionContext.sessionNumber} with ongoing concerns about ${body.context}. ${(clientProfile as any).challenges ? 'Current challenges include: ' + (clientProfile as any).challenges.join(', ') + '.' : ''}`,
+        currentSituation: `Client presents for session ${sessionContext.sessionNumber} with ongoing concerns about ${body.context}. ${(clientProfile as { challenges?: string[] }).challenges ? 'Current challenges include: ' + (clientProfile as { challenges?: string[] }).challenges.join(', ') + '.' : ''}`,
       },
       sessionContext,
       challengeLevel: `${body.difficulty} level case requiring ${framework} intervention skills`,

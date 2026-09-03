@@ -43,14 +43,12 @@ export const GET = async ({
       }
       return decodedState
     } catch (decodeError) {
-      console.error('Invalid auth callback state:', decodeError)
       return '/dashboard'
     }
   }
 
   // Handle OAuth errors
   if (error) {
-    console.error('Auth0 OAuth error:', error, errorDescription)
     return new Response(
       `Authentication failed: ${error} - ${errorDescription}`,
       { status: 400 },
@@ -79,10 +77,6 @@ export const GET = async ({
       existingUser = await auth0UserService.findUserByEmail(socialUser.email)
     } catch (e) {
       // Ignore management API errors (e.g. not initialized), proceed with social identity
-      console.log(
-        'Skipping Auth0 Management API lookup (likely not configured or error)',
-        e instanceof Error ? e.message : e,
-      )
     }
 
     // In a social login flow, Auth0 has already created/linked the user.
@@ -163,7 +157,6 @@ export const GET = async ({
     const destination = sanitizeStateRedirect(state)
     return redirect(destination)
   } catch (error: unknown) {
-    console.error('Auth0 callback error:', error)
     return new Response(
       `Authentication failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       { status: 500 },

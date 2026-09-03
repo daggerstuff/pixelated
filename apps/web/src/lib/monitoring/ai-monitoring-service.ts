@@ -391,15 +391,15 @@ export class AIMonitoringService extends EventEmitter {
     const notifications: any[] = []
 
     if (this.config.alerting.channels.slack) {
-      notifications.push((this as any).sendSlackNotification(alert))
+      notifications.push(this.sendSlackNotification(alert))
     }
 
     if (this.config.alerting.channels.email) {
-      notifications.push((this as any).sendEmailNotification(alert))
+      notifications.push(this.sendEmailNotification(alert))
     }
 
     if (this.config.alerting.channels.webhook) {
-      notifications.push((this as any).sendWebhookNotification(alert))
+      notifications.push(this.sendWebhookNotification(alert))
     }
 
     await Promise.allSettled(notifications)

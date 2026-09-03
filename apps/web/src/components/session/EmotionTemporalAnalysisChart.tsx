@@ -371,7 +371,7 @@ export default function EmotionTemporalAnalysisChart({
                   return [formatNumber(value, 2), 'Significance']
                 }
                 return [value, name]
-              }) as any
+              }}
             }
           />
 
@@ -522,7 +522,7 @@ export default function EmotionTemporalAnalysisChart({
                   return [formatNumber(value, 1), 'Avg Duration (min)']
                 }
                 return [value, name]
-              }) as any
+              }}
             }
           />
 
@@ -560,13 +560,14 @@ export default function EmotionTemporalAnalysisChart({
         <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={
-            ((value: ValueType, name: NameType) => {
+            formatter={
+              (value: ValueType, name: NameType) => {
               if (name === 'correlation') {
                 return [formatNumber(value, 2), 'Correlation']
               }
-              return [value, name]
-            }) as any
+                return [value, name]
+              }
+            }
           }
         />
         <Legend />

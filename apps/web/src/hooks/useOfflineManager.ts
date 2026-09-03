@@ -89,7 +89,7 @@ export function useOfflineManager({
 
           const queued = indexedDBRequestQueue.add({
             url,
-            method: (options.method as any) ?? 'GET',
+            method: (options.method as string) ?? 'GET',
             headers: (options.headers as Record<string, string>) || {},
             body: options.body,
             priority,
@@ -100,7 +100,7 @@ export function useOfflineManager({
             onRequestQueued?.({
               id: `req_${Date.now()}`,
               url,
-              method: (options.method as any) ?? 'GET',
+              method: (options.method as string) ?? 'GET',
               headers: (options.headers as Record<string, string>) || {},
               body: options.body,
               timestamp: Date.now(),

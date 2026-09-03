@@ -480,10 +480,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         severity,
         confidence,
         firstSeen: new Date(
-          (data['first_seen'] ?? data['created'] ?? Date.now()) as any,
+          (data['first_seen'] ?? data['created'] ?? Date.now()) as string | number | Date,
         ),
         lastSeen: new Date(
-          (data['last_seen'] ?? data['updated'] ?? Date.now()) as any,
+          (data['last_seen'] ?? data['updated'] ?? Date.now()) as string | number | Date,
         ),
         expirationDate: data['expiration_date']
           ? new Date(data['expiration_date'] as string)
@@ -574,8 +574,8 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         threatType,
         severity: this.mapSeverity(String(data['confidence'] ?? 'medium')),
         confidence: this.extractConfidence(data['confidence'] ?? 50),
-        firstSeen: new Date((data['created'] ?? Date.now()) as any),
-        lastSeen: new Date((data['modified'] ?? Date.now()) as any),
+        firstSeen: new Date((data['created'] ?? Date.now()) as string | number | Date),
+        lastSeen: new Date((data['modified'] ?? Date.now()) as string | number | Date),
         source: (data['created_by_ref'] as string) || feed.name,
         tags: Array.isArray(data['labels']) ? (data['labels'] as string[]) : [],
         metadata: {

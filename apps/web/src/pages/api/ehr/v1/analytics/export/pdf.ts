@@ -45,7 +45,7 @@ export const POST = withV1Contract(
         `type must be one of: ${DASHBOARD_TYPES.join(', ')}`,
       )
 
-    if (!canAccessDashboard(caller.user.role as any, type))
+    if (!canAccessDashboard(caller.user.role as string, type))
       return ehrValidationError(
         `Your role does not have permission to access the ${type} dashboard.`,
       )
@@ -71,7 +71,7 @@ export const POST = withV1Contract(
     try {
       metrics = (await service.getDashboard(
         type,
-        caller.user.role as any,
+        caller.user.role as string,
         filter,
       )) as Record<string, unknown>
     } catch (err) {
