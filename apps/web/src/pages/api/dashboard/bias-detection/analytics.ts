@@ -18,7 +18,6 @@ export const GET: APIRoute = async ({ url }) => {
     let cachedData = await cache.getAnalyticsData('comprehensive', days)
 
     if (cachedData) {
-      console.log('✅ Analytics data served from cache')
       return new Response(
         JSON.stringify({
           ...cachedData,
@@ -32,7 +31,6 @@ export const GET: APIRoute = async ({ url }) => {
       )
     }
 
-    console.log('🔄 Computing fresh analytics data...')
 
     // Get historical data for the specified number of days
     const historicalQuery = `
@@ -154,7 +152,6 @@ export const GET: APIRoute = async ({ url }) => {
 
     // Cache the data for 15 minutes
     await cache.setAnalyticsData('comprehensive', days, computedData)
-    console.log('💾 Analytics data cached for 15 minutes')
 
     // Format response
     const response = {
@@ -204,7 +201,6 @@ export const GET: APIRoute = async ({ url }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Analytics API error:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch analytics data',

@@ -1,14 +1,14 @@
 import { defineMiddleware } from 'astro:middleware'
 
-import { getApiVersion, setVersionHeader, isApiRoute } from '../api-versioning'
+import {
+  getApiVersion,
+  setVersionHeader,
+  setDeprecationHeaders,
+  createDeprecationInfo,
+  isApiRoute,
+  extractVersionFromPath,
+} from '../api-versioning'
 
-/**
- * Astro middleware that adds the `X-API-Version` response header
- * to all `/api/*` responses.
- *
- * The version is determined from the URL path (`/api/v{N}/`) or
- * falls back to the current API version if not specified.
- */
 export const apiVersioningMiddleware = defineMiddleware(
   async (context, next) => {
     const { request } = context
@@ -21,10 +21,16 @@ export const apiVersioningMiddleware = defineMiddleware(
 
     const response = await next()
 
-    // Set version header on API responses
     if (response instanceof Response) {
-      const { version } = getApiVersion(pathname, request.headers)
+      const { version, source } = getApiVersion(pathname, request.headers)
       setVersionHeader(response, version)
+
+      const pathVersion = extractVersionFromPath(pathname)
+      if (pathVersion === null && source === 'default') {
+        const deprecation = createDeprecationInfo(0, 12, 1)
+        setDeprecationHeaders(response, deprecation)
+        response.headers.set('X-API-Deprecation-Notice', 'Unversioned endpoint. Migrate to /api/v1/ prefix.')
+      }
     }
 
     return response

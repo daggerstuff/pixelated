@@ -1,4 +1,3 @@
-// import type { APIRoute } from 'astro'
 import type { TherapeuticGoal } from '../../../lib/ai/types/TherapeuticGoals'
 import { goalSchema, goals } from './index' // Reuse schema if possible
 

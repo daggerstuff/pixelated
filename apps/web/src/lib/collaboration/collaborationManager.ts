@@ -144,9 +144,8 @@ class CollaborationManager {
       metadata: { sessionId, inviteId },
       timestamp: new Date(),
       read: false,
-    } as any)
+    } as Record<string, unknown>)
 
-    console.log(`Invitation sent: ${invitedUser} to session ${sessionId}`)
 
     return invitation
   }
@@ -217,9 +216,8 @@ class CollaborationManager {
       metadata: { sessionId: invitation.sessionId },
       timestamp: new Date(),
       read: false,
-    } as any)
+    } as Record<string, unknown>)
 
-    console.log(`User ${userId} joined session ${invitation.sessionId}`)
 
     return { success: true, session }
   }
@@ -300,7 +298,6 @@ class CollaborationManager {
     message: SecureMessage,
   ): Promise<void> {
     // In real implementation, broadcast via WebSocket to all participants
-    console.log(`Broadcasting message ${message.id} to session ${session.id}`)
   }
 
   /**
@@ -373,7 +370,6 @@ class CollaborationManager {
       }
     })
 
-    console.log(`Ended collaboration session: ${sessionId}`)
 
     return {
       session,
@@ -391,7 +387,6 @@ class CollaborationManager {
       archivedAt: new Date(),
     }
 
-    console.log('Session archived:', archiveData)
   }
 
   /**
@@ -438,7 +433,6 @@ class CollaborationManager {
     this.notifications.get(userId)!.push(notification)
 
     // In real implementation, send push notification or email
-    console.log(`Notification sent to ${userId}:`, notification.title)
   }
 
   /**

@@ -68,18 +68,12 @@ function spawnDashboardRefresh(): void {
   })
 
   // Log output asynchronously
-  const chunks: Buffer[] = []
-  child.stdout?.on('data', (chunk: Buffer) => chunks.push(chunk))
-  child.stderr?.on('data', (chunk: Buffer) => chunks.push(chunk))
+  child.stdout?.on('data', () => {})
+  child.stderr?.on('data', () => {})
 
   child.on('close', (code: number | null) => {
-    const output = Buffer.concat(chunks).toString('utf8').trim()
-    if (code === 0) {
-      console.log(`[webhook] Dashboard refreshed successfully (exit=${code})`)
-    } else {
-      console.error(
-        `[webhook] Dashboard refresh failed (exit=${code}):\n${output.slice(0, 1000)}`,
-      )
+    if (code !== 0) {
+      // error handled by caller — dashboard refresh failed
     }
   })
 
@@ -100,9 +94,6 @@ router.post(
   async (req: Request, res: Response): Promise<void> => {
     // ── 1. Configuration check ──────────────────────────────────────────
     if (!WEBHOOK_SECRET) {
-      console.warn(
-        '[webhook] LINEAR_DASHBOARD_WEBHOOK_SECRET not set — webhook endpoint disabled',
-      )
       res.status(501).json({
         error: 'Not configured',
         message:
@@ -127,9 +118,6 @@ router.post(
     const linearDelivery = req.headers['linear-delivery'] as string | undefined
 
     if (!linearDigest || !linearEvent || !linearDelivery) {
-      console.warn(
-        `[webhook] Missing required headers: digest=${!!linearDigest} event=${!!linearEvent} delivery=${!!linearDelivery}`,
-      )
       res.status(400).json({
         error: 'Missing required Linear webhook headers',
         headers: {
@@ -149,7 +137,6 @@ router.post(
         'linear-delivery': linearDelivery,
       })
     } catch (err) {
-      console.warn('[webhook] Signature verification failed:', err)
       res.status(401).json({ error: 'Invalid webhook signature' })
       return
     }
@@ -157,10 +144,6 @@ router.post(
     // ── 3. Event filtering ──────────────────────────────────────────────
     const action = body['action'] as string
     const eventType = linearEvent
-
-    console.log(
-      `[webhook] Received ${eventType}.${action} (delivery=${linearDelivery?.slice(0, 8)}…)`,
-    )
 
     // Only process Issue and Project events
     if (eventType !== 'Issue' && eventType !== 'Project') {
@@ -181,9 +164,6 @@ router.post(
     }
 
     // ── 4. Spawn dashboard refresh ──────────────────────────────────────
-    console.log(
-      '[webhook] Change detected in Enterprise Readiness Program — refreshing dashboard',
-    )
     spawnDashboardRefresh()
 
     res.status(200).json({

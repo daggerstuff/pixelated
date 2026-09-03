@@ -20,6 +20,3 @@ export async function processInChunks<T, R>(
   }
   return results
 }
-
-// Example usage:
-// await processInChunks(sessions, 100, async (chunk) => await engine.batchAnalyzeSessions(chunk))

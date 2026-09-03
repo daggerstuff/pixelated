@@ -388,14 +388,6 @@ export class BackupVerificationService extends EventEmitter {
     }
   }
 
-  // private async markBackupFailed(backupFile: string): Promise<void> {
-  //   const metadata = await this.getBackupMetadata(backupFile)
-  //   if (metadata) {
-  //     metadata.status = 'failed'
-  //     await this.saveBackupMetadata(backupFile, metadata)
-  //   }
-  // }
-
   private async saveBackupMetadata(
     backupFile: string,
     metadata: BackupMetadata,

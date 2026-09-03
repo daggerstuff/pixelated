@@ -11,7 +11,7 @@ import { getLogger } from '@/lib/logging'
 import { createCacheInvalidation } from './invalidation'
 import { getCache } from './redis-cache'
 
-const logger = getLogger({ name: 'advanced-cache' } as any)
+const logger = getLogger('advanced-cache')
 const gzipAsync = promisify(gzip)
 const unzipAsync = promisify(unzip)
 
@@ -110,7 +110,10 @@ class CacheKeyGenerator {
  * Advanced caching strategy with multi-layer support
  */
 export class AdvancedCacheStrategy {
-  private readonly cache = getCache() as any
+  private readonly cache = getCache() as {
+    get: (key: string) => Promise<string | null>
+    set: (key: string, value: string, ttl: number) => Promise<void>
+  }
   private readonly keyGenerator = new CacheKeyGenerator()
   private readonly invalidation = createCacheInvalidation({
     redis: this.cache,
@@ -241,7 +244,7 @@ export class AdvancedCacheStrategy {
           tags: options.tags,
           ttl: options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE,
         }
-        await this.invalidation.set(key, value, rule as any)
+        await this.invalidation.set(key, value, rule as { tags: string[]; ttl: number })
       }
     } catch (error: unknown) {
       logger.error('Cache set operation failed', { key, error })

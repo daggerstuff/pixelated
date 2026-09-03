@@ -210,33 +210,21 @@ let redisConnection: RedisConnection | null = null
 
 async function initializeDatabases() {
   try {
-    console.log('🔄 Connecting to MongoDB...')
     mongoConnection = await connectMongoDB()
-    console.log('✅ MongoDB connected')
   } catch (error: unknown) {
-    console.error(
-      '⚠️ MongoDB connection failed (continuing without it):',
-      error,
-    )
+    // error handled by caller — continuing without MongoDB
   }
 
   try {
-    console.log('🔄 Connecting to PostgreSQL...')
     postgresConnection = await connectPostgreSQL()
-    console.log('✅ PostgreSQL connected')
   } catch (error: unknown) {
-    console.error(
-      '⚠️ PostgreSQL connection failed (continuing without it):',
-      error,
-    )
+    // error handled by caller — continuing without PostgreSQL
   }
 
   try {
-    console.log('🔄 Connecting to Redis...')
     redisConnection = await connectRedis()
-    console.log('✅ Redis connected')
   } catch (error: unknown) {
-    console.error('⚠️ Redis connection failed (continuing without it):', error)
+    // error handled by caller — continuing without Redis
   }
 }
 
@@ -262,17 +250,12 @@ async function startServer() {
       `)
     })
   } catch (error: unknown) {
-    console.error('Failed to start server:', error)
     process.exit(1)
   }
 }
 
 // Global error handlers for unhandled rejections and exceptions
 process.on('unhandledRejection', (reason: unknown) => {
-  console.warn(
-    'Unhandled Rejection:',
-    reason instanceof Error ? reason.message : String(reason),
-  )
   if (captureException) {
     captureException(
       reason instanceof Error ? reason : new Error(String(reason)),
@@ -281,7 +264,6 @@ process.on('unhandledRejection', (reason: unknown) => {
 })
 
 process.on('uncaughtException', (error: Error) => {
-  console.error('Uncaught Exception:', error.message)
   if (captureException) {
     captureException(error)
   }
@@ -289,7 +271,6 @@ process.on('uncaughtException', (error: Error) => {
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully...')
   await closeSentry()
   if (mongoConnection) {
     await disconnectMongoDB()

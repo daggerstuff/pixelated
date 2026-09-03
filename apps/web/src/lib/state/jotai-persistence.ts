@@ -58,7 +58,7 @@ class EncryptedJotaiStorage<Value> {
       allowOffline: true,
       syncAcrossTabs: true,
       version: 1,
-      ttl: options.ttl ?? (undefined as any),
+      ttl: options.ttl ?? Number.POSITIVE_INFINITY,
       ...options,
     }
 
@@ -102,7 +102,7 @@ class EncryptedJotaiStorage<Value> {
 
     if (this.options.encrypt) {
       try {
-        serialized = await (encrypt as any)(serialized)
+        serialized = await encrypt(serialized)
       } catch (error: unknown) {
         logger.error('Failed to encrypt state:', error)
         throw new Error('Failed to encrypt state for storage', { cause: error })
@@ -119,7 +119,7 @@ class EncryptedJotaiStorage<Value> {
       // Try to decrypt if it looks like encrypted data
       if (this.options.encrypt || serialized.startsWith('enc:')) {
         try {
-          decrypted = await (decrypt as any)(serialized)
+          decrypted = await decrypt(serialized)
         } catch (error: unknown) {
           logger.warn(
             'Failed to decrypt stored state, treating as plain text:',

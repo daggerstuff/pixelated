@@ -229,7 +229,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       sessionId,
       feedbackValue,
     ])
-    const evaluationId = (insertResult.rows[0] as any)?.id
+    const evaluationId = (insertResult.rows[0] as { id?: string }).id
 
     // Update session with latest evaluation feedback
     const updateQuery = `

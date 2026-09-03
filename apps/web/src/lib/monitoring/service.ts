@@ -5,6 +5,16 @@ import { getMonitoringConfig } from "./config";
 
 const logger = createBuildSafeLogger("default");
 
+interface FaroWindow extends Window {
+  faro?: {
+    init(config: unknown): void;
+    api: {
+      pushMeasurement(metric: unknown, options?: unknown): void;
+      pushError(error: Error, options?: unknown): void;
+    };
+  };
+}
+
 // Define extended Performance interface to include memory property
 interface ExtendedPerformance extends Performance {
   memory?: {
@@ -87,8 +97,10 @@ export class MonitoringService {
         "https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js";
       script.async = true;
       script.onload = () => {
-        if ((window as any)?.faro) {
-          (window as any).faro.init({
+const faroWin = window as FaroWindow | undefined;
+
+    if (faroWin?.faro) {
+      faroWin.faro.init({
             url: this.config.grafana.url,
             apiKey,
             app: {
@@ -158,8 +170,8 @@ export class MonitoringService {
   }
 
   private reportWebVital(metric: string, entry: PerformanceEntry): void {
-    if ((window as any)?.faro) {
-      (window as any).faro.api.pushMeasurement(metric, {
+    if ((window as FaroWindow)?.faro) {
+      (window as FaroWindow).faro.api.pushMeasurement(metric, {
         value: entry.startTime,
         unit: "ms",
       });
@@ -174,8 +186,8 @@ export class MonitoringService {
       resources: performance.getEntriesByType("resource") as PerformanceResourceTiming[],
     };
 
-    if ((window as any)?.faro) {
-      (window as any).faro.api.pushMeasurement("performance", {
+    if ((window as FaroWindow)?.faro) {
+      (window as FaroWindow).faro.api.pushMeasurement("performance", {
         value: metrics,
       });
     }
@@ -257,8 +269,8 @@ export class MonitoringService {
 
     try {
       // Send to Grafana
-      if ((window as any)?.faro) {
-        (window as any).faro.api.pushError(new Error(data.message), {
+      if ((window as FaroWindow)?.faro) {
+        (window as FaroWindow).faro.api.pushError(new Error(data.message), {
           type,
           level: data.level,
           context: data,

@@ -124,12 +124,6 @@ export type OmitByType<T, U> = Omit<T, KeysOfType<T, U>>
 // Note: TypeScript provides built-in Uppercase, Lowercase, Capitalize, and Uncapitalize utility types
 // These are available globally in TypeScript 4.1+, so we don't need to redefine them here
 
-// If you need custom string manipulation types, define them with different names:
-// export type ToUppercase<S extends string> = Uppercase<S>
-// export type ToLowercase<S extends string> = Lowercase<S>
-// export type ToCapitalize<S extends string> = Capitalize<S>
-// export type ToUncapitalize<S extends string> = Uncapitalize<S>
-
 /** Creates a template literal type */
 export type Join<
   T extends readonly string[],

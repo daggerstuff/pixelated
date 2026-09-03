@@ -85,7 +85,7 @@ export async function buildVapidJwt(
   const signature = await subtle.sign(
     { name: 'ECDSA', hash: 'SHA-256' },
     privateKey,
-    new TextEncoder().encode(input) as any,
+    new TextEncoder().encode(input),
   )
 
   return `${input}.${uint8ArrayToBase64(new Uint8Array(signature))}`

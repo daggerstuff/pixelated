@@ -32,7 +32,7 @@ export const GET = protectRoute(
     const trail = auditService.getAuditTrail({
       userId,
       queryId,
-      queryType: queryType as any,
+      queryType: queryType as string,
       startDate,
       endDate,
     })

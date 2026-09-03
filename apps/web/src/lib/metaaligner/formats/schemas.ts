@@ -10,8 +10,8 @@ import { z } from 'zod'
  * Zod schema for the {@link LLMOutput} interface.
  */
 export const LLMOutputSchema = z.object({
-  content: z.union([z.string(), (z.record as any)(z.unknown())]),
-  metadata: (z.record as any)(z.unknown()).optional(),
+  content: z.union([z.string(), z.record(z.unknown())]),
+  metadata: z.record(z.unknown()).optional(),
   version: z.string().optional(),
 })
 
@@ -40,8 +40,8 @@ export const UnifiedProcessingResponseSchema = z.object({
   enhancedResponse: z.string(),
   originalResponse: z.string(),
   alignment: z.object({
-    evaluation: (z.record as any)(z.unknown()), // This could be more specific if AlignmentEvaluationResult has a Zod schema
-    metrics: (z.record as any)(z.unknown()), // This could be more specific if AlignmentMetrics has a Zod schema
+    evaluation: z.record(z.unknown()),
+    metrics: z.record(z.unknown()),
     enhanced: z.boolean(),
     enhancementAttempts: z.number(),
   }),

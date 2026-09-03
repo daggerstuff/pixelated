@@ -62,7 +62,6 @@ export const GET = async ({ request }) => {
       },
     )
   } catch (error: unknown) {
-    console.error('Auth0 Profile GET error:', error)
     return new Response(
       JSON.stringify({
         error:
@@ -137,7 +136,6 @@ export const PATCH = async ({ request }) => {
       },
     )
   } catch (error: unknown) {
-    console.error('Auth0 Profile PATCH error:', error)
     return new Response(
       JSON.stringify({
         error:

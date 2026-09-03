@@ -1,16 +1,23 @@
 import type { APIContext } from 'astro'
-// import { updatePasswordWithToken } from '../../../lib/services/auth.service'
+import { z } from 'zod'
+import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
+
+const updatePasswordSchema = z.object({
+  password: z.string().min(8, 'Password must be at least 8 characters long'),
+})
 
 export const POST = async ({ request, cookies }: APIContext) => {
   try {
-    // Parse the request body to get the new password
-    const { password } = await request.json()
-
-    if (!password || password.length < 8) {
+    const [body, validationError] = await validateRequestBody(
+      request,
+      updatePasswordSchema,
+    )
+    if (validationError) {
+      const firstError = Object.values(validationError.details)[0] ?? 'Invalid request body'
       return new Response(
         JSON.stringify({
           success: false,
-          message: 'Password must be at least 8 characters long',
+          message: firstError,
         }),
         {
           status: 400,
@@ -59,7 +66,6 @@ export const POST = async ({ request, cookies }: APIContext) => {
       },
     )
   } catch (error: unknown) {
-    console.error('Error updating password:', error)
 
     return new Response(
       JSON.stringify({

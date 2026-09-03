@@ -3,10 +3,28 @@
  * Orchestrates deployment, rollback, and environment management
  */
 
-import type { DeploymentConfig, RollbackPlan } from '@/types/deployment'
-
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('productionManager')
+
+interface ProductionManagerConfig {
+  enableAutoRollback: boolean
+  healthCheckInterval: number
+  maxRollbackVersions: number
+  enableBlueGreen: boolean
+  enableCanary: boolean
+  notificationChannels: string[]
+}
+
+interface ProductionRollbackPlan {
+  id: string
+  environment: string
+  fromVersion: string
+  toVersion: string
+  steps: string[]
+  estimatedDuration: number
+  riskLevel: string
+  requiresApproval: boolean
+}
 
 export interface EnvironmentConfig {
   name: string
@@ -61,7 +79,7 @@ export interface DeploymentHealth {
  * Production Deployment Manager
  */
 class ProductionManager {
-  private readonly config: DeploymentConfig
+  private readonly config: ProductionManagerConfig
   private readonly environments = new Map<string, EnvironmentConfig>()
   private readonly deployments = new Map<string, DeploymentArtifact>()
 
@@ -73,7 +91,7 @@ class ProductionManager {
       enableBlueGreen: true,
       enableCanary: true,
       notificationChannels: ['email', 'slack', 'sms'],
-    } as any
+    }
 
     this.initializeEnvironments()
   }
@@ -140,7 +158,7 @@ class ProductionManager {
     deploymentId: string
     status: 'success' | 'failed' | 'rollback'
     duration: number
-    rollbackPlan?: RollbackPlan
+    rollbackPlan?: ProductionRollbackPlan
   }> {
     const env = this.environments.get(environment)
     if (!env) {
@@ -193,7 +211,7 @@ class ProductionManager {
       logger.error(`Deployment to ${environment} failed:`, error)
 
       // Auto-rollback if enabled
-      if ((this.config as any).enableAutoRollback) {
+      if (this.config.enableAutoRollback) {
         const rollbackPlan = await this.createRollbackPlan(
           environment,
           artifact,
@@ -505,7 +523,7 @@ class ProductionManager {
   async createRollbackPlan(
     environment: string,
     failedArtifact: DeploymentArtifact,
-  ): Promise<RollbackPlan> {
+  ): Promise<ProductionRollbackPlan> {
     const previousDeployment = this.findPreviousDeployment(environment)
 
     if (!previousDeployment) {
@@ -518,16 +536,16 @@ class ProductionManager {
       fromVersion: failedArtifact.version,
       toVersion: previousDeployment.version,
       steps: [
-        'Backup current database state' as any,
-        'Switch traffic to previous version' as any,
-        'Validate rollback health' as any,
+        'Backup current database state',
+        'Switch traffic to previous version',
+        'Validate rollback health',
         'Restore user sessions',
         'Clean up failed deployment',
-      ] as any,
+      ],
       estimatedDuration: 300000, // 5 minutes
       riskLevel: 'medium',
       requiresApproval: true,
-    } as any
+    }
   }
 
   private findPreviousDeployment(
@@ -546,7 +564,7 @@ class ProductionManager {
    */
   async rollback(
     environment: string,
-    rollbackPlan: RollbackPlan,
+    rollbackPlan: ProductionRollbackPlan,
   ): Promise<{
     success: boolean
     duration: number
@@ -560,7 +578,7 @@ class ProductionManager {
       // Execute rollback steps
       for (const step of rollbackPlan.steps) {
         logger.info(`Executing rollback step: ${step}`)
-        await this.executeRollbackStep(step as any, environment)
+        await this.executeRollbackStep(step, environment)
       }
 
       const duration = Date.now() - startTime

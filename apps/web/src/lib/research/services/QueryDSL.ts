@@ -38,6 +38,48 @@ export interface ResearchQueryRequest {
   requiresApproval?: boolean
 }
 
+const ALLOWED_AGG_FUNCTIONS = new Set([
+  'avg',
+  'sum',
+  'count',
+  'min',
+  'max',
+  'stddev',
+  'median',
+])
+
+const ALLOWED_FIELDS = new Set([
+  'session_type',
+  'outcome_metric',
+  'age',
+  'gender',
+  'ethnicity',
+  'cultural_background',
+  'technique_type',
+  'confidence',
+  'created_at',
+  'session_id',
+  'user_id',
+  'emotion_scores',
+  'technique_effectiveness',
+])
+
+const ALLOWED_SORT_DIRECTIONS = new Set(['asc', 'desc'])
+
+function validateFieldName(field: string): string {
+  if (!ALLOWED_FIELDS.has(field)) {
+    throw new Error(`Disallowed field name in query: ${field}`)
+  }
+  return field
+}
+
+function validateIdentifier(name: string, label: string): string {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+    throw new Error(`Invalid ${label}: ${name}`)
+  }
+  return name
+}
+
 export function dslToSQL(dsl: QueryDSL): string {
   const selectParts: string[] = []
   const whereParts: string[] = []
@@ -45,12 +87,19 @@ export function dslToSQL(dsl: QueryDSL): string {
   let paramIdx = 1
 
   for (const agg of dsl.aggregations) {
-    const alias = agg.alias ?? `${agg.function}_${agg.field}`
+    if (!ALLOWED_AGG_FUNCTIONS.has(agg.function)) {
+      throw new Error(`Disallowed aggregation function: ${agg.function}`)
+    }
+    validateFieldName(agg.field)
+    const alias = agg.alias
+      ? validateIdentifier(agg.alias, 'alias')
+      : `${agg.function}_${agg.field}`
     selectParts.push(`${agg.function.toUpperCase()}(${agg.field}) AS ${alias}`)
   }
 
   if (dsl.groupBy) {
     for (const field of dsl.groupBy) {
+      validateFieldName(field)
       selectParts.unshift(field)
     }
   }
@@ -103,15 +152,22 @@ export function dslToSQL(dsl: QueryDSL): string {
   let sql = `SELECT ${selectClause} FROM research_data${whereClause}`
 
   if (dsl.groupBy) {
+    for (const field of dsl.groupBy) {
+      validateFieldName(field)
+    }
     sql += ` GROUP BY ${dsl.groupBy.join(', ')}`
   }
 
   if (dsl.sortBy) {
-    sql += ` ORDER BY ${dsl.sortBy.field} ${dsl.sortBy.direction.toUpperCase()}`
+    validateFieldName(dsl.sortBy.field)
+    const direction = ALLOWED_SORT_DIRECTIONS.has(dsl.sortBy.direction)
+      ? dsl.sortBy.direction.toUpperCase()
+      : 'ASC'
+    sql += ` ORDER BY ${dsl.sortBy.field} ${direction}`
   }
 
-  if (dsl.limit) {
-    sql += ` LIMIT ${dsl.limit}`
+  if (dsl.limit !== undefined && dsl.limit > 0) {
+    sql += ` LIMIT ${Math.min(Math.floor(dsl.limit), 10000)}`
   }
 
   return sql

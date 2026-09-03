@@ -184,4 +184,4 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       },
     )
   }
-}) as any
+}) as unknown

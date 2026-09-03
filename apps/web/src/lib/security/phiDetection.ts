@@ -4,7 +4,7 @@
  * This implementation can detect PHI/PII in clinical text with high accuracy and
  * configurable redaction strategies for HIPAA compliance.
  */
-// TODO: 'Not be a bitch'
+// TODO: Integrate Microsoft Presidio Python service for production PHI detection
 // Mock implementations since Presidio is a Python package, not JavaScript
 // In production, you would need to call a Python service
 class Analyzer {

@@ -679,7 +679,7 @@ export class ResearchQueryEngine {
     // Apply anonymization based on level
     const anonymizedData =
       await this.anonymizationService.anonymizeResearchData(
-        result.data as any,
+        result.data as Record<string, unknown>,
         consentLevel,
       )
 

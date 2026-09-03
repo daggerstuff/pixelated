@@ -1,7 +1,7 @@
 /**
  * Database Connection Pool Event Types
  *
- * TODO/TECHDEBT: These event types are defined for a future event system.
+ * TECHDEBT: These event types are defined for a future event system.
  * Currently unused but preserved for planned implementation of enhanced
  * pool event monitoring and observability features.
  *

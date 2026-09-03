@@ -5,6 +5,11 @@ import { NextFunction, Request, Response } from 'express'
 
 import { getPostgresPool } from '../../lib/db/connection'
 
+type LoggedRequest = Request & {
+  requestId?: string
+  startTime?: number
+}
+
 /**
  * Request logger middleware
  * Logs all incoming requests
@@ -18,21 +23,16 @@ export function requestLogger(
   const requestId = createRequestId()
 
   // Store metadata on request object
-  ;(req as any).requestId = requestId
-  ;(req as any).startTime = startTime
+  ;(req as LoggedRequest).requestId = requestId
+  ;(req as LoggedRequest).startTime = startTime
 
   // Log on response finish
   res.on('finish', () => {
     const duration = Date.now() - startTime
-    const level = res.statusCode >= 400 ? 'error' : 'info'
-
-    console.log(
-      `[${requestId}] ${level.toUpperCase()} - ${req.method} ${req.path} - ${res.statusCode} (${duration}ms)`,
-    )
 
     // Audit log for user actions
-    if (req.user && shouldAuditLog(req as any)) {
-      void logAuditEvent(req as any, res, requestId, duration)
+    if (req.user && shouldAuditLog(req as LoggedRequest)) {
+      void logAuditEvent(req as LoggedRequest, res, requestId, duration)
     }
   })
 
@@ -113,8 +113,7 @@ async function logAuditEvent(
       ],
     )
   } catch (error: unknown) {
-    console.error('Failed to log audit event:', error)
-    // Don't throw - audit logging failures shouldn't break the app
+    // error handled by caller — audit logging failures shouldn't break the app
   }
 }
 
@@ -211,5 +210,5 @@ function createRequestId(): string {
 }
 
 export function getRequestId(req: Request): string {
-  return (req as any).requestId ?? 'unknown'
+  return (req as LoggedRequest).requestId ?? 'unknown'
 }

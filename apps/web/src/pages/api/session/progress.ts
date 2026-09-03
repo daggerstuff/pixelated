@@ -106,7 +106,7 @@ export const GET = async ({ request }) => {
           ORDER BY created_at DESC
         `
         const feedbackResult = await client.query(feedbackQuery, [sessionId])
-        feedback = feedbackResult.rows as any
+        feedback = feedbackResult.rows as unknown[]
       }
       return new Response(
         JSON.stringify({

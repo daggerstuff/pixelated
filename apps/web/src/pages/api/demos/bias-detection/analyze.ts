@@ -78,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
     const alertLevel = determineAlertLevel(biasFactors.overall)
 
     // Generate additional analysis components
-    const counterfactualScenarios = (generateCounterfactualScenarios as any)(
+    const counterfactualScenarios = (generateCounterfactualScenarios as (...args: unknown[]) => unknown)(
       sessionData,
       biasFactors,
     )
@@ -161,17 +161,6 @@ export const POST: APIRoute = async ({ request }) => {
       },
     }
 
-    // Log analysis for monitoring (in production, this would go to proper logging)
-    console.log(
-      `Bias analysis completed for session ${sessionData.sessionId}:`,
-      {
-        overallScore: biasFactors.overall,
-        alertLevel,
-        contentLength: sessionData.content.length,
-        demographics: sessionData.demographics,
-      },
-    )
-
     return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
@@ -180,8 +169,6 @@ export const POST: APIRoute = async ({ request }) => {
       },
     })
   } catch (error: unknown) {
-    console.error('Bias analysis API error:', error)
-
     return new Response(
       JSON.stringify({
         error: 'Internal server error during bias analysis',

@@ -63,7 +63,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: true,
-          comparisonId: (result.rows[0] as any).id,
+          comparisonId: (result.rows[0] as { id: string }).id,
           therapistId,
           currentSessionId,
         }),
@@ -157,7 +157,18 @@ export const GET: APIRoute = async ({ request }) => {
         typeof v === 'string'
           ? (JSON.parse(v || '{}') as Record<string, unknown>)
           : ((v as Record<string, unknown>) ?? {})
-      const comparisons = (result.rows as any[]).map((row) => ({
+      interface ComparisonRow {
+        id: string
+        therapist_id: string
+        current_session_id: string
+        previous_session_id: string | null
+        improvement_score: number
+        comparison_metrics: string
+        analyzed_at: string
+        current_session_started_at: string | null
+        previous_session_started_at: string | null
+      }
+      const comparisons = (result.rows as ComparisonRow[]).map((row) => ({
         id: row.id,
         therapistId: row.therapist_id,
         currentSessionId: row.current_session_id,
@@ -177,7 +188,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({
-          therapistId: therapistId ?? (result.rows[0] as any)?.therapist_id,
+          therapistId: therapistId ?? (result.rows[0] as ComparisonRow | undefined)?.therapist_id,
           sessionId: sessionId,
           comparisons,
         }),

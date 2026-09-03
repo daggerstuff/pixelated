@@ -32,7 +32,6 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
           timestamp: new Date().toISOString(),
         },
       })
-      console.log('✅ Test error sent to Sentry!')
     }
   }
 
@@ -43,7 +42,6 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
         timestamp: new Date().toISOString(),
       },
     })
-    console.log('✅ Test message sent to Sentry!')
   }
 
   const handleFullTest = () => {

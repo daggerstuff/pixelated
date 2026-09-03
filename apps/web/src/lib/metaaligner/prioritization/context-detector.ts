@@ -242,9 +242,9 @@ export class ContextDetector {
           content = r['content']
         } else if (
           Array.isArray(r['choices']) &&
-          (r['choices'] as any)[0]?.['message']?.['content']
+          (r['choices'] as Array<{ message?: { content?: string } }>)[0]?.['message']?.['content']
         ) {
-          content = String((r['choices'] as any)[0]?.['message']?.['content'])
+          content = String((r['choices'] as Array<{ message?: { content?: string } }>)[0]?.['message']?.['content'])
         }
       }
 

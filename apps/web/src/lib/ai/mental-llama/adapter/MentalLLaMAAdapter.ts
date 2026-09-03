@@ -24,9 +24,6 @@ import type {
 } from "../types/mentalLLaMATypes.ts";
 const logger = getAiServiceLogger("mental-llama");
 
-// Option 1: Static import (uncomment if you want static import)
-// import { CrisisSessionFlaggingService } from '../../crisis/CrisisSessionFlaggingService.ts'
-
 export class MentalLLaMAAdapter {
   private readonly modelProvider: IModelProvider | undefined;
   private readonly crisisNotifier: ICrisisNotificationHandler | undefined;

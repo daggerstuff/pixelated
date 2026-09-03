@@ -63,7 +63,7 @@ export const GET: APIRoute = async () => {
 
     const metrics =
       (metricsResult.rows[0] as Record<string, unknown> | undefined) ?? {}
-    const uptime = (uptimeResult.rows[0] as any)?.['uptime_hours'] ?? 0
+    const uptime = (uptimeResult.rows[0] as { uptime_hours?: number })?.uptime_hours ?? 0
 
     // Format response
     const response = {
@@ -98,7 +98,6 @@ export const GET: APIRoute = async () => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Dashboard summary API error:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch dashboard data',

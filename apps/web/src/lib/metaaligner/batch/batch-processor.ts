@@ -60,7 +60,7 @@ export class BatchProcessor implements IBatchProcessor {
   }
 
   constructor(api: IUnifiedMetaAlignerAPI, config: BatchProcessorConfig = {}) {
-    ;(this as any).api = api
+    ;(this as { api?: unknown }).api = api
     this.config = {
       batchSize: 10,
       timeout: 1000,
@@ -111,7 +111,6 @@ export class BatchProcessor implements IBatchProcessor {
     try {
       await this.circuitBreaker.fire(async () => {
         // In a real-world scenario, you would call the API to process the batch.
-        // return this.api.processBatch(optimizedBatch);
         return Promise.resolve()
       })
     } catch (error: unknown) {

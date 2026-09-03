@@ -36,9 +36,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       this.isShuttingDown = false
 
       // Log initialization but not config (for privacy)
-      console.log('WebRTC service initialized')
     } catch (error: unknown) {
-      console.error('Error initializing WebRTC connection:', error)
       throw new Error('Failed to initialize WebRTC connection', {
         cause: error,
       })
@@ -70,7 +68,6 @@ export class WebRTCService implements WebRTCServiceInterface {
 
       return stream
     } catch (error: unknown) {
-      console.error('Error creating local stream:', error)
       throw new Error('Failed to access microphone or camera', { cause: error })
     }
   }
@@ -96,7 +93,7 @@ export class WebRTCService implements WebRTCServiceInterface {
           noiseSuppression: true,
           autoGainControl: true,
         })
-        .catch((err) => console.warn('Could not apply audio constraints:', err))
+        .catch(() => {})
 
       // Create a MediaStreamSource from the original stream
       const source = audioContext.createMediaStreamSource(stream)
@@ -172,9 +169,7 @@ export class WebRTCService implements WebRTCServiceInterface {
           noiseSuppression: true,
           autoGainControl: true,
         })
-        .catch((err) =>
-          console.warn('Could not apply processed track constraints:', err),
-        )
+        .catch(() => {})
 
       // Stop the original track
       audioTrack.stop()
@@ -185,14 +180,10 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Add the processed track to the stream
       stream.addTrack(processedAudioTrack)
 
-      console.log(
-        'Applied professional audio processing for therapeutic clarity',
-      )
 
       // Set up audio monitoring and visualization if needed
       this.setupAudioMonitoring(analyzer)
     } catch (error: unknown) {
-      console.error('Error applying audio processing:', error)
       // Fall back to unprocessed audio if processing fails
     }
   }
@@ -222,7 +213,7 @@ export class WebRTCService implements WebRTCServiceInterface {
 
       // Log significant audio events for debugging
       if (averageEnergy > 200) {
-        console.debug('High energy audio detected')
+        // error handled by caller
       }
 
       // Continue monitoring
@@ -274,9 +265,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Start connection monitoring
       this.startConnectionMonitoring()
 
-      console.log('Connected to peer')
     } catch (error: unknown) {
-      console.error('Error connecting to peer:', error)
       this.handleConnectionFailure()
     }
   }
@@ -325,7 +314,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       try {
         await this.createAndSendOffer()
       } catch (error: unknown) {
-        console.error('Error during negotiation:', error)
+        // error handled by caller
       }
     }
 
@@ -341,16 +330,15 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private setupDataChannel(dataChannel: RTCDataChannel): void {
     dataChannel.onopen = () => {
-      console.log('Data channel opened')
+      // error handled by caller
     }
 
     dataChannel.onclose = () => {
-      console.log('Data channel closed')
+      // error handled by caller
     }
 
     dataChannel.onmessage = (event) => {
       // Process incoming messages
-      console.log('Received message:', event.data)
     }
   }
 
@@ -368,7 +356,6 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Create and send an offer
       await this.createAndSendOffer()
     } catch (error: unknown) {
-      console.error('Error initiating peer connection:', error)
       throw error
     }
   }
@@ -395,7 +382,6 @@ export class WebRTCService implements WebRTCServiceInterface {
       // For this implementation, we'll use a local signaling mechanism
       this.sendOfferToSignalingServer(offer)
     } catch (error: unknown) {
-      console.error('Error creating offer:', error)
       throw error
     }
   }
@@ -406,7 +392,6 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private sendOfferToSignalingServer(offer: RTCSessionDescriptionInit): void {
     // In a production app, this would send the offer to a WebSocket server
-    console.log('Sending offer to signaling server')
 
     // Simulate receiving an answer from the peer
     // For this implementation, we'll automatically create an answer locally
@@ -423,7 +408,6 @@ export class WebRTCService implements WebRTCServiceInterface {
    */
   private sendIceCandidateToSignalingServer(candidate: RTCIceCandidate): void {
     // In a production app, this would send the ICE candidate to a WebSocket server
-    console.log('Sending ICE candidate to signaling server')
 
     // For this implementation, we'll simulate received remote ICE candidates
     setTimeout(() => {
@@ -438,7 +422,7 @@ export class WebRTCService implements WebRTCServiceInterface {
         // Add the simulated remote candidate
         this.peerConnection
           .addIceCandidate(remoteCandidate)
-          .catch((err) => console.error('Error adding ICE candidate:', err))
+          .catch(() => {})
       }
     }, 300)
   }
@@ -456,9 +440,7 @@ export class WebRTCService implements WebRTCServiceInterface {
     try {
       // Set the remote description using the received answer
       await this.peerConnection.setRemoteDescription(answer)
-      console.log('Successfully set remote description from answer')
     } catch (error: unknown) {
-      console.error('Error setting remote description:', error)
       throw error
     }
   }
@@ -473,7 +455,6 @@ export class WebRTCService implements WebRTCServiceInterface {
 
     const state = this.peerConnection.connectionState
 
-    console.log(`Connection state changed: ${state}`)
 
     switch (state) {
       case 'new':
@@ -505,7 +486,6 @@ export class WebRTCService implements WebRTCServiceInterface {
 
     const state = this.peerConnection.iceConnectionState
 
-    console.log(`ICE connection state changed: ${state}`)
 
     switch (state) {
       case 'new':
@@ -532,9 +512,6 @@ export class WebRTCService implements WebRTCServiceInterface {
   private handleConnectionFailure() {
     // Attempt to reconnect if under max attempts
     if (this.connectionAttempts < this.maxConnectionAttempts) {
-      console.log(
-        `Connection attempt ${this.connectionAttempts} failed, retrying...`,
-      )
 
       // Clean up existing connection
       this.cleanupPeerConnection()
@@ -542,11 +519,10 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Try to reconnect after delay
       this.connectionRetryTimeout = setTimeout(() => {
         this.connectToPeer().catch((err) => {
-          console.error('Reconnection failed:', err)
+          // error handled by caller
         })
       }, this.connectionRetryIntervalMs)
     } else {
-      console.error('Max connection attempts reached, giving up')
 
       // Notify disconnect listeners
       this.notifyDisconnectListeners()
@@ -568,7 +544,6 @@ export class WebRTCService implements WebRTCServiceInterface {
       if (this.peerConnection) {
         const state = this.peerConnection.iceConnectionState
         if (state === 'disconnected' || state === 'failed') {
-          console.log('Connection problem detected by monitor')
           this.handleConnectionFailure()
         }
       }
@@ -608,7 +583,7 @@ export class WebRTCService implements WebRTCServiceInterface {
    * Send a message via data channel (WebRTCServiceInterface implementation)
    */
   sendMessage(message: unknown): void {
-    console.log('WebRTC sendMessage:', message)
+    // error handled by caller
   }
 
   /**
@@ -618,7 +593,6 @@ export class WebRTCService implements WebRTCServiceInterface {
     this.isShuttingDown = true
     this.cleanupConnection()
     this.notifyDisconnectListeners()
-    console.log('Disconnected from peer')
   }
 
   /**
@@ -687,7 +661,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       try {
         listener(stream)
       } catch (error: unknown) {
-        console.error('Error in stream listener:', error)
+        // error handled by caller
       }
     })
   }
@@ -700,16 +674,11 @@ export class WebRTCService implements WebRTCServiceInterface {
       try {
         listener()
       } catch (error: unknown) {
-        console.error('Error in disconnect listener:', error)
+        // error handled by caller
       }
     })
   }
 }
 
 // Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });
+

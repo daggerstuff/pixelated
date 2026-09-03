@@ -34,7 +34,7 @@ export default function useConversionTracking(
   const log = useCallback(
     (message: string, data?: unknown) => {
       if (debug) {
-        console.log(`🔍 Conversion Tracking: ${message}`, data ?? '')
+        // error handled by caller
       }
     },
     [debug],
@@ -79,7 +79,7 @@ export default function useConversionTracking(
           })
         }
       } catch (error: unknown) {
-        console.error('Error tracking event:', error)
+        // error handled by caller
       }
     },
     [log],
@@ -104,7 +104,7 @@ export default function useConversionTracking(
         // - Google Analytics: gtag('event', 'conversion', { send_to: 'AW-CONVERSION_ID/CONVERSION_LABEL', value, currency: 'USD' })
         // - Facebook Pixel: fbq('track', conversionName, { value, currency: 'USD', ...data })
       } catch (error: unknown) {
-        console.error('Error tracking conversion:', error)
+        // error handled by caller
       }
     },
     [trackEventGeneric, log],
@@ -117,16 +117,12 @@ export default function useConversionTracking(
         // Find the funnel
         const funnel = funnels.find((f) => f.id === funnelId)
         if (!funnel) {
-          console.warn(`Funnel with ID "${funnelId}" not found`)
           return
         }
 
         // Find the stage
         const stage = funnel.stages.find((s) => s.id === stageId)
         if (!stage) {
-          console.warn(
-            `Stage with ID "${stageId}" not found in funnel "${funnelId}"`,
-          )
           return
         }
 
@@ -143,7 +139,7 @@ export default function useConversionTracking(
           ...data,
         })
       } catch (error: unknown) {
-        console.error('Error tracking funnel stage:', error)
+        // error handled by caller
       }
     },
     [funnels, trackEventGeneric, log],

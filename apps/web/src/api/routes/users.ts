@@ -98,7 +98,7 @@ router.get(
   '/:userId',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
-    const { user } = req as any
+    const { user } = req as { user?: { id?: string; role?: string } }
 
     // Validate UUID format
     const uuidRegex =
@@ -138,7 +138,7 @@ router.put(
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.params['userId'] as string
     const { name, email, status, role } = req.body
-    const { user } = req as any
+    const { user } = req as { user?: { id?: string; role?: string } }
 
     // Validate UUID format
     const uuidRegex =

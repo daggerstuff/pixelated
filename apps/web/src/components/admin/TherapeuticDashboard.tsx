@@ -39,7 +39,6 @@ export const TherapeuticDashboard: React.FC = () => {
       ])
       setAnalysis({ crisis, pii })
     } catch (e: unknown) {
-      console.error(e)
       alert('Analysis failed')
     } finally {
       setLoading(false)

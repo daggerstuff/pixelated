@@ -87,7 +87,7 @@ export function useCollaboration({
 
     socket.onRemoteChange((data) => {
       // Apply remote changes to content
-      const newContent = applyChange(content, data.change as any)
+      const newContent = applyChange(content, data.change as unknown)
       setContent(newContent)
       setVersion(data.version)
       onContentChange(newContent)
@@ -146,7 +146,7 @@ export function useCollaboration({
           content: newContent,
           userId: 'current', // This will be replaced by server
         }
-        socketRef.current.sendDocumentChange(change as any, version)
+        socketRef.current.sendDocumentChange(change as unknown, version)
       }
     },
     [version, isConnected],

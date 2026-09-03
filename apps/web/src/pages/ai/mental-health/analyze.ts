@@ -17,7 +17,7 @@ export const POST: (context: APIContext) => Promise<Response> = async ({
     logger.debug('Received messages', { messages })
 
     const model = await createMentalLLaMAFromEnv()
-    const result = await (model as any).chat(messages)
+    const result = await (model as { chat(messages: unknown[]): Promise<unknown> }).chat(messages)
 
     logger.info('Successfully analyzed mental health')
     return new Response(JSON.stringify(result), {

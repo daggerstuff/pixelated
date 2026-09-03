@@ -108,7 +108,7 @@ export class FHECacheService {
     try {
       this.fheService = await getFHEService({
         implementation: process.env['NODE_ENV'] === 'test' ? 'mock' : 'seal',
-      } as any)
+      } as Record<string, unknown>)
 
       await this.fheService.initialize()
       this.initialized = true

@@ -52,7 +52,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const req = context.request
   const url = (() => {
     try {
-      const ctxUrl = (context as any).url
+      const ctxUrl = (context as { url?: string }).url
       if (ctxUrl && ctxUrl instanceof URL) return ctxUrl
       // Fallback to constructing from request.url when available
       if (typeof req?.url === 'string') return new URL(req.url)

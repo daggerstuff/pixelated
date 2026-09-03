@@ -42,7 +42,8 @@ export const POST = async ({ request }) => {
         code: 'VALIDATION_ERROR',
         errorMessage: 'Invalid analytics event data',
         details: validationErrors,
-      } as any
+      }
+
       return new Response(JSON.stringify(error), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -63,15 +64,6 @@ export const POST = async ({ request }) => {
     // Store the event (in production, save to database)
     analyticsData.push(enrichedEvent)
 
-    // Log for debugging
-    console.log('Demo Analytics Event:', {
-      event: enrichedEvent.event,
-      session_id: enrichedEvent.session_id,
-      ab_variant: enrichedEvent.ab_variant,
-      timestamp: new Date(enrichedEvent.timestamp).toISOString(),
-    })
-
-    // Log which analytics integrations will be attempted
     const hasGA = Boolean(
       import.meta.env['PUBLIC_GA_MEASUREMENT_ID'] &&
       import.meta.env['GA_API_SECRET'],
@@ -81,11 +73,6 @@ export const POST = async ({ request }) => {
       import.meta.env['CUSTOM_ANALYTICS_ENDPOINT'] &&
       import.meta.env['CUSTOM_ANALYTICS_TOKEN'],
     )
-    console.log('Attempting analytics integrations:', {
-      hasGA,
-      hasMixpanel,
-      hasCustom,
-    })
 
     // Only call analytics integrations if credentials are present
     const analyticsPromises: Promise<void>[] = []
@@ -110,8 +97,6 @@ export const POST = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Demo analytics error:', error)
-
     const apiError: AnalyticsError = {
       code: 'PROCESSING_ERROR',
       errorMessage: 'Failed to process analytics event',
@@ -119,7 +104,7 @@ export const POST = async ({ request }) => {
         source: 'demo-tracking',
         message: error instanceof Error ? String(error) : String(error),
       },
-    } as any
+    }
 
     return new Response(JSON.stringify(apiError), {
       status: 500,
@@ -168,8 +153,6 @@ export const GET = async ({ url }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Demo analytics query error:', error)
-
     const apiError: AnalyticsError = {
       code: 'PROCESSING_ERROR',
       errorMessage: 'Failed to retrieve analytics data',
@@ -177,7 +160,7 @@ export const GET = async ({ url }) => {
         source: 'demo-tracking',
         message: error instanceof Error ? String(error) : String(error),
       },
-    } as any
+    }
 
     return new Response(JSON.stringify(apiError), {
       status: 500,
@@ -194,7 +177,6 @@ async function sendToGoogleAnalytics(
   const { GA_API_SECRET } = import.meta.env
 
   if (!GA_MEASUREMENT_ID || !GA_API_SECRET) {
-    console.warn('Google Analytics credentials not configured')
     return
   }
 
@@ -240,7 +222,7 @@ async function sendToGoogleAnalytics(
       throw new Error(`GA4 API error: ${response.status}`)
     }
   } catch (error: unknown) {
-    console.error('Failed to send to Google Analytics:', error)
+    // error handled by caller
   }
 }
 
@@ -248,7 +230,6 @@ async function sendToMixpanel(event: EnrichedAnalyticsEvent): Promise<void> {
   const { MIXPANEL_TOKEN } = import.meta.env
 
   if (!MIXPANEL_TOKEN) {
-    console.warn('Mixpanel token not configured')
     return
   }
 
@@ -275,7 +256,7 @@ async function sendToMixpanel(event: EnrichedAnalyticsEvent): Promise<void> {
       throw new Error(`Mixpanel API error: ${response.status}`)
     }
   } catch (error: unknown) {
-    console.error('Failed to send to Mixpanel:', error)
+    // error handled by caller
   }
 }
 
@@ -303,7 +284,7 @@ async function sendToCustomAnalytics(
       throw new Error(`Custom analytics API error: ${response.status}`)
     }
   } catch (error: unknown) {
-    console.error('Failed to send to custom analytics:', error)
+    // error handled by caller
   }
 }
 

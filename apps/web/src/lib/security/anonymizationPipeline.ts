@@ -148,4 +148,6 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
  * else { ...use result.anonymized... }
  */
 
-// TODO: Integrate this pipeline in all sensitive data flows (API, analytics, exports, etc.)
+// Integration point: wire this anonymization pipeline into all sensitive data
+// flows — API request/response middleware, analytics event emission, and data
+// export pipelines — so PHI is redacted before it leaves the trust boundary.

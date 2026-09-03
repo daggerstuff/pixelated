@@ -16,7 +16,7 @@ export async function initializeSecurityDatabase() {
     await initializeSecurityTables()
 
     // Log successful initialization
-    await (createAuditLog as any)({
+    await (createAuditLog as (...args: unknown[]) => Promise<unknown>)({
       userId: 'system',
       action: 'system.security.database.initialize',
       resource: 'database',
@@ -34,7 +34,7 @@ export async function initializeSecurityDatabase() {
     )
 
     // Log initialization failure
-    await (createAuditLog as any)({
+    await (createAuditLog as (...args: unknown[]) => Promise<unknown>)({
       userId: 'system',
       action: 'system.security.database.initialize.error',
       resource: 'database',

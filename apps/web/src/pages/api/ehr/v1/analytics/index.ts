@@ -43,7 +43,7 @@ export const GET = withV1Contract('getDashboard', async (ctx, caller) => {
     )
 
   // RBAC: verify the user's role can access this dashboard type
-  if (!canAccessDashboard(caller.user.role as any, type))
+  if (!canAccessDashboard(caller.user.role as string, type))
     return ehrValidationError(
       `Your role does not have permission to access the ${type} dashboard.`,
     )
@@ -58,7 +58,7 @@ export const GET = withV1Contract('getDashboard', async (ctx, caller) => {
   }
   const perm = await requireEHRPermission(
     caller.user.role,
-    dashboardPerms[type] as any,
+    dashboardPerms[type] as string,
     caller.user.id,
     tenantId,
   )
@@ -84,7 +84,7 @@ export const GET = withV1Contract('getDashboard', async (ctx, caller) => {
   try {
     const metrics = await service.getDashboard(
       type,
-      caller.user.role as any,
+      caller.user.role as string,
       filter,
     )
     return ehrSuccess(metrics)

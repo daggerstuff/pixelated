@@ -166,7 +166,7 @@ export class ResearchQueryEngineService {
     } catch (error: unknown) {
       logger.error('Error translating natural language query:', error)
       throw new Error(
-        `Query translation failed: ${(error as any)?.message ?? 'Unknown error'}`,
+        `Query translation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -211,8 +211,18 @@ export class ResearchQueryEngineService {
       }
 
       // Validate consent for data access
+      // validateConsent is not yet on ConsentManagementService; use a typed shape
       const consentValid = await (
-        consentManagementService as any
+        consentManagementService as unknown as {
+          validateConsent: (
+            userId: string,
+            request: {
+              activityType: string
+              dataTypes: string[]
+              purpose: string
+            },
+          ) => Promise<{ isValid: boolean; limitations: string[] }>
+        }
       ).validateConsent(userId, {
         activityType: 'research_query',
         dataTypes: ['therapeutic_sessions', 'emotional_analysis'],
@@ -408,13 +418,13 @@ export class ResearchQueryEngineService {
     }
 
     // Extract entities (simplified)
-    const entities: any[] = []
+    const entities: Array<{ type: string; value: string }> = []
     if (query.includes('anxiety'))
-      entities.push({ type: 'condition', value: 'anxiety' } as any)
+      entities.push({ type: 'condition', value: 'anxiety' })
     if (query.includes('depression'))
-      entities.push({ type: 'condition', value: 'depression' } as any)
+      entities.push({ type: 'condition', value: 'depression' })
     if (query.includes('session'))
-      entities.push({ type: 'data_type', value: 'therapeutic_session' } as any)
+      entities.push({ type: 'data_type', value: 'therapeutic_session' })
 
     return {
       intent,
@@ -447,7 +457,7 @@ export class ResearchQueryEngineService {
       'session_date',
       'emotional_metrics',
     ]
-    let conditions: any[] = []
+    let conditions: string[] = []
     let params: unknown[] = []
     let paramIndex = 1
 
@@ -461,7 +471,7 @@ export class ResearchQueryEngineService {
     // Add conditions based on entities using parameterized queries
     entities.forEach((entity) => {
       if (entity.type === 'condition') {
-        conditions.push(`primary_condition = $${paramIndex}` as any)
+        conditions.push(`primary_condition = $${paramIndex}`)
         params.push(entity.value)
         paramIndex++
       }
@@ -470,7 +480,7 @@ export class ResearchQueryEngineService {
     // Add time range if specified using parameterized queries
     if (researchContext.timeRange) {
       conditions.push(
-        `session_date BETWEEN $${paramIndex} AND $${paramIndex + 1}` as any,
+        `session_date BETWEEN $${paramIndex} AND $${paramIndex + 1}`,
       )
       params.push(
         researchContext.timeRange.start,
@@ -618,13 +628,13 @@ export class ResearchQueryEngineService {
     sql: string,
     _dataScope: string[],
   ): Promise<string[]> {
-    const permissions: any[] = []
+    const permissions: string[] = []
 
     if (sql.includes('emotional_metrics'))
-      permissions.push('emotional_data_access' as any)
-    if (sql.includes('session_')) permissions.push('session_data_access' as any)
-    if (sql.includes('user_')) permissions.push('user_data_access' as any)
-    if (sql.includes('outcome')) permissions.push('outcome_data_access' as any)
+      permissions.push('emotional_data_access')
+    if (sql.includes('session_')) permissions.push('session_data_access')
+    if (sql.includes('user_')) permissions.push('user_data_access')
+    if (sql.includes('outcome')) permissions.push('outcome_data_access')
 
     return permissions
   }
@@ -668,16 +678,16 @@ export class ResearchQueryEngineService {
     query: ResearchQuery,
     results: AnonymizedRecord[],
   ): string[] {
-    const warnings: any[] = []
+    const warnings: string[] = []
 
     if (results.length === 0) {
       warnings.push(
-        'No results found for query. Consider broadening search criteria.' as any,
+        'No results found for query. Consider broadening search criteria.',
       )
     }
 
     if (query.estimatedExecutionTime > 10) {
-      warnings.push('Query may take longer than expected to execute.' as any)
+      warnings.push('Query may take longer than expected to execute.')
     }
 
     const avgInformationLoss =
@@ -685,7 +695,7 @@ export class ResearchQueryEngineService {
       results.length
     if (avgInformationLoss > 0.5) {
       warnings.push(
-        'High information loss due to anonymization. Results may be less precise.' as any,
+        'High information loss due to anonymization. Results may be less precise.',
       )
     }
 
@@ -696,24 +706,24 @@ export class ResearchQueryEngineService {
     history: ResearchQuery[],
     metrics: QueryPerformanceMetrics,
   ): string[] {
-    const suggestions: any[] = []
+    const suggestions: string[] = []
 
     if (metrics.averageExecutionTime > 5) {
       suggestions.push(
-        'Consider adding more specific filters to reduce query execution time' as any,
+        'Consider adding more specific filters to reduce query execution time',
       )
     }
 
     if (metrics.cacheHitRate < 0.5) {
       suggestions.push(
-        'Similar queries detected. Consider reusing previous results when appropriate' as any,
+        'Similar queries detected. Consider reusing previous results when appropriate',
       )
     }
 
     const complexQueries = history.filter((q) => q.estimatedExecutionTime > 10)
     if (complexQueries.length > 0) {
       suggestions.push(
-        'Break down complex queries into smaller, more focused analyses' as any,
+        'Break down complex queries into smaller, more focused analyses',
       )
     }
 

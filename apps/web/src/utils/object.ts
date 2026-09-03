@@ -265,7 +265,7 @@ export function deepEqual<T>(a: T, b: T, _visited?: WeakSet<object>): boolean {
     // Handle objects - use hasOwnProperty for O(1) key lookups without Set allocation overhead
     for (const key of keysA) {
       if (!Object.prototype.hasOwnProperty.call(b, key)) return false
-      if (!deepEqual((a as any)[key], (b as any)[key], visited)) return false
+      if (!deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key], visited)) return false
     }
     return true
   }

@@ -1,4 +1,3 @@
-// import type { APIRoute } from 'astro'
 import { healthMonitor } from '../../../lib/services/health-monitor'
 
 export const GET = async () => {

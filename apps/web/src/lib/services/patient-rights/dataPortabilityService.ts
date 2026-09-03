@@ -614,7 +614,6 @@ async function processExportRequest(exportId: string): Promise<void> {
     })
 
     // Send notification to user (would implement in production)
-    // await notifyUserOfCompletedExport(exportData.requestedBy, exportId);
   } catch (error: unknown) {
     logger.error('Error processing export', {
       error: error instanceof Error ? String(error) : String(error),

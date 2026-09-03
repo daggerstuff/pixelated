@@ -397,9 +397,6 @@ export class DynamicWeightingEngine {
     // Only check if we have enough history
     // We remove the early return here because we want to update trackers cumulatively
     // even before the window is full.
-    // if (this.weightHistory.length < window) {
-    //   return false
-    // }
 
     // Track direction changes for each objective
     for (const [k, v] of Object.entries(newWeights) as [

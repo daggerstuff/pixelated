@@ -452,7 +452,7 @@ export class OptimizedBiasDetectionService {
 
     try {
       // Check cache first
-      const cached = (await this.cache.get(cacheKey)) as any
+      const cached = (await this.cache.get(cacheKey)) as unknown
       if (
         cached &&
         typeof cached === 'object' &&

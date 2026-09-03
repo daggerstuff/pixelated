@@ -55,7 +55,7 @@ export function verifyToken(token: string): Record<string, unknown> | null {
       !('exp' in parsed) ||
       typeof parsed['exp'] !== 'number'
     ) {
-      logger.warn('Token payload invalid', { token })
+      logger.warn('Token payload invalid')
       return null
     }
 
@@ -63,19 +63,19 @@ export function verifyToken(token: string): Record<string, unknown> | null {
     const iat = parsed['iat']
 
     if (typeof exp !== 'number' || typeof iat !== 'number') {
-      logger.warn('Token payload invalid', { token })
+      logger.warn('Token payload invalid')
       return null
     }
 
     // Check expiration
     if (exp < Date.now()) {
-      logger.warn('Token expired', { token })
+      logger.warn('Token expired')
       return null
     }
 
     return parsed
   } catch (error: unknown) {
-    logger.error('Error verifying token', { error, token })
+    logger.error('Error verifying token', { error })
     return null
   }
 }

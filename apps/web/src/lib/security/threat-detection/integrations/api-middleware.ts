@@ -94,7 +94,7 @@ export class ThreatDetectionMiddleware {
     return async (req: Request, res: Response, next: NextFunction) => {
       // NOTE: Using 'any' cast for config to access 'enabled' if it exists on ApiMiddlewareConfig but not typed in ThreatDetectionMiddlewareConfig
       // or if types are mismatched.
-      if ((this.config as any).enabled === false) {
+      if ((this.config as { enabled?: boolean }).enabled === false) {
         return next()
       }
 

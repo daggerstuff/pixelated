@@ -29,8 +29,17 @@ export enum ResourceType {
   PODCASTS = 'podcasts',
 }
 
+interface AIChatService {
+  createChatCompletion(
+    messages: Array<{ role: string; content: string }>,
+    options?: { model?: string },
+  ): Promise<{
+    choices?: Array<{ message?: { content?: string } }>
+  }>
+}
+
 export interface EducationalRecognizerConfig {
-  aiService?: unknown
+  aiService?: AIChatService
   model?: string
   includeResourceRecommendations?: boolean
   adaptToUserLevel?: boolean
@@ -244,7 +253,7 @@ export class EducationalContextRecognizer {
       },
     ]
 
-    const response = await (this.config.aiService as any).createChatCompletion(
+    const response = await this.config.aiService?.createChatCompletion(
       messages,
       {
         model: this.config.model,
@@ -264,12 +273,19 @@ export class EducationalContextRecognizer {
         learningObjectives?: unknown
         recommendedResources?: unknown
         priorKnowledgeRequired?: unknown
+        metadata?: {
+          conceptualDepth?: number
+          practicalApplications?: unknown[]
+          relatedTopics?: unknown[]
+        }
       }
       return {
         isEducational: Boolean(parsed.isEducational),
         confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.8)),
         educationalType: type, // Use pattern-detected type
-        complexity: this.validateComplexity(parsed.complexity as any),
+        complexity: this.validateComplexity(
+          typeof parsed.complexity === 'string' ? parsed.complexity : 'intermediate',
+        ),
         topicArea, // Use pattern-detected topic
         learningObjectives: Array.isArray(parsed.learningObjectives)
           ? parsed.learningObjectives
@@ -283,15 +299,15 @@ export class EducationalContextRecognizer {
         metadata: {
           conceptualDepth: Math.max(
             0,
-            Math.min(1, (parsed as any).metadata?.conceptualDepth ?? 0.5),
+            Math.min(1, parsed.metadata?.conceptualDepth ?? 0.5),
           ),
           practicalApplications: Array.isArray(
-            (parsed as any).metadata?.practicalApplications,
+            parsed.metadata?.practicalApplications,
           )
-            ? (parsed as any).metadata.practicalApplications
+            ? parsed.metadata.practicalApplications
             : [],
-          relatedTopics: Array.isArray((parsed as any).metadata?.relatedTopics)
-            ? (parsed as any).metadata.relatedTopics
+          relatedTopics: Array.isArray(parsed.metadata?.relatedTopics)
+            ? parsed.metadata.relatedTopics
             : [],
         },
       }
