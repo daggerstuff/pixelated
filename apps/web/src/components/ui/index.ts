@@ -15,6 +15,10 @@ export {
   getButtonClassName,
 } from './button/button-types'
 
+export { Alert, AlertDescription } from './alert'
+
+export { Badge, badgeVariants } from './badge/badge'
+
 export {
   Card,
   CardHeader,
@@ -41,4 +45,8 @@ export {
 
 export { Switch } from './switch'
 
+export { Progress, ProgressCircular } from './progress'
+
 export { Textarea } from './textarea'
+
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './tabs'
