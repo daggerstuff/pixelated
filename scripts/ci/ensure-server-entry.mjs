@@ -62,6 +62,15 @@ async function resolveServerEntryName() {
 }
 
 async function main() {
+  // Vercel adapter writes SSR output to .vercel/output/, not dist/server/.
+  // This normalization step only applies to @astrojs/node middleware builds.
+  if (process.env.VERCEL) {
+    console.log(
+      '[ensure-server-entry] Skipping: Vercel adapter uses .vercel/output instead of dist/server',
+    )
+    return
+  }
+
   const targetName = await resolveServerEntryName()
   const targetPath = path.join(serverDir, targetName)
   const handlerFile = await findHandlerEntryFile()
