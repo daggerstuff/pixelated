@@ -60,10 +60,10 @@ export function useAnalyticsDashboard(
    * Fetch analytics data from API with retry logic
    */
   const fetchAnalyticsData = useCallback(
-    async (
+    async function fetchAnalyticsData(
       currentFilters: AnalyticsFilters,
       retryCount = 0,
-    ): Promise<AnalyticsChartData> => {
+    ): Promise<AnalyticsChartData> {
       // Cancel any existing request
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
@@ -239,7 +239,10 @@ export function useAnalyticsDashboard(
    * Load data when filters change
    */
   useEffect(() => {
-    void loadData(true)
+    const timer = window.setTimeout(() => {
+      void loadData(true)
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [loadData])
 
   /**

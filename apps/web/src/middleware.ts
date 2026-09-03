@@ -130,10 +130,14 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
     // cookie value is never minted by any real auth path. E2E_TEST_AUTH is
     // only set in the bias-detection CI workflow.
     if (process.env['E2E_TEST_AUTH'] === '1') {
+      const e2eToken = process.env['E2E_TEST_TOKEN']
+      if (!e2eToken) {
+        return next()
+      }
       const cookieHeader = request.headers.get('cookie') ?? ''
-      if (cookieHeader.includes('auth-token=e2e-test-admin')) {
+      if (cookieHeader.includes(`auth-token=${e2eToken}`)) {
         const e2eUser = {
-          id: 'e2e-test-admin',
+          id: `e2e-${e2eToken.slice(0, 8)}`,
           email: 'test@example.com',
           emailVerified: true,
           role: 'admin',
@@ -141,8 +145,8 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
         }
         context.locals.user = e2eUser
         context.locals.session = {
-          id: 'e2e-test-session',
-          userId: 'e2e-test-admin',
+          id: `e2e-session-${e2eToken.slice(0, 8)}`,
+          userId: e2eUser.id,
           expiresAt: new Date(Date.now() + 60 * 60 * 1000),
         }
         return next()

@@ -206,4 +206,3 @@ const _isNullAssignableToTimestamp: IsNullAssignableToTimestamp = false
 // fail to compile — that's intentional (it's the drift detector).
 
 // Export nothing — this is a compile-time-only file.
-export {}

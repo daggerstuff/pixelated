@@ -355,17 +355,10 @@ interface ExtendedFHESystem {
   decrypt: (data: string) => Promise<string>
 }
 
-// Function to obfuscate test keys to avoid gitleaks detection
-// while still having usable test values
-function getTestKey(id = ''): string {
-  return `test-${id}-mock-key-${new Date().getTime().toString().substring(5)}`
-}
-
 describe('encryption', () => {
   it('should encrypt and decrypt data correctly', () => {
     const data = 'Sensitive patient data'
-    // Mock test key - DO NOT USE IN PRODUCTION
-    const key = getTestKey('encryption')
+    const key = 'test-encryption-key'
 
     const encrypted = Encryption.encrypt(data, key)
     expect(encrypted).toContain('v1:') // Should have version prefix
@@ -376,8 +369,7 @@ describe('encryption', () => {
 
   it('should include version in encrypted data', () => {
     const data = 'Sensitive patient data'
-    // Mock test key - DO NOT USE IN PRODUCTION
-    const key = getTestKey('version-test')
+    const key = 'test-version-key'
     const version = 3
 
     const encrypted = Encryption.encrypt(data, key, version)
@@ -386,9 +378,8 @@ describe('encryption', () => {
 
   it('should throw error when decrypting with wrong key', () => {
     const data = 'Sensitive patient data'
-    // Mock test keys - DO NOT USE IN PRODUCTION
-    const key = getTestKey('correct')
-    const wrongKey = getTestKey('wrong')
+    const key = 'test-correct-key'
+    const wrongKey = 'test-wrong-key'
 
     const encrypted = Encryption.encrypt(data, key)
 
@@ -407,8 +398,7 @@ describe('keyRotationManager', () => {
 
   it('should add a new key', () => {
     const keyId = 'test-key-12345'
-    // Mock test key - DO NOT USE IN PRODUCTION
-    const key = getTestKey('add')
+    const key = 'test-add-key'
 
     const metadata = keyManager.addKey(keyId, key)
 
@@ -420,9 +410,8 @@ describe('keyRotationManager', () => {
 
   it('should rotate a key', () => {
     const keyId = 'test-key-12345'
-    // Mock test keys - DO NOT USE IN PRODUCTION
-    const key = getTestKey('original')
-    const newKey = getTestKey('rotated')
+    const key = 'test-original-key'
+    const newKey = 'test-rotated-key'
 
     // Add initial key
     keyManager.addKey(keyId, key)
@@ -437,8 +426,7 @@ describe('keyRotationManager', () => {
 
   it('should identify keys that need rotation', () => {
     const keyId = 'test-key-12345'
-    // Mock test key - DO NOT USE IN PRODUCTION
-    const key = getTestKey('rotation-check')
+    const key = 'test-rotation-key'
 
     // Add a key with custom expiration (expired)
     const metadata = keyManager.addKey(keyId, key)

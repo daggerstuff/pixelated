@@ -134,11 +134,11 @@ export const TherapistDashboard: FC = () => {
     [setSelectedPatients],
   )
 
-  const analyticsData = patients.map((patient, _index) => ({
+  const analyticsData = patients.map((patient, index) => ({
     patientId: patient.id,
     patientName: patient.name,
-    sessionsCompleted: Math.floor(Math.random() * 20) + 5,
-    avgMoodScore: Math.random() * 2 + 3, // 3-5 scale
+    sessionsCompleted: 5 + ((index * 7) % 20),
+    avgMoodScore: 3 + ((index % 3) * 0.5), // 3-5 scale
     progressScore: patient.progress,
     riskScore:
       patient.riskLevel === 'critical'

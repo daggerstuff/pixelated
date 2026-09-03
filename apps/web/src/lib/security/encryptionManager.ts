@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { secureRandomString } from './random'
 const logger = createBuildSafeLogger('encryptionManager') /**
  * Advanced Encryption Manager for Pixelated Empathy
  * Handles key rotation, perfect forward secrecy, and HSM integration
@@ -105,7 +106,7 @@ class EncryptionManager {
   }
 
   private async generateKeyPair(): Promise<{ id: string; key: CryptoKey }> {
-    const keyId = `key_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+    const keyId = `key_${Date.now()}_${secureRandomString(11)}`
 
     if (this.config.algorithm.startsWith('AES')) {
       const key = await crypto.subtle.generateKey(

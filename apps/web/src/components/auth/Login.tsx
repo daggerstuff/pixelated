@@ -53,7 +53,7 @@ export default function LoginForm() {
       }
 
       // On success, redirect to dashboard or home
-      window.location.href = '/dashboard'
+      window.location.assign('/dashboard')
     } catch (error) {
       setError('Network error. Please try again.')
       setIsLoading(false)
