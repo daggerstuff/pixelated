@@ -134,9 +134,9 @@ export class RiskStratificationService {
   private readonly apiTimeoutMs: number
 
   constructor(private readonly rlsContext: RLSContext) {
-    this.apiUrl = process.env.RISK_STRATIFICATION_API_URL ?? DEFAULT_API_URL
+    this.apiUrl = process.env['RISK_STRATIFICATION_API_URL'] ?? DEFAULT_API_URL
     this.apiTimeoutMs = Number(
-      process.env.RISK_STRATIFICATION_TIMEOUT_MS ?? '30000',
+      process.env['RISK_STRATIFICATION_TIMEOUT_MS'] ?? '30000',
     )
   }
 
