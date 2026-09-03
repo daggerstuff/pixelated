@@ -64,7 +64,10 @@ export function ResearchConsentForm({
 
   // Wait for hydration to avoid SSR/CSR mismatch
   useEffect(() => {
-    setIsHydrated(true)
+    const timer = window.setTimeout(() => {
+      setIsHydrated(true)
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [])
 
   // ⚡ Bolt: Memoize sanitized HTML to prevent expensive re-sanitization on every render
@@ -77,7 +80,7 @@ export function ResearchConsentForm({
     return DOMPurify.sanitize(consentStatus.currentVersion.documentText, {
       USE_PROFILES: { html: true },
     })
-  }, [consentStatus?.currentVersion.documentText, isHydrated])
+  }, [consentStatus, isHydrated])
 
   // Fetch consent status when component mounts or user changes
   useEffect(() => {

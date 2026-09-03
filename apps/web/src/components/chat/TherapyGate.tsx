@@ -143,11 +143,16 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
   }, [gateApiUrl])
 
   const handleSubmitRef = useRef<() => Promise<void>>(handleSubmit)
-  handleSubmitRef.current = handleSubmit
-  if (typeof window !== 'undefined') {
-    ;(window as typeof window & { handleTherapyGateSubmit?: () => void }).handleTherapyGateSubmit = () => handleSubmitRef.current()
-    ;(window as typeof window & { pixelatedSubmit?: () => void }).pixelatedSubmit = () => handleSubmitRef.current()
-  }
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit
+    if (typeof window === 'undefined') return
+    const gateWindow = window as typeof window & {
+      handleTherapyGateSubmit?: () => void
+      pixelatedSubmit?: () => void
+    }
+    gateWindow.handleTherapyGateSubmit = () => handleSubmitRef.current()
+    gateWindow.pixelatedSubmit = () => handleSubmitRef.current()
+  }, [])
 
   return (
     <div

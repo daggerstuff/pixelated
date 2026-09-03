@@ -46,6 +46,7 @@ export function ConversionDashboard() {
     [],
   )
   const [activeTab, setActiveTab] = useState('overview')
+  const [now] = useState(() => Date.now())
 
   const analytics = AnalyticsService.getInstance()
 
@@ -94,7 +95,10 @@ export function ConversionDashboard() {
 
   // Load conversion data
   useEffect(() => {
-    void loadConversionData()
+    const timer = window.setTimeout(() => {
+      void loadConversionData()
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [period, filter, loadConversionData])
 
   // Calculate summary metrics
@@ -114,7 +118,6 @@ export function ConversionDashboard() {
       )
 
       // Calculate trend (last 7 days)
-      const now = Date.now()
       const oneDay = 24 * 60 * 60 * 1000
       const trend = Array(7)
         .fill(0)
@@ -187,7 +190,7 @@ export function ConversionDashboard() {
       conversionRate:
         (data.count / (pageViews[path as keyof typeof pageViews] || 1)) * 100,
     }))
-  }, [conversionEvents])
+  }, [conversionEvents, now])
 
   // Chart data for conversions over time
   const timeChartData = useMemo(() => {

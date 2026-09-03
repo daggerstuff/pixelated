@@ -78,7 +78,7 @@ export function TrainingSessionComponent() {
   const userId = session?.user?.id ?? 'demo-therapist'
   const sessionId = 'session-1'
   const [therapistResponse, setTherapistResponse] = useState('')
-  const [conversation, setConversation] = useState<ConversationEntry[]>([
+  const [conversation, setConversation] = useState<ConversationEntry[]>(() => [
     { id: `msg-${Date.now()}`, role: 'client', message: initialClientMessage },
   ])
   const [evaluation, setEvaluation] = useState<string | null>(null)
@@ -441,15 +441,17 @@ export function TrainingSessionComponent() {
 
   // Handle role changes
   useEffect(() => {
-    locallyAddedMessages.current.clear()
-    setConversation([
-      {
-        id: `msg-${Date.now()}`,
-        role: 'client',
-        message: initialClientMessage,
-      },
-    ])
-    setEvaluation(null)
+    queueMicrotask(() => {
+      locallyAddedMessages.current.clear()
+      setConversation([
+        {
+          id: `msg-${Date.now()}`,
+          role: 'client',
+          message: initialClientMessage,
+        },
+      ])
+      setEvaluation(null)
+    })
 
     if (!ws.current) {
       return undefined

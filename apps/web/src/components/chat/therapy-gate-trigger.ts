@@ -1,7 +1,7 @@
 export async function triggerTherapyGateSubmit() {
   const fn = (window as typeof window & { handleTherapyGateSubmit?: () => void }).handleTherapyGateSubmit
   if (typeof fn === 'function') {
-    await fn()
+    fn()
     return
   }
   const textarea = document.querySelector(

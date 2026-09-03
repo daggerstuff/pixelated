@@ -92,12 +92,33 @@ DROP TRIGGER IF EXISTS update_sessions_updated_at ON sessions;
 CREATE TRIGGER update_sessions_updated_at BEFORE UPDATE
     ON sessions FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Insert a sample admin user
-INSERT INTO users (email, password_hash, first_name, last_name, role, institution, is_active)
-VALUES ('admin@example.com', '$2b$10$example_hash_here', 'Admin', 'User', 'admin', 'Pixelated Empathy', true)
-ON CONFLICT (email) DO NOTHING;
+-- Seed sample users. The workspace_id column is added later by migration 011,
+-- so on a fresh database this branch inserts without it. When this file is
+-- re-applied after 011 has set workspace_id NOT NULL, include the sentinel
+-- workspace instead of tripping the not-null constraint.
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = 'users'
+          AND column_name = 'workspace_id'
+    ) THEN
+        INSERT INTO users (email, password_hash, first_name, last_name, role, institution, is_active, workspace_id)
+        VALUES ('admin@example.com', '$2b$10$example_hash_here', 'Admin', 'User', 'admin', 'Pixelated Empathy', true, '00000000-0000-0000-0000-000000000001')
+        ON CONFLICT (email) DO NOTHING;
 
--- Insert a sample therapist user
-INSERT INTO users (email, password_hash, first_name, last_name, role, institution, license_number, is_active)
-VALUES ('therapist@example.com', '$2b$10$example_hash_here', 'Sample', 'Therapist', 'therapist', 'Demo Institution', 'LIC123456', true)
-ON CONFLICT (email) DO NOTHING;
+        INSERT INTO users (email, password_hash, first_name, last_name, role, institution, license_number, is_active, workspace_id)
+        VALUES ('therapist@example.com', '$2b$10$example_hash_here', 'Sample', 'Therapist', 'therapist', 'Demo Institution', 'LIC123456', true, '00000000-0000-0000-0000-000000000001')
+        ON CONFLICT (email) DO NOTHING;
+    ELSE
+        INSERT INTO users (email, password_hash, first_name, last_name, role, institution, is_active)
+        VALUES ('admin@example.com', '$2b$10$example_hash_here', 'Admin', 'User', 'admin', 'Pixelated Empathy', true)
+        ON CONFLICT (email) DO NOTHING;
+
+        INSERT INTO users (email, password_hash, first_name, last_name, role, institution, license_number, is_active)
+        VALUES ('therapist@example.com', '$2b$10$example_hash_here', 'Sample', 'Therapist', 'therapist', 'Demo Institution', 'LIC123456', true)
+        ON CONFLICT (email) DO NOTHING;
+    END IF;
+END
+$$;
