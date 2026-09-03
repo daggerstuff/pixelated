@@ -55,9 +55,10 @@ function generateRandomBytes(length: number): Uint8Array {
     globalWithCrypto.crypto.getRandomValues(bytes)
     return bytes
   }
-  // Fallback to Math.random (not cryptographically secure, but avoids bundling node:crypto in client)
-  for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256)
-  return bytes
+  // No insecure fallback — cryptographic random is required for secrets
+  throw new Error(
+    'No cryptographically secure random source available (crypto.getRandomValues missing)',
+  )
 }
 
 export class SecretsManager {
