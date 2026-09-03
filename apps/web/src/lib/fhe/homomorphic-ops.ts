@@ -25,170 +25,9 @@ const logger = createBuildSafeLogger('homomorphic-ops')
 // Environment detection
 const isServer = typeof window === 'undefined'
 
-type SerializedSealObject = {
-  save: () => string
-  delete: () => void
-}
-
-type SerializedCiphertextInput = {
-  serializedCiphertext: string
-}
-
-type OptionalNumericArray = number[] | null
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
-
-function isSerializedCiphertextInput(
-  value: unknown,
-): value is SerializedCiphertextInput {
-  return (
-    isRecord(value) &&
-    typeof value['serializedCiphertext'] === 'string' &&
-    value['serializedCiphertext'].length > 0
-  )
-}
-
-function parseSerializedCiphertextInput(
-  encryptedData: string,
-): SerializedCiphertextInput {
-  try {
-    const parsed: unknown = JSON.parse(encryptedData)
-    return isSerializedCiphertextInput(parsed)
-      ? parsed
-      : { serializedCiphertext: encryptedData }
-  } catch {
-    return { serializedCiphertext: encryptedData }
-  }
-}
-
-function isSerializedSealObject(value: unknown): value is SerializedSealObject {
-  return (
-    isRecord(value) &&
-    typeof value['save'] === 'function' &&
-    typeof value['delete'] === 'function'
-  )
-}
-
-function resolveSerializedResult(result: unknown): string {
-  if (!isSerializedSealObject(result)) {
-    throw new Error('SEAL result object does not expose save/delete')
-  }
-  const serialized = result.save()
-  result.delete()
-  return serialized
-}
-
-function normalizeOptionalRecordToStringArray(
-  value: unknown,
-): Record<string, string[]> {
-  if (!isRecord(value)) {
-    return {}
-  }
-
-  const normalized: Record<string, string[]> = {}
-  for (const [key, rawValues] of Object.entries(value)) {
-    if (
-      Array.isArray(rawValues) &&
-      rawValues.every((token): token is string => typeof token === 'string')
-    ) {
-      normalized[key] = rawValues
-    }
-  }
-  return normalized
-}
-
-function getNumericArray(
-  value: unknown,
-  fallback: OptionalNumericArray = null,
-): number[] {
-  if (Array.isArray(value) && value.every((item) => typeof item === 'number')) {
-    return value
-  }
-  if (fallback === null) {
-    return []
-  }
-  return fallback
-}
-
-function getNumericValue(value: unknown, fallback: number): number {
-  return typeof value === 'number' ? value : fallback
-}
-
-function getStringArray(value: unknown): string[] | undefined {
-  if (!Array.isArray(value)) {
-    return undefined
-  }
-
-  return value.every((token): token is string => typeof token === 'string')
-    ? value
-    : undefined
-}
-
-function formatOperationError(error: string | undefined): string {
-  return error ?? 'Unknown error'
-}
-
-/**
- * Custom error class for homomorphic operation errors
- * Extends the base Error class for FHE-specific error handling
- */
-export class FHEOperationError extends Error {
-  public readonly operation: FHEOperation | string
-  public readonly code: string
-
-  constructor(
-    message: string,
-    operation: FHEOperation | string,
-    code = 'OPERATION_ERROR',
-  ) {
-    super(message)
-    this.name = 'FHEOperationError'
-    this.operation = operation
-    this.code = code
-  }
-}
-
-/**
- * Basic sentiment words for demonstration
- */
-const SENTIMENT_WORDS = {
-  positive: [
-    'good',
-    'great',
-    'excellent',
-    'wonderful',
-    'amazing',
-    'happy',
-    'joy',
-    'loved',
-    'best',
-    'better',
-  ],
-  negative: [
-    'bad',
-    'terrible',
-    'awful',
-    'horrible',
-    'sad',
-    'angry',
-    'hate',
-    'worst',
-    'poor',
-    'disappointing',
-  ],
-  neutral: [
-    'maybe',
-    'possibly',
-    'perhaps',
-    'okay',
-    'fine',
-    'average',
-    'neutral',
-    'unclear',
-  ],
-}
+import { isRecord, parseSerializedCiphertextInput, resolveSerializedResult, normalizeOptionalRecordToStringArray, getNumericArray, getNumericValue, getStringArray, formatOperationError, FHEOperationError } from './homomorphic-ops.utils'
+export { FHEOperationError } from './homomorphic-ops.utils'
+import { simulateCategorization, analyzeSentiment, categorizeText, summarizeText, tokenizeText, filterText, estimateSyllables } from './homomorphic-ops.text-analysis'
 
 /**
  * Class for performing homomorphic operations on encrypted data
@@ -368,7 +207,7 @@ export class HomomorphicOperations {
           case FHEOperation.CATEGORIZE:
             // For categorization, we compute dot products with category vectors
             // This is simulated since complex text operations are challenging in pure FHE
-            categoryResult = await this.simulateCategorization(
+            categoryResult = await simulateCategorization(
               serializedCiphertext,
               params,
             )
@@ -788,12 +627,12 @@ export class HomomorphicOperations {
     // Perform the operation (simulated)
     switch (operation) {
       case FHEOperation.SENTIMENT:
-        result = await this.analyzeSentiment(decodedData)
+        result = await analyzeSentiment(decodedData)
         metadata['confidence'] = 0.85
         break
 
       case FHEOperation.CATEGORIZE:
-        result = await this.categorizeText(
+        result = await categorizeText(
           decodedData,
           normalizeOptionalRecordToStringArray(params?.['categories']),
         )
@@ -803,7 +642,7 @@ export class HomomorphicOperations {
         break
 
       case FHEOperation.SUMMARIZE:
-        result = await this.summarizeText(
+        result = await summarizeText(
           decodedData,
           getNumericValue(params?.['maxLength'], 100),
         )
@@ -811,13 +650,13 @@ export class HomomorphicOperations {
         break
 
       case FHEOperation.TOKENIZE:
-        tokens = await this.tokenizeText(decodedData)
+        tokens = await tokenizeText(decodedData)
         result = JSON.stringify(tokens)
         metadata['tokenCount'] = tokens.length
         break
 
       case FHEOperation.FILTER:
-        result = await this.filterText(
+        result = await filterText(
           decodedData,
           getStringArray(params?.['filterTerms']),
         )
@@ -881,7 +720,7 @@ export class HomomorphicOperations {
 
       case FHEOperation.ANALYZE: {
         const words = decodedData.toLowerCase().split(/\s+/).filter(Boolean)
-        const sentiment = await this.analyzeSentiment(decodedData)
+        const sentiment = await analyzeSentiment(decodedData)
         const uniqueWords = new Set(words)
         result = JSON.stringify({
           sentiment,
@@ -930,163 +769,6 @@ export class HomomorphicOperations {
     }
   }
 
-  /**
-   * Simulate categorization on encrypted data
-   * This is a placeholder for complex text operations that are challenging in pure FHE
-   */
-  private async simulateCategorization(
-    _serializedCiphertext: string,
-    _params?: Record<string, unknown>,
-  ): Promise<string> {
-    // In a real implementation, we would compute dot products with category vectors
-    // using homomorphic operations. For now, we return a placeholder result.
-    return `simulated_categorization_result_${Date.now()}`
-  }
-
-  /**
-   * Analyze sentiment from text (for simulation only)
-   */
-  private async analyzeSentiment(text: string): Promise<string> {
-    // This would be a real sentiment analysis algorithm in a production implementation
-    // For simulation, we'll do a simple word count
-    text = text.toLowerCase()
-
-    let positiveCount = 0
-    let negativeCount = 0
-    let neutralCount = 0
-
-    const words = text.split(/\s+/)
-
-    for (const word of words) {
-      if (SENTIMENT_WORDS.positive.includes(word)) {
-        positiveCount++
-      }
-      if (SENTIMENT_WORDS.negative.includes(word)) {
-        negativeCount++
-      }
-      if (SENTIMENT_WORDS.neutral.includes(word)) {
-        neutralCount++
-      }
-    }
-
-    if (positiveCount > negativeCount && positiveCount > neutralCount) {
-      return 'positive'
-    } else if (negativeCount > positiveCount && negativeCount > neutralCount) {
-      return 'negative'
-    } else {
-      return 'neutral'
-    }
-  }
-
-  /**
-   * Categorize text based on keyword matching (for simulation only)
-   */
-  private async categorizeText(
-    text: string,
-    categories?: Record<string, string[]>,
-  ): Promise<string> {
-    // If no categories provided, use some defaults
-    const defaultCategories: Record<string, string[]> = {
-      health: ['health', 'medical', 'doctor', 'hospital', 'symptom'],
-      finance: ['money', 'finance', 'bank', 'invest', 'budget'],
-      technology: ['computer', 'software', 'hardware', 'tech', 'digital'],
-      education: ['learn', 'school', 'study', 'education', 'student'],
-    }
-
-    const categoriesToUse = categories ?? defaultCategories
-    text = text.toLowerCase()
-
-    // Count matches for each category
-    const categoryScores: Record<string, number> = {}
-
-    for (const [category, keywords] of Object.entries(categoriesToUse)) {
-      categoryScores[category] = 0
-
-      for (const keyword of keywords) {
-        const regex = new RegExp(`\\b${keyword}\\b`, 'gi')
-        const matches = text.match(regex)
-        if (matches) {
-          categoryScores[category] += matches.length
-        }
-      }
-    }
-
-    // Find category with highest score
-    let maxScore = 0
-    let maxCategory = 'unknown'
-
-    for (const [category, score] of Object.entries(categoryScores)) {
-      if (score > maxScore) {
-        maxScore = score
-        maxCategory = category
-      }
-    }
-
-    return maxCategory
-  }
-
-  /**
-   * Summarize text by extracting key sentences (for simulation only)
-   */
-  private async summarizeText(
-    text: string,
-    maxLength?: number,
-  ): Promise<string> {
-    const max = maxLength ?? 100
-
-    if (text.length <= max) {
-      return text
-    }
-
-    // Simple extractive summarization by taking the first few sentences
-    const sentences = text.split(/[.!?]+/)
-    let summary = ''
-    let currentLength = 0
-
-    for (const sentence of sentences) {
-      const trimmedSentence = sentence.trim()
-      if (!trimmedSentence) {
-        continue
-      }
-
-      if (currentLength + trimmedSentence.length <= max) {
-        summary += trimmedSentence + '. '
-        currentLength += trimmedSentence.length + 2
-      } else {
-        break
-      }
-    }
-
-    return summary.trim()
-  }
-
-  /**
-   * Tokenize text into words (for simulation only)
-   */
-  private async tokenizeText(text: string): Promise<string[]> {
-    return text.toLowerCase().split(/\W+/).filter(Boolean)
-  }
-
-  /**
-   * Filter text by removing specified terms (for simulation only)
-   */
-  private async filterText(
-    text: string,
-    filterTerms?: string[],
-  ): Promise<string> {
-    if (!filterTerms || filterTerms.length === 0) {
-      return text
-    }
-
-    let filteredText = text
-
-    for (const term of filterTerms) {
-      const regex = new RegExp(`\\b${term}\\b`, 'gi')
-      filteredText = filteredText.replace(regex, '[FILTERED]')
-    }
-
-    return filteredText
-  }
 
   /**
    * Perform a custom operation on text (for simulation only)
@@ -1122,7 +804,7 @@ export class HomomorphicOperations {
         // Simplified Flesch-Kincaid Grade Level calculation
         const wordCount = text.split(/\s+/).filter(Boolean).length
         const sentenceCount = text.split(/[.!?]+/).filter(Boolean).length
-        const syllableCount = this.estimateSyllables(text)
+        const syllableCount = estimateSyllables(text)
 
         if (wordCount === 0 || sentenceCount === 0) {
           return 'Unknown'
@@ -1141,34 +823,8 @@ export class HomomorphicOperations {
     }
   }
 
-  /**
-   * Estimate syllable count in text (helper for reading level calculation)
-   */
-  private estimateSyllables(text: string): number {
-    // This is a very simplified syllable counter
-    // In a real implementation, this would be more sophisticated
-
-    const words = text.toLowerCase().split(/\s+/).filter(Boolean)
-    let syllableCount = 0
-
-    for (const word of words) {
-      // Count vowel groups as syllables
-      const vowelGroups = word.match(/[aeiouy]+/g)
-      if (vowelGroups) {
-        syllableCount += vowelGroups.length
-      } else {
-        syllableCount += 1 // Assume at least one syllable
-      }
-
-      // Subtract for silent 'e' at the end
-      if (word.length > 2 && word.endsWith('e')) {
-        syllableCount -= 1
-      }
-    }
-
-    return syllableCount
-  }
 }
 
 // Export default instance
 export default HomomorphicOperations.getInstance()
+
