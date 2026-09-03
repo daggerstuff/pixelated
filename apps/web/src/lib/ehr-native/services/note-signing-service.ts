@@ -85,10 +85,10 @@ class AIDraftRegistry {
   // DB persistence deferred until the FHIR DocumentReference table is available.
   private get drafts(): Map<string, AIDraftMetadata> {
     const g = globalThis as unknown as Record<string, unknown>
-    if (!g.aidDraftRegistry) {
-      g.aidDraftRegistry = new Map<string, AIDraftMetadata>()
+    if (!g['aidDraftRegistry']) {
+      g['aidDraftRegistry'] = new Map<string, AIDraftMetadata>()
     }
-    return g.aidDraftRegistry as Map<string, AIDraftMetadata>
+    return g['aidDraftRegistry'] as Map<string, AIDraftMetadata>
   }
 
   /** Register a new AI-drafted note. */
