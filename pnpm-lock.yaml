@@ -922,8 +922,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0
       oxc-parser:
-        specifier: ^0.131.0
-        version: 0.131.0
+        specifier: ^0.147.0
+        version: 0.147.0
       oxc-resolver:
         specifier: ^11.24.2
         version: 11.24.2
@@ -22086,8 +22086,8 @@ snapshots:
 
   '@typescript-eslint/project-service@8.68.0(supports-color@10.2.2)(typescript@5.8.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.69.0(typescript@5.8.3)
-      '@typescript-eslint/types': 8.69.0
+      '@typescript-eslint/tsconfig-utils': 8.68.0(typescript@5.8.3)
+      '@typescript-eslint/types': 8.68.0
       debug: 4.4.3(supports-color@10.2.2)
       typescript: 5.8.3
     transitivePeerDependencies:
