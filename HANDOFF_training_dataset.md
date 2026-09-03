@@ -15,10 +15,10 @@
 - `ai/training/build_vera_mh_golden.py` – Deterministic builder extracting multi-turn session transcripts and aggregating multi-clinician ratings from VERA-MH S3 archive.
 - `ai/training/build_real_golden_calibration.py` – Deterministic builder for single-turn AnnoMI / ESConv clinical calibration set.
 - `ai/training/dual_judge.py` – Dual-model LLM-as-judge with multi-turn trajectory evaluation, deterministic anti-sycophancy gating, and deep reasoning trace extraction (`reasoning_content` + `content` fallbacks).
-- `ai/training/orpo_trainer.py` – Production ORPO (Odds Ratio Preference Optimization) trainer combining SFT and anti-sycophancy preference alignment in a single pass with ZeRO-3, WandB tracking, and `zai-org/glm-5.3-flash` base model.
+- `ai/training/orpo_trainer.py` – Production ORPO (Odds Ratio Preference Optimization) trainer combining SFT and anti-sycophancy preference alignment in a single pass with ZeRO-3, WandB tracking, and `deepseek-ai/DeepSeek-V4-Pro` base model.
 - `ai/training/mental_ift_trainer.py` – Mental Health Instruction Fine-Tuning (IFT) curriculum trainer (classification -> estimation -> generation) with QLoRA and per-task evaluation.
 - `ai/training/grpo_trainer.py` – Group Relative Policy Optimization (GRPO) reinforcement learning trainer with anti-sycophancy and clinical empathy reward functions.
-- `ai/configs/models/training_config.json` – Pinned 2026 non-Llama base model (`zai-org/glm-5.3-flash`, bf16).
+- `ai/configs/models/training_config.json` – Pinned 2026 non-Llama base model (`deepseek-ai/DeepSeek-V4-Pro`, bf16).
 - `ai/configs/models/training_config_v2_antirepetition.json` – Antirepetition LoRA configuration.
 
 ## Multi-Turn Calibration Benchmark (VERA-MH Ground Truth)
@@ -40,7 +40,7 @@
 5. **Strict 2026 Non-Llama Model Stack**:
    - Primary Judge: `@cf/deepseek-ai/deepseek-v4-pro-0813`
    - Secondary Judge: `@cf/mistralai/mistral-small-3.1-24b-instruct`
-   - Base Training Models: `zai-org/glm-5.3-flash` (bf16)
+   - Base Training Models: `deepseek-ai/DeepSeek-V4-Pro` (bf16)
    - Qwen 3.8 completely removed.
 
 ## Execution Commands
@@ -48,14 +48,14 @@
 # 1. Run ORPO single-pass SFT + Anti-Sycophancy alignment
 uv run python -m ai.training.orpo_trainer \
     --data_path ai/data/curated/sft_chatml/train.jsonl \
-    --base_model_checkpoint zai-org/glm-5.3-flash \
+    --base_model_checkpoint deepseek-ai/DeepSeek-V4-Pro \
     --output_dir ai/models/orpo_glm53 \
     --beta 0.1 \
     --wandb_project pixelated-empathy-orpo
 
 # 2. Run Mental Health Instruction Fine-Tuning (IFT)
 uv run python -m ai.training.mental_ift_trainer \
-    --base_model zai-org/glm-5.3-flash \
+    --base_model deepseek-ai/DeepSeek-V4-Pro \
     --output_dir ai/models/mental_ift_glm53
 
 # 3. Verify dual-judge evaluation and calibration suite
