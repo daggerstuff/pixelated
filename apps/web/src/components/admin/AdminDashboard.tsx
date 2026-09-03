@@ -31,6 +31,8 @@ interface TherapistPerformance {
   avgSessionRating: number
   completionRate: number
   riskLevelDistribution: Record<string, number>
+  successRate: number
+  lastActiveHours: number
 }
 
 type DiagnosticIssueSeverity = 'critical' | 'warning' | 'info'
@@ -141,11 +143,11 @@ function getHighRiskCount(
 export const AdminDashboard: FC = () => {
   // Persistent dashboard preferences
   const [dashboardView, setDashboardView] = usePersistentState<
-    'overview' | 'therapists' | 'institutions' | 'system' | 'compliance'
-  >({
-    key: 'admin_dashboard_view',
-    defaultValue: 'overview',
-  })
+                                                'overview' | 'therapists' | 'institutions' | 'system' | 'compliance'
+                                              >({
+                                                key: 'admin_dashboard_view',
+                                                defaultValue: 'overview',
+                                              })
   const [timeRange, setTimeRange] = usePersistentState<
     'week' | 'month' | 'quarter' | 'year'
   >({
@@ -181,7 +183,7 @@ export const AdminDashboard: FC = () => {
     complianceScore: 94,
   }
 
-  const therapists: TherapistPerformance[] = [
+  const [therapists] = React.useState<TherapistPerformance[]>(() => [
     {
       id: '1',
       name: 'Dr. Sarah Johnson',
@@ -189,6 +191,8 @@ export const AdminDashboard: FC = () => {
       avgSessionRating: 4.6,
       completionRate: 96,
       riskLevelDistribution: { low: 60, medium: 30, high: 8, critical: 2 },
+      successRate: Math.floor(Math.random() * 20) + 75,
+      lastActiveHours: Math.floor(Math.random() * 3) + 1,
     },
     {
       id: '2',
@@ -197,6 +201,8 @@ export const AdminDashboard: FC = () => {
       avgSessionRating: 4.4,
       completionRate: 94,
       riskLevelDistribution: { low: 55, medium: 35, high: 8, critical: 2 },
+      successRate: Math.floor(Math.random() * 20) + 75,
+      lastActiveHours: Math.floor(Math.random() * 3) + 1,
     },
     {
       id: '3',
@@ -205,8 +211,14 @@ export const AdminDashboard: FC = () => {
       avgSessionRating: 4.7,
       completionRate: 98,
       riskLevelDistribution: { low: 65, medium: 25, high: 8, critical: 2 },
+      successRate: Math.floor(Math.random() * 20) + 75,
+      lastActiveHours: Math.floor(Math.random() * 3) + 1,
     },
-  ]
+  ])
+
+  const [activeSessions] = React.useState<number>(
+    () => Math.floor(Math.random() * 50) + 20,
+  )
 
   const systemHealth: SystemHealth = {
     apiResponseTime: 45,
@@ -310,7 +322,9 @@ export const AdminDashboard: FC = () => {
             <InstitutionsTab metrics={institutionMetrics} />
           )}
 
-          {dashboardView === 'system' && <SystemTab health={systemHealth} />}
+          {dashboardView === 'system' && (
+            <SystemTab health={systemHealth} activeSessions={activeSessions} />
+          )}
 
           {dashboardView === 'compliance' && (
             <ComplianceTab metrics={institutionMetrics} />
@@ -493,7 +507,7 @@ const OverviewTab: FC<{
                         Success Rate:
                       </span>
                       <span className="ml-2 font-medium">
-                        {87}%
+                        {therapist.successRate}%
                       </span>
                     </div>
                     <div>
@@ -501,7 +515,7 @@ const OverviewTab: FC<{
                         Last Active:
                       </span>
                       <span className="ml-2 font-medium">
-                        {1}h ago
+                        {therapist.lastActiveHours}h ago
                       </span>
                     </div>
                   </div>
@@ -725,7 +739,7 @@ const TherapistsTab: FC<{
                         Success Rate:
                       </span>
                       <span className="ml-2 font-medium">
-                        {87}%
+                        {therapist.successRate}%
                       </span>
                     </div>
                     <div>
@@ -733,7 +747,7 @@ const TherapistsTab: FC<{
                         Last Active:
                       </span>
                       <span className="ml-2 font-medium">
-                        {1}h ago
+                        {therapist.lastActiveHours}h ago
                       </span>
                     </div>
                   </div>
@@ -854,7 +868,8 @@ const InstitutionsTab: FC<{
  */
 const SystemTab: FC<{
   health: SystemHealth
-}> = ({ health }) => {
+  activeSessions: number
+}> = ({ health, activeSessions }) => {
   const [diagnosticIssues, setDiagnosticIssues] = React.useState<
     DiagnosticIssue[]
   >([])
@@ -1015,7 +1030,7 @@ const SystemTab: FC<{
                 Active Sessions
               </span>
               <span className="text-blue-600 font-bold">
-                {34}
+                {activeSessions}
               </span>
             </div>
             <div className="bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 flex items-center justify-between rounded-lg border p-3">

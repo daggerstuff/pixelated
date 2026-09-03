@@ -138,6 +138,7 @@ export class PresidioPHIDetector {
   private anonymizer: Anonymizer | null = null
   private initialized = false
   private initializationError: Error | null = null
+  private readonly config: { enabled: boolean } = { enabled: false }
 
   /**
    * Initialize the Presidio library
@@ -208,7 +209,22 @@ export class PresidioPHIDetector {
           value: text.substring(entity.start, entity.end),
         }))
       } else {
-        // Use fallback detection if Presidio is not available
+        // Fail-closed: if Presidio was configured but failed to initialize,
+        // block non-empty input rather than silently passing it through
+        if (this.config?.enabled && text.trim().length > 0) {
+          logger.error(
+            'Presidio PHI detection configured but not initialized — blocking non-empty input (fail-closed)',
+            {
+              error: this.initializationError?.message,
+            },
+          )
+          return {
+            hasDetectedPHI: true,
+            entities: [],
+            redactedText: undefined,
+          }
+        }
+        // Use fallback detection if Presidio is not configured
         entities = this.fallbackDetection(text)
 
         if (this.initializationError) {

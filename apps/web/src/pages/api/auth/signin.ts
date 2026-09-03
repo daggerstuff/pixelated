@@ -34,28 +34,35 @@ export const POST = async ({
   // tenant. Never activates in production: E2E_TEST_AUTH is unset there.
   // E2E_TEST_AUTH is only set in the bias-detection CI workflow.
   if (process.env['E2E_TEST_AUTH'] === '1') {
+    const e2eToken = process.env['E2E_TEST_TOKEN']
+    if (!e2eToken) {
+      return new Response(
+        JSON.stringify({ error: 'E2E test token not configured' }),
+        { status: 503, headers: { 'Content-Type': 'application/json' } },
+      )
+    }
     try {
       const body = await request.json()
       if (
         body.email === 'test@example.com' &&
-        body.password === 'password123'
+        body.password === e2eToken
       ) {
         const headers = new Headers()
         headers.set('Content-Type', 'application/json')
         headers.append(
           'Set-Cookie',
-          'auth-token=e2e-test-admin; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600',
+          `auth-token=${e2eToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`,
         )
         return new Response(
           JSON.stringify({
             success: true,
             user: {
-              id: 'e2e-test-admin',
+              id: `e2e-${e2eToken.slice(0, 8)}`,
               email: 'test@example.com',
               role: 'admin',
               fullName: 'E2E Test Admin',
             },
-            token: 'e2e-test-admin',
+            token: e2eToken,
           }),
           { status: 200, headers },
         )

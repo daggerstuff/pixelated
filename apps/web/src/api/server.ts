@@ -209,22 +209,39 @@ let postgresConnection: PostgresConnection | null = null
 let redisConnection: RedisConnection | null = null
 
 async function initializeDatabases() {
+  const isProduction = process.env['NODE_ENV'] === 'production'
+
+  // MongoDB — optional in dev, required in production
   try {
     mongoConnection = await connectMongoDB()
   } catch (error: unknown) {
-    // error handled by caller — continuing without MongoDB
+    if (isProduction) {
+      logger.error('MongoDB connection failed in production — aborting startup')
+      throw error
+    }
+    logger.warn('MongoDB connection failed — continuing without MongoDB (dev mode)')
   }
 
+  // PostgreSQL — required in all environments
   try {
     postgresConnection = await connectPostgreSQL()
   } catch (error: unknown) {
-    // error handled by caller — continuing without PostgreSQL
+    if (isProduction) {
+      logger.error('PostgreSQL connection failed in production — aborting startup')
+      throw error
+    }
+    logger.warn('PostgreSQL connection failed — continuing without PostgreSQL (dev mode)')
   }
 
+  // Redis — optional in dev, required in production
   try {
     redisConnection = await connectRedis()
   } catch (error: unknown) {
-    // error handled by caller — continuing without Redis
+    if (isProduction) {
+      logger.error('Redis connection failed in production — aborting startup')
+      throw error
+    }
+    logger.warn('Redis connection failed — continuing without Redis (dev mode)')
   }
 }
 
