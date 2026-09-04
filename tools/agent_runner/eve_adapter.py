@@ -2,12 +2,10 @@
 
 from __future__ import annotations
 
-import json
 import logging
 import os
 import subprocess
 import time
-from typing import Any
 
 from tools.agent_runner.adapters import AgentAdapter
 from tools.agent_runner.foresight_bridge import ForesightBridge
@@ -30,15 +28,13 @@ class EveAgentAdapter(AgentAdapter):
         ticket_identifier: str,
         enable_branching: bool = False,
     ) -> ExecutionResult:
+        _ = enable_branching
         start_time = time.time()
         logger.info("Invoking Eve Agent Adapter for %s in %s...", ticket_identifier, workdir)
 
         # 1. Fetch Foresight persistent memory and standing directives
-        foresight_context = self.foresight.format_context_for_ticket(
-            ticket_identifier=ticket_identifier,
-            title=prompt.splitlines()[0] if prompt else "",
-            description=prompt,
-        )
+        title = prompt.splitlines()[0] if prompt else ""
+        foresight_context = self.foresight.get_relevant_context(f"{title} {prompt}")
 
         full_prompt = (
             f"=== PERSISTENT FORESIGHT CONTEXT & USER PREFERENCES ===\n"
@@ -47,14 +43,23 @@ class EveAgentAdapter(AgentAdapter):
             f"{prompt}\n"
         )
 
-        # 2. Check if native TypeScript Eve agent exists in agents/eve-agent
-        eve_root = os.path.join(workdir, "agents", "eve-agent")
+        # 2. Resolve the native TypeScript Eve agent. Prefer a checkout with
+        # installed dependencies so worktree executions can share node_modules.
+        workspace_eve_root = os.path.join(workdir, "agents", "eve-agent")
+        repo_eve_root = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "..", "agents", "eve-agent")
+        )
+        eve_root = workspace_eve_root
+        if not os.path.isdir(os.path.join(eve_root, "node_modules")) and os.path.isdir(
+            os.path.join(repo_eve_root, "node_modules")
+        ):
+            eve_root = repo_eve_root
         if not os.path.exists(eve_root):
-            eve_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "agents", "eve-agent"))
+            eve_root = repo_eve_root
 
         # Formulate execution command
         if os.path.exists(eve_root) and os.path.exists(os.path.join(eve_root, "package.json")):
-            cmd = ["pnpm", "--dir", eve_root, "start", "--prompt", full_prompt]
+            cmd = ["pnpm", "--dir", eve_root, "exec", "eve", "invoke", full_prompt]
         else:
             # Fallback to configured CLI command with full prompt file
             prompt_file = os.path.join(workdir, f".eve_prompt_{ticket_identifier}.md")
@@ -77,7 +82,7 @@ class EveAgentAdapter(AgentAdapter):
                 env=env,
                 capture_output=True,
                 text=True,
-                timeout=300,
+                timeout=self.config.timeout_seconds,
                 check=False,
             )
             duration = time.time() - start_time
@@ -111,7 +116,7 @@ class EveAgentAdapter(AgentAdapter):
                 success=False,
                 output="",
                 stderr="Execution timed out after 300s",
-                duration_seconds=300.0,
+                duration_seconds=self.config.timeout_seconds,
             )
         except Exception as e:
             logger.error("Eve Agent execution failed with error: %s", e)
