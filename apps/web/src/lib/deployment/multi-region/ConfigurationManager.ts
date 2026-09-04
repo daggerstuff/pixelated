@@ -10,161 +10,27 @@ import { EventEmitter } from 'events'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('ConfigurationManager')
+import type {
+  MultiRegionConfig,
+  EnvironmentConfig,
+  FeatureFlags,
+  SecretConfig,
+  MonitoringConfig,
+  ComplianceConfig,
+} from './configuration-manager.types'
+import { validateConfiguration, mergeConfigurations } from './configuration-manager.utils'
+export type {
+  MultiRegionConfig,
+  EnvironmentConfig,
+  FeatureFlags,
+  SecretConfig,
+  MonitoringConfig,
+  ComplianceConfig,
+} from './configuration-manager.types'
 
 import { EdgeDeploymentConfig } from './EdgeComputingManager'
 import { RoutingConfig } from './GlobalTrafficRoutingManager'
 import { DeploymentConfig, RegionConfig } from './MultiRegionDeploymentManager'
-
-export interface MultiRegionConfig {
-  deployment: DeploymentConfig
-  edgeComputing: EdgeDeploymentConfig
-  trafficRouting: RoutingConfig
-  environments: {
-    development: EnvironmentConfig
-    staging: EnvironmentConfig
-    production: EnvironmentConfig
-  }
-  featureFlags: FeatureFlags
-  secrets: SecretConfig
-  monitoring: MonitoringConfig
-  compliance: ComplianceConfig
-}
-
-export interface EnvironmentConfig {
-  regions: RegionConfig[]
-  scaling: {
-    autoScaling: boolean
-    minInstances: number
-    maxInstances: number
-    targetCpuUtilization: number
-    targetMemoryUtilization: number
-  }
-  resources: {
-    cpu: string
-    memory: string
-    storage: string
-  }
-  networking: {
-    vpcCidr: string
-    subnetCidrs: string[]
-    securityGroups: string[]
-    loadBalancers: string[]
-  }
-  monitoring: {
-    enabled: boolean
-    samplingRate: number
-    alertThresholds: Record<string, number>
-  }
-}
-
-export interface FeatureFlags {
-  multiRegionDeployment: boolean
-  edgeComputing: boolean
-  intelligentRouting: boolean
-  autoFailover: boolean
-  threatDetection: boolean
-  biasDetection: boolean
-  complianceChecking: boolean
-  performanceMonitoring: boolean
-  aiModelServing: boolean
-  cacheOptimization: boolean
-}
-
-export interface SecretConfig {
-  cloudProviders: {
-    aws: {
-      accessKeyId: string
-      secretAccessKey: string
-      region: string
-    }
-    gcp: {
-      projectId: string
-      keyFilename: string
-    }
-    azure: {
-      subscriptionId: string
-      clientId: string
-      clientSecret: string
-      tenantId: string
-    }
-  }
-  databases: {
-    cockroachdb: {
-      connectionString: string
-      sslMode: string
-    }
-    redis: {
-      url: string
-      password: string
-    }
-  }
-  aiServices: {
-    openai: {
-      apiKey: string
-      organization: string
-    }
-    google: {
-      apiKey: string
-      projectId: string
-    }
-  }
-  monitoring: {
-    sentry: {
-      dsn: string
-      authToken: string
-    }
-    datadog: {
-      apiKey: string
-      appKey: string
-    }
-  }
-}
-
-export interface MonitoringConfig {
-  metrics: {
-    enabled: boolean
-    interval: number
-    retention: number
-    aggregation: string
-  }
-  alerting: {
-    enabled: boolean
-    channels: string[]
-    severityLevels: string[]
-    escalationRules: Record<string, unknown>
-  }
-  logging: {
-    level: string
-    format: string
-    destinations: string[]
-    sampling: number
-  }
-}
-
-export interface ComplianceConfig {
-  gdpr: {
-    enabled: boolean
-    dataResidency: string[]
-    retentionPeriods: Record<string, number>
-    subjectRights: string[]
-  }
-  hipaa: {
-    enabled: boolean
-    encryptionRequired: boolean
-    auditLogging: boolean
-    accessControls: string[]
-  }
-  soc2: {
-    enabled: boolean
-    auditFrequency: string
-    controls: string[]
-  }
-  pci: {
-    enabled: boolean
-    requirements: string[]
-    scanningFrequency: string
-  }
-}
 
 export class ConfigurationManager extends EventEmitter {
   private config: MultiRegionConfig
@@ -184,7 +50,7 @@ export class ConfigurationManager extends EventEmitter {
       logger.info('Initializing Configuration Manager')
 
       // Validate initial configuration
-      await this.validateConfiguration(this.config)
+      await validateConfiguration(this.config)
 
       // Load environment-specific configuration
       await this.loadEnvironmentConfig()
@@ -215,76 +81,6 @@ export class ConfigurationManager extends EventEmitter {
   /**
    * Validate configuration structure and values
    */
-  private async validateConfiguration(
-    config: MultiRegionConfig,
-  ): Promise<void> {
-    const errors: string[] = []
-
-    // Validate deployment configuration
-    if (
-      !config.deployment ||
-      !config.deployment.regions ||
-      config.deployment.regions.length === 0
-    ) {
-      errors.push('Deployment configuration must include at least one region')
-    }
-
-    // Validate region configurations
-    for (const region of config.deployment.regions) {
-      if (!region.id || !region.name) {
-        errors.push(
-          `Region configuration missing required fields: ${JSON.stringify(region)}`,
-        )
-      }
-
-      if (
-        !region.provider ||
-        !['aws', 'gcp', 'azure'].includes(region.provider)
-      ) {
-        errors.push(
-          `Invalid provider for region ${region.id}: ${region.provider}`,
-        )
-      }
-
-      if (!region.capacity || region.capacity.minInstances < 1) {
-        errors.push(`Invalid capacity configuration for region ${region.id}`)
-      }
-    }
-
-    // Validate edge computing configuration
-    if (config.edgeComputing?.locations.length === 0) {
-      errors.push(
-        'Edge computing configuration must include at least one location',
-      )
-    }
-
-    // Validate traffic routing configuration
-    if (
-      !config.trafficRouting.strategy ||
-      ![
-        'latency-based',
-        'health-based',
-        'compliance-based',
-        'weighted-round-robin',
-      ].includes(config.trafficRouting.strategy)
-    ) {
-      errors.push('Invalid traffic routing strategy')
-    }
-
-    // Validate feature flags
-    if (!config.featureFlags) {
-      errors.push('Feature flags configuration is required')
-    }
-
-    // Validate secrets (basic structure check)
-    if (!config.secrets?.cloudProviders) {
-      errors.push('Secrets configuration is required')
-    }
-
-    if (errors.length > 0) {
-      throw new Error(`Configuration validation failed: ${errors.join(', ')}`)
-    }
-  }
 
   /**
    * Load environment-specific configuration
@@ -298,7 +94,7 @@ export class ConfigurationManager extends EventEmitter {
       const envConfig = await this.loadEnvironmentOverrides(environment)
 
       if (envConfig) {
-        this.config = this.mergeConfigurations(this.config, envConfig)
+        this.config = mergeConfigurations(this.config, envConfig)
         logger.info(`Environment configuration loaded for: ${environment}`)
       }
 
@@ -953,13 +749,13 @@ export class ConfigurationManager extends EventEmitter {
       logger.info('Updating configuration')
 
       // Validate updates
-      await this.validateConfiguration({
+      await validateConfiguration({
         ...this.config,
         ...updates,
       })
 
       // Apply updates
-      this.config = this.mergeConfigurations(this.config, updates)
+      this.config = mergeConfigurations(this.config, updates)
 
       // Reinitialize affected components
       await this.reinitializeAffectedComponents(updates)
@@ -975,32 +771,6 @@ export class ConfigurationManager extends EventEmitter {
   /**
    * Merge configurations
    */
-  private mergeConfigurations(
-    base: MultiRegionConfig,
-    updates: Partial<MultiRegionConfig>,
-  ): MultiRegionConfig {
-    return {
-      ...base,
-      ...updates,
-      deployment: {
-        ...base.deployment,
-        ...updates.deployment,
-        regions: updates.deployment?.regions ?? base.deployment.regions,
-      },
-      featureFlags: {
-        ...base.featureFlags,
-        ...updates.featureFlags,
-      },
-      monitoring: {
-        ...base.monitoring,
-        ...updates.monitoring,
-      },
-      compliance: {
-        ...base.compliance,
-        ...updates.compliance,
-      },
-    }
-  }
 
   /**
    * Reinitialize components affected by configuration changes
@@ -1054,7 +824,7 @@ export class ConfigurationManager extends EventEmitter {
 
       if (newConfig) {
         // Validate new configuration
-        await this.validateConfiguration(newConfig)
+        await validateConfiguration(newConfig)
 
         // Apply new configuration
         this.config = newConfig
