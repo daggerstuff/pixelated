@@ -1,1 +1,7 @@
-export { default } from '../../../../lib/instrumentation.js'
+import { defineInstrumentation } from 'eve/instrumentation'
+
+export default defineInstrumentation({
+  traceChannelRequests: true,
+  recordInputs: true,
+  recordOutputs: true,
+})

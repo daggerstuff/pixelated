@@ -1,7 +1,9 @@
 import { defineAgent } from 'eve'
+import { agentModel, AGENT_MODEL_CONTEXT_WINDOW_TOKENS } from './lib/workers-ai.js'
+
 export default defineAgent({
-  model: 'zai/glm-5.2', // Free for eve agents through Aug 27 via Blackbox on AI Gateway
-  modelContextWindowTokens: 1_000_000, // GLM 5.2 has 1M context window
+  model: agentModel,
+  modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
   compaction: {
     thresholdPercent: 0.75,
   },
