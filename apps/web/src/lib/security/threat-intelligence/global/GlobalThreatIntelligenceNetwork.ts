@@ -59,29 +59,21 @@ import {
 
 const logger = createBuildSafeLogger('global-threat-intelligence-network')
 
-export interface GlobalThreatIntelligenceNetwork {
-  initialize(): Promise<void>
-  processThreatIntelligence(
-    threatData: RealTimeThreatData,
-  ): Promise<GlobalThreatIntelligence>
-  correlateThreatsAcrossRegions(threatIds: string[]): Promise<CorrelationData[]>
-  validateThreatIntelligence(intelligenceId: string): Promise<ValidationStatus>
-  getGlobalThreatSummary(region?: string): Promise<GlobalThreatSummary>
-  getHealthStatus(): Promise<HealthStatus>
-  shutdown(): Promise<void>
-}
-
-export interface GlobalThreatSummary {
-  totalThreats: number
-  activeThreats: number
-  threatsByRegion: Record<string, number>
-  threatsBySeverity: Record<string, number>
-  recentThreats: GlobalThreatIntelligence[]
-  correlationCount: number
-  validationMetrics: ValidationMetrics
-}
-
-export interface ValidationMetrics extends ValidationSystemMetrics {}
+import type {
+  GlobalThreatIntelligenceNetwork,
+  GlobalThreatSummary,
+  RegionStatus,
+  ComponentHealth,
+  SystemMetrics,
+} from './global-threat-intelligence-network.utils'
+import {
+  mapSeverityToLevel,
+  generateGlobalThreatId,
+  generateIntelligenceId,
+  createPendingValidationStatus,
+  createDefaultHuntingConfig,
+  createDefaultFeedConfig,
+} from './global-threat-intelligence-network.utils'
 
 export class GlobalThreatIntelligenceNetworkCore
   extends EventEmitter
@@ -209,13 +201,13 @@ export class GlobalThreatIntelligenceNetworkCore
 
       // Initialize Threat Hunting System
       this.huntingSystem = new ThreatHuntingSystemCore(
-        this.createDefaultHuntingConfig(),
+        createDefaultHuntingConfig(),
       )
       await this.huntingSystem.initialize()
 
       // Initialize External Threat Feed Integration
       this.feedIntegration = new ExternalThreatFeedIntegrationCore(
-        this.createDefaultFeedConfig(),
+        createDefaultFeedConfig(),
       )
       await this.feedIntegration.initialize()
 
@@ -411,7 +403,7 @@ export class GlobalThreatIntelligenceNetworkCore
 
       // Update severity if higher
       const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
-      const newSeverity = this.mapSeverityToLevel(newThreatData.severity)
+      const newSeverity = mapSeverityToLevel(newThreatData.severity)
       if (severityOrder[newSeverity] > severityOrder[existingThreat.severity]) {
         existingThreat.severity = newSeverity
       }
@@ -462,15 +454,15 @@ export class GlobalThreatIntelligenceNetworkCore
     edgeDetectionResult: EdgeDetectionResult,
     correlationData: CorrelationData,
   ): Promise<GlobalThreatIntelligence> {
-    const globalThreatId = this.generateGlobalThreatId()
+    const globalThreatId = generateGlobalThreatId()
 
     const globalThreat: GlobalThreatIntelligence = {
-      intelligenceId: this.generateIntelligenceId(),
+      intelligenceId: generateIntelligenceId(),
       threatId: threatData.threatId,
       globalThreatId,
       regions: [threatData.region],
       threatType: edgeDetectionResult.threatType,
-      severity: this.mapSeverityToLevel(threatData.severity),
+      severity: mapSeverityToLevel(threatData.severity),
       confidence: threatData.confidence,
       firstSeen: threatData.timestamp,
       lastSeen: threatData.timestamp,
@@ -490,77 +482,10 @@ export class GlobalThreatIntelligenceNetworkCore
         correlationData,
       ),
       correlationData,
-      validationStatus: this.createPendingValidationStatus(),
+      validationStatus: createPendingValidationStatus(),
     }
 
     return globalThreat
-  }
-
-  private mapSeverityToLevel(
-    severity: number,
-  ): 'low' | 'medium' | 'high' | 'critical' {
-    if (severity >= 0.8) return 'critical'
-    if (severity >= 0.6) return 'high'
-    if (severity >= 0.4) return 'medium'
-    return 'low'
-  }
-
-  private generateGlobalThreatId(): string {
-    return `global_threat_${this.secureId()}`
-  }
-
-  private generateIntelligenceId(): string {
-    return `intelligence_${this.secureId()}`
-  }
-
-  private secureId(): string {
-    try {
-      if (typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID()
-      }
-    } catch {
-      // Fallback to timestamp-based ID
-    }
-    return `${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
-  }
-
-  private createPendingValidationStatus(): ValidationStatus {
-    const now = new Date()
-    return {
-      validationId: `validation_${this.secureId()}`,
-      status: 'pending',
-      accuracy: 0,
-      completeness: 0,
-      consistency: 0,
-      timeliness: 0,
-      relevance: 0,
-      validator: 'pending',
-      validationDate: now,
-      feedback: [],
-    }
-  }
-
-  private createDefaultHuntingConfig(): HuntingConfig {
-    return {
-      enabled: false,
-      maxHunts: 10,
-      defaultTimeout: 60_000,
-      autoEscalate: false,
-      huntPatterns: [],
-    }
-  }
-
-  private createDefaultFeedConfig(): FeedConfig {
-    return {
-      feedId: 'default-feed',
-      provider: 'default',
-      feedType: 'generic',
-      endpoint: 'https://localhost',
-      requiresAuth: false,
-      updateFrequency: 'hourly',
-      parameters: {},
-      filters: {},
-    }
   }
 
   private mapThreatValidationToStatus(
@@ -1068,27 +993,3 @@ export class GlobalThreatIntelligenceNetworkCore
 }
 
 // Supporting interfaces
-interface RegionStatus {
-  regionId: string
-  status: 'healthy' | 'degraded' | 'unhealthy' | 'initializing'
-  lastUpdate: Date
-  threatCount: number
-  activeNodes: number
-  healthScore: number
-}
-
-interface ComponentHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy'
-  message?: string
-  lastCheck: Date
-  responseTime?: number
-}
-
-interface SystemMetrics {
-  cpuUsage: number
-  memoryUsage: number
-  diskUsage: number
-  networkLatency: number
-  activeConnections: number
-  queueSize: number
-}
