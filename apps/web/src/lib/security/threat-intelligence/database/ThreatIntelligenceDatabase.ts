@@ -10,6 +10,23 @@ import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
+  validateThreatData,
+  buildSearchQuery,
+  storeThreatIndicators,
+  initializeTAXIICollections,
+  checkMongoDBHealth,
+  checkRedisHealth,
+  cacheThreatIntelligence,
+} from './ThreatIntelligenceDatabase.utils'
+export type {
+  SearchQuery,
+  ThreatIntelligenceDatabase,
+  HealthStatus,
+  DatabaseStats,
+  STIXObject,
+  TAXIICollection,
+} from './ThreatIntelligenceDatabase.types'
+import {
   DatabaseConfig,
   GlobalThreatIntelligence,
   STIXConfig,
@@ -20,104 +37,6 @@ import {
 } from '../global/types'
 
 const logger = createBuildSafeLogger('threat-intelligence-database')
-
-export interface SearchQuery {
-  threatId?: string
-  intelligenceId?: string
-  globalThreatId?: string
-  regions?: string[]
-  severity?: string
-  confidence?: {
-    min?: number
-    max?: number
-  }
-  timeRange?: {
-    start?: string | Date
-    end?: string | Date
-  }
-  indicators?: {
-    types?: string[]
-    values?: string[]
-  }
-}
-
-export interface ThreatIntelligenceDatabase {
-  initialize(): Promise<void>
-  storeThreatIntelligence(threat: GlobalThreatIntelligence): Promise<void>
-  updateThreatIntelligence(threat: GlobalThreatIntelligence): Promise<void>
-  getThreatById(threatId: string): Promise<GlobalThreatIntelligence | null>
-  getThreatByIntelligenceId(
-    intelligenceId: string,
-  ): Promise<GlobalThreatIntelligence | null>
-  getThreatByIndicator(
-    indicatorType: string,
-    indicatorValue: string,
-  ): Promise<GlobalThreatIntelligence | null>
-  getThreatsByRegion(region?: string): Promise<Record<string, number>>
-  getThreatsBySeverity(region?: string): Promise<Record<string, number>>
-  getRecentThreats(
-    region?: string,
-    limit?: number,
-  ): Promise<GlobalThreatIntelligence[]>
-  getTotalThreatCount(region?: string): Promise<number>
-  getActiveThreatCount(region?: string): Promise<number>
-  getCorrelationCount(region?: string): Promise<number>
-  storeCorrelationData(correlation: CorrelationData): Promise<void>
-  getSTIXObjects(
-    objectType: string,
-    filters?: Record<string, unknown>,
-  ): Promise<Record<string, unknown>[]>
-  getTAXIICollections(): Promise<Record<string, unknown>[]>
-  getTAXIIObjects(
-    collectionId: string,
-    filters?: Record<string, unknown>,
-  ): Promise<Record<string, unknown>[]>
-  searchThreats(
-    query: SearchQuery,
-    pagination: PaginationParams,
-  ): Promise<ApiResponse<GlobalThreatIntelligence[]>>
-  getHealthStatus(): Promise<HealthStatus>
-  shutdown(): Promise<void>
-}
-
-export interface HealthStatus {
-  healthy: boolean
-  message: string
-  responseTime?: number
-  databaseStats?: DatabaseStats
-}
-
-export interface DatabaseStats {
-  totalThreats: number
-  totalCorrelations: number
-  totalSTIXObjects: number
-  totalTAXIIObjects: number
-  lastUpdate: Date
-}
-
-export interface STIXObject {
-  id: string
-  type: string
-  spec_version: string
-  created: Date
-  modified: Date
-  created_by_ref?: string
-  labels?: string[]
-  object_marking_refs?: string[]
-  granular_markings?: Record<string, unknown>[]
-  [key: string]: unknown
-}
-
-export interface TAXIICollection {
-  id: string
-  title: string
-  description: string
-  can_read: boolean
-  can_write: boolean
-  media_types: string[]
-  created: Date
-  modified: Date
-}
 
 export class ThreatIntelligenceDatabaseCore
   extends EventEmitter
@@ -154,7 +73,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       if (this.taxiiConfig.enabled) {
-        await this.initializeTAXIICollections()
+        await initializeTAXIICollections(this.db)
       }
 
       // Start database maintenance tasks
@@ -290,63 +209,6 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  private async initializeTAXIICollections(): Promise<void> {
-    try {
-      const taxiiCollection = this.db.collection('taxii_collections')
-
-      // Create default TAXII collections
-      const defaultCollections = [
-        {
-          id: 'threat-intelligence',
-          title: 'Threat Intelligence',
-          description: 'General threat intelligence data',
-          can_read: true,
-          can_write: false,
-          media_types: ['application/stix+json;version=2.1'],
-          created: new Date(),
-          modified: new Date(),
-        },
-        {
-          id: 'malware-indicators',
-          title: 'Malware Indicators',
-          description: 'Indicators of compromise and malware signatures',
-          can_read: true,
-          can_write: false,
-          media_types: ['application/stix+json;version=2.1'],
-          created: new Date(),
-          modified: new Date(),
-        },
-        {
-          id: 'attack-patterns',
-          title: 'Attack Patterns',
-          description: 'Common attack patterns and techniques',
-          can_read: true,
-          can_write: false,
-          media_types: ['application/stix+json;version=2.1'],
-          created: new Date(),
-          modified: new Date(),
-        },
-      ]
-
-      for (const collection of defaultCollections) {
-        await taxiiCollection.replaceOne({ id: collection.id }, collection, {
-          upsert: true,
-        })
-      }
-
-      // Create TAXII objects collection
-      const taxiiObjectsCollection = this.db.collection('taxii_objects')
-      await taxiiObjectsCollection.createIndex({ id: 1 }, { unique: true })
-      await taxiiObjectsCollection.createIndex({ collection_id: 1 })
-      await taxiiObjectsCollection.createIndex({ type: 1 })
-      await taxiiObjectsCollection.createIndex({ created: 1 })
-
-      logger.info('TAXII collections initialized successfully')
-    } catch (error: unknown) {
-      logger.error('Failed to initialize TAXII collections:', { error })
-      throw error
-    }
-  }
 
   private async startMaintenanceTasks(): Promise<void> {
     // Start periodic maintenance tasks
@@ -378,7 +240,7 @@ export class ThreatIntelligenceDatabaseCore
       })
 
       // Validate threat data
-      this.validateThreatData(threat)
+      validateThreatData(threat)
 
       // Store in main collection
       const threatsCollection = this.db.collection('global_threat_intelligence')
@@ -389,7 +251,7 @@ export class ThreatIntelligenceDatabaseCore
       )
 
       // Store indicators separately for faster queries
-      await this.storeThreatIndicators(threat)
+      await storeThreatIndicators(this.db, threat)
 
       // Update STIX objects if enabled
       if (this.stixConfig.enabled) {
@@ -397,7 +259,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       // Cache for real-time access
-      await this.cacheThreatIntelligence(threat)
+      await cacheThreatIntelligence(this.redis, threat)
 
       this.emit('threat_stored', {
         threatId: threat.threatId,
@@ -410,54 +272,7 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  private validateThreatData(threat: GlobalThreatIntelligence): void {
-    if (!threat.threatId || !threat.intelligenceId || !threat.globalThreatId) {
-      throw new Error('Invalid threat data: missing required IDs')
-    }
 
-    if (!threat.regions || threat.regions.length === 0) {
-      throw new Error('Invalid threat data: no regions specified')
-    }
-
-    if (!['low', 'medium', 'high', 'critical'].includes(threat.severity)) {
-      throw new Error('Invalid threat data: invalid severity level')
-    }
-
-    if (threat.confidence < 0 || threat.confidence > 1) {
-      throw new Error('Invalid threat data: confidence must be between 0 and 1')
-    }
-  }
-
-  private async storeThreatIndicators(
-    threat: GlobalThreatIntelligence,
-  ): Promise<void> {
-    try {
-      const indicatorsCollection = this.db.collection('threat_indicators')
-
-      // Store each indicator separately for efficient querying
-      for (const indicator of threat.indicators) {
-        const indicatorDoc = {
-          ...indicator,
-          threatId: threat.threatId,
-          intelligenceId: threat.intelligenceId,
-          globalThreatId: threat.globalThreatId,
-          storedAt: new Date(),
-        }
-
-        await indicatorsCollection.replaceOne(
-          {
-            threatId: threat.threatId,
-            indicatorId: indicator.indicatorId,
-          },
-          indicatorDoc,
-          { upsert: true },
-        )
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to store threat indicators:', { error })
-      throw error
-    }
-  }
 
   private async updateSTIXObjects(
     threat: GlobalThreatIntelligence,
@@ -543,40 +358,6 @@ export class ThreatIntelligenceDatabaseCore
     return stixObjects
   }
 
-  private async cacheThreatIntelligence(
-    threat: GlobalThreatIntelligence,
-  ): Promise<void> {
-    try {
-      // Cache main threat data
-      const cacheKey = `threat:${threat.threatId}`
-      const cacheData = {
-        threatId: threat.threatId,
-        intelligenceId: threat.intelligenceId,
-        globalThreatId: threat.globalThreatId,
-        severity: threat.severity,
-        confidence: threat.confidence,
-        regions: threat.regions,
-        firstSeen: threat.firstSeen,
-        lastSeen: threat.lastSeen,
-      }
-
-      await this.redis.setex(cacheKey, 3600, JSON.stringify(cacheData)) // 1 hour TTL
-
-      // Cache by intelligence ID
-      const intelligenceCacheKey = `intelligence:${threat.intelligenceId}`
-      await this.redis.setex(
-        intelligenceCacheKey,
-        3600,
-        JSON.stringify(cacheData),
-      )
-
-      // Cache by global threat ID
-      const globalCacheKey = `global_threat:${threat.globalThreatId}`
-      await this.redis.setex(globalCacheKey, 3600, JSON.stringify(cacheData))
-    } catch (error: unknown) {
-      logger.error('Failed to cache threat intelligence:', { error })
-    }
-  }
 
   async updateThreatIntelligence(
     threat: GlobalThreatIntelligence,
@@ -588,7 +369,7 @@ export class ThreatIntelligenceDatabaseCore
       })
 
       // Validate threat data
-      this.validateThreatData(threat)
+      validateThreatData(threat)
 
       // Update in main collection
       const threatsCollection = this.db.collection('global_threat_intelligence')
@@ -604,7 +385,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       // Update indicators
-      await this.storeThreatIndicators(threat)
+      await storeThreatIndicators(this.db, threat)
 
       // Update STIX objects if enabled
       if (this.stixConfig.enabled) {
@@ -612,7 +393,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       // Update cache
-      await this.cacheThreatIntelligence(threat)
+      await cacheThreatIntelligence(this.redis, threat)
 
       this.emit('threat_updated', {
         threatId: threat.threatId,
@@ -955,7 +736,7 @@ export class ThreatIntelligenceDatabaseCore
       const threatsCollection = this.db.collection('global_threat_intelligence')
 
       // Build search query
-      const searchQuery = this.buildSearchQuery(query)
+      const searchQuery = buildSearchQuery(query)
 
       // Get total count
 
@@ -993,84 +774,13 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  private buildSearchQuery(query: SearchQuery): Record<string, unknown> {
-    const searchQuery: Record<string, unknown> = {}
-
-    if (query.threatId) {
-      searchQuery['threatId'] = query.threatId
-    }
-
-    if (query.intelligenceId) {
-      searchQuery['intelligenceId'] = query.intelligenceId
-    }
-
-    if (query.globalThreatId) {
-      searchQuery['globalThreatId'] = query.globalThreatId
-    }
-
-    if (query.regions && query.regions.length > 0) {
-      searchQuery['regions'] = { $in: query.regions }
-    }
-
-    if (query.severity) {
-      searchQuery['severity'] = query.severity
-    }
-
-    if (
-      query.confidence &&
-      (query.confidence.min !== undefined || query.confidence.max !== undefined)
-    ) {
-      const confidenceFilter: Record<string, number> = {}
-      if (query.confidence.min !== undefined) {
-        confidenceFilter['$gte'] = query.confidence.min
-      }
-      if (query.confidence.max !== undefined) {
-        confidenceFilter['$lte'] = query.confidence.max
-      }
-      searchQuery['confidence'] = confidenceFilter
-    }
-
-    if (query.timeRange) {
-      const firstSeenFilter: Record<string, Date> = {}
-      if (query.timeRange.start) {
-        firstSeenFilter['$gte'] = new Date(query.timeRange.start)
-      }
-      if (query.timeRange.end) {
-        firstSeenFilter['$lte'] = new Date(query.timeRange.end)
-      }
-      searchQuery['firstSeen'] = firstSeenFilter
-    }
-
-    if (
-      query.indicators &&
-      (query.indicators.types || query.indicators.values)
-    ) {
-      const orConditions: Record<string, unknown>[] = []
-
-      if (query.indicators.types && query.indicators.types.length > 0) {
-        orConditions.push({
-          'indicators.indicatorType': { $in: query.indicators.types },
-        })
-      }
-
-      if (query.indicators.values && query.indicators.values.length > 0) {
-        orConditions.push({
-          'indicators.value': { $in: query.indicators.values },
-        })
-      }
-
-      searchQuery['$or'] = orConditions
-    }
-
-    return searchQuery
-  }
 
   async getHealthStatus(): Promise<HealthStatus> {
     try {
       const startTime = Date.now()
 
       // Check MongoDB connection
-      const mongodbHealthy = await this.checkMongoDBHealth()
+      const mongodbHealthy = await checkMongoDBHealth(this.db)
       if (!mongodbHealthy) {
         return {
           healthy: false,
@@ -1079,7 +789,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       // Check Redis connection
-      const redisHealthy = await this.checkRedisHealth()
+      const redisHealthy = await checkRedisHealth(this.redis)
       if (!redisHealthy) {
         return {
           healthy: false,
@@ -1107,25 +817,7 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  private async checkMongoDBHealth(): Promise<boolean> {
-    try {
-      await this.db.admin().ping()
-      return true
-    } catch (error: unknown) {
-      logger.error('MongoDB health check failed:', { error })
-      return false
-    }
-  }
 
-  private async checkRedisHealth(): Promise<boolean> {
-    try {
-      const result = await this.redis.ping()
-      return result === 'PONG'
-    } catch (error: unknown) {
-      logger.error('Redis health check failed:', { error })
-      return false
-    }
-  }
 
   private async getDatabaseStats(): Promise<DatabaseStats> {
     try {
