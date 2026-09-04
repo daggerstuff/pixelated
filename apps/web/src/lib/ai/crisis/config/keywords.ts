@@ -3,10 +3,10 @@
 
 // Built-in suicide euphemisms (conservative base set)
 const BUILTIN_SUICIDE_EUPHEMISMS: readonly string[] = [
-  'unalive',
-  'unalive myself',
+  "unalive",
+  "unalive myself",
   "don't want to live",
-]
+];
 
 // Built-in safe idiomatic exclusions (conservative regex patterns)
 const BUILTIN_SAFE_IDIOMATIC_EXCLUSIONS: readonly RegExp[] = [
@@ -17,36 +17,43 @@ const BUILTIN_SAFE_IDIOMATIC_EXCLUSIONS: readonly RegExp[] = [
   /\b(homework|traffic|commute|deadline|exam|emoji)\s+is\s+killing\s+me\b/i,
   /\b(?:reading|studying|learning|talking)\s+about\s+suicide\b/i,
   /\b(?:watch(?:ing)?|saw)\s+(?:a\s+)?(?:movie|film|article)\s+about\s+suicide\b/i,
-]
+];
 
 /**
  * Attempt to load auto-generated keywords from Python integrator.
  * Falls back gracefully if generated module is not yet populated.
  */
 function loadGeneratedKeywords(): {
-  euphemisms: string[]
-  exclusions: RegExp[]
+  euphemisms: string[];
+  exclusions: RegExp[];
 } {
   try {
     // Use require for synchronous loading (Astro/build-time compatible)
-    const generated = (globalThis as typeof globalThis & { require?: (id: string) => unknown }).require('./generated.keywords.ts')
+    const generated = (
+      globalThis as typeof globalThis & {
+        require?: (id: string) => {
+          SUICIDE_EUPHEMISMS?: unknown;
+          SAFE_IDIOMATIC_EXCLUSIONS?: unknown;
+        };
+      }
+    ).require("./generated.keywords.ts");
     return {
-      euphemisms: Array.isArray(generated.SUICIDE_EUPHEMISMS)
-        ? generated.SUICIDE_EUPHEMISMS
+      euphemisms: Array.isArray(generated?.SUICIDE_EUPHEMISMS)
+        ? (generated.SUICIDE_EUPHEMISMS as string[])
         : [],
-      exclusions: Array.isArray(generated.SAFE_IDIOMATIC_EXCLUSIONS)
-        ? generated.SAFE_IDIOMATIC_EXCLUSIONS
+      exclusions: Array.isArray(generated?.SAFE_IDIOMATIC_EXCLUSIONS)
+        ? (generated.SAFE_IDIOMATIC_EXCLUSIONS as RegExp[])
         : [],
-    }
+    };
   } catch (e) {
     // Silently fall back to built-ins if generated module is not available
     // This allows the app to function before the Python integrator runs
-    console.debug('Generated keywords not available, using built-ins', e)
-    return { euphemisms: [], exclusions: [] }
+    console.debug("Generated keywords not available, using built-ins", e);
+    return { euphemisms: [], exclusions: [] };
   }
 }
 
-const generated = loadGeneratedKeywords()
+const generated = loadGeneratedKeywords();
 
 /**
  * Merged suicide euphemisms: built-ins + auto-generated from cultural datasets
@@ -55,7 +62,7 @@ const generated = loadGeneratedKeywords()
 export const SUICIDE_EUPHEMISMS: readonly string[] = [
   ...BUILTIN_SUICIDE_EUPHEMISMS,
   ...generated.euphemisms,
-]
+];
 
 /**
  * Merged safe idiomatic exclusions: built-ins + auto-generated from cultural datasets
@@ -64,4 +71,4 @@ export const SUICIDE_EUPHEMISMS: readonly string[] = [
 export const SAFE_IDIOMATIC_EXCLUSIONS: readonly RegExp[] = [
   ...BUILTIN_SAFE_IDIOMATIC_EXCLUSIONS,
   ...generated.exclusions,
-]
+];
