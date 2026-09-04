@@ -17,6 +17,31 @@ import {
   IntegrationEndpoint,
   GlobalThreatIntelligence,
 } from '../global/types'
+import {
+  calculateEstimatedImpact,
+  evaluateLocationCondition,
+  evaluatePatternCondition,
+  evaluateThresholdCondition,
+  evaluateTimeCondition,
+  executeBlockAction,
+  executeInvestigateAction,
+  executeIsolateAction,
+  executeMitigateAction,
+  executeRollbackAction,
+  generateResponseActions,
+  generateResponseId,
+  getDefaultStrategy,
+  getNotificationLevel,
+  inferThreatType,
+  sendCriticalNotification,
+  sendHighPriorityNotification,
+  sendLowPriorityNotification,
+  sendMediumPriorityNotification,
+  sendToIntegrationEndpoint,
+  validateAction,
+  validateResponseStrategy,
+  type ThreatResponse,
+} from './orchestrationHelpers'
 
 const logger = createBuildSafeLogger('automated-threat-response-orchestrator')
 
@@ -34,25 +59,6 @@ export interface AutomatedThreatResponseOrchestrator {
   shutdown(): Promise<void>
 }
 
-export interface ThreatResponse {
-  responseId: string
-  threatId: string
-  responseType:
-    | 'block'
-    | 'isolate'
-    | 'alert'
-    | 'investigate'
-    | 'mitigate'
-    | 'rate_limit'
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  actions: ResponseAction[]
-  confidence: number
-  estimatedImpact: number
-  executionTime: Date
-  completedTime?: Date
-  status: 'pending' | 'executing' | 'completed' | 'failed' | 'rolled_back'
-  metadata?: Record<string, unknown>
-}
 
 export interface HealthStatus {
   healthy: boolean
@@ -217,20 +223,20 @@ export class AutomatedThreatResponseOrchestratorCore
       const strategy = await this.selectResponseStrategy(threat)
 
       // Step 2: Generate response actions based on strategy
-      const actions = await this.generateResponseActions(threat, strategy)
+      const actions = await generateResponseActions(threat, strategy)
 
       // Step 3: Validate response actions
       const validatedActions = await this.validateResponseActions(actions)
 
       // Step 4: Calculate estimated impact
-      const estimatedImpact = await this.calculateEstimatedImpact(
+      const estimatedImpact = await calculateEstimatedImpact(
         threat,
         validatedActions,
       )
 
       // Step 5: Create threat response object
       const response: ThreatResponse = {
-        responseId: this.generateResponseId(),
+        responseId: generateResponseId(),
         threatId: threat.threatId,
         responseType:
           strategy.primaryType ??
@@ -293,7 +299,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       if (matchingStrategies.length === 0) {
         // Use default strategy
-        return this.getDefaultStrategy(threat)
+        return getDefaultStrategy(threat)
       }
 
       // Select the best matching strategy based on priority and conditions
@@ -301,7 +307,7 @@ export class AutomatedThreatResponseOrchestratorCore
       return matchingStrategies[0]
     } catch (error: unknown) {
       logger.error('Failed to select response strategy:', { error })
-      return this.getDefaultStrategy(threat)
+      return getDefaultStrategy(threat)
     }
   }
 
@@ -312,7 +318,7 @@ export class AutomatedThreatResponseOrchestratorCore
     try {
       // Check if threat type matches
       if (strategy.threatTypes.length > 0) {
-        const threatType = this.inferThreatType(threat)
+        const threatType = inferThreatType(threat)
         if (!strategy.threatTypes.includes(threatType)) {
           return false
         }
@@ -341,19 +347,6 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private inferThreatType(threat: GlobalThreatIntelligence): string {
-    // Infer threat type based on indicators and context
-    if (threat.indicators.some((i) => i.indicatorType === 'ip')) {
-      return 'network'
-    }
-    if (threat.indicators.some((i) => i.indicatorType === 'file_hash')) {
-      return 'malware'
-    }
-    if (threat.attribution?.family) {
-      return 'attributed'
-    }
-    return 'general'
-  }
 
   private evaluateCondition(
     condition: ResponseCondition,
@@ -362,13 +355,13 @@ export class AutomatedThreatResponseOrchestratorCore
     try {
       switch (condition.conditionType) {
         case 'threshold':
-          return this.evaluateThresholdCondition(condition, threat)
+          return evaluateThresholdCondition(condition, threat)
         case 'pattern':
-          return this.evaluatePatternCondition(condition, threat)
+          return evaluatePatternCondition(condition, threat)
         case 'time':
-          return this.evaluateTimeCondition(condition, threat)
+          return evaluateTimeCondition(condition, threat)
         case 'location':
-          return this.evaluateLocationCondition(condition, threat)
+          return evaluateLocationCondition(condition, threat)
         default:
           return false
       }
@@ -378,303 +371,13 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private evaluateThresholdCondition(
-    condition: ResponseCondition,
-    threat: GlobalThreatIntelligence,
-  ): boolean {
-    const value = this.getThreatValue(threat, condition.condition)
 
-    switch (condition.operator) {
-      case 'greater_than':
-        return value > (condition.value as number)
-      case 'less_than':
-        return value < (condition.value as number)
-      case 'equals':
-        return value === (condition.value as number)
-      case 'contains': {
-        throw new Error('Not implemented yet: "contains" case')
-      }
-      case 'matches': {
-        throw new Error('Not implemented yet: "matches" case')
-      }
-      default:
-        return false
-    }
-  }
 
-  private evaluatePatternCondition(
-    condition: ResponseCondition,
-    threat: GlobalThreatIntelligence,
-  ): boolean {
-    const value = this.getThreatValue(threat, condition.condition)
 
-    if (condition.operator === 'contains') {
-      return String(value).includes(String(condition.value))
-    }
 
-    if (condition.operator === 'matches') {
-      const regex = new RegExp(String(condition.value))
-      return regex.test(String(value))
-    }
 
-    return false
-  }
 
-  private evaluateTimeCondition(
-    condition: ResponseCondition,
-    _threat: GlobalThreatIntelligence,
-  ): boolean {
-    const currentTime = new Date()
-    const conditionTime = new Date(condition.value as string)
 
-    switch (condition.operator) {
-      case 'greater_than':
-        return currentTime > conditionTime
-      case 'less_than':
-        return currentTime < conditionTime
-      case 'contains': {
-        throw new Error('Not implemented yet: "contains" case')
-      }
-      case 'equals': {
-        throw new Error('Not implemented yet: "equals" case')
-      }
-      case 'matches': {
-        throw new Error('Not implemented yet: "matches" case')
-      }
-      default:
-        return false
-    }
-  }
-
-  private evaluateLocationCondition(
-    condition: ResponseCondition,
-    threat: GlobalThreatIntelligence,
-  ): boolean {
-    const regions = threat.regions
-    const targetRegions = condition.value as string[]
-
-    switch (condition.operator) {
-      case 'contains':
-        return regions.some((region) => targetRegions.includes(region))
-      case 'equals':
-        return (
-          regions.length === targetRegions.length &&
-          regions.every((region) => targetRegions.includes(region))
-        )
-      case 'greater_than': {
-        throw new Error('Not implemented yet: "greater_than" case')
-      }
-      case 'less_than': {
-        throw new Error('Not implemented yet: "less_than" case')
-      }
-      case 'matches': {
-        throw new Error('Not implemented yet: "matches" case')
-      }
-      default:
-        return false
-    }
-  }
-
-  private getThreatValue(threat: GlobalThreatIntelligence, path: string): any {
-    const keys = path.split('.')
-    let value: any = threat
-
-    for (const key of keys) {
-      if (value && typeof value === 'object' && key in value) {
-        value = value[key]
-      } else {
-        return undefined
-      }
-    }
-
-    return value
-  }
-
-  private getDefaultStrategy(
-    threat: GlobalThreatIntelligence,
-  ): ResponseStrategy {
-    // Return a default strategy based on threat severity
-    const severity = threat.severity
-
-    const defaultStrategies: Record<string, ResponseStrategy> = {
-      critical: {
-        strategyId: 'default_critical',
-        threatTypes: [],
-        severityLevels: ['critical'],
-        responseActions: [
-          {
-            actionId: 'block_ip',
-            actionType: 'block',
-            target: 'firewall',
-            parameters: { duration: '24h' },
-            priority: 10,
-            timeout: 30000,
-            rollbackStrategy: 'unblock_ip',
-          },
-          {
-            actionId: 'escalate_security',
-            actionType: 'alert',
-            target: 'security_team',
-            parameters: { priority: 'critical' },
-            priority: 9,
-            timeout: 10000,
-          },
-        ],
-        conditions: [],
-        priority: 100,
-      },
-      high: {
-        strategyId: 'default_high',
-        threatTypes: [],
-        severityLevels: ['high'],
-        responseActions: [
-          {
-            actionId: 'rate_limit',
-            actionType: 'rate_limit',
-            target: 'rate_limiter',
-            parameters: { limit: 10, windowMs: 60000 },
-            priority: 8,
-            timeout: 15000,
-            rollbackStrategy: 'remove_rate_limit',
-          },
-          {
-            actionId: 'increase_monitoring',
-            actionType: 'investigate',
-            target: 'monitoring_system',
-            parameters: { level: 'high' },
-            priority: 7,
-            timeout: 20000,
-          },
-        ],
-        conditions: [],
-        priority: 80,
-      },
-      medium: {
-        strategyId: 'default_medium',
-        threatTypes: [],
-        severityLevels: ['medium'],
-        responseActions: [
-          {
-            actionId: 'log_analysis',
-            actionType: 'investigate',
-            target: 'security_logs',
-            parameters: { depth: 'detailed' },
-            priority: 6,
-            timeout: 30000,
-          },
-          {
-            actionId: 'user_notification',
-            actionType: 'alert',
-            target: 'user_management',
-            parameters: { priority: 'medium' },
-            priority: 5,
-            timeout: 10000,
-          },
-        ],
-        conditions: [],
-        priority: 60,
-      },
-      low: {
-        strategyId: 'default_low',
-        threatTypes: [],
-        severityLevels: ['low'],
-        responseActions: [
-          {
-            actionId: 'log_threat',
-            actionType: 'alert',
-            target: 'audit_system',
-            parameters: { level: 'info' },
-            priority: 3,
-            timeout: 5000,
-          },
-        ],
-        conditions: [],
-        priority: 40,
-      },
-    }
-
-    return defaultStrategies[severity] ?? defaultStrategies['medium']
-  }
-
-  private async generateResponseActions(
-    threat: GlobalThreatIntelligence,
-    strategy: ResponseStrategy,
-  ): Promise<ResponseAction[]> {
-    try {
-      const actions: ResponseAction[] = []
-
-      for (const action of strategy.responseActions) {
-        // Customize action parameters based on threat characteristics
-        const customizedAction = await this.customizeAction(action, threat)
-        actions.push(customizedAction)
-      }
-
-      // Sort by priority (highest first)
-      return actions.sort((a, b) => b.priority - a.priority)
-    } catch (error: unknown) {
-      logger.error('Failed to generate response actions:', { error })
-      return strategy.responseActions
-    }
-  }
-
-  private async customizeAction(
-    action: ResponseAction,
-    threat: GlobalThreatIntelligence,
-  ): Promise<ResponseAction> {
-    try {
-      const customizedAction = { ...action }
-
-      // Customize parameters based on threat
-      switch (action.actionType) {
-        case 'block':
-          customizedAction.parameters = {
-            ...action.parameters,
-            threatId: threat.threatId,
-            severity: threat.severity,
-            confidence: threat.confidence,
-          }
-          break
-
-        case 'rate_limit':
-          customizedAction.parameters = {
-            ...action.parameters,
-            severity: threat.severity,
-            confidence: threat.confidence,
-            regions: threat.regions,
-          }
-          break
-
-        case 'alert':
-          customizedAction.parameters = {
-            ...action.parameters,
-            threatId: threat.threatId,
-            severity: threat.severity,
-            indicators: threat.indicators.length,
-          }
-          break
-
-        case 'investigate':
-          customizedAction.parameters = {
-            ...action.parameters,
-            threatId: threat.threatId,
-            severity: threat.severity,
-            regions: threat.regions,
-          }
-          break
-        case 'isolate': {
-          throw new Error('Not implemented yet: "isolate" case')
-        }
-        case 'mitigate': {
-          throw new Error('Not implemented yet: "mitigate" case')
-        }
-      }
-
-      return customizedAction
-    } catch (error: unknown) {
-      logger.error('Failed to customize action:', { error })
-      return action
-    }
-  }
 
   private async validateResponseActions(
     actions: ResponseAction[],
@@ -683,7 +386,7 @@ export class AutomatedThreatResponseOrchestratorCore
       const validatedActions: ResponseAction[] = []
 
       for (const action of actions) {
-        if (await this.validateAction(action)) {
+        if (await validateAction(action)) {
           validatedActions.push(action)
         } else {
           logger.warn('Action validation failed, skipping action', {
@@ -699,89 +402,8 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private async validateAction(action: ResponseAction): Promise<boolean> {
-    try {
-      // Validate action parameters
-      if (!action.actionId || !action.actionType || !action.target) {
-        return false
-      }
 
-      // Validate timeout
-      if (action.timeout <= 0 || action.timeout > 300000) {
-        // Max 5 minutes
-        return false
-      }
 
-      // Validate priority
-      if (action.priority < 0 || action.priority > 10) {
-        return false
-      }
-
-      // Check if target system is available
-      const isTargetAvailable = await this.checkTargetAvailability(
-        action.target,
-      )
-      if (!isTargetAvailable) {
-        return false
-      }
-
-      return true
-    } catch (error: unknown) {
-      logger.error('Action validation error:', {
-        error,
-        actionId: action.actionId,
-      })
-      return false
-    }
-  }
-
-  private async checkTargetAvailability(target: string): Promise<boolean> {
-    try {
-      // Check if the target system is available
-      // This would typically involve health checks or API calls
-      // For now, we'll assume all targets are available
-      return true
-    } catch (error: unknown) {
-      logger.error('Target availability check failed:', { error, target })
-      return false
-    }
-  }
-
-  private async calculateEstimatedImpact(
-    threat: GlobalThreatIntelligence,
-    actions: ResponseAction[],
-  ): Promise<number> {
-    try {
-      // Calculate estimated impact based on threat severity and response actions
-      let baseImpact = 0
-
-      switch (threat.severity) {
-        case 'critical':
-          baseImpact = 0.9
-          break
-        case 'high':
-          baseImpact = 0.7
-          break
-        case 'medium':
-          baseImpact = 0.5
-          break
-        case 'low':
-          baseImpact = 0.3
-          break
-      }
-
-      // Adjust based on number and type of actions
-      const actionImpact = Math.min(actions.length * 0.1, 0.3)
-
-      // Adjust based on threat confidence
-      const confidenceImpact = threat.confidence * 0.2
-
-      return Math.min(baseImpact + actionImpact + confidenceImpact, 1)
-    } catch (error: unknown) {
-      logger.error('Failed to calculate estimated impact:', { error })
-      return 0.5
-    }
-  }
 
   private shouldAutoExecute(response: ThreatResponse): boolean {
     return (
@@ -871,22 +493,22 @@ export class AutomatedThreatResponseOrchestratorCore
 
       switch (action.actionType) {
         case 'block':
-          executionResult = await this.executeBlockAction(action, response)
+          executionResult = await executeBlockAction(action, response)
           break
         case 'isolate':
-          executionResult = await this.executeIsolateAction(action, response)
+          executionResult = await executeIsolateAction(action, response)
           break
         case 'alert':
           executionResult = await this.executeAlertAction(action, response)
           break
         case 'investigate':
-          executionResult = await this.executeInvestigateAction(
+          executionResult = await executeInvestigateAction(
             action,
             response,
           )
           break
         case 'mitigate':
-          executionResult = await this.executeMitigateAction(action, response)
+          executionResult = await executeMitigateAction(action, response)
           break
         case 'rate_limit': {
           throw new Error('Not implemented yet: "rate_limit" case')
@@ -918,59 +540,7 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private async executeBlockAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      // Implement blocking logic (e.g., IP blocking, domain blocking)
-      const parameters = action.parameters || {}
-      const sourceIp = parameters['sourceIp']
-      const duration = parameters['duration']
 
-      if (!sourceIp) {
-        logger.error('Missing source IP for block action')
-        return false
-      }
-
-      // Integrate with firewall or blocking system
-      logger.info('Executing block action', {
-        responseId: response.responseId,
-        sourceIp,
-        duration,
-      })
-
-      // Simulate successful blocking
-      return true
-    } catch (error: unknown) {
-      logger.error('Block action execution failed:', { error })
-      return false
-    }
-  }
-
-  private async executeIsolateAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      // Implement isolation logic (e.g., network isolation, user isolation)
-      const parameters = action.parameters || {}
-      const userId = parameters['userId']
-      const systemId = parameters['systemId']
-
-      logger.info('Executing isolate action', {
-        responseId: response.responseId,
-        userId,
-        systemId,
-      })
-
-      // Simulate successful isolation
-      return true
-    } catch (error: unknown) {
-      logger.error('Isolate action execution failed:', { error })
-      return false
-    }
-  }
 
   private async executeAlertAction(
     action: ResponseAction,
@@ -998,55 +568,7 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private async executeInvestigateAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      // Implement investigation logic (e.g., log analysis, forensic collection)
-      const parameters = action.parameters || {}
-      const depth = parameters['depth']
-      const scope = parameters['scope']
-      const dataSources = parameters['dataSources']
 
-      logger.info('Executing investigate action', {
-        responseId: response.responseId,
-        depth,
-        scope,
-        dataSources,
-      })
-
-      // Simulate successful investigation initiation
-      return true
-    } catch (error: unknown) {
-      logger.error('Investigate action execution failed:', { error })
-      return false
-    }
-  }
-
-  private async executeMitigateAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      // Implement mitigation logic (e.g., patch deployment, configuration changes)
-      const parameters = action.parameters || {}
-      const mitigationType = parameters['mitigationType']
-      const targetSystem = parameters['targetSystem']
-
-      logger.info('Executing mitigate action', {
-        responseId: response.responseId,
-        mitigationType,
-        targetSystem,
-      })
-
-      // Simulate successful mitigation
-      return true
-    } catch (error: unknown) {
-      logger.error('Mitigate action execution failed:', { error })
-      return false
-    }
-  }
 
   private async queueForManualReview(response: ThreatResponse): Promise<void> {
     try {
@@ -1074,7 +596,7 @@ export class AutomatedThreatResponseOrchestratorCore
   private async sendNotifications(response: ThreatResponse): Promise<void> {
     try {
       // Send notifications based on response severity
-      const notificationLevel = this.getNotificationLevel(response.severity)
+      const notificationLevel = getNotificationLevel(response.severity)
 
       if (notificationLevel === 'none') {
         return
@@ -1092,16 +614,16 @@ export class AutomatedThreatResponseOrchestratorCore
       // Send to different channels based on level
       switch (notificationLevel) {
         case 'critical':
-          await this.sendCriticalNotification(notificationData)
+          await sendCriticalNotification(notificationData)
           break
         case 'high':
-          await this.sendHighPriorityNotification(notificationData)
+          await sendHighPriorityNotification(notificationData)
           break
         case 'medium':
-          await this.sendMediumPriorityNotification(notificationData)
+          await sendMediumPriorityNotification(notificationData)
           break
         case 'low':
-          await this.sendLowPriorityNotification(notificationData)
+          await sendLowPriorityNotification(notificationData)
           break
       }
     } catch (error: unknown) {
@@ -1109,35 +631,10 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private getNotificationLevel(severity: string): string {
-    const levels: Record<string, string> = {
-      critical: 'critical',
-      high: 'high',
-      medium: 'medium',
-      low: 'low',
-    }
-    return levels[severity] ?? 'medium'
-  }
 
-  private async sendCriticalNotification(data: any): Promise<void> {
-    // Send critical notifications (SMS, phone calls, immediate alerts)
-    logger.info('Sending critical notification', data)
-  }
 
-  private async sendHighPriorityNotification(data: any): Promise<void> {
-    // Send high priority notifications (email, Slack, etc.)
-    logger.info('Sending high priority notification', data)
-  }
 
-  private async sendMediumPriorityNotification(data: any): Promise<void> {
-    // Send medium priority notifications
-    logger.info('Sending medium priority notification', data)
-  }
 
-  private async sendLowPriorityNotification(data: any): Promise<void> {
-    // Send low priority notifications
-    logger.info('Sending low priority notification', data)
-  }
 
   private async integrateWithExternalSystems(
     response: ThreatResponse,
@@ -1146,7 +643,7 @@ export class AutomatedThreatResponseOrchestratorCore
       // Integrate with configured external systems
       for (const endpoint of this.integrationEndpoints.values()) {
         if (endpoint.enabled !== false) {
-          await this.sendToIntegrationEndpoint(endpoint, response)
+          await sendToIntegrationEndpoint(endpoint, response)
         }
       }
     } catch (error: unknown) {
@@ -1154,25 +651,6 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private async sendToIntegrationEndpoint(
-    endpoint: IntegrationEndpoint,
-    _response: ThreatResponse,
-  ): Promise<void> {
-    try {
-      logger.info('Sending to integration endpoint', {
-        endpoint: endpoint.endpointId,
-        service: endpoint.service,
-      })
-
-      // Simulate API call to integration endpoint
-      // In a real implementation, this would make actual HTTP requests
-    } catch (error: unknown) {
-      logger.error('Integration endpoint communication failed:', {
-        error,
-        endpoint: endpoint.endpointId,
-      })
-    }
-  }
 
   private async storeThreatResponse(response: ThreatResponse): Promise<void> {
     try {
@@ -1249,7 +727,7 @@ export class AutomatedThreatResponseOrchestratorCore
       for (let i = response.actions.length - 1; i >= 0; i--) {
         const action = response.actions[i]
         if (action?.rollbackStrategy) {
-          const result = await this.executeRollbackAction(action, response)
+          const result = await executeRollbackAction(action, response)
           rollbackResults.push(result)
         }
       }
@@ -1275,88 +753,8 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private async executeRollbackAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      logger.info('Executing rollback action', {
-        responseId: response.responseId,
-        actionId: action.actionId,
-        rollbackStrategy: action.rollbackStrategy,
-      })
 
-      // Execute rollback based on strategy
-      switch (action.rollbackStrategy) {
-        case 'unblock_ip':
-          return await this.rollbackBlockAction(action, response)
-        case 'remove_rate_limit':
-          return await this.rollbackRateLimitAction(action, response)
-        case undefined: {
-          throw new Error('Not implemented yet: undefined case')
-        }
-        default:
-          logger.warn('Unknown rollback strategy', {
-            actionId: action.actionId,
-            rollbackStrategy: action.rollbackStrategy,
-          })
-          return false
-      }
-    } catch (error: unknown) {
-      logger.error('Rollback action execution failed:', {
-        error,
-        actionId: action.actionId,
-      })
-      return false
-    }
-  }
 
-  private async rollbackBlockAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      const parameters = action.parameters || {}
-      const sourceIp = parameters['sourceIp']
-
-      if (!sourceIp) {
-        logger.error('Missing source IP for rollback')
-        return false
-      }
-
-      // Implement unblock logic
-      logger.info('Rolling back block action', {
-        responseId: response.responseId,
-        sourceIp,
-      })
-
-      return true
-    } catch (error: unknown) {
-      logger.error('Rollback block action failed:', { error })
-      return false
-    }
-  }
-
-  private async rollbackRateLimitAction(
-    action: ResponseAction,
-    response: ThreatResponse,
-  ): Promise<boolean> {
-    try {
-      const parameters = action.parameters || {}
-      const userId = parameters['userId']
-
-      // Implement remove rate limit logic
-      logger.info('Rolling back rate limit action', {
-        responseId: response.responseId,
-        userId,
-      })
-
-      return true
-    } catch (error: unknown) {
-      logger.error('Rollback rate limit action failed:', { error })
-      return false
-    }
-  }
 
   private async getThreatResponse(
     responseId: string,
@@ -1392,7 +790,7 @@ export class AutomatedThreatResponseOrchestratorCore
       })
 
       // Validate strategy
-      this.validateResponseStrategy(strategy)
+      validateResponseStrategy(strategy)
 
       // Update in memory
       this.responseStrategies.set(strategy.strategyId, strategy)
@@ -1413,21 +811,6 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private validateResponseStrategy(strategy: ResponseStrategy): void {
-    if (
-      !strategy.strategyId ||
-      !strategy.responseActions ||
-      strategy.responseActions.length === 0
-    ) {
-      throw new Error('Invalid response strategy: missing required fields')
-    }
-
-    if (strategy.priority < 0 || strategy.priority > 100) {
-      throw new Error(
-        'Invalid response strategy: priority must be between 0 and 100',
-      )
-    }
-  }
 
   async getResponseHistory(
     threatId: string,
@@ -1673,9 +1056,6 @@ export class AutomatedThreatResponseOrchestratorCore
     }
   }
 
-  private generateResponseId(): string {
-    return `response_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
-  }
 
   async shutdown(): Promise<void> {
     try {
