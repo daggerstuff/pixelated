@@ -1,12 +1,8 @@
 import {
   ResearchPlatformConfig,
-  ResearchQuery,
   ResearchAPIResponse,
-  ResearchDataPoint,
-  ConsentLevel,
   ValidationResult,
   SystemMetrics,
-  ResearchConsent,
   Alert,
   AuditLog,
 } from '@/lib/research/types/research-types'
@@ -17,16 +13,22 @@ import {
   ConsentManagementService,
   type ConsentUpdate,
 } from './services/ConsentManagementService'
-import {
-  EvidenceGenerationService,
-  type EvidenceRequest,
-} from './services/EvidenceGenerationService'
+import { EvidenceGenerationService } from './services/EvidenceGenerationService'
 import { HIPAADataService } from './services/HIPAADataService'
-import {
-  PatternDiscoveryService,
-  type DiscoveryRequest,
-} from './services/PatternDiscoveryService'
+import { PatternDiscoveryService } from './services/PatternDiscoveryService'
 import { ResearchQueryEngine } from './services/ResearchQueryEngine'
+import {
+  asString,
+  extractClientIdsFromUnknownData,
+  mapConsentLevel,
+  mapConsentLevelForAnonymization,
+  normalizeResearchData,
+  parseDiscoveryRequest,
+  parseEvidenceRequest,
+  parseResearchQuery,
+  toBoolean,
+  toRecord,
+} from './researchParsing'
 
 const logger = getLogger('ResearchPlatform')
 
@@ -329,7 +331,7 @@ export class ResearchPlatform {
 
     try {
       // Validate consent
-      const sanitizedData = this.normalizeResearchData(data)
+      const sanitizedData = normalizeResearchData(data)
       const clientIds = sanitizedData.map((d) => d.clientId)
       const consentValidation =
         await this.consentService.validateResearchAccess(
@@ -361,7 +363,7 @@ export class ResearchPlatform {
       // Anonymize data
       const anonymized = await this.anonymizationService.anonymizeResearchData(
         sanitizedData,
-        this.mapConsentLevelForAnonymization(consentLevel),
+        mapConsentLevelForAnonymization(consentLevel),
       )
 
       // Encrypt sensitive data
@@ -395,7 +397,7 @@ export class ResearchPlatform {
         },
       }
     } catch (error: unknown) {
-      const clientIds = this.extractClientIdsFromUnknownData(data)
+      const clientIds = extractClientIdsFromUnknownData(data)
       this.recordAudit({
         action: 'submit_research_data',
         userId,
@@ -477,7 +479,7 @@ export class ResearchPlatform {
       }
 
       // Execute query
-      const parsedQuery = this.parseResearchQuery(query)
+      const parsedQuery = parseResearchQuery(query)
       if (!parsedQuery) {
         return {
           success: false,
@@ -589,7 +591,7 @@ export class ResearchPlatform {
       }
 
       // Discover patterns
-      const discoveryRequest = this.parseDiscoveryRequest(request)
+      const discoveryRequest = parseDiscoveryRequest(request)
       if (!discoveryRequest) {
         return {
           success: false,
@@ -667,7 +669,7 @@ export class ResearchPlatform {
       }
 
       // Generate evidence
-      const evidenceRequest = this.parseEvidenceRequest(request)
+      const evidenceRequest = parseEvidenceRequest(request)
       if (!evidenceRequest) {
         return {
           success: false,
@@ -727,7 +729,7 @@ export class ResearchPlatform {
 
     try {
       let result: unknown
-      const consentData = this.toRecord(data)
+      const consentData = toRecord(data)
       if (!consentData) {
         return {
           success: false,
@@ -738,18 +740,18 @@ export class ResearchPlatform {
         }
       }
 
-      const consentLevel = this.mapConsentLevel(
-        this.asString(consentData['level']) ?? this.config.consent.defaultLevel,
+      const consentLevel = mapConsentLevel(
+        asString(consentData['level']) ?? this.config.consent.defaultLevel,
       )
       const metadata =
-        this.toRecord(consentData['metadata']) ??
-        this.toRecord(consentData['metaData']) ??
+        toRecord(consentData['metadata']) ??
+        toRecord(consentData['metaData']) ??
         undefined
       const reason =
         typeof consentData['reason'] === 'string'
           ? consentData['reason']
           : undefined
-      const immediate = this.toBoolean(consentData['immediate'])
+      const immediate = toBoolean(consentData['immediate'])
       const update: ConsentUpdate = {
         clientId,
         newLevel: consentLevel,
@@ -783,7 +785,7 @@ export class ResearchPlatform {
             if (message.includes('No consent record found')) {
               const initialized = await this.consentService.initializeConsent(
                 clientId,
-                this.mapConsentLevel(
+                mapConsentLevel(
                   typeof consentData['level'] === 'string'
                     ? consentData['level']
                     : this.config.consent.defaultLevel,
@@ -985,298 +987,6 @@ export class ResearchPlatform {
     }
   }
 
-  private toBoolean(value: unknown): boolean {
-    return typeof value === 'boolean' ? value : false
-  }
-
-  private asString(value: unknown): string | undefined {
-    return typeof value === 'string' ? value : undefined
-  }
-
-  private isRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value)
-  }
-
-  private toRecord(value: unknown): Record<string, unknown> | undefined {
-    return this.isRecord(value) ? value : undefined
-  }
-
-  private parseDate(value: unknown): Date | undefined {
-    if (value instanceof Date && !Number.isNaN(value.getTime())) {
-      return value
-    }
-    if (typeof value === 'string' || typeof value === 'number') {
-      const date = new Date(value)
-      if (!Number.isNaN(date.getTime())) {
-        return date
-      }
-    }
-    return undefined
-  }
-
-  private parseDateString(value: unknown): string | undefined {
-    const date = this.parseDate(value)
-    return date ? date.toISOString() : undefined
-  }
-
-  private toNumberRecord(value: unknown): Record<string, number> {
-    const out: Record<string, number> = {}
-    if (!this.isRecord(value)) return out
-    for (const [key, v] of Object.entries(value)) {
-      if (typeof v === 'number' && Number.isFinite(v)) {
-        out[key] = v
-      }
-    }
-    return out
-  }
-
-  private normalizeResearchData(data: unknown[]): ResearchDataPoint[] {
-    return data
-      .map((entry) => this.parseResearchDataPoint(entry))
-      .filter((entry): entry is ResearchDataPoint => entry !== undefined)
-  }
-
-  private extractClientIdsFromUnknownData(data: unknown[]): string[] {
-    return this.normalizeResearchData(data).map((entry) => entry.clientId)
-  }
-
-  private parseResearchDataPoint(
-    entry: unknown,
-  ): ResearchDataPoint | undefined {
-    if (!this.isRecord(entry)) return undefined
-
-    const timestamp = this.parseDate(entry['timestamp'])
-    const sessionDuration =
-      typeof entry['sessionDuration'] === 'number'
-        ? entry['sessionDuration']
-        : undefined
-    if (
-      typeof entry['id'] !== 'string' ||
-      typeof entry['clientId'] !== 'string' ||
-      typeof entry['sessionId'] !== 'string' ||
-      !timestamp ||
-      typeof sessionDuration !== 'number'
-    ) {
-      return undefined
-    }
-
-    return {
-      id: entry['id'],
-      clientId: entry['clientId'],
-      sessionId: entry['sessionId'],
-      timestamp,
-      emotionScores: this.toNumberRecord(entry['emotionScores']),
-      techniqueEffectiveness: this.toNumberRecord(
-        entry['techniqueEffectiveness'],
-      ),
-      sessionDuration,
-      age: this.asString(entry['age']),
-      gender: this.asString(entry['gender']),
-      location: this.asString(entry['location']),
-      therapeuticApproach: this.asString(entry['therapeuticApproach']),
-      outcomeScore:
-        typeof entry['outcomeScore'] === 'number'
-          ? entry['outcomeScore']
-          : undefined,
-      metadata: this.toRecord(entry['metadata']),
-    }
-  }
-
-  private parseResearchQuery(query: unknown): ResearchQuery | undefined {
-    if (!this.isRecord(query)) return undefined
-
-    const type = this.asString(query['type'])
-    if (!type || !this.isResearchQueryType(type)) {
-      return undefined
-    }
-
-    const anonymizationLevel = this.asString(query['anonymizationLevel'])
-    if (!anonymizationLevel || !this.isAnonymizationLevel(anonymizationLevel)) {
-      return undefined
-    }
-
-    return {
-      id: this.asString(query['id']) ?? crypto.randomUUID(),
-      type,
-      sql: this.asString(query['sql']),
-      parameters: this.toRecord(query['parameters']) ?? {},
-      description: this.asString(query['description']) ?? '',
-      context: this.asString(query['context']),
-      expectedOutput: this.asString(query['expectedOutput']),
-      requiresApproval: this.toBoolean(query['requiresApproval']),
-      anonymizationLevel: anonymizationLevel,
-      createdAt:
-        this.parseDateString(query['createdAt']) ?? new Date().toISOString(),
-      createdBy: this.asString(query['createdBy']) ?? 'system',
-      approvedBy: this.asString(query['approvedBy']),
-      approvedAt: this.parseDateString(query['approvedAt']),
-    }
-  }
-
-  private isResearchQueryType(value: string): value is ResearchQuery['type'] {
-    return (
-      value === 'sql' ||
-      value === 'pattern-discovery' ||
-      value === 'longitudinal-analysis' ||
-      value === 'cohort-comparison' ||
-      value === 'aggregate-analysis'
-    )
-  }
-
-  private isAnonymizationLevel(
-    value: string,
-  ): value is ResearchQuery['anonymizationLevel'] {
-    return (
-      value === 'none' ||
-      value === 'low' ||
-      value === 'medium' ||
-      value === 'high'
-    )
-  }
-
-  private parseDiscoveryRequest(
-    request: unknown,
-  ): DiscoveryRequest | undefined {
-    if (!this.isRecord(request)) return undefined
-
-    const patternTypes = request['patternTypes']
-    if (!Array.isArray(patternTypes) || patternTypes.length === 0)
-      return undefined
-    const parsedPatternTypes = patternTypes
-      .map((type) => this.asString(type))
-      .filter(
-        (type): type is 'correlation' | 'trend' | 'anomaly' | 'cluster' =>
-          type === 'correlation' ||
-          type === 'trend' ||
-          type === 'anomaly' ||
-          type === 'cluster',
-      )
-
-    const metrics = request['metrics']
-    if (!Array.isArray(metrics) || metrics.length === 0) return undefined
-    const parsedMetrics = metrics.flatMap((metric) => {
-      const parsed = this.asString(metric)
-      return parsed === undefined ? [] : [parsed]
-    })
-
-    const timeRange = request['timeRange']
-    if (!this.isRecord(timeRange)) return undefined
-    const start = this.parseDate(timeRange['start'])
-    const end = this.parseDate(timeRange['end'])
-    if (!start || !end) return undefined
-
-    if (parsedPatternTypes.length === 0 || parsedMetrics.length === 0)
-      return undefined
-
-    return {
-      patternTypes: parsedPatternTypes,
-      metrics: parsedMetrics,
-      timeRange: { start, end },
-      demographicFilters: this.toRecord(request['demographicFilters']),
-      techniqueFilters: this.toRecord(request['techniqueFilters']),
-    }
-  }
-
-  private parseHypothesis(value: unknown):
-    | {
-        id: string
-        statement: string
-        variables: string[]
-        expectedDirection: 'positive' | 'negative' | 'neutral'
-        nullHypothesis: string
-        alternativeHypothesis: string
-      }
-    | undefined {
-    if (!this.isRecord(value)) return undefined
-    const id = this.asString(value['id'])
-    const statement = this.asString(value['statement'])
-    const nullHypothesis = this.asString(value['nullHypothesis'])
-    const alternativeHypothesis = this.asString(value['alternativeHypothesis'])
-    const variables = value['variables']
-    if (
-      !id ||
-      !statement ||
-      !Array.isArray(variables) ||
-      variables.length === 0 ||
-      !nullHypothesis ||
-      !alternativeHypothesis
-    ) {
-      return undefined
-    }
-
-    const parsedVariables = variables.flatMap((v) => {
-      const parsed = this.asString(v)
-      return parsed === undefined ? [] : [parsed]
-    })
-    if (parsedVariables.length === 0) return undefined
-
-    const expectedDirection = this.asString(value['expectedDirection'])
-    if (
-      expectedDirection !== 'positive' &&
-      expectedDirection !== 'negative' &&
-      expectedDirection !== 'neutral'
-    ) {
-      return undefined
-    }
-
-    return {
-      id,
-      statement,
-      variables: parsedVariables,
-      expectedDirection,
-      nullHypothesis,
-      alternativeHypothesis,
-    }
-  }
-
-  private parseEvidenceRequest(request: unknown): EvidenceRequest | undefined {
-    if (!this.isRecord(request)) return undefined
-    const hypotheses = request['hypotheses']
-    if (!Array.isArray(hypotheses) || hypotheses.length === 0) return undefined
-
-    const parsedHypotheses = hypotheses
-      .map((hypothesis) => this.parseHypothesis(hypothesis))
-      .filter(
-        (hypothesis): hypothesis is EvidenceRequest['hypotheses'][number] =>
-          hypothesis !== undefined,
-      )
-
-    if (parsedHypotheses.length === 0) return undefined
-
-    return {
-      hypotheses: parsedHypotheses,
-      dataFilters: this.toRecord(request['dataFilters']),
-      timeRange: this.isRecord(request['timeRange'])
-        ? {
-            start: this.parseDate(request['timeRange']['start']) ?? new Date(0),
-            end: this.parseDate(request['timeRange']['end']) ?? new Date(0),
-          }
-        : undefined,
-      demographicFilters: this.toRecord(request['demographicFilters']),
-      techniqueFilters: this.toRecord(request['techniqueFilters']),
-    }
-  }
-
-  private mapConsentLevelForAnonymization(
-    level: string,
-  ): 'minimal' | 'limited' | 'full' {
-    const mapped = this.mapConsentLevel(level)
-    return mapped === 'none' ? 'minimal' : mapped
-  }
-
-  private mapConsentLevel(level: string): ConsentLevel {
-    if (
-      level === 'none' ||
-      level === 'minimal' ||
-      level === 'limited' ||
-      level === 'full'
-    ) {
-      return level
-    }
-
-    if (level === 'high') return 'full'
-    return 'minimal'
-  }
 
   private recordAudit(entry: AuditLog): void {
     this.platformAuditLog.push(entry)
