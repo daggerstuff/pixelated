@@ -1,0 +1,19 @@
+# Colab Nightmare-Fuel run env — copy to /content/nf_env and fill in.
+# Loaded by scripts/colab_nf_bootstrap.py (load_env reads KEY=VALUE lines).
+
+# --- Generation target ---
+TARGET=50000
+LOCAL_MODEL=gurubot/wayfarer-2-12B
+
+# --- Crash-persistence upload (optional but recommended) ---
+# R2 S3-compatible endpoint (Cloudflare). Bucket/prefix verified:
+#   bucket "training" @ 6c9200f8f880a7f846e70cda63baa1be.r2.cloudflarestorage.com
+#   prefix colab_nf_output
+R2_ENDPOINT=https://6c9200f8f880a7f846e70cda63baa1be.r2.cloudflarestorage.com
+R2_ACCESS_KEY_ID=<fill-from-.env.bak>
+R2_SECRET_ACCESS_KEY=<fill-from-.env.bak>
+R2_BUCKET=training
+
+# --- Observability (optional) ---
+#LANGSMITH_API_KEY=
+#WANDB_API_KEY=
