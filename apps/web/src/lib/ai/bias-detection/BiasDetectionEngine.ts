@@ -12,8 +12,6 @@ import { getPerformanceOptimizer, type PerformanceOptimizer } from "./performanc
 import { PythonBiasDetectionBridge } from "./python-bridge";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
-const biasLogger = createBuildSafeLogger("bias-detection");
-
 import type {
   AlertLevel,
   AnalysisResult,
@@ -28,81 +26,26 @@ import type {
   UserContext,
 } from "./types";
 
-const logger = createBuildSafeLogger("BiasDetectionEngine");
-
-type LayerResults = import("./types").LayerResults;
-
-const DEFAULT_THRESHOLDS: BiasThresholdsConfig = {
-  warning: 0.3,
-  high: 0.6,
-  critical: 0.8,
-};
-
-const DEFAULT_WEIGHTS: BiasLayerWeights = {
-  preprocessing: 0.25,
-  modelLevel: 0.25,
-  interactive: 0.25,
-  evaluation: 0.25,
-};
-
-function isRecordValue(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
-}
-
-function toStringValue(value: unknown): string {
-  return typeof value === "string" ? value : "";
-}
-
-function toNumberValue(value: unknown): number {
-  return typeof value === "number" ? value : 0;
-}
-
-function toStringArrayValue(value: unknown): string[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value.every((item): item is string => typeof item === "string") ? value : [];
-}
-
-type DemographicsSnapshot = {
-  age: string;
-  gender: string;
-  ethnicity: string;
-  primaryLanguage: string;
-};
-
-function toDemographics(demographics: Record<string, unknown> | undefined): DemographicsSnapshot {
-  return {
-    age: toStringValue(demographics?.["age"]),
-    gender: toStringValue(demographics?.["gender"]),
-    ethnicity: toStringValue(demographics?.["ethnicity"]),
-    primaryLanguage: toStringValue(demographics?.["primaryLanguage"]),
-  };
-}
-
-function normalizeError(error: unknown): Error {
-  return error instanceof Error ? error : new Error(String(error));
-}
-
-function toAlertLevel(value: string): AlertLevel {
-  if (value === "low" || value === "medium" || value === "high" || value === "critical") {
-    return value;
-  }
-  return "low";
-}
-
-function isSessionData(value: unknown): value is SessionData {
-  return (
-    isRecordValue(value) && typeof value["sessionId"] === "string" && value["sessionId"] !== ""
-  );
-}
-
-function validateWeights(w: BiasLayerWeights): void {
-  const sum = w["preprocessing"] + w["modelLevel"] + w["interactive"] + w["evaluation"];
-  if (Math.abs(sum - 1) > 1e-6) {
-    throw new Error("Layer weights must sum to 1.0");
-  }
-}
+import {
+  biasLogger,
+  logger,
+  DEFAULT_THRESHOLDS,
+  DEFAULT_WEIGHTS,
+  isRecordValue,
+  toStringValue,
+  toNumberValue,
+  toStringArrayValue,
+  toDemographics,
+  normalizeError,
+  toAlertLevel,
+  isSessionData,
+  validateWeights,
+  fallbackLayer,
+  getPreprocessingFallback,
+  getModelLevelFallback,
+  getInteractiveFallback,
+  getEvaluationFallback,
+} from "./bias-detection-engine.utils";
 
 export class BiasDetectionEngine {
   private readonly config: BiasDetectionConfig & {
@@ -290,10 +233,6 @@ export class BiasDetectionEngine {
    * Note: All integration and error‑handling tests should expect a fallback biasScore of 0.5
    * for failed layers. Any changes to this value require test and documentation updates.
    */
-  private fallbackLayer(): { biasScore: number; confidence: number } {
-    return { biasScore: 0.5, confidence: 0.4 };
-  }
-
   private computeAlertLevel(score: number): AlertLevel {
     const thresholds = this.config.thresholds;
     const warning = thresholds.warning;
@@ -349,119 +288,6 @@ export class BiasDetectionEngine {
   /**
    * Returns fallback result for preprocessing analysis.
    */
-  private getPreprocessingFallback(): PreprocessingAnalysisResult {
-    const fb = this.fallbackLayer();
-    return {
-      biasScore: fb.biasScore,
-      linguisticBias: {
-        genderBiasScore: 0,
-        racialBiasScore: 0,
-        ageBiasScore: 0,
-        culturalBiasScore: 0,
-        biasedTerms: [],
-        sentimentAnalysis: {
-          overallSentiment: 0,
-          emotionalValence: 0,
-          subjectivity: 0,
-          demographicVariations: {},
-        },
-      },
-      representationAnalysis: {
-        demographicDistribution: {},
-        underrepresentedGroups: [],
-        overrepresentedGroups: [],
-        diversityIndex: 0,
-        intersectionalityAnalysis: [],
-      },
-      dataQualityMetrics: {
-        completeness: 1,
-        consistency: 1,
-        accuracy: 1,
-        timeliness: 1,
-        validity: 1,
-        missingDataByDemographic: {},
-      },
-      recommendations: [],
-    };
-  }
-
-  /**
-   * Returns fallback result for model-level analysis.
-   */
-  private getModelLevelFallback(): ModelLevelAnalysisResult {
-    const fb = this.fallbackLayer();
-    return {
-      biasScore: fb.biasScore,
-      fairnessMetrics: {
-        demographicParity: 0,
-        equalizedOdds: 0,
-        equalOpportunity: 0,
-        calibration: 0,
-        individualFairness: 0,
-        counterfactualFairness: 0,
-      },
-      performanceMetrics: {
-        accuracy: 0,
-        precision: 0,
-        recall: 0,
-        f1Score: 0,
-        auc: 0,
-        calibrationError: 0,
-        demographicBreakdown: {},
-      },
-      groupPerformanceComparison: [],
-      recommendations: [],
-    };
-  }
-
-  /**
-   * Returns fallback result for interactive analysis.
-   */
-  private getInteractiveFallback(): InteractiveAnalysisResult {
-    const fb = this.fallbackLayer();
-    return {
-      biasScore: fb.biasScore,
-      counterfactualAnalysis: {
-        scenariosAnalyzed: 0,
-        biasDetected: false,
-        consistencyScore: 0,
-        problematicScenarios: [],
-      },
-      featureImportance: [],
-      whatIfScenarios: [],
-      recommendations: [],
-    };
-  }
-
-  /**
-   * Returns fallback result for evaluation analysis.
-   */
-  private getEvaluationFallback(): EvaluationAnalysisResult {
-    const fb = this.fallbackLayer();
-    return {
-      biasScore: fb.biasScore,
-      huggingFaceMetrics: {
-        toxicity: 0.05,
-        bias: 0.15,
-        regard: {},
-        stereotype: 0.1,
-        fairness: 0.85,
-      },
-      customMetrics: {
-        therapeuticBias: 0.1,
-        culturalSensitivity: 0.1,
-        professionalEthics: 0.1,
-        patientSafety: 0.1,
-      },
-      temporalAnalysis: {
-        trendDirection: "stable",
-        changeRate: 0,
-        seasonalPatterns: [],
-        interventionEffectiveness: [],
-      },
-      recommendations: [],
-    };
-  }
 
   private handleSettledPromise<T>(
     result: PromiseSettledResult<T>,
@@ -499,25 +325,25 @@ export class BiasDetectionEngine {
     const layerResults: LayerResults = {
       preprocessing: this.handleSettledPromise(
         results[0],
-        () => this.getPreprocessingFallback(),
+        () => getPreprocessingFallback(),
         "Preprocessing",
         recs,
       ),
       modelLevel: this.handleSettledPromise(
         results[1],
-        () => this.getModelLevelFallback(),
+        () => getModelLevelFallback(),
         "Model-level",
         recs,
       ),
       interactive: this.handleSettledPromise(
         results[2],
-        () => this.getInteractiveFallback(),
+        () => getInteractiveFallback(),
         "Interactive",
         recs,
       ),
       evaluation: this.handleSettledPromise(
         results[3],
-        () => this.getEvaluationFallback(),
+        () => getEvaluationFallback(),
         "Evaluation",
         recs,
       ),
