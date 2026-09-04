@@ -1,8 +1,8 @@
 // Deprecated legacy route file. Modern routes live in projects.ts.
 // Intentionally left without exports to avoid duplicate route definitions.
-import express, { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from "express";
 
-import { asyncHandler, ValidationError } from '../middleware/error-handler'
+import { asyncHandler, ValidationError } from "../middleware/error-handler";
 import {
   getProject,
   updateProject,
@@ -10,69 +10,69 @@ import {
   listProjects,
   searchProjects,
   shareProject,
-} from '../lib/services/project-service'
+} from "../services/project-service";
 
-const router: Router = express.Router()
+const router: Router = express.Router();
 
 /**
  * GET /projects
  * List all projects accessible to user
  */
 router.get(
-  '/',
+  "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, category, status } = req.query
-    const { user } = req as unknown as { user: { id: string } }
+    const { page, limit, category, status } = req.query;
+    const { user } = req as unknown as { user: { id: string } };
 
     const result = await listProjects(user.id, {
       page: page ? parseInt(page as string) : 1,
       limit: limit ? parseInt(limit as string) : 50,
       category: category as string,
       status: status as string,
-    })
+    });
 
     res.json({
       success: true,
       ...result,
-    })
+    });
   }),
-)
+);
 
 /**
  * GET /projects/:projectId
  * Get project details
  */
 router.get(
-  '/:projectId',
+  "/:projectId",
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params['projectId'] as string
-    const { user } = req as unknown as { user: { id: string } }
+    const projectId = req.params["projectId"] as string;
+    const { user } = req as unknown as { user: { id: string } };
 
-    const project = await getProject(projectId, user.id)
+    const project = await getProject(projectId, user.id);
 
     res.json({
       success: true,
       data: project,
-    })
+    });
   }),
-)
+);
 
 /**
  * PUT /projects/:projectId
  * Update project details
  */
 router.put(
-  '/:projectId',
+  "/:projectId",
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params['projectId'] as string
+    const projectId = req.params["projectId"] as string;
     const { name, description, category, budget, status } = req.body as {
-      name?: string
-      description?: string
-      category?: string
-      budget?: number
-      status?: string
-    }
-    const { user } = req as unknown as { user: { id: string } }
+      name?: string;
+      description?: string;
+      category?: string;
+      budget?: number;
+      status?: string;
+    };
+    const { user } = req as unknown as { user: { id: string } };
 
     const project = await updateProject(projectId, user.id, {
       name,
@@ -80,35 +80,35 @@ router.put(
       category,
       budget,
       status,
-    })
+    });
 
     res.json({
       success: true,
       data: project,
-    })
+    });
   }),
-)
+);
 
 /**
  * POST /projects/:projectId/objectives
  * Add objective to project
  */
 router.post(
-  '/:projectId/objectives',
+  "/:projectId/objectives",
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params['projectId'] as string
+    const projectId = req.params["projectId"] as string;
     const { title, description, successCriteria, deadline } = req.body as {
-      title?: string
-      description?: string
-      successCriteria?: string[]
-      deadline?: string | Date
-    }
-    const { user } = req as unknown as { user: { id: string } }
+      title?: string;
+      description?: string;
+      successCriteria?: string[];
+      deadline?: string | Date;
+    };
+    const { user } = req as unknown as { user: { id: string } };
 
     if (!title) {
-      throw new ValidationError('Objective title is required', {
-        title: 'title is required',
-      })
+      throw new ValidationError("Objective title is required", {
+        title: "title is required",
+      });
     }
 
     const project = await addObjective(projectId, user.id, {
@@ -116,73 +116,73 @@ router.post(
       description,
       successCriteria,
       deadline: deadline ? new Date(deadline) : undefined,
-    })
+    });
 
     res.json({
       success: true,
       data: project,
-    })
+    });
   }),
-)
+);
 
 /**
  * POST /projects/:projectId/share
  * Share project with another user
  */
 router.post(
-  '/:projectId/share',
+  "/:projectId/share",
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params['projectId'] as string
+    const projectId = req.params["projectId"] as string;
     const { userId, permissionLevel } = req.body as {
-      userId?: string
-      permissionLevel?: string
-    }
-    const { user } = req as unknown as { user: { id: string } }
+      userId?: string;
+      permissionLevel?: string;
+    };
+    const { user } = req as unknown as { user: { id: string } };
 
-    if (typeof userId !== 'string' || typeof permissionLevel !== 'string') {
-      throw new ValidationError('userId and permissionLevel required', {
-        userId: 'userId must be a string',
-        permissionLevel: 'permissionLevel must be a string',
-      })
+    if (typeof userId !== "string" || typeof permissionLevel !== "string") {
+      throw new ValidationError("userId and permissionLevel required", {
+        userId: "userId must be a string",
+        permissionLevel: "permissionLevel must be a string",
+      });
     }
 
-    if (!['view', 'edit', 'comment'].includes(permissionLevel)) {
-      throw new ValidationError('Invalid permission level', {
-        permissionLevel: 'invalid permission level',
-      })
+    if (!["view", "edit", "comment"].includes(permissionLevel)) {
+      throw new ValidationError("Invalid permission level", {
+        permissionLevel: "invalid permission level",
+      });
     }
 
     const project = await shareProject(
       projectId,
       user.id,
       userId,
-      permissionLevel as 'view' | 'edit' | 'comment',
-    )
+      permissionLevel as "view" | "edit" | "comment",
+    );
 
     res.json({
       success: true,
       data: project,
-    })
+    });
   }),
-)
+);
 
 /**
  * GET /projects/search/:query
  * Search projects
  */
 router.get(
-  '/search/:query',
+  "/search/:query",
   asyncHandler(async (req: Request, res: Response) => {
-    const query = req.params['query'] as string
-    const { user } = req as unknown as { user: { id: string } }
+    const query = req.params["query"] as string;
+    const { user } = req as unknown as { user: { id: string } };
 
-    const results = await searchProjects(query, user.id)
+    const results = await searchProjects(query, user.id);
 
     res.json({
       success: true,
       data: results,
-    })
+    });
   }),
-)
+);
 
-export default router
+export default router;

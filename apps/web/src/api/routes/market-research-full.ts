@@ -1,41 +1,40 @@
 // Market Research Routes
-import express, { Router, Request, Response } from 'express'
+import express, { Router, Request, Response } from "express";
 
-import { authMiddleware } from '../middleware/auth'
-import { asyncHandler } from '../middleware/error-handler'
-import { ValidationError } from '../middleware/error-handler'
+import { authMiddleware } from "../middleware/auth";
+import { asyncHandler } from "../middleware/error-handler";
+import { ValidationError } from "../middleware/error-handler";
 import {
   createMarketResearch,
   searchMarketResearch,
   shareMarketResearch,
-} from '../lib/services/market-research-service'
+} from "../services/market-research-service";
 
-const router: Router = express.Router()
+const router: Router = express.Router();
 
 // All routes require authentication
-router.use(authMiddleware)
+router.use(authMiddleware);
 
 /**
  * POST /market-research
  * Create new market research document
  */
 router.post(
-  '/',
+  "/",
   asyncHandler(async (req: Request, res: Response) => {
-    const { title, description, targetMarkets, researchType, timeline } =
-      req.body as {
-        title?: string
-        description?: string
-        targetMarkets?: string[]
-        researchType?: string
-        timeline?: { startDate: Date; endDate: Date }
-      }
-    const { id } = (req as unknown as { user: { id: string } }).user
+    const { title, description, targetMarkets, researchType, timeline } = req.body as {
+      title?: string;
+      description?: string;
+      targetMarkets?: string[];
+      researchType?: string;
+      timeline?: { startDate: Date; endDate: Date };
+    };
+    const { id } = (req as unknown as { user: { id: string } }).user;
 
-    if (typeof title !== 'string') {
-      throw new ValidationError('Research title is required', {
-        title: 'Title is required',
-      })
+    if (typeof title !== "string") {
+      throw new ValidationError("Research title is required", {
+        title: "Title is required",
+      });
     }
 
     const research = await createMarketResearch({
@@ -45,76 +44,73 @@ router.post(
       researchType,
       timeline,
       ownerId: id,
-    })
+    });
 
     res.json({
       success: true,
       data: research,
-    })
+    });
   }),
-)
+);
 
 /**
  * GET /market-research/search/:query
  * Search market research
  */
 router.get(
-  '/search/:query',
+  "/search/:query",
   asyncHandler(async (req: Request, res: Response) => {
-    const query = req.params['query'] as string
-    const { id } = (req as unknown as { user: { id: string } }).user
+    const query = req.params["query"] as string;
+    const { id } = (req as unknown as { user: { id: string } }).user;
 
-    const results = await searchMarketResearch(query, id)
+    const results = await searchMarketResearch(query, id);
 
     res.json({
       success: true,
       data: results,
-    })
+    });
   }),
-)
+);
 
 /**
  * POST /market-research/:researchId/share
  * Share research with another user
  */
 router.post(
-  '/:researchId/share',
+  "/:researchId/share",
   asyncHandler(async (req: Request, res: Response) => {
-    const researchId = req.params['researchId'] as string
+    const researchId = req.params["researchId"] as string;
     const { userId, permissionLevel } = req.body as {
-      userId?: string
-      permissionLevel?: string
-    }
-    const { id } = (req as unknown as { user: { id: string } }).user
+      userId?: string;
+      permissionLevel?: string;
+    };
+    const { id } = (req as unknown as { user: { id: string } }).user;
 
-    if (typeof userId !== 'string' || typeof permissionLevel !== 'string') {
-      throw new ValidationError('userId and permissionLevel required', {
-        userId: typeof userId !== 'string' ? 'User ID is required' : '',
-        permissionLevel:
-          typeof permissionLevel !== 'string'
-            ? 'Permission level is required'
-            : '',
-      })
+    if (typeof userId !== "string" || typeof permissionLevel !== "string") {
+      throw new ValidationError("userId and permissionLevel required", {
+        userId: typeof userId !== "string" ? "User ID is required" : "",
+        permissionLevel: typeof permissionLevel !== "string" ? "Permission level is required" : "",
+      });
     }
 
-    if (!['view', 'edit', 'comment'].includes(permissionLevel)) {
-      throw new ValidationError('Invalid permission level', {
-        permissionLevel: 'Invalid permission level',
-      })
+    if (!["view", "edit", "comment"].includes(permissionLevel)) {
+      throw new ValidationError("Invalid permission level", {
+        permissionLevel: "Invalid permission level",
+      });
     }
 
     const research = await shareMarketResearch(
       researchId,
       id,
       userId,
-      permissionLevel as 'view' | 'edit' | 'comment',
-    )
+      permissionLevel as "view" | "edit" | "comment",
+    );
 
     res.json({
       success: true,
       data: research,
-    })
+    });
   }),
-)
+);
 
-export default router
+export default router;
