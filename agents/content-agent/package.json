@@ -17,10 +17,10 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@vercel/connect": "0.2.2",
+    "@vercel/connect": "2.0.1",
     "ai": "7.0.0-beta.178",
     "eve": "^0.47.3",
-    "workers-ai-provider": "^3.2.0",
+    "workers-ai-provider": "^4.0.0",
     "zod": "4.5.4"
   },
   "devDependencies": {
