@@ -1,1 +1,1 @@
-export * from '../../../../lib/langsmith-otel.js';
+export * from '../../../lib/langsmith-otel.js';

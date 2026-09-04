@@ -18,12 +18,16 @@ COPY ${AGENT_DIR}/package.json ${AGENT_DIR}/pnpm-workspace.yaml ./
 RUN pnpm install --no-frozen-lockfile
 
 COPY ${AGENT_DIR}/ ./
- # Copy shared lib files needed by agent path aliases (@/lib/context/*)
- # tsconfig resolves @/lib/* -> ../../apps/web/src/lib/* relative to /agent/tsconfig.json = /apps/web/src/lib/*
- # (repo restructure 2026-08-26 moved src/lib -> apps/web/src/lib)
- COPY apps/web/src/lib/context/ /src/lib/context/
- # Also copy to /lib/context/ for relative imports like '../../lib/context/startup-profiler.js'
+ # Shared agent libs are copied to /lib so relative imports such as
+ # ../../../lib/channels/eve.js and ../../lib/instrumentation.js resolve to
+ # /lib/... exactly as they resolve against agents/lib during local `eve dev`.
+ COPY agents/lib/ /lib/
+ # Keep the app startup-profiler implementation available for legacy imports
+ # that resolve through /lib/context/startup-profiler.js.
  COPY apps/web/src/lib/context/ /lib/context/
+ # tsconfig aliases resolve @/lib/* against /src/lib/* for generated eve
+ # authored-modules that still use @/lib imports.
+ COPY apps/web/src/lib/context/ /src/lib/context/
  RUN pnpm build
 
 FROM node:24.16.0-bookworm-slim AS runtime
