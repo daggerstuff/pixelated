@@ -90,6 +90,7 @@ END $$;
 ALTER TABLE ehr_state_consent_rules ENABLE ROW LEVEL SECURITY;
 
 -- SELECT: compliance/HIM/systemAdmin see all; other roles see only active rules
+DROP POLICY IF EXISTS ehr_state_consent_rules_select ON ehr_state_consent_rules;
 CREATE POLICY ehr_state_consent_rules_select ON ehr_state_consent_rules FOR SELECT
     USING (
         current_setting('request.jwt.claims', true)::jsonb->>'role'
@@ -98,6 +99,7 @@ CREATE POLICY ehr_state_consent_rules_select ON ehr_state_consent_rules FOR SELE
     );
 
 -- INSERT: compliance officers, health information managers, system admins
+DROP POLICY IF EXISTS ehr_state_consent_rules_insert ON ehr_state_consent_rules;
 CREATE POLICY ehr_state_consent_rules_insert ON ehr_state_consent_rules FOR INSERT
     WITH CHECK (
         current_setting('request.jwt.claims', true)::jsonb->>'role'
@@ -105,6 +107,7 @@ CREATE POLICY ehr_state_consent_rules_insert ON ehr_state_consent_rules FOR INSE
     );
 
 -- UPDATE: compliance officers, health information managers, system admins
+DROP POLICY IF EXISTS ehr_state_consent_rules_update ON ehr_state_consent_rules;
 CREATE POLICY ehr_state_consent_rules_update ON ehr_state_consent_rules FOR UPDATE
     USING (
         current_setting('request.jwt.claims', true)::jsonb->>'role'
@@ -116,6 +119,7 @@ CREATE POLICY ehr_state_consent_rules_update ON ehr_state_consent_rules FOR UPDA
     );
 
 -- DELETE: system admins only
+DROP POLICY IF EXISTS ehr_state_consent_rules_delete ON ehr_state_consent_rules;
 CREATE POLICY ehr_state_consent_rules_delete ON ehr_state_consent_rules FOR DELETE
     USING (
         current_setting('request.jwt.claims', true)::jsonb->>'role' = 'systemAdmin'
@@ -162,6 +166,7 @@ CREATE INDEX IF NOT EXISTS idx_ehr_state_consent_rules_audit_tenant
 ALTER TABLE ehr_state_consent_rules_audit ENABLE ROW LEVEL SECURITY;
 
 -- SELECT: compliance officers, health info managers, system admins only
+DROP POLICY IF EXISTS ehr_state_consent_rules_audit_select ON ehr_state_consent_rules_audit;
 CREATE POLICY ehr_state_consent_rules_audit_select ON ehr_state_consent_rules_audit FOR SELECT
     USING (
         current_setting('request.jwt.claims', true)::jsonb->>'role'
@@ -169,16 +174,19 @@ CREATE POLICY ehr_state_consent_rules_audit_select ON ehr_state_consent_rules_au
     );
 
 -- INSERT: actor_role must match JWT role (ensures audit entries are authentic)
+DROP POLICY IF EXISTS ehr_state_consent_rules_audit_insert ON ehr_state_consent_rules_audit;
 CREATE POLICY ehr_state_consent_rules_audit_insert ON ehr_state_consent_rules_audit FOR INSERT
     WITH CHECK (
         actor_role = current_setting('request.jwt.claims', true)::jsonb->>'role'
     );
 
 -- No UPDATE — immutable
+DROP POLICY IF EXISTS ehr_state_consent_rules_audit_update ON ehr_state_consent_rules_audit;
 CREATE POLICY ehr_state_consent_rules_audit_update ON ehr_state_consent_rules_audit FOR UPDATE
     USING (false) WITH CHECK (false);
 
 -- No DELETE — immutable
+DROP POLICY IF EXISTS ehr_state_consent_rules_audit_delete ON ehr_state_consent_rules_audit;
 CREATE POLICY ehr_state_consent_rules_audit_delete ON ehr_state_consent_rules_audit FOR DELETE
     USING (false);
 
