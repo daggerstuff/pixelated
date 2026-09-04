@@ -5,86 +5,30 @@ import Redis from 'ioredis'
 import { MongoClient, type Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import {
+  addRateLimitingInterceptor,
+  mapSeverity,
+  extractConfidence,
+  matchesQuery,
+  extractIOCsFromResponse,
+  getTopThreatTypes,
+  getSeverityDistribution,
+  syncWithVirusTotal,
+  syncWithAbuseIPDB,
+  syncWithAlienVault,
+  queryDatabase,
+  getFeedStatistics,
+} from './external-threat-intelligence.utils'
+export type {
+  ThreatIntelligenceConfig,
+  ThreatIntelligenceFeed,
+  ThreatIntelligence,
+  ThreatIntelligenceQuery,
+  ThreatIntelligenceResult,
+} from './external-threat-intelligence.types'
 import type { ThreatResponse } from '../response-orchestration'
 
 const logger = createBuildSafeLogger('external-threat-intelligence')
-
-export interface ThreatIntelligenceConfig {
-  enabled: boolean
-  feeds: ThreatIntelligenceFeed[]
-  updateInterval: number // milliseconds
-  cacheTimeout: number // milliseconds
-  apiKeys: Record<string, string>
-  mongoUrl?: string
-  redisUrl?: string
-  proxyConfig?: {
-    host: string
-    port: number
-    auth?: {
-      username: string
-      password: string
-    }
-  }
-}
-
-export interface ThreatIntelligenceFeed {
-  name: string
-  type: 'commercial' | 'open_source' | 'community'
-  url: string
-  apiKey?: string
-  authType: 'none' | 'api_key' | 'bearer' | 'basic'
-  rateLimit: {
-    requestsPerMinute: number
-    burstLimit: number
-  }
-  supportedIOCTypes: string[]
-  updateFrequency: number // milliseconds
-  enabled: boolean
-  priority: number
-}
-
-export interface ThreatIntelligence {
-  intelligenceId: string
-  feedName: string
-  iocType: string
-  iocValue: string
-  threatType: string
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  confidence: number
-  firstSeen: Date
-  lastSeen: Date
-  expirationDate?: Date
-  source: string
-  tags: string[]
-  metadata: Record<string, unknown>
-  relatedIOCs?: string[]
-  attribution?: {
-    actor: string
-    campaign: string
-    family: string
-  }
-}
-
-export interface ThreatIntelligenceQuery {
-  iocType?: string
-  iocValue?: string
-  threatType?: string
-  severity?: string
-  tags?: string[]
-  source?: string
-  timeRange?: {
-    start: Date
-    end: Date
-  }
-}
-
-export interface ThreatIntelligenceResult {
-  intelligence: ThreatIntelligence[]
-  totalCount: number
-  sources: string[]
-  queryTime: Date
-  cacheHit: boolean
-}
 
 export class ExternalThreatIntelligenceService extends EventEmitter {
   private mongoClient!: MongoClient
@@ -167,7 +111,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       }
 
       // Add rate limiting interceptor
-      this.addRateLimitingInterceptor(client, feed)
+      addRateLimitingInterceptor(client, feed)
 
       this.httpClients.set(feed.name, client)
     }
@@ -176,49 +120,6 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   /**
    * Add rate limiting interceptor to HTTP client
    */
-  private addRateLimitingInterceptor(
-    client: AxiosInstance,
-    feed: ThreatIntelligenceFeed,
-  ): void {
-    let requestQueue: (() => Promise<void>)[] = []
-    let processing = false
-
-    const processQueue = async () => {
-      if (processing || requestQueue.length === 0) {
-        return
-      }
-
-      processing = true
-      const request = requestQueue.shift()
-
-      if (request) {
-        try {
-          await request()
-        } catch (error: unknown) {
-          logger.error('Rate limited request failed:', {
-            error,
-            feed: feed.name,
-          })
-        }
-      }
-
-      processing = false
-
-      // Schedule next request
-      const delay = 60000 / feed.rateLimit.requestsPerMinute // milliseconds between requests
-      setTimeout(processQueue, delay)
-    }
-
-    client.interceptors.request.use(async (config) => {
-      return new Promise((resolve) => {
-        requestQueue.push(async () => {
-          resolve(config)
-        })
-
-        void processQueue()
-      })
-    })
-  }
 
   /**
    * Start threat intelligence updates
@@ -460,10 +361,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const threatType = String(
         data['threat_type'] ?? data['malware_family'] ?? 'unknown',
       )
-      const severity = this.mapSeverity(
+      const severity = mapSeverity(
         String(data['severity'] ?? data['confidence'] ?? 'medium'),
       )
-      const confidence = this.extractConfidence(
+      const confidence = extractConfidence(
         data['confidence'] ?? data['score'] ?? 50,
       )
 
@@ -572,8 +473,8 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         iocType,
         iocValue,
         threatType,
-        severity: this.mapSeverity(String(data['confidence'] ?? 'medium')),
-        confidence: this.extractConfidence(data['confidence'] ?? 50),
+        severity: mapSeverity(String(data['confidence'] ?? 'medium')),
+        confidence: extractConfidence(data['confidence'] ?? 50),
         firstSeen: new Date((data['created'] ?? Date.now()) as string | number | Date),
         lastSeen: new Date((data['modified'] ?? Date.now()) as string | number | Date),
         source: (data['created_by_ref'] as string) || feed.name,
@@ -593,38 +494,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   /**
    * Map severity string to standardized value
    */
-  private mapSeverity(severity: string): ThreatIntelligence['severity'] {
-    const severityMap: Record<string, ThreatIntelligence['severity']> = {
-      low: 'low',
-      medium: 'medium',
-      high: 'high',
-      critical: 'critical',
-      info: 'low',
-      warning: 'medium',
-      error: 'high',
-      severe: 'critical',
-    }
-
-    return severityMap[severity.toLowerCase()] ?? 'medium'
-  }
 
   /**
    * Extract confidence score from various formats
    */
-  private extractConfidence(confidence: unknown): number {
-    if (typeof confidence === 'number') {
-      return Math.max(0, Math.min(1, confidence / 100)) // Convert percentage to 0-1
-    }
-
-    if (typeof confidence === 'string') {
-      const num = parseFloat(confidence)
-      if (!isNaN(num)) {
-        return Math.max(0, Math.min(1, num / 100))
-      }
-    }
-
-    return 0.5 // Default confidence
-  }
 
   /**
    * Process and store threat intelligence data
@@ -738,7 +611,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       }
 
       // Query database
-      const dbResult = await this.queryDatabase(query)
+      const dbResult = await queryDatabase(this.mongoClient, query)
 
       const result: ThreatIntelligenceResult = {
         ...dbResult,
@@ -790,7 +663,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         const intel = JSON.parse(cachedData) as Partial<ThreatIntelligence>
 
         // Check if cached intelligence matches query criteria
-        if (this.matchesQuery(intel, query)) {
+        if (matchesQuery(intel, query)) {
           return {
             intelligence: [intel as ThreatIntelligence],
             totalCount: 1,
@@ -823,114 +696,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   /**
    * Query threat intelligence database
    */
-  private async queryDatabase(
-    query: ThreatIntelligenceQuery,
-  ): Promise<ThreatIntelligenceResult> {
-    try {
-      const db = this.mongoClient.db('threat_detection')
-      const filter: Record<string, unknown> = {}
-
-      // Build query filter
-      if (query.iocType) {
-        filter['iocType'] = query.iocType
-      }
-
-      if (query.iocValue) {
-        filter['iocValue'] = query.iocValue
-      }
-
-      if (query.threatType) {
-        filter['threatType'] = query.threatType
-      }
-
-      if (query.severity) {
-        filter['severity'] = query.severity
-      }
-
-      if (query.tags && query.tags.length > 0) {
-        filter['tags'] = { $in: query.tags }
-      }
-
-      if (query.source) {
-        filter['source'] = query.source
-      }
-
-      if (query.timeRange) {
-        filter['lastSeen'] = {
-          $gte: query.timeRange.start,
-          $lte: query.timeRange.end,
-        }
-      }
-
-      // Add expiration filter
-      filter['$or'] = [
-        { expirationDate: { $exists: false } },
-        { expirationDate: { $gt: new Date() } },
-      ]
-
-      const intelligence = await db
-        .collection('threat_intelligence')
-        .find(filter)
-        .sort({ confidence: -1, lastSeen: -1 })
-        .limit(100)
-        .toArray()
-
-      const sources = Array.from(
-        new Set(
-          intelligence.map(
-            (i: Record<string, unknown>) => i['feedName'] as string,
-          ),
-        ),
-      )
-
-      return {
-        intelligence: intelligence as unknown as ThreatIntelligence[],
-        totalCount: intelligence.length,
-        sources,
-        queryTime: new Date(),
-        cacheHit: false,
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to query database:', { error })
-      return {
-        intelligence: [],
-        totalCount: 0,
-        sources: [],
-        queryTime: new Date(),
-        cacheHit: false,
-      }
-    }
-  }
 
   /**
    * Check if intelligence matches query criteria
    */
-  private matchesQuery(
-    intel: Partial<ThreatIntelligence>,
-    query: ThreatIntelligenceQuery,
-  ): boolean {
-    if (query.threatType && intel.threatType !== query.threatType) {
-      return false
-    }
-
-    if (query.severity && intel.severity !== query.severity) {
-      return false
-    }
-
-    if (query.source && intel.source !== query.source) {
-      return false
-    }
-
-    if (query.tags && query.tags.length > 0) {
-      const intelTags = intel.tags ?? []
-      const hasMatchingTag = query.tags.some((tag) => intelTags.includes(tag))
-      if (!hasMatchingTag) {
-        return false
-      }
-    }
-
-    return true
-  }
 
   /**
    * Check if IOC is malicious
@@ -992,7 +761,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const intelligenceFindings: Record<string, unknown>[] = []
 
       // Extract IOCs from threat response
-      const iocs = this.extractIOCsFromResponse(threatResponse)
+      const iocs = extractIOCsFromResponse(threatResponse)
 
       for (const ioc of iocs) {
         const checkResult = await this.checkIOC(ioc.type, ioc.value)
@@ -1034,55 +803,6 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   /**
    * Extract IOCs from threat response
    */
-  private extractIOCsFromResponse(
-    threatResponse: ThreatResponse,
-  ): Array<{ type: string; value: string }> {
-    const iocs: Array<{ type: string; value: string }> = []
-
-    try {
-      // Extract from actions
-      for (const action of threatResponse.actions) {
-        if (action.actionType === 'ip_block' && action.parameters['sourceIp']) {
-          iocs.push({
-            type: 'ip',
-            value: action.parameters['sourceIp'] as string,
-          })
-        }
-
-        if (
-          action.actionType === 'domain_block' &&
-          action.parameters['domain']
-        ) {
-          iocs.push({
-            type: 'domain',
-            value: action.parameters['domain'] as string,
-          })
-        }
-      }
-
-      // Extract from metadata
-      if (threatResponse.metadata?.['ip']) {
-        iocs.push({
-          type: 'ip',
-          value: threatResponse.metadata['ip'] as string,
-        })
-      }
-
-      if (threatResponse.metadata?.['userAgent']) {
-        iocs.push({
-          type: 'user_agent',
-          value: threatResponse.metadata['userAgent'] as string,
-        })
-      }
-    } catch (error: unknown) {
-      logger.error('Failed to extract IOCs from response:', {
-        error,
-        responseId: threatResponse.responseId,
-      })
-    }
-
-    return iocs
-  }
 
   /**
    * Get threat intelligence statistics
@@ -1118,9 +838,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
             { expirationDate: { $gt: new Date() } },
           ],
         }),
-        this.getFeedStatistics(db),
-        this.getTopThreatTypes(db),
-        this.getSeverityDistribution(db),
+        getFeedStatistics(this.config, db),
+        getTopThreatTypes(db),
+        getSeverityDistribution(db),
       ])
 
       return {
@@ -1145,117 +865,14 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   /**
    * Get feed statistics
    */
-  private async getFeedStatistics(
-    db: Db,
-  ): Promise<
-    Record<string, { total: number; active: number; lastUpdate: Date }>
-  > {
-    const feedStats: Record<
-      string,
-      { total: number; active: number; lastUpdate: Date }
-    > = {}
-
-    for (const feed of this.config.feeds) {
-      if (!feed.enabled) {
-        continue
-      }
-
-      const [total, active, lastUpdate] = await Promise.all([
-        db
-          .collection('threat_intelligence')
-          .countDocuments({ feedName: feed.name }),
-        db.collection('threat_intelligence').countDocuments({
-          feedName: feed.name,
-          $or: [
-            { expirationDate: { $exists: false } },
-            { expirationDate: { $gt: new Date() } },
-          ],
-        }),
-        db
-          .collection('threat_intelligence')
-          .findOne({ feedName: feed.name }, { sort: { lastSeen: -1 } }),
-      ])
-
-      feedStats[feed.name] = {
-        total,
-        active,
-        lastUpdate: lastUpdate?.['lastSeen'] ?? new Date(0),
-      }
-    }
-
-    return feedStats
-  }
 
   /**
    * Get top threat types
    */
-  private async getTopThreatTypes(
-    db: Db,
-  ): Promise<Array<{ type: string; count: number }>> {
-    const pipeline = [
-      {
-        $group: {
-          _id: '$threatType',
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $sort: { count: -1 },
-      },
-      {
-        $limit: 10,
-      },
-      {
-        $project: {
-          type: '$_id',
-          count: 1,
-          _id: 0,
-        },
-      },
-    ]
-
-    const results = (await db
-      .collection('threat_intelligence')
-      .aggregate(pipeline)
-      .toArray()) as unknown as Array<{ type: string; count: number }>
-
-    return results
-  }
 
   /**
    * Get severity distribution
    */
-  private async getSeverityDistribution(
-    db: Db,
-  ): Promise<Record<string, number>> {
-    const pipeline = [
-      {
-        $group: {
-          _id: '$severity',
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          severity: '$_id',
-          count: 1,
-          _id: 0,
-        },
-      },
-    ]
-
-    const results = (await db
-      .collection('threat_intelligence')
-      .aggregate(pipeline)
-      .toArray()) as unknown as Array<{ severity: string; count: number }>
-
-    const distribution: Record<string, number> = {}
-    for (const result of results) {
-      distribution[result.severity] = result.count
-    }
-
-    return distribution
-  }
 
   /**
    * Clean up expired intelligence
@@ -1314,15 +931,15 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       switch (platform.toLowerCase()) {
         case 'virustotal':
-          await this.syncWithVirusTotal()
+          await syncWithVirusTotal()
           break
 
         case 'abuseipdb':
-          await this.syncWithAbuseIPDB()
+          await syncWithAbuseIPDB()
           break
 
         case 'alienvault':
-          await this.syncWithAlienVault()
+          await syncWithAlienVault()
           break
 
         default:
@@ -1337,26 +954,14 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   /**
    * Sync with VirusTotal
    */
-  private async syncWithVirusTotal(): Promise<void> {
-    // Implementation for VirusTotal API integration
-    logger.info('Syncing with VirusTotal')
-  }
 
   /**
    * Sync with AbuseIPDB
    */
-  private async syncWithAbuseIPDB(): Promise<void> {
-    // Implementation for AbuseIPDB API integration
-    logger.info('Syncing with AbuseIPDB')
-  }
 
   /**
    * Sync with AlienVault OTX
    */
-  private async syncWithAlienVault(): Promise<void> {
-    // Implementation for AlienVault OTX API integration
-    logger.info('Syncing with AlienVault OTX')
-  }
 
   async shutdown(): Promise<void> {
     try {
