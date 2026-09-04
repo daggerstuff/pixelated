@@ -20,46 +20,33 @@ import {
 } from '../global/types'
 
 const logger = createBuildSafeLogger('edge-threat-detection')
-
-export interface EdgeThreatDetectionSystem {
-  initialize(): Promise<void>
-  detectThreat(threatData: RealTimeThreatData): Promise<EdgeDetectionResult>
-  getEdgeNodeStatus(nodeId: string): Promise<EdgeNodeStatus>
-  deployAIModel(modelConfig: AIModelConfig, nodeIds: string[]): Promise<boolean>
-  updateDetectionThresholds(thresholds: DetectionThresholds): Promise<boolean>
-  getHealthStatus(): Promise<HealthStatus>
-  shutdown(): Promise<void>
-}
-
-export interface DetectionThresholds {
-  anomaly: number
-  threat: number
-  confidence: number
-  severity: {
-    low: number
-    medium: number
-    high: number
-    critical: number
-  }
-}
-
-export interface HealthStatus {
-  healthy: boolean
-  message: string
-  responseTime?: number
-  activeNodes?: number
-  totalNodes?: number
-}
-
-export interface ModelPerformance {
-  modelId: string
-  accuracy: number
-  precision: number
-  recall: number
-  f1Score: number
-  inferenceTime: number
-  memoryUsage: number
-}
+import type {
+  DetectionThresholds,
+  HealthStatus,
+  ModelPerformance,
+  ProcessedThreatData,
+  ClassificationResult,
+  CombinedResult,
+} from './edge-threat-detection.types'
+import {
+  buildAnomalyDetectionModel,
+  buildClassificationModel,
+  buildClusteringModel,
+  buildPredictionModel,
+  getLossFunction,
+  createFeatureVector,
+  fallbackAnomalyDetection,
+  fallbackClassification,
+  selectPrimaryModel,
+  extractIndicators,
+  validateThresholds,
+} from './edge-threat-detection.utils'
+export type {
+  EdgeThreatDetectionSystem,
+  DetectionThresholds,
+  HealthStatus,
+  ModelPerformance,
+} from './edge-threat-detection.types'
 
 export class EdgeThreatDetectionSystemCore
   extends EventEmitter
@@ -181,16 +168,16 @@ export class EdgeThreatDetectionSystemCore
       // Add layers based on model type
       switch (modelConfig.modelType) {
         case 'anomaly':
-          this.buildAnomalyDetectionModel(model, modelConfig)
+          buildAnomalyDetectionModel(model, modelConfig)
           break
         case 'classification':
-          this.buildClassificationModel(model, modelConfig)
+          buildClassificationModel(model, modelConfig)
           break
         case 'clustering':
-          this.buildClusteringModel(model, modelConfig)
+          buildClusteringModel(model, modelConfig)
           break
         case 'prediction':
-          this.buildPredictionModel(model, modelConfig)
+          buildPredictionModel(model, modelConfig)
           break
         default:
           throw new Error(
@@ -201,7 +188,7 @@ export class EdgeThreatDetectionSystemCore
       // Compile the model
       model.compile({
         optimizer: tf.train.adam(0.001),
-        loss: this.getLossFunction(modelConfig.modelType),
+        loss: getLossFunction(modelConfig.modelType),
         metrics: ['accuracy'],
       })
 
@@ -214,197 +201,10 @@ export class EdgeThreatDetectionSystemCore
     }
   }
 
-  private buildAnomalyDetectionModel(
-    model: tf.Sequential,
-    _modelConfig: AIModelConfig,
-  ): void {
-    // Autoencoder architecture for anomaly detection
-    model.add(
-      tf.layers.dense({
-        units: 64,
-        activation: 'relu',
-        inputShape: [10],
-      }),
-    )
 
-    model.add(
-      tf.layers.dense({
-        units: 32,
-        activation: 'relu',
-      }),
-    )
 
-    model.add(
-      tf.layers.dense({
-        units: 16,
-        activation: 'relu',
-      }),
-    )
 
-    model.add(
-      tf.layers.dense({
-        units: 8,
-        activation: 'relu',
-      }),
-    )
 
-    // Decoder
-    model.add(
-      tf.layers.dense({
-        units: 16,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 32,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 64,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 10,
-        activation: 'sigmoid',
-      }),
-    )
-  }
-
-  private buildClassificationModel(
-    model: tf.Sequential,
-    _modelConfig: AIModelConfig,
-  ): void {
-    // Classification model for threat categorization
-    model.add(
-      tf.layers.dense({
-        units: 128,
-        activation: 'relu',
-        inputShape: [10],
-      }),
-    )
-
-    model.add(tf.layers.dropout({ rate: 0.3 }))
-
-    model.add(
-      tf.layers.dense({
-        units: 64,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(tf.layers.dropout({ rate: 0.2 }))
-
-    model.add(
-      tf.layers.dense({
-        units: 32,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 4, // 4 threat categories: low, medium, high, critical
-        activation: 'softmax',
-      }),
-    )
-  }
-
-  private buildClusteringModel(
-    model: tf.Sequential,
-    _modelConfig: AIModelConfig,
-  ): void {
-    // Clustering model for threat grouping
-    model.add(
-      tf.layers.dense({
-        units: 64,
-        activation: 'relu',
-        inputShape: [10],
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 32,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 16,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 8,
-        activation: 'relu',
-      }),
-    )
-  }
-
-  private buildPredictionModel(
-    model: tf.Sequential,
-    _modelConfig: AIModelConfig,
-  ): void {
-    // Prediction model for threat forecasting
-    model.add(
-      tf.layers.dense({
-        units: 100,
-        activation: 'relu',
-        inputShape: [10],
-      }),
-    )
-
-    model.add(tf.layers.dropout({ rate: 0.2 }))
-
-    model.add(
-      tf.layers.dense({
-        units: 50,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(tf.layers.dropout({ rate: 0.2 }))
-
-    model.add(
-      tf.layers.dense({
-        units: 25,
-        activation: 'relu',
-      }),
-    )
-
-    model.add(
-      tf.layers.dense({
-        units: 1,
-        activation: 'sigmoid',
-      }),
-    )
-  }
-
-  private getLossFunction(modelType: string): string {
-    switch (modelType) {
-      case 'anomaly':
-        return 'meanSquaredError'
-      case 'classification':
-        return 'categoricalCrossentropy'
-      case 'clustering':
-        return 'meanSquaredError'
-      case 'prediction':
-        return 'binaryCrossentropy'
-      default:
-        return 'meanSquaredError'
-    }
-  }
 
   private async initializeEdgeNodes(): Promise<void> {
     try {
@@ -508,7 +308,7 @@ export class EdgeThreatDetectionSystemCore
         threatType: finalResult.threatType,
         severity: finalResult.scores.combined,
         confidence: finalResult.confidence,
-        indicators: this.extractIndicators(threatData, finalResult),
+        indicators: extractIndicators(threatData, finalResult),
         aiModel: finalResult.primaryModel,
         processingTime: Date.now() - startTime,
         timestamp: new Date(),
@@ -553,7 +353,7 @@ export class EdgeThreatDetectionSystemCore
       indicators: threatData.indicators,
       context: threatData.context,
       normalizedSeverity: this.normalizeSeverity(threatData.severity),
-      featureVector: this.createFeatureVector(threatData),
+      featureVector: createFeatureVector(threatData),
     }
   }
 
@@ -562,44 +362,6 @@ export class EdgeThreatDetectionSystemCore
     return Math.max(0, Math.min(1, severity))
   }
 
-  private createFeatureVector(threatData: RealTimeThreatData): number[] {
-    // Create numerical feature vector for ML models
-    const features: number[] = []
-
-    // Threat severity
-    features.push(threatData.severity)
-
-    // Confidence level
-    features.push(threatData.confidence)
-
-    // Number of indicators
-    features.push(threatData.indicators.length / 10) // Normalize to 0-1
-
-    // Time-based features
-    const hour = threatData.timestamp.getHours()
-    features.push(hour / 24) // Hour of day (0-1)
-    features.push(hour >= 9 && hour <= 17 ? 1 : 0) // Business hours
-
-    // Indicator type distribution
-    const indicatorTypes = new Set(
-      threatData.indicators.map((i) => i.indicatorType),
-    )
-    features.push(indicatorTypes.size / 5) // Normalize to 0-1
-
-    // Geographic features (if available)
-    if (threatData.context?.geographicLocation) {
-      features.push(1) // Has location
-    } else {
-      features.push(0) // No location
-    }
-
-    // Pad or truncate to fixed size (10 features)
-    while (features.length < 10) {
-      features.push(0)
-    }
-
-    return features.slice(0, 10)
-  }
 
   private async extractFeatures(
     processedData: ProcessedThreatData,
@@ -612,7 +374,7 @@ export class EdgeThreatDetectionSystemCore
       const anomalyModel = this.models.get('anomaly_detection')
       if (!anomalyModel) {
         logger.warn('Anomaly detection model not found, using fallback')
-        return this.fallbackAnomalyDetection(features)
+        return fallbackAnomalyDetection(features)
       }
 
       const input = tf.tensor2d([features])
@@ -625,25 +387,10 @@ export class EdgeThreatDetectionSystemCore
       return anomalyScore[0]
     } catch (error: unknown) {
       logger.error('Anomaly detection failed:', { error })
-      return this.fallbackAnomalyDetection(features)
+      return fallbackAnomalyDetection(features)
     }
   }
 
-  private fallbackAnomalyDetection(features: number[]): number {
-    // Simple statistical anomaly detection
-    const mean = features.reduce((sum, val) => sum + val, 0) / features.length
-    const variance =
-      features.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-      features.length
-    const stdDev = Math.sqrt(variance)
-
-    // Calculate z-score for the most anomalous feature
-    const maxDeviation = Math.max(...features.map((f) => Math.abs(f - mean)))
-    const zScore = maxDeviation / (stdDev || 1)
-
-    // Normalize to 0-1 range
-    return Math.min(zScore / 3, 1)
-  }
 
   private async classifyThreat(
     features: number[],
@@ -652,7 +399,7 @@ export class EdgeThreatDetectionSystemCore
       const classificationModel = this.models.get('threat_classification')
       if (!classificationModel) {
         logger.warn('Classification model not found, using fallback')
-        return this.fallbackClassification(features)
+        return fallbackClassification(features)
       }
 
       const input = tf.tensor2d([features])
@@ -675,41 +422,10 @@ export class EdgeThreatDetectionSystemCore
       }
     } catch (error: unknown) {
       logger.error('Threat classification failed:', { error })
-      return this.fallbackClassification(features)
+      return fallbackClassification(features)
     }
   }
 
-  private fallbackClassification(features: number[]): ClassificationResult {
-    // Simple rule-based classification
-    const avgFeature =
-      features.reduce((sum, val) => sum + val, 0) / features.length
-
-    if (avgFeature > 0.7) {
-      return {
-        threatType: 'critical',
-        confidence: 0.8,
-        probabilities: [0.1, 0.2, 0.3, 0.4],
-      }
-    } else if (avgFeature > 0.5) {
-      return {
-        threatType: 'high',
-        confidence: 0.7,
-        probabilities: [0.2, 0.3, 0.4, 0.1],
-      }
-    } else if (avgFeature > 0.3) {
-      return {
-        threatType: 'medium',
-        confidence: 0.6,
-        probabilities: [0.3, 0.4, 0.2, 0.1],
-      }
-    } else {
-      return {
-        threatType: 'low',
-        confidence: 0.5,
-        probabilities: [0.4, 0.3, 0.2, 0.1],
-      }
-    }
-  }
 
   private async predictThreat(features: number[]): Promise<number> {
     try {
@@ -775,7 +491,7 @@ export class EdgeThreatDetectionSystemCore
       )
 
       // Select primary model based on highest confidence
-      const primaryModel = this.selectPrimaryModel(
+      const primaryModel = selectPrimaryModel(
         anomalyScore,
         classificationResult,
         predictionScore,
@@ -833,29 +549,6 @@ export class EdgeThreatDetectionSystemCore
     )
   }
 
-  private selectPrimaryModel(
-    anomalyScore: number,
-    classificationResult: ClassificationResult,
-    predictionScore: number,
-  ): string {
-    const scores = {
-      anomaly_detection: anomalyScore,
-      threat_classification: classificationResult.confidence,
-      threat_prediction: predictionScore,
-    }
-
-    let maxScore = 0
-    let primaryModel = 'threat_classification' // Default
-
-    for (const [model, score] of Object.entries(scores)) {
-      if (score > maxScore) {
-        maxScore = score
-        primaryModel = model
-      }
-    }
-
-    return primaryModel
-  }
 
   private mapScoreToSeverity(
     score: number,
@@ -866,27 +559,6 @@ export class EdgeThreatDetectionSystemCore
     return 'low'
   }
 
-  private extractIndicators(
-    threatData: RealTimeThreatData,
-    finalResult: CombinedResult,
-  ): ThreatIndicator[] {
-    // Extract and enhance indicators based on detection results
-    const enhancedIndicators: ThreatIndicator[] = []
-
-    for (const indicator of threatData.indicators) {
-      enhancedIndicators.push({
-        ...indicator,
-        confidence: Math.min(indicator.confidence * finalResult.confidence, 1),
-        metadata: {
-          ...indicator.metadata,
-          edgeDetectionScore: finalResult.scores.combined,
-          primaryModel: finalResult.primaryModel,
-        },
-      })
-    }
-
-    return enhancedIndicators
-  }
 
   private selectOptimalEdgeNode(region: string): string {
     // Select the edge node with the lowest load and highest availability
@@ -1005,7 +677,7 @@ export class EdgeThreatDetectionSystemCore
       logger.info('Updating detection thresholds', { thresholds })
 
       // Validate thresholds
-      this.validateThresholds(thresholds)
+      validateThresholds(thresholds)
 
       // Cache new thresholds
       await this.redis.setex(
@@ -1022,34 +694,6 @@ export class EdgeThreatDetectionSystemCore
     }
   }
 
-  private validateThresholds(thresholds: DetectionThresholds): void {
-    if (thresholds.anomaly < 0 || thresholds.anomaly > 1) {
-      throw new Error('Anomaly threshold must be between 0 and 1')
-    }
-
-    if (thresholds.threat < 0 || thresholds.threat > 1) {
-      throw new Error('Threat threshold must be between 0 and 1')
-    }
-
-    if (thresholds.confidence < 0 || thresholds.confidence > 1) {
-      throw new Error('Confidence threshold must be between 0 and 1')
-    }
-
-    // Validate severity thresholds
-    const severityThresholds = thresholds.severity
-    if (
-      severityThresholds.low < 0 ||
-      severityThresholds.low > 1 ||
-      severityThresholds.medium < 0 ||
-      severityThresholds.medium > 1 ||
-      severityThresholds.high < 0 ||
-      severityThresholds.high > 1 ||
-      severityThresholds.critical < 0 ||
-      severityThresholds.critical > 1
-    ) {
-      throw new Error('Severity thresholds must be between 0 and 1')
-    }
-  }
 
   async getHealthStatus(): Promise<HealthStatus> {
     try {
@@ -1148,33 +792,3 @@ export class EdgeThreatDetectionSystemCore
 }
 
 // Supporting interfaces
-interface ProcessedThreatData {
-  threatId: string
-  timestamp: Date
-  region: string
-  severity: number
-  confidence: number
-  indicators: ThreatIndicator[]
-  context: ThreatContext
-  normalizedSeverity: number
-  featureVector: number[]
-}
-
-interface ClassificationResult {
-  threatType: string
-  confidence: number
-  probabilities: number[]
-}
-
-interface CombinedResult {
-  threatType: string
-  severity: 'low' | 'medium' | 'high' | 'critical'
-  confidence: number
-  primaryModel: string
-  scores: {
-    anomaly: number
-    classification: number
-    prediction: number
-    combined: number
-  }
-}
