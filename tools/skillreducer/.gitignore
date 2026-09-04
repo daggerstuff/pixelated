@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+.venv/
+venv/
+.env
+*.log
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+optimized/
+output/
+.DS_Store
+skillreducer/tscg/node_modules/

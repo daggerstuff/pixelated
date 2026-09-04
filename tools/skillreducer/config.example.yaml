@@ -1,0 +1,35 @@
+models:
+  compression: meta-llama/Llama-3.3-70B-Instruct:groq
+  routing_oracle: meta-llama/Llama-3.3-70B-Instruct:groq
+  evaluation: meta-llama/Llama-3.3-70B-Instruct:groq
+
+thresholds:
+  short_description_tokens: 40
+  min_reference_tokens: 30
+  min_script_tokens: 20
+  max_feedback_iterations: 2
+  max_restore_steps: 3
+
+oracle:
+  num_test_queries: 8
+  num_distractors: 4
+  include_adversarial: true
+
+# Optional tool-schema compression (requires Node >= 18 and:
+#   cd skillreducer/tscg && npm install
+tscg:
+  enabled: false
+  model: claude-sonnet
+  profile: balanced
+
+# Prefer .env (see .env.example). Env vars override these fields.
+# api_key: sk-...
+# api_base_url: https://api.openai.com/v1
+# base_url: https://api.openai.com/v1   # alias for api_base_url
+#
+# Azure OpenAI (set azure_subscription: true)
+# azure_subscription: true
+# api_key: <azure-api-key>
+# azure_endpoint: https://<resource>.openai.azure.com/
+# api_version: 2024-10-21
+use_llm: true

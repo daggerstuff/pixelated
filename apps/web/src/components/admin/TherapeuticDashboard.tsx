@@ -17,11 +17,7 @@ export const TherapeuticDashboard: React.FC = () => {
   }>({})
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    void checkHealth()
-  }, [])
-
-  const checkHealth = async () => {
+  async function checkHealth() {
     try {
       const status = await therapeuticClient.healthCheck()
       setHealth(status)
@@ -29,6 +25,13 @@ export const TherapeuticDashboard: React.FC = () => {
       setHealth({ status: 'offline' })
     }
   }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void checkHealth()
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   const runAnalysis = async () => {
     setLoading(true)
@@ -39,7 +42,6 @@ export const TherapeuticDashboard: React.FC = () => {
       ])
       setAnalysis({ crisis, pii })
     } catch (e: unknown) {
-      console.error(e)
       alert('Analysis failed')
     } finally {
       setLoading(false)

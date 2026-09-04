@@ -1,4 +1,3 @@
-// import type { APIRoute } from 'astro'
 
 // Simulates a CPU-intensive operation
 async function performHeavyComputation(): Promise<number> {

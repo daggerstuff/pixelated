@@ -346,10 +346,10 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
           }}
         >
           {config.dimensions.x.label}:{' '}
-          {hoveredPoint[config.dimensions.x.field] as any}
+          {hoveredPoint[config.dimensions.x.field] as unknown}
           <br />
           {config.dimensions.y.label}:{' '}
-          {hoveredPoint[config.dimensions.y.field] as any}
+          {hoveredPoint[config.dimensions.y.field] as unknown}
         </div>
       )}
     </div>

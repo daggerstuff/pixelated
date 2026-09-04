@@ -852,7 +852,6 @@ export class PerformanceOptimizer {
    * Get comprehensive performance statistics
    */
   async getPerformanceStats(): Promise<PerformanceStats> {
-    // const connectionHealth = await this.connectionManager.healthCheck() // Removed unused variable
     const memoryStats = this.memoryOptimizer.getStats()
     const cacheStats = this.cacheManager.getStats()
     const batchStats = this.batchProcessor.getStats()

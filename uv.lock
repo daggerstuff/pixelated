@@ -4844,7 +4844,7 @@ requires-dist = [
     { name = "textstat", specifier = ">=0.7.8" },
     { name = "torch", specifier = "==2.13.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "tqdm", specifier = ">=4.67.0" },
-    { name = "transformers", specifier = ">=5.0.0rc3" },
+    { name = "transformers", specifier = ">=5.14.1" },
     { name = "types-requests", marker = "extra == 'dev'" },
     { name = "types-requests", marker = "extra == 'test'" },
     { name = "undetected-chromedriver", specifier = ">=3.5.5" },

@@ -49,7 +49,6 @@ async function connect(): Promise<Db> {
   })
   await client.connect()
   db = client.db(MONGODB_DB_NAME)
-  console.log(`[mongo-client] Connected to MongoDB: ${MONGODB_DB_NAME}`)
   return db
 }
 
@@ -89,7 +88,6 @@ export async function saveSessionHeader(
       )
     return result.upsertedId?.toString() ?? sessionId
   } catch (err) {
-    console.error('[mongo-client] saveSessionHeader failed:', err)
     return null
   }
 }
@@ -130,7 +128,6 @@ export async function saveSessionTranscript(
       emotion_rollup_count: emotionRollups.length,
     }
   } catch (err) {
-    console.error('[mongo-client] saveSessionTranscript failed:', err)
     return {
       session_id: sessionId,
       transcript_count: 0,
@@ -186,7 +183,6 @@ export async function hydrateSession(
       exit_reason: doc.exit_reason ?? null,
     }
   } catch (err) {
-    console.error('[mongo-client] hydrateSession failed:', err)
     return null
   }
 }
@@ -214,7 +210,6 @@ export async function updateSessionState(
     )
     return true
   } catch (err) {
-    console.error('[mongo-client] updateSessionState failed:', err)
     return false
   }
 }

@@ -61,13 +61,14 @@ type SentryShim = {
 
 function getSentry(): SentryShim | null {
   // Primary: use the bundled @sentry/astro SDK
-  if (SentrySDK && typeof (SentrySDK as any).captureException === 'function') {
+  if (SentrySDK && typeof (SentrySDK as Record<string, unknown>).captureException === 'function') {
     return SentrySDK as unknown as SentryShim
   }
   // Fallback: window.Sentry global (for pages that load Sentry via script tag)
   try {
-    if ((window as any)?.Sentry) {
-      return (window as any).Sentry as SentryShim
+    const w = window as Window & typeof globalThis & { Sentry?: unknown }
+    if (w?.Sentry) {
+      return w.Sentry as SentryShim
     }
   } catch (error: unknown) {
     if (IS_DEV) {
@@ -530,7 +531,7 @@ export const sessionMetrics = {
  */
 export async function flushMetrics(): Promise<void> {
   try {
-    const client = getSentry() as any
+    const client = getSentry() as SentryShim | null
     if (client && typeof client.flush === 'function') {
       await client.flush()
     }

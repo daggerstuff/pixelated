@@ -75,53 +75,12 @@ export function ChartWidget({
   const [chart, setChart] = useState<ChartInstance | null>(null)
   const chartRef = useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
-    // Dynamically import Chart.js only in browser environment
-    if (typeof window !== 'undefined' && chartRef.current) {
-      void import('chart.js').then((ChartJS) => {
-        // Register required controllers and elements
-        ChartJS.Chart.register(
-          ChartJS.CategoryScale,
-          ChartJS.LinearScale,
-          ChartJS.PointElement,
-          ChartJS.LineElement,
-          ChartJS.BarElement,
-          ChartJS.ArcElement,
-          ChartJS.Tooltip,
-          ChartJS.Legend,
-        )
-
-        const ctx = chartRef.current?.getContext('2d')
-        if (ctx) {
-          // Destroy any existing chart
-          if (chart) {
-            chart.destroy()
-          }
-
-          // Create configuration based on chart type
-          const config = createChartConfig(chartType, labels, series)
-
-          // Create and store the chart
-          const newChart = new ChartJS.Chart(ctx, config) as ChartInstance
-          setChart(newChart)
-        }
-      })
-    }
-
-    return () => {
-      // Clean up chart on unmount
-      if (chart) {
-        chart.destroy()
-      }
-    }
-  }, [chartType, labels, series, isTimeSeries, chart])
-
   // Function to create chart configuration based on type
-  const createChartConfig = (
+  function createChartConfig(
     type: ChartType,
     chartLabels: string[],
     chartSeries: DataSeries[] | DataPoint[],
-  ) => {
+  ) {
     // Default color palette
     const defaultColors = [
       'rgba(59, 130, 246, 0.5)', // Blue
@@ -215,6 +174,41 @@ export function ChartWidget({
       },
     }
   }
+
+  useEffect(() => {
+    // Dynamically import Chart.js only in browser environment
+    if (typeof window !== 'undefined' && chartRef.current) {
+      void import('chart.js').then((ChartJS) => {
+        ChartJS.Chart.register(
+          ChartJS.CategoryScale,
+          ChartJS.LinearScale,
+          ChartJS.PointElement,
+          ChartJS.LineElement,
+          ChartJS.BarElement,
+          ChartJS.ArcElement,
+          ChartJS.Tooltip,
+          ChartJS.Legend,
+        )
+
+        const ctx = chartRef.current?.getContext('2d')
+        if (ctx) {
+          if (chart) {
+            chart.destroy()
+          }
+
+          const config = createChartConfig(chartType, labels, series)
+          const newChart = new ChartJS.Chart(ctx, config) as ChartInstance
+          setChart(newChart)
+        }
+      })
+    }
+
+    return () => {
+      if (chart) {
+        chart.destroy()
+      }
+    }
+  }, [chartType, labels, series, isTimeSeries, chart])
 
   // Handle data fetching
   useEffect(() => {

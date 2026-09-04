@@ -6,7 +6,7 @@ import { defineHook } from 'eve/hooks'
 export default defineHook({
   events: {
     'session.started'(_event, ctx) {
-      console.log('[content-audit] session started', { agent: ctx.agent.name })
+      // error handled by caller
     },
     'action.result'(event, _ctx) {
       const eventData = (event as { data?: unknown }).data
@@ -16,13 +16,9 @@ export default defineHook({
         'status' in eventData
           ? (eventData as { status?: unknown }).status
           : eventData
-      console.log('[content-audit] action result', { status })
     },
     'message.completed'(event, _ctx) {
       const text = event.data?.message ?? ''
-      console.log('[content-audit] message completed', {
-        chars: typeof text === 'string' ? text.length : 0,
-      })
     },
   },
 })

@@ -12,7 +12,7 @@ import {
   validatePath,
 } from '@/utils/path-security'
 
-const logger = getLogger('secrets-manager' as any)
+const logger = getLogger('secrets-manager')
 
 // Security configuration
 const SECURITY_CONFIG = {
@@ -50,13 +50,15 @@ export interface SecretConfig {
 function generateRandomBytes(length: number): Uint8Array {
   const bytes = new Uint8Array(length)
   // Prefer Web Crypto when available (browsers, modern Node)
-  if ((globalThis as any)?.crypto?.getRandomValues) {
-    ;(globalThis as any).crypto.getRandomValues(bytes)
+  const globalWithCrypto = globalThis as typeof globalThis & { crypto?: Crypto }
+  if (globalWithCrypto.crypto?.getRandomValues) {
+    globalWithCrypto.crypto.getRandomValues(bytes)
     return bytes
   }
-  // Fallback to Math.random (not cryptographically secure, but avoids bundling node:crypto in client)
-  for (let i = 0; i < length; i++) bytes[i] = Math.floor(Math.random() * 256)
-  return bytes
+  // No insecure fallback — cryptographic random is required for secrets
+  throw new Error(
+    'No cryptographically secure random source available (crypto.getRandomValues missing)',
+  )
 }
 
 export class SecretsManager {

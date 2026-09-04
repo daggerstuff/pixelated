@@ -739,7 +739,7 @@ void this.trainAdvancedClassificationModel()
   private generateTechniqueMetrics(
     _metricType: string,
   ): Record<TherapeuticTechnique, number> {
-    const metrics: Record<TherapeuticTechnique, number> = {} as any
+    const metrics = {} as Record<TherapeuticTechnique, number>
     Object.values(TherapeuticTechnique).forEach((technique) => {
       metrics[technique] = Math.random() * 0.3 + 0.6 // 0.6 to 0.9
     })

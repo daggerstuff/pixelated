@@ -249,13 +249,11 @@ export function useSyncedState<T>({
   const [syncStatus, setSyncStatus] = useState<
     'synced' | 'syncing' | 'conflict' | 'offline'
   >('synced')
-  const instanceId = useRef<string | null>(null)
-  if (instanceId.current === undefined) {
-    // Use crypto.randomUUID() for unique, collision-resistant instance IDs
-    instanceId.current = crypto?.randomUUID
+  const [instanceId] = useState<string>(() =>
+    crypto?.randomUUID
       ? crypto.randomUUID()
-      : Math.random().toString(36).substring(2, 11)
-  }
+      : Math.random().toString(36).substring(2, 11),
+  )
 
   const handleStateChange = useCallback((value: T) => {
     setState(value)
@@ -272,7 +270,7 @@ export function useSyncedState<T>({
     () =>
       new SyncLifecycleManager<T>(
         syncManager,
-        instanceId.current!,
+        instanceId,
         {
           key,
           defaultValue,
@@ -287,11 +285,11 @@ export function useSyncedState<T>({
   )
 
   const prevStorageOptionsRef = useRef(storageOptions)
-  if (!deepEqual(prevStorageOptionsRef.current, storageOptions)) {
-    prevStorageOptionsRef.current = storageOptions
-  }
 
   useLayoutEffect(() => {
+    if (!deepEqual(prevStorageOptionsRef.current, storageOptions)) {
+      prevStorageOptionsRef.current = storageOptions
+    }
     manager.updateOptions(
       { key, enableSync, conflictStrategy, defaultValue, debounceMs },
       prevStorageOptionsRef.current,
@@ -305,15 +303,19 @@ export function useSyncedState<T>({
     conflictStrategy,
     defaultValue,
     debounceMs,
-    prevStorageOptionsRef.current,
     onSync,
     onConflict,
   ])
 
   useLayoutEffect(() => {
     manager.init()
-    setIsLoaded(true)
-    return () => manager.cleanup()
+    const timer = window.setTimeout(() => {
+      setIsLoaded(true)
+    }, 0)
+    return () => {
+      window.clearTimeout(timer)
+      manager.cleanup()
+    }
   }, [manager])
 
   const setSyncedState = useCallback((value: T | ((prev: T) => T)) => {

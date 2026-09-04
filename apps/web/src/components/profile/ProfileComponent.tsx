@@ -44,7 +44,6 @@ export function ProfileComponent({ user }: ProfileComponentProps) {
     setIsLoading(true)
 
     // Here you would typically send the updated profile to the server
-    console.log('Updated profile:', formData)
 
     // Mock successful update with delay
     setTimeout(() => {

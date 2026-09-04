@@ -27,7 +27,7 @@ export const GET = async ({ request, url }) => {
 
   try {
     // Verify session
-    session = await (getSession as any)()
+    session = await getSession(request)
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

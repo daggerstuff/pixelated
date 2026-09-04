@@ -12,11 +12,9 @@ export function getRandomBytes(length: number): Uint8Array {
   if (crypto?.getRandomValues) {
     return crypto.getRandomValues(new Uint8Array(length))
   }
-  const bytes = new Uint8Array(length)
-  for (let i = 0; i < length; i++) {
-    bytes[i] = Math.floor(Math.random() * 256)
-  }
-  return bytes
+  throw new Error(
+    'No cryptographically secure random source available (crypto.getRandomValues missing)',
+  )
 }
 
 export function secureRandomIntRange(min: number, max: number): number {

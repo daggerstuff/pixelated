@@ -6,5 +6,3 @@ expect.extend(customMatchers as any)
 
 // Custom matchers for Redis testing
 // Note: Vitest custom matchers would be declared here if needed
-
-export {}

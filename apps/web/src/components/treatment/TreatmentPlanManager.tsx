@@ -1,6 +1,6 @@
 import { format, addDays, differenceInDays } from 'date-fns'
 import { Target, Dumbbell } from 'lucide-react'
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo, useRef } from 'react'
 
 interface TreatmentGoal {
   id: string
@@ -65,6 +65,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   readOnly = false,
 }) => {
   const [currentPlan, setCurrentPlan] = useState<TreatmentPlan | null>(null)
+  const goalCounterRef = useRef(0)
   const [activeTab, setActiveTab] = useState<
     'overview' | 'goals' | 'progress' | 'notes'
   >('overview')
@@ -77,8 +78,8 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
     id: 'plan-1',
     clientName: 'Anonymous Client',
     therapistName: 'Dr. Smith',
-    createdDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-    lastModified: new Date(),
+    createdDate: new Date('2026-08-27T00:00:00Z'),
+    lastModified: new Date('2026-09-03T00:00:00Z'),
     duration: 12,
     status: 'active',
     notes:
@@ -89,7 +90,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         title: 'Reduce Anxiety Symptoms',
         description:
           'Learn and practice anxiety management techniques to reduce daily anxiety levels',
-        targetDate: addDays(new Date(), 30),
+        targetDate: new Date('2026-10-03T00:00:00Z'),
         priority: 'high',
         status: 'in-progress',
         progress: 65,
@@ -99,13 +100,13 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             id: 'm1',
             title: 'Learn breathing techniques',
             completed: true,
-            completedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+            completedDate: new Date('2026-08-29T00:00:00Z'),
           },
           {
             id: 'm2',
             title: 'Practice daily meditation',
             completed: true,
-            completedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+            completedDate: new Date('2026-08-31T00:00:00Z'),
           },
           { id: 'm3', title: 'Identify anxiety triggers', completed: false },
           { id: 'm4', title: 'Develop coping strategies', completed: false },
@@ -116,7 +117,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         title: 'Improve Sleep Quality',
         description:
           'Establish healthy sleep patterns and improve sleep duration and quality',
-        targetDate: addDays(new Date(), 21),
+        targetDate: new Date('2026-09-24T00:00:00Z'),
         priority: 'medium',
         status: 'in-progress',
         progress: 40,
@@ -126,7 +127,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
             id: 'm5',
             title: 'Create bedtime routine',
             completed: true,
-            completedDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+            completedDate: new Date('2026-08-30T00:00:00Z'),
           },
           { id: 'm6', title: 'Limit screen time before bed', completed: false },
           { id: 'm7', title: 'Track sleep patterns', completed: false },
@@ -137,7 +138,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
         title: 'Enhance Social Connections',
         description:
           'Build and maintain meaningful relationships and social support networks',
-        targetDate: addDays(new Date(), 45),
+        targetDate: new Date('2026-10-17T00:00:00Z'),
         priority: 'medium',
         status: 'not-started',
         progress: 0,
@@ -152,7 +153,10 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   }
 
   useEffect(() => {
-    setCurrentPlan(plan ?? defaultPlan)
+    const timer = window.setTimeout(() => {
+      setCurrentPlan(plan ?? defaultPlan)
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [plan, defaultPlan])
 
   // ⚡ Bolt: Memoize O(N) progress calculation to prevent recalculation on tab changes
@@ -198,7 +202,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
       goals: currentPlan.goals.map((goal) =>
         goal.id === goalId ? { ...goal, ...updates } : goal,
       ),
-      lastModified: new Date(),
+      lastModified: new Date('2026-09-03T00:00:00Z'),
     }
 
     setCurrentPlan(updatedPlan)
@@ -234,10 +238,10 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
     if (!currentPlan || !newGoal.title) return
 
     const goal: TreatmentGoal = {
-      id: `goal-${Date.now()}`,
+      id: `goal-${++goalCounterRef.current}`,
       title: newGoal.title || '',
       description: newGoal.description ?? '',
-      targetDate: newGoal.targetDate ?? addDays(new Date(), 30),
+      targetDate: newGoal.targetDate ?? new Date('2026-10-03T00:00:00Z'),
       priority: newGoal.priority ?? 'medium',
       status: 'not-started',
       progress: 0,
@@ -248,7 +252,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
     const updatedPlan = {
       ...currentPlan,
       goals: [...currentPlan.goals, goal],
-      lastModified: new Date(),
+      lastModified: new Date('2026-09-03T00:00:00Z'),
     }
 
     setCurrentPlan(updatedPlan)
@@ -444,7 +448,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                   value={
                     newGoal.targetDate
                       ? format(newGoal.targetDate, 'yyyy-MM-dd')
-                      : format(addDays(new Date(), 30), 'yyyy-MM-dd')
+                      : format(new Date('2026-10-03T00:00:00Z'), 'yyyy-MM-dd')
                   }
                   onChange={(e) =>
                     setNewGoal({
@@ -590,7 +594,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
                 const updatedPlan = {
                   ...currentPlan,
                   notes: e.target.value,
-                  lastModified: new Date(),
+                  lastModified: new Date('2026-09-03T00:00:00Z'),
                 }
                 setCurrentPlan(updatedPlan)
                 onSave?.(updatedPlan)

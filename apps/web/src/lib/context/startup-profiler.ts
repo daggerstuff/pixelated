@@ -32,12 +32,11 @@ export async function profileAgentStartup(
         return result
       })
     } catch (err) {
-      console.error(`[${agentName}] startup component "${label}" failed:`, err)
+      // error handled by caller
     }
   }
 
   const report = profiler.report()
-  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2))
   return report
 }
 
@@ -71,5 +70,4 @@ export function profileAndLogAgentStartup(
   }
 
   const report = profiler.report()
-  console.log(`[${agentName}] startup profile`, JSON.stringify(report, null, 2))
 }

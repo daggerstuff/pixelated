@@ -150,7 +150,6 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
       setRecoveryHistory([data, ...recoveryHistory])
       toast.success('Recovery test completed successfully!')
     } catch (error: unknown) {
-      console.error('Recovery test failed:', error)
 
       // Type guard to safely access String(error)
       const errorMessage =

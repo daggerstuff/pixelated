@@ -8,12 +8,12 @@ version = "0.3.0"
 description = "Deslop SaaS — HTTP API for cleaning AI slop from datasets. Scan, clean, preview, and regenerate JSON/JSONL data."
 readme = "README.md"
 license = { text = "MIT" }
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 authors = [{ name = "Pixelated" }]
 keywords = ["ai-slop", "dataset", "hygiene", "fastapi", "jsonl", "llm"]
 
 dependencies = [
-    "fastapi>=0.115.0",
+    "fastapi>=0.124.4",
     "uvicorn[standard]>=0.32.0",
     "python-multipart>=0.0.12",
     "pydantic>=2.0",

@@ -68,8 +68,8 @@ Before ending substantial work:
 | -------------- | ------------------------ | ------------------------------------------------------ |
 | **Submodules** | Init & sync (first step) | `git submodule update --init --recursive`              |
 | **Node / TS**  | Dev Server               | `pnpm dev` _(port 5173)_ or `pnpm dev:all-services`    |
-|                | Typecheck                | `pnpm typecheck`                                       |
-|                | Lint & Format            | `pnpm lint` / `pnpm format`                            |
+|                | Lint (type-aware)        | `pnpm lint` (oxlint)                                   |
+|                | Format                   | `pnpm format`                                          |
 |                | Unit & Integration Tests | `pnpm vitest run -c config/vitest.config.ts`           |
 |                | Production Build         | `pnpm build`                                           |
 | **Python**     | Run script / module      | `uv run python <script.py>` / `uv run python -m <pkg>` |
@@ -93,6 +93,16 @@ Before ending substantial work:
   isolation. Never expose clinical PHI or sensitive keys.
 - **Verify Explicitly**: Validate every code change with real test/lint
   execution before marking done.
+
+### 🚫 Banned Type-Check Tooling (OOM Risk)
+
+> [!IMPORTANT] **STOP using `astro check`, `pnpm typecheck`, and `tsc`.** They
+> are all far too slow and heavy, and repeatedly cause out-of-memory (OOM)
+> failures. Do **not** run them, and do **not** add them to CI, scripts, or
+> pre-commit hooks.
+>
+> Use **oxlint with type-aware flags** for lint/type verification instead:
+> `pnpm lint` (type-aware oxlint).
 
 ### 🚫 Strict Anti-Suppression Policy (Zero Tolerance)
 

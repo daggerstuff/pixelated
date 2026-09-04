@@ -86,7 +86,7 @@ export class SealPatternRecognitionService implements FHEService {
     encryptedData: EncryptedData,
     options?: unknown,
   ): Promise<T> {
-    return this.enhancedService.decrypt(encryptedData, options) as any
+    return this.enhancedService.decrypt<T>(encryptedData, options)
   }
 
   /**
@@ -185,10 +185,10 @@ export class SealPatternRecognitionService implements FHEService {
         const decodedPatterns: TrendPattern[] = []
 
         // Use the results info from the encrypted data if available
-        const resultCount = (data.results as any[] | undefined)?.length ?? 2
+        const resultCount = (data.results as Array<{ type: string; confidence: number }> | undefined)?.length ?? 2
 
         for (let i = 0; i < resultCount; i++) {
-          const basePattern = (data.results as any[] | undefined)?.[i] ?? {
+          const basePattern = (data.results as Array<{ type: string; confidence: number }> | undefined)?.[i] ?? {
             type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
             confidence: 0.7 + Math.random() * 0.25,
           }

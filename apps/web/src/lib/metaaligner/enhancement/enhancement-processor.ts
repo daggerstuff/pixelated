@@ -43,7 +43,7 @@ export class EnhancementProcessor implements IEnhancementProcessor {
     const response: UnifiedProcessingResponse = {
       enhancedResponse: improvedContent,
       originalResponse: request.llmOutput.content as string,
-      alignment: { score, history: this.enhancementHistory } as any, // This will be populated by the alignment evaluation
+      alignment: { score, history: this.enhancementHistory } as unknown, // This will be populated by the alignment evaluation
     }
     return response
   }

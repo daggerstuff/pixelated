@@ -40,14 +40,19 @@ function useReducedMotion(): boolean {
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
+    const timer = window.setTimeout(() => {
+      setPrefersReducedMotion(mediaQuery.matches)
+    }, 0)
 
     const handleChange = (event: MediaQueryListEvent) => {
       setPrefersReducedMotion(event.matches)
     }
 
     mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+    return () => {
+      window.clearTimeout(timer)
+      mediaQuery.removeEventListener('change', handleChange)
+    }
   }, [])
 
   return prefersReducedMotion
@@ -287,7 +292,7 @@ export function AdvancedSequence({
   const [, setCurrentStep] = useState(0)
 
   // Execute sequence
-  const executeSequence = useCallback(async () => {
+  const executeSequence = useCallback(async function executeSequence() {
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i]
       if (!step) {
@@ -314,9 +319,12 @@ export function AdvancedSequence({
   }, [steps, controls, loop, onSequenceComplete])
 
   useEffect(() => {
-    if (autoPlay && steps.length > 0) {
-      void executeSequence()
-    }
+    const timer = window.setTimeout(() => {
+      if (autoPlay && steps.length > 0) {
+        void executeSequence()
+      }
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [autoPlay, executeSequence, steps.length])
 
   return (

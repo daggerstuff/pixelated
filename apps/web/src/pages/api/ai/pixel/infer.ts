@@ -293,7 +293,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       )
     }
 
-    const body = validatedData as any
+    const body = validatedData as Record<string, unknown>
 
     const pixelRequest: PixelInferenceRequest = {
       user_query: body.user_query,

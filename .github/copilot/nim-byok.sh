@@ -17,9 +17,24 @@ if [[ -z "${GH_TOKEN:-}" && -z "${GITHUB_TOKEN:-}" ]] && command -v gh >/dev/nul
   fi
 fi
 
+# Derive the live 9Router API key from its own DB instead of hardcoding it.
+# Keeps this script correct even if the key is rotated in the Dashboard.
+_9router_api_key() {
+  python3 - "$HOME/.9router/db/data.sqlite" <<'PY' 2>/dev/null
+import sqlite3, sys
+try:
+    c = sqlite3.connect(sys.argv[1])
+    row = c.execute("SELECT key FROM apiKeys WHERE isActive=1 ORDER BY createdAt DESC LIMIT 1").fetchone()
+    if row and row[0]:
+        print(row[0])
+except Exception:
+    pass
+PY
+}
+
 # 9Router endpoint (OpenAI-compatible)
 export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:20128/v1"
-export COPILOT_PROVIDER_API_KEY="sk_9router"
+export COPILOT_PROVIDER_API_KEY="$(_9router_api_key)"
 export COPILOT_PROVIDER_TYPE="openai"
 
 # Keep qwen/GPT-4o mini drift from being reused as default for this project.

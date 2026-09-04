@@ -273,7 +273,9 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
     setupMediaStream,
   ])
 
-  handleConnectionFailureRef.current = handleConnectionFailure
+  useEffect(() => {
+    handleConnectionFailureRef.current = handleConnectionFailure
+  }, [handleConnectionFailure])
 
   // Handle incoming signaling messages
   const handleSignalingMessage = useCallback(
@@ -520,9 +522,3 @@ const VideoDisplay: React.FC<VideoDisplayProps> = ({
 export default VideoDisplay
 
 // Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });

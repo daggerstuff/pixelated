@@ -3,7 +3,7 @@
  * Specialized component for identifying and classifying emotional support needs
  */
 
-import type { AIService } from '../../ai/models/ai-types'
+import type { AIService, AIMessage, AICompletion } from '../../ai/models/ai-types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('support-context-identifier')
@@ -34,6 +34,8 @@ export interface SupportContextResult {
     immediateNeeds: string[]
     triggerEvents?: string[]
     resilientFactors?: string[]
+    requiresHumanReview?: boolean
+    crisisInterventionFlagged?: boolean
   }
 }
 
@@ -465,8 +467,8 @@ export class SupportContextIdentifier {
           socialSupport: 'unknown',
           immediateNeeds: [],
         }
-      ;(result.metadata as any).requiresHumanReview = true
-      ;(result.metadata as any).crisisInterventionFlagged = true
+      ;result.metadata.requiresHumanReview = true
+      ;result.metadata.crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
     const urgCheck = (result.urgency || '').toLowerCase().trim()
@@ -488,8 +490,8 @@ export class SupportContextIdentifier {
           socialSupport: 'unknown',
           immediateNeeds: [],
         }
-      ;(result.metadata as any).requiresHumanReview = true
-      ;(result.metadata as any).crisisInterventionFlagged = true
+      ;result.metadata.requiresHumanReview = true
+      ;result.metadata.crisisInterventionFlagged = true
     }
 
     // Type-safe resource stringification
@@ -900,17 +902,17 @@ Consider this context in your assessment.`
       return this.parseAIResponse(text)
     }
 
-    const messages: Array<{ role: string; content: string }> = [
+    const messages: AIMessage[] = [
       { role: 'system', content: contextualPrompt },
       { role: 'user', content: queryWithContext },
     ]
 
-    const response = (await this.aiService.createChatCompletion(
-      messages as any,
+    const response: AICompletion = await this.aiService.createChatCompletion(
+      messages,
       {
         model: this.model,
       },
-    )) as any
+    )
 
     let content = ''
     if (typeof response === 'string') {

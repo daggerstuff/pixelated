@@ -121,7 +121,7 @@ export function CognitiveModelSelector({
   }, [selectedModelId, onSelectModel])
 
   // Load detailed information for the selected model
-  const loadModelDetails = async (modelId: string) => {
+  async function loadModelDetails(modelId: string) {
     if (!modelId) {
       return
     }

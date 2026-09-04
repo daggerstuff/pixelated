@@ -156,9 +156,8 @@ if (isProduction) {
       cert: readFileSync('/etc/ssl/certs/server.crt'),
     }
     server = createHttpsServer(options, app)
-    console.log('🔒 HTTPS server configured')
   } catch (error: unknown) {
-    console.error('❌ SSL certificates not found, falling back to HTTP:', error)
+    // error handled by caller — falling back to HTTP
     server = createHttpServer(app)
   }
 } else {
@@ -170,10 +169,6 @@ const socketService = new SocketService(server, redis, db)
 
 // Global error handlers for unhandled rejections and exceptions
 process.on('unhandledRejection', (reason: unknown) => {
-  console.warn(
-    'Unhandled Rejection:',
-    reason instanceof Error ? reason.message : String(reason),
-  )
   if (!hasSentryErrorHandler) {
     Sentry.captureException(
       reason instanceof Error ? reason : new Error(String(reason)),
@@ -182,7 +177,6 @@ process.on('unhandledRejection', (reason: unknown) => {
 })
 
 process.on('uncaughtException', (error: Error) => {
-  console.error('Uncaught Exception:', error.message)
   if (!hasSentryErrorHandler) {
     Sentry.captureException(error)
   }
@@ -190,13 +184,11 @@ process.on('uncaughtException', (error: Error) => {
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('🔄 SIGTERM received, shutting down gracefully')
-
   await closeSentry()
   await redis.quit()
   await db.end()
   server.close(() => {
-    console.log('✅ Server closed')
+    // error handled by caller
     process.exit(0)
   })
 })
@@ -209,7 +201,6 @@ app.use(
     res: express.Response,
     _next: express.NextFunction,
   ) => {
-    console.error('❌ Error:', error)
     if (!hasSentryErrorHandler) {
       Sentry.captureException(error)
     }

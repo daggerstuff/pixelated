@@ -256,7 +256,9 @@ export interface ClusterPattern {
     {
       mean: number
       stdDev: number
-      distribution: Record<string, number>
+      distribution?: Record<string, number>
+      min?: number
+      max?: number
     }
   >
 }

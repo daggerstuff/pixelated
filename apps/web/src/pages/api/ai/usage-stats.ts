@@ -49,7 +49,7 @@ export const GET: APIRoute = async ({ request, cookies, url }) => {
       })
     }
     // Verify session and permissions
-    session = await (getSession as any)()
+    session = await getSession(request)
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,

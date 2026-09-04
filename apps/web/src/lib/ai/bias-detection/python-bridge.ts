@@ -390,7 +390,7 @@ export class PythonBiasDetectionBridge {
             underrepresentedGroups: (rep["underrepresented_groups"] as string[]) ?? [],
             overrepresentedGroups: (rep["overrepresented_groups"] as string[]) ?? [],
             diversityIndex: (rep["diversity_index"] as number) ?? 0,
-            intersectionalityAnalysis: (rep["intersectionality_analysis"] as any[]) ?? [],
+            intersectionalityAnalysis: (rep["intersectionality_analysis"] as Record<string, unknown>[]) ?? [],
           },
           dataQualityMetrics: {
             completeness: (dq["completeness"] as number) ?? 1,
@@ -552,10 +552,10 @@ export class PythonBiasDetectionBridge {
             scenariosAnalyzed: (counterfactual["scenarios_analyzed"] as number) ?? 0,
             biasDetected: (counterfactual["bias_detected"] as boolean) ?? false,
             consistencyScore: (counterfactual["consistency_score"] as number) ?? 0.5,
-            problematicScenarios: (counterfactual["problematic_scenarios"] as any[]) ?? [],
+            problematicScenarios: (counterfactual["problematic_scenarios"] as Record<string, unknown>[]) ?? [],
           },
-          featureImportance: featureImp as any[],
-          whatIfScenarios: whatIf as any[],
+          featureImportance: featureImp,
+          whatIfScenarios: whatIf,
           detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
         };
@@ -604,8 +604,8 @@ export class PythonBiasDetectionBridge {
                 "trend_direction"
               ] as EvaluationLayerResult["temporalAnalysis"]["trendDirection"]) ?? "stable",
             changeRate: (temporal["change_rate"] as number) ?? 0,
-            seasonalPatterns: (temporal["seasonal_patterns"] as any[]) ?? [],
-            interventionEffectiveness: (temporal["intervention_effectiveness"] as any[]) ?? [],
+            seasonalPatterns: (temporal["seasonal_patterns"] as Record<string, unknown>[]) ?? [],
+            interventionEffectiveness: (temporal["intervention_effectiveness"] as Record<string, unknown>[]) ?? [],
           },
           detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],

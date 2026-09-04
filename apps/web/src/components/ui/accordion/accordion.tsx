@@ -105,7 +105,7 @@ const AccordionTrigger = React.forwardRef<
 
   return (
     <AccordionItemContext.Provider
-      value={{ value, isOpen, contentId, triggerId } as any}
+      value={{ value, isOpen, contentId, triggerId } as Record<string, unknown>}
     >
       <button
         ref={ref}
@@ -138,7 +138,7 @@ const AccordionContent = React.forwardRef<
 >(({ className, children, ...props }, ref) => {
   const { isOpen, contentId, triggerId } = React.useContext(
     AccordionItemContext,
-  ) as any
+  ) as unknown
 
   return (
     <div

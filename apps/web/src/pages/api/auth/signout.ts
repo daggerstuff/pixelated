@@ -57,7 +57,6 @@ export const POST = async ({ request }: { request: Request }) => {
       headers,
     })
   } catch (error: any) {
-    console.error('Sign out error:', error)
     return new Response(
       JSON.stringify({ success: true }), // Still return success on logout error
       {

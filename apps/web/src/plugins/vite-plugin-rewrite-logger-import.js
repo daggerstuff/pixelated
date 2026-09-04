@@ -51,8 +51,6 @@ export default function rewriteLoggerImportPlugin() {
         return { code: transformed, map: null }
       } catch {
         // Fail open: do not block the build on plugin transform errors
-        // Optionally log error for debugging
-        // console.error('Transform error in rewrite-logger-import plugin');
         return null
       }
     },

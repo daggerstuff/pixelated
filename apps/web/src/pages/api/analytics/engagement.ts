@@ -243,7 +243,6 @@ export const GET = async ({ request }: { request: Request }) => {
     })
   } catch (error: unknown) {
     // Log error securely (avoid leaking sensitive info)
-    console.error('Engagement metrics API error:', error)
 
     const apiError: AnalyticsError = {
       code: 'PROCESSING_ERROR',
@@ -252,7 +251,7 @@ export const GET = async ({ request }: { request: Request }) => {
         source: 'engagement',
         message: error instanceof Error ? String(error) : String(error),
       },
-    } as any
+    } as Record<string, unknown>
 
     const status =
       error && typeof error === 'object' && 'status' in error

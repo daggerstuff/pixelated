@@ -42,9 +42,9 @@ export async function getSessionFromRequest(
           id: decoded.userId,
           _id: decoded.userId,
           email: decoded.email,
-          role: decoded.role as any,
+          role: decoded.role as string,
           emailVerified: true,
-        } as any,
+        } as Record<string, unknown>,
         session: {
           token: authHeader.startsWith('Bearer ')
             ? authHeader.substring(7)

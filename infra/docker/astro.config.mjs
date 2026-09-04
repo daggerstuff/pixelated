@@ -9,6 +9,8 @@ import UnoCSS from "@unocss/astro";
 import { defineConfig, passthroughImageService } from "astro/config";
 import { visualizer } from "rollup-plugin-visualizer";
 
+import { rewriteSentrySource } from "../../config/sentry-source-map.mjs";
+
 // Detect Docker build environment
 const isDockerBuild = process.env.DOCKER_BUILD === "true" || process.env.CI === "true";
 
@@ -36,6 +38,7 @@ function createScopedSentryVitePlugins({ ssr, assets, filesToDeleteAfterUpload }
     sourcemaps: {
       assets,
       ignore: ["**/node_modules/**"],
+      rewriteSources: rewriteSentrySource,
       filesToDeleteAfterUpload,
     },
   }).map((plugin) => ({

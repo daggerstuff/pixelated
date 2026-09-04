@@ -88,7 +88,7 @@ export const GET: APIRoute = async ({ request, url }) => {
     // Use a stricter IOC type instead of `any` to satisfy linter/type rules
     type IOCType = 'ip' | 'domain' | 'hash' | 'url'
     const results = await (
-      threatDetectionSystem.intelligenceService.lookupIOC as any
+      threatDetectionSystem.intelligenceService.lookupIOC as unknown
     )(sanitizedIndicator, sanitizedType, refresh)
 
     return new Response(
@@ -282,7 +282,7 @@ export const PUT: APIRoute = async ({ request }) => {
   try {
     // Authenticate request - require admin privileges
     const authResult = await authenticateRequest(request)
-    if (!authResult.success || !(authResult as any).user?.isAdmin) {
+    if (!authResult.success || !(authResult as { user?: { isAdmin?: boolean } }).user?.isAdmin) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized or insufficient privileges' }),
         {

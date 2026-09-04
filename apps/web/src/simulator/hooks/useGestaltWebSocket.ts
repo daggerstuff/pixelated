@@ -208,7 +208,7 @@ export function useGestaltWebSocket({
     }
   }, [])
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function connect() {
     if (!isMountedRef.current) return
     if (
       wsRef.current?.readyState === WebSocket.OPEN ||

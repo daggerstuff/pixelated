@@ -229,33 +229,41 @@ export const defaultThreatDetectionConfig: ThreatDetectionConfig = {
 }
 
 /**
+ * Extended Request type with authentication context
+ */
+interface AuthenticatedRequest extends Request {
+  user?: { id: string; role?: string };
+  session?: { id: string };
+}
+
+/**
  * Middleware configuration for Express applications
  */
 export const expressMiddlewareConfig = {
   enabled: true,
   enableLogging: true,
   skipPaths: ['/health', '/status', '/metrics', '/api/health', '/api/status'],
-  getIdentifier: (req: Request) => {
-    if ((req as any).user?.id) {
-      return `user:${(req as any).user.id}`
+  getIdentifier: (req: AuthenticatedRequest) => {
+    if (req.user?.id) {
+      return `user:${req.user.id}`
     }
-    if ((req as any).session?.id) {
-      return `session:${(req as any).session.id}`
+    if (req.session?.id) {
+      return `session:${req.session.id}`
     }
     if (req.ip) {
       return `ip:${req.ip}`
     }
     return 'unknown'
   },
-  getContext: (req: Request): ThreatDetectionContext => ({
+  getContext: (req: AuthenticatedRequest): ThreatDetectionContext => ({
     ip: req.ip,
     method: req.method,
     path: req.path,
     userAgent: req.get('User-Agent'),
     timestamp: new Date().toISOString(),
-    userId: (req as any).user?.id,
-    userRole: (req as any).user?.role,
-    sessionId: (req as any).session?.id,
+    userId: req.user?.id,
+    userRole: req.user?.role,
+    sessionId: req.session?.id,
     headers: Object.fromEntries(
       Object.entries(req.headers)
         .filter(
@@ -399,8 +407,7 @@ export function createThreatHuntingService(
     orchestrator,
     aiService,
     behavioralService,
-    predictiveService,
-    config as any,
+    config,
   )
 }
 

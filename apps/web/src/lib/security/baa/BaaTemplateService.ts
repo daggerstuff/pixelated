@@ -527,10 +527,10 @@ export class BaaTemplateService {
       '1.0',
       createdBy,
       [
-        'EHR_VENDOR' as any,
-        'CLOUD_SERVICE' as any,
-        'DATA_ANALYTICS' as any,
-        'TELEMEDICINE' as any,
+        BusinessAssociateType.EHR_VENDOR,
+        BusinessAssociateType.CLOUD_SERVICE,
+        BusinessAssociateType.DATA_ANALYTICS,
+        BusinessAssociateType.TELEMEDICINE,
       ],
       [
         ServiceCategory.DATA_STORAGE,

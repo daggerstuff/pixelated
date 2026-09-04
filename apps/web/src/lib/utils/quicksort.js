@@ -72,9 +72,7 @@ Example usage:
 import quicksort from './quicksort.js'
 
 const nums = [5, 3, 8, 1, 2]
-console.log(quicksort(nums)) // [1,2,3,5,8]
 
 const objs = [{v:3},{v:1},{v:2}]
-console.log(quicksort(objs, (a,b)=>a.v-b.v)) // sorted by v
 
 */

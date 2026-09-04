@@ -132,8 +132,6 @@ export const POST: APIRoute = async ({ request }) => {
         )
     }
   } catch (error: unknown) {
-    console.error('Export API error:', error)
-
     return new Response(
       JSON.stringify({
         error: 'Internal server error during export',

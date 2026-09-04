@@ -72,7 +72,6 @@ export async function POST({ request }: { request: Request }) {
       { status: 201, headers: { 'Content-Type': 'application/json' } },
     )
   } catch (error: any) {
-    console.error('Registration error:', error)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

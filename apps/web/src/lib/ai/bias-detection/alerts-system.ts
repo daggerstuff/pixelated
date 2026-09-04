@@ -817,7 +817,7 @@ export class BiasAlertSystem {
     const callbackData = {
       alerts,
       sessionId: result.sessionId,
-      timestamp: (result as any)?.timestamp ?? new Date().toISOString(),
+      timestamp: (result as { timestamp?: string })?.timestamp ?? new Date().toISOString(),
       overallBiasScore: result.overallBiasScore,
       alertLevel: result.alertLevel,
       recommendations: result.recommendations,

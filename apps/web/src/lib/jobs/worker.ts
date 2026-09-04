@@ -153,7 +153,7 @@ const jobsWorker = {
             request: RequestInfo
           })
           const batchStartTime = Date.now()
-          results = await (biasDetectionEngine as any).analyzeSessionsBatch(
+          results = await (biasDetectionEngine as { analyzeSessionsBatch?: (...args: unknown[]) => Promise<unknown> }).analyzeSessionsBatch(
             sessions,
             user,
             {
@@ -201,7 +201,7 @@ const jobsWorker = {
               start: new Date(timeRange.start),
               end: new Date(timeRange.end),
             },
-            safeOptions as any,
+            safeOptions as Record<string, unknown>,
           )
           const reportDurationMs = Date.now() - reportStartTime
           distributionMetric(
@@ -218,7 +218,9 @@ const jobsWorker = {
           })
           break
         }
-        // TODO: Add other job types as needed (e.g., data-cleanup, metric-aggregation)
+        // Extensible job queue: new job types (data-cleanup, metric-aggregation,
+        // etc.) should be registered in the JobType enum and handled here with
+        // their own processing logic before the default case.
         default:
           throw new Error(`Unknown job type: ${job.type}`)
       }

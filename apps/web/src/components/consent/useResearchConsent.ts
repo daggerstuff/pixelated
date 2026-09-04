@@ -214,7 +214,7 @@ export function useResearchConsent() {
   const sanitizedDocumentText = useMemo(() => {
     if (!consentStatus?.currentVersion?.documentText) return ''
     return DOMPurify.sanitize(consentStatus.currentVersion.documentText)
-  }, [consentStatus?.currentVersion?.documentText])
+  }, [consentStatus])
 
   return {
     loading,

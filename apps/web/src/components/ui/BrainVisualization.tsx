@@ -117,7 +117,7 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   }, [moodVector])
 
   // Animation function
-  const animate = useCallback(() => {
+  const animate = useCallback(function animate() {
     const canvas = canvasRef.current
     if (!canvas) {
       return

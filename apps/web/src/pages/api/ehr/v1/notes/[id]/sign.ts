@@ -79,7 +79,7 @@ export const POST = withV1Contract('signClinicalNote', async (ctx, caller) => {
     signer_ref,
     breakGlassActivated,
     breakGlassReason,
-  } = parsed.data as any
+  } = parsed.data as Record<string, unknown>
 
   // Verify the note ID in the URL matches the note in the body
   const bodyNoteId = (note as Record<string, unknown>)['id']

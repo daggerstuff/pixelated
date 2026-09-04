@@ -1,6 +1,5 @@
 import { useState } from 'react'
 
-// import { LineChart } from '../ui/charts/LineChart' // This will be in ProgressChart.tsx
 import type { AuthRequestConfig } from '@/lib/auth/auth0-protected-fetch'
 
 import { useComparativeProgress } from '../../hooks/useComparativeProgress'

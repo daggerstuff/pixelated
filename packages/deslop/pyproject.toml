@@ -9,7 +9,7 @@ description = "Clean AI slop from JSON/JSONL datasets. Remove filler phrases, de
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Pixelated Empathy" }]
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = ["rich>=13.0.0", "pyyaml>=6.0", "typer>=0.15.0"]
 keywords = [
   "ai",

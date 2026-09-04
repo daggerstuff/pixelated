@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skillreducer"
+version = "0.1.0"
+description = "Implementation of the SkillReducer framework (Gao et al., arXiv:2603.29919) for LLM agent skill optimization"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "zealgoswami-lab" }]
+keywords = ["llm", "skills", "agents", "agno", "skillreducer", "prompt-compression", "skillhub", "claude-code"]
+dependencies = [
+    "agno>=2.5",
+    "click>=8.1",
+    "pyyaml>=6.0",
+    "tiktoken>=0.7",
+    "openai>=1.40",
+    "rich>=13.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+build = ["pyinstaller>=6.0"]
+# SkillRevise Python package is vendored under src/skillrevise (no git install).
+# Optional extras for SkillRevise analysis helpers only:
+revise-analysis = ["matplotlib>=3.7", "numpy>=1.24"]
+
+[project.scripts]
+skillreducer = "skillreducer.cli:main"
+skillrevise = "skillrevise.cli:main"
+skillrevise-llm = "skillrevise.llm.command:main"
+skillrevise-benchmark = "skillrevise.benchmarks.run_benchmark:main"
+skillrevise-convert-skillsbench = "skillrevise.benchmarks.convert_skillsbench:main"
+
+[tool.setuptools.packages.find]
+where = [".", "src"]
+include = ["skillreducer*", "skillrevise*"]
+
+[tool.setuptools.package-data]
+skillreducer = [
+    "tscg/bridge.mjs",
+    "tscg/package.json",
+    "tscg/README.md",
+]
+skillrevise = ["LICENSE", "VENDOR.md", "README.md", "benchmarks/README.md"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

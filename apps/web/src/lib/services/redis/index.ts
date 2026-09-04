@@ -38,6 +38,3 @@ export const redis = new RedisService(config)
 
 // Optionally, connect the singleton immediately if desired
 // (consider application lifecycle implications)
-// redis.connect().catch(error => {
-//   console.error("Failed to connect singleton redis instance:", error);
-// });

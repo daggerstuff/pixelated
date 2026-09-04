@@ -91,17 +91,11 @@ class MongoDB {
       return this.db
     }
 
-    try {
-      this.client = new MongoClient(this.config.uri, this.config.options)
-      await this.client.connect()
-      this.db = this.client.db(this.config.dbName)
+    this.client = new MongoClient(this.config.uri, this.config.options)
+    await this.client.connect()
+    this.db = this.client.db(this.config.dbName)
 
-      console.log(`✅ Connected to MongoDB database: ${this.config.dbName}`)
-      return this.db
-    } catch (error: unknown) {
-      console.error('❌ Failed to connect to MongoDB:', error)
-      throw error
-    }
+    return this.db
   }
 
   public async disconnect(): Promise<void> {
@@ -109,7 +103,6 @@ class MongoDB {
       await this.client.close()
       this.client = null
       this.db = null
-      console.log('🔌 Disconnected from MongoDB')
     }
   }
 
@@ -134,7 +127,6 @@ class MongoDB {
       await db.admin().ping()
       return true
     } catch (error: unknown) {
-      console.error('MongoDB health check failed:', error)
       return false
     }
   }

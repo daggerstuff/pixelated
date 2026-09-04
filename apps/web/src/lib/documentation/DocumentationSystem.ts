@@ -233,7 +233,6 @@ export class DocumentationSystem extends EventEmitter {
   ): Promise<TherapyAIResponse[]> {
     try {
       // In a real implementation, this would call the repository method
-      // return await this.repository.getInterventionsForSession(sessionId)
 
       // For now, use mock data that matches the TherapyAIResponse interface
       const mockResponse: TherapyAIResponse = {
@@ -277,7 +276,10 @@ export class DocumentationSystem extends EventEmitter {
       const interventions = await this.getInterventionsForSession(sessionId)
 
       // Generate documentation using AI service
-      // TODO: Implement generateSessionDocumentation method in AIService
+      // Deferred: AIService.generateSessionDocumentation is not yet implemented.
+      // When available, replace the static notes below with a call that
+      // synthesizes session transcripts, interventions, and outcomes into
+      // structured clinical documentation.
       const documentation: SessionDocumentation = {
         sessionId: session.sessionId ?? sessionId,
         clientId: session.clientId || 'unknown',
@@ -360,7 +362,6 @@ export class DocumentationSystem extends EventEmitter {
   ): Promise<boolean> {
     try {
       // In a real implementation, this would save to a repository
-      // await this.repository.saveSessionDocumentation(sessionId, documentation)
 
       // For now, just update our active sessions cache
       const activeSession = this.activeSessions.get(sessionId)

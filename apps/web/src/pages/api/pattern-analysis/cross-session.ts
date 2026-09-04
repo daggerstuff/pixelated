@@ -1,5 +1,4 @@
 import type { TherapySession } from '@/lib/ai/AIService'
-// import type { APIRoute } from 'astro'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
 import { getCurrentUser } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'

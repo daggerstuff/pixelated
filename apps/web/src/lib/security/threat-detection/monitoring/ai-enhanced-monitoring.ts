@@ -1533,7 +1533,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const db = this.mongoClient.db('threat_detection')
       return await db
         .collection<Alert>('alerts')
-        .find({ severity: severity as any })
+        .find({ severity: severity as string })
         .toArray()
     } catch {
       return []

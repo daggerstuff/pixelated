@@ -1,5 +1,22 @@
 import type { APIContext } from 'astro'
+import { z } from 'zod'
+import { validateRequestBody } from '../../../lib/validation/validateRequestBody'
+
 export const prerender = false
+
+const crisisDetectionSchema = z
+  .object({
+    content: z.string().min(1, 'Content is required and must be a string'),
+    contentType: z.enum([
+      'chat_message',
+      'journal_entry',
+      'form_response',
+      'voice_transcript',
+    ]),
+    context: z.any().optional(),
+    options: z.any().optional(),
+  })
+  .passthrough()
 
 export interface CrisisDetectionRequest {
   content: string
@@ -601,12 +618,15 @@ export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {
-    const body = (await request.json()) as CrisisDetectionRequest
-
-    if (!body.content || typeof body.content !== 'string') {
+    const [body, validationError] = await validateRequestBody(
+      request,
+      crisisDetectionSchema,
+    )
+    if (validationError) {
+      const firstError = Object.values(validationError.details)[0] ?? 'Invalid request body'
       return new Response(
         JSON.stringify({
-          error: 'Invalid request: content is required and must be a string',
+          error: firstError,
         }),
         {
           status: 400,
@@ -840,7 +860,6 @@ export const POST = async ({ request }: APIContext) => {
       },
     })
   } catch (error: unknown) {
-    console.error('Crisis detection error:', error)
     return new Response(
       JSON.stringify({
         error: 'Internal server error during crisis detection',

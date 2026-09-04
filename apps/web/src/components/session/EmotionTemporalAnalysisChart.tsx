@@ -355,24 +355,22 @@ export default function EmotionTemporalAnalysisChart({
           <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
           <Tooltip
             contentStyle={tooltipStyle}
-            formatter={
-              ((value: ValueType, name: NameType) => {
-                if (name === 'slope') {
-                  const numericValue = toNumber(value)
-                  return [
-                    `${formatNumber(numericValue, 2)} (${numericValue > 0 ? 'increasing' : 'decreasing'})`,
-                    'Trend',
-                  ]
-                }
-                if (name === 'correlation') {
-                  return [formatNumber(value, 2), 'Correlation']
-                }
-                if (name === 'significance') {
-                  return [formatNumber(value, 2), 'Significance']
-                }
-                return [value, name]
-              }) as any
-            }
+            formatter={(value: ValueType, name: NameType) => {
+              if (name === 'slope') {
+                const numericValue = toNumber(value)
+                return [
+                  `${formatNumber(numericValue, 2)} (${numericValue > 0 ? 'increasing' : 'decreasing'})`,
+                  'Trend',
+                ]
+              }
+              if (name === 'correlation') {
+                return [formatNumber(value, 2), 'Correlation']
+              }
+              if (name === 'significance') {
+                return [formatNumber(value, 2), 'Significance']
+              }
+              return [value, name]
+            }}
           />
 
           <Legend />
@@ -513,17 +511,15 @@ export default function EmotionTemporalAnalysisChart({
 
           <Tooltip
             contentStyle={tooltipStyle}
-            formatter={
-              ((value: ValueType, name: NameType) => {
-                if (name === 'frequency') {
-                  return [value, 'Frequency']
-                }
-                if (name === 'duration') {
-                  return [formatNumber(value, 1), 'Avg Duration (min)']
-                }
-                return [value, name]
-              }) as any
-            }
+            formatter={(value: ValueType, name: NameType) => {
+              if (name === 'frequency') {
+                return [value, 'Frequency']
+              }
+              if (name === 'duration') {
+                return [formatNumber(value, 1), 'Avg Duration (min)']
+              }
+              return [value, name]
+            }}
           />
 
           <Legend />
@@ -560,14 +556,12 @@ export default function EmotionTemporalAnalysisChart({
         <YAxis domain={[-1, 1]} tick={axisTick} axisLine={axisLineProps} />
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={
-            ((value: ValueType, name: NameType) => {
-              if (name === 'correlation') {
-                return [formatNumber(value, 2), 'Correlation']
-              }
-              return [value, name]
-            }) as any
-          }
+          formatter={(value: ValueType, name: NameType) => {
+            if (name === 'correlation') {
+              return [formatNumber(value, 2), 'Correlation']
+            }
+            return [value, name]
+          }}
         />
         <Legend />
         <ReferenceLine y={0} stroke="var(--np-muted)" />

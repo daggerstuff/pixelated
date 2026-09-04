@@ -72,8 +72,13 @@ jobs:
       - name: Check for unresolved imports
         run: pnpm lint:ci:imports
 
-      - name: Lint code
+      - name: Lint code (type-aware)
         run: pnpm lint:ci
+
+      - name: Type check
+        env:
+          NODE_OPTIONS: '--max-old-space-size=8192'
+        run: pnpm lint:ci:type-aware
 
       - name: Lint markdown
         run: pnpm lint:markdown:ci
@@ -90,6 +95,7 @@ jobs:
           # corpus hangs without Redis/Mongo/Auth0 (run 30737434511, exit 124)
           # so only the core bucket runs here as a fast smoke.
           VITEST_BUCKET=core timeout 15m pnpm test:blocking
+          VITEST_BUCKET=security timeout 10m pnpm test:blocking || echo "::warning::Security test bucket failed (non-blocking)"
 
       - name: Build Docker image
         id: build-image
@@ -146,7 +152,8 @@ jobs:
         run: |
           findings="${{ steps.trivy_summary.outputs.critical_or_high_findings || '0' }}"
           if [[ "$findings" -gt 0 ]]; then
-            echo "::warning::Trivy gate: ${findings} CRITICAL/HIGH vulnerabilities detected. Inspect at: https://github.com/${{ github.repository }}/security/code-scanning"
+            echo "::error::Trivy gate: ${findings} CRITICAL/HIGH vulnerabilities detected. Failing build. Inspect at: https://github.com/${{ github.repository }}/security/code-scanning"
+            exit 1
           else
             echo "✅ Trivy gate: no CRITICAL/HIGH vulnerabilities detected."
           fi

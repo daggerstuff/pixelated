@@ -43,7 +43,7 @@ export function usePipelineWebSocket({
   // keep a ref to the socket to avoid reading socket.readyState inside hooks deps
   const socketRef = useRef<WebSocket | null>(null)
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function connect() {
     if (socketRef.current?.readyState === WebSocket.OPEN) return
 
     setConnectionStatus('connecting')
@@ -242,11 +242,14 @@ export function usePipelineWebSocket({
   )
 
   useEffect(() => {
-    if (autoConnect) {
-      connect()
-    }
+    const timer = window.setTimeout(() => {
+      if (autoConnect) {
+        connect()
+      }
+    }, 0)
 
     return () => {
+      window.clearTimeout(timer)
       isMountedRef.current = false
       disconnect()
     }
@@ -368,9 +371,12 @@ export function useMultiPipelineWebSocket({
       newConnections.set(executionId, connection)
     })
 
-    setConnections(newConnections)
+    const timer = window.setTimeout(() => {
+      setConnections(newConnections)
+    }, 0)
 
     return () => {
+      window.clearTimeout(timer)
       // Cleanup logic would go here
       newConnections.forEach((_connection) => {
         // Disconnect logic placeholder
@@ -392,7 +398,10 @@ export function useMultiPipelineWebSocket({
   useEffect(() => {
     // This would need to be implemented differently since we can't track connection status
     // without actual WebSocket connections
-    setOverallStatus('partial') // Placeholder
+    const timer = window.setTimeout(() => {
+      setOverallStatus('partial') // Placeholder
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [connections])
 
   const getConnection = useCallback(

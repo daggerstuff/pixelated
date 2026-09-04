@@ -1,5 +1,5 @@
 import { Search, ChartBar, Lightbulb } from 'lucide-react'
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 
 interface FHEOperation {
   id: string
@@ -35,6 +35,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
   })
   const [isLoading, setIsLoading] = useState(false)
   const [fheInitialized, setFheInitialized] = useState(false)
+  const operationIdRef = useRef(0)
   const [benchmarkResults, setBenchmarkResults] = useState<
     {
       operation: string
@@ -117,7 +118,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     if (!fheInitialized || !currentOperation.operation) return
 
     const operation: FHEOperation = {
-      id: `op-${Date.now()}`,
+      id: `op-${++operationIdRef.current}`,
       operation: currentOperation.operation,
       input1: currentOperation.input1 ?? 0,
       input2: currentOperation.input2,

@@ -21,7 +21,7 @@ export const GET = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
-    context as any,
+    context as Record<string, unknown>,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -30,7 +30,7 @@ export const GET = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId } = (context.locals as any).admin
+    const { userId } = (context.locals as { admin?: { userId: string } }).admin
 
     // Parse query parameters for pagination and filtering
     const url = new URL(context.request.url)
@@ -91,7 +91,7 @@ export const PATCH = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
-    context as any,
+    context as Record<string, unknown>,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -100,7 +100,7 @@ export const PATCH = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId: adminId } = (context.locals as any).admin
+    const { userId: adminId } = (context.locals as { admin?: { userId: string } }).admin
 
     // Parse the request body
     const requestData = (await context.request.json()) as Record<

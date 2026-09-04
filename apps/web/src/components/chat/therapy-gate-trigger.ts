@@ -1,7 +1,7 @@
 export async function triggerTherapyGateSubmit() {
-  const fn = (window as any).handleTherapyGateSubmit
+  const fn = (window as typeof window & { handleTherapyGateSubmit?: () => void }).handleTherapyGateSubmit
   if (typeof fn === 'function') {
-    await fn()
+    fn()
     return
   }
   const textarea = document.querySelector(
@@ -11,7 +11,7 @@ export async function triggerTherapyGateSubmit() {
     '[data-testid="chat-history"]',
   ) as HTMLElement | null
   if (!textarea?.value.trim()) return
-  const gateUrl = (window as any).gateApiUrl ?? '/api/ingestion/gate'
+  const gateUrl = (window as typeof window & { gateApiUrl?: string }).gateApiUrl ?? '/api/ingestion/gate'
   const message = textarea.value
   textarea.value = ''
   try {

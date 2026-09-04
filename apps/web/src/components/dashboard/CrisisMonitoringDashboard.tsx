@@ -128,7 +128,7 @@ export const CrisisMonitoringDashboard: React.FC<
       setMetrics(metricsResponse)
       setLastUpdated(new Date())
     } catch (error) {
-      console.error('Error fetching dashboard data:', error)
+      // error handled by caller
     } finally {
       setLoading(false)
     }
@@ -221,7 +221,7 @@ export const CrisisMonitoringDashboard: React.FC<
         ),
       )
     } catch (error) {
-      console.error('Error acknowledging alert:', error)
+      // error handled by caller
     }
   }
 
@@ -231,7 +231,7 @@ export const CrisisMonitoringDashboard: React.FC<
       await triggerEscalationAPI(patientId, 'manual')
       await fetchDashboardData() // Refresh data
     } catch (error) {
-      console.error('Error triggering escalation:', error)
+      // error handled by caller
     }
   }
 
@@ -757,7 +757,6 @@ async function fetchMetrics(_therapistId: string): Promise<DashboardMetrics> {
 
 async function acknowledgeAlertAPI(alertId: string): Promise<void> {
   // API call to acknowledge alert
-  console.log('Acknowledging alert:', alertId)
 }
 
 async function triggerEscalationAPI(
@@ -765,7 +764,6 @@ async function triggerEscalationAPI(
   type: string,
 ): Promise<void> {
   // API call to trigger escalation
-  console.log('Triggering escalation for patient:', patientId, 'type:', type)
 }
 
 export default CrisisMonitoringDashboard

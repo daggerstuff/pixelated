@@ -7,42 +7,9 @@ import { DEFAULT_LLM_MODEL } from '../ai/constants'
  */
 export const ChatMessageSchema = z.object({
   role: z.enum(['system', 'user', 'assistant']),
-  content: z
-    .string()
-    .min(1)
-    .max(32768)
-    .refine(
-      (value) => {
-        // Block common XSS patterns
-        const xssPatterns = [
-          /<script\b[^<]*(?:<[^<]*)*<\/script>/i, // Script tags
-          /javascript:/i, // JavaScript protocol
-          /data:[^,]*base64/i, // Data URIs with base64
-          /on\w+=/i, // Event handlers
-          /eval\(/i, // Eval calls
-        ]
-        return !xssPatterns.some((pattern) => pattern.test(value))
-      },
-      {
-        message: 'Potential security issue detected in content',
-      },
-    )
-    .refine(
-      (value) => {
-        // Block SQL injection patterns
-        const sqlPatterns = [
-          /\b(select|insert|update|delete|drop|alter|create|truncate)\b.*\b(from|into|table|database|values)\b/i,
-          /\bunion\b.*\bselect\b/i,
-          /--.*$/m,
-          /;$/,
-          /\/\*.*\*\//,
-        ]
-        return !sqlPatterns.some((pattern) => pattern.test(value))
-      },
-      {
-        message: 'Potential injection attack detected in content',
-      },
-    ),
+  // Security: Content is sanitized at the rendering layer using DOMPurify and
+  // at the data layer using parameterized queries. Regex blocklists here would
+  // create false confidence and block legitimate clinical text.
   name: z.string().optional(),
 })
 

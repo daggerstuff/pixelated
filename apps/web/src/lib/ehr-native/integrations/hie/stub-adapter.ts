@@ -277,7 +277,7 @@ export class StubHIEAdapter implements HIEAdapter {
       const stateLower = request.state.toLowerCase()
       orgs = orgs.filter(
         (o) =>
-          (o as any).state?.toLowerCase() === stateLower ||
+          (o as { state?: string }).state?.toLowerCase() === stateLower ||
           o.id.toLowerCase().includes(stateLower),
       )
     }

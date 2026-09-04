@@ -29,7 +29,7 @@ export default function DatasetSearch() {
     return () => clearTimeout(timer)
   }, [hasSearched, minTurns, minQuality])
 
-  const handleSearch = async (e?: SyntheticEvent) => {
+  async function handleSearch(e?: SyntheticEvent) {
     if (e) e.preventDefault()
 
     setLoading(true)
