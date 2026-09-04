@@ -21,60 +21,22 @@ import { promises as fs } from 'node:fs'
 import * as path from 'node:path'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { BridgePerformanceMetrics } from './MentalArenaPythonBridge.types'
+import {
+  validatePackage,
+  fileExists,
+  cleanupTempFiles,
+} from './MentalArenaPythonBridge.utils'
+export type {
+  PythonBridgeConfig,
+  PythonExecutionResult,
+  GenerateDataOptions,
+  ModelEvaluationOptions,
+  SymptomAnalysisOptions,
+} from './MentalArenaPythonBridge.types'
 
 const logger = createBuildSafeLogger('MentalArenaPythonBridge')
 
-export interface PythonBridgeConfig {
-  mentalArenaPath: string
-  pythonPath: string
-  virtualEnvPath?: string
-  timeout?: number
-  maxRetries?: number
-  enableLogging?: boolean
-  securityMode?: 'strict' | 'standard' | 'development'
-}
-
-export interface PythonExecutionResult {
-  success: boolean
-  output: unknown
-  error?: string | undefined
-  exitCode?: number | undefined
-  executionTime: number
-  metadata: {
-    command: string
-    timestamp: string
-    processId: number
-  }
-}
-
-export interface GenerateDataOptions {
-  baseModel: string
-  outputFile: string
-  numSessions: number
-  disorders?: string[]
-  maxTurns?: number
-  temperature?: number
-  qualityThreshold?: number
-  useEncryption?: boolean
-}
-
-export interface ModelEvaluationOptions {
-  modelPath: string
-  testDataPath: string
-  outputPath: string
-  metrics?: string[]
-  batchSize?: number
-}
-
-export interface SymptomAnalysisOptions {
-  text: string
-  analysisType: 'encoding' | 'decoding' | 'validation'
-  context?: Record<string, unknown>
-}
-
-/**
- * Production-grade Python bridge for MentalArena integration
- */
 export class MentalArenaPythonBridge {
   private readonly config: Required<PythonBridgeConfig>
   private readonly pythonProcess?: ChildProcess
@@ -277,7 +239,7 @@ export class MentalArenaPythonBridge {
       })
 
       // Read and parse result if successful
-      if (result.success && (await this.fileExists(outputFile))) {
+      if (result.success && (await fileExists(outputFile))) {
         const resultData = await fs.readFile(outputFile, 'utf-8')
         result.output = JSON.parse(resultData) as unknown
       }
@@ -285,7 +247,7 @@ export class MentalArenaPythonBridge {
       return result
     } finally {
       // Clean up temporary files
-      await this.cleanupTempFiles([inputFile, outputFile])
+      await cleanupTempFiles([inputFile, outputFile])
     }
   }
 
@@ -381,7 +343,7 @@ export class MentalArenaPythonBridge {
       this.config.virtualEnvPath ||
       path.join(this.config.mentalArenaPath, 'venv')
 
-    if (await this.fileExists(venvPath)) {
+    if (await fileExists(venvPath)) {
       logger.info('Cleaning up virtual environment', { venvPath })
 
       try {
@@ -520,13 +482,13 @@ export class MentalArenaPythonBridge {
     }
 
     // Validate Python path
-    if (!(await this.fileExists(this.config.pythonPath))) {
+    if (!(await fileExists(this.config.pythonPath))) {
       throw new Error(`Python executable not found: ${this.config.pythonPath}`)
     }
   }
 
   private async ensureMentalArenaRepository(): Promise<void> {
-    if (!(await this.fileExists(this.config.mentalArenaPath))) {
+    if (!(await fileExists(this.config.mentalArenaPath))) {
       logger.info('MentalArena repository not found, cloning...')
 
       const { spawn } = await import('node:child_process')
@@ -563,7 +525,7 @@ export class MentalArenaPythonBridge {
       path.join(this.config.mentalArenaPath, 'venv')
 
     // Create virtual environment if it doesn't exist
-    if (!(await this.fileExists(venvPath))) {
+    if (!(await fileExists(venvPath))) {
       logger.info('Creating Python virtual environment...', { venvPath })
 
       await this.executeSecure(
@@ -587,7 +549,7 @@ export class MentalArenaPythonBridge {
         : path.join(venvPath, 'bin', 'pip')
 
     // Validate virtual environment was created successfully
-    if (!(await this.fileExists(venvPython))) {
+    if (!(await fileExists(venvPython))) {
       throw new Error(
         `Failed to create virtual environment: Python executable not found at ${venvPython}`,
       )
@@ -604,7 +566,7 @@ export class MentalArenaPythonBridge {
       },
     )
 
-    if (await this.fileExists(requirementsPath)) {
+    if (await fileExists(requirementsPath)) {
       logger.info(
         'Validating and installing Python dependencies in virtual environment...',
       )
@@ -682,7 +644,7 @@ export class MentalArenaPythonBridge {
       'validate_setup.py',
     )
 
-    if (await this.fileExists(validationScript)) {
+    if (await fileExists(validationScript)) {
       logger.info('Running basic validation script in virtual environment')
 
       const result = await this.executeSecure(
@@ -920,7 +882,7 @@ export class MentalArenaPythonBridge {
         }
 
         // Validate package using centralized validation method
-        const validation = this.validatePackage(packageName, versionSpec)
+        const validation = validatePackage(packageName, versionSpec)
 
         // Collect violations
         violations.push(...validation.violations)
@@ -982,101 +944,7 @@ export class MentalArenaPythonBridge {
     }
   }
 
-  /**
-   * Get the current package whitelist
-   */
-  private getPackageWhitelist(): Record<string, string[]> {
-    return {
-      torch: ['>=1.12.0,<3.0.0'],
-      transformers: ['>=4.20.0,<5.0.0'],
-      datasets: ['>=2.0.0,<3.0.0'],
-      numpy: ['>=1.21.0,<2.0.0'],
-      pandas: ['>=1.4.0,<3.0.0'],
-      'scikit-learn': ['>=1.1.0,<2.0.0'],
-      matplotlib: ['>=3.5.0,<4.0.0'],
-      seaborn: ['>=0.11.0,<1.0.0'],
-      tqdm: ['>=4.64.0,<5.0.0'],
-      requests: ['>=2.28.0,<3.0.0'],
-      pyyaml: ['>=6.0,<7.0'],
-      pillow: ['>=9.0.0,<11.0.0'],
-      tokenizers: ['>=0.13.0,<1.0.0'],
-      accelerate: ['>=0.20.0,<1.0.0'],
-      evaluate: ['>=0.4.0,<1.0.0'],
-      wandb: ['>=0.13.0,<1.0.0'],
-      tensorboard: ['>=2.9.0,<3.0.0'],
-      jupyter: ['>=1.0.0,<2.0.0'],
-      ipython: ['>=8.0.0,<9.0.0'],
-      scipy: ['>=1.9.0,<2.0.0'],
-    }
-  }
 
-  /**
-   * Validate a single package against the whitelist
-   */
-  private validatePackage(
-    packageName: string,
-    versionSpec?: string,
-  ): {
-    isAllowed: boolean
-    hasValidVersion: boolean
-    allowedVersions: string[]
-    violations: string[]
-  } {
-    const whitelist = this.getPackageWhitelist()
-    const normalizedPackageName = packageName
-      .toLowerCase()
-      .replace(/[-_]/g, '-')
-
-    const whitelistKey = Object.keys(whitelist).find(
-      (key) =>
-        key.toLowerCase().replace(/[-_]/g, '-') === normalizedPackageName,
-    )
-
-    const violations: string[] = []
-
-    if (!whitelistKey) {
-      violations.push(`Package not in whitelist: ${packageName}`)
-      return {
-        isAllowed: false,
-        hasValidVersion: false,
-        allowedVersions: [],
-        violations,
-      }
-    }
-
-    const allowedVersions = whitelist[whitelistKey] ?? []
-
-    if (!versionSpec) {
-      violations.push(`Package missing version specification: ${packageName}`)
-      return {
-        isAllowed: true,
-        hasValidVersion: false,
-        allowedVersions,
-        violations,
-      }
-    }
-
-    // Basic version validation
-    const hasValidVersion = allowedVersions.some((constraint) => {
-      if (constraint.includes('>=') && constraint.includes('<')) {
-        return true // Accept range specifications for now
-      }
-      return versionSpec.includes(constraint.replace(/[>=<]/g, ''))
-    })
-
-    if (!hasValidVersion) {
-      violations.push(
-        `Package version not in allowed range: ${packageName}${versionSpec} (allowed: ${allowedVersions.join(', ')})`,
-      )
-    }
-
-    return {
-      isAllowed: true,
-      hasValidVersion,
-      allowedVersions,
-      violations,
-    }
-  }
 
   private async validateScriptPath(scriptPath: string): Promise<void> {
     const resolvedPath = path.resolve(scriptPath)
@@ -1098,91 +966,10 @@ export class MentalArenaPythonBridge {
       }
     }
 
-    if (!(await this.fileExists(resolvedPath))) {
+    if (!(await fileExists(resolvedPath))) {
       throw new Error(`Script not found: ${scriptPath}`)
     }
   }
 
-  private async fileExists(filePath: string): Promise<boolean> {
-    try {
-      await fs.access(filePath)
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private async cleanupTempFiles(filePaths: string[]): Promise<void> {
-    await Promise.allSettled(
-      filePaths.map(async (filePath) => {
-        try {
-          if (await this.fileExists(filePath)) {
-            await fs.unlink(filePath)
-          }
-        } catch (error: unknown) {
-          logger.warn(`Failed to cleanup temp file: ${filePath}`, error)
-        }
-      }),
-    )
-  }
 }
 
-/**
- * Performance metrics tracker for the Python bridge
- */
-class BridgePerformanceMetrics {
-  private executions: Array<{
-    timestamp: number
-    duration: number
-    success: boolean
-  }> = []
-  private initializationTime: number = 0
-
-  recordExecution(duration: number, success: boolean): void {
-    this.executions.push({
-      timestamp: Date.now(),
-      duration,
-      success,
-    })
-
-    // Keep only last 1000 executions
-    if (this.executions.length > 1000) {
-      this.executions = this.executions.slice(-1000)
-    }
-  }
-
-  recordInitialization(duration: number): void {
-    this.initializationTime = duration
-  }
-
-  getMetrics(): {
-    totalExecutions: number
-    averageExecutionTime: number
-    successRate: number
-    initializationTime: number
-  } {
-    if (this.executions.length === 0) {
-      return {
-        totalExecutions: 0,
-        averageExecutionTime: 0,
-        successRate: 0,
-        initializationTime: this.initializationTime,
-      }
-    }
-
-    const totalDuration = this.executions.reduce(
-      (sum, exec) => sum + exec.duration,
-      0,
-    )
-    const successfulExecutions = this.executions.filter(
-      (exec) => exec.success,
-    ).length
-
-    return {
-      totalExecutions: this.executions.length,
-      averageExecutionTime: totalDuration / this.executions.length,
-      successRate: (successfulExecutions / this.executions.length) * 100,
-      initializationTime: this.initializationTime,
-    }
-  }
-}
