@@ -268,3 +268,10 @@ updates:
       - dependency-name: 'moviepy'
       # Stale security alerts trigger security_update_not_needed once setuptools is current.
       - dependency-name: 'setuptools'
+      # The `lightning` package switched from calendar versioning (2022.x) to
+      # semver (2.x). PEP 440 considers 2.x < 2022.6.15, so the GHSA advisory
+      # for `< 2022.6.15` false-positives on all 2.x releases. We pin
+      # lightning>=2.6.5 in pyproject.toml to address the real CVEs
+      # (=2.6.2, =2.6.3 insecure deserialization); this ignore suppresses the
+      # false-positive advisory so Dependabot security jobs can succeed.
+      - dependency-name: 'lightning'

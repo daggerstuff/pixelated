@@ -48,6 +48,7 @@ dependencies = [
   "timm>=1.0.28",
   "open-clip-torch>=3.3.0",
   "pytorch-lightning>=2.6.5", # Fixes CVE-2026-31221 (insecure deserialization RCE in load_from_checkpoint)
+  "lightning>=2.6.5", # Security pin: ensures transitive lightning meta-package matches pytorch-lightning version
   # Audio Processing
   "speechbrain>=1.1.0",
   "pyannote.audio>=4.0.7",
