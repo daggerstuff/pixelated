@@ -215,7 +215,7 @@ export class ObjectiveWeightingEngine {
     // Ensure all objectives are represented; fall back to base when missing
     for (const [objectiveId, base] of Object.entries(baseWeights)) {
       weights[objectiveId] =
-        (contextual as any as Record<string, number>)[objectiveId] ?? base
+        (contextual as Record<string, number>)[objectiveId] ?? base
     }
     const { userProfile } = context
 
@@ -319,27 +319,6 @@ export class ObjectiveWeightingEngine {
 
     return weights
   }
-
-  // This method is no longer needed as context.detectedContext is used directly
-  // private determineContextType(
-  //   context: AlignmentContext,
-  // ): keyof ContextWeightMultipliers {
-  //   // Use the detected context type from the context object
-  //   switch (context.detectedContext) {
-  //     case ContextType.CRISIS:
-  //       return 'crisis'
-  //     case ContextType.EDUCATIONAL:
-  //       return 'educational'
-  //     case ContextType.SUPPORT:
-  //       return 'support'
-  //     case ContextType.CLINICAL_ASSESSMENT:
-  //       return 'clinical'
-  //     case ContextType.INFORMATIONAL:
-  //       return 'informational'
-  //     default:
-  //       return 'default'
-  //   }
-  // }
 
   private identifyPriorityObjectives(context: AlignmentContext): string[] {
     const priorities: string[] = []

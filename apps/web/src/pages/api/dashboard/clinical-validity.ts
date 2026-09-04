@@ -39,7 +39,6 @@ async function getQueueStats(): Promise<number> {
       return data.pending ?? 0
     }
   } catch (error) {
-    console.warn('Failed to fetch annotation queue stats:', error)
   }
 
   return mockData.queueDepth
@@ -62,7 +61,6 @@ async function runBenchmark(): Promise<{
       'training.benchmark',
     ]
 
-    console.log(`Running benchmark: ${command} ${args.join(' ')}`)
 
     const child = spawn(command, args, {
       cwd: join(process.cwd(), 'ai'),
@@ -134,19 +132,14 @@ async function runBenchmark(): Promise<{
             weeklyTrend,
           })
         } catch (parseError) {
-          console.error('Failed to parse benchmark output:', parseError)
-          console.error('STDOUT:', stdout)
-          console.error('STDERR:', stderr)
           reject(new Error('Failed to parse benchmark output'))
         }
       } else {
-        console.error(`Benchmark failed with code ${code}:`, stderr)
         reject(new Error(`Benchmark process exited with code ${code}`))
       }
     })
 
     child.on('error', (error) => {
-      console.error('Failed to spawn benchmark process:', error)
       reject(error)
     })
   })
@@ -170,7 +163,6 @@ async function readBenchmarkFile(): Promise<{
       weeklyTrend: result.historical_trend?.slice(-7) ?? mockData.weeklyTrend,
     }
   } catch (error) {
-    console.warn('Failed to read benchmark file:', error)
     throw new Error(
       `Failed to read benchmark file: ${error instanceof Error ? error.message : 'Unknown error'}`,
     )
@@ -190,7 +182,6 @@ export const GET: APIRoute = async ({ url }) => {
     let queueDepth: number
 
     if (useMock) {
-      console.log('Using mock data for clinical validity dashboard')
       benchmarkData = mockData
       queueDepth = mockData.queueDepth
     } else {
@@ -198,10 +189,6 @@ export const GET: APIRoute = async ({ url }) => {
         // Try to run benchmark first
         benchmarkData = await runBenchmark()
       } catch (benchmarkError) {
-        console.warn(
-          'Benchmark execution failed, trying to read from file:',
-          benchmarkError,
-        )
 
         // Try to read from file as fallback
         benchmarkData = await readBenchmarkFile()
@@ -234,7 +221,6 @@ export const GET: APIRoute = async ({ url }) => {
       },
     })
   } catch (error) {
-    console.error('Clinical validity API error:', error)
 
     // Return 500 error when scorer fails
     const errorResponse = {

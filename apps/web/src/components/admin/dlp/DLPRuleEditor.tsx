@@ -217,7 +217,6 @@ export default function DLPRuleEditor() {
         }, 100)
       }
     } catch (error: unknown) {
-      console.error('Error saving rule:', error)
       document.dispatchEvent(
         new CustomEvent('dlp:error', {
           detail: {

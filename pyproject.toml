@@ -45,7 +45,7 @@ dependencies = [
   "sentence-transformers>=2.7.0", # For semantic similarity in deduplication
   # HuggingFace Hub
   "huggingface-hub>=0.24.0",
-  "transformers>=5.0.0rc3", # Required for dataset_pipeline training_runner
+  "transformers>=5.14.1",
   "torch==2.13.0", # Matches apps/web/src/lib/ai/training/requirements.txt
   "gguf>=0.10.0",
   "yamllint>=1.37.1",

@@ -25,7 +25,7 @@ type EmailTemplate = z.infer<typeof EmailTemplateSchema>
 const EmailDataSchema = z.object({
   to: z.email(),
   templateAlias: z.string(),
-  templateModel: (z.record as any)(z.unknown()),
+  templateModel: z.record(z.unknown()),
   attachments: z
     .array(
       z.object({
@@ -35,7 +35,7 @@ const EmailDataSchema = z.object({
       }),
     )
     .optional(),
-  metadata: (z.record as any)(z.string()).optional(),
+  metadata: z.record(z.string()).optional(),
   messageStream: z.string().optional(),
 })
 

@@ -47,14 +47,16 @@ export function useConversationMessages(
     })
 
   // Track last message time for response time calculation
-  const lastMessageTimeRef = useRef<number>(Date.now())
+  const lastMessageTimeRef = useRef<number | null>(null)
 
   /**
    * Adds a message to the conversation history and updates metrics.
    */
   const addMessage = (role: 'therapist' | 'client', message: string) => {
     const currentTime = Date.now()
-    const responseTime = (currentTime - lastMessageTimeRef.current) / 1000 // seconds
+    const lastTime = lastMessageTimeRef.current
+    const responseTime =
+      lastTime === null ? 0 : (currentTime - lastTime) / 1000 // seconds
 
     setHistory((prev) => [...prev, { role, message }])
     setProgressMetrics((prev) => {

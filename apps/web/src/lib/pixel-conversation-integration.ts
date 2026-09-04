@@ -356,7 +356,7 @@ export class PixelConversationIntegration {
       if (Array.isArray(val) && val.length > maxHistory) {
         ;(this.state.eqMetricsAggregate[
           key as keyof EQMetricsAggregate
-        ] as any) = val.slice(-maxHistory)
+        ] as unknown) = val.slice(-maxHistory)
       }
     })
   }

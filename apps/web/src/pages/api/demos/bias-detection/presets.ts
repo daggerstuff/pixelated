@@ -1,6 +1,5 @@
 // API endpoint for bias detection preset scenarios
 
-// import type { APIRoute } from 'astro'
 import {
   PRESET_SCENARIOS,
   getPresetScenario,
@@ -161,8 +160,6 @@ export const GET = async ({ url }) => {
       },
     )
   } catch (error: unknown) {
-    console.error('Presets API error:', error)
-
     return new Response(
       JSON.stringify({
         error: 'Internal server error',

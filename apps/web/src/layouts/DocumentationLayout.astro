@@ -194,7 +194,6 @@ const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
     <ToTopButton />
     <script is:inline nonce={cspNonce}>
       function _speedInsightsBeforeSend(data) {
-        console.log('Speed Insights before send', data)
         return data
       }
     </script>

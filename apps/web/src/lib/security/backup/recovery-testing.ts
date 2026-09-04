@@ -327,11 +327,6 @@ export class RecoveryTestingManager {
     // Implementation would connect to a scheduling system
     // to periodically run recovery tests
 
-    // For example, using node-cron or similar:
-    // cron.schedule(this.config.schedule, () => {
-    //   this.runScheduledTest()
-    // })
-
     // Log scheduling as an audit event
     logAuditEvent(
       AuditEventType.SECURITY,
@@ -734,7 +729,6 @@ interface TestEnvironment {
  * Docker-based test environment
  */
 class DockerTestEnvironment implements TestEnvironment {
-  // private config: Record<string, unknown>
 
   async initialize(): Promise<void> {
     logger.info('Initializing Docker test environment')
@@ -776,7 +770,6 @@ class DockerTestEnvironment implements TestEnvironment {
  * Kubernetes-based test environment
  */
 class KubernetesTestEnvironment implements TestEnvironment {
-  // private config: Record<string, unknown>
 
   async initialize(): Promise<void> {
     logger.info('Initializing Kubernetes test environment')
@@ -818,7 +811,6 @@ class KubernetesTestEnvironment implements TestEnvironment {
  * VM-based test environment
  */
 class VMTestEnvironment implements TestEnvironment {
-  // private config: Record<string, unknown>
 
   async initialize(): Promise<void> {
     logger.info('Initializing VM test environment')
@@ -860,7 +852,6 @@ class VMTestEnvironment implements TestEnvironment {
  * In-memory sandbox test environment (lightest option)
  */
 class SandboxTestEnvironment implements TestEnvironment {
-  // private config: Record<string, unknown>
   private restoredData: Map<string, Uint8Array> = new Map()
 
   async initialize(): Promise<void> {

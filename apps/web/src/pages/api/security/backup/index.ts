@@ -1,4 +1,3 @@
-// import type { APIRoute } from 'astro'
 import { getCurrentUser } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 

@@ -11,6 +11,7 @@ import { getMockFHEService } from './mock/mock-fhe-service'
 import { SealOperations } from './seal-operations'
 import { SealScheme } from './seal-scheme'
 import { SealService } from './seal-service'
+import type { SealCipherText } from './seal-service'
 import { SealSchemeType } from './seal-types'
 import { tenantManager } from './tenant-manager'
 import type { FHEOperation } from './types'
@@ -147,7 +148,7 @@ const sealFHEService: FHEService = {
       // Deserialize the ciphertext string back to a SealCipherText object
       const seal = sealService.getSeal()
       const context = sealService.getContext()
-      const sealCipherText = seal.CipherText() as any
+      const sealCipherText: SealCipherText = seal.CipherText()
       sealCipherText.load(context, ciphertext as string)
 
       // Decrypt the SealCipherText object
@@ -187,10 +188,10 @@ const sealFHEService: FHEService = {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const aCiphertext = seal.CipherText() as any
+      const aCiphertext: SealCipherText = seal.CipherText()
       aCiphertext.load(context, aCiphertextStr as string)
 
-      const bCiphertext = seal.CipherText() as any
+      const bCiphertext: SealCipherText = seal.CipherText()
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.add(aCiphertext, bCiphertext)
@@ -238,10 +239,10 @@ const sealFHEService: FHEService = {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const aCiphertext = seal.CipherText() as any
+      const aCiphertext: SealCipherText = seal.CipherText()
       aCiphertext.load(context, aCiphertextStr as string)
 
-      const bCiphertext = seal.CipherText() as any
+      const bCiphertext: SealCipherText = seal.CipherText()
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.subtract(aCiphertext, bCiphertext)
@@ -285,9 +286,18 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
+      const seal = sealService.getSeal()
+      const context = sealService.getContext()
+
+      const aCiphertext: SealCipherText = seal.CipherText()
+      aCiphertext.load(context, aCiphertext as string)
+
+      const bCiphertext: SealCipherText = seal.CipherText()
+      bCiphertext.load(context, bCiphertext as string)
+
       const result = await sealOperations.multiply(
-        aCiphertext as string as any,
-        bCiphertext as string as any,
+        aCiphertext,
+        bCiphertext,
       )
 
       if (!result.success) {
@@ -311,7 +321,14 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
-      const result = await sealOperations.negate(ciphertext as any)
+      const seal = sealService.getSeal()
+      const context = sealService.getContext()
+      const cipherObj: SealCipherText = seal.CipherText()
+      cipherObj.load(context, ciphertext as string)
+
+      const result = await sealOperations.negate(cipherObj)
+
+      cipherObj.delete()
 
       if (!result.success) {
         throw new Error(result.error ?? 'Negation operation failed')
@@ -337,10 +354,17 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
+      const seal = sealService.getSeal()
+      const context = sealService.getContext()
+      const cipherObj: SealCipherText = seal.CipherText()
+      cipherObj.load(context, ciphertext as string)
+
       const result = await sealOperations.polynomial(
-        ciphertext as any,
+        cipherObj,
         coefficients,
       )
+
+      cipherObj.delete()
 
       if (!result.success) {
         throw new Error(result.error ?? 'Polynomial operation failed')
@@ -363,7 +387,14 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
-      const result = await sealOperations.rotate(ciphertext as any, steps)
+      const seal = sealService.getSeal()
+      const context = sealService.getContext()
+      const cipherObj: SealCipherText = seal.CipherText()
+      cipherObj.load(context, ciphertext as string)
+
+      const result = await sealOperations.rotate(cipherObj, steps)
+
+      cipherObj.delete()
 
       if (!result.success) {
         throw new Error(result.error ?? 'Rotation operation failed')
@@ -627,7 +658,7 @@ export async function getTenantFHEService(
         )
       }
 
-      return baseService.decrypt<T>(encryptedData as any, options)
+      return baseService.decrypt<T>(encryptedData as EncryptedData<T>, options)
     },
   }
 

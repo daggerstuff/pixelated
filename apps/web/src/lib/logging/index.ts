@@ -33,10 +33,6 @@ export type LogMetadata = Record<string, LogMetadataValue>
 const DEFAULT_PHI_PATTERNS: RegExp[] = [
   /\b\d{3}-\d{2}-\d{4}\b/g,
   // Add more patterns for common PHI/PII like DOB, specific ID formats, etc.
-  // Example: Credit Card Numbers (very basic, needs refinement for real use)
-  // /\b(?:\d[ -]*?){13,16}\b/g,
-  // Example: Email Addresses (might be too broad for some logs, consider context)
-  // /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g,
 ]
 
 // Logger options
@@ -403,4 +399,3 @@ export function configureLogging(options: Partial<LoggerOptions>): void {
  * Do NOT export a top-level logger instance to avoid circular import issues.
  * If you need a default logger, use createBuildSafeLogger("default") directly in your code.
  */
-// export default createBuildSafeLogger("default")

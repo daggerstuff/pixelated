@@ -463,9 +463,4 @@ export function getScenariosByDifficulty(
 }
 
 // Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });
+

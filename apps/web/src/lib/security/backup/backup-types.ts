@@ -2,8 +2,6 @@
  * Common types for backup and recovery systems
  */
 
-// export type StorageProvider = typeof StorageProvider
-
 /**
  * Type of backup being performed
  */

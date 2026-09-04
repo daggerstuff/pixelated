@@ -34,10 +34,12 @@ chore: bump pnpm to 11.12.0
 ## Before Pushing
 
 ```bash
-pnpm check:all    # typecheck + astro check
-pnpm lint         # oxlint
+pnpm lint         # oxlint (type-aware)
 pnpm format:check # formatting
 ```
+
+> **Do not use** `astro check`, `pnpm typecheck`, or `tsc` — they cause OOM failures.
+> Use `pnpm lint` (type-aware oxlint) instead.
 
 Git hooks run automatically on commit (installed via
 `scripts/devops/pnpm-install-with-fallback.sh`).

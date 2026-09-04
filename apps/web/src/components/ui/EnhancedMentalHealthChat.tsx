@@ -195,6 +195,37 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
     scrollToBottom()
   }, [messages])
 
+  function generateResponse(analysis: MindMirrorAnalysis): string {
+    const archetype = analysis.archetype.main_archetype
+    const urgency = analysis.mood_vector.urgency_score
+
+    if (urgency > 0.8) {
+      return "I notice some urgency in your message. It's important that you know support is available. Would you like to talk about what's concerning you most right now?"
+    }
+
+    const responses: Record<Archetype, string> = {
+      wounded_healer:
+        'I can sense the depth of your experience. Your ability to transform challenges into wisdom is remarkable. How has this journey shaped your perspective?',
+      shadow_strategist:
+        'Your analytical approach is clear in your message. You seem to be processing this situation strategically. What factors are you considering most important?',
+      visionary:
+        'I can feel the creative energy in your words. Your forward-thinking perspective is inspiring. What vision are you working toward?',
+      caregiver:
+        "Your caring nature comes through strongly. It's beautiful how you focus on supporting others. How are you taking care of yourself too?",
+      inner_child:
+        "There's a wonderful authenticity in your expression. Your openness is refreshing. What brings you the most joy right now?",
+      wise_elder:
+        'Your thoughtful perspective shows real wisdom. I appreciate the depth of your reflection. What insights have been most meaningful to you?',
+      rebel_spirit:
+        'I can sense your drive for change and independence. Your energy is powerful. What transformation are you working toward?',
+    }
+
+    return (
+      responses[archetype] ??
+      "Thank you for sharing. I can see there's a lot going on for you right now. What would be most helpful to explore together?"
+    )
+  }
+
   const handleSend = useCallback(async () => {
     if (!input.trim() || isAnalyzing) {
       return
@@ -242,37 +273,6 @@ export const EnhancedMentalHealthChat: FC<EnhancedMentalHealthChatProps> = ({
       setIsAnalyzing(false)
     }
   }, [input, isAnalyzing, onAnalyze])
-
-  const generateResponse = (analysis: MindMirrorAnalysis): string => {
-    const archetype = analysis.archetype.main_archetype
-    const urgency = analysis.mood_vector.urgency_score
-
-    if (urgency > 0.8) {
-      return "I notice some urgency in your message. It's important that you know support is available. Would you like to talk about what's concerning you most right now?"
-    }
-
-    const responses: Record<Archetype, string> = {
-      wounded_healer:
-        'I can sense the depth of your experience. Your ability to transform challenges into wisdom is remarkable. How has this journey shaped your perspective?',
-      shadow_strategist:
-        'Your analytical approach is clear in your message. You seem to be processing this situation strategically. What factors are you considering most important?',
-      visionary:
-        'I can feel the creative energy in your words. Your forward-thinking perspective is inspiring. What vision are you working toward?',
-      caregiver:
-        "Your caring nature comes through strongly. It's beautiful how you focus on supporting others. How are you taking care of yourself too?",
-      inner_child:
-        "There's a wonderful authenticity in your expression. Your openness is refreshing. What brings you the most joy right now?",
-      wise_elder:
-        'Your thoughtful perspective shows real wisdom. I appreciate the depth of your reflection. What insights have been most meaningful to you?',
-      rebel_spirit:
-        'I can sense your drive for change and independence. Your energy is powerful. What transformation are you working toward?',
-    }
-
-    return (
-      responses[archetype] ??
-      "Thank you for sharing. I can see there's a lot going on for you right now. What would be most helpful to explore together?"
-    )
-  }
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {

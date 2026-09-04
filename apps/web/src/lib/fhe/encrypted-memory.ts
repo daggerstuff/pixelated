@@ -407,7 +407,7 @@ export class EncryptedMemoryService {
           },
           createdAt: (session['createdAt'] as number) || 0,
           updatedAt: (session['updatedAt'] as number) || 0,
-          metadata: (session['metadata'] as any) ?? {},
+          metadata: (session['metadata'] as Record<string, unknown>) ?? {},
         })
       }
     }
@@ -430,7 +430,7 @@ export class EncryptedMemoryService {
             (memory['entryType'] as EncryptedMemoryEntry['entryType']) ||
             'session_summary',
           createdAt: (memory['createdAt'] as number) || 0,
-          metadata: (memory['metadata'] as any) ?? {},
+          metadata: (memory['metadata'] as Record<string, unknown>) ?? {},
         })
       }
     }

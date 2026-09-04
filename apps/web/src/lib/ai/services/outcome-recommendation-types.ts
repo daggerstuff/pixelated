@@ -14,12 +14,12 @@ export const TherapySessionSchema = z.object({
   status: z.enum(['active', 'completed', 'scheduled', 'cancelled']),
   securityLevel: z.enum(['standard', 'enhanced', 'maximum']),
   emotionAnalysisEnabled: z.boolean(),
-  metadata: (z.record as any)(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 })
 
 export const ChatSessionSchema = z.object({
   messages: z.array(MessageSchema),
-  metadata: (z.record as any)(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 })
 
 export const EmotionStateSchema = z.object({
@@ -28,7 +28,7 @@ export const EmotionStateSchema = z.object({
   timestamp: z.date(),
   confidence: z.number().min(0).max(1),
   relatedFactors: z.array(z.string()).optional(),
-  metadata: (z.record as any)(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 })
 
 export const MentalHealthAnalysisSchema = z.object({
@@ -46,7 +46,7 @@ export const RecommendationContextSchema = z.object({
   chatSession: ChatSessionSchema,
   recentEmotionState: EmotionStateSchema,
   recentInterventions: z.array(z.string()),
-  userPreferences: (z.record as any)(z.unknown()).optional(),
+  userPreferences: z.record(z.unknown()).optional(),
   mentalHealthAnalysis: MentalHealthAnalysisSchema.optional(),
 })
 
@@ -74,7 +74,7 @@ export const TreatmentForecastSchema = z.object({
       sideEffects: z.array(z.string()),
     })
     .optional(),
-  metadata: (z.record as any)(z.unknown()).optional(),
+  metadata: z.record(z.unknown()).optional(),
 })
 
 // Type definitions

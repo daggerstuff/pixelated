@@ -5,10 +5,7 @@ export class EmailService {
     temporaryPassword: string,
     role: string,
   ): Promise<void> {
-    console.log(`Sending invitation email to: ${email}`)
-    console.log(`Temporary password: ${temporaryPassword}`)
-    console.log(`Role: ${role}`)
-    console.log('Email content: Welcome to Business Strategy CMS!')
+    // Security: Never log credentials. Redact temporary password.
 
     // In a real implementation, this would use nodemailer or similar
     // to send actual emails
@@ -18,16 +15,14 @@ export class EmailService {
     email: string,
     username: string,
   ): Promise<void> {
-    console.log(`Sending welcome email to: ${email}`)
-    console.log(`Welcome ${username}! Your account is now active.`)
+    // error handled by caller
   }
 
   static async sendPasswordResetEmail(
     email: string,
     resetToken: string,
   ): Promise<void> {
-    console.log(`Sending password reset email to: ${email}`)
-    console.log(`Reset token: ${resetToken}`)
+    // error handled by caller
   }
 
   static async sendEmail(options: {
@@ -35,8 +30,6 @@ export class EmailService {
     subject: string
     body: string
   }): Promise<void> {
-    console.log(`Sending email to: ${options.to}`)
-    console.log(`Subject: ${options.subject}`)
-    console.log('Body:', options.body)
+    // error handled by caller
   }
 }

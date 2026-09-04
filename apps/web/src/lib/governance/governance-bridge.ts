@@ -3,7 +3,7 @@ import { ComplianceValidator } from './compliance-validator'
 import { SlackAlerter } from './slack-alert'
 import { UnifiedMonitor, type MonitorEvent } from './unified-monitor'
 
-const logger = getLogger({ module: 'governance-bridge' } as any)
+const logger = getLogger('governance-bridge')
 
 /**
  * GovernanceBridge — composition root for governance event aggregation.

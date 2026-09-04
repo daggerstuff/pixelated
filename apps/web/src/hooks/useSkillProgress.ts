@@ -43,8 +43,8 @@ export function useSkillProgress(
         }
 
         // If session directly contains skill progress, use it.
-        if ((session as any).skills && Array.isArray((session as any).skills)) {
-          const normalized = (session as any).skills.map((s: any) => ({
+        if ((session as { skills?: unknown[] }).skills && Array.isArray((session as { skills?: unknown[] }).skills)) {
+          const normalized = (session as { skills?: unknown[] }).skills.map((s: Record<string, unknown>) => ({
             skill: String(s.skill ?? s.name ?? 'Unknown'),
             score: Number(s.score ?? 0),
             trend: s.trend === 'up' || s.trend === 'down' ? s.trend : 'stable',

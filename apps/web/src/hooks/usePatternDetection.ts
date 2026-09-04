@@ -38,7 +38,6 @@ export const usePatternDetection = () => {
     content: 'Sample message',
     name: 'SampleUser',
   }
-  console.log('[usePatternDetection] Sample Message:', sampleMessage)
 
   const detectPatterns = useCallback(
     async (messages: Message[]): Promise<ConversationPattern[]> => {
@@ -105,7 +104,6 @@ export const usePatternDetection = () => {
             }))
           : []
       } catch (error: unknown) {
-        console.error('Error detecting patterns:', error)
         return [
           {
             patternType: 'error',

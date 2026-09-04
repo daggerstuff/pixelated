@@ -43,7 +43,7 @@ export function useWebSocket({
   const [error, setError] = useState<Error | null>(null)
   const wsRef = useRef<WebSocket | null>(null)
 
-  const connect = useCallback(() => {
+  const connect = useCallback(function connect() {
     try {
       const ws = new WebSocket(url)
       wsRef.current = ws
@@ -121,9 +121,10 @@ export function useWebSocket({
   }, [url, sessionId, onMessage, onStatusChange, onError, encrypted])
 
   useEffect(() => {
-    connect()
+    const timer = window.setTimeout(connect, 0)
 
     return () => {
+      window.clearTimeout(timer)
       if (wsRef.current) {
         wsRef.current.close()
       }

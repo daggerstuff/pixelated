@@ -156,7 +156,6 @@ export const GET: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Error fetching AI preferences', { error })
 
     // Create audit log for the error
     await createAuditLog(
@@ -261,7 +260,6 @@ export const PUT: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Error updating AI preferences', { error })
 
     // Create audit log for the error
     await createAuditLog(
@@ -361,7 +359,6 @@ export const DELETE: APIRoute = async ({ request }) => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Error resetting AI preferences', { error })
 
     // Create audit log for the error
     await createAuditLog(

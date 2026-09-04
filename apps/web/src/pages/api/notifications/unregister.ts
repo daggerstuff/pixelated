@@ -10,7 +10,7 @@ export const POST = async ({ request }: { request: Request }) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!(authResult as any)?.authenticated) {
+    if (!(authResult as { authenticated?: boolean })?.authenticated) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -27,7 +27,7 @@ export const POST = async ({ request }: { request: Request }) => {
 
     // Remove push subscription
     await notificationService.removePushSubscription(
-      (authResult as any).user?.id,
+      (authResult as { user?: { id?: string } }).user?.id,
     )
 
     return new Response(

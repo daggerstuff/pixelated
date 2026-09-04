@@ -109,7 +109,7 @@ export function useEvidenceAssistant(
         throw normalizedError
       }
     },
-    [authConfig?.getAccessTokenSilently],
+    [authConfig],
   )
 
   const cancel = useCallback(() => {

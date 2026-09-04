@@ -199,7 +199,7 @@ export function useComparativeProgress(
       setLoading(false)
     }
   }, [
-    authConfig?.getAccessTokenSilently,
+    authConfig,
     userId,
     metric,
     cohort,
@@ -208,8 +208,11 @@ export function useComparativeProgress(
   ])
 
   useEffect(() => {
-    void fetchData()
+    const timer = window.setTimeout(() => {
+      void fetchData()
+    }, 0)
     return () => {
+      window.clearTimeout(timer)
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }

@@ -16,7 +16,7 @@ import type { TherapeuticSession } from './types'
 export function anonymizeSession(
   session: TherapeuticSession,
 ): TherapeuticSession {
-  const anonymizedSession = JSON.parse((JSON as any).stringify(session) as string)
+  const anonymizedSession = JSON.parse(JSON.stringify(session) as string)
 
   // Anonymize participant demographics
   anonymizedSession['participantDemographics'] = {

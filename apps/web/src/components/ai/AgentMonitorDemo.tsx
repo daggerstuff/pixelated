@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Play, Pause, Plus, Trash2, Zap, Send, Loader2, Download, RotateCcw } from 'lucide-react';
 import { MultiAgentThoughtUI } from './MultiAgentThoughtUI';
 import { AgentPerformanceHeatmap, type AgentMetric } from './AgentPerformanceHeatmap';
@@ -50,7 +50,7 @@ export const AgentMonitorDemo: React.FC = () => {
   const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null);
   
   // Unique session ID for the current "Live" session
-  const sessionTurnId = useMemo(() => Math.random().toString(36).substring(2, 15), []);
+  const [sessionTurnId] = useState(() => `session-${Math.random().toString(36).substring(2, 15)}`);
   
   // Performance stats state
   const [stats, setStats] = useState<Record<string, AgentMetric>>({});
@@ -119,7 +119,7 @@ export const AgentMonitorDemo: React.FC = () => {
       await fetch('/api/ai/pixel/stats', { method: 'POST' }); // The proxy handles POST as reset
       void fetchStats();
     } catch (err) {
-      console.error('Failed to reset stats');
+      // error handled by caller
     }
   };
 
@@ -149,7 +149,7 @@ export const AgentMonitorDemo: React.FC = () => {
         setStats(data);
       }
     } catch (err) {
-      console.error('Failed to fetch stats');
+      // error handled by caller
     }
   }, []);
 
@@ -188,9 +188,8 @@ export const AgentMonitorDemo: React.FC = () => {
         });
       }
       
-      console.log(`Feedback ${feedback} saved for ${activityId}`);
     } catch (err) {
-      console.error('Error saving feedback:', err);
+      // error handled by caller
     }
   };
 

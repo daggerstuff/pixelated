@@ -73,6 +73,8 @@ export function usePixelConversationIntegration(
 
   // Service reference
   const integrationRef = useRef<PixelConversationIntegration | null>(null)
+  const [integration, setIntegration] =
+    useState<PixelConversationIntegration | null>(null)
 
   // State
   const [eqMetrics, setEQMetrics] = useState<EQMetricsAggregate | null>(null)
@@ -89,6 +91,7 @@ export function usePixelConversationIntegration(
     if (autoInitialize && !integrationRef.current) {
       integrationRef.current = createPixelIntegration(pixelConfig)
       integrationRef.current.initializeSession(sessionId, userId)
+      setIntegration(integrationRef.current)
     }
 
     return () => {
@@ -186,7 +189,7 @@ export function usePixelConversationIntegration(
     clearBiasFlags,
     resetSession,
     getConversationHistory,
-    integration: integrationRef.current,
+    integration,
   }
 }
 

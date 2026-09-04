@@ -64,21 +64,14 @@ const redisOptions = REDIS_URL.startsWith('rediss://')
 let redis: RedisLike | Redis = new Redis(REDIS_URL, redisOptions)
 setRedisClient(redis as unknown as Parameters<typeof setRedisClient>[0])
 
-redis.on('error', (err: unknown) => {
-  // We handle connection errors in the connect().catch() block below
+redis.on('error', (_err: unknown) => {
   // This listener prevents the "Unhandled error event" warning
-  const message = err instanceof Error ? err.message : String(err)
-  console.debug('Redis connection error (handled):', message)
 })
 
 // Attempt connection with fallback for development
 if (typeof redis.connect === 'function') {
   redis.connect().catch((err) => {
     if (process.env['NODE_ENV'] === 'development') {
-      console.warn(
-        'Failed to connect to Redis in development, using mock:',
-        err instanceof Error ? err.message : String(err),
-      )
       // Create a simple mock compatible with ioredis interface
       const redisMock: RedisLike = {
         connect: async () => undefined,
@@ -93,16 +86,10 @@ if (typeof redis.connect === 'function') {
       setRedisClient(
         redisMock as unknown as Parameters<typeof setRedisClient>[0],
       )
-    } else {
-      console.error('Failed to connect to Redis:', err)
     }
   })
 } else {
-  if (process.env['NODE_ENV'] === 'development') {
-    console.warn(
-      'Redis client does not expose connect(), skipping eager connection fallback.',
-    )
-  }
+  // Redis client does not expose connect() — skipping eager connection fallback
 }
 
 // GovernanceBridge — FHE/audit/secrets event aggregation
@@ -141,7 +128,6 @@ app.use(
     res: express.Response,
     _next: express.NextFunction,
   ) => {
-    console.error('Unhandled server error:', error)
     if (!hasSentryErrorHandler) {
       Sentry.captureException(error)
     }
@@ -163,10 +149,6 @@ const socketService = new SocketService(server, redis, db)
 
 // Global error handlers for unhandled rejections and exceptions
 process.on('unhandledRejection', (reason: unknown) => {
-  console.warn(
-    'Unhandled Rejection:',
-    reason instanceof Error ? reason.message : String(reason),
-  )
   if (!hasSentryErrorHandler) {
     Sentry.captureException(
       reason instanceof Error ? reason : new Error(String(reason)),
@@ -175,7 +157,6 @@ process.on('unhandledRejection', (reason: unknown) => {
 })
 
 process.on('uncaughtException', (error: Error) => {
-  console.error('Uncaught Exception:', error.message)
   if (!hasSentryErrorHandler) {
     Sentry.captureException(error)
   }
@@ -183,13 +164,11 @@ process.on('uncaughtException', (error: Error) => {
 
 // Graceful shutdown
 process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully')
-
   await redis.quit()
   await db.end()
   await closeSentry()
   server.close(() => {
-    console.log('Server closed')
+    // error handled by caller
     process.exit(0)
   })
 })

@@ -141,7 +141,7 @@ export async function createMentalLLaMAFactory(
 
   const adapterOptions: MentalLLaMAAdapterOptions = { modelProvider, taskRouter }
   if (crisisNotifier) {
-    adapterOptions.crisisNotifier = crisisNotifier as any
+    adapterOptions.crisisNotifier = crisisNotifier as unknown
   }
   const adapter = new MentalLLaMAAdapter(adapterOptions)
   // pythonBridge is not directly part of MentalLLaMAAdapterOptions in the merged version

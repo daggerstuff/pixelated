@@ -2,9 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 
 import type { SecurityLevel } from '../../hooks/useSecurity'
 import type { Message } from '../../types/chat'
-// Dynamic imports for FHE to reduce bundle size
-// import { fheService } from '../../lib/fhe'
-// import { AnalyticsType, fheAnalytics } from '../../lib/fhe/analytics'
+
+let fallbackAnalyticsId = 0
 
 // Dynamic FHE imports
 async function loadFHE() {
@@ -146,12 +145,7 @@ export default function AnalyticsDashboard({
   }, [securityLevel, encryptionEnabled])
 
   const generateId = () => {
-    try {
-      return crypto.randomUUID()
-    } catch (error: unknown) {
-      console.error('Failed to generate UUID:', error)
-      return `id-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
-    }
+    return `id-${++fallbackAnalyticsId}`
   }
 
   // Load analytics data
@@ -215,9 +209,12 @@ export default function AnalyticsDashboard({
 
   // Load analytics when messages or FHE initialization changes
   useEffect(() => {
-    if (fheInitialized && messages.length > 0) {
-      void loadAnalytics()
-    }
+    const timer = window.setTimeout(() => {
+      if (fheInitialized && messages.length > 0) {
+        void loadAnalytics()
+      }
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [messages, fheInitialized, loadAnalytics])
 
   // Set up refresh interval
@@ -281,7 +278,7 @@ export default function AnalyticsDashboard({
           <div className="bg-gray-800 flex h-40 items-end space-x-1 rounded-lg p-2">
             {data.sentimentData.map((item: SentimentItem) => {
               // Get mock sentiment values (would be real in production)
-              const sentimentValue = Math.random()
+              const sentimentValue = ((item.messageIndex % 7) + 1) / 7
               const height = `${Math.max(10, Math.round(sentimentValue * 100))}%`
               const color =
                 sentimentValue > 0.7
@@ -333,12 +330,12 @@ export default function AnalyticsDashboard({
 
     // Create mock topic distribution (would be real in production)
     const mockTopics = {
-      anxiety: Math.random() * 0.3,
-      depression: Math.random() * 0.2,
-      trauma: Math.random() * 0.15,
-      relationships: Math.random() * 0.25,
-      work: Math.random() * 0.15,
-      health: Math.random() * 0.1,
+      anxiety: 0.3,
+      depression: 0.2,
+      trauma: 0.15,
+      relationships: 0.25,
+      work: 0.15,
+      health: 0.1,
     }
 
     // Sort topics for display
@@ -400,7 +397,7 @@ export default function AnalyticsDashboard({
     }
 
     // Generate mock risk score (would be real in production)
-    const riskScore = Math.random()
+    const riskScore = data.riskData.length > 0 ? 0.42 : 0
     const riskLevel =
       riskScore > 0.7 ? 'High' : riskScore > 0.3 ? 'Medium' : 'Low'
     const riskColor =
@@ -487,11 +484,11 @@ export default function AnalyticsDashboard({
 
     // Mock intervention types effectiveness (would be real in production)
     const mockInterventions = [
-      { type: 'reflective', effectiveness: Math.random() * 0.8 + 0.2 },
-      { type: 'clarifying', effectiveness: Math.random() * 0.7 + 0.2 },
-      { type: 'challenging', effectiveness: Math.random() * 0.6 + 0.1 },
-      { type: 'supportive', effectiveness: Math.random() * 0.9 + 0.1 },
-      { type: 'directive', effectiveness: Math.random() * 0.5 + 0.3 },
+      { type: 'reflective', effectiveness: 0.84 },
+      { type: 'clarifying', effectiveness: 0.72 },
+      { type: 'challenging', effectiveness: 0.58 },
+      { type: 'supportive', effectiveness: 0.91 },
+      { type: 'directive', effectiveness: 0.63 },
     ]
 
     return (
@@ -564,7 +561,7 @@ export default function AnalyticsDashboard({
     const mockEmotionData = emotions.map((emotion) => {
       return {
         emotion,
-        values: Array.from({ length: 5 }, () => Math.random()),
+        values: Array.from({ length: 5 }, (_, index) => (index + 1) / 5),
       }
     })
 

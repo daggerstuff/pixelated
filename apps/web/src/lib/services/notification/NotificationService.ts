@@ -226,7 +226,7 @@ export class NotificationService {
   private async initializeCrisisTemplate(): Promise<void> {
     if (!this.templates.has(CRISIS_ALERT_TEMPLATE_ID)) {
       // adminEmail may not be present on config.notifications type, but is expected here.
-      const adminEmail = (config.notifications as any).adminEmail?.()
+      const adminEmail = (config.notifications as { adminEmail?: () => string }).adminEmail?.()
       if (!adminEmail) {
         logger.warn(
           'Admin email not configured. Crisis email alerts will not be sent by default template.',
@@ -788,14 +788,6 @@ export class ConsoleNotificationService implements ICrisisNotificationHandler {
       'CRISIS ALERT DISPATCHED (ConsoleNotificationService):',
       JSON.stringify(alertContext, null, 2),
     )
-    // In a real implementation, this would make an API call, send an email, etc.
-    // For example:
-    // await sendToPagerDuty({ ... });
-    // await sendEmailToAdmin({ ... });
-
     // Simulate potential failure for robustness testing
-    // if (Math.random() < 0.1) { // 10% chance of failure
-    //   throw new Error('Simulated failure sending crisis alert via console.');
-    // }
   }
 }

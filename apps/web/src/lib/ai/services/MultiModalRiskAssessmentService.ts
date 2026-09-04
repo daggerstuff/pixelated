@@ -208,7 +208,7 @@ export class MultiModalRiskAssessmentService {
                   hasBehavioral: !!behavioralData,
                   hasClinical: !!clinicalData,
                   hasContextual: !!contextualData,
-                } as any),
+                } as Record<string, unknown>),
       )
 
       // Identify primary contributors

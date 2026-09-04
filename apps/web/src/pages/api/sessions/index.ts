@@ -154,7 +154,7 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
     // Get sessions
     const sessions: TherapySession[] = (await repository.getSessions(
       filter,
-    )) as any
+    )) as unknown
 
     // Apply limit
     const limitedSessions = sessions.slice(0, limit)

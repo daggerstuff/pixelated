@@ -1,8 +1,6 @@
 import type { LayersModel } from '@tensorflow/tfjs'
 
 // TensorFlow.js imports moved to dynamic imports to reduce bundle size
-// import * as tf from '@tensorflow/tfjs'
-// import { loadLayersModel } from '@tensorflow/tfjs-layers'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { createMentalLLaMAFromEnv } from '../../lib/ai/mental-llama'

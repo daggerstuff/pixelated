@@ -151,10 +151,6 @@ export const POST: APIRoute = async ({ request }) => {
       includeEncryptionKey: validatedData.includeEncryptionKey,
     }
 
-    // In a real implementation, you would save this to your database
-    // For this example, we'll just return success
-    // db.exportRequests.create(exportRequest);
-
     // Log the export request for audit purposes
     logger.info('Export request created', {
       exportId: exportRequest.id,
@@ -165,10 +161,6 @@ export const POST: APIRoute = async ({ request }) => {
       dataFormat: exportRequest.dataFormat,
       dataSections: exportRequest.dataSections.join(','),
     })
-
-    // Queue the export job for processing
-    // In a real implementation, you would add this to a queue
-    // queue.add('process-export-request', { exportId: exportRequest.id });
 
     return new Response(
       JSON.stringify({

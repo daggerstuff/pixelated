@@ -17,7 +17,6 @@ export const GET = async ({ request }: APIContext) => {
         },
       )
     }
-    // const { user } = session
 
     // Get query parameters
     const { searchParams } = new URL(request.url)

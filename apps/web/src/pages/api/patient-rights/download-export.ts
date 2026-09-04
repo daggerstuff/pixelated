@@ -1,4 +1,3 @@
-// import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -29,14 +28,14 @@ export const GET = async ({ request }: { request: Request }) => {
 
     if (!validationResult.success) {
       logger.warn('Invalid export download request', {
-        errors: (validationResult.error as any)?.errors,
+        errors: (validationResult.error as { errors?: string[] })?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid request parameters',
-          errors: (validationResult.error as any)?.errors,
+          errors: (validationResult.error as { errors?: string[] })?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

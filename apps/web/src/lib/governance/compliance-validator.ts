@@ -3,7 +3,7 @@ import { logGovernanceDecision } from '@/lib/audit/log'
 import { getLogger } from '../logging'
 import type { UnifiedMonitor } from './unified-monitor'
 
-const logger = getLogger({ module: 'compliance-validator' } as any)
+const logger = getLogger('compliance-validator')
 
 export interface ComplianceContext {
   operation: string

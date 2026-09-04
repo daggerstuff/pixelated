@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 import { cn } from '@/lib/utils'
 
 export interface ProgressBarProps {
@@ -25,7 +27,7 @@ export function ProgressBar({
   variant = 'default',
 }: ProgressBarProps) {
   const percentage = Math.min(Math.max((value / max) * 100, 0), 100)
-  const id = `progress-${Math.random().toString(36).slice(2, 11)}`
+  const id = useId()
 
   return (
     <div className={cn('w-full', className)}>

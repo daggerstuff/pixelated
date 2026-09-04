@@ -455,7 +455,11 @@ export class ComponentIntegrationService {
     onError: (error: any) => void
   }) {
     try {
-      // TODO: Implement WebSocket connection for real-time updates
+      // Deferred: WebSocket integration for real-time component updates.
+      // The current implementation uses polling via setInterval as a mock.
+      // To wire up: connect to the WebSocketServer instance, subscribe to
+      // session-scoped channels (emotions, particles, charts, treatment),
+      // and forward incoming messages to params.onUpdate.
       logger.info('Subscribing to real-time updates', {
         sessionId: params.sessionId,
         components: params.components,

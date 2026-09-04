@@ -82,43 +82,20 @@ export const POST = async ({
 
     if (!validationResult.success) {
       logger.warn('Invalid export request data', {
-        errors: (validationResult.error as any)?.errors,
+        errors: (validationResult.error as { errors?: string[] })?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid request data',
-          errors: (validationResult.error as any)?.errors,
+          errors: (validationResult.error as { errors?: string[] })?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
     const validatedData = validationResult.data
-
-    // In a real implementation, you would:
-    // 1. Verify that the user has permission to export this specific patient's data
-    // 2. Check if there are any existing recent export requests for this patient
-    // 3. Create a new export request record in the database
-    // 4. Potentially initiate an async background job to process the export
-
-    // Example implementation (commented out as placeholder)
-    // const exportRequest = await db.exportRequests.create({
-    //   data: {
-    //     patientId: validatedData.patientId,
-    //     dataFormats: validatedData.dataFormats,
-    //     dataSections: validatedData.dataSections,
-    //     recipientType: validatedData.recipientType,
-    //     recipientDetails: validatedData.recipientDetails,
-    //     notes: validatedData.notes,
-    //     encryptionRequested: validatedData.encryptionRequested,
-    //     urgencyLevel: validatedData.urgencyLevel,
-    //     status: 'pending',
-    //     requestedBy: user.id,
-    //     requestedAt: new Date()
-    //   }
-    // });
 
     // For this example, we'll generate a mock export ID
     const exportId = `export-${Date.now()}-${Math.floor(Math.random() * 1000)}`

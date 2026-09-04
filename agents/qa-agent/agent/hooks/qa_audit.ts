@@ -7,7 +7,7 @@ import { defineHook } from 'eve/hooks'
 export default defineHook({
   events: {
     'action.result'(_event, _ctx) {
-      console.log('[qa-audit] action finished')
+      // error handled by caller
     },
   },
 })

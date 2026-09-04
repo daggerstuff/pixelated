@@ -11,7 +11,6 @@ import {
 import { protectRoute } from '@/lib/auth/serverAuth'
 import type { AuthUser } from '@/lib/auth/types'
 import { AIRepository } from '@/lib/db/ai/repository'
-// import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('temporal-emotions-api')

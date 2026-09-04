@@ -101,7 +101,6 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     }
 
     // Handle unexpected errors
-    console.error('Token refresh error:', err)
 
     logSecurityEvent('error', null, {
       error:

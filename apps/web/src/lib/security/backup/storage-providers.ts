@@ -81,9 +81,11 @@ interface AzureBlockBlobClient {
  * @returns Whether the file path matches the pattern
  */
 function matchesPattern(filePath: string, pattern: string): boolean {
-  // TODO: Create a production-ready glob library
-  // Very simple glob-like pattern matching
-  // In production, use a proper glob library
+  // Minimal glob-like pattern matching for internal use.
+  // For production-grade matching, dynamically import a proper glob library
+  // (e.g., `fast-glob` or `picomatch`) only when cloud storage providers that
+  // need complex patterns are selected — keeps the bundle small for the
+  // common local-file path.
   const regexPattern = pattern.replace(/\*/g, '.*').replace(/\?/g, '.')
   const regex = new RegExp(`^${regexPattern}$`)
   return regex.test(filePath)

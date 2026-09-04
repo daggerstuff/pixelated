@@ -122,7 +122,9 @@ export function EnhancedSimulationContainer({
 
   // Use stable reference for scenario to avoid dependency issues
   const scenarioRef = useRef(scenario)
-  scenarioRef.current = scenario
+  useEffect(() => {
+    scenarioRef.current = scenario
+  }, [scenario])
 
   // Use refs to capture the latest function references to avoid dependency issues
   const startAnalysisRef = useRef(startAnalysis)
@@ -169,8 +171,11 @@ export function EnhancedSimulationContainer({
   // Check browser compatibility
   useEffect(() => {
     const { compatible, missingFeatures } = checkBrowserCompatibility()
-    setIsCompatible(compatible)
-    setCompatibilityError(missingFeatures)
+    const timer = window.setTimeout(() => {
+      setIsCompatible(compatible)
+      setCompatibilityError(missingFeatures)
+    }, 0)
+    return () => window.clearTimeout(timer)
   }, [])
 
   // Handle form submission
@@ -606,9 +611,3 @@ export function EnhancedSimulationContainer({
 }
 
 // Example PHI audit logging - uncomment and customize as needed
-// logger.info('Accessing PHI data', {
-//   userId: 'user-id-here',
-//   action: 'read',
-//   dataType: 'patient-record',
-//   recordId: 'record-id-here'
-// });

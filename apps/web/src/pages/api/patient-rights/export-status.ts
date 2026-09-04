@@ -35,14 +35,14 @@ export const GET = async ({
 
     if (!validationResult.success) {
       logger.warn('Invalid export status request', {
-        errors: (validationResult.error as any)?.errors,
+        errors: (validationResult.error as { errors?: string[] })?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid export ID',
-          errors: (validationResult.error as any)?.errors,
+          errors: (validationResult.error as { errors?: string[] })?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

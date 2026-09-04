@@ -281,7 +281,7 @@ export class IntelligentCache {
       const internalOptions = optStrategy
         ? { ...restOptions, strategy: optStrategy }
         : { ...restOptions };
-      await this.setToTiers(key, value, internalOptions as any);
+      await this.setToTiers(key, value, internalOptions as Record<string, unknown>);
     } catch (error: unknown) {
       logger.error("Cache set error", { key, error });
     }
@@ -803,7 +803,7 @@ export class IntelligentCache {
                   : undefined;
               const { strategy: _drop, ...rest } = safeOptions;
               const internalOptions = str ? { ...rest, strategy: str } : rest;
-              await this.setToTiers(op.key, op.value, internalOptions as any);
+              await this.setToTiers(op.key, op.value, internalOptions as Record<string, unknown>);
               op.resolve(undefined);
             } catch (error: unknown) {
               op.reject(error as Error);

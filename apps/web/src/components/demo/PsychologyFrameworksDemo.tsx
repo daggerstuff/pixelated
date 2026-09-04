@@ -96,7 +96,7 @@ export default function PsychologyFrameworksDemo() {
     void loadFrameworks()
   }, [])
 
-  const loadFrameworks = async () => {
+  async function loadFrameworks() {
     setLoading(true)
     try {
       const response = await fetch('/api/psychology/frameworks', {

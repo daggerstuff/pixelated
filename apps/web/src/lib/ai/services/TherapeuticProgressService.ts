@@ -178,12 +178,6 @@ export class TherapeuticProgressService {
       })
       throw new Error('Skill name cannot be empty.')
     }
-    // Clamping is handled by Math.max/min below, so no error throw for out-of-bounds proficiency.
-    // if (initialProficiency < 0 || initialProficiency > 1) {
-    //   appLogger.warn('acquireSkill: Initial proficiency must be between 0 and 1.', { profileId: profile.id, skillName, initialProficiency });
-    //   throw new Error('Initial proficiency must be between 0 and 1.');
-    // }
-
     const progress = profile.cognitiveModel.therapeuticProgress
     // Ensure skillsAcquired array exists
     const skills = progress.skillsAcquired ? [...progress.skillsAcquired] : []
@@ -260,12 +254,6 @@ export class TherapeuticProgressService {
       )
       throw new Error('Invalid patient profile or skills not initialized.')
     }
-    // Clamping is handled by Math.max/min below, so no error throw for out-of-bounds proficiency.
-    //  if (newProficiency < 0 || newProficiency > 1) {
-    //   appLogger.warn('updateSkillProficiency: New proficiency must be between 0 and 1.', { profileId: profile.id, skillName, newProficiency });
-    //   throw new Error('New proficiency must be between 0 and 1.');
-    // }
-
     let skillFound = false
     const updatedSkills =
       profile.cognitiveModel.therapeuticProgress.skillsAcquired.map((skill) => {

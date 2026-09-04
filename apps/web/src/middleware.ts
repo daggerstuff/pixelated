@@ -70,9 +70,22 @@ const routeAuthConfig: RouteConfig[] = [
     requiredScopes: ['api:read'],
   },
   { pattern: /\/api\/protected(.*)/, strategy: 'jwtOnly' },
-  { pattern: /\/api\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research API endpoints
-  { pattern: /\/api\/agent-notes(.*)/, strategy: 'jwtOnly' }, // Protect agent note collaboration APIs
-  { pattern: /\/journal-research(.*)/, strategy: 'jwtOnly' }, // Protect journal-research pages
+  { pattern: /\/api\/journal-research(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/agent-notes(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/chat(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/patient-rights(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/treatment-plans(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/crisis(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/mental-health(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/bias-detection(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/therapy(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/sessions(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/emotions(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/interventions(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/users\/(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/consent(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/api\/audit(.*)/, strategy: 'jwtOnly' },
+  { pattern: /\/journal-research(.*)/, strategy: 'jwtOnly' },
 ]
 
 function getRouteConfig(request: Request): RouteConfig | null {
@@ -117,10 +130,14 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
     // cookie value is never minted by any real auth path. E2E_TEST_AUTH is
     // only set in the bias-detection CI workflow.
     if (process.env['E2E_TEST_AUTH'] === '1') {
+      const e2eToken = process.env['E2E_TEST_TOKEN']
+      if (!e2eToken) {
+        return next()
+      }
       const cookieHeader = request.headers.get('cookie') ?? ''
-      if (cookieHeader.includes('auth-token=e2e-test-admin')) {
+      if (cookieHeader.includes(`auth-token=${e2eToken}`)) {
         const e2eUser = {
-          id: 'e2e-test-admin',
+          id: `e2e-${e2eToken.slice(0, 8)}`,
           email: 'test@example.com',
           emailVerified: true,
           role: 'admin',
@@ -128,8 +145,8 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
         }
         context.locals.user = e2eUser
         context.locals.session = {
-          id: 'e2e-test-session',
-          userId: 'e2e-test-admin',
+          id: `e2e-session-${e2eToken.slice(0, 8)}`,
+          userId: e2eUser.id,
           expiresAt: new Date(Date.now() + 60 * 60 * 1000),
         }
         return next()

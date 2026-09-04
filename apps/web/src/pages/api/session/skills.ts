@@ -158,7 +158,7 @@ export const GET: APIRoute = async ({ request }) => {
         return new Response(
           JSON.stringify({
             sessionId,
-            skillScores: (result as any).rows[0].skill_scores,
+            skillScores: (result as { rows: Array<{ skill_scores?: unknown }> }).rows[0].skill_scores,
           }),
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         )

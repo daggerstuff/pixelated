@@ -45,7 +45,7 @@ export async function applyRateLimit(
   let role = 'anonymous'
 
   try {
-    const sessionAny = (await getSessionFromRequest(request)) as any
+    const sessionAny = (await getSessionFromRequest(request)) as unknown
     if (sessionAny?.user?.id) {
       userId = sessionAny.user.id
       role = sessionAny.user.role ?? 'user'

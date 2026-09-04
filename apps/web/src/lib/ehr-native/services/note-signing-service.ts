@@ -81,13 +81,14 @@ export interface ManualSignValidation {
  */
 class AIDraftRegistry {
   // Durable registry: in production backed by FHIR DocumentReference persistence.
-  // For serverless, use globalThis to share across hot reloads; DB persistence TODO for cross-instance.
+  // For serverless, use globalThis to share across hot reloads; cross-instance
+  // DB persistence deferred until the FHIR DocumentReference table is available.
   private get drafts(): Map<string, AIDraftMetadata> {
     const g = globalThis as unknown as Record<string, unknown>
-    if (!g.aidDraftRegistry) {
-      g.aidDraftRegistry = new Map<string, AIDraftMetadata>()
+    if (!g['aidDraftRegistry']) {
+      g['aidDraftRegistry'] = new Map<string, AIDraftMetadata>()
     }
-    return g.aidDraftRegistry as Map<string, AIDraftMetadata>
+    return g['aidDraftRegistry'] as Map<string, AIDraftMetadata>
   }
 
   /** Register a new AI-drafted note. */

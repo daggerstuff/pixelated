@@ -53,11 +53,7 @@ export function useNotificationPreferences() {
   const [error, setError] = useState<Error | null>(null)
   const { getAccessTokenSilently } = useAuth0()
 
-  useEffect(() => {
-    void loadPreferences()
-  }, [])
-
-  const loadPreferences = async () => {
+  async function loadPreferences() {
     try {
       setIsLoading(true)
       const data = await fetchJsonWithAuthToken(
@@ -71,10 +67,17 @@ export function useNotificationPreferences() {
       setError(err instanceof Error ? err : new Error('Unknown error'))
       // Fall back to default preferences on error
       setPreferences(defaultPreferences)
-    } finally {
+  } finally {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void loadPreferences()
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   const updatePreferences = async (
     newPreferences: Partial<NotificationPreferences>,

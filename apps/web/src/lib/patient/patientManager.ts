@@ -98,7 +98,6 @@ class PatientManager {
     // Cache patient data
     this.patientCache.set(patientId, patientProfile)
 
-    console.log(`Created patient profile: ${patientId}`)
 
     return patientProfile
   }
@@ -291,7 +290,6 @@ class PatientManager {
       reason,
     )
 
-    console.log(`Updated patient: ${patientId}`)
 
     return patient
   }
@@ -333,9 +331,6 @@ class PatientManager {
 
     const transferId = `transfer_${Date.now()}`
 
-    console.log(
-      `Transferred ${patients.length} patients from ${fromTherapistId} to ${toTherapistId}`,
-    )
 
     return {
       success: true,
@@ -640,7 +635,6 @@ class PatientManager {
       ),
     }
 
-    console.log('Audit entry created:', auditEntry)
   }
 
   private calculateChanges(

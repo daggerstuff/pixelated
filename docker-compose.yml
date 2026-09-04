@@ -1,0 +1,55 @@
+# Root-level Docker Compose for Pixelated Empathy development
+# Production: use infra/docker/docker-compose.production.yml
+# This file provides quick-start local development with all core services
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://dev_user:dev_password@db:5432/pixelated_dev
+      - REDIS_URL=redis://redis:6379
+      - MONGODB_URI=mongodb://mongo:27017/pixelated_dev
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - '5173:5173'
+    depends_on:
+      - db
+      - redis
+      - mongo
+
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: pixelated_dev
+      POSTGRES_USER: dev_user
+      POSTGRES_PASSWORD: dev_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+
+  mongo:
+    image: mongo:8
+    environment:
+      MONGODB_DB: pixelated_dev
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  postgres_data:
+  redis_data:
+  mongo_data:

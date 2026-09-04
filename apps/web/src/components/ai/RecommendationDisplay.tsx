@@ -101,14 +101,14 @@ const RecommendationDisplay: FC<RecommendationDisplayProps> = ({ recommendations
         Treatment Recommendations ({recommendations.length})
       </h2>
 
-      {recommendations.map((baseRec) => {
+      {recommendations.map((baseRec, index) => {
         // Cast to extended type to handle additional properties
         const rec = baseRec as ExtendedTreatmentRecommendation;
 
         return (
           <div
             key={
-              rec.id || `rec-${rec.title || "untitled"}-${rec.metadata?.generatedAt || Date.now()}`
+              rec.id || `rec-${index}`
             }
             className="bg-white border-gray-200 rounded-lg border p-6 shadow-md"
           >

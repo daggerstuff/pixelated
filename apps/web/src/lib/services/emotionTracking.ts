@@ -184,9 +184,6 @@ export function useSessionEmotions(
   sessionId: string,
 ): UseSessionEmotionsReturn {
   // This would ideally use your existing data fetching patterns
-  // For example, if using a data fetching library:
-  // const data = useQuery(['sessions', sessionId, 'emotions'], () => fetchSessionEmotionData(sessionId));
-
   // For now, we'll just return a mock implementation
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [data, setData] = useState<EmotionDataPoint[]>([])
