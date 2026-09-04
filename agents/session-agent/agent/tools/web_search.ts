@@ -1,4 +1,4 @@
-import { webSearch } from 'eve/tools'
+import { webSearch } from 'eve/tools/web_search'
 
 // The eve framework auto-adds a web_search tool to the agent's toolset.
 // The default provider ('exa') requires gateway.tools.exaSearch which is

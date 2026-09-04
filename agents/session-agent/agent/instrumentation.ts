@@ -1,1 +1,1 @@
-export { default } from '../../../../lib/instrumentation.js'
+export { default } from '../../lib/instrumentation.js'

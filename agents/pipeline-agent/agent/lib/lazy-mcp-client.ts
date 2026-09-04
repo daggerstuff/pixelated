@@ -1,1 +1,1 @@
-export * from '../../../../lib/lazy-mcp-client.js';
+export * from '../../../lib/lazy-mcp-client.js';

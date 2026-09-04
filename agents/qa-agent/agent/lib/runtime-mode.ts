@@ -1,1 +1,1 @@
-export * from '../../../../lib/runtime-mode.js';
+export * from '../../../lib/runtime-mode.js';

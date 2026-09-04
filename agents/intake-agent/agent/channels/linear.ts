@@ -1,1 +1,1 @@
-export * from '../../../lib/channels/linear.js';
+export { default } from '../../../lib/channels/linear.js';
