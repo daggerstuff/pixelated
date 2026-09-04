@@ -5,161 +5,57 @@
  * Implements zero-trust architecture with comprehensive audit trails.
  */
 
-import crypto from 'crypto'
 import { EventEmitter } from 'node:events'
 
 import AWS from 'aws-sdk'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import {
+  isObjectRecord,
+  isAwsListSecretsResponse,
+  isAwsSecretValue,
+  isProd,
+  HIPAA_DEFAULT_OPTIONS,
+  SECURITY_CONSTANTS,
+  generateSecureId,
+  deriveEncryptionKey,
+  exponentialBackoff,
+  generateKeyId,
+  getErrorMessage,
+  parseKeyPair,
+  triggerSecurityAlarm,
+  filterAuditEvents,
+  releaseLock,
+  scheduleClientRotationCheck,
+  deprecateOldKeys,
+  auditLog,
+} from './key-rotation.utils'
+import type {
+  AuditEvent,
+  SecurityMetrics,
+  DistributedLock,
+  KeyVersion,
+  AwsRequest,
+  AwsKmsClient,
+  AwsSecretsManagerClient,
+  AwsCloudWatchClient,
+  AwsSecretListEntry,
+  AwsListSecretsRequest,
+  AwsListSecretsResponse,
+  AwsSecretValue,
+} from './key-rotation.types'
 import { SealService } from './seal-service'
 import type { KeyManagementOptions, TFHEKeyPair } from './types'
 import { EncryptionMode } from './types'
 
 // HIPAA++ Compliance Types
-interface AuditEvent {
-  eventId: string
-  timestamp: string
-  action: string
-  keyId?: string
-  userId?: string
-  ipAddress?: string
-  success: boolean
-  details: Record<string, unknown>
-  metadata?: Record<string, unknown>
-  riskLevel: 'low' | 'medium' | 'high' | 'critical'
-}
-
-interface SecurityMetrics {
-  rotationAttempts: number
-  rotationFailures: number
-  unauthorizedAccess: number
-  keyCompromiseEvents: number
-  lastRotation: number
-  averageRotationTime: number
-}
-
-interface DistributedLock {
-  lockId: string
-  nodeId: string
-  expiresAt: number
-  operation: string
-}
-
-type AwsRequest<T> = {
-  promise(): Promise<T>
-}
-
-type AwsKmsClient = {
-  generateDataKey: (params: Record<string, unknown>) => AwsRequest<unknown>
-  decrypt: (params: Record<string, unknown>) => AwsRequest<unknown>
-}
-
-type AwsSecretsManagerClient = {
-  createSecret: (params: Record<string, unknown>) => AwsRequest<unknown>
-  rotateSecret: (params: Record<string, unknown>) => AwsRequest<unknown>
-  listSecrets: (params: AwsListSecretsRequest) => AwsRequest<unknown>
-  getSecretValue: (params: Record<string, unknown>) => AwsRequest<unknown>
-}
-
-type AwsCloudWatchClient = {
-  putMetricData: (params: Record<string, unknown>) => AwsRequest<unknown>
-}
-
-type AwsSecretListEntry = {
-  Name?: string
-  [key: string]: unknown
-}
-
-type AwsListSecretsRequest = {
-  Filters?: Array<{
-    Key: string
-    Values: string[]
-  }>
-  NextToken?: string
-}
-
-type AwsListSecretsResponse = {
-  SecretList?: AwsSecretListEntry[]
-  NextToken?: string
-}
-
-type AwsSecretValue = {
-  SecretString?: string
-}
-
-const isObjectRecord = (value: unknown): value is Record<string, unknown> => {
-  return typeof value === 'object' && value !== null
-}
-
-const isAwsListSecretsResponse = (
-  value: unknown,
-): value is AwsListSecretsResponse => {
-  if (!isObjectRecord(value)) {
-    return false
-  }
-
-  if (value['SecretList'] !== undefined) {
-    if (!Array.isArray(value['SecretList'])) {
-      return false
-    }
-  }
-
-  if (value['NextToken'] !== undefined) {
-    return typeof value['NextToken'] === 'string'
-  }
-
-  return true
-}
-
-const isAwsSecretValue = (value: unknown): value is AwsSecretValue => {
-  if (!isObjectRecord(value)) {
-    return false
-  }
-
-  if (value['SecretString'] === undefined) {
-    return true
-  }
-
-  return typeof value['SecretString'] === 'string'
-}
-
-interface KeyVersion {
-  version: number
-  keyId: string
-  created: number
-  deprecated?: number
-  status: 'active' | 'deprecated' | 'compromised' | 'destroyed'
-  migrationStatus?: 'pending' | 'in_progress' | 'completed'
-}
-
-// Enhanced logging with audit trail
 const logger = createBuildSafeLogger('hipaa-fhe-rotation')
-const auditLogger = createBuildSafeLogger('hipaa-audit')
 
 /**
  * Helper function to check if we're in production environment
  */
-const isProd = (): boolean =>
-  process.env['NODE_ENV']?.toLowerCase() === 'production'
 
-/**
- * HIPAA++ Default Configuration
- */
-const HIPAA_DEFAULT_OPTIONS: KeyManagementOptions = {
-  rotationPeriodDays: 7, // Weekly rotation for HIPAA++
-  persistKeys: true,
-  storagePrefix: 'hipaa_fhe_key_',
-}
 
-const SECURITY_CONSTANTS = {
-  MAX_KEY_AGE_MS: 7 * 24 * 60 * 60 * 1000, // 7 days
-  LOCK_TIMEOUT_MS: 30 * 1000, // 30 seconds
-  RETRY_ATTEMPTS: 3,
-  RETRY_DELAY_MS: 1000,
-  AUDIT_RETENTION_DAYS: 2555, // 7 years for HIPAA
-  KEY_DERIVATION_ITERATIONS: 100000,
-  SECURE_RANDOM_BYTES: 32,
-} as const
 
 /**
  * HIPAA++ Compliant FHE Key Rotation Service
@@ -191,7 +87,7 @@ export class KeyRotationService extends EventEmitter {
   private constructor(options?: Partial<KeyManagementOptions>) {
     super()
     this.options = { ...HIPAA_DEFAULT_OPTIONS, ...options }
-    this.nodeId = this.generateSecureId()
+    this.nodeId = generateSecureId()
     this.securityMetrics = {
       rotationAttempts: 0,
       rotationFailures: 0,
@@ -213,7 +109,7 @@ export class KeyRotationService extends EventEmitter {
           maxRetries: 3,
           retryDelayOptions: {
             customBackoff: (retryCount: number) =>
-              this.exponentialBackoff(retryCount),
+              exponentialBackoff(retryCount),
           },
         })
         this.secretsManager = new AWS.SecretsManager({
@@ -221,17 +117,17 @@ export class KeyRotationService extends EventEmitter {
           maxRetries: 3,
           retryDelayOptions: {
             customBackoff: (retryCount: number) =>
-              this.exponentialBackoff(retryCount),
+              exponentialBackoff(retryCount),
           },
         })
         this.cloudWatch = new AWS.CloudWatch({ apiVersion: '2010-08-01' })
 
         logger.info('HIPAA++ AWS clients initialized with enhanced security')
-        this.auditLog('aws_clients_initialized', { success: true })
+        auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'aws_clients_initialized', { success: true })
       } catch (error: unknown) {
         const errorMessage =
           error instanceof Error ? String(error) : 'Unknown error'
-        this.auditLog('aws_clients_init_failed', {
+        auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'aws_clients_init_failed', {
           success: false,
           details: { error: errorMessage },
         })
@@ -249,7 +145,7 @@ export class KeyRotationService extends EventEmitter {
       `HIPAA++ Key Rotation Service initialized in ${this.isServer ? 'server' : 'client'} environment`,
       { nodeId: this.nodeId },
     )
-    this.auditLog('service_initialized', {
+    auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'service_initialized', {
       success: true,
       details: {
         environment: this.isServer ? 'server' : 'client',
@@ -303,62 +199,18 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Generate cryptographically secure ID
    */
-  private generateSecureId(): string {
-    return crypto
-      .randomBytes(SECURITY_CONSTANTS.SECURE_RANDOM_BYTES)
-      .toString('hex')
-  }
 
   /**
    * Derive master encryption key using PBKDF2
    */
-  private async deriveEncryptionKey(): Promise<Buffer> {
-    const masterSecret = process.env['HIPAA_MASTER_SECRET']
-    if (!masterSecret) {
-      throw new Error('HIPAA_MASTER_SECRET environment variable is required')
-    }
-
-    const salt = crypto.randomBytes(32)
-    return crypto.pbkdf2Sync(
-      masterSecret,
-      salt,
-      SECURITY_CONSTANTS.KEY_DERIVATION_ITERATIONS,
-      32,
-      'sha512',
-    )
-  }
 
   /**
    * Exponential backoff for AWS retries
    */
-  private exponentialBackoff(retryCount: number): number {
-    return Math.min(1000 * Math.pow(2, retryCount), 30000)
-  }
 
   /**
    * Audit logging with HIPAA compliance
    */
-  private auditLog(action: string, details: Partial<AuditEvent>): void {
-    const event: AuditEvent = {
-      eventId: this.generateSecureId(),
-      timestamp: new Date().toISOString(),
-      action,
-      userId: details.userId ?? 'system',
-      ipAddress: details.ipAddress ?? 'internal',
-      success: details.success ?? true,
-      details: details.details ?? {},
-      riskLevel: details.riskLevel ?? 'low',
-      ...(details.keyId && { keyId: details.keyId }),
-    }
-
-    this.auditEvents.push(event)
-    auditLogger.info('HIPAA Audit Event', { ...event })
-
-    // Emit high-risk events immediately
-    if (event.riskLevel === 'critical' || event.riskLevel === 'high') {
-      this.emit('security-alert', event)
-    }
-  }
 
   /**
    * Acquire distributed lock for critical operations
@@ -382,7 +234,7 @@ export class KeyRotationService extends EventEmitter {
       }
 
       this.distributedLocks.set(operation, lock)
-      this.auditLog('lock_acquired', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'lock_acquired', {
         success: true,
         details: { lockId, operation },
         riskLevel: 'medium',
@@ -391,7 +243,7 @@ export class KeyRotationService extends EventEmitter {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
-      this.auditLog('lock_acquisition_failed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'lock_acquisition_failed', {
         success: false,
         details: { operation, error: errorMessage },
         riskLevel: 'high',
@@ -403,14 +255,6 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Release distributed lock
    */
-  private releaseLock(operation: string): void {
-    this.distributedLocks.delete(operation)
-    this.auditLog('lock_released', {
-      success: true,
-      details: { operation },
-      riskLevel: 'low',
-    })
-  }
 
   /**
    * Perform security health check
@@ -424,14 +268,14 @@ export class KeyRotationService extends EventEmitter {
         version.status === 'active' &&
         now - version.created > SECURITY_CONSTANTS.MAX_KEY_AGE_MS
       ) {
-        this.auditLog('key_age_violation', {
+        auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_age_violation', {
           success: false,
           keyId,
           details: { age: now - version.created },
           riskLevel: 'high',
         })
         // Trigger CloudWatch alarm
-        void this.triggerSecurityAlarm('KeyAgeViolation', keyId)
+        void triggerSecurityAlarm(this.cloudWatch, 'KeyAgeViolation', keyId)
       }
     }
 
@@ -441,46 +285,19 @@ export class KeyRotationService extends EventEmitter {
     ).length
 
     if (recentFailures > 5) {
-      this.auditLog('suspicious_activity_detected', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'suspicious_activity_detected', {
         success: false,
         details: { recentFailures },
         riskLevel: 'critical',
       })
       // Trigger CloudWatch alarm
-      void this.triggerSecurityAlarm(
+      void triggerSecurityAlarm(this.cloudWatch, 
         'SuspiciousActivity',
         `failures: ${recentFailures}`,
       )
     }
   }
 
-  private async triggerSecurityAlarm(
-    alarmType: string,
-    details: string,
-  ): Promise<void> {
-    if (!this.cloudWatch) {
-      return
-    }
-
-    try {
-      await this.cloudWatch
-        .putMetricData({
-          Namespace: 'HIPAA/FHE/Security',
-          MetricData: [
-            {
-              MetricName: alarmType,
-              Value: 1,
-              Unit: 'Count',
-              Timestamp: new Date(),
-              Dimensions: [{ Name: 'Details', Value: details }],
-            },
-          ],
-        })
-        .promise()
-    } catch (error: unknown) {
-      logger.error('Failed to trigger security alarm', { alarmType, error })
-    }
-  }
 
   /**
    * Emit security metrics to CloudWatch
@@ -535,7 +352,7 @@ export class KeyRotationService extends EventEmitter {
 
     const removedCount = initialCount - this.auditEvents.length
     if (removedCount > 0) {
-      this.auditLog('audit_cleanup', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'audit_cleanup', {
         success: true,
         details: { removedCount },
         riskLevel: 'low',
@@ -560,7 +377,7 @@ export class KeyRotationService extends EventEmitter {
     try {
       // Initialize master encryption key for server environments
       if (this.isServer && !this.encryptionKey) {
-        this.encryptionKey = await this.deriveEncryptionKey()
+        this.encryptionKey = await deriveEncryptionKey()
       }
 
       // Update options if provided
@@ -604,7 +421,7 @@ export class KeyRotationService extends EventEmitter {
       logger.info('HIPAA++ Key rotation service initialized successfully', {
         initTime,
       })
-      this.auditLog('service_initialization_complete', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'service_initialization_complete', {
         success: true,
         details: { initTime, activeKeyId: this.activeKeyId },
         riskLevel: 'low',
@@ -614,7 +431,7 @@ export class KeyRotationService extends EventEmitter {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
-      this.auditLog('service_initialization_failed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'service_initialization_failed', {
         success: false,
         details: { error: errorMessage },
         riskLevel: 'critical',
@@ -647,7 +464,7 @@ export class KeyRotationService extends EventEmitter {
       const timer = setTimeout(() => {
         this.rotateKeys().catch((err) => {
           logger.error(`Failed to rotate key ${keyId}`, {
-            error: this.getErrorMessage(err),
+            error: getErrorMessage(err),
           })
         })
       }, timeToExpiry)
@@ -658,40 +475,19 @@ export class KeyRotationService extends EventEmitter {
       )
     } else if (this.isClient) {
       // For client environments, check periodically
-      this.scheduleClientRotationCheck(keyId, expiryTime)
+      scheduleClientRotationCheck(this.keyRotationTimers, () => this.rotateKeys(), keyId, expiryTime)
     }
   }
 
   /**
    * Schedule a periodic check for key rotation in the client
    */
-  private scheduleClientRotationCheck(keyId: string, expiryTime: number): void {
-    // In the client, we check daily if the key needs rotation
-    const checkInterval = 24 * 60 * 60 * 1000 // 24 hours
-
-    const timer = setInterval(() => {
-      const now = Date.now()
-      if (now >= expiryTime) {
-        this.rotateKeys().catch((err) => {
-          logger.error(`Failed to rotate key ${keyId}`, {
-            error: this.getErrorMessage(err),
-          })
-        })
-
-        // Clear the interval after rotation
-        clearInterval(timer)
-        this.keyRotationTimers.delete(keyId)
-      }
-    }, checkInterval)
-
-    this.keyRotationTimers.set(keyId, timer)
-  }
 
   /**
    * Generate new key pair with HIPAA++ security controls
    */
   public async rotateKeys(): Promise<string> {
-    const rotationId = this.generateSecureId()
+    const rotationId = generateSecureId()
     const startTime = Date.now()
 
     // Acquire distributed lock
@@ -702,7 +498,7 @@ export class KeyRotationService extends EventEmitter {
     }
 
     this.securityMetrics.rotationAttempts++
-    this.auditLog('key_rotation_started', {
+    auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_rotation_started', {
       success: true,
       details: { rotationId },
       riskLevel: 'medium',
@@ -711,7 +507,7 @@ export class KeyRotationService extends EventEmitter {
       logger.info('Rotating encryption keys')
 
       // Generate a new key ID
-      const keyId = this.generateKeyId()
+      const keyId = generateKeyId()
 
       // Calculate expiry time
       const now = Date.now()
@@ -786,9 +582,9 @@ export class KeyRotationService extends EventEmitter {
       })
 
       // Deprecate old keys
-      await this.deprecateOldKeys(keyId)
+      await deprecateOldKeys(this.keyVersions, (a, d) => auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), a, d), (id) => this.securelyDestroyKey(id), keyId)
 
-      this.releaseLock('key_rotation')
+      releaseLock(this.distributedLocks, (a, d) => auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), a, d), 'key_rotation')
 
       logger.info(
         `HIPAA++ Key rotation completed successfully. New key ID: ${keyId}`,
@@ -798,7 +594,7 @@ export class KeyRotationService extends EventEmitter {
         },
       )
 
-      this.auditLog('key_rotation_completed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_rotation_completed', {
         success: true,
         keyId,
         details: { rotationTime, rotationId },
@@ -809,18 +605,18 @@ export class KeyRotationService extends EventEmitter {
       return keyId
     } catch (error: unknown) {
       this.securityMetrics.rotationFailures++
-      this.releaseLock('key_rotation')
+      releaseLock(this.distributedLocks, (a, d) => auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), a, d), 'key_rotation')
 
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
-      this.auditLog('key_rotation_failed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_rotation_failed', {
         success: false,
         details: { error: errorMessage, rotationId },
         riskLevel: 'critical',
       })
 
       logger.error('HIPAA++ Key rotation failed', {
-        error: this.getErrorMessage(error),
+        error: getErrorMessage(error),
         rotationId,
       })
       this.emit('rotation-failed', { error: errorMessage, rotationId })
@@ -833,34 +629,6 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Deprecate old keys with secure migration
    */
-  private async deprecateOldKeys(newKeyId: string): Promise<void> {
-    for (const [keyId, version] of this.keyVersions.entries()) {
-      if (keyId !== newKeyId && version.status === 'active') {
-        version.status = 'deprecated'
-        version.deprecated = Date.now()
-
-        this.auditLog('key_deprecated', {
-          success: true,
-          keyId,
-          details: { newKeyId },
-          riskLevel: 'medium',
-        })
-
-        // Schedule secure destruction after migration period
-        setTimeout(
-          () => {
-            this.securelyDestroyKey(keyId).catch((err) => {
-              logger.error('Failed to destroy deprecated key', {
-                keyId,
-                error: this.getErrorMessage(err),
-              })
-            })
-          },
-          24 * 60 * 60 * 1000,
-        ) // 24 hours
-      }
-    }
-  }
 
   /**
    * Securely destroy deprecated keys
@@ -884,7 +652,7 @@ export class KeyRotationService extends EventEmitter {
         version.status = 'destroyed'
       }
 
-      this.auditLog('key_destroyed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_destroyed', {
         success: true,
         keyId,
         details: { destructionTime: Date.now() },
@@ -893,7 +661,7 @@ export class KeyRotationService extends EventEmitter {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
-      this.auditLog('key_destruction_failed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_destruction_failed', {
         success: false,
         keyId,
         details: { error: errorMessage },
@@ -942,7 +710,7 @@ export class KeyRotationService extends EventEmitter {
 
             const lambdaArn = process.env['KEY_ROTATION_LAMBDA_ARN']
             if (!lambdaArn) {
-              this.auditLog('missing_lambda_arn', {
+              auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'missing_lambda_arn', {
                 success: false,
                 details: { keyId: keyPair.id },
                 riskLevel: 'critical',
@@ -963,7 +731,7 @@ export class KeyRotationService extends EventEmitter {
 
             await this.secretsManager.rotateSecret(rotationParams).promise()
 
-            this.auditLog('aws_rotation_configured', {
+            auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'aws_rotation_configured', {
               success: true,
               keyId: keyPair.id,
               details: { rotationPeriod: this.options.rotationPeriodDays },
@@ -981,7 +749,7 @@ export class KeyRotationService extends EventEmitter {
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
-      this.auditLog('key_storage_failed', {
+      auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_storage_failed', {
         success: false,
         keyId: keyPair.id,
         details: { error: errorMessage },
@@ -989,7 +757,7 @@ export class KeyRotationService extends EventEmitter {
       })
 
       logger.error(`Failed to store key ${keyPair.id}`, {
-        error: this.getErrorMessage(error),
+        error: getErrorMessage(error),
       })
       throw new Error(`HIPAA++ Key storage error: ${errorMessage}`, {
         cause: error,
@@ -1046,7 +814,7 @@ export class KeyRotationService extends EventEmitter {
           try {
             const value = localStorage.getItem(key)
             if (value) {
-              const keyPair = this.parseKeyPair(value)
+              const keyPair = parseKeyPair(value)
               if (keyPair) {
                 allKeys.push(keyPair)
               }
@@ -1079,7 +847,7 @@ export class KeyRotationService extends EventEmitter {
             })
             .catch((err) => {
               logger.error('Failed to load SEAL keys', {
-                error: this.getErrorMessage(err),
+                error: getErrorMessage(err),
               })
             })
         }
@@ -1098,7 +866,7 @@ export class KeyRotationService extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Error loading keys from localStorage', {
-        error: this.getErrorMessage(error),
+        error: getErrorMessage(error),
       })
     }
   }
@@ -1162,7 +930,7 @@ export class KeyRotationService extends EventEmitter {
               }
 
               if (secretValue.SecretString) {
-                const keyPair = this.parseKeyPair(secretValue.SecretString)
+                const keyPair = parseKeyPair(secretValue.SecretString)
                 if (keyPair) {
                   allKeys.push(keyPair)
                 }
@@ -1239,7 +1007,7 @@ export class KeyRotationService extends EventEmitter {
       const errorMessage =
         error instanceof Error ? String(error) : 'Unknown error'
       logger.error('Failed to load keys from secure storage', {
-        error: this.getErrorMessage(error),
+        error: getErrorMessage(error),
       })
       throw new Error(`Key loading error: ${errorMessage}`, { cause: error })
     }
@@ -1255,11 +1023,6 @@ export class KeyRotationService extends EventEmitter {
   /**
    * Generate a random key ID
    */
-  private generateKeyId(): string {
-    const timestamp = Date.now().toString(36)
-    const random = Math.random().toString(36).substring(2, 10)
-    return `key_${timestamp}_${random}`
-  }
 
   /**
    * Get security metrics for monitoring
@@ -1268,63 +1031,21 @@ export class KeyRotationService extends EventEmitter {
     return { ...this.securityMetrics }
   }
 
-  private getErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : String(error)
+  public getAuditEvents(since?: Date): AuditEvent[] {
+    return filterAuditEvents(this.auditEvents, since)
   }
 
-  private parseKeyPair(value: string): TFHEKeyPair | null {
-    const parsed: unknown = JSON.parse(value)
-    if (!isObjectRecord(parsed)) {
-      return null
-    }
 
-    const id = parsed['id']
-    const publicKey = parsed['publicKey']
-    const privateKeyEncrypted = parsed['privateKeyEncrypted']
-    const created = parsed['created']
-    const expires = parsed['expires']
-    const version = parsed['version']
-
-    if (
-      typeof id !== 'string' ||
-      typeof publicKey !== 'string' ||
-      typeof privateKeyEncrypted !== 'string' ||
-      typeof created !== 'number' ||
-      typeof expires !== 'number' ||
-      typeof version !== 'string'
-    ) {
-      return null
-    }
-
-    return {
-      id,
-      publicKey,
-      privateKeyEncrypted,
-      created,
-      expires,
-      version,
-    }
-  }
 
   /**
    * Get audit events for compliance reporting
    */
-  public getAuditEvents(since?: Date): AuditEvent[] {
-    if (!since) {
-      return [...this.auditEvents]
-    }
-
-    const sinceTime = since.getTime()
-    return this.auditEvents.filter(
-      (event) => new Date(event.timestamp).getTime() >= sinceTime,
-    )
-  }
 
   /**
    * Force key rotation (emergency use)
    */
   public async emergencyRotation(reason: string): Promise<string> {
-    this.auditLog('emergency_rotation_triggered', {
+    auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'emergency_rotation_triggered', {
       success: true,
       details: { reason },
       riskLevel: 'critical',
@@ -1348,7 +1069,7 @@ export class KeyRotationService extends EventEmitter {
       version.status = 'compromised'
     }
 
-    this.auditLog('key_compromise_reported', {
+    auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'key_compromise_reported', {
       success: true,
       keyId,
       details: { compromiseDetails: details },
@@ -1366,7 +1087,7 @@ export class KeyRotationService extends EventEmitter {
    * HIPAA++ compliant disposal with secure cleanup
    */
   public async dispose(): Promise<void> {
-    this.auditLog('service_disposal_started', {
+    auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'service_disposal_started', {
       success: true,
       details: { activeKeys: this.keyVersions.size },
       riskLevel: 'medium',
@@ -1391,7 +1112,7 @@ export class KeyRotationService extends EventEmitter {
       this.encryptionKey = null
     }
 
-    this.auditLog('service_disposed', {
+    auditLog(this.auditEvents, (event, payload) => this.emit(event, payload), 'service_disposed', {
       success: true,
       details: { disposalTime: Date.now() },
       riskLevel: 'low',
@@ -1406,6 +1127,6 @@ export class KeyRotationService extends EventEmitter {
 const hipaaKeyRotationService = KeyRotationService.getInstance()
 
 // Export types for external use
-export type { AuditEvent, SecurityMetrics, KeyVersion }
+export type { AuditEvent, SecurityMetrics, KeyVersion } from './key-rotation.types'
 
 export default hipaaKeyRotationService
