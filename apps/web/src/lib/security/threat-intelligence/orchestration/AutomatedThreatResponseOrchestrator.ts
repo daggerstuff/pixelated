@@ -23,25 +23,27 @@ import {
   evaluatePatternCondition,
   evaluateThresholdCondition,
   evaluateTimeCondition,
+  generateResponseActions,
+  getDefaultStrategy,
+  inferThreatType,
+  validateAction,
+  validateResponseStrategy,
+} from './strategyEvaluation'
+import {
   executeBlockAction,
   executeInvestigateAction,
   executeIsolateAction,
   executeMitigateAction,
   executeRollbackAction,
-  generateResponseActions,
   generateResponseId,
-  getDefaultStrategy,
   getNotificationLevel,
-  inferThreatType,
   sendCriticalNotification,
   sendHighPriorityNotification,
   sendLowPriorityNotification,
   sendMediumPriorityNotification,
   sendToIntegrationEndpoint,
-  validateAction,
-  validateResponseStrategy,
   type ThreatResponse,
-} from './orchestrationHelpers'
+} from './actionExecution'
 
 const logger = createBuildSafeLogger('automated-threat-response-orchestrator')
 

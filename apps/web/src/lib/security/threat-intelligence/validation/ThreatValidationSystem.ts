@@ -18,15 +18,17 @@ import {
   ThreatIndicator,
 } from '../global/types'
 import {
-  applyValidationRule,
-  calculateOverallValidationScore,
-  generateValidationId,
   validateAttribution,
   validateIndicators,
   validateMetadata,
   validateThreatStructure,
+} from './indicatorValidation'
+import {
+  applyValidationRule,
+  calculateOverallValidationScore,
+  generateValidationId,
   validateValidationRule,
-} from './validationHelpers'
+} from './ruleValidation'
 
 const logger = createBuildSafeLogger('threat-validation-system')
 
