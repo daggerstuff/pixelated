@@ -73,7 +73,7 @@ VALUES
         ARRAY['*']::TEXT[],
         true
     )
-ON CONFLICT (workspace_id, name) DO NOTHING;
+ON CONFLICT DO NOTHING;
 
 -- Backfill: map existing users.role string to user_roles (workspace-scoped only).
 -- Users with role='admin' do NOT auto-receive the system admin role here; admin

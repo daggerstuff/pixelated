@@ -50,6 +50,7 @@ END $$;
 
 ALTER TABLE ehr_practitioner ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_practitioner_select ON ehr_practitioner;
 CREATE POLICY ehr_practitioner_select
     ON ehr_practitioner FOR SELECT
     USING (
@@ -62,6 +63,7 @@ CREATE POLICY ehr_practitioner_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_practitioner_insert ON ehr_practitioner;
 CREATE POLICY ehr_practitioner_insert
     ON ehr_practitioner FOR INSERT
     WITH CHECK (
@@ -71,6 +73,7 @@ CREATE POLICY ehr_practitioner_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_practitioner_update ON ehr_practitioner;
 CREATE POLICY ehr_practitioner_update
     ON ehr_practitioner FOR UPDATE
     USING (
@@ -86,6 +89,7 @@ CREATE POLICY ehr_practitioner_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_practitioner_delete ON ehr_practitioner;
 CREATE POLICY ehr_practitioner_delete
     ON ehr_practitioner FOR DELETE
     USING (
@@ -171,6 +175,7 @@ END $$;
 
 ALTER TABLE ehr_consent ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_consent_select ON ehr_consent;
 CREATE POLICY ehr_consent_select
     ON ehr_consent FOR SELECT
     USING (
@@ -181,6 +186,7 @@ CREATE POLICY ehr_consent_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_consent_insert ON ehr_consent;
 CREATE POLICY ehr_consent_insert
     ON ehr_consent FOR INSERT
     WITH CHECK (
@@ -190,6 +196,7 @@ CREATE POLICY ehr_consent_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_consent_update ON ehr_consent;
 CREATE POLICY ehr_consent_update
     ON ehr_consent FOR UPDATE
     USING (
@@ -207,6 +214,7 @@ CREATE POLICY ehr_consent_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_consent_delete ON ehr_consent;
 CREATE POLICY ehr_consent_delete
     ON ehr_consent FOR DELETE
     USING (
@@ -246,6 +254,7 @@ SET search_path = public;
 -- ============================================================================
 ALTER TABLE ehr_patient ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_patient_select ON ehr_patient;
 CREATE POLICY ehr_patient_select
     ON ehr_patient FOR SELECT
     USING (
@@ -265,6 +274,7 @@ CREATE POLICY ehr_patient_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_patient_insert ON ehr_patient;
 CREATE POLICY ehr_patient_insert
     ON ehr_patient FOR INSERT
     WITH CHECK (
@@ -275,6 +285,7 @@ CREATE POLICY ehr_patient_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_patient_update ON ehr_patient;
 CREATE POLICY ehr_patient_update
     ON ehr_patient FOR UPDATE
     USING (
@@ -299,6 +310,7 @@ CREATE POLICY ehr_patient_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_patient_delete ON ehr_patient;
 CREATE POLICY ehr_patient_delete
     ON ehr_patient FOR DELETE
     USING (
@@ -355,6 +367,7 @@ END $$;
 
 ALTER TABLE ehr_encounter ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_encounter_select ON ehr_encounter;
 CREATE POLICY ehr_encounter_select
     ON ehr_encounter FOR SELECT
     USING (
@@ -374,6 +387,7 @@ CREATE POLICY ehr_encounter_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_encounter_insert ON ehr_encounter;
 CREATE POLICY ehr_encounter_insert
     ON ehr_encounter FOR INSERT
     WITH CHECK (
@@ -384,6 +398,7 @@ CREATE POLICY ehr_encounter_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_encounter_update ON ehr_encounter;
 CREATE POLICY ehr_encounter_update
     ON ehr_encounter FOR UPDATE
     USING (
@@ -408,6 +423,7 @@ CREATE POLICY ehr_encounter_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_encounter_delete ON ehr_encounter;
 CREATE POLICY ehr_encounter_delete
     ON ehr_encounter FOR DELETE
     USING (
@@ -464,6 +480,7 @@ END $$;
 ALTER TABLE ehr_appointment ENABLE ROW LEVEL SECURITY;
 
 -- Appointments bypass consent checks (schedule management consent level = 'none')
+DROP POLICY IF EXISTS ehr_appointment_select ON ehr_appointment;
 CREATE POLICY ehr_appointment_select
     ON ehr_appointment FOR SELECT
     USING (
@@ -474,6 +491,7 @@ CREATE POLICY ehr_appointment_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_appointment_insert ON ehr_appointment;
 CREATE POLICY ehr_appointment_insert
     ON ehr_appointment FOR INSERT
     WITH CHECK (
@@ -484,6 +502,7 @@ CREATE POLICY ehr_appointment_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_appointment_update ON ehr_appointment;
 CREATE POLICY ehr_appointment_update
     ON ehr_appointment FOR UPDATE
     USING (
@@ -501,6 +520,7 @@ CREATE POLICY ehr_appointment_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_appointment_delete ON ehr_appointment;
 CREATE POLICY ehr_appointment_delete
     ON ehr_appointment FOR DELETE
     USING (
@@ -554,6 +574,7 @@ END $$;
 ALTER TABLE ehr_document_reference ENABLE ROW LEVEL SECURITY;
 
 -- Clinical notes require 'limited' consent level
+DROP POLICY IF EXISTS ehr_document_reference_select ON ehr_document_reference;
 CREATE POLICY ehr_document_reference_select
     ON ehr_document_reference FOR SELECT
     USING (
@@ -572,6 +593,7 @@ CREATE POLICY ehr_document_reference_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_document_reference_insert ON ehr_document_reference;
 CREATE POLICY ehr_document_reference_insert
     ON ehr_document_reference FOR INSERT
     WITH CHECK (
@@ -581,6 +603,7 @@ CREATE POLICY ehr_document_reference_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_document_reference_update ON ehr_document_reference;
 CREATE POLICY ehr_document_reference_update
     ON ehr_document_reference FOR UPDATE
     USING (
@@ -603,6 +626,7 @@ CREATE POLICY ehr_document_reference_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_document_reference_delete ON ehr_document_reference;
 CREATE POLICY ehr_document_reference_delete
     ON ehr_document_reference FOR DELETE
     USING (
@@ -660,6 +684,7 @@ END $$;
 
 ALTER TABLE ehr_observation ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_observation_select ON ehr_observation;
 CREATE POLICY ehr_observation_select
     ON ehr_observation FOR SELECT
     USING (
@@ -678,6 +703,7 @@ CREATE POLICY ehr_observation_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_observation_insert ON ehr_observation;
 CREATE POLICY ehr_observation_insert
     ON ehr_observation FOR INSERT
     WITH CHECK (
@@ -688,6 +714,7 @@ CREATE POLICY ehr_observation_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_observation_update ON ehr_observation;
 CREATE POLICY ehr_observation_update
     ON ehr_observation FOR UPDATE
     USING (
@@ -712,6 +739,7 @@ CREATE POLICY ehr_observation_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_observation_delete ON ehr_observation;
 CREATE POLICY ehr_observation_delete
     ON ehr_observation FOR DELETE
     USING (
@@ -767,6 +795,7 @@ END $$;
 
 ALTER TABLE ehr_claim ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_claim_select ON ehr_claim;
 CREATE POLICY ehr_claim_select
     ON ehr_claim FOR SELECT
     USING (
@@ -784,6 +813,7 @@ CREATE POLICY ehr_claim_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_claim_insert ON ehr_claim;
 CREATE POLICY ehr_claim_insert
     ON ehr_claim FOR INSERT
     WITH CHECK (
@@ -793,6 +823,7 @@ CREATE POLICY ehr_claim_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_claim_update ON ehr_claim;
 CREATE POLICY ehr_claim_update
     ON ehr_claim FOR UPDATE
     USING (
@@ -815,6 +846,7 @@ CREATE POLICY ehr_claim_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_claim_delete ON ehr_claim;
 CREATE POLICY ehr_claim_delete
     ON ehr_claim FOR DELETE
     USING (
@@ -875,6 +907,7 @@ END $$;
 
 ALTER TABLE ehr_service_request ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS ehr_service_request_select ON ehr_service_request;
 CREATE POLICY ehr_service_request_select
     ON ehr_service_request FOR SELECT
     USING (
@@ -893,6 +926,7 @@ CREATE POLICY ehr_service_request_select
         )
     );
 
+DROP POLICY IF EXISTS ehr_service_request_insert ON ehr_service_request;
 CREATE POLICY ehr_service_request_insert
     ON ehr_service_request FOR INSERT
     WITH CHECK (
@@ -902,6 +936,7 @@ CREATE POLICY ehr_service_request_insert
         )
     );
 
+DROP POLICY IF EXISTS ehr_service_request_update ON ehr_service_request;
 CREATE POLICY ehr_service_request_update
     ON ehr_service_request FOR UPDATE
     USING (
@@ -924,6 +959,7 @@ CREATE POLICY ehr_service_request_update
         )
     );
 
+DROP POLICY IF EXISTS ehr_service_request_delete ON ehr_service_request;
 CREATE POLICY ehr_service_request_delete
     ON ehr_service_request FOR DELETE
     USING (
@@ -965,6 +1001,7 @@ CREATE INDEX IF NOT EXISTS idx_ehr_audit_history_fhir
 ALTER TABLE ehr_audit_history ENABLE ROW LEVEL SECURITY;
 
 -- Read: compliance officer, health information manager, system admin only
+DROP POLICY IF EXISTS ehr_audit_history_select ON ehr_audit_history;
 CREATE POLICY ehr_audit_history_select
     ON ehr_audit_history FOR SELECT
     USING (
@@ -975,6 +1012,7 @@ CREATE POLICY ehr_audit_history_select
     );
 
 -- Write: all authenticated roles insert audit entries
+DROP POLICY IF EXISTS ehr_audit_history_insert ON ehr_audit_history;
 CREATE POLICY ehr_audit_history_insert
     ON ehr_audit_history FOR INSERT
     WITH CHECK (
@@ -988,12 +1026,14 @@ CREATE POLICY ehr_audit_history_insert
     );
 
 -- Update: deny — audit records are immutable
+DROP POLICY IF EXISTS ehr_audit_history_update ON ehr_audit_history;
 CREATE POLICY ehr_audit_history_update
     ON ehr_audit_history FOR UPDATE
     USING (false)
     WITH CHECK (false);
 
 -- Delete: deny — audit records are immutable
+DROP POLICY IF EXISTS ehr_audit_history_delete ON ehr_audit_history;
 CREATE POLICY ehr_audit_history_delete
     ON ehr_audit_history FOR DELETE
     USING (false);
