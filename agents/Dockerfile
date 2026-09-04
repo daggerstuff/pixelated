@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && npm install -g pnpm@${PNPM_VERSION} \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ${AGENT_DIR}/package.json ${AGENT_DIR}/pnpm-lock.yaml ${AGENT_DIR}/pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+COPY ${AGENT_DIR}/package.json ${AGENT_DIR}/pnpm-workspace.yaml ./
+RUN pnpm install --no-frozen-lockfile
 
 COPY ${AGENT_DIR}/ ./
  # Copy shared lib files needed by agent path aliases (@/lib/context/*)

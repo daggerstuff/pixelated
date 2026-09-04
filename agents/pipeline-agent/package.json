@@ -35,9 +35,6 @@
     "@vitest/coverage-v8": "^4.1.9",
     "vitest": "^4.1.9"
   },
-  "resolutions": {
-    "ai": "7.0.0-beta.178"
-  },
   "overrides": {
     "ai": "7.0.0-beta.178",
     "fast-uri": "3.1.4"
