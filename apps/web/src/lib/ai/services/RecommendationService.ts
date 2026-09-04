@@ -1,177 +1,54 @@
-import type { MentalHealthAnalysis } from '@/lib/chat'
+
 import { getClinicalAnalysisLogger } from '@/lib/logging/standardized-logger'
 
 import { ClinicalKnowledgeBase } from '../mental-llama/ClinicalKnowledgeBase'
 import type {
   MentalHealthAnalysisResult,
   ExpertGuidedAnalysisResult,
-  ExpertGuidance,
 } from '../mental-llama/types/mentalLLaMATypes'
-import type { TherapySession } from '../models/ai-types'
+
 
 const logger = getClinicalAnalysisLogger('general')
 
+import type {
+  TreatmentTechnique,
+  SupportingPattern,
+  TreatmentRecommendation,
+  ClientProfile,
+  ClientState,
+  InterventionSuggestion,
+  RecommendationContext,
+  RecommendationOptions,
+} from './recommendation-service.types'
+import {
+  mapUrgencyToPriority,
+  mapUrgencyToTimeframe,
+  identifyPrimaryConcerns,
+  assessFunctionalImpairment,
+  calculateEvidenceStrength,
+  identifySupportingPatterns,
+  generateExpectedOutcomes,
+  identifyRiskConsiderations,
+  generateProgressMetrics,
+  identifyCulturalAdaptations,
+  identifyIndividualAdaptations,
+  identifyContraindications,
+  selectMeasurementTools,
+  determineCheckpointIntervals,
+  defineSuccessCriteria,
+  calculateInterventionEvidenceStrength,
+  generateOutcomesForCategory,
+  getRiskConsiderationsForCategory,
+  getAssessmentToolsForCategory,
+  extractRiskIndicators,
+  generatePersonalizedDescription,
+  selectAppropriateTechniques,
+  generatePersonalizedNarrative,
+  generateCrisisRecommendations,
+  selectTechniquesForIntervention,
+} from './recommendation-service.utils'
+
 // Local type definitions
-interface ChatMessage {
-  id: string
-  content: string
-  role: 'user' | 'assistant'
-  timestamp: number
-}
-/**
- * Treatment Recommendation Service Types
- * Types and interfaces for treatment recommendation system
- */
-
-export interface TreatmentTechnique {
-  id: string
-  name: string
-  description: string
-  category:
-    | 'cognitive'
-    | 'behavioral'
-    | 'somatic'
-    | 'mindfulness'
-    | 'exposure'
-    | 'interpersonal'
-  difficultyLevel: 'beginner' | 'intermediate' | 'advanced'
-  timeCommitment: string
-  evidenceLevel: 'low' | 'medium' | 'high' | 'strong'
-  contraindications?: string[]
-  prerequisites?: string[]
-}
-
-export interface SupportingPattern {
-  type:
-    | 'symptom'
-    | 'behavior'
-    | 'cognition'
-    | 'emotion'
-    | 'risk_factor'
-    | 'protective_factor'
-  category: string
-  description: string
-  severity?: 'low' | 'moderate' | 'high' | 'critical'
-  frequency?: 'rare' | 'occasional' | 'frequent' | 'persistent'
-  confidence: number
-}
-
-export interface TreatmentRecommendation {
-  id: string
-  title: string
-  description: string
-  priority: 'low' | 'medium' | 'high' | 'critical'
-  techniques: TreatmentTechnique[]
-  evidenceStrength: number
-  supportingPatterns: SupportingPattern[]
-  personalizedDescription: string
-  validUntil: string
-  timeframe: string
-  rationale: string
-  expectedOutcomes: string[]
-  riskConsiderations: string[]
-  adaptations?: {
-    culturalFactors: string[]
-    individualNeeds: string[]
-    contraindications: string[]
-  }
-  progressMetrics: {
-    measurementTools: string[]
-    checkpointIntervals: string[]
-    successCriteria: string[]
-  }
-  metadata: {
-    generatedAt: string
-    basedOnSessions: string[]
-    clinicalContext: string
-    reviewRequired: boolean
-    lastUpdated: string
-  }
-}
-
-export interface ClientProfile {
-  id: string
-  demographics: {
-    age?: number
-    gender?: string
-    culturalBackground?: string[]
-    primaryLanguage?: string
-  }
-  clinicalHistory: {
-    primaryDiagnosis?: string
-    secondaryDiagnoses?: string[]
-    currentMedications?: string[]
-    allergies?: string[]
-    traumaHistory?: boolean
-    substanceUse?: string
-  }
-  treatmentHistory: {
-    previousTherapies: string[]
-    effectiveInterventions: string[]
-    ineffectiveInterventions: string[]
-    dropoutReasons?: string[]
-  }
-  currentStatus: {
-    riskLevel: 'low' | 'moderate' | 'high' | 'critical'
-    functionalStatus: string
-    supportSystem: 'strong' | 'moderate' | 'limited' | 'absent'
-    treatmentMotivation: 'low' | 'moderate' | 'high'
-  }
-  preferences: {
-    preferredModalities: string[]
-    sessionFrequency?: string
-    therapistGender?: string
-    religiousConsiderations?: string[]
-  }
-}
-
-export interface ClientState {
-  primaryConcerns: string[]
-  riskLevel: 'low' | 'moderate' | 'high' | 'critical'
-  functionalImpairment: string
-  readinessForChange: 'low' | 'moderate' | 'high'
-  supportSystemStrength: 'strong' | 'moderate' | 'limited' | 'absent'
-  riskIndicators: string[]
-  emergentIssues: string[]
-}
-
-export interface InterventionSuggestion {
-  intervention: string
-  urgency: 'immediate' | 'urgent' | 'routine'
-  rationale: string
-}
-
-export interface RecommendationContext {
-  clientProfile: ClientProfile
-  recentSessions: TherapySession[]
-  mentalHealthAnalyses: MentalHealthAnalysis[]
-  conversationHistory: ChatMessage[]
-  expertGuidance?: ExpertGuidance
-  emergentIssues?: string[]
-  treatmentGoals: string[]
-  timeConstraints?: {
-    urgency: 'immediate' | 'urgent' | 'standard' | 'maintenance'
-    sessionAvailability: string
-    duration: string
-  }
-}
-
-export interface RecommendationOptions {
-  maxRecommendations?: number
-  priorityFilter?: ('low' | 'medium' | 'high' | 'critical')[]
-  techniqueFilter?: (
-    | 'cognitive'
-    | 'behavioral'
-    | 'somatic'
-    | 'mindfulness'
-    | 'exposure'
-    | 'interpersonal'
-  )[]
-  evidenceThreshold?: number
-  includeExperimental?: boolean
-  culturalAdaptation?: boolean
-  personalizedNarratives?: boolean
-}
 
 /**
  * Production-grade Treatment Recommendation Service
@@ -303,7 +180,7 @@ export class RecommendationService {
 
       // Add crisis-specific recommendations if needed
       if (analysis.isCrisis) {
-        const crisisRecommendations = await this.generateCrisisRecommendations(
+        const crisisRecommendations = await generateCrisisRecommendations(
           analysis,
           context,
         )
@@ -512,16 +389,16 @@ export class RecommendationService {
     const latestAnalysis = context.mentalHealthAnalyses?.[0]
     const riskIndicators =
       context.recentSessions.length > 0
-        ? await this.extractRiskIndicators(context.recentSessions)
+        ? await extractRiskIndicators(context.recentSessions)
         : []
 
     return {
-      primaryConcerns: this.identifyPrimaryConcerns(context),
+      primaryConcerns: identifyPrimaryConcerns(context),
       riskLevel:
         (latestAnalysis?.riskLevel ??
         context.clientProfile.currentStatus.riskLevel) ||
         'moderate',
-      functionalImpairment: this.assessFunctionalImpairment(context),
+      functionalImpairment: assessFunctionalImpairment(context),
       readinessForChange:
         context.clientProfile.currentStatus.treatmentMotivation,
       supportSystemStrength: context.clientProfile.currentStatus.supportSystem,
@@ -551,9 +428,9 @@ export class RecommendationService {
       for (const intervention of categoryRecommendations) {
         recommendations.push({
           title: intervention.intervention,
-          priority: this.mapUrgencyToPriority(intervention.urgency),
+          priority: mapUrgencyToPriority(intervention.urgency),
           rationale: intervention.rationale,
-          timeframe: this.mapUrgencyToTimeframe(intervention.urgency),
+          timeframe: mapUrgencyToTimeframe(intervention.urgency),
         })
       }
     }
@@ -583,19 +460,19 @@ export class RecommendationService {
       const recommendation: TreatmentRecommendation = {
         id,
         title: base.title ?? 'Therapeutic Intervention',
-        description: await this.generatePersonalizedDescription(
+        description: await generatePersonalizedDescription(
           base,
           context,
           currentState,
         ),
         priority: base.priority ?? 'medium',
-        techniques: await this.selectAppropriateTechniques(base, context),
-        evidenceStrength: this.calculateEvidenceStrength(base, context),
-        supportingPatterns: this.identifySupportingPatterns(
+        techniques: await selectAppropriateTechniques(base, context),
+        evidenceStrength: calculateEvidenceStrength(base, context),
+        supportingPatterns: identifySupportingPatterns(
           context,
           currentState,
         ),
-        personalizedDescription: await this.generatePersonalizedNarrative(
+        personalizedDescription: await generatePersonalizedNarrative(
           base,
           context,
         ),
@@ -606,9 +483,9 @@ export class RecommendationService {
         rationale:
           base.rationale ??
           'Evidence-based intervention for presenting concerns',
-        expectedOutcomes: this.generateExpectedOutcomes(base, context),
-        riskConsiderations: this.identifyRiskConsiderations(base, context),
-        progressMetrics: this.generateProgressMetrics(base, context),
+        expectedOutcomes: generateExpectedOutcomes(base, context),
+        riskConsiderations: identifyRiskConsiderations(base, context),
+        progressMetrics: generateProgressMetrics(base, context),
         metadata: {
           generatedAt: new Date().toISOString(),
           basedOnSessions: context.recentSessions.map((s) => s.sessionId ?? ''),
@@ -661,11 +538,11 @@ export class RecommendationService {
     return recommendations.map((rec) => ({
       ...rec,
       adaptations: {
-        culturalFactors: this.identifyCulturalAdaptations(
+        culturalFactors: identifyCulturalAdaptations(
           context.clientProfile,
         ),
-        individualNeeds: this.identifyIndividualAdaptations(context),
-        contraindications: this.identifyContraindications(rec, context),
+        individualNeeds: identifyIndividualAdaptations(context),
+        contraindications: identifyContraindications(rec, context),
       },
     }))
   }
@@ -680,9 +557,9 @@ export class RecommendationService {
     return recommendations.map((rec) => ({
       ...rec,
       progressMetrics: {
-        measurementTools: this.selectMeasurementTools(rec, context),
-        checkpointIntervals: this.determineCheckpointIntervals(rec),
-        successCriteria: this.defineSuccessCriteria(rec, context),
+        measurementTools: selectMeasurementTools(rec, context),
+        checkpointIntervals: determineCheckpointIntervals(rec),
+        successCriteria: defineSuccessCriteria(rec, context),
       },
     }))
   }
@@ -825,10 +702,10 @@ export class RecommendationService {
       id: `rec-${analysis.mentalHealthCategory}-${Date.now()}`,
       title: intervention.intervention,
       description: `Evidence-based intervention for ${analysis.mentalHealthCategory}`,
-      priority: this.mapUrgencyToPriority(intervention.urgency),
-      techniques: await this.selectTechniquesForIntervention(intervention),
+      priority: mapUrgencyToPriority(intervention.urgency),
+      techniques: await selectTechniquesForIntervention(intervention),
       evidenceStrength:
-        this.calculateInterventionEvidenceStrength(intervention),
+        calculateInterventionEvidenceStrength(intervention),
       supportingPatterns: [
         {
           type: 'symptom',
@@ -841,16 +718,16 @@ export class RecommendationService {
       validUntil: new Date(
         now.getTime() + this.DEFAULT_VALID_DURATION,
       ).toISOString(),
-      timeframe: this.mapUrgencyToTimeframe(intervention.urgency),
+      timeframe: mapUrgencyToTimeframe(intervention.urgency),
       rationale: intervention.rationale,
-      expectedOutcomes: this.generateOutcomesForCategory(
+      expectedOutcomes: generateOutcomesForCategory(
         analysis.mentalHealthCategory,
       ),
-      riskConsiderations: this.getRiskConsiderationsForCategory(
+      riskConsiderations: getRiskConsiderationsForCategory(
         analysis.mentalHealthCategory,
       ),
       progressMetrics: {
-        measurementTools: this.getAssessmentToolsForCategory(
+        measurementTools: getAssessmentToolsForCategory(
           analysis.mentalHealthCategory,
         ),
         checkpointIntervals: ['1 week', '2 weeks', '4 weeks'],
@@ -870,413 +747,4 @@ export class RecommendationService {
     }
   }
 
-  // Additional helper methods (implementation continues...)
-  private mapUrgencyToPriority(
-    urgency: string,
-  ): 'low' | 'medium' | 'high' | 'critical' {
-    switch (urgency) {
-      case 'immediate':
-        return 'critical'
-      case 'urgent':
-        return 'high'
-      case 'routine':
-        return 'medium'
-      default:
-        return 'medium'
-    }
-  }
-
-  private mapUrgencyToTimeframe(urgency: string): string {
-    switch (urgency) {
-      case 'immediate':
-        return 'Within 24 hours'
-      case 'urgent':
-        return 'Within 1 week'
-      case 'routine':
-        return 'Within 2-4 weeks'
-      default:
-        return 'Within 2-4 weeks'
-    }
-  }
-
-  private identifyPrimaryConcerns(context: RecommendationContext): string[] {
-    const concerns: string[] = []
-
-    // Extract from recent analyses
-    if (context.mentalHealthAnalyses.length > 0) {
-      context.mentalHealthAnalyses.forEach((analysis) => {
-        if (analysis.category && !concerns.includes(analysis.category)) {
-          concerns.push(analysis.category)
-        }
-      })
-    }
-
-    // Extract from clinical history
-    if (context.clientProfile.clinicalHistory.primaryDiagnosis) {
-      const diagnosis =
-        context.clientProfile.clinicalHistory.primaryDiagnosis.toLowerCase()
-      if (!concerns.some((c) => diagnosis.includes(c))) {
-        concerns.push(diagnosis)
-      }
-    }
-
-    return concerns.length > 0 ? concerns : ['general_mental_health']
-  }
-
-  private async extractRiskIndicators(
-    sessions: TherapySession[],
-  ): Promise<string[]> {
-    // Analyze sessions for risk indicators
-    const indicators: string[] = []
-
-    sessions.forEach((session) => {
-      if (session.aiAnalysis?.riskAssessment === 'high') {
-        indicators.push('high_risk_session')
-      }
-
-      if (session.notes?.toLowerCase().includes('crisis')) {
-        indicators.push('crisis_mention')
-      }
-    })
-
-    return indicators
-  }
-
-  private assessFunctionalImpairment(context: RecommendationContext): string {
-    // Assess functional impairment based on available data
-    return context.clientProfile.currentStatus.functionalStatus || 'moderate'
-  }
-
-  private async generatePersonalizedDescription(
-    _base: Partial<TreatmentRecommendation>,
-    _context: RecommendationContext,
-    currentState: ClientState,
-  ): Promise<string> {
-    const concerns = currentState.primaryConcerns.join(' and ')
-    return `This intervention addresses your ${concerns} and is tailored to your current situation and treatment goals.`
-  }
-
-  private async selectAppropriateTechniques(
-    _base: Partial<TreatmentRecommendation>,
-    _context: RecommendationContext,
-  ): Promise<TreatmentTechnique[]> {
-    // Select appropriate techniques based on client profile and preferences
-    const techniques: TreatmentTechnique[] = []
-
-    // Default cognitive technique
-    techniques.push({
-      id: 'cognitive-restructuring',
-      name: 'Cognitive Restructuring',
-      description: 'Identifying and changing negative thought patterns',
-      category: 'cognitive',
-      difficultyLevel: 'intermediate',
-      timeCommitment: '15-30 minutes daily',
-      evidenceLevel: 'strong',
-    })
-
-    return techniques
-  }
-
-  private calculateEvidenceStrength(
-    _base: Partial<TreatmentRecommendation>,
-    context: RecommendationContext,
-  ): number {
-    // Calculate evidence strength based on various factors
-    let strength = 0.7 // Base strength
-
-    // Adjust based on client factors
-    if (
-      context.clientProfile.treatmentHistory.effectiveInterventions.length > 0
-    ) {
-      strength += 0.1
-    }
-
-    return Math.min(strength, 1.0)
-  }
-
-  private identifySupportingPatterns(
-    _context: RecommendationContext,
-    currentState: ClientState,
-  ): SupportingPattern[] {
-    const patterns: SupportingPattern[] = []
-
-    // Add patterns from primary concerns
-    currentState.primaryConcerns.forEach((concern: string) => {
-      patterns.push({
-        type: 'symptom',
-        category: concern,
-        description: `${concern} symptoms identified`,
-        confidence: 0.8,
-      })
-    })
-
-    return patterns
-  }
-
-  private async generatePersonalizedNarrative(
-    _base: Partial<TreatmentRecommendation>,
-    _context: RecommendationContext,
-  ): Promise<string> {
-    return `Based on your individual profile and current needs, this recommendation has been specifically tailored for you.`
-  }
-
-  private generateExpectedOutcomes(
-    _base: Partial<TreatmentRecommendation>,
-    _context: RecommendationContext,
-  ): string[] {
-    return [
-      'Reduction in symptoms',
-      'Improved daily functioning',
-      'Enhanced coping skills',
-      'Better emotional regulation',
-    ]
-  }
-
-  private identifyRiskConsiderations(
-    _base: Partial<TreatmentRecommendation>,
-    context: RecommendationContext,
-  ): string[] {
-    const considerations: string[] = []
-
-    if (context.clientProfile.currentStatus.riskLevel === 'high') {
-      considerations.push(
-        'Requires careful monitoring due to elevated risk level',
-      )
-    }
-
-    return considerations
-  }
-
-  private generateProgressMetrics(
-    _base: Partial<TreatmentRecommendation>,
-    _context: RecommendationContext,
-  ) {
-    return {
-      measurementTools: ['Standardized assessment scales', 'Session ratings'],
-      checkpointIntervals: ['Weekly', 'Bi-weekly', 'Monthly'],
-      successCriteria: [
-        'Symptom improvement',
-        'Functional gains',
-        'Goal achievement',
-      ],
-    }
-  }
-
-  private identifyCulturalAdaptations(profile: ClientProfile): string[] {
-    return profile.demographics.culturalBackground ?? []
-  }
-
-  private identifyIndividualAdaptations(
-    context: RecommendationContext,
-  ): string[] {
-    return context.clientProfile.preferences.preferredModalities || []
-  }
-
-  private identifyContraindications(
-    _recommendation: TreatmentRecommendation,
-    context: RecommendationContext,
-  ): string[] {
-    const contraindications: string[] = []
-
-    // Check against ineffective previous interventions
-    context.clientProfile.treatmentHistory.ineffectiveInterventions.forEach(
-      (intervention) => {
-        contraindications.push(`Previously ineffective: ${intervention}`)
-      },
-    )
-
-    return contraindications
-  }
-
-  private selectMeasurementTools(
-    _recommendation: TreatmentRecommendation,
-    _context: RecommendationContext,
-  ): string[] {
-    return ['PHQ-9', 'GAD-7', 'Session rating scales', 'Functional assessment']
-  }
-
-  private determineCheckpointIntervals(
-    recommendation: TreatmentRecommendation,
-  ): string[] {
-    switch (recommendation.priority) {
-      case 'critical':
-        return ['24 hours', '1 week', '2 weeks']
-      case 'high':
-        return ['1 week', '2 weeks', '4 weeks']
-      case 'medium':
-        return ['2 weeks', '4 weeks', '8 weeks']
-      case "low": { throw new Error('Not implemented yet: "low" case') }
-      default:
-        return ['4 weeks', '8 weeks', '12 weeks']
-    }
-  }
-
-  private defineSuccessCriteria(
-    _recommendation: TreatmentRecommendation,
-    _context: RecommendationContext,
-  ): string[] {
-    return [
-      'Measurable symptom reduction',
-      'Improved functioning in daily activities',
-      'Achievement of identified treatment goals',
-      'Enhanced quality of life measures',
-    ]
-  }
-
-  private async generateCrisisRecommendations(
-    _analysis: MentalHealthAnalysisResult,
-    _context: RecommendationContext,
-  ): Promise<TreatmentRecommendation[]> {
-    return [
-      {
-        id: `crisis-${Date.now()}`,
-        title: 'Immediate Crisis Intervention',
-        description: 'Emergency intervention for crisis situation',
-        priority: 'critical',
-        techniques: [
-          {
-            id: 'crisis-intervention',
-            name: 'Crisis Intervention',
-            description: 'Immediate crisis support and safety planning',
-            category: 'behavioral',
-            difficultyLevel: 'advanced',
-            timeCommitment: 'Immediate',
-            evidenceLevel: 'strong',
-          },
-        ],
-        evidenceStrength: 0.95,
-        supportingPatterns: [
-          {
-            type: 'risk_factor',
-            category: 'crisis',
-            description: 'Crisis indicators detected',
-            severity: 'critical',
-            confidence: 0.9,
-          },
-        ],
-        personalizedDescription:
-          'Immediate professional intervention is recommended due to crisis indicators.',
-        validUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-        timeframe: 'Immediate',
-        rationale: 'Crisis situation requires immediate professional attention',
-        expectedOutcomes: ['Immediate safety', 'Crisis stabilization'],
-        riskConsiderations: ['Requires immediate professional oversight'],
-        progressMetrics: {
-          measurementTools: ['Safety assessment', 'Risk evaluation'],
-          checkpointIntervals: ['Immediate', '2 hours', '24 hours'],
-          successCriteria: ['Safety established', 'Crisis resolved'],
-        },
-        metadata: {
-          generatedAt: new Date().toISOString(),
-          basedOnSessions: [],
-          clinicalContext: 'Crisis intervention',
-          reviewRequired: true,
-          lastUpdated: new Date().toISOString(),
-        },
-      },
-    ]
-  }
-
-  private async selectTechniquesForIntervention(
-    intervention: InterventionSuggestion,
-  ): Promise<TreatmentTechnique[]> {
-    // Default technique mapping
-    return [
-      {
-        id: 'intervention-technique',
-        name: intervention.intervention,
-        description: 'Evidence-based therapeutic technique',
-        category: 'cognitive',
-        difficultyLevel: 'intermediate',
-        timeCommitment: '30-60 minutes',
-        evidenceLevel: 'high',
-      },
-    ]
-  }
-
-  private calculateInterventionEvidenceStrength(
-    intervention: InterventionSuggestion,
-  ): number {
-    // Base evidence strength calculation
-    switch (intervention.urgency) {
-      case 'immediate':
-        return 0.95
-      case 'urgent':
-        return 0.85
-      case 'routine':
-        return 0.75
-      default:
-        return 0.7
-    }
-  }
-
-  private generateOutcomesForCategory(category: string): string[] {
-    const outcomeMap: Record<string, string[]> = {
-      depression: [
-        'Improved mood',
-        'Increased energy',
-        'Better sleep',
-        'Enhanced motivation',
-      ],
-      anxiety: [
-        'Reduced worry',
-        'Improved relaxation',
-        'Better stress management',
-        'Increased confidence',
-      ],
-      trauma: [
-        'Reduced flashbacks',
-        'Improved emotional regulation',
-        'Better relationships',
-        'Increased safety',
-      ],
-    }
-
-    return (
-      outcomeMap[category] ?? [
-        'Symptom improvement',
-        'Better functioning',
-        'Enhanced well-being',
-      ]
-    )
-  }
-
-  private getRiskConsiderationsForCategory(category: string): string[] {
-    const riskMap: Record<string, string[]> = {
-      depression: [
-        'Monitor for suicidal ideation',
-        'Watch for worsening symptoms',
-      ],
-      anxiety: ['Monitor for panic attacks', 'Avoid overexposure'],
-      trauma: [
-        'Risk of re-traumatization',
-        'Requires trauma-informed approach',
-      ],
-    }
-
-    return riskMap[category] ?? ['Requires professional monitoring']
-  }
-
-  private getAssessmentToolsForCategory(category: string): string[] {
-    const toolMap: Record<string, string[]> = {
-      depression: [
-        'PHQ-9',
-        'Beck Depression Inventory',
-        'Hamilton Depression Rating Scale',
-      ],
-      anxiety: [
-        'GAD-7',
-        'Beck Anxiety Inventory',
-        'State-Trait Anxiety Inventory',
-      ],
-      trauma: ['PCL-5', 'CAPS-5', 'Trauma Symptom Inventory'],
-    }
-
-    return (
-      toolMap[category] ?? [
-        'Standardized assessment scales',
-        'Clinical interview',
-      ]
-    )
-  }
 }
