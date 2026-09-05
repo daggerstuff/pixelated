@@ -16,6 +16,9 @@ TARGET=50000
 # stop it ~132 records short. Raise NF_HARD_CEILING for the real run.
 NF_HOURLY_LIMIT=10000
 NF_HARD_CEILING=55000
+# Gate-rejected generations are retried up to this many times with the offending
+# phrase explicitly forbidden (cuts the ~25% cliché rejection rate to a few %).
+NF_REJECT_RETRIES=2
 
 # --- Ollama / local model (the ONLY backend — never switch off Ollama) ---
 LOCAL_MODEL=gurubot/wayfarer-2-12B
