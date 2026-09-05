@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Colab GPU bootstrap for the +50k edge/nightmare run (Stage 3).
+"""Colab bootstrap for the +50k edge/nightmare run (Stage 3).
 
-Untars the uploaded ``ai/`` tree, installs Ollama, pulls the local generation
-model, serves it on the Colab GPU, then runs the Stage-3 generator against it
-(``NF_BACKEND=vllm``). The GPU is the reason this runs on Colab.
+Untars the uploaded ``ai/`` tree, installs Ollama, pulls a local generation
+model, and runs the Stage-3 generator against the local vLLM endpoint
+(``VLLM_URL``). Needs a GPU for the 12B model.
 """
 
 from __future__ import annotations
@@ -34,10 +34,7 @@ TARBALL = "/content/nf_code.tar.gz"
 OUTPUT_DIR = "/content/output"
 AI_DIR = "/content/ai"
 
-OLLAMA_TAR_ZST = (
-    "https://github.com/ollama/ollama/releases/latest/download/"
-    "ollama-linux-amd64.tar.zst"
-)
+OLLAMA_TAR_ZST = "https://github.com/ollama/ollama/releases/latest/download/ollama-linux-amd64.tar.zst"
 
 # Crash-persistence: periodically mirror the local output dir to a durable
 # remote via rclone. The target is env-configurable so a writable S3 remote (or
@@ -83,17 +80,18 @@ def install_ollama() -> None:
     # Decompress .zst -> .tar in Python (no zstd binary on Colab).
     import zstandard
 
+    # Stream the frame: the release tarball is compressed without a content-size
+    # hint, so the one-shot decompressor raises ZstdError ("could not determine
+    # content size in frame header").
     with open(zst, "rb") as src, open(tar, "wb") as dst:
-        dst.write(zstandard.ZstdDecompressor().decompress(src.read()))
+        zstandard.ZstdDecompressor().copy_stream(src, dst)
 
     # Extract the FULL tarball (not just bin/ollama) so the bundled
     # lib/ollama/cuda_v12 CUDA libs are present.
     sh(f"tar -C /usr/local -xf {tar}")
 
     # Point Ollama at its bundled CUDA libs and the first GPU.
-    os.environ["LD_LIBRARY_PATH"] = (
-        "/usr/local/lib/ollama:" + os.environ.get("LD_LIBRARY_PATH", "")
-    )
+    os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib/ollama:" + os.environ.get("LD_LIBRARY_PATH", "")
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
     os.environ["PATH"] = "/usr/local/bin:" + os.environ.get("PATH", "")
 
@@ -202,16 +200,21 @@ def _r2_workers_upload(cfg: dict[str, str], output_dir: str) -> None:
             with open(src, "rb") as f_in, gzip.open(gz, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
             key = f"{prefix}/{name}.gz"
-            url = (
-                f"https://api.cloudflare.com/client/v4/accounts/{acct}"
-                f"/r2/buckets/{bucket}/objects/{key}"
-            )
+            url = f"https://api.cloudflare.com/client/v4/accounts/{acct}/r2/buckets/{bucket}/objects/{key}"
             subprocess.run(
                 [
-                    "curl", "-sS", "-o", "/dev/null", "-w", "%{http_code}",
-                    "-X", "PUT",
-                    "-H", f"Authorization: Bearer {token}",
-                    "--data-binary", f"@{gz}",
+                    "curl",
+                    "-sS",
+                    "-o",
+                    "/dev/null",
+                    "-w",
+                    "%{http_code}",
+                    "-X",
+                    "PUT",
+                    "-H",
+                    f"Authorization: Bearer {token}",
+                    "--data-binary",
+                    f"@{gz}",
                     url,
                 ],
                 check=False,
@@ -275,10 +278,13 @@ def init_observability(cfg: dict[str, str]) -> Any:
     """
     langsmith_key = cfg.get("LANGSMITH_API_KEY", "").strip()
     project = cfg.get("LANGSMITH_PROJECT", "clinical-nf-generation").strip()
+    langsmith_workspace = cfg.get("LANGSMITH_WORKSPACE_ID", "").strip()
     if langsmith_key:
         os.environ["LANGSMITH_API_KEY"] = langsmith_key
         os.environ["LANGSMITH_TRACING_V2"] = "true"
         os.environ["LANGSMITH_PROJECT"] = project
+        if langsmith_workspace:
+            os.environ["LANGSMITH_WORKSPACE_ID"] = langsmith_workspace
 
     wandb_key = cfg.get("WANDB_API_KEY", "").strip()
     if wandb_key:
@@ -318,13 +324,21 @@ def main() -> int:
 
     tarfile.open(TARBALL).extractall("/content")
     sh(f"{sys.executable} -m pip install -q aiohttp langsmith weave")
-    install_ollama()
 
+    install_ollama()
     proc = subprocess.Popen(
         ["ollama", "serve"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+    # Wait for the server to bind before pulling — `ollama pull` is a client that
+    # talks to localhost:11434 and otherwise races the server startup.
+    for _ in range(60):
+        try:
+            urllib.request.urlopen("http://localhost:11434/api/version", timeout=1)
+            break
+        except Exception:
+            time.sleep(1)
     sh(f"ollama pull {local_model}")
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -360,7 +374,7 @@ def main() -> int:
     )
     upload_thread.start()
 
-    # Wait for the OpenAI-compatible endpoint to come up before generating.
+    # Wait for the local OpenAI-compatible endpoint to come up before generating.
     for _ in range(180):
         try:
             urllib.request.urlopen(f"{vllm_url}/v1/models", timeout=1)
@@ -370,8 +384,14 @@ def main() -> int:
     else:
         print("WARNING: Ollama endpoint not reachable; proceeding anyway", flush=True)
 
+    gen_cmd = [sys.executable, "-m", "training.build_edge_and_nightmare_dataset", "--target", target]
+    # Optional hard cap for smoke/dry runs: stops generation once NF_LIMIT records
+    # are reached (the generator's own --limit flag).
+    limit = cfg.get("NF_LIMIT", "").strip()
+    if limit:
+        gen_cmd += ["--limit", limit]
     r = subprocess.run(
-        [sys.executable, "-m", "training.build_edge_and_nightmare_dataset", "--target", target],
+        gen_cmd,
         cwd=AI_DIR,
         env={**os.environ, "PYTHONPATH": AI_DIR},
     )
