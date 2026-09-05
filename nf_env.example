@@ -3,11 +3,19 @@
 # Fill secrets from the repo-root .env (gitignored); NEVER commit real values here.
 
 # --- Generation target ---
-# Variations per combo: ceil(TARGET/120) x 120 combos. NOT a total-record cap.
+# Total edge-case records. Variations per combo = ceil(TARGET/120); the 120-combo
+# matrix (10 families x 3 difficulty x 4 ambiguity) then yields >= TARGET records.
 TARGET=50000
 # Optional hard cap on TOTAL output records (smoke/dry runs only).
 # Unset for the real +50k run.
 #NF_LIMIT=5
+
+# --- ModerateGuard credit-burn limits (defaults: 10000/hour, 50000 hard) ---
+# The guard auto-kills once total records > NF_HARD_CEILING. A +50k run produces
+# 50040 edge + 92 nightmare = 50132 records, so the DEFAULT 50000 ceiling would
+# stop it ~132 records short. Raise NF_HARD_CEILING for the real run.
+NF_HOURLY_LIMIT=10000
+NF_HARD_CEILING=55000
 
 # --- Ollama / local model (the ONLY backend — never switch off Ollama) ---
 LOCAL_MODEL=gurubot/wayfarer-2-12B
@@ -22,6 +30,8 @@ R2_ENDPOINT=https://6c9200f8f880a7f846e70cda63baa1be.r2.cloudflarestorage.com
 R2_ACCESS_KEY_ID=<from-.env>
 R2_SECRET_ACCESS_KEY=<from-.env>
 R2_PREFIX=colab_nf_output
+# Seconds between durable R2 mirror uploads (default 300); a final flush always runs.
+NF_UPLOAD_INTERVAL=300
 
 # --- Observability ---
 # LangSmith v2: LANGSMITH_WORKSPACE_ID is REQUIRED — without it ingest 403s.
