@@ -1,19 +1,34 @@
-# Colab Nightmare-Fuel run env — copy to /content/nf_env and fill in.
+# Colab Nightmare-Fuel run env — copy to /content/nf_env and fill in real values.
 # Loaded by scripts/colab_nf_bootstrap.py (load_env reads KEY=VALUE lines).
+# Fill secrets from the repo-root .env (gitignored); NEVER commit real values here.
 
 # --- Generation target ---
+# Variations per combo: ceil(TARGET/120) x 120 combos. NOT a total-record cap.
 TARGET=50000
+# Optional hard cap on TOTAL output records (smoke/dry runs only).
+# Unset for the real +50k run.
+#NF_LIMIT=5
+
+# --- Ollama / local model (the ONLY backend — never switch off Ollama) ---
 LOCAL_MODEL=gurubot/wayfarer-2-12B
+# Ollama OpenAI-compatible endpoint.
+VLLM_URL=http://localhost:11434
+# Where generated JSONL lands on the Colab VM.
+NF_OUTPUT_DIR=/content/output
 
-# --- Crash-persistence upload (optional but recommended) ---
-# R2 S3-compatible endpoint (Cloudflare). Bucket/prefix verified:
-#   bucket "training" @ 6c9200f8f880a7f846e70cda63baa1be.r2.cloudflarestorage.com
-#   prefix colab_nf_output
-R2_ENDPOINT=https://6c9200f8f880a7f846e70cda63baa1be.r2.cloudflarestorage.com
-R2_ACCESS_KEY_ID=<fill-from-.env.bak>
-R2_SECRET_ACCESS_KEY=<fill-from-.env.bak>
+# --- Crash-persistence upload to Cloudflare R2 (S3-compatible, via rclone) ---
 R2_BUCKET=training
+R2_ENDPOINT=https://6c9200f8f880a7f846e70cda63baa1be.r2.cloudflarestorage.com
+R2_ACCESS_KEY_ID=<from-.env>
+R2_SECRET_ACCESS_KEY=<from-.env>
+R2_PREFIX=colab_nf_output
 
-# --- Observability (optional) ---
-#LANGSMITH_API_KEY=
-#WANDB_API_KEY=
+# --- Observability ---
+# LangSmith v2: LANGSMITH_WORKSPACE_ID is REQUIRED — without it ingest 403s.
+LANGSMITH_API_KEY=<from-.env>
+LANGSMITH_ENDPOINT=https://api.smith.langchain.com
+LANGSMITH_PROJECT=clinical-nf-generation
+LANGSMITH_WORKSPACE_ID=<from-.env>
+# Weave (W&B tracing).
+WANDB_API_KEY=<from-.env>
+WANDB_PROJECT=pixelated-empathy-kan28
