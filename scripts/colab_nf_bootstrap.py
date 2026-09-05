@@ -214,6 +214,39 @@ def _upload_once(cfg: dict[str, str], remote: str, path: str, output_dir: str) -
         _rclone_upload(remote, path, output_dir)
 
 
+def _rclone_download(remote: str, path: str, output_dir: str) -> None:
+    """Download the durable checkpoint into the output dir (idempotent, best-effort)."""
+    try:
+        subprocess.run(
+            ["rclone", "copy", f"{remote}:{path}", output_dir],
+            check=False,
+            capture_output=True,
+            text=True,
+        )
+    except Exception as e:  # pragma: no cover - network path
+        print(f"restore failed: {e}", flush=True)
+
+
+def _restore_once(cfg: dict[str, str], remote: str, path: str, output_dir: str) -> None:
+    """Restore a prior checkpoint so a killed/restarted session resumes, not restarts.
+
+    Best-effort: a missing or unreachable remote leaves the output dir empty and
+    generation starts fresh.
+    """
+    r2_bucket = cfg.get("R2_BUCKET", "").strip()
+    r2_s3 = bool(
+        cfg.get("R2_ACCESS_KEY_ID", "").strip()
+        and cfg.get("R2_SECRET_ACCESS_KEY", "").strip()
+        and cfg.get("R2_ENDPOINT", "").strip()
+        and r2_bucket
+    )
+    if r2_s3:
+        prefix = cfg.get("R2_PREFIX", "colab_nf_output").strip()
+        _rclone_download("r2", f"{r2_bucket}/{prefix}", output_dir)
+    else:
+        _rclone_download(remote, path, output_dir)
+
+
 def _periodic_upload_loop(
     cfg: dict[str, str],
     remote: str,
@@ -313,6 +346,7 @@ def main() -> int:
     upload_remote = configure_rclone(cfg)
     if upload_remote:
         remote = upload_remote
+    _restore_once(cfg, remote, upload_path, OUTPUT_DIR)
     stop_upload = threading.Event()
     upload_thread = threading.Thread(
         target=_periodic_upload_loop,
