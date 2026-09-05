@@ -20,35 +20,26 @@ flowchart LR
 
 ### A. Session Startup (Mandatory)
 
-Before writing code, making a plan, or exploring the repo, run a **single
-unified context injection**:
+Ambient auto-injection hooks automatically populate `[FORESIGHT CONTINUITY CONTEXT]` on Turn 1 across Claude Code, OpenCode, OMP, and Antigravity.
 
-- **MCP Tool**:
-  `inject_context(conversation_text="<user's initial request or task description>")`
-- **Output**: Automatically surfaces relevant memories, active project
-  directives, `user_preferences`, and `pending_items`.
-- **Action**: Silently incorporate retrieved context into your reasoning and
-  approach.
+When calling explicitly (or on topic shifts / subagent starts):
+- **Claude / OpenCode / OMP**: Direct MCP tool call `inject_context(conversation_text="...")` (or `mcp__foresight__inject_context`).
+- **Antigravity / Gemini CLI** (lazy MCP tools): `call_mcp_tool(ServerName="foresight", ToolName="inject_context", Arguments={"conversation_text": "..."})`.
+- **Output**: Surfaces relevant memories, active project directives, `user_preferences`, and `pending_items`.
+- **Action**: Silently incorporate retrieved context into your reasoning and approach.
 
 ### B. In-Session Continuity & Capture
 
-- **When user states a preference or rule** (_"prefer X over Y"_, _"always do
-  Z"_): Call
-  `manage_context_blocks(action="update", label="user_preferences", content="<new preference>")`
-  immediately.
-- **When key decisions or facts are finalized**: Call
-  `manage_memories(action="store", category="decision"|"fact", content="<concise distilled statement>")`.
+- **When user states a preference or rule** (_"prefer X over Y"_, _"always do Z"_):
+  Update `user_preferences` context block immediately (`manage_context_blocks` or `call_mcp_tool`).
+- **When key decisions or facts are finalized**:
+  Store concise distilled statement (`manage_memories` with `category="decision"|"fact"`).
 
 ### C. Session Wrap-Up
 
-Before ending substantial work:
-
-- Update `pending_items` block:
-  `manage_context_blocks(action="update", label="pending_items", content="...")`
-  marking finished tasks and listing follow-ups.
-- For long multi-turn sessions: Call
-  `process_session_transcript(session_id="...", messages=[...])` to trigger
-  background distillation.
+Ambient hooks trigger `process_session_transcript` automatically on session completion. When wrapping up explicitly:
+- Update `pending_items` block marking finished tasks and listing follow-ups (`manage_context_blocks`).
+- For long multi-turn sessions without auto-capture: Call `process_session_transcript(session_id="...", messages=[...])`.
 
 ---
 
