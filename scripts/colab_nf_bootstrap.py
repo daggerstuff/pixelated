@@ -307,6 +307,11 @@ def init_observability(cfg: dict[str, str]) -> Any:
 
 def main() -> int:
     cfg = load_env()
+    # Export every env key to the process environment so the generator subprocess
+    # (which reads os.environ, not the uploaded nf_env dict) inherits
+    # NF_HARD_CEILING, NF_HOURLY_LIMIT, NF_REJECT_RETRIES, etc.
+    for key, value in cfg.items():
+        os.environ.setdefault(key, value)
     tree = init_observability(cfg)
     local_model = cfg.get("LOCAL_MODEL", "gurubot/wayfarer-2-12B")
     vllm_url = cfg.get("VLLM_URL", "http://localhost:11434")
