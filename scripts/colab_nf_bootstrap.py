@@ -8,7 +8,6 @@ model, and runs the Stage-3 generator against the local vLLM endpoint
 
 from __future__ import annotations
 
-import gzip
 import os
 import shutil
 import subprocess
@@ -166,66 +165,6 @@ def resolve_upload_target(cfg: dict[str, str]) -> tuple[str, str, int]:
     return remote, path, interval
 
 
-def _r2_workers_upload(cfg: dict[str, str], output_dir: str) -> None:
-    """Upload output-dir files to Cloudflare R2 via the Workers API.
-
-    Uses ``CLOUDFLARE_API_TOKEN`` + ``CLOUDFLARE_ACCOUNT_ID`` (or ``R2_API_TOKEN`` /
-    ``R2_ACCOUNT_ID``) + ``R2_BUCKET``. Each file is gzipped before PUT to stay
-    well under the Workers API 100MB single-request limit.
-
-    Verified working against the ``6c9200f8…r2.cloudflarestorage.com/training``
-    bucket (PUT → GET → DELETE all HTTP 200).
-    """
-    acct = (
-        cfg.get("R2_ACCOUNT_ID", "").strip()
-        or cfg.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
-        or os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
-    )
-    token = (
-        cfg.get("R2_API_TOKEN", "").strip()
-        or cfg.get("CLOUDFLARE_API_TOKEN", "").strip()
-        or os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
-    )
-    bucket = cfg.get("R2_BUCKET", "training").strip()
-    prefix = cfg.get("R2_PREFIX", "colab_nf_output").strip()
-    if not (acct and token):
-        return
-
-    for name in sorted(os.listdir(output_dir)):
-        src = os.path.join(output_dir, name)
-        if not os.path.isfile(src):
-            continue
-        gz = src + ".gz"
-        try:
-            with open(src, "rb") as f_in, gzip.open(gz, "wb") as f_out:
-                shutil.copyfileobj(f_in, f_out)
-            key = f"{prefix}/{name}.gz"
-            url = f"https://api.cloudflare.com/client/v4/accounts/{acct}/r2/buckets/{bucket}/objects/{key}"
-            subprocess.run(
-                [
-                    "curl",
-                    "-sS",
-                    "-o",
-                    "/dev/null",
-                    "-w",
-                    "%{http_code}",
-                    "-X",
-                    "PUT",
-                    "-H",
-                    f"Authorization: Bearer {token}",
-                    "--data-binary",
-                    f"@{gz}",
-                    url,
-                ],
-                check=False,
-            )
-        except Exception as e:  # pragma: no cover - network path
-            print(f"r2 upload failed for {name}: {e}", flush=True)
-        finally:
-            if os.path.exists(gz):
-                os.remove(gz)
-
-
 def _rclone_upload(remote: str, path: str, output_dir: str) -> None:
     """Incremental mirror of the output dir to ``remote:path`` (idempotent)."""
     try:
@@ -240,7 +179,7 @@ def _rclone_upload(remote: str, path: str, output_dir: str) -> None:
 
 
 def _upload_once(cfg: dict[str, str], remote: str, path: str, output_dir: str) -> None:
-    """Mirror output to the durable target: R2 S3 (rclone) → R2 Workers API → rclone."""
+    """Mirror output to the durable target: R2 S3 via rclone, else the configured remote."""
     r2_bucket = cfg.get("R2_BUCKET", "").strip()
     r2_s3 = bool(
         cfg.get("R2_ACCESS_KEY_ID", "").strip()
@@ -251,8 +190,6 @@ def _upload_once(cfg: dict[str, str], remote: str, path: str, output_dir: str) -
     if r2_s3:
         prefix = cfg.get("R2_PREFIX", "colab_nf_output").strip()
         _rclone_upload("r2", f"{r2_bucket}/{prefix}", output_dir)
-    elif r2_bucket:
-        _r2_workers_upload(cfg, output_dir)
     else:
         _rclone_upload(remote, path, output_dir)
 
@@ -351,21 +288,10 @@ def main() -> int:
     # killed/restarted VM doesn't lose the whole run. Best-effort — generation
     # proceeds even if the upload remote is unreachable or unwritable.
     remote, upload_path, interval = resolve_upload_target(cfg)
-    r2_s3 = bool(
-        cfg.get("R2_ACCESS_KEY_ID", "").strip()
-        and cfg.get("R2_SECRET_ACCESS_KEY", "").strip()
-        and cfg.get("R2_ENDPOINT", "").strip()
-        and cfg.get("R2_BUCKET", "").strip()
-    )
-    workers_only = bool(cfg.get("R2_BUCKET", "").strip()) and not r2_s3
-    if workers_only:
-        # Cloudflare R2 via the Workers API — verified writable, no rclone needed.
-        pass
-    else:
-        install_rclone()
-        upload_remote = configure_rclone(cfg)
-        if upload_remote:
-            remote = upload_remote
+    install_rclone()
+    upload_remote = configure_rclone(cfg)
+    if upload_remote:
+        remote = upload_remote
     stop_upload = threading.Event()
     upload_thread = threading.Thread(
         target=_periodic_upload_loop,
