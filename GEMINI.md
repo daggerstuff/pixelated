@@ -7,20 +7,34 @@
 
 ## 1. ⚡ Priority Zero: Context Grounding (Foresight First)
 
-Before executing any substantive task, run context injection to retrieve
-standing user preferences, recent architecture decisions, and active task state:
+Ambient auto-injection automatically injects `[FORESIGHT CONTINUITY CONTEXT]` into turn 1.
+When explicitly retrieving or persisting state during a session:
 
-```python
-inject_context(conversation_text="<user's prompt or task description>")
-```
-
+- **Retrieval (Antigravity lazy MCP tool)**:
+  ```python
+  call_mcp_tool(
+      ServerName="foresight",
+      ToolName="inject_context",
+      Arguments={"conversation_text": "<user's prompt or topic>"},
+  )
+  ```
+- **In-Session Capture (Preferences & Decisions)**:
+  ```python
+  # Update user preferences or pending items
+  call_mcp_tool(
+      ServerName="foresight",
+      ToolName="manage_context_blocks",
+      Arguments={"action": "update", "label": "user_preferences", "content": "..."},
+  )
+  # Store key decisions
+  call_mcp_tool(
+      ServerName="foresight",
+      ToolName="manage_memories",
+      Arguments={"action": "store", "category": "decision", "content": "..."},
+  )
+  ```
 - Silently incorporate returned memories and context blocks (`user_preferences`,
   `pending_items`, `core_directives`).
-- When user states technical preferences (_"prefer pnpm"_, _"use PostgreSQL"_),
-  persist immediately:
-  ```python
-  manage_context_blocks(action="update", label="user_preferences", content="...")
-  ```
 
 ---
 
