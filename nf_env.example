@@ -21,6 +21,9 @@ NF_HARD_CEILING=55000
 LOCAL_MODEL=gurubot/wayfarer-2-12B
 # Ollama OpenAI-compatible endpoint.
 VLLM_URL=http://localhost:11434
+# Parallel request serving (default 1 = serial). Match the generator's concurrency
+# (3) so an A100/40GB runs ~3x faster; raise/lower with VRAM headroom.
+OLLAMA_NUM_PARALLEL=3
 # Where generated JSONL lands on the Colab VM.
 NF_OUTPUT_DIR=/content/output
 

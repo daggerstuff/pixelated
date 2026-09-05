@@ -317,6 +317,10 @@ def main() -> int:
     sh(f"{sys.executable} -m pip install -q aiohttp langsmith weave")
 
     install_ollama()
+    # Parallel request serving: the generator fans out with concurrency 3, but
+    # Ollama serializes by default (OLLAMA_NUM_PARALLEL=1). The A100 has VRAM
+    # headroom for several concurrent 12B generations, so match the fan-out.
+    os.environ["OLLAMA_NUM_PARALLEL"] = cfg.get("OLLAMA_NUM_PARALLEL", "3").strip() or "3"
     proc = subprocess.Popen(
         ["ollama", "serve"],
         stdout=subprocess.DEVNULL,
