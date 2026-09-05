@@ -43,7 +43,22 @@ UPLOAD_INTERVAL_SECONDS = 300
 
 def sh(cmd: str) -> None:
     print("+", cmd, flush=True)
-    subprocess.run(cmd, shell=True, check=True)
+    # Stream merged stdout/stderr through print() so output is visible via
+    # ``colab exec`` (a subprocess that merely inherits the kernel's file
+    # descriptors bypasses the iopub stream and shows nothing).
+    proc = subprocess.Popen(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+    )
+    assert proc.stdout is not None
+    for line in proc.stdout:
+        print(line, end="", flush=True)
+    code = proc.wait()
+    if code != 0:
+        raise subprocess.CalledProcessError(code, cmd)
 
 
 def load_env() -> dict[str, str]:
@@ -58,13 +73,18 @@ def load_env() -> dict[str, str]:
 
 
 def install_ollama() -> None:
-    """Install Ollama. Primary: official script. Fallback: GitHub tar.zst.
+    """Install Ollama via the official installer, with a tarball fallback.
 
-    Verified: ``ollama.com/install.sh`` returns 200 and the amd64 CUDA asset is
-    ``ollama-linux-amd64.tar.zst`` under the ``latest`` release tag.
+    ``ollama.com/install.sh`` shells out to the ``zstd`` CLI, which Colab does
+    not ship, so install it first (apt, not pip — the pip wheels bundle only the
+    Python binding, not the binary). If the installer still fails for any other
+    reason, fall back to the GitHub amd64 CUDA tarball extracted via Python
+    ``zstandard``.
     """
     if shutil.which("ollama"):
         return
+
+    sh("sudo apt-get update -qq && sudo apt-get install -y -qq zstd")
     try:
         sh("curl -fsSL https://ollama.com/install.sh | sh")
         return
@@ -76,7 +96,7 @@ def install_ollama() -> None:
     sh(f"curl -fL -o {zst} '{OLLAMA_TAR_ZST}'")
     sh(f"{sys.executable} -m pip install -q zstandard")
 
-    # Decompress .zst -> .tar in Python (no zstd binary on Colab).
+    # Decompress .zst -> .tar in Python (self-contained fallback path).
     import zstandard
 
     # Stream the frame: the release tarball is compressed without a content-size
@@ -259,7 +279,8 @@ def main() -> int:
     vllm_url = cfg.get("VLLM_URL", "http://localhost:11434")
     target = cfg.get("TARGET", "50000")
 
-    tarfile.open(TARBALL).extractall("/content")
+    with tarfile.open(TARBALL) as tf:
+        tf.extractall("/content", filter="data")
     sh(f"{sys.executable} -m pip install -q aiohttp langsmith weave")
 
     install_ollama()
@@ -316,14 +337,22 @@ def main() -> int:
     limit = cfg.get("NF_LIMIT", "").strip()
     if limit:
         gen_cmd += ["--limit", limit]
-    r = subprocess.run(
+    gen_proc = subprocess.Popen(
         gen_cmd,
         cwd=AI_DIR,
         env={**os.environ, "PYTHONPATH": AI_DIR},
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
     )
+    assert gen_proc.stdout is not None
+    for line in gen_proc.stdout:
+        print(line, end="", flush=True)
+    returncode = gen_proc.wait()
+
     if tree is not None and hasattr(tree, "end"):
         try:
-            tree.end(outputs={"returncode": r.returncode})
+            tree.end(outputs={"returncode": returncode})
             tree.patch()
         except Exception as e:
             print(f"LangSmith RunTree end skipped: {e}", flush=True)
@@ -333,8 +362,18 @@ def main() -> int:
     upload_thread.join(timeout=30)
     _upload_once(cfg, remote, upload_path, OUTPUT_DIR)
     proc.terminate()
-    return r.returncode
+    return returncode
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    exit_code = main()
+    # In a Colab/IPython kernel, raising SystemExit prints a spurious "exception
+    # occurred" traceback even for exit code 0. As a real script, propagate it.
+    try:
+        from IPython import get_ipython
+
+        in_kernel = get_ipython() is not None
+    except ImportError:
+        in_kernel = False
+    if not in_kernel:
+        raise SystemExit(exit_code)
