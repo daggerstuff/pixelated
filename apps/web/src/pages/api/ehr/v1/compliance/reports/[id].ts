@@ -8,7 +8,6 @@
  * metadata from the in-memory store if available, or 404 if not found.
  */
 
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   resolveTenantId,
   requireEHRPermission,
@@ -17,6 +16,7 @@ import {
   ehrSuccess,
 } from '@/lib/ehr-native/api'
 import { getScheduledReport } from '@/lib/ehr-native/compliance'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 export const GET = withV1Contract(
   'getComplianceReport',

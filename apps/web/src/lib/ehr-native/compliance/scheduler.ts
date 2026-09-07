@@ -7,6 +7,7 @@
  * implementations would persist to PostgreSQL.
  */
 
+import { runScheduledReport } from './report-generator'
 import type {
   ReportType,
   ReportSchedule,
@@ -14,7 +15,6 @@ import type {
   ReportMetadata,
   ReportFormat,
 } from './types'
-import { runScheduledReport } from './report-generator'
 
 // ---------------------------------------------------------------------------
 // Scheduled report store (in-memory; replace with DB in production)

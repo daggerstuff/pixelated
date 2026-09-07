@@ -6,6 +6,10 @@
  * compliance rate computation.
  */
 
+import type { QueryResultRow } from 'pg'
+
+import { query } from '@/lib/db'
+
 import type {
   ReportPeriod,
   ConsentComplianceReport,
@@ -14,9 +18,6 @@ import type {
   ExpiringConsent,
   ConsentComplianceSummary,
 } from './types'
-
-import { query } from '@/lib/db'
-import type { QueryResultRow } from 'pg'
 
 // ---------------------------------------------------------------------------
 // Consent row from PostgreSQL (matches ConsentRow from consent/repository.ts)

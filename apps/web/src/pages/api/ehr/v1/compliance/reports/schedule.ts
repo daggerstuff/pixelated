@@ -6,7 +6,6 @@
  * DELETE /api/ehr/v1/compliance/reports/schedule — Delete a scheduled report
  */
 
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   resolveTenantId,
   requireEHRPermission,
@@ -30,6 +29,7 @@ import type {
   ReportSchedule,
   ReportFormat,
 } from '@/lib/ehr-native/compliance'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 // ---------------------------------------------------------------------------
 // POST — Create a scheduled report

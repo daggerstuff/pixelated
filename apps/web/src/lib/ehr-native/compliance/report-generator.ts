@@ -6,6 +6,20 @@
  * typed compliance report data.
  */
 
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+import type { AuditEvent } from '@/lib/audit/events'
+import { AuditLogger } from '@/lib/audit/logger'
+
+import { generateAccessReviewReport } from './access-review-report'
+import { generateConsentComplianceReport } from './consent-compliance-report'
+import { generateHIPAAAuditReport } from './hipaa-report'
+import {
+  generateSOC2SecurityReport,
+  generateSOC2AvailabilityReport,
+} from './soc2-report'
 import type {
   ReportType,
   ReportPeriod,
@@ -16,20 +30,6 @@ import type {
   ReportMetadata,
   ReportStatus,
 } from './types'
-
-import { AuditLogger } from '@/lib/audit/logger'
-import type { AuditEvent } from '@/lib/audit/events'
-
-import { generateHIPAAAuditReport } from './hipaa-report'
-import {
-  generateSOC2SecurityReport,
-  generateSOC2AvailabilityReport,
-} from './soc2-report'
-import { generateConsentComplianceReport } from './consent-compliance-report'
-import { generateAccessReviewReport } from './access-review-report'
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
 
 // ---------------------------------------------------------------------------
 // Template loader

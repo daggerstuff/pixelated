@@ -6,6 +6,10 @@
  * a HIPAAAuditReport.
  */
 
+import { AuditEventType } from '@/lib/audit/events'
+import type { AuditEvent } from '@/lib/audit/events'
+
+import { queryAuditEvents } from './report-generator'
 import type {
   ReportPeriod,
   ChainVerificationResult,
@@ -15,10 +19,6 @@ import type {
   BreakGlassEvent,
   HIPAAAuditSummary,
 } from './types'
-
-import { AuditEventType } from '@/lib/audit/events'
-import type { AuditEvent } from '@/lib/audit/events'
-import { queryAuditEvents } from './report-generator'
 
 // ---------------------------------------------------------------------------
 // Event classification helpers

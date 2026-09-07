@@ -5,7 +5,6 @@
  * GET   /api/ehr/v1/compliance/reports         — List scheduled report configurations
  */
 
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   resolveTenantId,
   requireEHRPermission,
@@ -19,6 +18,7 @@ import {
   listScheduledReports,
 } from '@/lib/ehr-native/compliance'
 import type { ReportType } from '@/lib/ehr-native/compliance'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 // ---------------------------------------------------------------------------
 // POST — Generate ad-hoc compliance report

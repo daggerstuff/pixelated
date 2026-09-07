@@ -6,6 +6,10 @@
  * - Availability: uptime, backup/restore, disaster recovery
  */
 
+import { AuditEventType } from '@/lib/audit/events'
+import type { AuditEvent } from '@/lib/audit/events'
+
+import { queryAuditEvents } from './report-generator'
 import type {
   ReportPeriod,
   ChainVerificationResult,
@@ -22,10 +26,6 @@ import type {
   SOC2SecuritySummary,
   SOC2AvailabilitySummary,
 } from './types'
-
-import { AuditEventType } from '@/lib/audit/events'
-import type { AuditEvent } from '@/lib/audit/events'
-import { queryAuditEvents } from './report-generator'
 
 // ---------------------------------------------------------------------------
 // Security Report

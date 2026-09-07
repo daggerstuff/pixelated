@@ -6,6 +6,14 @@
  * and high-risk permission identification.
  */
 
+import type { AuditEvent } from '@/lib/audit/events'
+import {
+  CLINICAL_ROLE_DEFINITIONS,
+  resolveRolePermissions,
+} from '@/lib/ehr-native/auth/role-permissions'
+import type { ClinicalRole, EHRPermission } from '@/lib/ehr-native/auth/types'
+
+import { queryAuditEvents } from './report-generator'
 import type {
   ReportPeriod,
   AccessReviewReport,
@@ -13,14 +21,6 @@ import type {
   PermissionChange,
   AccessReviewSummary,
 } from './types'
-
-import type { AuditEvent } from '@/lib/audit/events'
-import { queryAuditEvents } from './report-generator'
-import {
-  CLINICAL_ROLE_DEFINITIONS,
-  resolveRolePermissions,
-} from '@/lib/ehr-native/auth/role-permissions'
-import type { ClinicalRole, EHRPermission } from '@/lib/ehr-native/auth/types'
 
 // ---------------------------------------------------------------------------
 // High-risk permissions

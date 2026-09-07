@@ -7,7 +7,6 @@
  * Response: application/pdf
  */
 
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 import {
   resolveTenantId,
   requireEHRPermission,
@@ -16,6 +15,7 @@ import {
 } from '@/lib/ehr-native/api'
 import { generateReport, exportReportToPDF } from '@/lib/ehr-native/compliance'
 import type { ReportType } from '@/lib/ehr-native/compliance'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 export const POST = withV1Contract(
   'exportComplianceReportPDF',

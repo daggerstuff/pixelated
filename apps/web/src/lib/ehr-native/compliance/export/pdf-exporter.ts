@@ -6,6 +6,7 @@
  */
 
 import PDFDocument from 'pdfkit'
+
 import type { ComplianceReport, ReportMetadata } from '../types'
 import type {
   HIPAAAuditReport,

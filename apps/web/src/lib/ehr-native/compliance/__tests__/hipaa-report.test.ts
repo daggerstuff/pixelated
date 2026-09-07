@@ -6,6 +6,7 @@
 // @vitest-environment node
 
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { AuditEventType, AuditSeverity } from '@/lib/audit/events'
 import type { AuditEvent } from '@/lib/audit/events'
 
