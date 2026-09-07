@@ -77,7 +77,7 @@ RUN pnpm run build
 # Production dependencies stage (runtime image excludes dev tooling)
 FROM deps AS prod-deps
 COPY . .
-RUN pnpm prune --prod --ignore-scripts
+RUN pnpm prune --prod --ignore-scripts --yes
 
 # Final runner stage
 FROM runtime AS runner
