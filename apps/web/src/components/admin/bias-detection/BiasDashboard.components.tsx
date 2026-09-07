@@ -83,11 +83,7 @@ import {
 // 1. CustomTooltip
 // ---------------------------------------------------------------------------
 
-export const CustomTooltip: React.FC<TooltipProps> = ({
-  active,
-  payload,
-  label,
-}) => {
+const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
       <div className="bg-white border-gray-200 rounded-lg border p-3 shadow-lg">
@@ -1935,7 +1931,6 @@ export type {
   HighBiasAlertNotificationProps,
   AccessibilitySkipLinksProps,
   HeaderProps,
-  ConnectionStatusDisplay,
   NotificationSettingsPanelProps,
   ExportDialogProps,
   FilteringControlsProps,
