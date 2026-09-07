@@ -36,7 +36,7 @@
     "express-rate-limit": "^8.7.0",
     "gray-matter": "^4.0.3",
     "helmet": "^8.3.0",
-    "joi": "^17.13.6",
+    "joi": "^17.13.7",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.9.4",
     "multer": "^2.3.0",
