@@ -278,7 +278,7 @@ function buildBackupRestoreSummary(events: AuditEvent[]): BackupRestoreSummary {
   }
 
   return {
-    lastBackupAt: lastBackupAt || new Date().toISOString(),
+    lastBackupAt,
     backupFrequency: 'Daily (automated)',
     lastRestoreTest,
     backupEncryption: true,
@@ -322,7 +322,7 @@ function buildAvailabilitySummary(
     uptimePercentage: uptime.totalUptimePercentage,
     totalDowntimeMinutes: uptime.totalDowntimeMinutes,
     backupCompliant: backup.backupEncryption && Boolean(backup.lastBackupAt),
-    drCompliant: Boolean(dr.lastTestDate) || dr.rtoMinutes > 0,
+    drCompliant: Boolean(dr.lastTestDate),
   };
 }
 
