@@ -16,7 +16,7 @@ import type {
 
 import type { AuditEvent } from '@/lib/audit/events';
 import { queryAuditEvents } from './report-generator';
-import { CLINICAL_ROLE_DEFINITIONS } from '@/lib/ehr-native/auth/role-permissions';
+import { CLINICAL_ROLE_DEFINITIONS, resolveRolePermissions } from '@/lib/ehr-native/auth/role-permissions';
 import type { ClinicalRole, EHRPermission } from '@/lib/ehr-native/auth/types';
 
 // ---------------------------------------------------------------------------
@@ -118,10 +118,7 @@ function resolvePermissionsForRole(roleStr: string): string[] {
   const knownRoles = Object.keys(CLINICAL_ROLE_DEFINITIONS) as ClinicalRole[];
   if ((knownRoles as string[]).includes(roleStr)) {
     const role = roleStr as ClinicalRole;
-    const def = CLINICAL_ROLE_DEFINITIONS[role];
-    if (def && def.permissions) {
-      return [...def.permissions];
-    }
+    return Array.from(resolveRolePermissions(role));
   }
   return [];
 }

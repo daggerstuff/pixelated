@@ -96,7 +96,7 @@ export async function queryAuditEvents(
   };
 
   if (tenantId) {
-    filter['metadata.tenantId'] = tenantId;
+    filter['tenantId'] = tenantId;
   }
 
   const events = await collection
@@ -117,6 +117,7 @@ export async function queryAuditEvents(
     metadata: doc.metadata,
     ipAddress: doc.ipAddress,
     userAgent: doc.userAgent,
+    tenantId: doc.tenantId,
     status: doc.status ?? 'success',
     errorMessage: doc.errorMessage,
     previousHash: doc.previousHash,

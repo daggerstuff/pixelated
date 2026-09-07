@@ -16,6 +16,7 @@ import type {
   HIPAAAuditSummary,
 } from './types';
 
+import { AuditEventType } from '@/lib/audit/events';
 import type { AuditEvent } from '@/lib/audit/events';
 import { queryAuditEvents } from './report-generator';
 
@@ -70,7 +71,7 @@ function isPhiAccess(event: AuditEvent): boolean {
     'patientId' in event.metadata &&
     event.metadata.patientId
   ) {
-    return event.type === 'ACCESS' || String(event.type) === 'ACCESS';
+    return event.type === AuditEventType.ACCESS;
   }
   return false;
 }

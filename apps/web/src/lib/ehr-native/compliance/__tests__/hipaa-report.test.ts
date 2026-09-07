@@ -6,6 +6,7 @@
 // @vitest-environment node
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { AuditEventType, AuditSeverity } from '@/lib/audit/events';
 import type { AuditEvent } from '@/lib/audit/events';
 
 // Mock queryAuditEvents from report-generator
@@ -38,9 +39,9 @@ function makeEvent(overrides: Partial<AuditEvent> = {}): AuditEvent {
     id: 'evt-' + Math.random().toString(36).slice(2, 8),
     timestamp: new Date().toISOString(),
     userId: 'user-1',
-    type: 'ACCESS',
+    type: AuditEventType.ACCESS,
     action: 'patient_view',
-    severity: 'INFO',
+    severity: AuditSeverity.INFO,
     status: 'success',
     ...overrides,
   };
@@ -49,9 +50,9 @@ function makeEvent(overrides: Partial<AuditEvent> = {}): AuditEvent {
 describe('generateHIPAAAuditReport', () => {
   it('classifies PHI access events correctly', async () => {
     const events: AuditEvent[] = [
-      makeEvent({ action: 'patient_view', type: 'ACCESS' }),
-      makeEvent({ action: 'read_patient', type: 'ACCESS' }),
-      makeEvent({ action: 'encounter_view', type: 'ACCESS' }),
+      makeEvent({ action: 'patient_view', type: AuditEventType.ACCESS }),
+      makeEvent({ action: 'read_patient', type: AuditEventType.ACCESS }),
+      makeEvent({ action: 'encounter_view', type: AuditEventType.ACCESS }),
     ];
     mockQueryAuditEvents.mockResolvedValue(events);
 
@@ -62,9 +63,9 @@ describe('generateHIPAAAuditReport', () => {
 
   it('classifies PHI modification events correctly', async () => {
     const events: AuditEvent[] = [
-      makeEvent({ action: 'patient_create', type: 'CREATE' }),
-      makeEvent({ action: 'patient_update', type: 'UPDATE' }),
-      makeEvent({ action: 'record_delete', type: 'DELETE' }),
+      makeEvent({ action: 'patient_create', type: AuditEventType.CREATE }),
+      makeEvent({ action: 'patient_update', type: AuditEventType.UPDATE }),
+      makeEvent({ action: 'record_delete', type: AuditEventType.DELETE }),
     ];
     mockQueryAuditEvents.mockResolvedValue(events);
 
@@ -75,8 +76,8 @@ describe('generateHIPAAAuditReport', () => {
 
   it('classifies break-glass events by action', async () => {
     const events: AuditEvent[] = [
-      makeEvent({ action: 'break_glass', type: 'SECURITY', severity: 'HIGH' }),
-      makeEvent({ action: 'break_glass_activate', type: 'SECURITY', severity: 'HIGH' }),
+      makeEvent({ action: 'break_glass', type: AuditEventType.SECURITY, severity: AuditSeverity.HIGH }),
+      makeEvent({ action: 'break_glass_activate', type: AuditEventType.SECURITY, severity: AuditSeverity.HIGH }),
     ];
     mockQueryAuditEvents.mockResolvedValue(events);
 
@@ -89,7 +90,7 @@ describe('generateHIPAAAuditReport', () => {
     const events: AuditEvent[] = [
       makeEvent({
         action: 'patient_view',
-        type: 'ACCESS',
+        type: AuditEventType.ACCESS,
         metadata: { breakGlass: true, breakGlassReason: 'Emergency' },
       }),
     ];
@@ -160,7 +161,7 @@ describe('generateHIPAAAuditReport', () => {
     const events: AuditEvent[] = [
       makeEvent({
         action: 'some_custom_action',
-        type: 'ACCESS',
+        type: AuditEventType.ACCESS,
         metadata: { patientId: 'patient-99' },
       }),
     ];

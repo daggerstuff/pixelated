@@ -23,6 +23,7 @@ import type {
   SOC2AvailabilitySummary,
 } from './types';
 
+import { AuditEventType } from '@/lib/audit/events';
 import type { AuditEvent } from '@/lib/audit/events';
 import { queryAuditEvents } from './report-generator';
 
@@ -45,14 +46,14 @@ const ACCESS_CONTROL_ACTIONS = new Set([
 function isSecurityIncident(event: AuditEvent): boolean {
   const action = String(event.action).toLowerCase();
   if (SECURITY_INCIDENT_ACTIONS.has(action)) return true;
-  if (event.type === 'SECURITY') return true;
+  if (event.type === AuditEventType.SECURITY) return true;
   if (event.severity === 'CRITICAL' || event.severity === 'critical') return true;
   return false;
 }
 
 function isAccessControlEvent(event: AuditEvent): boolean {
   const action = String(event.action).toLowerCase();
-  return ACCESS_CONTROL_ACTIONS.has(action) || event.type === 'GOVERNANCE_ALLOW' || event.type === 'GOVERNANCE_DENY';
+  return ACCESS_CONTROL_ACTIONS.has(action) || event.type === AuditEventType.GOVERNANCE_ALLOW || event.type === AuditEventType.GOVERNANCE_DENY;
 }
 
 function isFailedAccess(event: AuditEvent): boolean {

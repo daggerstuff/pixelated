@@ -140,7 +140,7 @@ describe('queryAuditEvents', () => {
     await queryAuditEvents('2025-01-01', '2025-01-31', 'tenant-001');
     expect(mockFind).toHaveBeenCalledWith(
       expect.objectContaining({
-        'metadata.tenantId': 'tenant-001',
+        'tenantId': 'tenant-001',
       }),
     );
   });
@@ -148,7 +148,7 @@ describe('queryAuditEvents', () => {
   it('omits tenant filter when tenantId is not provided', async () => {
     await queryAuditEvents('2025-01-01', '2025-01-31');
     const filter = mockFind.mock.calls[0][0] as Record<string, unknown>;
-    expect(filter).not.toHaveProperty('metadata.tenantId');
+    expect(filter).not.toHaveProperty('tenantId');
   });
 
   it('maps MongoDB docs to AuditEvent shape', async () => {
