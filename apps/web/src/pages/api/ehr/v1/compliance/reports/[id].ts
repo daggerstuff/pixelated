@@ -44,7 +44,7 @@ export const GET = withV1Contract('getComplianceReport', async (ctx, caller) => 
   // Check if this is a scheduled report ID
   if (reportId.startsWith('sch-')) {
     const schedule = getScheduledReport(reportId);
-    if (!schedule) {
+    if (!schedule || schedule.tenantId !== tenantId) {
       return ehrNotFound('Scheduled report', reportId);
     }
     return ehrSuccess(schedule);

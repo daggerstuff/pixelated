@@ -23,6 +23,7 @@ import {
   listScheduledReports,
   updateScheduledReport,
   deleteScheduledReport,
+  getScheduledReport,
   triggerScheduledReportNow,
 } from '@/lib/ehr-native/compliance';
 import type { ReportType, ReportSchedule, ReportFormat } from '@/lib/ehr-native/compliance';
@@ -171,10 +172,12 @@ export const DELETE = withV1Contract('deleteScheduledReport', async (ctx, caller
     return ehrValidationError('scheduleId is required.');
   }
 
-  const deleted = deleteScheduledReport(scheduleId);
-  if (!deleted) {
+  const schedule = getScheduledReport(scheduleId);
+  if (!schedule || schedule.tenantId !== tenantId) {
     return ehrNotFound('Scheduled report', scheduleId);
   }
+
+  deleteScheduledReport(scheduleId);
 
   return ehrSuccess({ scheduleId, deleted: true });
 });
