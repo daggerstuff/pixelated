@@ -3,8 +3,8 @@
  * Each hook encapsulates a logical domain of state + effects + callbacks.
  */
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Activity, RefreshCw, AlertTriangle } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import type React from 'react'
 
 import {
@@ -26,6 +26,7 @@ import type {
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { isObject } from '@/lib/utils'
 
+import { getFilteredData } from './BiasDashboard.helpers'
 import type {
   AlertAction,
   AlertItem,
@@ -34,7 +35,6 @@ import type {
   NotificationSettings,
   TrendItem,
 } from './BiasDashboard.types'
-import { getFilteredData } from './BiasDashboard.helpers'
 
 const logger = createBuildSafeLogger('bias-dashboard')
 
@@ -42,12 +42,19 @@ const logger = createBuildSafeLogger('bias-dashboard')
 /* useBiasDashboardData                                                */
 /* ------------------------------------------------------------------ */
 
-export function useBiasDashboardData(refreshInterval: number, autoRefresh: boolean) {
-  const [dashboardData, setDashboardData] = useState<BiasDashboardData | null>(null)
+export function useBiasDashboardData(
+  refreshInterval: number,
+  autoRefresh: boolean,
+) {
+  const [dashboardData, setDashboardData] = useState<BiasDashboardData | null>(
+    null,
+  )
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-  const [newHighBiasAlert, setNewHighBiasAlert] = useState<AlertItem | null>(null)
+  const [newHighBiasAlert, setNewHighBiasAlert] = useState<AlertItem | null>(
+    null,
+  )
   const wsRef = useRef<WebSocket | null>(null)
   const [wsConnected, setWsConnected] = useState(false)
   const [wsConnectionStatus, setWsConnectionStatus] =
@@ -70,7 +77,8 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
       setDashboardData(data)
       setLastUpdated(new Date())
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load dashboard'
+      const message =
+        err instanceof Error ? err.message : 'Failed to load dashboard'
       setError(message)
       logger.error('Failed to fetch dashboard data', { error: message })
     } finally {
@@ -134,7 +142,9 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
             break
           }
           case 'connection_status':
-            logger.info('WebSocket connection status', { status: message.data?.status })
+            logger.info('WebSocket connection status', {
+              status: message.data?.status,
+            })
             break
           case 'heartbeat':
             try {
@@ -172,7 +182,10 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
       void fetchDashboardData()
     }, 0)
     if (autoRefresh && refreshInterval > 0) {
-      const interval = setInterval(() => void fetchDashboardData(), refreshInterval)
+      const interval = setInterval(
+        () => void fetchDashboardData(),
+        refreshInterval,
+      )
       return () => {
         window.clearTimeout(timer)
         clearInterval(interval)
@@ -211,20 +224,24 @@ interface UseAlertActionsParams {
 
 export function useAlertActions(params: UseAlertActionsParams) {
   const [selectedAlerts, setSelectedAlerts] = useState<Set<string>>(new Set())
-  const [alertActions, setAlertActions] = useState<Map<string, AlertAction[]>>(new Map())
-  const [alertNotes, setAlertNotes] = useState<Map<string, string>>(new Map())
-  const [dashboardDataProxy, setDashboardDataProxy] = useState<BiasDashboardData | null>(
-    params.dashboardData,
+  const [alertActions, setAlertActions] = useState<Map<string, AlertAction[]>>(
+    new Map(),
   )
+  const [alertNotes, setAlertNotes] = useState<Map<string, string>>(new Map())
+  const [dashboardDataProxy, setDashboardDataProxy] =
+    useState<BiasDashboardData | null>(params.dashboardData)
 
   const handleAlertAction = useCallback(
     async (alertId: string, action: AlertAction['type'], notes?: string) => {
       try {
-        const response = await fetch(`/api/bias-detection/alerts/${alertId}/action`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action, notes }),
-        })
+        const response = await fetch(
+          `/api/bias-detection/alerts/${alertId}/action`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action, notes }),
+          },
+        )
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
         const alertAction: AlertAction = {
@@ -248,7 +265,12 @@ export function useAlertActions(params: UseAlertActionsParams) {
             ...prev,
             alerts: prev.alerts.map((a) =>
               a.alertId === alertId
-                ? { ...a, status: action, acknowledged: true, timestamp: new Date().toISOString() }
+                ? {
+                    ...a,
+                    status: action,
+                    acknowledged: true,
+                    timestamp: new Date().toISOString(),
+                  }
                 : a,
             ),
           }
@@ -325,27 +347,32 @@ export function useAlertActions(params: UseAlertActionsParams) {
 /* ------------------------------------------------------------------ */
 
 export function useNotificationSettings() {
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
-    emailEnabled: true,
-    smsEnabled: false,
-    inAppEnabled: true,
-    criticalAlerts: true,
-    highAlerts: true,
-    mediumAlerts: false,
-    lowAlerts: false,
-  })
-  const [showNotificationSettings, setShowNotificationSettings] = useState(false)
+  const [notificationSettings, setNotificationSettings] =
+    useState<NotificationSettings>({
+      emailEnabled: true,
+      smsEnabled: false,
+      inAppEnabled: true,
+      criticalAlerts: true,
+      highAlerts: true,
+      mediumAlerts: false,
+      lowAlerts: false,
+    })
+  const [showNotificationSettings, setShowNotificationSettings] =
+    useState(false)
 
   const updateNotificationSettings = useCallback(
     async (newSettings: Partial<NotificationSettings>) => {
       const previous = notificationSettings
       setNotificationSettings((prev) => ({ ...prev, ...newSettings }))
       try {
-        const response = await fetch('/api/bias-detection/notification-settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newSettings),
-        })
+        const response = await fetch(
+          '/api/bias-detection/notification-settings',
+          {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newSettings),
+          },
+        )
         if (!response.ok) throw new Error(`HTTP ${response.status}`)
       } catch (err) {
         setNotificationSettings(previous)
@@ -385,7 +412,10 @@ export function useNotificationSettings() {
 export function useAccessibility() {
   const [isMobile, setIsMobile] = useState(false)
   const [isTablet, setIsTablet] = useState(false)
-  const [screenSize, setScreenSize] = useState<{ width: number; height: number }>({
+  const [screenSize, setScreenSize] = useState<{
+    width: number
+    height: number
+  }>({
     width: 0,
     height: 0,
   })
@@ -462,7 +492,10 @@ export function useAccessibility() {
       window.removeEventListener('resize', updateScreenSize)
       motionQuery.removeEventListener('change', checkAccessibilityPreferences)
       contrastQuery.removeEventListener('change', checkAccessibilityPreferences)
-      contrastHighQuery.removeEventListener('change', checkAccessibilityPreferences)
+      contrastHighQuery.removeEventListener(
+        'change',
+        checkAccessibilityPreferences,
+      )
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [updateScreenSize, checkAccessibilityPreferences, handleKeyDown])
@@ -495,8 +528,13 @@ interface UseExportDataParams {
 
 export function useExportData(params: UseExportDataParams) {
   const [showExportDialog, setShowExportDialog] = useState(false)
-  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'pdf'>('json')
-  const [exportDateRange, setExportDateRange] = useState<{ start: Date; end: Date }>(() => ({
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'pdf'>(
+    'json',
+  )
+  const [exportDateRange, setExportDateRange] = useState<{
+    start: Date
+    end: Date
+  }>(() => ({
     start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     end: new Date(),
   }))
@@ -534,8 +572,10 @@ export function useExportData(params: UseExportDataParams) {
       setExportProgress,
       setShowExportDialog,
       logger: {
-        info: (message: string, details?: unknown) => logger.info(message, details),
-        error: (message: string, details?: unknown) => logger.error(message, details),
+        info: (message: string, details?: unknown) =>
+          logger.info(message, details),
+        error: (message: string, details?: unknown) =>
+          logger.error(message, details),
       },
       dashboardData: params.dashboardData,
     })
@@ -657,10 +697,18 @@ export function useConnectionStatus(
 
 export function useFilters() {
   const [selectedTimeRange, setSelectedTimeRange] = useState('24h')
-  const [selectedDemographicFilter, setSelectedDemographicFilter] = useState('all')
-  const [biasScoreFilter, setBiasScoreFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all')
-  const [alertLevelFilter, setAlertLevelFilter] = useState<'all' | 'low' | 'medium' | 'high' | 'critical'>('all')
-  const [customDateRange, setCustomDateRange] = useState<{ start: Date; end: Date }>(() => ({
+  const [selectedDemographicFilter, setSelectedDemographicFilter] =
+    useState('all')
+  const [biasScoreFilter, setBiasScoreFilter] = useState<
+    'all' | 'low' | 'medium' | 'high'
+  >('all')
+  const [alertLevelFilter, setAlertLevelFilter] = useState<
+    'all' | 'low' | 'medium' | 'high' | 'critical'
+  >('all')
+  const [customDateRange, setCustomDateRange] = useState<{
+    start: Date
+    end: Date
+  }>(() => ({
     start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
     end: new Date(),
   }))

@@ -3,28 +3,38 @@
  * All components are pure/presentational — no state, no effects, no API calls.
  */
 
-import React from 'react'
 import {
   AlertTriangle,
   Archive,
   BarChart3,
   Bell,
   Check,
-
   Clock,
   Download,
   Eye,
   Filter,
-
   Mail,
   MessageSquare,
   RefreshCw,
   Users,
   X,
 } from 'lucide-react'
+import React from 'react'
 
-import { Alert, Badge, Button, Card, CardContent, CardHeader, CardTitle, Progress, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
-
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Progress,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui'
 import {
   ResponsiveContainer,
   AreaChart,
@@ -46,7 +56,16 @@ import {
   YAxis,
   CartesianGrid,
 } from '@/components/ui/LazyChart'
+import type { BiasDashboardData } from '@/lib/ai/bias-detection'
 
+import {
+  getAlertColor,
+  getBiasScoreColor,
+  getChartColors,
+  getResponsiveChartHeight,
+  getResponsiveGridCols,
+} from './BiasDashboard.helpers'
+import type { DateRange, FilterParams } from './BiasDashboard.helpers'
 import type {
   AlertAction,
   AlertItem,
@@ -55,22 +74,29 @@ import type {
   NotificationSettings,
   TooltipProps,
 } from './BiasDashboard.types'
-import { timeRangeOptions, demographicFilterOptions } from './BiasDashboard.types'
-import type { BiasDashboardData } from '@/lib/ai/bias-detection'
-import { getAlertColor, getBiasScoreColor, getChartColors, getResponsiveChartHeight, getResponsiveGridCols } from './BiasDashboard.helpers'
-import type { DateRange, FilterParams } from './BiasDashboard.helpers'
+import {
+  timeRangeOptions,
+  demographicFilterOptions,
+} from './BiasDashboard.types'
 
 // ---------------------------------------------------------------------------
 // 1. CustomTooltip
 // ---------------------------------------------------------------------------
 
-export const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
+export const CustomTooltip: React.FC<TooltipProps> = ({
+  active,
+  payload,
+  label,
+}) => {
   if (active && payload?.length) {
     return (
       <div className="bg-white border-gray-200 rounded-lg border p-3 shadow-lg">
         <p className="font-medium">{`${label}`}</p>
         {payload.map((entry) => (
-          <p key={`${entry.name}-${entry.value}`} style={{ color: entry.color }}>
+          <p
+            key={`${entry.name}-${entry.value}`}
+            style={{ color: entry.color }}
+          >
             {`${entry.name}: ${entry.value}${entry.payload?.percent ? ` (${entry.payload.percent}%)` : ''}`}
           </p>
         ))}
@@ -89,7 +115,9 @@ interface HighBiasAlertNotificationProps {
   onDismiss: () => void
 }
 
-export const HighBiasAlertNotification: React.FC<HighBiasAlertNotificationProps> = ({ newHighBiasAlert, onDismiss }) => {
+export const HighBiasAlertNotification: React.FC<
+  HighBiasAlertNotificationProps
+> = ({ newHighBiasAlert, onDismiss }) => {
   if (!newHighBiasAlert) return null
   return (
     <div
@@ -143,24 +171,20 @@ export const AccessibilitySkipLinks: React.FC<AccessibilitySkipLinksProps> = ({
         <button
           ref={skipLinkRef}
           onClick={() => mainContentRef.current?.focus()}
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50"
         >
           Skip to main content (Alt+M)
         </button>
         <button
           onClick={() => announceToScreenReader('Alerts section')}
-          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50"
         >
           Skip to alerts (Alt+A)
         </button>
       </div>
 
       {/* Screen Reader Announcements */}
-      <div
-        role="status"
-        aria-live="polite"
-        className="sr-only"
-      >
+      <div role="status" aria-live="polite" className="sr-only">
         {announcements.join('. ')}
       </div>
     </>
@@ -226,12 +250,14 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="flex items-center space-x-2">
         {/* Connection status */}
-        <div className={`flex items-center space-x-1 ${connectionStatus.color}`}>
+        <div
+          className={`flex items-center space-x-1 ${connectionStatus.color}`}
+        >
           {connectionStatus.icon}
           <span className="text-sm">
             {connectionStatus.text}
             {connectionStatus.pulse && (
-              <span className="ml-1 inline-block h-2 w-2 animate-pulse rounded-full bg-current" />
+              <span className="bg-current ml-1 inline-block h-2 w-2 animate-pulse rounded-full" />
             )}
           </span>
         </div>
@@ -244,7 +270,9 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onAutoRefreshChange(!autoRefresh)}
             aria-label="Toggle auto-refresh"
           >
-            <RefreshCw className={`mr-1 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`mr-1 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`}
+            />
             {!isMobile && 'Auto'}
           </Button>
         )}
@@ -261,7 +289,8 @@ export const Header: React.FC<HeaderProps> = ({
         </Button>
 
         {/* Reconnect */}
-        {(wsConnectionStatus === 'error' || wsConnectionStatus === 'disconnected') && (
+        {(wsConnectionStatus === 'error' ||
+          wsConnectionStatus === 'disconnected') && (
           <Button
             variant="outline"
             size="sm"
@@ -310,7 +339,9 @@ interface NotificationSettingsPanelProps {
   onClose: () => void
 }
 
-export const NotificationSettingsPanel: React.FC<NotificationSettingsPanelProps> = ({
+export const NotificationSettingsPanel: React.FC<
+  NotificationSettingsPanelProps
+> = ({
   showNotificationSettings,
   notificationSettings,
   onUpdate,
@@ -380,7 +411,11 @@ export const NotificationSettingsPanel: React.FC<NotificationSettingsPanelProps>
                 <label key={level} className="flex items-center space-x-2">
                   <input
                     type="checkbox"
-                    checked={notificationSettings[`${level}Alerts` as keyof NotificationSettings] as boolean}
+                    checked={
+                      notificationSettings[
+                        `${level}Alerts` as keyof NotificationSettings
+                      ] as boolean
+                    }
                     onChange={(e) =>
                       onUpdate({
                         [`${level}Alerts`]: e.target.checked,
@@ -540,23 +575,28 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         <div>
           <h4 className="mb-2 font-semibold">Data Types to Export</h4>
           <div className="grid grid-cols-2 gap-2">
-            {['summary', 'alerts', 'trends', 'demographics', 'sessions', 'recommendations'].map(
-              (type) => (
-                <label key={type} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={exportDataTypes[type] ?? false}
-                    onChange={(e) =>
-                      setExportDataTypes({
-                        ...exportDataTypes,
-                        [type]: e.target.checked,
-                      })
-                    }
-                  />
-                  <span className="text-sm capitalize">{type}</span>
-                </label>
-              ),
-            )}
+            {[
+              'summary',
+              'alerts',
+              'trends',
+              'demographics',
+              'sessions',
+              'recommendations',
+            ].map((type) => (
+              <label key={type} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={exportDataTypes[type] ?? false}
+                  onChange={(e) =>
+                    setExportDataTypes({
+                      ...exportDataTypes,
+                      [type]: e.target.checked,
+                    })
+                  }
+                />
+                <span className="text-sm capitalize">{type}</span>
+              </label>
+            ))}
           </div>
         </div>
 
@@ -569,7 +609,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                 type="checkbox"
                 checked={exportFilters.applyCurrentFilters}
                 onChange={(e) =>
-                  setExportFilters({ ...exportFilters, applyCurrentFilters: e.target.checked })
+                  setExportFilters({
+                    ...exportFilters,
+                    applyCurrentFilters: e.target.checked,
+                  })
                 }
               />
               <span className="text-sm">Apply current dashboard filters</span>
@@ -579,7 +622,10 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                 type="checkbox"
                 checked={exportFilters.includeArchived}
                 onChange={(e) =>
-                  setExportFilters({ ...exportFilters, includeArchived: e.target.checked })
+                  setExportFilters({
+                    ...exportFilters,
+                    includeArchived: e.target.checked,
+                  })
                 }
               />
               <span className="text-sm">Include archived data</span>
@@ -627,7 +673,9 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         {exportProgress.isExporting && (
           <div>
             <Progress value={exportProgress.progress} className="w-full" />
-            <p className="text-muted-foreground mt-1 text-sm">{exportProgress.status}</p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {exportProgress.status}
+            </p>
           </div>
         )}
 
@@ -803,7 +851,10 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
 
           {/* Demographics */}
           <div>
-            <label className="text-sm font-medium" htmlFor="filter-demographics">
+            <label
+              className="text-sm font-medium"
+              htmlFor="filter-demographics"
+            >
               Demographics
             </label>
             <select
@@ -848,8 +899,9 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
             : [
                 selectedTimeRange !== '24h'
                   ? `Time: ${
-                      timeOpts.find((option) => option.value === selectedTimeRange)
-                        ?.label ?? selectedTimeRange
+                      timeOpts.find(
+                        (option) => option.value === selectedTimeRange,
+                      )?.label ?? selectedTimeRange
                     }`
                   : null,
                 biasScoreFilter !== 'all'
@@ -878,7 +930,9 @@ interface CriticalAlertsProps {
   filteredAlerts: AlertItem[]
 }
 
-export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({ filteredAlerts }) => {
+export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({
+  filteredAlerts,
+}) => {
   const criticalHigh = filteredAlerts.filter(
     (a) => a.level === 'critical' || a.level === 'high',
   )
@@ -889,11 +943,10 @@ export const CriticalAlerts: React.FC<CriticalAlertsProps> = ({ filteredAlerts }
       <AlertTriangle className="h-4 w-4" />
       <div>
         <p className="font-semibold">
-          {criticalHigh.length} Critical/High Alert{criticalHigh.length > 1 ? 's' : ''}
+          {criticalHigh.length} Critical/High Alert
+          {criticalHigh.length > 1 ? 's' : ''}
         </p>
-        <p className="text-sm">
-          {criticalHigh.map((a) => a.type).join(', ')}
-        </p>
+        <p className="text-sm">{criticalHigh.map((a) => a.type).join(', ')}</p>
       </div>
     </Alert>
   )
@@ -924,7 +977,9 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-muted-foreground text-sm">Total Sessions</p>
-              <p className="text-2xl font-bold">{summary?.totalSessions ?? 0}</p>
+              <p className="text-2xl font-bold">
+                {summary?.totalSessions ?? 0}
+              </p>
             </div>
             <Users className="text-primary h-8 w-8" />
           </div>
@@ -936,7 +991,9 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Average Bias Score</p>
+              <p className="text-muted-foreground text-sm">
+                Average Bias Score
+              </p>
               <p
                 className={`text-2xl font-bold ${getBiasScoreColor(summary?.averageBiasScore ?? 0)}`}
               >
@@ -995,7 +1052,12 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
 // ---------------------------------------------------------------------------
 
 interface TrendsTabProps {
-  filteredTrends: Array<{ date: string; biasScore: number; sessionCount: number; alertCount: number }>
+  filteredTrends: Array<{
+    date: string
+    biasScore: number
+    sessionCount: number
+    alertCount: number
+  }>
   reducedMotion: boolean
   isMobile: boolean
   isTablet: boolean
@@ -1022,7 +1084,13 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
           <ResponsiveContainer width="100%" height={chartHeight}>
             <AreaChart data={filteredTrends}>
               <defs>
-                <linearGradient id="biasScoreGradient" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient
+                  id="biasScoreGradient"
+                  x1="0"
+                  y1="0"
+                  x2="0"
+                  y2="1"
+                >
                   <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
                   <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
                 </linearGradient>
@@ -1037,8 +1105,18 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
               <YAxis domain={[0, 1]} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <ReferenceLine y={0.3} stroke="#f59e0b" strokeDasharray="3 3" label="Warning" />
-              <ReferenceLine y={0.6} stroke="#ef4444" strokeDasharray="3 3" label="High" />
+              <ReferenceLine
+                y={0.3}
+                stroke="#f59e0b"
+                strokeDasharray="3 3"
+                label="Warning"
+              />
+              <ReferenceLine
+                y={0.6}
+                stroke="#ef4444"
+                strokeDasharray="3 3"
+                label="High"
+              />
               <Area
                 type="monotone"
                 dataKey="biasScore"
@@ -1157,7 +1235,9 @@ interface DemographicsTabProps {
   demographics: BiasDashboardData['demographics']
 }
 
-export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }) => {
+export const DemographicsTab: React.FC<DemographicsTabProps> = ({
+  demographics,
+}) => {
   return (
     <TabsContent value="demographics" className="space-y-6">
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -1170,27 +1250,38 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
-                  data={Object.entries(demographics?.age ?? {}).map(([age, count]) => ({
-                    name: age,
-                    value: count,
-                  }))}
+                  data={Object.entries(demographics?.age ?? {}).map(
+                    ([age, count]) => ({
+                      name: age,
+                      value: count,
+                    }),
+                  )}
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }: { name: string; percent?: number }) =>
-                    `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
-                  }
+                  label={({
+                    name,
+                    percent,
+                  }: {
+                    name: string
+                    percent?: number
+                  }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                   animationDuration={1000}
                   animationBegin={0}
                 >
-                  {Object.entries(demographics?.age ?? {}).map(([age, count], index) => (
-                    <Cell
-                      key={`age-${age}-${String(count)}`}
-                      fill={getChartColors(index, Object.keys(demographics?.age ?? {}).length)}
-                    />
-                  ))}
+                  {Object.entries(demographics?.age ?? {}).map(
+                    ([age, count], index) => (
+                      <Cell
+                        key={`age-${age}-${String(count)}`}
+                        fill={getChartColors(
+                          index,
+                          Object.keys(demographics?.age ?? {}).length,
+                        )}
+                      />
+                    ),
+                  )}
                 </Pie>
                 <Tooltip
                   content={({
@@ -1198,7 +1289,11 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
                     payload,
                   }: {
                     active?: boolean
-                    payload?: Array<{ name?: string; value?: number; percent?: number }>
+                    payload?: Array<{
+                      name?: string
+                      value?: number
+                      percent?: number
+                    }>
                   }) => {
                     if (active && payload && payload.length) {
                       return (
@@ -1206,7 +1301,8 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
                           <p className="font-semibold">{payload[0]?.name}</p>
                           <p>Count: {payload[0]?.value}</p>
                           <p>
-                            Percentage: {payload[0]?.percent
+                            Percentage:{' '}
+                            {payload[0]?.percent
                               ? (payload[0].percent * 100).toFixed(1)
                               : 0}
                             %
@@ -1232,27 +1328,38 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
-                  data={Object.entries(demographics?.gender ?? {}).map(([gender, count]) => ({
-                    name: gender,
-                    value: count,
-                  }))}
+                  data={Object.entries(demographics?.gender ?? {}).map(
+                    ([gender, count]) => ({
+                      name: gender,
+                      value: count,
+                    }),
+                  )}
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
                   fill="#82ca9d"
                   dataKey="value"
-                  label={({ name, percent }: { name: string; percent?: number }) =>
-                    `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`
-                  }
+                  label={({
+                    name,
+                    percent,
+                  }: {
+                    name: string
+                    percent?: number
+                  }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
                   animationDuration={1000}
                   animationBegin={0}
                 >
-                  {Object.entries(demographics?.gender ?? {}).map(([gender, count], index) => (
-                    <Cell
-                      key={`gender-${gender}-${String(count)}`}
-                      fill={getChartColors(index, Object.keys(demographics?.gender ?? {}).length)}
-                    />
-                  ))}
+                  {Object.entries(demographics?.gender ?? {}).map(
+                    ([gender, count], index) => (
+                      <Cell
+                        key={`gender-${gender}-${String(count)}`}
+                        fill={getChartColors(
+                          index,
+                          Object.keys(demographics?.gender ?? {}).length,
+                        )}
+                      />
+                    ),
+                  )}
                 </Pie>
                 <Tooltip
                   content={({
@@ -1260,7 +1367,11 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
                     payload,
                   }: {
                     active?: boolean
-                    payload?: Array<{ name?: string; value?: number; percent?: number }>
+                    payload?: Array<{
+                      name?: string
+                      value?: number
+                      percent?: number
+                    }>
                   }) => {
                     if (active && payload && payload.length) {
                       return (
@@ -1268,7 +1379,8 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
                           <p className="font-semibold">{payload[0]?.name}</p>
                           <p>Count: {payload[0]?.value}</p>
                           <p>
-                            Percentage: {payload[0]?.percent
+                            Percentage:{' '}
+                            {payload[0]?.percent
                               ? (payload[0].percent * 100).toFixed(1)
                               : 0}
                             %
@@ -1294,10 +1406,12 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({ demographics }
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart
-              data={Object.entries(demographics?.ethnicity ?? {}).map(([ethnicity, count]) => ({
-                ethnicity,
-                count,
-              }))}
+              data={Object.entries(demographics?.ethnicity ?? {}).map(
+                ([ethnicity, count]) => ({
+                  ethnicity,
+                  count,
+                }),
+              )}
               layout="horizontal"
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -1330,14 +1444,20 @@ interface AlertsTabProps {
   selectedAlerts: Set<string>
   alertActions: Map<string, AlertAction[]>
   alertNotes: Map<string, string>
-  onAlertAction: (alertId: string, action: string, notes?: string) => Promise<void>
+  onAlertAction: (
+    alertId: string,
+    action: string,
+    notes?: string,
+  ) => Promise<void>
   onBulkAlertAction: (alertIds: string[], action: string) => Promise<void>
   onToggleAlertSelection: (alertId: string) => void
   onSelectAllAlerts: () => void
   onClearAlertSelection: () => void
   onSetAlertLevelFilter: (value: string) => void
   onSetSelectedTimeRange: (value: string) => void
-  onSetAlertNotes: (updater: (prev: Map<string, string>) => Map<string, string>) => void
+  onSetAlertNotes: (
+    updater: (prev: Map<string, string>) => Map<string, string>,
+  ) => void
 }
 
 export const AlertsTab: React.FC<AlertsTabProps> = ({
@@ -1371,7 +1491,9 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                       filteredAlerts.length > 0
                     }
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      e.target.checked ? onSelectAllAlerts() : onClearAlertSelection()
+                      e.target.checked
+                        ? onSelectAllAlerts()
+                        : onClearAlertSelection()
                     }
                     className="rounded"
                   />
@@ -1388,7 +1510,10 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={async () =>
-                        onBulkAlertAction(Array.from(selectedAlerts), 'acknowledge')
+                        onBulkAlertAction(
+                          Array.from(selectedAlerts),
+                          'acknowledge',
+                        )
                       }
                     >
                       <Check className="mr-1 h-4 w-4" />
@@ -1421,11 +1546,14 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
               </div>
 
               <div className="flex items-center space-x-2">
-                <Badge variant="secondary">{filteredAlerts.length} alerts</Badge>
+                <Badge variant="secondary">
+                  {filteredAlerts.length} alerts
+                </Badge>
                 <Badge variant="destructive">
                   {
                     filteredAlerts.filter(
-                      (a: AlertItem) => a.level === 'critical' || a.level === 'high',
+                      (a: AlertItem) =>
+                        a.level === 'critical' || a.level === 'high',
                     ).length
                   }{' '}
                   high priority
@@ -1440,7 +1568,9 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">
-              {alerts.length === 0 ? 'No active alerts' : 'No alerts match current filters'}
+              {alerts.length === 0
+                ? 'No active alerts'
+                : 'No alerts match current filters'}
             </p>
             {alerts.length > 0 && filteredAlerts.length === 0 && (
               <Button
@@ -1464,7 +1594,10 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
           const lastAction = actions[actions.length - 1]
 
           return (
-            <Card key={alert.alertId} className={isSelected ? 'ring-blue-500 ring-2' : ''}>
+            <Card
+              key={alert.alertId}
+              className={isSelected ? 'ring-blue-500 ring-2' : ''}
+            >
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
                   {/* Selection Checkbox */}
@@ -1479,12 +1612,16 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                   <div className="flex-1">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start space-x-3">
-                        <Badge className={`${getAlertColor(alert.level)} text-white`}>
+                        <Badge
+                          className={`${getAlertColor(alert.level)} text-white`}
+                        >
                           {alert.level?.toUpperCase() || 'UNKNOWN'}
                         </Badge>
                         <div>
                           <h4 className="font-semibold">{alert.type}</h4>
-                          <p className="text-muted-foreground mt-1 text-sm">{alert.message}</p>
+                          <p className="text-muted-foreground mt-1 text-sm">
+                            {alert.message}
+                          </p>
                           <p className="text-muted-foreground mt-2 text-xs">
                             Session: {alert.sessionId} •{' '}
                             {alert.timestamp
@@ -1512,7 +1649,9 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                                   lastAction.type.slice(1)}
                               </Badge>
                               <span className="text-muted-foreground text-xs">
-                                {new Date(lastAction.timestamp).toLocaleString()}
+                                {new Date(
+                                  lastAction.timestamp,
+                                ).toLocaleString()}
                               </span>
                             </div>
                           )}
@@ -1520,7 +1659,8 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                           {/* Alert Notes */}
                           {alertNotes.has(alert.alertId) && (
                             <div className="bg-muted mt-2 rounded p-2 text-sm">
-                              <strong>Notes:</strong> {alertNotes.get(alert.alertId)}
+                              <strong>Notes:</strong>{' '}
+                              {alertNotes.get(alert.alertId)}
                             </div>
                           )}
                         </div>
@@ -1566,7 +1706,8 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                             const notes = prompt('Add notes (optional):')
                             if (notes) {
                               onSetAlertNotes(
-                                (prev) => new Map(prev.set(alert.alertId, notes)),
+                                (prev) =>
+                                  new Map(prev.set(alert.alertId, notes)),
                               )
                             }
                           }}
@@ -1578,7 +1719,9 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={async () => onAlertAction(alert.alertId, 'dismiss')}
+                          onClick={async () =>
+                            onAlertAction(alert.alertId, 'dismiss')
+                          }
                         >
                           <X className="mr-1 h-4 w-4" />
                           Dismiss
@@ -1600,7 +1743,8 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                                 className="flex items-center justify-between text-xs"
                               >
                                 <span>
-                                  {action.type.charAt(0).toUpperCase() + action.type.slice(1)}
+                                  {action.type.charAt(0).toUpperCase() +
+                                    action.type.slice(1)}
                                   {action.notes && ` - ${action.notes}`}
                                 </span>
                                 <span className="text-muted-foreground">
@@ -1646,7 +1790,9 @@ export const SessionsTab: React.FC<SessionsTabProps> = ({
         <Card>
           <CardContent className="py-8 text-center">
             <p className="text-muted-foreground">
-              {recentAnalyses.length === 0 ? 'No recent sessions' : 'No sessions match current filters'}
+              {recentAnalyses.length === 0
+                ? 'No recent sessions'
+                : 'No sessions match current filters'}
             </p>
             {recentAnalyses.length > 0 && filteredSessions.length === 0 && (
               <Button
@@ -1669,15 +1815,22 @@ export const SessionsTab: React.FC<SessionsTabProps> = ({
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="font-semibold">Session {analysis['sessionId']}</h4>
+                  <h4 className="font-semibold">
+                    Session {analysis['sessionId']}
+                  </h4>
                   <div className="mt-2 flex items-center space-x-4">
                     <span
                       className={`text-sm font-medium ${getBiasScoreColor(analysis.overallBiasScore)}`}
                     >
-                      Bias Score: {(analysis.overallBiasScore * 100).toFixed(1)}%
+                      Bias Score: {(analysis.overallBiasScore * 100).toFixed(1)}
+                      %
                     </span>
                     <Badge
-                      variant={analysis.alertLevel === 'low' ? 'secondary' : 'destructive'}
+                      variant={
+                        analysis.alertLevel === 'low'
+                          ? 'secondary'
+                          : 'destructive'
+                      }
                     >
                       {analysis.alertLevel}
                     </Badge>
@@ -1715,7 +1868,9 @@ interface RecommendationsTabProps {
   recommendations: DashboardRecommendation[]
 }
 
-export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ recommendations }) => {
+export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({
+  recommendations,
+}) => {
   return (
     <TabsContent value="recommendations" className="space-y-4">
       {recommendations?.length > 0 ? (
@@ -1726,13 +1881,19 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ recommen
                 <div className="flex-1">
                   <div className="mb-2 flex items-center space-x-2">
                     <Badge
-                      variant={rec.priority === 'critical' ? 'destructive' : 'secondary'}
+                      variant={
+                        rec.priority === 'critical'
+                          ? 'destructive'
+                          : 'secondary'
+                      }
                     >
                       {rec.priority}
                     </Badge>
                     <h4 className="font-semibold">{rec.title}</h4>
                   </div>
-                  <p className="text-muted-foreground mb-3 text-sm">{rec.description}</p>
+                  <p className="text-muted-foreground mb-3 text-sm">
+                    {rec.description}
+                  </p>
                   <div className="flex items-center space-x-2">
                     <Button
                       size="sm"
@@ -1756,7 +1917,9 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({ recommen
       ) : (
         <Card>
           <CardContent className="py-8 text-center">
-            <p className="text-muted-foreground">No recommendations available</p>
+            <p className="text-muted-foreground">
+              No recommendations available
+            </p>
           </CardContent>
         </Card>
       )}

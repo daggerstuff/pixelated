@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { Alert, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
 import {
   isAlertItemArray,
   isAlertLevel,
@@ -9,20 +8,15 @@ import {
   isExportFormat,
   isTrendItemArray,
 } from '@/components/admin/bias-detection/utils/dashboard-type-guards'
-
-import type { BiasDashboardData, BiasAnalysisItem, AlertItem } from './BiasDashboard.types'
-import type { BiasDashboardProps } from './BiasDashboard.types'
-import { timeRangeOptions, demographicFilterOptions } from './BiasDashboard.types'
-import { getAlertColor, getBiasScoreColor, getChartColors, getFilteredData } from './BiasDashboard.helpers'
 import {
-  useAccessibility,
-  useAlertActions,
-  useBiasDashboardData,
-  useConnectionStatus,
-  useExportData,
-  useFilters,
-  useNotificationSettings,
-} from './BiasDashboard.hooks'
+  Alert,
+  Button,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui'
+
 import {
   AccessibilitySkipLinks,
   AlertsTab,
@@ -38,6 +32,31 @@ import {
   SummaryCards,
   TrendsTab,
 } from './BiasDashboard.components'
+import {
+  getAlertColor,
+  getBiasScoreColor,
+  getChartColors,
+  getFilteredData,
+} from './BiasDashboard.helpers'
+import {
+  useAccessibility,
+  useAlertActions,
+  useBiasDashboardData,
+  useConnectionStatus,
+  useExportData,
+  useFilters,
+  useNotificationSettings,
+} from './BiasDashboard.hooks'
+import type {
+  BiasDashboardData,
+  BiasAnalysisItem,
+  AlertItem,
+} from './BiasDashboard.types'
+import type { BiasDashboardProps } from './BiasDashboard.types'
+import {
+  timeRangeOptions,
+  demographicFilterOptions,
+} from './BiasDashboard.types'
 
 export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   className = '',
@@ -189,28 +208,54 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       recommendations: [],
     } satisfies BiasDashboardData)
 
-  const { summary, recentAnalyses, alerts, trends, demographics, recommendations } =
-    resolvedDashboardData
+  const {
+    summary,
+    recentAnalyses,
+    alerts,
+    trends,
+    demographics,
+    recommendations,
+  } = resolvedDashboardData
 
   const filteredTrends = useMemo<BiasDashboardData['trends']>(() => {
     const data = getFilteredData(trends, 'trends', filterParams)
     return isTrendItemArray(data) ? data : []
-  }, [selectedTimeRange, alertLevelFilter, biasScoreFilter, customDateRange, trends])
+  }, [
+    selectedTimeRange,
+    alertLevelFilter,
+    biasScoreFilter,
+    customDateRange,
+    trends,
+  ])
 
   const filteredAlerts = useMemo<AlertItem[]>(() => {
     const data = getFilteredData(alerts, 'alerts', filterParams)
     return isAlertItemArray(data) ? data : []
-  }, [selectedTimeRange, alertLevelFilter, biasScoreFilter, customDateRange, alerts])
+  }, [
+    selectedTimeRange,
+    alertLevelFilter,
+    biasScoreFilter,
+    customDateRange,
+    alerts,
+  ])
 
   const filteredSessions = useMemo<BiasAnalysisItem[]>(() => {
     const data = getFilteredData(recentAnalyses, 'sessions', filterParams)
     return isBiasAnalysisItemArray(data) ? data : []
-  }, [selectedTimeRange, alertLevelFilter, biasScoreFilter, customDateRange, recentAnalyses])
+  }, [
+    selectedTimeRange,
+    alertLevelFilter,
+    biasScoreFilter,
+    customDateRange,
+    recentAnalyses,
+  ])
 
   // ── Early returns ──────────────────────────────────────────────────
   if (loading && !dashboardData) {
     return (
-      <div className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}>
+      <div
+        className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
+      >
         <AccessibilitySkipLinks
           skipLinkRef={skipLinkRef}
           mainContentRef={mainContentRef}
@@ -229,7 +274,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           onAutoRefreshChange={setAutoRefresh}
           onRefresh={fetchDashboardData}
           onReconnect={reconnectWebSocket}
-          onToggleNotificationSettings={() => setShowNotificationSettings((prev) => !prev)}
+          onToggleNotificationSettings={() =>
+            setShowNotificationSettings((prev) => !prev)
+          }
           onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
         />
         <div className="flex h-64 items-center justify-center">
@@ -244,7 +291,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
   if (error) {
     return (
-      <div className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}>
+      <div
+        className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
+      >
         <AccessibilitySkipLinks
           skipLinkRef={skipLinkRef}
           mainContentRef={mainContentRef}
@@ -307,7 +356,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         onAutoRefreshChange={setAutoRefresh}
         onRefresh={fetchDashboardData}
         onReconnect={reconnectWebSocket}
-        onToggleNotificationSettings={() => setShowNotificationSettings((prev) => !prev)}
+        onToggleNotificationSettings={() =>
+          setShowNotificationSettings((prev) => !prev)
+        }
         onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
       />
 
@@ -397,7 +448,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               {isMobile ? 'Alerts' : 'Alerts Tab'}
               {filteredAlerts.length > 0 && (
                 <span
-                  className="ml-2 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800"
+                  className="bg-red-100 text-red-800 ml-2 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                   aria-label={`${filteredAlerts.length} active alerts`}
                 >
                   {filteredAlerts.length}
