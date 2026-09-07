@@ -1,8 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 
 import { Alert, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui'
-import { isAlertItemArray, isBiasAnalysisItemArray, isTrendItemArray } from '@/components/admin/bias-detection/utils/dashboard-type-guards'
+import {
+  isAlertItemArray,
+  isAlertLevel,
+  isBiasAnalysisItemArray,
+  isExportFormat,
+  isTrendItemArray,
+} from '@/components/admin/bias-detection/utils/dashboard-type-guards'
 
 import type { BiasDashboardData, BiasAnalysisItem, AlertItem } from './BiasDashboard.types'
 import type { BiasDashboardProps } from './BiasDashboard.types'
@@ -73,6 +79,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     newHighBiasAlert,
     setNewHighBiasAlert,
     wsConnectionStatus,
+    wsReconnectAttempts,
     wsRef,
     fetchDashboardData,
   } = useBiasDashboardData(refreshInterval, enableRealTimeUpdates)
@@ -80,6 +87,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   // ── Connection Status ──────────────────────────────────────────────
   const { connectionStatus, reconnectWebSocket } = useConnectionStatus(
     wsConnectionStatus,
+    wsReconnectAttempts,
     wsRef,
     enableRealTimeUpdates,
     announceToScreenReader,
@@ -138,6 +146,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   // ── Auto-refresh state (local toggle) ──────────────────────────────
   const [autoRefresh, setAutoRefresh] = useState(enableRealTimeUpdates)
 
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowExportDialog(false)
+        setShowNotificationSettings(false)
+      }
+    }
+    document.addEventListener('keydown', handleEscape)
+    return () => document.removeEventListener('keydown', handleEscape)
+  }, [setShowExportDialog, setShowNotificationSettings])
+
   // ── Resolved data + filtered datasets ──────────────────────────────
   const filterParams = {
     selectedTimeRange,
@@ -176,25 +195,43 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   const filteredTrends = useMemo<BiasDashboardData['trends']>(() => {
     const data = getFilteredData(trends, 'trends', filterParams)
     return isTrendItemArray(data) ? data : []
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTimeRange, alertLevelFilter, biasScoreFilter, customDateRange, trends])
 
   const filteredAlerts = useMemo<AlertItem[]>(() => {
     const data = getFilteredData(alerts, 'alerts', filterParams)
     return isAlertItemArray(data) ? data : []
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTimeRange, alertLevelFilter, biasScoreFilter, customDateRange, alerts])
 
   const filteredSessions = useMemo<BiasAnalysisItem[]>(() => {
     const data = getFilteredData(recentAnalyses, 'sessions', filterParams)
     return isBiasAnalysisItemArray(data) ? data : []
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTimeRange, alertLevelFilter, biasScoreFilter, customDateRange, recentAnalyses])
 
   // ── Early returns ──────────────────────────────────────────────────
   if (loading && !dashboardData) {
     return (
-      <div className={`p-6 ${className}`}>
+      <div className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}>
+        <AccessibilitySkipLinks
+          skipLinkRef={skipLinkRef}
+          mainContentRef={mainContentRef}
+          announceToScreenReader={announceToScreenReader}
+          announcements={announcements}
+        />
+        <Header
+          isMobile={isMobile}
+          lastUpdated={lastUpdated}
+          enableRealTimeUpdates={enableRealTimeUpdates}
+          connectionStatus={connectionStatus}
+          autoRefresh={autoRefresh}
+          loading={loading}
+          wsConnectionStatus={wsConnectionStatus}
+          showNotificationSettings={showNotificationSettings}
+          onAutoRefreshChange={setAutoRefresh}
+          onRefresh={fetchDashboardData}
+          onReconnect={reconnectWebSocket}
+          onToggleNotificationSettings={() => setShowNotificationSettings((prev) => !prev)}
+          onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
+        />
         <div className="flex h-64 items-center justify-center">
           <RefreshCw className="text-neutral-500 h-8 w-8 animate-spin" />
           <span className="ml-2 text-lg">
@@ -207,7 +244,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
   if (error) {
     return (
-      <div className={`p-6 ${className}`}>
+      <div className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}>
+        <AccessibilitySkipLinks
+          skipLinkRef={skipLinkRef}
+          mainContentRef={mainContentRef}
+          announceToScreenReader={announceToScreenReader}
+          announcements={announcements}
+        />
         <Alert
           variant="error"
           title="Error Loading Dashboard"
@@ -261,20 +304,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         loading={loading}
         wsConnectionStatus={wsConnectionStatus}
         showNotificationSettings={showNotificationSettings}
-        handlers={{
-          setAutoRefresh,
-          fetchDashboardData,
-          reconnectWebSocket,
-          setShowNotificationSettings,
-          setShowExportDialog,
-        }}
+        onAutoRefreshChange={setAutoRefresh}
+        onRefresh={fetchDashboardData}
+        onReconnect={reconnectWebSocket}
+        onToggleNotificationSettings={() => setShowNotificationSettings((prev) => !prev)}
+        onToggleExportDialog={() => setShowExportDialog((prev) => !prev)}
       />
 
       <NotificationSettingsPanel
         showNotificationSettings={showNotificationSettings}
         notificationSettings={notificationSettings}
-        updateNotificationSettings={updateNotificationSettings}
-        sendTestNotification={sendTestNotification}
+        onUpdate={updateNotificationSettings}
+        onTestNotification={sendTestNotification}
         onClose={() => setShowNotificationSettings(false)}
       />
 
@@ -289,7 +330,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         exportFilters={exportFilters}
         setExportFilters={setExportFilters}
         exportProgress={exportProgress}
-        exportDataWithOptions={exportDataWithOptions}
+        isExportFormat={isExportFormat}
+        onExport={exportDataWithOptions}
         onClose={() => setShowExportDialog(false)}
       />
 
@@ -306,6 +348,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         setSelectedDemographicFilter={setSelectedDemographicFilter}
         timeRangeOptions={timeRangeOptions}
         demographicFilterOptions={demographicFilterOptions}
+        isAlertLevel={isAlertLevel}
       />
 
       <CriticalAlerts filteredAlerts={filteredAlerts} />
@@ -315,7 +358,6 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         filteredSessions={filteredSessions}
         filteredAlerts={filteredAlerts}
         alerts={alerts}
-        getBiasScoreColor={getBiasScoreColor}
       />
 
       {/* Main Content Tabs */}
@@ -410,35 +452,28 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               isMobile={isMobile}
               isTablet={isTablet}
               reducedMotion={reducedMotion}
-              getChartColors={getChartColors}
-              getResponsiveChartHeight={(isMobile: boolean, isTablet: boolean) =>
-                isMobile ? 200 : isTablet ? 300 : 400
-              }
-              getResponsiveGridCols={(defaultCols: number, isMobile: boolean, isTablet: boolean) =>
-                isMobile ? 1 : isTablet ? 2 : defaultCols
-              }
             />
           </TabsContent>
 
           <TabsContent value="demographics" className="space-y-6">
-            <DemographicsTab demographics={demographics} getChartColors={getChartColors} />
+            <DemographicsTab demographics={demographics} />
           </TabsContent>
 
           <TabsContent value="alerts" className="space-y-6">
             <AlertsTab
               filteredAlerts={filteredAlerts}
+              alerts={alerts}
               selectedAlerts={selectedAlerts}
               alertActions={alertActions}
               alertNotes={alertNotes}
-              setAlertNotes={setAlertNotes}
-              handleAlertAction={handleAlertAction}
-              handleBulkAlertAction={handleBulkAlertAction}
-              toggleAlertSelection={toggleAlertSelection}
-              selectAllAlerts={selectAllAlerts}
-              clearAlertSelection={clearAlertSelection}
-              setAlertLevelFilter={setAlertLevelFilter}
-              setSelectedTimeRange={setSelectedTimeRange}
-              getAlertColor={getAlertColor}
+              onAlertAction={handleAlertAction}
+              onBulkAlertAction={handleBulkAlertAction}
+              onToggleAlertSelection={toggleAlertSelection}
+              onSelectAllAlerts={selectAllAlerts}
+              onClearAlertSelection={clearAlertSelection}
+              onSetAlertLevelFilter={setAlertLevelFilter}
+              onSetSelectedTimeRange={setSelectedTimeRange}
+              onSetAlertNotes={setAlertNotes}
             />
           </TabsContent>
 
@@ -446,9 +481,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             <SessionsTab
               filteredSessions={filteredSessions}
               recentAnalyses={recentAnalyses}
-              setBiasScoreFilter={setBiasScoreFilter}
-              setSelectedTimeRange={setSelectedTimeRange}
-              getBiasScoreColor={getBiasScoreColor}
+              onSetBiasScoreFilter={setBiasScoreFilter}
+              onSetSelectedTimeRange={setSelectedTimeRange}
             />
           </TabsContent>
 

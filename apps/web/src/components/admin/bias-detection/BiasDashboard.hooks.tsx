@@ -7,7 +7,10 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { Activity, RefreshCw, AlertTriangle } from 'lucide-react'
 import type React from 'react'
 
-import { useBiasDashboardWebSocket } from '@/components/admin/bias-detection/hooks/useBiasDashboardWebSocket'
+import {
+  useBiasDashboardWebSocket,
+  type WsConnectionStatus,
+} from '@/components/admin/bias-detection/hooks/useBiasDashboardWebSocket'
 import {
   isAlertItemArray,
   isBiasAnalysisItemArray,
@@ -45,6 +48,11 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
   const [error, setError] = useState<string | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [newHighBiasAlert, setNewHighBiasAlert] = useState<AlertItem | null>(null)
+  const wsRef = useRef<WebSocket | null>(null)
+  const [wsConnected, setWsConnected] = useState(false)
+  const [wsConnectionStatus, setWsConnectionStatus] =
+    useState<WsConnectionStatus>('disconnected')
+  const [wsReconnectAttempts, setWsReconnectAttempts] = useState(0)
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -143,9 +151,19 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
     [],
   )
 
-  const ws = useBiasDashboardWebSocket({
+  useBiasDashboardWebSocket({
+    enableRealTimeUpdates: autoRefresh,
+    wsRef,
+    selectedTimeRange: '24h',
+    biasScoreFilter: 'all',
+    alertLevelFilter: 'all',
+    selectedDemographicFilter: 'all',
+    setWsConnectionStatus,
+    setWsConnected,
+    setWsReconnectAttempts,
+    announceToScreenReader: () => {},
+    logger,
     onMessage: handleWebSocketMessage,
-    enabled: autoRefresh,
   })
 
   // Auto-refresh effect
@@ -171,10 +189,10 @@ export function useBiasDashboardData(refreshInterval: number, autoRefresh: boole
     lastUpdated,
     newHighBiasAlert,
     setNewHighBiasAlert,
-    wsConnected: ws.connected,
-    wsConnectionStatus: ws.connectionStatus,
-    wsReconnectAttempts: ws.reconnectAttempts,
-    wsRef: ws.wsRef,
+    wsConnected,
+    wsConnectionStatus,
+    wsReconnectAttempts,
+    wsRef,
     fetchDashboardData,
   }
 }
@@ -345,7 +363,7 @@ export function useNotificationSettings() {
         body: JSON.stringify(notificationSettings),
       })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      alert('Test notification sent successfully')
+      alert('Test notification sent successfully!')
     } catch {
       alert('Failed to send test notification')
     }
@@ -371,7 +389,13 @@ export function useAccessibility() {
     width: 0,
     height: 0,
   })
-  const [highContrast, setHighContrast] = useState(false)
+  const [highContrast, setHighContrast] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return (
+      window.matchMedia('(prefers-contrast: more)').matches ||
+      window.matchMedia('(prefers-contrast: high)').matches
+    )
+  })
   const [reducedMotion, setReducedMotion] = useState(false)
   const [announcements, setAnnouncements] = useState<string[]>([])
 
@@ -390,7 +414,8 @@ export function useAccessibility() {
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     setReducedMotion(motionQuery.matches)
     const contrastQuery = window.matchMedia('(prefers-contrast: more)')
-    setHighContrast(contrastQuery.matches)
+    const contrastHighQuery = window.matchMedia('(prefers-contrast: high)')
+    setHighContrast(contrastQuery.matches || contrastHighQuery.matches)
   }, [])
 
   const updateScreenSize = useCallback(() => {
@@ -427,14 +452,17 @@ export function useAccessibility() {
     window.addEventListener('resize', updateScreenSize)
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const contrastQuery = window.matchMedia('(prefers-contrast: more)')
+    const contrastHighQuery = window.matchMedia('(prefers-contrast: high)')
     motionQuery.addEventListener('change', checkAccessibilityPreferences)
     contrastQuery.addEventListener('change', checkAccessibilityPreferences)
+    contrastHighQuery.addEventListener('change', checkAccessibilityPreferences)
     document.addEventListener('keydown', handleKeyDown)
     return () => {
       window.clearTimeout(timer)
       window.removeEventListener('resize', updateScreenSize)
       motionQuery.removeEventListener('change', checkAccessibilityPreferences)
       contrastQuery.removeEventListener('change', checkAccessibilityPreferences)
+      contrastHighQuery.removeEventListener('change', checkAccessibilityPreferences)
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [updateScreenSize, checkAccessibilityPreferences, handleKeyDown])

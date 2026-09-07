@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import type { RefObject } from 'react'
 
-type WsConnectionStatus =
+export type WsConnectionStatus =
   | 'disconnected'
   | 'connecting'
   | 'connected'
