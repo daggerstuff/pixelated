@@ -474,6 +474,7 @@
     "mixpanel-browser": "^2.82.1",
     "mongodb-memory-server": "^11.2.0",
     "msw": "^2.15.0",
+    "node-gyp-build": "^4.8.4",
     "nprogress": "^0.2.0",
     "oxc-parser": "^0.147.0",
     "oxc-resolver": "^11.24.2",
