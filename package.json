@@ -479,7 +479,6 @@
     "oxc-resolver": "^11.24.2",
     "oxfmt": "^0.65.0",
     "oxlint": "^1.80.0",
-    "oxlint-tsgolint": "7.0.2001",
     "path-browserify": "^1.0.1",
     "path-to-regexp": "6.3.0",
     "postcss": "^8.5.26",
@@ -539,8 +538,8 @@
     "@opentelemetry/propagator-jaeger": "2.10.0",
     "@vercel/oidc": "3.7.1",
     "adm-zip": "0.6.0",
-    "fast-uri": "3.1.4",
-    "js-yaml": "4.3.0",
+    "fast-uri": "3.1.6",
+    "js-yaml": "4.3.1",
     "shell-quote": "1.9.0"
   },
   "engines": {
