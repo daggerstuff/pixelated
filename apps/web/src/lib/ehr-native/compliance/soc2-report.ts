@@ -56,15 +56,11 @@ function isAccessControlEvent(event: AuditEvent): boolean {
   return ACCESS_CONTROL_ACTIONS.has(action) || event.type === AuditEventType.GOVERNANCE_ALLOW || event.type === AuditEventType.GOVERNANCE_DENY;
 }
 
-function isFailedAccess(event: AuditEvent): boolean {
-  return event.status === 'failure' && (isAccessControlEvent(event) || String(event.action).includes('login'));
-}
-
 /**
  * Build access control summary from audit events.
  * Groups role assignments and counts grants/revocations.
  */
-function buildAccessControlSummary(events: AuditEvent[], tenantId: string): AccessControlSummary {
+function buildAccessControlSummary(events: AuditEvent[], _tenantId: string): AccessControlSummary {
   const roleMap = new Map<string, Set<string>>(); // role → set of userIds
   let permissionGrants = 0;
   let permissionRevocations = 0;

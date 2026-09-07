@@ -21,7 +21,6 @@ import {
 import {
   createScheduledReport,
   listScheduledReports,
-  updateScheduledReport,
   deleteScheduledReport,
   getScheduledReport,
   triggerScheduledReportNow,

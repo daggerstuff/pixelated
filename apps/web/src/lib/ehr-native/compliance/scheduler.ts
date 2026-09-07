@@ -15,8 +15,7 @@ import type {
   ReportFormat,
 } from './types';
 import { runScheduledReport } from './report-generator';
-import { exportReportToPDF } from './export/pdf-exporter';
-import { exportReportToCSV } from './export/csv-exporter';
+
 
 // ---------------------------------------------------------------------------
 // Scheduled report store (in-memory; replace with DB in production)
@@ -185,7 +184,7 @@ async function deliverReportByEmail(
 ): Promise<void> {
   // Build the email payload
   const subject = `[Compliance Report] ${config.type} — ${metadata.period.startDate} to ${metadata.period.endDate}`;
-  const body = [
+  const _body = [
     `A new compliance report has been generated.`,
     '',
     `Report ID: ${metadata.reportId}`,

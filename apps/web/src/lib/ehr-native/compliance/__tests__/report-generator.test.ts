@@ -6,14 +6,12 @@
 // @vitest-environment node
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { AuditEvent } from '@/lib/audit/events';
 
 // Mock AuditLogger
 const {
   mockVerifyChain,
   mockGetInstance,
   mockFind,
-  mockSort,
   mockCollection,
   mockConnect,
   mockGenerateHIPAA,
