@@ -15,6 +15,7 @@ tar -czf "$OUT" \
   ai/training/build_edge_and_nightmare_dataset.py \
   ai/training/generation_backend.py \
   ai/training/cliche_gate.py \
+  ai/training/dual_judge.py \
   ai/data/synthetic/assets/empathy_nightmare_fuel/scenarios.jsonl
 
 echo "Built $OUT ($(du -h "$OUT" | cut -f1))"
