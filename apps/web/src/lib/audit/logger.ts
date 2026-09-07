@@ -70,6 +70,7 @@ export function chainPayload(event: AuditEvent): Record<string, unknown> {
     ipAddress: event.ipAddress ?? null,
     userAgent: event.userAgent ?? null,
     errorMessage: event.errorMessage ?? null,
+    tenantId: event.tenantId ?? null,
   }
 }
 
