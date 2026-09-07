@@ -156,15 +156,13 @@ export const AccessibilitySkipLinks: React.FC<AccessibilitySkipLinksProps> = ({
       </div>
 
       {/* Screen Reader Announcements */}
-      {announcements.length > 0 && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="sr-only"
-        >
-          {announcements.join('. ')}
-        </div>
-      )}
+      <div
+        role="status"
+        aria-live="polite"
+        className="sr-only"
+      >
+        {announcements.join('. ')}
+      </div>
     </>
   )
 }
@@ -212,7 +210,10 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleExportDialog,
 }) => {
   return (
-    <div className="flex items-center justify-between">
+    <div
+      role="banner"
+      className={`flex items-center justify-between ${isMobile ? 'flex-col' : ''}`}
+    >
       <div>
         <h1 className="text-2xl font-bold">Bias Detection Dashboard</h1>
         {lastUpdated && (
@@ -254,7 +255,7 @@ export const Header: React.FC<HeaderProps> = ({
           size="sm"
           onClick={onRefresh}
           disabled={loading}
-          aria-label="Refresh dashboard"
+          aria-label="Refresh dashboard data"
         >
           <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
         </Button>
@@ -276,7 +277,8 @@ export const Header: React.FC<HeaderProps> = ({
           variant={showNotificationSettings ? 'default' : 'outline'}
           size="sm"
           onClick={onToggleNotificationSettings}
-          aria-label="Notification settings"
+          aria-label="Open notification settings"
+          data-testid="notifications-button"
         >
           <Bell className="h-4 w-4" />
         </Button>
@@ -286,7 +288,8 @@ export const Header: React.FC<HeaderProps> = ({
           variant="outline"
           size="sm"
           onClick={onToggleExportDialog}
-          aria-label="Export dashboard data"
+          aria-label="Open data export options"
+          data-testid="export-button"
         >
           <Download className="h-4 w-4" />
         </Button>
@@ -322,9 +325,14 @@ export const NotificationSettingsPanel: React.FC<NotificationSettingsPanelProps>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center">
             <Bell className="mr-2 h-5 w-5" />
-            Notification Settings
+            Notification Settings Panel
           </CardTitle>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            data-testid="close-notification-settings"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -414,8 +422,8 @@ interface ExportDialogProps {
   showExportDialog: boolean
   exportFormat: string
   setExportFormat: (format: string) => void
-  exportDateRange: DateRange
-  setExportDateRange: (range: DateRange) => void
+  exportDateRange: { start: Date; end: Date }
+  setExportDateRange: (range: { start: Date; end: Date }) => void
   exportDataTypes: Record<string, boolean>
   setExportDataTypes: (types: Record<string, boolean>) => void
   exportFilters: {
@@ -454,7 +462,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center">
             <Download className="mr-2 h-5 w-5" />
-            Export Dashboard Data
+            Export Dashboard Data Dialog
           </CardTitle>
           <Button
             variant="ghost"
@@ -478,6 +486,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                   name="exportFormat"
                   value={fmt}
                   checked={exportFormat === fmt}
+                  aria-label={`Export data as ${fmt.toUpperCase()} format`}
                   onChange={(e) => {
                     if (isExportFormat(e.target.value)) {
                       setExportFormat(e.target.value)
@@ -498,9 +507,13 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
               <label className="text-sm">Start Date</label>
               <input
                 type="date"
-                value={exportDateRange.start}
+                aria-label="Start Date"
+                value={exportDateRange.start.toISOString().slice(0, 10)}
                 onChange={(e) =>
-                  setExportDateRange({ ...exportDateRange, start: e.target.value })
+                  setExportDateRange({
+                    ...exportDateRange,
+                    start: new Date(e.target.value),
+                  })
                 }
                 className="block rounded border p-1"
               />
@@ -509,9 +522,13 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
               <label className="text-sm">End Date</label>
               <input
                 type="date"
-                value={exportDateRange.end}
+                aria-label="End Date"
+                value={exportDateRange.end.toISOString().slice(0, 10)}
                 onChange={(e) =>
-                  setExportDateRange({ ...exportDateRange, end: e.target.value })
+                  setExportDateRange({
+                    ...exportDateRange,
+                    end: new Date(e.target.value),
+                  })
                 }
                 className="block rounded border p-1"
               />
@@ -616,12 +633,19 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 
         {/* Actions */}
         <div className="flex justify-end space-x-2">
-          <Button variant="outline" size="sm" onClick={onClose} disabled={exportProgress.isExporting}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            disabled={exportProgress.isExporting}
+            data-testid="cancel-export"
+          >
             Cancel
           </Button>
           <Button
             size="sm"
             onClick={onExport}
+            data-testid="export-data-button"
             disabled={
               exportProgress.isExporting ||
               !Object.values(exportDataTypes).some((v) => v)
@@ -643,8 +667,8 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
 interface FilteringControlsProps {
   selectedTimeRange: string
   setSelectedTimeRange: (value: string) => void
-  customDateRange: DateRange
-  setCustomDateRange: (range: DateRange) => void
+  customDateRange: { start: Date; end: Date }
+  setCustomDateRange: (range: { start: Date; end: Date }) => void
   biasScoreFilter: string
   setBiasScoreFilter: (value: string) => void
   alertLevelFilter: string
@@ -676,15 +700,19 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center">
           <Filter className="mr-2 h-5 w-5" />
-          Filters
+          Filters & Time Range
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {/* Time Range */}
           <div>
-            <label className="text-sm font-medium">Time Range</label>
+            <label className="text-sm font-medium" htmlFor="filter-time-range">
+              Time Range
+            </label>
             <select
+              id="filter-time-range"
+              aria-label="Time Range"
               value={selectedTimeRange}
               onChange={(e) => setSelectedTimeRange(e.target.value)}
               className="mt-1 block w-full rounded border p-2"
@@ -703,18 +731,26 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
               <label className="text-sm font-medium">Custom Date Range</label>
               <div className="mt-1 flex space-x-2">
                 <input
-                  type="date"
-                  value={customDateRange.start}
+                  type="datetime-local"
+                  aria-label="Start Date"
+                  value={customDateRange.start.toISOString().slice(0, 16)}
                   onChange={(e) =>
-                    setCustomDateRange({ ...customDateRange, start: e.target.value })
+                    setCustomDateRange({
+                      ...customDateRange,
+                      start: new Date(e.target.value),
+                    })
                   }
                   className="rounded border p-1"
                 />
                 <input
-                  type="date"
-                  value={customDateRange.end}
+                  type="datetime-local"
+                  aria-label="End Date"
+                  value={customDateRange.end.toISOString().slice(0, 16)}
                   onChange={(e) =>
-                    setCustomDateRange({ ...customDateRange, end: e.target.value })
+                    setCustomDateRange({
+                      ...customDateRange,
+                      end: new Date(e.target.value),
+                    })
                   }
                   className="rounded border p-1"
                 />
@@ -724,8 +760,12 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
 
           {/* Bias Score Level */}
           <div>
-            <label className="text-sm font-medium">Bias Score Level</label>
+            <label className="text-sm font-medium" htmlFor="filter-bias-score">
+              Bias Score Level
+            </label>
             <select
+              id="filter-bias-score"
+              aria-label="Bias Score Level"
               value={biasScoreFilter}
               onChange={(e) => setBiasScoreFilter(e.target.value)}
               className="mt-1 block w-full rounded border p-2"
@@ -739,8 +779,12 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
 
           {/* Alert Level */}
           <div>
-            <label className="text-sm font-medium">Alert Level</label>
+            <label className="text-sm font-medium" htmlFor="filter-alert-level">
+              Alert Level
+            </label>
             <select
+              id="filter-alert-level"
+              aria-label="Alert Level"
               value={alertLevelFilter}
               onChange={(e) => {
                 if (isAlertLevel(e.target.value)) {
@@ -759,8 +803,12 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
 
           {/* Demographics */}
           <div>
-            <label className="text-sm font-medium">Demographics</label>
+            <label className="text-sm font-medium" htmlFor="filter-demographics">
+              Demographics
+            </label>
             <select
+              id="filter-demographics"
+              aria-label="Demographics"
               value={selectedDemographicFilter}
               onChange={(e) => setSelectedDemographicFilter(e.target.value)}
               className="mt-1 block w-full rounded border p-2"
@@ -789,6 +837,34 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
             </Button>
           </div>
         </div>
+
+        <p className="text-muted-foreground mt-3 text-sm">
+          Active Filters:{' '}
+          {selectedTimeRange === '24h' &&
+          biasScoreFilter === 'all' &&
+          alertLevelFilter === 'all' &&
+          selectedDemographicFilter === 'all'
+            ? 'None'
+            : [
+                selectedTimeRange !== '24h'
+                  ? `Time: ${
+                      timeOpts.find((option) => option.value === selectedTimeRange)
+                        ?.label ?? selectedTimeRange
+                    }`
+                  : null,
+                biasScoreFilter !== 'all'
+                  ? `Bias Score: ${biasScoreFilter}`
+                  : null,
+                alertLevelFilter !== 'all'
+                  ? `Alert Level: ${alertLevelFilter}`
+                  : null,
+                selectedDemographicFilter !== 'all'
+                  ? `Demographics: ${selectedDemographicFilter}`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(', ')}
+        </p>
       </CardContent>
     </Card>
   )
