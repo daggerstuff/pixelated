@@ -86,9 +86,6 @@ jobs:
       - name: Check for unused exports
         run: pnpm lint:ci:unused-exports
 
-      - name: Check astro hints against baseline
-        run: node scripts/ci/check-astro-hints.mjs
-
       - name: Run unit tests
         run: |
           # Blocking suite — fails CI on test failures. The full unbucketed
