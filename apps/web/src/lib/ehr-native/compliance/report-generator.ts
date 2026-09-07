@@ -67,11 +67,9 @@ export async function loadTemplate(type: ReportType): Promise<ReportTemplate> {
  * Verify the audit chain before generating any compliance report.
  * Uses AuditLogger.verifyChain() which returns {valid, brokenAtIndex?, brokenAtId?, reason?}.
  */
-export async function verifyAuditChain(
-  tenantId?: string,
-): Promise<ChainVerificationResult> {
+export async function verifyAuditChain(): Promise<ChainVerificationResult> {
   const logger = AuditLogger.getInstance()
-  const result = await logger.verifyChain(tenantId)
+  const result = await logger.verifyChain()
   return {
     valid: result.valid,
     totalEvents: 0, // verifyChain doesn't return count; will be set by caller
@@ -110,7 +108,7 @@ export async function queryAuditEvents(
 
   // Map MongoDB docs to AuditEvent shape
   return events.map((doc) => ({
-    id: String(doc._id),
+    id: doc.id ?? String(doc._id),
     timestamp:
       doc.timestamp instanceof Date
         ? doc.timestamp.toISOString()
@@ -167,7 +165,7 @@ export async function generateReport(
   await loadTemplate(type)
 
   // 2. Verify audit chain
-  const chainVerification = await verifyAuditChain(tenantId)
+  const chainVerification = await verifyAuditChain()
 
   // 3. Delegate to type-specific generator
   let report: ComplianceReport

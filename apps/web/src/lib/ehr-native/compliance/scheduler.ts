@@ -202,7 +202,7 @@ async function deliverReportByEmail(
   // In production, send the email with the report attached
   // For now, log the intent
   console.info(
-    `[compliance-email] Sending report to ${config.emailRecipients.join(', ')}: ${subject}`,
+    `[compliance-email] Sending report to ${config.emailRecipients.join(', ')}: ${subject}\n${body}`,
   )
 
   // The actual report attachment would be generated here:
