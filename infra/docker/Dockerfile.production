@@ -61,8 +61,8 @@ RUN set -eux; \
     fi && \
     rm -rf /var/lib/apt/lists/*
 
-# Production dependencies stage
-FROM build-base AS prod-deps
+# Dependency installation stage (build needs dev tools)
+FROM build-base AS deps
 COPY package.json pnpm-lock.yaml ./
 COPY pnpm-workspace.yaml ./
 COPY patches ./patches
@@ -70,9 +70,13 @@ COPY scripts/devops/install-git-hooks.sh ./scripts/devops/install-git-hooks.sh
 RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Build stage
-FROM prod-deps AS build
+FROM deps AS build
 COPY . .
 RUN pnpm run build
+
+# Production dependencies stage (runtime image excludes dev tooling)
+FROM deps AS prod-deps
+RUN pnpm prune --prod --ignore-scripts
 
 # Final runner stage
 FROM runtime AS runner
