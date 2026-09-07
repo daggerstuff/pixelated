@@ -44,7 +44,7 @@ export type {
   ComplianceReport,
   ReportTemplate,
   ReportSection,
-} from './types';
+} from './types'
 
 // Report generator
 export {
@@ -55,17 +55,20 @@ export {
   generateReport,
   runScheduledReport,
   computePeriodForSchedule,
-} from './report-generator';
+} from './report-generator'
 
 // Report type generators
-export { generateHIPAAAuditReport } from './hipaa-report';
-export { generateSOC2SecurityReport, generateSOC2AvailabilityReport } from './soc2-report';
-export { generateConsentComplianceReport } from './consent-compliance-report';
-export { generateAccessReviewReport } from './access-review-report';
+export { generateHIPAAAuditReport } from './hipaa-report'
+export {
+  generateSOC2SecurityReport,
+  generateSOC2AvailabilityReport,
+} from './soc2-report'
+export { generateConsentComplianceReport } from './consent-compliance-report'
+export { generateAccessReviewReport } from './access-review-report'
 
 // Export
-export { exportReportToPDF } from './export/pdf-exporter';
-export { exportReportToCSV } from './export/csv-exporter';
+export { exportReportToPDF } from './export/pdf-exporter'
+export { exportReportToCSV } from './export/csv-exporter'
 
 // Scheduler
 export {
@@ -76,4 +79,4 @@ export {
   deleteScheduledReport,
   processScheduledReports,
   triggerScheduledReportNow,
-} from './scheduler';
+} from './scheduler'

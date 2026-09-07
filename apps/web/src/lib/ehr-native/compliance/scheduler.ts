@@ -13,15 +13,14 @@ import type {
   ScheduledReportConfig,
   ReportMetadata,
   ReportFormat,
-} from './types';
-import { runScheduledReport } from './report-generator';
-
+} from './types'
+import { runScheduledReport } from './report-generator'
 
 // ---------------------------------------------------------------------------
 // Scheduled report store (in-memory; replace with DB in production)
 // ---------------------------------------------------------------------------
 
-const SCHEDULED_REPORTS = new Map<string, ScheduledReportConfig>();
+const SCHEDULED_REPORTS = new Map<string, ScheduledReportConfig>()
 
 // ---------------------------------------------------------------------------
 // CRUD operations
@@ -38,8 +37,8 @@ export function createScheduledReport(
   format: ReportFormat = 'pdf',
   dayOfMonth: number = 1,
 ): ScheduledReportConfig {
-  const scheduleId = `sch-${type}-${Date.now().toString(36)}`;
-  const now = new Date().toISOString();
+  const scheduleId = `sch-${type}-${Date.now().toString(36)}`
+  const now = new Date().toISOString()
 
   const config: ScheduledReportConfig = {
     scheduleId,
@@ -52,28 +51,32 @@ export function createScheduledReport(
     active: true,
     createdAt: now,
     updatedAt: now,
-  };
+  }
 
-  SCHEDULED_REPORTS.set(scheduleId, config);
-  return config;
+  SCHEDULED_REPORTS.set(scheduleId, config)
+  return config
 }
 
 /**
  * List all scheduled reports, optionally filtered by tenant.
  */
-export function listScheduledReports(tenantId?: string): ScheduledReportConfig[] {
-  const all = Array.from(SCHEDULED_REPORTS.values());
+export function listScheduledReports(
+  tenantId?: string,
+): ScheduledReportConfig[] {
+  const all = Array.from(SCHEDULED_REPORTS.values())
   if (tenantId) {
-    return all.filter((c) => c.tenantId === tenantId);
+    return all.filter((c) => c.tenantId === tenantId)
   }
-  return all;
+  return all
 }
 
 /**
  * Get a scheduled report by ID.
  */
-export function getScheduledReport(scheduleId: string): ScheduledReportConfig | undefined {
-  return SCHEDULED_REPORTS.get(scheduleId);
+export function getScheduledReport(
+  scheduleId: string,
+): ScheduledReportConfig | undefined {
+  return SCHEDULED_REPORTS.get(scheduleId)
 }
 
 /**
@@ -83,24 +86,24 @@ export function updateScheduledReport(
   scheduleId: string,
   updates: Partial<Omit<ScheduledReportConfig, 'scheduleId' | 'createdAt'>>,
 ): ScheduledReportConfig | undefined {
-  const existing = SCHEDULED_REPORTS.get(scheduleId);
-  if (!existing) return undefined;
+  const existing = SCHEDULED_REPORTS.get(scheduleId)
+  if (!existing) return undefined
 
   const updated: ScheduledReportConfig = {
     ...existing,
     ...updates,
     updatedAt: new Date().toISOString(),
-  };
+  }
 
-  SCHEDULED_REPORTS.set(scheduleId, updated);
-  return updated;
+  SCHEDULED_REPORTS.set(scheduleId, updated)
+  return updated
 }
 
 /**
  * Delete a scheduled report.
  */
 export function deleteScheduledReport(scheduleId: string): boolean {
-  return SCHEDULED_REPORTS.delete(scheduleId);
+  return SCHEDULED_REPORTS.delete(scheduleId)
 }
 
 // ---------------------------------------------------------------------------
@@ -116,54 +119,54 @@ export function deleteScheduledReport(scheduleId: string): boolean {
 export async function processScheduledReports(
   now: Date = new Date(),
 ): Promise<ReportMetadata[]> {
-  const results: ReportMetadata[] = [];
+  const results: ReportMetadata[] = []
 
   for (const config of SCHEDULED_REPORTS.values()) {
-    if (!config.active) continue;
-    if (!isReportDue(config, now)) continue;
+    if (!config.active) continue
+    if (!isReportDue(config, now)) continue
 
     try {
-      const metadata = await runScheduledReport(config);
+      const metadata = await runScheduledReport(config)
 
       // Deliver via email
-      await deliverReportByEmail(config, metadata);
+      await deliverReportByEmail(config, metadata)
 
-      results.push(metadata);
+      results.push(metadata)
     } catch (error) {
       // Log and continue — one failure shouldn't stop others
       console.error(
         `[compliance-scheduler] Failed to generate scheduled report ${config.scheduleId}:`,
         error instanceof Error ? error.message : String(error),
-      );
+      )
     }
   }
 
-  return results;
+  return results
 }
 
 /**
  * Check if a scheduled report is due for generation.
  */
 function isReportDue(config: ScheduledReportConfig, now: Date): boolean {
-  const day = now.getDate();
+  const day = now.getDate()
 
   switch (config.schedule) {
     case 'monthly':
-      return day === config.dayOfMonth;
+      return day === config.dayOfMonth
     case 'quarterly': {
-      const month = now.getMonth();
-      const isFirstMonthOfQuarter = month % 3 === 0;
-      return isFirstMonthOfQuarter && day === config.dayOfMonth;
+      const month = now.getMonth()
+      const isFirstMonthOfQuarter = month % 3 === 0
+      return isFirstMonthOfQuarter && day === config.dayOfMonth
     }
     case 'annual': {
-      const month = now.getMonth();
-      return month === 0 && day === config.dayOfMonth;
+      const month = now.getMonth()
+      return month === 0 && day === config.dayOfMonth
     }
     case 'ad-hoc':
-      return false; // Ad-hoc reports are triggered manually
+      return false // Ad-hoc reports are triggered manually
     default: {
-      const exhaustive: never = config.schedule;
-      throw new Error(`Unsupported schedule: ${exhaustive}`);
+      const exhaustive: never = config.schedule
+      throw new Error(`Unsupported schedule: ${exhaustive}`)
     }
   }
 }
@@ -183,8 +186,8 @@ async function deliverReportByEmail(
   metadata: ReportMetadata,
 ): Promise<void> {
   // Build the email payload
-  const subject = `[Compliance Report] ${config.type} — ${metadata.period.startDate} to ${metadata.period.endDate}`;
-  const _body = [
+  const subject = `[Compliance Report] ${config.type} — ${metadata.period.startDate} to ${metadata.period.endDate}`
+  const body = [
     `A new compliance report has been generated.`,
     '',
     `Report ID: ${metadata.reportId}`,
@@ -194,13 +197,13 @@ async function deliverReportByEmail(
     `Format: ${config.format}`,
     '',
     `This is an automated message from the Pixelated Empathy Compliance Reporting System.`,
-  ].join('\n');
+  ].join('\n')
 
   // In production, send the email with the report attached
   // For now, log the intent
   console.info(
     `[compliance-email] Sending report to ${config.emailRecipients.join(', ')}: ${subject}`,
-  );
+  )
 
   // The actual report attachment would be generated here:
   // if (config.format === 'pdf') {
@@ -222,12 +225,12 @@ async function deliverReportByEmail(
 export async function triggerScheduledReportNow(
   scheduleId: string,
 ): Promise<ReportMetadata> {
-  const config = SCHEDULED_REPORTS.get(scheduleId);
+  const config = SCHEDULED_REPORTS.get(scheduleId)
   if (!config) {
-    throw new Error(`Scheduled report not found: ${scheduleId}`);
+    throw new Error(`Scheduled report not found: ${scheduleId}`)
   }
 
-  const metadata = await runScheduledReport(config);
-  await deliverReportByEmail(config, metadata);
-  return metadata;
+  const metadata = await runScheduledReport(config)
+  await deliverReportByEmail(config, metadata)
+  return metadata
 }

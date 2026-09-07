@@ -14,11 +14,11 @@ import type {
   PHIModificationEvent,
   BreakGlassEvent,
   HIPAAAuditSummary,
-} from './types';
+} from './types'
 
-import { AuditEventType } from '@/lib/audit/events';
-import type { AuditEvent } from '@/lib/audit/events';
-import { queryAuditEvents } from './report-generator';
+import { AuditEventType } from '@/lib/audit/events'
+import type { AuditEvent } from '@/lib/audit/events'
+import { queryAuditEvents } from './report-generator'
 
 // ---------------------------------------------------------------------------
 // Event classification helpers
@@ -26,36 +26,52 @@ import { queryAuditEvents } from './report-generator';
 
 /** Actions that represent PHI access (read-type actions) */
 const PHI_ACCESS_ACTIONS = new Set([
-  'patient_view', 'patient_record_access', 'record_view',
-  'read_patient', 'ehr_patient_view', 'encounter_view',
-  'consent_view', 'record_export', 'export_phi',
-]);
+  'patient_view',
+  'patient_record_access',
+  'record_view',
+  'read_patient',
+  'ehr_patient_view',
+  'encounter_view',
+  'consent_view',
+  'record_export',
+  'export_phi',
+])
 
 /** Actions that represent PHI modifications (write-type actions) */
 const PHI_MODIFICATION_ACTIONS = new Set([
-  'patient_create', 'patient_update', 'patient_delete',
-  'record_create', 'record_update', 'record_delete',
-  'encounter_create', 'encounter_update', 'encounter_delete',
-  'consent_create', 'consent_update', 'consent_revoke',
-]);
+  'patient_create',
+  'patient_update',
+  'patient_delete',
+  'record_create',
+  'record_update',
+  'record_delete',
+  'encounter_create',
+  'encounter_update',
+  'encounter_delete',
+  'consent_create',
+  'consent_update',
+  'consent_revoke',
+])
 
 /** Actions related to break-glass access */
 const BREAK_GLASS_ACTIONS = new Set([
-  'break_glass', 'break_glass_activate', 'break_glass_access',
-]);
+  'break_glass',
+  'break_glass_activate',
+  'break_glass_access',
+])
 
 /**
  * Check if an action falls into the given set, case-insensitively.
  */
 function actionMatches(action: string, set: Set<string>): boolean {
-  const lower = action.toLowerCase();
+  const lower = action.toLowerCase()
   // Direct match
-  if (set.has(lower)) return true;
+  if (set.has(lower)) return true
   // Partial match (action contains a known PHI access verb)
   for (const s of set) {
-    if (lower.includes(s)) return true;
+    if (lower.includes(s)) return true
   }
-  return false;
+  return false
 }
 
 /**
@@ -63,7 +79,7 @@ function actionMatches(action: string, set: Set<string>): boolean {
  * Uses action + resource type heuristics.
  */
 function isPhiAccess(event: AuditEvent): boolean {
-  if (actionMatches(String(event.action), PHI_ACCESS_ACTIONS)) return true;
+  if (actionMatches(String(event.action), PHI_ACCESS_ACTIONS)) return true
   // Any successful access to a patient-linked resource is PHI access
   if (
     event.metadata &&
@@ -71,32 +87,32 @@ function isPhiAccess(event: AuditEvent): boolean {
     'patientId' in event.metadata &&
     event.metadata.patientId
   ) {
-    return event.type === AuditEventType.ACCESS;
+    return event.type === AuditEventType.ACCESS
   }
-  return false;
+  return false
 }
 
 /**
  * Check whether an event is a PHI modification event.
  */
 function isPhiModification(event: AuditEvent): boolean {
-  return actionMatches(String(event.action), PHI_MODIFICATION_ACTIONS);
+  return actionMatches(String(event.action), PHI_MODIFICATION_ACTIONS)
 }
 
 /**
  * Check whether an event is a break-glass event.
  */
 function isBreakGlass(event: AuditEvent): boolean {
-  if (actionMatches(String(event.action), BREAK_GLASS_ACTIONS)) return true;
+  if (actionMatches(String(event.action), BREAK_GLASS_ACTIONS)) return true
   if (
     event.metadata &&
     typeof event.metadata === 'object' &&
     'breakGlass' in event.metadata &&
     event.metadata.breakGlass === true
   ) {
-    return true;
+    return true
   }
-  return false;
+  return false
 }
 
 // ---------------------------------------------------------------------------
@@ -104,7 +120,7 @@ function isBreakGlass(event: AuditEvent): boolean {
 // ---------------------------------------------------------------------------
 
 function mapToPHIAccessEvent(event: AuditEvent): PHIAccessEvent {
-  const meta = event.metadata as Record<string, unknown> | undefined;
+  const meta = event.metadata as Record<string, unknown> | undefined
   return {
     eventId: event.id,
     timestamp: event.timestamp,
@@ -118,7 +134,7 @@ function mapToPHIAccessEvent(event: AuditEvent): PHIAccessEvent {
     ipAddress: event.ipAddress,
     userAgent: event.userAgent,
     hash: event.hash,
-  };
+  }
 }
 
 function mapToPHIModificationEvent(event: AuditEvent): PHIModificationEvent {
@@ -132,11 +148,11 @@ function mapToPHIModificationEvent(event: AuditEvent): PHIModificationEvent {
     previousHash: event.previousHash,
     hash: event.hash,
     status: event.status,
-  };
+  }
 }
 
 function mapToBreakGlassEvent(event: AuditEvent): BreakGlassEvent {
-  const meta = event.metadata as Record<string, unknown> | undefined;
+  const meta = event.metadata as Record<string, unknown> | undefined
   return {
     eventId: event.id,
     timestamp: event.timestamp,
@@ -145,7 +161,7 @@ function mapToBreakGlassEvent(event: AuditEvent): BreakGlassEvent {
     resourceType: event.resourceType ?? '',
     resourceId: event.resourceId ?? '',
     severity: String(event.severity),
-  };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -158,22 +174,22 @@ function buildSummary(
   breakGlassEvents: BreakGlassEvent[],
   chain: ChainVerificationResult,
 ): HIPAAAuditSummary {
-  const userSet = new Set<string>();
-  const patientSet = new Set<string>();
-  let failedAccess = 0;
+  const userSet = new Set<string>()
+  const patientSet = new Set<string>()
+  let failedAccess = 0
 
   for (const e of accessEvents) {
-    userSet.add(e.userId);
-    if (e.patientId) patientSet.add(e.patientId);
-    if (e.status === 'failure') failedAccess += 1;
+    userSet.add(e.userId)
+    if (e.patientId) patientSet.add(e.patientId)
+    if (e.status === 'failure') failedAccess += 1
   }
 
   for (const e of modificationEvents) {
-    userSet.add(e.userId);
+    userSet.add(e.userId)
   }
 
   for (const e of breakGlassEvents) {
-    userSet.add(e.userId);
+    userSet.add(e.userId)
   }
 
   return {
@@ -184,7 +200,7 @@ function buildSummary(
     uniqueUsers: userSet.size,
     uniquePatients: patientSet.size,
     chainValid: chain.valid,
-  };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -197,29 +213,38 @@ export async function generateHIPAAAuditReport(
   chainVerification: ChainVerificationResult,
 ): Promise<HIPAAAuditReport> {
   // Fetch audit events in the period
-  const events = await queryAuditEvents(period.startDate, period.endDate, tenantId);
+  const events = await queryAuditEvents(
+    period.startDate,
+    period.endDate,
+    tenantId,
+  )
 
   // Update chain totalEvents count
-  chainVerification.totalEvents = events.length;
+  chainVerification.totalEvents = events.length
 
   // Classify events
-  const phiAccessEvents: PHIAccessEvent[] = [];
-  const phiModificationEvents: PHIModificationEvent[] = [];
-  const breakGlassEvents: BreakGlassEvent[] = [];
+  const phiAccessEvents: PHIAccessEvent[] = []
+  const phiModificationEvents: PHIModificationEvent[] = []
+  const breakGlassEvents: BreakGlassEvent[] = []
 
   for (const event of events) {
     if (isBreakGlass(event)) {
-      breakGlassEvents.push(mapToBreakGlassEvent(event));
+      breakGlassEvents.push(mapToBreakGlassEvent(event))
     }
     if (isPhiAccess(event)) {
-      phiAccessEvents.push(mapToPHIAccessEvent(event));
+      phiAccessEvents.push(mapToPHIAccessEvent(event))
     }
     if (isPhiModification(event)) {
-      phiModificationEvents.push(mapToPHIModificationEvent(event));
+      phiModificationEvents.push(mapToPHIModificationEvent(event))
     }
   }
 
-  const summary = buildSummary(phiAccessEvents, phiModificationEvents, breakGlassEvents, chainVerification);
+  const summary = buildSummary(
+    phiAccessEvents,
+    phiModificationEvents,
+    breakGlassEvents,
+    chainVerification,
+  )
 
   return {
     reportType: 'hipaa_audit',
@@ -232,5 +257,5 @@ export async function generateHIPAAAuditReport(
     phiModificationEvents,
     breakGlassEvents,
     summary,
-  };
+  }
 }
