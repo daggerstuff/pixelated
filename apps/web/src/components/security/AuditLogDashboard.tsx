@@ -145,7 +145,11 @@ export function AuditLogDashboard() {
   }, [filters])
 
   useEffect(() => {
-    void fetchLogs()
+    const initialLoad = window.setTimeout(() => {
+      void fetchLogs()
+    }, 0)
+
+    return () => window.clearTimeout(initialLoad)
   }, [fetchLogs])
 
   const getEventTypeStats = () => {

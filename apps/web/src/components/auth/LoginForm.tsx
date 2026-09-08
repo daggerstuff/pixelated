@@ -24,40 +24,35 @@ export function LoginForm({
   const { data: session } = authClient.useSession()
 
   // Form state
-  const [email, setEmail] = useState<string>('')
+  const [email, setEmail] = useState<string>(() => {
+    try {
+      const rememberedFlag =
+        localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true'
+      if (!rememberedFlag) return ''
+      return localStorage.getItem(STORAGE_KEY_EMAIL) ?? ''
+    } catch {
+      return ''
+    }
+  })
   const [password, setPassword] = useState<string>('')
   const [mode, setMode] = useState<'login' | 'reset'>('login')
   const [resetEmailSent, setResetEmailSent] = useState<boolean>(false)
   const [focusedInput, setFocusedInput] = useState<string | null>(null)
-  const [rememberMe, setRememberMe] = useState<boolean>(false)
+  const [rememberMe, setRememberMe] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true'
+    } catch {
+      return false
+    }
+  })
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [isHydrated, setIsHydrated] = useState<boolean>(false)
+  const [isHydrated] = useState<boolean>(true)
 
   // Validation errors
   const [errors, setErrors] = useState<{
     email?: string
     password?: string
   }>({})
-
-  // Load remembered email from localStorage
-  useEffect(() => {
-    setIsHydrated(true)
-  }, [])
-
-  useEffect(() => {
-    try {
-      const rememberedEmail = localStorage.getItem(STORAGE_KEY_EMAIL)
-      const rememberedFlag =
-        localStorage.getItem(STORAGE_KEY_REMEMBER) === 'true'
-
-      if (rememberedEmail && rememberedFlag) {
-        setEmail(rememberedEmail)
-        setRememberMe(true)
-      }
-    } catch (error_) {
-      console.error('LocalStorage access error:', error_)
-    }
-  }, [])
 
   // Redirect if already authenticated
   useEffect(() => {

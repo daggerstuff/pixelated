@@ -149,21 +149,50 @@ export function useChatCompletion({
   onTypingStop,
   onMessageSaved,
 }: UseChatCompletionOptions = {}): UseChatCompletionResult {
-  const [messages, setMessages] = useState<AIMessage[]>(initialMessages)
+  const [messages, setMessages] = useState<AIMessage[]>(() => {
+    if (!persistKey || initialMessages.length > 0) {
+      return initialMessages
+    }
+
+    try {
+      const saved = localStorage.getItem(persistKey)
+      return saved
+        ? (JSON.parse(saved) as unknown as AIMessage[])
+        : initialMessages
+    } catch {
+      return initialMessages
+    }
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
   const [isTyping, setIsTyping] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [progress, setProgress] = useState<number>(0)
   const [conversationStats, setConversationStats] = useState<ConversationStats>(
-    {
-      messageCount: initialMessages.length,
-      userMessages: initialMessages.filter((m) => m.role === 'user').length,
-      assistantMessages: initialMessages.filter((m) => m.role === 'assistant')
-        .length,
-      avgResponseTime: 0,
-      totalDuration: 0,
-      startTime: initialMessages.length > 0 ? new Date() : null,
+    () => {
+      const loadedMessages =
+        persistKey && initialMessages.length === 0
+          ? (() => {
+              try {
+                const saved = localStorage.getItem(persistKey)
+                return saved
+                  ? (JSON.parse(saved) as unknown as AIMessage[])
+                  : initialMessages
+              } catch {
+                return initialMessages
+              }
+            })()
+          : initialMessages
+
+      return {
+        messageCount: loadedMessages.length,
+        userMessages: loadedMessages.filter((m) => m.role === 'user').length,
+        assistantMessages: loadedMessages.filter((m) => m.role === 'assistant')
+          .length,
+        avgResponseTime: 0,
+        totalDuration: 0,
+        startTime: loadedMessages.length > 0 ? new Date() : null,
+      }
     },
   )
   const [sentimentDistribution, setSentimentDistribution] = useState<{
@@ -192,31 +221,6 @@ export function useChatCompletion({
       }
     }
   }, [messages, autoSave, persistKey, onMessageSaved])
-
-  // Load conversation from storage on mount
-  useEffect(() => {
-    if (persistKey && messages.length === 0) {
-      try {
-        const saved = localStorage.getItem(persistKey)
-        if (saved) {
-          const parsedMessages = JSON.parse(saved) as unknown as AIMessage[]
-          setMessages(parsedMessages)
-          setConversationStats((prev) => ({
-            ...prev,
-            messageCount: parsedMessages.length,
-            userMessages: parsedMessages.filter((m) => m.role === 'user')
-              .length,
-            assistantMessages: parsedMessages.filter(
-              (m) => m.role === 'assistant',
-            ).length,
-            startTime: new Date(),
-          }))
-        }
-      } catch (err: unknown) {
-        console.warn('Failed to load conversation:', err)
-      }
-    }
-  }, [persistKey, messages.length])
 
   // Reset chat to initial state
   const resetChat = useCallback(() => {

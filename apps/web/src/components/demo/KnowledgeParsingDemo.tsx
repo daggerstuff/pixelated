@@ -75,7 +75,17 @@ export default function KnowledgeParsingDemo() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState<AnalysisResults | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [analysisHistory, setAnalysisHistory] = useState<AnalysisHistory[]>([])
+  const [analysisHistory, setAnalysisHistory] = useState<AnalysisHistory[]>(() => {
+    try {
+      const savedHistory = localStorage.getItem('knowledgeParsingHistory')
+      return savedHistory
+        ? (JSON.parse(savedHistory) as AnalysisHistory[])
+        : []
+    } catch (error_) {
+      console.warn('Failed to load analysis history:', error_)
+      return []
+    }
+  })
   const [processingTime, setProcessingTime] = useState<number | null>(null)
   const [isRealTimeMode, setIsRealTimeMode] = useState(false)
   const [confidence, setConfidence] = useState<number>(0)
@@ -227,18 +237,6 @@ export default function KnowledgeParsingDemo() {
       }
     }
   }, [inputText, isRealTimeMode, analyze])
-
-  // Load analysis history from localStorage
-  useEffect(() => {
-    const savedHistory = localStorage.getItem('knowledgeParsingHistory')
-    if (savedHistory) {
-      try {
-        setAnalysisHistory(JSON.parse(savedHistory) as AnalysisHistory[])
-      } catch (e) {
-        console.warn('Failed to load analysis history:', e)
-      }
-    }
-  }, [])
 
   const loadFromHistory = (historyItem: AnalysisHistory) => {
     setInputText(historyItem.text)

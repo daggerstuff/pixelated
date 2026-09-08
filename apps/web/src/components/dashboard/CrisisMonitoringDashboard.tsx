@@ -136,13 +136,18 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Auto-refresh effect
   useEffect(() => {
-    void fetchDashboardData()
+    const initialLoad = window.setTimeout(() => {
+      void fetchDashboardData()
+    }, 0)
 
     if (autoRefresh) {
       const interval = setInterval(fetchDashboardData, refreshInterval)
-      return () => clearInterval(interval)
+      return () => {
+        window.clearTimeout(initialLoad)
+        clearInterval(interval)
+      }
     }
-    return undefined
+    return () => window.clearTimeout(initialLoad)
   }, [fetchDashboardData, autoRefresh, refreshInterval])
 
   // Performance optimization: Compute formatted date strings once to avoid expensive O(N) Date creations during render

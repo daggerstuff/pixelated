@@ -254,8 +254,12 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
   // Auto-load memories on mount or when dependencies change
   useEffect(() => {
     if (autoLoad && userId) {
-      void refreshMemories()
+      const loadTimer = setTimeout(() => {
+        void refreshMemories()
+      }, 0)
+      return () => clearTimeout(loadTimer)
     }
+    return undefined
   }, [autoLoad, userId, refreshMemories])
 
   return {

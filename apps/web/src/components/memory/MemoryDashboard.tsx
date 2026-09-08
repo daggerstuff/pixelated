@@ -203,7 +203,6 @@ export function MemoryDashboard({
       const timeoutId = setTimeout(handleSearchDebounced, 300)
       return () => clearTimeout(timeoutId)
     }
-    setSearchResults([])
     return undefined
   }, [searchQuery, handleSearchDebounced])
 

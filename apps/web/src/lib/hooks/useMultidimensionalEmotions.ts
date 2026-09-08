@@ -40,9 +40,6 @@ export function useMultidimensionalEmotions(
 
   // Helper to fetch data
   const fetchData = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-
     try {
       // Validate options
       if (!clientId && !sessionId) {
@@ -108,7 +105,19 @@ export function useMultidimensionalEmotions(
   }, [clientId, sessionId, timeRange, dataPoints])
 
   useEffect(() => {
-    void fetchData()
+    if (clientId || sessionId) {
+      const fetchTimer = setTimeout(() => {
+        void fetchData()
+      }, 0)
+      return () => clearTimeout(fetchTimer)
+    }
+    return undefined
+  }, [fetchData])
+
+  const refetch = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    await fetchData()
   }, [fetchData])
 
   return {
@@ -116,6 +125,6 @@ export function useMultidimensionalEmotions(
     patterns,
     isLoading,
     error,
-    refetch: fetchData,
+    refetch,
   }
 }

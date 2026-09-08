@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { cn } from '../../lib/utils'
 import { getTherapeuticPrompts } from '../utils/speechRecognition'
@@ -22,27 +22,15 @@ export default function RealTimePrompts({
   maxPrompts = 3,
   onPromptClick,
 }: RealTimePromptsProps) {
-  const [prompts, setPrompts] = useState<string[]>([])
   const [selectedPrompt, setSelectedPrompt] = useState<number | null>(null)
 
-  // Generate prompts when keywords change
-  useEffect(() => {
-    if (detectedKeywords.length > 0) {
-      // Get prompts based on the keywords
-      const newPrompts = getTherapeuticPrompts(detectedKeywords, domain)
-
-      // Only update if we have new prompts
-      if (newPrompts.length > 0) {
-        setPrompts((prev) => {
-          // Combine with existing prompts but avoid duplicates
-          const combined = [...newPrompts, ...prev]
-          const unique = [...new Set(combined)]
-
-          // Limit to max number of prompts
-          return unique.slice(0, maxPrompts)
-        })
-      }
+  const prompts = useMemo(() => {
+    if (detectedKeywords.length === 0) {
+      return []
     }
+
+    const newPrompts = getTherapeuticPrompts(detectedKeywords, domain)
+    return [...new Set(newPrompts)].slice(0, maxPrompts)
   }, [detectedKeywords, domain, maxPrompts])
 
   // Handle prompt selection

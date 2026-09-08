@@ -21,14 +21,12 @@ export function useChartData(params: UseChartDataParams) {
   const [chartData, setChartData] = useState<Record<string, unknown> | null>(
     null,
   )
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchData = useCallback(
     async (signal?: AbortSignal) => {
-      setLoading(true)
-      setError(null)
       try {
         const data = await componentIntegrationService.getChartData({
           type: params.type,
@@ -69,7 +67,9 @@ export function useChartData(params: UseChartDataParams) {
   useEffect(() => {
     const controller = new AbortController()
     abortControllerRef.current = controller
-    void fetchData(controller.signal)
+    const startTimer = setTimeout(() => {
+      void fetchData(controller.signal)
+    }, 0)
 
     if (
       params.autoRefresh &&
@@ -79,14 +79,18 @@ export function useChartData(params: UseChartDataParams) {
       const id = setInterval(() => {
         const ctrl = new AbortController()
         abortControllerRef.current = ctrl
+        setLoading(true)
+        setError(null)
         void fetchData(ctrl.signal)
       }, params.refreshInterval)
       return () => {
         clearInterval(id)
+        clearTimeout(startTimer)
         controller.abort()
       }
     }
     return () => {
+      clearTimeout(startTimer)
       controller.abort()
     }
   }, [
@@ -106,6 +110,8 @@ export function useChartData(params: UseChartDataParams) {
     loading,
     error,
     refresh: () => {
+      setLoading(true)
+      setError(null)
       const controller = new AbortController()
       abortControllerRef.current = controller
       void fetchData(controller.signal)
@@ -116,11 +122,10 @@ export function useChartData(params: UseChartDataParams) {
 // Hook for service health monitoring
 export function useServiceHealth(checkInterval: number = 60000) {
   const [health, setHealth] = useState<Record<string, unknown> | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const checkHealth = useCallback(async () => {
-    setLoading(true)
     try {
       const healthData = await componentIntegrationService.getServiceHealth()
       setHealth(healthData)
@@ -138,11 +143,14 @@ export function useServiceHealth(checkInterval: number = 60000) {
   }, [])
 
   useEffect(() => {
-    void checkHealth()
+    const startTimer = setTimeout(() => {
+      void checkHealth()
+    }, 0)
     if (checkInterval > 0) {
       intervalRef.current = setInterval(checkHealth, checkInterval)
     }
     return () => {
+      clearTimeout(startTimer)
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }

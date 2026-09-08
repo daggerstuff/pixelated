@@ -50,13 +50,12 @@ export default function SessionDocumentationComponent({
 
   const [editableDocumentation, setEditableDocumentation] =
     useState<SessionDocumentation | null>(null)
+  const [previousDocumentation, setPreviousDocumentation] = useState(documentation)
 
-  // Update editable documentation when prop changes
-  useEffect(() => {
-    if (documentation) {
-      setEditableDocumentation(documentation)
-    }
-  }, [documentation])
+  if (documentation && documentation !== previousDocumentation) {
+    setPreviousDocumentation(documentation)
+    setEditableDocumentation(documentation)
+  }
 
   // Handle changes to editable fields (when not in readOnly mode)
   const handleChange = (field: string, value: unknown) => {

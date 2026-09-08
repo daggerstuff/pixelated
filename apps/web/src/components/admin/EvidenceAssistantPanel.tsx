@@ -28,11 +28,9 @@ export function EvidenceAssistantPanel() {
 
   const groundedAnswerEnabled = groundedAnswerAvailable ?? true
 
-  useEffect(() => {
-    if (!groundedAnswerEnabled && generateAnswer) {
-      setGenerateAnswer(false)
-    }
-  }, [groundedAnswerEnabled, generateAnswer])
+  if (!groundedAnswerEnabled && generateAnswer) {
+    setGenerateAnswer(false)
+  }
 
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()

@@ -1,4 +1,4 @@
-import { useState, useEffect, SyntheticEvent } from 'react'
+import { useState, SyntheticEvent } from 'react'
 
 import {
   ErrorMessage,
@@ -48,18 +48,18 @@ export function EvaluationForm({
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
   const [submitError, setSubmitError] = useState<unknown>(null)
+  const [previousEvaluation, setPreviousEvaluation] = useState(evaluation)
 
-  useEffect(() => {
-    if (evaluation) {
-      setFormData({
-        therapeuticRelevance: evaluation.therapeuticRelevance,
-        dataStructureQuality: evaluation.dataStructureQuality,
-        trainingIntegration: evaluation.trainingIntegration,
-        ethicalAccessibility: evaluation.ethicalAccessibility,
-        priorityTier: evaluation.priorityTier,
-      })
-    }
-  }, [evaluation])
+  if (evaluation && evaluation !== previousEvaluation) {
+    setPreviousEvaluation(evaluation)
+    setFormData({
+      therapeuticRelevance: evaluation.therapeuticRelevance,
+      dataStructureQuality: evaluation.dataStructureQuality,
+      trainingIntegration: evaluation.trainingIntegration,
+      ethicalAccessibility: evaluation.ethicalAccessibility,
+      priorityTier: evaluation.priorityTier,
+    })
+  }
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()

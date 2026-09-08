@@ -35,13 +35,12 @@ export function useOffline(options: UseOfflineOptions = {}): {
   checkConnection: () => Promise<boolean>
   connectionInfo: ConnectionInfo
 } {
-  const [isOffline, setIsOffline] = useState<boolean>(false)
+  const [isOffline, setIsOffline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? !navigator.onLine : false,
+  )
   const { onOffline, onOnline } = options
 
   useEffect(() => {
-    // Initial offline check
-    setIsOffline(!navigator.onLine)
-
     const handleOffline = () => {
       setIsOffline(true)
       onOffline?.()

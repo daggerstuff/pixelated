@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 interface FeatureTest {
   name: string
@@ -6,33 +6,18 @@ interface FeatureTest {
 }
 
 export function BrowserCompatibilityTester() {
-  const [browserInfo, setBrowserInfo] = useState({
-    userAgent: '',
-    platform: '',
-    language: '',
-    cookiesEnabled: false,
-    vendor: '',
-    screenSize: '',
-    pixelRatio: 0,
-    touchPoints: 0,
-    hasTouch: false,
-  })
-  const [results, setResults] = useState<Record<string, boolean | string>>({})
-
-  useEffect(() => {
-    // Collect browser information
-    setBrowserInfo({
-      userAgent: navigator.userAgent,
-      platform: (navigator as Navigator & { platform: string }).platform,
-      language: navigator.language,
-      cookiesEnabled: navigator.cookieEnabled,
-      vendor: (navigator as Navigator & { vendor: string }).vendor,
-      screenSize: `${window.innerWidth}x${window.innerHeight}`,
-      pixelRatio: window.devicePixelRatio,
-      touchPoints: navigator.maxTouchPoints,
-      hasTouch: 'ontouchstart' in window,
-    })
-
+  const [browserInfo] = useState(() => ({
+    userAgent: navigator.userAgent,
+    platform: (navigator as Navigator & { platform: string }).platform,
+    language: navigator.language,
+    cookiesEnabled: navigator.cookieEnabled,
+    vendor: (navigator as Navigator & { vendor: string }).vendor,
+    screenSize: `${window.innerWidth}x${window.innerHeight}`,
+    pixelRatio: window.devicePixelRatio,
+    touchPoints: navigator.maxTouchPoints,
+    hasTouch: 'ontouchstart' in window,
+  }))
+  const [results] = useState<Record<string, boolean | string>>(() => {
     // Test feature support
     const featureTests: FeatureTest[] = [
       {
@@ -124,8 +109,8 @@ export function BrowserCompatibilityTester() {
       testResults['High Contrast Mode'] = 'Active'
     }
 
-    setResults(testResults)
-  }, [])
+    return testResults
+  })
 
   // Helper functions for feature detection
 

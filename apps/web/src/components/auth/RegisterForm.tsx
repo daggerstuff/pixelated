@@ -1,4 +1,4 @@
-import React, { useState, useEffect, SyntheticEvent } from 'react'
+import React, { useState, SyntheticEvent } from 'react'
 
 import { authClient } from '@/lib/auth-client'
 
@@ -25,7 +25,7 @@ export function RegisterForm({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSuccessful, setIsSuccessful] = useState<boolean>(false)
   const [acceptTerms, setAcceptTerms] = useState<boolean>(false)
-  const [announcement, setAnnouncement] = useState<string>('')
+  const [googleAnnouncement, setGoogleAnnouncement] = useState<string>('')
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [formIsValid, setFormIsValid] = useState<boolean>(false)
 
@@ -63,18 +63,15 @@ export function RegisterForm({
     setFieldErrors(errors)
   }
 
-  // Announce loading states and errors to screen readers
-  useEffect(() => {
-    if (isLoading) {
-      setAnnouncement('Creating your account, please wait...')
-    } else if (errorMessage) {
-      setAnnouncement(`Error: ${errorMessage}`)
-    } else if (isSuccessful) {
-      setAnnouncement(
-        'Registration successful! Please check your email to verify your account.',
-      )
-    }
-  }, [isLoading, errorMessage, isSuccessful])
+  const announcement =
+    googleAnnouncement ||
+    (isLoading
+      ? 'Creating your account, please wait...'
+      : errorMessage
+        ? `Error: ${errorMessage}`
+        : isSuccessful
+          ? 'Registration successful! Please check your email to verify your account.'
+          : '')
 
   const handleSubmit = async (e: SyntheticEvent) => {
     e.preventDefault()
@@ -123,7 +120,7 @@ export function RegisterForm({
     try {
       setIsLoading(true)
       setErrorMessage('')
-      setAnnouncement('Initiating Google sign in...')
+      setGoogleAnnouncement('Initiating Google sign in...')
 
       await authClient.signIn.social({
         provider: 'google',

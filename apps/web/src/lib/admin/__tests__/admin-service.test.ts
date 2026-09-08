@@ -36,7 +36,6 @@ import { AdminService, type MockSession } from '../index'
  */
 async function getFreshService(): Promise<{
   service: AdminService
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   store: MockSession[]
 }> {
   vi.resetModules()

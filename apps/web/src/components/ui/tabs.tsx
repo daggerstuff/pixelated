@@ -48,25 +48,18 @@ export function Tabs({
   const [tabValues, setTabValues] = useState<string[]>([])
 
   // Initialize with controlled value, defaultValue, or first registered tab
-  const [internalValue, setInternalValue] = useState(
+  const [uncontrolledValue, setUncontrolledValue] = useState(
     value ?? defaultValue ?? '',
   )
 
   // If this is a controlled component, use the provided value
-  const activeValue = value ?? internalValue
-
-  // Update internal value when controlled value changes
-  useEffect(() => {
-    if (value !== undefined) {
-      setInternalValue(value)
-    }
-  }, [value])
+  const activeValue = value ?? uncontrolledValue
 
   // Set active value and call onValueChange if provided
   const setActiveValue = useCallback(
     (newValue: string) => {
       if (value === undefined) {
-        setInternalValue(newValue)
+        setUncontrolledValue(newValue)
       }
       onValueChange?.(newValue)
     },

@@ -30,20 +30,46 @@ type NetworkInformationLike = {
   removeEventListener?: (type: string, listener: () => void) => void
 }
 
+function readNetworkState(): OfflineState {
+  if (typeof navigator === 'undefined') {
+    return {
+      isOnline: true,
+      isOffline: false,
+      connectionType: 'unknown',
+      effectiveType: 'unknown',
+      downlink: 0,
+      rtt: 0,
+      saveData: false,
+    }
+  }
+
+  const nav = navigator as unknown as {
+    connection?: NetworkInformationLike
+    mozConnection?: NetworkInformationLike
+    webkitConnection?: NetworkInformationLike
+  }
+  const connection = nav.connection ?? nav.mozConnection ?? nav.webkitConnection
+  const isOnline = navigator.onLine
+
+  return {
+    isOnline,
+    isOffline: !isOnline,
+    connectionType: connection?.type ?? 'unknown',
+    effectiveType: connection?.effectiveType ?? 'unknown',
+    downlink: connection?.downlink ?? 0,
+    rtt: connection?.rtt ?? 0,
+    saveData: connection?.saveData ?? false,
+  }
+}
+
 export function useOfflineDetection({
   onOnline,
   onOffline,
   enableNetworkInfo = true,
 }: UseOfflineDetectionOptions = {}) {
-  const [networkState, setNetworkState] = useState<OfflineState>({
-    isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
-    isOffline: typeof navigator !== 'undefined' ? !navigator.onLine : false,
-    connectionType: 'unknown',
-    effectiveType: 'unknown',
-    downlink: 0,
-    rtt: 0,
-    saveData: false,
-  })
+  const [networkState, setNetworkState] = useState<OfflineState>(() =>
+    readNetworkState(),
+  )
 
   const updateNetworkState = useCallback(() => {
     if (typeof navigator === 'undefined') return
@@ -76,8 +102,6 @@ export function useOfflineDetection({
   }, [onOnline, onOffline])
 
   useEffect(() => {
-    updateNetworkState()
-
     // Listen for online/offline events
     window.addEventListener('online', updateNetworkState)
     window.addEventListener('offline', updateNetworkState)

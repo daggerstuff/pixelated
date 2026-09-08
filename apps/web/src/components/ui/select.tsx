@@ -59,7 +59,7 @@ export function Select({
   >([])
 
   // Initialize with controlled value or defaultValue
-  const [internalValue, setInternalValue] = useState<string>(
+  const [uncontrolledValue, setUncontrolledValue] = useState<string>(
     value ?? defaultValue ?? '',
   )
 
@@ -71,14 +71,7 @@ export function Select({
   const contentRef = useRef<HTMLDivElement>(null!)
 
   // If this is a controlled component, use the provided value
-  const currentValue = value ?? internalValue
-
-  // Update internal value when controlled value changes
-  useEffect(() => {
-    if (value !== undefined) {
-      setInternalValue(value)
-    }
-  }, [value])
+  const currentValue = value ?? uncontrolledValue
 
   // Close the dropdown when clicking outside
   useEffect(() => {
@@ -108,7 +101,7 @@ export function Select({
   const setValue = useCallback(
     (newValue: string) => {
       if (value === undefined) {
-        setInternalValue(newValue)
+        setUncontrolledValue(newValue)
       }
       onValueChange?.(newValue)
       setIsOpen(false)

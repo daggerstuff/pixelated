@@ -10,8 +10,9 @@ import { KVStore } from '@/lib/db/KVStore'
 export function usePatientModel() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [patientService, setPatientService] =
-    useState<PatientModelService | null>(null)
+  const [patientService] = useState<PatientModelService | null>(
+    () => new PatientModelService(new KVStore('cognitive_models_', true)),
+  )
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const [currentModelId, setCurrentModelId] = useState<string | null>(null)
   const [currentModel, setCurrentModel] = useState<CognitiveModel | null>(null)
@@ -25,17 +26,14 @@ export function usePatientModel() {
 
   // Initialize the patient model service
   useEffect(() => {
-    const kvStore = new KVStore('cognitive_models_', true)
-    const service = new PatientModelService(kvStore)
-    setPatientService(service)
-
     // Load available models
     const loadModels = async () => {
+      if (!patientService) return
       setIsLoading(true)
       setError(null)
 
       try {
-        const models = await service.getAvailableModels()
+        const models = await patientService.getAvailableModels()
         const modelIds = models
           .map((model) => model.id)
           .filter((id): id is string => typeof id === 'string' && id.length > 0)
@@ -56,7 +54,11 @@ export function usePatientModel() {
       }
     }
 
-    void loadModels()
+    const loadTimer = setTimeout(() => {
+      void loadModels()
+    }, 0)
+
+    return () => clearTimeout(loadTimer)
   }, [currentModelId])
 
   // Load the selected model when currentModelId changes
@@ -87,7 +89,11 @@ export function usePatientModel() {
       }
     }
 
-    void loadModel()
+    const loadTimer = setTimeout(() => {
+      void loadModel()
+    }, 0)
+
+    return () => clearTimeout(loadTimer)
   }, [patientService, currentModelId])
 
   // Select a different patient model

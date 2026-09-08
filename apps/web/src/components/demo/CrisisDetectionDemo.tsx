@@ -12,7 +12,7 @@ import {
   TrendingUp,
   AlertCircle,
 } from 'lucide-react'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 import Alert from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge/index'
@@ -62,9 +62,7 @@ export default function CrisisDetectionDemo() {
   const [error, setError] = useState<string | null>(null)
 
   const [realTimeMonitoring, setRealTimeMonitoring] = useState(false)
-  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
-    null,
-  )
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const [assessmentHistory, setAssessmentHistory] = useState<
     CrisisAssessment[]
   >([])
@@ -307,8 +305,8 @@ export default function CrisisDetectionDemo() {
   useEffect(() => {
     if (realTimeMonitoring && inputText.length > 50) {
       // Clear existing timeout
-      if (typingTimeout) {
-        clearTimeout(typingTimeout)
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
       }
 
       // Set new timeout for real-time analysis
@@ -316,15 +314,15 @@ export default function CrisisDetectionDemo() {
         void performCrisisAssessment(true) // Silent assessment
       }, 2000) // Wait 2 seconds after user stops typing
 
-      setTypingTimeout(timeout)
+      typingTimeoutRef.current = timeout
     }
 
     return () => {
-      if (typingTimeout) {
-        clearTimeout(typingTimeout)
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current)
       }
     }
-  }, [inputText, realTimeMonitoring, typingTimeout, performCrisisAssessment])
+  }, [inputText, realTimeMonitoring, performCrisisAssessment])
 
   const getRiskLevelColor = (level: string) => {
     switch (level) {

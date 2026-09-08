@@ -47,7 +47,6 @@ export function WebSocketProgressBar(props: {
 
   useEffect(() => {
     if (!webSocket) {
-      setStatusText('disconnected')
       return
     }
 

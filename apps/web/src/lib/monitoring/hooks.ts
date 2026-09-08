@@ -153,7 +153,10 @@ export function useRUMData() {
 
   // Fetch data on mount and provide refresh function
   useEffect(() => {
-    void fetchRUMData()
+    const fetchTimer = setTimeout(() => {
+      void fetchRUMData()
+    }, 0)
+    return () => clearTimeout(fetchTimer)
   }, [fetchRUMData])
 
   return {

@@ -436,10 +436,13 @@ export function useMultidimensionalEmotions(
     }
 
     // Fetch data
-    void fetchEmotionData()
+    const fetchTimer = setTimeout(() => {
+      void fetchEmotionData()
+    }, 0)
 
     // Clean up function
     return () => {
+      clearTimeout(fetchTimer)
       isMountedRef.current = false
 
       // Cancel any pending requests when the component unmounts

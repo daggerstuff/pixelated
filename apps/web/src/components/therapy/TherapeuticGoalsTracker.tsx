@@ -55,7 +55,7 @@ export function TherapeuticGoalsTracker({
   const [goals, setGoals] = useState<TherapeuticGoal[]>([])
   const [activeGoalId, setActiveGoalId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<GoalCategory | 'all'>('all')
-  const [loading, setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<boolean>(false)
   const [actionError, setActionError] = useState<string | null>(null)
@@ -65,8 +65,6 @@ export function TherapeuticGoalsTracker({
 
   // Fetch goals from API
   useEffect(() => {
-    setLoading(true)
-    setError(null)
     fetch('/api/goals')
       .then(async (res) => {
         if (!res.ok) {

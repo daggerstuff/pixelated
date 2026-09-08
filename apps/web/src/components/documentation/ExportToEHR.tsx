@@ -21,16 +21,7 @@ export function ExportToEHR({
     'fhir',
   )
   const [includeEmotionData, setIncludeEmotionData] = useState(true)
-  const [showSuccessDetails, setShowSuccessDetails] = useState(false)
-
-  // Reset success details when export result changes
-  useEffect(() => {
-    if (exportResult?.success) {
-      setShowSuccessDetails(true)
-    } else {
-      setShowSuccessDetails(false)
-    }
-  }, [exportResult])
+  const showSuccessDetails = exportResult?.success === true
 
   // Export options memo
   const exportOptions = useMemo<EHRExportOptions>(() => {

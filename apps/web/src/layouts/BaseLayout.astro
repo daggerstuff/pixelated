@@ -1,14 +1,13 @@
 ---
-// Type system: Pure Monospace Technical Instrument — JetBrains Mono
-// Variable carries display, body, and mono roles. Weight, size, and
-// tracking carry all hierarchy. No serif display, no soft sans.
+// Type system: The Quiet Instrument. Fraunces Variable carries display,
+// Public Sans Variable carries body, JetBrains Mono Variable carries
+// labels and data. Weight, size, and tracking carry hierarchy.
 import '@/lib/fonts'
 /* Astro-palette base tokens (AGPL import-only CSS, no .astro source copied) */
 /* style.css is loaded via <link> in <head> — public assets must not be
    imported through Astro frontmatter (Vite build resolution failure). */
 import '@/styles/np-tokens.css'
 import '@/styles/marketing.css'
-import ThemeSwitcher from '@/components/ThemeSwitcher.astro'
 import { withBasePath } from '@/utils/path'
 import {
   getServiceWorkerScope,
@@ -176,14 +175,10 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <script is:inline nonce={cspNonce}>
       const storedTheme = localStorage.getItem('theme')
       document.documentElement.dataset['theme'] = storedTheme || 'dark'
-      const storedPalette = localStorage.getItem('site-palette')
-      const systemPalette = window.matchMedia('(prefers-color-scheme: dark)')
-        .matches
-        ? 'vesper'
-        : 'rose-pine-dawn'
-      document.documentElement.setAttribute(
-        'data-palette',
-        storedPalette || systemPalette,
+      const themeColor = document.querySelector('meta[name="theme-color"]')
+      themeColor?.setAttribute(
+        'content',
+        storedTheme === 'light' ? '#fafafa' : '#131313',
       )
     </script>
     <script
@@ -214,8 +209,6 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
   </head>
   <body>
     <a class="np-skip-link" href="#main-content">Skip to main content</a>
-
-    <ThemeSwitcher showHint={true} />
 
     <header class="site-header">
       <nav class="nav" aria-label="Primary navigation">
@@ -370,6 +363,11 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
         const next = current === 'dark' ? 'light' : 'dark'
         document.documentElement.dataset['theme'] = next
         localStorage.setItem('theme', next)
+        const themeColor = document.querySelector('meta[name="theme-color"]')
+        themeColor?.setAttribute(
+          'content',
+          next === 'dark' ? '#131313' : '#fafafa',
+        )
         window.dispatchEvent(
           new CustomEvent('theme-changed', { detail: { theme: next } }),
         )

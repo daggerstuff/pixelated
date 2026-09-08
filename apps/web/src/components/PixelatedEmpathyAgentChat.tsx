@@ -127,45 +127,45 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
   onScenarioGenerated,
   onBiasAnalysis,
 }) => {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [context, setContext] = useState(initialContext)
-  const [isConnected, setIsConnected] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const agent = useRef<ReturnType<typeof createPixelatedEmpathyAgent> | null>(
-    null,
-  )
-
-  useEffect(() => {
+  const [agent] = useState<ReturnType<
+    typeof createPixelatedEmpathyAgent
+  > | null>(() => {
     try {
-      agent.current = createPixelatedEmpathyAgent()
-      setIsConnected(true)
-
-      // Add welcome message
-      setMessages([
+      return createPixelatedEmpathyAgent()
+    } catch (error: unknown) {
+      console.error('Failed to initialize agent:', error)
+      return null
+    }
+  })
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (agent) {
+      return [
         {
           id: 'welcome',
-          content: `Hello! I'm your Pixelated Empathy AI Assistant. I'm specialized in clinical training scenarios, bias detection, and therapeutic guidance. How can I help you today?`,
+          content:
+            "Hello! I'm your Pixelated Empathy AI Assistant. I'm specialized in clinical training scenarios, bias detection, and therapeutic guidance. How can I help you today?",
           role: 'agent',
           timestamp: new Date(),
           context: 'system',
         },
-      ])
-    } catch (error: unknown) {
-      console.error('Failed to initialize agent:', error)
-      setMessages([
-        {
-          id: 'error',
-          content:
-            'Unable to connect to the AI Agent. Please check your configuration.',
-          role: 'agent',
-          timestamp: new Date(),
-          context: 'error',
-        },
-      ])
+      ]
     }
-  }, [])
+    return [
+      {
+        id: 'error',
+        content:
+          'Unable to connect to the AI Agent. Please check your configuration.',
+        role: 'agent',
+        timestamp: new Date(),
+        context: 'error',
+      },
+    ]
+  })
+  const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [context, setContext] = useState(initialContext)
+  const isConnected = Boolean(agent)
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -175,7 +175,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
     userInput: string,
     currentContext: AgentContext,
   ): Promise<AgentResponse> => {
-    if (!agent.current) {
+    if (!agent) {
       throw new Error('Agent not initialized')
     }
 
@@ -185,18 +185,18 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
         const shouldGenerateScenario =
           lowerInput.includes('scenario') || lowerInput.includes('generate')
         if (shouldGenerateScenario) {
-          return await agent.current.generateScenario({
+          return await agent.generateScenario({
             condition: extractCondition(userInput),
             difficulty: extractDifficulty(userInput),
             population: extractPopulation(userInput),
           })
         }
-        return await agent.current.sendMessage(userInput, currentContext)
+        return await agent.sendMessage(userInput, currentContext)
       }
       case 'bias_detection':
-        return await agent.current.analyzeBias(userInput)
+        return await agent.analyzeBias(userInput)
       case 'training_recommendation':
-        return await agent.current.recommendTraining({
+        return await agent.recommendTraining({
           experience: extractExperience(userInput),
           specializations: extractSpecializations(userInput),
         })
@@ -204,7 +204,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
         throw new Error('Not implemented yet: "general" case')
       }
       default:
-        return await agent.current.sendMessage(userInput, currentContext)
+        return await agent.sendMessage(userInput, currentContext)
     }
   }
 
@@ -235,7 +235,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
   }
 
   const handleSend = async () => {
-    if (!input.trim() || !agent.current || isLoading) {
+    if (!input.trim() || !agent || isLoading) {
       return
     }
 

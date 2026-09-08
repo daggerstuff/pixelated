@@ -30,16 +30,20 @@ export default function RealTimeFeedbackPanel({
 
   // Update empathy history when emotionInsights changes
   useEffect(() => {
-    // Calculate empathy score as weighted combination of valence and dominance
-    // This is a simplified model - in a real implementation this would be more sophisticated
-    const empathyScore =
-      emotionInsights.valence * 0.7 + (1 - emotionInsights.dominance) * 0.3
+    const historyTimer = setTimeout(() => {
+      // Calculate empathy score as weighted combination of valence and dominance
+      // This is a simplified model - in a real implementation this would be more sophisticated
+      const empathyScore =
+        emotionInsights.valence * 0.7 + (1 - emotionInsights.dominance) * 0.3
 
-    setEmpathyHistory((prev) => {
-      const updated = [...prev, empathyScore]
-      // Keep only the last 20 values
-      return updated.slice(-20)
-    })
+      setEmpathyHistory((prev) => {
+        const updated = [...prev, empathyScore]
+        // Keep only the last 20 values
+        return updated.slice(-20)
+      })
+    }, 0)
+
+    return () => clearTimeout(historyTimer)
   }, [emotionInsights])
 
   // Get most recent high-priority feedback
@@ -392,4 +396,3 @@ export default function RealTimeFeedbackPanel({
 }
 
 // Example PHI audit logging - uncomment and customize as needed
-

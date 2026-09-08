@@ -22,23 +22,15 @@ interface PrivacySettings {
 }
 
 export function PrivacyDashboard() {
+  const analytics = AnalyticsService.getInstance()
   const [settings, setSettings] = useState<PrivacySettings>({
     enabled: true,
     differentialPrivacy: true,
     privacyBudget: 1.0,
     anonymize: true,
   })
-  const [eventCount, setEventCount] = useState(0)
-  const [lastSync, setLastSync] = useState<Date | null>(null)
-
-  const analytics = AnalyticsService.getInstance()
-
-  useEffect(() => {
-    // Load initial settings
-    const events = analytics.getEvents()
-    setEventCount(events.length)
-    setLastSync(new Date())
-  }, [analytics])
+  const [eventCount, setEventCount] = useState(() => analytics.getEvents().length)
+  const [lastSync, setLastSync] = useState<Date | null>(() => new Date())
 
   const handleSettingChange = (
     key: keyof PrivacySettings,

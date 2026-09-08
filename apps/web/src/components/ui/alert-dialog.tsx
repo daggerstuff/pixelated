@@ -25,20 +25,13 @@ const AlertDialogContext = React.createContext<{
   onOpenChange: (open: boolean) => void
 }>({ open: false, onOpenChange: () => {} })
 
-function AlertDialog({
-  open = false,
-  onOpenChange,
-  children,
-}: AlertDialogProps) {
-  const [isOpen, setIsOpen] = React.useState(open)
-
-  React.useEffect(() => {
-    setIsOpen(open)
-  }, [open])
+function AlertDialog({ open, onOpenChange, children }: AlertDialogProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(open ?? false)
+  const isOpen = open ?? uncontrolledOpen
 
   const handleOpenChange = React.useCallback(
     (newOpen: boolean) => {
-      setIsOpen(newOpen)
+      setUncontrolledOpen(newOpen)
       onOpenChange?.(newOpen)
     },
     [onOpenChange],

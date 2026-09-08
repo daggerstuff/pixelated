@@ -1,5 +1,6 @@
 /* Font @font-face declarations are in src/styles/fonts.css (loaded via src/lib/fonts.ts).
-   IoskeleyMono (mono/display) and Switzer (body) are served from /fonts/. */
+   Fraunces Variable (display), Public Sans Variable (body), and
+   JetBrains Mono Variable (mono/labels) are served from fontsource packages. */
 
 :root {
   --bg: #f0eee9;
@@ -22,10 +23,11 @@
   --radius-sm: 2px;
   --max: 1160px;
   --mono:
-    'IoskeleyMono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas,
+    monospace;
   --body:
-    Switzer, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', sans-serif;
+    'Public Sans Variable', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --term-bg: #1a1d22;
   --term-sidebar-bg: #15181d;
   --term-active-bg: #20242c;
