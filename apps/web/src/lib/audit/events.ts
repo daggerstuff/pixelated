@@ -67,6 +67,7 @@ export interface AuditEvent {
   userAgent?: string
   status: 'success' | 'failure'
   errorMessage?: string
+  tenantId?: string
   /**
    * SHA-256 hash-chain linkage.
    *
