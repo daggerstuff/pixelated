@@ -1,0 +1,44 @@
+{
+  "templateId": "tpl-soc2-security-v1",
+  "type": "soc2_security",
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "sections": [
+    {
+      "id": "header",
+      "title": "SOC 2 Security Report",
+      "description": "Report header with period and tenant information",
+      "required": true
+    },
+    {
+      "id": "access_controls",
+      "title": "Access Controls",
+      "description": "RBAC role assignments and permission grants/revocations",
+      "required": true
+    },
+    {
+      "id": "audit_log_integrity",
+      "title": "Audit Log Integrity",
+      "description": "Audit chain verification and hash integrity",
+      "required": true
+    },
+    {
+      "id": "encryption",
+      "title": "Encryption Controls",
+      "description": "Data in transit, at rest, and audit log hashing",
+      "required": true
+    },
+    {
+      "id": "incidents",
+      "title": "Security Incidents",
+      "description": "Security incidents and response status",
+      "required": true
+    },
+    {
+      "id": "summary",
+      "title": "Summary Statistics",
+      "description": "Aggregated security metrics for the reporting period",
+      "required": true
+    }
+  ]
+}

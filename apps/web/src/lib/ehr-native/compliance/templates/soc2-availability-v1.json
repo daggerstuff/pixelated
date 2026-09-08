@@ -1,0 +1,38 @@
+{
+  "templateId": "tpl-soc2-availability-v1",
+  "type": "soc2_availability",
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "sections": [
+    {
+      "id": "header",
+      "title": "SOC 2 Availability Report",
+      "description": "Report header with period and tenant information",
+      "required": true
+    },
+    {
+      "id": "uptime",
+      "title": "System Uptime",
+      "description": "Uptime percentage and availability incidents",
+      "required": true
+    },
+    {
+      "id": "backup_restore",
+      "title": "Backup and Restore",
+      "description": "Backup frequency, last backup, and restore test results",
+      "required": true
+    },
+    {
+      "id": "disaster_recovery",
+      "title": "Disaster Recovery",
+      "description": "DR plan version, last test, RTO and RPO metrics",
+      "required": true
+    },
+    {
+      "id": "summary",
+      "title": "Summary Statistics",
+      "description": "Aggregated availability metrics",
+      "required": true
+    }
+  ]
+}
