@@ -1,0 +1,32 @@
+{
+  "templateId": "tpl-access-review-v1",
+  "type": "access_review",
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "sections": [
+    {
+      "id": "header",
+      "title": "Access Review Report",
+      "description": "Report header with period and tenant information",
+      "required": true
+    },
+    {
+      "id": "role_assignments",
+      "title": "Active Role Assignments",
+      "description": "Current RBAC role assignments with permissions",
+      "required": true
+    },
+    {
+      "id": "permission_changes",
+      "title": "Permission Changes",
+      "description": "Permission grants and revocations within the reporting period",
+      "required": true
+    },
+    {
+      "id": "summary",
+      "title": "Summary Statistics",
+      "description": "Aggregated access review metrics",
+      "required": true
+    }
+  ]
+}
