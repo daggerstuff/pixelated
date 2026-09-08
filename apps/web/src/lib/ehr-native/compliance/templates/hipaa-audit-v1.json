@@ -1,0 +1,44 @@
+{
+  "templateId": "tpl-hipaa-audit-v1",
+  "type": "hipaa_audit",
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "sections": [
+    {
+      "id": "header",
+      "title": "HIPAA Audit Report",
+      "description": "Report header with period and tenant information",
+      "required": true
+    },
+    {
+      "id": "chain_verification",
+      "title": "Audit Chain Verification",
+      "description": "SHA-256 hash chain integrity verification results",
+      "required": true
+    },
+    {
+      "id": "phi_access",
+      "title": "PHI Access Events",
+      "description": "All PHI access events within the reporting period",
+      "required": true
+    },
+    {
+      "id": "phi_modifications",
+      "title": "PHI Modification Events",
+      "description": "All PHI create/update/delete events within the reporting period",
+      "required": true
+    },
+    {
+      "id": "break_glass",
+      "title": "Break-Glass Access Events",
+      "description": "Emergency access events using break-glass protocol",
+      "required": true
+    },
+    {
+      "id": "summary",
+      "title": "Summary Statistics",
+      "description": "Aggregated statistics for the reporting period",
+      "required": true
+    }
+  ]
+}

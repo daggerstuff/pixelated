@@ -70,6 +70,7 @@ export function chainPayload(event: AuditEvent): Record<string, unknown> {
     ipAddress: event.ipAddress ?? null,
     userAgent: event.userAgent ?? null,
     errorMessage: event.errorMessage ?? null,
+    ...(event.tenantId !== undefined ? { tenantId: event.tenantId } : {}),
   }
 }
 
@@ -499,11 +500,12 @@ export class AuditLogger {
    * deliberately remain serialised through `withChainHash` + the
    * `chain_audit_cursor` upsert; this reader walks the persisted chain.
    */
-  public async verifyChain(): Promise<AuditChainVerification> {
+  public async verifyChain(tenantId?: string): Promise<AuditChainVerification> {
     const db = await this.ensureConnected()
+    const filter = tenantId ? { tenantId } : {}
     const events = await db
       .collection<AuditEvent>('audit_logs')
-      .find({})
+      .find(filter)
       .sort({ _id: 1 })
       .toArray()
     return verifyAuditChain(events)

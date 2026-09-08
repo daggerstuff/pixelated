@@ -1,0 +1,38 @@
+{
+  "templateId": "tpl-consent-compliance-v1",
+  "type": "consent_compliance",
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "sections": [
+    {
+      "id": "header",
+      "title": "Consent Compliance Report",
+      "description": "Report header with period and tenant information",
+      "required": true
+    },
+    {
+      "id": "by_state",
+      "title": "Consent by State",
+      "description": "Consent records grouped by state with compliance rates",
+      "required": true
+    },
+    {
+      "id": "by_treatment",
+      "title": "Consent by Treatment Category",
+      "description": "Consent records grouped by treatment category",
+      "required": true
+    },
+    {
+      "id": "expiring",
+      "title": "Expiring Consents",
+      "description": "Consents expiring within 30 days",
+      "required": true
+    },
+    {
+      "id": "summary",
+      "title": "Summary Statistics",
+      "description": "Aggregated consent compliance metrics",
+      "required": true
+    }
+  ]
+}
