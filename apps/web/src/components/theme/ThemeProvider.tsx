@@ -3,6 +3,15 @@ import type { ReactNode } from 'react'
 
 type Theme = 'light' | 'dark' | 'system'
 
+const getStoredTheme = (): Theme => {
+  const storedTheme = localStorage.getItem('theme') as Theme | null
+  if (storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system') {
+    return storedTheme
+  }
+  localStorage.setItem('theme', 'dark')
+  return 'dark'
+}
+
 interface ThemeContextType {
   theme: Theme
   setTheme: (theme: Theme) => void
@@ -22,20 +31,8 @@ export function useTheme() {
 export { ThemeContext }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Initialize with dark as default
-  const [theme, setThemeState] = useState<Theme>('dark')
+  const [theme, setThemeState] = useState<Theme>(getStoredTheme)
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark')
-
-  useEffect(() => {
-    // Get stored theme or use dark as default
-    const storedTheme = localStorage.getItem('theme') as Theme | null
-    if (storedTheme) {
-      setThemeState(storedTheme)
-    } else {
-      // Set dark as default when no preference is stored
-      localStorage.setItem('theme', 'dark')
-    }
-  }, [])
 
   // Update theme when it changes
   useEffect(() => {

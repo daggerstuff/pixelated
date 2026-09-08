@@ -43,10 +43,17 @@ export function ThemeProvider({
     initialState.motionPreference ?? 'normal',
   )
 
-  // Derive active theme based on color scheme and system preference
-  const [activeTheme, setActiveTheme] = useState<Theme>(
-    initialState.theme ?? 'dark',
-  )
+  const [systemTheme, setSystemTheme] = useState<Theme>(() => {
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: light)').matches
+    ) {
+      return 'light'
+    }
+    return initialState.theme ?? 'dark'
+  })
+
+  const activeTheme = colorScheme === 'system' ? systemTheme : colorScheme
 
   // Handle system theme changes
   useEffect(() => {
@@ -58,23 +65,13 @@ export function ThemeProvider({
 
     function updateTheme(e: MediaQueryListEvent | MediaQueryList) {
       if (colorScheme === 'system') {
-        setActiveTheme(e.matches ? 'dark' : 'light')
+        setSystemTheme(e.matches ? 'dark' : 'light')
       }
     }
-
-    // Set initial value
-    updateTheme(mediaQuery)
 
     // Listen for changes
     mediaQuery.addEventListener('change', updateTheme)
     return () => mediaQuery.removeEventListener('change', updateTheme)
-  }, [colorScheme])
-
-  // Update active theme when color scheme changes
-  useEffect(() => {
-    if (colorScheme !== 'system') {
-      setActiveTheme(colorScheme)
-    }
   }, [colorScheme])
 
   // Update document classes when preferences change

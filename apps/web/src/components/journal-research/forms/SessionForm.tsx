@@ -1,4 +1,4 @@
-import { useState, useEffect, SyntheticEvent } from 'react'
+import { useState, SyntheticEvent } from 'react'
 import { z } from 'zod'
 
 import {
@@ -61,17 +61,17 @@ export function SessionForm({
   const [submitError, setSubmitError] = useState<unknown>(null)
   const [keywordInput, setKeywordInput] = useState('')
   const [keywordCategory, setKeywordCategory] = useState('default')
+  const [previousSession, setPreviousSession] = useState(session)
 
-  useEffect(() => {
-    if (session) {
-      setFormData({
-        targetSources: session['targetSources'],
-        searchKeywords: session.searchKeywords,
-        weeklyTargets: session.weeklyTargets,
-        currentPhase: session.currentPhase,
-      })
-    }
-  }, [session])
+  if (session && session !== previousSession) {
+    setPreviousSession(session)
+    setFormData({
+      targetSources: session['targetSources'],
+      searchKeywords: session.searchKeywords,
+      weeklyTargets: session.weeklyTargets,
+      currentPhase: session.currentPhase,
+    })
+  }
 
   const validateField = (fieldName: string, value: unknown) => {
     try {

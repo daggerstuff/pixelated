@@ -22,16 +22,13 @@ const DialogContext = React.createContext<DialogContextType>({
 })
 
 // Shadcn/UI Dialog Components
-const Dialog = ({ open = false, onOpenChange, children }: DialogRootProps) => {
-  const [isOpen, setIsOpen] = useState(open)
-
-  useEffect(() => {
-    setIsOpen(open)
-  }, [open])
+const Dialog = ({ open, onOpenChange, children }: DialogRootProps) => {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(open ?? false)
+  const isOpen = open ?? uncontrolledOpen
 
   const handleOpenChange = useCallback(
     (newOpen: boolean) => {
-      setIsOpen(newOpen)
+      setUncontrolledOpen(newOpen)
       onOpenChange?.(newOpen)
     },
     [onOpenChange],

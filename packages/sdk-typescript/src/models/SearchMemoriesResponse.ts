@@ -1,5 +1,4 @@
 /* tslint:disable */
-/* eslint-disable */
 /**
  * Pixelated Memory API (v1)
  * Public v1 memory API contract. Schemas derive from `src/lib/memory/contract/v1.ts`. 
@@ -96,4 +95,3 @@ export function SearchMemoriesResponseToJSONTyped(value?: SearchMemoriesResponse
         'pagination': PaginationToJSON(value['pagination']),
     };
 }
-

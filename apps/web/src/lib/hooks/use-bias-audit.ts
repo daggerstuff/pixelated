@@ -6,7 +6,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 
 import type {
   DatasetForAudit,
@@ -268,7 +268,7 @@ export function useBiasAuditDashboard() {
   const [selectedDatasetId, setSelectedDatasetId] = useState<string | null>(
     null,
   )
-  const [selectedAuditId, setSelectedAuditId] = useState<string | null>(null)
+  const [manualAuditId, setManualAuditId] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<
     QuarantineStatus | undefined
   >(undefined)
@@ -282,26 +282,17 @@ export function useBiasAuditDashboard() {
     pageSize,
   })
   const selectedDatasetQuery = useDataset(selectedDatasetId)
+  const selectedAuditId =
+    manualAuditId ?? selectedDatasetQuery.data?.lastAuditId ?? null
   const selectedAuditQuery = useAuditResult(selectedAuditId)
   const historyQuery = useAuditHistory(selectedDatasetId)
 
   const initiateAuditMutation = useInitiateAudit()
   const quarantineActionMutation = useQuarantineAction()
 
-  // Auto-select audit when dataset changes
-  useEffect(() => {
-    if (selectedDatasetQuery.data?.lastAuditId) {
-      setSelectedAuditId(selectedDatasetQuery.data.lastAuditId)
-    } else {
-      setSelectedAuditId(null)
-    }
-  }, [selectedDatasetQuery.data?.lastAuditId])
-
   const selectDataset = useCallback((datasetId: string | null) => {
     setSelectedDatasetId(datasetId)
-    if (!datasetId) {
-      setSelectedAuditId(null)
-    }
+    setManualAuditId(null)
   }, [])
 
   const initiateAudit = useCallback(
@@ -314,7 +305,7 @@ export function useBiasAuditDashboard() {
         const firstResult = results[0]
         if (firstResult) {
           setSelectedDatasetId(firstResult.datasetId)
-          setSelectedAuditId(firstResult.auditId)
+          setManualAuditId(firstResult.auditId)
         }
       }
       return results

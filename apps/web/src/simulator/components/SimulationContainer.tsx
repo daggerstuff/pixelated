@@ -26,8 +26,9 @@ export function SimulationContainer({
   onBackToScenarios,
 }: SimulationContainerProps) {
   const [userResponse, setUserResponse] = useState<string>('')
-  const [isCompatible, setIsCompatible] = useState<boolean>(true)
-  const [compatibilityError, setCompatibilityError] = useState<string[]>([])
+  const [compatibility] = useState(() => checkBrowserCompatibility())
+  const isCompatible = compatibility.compatible
+  const compatibilityError = compatibility.missingFeatures
   const [autoScrollEnabled, setAutoScrollEnabled] = useState<boolean>(true)
   const [showTechniqueHighlights, setShowTechniqueHighlights] =
     useState<boolean>(true)
@@ -54,54 +55,54 @@ export function SimulationContainer({
     }>
   >([])
 
-  // Check browser compatibility on mount
-  useEffect(() => {
-    const { compatible, missingFeatures } = checkBrowserCompatibility()
-    setIsCompatible(compatible)
-    setCompatibilityError(missingFeatures)
-  }, [])
-
   // Start simulation when scenarioId changes
   useEffect(() => {
-    if (scenarioId) {
-      // Reset conversation
-      setConversation([])
-      setUserResponse('')
+    const startTimer = setTimeout(() => {
+      if (scenarioId) {
+        // Reset conversation
+        setConversation([])
+        setUserResponse('')
 
-      // Start new simulation
-      dispatch({ type: 'START_SIMULATION' })
+        // Start new simulation
+        dispatch({ type: 'START_SIMULATION' })
 
-      // Focus on response input after simulation starts
-      if (responseInputRef.current) {
-        responseInputRef.current.focus()
+        // Focus on response input after simulation starts
+        if (responseInputRef.current) {
+          responseInputRef.current.focus()
+        }
       }
-    }
+    }, 0)
 
     // Clean up on unmount
     return () => {
+      clearTimeout(startTimer)
       dispatch({ type: 'STOP_SIMULATION' })
     }
   }, [scenarioId, dispatch])
 
   // Add scenario information to conversation when scenarioId changes
   useEffect(() => {
-    if (scenarioId) {
-      setConversation((prev) => {
-        // Check if we already have the scenario information
-        if (prev.some((item) => item.type === 'scenario')) {
-          return prev
-        }
+    const scenarioTimer = setTimeout(() => {
+      if (scenarioId) {
+        setConversation((prev) => {
+          // Check if we already have the scenario information
+          if (prev.some((item) => item.type === 'scenario')) {
+            return prev
+          }
 
-        // Add scenario information
-        return [
-          {
-            type: 'scenario' as const,
-            content: `Scenario ${scenarioId} loaded`,
-            timestamp: Date.now(),
-          },
-        ]
-      })
-    }
+          // Add scenario information
+          return [
+            {
+              type: 'scenario' as const,
+              content: `Scenario ${scenarioId} loaded`,
+              timestamp: Date.now(),
+            },
+          ]
+        })
+      }
+    }, 0)
+
+    return () => clearTimeout(scenarioTimer)
   }, [scenarioId])
 
   // Auto-scroll to bottom of conversation when new messages arrive
@@ -113,47 +114,51 @@ export function SimulationContainer({
 
   // Add feedback to conversation when it arrives
   useEffect(() => {
-    if (realtimeFeedback.length > 0) {
-      const latestFeedback: RealTimeFeedback = realtimeFeedback[0]
+    const feedbackTimer = setTimeout(() => {
+      if (realtimeFeedback.length > 0) {
+        const latestFeedback: RealTimeFeedback = realtimeFeedback[0]
 
-      // Add feedback to conversation if it has content
-      let content = latestFeedback.suggestion
+        // Add feedback to conversation if it has content
+        let content = latestFeedback.suggestion
 
-      if (typeof latestFeedback.content === 'string') {
-        content = latestFeedback.content
-      }
-
-      setConversation((prev) => {
-        // Check if we've already added this feedback
-        if (
-          prev.some(
-            (item) =>
-              item.type === 'feedback' &&
-              item.timestamp === latestFeedback.timestamp,
-          )
-        ) {
-          return prev
+        if (typeof latestFeedback.content === 'string') {
+          content = latestFeedback.content
         }
 
-        return [
-          ...prev,
-          {
-            type: 'feedback',
-            content,
-            timestamp: latestFeedback.timestamp,
-          },
-        ]
-      })
+        setConversation((prev) => {
+          // Check if we've already added this feedback
+          if (
+            prev.some(
+              (item) =>
+                item.type === 'feedback' &&
+                item.timestamp === latestFeedback.timestamp,
+            )
+          ) {
+            return prev
+          }
 
-      // Update detected techniques if available
-      if (latestFeedback.suggestedTechnique) {
-        setDetectedTechniques((prev) =>
-          prev.includes(latestFeedback.suggestedTechnique!)
-            ? prev
-            : [...prev, latestFeedback.suggestedTechnique!],
-        )
+          return [
+            ...prev,
+            {
+              type: 'feedback',
+              content,
+              timestamp: latestFeedback.timestamp,
+            },
+          ]
+        })
+
+        // Update detected techniques if available
+        if (latestFeedback.suggestedTechnique) {
+          setDetectedTechniques((prev) =>
+            prev.includes(latestFeedback.suggestedTechnique!)
+              ? prev
+              : [...prev, latestFeedback.suggestedTechnique!],
+          )
+        }
       }
-    }
+    }, 0)
+
+    return () => clearTimeout(feedbackTimer)
   }, [realtimeFeedback])
 
   // Handle form submission

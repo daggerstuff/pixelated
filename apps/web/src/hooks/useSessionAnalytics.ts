@@ -47,9 +47,6 @@ export function useSessionAnalytics(
       return
     }
 
-    setIsLoading(true)
-    setError(null)
-
     // Async analytics retrieval (side effect, never blocking render)
     const fetchAllAnalytics = async () => {
       try {

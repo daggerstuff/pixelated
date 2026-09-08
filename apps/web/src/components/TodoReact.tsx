@@ -36,28 +36,26 @@ const parseTodoItems = (value: unknown): TodoItem[] | null => {
   return value.filter(isTodoItem)
 }
 
-export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
-  const [todos, setTodos] = useState<TodoItem[]>([])
-  const [inputValue, setInputValue] = useState('')
-
-  useEffect(() => {
-    const loadTodos = (): TodoItem[] => {
-      try {
-        const savedTodos = localStorage.getItem('todos')
-        if (!savedTodos) {
-          return initialTodos
-        }
-
-        const parsedTodos: unknown = JSON.parse(savedTodos)
-        return parseTodoItems(parsedTodos) ?? initialTodos
-      } catch (err: unknown) {
-        console.error('Error loading todos:', err)
-        return initialTodos
-      }
+const loadTodos = (initialTodos: TodoItem[]): TodoItem[] => {
+  try {
+    const savedTodos = localStorage.getItem('todos')
+    if (!savedTodos) {
+      return initialTodos
     }
 
-    setTodos(loadTodos())
-  }, [initialTodos])
+    const parsedTodos: unknown = JSON.parse(savedTodos)
+    return parseTodoItems(parsedTodos) ?? initialTodos
+  } catch (err: unknown) {
+    console.error('Error loading todos:', err)
+    return initialTodos
+  }
+}
+
+export function Todo({ title = 'Todo List', initialTodos = [] }: TodoProps) {
+  const [todos, setTodos] = useState<TodoItem[]>(() =>
+    loadTodos(initialTodos),
+  )
+  const [inputValue, setInputValue] = useState('')
 
   useEffect(() => {
     try {

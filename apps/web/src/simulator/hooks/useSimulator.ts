@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 
 import { getScenarioById } from '../data/scenarios'
 import type { SimulationFeedback, Scenario } from '../types'
@@ -30,15 +30,10 @@ export function useSimulator() {
   const [currentScenario, setCurrentScenario] = useState<Scenario | undefined>()
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [feedback, setFeedback] = useState<SimulationFeedback | undefined>()
-  const [metricsConsent, setMetricsConsentState] = useState<boolean>(
+  const [metricsConsent, setMetricsConsentState] = useState<boolean>(() =>
     getUserConsentPreference(),
   )
   const { updateMetrics } = useAnonymizedMetrics()
-
-  // Initialize metrics consent from localStorage on mount
-  useEffect(() => {
-    setMetricsConsentState(getUserConsentPreference())
-  }, [])
 
   // Update local storage when consent changes
   const setMetricsConsent = useCallback((consent: boolean) => {

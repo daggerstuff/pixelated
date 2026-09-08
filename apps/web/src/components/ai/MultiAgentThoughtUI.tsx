@@ -92,6 +92,15 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<Record<string, boolean>>({});
   const [correctionText, setCorrectionText] = useState<Record<string, string>>({});
   const [showCorrectionInput, setShowCorrectionInput] = useState<Record<string, boolean>>({});
+  const [lastAutoExpandedId, setLastAutoExpandedId] = useState<string | null>(null);
+
+  if (isLive && activities.length > 0) {
+    const lastActivity = activities[activities.length - 1];
+    if (lastActivity && lastActivity.id !== lastAutoExpandedId) {
+      setLastAutoExpandedId(lastActivity.id);
+      setExpandedItems(prev => prev[lastActivity.id] ? prev : { ...prev, [lastActivity.id]: true });
+    }
+  }
 
   const toggleExpand = (id: string) => {
     setExpandedItems(prev => ({ ...prev, [id]: !prev[id] }));
@@ -119,16 +128,6 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
       setIsSubmitting(prev => ({ ...prev, [activityId]: false }));
     }
   };
-
-  // Auto-expand new activities if live
-  useEffect(() => {
-    if (isLive && activities.length > 0) {
-      const lastActivity = activities[activities.length - 1];
-      if (lastActivity) {
-        setExpandedItems(prev => ({ ...prev, [lastActivity.id]: true }));
-      }
-    }
-  }, [activities.length, isLive]);
 
   return (
     <div className={cn("flex flex-col gap-4 p-4 rounded-xl border border-white/10 bg-black/40 backdrop-blur-md", className)}>

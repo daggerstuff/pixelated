@@ -31,6 +31,15 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
     () => offlineManager.getStatus().queueStats,
   )
   const [isVisible, setIsVisible] = React.useState(false)
+  const [previousAutoShow, setPreviousAutoShow] = React.useState<boolean | null>(
+    null,
+  )
+
+  const autoShow = networkState.isOffline || queueStats.total > 0
+  if (previousAutoShow !== autoShow) {
+    setPreviousAutoShow(autoShow)
+    setIsVisible(autoShow)
+  }
 
   // Update queue stats periodically
   React.useEffect(() => {
@@ -43,11 +52,6 @@ export const OfflineIndicator: FC<OfflineIndicatorProps> = ({
 
     return () => clearInterval(interval)
   }, [])
-
-  // Auto-show when offline or when there are pending requests
-  React.useEffect(() => {
-    setIsVisible(networkState.isOffline || queueStats.total > 0)
-  }, [networkState.isOffline, queueStats.total])
 
   // Listen to offline manager events
   React.useEffect(() => {

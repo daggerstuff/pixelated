@@ -22,25 +22,19 @@ export function AccessibilityAnnouncer({
   assertive = false,
   clearDelay = 1000,
 }: Message) {
-  const [currentMessage, setCurrentMessage] = useState('')
+  const [currentMessage, setCurrentMessage] = useState(message)
 
   useEffect(() => {
-    if (message) {
+    const showTimer = setTimeout(() => {
       setCurrentMessage(message)
-      if (clearDelay > 0) {
-        const timer = setTimeout(() => {
-          setCurrentMessage('')
-        }, clearDelay)
-        return () => clearTimeout(timer)
+      if (message && clearDelay > 0) {
+        const clearTimer = setTimeout(() => setCurrentMessage(''), clearDelay)
+        return () => clearTimeout(clearTimer)
       }
-      // If clearDelay is 0 or less, immediately clear the message for accessibility.
-      // This ensures screen readers do not announce stale or empty messages.
-      // See: https://www.w3.org/WAI/WCAG21/Techniques/aria/ARIA19 for best practices.
-    } else {
-      setCurrentMessage('') // Immediately clear message for accessibility when message is falsy
-    }
-    // Explicitly return undefined to satisfy TypeScript
-    return undefined
+      return undefined
+    }, 0)
+
+    return () => clearTimeout(showTimer)
   }, [message, clearDelay])
 
   return (

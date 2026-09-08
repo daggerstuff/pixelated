@@ -42,8 +42,8 @@
   --fm-accent-2: var(--np-mid, oklch(0.7 0 0));
   --fm-accent-3: var(--np-mid, oklch(0.7 0 0));
   --fm-danger: var(--np-text, oklch(0.93 0 0));
-  --fm-mono: 'IoskeleyMono', ui-monospace, monospace;
-  --fm-display: var(--np-font-display, 'IoskeleyMono', ui-monospace, monospace);
+  --fm-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --fm-display: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
   --fm-sans: var(
     --np-font-body,
     ui-sans-serif,

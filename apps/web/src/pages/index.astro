@@ -60,12 +60,11 @@ const buildableScenarios = [
 ---
 
 <BaseLayout title={hero.title} description={hero.metaDescription}>
-  <div class="np-page" data-palette="herdr">
+  <div class="np-page">
     <!-- Hero: content left, conversation demo right -->
     <section class="np-hero" aria-label="Platform overview">
       <div class="np-container np-hero__grid">
         <div class="np-hero__content">
-          <span class="np-hero__kicker np-data">{hero.kicker}</span>
           <h1 class="np-display np-hero__display">
             {heroTitleParts.before}<span class="np-mono-word"
               >{heroTitleParts.accent}</span
@@ -227,7 +226,6 @@ const buildableScenarios = [
     <section class="np-section np-section--track np-reveal">
       <div class="np-container">
         <div class="np-section-header np-section-header--track">
-          <span class="np-label">{workflow.label}</span>
           <h2 class="np-headline">{workflow.title}</h2>
         </div>
 
@@ -251,7 +249,6 @@ const buildableScenarios = [
     <section class="np-section np-section--artifact np-reveal">
       <div class="np-container">
         <div class="np-section-header">
-          <span class="np-label">A session, end to end</span>
           <h2 class="np-headline">
             One attempt. Four things your next meeting can teach from.
           </h2>
@@ -291,7 +288,6 @@ const buildableScenarios = [
         </ol>
 
         <div class="np-section-header np-section-header--spaced">
-          <span class="np-label">Scenarios your team can run today</span>
           <h2 class="np-headline">
             Start where the room gets hardest to hold.
           </h2>
@@ -347,7 +343,6 @@ const buildableScenarios = [
       <div class="np-container">
         <div class="np-cta-grid">
           <div class="np-cta-pitch">
-            <span class="np-label">{cta.label}</span>
             <h2 class="np-headline np-cta-pitch__title">{cta.title}</h2>
             <p class="np-body np-cta-pitch__body">{cta.intro}</p>
             <p class="np-cta__meta">{cta.meta}</p>

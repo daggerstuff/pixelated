@@ -25,23 +25,47 @@ export default function SearchBox({
 }: SearchBoxProps) {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
-  const [isSearching, setIsSearching] = useState(false)
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [isSearchReady, setIsSearchReady] = useState(false)
+  const [isSearchReady, setIsSearchReady] = useState(true)
   const [isOpen, setIsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
-  const [shortcutSymbol, setShortcutSymbol] = useState('Ctrl')
+  const [shortcutSymbol] = useState(() =>
+    typeof navigator !== 'undefined' &&
+    /Mac|iPod|iPhone|iPad/.test(navigator.userAgent)
+      ? '⌘'
+      : 'Ctrl',
+  )
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
 
   // ⚡ Bolt: Debounce query to prevent synchronous main thread blocking during rapid typing
   useEffect(() => {
-    setIsSearching(true)
     const timer = setTimeout(() => {
       setDebouncedQuery(query)
     }, 300)
     return () => clearTimeout(timer)
   }, [query])
+
+  const results = useMemo(() => {
+    if (!isSearchReady || debouncedQuery.length < minQueryLength) {
+      return []
+    }
+
+    try {
+      // Use the global search client
+      const searchResults = window.searchClient.search(debouncedQuery)
+
+      // Apply filtering after search
+      let limitedResults = searchResults
+      if (maxResults && searchResults.length > maxResults) {
+        limitedResults = searchResults.slice(0, maxResults)
+      }
+
+      return limitedResults
+    } catch (error: unknown) {
+      console.error('Search error:', error)
+      return []
+    }
+  }, [debouncedQuery, isSearchReady, maxResults, minQueryLength])
 
   // Track if the search is actually showing results
   const hasResults = useMemo(() => results.length > 0, [results])
@@ -50,13 +74,13 @@ export default function SearchBox({
     [isOpen, query, minQueryLength],
   )
 
+  const isSearching = query !== debouncedQuery
+
   // Initialize search when component mounts
   useEffect(() => {
     const handleSearchReady = () => {
       setIsSearchReady(true)
     }
-
-    setIsSearchReady(true)
 
     // Listen for search ready event
     window.addEventListener('search:ready', handleSearchReady)
@@ -73,16 +97,6 @@ export default function SearchBox({
     }
   }, [autoFocus])
 
-  // Detect OS for shortcut symbol
-  useEffect(() => {
-    if (
-      typeof navigator !== 'undefined' &&
-      /Mac|iPod|iPhone|iPad/.test(navigator.userAgent)
-    ) {
-      setShortcutSymbol('⌘')
-    }
-  }, [])
-
   // Handle global keyboard shortcut
   useEffect(() => {
     const handleGlobalKeyDown = (e: KeyboardEvent) => {
@@ -98,42 +112,11 @@ export default function SearchBox({
     }
   }, [])
 
-  // Reset active index when results change
   useEffect(() => {
-    setActiveIndex(-1)
-  }, [results])
-
-  // Handle searching when query changes
-  useEffect(() => {
-    if (!isSearchReady || debouncedQuery.length < minQueryLength) {
-      setResults([])
-      setIsSearching(false)
-      return
+    if (onSearch && results.length > 0) {
+      onSearch(debouncedQuery, results)
     }
-
-    try {
-      // Use the global search client
-      const searchResults = window.searchClient.search(debouncedQuery)
-
-      // Apply filtering after search
-      let limitedResults = searchResults
-      if (maxResults && searchResults.length > maxResults) {
-        limitedResults = searchResults.slice(0, maxResults)
-      }
-
-      setResults(limitedResults)
-
-      // Call onSearch callback if provided
-      if (onSearch) {
-        onSearch(debouncedQuery, limitedResults)
-      }
-    } catch (error: unknown) {
-      console.error('Search error:', error)
-      setResults([])
-    } finally {
-      setIsSearching(false)
-    }
-  }, [debouncedQuery, isSearchReady, maxResults, minQueryLength, onSearch])
+  }, [debouncedQuery, onSearch, results])
 
   // Close results when clicking outside
   useEffect(() => {
@@ -198,12 +181,14 @@ export default function SearchBox({
     const newQuery = e.target.value
     setQuery(newQuery)
     setIsOpen(newQuery.length > 0)
+    setActiveIndex(-1)
   }
 
   // Handle result click
   const handleResultClick = (result: SearchResult) => {
     setIsOpen(false)
     setQuery('')
+    setActiveIndex(-1)
 
     if (onResultClick) {
       onResultClick(result)

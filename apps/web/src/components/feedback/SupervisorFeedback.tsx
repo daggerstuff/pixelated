@@ -262,11 +262,15 @@ export function SupervisorFeedback({
 
   // Analyze therapist techniques when component mounts or therapist responses change
   useEffect(() => {
-    if (therapistResponses.length > 0) {
-      analyzeTechniques()
-      identifyMissedOpportunities()
-      generateFeedbackSummary()
-    }
+    const timer = window.setTimeout(() => {
+      if (therapistResponses.length > 0) {
+        analyzeTechniques()
+        identifyMissedOpportunities()
+        generateFeedbackSummary()
+      }
+    }, 0)
+
+    return () => window.clearTimeout(timer)
   }, [
     therapistResponses,
     sessionTranscript,

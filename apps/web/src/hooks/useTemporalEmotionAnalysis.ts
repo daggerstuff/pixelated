@@ -55,9 +55,6 @@ export function useTemporalEmotionAnalysis(
     }
 
     try {
-      setIsLoading(true)
-      setError(null)
-
       // Build query parameters
       const queryParams = new URLSearchParams()
       queryParams.append('includePatterns', includePatterns ? 'true' : 'false')
@@ -95,14 +92,26 @@ export function useTemporalEmotionAnalysis(
 
   // Fetch data on mount and when dependencies change
   useEffect(() => {
-    void fetchAnalysis()
+    if (sessionId) {
+      const fetchTimer = setTimeout(() => {
+        void fetchAnalysis()
+      }, 0)
+      return () => clearTimeout(fetchTimer)
+    }
+    return undefined
+  }, [fetchAnalysis])
+
+  const refetch = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    await fetchAnalysis()
   }, [fetchAnalysis])
 
   return {
     data,
     isLoading,
     error,
-    refetch: fetchAnalysis,
+    refetch,
   }
 }
 
@@ -136,9 +145,6 @@ export function useEmotionProgression(
     }
 
     try {
-      setIsLoading(true)
-      setError(null)
-
       // Build query parameters
       const queryParams = new URLSearchParams()
       queryParams.append('timeWindow', timeWindow.toString())
@@ -171,14 +177,26 @@ export function useEmotionProgression(
 
   // Fetch data on mount and when dependencies change
   useEffect(() => {
-    void fetchProgression()
+    if (clientId) {
+      const fetchTimer = setTimeout(() => {
+        void fetchProgression()
+      }, 0)
+      return () => clearTimeout(fetchTimer)
+    }
+    return undefined
+  }, [fetchProgression])
+
+  const refetchProgression = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    await fetchProgression()
   }, [fetchProgression])
 
   return {
     progression,
     isLoading,
     error,
-    refetch: fetchProgression,
+    refetch: refetchProgression,
   }
 }
 
@@ -212,9 +230,6 @@ export function useEmotionPatterns(
     }
 
     try {
-      setIsLoading(true)
-      setError(null)
-
       // Build query parameters
       const queryParams = new URLSearchParams()
       queryParams.append('timeWindow', timeWindow.toString())
@@ -248,13 +263,25 @@ export function useEmotionPatterns(
 
   // Fetch data on mount and when dependencies change
   useEffect(() => {
-    void fetchPatterns()
+    if (clientId) {
+      const fetchTimer = setTimeout(() => {
+        void fetchPatterns()
+      }, 0)
+      return () => clearTimeout(fetchTimer)
+    }
+    return undefined
+  }, [fetchPatterns])
+
+  const refetchPatterns = useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    await fetchPatterns()
   }, [fetchPatterns])
 
   return {
     patterns,
     isLoading,
     error,
-    refetch: fetchPatterns,
+    refetch: refetchPatterns,
   }
 }

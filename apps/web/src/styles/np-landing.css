@@ -59,9 +59,9 @@
   flex-shrink: 0;
 }
 
-/* === Display / Headings — Pure Monospace Technical Instrument.
-   IoskeleyMono carries the full hierarchy through weight,
-   size, and tracking alone — no serif display, no soft sans.
+/* === Display / Headings — The Quiet Instrument.
+   Fraunces Variable carries display hierarchy through weight, size, and
+   tracking alone. Public Sans carries titles; JetBrains Mono carries data.
    The hero headline's accent word is emphasized by weight, not font swap. === */
 .np-display {
   font-family: var(--np-font-display);
@@ -93,11 +93,11 @@
 }
 
 .np-title {
-  font-family: var(--np-font-display);
-  font-weight: var(--np-weight-title, 700);
+  font-family: var(--np-font-body);
+  font-weight: var(--np-weight-title, 600);
   font-size: var(--np-text-title, 1.125rem);
   line-height: var(--np-leading-title, 1.2);
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
   margin: 0;
 }
 
@@ -242,17 +242,9 @@
   text-align: left;
 }
 
-.np-hero__kicker {
-  font-family: var(--np-font-mono);
-  margin-bottom: 0;
-  font-size: var(--np-text-caption, 0.6875rem);
-  letter-spacing: 0.08em;
-  color: var(--np-mid);
-}
-
 .np-hero__display {
   max-width: 16ch;
-  margin-top: 16px;
+  margin-top: 0;
   text-wrap: balance;
 }
 
@@ -273,43 +265,6 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   margin-top: 28px;
-}
-
-/* Product screenshot — the focal anchor that takes focus off the type
-   Retired: replaced by inline chat demo. Keeping .np-hero__artifact for
-   backward compat, unused in production. */
-.np-hero__artifact {
-  display: none;
-}
-
-.np-hero__art {
-  margin: 0;
-}
-
-.np-hero__art img {
-  display: block;
-  width: 100%;
-  max-width: 960px;
-  margin: 0 auto;
-  height: auto;
-  border: 1px solid var(--np-line);
-  outline: 1px solid var(--np-line);
-  outline-offset: -1px;
-}
-
-.np-hero__art-cap {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  justify-content: center;
-  margin-top: 16px;
-  text-align: center;
-  color: var(--np-muted);
-}
-
-.np-hero__art-cap .np-mono {
-  font-size: 0.8125rem;
-  text-wrap: balance;
 }
 
 /* === Chat demo — raw transcript showcase, no bubbles === */

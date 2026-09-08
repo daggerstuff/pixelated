@@ -112,7 +112,11 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
   }, [userId, showPendingOnly])
 
   useEffect(() => {
-    void loadFlags()
+    const initialLoad = window.setTimeout(() => {
+      void loadFlags()
+    }, 0)
+
+    return () => window.clearTimeout(initialLoad)
   }, [loadFlags])
 
   const updateFlagStatus = async (

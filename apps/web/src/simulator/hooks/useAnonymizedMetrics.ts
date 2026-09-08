@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
 import { TherapeuticTechnique } from '../types'
 
@@ -47,6 +47,45 @@ function isPersistedMetrics(value: unknown): value is PersistedMetrics {
   )
 }
 
+function createInitialMetrics(): PersistedMetrics {
+  try {
+    const storedMetrics = localStorage.getItem(METRICS_STORAGE_KEY)
+
+    if (storedMetrics) {
+      const parsedMetrics: unknown = JSON.parse(storedMetrics)
+      if (isPersistedMetrics(parsedMetrics)) {
+        return parsedMetrics
+      }
+    }
+
+    const demoMetrics: PersistedMetrics = {
+      sessionCount: 12,
+      averageScore: 75,
+      skillsImproving: [
+        formatTechniqueName(TherapeuticTechnique.REFLECTIVE_STATEMENTS),
+        formatTechniqueName(TherapeuticTechnique.OPEN_ENDED_QUESTIONS),
+      ],
+      skillsNeeding: [
+        formatTechniqueName(TherapeuticTechnique.COGNITIVE_RESTRUCTURING),
+        formatTechniqueName(TherapeuticTechnique.MINDFULNESS),
+      ],
+      lastSessionDate: Date.now() - 24 * 60 * 60 * 1000,
+    }
+
+    localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(demoMetrics))
+    return demoMetrics
+  } catch (error: unknown) {
+    console.error('Failed to load metrics from localStorage:', error)
+    return {
+      sessionCount: 0,
+      averageScore: 0,
+      skillsImproving: [],
+      skillsNeeding: [],
+      lastSessionDate: null,
+    }
+  }
+}
+
 /**
  * Simplified hook for anonymized metrics that provides data for the MetricsDialog.
  *
@@ -59,49 +98,9 @@ function isPersistedMetrics(value: unknown): value is PersistedMetrics {
  * @returns {SimpleMetrics} An object containing the simplified metrics and an update function.
  */
 export function useAnonymizedMetrics(): SimpleMetrics {
-  const [metrics, setMetrics] = useState<Omit<SimpleMetrics, 'updateMetrics'>>({
-    sessionCount: 0,
-    averageScore: 0,
-    skillsImproving: [],
-    skillsNeeding: [],
-    lastSessionDate: null,
-  })
-
-  // Load metrics from localStorage on mount
-  useEffect(() => {
-    try {
-      const storedMetrics = localStorage.getItem(METRICS_STORAGE_KEY)
-
-      if (storedMetrics) {
-        // Use stored metrics if available
-        const parsedMetrics: unknown = JSON.parse(storedMetrics)
-        if (isPersistedMetrics(parsedMetrics)) {
-          setMetrics(parsedMetrics)
-        }
-      } else {
-        // Generate demo data for first-time users
-        const demoMetrics = {
-          sessionCount: 12,
-          averageScore: 75,
-          skillsImproving: [
-            formatTechniqueName(TherapeuticTechnique.REFLECTIVE_STATEMENTS),
-            formatTechniqueName(TherapeuticTechnique.OPEN_ENDED_QUESTIONS),
-          ],
-          skillsNeeding: [
-            formatTechniqueName(TherapeuticTechnique.COGNITIVE_RESTRUCTURING),
-            formatTechniqueName(TherapeuticTechnique.MINDFULNESS),
-          ],
-          lastSessionDate: Date.now() - 24 * 60 * 60 * 1000, // 1 day ago
-        }
-
-        setMetrics(demoMetrics)
-        localStorage.setItem(METRICS_STORAGE_KEY, JSON.stringify(demoMetrics))
-      }
-    } catch (error: unknown) {
-      console.error('Failed to load metrics from localStorage:', error)
-      // Fall back to default empty metrics
-    }
-  }, [])
+  const [metrics, setMetrics] = useState<PersistedMetrics>(() =>
+    createInitialMetrics(),
+  )
 
   // Update metrics based on events
   const updateMetrics = useCallback((event: MetricsEvent) => {

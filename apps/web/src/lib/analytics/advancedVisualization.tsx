@@ -63,7 +63,9 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
   onInsightGenerated,
   className = '',
 }) => {
-  const [insights, setInsights] = React.useState<AnalyticsInsight[]>([])
+  const [subsetInsights, setSubsetInsights] = React.useState<
+    AnalyticsInsight[]
+  >([])
   const [selectedDataPoints, setSelectedDataPoints] = React.useState<
     DataPoint[]
   >([])
@@ -71,10 +73,14 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
     'overview' | 'detailed' | 'comparative'
   >('overview')
 
+  const insights = React.useMemo(
+    () => [...generateInsights(data, config), ...subsetInsights],
+    [config, data, subsetInsights],
+  )
+
   // Generate insights based on data analysis
   React.useEffect(() => {
     const generatedInsights = generateInsights(data, config)
-    setInsights(generatedInsights)
     if (onInsightGenerated) {
       generatedInsights.forEach(onInsightGenerated)
     }
@@ -85,7 +91,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
     // Generate insights for selected subset
     if (points.length > 0) {
       const subsetInsights = generateInsights(points, config)
-      setInsights((prev) => [...prev, ...subsetInsights])
+      setSubsetInsights((prev) => [...prev, ...subsetInsights])
     }
   }
 
