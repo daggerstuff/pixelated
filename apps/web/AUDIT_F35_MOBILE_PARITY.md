@@ -14,18 +14,18 @@ The EHR Mobile Parity Hardening (F3.5) extends the desktop EHR portal to support
 full mobile usage with offline capabilities. The following table maps desktop
 features to their mobile equivalents.
 
-| Feature                | Desktop Component              | Mobile Component               | Offline Support | Parity Status |
-| ---------------------- | ------------------------------ | ------------------------------ | --------------- | ------------- |
-| **Layout**             | Desktop portal layout          | `EHRMobileLayout`               | N/A             | ✅ Parity     |
-| **Note Drafting**      | Desktop note editor            | `ModalityNoteEditor`            | Draft → Sync    | ✅ Parity     |
-| **Scheduling**         | `SchedulingWidget`             | `MobileScheduleView`            | Queue → Sync    | ✅ Parity     |
-| **Messaging**          | `MessagingWidget`              | `MessagingWidget` (offline)     | Queue → Sync    | ✅ Parity     |
-| **Outcomes**           | Desktop outcomes form          | Offline sync service            | Queue → Sync    | ✅ Parity     |
-| **Sync Engine**        | N/A                            | `OfflineSyncService`            | Full offline    | ✅ New        |
-| **PWA Install**        | N/A                            | `manifest.json` + `sw.js`       | N/A             | ✅ New        |
-| **Bottom Navigation**  | Top nav bar                    | Fixed bottom nav (56px)         | N/A             | ✅ Parity     |
-| **Touch Targets**      | Mouse/click                    | ≥44px all interactive           | N/A             | ✅ New        |
-| **Horizontal Scroll**  | Responsive grid                | `overflow-x-hidden` enforced    | N/A             | ✅ New        |
+| Feature               | Desktop Component     | Mobile Component             | Offline Support | Parity Status |
+| --------------------- | --------------------- | ---------------------------- | --------------- | ------------- |
+| **Layout**            | Desktop portal layout | `EHRMobileLayout`            | N/A             | ✅ Parity     |
+| **Note Drafting**     | Desktop note editor   | `ModalityNoteEditor`         | Draft → Sync    | ✅ Parity     |
+| **Scheduling**        | `SchedulingWidget`    | `MobileScheduleView`         | Queue → Sync    | ✅ Parity     |
+| **Messaging**         | `MessagingWidget`     | `MessagingWidget` (offline)  | Queue → Sync    | ✅ Parity     |
+| **Outcomes**          | Desktop outcomes form | Offline sync service         | Queue → Sync    | ✅ Parity     |
+| **Sync Engine**       | N/A                   | `OfflineSyncService`         | Full offline    | ✅ New        |
+| **PWA Install**       | N/A                   | `manifest.json` + `sw.js`    | N/A             | ✅ New        |
+| **Bottom Navigation** | Top nav bar           | Fixed bottom nav (56px)      | N/A             | ✅ Parity     |
+| **Touch Targets**     | Mouse/click           | ≥44px all interactive        | N/A             | ✅ New        |
+| **Horizontal Scroll** | Responsive grid       | `overflow-x-hidden` enforced | N/A             | ✅ New        |
 
 ### Offline Sync Architecture
 
@@ -41,15 +41,15 @@ engine supporting four item types:
 
 ### API Endpoints (Offline Sync Targets)
 
-| Item Type   | Endpoint                                       | Method |
-| ----------- | ---------------------------------------------- | ------ |
-| Notes       | `/api/ehr/v1/notes`                             | POST   |
-| Scheduling  | `/api/portal/v1/scheduling`                     | POST   |
-| Scheduling  | `/api/portal/v1/scheduling/{id}/cancel`         | POST   |
-| Scheduling  | `/api/portal/v1/scheduling/{id}/reschedule`     | POST   |
-| Messaging   | `/api/portal/v1/messaging`                      | POST   |
-| Messaging   | `/api/portal/v1/messaging/{threadId}`           | POST   |
-| Outcomes    | `/api/portal/v1/outcomes`                       | POST   |
+| Item Type  | Endpoint                                    | Method |
+| ---------- | ------------------------------------------- | ------ |
+| Notes      | `/api/ehr/v1/notes`                         | POST   |
+| Scheduling | `/api/portal/v1/scheduling`                 | POST   |
+| Scheduling | `/api/portal/v1/scheduling/{id}/cancel`     | POST   |
+| Scheduling | `/api/portal/v1/scheduling/{id}/reschedule` | POST   |
+| Messaging  | `/api/portal/v1/messaging`                  | POST   |
+| Messaging  | `/api/portal/v1/messaging/{threadId}`       | POST   |
+| Outcomes   | `/api/portal/v1/outcomes`                   | POST   |
 
 ### Storage & Security
 
@@ -61,6 +61,7 @@ engine supporting four item types:
 ### Service Worker
 
 `sw.js` (173 lines) provides:
+
 - Cache versioning via `__SW_VERSION__` placeholder
 - **Static assets**: CacheFirst strategy
 - **API routes**: StaleWhileRevalidate (non-PHI routes only)
@@ -73,57 +74,58 @@ engine supporting four item types:
 
 ### EHRMobileLayout (174 lines)
 
-| WCAG Criterion        | Implementation                         | Status |
-| --------------------- | ------------------------------------- | ------ |
-| **1.3.1 Info & Rel**  | Semantic `<nav>`, `<aside>`, `<main>` | ✅     |
-| **1.4.3 Contrast**   | CSS vars `--np-text`, `--np-muted`    | ✅     |
-| **1.4.10 Reflow**     | `overflow-x-hidden` on containers     | ✅     |
-| **1.4.11 Non-text**   | Borders use `--np-line` color         | ✅     |
-| **2.1.1 Keyboard**    | All interactive elements focusable     | ✅     |
-| **2.4.1 Bypass**      | `aria-label` on `<nav>` and `<aside>`  | ✅     |
-| **2.4.7 Focus Visible** | Default focus rings preserved        | ✅     |
-| **4.1.2 Name/Role/Val** | `aria-label` on all controls         | ✅     |
+| WCAG Criterion          | Implementation                        | Status |
+| ----------------------- | ------------------------------------- | ------ |
+| **1.3.1 Info & Rel**    | Semantic `<nav>`, `<aside>`, `<main>` | ✅     |
+| **1.4.3 Contrast**      | CSS vars `--np-text`, `--np-muted`    | ✅     |
+| **1.4.10 Reflow**       | `overflow-x-hidden` on containers     | ✅     |
+| **1.4.11 Non-text**     | Borders use `--np-line` color         | ✅     |
+| **2.1.1 Keyboard**      | All interactive elements focusable    | ✅     |
+| **2.4.1 Bypass**        | `aria-label` on `<nav>` and `<aside>` | ✅     |
+| **2.4.7 Focus Visible** | Default focus rings preserved         | ✅     |
+| **4.1.2 Name/Role/Val** | `aria-label` on all controls          | ✅     |
 
 ### ModalityNoteEditor (430 lines)
 
-| WCAG Criterion        | Implementation                              | Status |
-| --------------------- | ------------------------------------------ | ------ |
+| WCAG Criterion        | Implementation                               | Status |
+| --------------------- | -------------------------------------------- | ------ |
 | **1.3.1 Info & Rel**  | `aria-expanded`, `aria-controls` on sections | ✅     |
-| **1.4.3 Contrast**    | Status indicators use themed colors         | ✅     |
-| **2.1.1 Keyboard**    | All inputs, selects, buttons focusable      | ✅     |
-| **2.1.2 No Trap**     | Collapsible sections don't trap focus       | ✅     |
-| **2.4.6 Headings**     | `aria-labelledby` on sections               | ✅     |
-| **3.2.1 On Focus**    | No context change on focus                  | ✅     |
-| **3.3.1 Error Ident** | `role="alert"` on conflict messages        | ✅     |
-| **3.3.2 Labels**      | `aria-label` on save button                 | ✅     |
-| **4.1.2 Name/Role**   | `aria-label` on all buttons                 | ✅     |
-| **4.1.3 Status Msgs** | `role="alert"` for conflict notifications  | ✅     |
+| **1.4.3 Contrast**    | Status indicators use themed colors          | ✅     |
+| **2.1.1 Keyboard**    | All inputs, selects, buttons focusable       | ✅     |
+| **2.1.2 No Trap**     | Collapsible sections don't trap focus        | ✅     |
+| **2.4.6 Headings**    | `aria-labelledby` on sections                | ✅     |
+| **3.2.1 On Focus**    | No context change on focus                   | ✅     |
+| **3.3.1 Error Ident** | `role="alert"` on conflict messages          | ✅     |
+| **3.3.2 Labels**      | `aria-label` on save button                  | ✅     |
+| **4.1.2 Name/Role**   | `aria-label` on all buttons                  | ✅     |
+| **4.1.3 Status Msgs** | `role="alert"` for conflict notifications    | ✅     |
 
 ### MobileScheduleView (529 lines)
 
-| WCAG Criterion        | Implementation                              | Status |
-| --------------------- | ------------------------------------------ | ------ |
-| **1.3.1 Info & Rel**  | Semantic list structure for appointments    | ✅     |
-| **2.1.1 Keyboard**    | All buttons, filters focusable             | ✅     |
-| **2.4.6 Headings**     | `aria-labelledby` on booking dialog         | ✅     |
-| **3.2.1 On Focus**    | Filter chips use `aria-pressed`             | ✅     |
-| **3.3.1 Error Ident** | Conflict states surfaced via status text    | ✅     |
-| **4.1.2 Name/Role**   | `aria-label` on all action buttons          | ✅     |
-| **4.1.2 Dialog**      | `role="dialog"`, `aria-modal="true"`       | ✅     |
+| WCAG Criterion        | Implementation                           | Status |
+| --------------------- | ---------------------------------------- | ------ |
+| **1.3.1 Info & Rel**  | Semantic list structure for appointments | ✅     |
+| **2.1.1 Keyboard**    | All buttons, filters focusable           | ✅     |
+| **2.4.6 Headings**    | `aria-labelledby` on booking dialog      | ✅     |
+| **3.2.1 On Focus**    | Filter chips use `aria-pressed`          | ✅     |
+| **3.3.1 Error Ident** | Conflict states surfaced via status text | ✅     |
+| **4.1.2 Name/Role**   | `aria-label` on all action buttons       | ✅     |
+| **4.1.2 Dialog**      | `role="dialog"`, `aria-modal="true"`     | ✅     |
 
 ### MessagingWidget (686 lines)
 
-| WCAG Criterion        | Implementation                         | Status |
-| --------------------- | ------------------------------------- | ------ |
-| **1.3.1 Info & Rel**  | Semantic message list structure        | ✅     |
-| **2.1.1 Keyboard**    | All inputs, send button focusable      | ✅     |
-| **3.2.1 On Focus**    | No context change on focus             | ✅     |
-| **4.1.2 Name/Role**   | `aria-label` on send control            | ✅     |
+| WCAG Criterion       | Implementation                    | Status |
+| -------------------- | --------------------------------- | ------ |
+| **1.3.1 Info & Rel** | Semantic message list structure   | ✅     |
+| **2.1.1 Keyboard**   | All inputs, send button focusable | ✅     |
+| **3.2.1 On Focus**   | No context change on focus        | ✅     |
+| **4.1.2 Name/Role**  | `aria-label` on send control      | ✅     |
 
 ### Touch Target Compliance
 
 All interactive elements meet the WCAG 2.5.5 (Level AAA) / 2.5.8 (Level AA)
 target size minimum of 44×44 CSS pixels:
+
 - Bottom navigation bar: 56px height
 - Save/sync buttons: `min-h-[44px]`
 - Filter chips: `min-h-[44px]`
@@ -135,14 +137,14 @@ target size minimum of 44×44 CSS pixels:
 
 ### Mobile Performance Budgets
 
-| Metric  | Target        | Verification Method                        |
-| ------- | ------------- | ----------------------------------------- |
-| **LCP** | < 2.5s        | Lighthouse mobile audit (P75)             |
-| **INP** | < 200ms       | Lighthouse mobile audit + field data      |
-| **CLS** | < 0.1         | Lighthouse mobile audit                   |
-| **FCP** | < 1.8s        | Lighthouse mobile audit                   |
-| **TBT** | < 200ms       | Lighthouse mobile audit                   |
-| **SI**  | < 3.4s        | Lighthouse mobile audit                   |
+| Metric  | Target  | Verification Method                  |
+| ------- | ------- | ------------------------------------ |
+| **LCP** | < 2.5s  | Lighthouse mobile audit (P75)        |
+| **INP** | < 200ms | Lighthouse mobile audit + field data |
+| **CLS** | < 0.1   | Lighthouse mobile audit              |
+| **FCP** | < 1.8s  | Lighthouse mobile audit              |
+| **TBT** | < 200ms | Lighthouse mobile audit              |
+| **SI**  | < 3.4s  | Lighthouse mobile audit              |
 
 ### Verification Approach
 
@@ -161,18 +163,18 @@ target size minimum of 44×44 CSS pixels:
 
 ### PWA Installability Checklist
 
-| Requirement                  | Status | Implementation                    |
-| ---------------------------- | ------ | --------------------------------- |
-| Web App Manifest              | ✅     | `apps/web/public/manifest.json`   |
-| Service Worker               | ✅     | `apps/web/public/sw.js`           |
-| HTTPS (or localhost)         | ✅     | Production deployment via HTTPS   |
-| Icons (192px + 512px)        | ✅     | Referenced in manifest            |
-| `display: standalone`        | ✅     | Set in manifest                   |
-| `start_url`                  | ✅     | Set to `/`                        |
-| `theme_color`                | ✅     | `#1e293b`                         |
-| `background_color`            | ✅     | `#0f172a`                         |
-| `short_name` (≤12 chars)     | ✅     | `Pixelated`                        |
-| Offline fallback page        | ✅     | SW NetworkFirst with cache        |
+| Requirement              | Status | Implementation                  |
+| ------------------------ | ------ | ------------------------------- |
+| Web App Manifest         | ✅     | `apps/web/public/manifest.json` |
+| Service Worker           | ✅     | `apps/web/public/sw.js`         |
+| HTTPS (or localhost)     | ✅     | Production deployment via HTTPS |
+| Icons (192px + 512px)    | ✅     | Referenced in manifest          |
+| `display: standalone`    | ✅     | Set in manifest                 |
+| `start_url`              | ✅     | Set to `/`                      |
+| `theme_color`            | ✅     | `#1e293b`                       |
+| `background_color`       | ✅     | `#0f172a`                       |
+| `short_name` (≤12 chars) | ✅     | `Pixelated`                     |
+| Offline fallback page    | ✅     | SW NetworkFirst with cache      |
 
 ---
 
@@ -181,6 +183,7 @@ target size minimum of 44×44 CSS pixels:
 ### Unit Tests (Vitest)
 
 `offline-sync.service.test.ts` (447 lines, 17 tests):
+
 - ✅ Draft note queueing and version increment
 - ✅ Draft note list filtering and deletion
 - ✅ Conflict resolution (client-wins, server-wins, manual)
@@ -194,6 +197,7 @@ target size minimum of 44×44 CSS pixels:
 ### E2E Tests (Playwright)
 
 `tests/e2e/ehr/mobile-parity.spec.ts` (16 tests across 2 viewports):
+
 - ✅ PWA manifest served and valid
 - ✅ Service worker accessible
 - ✅ Mobile EHR layout renders with bottom navigation

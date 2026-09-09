@@ -214,6 +214,8 @@ export function MessagingWidget() {
         })
         setMessageBody('')
         setQueuedMessages(offlineSyncService.getQueuedMessages())
+      } else if (err instanceof Error) {
+        setError(err.message)
       }
     } finally {
       setSendingMessage(false)
