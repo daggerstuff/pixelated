@@ -39,18 +39,5 @@ jobs:
           sudo mv /tmp/eksctl /usr/local/bin/eksctl
           eksctl version
 
-      - name: Grant temporary EKS bootstrap permissions
-        run: |
-          ROLE_NAME="pixelated-empathy-github-actions"
-          POLICY_ARN="arn:aws:iam::aws:policy/AdministratorAccess"
-          aws iam attach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN"
-
       - name: Create EKS cluster
         run: eksctl create cluster -f infra/aws/eksctl/pixelated-eks.yaml --timeout 60m
-
-      - name: Revoke temporary EKS bootstrap permissions
-        if: always()
-        run: |
-          ROLE_NAME="pixelated-empathy-github-actions"
-          POLICY_ARN="arn:aws:iam::aws:policy/AdministratorAccess"
-          aws iam detach-role-policy --role-name "$ROLE_NAME" --policy-arn "$POLICY_ARN" || true
