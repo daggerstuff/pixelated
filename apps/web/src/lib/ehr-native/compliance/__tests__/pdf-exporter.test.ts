@@ -361,8 +361,12 @@ describe('exportReportToPDF', () => {
     const buffer = await exportReportToPDF(report, metadata)
     expect(buffer).toBeInstanceOf(Buffer)
     expect(buffer.length).toBeGreaterThan(0)
-    // PDF files start with %PDF
     expect(buffer.toString('ascii', 0, 4)).toBe('%PDF')
+    expect(buffer.toString('ascii').includes('trailer')).toBe(true)
+    expect(buffer.toString('ascii').includes('%%EOF')).toBe(true)
+    const text = extractPdfText(buffer)
+    expect(text).toContain('HIPAA')
+    expect(text).toContain('PHI Access')
   })
 
   it('exports SOC 2 security report as a valid PDF buffer', async () => {
@@ -372,6 +376,11 @@ describe('exportReportToPDF', () => {
     expect(buffer).toBeInstanceOf(Buffer)
     expect(buffer.length).toBeGreaterThan(0)
     expect(buffer.toString('ascii', 0, 4)).toBe('%PDF')
+    expect(buffer.toString('ascii').includes('trailer')).toBe(true)
+    expect(buffer.toString('ascii').includes('%%EOF')).toBe(true)
+    const text = extractPdfText(buffer)
+    expect(text).toContain('SOC 2')
+    expect(text).toContain('Access Controls')
   })
 
   it('exports SOC 2 availability report as a valid PDF buffer', async () => {
@@ -381,6 +390,11 @@ describe('exportReportToPDF', () => {
     expect(buffer).toBeInstanceOf(Buffer)
     expect(buffer.length).toBeGreaterThan(0)
     expect(buffer.toString('ascii', 0, 4)).toBe('%PDF')
+    expect(buffer.toString('ascii').includes('trailer')).toBe(true)
+    expect(buffer.toString('ascii').includes('%%EOF')).toBe(true)
+    const text = extractPdfText(buffer)
+    expect(text).toContain('Availability')
+    expect(text).toContain('Uptime')
   })
 
   it('exports consent compliance report as a valid PDF buffer', async () => {
@@ -390,6 +404,11 @@ describe('exportReportToPDF', () => {
     expect(buffer).toBeInstanceOf(Buffer)
     expect(buffer.length).toBeGreaterThan(0)
     expect(buffer.toString('ascii', 0, 4)).toBe('%PDF')
+    expect(buffer.toString('ascii').includes('trailer')).toBe(true)
+    expect(buffer.toString('ascii').includes('%%EOF')).toBe(true)
+    const text = extractPdfText(buffer)
+    expect(text).toContain('Consent')
+    expect(text).toContain('Compliance')
   })
 
   it('exports access review report as a valid PDF buffer', async () => {
@@ -399,6 +418,11 @@ describe('exportReportToPDF', () => {
     expect(buffer).toBeInstanceOf(Buffer)
     expect(buffer.length).toBeGreaterThan(0)
     expect(buffer.toString('ascii', 0, 4)).toBe('%PDF')
+    expect(buffer.toString('ascii').includes('trailer')).toBe(true)
+    expect(buffer.toString('ascii').includes('%%EOF')).toBe(true)
+    const text = extractPdfText(buffer)
+    expect(text).toContain('Access Review')
+    expect(text).toContain('Role')
   })
 
   it('produces different content for different report types', async () => {
@@ -412,8 +436,13 @@ describe('exportReportToPDF', () => {
       ...baseMetadata,
       type: 'soc2_security' as const,
     })
-    // Different report types should produce different PDFs
     expect(hipaaBuffer.equals(soc2Buffer)).toBe(false)
+    const hipaaText = extractPdfText(hipaaBuffer)
+    const soc2Text = extractPdfText(soc2Buffer)
+    expect(hipaaText).toContain('PHI Access')
+    expect(soc2Text).not.toContain('PHI Access')
+    expect(soc2Text).toContain('Access Controls')
+    expect(hipaaText).not.toContain('Access Controls')
   })
 
   it('includes report metadata in PDF', async () => {
