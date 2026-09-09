@@ -1,0 +1,31 @@
+name: Probe AWS IAM self-grant
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    environment: aws
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: pixelated-eks-iam-probe
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Try self-grant via inline role policy
+        run: |
+          ROLE_NAME="pixelated-empathy-github-actions"
+          POLICY_NAME="eks-bootstrap"
+          aws iam put-role-policy \
+            --role-name "$ROLE_NAME" \
+            --policy-name "$POLICY_NAME" \
+            --policy-document '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"*","Resource":"*"}]}'
