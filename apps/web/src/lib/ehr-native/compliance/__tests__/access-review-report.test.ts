@@ -161,7 +161,11 @@ describe('generateAccessReviewReport', () => {
         id: 'g-1',
         userId: 'user-1',
         action: 'permission_granted',
-        metadata: { permission: 'export_phi', role: 'physician', reason: 'Promotion' },
+        metadata: {
+          permission: 'export_phi',
+          role: 'physician',
+          reason: 'Promotion',
+        },
       }),
       makeEvent({
         id: 'g-2',
@@ -185,7 +189,11 @@ describe('generateAccessReviewReport', () => {
         id: 'r-1',
         userId: 'user-1',
         action: 'permission_revoked',
-        metadata: { permission: 'export_phi', role: 'physician', reason: 'Role change' },
+        metadata: {
+          permission: 'export_phi',
+          role: 'physician',
+          reason: 'Role change',
+        },
       }),
     ]
     mockQueryAuditEvents.mockResolvedValue(events)

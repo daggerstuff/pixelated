@@ -146,13 +146,21 @@ describe('generateSOC2SecurityReport', () => {
         id: 'sec-1',
         action: 'security_breach',
         severity: AuditSeverity.CRITICAL,
-        metadata: { incidentType: 'breach', description: 'Data breach', resolved: false },
+        metadata: {
+          incidentType: 'breach',
+          description: 'Data breach',
+          resolved: false,
+        },
       }),
       makeEvent({
         id: 'sec-2',
         action: 'security_incident',
         severity: AuditSeverity.HIGH,
-        metadata: { incidentType: 'intrusion', description: 'Intrusion attempt', resolved: true },
+        metadata: {
+          incidentType: 'intrusion',
+          description: 'Intrusion attempt',
+          resolved: true,
+        },
       }),
     ]
     mockQueryAuditEvents.mockResolvedValue(events)

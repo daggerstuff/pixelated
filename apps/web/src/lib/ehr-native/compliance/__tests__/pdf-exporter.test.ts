@@ -6,8 +6,9 @@
 
 // @vitest-environment node
 
-import { describe, it, expect } from 'vitest'
 import zlib from 'node:zlib'
+
+import { describe, it, expect } from 'vitest'
 
 import { exportReportToPDF } from '../export/pdf-exporter'
 import type {
@@ -112,7 +113,11 @@ function makeSOC2SecurityReport(): SOC2SecurityReport {
     accessControls: {
       totalUsers: 5,
       roleAssignments: [
-        { role: 'physician', count: 2, permissions: ['read_patient', 'write_patient'] },
+        {
+          role: 'physician',
+          count: 2,
+          permissions: ['read_patient', 'write_patient'],
+        },
         { role: 'nurse', count: 3, permissions: ['read_patient'] },
       ],
       permissionGrants: 4,
@@ -124,7 +129,8 @@ function makeSOC2SecurityReport(): SOC2SecurityReport {
       dataInTransit: true,
       dataAtRest: true,
       auditLogHashing: true,
-      algorithm: 'SHA-256 (audit chain), AES-256 (data at rest), TLS 1.3 (transit)',
+      algorithm:
+        'SHA-256 (audit chain), AES-256 (data at rest), TLS 1.3 (transit)',
     },
     incidents: [
       {
@@ -321,7 +327,9 @@ function extractPdfText(buffer: Buffer): string {
     if (streamEnd === -1) break
 
     try {
-      const decompressed = zlib.inflateSync(buffer.subarray(dataStart, streamEnd))
+      const decompressed = zlib.inflateSync(
+        buffer.subarray(dataStart, streamEnd),
+      )
       const content = decompressed.toString('latin1')
       const hexMatches = content.match(/<([0-9A-Fa-f]+)>/g)
       if (hexMatches) {
