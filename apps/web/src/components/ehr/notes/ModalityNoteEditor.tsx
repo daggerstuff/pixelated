@@ -86,6 +86,7 @@ export function ModalityNoteEditor({
     noteTemplateService.listTemplates()[0]
   const allTemplates = noteTemplateService.listTemplates()
   const autosaveTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const docStatusRef = useRef(docStatus)
 
   // Network listeners
   useEffect(() => {
@@ -112,6 +113,15 @@ export function ModalityNoteEditor({
       }
     }
   }, [draftId])
+
+  // Cancel pending autosave when docStatus changes to prevent stale save
+  useEffect(() => {
+    docStatusRef.current = docStatus
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current)
+      autosaveTimerRef.current = null
+    }
+  }, [docStatus])
 
   // Autosave callback
   const saveDraft = useCallback(
@@ -151,7 +161,7 @@ export function ModalityNoteEditor({
       clearTimeout(autosaveTimerRef.current)
     }
     autosaveTimerRef.current = setTimeout(() => {
-      void saveDraft(updated, docStatus)
+      void saveDraft(updated, docStatusRef.current)
     }, 1500)
   }
 
@@ -160,8 +170,7 @@ export function ModalityNoteEditor({
       clearTimeout(autosaveTimerRef.current)
     }
     setManualSyncing(true)
-    await saveDraft(content, docStatus)
-    await offlineSyncService.syncDraftNote(draftId, { force: true })
+    await saveDraft(content, docStatusRef.current)
     const updated = offlineSyncService.getDraftNote(draftId)
     if (updated) {
       setSyncStatus(updated.syncStatus)

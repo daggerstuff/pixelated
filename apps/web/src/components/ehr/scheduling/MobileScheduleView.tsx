@@ -123,12 +123,16 @@ export function MobileScheduleView({
     const unsubQueue = offlineSyncService.on('itemQueued', () => {
       setQueuedActions(offlineSyncService.getQueuedAppointmentActions())
     })
+    const unsubSync = offlineSyncService.on('syncComplete', () => {
+      void fetchAppointments()
+    })
 
     return () => {
       cancelled = true
       unsubOnline()
       unsubOffline()
       unsubQueue()
+      unsubSync()
     }
   }, [fetchAppointments, selectedDate])
 
@@ -136,8 +140,8 @@ export function MobileScheduleView({
     e.preventDefault()
     if (!selectedDate || !bookingTime) return
 
-    const start = `${selectedDate}T${bookingTime}:00Z`
-    const end = `${selectedDate}T${bookingTime}:50:00Z`
+    const start = new Date(`${selectedDate}T${bookingTime}:00`).toISOString()
+    const end = new Date(`${selectedDate}T${bookingTime}:50:00`).toISOString()
 
     // Queue action via offline sync service
     const action = await offlineSyncService.queueAppointmentAction({

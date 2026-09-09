@@ -125,14 +125,14 @@ for (const { name, device } of MOBILE_VIEWPORTS) {
       await page.goto("/portal");
       await page.waitForLoadState("networkidle");
 
-      // Look for note editor components
       const noteEditor = page.locator("[data-testid='modality-note-editor']");
       const noteSection = page.locator("section[aria-labelledby]");
 
-      // At least one of these should be present
-      const editorVisible = await noteEditor.isVisible().catch(() => false);
-      const sectionVisible = await noteSection.first().isVisible().catch(() => false);
-      expect(editorVisible || sectionVisible).toBe(true);
+      // Assert at least one is visible (no conditional skip)
+      const editorVisible = await noteEditor.isVisible();
+      if (!editorVisible) {
+        await expect(noteSection.first()).toBeVisible();
+      }
     });
 
     test("mobile schedule view renders appointment list", async ({
@@ -141,15 +141,13 @@ for (const { name, device } of MOBILE_VIEWPORTS) {
       await page.goto("/portal/scheduling");
       await page.waitForLoadState("networkidle");
 
-      // Mobile schedule view should render
       const scheduleView = page.locator("[data-testid='mobile-schedule-view']");
       const appointmentList = page.locator("[data-testid='appointment-list']");
 
-      const scheduleVisible = await scheduleView.isVisible().catch(() => false);
-      const listVisible = await appointmentList.isVisible().catch(() => false);
-
-      // At least one should be present on the scheduling page
-      expect(scheduleVisible || listVisible).toBe(true);
+      const scheduleVisible = await scheduleView.isVisible();
+      if (!scheduleVisible) {
+        await expect(appointmentList).toBeVisible();
+      }
     });
 
     test("messaging widget renders with offline queue support", async ({
@@ -158,14 +156,13 @@ for (const { name, device } of MOBILE_VIEWPORTS) {
       await page.goto("/portal/messaging");
       await page.waitForLoadState("networkidle");
 
-      // Messaging widget should be present
       const messagingWidget = page.locator("[data-testid='messaging-widget']");
       const messageList = page.locator("[data-testid='message-list']");
 
-      const widgetVisible = await messagingWidget.isVisible().catch(() => false);
-      const listVisible = await messageList.isVisible().catch(() => false);
-
-      expect(widgetVisible || listVisible).toBe(true);
+      const widgetVisible = await messagingWidget.isVisible();
+      if (!widgetVisible) {
+        await expect(messageList).toBeVisible();
+      }
     });
 
     test("offline note drafting creates queued draft", async ({
@@ -175,27 +172,21 @@ for (const { name, device } of MOBILE_VIEWPORTS) {
       await page.goto("/portal");
       await page.waitForLoadState("networkidle");
 
-      // Go offline
       await context.setOffline(true);
 
-      // Find note editor textarea or contenteditable
       const noteInput = page.locator(
         "textarea[data-testid='note-content'], [contenteditable='true']",
       );
 
-      if (await noteInput.first().isVisible().catch(() => false)) {
-        await noteInput.first().fill("Test offline draft note");
+      await expect(noteInput.first()).toBeVisible();
+      await noteInput.first().fill("Test offline draft note");
 
-        // Wait for autosave debounce (1.5s)
-        await page.waitForTimeout(2000);
+      await page.waitForTimeout(2000);
 
-        // Check for pending/saved indicator
-        const statusIndicator = page.locator(
-          "[data-testid='save-status'], [data-testid='sync-status']",
-        );
-        const statusVisible = await statusIndicator.isVisible().catch(() => false);
-        expect(statusVisible).toBe(true);
-      }
+      const statusIndicator = page.locator(
+        "[data-testid='save-status'], [data-testid='sync-status']",
+      );
+      await expect(statusIndicator).toBeVisible();
 
       await context.setOffline(false);
     });
@@ -207,26 +198,20 @@ for (const { name, device } of MOBILE_VIEWPORTS) {
       await page.goto("/portal/scheduling");
       await page.waitForLoadState("networkidle");
 
-      // Go offline
       await context.setOffline(true);
 
-      // Look for booking button
       const bookBtn = page.locator(
         "button[data-testid='book-appointment'], button[aria-label*='book'], button[aria-label*='schedule']",
       );
 
-      if (await bookBtn.first().isVisible().catch(() => false)) {
-        await bookBtn.first().click();
+      await expect(bookBtn.first()).toBeVisible();
+      await bookBtn.first().click();
 
-        // If dialog opens, try to fill and submit
-        const dialog = page.locator("[role='dialog']");
-        if (await dialog.isVisible().catch(() => false)) {
-          const submitBtn = dialog.locator("button[type='submit']");
-          if (await submitBtn.isVisible().catch(() => false)) {
-            await submitBtn.click();
-          }
-        }
-      }
+      const dialog = page.locator("[role='dialog']");
+      await expect(dialog).toBeVisible();
+      const submitBtn = dialog.locator("button[type='submit']");
+      await expect(submitBtn).toBeVisible();
+      await submitBtn.click();
 
       await context.setOffline(false);
     });
@@ -235,21 +220,17 @@ for (const { name, device } of MOBILE_VIEWPORTS) {
       await page.goto("/portal/messaging");
       await page.waitForLoadState("networkidle");
 
-      // Go offline
       await context.setOffline(true);
 
-      // Find message input
       const messageInput = page.locator(
         "textarea[data-testid='message-input'], input[data-testid='message-input']",
       );
 
-      if (await messageInput.first().isVisible().catch(() => false)) {
-        await messageInput.first().fill("Test offline message");
-        const sendBtn = page.locator("button[data-testid='send-message']");
-        if (await sendBtn.isVisible().catch(() => false)) {
-          await sendBtn.click();
-        }
-      }
+      await expect(messageInput.first()).toBeVisible();
+      await messageInput.first().fill("Test offline message");
+      const sendBtn = page.locator("button[data-testid='send-message']");
+      await expect(sendBtn).toBeVisible();
+      await sendBtn.click();
 
       await context.setOffline(false);
     });

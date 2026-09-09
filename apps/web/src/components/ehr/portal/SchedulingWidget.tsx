@@ -1,5 +1,6 @@
 import { Calendar, Clock, Plus, X } from 'lucide-react'
 import React, { useCallback, useEffect, useState } from 'react'
+import { offlineSyncService } from '@/lib/ehr-native/services/offline-sync.service'
 
 interface Appointment {
   id: string
@@ -159,16 +160,24 @@ export function SchedulingWidget() {
       setReason('')
       await fetchAppointments()
     } catch {
-      // Offline fallback: optimistically create appointment locally and queue
-      const optId = `offline_appt_${Date.now()}`
+      // Offline fallback: queue via offline sync service and optimistic UI
       const start = new Date(`${selectedDate}T${selectedTime}:00`)
       const end = new Date(start.getTime() + 60 * 60 * 1000)
       const pracName =
         PRACTITIONERS.find((p) => p.id === selectedPractitioner)?.name ??
         'Assigned Practitioner'
 
+      const action = await offlineSyncService.queueAppointmentAction({
+        actionType: 'create',
+        patientId: 'current',
+        practitionerId: selectedPractitioner,
+        start: start.toISOString(),
+        end: end.toISOString(),
+        reason: reason || 'Routine Consultation',
+      })
+
       const optimisticAppt: Appointment = {
-        id: optId,
+        id: action.id,
         start: start.toISOString(),
         end: end.toISOString(),
         status: 'pending',

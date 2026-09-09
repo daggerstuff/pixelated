@@ -53,6 +53,18 @@ const PHI_PATTERNS = [
   /\/api\/telehealth\//,
 ]
 
+// Protected navigation routes — NEVER cache page HTML (authenticated, may contain PHI)
+// These pages are served fresh from the network on every visit.
+const PROTECTED_NAV_PATTERNS = [
+  /\/portal\//,
+  /\/ehr\//,
+  /\/fhir\//,
+  /\/telehealth\//,
+  /\/dashboard/,
+  /\/treatment\//,
+  /\/admin\//,
+]
+
 function isStaticAsset(url) {
   return STATIC_PATTERNS.some((p) => p.test(url))
 }
@@ -63,6 +75,17 @@ function isSWRRoute(url) {
 
 function isPHIRoute(url) {
   return PHI_PATTERNS.some((p) => p.test(url))
+}
+
+function isProtectedNav(url) {
+  const pathname = (() => {
+    try {
+      return new URL(url).pathname
+    } catch {
+      return url
+    }
+  })()
+  return PROTECTED_NAV_PATTERNS.some((p) => p.test(pathname))
 }
 
 self.addEventListener('install', (event) => {
@@ -152,10 +175,13 @@ self.addEventListener('fetch', (event) => {
 
   // Navigation requests: NetworkFirst with cached shell fallback
   if (request.mode === 'navigate') {
+    const protectedNav = isProtectedNav(url)
+
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (response.ok) {
+          // Never cache protected/authenticated page HTML (PHI risk)
+          if (response.ok && !protectedNav) {
             const copy = response.clone()
             void caches
               .open(SHELL_CACHE)
@@ -164,6 +190,10 @@ self.addEventListener('fetch', (event) => {
           return response
         })
         .catch(async () => {
+          // Protected routes: no shell cache fallback — return network error
+          if (protectedNav) {
+            return Response.error()
+          }
           const cache = await caches.open(SHELL_CACHE)
           const match = await cache.match(request)
           return match ?? (await cache.match('/')) ?? Response.error()

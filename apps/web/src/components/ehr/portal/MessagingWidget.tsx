@@ -167,8 +167,10 @@ export function MessagingWidget() {
     setSendingMessage(true)
     const text = messageBody.trim()
 
+    let shouldQueue = false
     try {
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        shouldQueue = true
         throw new Error('Offline')
       }
       const res = await fetch(`/api/portal/v1/messaging/${activeThread.id}`, {
@@ -185,32 +187,34 @@ export function MessagingWidget() {
       const result = (await res.json()) as { data: MessageThread }
       setActiveThread(result.data)
       setMessageBody('')
-    } catch {
-      // Offline fallback: queue message and update optimistic state
-      await offlineSyncService.queueMessage({
-        threadId: activeThread.id,
-        recipientReference:
-          activeThread.participantReferences[0]?.reference ??
-          'Practitioner/assigned',
-        senderReference: 'Patient/current',
-        body: text,
-      })
-      const optimisticMsg: ThreadMessage = {
-        id: `offline_msg_${Date.now()}`,
-        senderReference: 'Patient/current',
-        recipientReference:
-          activeThread.participantReferences[0]?.reference ??
-          'Practitioner/assigned',
-        body: text,
-        sentAt: new Date().toISOString(),
-        status: 'pending',
+    } catch (err) {
+      // Queue only for network/offline failures, not HTTP 4xx/5xx
+      if (shouldQueue || err instanceof TypeError) {
+        await offlineSyncService.queueMessage({
+          threadId: activeThread.id,
+          recipientReference:
+            activeThread.participantReferences[0]?.reference ??
+            'Practitioner/assigned',
+          senderReference: 'Patient/current',
+          body: text,
+        })
+        const optimisticMsg: ThreadMessage = {
+          id: `offline_msg_${Date.now()}`,
+          senderReference: 'Patient/current',
+          recipientReference:
+            activeThread.participantReferences[0]?.reference ??
+            'Practitioner/assigned',
+          body: text,
+          sentAt: new Date().toISOString(),
+          status: 'pending',
+        }
+        setActiveThread({
+          ...activeThread,
+          messages: [...activeThread.messages, optimisticMsg],
+        })
+        setMessageBody('')
+        setQueuedMessages(offlineSyncService.getQueuedMessages())
       }
-      setActiveThread({
-        ...activeThread,
-        messages: [...activeThread.messages, optimisticMsg],
-      })
-      setMessageBody('')
-      setQueuedMessages(offlineSyncService.getQueuedMessages())
     } finally {
       setSendingMessage(false)
     }

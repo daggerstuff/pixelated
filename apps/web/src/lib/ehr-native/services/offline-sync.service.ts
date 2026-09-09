@@ -161,7 +161,59 @@ export class EncryptedLocalStorageAdapter implements SecureStorageAdapter {
     }
 
     this.encryptionKeyPromise = (async () => {
-      return await crypto.subtle.generateKey(
+      const keyStorageKey = `${this.prefix}key_material`
+      let seed: Uint8Array
+      let salt: Uint8Array
+
+      // Try to load persisted key material so data survives reloads
+      if (typeof localStorage !== 'undefined') {
+        const stored = localStorage.getItem(keyStorageKey)
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored) as {
+              salt: number[]
+              seed: number[]
+            }
+            salt = new Uint8Array(parsed.salt)
+            seed = new Uint8Array(parsed.seed)
+          } catch {
+            // Fall through to generate new key
+          }
+        }
+      }
+
+      // Generate new key material if not found
+      if (!seed! || !salt!) {
+        seed = crypto.getRandomValues(new Uint8Array(32))
+        salt = crypto.getRandomValues(new Uint8Array(16))
+        if (typeof localStorage !== 'undefined') {
+          try {
+            localStorage.setItem(
+              keyStorageKey,
+              JSON.stringify({
+                salt: Array.from(salt),
+                seed: Array.from(seed),
+              }),
+            )
+          } catch {
+            // If we can't persist, the key won't survive a reload,
+            // but encryption still works for the current session
+          }
+        }
+      }
+
+      // Derive AES-GCM key from persisted seed via PBKDF2
+      const baseKey = await crypto.subtle.importKey(
+        'raw',
+        seed,
+        'PBKDF2',
+        false,
+        ['deriveKey'],
+      )
+
+      return await crypto.subtle.deriveKey(
+        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        baseKey,
         { name: 'AES-GCM', length: 256 },
         false,
         ['encrypt', 'decrypt'],
@@ -197,26 +249,23 @@ export class EncryptedLocalStorageAdapter implements SecureStorageAdapter {
   async setItem(key: string, value: string): Promise<void> {
     if (typeof localStorage === 'undefined') return
 
-    try {
-      const cryptoKey = await this.getOrCreateKey()
-      const iv = crypto.getRandomValues(new Uint8Array(12))
-      const encoded = new TextEncoder().encode(value)
+    // Fail closed: never write plaintext PHI to localStorage
+    const cryptoKey = await this.getOrCreateKey()
+    const iv = crypto.getRandomValues(new Uint8Array(12))
+    const encoded = new TextEncoder().encode(value)
 
-      const encrypted = await crypto.subtle.encrypt(
-        { name: 'AES-GCM', iv },
-        cryptoKey,
-        encoded,
-      )
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      encoded,
+    )
 
-      const payload = {
-        iv: Array.from(iv),
-        data: Array.from(new Uint8Array(encrypted)),
-      }
-
-      localStorage.setItem(`${this.prefix}${key}`, JSON.stringify(payload))
-    } catch {
-      localStorage.setItem(`${this.prefix}${key}`, value)
+    const payload = {
+      iv: Array.from(iv),
+      data: Array.from(new Uint8Array(encrypted)),
     }
+
+    localStorage.setItem(`${this.prefix}${key}`, JSON.stringify(payload))
   }
 
   async removeItem(key: string): Promise<void> {
@@ -1037,4 +1086,5 @@ export class OfflineSyncService {
 
 // Global Singleton Instance
 export const offlineSyncService = new OfflineSyncService()
+void offlineSyncService.initialize()
 export default offlineSyncService
