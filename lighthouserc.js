@@ -23,12 +23,12 @@ module.exports = {
         preset: 'mobile',
       },
       url: [
-        'http://localhost:5173/portal',
-        'http://localhost:5173/portal/scheduling',
-        'http://localhost:5173/portal/messaging',
+        'http://localhost:4321/portal',
+        'http://localhost:4321/portal/scheduling',
+        'http://localhost:4321/portal/messaging',
       ],
       startServerCommand: 'pnpm build && pnpm preview',
-      startServerReadyPattern: 'preview',
+      startServerReadyPattern: 'Server running',
     },
     assert: {
       assertions: {

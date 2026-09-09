@@ -106,7 +106,7 @@ export default defineConfig({
       ? undefined
       : isCi
         ? {
-            command: `pnpm run build && pnpm run preview -- --port ${webServerPort ?? 4321}`,
+            command: `pnpm run build && PORT=${webServerPort ?? 4321} pnpm run preview`,
             url: webServerUrl ?? 'http://localhost:4321',
             reuseExistingServer: false,
             timeout: 10 * 60 * 1000,
