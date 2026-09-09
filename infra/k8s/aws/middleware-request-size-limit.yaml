@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pixelated-empathy-request-size-limit
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: pixelated-empathy
+spec:
+  buffering:
+    maxRequestBodyBytes: 10485760
+    memRequestBodyBytes: 2097152

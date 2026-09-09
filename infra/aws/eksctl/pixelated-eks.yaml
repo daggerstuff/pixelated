@@ -1,0 +1,26 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: pixelated-eks
+  region: us-west-2
+  version: "1.32"
+
+iam:
+  withOIDC: true
+
+managedNodeGroups:
+  - name: pixelated-apps
+    instanceType: t3.medium
+    minSize: 2
+    maxSize: 3
+    desiredCapacity: 2
+    volumeSize: 20
+    volumeType: gp3
+    labels:
+      workload: apps
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
