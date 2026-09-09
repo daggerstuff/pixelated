@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: pixelated-empathy-rate-limit
+  namespace: pixelated-empathy
+  labels:
+    app.kubernetes.io/name: pixelated-empathy
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: pixelated-empathy
+spec:
+  rateLimit:
+    average: 100
+    period: 60s
+    burst: 50
