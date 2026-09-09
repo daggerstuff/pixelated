@@ -1,0 +1,281 @@
+name: Deploy to AWS EKS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: pixelatedempathy/api
+  SESSION_AGENT_IMAGE_NAME: pixelatedempathy/session-agent
+  QA_AGENT_IMAGE_NAME: pixelatedempathy/qa-agent
+  PIPELINE_AGENT_IMAGE_NAME: pixelatedempathy/pipeline-agent
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+      app_digest: ${{ steps.build-app.outputs.digest }}
+      session_digest: ${{ steps.build-session.outputs.digest }}
+      qa_digest: ${{ steps.build-qa.outputs.digest }}
+      pipeline_digest: ${{ steps.build-pipeline.outputs.digest }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Determine image tag
+        id: vars
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            IMAGE_TAG="production"
+          else
+            IMAGE_TAG="${{ github.ref_name }}"
+          fi
+          echo "IMAGE_TAG=$IMAGE_TAG" >> "$GITHUB_ENV"
+          echo "image_tag=$IMAGE_TAG" >> "$GITHUB_OUTPUT"
+          echo "Built image tag: $IMAGE_TAG"
+
+      - name: Build and push app
+        id: build-app
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./infra/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Build and push session agent
+        id: build-session
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./agents/Dockerfile
+          build-args: |
+            AGENT_DIR=agents/session-agent
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=session-agent
+          cache-to: type=gha,mode=max,scope=session-agent
+          platforms: linux/amd64
+
+      - name: Build and push QA agent
+        id: build-qa
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./agents/Dockerfile
+          build-args: |
+            AGENT_DIR=agents/qa-agent
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=qa-agent
+          cache-to: type=gha,mode=max,scope=qa-agent
+          platforms: linux/amd64
+
+      - name: Build and push pipeline agent
+        id: build-pipeline
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./agents/Dockerfile
+          build-args: |
+            AGENT_DIR=agents/pipeline-agent
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }},${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}:latest
+          cache-from: type=gha,scope=pipeline-agent
+          cache-to: type=gha,mode=max,scope=pipeline-agent
+          platforms: linux/amd64
+
+      - name: Image digests
+        run: |
+          echo "app:      ${{ steps.build-app.outputs.digest }}"
+          echo "session:  ${{ steps.build-session.outputs.digest }}"
+          echo "qa:       ${{ steps.build-qa.outputs.digest }}"
+          echo "pipeline: ${{ steps.build-pipeline.outputs.digest }}"
+
+  deploy-aws:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: aws
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: pixelated-eks-deploy
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER_NAME"
+
+      - name: Install kubectl, kustomize, and helm
+        run: |
+          KUBE_STABLE=$(curl -fsSL https://dl.k8s.io/release/stable.txt)
+          curl -fsSLo /tmp/kubectl "https://dl.k8s.io/release/${KUBE_STABLE}/bin/linux/amd64/kubectl"
+          chmod +x /tmp/kubectl
+          sudo mv /tmp/kubectl /usr/local/bin/kubectl
+
+          KUSTOMIZE_VERSION=5.6.0
+          KUSTOMIZE_BASE_URL="https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}"
+          KUSTOMIZE_ARCHIVE="kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          EXPECTED_KUSTOMIZE_SHA256="54e4031ddc4e7fc59e408da29e7c646e8e57b8088c51b84b3df0864f47b5148f"
+          curl -fsSLo "${KUSTOMIZE_ARCHIVE}" "${KUSTOMIZE_BASE_URL}/${KUSTOMIZE_ARCHIVE}"
+          echo "${EXPECTED_KUSTOMIZE_SHA256}  ${KUSTOMIZE_ARCHIVE}" | sha256sum -c -
+          tar -xzf "${KUSTOMIZE_ARCHIVE}"
+          sudo mv kustomize /usr/local/bin/kustomize
+          rm "${KUSTOMIZE_ARCHIVE}"
+
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+      - name: Install Traefik
+        run: |
+          helm repo add traefik https://traefik.github.io/charts 2>/dev/null || true
+          helm repo update
+          helm upgrade --install traefik traefik/traefik \
+            --namespace traefik \
+            --create-namespace \
+            --values infra/k8s/aws/traefik-values.yaml \
+            --wait \
+            --timeout 10m
+
+      - name: Deploy application and agents
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_AI_API_KEY: ${{ secrets.CLOUDFLARE_AI_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_SIGNING_SECRET: ${{ secrets.SLACK_SIGNING_SECRET }}
+          LINEAR_AGENT_ACCESS_TOKEN: ${{ secrets.LINEAR_AGENT_ACCESS_TOKEN }}
+          LINEAR_WEBHOOK_SECRET: ${{ secrets.LINEAR_WEBHOOK_SECRET }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          EVE_AUTH_USERNAME: ${{ secrets.EVE_AUTH_USERNAME }}
+          EVE_AUTH_PASSWORD: ${{ secrets.EVE_AUTH_PASSWORD }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          REDIS_URL: ${{ secrets.REDIS_URL }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          UMAMI_DATABASE_URL: ${{ secrets.UMAMI_DATABASE_URL }}
+          UMAMI_APP_SECRET: ${{ secrets.UMAMI_APP_SECRET }}
+        run: |
+          kubectl apply -f infra/k8s/aws/namespace.yaml
+
+          kubectl create secret docker-registry dockerhub-registry-credentials \
+            --docker-username="${{ secrets.DOCKERHUB_USERNAME }}" \
+            --docker-password="${{ secrets.DOCKERHUB_TOKEN }}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic cloudflare-workers-ai \
+            --from-literal=account-id="${CLOUDFLARE_ACCOUNT_ID:-}" \
+            --from-literal=api-key="${CLOUDFLARE_AI_API_KEY:-}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic slack-agent \
+            --from-literal=bot-token="${SLACK_BOT_TOKEN:-}" \
+            --from-literal=signing-secret="${SLACK_SIGNING_SECRET:-}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic linear-agent \
+            --from-literal=access-token="${LINEAR_AGENT_ACCESS_TOKEN:-}" \
+            --from-literal=webhook-secret="${LINEAR_WEBHOOK_SECRET:-}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic umami-secrets \
+            --from-literal=DATABASE_URL="${UMAMI_DATABASE_URL}" \
+            --from-literal=APP_SECRET="${UMAMI_APP_SECRET}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic pixelated-empathy-secrets \
+            --from-literal=JWT_SECRET="${JWT_SECRET}" \
+            --from-literal=DATABASE_URL="${DATABASE_URL}" \
+            --from-literal=REDIS_URL="${REDIS_URL}" \
+            --from-literal=REDIS_PASSWORD="${REDIS_PASSWORD}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic eve-auth \
+            --from-literal=username="${EVE_AUTH_USERNAME:-}" \
+            --from-literal=password="${EVE_AUTH_PASSWORD:-}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl create secret generic mongodb \
+            --from-literal=uri="${MONGODB_URI:-}" \
+            --namespace pixelated-empathy \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+          kubectl apply -k infra/k8s/aws
+          kubectl apply -f agents/session-agent/k8s/deployment.yaml
+          kubectl apply -f agents/qa-agent/k8s/deployment.yaml
+          kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
+          kubectl delete deployment/pixelated-empathy -n pixelated-empathy --ignore-not-found
+
+          kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
+          kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
+          kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
+          kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
+
+          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
+
+      - name: Smoke test through cluster service
+        run: |
+          kubectl port-forward -n pixelated-empathy svc/pixelated-empathy 8080:80 &
+          PF_PID=$!
+          trap 'kill $PF_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/health; then
+              echo "Service health check passed."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Service health check failed."
+          exit 1
+
+      - name: Show DNS target
+        run: |
+          for i in $(seq 1 30); do
+            DNS_TARGET=$(kubectl get svc -n traefik traefik -o jsonpath='{.status.loadBalancer.ingress[0].hostname}' 2>/dev/null || true)
+            if [[ -n "$DNS_TARGET" ]]; then
+              echo "Update Cloudflare DNS CNAME records to: $DNS_TARGET"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Timed out waiting for Traefik NLB hostname."
+          exit 1
