@@ -274,7 +274,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
 
           // At least one labeling mechanism must be present
           expect(
-            hasLabel > 0 || ariaLabel || ariaLabelledBy || placeholder,
+            hasLabel > 0 || Boolean(ariaLabel) || Boolean(ariaLabelledBy) || Boolean(placeholder),
             `${path}: input #${i} has no label, aria-label, aria-labelledby, or placeholder`
           ).toBe(true)
         }
@@ -298,22 +298,28 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       'navigation', 'banner', 'contentinfo', 'main', 'complementary',
     ])
 
-    for (const path of ['/portal', '/portal/scheduling', '/portal/messaging']) {
-      await page.goto(path)
-      await page.waitForLoadState('networkidle')
+      const violations: string[] = []
 
-      const elementsWithRole = page.locator('[role]')
-      const count = await elementsWithRole.count()
+      for (const path of ['/portal', '/portal/scheduling', '/portal/messaging']) {
+        await page.goto(path)
+        await page.waitForLoadState('networkidle')
 
-      for (let i = 0; i < count; i++) {
-        const el = elementsWithRole.nth(i)
-        const role = await el.getAttribute('role')
-        if (role && !validRoles.has(role)) {
-          // Log but don't fail — some custom roles may exist
-          console.warn(`${path}: element with non-standard role "${role}"`)
+        const elementsWithRole = page.locator('[role]')
+        const count = await elementsWithRole.count()
+
+        for (let i = 0; i < count; i++) {
+          const el = elementsWithRole.nth(i)
+          const role = await el.getAttribute('role')
+          if (role && !validRoles.has(role)) {
+            violations.push(`${path}: element with non-standard role "${role}"`)
+          }
         }
       }
-    }
+
+      expect(
+        violations,
+        `Non-standard ARIA roles found: ${violations.join(', ')}`,
+      ).toEqual([])
   })
 
   test('status messages use appropriate ARIA live regions', async ({

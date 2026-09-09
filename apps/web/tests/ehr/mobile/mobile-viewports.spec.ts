@@ -19,13 +19,13 @@
 import { test, expect } from '@playwright/test'
 
 const EHR_PAGES = [
-  { path: '/portal', label: 'Portal Home', testIds: ['ehr-mobile-layout', 'messaging-widget', 'scheduling-widget'] },
-  { path: '/portal/scheduling', label: 'Scheduling', testIds: ['mobile-schedule-view', 'appointment-list'] },
-  { path: '/portal/messaging', label: 'Messaging', testIds: ['messaging-widget', 'message-list'] },
-  { path: '/portal/telehealth', label: 'Telehealth', testIds: ['telehealth-widget', 'video-call'] },
-  { path: '/portal/statements', label: 'Statements', testIds: ['statements-list', 'statement-card'] },
-  { path: '/portal/homework', label: 'Homework', testIds: ['homework-list', 'homework-card'] },
-  { path: '/dashboard', label: 'Dashboard / Patient List', testIds: ['patient-list', 'dashboard'] },
+  { path: '/portal', label: 'Portal Home' },
+  { path: '/portal/scheduling', label: 'Scheduling' },
+  { path: '/portal/messaging', label: 'Messaging' },
+  { path: '/portal/telehealth', label: 'Telehealth' },
+  { path: '/portal/statements', label: 'Statements' },
+  { path: '/portal/homework', label: 'Homework' },
+  { path: '/dashboard', label: 'Dashboard / Patient List' },
 ]
 
 const MOBILE_VIEWPORTS = [

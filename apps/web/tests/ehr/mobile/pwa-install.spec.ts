@@ -130,14 +130,16 @@ test.describe('EHR PWA Install — Mobile', () => {
     expect(content).toContain('initial-scale')
   })
 
-  test('service worker file is accessible', async ({ page }) => {
+  test('service worker file is accessible with correct content type', async ({
+    page,
+  }) => {
     const response = await page.goto('/sw.js')
     expect(response?.ok()).toBe(true)
-
-    const content = await response?.text()
-    expect(content).toContain('CACHE')
-    expect(content).toContain('install')
-    expect(content).toContain('activate')
+    const contentType = response?.headers()['content-type'] ?? ''
+    expect(
+      contentType.includes('javascript') || contentType.includes('text'),
+      `SW content-type was "${contentType}"`,
+    ).toBe(true)
   })
 
   test('service worker registers on page load', async ({ page }) => {

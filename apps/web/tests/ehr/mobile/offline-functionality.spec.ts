@@ -88,12 +88,16 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     await page.waitForTimeout(3000)
 
-    const syncBanner = page.locator(
-      "[data-testid='sync-status-banner'], [data-testid='offline-status']"
+    // After reconnect, verify the note content persisted and sync indicator shows online state
+    const noteInputAfter = page.locator(
+      "textarea[data-testid='note-content'], [contenteditable='true']"
     )
-    const bannerVisible = await syncBanner.isVisible().catch(() => false)
-    // After sync, the banner may or may not be visible depending on pending count
-    expect(typeof bannerVisible).toBe('boolean')
+    await expect(noteInputAfter.first()).toBeVisible()
+
+    // The offline indicator should no longer show offline state
+    const offlineIndicator = page.locator("[data-testid='offline-status']")
+    const offlineVisible = await offlineIndicator.isVisible().catch(() => false)
+    expect(offlineVisible).toBe(false)
   })
 
   test('offline scheduling queues appointment action', async ({
@@ -150,9 +154,11 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(false)
     await page.waitForTimeout(3000)
 
-    // Page should not crash after sync
-    const pageAlive = await page.evaluate(() => document.readyState)
-    expect(pageAlive).toBe('complete')
+    // After reconnect, the scheduling view should still be functional
+    const scheduleView = page.locator(
+      "[data-testid='mobile-schedule-view'], [data-testid='appointment-list']"
+    )
+    await expect(scheduleView.first()).toBeVisible()
   })
 
   test('offline messaging queues message', async ({ page, context }) => {
@@ -194,8 +200,11 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(false)
     await page.waitForTimeout(3000)
 
-    const pageAlive = await page.evaluate(() => document.readyState)
-    expect(pageAlive).toBe('complete')
+    // After reconnect, the messaging widget should still be functional
+    const messageInputAfter = page.locator(
+      "textarea[data-testid='message-input'], input[data-testid='message-input']"
+    )
+    await expect(messageInputAfter.first()).toBeVisible()
   })
 
   test('no data loss when network drops mid-action', async ({
@@ -227,9 +236,16 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(false)
     await page.waitForTimeout(3000)
 
-    // Page should be alive and the content should not have been lost
-    const pageAlive = await page.evaluate(() => document.readyState)
-    expect(pageAlive).toBe('complete')
+    // Verify the draft content was not lost during offline period
+    const noteInputAfter = page.locator(
+      "textarea[data-testid='note-content'], [contenteditable='true']"
+    )
+    await expect(noteInputAfter.first()).toBeVisible()
+    const contentAfter =
+      (await noteInputAfter.first().inputValue().catch(() => null)) ??
+      (await noteInputAfter.first().textContent()) ??
+      ''
+    expect(contentAfter.length).toBeGreaterThan(0)
   })
 
   test('sync status banner shows pending count after reconnect', async ({
@@ -255,14 +271,10 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(false)
     await page.waitForTimeout(2000)
 
-    // Sync banner may show pending count or may have already synced
-    const syncBanner = page.locator(
-      "[data-testid='sync-status-banner'], [data-testid='offline-status']"
-    )
-    const bannerVisible = await syncBanner.isVisible().catch(() => false)
-
-    // Either the banner shows pending count, or it already synced (both valid)
-    expect(typeof bannerVisible).toBe('boolean')
+    // After reconnect, the offline indicator should no longer show offline state
+    const offlineIndicator = page.locator("[data-testid='offline-status']")
+    const offlineVisible = await offlineIndicator.isVisible().catch(() => false)
+    expect(offlineVisible).toBe(false)
   })
 
   test('multiple offline actions queue and sync correctly', async ({
@@ -297,7 +309,10 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(false)
     await page.waitForTimeout(3000)
 
-    const pageAlive = await page.evaluate(() => document.readyState)
-    expect(pageAlive).toBe('complete')
+    // After multiple offline-online cycles, the page should still be functional
+    const noteInputAfter = page.locator(
+      "textarea[data-testid='note-content'], [contenteditable='true']"
+    )
+    await expect(noteInputAfter.first()).toBeVisible()
   })
 })

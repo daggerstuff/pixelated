@@ -27,8 +27,8 @@ module.exports = {
         'http://localhost:5173/portal/scheduling',
         'http://localhost:5173/portal/messaging',
       ],
-      startServerCommand: 'pnpm dev',
-      startServerReadyPattern: 'Local',
+      startServerCommand: 'pnpm build && pnpm preview',
+      startServerReadyPattern: 'preview',
     },
     assert: {
       assertions: {
