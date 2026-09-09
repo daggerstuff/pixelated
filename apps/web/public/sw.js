@@ -1,6 +1,7 @@
 const CACHE_VERSION = '__SW_VERSION__'
 const STATIC_CACHE = `static-${CACHE_VERSION}`
 const SWR_CACHE = `swr-${CACHE_VERSION}`
+const SHELL_CACHE = `shell-${CACHE_VERSION}`
 
 // Static asset patterns (CacheFirst)
 const STATIC_PATTERNS = [
@@ -27,7 +28,7 @@ const SWR_PATTERNS = [
   /\/docs\/api\//,
 ]
 
-// PHI routes — NEVER intercept (let network handle always)
+// PHI routes — NEVER intercept or cache (strictly direct to network, HIPAA Guardrail)
 const PHI_PATTERNS = [
   /\/api\/sessions\//,
   /\/api\/auth\//,
@@ -46,6 +47,22 @@ const PHI_PATTERNS = [
   /\/api\/dashboard$/,
   /\/api\/ingestion\//,
   /\/api\/reprioritization\//,
+  /\/api\/ehr\//,
+  /\/api\/portal\//,
+  /\/fhir\//,
+  /\/api\/telehealth\//,
+]
+
+// Protected navigation routes — NEVER cache page HTML (authenticated, may contain PHI)
+// These pages are served fresh from the network on every visit.
+const PROTECTED_NAV_PATTERNS = [
+  /\/portal\//,
+  /\/ehr\//,
+  /\/fhir\//,
+  /\/telehealth\//,
+  /\/dashboard/,
+  /\/treatment\//,
+  /\/admin\//,
 ]
 
 function isStaticAsset(url) {
@@ -60,6 +77,17 @@ function isPHIRoute(url) {
   return PHI_PATTERNS.some((p) => p.test(url))
 }
 
+function isProtectedNav(url) {
+  const pathname = (() => {
+    try {
+      return new URL(url).pathname
+    } catch {
+      return url
+    }
+  })()
+  return PROTECTED_NAV_PATTERNS.some((p) => p.test(pathname))
+}
+
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(STATIC_CACHE).then(() => self.skipWaiting()))
 })
@@ -71,7 +99,12 @@ self.addEventListener('activate', (event) => {
       caches.keys().then(async (keys) => {
         return Promise.all(
           keys
-            .filter((key) => key !== STATIC_CACHE && key !== SWR_CACHE)
+            .filter(
+              (key) =>
+                key !== STATIC_CACHE &&
+                key !== SWR_CACHE &&
+                key !== SHELL_CACHE,
+            )
             .map(async (key) => caches.delete(key)),
         )
       }),
@@ -94,7 +127,7 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // NEVER intercept PHI routes — always go to network
+  // NEVER intercept PHI routes — always go straight to network
   if (isPHIRoute(url)) {
     return
   }
@@ -113,7 +146,7 @@ self.addEventListener('fetch', (event) => {
             void cache.put(request, response.clone())
           }
           return response
-        } catch (err) {
+        } catch {
           return cached ?? Response.error()
         }
       }),
@@ -138,5 +171,33 @@ self.addEventListener('fetch', (event) => {
       }),
     )
     return
+  }
+
+  // Navigation requests: NetworkFirst with cached shell fallback
+  if (request.mode === 'navigate') {
+    const protectedNav = isProtectedNav(url)
+
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Never cache protected/authenticated page HTML (PHI risk)
+          if (response.ok && !protectedNav) {
+            const copy = response.clone()
+            void caches
+              .open(SHELL_CACHE)
+              .then((cache) => cache.put(request, copy))
+          }
+          return response
+        })
+        .catch(async () => {
+          // Protected routes: no shell cache fallback — return network error
+          if (protectedNav) {
+            return Response.error()
+          }
+          const cache = await caches.open(SHELL_CACHE)
+          const match = await cache.match(request)
+          return match ?? (await cache.match('/')) ?? Response.error()
+        }),
+    )
   }
 })
