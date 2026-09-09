@@ -15,20 +15,27 @@
  */
 
 /** @type {import('@lhci/cli').LighthouseCiConfig} */
+const port = process.env.LHCI_PORT || 4321;
+
 module.exports = {
   ci: {
     collect: {
       numberOfRuns: 3,
       settings: {
         preset: 'mobile',
+        chromeFlags: '--no-sandbox --disable-dev-shm-usage',
       },
       url: [
-        'http://localhost:4321/portal',
-        'http://localhost:4321/portal/scheduling',
-        'http://localhost:4321/portal/messaging',
+        `http://127.0.0.1:${port}/portal`,
+        `http://127.0.0.1:${port}/portal/scheduling`,
+        `http://127.0.0.1:${port}/portal/messaging`,
       ],
-      startServerCommand: 'pnpm build && pnpm preview',
-      startServerReadyPattern: 'Server running',
+      startServerCommand: process.env.LHCI_PORT
+        ? undefined
+        : 'pnpm build && pnpm preview',
+      startServerReadyPattern: process.env.LHCI_PORT
+        ? undefined
+        : 'Server running',
     },
     assert: {
       assertions: {
