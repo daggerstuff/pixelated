@@ -15,7 +15,7 @@
  */
 
 /** @type {import('@lhci/cli').LighthouseCiConfig} */
-const port = process.env.LHCI_PORT || 4321;
+const port = process.env.LHCI_PORT || 4321
 
 module.exports = {
   ci: {
