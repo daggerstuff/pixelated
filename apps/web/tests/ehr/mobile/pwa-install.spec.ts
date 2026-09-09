@@ -63,9 +63,7 @@ test.describe('EHR PWA Install — Mobile', () => {
     expect(has192).toBe(true)
     expect(has512).toBe(true)
 
-    const hasMaskable = icons.some(
-      (i) => i.purpose?.includes('maskable'),
-    )
+    const hasMaskable = icons.some((i) => i.purpose?.includes('maskable'))
     expect(hasMaskable).toBe(true)
   })
 
@@ -75,9 +73,7 @@ test.describe('EHR PWA Install — Mobile', () => {
     const icons = manifest.icons as Array<{ src: string }>
 
     for (const icon of icons.slice(0, 3)) {
-      const iconUrl = icon.src.startsWith('/')
-        ? icon.src
-        : `/${icon.src}`
+      const iconUrl = icon.src.startsWith('/') ? icon.src : `/${icon.src}`
       const iconResponse = await request.get(iconUrl)
       expect(
         iconResponse.ok(),

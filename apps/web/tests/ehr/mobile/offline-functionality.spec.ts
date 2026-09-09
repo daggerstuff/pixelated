@@ -30,7 +30,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     const offlineIndicator = page.locator(
-      "[data-testid='offline-status'], [data-testid='sync-status-banner']"
+      "[data-testid='offline-status'], [data-testid='sync-status-banner']",
     )
     await expect(offlineIndicator).toBeVisible({ timeout: 5000 })
 
@@ -47,7 +47,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     const noteInput = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
     await expect(noteInput.first()).toBeVisible()
     await noteInput.first().fill('Test offline draft note — PIX-4430')
@@ -55,7 +55,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await page.waitForTimeout(2000)
 
     const statusIndicator = page.locator(
-      "[data-testid='save-status'], [data-testid='sync-status']"
+      "[data-testid='save-status'], [data-testid='sync-status']",
     )
     await expect(statusIndicator).toBeVisible()
 
@@ -72,7 +72,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     const noteInput = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
     await expect(noteInput.first()).toBeVisible()
     await noteInput.first().fill('Offline note — sync test PIX-4430')
@@ -80,7 +80,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await page.waitForTimeout(2000)
 
     const statusBefore = page.locator(
-      "[data-testid='save-status'], [data-testid='sync-status']"
+      "[data-testid='save-status'], [data-testid='sync-status']",
     )
     await expect(statusBefore).toBeVisible()
 
@@ -90,7 +90,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     // After reconnect, verify the note content persisted and sync indicator shows online state
     const noteInputAfter = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
     await expect(noteInputAfter.first()).toBeVisible()
 
@@ -110,7 +110,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     const bookBtn = page.locator(
-      "button[data-testid='book-appointment'], button[aria-label*='book'], button[aria-label*='schedule']"
+      "button[data-testid='book-appointment'], button[aria-label*='book'], button[aria-label*='schedule']",
     )
     await expect(bookBtn.first()).toBeVisible()
     await bookBtn.first().click()
@@ -137,9 +137,14 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await page.waitForTimeout(500)
 
     const bookBtn = page.locator(
-      "button[data-testid='book-appointment'], button[aria-label*='book'], button[aria-label*='schedule']"
+      "button[data-testid='book-appointment'], button[aria-label*='book'], button[aria-label*='schedule']",
     )
-    if (await bookBtn.first().isVisible().catch(() => false)) {
+    if (
+      await bookBtn
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await bookBtn.first().click()
       const dialog = page.locator("[role='dialog']")
       if (await dialog.isVisible().catch(() => false)) {
@@ -156,7 +161,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     // After reconnect, the scheduling view should still be functional
     const scheduleView = page.locator(
-      "[data-testid='mobile-schedule-view'], [data-testid='appointment-list']"
+      "[data-testid='mobile-schedule-view'], [data-testid='appointment-list']",
     )
     await expect(scheduleView.first()).toBeVisible()
   })
@@ -168,7 +173,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     const messageInput = page.locator(
-      "textarea[data-testid='message-input'], input[data-testid='message-input']"
+      "textarea[data-testid='message-input'], input[data-testid='message-input']",
     )
     await expect(messageInput.first()).toBeVisible()
     await messageInput.first().fill('Test offline message — PIX-4430')
@@ -187,9 +192,14 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     const messageInput = page.locator(
-      "textarea[data-testid='message-input'], input[data-testid='message-input']"
+      "textarea[data-testid='message-input'], input[data-testid='message-input']",
     )
-    if (await messageInput.first().isVisible().catch(() => false)) {
+    if (
+      await messageInput
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await messageInput.first().fill('Offline message for sync test')
       const sendBtn = page.locator("button[data-testid='send-message']")
       if (await sendBtn.isVisible().catch(() => false)) {
@@ -202,7 +212,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     // After reconnect, the messaging widget should still be functional
     const messageInputAfter = page.locator(
-      "textarea[data-testid='message-input'], input[data-testid='message-input']"
+      "textarea[data-testid='message-input'], input[data-testid='message-input']",
     )
     await expect(messageInputAfter.first()).toBeVisible()
   })
@@ -215,7 +225,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await page.waitForLoadState('networkidle')
 
     const noteInput = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
     await expect(noteInput.first()).toBeVisible()
     await noteInput.first().fill('Draft before offline')
@@ -229,7 +239,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await page.waitForTimeout(1000)
 
     const statusIndicator = page.locator(
-      "[data-testid='save-status'], [data-testid='sync-status']"
+      "[data-testid='save-status'], [data-testid='sync-status']",
     )
     await expect(statusIndicator).toBeVisible()
 
@@ -238,11 +248,14 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     // Verify the draft content was not lost during offline period
     const noteInputAfter = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
     await expect(noteInputAfter.first()).toBeVisible()
     const contentAfter =
-      (await noteInputAfter.first().inputValue().catch(() => null)) ??
+      (await noteInputAfter
+        .first()
+        .inputValue()
+        .catch(() => null)) ??
       (await noteInputAfter.first().textContent()) ??
       ''
     expect(contentAfter.length).toBeGreaterThan(0)
@@ -260,9 +273,14 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await page.waitForTimeout(500)
 
     const noteInput = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
-    if (await noteInput.first().isVisible().catch(() => false)) {
+    if (
+      await noteInput
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await noteInput.first().fill('Queued note 1 — PIX-4430')
       await page.waitForTimeout(500)
     }
@@ -288,9 +306,14 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     // Queue a note
     const noteInput = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
-    if (await noteInput.first().isVisible().catch(() => false)) {
+    if (
+      await noteInput
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await noteInput.first().fill('Multi-queue note 1')
       await page.waitForTimeout(500)
     }
@@ -301,7 +324,12 @@ test.describe('EHR Offline Functionality — Mobile', () => {
     await context.setOffline(true)
 
     // Queue another note
-    if (await noteInput.first().isVisible().catch(() => false)) {
+    if (
+      await noteInput
+        .first()
+        .isVisible()
+        .catch(() => false)
+    ) {
       await noteInput.first().fill('Multi-queue note 2')
       await page.waitForTimeout(500)
     }
@@ -311,7 +339,7 @@ test.describe('EHR Offline Functionality — Mobile', () => {
 
     // After multiple offline-online cycles, the page should still be functional
     const noteInputAfter = page.locator(
-      "textarea[data-testid='note-content'], [contenteditable='true']"
+      "textarea[data-testid='note-content'], [contenteditable='true']",
     )
     await expect(noteInputAfter.first()).toBeVisible()
   })

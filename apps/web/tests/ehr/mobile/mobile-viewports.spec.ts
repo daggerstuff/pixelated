@@ -58,7 +58,9 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.goto('/portal')
       await page.waitForLoadState('networkidle')
 
-      const bottomNav = page.locator("nav[aria-label='Mobile navigation'], nav[aria-label='EHR navigation']")
+      const bottomNav = page.locator(
+        "nav[aria-label='Mobile navigation'], nav[aria-label='EHR navigation']",
+      )
       await expect(bottomNav).toBeVisible()
 
       const navBox = await bottomNav.boundingBox()
@@ -75,9 +77,12 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const patientList = page.locator(
-        "[data-testid='patient-list'], [data-testid='patient-card'], [role='list']"
+        "[data-testid='patient-list'], [data-testid='patient-card'], [role='list']",
       )
-      const listVisible = await patientList.first().isVisible().catch(() => false)
+      const listVisible = await patientList
+        .first()
+        .isVisible()
+        .catch(() => false)
       expect(listVisible).toBe(true)
     })
 
@@ -86,7 +91,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const telehealthSection = page.locator(
-        "[data-testid='telehealth-widget'], [data-testid='video-call'], section, main"
+        "[data-testid='telehealth-widget'], [data-testid='video-call'], section, main",
       )
       await expect(telehealthSection.first()).toBeVisible()
     })
@@ -96,11 +101,14 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const noteEditor = page.locator(
-        "[data-testid='modality-note-editor'], textarea[data-testid='note-content'], [contenteditable='true']"
+        "[data-testid='modality-note-editor'], textarea[data-testid='note-content'], [contenteditable='true']",
       )
       const noteSection = page.locator('section[aria-labelledby]')
 
-      const editorVisible = await noteEditor.first().isVisible().catch(() => false)
+      const editorVisible = await noteEditor
+        .first()
+        .isVisible()
+        .catch(() => false)
       if (!editorVisible) {
         await expect(noteSection.first()).toBeVisible()
       }
@@ -111,7 +119,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const messagingWidget = page.locator(
-        "[data-testid='messaging-widget'], [data-testid='message-list']"
+        "[data-testid='messaging-widget'], [data-testid='message-list']",
       )
       await expect(messagingWidget.first()).toBeVisible()
     })
@@ -121,7 +129,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const scheduleView = page.locator(
-        "[data-testid='mobile-schedule-view'], [data-testid='appointment-list']"
+        "[data-testid='mobile-schedule-view'], [data-testid='appointment-list']",
       )
       await expect(scheduleView.first()).toBeVisible()
     })
@@ -131,7 +139,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const statementsSection = page.locator(
-        "[data-testid='statements-list'], [data-testid='statement-card'], section, main"
+        "[data-testid='statements-list'], [data-testid='statement-card'], section, main",
       )
       await expect(statementsSection.first()).toBeVisible()
     })
@@ -141,7 +149,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const homeworkSection = page.locator(
-        "[data-testid='homework-list'], [data-testid='homework-card'], section, main"
+        "[data-testid='homework-list'], [data-testid='homework-card'], section, main",
       )
       await expect(homeworkSection.first()).toBeVisible()
     })
@@ -161,7 +169,9 @@ for (const viewport of MOBILE_VIEWPORTS) {
         '[tabindex]:not([tabindex="-1"])',
       ]
 
-      const focusableCount = await page.locator(focusableSelectors.join(', ')).count()
+      const focusableCount = await page
+        .locator(focusableSelectors.join(', '))
+        .count()
       expect(focusableCount).toBeGreaterThan(0)
 
       // Tab through the first several elements
@@ -192,7 +202,7 @@ for (const viewport of MOBILE_VIEWPORTS) {
         })
         expect(
           bodyWidth.scrollWidth,
-          `Content clipped on ${label} (${path})`
+          `Content clipped on ${label} (${path})`,
         ).toBeLessThanOrEqual(bodyWidth.clientWidth + 1)
       }
     })
@@ -204,7 +214,9 @@ for (const viewport of MOBILE_VIEWPORTS) {
       await page.waitForLoadState('networkidle')
 
       const tinyFonts = await page.evaluate(() => {
-        const elements = document.querySelectorAll('p, span, li, td, th, label, a, button, h1, h2, h3, h4, h5, h6')
+        const elements = document.querySelectorAll(
+          'p, span, li, td, th, label, a, button, h1, h2, h3, h4, h5, h6',
+        )
         const results: string[] = []
         for (const el of elements) {
           const style = window.getComputedStyle(el)
@@ -215,7 +227,10 @@ for (const viewport of MOBILE_VIEWPORTS) {
         }
         return results
       })
-      expect(tinyFonts, `Found elements with font-size < 12px: ${tinyFonts.join(', ')}`).toHaveLength(0)
+      expect(
+        tinyFonts,
+        `Found elements with font-size < 12px: ${tinyFonts.join(', ')}`,
+      ).toHaveLength(0)
     })
   })
 }

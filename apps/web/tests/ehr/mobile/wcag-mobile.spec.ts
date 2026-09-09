@@ -50,7 +50,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       })
       expect(
         hasOverflow.scrollWidth,
-        `Horizontal overflow on ${path}: scrollWidth=${hasOverflow.scrollWidth} > clientWidth=${hasOverflow.clientWidth}`
+        `Horizontal overflow on ${path}: scrollWidth=${hasOverflow.scrollWidth} > clientWidth=${hasOverflow.clientWidth}`,
       ).toBeLessThanOrEqual(hasOverflow.clientWidth + 1)
     }
   })
@@ -63,7 +63,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       await page.waitForLoadState('networkidle')
 
       const interactiveElements = page.locator(
-        "button:not([disabled]), a[href], [role='button'], input[type='submit'], input[type='button'], [tabindex]:not([tabindex='-1'])"
+        "button:not([disabled]), a[href], [role='button'], input[type='submit'], input[type='button'], [tabindex]:not([tabindex='-1'])",
       )
       const count = await interactiveElements.count()
 
@@ -79,7 +79,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
               const tagName = await el.evaluate((e) => e.tagName)
               const text = (await el.textContent())?.slice(0, 30) ?? ''
               violations.push(
-                `${path}: ${tagName} "${text}" — ${box.width}x${box.height}px`
+                `${path}: ${tagName} "${text}" — ${box.width}x${box.height}px`,
               )
             }
           }
@@ -87,7 +87,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       }
       expect(
         violations,
-        `Touch target violations (expected ≥44x44px, allowed ≥42px):\n${violations.join('\n')}`
+        `Touch target violations (expected ≥44x44px, allowed ≥42px):\n${violations.join('\n')}`,
       ).toHaveLength(0)
     }
   })
@@ -98,7 +98,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       await page.waitForLoadState('networkidle')
 
       const interactiveElements = page.locator(
-        "button:not([disabled]), a[href], [role='button'], input:not([disabled]), select:not([disabled]), textarea:not([disabled])"
+        "button:not([disabled]), a[href], [role='button'], input:not([disabled]), select:not([disabled]), textarea:not([disabled])",
       )
       const count = await interactiveElements.count()
 
@@ -129,7 +129,12 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
             const hasAriaLabel = await el.getAttribute('aria-label')
             const hasAriaLabelledBy = await el.getAttribute('aria-labelledby')
 
-            if (!hasLabel && !hasAriaLabel && !hasAriaLabelledBy && !accessibleName) {
+            if (
+              !hasLabel &&
+              !hasAriaLabel &&
+              !hasAriaLabelledBy &&
+              !accessibleName
+            ) {
               const placeholder = await el.getAttribute('placeholder')
               if (!placeholder) {
                 unlabeled.push(`${path}: ${tagName}#${id ?? 'no-id'}`)
@@ -142,7 +147,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       }
       expect(
         unlabeled,
-        `Elements without accessible names:\n${unlabeled.join('\n')}`
+        `Elements without accessible names:\n${unlabeled.join('\n')}`,
       ).toHaveLength(0)
     }
   })
@@ -170,7 +175,8 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
         const style = window.getComputedStyle(el)
         return {
           tagName: el.tagName,
-          hasFocusVisible: style.outlineStyle !== 'none' || style.boxShadow !== 'none',
+          hasFocusVisible:
+            style.outlineStyle !== 'none' || style.boxShadow !== 'none',
           outlineWidth: style.outlineWidth,
         }
       })
@@ -179,7 +185,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
         // Focus should be visible (either outline or box-shadow)
         expect(
           focusInfo.hasFocusVisible,
-          `${focusInfo.tagName} at position ${i} has no visible focus indicator`
+          `${focusInfo.tagName} at position ${i} has no visible focus indicator`,
         ).toBe(true)
       }
     }
@@ -202,16 +208,14 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
           // Images should have alt text, or role="presentation"/"none" for decorative
           expect(
             alt !== null || role === 'presentation' || role === 'none',
-            `${path}: img #${i} missing alt attribute`
+            `${path}: img #${i} missing alt attribute`,
           ).toBe(true)
         }
       }
     }
   })
 
-  test('heading hierarchy is logical (no skipped levels)', async ({
-    page,
-  }) => {
+  test('heading hierarchy is logical (no skipped levels)', async ({ page }) => {
     for (const path of EHR_PAGES) {
       await page.goto(path)
       await page.waitForLoadState('networkidle')
@@ -229,7 +233,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
         for (let i = 1; i < headings.length; i++) {
           expect(
             headings[i] - headings[i - 1],
-            `${path}: heading jumps from h${headings[i - 1]} to h${headings[i]}`
+            `${path}: heading jumps from h${headings[i - 1]} to h${headings[i]}`,
           ).toBeLessThanOrEqual(1)
         }
       }
@@ -243,10 +247,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
 
       const main = page.locator("main, [role='main']")
       const mainCount = await main.count()
-      expect(
-        mainCount,
-        `${path}: missing main landmark`
-      ).toBeGreaterThan(0)
+      expect(mainCount, `${path}: missing main landmark`).toBeGreaterThan(0)
     }
   })
 
@@ -256,7 +257,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       await page.waitForLoadState('networkidle')
 
       const inputs = page.locator(
-        "input[type='text'], input[type='email'], input[type='tel'], input[type='search'], textarea, select"
+        "input[type='text'], input[type='email'], input[type='tel'], input[type='search'], textarea, select",
       )
       const count = await inputs.count()
 
@@ -274,8 +275,11 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
 
           // At least one labeling mechanism must be present
           expect(
-            hasLabel > 0 || Boolean(ariaLabel) || Boolean(ariaLabelledBy) || Boolean(placeholder),
-            `${path}: input #${i} has no label, aria-label, aria-labelledby, or placeholder`
+            hasLabel > 0 ||
+              Boolean(ariaLabel) ||
+              Boolean(ariaLabelledBy) ||
+              Boolean(placeholder),
+            `${path}: input #${i} has no label, aria-label, aria-labelledby, or placeholder`,
           ).toBe(true)
         }
       }
@@ -284,42 +288,100 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
 
   test('ARIA attributes are valid (no invalid roles)', async ({ page }) => {
     const validRoles = new Set([
-      'alert', 'alertdialog', 'application', 'article', 'banner', 'button',
-      'cell', 'checkbox', 'columnheader', 'combobox', 'complementary',
-      'contentinfo', 'dialog', 'directory', 'document', 'form', 'grid',
-      'gridcell', 'group', 'heading', 'img', 'link', 'list', 'listbox',
-      'listitem', 'log', 'main', 'marquee', 'math', 'menu', 'menubar',
-      'menuitem', 'menuitemcheckbox', 'menuitemradio', 'navigation',
-      'none', 'note', 'option', 'presentation', 'progressbar', 'radio',
-      'radiogroup', 'region', 'row', 'rowgroup', 'rowheader', 'scrollbar',
-      'search', 'separator', 'slider', 'spinbutton', 'status', 'switch',
-      'tab', 'tablist', 'tabpanel', 'textbox', 'timer', 'toolbar',
-      'tooltip', 'tree', 'treegrid', 'treeitem', 'feed', 'table',
-      'navigation', 'banner', 'contentinfo', 'main', 'complementary',
+      'alert',
+      'alertdialog',
+      'application',
+      'article',
+      'banner',
+      'button',
+      'cell',
+      'checkbox',
+      'columnheader',
+      'combobox',
+      'complementary',
+      'contentinfo',
+      'dialog',
+      'directory',
+      'document',
+      'form',
+      'grid',
+      'gridcell',
+      'group',
+      'heading',
+      'img',
+      'link',
+      'list',
+      'listbox',
+      'listitem',
+      'log',
+      'main',
+      'marquee',
+      'math',
+      'menu',
+      'menubar',
+      'menuitem',
+      'menuitemcheckbox',
+      'menuitemradio',
+      'navigation',
+      'none',
+      'note',
+      'option',
+      'presentation',
+      'progressbar',
+      'radio',
+      'radiogroup',
+      'region',
+      'row',
+      'rowgroup',
+      'rowheader',
+      'scrollbar',
+      'search',
+      'separator',
+      'slider',
+      'spinbutton',
+      'status',
+      'switch',
+      'tab',
+      'tablist',
+      'tabpanel',
+      'textbox',
+      'timer',
+      'toolbar',
+      'tooltip',
+      'tree',
+      'treegrid',
+      'treeitem',
+      'feed',
+      'table',
+      'navigation',
+      'banner',
+      'contentinfo',
+      'main',
+      'complementary',
     ])
 
-      const violations: string[] = []
+    const violations: string[] = []
 
-      for (const path of ['/portal', '/portal/scheduling', '/portal/messaging']) {
-        await page.goto(path)
-        await page.waitForLoadState('networkidle')
+    for (const path of ['/portal', '/portal/scheduling', '/portal/messaging']) {
+      await page.goto(path)
+      await page.waitForLoadState('networkidle')
 
-        const elementsWithRole = page.locator('[role]')
-        const count = await elementsWithRole.count()
+      const elementsWithRole = page.locator('[role]')
+      const count = await elementsWithRole.count()
 
-        for (let i = 0; i < count; i++) {
-          const el = elementsWithRole.nth(i)
-          const role = await el.getAttribute('role')
-          if (role && !validRoles.has(role)) {
-            violations.push(`${path}: element with non-standard role "${role}"`)
-          }
+      for (let i = 0; i < count; i++) {
+        const el = elementsWithRole.nth(i)
+        const role = await el.getAttribute('role')
+        if (role && !validRoles.has(role)) {
+          violations.push(`${path}: element with non-standard role "${role}"`)
         }
       }
+    }
 
-      expect(
-        violations,
-        `Non-standard ARIA roles found: ${violations.join(', ')}`,
-      ).toEqual([])
+    expect(
+      violations,
+      `Non-standard ARIA roles found: ${violations.join(', ')}`,
+    ).toEqual([])
   })
 
   test('status messages use appropriate ARIA live regions', async ({
@@ -334,7 +396,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
 
     // The offline status banner should be a status/alert
     const statusElements = page.locator(
-      "[role='status'], [role='alert'], [aria-live='polite'], [aria-live='assertive'], [data-testid='offline-status'], [data-testid='sync-status-banner']"
+      "[role='status'], [role='alert'], [aria-live='polite'], [aria-live='assertive'], [data-testid='offline-status'], [data-testid='sync-status-banner']",
     )
     const statusCount = await statusElements.count()
     expect(statusCount).toBeGreaterThan(0)
@@ -350,7 +412,9 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
 
     // Basic check: verify text elements don't use very low contrast combinations
     const lowContrastCount = await page.evaluate(() => {
-      const textElements = document.querySelectorAll('p, span, li, a, button, label, h1, h2, h3, h4, h5, h6')
+      const textElements = document.querySelectorAll(
+        'p, span, li, a, button, label, h1, h2, h3, h4, h5, h6',
+      )
       let issues = 0
       for (const el of textElements) {
         const style = window.getComputedStyle(el)
@@ -396,10 +460,7 @@ test.describe('EHR WCAG 2.1 AA — Mobile (320px)', () => {
       const lang = await page.evaluate(() => {
         return document.documentElement.lang
       })
-      expect(
-        lang,
-        `${path}: html element missing lang attribute`
-      ).toBeTruthy()
+      expect(lang, `${path}: html element missing lang attribute`).toBeTruthy()
     }
   })
 })
