@@ -7,6 +7,7 @@
 // @vitest-environment node
 
 import { describe, it, expect } from 'vitest'
+import zlib from 'node:zlib'
 
 import { exportReportToPDF } from '../export/pdf-exporter'
 import type {
@@ -301,6 +302,47 @@ function makeAccessReviewReport(): AccessReviewReport {
 }
 
 // ---------------------------------------------------------------------------
+// PDF text extraction helper
+// ---------------------------------------------------------------------------
+
+function extractPdfText(buffer: Buffer): string {
+  const binaryStr = buffer.toString('binary')
+  const chunks: string[] = []
+  let searchFrom = 0
+
+  while (true) {
+    const streamKeyword = 'stream'
+    const streamStart = binaryStr.indexOf(streamKeyword, searchFrom)
+    if (streamStart === -1) break
+
+    const afterKeyword = streamStart + streamKeyword.length
+    const dataStart = afterKeyword + (binaryStr[afterKeyword] === '\r' ? 2 : 1)
+    const streamEnd = binaryStr.indexOf('endstream', dataStart)
+    if (streamEnd === -1) break
+
+    try {
+      const decompressed = zlib.inflateSync(buffer.subarray(dataStart, streamEnd))
+      const content = decompressed.toString('latin1')
+      const hexMatches = content.match(/<([0-9A-Fa-f]+)>/g)
+      if (hexMatches) {
+        for (const hexStr of hexMatches) {
+          const hex = hexStr.replace(/[<>]/g, '')
+          if (hex.length % 2 === 0) {
+            chunks.push(Buffer.from(hex, 'hex').toString('latin1'))
+          }
+        }
+      }
+    } catch {
+      // not a FlateDecode stream
+    }
+
+    searchFrom = streamEnd + 'endstream'.length
+  }
+
+  return chunks.join('')
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -374,8 +416,11 @@ describe('exportReportToPDF', () => {
       status: 'completed' as const,
     }
     const buffer = await exportReportToPDF(report, metadata)
-    // The PDF should contain text content — check it's not just a minimal PDF
-    expect(buffer.length).toBeGreaterThan(100)
+    const text = extractPdfText(buffer)
+    expect(text).toContain('rpt-test-001')
+    expect(text).toContain('specific-test-user')
+    expect(text).toContain('completed')
+    expect(text).toContain('Report Information')
   })
 
   it('handles empty report data gracefully', async () => {
