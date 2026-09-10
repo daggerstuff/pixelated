@@ -10,8 +10,9 @@
  */
 
 import { z } from 'zod'
-import { getSeedForState, getAllSeeds, type StateRuleSeed } from './seed-data'
+
 import { StateCodeSchema, US_STATE_CODE_LIST } from './schemas'
+import { getSeedForState, getAllSeeds, type StateRuleSeed } from './seed-data'
 
 // ---------------------------------------------------------------------------
 // Checklist item schema
@@ -27,9 +28,13 @@ export type ChecklistItemStatus = z.infer<typeof ChecklistItemStatusSchema>
 
 export const StateChecklistItemSchema = z
   .object({
-    itemId: z.string().describe('Stable unique identifier for this checklist item'),
+    itemId: z
+      .string()
+      .describe('Stable unique identifier for this checklist item'),
     stateCode: StateCodeSchema,
-    category: z.string().describe('Checklist category (e.g., "age_of_majority")'),
+    category: z
+      .string()
+      .describe('Checklist category (e.g., "age_of_majority")'),
     label: z.string().describe('Human-readable label for legal review'),
     description: z.string().describe('Detailed explanation of what to verify'),
     legalReference: z
@@ -186,7 +191,9 @@ function buildChecklistForSeed(seed: StateRuleSeed): StateChecklistItem[] {
  * @param stateCode 2-letter USPS code
  * @returns StateChecklist with all review items, or undefined if no seed exists
  */
-export function generateStateChecklist(stateCode: string): StateChecklist | undefined {
+export function generateStateChecklist(
+  stateCode: string,
+): StateChecklist | undefined {
   const seed = getSeedForState(stateCode)
   if (!seed) {
     return undefined

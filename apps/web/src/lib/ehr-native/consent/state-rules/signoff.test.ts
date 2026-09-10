@@ -38,7 +38,13 @@ const validCreateInput = {
 describe('G3.1 attorney sign-off schemas', () => {
   describe('SignoffStatusSchema', () => {
     it('accepts all valid statuses', () => {
-      for (const s of ['pending', 'in_review', 'approved', 'rejected', 'withdrawn']) {
+      for (const s of [
+        'pending',
+        'in_review',
+        'approved',
+        'rejected',
+        'withdrawn',
+      ]) {
         expect(SignoffStatusSchema.parse(s)).toBe(s)
       }
     })
@@ -67,19 +73,28 @@ describe('G3.1 attorney sign-off schemas', () => {
 
     it('rejects invalid state code', () => {
       expect(() =>
-        CreateSignoffInputSchema.parse({ ...validCreateInput, stateCode: 'XX' }),
+        CreateSignoffInputSchema.parse({
+          ...validCreateInput,
+          stateCode: 'XX',
+        }),
       ).toThrow()
     })
 
     it('rejects invalid attorneyId (not uuid)', () => {
       expect(() =>
-        CreateSignoffInputSchema.parse({ ...validCreateInput, attorneyId: 'not-a-uuid' }),
+        CreateSignoffInputSchema.parse({
+          ...validCreateInput,
+          attorneyId: 'not-a-uuid',
+        }),
       ).toThrow()
     })
 
     it('rejects empty attorneyName', () => {
       expect(() =>
-        CreateSignoffInputSchema.parse({ ...validCreateInput, attorneyName: '' }),
+        CreateSignoffInputSchema.parse({
+          ...validCreateInput,
+          attorneyName: '',
+        }),
       ).toThrow()
     })
 
@@ -238,7 +253,9 @@ describe('G3.1 sign-off state machine', () => {
 
   describe('validateSignoffTransition', () => {
     it('does not throw for valid transition', () => {
-      expect(() => validateSignoffTransition('pending', 'in_review')).not.toThrow()
+      expect(() =>
+        validateSignoffTransition('pending', 'in_review'),
+      ).not.toThrow()
     })
 
     it('throws for invalid transition', () => {
@@ -281,7 +298,10 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
 
     it('rejects invalid input', () => {
       expect(() =>
-        attorneySignoffRepository.create({ ...validCreateInput, stateCode: 'XX' }),
+        attorneySignoffRepository.create({
+          ...validCreateInput,
+          stateCode: 'XX',
+        }),
       ).toThrow()
     })
   })
@@ -296,7 +316,9 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
 
     it('returns undefined for unknown id', () => {
       expect(
-        attorneySignoffRepository.getById('550e8400-e29b-41d4-a716-446655440099'),
+        attorneySignoffRepository.getById(
+          '550e8400-e29b-41d4-a716-446655440099',
+        ),
       ).toBeUndefined()
     })
   })
@@ -304,7 +326,10 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
   describe('listByState', () => {
     it('returns sign-offs for a given state', () => {
       attorneySignoffRepository.create(validCreateInput)
-      attorneySignoffRepository.create({ ...validCreateInput, attorneyId: '550e8400-e29b-41d4-a716-446655440002' })
+      attorneySignoffRepository.create({
+        ...validCreateInput,
+        attorneyId: '550e8400-e29b-41d4-a716-446655440002',
+      })
       const list = attorneySignoffRepository.listByState(STATE_CODE)
       expect(list).toHaveLength(2)
     })
@@ -312,8 +337,14 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
     it('filters by status', () => {
       const s = attorneySignoffRepository.create(validCreateInput)
       attorneySignoffRepository.updateStatus(s.signoffId, 'in_review')
-      const pending = attorneySignoffRepository.listByState(STATE_CODE, 'pending')
-      const inReview = attorneySignoffRepository.listByState(STATE_CODE, 'in_review')
+      const pending = attorneySignoffRepository.listByState(
+        STATE_CODE,
+        'pending',
+      )
+      const inReview = attorneySignoffRepository.listByState(
+        STATE_CODE,
+        'in_review',
+      )
       expect(pending).toHaveLength(0)
       expect(inReview).toHaveLength(1)
     })
@@ -350,14 +381,20 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
   describe('updateStatus', () => {
     it('transitions pending → in_review', () => {
       const s = attorneySignoffRepository.create(validCreateInput)
-      const updated = attorneySignoffRepository.updateStatus(s.signoffId, 'in_review')
+      const updated = attorneySignoffRepository.updateStatus(
+        s.signoffId,
+        'in_review',
+      )
       expect(updated?.status).toBe('in_review')
     })
 
     it('sets signedAt when transitioning to approved', () => {
       const s = attorneySignoffRepository.create(validCreateInput)
       attorneySignoffRepository.updateStatus(s.signoffId, 'in_review')
-      const approved = attorneySignoffRepository.updateStatus(s.signoffId, 'approved')
+      const approved = attorneySignoffRepository.updateStatus(
+        s.signoffId,
+        'approved',
+      )
       expect(approved?.status).toBe('approved')
       expect(approved?.signedAt).toBeDefined()
     })
@@ -365,7 +402,10 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
     it('sets signedAt when transitioning to rejected', () => {
       const s = attorneySignoffRepository.create(validCreateInput)
       attorneySignoffRepository.updateStatus(s.signoffId, 'in_review')
-      const rejected = attorneySignoffRepository.updateStatus(s.signoffId, 'rejected')
+      const rejected = attorneySignoffRepository.updateStatus(
+        s.signoffId,
+        'rejected',
+      )
       expect(rejected?.status).toBe('rejected')
       expect(rejected?.signedAt).toBeDefined()
     })
@@ -402,7 +442,10 @@ describe('G3.1 AttorneySignoffRepository (in-memory)', () => {
       const s = attorneySignoffRepository.create(validCreateInput)
       attorneySignoffRepository.updateStatus(s.signoffId, 'in_review')
       attorneySignoffRepository.updateStatus(s.signoffId, 'approved')
-      const withdrawn = attorneySignoffRepository.withdraw(s.signoffId, 'Revoked')
+      const withdrawn = attorneySignoffRepository.withdraw(
+        s.signoffId,
+        'Revoked',
+      )
       expect(withdrawn?.status).toBe('withdrawn')
       expect(withdrawn?.notes).toBe('Revoked')
     })

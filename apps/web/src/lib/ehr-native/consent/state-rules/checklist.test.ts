@@ -6,7 +6,6 @@
 
 import { describe, it, expect } from 'vitest'
 
-import { US_STATE_CODE_LIST } from './schemas'
 import {
   generateStateChecklist,
   generateAllChecklists,
@@ -14,6 +13,7 @@ import {
   StateChecklistSchema,
   StateChecklistItemSchema,
 } from './checklist'
+import { US_STATE_CODE_LIST } from './schemas'
 
 // ---------------------------------------------------------------------------
 // Tests
@@ -73,7 +73,9 @@ describe('G3.1 checklist generator', () => {
 
     it('item legalReference matches seed legalReference', () => {
       const ca = generateStateChecklist('CA')
-      const refItem = ca?.items.find((i) => i.category === 'legal_reference_currency')
+      const refItem = ca?.items.find(
+        (i) => i.category === 'legal_reference_currency',
+      )
       expect(refItem?.legalReference).toBeDefined()
       expect(refItem?.legalReference.length).toBeGreaterThan(0)
     })

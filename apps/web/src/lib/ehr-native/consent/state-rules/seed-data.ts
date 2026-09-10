@@ -84,7 +84,12 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Alaska',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
       legalReference: 'Alaska Stat. § 25.20.025; § 47.30.700 (mental health)',
       sourceUrl: 'https://www.akleg.gov/statutes/',
     }),
@@ -96,8 +101,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Arizona',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'A.R.S. § 12-1281; § 36-2022 (mental health treatment for minors)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'A.R.S. § 12-1281; § 36-2022 (mental health treatment for minors)',
       sourceUrl: 'https://www.azleg.gov/ars/',
     }),
     legalReference: 'A.R.S. § 12-1281; § 36-2022',
@@ -108,7 +119,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Arkansas',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'Ark. Code § 9-26-104; § 20-47-214 (mental health parity)',
+      legalReference:
+        'Ark. Code § 9-26-104; § 20-47-214 (mental health parity)',
       sourceUrl: 'https://codes.findlaw.com/ar/',
     }),
     legalReference: 'Ark. Code § 9-26-104; § 20-47-214',
@@ -120,11 +132,19 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     ruleConfig: makeSeedConfig({
       minimumConsentLevel: 'limited',
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Cal. Fam. Code § 6500-6502; Cal. Health & Safety Code § 123110; Cal. Welf. & Inst. Code § 14007.5',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Cal. Fam. Code § 6500-6502; Cal. Health & Safety Code § 123110; Cal. Welf. & Inst. Code § 14007.5',
       sourceUrl: 'https://leginfo.legislature.ca.gov/',
     }),
-    legalReference: 'Cal. Fam. Code § 6500-6502; Cal. Health & Safety Code § 123110',
+    legalReference:
+      'Cal. Fam. Code § 6500-6502; Cal. Health & Safety Code § 123110',
     lastReviewed: LAST_REVIEWED,
   },
   CO: {
@@ -132,8 +152,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Colorado',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Colo. Rev. Stat. § 13-22-101; § 27-65-103 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Colo. Rev. Stat. § 13-22-101; § 27-65-103 (mental health consent)',
       sourceUrl: 'https://leg.colorado.gov/',
     }),
     legalReference: 'Colo. Rev. Stat. § 13-22-101; § 27-65-103',
@@ -144,8 +170,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Connecticut',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Conn. Gen. Stat. § 19a-215; § 17a-490 (mental health admission)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Conn. Gen. Stat. § 19a-215; § 17a-490 (mental health admission)',
       sourceUrl: 'https://www.cga.ct.gov/',
     }),
     legalReference: 'Conn. Gen. Stat. § 19a-215; § 17a-490',
@@ -156,8 +188,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Delaware',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Del. Code tit. 13 § 701; tit. 16 § 5007 (mental health treatment)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Del. Code tit. 13 § 701; tit. 16 § 5007 (mental health treatment)',
       sourceUrl: 'https://delcode.delaware.gov/',
     }),
     legalReference: 'Del. Code tit. 13 § 701; tit. 16 § 5007',
@@ -168,8 +206,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Florida',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Fla. Stat. § 743.07; § 394.4788 (Baker Act - mental health)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Fla. Stat. § 743.07; § 394.4788 (Baker Act - mental health)',
       sourceUrl: 'http://www.leg.state.fl.us/statutes/',
     }),
     legalReference: 'Fla. Stat. § 743.07; § 394.4788',
@@ -180,7 +225,12 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Georgia',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
       legalReference: 'O.C.G.A. § 39-1-1; § 37-3-23 (mental health consent)',
       sourceUrl: 'https://www.legis.ga.gov/',
     }),
@@ -192,8 +242,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Hawaii',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Haw. Rev. Stat. § 577D-2; § 334-5 (mental health treatment)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Haw. Rev. Stat. § 577D-2; § 334-5 (mental health treatment)',
       sourceUrl: 'https://www.capitol.hawaii.gov/',
     }),
     legalReference: 'Haw. Rev. Stat. § 577D-2; § 334-5',
@@ -204,7 +261,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Idaho',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'Idaho Code § 32-101; § 66-318 (mental health commitment)',
+      legalReference:
+        'Idaho Code § 32-101; § 66-318 (mental health commitment)',
       sourceUrl: 'https://legislature.idaho.gov/statutesrules/',
     }),
     legalReference: 'Idaho Code § 32-101; § 66-318',
@@ -215,8 +273,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Illinois',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: '755 ILCS 5/11-2; 405 ILCS 5/3-811 (mental health consent for minors 12+)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        '755 ILCS 5/11-2; 405 ILCS 5/3-811 (mental health consent for minors 12+)',
       sourceUrl: 'https://www.ilga.gov/legislation/',
     }),
     legalReference: '755 ILCS 5/11-2; 405 ILCS 5/3-811',
@@ -227,8 +291,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Indiana',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Ind. Code § 29-3-1-6; § 12-26-2-2 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Ind. Code § 29-3-1-6; § 12-26-2-2 (mental health consent)',
       sourceUrl: 'https://iga.in.gov/',
     }),
     legalReference: 'Ind. Code § 29-3-1-6; § 12-26-2-2',
@@ -239,7 +309,12 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Iowa',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
       legalReference: 'Iowa Code § 599.1; § 229.16 (mental health consent)',
       sourceUrl: 'https://www.legis.iowa.gov/',
     }),
@@ -251,7 +326,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Kansas',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'Kan. Stat. § 38-101; § 59-2910 (mental health treatment consent)',
+      legalReference:
+        'Kan. Stat. § 38-101; § 59-2910 (mental health treatment consent)',
       sourceUrl: 'https://www.kslegislature.org/',
     }),
     legalReference: 'Kan. Stat. § 38-101; § 59-2910',
@@ -262,8 +338,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Kentucky',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Ky. Rev. Stat. § 2.015; § 202A.400 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Ky. Rev. Stat. § 2.015; § 202A.400 (mental health consent)',
       sourceUrl: 'https://apps.legislature.ky.gov/',
     }),
     legalReference: 'Ky. Rev. Stat. § 2.015; § 202A.400',
@@ -274,8 +356,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Louisiana',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'La. Civ. Code art. 29; La. Rev. Stat. § 28:422 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'La. Civ. Code art. 29; La. Rev. Stat. § 28:422 (mental health consent)',
       sourceUrl: 'https://www.legis.la.gov/',
     }),
     legalReference: 'La. Civ. Code art. 29; La. Rev. Stat. § 28:422',
@@ -286,8 +374,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Maine',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Me. Rev. Stat. tit. 22 § 1822; tit. 34-B § 3861 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Me. Rev. Stat. tit. 22 § 1822; tit. 34-B § 3861 (mental health consent)',
       sourceUrl: 'https://www.mainelegislature.org/',
     }),
     legalReference: 'Me. Rev. Stat. tit. 22 § 1822; tit. 34-B § 3861',
@@ -298,8 +392,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Maryland',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Md. Code, Health-Gen. § 20-102; § 10-610 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Md. Code, Health-Gen. § 20-102; § 10-610 (mental health consent)',
       sourceUrl: 'https://mgaleg.maryland.gov/',
     }),
     legalReference: 'Md. Code, Health-Gen. § 20-102; § 10-610',
@@ -310,8 +411,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Massachusetts',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Mass. Gen. Laws ch. 112 § 12F; ch. 123 § 12 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Mass. Gen. Laws ch. 112 § 12F; ch. 123 § 12 (mental health consent)',
       sourceUrl: 'https://malegislature.gov/Laws/',
     }),
     legalReference: 'Mass. Gen. Laws ch. 112 § 12F; ch. 123 § 12',
@@ -322,8 +429,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Michigan',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Mich. Comp. Laws § 722.1; § 330.1708 (mental health code)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Mich. Comp. Laws § 722.1; § 330.1708 (mental health code)',
       sourceUrl: 'https://www.legislature.mi.gov/',
     }),
     legalReference: 'Mich. Comp. Laws § 722.1; § 330.1708',
@@ -334,8 +447,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Minnesota',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Minn. Stat. § 144.341; § 253B.05 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Minn. Stat. § 144.341; § 253B.05 (mental health consent)',
       sourceUrl: 'https://www.revisor.mn.gov/',
     }),
     legalReference: 'Minn. Stat. § 144.341; § 253B.05',
@@ -346,7 +465,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Mississippi',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 21,
-      legalReference: 'Miss. Code § 43-21-551; § 41-21-97 (mental health consent)',
+      legalReference:
+        'Miss. Code § 43-21-551; § 41-21-97 (mental health consent)',
       sourceUrl: 'https://billstatus.ls.state.ms.us/',
     }),
     legalReference: 'Miss. Code § 43-21-551; § 41-21-97',
@@ -357,8 +477,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Missouri',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Mo. Rev. Stat. § 431.061; § 632.005 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Mo. Rev. Stat. § 431.061; § 632.005 (mental health consent)',
       sourceUrl: 'https://revisor.mo.gov/',
     }),
     legalReference: 'Mo. Rev. Stat. § 431.061; § 632.005',
@@ -369,8 +495,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Montana',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Mont. Code § 41-1-201; § 53-21-102 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Mont. Code § 41-1-201; § 53-21-102 (mental health consent)',
       sourceUrl: 'https://leg.mt.gov/',
     }),
     legalReference: 'Mont. Code § 41-1-201; § 53-21-102',
@@ -381,7 +513,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Nebraska',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 19,
-      legalReference: 'Neb. Rev. Stat. § 43-2101; § 83-1061 (mental health commitment)',
+      legalReference:
+        'Neb. Rev. Stat. § 43-2101; § 83-1061 (mental health commitment)',
       sourceUrl: 'https://nebraskalegislature.gov/',
     }),
     legalReference: 'Neb. Rev. Stat. § 43-2101; § 83-1061',
@@ -392,8 +525,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Nevada',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Nev. Rev. Stat. § 129.010; § 433A.300 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Nev. Rev. Stat. § 129.010; § 433A.300 (mental health consent)',
       sourceUrl: 'https://www.leg.state.nv.us/',
     }),
     legalReference: 'Nev. Rev. Stat. § 129.010; § 433A.300',
@@ -404,8 +543,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'New Hampshire',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'N.H. Rev. Stat. § 463-A:1; § 135-C:27 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'N.H. Rev. Stat. § 463-A:1; § 135-C:27 (mental health consent)',
       sourceUrl: 'https://www.gencourt.state.nh.us/',
     }),
     legalReference: 'N.H. Rev. Stat. § 463-A:1; § 135-C:27',
@@ -416,8 +561,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'New Jersey',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'N.J. Stat. § 9:17A-4; § 30:4-248.1 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'N.J. Stat. § 9:17A-4; § 30:4-248.1 (mental health consent)',
       sourceUrl: 'https://www.njleg.state.nj.us/',
     }),
     legalReference: 'N.J. Stat. § 9:17A-4; § 30:4-248.1',
@@ -428,7 +579,13 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'New Mexico',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
       legalReference: 'N.M. Stat. § 24-8-5; § 43-1-10 (mental health consent)',
       sourceUrl: 'https://www.nmlegis.gov/',
     }),
@@ -441,8 +598,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     ruleConfig: makeSeedConfig({
       minimumConsentLevel: 'limited',
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'N.Y. Pub. Health Law § 2504; N.Y. Ment. Hyg. Law § 22.09 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'N.Y. Pub. Health Law § 2504; N.Y. Ment. Hyg. Law § 22.09 (mental health consent)',
       sourceUrl: 'https://www.nysenate.gov/legislation/',
     }),
     legalReference: 'N.Y. Pub. Health Law § 2504; N.Y. Ment. Hyg. Law § 22.09',
@@ -453,8 +617,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'North Carolina',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'N.C. Gen. Stat. § 90-21.7; § 122C-301 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'N.C. Gen. Stat. § 90-21.7; § 122C-301 (mental health consent)',
       sourceUrl: 'https://www.ncleg.gov/',
     }),
     legalReference: 'N.C. Gen. Stat. § 90-21.7; § 122C-301',
@@ -465,7 +635,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'North Dakota',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'N.D. Cent. Code § 14-10-01; § 25-03.1-03 (mental health consent)',
+      legalReference:
+        'N.D. Cent. Code § 14-10-01; § 25-03.1-03 (mental health consent)',
       sourceUrl: 'https://www.legis.nd.gov/',
     }),
     legalReference: 'N.D. Cent. Code § 14-10-01; § 25-03.1-03',
@@ -476,8 +647,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Ohio',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Ohio Rev. Code § 3709.51; § 5122.14 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Ohio Rev. Code § 3709.51; § 5122.14 (mental health consent)',
       sourceUrl: 'https://codes.ohio.gov/',
     }),
     legalReference: 'Ohio Rev. Code § 3709.51; § 5122.14',
@@ -488,8 +665,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Oklahoma',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Okla. Stat. tit. 63 § 2601; tit. 43A § 5-203 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Okla. Stat. tit. 63 § 2601; tit. 43A § 5-203 (mental health consent)',
       sourceUrl: 'https://www.oklegislature.gov/',
     }),
     legalReference: 'Okla. Stat. tit. 63 § 2601; tit. 43A § 5-203',
@@ -501,8 +684,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     ruleConfig: makeSeedConfig({
       minimumConsentLevel: 'limited',
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Or. Rev. Stat. § 109.640; § 426.070 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Or. Rev. Stat. § 109.640; § 426.070 (mental health consent)',
       sourceUrl: 'https://www.oregonlegislature.gov/',
     }),
     legalReference: 'Or. Rev. Stat. § 109.640; § 426.070',
@@ -513,8 +703,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Pennsylvania',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: '35 Pa. Cons. Stat. § 10101; 50 P.S. § 7101 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        '35 Pa. Cons. Stat. § 10101; 50 P.S. § 7101 (mental health consent)',
       sourceUrl: 'https://www.legis.state.pa.us/',
     }),
     legalReference: '35 Pa. Cons. Stat. § 10101; 50 P.S. § 7101',
@@ -525,8 +721,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Rhode Island',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'R.I. Gen. Laws § 23-4-7; § 40.1-8-4 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'R.I. Gen. Laws § 23-4-7; § 40.1-8-4 (mental health consent)',
       sourceUrl: 'https://webserver.rilin.state.ri.us/',
     }),
     legalReference: 'R.I. Gen. Laws § 23-4-7; § 40.1-8-4',
@@ -537,7 +739,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'South Carolina',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'S.C. Code § 63-9-340; § 44-22-110 (mental health consent)',
+      legalReference:
+        'S.C. Code § 63-9-340; § 44-22-110 (mental health consent)',
       sourceUrl: 'https://www.scstatehouse.gov/',
     }),
     legalReference: 'S.C. Code § 63-9-340; § 44-22-110',
@@ -548,7 +751,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'South Dakota',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'S.D. Cod. Laws § 26-2-1; § 27A-10-9 (mental health consent)',
+      legalReference:
+        'S.D. Cod. Laws § 26-2-1; § 27A-10-9 (mental health consent)',
       sourceUrl: 'https://sdlegislature.gov/',
     }),
     legalReference: 'S.D. Cod. Laws § 26-2-1; § 27A-10-9',
@@ -559,8 +763,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Tennessee',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Tenn. Code § 29-32-101; § 33-3-101 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Tenn. Code § 29-32-101; § 33-3-101 (mental health consent)',
       sourceUrl: 'https://publications.tnsosfiles.com/',
     }),
     legalReference: 'Tenn. Code § 29-32-101; § 33-3-101',
@@ -571,11 +781,18 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Texas',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Tex. Fam. Code § 151.003; Tex. Health & Safety Code § 571.004 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Tex. Fam. Code § 151.003; Tex. Health & Safety Code § 571.004 (mental health consent)',
       sourceUrl: 'https://statutes.capitol.texas.gov/',
     }),
-    legalReference: 'Tex. Fam. Code § 151.003; Tex. Health & Safety Code § 571.004',
+    legalReference:
+      'Tex. Fam. Code § 151.003; Tex. Health & Safety Code § 571.004',
     lastReviewed: LAST_REVIEWED,
   },
   UT: {
@@ -583,8 +800,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Utah',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Utah Code § 78A-6-105; § 62A-15-101 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Utah Code § 78A-6-105; § 62A-15-101 (mental health consent)',
       sourceUrl: 'https://le.utah.gov/',
     }),
     legalReference: 'Utah Code § 78A-6-105; § 62A-15-101',
@@ -596,8 +819,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     ruleConfig: makeSeedConfig({
       minimumConsentLevel: 'limited',
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Vt. Stat. tit. 18 § 4226; tit. 18 § 7101 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Vt. Stat. tit. 18 § 4226; tit. 18 § 7101 (mental health consent)',
       sourceUrl: 'https://legislature.vermont.gov/',
     }),
     legalReference: 'Vt. Stat. tit. 18 § 4226; tit. 18 § 7101',
@@ -608,7 +838,12 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Virginia',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
       legalReference: 'Va. Code § 8.01-322; § 37.2-801 (mental health consent)',
       sourceUrl: 'https://law.lis.virginia.gov/',
     }),
@@ -621,8 +856,15 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     ruleConfig: makeSeedConfig({
       minimumConsentLevel: 'limited',
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
-      legalReference: 'Wash. Rev. Code § 26.28.010; § 71.05.360 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
+      legalReference:
+        'Wash. Rev. Code § 26.28.010; § 71.05.360 (mental health consent)',
       sourceUrl: 'https://app.leg.wa.gov/rcw/',
     }),
     legalReference: 'Wash. Rev. Code § 26.28.010; § 71.05.360',
@@ -633,7 +875,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'West Virginia',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'W. Va. Code § 49-4-101; § 27-5-1 (mental health consent)',
+      legalReference:
+        'W. Va. Code § 49-4-101; § 27-5-1 (mental health consent)',
       sourceUrl: 'https://code.wvlegislature.gov/',
     }),
     legalReference: 'W. Va. Code § 49-4-101; § 27-5-1',
@@ -644,7 +887,12 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Wisconsin',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
       legalReference: 'Wis. Stat. § 48.02; § 51.20 (mental health commitment)',
       sourceUrl: 'https://docs.legis.wisconsin.gov/',
     }),
@@ -656,7 +904,8 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Wyoming',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      legalReference: 'Wyo. Stat. § 14-1-101; § 25-10-101 (mental health consent)',
+      legalReference:
+        'Wyo. Stat. § 14-1-101; § 25-10-101 (mental health consent)',
       sourceUrl: 'https://www.wyoleg.gov/',
     }),
     legalReference: 'Wyo. Stat. § 14-1-101; § 25-10-101',
@@ -669,7 +918,13 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     ruleConfig: makeSeedConfig({
       minimumConsentLevel: 'limited',
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health', 'prenatal_care'],
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+        'prenatal_care',
+      ],
       legalReference: 'D.C. Code § 21-101; § 7-1231.03 (mental health consent)',
       sourceUrl: 'https://code.dccouncil.gov/',
     }),
@@ -682,8 +937,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Puerto Rico',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 21,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'P.R. Laws tit. 8 § 301; tit. 401 § 6021 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'P.R. Laws tit. 8 § 301; tit. 401 § 6021 (mental health consent)',
       sourceUrl: 'https://bvirtualogp.pr.gov/',
     }),
     legalReference: 'P.R. Laws tit. 8 § 301; tit. 401 § 6021',
@@ -694,8 +955,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'Guam',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'Guam Code tit. 9 § 7101; tit. 10 § 90102 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'Guam Code tit. 9 § 7101; tit. 10 § 90102 (mental health consent)',
       sourceUrl: 'https://www.guamcode.org/',
     }),
     legalReference: 'Guam Code tit. 9 § 7101; tit. 10 § 90102',
@@ -706,8 +973,14 @@ export const STATE_RULE_SEEDS: Record<string, StateRuleSeed> = {
     stateName: 'US Virgin Islands',
     ruleConfig: makeSeedConfig({
       ageOfMajority: 18,
-      minorConsentCategories: ['reproductive_health', 'mental_health', 'substance_use_disorder', 'sexual_health'],
-      legalReference: 'V.I. Code tit. 14 § 2201; tit. 19 § 1001 (mental health consent)',
+      minorConsentCategories: [
+        'reproductive_health',
+        'mental_health',
+        'substance_use_disorder',
+        'sexual_health',
+      ],
+      legalReference:
+        'V.I. Code tit. 14 § 2201; tit. 19 § 1001 (mental health consent)',
       sourceUrl: 'https://legvi.org/',
     }),
     legalReference: 'V.I. Code tit. 14 § 2201; tit. 19 § 1001',

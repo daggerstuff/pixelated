@@ -13,6 +13,7 @@
  */
 
 import { randomUUID } from 'node:crypto'
+
 import type {
   AttorneySignoff,
   CreateSignoffInput,
@@ -67,10 +68,7 @@ export class AttorneySignoffRepository {
    * @param stateCode 2-letter USPS code
    * @param status optional status filter
    */
-  listByState(
-    stateCode: string,
-    status?: SignoffStatus,
-  ): AttorneySignoff[] {
+  listByState(stateCode: string, status?: SignoffStatus): AttorneySignoff[] {
     return Array.from(this.records.values()).filter(
       (r) =>
         r.stateCode === stateCode &&

@@ -95,9 +95,13 @@ describe('G3.1 seed data', () => {
 
     it('every seed ruleConfig has boolean consent flags', () => {
       for (const seed of getAllSeeds()) {
-        expect(typeof seed.ruleConfig.requiresMentalHealthConsent).toBe('boolean')
+        expect(typeof seed.ruleConfig.requiresMentalHealthConsent).toBe(
+          'boolean',
+        )
         expect(typeof seed.ruleConfig.requiresSUDConsent).toBe('boolean')
-        expect(typeof seed.ruleConfig.requiresMinorParentalConsent).toBe('boolean')
+        expect(typeof seed.ruleConfig.requiresMinorParentalConsent).toBe(
+          'boolean',
+        )
       }
     })
 
@@ -112,11 +116,15 @@ describe('G3.1 seed data', () => {
 
   describe('state-specific values', () => {
     it('California uses limited minimum consent', () => {
-      expect(getSeedForState('CA')?.ruleConfig.minimumConsentLevel).toBe('limited')
+      expect(getSeedForState('CA')?.ruleConfig.minimumConsentLevel).toBe(
+        'limited',
+      )
     })
 
     it('New York uses limited minimum consent', () => {
-      expect(getSeedForState('NY')?.ruleConfig.minimumConsentLevel).toBe('limited')
+      expect(getSeedForState('NY')?.ruleConfig.minimumConsentLevel).toBe(
+        'limited',
+      )
     })
 
     it('Alabama age of majority is 19', () => {

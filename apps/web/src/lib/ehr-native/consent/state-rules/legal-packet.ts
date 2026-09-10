@@ -10,14 +10,20 @@
  *   sign-off state for each jurisdiction.
  */
 
-import { randomUUID } from 'node:crypto';
-import { z } from 'zod';
-import { US_STATE_CODE_LIST } from './schemas';
-import { getAllSeeds, getSeedForState, SEED_JURISDICTION_COUNT } from './seed-data';
-import { generateAllChecklists, generateStateChecklist } from './checklist';
-import type { StateChecklist } from './checklist';
-import { attorneySignoffRepository } from './signoff-repository';
-import type { AttorneySignoff, SignoffStatus } from './signoff';
+import { randomUUID } from 'node:crypto'
+
+import { z } from 'zod'
+
+import { generateAllChecklists, generateStateChecklist } from './checklist'
+import type { StateChecklist } from './checklist'
+import { US_STATE_CODE_LIST } from './schemas'
+import {
+  getAllSeeds,
+  getSeedForState,
+  SEED_JURISDICTION_COUNT,
+} from './seed-data'
+import type { AttorneySignoff, SignoffStatus } from './signoff'
+import { attorneySignoffRepository } from './signoff-repository'
 
 /**
  * Schema for a single jurisdiction entry in the legal review packet.
@@ -32,10 +38,17 @@ export const PacketJurisdictionSchema = z
     sourceUrl: z.string().url().nullable(),
     lastReviewed: z.string(),
     checklist: z.record(z.string(), z.unknown()),
-    signoffStatus: z.enum(['pending', 'in_review', 'approved', 'rejected', 'withdrawn', 'none']),
+    signoffStatus: z.enum([
+      'pending',
+      'in_review',
+      'approved',
+      'rejected',
+      'withdrawn',
+      'none',
+    ]),
     signoffs: z.array(z.record(z.string(), z.unknown())),
   })
-  .strict();
+  .strict()
 
 /**
  * Schema for the top-level legal review packet.
@@ -58,27 +71,27 @@ export const LegalReviewPacketSchema = z
       })
       .strict(),
   })
-  .strict();
+  .strict()
 
-export type PacketJurisdiction = z.infer<typeof PacketJurisdictionSchema>;
-export type LegalReviewPacket = z.infer<typeof LegalReviewPacketSchema>;
+export type PacketJurisdiction = z.infer<typeof PacketJurisdictionSchema>
+export type LegalReviewPacket = z.infer<typeof LegalReviewPacketSchema>
 
 /**
  * Aggregate sign-off records by state code into a lookup map.
  * Returns a map keyed by stateCode → array of sign-offs for that state.
  */
 function aggregateSignoffsByState(): Map<string, AttorneySignoff[]> {
-  const all = attorneySignoffRepository.listAll();
-  const byState = new Map<string, AttorneySignoff[]>();
+  const all = attorneySignoffRepository.listAll()
+  const byState = new Map<string, AttorneySignoff[]>()
   for (const signoff of all) {
-    const list = byState.get(signoff.stateCode);
+    const list = byState.get(signoff.stateCode)
     if (list) {
-      list.push(signoff);
+      list.push(signoff)
     } else {
-      byState.set(signoff.stateCode, [signoff]);
+      byState.set(signoff.stateCode, [signoff])
     }
   }
-  return byState;
+  return byState
 }
 
 /**
@@ -86,9 +99,11 @@ function aggregateSignoffsByState(): Map<string, AttorneySignoff[]> {
  * If multiple sign-offs exist for a state, the most "advanced" status wins:
  *   approved > in_review > pending > rejected > withdrawn > none
  */
-function deriveSignoffStatus(signoffs: AttorneySignoff[]): SignoffStatus | 'none' {
+function deriveSignoffStatus(
+  signoffs: AttorneySignoff[],
+): SignoffStatus | 'none' {
   if (signoffs.length === 0) {
-    return 'none';
+    return 'none'
   }
   const priority: Record<SignoffStatus, number> = {
     approved: 5,
@@ -96,17 +111,17 @@ function deriveSignoffStatus(signoffs: AttorneySignoff[]): SignoffStatus | 'none
     pending: 3,
     rejected: 2,
     withdrawn: 1,
-  };
-  let best: SignoffStatus = 'pending';
-  let bestRank = -1;
+  }
+  let best: SignoffStatus = 'pending'
+  let bestRank = -1
   for (const s of signoffs) {
-    const rank = priority[s.status];
+    const rank = priority[s.status]
     if (rank > bestRank) {
-      bestRank = rank;
-      best = s.status;
+      bestRank = rank
+      best = s.status
     }
   }
-  return best;
+  return best
 }
 
 /**
@@ -117,9 +132,9 @@ function buildPacketJurisdiction(
   checklist: StateChecklist | undefined,
   signoffs: AttorneySignoff[],
 ): PacketJurisdiction | undefined {
-  const seed = getSeedForState(stateCode);
+  const seed = getSeedForState(stateCode)
   if (!seed) {
-    return undefined;
+    return undefined
   }
   return {
     stateCode: seed.stateCode,
@@ -131,7 +146,7 @@ function buildPacketJurisdiction(
     checklist: checklist ?? {},
     signoffStatus: deriveSignoffStatus(signoffs),
     signoffs,
-  };
+  }
 }
 
 /**
@@ -142,32 +157,36 @@ function buildPacketJurisdiction(
  * @returns A structured LegalReviewPacket ready for attorney review.
  */
 export function generateLegalReviewPacket(): LegalReviewPacket {
-  const checklists = generateAllChecklists();
-  const checklistByState = new Map<string, StateChecklist>();
+  const checklists = generateAllChecklists()
+  const checklistByState = new Map<string, StateChecklist>()
   for (const c of checklists) {
-    checklistByState.set(c.stateCode, c);
+    checklistByState.set(c.stateCode, c)
   }
-  const signoffsByState = aggregateSignoffsByState();
+  const signoffsByState = aggregateSignoffsByState()
 
-  const jurisdictions: PacketJurisdiction[] = [];
+  const jurisdictions: PacketJurisdiction[] = []
   for (const stateCode of US_STATE_CODE_LIST) {
-    const checklist = checklistByState.get(stateCode);
-    const signoffs = signoffsByState.get(stateCode) ?? [];
-    const entry = buildPacketJurisdiction(stateCode, checklist, signoffs);
+    const checklist = checklistByState.get(stateCode)
+    const signoffs = signoffsByState.get(stateCode) ?? []
+    const entry = buildPacketJurisdiction(stateCode, checklist, signoffs)
     if (entry) {
-      jurisdictions.push(entry);
+      jurisdictions.push(entry)
     }
   }
 
   const summary = {
     total: jurisdictions.length,
-    approved: jurisdictions.filter((j) => j.signoffStatus === 'approved').length,
-    inReview: jurisdictions.filter((j) => j.signoffStatus === 'in_review').length,
+    approved: jurisdictions.filter((j) => j.signoffStatus === 'approved')
+      .length,
+    inReview: jurisdictions.filter((j) => j.signoffStatus === 'in_review')
+      .length,
     pending: jurisdictions.filter((j) => j.signoffStatus === 'pending').length,
-    rejected: jurisdictions.filter((j) => j.signoffStatus === 'rejected').length,
-    withdrawn: jurisdictions.filter((j) => j.signoffStatus === 'withdrawn').length,
+    rejected: jurisdictions.filter((j) => j.signoffStatus === 'rejected')
+      .length,
+    withdrawn: jurisdictions.filter((j) => j.signoffStatus === 'withdrawn')
+      .length,
     noSignoff: jurisdictions.filter((j) => j.signoffStatus === 'none').length,
-  };
+  }
 
   return {
     packetId: randomUUID(),
@@ -175,7 +194,7 @@ export function generateLegalReviewPacket(): LegalReviewPacket {
     jurisdictionCount: jurisdictions.length,
     jurisdictions,
     summary,
-  };
+  }
 }
 
 /**
@@ -185,12 +204,14 @@ export function generateLegalReviewPacket(): LegalReviewPacket {
  * @param stateCode - Two-letter US state code.
  * @returns A single-jurisdiction packet, or undefined if the state has no seed.
  */
-export function generateStatePacket(stateCode: string): LegalReviewPacket | undefined {
-  const checklist = generateStateChecklist(stateCode);
-  const signoffs = attorneySignoffRepository.listByState(stateCode);
-  const entry = buildPacketJurisdiction(stateCode, checklist, signoffs);
+export function generateStatePacket(
+  stateCode: string,
+): LegalReviewPacket | undefined {
+  const checklist = generateStateChecklist(stateCode)
+  const signoffs = attorneySignoffRepository.listByState(stateCode)
+  const entry = buildPacketJurisdiction(stateCode, checklist, signoffs)
   if (!entry) {
-    return undefined;
+    return undefined
   }
   const summary = {
     total: 1,
@@ -200,17 +221,17 @@ export function generateStatePacket(stateCode: string): LegalReviewPacket | unde
     rejected: entry.signoffStatus === 'rejected' ? 1 : 0,
     withdrawn: entry.signoffStatus === 'withdrawn' ? 1 : 0,
     noSignoff: entry.signoffStatus === 'none' ? 1 : 0,
-  };
+  }
   return {
     packetId: randomUUID(),
     generatedAt: new Date().toISOString(),
     jurisdictionCount: 1,
     jurisdictions: [entry],
     summary,
-  };
+  }
 }
 
 /**
  * Convenience export: the expected jurisdiction count for the packet.
  */
-export const PACKET_JURISDICTION_COUNT = SEED_JURISDICTION_COUNT;
+export const PACKET_JURISDICTION_COUNT = SEED_JURISDICTION_COUNT
