@@ -7,7 +7,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: 'true'
-    traefik.ingress.kubernetes.io/router.middlewares: pixelated-empathy-security-headers@kubernetescrd,pixelated-empathy-rate-limit@kubernetescrd,pixelated-empathy-cors@kubernetescrd,pixelated-empathy-request-size-limit@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: pixelated-empathy-pixelated-empathy-security-headers@kubernetescrd,pixelated-empathy-pixelated-empathy-rate-limit@kubernetescrd,pixelated-empathy-pixelated-empathy-cors@kubernetescrd,pixelated-empathy-pixelated-empathy-request-size-limit@kubernetescrd
 spec:
   ingressClassName: traefik
   rules:
