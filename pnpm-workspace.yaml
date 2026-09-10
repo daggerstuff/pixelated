@@ -298,7 +298,8 @@ overrides:
   'nitro>h3': '2.0.1-rc.22'
   hono: ^4.12.14
   ip-address: '>=10.1.1'
-  js-yaml: 4.3.1
+  # CVE-2026-84375 (HIGH, fixed in 4.3.2).
+  js-yaml: 4.3.2
   markdown-it: 14.2.0
   '@opentelemetry/core': 2.8.0
   joi: 17.13.4
