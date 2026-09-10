@@ -1,0 +1,62 @@
+name: Diagnose AWS EKS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    environment: aws
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-session-name: pixelated-eks-diagnose
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install kubectl
+        run: |
+          KUBE_STABLE=$(curl -fsSL https://dl.k8s.io/release/stable.txt)
+          curl -fsSLo /tmp/kubectl "https://dl.k8s.io/release/${KUBE_STABLE}/bin/linux/amd64/kubectl"
+          chmod +x /tmp/kubectl
+          sudo mv /tmp/kubectl /usr/local/bin/kubectl
+
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --region "$AWS_REGION" --name "$EKS_CLUSTER_NAME"
+
+      - name: Collect cluster diagnostics
+        run: |
+          echo "=== Nodes ==="
+          kubectl get nodes -o wide
+          echo "=== Namespace ==="
+          kubectl get ns pixelated-empathy
+          echo "=== Deployments ==="
+          kubectl get deploy -n pixelated-empathy -o wide
+          echo "=== Pods ==="
+          kubectl get pods -n pixelated-empathy -o wide
+          echo "=== Services ==="
+          kubectl get svc -n pixelated-empathy -o wide
+          echo "=== Ingresses ==="
+          kubectl get ingress -n pixelated-empathy -o wide
+          echo "=== Traefik middlewares ==="
+          kubectl get middleware -n pixelated-empathy
+          echo "=== Traefik service ==="
+          kubectl get svc -n traefik -o wide
+          echo "=== Traefik pods ==="
+          kubectl get pods -n traefik -o wide
+          echo "=== Traefik logs tail ==="
+          kubectl logs -n traefik deploy/traefik --tail=80 || true
