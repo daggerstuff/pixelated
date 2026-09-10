@@ -78,7 +78,7 @@ export const UpdateSignoffInputSchema = z
   })
   .strict()
 
-export type UpdateSignoffInput = z.infer<typeof UpdateSignoffInputSchema>
+type UpdateSignoffInput = z.infer<typeof UpdateSignoffInputSchema>
 
 // ---------------------------------------------------------------------------
 // State machine validation

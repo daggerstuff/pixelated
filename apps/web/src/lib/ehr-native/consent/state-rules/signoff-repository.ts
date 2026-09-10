@@ -29,7 +29,7 @@ import {
 // Repository
 // ---------------------------------------------------------------------------
 
-export class AttorneySignoffRepository {
+class AttorneySignoffRepository {
   private readonly records = new Map<string, AttorneySignoff>()
 
   /**
@@ -160,6 +160,3 @@ export class AttorneySignoffRepository {
 // ---------------------------------------------------------------------------
 
 export const attorneySignoffRepository = new AttorneySignoffRepository()
-
-// Re-export update input schema for consumers
-export { UpdateSignoffInputSchema }

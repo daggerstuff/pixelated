@@ -301,6 +301,16 @@ describe('G3.1 legal review packet', () => {
       expect(packet?.summary.total).toBe(1)
     })
 
+    it('includes a checklistSummary counting items by status', () => {
+      const packet = generateStatePacket(STATE_CODE)
+      expect(packet?.jurisdictions[0].checklistSummary).toEqual({
+        pending: 7,
+        verified: 0,
+        flagged: 0,
+        not_applicable: 0,
+      })
+    })
+
     it('reports approved=1 when the state has an approved sign-off', () => {
       const s = attorneySignoffRepository.create(validCreateInput)
       attorneySignoffRepository.updateStatus(s.signoffId, 'in_review')

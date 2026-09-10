@@ -14,8 +14,17 @@ import { randomUUID } from 'node:crypto'
 
 import { z } from 'zod'
 
-import { generateAllChecklists, generateStateChecklist } from './checklist'
-import type { StateChecklist } from './checklist'
+import {
+  ChecklistItemStatusSchema,
+  StateChecklistItemSchema,
+  generateAllChecklists,
+  generateStateChecklist,
+} from './checklist'
+import type {
+  ChecklistItemStatus,
+  StateChecklist,
+  StateChecklistItem,
+} from './checklist'
 import { US_STATE_CODE_LIST } from './schemas'
 import {
   getAllSeeds,
@@ -47,6 +56,9 @@ export const PacketJurisdictionSchema = z
       'none',
     ]),
     signoffs: z.array(z.record(z.string(), z.unknown())),
+    checklistSummary: z
+      .record(ChecklistItemStatusSchema, z.number().int().nonnegative())
+      .optional(),
   })
   .strict()
 
@@ -73,7 +85,7 @@ export const LegalReviewPacketSchema = z
   })
   .strict()
 
-export type PacketJurisdiction = z.infer<typeof PacketJurisdictionSchema>
+type PacketJurisdiction = z.infer<typeof PacketJurisdictionSchema>
 export type LegalReviewPacket = z.infer<typeof LegalReviewPacketSchema>
 
 /**
@@ -125,6 +137,24 @@ function deriveSignoffStatus(
 }
 
 /**
+ * Validate a generated checklist and summarize item statuses.
+ * Fails fast on corrupt seed-derived data so the packet never carries
+ * checklist items that violate the review schema.
+ */
+function summarizeChecklist(
+  checklist: StateChecklist,
+): Record<ChecklistItemStatus, number> {
+  const byStatus = Object.fromEntries(
+    ChecklistItemStatusSchema.options.map((status) => [status, 0]),
+  ) as Record<ChecklistItemStatus, number>
+  for (const raw of checklist.items) {
+    const item: StateChecklistItem = StateChecklistItemSchema.parse(raw)
+    byStatus[item.status] += 1
+  }
+  return byStatus
+}
+
+/**
  * Build a single jurisdiction entry for the packet.
  */
 function buildPacketJurisdiction(
@@ -144,6 +174,7 @@ function buildPacketJurisdiction(
     sourceUrl: seed.sourceUrl ?? null,
     lastReviewed: seed.lastReviewed,
     checklist: checklist ?? {},
+    checklistSummary: checklist ? summarizeChecklist(checklist) : undefined,
     signoffStatus: deriveSignoffStatus(signoffs),
     signoffs,
   }
