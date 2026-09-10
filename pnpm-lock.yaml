@@ -388,7 +388,7 @@ importers:
         version: 0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.92(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.92(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -634,11 +634,11 @@ importers:
         specifier: 4.20260611.1
         version: 4.20260611.1
       '@composio/core':
-        specifier: ^0.18.0
-        version: 0.18.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)
+        specifier: ^0.18.1
+        version: 0.18.1(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)
       '@composio/vercel':
         specifier: ^0.11.2
-        version: 0.11.2(@composio/core@0.18.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4))(ai@7.0.92(zod@4.5.4))
+        version: 0.11.2(@composio/core@0.18.1(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4))(ai@7.0.92(zod@4.5.4))
       '@eslint/css':
         specifier: ^2.0.0
         version: 2.0.0
@@ -655,8 +655,8 @@ importers:
         specifier: ^5.3.0
         version: 5.3.0
       '@github/copilot-sdk':
-        specifier: 1.0.11
-        version: 1.0.11
+        specifier: 1.0.13
+        version: 1.0.13
       '@graphql-codegen/cli':
         specifier: ^7.3.1
         version: 7.4.0(@parcel/watcher@2.6.0)(@types/node@26.4.1)(crossws@0.4.12(srvx@0.11.22))(graphql@17.0.2)(supports-color@10.2.2)(typescript@5.8.3)(utf-8-validate@6.0.6)
@@ -799,8 +799,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       autoprefixer:
-        specifier: ^10.5.4
-        version: 10.5.4(postcss@8.5.28)
+        specifier: ^10.5.5
+        version: 10.5.5(postcss@8.5.28)
       axe-core:
         specifier: ^4.13.0
         version: 4.13.0
@@ -1079,7 +1079,7 @@ importers:
         version: 9.1.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       wrangler:
         specifier: ^4.59.1
-        version: 4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)
+        version: 4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)
       yaml:
         specifier: npm:yaml@2.8.4
         version: 2.8.4
@@ -1091,13 +1091,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4)
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.49(zod@4.5.4))(@ai-sdk/openai@4.0.58(zod@4.5.4))(@ai-sdk/provider@4.0.10)(ai@7.0.0-beta.178(zod@4.5.4))
@@ -1122,13 +1122,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4)
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.49(zod@4.5.4))(@ai-sdk/openai@4.0.58(zod@4.5.4))(@ai-sdk/provider@4.0.10)(ai@7.0.0-beta.178(zod@4.5.4))
@@ -1156,13 +1156,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4)
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1190,13 +1190,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4)
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1242,13 +1242,13 @@ importers:
         version: 1.43.0
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.49(zod@4.5.4))(@ai-sdk/openai@4.0.58(zod@4.5.4))(@ai-sdk/provider@4.0.10)(ai@7.0.0-beta.178(zod@4.5.4))
@@ -1294,13 +1294,13 @@ importers:
         version: 1.43.0
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.49(zod@4.5.4))(@ai-sdk/openai@4.0.58(zod@4.5.4))(@ai-sdk/provider@4.0.10)(ai@7.0.0-beta.178(zod@4.5.4))
@@ -1346,13 +1346,13 @@ importers:
         version: 1.43.0
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       mongodb:
         specifier: ^7.5.0
         version: 7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
@@ -1389,13 +1389,13 @@ importers:
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.5.4)
       '@vercel/connect':
         specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
+        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.5.4)
       eve:
         specifier: ^0.47.3
-        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+        version: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1560,7 +1560,7 @@ importers:
     devDependencies:
       '@types/node':
         specifier: ^22.9.0
-        version: 22.20.2
+        version: 22.20.1
       '@types/pg':
         specifier: ^8.11.10
         version: 8.23.1
@@ -1572,7 +1572,7 @@ importers:
         version: 5.8.3
       vitest:
         specifier: ^4.1.10
-        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.2)(@vitest/coverage-v8@5.0.0(vitest@4.1.11))(jsdom@30.0.1(@noble/hashes@2.4.0))(msw@2.15.0(@types/node@22.20.2)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))
+        version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@5.0.0(vitest@4.1.11))(jsdom@30.0.1(@noble/hashes@2.4.0))(msw@2.15.0(@types/node@22.20.1)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))
 
   packages/memory-schema:
     dependencies:
@@ -2590,32 +2590,32 @@ packages:
       workerd:
         optional: true
 
-  '@cloudflare/workerd-darwin-64@1.20260903.1':
-    resolution: {integrity: sha512-FG+4mGxAXhKiL/1temH42alevIkumtYXNidhTa//3yULpzux6APw5UNVocI/vCQ1yG1YOEZRfbVy8lyuipM9MQ==}
+  '@cloudflare/workerd-darwin-64@1.20260907.1':
+    resolution: {integrity: sha512-Xaum46kviN8xixl0axXm7mfLTf2GAG+baotnEIv8M5EbvyHxHagvS5Z8bU5B/WJlTWwwvGzItFfKZvga78o3ew==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [darwin]
 
-  '@cloudflare/workerd-darwin-arm64@1.20260903.1':
-    resolution: {integrity: sha512-o241VefnjG8eG+kGap5CjgV4zOT5UaAmS3OR1VZCpNj7vkXGxvp9KftKvtQgcCsIqJKaKx+7Xd7xq0L1DjkfPQ==}
+  '@cloudflare/workerd-darwin-arm64@1.20260907.1':
+    resolution: {integrity: sha512-P2o7xpZbxvoES9xY5uHqJPXvsWBWi0w1STCGoYLqxI1rh1gSUdlr4HruMiWq/TA94PPoQCg0eUfoshyQxMdGpA==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
 
-  '@cloudflare/workerd-linux-64@1.20260903.1':
-    resolution: {integrity: sha512-/VEvvtQ/XKf6HlBbg6FbvpwcpfYUcx6Fv6RkASY8DyEmUyuJ8rc7Qxil83ClRFoBzz/GY0BV94UZ6F+wers/hg==}
+  '@cloudflare/workerd-linux-64@1.20260907.1':
+    resolution: {integrity: sha512-4aXjFMtD76FgVmDm7vUtl96LWNmFScfrYZ9lA6JpP5+svRfUQOYaJKcYK4g9IVmAxemItJizTTIA8jhEZaw0vg==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [linux]
 
-  '@cloudflare/workerd-linux-arm64@1.20260903.1':
-    resolution: {integrity: sha512-OWhihGC6KoTXF4u2C1AonfpgXeM4/7p/1IXuALqXESmFUpLLP5gZhRzjSk/gWW+mrCZDfSrvnjifl+lRqselbA==}
+  '@cloudflare/workerd-linux-arm64@1.20260907.1':
+    resolution: {integrity: sha512-nex+emDfyOYnQlhfPoCfLYQN6L+Ng0fVg5f3+8Ot4XRZaKJUzpiBFiRkgpoUuEN47U8Pm8BwhhOK2dQwtKwivQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
 
-  '@cloudflare/workerd-windows-64@1.20260903.1':
-    resolution: {integrity: sha512-soPMF9/aMHlHKK7M0vq5HrRRicPbnZO1F6ZZ7JWN8EltxWJU5L7CEq7CxjO878DzyPx7gYvqBFy3SVgdZKZjMQ==}
+  '@cloudflare/workerd-windows-64@1.20260907.1':
+    resolution: {integrity: sha512-/ZHtEmpdSUKZyQCBUSqmGp+I7GwWVR2eUaGE5NzFJIu31HBsoQEakXaDpTrbwXydpBzpI9N0DC83W7qekkGPMQ==}
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
@@ -2630,14 +2630,14 @@ packages:
   '@composio/client@0.1.0-alpha.76':
     resolution: {integrity: sha512-MXC5JGRVdiQ4EgLricy9o/mqBa1+1T7wHFZ6Q4ZJkrjzZqOMvxTgy21Zlb5J/1oGkB2bg9UDzpH8PkXCp/D4zA==}
 
-  '@composio/core@0.18.0':
-    resolution: {integrity: sha512-u8dfSDJV+BYiQYJBxbk6xRI8o8f7O6nb8xE0rJmvC+8zKNJdY/M119R8a30grLh07a6fcLeVFYCJlTRpCjwKyg==}
+  '@composio/core@0.18.1':
+    resolution: {integrity: sha512-VEg6F92cMG/4uhRfX6O4SRd+0Pnd4L67tF+Az/EXQ/+aPfDasW5GMTzkiSUSArGDyiMfEsLUYaTYizfnEw2usw==}
     engines: {node: '>=22.22.3'}
     peerDependencies:
       zod: ^4.3.2
 
-  '@composio/json-schema-to-zod@0.3.1':
-    resolution: {integrity: sha512-ZmDksfKZrkJZj6XCgR+AmjsxqvFnfc4XDEQPfJJZMYxIqhE3MBZ2KimLuPT+YGahO4h9uzT2EYi9asMF4qR4+g==}
+  '@composio/json-schema-to-zod@0.3.2':
+    resolution: {integrity: sha512-TUUzu4uQH6esokVd6LD0SK4oIz8WaYRtU0cnuj0rmxbiHS0VbhN1qdvj2gIvrIWDdNyvQUIalO63YT/lNx46Gw==}
     engines: {node: '>=22.22.3'}
     peerDependencies:
       zod: ^4.3.2
@@ -3026,56 +3026,53 @@ packages:
   '@formatjs/intl-localematcher@0.6.2':
     resolution: {integrity: sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA==}
 
-  '@github/copilot-darwin-arm64@1.0.82':
-    resolution: {integrity: sha512-UpVSFA0COmlIakAr7/6WJqJlabtKgY8y5en6La3IxGxXsLlbkGoeevSqyfXvqJyHxaGn0YGpOC1oEPL379JfCw==}
+  '@github/copilot-sdk-darwin-arm64@1.0.13':
+    resolution: {integrity: sha512-AvBV5dzjNWpGwgoCnttrETnt7rLI4pTFQsRSM7GU5TK+YqShauffdMU06Bn/d+IDX2fj1Z4ThH7yl/gHCDvoNQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@github/copilot-darwin-x64@1.0.82':
-    resolution: {integrity: sha512-wMKbxK8fpKsbATjn9dE31Pae67H1xu6dmaCuyXpXjXLsNPVjeLFszJZ30MAOwxRWz4dmA8VvEJZmLgJekojo2Q==}
+  '@github/copilot-sdk-darwin-x64@1.0.13':
+    resolution: {integrity: sha512-ZNQmTnHwk8bO/E514k0sFBsuCVNpFj8jMH4jeLncASQM4RRdOqYhXlYLW7H/ts7ANjdfMJjJY29NUqzEWaADOA==}
     cpu: [x64]
     os: [darwin]
 
-  '@github/copilot-linux-arm64@1.0.82':
-    resolution: {integrity: sha512-YDQmh0F+GzWORPmNNxQdcjHcXHxcy08dhMhbAhu4cqtMeA2sZWQqhfk9mJhHppMm9U0uR7h0KAB6nsgw/8Bsuw==}
+  '@github/copilot-sdk-linux-arm64@1.0.13':
+    resolution: {integrity: sha512-km1jvveDwlJbht8luFyBurz0wUxPHSzdkZRMJEJgVHYfMn03gi0gdnZ6fC6JWgkiffNZpukSxRPJmPfRobw6Aw==}
     cpu: [arm64]
     os: [linux]
     libc: [glibc]
 
-  '@github/copilot-linux-x64@1.0.82':
-    resolution: {integrity: sha512-vqmG9665ktgLHAkGKMjp4uVMdHqLxi8uS9zL+g2pMwZUPoM7JxkaSfOoeyYr99caF7J6VIJTWv4LdRNQyG5jrQ==}
+  '@github/copilot-sdk-linux-x64@1.0.13':
+    resolution: {integrity: sha512-4AbzC8Nb1dWYQ1uxbHGAh0ZAoOJeL3Ms1oe3byZLn8ENP1PfoyD8DJZUSsyXGYHxL7oLJyUqd3wyt18ifIg8iw==}
     cpu: [x64]
     os: [linux]
     libc: [glibc]
 
-  '@github/copilot-linuxmusl-arm64@1.0.82':
-    resolution: {integrity: sha512-14dWfa4rBME55bKmF+Z8V+WzZNgPQZKFFBQX+EOiAgLVV/arQCnQ1m7wwa5oXjQeCIgkS/L9J8uM8jNm6cZbOA==}
+  '@github/copilot-sdk-linuxmusl-arm64@1.0.13':
+    resolution: {integrity: sha512-pCUjly1nXcNpYDZNnKrglFIFejbb+QDkloilldu+0tTbSzb8gEmVsbGwpfwyZXfNQf5Je5FFjsOfQR9PXH1NDQ==}
     cpu: [arm64]
     os: [linux]
     libc: [musl]
 
-  '@github/copilot-linuxmusl-x64@1.0.82':
-    resolution: {integrity: sha512-Mauqa2TBjtB8W/1KXF/jJ4MbtwnLvoEQNHYoSyoX+s+nIpttmixmYBJDwKV89ZlQRdjOCuxOgraRLQ9hjjXvNQ==}
+  '@github/copilot-sdk-linuxmusl-x64@1.0.13':
+    resolution: {integrity: sha512-y5RmqAbKSYHt+OwQdILIiiMSibXdd7/0kO7kFoTZCN2gn2eGRA8wJbXlf6KZh+yYgWSJGUL8677LDJd3WnIHbA==}
     cpu: [x64]
     os: [linux]
     libc: [musl]
 
-  '@github/copilot-sdk@1.0.11':
-    resolution: {integrity: sha512-ngrnfa9052fLTOMoY0iiQS2B6pFDYJpWNj3syCdjzdje0R5mWoij9b8exJZciLvX7BbJjKz2/lIdwo24av3e3A==}
+  '@github/copilot-sdk-win32-arm64@1.0.13':
+    resolution: {integrity: sha512-azISXh4pEVfX0hPzu58wZTYg3tdWG4L1nNpiRa/wdBxhcovbxw+eZVkI4C6FZMx0tiNYFkqWzVTV7oKskNybcw==}
+    cpu: [arm64]
+    os: [win32]
+
+  '@github/copilot-sdk-win32-x64@1.0.13':
+    resolution: {integrity: sha512-lvS7kMbuuxydBQxPDHCkuUwbC858Rvcz3Q3vv0mxnLKuWJ75lAcqERefqA2p4beaPdez+ifZOA5heUT0rx3GnA==}
+    cpu: [x64]
+    os: [win32]
+
+  '@github/copilot-sdk@1.0.13':
+    resolution: {integrity: sha512-/j6/tGc9HOtcupuYFloOKk0fpScdpy65EVF1LKg2Z2VQOojCGPgBGkhgVGVDaqW7UB6TV2qbQZa9rKJimJ0wWQ==}
     engines: {node: ^20.19.0 || >=22.12.0}
-
-  '@github/copilot-win32-arm64@1.0.82':
-    resolution: {integrity: sha512-PaW9s0GTgM+svtDkB583dZRrhLrO4o10y2ozMmQ0Hi5eB11C24UdC5U81nFlvKPED7+GlnBJIFQ+oHaxHrnp3A==}
-    cpu: [arm64]
-    os: [win32]
-
-  '@github/copilot-win32-x64@1.0.82':
-    resolution: {integrity: sha512-m4iSROOMEPp1yRIQQwbnO0CDfwB4syESyHoeSLLFuynMR4/ApghAdyBrBQQcTKGsUu3R5rOE64RYlVmyKmuA9A==}
-    cpu: [x64]
-    os: [win32]
-
-  '@github/copilot@1.0.82':
-    resolution: {integrity: sha512-+mDIwBO3dCpL3k2rVLc4+1tFzqcVBTJNA/0co+okEpmCgcHjaz91Cqq7++pJKN5yJQuGC6bKangm7PSoheI1Xw==}
 
   '@google-cloud/paginator@7.0.1':
     resolution: {integrity: sha512-k32cWlHAF8yTgg8rciLI8mPMI6UzuJdKp53YRxISRwMFxUl2FYplvs+Mr2UHxKn0W7rXsqZnUZy73AOJFDP8iA==}
@@ -7214,8 +7211,8 @@ packages:
   '@types/node@18.19.130':
     resolution: {integrity: sha512-GRaXQx6jGfL8sKfaIDD6OupbIHBr9jv7Jnaml9tB7l4v068PAOXqfcujMMo5PhbIs6ggR1XODELqahT2R8v0fg==}
 
-  '@types/node@22.20.2':
-    resolution: {integrity: sha512-xlvWf4Vs9n1PEVYwP1n4vvG07M6y8WgvJ2t0vbrWTmijsIHp1cS+uJ2kMIRdY3nHZK0nCYKrPeD171+SzF4/zw==}
+  '@types/node@22.20.1':
+    resolution: {integrity: sha512-EANqOCF9QFyra+4pfxUcX9STKJpCLjMbObVzljIJomAWSnuSIEAvyzEU53GaajbXJEgdh0iEcPL+DGvpUd4k1Q==}
 
   '@types/node@24.13.3':
     resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
@@ -8291,8 +8288,8 @@ packages:
     resolution: {integrity: sha512-ooviqdwwgfIfNmDwo94wlshcdzfO64XV0Cg6oDsDYBJfITDz1EngD2z7DkbvCWn+XIMsIqW27sEVF6qcpJrRcg==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  autoprefixer@10.5.4:
-    resolution: {integrity: sha512-MaU0U/za7N3r6brxD4YB/l4NSrFzLPlANv6wEuQVaIPlD3L4W9rFcQPbL/EilY9BHhHvhfcz3gInDLrEtWT4EA==}
+  autoprefixer@10.5.5:
+    resolution: {integrity: sha512-uiRYvQYe/nNSzBJ7OUnd2/TZVsAdob3blml44teEpee9Cc1f4rGZFewO+JT3Wo8mgFOSzNqes4FHZn/Qz8WOuw==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -8432,6 +8429,7 @@ packages:
   baseline-browser-mapping@2.11.21:
     resolution: {integrity: sha512-uh8vpY/1/YyFkunIDFH/12p7/7VdPKA1hejMVEbdkEaWnUz0Hesvx5EbiU6XxjyHZIOju+ZMbQJkRh+es3/spQ==}
     engines: {node: '>=6.0.0'}
+    hasBin: true
 
   basic-auth@2.0.1:
     resolution: {integrity: sha512-NF+epuEdnUYVlGuhaxbbq+dvJttwLnGY+YixlXlME5KpQ5W3CnXA5cVTneY3SPbPDRkcjMbifrwmFYcClgOZeg==}
@@ -8494,9 +8492,10 @@ packages:
   browserify-zlib@0.2.0:
     resolution: {integrity: sha512-Z942RysHXmJrhqk88FmKBVq/v5tqmSkDz7p54G/MGyjMnCFFnC79XWNbg+Vta8W6Wb2qtSZTSxIGkJrRpCFEiA==}
 
-  browserslist@4.28.8:
-    resolution: {integrity: sha512-V2NpofLblG64mfOtSgDhOJESZEGogzDMBv/q+W6oc4LXWP/q75eOXoOaaOu1EOadB9U4Bwx/e0yzbvwKH8zalA==}
+  browserslist@4.28.9:
+    resolution: {integrity: sha512-EWazOblFYUvlGZcfGhPUPmYh3nikUxBVb+y9MJun5f3hBi812X+8MSQTujLBtgK3cf51fJWbWfOjyeO954d+Eg==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
+    hasBin: true
 
   bs-logger@0.2.6:
     resolution: {integrity: sha512-pd8DCoxmbgc7hyPKOvxtqNcjYoOsABPQdcCUjGp3d42VR2CX1ORhk2A87oqqu5R1kk+76nsxZupkmyd+MVtCog==}
@@ -11982,8 +11981,8 @@ packages:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
 
-  miniflare@5.20260903.0-alpha:
-    resolution: {integrity: sha512-VCZIFxOqFXeibRBJWwTlppqbv2lkeO10IX3QBRGK9j1QiMAfH/OSsCvbjp1MslBMhVZmy2VTRlVaVnsKnbDp6A==}
+  miniflare@5.20260907.0-alpha:
+    resolution: {integrity: sha512-56F13BeJQuDbTxcoGGN4MGxN8oNNIH3pK48VyJ1JGmjbzE9MMu6S2kxoON3nOBHlLdNjXyzg1Rz3jdHx+JpuZA==}
     engines: {node: '>=22.0.0'}
 
   minimatch@10.2.6:
@@ -13497,6 +13496,7 @@ packages:
   semver@7.8.5:
     resolution: {integrity: sha512-Y7/KDsb8LjooZpwaqGyulO6DQlksgCncchHGk+sZIY4SBvUocMBEFH5Ur1fI4dV+Jvl0w6cjvucaIi40puRioA==}
     engines: {node: '>=10'}
+    hasBin: true
 
   send@1.2.1:
     resolution: {integrity: sha512-1gnZf7DFcoIcajTjTwjwuDjzuz4PPcY2StKPlsGAQ1+YH20IRVrBaXSWmdjowTJ6u8Rc01PoYOGHXfP1mYcZNQ==}
@@ -15086,9 +15086,10 @@ packages:
   wordwrap@1.0.0:
     resolution: {integrity: sha512-gvVzJFlPycKc5dZN4yPkP8w7Dc37BtP1yczEneOb4uq34pXZcvrtRTmWV8W+Ume+XCxKgbjM+nevkyFPMybd4Q==}
 
-  workerd@1.20260903.1:
-    resolution: {integrity: sha512-xJzt2RnCy7ulOULmZy/4JLbEPg1uisp9lVoOUsEz+UVhDsTmrSQ0rBXZMGcXuhr2HCGKs89bg8nnbbzvBSX1Ig==}
+  workerd@1.20260907.1:
+    resolution: {integrity: sha512-MN/jgZkg2y9ZOOXdN9ecYynRFaqTCRkmpt3jS6LQNPoSx8HxTgcG947SduxJEB38YisB7RJ3Gu/y7fpd7fZ5bA==}
     engines: {node: '>=16'}
+    hasBin: true
 
   workers-ai-provider@4.0.0:
     resolution: {integrity: sha512-FkhwMP1EP/MKXR8Jv1o7wLVKfTqu0h/PUaEmhZ7gyDiioib5Wsh3oPAKhG+7+SWfU3roTDHaEWlJpkJjpXu+fQ==}
@@ -15106,8 +15107,8 @@ packages:
       '@ai-sdk/openai':
         optional: true
 
-  wrangler@4.129.0:
-    resolution: {integrity: sha512-PGPvs9UPoFrwxT0VogpESSZGvZIctAuTK3wGsLLPHtHsSgS85kNdvtpa2d14UzG8gwLWD64XUGFPGG9tOXG9VQ==}
+  wrangler@4.129.1:
+    resolution: {integrity: sha512-u1Q8dMAczlmj41K0xk5LkfcHHmbwq5xZRctlyrErVqpcoGsSIW07i74phv3B9xt6mTEO1dX3U5d9WVxR3GFRfA==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
@@ -16192,7 +16193,7 @@ snapshots:
     dependencies:
       '@babel/compat-data': 7.29.7
       '@babel/helper-validator-option': 7.29.7
-      browserslist: 4.28.8
+      browserslist: 4.28.9
       lru-cache: 5.1.1
       semver: 6.3.1
 
@@ -16659,25 +16660,25 @@ snapshots:
       - supports-color
       - workflow
 
-  '@cloudflare/unenv-preset@2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260903.1)':
+  '@cloudflare/unenv-preset@2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260907.1)':
     dependencies:
       unenv: 2.0.0-rc.24
     optionalDependencies:
-      workerd: 1.20260903.1
+      workerd: 1.20260907.1
 
-  '@cloudflare/workerd-darwin-64@1.20260903.1':
+  '@cloudflare/workerd-darwin-64@1.20260907.1':
     optional: true
 
-  '@cloudflare/workerd-darwin-arm64@1.20260903.1':
+  '@cloudflare/workerd-darwin-arm64@1.20260907.1':
     optional: true
 
-  '@cloudflare/workerd-linux-64@1.20260903.1':
+  '@cloudflare/workerd-linux-64@1.20260907.1':
     optional: true
 
-  '@cloudflare/workerd-linux-arm64@1.20260903.1':
+  '@cloudflare/workerd-linux-arm64@1.20260907.1':
     optional: true
 
-  '@cloudflare/workerd-windows-64@1.20260903.1':
+  '@cloudflare/workerd-windows-64@1.20260907.1':
     optional: true
 
   '@cloudflare/workers-types@4.20260611.1': {}
@@ -16686,10 +16687,10 @@ snapshots:
 
   '@composio/client@0.1.0-alpha.76': {}
 
-  '@composio/core@0.18.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)':
+  '@composio/core@0.18.1(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)':
     dependencies:
       '@composio/client': 0.1.0-alpha.76
-      '@composio/json-schema-to-zod': 0.3.1(zod@4.5.4)
+      '@composio/json-schema-to-zod': 0.3.2(zod@4.5.4)
       '@types/json-schema': 7.0.15
       is-fs-case-sensitive: 2.0.0
       openai: 6.37.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)
@@ -16702,13 +16703,15 @@ snapshots:
     transitivePeerDependencies:
       - ws
 
-  '@composio/json-schema-to-zod@0.3.1(zod@4.5.4)':
+  '@composio/json-schema-to-zod@0.3.2(zod@4.5.4)':
     dependencies:
+      '@cfworker/json-schema': 4.1.1
+      dequal: 2.0.3
       zod: 4.5.4
 
-  '@composio/vercel@0.11.2(@composio/core@0.18.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4))(ai@7.0.92(zod@4.5.4))':
+  '@composio/vercel@0.11.2(@composio/core@0.18.1(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4))(ai@7.0.92(zod@4.5.4))':
     dependencies:
-      '@composio/core': 0.18.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)
+      '@composio/core': 0.18.1(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)
       ai: 7.0.92(zod@4.5.4)
 
   '@cspotcode/source-map-support@0.8.1':
@@ -17044,49 +17047,44 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@github/copilot-darwin-arm64@1.0.82':
+  '@github/copilot-sdk-darwin-arm64@1.0.13':
     optional: true
 
-  '@github/copilot-darwin-x64@1.0.82':
+  '@github/copilot-sdk-darwin-x64@1.0.13':
     optional: true
 
-  '@github/copilot-linux-arm64@1.0.82':
+  '@github/copilot-sdk-linux-arm64@1.0.13':
     optional: true
 
-  '@github/copilot-linux-x64@1.0.82':
+  '@github/copilot-sdk-linux-x64@1.0.13':
     optional: true
 
-  '@github/copilot-linuxmusl-arm64@1.0.82':
+  '@github/copilot-sdk-linuxmusl-arm64@1.0.13':
     optional: true
 
-  '@github/copilot-linuxmusl-x64@1.0.82':
+  '@github/copilot-sdk-linuxmusl-x64@1.0.13':
     optional: true
 
-  '@github/copilot-sdk@1.0.11':
+  '@github/copilot-sdk-win32-arm64@1.0.13':
+    optional: true
+
+  '@github/copilot-sdk-win32-x64@1.0.13':
+    optional: true
+
+  '@github/copilot-sdk@1.0.13':
     dependencies:
-      '@github/copilot': 1.0.82
       koffi: 3.2.0
       vscode-jsonrpc: 8.2.1
       zod: 4.5.4
-
-  '@github/copilot-win32-arm64@1.0.82':
-    optional: true
-
-  '@github/copilot-win32-x64@1.0.82':
-    optional: true
-
-  '@github/copilot@1.0.82':
-    dependencies:
-      detect-libc: 2.1.2
     optionalDependencies:
-      '@github/copilot-darwin-arm64': 1.0.82
-      '@github/copilot-darwin-x64': 1.0.82
-      '@github/copilot-linux-arm64': 1.0.82
-      '@github/copilot-linux-x64': 1.0.82
-      '@github/copilot-linuxmusl-arm64': 1.0.82
-      '@github/copilot-linuxmusl-x64': 1.0.82
-      '@github/copilot-win32-arm64': 1.0.82
-      '@github/copilot-win32-x64': 1.0.82
+      '@github/copilot-sdk-darwin-arm64': 1.0.13
+      '@github/copilot-sdk-darwin-x64': 1.0.13
+      '@github/copilot-sdk-linux-arm64': 1.0.13
+      '@github/copilot-sdk-linux-x64': 1.0.13
+      '@github/copilot-sdk-linuxmusl-arm64': 1.0.13
+      '@github/copilot-sdk-linuxmusl-x64': 1.0.13
+      '@github/copilot-sdk-win32-arm64': 1.0.13
+      '@github/copilot-sdk-win32-x64': 1.0.13
 
   '@google-cloud/paginator@7.0.1':
     dependencies:
@@ -17756,12 +17754,12 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.4.1
 
-  '@inquirer/confirm@6.3.1(@types/node@22.20.2)':
+  '@inquirer/confirm@6.3.1(@types/node@22.20.1)':
     dependencies:
-      '@inquirer/core': 12.0.2(@types/node@22.20.2)
-      '@inquirer/type': 4.1.1(@types/node@22.20.2)
+      '@inquirer/core': 12.0.2(@types/node@22.20.1)
+      '@inquirer/type': 4.1.1(@types/node@22.20.1)
     optionalDependencies:
-      '@types/node': 22.20.2
+      '@types/node': 22.20.1
     optional: true
 
   '@inquirer/confirm@6.3.1(@types/node@24.13.3)':
@@ -17779,17 +17777,17 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.4.1
 
-  '@inquirer/core@12.0.2(@types/node@22.20.2)':
+  '@inquirer/core@12.0.2(@types/node@22.20.1)':
     dependencies:
       '@inquirer/ansi': 2.0.8
       '@inquirer/figures': 2.0.9
-      '@inquirer/type': 4.1.1(@types/node@22.20.2)
+      '@inquirer/type': 4.1.1(@types/node@22.20.1)
       cli-width: 4.1.0
       fast-wrap-ansi: 0.2.2
       mute-stream: 3.0.0
       signal-exit: 4.1.0
     optionalDependencies:
-      '@types/node': 22.20.2
+      '@types/node': 22.20.1
     optional: true
 
   '@inquirer/core@12.0.2(@types/node@24.13.3)':
@@ -17902,9 +17900,9 @@ snapshots:
     optionalDependencies:
       '@types/node': 26.4.1
 
-  '@inquirer/type@4.1.1(@types/node@22.20.2)':
+  '@inquirer/type@4.1.1(@types/node@22.20.1)':
     optionalDependencies:
-      '@types/node': 22.20.2
+      '@types/node': 22.20.1
     optional: true
 
   '@inquirer/type@4.1.1(@types/node@24.13.3)':
@@ -21697,7 +21695,7 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@22.20.2':
+  '@types/node@22.20.1':
     dependencies:
       undici-types: 6.21.0
 
@@ -22287,13 +22285,13 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/connect@2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))':
+  '@vercel/connect@2.0.2(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)))':
     dependencies:
       '@vercel/oidc': 3.7.1
     optionalDependencies:
       '@ai-sdk/mcp': 2.0.44(zod@4.5.4)
       ai: 7.0.0-beta.178(zod@4.5.4)
-      eve: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+      eve: 0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
 
   '@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6))':
     dependencies:
@@ -22408,14 +22406,14 @@ snapshots:
     dependencies:
       '@vitest/istanbul-lib-coverage': 1.0.1
 
-  '@vitest/mocker@4.1.11(msw@2.15.0(@types/node@22.20.2)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))':
+  '@vitest/mocker@4.1.11(msw@2.15.0(@types/node@22.20.1)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))':
     dependencies:
       '@vitest/spy': 4.1.11
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.15.0(@types/node@22.20.2)(typescript@5.8.3)
-      vite: 7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)
+      msw: 2.15.0(@types/node@22.20.1)(typescript@5.8.3)
+      vite: 7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)
 
   '@vitest/mocker@4.1.11(msw@2.15.0(@types/node@24.13.3)(typescript@5.8.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))':
     dependencies:
@@ -23048,9 +23046,9 @@ snapshots:
 
   auto-bind@5.0.1: {}
 
-  autoprefixer@10.5.4(postcss@8.5.28):
+  autoprefixer@10.5.5(postcss@8.5.28):
     dependencies:
-      browserslist: 4.28.8
+      browserslist: 4.28.9
       caniuse-lite: 1.0.30001810
       fraction.js: 5.3.4
       picocolors: 1.1.1
@@ -23271,13 +23269,13 @@ snapshots:
     dependencies:
       pako: 1.0.11
 
-  browserslist@4.28.8:
+  browserslist@4.28.9:
     dependencies:
       baseline-browser-mapping: 2.11.21
       caniuse-lite: 1.0.30001810
       electron-to-chromium: 1.5.420
       node-releases: 2.0.54
-      update-browserslist-db: 1.3.2(browserslist@4.28.8)
+      update-browserslist-db: 1.3.2(browserslist@4.28.9)
 
   bs-logger@0.2.6:
     dependencies:
@@ -24217,14 +24215,14 @@ snapshots:
 
   env-paths@2.2.1: {}
 
-  env-runner@0.1.16(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
+  env-runner@0.1.16(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
     dependencies:
       crossws: 0.4.12(srvx@0.11.22)
       exsolve: 1.1.1
       httpxy: 0.5.5
       srvx: 0.11.22
     optionalDependencies:
-      wrangler: 4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)
+      wrangler: 4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)
 
   environment@1.1.0: {}
 
@@ -24550,10 +24548,10 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
+  eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.0-beta.178(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
     dependencies:
       ai: 7.0.0-beta.178(zod@4.5.4)
-      nitro: 3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+      nitro: 3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       undici: 7.29.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
@@ -24598,10 +24596,10 @@ snapshots:
       - xml2js
       - zephyr-agent
 
-  eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.92(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
+  eve@0.47.7(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@opentelemetry/api@1.9.1)(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(ai@7.0.92(zod@4.5.4))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(just-bash@3.4.2(supports-color@10.2.2))(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
     dependencies:
       ai: 7.0.92(zod@4.5.4)
-      nitro: 3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+      nitro: 3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       undici: 7.29.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
@@ -27425,12 +27423,12 @@ snapshots:
 
   min-indent@1.0.1: {}
 
-  miniflare@5.20260903.0-alpha(@types/node@26.4.1)(utf-8-validate@6.0.6):
+  miniflare@5.20260907.0-alpha(@types/node@26.4.1)(utf-8-validate@6.0.6):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       sharp: 0.35.4(@types/node@26.4.1)
       undici: 7.29.0
-      workerd: 1.20260903.1
+      workerd: 1.20260907.1
       ws: 8.21.3(utf-8-validate@6.0.6)
       youch: 4.1.0-beta.10
     transitivePeerDependencies:
@@ -27611,9 +27609,9 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.15.0(@types/node@22.20.2)(typescript@5.8.3):
+  msw@2.15.0(@types/node@22.20.1)(typescript@5.8.3):
     dependencies:
-      '@inquirer/confirm': 6.3.1(@types/node@22.20.2)
+      '@inquirer/confirm': 6.3.1(@types/node@22.20.1)
       '@mswjs/interceptors': 0.41.9
       '@open-draft/deferred-promise': 3.0.0
       '@types/statuses': 2.0.6
@@ -27788,12 +27786,12 @@ snapshots:
       jsonpath-plus: 10.4.0
       lodash.topath: 4.5.2
 
-  nitro@3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
+  nitro@3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
     dependencies:
       consola: 3.4.2
       crossws: 0.4.12(srvx@0.11.22)
       db0: 0.3.4(better-sqlite3@13.0.3)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))
-      env-runner: 0.1.16(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+      env-runner: 0.1.16(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       h3: 2.0.1-rc.22(crossws@0.4.12(srvx@0.11.22))
       hookable: 6.1.1
       nf3: 0.3.24
@@ -27841,12 +27839,12 @@ snapshots:
       - uploadthing
       - wrangler
 
-  nitro@3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
+  nitro@3.0.260610-beta(@azure/storage-blob@12.33.0(supports-color@10.2.2))(@upstash/redis@1.38.4)(@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6)))(better-sqlite3@13.0.3)(chokidar@5.0.0)(dotenv@17.4.2)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))(ioredis@5.11.1(supports-color@10.2.2))(jiti@2.7.0)(lru-cache@11.5.2)(mongodb@7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10))(rollup@4.63.1)(vite@7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6)):
     dependencies:
       consola: 3.4.2
       crossws: 0.4.12(srvx@0.11.22)
       db0: 0.3.4(better-sqlite3@13.0.3)(drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2))
-      env-runner: 0.1.16(wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
+      env-runner: 0.1.16(wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6))
       h3: 2.0.1-rc.22(crossws@0.4.12(srvx@0.11.22))
       hookable: 6.1.1
       nf3: 0.3.24
@@ -30606,9 +30604,9 @@ snapshots:
 
   until-async@3.0.2: {}
 
-  update-browserslist-db@1.3.2(browserslist@4.28.8):
+  update-browserslist-db@1.3.2(browserslist@4.28.9):
     dependencies:
-      browserslist: 4.28.8
+      browserslist: 4.28.9
       escalade: 3.2.0
       picocolors: 1.1.1
 
@@ -30720,7 +30718,7 @@ snapshots:
       - supports-color
       - typescript
 
-  vite@7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4):
+  vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4):
     dependencies:
       esbuild: 0.28.2
       fdir: 6.5.0(picomatch@4.0.7)
@@ -30729,7 +30727,7 @@ snapshots:
       rollup: 4.63.1
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 22.20.2
+      '@types/node': 22.20.1
       fsevents: 2.3.3
       jiti: 2.7.0
       lightningcss: 1.33.0
@@ -30775,10 +30773,10 @@ snapshots:
     optionalDependencies:
       vite: 7.3.6(@types/node@26.4.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)
 
-  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.2)(@vitest/coverage-v8@5.0.0(vitest@4.1.11))(jsdom@30.0.1(@noble/hashes@2.4.0))(msw@2.15.0(@types/node@22.20.2)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)):
+  vitest@4.1.11(@opentelemetry/api@1.9.1)(@types/node@22.20.1)(@vitest/coverage-v8@5.0.0(vitest@4.1.11))(jsdom@30.0.1(@noble/hashes@2.4.0))(msw@2.15.0(@types/node@22.20.1)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)):
     dependencies:
       '@vitest/expect': 4.1.11
-      '@vitest/mocker': 4.1.11(msw@2.15.0(@types/node@22.20.2)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))
+      '@vitest/mocker': 4.1.11(msw@2.15.0(@types/node@22.20.1)(typescript@5.8.3))(vite@7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))
       '@vitest/pretty-format': 4.1.11
       '@vitest/runner': 4.1.11
       '@vitest/snapshot': 4.1.11
@@ -30795,11 +30793,11 @@ snapshots:
       tinyexec: 1.3.1
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.1
-      vite: 7.3.6(@types/node@22.20.2)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)
+      vite: 7.3.6(@types/node@22.20.1)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
-      '@types/node': 22.20.2
+      '@types/node': 22.20.1
       '@vitest/coverage-v8': 5.0.0(vitest@4.1.11)
       jsdom: 30.0.1(@noble/hashes@2.4.0)
     transitivePeerDependencies:
@@ -31164,13 +31162,13 @@ snapshots:
 
   wordwrap@1.0.0: {}
 
-  workerd@1.20260903.1:
+  workerd@1.20260907.1:
     optionalDependencies:
-      '@cloudflare/workerd-darwin-64': 1.20260903.1
-      '@cloudflare/workerd-darwin-arm64': 1.20260903.1
-      '@cloudflare/workerd-linux-64': 1.20260903.1
-      '@cloudflare/workerd-linux-arm64': 1.20260903.1
-      '@cloudflare/workerd-windows-64': 1.20260903.1
+      '@cloudflare/workerd-darwin-64': 1.20260907.1
+      '@cloudflare/workerd-darwin-arm64': 1.20260907.1
+      '@cloudflare/workerd-linux-64': 1.20260907.1
+      '@cloudflare/workerd-linux-arm64': 1.20260907.1
+      '@cloudflare/workerd-windows-64': 1.20260907.1
 
   workers-ai-provider@4.0.0(@ai-sdk/anthropic@4.0.49(zod@4.5.4))(@ai-sdk/openai@4.0.58(zod@4.5.4))(@ai-sdk/provider@4.0.10)(ai@7.0.0-beta.178(zod@4.5.4)):
     dependencies:
@@ -31188,16 +31186,16 @@ snapshots:
       '@ai-sdk/anthropic': 4.0.49(zod@4.5.4)
       '@ai-sdk/openai': 4.0.58(zod@4.5.4)
 
-  wrangler@4.129.0(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6):
+  wrangler@4.129.1(@cloudflare/workers-types@4.20260611.1)(@types/node@26.4.1)(utf-8-validate@6.0.6):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
-      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260903.1)
+      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260907.1)
       blake3-wasm: 2.1.5
       esbuild: 0.28.2
-      miniflare: 5.20260903.0-alpha(@types/node@26.4.1)(utf-8-validate@6.0.6)
+      miniflare: 5.20260907.0-alpha(@types/node@26.4.1)(utf-8-validate@6.0.6)
       path-to-regexp: 6.3.0
       unenv: 2.0.0-rc.24
-      workerd: 1.20260903.1
+      workerd: 1.20260907.1
     optionalDependencies:
       '@cloudflare/workers-types': 4.20260611.1
       fsevents: 2.3.3
