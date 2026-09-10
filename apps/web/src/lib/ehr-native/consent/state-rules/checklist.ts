@@ -12,7 +12,7 @@
 import { z } from 'zod'
 
 import { StateCodeSchema, US_STATE_CODE_LIST } from './schemas'
-import { getSeedForState, getAllSeeds, type StateRuleSeed } from './seed-data'
+import { getSeedForState, type StateRuleSeed } from './seed-data'
 
 // ---------------------------------------------------------------------------
 // Checklist item schema

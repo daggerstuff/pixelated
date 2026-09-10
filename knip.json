@@ -31,7 +31,8 @@
     "apps/web/src/lib/ehr-native/integrations/e-prescribing/*.ts",
     "apps/web/src/lib/fhe/exports.ts",
     "apps/web/src/lib/fhe/operations.ts",
-    "apps/web/src/utils/offline/offlineManager.ts"
+    "apps/web/src/utils/offline/offlineManager.ts",
+    "apps/web/src/lib/ehr-native/consent/state-rules/*.ts"
   ],
   "project": [
     "apps/web/src/**/*.{ts,tsx,js,jsx,astro}",
