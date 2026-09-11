@@ -48,16 +48,9 @@ jobs:
           echo "(the fresh `pixelated` DB) for migrations 001-013 to apply against."
           exit 1
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
+      - uses: ./.github/actions/setup-node-pnpm
         with:
-          node-version-file: '.nvmrc'
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          node-version: '24.16.0'
 
       - name: Apply pending migrations
         run: pnpm db:migrate
