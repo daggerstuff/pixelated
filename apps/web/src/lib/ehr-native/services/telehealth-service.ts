@@ -240,7 +240,7 @@ export class TelehealthService {
         ? (input.webRtcConfig ?? DEFAULT_WEBRTC_CONFIG)
         : undefined
 
-    const sessionId = crypto.randomUUID()
+    const sessionId = randomUUID()
     const startedAt = new Date().toISOString()
 
     const session: TelehealthSession = {
