@@ -83,6 +83,7 @@
     "infra/k8s/**",
     "scripts/**",
     "apps/web/src/lib/utils/image-optimizer.ts",
-    "apps/web/src/lib/utils/image-optimizer.test.ts"
+    "apps/web/src/lib/utils/image-optimizer.test.ts",
+    "apps/web/src/lib/ehr-native/integrations/zoom/types.ts"
   ]
 }
