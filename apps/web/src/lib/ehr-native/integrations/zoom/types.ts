@@ -132,7 +132,8 @@ export type ZoomMeeting = z.infer<typeof zoomMeetingSchema>
  */
 export const zoomRecordingFileSchema = z.object({
   id: z.string(),
-  meeting_id: z.number().int(),
+  // Zoom returns the meeting UUID (string) here, not the numeric meeting ID.
+  meeting_id: z.string(),
   recording_start: z.iso.datetime(),
   recording_end: z.iso.datetime(),
   file_type: z.string(),
@@ -151,7 +152,8 @@ export type ZoomRecordingFile = z.infer<typeof zoomRecordingFileSchema>
  */
 export const zoomRecordingSchema = z.object({
   id: z.string(),
-  meeting_id: z.number().int(),
+  // Same as recording files: Zoom returns the meeting UUID (string).
+  meeting_id: z.string(),
   topic: z.string(),
   start_time: z.iso.datetime(),
   duration: z.number().int().nonnegative(),

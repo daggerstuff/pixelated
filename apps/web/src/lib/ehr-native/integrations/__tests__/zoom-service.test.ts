@@ -538,6 +538,16 @@ describe('ZoomService', () => {
       )
       expect(result.data).toHaveLength(1)
     })
+
+    it('returns meeting_id as a string matching the real Zoom recording API shape', async () => {
+      const result = await service.listRecordings(
+        ACCESS_TOKEN,
+        TENANT_ID,
+        USER_ID,
+      )
+      expect(result.data[0].meeting_id).toBe('100000001')
+      expect(result.data[0].recording_files[0].meeting_id).toBe('100000001')
+    })
   })
 
   // -------------------------------------------------------------------------
