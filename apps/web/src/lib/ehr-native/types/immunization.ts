@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -7,19 +9,13 @@ import {
   fhirDateTimeSchema,
   fhirDateSchema,
   fhirBackboneElementSchema,
-} from "./base.js";
-import { z } from "zod";
+} from './base.js'
 
 /** FHIR R4 Immunization resource schema. @see http://hl7.org/fhir/R4/immunization.html */
 export const immunizationSchema = fhirDomainResourceSchema.extend({
-  resourceType: z.literal("Immunization"),
+  resourceType: z.literal('Immunization'),
   identifier: z.array(fhirIdentifierSchema).optional(),
-  status: z.enum([
-    "completed",
-    "entered-in-error",
-    "not-done",
-    "unknown",
-  ]),
+  status: z.enum(['completed', 'entered-in-error', 'not-done', 'unknown']),
   statusReason: fhirCodeableConceptSchema.optional(),
   vaccineCode: fhirCodeableConceptSchema,
   patient: fhirReferenceSchema,
@@ -76,6 +72,6 @@ export const immunizationSchema = fhirDomainResourceSchema.extend({
       }),
     )
     .optional(),
-});
+})
 
-export type Immunization = z.infer<typeof immunizationSchema>;
+export type Immunization = z.infer<typeof immunizationSchema>

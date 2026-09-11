@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -8,24 +10,23 @@ import {
   fhirInstantSchema,
   fhirAttachmentSchema,
   fhirBackboneElementSchema,
-} from "./base.js";
-import { z } from "zod";
+} from './base.js'
 
 /** FHIR R4 DiagnosticReport resource schema. @see http://hl7.org/fhir/R4/diagnosticreport.html */
 export const diagnosticReportSchema = fhirDomainResourceSchema.extend({
-  resourceType: z.literal("DiagnosticReport"),
+  resourceType: z.literal('DiagnosticReport'),
   identifier: z.array(fhirIdentifierSchema).optional(),
   status: z.enum([
-    "registered",
-    "partial",
-    "preliminary",
-    "final",
-    "amended",
-    "corrected",
-    "appended",
-    "cancelled",
-    "entered-in-error",
-    "unknown",
+    'registered',
+    'partial',
+    'preliminary',
+    'final',
+    'amended',
+    'corrected',
+    'appended',
+    'cancelled',
+    'entered-in-error',
+    'unknown',
   ]),
   category: z.array(fhirCodeableConceptSchema).optional(),
   code: fhirCodeableConceptSchema,
@@ -56,6 +57,6 @@ export const diagnosticReportSchema = fhirDomainResourceSchema.extend({
   conclusion: z.string().optional(),
   conclusionCode: z.array(fhirCodeableConceptSchema).optional(),
   presentedForm: z.array(fhirAttachmentSchema).optional(),
-});
+})
 
-export type DiagnosticReport = z.infer<typeof diagnosticReportSchema>;
+export type DiagnosticReport = z.infer<typeof diagnosticReportSchema>

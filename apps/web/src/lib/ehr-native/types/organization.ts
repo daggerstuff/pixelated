@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -5,12 +7,11 @@ import {
   fhirContactPointSchema,
   fhirAddressSchema,
   fhirReferenceSchema,
-} from "./base.js";
-import { z } from "zod";
+} from './base.js'
 
 /** FHIR R4 Organization resource schema. @see http://hl7.org/fhir/R4/organization.html */
 export const organizationSchema = fhirDomainResourceSchema.extend({
-  resourceType: z.literal("Organization"),
+  resourceType: z.literal('Organization'),
   identifier: z.array(fhirIdentifierSchema).optional(),
   active: z.boolean().optional(),
   type: z.array(fhirCodeableConceptSchema).optional(),
@@ -30,6 +31,6 @@ export const organizationSchema = fhirDomainResourceSchema.extend({
     )
     .optional(),
   endpoint: z.array(fhirReferenceSchema).optional(),
-});
+})
 
-export type Organization = z.infer<typeof organizationSchema>;
+export type Organization = z.infer<typeof organizationSchema>

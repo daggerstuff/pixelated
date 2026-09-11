@@ -101,8 +101,7 @@ export const communicationPayloadSchema = z
       return present === 1
     },
     {
-      message:
-        'Communication payload must have exactly one content[x] field',
+      message: 'Communication payload must have exactly one content[x] field',
     },
   )
 

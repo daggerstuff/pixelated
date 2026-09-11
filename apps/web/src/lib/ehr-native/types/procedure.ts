@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import {
   fhirDomainResourceSchema,
   fhirIdentifierSchema,
@@ -6,22 +8,21 @@ import {
   fhirPeriodSchema,
   fhirDateTimeSchema,
   fhirBackboneElementSchema,
-} from "./base.js";
-import { z } from "zod";
+} from './base.js'
 
 /** FHIR R4 Procedure resource schema. @see http://hl7.org/fhir/R4/procedure.html */
 export const procedureSchema = fhirDomainResourceSchema.extend({
-  resourceType: z.literal("Procedure"),
+  resourceType: z.literal('Procedure'),
   identifier: z.array(fhirIdentifierSchema).optional(),
   status: z.enum([
-    "preparation",
-    "in-progress",
-    "not-done",
-    "on-hold",
-    "stopped",
-    "completed",
-    "entered-in-error",
-    "unknown",
+    'preparation',
+    'in-progress',
+    'not-done',
+    'on-hold',
+    'stopped',
+    'completed',
+    'entered-in-error',
+    'unknown',
   ]),
   statusReason: fhirCodeableConceptSchema.optional(),
   category: fhirCodeableConceptSchema.optional(),
@@ -50,6 +51,6 @@ export const procedureSchema = fhirDomainResourceSchema.extend({
   note: z.array(z.object({ text: z.string() })).optional(),
   usedCode: z.array(fhirCodeableConceptSchema).optional(),
   usedReference: z.array(fhirReferenceSchema).optional(),
-});
+})
 
-export type Procedure = z.infer<typeof procedureSchema>;
+export type Procedure = z.infer<typeof procedureSchema>
