@@ -284,6 +284,34 @@ body {
 }
 
 /* ==============================================
+   NP TOKEN → LEGACY PALETTE BRIDGE
+   BaseLayout switched from astro-palette to data-theme,
+   so pages no longer carry a data-palette attribute.
+   Without this, public/css/style.css keeps its light
+   --bg/--ink defaults while NP tokens apply the dark
+   theme, producing light surfaces with light text.
+   Map legacy tokens only when no astro-palette is set;
+   palette pages keep their own values in style.css.
+   ============================================== */
+:root:not([data-palette]) {
+  --bg: var(--np-bg);
+  --bg-elevated: var(--np-elevated);
+  --ink: var(--np-text);
+  --ink-soft: var(--np-muted);
+  --muted: var(--np-muted);
+  --muted-2: var(--np-mid);
+  --line: var(--np-line);
+  --line-strong: var(--np-line-strong);
+  --terminal: var(--np-surface);
+  --terminal-2: var(--np-elevated);
+  --accent: var(--np-mid);
+  --accent-soft: color-mix(in srgb, var(--np-mid) 10%, transparent);
+  --green: var(--np-text);
+  --yellow: var(--np-muted);
+  --red: var(--np-text);
+}
+
+/* ==============================================
    PALETTE → NP TOKEN BRIDGE
    Maps astro-palette's --bg/--ink/--bg-elevated/etc.
    (defined in public/css/style.css) onto the --np-*
