@@ -182,11 +182,12 @@ interface ClaimObj {
   use: string
   patient: FHIRReference
   provider: FHIRReference
+  created: string
+  priority: FHIRCodeableConcept
   item: ClaimItemObj[]
   insurer?: FHIRReference
   billablePeriod?: FHIRPeriod
   facility?: FHIRReference
-  priority?: FHIRCodeableConcept
   diagnosis?: ClaimDiagnosisObj[]
   procedure?: ClaimProcedureObj[]
   insurance?: ClaimInsuranceObj[]
@@ -306,6 +307,8 @@ export class ClaimsService {
       use: input.use,
       patient: { reference: input.patient } as FHIRReference,
       provider: { reference: input.provider } as FHIRReference,
+      created: new Date().toISOString(),
+      priority: input.priority ?? { text: 'Normal' },
       item: items,
     }
 
@@ -317,9 +320,6 @@ export class ClaimsService {
     }
     if (input.facility) {
       claim.facility = { reference: input.facility } as FHIRReference
-    }
-    if (input.priority) {
-      claim.priority = input.priority
     }
 
     if (input.diagnoses && input.diagnoses.length > 0) {

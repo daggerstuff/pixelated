@@ -8,6 +8,8 @@ import {
   fhirPeriodSchema,
   fhirBackboneElementSchema,
   fhirAttachmentSchema,
+  fhirMoneySchema,
+  fhirQuantitySchema,
 } from './base'
 
 /**
@@ -19,16 +21,16 @@ export const claimSchema = fhirDomainResourceSchema.extend({
   resourceType: z.literal('Claim'),
   identifier: z.array(fhirIdentifierSchema).optional(),
   status: z.enum(['active', 'cancelled', 'draft', 'entered-in-error']),
-  type: fhirCodeableConceptSchema,
+  type: fhirCodeableConceptSchema.optional(),
   subType: fhirCodeableConceptSchema.optional(),
   use: z.enum(['claim', 'preauthorization', 'predetermination']),
   patient: fhirReferenceSchema,
   billablePeriod: fhirPeriodSchema.optional(),
-  created: z.string().optional(),
+  created: z.string(),
   enterer: fhirReferenceSchema.optional(),
   insurer: fhirReferenceSchema.optional(),
   provider: fhirReferenceSchema,
-  priority: fhirCodeableConceptSchema.optional(),
+  priority: fhirCodeableConceptSchema,
   fundsReserve: fhirCodeableConceptSchema.optional(),
   related: z
     .array(
@@ -123,7 +125,7 @@ export const claimSchema = fhirDomainResourceSchema.extend({
         claimResponse: fhirReferenceSchema.optional(),
       }),
     )
-    .optional(),
+    .min(1),
   accident: z
     .object({
       ...fhirBackboneElementSchema.shape,
@@ -282,3 +284,113 @@ export const claimSchema = fhirDomainResourceSchema.extend({
 })
 
 export type Claim = z.infer<typeof claimSchema>
+
+export const claimResponseSchema = fhirDomainResourceSchema.extend({
+  resourceType: z.literal('ClaimResponse'),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  status: z.enum(['active', 'cancelled', 'draft', 'entered-in-error']),
+  type: fhirCodeableConceptSchema.optional(),
+  subType: fhirCodeableConceptSchema.optional(),
+  use: z.enum(['claim', 'preauthorization', 'predetermination']),
+  patient: fhirReferenceSchema,
+  created: z.string(),
+  disposition: z.string().optional(),
+  preAuthRef: z.string().optional(),
+  payee: fhirReferenceSchema.optional(),
+  insurer: fhirReferenceSchema,
+  outcome: z.enum(['queued', 'complete', 'error', 'partial']),
+  total: z
+    .array(
+      z.object({
+        category: fhirCodeableConceptSchema,
+        amount: fhirMoneySchema,
+      }),
+    )
+    .optional(),
+  payment: z
+    .object({
+      type: fhirCodeableConceptSchema,
+      amount: fhirMoneySchema.optional(),
+    })
+    .optional(),
+  processNote: z
+    .array(
+      z.object({
+        text: z.string(),
+      }),
+    )
+    .optional(),
+})
+
+export type ClaimResponse = z.infer<typeof claimResponseSchema>
+
+export const coverageSchema = fhirDomainResourceSchema.extend({
+  resourceType: z.literal('Coverage'),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  status: z.enum(['active', 'entered-in-error', 'draft', 'cancelled']),
+  type: fhirCodeableConceptSchema.optional(),
+  beneficiary: fhirReferenceSchema,
+  policyHolder: fhirReferenceSchema.optional(),
+  subscriber: fhirReferenceSchema.optional(),
+  subscriberId: z.string().optional(),
+  dependent: z.string().optional(),
+  relationship: fhirCodeableConceptSchema.optional(),
+  period: fhirPeriodSchema.optional(),
+  payor: z.array(fhirReferenceSchema).min(1),
+  order: z.number().int().positive().optional(),
+  network: z.string().optional(),
+})
+
+export type Coverage = z.infer<typeof coverageSchema>
+
+export const explanationOfBenefitSchema = fhirDomainResourceSchema.extend({
+  resourceType: z.literal('ExplanationOfBenefit'),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  status: z.enum(['active', 'cancelled', 'draft', 'entered-in-error']),
+  type: fhirCodeableConceptSchema.optional(),
+  subType: fhirCodeableConceptSchema.optional(),
+  use: z.enum(['claim', 'preauthorization', 'predetermination']),
+  patient: fhirReferenceSchema,
+  billablePeriod: fhirPeriodSchema.optional(),
+  created: z.string(),
+  disposition: z.string().optional(),
+  preAuthRef: z.array(z.string()).optional(),
+  insurer: fhirReferenceSchema,
+  provider: fhirReferenceSchema,
+  outcome: z.enum(['queued', 'complete', 'error', 'partial']),
+  insurance: z.object({
+    focal: z.boolean(),
+    coverage: fhirReferenceSchema,
+  }),
+  total: z
+    .array(
+      z.object({
+        category: fhirCodeableConceptSchema,
+        amount: fhirMoneySchema,
+      }),
+    )
+    .optional(),
+  payment: z
+    .object({
+      type: fhirCodeableConceptSchema,
+      amount: fhirMoneySchema.optional(),
+    })
+    .optional(),
+  benefitBalance: z
+    .array(
+      z.object({
+        category: fhirCodeableConceptSchema,
+        financial: z
+          .array(
+            z.object({
+              type: fhirCodeableConceptSchema,
+              usedMoney: fhirMoneySchema.optional(),
+            }),
+          )
+          .optional(),
+      }),
+    )
+    .optional(),
+})
+
+export type ExplanationOfBenefit = z.infer<typeof explanationOfBenefitSchema>

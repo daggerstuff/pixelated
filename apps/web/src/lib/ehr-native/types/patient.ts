@@ -12,6 +12,7 @@ import {
   fhirReferenceSchema,
   fhirExtensionSchema,
   fhirBackboneElementSchema,
+  fhirDateSchema,
 } from './base'
 
 /**
@@ -26,7 +27,7 @@ export const patientSchema = fhirDomainResourceSchema.extend({
   name: z.array(fhirHumanNameSchema).optional(),
   telecom: z.array(fhirContactPointSchema).optional(),
   gender: z.enum(['male', 'female', 'other', 'unknown']).optional(),
-  birthDate: z.string().optional(),
+  birthDate: fhirDateSchema.optional(),
   deceasedBoolean: z.boolean().optional(),
   deceasedDateTime: z.string().optional(),
   address: z.array(fhirAddressSchema).optional(),

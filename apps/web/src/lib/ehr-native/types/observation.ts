@@ -8,6 +8,10 @@ import {
   fhirPeriodSchema,
   fhirQuantitySchema,
   fhirBackboneElementSchema,
+  fhirRangeSchema,
+  fhirRatioSchema,
+  fhirTimeSchema,
+  fhirDateTimeSchema,
 } from './base'
 
 /**
@@ -174,6 +178,38 @@ export const observationSchema = fhirDomainResourceSchema.extend({
       }),
     )
     .optional(),
-})
+}).refine(
+  (data) => {
+    const valueKeys = [
+      'valueQuantity',
+      'valueCodeableConcept',
+      'valueString',
+      'valueBoolean',
+      'valueInteger',
+      'valueRange',
+      'valueRatio',
+      'valueSampledData',
+      'valueTime',
+      'valueDateTime',
+      'valuePeriod',
+    ]
+    const presentCount = valueKeys.filter((k) => data[k] !== undefined).length
+    return presentCount <= 1
+  },
+  { message: 'Observation may have at most one value[x] field' },
+)
+
+export const observationValueSchema = z.union([
+  z.object({ valueQuantity: fhirQuantitySchema }),
+  z.object({ valueCodeableConcept: fhirCodeableConceptSchema }),
+  z.object({ valueString: z.string() }),
+  z.object({ valueBoolean: z.boolean() }),
+  z.object({ valueInteger: z.number().int() }),
+  z.object({ valueRange: fhirRangeSchema }),
+  z.object({ valueRatio: fhirRatioSchema }),
+  z.object({ valueTime: fhirTimeSchema }),
+  z.object({ valueDateTime: fhirDateTimeSchema }),
+  z.object({ valuePeriod: fhirPeriodSchema }),
+])
 
 export type Observation = z.infer<typeof observationSchema>
