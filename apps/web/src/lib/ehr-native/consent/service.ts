@@ -88,10 +88,10 @@ export class ConsentService {
     stateCode?: string,
     treatmentCategory?: string,
   ): Promise<ConsentVerificationResult> {
-    // Phase 1: delegate baseline check to SQL function (returns a row with
-    // has_consent + consent_level columns via SELECT * FROM)
+    // Phase 1: delegate baseline check to SQL function. It RETURNS boolean
+    // (scalar), so alias the result to has_consent for a stable row shape.
     const sqlResult = await query<{ has_consent: boolean }>(
-      `SELECT * FROM ehr_patient_has_consent($1, $2, $3)`,
+      `SELECT ehr_patient_has_consent($1, $2, $3) AS has_consent`,
       [patientId, tenantId, minimumLevel],
     )
     const hasConsent = sqlResult.rows[0]?.has_consent ?? false
