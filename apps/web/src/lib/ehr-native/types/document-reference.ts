@@ -150,28 +150,10 @@ export type Communication = z.infer<typeof communicationSchema>
 
 /**
  * FHIR R4 CommunicationRequest payload schema.
+ * Identical structure to Communication payload — aliased to avoid duplication.
  * @see http://hl7.org/fhir/R4/communicationrequest.html
  */
-export const communicationRequestPayloadSchema = z
-  .object({
-    contentString: z.string().optional(),
-    contentAttachment: fhirAttachmentSchema.optional(),
-    contentReference: fhirReferenceSchema.optional(),
-  })
-  .refine(
-    (data) => {
-      const present = [
-        data.contentString,
-        data.contentAttachment,
-        data.contentReference,
-      ].filter((v) => v !== undefined).length
-      return present === 1
-    },
-    {
-      message:
-        'Communication request payload must have exactly one content[x] field',
-    },
-  )
+export const communicationRequestPayloadSchema = communicationPayloadSchema
 
 /**
  * FHIR R4 CommunicationRequest resource schema.
