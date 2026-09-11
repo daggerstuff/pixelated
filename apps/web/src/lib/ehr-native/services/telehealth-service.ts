@@ -34,10 +34,6 @@ import type {
 // ---------------------------------------------------------------------------
 
 function validateId(id: string, label: string): string {
-  return validateUuid(id, label)
-}
-
-function validateUuid(id: string, label: string): string {
   const sanitized = id.trim()
   if (
     !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
@@ -322,6 +318,23 @@ export class TelehealthService {
         },
       )
       return null
+    }
+
+    const alreadyJoined = existing.participants.some(
+      (p) => p.participantId === participantId && p.role === input.role,
+    )
+    if (alreadyJoined) {
+      await this.auditService.logTelehealthAccess(
+        EHRAuditAction.JOIN_TELEHEALTH_SESSION,
+        {
+          userId,
+          status: 'success',
+          sessionId,
+          patientId: auditPatientId,
+          practitionerId: auditPractitionerId,
+        },
+      )
+      return existing
     }
 
     const updated: TelehealthSession = {
