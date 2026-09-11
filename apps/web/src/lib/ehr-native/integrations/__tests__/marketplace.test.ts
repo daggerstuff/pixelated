@@ -25,13 +25,21 @@ import type { IntegrationProvider } from '../types'
 // ---------------------------------------------------------------------------
 
 describe('MARKETPLACE_PROVIDERS', () => {
-  it('exports exactly 4 providers', () => {
-    expect(MARKETPLACE_PROVIDERS).toHaveLength(4)
+  it('exports exactly 7 providers', () => {
+    expect(MARKETPLACE_PROVIDERS).toHaveLength(7)
   })
 
-  it('contains calendly, zoom, stripe, twilio', () => {
+  it('contains calendly, zoom, stripe, twilio, carequality, directtrust, dosespot', () => {
     const keys = MARKETPLACE_PROVIDERS.map((p) => p.provider)
-    expect(keys).toEqual(['calendly', 'zoom', 'stripe', 'twilio'])
+    expect(keys).toEqual([
+      'calendly',
+      'zoom',
+      'stripe',
+      'twilio',
+      'carequality',
+      'directtrust',
+      'dosespot',
+    ])
   })
 
   it('INTEGRATION_PROVIDERS is the same reference', () => {
@@ -73,7 +81,26 @@ describe('MARKETPLACE_PROVIDERS', () => {
   it('each provider has webhookEvents', () => {
     for (const p of MARKETPLACE_PROVIDERS) {
       expect(p.webhookEvents).toBeDefined()
+    }
+  })
+
+  it('webhook-driven providers declare a non-empty webhookEvents list', () => {
+    const webhookDriven = MARKETPLACE_PROVIDERS.filter((p) =>
+      ['scheduling', 'video', 'payments', 'communications'].includes(p.category),
+    )
+    expect(webhookDriven.length).toBeGreaterThan(0)
+    for (const p of webhookDriven) {
       expect(p.webhookEvents!.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('hie and eprescribing providers declare empty webhookEvents (poll-based)', () => {
+    const pollBased = MARKETPLACE_PROVIDERS.filter((p) =>
+      ['hie', 'eprescribing'].includes(p.category),
+    )
+    expect(pollBased.length).toBeGreaterThan(0)
+    for (const p of pollBased) {
+      expect(p.webhookEvents).toEqual([])
     }
   })
 })
@@ -83,9 +110,9 @@ describe('MARKETPLACE_PROVIDERS', () => {
 // ---------------------------------------------------------------------------
 
 describe('PROVIDER_MAP', () => {
-  it('is a ReadonlyMap with 4 entries', () => {
+  it('is a ReadonlyMap with 7 entries', () => {
     expect(PROVIDER_MAP).toBeInstanceOf(Map)
-    expect(PROVIDER_MAP.size).toBe(4)
+    expect(PROVIDER_MAP.size).toBe(7)
   })
 
   it('returns correct metadata for each provider', () => {
@@ -132,9 +159,9 @@ describe('getProviderMetadata', () => {
 // ---------------------------------------------------------------------------
 
 describe('getAllProviders', () => {
-  it('returns all 4 providers', () => {
+  it('returns all 7 providers', () => {
     const all = getAllProviders()
-    expect(all).toHaveLength(4)
+    expect(all).toHaveLength(7)
     expect(all).toBe(MARKETPLACE_PROVIDERS)
   })
 })
@@ -166,6 +193,21 @@ describe('getProvidersByCategory', () => {
     const result = getProvidersByCategory('communications')
     expect(result).toHaveLength(1)
     expect(result[0].provider).toBe('twilio')
+  })
+
+  it('returns hie providers', () => {
+    const result = getProvidersByCategory('hie')
+    expect(result).toHaveLength(2)
+    expect(result.map((p) => p.provider).sort()).toEqual([
+      'carequality',
+      'directtrust',
+    ])
+  })
+
+  it('returns eprescribing providers', () => {
+    const result = getProvidersByCategory('eprescribing')
+    expect(result).toHaveLength(1)
+    expect(result[0].provider).toBe('dosespot')
   })
 })
 
@@ -477,9 +519,9 @@ describe('buildMarketplaceDashboard', () => {
     expect(dash.tenantId).toBe(tenantId)
   })
 
-  it('returns providers array with 4 entries', () => {
+  it('returns providers array with 7 entries', () => {
     const dash = buildMarketplaceDashboard(tenantId)
-    expect(dash.providers).toHaveLength(4)
+    expect(dash.providers).toHaveLength(7)
   })
 
   it('totalAvailable equals MARKETPLACE_PROVIDERS length', () => {
@@ -592,6 +634,10 @@ describe('validateTenantProviderStatus', () => {
       tenantId: 't1',
       provider: 'zoom',
       status: 'connected',
+      displayName: 'Zoom',
+      description: 'Telehealth video sessions.',
+      category: 'video',
+      defaultScopes: ['meeting:read'],
     })
     expect(result.status).toBe('connected')
   })

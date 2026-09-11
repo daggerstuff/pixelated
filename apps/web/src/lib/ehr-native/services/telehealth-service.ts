@@ -34,11 +34,17 @@ import type {
 // ---------------------------------------------------------------------------
 
 function validateId(id: string, label: string): string {
+  return validateUuid(id, label)
+}
+
+function validateUuid(id: string, label: string): string {
   const sanitized = id.trim()
-  if (!/^[A-Za-z0-9\-.]{1,64}$/.test(sanitized)) {
-    throw new Error(
-      `Invalid ${label} format: expected FHIR id (1-64 chars, A-Z, a-z, 0-9, -, .)`,
+  if (
+    !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+      sanitized,
     )
+  ) {
+    throw new Error(`Invalid ${label} format: expected UUID`)
   }
   return sanitized
 }
@@ -112,6 +118,14 @@ function isWebRTCAvailable(): boolean {
 export class TelehealthService {
   private readonly encounterRepo: EncounterRepository
   private readonly auditService: EHRAuditService
+  /**
+   * In-memory session store for the service instance lifetime.
+   * Sessions created via startSession are kept here so joinSession,
+   * getSession, and getActiveSessionByAppointment can resolve them.
+   * Not shared across instances — a persistent store (F1.12) is still
+   * deferred for cross-instance joins.
+   */
+  private readonly sessions = new Map<string, TelehealthSession>()
 
   constructor(rlsContext: RLSContext) {
     this.encounterRepo = new EncounterRepository(rlsContext)
@@ -256,6 +270,8 @@ export class TelehealthService {
       ],
     }
 
+    this.sessions.set(sessionId, session)
+
     // Audit session start
     await this.auditService.logTelehealthAccess(
       EHRAuditAction.START_TELEHEALTH_SESSION,
@@ -276,16 +292,10 @@ export class TelehealthService {
   /**
    * Joins an existing telehealth session as a participant.
    *
-   * Adds the participant to the session's participant list and audits the join.
+   * Looks the session up in the instance session store, appends the
+   * participant, transitions status to 'active', and audits the join.
    *
    * @returns The updated TelehealthSession, or null if not found.
-   */
-  /**
-   * Join a telehealth session — currently a stub.
-   * Session store not yet wired; always returns null and audits with failure.
-   * Deferred: wire the session store (F1.12) to persist participant joins
-   * across instances — currently the in-memory map is the only source of
-   * truth and is lost on restart.
    */
   async joinSession(
     input: JoinSessionInput,
@@ -298,20 +308,48 @@ export class TelehealthService {
     const auditPatientId = isPatient ? participantId : undefined
     const auditPractitionerId = isPatient ? undefined : participantId
 
+    const existing = this.sessions.get(sessionId)
+    if (!existing) {
+      await this.auditService.logTelehealthAccess(
+        EHRAuditAction.JOIN_TELEHEALTH_SESSION,
+        {
+          userId,
+          status: 'failure',
+          errorMessage: 'Session not found',
+          sessionId,
+          patientId: auditPatientId,
+          practitionerId: auditPractitionerId,
+        },
+      )
+      return null
+    }
+
+    const updated: TelehealthSession = {
+      ...existing,
+      status: 'active',
+      participants: [
+        ...existing.participants,
+        {
+          participantId,
+          role: input.role,
+          joinedAt: new Date().toISOString(),
+        },
+      ],
+    }
+    this.sessions.set(sessionId, updated)
+
     await this.auditService.logTelehealthAccess(
       EHRAuditAction.JOIN_TELEHEALTH_SESSION,
       {
         userId,
-        status: 'failure',
-        errorMessage: 'Session store not available',
+        status: 'success',
         sessionId,
         patientId: auditPatientId,
         practitionerId: auditPractitionerId,
       },
     )
 
-    // No session store wired — cannot return a valid session.
-    return null
+    return updated
   }
 
   /**
@@ -488,8 +526,7 @@ export class TelehealthService {
    */
   async getSession(sessionId: string): Promise<TelehealthSession | null> {
     validateId(sessionId, 'sessionId')
-    // Session store not yet implemented — returns null
-    return null
+    return this.sessions.get(sessionId) ?? null
   }
 
   /**
@@ -504,7 +541,14 @@ export class TelehealthService {
     appointmentId: string,
   ): Promise<TelehealthSession | null> {
     validateId(appointmentId, 'appointmentId')
-    // Session store not yet implemented — returns null
+    for (const session of this.sessions.values()) {
+      if (
+        session.appointmentId === appointmentId &&
+        session.status !== 'ended'
+      ) {
+        return session
+      }
+    }
     return null
   }
 }

@@ -38,6 +38,13 @@ vi.mock('@/lib/redis', () => ({
     setNx: mockRedisSetNx,
     del: vi.fn().mockResolvedValue(1),
   },
+  redisClient: {
+    get: mockRedisGet,
+    set: mockRedisSet,
+    setex: mockRedisSetex,
+    setNx: mockRedisSetNx,
+    del: vi.fn().mockResolvedValue(1),
+  },
 }))
 
 vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
@@ -75,7 +82,7 @@ function makeTwilioSignature(
     .map((k) => `${k}${params.get(k) ?? ''}`)
     .join('')
   const dataToSign = `${requestUrl}${postParams}`
-  return createHmac('sha256', secret)
+  return createHmac('sha1', secret)
     .update(dataToSign, 'utf8')
     .digest('base64')
 }
@@ -222,7 +229,9 @@ describe('TwilioService', () => {
 
     it('uses the configured authorizeUrl as base', () => {
       const url = service.buildAuthorizeUrl('s')
-      expect(url.startsWith('https://www.twilio.com/authorize')).toBe(true)
+      expect(url.startsWith('https://api.twilio.com/oauth/authorize')).toBe(
+        true,
+      )
     })
   })
 

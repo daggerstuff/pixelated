@@ -25,6 +25,13 @@ vi.mock('@/lib/redis', () => ({
     set: mockRedisSet,
     del: vi.fn().mockResolvedValue(1),
   },
+  redisClient: {
+    get: mockRedisGet,
+    setex: mockRedisSetex,
+    setNx: mockRedisSetNx,
+    set: mockRedisSet,
+    del: vi.fn().mockResolvedValue(1),
+  },
 }))
 
 const mockAuditLog = vi.fn().mockResolvedValue('audit-log-id')

@@ -130,6 +130,20 @@ export type ZoomMeeting = z.infer<typeof zoomMeetingSchema>
  * Zoom recording file — a single file within a recording.
  * @see https://developers.zoom.us/docs/api/rest/reference/cloud-recording/methods#operation/recordingGet
  */
+export const zoomRecordingFileSchema = z.object({
+  id: z.string(),
+  meeting_id: z.number().int(),
+  recording_start: z.iso.datetime(),
+  recording_end: z.iso.datetime(),
+  file_type: z.string(),
+  file_size: z.number().int().nonnegative(),
+  play_url: z.url().optional(),
+  download_url: z.url().optional(),
+  status: z.string().optional(),
+  recording_type: z.string().optional(),
+})
+
+export type ZoomRecordingFile = z.infer<typeof zoomRecordingFileSchema>
 
 /**
  * Zoom recording — cloud recording for a meeting.

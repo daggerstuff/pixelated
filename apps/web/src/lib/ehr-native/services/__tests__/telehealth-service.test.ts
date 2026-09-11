@@ -234,7 +234,49 @@ describe('TelehealthService', () => {
   })
 
   describe('joinSession', () => {
-    it('audits the join and returns null (no session store wired)', async () => {
+    it('adds the participant and returns the updated session', async () => {
+      mockEncounterRepo.create.mockResolvedValue({ id: validEncounterId })
+
+      const started = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      )
+      expect(started).not.toBeNull()
+
+      const result = await service.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+
+      expect(result).not.toBeNull()
+      expect(result!.id).toBe(started!.id)
+      expect(result!.status).toBe('active')
+      expect(result!.participants).toHaveLength(2)
+      expect(result!.participants[1]).toMatchObject({
+        participantId: validPatientId,
+        role: 'patient',
+      })
+
+      expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
+        'join_telehealth_session',
+        expect.objectContaining({
+          status: 'success',
+          sessionId: started!.id,
+          patientId: validPatientId,
+        }),
+      )
+    })
+
+    it('returns null and audits failure for an unknown session', async () => {
       const result = await service.joinSession(
         {
           sessionId: validSessionId,
@@ -249,6 +291,8 @@ describe('TelehealthService', () => {
       expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
         'join_telehealth_session',
         expect.objectContaining({
+          status: 'failure',
+          errorMessage: 'Session not found',
           sessionId: validSessionId,
           patientId: validPatientId,
         }),
