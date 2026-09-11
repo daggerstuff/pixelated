@@ -82,9 +82,7 @@ function makeTwilioSignature(
     .map((k) => `${k}${params.get(k) ?? ''}`)
     .join('')
   const dataToSign = `${requestUrl}${postParams}`
-  return createHmac('sha1', secret)
-    .update(dataToSign, 'utf8')
-    .digest('base64')
+  return createHmac('sha1', secret).update(dataToSign, 'utf8').digest('base64')
 }
 
 function makeWebhookEvent(

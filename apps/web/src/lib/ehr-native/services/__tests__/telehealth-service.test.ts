@@ -276,6 +276,60 @@ describe('TelehealthService', () => {
       )
     })
 
+    it('is idempotent on re-join: duplicate participant is not appended and success is audited', async () => {
+      mockEncounterRepo.create.mockResolvedValue({ id: validEncounterId })
+
+      const started = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      )
+      expect(started).not.toBeNull()
+
+      const firstJoin = await service.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+      expect(firstJoin).not.toBeNull()
+      const participantsAfterFirst = firstJoin!.participants.length
+
+      // Re-join with the same participantId + role (page refresh, duplicate
+      // click, retry) must NOT append a duplicate participant entry.
+      const reJoin = await service.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+
+      expect(reJoin).not.toBeNull()
+      expect(reJoin!.id).toBe(started!.id)
+      expect(reJoin!.participants.length).toBe(participantsAfterFirst)
+      expect(
+        reJoin!.participants.filter(
+          (p) => p.participantId === validPatientId && p.role === 'patient',
+        ),
+      ).toHaveLength(1)
+
+      // Both joins audit success; no failure audit for the re-join.
+      const successJoins = mockLogTelehealthAccess.mock.calls.filter(
+        ([action, payload]) =>
+          action === 'join_telehealth_session' &&
+          (payload as { status?: string }).status === 'success',
+      )
+      expect(successJoins).toHaveLength(2)
+    })
+
     it('returns null and audits failure for an unknown session', async () => {
       const result = await service.joinSession(
         {

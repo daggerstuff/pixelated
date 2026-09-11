@@ -86,7 +86,9 @@ describe('MARKETPLACE_PROVIDERS', () => {
 
   it('webhook-driven providers declare a non-empty webhookEvents list', () => {
     const webhookDriven = MARKETPLACE_PROVIDERS.filter((p) =>
-      ['scheduling', 'video', 'payments', 'communications'].includes(p.category),
+      ['scheduling', 'video', 'payments', 'communications'].includes(
+        p.category,
+      ),
     )
     expect(webhookDriven.length).toBeGreaterThan(0)
     for (const p of webhookDriven) {
