@@ -102,6 +102,21 @@ function isWebRTCAvailable(): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Shared session store
+// ---------------------------------------------------------------------------
+
+/**
+ * Module-level session map shared by every TelehealthService instance.
+ * Exported clear hook is test-only: unit tests reset it in beforeEach so
+ * sessions from one test never leak into another.
+ */
+const sharedTelehealthSessions = new Map<string, TelehealthSession>()
+
+export function clearTelehealthSessionsForTests(): void {
+  sharedTelehealthSessions.clear()
+}
+
+// ---------------------------------------------------------------------------
 // TelehealthService
 // ---------------------------------------------------------------------------
 
@@ -115,13 +130,13 @@ export class TelehealthService {
   private readonly encounterRepo: EncounterRepository
   private readonly auditService: EHRAuditService
   /**
-   * In-memory session store for the service instance lifetime.
-   * Sessions created via startSession are kept here so joinSession,
-   * getSession, and getActiveSessionByAppointment can resolve them.
-   * Not shared across instances — a persistent store (F1.12) is still
-   * deferred for cross-instance joins.
+   * Session store shared across all service instances.
+   * The service is instantiated per request, so instance state would be
+   * lost between a practitioner's startSession call and a patient's
+   * joinSession call. All instances reference the same module-level map,
+   * which keeps joins resolvable until a persistent store (F1.12) lands.
    */
-  private readonly sessions = new Map<string, TelehealthSession>()
+  private readonly sessions: Map<string, TelehealthSession> = sharedTelehealthSessions
 
   constructor(rlsContext: RLSContext) {
     this.encounterRepo = new EncounterRepository(rlsContext)

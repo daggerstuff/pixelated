@@ -63,7 +63,9 @@ vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
   },
 }))
 
-const { TelehealthService } = await import('../telehealth-service')
+const { TelehealthService, clearTelehealthSessionsForTests } = await import(
+  '../telehealth-service'
+)
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -91,6 +93,7 @@ describe('TelehealthService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    clearTelehealthSessionsForTests()
     service = new TelehealthService(rlsContext)
   })
 
@@ -353,6 +356,37 @@ describe('TelehealthService', () => {
       )
     })
 
+    it('resolves a session started on a different service instance', async () => {
+      mockEncounterRepo.create.mockResolvedValue({ id: validEncounterId })
+
+      const started = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      )
+      expect(started).not.toBeNull()
+
+      // Production instantiates the service per request: the patient join
+      // runs on a fresh instance and must still resolve the session.
+      const otherInstance = new TelehealthService(rlsContext)
+      const result = await otherInstance.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+
+      expect(result).not.toBeNull()
+      expect(result!.id).toBe(started!.id)
+      expect(result!.status).toBe('active')
+    })
+
     it('throws on invalid sessionId', async () => {
       await expect(
         service.joinSession(
@@ -502,7 +536,7 @@ describe('TelehealthService', () => {
   })
 
   describe('getSession', () => {
-    it('returns null (session store not yet wired)', async () => {
+    it('returns null when the store is empty', async () => {
       const result = await service.getSession(validSessionId)
       expect(result).toBeNull()
     })
@@ -515,7 +549,7 @@ describe('TelehealthService', () => {
   })
 
   describe('getActiveSessionByAppointment', () => {
-    it('returns null (session store not yet wired)', async () => {
+    it('returns null when the store is empty', async () => {
       const result =
         await service.getActiveSessionByAppointment(validAppointmentId)
       expect(result).toBeNull()
