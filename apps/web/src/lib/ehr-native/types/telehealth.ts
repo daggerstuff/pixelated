@@ -136,10 +136,10 @@ export type DeviceCheckResult = z.infer<typeof deviceCheckResultSchema>
 // ---------------------------------------------------------------------------
 
 export const startSessionInputSchema = z.object({
-  appointmentId: fhirIdSchema.optional(),
-  encounterId: fhirIdSchema.optional(),
-  patientId: fhirIdSchema,
-  practitionerId: fhirIdSchema,
+  appointmentId: fhirUuidSchema.optional(),
+  encounterId: fhirUuidSchema.optional(),
+  patientId: fhirUuidSchema,
+  practitionerId: fhirUuidSchema,
   preferredProvider: telehealthProviderSchema.default('webrtc'),
   webRtcConfig: webRtcConfigSchema.optional(),
   zoomMeetingId: z.string().optional(),
@@ -154,7 +154,7 @@ export type StartSessionInput = z.infer<typeof startSessionInputSchema>
 
 export const joinSessionInputSchema = z.object({
   sessionId: fhirUuidSchema,
-  participantId: fhirIdSchema,
+  participantId: fhirUuidSchema,
   role: z.enum(['practitioner', 'patient']),
 })
 
