@@ -313,10 +313,12 @@ describe('explanationOfBenefitSchema', () => {
     insurer: { reference: 'Organization/ins' },
     provider: { reference: 'Practitioner/456' },
     outcome: 'complete',
-    insurance: {
-      focal: true,
-      coverage: { reference: 'Coverage/789' },
-    },
+    insurance: [
+      {
+        focal: true,
+        coverage: { reference: 'Coverage/789' },
+      },
+    ],
   }
 
   it('validates a minimal EOB with all required fields', () => {

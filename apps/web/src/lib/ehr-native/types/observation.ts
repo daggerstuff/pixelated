@@ -209,6 +209,18 @@ export const observationValueSchema = z.union([
   z.object({ valueInteger: z.number().int() }),
   z.object({ valueRange: fhirRangeSchema }),
   z.object({ valueRatio: fhirRatioSchema }),
+  z.object({
+    valueSampledData: z.object({
+      ...fhirBackboneElementSchema.shape,
+      origin: fhirQuantitySchema,
+      period: z.number(),
+      factor: z.number().optional(),
+      lowerLimit: z.number().optional(),
+      upperLimit: z.number().optional(),
+      dimensions: z.number().int().positive(),
+      data: z.string().optional(),
+    }),
+  }),
   z.object({ valueTime: fhirTimeSchema }),
   z.object({ valueDateTime: fhirDateTimeSchema }),
   z.object({ valuePeriod: fhirPeriodSchema }),
