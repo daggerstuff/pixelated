@@ -1786,10 +1786,13 @@ button.nav-icon-link {
     gap: 0.35rem;
   }
 
-  /* The brand + hamburger + icon row don't all fit on one line below
-       ~370px (iPhone SE and similar) — wrap the icon row onto its own
-       line instead of letting it overflow the viewport. Harmless on
-       wider phones where everything already fits on one row. */
+}
+
+/* Only wrap the icon row below 320px, where the brand + hamburger +
+   icons genuinely no longer fit on one line. Above this width the row
+   fits, and forcing nav-tools to 100% basis mashes the header into two
+   stacked rows. */
+@media (max-width: 319px) {
   .nav {
     flex-wrap: wrap;
     row-gap: 0.5rem;
