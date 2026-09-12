@@ -63,7 +63,8 @@ vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
   },
 }))
 
-const { TelehealthService } = await import('../telehealth-service')
+const { TelehealthService, clearTelehealthSessionsForTests } =
+  await import('../telehealth-service')
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -91,6 +92,7 @@ describe('TelehealthService', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    clearTelehealthSessionsForTests()
     service = new TelehealthService(rlsContext)
   })
 
@@ -234,7 +236,103 @@ describe('TelehealthService', () => {
   })
 
   describe('joinSession', () => {
-    it('audits the join and returns null (no session store wired)', async () => {
+    it('adds the participant and returns the updated session', async () => {
+      mockEncounterRepo.create.mockResolvedValue({ id: validEncounterId })
+
+      const started = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      )
+      expect(started).not.toBeNull()
+
+      const result = await service.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+
+      expect(result).not.toBeNull()
+      expect(result!.id).toBe(started!.id)
+      expect(result!.status).toBe('active')
+      expect(result!.participants).toHaveLength(2)
+      expect(result!.participants[1]).toMatchObject({
+        participantId: validPatientId,
+        role: 'patient',
+      })
+
+      expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
+        'join_telehealth_session',
+        expect.objectContaining({
+          status: 'success',
+          sessionId: started!.id,
+          patientId: validPatientId,
+        }),
+      )
+    })
+
+    it('is idempotent on re-join: duplicate participant is not appended and success is audited', async () => {
+      mockEncounterRepo.create.mockResolvedValue({ id: validEncounterId })
+
+      const started = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      )
+      expect(started).not.toBeNull()
+
+      const firstJoin = await service.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+      expect(firstJoin).not.toBeNull()
+      const participantsAfterFirst = firstJoin!.participants.length
+
+      // Re-join with the same participantId + role (page refresh, duplicate
+      // click, retry) must NOT append a duplicate participant entry.
+      const reJoin = await service.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+
+      expect(reJoin).not.toBeNull()
+      expect(reJoin!.id).toBe(started!.id)
+      expect(reJoin!.participants.length).toBe(participantsAfterFirst)
+      expect(
+        reJoin!.participants.filter(
+          (p) => p.participantId === validPatientId && p.role === 'patient',
+        ),
+      ).toHaveLength(1)
+
+      // Both joins audit success; no failure audit for the re-join.
+      const successJoins = mockLogTelehealthAccess.mock.calls.filter(
+        ([action, payload]) =>
+          action === 'join_telehealth_session' &&
+          (payload as { status?: string }).status === 'success',
+      )
+      expect(successJoins).toHaveLength(2)
+    })
+
+    it('returns null and audits failure for an unknown session', async () => {
       const result = await service.joinSession(
         {
           sessionId: validSessionId,
@@ -249,10 +347,43 @@ describe('TelehealthService', () => {
       expect(mockLogTelehealthAccess).toHaveBeenCalledWith(
         'join_telehealth_session',
         expect.objectContaining({
+          status: 'failure',
+          errorMessage: 'Session not found',
           sessionId: validSessionId,
           patientId: validPatientId,
         }),
       )
+    })
+
+    it('resolves a session started on a different service instance', async () => {
+      mockEncounterRepo.create.mockResolvedValue({ id: validEncounterId })
+
+      const started = await service.startSession(
+        {
+          patientId: validPatientId,
+          practitionerId: validPractitionerId,
+          preferredProvider: 'webrtc',
+          appointmentId: validAppointmentId,
+        },
+        'user-456',
+      )
+      expect(started).not.toBeNull()
+
+      // Production instantiates the service per request: the patient join
+      // runs on a fresh instance and must still resolve the session.
+      const otherInstance = new TelehealthService(rlsContext)
+      const result = await otherInstance.joinSession(
+        {
+          sessionId: started!.id,
+          participantId: validPatientId,
+          role: 'patient',
+        },
+        'user-456',
+      )
+
+      expect(result).not.toBeNull()
+      expect(result!.id).toBe(started!.id)
+      expect(result!.status).toBe('active')
     })
 
     it('throws on invalid sessionId', async () => {
@@ -404,7 +535,7 @@ describe('TelehealthService', () => {
   })
 
   describe('getSession', () => {
-    it('returns null (session store not yet wired)', async () => {
+    it('returns null when the store is empty', async () => {
       const result = await service.getSession(validSessionId)
       expect(result).toBeNull()
     })
@@ -417,7 +548,7 @@ describe('TelehealthService', () => {
   })
 
   describe('getActiveSessionByAppointment', () => {
-    it('returns null (session store not yet wired)', async () => {
+    it('returns null when the store is empty', async () => {
       const result =
         await service.getActiveSessionByAppointment(validAppointmentId)
       expect(result).toBeNull()

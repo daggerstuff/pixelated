@@ -7,12 +7,12 @@
 
 import { describe, it, expect } from 'vitest'
 
-import { ClaimsService } from '../claims-service'
+import { claimSchema } from '../../types/claim'
 import {
   communicationPayloadSchema,
   communicationRequestPayloadSchema,
 } from '../../types/document-reference'
-import { claimSchema } from '../../types/claim'
+import { ClaimsService } from '../claims-service'
 
 describe('F1: claim-insurance-service-regression', () => {
   const service = new ClaimsService()
@@ -32,9 +32,7 @@ describe('F1: claim-insurance-service-regression', () => {
       ],
       // insurance intentionally omitted
     }
-    expect(() => service.createClaim(input as never)).toThrow(
-      /insurance/,
-    )
+    expect(() => service.createClaim(input as never)).toThrow(/insurance/)
   })
 
   it('createClaim throws when insurance array is empty', () => {
@@ -68,7 +66,9 @@ describe('F1: claim-insurance-service-regression', () => {
         const claim = service.createClaim(raw as never)
         return { status: 201, body: claim }
       } catch (err) {
-        return ehrValidationError(err instanceof Error ? err.message : 'Invalid')
+        return ehrValidationError(
+          err instanceof Error ? err.message : 'Invalid',
+        )
       }
     }
     const res = tryCreate({
@@ -99,9 +99,9 @@ describe('F1: claim-insurance-service-regression', () => {
       priority: { text: 'Normal' },
     }
     expect(claimSchema.safeParse(minimal).success).toBe(false)
-    expect(
-      claimSchema.safeParse({ ...minimal, insurance: [] }).success,
-    ).toBe(false)
+    expect(claimSchema.safeParse({ ...minimal, insurance: [] }).success).toBe(
+      false,
+    )
   })
 })
 

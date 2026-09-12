@@ -696,6 +696,10 @@ describe('tenantProviderStatusSchema', () => {
     tenantId: 'tenant-1',
     provider: 'zoom',
     status: 'connected',
+    displayName: 'Zoom',
+    description: 'Telehealth video sessions.',
+    category: 'video',
+    defaultScopes: ['meeting:read'],
   }
 
   it('parses minimal valid status', () => {
@@ -779,10 +783,14 @@ describe('marketplaceDashboardSchema', () => {
           tenantId: 't1',
           provider: 'calendly',
           status: 'connected',
+          displayName: 'Calendly',
+          description: 'Patient scheduling.',
+          category: 'scheduling',
+          defaultScopes: ['read_events'],
         },
       ],
       totalConnected: 1,
-      totalAvailable: 4,
+      totalAvailable: 7,
     })
     expect(result.providers).toHaveLength(1)
     expect(result.totalConnected).toBe(1)

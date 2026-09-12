@@ -35,6 +35,8 @@ jobs:
       # consent workflow's DATABASE_URL, which points at the shared
       # LiteLLM/Prisma database that cannot host these migrations.
       DATABASE_URL: ${{ secrets.APP_DATABASE_URL }}
+      # 30-second connection timeout allows cold-start wake up of serverless Neon Postgres
+      DB_CONNECTION_TIMEOUT: '30000'
     steps:
       - name: Checkout
         uses: actions/checkout@v7

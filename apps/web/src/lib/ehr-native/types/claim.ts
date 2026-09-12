@@ -358,10 +358,17 @@ export const explanationOfBenefitSchema = fhirDomainResourceSchema.extend({
   insurer: fhirReferenceSchema,
   provider: fhirReferenceSchema,
   outcome: z.enum(['queued', 'complete', 'error', 'partial']),
-  insurance: z.object({
-    focal: z.boolean(),
-    coverage: fhirReferenceSchema,
-  }),
+  insurance: z
+    .array(
+      z.object({
+        ...fhirBackboneElementSchema.shape,
+        sequence: z.number().int().positive().optional(),
+        focal: z.boolean(),
+        coverage: fhirReferenceSchema,
+        preAuthRef: z.array(z.string()).optional(),
+      }),
+    )
+    .min(1),
   total: z
     .array(
       z.object({

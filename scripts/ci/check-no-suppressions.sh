@@ -96,6 +96,8 @@ EXCLUDE_GLOBS=(
     '*/.git/*'
     # Git submodules have their own quality rules.
     '*/foresight-mcp/*'
+    # Generated OpenAPI SDKs have generator-emitted suppression headers.
+    '*packages/sdk-typescript/*'
 )
 
 # Source roots scanned when no CLI files are passed. Missing directories
@@ -126,7 +128,10 @@ fi
 
 if [ ${#CLI_FILES[@]} -gt 0 ]; then
     # De-dup while preserving order.
-    mapfile -t SCAN_FILES < <(printf '%s\n' "${CLI_FILES[@]}" | sort -u)
+    SCAN_FILES=()
+    while IFS= read -r file; do
+        [[ -n "${file}" ]] && SCAN_FILES+=("${file}")
+    done < <(printf '%s\n' "${CLI_FILES[@]}" | sort -u)
 else
     # Build `-name` OR-list (one entry per extension), wrapped in a
     # single grouping. Strip the trailing `-o` so find treats the group
@@ -136,7 +141,7 @@ else
         name_args+=(-name "*.${ext}" -o)
     done
     if [ ${#name_args[@]} -gt 0 ]; then
-        unset 'name_args[-1]'
+        unset "name_args[$((${#name_args[@]} - 1))]"
     fi
 
     find_args=()
@@ -147,7 +152,10 @@ else
         find_args+=( -not -path "$excl" )
     done
 
-    mapfile -t SCAN_FILES < <(
+    SCAN_FILES=()
+    while IFS= read -r file; do
+        [[ -n "${file}" ]] && SCAN_FILES+=("${file}")
+    done < <(
         for root in "${SOURCE_ROOTS[@]}"; do
             [ -d "$root" ] || continue
             find "$root" "${find_args[@]}" 2>/dev/null || true
