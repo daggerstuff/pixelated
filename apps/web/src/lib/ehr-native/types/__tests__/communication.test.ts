@@ -60,7 +60,7 @@ describe('documentReferenceSchema', () => {
         },
       ],
       context: {
-        encounter: { reference: 'Encounter/123' },
+        encounter: [{ reference: 'Encounter/123' }],
         period: { start: '2024-01-01', end: '2024-01-15' },
       },
     })
