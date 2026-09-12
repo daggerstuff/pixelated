@@ -136,7 +136,8 @@ export class TelehealthService {
    * joinSession call. All instances reference the same module-level map,
    * which keeps joins resolvable until a persistent store (F1.12) lands.
    */
-  private readonly sessions: Map<string, TelehealthSession> = sharedTelehealthSessions
+  private readonly sessions: Map<string, TelehealthSession> =
+    sharedTelehealthSessions
 
   constructor(rlsContext: RLSContext) {
     this.encounterRepo = new EncounterRepository(rlsContext)

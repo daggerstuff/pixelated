@@ -63,9 +63,8 @@ vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({
   },
 }))
 
-const { TelehealthService, clearTelehealthSessionsForTests } = await import(
-  '../telehealth-service'
-)
+const { TelehealthService, clearTelehealthSessionsForTests } =
+  await import('../telehealth-service')
 
 // ---------------------------------------------------------------------------
 // Fixtures
