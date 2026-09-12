@@ -88,20 +88,23 @@ export class ConsentService {
     stateCode?: string,
     treatmentCategory?: string,
   ): Promise<ConsentVerificationResult> {
-    // Phase 1: delegate baseline check to SQL function (returns boolean)
-    const sqlResult = await query<{ ehr_patient_has_consent: boolean }>(
-      `SELECT ehr_patient_has_consent($1, $2, $3)`,
+    // Phase 1: delegate baseline check to SQL function. It RETURNS boolean
+    // (scalar), so alias the result to has_consent for a stable row shape.
+    const sqlResult = await query<{ has_consent: boolean }>(
+      `SELECT ehr_patient_has_consent($1, $2, $3) AS has_consent`,
       [patientId, tenantId, minimumLevel],
     )
-    const hasConsent = Boolean(sqlResult.rows[0]?.['ehr_patient_has_consent'])
+    const hasConsent = sqlResult.rows[0]?.has_consent ?? false
 
-    // Get consent level from the active consent record
+    // Get consent level from the active consent record. When the SQL baseline
+    // check says consent is insufficient, the effective level is 'none'.
     const activeConsent = await this.repository.getActiveByPatient(
       patientId,
       tenantId,
     )
     const dbConsentLevel = (activeConsent?.consent_level ??
       'none') as ConsentLevel
+    const consentLevel: ConsentLevel = hasConsent ? dbConsentLevel : 'none'
     const expired = this.isConsentExpired(activeConsent)
 
     // Apply state rules via Phase 3 engine (falls back to Phase 1 in-memory)
@@ -117,7 +120,7 @@ export class ConsentService {
       }
 
       const engineResult = await stateConsentRulesEngine.evaluateConsent(
-        dbConsentLevel,
+        consentLevel,
         minimumLevel,
         context,
       )
@@ -129,7 +132,7 @@ export class ConsentService {
 
     return {
       verified,
-      consentLevel: dbConsentLevel,
+      consentLevel,
       expired,
       stateRules,
       reason: this.buildReason(verified, hasConsent, expired, stateRulesPass),
@@ -219,7 +222,7 @@ export class ConsentService {
     stateRulesPass: boolean,
   ): string {
     if (verified) return 'Consent verified'
-    if (!hasConsent) return 'No active consent record found'
+    if (!hasConsent) return 'Patient does not have sufficient consent'
     if (expired) return 'Consent has expired'
     if (!stateRulesPass) return 'State-specific consent requirements not met'
     return 'Consent verification failed'
