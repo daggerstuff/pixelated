@@ -1,6 +1,8 @@
 /**
  * @vitest-environment node
  */
+import { createHmac } from 'node:crypto'
+
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock redis before importing the module under test
@@ -308,8 +310,7 @@ describe('verifyWebhookSignature (twilio format)', () => {
       .map((k) => `${k}${params.get(k) ?? ''}`)
       .join('')
     const dataToSign = `${url}${postParams}`
-    const expectedHex = computeHmacSha256(dataToSign, key)
-    return Buffer.from(expectedHex, 'hex').toString('base64')
+    return createHmac('sha1', key).update(dataToSign, 'utf8').digest('base64')
   }
 
   it('returns true for a valid base64 Twilio signature', () => {
@@ -582,8 +583,9 @@ describe('processWebhook', () => {
       .map((k) => `${k}${params.get(k) ?? ''}`)
       .join('')
     const dataToSign = `${url}${postParams}`
-    const expectedHex = computeHmacSha256(dataToSign, twilioSecret)
-    const expectedBase64 = Buffer.from(expectedHex, 'hex').toString('base64')
+    const expectedBase64 = createHmac('sha1', twilioSecret)
+      .update(dataToSign, 'utf8')
+      .digest('base64')
 
     const twilioEvent: WebhookEvent = {
       provider: 'twilio',

@@ -89,14 +89,14 @@ export class StubZoomAdapter implements ZoomAdapter {
 
     const recording1: ZoomRecording = {
       id: 'stub-recording-001',
-      meeting_id: meeting1.id,
+      meeting_id: String(meeting1.id),
       topic: meeting1.topic,
       start_time: '2025-06-15T10:00:00.000Z',
       duration: 45,
       recording_files: [
         {
           id: 'stub-file-001',
-          meeting_id: meeting1.id,
+          meeting_id: String(meeting1.id),
           recording_start: '2025-06-15T10:00:00.000Z',
           recording_end: '2025-06-15T10:45:00.000Z',
           file_type: 'MP4',

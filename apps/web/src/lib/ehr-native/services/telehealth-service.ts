@@ -35,10 +35,12 @@ import type {
 
 function validateId(id: string, label: string): string {
   const sanitized = id.trim()
-  if (!/^[A-Za-z0-9\-.]{1,64}$/.test(sanitized)) {
-    throw new Error(
-      `Invalid ${label} format: expected FHIR id (1-64 chars, A-Z, a-z, 0-9, -, .)`,
+  if (
+    !/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+      sanitized,
     )
+  ) {
+    throw new Error(`Invalid ${label} format: expected UUID`)
   }
   return sanitized
 }
@@ -100,6 +102,21 @@ function isWebRTCAvailable(): boolean {
 }
 
 // ---------------------------------------------------------------------------
+// Shared session store
+// ---------------------------------------------------------------------------
+
+/**
+ * Module-level session map shared by every TelehealthService instance.
+ * Exported clear hook is test-only: unit tests reset it in beforeEach so
+ * sessions from one test never leak into another.
+ */
+const sharedTelehealthSessions = new Map<string, TelehealthSession>()
+
+export function clearTelehealthSessionsForTests(): void {
+  sharedTelehealthSessions.clear()
+}
+
+// ---------------------------------------------------------------------------
 // TelehealthService
 // ---------------------------------------------------------------------------
 
@@ -112,6 +129,15 @@ function isWebRTCAvailable(): boolean {
 export class TelehealthService {
   private readonly encounterRepo: EncounterRepository
   private readonly auditService: EHRAuditService
+  /**
+   * Session store shared across all service instances.
+   * The service is instantiated per request, so instance state would be
+   * lost between a practitioner's startSession call and a patient's
+   * joinSession call. All instances reference the same module-level map,
+   * which keeps joins resolvable until a persistent store (F1.12) lands.
+   */
+  private readonly sessions: Map<string, TelehealthSession> =
+    sharedTelehealthSessions
 
   constructor(rlsContext: RLSContext) {
     this.encounterRepo = new EncounterRepository(rlsContext)
@@ -230,7 +256,7 @@ export class TelehealthService {
         ? (input.webRtcConfig ?? DEFAULT_WEBRTC_CONFIG)
         : undefined
 
-    const sessionId = crypto.randomUUID()
+    const sessionId = randomUUID()
     const startedAt = new Date().toISOString()
 
     const session: TelehealthSession = {
@@ -256,6 +282,8 @@ export class TelehealthService {
       ],
     }
 
+    this.sessions.set(sessionId, session)
+
     // Audit session start
     await this.auditService.logTelehealthAccess(
       EHRAuditAction.START_TELEHEALTH_SESSION,
@@ -276,16 +304,10 @@ export class TelehealthService {
   /**
    * Joins an existing telehealth session as a participant.
    *
-   * Adds the participant to the session's participant list and audits the join.
+   * Looks the session up in the instance session store, appends the
+   * participant, transitions status to 'active', and audits the join.
    *
    * @returns The updated TelehealthSession, or null if not found.
-   */
-  /**
-   * Join a telehealth session — currently a stub.
-   * Session store not yet wired; always returns null and audits with failure.
-   * Deferred: wire the session store (F1.12) to persist participant joins
-   * across instances — currently the in-memory map is the only source of
-   * truth and is lost on restart.
    */
   async joinSession(
     input: JoinSessionInput,
@@ -298,20 +320,65 @@ export class TelehealthService {
     const auditPatientId = isPatient ? participantId : undefined
     const auditPractitionerId = isPatient ? undefined : participantId
 
+    const existing = this.sessions.get(sessionId)
+    if (!existing) {
+      await this.auditService.logTelehealthAccess(
+        EHRAuditAction.JOIN_TELEHEALTH_SESSION,
+        {
+          userId,
+          status: 'failure',
+          errorMessage: 'Session not found',
+          sessionId,
+          patientId: auditPatientId,
+          practitionerId: auditPractitionerId,
+        },
+      )
+      return null
+    }
+
+    const alreadyJoined = existing.participants.some(
+      (p) => p.participantId === participantId && p.role === input.role,
+    )
+    if (alreadyJoined) {
+      await this.auditService.logTelehealthAccess(
+        EHRAuditAction.JOIN_TELEHEALTH_SESSION,
+        {
+          userId,
+          status: 'success',
+          sessionId,
+          patientId: auditPatientId,
+          practitionerId: auditPractitionerId,
+        },
+      )
+      return existing
+    }
+
+    const updated: TelehealthSession = {
+      ...existing,
+      status: 'active',
+      participants: [
+        ...existing.participants,
+        {
+          participantId,
+          role: input.role,
+          joinedAt: new Date().toISOString(),
+        },
+      ],
+    }
+    this.sessions.set(sessionId, updated)
+
     await this.auditService.logTelehealthAccess(
       EHRAuditAction.JOIN_TELEHEALTH_SESSION,
       {
         userId,
-        status: 'failure',
-        errorMessage: 'Session store not available',
+        status: 'success',
         sessionId,
         patientId: auditPatientId,
         practitionerId: auditPractitionerId,
       },
     )
 
-    // No session store wired — cannot return a valid session.
-    return null
+    return updated
   }
 
   /**
@@ -488,8 +555,7 @@ export class TelehealthService {
    */
   async getSession(sessionId: string): Promise<TelehealthSession | null> {
     validateId(sessionId, 'sessionId')
-    // Session store not yet implemented — returns null
-    return null
+    return this.sessions.get(sessionId) ?? null
   }
 
   /**
@@ -504,7 +570,14 @@ export class TelehealthService {
     appointmentId: string,
   ): Promise<TelehealthSession | null> {
     validateId(appointmentId, 'appointmentId')
-    // Session store not yet implemented — returns null
+    for (const session of this.sessions.values()) {
+      if (
+        session.appointmentId === appointmentId &&
+        session.status !== 'ended'
+      ) {
+        return session
+      }
+    }
     return null
   }
 }
