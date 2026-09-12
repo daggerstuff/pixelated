@@ -7,12 +7,12 @@
 
 import { describe, it, expect } from 'vitest'
 
-import { ClaimsService } from '../claims-service'
+import { claimSchema } from '../../types/claim'
 import {
   communicationPayloadSchema,
   communicationRequestPayloadSchema,
 } from '../../types/document-reference'
-import { claimSchema } from '../../types/claim'
+import { ClaimsService } from '../claims-service'
 
 describe('F1: claim-insurance-service-regression', () => {
   const service = new ClaimsService()
