@@ -512,6 +512,17 @@ describe('observationValueSchema union', () => {
       }).success,
     ).toBe(true)
   })
+  it('validates valueSampledData variant', () => {
+    expect(
+      observationValueSchema.safeParse({
+        valueSampledData: {
+          origin: { value: 0 },
+          period: 1000,
+          dimensions: 1,
+        },
+      }).success,
+    ).toBe(true)
+  })
   it('validates valueTime variant', () => {
     expect(
       observationValueSchema.safeParse({ valueTime: '10:30:00' }).success,

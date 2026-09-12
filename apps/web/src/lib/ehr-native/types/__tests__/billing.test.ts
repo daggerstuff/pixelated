@@ -16,6 +16,7 @@ describe('claimSchema', () => {
     resourceType: 'Claim',
     status: 'active',
     use: 'claim',
+    type: { text: 'Professional' },
     patient: { reference: 'Patient/123' },
     created: '2024-01-15',
     provider: { reference: 'Practitioner/456' },
@@ -75,9 +76,13 @@ describe('claimSchema', () => {
     const { patient, ...rest } = validClaim
     expect(claimSchema.safeParse(rest).success).toBe(false)
   })
-  it('rejects missing created', () => {
-    const { created, ...rest } = validClaim
+  it('rejects missing type (FHIR R4 1..1)', () => {
+    const { type, ...rest } = validClaim
     expect(claimSchema.safeParse(rest).success).toBe(false)
+  })
+  it('validates a claim without created (FHIR R4 0..1)', () => {
+    const { created, ...rest } = validClaim
+    expect(claimSchema.safeParse(rest).success).toBe(true)
   })
   it('rejects missing provider', () => {
     const { provider, ...rest } = validClaim
@@ -308,10 +313,12 @@ describe('explanationOfBenefitSchema', () => {
     insurer: { reference: 'Organization/ins' },
     provider: { reference: 'Practitioner/456' },
     outcome: 'complete',
-    insurance: {
-      focal: true,
-      coverage: { reference: 'Coverage/789' },
-    },
+    insurance: [
+      {
+        focal: true,
+        coverage: { reference: 'Coverage/789' },
+      },
+    ],
   }
 
   it('validates a minimal EOB with all required fields', () => {
