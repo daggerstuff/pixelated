@@ -59,6 +59,36 @@ async function runStatus(): Promise<number> {
   return 0
 }
 
+async function executeWithRetry<T>(
+  action: () => Promise<T>,
+  maxRetries = 3,
+  delayMs = 2000,
+): Promise<T> {
+  let attempt = 0
+  while (true) {
+    attempt++
+    try {
+      return await action()
+    } catch (err: unknown) {
+      const isConnectionError =
+        err instanceof Error &&
+        (err.message.includes('timeout') ||
+          err.message.includes('terminated') ||
+          err.message.includes('ECONNREFUSED') ||
+          err.message.includes('ETIMEDOUT') ||
+          err.message.includes('Connection terminated'))
+      if (attempt < maxRetries && isConnectionError) {
+        console.warn(
+          `[db-migrate] Database connection attempt ${attempt} failed: ${err.message}. Retrying in ${delayMs / 1000}s...`,
+        )
+        await new Promise((resolve) => setTimeout(resolve, delayMs))
+        continue
+      }
+      throw err
+    }
+  }
+}
+
 async function main(): Promise<void> {
   const command = process.argv[2] ?? 'migrate'
   await ensureDatabase()
@@ -67,14 +97,14 @@ async function main(): Promise<void> {
     switch (command) {
       case 'migrate':
       case 'up':
-        exitCode = await runMigrate()
+        exitCode = await executeWithRetry(() => runMigrate())
         break
       case 'rollback':
       case 'down':
-        exitCode = await runRollback()
+        exitCode = await executeWithRetry(() => runRollback())
         break
       case 'status':
-        exitCode = await runStatus()
+        exitCode = await executeWithRetry(() => runStatus())
         break
       default:
         console.error(`Unknown command: ${command}`)

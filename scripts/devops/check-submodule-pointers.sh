@@ -27,7 +27,10 @@ git rev-parse --verify --quiet "${COMMITISH}^{commit}" >/dev/null 2>&1 || {
   exit 2
 }
 
-mapfile -t NAMES < <(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk -F'.' '{print $2}')
+NAMES=()
+while IFS= read -r name; do
+  [[ -n "${name}" ]] && NAMES+=("${name}")
+done < <(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' | awk -F'.' '{print $2}')
 
 if [[ ${#NAMES[@]} -eq 0 ]]; then
   echo "OK: No submodules in .gitmodules - nothing to validate."
@@ -57,9 +60,16 @@ for name in "${NAMES[@]}"; do
     probe_url="https://x-access-token:${token}@github.com/${probe_url#https://github.com/}"
   fi
 
+  # Fast path: check if pinned commit is directly advertised as a ref upstream
+  remote_refs="$(GIT_TERMINAL_PROMPT=0 git ls-remote "${probe_url}" 2>/dev/null || true)"
+  if grep -q "^${pinned}" <<< "${remote_refs}"; then
+    echo "PASS ${name}: ${pinned:0:12} resolves upstream (${url})"
+    continue
+  fi
+
   scratch="$(mktemp -d)"
   err=""
-  if git init -q "${scratch}" && err="$(cd "${scratch}" && git fetch --no-tags --quiet "${probe_url}" "${pinned}" 2>&1)"; then
+  if git init -q "${scratch}" && err="$(cd "${scratch}" && GIT_TERMINAL_PROMPT=0 git fetch --no-tags --depth 1 --quiet "${probe_url}" "${pinned}" 2>&1)"; then
     echo "PASS ${name}: ${pinned:0:12} resolves upstream (${url})"
   else
     echo "FAIL ${name}: pinned commit ${pinned:0:12} is NOT fetchable from ${url}"

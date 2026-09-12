@@ -9,6 +9,7 @@ export function parseDatabaseUrl(url: string): {
   user: string
   password: string
   ssl: boolean | object
+  connectionTimeoutMillis?: number
 } {
   const parsed = new URL(url)
   const sslMode = parsed.searchParams.get('sslmode')
@@ -28,6 +29,14 @@ export function parseDatabaseUrl(url: string): {
   const ssl: boolean | object = enableSsl
     ? { rejectUnauthorized: false }
     : false
+
+  const connectTimeoutSec = parsed.searchParams.get('connect_timeout')
+  const parsedTimeout = connectTimeoutSec ? parseInt(connectTimeoutSec, 10) : NaN
+  const connectionTimeoutMillis =
+    Number.isFinite(parsedTimeout) && parsedTimeout > 0
+      ? parsedTimeout * 1000
+      : undefined
+
   return {
     host: parsed.hostname,
     port: parsed.port ? parseInt(parsed.port, 10) : 5432,
@@ -35,5 +44,6 @@ export function parseDatabaseUrl(url: string): {
     user: decodeURIComponent(parsed.username),
     password: decodeURIComponent(parsed.password),
     ssl,
+    ...(connectionTimeoutMillis !== undefined ? { connectionTimeoutMillis } : {}),
   }
 }

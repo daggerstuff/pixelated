@@ -202,7 +202,9 @@ describe('ConsentService', () => {
       await service.verifyConsent('patient-1', 'tenant-1', 'limited')
 
       const [sql, params] = mockQuery.mock.calls[0]
-      expect(sql).toBe('SELECT * FROM ehr_patient_has_consent($1, $2, $3)')
+      expect(sql).toBe(
+        'SELECT ehr_patient_has_consent($1, $2, $3) AS has_consent',
+      )
       expect(params).toEqual(['patient-1', 'tenant-1', 'limited'])
     })
   })
