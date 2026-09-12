@@ -38,6 +38,13 @@ vi.mock('@/lib/redis', () => ({
     setNx: mockRedisSetNx,
     del: vi.fn().mockResolvedValue(1),
   },
+  redisClient: {
+    get: mockRedisGet,
+    set: mockRedisSet,
+    setex: mockRedisSetex,
+    setNx: mockRedisSetNx,
+    del: vi.fn().mockResolvedValue(1),
+  },
 }))
 
 vi.mock('@/lib/ehr-native/audit/ehr-audit-service', () => ({

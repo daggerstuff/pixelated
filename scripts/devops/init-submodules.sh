@@ -73,10 +73,10 @@ run() {
 
 git_with_auth() {
   if [[ "${DRY_RUN}" == "true" ]]; then
-    run git "${AUTH_GIT_ARGS[@]}" "$@"
+    run git "${AUTH_GIT_ARGS[@]+"${AUTH_GIT_ARGS[@]}"}" "$@"
     return 0
   fi
-  git "${AUTH_GIT_ARGS[@]}" "$@"
+  git "${AUTH_GIT_ARGS[@]+"${AUTH_GIT_ARGS[@]}"}" "$@"
 }
 
 # ---------------------------------------------------------------------------

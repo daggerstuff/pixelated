@@ -107,8 +107,8 @@ export interface CreateClaimInput {
   diagnoses?: CreateClaimDiagnosisInput[]
   /** Procedures. */
   procedures?: CreateClaimProcedureInput[]
-  /** Insurance coverages. */
-  insurance?: CreateClaimInsuranceInput[]
+  /** Insurance coverages (required — FHIR R4 Claim.insurance is 1..*). */
+  insurance: CreateClaimInsuranceInput[]
 }
 
 /** Result of claim validation. */
@@ -182,14 +182,15 @@ interface ClaimObj {
   use: string
   patient: FHIRReference
   provider: FHIRReference
+  created: string
+  priority: FHIRCodeableConcept
   item: ClaimItemObj[]
   insurer?: FHIRReference
   billablePeriod?: FHIRPeriod
   facility?: FHIRReference
-  priority?: FHIRCodeableConcept
   diagnosis?: ClaimDiagnosisObj[]
   procedure?: ClaimProcedureObj[]
-  insurance?: ClaimInsuranceObj[]
+  insurance: ClaimInsuranceObj[]
   total?: { value: number; currency: string }
 }
 
@@ -297,6 +298,10 @@ export class ClaimsService {
       throw new Error('Claim must have at least one line item')
     }
 
+    if (!input.insurance || input.insurance.length === 0) {
+      throw new Error('Claim must have at least one insurance entry')
+    }
+
     const items = input.items.map((item, index) => buildClaimItem(item, index))
 
     const claim: ClaimObj = {
@@ -306,6 +311,8 @@ export class ClaimsService {
       use: input.use,
       patient: { reference: input.patient } as FHIRReference,
       provider: { reference: input.provider } as FHIRReference,
+      created: new Date().toISOString(),
+      priority: input.priority ?? { text: 'Normal' },
       item: items,
     }
 
@@ -317,9 +324,6 @@ export class ClaimsService {
     }
     if (input.facility) {
       claim.facility = { reference: input.facility } as FHIRReference
-    }
-    if (input.priority) {
-      claim.priority = input.priority
     }
 
     if (input.diagnoses && input.diagnoses.length > 0) {
@@ -334,17 +338,15 @@ export class ClaimsService {
       )
     }
 
-    if (input.insurance && input.insurance.length > 0) {
-      claim.insurance = input.insurance.map((ins, index) => ({
-        sequence: index + 1,
-        focal: ins.focal,
-        coverage: { reference: ins.coverage } as FHIRReference,
-        ...(ins.preAuthRef ? { preAuthRef: ins.preAuthRef } : {}),
-        ...(ins.businessArrangement
-          ? { businessArrangement: ins.businessArrangement }
-          : {}),
-      }))
-    }
+    claim.insurance = input.insurance.map((ins, index) => ({
+      sequence: index + 1,
+      focal: ins.focal,
+      coverage: { reference: ins.coverage } as FHIRReference,
+      ...(ins.preAuthRef ? { preAuthRef: ins.preAuthRef } : {}),
+      ...(ins.businessArrangement
+        ? { businessArrangement: ins.businessArrangement }
+        : {}),
+    }))
 
     const total = this.calculateTotal(claim as unknown as Claim)
     if (total.value > 0) {

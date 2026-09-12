@@ -196,3 +196,38 @@ export const medicationRequestSchema = fhirDomainResourceSchema.extend({
 })
 
 export type MedicationRequest = z.infer<typeof medicationRequestSchema>
+
+/**
+ * FHIR R4 Medication resource schema.
+ * Definition of a Medication.
+ * @see http://hl7.org/fhir/R4/medication.html
+ */
+export const medicationSchema = fhirDomainResourceSchema.extend({
+  resourceType: z.literal('Medication'),
+  identifier: z.array(fhirIdentifierSchema).optional(),
+  code: fhirCodeableConceptSchema.optional(),
+  status: z.enum(['active', 'inactive', 'entered-in-error']).optional(),
+  manufacturer: fhirReferenceSchema.optional(),
+  form: fhirCodeableConceptSchema.optional(),
+  amount: fhirQuantitySchema.optional(),
+  ingredient: z
+    .array(
+      z.object({
+        ...fhirBackboneElementSchema.shape,
+        itemCodeableConcept: fhirCodeableConceptSchema.optional(),
+        itemReference: fhirReferenceSchema.optional(),
+        isActive: z.boolean().optional(),
+        strength: fhirQuantitySchema.optional(),
+      }),
+    )
+    .optional(),
+  batch: z
+    .object({
+      ...fhirBackboneElementSchema.shape,
+      lotNumber: z.string().optional(),
+      expirationDate: z.string().optional(),
+    })
+    .optional(),
+})
+
+export type Medication = z.infer<typeof medicationSchema>
