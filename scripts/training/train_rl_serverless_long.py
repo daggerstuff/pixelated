@@ -45,7 +45,7 @@ if not WANDB_API_KEY:
 PROJECT = "wayfarer-ab-test"
 MODEL_NAME = "wayfarer-2-12b-serverless-rl-long"
 BASE_MODEL = "OpenPipe/Qwen3-14B-Instruct"
-DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
+DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
 GROUPS_PER_STEP = 5
 ROLLOUTS_PER_GROUP = 8

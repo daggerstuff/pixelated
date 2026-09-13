@@ -28,7 +28,7 @@ class NvidiaAPIService:
 
     def _load_configuration(self) -> None:
         """Load configuration from Claude Code router config"""
-        config_path = "/home/vivi/.claude-code-router/config.json"
+        config_path = str(Path.home() / ".claude-code-router/config.json")
 
         try:
             if os.path.exists(config_path):

@@ -17,7 +17,7 @@ integrated into our bias detection service. This implementation provides:
 ## Configuration
 
 The service automatically loads configuration from
-`/home/vivi/.claude-code-router/config.json`. The relevant section looks like:
+`~/.claude-code-router/config.json`. The relevant section looks like:
 
 ```json
 {
@@ -109,19 +109,19 @@ All errors are logged using structlog for debugging purposes.
 Run tests with:
 
 ```bash
-cd /home/vivi/pixelated/src/lib/ai/bias-detection/python-service
+cd ~/pixelated/src/lib/ai/bias-detection/python-service
 python -m pytest tests/test_nvidia_api_service.py -v
 ```
 
 ## Examples
 
 See the example script at:
-`/home/vivi/pixelated/src/lib/ai/bias-detection/python-service/examples/nvidia_api_example.py`
+`~/pixelated/src/lib/ai/bias-detection/python-service/examples/nvidia_api_example.py`
 
 Run it with:
 
 ```bash
-cd /home/vivi/pixelated/src/lib/ai/bias-detection/python-service
+cd ~/pixelated/src/lib/ai/bias-detection/python-service
 python examples/nvidia_api_example.py
 ```
 

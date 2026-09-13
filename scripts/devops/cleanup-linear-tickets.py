@@ -95,7 +95,7 @@ Implement the real-time clinical safety and data ingestion gating layer to scree
   - Route standard messages to standard memory collections and flag high-arousal messages for immediate professional escalation.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-20: AI Ingestion and Safety Protocols](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-20: AI Ingestion and Safety Protocols](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Fast API Gate Controller: `ai-services/ingestion/gate.py`
   - React Chat Screen: `src/components/chat/TherapyGate.tsx`
@@ -120,7 +120,7 @@ Build the background memory consolidation and summarization engine ("Dreaming") 
   - Ensure correct primary key references are maintained across compacted collections.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-21: Cognitive Reflection and Offline Processing](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-21: Cognitive Reflection and Offline Processing](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Dream Scheduler Service: `src/services/dream_scheduler.ts`
   - ML Summarization Task: `ai-services/dream/consolidation.py`

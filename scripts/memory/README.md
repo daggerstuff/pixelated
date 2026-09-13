@@ -16,7 +16,7 @@ uv sync
 uv run foresight-server
 
 # Or use the workspace wrapper script
-/home/vivi/pixelated/scripts/memory/foresight-server.sh
+~/pixelated/scripts/memory/foresight-server.sh
 ```
 
 ## Add to Claude Code
@@ -27,7 +27,7 @@ After installing foresight package:
 {
   "mcpServers": {
     "foresight": {
-      "command": "/home/vivi/pixelated/scripts/memory/foresight-server.sh",
+      "command": "~/pixelated/scripts/memory/foresight-server.sh",
       "args": [],
       "cwd": "/path/to/foresight",
       "env": {

@@ -3,7 +3,7 @@
 ## Issue
 
 Codacy flagged a Critical security issue in
-`/home/vivi/pixelated/docker/docker-compose.playwright.yml`:
+`~/pixelated/docker/docker-compose.playwright.yml`:
 
 - Service 'playwright' was running in privileged mode (`privileged: true`)
 - This poses a serious security risk as it grants the container full access to
@@ -38,9 +38,9 @@ The seccomp (secure computing mode) profile:
 
 ## Files Modified
 
-1. `/home/vivi/pixelated/docker/docker-compose.playwright.yml` - Removed
+1. `~/pixelated/docker/docker-compose.playwright.yml` - Removed
    privileged mode, added seccomp profile
-2. `/home/vivi/pixelated/docker/seccomp/chromium.json` - Added Chromium-specific
+2. `~/pixelated/docker/seccomp/chromium.json` - Added Chromium-specific
    seccomp profile
 
 ## Testing

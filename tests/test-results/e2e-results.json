@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/home/vivi/astro/tests/e2e-config.ts",
-    "rootDir": "/home/vivi/astro/tests/tests/e2e",
+    "configFile": "~/astro/tests/e2e-config.ts",
+    "rootDir": "~/astro/tests/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -34,25 +34,25 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "/home/vivi/astro/test-results",
+        "outputDir": "~/astro/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/home/vivi/astro/tests/tests/e2e",
+        "testDir": "~/astro/tests/tests/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 60000
       },
       {
-        "outputDir": "/home/vivi/astro/test-results",
+        "outputDir": "~/astro/test-results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {},
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "/home/vivi/astro/tests/tests/e2e",
+        "testDir": "~/astro/tests/tests/e2e",
         "testIgnore": [],
         "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
         "timeout": 60000

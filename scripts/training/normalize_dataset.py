@@ -1,8 +1,8 @@
 import json
 import random
 
-INPUT_FILE = "/home/vivi/dataset/ULTIMATE_FINAL_DATASET.jsonl"
-OUTPUT_FILE = "/home/vivi/dataset/RL_training_dataset.jsonl"
+INPUT_FILE = str(Path.home() / "dataset" / "ULTIMATE_FINAL_DATASET.jsonl")
+OUTPUT_FILE = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 MAX_CONVERSATIONS = 10000
 
 

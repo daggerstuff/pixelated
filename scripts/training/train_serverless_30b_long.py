@@ -39,7 +39,7 @@ MODEL_NAME = os.environ.get(
     f"qwen3-30b-serverless-rl-long-{datetime.datetime.now(tz=datetime.timezone.utc).strftime('%Y%m%d-%H%M')}",
 )
 BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
-DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
+DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
 GROUPS_PER_STEP = 5
 ROLLOUTS_PER_GROUP = 8

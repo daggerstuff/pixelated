@@ -35,7 +35,7 @@ if not WANDB_API_KEY:
 PROJECT = "wayfarer-ab-test"
 MODEL_NAME = "qwen3-30b-serverless-rl-v2"
 BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
-DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
+DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
 # RL Hyperparameters
 GROUPS_PER_STEP = 5

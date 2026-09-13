@@ -33,10 +33,10 @@ Establish the foundational microservice baseline with enterprise-grade distribut
   - Integrate connection diagnostics showing live status for MongoDB, Redis, and upstream APIs.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-5: Bulletproof Scaling System Architecture](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-5: Bulletproof Scaling System Architecture](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
-  - Lock Manager: [lock.ts](file:///home/vivi/pixelated/src/lib/redis/lock.ts)
-  - Memory Database Adapter: [memory_adapter.py](file:///home/vivi/pixelated/ai-services/memory_adapter.py)
+  - Lock Manager: [lock.ts](src/lib/redis/lock.ts)
+  - Memory Database Adapter: [memory_adapter.py](ai-services/memory_adapter.py)
   - Config Setup: [.env](file:///data/vivi/pixelated/.env)
 
 ### Verification & Testing Checklist
@@ -65,7 +65,7 @@ Design and implement a highly scalable, serverless ML training infrastructure ca
   - Build robust, multi-worker PyTorch `DataLoader` instances with pinned memory and asynchronous pre-fetching.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-5: Bulletproof Scaling System Architecture](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-5: Bulletproof Scaling System Architecture](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Model Runner: `ai-services/training/modal_runner.py`
   - Telemetry Callbacks: `ai-services/training/callbacks.py`
@@ -95,12 +95,12 @@ Unify the clinical data definitions across all application modules, establishing
   - Develop migration scripts to upgrade pre-existing database records to the unified structural format.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-19: Clinical Memory Subsystem Refactor](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-19: Clinical Memory Subsystem Refactor](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
-  - Schema Defaults: [defaults.ts](file:///home/vivi/pixelated/packages/memory-schema/src/defaults.ts)
-  - Memory Manager Client: [memory.ts](file:///home/vivi/pixelated/src/lib/memory.ts)
-  - Package Configuration: [package.json](file:///home/vivi/pixelated/packages/memory-schema/package.json)
-  - Python Adapter: [memory_adapter.py](file:///home/vivi/pixelated/ai-services/memory_adapter.py)
+  - Schema Defaults: [defaults.ts](packages/memory-schema/src/defaults.ts)
+  - Memory Manager Client: [memory.ts](src/lib/memory.ts)
+  - Package Configuration: [package.json](packages/memory-schema/package.json)
+  - Python Adapter: [memory_adapter.py](ai-services/memory_adapter.py)
 
 ### Verification & Testing Checklist
 - [ ] **TypeScript Typecheck**: Run `pnpm typecheck` and confirm zero compilation warnings or type mismatches.
@@ -126,7 +126,7 @@ Implement the real-time clinical safety and data ingestion gating layer to scree
   - Route standard messages to standard memory collections and flag high-arousal messages for immediate professional escalation.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-20: AI Ingestion and Safety Protocols](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-20: AI Ingestion and Safety Protocols](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Fast API Gate Controller: `ai-services/ingestion/gate.py`
   - React Chat Screen: `src/components/chat/TherapyGate.tsx`
@@ -154,7 +154,7 @@ Build the background memory consolidation and summarization engine ("Dreaming") 
   - Ensure correct primary key references are maintained across compacted collections.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-21: Cognitive Reflection and Offline Processing](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-21: Cognitive Reflection and Offline Processing](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Dream Scheduler Service: `src/services/dream_scheduler.ts`
   - ML Summarization Task: `ai-services/dream/consolidation.py`
@@ -184,7 +184,7 @@ Develop a comprehensive suite of unit tests for the AI safety gating layer, ensu
   - Enforce a minimum of **95% statement and branch coverage** on safety rules files.
 
 ### Atlassian & Code Linkages
-- **Parent Task**: [ADHD-317: Sprint 2: Gating & Ingestion](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Parent Task**: [ADHD-317: Sprint 2: Gating & Ingestion](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Test Suite: `packages/memory-schema/tests/gate-rules.test.ts`
   - Ingestion Gate Rules: `packages/memory-schema/src/gate-rules.ts`
@@ -211,7 +211,7 @@ Create the automated rules engine that translates real-time performance gap data
   - Integrate with the Atlassian REST SDK to automatically provision backlog tickets under the Jira project.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-9: Steering & Adaptive Development Loop](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-9: Steering & Adaptive Development Loop](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Performance Monitor Listener: `src/services/performance_analyzer.ts`
   - Backlog Converter Rules: `src/services/backlog_converter.ts`
@@ -241,7 +241,7 @@ Design and implement the algorithmic reprioritization engine that scores and re-
   - Map prioritization outputs back to standard Atlassian/Linear priority levels (Highest, High, Medium, Low, Lowest).
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-9: Steering & Adaptive Development Loop](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-9: Steering & Adaptive Development Loop](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Prioritization Backend Service: `ai-services/prioritization/engine.py`
   - Math Model Utilities: `ai-services/prioritization/scoring.py`
@@ -270,7 +270,7 @@ Hook the automated backlog steering and prioritization pipeline directly into th
   - Design a premium frontend dashboard for developers to visualize steering decisions and review conversion rules.
 
 ### Atlassian & Code Linkages
-- **Epic Link**: [ADHD-9: Steering & Adaptive Development Loop](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)
+- **Epic Link**: [ADHD-9: Steering & Adaptive Development Loop](exports/pix-to-adhd-key-map.json)
 - **Primary Source Code**:
   - Sync Coordinator Hook: `scripts/task_sync/tri_sync.py`
   - Slack Notification Helper: `src/lib/notifications/slack.ts`

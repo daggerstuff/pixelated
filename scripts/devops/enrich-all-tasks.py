@@ -178,7 +178,7 @@ def build_training_description(task_num: str, task: dict[str, str], pix_key: str
 - **Source Plan File**: [TRAINING-PIPELINE-TASKS-2026-04-29.md](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)"""
     if files_mentioned:
         for file in files_mentioned:
-            linkages_section += f"\n- **Source File**: [{os.path.basename(file)}](file:///home/vivi/pixelated/{file})"
+            linkages_section += f"\n- **Source File**: [{os.path.basename(file)}]({file})"
 
     return f"""### Core Objective
 {objective_text}
@@ -208,7 +208,7 @@ Document where each pipeline check lives, their owners, the break/fix resolution
   - Detail procedures for notifying the on-call engineer and logging incident reports.
 
 ### Atlassian & Code Linkages
-- **Primary Runbook**: [RUNBOOK.md](file:///home/vivi/pixelated/docs/RUNBOOK.md)
+- **Primary Runbook**: [RUNBOOK.md](docs/RUNBOOK.md)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -226,7 +226,7 @@ Author and publish a consensus RFC standardizing the federated CI operating rule
   - Lock one owner per pipeline capability.
 
 ### Atlassian & Code Linkages
-- **RFC Document**: [CI-OPERATING-MODEL.md](file:///home/vivi/pixelated/docs/rfc/CI-OPERATING-MODEL.md)
+- **RFC Document**: [CI-OPERATING-MODEL.md](docs/rfc/CI-OPERATING-MODEL.md)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -245,8 +245,8 @@ Build a lightweight status collector to aggregate pipeline check results from mu
   - Output a consolidated JSON payload outlining current pass/fail status.
 
 ### Atlassian & Code Linkages
-- **Aggregator Script**: [aggregate-readiness.py](file:///home/vivi/pixelated/scripts/devops/aggregate-readiness.py)
-- **Schema Reference**: [release-readiness-schema.json](file:///home/vivi/pixelated/config/release-readiness-schema.json)
+- **Aggregator Script**: [aggregate-readiness.py](scripts/devops/aggregate-readiness.py)
+- **Schema Reference**: [release-readiness-schema.json](config/release-readiness-schema.json)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -308,7 +308,7 @@ Define the structured JSON schema mapping release-readiness status, checks, and 
 - Ensure TS/Python parser compatibility.
 
 ### Atlassian & Code Linkages
-- **JSON Schema**: [release-readiness-schema.json](file:///home/vivi/pixelated/config/release-readiness-schema.json)
+- **JSON Schema**: [release-readiness-schema.json](config/release-readiness-schema.json)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -324,7 +324,7 @@ Catalog all active workflow pipelines across GitHub and Bitbucket.
 - Document inventory in documentation repo.
 
 ### Atlassian & Code Linkages
-- **Inventory Doc**: [PIPELINE-INVENTORY.md](file:///home/vivi/pixelated/docs/PIPELINE-INVENTORY.md)
+- **Inventory Doc**: [PIPELINE-INVENTORY.md](docs/PIPELINE-INVENTORY.md)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -353,7 +353,7 @@ Keep AI, data, and governance validation checks in Bitbucket, aligning triggers 
 - Configure Bitbucket triggers to run security and quality validations strictly on updates to the `ai/` folder, database models, or scheduling rules.
 
 ### Atlassian & Code Linkages
-- **Bitbucket Config**: [bitbucket-pipelines.yml](file:///home/vivi/pixelated/bitbucket-pipelines.yml)
+- **Bitbucket Config**: [bitbucket-pipelines.yml](bitbucket-pipelines.yml)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -369,7 +369,7 @@ Restructure GitHub Actions to handle CodeQL, SARIF, and security scanning, remov
 - Ensure that GitHub handles the central reporting dashboard for CodeQL alerts.
 
 ### Atlassian & Code Linkages
-- **GitHub Workflow**: [.github/workflows/security.yml](file:///home/vivi/pixelated/.github/workflows/security.yml)
+- **GitHub Workflow**: [.github/workflows/security.yml](.github/workflows/security.yml)
 - **Source Plan**: 2026-03-17-ci-federation-asana-tasks.csv
 
 ### Verification & Testing Checklist
@@ -403,8 +403,8 @@ Redesign and implement a secure, HIPAA-compliant home directory backup system us
   - Configure instant Slack webhooks on backup failure.
 
 ### Atlassian & Code Linkages
-- **Backup Script**: [backup-home-vivi.sh](file:///home/vivi/pixelated/scripts/backup/backup-home-vivi.sh)
-- **Security Plan**: [backup-security-plan.md](file:///home/vivi/pixelated/artifacts/training-task-discovery/archived_task_files_flat/.agent__internal__train__.notes__.notes__backup-security-plan.md)
+- **Backup Script**: [backup-home-vivi.sh](scripts/backup/backup-home-vivi.sh)
+- **Security Plan**: [backup-security-plan.md](artifacts/training-task-discovery/archived_task_files_flat/.agent__internal__train__.notes__.notes__backup-security-plan.md)
 - **Source Plan**: [2026-03-21-home-backup-redesign.md](http://2026-03-21-home-backup-redesign.md)
 
 ### Verification & Testing Checklist
@@ -467,7 +467,7 @@ Establish a single, typed memory schema structure shared across Astro UI, librar
   - Validate bidirectional serialization/deserialization.
 
 ### Atlassian & Code Linkages
-- **Schema Defaults**: [defaults.ts](file:///home/vivi/pixelated/packages/memory-schema/src/defaults.ts)
+- **Schema Defaults**: [defaults.ts](packages/memory-schema/src/defaults.ts)
 
 ### Verification & Testing Checklist
 - [ ] Consolidate schemas into shared package `@pixelated/memory-schema`.
@@ -483,7 +483,7 @@ Update python adapters to integrate the new unified memory schema.
   - Assert query serialization matches TS models.
 
 ### Atlassian & Code Linkages
-- **Memory Adapter**: [memory_adapter.py](file:///home/vivi/pixelated/ai-services/memory_adapter.py)
+- **Memory Adapter**: [memory_adapter.py](ai-services/memory_adapter.py)
 
 ### Verification & Testing Checklist
 - [ ] Replace custom dict parsing with Pydantic model validation.

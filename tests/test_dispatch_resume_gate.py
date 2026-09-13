@@ -367,9 +367,7 @@ def test_warns_when_ps_alive_but_registry_empty() -> None:
     dispatch_<month> argv pattern."""
     month = "2025-10-test9"
     fake_pid = 123456
-    fake_argv = (
-        "/usr/bin/python /home/vivi/pixelated/scripts/services/monthly_llm_driver/dispatch_2025-10.py 2025-10 650 800"
-    )
+    fake_argv = "/usr/bin/python ./scripts/services/monthly_llm_driver/dispatch_2025-10.py 2025-10 650 800"
 
     with tempfile.TemporaryDirectory() as tmpdir:
         kills_log = Path(tmpdir) / "dispatch_resume_gate_kills.log"

@@ -99,7 +99,7 @@ async def run_30b_experiment():
 
     MODEL_NAME = "qwen3-30b-serverless-rl-v2"
     BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
-    DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
+    DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
     GROUPS_PER_STEP = 5
     ROLLOUTS_PER_GROUP = 8
