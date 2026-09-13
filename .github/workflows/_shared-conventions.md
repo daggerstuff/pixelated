@@ -47,9 +47,7 @@ GitHub's default `GITHUB_TOKEN` cannot authorize pushes that modify files under
 > refusing to allow a GitHub App to create or update workflow `.yml` without
 > workflows permission
 
-To create PRs that edit workflow files (e.g., `update-kubectl-pin.yml`
-auto-bumping a kubectl pin, or `update-civo-cli-pin.yml` auto-bumping a Civo CLI
-pin), the workflow's `peter-evans/create-pull-request` step must authenticate
+To create PRs that edit workflow files, the workflow's `peter-evans/create-pull-request` step must authenticate
 with a Personal Access Token (PAT) that has the **`workflow`** scope.
 
 The convention name: `WORKFLOW_PAT` (uppercase, snake_case) -- registered as a
@@ -87,10 +85,6 @@ a red run for an unconfigured-repo or expired-token state.
 
 | Workflow                  | Convention   | Where the convention applies                        |
 | ------------------------- | ------------ | --------------------------------------------------- |
-| `deploy-civo.yml`         | GH_TOKEN     | `deploy-civo` job -- env block above the steps      |
-| `update-civo-cli-pin.yml` | GH_TOKEN     | `check-and-update` job -- env block above the steps |
-| `update-civo-cli-pin.yml` | WORKFLOW_PAT | `permissions:` block at the top of the file         |
-| `update-kubectl-pin.yml`  | WORKFLOW_PAT | `permissions:` block at the top of the file         |
 
 Workflows following the GH_TOKEN convention comment the env block with a
 one-line pointer to this document's GH_TOKEN section. Workflows following the

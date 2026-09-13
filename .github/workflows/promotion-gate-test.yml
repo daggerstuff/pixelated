@@ -133,7 +133,7 @@ jobs:
         run: |
           echo "=== Testing deploy gate decision logic ==="
 
-          # Simulate the gate decision that would be used in deploy-civo.yml
+          # Simulate the gate decision that would be used in deploy-aws.yml
           python3 <<'PYEOF'
           import json
           import sys
@@ -220,7 +220,7 @@ jobs:
 
           ## Next Steps
           - Review readiness aggregator output
-          - Verify deploy-civo.yml uses this gate before deployment
+          - Verify deploy-aws.yml uses this gate before deployment
           - Schedule regular promotion tests (weekly)
           EOF
 

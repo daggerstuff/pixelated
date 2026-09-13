@@ -44,12 +44,12 @@ are deployed to the inactive slot, health-checked, then traffic is switched.
 
 | File | Description |
 |------|-------------|
-| `k8s/base/deployment-blue.yaml` | Base (GCE) blue deployment (port 5001) |
-| `k8s/base/deployment-green.yaml` | Base (GCE) green deployment (port 5001) |
+| `k8s/base/deployment-blue.yaml` | Base blue deployment (port 5001) |
+| `k8s/base/deployment-green.yaml` | Base green deployment (port 5001) |
 | `k8s/base/service.yaml` | Base Service — selector includes `slot: blue` |
-| `k8s/civo/deployment-blue.yaml` | Civo blue deployment (port 4321, TLS) |
-| `k8s/civo/deployment-green.yaml` | Civo green deployment (port 4321, TLS) |
-| `k8s/civo/service.yaml` | Civo LoadBalancer Service — selector includes `slot: blue` |
+| `k8s/aws/deployment-blue.yaml` | AWS blue deployment (port 4321, TLS) |
+| `k8s/aws/deployment-green.yaml` | AWS green deployment (port 4321, TLS) |
+| `k8s/aws/service.yaml` | AWS Service — selector includes `slot: blue` |
 | `scripts/devops/blue-green-deploy.sh` | Deployment automation script |
 
 ## Deployment Workflow
@@ -128,7 +128,7 @@ rollback window (`ROLLBACK_WINDOW=300`). During this window:
 
 ## Kustomize Integration
 
-### Base (GCE)
+### Base
 ```yaml
 # k8s/base/kustomization.yaml
 resources:
@@ -137,9 +137,9 @@ resources:
   - service.yaml
 ```
 
-### Civo
+### AWS
 ```yaml
-# k8s/civo/kustomization.yaml
+# k8s/aws/kustomization.yaml
 resources:
   - deployment-blue.yaml
   - deployment-green.yaml

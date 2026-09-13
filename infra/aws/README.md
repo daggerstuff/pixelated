@@ -62,8 +62,8 @@ deleted. The deploy workflow is idempotent.
 
 ## Post-cutover
 
-- After DNS is confirmed stable, disable the Civo deploy workflow:
-  `.github/workflows/deploy-civo.yml`.
+- The Civo deploy workflow and `infra/k8s/civo/` overlay were removed. EKS is
+  the sole deploy target.
 - Re-point any external Postgres, Redis, or MongoDB clients to allowlist the
   EKS node egress IPs. The deploy workflow already carries `DATABASE_URL`,
   `REDIS_URL`, and `MONGODB_URI` through, so no database move is required on

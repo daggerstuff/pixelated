@@ -31,10 +31,9 @@ Two gateway implementations are maintained:
 
 | Gateway             | Use Case                           | Config Files                                               |
 | ------------------- | ---------------------------------- | ---------------------------------------------------------- |
-| Traefik             | Primary (Docker Compose, K8s/Civo) | `docker/traefik/traefik.yml`, `docker/traefik/dynamic.yml` |
+| Traefik             | Primary (Docker Compose, K8s)       | `docker/traefik/traefik.yml`, `docker/traefik/dynamic.yml` |
 | Caddy               | Alternate (subdomains, Ollama)     | `docker/caddy/Caddyfile`                                   |
-| K8s GCE Ingress     | GKE production                     | `k8s/base/ingress.yaml`                                    |
-| K8s Traefik Ingress | Civo production                    | `k8s/civo/ingress.yaml`                                    |
+| K8s Traefik Ingress | AWS EKS production                  | `k8s/aws/ingress.yaml`                                     |
 
 ## TLS Termination
 
@@ -62,8 +61,7 @@ certificatesResolvers:
 
 ### K8s
 
-- GKE: `networking.gke.io/managed-certificates` annotation
-- Civo: `traefik.ingress.kubernetes.io/router.tls: true`
+- EKS: Traefik ingress with `traefik.ingress.kubernetes.io/router.tls: true`
 
 ## CORS Policy
 
@@ -149,7 +147,7 @@ See: `src/lib/rate-limit/` for implementation.
 
 ## Health Check Endpoint
 
-- Path: `/api/health` (Traefik), `/health` (K8s GCE, Caddy)
+- Path: `/api/health` (Traefik), `/health` (K8s Traefik, Caddy)
 - Interval: 30s
 - Timeout: 5s
 - Unhealthy backends are removed from rotation
