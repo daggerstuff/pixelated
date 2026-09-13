@@ -222,18 +222,18 @@ export function createContentHash(
 }
 
 /** Result from running migrations from a directory. */
-export interface MigrateFromDirectoryResult {
+interface MigrateFromDirectoryResult {
   applied: string[]
   skipped: string[]
 }
 
 /** Result from rolling back the last migration. */
-export interface RollbackLastResult {
+interface RollbackLastResult {
   rolledBack: string | null
 }
 
 /** Status of applied vs pending migrations. */
-export interface MigrationStatusResult {
+interface MigrationStatusResult {
   applied: string[]
   pending: string[]
 }
