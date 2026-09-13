@@ -227,7 +227,7 @@ function buildClaimItem(
     lineItem.servicedPeriod = item.servicedPeriod
   }
   if (item.encounter) {
-    lineItem.encounter = [{ reference: item.encounter } as FHIRReference]
+    lineItem.encounter = [{ reference: item.encounter }]
   }
   return lineItem
 }
@@ -240,7 +240,7 @@ function buildDiagnosis(
   if (diag.diagnosisReference) {
     entry.diagnosisReference = {
       reference: diag.diagnosisReference,
-    } as FHIRReference
+    }
   }
   if (diag.diagnosisCodeableConcept) {
     entry.diagnosisCodeableConcept = diag.diagnosisCodeableConcept
@@ -262,7 +262,7 @@ function buildProcedure(
   if (proc.procedureReference) {
     entry.procedureReference = {
       reference: proc.procedureReference,
-    } as FHIRReference
+    }
   }
   if (proc.procedureCodeableConcept) {
     entry.procedureCodeableConcept = proc.procedureCodeableConcept
@@ -309,21 +309,21 @@ export class ClaimsService {
       status: 'draft',
       type: input.type,
       use: input.use,
-      patient: { reference: input.patient } as FHIRReference,
-      provider: { reference: input.provider } as FHIRReference,
+      patient: { reference: input.patient },
+      provider: { reference: input.provider },
       created: new Date().toISOString(),
       priority: input.priority ?? { text: 'Normal' },
       item: items,
     }
 
     if (input.insurer) {
-      claim.insurer = { reference: input.insurer } as FHIRReference
+      claim.insurer = { reference: input.insurer }
     }
     if (input.billablePeriod) {
       claim.billablePeriod = input.billablePeriod
     }
     if (input.facility) {
-      claim.facility = { reference: input.facility } as FHIRReference
+      claim.facility = { reference: input.facility }
     }
 
     if (input.diagnoses && input.diagnoses.length > 0) {
@@ -341,19 +341,19 @@ export class ClaimsService {
     claim.insurance = input.insurance.map((ins, index) => ({
       sequence: index + 1,
       focal: ins.focal,
-      coverage: { reference: ins.coverage } as FHIRReference,
+      coverage: { reference: ins.coverage },
       ...(ins.preAuthRef ? { preAuthRef: ins.preAuthRef } : {}),
       ...(ins.businessArrangement
         ? { businessArrangement: ins.businessArrangement }
         : {}),
     }))
 
-    const total = this.calculateTotal(claim as unknown as Claim)
+    const total = this.calculateTotal(claim)
     if (total.value > 0) {
       claim.total = total
     }
 
-    return claimSchema.parse(claim) as Claim
+    return claimSchema.parse(claim)
   }
 
   /**
@@ -420,11 +420,7 @@ export class ClaimsService {
       if (!item.productOrService) {
         errors.push(`Item ${index + 1}: productOrService is required`)
       }
-      if (
-        item.quantity &&
-        item.quantity.value !== undefined &&
-        item.quantity.value <= 0
-      ) {
+      if (item.quantity?.value !== undefined && item.quantity.value <= 0) {
         warnings.push(`Item ${index + 1}: quantity should be positive`)
       }
     }
@@ -504,7 +500,7 @@ export class ClaimsService {
    * @throws {Error} If the status transition is not allowed
    */
   updateStatus(claim: Claim, newStatus: ClaimStatus): Claim {
-    const currentStatus = claim.status as ClaimStatus
+    const currentStatus = claim.status
     const transition = this.validateStatusTransition(currentStatus, newStatus)
 
     if (!transition.allowed) {
