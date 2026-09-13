@@ -14,6 +14,7 @@ export default defineAgent({
     'in the `run_evaluation` tool, not at the model layer.',
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  reasoning: 'medium',
   outputSchema: z.object({
     verdict: z.enum(['pass', 'conditional_pass', 'fail']),
     dimensions: z.array(

@@ -14,6 +14,7 @@ export default defineAgent({
     'agent parks until this directive arrives, then resumes.',
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  reasoning: 'medium',
   outputSchema: z.object({
     intervention_kind: z.enum([
       'suggestion',

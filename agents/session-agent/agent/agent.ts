@@ -6,6 +6,7 @@ import { z } from 'zod'
 export default defineAgent({
   model: 'zai/glm-5.2',
   modelContextWindowTokens: 1_000_000,
+  reasoning: 'medium',
   compaction: {
     // Rehearsal sessions routinely exceed 30 minutes. Compact framing (state
     // transitions, tool summaries) earlier than the framework default so the

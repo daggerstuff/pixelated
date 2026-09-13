@@ -51,7 +51,12 @@ export const AGENT_MODEL_CONTEXT_WINDOW_TOKENS = 1_000_000
 
 // When using AI Gateway, pass the string directly (eve resolves it).
 // When using Workers AI, wrap in the workers-ai-provider LanguageModel.
-export const agentModel = useAiGateway ? AGENT_MODEL : workersai(AGENT_MODEL)
+// GLM loop suppression: cap reasoning effort and add repetition_penalty on
+// the Workers AI fallback path (the Workers AI GLM endpoint accepts both
+// as passthrough options; the provider index signature forwards them).
+export const agentModel = useAiGateway
+  ? AGENT_MODEL
+  : workersai(AGENT_MODEL, { reasoning_effort: 'medium', repetition_penalty: 1.1 })
 
 export function getModel() {
   return hasCredentials ? workersai(MODEL) : null
