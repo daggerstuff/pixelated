@@ -15,6 +15,7 @@ export default defineAgent({
     "or participant's most recent turn has not yet been analyzed.",
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  reasoning: 'medium',
   outputSchema: z.object({
     primary_emotion: z.string(),
     intensity: z.number().min(0).max(1),

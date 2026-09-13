@@ -14,6 +14,7 @@ export default defineAgent({
     'batch.',
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  reasoning: 'medium',
   outputSchema: z.object({
     dimensions: z.array(
       z.object({

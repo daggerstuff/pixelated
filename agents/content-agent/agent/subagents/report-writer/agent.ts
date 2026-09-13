@@ -14,6 +14,7 @@ export default defineAgent({
     'demo QA agent has produced an audit and is ready to summarize.',
   model: agentModel,
   modelContextWindowTokens: AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+  reasoning: 'medium',
   outputSchema: z.object({
     headline: z.string().max(280),
     strengths: z.array(z.string().max(160)).min(1).max(3),
