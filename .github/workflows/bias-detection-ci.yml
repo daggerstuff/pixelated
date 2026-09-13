@@ -561,6 +561,14 @@ jobs:
       - name: Build application
         run: pnpm build
 
+      - name: Generate E2E test token
+        # Per-run random token shared by the app server (signin + middleware)
+        # and the Playwright test runner. No literal credentials in the repo;
+        # see THREAT_MODEL.md "E2E test-auth bypass".
+        run: |
+          E2E_TEST_TOKEN=$(openssl rand -hex 24)
+          echo "E2E_TEST_TOKEN=${E2E_TEST_TOKEN}" >> "$GITHUB_ENV"
+
       - name: Start application
         run: |
           pnpm start &
@@ -581,6 +589,7 @@ jobs:
         env:
           NODE_ENV: test
           E2E_TEST_AUTH: '1'
+          E2E_TEST_TOKEN: ${{ env.E2E_TEST_TOKEN }}
           JWT_SECRET: test-jwt-secret-for-ci-only-do-not-use-in-production
           DATABASE_URL: postgresql://postgres@localhost:5432/test_db
           PGUSER: postgres
@@ -594,9 +603,9 @@ jobs:
       - name: Run Playwright tests
         # Full dashboard + smoke specs. The dashboard spec authenticates via
         # the E2E test-auth bypass (E2E_TEST_AUTH=1 on "Start application"):
-        # signin accepts the seeded test@example.com/password123 and issues an
-        # admin session cookie, and middleware grants an admin locals session
-        # for that cookie — no Auth0 tenant required.
+        # signin accepts test@example.com + the per-run E2E_TEST_TOKEN and
+        # issues an admin session cookie, and middleware grants an admin
+        # locals session for that cookie — no Auth0 tenant required.
         run: >-
           pnpm e2e tests/e2e/bias-detection-dashboard.spec.ts
           tests/e2e/smoke/bias-detection-smoke.spec.ts --project=chromium
@@ -607,6 +616,7 @@ jobs:
           # on port 4321.
           DISABLE_PLAYWRIGHT_WEBSERVER: '1'
           E2E_TEST_AUTH: '1'
+          E2E_TEST_TOKEN: ${{ env.E2E_TEST_TOKEN }}
           DATABASE_URL: postgresql://postgres@localhost:5432/test_db
           PGUSER: postgres
           PGDATABASE: test_db
