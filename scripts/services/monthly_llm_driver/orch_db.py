@@ -13,7 +13,7 @@ The ``.from_env()`` factory reads ``REDIS_URL``, ``MONGO_URL``,
 
 1. Process environment variables (``os.environ``).
 2. The mission ``.env`` file at
-   ``/home/vivi/.factory/missions/98c15371-4572-4f91-a290-ce42806e9bbf/.env``.
+   ``~/.factory/missions/98c15371-4572-4f91-a290-ce42806e9bbf/.env``.
 3. Hard-coded fallback defaults (dev credentials on 127.0.0.1).
 
 The bundle is a context manager: ``close()`` flushes/closes Redis,
@@ -46,7 +46,7 @@ _DEFAULT_REDIS_URL = "redis://:dev_redis_password@127.0.0.1:6379/0"
 _DEFAULT_MONGO_URL = "mongodb://127.0.0.1:27017"
 _DEFAULT_POSTGRES_URL = "postgresql://pixelated:dev_password_change_in_prod@127.0.0.1:5432/pixelated_empathy"
 
-_MISSION_ENV_PATH = Path("/home/vivi/.factory/missions/98c15371-4572-4f91-a290-ce42806e9bbf/.env")
+_MISSION_ENV_PATH = Path(str(Path.home() / ".factory/missions/98c15371-4572-4f91-a290-ce42806e9bbf/.env"))
 
 # 5-minute wall budget per connection handshake.
 _CONNECT_TIMEOUT_S = 300

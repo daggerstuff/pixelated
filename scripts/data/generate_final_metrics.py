@@ -7,7 +7,10 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, "/home/vivi/pixelated/ai")
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+sys.path.insert(0, str(_PROJECT_ROOT / "ai"))
 
 
 def analyze_dataset(file_path: Path) -> dict:

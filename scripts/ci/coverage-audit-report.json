@@ -1,7 +1,7 @@
 {
   "timestamp": "2026-08-01T02:32:59.345Z",
   "tool": "coverage-audit",
-  "coverageFile": "/home/vivi/firstmate/projects/pixelated/coverage/coverage-final.json",
+  "coverageFile": "~/firstmate/projects/pixelated/coverage/coverage-final.json",
   "summary": {
     "totalModules": 18,
     "totalFiles": 22,

@@ -38,7 +38,7 @@ if not WANDB_API_KEY:
 PROJECT = "wayfarer-ab-test"  # Keeping project name as is, unless you want this changed too!
 MODEL_NAME = "qwen3-14b-serverless-rl"
 BASE_MODEL = "OpenPipe/Qwen3-14B-Instruct"
-DATASET_PATH = "/home/vivi/dataset/RL_training_dataset.jsonl"
+DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
 # RL Hyperparameters
 GROUPS_PER_STEP = 5

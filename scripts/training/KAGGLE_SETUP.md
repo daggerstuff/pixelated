@@ -11,7 +11,7 @@ Kaggle offers **30 free GPU hours/week** with T4 (16GB VRAM). This is enough for
 1. Go to [kaggle.com](https://kaggle.com) and sign in
 2. Go to **Datasets** → **New Dataset**
 3. Upload training data:
-   - `/home/vivi/pixelated/ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl`
+   - `~/pixelated/ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl`
 4. Title: `pixelated-training-data`
 5. Make it Private
 6. Note the dataset ID: `your-username/pixelated-training-data`

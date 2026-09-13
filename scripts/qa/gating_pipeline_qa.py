@@ -4,8 +4,12 @@
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
-sys.path.insert(0, "/home/vivi/pixelated")
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 from ai.memory.gates import GateDecision, GateResult, GatingReport
 from ai.memory.gates.consent_gate import ConsentGateChecker
