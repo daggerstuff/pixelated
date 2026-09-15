@@ -52,6 +52,9 @@ jobs:
       - name: Serve production build in background
         env:
           PORT: '4321'
+          # Throwaway value for the ephemeral local scan target only —
+          # the real secret never leaves the deployment environment.
+          JWT_SECRET: 'dast-scan-local-placeholder-secret'
         run: |
           pnpm preview &
           for i in $(seq 1 60); do
