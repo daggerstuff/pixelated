@@ -133,6 +133,7 @@ __mocks__
 .coverage
 .coverage.*
 htmlcov/
+.profiles/
 .eggs/
 .hypothesis/
 .installed.cfg
