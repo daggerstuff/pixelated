@@ -4,8 +4,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Mock dependencies before importing the module under test.
 // All paths resolve relative to this test file:
 //   src/lib/services/patient-rights/__tests__/dataPortabilityService.test.ts
-//   ../ → patient-rights/, ../../ → services/, ../../../ → lib/, ../../../../ → src/
-vi.mock('../../../../db/mongoClient', () => {
+//   ../ → patient-rights/, ../../ → services/, ../../../ → lib/
+vi.mock('../../../db/mongoClient', () => {
   const collectionMock = {
     find: vi.fn().mockReturnValue({
       toArray: vi.fn().mockResolvedValue([]),
@@ -22,7 +22,7 @@ vi.mock('../../../../db/mongoClient', () => {
   }
 })
 
-vi.mock('../../../../services/mongodb.dao', () => ({
+vi.mock('../../mongodb.dao', () => ({
   dataExportDAO: {
     create: vi.fn().mockResolvedValue(undefined),
     findById: vi.fn().mockResolvedValue(null),
