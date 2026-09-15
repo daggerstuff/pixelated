@@ -194,10 +194,12 @@ intentional change.
 - **Release notes**: pushing a `vX.Y.Z` tag verifies the tagged revision
   builds, then creates a GitHub Release with auto-generated notes
   ([release workflow](.github/workflows/release-notes.yml)).
-- **Deploys** ([deploy-aws.yml](.github/workflows/deploy-aws.yml)): rollout
-  status gates, a smoke test through the cluster service, and — if the smoke
-  test fails — an automatic `kubectl rollout undo` of the app and agent
-  deployments back to the previous revision.
+- **Deploys** ([deploy-aws.yml](.github/workflows/deploy-aws.yml)): a successful
+  CI run on `staging` deploys to EKS automatically (manual dispatch still
+  works). Rollout status gates, a smoke test through the cluster service, and
+  — if the smoke test fails — an automatic `kubectl rollout undo` of the app
+  and agent deployments back to the previous revision. Deploys serialize via a
+  `deploy-production` concurrency group.
 
 ## Python Code
 

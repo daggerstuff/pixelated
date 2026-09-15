@@ -73,12 +73,9 @@ const envSchema = z.object({
   // W&B
   WANDB_API_KEY: z.string().optional(),
 
-  // Feature Flags (declared and evaluated in ./feature-flags.ts; the schema
-  // entries only tolerate the env vars, evaluation routes through the registry)
-  FEATURE_AI_INSIGHTS: z.string().default('false'),
-  FEATURE_APPROVAL_WORKFLOWS: z.string().default('false'),
-  FEATURE_COLLABORATION: z.string().default('false'),
-  FEATURE_VERSIONING: z.string().default('false'),
+  // Feature Flags: declared and evaluated in ./feature-flags.ts. There are
+  // currently no flags; when the first one lands, its FEATURE_* variable is
+  // validated here.
 
   // Rate Limiting
   RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
@@ -189,7 +186,8 @@ export const config = {
   // W&B
   wandbApiKey: parsed.WANDB_API_KEY,
 
-  // Feature Flags — evaluated by the registry (./feature-flags.ts)
+  // Feature Flags — evaluated by the registry (./feature-flags.ts); currently
+  // an empty record until the first flag lands.
   features: getFeatureFlags(),
 
   // Rate Limiting
