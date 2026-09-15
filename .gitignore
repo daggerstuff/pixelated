@@ -483,3 +483,4 @@ thread-5302e593-transcript.md
 .jscpd-report/
 .test-perf/
 .test-reliability/
+.build-perf/

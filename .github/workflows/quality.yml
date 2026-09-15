@@ -16,12 +16,20 @@ on:
       - '.oxlintrc.complexity.json'
       - '.eslintrc.naming.mjs'
       - 'eslint.config.js'
+      - 'astro.config.*'
+      - 'config/**'
       - 'pyproject.toml'
       - 'package.json'
       - '.github/workflows/quality.yml'
   pull_request:
     branches: [staging]
   workflow_dispatch:
+
+# Cancel superseded runs so feedback on the newest commit is not queued
+# behind stale ones.
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   # Static code-quality gates. Each audit compares the current state against a
@@ -196,4 +204,42 @@ jobs:
         with:
           name: test-reliability-report
           path: .test-reliability/
+          retention-days: 14
+
+  # Build performance. Times `pnpm build` (the same command CI and developers
+  # run) and gates wall-clock duration against a pinned budget
+  # (scripts/ci/build-perf-baseline.json), so build-time regressions — a new
+  # heavy dependency, bundle growth, a plugin misconfiguration — fail CI
+  # instead of silently stretching every subsequent run.
+  build-performance:
+    name: Build performance tracking
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Time the production build and enforce budget
+        run: pnpm build:perf
+
+      - name: Publish report to step summary
+        if: always()
+        run: cat .build-perf/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload build-performance report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-performance-report
+          path: .build-perf/
           retention-days: 14

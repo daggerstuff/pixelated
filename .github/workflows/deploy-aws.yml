@@ -253,6 +253,7 @@ jobs:
           kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
 
       - name: Smoke test through cluster service
+        id: smoke
         run: |
           kubectl port-forward -n pixelated-empathy svc/pixelated-empathy 8080:80 &
           PF_PID=$!
@@ -265,6 +266,23 @@ jobs:
             sleep 2
           done
           echo "Service health check failed."
+          exit 1
+
+      # Automatic rollback: if the new image never became healthy, undo the
+      # rollout so the previous known-good ReplicaSet serves traffic again.
+      - name: Roll back failed deployment
+        if: failure() && steps.smoke.outcome == 'failure'
+        run: |
+          set -u
+          echo "::error::Smoke test failed after rollout — rolling back to the previous revision."
+          for deployment in pixelated-empathy-blue session-agent qa-agent pipeline-agent; do
+            echo "Rolling back deployment/$deployment ..."
+            kubectl rollout undo "deployment/$deployment" -n pixelated-empathy
+          done
+          for deployment in pixelated-empathy-blue session-agent qa-agent pipeline-agent; do
+            kubectl rollout status "deployment/$deployment" -n pixelated-empathy --timeout=5m
+          done
+          echo "Rollback complete."
           exit 1
 
       - name: Show DNS target

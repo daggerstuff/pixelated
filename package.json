@@ -61,6 +61,8 @@
     "test:nplusone": "NODE_ENV=test node_modules/.bin/vitest run -c config/vitest.config.ts apps/web/src/lib/db/__tests__/query-counting.test.ts --coverage.enabled=false",
     "test:perf": "node scripts/ci/test-perf-tracker.mjs",
     "test:perf:report": "node scripts/ci/test-perf-tracker.mjs --no-run",
+    "build:perf": "node scripts/ci/build-perf-tracker.mjs",
+    "build:perf:report": "node scripts/ci/build-perf-tracker.mjs --no-run",
     "test:flaky": "node scripts/ci/flaky-test-audit.mjs",
     "test:isolation": "node scripts/ci/isolation-audit.mjs",
     "test:coverage:gate": "node scripts/ci/coverage-gate.mjs",

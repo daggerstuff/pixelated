@@ -1,0 +1,42 @@
+---
+name: Release Notes
+
+# Release-notes automation: when a version tag is pushed, create a GitHub
+# Release with notes generated from the commits/PRs between tags. The notes
+# land in the release (and the GitHub release feed) without manual writing.
+#
+# Tagging a release:
+#   git tag vX.Y.Z && git push origin vX.Y.Z
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - name: Create GitHub release with generated notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release for $TAG already exists; leaving it untouched."
+            exit 0
+          fi
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --generate-notes \
+            --latest

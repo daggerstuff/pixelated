@@ -138,6 +138,30 @@ the same hermetic slice as `pnpm test:perf`, so the numbers are comparable:
   **Keep `@vitest/coverage-v8` on the same major version as `vitest`** — a
   mismatch silently aborts coverage collection.
 
+### Build performance
+
+`pnpm build:perf` times the full production build and fails when it exceeds
+1.25× the pinned baseline (`scripts/ci/build-perf-baseline.json`), so
+build-time regressions fail CI instead of silently stretching every run.
+`pnpm build:perf -- --update` re-pins after a deliberate build-time change.
+
+### Feature flags
+
+Flags are declared once in the registry
+([`apps/web/src/lib/config/feature-flags.ts`](apps/web/src/lib/config/feature-flags.ts))
+with an env override (`FEATURE_*`), a safe default (`false`), and a
+description. Read them with `isFeatureEnabled('flagName')` — never read the env
+var directly at the call site. Malformed env values never enable a flag.
+
+### Releases and deploys
+
+- **Release notes**: pushing a `vX.Y.Z` tag creates a GitHub Release with
+  auto-generated notes ([release workflow](.github/workflows/release-notes.yml)).
+- **Deploys** ([deploy-aws.yml](.github/workflows/deploy-aws.yml)): rollout
+  status gates, a smoke test through the cluster service, and — if the smoke
+  test fails — an automatic `kubectl rollout undo` of the app and agent
+  deployments back to the previous revision.
+
 ## Python Code
 
 All Python work lives in `ai/` and `tests/`. Use `uv` for dependency management:
