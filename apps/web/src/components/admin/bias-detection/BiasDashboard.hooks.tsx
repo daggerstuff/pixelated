@@ -161,6 +161,10 @@ export function useBiasDashboardData(
     [],
   )
 
+  // Stable identity so the WebSocket effect does not tear down/re-run on every
+  // render (inline arrow here caused React "Maximum update depth exceeded").
+  const announceToScreenReader = useCallback(() => {}, [])
+
   useBiasDashboardWebSocket({
     enableRealTimeUpdates: autoRefresh,
     wsRef,
@@ -171,7 +175,7 @@ export function useBiasDashboardData(
     setWsConnectionStatus,
     setWsConnected,
     setWsReconnectAttempts,
-    announceToScreenReader: () => {},
+    announceToScreenReader,
     logger,
     onMessage: handleWebSocketMessage,
   })
