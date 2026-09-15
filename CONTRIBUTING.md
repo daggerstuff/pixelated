@@ -50,16 +50,16 @@ regression**, so existing debt is visible without blocking work. When a change
 shrinks debt the baseline naturally allows the improvement; only re-pin after an
 intentional change with `-- --update`.
 
-| Command | Signal it enforces | Config / baseline |
-| --- | --- | --- |
-| `pnpm lint:boundaries` | Module boundaries & circular deps | `.dependency-cruiser.cjs`, `scripts/ci/boundaries-baseline.json` |
-| `pnpm lint:duplication` | Duplicate code (DRY) | `.jscpd.json`, `scripts/ci/duplication-baseline.json` |
-| `pnpm lint:complexity` | Cyclomatic complexity, nesting, unit size | `.oxlintrc.complexity.json`, `scripts/ci/complexity-baseline.json` |
-| `pnpm lint:file-size` | Oversized files (TS/TSX/Astro/Python) | `scripts/ci/large-file-baseline.json` |
-| `pnpm lint:tech-debt` | Untracked `TODO`/`FIXME` markers | `scripts/ci/tech-debt-baseline.json` |
-| `pnpm lint:naming` | Naming conventions (TS/TSX) | `.eslintrc.naming.mjs`, `scripts/ci/naming-baseline.json` |
-| `pnpm lint:mock-paths` | Every `vi.mock(...)` specifier resolves to a real module | none (strict) |
-| `pnpm lint:python-correctness` | Python correctness (undefined names, unused imports, bare excepts, unchained raises) outside submodules/generated SDK | `scripts/ci/python-ruff-baseline.json` |
+| Command                        | Signal it enforces                                                                                                    | Config / baseline                                                  |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `pnpm lint:boundaries`         | Module boundaries & circular deps                                                                                     | `.dependency-cruiser.cjs`, `scripts/ci/boundaries-baseline.json`   |
+| `pnpm lint:duplication`        | Duplicate code (DRY)                                                                                                  | `.jscpd.json`, `scripts/ci/duplication-baseline.json`              |
+| `pnpm lint:complexity`         | Cyclomatic complexity, nesting, unit size                                                                             | `.oxlintrc.complexity.json`, `scripts/ci/complexity-baseline.json` |
+| `pnpm lint:file-size`          | Oversized files (TS/TSX/Astro/Python)                                                                                 | `scripts/ci/large-file-baseline.json`                              |
+| `pnpm lint:tech-debt`          | Untracked `TODO`/`FIXME` markers                                                                                      | `scripts/ci/tech-debt-baseline.json`                               |
+| `pnpm lint:naming`             | Naming conventions (TS/TSX)                                                                                           | `.eslintrc.naming.mjs`, `scripts/ci/naming-baseline.json`          |
+| `pnpm lint:mock-paths`         | Every `vi.mock(...)` specifier resolves to a real module                                                              | none (strict)                                                      |
+| `pnpm lint:python-correctness` | Python correctness (undefined names, unused imports, bare excepts, unchained raises) outside submodules/generated SDK | `scripts/ci/python-ruff-baseline.json`                             |
 
 `pnpm lint:quality` runs all eight. For Python, naming is enforced by ruff's `N`
 (pep8-naming) rules and strict types by `pnpm typecheck:python`
@@ -77,12 +77,12 @@ Git hooks run automatically on commit and are managed by
 `scripts/devops/hooks/templates/`, so the same checks run locally and in
 CI:
 
-| Hook | Check |
-| --- | --- |
-| `pre-commit` | Staged secret scanning, lockfile sync, `lint-staged` (oxlint / ruff / markdownlint), markdownlint suppression guard |
-| `commit-msg` | Conventional Commits format |
-| `pre-rebase` | Blocks history rewrites of protected branches |
-| `post-checkout` / `post-merge` | Re-syncs `pnpm-lock.yaml` / `uv.lock` when they change |
+| Hook                           | Check                                                                                                               |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `pre-commit`                   | Staged secret scanning, lockfile sync, `lint-staged` (oxlint / ruff / markdownlint), markdownlint suppression guard |
+| `commit-msg`                   | Conventional Commits format                                                                                         |
+| `pre-rebase`                   | Blocks history rewrites of protected branches                                                                       |
+| `post-checkout` / `post-merge` | Re-syncs `pnpm-lock.yaml` / `uv.lock` when they change                                                              |
 
 Never edit `.husky/_/` (generated, git-ignored) or `.git/hooks/` directly;
 edit `.husky/<hook>` or the template in `scripts/devops/hooks/templates/`.
@@ -125,11 +125,11 @@ For Python, `uv run pytest` prints the 25 slowest tests by default
 Three gates run in the [Quality workflow](.github/workflows/quality.yml) over
 the same hermetic slice as `pnpm test:perf`, so the numbers are comparable:
 
-| Command                  | Enforces                                                                 | Baseline                              |
-| ------------------------ | ------------------------------------------------------------------------ | ------------------------------------- |
-| `pnpm test:flaky`        | 3 repeat runs; any test whose outcome changes across identical runs fails | `scripts/ci/flaky-baseline.json`     |
-| `pnpm test:isolation`    | Ordered vs `--sequence.shuffle` execution; every test must pass in both   | none (strict)                         |
-| `pnpm test:coverage:gate`| Per-metric slice coverage stays within 5% of the pinned value and above an absolute floor | `scripts/ci/coverage-baseline.json` |
+| Command                   | Enforces                                                                                  | Baseline                            |
+| ------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------- |
+| `pnpm test:flaky`         | 3 repeat runs; any test whose outcome changes across identical runs fails                 | `scripts/ci/flaky-baseline.json`    |
+| `pnpm test:isolation`     | Ordered vs `--sequence.shuffle` execution; every test must pass in both                   | none (strict)                       |
+| `pnpm test:coverage:gate` | Per-metric slice coverage stays within 5% of the pinned value and above an absolute floor | `scripts/ci/coverage-baseline.json` |
 
 - `pnpm test:reliability` runs all three in sequence.
 - Flaky tolerance list: a genuinely flaky external dependency can be pinned
@@ -181,12 +181,12 @@ the same change.
 Four ratcheted audits (see the [Quality workflow](.github/workflows/quality.yml));
 each fails only on NEW problems, pinned in `scripts/ci/*-baseline.json`:
 
-| Command                | Enforces                                                             |
-| ---------------------- | -------------------------------------------------------------------- |
-| `pnpm lint:heavy-deps` | Total install weight stays within 1.25× of the pinned baseline     |
-| `pnpm lint:version-drift` | No package resolves to more distinct versions than pinned           |
-| `pnpm lint:flags`      | No feature flag is born dead or loses its last reference             |
-| `pnpm lint:unused-deps`| knip reports no NEW unused dependencies                              |
+| Command                   | Enforces                                                       |
+| ------------------------- | -------------------------------------------------------------- |
+| `pnpm lint:heavy-deps`    | Total install weight stays within 1.25× of the pinned baseline |
+| `pnpm lint:version-drift` | No package resolves to more distinct versions than pinned      |
+| `pnpm lint:flags`         | No feature flag is born dead or loses its last reference       |
+| `pnpm lint:unused-deps`   | knip reports no NEW unused dependencies                        |
 
 `pnpm lint:deps` runs all four. Each supports `-- --update` to re-pin after an
 intentional change.
