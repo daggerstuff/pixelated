@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import AsyncGenerator
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -33,7 +33,7 @@ async def get_db_session() -> AsyncGenerator[AsyncSession]:
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
+    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security_scheme)],
 ) -> dict[str, Any]:
     """Validate JWT and return the token payload.
 
@@ -69,7 +69,7 @@ async def get_current_user(
 
 
 async def get_rls_session(
-    current_user: dict[str, Any] = Depends(get_current_user),
+    current_user: Annotated[dict[str, Any], Depends(get_current_user)],
 ) -> AsyncGenerator[AsyncSession]:
     """Provide a DB session with RLS context set from the JWT.
 
