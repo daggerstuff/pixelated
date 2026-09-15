@@ -7,7 +7,7 @@ Implements:
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -41,11 +41,11 @@ class ScenarioDetailResponse(ScenarioResponse):
 
 @router.get("", response_model=list[ScenarioResponse])
 async def list_scenarios(
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict[str, Any], Depends(role_at_least(UserRole.LEARNER))],
     clinical_focus: str | None = None,
     difficulty: str | None = None,
     published_only: bool = True,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict[str, Any] = Depends(role_at_least(UserRole.LEARNER)),
 ) -> list[ScenarioResponse]:
     """List scenarios available to the current tenant.
 
@@ -109,8 +109,8 @@ async def list_scenarios(
 @router.get("/{scenario_id}", response_model=ScenarioDetailResponse)
 async def get_scenario(
     scenario_id: str,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict[str, Any] = Depends(role_at_least(UserRole.LEARNER)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict[str, Any], Depends(role_at_least(UserRole.LEARNER))],
 ) -> ScenarioDetailResponse:
     """Get detailed information about a specific scenario."""
     result = await session.execute(
