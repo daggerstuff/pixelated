@@ -1,5 +1,7 @@
 import { AlertTriangle, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import { ChartErrorBoundary } from './ChartErrorBoundary'
+import { DashboardErrorBoundary } from './DashboardErrorBoundary'
 
 import {
   isAlertItemArray,
@@ -324,14 +326,46 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   }
 
   if (!dashboardData) {
-    return null
+    return (
+      <div
+        className={`p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
+      >
+        <AccessibilitySkipLinks
+          skipLinkRef={skipLinkRef}
+          mainContentRef={mainContentRef}
+          announceToScreenReader={announceToScreenReader}
+          announcements={announcements}
+        />
+        <Alert
+          variant="error"
+          title="Dashboard Unavailable"
+          description={
+            <div>
+              No dashboard data could be loaded. This can happen if your session
+              expired or the data service is temporarily unreachable.
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-2"
+                onClick={fetchDashboardData}
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Retry
+              </Button>
+            </div>
+          }
+          icon={<AlertTriangle className="h-4 w-4" />}
+        />
+      </div>
+    )
   }
 
   // ── Main render ────────────────────────────────────────────────────
   return (
-    <div
-      className={`space-y-6 p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
-    >
+    <DashboardErrorBoundary>
+      <div
+        className={`space-y-6 p-6 ${className} ${highContrast ? 'high-contrast' : ''}`}
+      >
       <HighBiasAlertNotification
         newHighBiasAlert={newHighBiasAlert}
         onDismiss={() => setNewHighBiasAlert(null)}
@@ -498,16 +532,20 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           )}
 
           <TabsContent value="trends" className="space-y-6">
-            <TrendsTab
-              filteredTrends={filteredTrends}
-              isMobile={isMobile}
-              isTablet={isTablet}
-              reducedMotion={reducedMotion}
-            />
+            <ChartErrorBoundary label="Trends chart">
+              <TrendsTab
+                filteredTrends={filteredTrends}
+                isMobile={isMobile}
+                isTablet={isTablet}
+                reducedMotion={reducedMotion}
+              />
+            </ChartErrorBoundary>
           </TabsContent>
 
           <TabsContent value="demographics" className="space-y-6">
-            <DemographicsTab demographics={demographics} />
+            <ChartErrorBoundary label="Demographics chart">
+              <DemographicsTab demographics={demographics} />
+            </ChartErrorBoundary>
           </TabsContent>
 
           <TabsContent value="alerts" className="space-y-6">
@@ -542,7 +580,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </TabsContent>
         </Tabs>
       </main>
-    </div>
+      </div>
+    </DashboardErrorBoundary>
   )
 }
 

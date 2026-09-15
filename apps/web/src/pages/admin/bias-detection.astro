@@ -3,13 +3,14 @@ export const prerender = false
 
 import AdminLayout from '@/layouts/AdminLayout.astro'
 import { ClientRouter } from 'astro:transitions'
+import { BiasDashboard } from '@/components/admin/bias-detection/BiasDashboard'
 
 // Verify admin access via session
 const session = (Astro.locals as any)?.session
 const user = (Astro.locals as any)?.user
 
 if (!session || !user || user.role !== 'admin') {
-  return Astro.redirect('/auth/sign-in')
+  return Astro.redirect(`/login?redirect=${encodeURIComponent('/admin/bias-detection')}`)
 }
 
 // Page metadata
@@ -26,48 +27,15 @@ const pageDescription =
   <ClientRouter />
 
   <div class="container mx-auto px-4 py-6">
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          Bias Detection Dashboard
-        </h1>
-        <p class="text-muted-foreground mt-2">
-          Real-time monitoring and analytics for bias detection in therapeutic
-          training sessions
-        </p>
-      </div>
-    </div>
-
-    <!-- Main Dashboard Component -->
-    <div
-      id="bias-dashboard"
-      data-testid="bias-dashboard"
-      class="bias-dashboard-container"
-    >
-      <!-- React component will be mounted here -->
+    <div id="bias-dashboard" data-testid="bias-dashboard" class="bias-dashboard-container">
+      <BiasDashboard
+        client:load
+        refreshInterval={30000}
+        enableRealTimeUpdates={true}
+        className="w-full"
+      />
     </div>
   </div>
-
-  <script>
-    import { BiasDashboard } from '@/components/admin/bias-detection/BiasDashboard'
-    import { createElement } from 'react'
-    import { createRoot } from 'react-dom/client'
-
-    // Mount the React component when the page loads
-    document.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('bias-dashboard')
-      if (container) {
-        const root = createRoot(container)
-        root.render(
-          createElement(BiasDashboard, {
-            refreshInterval: 30000,
-            enableRealTimeUpdates: true,
-            className: 'w-full',
-          }),
-        )
-      }
-    })
-  </script>
 
   <style>
     .bias-dashboard-container {

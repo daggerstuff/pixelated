@@ -86,7 +86,7 @@ import {
 const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className="bg-white border-gray-200 rounded-lg border p-3 shadow-lg">
+      <div className="bg-popover text-popover-foreground border-border border p-3">
         <p className="font-medium">{`${label}`}</p>
         {payload.map((entry) => (
           <p
@@ -118,7 +118,7 @@ export const HighBiasAlertNotification: React.FC<
   return (
     <div
       role="alert"
-      className="border-destructive/20 bg-destructive/10 flex items-start justify-between rounded-lg border p-4"
+      className="border-border bg-card flex items-start justify-between border p-4"
     >
       <div className="flex items-start space-x-3">
         <AlertTriangle className="text-destructive mt-0.5 h-5 w-5" />
@@ -235,7 +235,19 @@ export const Header: React.FC<HeaderProps> = ({
       className={`flex items-center justify-between ${isMobile ? 'flex-col' : ''}`}
     >
       <div>
-        <h1 className="text-2xl font-bold">Bias Detection Dashboard</h1>
+        <h1
+          className="font-display"
+          style={{
+            fontFamily: 'var(--np-font-display)',
+            fontWeight: 'var(--np-weight-display)',
+            letterSpacing: 'var(--np-tracking-display)',
+            fontSize: '2.25rem',
+            lineHeight: 'var(--np-leading-display)',
+            color: 'var(--np-text)',
+          }}
+        >
+          Bias Detection Dashboard
+        </h1>
         {lastUpdated && (
           <p className="text-muted-foreground flex items-center text-sm">
             <Clock className="mr-1 h-3 w-3" />
@@ -265,11 +277,12 @@ export const Header: React.FC<HeaderProps> = ({
             size="sm"
             onClick={() => onAutoRefreshChange(!autoRefresh)}
             aria-label="Toggle auto-refresh"
+            data-testid="auto-refresh-button"
           >
             <RefreshCw
               className={`mr-1 h-4 w-4 ${autoRefresh ? 'animate-spin' : ''}`}
             />
-            {!isMobile && 'Auto'}
+            {!isMobile && `auto-refresh ${autoRefresh ? 'on' : 'off'}`}
           </Button>
         )}
 
@@ -376,7 +389,7 @@ export const NotificationSettingsPanel: React.FC<
                   checked={notificationSettings.inAppEnabled}
                   onChange={(e) => onUpdate({ inAppEnabled: e.target.checked })}
                 />
-                <span className="text-sm">In-App Notifications</span>
+                <span className="text-sm">Enable in-app notifications</span>
               </label>
               <label className="flex items-center space-x-2">
                 <input
@@ -385,7 +398,7 @@ export const NotificationSettingsPanel: React.FC<
                   onChange={(e) => onUpdate({ emailEnabled: e.target.checked })}
                 />
                 <Mail className="h-4 w-4" />
-                <span className="text-sm">Email Notifications</span>
+                <span className="text-sm">Enable email notifications</span>
               </label>
               <label className="flex items-center space-x-2">
                 <input
@@ -500,6 +513,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
             size="sm"
             onClick={onClose}
             disabled={exportProgress.isExporting}
+            data-testid="close-export-dialog"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -516,6 +530,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
                   type="radio"
                   name="exportFormat"
                   value={fmt}
+                  id={`exportFormat${fmt.charAt(0).toUpperCase()}${fmt.slice(1)}`}
                   checked={exportFormat === fmt}
                   aria-label={`Export data as ${fmt.toUpperCase()} format`}
                   onChange={(e) => {
@@ -1061,7 +1076,6 @@ interface TrendsTabProps {
 
 export const TrendsTab: React.FC<TrendsTabProps> = ({
   filteredTrends,
-  reducedMotion,
   isMobile,
   isTablet,
 }) => {
@@ -1087,8 +1101,8 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
                   x2="0"
                   y2="1"
                 >
-                  <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
-                  <stop offset="95%" stopColor="#ef4444" stopOpacity={0.1} />
+                  <stop offset="5%" stopColor="#d1d1d1" stopOpacity={0.8} />
+                  <stop offset="95%" stopColor="#d1d1d1" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" />
@@ -1103,23 +1117,24 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
               <Legend />
               <ReferenceLine
                 y={0.3}
-                stroke="#f59e0b"
+                stroke="#a3a3a3"
                 strokeDasharray="3 3"
                 label="Warning"
               />
               <ReferenceLine
                 y={0.6}
-                stroke="#ef4444"
+                stroke="#e5e5e5"
                 strokeDasharray="3 3"
                 label="High"
               />
               <Area
                 type="monotone"
                 dataKey="biasScore"
-                stroke="#ef4444"
+                stroke="#e5e5e5"
                 fillOpacity={1}
                 fill="url(#biasScoreGradient)"
-                animationDuration={reducedMotion ? 0 : 1000}
+                isAnimationActive={false}
+                animationDuration={0}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -1148,9 +1163,10 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
                 <Legend />
                 <Bar
                   dataKey="sessionCount"
-                  fill="#3b82f6"
-                  radius={[4, 4, 0, 0]}
-                  animationDuration={reducedMotion ? 0 : 1000}
+                  fill="#8a8a8a"
+                  radius={[0, 0, 0, 0]}
+                  isAnimationActive={false}
+                  animationDuration={0}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -1176,9 +1192,10 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
                 <Legend />
                 <Bar
                   dataKey="alertCount"
-                  fill="#f59e0b"
-                  radius={[4, 4, 0, 0]}
-                  animationDuration={reducedMotion ? 0 : 1000}
+                  fill="#6b6b6b"
+                  radius={[0, 0, 0, 0]}
+                  isAnimationActive={false}
+                  animationDuration={0}
                 />
               </BarChart>
             </ResponsiveContainer>
@@ -1209,10 +1226,11 @@ export const TrendsTab: React.FC<TrendsTabProps> = ({
               <Radar
                 name="Bias Score"
                 dataKey="value"
-                stroke="#ef4444"
-                fill="#ef4444"
+                stroke="#a3a3a3"
+                fill="#a3a3a3"
                 fillOpacity={0.6}
-                animationDuration={reducedMotion ? 0 : 1000}
+                isAnimationActive={false}
+                animationDuration={0}
               />
               <Legend />
             </RadarChart>
@@ -1255,7 +1273,7 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                   cx="50%"
                   cy="50%"
                   outerRadius={80}
-                  fill="#8884d8"
+                  fill="#8a8a8a"
                   dataKey="value"
                   label={({
                     name,
@@ -1264,8 +1282,8 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                     name: string
                     percent?: number
                   }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                  animationDuration={1000}
-                  animationBegin={0}
+                  isAnimationActive={false}
+                  animationDuration={0}
                 >
                   {Object.entries(demographics?.age ?? {}).map(
                     ([age, count], index) => (
@@ -1293,7 +1311,7 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                   }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="bg-white rounded border p-2 shadow">
+                        <div className="bg-popover text-popover-foreground border-border border p-2">
                           <p className="font-semibold">{payload[0]?.name}</p>
                           <p>Count: {payload[0]?.value}</p>
                           <p>
@@ -1342,8 +1360,8 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                     name: string
                     percent?: number
                   }) => `${name} ${percent ? (percent * 100).toFixed(0) : 0}%`}
-                  animationDuration={1000}
-                  animationBegin={0}
+                  isAnimationActive={false}
+                  animationDuration={0}
                 >
                   {Object.entries(demographics?.gender ?? {}).map(
                     ([gender, count], index) => (
@@ -1371,7 +1389,7 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                   }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="bg-white rounded border p-2 shadow">
+                        <div className="bg-popover text-popover-foreground border-border border p-2">
                           <p className="font-semibold">{payload[0]?.name}</p>
                           <p>Count: {payload[0]?.value}</p>
                           <p>
@@ -1417,10 +1435,10 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
               <Legend />
               <Bar
                 dataKey="count"
-                fill="#8884d8"
-                radius={[0, 4, 4, 0]}
-                animationDuration={1000}
-                animationBegin={0}
+                fill="#8a8a8a"
+                radius={[0, 0, 0, 0]}
+                isAnimationActive={false}
+                animationDuration={0}
               />
             </BarChart>
           </ResponsiveContainer>

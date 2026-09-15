@@ -540,7 +540,14 @@ export default defineConfig({
       // can produce a stale/missing chunk (e.g. settings-XXXXXXXX.js) after a
       // lockfile update, causing "Failed to fetch dynamically imported module"
       // errors on pages that load TherapyGate → memory-schema → zod.
-      include: ['zod'],
+      //
+      // Pre-bundle recharts too: its state/hooks imports the CJS
+      // `use-sync-external-store/shim/with-selector` shim. Serving recharts raw
+      // (via optimizeDeps.exclude) breaks Vite's CJS→ESM named-export interop,
+      // and ResponsiveContainer throws "does not provide an export named
+      // 'useSyncExternalStoreWithSelector'" which unmounts the dashboard island.
+      // Bundling recharts + the shim together fixes the interop.
+      include: ['zod', 'recharts'],
       exclude: [
         // ── Server-only source directories ─────────────────────────────────
         'apps/web/src/lib/security',
@@ -607,7 +614,6 @@ export default defineConfig({
         'axios',
         'bcryptjs',
         'jsonwebtoken',
-        'recharts',
         'lucide-react',
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',

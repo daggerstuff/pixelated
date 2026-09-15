@@ -6,6 +6,11 @@
 :root {
   color-scheme: dark;
 
+  /* UnoCSS tailwind-reset default border color → NP hairline. Without this,
+     a bare `border` class falls back to light-gray #e5e7eb and reads wrong on
+     the dark NP canvas. */
+  --un-default-border-color: var(--np-line);
+
   /* =============================================
      ZERO-CHROMA GRAYSCALE PALETTE (Dark — Primary)
      All colors at oklch C = 0 (zero chroma)
@@ -148,6 +153,8 @@
    ============================================= */
 :root[data-theme='light'] {
   color-scheme: light;
+
+  --un-default-border-color: var(--np-line);
 
   --np-bg: oklch(0.98 0 0); /* #fafafa */
   --np-surface: oklch(0.95 0 0); /* #f2f2f2 */
