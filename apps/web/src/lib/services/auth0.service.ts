@@ -985,7 +985,17 @@ export class Auth0UserService {
     try {
       const mgmtRes = await auth0Management.users.get(managementId)
       const enriched = this.parseAuth0UserRecord(mgmtRes)
-      return { ...enriched, user_id: enriched.user_id ?? enriched.sub }
+      const enrichedId = enriched.user_id ?? enriched.sub
+      if (!enrichedId) {
+        // An unusable Management response must not wipe the /userinfo record;
+        // fall back to the original so callers keep the token-derived data.
+        authLogger.warn(
+          'Management metadata enrichment returned no user id; keeping userinfo record',
+          { managementId },
+        )
+        return userResponse
+      }
+      return { ...enriched, user_id: enrichedId }
     } catch (enrichError) {
       authLogger.warn('Failed to enrich user with role metadata', enrichError)
       return userResponse
