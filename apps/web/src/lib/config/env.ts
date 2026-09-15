@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { getFeatureFlags } from './feature-flags'
+
 /**
  * Centralized environment configuration with Zod validation.
  *
@@ -41,7 +43,11 @@ const envSchema = z.object({
 
   // External API
   RISK_STRATIFICATION_API_URL: z.string().url().optional(),
-  RISK_STRATIFICATION_TIMEOUT_MS: z.coerce.number().int().positive().default(30000),
+  RISK_STRATIFICATION_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(30000),
 
   // LLM
   LLM_PROVIDER: z.string().optional(),
@@ -67,7 +73,8 @@ const envSchema = z.object({
   // W&B
   WANDB_API_KEY: z.string().optional(),
 
-  // Feature Flags
+  // Feature Flags (declared and evaluated in ./feature-flags.ts; the schema
+  // entries only tolerate the env vars, evaluation routes through the registry)
   FEATURE_AI_INSIGHTS: z.string().default('false'),
   FEATURE_APPROVAL_WORKFLOWS: z.string().default('false'),
   FEATURE_COLLABORATION: z.string().default('false'),
@@ -107,11 +114,18 @@ function parseEnv(): EnvConfig {
   }
   if (isTest) {
     // In tests, log warnings but return defaults for any missing vars
-    console.warn('[env] Config validation warnings (test mode):', result.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; '))
+    console.warn(
+      '[env] Config validation warnings (test mode):',
+      result.error.issues
+        .map((i) => `${i.path.join('.')}: ${i.message}`)
+        .join('; '),
+    )
     return envSchema.parse({}) // all defaults
   }
   // In production/dev, fail fast on invalid config
-  const issues = result.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`).join('\n')
+  const issues = result.error.issues
+    .map((i) => `  - ${i.path.join('.')}: ${i.message}`)
+    .join('\n')
   throw new Error(`[env] Invalid environment configuration:\n${issues}`)
 }
 
@@ -175,13 +189,8 @@ export const config = {
   // W&B
   wandbApiKey: parsed.WANDB_API_KEY,
 
-  // Feature Flags (parsed as strings, consume with check)
-  features: {
-    aiInsights: parsed.FEATURE_AI_INSIGHTS === 'true',
-    approvalWorkflows: parsed.FEATURE_APPROVAL_WORKFLOWS === 'true',
-    collaboration: parsed.FEATURE_COLLABORATION === 'true',
-    versioning: parsed.FEATURE_VERSIONING === 'true',
-  },
+  // Feature Flags — evaluated by the registry (./feature-flags.ts)
+  features: getFeatureFlags(),
 
   // Rate Limiting
   rateLimitMaxRequests: parsed.RATE_LIMIT_MAX_REQUESTS,

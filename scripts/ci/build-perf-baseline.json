@@ -1,0 +1,7 @@
+{
+  "$schema": "Build-time ratchet for scripts/ci/build-perf-tracker.mjs",
+  "description": "Wall-clock duration of `pnpm build`. The gate fails when a build takes more than 1.25× the pinned value (or the absolute floor, whichever is larger). Re-pin after a deliberate build-time change with `pnpm build:perf -- --update`.",
+  "generatedAt": "2026-09-15T04:32:31.326Z",
+  "command": "pnpm build",
+  "buildMs": 212026
+}

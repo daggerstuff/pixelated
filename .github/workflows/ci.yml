@@ -26,6 +26,12 @@ on:
     branches: [staging]
   workflow_dispatch:
 
+# Cancel superseded runs so feedback on the newest commit is not queued
+# behind stale ones.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-test:
     runs-on: ubuntu-latest
