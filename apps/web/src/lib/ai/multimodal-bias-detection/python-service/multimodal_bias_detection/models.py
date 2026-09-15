@@ -7,7 +7,7 @@ from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class MediaType(StrEnum):
@@ -79,27 +79,25 @@ class ImageAnalysisRequest(BaseModel):
     user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
-    @validator("sensitivity")
-    def validate_sensitivity(self, v: str) -> str:
+    @field_validator("sensitivity")
+    @classmethod
+    def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
 
-    @validator("analysis_type")
-    def validate_analysis_type(self, v: str) -> str:
+    @field_validator("analysis_type")
+    @classmethod
+    def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis type"""
         valid_types = {"faces", "objects", "text", "comprehensive"}
         if v.lower() not in valid_types:
             raise ValueError(f"Analysis type must be one of: {valid_types}")
         return v.lower()
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
-        validate_assignment = True
+    model_config = ConfigDict(use_enum_values=True, validate_assignment=True)
 
 
 class AudioAnalysisRequest(BaseModel):
@@ -119,33 +117,33 @@ class AudioAnalysisRequest(BaseModel):
     user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
-    @validator("sensitivity")
-    def validate_sensitivity(self, v: str) -> str:
+    @field_validator("sensitivity")
+    @classmethod
+    def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
 
-    @validator("analysis_type")
-    def validate_analysis_type(self, v: str) -> str:
+    @field_validator("analysis_type")
+    @classmethod
+    def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis type"""
         valid_types = {"speech", "music", "comprehensive"}
         if v.lower() not in valid_types:
             raise ValueError(f"Analysis type must be one of: {valid_types}")
         return v.lower()
 
-    @validator("language")
-    def validate_language(self, v: str) -> str:
+    @field_validator("language")
+    @classmethod
+    def validate_language(cls, v: str) -> str:
         """Validate language code"""
         if len(v) != 2 and v != "auto":
             raise ValueError("Language must be a 2-letter ISO 639-1 code or 'auto'")
         return v.lower()
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class VideoAnalysisRequest(BaseModel):
@@ -167,33 +165,33 @@ class VideoAnalysisRequest(BaseModel):
     user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
-    @validator("sensitivity")
-    def validate_sensitivity(self, v: str) -> str:
+    @field_validator("sensitivity")
+    @classmethod
+    def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
 
-    @validator("analysis_type")
-    def validate_analysis_type(self, v: str) -> str:
+    @field_validator("analysis_type")
+    @classmethod
+    def validate_analysis_type(cls, v: str) -> str:
         """Validate analysis type"""
         valid_types = {"visual", "audio", "text", "comprehensive"}
         if v.lower() not in valid_types:
             raise ValueError(f"Analysis type must be one of: {valid_types}")
         return v.lower()
 
-    @validator("frame_extraction_rate")
-    def validate_frame_rate(self, v: int) -> int:
+    @field_validator("frame_extraction_rate")
+    @classmethod
+    def validate_frame_rate(cls, v: int) -> int:
         """Validate frame extraction rate"""
         if v < 1 or v > 10:
             raise ValueError("Frame extraction rate must be between 1 and 10")
         return v
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class MultimodalAnalysisRequest(BaseModel):
@@ -218,33 +216,33 @@ class MultimodalAnalysisRequest(BaseModel):
     user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
-    @validator("sensitivity")
-    def validate_sensitivity(self, v: str) -> str:
+    @field_validator("sensitivity")
+    @classmethod
+    def validate_sensitivity(cls, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
             raise ValueError(f"Sensitivity must be one of: {valid_levels}")
         return v.lower()
 
-    @validator("analysis_priority")
-    def validate_priority(self, v: str) -> str:
+    @field_validator("analysis_priority")
+    @classmethod
+    def validate_priority(cls, v: str) -> str:
         """Validate analysis priority"""
         valid_priorities = {"text", "visual", "audio", "balanced"}
         if v.lower() not in valid_priorities:
             raise ValueError(f"Analysis priority must be one of: {valid_priorities}")
         return v.lower()
 
-    @validator("text_content")
-    def validate_text_content(self, v: str | None) -> str | None:
+    @field_validator("text_content")
+    @classmethod
+    def validate_text_content(cls, v: str | None) -> str | None:
         """Validate text content if provided"""
         if v and len(v.strip()) == 0:
             raise ValueError("Text content cannot be empty or whitespace only")
         return v.strip() if v else v
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class DetectedObject(BaseModel):
@@ -401,14 +399,7 @@ class MultimodalAnalysisResponse(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     completed_at: datetime | None = Field(default=None)
 
-    class Config:
-        """Pydantic configuration"""
-
-        use_enum_values = True
-        json_encoders = {
-            datetime: lambda v: v.isoformat(),
-            UUID: str,
-        }
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class HealthResponse(BaseModel):
