@@ -3,6 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+from starlette.websockets import WebSocketDisconnect
 
 from src.pe.core.security import create_access_token
 from src.pe.main import app
@@ -149,13 +150,19 @@ class TestWebSocketEndpoint:
 
     @pytest.mark.asyncio
     async def test_ws_no_token_rejected(self) -> None:
-        """WebSocket without token should be rejected."""
+        """WebSocket without token should be rejected during the handshake.
+
+        The endpoint closes the socket before accepting it, which starlette
+        surfaces as a WebSocketDisconnect from websocket_connect itself.
+        """
         client = TestClient(app)
-        with client.websocket_connect(
-            "/api/v1/simulations/ws/test-session",
+        with (
+            pytest.raises(WebSocketDisconnect),
+            client.websocket_connect(
+                "/api/v1/simulations/ws/test-session",
+            ),
         ):
-            # Should get a close frame
-            pass  # We expect the connection to be closed
+            pass  # Unreachable: the server rejects before accepting.
 
     @pytest.mark.asyncio
     async def test_ws_with_valid_token(self) -> None:

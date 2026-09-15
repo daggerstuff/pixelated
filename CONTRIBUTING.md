@@ -211,6 +211,18 @@ uv run ruff check .     # lint Python code
 uv run ruff format .    # format Python code
 ```
 
+The FastAPI `pe` service's tests import as `src.pe.*`, so run them from
+`apps/web` with the local packages on the path:
+
+```bash
+cd apps/web
+PYTHONPATH=.:.. uv run pytest src/pe/tests/ -q
+```
+
+The integration tests additionally need the local Docker databases
+(`make docker-up`, credentials from `docker-compose.yml`); without them the
+DB-backed tests fail on connection errors rather than being skipped.
+
 ## AI Assistant Instructions
 
 This repo includes `AGENTS.md` with detailed instructions for AI coding

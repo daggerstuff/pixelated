@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import AsyncGenerator
 
 import pytest
+import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,7 +20,7 @@ def anyio_backend() -> str:
     return "asyncio"
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def client() -> AsyncGenerator[AsyncClient]:
     """Provide an async HTTP client for testing."""
     transport = ASGITransport(app=app)
@@ -27,7 +28,7 @@ async def client() -> AsyncGenerator[AsyncClient]:
         yield ac
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db_session() -> AsyncGenerator[AsyncSession]:
     """Provide a database session for testing (no RLS)."""
     async with async_session_factory() as session:
