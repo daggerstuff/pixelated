@@ -145,6 +145,23 @@ the same hermetic slice as `pnpm test:perf`, so the numbers are comparable:
 build-time regressions fail CI instead of silently stretching every run.
 `pnpm build:perf -- --update` re-pins after a deliberate build-time change.
 
+## Security
+
+- **Never** commit credentials, API keys, or patient data
+- **Never** use `@ts-ignore`, `# noqa`, or `# type: ignore` to suppress issues
+- Report vulnerabilities to
+  [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
+
+All code changes run through the [Security workflow](.github/workflows/security.yml)
+(Trivy image scanning, secret/misconfig scanners), and log payloads are
+scrubbed automatically: the canonical logger redacts sensitive keys
+(passwords, tokens, secrets, session IDs, PHI fields) and masks emails and
+bearer credentials before anything reaches the console — see
+[`apps/web/src/lib/logging/scrub.ts`](apps/web/src/lib/logging/scrub.ts). New
+dependencies are additionally protected by a one-day
+`minimumReleaseAge` in `pnpm-workspace.yaml` (malicious releases are usually
+yanked within hours; day-one exceptions go in `minimumReleaseAgeExclude`).
+
 ### Feature flags
 
 Flags are declared once in the registry
@@ -191,13 +208,6 @@ uv run pytest           # run Python tests
 uv run ruff check .     # lint Python code
 uv run ruff format .    # format Python code
 ```
-
-## Security
-
-- **Never** commit credentials, API keys, or patient data
-- **Never** use `@ts-ignore`, `# noqa`, or `# type: ignore` to suppress issues
-- Report vulnerabilities to
-  [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
 
 ## AI Assistant Instructions
 
