@@ -48,7 +48,6 @@ function registryFlagNames() {
     const match = line.match(/^\s{2}([a-zA-Z][a-zA-Z0-9]*):\s*{/)
     if (match) names.push(match[1])
   }
-  if (names.length === 0) throw new Error('No flag entries found in FEATURE_FLAG_REGISTRY')
   return names
 }
 
@@ -84,6 +83,10 @@ function main() {
   console.log('\n══════════════════════════════════════════════')
   console.log('  Dead-feature-flag audit')
   console.log('══════════════════════════════════════════════\n')
+  if (names.length === 0) {
+    console.log('  Registry is empty — nothing to audit. New flags must land')
+    console.log('  together with the production code that reads them.')
+  }
   for (const name of names) {
     const refs = current[name].references
     console.log(`  ${name.padEnd(22)} ${refs === 0 ? 'staged (no references)' : `live (${refs} reference${refs === 1 ? '' : 's'})`}`)

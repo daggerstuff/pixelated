@@ -2,6 +2,18 @@ name: Deploy to AWS EKS
 
 on:
   workflow_dispatch:
+  # Auto-deploy: a successful CI run on staging deploys to EKS, so shipping
+  # is the default instead of a manual step. CI must pass first; the deploy
+  # itself gates on rollout status + smoke test and rolls back on failure.
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [staging]
+
+# Deploys must not overlap: a newer run waits for the current one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
 
 permissions:
   id-token: write
@@ -16,6 +28,11 @@ env:
 
 jobs:
   build-and-push:
+    # Auto-deploys only follow a successful CI run; manual dispatch is always allowed.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'staging')
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.vars.outputs.image_tag }}

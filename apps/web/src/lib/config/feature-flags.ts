@@ -2,16 +2,19 @@
  * Feature-flag registry — the single source of truth for runtime feature flags.
  *
  * Every flag is declared here with the environment variable that overrides it
- * and a safe default (off). Evaluation is a pure function of
- * `process.env`, so flags resolve identically on the server, in scripts, and
- * under test (set the env var in the test or mock it).
+ * and a safe default (off). Evaluation is a pure function of the environment,
+ * so flags resolve identically on the server, in scripts, and under test.
+ *
+ * The registry is intentionally empty: a flag that no production code reads is
+ * dead config, and `scripts/ci/flag-audit.mjs` fails on flags born dead. The
+ * first real flag lands here together with the code it gates.
  *
  * Adding a flag:
  *   1. Add an entry to `FEATURE_FLAG_REGISTRY` below with a default of `false`.
- *   2. Read it with `isFeatureEnabled('myFlag')` — never read the env var
- *      directly at the call site.
- *   3. Do not remove flags that shipped enabled; retire them via
- *      `scripts/ci/flag-audit.mjs` when no code reads them anymore.
+ *   2. Land the consumer in the same change, read via
+ *      `isFeatureEnabled('myFlag')` — never read the env var directly at the
+ *      call site.
+ *   3. `pnpm lint:flags` fails if the flag has no references.
  */
 
 export interface FeatureFlagDefinition {
@@ -24,32 +27,15 @@ export interface FeatureFlagDefinition {
 }
 
 export const FEATURE_FLAG_REGISTRY = {
-  aiInsights: {
-    envVar: 'FEATURE_AI_INSIGHTS',
-    default: false,
-    description: 'AI-generated insight summaries in monitoring dashboards.',
-  },
-  approvalWorkflows: {
-    envVar: 'FEATURE_APPROVAL_WORKFLOWS',
-    default: false,
-    description: 'Multi-step approval workflows for high-risk actions.',
-  },
-  collaboration: {
-    envVar: 'FEATURE_COLLABORATION',
-    default: false,
-    description: 'Real-time collaborative editing of shared documents.',
-  },
-  versioning: {
-    envVar: 'FEATURE_VERSIONING',
-    default: false,
-    description: 'Document version history and restore.',
-  },
+  // Entries are added together with the production code that reads them; the
+  // dead-flag audit (scripts/ci/flag-audit.mjs) rejects entries with zero
+  // references.
 } as const satisfies Record<string, FeatureFlagDefinition>
 
 export type FeatureFlagName = keyof typeof FEATURE_FLAG_REGISTRY
 
 /** Explicit `"true"`/`"false"` strings; anything else falls back to the default. */
-function parseOverride(raw: string | undefined): boolean | undefined {
+export function parseOverride(raw: string | undefined): boolean | undefined {
   if (raw === undefined) return undefined
   const normalized = raw.trim().toLowerCase()
   if (normalized === 'true') return true
@@ -57,14 +43,21 @@ function parseOverride(raw: string | undefined): boolean | undefined {
   return undefined
 }
 
-/** Resolve a single flag from `process.env`. Pure; export for testing. */
+/** Pure evaluation of a single definition against an environment. */
+export function evaluateFlag(
+  definition: FeatureFlagDefinition,
+  env: Record<string, string | undefined>,
+): boolean {
+  const override = parseOverride(env[definition.envVar])
+  return override ?? definition.default
+}
+
+/** Resolve a declared flag from `process.env`. Pure; export for testing. */
 export function resolveFeatureFlag(
   name: FeatureFlagName,
   env: Record<string, string | undefined> = process.env,
 ): boolean {
-  const definition = FEATURE_FLAG_REGISTRY[name]
-  const override = parseOverride(env[definition.envVar])
-  return override ?? definition.default
+  return evaluateFlag(FEATURE_FLAG_REGISTRY[name], env)
 }
 
 /** All flags at once, e.g. for config bootstrap or diagnostics endpoints. */
