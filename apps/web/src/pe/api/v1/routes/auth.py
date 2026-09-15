@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import secrets
+from typing import Any
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -161,7 +162,7 @@ def _decrypt_email(ciphertext: bytes, _key: str | None = None) -> str:
 async def login(
     request: LoginRequest,
     session: AsyncSession = Depends(get_db_session),
-):
+) -> LoginResponse:
     """Authenticate user and return JWT tokens.
 
     Looks up user by email_hash, verifies password with bcrypt,
@@ -230,7 +231,7 @@ async def login(
 async def refresh_token(
     request: RefreshRequest,
     session: AsyncSession = Depends(get_db_session),
-):
+) -> RefreshResponse:
     """Refresh an access token using a valid refresh token.
 
     Implements token rotation: old refresh token is invalidated,
@@ -298,8 +299,8 @@ async def refresh_token(
 async def create_user(
     request: UserCreateRequest,
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.INSTITUTION_ADMIN)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.INSTITUTION_ADMIN)),
+) -> UserResponse:
     """Create a new user within the current tenant.
 
     Institution admins can create users in their own tenant.
@@ -355,8 +356,8 @@ async def create_user(
 @router.get("/users", response_model=list[UserResponse])
 async def list_users(
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.MANAGER)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.MANAGER)),
+) -> list[UserResponse]:
     """List all users in the current tenant."""
     tenant_id = current_user["tenant_id"]
 
@@ -387,8 +388,8 @@ async def list_users(
 @router.get("/users/me", response_model=UserResponse)
 async def get_current_user_profile(
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(get_current_user),
-):
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> UserResponse:
     """Get the current user's profile."""
     user_id = current_user["user_id"]
 
@@ -420,8 +421,8 @@ async def get_current_user_profile(
 async def create_institution(
     request: InstitutionCreateRequest,
     session: AsyncSession = Depends(get_db_session),
-    _current_user: dict = Depends(require_role(UserRole.SUPER_ADMIN)),
-):
+    _current_user: dict[str, Any] = Depends(require_role(UserRole.SUPER_ADMIN)),
+) -> InstitutionResponse:
     """Create a new institution/tenant. Super admin only."""
     result = await session.execute(
         text("""
@@ -455,8 +456,8 @@ async def create_institution(
 @router.get("/institutions", response_model=list[InstitutionResponse])
 async def list_institutions(
     session: AsyncSession = Depends(get_db_session),
-    _current_user: dict = Depends(require_role(UserRole.SUPER_ADMIN)),
-):
+    _current_user: dict[str, Any] = Depends(require_role(UserRole.SUPER_ADMIN)),
+) -> list[InstitutionResponse]:
     """List all institutions. Super admin only."""
     result = await session.execute(
         text("""
@@ -488,8 +489,8 @@ async def list_institutions(
 async def create_api_key(
     request: ApiKeyCreateRequest,
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.MANAGER)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.MANAGER)),
+) -> ApiKeyResponse:
     """Create an API key for programmatic access."""
     tenant_id = current_user["tenant_id"]
     user_id = current_user["user_id"]
@@ -530,8 +531,8 @@ async def create_api_key(
 @router.get("/api-keys", response_model=list[ApiKeyResponse])
 async def list_api_keys(
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.MANAGER)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.MANAGER)),
+) -> list[ApiKeyResponse]:
     """List API keys for the current tenant."""
     tenant_id = current_user["tenant_id"]
 
@@ -562,8 +563,8 @@ async def list_api_keys(
 async def revoke_api_key(
     key_id: str,
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.INSTITUTION_ADMIN)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.INSTITUTION_ADMIN)),
+) -> None:
     """Revoke an API key (soft delete)."""
     result = await session.execute(
         text("UPDATE pe.api_keys SET is_active = FALSE WHERE id = :id AND institution_id = :tenant"),

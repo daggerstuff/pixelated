@@ -175,6 +175,20 @@ ignore_missing_imports = true
 mypy_path = "stubs"
 files = ["src", "tests", "ai"]
 show_error_codes = true
+# ── Strict typing ─────────────────────────────────────────────────────
+# Global strict mode. The `pe` FastAPI service is enforced strict-clean in CI
+# (scripts/ci/python-typecheck.sh). Legacy trees that are not yet strict-clean
+# are exempted below so strict mode can be adopted incrementally without
+# weakening it project-wide; narrow these exemptions as the trees are repaired.
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["ai.*", "scripts.*", "foresight.*", "foresight_mcp.*", "tools.*", "tests.*"]
+# Legacy exemptions — these trees predate strict mode and carry untyped code.
+# New modules in these trees should still be written strict-clean; this override
+# exists only so the enforced `pe` scope can run alongside them.
+ignore_errors = true
+
 [tool.pyright]
 include = ["src", "tests", "ai"]
 exclude = [
@@ -275,7 +289,7 @@ known_first_party = ["ai", "src"]
 combine_as_imports = true
 force_single_line = false
 [tool.pytest.ini_options]
-addopts = "-ra --strict-markers"
+addopts = "-ra --strict-markers --durations=25"
 testpaths = ["tests", "ai/core/tests"]
 norecursedirs = ["ai/core/pipelines/tests", "ai/lab/tests", "ai/infra"]
 asyncio_default_fixture_loop_scope = "function"

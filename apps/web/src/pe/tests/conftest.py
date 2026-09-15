@@ -43,9 +43,11 @@ def make_test_token(
     role: str = "learner",
 ) -> str:
     """Create a test JWT token for integration tests."""
-    return create_access_token(
-        user_id=user_id,
-        tenant_id=tenant_id,
-        role=role,
-        email_hash="abc123def456",
+    return str(
+        create_access_token(
+            user_id=user_id,
+            tenant_id=tenant_id,
+            role=role,
+            email_hash="abc123def456",
+        )
     )

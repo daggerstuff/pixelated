@@ -123,7 +123,7 @@ app.include_router(api_v1_router)
 
 
 @app.get("/")
-async def root() -> dict:
+async def root() -> dict[str, Any]:
     """Root endpoint — API information."""
     return {
         "name": settings.APP_NAME,
@@ -133,6 +133,6 @@ async def root() -> dict:
 
 
 @app.get("/health")
-async def health() -> dict:
+async def health() -> dict[str, Any]:
     """Health check endpoint."""
     return {"status": "ok", "name": settings.APP_NAME}

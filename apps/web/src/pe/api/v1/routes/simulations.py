@@ -134,8 +134,8 @@ async def trigger_celery_chain(
 async def create_simulation(
     request: CreateSimulationRequest,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Create a new simulation session.
 
     Initializes the session with pending status, creates persona instances
@@ -230,9 +230,9 @@ async def create_simulation(
 @router.get("", response_model=list[SimulationResponse])
 async def list_simulations(
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_learner_required)],
+    current_user: Annotated[dict[str, Any], Depends(_learner_required)],
     status_filter: str | None = None,
-):
+) -> list[SimulationResponse]:
     """List simulation sessions for the current tenant.
 
     Learners see only their own sessions. Educators+ see all.
@@ -286,8 +286,8 @@ async def list_simulations(
 async def get_simulation(
     sim_id: str,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_learner_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_learner_required)],
+) -> SimulationResponse:
     """Get details of a specific simulation session."""
     result = await session.execute(
         text("""
@@ -320,8 +320,8 @@ async def get_simulation(
 async def start_simulation(
     sim_id: str,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Start a pending simulation session."""
     result = await session.execute(
         text("""
@@ -355,8 +355,8 @@ async def start_simulation(
 async def pause_simulation(
     sim_id: str,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Pause an active simulation."""
     result = await session.execute(
         text("""
@@ -390,8 +390,8 @@ async def pause_simulation(
 async def resume_simulation(
     sim_id: str,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_educator_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_educator_required)],
+) -> SimulationResponse:
     """Resume a paused simulation, accounting for elapsed pause time."""
     # Calculate and accumulate pause duration
     result = await session.execute(
@@ -429,8 +429,8 @@ async def resume_simulation(
 async def abort_simulation(
     sim_id: str,
     session: Annotated[AsyncSession, Depends(get_rls_session)],
-    current_user: Annotated[dict, Depends(_admin_required)],
-):
+    current_user: Annotated[dict[str, Any], Depends(_admin_required)],
+) -> SimulationResponse:
     """Abort a simulation (admin only — terminates any status except completed)."""
     result = await session.execute(
         text("""
@@ -468,7 +468,7 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
     ws: WebSocket,
     session_id: str,
     token: str | None = None,
-):
+) -> None:
     """WebSocket endpoint for live simulation interaction.
 
     Connection: wss://host/api/v1/simulations/ws/{session_id}?token={jwt}
@@ -547,9 +547,7 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
                 # Trigger Celery chain (async)
                 assert tenant_id is not None
                 assert user_id is not None
-                task_id = await trigger_celery_chain(  # type: ignore
-                    session_id, user_text, tenant_id, user_id
-                )
+                task_id = await trigger_celery_chain(session_id, user_text, tenant_id, user_id)
 
                 # If no Celery, echo back a stub response
                 if task_id is None:

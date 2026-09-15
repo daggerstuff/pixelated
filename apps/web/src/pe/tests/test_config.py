@@ -1,5 +1,7 @@
 """Tests for application configuration."""
 
+import pytest
+
 from src.pe.config import Settings, settings
 from src.pe.logging_config import setup_logging
 
@@ -16,7 +18,7 @@ class TestSettings:
         assert s.JWT_ACCESS_TOKEN_EXPIRE_MINUTES == 15
         assert s.API_V1_PREFIX == "/api/v1"
 
-    def test_env_override(self, monkeypatch) -> None:
+    def test_env_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Environment variables should override defaults."""
         monkeypatch.setenv("PE_DEBUG", "true")
         monkeypatch.setenv("PE_JWT_SECRET_KEY", "test-secret-key")

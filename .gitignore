@@ -480,3 +480,5 @@ Modern Multi-Agent Coding Architectures.pdf
 *.bak
 NF_PIPELINE_HANDOFF.md
 thread-5302e593-transcript.md
+.jscpd-report/
+.test-perf/

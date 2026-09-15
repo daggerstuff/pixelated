@@ -1,0 +1,18 @@
+{
+  "$schema": "Complexity baseline for .oxlintrc.complexity.json",
+  "description": "Per-rule oxlint complexity diagnostic counts. The audit fails when a rule regresses above this count; re-pin with `pnpm lint:complexity -- --update` only after intentional changes.",
+  "generatedAt": "2026-09-14T23:16:24.329Z",
+  "thresholds": {
+    "complexity": 20,
+    "max-depth": 4,
+    "max-lines-per-function": 120,
+    "max-lines": 800
+  },
+  "rules": {
+    "eslint(complexity)": 172,
+    "eslint(max-depth)": 113,
+    "eslint(max-lines-per-function)": 370,
+    "eslint(max-lines)": 53,
+    "unknown": 2
+  }
+}

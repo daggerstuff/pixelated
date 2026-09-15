@@ -140,10 +140,8 @@ export class Auth0SocialAuthService {
     this.domain = config.domain
     this.clientId = config.clientId
 
-    if (!this.domain || !this.clientId) {
-      if (shouldWarnAuth0Configuration) {
-        logger.warn('Auth0 is not properly configured')
-      }
+    if ((!this.domain || !this.clientId) && shouldWarnAuth0Configuration) {
+      logger.warn('Auth0 is not properly configured')
     }
     initializeAuth0Clients()
   }
@@ -209,14 +207,14 @@ export class Auth0SocialAuthService {
         code,
         redirect_uri: redirectUri,
       })
-      const data = response.data
+      const { data: tokenData } = response
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-        idToken: data.id_token,
-        expiresIn: data.expires_in,
-        tokenType: data.token_type,
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        idToken: tokenData.id_token,
+        expiresIn: tokenData.expires_in,
+        tokenType: tokenData.token_type,
       }
     } catch (error: unknown) {
       logger.error('Token exchange failed:', error)
@@ -269,14 +267,14 @@ export class Auth0SocialAuthService {
       const response = await auth0Authentication.oauth.refreshTokenGrant({
         refresh_token: refreshToken,
       })
-      const data = response.data
+      const { data: tokenData } = response
 
       return {
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-        idToken: data.id_token,
-        expiresIn: data.expires_in,
-        tokenType: data.token_type,
+        accessToken: tokenData.access_token,
+        refreshToken: tokenData.refresh_token,
+        idToken: tokenData.id_token,
+        expiresIn: tokenData.expires_in,
+        tokenType: tokenData.token_type,
       }
     } catch (error: unknown) {
       logger.error('Token refresh failed:', error)
@@ -456,7 +454,7 @@ export class Auth0SocialAuthService {
 
     try {
       const response = await auth0Management.users.get(userId)
-      const user = response.data
+      const user = response
       if (
         typeof user === 'object' &&
         'identities' in user &&

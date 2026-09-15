@@ -7,7 +7,7 @@ import warnings
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, ValidationInfo, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Known insecure default values that MUST be replaced in production
@@ -87,7 +87,7 @@ class Settings(BaseSettings):
 
     @field_validator("JWT_SECRET_KEY", "ENCRYPTION_KEY")
     @classmethod
-    def _check_insecure_defaults(cls, v: str, info) -> str:
+    def _check_insecure_defaults(cls, v: str, info: ValidationInfo) -> str:
         """Warn if security-sensitive fields use known insecure defaults."""
         if v.lower() in INSECURE_DEFAULTS:
             warnings.warn(

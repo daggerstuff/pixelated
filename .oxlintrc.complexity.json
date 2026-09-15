@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "ignorePatterns": [
+    "patches/**",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "**/*.d.ts",
+    "**/*.generated.*",
+    "**/generated/**",
+    "**/__mocks__/**",
+    "apps/web/public/**",
+    "ai/.venv/**"
+  ],
+  "env": { "browser": true, "node": true, "vitest": true },
+  "plugins": ["import", "typescript", "react", "vitest"],
+  "categories": { "correctness": "off", "suspicious": "off" },
+  "rules": {
+    "complexity": ["warn", { "max": 20 }],
+    "max-depth": ["warn", { "max": 4 }],
+    "max-lines-per-function": [
+      "warn",
+      { "max": 120, "skipBlankLines": true, "skipComments": true }
+    ],
+    "max-lines": [
+      "warn",
+      { "max": 800, "skipBlankLines": true, "skipComments": true }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "**/__tests__/**"],
+      "rules": {
+        "complexity": "off",
+        "max-depth": "off",
+        "max-lines": "off",
+        "max-lines-per-function": "off"
+      }
+    }
+  ]
+}

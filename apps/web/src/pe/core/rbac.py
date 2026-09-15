@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from enum import StrEnum
+from typing import Any
 
 from fastapi import HTTPException, status
 
@@ -37,7 +38,7 @@ _ROLE_LEVELS: dict[UserRole, int] = {
 }
 
 
-def role_at_least(minimum_role: UserRole) -> Callable:
+def role_at_least(minimum_role: UserRole) -> Callable[..., Any]:
     """Dependency factory: require a minimum role level.
 
     Usage:
@@ -46,7 +47,7 @@ def role_at_least(minimum_role: UserRole) -> Callable:
             ...
     """
 
-    async def _role_checker(current_user: dict) -> dict:
+    async def _role_checker(current_user: dict[str, Any]) -> dict[str, Any]:
         user_role = UserRole(current_user.get("role", "learner"))
         if user_role.level < minimum_role.level:
             raise HTTPException(
@@ -58,7 +59,7 @@ def role_at_least(minimum_role: UserRole) -> Callable:
     return _role_checker
 
 
-def require_role(*roles: UserRole) -> Callable:
+def require_role(*roles: UserRole) -> Callable[..., Any]:
     """Dependency factory: require one of the specified roles exactly.
 
     Usage:
@@ -70,7 +71,7 @@ def require_role(*roles: UserRole) -> Callable:
     """
     allowed_roles = set(roles)
 
-    async def _role_checker(current_user: dict) -> dict:
+    async def _role_checker(current_user: dict[str, Any]) -> dict[str, Any]:
         user_role = UserRole(current_user.get("role", "learner"))
         if user_role not in allowed_roles:
             raise HTTPException(
@@ -82,7 +83,7 @@ def require_role(*roles: UserRole) -> Callable:
     return _role_checker
 
 
-def same_tenant_or_super_admin(target_tenant_id: str) -> Callable:
+def same_tenant_or_super_admin(target_tenant_id: str) -> Callable[..., Any]:
     """Dependency factory: ensure user belongs to the target tenant (or is super_admin).
 
     Usage:
@@ -94,7 +95,7 @@ def same_tenant_or_super_admin(target_tenant_id: str) -> Callable:
             ...
     """
 
-    async def _tenant_checker(current_user: dict) -> dict:
+    async def _tenant_checker(current_user: dict[str, Any]) -> dict[str, Any]:
         user_role = current_user.get("role", "learner")
         user_tenant = current_user.get("tenant_id")
         if user_role != "super_admin" and user_tenant != target_tenant_id:
