@@ -17,7 +17,29 @@ on:
       - 'v*.*.*'
 
 jobs:
+  # Prove the tag is releasable before publishing anything about it.
+  build-verification:
+    name: Verify the tagged revision builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Production build
+        run: pnpm build
+
   release:
+    needs: build-verification
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

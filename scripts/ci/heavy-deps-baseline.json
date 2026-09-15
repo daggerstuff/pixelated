@@ -1,0 +1,6 @@
+{
+  "$schema": "Heavy-dependency ratchet for scripts/ci/heavy-deps-audit.mjs",
+  "description": "Total install footprint of node_modules/.pnpm, in KB. The gate fails when the total exceeds 1.25x this value. Re-pin after an intentional dependency change with `pnpm lint:heavy-deps -- --update`.",
+  "generatedAt": "2026-09-15T04:43:08.030Z",
+  "totalKb": 3753408
+}

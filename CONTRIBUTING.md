@@ -153,10 +153,30 @@ with an env override (`FEATURE_*`), a safe default (`false`), and a
 description. Read them with `isFeatureEnabled('flagName')` — never read the env
 var directly at the call site. Malformed env values never enable a flag.
 
+`pnpm lint:flags` fails on dead flags: a new registry entry with no references,
+or a flag that loses its last reference. Land registry entry and consumer in
+the same change.
+
+### Dependency health
+
+Four ratcheted audits (see the [Quality workflow](.github/workflows/quality.yml));
+each fails only on NEW problems, pinned in `scripts/ci/*-baseline.json`:
+
+| Command                | Enforces                                                             |
+| ---------------------- | -------------------------------------------------------------------- |
+| `pnpm lint:heavy-deps` | Total install weight stays within 1.25× of the pinned baseline     |
+| `pnpm lint:version-drift` | No package resolves to more distinct versions than pinned           |
+| `pnpm lint:flags`      | No feature flag is born dead or loses its last reference             |
+| `pnpm lint:unused-deps`| knip reports no NEW unused dependencies                              |
+
+`pnpm lint:deps` runs all four. Each supports `-- --update` to re-pin after an
+intentional change.
+
 ### Releases and deploys
 
-- **Release notes**: pushing a `vX.Y.Z` tag creates a GitHub Release with
-  auto-generated notes ([release workflow](.github/workflows/release-notes.yml)).
+- **Release notes**: pushing a `vX.Y.Z` tag verifies the tagged revision
+  builds, then creates a GitHub Release with auto-generated notes
+  ([release workflow](.github/workflows/release-notes.yml)).
 - **Deploys** ([deploy-aws.yml](.github/workflows/deploy-aws.yml)): rollout
   status gates, a smoke test through the cluster service, and — if the smoke
   test fails — an automatic `kubectl rollout undo` of the app and agent
