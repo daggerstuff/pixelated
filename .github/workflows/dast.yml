@@ -1,0 +1,88 @@
+name: DAST Scan
+
+permissions:
+  contents: read
+
+# Dynamic security testing: builds the site and runs the OWASP ZAP
+# baseline (passive) scan against the production build served locally.
+# The baseline scan reports findings without attacking the app, so it is
+# safe to run on every push.
+#
+# zap-baseline exit codes: 0 = clean, 1 = FAIL-level findings, 2 = only
+# WARN-level findings. This gate fails the workflow only on FAIL-level
+# findings; WARNs are uploaded as an artifact for review.
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'apps/web/src/**'
+      - 'infra/docker/**'
+      - 'config/**'
+      - 'package.json'
+      - '.github/workflows/dast.yml'
+  schedule:
+    # Weekly full pass (Tue 03:00 UTC)
+    - cron: '0 3 * * 2'
+  workflow_dispatch:
+
+concurrency:
+  group: dast-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  zap-baseline:
+    name: OWASP ZAP baseline scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'dast-v1'
+
+      - name: Build production bundle
+        run: pnpm build
+
+      - name: Serve production build in background
+        env:
+          PORT: '4321'
+        run: |
+          pnpm preview &
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:4321/ >/dev/null 2>&1 && break
+            sleep 2
+          done
+          curl -sf http://127.0.0.1:4321/ >/dev/null
+
+      - name: Run ZAP baseline scan
+        run: |
+          mkdir -p zap/report
+          cp zap-baseline.conf zap/
+          code=0
+          docker run --rm --network host \
+            -v "$PWD/zap:/zap/wrk:rw" \
+            ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t http://127.0.0.1:4321/ \
+              -c zap-baseline.conf \
+              -r report.html -x report.xml -J report.json || code=$?
+          # zap-baseline: 0 clean, 1 FAIL findings, 2 WARN only
+          echo "ZAP exit code: $code"
+          if [ "$code" -eq 1 ]; then
+            echo "::error::ZAP found FAIL-level security findings. See the zap/ artifact."
+            exit 1
+          fi
+          exit 0
+
+      - name: Upload ZAP report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zap-baseline-report
+          path: zap/
+          retention-days: 30
