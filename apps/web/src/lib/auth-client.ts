@@ -124,6 +124,24 @@ class AuthClient {
   }
 
   /**
+   * Fetch a fresh CSRF token from the minting endpoint.
+   */
+  private async fetchCsrfToken(): Promise<string> {
+    try {
+      const response = await fetch('/api/auth/csrf')
+      if (response.ok) {
+        const data = await response.json()
+        if (typeof data.csrfToken === 'string' && data.csrfToken) {
+          return data.csrfToken
+        }
+      }
+    } catch {
+      // Fall through to empty token
+    }
+    return ''
+  }
+
+  /**
    * Sign in with email and password
    */
   async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
@@ -131,9 +149,13 @@ class AuthClient {
     error: Error | null
   }> {
     try {
+      const csrfToken = await this.fetchCsrfToken()
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
@@ -169,9 +191,13 @@ class AuthClient {
     error: Error | null
   }> {
     try {
+      const csrfToken = await this.fetchCsrfToken()
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': csrfToken,
+        },
         body: JSON.stringify({ email, password, role }),
       })
 

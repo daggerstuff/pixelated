@@ -7,7 +7,7 @@ const session = (Astro.locals as any)?.session
 const user = (Astro.locals as any)?.user
 
 if (!session || !user || user.role !== 'admin') {
-  return Astro.redirect('/auth/sign-in')
+  return Astro.redirect(`/login?redirect=${encodeURIComponent('/admin/ai/high-risk-crises')}`)
 }
 ---
 

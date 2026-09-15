@@ -357,7 +357,7 @@ async function handleUnauthorized(context: {
   // Redirect to login if we're in the browser
   if (typeof window !== 'undefined') {
     const currentPath = window.location.pathname
-    window.location.href = `/auth/sign-in?redirect=${encodeURIComponent(currentPath)}`
+    window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`
   }
 }
 
