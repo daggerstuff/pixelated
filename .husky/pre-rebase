@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Version-controlled pre-rebase entry point (husky).
+#
+# Blocks history rewrites of protected branches via the shared template at
+# scripts/devops/hooks/templates/pre-rebase.tmpl. Rebase args ($1 upstream,
+# $2 branch) are forwarded verbatim.
+exec bash scripts/devops/hooks/templates/pre-rebase.tmpl "$@"

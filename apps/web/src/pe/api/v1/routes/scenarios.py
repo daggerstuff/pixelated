@@ -45,8 +45,8 @@ async def list_scenarios(
     difficulty: str | None = None,
     published_only: bool = True,
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.LEARNER)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.LEARNER)),
+) -> list[ScenarioResponse]:
     """List scenarios available to the current tenant.
 
     Learners see only published scenarios. Educators+ see all.
@@ -110,8 +110,8 @@ async def list_scenarios(
 async def get_scenario(
     scenario_id: str,
     session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.LEARNER)),
-):
+    current_user: dict[str, Any] = Depends(role_at_least(UserRole.LEARNER)),
+) -> ScenarioDetailResponse:
     """Get detailed information about a specific scenario."""
     result = await session.execute(
         text("""

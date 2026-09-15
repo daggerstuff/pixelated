@@ -184,12 +184,10 @@ function initializeAuth0Clients() {
       clientId: config.managementClientId,
       clientSecret: config.managementClientSecret,
     })
-  } else {
-    if (shouldWarnAuth0Configuration) {
-      authLogger.warn(
-        'Auth0 Management configuration is incomplete. User management features may not work.',
-      )
-    }
+  } else if (shouldWarnAuth0Configuration) {
+    authLogger.warn(
+      'Auth0 Management configuration is incomplete. User management features may not work.',
+    )
   }
 
   // Initialize Authentication Client if config is available
@@ -208,12 +206,10 @@ function initializeAuth0Clients() {
     auth0UserInfo ??= new UserInfoClient({
       domain: config.domain,
     }) as ExtendedUserInfoClient
-  } else {
-    if (shouldWarnAuth0Configuration) {
-      authLogger.warn(
-        'Auth0 Authentication configuration is incomplete. Login features will not work.',
-      )
-    }
+  } else if (shouldWarnAuth0Configuration) {
+    authLogger.warn(
+      'Auth0 Authentication configuration is incomplete. Login features will not work.',
+    )
   }
 
   return config
@@ -268,6 +264,8 @@ export class Auth0UserService {
           ...userResponse,
           user_id: userResponse.user_id ?? userResponse.sub,
         }
+
+        userResponse = await this.enrichWithManagementMetadata(userResponse)
       } catch (e) {
         authLogger.warn(
           'Failed to fetch user info, falling back to token decode if possible or error',
@@ -323,7 +321,7 @@ export class Auth0UserService {
           created_at: new Date().toISOString(),
         },
       })
-      const auth0User = this.parseAuth0UserRecord(createRes.data)
+      const auth0User = this.parseAuth0UserRecord(createRes)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -343,8 +341,8 @@ export class Auth0UserService {
     }
 
     try {
-      const getUserRes = await auth0Management.users.get({ id: userId })
-      const auth0User = this.parseAuth0UserRecord(getUserRes.data)
+      const getUserRes = await auth0Management.users.get(userId)
+      const auth0User = this.parseAuth0UserRecord(getUserRes)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -460,7 +458,7 @@ export class Auth0UserService {
       }
 
       const updateRes = await auth0Management.users.update(userId, updateParams)
-      const auth0User = this.parseAuth0UserRecord(updateRes.data)
+      const auth0User = this.parseAuth0UserRecord(updateRes)
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
@@ -961,6 +959,37 @@ export class Auth0UserService {
     return typeof value === 'number' && Number.isFinite(value)
       ? value
       : fallback
+  }
+
+  /**
+   * Enrich a user record with `app_metadata`/`user_metadata` from the Auth0
+   * Management API. The `/userinfo` endpoint omits metadata, so the role would
+   * otherwise always resolve to 'user'. Best-effort: on failure (or when the
+   * Management client is unavailable) the original record is returned, so the
+   * caller falls back to the token-derived role.
+   */
+  private async enrichWithManagementMetadata(
+    userResponse: Auth0UserRecord,
+  ): Promise<Auth0UserRecord> {
+    if (!auth0Management) {
+      return userResponse
+    }
+
+    const managementId = this.toStringOrUndefined(
+      userResponse.user_id ?? userResponse.sub,
+    )
+    if (!managementId) {
+      return userResponse
+    }
+
+    try {
+      const mgmtRes = await auth0Management.users.get(managementId)
+      const enriched = this.parseAuth0UserRecord(mgmtRes)
+      return { ...enriched, user_id: enriched.user_id ?? enriched.sub }
+    } catch (enrichError) {
+      authLogger.warn('Failed to enrich user with role metadata', enrichError)
+      return userResponse
+    }
   }
 }
 

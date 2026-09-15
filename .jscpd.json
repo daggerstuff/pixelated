@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kucherenko/jscpd/master/packages/jscpd/schema.json",
+  "description": "Duplicate-code (DRY) detection. Run via `pnpm lint:duplication`.",
+  "minLines": 20,
+  "minTokens": 100,
+  "mode": "strict",
+  "format": ["typescript", "tsx", "javascript", "jsx"],
+  "absolute": true,
+  "gitignore": true,
+  "reporters": ["console", "json"],
+  "output": ".jscpd-report",
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/.venv/**",
+    "**/.astro/**",
+    "**/.turbo/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.d.ts",
+    "**/*.generated.*",
+    "**/generated/**",
+    "**/.Jules/**",
+    "**/tmp/**"
+  ]
+}

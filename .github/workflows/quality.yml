@@ -1,0 +1,146 @@
+name: Quality
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'apps/web/src/**'
+      - 'agents/**'
+      - 'packages/**'
+      - 'scripts/ci/**'
+      - '.dependency-cruiser.cjs'
+      - '.jscpd.json'
+      - '.oxlintrc.complexity.json'
+      - '.eslintrc.naming.mjs'
+      - 'eslint.config.js'
+      - 'pyproject.toml'
+      - 'package.json'
+      - '.github/workflows/quality.yml'
+  pull_request:
+    branches: [staging]
+  workflow_dispatch:
+
+jobs:
+  # Static code-quality gates. Each audit compares the current state against a
+  # pinned baseline and fails only on regressions, so existing debt does not
+  # block work but cannot grow. Baselines live in scripts/ci/*-baseline.json.
+  code-quality:
+    name: Code quality audits
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Module boundaries (dependency-cruiser)
+        run: pnpm lint:boundaries
+
+      - name: Duplicate code (jscpd)
+        run: pnpm lint:duplication
+
+      - name: Cyclomatic complexity (oxlint)
+        run: pnpm lint:complexity
+
+      - name: Large files
+        run: pnpm lint:file-size
+
+      - name: Technical debt markers
+        run: pnpm lint:tech-debt
+
+      - name: Naming conventions
+        run: pnpm lint:naming
+
+  # Strict typing for the Python `pe` service. Scoped deliberately: the wider
+  # Python tree is not yet strict-clean (see pyproject.toml [tool.mypy]).
+  python-strict-types:
+    name: Python strict types (mypy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: mypy --strict (pe service)
+        run: bash scripts/ci/python-typecheck.sh
+
+  # N+1 query detection. The detector lives in production code
+  # (apps/web/src/lib/db/query-counting.ts) and is exercised here so a
+  # regression in the instrumentation or a new N+1 becomes a test failure.
+  n-plus-one:
+    name: N+1 query detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Run N+1 detection tests
+        run: pnpm test:nplusone
+
+  # Test performance. Runs a bounded hermetic slice of the Vitest suite with the
+  # JSON reporter and gates total/slowest per-test durations against a pinned
+  # baseline, so a slow test is visible and cannot regress unnoticed.
+  test-performance:
+    name: Test performance tracking
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Measure test durations and enforce budget
+        run: pnpm test:perf
+
+      - name: Publish report to step summary
+        if: always()
+        run: cat .test-perf/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test-performance report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-performance-report
+          path: .test-perf/
+          retention-days: 14

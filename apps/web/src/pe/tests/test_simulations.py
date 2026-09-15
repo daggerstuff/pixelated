@@ -9,15 +9,17 @@ from src.pe.main import app
 
 
 def _make_token(role: str = "educator") -> str:
-    return create_access_token(
-        user_id="00000000-0000-0000-0000-000000000001",
-        tenant_id="00000000-0000-0000-0000-000000000001",
-        role=role,
+    return str(
+        create_access_token(
+            user_id="00000000-0000-0000-0000-000000000001",
+            tenant_id="00000000-0000-0000-0000-000000000001",
+            role=role,
+        )
     )
 
 
 @pytest.fixture
-def auth_headers(role: str = "educator"):
+def auth_headers(role: str = "educator") -> dict[str, str]:
     token = _make_token(role)
     return {"Authorization": f"Bearer {token}"}
 
@@ -26,7 +28,7 @@ class TestSimulationEndpoints:
     """Integration tests for simulation CRUD."""
 
     @pytest.mark.asyncio
-    async def test_create_simulation_no_auth(self, client: AsyncClient):
+    async def test_create_simulation_no_auth(self, client: AsyncClient) -> None:
         """Creating a simulation without auth should 401."""
         response = await client.post(
             "/api/v1/simulations",
@@ -37,7 +39,7 @@ class TestSimulationEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_create_simulation_learner_forbidden(self, client: AsyncClient):
+    async def test_create_simulation_learner_forbidden(self, client: AsyncClient) -> None:
         """Learners should not be able to create simulations."""
         headers = {"Authorization": f"Bearer {_make_token('learner')}"}
         response = await client.post(
@@ -50,13 +52,13 @@ class TestSimulationEndpoints:
         assert response.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_list_simulations_no_auth(self, client: AsyncClient):
+    async def test_list_simulations_no_auth(self, client: AsyncClient) -> None:
         """Listing simulations without auth should 401."""
         response = await client.get("/api/v1/simulations")
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_get_simulation_not_found(self, client: AsyncClient):
+    async def test_get_simulation_not_found(self, client: AsyncClient) -> None:
         """Getting a non-existent simulation should 404."""
         headers = {"Authorization": f"Bearer {_make_token('educator')}"}
         response = await client.get(
@@ -66,7 +68,7 @@ class TestSimulationEndpoints:
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_start_simulation_not_found(self, client: AsyncClient):
+    async def test_start_simulation_not_found(self, client: AsyncClient) -> None:
         """Starting a non-existent simulation should 400."""
         headers = {"Authorization": f"Bearer {_make_token('educator')}"}
         response = await client.post(
@@ -76,7 +78,7 @@ class TestSimulationEndpoints:
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_start_simulation_invalid_status(self, client: AsyncClient):
+    async def test_start_simulation_invalid_status(self, client: AsyncClient) -> None:
         """Starting a simulation that doesn't exist should 400."""
         headers = {"Authorization": f"Bearer {_make_token('educator')}"}
         response = await client.post(
@@ -86,7 +88,7 @@ class TestSimulationEndpoints:
         assert response.status_code == 400
 
     @pytest.mark.asyncio
-    async def test_simulation_status_flow(self, client: AsyncClient):
+    async def test_simulation_status_flow(self, client: AsyncClient) -> None:
         """Test pause/resume/abort flow returns proper errors without DB."""
         headers = {"Authorization": f"Bearer {_make_token('educator')}"}
         sim_id = "00000000-0000-0000-0000-000000000099"
@@ -108,13 +110,13 @@ class TestScenarioEndpoints:
     """Integration tests for scenario CRUD."""
 
     @pytest.mark.asyncio
-    async def test_list_scenarios_no_auth(self, client: AsyncClient):
+    async def test_list_scenarios_no_auth(self, client: AsyncClient) -> None:
         """Listing scenarios without auth should 401."""
         response = await client.get("/api/v1/scenarios")
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_list_scenarios_authenticated(self, client: AsyncClient):
+    async def test_list_scenarios_authenticated(self, client: AsyncClient) -> None:
         """Listing scenarios with valid auth should not 401."""
         headers = {"Authorization": f"Bearer {_make_token('learner')}"}
         response = await client.get("/api/v1/scenarios", headers=headers)
@@ -122,7 +124,7 @@ class TestScenarioEndpoints:
         assert response.status_code != 401
 
     @pytest.mark.asyncio
-    async def test_get_scenario_not_found(self, client: AsyncClient):
+    async def test_get_scenario_not_found(self, client: AsyncClient) -> None:
         """Getting a non-existent scenario should 404."""
         headers = {"Authorization": f"Bearer {_make_token('learner')}"}
         response = await client.get(
@@ -132,7 +134,7 @@ class TestScenarioEndpoints:
         assert response.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_scenario_filter_by_focus(self, client: AsyncClient):
+    async def test_scenario_filter_by_focus(self, client: AsyncClient) -> None:
         """Filtering scenarios by clinical focus should work."""
         headers = {"Authorization": f"Bearer {_make_token('learner')}"}
         response = await client.get(
@@ -146,7 +148,7 @@ class TestWebSocketEndpoint:
     """Tests for the simulation WebSocket endpoint."""
 
     @pytest.mark.asyncio
-    async def test_ws_no_token_rejected(self):
+    async def test_ws_no_token_rejected(self) -> None:
         """WebSocket without token should be rejected."""
         client = TestClient(app)
         with client.websocket_connect(
@@ -156,7 +158,7 @@ class TestWebSocketEndpoint:
             pass  # We expect the connection to be closed
 
     @pytest.mark.asyncio
-    async def test_ws_with_valid_token(self):
+    async def test_ws_with_valid_token(self) -> None:
         """WebSocket with valid token should connect."""
         token = _make_token("learner")
         client = TestClient(app)

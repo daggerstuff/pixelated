@@ -61,11 +61,14 @@ Ambient hooks trigger `process_session_transcript` automatically on session comp
 | **Node / TS**  | Dev Server               | `pnpm dev` _(port 5173)_ or `pnpm dev:all-services`    |
 |                | Lint (type-aware)        | `pnpm lint` (oxlint)                                   |
 |                | Format                   | `pnpm format`                                          |
+|                | Code-quality audits      | `pnpm lint:quality` (see `CONTRIBUTING.md`)            |
 |                | Unit & Integration Tests | `pnpm vitest run -c config/vitest.config.ts`           |
+|                | Test performance         | `pnpm test:perf` (slowest tests + regression gate)     |
 |                | Production Build         | `pnpm build`                                           |
 | **Python**     | Run script / module      | `uv run python <script.py>` / `uv run python -m <pkg>` |
 |                | Pytest Test Suite        | `uv run pytest`                                        |
 |                | Lint & Format            | `uv run ruff check .` / `uv run ruff format .`         |
+|                | Strict types (mypy)      | `pnpm typecheck:python`                                |
 | **Foresight**  | System Health            | `foresight doctor` / `foresight security status`       |
 |                | Run Proof Benchmark      | `foresight prove`                                      |
 

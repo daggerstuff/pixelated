@@ -9,6 +9,7 @@ Implements the tenant isolation strategy from ADR-001:
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
+from typing import Any
 
 import structlog
 from sqlalchemy import text
@@ -46,7 +47,7 @@ async_session_factory = async_sessionmaker(
 
 
 @asynccontextmanager  # type: ignore
-async def check_connection() -> dict:
+async def check_connection() -> dict[str, Any]:
     """Verify database connectivity and return server info.
 
     Returns:

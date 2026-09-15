@@ -1,0 +1,11 @@
+{
+  "$schema": "Duplicated-code baseline for .jscpd.json",
+  "description": "Pinned jscpd duplication percentage. The audit fails when the current percentage exceeds this value plus a small tolerance. Lower is better; re-pin with `pnpm lint:duplication -- --update`.",
+  "generatedAt": "2026-09-14T23:14:27.120Z",
+  "minLines": 20,
+  "minTokens": 100,
+  "percentage": 2.12,
+  "duplicatedLines": 11535,
+  "totalLines": 544867,
+  "clones": 298
+}

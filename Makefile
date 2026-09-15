@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build
 
 .DEFAULT_GOAL := help
 
@@ -44,6 +44,12 @@ lint: ## Run linter (oxlint)
 
 python-lint: ## Lint Python code via ruff
 	uv run ruff check .
+
+python-typecheck: ## Strict type check the Python pe service (mypy)
+	bash scripts/ci/python-typecheck.sh
+
+quality: ## Run all code-quality audits (boundaries, duplication, complexity, file size, tech debt, naming)
+	pnpm lint:quality
 
 format: ## Format all code
 	pnpm format

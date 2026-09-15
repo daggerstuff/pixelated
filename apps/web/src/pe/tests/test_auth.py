@@ -10,7 +10,7 @@ class TestAuthEndpoints:
     """Integration tests for auth endpoints."""
 
     @pytest.mark.asyncio
-    async def test_health_check(self, client: AsyncClient):
+    async def test_health_check(self, client: AsyncClient) -> None:
         """Health endpoint should return 200."""
         response = await client.get("/api/v1/health")
         assert response.status_code == 200
@@ -18,13 +18,13 @@ class TestAuthEndpoints:
         assert data["status"] in ("healthy", "degraded")
 
     @pytest.mark.asyncio
-    async def test_login_missing_fields(self, client: AsyncClient):
+    async def test_login_missing_fields(self, client: AsyncClient) -> None:
         """Login without credentials should return 422."""
         response = await client.post("/api/v1/auth/login", json={})
         assert response.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_login_invalid_credentials(self, client: AsyncClient):
+    async def test_login_invalid_credentials(self, client: AsyncClient) -> None:
         """Login with bad credentials should return 401."""
         response = await client.post(
             "/api/v1/auth/login",
@@ -37,7 +37,7 @@ class TestAuthEndpoints:
         assert "Invalid email or password" in response.text
 
     @pytest.mark.asyncio
-    async def test_refresh_invalid_token(self, client: AsyncClient):
+    async def test_refresh_invalid_token(self, client: AsyncClient) -> None:
         """Refresh with invalid token should return 401."""
         response = await client.post(
             "/api/v1/auth/refresh",
@@ -48,19 +48,19 @@ class TestAuthEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_me_unauthenticated(self, client: AsyncClient):
+    async def test_me_unauthenticated(self, client: AsyncClient) -> None:
         """Accessing /me without auth should return 401."""
         response = await client.get("/api/v1/auth/users/me")
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_list_users_unauthenticated(self, client: AsyncClient):
+    async def test_list_users_unauthenticated(self, client: AsyncClient) -> None:
         """Listing users without auth should return 401."""
         response = await client.get("/api/v1/auth/users")
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_create_user_no_auth(self, client: AsyncClient):
+    async def test_create_user_no_auth(self, client: AsyncClient) -> None:
         """Creating a user without auth should return 401."""
         response = await client.post(
             "/api/v1/auth/users",
@@ -74,7 +74,7 @@ class TestAuthEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_create_institution_no_auth(self, client: AsyncClient):
+    async def test_create_institution_no_auth(self, client: AsyncClient) -> None:
         """Creating institution without auth should return 401."""
         response = await client.post(
             "/api/v1/auth/institutions",
@@ -87,7 +87,7 @@ class TestAuthEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_create_api_key_no_auth(self, client: AsyncClient):
+    async def test_create_api_key_no_auth(self, client: AsyncClient) -> None:
         """Creating API key without auth should return 401."""
         response = await client.post(
             "/api/v1/auth/api-keys",
@@ -99,7 +99,7 @@ class TestAuthEndpoints:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_auth_with_valid_token(self, client: AsyncClient):
+    async def test_auth_with_valid_token(self, client: AsyncClient) -> None:
         """Using a valid JWT should pass auth checks."""
         token = create_access_token(
             user_id="00000000-0000-0000-0000-000000000001",
@@ -117,14 +117,14 @@ class TestAuthEndpoints:
 class TestSecurityUnit:
     """Unit tests for security functions."""
 
-    def test_password_hashing(self):
+    def test_password_hashing(self) -> None:
         """Password hashing should work correctly."""
         pw = "TestPassword123!"
         hashed = hash_password(pw)
         assert verify_password(pw, hashed) is True
         assert verify_password("WrongPassword", hashed) is False
 
-    def test_jwt_token_creation(self):
+    def test_jwt_token_creation(self) -> None:
         """JWT token creation should produce valid tokens."""
         token = create_access_token(
             user_id="user-1",

@@ -8,6 +8,8 @@ Designed to integrate with the AI Persona Engineer's task chain:
 
 from __future__ import annotations
 
+from typing import Any
+
 from celery import Celery
 
 from src.pe.config import settings
@@ -42,7 +44,7 @@ celery_app.autodiscover_tasks(
 
 # ── Periodic / Scheduled Tasks ────────────────────────────────────
 # These run on a schedule via celery beat
-CELERY_BEAT_SCHEDULE: dict = {}
+CELERY_BEAT_SCHEDULE: dict[str, Any] = {}
 
 # Example: metering daily rollup
 # CELERY_BEAT_SCHEDULE["metering-daily-rollup"] = {
