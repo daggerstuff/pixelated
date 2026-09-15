@@ -71,6 +71,9 @@ jobs:
       - name: Naming conventions
         run: pnpm lint:naming
 
+      - name: Mock-path resolution (vi.mock specifiers must resolve)
+        run: pnpm lint:mock-paths
+
   # Strict typing for the Python `pe` service. Scoped deliberately: the wider
   # Python tree is not yet strict-clean (see pyproject.toml [tool.mypy]).
   python-strict-types:

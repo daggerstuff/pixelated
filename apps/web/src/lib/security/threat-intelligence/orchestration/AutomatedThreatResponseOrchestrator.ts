@@ -8,7 +8,7 @@ import { EventEmitter } from 'events'
 import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import {
   OrchestrationConfig,
   ResponseStrategy,

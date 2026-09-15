@@ -6,7 +6,7 @@ import type { MemoryObject } from '../types';
 
 // Mock the dependencies
 vi.mock('../../services/crisis-detection');
-vi.mock('../../logging/build-safe-logger', () => ({
+vi.mock('../../../logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => ({
     info: vi.fn(),
     error: vi.fn(),

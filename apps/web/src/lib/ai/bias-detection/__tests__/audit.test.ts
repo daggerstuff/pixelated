@@ -22,8 +22,8 @@ import type {
 } from "../types";
 
 // Mock logger
-vi.mock("../../utils/logger", () => ({
-  getLogger: () => ({
+vi.mock("../../../logging/build-safe-logger", () => ({
+  createBuildSafeLogger: () => ({
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),

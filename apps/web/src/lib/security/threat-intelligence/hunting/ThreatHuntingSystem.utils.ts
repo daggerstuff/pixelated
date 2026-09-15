@@ -4,8 +4,7 @@
 
 import { type Document } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import {
   type GlobalThreatIntelligence,
   type HuntExecution,
@@ -14,7 +13,6 @@ import {
   type HuntQuery,
   type HuntSchedule,
 } from '../global/types'
-
 import type {
   DocumentRecord,
   RawHuntFinding,
@@ -61,9 +59,7 @@ export const THREAT_TYPE_MAP: Record<string, string> = {
 
 // --- Type Guards & Parsers ---
 
-export function isRecord(
-  value: unknown,
-): value is Record<string, unknown> {
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
@@ -286,9 +282,7 @@ export function validateHuntPattern(pattern: HuntPattern): void {
   }
 
   if (pattern.confidence < 0 || pattern.confidence > 1) {
-    throw new Error(
-      'Invalid hunt pattern: confidence must be between 0 and 1',
-    )
+    throw new Error('Invalid hunt pattern: confidence must be between 0 and 1')
   }
 }
 

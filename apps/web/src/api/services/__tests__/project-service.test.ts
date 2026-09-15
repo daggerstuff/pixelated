@@ -4,10 +4,7 @@
 // Project Service Unit Tests
 // Tests for project-service.ts functions
 
-import {
-  getMongoConnection,
-  getPostgresPool,
-} from '../../../lib/db/connection'
+import { getMongoConnection, getPostgresPool } from '../../../lib/db/connection'
 import { NotFoundError, ForbiddenError } from '../../middleware/error-handler'
 import * as projectService from '../project-service'
 
@@ -22,7 +19,7 @@ vi.mock('uuid', () => ({
   v4: vi.fn(() => 'mocked-uuid-123'),
 }))
 
-vi.mock('../../utils/common', () => ({
+vi.mock('../../../utils/common', () => ({
   slug: vi.fn((str: string): string => str.toLowerCase().replace(/\s+/g, '-')),
 }))
 

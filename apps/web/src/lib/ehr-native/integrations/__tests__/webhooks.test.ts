@@ -17,7 +17,7 @@ vi.mock('@/lib/redis', () => ({
 }))
 
 // Mock the EHR audit service and events
-vi.mock('../audit/ehr-audit-service', () => {
+vi.mock('../../audit/ehr-audit-service', () => {
   const mockLog = vi.fn().mockResolvedValue('audit-id-123')
   return {
     EHRAuditService: {
@@ -26,7 +26,7 @@ vi.mock('../audit/ehr-audit-service', () => {
   }
 })
 
-vi.mock('../audit/events', () => ({
+vi.mock('../../audit/events', () => ({
   EHRAuditAction: {
     INTEGRATION_WEBHOOK_RECEIVED: 'integration_webhook_received',
   },
