@@ -6,7 +6,11 @@ API keys or URLs only surface when a provider is actually requested.
 
 from __future__ import annotations
 
-from ai.orchestration.core.inference import LLMProvider, MockLLMProvider, OpenAIProvider
+from ai.pipelines.model_training.core.inference import (
+    LLMProvider,
+    MockLLMProvider,
+    OpenAIProvider,
+)
 from src.pe.config import settings
 
 

@@ -83,7 +83,10 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     # ── Paths ────────────────────────────────────────────────────
-    PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent
+    # config.py lives at <root>/apps/web/src/pe/config.py; four levels up is
+    # the repository root (where pyproject.toml and .env live). The production
+    # image copies the full repo to /app, so the derivation holds there too.
+    PROJECT_ROOT: Path = Path(__file__).resolve().parents[4]
 
     @field_validator("JWT_SECRET_KEY", "ENCRYPTION_KEY")
     @classmethod
