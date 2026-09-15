@@ -147,6 +147,19 @@ the same hermetic slice as `pnpm test:perf`, so the numbers are comparable:
 build-time regressions fail CI instead of silently stretching every run.
 `pnpm build:perf -- --update` re-pins after a deliberate build-time change.
 
+### Profiling
+
+Opt-in CPU profiling exists on both runtimes; both write to the gitignored
+`.profiles/` directory.
+
+| Surface | How                                                                                                                                                      | Output                                                        |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Web app | `pnpm dev:profile` (dev server under `--cpu-prof --heap-prof`)                                                                                           | `.profiles/node/*.cpuprofile`, `*.heapprofile`                |
+| pe API  | `PE_PROFILING_ENABLED=true uv run uvicorn src.pe.main:app` (every request), or send header `X-Profile-Request: true` for a single request on a debug pod | `.profiles/*.prof` (load with `python -m pstats` or snakeviz) |
+
+The pe middleware adds an `X-Profile` response header naming the dump file;
+it is disabled unless explicitly requested, so normal runs pay no overhead.
+
 ## Security
 
 - **Never** commit credentials, API keys, or patient data

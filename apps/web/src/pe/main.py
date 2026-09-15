@@ -18,6 +18,7 @@ from src.pe.api import api_v1_router
 from src.pe.config import settings
 from src.pe.database import close_db, init_db
 from src.pe.logging_config import setup_logging
+from src.pe.middleware.profiling import ProfilingMiddleware
 
 logger = structlog.get_logger(__name__)
 
@@ -57,8 +58,13 @@ app.add_middleware(
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID", "X-Profile-Request"],
 )
+
+# Opt-in request profiler (see src/pe/middleware/profiling.py). Disabled
+# unless PE_PROFILING_ENABLED or the X-Profile-Request header is present,
+# so normal runs pay no overhead.
+app.add_middleware(ProfilingMiddleware)
 
 
 @app.middleware("http")

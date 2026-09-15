@@ -8,6 +8,7 @@
     "astro": "astro",
     "sync": "astro sync",
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' astro dev --host 0.0.0.0 --port 5173",
+    "dev:profile": "NODE_OPTIONS='--max-old-space-size=8192 --cpu-prof --cpu-prof-dir=.profiles/node --heap-prof --heap-prof-dir=.profiles/node' astro dev --host 0.0.0.0 --port 5173",
     "dev:ci": "NODE_OPTIONS='--max-old-space-size=8192' astro dev --json --background --host 0.0.0.0 --port 5173",
     "start": "node scripts/utils/start-server.mjs",
     "start:sentry": "node scripts/utils/start-server.mjs",
