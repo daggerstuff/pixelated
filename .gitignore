@@ -482,3 +482,4 @@ NF_PIPELINE_HANDOFF.md
 thread-5302e593-transcript.md
 .jscpd-report/
 .test-perf/
+.test-reliability/

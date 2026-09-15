@@ -144,3 +144,56 @@ jobs:
           name: test-performance-report
           path: .test-perf/
           retention-days: 14
+
+  # Test reliability. Three gates over the same hermetic slice used by the
+  # N+1 and test-performance jobs, so the numbers are comparable across jobs:
+  #   - flaky detection: repeat runs diffed for outcome changes (with a pinned
+  #     tolerance list in scripts/ci/flaky-baseline.json)
+  #   - isolation: ordered vs shuffled execution; tests must pass in both
+  #   - coverage ratchet: per-metric budget pinned in
+  #     scripts/ci/coverage-baseline.json (the global thresholds in
+  #     config/vitest.config.ts target full, non-hermetic runs)
+  test-reliability:
+    name: Test reliability (flaky / isolation / coverage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Flaky test detection (3 repeat runs)
+        run: pnpm test:flaky
+
+      - name: Test isolation (ordered vs shuffled)
+        run: pnpm test:isolation
+
+      - name: Coverage ratchet (hermetic slice)
+        run: pnpm test:coverage:gate
+
+      - name: Publish reports to step summary
+        if: always()
+        run: |
+          for f in .test-reliability/*.md; do
+            if [ -f "$f" ]; then
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              cat "$f" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+      - name: Upload test-reliability reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reliability-report
+          path: .test-reliability/
+          retention-days: 14

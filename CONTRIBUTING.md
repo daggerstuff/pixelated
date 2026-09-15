@@ -118,6 +118,26 @@ For Python, `uv run pytest` prints the 25 slowest tests by default
 `redis://localhost:6379/0` when running tests against local Docker. See
 [WALKTHROUGH.md](WALKTHROUGH.md) for details.
 
+### Test reliability
+
+Three gates run in the [Quality workflow](.github/workflows/quality.yml) over
+the same hermetic slice as `pnpm test:perf`, so the numbers are comparable:
+
+| Command                  | Enforces                                                                 | Baseline                              |
+| ------------------------ | ------------------------------------------------------------------------ | ------------------------------------- |
+| `pnpm test:flaky`        | 3 repeat runs; any test whose outcome changes across identical runs fails | `scripts/ci/flaky-baseline.json`     |
+| `pnpm test:isolation`    | Ordered vs `--sequence.shuffle` execution; every test must pass in both   | none (strict)                         |
+| `pnpm test:coverage:gate`| Per-metric slice coverage stays within 5% of the pinned value and above an absolute floor | `scripts/ci/coverage-baseline.json` |
+
+- `pnpm test:reliability` runs all three in sequence.
+- Flaky tolerance list: a genuinely flaky external dependency can be pinned
+  explicitly with `pnpm test:flaky -- --update`, but an empty list is the goal.
+- Coverage: `pnpm test:coverage:gate -- --update` re-pins after adding tests.
+  The global thresholds in `config/vitest.config.ts` target full
+  (non-hermetic) runs; the gate ratchets the hermetic slice.
+  **Keep `@vitest/coverage-v8` on the same major version as `vitest`** — a
+  mismatch silently aborts coverage collection.
+
 ## Python Code
 
 All Python work lives in `ai/` and `tests/`. Use `uv` for dependency management:

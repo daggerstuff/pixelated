@@ -1,0 +1,23 @@
+{
+  "$schema": "Coverage ratchet for scripts/ci/coverage-gate.mjs",
+  "description": "Per-metric coverage of the hermetic slice. The gate fails when a metric drops more than 5% below its pinned value, or below its absolute floor. Re-pin upward after adding tests with `pnpm test:coverage:gate -- --update`. The global thresholds in config/vitest.config.ts target full (non-hermetic) runs.",
+  "generatedAt": "2026-09-15T03:42:51.185Z",
+  "scope": [
+    "apps/web/src/lib/db",
+    "apps/web/src/lib/logging",
+    "apps/web/src/lib/audit",
+    "apps/web/src/lib/utils"
+  ],
+  "coverage": {
+    "lines": 34.6,
+    "statements": 34.66,
+    "functions": 32.14,
+    "branches": 33.7
+  },
+  "floors": {
+    "lines": 25,
+    "statements": 25,
+    "functions": 20,
+    "branches": 25
+  }
+}
