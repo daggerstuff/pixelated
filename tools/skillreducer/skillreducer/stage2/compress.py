@@ -3,9 +3,9 @@ from __future__ import annotations
 import re
 from collections import defaultdict
 
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
-from skillreducer.models import ContentItem, ContentType
+from skillreducer.llm.client import LLMClient
+from skillreducer.models import ContentItem
 
 
 def compress_core(items: list[ContentItem]) -> str:

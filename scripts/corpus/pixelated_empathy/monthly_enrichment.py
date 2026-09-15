@@ -15,14 +15,12 @@ import json
 from pathlib import Path
 
 from pixelated_empathy.company_events import get_event_spine
-from pixelated_empathy.monthly_gate import get_accepted_months
-from pixelated_empathy.personas import PERSONAS, persona_voice_summary
+from pixelated_empathy.personas import PERSONAS
 from pixelated_empathy.schemas import (
-    ClinicalEvent,
+    MONTH_ORDER,
     MonthBible,
     MonthEnrichment,
     PersonaVoiceContext,
-    MONTH_ORDER,
 )
 
 # ---------------------------------------------------------------------------
@@ -106,11 +104,17 @@ _REFERENCE_CHATS: list[dict[str, object]] = [
         "room": "#engineering",
         "topic": "Empathy scoring latency",
         "messages": [
-            {"sender": "Marcus", "text": "Adaora — the real-time scoring PR looks good except line 142. The debounce is 500ms, should be 200ms for live feedback."},
+            {
+                "sender": "Marcus",
+                "text": "Adaora — the real-time scoring PR looks good except line 142. The debounce is 500ms, should be 200ms for live feedback.",
+            },
             {"sender": "Adaora", "text": "On it. Fixing now."},
             {"sender": "Ren", "text": "ack"},
             {"sender": "Marcus", "text": "Thanks. ETA?"},
-            {"sender": "Adaora", "text": "20 min. Also found a race condition in the WAI-SR calculation. Filing a separate PR."},
+            {
+                "sender": "Adaora",
+                "text": "20 min. Also found a race condition in the WAI-SR calculation. Filing a separate PR.",
+            },
         ],
         "note": "#engineering: terse, focused, specific line numbers, clinical tool references",
     },
@@ -119,11 +123,26 @@ _REFERENCE_CHATS: list[dict[str, object]] = [
         "room": "#clinical",
         "topic": "Crisis module debrief observation",
         "messages": [
-            {"sender": "Naomi", "text": "so I was just thinking about something Ada said in the gate review — Sam is engaging with the crisis scenarios, but they're not *feeling* the weight. they're performing the protocol."},
-            {"sender": "Ada", "text": "Yes. That's the core challenge of crisis training. The protocol creates the structure; the debrief is where the emotional processing happens."},
-            {"sender": "Mira", "text": "I noticed the same thing. The simulation is almost too safe for them. Real crisis doesn't have a pause button."},
-            {"sender": "Naomi", "text": "so maybe we need to add more... unpredictability? not danger, but things that don't follow the script?"},
-            {"sender": "Ada", "text": "That's the persona variability discussion we've been circling. I think it's time to open it formally."},
+            {
+                "sender": "Naomi",
+                "text": "so I was just thinking about something Ada said in the gate review — Sam is engaging with the crisis scenarios, but they're not *feeling* the weight. they're performing the protocol.",
+            },
+            {
+                "sender": "Ada",
+                "text": "Yes. That's the core challenge of crisis training. The protocol creates the structure; the debrief is where the emotional processing happens.",
+            },
+            {
+                "sender": "Mira",
+                "text": "I noticed the same thing. The simulation is almost too safe for them. Real crisis doesn't have a pause button.",
+            },
+            {
+                "sender": "Naomi",
+                "text": "so maybe we need to add more... unpredictability? not danger, but things that don't follow the script?",
+            },
+            {
+                "sender": "Ada",
+                "text": "That's the persona variability discussion we've been circling. I think it's time to open it formally.",
+            },
         ],
         "note": "#clinical: thoughtful, builds on each other, Mira adds philosophical depth",
     },
@@ -132,10 +151,19 @@ _REFERENCE_CHATS: list[dict[str, object]] = [
         "room": "#supervision",
         "topic": "Sam's session with Case 2025-10-003",
         "messages": [
-            {"sender": "Naomi", "text": "Sam's risk assessment was clinically sound but the engagement was too clinical. The patient needed presence, not protocol."},
+            {
+                "sender": "Naomi",
+                "text": "Sam's risk assessment was clinically sound but the engagement was too clinical. The patient needed presence, not protocol.",
+            },
             {"sender": "Mira", "text": "This is the tension we keep coming back to. Competence vs. connection."},
-            {"sender": "Naomi", "text": "I'm going to focus the next supervision on therapeutic presence. Not technique — presence."},
-            {"sender": "Sam", "text": "I've been thinking about this since the session. I think I was so focused on getting the Columbia Protocol right that I forgot to actually be with the patient."},
+            {
+                "sender": "Naomi",
+                "text": "I'm going to focus the next supervision on therapeutic presence. Not technique — presence.",
+            },
+            {
+                "sender": "Sam",
+                "text": "I've been thinking about this since the session. I think I was so focused on getting the Columbia Protocol right that I forgot to actually be with the patient.",
+            },
             {"sender": "Naomi", "text": "That's exactly the insight I wanted you to reach. ✓"},
         ],
         "note": "#supervision: reflective, Sam shows self-awareness, Naomi affirms",
@@ -183,10 +211,7 @@ def _thread_continuity_hooks(month: str, work_dir_root: Path) -> list[dict[str, 
             thread_subjects[tid] = str(email.get("subject", ""))
         # Top 5 most active threads = likely continuation candidates
         top = sorted(thread_counts.items(), key=lambda x: x[1], reverse=True)[:5]
-        return [
-            {"thread_id": tid, "subject": thread_subjects[tid], "message_count": count}
-            for tid, count in top
-        ]
+        return [{"thread_id": tid, "subject": thread_subjects[tid], "message_count": count} for tid, count in top]
     except Exception:
         return []
 
@@ -199,9 +224,7 @@ def build(month: str, work_dir_root: Path) -> MonthEnrichment:
     month_dir = work_dir_root / month
     bible_path = month_dir / "month_bible.json"
     if not bible_path.exists():
-        raise FileNotFoundError(
-            f"Month bible missing for {month}. Run 'corpus plan {month}' first."
-        )
+        raise FileNotFoundError(f"Month bible missing for {month}. Run 'corpus plan {month}' first.")
 
     bible = MonthBible.model_validate_json(bible_path.read_text())
     spine = get_event_spine()

@@ -6,9 +6,7 @@ import concurrent.futures
 import logging
 import os
 import subprocess
-import time
-from dataclasses import dataclass, field
-from typing import Any, Callable
+from dataclasses import dataclass
 
 from tools.agent_runner.execution_harness import AgentExecutionHarness, HarnessRunReport
 from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue
@@ -50,7 +48,11 @@ class ParallelSpeculativeExecutor:
         if not batch:
             return []
 
-        logger.info("Executing parallel speculative batch of %d tasks (max concurrency: %d)...", len(batch), self.max_concurrency)
+        logger.info(
+            "Executing parallel speculative batch of %d tasks (max concurrency: %d)...",
+            len(batch),
+            self.max_concurrency,
+        )
         executions: list[ParallelTaskExecution] = []
 
         # Provision worktree leases
@@ -76,8 +78,7 @@ class ParallelSpeculativeExecutor:
         # Execute concurrently
         with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(batch), self.max_concurrency)) as executor:
             futures = [
-                executor.submit(_worker, exec_item, prompt)
-                for exec_item, (_, _, prompt) in zip(executions, batch)
+                executor.submit(_worker, exec_item, prompt) for exec_item, (_, _, prompt) in zip(executions, batch)
             ]
             concurrent.futures.wait(futures)
 
@@ -86,7 +87,11 @@ class ParallelSpeculativeExecutor:
             try:
                 # If passed, merge branch into local staging
                 if exec_item.report and exec_item.report.overall_passed:
-                    logger.info("Integrating passed branch %s for %s...", exec_item.lease.branch_name, exec_item.issue.identifier)
+                    logger.info(
+                        "Integrating passed branch %s for %s...",
+                        exec_item.lease.branch_name,
+                        exec_item.issue.identifier,
+                    )
                     subprocess.run(
                         ["git", "merge", exec_item.lease.branch_name, "--no-edit"],
                         cwd=self.base_repo,

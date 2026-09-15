@@ -534,7 +534,7 @@ def create_app() -> FastAPI:
             logger.error("Failed to get models info", error=str(e))
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to get model information"
-            )
+            ) from e
 
     return app
 

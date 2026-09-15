@@ -14,12 +14,11 @@ from pathlib import Path
 from pixelated_empathy.company_events import get_event_spine
 from pixelated_empathy.personas import PERSONA_NAMES
 from pixelated_empathy.schemas import (
-    GateTier,
+    MONTH_ORDER,
+    MONTH_TARGETS,
     Manifest,
     ManifestEntry,
     MonthBible,
-    MONTH_ORDER,
-    MONTH_TARGETS,
     SalvageCandidate,
 )
 
@@ -283,13 +282,9 @@ def plan_month(
     # Write outputs
     month_dir = work_dir
     month_dir.mkdir(parents=True, exist_ok=True)
-    (month_dir / "month_bible.json").write_text(
-        bible.model_dump_json(indent=2)
-    )
+    (month_dir / "month_bible.json").write_text(bible.model_dump_json(indent=2))
     salvage_data = [s.model_dump() for s in salvage]
-    (month_dir / "salvage_candidates.json").write_text(
-        json.dumps(salvage_data, indent=2, default=str)
-    )
+    (month_dir / "salvage_candidates.json").write_text(json.dumps(salvage_data, indent=2, default=str))
 
     return bible, salvage
 

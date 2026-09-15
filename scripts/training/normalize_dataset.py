@@ -1,5 +1,6 @@
 import json
 import random
+from pathlib import Path
 
 INPUT_FILE = str(Path.home() / "dataset" / "ULTIMATE_FINAL_DATASET.jsonl")
 OUTPUT_FILE = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")

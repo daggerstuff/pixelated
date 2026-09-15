@@ -30,8 +30,7 @@ def _load_torch() -> ModuleType:
         _torch_import_error = RuntimeError(
             "torch is unavailable in this environment; loading is intentionally deferred."
         )
-        _torch_import_error.__cause__ = exc
-        raise _torch_import_error
+        raise _torch_import_error from exc
 
 
 class _TorchModuleProxy:

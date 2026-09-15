@@ -16,7 +16,6 @@ import logging
 import os
 import sqlite3
 import time
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
@@ -85,9 +84,7 @@ class EscalationStore:
         """Fetch all unresolved escalations."""
         with sqlite3.connect(self.db_path) as conn:
             conn.row_factory = sqlite3.Row
-            rows = conn.execute(
-                "SELECT * FROM escalations WHERE status = 'pending' ORDER BY created_at ASC"
-            ).fetchall()
+            rows = conn.execute("SELECT * FROM escalations WHERE status = 'pending' ORDER BY created_at ASC").fetchall()
             return [dict(r) for r in rows]
 
     def get_escalation(self, esc_id: str) -> dict[str, Any] | None:
@@ -97,9 +94,7 @@ class EscalationStore:
             row = conn.execute("SELECT * FROM escalations WHERE id = ?", (esc_id,)).fetchone()
             return dict(row) if row else None
 
-    def resolve_escalation(
-        self, esc_id: str, action: str, hint: str | None = None
-    ) -> AgentState | None:
+    def resolve_escalation(self, esc_id: str, action: str, hint: str | None = None) -> AgentState | None:
         """Apply human intervention to state and mark resolved."""
         esc = self.get_escalation(esc_id)
         if not esc:

@@ -59,8 +59,9 @@ intentional change with `-- --update`.
 | `pnpm lint:tech-debt` | Untracked `TODO`/`FIXME` markers | `scripts/ci/tech-debt-baseline.json` |
 | `pnpm lint:naming` | Naming conventions (TS/TSX) | `.eslintrc.naming.mjs`, `scripts/ci/naming-baseline.json` |
 | `pnpm lint:mock-paths` | Every `vi.mock(...)` specifier resolves to a real module | none (strict) |
+| `pnpm lint:python-correctness` | Python correctness (undefined names, unused imports, bare excepts, unchained raises) outside submodules/generated SDK | `scripts/ci/python-ruff-baseline.json` |
 
-`pnpm lint:quality` runs all seven. For Python, naming is enforced by ruff's `N`
+`pnpm lint:quality` runs all eight. For Python, naming is enforced by ruff's `N`
 (pep8-naming) rules and strict types by `pnpm typecheck:python`
 (`scripts/ci/python-typecheck.sh`), which runs `mypy --strict` over the `pe`
 service.

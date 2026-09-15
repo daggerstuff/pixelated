@@ -14,6 +14,7 @@
     "**/dist/**",
     "**/build/**",
     "**/coverage/**",
+    "**/htmlcov/**",
     "**/.venv/**",
     "**/.astro/**",
     "**/.turbo/**",
