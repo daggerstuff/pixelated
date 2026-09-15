@@ -1,0 +1,31 @@
+{
+  "name": "pixelated-empathy",
+  "dockerComposeFile": ["../docker-compose.yml"],
+  "service": "app",
+  "runServices": ["app", "db", "redis", "mongo"],
+  // docker-compose.yml mounts the repo at /app inside the `app` service.
+  "workspaceFolder": "/app",
+
+  // The root Dockerfile provides Node 24 + pnpm; uv provides Python 3.13
+  // for the pe FastAPI service and the bias-detection services.
+  "features": {
+    "ghcr.io/devcontainer/features/git:1": {},
+    "ghcr.io/astral-sh/devcontainer-uv:latest": {}
+  },
+
+  "forwardPorts": [5173, 5432, 6379, 27017],
+  "portsAttributes": {
+    "5173": { "label": "Astro dev server" },
+    "5432": { "label": "PostgreSQL 17" },
+    "6379": { "label": "Redis" },
+    "27017": { "label": "MongoDB" }
+  },
+
+  "postCreateCommand": "git submodule update --init --recursive && pnpm install && uv sync",
+
+  "customizations": {
+    "vscode": {
+      "extensions": ["astro-build.astro-vscode", "dbaeumer.vscode-eslint"]
+    }
+  }
+}
