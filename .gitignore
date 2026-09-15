@@ -484,3 +484,4 @@ thread-5302e593-transcript.md
 .test-perf/
 .test-reliability/
 .build-perf/
+.deps-audit/

@@ -243,3 +243,43 @@ jobs:
           name: build-performance-report
           path: .build-perf/
           retention-days: 14
+
+  # Dependency health. Four ratcheted audits that fail only on NEW problems,
+  # so existing debt does not block work but cannot grow:
+  #   - heavy dependencies (install weight, scripts/ci/heavy-deps-baseline.json)
+  #   - version drift (duplicate resolved versions, version-drift-baseline.json)
+  #   - dead feature flags (flag-baseline.json)
+  #   - unused dependencies (knip ratchet, unused-deps-baseline.json)
+  dependency-health:
+    name: Dependency health audits
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: '24.16.0'
+          cache-key-prefix: 'quality-v1'
+
+      - name: Heavy dependencies (install weight)
+        run: pnpm lint:heavy-deps
+
+      - name: Version drift (duplicate versions)
+        run: pnpm lint:version-drift
+
+      - name: Dead feature flags
+        run: pnpm lint:flags
+
+      - name: Unused dependencies (knip ratchet)
+        run: pnpm lint:unused-deps
+
+      - name: Publish heavy-deps report to step summary
+        if: always() && hashFiles('.deps-audit/heavy-deps.md') != ''
+        run: cat .deps-audit/heavy-deps.md >> "$GITHUB_STEP_SUMMARY"

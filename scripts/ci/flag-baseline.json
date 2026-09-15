@@ -1,0 +1,19 @@
+{
+  "$schema": "Feature-flag liveness ratchet for scripts/ci/flag-audit.mjs",
+  "description": "Reference counts per registry flag. The gate fails when a new flag has zero references, or when a live flag (references > 0 at pin time) loses all references. Staged flags (0 references) must gain references eventually — re-pin with `node scripts/ci/flag-audit.mjs --update` after wiring or retiring them.",
+  "generatedAt": "2026-09-15T04:42:51.876Z",
+  "flags": {
+    "aiInsights": {
+      "references": 0
+    },
+    "approvalWorkflows": {
+      "references": 0
+    },
+    "collaboration": {
+      "references": 0
+    },
+    "versioning": {
+      "references": 0
+    }
+  }
+}
