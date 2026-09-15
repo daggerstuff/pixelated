@@ -12,7 +12,7 @@ DEFAULT_NEMOTRON_MODEL="groq/openai/gpt-oss-120b"
 
 _copilot_safe_is_forbidden_model() {
   local candidate="$1"
-  [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == *qwen* ]]
+  [[ "$candidate" == "gpt-5.4-mini" || "$candidate" == qwen/* || "$candidate" == nvidia/*qwen* || "$candidate" == nscale/*qwen* ]]
 }
 
 _copilot_safe_sanitize_model() {

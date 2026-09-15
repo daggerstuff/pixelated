@@ -25,11 +25,12 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  statuses: write
 
 jobs:
   advisor-review:
     name: Advisor Code Review
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/staging')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -62,7 +63,7 @@ jobs:
           cat advisor-review.json
 
       - name: Post review comment
-        if: always()
+        if: always() && github.event_name == 'pull_request'
         uses: actions/github-script@v9
         with:
           script: |
@@ -100,6 +101,36 @@ jobs:
             } catch (e) {
               console.log('Could not post review comment:', e.message);
             }
+
+      - name: Post commit status
+        if: always() && github.event_name == 'push'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            let state = 'success';
+            let summary = 'No summary available';
+            try {
+              const data = JSON.parse(fs.readFileSync('advisor-review.json', 'utf8'));
+              summary = data.summary || summary;
+              const findings = data.findings || [];
+              const sev = (f) => String(f.severity || '').toLowerCase();
+              if (findings.some(f => sev(f) === 'high' || sev(f) === 'critical')) {
+                state = 'failure';
+              }
+            } catch (e) {
+              state = 'failure';
+              summary = 'Advisor review failed: ' + e.message;
+            }
+            const body = typeof summary === 'string' ? summary.slice(0, 1000) : 'Advisor review completed';
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state,
+              context: 'px/advisor-review',
+              description: body,
+            });
 
   qa-score:
     name: QA Session Score
