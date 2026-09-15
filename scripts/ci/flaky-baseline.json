@@ -1,0 +1,6 @@
+{
+  "$schema": "Flaky-test tolerance list for scripts/ci/flaky-test-audit.mjs",
+  "description": "Tests whose outcomes are known to vary between runs. The gate fails on any flaky test NOT listed here. Adding an entry means deciding a flake is tolerable; prefer fixing the test. Re-pin with `pnpm test:flaky -- --update`.",
+  "generatedAt": "2026-09-15T03:40:19.100Z",
+  "tolerated": []
+}

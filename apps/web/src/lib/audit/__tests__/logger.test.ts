@@ -45,6 +45,12 @@ describe('AuditLogger', () => {
 
   describe('logEvent - volatile fallback', () => {
     it('redacts metadata in the volatile fallback when persistence fails', async () => {
+      // vi.clearAllMocks() clears call history but not implementations, so
+      // tests that installed mockImplementation/mockReturnValue on the hoisted
+      // mocks would otherwise leak into this test when the order is shuffled.
+      mocks.uuid.mockImplementation(() => 'audit-event-1')
+      mocks.scanContent.mockImplementation(() => null)
+
       const { AuditLogger } = await import('../logger')
       const auditLogger = AuditLogger.getInstance()
 
