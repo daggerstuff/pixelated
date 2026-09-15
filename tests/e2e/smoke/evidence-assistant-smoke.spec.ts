@@ -1,6 +1,14 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { TestData } from '../data/TestData'
+
+// Unauthenticated admin visits land on the login page. Route guards used to
+// redirect to /auth/sign-in (since removed); the current guard redirects to
+// /login with a `redirect` query param.
+function isRedirectedToLogin(page: Page): boolean {
+  const url = page.url()
+  return url.includes('/login') || url.includes('/auth/sign-in')
+}
 
 test.describe('Evidence Assistant admin page', () => {
   test('page is accessible and includes the admin UI shell', async ({
@@ -11,7 +19,7 @@ test.describe('Evidence Assistant admin page', () => {
       timeout: 30_000,
     })
 
-    if (page.url().includes('/auth/sign-in')) {
+    if (isRedirectedToLogin(page)) {
       test.skip(
         true,
         'Admin authentication is required for this route in the current environment.',
@@ -75,7 +83,7 @@ test.describe('Evidence Assistant admin page', () => {
       timeout: 30_000,
     })
 
-    if (page.url().includes('/auth/sign-in')) {
+    if (isRedirectedToLogin(page)) {
       test.skip(
         true,
         'Admin authentication is required for this route in the current environment.',
@@ -110,7 +118,7 @@ test.describe('Evidence Assistant admin page', () => {
     page,
   }) => {
     const { email, password } = TestData.users.adminUser
-    await page.goto('/auth/sign-in')
+    await page.goto('/login')
 
     if ((await page.locator('input[type="email"]').count()) === 0) {
       test.skip(true, 'No sign-in form present for admin smoke authentication.')
@@ -127,7 +135,7 @@ test.describe('Evidence Assistant admin page', () => {
       timeout: 30_000,
     })
 
-    if (page.url().includes('/auth/sign-in')) {
+    if (isRedirectedToLogin(page)) {
       test.skip(true, 'Could not authenticate as admin in this environment.')
     }
 
