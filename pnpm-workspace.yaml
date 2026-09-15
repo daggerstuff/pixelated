@@ -78,7 +78,11 @@ allowBuilds:
   '@scarf/scarf': true
   koffi: true
   '@google/genai': true
-minimumReleaseAge: 0
+# One day (minutes). Newly published package versions are only installable
+# after they have been on the registry for 24 hours — most malicious or
+# defective releases are yanked within that window. Packages that genuinely
+# need day-one installs are exempted in minimumReleaseAgeExclude below.
+minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@cloudflare/*'

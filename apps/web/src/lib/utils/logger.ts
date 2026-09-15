@@ -4,6 +4,8 @@
  * support for different environments and log levels
  */
 
+import { scrub } from '../logging/scrub'
+
 type LogLevel = 'debug' | 'info' | 'warn' | 'error'
 
 interface LoggerOptions {
@@ -127,10 +129,11 @@ class Logger {
     const prefix = this.options.prefix ? `[${this.options.prefix}]` : ''
     const formattedMessage = `${timestamp} ${level.toUpperCase()} ${prefix} ${message}`
 
-    // Redact sensitive data if needed
-    const redactedArgs = this.options.redact
-      ? args.map((arg) => this.redact(arg, this.options.redact!))
-      : args
+    // Scrub secrets/PII from structured payloads (../logging/scrub.ts), then
+    // apply any explicitly configured key redaction on top.
+    const redactedArgs = args
+      .map((arg) => scrub(arg))
+      .map((arg) => this.options.redact ? this.redact(arg, this.options.redact) : arg)
 
     // Browser or server logging
     if (typeof window !== 'undefined') {

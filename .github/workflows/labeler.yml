@@ -1,0 +1,22 @@
+name: PR Labeler
+
+# Automatic labeling for pull requests: paths matched by .github/labeler.yml
+# are applied on PR open and resync so triage starts labeled.
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/labeler@v6
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          sync-labels: true
