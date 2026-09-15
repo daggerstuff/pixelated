@@ -11,11 +11,9 @@ from __future__ import annotations
 
 import logging
 import os
-import shutil
 import subprocess
 import time
 from dataclasses import dataclass
-from typing import Any
 
 from tools.agent_runner.worktree_pool import GitWorktreePool, WorktreeLease
 
@@ -34,7 +32,9 @@ class SandboxCommandResult:
 class EphemeralSandbox:
     """Ephemeral isolated execution sandbox for multi-agent task loops."""
 
-    def __init__(self, task_id: str, base_repo: str, worktree_pool: GitWorktreePool | None = None, agent_name: str = "sandbox"):
+    def __init__(
+        self, task_id: str, base_repo: str, worktree_pool: GitWorktreePool | None = None, agent_name: str = "sandbox"
+    ):
         self.task_id = task_id
         self.base_repo = os.path.abspath(base_repo)
         self.worktree_pool = worktree_pool or GitWorktreePool()
@@ -46,7 +46,12 @@ class EphemeralSandbox:
         """Create fresh, isolated sandbox worktree."""
         self.lease = self.worktree_pool.acquire_worktree(self.base_repo, self.task_id, self.agent_name)
         self.sandbox_path = self.lease.worktree_path
-        logger.info("Provisioned ephemeral sandbox for %s at %s (branch: %s)", self.task_id, self.sandbox_path, self.lease.branch_name)
+        logger.info(
+            "Provisioned ephemeral sandbox for %s at %s (branch: %s)",
+            self.task_id,
+            self.sandbox_path,
+            self.lease.branch_name,
+        )
         return self.sandbox_path
 
     def execute_command(self, command: list[str] | str, timeout: int = 60) -> SandboxCommandResult:

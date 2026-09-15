@@ -132,6 +132,7 @@ __mocks__
 *.so
 .coverage
 .coverage.*
+htmlcov/
 .eggs/
 .hypothesis/
 .installed.cfg
@@ -485,3 +486,6 @@ thread-5302e593-transcript.md
 .test-reliability/
 .build-perf/
 .deps-audit/
+
+HANDOFF-dashboard-theme.md
+MISSION-stub-tech-debt.md

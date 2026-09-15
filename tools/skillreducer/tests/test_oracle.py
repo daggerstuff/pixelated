@@ -9,8 +9,6 @@ from skillreducer.stage1.ddmin import ddmin
 from skillreducer.stage1.oracle import (
     CandidateSkill,
     Stage1Oracle,
-    _cosine_similarity,
-    _tokenize,
     build_test_queries,
     route_query,
     select_tfidf_distractors,
@@ -30,7 +28,9 @@ def _skill(name: str, description: str) -> Skill:
 
 def test_tfidf_selects_similar_skill() -> None:
     target = _skill("jwt-auth", "Handles JWT authentication and token validation for APIs.")
-    other_close = _skill("oauth-refresh", "Refreshes OAuth 2.0 tokens and manages client credentials.")
+    other_close = _skill(
+        "oauth-refresh", "Refreshes OAuth 2.0 tokens and manages client credentials."
+    )
     other_far = _skill("pdf-merge", "Merges PDF files and splits pages for document workflows.")
 
     distractors = select_tfidf_distractors(target, [other_close, other_far], k=2)
@@ -66,7 +66,9 @@ def test_simulated_oracle_requires_target_selection() -> None:
 
 def test_route_query_heuristic_prefers_overlap() -> None:
     candidates = [
-        CandidateSkill(name="target", description="JWT authentication API security", is_target=True),
+        CandidateSkill(
+            name="target", description="JWT authentication API security", is_target=True
+        ),
         CandidateSkill(name="other", description="PDF merging and page splitting"),
     ]
     selected = route_query("help with JWT API authentication", candidates, llm=None)

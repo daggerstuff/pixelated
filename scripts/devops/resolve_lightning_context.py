@@ -5,6 +5,7 @@ import argparse
 import base64
 import json
 import re
+import sys
 from dataclasses import dataclass
 from urllib.request import Request, urlopen
 
@@ -149,8 +150,9 @@ def main() -> None:
             pass
         else:
             pass
-    except Exception:
-        raise SystemExit(1)
+    except Exception as exc:
+        print(f"failed to resolve lightning context: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
 
 
 if __name__ == "__main__":

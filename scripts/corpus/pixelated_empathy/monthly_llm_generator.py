@@ -25,7 +25,6 @@ from pixelated_empathy.personas import persona_voice_summary
 from pixelated_empathy.schemas import (
     BatchSpec,
     ChatBurst,
-    ChatMessage,
     ClinicalEvent,
     EmailRecord,
     GateTier,
@@ -54,6 +53,7 @@ RETRY_DELAY_SECS = 2.0
 # ---------------------------------------------------------------------------
 # JSON repair helpers
 # ---------------------------------------------------------------------------
+
 
 def _strip_code_fences(raw: str) -> str:
     """Remove ```json ... ``` wrappers if present."""
@@ -124,9 +124,7 @@ def _repair_email(email: dict[str, Any], month: str) -> dict[str, Any]:
     body = str(email.get("body", "")).strip()
     if not body or _PLACEHOLDER_BODY_RE.match(body) or len(body) < 20:
         sender = email.get("sender", "Unknown")
-        email["body"] = (
-            f"Following up on the thread. Happy to discuss further when you have a moment."
-        )
+        email["body"] = "Following up on the thread. Happy to discuss further when you have a moment."
         logger.warning("Repaired placeholder body for email sender=%s", sender)
 
     # Remove sender from recipients if present
@@ -168,6 +166,7 @@ def _repair_chat_burst(burst: dict[str, Any], month: str) -> dict[str, Any]:
 # Source quality gate
 # ---------------------------------------------------------------------------
 
+
 def _validate_email_quality(
     email: EmailRecord,
     month: str,
@@ -183,13 +182,9 @@ def _validate_email_quality(
 
     # No clairvoyance: event_id must reference an event before or on the email date
     if email.event_id:
-        future_events = [
-            e for e in events if e.id == email.event_id and e.date > email.date
-        ]
+        future_events = [e for e in events if e.id == email.event_id and e.date > email.date]
         if future_events:
-            issues.append(
-                f"Clairvoyant event reference: {email.event_id} is after email date {email.date.date()}"
-            )
+            issues.append(f"Clairvoyant event reference: {email.event_id} is after email date {email.date.date()}")
 
     # Thread date monotonicity is checked at the batch level
 
@@ -213,9 +208,7 @@ def _validate_chat_quality(
         issues.append(f"Date {burst.date.date()} outside month {month}")
 
     if burst.event_id:
-        future_events = [
-            e for e in events if e.id == burst.event_id and e.date > burst.date
-        ]
+        future_events = [e for e in events if e.id == burst.event_id and e.date > burst.date]
         if future_events:
             issues.append(f"Clairvoyant event reference: {burst.event_id}")
 
@@ -230,6 +223,7 @@ def _validate_chat_quality(
 # Prompt builders
 # ---------------------------------------------------------------------------
 
+
 def _email_prompt(
     batch_spec: BatchSpec,
     enrichment: MonthEnrichment,
@@ -239,14 +233,11 @@ def _email_prompt(
     persona_blocks = "\n\n".join(
         persona_voice_summary(name)
         for name in batch_spec.personas_involved
-        if name in enrichment.model_dump().get("persona_contexts", {})
-        or True  # always include requested personas
+        if name in enrichment.model_dump().get("persona_contexts", {}) or True  # always include requested personas
     )
 
     event_summaries = "\n".join(
-        f"  {e.id} ({e.date.date()}) — {e.summary}"
-        for e in events
-        if e.id in batch_spec.event_ids
+        f"  {e.id} ({e.date.date()}) — {e.summary}" for e in events if e.id in batch_spec.event_ids
     )
 
     ref_block = "\n\n".join(
@@ -328,9 +319,7 @@ def _chat_prompt(
     reference_examples: list[dict[str, Any]],
 ) -> str:
     event_summaries = "\n".join(
-        f"  {e.id} ({e.date.date()}) — {e.summary}"
-        for e in events
-        if e.id in batch_spec.event_ids
+        f"  {e.id} ({e.date.date()}) — {e.summary}" for e in events if e.id in batch_spec.event_ids
     )
 
     ref_block = "\n\n".join(
@@ -393,6 +382,7 @@ OUTPUT: Only the JSON array. No commentary. No markdown.
 # ---------------------------------------------------------------------------
 # Core generation function
 # ---------------------------------------------------------------------------
+
 
 def _save_parse_failure(
     batch_id: str,
@@ -485,20 +475,24 @@ def generate_batch(
             try:
                 email = EmailRecord(**repaired_record)
             except (ValidationError, TypeError) as exc:
-                quality_issues.append({
-                    "issue": "schema_validation_failed",
-                    "artifact_id": raw_record.get("id", "unknown"),
-                    "detail": str(exc),
-                })
+                quality_issues.append(
+                    {
+                        "issue": "schema_validation_failed",
+                        "artifact_id": raw_record.get("id", "unknown"),
+                        "detail": str(exc),
+                    }
+                )
                 continue
             issues = _validate_email_quality(email, batch_spec.month, events)
             if issues:
                 for issue in issues:
-                    quality_issues.append({
-                        "issue": "quality_gate",
-                        "artifact_id": email.id,
-                        "detail": issue,
-                    })
+                    quality_issues.append(
+                        {
+                            "issue": "quality_gate",
+                            "artifact_id": email.id,
+                            "detail": issue,
+                        }
+                    )
                 continue
             validated_records.append(email)
 
@@ -507,20 +501,24 @@ def generate_batch(
             try:
                 burst = ChatBurst(**repaired_record)
             except (ValidationError, TypeError) as exc:
-                quality_issues.append({
-                    "issue": "schema_validation_failed",
-                    "artifact_id": raw_record.get("id", "unknown"),
-                    "detail": str(exc),
-                })
+                quality_issues.append(
+                    {
+                        "issue": "schema_validation_failed",
+                        "artifact_id": raw_record.get("id", "unknown"),
+                        "detail": str(exc),
+                    }
+                )
                 continue
             issues = _validate_chat_quality(burst, batch_spec.month, events)
             if issues:
                 for issue in issues:
-                    quality_issues.append({
-                        "issue": "quality_gate",
-                        "artifact_id": burst.id,
-                        "detail": issue,
-                    })
+                    quality_issues.append(
+                        {
+                            "issue": "quality_gate",
+                            "artifact_id": burst.id,
+                            "detail": issue,
+                        }
+                    )
                 continue
             validated_records.append(burst)
 

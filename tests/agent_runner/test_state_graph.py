@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-import json
 import os
 import tempfile
 from unittest.mock import MagicMock
-import pytest
 
 from tools.agent_runner.hitl_proxy import EscalationStore
 from tools.agent_runner.models import AgentConfig, ExecutionResult, LinearIssue
 from tools.agent_runner.sandbox_provisioner import EphemeralSandbox
-from tools.agent_runner.state_graph import CodingStateGraph, DeveloperNode, ReviewerNode
+from tools.agent_runner.state_graph import CodingStateGraph
 from tools.agent_runner.verifier import VerificationOutcome
 
 

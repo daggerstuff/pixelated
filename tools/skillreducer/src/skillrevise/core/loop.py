@@ -2,13 +2,20 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from skillrevise.core.metrics import trace_outcome_score
+from skillrevise.core.models import (
+    ExecutionTrace,
+    HarnessIteration,
+    HarnessResult,
+    PairedEvaluation,
+    RepairPrinciple,
+    TaskSpec,
+)
+from skillrevise.core.runner import PairedRunner
 from skillrevise.method.authoring import SkillAuthor
 from skillrevise.method.diagnosis import Diagnoser
-from skillrevise.core.metrics import trace_outcome_score
-from skillrevise.core.models import ExecutionTrace, HarnessIteration, HarnessResult, PairedEvaluation, RepairPrinciple, Skill, TaskSpec
 from skillrevise.method.principles import PrincipleAbsorber
 from skillrevise.method.revision import RevisionEngine
-from skillrevise.core.runner import PairedRunner
 
 
 class HarnessLoop:
@@ -34,7 +41,9 @@ class HarnessLoop:
         self.continue_after_non_improving_revision = continue_after_non_improving_revision
         self.require_diagnosis_for_revision = require_diagnosis_for_revision
 
-    def run_task(self, task: TaskSpec, *, heldout_tasks: Sequence[TaskSpec] | None = None) -> HarnessResult:
+    def run_task(
+        self, task: TaskSpec, *, heldout_tasks: Sequence[TaskSpec] | None = None
+    ) -> HarnessResult:
         initial_skill = self.author.author(task)
         iterations: list[HarnessIteration] = []
 
@@ -47,7 +56,9 @@ class HarnessLoop:
             diagnosis = self.diagnoser.diagnose(task, current_skill, current_eval)
             revision = None
 
-            if iteration_index < self.max_revisions and self._should_revise(current_eval, diagnosis):
+            if iteration_index < self.max_revisions and self._should_revise(
+                current_eval, diagnosis
+            ):
                 revision = self.reviser.revise(task, current_skill, diagnosis)
 
             iterations.append(
@@ -63,15 +74,17 @@ class HarnessLoop:
             if revision is None:
                 break
 
-            candidate_eval = self.runner.evaluate(task, revision.revised_skill, transfer_tasks=heldout_tasks)
+            candidate_eval = self.runner.evaluate(
+                task, revision.revised_skill, transfer_tasks=heldout_tasks
+            )
             if self._is_better(candidate_eval, best_eval):
                 best_skill = revision.revised_skill
                 best_eval = candidate_eval
 
-            if self._is_better(candidate_eval, current_eval):
-                current_skill = revision.revised_skill
-                current_eval = candidate_eval
-            elif self.continue_after_non_improving_revision and iteration_index + 1 < self.max_revisions:
+            if self._is_better(candidate_eval, current_eval) or (
+                self.continue_after_non_improving_revision
+                and iteration_index + 1 < self.max_revisions
+            ):
                 current_skill = revision.revised_skill
                 current_eval = candidate_eval
             else:
@@ -80,7 +93,9 @@ class HarnessLoop:
                         iteration_index=iteration_index + 1,
                         skill=revision.revised_skill,
                         evaluation=candidate_eval,
-                        diagnosis=self.diagnoser.diagnose(task, revision.revised_skill, candidate_eval),
+                        diagnosis=self.diagnoser.diagnose(
+                            task, revision.revised_skill, candidate_eval
+                        ),
                         revision=None,
                     )
                 )
@@ -105,7 +120,9 @@ class HarnessLoop:
         incumbent_has_valid_trace = self._has_selectable_with_skill_trace(incumbent)
         if candidate_has_valid_trace != incumbent_has_valid_trace:
             return candidate_has_valid_trace
-        return self._efficiency_key(candidate.with_skill) < self._efficiency_key(incumbent.with_skill)
+        return self._efficiency_key(candidate.with_skill) < self._efficiency_key(
+            incumbent.with_skill
+        )
 
     def _efficiency_key(self, trace: ExecutionTrace) -> tuple[int, int, int, int]:
         token_count = self._positive_int_or_none(trace.tokens)
@@ -115,7 +132,7 @@ class HarnessLoop:
             return (0, token_count, tool_calls, steps)
         return (1, tool_calls, steps, 0)
 
-    def _positive_int_or_none(self, value: int | float | None) -> int | None:
+    def _positive_int_or_none(self, value: float | None) -> int | None:
         if isinstance(value, bool) or value is None:
             return None
         try:
@@ -124,7 +141,7 @@ class HarnessLoop:
             return None
         return parsed if parsed > 0 else None
 
-    def _nonnegative_int(self, value: int | float | None) -> int:
+    def _nonnegative_int(self, value: float | None) -> int:
         if isinstance(value, bool) or value is None:
             return 0
         try:

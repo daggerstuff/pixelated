@@ -16,11 +16,9 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import typer
 from rich import print as rprint
@@ -55,10 +53,11 @@ def _work_dir_opt() -> Path:
 def plan(
     month: str = typer.Argument(..., help="Month to plan, e.g. 2025-07"),
     work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir", help="Root work directory"),
-    prior_summary: Optional[str] = typer.Option(None, "--prior-summary", help="Prior month summary text"),
+    prior_summary: str | None = typer.Option(None, "--prior-summary", help="Prior month summary text"),
 ) -> None:
     """Plan a single month: emit month_bible.json and salvage_candidates.json."""
     from pixelated_empathy.monthly_pipeline import plan_month
+
     month_dir = work_dir / month
     rprint(f"[bold blue]Planning {month}…[/bold blue]")
     bible, salvage = plan_month(month, month_dir, prior_summary)
@@ -139,7 +138,7 @@ def enrich(
 def generate(
     month: str = typer.Argument(..., help="Month to generate"),
     work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
-    model: Optional[str] = typer.Option(None, "--model", help="Override Ollama model"),
+    model: str | None = typer.Option(None, "--model", help="Override Ollama model"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be generated without calling LLM"),
 ) -> None:
     """Run LLM generation for a month."""
@@ -238,7 +237,7 @@ def adversarial(
 def llm_review(
     month: str = typer.Argument(..., help="Month to LLM-judge"),
     work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
-    model: Optional[str] = typer.Option(None, "--model", help="Override judge model"),
+    model: str | None = typer.Option(None, "--model", help="Override judge model"),
 ) -> None:
     """Run 3-persona LLM judge review on a month."""
     from pixelated_empathy.monthly_adversarial_llm_review import review as run_llm_review
@@ -272,20 +271,20 @@ def llm_review(
 def run_month(
     month: str = typer.Argument(..., help="Month to fully process"),
     work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
-    model: Optional[str] = typer.Option(None, "--model"),
+    model: str | None = typer.Option(None, "--model"),
     skip_llm_review: bool = typer.Option(False, "--skip-llm-review", help="Skip the 3-persona LLM judge"),
 ) -> None:
     """Full pipeline for one month: plan → gate → enrich → generate → audit → adversarial → llm-review.
 
     All three gates must pass before the month is marked ACCEPTED.
     """
-    from pixelated_empathy.monthly_pipeline import plan_month
-    from pixelated_empathy.monthly_gate import prepare, mark_accepted, mark_rejected
-    from pixelated_empathy.monthly_enrichment import build
-    from pixelated_empathy.monthly_llm_jobs import launch
-    from pixelated_empathy.monthly_auditor import audit as run_audit
-    from pixelated_empathy.monthly_adversarial_review import review as run_adv
     from pixelated_empathy.monthly_adversarial_llm_review import review as run_llm
+    from pixelated_empathy.monthly_adversarial_review import review as run_adv
+    from pixelated_empathy.monthly_auditor import audit as run_audit
+    from pixelated_empathy.monthly_enrichment import build
+    from pixelated_empathy.monthly_gate import mark_accepted, mark_rejected, prepare
+    from pixelated_empathy.monthly_llm_jobs import launch
+    from pixelated_empathy.monthly_pipeline import plan_month
 
     rprint(f"\n[bold cyan]━━━ Running full pipeline for {month} ━━━[/bold cyan]\n")
 
@@ -319,9 +318,7 @@ def run_month(
     # Step 5: Structural audit
     rprint("[bold]Step 5: Structural audit[/bold]")
     audit_report = run_audit(month, work_dir)
-    rprint(
-        f"  Critical: {audit_report.critical_count}, Warnings: {audit_report.warning_count}"
-    )
+    rprint(f"  Critical: {audit_report.critical_count}, Warnings: {audit_report.warning_count}")
     if not audit_report.passed:
         mark_rejected(month, work_dir, f"Structural audit failed: {audit_report.critical_count} critical findings")
         rprint("[red]  ✗ Audit FAILED — remediate and re-run[/red]")
@@ -375,8 +372,7 @@ def status(
     rprint(f"  In progress: {'[yellow]yes[/yellow]' if info['in_progress'] else 'no'}")
     if info["report"]:
         r = info["report"]
-        rprint(f"  Last run: {r.get('batches_run', 0)} batches, "
-               f"{r.get('batches_failed', 0)} failed")
+        rprint(f"  Last run: {r.get('batches_run', 0)} batches, {r.get('batches_failed', 0)} failed")
 
 
 @app.command(name="status-all")
@@ -384,8 +380,8 @@ def status_all(
     work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
 ) -> None:
     """Show status for all months."""
-    from pixelated_empathy.monthly_llm_jobs import status as get_status
     from pixelated_empathy.monthly_gate import get_accepted_months
+    from pixelated_empathy.monthly_llm_jobs import status as get_status
     from pixelated_empathy.schemas import MONTH_ORDER, MONTH_TARGETS
 
     accepted = set(get_accepted_months(work_dir))

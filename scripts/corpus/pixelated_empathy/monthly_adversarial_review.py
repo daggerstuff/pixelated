@@ -16,17 +16,16 @@ from __future__ import annotations
 
 import json
 import re
-from collections import Counter
 from pathlib import Path
 from typing import Any
 
 from pixelated_empathy.schemas import (
+    MONTH_ORDER,
     AdversarialFinding,
     AdversarialReviewReport,
     AuditSeverity,
     ChatBurst,
     EmailRecord,
-    MONTH_ORDER,
 )
 
 # ---------------------------------------------------------------------------
@@ -82,36 +81,42 @@ def _check_emails(emails: list[EmailRecord]) -> list[AdversarialFinding]:
 
         # Placeholder body
         if PLACEHOLDER_BODY_RE.match(body) or len(body) < 20:
-            findings.append(AdversarialFinding(
-                severity=AuditSeverity.CRITICAL,
-                rule="placeholder_body",
-                artifact_id=email.id,
-                excerpt=body[:80],
-                detail="Email body is a placeholder or too short",
-            ))
+            findings.append(
+                AdversarialFinding(
+                    severity=AuditSeverity.CRITICAL,
+                    rule="placeholder_body",
+                    artifact_id=email.id,
+                    excerpt=body[:80],
+                    detail="Email body is a placeholder or too short",
+                )
+            )
             continue
 
         # Stock phrases
         stock_hits = STOCK_PHRASES_RE.findall(body)
         if stock_hits:
-            findings.append(AdversarialFinding(
-                severity=AuditSeverity.WARNING,
-                rule="stock_phrase",
-                artifact_id=email.id,
-                excerpt=body[:120],
-                detail=f"Stock phrase(s) found: {', '.join(set(h.lower() for h in stock_hits))}",
-            ))
+            findings.append(
+                AdversarialFinding(
+                    severity=AuditSeverity.WARNING,
+                    rule="stock_phrase",
+                    artifact_id=email.id,
+                    excerpt=body[:120],
+                    detail=f"Stock phrase(s) found: {', '.join(set(h.lower() for h in stock_hits))}",
+                )
+            )
 
         # Formulaic opener — check first line
         first_line = body.split("\n")[0].strip()
         if FORMULAIC_OPENER_RE.match(first_line):
-            findings.append(AdversarialFinding(
-                severity=AuditSeverity.CRITICAL,
-                rule="formulaic_opener",
-                artifact_id=email.id,
-                excerpt=first_line[:100],
-                detail="Formulaic opener detected",
-            ))
+            findings.append(
+                AdversarialFinding(
+                    severity=AuditSeverity.CRITICAL,
+                    rule="formulaic_opener",
+                    artifact_id=email.id,
+                    excerpt=first_line[:100],
+                    detail="Formulaic opener detected",
+                )
+            )
 
     # Jaccard check: repeated normalized lines across email bodies
     body_tokens: list[tuple[str, frozenset[str]]] = []
@@ -128,13 +133,15 @@ def _check_emails(emails: list[EmailRecord]) -> list[AdversarialFinding]:
             id_b, tokens_b = body_tokens[j]
             sim = _jaccard(tokens_a, tokens_b)
             if sim >= JACCARD_THRESHOLD and id_a not in flagged_for_repetition:
-                findings.append(AdversarialFinding(
-                    severity=AuditSeverity.WARNING,
-                    rule="repeated_content",
-                    artifact_id=id_a,
-                    excerpt=f"Similar to {id_b} (Jaccard={sim:.2f})",
-                    detail=f"Email bodies are {sim:.0%} similar",
-                ))
+                findings.append(
+                    AdversarialFinding(
+                        severity=AuditSeverity.WARNING,
+                        rule="repeated_content",
+                        artifact_id=id_a,
+                        excerpt=f"Similar to {id_b} (Jaccard={sim:.2f})",
+                        detail=f"Email bodies are {sim:.0%} similar",
+                    )
+                )
                 flagged_for_repetition.add(id_a)
 
     return findings
@@ -155,13 +162,15 @@ def _check_chats(chats: list[ChatBurst]) -> list[AdversarialFinding]:
 
             # Placeholder check
             if PLACEHOLDER_BODY_RE.match(curr_text):
-                findings.append(AdversarialFinding(
-                    severity=AuditSeverity.CRITICAL,
-                    rule="placeholder_message",
-                    artifact_id=burst.id,
-                    excerpt=curr_text[:60],
-                    detail=f"Placeholder text in message {i} from {messages[i].sender}",
-                ))
+                findings.append(
+                    AdversarialFinding(
+                        severity=AuditSeverity.CRITICAL,
+                        rule="placeholder_message",
+                        artifact_id=burst.id,
+                        excerpt=curr_text[:60],
+                        detail=f"Placeholder text in message {i} from {messages[i].sender}",
+                    )
+                )
                 continue
 
             # Message restates parent (high token overlap)
@@ -170,29 +179,33 @@ def _check_chats(chats: list[ChatBurst]) -> list[AdversarialFinding]:
             if len(prev_tokens) >= 4 and len(curr_tokens) >= 4:
                 sim = _jaccard(prev_tokens, curr_tokens)
                 if sim >= 0.75:
-                    findings.append(AdversarialFinding(
-                        severity=AuditSeverity.WARNING,
-                        rule="message_restates_parent",
-                        artifact_id=burst.id,
-                        excerpt=curr_text[:80],
-                        detail=(
-                            f"Message {i} from {messages[i].sender} "
-                            f"restates message {i-1} from {messages[i-1].sender} "
-                            f"(Jaccard={sim:.2f})"
-                        ),
-                    ))
+                    findings.append(
+                        AdversarialFinding(
+                            severity=AuditSeverity.WARNING,
+                            rule="message_restates_parent",
+                            artifact_id=burst.id,
+                            excerpt=curr_text[:80],
+                            detail=(
+                                f"Message {i} from {messages[i].sender} "
+                                f"restates message {i - 1} from {messages[i - 1].sender} "
+                                f"(Jaccard={sim:.2f})"
+                            ),
+                        )
+                    )
 
             # Stock phrases in chat
             stock_hits = STOCK_PHRASES_RE.findall(messages[i].text)
             if stock_hits:
-                findings.append(AdversarialFinding(
-                    severity=AuditSeverity.WARNING,
-                    rule="stock_phrase",
-                    artifact_id=burst.id,
-                    excerpt=messages[i].text[:80],
-                    detail=f"Stock phrase in chat from {messages[i].sender}: "
-                           f"{', '.join(set(h.lower() for h in stock_hits))}",
-                ))
+                findings.append(
+                    AdversarialFinding(
+                        severity=AuditSeverity.WARNING,
+                        rule="stock_phrase",
+                        artifact_id=burst.id,
+                        excerpt=messages[i].text[:80],
+                        detail=f"Stock phrase in chat from {messages[i].sender}: "
+                        f"{', '.join(set(h.lower() for h in stock_hits))}",
+                    )
+                )
 
     # Check for repeated normalized bursts (same topic text across bursts)
     burst_texts: list[tuple[str, frozenset[str]]] = []
@@ -209,13 +222,15 @@ def _check_chats(chats: list[ChatBurst]) -> list[AdversarialFinding]:
             id_b, tokens_b = burst_texts[j]
             sim = _jaccard(tokens_a, tokens_b)
             if sim >= JACCARD_THRESHOLD and id_a not in flagged:
-                findings.append(AdversarialFinding(
-                    severity=AuditSeverity.WARNING,
-                    rule="repeated_burst_content",
-                    artifact_id=id_a,
-                    excerpt=f"Similar to {id_b} (Jaccard={sim:.2f})",
-                    detail=f"Chat bursts are {sim:.0%} similar",
-                ))
+                findings.append(
+                    AdversarialFinding(
+                        severity=AuditSeverity.WARNING,
+                        rule="repeated_burst_content",
+                        artifact_id=id_a,
+                        excerpt=f"Similar to {id_b} (Jaccard={sim:.2f})",
+                        detail=f"Chat bursts are {sim:.0%} similar",
+                    )
+                )
                 flagged.add(id_a)
 
     return findings
@@ -258,9 +273,7 @@ def review(month: str, work_dir_root: Path) -> AdversarialReviewReport:
 
     report_path = work_dir / "llm_generation_report.json"
     if not report_path.exists():
-        raise FileNotFoundError(
-            f"llm_generation_report.json missing for {month}. Run generation first."
-        )
+        raise FileNotFoundError(f"llm_generation_report.json missing for {month}. Run generation first.")
 
     emails = _load_emails(work_dir)
     chats = _load_chats(work_dir)

@@ -18,18 +18,16 @@ from typing import Any
 
 import ollama
 
+from pixelated_empathy.monthly_llm_generator import MODEL_BY_TIER
 from pixelated_empathy.schemas import (
+    MONTH_ORDER,
+    MONTH_TARGETS,
     AdversarialLLMReviewReport,
-    AuditSeverity,
     ChatBurst,
     EmailRecord,
     GateTier,
-    MonthEnrichment,
     PersonaJudgeResult,
-    MONTH_ORDER,
-    MONTH_TARGETS,
 )
-from pixelated_empathy.monthly_llm_generator import MODEL_BY_TIER
 
 logger = logging.getLogger(__name__)
 
@@ -83,12 +81,8 @@ def _format_chat_samples(chats: list[ChatBurst], n: int = SAMPLE_SIZE_CHATS) -> 
     sample = random.sample(chats, min(n, len(chats)))
     blocks: list[str] = []
     for burst in sample:
-        messages_text = "\n".join(
-            f"  {msg.sender}: {msg.text}" for msg in burst.messages
-        )
-        blocks.append(
-            f"[{burst.id}] {burst.room} — {burst.topic}\n{messages_text}"
-        )
+        messages_text = "\n".join(f"  {msg.sender}: {msg.text}" for msg in burst.messages)
+        blocks.append(f"[{burst.id}] {burst.room} — {burst.topic}\n{messages_text}")
     return "\n\n---\n\n".join(blocks)
 
 
@@ -251,9 +245,7 @@ def review(
 
     report_path = work_dir / "llm_generation_report.json"
     if not report_path.exists():
-        raise FileNotFoundError(
-            f"llm_generation_report.json missing for {month}. Run generation first."
-        )
+        raise FileNotFoundError(f"llm_generation_report.json missing for {month}. Run generation first.")
 
     target = MONTH_TARGETS[month]
     tier: GateTier = target["tier"]
@@ -277,9 +269,7 @@ def review(
                 for name in ["Voice Fidelity Auditor", "Clinical Accuracy Reviewer", "Training Signal Engineer"]
             ],
         )
-        (work_dir / "adversarial_llm_review_report.json").write_text(
-            report.model_dump_json(indent=2)
-        )
+        (work_dir / "adversarial_llm_review_report.json").write_text(report.model_dump_json(indent=2))
         return report
 
     email_samples = _format_email_samples(emails)
@@ -311,8 +301,6 @@ def review(
     )
 
     work_dir.mkdir(parents=True, exist_ok=True)
-    (work_dir / "adversarial_llm_review_report.json").write_text(
-        report.model_dump_json(indent=2)
-    )
+    (work_dir / "adversarial_llm_review_report.json").write_text(report.model_dump_json(indent=2))
 
     return report
