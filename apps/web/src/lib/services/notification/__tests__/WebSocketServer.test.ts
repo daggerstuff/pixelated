@@ -59,36 +59,6 @@ vi.mock('@/lib/logging/build-safe-logger', () => ({
 
 const logger = createBuildSafeLogger('websocket')
 
-// Mock Supabase
-vi.mock('@/lib/supabase', () => {
-  const mockUser = { id: 'test-user' }
-  const mockProfile = { role: 'user' }
-  const mockSession = { user_id: 'test-user' }
-
-  return {
-    mongoClient: {
-      auth: {
-        getUser: vi.fn().mockResolvedValue({
-          data: { user: mockUser },
-          error: null,
-        }),
-        getSession: vi.fn().mockResolvedValue({
-          data: { session: mockSession },
-          error: null,
-        }),
-      },
-      from: vi.fn().mockImplementation(() => ({
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({
-          data: mockProfile,
-          error: null,
-        }),
-      })),
-    },
-  }
-})
-
 type WSEventHandler = (ws: WebSocket, req: IncomingMessage) => void
 type WSErrorHandler = (error: Error) => void
 type WSMessageHandler = (data: string) => void

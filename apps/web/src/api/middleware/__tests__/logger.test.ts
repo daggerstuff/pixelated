@@ -3,12 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 // Mock dependencies
 const mockAuditLog = vi.fn()
 
-vi.mock('../../../lib/db/postgres', () => ({
-  postgres: {
-    query: mockAuditLog,
-  },
-}))
-
 interface AuditData {
   userId?: string
   action: string

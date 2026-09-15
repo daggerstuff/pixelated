@@ -58,8 +58,9 @@ intentional change with `-- --update`.
 | `pnpm lint:file-size` | Oversized files (TS/TSX/Astro/Python) | `scripts/ci/large-file-baseline.json` |
 | `pnpm lint:tech-debt` | Untracked `TODO`/`FIXME` markers | `scripts/ci/tech-debt-baseline.json` |
 | `pnpm lint:naming` | Naming conventions (TS/TSX) | `.eslintrc.naming.mjs`, `scripts/ci/naming-baseline.json` |
+| `pnpm lint:mock-paths` | Every `vi.mock(...)` specifier resolves to a real module | none (strict) |
 
-`pnpm lint:quality` runs all six. For Python, naming is enforced by ruff's `N`
+`pnpm lint:quality` runs all seven. For Python, naming is enforced by ruff's `N`
 (pep8-naming) rules and strict types by `pnpm typecheck:python`
 (`scripts/ci/python-typecheck.sh`), which runs `mypy --strict` over the `pe`
 service.

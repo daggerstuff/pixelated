@@ -2,21 +2,30 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createLLMService } from '../llm-provider'
 
-vi.mock('../tracing/arize-setup', () => ({
+vi.mock('../../tracing/arize-setup', () => ({
   getArizeTracer: () => ({
     startActiveSpan: (
       _name: string,
       fn: (span: unknown) => unknown,
-    ) => fn({ span: {} }),
+    ) =>
+      fn({
+        end: () => {},
+        setAttribute: () => {},
+        setAttributes: () => {},
+        setStatus: () => {},
+        recordException: () => {},
+      }),
     startSpan: () => ({
       end: () => {},
       setAttribute: () => {},
+      setAttributes: () => {},
+      setStatus: () => {},
       recordException: () => {},
     }),
   }),
 }))
 
-vi.mock('../logging/build-safe-logger', () => ({
+vi.mock('../../../logging/build-safe-logger', () => ({
   createBuildSafeLogger: () => ({
     info: () => {},
     warn: () => {},

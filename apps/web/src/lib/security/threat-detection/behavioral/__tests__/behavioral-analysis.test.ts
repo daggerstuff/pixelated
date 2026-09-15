@@ -185,7 +185,14 @@ vi.mock('@tensorflow/tfjs', () => {
   }
 })
 
-vi.mock('../../logging/build-safe-logger')
+vi.mock('@/lib/logging/build-safe-logger', () => ({
+  createBuildSafeLogger: vi.fn(() => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  })),
+}))
 vi.mock('../../response-orchestration')
 
 describe('Behavioral Analysis Service', () => {

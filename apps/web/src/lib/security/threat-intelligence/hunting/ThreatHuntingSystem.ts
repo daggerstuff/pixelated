@@ -16,7 +16,7 @@ import { EventEmitter } from 'events'
 import Redis from 'ioredis'
 import { Document, MongoClient, Db, WithId } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type {
   HuntingConfig,
   HuntQuery,
@@ -27,6 +27,16 @@ import type {
   HuntFinding,
   GlobalThreatIntelligence,
 } from '../global/types'
+import { analyzeHuntResults } from './ThreatHuntingSystem.analysis'
+import { executeHuntByPattern } from './ThreatHuntingSystem.hunts'
+import {
+  generateThreatIntelligence,
+  storeHuntResults,
+  storeHuntExecution,
+  updateHuntExecution,
+  sendThreatNotifications,
+  integrateWithGlobalIntelligence,
+} from './ThreatHuntingSystem.intelligence'
 import type {
   ThreatHuntingSystem,
   HuntMetrics,
@@ -46,16 +56,6 @@ import {
   calculateOverallConfidence,
   toDate,
 } from './ThreatHuntingSystem.utils'
-import { executeHuntByPattern } from './ThreatHuntingSystem.hunts'
-import { analyzeHuntResults } from './ThreatHuntingSystem.analysis'
-import {
-  generateThreatIntelligence,
-  storeHuntResults,
-  storeHuntExecution,
-  updateHuntExecution,
-  sendThreatNotifications,
-  integrateWithGlobalIntelligence,
-} from './ThreatHuntingSystem.intelligence'
 
 const logger = createBuildSafeLogger('threat-hunting-system')
 
@@ -114,7 +114,9 @@ export class ThreatHuntingSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
+      this.redis = new Redis(
+        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
+      )
       await this.redis.ping()
       logger.info('Redis connection established for threat hunting')
     } catch (error: unknown) {
@@ -126,7 +128,8 @@ export class ThreatHuntingSystemCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_hunting',
+        process.env['MONGODB_URI'] ??
+          'mongodb://localhost:27017/threat_hunting',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_hunting')
@@ -139,9 +142,12 @@ export class ThreatHuntingSystemCore
 
   private async loadHuntPatterns(): Promise<void> {
     try {
-      const patternsCollection = this.getCollection<HuntPattern>('hunt_patterns')
+      const patternsCollection =
+        this.getCollection<HuntPattern>('hunt_patterns')
       const patterns = await patternsCollection.find({}).toArray()
-      const mappedPatterns = patterns.map((pattern) => this.mapStoredDocument(pattern))
+      const mappedPatterns = patterns.map((pattern) =>
+        this.mapStoredDocument(pattern),
+      )
       for (const pattern of mappedPatterns) {
         this.huntPatterns.set(pattern.patternId, pattern)
       }
@@ -185,9 +191,17 @@ export class ThreatHuntingSystemCore
       const pattern = await this.selectHuntPattern(validatedQuery)
       const execution = await this.prepareHuntExecution(validatedQuery, pattern)
 
-      const huntResults = await executeHuntByPattern(this.db, execution, pattern)
+      const huntResults = await executeHuntByPattern(
+        this.db,
+        execution,
+        pattern,
+      )
       const analyzedResults = await analyzeHuntResults(huntResults, pattern)
-      const threats = await generateThreatIntelligence(analyzedResults, pattern, execution)
+      const threats = await generateThreatIntelligence(
+        analyzedResults,
+        pattern,
+        execution,
+      )
 
       execution.status = 'completed'
       execution.completedTime = new Date()
@@ -207,7 +221,8 @@ export class ThreatHuntingSystemCore
         confidence: calculateOverallConfidence(analyzedResults),
         metadata: {
           executionTime:
-            toDate(execution.completedTime).getTime() - toDate(execution.startTime).getTime(),
+            toDate(execution.completedTime).getTime() -
+            toDate(execution.startTime).getTime(),
           dataSources: execution.dataSources,
           regions: execution.regions,
         },
@@ -230,7 +245,10 @@ export class ThreatHuntingSystemCore
 
       return huntResult
     } catch (error: unknown) {
-      logger.error('Failed to execute threat hunt:', { error, huntId: query.huntId })
+      logger.error('Failed to execute threat hunt:', {
+        error,
+        huntId: query.huntId,
+      })
       this.emit('hunt_execution_error', { error, huntId: query.huntId })
       throw error
     }
@@ -252,7 +270,9 @@ export class ThreatHuntingSystemCore
         const startTime = new Date(query.timeRange.startTime)
         const endTime = new Date(query.timeRange.endTime)
         if (startTime >= endTime) {
-          throw new Error('Invalid time range: startTime must be before endTime')
+          throw new Error(
+            'Invalid time range: startTime must be before endTime',
+          )
         }
         if (endTime.getTime() - startTime.getTime() > 7 * 24 * 60 * 60 * 1000) {
           throw new Error('Time range cannot exceed 7 days')
@@ -339,7 +359,10 @@ export class ThreatHuntingSystemCore
         try {
           await this.executeScheduledHunt(schedule)
         } catch (error: unknown) {
-          logger.error('Scheduled hunt execution failed:', { error, scheduleId: schedule.scheduleId })
+          logger.error('Scheduled hunt execution failed:', {
+            error,
+            scheduleId: schedule.scheduleId,
+          })
         }
       }, interval)
 
@@ -354,7 +377,8 @@ export class ThreatHuntingSystemCore
 
   private async storeHuntSchedule(schedule: HuntSchedule): Promise<void> {
     try {
-      const schedulesCollection = this.getCollection<HuntSchedule>('hunt_schedules')
+      const schedulesCollection =
+        this.getCollection<HuntSchedule>('hunt_schedules')
       await schedulesCollection.replaceOne(
         { scheduleId: schedule.scheduleId },
         schedule,
@@ -368,7 +392,9 @@ export class ThreatHuntingSystemCore
 
   private async executeScheduledHunt(schedule: HuntSchedule): Promise<void> {
     try {
-      logger.info('Executing scheduled hunt', { scheduleId: schedule.scheduleId })
+      logger.info('Executing scheduled hunt', {
+        scheduleId: schedule.scheduleId,
+      })
       const huntQuery: HuntQuery = {
         huntId: `scheduled_${schedule.scheduleId}_${Date.now()}`,
         patternId: schedule.patternId,
@@ -379,7 +405,10 @@ export class ThreatHuntingSystemCore
       }
       await this.executeHunt(huntQuery)
     } catch (error: unknown) {
-      logger.error('Scheduled hunt execution failed:', { error, scheduleId: schedule.scheduleId })
+      logger.error('Scheduled hunt execution failed:', {
+        error,
+        scheduleId: schedule.scheduleId,
+      })
       throw error
     }
   }
@@ -405,7 +434,10 @@ export class ThreatHuntingSystemCore
       executionToCancel.completedTime = new Date()
       await updateHuntExecution(this.db, executionToCancel)
       this.activeHunts.delete(executionToCancel.executionId)
-      this.emit('hunt_cancelled', { huntId, executionId: executionToCancel.executionId })
+      this.emit('hunt_cancelled', {
+        huntId,
+        executionId: executionToCancel.executionId,
+      })
       return true
     } catch (error: unknown) {
       logger.error('Failed to cancel hunt:', { error, huntId })
@@ -415,7 +447,10 @@ export class ThreatHuntingSystemCore
 
   // ─── Query methods ─────────────────────────────────────────────
 
-  async getHuntResults(huntId: string, limit: number = 100): Promise<HuntResult[]> {
+  async getHuntResults(
+    huntId: string,
+    limit: number = 100,
+  ): Promise<HuntResult[]> {
     try {
       const resultsCollection = this.getCollection<HuntResult>('hunt_results')
       const results = await resultsCollection
@@ -432,7 +467,8 @@ export class ThreatHuntingSystemCore
 
   async getActiveHunts(): Promise<HuntExecution[]> {
     try {
-      const executionsCollection = this.getCollection<HuntExecution>('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       return await executionsCollection
         .find({ status: { $in: ['preparing', 'executing'] } })
         .sort({ startTime: -1 })
@@ -449,8 +485,13 @@ export class ThreatHuntingSystemCore
       validateHuntPattern(pattern)
       this.huntPatterns.set(pattern.patternId, pattern)
 
-      const patternsCollection = this.getCollection<HuntPattern>('hunt_patterns')
-      await patternsCollection.replaceOne({ patternId: pattern.patternId }, pattern, { upsert: true })
+      const patternsCollection =
+        this.getCollection<HuntPattern>('hunt_patterns')
+      await patternsCollection.replaceOne(
+        { patternId: pattern.patternId },
+        pattern,
+        { upsert: true },
+      )
       this.emit('pattern_updated', { patternId: pattern.patternId })
       return true
     } catch (error: unknown) {
@@ -463,8 +504,10 @@ export class ThreatHuntingSystemCore
 
   async getHuntMetrics(): Promise<HuntMetrics> {
     try {
-      const executionsCollection = this.getCollection<HuntExecution>('hunt_executions')
-      const threatsCollection = this.getCollection<GlobalThreatIntelligence>('discovered_threats')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
+      const threatsCollection =
+        this.getCollection<GlobalThreatIntelligence>('discovered_threats')
 
       const [
         totalHunts,
@@ -511,9 +554,14 @@ export class ThreatHuntingSystemCore
 
   private async calculateAverageExecutionTime(): Promise<number> {
     try {
-      const executionsCollection = this.getCollection<HuntExecution>('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       const completedExecutions = await executionsCollection
-        .find({ status: 'completed', startTime: { $exists: true }, completedTime: { $exists: true } })
+        .find({
+          status: 'completed',
+          startTime: { $exists: true },
+          completedTime: { $exists: true },
+        })
         .project({ startTime: 1, completedTime: 1 })
         .limit(100)
         .toArray()
@@ -548,7 +596,8 @@ export class ThreatHuntingSystemCore
 
   private async getHuntsByType(): Promise<Record<string, number>> {
     try {
-      const executionsCollection = this.getCollection<HuntExecution>('hunt_executions')
+      const executionsCollection =
+        this.getCollection<HuntExecution>('hunt_executions')
       const results = await executionsCollection
         .aggregate<PatternTypeCount>([
           { $group: { _id: '$metadata.patternType', count: { $sum: 1 } } },
@@ -590,8 +639,11 @@ export class ThreatHuntingSystemCore
 
   private async checkScheduledHunts(): Promise<void> {
     try {
-      const schedulesCollection = this.getCollection<HuntSchedule>('hunt_schedules')
-      const activeSchedules = await schedulesCollection.find({ enabled: true }).toArray()
+      const schedulesCollection =
+        this.getCollection<HuntSchedule>('hunt_schedules')
+      const activeSchedules = await schedulesCollection
+        .find({ enabled: true })
+        .toArray()
 
       for (const schedule of activeSchedules) {
         if (await this.shouldExecuteScheduledHunt(schedule)) {
@@ -603,17 +655,23 @@ export class ThreatHuntingSystemCore
     }
   }
 
-  private async shouldExecuteScheduledHunt(schedule: HuntSchedule): Promise<boolean> {
+  private async shouldExecuteScheduledHunt(
+    schedule: HuntSchedule,
+  ): Promise<boolean> {
     try {
       const now = new Date()
-      const lastExecution = schedule.lastExecution ? new Date(schedule.lastExecution) : null
+      const lastExecution = schedule.lastExecution
+        ? new Date(schedule.lastExecution)
+        : null
 
       if (!lastExecution) return true
 
       const interval = calculateScheduleInterval(schedule.frequency)
       return now.getTime() - lastExecution.getTime() >= interval
     } catch (error: unknown) {
-      logger.error('Failed to check if scheduled hunt should execute:', { error })
+      logger.error('Failed to check if scheduled hunt should execute:', {
+        error,
+      })
       return false
     }
   }
@@ -644,9 +702,10 @@ export class ThreatHuntingSystemCore
       }
 
       const metrics = await this.getHuntMetrics()
-      const successRate = metrics.totalHunts > 0
-        ? (metrics.successfulHunts / metrics.totalHunts) * 100
-        : 0
+      const successRate =
+        metrics.totalHunts > 0
+          ? (metrics.successfulHunts / metrics.totalHunts) * 100
+          : 0
 
       return {
         healthy: true,
@@ -657,7 +716,8 @@ export class ThreatHuntingSystemCore
       }
     } catch (error: unknown) {
       logger.error('Health check failed:', { error })
-      const message = error instanceof Error ? error.message : 'Unknown health check failure'
+      const message =
+        error instanceof Error ? error.message : 'Unknown health check failure'
       return { healthy: false, message: `Health check failed: ${message}` }
     }
   }

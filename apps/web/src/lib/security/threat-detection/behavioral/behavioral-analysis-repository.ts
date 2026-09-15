@@ -1,4 +1,4 @@
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { IMongoClient, IRedisClient } from '../threat-hunting/types'
 
 const logger = createBuildSafeLogger('behavioral-analysis-repository')

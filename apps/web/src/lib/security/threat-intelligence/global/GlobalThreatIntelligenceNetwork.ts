@@ -9,7 +9,7 @@ import { EventEmitter } from 'events'
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import { type ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
 import { type AdvancedPredictiveThreatIntelligence } from '../../threat-detection/predictive/predictive-threat-intelligence'
 import { type AdvancedResponseOrchestrator } from '../../threat-detection/response-orchestration'

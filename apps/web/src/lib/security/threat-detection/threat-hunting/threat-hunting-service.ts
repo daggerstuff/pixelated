@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { runInParallelBatches } from '../../utils/concurrency'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { runInParallelBatches } from '../../../utils/concurrency'
 import { ThreatInvestigationManager } from './threat-investigation-manager'
 import { ThreatInvestigationRepository } from './threat-investigation-repository'
 import { ThreatMLInferenceManager } from './threat-ml-inference-manager'

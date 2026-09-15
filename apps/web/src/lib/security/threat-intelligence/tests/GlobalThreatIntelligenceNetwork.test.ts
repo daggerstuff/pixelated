@@ -14,8 +14,9 @@ import type {
 } from '../global/types'
 import type { ValidationMetrics } from '../validation/ThreatValidationSystem'
 
-// Mock dependencies
-vi.mock('../../logging/build-safe-logger', () => ({
+// Mock dependencies — matches the module id production imports
+// (lib/logging/build-safe-logger via '@/lib/logging/build-safe-logger').
+vi.mock('@/lib/logging/build-safe-logger', () => ({
   createBuildSafeLogger: vi.fn<
     () => {
       info: (message: string, ...args: unknown[]) => void

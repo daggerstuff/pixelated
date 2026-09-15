@@ -1,5 +1,5 @@
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { runInParallelBatches } from '../../utils/concurrency'
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { runInParallelBatches } from '../../../utils/concurrency'
 import { IRedisClient, IMongoClient, HuntFinding } from './types'
 
 const logger = createBuildSafeLogger('threat-query-provider')
