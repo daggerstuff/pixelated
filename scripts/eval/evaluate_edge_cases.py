@@ -17,7 +17,9 @@ Evaluates the pixelated_v2 edge case dataset across:
 import json
 import sys
 from collections import Counter
+from collections.abc import Iterable
 from pathlib import Path
+from typing import TypedDict
 
 import numpy as np
 import pandas as pd
@@ -39,7 +41,7 @@ BANNED_OPENERS = [
 ]
 
 
-def load_all(batches):
+def load_all(batches: Iterable[Path]) -> pd.DataFrame:
     dfs = []
     for b in sorted(batches):
         try:
@@ -57,7 +59,20 @@ def check_banned_opener(text: str) -> str | None:
     return None
 
 
-def eval_session(messages):
+class SessionEval(TypedDict, total=False):
+    """Per-session evaluation summary (invalid sessions carry only valid/reason)."""
+
+    valid: bool
+    reason: str
+    user_turns: int
+    asst_turns: int
+    total_turns: int
+    avg_asst_chars: float
+    banned_hits: list[str]
+    is_fallback: bool
+
+
+def eval_session(messages: object) -> SessionEval:
     # messages can be a numpy ndarray of dicts, a list, or a JSON string
     if isinstance(messages, np.ndarray):
         messages = messages.tolist()
@@ -75,7 +90,7 @@ def eval_session(messages):
     if len(asst_turns) == 0:
         return {"valid": False, "reason": "no assistant turns"}
 
-    banned_hits = []
+    banned_hits: list[str] = []
     total_asst_chars = 0
     for m in asst_turns:
         content = m.get("content", "")
@@ -97,7 +112,7 @@ def eval_session(messages):
     }
 
 
-def print_category_distribution(df):
+def print_category_distribution(df: pd.DataFrame) -> None:
     sys.stdout.write(f"\n{'─' * 40}\n")
     sys.stdout.write("1. CATEGORY DISTRIBUTION\n")
     if "category" in df.columns:
@@ -107,7 +122,7 @@ def print_category_distribution(df):
             sys.stdout.write(f"  {cat:<30} {count:>5}  ({pct:.1f}%)\n")
 
 
-def print_diagnosis_coverage(df):
+def print_diagnosis_coverage(df: pd.DataFrame) -> None:
     sys.stdout.write(f"\n{'─' * 40}\n")
     sys.stdout.write("2. DIAGNOSIS COVERAGE\n")
     if "diagnosis" in df.columns:
@@ -119,7 +134,7 @@ def print_diagnosis_coverage(df):
             sys.stdout.write(f"  ... and {len(diags) - 5} more\n")
 
 
-def print_persona_coverage(df):
+def print_persona_coverage(df: pd.DataFrame) -> None:
     sys.stdout.write(f"\n{'─' * 40}\n")
     sys.stdout.write("3. PERSONA COVERAGE\n")
     if "persona_niche" in df.columns:
@@ -129,11 +144,11 @@ def print_persona_coverage(df):
             sys.stdout.write(f"  {p[:45]:<46} {c:>4}\n")
 
 
-def print_session_quality_metrics(df):
+def print_session_quality_metrics(df: pd.DataFrame) -> None:
     sys.stdout.write(f"\n{'─' * 40}\n")
     sys.stdout.write("4. SESSION QUALITY METRICS\n")
 
-    results = []
+    results: list[SessionEval] = []
     for _, row in df.iterrows():
         messages = row.get("messages")
         results.append(eval_session(messages))
@@ -171,7 +186,7 @@ def print_session_quality_metrics(df):
             sys.stdout.write(f"    {reason}: {count}\n")
 
 
-def print_sample_output(df):
+def print_sample_output(df: pd.DataFrame) -> None:
     sys.stdout.write(f"\n{'─' * 40}\n")
     sys.stdout.write("5. SAMPLE SESSIONS\n")
 
@@ -201,7 +216,7 @@ def print_sample_output(df):
             sys.stdout.write(f"    {role}: {content}{'...' if len(m.get('content', '')) > 300 else ''}\n")
 
 
-def main():
+def main() -> None:
     sys.stdout.write(f"\n{'=' * 60}\n")
     sys.stdout.write("PIXELATED v2 EDGE CASE DATASET — EVALUATION REPORT\n")
     sys.stdout.write(f"{'=' * 60}\n")

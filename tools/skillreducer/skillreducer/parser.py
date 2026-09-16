@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -50,7 +51,7 @@ def parse_skill_md(path: Path) -> Skill:
 
 def write_skill_md(
     path: Path,
-    frontmatter: dict,
+    frontmatter: dict[str, Any],
     body: str,
 ) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -59,18 +60,18 @@ def write_skill_md(
     path.write_text(content, encoding="utf-8")
 
 
-def _split_frontmatter(raw: str) -> tuple[dict, str]:
+def _split_frontmatter(raw: str) -> tuple[dict[str, Any], str]:
     if not raw.startswith("---"):
         return {}, raw
     match = re.match(r"^---\s*\n(.*?)\n---\s*\n?", raw, re.DOTALL)
     if not match:
         return {}, raw
-    frontmatter = yaml.safe_load(match.group(1)) or {}
+    frontmatter: dict[str, Any] = yaml.safe_load(match.group(1)) or {}
     body = raw[match.end() :]
     return frontmatter, body
 
 
-def _dump_frontmatter(frontmatter: dict) -> str:
+def _dump_frontmatter(frontmatter: dict[str, Any]) -> str:
     dumped = yaml.safe_dump(frontmatter, sort_keys=False, allow_unicode=True).strip()
     return f"---\n{dumped}\n---"
 

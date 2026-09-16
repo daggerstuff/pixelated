@@ -60,6 +60,7 @@ class EphemeralSandbox:
             raise RuntimeError(f"Sandbox for {self.task_id} is not provisioned.")
 
         start = time.time()
+        cmd: str | list[str]
         if isinstance(command, str):
             cmd = command
             shell = True

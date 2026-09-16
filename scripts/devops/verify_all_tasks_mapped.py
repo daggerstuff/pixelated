@@ -5,9 +5,9 @@ import re
 from parse_and_map_tasks import parse_md_all_tasks
 
 
-def get_mappings():
+def get_mappings() -> dict[str, str]:
     # Base mappings from CSV
-    mappings = {}
+    mappings: dict[str, str] = {}
     with open(".agent/internal/plans/asana-training-pipeline-tasks.csv") as f:
         reader = csv.reader(f)
         next(reader)
@@ -34,7 +34,7 @@ def get_mappings():
     return mappings
 
 
-def main():
+def main() -> None:
     md_path = ".agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md"
     tasks = parse_md_all_tasks(md_path)
     mappings = get_mappings()
@@ -43,8 +43,8 @@ def main():
         linear_data = json.load(f)
     linear_keys = {d["identifier"] for d in linear_data}
 
-    missing_mapping = []
-    missing_linear = []
+    missing_mapping: list[str] = []
+    missing_linear: list[tuple[str, str]] = []
 
     for num, _t in sorted(tasks.items(), key=lambda x: [int(v) for v in x[0].split(".")]):
         if num not in mappings:

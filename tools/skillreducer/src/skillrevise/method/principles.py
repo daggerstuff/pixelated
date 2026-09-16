@@ -75,15 +75,18 @@ class PrincipleBank:
         self.retrieval_config = retrieval_config or PrincipleRetrievalConfig()
 
     @classmethod
-    def default(cls) -> "PrincipleBank":
+    def default(cls) -> PrincipleBank:
         return cls.with_seed_principles()
 
     @classmethod
     def with_seed_principles(
         cls, *, retrieval_config: PrincipleRetrievalConfig | None = None
-    ) -> "PrincipleBank":
+    ) -> PrincipleBank:
         return cls(
-            [_materialize_principle(principle, source="seed_principle") for principle in DEFAULT_SEED_PRINCIPLES],
+            [
+                _materialize_principle(principle, source="seed_principle")
+                for principle in DEFAULT_SEED_PRINCIPLES
+            ],
             retrieval_config=retrieval_config,
         )
 
@@ -93,7 +96,7 @@ class PrincipleBank:
         path: str | Path,
         *,
         retrieval_config: PrincipleRetrievalConfig | None = None,
-    ) -> "PrincipleBank":
+    ) -> PrincipleBank:
         payload = json.loads(Path(path).read_text())
         if isinstance(payload, dict):
             items = payload.get("principles", [])
@@ -114,8 +117,12 @@ class PrincipleBank:
                 acceptance_evidence=[str(case) for case in item.get("acceptance_evidence", [])],
                 intent=str(item.get("intent", "")),
                 trigger=str(item.get("trigger", "")),
-                applicable_failure_modes=[str(mode) for mode in item.get("applicable_failure_modes", [])],
-                evidence_requirements=[str(requirement) for requirement in item.get("evidence_requirements", [])],
+                applicable_failure_modes=[
+                    str(mode) for mode in item.get("applicable_failure_modes", [])
+                ],
+                evidence_requirements=[
+                    str(requirement) for requirement in item.get("evidence_requirements", [])
+                ],
                 retrieval_text=str(item.get("retrieval_text", "")),
                 action_template=str(item.get("action_template", "")),
                 verification_template=str(item.get("verification_template", "")),
@@ -152,8 +159,13 @@ class PrincipleBank:
     def write_json(self, path: str | Path) -> None:
         Path(path).write_text(json.dumps(self.to_jsonable(), indent=2, ensure_ascii=True))
 
-    def retrieve(self, task: TaskSpec, diagnosis: DiagnosisReport, *, limit: int = 4) -> list[RepairPrinciple]:
-        return [candidate.principle for candidate in self.retrieve_candidates(task, diagnosis, limit=limit)]
+    def retrieve(
+        self, task: TaskSpec, diagnosis: DiagnosisReport, *, limit: int = 4
+    ) -> list[RepairPrinciple]:
+        return [
+            candidate.principle
+            for candidate in self.retrieve_candidates(task, diagnosis, limit=limit)
+        ]
 
     def retrieve_candidates(
         self, task: TaskSpec, diagnosis: DiagnosisReport, *, limit: int = 4
@@ -166,7 +178,9 @@ class PrincipleBank:
         if method == "legacy":
             return self._retrieve_legacy(task, diagnosis, context, limit=limit)
 
-        active_principles = [principle for principle in self.principles if principle.status == "active"]
+        active_principles = [
+            principle for principle in self.principles if principle.status == "active"
+        ]
         if not active_principles:
             return []
 
@@ -184,9 +198,13 @@ class PrincipleBank:
             raise RuntimeError(f"Dense principle retrieval unavailable: {dense_status}")
 
         if method == "bm25":
-            return _rank_candidates(active_principles, sparse_scores, context, task, diagnosis, limit, source="bm25")
+            return _rank_candidates(
+                active_principles, sparse_scores, context, task, diagnosis, limit, source="bm25"
+            )
         if method == "dense":
-            return _rank_candidates(active_principles, dense_scores, context, task, diagnosis, limit, source="dense")
+            return _rank_candidates(
+                active_principles, dense_scores, context, task, diagnosis, limit, source="dense"
+            )
 
         fused_scores = _rrf_fuse(
             sparse_scores=sparse_scores,
@@ -215,13 +233,17 @@ class PrincipleBank:
 
         scored.sort(key=lambda item: (-item[0], item[1].principle_id))
         return [
-            PrincipleRetrievalCandidate(principle=principle, score=score, rank=index + 1, matched_signals=signals)
+            PrincipleRetrievalCandidate(
+                principle=principle, score=score, rank=index + 1, matched_signals=signals
+            )
             for index, (score, principle, signals) in enumerate(scored[:limit])
         ]
 
     def render_for_prompt(self, principles: list[RepairPrinciple]) -> str:
         candidates = [
-            PrincipleRetrievalCandidate(principle=principle, score=0.0, rank=index + 1, matched_signals=[])
+            PrincipleRetrievalCandidate(
+                principle=principle, score=0.0, rank=index + 1, matched_signals=[]
+            )
             for index, principle in enumerate(principles)
         ]
         return self.render_candidates_for_prompt(candidates)
@@ -298,7 +320,9 @@ class PrincipleBank:
         return score, _dedupe(matched_signals)
 
     def _context_text(self, task: TaskSpec, diagnosis: DiagnosisReport) -> str:
-        evidence = " ".join(f"{item.source} {item.snippet} {item.reason}" for item in diagnosis.evidence)
+        evidence = " ".join(
+            f"{item.source} {item.snippet} {item.reason}" for item in diagnosis.evidence
+        )
         return " ".join(
             [
                 task.task_id,
@@ -422,7 +446,9 @@ class PrincipleAbsorber:
         evidence = diagnosis.evidence[0]
         labels = [label.value for label in diagnosis.labels]
         target = diagnosis.rewrite_targets[0] if diagnosis.rewrite_targets else revision.rationale
-        abstraction = _abstract_absorbed_repair(target=target, evidence=evidence.snippet, task=task, diagnosis=diagnosis)
+        abstraction = _abstract_absorbed_repair(
+            target=target, evidence=evidence.snippet, task=task, diagnosis=diagnosis
+        )
         if abstraction is None:
             return None
         digest_source = "|".join(
@@ -436,7 +462,9 @@ class PrincipleAbsorber:
         digest = hashlib.sha1(digest_source.encode("utf-8")).hexdigest()[:10]
         title = abstraction.title
         trigger_evidence = f"[{evidence.source}] {abstraction.trigger}"
-        repair_rule = f"When {abstraction.trigger}, revise the skill to: {abstraction.action_template}"
+        repair_rule = (
+            f"When {abstraction.trigger}, revise the skill to: {abstraction.action_template}"
+        )
         if _contains_task_local_anchor(repair_rule, task):
             return None
         return RepairPrinciple(
@@ -454,7 +482,14 @@ class PrincipleAbsorber:
                 "At least one later skill version improves reward or preserves reward with higher utility.",
                 "The reusable action can be stated without task-specific identifiers, constants, paths, or answers.",
             ],
-            retrieval_text=" ".join([title, abstraction.trigger, abstraction.action_template, *abstraction.retrieval_tags]),
+            retrieval_text=" ".join(
+                [
+                    title,
+                    abstraction.trigger,
+                    abstraction.action_template,
+                    *abstraction.retrieval_tags,
+                ]
+            ),
             action_template=abstraction.action_template,
             verification_template=abstraction.verification_template,
             escalation_rule=(
@@ -539,8 +574,20 @@ def _abstract_absorbed_repair(
                 "Mirror the verifier traversal or invariant locally: allowed sentinels may appear only in the "
                 "exception-bearing field, and ordinary objects must still satisfy reachability or membership checks."
             ),
-            trigger_keywords=["verifier", "sentinel", "terminal", "boundary", "exception", "interface"],
-            retrieval_tags=["sentinel convention", "boundary value", "interface exception", "reachability"],
+            trigger_keywords=[
+                "verifier",
+                "sentinel",
+                "terminal",
+                "boundary",
+                "exception",
+                "interface",
+            ],
+            retrieval_tags=[
+                "sentinel convention",
+                "boundary value",
+                "interface exception",
+                "reachability",
+            ],
         )
 
     if _mentions_output_artifact(context):
@@ -571,7 +618,14 @@ def _abstract_absorbed_repair(
             verification_template=(
                 "Re-run or restate the failed assertion locally and confirm the previous passing checks still pass."
             ),
-            trigger_keywords=["verifier", "assertion", "precheck", "expected", "actual", "invariant"],
+            trigger_keywords=[
+                "verifier",
+                "assertion",
+                "precheck",
+                "expected",
+                "actual",
+                "invariant",
+            ],
             retrieval_tags=["assertion mirroring", "pre-finalization check", "verifier alignment"],
         )
 
@@ -586,7 +640,13 @@ def _abstract_absorbed_repair(
             verification_template=(
                 "Add local checks for required fields, ranges, counts, and generated artifacts before the final answer."
             ),
-            trigger_keywords=["validation", "fallback", "invariant", "assumption", "false_certainty"],
+            trigger_keywords=[
+                "validation",
+                "fallback",
+                "invariant",
+                "assumption",
+                "false_certainty",
+            ],
             retrieval_tags=["input validation", "fallback handling", "strict invariant checks"],
         )
 
@@ -599,7 +659,14 @@ def _abstract_absorbed_repair(
                 "commands, versions, and constants from the current workspace or verifier contract"
             ),
             verification_template="Run the derived command or path check in the current workspace before finalizing.",
-            trigger_keywords=["hardcoding", "discovery", "conditional", "path", "version", "constant"],
+            trigger_keywords=[
+                "hardcoding",
+                "discovery",
+                "conditional",
+                "path",
+                "version",
+                "constant",
+            ],
             retrieval_tags=["anti-hardcoding", "conditional discovery", "workspace grounding"],
         )
 
@@ -624,7 +691,9 @@ def _abstract_absorbed_repair(
 def _mentions_sentinel_convention(text: str) -> bool:
     return any(keyword in text for keyword in ["sentinel", "terminal", "boundary value"]) or bool(
         re.search(r"\b(end|stop|done|null|none|n/?a|unknown)\b", text)
-        and any(keyword in text for keyword in ["reachab", "travers", "node", "edge", "queue", "target"])
+        and any(
+            keyword in text for keyword in ["reachab", "travers", "node", "edge", "queue", "target"]
+        )
     )
 
 
@@ -644,9 +713,9 @@ def _mentions_output_artifact(text: str) -> bool:
 
 
 def _mentions_assertion_mirroring(text: str) -> bool:
-    return any(keyword in text for keyword in ["verifier assertion", "failed assertion", "assertion"]) or (
-        "expected" in text and "actual" in text
-    )
+    return any(
+        keyword in text for keyword in ["verifier assertion", "failed assertion", "assertion"]
+    ) or ("expected" in text and "actual" in text)
 
 
 def _mentions_input_invariant_repair(text: str) -> bool:
@@ -664,7 +733,10 @@ def _mentions_input_invariant_repair(text: str) -> bool:
 
 
 def _mentions_hardcoding_repair(text: str) -> bool:
-    return any(keyword in text for keyword in ["hard-code", "hard coded", "hardcoded", "fixed path", "fixed command"])
+    return any(
+        keyword in text
+        for keyword in ["hard-code", "hard coded", "hardcoded", "fixed path", "fixed command"]
+    )
 
 
 def _mentions_concision_repair(text: str) -> bool:
@@ -685,7 +757,9 @@ def _contains_task_local_anchor(text: str, task: TaskSpec) -> bool:
     lowered = text.lower()
     if task.task_id.lower() in lowered:
         return True
-    if re.search(r"(/[\w./-]+|[A-Za-z0-9_-]+\.(json|py|csv|txt|pdf|dot|sh|toml|ya?ml|png|jpe?g))", text):
+    if re.search(
+        r"(/[\w./-]+|[A-Za-z0-9_-]+\.(json|py|csv|txt|pdf|dot|sh|toml|ya?ml|png|jpe?g))", text
+    ):
         return True
     if re.search(r"`[^`]+`", text):
         return True
@@ -722,7 +796,9 @@ def _principle_to_jsonable(principle: RepairPrinciple) -> dict[str, object]:
     }
 
 
-def _materialize_principle(principle: RepairPrinciple, *, source: str | None = None) -> RepairPrinciple:
+def _materialize_principle(
+    principle: RepairPrinciple, *, source: str | None = None
+) -> RepairPrinciple:
     provenance = dict(principle.provenance)
     if source and not provenance:
         provenance = {"source": source, "created_from_episode": None}
@@ -798,7 +874,8 @@ def _shorten(text: str, limit: int) -> str:
 
 def _principle_retrieval_text(principle: RepairPrinciple) -> str:
     if principle.retrieval_text:
-        return principle.retrieval_text
+        retrieval_text: str = principle.retrieval_text
+        return retrieval_text
     return " ".join(
         [
             principle.title,
@@ -846,7 +923,10 @@ def _principle_keyword_text(principle: RepairPrinciple) -> str:
 
 def _bm25_scores(query: str, principles: list[RepairPrinciple]) -> dict[str, float]:
     query_terms = _token_list(query)
-    documents = {principle.principle_id: _token_list(_principle_keyword_text(principle)) for principle in principles}
+    documents = {
+        principle.principle_id: _token_list(_principle_keyword_text(principle))
+        for principle in principles
+    }
     if not query_terms or not documents:
         return {}
 
@@ -933,7 +1013,9 @@ def _rrf_fuse(
 def _rank_map(scores: dict[str, float]) -> dict[str, int]:
     return {
         principle_id: index + 1
-        for index, (principle_id, _) in enumerate(sorted(scores.items(), key=lambda item: (-item[1], item[0])))
+        for index, (principle_id, _) in enumerate(
+            sorted(scores.items(), key=lambda item: (-item[1], item[0]))
+        )
     }
 
 
@@ -949,7 +1031,11 @@ def _rank_candidates(
 ) -> list[PrincipleRetrievalCandidate]:
     by_id = {principle.principle_id: principle for principle in principles}
     ranked = sorted(
-        ((principle_id, score) for principle_id, score in scores.items() if principle_id in by_id and score > 0),
+        (
+            (principle_id, score)
+            for principle_id, score in scores.items()
+            if principle_id in by_id and score > 0
+        ),
         key=lambda item: (-item[1], item[0]),
     )
     candidates: list[PrincipleRetrievalCandidate] = []
@@ -988,7 +1074,9 @@ def _exact_match_signals(
     return signals
 
 
-def _embed_texts(texts: list[str], config: PrincipleRetrievalConfig) -> tuple[list[list[float]] | None, str]:
+def _embed_texts(
+    texts: list[str], config: PrincipleRetrievalConfig
+) -> tuple[list[list[float]] | None, str]:
     local_config = _load_local_embedding_config()
     cache_path = (
         config.embedding_cache
@@ -1006,7 +1094,11 @@ def _embed_texts(texts: list[str], config: PrincipleRetrievalConfig) -> tuple[li
     for index, text in enumerate(texts):
         key = _embedding_cache_key(model, text)
         cached = cache.get(key)
-        if isinstance(cached, list) and cached and all(isinstance(value, (int, float)) for value in cached):
+        if (
+            isinstance(cached, list)
+            and cached
+            and all(isinstance(value, (int, float)) for value in cached)
+        ):
             embeddings.append([float(value) for value in cached])
         else:
             embeddings.append(None)
@@ -1036,7 +1128,9 @@ def _compute_embeddings(
     if endpoint:
         return _compute_embeddings_via_http(texts, config, model, endpoint)
 
-    backend = (get_env(os.environ, "SKILL_REVISE_PRINCIPLE_EMBEDDING_BACKEND", "") or "").strip().lower()
+    backend = (
+        (get_env(os.environ, "SKILL_REVISE_PRINCIPLE_EMBEDDING_BACKEND", "") or "").strip().lower()
+    )
     if backend in {"sentence-transformers", "sentence_transformers", "local"}:
         return _compute_embeddings_via_sentence_transformers(texts, model)
     return None, "no_embedding_backend"
@@ -1120,7 +1214,7 @@ def _compute_embeddings_via_sentence_transformers(
     texts: list[str], model: str
 ) -> tuple[list[list[float]] | None, str]:
     try:
-        from sentence_transformers import SentenceTransformer  # type: ignore
+        from sentence_transformers import SentenceTransformer
     except Exception as exc:
         return None, f"sentence_transformers_unavailable:{type(exc).__name__}"
 
@@ -1160,7 +1254,7 @@ def _write_embedding_cache(path: str, cache: dict[str, list[float]]) -> None:
 
 
 def _embedding_cache_key(model: str, text: str) -> str:
-    return hashlib.sha1(f"{model}\0{text}".encode("utf-8")).hexdigest()
+    return hashlib.sha1(f"{model}\0{text}".encode()).hexdigest()
 
 
 def _cosine_similarity(left: list[float], right: list[float]) -> float:
@@ -1186,7 +1280,7 @@ def _token_list(text: str) -> list[str]:
 
 def _load_local_embedding_config() -> dict[str, str]:
     try:
-        from skillrevise import local_llm_config as config  # type: ignore
+        from skillrevise import local_llm_config as config
     except Exception:
         return {}
     keys = {
@@ -1254,7 +1348,11 @@ DEFAULT_SEED_PRINCIPLES = [
     RepairPrinciple(
         principle_id="workflow-checkpointing",
         title="Make The Skill Executable As Checkpoints",
-        defect_labels=["missing_workflow_explicitness", "over_generality", "wrong_abstraction_level"],
+        defect_labels=[
+            "missing_workflow_explicitness",
+            "over_generality",
+            "wrong_abstraction_level",
+        ],
         failure_types=[FailureType.OVER_GENERALITY, FailureType.WRONG_ABSTRACTION_LEVEL],
         trigger_keywords=["vague", "broad", "workflow", "checkpoint", "step", "not actionable"],
         trigger_evidence="The skill gives broad advice but does not force verifiable intermediate decisions.",
@@ -1268,9 +1366,23 @@ DEFAULT_SEED_PRINCIPLES = [
     RepairPrinciple(
         principle_id="input-schema-validation",
         title="Validate Input And Output Schemas Before Finalizing",
-        defect_labels=["missing_input_validation", "output_format_mismatch", "missing_verifier_alignment"],
+        defect_labels=[
+            "missing_input_validation",
+            "output_format_mismatch",
+            "missing_verifier_alignment",
+        ],
         failure_types=[FailureType.FALSE_CERTAINTY, FailureType.WRONG_ABSTRACTION_LEVEL],
-        trigger_keywords=["schema", "json", "csv", "npy", "shape", "dtype", "tokens", "field", "format"],
+        trigger_keywords=[
+            "schema",
+            "json",
+            "csv",
+            "npy",
+            "shape",
+            "dtype",
+            "tokens",
+            "field",
+            "format",
+        ],
         trigger_evidence="Verifier failures mention malformed fields, wrong types, missing keys, or numeric mismatches.",
         repair_rule=(
             "Add a post-write schema check that reloads produced artifacts and asserts required keys, types, "
@@ -1282,7 +1394,11 @@ DEFAULT_SEED_PRINCIPLES = [
     RepairPrinciple(
         principle_id="environment-output-grounding",
         title="Ground Required Outputs In Verifier-Visible Paths",
-        defect_labels=["missing_environment_grounding", "missing_verifier_alignment", "output_format_mismatch"],
+        defect_labels=[
+            "missing_environment_grounding",
+            "missing_verifier_alignment",
+            "output_format_mismatch",
+        ],
         failure_types=[FailureType.ENVIRONMENT_MISMATCH, FailureType.FALSE_CERTAINTY],
         trigger_keywords=[
             "file not found",
@@ -1305,9 +1421,22 @@ DEFAULT_SEED_PRINCIPLES = [
     RepairPrinciple(
         principle_id="verifier-contract-alignment",
         title="Translate Verifier Logic Into Skill Constraints",
-        defect_labels=["missing_verifier_alignment", "strict_constraint_checking", "output_format_mismatch"],
+        defect_labels=[
+            "missing_verifier_alignment",
+            "strict_constraint_checking",
+            "output_format_mismatch",
+        ],
         failure_types=[FailureType.FALSE_CERTAINTY, FailureType.WRONG_ABSTRACTION_LEVEL],
-        trigger_keywords=["verifier", "test", "assert", "expected", "reachability", "terminal", "end", "contract"],
+        trigger_keywords=[
+            "verifier",
+            "test",
+            "assert",
+            "expected",
+            "reachability",
+            "terminal",
+            "end",
+            "contract",
+        ],
         trigger_evidence="The skill follows plausible domain logic but misses a subtle verifier convention.",
         repair_rule=(
             "Make the skill require reading or inferring the verifier contract, then restating any non-obvious sentinel, "
@@ -1321,9 +1450,21 @@ DEFAULT_SEED_PRINCIPLES = [
     RepairPrinciple(
         principle_id="fallback-after-tool-failure",
         title="Add Bounded Recovery For Broken Tools Or Assumptions",
-        defect_labels=["missing_fallback_handling", "tool_usage_mismatch", "missing_environment_grounding"],
+        defect_labels=[
+            "missing_fallback_handling",
+            "tool_usage_mismatch",
+            "missing_environment_grounding",
+        ],
         failure_types=[FailureType.ENVIRONMENT_MISMATCH, FailureType.FALSE_CERTAINTY],
-        trigger_keywords=["error", "failed", "unavailable", "timeout", "exception", "permission", "fallback"],
+        trigger_keywords=[
+            "error",
+            "failed",
+            "unavailable",
+            "timeout",
+            "exception",
+            "permission",
+            "fallback",
+        ],
         trigger_evidence="A command, tool, file, endpoint, or assumption failed and the agent did not switch to a valid alternative.",
         repair_rule=(
             "Add one bounded fallback branch: when the planned route fails, inspect the failure signal, choose the closest "
@@ -1341,7 +1482,16 @@ DEFAULT_SEED_PRINCIPLES = [
             FailureType.CONTEXT_POLLUTION,
             FailureType.WRONG_ABSTRACTION_LEVEL,
         ],
-        trigger_keywords=["hard-code", "specific", "literal", "memorize", "overfit", "transfer", "too long", "tokens"],
+        trigger_keywords=[
+            "hard-code",
+            "specific",
+            "literal",
+            "memorize",
+            "overfit",
+            "transfer",
+            "too long",
+            "tokens",
+        ],
         trigger_evidence="The repair target is a single task instance, path, literal, or answer rather than a reusable behavior.",
         repair_rule=(
             "Replace instance-specific content with a trigger condition and reusable decision rule. Keep only details that "
@@ -1355,7 +1505,14 @@ DEFAULT_SEED_PRINCIPLES = [
         title="Make Skill Triggering Precise Enough To Avoid Harm",
         defect_labels=["negative_transfer_risk", "context_pollution", "over_generality"],
         failure_types=[FailureType.CONTEXT_POLLUTION, FailureType.OVER_GENERALITY],
-        trigger_keywords=["irrelevant", "wrong task", "overhead", "more tokens", "misleading", "not applicable"],
+        trigger_keywords=[
+            "irrelevant",
+            "wrong task",
+            "overhead",
+            "more tokens",
+            "misleading",
+            "not applicable",
+        ],
         trigger_evidence="The skill adds cost or steers the agent when its procedure is not needed for the current task.",
         repair_rule=(
             "Narrow When to Use and add exclusion conditions so the skill fires only when its checks or workflow change "

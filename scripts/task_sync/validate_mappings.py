@@ -21,10 +21,10 @@ import os
 import sys
 import urllib.request
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 
 
-def print_out(msg: str = "", file=sys.stdout) -> None:
+def print_out(msg: str = "", file: TextIO = sys.stdout) -> None:
     file.write(f"{msg}\n")
     file.flush()
 

@@ -17,6 +17,7 @@ Outputs:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime
 import json
 import logging
@@ -76,10 +77,23 @@ class DashboardReport:
     commit: str
     metrics: dict[str, Any]
     duplicate_jobs: list[dict[str, Any]]
-    lane_failures: dict[str, list[dict[str, Any]]]
+    lane_failures: dict[str, dict[str, int]]
     deploy_gate_events: list[dict[str, Any]]
     provider_workflow_counts: dict[str, int]
     recent_runs: list[dict[str, Any]]
+
+
+@dataclass
+class DashboardOptions:
+    """Configuration options for the dashboard runner."""
+
+    root: str = "."
+    days: int = 7
+    branch: str | None = None
+    output_path: str | None = None
+    html_path: str | None = None
+    github_token: str | None = None
+    github_repo: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -92,7 +106,7 @@ LANE_PATTERNS: dict[str, list[str]] = {
     "test": ["test", "vitest", "pytest", "unit test", "advisory", "browser", "playwright"],
     "build": ["build", "docker", "image", "compile"],
     "security": ["security", "codeql", "trivy", "scan", "snyk", "sonar", "shellcheck"],
-    "deploy": ["deploy", "release", "rollout", "civo", "k8s", "kubernetes"],
+    "deploy": ["deploy", "release", "rollout", "eks", "k8s", "kubernetes"],
 }
 
 
@@ -121,20 +135,16 @@ def find_workflow_files(root: str = ".") -> list[Path]:
     # GitHub Actions workflows
     gh_dir = Path(root) / ".github" / "workflows"
     if gh_dir.exists():
-        for f in sorted(gh_dir.iterdir()):
-            if f.suffix in (".yml", ".yaml") and f.is_file():
-                result.append(f)
+        result.extend(f for f in sorted(gh_dir.iterdir()) if f.suffix in (".yml", ".yaml") and f.is_file())
 
     # Bitbucket Pipelines
     bb_files = [Path(root) / "bitbucket-pipelines.yml", Path(root) / "bitbucket-pipelines.yaml"]
-    for bb in bb_files:
-        if bb.exists():
-            result.append(bb)
+    result.extend(bb for bb in bb_files if bb.exists())
 
     return result
 
 
-def parse_workflow_yaml(path: Path, root: str = ".") -> list[WorkflowJob]:
+def parse_workflow_yaml(path: Path) -> list[WorkflowJob]:
     """Parse a workflow YAML file and extract job definitions."""
     try:
         with open(path) as f:
@@ -149,71 +159,72 @@ def parse_workflow_yaml(path: Path, root: str = ".") -> list[WorkflowJob]:
     provider = "bitbucket" if "bitbucket" in path.name.lower() else "github"
     workflow_name = data.get("name", "") or data.get("pipeline", "") or path.stem
 
-    jobs: list[WorkflowJob] = []
-
     if provider == "github":
-        # GitHub Actions: top-level `jobs:` key
-        gh_jobs = data.get("jobs", {})
-        if isinstance(gh_jobs, dict):
-            for jname, jbody in gh_jobs.items():
-                if isinstance(jbody, dict):
-                    steps_list: list[str] = []
-                    for step in jbody.get("steps", []):
-                        if isinstance(step, dict) and "name" in step:
-                            steps_list.append(step["name"])
-                        elif isinstance(step, dict) and "run" in step:
-                            steps_list.append(step["run"][:80])
-                    lane = classify_lane(jname, workflow_name, steps_list)
-                    jobs.append(
-                        WorkflowJob(
-                            name=jname,
-                            workflow_name=str(workflow_name),
-                            provider=provider,
-                            lane=lane,
-                            steps=steps_list,
-                        )
-                    )
-    else:
-        # Bitbucket Pipelines: `pipelines:` key
-        # Structure: pipelines.{event_type}[].{step|parallel}[]
-        # Keys are 'step' (singular) for single steps or 'parallel' for parallel groups
-        pipelines = data.get("pipelines", {})
-        if isinstance(pipelines, dict):
-            for event_type, steps_or_branches in pipelines.items():
-                if isinstance(steps_or_branches, list):
-                    for entry in steps_or_branches:
-                        if not isinstance(entry, dict):
-                            continue
-                        # Single step: entry = {"step": <resolved_anchor_dict>}
-                        if "step" in entry and isinstance(entry["step"], dict):
-                            parsed = _parse_bb_step(entry["step"], event_type, provider)
-                            if parsed:
-                                jobs.append(parsed)
-                        # Parallel group: entry = {"parallel": [{"step": ...}, ...]}
-                        if "parallel" in entry and isinstance(entry["parallel"], list):
-                            for parallel_entry in entry["parallel"]:
-                                if isinstance(parallel_entry, dict) and "step" in parallel_entry:
-                                    if isinstance(parallel_entry["step"], dict):
-                                        parsed = _parse_bb_step(parallel_entry["step"], event_type, provider)
-                                        if parsed:
-                                            jobs.append(parsed)
+        return _parse_gh_jobs(data, workflow_name)
+    return _parse_bb_jobs(data, provider)
 
+
+def _parse_gh_jobs(data: dict[str, Any], workflow_name: str) -> list[WorkflowJob]:
+    """Extract jobs from a GitHub Actions workflow (`jobs:` key)."""
+    jobs: list[WorkflowJob] = []
+    gh_jobs = data.get("jobs", {})
+    if not isinstance(gh_jobs, dict):
+        return jobs
+
+    for jname, jbody in gh_jobs.items():
+        if not isinstance(jbody, dict):
+            continue
+        steps = jbody.get("steps", [])
+        steps_list = [step["name"] for step in steps if isinstance(step, dict) and "name" in step]
+        steps_list.extend(step["run"][:80] for step in steps if isinstance(step, dict) and "run" in step)
+        lane = classify_lane(jname, workflow_name, steps_list)
+        jobs.append(
+            WorkflowJob(
+                name=jname,
+                workflow_name=workflow_name,
+                provider="github",
+                lane=lane,
+                steps=steps_list,
+            )
+        )
     return jobs
 
 
-def _parse_bb_step(step: dict, event_type: str, provider: str) -> WorkflowJob | None:
+def _parse_bb_jobs(data: dict[str, Any], provider: str) -> list[WorkflowJob]:
+    """Extract jobs from a Bitbucket Pipelines workflow (`pipelines:` key)."""
+    jobs: list[WorkflowJob] = []
+    pipelines = data.get("pipelines", {})
+    if not isinstance(pipelines, dict):
+        return jobs
+
+    for event_type, steps_or_branches in pipelines.items():
+        if not isinstance(steps_or_branches, list):
+            continue
+        for entry in steps_or_branches:
+            if not isinstance(entry, dict):
+                continue
+            # Single step: entry = {"step": <resolved_anchor_dict>}
+            if isinstance(entry.get("step"), dict) and (parsed := _parse_bb_step(entry["step"], event_type, provider)):
+                jobs.append(parsed)
+            # Parallel group: entry = {"parallel": [{"step": ...}, ...]}
+            if isinstance(entry.get("parallel"), list):
+                for parallel_entry in entry["parallel"]:
+                    if (
+                        isinstance(parallel_entry, dict)
+                        and isinstance(parallel_entry.get("step"), dict)
+                        and (parsed := _parse_bb_step(parallel_entry["step"], event_type, provider))
+                    ):
+                        jobs.append(parsed)
+    return jobs
+
+
+def _parse_bb_step(step: dict[str, Any], event_type: str, provider: str) -> WorkflowJob | None:
     sname = step.get("name", "")
     if not sname:
         script = step.get("script", [])
-        if isinstance(script, list) and script:
-            sname = str(script[0])[:60]
-        else:
-            sname = "unnamed"
+        sname = str(script[0])[:60] if isinstance(script, list) and script else "unnamed"
 
-    step_scripts: list[str] = []
-    for s in step.get("script", []):
-        if isinstance(s, str):
-            step_scripts.append(s[:80])
+    step_scripts = [s[:80] for s in step.get("script", []) if isinstance(s, str)]
 
     lane = classify_lane(sname, f"bitbucket/{event_type}", step_scripts)
     return WorkflowJob(
@@ -229,7 +240,7 @@ def build_job_inventory(root: str = ".") -> tuple[list[WorkflowJob], dict[str, i
     """Build a complete inventory of all CI jobs across providers."""
     all_jobs: list[WorkflowJob] = []
     for wf_path in find_workflow_files(root):
-        all_jobs.extend(parse_workflow_yaml(wf_path, root))
+        all_jobs.extend(parse_workflow_yaml(wf_path))
 
     provider_counts: dict[str, int] = defaultdict(int)
     for j in all_jobs:
@@ -296,15 +307,12 @@ class GitHubActionsCollector:
 
     @staticmethod
     def _detect_repo() -> str | None:
-        try:
+        with contextlib.suppress(Exception):
             remote = subprocess.check_output(
                 ["git", "remote", "get-url", "origin"], stderr=subprocess.DEVNULL, text=True
             ).strip()
-            match = re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?$", remote)
-            if match:
-                return match.group(1)
-        except Exception:
-            pass
+            if match := re.search(r"github\.com[:/]([^/]+/[^/]+?)(?:\.git)?$", remote):
+                return match[1]
         return None
 
     def is_available(self) -> bool:
@@ -343,23 +351,21 @@ class GitHubActionsCollector:
             logger.warning("  ⚠ GitHub API request failed: %s", exc)
             return []
 
-        runs: list[WorkflowRun] = []
-        for run in data.get("workflow_runs", []):
-            runs.append(
-                WorkflowRun(
-                    name=run.get("name", "unknown"),
-                    status=run.get("status", "unknown"),
-                    conclusion=run.get("conclusion"),
-                    url=run.get("html_url", ""),
-                    started_at=run.get("run_started_at"),
-                    completed_at=run.get("updated_at"),
-                    event=run.get("event", "unknown"),
-                    head_branch=run.get("head_branch", ""),
-                    head_sha=run.get("head_sha", ""),
-                    run_number=run.get("run_number", 0),
-                )
+        return [
+            WorkflowRun(
+                name=run.get("name", "unknown"),
+                status=run.get("status", "unknown"),
+                conclusion=run.get("conclusion"),
+                url=run.get("html_url", ""),
+                started_at=run.get("run_started_at"),
+                completed_at=run.get("updated_at"),
+                event=run.get("event", "unknown"),
+                head_branch=run.get("head_branch", ""),
+                head_sha=run.get("head_sha", ""),
+                run_number=run.get("run_number", 0),
             )
-        return runs
+            for run in data.get("workflow_runs", [])
+        ]
 
 
 # ---------------------------------------------------------------------------
@@ -379,6 +385,8 @@ def compute_pr_feedback_time(runs: list[WorkflowRun]) -> dict[str, Any]:
 
     for run in pr_runs:
         try:
+            if run.started_at is None or run.completed_at is None:
+                continue
             started = datetime.datetime.fromisoformat(run.started_at.replace("Z", "+00:00"))
             completed = datetime.datetime.fromisoformat(run.completed_at.replace("Z", "+00:00"))
             minutes = (completed - started).total_seconds() / 60.0
@@ -415,9 +423,7 @@ def compute_failed_checks_by_lane(runs: list[WorkflowRun], jobs: list[WorkflowJo
         return {"total_failures": 0, "by_lane": {}, "by_workflow": {}}
 
     # Map workflow names to lanes using the job inventory
-    name_to_lane: dict[str, str] = {}
-    for job in jobs:
-        name_to_lane[job.workflow_name] = job.lane
+    name_to_lane = {job.workflow_name: job.lane for job in jobs}
 
     by_lane: dict[str, int] = defaultdict(int)
     by_workflow: dict[str, int] = defaultdict(int)
@@ -441,19 +447,18 @@ def compute_deploy_gate_failures(runs: list[WorkflowRun], jobs: list[WorkflowJob
         job.workflow_name for job in jobs if job.lane in ("deploy", "security") or "deploy" in job.workflow_name.lower()
     }
 
-    gate_failures: list[dict[str, Any]] = []
-    for run in runs:
-        if run.name in deploy_workflows and run.conclusion == "failure":
-            gate_failures.append(
-                {
-                    "workflow": run.name,
-                    "run_number": run.run_number,
-                    "branch": run.head_branch,
-                    "conclusion": run.conclusion,
-                    "url": run.url,
-                    "completed_at": run.completed_at,
-                }
-            )
+    gate_failures = [
+        {
+            "workflow": run.name,
+            "run_number": run.run_number,
+            "branch": run.head_branch,
+            "conclusion": run.conclusion,
+            "url": run.url,
+            "completed_at": run.completed_at,
+        }
+        for run in runs
+        if run.name in deploy_workflows and run.conclusion == "failure"
+    ]
 
     return sorted(gate_failures, key=lambda x: x.get("completed_at", ""), reverse=True)
 
@@ -473,9 +478,7 @@ def generate_html_report(report: DashboardReport) -> str:
     def severity_color(val: float, good: float, warn: float) -> str:
         if val >= good:
             return "#2ecc71"
-        if val >= warn:
-            return "#f39c12"
-        return "#e74c3c"
+        return "#f39c12" if val >= warn else "#e74c3c"
 
     dup_jobs_rows = ""
     for d in dj:
@@ -562,7 +565,7 @@ def generate_html_report(report: DashboardReport) -> str:
 <table>
 <thead><tr><th>Lane</th><th>Providers</th><th>Jobs</th><th>GitHub Jobs</th></tr></thead>
 <tbody>
-  {dup_jobs_rows if dup_jobs_rows else '<tr><td colspan="4">No duplicates detected</td></tr>'}
+  {dup_jobs_rows or '<tr><td colspan="4">No duplicates detected</td></tr>'}
 </tbody>
 </table>
 
@@ -570,7 +573,7 @@ def generate_html_report(report: DashboardReport) -> str:
 <table>
 <thead><tr><th>Lane</th><th>Failures</th></tr></thead>
 <tbody>
-  {lane_rows if lane_rows else '<tr><td colspan="2">No failures in the period</td></tr>'}
+  {lane_rows or '<tr><td colspan="2">No failures in the period</td></tr>'}
 </tbody>
 </table>
 
@@ -597,8 +600,15 @@ def generate_html_report(report: DashboardReport) -> str:
 
 def print_terminal_report(report: DashboardReport) -> None:
     """Print a formatted terminal report using logging."""
-    m = report.metrics
+    _print_header(report)
+    _print_summary(report)
+    _print_duplicate_jobs(report)
+    _print_failed_checks(report)
+    _print_deploy_gates(report)
+    _print_pr_feedback(report)
 
+
+def _print_header(report: DashboardReport) -> None:
     logger.info("")
     logger.info("╔══════════════════════════════════════════════════════════╗")
     logger.info("║           CI OPERATIONS DASHBOARD                       ║")
@@ -610,11 +620,16 @@ def print_terminal_report(report: DashboardReport) -> None:
     logger.info("╚══════════════════════════════════════════════════════════╝")
     logger.info("")
 
-    # Summary cards
-    total_jobs = report.provider_workflow_counts.get("github", 0) + report.provider_workflow_counts.get("bitbucket", 0)
-    dup_count = len(report.duplicate_jobs)
+
+def _print_summary(report: DashboardReport) -> None:
+    m = report.metrics
+    gh_count = report.provider_workflow_counts.get("github", 0)
+    bb_count = report.provider_workflow_counts.get("bitbucket", 0)
+    failed_checks = m.get("failed_checks", {})
     pr_fb = m.get("pr_feedback_time", {}).get("avg_minutes")
-    fail_count = m.get("failed_checks", {}).get("total_failures", 0)
+
+    dup_count = len(report.duplicate_jobs)
+    fail_count = failed_checks.get("total_failures", 0)
     gate_count = len(report.deploy_gate_events)
     total_runs = m.get("total_runs", 0)
 
@@ -629,50 +644,52 @@ def print_terminal_report(report: DashboardReport) -> None:
         fail_indicator,
         fail_count,
         total_runs,
-        m.get("failed_checks", {}).get("rate_pct", 0),
+        failed_checks.get("rate_pct", 0),
     )
     logger.info("  %s Deploy Gates:      %d failure(s)", gate_indicator, gate_count)
-    logger.info(
-        "  📊 Total Jobs:       %d (GH: %d · BB: %d)",
-        total_jobs,
-        report.provider_workflow_counts.get("github", 0),
-        report.provider_workflow_counts.get("bitbucket", 0),
-    )
+    logger.info("  📊 Total Jobs:       %d (GH: %d · BB: %d)", gh_count + bb_count, gh_count, bb_count)
     logger.info("")
 
-    # Duplicate jobs detail
-    if report.duplicate_jobs:
-        logger.info("  ── Duplicate Lanes ──")
-        for d in report.duplicate_jobs:
-            logger.info("    • %s: %s", d["lane"], ", ".join(d["providers"]))
-            if d.get("github_jobs"):
-                logger.info("      GH: %s", ", ".join(d["github_jobs"]))
-        logger.info("")
 
-    # Failed checks by lane
-    fc = m.get("failed_checks", {})
-    if fc.get("by_lane"):
-        logger.info("  ── Failed Checks by Lane ──")
-        for lane, count in sorted(fc["by_lane"].items(), key=lambda x: -x[1]):
-            logger.info("    • %s: %d", lane, count)
-        logger.info("")
+def _print_duplicate_jobs(report: DashboardReport) -> None:
+    if not report.duplicate_jobs:
+        return
+    logger.info("  ── Duplicate Lanes ──")
+    for d in report.duplicate_jobs:
+        logger.info("    • %s: %s", d["lane"], ", ".join(d["providers"]))
+        if d.get("github_jobs"):
+            logger.info("      GH: %s", ", ".join(d["github_jobs"]))
+    logger.info("")
 
-    # Deploy gate failures
-    if report.deploy_gate_events:
-        logger.info("  ── Deploy Gate Failures ──")
-        for g in report.deploy_gate_events[:5]:
-            logger.info("    • %s #%d (%s): %s", g["workflow"], g["run_number"], g["branch"], g["url"])
-        logger.info("")
 
-    # PR feedback by workflow
-    pr_wf = pr_fb_data = m.get("pr_feedback_time", {}).get("by_workflow", {})
-    if pr_wf:
-        logger.info("  ── PR Feedback Time by Workflow ──")
-        for wf, v in sorted(pr_wf.items(), key=lambda x: -x[1]["count"]):
-            avg = v.get("avg_minutes")
-            if avg:
-                logger.info("    • %s: %.1fm avg (%d runs)", wf, avg, v["count"])
-        logger.info("")
+def _print_failed_checks(report: DashboardReport) -> None:
+    by_lane = report.metrics.get("failed_checks", {}).get("by_lane")
+    if not by_lane:
+        return
+    logger.info("  ── Failed Checks by Lane ──")
+    for lane, count in sorted(by_lane.items(), key=lambda x: -x[1]):
+        logger.info("    • %s: %d", lane, count)
+    logger.info("")
+
+
+def _print_deploy_gates(report: DashboardReport) -> None:
+    if not report.deploy_gate_events:
+        return
+    logger.info("  ── Deploy Gate Failures ──")
+    for g in report.deploy_gate_events[:5]:
+        logger.info("    • %s #%d (%s): %s", g["workflow"], g["run_number"], g["branch"], g["url"])
+    logger.info("")
+
+
+def _print_pr_feedback(report: DashboardReport) -> None:
+    by_workflow = report.metrics.get("pr_feedback_time", {}).get("by_workflow", {})
+    if not by_workflow:
+        return
+    logger.info("  ── PR Feedback Time by Workflow ──")
+    for wf, v in sorted(by_workflow.items(), key=lambda x: -x[1]["count"]):
+        if avg := v.get("avg_minutes"):
+            logger.info("    • %s: %.1fm avg (%d runs)", wf, avg, v["count"])
+    logger.info("")
 
 
 # ---------------------------------------------------------------------------
@@ -680,16 +697,16 @@ def print_terminal_report(report: DashboardReport) -> None:
 # ---------------------------------------------------------------------------
 
 
-def run_dashboard(
-    root: str = ".",
-    days: int = 7,
-    branch: str | None = None,
-    output_path: str | None = None,
-    html_path: str | None = None,
-    github_token: str | None = None,
-    github_repo: str | None = None,
-) -> DashboardReport:
+def run_dashboard(opts: DashboardOptions) -> DashboardReport:
     """Run the CI operations dashboard and return the report."""
+    root = opts.root
+    days = opts.days
+    branch = opts.branch
+    output_path = opts.output_path
+    html_path = opts.html_path
+    github_token = opts.github_token
+    github_repo = opts.github_repo
+
     logger.info("▸ CI Operations Dashboard")
     logger.info("  Scanning workflows, collecting metrics...")
     logger.info("")
@@ -706,20 +723,16 @@ def run_dashboard(
         runs = collector.fetch_recent_runs(branch=branch, days=days)
     else:
         # Detect current branch
-        try:
+        with contextlib.suppress(Exception):
             branch = subprocess.check_output(
                 ["git", "rev-parse", "--abbrev-ref", "HEAD"], stderr=subprocess.DEVNULL, text=True
             ).strip()
-        except Exception:
-            branch = "unknown"
-        runs = collector.fetch_recent_runs(branch=branch, days=days)
+        runs = collector.fetch_recent_runs(branch=branch or "unknown", days=days)
 
     # 4. Compute commit hash
     commit = "unknown"
-    try:
+    with contextlib.suppress(Exception):
         commit = subprocess.check_output(["git", "rev-parse", "HEAD"], stderr=subprocess.DEVNULL, text=True).strip()
-    except Exception:
-        pass
 
     # 5. Compute metrics
     pr_feedback = compute_pr_feedback_time(runs)
@@ -797,13 +810,15 @@ def main() -> None:
     args = parser.parse_args()
 
     run_dashboard(
-        root=".",
-        days=args.days,
-        branch=args.branch,
-        output_path=args.output,
-        html_path=args.html,
-        github_token=args.github_token,
-        github_repo=args.github_repo,
+        DashboardOptions(
+            root=".",
+            days=args.days,
+            branch=args.branch,
+            output_path=args.output,
+            html_path=args.html,
+            github_token=args.github_token,
+            github_repo=args.github_repo,
+        )
     )
 
 

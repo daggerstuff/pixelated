@@ -19,9 +19,11 @@ from scripts.data.designer.release_manifest import DVCPointer, build_manifest_fr
 from scripts.data.designer.schemas import (
     ChatMessage,
     ConstructionRecord,
+    ContributionMode,
     HumanReviewStatus,
     JudgeResult,
     TargetProduct,
+    UsePolicy,
     lineage_columns,
 )
 from scripts.data.designer.source_registry import SourceRegistry
@@ -35,8 +37,8 @@ def _make_construction_record() -> ConstructionRecord:
         source_id="SRC-047",
         analysis_id="src047.mi-reflection",
         source_unit_refs=["annomi:dialogue-001:turn-04"],
-        use_policies=["direct"],
-        contribution_mode="direct_seed",
+        use_policies=[UsePolicy.DIRECT],
+        contribution_mode=ContributionMode.DIRECT_SEED,
         construction_spec_version=CONSTRUCTION_SPEC_VERSION,
         model_alias="nvidia-text",
         prompt_version=PROMPT_VERSION,

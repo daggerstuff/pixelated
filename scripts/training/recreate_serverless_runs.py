@@ -26,6 +26,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Protocol, cast
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
 PROJECT = "wayfarer-ab-test"
 
 
-def generate_report():
+def generate_report() -> str:
     """Fetch all runs from wandb and generate a comprehensive report."""
     import wandb
 
@@ -75,13 +76,23 @@ def generate_report():
     return report_text
 
 
-def fetch_run_history(run_name: str):
+# wandb types `Run.history()` as `list[dict[str, Any]] | pd.DataFrame`, but
+# the call below uses the default `pandas=True` mode, which always returns a
+# DataFrame-shaped history. This minimal protocol mirrors the two members the
+# script uses, so the typed value flows through without a pandas import.
+class _HistoryFrame(Protocol):
+    def to_json(self, path_or_buf: str | Path, orient: str) -> str | None: ...
+
+    def __len__(self) -> int: ...
+
+
+def fetch_run_history(run_name: str) -> _HistoryFrame:
     """Fetch detailed history for a specific run."""
     import wandb
 
     api = wandb.Api()
     run = api.run(f"{PROJECT}/{run_name}")
-    history = run.history()
+    history = cast(_HistoryFrame, run.history())
 
     output_path = Path(f"/tmp/{run_name}_history.json")
     history.to_json(output_path, orient="records")
@@ -89,7 +100,7 @@ def fetch_run_history(run_name: str):
     return history
 
 
-async def run_30b_experiment():
+async def run_30b_experiment() -> None:
     """Re-run the 30B serverless RL experiment."""
     import art
     from art.serverless.backend import ServerlessBackend
@@ -107,7 +118,7 @@ async def run_30b_experiment():
     MAX_RL_STEPS = 100
 
     logger.info("Loading dataset...")
-    examples = []
+    examples: list[list[dict[str, Any]]] = []
     with open(DATASET_PATH) as f:
         for line in f:
             data = json.loads(line)
@@ -169,8 +180,14 @@ async def run_30b_experiment():
     logger.info("30B RL training complete!")
 
 
-async def rollout(model, messages: list):
-    """Generate a response and compute reward."""
+async def rollout(model: Any, messages: list[dict[str, Any]]) -> Any:
+    """Generate a response and compute reward.
+
+    ``model`` is an ``art.TrainableModel`` and the return value an
+    ``art.Trajectory``; the ``art`` package ships no type information
+    (and is absent from the type-check environment), so ``Any`` is the
+    precise interface contract available here.
+    """
     import math
 
     import art
@@ -236,7 +253,7 @@ async def rollout(model, messages: list):
     return trajectory
 
 
-async def evaluate_12b_model():
+async def evaluate_12b_model() -> None:
     """Evaluate the trained 12B model on golden questions."""
     import art
     from art.serverless.backend import ServerlessBackend
@@ -267,7 +284,7 @@ async def evaluate_12b_model():
         questions = json.load(f)
 
     logger.info(f"Evaluating on {len(questions)} questions...")
-    results = []
+    results: list[dict[str, Any]] = []
     for q in questions[:5]:  # Test with first 5
         prompt = q.get("question", q.get("prompt", ""))
         client = model.openai_client()
@@ -288,7 +305,7 @@ async def evaluate_12b_model():
     logger.info(f"Evaluation results saved to {output_path}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Recreate W&B serverless training runs")
     parser.add_argument("--report", action="store_true", help="Generate report of previous runs")
     parser.add_argument("--fetch-history", type=str, help="Fetch history for a specific run name")

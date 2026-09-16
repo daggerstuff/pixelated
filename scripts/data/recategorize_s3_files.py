@@ -18,7 +18,7 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 # Add ai module to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -43,6 +43,18 @@ class RecategorizationStats:
     start_time: str = ""
     end_time: str = ""
     duration_seconds: float = 0.0
+
+
+class FileStats(TypedDict):
+    """Statistics for a single processed file."""
+
+    file: str
+    total_records: int
+    classified: int
+    low_confidence: int
+    categories: dict[str, int]
+    avg_confidence: float
+    error: NotRequired[str]
 
 
 class S3Recategorizer:
@@ -125,7 +137,8 @@ class S3Recategorizer:
             Extracted text content
         """
         if "text" in record:
-            return record["text"]
+            text: str = record["text"]
+            return text
 
         if "messages" in record and isinstance(record["messages"], list):
             return " ".join(msg["content"] for msg in record["messages"] if isinstance(msg, dict) and "content" in msg)
@@ -138,10 +151,11 @@ class S3Recategorizer:
         # Fallback: try to find any text field
         for text_key in ["input", "prompt", "query", "question"]:
             if text_key in record and isinstance(record[text_key], str):
-                return record[text_key]
+                value: str = record[text_key]
+                return value
         return ""
 
-    def process_file(self, s3_key: str, output_prefix: str = "categorized/") -> dict[str, Any]:
+    def process_file(self, s3_key: str, output_prefix: str = "categorized/") -> FileStats:
         """
         Process a single S3 file and recategorize its records.
 
@@ -154,7 +168,7 @@ class S3Recategorizer:
         """
         logger.info(f"Processing: {s3_key}")
 
-        stats = {
+        stats: FileStats = {
             "file": s3_key,
             "total_records": 0,
             "classified": 0,
@@ -250,7 +264,7 @@ class S3Recategorizer:
         )
 
         total_confidence = 0.0
-        file_stats_list = []
+        file_stats_list: list[FileStats] = []
 
         # Process each file
         for i, s3_key in enumerate(files_to_process, 1):
@@ -289,7 +303,7 @@ class S3Recategorizer:
         return stats
 
 
-def main():
+def main() -> None:
     """Run the recategorization process."""
     parser = argparse.ArgumentParser(description="Re-categorize S3 'Other' files using hybrid classifier")
     parser.add_argument("--limit", type=int, help="Limit number of files (for testing)")

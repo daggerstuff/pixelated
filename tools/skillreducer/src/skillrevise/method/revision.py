@@ -4,12 +4,18 @@ import json
 import re
 from typing import Any, Protocol
 
-from skillrevise.method.authoring import AuthoringPrior, SkillConstraintChecker
+from skillrevise.core.models import (
+    DiagnosisReport,
+    FailureType,
+    RepairPrinciple,
+    RevisionCandidate,
+    Skill,
+    TaskSpec,
+)
 from skillrevise.llm import LLMClient
-from skillrevise.core.models import DiagnosisReport, FailureType, RevisionCandidate, Skill, TaskSpec
+from skillrevise.method.authoring import AuthoringPrior, SkillConstraintChecker
 from skillrevise.method.principles import PrincipleBank
 from skillrevise.method.skill_parser import parse_skill_markdown
-
 
 REVISION_ABLATIONS = frozenset({"none", "no-execution-anchors", "no-preserve-ledger"})
 
@@ -46,8 +52,14 @@ class HeuristicRevisionEngine:
         revised_skill.metadata["prior_violations"] = [
             violation.code for violation in self.checker.check(revised_skill, task)
         ]
-        rationale = "; ".join(diagnosis.rewrite_targets) if diagnosis.rewrite_targets else "No revision required."
-        return RevisionCandidate(parent_version=skill.version, revised_skill=revised_skill, rationale=rationale)
+        rationale = (
+            "; ".join(diagnosis.rewrite_targets)
+            if diagnosis.rewrite_targets
+            else "No revision required."
+        )
+        return RevisionCandidate(
+            parent_version=skill.version, revised_skill=revised_skill, rationale=rationale
+        )
 
     def _build_procedure(self, task: TaskSpec, diagnosis: DiagnosisReport) -> list[str]:
         procedure = [
@@ -68,7 +80,9 @@ class HeuristicRevisionEngine:
         if FailureType.CONTEXT_POLLUTION in labels:
             procedure = procedure[:6]
         if FailureType.WRONG_ABSTRACTION_LEVEL in labels:
-            procedure[0] = "Start from the task-family workflow, then specialize only after the local environment is verified."
+            procedure[0] = (
+                "Start from the task-family workflow, then specialize only after the local environment is verified."
+            )
         return procedure
 
     def _build_constraints(self, diagnosis: DiagnosisReport) -> list[str]:
@@ -81,9 +95,13 @@ class HeuristicRevisionEngine:
         ]
         labels = set(diagnosis.labels)
         if FailureType.CONTEXT_POLLUTION in labels:
-            constraints.append("Keep the skill concise: every line should change an execution decision.")
+            constraints.append(
+                "Keep the skill concise: every line should change an execution decision."
+            )
         if FailureType.FALSE_CERTAINTY in labels:
-            constraints.append("Phrase directives as validated conditions rather than unconditional commands.")
+            constraints.append(
+                "Phrase directives as validated conditions rather than unconditional commands."
+            )
         return constraints
 
     def _bump_version(self, version: str) -> str:
@@ -144,8 +162,14 @@ class LLMRevisionEngine:
                 revision_trace,
                 revision_ablation=self.revision_ablation,
             )
-            revision_protocol_version = "principle_revision_v2" if using_principle_memory else "diagnosis_revision_v1"
-            revision_framework = "principle_bank_guided" if using_principle_memory else "diagnosis_guided_no_principle_memory"
+            revision_protocol_version = (
+                "principle_revision_v2" if using_principle_memory else "diagnosis_revision_v1"
+            )
+            revision_framework = (
+                "principle_bank_guided"
+                if using_principle_memory
+                else "diagnosis_guided_no_principle_memory"
+            )
             selected_ids = _selected_principle_ids(revision_trace)
             selected_principles = _principles_by_ids(principles, selected_ids) or principles
             metadata = {
@@ -196,7 +220,9 @@ class LLMRevisionEngine:
             candidate.revised_skill.metadata["revision_ablation"] = self.revision_ablation
             candidate.revised_skill.metadata["removed_mechanism"] = removed_mechanism
             candidate.revised_skill.metadata["principle_memory_enabled"] = using_principle_memory
-            candidate.revised_skill.metadata["principle_ids"] = [principle.principle_id for principle in principles]
+            candidate.revised_skill.metadata["principle_ids"] = [
+                principle.principle_id for principle in principles
+            ]
             candidate.revised_skill.metadata["retrieved_principle_ids"] = [
                 principle.principle_id for principle in principles
             ]
@@ -241,12 +267,15 @@ class LLMRevisionEngine:
         skill: Skill,
         diagnosis: DiagnosisReport,
         *,
-        principle_candidates,
+        principle_candidates: list[RepairPrinciple],
         using_principle_memory: bool = True,
     ) -> str:
-        evidence = "\n".join(
-            f"- [{item.source}] {item.snippet}: {item.reason}" for item in diagnosis.evidence
-        ) or "- None"
+        evidence = (
+            "\n".join(
+                f"- [{item.source}] {item.snippet}: {item.reason}" for item in diagnosis.evidence
+            )
+            or "- None"
+        )
         targets = "\n".join(f"- {item}" for item in diagnosis.rewrite_targets) or "- None"
         include_execution_anchors = _include_execution_anchors(self.revision_ablation)
         include_preserve_ledger = _include_preserve_ledger(self.revision_ablation)
@@ -402,12 +431,17 @@ class FreeFormLLMRevisionEngine:
         violations = self.checker.check(revised, task)
         revised.metadata["prior_violations"] = [violation.code for violation in violations]
         rationale = "Free-form LLM revision from task context, current skill, and observed execution feedback."
-        return RevisionCandidate(parent_version=skill.version, revised_skill=revised, rationale=rationale)
+        return RevisionCandidate(
+            parent_version=skill.version, revised_skill=revised, rationale=rationale
+        )
 
     def _build_prompt(self, task: TaskSpec, skill: Skill, diagnosis: DiagnosisReport) -> str:
-        feedback = "\n".join(
-            f"- [{item.source}] {item.snippet}: {item.reason}" for item in diagnosis.evidence
-        ) or "- No concrete feedback was extracted."
+        feedback = (
+            "\n".join(
+                f"- [{item.source}] {item.snippet}: {item.reason}" for item in diagnosis.evidence
+            )
+            or "- No concrete feedback was extracted."
+        )
         output_template = _freeform_revision_output_template()
         return "\n\n".join(
             [
@@ -622,7 +656,8 @@ def _base_revision_trace_lines(
         [
             '  "acceptance_signals": {',
             '    "expected_utility_improvement": "",',
-            '    "expected_failed_assertions_reduced": []' + ("," if include_preserve_ledger else ""),
+            '    "expected_failed_assertions_reduced": []'
+            + ("," if include_preserve_ledger else ""),
         ]
     )
     if include_preserve_ledger:
@@ -703,7 +738,9 @@ def _render_revision_memory(
 ) -> str:
     trace = skill.metadata.get("revision_trace") if isinstance(skill.metadata, dict) else None
     if not isinstance(trace, dict) or not trace:
-        return "- No previous revision trace is available. Treat this as the first revision attempt."
+        return (
+            "- No previous revision trace is available. Treat this as the first revision attempt."
+        )
 
     acceptance_signals = trace.get("acceptance_signals", {})
     if isinstance(acceptance_signals, dict):
@@ -764,7 +801,7 @@ def _removed_mechanism_for_revision_ablation(revision_ablation: str) -> str:
 def _sanitize_revision_trace(trace: dict[str, Any], *, revision_ablation: str) -> dict[str, Any]:
     if not isinstance(trace, dict):
         return {}
-    sanitized = json.loads(json.dumps(trace))
+    sanitized: dict[str, Any] = json.loads(json.dumps(trace))
     if not _include_execution_anchors(revision_ablation):
         sanitized.pop("execution_anchors", None)
     if not _include_preserve_ledger(revision_ablation):
@@ -808,8 +845,8 @@ def _trace_execution_anchors(trace: dict[str, Any]) -> list[dict[str, Any]]:
     return [dict(anchor) for anchor in anchors if isinstance(anchor, dict)]
 
 
-def _split_revision_response(text: str) -> tuple[dict, str]:
-    trace: dict = {}
+def _split_revision_response(text: str) -> tuple[dict[str, Any], str]:
+    trace: dict[str, Any] = {}
     trace_match = re.search(
         r"REVISION_TRACE_JSON:\s*```(?:json)?\s*(\{.*?\})\s*```",
         text,
@@ -834,7 +871,7 @@ def _split_revision_response(text: str) -> tuple[dict, str]:
     return trace, text.strip()
 
 
-def _selected_principle_ids(trace: dict) -> list[str]:
+def _selected_principle_ids(trace: dict[str, Any]) -> list[str]:
     selected = trace.get("selected_principles")
     if not isinstance(selected, list):
         return []
@@ -848,7 +885,9 @@ def _selected_principle_ids(trace: dict) -> list[str]:
     return ids
 
 
-def _principles_by_ids(principles, principle_ids: list[str]):
+def _principles_by_ids(
+    principles: list[RepairPrinciple], principle_ids: list[str]
+) -> list[RepairPrinciple]:
     if not principle_ids:
         return []
     by_id = {principle.principle_id: principle for principle in principles}

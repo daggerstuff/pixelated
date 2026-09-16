@@ -20,6 +20,7 @@ import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger("model_registry")
 
@@ -27,15 +28,16 @@ REGISTRY_PATH = Path(__file__).resolve().parent.parent.parent / "ai" / "training
 DEFAULT_CHECKPOINT_DIR = Path("/tmp/pixelated-checkpoints")  # override via PIX_CHECKPOINT_DIR
 
 
-def _load_manifest() -> dict:
+def _load_manifest() -> dict[str, Any]:
     """Load the registry manifest from disk, returning a default if missing."""
     if not REGISTRY_PATH.exists():
         return {"schema_version": "1.0", "active_run_id": None, "checkpoints": []}
     with open(REGISTRY_PATH, encoding="utf-8") as f:
-        return json.load(f)
+        manifest: dict[str, Any] = json.load(f)
+        return manifest
 
 
-def _save_manifest(manifest: dict) -> None:
+def _save_manifest(manifest: dict[str, Any]) -> None:
     REGISTRY_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(REGISTRY_PATH, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2)
@@ -64,7 +66,7 @@ def cmd_list(args: argparse.Namespace) -> None:
 def cmd_tag(args: argparse.Namespace) -> None:
     manifest = _load_manifest()
 
-    new_entry: dict = {
+    new_entry: dict[str, Any] = {
         "run_id": args.run_id,
         "base_model": args.base_model,
         "dataset_version": args.dataset_version,

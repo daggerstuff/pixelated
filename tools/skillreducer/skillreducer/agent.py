@@ -22,8 +22,10 @@ from skillreducer.tokenizer import count_tokens
 
 try:
     from agno.agent import Agent
+
+    _AGENT_AVAILABLE = True
 except ImportError:  # pragma: no cover
-    Agent = None  # type: ignore[misc, assignment]
+    _AGENT_AVAILABLE = False
 
 
 @dataclass
@@ -48,7 +50,7 @@ class SkillOptimizationResult:
 
 def create_completion_agent(config: Config) -> Agent:
     """Agno agent for Stage 2 body compression LLM calls."""
-    if Agent is None:
+    if not _AGENT_AVAILABLE:
         raise ImportError("agno is not installed. Install with: pip install agno")
     if not resolve_api_key(config):
         raise ValueError(
@@ -68,7 +70,7 @@ def create_completion_agent(config: Config) -> Agent:
 
 def create_skill_reducer_agent(config: Config) -> Agent:
     """Orchestrator Agno agent for full skill folder optimization."""
-    if Agent is None:
+    if not _AGENT_AVAILABLE:
         raise ImportError("agno is not installed. Install with: pip install agno")
     if not resolve_api_key(config):
         raise ValueError(
@@ -165,10 +167,13 @@ class SkillReducerAgent:
 
         out_skill_dir = report.output
         skill_md = out_skill_dir / "SKILL.md"
-        reference_files = sorted(
-            p for p in out_skill_dir.iterdir()
-            if p.is_file() and p.name.lower() != "skill.md"
-        ) if out_skill_dir.exists() else []
+        reference_files = (
+            sorted(
+                p for p in out_skill_dir.iterdir() if p.is_file() and p.name.lower() != "skill.md"
+            )
+            if out_skill_dir.exists()
+            else []
+        )
 
         scripts_dir = out_skill_dir / "scripts"
         summary = (

@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 import logging
 import os
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -44,11 +46,16 @@ def _load_token(path: Path) -> Credentials | None:
     """Load a token file; return None if unusable or missing drive.readonly scope."""
     if not path.exists():
         return None
-    creds = Credentials.from_authorized_user_file(str(path), SCOPES)
+    # google-auth 2.x ships `from_authorized_user_file`, `refresh`, and
+    # `to_json` without type annotations. Adapt each into a precisely typed
+    # callable rather than suppressing the checker.
+    load_from_file: Callable[..., Credentials] = Credentials.from_authorized_user_file
+    creds: Credentials = load_from_file(str(path), SCOPES)
     if creds.valid and _has_scope(creds):
         return creds
     if creds.expired and creds.refresh_token and _has_scope(creds):
-        creds.refresh(Request())
+        refresh_credentials: Callable[..., None] = creds.refresh
+        refresh_credentials(Request())
         return creds
     return None
 
@@ -68,10 +75,11 @@ def _run_flow(client_secrets: Path, cfg: Config) -> Credentials:
     )
     logger.info("Then open the printed URL in your browser.")
     logger.info("=" * 64)
-    creds = flow.run_local_server(port=OAUTH_CALLBACK_PORT, open_browser=False)
+    creds: Credentials = flow.run_local_server(port=OAUTH_CALLBACK_PORT, open_browser=False)
     cfg.state_dir.mkdir(parents=True, exist_ok=True)
     token_path = cfg.state_dir / TOKEN_FILE_NAME
-    token_path.write_text(creds.to_json(), encoding="utf-8")
+    credentials_to_json: Callable[..., str] = creds.to_json
+    token_path.write_text(credentials_to_json(), encoding="utf-8")
     os.chmod(token_path, 0o600)
     logger.info("Stored drive.readonly token at %s", token_path)
     return creds
@@ -104,6 +112,7 @@ def load_credentials(cfg: Config) -> Credentials:
     return _run_flow(secret_path, cfg)
 
 
-def build_drive_service(cfg: Config):
+def build_drive_service(cfg: Config) -> Any:
+    """Build the Drive API service (googleapiclient returns a dynamic Resource)."""
     creds = load_credentials(cfg)
     return build("drive", "v3", credentials=creds, cache_discovery=False)

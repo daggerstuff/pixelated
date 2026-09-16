@@ -26,7 +26,7 @@ def substitute_env_vars(val: Any) -> Any:
     if isinstance(val, str):
         pattern = re.compile(r"\$\{([A-Za-z0-9_]+)(?::-([^}]*))?\}|\$([A-Za-z0-9_]+)")
 
-        def repl(match: re.Match) -> str:
+        def repl(match: re.Match[str]) -> str:
             var_name = match.group(1) or match.group(3)
             default_val = match.group(2) if match.group(1) else ""
             return os.environ.get(var_name, default_val if default_val is not None else "")

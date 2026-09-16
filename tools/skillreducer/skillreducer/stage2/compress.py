@@ -39,7 +39,10 @@ def compress_templates(items: list[ContentItem]) -> str:
 def compress_background(items: list[ContentItem], llm: LLMClient | None) -> str:
     joined = "\n\n".join(item.text for item in items)
     if llm and llm.enabled and joined:
-        return llm.complete(prompts.SUMMARIZE_BACKGROUND.format(content=joined[:8000])).strip()
+        summary: str = llm.complete(
+            prompts.SUMMARIZE_BACKGROUND.format(content=joined[:8000])
+        ).strip()
+        return summary
     sentences = re.split(r"(?<=[.!?])\s+", joined)
     return " ".join(sentences[:3]).strip()
 

@@ -18,6 +18,9 @@ import time
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
+
+IssueDict = dict[str, Any]
 
 SYNC_LINE_RE = re.compile(r"(?im)^\s*(?P<key>[a-z0-9_.-]+)\s*:\s*(?P<value>.+?)\s*$")
 SYNC_BLOCK_START = "<!-- pixelated-sync"
@@ -39,7 +42,7 @@ def extract_metadata(body: str) -> dict[str, str]:
     return metadata
 
 
-def fetch_all_issues_via_api(repo: str, token: str) -> list[dict]:
+def fetch_all_issues_via_api(repo: str, token: str) -> list[IssueDict]:
     """Fetch all issues via GitHub REST API (reliable pagination)."""
     owner, repo_name = repo.split("/")
     headers = {
@@ -49,7 +52,7 @@ def fetch_all_issues_via_api(repo: str, token: str) -> list[dict]:
         "User-Agent": "pixelated-dedup",
     }
 
-    all_issues: list[dict] = []
+    all_issues: list[IssueDict] = []
     page = 1
     while True:
         url = (
@@ -120,7 +123,7 @@ def close_issue(repo: str, issue_number: int) -> bool:
     return False
 
 
-def _sorted_for_keep(group: list[dict]) -> list[dict]:
+def _sorted_for_keep(group: list[IssueDict]) -> list[IssueDict]:
     """Sort a duplicate group so the keeper (longest body, then earliest, then lowest number) is first."""
     return sorted(
         group,
@@ -132,7 +135,7 @@ def _sorted_for_keep(group: list[dict]) -> list[dict]:
     )
 
 
-def _plan_true_duplicates(linear_map: dict[str, list[dict]]) -> tuple[int, list[tuple[int, int, str]]]:
+def _plan_true_duplicates(linear_map: dict[str, list[IssueDict]]) -> tuple[int, list[tuple[int, int, str]]]:
     """Plan closes for groups sharing the same Linear ID. Returns (group_count, closes)."""
     closes: list[tuple[int, int, str]] = []  # (close_num, keep_num, linear_id)
     groups = 0
@@ -145,7 +148,7 @@ def _plan_true_duplicates(linear_map: dict[str, list[dict]]) -> tuple[int, list[
     return groups, closes
 
 
-def _plan_no_meta_duplicates(no_meta: list[dict]) -> tuple[int, list[tuple[int, int]]]:
+def _plan_no_meta_duplicates(no_meta: list[IssueDict]) -> tuple[int, list[tuple[int, int]]]:
     """Plan closes for title duplicates with no sync metadata. Returns (group_count, closes)."""
     if len(no_meta) <= 1:
         return 0, []
@@ -154,12 +157,12 @@ def _plan_no_meta_duplicates(no_meta: list[dict]) -> tuple[int, list[tuple[int, 
     return 1, [(dup["number"], keep["number"]) for dup in sorted_no_meta[1:]]
 
 
-def _plan_collisions(group: list[dict]) -> tuple[int, list[tuple[int, int]]]:
+def _plan_collisions(group: list[IssueDict]) -> tuple[int, list[tuple[int, int]]]:
     """Plan closes for title collisions (different Linear IDs). Partition by Linear ID,
     select one keeper per subgroup, build closures from subgroup keepers."""
     # Partition group by Linear ID (exclude empty/no-linear issues from subgroup selection)
-    linear_subgroups: dict[str, list[dict]] = defaultdict(list)
-    no_linear: list[dict] = []
+    linear_subgroups: dict[str, list[IssueDict]] = defaultdict(list)
+    no_linear: list[IssueDict] = []
     for issue in group:
         meta = extract_metadata(issue.get("body", "") or "")
         lid = meta.get("linear", "")
@@ -169,8 +172,8 @@ def _plan_collisions(group: list[dict]) -> tuple[int, list[tuple[int, int]]]:
             no_linear.append(issue)
 
     # Select keeper from each Linear subgroup using existing keeper-ordering
-    subgroup_keepers: list[dict] = []
-    for lid, subgroup in linear_subgroups.items():
+    subgroup_keepers: list[IssueDict] = []
+    for _lid, subgroup in linear_subgroups.items():
         sorted_sub = _sorted_for_keep(subgroup)
         subgroup_keepers.append(sorted_sub[0])
 
@@ -194,10 +197,10 @@ def _plan_collisions(group: list[dict]) -> tuple[int, list[tuple[int, int]]]:
     return 1, closes
 
 
-def classify_and_plan(issues: list[dict]) -> dict:
+def classify_and_plan(issues: list[IssueDict]) -> dict[str, Any]:
     """Classify duplicate groups and build close plan."""
     # Group by title
-    by_title: dict[str, list[dict]] = defaultdict(list)
+    by_title: dict[str, list[IssueDict]] = defaultdict(list)
     for issue in issues:
         by_title[issue["title"]].append(issue)
 
@@ -215,8 +218,8 @@ def classify_and_plan(issues: list[dict]) -> dict:
             continue
 
         # Extract sync metadata
-        linear_map: dict[str, list[dict]] = defaultdict(list)
-        no_meta: list[dict] = []
+        linear_map: dict[str, list[IssueDict]] = defaultdict(list)
+        no_meta: list[IssueDict] = []
         for issue in group:
             meta = extract_metadata(issue["body"])
             lid = meta.get("linear", "")
@@ -225,18 +228,18 @@ def classify_and_plan(issues: list[dict]) -> dict:
             else:
                 no_meta.append(issue)
 
-        groups, closes = _plan_true_duplicates(linear_map)
-        true_dup_groups += groups
-        true_dup_closes.extend(closes)
+        td_groups, td_closes = _plan_true_duplicates(linear_map)
+        true_dup_groups += td_groups
+        true_dup_closes.extend(td_closes)
 
-        groups, closes = _plan_no_meta_duplicates(no_meta)
-        no_meta_groups += groups
-        no_meta_closes.extend(closes)
+        nm_groups, nm_closes = _plan_no_meta_duplicates(no_meta)
+        no_meta_groups += nm_groups
+        no_meta_closes.extend(nm_closes)
 
         if len(linear_map) > 1 and len(no_meta) == 0:
-            groups, closes = _plan_collisions(group)
-            collision_groups += groups
-            collision_closes.extend(closes)
+            col_groups, col_closes = _plan_collisions(group)
+            collision_groups += col_groups
+            collision_closes.extend(col_closes)
 
     return {
         "singles": singles,
@@ -249,7 +252,7 @@ def classify_and_plan(issues: list[dict]) -> dict:
     }
 
 
-def main():
+def main() -> int:
     repo = os.environ.get("GITHUB_REPO", "")
     owner = os.environ.get("GITHUB_OWNER", "")
     token = os.environ.get("GITHUB_TOKEN", "")
@@ -306,7 +309,7 @@ def main():
     # Sort by issue number ascending
     all_closes.sort(key=lambda x: x["issue"])
 
-    results = {"closed": 0, "failed": 0, "skipped": []}
+    results: dict[str, Any] = {"closed": 0, "failed": 0, "skipped": []}
 
     for item in all_closes:
         issue_num = item["issue"]

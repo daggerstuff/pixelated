@@ -20,6 +20,7 @@ import re
 import sys
 import urllib.parse
 import urllib.request
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -120,7 +121,7 @@ def get_priority_label(priority: int) -> str:
     return {0: "urgent", 1: "high", 2: "medium", 3: "low", 4: "none"}.get(priority, "none")
 
 
-def get_linear_labels(issue: dict) -> list[str]:
+def get_linear_labels(issue: dict[str, Any]) -> list[str]:
     """Extract label names from a Linear issue node."""
     label_nodes = issue.get("labels", {}).get("nodes") or []
     return [str(n.get("name") or "").strip() for n in label_nodes if n.get("name")]
@@ -131,7 +132,7 @@ def get_linear_labels(issue: dict) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-def _gql(query: str, variables: dict | None = None) -> dict:
+def _gql(query: str, variables: dict[str, Any] | None = None) -> dict[str, Any]:
     payload = json.dumps({"query": query, "variables": variables or {}}).encode()
     req = urllib.request.Request(
         LINEAR_API,
@@ -139,12 +140,13 @@ def _gql(query: str, variables: dict | None = None) -> dict:
         headers={"Authorization": LINEAR_TOKEN or "", "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
-        return json.loads(resp.read())
+        result: dict[str, Any] = json.loads(resp.read())
+        return result
 
 
-def fetch_all_linear_issues() -> list[dict]:
+def fetch_all_linear_issues() -> list[dict[str, Any]]:
     print("Fetching all live Linear issues (unfiltered)...")
-    issues = []
+    issues: list[dict[str, Any]] = []
     after = None
     while True:
         data = _gql(
@@ -181,7 +183,7 @@ query($after: String) {
 # ---------------------------------------------------------------------------
 
 
-def fetch_gitlab_issues() -> list[dict]:
+def fetch_gitlab_issues() -> list[dict[str, Any]]:
     token = os.environ.get("GITLAB_TOKEN")
     if not token:
         print("Warning: GITLAB_TOKEN not set. Skipping GitLab export.")
@@ -189,7 +191,7 @@ def fetch_gitlab_issues() -> list[dict]:
 
     print("Fetching GitLab issues...")
     headers = {"PRIVATE-TOKEN": token}
-    issues = []
+    issues: list[dict[str, Any]] = []
     page = 1
     while True:
         url = f"https://gitlab.com/api/v4/projects/pixelgroupies%2Fpixelated/issues?state=all&per_page=100&page={page}"
@@ -210,7 +212,7 @@ def fetch_gitlab_issues() -> list[dict]:
     return issues
 
 
-def apply_gitlab_action(action: dict) -> str | None:
+def apply_gitlab_action(action: dict[str, Any]) -> str | None:
     token = os.environ.get("GITLAB_TOKEN")
     if not token:
         return None
@@ -252,7 +254,7 @@ def apply_gitlab_action(action: dict) -> str | None:
 
 
 def build_sync_metadata_block(
-    sync_key: str, status: str, linear_issue: dict, provider_ids: dict[str, str]
+    sync_key: str, status: str, linear_issue: dict[str, Any], provider_ids: dict[str, str]
 ) -> str:
     lines = [
         SYNC_BLOCK_START,
@@ -273,7 +275,7 @@ def build_sync_metadata_block(
     return "\n".join(lines)
 
 
-def main():  # noqa: PLR0912, PLR0915
+def main() -> None:  # noqa: PLR0912, PLR0915
     apply_mode = "--apply" in sys.argv
     print("=== Syncing from Linear (Source of Truth) ===")
     print(f"Mode: {'APPLY' if apply_mode else 'DRY RUN'}\n")
@@ -575,8 +577,8 @@ def main():  # noqa: PLR0912, PLR0915
                 res = apply_asana_action(a)
                 ok = bool(res.get("gid"))
             elif prov == "gitlab":
-                res = apply_gitlab_action(a)
-                ok = bool(res)
+                gitlab_res = apply_gitlab_action(a)
+                ok = bool(gitlab_res)
         except Exception as e:
             print(f" Exception: {e}")
             fail_count += 1

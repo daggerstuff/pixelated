@@ -8,18 +8,23 @@ Uses the fixed training config (lora_alpha=16, lr=5e-6, dropout=0.1).
 import contextlib
 import json
 import logging
+import math
 import traceback
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 import modal
 import torch
 import wandb
 from datasets import Dataset
-from peft import LoraConfig, TaskType, get_peft_model
+from peft import LoraConfig, PeftMixedModel, PeftModel, TaskType, get_peft_model
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
+    BatchEncoding,
     DataCollatorForLanguageModeling,
+    PreTrainedTokenizerBase,
     Trainer,
     TrainingArguments,
 )
@@ -46,17 +51,18 @@ TRAINING_IMAGE = (
 MODELS_VOLUME = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
 
 
-def _load_config(config_path: str) -> dict:
+def _load_config(config_path: str) -> dict[str, Any]:
     """Load and validate the training config file."""
     path = Path(config_path)
     if not path.exists():
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
     with open(path) as handle:
-        return json.load(handle)
+        data: dict[str, Any] = json.load(handle)
+    return data
 
 
-def _extract_training_text(item: dict) -> str | None:
+def _extract_training_text(item: dict[str, Any]) -> str | None:
     """Convert supported training sample formats into a single text string."""
     if "text" in item:
         text = item["text"]
@@ -93,13 +99,13 @@ def _extract_training_text(item: dict) -> str | None:
     return None
 
 
-def _load_training_samples(data_path: str) -> list[dict]:
+def _load_training_samples(data_path: str) -> list[dict[str, Any]]:
     """Load JSONL training samples with parse validation."""
     path = Path(data_path)
     if not path.exists():
         raise FileNotFoundError(f"Training data file not found: {path}")
 
-    samples: list[dict] = []
+    samples: list[dict[str, Any]] = []
     parse_errors = 0
     with open(path) as handle:
         for line_num, line in enumerate(handle, 1):
@@ -125,11 +131,14 @@ def _load_training_samples(data_path: str) -> list[dict]:
     return samples
 
 
-def _build_tokenize_function(tokenizer, max_seq_length: int):
+def _build_tokenize_function(
+    tokenizer: PreTrainedTokenizerBase,
+    max_seq_length: int,
+) -> Callable[[dict[str, Any]], BatchEncoding | dict[str, list[int]]]:
     """Create a datasets.map tokenizer callback."""
 
-    def tokenize(batch: dict) -> dict:
-        texts = []
+    def tokenize(batch: dict[str, Any]) -> BatchEncoding | dict[str, list[int]]:
+        texts: list[str] = []
         for item in batch.get("_raw_item", []):
             if not isinstance(item, dict):
                 continue
@@ -140,17 +149,22 @@ def _build_tokenize_function(tokenizer, max_seq_length: int):
         if not texts:
             return {"input_ids": [], "attention_mask": []}
 
-        return tokenizer(
+        # PreTrainedTokenizerBase.__call__ is typed as returning Any by
+        # transformers; anchor it to the documented BatchEncoding result.
+        encoded: BatchEncoding = tokenizer(
             texts,
             truncation=True,
             max_length=max_seq_length,
             padding="max_length",
         )
+        return encoded
 
     return tokenize
 
 
-def _load_model_and_tokenizer(config: dict):
+def _load_model_and_tokenizer(
+    config: dict[str, Any],
+) -> tuple[PeftModel | PeftMixedModel, PreTrainedTokenizerBase]:
     """Load the base model/tokenizer and attach the LoRA adapter."""
     logger.info("\n[1/5] Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(config["model"]["base_model"])
@@ -175,14 +189,17 @@ def _load_model_and_tokenizer(config: dict):
         lora_dropout=config["lora"]["lora_dropout"],
         target_modules=config["lora"]["target_modules"],
     )
-    model = get_peft_model(model, lora_config)
-    model.print_trainable_parameters()
+    peft_model = get_peft_model(model, lora_config)
+    peft_model.print_trainable_parameters()
     logger.info("✅ LoRA adapter applied")
 
-    return model, tokenizer
+    return peft_model, tokenizer
 
 
-def _prepare_datasets(config: dict, tokenizer):
+def _prepare_datasets(
+    config: dict[str, Any],
+    tokenizer: PreTrainedTokenizerBase,
+) -> tuple[Dataset, Dataset]:
     """Load raw samples, tokenize, and split train/eval datasets."""
     logger.info("[4/5] Loading training data...")
     train_data = _load_training_samples(config["data"]["train_file"])
@@ -212,35 +229,46 @@ def _prepare_datasets(config: dict, tokenizer):
     return train_dataset, eval_dataset
 
 
-def _build_training_arguments(config: dict) -> TrainingArguments:
+def _build_training_arguments(config: dict[str, Any], num_train_samples: int) -> TrainingArguments:
     """Construct Hugging Face training arguments from config."""
     logger.info("\nSetting up training arguments...")
+    training = config["training"]
+    # transformers 5.x removed `warmup_ratio` from TrainingArguments (only
+    # `warmup_steps` remains), so apply the configured ratio to the estimated
+    # total optimizer steps.
+    effective_batch = max(1, training["per_device_train_batch_size"] * training["gradient_accumulation_steps"])
+    steps_per_epoch = max(1, math.ceil(num_train_samples / effective_batch))
+    warmup_steps = int(training["warmup_ratio"] * steps_per_epoch * training["num_train_epochs"])
     return TrainingArguments(
         output_dir="/tmp/pixelated-v2-output",
-        num_train_epochs=config["training"]["num_train_epochs"],
-        per_device_train_batch_size=config["training"]["per_device_train_batch_size"],
-        per_device_eval_batch_size=config["training"]["per_device_eval_batch_size"],
-        gradient_accumulation_steps=config["training"]["gradient_accumulation_steps"],
-        learning_rate=config["training"]["learning_rate"],
-        weight_decay=config["training"]["weight_decay"],
-        warmup_ratio=config["training"]["warmup_ratio"],
-        lr_scheduler_type=config["training"]["lr_scheduler_type"],
-        logging_steps=config["training"]["logging_steps"],
+        num_train_epochs=training["num_train_epochs"],
+        per_device_train_batch_size=training["per_device_train_batch_size"],
+        per_device_eval_batch_size=training["per_device_eval_batch_size"],
+        gradient_accumulation_steps=training["gradient_accumulation_steps"],
+        learning_rate=training["learning_rate"],
+        weight_decay=training["weight_decay"],
+        warmup_steps=warmup_steps,
+        lr_scheduler_type=training["lr_scheduler_type"],
+        logging_steps=training["logging_steps"],
         eval_strategy="steps",
-        eval_steps=config["training"]["eval_steps"],
-        save_steps=config["training"]["save_steps"],
-        save_total_limit=config["training"]["save_total_limit"],
-        load_best_model_at_end=config["training"]["load_best_model_at_end"],
-        metric_for_best_model=config["training"]["metric_for_best_model"],
-        greater_is_better=config["training"]["greater_is_better"],
+        eval_steps=training["eval_steps"],
+        save_steps=training["save_steps"],
+        save_total_limit=training["save_total_limit"],
+        load_best_model_at_end=training["load_best_model_at_end"],
+        metric_for_best_model=training["metric_for_best_model"],
+        greater_is_better=training["greater_is_better"],
         bf16=config["system"]["bf16"],
         gradient_checkpointing=config["system"]["gradient_checkpointing"],
-        report_to=config["training"]["report_to"],
-        run_name=config["training"]["run_name"],
+        report_to=training["report_to"],
+        run_name=training["run_name"],
     )
 
 
-def _save_adapter(model, tokenizer, config: dict) -> Path:
+def _save_adapter(
+    model: PeftModel | PeftMixedModel,
+    tokenizer: PreTrainedTokenizerBase,
+    config: dict[str, Any],
+) -> Path:
     """Save the trained LoRA adapter and config into the Modal volume."""
     logger.info("\nSaving LoRA adapter...")
     adapter_output_dir = Path("/models/pixelated-v2-adapter")
@@ -265,7 +293,7 @@ def _save_adapter(model, tokenizer, config: dict) -> Path:
         modal.Secret.from_name("wandb-secret"),
     ],
 )
-def train_model(config_path: str = "ai/config/training_config_v2_antirepetition.json"):
+def train_model(config_path: str = "ai/config/training_config_v2_antirepetition.json") -> dict[str, object]:
     """Train the model with anti-repetition config."""
     try:
         logger.info(f"Loading config from {config_path}...")
@@ -282,7 +310,7 @@ def train_model(config_path: str = "ai/config/training_config_v2_antirepetition.
 
         model, tokenizer = _load_model_and_tokenizer(config)
         train_dataset, eval_dataset = _prepare_datasets(config, tokenizer)
-        training_args = _build_training_arguments(config)
+        training_args = _build_training_arguments(config, len(train_dataset))
         data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
         wandb.init(
@@ -322,7 +350,7 @@ def train_model(config_path: str = "ai/config/training_config_v2_antirepetition.
 
 
 @app.local_entrypoint()
-def main(config_path: str = "ai/config/training_config_v2_antirepetition.json"):
+def main(config_path: str = "ai/config/training_config_v2_antirepetition.json") -> None:
     """Run training from the local machine."""
     result = train_model.remote(config_path)
     logger.info("\n" + "=" * 60)
