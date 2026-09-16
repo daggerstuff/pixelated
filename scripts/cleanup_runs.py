@@ -18,7 +18,7 @@ RUNS_ONLY = "--runs-only" in sys.argv
 CACHES_ONLY = "--caches-only" in sys.argv
 
 
-def gh(*args):
+def gh(*args: str) -> str | None:
     """Run a gh CLI command and return parsed JSON or raw output."""
     cmd = ["gh", "api", *list(args)]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=120, shell=False, check=False)
@@ -27,9 +27,9 @@ def gh(*args):
     return result.stdout.strip()
 
 
-def fetch_run_ids():
+def fetch_run_ids() -> list[int]:
     """Fetch all run IDs older than cutoff via paginated API."""
-    all_ids = []
+    all_ids: list[int] = []
     page = 1
     while True:
         query = urlencode(
@@ -58,7 +58,7 @@ def fetch_run_ids():
     return all_ids
 
 
-def delete_run(run_id):
+def delete_run(run_id: int) -> tuple[int, bool]:
     """Delete a single workflow run. Returns (run_id, success)."""
     result = subprocess.run(
         ["gh", "api", "--method", "DELETE", f"/repos/{OWNER}/{REPO}/actions/runs/{run_id}", "--silent"],
@@ -70,7 +70,7 @@ def delete_run(run_id):
     return (run_id, result.returncode == 0)
 
 
-def get_remaining_count():
+def get_remaining_count() -> int:
     """Get count of remaining old runs."""
     query = urlencode({"created": f"<{CUTOFF}", "per_page": "1"})
     stdout = gh(
@@ -83,7 +83,7 @@ def get_remaining_count():
     return -1
 
 
-def fetch_cache_ids():
+def fetch_cache_ids() -> list[int]:
     """Fetch all cache IDs older than cutoff via paginated API.
     GitHub caches API doesn't support date filtering, so we sort ascending
     and stop when we hit items newer than cutoff."""
@@ -128,7 +128,7 @@ def fetch_cache_ids():
     return all_ids
 
 
-def delete_cache(cache_id):
+def delete_cache(cache_id: int) -> tuple[int, bool]:
     """Delete a single cache. Returns (cache_id, success)."""
     result = subprocess.run(
         ["gh", "api", "--method", "DELETE", f"/repos/{OWNER}/{REPO}/actions/caches/{cache_id}", "--silent"],
@@ -140,7 +140,7 @@ def delete_cache(cache_id):
     return (cache_id, result.returncode == 0)
 
 
-def get_remaining_cache_count():
+def get_remaining_cache_count() -> int:
     """Get count of caches older than cutoff."""
     total = 0
     page = 1
@@ -178,7 +178,7 @@ def get_remaining_cache_count():
     return total
 
 
-def main():
+def main() -> int | None:
     do_runs = not CACHES_ONLY
     do_caches = not RUNS_ONLY
 
@@ -227,6 +227,7 @@ def main():
                 time.sleep(15)
             if any_failure:
                 return 1
+    return 0
 
 
 if __name__ == "__main__":

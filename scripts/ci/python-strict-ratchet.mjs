@@ -4,24 +4,26 @@
  *
  * pyproject.toml [tool.mypy] runs strict mode project-wide but exempts
  * legacy trees (ai/, scripts/, foresight/, tools/, tests/) whose pre-strict
- * code has not been repaired yet — 1000+ errors at last count. The pe
+ * code has not been repaired yet — ~1000 errors at baseline. The pe
  * FastAPI service is fully enforced (scripts/ci/python-typecheck.sh).
  *
- * This ratchet makes the exemption non-expanding: every Python file that
- * exists in an exempt tree at baseline time is pinned as legacy, and any
- * NEW .py file in those trees must pass `mypy --strict` or CI fails. The
- * baseline can only shrink (via --prune); it never absorbs new files
- * silently (--update must be run deliberately, and each entry is visible
- * in review).
+ * The ratchet pins two things, and both can only shrink:
+ *
+ * 1. Which files are legacy. Any NEW .py file in an exempt tree must pass
+ *    `mypy --strict` or CI fails — the exemption never expands to new code.
+ * 2. How many strict errors each legacy file carries, per error code. Any
+ *    NEW error, or an increased count, fails CI. Fixes show up as
+ *    "cleaned" entries; --update is required to raise anything, and every
+ *    change is visible in review.
  *
  * This mirrors the TypeScript strict-mode tracker
  * (scripts/ci/ts-strict-mode-tracker.ts): strict where enforced today,
- * documented legacy, and a mechanism that guarantees the legacy set only
+ * documented legacy, and a mechanism that guarantees the legacy debt only
  * gets smaller.
  *
  * Usage:
  *   node scripts/ci/python-strict-ratchet.mjs            # enforce
- *   node scripts/ci/python-strict-ratchet.mjs --update   # pin new files
+ *   node scripts/ci/python-strict-ratchet.mjs --update   # re-pin (deliberate)
  *   node scripts/ci/python-strict-ratchet.mjs --prune    # drop deleted files
  */
 
@@ -58,21 +60,29 @@ function collectPythonFiles(dir, acc = []) {
 }
 
 function readBaseline() {
-  if (!existsSync(BASELINE_PATH)) return { files: [] }
-  return JSON.parse(readFileSync(BASELINE_PATH, 'utf8'))
+  if (!existsSync(BASELINE_PATH)) return { files: [], errors: {} }
+  const raw = JSON.parse(readFileSync(BASELINE_PATH, 'utf8'))
+  return { files: raw.files ?? [], errors: raw.errors ?? {} }
 }
 
 function writeBaseline(baseline) {
   const files = [...new Set(baseline.files)].sort()
+  const errors = {}
+  for (const key of Object.keys(baseline.errors).sort()) {
+    errors[key] = baseline.errors[key]
+  }
   writeFileSync(
     BASELINE_PATH,
     `${JSON.stringify(
       {
-        $schema: 'Legacy (pre-strict) Python files, pinned by scripts/ci/python-strict-ratchet.mjs. New .py files in the exempt trees must pass mypy --strict.',
+        $schema: 'Legacy (pre-strict) Python debt, pinned by scripts/ci/python-strict-ratchet.mjs.',
         description:
-          'These files predate strict typing and remain exempt. The ratchet fails CI when a file NOT listed here has strict errors. --prune removes entries for deleted files.',
+          'files: legacy-exempt .py files. errors: "file :: code" → pinned strict-error count. ' +
+          'The ratchet fails CI on any new file with strict errors, any new error key, or any ' +
+          'increased count. Fixes shrink these maps; --update re-pins deliberately.',
         generatedAt: new Date().toISOString(),
         files,
+        errors,
       },
       null,
       2,
@@ -81,13 +91,13 @@ function writeBaseline(baseline) {
   )
 }
 
-/** Run mypy --strict on the given files with the exemption-free config. */
-function runStrictMypy(files) {
+/** Run mypy --strict on all tree files with the exemption-free config. */
+function runStrictMypy() {
   const configDir = mkdtempSync(join(tmpdir(), 'mypy-strict-ratchet-'))
   const configPath = join(configDir, 'mypy.ini')
   writeFileSync(configPath, MYPY_CONFIG, 'utf8')
 
-  const result = spawnSync(
+  return spawnSync(
     'uv',
     [
       'run',
@@ -97,16 +107,31 @@ function runStrictMypy(files) {
       '--config-file',
       configPath,
       '--explicit-package-bases',
-      // Only report diagnostics for the files we pass, not the legacy
-      // modules they import.
       '--follow-imports',
       'silent',
       '--no-error-summary',
-      ...files,
+      ...EXEMPT_TREES,
     ],
     { cwd: ROOT, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 20 * 60 * 1000 },
   )
-  return result
+}
+
+/** Parse `path:line: error: msg [code]` lines into `file :: code` counts. */
+function parseErrorCounts(output, treePrefixes) {
+  const counts = new Map()
+  const perFile = new Map()
+  const lineRe = new RegExp(`^(${treePrefixes.join('|')})/[^:]+:\\d+(?::\\d+)?: error: .*\\[([a-z-]+)\\]$`)
+  for (const line of output.split('\n')) {
+    const m = line.match(lineRe)
+    if (!m) continue
+    // Paths contain no ':' — the first one separates the line number.
+    const file = line.slice(0, line.indexOf(':'))
+    const code = m[2]
+    const key = `${file} :: ${code}`
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+    perFile.set(file, (perFile.get(file) ?? 0) + 1)
+  }
+  return { counts, perFile }
 }
 
 function main() {
@@ -135,41 +160,84 @@ function main() {
   console.log(`  New (must be strict-clean): ${newFiles.length}`)
 
   if (prune && stale.length > 0) {
-    writeBaseline({ files: current })
-    console.log(`\n  Pruned ${stale.length} deleted files from the baseline.`)
+    const errors = {}
+    for (const [key, count] of Object.entries(baseline.errors)) {
+      if (!stale.some((f) => key.startsWith(`${f} ::`))) errors[key] = count
+    }
+    writeBaseline({ files: current, errors })
+    console.log(`\n  Pruned ${stale.length} deleted file(s) from the baseline.`)
     return 0
   }
 
+  if (stale.length > 0 && !update) {
+    console.log('\n  Run with --prune to remove deleted files from the baseline.')
+  }
+
+  console.log('\n  Running mypy --strict across the exempt trees…')
+  const result = runStrictMypy()
+  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
+  const { counts, perFile } = parseErrorCounts(output, EXEMPT_TREES)
+
+  if (result.status !== 0 && counts.size === 0 && !/^\S+:\d+.*error:/m.test(output)) {
+    // mypy itself broke (bad config, syntax crash) — surface raw output.
+    console.error(output)
+    console.error('❌ mypy did not produce a usable error report.')
+    return 1
+  }
+
+  const pinned = baseline.errors
+  const totalErrors = [...counts.values()].reduce((a, b) => a + b, 0)
+  const pinnedTotal = Object.values(pinned).reduce((a, b) => a + b, 0)
+  console.log(`\n  Strict errors now:  ${totalErrors} (pinned: ${pinnedTotal})`)
+
+  // Rule 1: no new files may carry errors.
+  const newFileWithErrors = [...new Set([...perFile.keys()])].filter((f) => !legacy.has(f))
+
+  // Rule 2: no new error keys, no increased counts.
+  const regressions = []
+  const cleaned = []
+  for (const [key, count] of counts) {
+    const pinnedCount = pinned[key]
+    if (pinnedCount === undefined) regressions.push(`NEW     ${key} (x${count})`)
+    else if (count > pinnedCount) regressions.push(`GREW    ${key} ${pinnedCount} → ${count}`)
+    else if (count < pinnedCount) cleaned.push(`${key} ${pinnedCount} → ${count}`)
+  }
+  for (const key of Object.keys(pinned)) {
+    if (!counts.has(key)) cleaned.push(`${key} ${pinned[key]} → 0`)
+  }
+
   if (update) {
-    writeBaseline({ files: allFiles })
-    console.log(`\n  Baseline updated: pinned ${newFiles.length} new files as legacy.`)
+    writeBaseline({ files: allFiles, errors: Object.fromEntries(counts) })
+    console.log(`\n  Baseline re-pinned: ${allFiles.length} files, ${totalErrors} errors.`)
     console.log('  Review the diff — --update is for deliberate grandfathering only.')
     return 0
   }
 
-  if (stale.length > 0) {
-    console.log('\n  Run with --prune to remove deleted files from the baseline.')
+  const failures = []
+  if (newFileWithErrors.length > 0) {
+    failures.push(
+      `${newFileWithErrors.length} NEW file(s) have strict errors:\n` +
+        newFileWithErrors.map((f) => `  - ${f} (${perFile.get(f)} errors)`).join('\n'),
+    )
+  }
+  if (regressions.length > 0) {
+    failures.push(`\n${regressions.length} regressed error count(s):\n  ${regressions.join('\n  ')}`)
   }
 
-  if (newFiles.length === 0) {
-    console.log('\n✅ No new Python files in the exempt trees — exemption is not expanding.')
-    return 0
+  if (cleaned.length > 0) {
+    console.log(`\n  Cleaned up (can be re-pinned lower): ${cleaned.length}`)
   }
 
-  console.log('\n  Running mypy --strict on new files…')
-  const result = runStrictMypy(newFiles)
-  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
-
-  if (result.status === 0) {
-    console.log(`\n✅ All ${newFiles.length} new file(s) are strict-clean.`)
-    return 0
+  if (failures.length > 0) {
+    console.error(`\n❌ Strict debt grew:\n${failures.join('\n')}`)
+    console.error(
+      '\n   Fix the annotations. The legacy exemption only shrinks — never grows.',
+    )
+    return 1
   }
 
-  console.error(output)
-  console.error(`❌ ${newFiles.length} new file(s) in the exempt trees are NOT strict-clean.`)
-  console.error('   Add precise type annotations — the exemption never expands to new files.')
-  console.error('   If this is a deliberate legacy import, discuss before using --update.')
-  return 1
+  console.log('\n✅ Strict debt did not grow — exemption is stable or shrinking.')
+  return 0
 }
 
 process.exit(main())
