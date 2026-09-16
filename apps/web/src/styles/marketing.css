@@ -118,7 +118,7 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Fraunces Variable', Georgia, serif);
+  font-family: var(--np-font-display, 'Literata Variable', Georgia, serif);
   font-weight: var(--np-weight-display, 350);
   max-width: 18ch;
   font-size: var(--np-text-display, clamp(2.5rem, 5vw, 4.5rem));
@@ -166,7 +166,7 @@
   border: 1px solid var(--border-subtle);
   font-family: var(
     --np-font-mono,
-    'JetBrains Mono Variable',
+    'IBM Plex Mono',
     ui-monospace,
     monospace
   );
@@ -281,7 +281,7 @@
 .marketing-quote-label {
   font-family: var(
     --np-font-mono,
-    'JetBrains Mono Variable',
+    'IBM Plex Mono',
     ui-monospace,
     monospace
   );
@@ -295,7 +295,7 @@
 .marketing-eyebrow {
   font-family: var(
     --np-font-mono,
-    'JetBrains Mono Variable',
+    'IBM Plex Mono',
     ui-monospace,
     monospace
   );
@@ -434,7 +434,7 @@
   margin: 0;
   font-family: var(
     --np-font-body,
-    'Public Sans Variable',
+    'Albert Sans Variable',
     system-ui,
     sans-serif
   );
