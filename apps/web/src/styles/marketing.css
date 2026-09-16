@@ -164,12 +164,7 @@
   padding: 0.92rem 1.4rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  font-family: var(
-    --np-font-mono,
-    'IBM Plex Mono',
-    ui-monospace,
-    monospace
-  );
+  font-family: var(--np-font-mono, 'IBM Plex Mono', ui-monospace, monospace);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -279,12 +274,7 @@
 .marketing-card__label,
 .marketing-list-label,
 .marketing-quote-label {
-  font-family: var(
-    --np-font-mono,
-    'IBM Plex Mono',
-    ui-monospace,
-    monospace
-  );
+  font-family: var(--np-font-mono, 'IBM Plex Mono', ui-monospace, monospace);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.13em;
@@ -293,12 +283,7 @@
 }
 
 .marketing-eyebrow {
-  font-family: var(
-    --np-font-mono,
-    'IBM Plex Mono',
-    ui-monospace,
-    monospace
-  );
+  font-family: var(--np-font-mono, 'IBM Plex Mono', ui-monospace, monospace);
   font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.16em;
