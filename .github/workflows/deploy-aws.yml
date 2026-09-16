@@ -259,6 +259,12 @@ jobs:
           kubectl apply -f agents/pipeline-agent/k8s/deployment.yaml
           kubectl delete deployment/pixelated-empathy -n pixelated-empathy --ignore-not-found
 
+          # Product analytics: inject the Umami website id (repo variable,
+          # created in the Umami admin at analytics.pixelatedempathy.com).
+          # Empty/unset disables analytics client-side — UmamiAnalytics only
+          # renders when the id is non-empty.
+          kubectl patch configmap pixelated-empathy-config -n pixelated-empathy --type merge -p '{"data":{"PUBLIC_UMAMI_WEBSITE_ID":"${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}"}}'
+
           kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
           kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
           kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
