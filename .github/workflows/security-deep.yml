@@ -1,0 +1,535 @@
+name: Security Deep Scan
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GHA_LOCAL_RUN: 'false'
+  NODE_VERSION: 24.16.0
+  PYTHON_VERSION: 3.13.13
+
+# The heavyweight security scanners — CodeQL, Trivy filesystem, Checkov
+# infra/Helm, SBOM, container base images, Dockerfile config — are too slow
+# to justify on every push (security.yml's fast lane covers push with the
+# regression gate + dependency audits). They run:
+#
+#   - nightly, so findings and SARIF uploads stay fresh, and
+#   - on push when the surfaces they scan actually change (infra, Dockerfiles,
+#     Python requirements, scanner config), and
+#   - on demand via workflow_dispatch.
+on:
+  schedule:
+    - cron: '30 3 * * *'
+  workflow_dispatch:
+  push:
+    branches: [staging]
+    paths:
+      - 'infra/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'pyproject.toml'
+      - '**/requirements*.txt'
+      - '.github/security/**'
+      - '.github/codeql/**'
+      - '.github/workflows/security-deep.yml'
+
+concurrency:
+  group: security-deep-${{ github.ref }}
+  cancel-in-progress: true
+
+# ---------------------------------------------------------------------------
+# Jobs (moved verbatim from security.yml — see that file's fast lane)
+# ---------------------------------------------------------------------------
+
+jobs:
+  # -----------------------------------------------------------------------
+  # CodeQL static analysis (JS + Python)
+  # -----------------------------------------------------------------------
+  codeql-analysis:
+    name: CodeQL Analyze
+    if: github.event_name != 'pull_request' || github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      security-events: write
+      actions: write
+    concurrency:
+      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ matrix.language }}
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript', 'python']
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          config-file: .github/codeql/codeql-config.yml
+          queries: +security-and-quality,security-extended
+          ram: 16384
+          trap-caching: false
+
+      # --- JavaScript dependencies ---
+      - name: Setup Node.js
+        if: matrix.language == 'javascript'
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup pnpm
+        if: matrix.language == 'javascript'
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+        with:
+          run_install: false
+
+      - name: Get pnpm store directory
+        if: matrix.language == 'javascript'
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm cache
+        if: matrix.language == 'javascript'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Clean pnpm workspace artifacts
+        if: matrix.language == 'javascript'
+        run: rm -rf node_modules
+
+      - name: Install native build dependencies
+        if: matrix.language == 'javascript'
+        timeout-minutes: 5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          npm install -g node-gyp
+
+      - name: Install JavaScript dependencies
+        if: matrix.language == 'javascript'
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          --ignore-scripts
+
+      - name: Autobuild JavaScript/TypeScript
+        if: matrix.language == 'javascript'
+        uses: github/codeql-action/autobuild@v4
+
+      # --- Python dependencies ---
+      - name: Setup Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Prepare uv venv
+        if: matrix.language == 'python'
+        id: prepare-uv
+        uses: ./.github/actions/prepare-uv-venv
+        with:
+          service-dir: apps/web/src/lib/ai/bias-detection/python-service
+
+      - name: Install Python dependencies
+        if: matrix.language == 'python'
+        env:
+          VIRTUAL_ENV: ${{ github.workspace
+            }}/apps/web/src/lib/ai/bias-detection/python-service/.venv
+        run: |
+          if [ -d "apps/web/src/lib/ai/bias-detection/python-service" ]; then
+            cd apps/web/src/lib/ai/bias-detection/python-service
+            USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
+            uv pip install ${USE_SYSTEM} --upgrade 'pip>=25.3' setuptools wheel
+            uv pip install ${USE_SYSTEM} -r requirements.txt || true
+            cd - > /dev/null
+          fi
+          find . -name "requirements.txt" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/.venv/*" \
+            -not -path "*/site-packages/*" \
+            -not -path "*/apps/web/src/lib/ai/bias-detection/*" \
+            -not -path "*/ai/data/*" \
+            | head -5 | while read req; do
+            dir=$(dirname "$req")
+            cd "$dir"
+            if [ -d ".venv" ]; then
+              DIR_USE_SYSTEM=""
+              DIR_VIRTUAL_ENV="${PWD}/.venv"
+            else
+              DIR_USE_SYSTEM="--system"
+              DIR_VIRTUAL_ENV=""
+            fi
+            VIRTUAL_ENV="${DIR_VIRTUAL_ENV}" uv pip install ${DIR_USE_SYSTEM} -r requirements.txt || true
+            cd - > /dev/null
+          done || true
+
+      - name: Autobuild Python
+        if: matrix.language == 'python'
+        uses: github/codeql-action/autobuild@v4
+
+      # --- Analysis ---
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: '/language:${{ matrix.language }}'
+          upload: true
+          output: sarif-latest
+
+      - name: Collect CodeQL SARIF results
+        id: codeql-sarif
+        if: always()
+        shell: bash
+        run: |
+          mapfile -t SARIF_FILES < <(find "${RUNNER_TEMP}/codeql_databases" -type f -name "*.sarif")
+          if [ "${#SARIF_FILES[@]}" -eq 0 ]; then
+            echo "found=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "found=true" >> "${GITHUB_OUTPUT}"
+            { echo "paths<<EOF"; printf "%s\n" "${SARIF_FILES[@]}"; echo "EOF"; } >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Upload CodeQL SARIF artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always() && steps.codeql-sarif.outputs.found == 'true'
+        with:
+          name: codeql-sarif-${{ matrix.language }}
+          path: ${{ steps.codeql-sarif.outputs.paths }}
+          retention-days: 30
+
+  # -----------------------------------------------------------------------
+  # Trivy filesystem scan + Checkov infrastructure/Helm scan
+  # -----------------------------------------------------------------------
+  trivy-checkov-scan:
+    name: Trivy & Checkov Scan
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up uv
+        uses: ./.github/actions/setup-uv
+
+      - name: Prepare Helm dependencies for Trivy scan
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        run: |
+          if ! command -v helm >/dev/null 2>&1; then
+            curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+          fi
+          helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
+          helm repo add traefik https://traefik.github.io/charts --force-update
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts --force-update
+          helm repo add grafana https://grafana.github.io/helm-charts --force-update
+          helm dep update ai/inference/deployment/pixel-voice
+          helm dep update ai/inference/deployment/helm/pixelated-empathy
+
+      - name: Run Trivy vulnerability scanner
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        id: trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          NODE_OPTIONS:
+            ${{ vars.TRACE_TRIVY_DEPRECATION == 'true' && '--trace-deprecation'
+            || '--no-deprecation' }}
+        with:
+          cache: 'false'
+          scan-type: 'fs'
+          scanners: 'vuln,secret,misconfig'
+          trivy-config: .github/security/trivy/trivy.yaml
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+          skip-files: >-
+            ai/training/sliced/stage2_therapeutic_expertise/clinical_diagnosis_mental_health.json,
+            ai/training/sliced/stage2_therapeutic_expertise/cultural_nuances.json,
+            ai/training/v1/stage2_expertise/reasoning/clinical_diagnosis_mental_health.json,
+            ai/training/v1/stage2_expertise/reasoning/cultural_nuances.json
+          limit-severities-for-sarif: true
+        continue-on-error: true
+
+      - name: Run Checkov infrastructure scan
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        id: checkov_infra
+        uses: bridgecrewio/checkov-action@v12.3122.0
+        with:
+          directory: .
+          framework: terraform,terraform_plan,bicep
+          output_format: sarif
+          output_file_path: checkov-infra-results.sarif
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/inference/deployment/pixel-voice,infra/docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
+          log_level: WARNING
+          container_user: 0
+        continue-on-error: true
+
+      - name: Run Checkov Helm scan
+        if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}
+        id: checkov_helm
+        uses: bridgecrewio/checkov-action@v12.3122.0
+        with:
+          directory: ai/inference/deployment/pixel-voice
+          framework: kubernetes,helm
+          output_format: sarif
+          output_file_path: checkov-helm-results.sarif
+          log_level: WARNING
+          container_user: 0
+        continue-on-error: true
+
+      # --- SARIF uploads ---
+      - name: Check for Trivy SARIF
+        id: trivy_sarif
+        run: |
+          if [ -s trivy-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for Checkov infra SARIF
+        id: checkov_infra_sarif
+        run: |
+          if [ -s checkov-infra-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Check for Checkov Helm SARIF
+        id: checkov_helm_sarif
+        run: |
+          if [ -s checkov-helm-results.sarif ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload Trivy SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.trivy_sarif.outputs.found == 'true'
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-fs
+
+      - name: Upload Trivy artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always() && steps.trivy_sarif.outputs.found == 'true'
+        with:
+          name: trivy-sarif
+          path: trivy-results.sarif
+
+      - name: Upload Checkov infra SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.checkov_infra_sarif.outputs.found == 'true'
+        with:
+          sarif_file: checkov-infra-results.sarif
+          category: checkov-infra
+
+      - name: Upload Checkov Helm SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.checkov_helm_sarif.outputs.found == 'true'
+        with:
+          sarif_file: checkov-helm-results.sarif
+          category: checkov-helm
+
+      - name: Upload Checkov artifacts
+        if: always() && (steps.checkov_infra_sarif.outputs.found == 'true' ||
+          steps.checkov_helm_sarif.outputs.found == 'true')
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: checkov-sarif
+          path: |
+            checkov-infra-results.sarif
+            checkov-helm-results.sarif
+
+      - name: Trivy security gate notice
+        if: always() && steps.trivy_sarif.outputs.found == 'true'
+        env:
+          TRIVY_OUTCOME: ${{ steps.trivy.outcome }}
+        run: |
+          echo "::notice::Trivy scan completed. Outcome: ${TRIVY_OUTCOME}. Findings at: https://github.com/${{ github.repository }}/security/code-scanning"
+
+  # -----------------------------------------------------------------------
+  # SBOM generation
+  # -----------------------------------------------------------------------
+  sbom-generation:
+    name: SBOM Generation
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Initialize submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Generate SBOM with Syft
+        uses: anchore/sbom-action@v0
+        with:
+          format: cyclonedx-json
+          output-file: sbom.cyclonedx.json
+          upload-artifact: false
+
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: sbom-cyclonedx
+          path: sbom.cyclonedx.json
+          retention-days: 30
+
+      - name: Post SBOM summary to PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v3
+        continue-on-error: true
+        with:
+          header: 📋 SBOM
+          path: sbom-summary.md
+
+  # -----------------------------------------------------------------------
+  # Container base image vulnerability scan
+  # -----------------------------------------------------------------------
+  container-image-scan:
+    name: Container Image Scan
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: node:24-bookworm-slim
+            dockerfile: infra/Dockerfile
+          - image: node:24-bookworm-slim
+            dockerfile: infra/docker/Dockerfile.production
+          - image: node:24-alpine
+            dockerfile: infra/docker/Dockerfile.prod
+          - image: python:3.13-slim
+            dockerfile: infra/docker/backend.Dockerfile
+          - image: mcr.microsoft.com/playwright:v1.60.0-jammy
+            dockerfile: infra/docker/Dockerfile.playwright
+          - image: debian:bookworm-slim
+            dockerfile: infra/docker/traefik/Dockerfile
+          - image: nvcr.io/nvidia/pytorch:26.07-py3
+            dockerfile: ai/Dockerfile
+          - image: nvidia/cuda:12.8.1-runtime-ubuntu24.04
+            dockerfile: infra/docker/training-service/Dockerfile
+          - image: nvidia/cuda:12.9.2-runtime-ubuntu24.04
+            dockerfile: ai/nemo/gpu/Dockerfile
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Create output directory
+        run: mkdir -p "$(dirname 'trivy-image-${{ matrix.dockerfile }}.json')"
+
+      - name: Scan base image with Trivy
+        id: trivy_image
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ matrix.image }}
+          scan-type: image
+          scanners: vuln
+          format: json
+          output: trivy-image-${{ matrix.dockerfile }}.json
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+        continue-on-error: true
+
+      - name: Create fallback result if scan produced no output
+        if: always()
+        run: |
+          if [ ! -s "trivy-image-${{ matrix.dockerfile }}.json" ]; then
+            echo '{"Results":[],"Metadata":{"Image":{"RepoTag":"${{ matrix.image }}"}},"scan_failed":true}' > "trivy-image-${{ matrix.dockerfile }}.json"
+            echo "::notice::Trivy produced no output for ${{ matrix.image }} — fallback JSON created"
+          fi
+
+      - name: Check scan results
+        id: scan_result
+        run: |
+          if [ -s trivy-image-${{ matrix.dockerfile }}.json ]; then
+            vulns=$(jq '[.Results[]? | .Vulnerabilities[]?] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            critical=$(jq '[.Results[]? | .Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            high=$(jq '[.Results[]? | .Vulnerabilities[]? | select(.Severity=="HIGH")] | length' trivy-image-${{ matrix.dockerfile }}.json 2>/dev/null || echo "0")
+            echo "total=$vulns" >> $GITHUB_OUTPUT
+            echo "critical=$critical" >> $GITHUB_OUTPUT
+            echo "high=$high" >> $GITHUB_OUTPUT
+            echo "::warning::${{ matrix.dockerfile }} (${{ matrix.image }}): $critical CRITICAL, $high HIGH"
+          else
+            echo "total=0" >> $GITHUB_OUTPUT
+            echo "critical=0" >> $GITHUB_OUTPUT
+            echo "high=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload image scan results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: container-scan-${{ matrix.dockerfile }}
+          path: trivy-image-${{ matrix.dockerfile }}.json
+        continue-on-error: true
+
+  # -----------------------------------------------------------------------
+  # Dockerfile configuration scan
+  # -----------------------------------------------------------------------
+  dockerfile-config-scan:
+    name: Dockerfile Config Scan
+    runs-on: ubuntu-24.04
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Scan Dockerfiles with Trivy config
+        id: trivy_config
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: config
+          scanners: misconfig,secret
+          format: sarif
+          output: dockerfile-config-results.sarif
+          severity: CRITICAL,HIGH,MEDIUM
+          exit-code: '0'
+        continue-on-error: true
+
+      - name: Check for SARIF
+        id: config_sarif
+        run: |
+          if [ -s dockerfile-config-results.sarif ]; then
+            echo "found=true" >> $GITHUB_OUTPUT
+          else
+            echo "found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Dockerfile config SARIF to Security tab
+        uses: github/codeql-action/upload-sarif@v4
+        if: always() && steps.config_sarif.outputs.found == 'true'
+        with:
+          sarif_file: dockerfile-config-results.sarif
+          category: trivy-dockerfile-config
+
+      - name: Upload Dockerfile config SARIF artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always() && steps.config_sarif.outputs.found == 'true'
+        with:
+          name: dockerfile-config-sarif
+          path: dockerfile-config-results.sarif

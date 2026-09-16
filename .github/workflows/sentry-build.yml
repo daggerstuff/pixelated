@@ -5,15 +5,14 @@ permissions:
   packages: write # Required: GHCR push via docker/login-action with GITHUB_TOKEN
 
 on:
-  push:
-    branches: [main, master, staging]
-    paths:
-      - 'apps/web/src/**'
-      - 'infra/Dockerfile'
-      - 'infra/docker/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/sentry-build.yml'
+  # A production build + Sentry release should track what actually shipped,
+  # not every push. It fires when a staging deploy completes (the deploy
+  # workflow builds and rolls out the same commit), so SENTRY_RELEASE
+  # (github.sha) always matches a deployed version.
+  workflow_run:
+    workflows: [Deploy to AWS EKS]
+    types: [completed]
+    branches: [staging]
   workflow_dispatch:
 
 env:
@@ -24,6 +23,7 @@ env:
 
 jobs:
   build:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-24.04
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
