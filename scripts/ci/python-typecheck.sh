@@ -1,17 +1,24 @@
 #!/usr/bin/env bash
 # Python strict type checking (mypy).
 #
-# Scope: the `pe` FastAPI service (`apps/web/src/pe`) is checked in full
-# `--strict` mode. The wider codebase (ai/, scripts/, foresight/, tools/) is
-# not yet strict-clean, so those packages are explicitly exempted below. This
-# is the same incremental-adoption strategy used for TypeScript (see
-# scripts/ci/ts-strict-mode-tracker.ts): strict where it is enforced today,
-# documented exemptions for legacy trees, and a clear path to widen the net.
+# Scope: the `pe` FastAPI service (`apps/web/src/pe`) plus the full scripts/
+# and tools/ trees are checked in `--strict` mode. The remaining legacy trees
+# (ai/, foresight/, tests/) are still exempted in pyproject.toml
+# [[tool.mypy.overrides]] and are not part of the enforced scope here.
 #
-# The exemption is non-expanding: scripts/ci/python-strict-ratchet.mjs (run
-# right after this check in CI) pins every legacy file in
-# scripts/ci/python-strict-baseline.json and fails when a NEW .py file in the
-# exempt trees is not strict-clean.
+# History: scripts/ and tools/ carried ~1000 pinned strict errors and were
+# enforced incrementally by scripts/ci/python-strict-ratchet.mjs (a shrink-only
+# baseline). Every pinned file has since reached zero strict errors, so the
+# exemption was retired and both trees are now enforced directly by this
+# check — the ratchet and its baseline were removed with it.
+#
+# The scripts/tools run uses the same flags the retired ratchet used:
+#   --explicit-package-bases  avoids "found twice" errors from the
+#                             submodule layout (e.g. tools/agent_runner).
+#   --follow-imports silent   errors in exempt trees (ai/) that scripts
+#                             import do not leak into the run; untyped
+#                             callees still surface as no-untyped-call in
+#                             the caller.
 #
 # A CI-visible summary line is printed so the check is easy to locate in logs.
 
@@ -20,16 +27,23 @@ set -uo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT_DIR" || exit 1
 
-STRICT_TARGETS=("apps/web/src/pe")
+PE_TARGETS=("apps/web/src/pe")
+WIDE_TARGETS=("scripts" "tools")
 
-echo "🐍 Running mypy --strict on: ${STRICT_TARGETS[*]}"
+echo "🐍 Running mypy --strict on: ${PE_TARGETS[*]}"
 echo "   Config: pyproject.toml [tool.mypy]; exemptions for legacy trees are documented there."
 
 # `uv run --extra dev` guarantees mypy is present even when the environment has
 # not synced the dev extra yet (fresh CI checkout).
-if ! uv run --extra dev mypy "${STRICT_TARGETS[@]}"; then
+if ! uv run --extra dev mypy "${PE_TARGETS[@]}"; then
   echo "❌ mypy strict check failed. Add precise type annotations (no suppressions)." >&2
   exit 1
 fi
+echo "✅ Python strict type check passed for ${PE_TARGETS[*]}"
 
-echo "✅ Python strict type check passed for ${STRICT_TARGETS[*]}"
+echo "🐍 Running mypy --strict on: ${WIDE_TARGETS[*]}"
+if ! uv run --extra dev mypy --explicit-package-bases --follow-imports silent "${WIDE_TARGETS[@]}"; then
+  echo "❌ mypy strict check failed. Add precise type annotations (no suppressions)." >&2
+  exit 1
+fi
+echo "✅ Python strict type check passed for ${WIDE_TARGETS[*]}"
