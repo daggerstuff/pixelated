@@ -290,15 +290,6 @@ ignore = ["E501", "UP017", "PLR2004"]
 "scripts/build_qa_dataset_v3.py" = ["PLR0912"]
 "scripts/cleanup_runs.py" = ["PLR0912"]
 "scripts/colab_nf_bootstrap.py" = ["PLR0913", "PLR0915", "PLR0917"]
-"scripts/corpus/pixelated_empathy/brene_brown_monthly_adversarial_review.py" = [
-  "PLR0913",
-  "PLR0917",
-]
-"scripts/corpus/pixelated_empathy/cli.py" = ["PLR0915"]
-"scripts/corpus/pixelated_empathy/company_events.py" = ["PLR0913", "PLR0917"]
-"scripts/corpus/pixelated_empathy/monthly_auditor.py" = ["PLR0912", "PLR0915"]
-"scripts/corpus/pixelated_empathy/monthly_llm_generator.py" = ["PLR0912", "PLR0915"]
-"scripts/corpus/pixelated_empathy/monthly_llm_jobs.py" = ["PLR0912", "PLR0915"]
 "scripts/data/designer/lineage_audit.py" = ["PLR0912", "PLR0915"]
 "scripts/data/designer/release_manifest.py" = ["PLR0913"]
 "scripts/data/expand_to_large_budget.py" = ["PLR0912", "PLR0915"]
