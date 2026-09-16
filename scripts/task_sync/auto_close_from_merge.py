@@ -62,7 +62,8 @@ def _gql(api_key: str, query: str, variables: dict[str, Any] | None = None) -> d
     )
     try:
         with urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read())
+            result: dict[str, Any] = json.loads(resp.read())
+            return result
     except HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"Linear HTTP {exc.code}: {body}") from exc
@@ -96,7 +97,7 @@ def _find_done_state(issue: dict[str, Any]) -> str | None:
     states_container = team.get("states") or {}
     for state in states_container.get("nodes") or []:
         if isinstance(state, dict) and state.get("type") == "completed":
-            return state["id"]
+            return str(state["id"])
     return None
 
 

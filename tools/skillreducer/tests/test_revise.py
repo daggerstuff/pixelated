@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from typing import Any
+
+import pytest
 from click.testing import CliRunner
 
 from skillreducer.cli import main
@@ -23,7 +26,7 @@ def test_revise_command_usage_when_no_args() -> None:
     assert "src/skillrevise/README.md" in result.output
 
 
-def test_revise_command_forwards_argv(monkeypatch) -> None:
+def test_revise_command_forwards_argv(monkeypatch: pytest.MonkeyPatch) -> None:
     seen: list[str] = []
 
     def fake_main() -> None:
@@ -41,12 +44,12 @@ def test_revise_command_forwards_argv(monkeypatch) -> None:
     assert seen == ["tasks.json", "--max-revisions", "3", "--baseline-only"]
 
 
-def test_revise_command_missing_import_message(monkeypatch) -> None:
+def test_revise_command_missing_import_message(monkeypatch: pytest.MonkeyPatch) -> None:
     import builtins
 
     real_import = builtins.__import__
 
-    def fake_import(name, *args, **kwargs):
+    def fake_import(name: str, *args: Any, **kwargs: Any) -> Any:
         if name == "skillrevise" or name.startswith("skillrevise."):
             raise ImportError("simulated missing skillrevise")
         return real_import(name, *args, **kwargs)

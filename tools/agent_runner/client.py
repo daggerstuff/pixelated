@@ -42,7 +42,8 @@ class LinearClient:
         data = resp.json()
         if "errors" in data:
             raise RuntimeError(f"Linear GraphQL Errors: {data['errors']}")
-        return data.get("data", {})
+        result: dict[str, Any] = data.get("data", {})
+        return result
 
     def resolve_team(self, team_key: str) -> LinearTeam:
         """Fetch team ID and state mapping by key (e.g. 'PIX')."""
@@ -126,7 +127,7 @@ class LinearClient:
         """
         try:
             create_data = self.execute_gql(create_mutation, {"teamId": team_id, "name": label_name})
-            label_id = create_data.get("issueLabelCreate", {}).get("issueLabel", {}).get("id")
+            label_id: str | None = create_data.get("issueLabelCreate", {}).get("issueLabel", {}).get("id")
             if label_id:
                 self._label_cache[team_id][label_name] = label_id
                 return label_id
@@ -137,7 +138,8 @@ class LinearClient:
                 for n in refetch.get("issueLabels", {}).get("nodes", []):
                     self._label_cache[team_id][n["name"]] = n["id"]
                     if n["name"].lower() == label_name.lower():
-                        return n["id"]
+                        matched_id: str = n["id"]
+                        return matched_id
             raise
 
         raise RuntimeError(f"Failed to create label '{label_name}' for team {team_id}")
@@ -263,7 +265,7 @@ class LinearClient:
         }
         """
         data = self.execute_gql(mutation, {"issueId": issue_id, "body": body})
-        comment_id = data.get("commentCreate", {}).get("comment", {}).get("id")
+        comment_id: str | None = data.get("commentCreate", {}).get("comment", {}).get("id")
         if not comment_id:
             raise RuntimeError(f"Failed to post comment on issue {issue_id}")
         return comment_id
@@ -418,7 +420,8 @@ class LinearClient:
         data = self.execute_gql(query, {"teamId": team.id, "title": title})
         nodes = data.get("issues", {}).get("nodes", [])
         if nodes:
-            return nodes[0]["identifier"]
+            identifier: str = nodes[0]["identifier"]
+            return identifier
 
         if not create_if_missing:
             raise ValueError(f"Coordination ticket '{title}' not found in team '{team_key}'.")

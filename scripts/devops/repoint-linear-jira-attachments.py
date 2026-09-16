@@ -16,6 +16,7 @@ import urllib.error
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 KEY_MAP_PATH = REPO_ROOT / "exports" / "pix-to-adhd-key-map.json"
@@ -27,7 +28,7 @@ MIGRATION_MARKER = "Migrated from slimshadyme"
 DUPLICATE_STATE_ID = "0b40a450-946c-48b0-9e85-d0676c800b76"
 
 
-def gql(api_key: str, query: str, variables: dict | None = None) -> dict:
+def gql(api_key: str, query: str, variables: dict[str, Any] | None = None) -> dict[str, Any]:
     body = json.dumps({"query": query, "variables": variables or {}}).encode()
     req = urllib.request.Request(
         "https://api.linear.app/graphql",
@@ -36,16 +37,17 @@ def gql(api_key: str, query: str, variables: dict | None = None) -> dict:
     )
     try:
         with urllib.request.urlopen(req, timeout=90) as resp:
-            payload = json.loads(resp.read())
+            payload: dict[str, Any] = json.loads(resp.read())
     except urllib.error.HTTPError as exc:
         detail = exc.read().decode("utf-8", errors="replace")
         raise RuntimeError(f"HTTP {exc.code}: {detail}") from exc
     if payload.get("errors"):
         raise RuntimeError(json.dumps(payload["errors"], indent=2))
-    return payload["data"]
+    data: dict[str, Any] = payload["data"]
+    return data
 
 
-def fetch_all_issues(api_key: str) -> list[dict]:
+def fetch_all_issues(api_key: str) -> list[dict[str, Any]]:
     query = """
     query TeamIssues($teamId: String!, $after: String) {
       team(id: $teamId) {
@@ -65,8 +67,8 @@ def fetch_all_issues(api_key: str) -> list[dict]:
       }
     }
     """
-    issues: list[dict] = []
-    after = None
+    issues: list[dict[str, Any]] = []
+    after: str | None = None
     while True:
         data = gql(api_key, query, {"teamId": TEAM_ID, "after": after})
         conn = data["team"]["issues"]
@@ -82,7 +84,7 @@ def pix_sort_key(identifier: str) -> int:
     return int(match.group(1)) if match else 10**9
 
 
-def is_migration(issue: dict) -> bool:
+def is_migration(issue: dict[str, Any]) -> bool:
     return MIGRATION_MARKER in (issue.get("description") or "")
 
 
@@ -100,13 +102,13 @@ def main() -> int:
 
     issues = fetch_all_issues(api_key)
 
-    by_title: dict[str, list[dict]] = defaultdict(list)
+    by_title: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
     for issue in issues:
         title = (issue.get("title") or "").strip().lower()
         if title:
             by_title[title].append(issue)
 
-    canonical_by_title: dict[str, dict] = {}
+    canonical_by_title: dict[str, dict[str, Any]] = {}
     for title, group in by_title.items():
         non_migration = [i for i in group if not is_migration(i)]
         pool = non_migration or group
@@ -114,7 +116,7 @@ def main() -> int:
 
     slim_deletes: list[tuple[str, str, str]] = []
     migration_cancel: list[str] = []
-    repoint: list[tuple[dict, str, str]] = []
+    repoint: list[tuple[dict[str, Any], str, str]] = []
 
     for issue in issues:
         ident = issue["identifier"]

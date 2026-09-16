@@ -8,8 +8,10 @@ from skillreducer.llm.json_util import parse_llm_json
 
 try:
     from agno.agent import Agent
+
+    _AGENT_AVAILABLE = True
 except ImportError:  # pragma: no cover
-    Agent = None  # type: ignore[misc, assignment]
+    _AGENT_AVAILABLE = False
 
 
 class AgnoLLMClient:
@@ -31,7 +33,9 @@ class AgnoLLMClient:
             return ""
         return content.strip() if isinstance(content, str) else str(content).strip()
 
-    def complete_json(self, prompt: str, model: str | None = None, system: str | None = None) -> Any:
+    def complete_json(
+        self, prompt: str, model: str | None = None, system: str | None = None
+    ) -> Any:
         """Return parsed JSON, or None if the model reply is empty / not JSON."""
         text = self.complete(prompt, model=model, system=system)
         return parse_llm_json(text)

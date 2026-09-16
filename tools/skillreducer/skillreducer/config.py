@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -114,8 +115,7 @@ def _env_bool(*names: str) -> bool | None:
 def normalize_azure_endpoint(url: str) -> str:
     """Strip OpenAI v1 suffix so AzureOpenAI gets a resource endpoint."""
     endpoint = url.rstrip("/")
-    if endpoint.endswith("/openai/v1"):
-        endpoint = endpoint[: -len("/openai/v1")]
+    endpoint = endpoint.removesuffix("/openai/v1")
     return endpoint.rstrip("/") + "/"
 
 
@@ -234,7 +234,7 @@ class Config:
         """Load config from yaml (optional), then apply env overrides."""
         ensure_dotenv_loaded()
         candidates = [path] if path else DEFAULT_CONFIG_PATHS
-        data: dict = {}
+        data: dict[str, Any] = {}
         for candidate in candidates:
             if candidate and candidate.exists():
                 loaded = yaml.safe_load(candidate.read_text(encoding="utf-8")) or {}
@@ -259,18 +259,16 @@ class Config:
                     "min_reference_tokens": thresholds.get(
                         "min_reference_tokens", cls.min_reference_tokens
                     ),
-                    "min_script_tokens": thresholds.get(
-                        "min_script_tokens", cls.min_script_tokens
-                    ),
+                    "min_script_tokens": thresholds.get("min_script_tokens", cls.min_script_tokens),
                     "max_feedback_iterations": thresholds.get(
                         "max_feedback_iterations", cls.max_feedback_iterations
                     ),
-                    "max_restore_steps": thresholds.get(
-                        "max_restore_steps", cls.max_restore_steps
-                    ),
+                    "max_restore_steps": thresholds.get("max_restore_steps", cls.max_restore_steps),
                     "num_test_queries": oracle.get("num_test_queries", cls.num_test_queries),
                     "num_distractors": oracle.get("num_distractors", cls.num_distractors),
-                    "include_adversarial": oracle.get("include_adversarial", cls.include_adversarial),
+                    "include_adversarial": oracle.get(
+                        "include_adversarial", cls.include_adversarial
+                    ),
                     "use_llm": loaded.get("use_llm", True),
                     "tscg_enabled": bool(tscg.get("enabled", cls.tscg_enabled)),
                     "tscg_model": tscg.get("model", cls.tscg_model),

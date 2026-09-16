@@ -2,18 +2,20 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Protocol
+from typing import Any, Protocol
 
-from skillrevise.method.authoring import SkillConstraintChecker
-from skillrevise.llm import LLMClient
 from skillrevise.core.models import (
     DiagnosisEvidence,
     DiagnosisReport,
+    ExecutionTrace,
     FailureType,
     PairedEvaluation,
     Skill,
     TaskSpec,
+    TrajectoryEvent,
 )
+from skillrevise.llm import LLMClient
+from skillrevise.method.authoring import SkillConstraintChecker
 
 GENERIC_MARKERS = (
     "be careful",
@@ -39,7 +41,9 @@ VIOLATION_TO_FAILURE = {
 
 
 class Diagnoser(Protocol):
-    def diagnose(self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation) -> DiagnosisReport:
+    def diagnose(
+        self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation
+    ) -> DiagnosisReport:
         """Return an execution-grounded diagnosis for a skill evaluation."""
 
 
@@ -47,7 +51,9 @@ class HeuristicDiagnoser:
     def __init__(self, checker: SkillConstraintChecker | None = None) -> None:
         self.checker = checker or SkillConstraintChecker()
 
-    def diagnose(self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation) -> DiagnosisReport:
+    def diagnose(
+        self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation
+    ) -> DiagnosisReport:
         text = skill.as_markdown().lower()
         labels: list[FailureType] = []
         evidence: list[DiagnosisEvidence] = []
@@ -70,7 +76,9 @@ class HeuristicDiagnoser:
         if self._looks_over_specific(text, evaluation):
             if FailureType.OVER_SPECIFICITY not in labels:
                 labels.append(FailureType.OVER_SPECIFICITY)
-            snippet = self._first_matching_line(skill, r"`[^`]+/[^`]+`|\b[a-zA-Z0-9_.-]+\.[a-z]{1,4}\b")
+            snippet = self._first_matching_line(
+                skill, r"`[^`]+/[^`]+`|\b[a-zA-Z0-9_.-]+\.[a-z]{1,4}\b"
+            )
             evidence.append(
                 DiagnosisEvidence(
                     source="skill",
@@ -85,7 +93,9 @@ class HeuristicDiagnoser:
             evidence.append(
                 DiagnosisEvidence(
                     source="skill",
-                    snippet=self._first_matching_line(skill, "|".join(re.escape(marker) for marker in GENERIC_MARKERS))
+                    snippet=self._first_matching_line(
+                        skill, "|".join(re.escape(marker) for marker in GENERIC_MARKERS)
+                    )
                     or skill.purpose,
                     reason="The draft relies on broad advice without enough executable workflow structure.",
                 )
@@ -117,7 +127,9 @@ class HeuristicDiagnoser:
         if self._has_false_certainty(text, evaluation):
             if FailureType.FALSE_CERTAINTY not in labels:
                 labels.append(FailureType.FALSE_CERTAINTY)
-            snippet = self._first_matching_line(skill, "|".join(re.escape(marker) for marker in ABSOLUTE_MARKERS))
+            snippet = self._first_matching_line(
+                skill, "|".join(re.escape(marker) for marker in ABSOLUTE_MARKERS)
+            )
             evidence.append(
                 DiagnosisEvidence(
                     source="skill",
@@ -170,7 +182,10 @@ class HeuristicDiagnoser:
         if evaluation.with_skill.success:
             return
 
-        verifier_event = next((event for event in reversed(evaluation.with_skill.events) if event.kind == "verifier"), None)
+        verifier_event = next(
+            (event for event in reversed(evaluation.with_skill.events) if event.kind == "verifier"),
+            None,
+        )
         if verifier_event is not None:
             if FailureType.FALSE_CERTAINTY not in labels:
                 labels.append(FailureType.FALSE_CERTAINTY)
@@ -197,12 +212,15 @@ class HeuristicDiagnoser:
     def _looks_over_specific(self, text: str, evaluation: PairedEvaluation) -> bool:
         hardcoded_literals = len(re.findall(r"`[^`]+/[^`]+`|\b[a-zA-Z0-9_.-]+\.[a-z]{1,4}\b", text))
         return hardcoded_literals >= 2 and (
-            evaluation.no_skill.success or any(event.kind == "env_error" for event in evaluation.with_skill.events)
+            evaluation.no_skill.success
+            or any(event.kind == "env_error" for event in evaluation.with_skill.events)
         )
 
     def _looks_over_general(self, text: str) -> bool:
         generic_hits = sum(marker in text for marker in GENERIC_MARKERS)
-        imperative_steps = sum(token in text for token in ("verify", "run", "inspect", "edit", "test"))
+        imperative_steps = sum(
+            token in text for token in ("verify", "run", "inspect", "edit", "test")
+        )
         return generic_hits >= 2 and imperative_steps <= 3
 
     def _has_context_pollution(self, skill: Skill, evaluation: PairedEvaluation) -> bool:
@@ -214,26 +232,37 @@ class HeuristicDiagnoser:
 
     def _has_false_certainty(self, text: str, evaluation: PairedEvaluation) -> bool:
         return any(marker in text for marker in ABSOLUTE_MARKERS) and any(
-            event.kind in {"false_certainty", "assumption_error"} for event in evaluation.with_skill.events
+            event.kind in {"false_certainty", "assumption_error"}
+            for event in evaluation.with_skill.events
         )
 
-    def _first_event(self, evaluation: PairedEvaluation, kind: str):
-        return next(event for event in evaluation.with_skill.events if event.kind == kind)
+    def _first_event(self, evaluation: PairedEvaluation, kind: str) -> TrajectoryEvent:
+        event: TrajectoryEvent = next(
+            event for event in evaluation.with_skill.events if event.kind == kind
+        )
+        return event
 
     def _first_matching_line(self, skill: Skill, pattern: str) -> str | None:
         compiled = re.compile(pattern, re.IGNORECASE)
         for line in skill.lines():
             if compiled.search(line):
-                return line.strip()
+                matched_line: str = line.strip()
+                return matched_line
         return None
 
-    def _build_causal_judgment(self, evaluation: PairedEvaluation, labels: list[FailureType]) -> str:
+    def _build_causal_judgment(
+        self, evaluation: PairedEvaluation, labels: list[FailureType]
+    ) -> str:
         if not labels:
-            return "No strong evidence that the skill is harming execution under the current protocol."
+            return (
+                "No strong evidence that the skill is harming execution under the current protocol."
+            )
         if evaluation.no_skill.success and not evaluation.with_skill.success:
             return "The skill likely causes regression by steering the agent toward the wrong procedure."
         if evaluation.with_skill.success and evaluation.utility.efficiency_gain < 0:
-            return "The skill is not blocking success, but it adds friction and should be compressed."
+            return (
+                "The skill is not blocking success, but it adds friction and should be compressed."
+            )
         return "The skill underperforms because its guidance shape does not match the task-family requirements."
 
     def _rewrite_target(self, label: FailureType) -> str:
@@ -248,7 +277,9 @@ class HeuristicDiagnoser:
         return targets[label]
 
     def _verifier_specific_rewrite_targets(self, evidence: list[DiagnosisEvidence]) -> list[str]:
-        text = "\n".join(item.snippet for item in evidence if item.source in {"verifier", "benchmark"}).lower()
+        text = "\n".join(
+            item.snippet for item in evidence if item.source in {"verifier", "benchmark"}
+        ).lower()
         targets: list[str] = []
         graph_contract_failure = (
             "unreachable nodes found" in text
@@ -259,14 +290,14 @@ class HeuristicDiagnoser:
         if "unreachable nodes found" in text or "reachability" in text:
             targets.append(
                 "For graph tasks, copy the verifier's terminal-sentinel convention into the skill: if a target such as "
-                "`End` is allowed as an edge target but skipped during traversal, keep edges with `to == \"End\"` while "
+                '`End` is allowed as an edge target but skipped during traversal, keep edges with `to == "End"` while '
                 "excluding `End` from JSON `nodes`; run the same reachability walk from the declared entry node (for "
                 "dialogue graphs, `Start`) and enqueue only non-terminal targets before export."
             )
             targets.append(
                 "Make the repair executable as a post-write check: after writing graph JSON/DOT, reload the JSON and "
-                "assert `\"End\" not in node_ids`, every edge target is either in `node_ids` or equals `\"End\"`, "
-                "reachability from `Start` enqueues only targets not equal to `\"End\"`, no non-terminal node remains "
+                'assert `"End" not in node_ids`, every edge target is either in `node_ids` or equals `"End"`, '
+                'reachability from `Start` enqueues only targets not equal to `"End"`, no non-terminal node remains '
                 "unreachable, and the DOT text contains `shape=diamond` for choice nodes."
             )
         if "shape=diamond" in text or "choice nodes should be visualized as diamonds" in text:
@@ -308,7 +339,9 @@ class NoOpDiagnoser:
     authoring, execution, and revision budgets otherwise comparable.
     """
 
-    def diagnose(self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation) -> DiagnosisReport:
+    def diagnose(
+        self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation
+    ) -> DiagnosisReport:
         return DiagnosisReport(
             labels=[],
             evidence=[],
@@ -330,7 +363,9 @@ class LLMDiagnoser:
         self.fallback = fallback or HeuristicDiagnoser(checker)
         self.checker = checker or SkillConstraintChecker()
 
-    def diagnose(self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation) -> DiagnosisReport:
+    def diagnose(
+        self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation
+    ) -> DiagnosisReport:
         prompt = self._build_prompt(task, skill, evaluation)
         try:
             response = self.llm.complete(prompt, purpose="skill_diagnosis")
@@ -357,9 +392,13 @@ class LLMDiagnoser:
 
     def _build_prompt(self, task: TaskSpec, skill: Skill, evaluation: PairedEvaluation) -> str:
         violations = self.checker.check(skill, task)
-        violation_lines = "\n".join(
-            f"- {item.code}: {item.message} Suggestion: {item.suggestion}" for item in violations
-        ) or "- None"
+        violation_lines = (
+            "\n".join(
+                f"- {item.code}: {item.message} Suggestion: {item.suggestion}"
+                for item in violations
+            )
+            or "- None"
+        )
         labels = ", ".join(label.value for label in FailureType)
         return "\n\n".join(
             [
@@ -380,7 +419,7 @@ class LLMDiagnoser:
             ]
         )
 
-    def _trace_summary(self, trace) -> str:
+    def _trace_summary(self, trace: ExecutionTrace) -> str:
         events = [
             {
                 "kind": event.kind,
@@ -403,14 +442,15 @@ class LLMDiagnoser:
             ensure_ascii=True,
         )
 
-    def _load_json(self, text: str) -> dict:
+    def _load_json(self, text: str) -> dict[str, Any]:
         stripped = text.strip()
         if stripped.startswith("```"):
             stripped = re.sub(r"^```(?:json)?\s*", "", stripped, flags=re.IGNORECASE)
             stripped = re.sub(r"\s*```$", "", stripped)
-        return json.loads(stripped)
+        payload: dict[str, Any] = json.loads(stripped)
+        return payload
 
-    def _parse_report(self, payload: dict) -> DiagnosisReport:
+    def _parse_report(self, payload: dict[str, Any]) -> DiagnosisReport:
         labels: list[FailureType] = []
         for item in payload.get("labels", []):
             try:

@@ -1,7 +1,7 @@
 import re
 
 
-def parse_md_all_tasks(md_path):
+def parse_md_all_tasks(md_path: str) -> dict[str, dict[str, str]]:
     with open(md_path) as f:
         content = f.read()
 
@@ -9,17 +9,17 @@ def parse_md_all_tasks(md_path):
     # (e.g. 1.0, 1.1, 1.2, 1.3, 2.0, 2.1 etc.)
     # Let's read line by line and keep track of state.
     lines = content.splitlines()
-    tasks = {}
-    current_parent_num = None
+    tasks: dict[str, dict[str, str]] = {}
+    current_parent_num: str | None = None
     current_parent_name = ""
 
     # We want to match:
     # 1. Parent task headers: '### 1.0 Create shared training infrastructure' or '### *27.0 Implement GRPO trainer and reward function'
     # 2. Subtask lines: '- [ ] 1.1 Property test — token length stats correctness (Prop 6)'
 
-    current_task_num = None
+    current_task_num: str | None = None
     current_task_name = ""
-    current_task_lines = []
+    current_task_lines: list[str] = []
 
     for line in lines:
         # Check for header
@@ -80,7 +80,7 @@ def parse_md_all_tasks(md_path):
     return tasks
 
 
-def main():
+def main() -> None:
     md_path = ".agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md"
     tasks = parse_md_all_tasks(md_path)
     for num in sorted(tasks.keys(), key=lambda x: [int(v) for v in x.split(".")]):

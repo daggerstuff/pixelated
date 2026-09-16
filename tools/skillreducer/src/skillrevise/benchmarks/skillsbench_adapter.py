@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from skillrevise.benchmarks.verifier import CommandVerifier, Verifier
-from skillrevise.core.agents import AgentAdapter
 from skillrevise.core.artifacts import ArtifactStore
 from skillrevise.core.env import env_flag_enabled, get_env, set_env_with_legacy
 from skillrevise.core.models import ExecutionTrace, Skill, TaskSpec, TrajectoryEvent
@@ -176,8 +175,9 @@ class CommandAgentHarness:
 
 
 def _bypass_proxy_enabled(env: dict[str, str]) -> bool:
-    return env_flag_enabled(env, "SKILL_REVISE_BYPASS_PROXY") or env_flag_enabled(
-        env, "SKILL_REVISE_NO_PROXY"
+    return bool(
+        env_flag_enabled(env, "SKILL_REVISE_BYPASS_PROXY")
+        or env_flag_enabled(env, "SKILL_REVISE_NO_PROXY")
     )
 
 
@@ -202,7 +202,7 @@ def _last_nonempty_line(value: str) -> str:
     return ""
 
 
-class SkillsBenchAgentAdapter(AgentAdapter):
+class SkillsBenchAgentAdapter:
     """Real benchmark adapter shell.
 
     This class handles workspace materialization, optional skill injection, external harness
@@ -307,7 +307,8 @@ class SkillsBenchAgentAdapter(AgentAdapter):
 
     def _create_run_dir(self, task: TaskSpec, label: str) -> Path:
         if self.artifact_store is not None:
-            return self.artifact_store.start_run(task.task_id, label)
+            run_dir: Path = self.artifact_store.start_run(task.task_id, label)
+            return run_dir
         safe_task_id = task.task_id.replace("/", "-").replace("\\", "-")
         return Path(tempfile.mkdtemp(prefix=f"{safe_task_id}-{label}-"))
 

@@ -318,9 +318,9 @@ def check_issue_updates(
     issue: dict[str, Any], issue_key_to_uuid: dict[str, str]
 ) -> tuple[dict[str, Any], list[str], str | None]:
     key = issue.get("identifier")
-    input_payload = {}
-    reason_parts = []
-    target_uuid = None
+    input_payload: dict[str, str] = {}
+    reason_parts: list[str] = []
+    target_uuid: str | None = None
 
     if not key:
         return input_payload, reason_parts, target_uuid
@@ -343,14 +343,14 @@ def check_issue_updates(
     # 3. Description enhancement check
     curr_desc = issue.get("description") or ""
     desc_val, desc_reason = _check_description_update(key, curr_desc)
-    if desc_val:
+    if desc_val and desc_reason:
         input_payload["description"] = desc_val
         reason_parts.append(desc_reason)
 
     # 4. Title normalization check
     curr_title = issue.get("title") or ""
     title_val, title_reason = _check_title_normalization(key, curr_title)
-    if title_val:
+    if title_val and title_reason:
         input_payload["title"] = title_val
         reason_parts.append(title_reason)
 
@@ -362,7 +362,7 @@ def execute_issue_update(
     input_payload: dict[str, Any],
     target_uuid: str | None,
     dry_run: bool,
-):
+) -> None:
     if dry_run:
         if target_uuid:
             logging.info("  -> [Dry Run] Would create duplicate relation")
@@ -401,7 +401,7 @@ def execute_issue_update(
         logging.error("  -> Error updating issue: %s", e)
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
     dry_run = "--dry-run" in sys.argv
 

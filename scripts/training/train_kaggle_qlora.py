@@ -12,15 +12,25 @@ Usage:
 
 import json
 from pathlib import Path
+from typing import Any, Protocol, TypedDict, TypeVar, cast
 
 import torch
 from datasets import Dataset
-from peft import LoraConfig, TaskType, get_peft_model, prepare_model_for_kbit_training
+from peft import (
+    LoraConfig,
+    PeftMixedModel,
+    PeftModel,
+    TaskType,
+    get_peft_model,
+    prepare_model_for_kbit_training,
+)
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
+    BatchEncoding,
     BitsAndBytesConfig,
     DataCollatorForLanguageModeling,
+    PreTrainedTokenizerBase,
     Trainer,
     TrainingArguments,
 )
@@ -28,7 +38,45 @@ from transformers import (
 # ============================================================================
 # Configuration - FIXED ANTI-REPETITION PARAMS
 # ============================================================================
-CONFIG = {
+
+
+class QLoRASettings(TypedDict):
+    bits: int
+    quant_type: str
+    double_quant: bool
+
+
+class LoraSettings(TypedDict):
+    r: int
+    lora_alpha: int
+    lora_dropout: float
+    target_modules: list[str]
+
+
+class TrainingSettings(TypedDict):
+    num_train_epochs: int
+    per_device_train_batch_size: int
+    gradient_accumulation_steps: int
+    learning_rate: float
+    weight_decay: float
+    warmup_ratio: float
+    lr_scheduler_type: str
+    max_seq_length: int
+    logging_steps: int
+    save_steps: int
+    save_total_limit: int
+
+
+class TrainConfig(TypedDict):
+    base_model: str
+    output_dir: str
+    data_path: str
+    qlora: QLoRASettings
+    lora: LoraSettings
+    training: TrainingSettings
+
+
+CONFIG: TrainConfig = {
     "base_model": "LatitudeGames/Wayfarer-2-12B",
     "output_dir": "./checkpoints/pixelated-v2-qlora",
     "data_path": "/kaggle/input/pixelated-training-data",  # Update with your dataset path
@@ -69,14 +117,36 @@ CONFIG = {
     },
 }
 
+# transformers 5.x ships `BitsAndBytesConfig.__init__` and peft ships
+# `prepare_model_for_kbit_training` without argument annotations, so strict
+# mypy rejects direct calls from typed code. These typed facades mirror the
+# real signatures; `prepare_model_for_kbit_training` returns the same model
+# it is given, so the facade is generic over the model type.
+_M = TypeVar("_M")
 
-def load_model_and_tokenizer():
+
+class _BitsAndBytesConfigFactory(Protocol):
+    def __call__(
+        self,
+        *,
+        load_in_4bit: bool,
+        bnb_4bit_quant_type: str,
+        bnb_4bit_compute_dtype: torch.dtype,
+        bnb_4bit_use_double_quant: bool,
+    ) -> BitsAndBytesConfig: ...
+
+
+class _PrepareModelForKBitTraining(Protocol):
+    def __call__(self, model: _M, use_gradient_checkpointing: bool = True) -> _M: ...
+
+
+def load_model_and_tokenizer() -> tuple[PeftModel | PeftMixedModel, PreTrainedTokenizerBase]:
     """Load model with 4-bit quantization for QLoRA"""
 
     print(f"Loading base model: {CONFIG['base_model']}")
 
     # BitsAndBytes config for 4-bit
-    bnb_config = BitsAndBytesConfig(
+    bnb_config = cast(_BitsAndBytesConfigFactory, BitsAndBytesConfig)(
         load_in_4bit=True,
         bnb_4bit_quant_type=CONFIG["qlora"]["quant_type"],
         bnb_4bit_compute_dtype=torch.bfloat16,
@@ -89,7 +159,7 @@ def load_model_and_tokenizer():
         tokenizer.pad_token = tokenizer.eos_token
 
     # Load model with 4-bit quantization
-    model = AutoModelForCausalLM.from_pretrained(
+    base_model = AutoModelForCausalLM.from_pretrained(
         CONFIG["base_model"],
         quantization_config=bnb_config,
         device_map="auto",
@@ -97,7 +167,7 @@ def load_model_and_tokenizer():
     )
 
     # Prepare for k-bit training
-    model = prepare_model_for_kbit_training(model)
+    prepared_model = cast(_PrepareModelForKBitTraining, prepare_model_for_kbit_training)(base_model)
 
     # Apply LoRA with FIXED config
     lora_config = LoraConfig(
@@ -108,18 +178,18 @@ def load_model_and_tokenizer():
         target_modules=CONFIG["lora"]["target_modules"],
     )
 
-    model = get_peft_model(model, lora_config)
+    model = get_peft_model(prepared_model, lora_config)
     model.print_trainable_parameters()
 
     return model, tokenizer
 
 
-def load_training_data(data_path: str):
+def load_training_data(data_path: str) -> list[dict[str, Any]]:
     """Load and prepare training data with validation"""
 
     print(f"Loading training data from: {data_path}")
 
-    all_data = []
+    all_data: list[dict[str, Any]] = []
     data_p = Path(data_path)
 
     # Validate path exists
@@ -169,10 +239,14 @@ def load_training_data(data_path: str):
     return all_data
 
 
-def tokenize_data(examples, tokenizer, max_length=2048):
+def tokenize_data(
+    examples: list[dict[str, Any]],
+    tokenizer: PreTrainedTokenizerBase,
+    max_length: int = 2048,
+) -> BatchEncoding | dict[str, list[int]]:
     """Tokenize training examples with validation"""
 
-    texts = []
+    texts: list[str] = []
     for item in examples:
         if not isinstance(item, dict):
             print(f"⚠️  Skipping non-dict item: {type(item)}")
@@ -224,16 +298,19 @@ def tokenize_data(examples, tokenizer, max_length=2048):
             "attention_mask": [],
         }
 
-    return tokenizer(
+    # PreTrainedTokenizerBase.__call__ is typed as returning Any by
+    # transformers; anchor it to the documented BatchEncoding result.
+    encoded: BatchEncoding = tokenizer(
         texts,
         truncation=True,
         max_length=max_length,
         padding="max_length",
         return_tensors=None,
     )
+    return encoded
 
 
-def main():
+def main() -> None:
     """Main training function"""
 
     print("=" * 60)
@@ -261,7 +338,7 @@ def main():
         dataset = Dataset.from_list(raw_data)
 
         # Tokenize
-        def tokenize_fn(batch):
+        def tokenize_fn(batch: dict[str, Any]) -> BatchEncoding | dict[str, list[int]]:
             return tokenize_data([batch], tokenizer, CONFIG["training"]["max_seq_length"])
 
         tokenized_dataset = dataset.map(
@@ -291,7 +368,7 @@ def main():
             gradient_accumulation_steps=CONFIG["training"]["gradient_accumulation_steps"],
             learning_rate=CONFIG["training"]["learning_rate"],
             weight_decay=CONFIG["training"]["weight_decay"],
-            warmup_ratio=CONFIG["training"]["warmup_ratio"],
+            warmup_steps=_estimate_warmup_steps(train_dataset, CONFIG),
             lr_scheduler_type=CONFIG["training"]["lr_scheduler_type"],
             logging_steps=CONFIG["training"]["logging_steps"],
             save_steps=CONFIG["training"]["save_steps"],
@@ -355,6 +432,20 @@ def main():
 
         traceback.print_exc()
         raise
+
+
+def _estimate_warmup_steps(train_dataset: Dataset, config: TrainConfig) -> int:
+    """Convert the configured warmup_ratio into warmup_steps.
+
+    transformers 5.x removed ``warmup_ratio`` from ``TrainingArguments``
+    (only ``warmup_steps`` remains), so the ratio is applied to the
+    estimated total optimizer steps here.
+    """
+    training = config["training"]
+    effective_batch = max(1, training["per_device_train_batch_size"] * training["gradient_accumulation_steps"])
+    steps_per_epoch = max(1, -(-len(train_dataset) // effective_batch))
+    total_steps = steps_per_epoch * training["num_train_epochs"]
+    return int(training["warmup_ratio"] * total_steps)
 
 
 if __name__ == "__main__":

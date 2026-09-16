@@ -16,6 +16,7 @@ import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from typing import Any, NotRequired, TypedDict
 
 import httpx
 import numpy as np
@@ -68,7 +69,7 @@ Instead: open with a precise clinical observation, a grounding question, or a di
 # ── Helpers ─────────────────────────────────────────────────────────────
 
 
-def has_banned_opener(messages) -> bool:
+def has_banned_opener(messages: object) -> bool:
     if isinstance(messages, np.ndarray):
         messages = messages.tolist()
     if not isinstance(messages, list):
@@ -144,15 +145,14 @@ def wait_for_vllm(timeout: int = 300) -> bool:
     return False
 
 
-def regen_session(messages, client: httpx.Client) -> list | None:
+def regen_session(messages: object, client: httpx.Client) -> list[dict[str, Any]] | None:
     """Regenerate a session using PsychAgent, returning new messages list."""
-    if isinstance(messages, np.ndarray):
-        messages = messages.tolist()
+    msg_list: Any = messages.tolist() if isinstance(messages, np.ndarray) else messages
 
     # Build prompt: keep system + user turns only, let PsychAgent fill assistant turns
     prompt_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
-    user_turns = [m for m in messages if isinstance(m, dict) and m.get("role") == "user"]
-    asst_turns = [m for m in messages if isinstance(m, dict) and m.get("role") == "assistant"]
+    user_turns = [m for m in msg_list if isinstance(m, dict) and m.get("role") == "user"]
+    asst_turns = [m for m in msg_list if isinstance(m, dict) and m.get("role") == "assistant"]
 
     if not user_turns:
         return None
@@ -189,11 +189,20 @@ def regen_session(messages, client: httpx.Client) -> list | None:
     return new_messages
 
 
-def process_batch(batch_name: str, work_dir: Path) -> dict:
+class BatchStats(TypedDict):
+    batch: str
+    flagged: int
+    regenned: int
+    failed: int
+    uploaded: bool
+    error: NotRequired[str]
+
+
+def process_batch(batch_name: str, work_dir: Path) -> BatchStats:
     batch_dir = work_dir / batch_name.replace(".parquet", "")
     batch_dir.mkdir(parents=True, exist_ok=True)
 
-    stats = {"batch": batch_name, "flagged": 0, "regenned": 0, "failed": 0, "uploaded": False}
+    stats: BatchStats = {"batch": batch_name, "flagged": 0, "regenned": 0, "failed": 0, "uploaded": False}
 
     # Download
     if not ovhai_download(batch_name, batch_dir):
@@ -213,7 +222,7 @@ def process_batch(batch_name: str, work_dir: Path) -> dict:
     # Regen flagged sessions concurrently
     with httpx.Client() as client:
 
-        def _regen(idx):
+        def _regen(idx: Any) -> tuple[Any, list[dict[str, Any]] | None]:
             new_msgs = regen_session(df.at[idx, "messages"], client)
             return idx, new_msgs
 
@@ -242,7 +251,7 @@ def process_batch(batch_name: str, work_dir: Path) -> dict:
 # ── Main ─────────────────────────────────────────────────────────────────
 
 
-def main():
+def main() -> None:
     WORK_DIR.mkdir(parents=True, exist_ok=True)
 
     # Wait for PsychAgent to be ready
@@ -252,7 +261,7 @@ def main():
     batch_names = [f"batch_{i:05d}.parquet" for i in range(NUM_BATCHES)]
 
     print(f"\n🔍 Scanning + regenerating {NUM_BATCHES} batches with {MAX_WORKERS} workers...")
-    all_stats = []
+    all_stats: list[BatchStats] = []
     total_flagged = 0
     total_regenned = 0
     total_failed = 0
