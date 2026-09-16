@@ -29,6 +29,7 @@ type MockManagementClient = {
 
 type MockAuthOAuthMethods = {
   passwordGrant: MockAuthMethod
+  authorizationCodeGrant: MockAuthMethod
   getProfile: MockAuthMethod
   refreshTokenGrant: MockAuthMethod
   revokeRefreshToken: MockAuthMethod
@@ -36,6 +37,7 @@ type MockAuthOAuthMethods = {
 
 type MockAuthMethods = {
   passwordGrant: MockAuthMethod
+  authorizationCodeGrant: MockAuthMethod
   getProfile: MockAuthMethod
   refreshToken: MockAuthMethod
   refreshTokenGrant: MockAuthMethod
@@ -74,18 +76,21 @@ const mockManagementClient: MockManagementClient = vi.hoisted(() => {
 
 const mockAuthMethods: MockAuthMethods = vi.hoisted(() => {
   const passwordGrant = vi.fn()
+  const authorizationCodeGrant = vi.fn()
   const refreshToken = vi.fn()
   const getProfile = vi.fn()
   const refreshTokenGrant = vi.fn()
   const revokeRefreshToken = vi.fn()
   return {
     passwordGrant,
+    authorizationCodeGrant,
     getProfile,
     refreshToken,
     refreshTokenGrant: refreshToken,
     revokeRefreshToken,
     oauth: {
       passwordGrant,
+      authorizationCodeGrant,
       getProfile,
       refreshTokenGrant: refreshToken,
       revokeRefreshToken,
