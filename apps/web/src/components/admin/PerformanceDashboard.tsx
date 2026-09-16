@@ -111,15 +111,21 @@ export function PerformanceDashboard({
   }, [timeRange])
 
   useEffect(() => {
+    // Deferred via timeout so the initial fetch is not a synchronous
+    // setState-in-effect (mirrors AuditLogDashboard's initialLoad pattern)
+    const initialLoad = window.setTimeout(() => {
+      void fetchData()
+    }, 0)
     if (!refreshIntervalMs || refreshIntervalMs <= 0) {
-      return undefined
+      return () => window.clearTimeout(initialLoad)
     }
-    // Fire once immediately, then on the refresh interval
-    void fetchData()
     const intervalId = setInterval(() => {
       void fetchData()
     }, refreshIntervalMs)
-    return () => clearInterval(intervalId)
+    return () => {
+      window.clearTimeout(initialLoad)
+      clearInterval(intervalId)
+    }
   }, [fetchData, refreshIntervalMs])
 
   const summary = useMemo(() => {

@@ -107,19 +107,25 @@ describe('PerformanceDashboard', () => {
   it('requests the selected time range and re-fetches on change', async () => {
     render(<PerformanceDashboard />)
 
+    const readTimeRange = (callIndex: number): string => {
+      const input = vi.mocked(global.fetch).mock.calls[callIndex]?.[0]
+      if (input instanceof URL) {
+        return input.searchParams.get('timeRange') ?? ''
+      }
+      const asText = typeof input === 'string' ? input : JSON.stringify(input)
+      const match = /timeRange=([^&"']+)/.exec(asText)
+      return match?.[1] ?? ''
+    }
+
     await waitFor(() => {
-      expect(
-        vi.mocked(global.fetch).mock.calls[0]?.[0]?.toString(),
-      ).toContain('timeRange=24h')
+      expect(readTimeRange(0)).toBe('24h')
     })
 
     fireEvent.click(screen.getByRole('button', { name: 'Last 7 days' }))
 
     await waitFor(() => {
       const calls = vi.mocked(global.fetch).mock.calls
-      expect(calls[calls.length - 1]?.[0]?.toString()).toContain(
-        'timeRange=7d',
-      )
+      expect(readTimeRange(calls.length - 1)).toBe('7d')
     })
   })
 
