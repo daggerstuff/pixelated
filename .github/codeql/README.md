@@ -84,11 +84,16 @@ Defines the custom query pack for healthcare compliance checks.
 
 ## Workflow Integration
 
-The CodeQL analysis runs:
+CodeQL runs in the Security Deep Scan workflow (`.github/workflows/security-deep.yml`):
 
-- On every push to `master` and `develop` branches
-- On every pull request targeting `master` or `develop`
-- Weekly on Monday at 2:00 AM UTC (scheduled scan)
+- Nightly at 03:30 UTC
+- On push to `staging` when the scanned surfaces change (infra, Dockerfiles, Python requirements, scanner config)
+- On demand via workflow_dispatch
+
+The per-push security lane (`security.yml`) keeps only the fast checks — the
+Security Regression Gate (required by branch protection) and dependency
+audits. CodeQL, Trivy, Checkov, SBOM, container-image, and Dockerfile-config
+scans all live in the deep-scan workflow so they do not tax every push.
 
 ## Languages Analyzed
 

@@ -68,11 +68,26 @@ We transparently track risks that cannot be addressed by simple upgrades.
 
 ## Security Tools & Practices
 
-- **Automated scans**: `pnpm security:scan` runs in CI
-- **Code reviews**: Every PR reviewed with security in mind
-- **Secrets management**: `.env` files are gitignored; secrets never committed
-- **HIPAA compliance**: Audit logging, encryption, and access controls enforced
-- **Audit logging**: All suspicious actions logged and monitored
+- **Two-lane scanning**: every push runs the fast lane (`security.yml`) —
+  the Security Regression Gate (required by branch protection, fails on
+  reintroduced CVEs) plus npm and Python dependency audits. Heavyweight
+  scanners (CodeQL, Trivy filesystem, Checkov infra/Helm, SBOM, container
+  base images, Dockerfile config) run nightly and on infra-path pushes in
+  `security-deep.yml`.
+- **DAST**: OWASP ZAP baseline scans the served production build (weekly
+  and on app/docker changes).
+- **Local scans**: `pnpm security:scan` and `pnpm security:check` run the
+  same tooling locally.
+- **Secrets management**: `.env` files are gitignored; a secret scanner
+  runs on every commit; cluster secrets applied from GitHub Actions
+  secrets only.
+- **Alerting**: production health probes (`scripts/ci/health-alerts.mjs`)
+  classify failures CRITICAL/HIGH/WARN and route to Slack — CRITICAL pages
+  `@here` and fails the run. Failed core workflows on staging
+  automatically open triageable issues (Error Insight workflow).
+- **Code reviews**: Every PR reviewed with security in mind.
+- **HIPAA compliance**: Audit logging, encryption, and access controls
+  enforced; compliance gate in CI.
 
 ---
 
