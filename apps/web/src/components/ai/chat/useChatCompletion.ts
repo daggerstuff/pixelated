@@ -331,7 +331,11 @@ export function useChatCompletion({
 
   // Send a message to the AI API
   const sendMessage = useCallback(
-    async (message: string, context?: Partial<AIMessage>) => {
+    async (
+      message: string,
+      context?: Partial<AIMessage>,
+      baseMessages?: AIMessage[],
+    ) => {
       if (!message.trim() || isLoading) {
         return
       }
@@ -360,6 +364,16 @@ export function useChatCompletion({
       let retries = 0
       let success = false
 
+      const resetBusyState = () => {
+        setIsLoading(false)
+        setIsStreaming(false)
+        setIsTyping(false)
+
+        if (onTypingStop) {
+          onTypingStop()
+        }
+      }
+
       while (retries < maxRetries && !success) {
         try {
           // Add user message to chat
@@ -370,7 +384,7 @@ export function useChatCompletion({
             ...context,
           }
 
-          const updatedMessages = [...messages, userMessage]
+          const updatedMessages = [...(baseMessages ?? messages), userMessage]
           setMessages(updatedMessages)
 
           const response = await makeRequest(updatedMessages)
@@ -503,6 +517,7 @@ export function useChatCompletion({
             if (onError && err instanceof Error) {
               onError(err)
             }
+            resetBusyState()
             throw err
           }
 
@@ -512,14 +527,8 @@ export function useChatCompletion({
             setTimeout(resolve, 2 ** retries * 300),
           )
         } finally {
-          if (success || retries === maxRetries) {
-            setIsLoading(false)
-            setIsStreaming(false)
-            setIsTyping(false)
-
-            if (onTypingStop) {
-              onTypingStop()
-            }
+          if (success) {
+            resetBusyState()
           }
         }
       }
@@ -698,10 +707,11 @@ export function useChatCompletion({
     async (index: number) => {
       const messageToResend = messages[index]
       if (messageToResend?.role === 'user') {
-        // Remove all messages after this one
-        setMessages((prev) => prev.slice(0, index))
+        // Resend from the truncated list so removed turns aren't re-appended.
+        const truncated = messages.slice(0, index)
+        setMessages(truncated)
         // Resend the message
-        await sendMessage(messageToResend.content)
+        await sendMessage(messageToResend.content, undefined, truncated)
       }
     },
     [messages, sendMessage],
