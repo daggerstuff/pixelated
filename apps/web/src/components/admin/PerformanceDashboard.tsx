@@ -21,7 +21,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 
-export interface PerformanceMetric {
+// NOTE: the three types below are temporarily un-exported (the consumers that
+// import them are still landing). Re-export them when the dashboard page work
+// is complete.
+interface PerformanceMetric {
   date: string
   model: string
   requestCount: number
@@ -32,7 +35,7 @@ export interface PerformanceMetric {
   optimizationRate: number
 }
 
-export interface ModelBreakdown {
+interface ModelBreakdown {
   model: string
   requestCount: number
   totalTokens: number
@@ -41,7 +44,7 @@ export interface ModelBreakdown {
   optimizationRate: number
 }
 
-export interface ErrorBreakdown {
+interface ErrorBreakdown {
   errorCode: string
   count: number
 }
