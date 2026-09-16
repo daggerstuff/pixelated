@@ -136,6 +136,7 @@ dependencies = [
   "ruff>=0.15.17",
   "beautifulsoup4>=4.15.0",
   "sqlalchemy>=2.0.51",
+  "celery>=5.6.3",
 ]
 [project.optional-dependencies]
 test = [
@@ -176,21 +177,21 @@ include = ["ai*"]
 [tool.mypy]
 python_version = "3.13"
 ignore_missing_imports = true
-mypy_path = "stubs"
+mypy_path = "stubs:tools/skillreducer:tools/skillreducer/src"
 files = ["src", "tests", "ai"]
 show_error_codes = true
 # ── Strict typing ─────────────────────────────────────────────────────
-# Global strict mode. The `pe` FastAPI service is enforced strict-clean in CI
-# (scripts/ci/python-typecheck.sh). Legacy trees that are not yet strict-clean
-# are exempted below so strict mode can be adopted incrementally without
-# weakening it project-wide; narrow these exemptions as the trees are repaired.
+# Global strict mode, enforced in CI by scripts/ci/python-typecheck.sh:
+# the `pe` FastAPI service plus the full scripts/ and tools/ trees are
+# checked strict-clean (the legacy exemption for those two trees was
+# retired once every pinned file reached zero strict errors).
 strict = true
 
 [[tool.mypy.overrides]]
-module = ["ai.*", "scripts.*", "foresight.*", "foresight_mcp.*", "tools.*", "tests.*"]
+module = ["ai.*", "foresight.*", "foresight_mcp.*", "tests.*"]
 # Legacy exemptions — these trees predate strict mode and carry untyped code.
 # New modules in these trees should still be written strict-clean; this override
-# exists only so the enforced `pe` scope can run alongside them.
+# exists only so the enforced scopes can run alongside them.
 ignore_errors = true
 
 [tool.pyright]
