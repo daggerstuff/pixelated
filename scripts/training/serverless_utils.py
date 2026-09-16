@@ -131,7 +131,7 @@ async def rollout(
         response_token_ids = tokenizer.encode(full_text, add_special_tokens=False)
 
         if len(response_token_ids) == len(choice.logprobs.content):
-            for lp, tid in zip(choice.logprobs.content, response_token_ids):
+            for lp, tid in zip(choice.logprobs.content, response_token_ids, strict=True):
                 object.__setattr__(lp, "token", f"token_id:{tid}")
         else:
             # Fallback: tokenize each token individually

@@ -63,9 +63,7 @@ def compress_tools(
     if not bridge_script().is_file():
         raise TscgError(f"Missing TSCG bridge: {bridge_script()}")
     if not tscg_dependency_installed():
-        raise TscgError(
-            "TSCG dependency missing. Run: cd skillreducer/tscg && npm install"
-        )
+        raise TscgError("TSCG dependency missing. Run: cd skillreducer/tscg && npm install")
 
     payload = json.dumps({"tools": tools, "model": model, "profile": profile})
     try:
@@ -101,10 +99,7 @@ def compress_tools(
     if not compressed:
         raise TscgError("TSCG bridge returned empty compressed output")
 
-    note = (
-        f"TSCG: schema tokens {original} -> {compressed_tok} "
-        f"({savings_pct:.1f}% savings)"
-    )
+    note = f"TSCG: schema tokens {original} -> {compressed_tok} ({savings_pct:.1f}% savings)"
     return TscgResult(
         compressed=compressed,
         original_tokens=original,

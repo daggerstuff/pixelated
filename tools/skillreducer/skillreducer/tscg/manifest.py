@@ -20,19 +20,19 @@ def normalize_tools(data: Any) -> list[dict[str, Any]]:
     elif isinstance(data, dict):
         if isinstance(data.get("tools"), list):
             raw = data["tools"]
-        elif "name" in data and ("parameters" in data or "input_schema" in data or "inputSchema" in data):
+        elif "name" in data and (
+            "parameters" in data or "input_schema" in data or "inputSchema" in data
+        ):
             raw = [data]
         else:
-            raise ValueError(
-                "Tool JSON must be a list, {\"tools\": [...]}, or a single tool object"
-            )
+            raise TypeError('Tool JSON must be a list, {"tools": [...]}, or a single tool object')
     else:
-        raise ValueError("Tool JSON must be a list or object")
+        raise TypeError("Tool JSON must be a list or object")
 
     tools: list[dict[str, Any]] = []
     for item in raw:
         if not isinstance(item, dict):
-            raise ValueError(f"Tool entry must be an object, got {type(item).__name__}")
+            raise TypeError(f"Tool entry must be an object, got {type(item).__name__}")
         tools.append(_to_openai_tool(item))
     if not tools:
         raise ValueError("Tool list is empty")

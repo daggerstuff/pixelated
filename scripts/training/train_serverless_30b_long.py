@@ -117,7 +117,7 @@ async def _train_once(examples: list[list[dict[str, Any]]], dataset_path: str) -
         ),
     )
     # Monkey-patch backend inference name so rollouts use the Ollama model name
-    backend._model_inference_name = lambda _model, step=None: ollama_model
+    backend._model_inference_name = lambda _model, *_args, **_kwargs: ollama_model
     logging.info(f"Inference overridden to Ollama: {ollama_base_url} model={ollama_model}")
 
     wandb_step = await model.get_step()

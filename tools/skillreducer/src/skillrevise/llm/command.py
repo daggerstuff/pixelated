@@ -307,14 +307,14 @@ def _extract_text_parts(value: Any) -> list[str]:
 
 
 def _describe_anthropic_content_shape(data: Mapping[str, Any]) -> str:
-    keys = ", ".join(sorted(str(key) for key in data.keys())[:8])
+    keys = ", ".join(sorted(str(key) for key in data)[:8])
     content = data.get("content")
     if isinstance(content, list):
         block_shapes = []
         for block in content[:4]:
             if isinstance(block, Mapping):
                 block_type = block.get("type")
-                block_keys = ",".join(sorted(str(key) for key in block.keys())[:6])
+                block_keys = ",".join(sorted(str(key) for key in block)[:6])
                 block_shapes.append(f"type={block_type!r};keys={block_keys}")
             else:
                 block_shapes.append(type(block).__name__)
@@ -369,7 +369,7 @@ def _post_json(
 def _describe_openai_compatible_error(data: Mapping[str, Any]) -> str:
     error = data.get("error")
     if not isinstance(error, Mapping):
-        keys = ", ".join(sorted(str(key) for key in data.keys())[:8])
+        keys = ", ".join(sorted(str(key) for key in data)[:8])
         return f"Response keys: {keys}." if keys else ""
     parts = []
     for key in ("type", "code", "param"):
@@ -426,9 +426,7 @@ def _should_retry_openai_compatible_error(
     )
     if any(marker in text for marker in retryable):
         return True
-    if data is not None and not data.get("choices"):
-        return True
-    return False
+    return bool(data is not None and not data.get("choices"))
 
 
 def _should_retry_anthropic_error(
@@ -474,9 +472,7 @@ def _should_retry_anthropic_error(
     )
     if any(marker in text for marker in retryable):
         return True
-    if data is not None and not _extract_anthropic_text(data):
-        return True
-    return False
+    return bool(data is not None and not _extract_anthropic_text(data))
 
 
 def _sleep_before_retry(base_delay_seconds: float, attempt: int) -> None:

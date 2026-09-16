@@ -117,6 +117,7 @@ class CommandAgentHarness:
                 capture_output=True,
                 text=True,
                 timeout=outer_timeout,
+                check=False,
             )
             stdout = completed.stdout
             stderr = completed.stderr

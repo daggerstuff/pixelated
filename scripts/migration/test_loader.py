@@ -18,7 +18,7 @@ logger = logging.getLogger("s3_loader_test")
 
 
 def attempt_load(name: str, stage: str | None = None, category: str | None = None) -> bool:
-    logger.info(f"Testing load: {name} (Stage: {stage})")
+    logger.info(f"Testing load: {name} (Stage: {stage}, Category: {category})")
     try:
         data = load_dataset_from_s3(name)
         if isinstance(data, dict):

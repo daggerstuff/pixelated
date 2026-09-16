@@ -223,10 +223,7 @@ def build_coverage_report(bucket: str, client: Any) -> Sequence[dict[str, Any]]:
         # If there are errors and no keys, status is "error"
         # If there are errors and some keys, status is "partial_with_errors"
         # Otherwise use normal classification
-        if errors:
-            status = "partial_with_errors" if all_keys else "error"
-        else:
-            status = classify_status(len(all_keys))
+        status = ("partial_with_errors" if all_keys else "error") if errors else classify_status(len(all_keys))
 
         # Always show sample keys from actual keys, not errors
         # Show errors in the description field

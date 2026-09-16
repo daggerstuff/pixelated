@@ -78,10 +78,8 @@ def has_banned_opener(messages: object) -> bool:
         if not isinstance(m, dict) or m.get("role") != "assistant":
             continue
         content = m.get("content", "").lower().strip()
-        for banned in BANNED_OPENERS:
-            if content.startswith(banned):
-                return True
-        return False  # only check first assistant turn
+        # only check first assistant turn
+        return any(content.startswith(banned) for banned in BANNED_OPENERS)
     return False
 
 
@@ -150,9 +148,7 @@ def regen_session(messages: object, client: httpx.Client) -> list[dict[str, Any]
     msg_list: Any = messages.tolist() if isinstance(messages, np.ndarray) else messages
 
     # Build prompt: keep system + user turns only, let PsychAgent fill assistant turns
-    prompt_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     user_turns = [m for m in msg_list if isinstance(m, dict) and m.get("role") == "user"]
-    asst_turns = [m for m in msg_list if isinstance(m, dict) and m.get("role") == "assistant"]
 
     if not user_turns:
         return None
@@ -161,7 +157,7 @@ def regen_session(messages: object, client: httpx.Client) -> list[dict[str, Any]
     new_messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     history = [{"role": "system", "content": SYSTEM_PROMPT}]
 
-    for i, user_msg in enumerate(user_turns):
+    for user_msg in user_turns:
         history.append(user_msg)
         new_messages.append(user_msg)
 

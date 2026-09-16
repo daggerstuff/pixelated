@@ -14,7 +14,6 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from pixelated_empathy.company_events import get_event_spine
 from pixelated_empathy.personas import PERSONAS
 from pixelated_empathy.schemas import (
     MONTH_ORDER,
@@ -228,8 +227,6 @@ def build(month: str, work_dir_root: Path) -> MonthEnrichment:
         raise FileNotFoundError(f"Month bible missing for {month}. Run 'corpus plan {month}' first.")
 
     bible = MonthBible.model_validate_json(bible_path.read_text())
-    spine = get_event_spine()
-    year, mon = (int(x) for x in month.split("-"))
 
     # Collect all topics from this month's events
     topic_set: set[str] = set()

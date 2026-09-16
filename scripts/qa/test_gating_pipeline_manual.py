@@ -27,7 +27,7 @@ class MockProtocol:
     def __init__(self) -> None:
         pass  # no backing document store needed for QA
 
-    def retain_items(self, bank_id: str, items: list[dict[str, Any]]) -> dict[str, Any]:
+    def retain_items(self, _bank_id: str, items: list[dict[str, Any]]) -> dict[str, Any]:
         return {"results": [{"id": f"doc-{len(items)}"}]}
 
     def build_add_memory_item(

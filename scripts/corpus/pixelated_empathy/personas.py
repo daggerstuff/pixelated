@@ -262,7 +262,7 @@ PERSONAS: dict[str, Persona] = {
             "Never talks about technology without grounding it in human experience."
         ),
         hard_constraints=[
-            "Early months (Jul–Sep 2025): emails are short, observational, deferential to Ada.",
+            "Early months (Jul-Sep 2025): emails are short, observational, deferential to Ada.",
             "Later months (Jan 2026+): longer, more confident, sometimes challenges Ada's caution.",
             "Never uses clinical jargon without immediately unpacking it.",
             "Deeply suspicious of metrics that reduce human suffering to a number.",
@@ -391,8 +391,8 @@ PERSONAS: dict[str, Persona] = {
             "crisis simulations and survived them. Still asks for help, but knows when."
         ),
         hard_constraints=[
-            "Early months (Jul–Sep 2025): emails are formal, uses full titles, asks for approval before acting.",
-            "Mid months (Oct–Dec 2025): starts using first names, asks for feedback rather than approval.",
+            "Early months (Jul-Sep 2025): emails are formal, uses full titles, asks for approval before acting.",
+            "Mid months (Oct-Dec 2025): starts using first names, asks for feedback rather than approval.",
             "Later months (Jan 2026+): writes with confidence, sometimes challenges Naomi's framing.",
             "Always references specific therapeutic techniques when discussing session strategy.",
             "Never uses real patient details — always uses de-identified case codes.",

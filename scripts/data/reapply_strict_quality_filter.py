@@ -36,12 +36,6 @@ def main() -> None:
 
     total_read = 0
     accepted_records = []
-    rejection_reasons = {
-        "short_substance": 0,
-        "ngram_or_density_or_unique": 0,
-        "artifact_junk": 0,
-        "dedup_or_other": 0,
-    }
 
     with open(local_file, encoding="utf-8") as f:
         for line in f:

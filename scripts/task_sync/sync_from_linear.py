@@ -29,7 +29,7 @@ load_dotenv()
 # Add the repository root to Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from scripts.task_sync.provider_bridge import (  # noqa: E402
+from scripts.task_sync.provider_bridge import (
     apply_asana_action,
     apply_github_action,
     apply_jira_action,

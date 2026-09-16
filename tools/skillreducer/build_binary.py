@@ -12,7 +12,6 @@ def main() -> None:
     root = Path(__file__).resolve().parent
     spec = root / "skillreducer.spec"
     dist = root / "dist"
-    build = root / "build"
 
     print("Building skillreducer binary...")
     subprocess.run(

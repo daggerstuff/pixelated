@@ -177,7 +177,7 @@ class LiveClusterMonitor:
                     self.send_response(404)
                     self.end_headers()
 
-            def log_message(self, format: str, *args: Any) -> None:
+            def log_message(self, fmt: str, *args: Any) -> None:
                 pass  # Suppress HTTP access logging in terminal
 
         server = http.server.HTTPServer(("0.0.0.0", port), TelemetryHTTPHandler)

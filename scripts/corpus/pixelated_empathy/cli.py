@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 import sys
 from pathlib import Path
+from typing import Annotated
 
 import typer
 from rich import print as rprint
@@ -52,8 +53,8 @@ def _work_dir_opt() -> Path:
 @app.command()
 def plan(
     month: str = typer.Argument(..., help="Month to plan, e.g. 2025-07"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir", help="Root work directory"),
-    prior_summary: str | None = typer.Option(None, "--prior-summary", help="Prior month summary text"),
+    work_dir: Annotated[Path, typer.Option("--work-dir", help="Root work directory")] = DEFAULT_WORK_DIR,
+    prior_summary: Annotated[str | None, typer.Option("--prior-summary", help="Prior month summary text")] = None,
 ) -> None:
     """Plan a single month: emit month_bible.json and salvage_candidates.json."""
     from pixelated_empathy.monthly_pipeline import plan_month
@@ -67,7 +68,7 @@ def plan(
 
 @app.command(name="plan-all")
 def plan_all(
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Plan all 12 months and write the manifest."""
     from pixelated_empathy.monthly_pipeline import build_manifest, plan_month
@@ -80,7 +81,7 @@ def plan_all(
     for month in MONTH_ORDER:
         month_dir = work_dir / month
         try:
-            bible, salvage = plan_month(month, month_dir)
+            bible, _salvage = plan_month(month, month_dir)
             rprint(f"  [green]✓[/green] {month}: {len(bible.events)} events")
         except Exception as exc:
             rprint(f"  [red]✗[/red] {month}: {exc}")
@@ -90,7 +91,7 @@ def plan_all(
 @app.command()
 def gate(
     month: str = typer.Argument(..., help="Month to check, e.g. 2025-07"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Check gate readiness for a month."""
     from pixelated_empathy.monthly_gate import prepare
@@ -119,7 +120,7 @@ def gate(
 @app.command()
 def enrich(
     month: str = typer.Argument(..., help="Month to enrich"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Build month enrichment context packet."""
     from pixelated_empathy.monthly_enrichment import build
@@ -137,7 +138,7 @@ def enrich(
 @app.command()
 def generate(
     month: str = typer.Argument(..., help="Month to generate"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
     model: str | None = typer.Option(None, "--model", help="Override Ollama model"),
     dry_run: bool = typer.Option(False, "--dry-run", help="Show what would be generated without calling LLM"),
 ) -> None:
@@ -159,7 +160,7 @@ def generate(
 @app.command()
 def audit(
     month: str = typer.Argument(..., help="Month to audit"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Run structural audit on a month."""
     from pixelated_empathy.monthly_auditor import audit as run_audit
@@ -197,7 +198,7 @@ def audit(
 @app.command()
 def adversarial(
     month: str = typer.Argument(..., help="Month to review"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Run rule-based adversarial review on a month."""
     from pixelated_empathy.monthly_adversarial_review import review as run_review
@@ -236,7 +237,7 @@ def adversarial(
 @app.command(name="llm-review")
 def llm_review(
     month: str = typer.Argument(..., help="Month to LLM-judge"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
     model: str | None = typer.Option(None, "--model", help="Override judge model"),
 ) -> None:
     """Run 3-persona LLM judge review on a month."""
@@ -270,7 +271,7 @@ def llm_review(
 @app.command(name="run-month")
 def run_month(
     month: str = typer.Argument(..., help="Month to fully process"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
     model: str | None = typer.Option(None, "--model"),
     skip_llm_review: bool = typer.Option(False, "--skip-llm-review", help="Skip the 3-persona LLM judge"),
 ) -> None:
@@ -359,7 +360,7 @@ def run_month(
 @app.command()
 def status(
     month: str = typer.Argument(..., help="Month to check"),
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Show generation status for a month."""
     from pixelated_empathy.monthly_llm_jobs import status as get_status
@@ -377,7 +378,7 @@ def status(
 
 @app.command(name="status-all")
 def status_all(
-    work_dir: Path = typer.Option(DEFAULT_WORK_DIR, "--work-dir"),
+    work_dir: Annotated[Path, typer.Option("--work-dir")] = DEFAULT_WORK_DIR,
 ) -> None:
     """Show status for all months."""
     from pixelated_empathy.monthly_gate import get_accepted_months

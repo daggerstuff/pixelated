@@ -14,7 +14,10 @@ from tools.agent_runner.config_loader import load_config
 from tools.agent_runner.coordinator import MultiAgentCoordinator
 from tools.agent_runner.dashboard import ClusterDashboard
 from tools.agent_runner.event_bus import EventBus
+from tools.agent_runner.hitl_proxy import EscalationStore, cli_proxy_listen
 from tools.agent_runner.lineage import LineageTracker
+from tools.agent_runner.monitor import LiveClusterMonitor
+from tools.agent_runner.onboarding import OnboardingWizard
 from tools.agent_runner.project_initializer import SpecProjectInitializer
 from tools.agent_runner.self_evolution import SelfEvolutionEngine
 from tools.agent_runner.skeptic import SkepticReviewer
@@ -380,19 +383,15 @@ def cmd_evolution(args: argparse.Namespace) -> int:
     return 0
 
 
-def cmd_hitl(args: argparse.Namespace) -> int:
+def cmd_hitl(_args: argparse.Namespace) -> int:
     """Run interactive Human-in-the-Loop CLI Proxy Listener."""
-    from tools.agent_runner.hitl_proxy import EscalationStore, cli_proxy_listen
-
     store = EscalationStore()
     cli_proxy_listen(store)
     return 0
 
 
-def cmd_onboard(args: argparse.Namespace) -> int:
+def cmd_onboard(_args: argparse.Namespace) -> int:
     """Run interactive setup and agent discovery wizard."""
-    from tools.agent_runner.onboarding import OnboardingWizard
-
     wizard = OnboardingWizard()
     wizard.run_interactive_setup()
     return 0
@@ -405,8 +404,6 @@ def cmd_monitor(args: argparse.Namespace) -> int:
     config = load_config(cfg_path)
     state_mgr = StateManager(args.state)
     event_bus = EventBus()
-
-    from tools.agent_runner.monitor import LiveClusterMonitor
 
     monitor = LiveClusterMonitor(config=config, state_mgr=state_mgr, event_bus=event_bus)
 

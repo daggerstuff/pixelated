@@ -51,7 +51,7 @@ class S3DatasetLoader:
     def __init__(self, *args: object, **kwargs: object) -> None:
         pass
 
-    def stream_jsonl(self, path: str) -> list[dict[str, Any]]:
+    def stream_jsonl(self, _path: str) -> list[dict[str, Any]]:
         return []
 
 
@@ -72,27 +72,27 @@ MIN_USER_CHARS = 10
 PERSONA_IMBALANCE_FRACTION = 0.1
 
 
-def _fails_human_likeness(t: str) -> bool:
+def _fails_human_likeness(_t: str) -> bool:
     return False
 
 
-def _is_refusal_or_fallback(t: str) -> bool:
+def _is_refusal_or_fallback(_t: str) -> bool:
     return False
 
 
-def _stable_message_hash(t: str) -> str:
+def _stable_message_hash(_t: str) -> str:
     return ""
 
 
-def last_assistant_content(r: dict[str, Any]) -> str:
+def last_assistant_content(_r: dict[str, Any]) -> str:
     return ""
 
 
-def last_user_content(r: dict[str, Any]) -> str:
+def last_user_content(_r: dict[str, Any]) -> str:
     return ""
 
 
-def validate_record(r: dict[str, Any], *args: object, **kwargs: object) -> list[str]:
+def validate_record(_r: dict[str, Any], *_args: object, **_kwargs: object) -> list[str]:
     return []
 
 

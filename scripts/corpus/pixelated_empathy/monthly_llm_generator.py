@@ -10,6 +10,7 @@ Handles:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import re
@@ -88,12 +89,9 @@ def _remove_trailing_commas(s: str) -> str:
 def repair_json(raw: str) -> str:
     """Best-effort JSON repair pipeline."""
     s = _strip_code_fences(raw)
-    try:
+    with contextlib.suppress(ValueError):
         s = _extract_json_array(s)
-    except ValueError:
-        pass
-    s = _remove_trailing_commas(s)
-    return s
+    return _remove_trailing_commas(s)
 
 
 # ---------------------------------------------------------------------------
@@ -314,12 +312,12 @@ OUTPUT: Only the JSON array. No commentary, no markdown fences, no explanation.
 
 def _chat_prompt(
     batch_spec: BatchSpec,
-    enrichment: MonthEnrichment,
+    _enrichment: MonthEnrichment,
     events: list[ClinicalEvent],
     reference_examples: list[dict[str, Any]],
 ) -> str:
     event_summaries = "\n".join(
-        f"  {e.id} ({e.date.date()}) — {e.summary}" for e in events if e.id in batch_spec.event_ids
+        f"  {e.id} ({e.date.date()}) - {e.summary}" for e in events if e.id in batch_spec.event_ids
     )
 
     ref_block = "\n\n".join(
@@ -343,8 +341,8 @@ MONTH EVENTS (anchor each burst to one):
 TOPICS THIS BATCH: {topic_list}
 
 CHAT VOICE RULES:
-- Chats should have off-topic texture, controlled disagreement, and cross-artifact callbacks — not just task reporting.
-- Each burst is 3–12 messages. Messages should feel like real Slack/chat messages between clinical team members.
+- Chats should have off-topic texture, controlled disagreement, and cross-artifact callbacks - not just task reporting.
+- Each burst is 3-12 messages. Messages should feel like real Slack/chat messages between clinical team members.
 - Mix quick reactions (👍, "on it", "done") with substantive exchanges.
 - Room assignments must be appropriate: clinical discussions in #clinical, supervision in #supervision, technical in #engineering, scenario design in #scenarios, infrastructure in #infra.
 - Do NOT have every burst be a celebration or a crisis. Most chats are mundane clinical coordination.

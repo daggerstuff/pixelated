@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Sequence
 import os
+from collections.abc import Sequence
 from typing import Any
 
 from skillrevise.core.agents import AgentAdapter
@@ -41,8 +41,13 @@ class PairedRunner:
         with_skill = self._run_with_retries(task, skill)
 
         transfer_gain = 0.0
-        pair_is_valid = trace_outcome_score(no_skill) is not None and trace_outcome_score(with_skill) is not None
-        interference_rate = 1.0 if pair_is_valid and no_skill.success and not with_skill.success else 0.0
+        pair_is_valid = (
+            trace_outcome_score(no_skill) is not None
+            and trace_outcome_score(with_skill) is not None
+        )
+        interference_rate = (
+            1.0 if pair_is_valid and no_skill.success and not with_skill.success else 0.0
+        )
         transfer_summary: dict[str, float] = {}
         if transfer_tasks:
             transfer_gain, transfer_interference = self.evaluate_family(skill, transfer_tasks)

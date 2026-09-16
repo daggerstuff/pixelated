@@ -259,9 +259,7 @@ async def main_async() -> None:
     semaphore = asyncio.Semaphore(4)  # 4 concurrent synthesis pipelines
     total_accepted_new = 0
 
-    out_f = open(local_file, "a", encoding="utf-8")
-
-    try:
+    with open(local_file, "a", encoding="utf-8") as out_f:
         for cat, target in target_counts.items():
             logger.info("Synthesizing category '%s' (target: %d)...", cat, target)
             accepted = 0
@@ -283,8 +281,6 @@ async def main_async() -> None:
                     logger.info("  [%s] Accepted %d / %d clean Wayfarer+Eve sessions...", cat, accepted, target)
 
             logger.info("Category '%s' complete: %d clean sessions accepted.", cat, accepted)
-    finally:
-        out_f.close()
 
     total_canonical = existing_count + total_accepted_new
     file_size_mb = os.path.getsize(local_file) / (1024 * 1024)

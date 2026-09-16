@@ -15,7 +15,12 @@ def load_config_builder() -> dd.DataDesignerConfigBuilder:
         product_name="knowledge_tasks",
         draft_model=_support.KnowledgeTaskDraft,
         axes={
-            "task_type": ["concept explanation", "compare approaches", "case-grounded retrieval", "contraindication lookup"],
+            "task_type": [
+                "concept explanation",
+                "compare approaches",
+                "case-grounded retrieval",
+                "contraindication lookup",
+            ],
             "answer_scope": ["brief", "structured", "multi-source synthesis"],
             "citation_density": ["one claim per citation", "paragraph-level citations", "contrastive citations"],
         },

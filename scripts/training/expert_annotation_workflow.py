@@ -57,8 +57,8 @@ def extract_borderline_samples(
     borderline: list[dict[str, Any]] = []
 
     with open(dataset_path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if not line:
                 continue
             try:

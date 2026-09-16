@@ -7,7 +7,7 @@ Status: "ready" or "not_ready".
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from pixelated_empathy.schemas import MONTH_ORDER, GateReport, GateStatus
@@ -142,7 +142,7 @@ def prepare(month: str, work_dir_root: Path) -> GateReport:
         month=month,
         status=status,
         checks=checks,
-        generated_at=datetime.utcnow(),
+        generated_at=datetime.now(timezone.utc),
     )
     month_dir.mkdir(parents=True, exist_ok=True)
     (month_dir / "gate_report.json").write_text(report.model_dump_json(indent=2))
@@ -177,7 +177,7 @@ def mark_rejected(month: str, work_dir_root: Path, reason: str) -> GateReport:
     updated = report.model_copy(
         update={
             "status": GateStatus.REJECTED,
-            "checks": list(report.checks) + [rejection_check],
+            "checks": [*report.checks, rejection_check],
         }
     )
     gate_path.write_text(updated.model_dump_json(indent=2))

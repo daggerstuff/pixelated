@@ -8,6 +8,7 @@ llm_generation_report.json.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import math
@@ -177,16 +178,12 @@ def launch(
                 logger.info("Replaying checkpoint for batch %s (%d records)", spec.batch_id, len(checkpoint_data))
                 if spec.artifact_type == "email":
                     for r in checkpoint_data:
-                        try:
+                        with contextlib.suppress(Exception):
                             all_emails.append(EmailRecord(**r))
-                        except Exception:
-                            pass
                 else:
                     for r in checkpoint_data:
-                        try:
+                        with contextlib.suppress(Exception):
                             all_chat_bursts.append(ChatBurst(**r))
-                        except Exception:
-                            pass
                 batches_succeeded += 1
                 continue
 

@@ -41,8 +41,8 @@ def parse_hh_rlhf(text: str) -> list[dict[str, str]] | None:
     """Parse Anthropic hh-rlhf Human/Assistant dialogue text."""
     turns = text.split("\n\n")
     messages: list[dict[str, str]] = []
-    for turn in turns:
-        turn = turn.strip()
+    for raw_turn in turns:
+        turn = raw_turn.strip()
         if turn.startswith("Human:"):
             content = turn[6:].strip()
             if content:

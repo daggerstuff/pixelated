@@ -56,7 +56,7 @@ def detect_ngram_repetitions(text: str, n: int = 3, threshold: int = 3) -> tuple
     return len(repeated_phrases) > 0, list(repeated_phrases)
 
 
-def detect_char_repetitions(text: str, min_len: int = 4, threshold: int = 5) -> tuple[bool, list[str]]:
+def detect_char_repetitions(text: str, _min_len: int = 4, threshold: int = 5) -> tuple[bool, list[str]]:
     """
     Detect repeated character sequences (e.g., "aaaaaa", "!!!!!!").
 

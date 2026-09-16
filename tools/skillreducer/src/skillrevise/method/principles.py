@@ -558,7 +558,7 @@ def _abstract_absorbed_repair(
     The bank should remember condition-action repair patterns, not task answers.
     Raw targets and verifier snippets stay in supporting episode provenance.
     """
-    context = " ".join([target, evidence, diagnosis.causal_judgment, diagnosis.summary]).lower()
+    context = f"{target} {evidence} {diagnosis.causal_judgment} {diagnosis.summary}".lower()
     labels = {label.value for label in diagnosis.labels}
 
     if _mentions_sentinel_convention(context):
@@ -764,9 +764,7 @@ def _contains_task_local_anchor(text: str, task: TaskSpec) -> bool:
         r"(/[\w./-]+|[A-Za-z0-9_-]+\.(json|py|csv|txt|pdf|dot|sh|toml|ya?ml|png|jpe?g))", text
     ):
         return True
-    if re.search(r"`[^`]+`", text):
-        return True
-    return False
+    return bool(re.search(r"`[^`]+`", text))
 
 
 def _principle_to_jsonable(principle: RepairPrinciple) -> dict[str, object]:

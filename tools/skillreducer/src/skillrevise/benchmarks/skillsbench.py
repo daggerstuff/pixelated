@@ -99,8 +99,8 @@ def build_family_index(tasks: Sequence[TaskSpec]) -> dict[str, list[TaskSpec]]:
     families: dict[str, list[TaskSpec]] = defaultdict(list)
     for task in tasks:
         families[task.family].append(task)
-    for family in families:
-        families[family].sort(key=lambda item: item.task_id)
+    for family_tasks in families.values():
+        family_tasks.sort(key=lambda item: item.task_id)
     return dict(families)
 
 
@@ -110,7 +110,11 @@ def select_sibling_tasks(
     *,
     max_tasks: int | None = None,
 ) -> list[TaskSpec]:
-    siblings = [candidate for candidate in family_index.get(task.family, []) if candidate.task_id != task.task_id]
+    siblings = [
+        candidate
+        for candidate in family_index.get(task.family, [])
+        if candidate.task_id != task.task_id
+    ]
     if max_tasks is not None:
         siblings = siblings[:max_tasks]
     return siblings

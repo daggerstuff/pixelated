@@ -48,8 +48,8 @@ def load_mapping(mapping_path: Path) -> set[str]:
         sys.exit(f"Mapping file not found: {mapping_path}")
     with mapping_path.open() as f:
         next(f)  # skip header
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if not line:
                 continue
             old, *_ = line.split("\t")
