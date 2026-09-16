@@ -11,3 +11,7 @@ data:
   CMS_PORT: "4321"
   METRICS_ENABLED: "true"
   HEALTH_PATH: "/health"
+  # Product analytics (Umami): PUBLIC_UMAMI_WEBSITE_ID is injected by the
+  # deploy workflow from the same-named repo variable (create it with
+  # `gh variable set PUBLIC_UMAMI_WEBSITE_ID` once the website exists in the
+  # Umami admin at analytics.pixelatedempathy.com). Empty = analytics off.
