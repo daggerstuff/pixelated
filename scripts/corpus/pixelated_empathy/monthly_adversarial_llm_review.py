@@ -10,6 +10,7 @@ A month passes if all 3 personas pass (score >= 0.7 and no critical flags).
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import random
@@ -43,10 +44,8 @@ def _load_emails(work_dir: Path) -> list[EmailRecord]:
     raw: list[dict[str, Any]] = json.loads(path.read_text())
     records: list[EmailRecord] = []
     for r in raw:
-        try:
+        with contextlib.suppress(Exception):
             records.append(EmailRecord(**r))
-        except Exception:
-            pass
     return records
 
 
@@ -57,10 +56,8 @@ def _load_chats(work_dir: Path) -> list[ChatBurst]:
     raw: list[dict[str, Any]] = json.loads(path.read_text())
     records: list[ChatBurst] = []
     for r in raw:
-        try:
+        with contextlib.suppress(Exception):
             records.append(ChatBurst(**r))
-        except Exception:
-            pass
     return records
 
 

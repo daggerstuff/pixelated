@@ -82,15 +82,16 @@ def _detect_issues(skill: Skill, stats: TokenStats, config: Config) -> list[Audi
             )
         )
 
-    if any(k in skill.body.lower() for k in ("## example", "## examples", "```")):
-        if not any(r.path.name in {"examples.md", "reference.md"} for r in skill.references):
-            issues.append(
-                AuditIssue(
-                    code="F2_MONOLITHIC",
-                    message="Examples embedded in SKILL.md instead of separate reference files",
-                    severity="info",
-                )
+    if any(k in skill.body.lower() for k in ("## example", "## examples", "```")) and not any(
+        r.path.name in {"examples.md", "reference.md"} for r in skill.references
+    ):
+        issues.append(
+            AuditIssue(
+                code="F2_MONOLITHIC",
+                message="Examples embedded in SKILL.md instead of separate reference files",
+                severity="info",
             )
+        )
 
     if stats.references > 5000:
         issues.append(

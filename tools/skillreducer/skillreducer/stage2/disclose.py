@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
+from skillreducer.llm.client import LLMClient
 from skillreducer.models import ContentItem, ContentType, ReferenceFile
 from skillreducer.stage2.classify import classify_paragraphs, split_paragraphs
 from skillreducer.stage2.compress import (
@@ -17,6 +18,8 @@ from skillreducer.tokenizer import count_tokens
 
 META_START = "<!-- skillreducer-meta"
 META_END = "-->"
+
+logger = logging.getLogger(__name__)
 
 
 def restructure_body(
@@ -52,10 +55,7 @@ def restructure_body(
         references["background.md"] = background
 
     if references:
-        notes.append(
-            "Stage 2: progressive disclosure -> "
-            + ", ".join(references.keys())
-        )
+        notes.append("Stage 2: progressive disclosure -> " + ", ".join(references.keys()))
 
     resource_lines = []
     if references:
@@ -93,13 +93,8 @@ def annotate_reference(content: str, llm: LLMClient | None) -> tuple[str, str, l
                 when = str(meta.get("when", when))
                 topics = [str(t) for t in meta.get("topics", topics)]
         except Exception:
-            pass
-    header = (
-        f"{META_START}\n"
-        f"when: {when}\n"
-        f"topics: {', '.join(topics)}\n"
-        f"{META_END}\n\n"
-    )
+            logger.debug("Reference metadata LLM call failed; using defaults", exc_info=True)
+    header = f"{META_START}\nwhen: {when}\ntopics: {', '.join(topics)}\n{META_END}\n\n"
     return header + content, when, topics
 
 

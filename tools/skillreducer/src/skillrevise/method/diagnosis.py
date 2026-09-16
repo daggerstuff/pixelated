@@ -151,9 +151,10 @@ class HeuristicDiagnoser:
                 )
             )
 
-        if FailureType.OVER_SPECIFICITY in labels or FailureType.OVER_GENERALITY in labels:
-            if FailureType.WRONG_ABSTRACTION_LEVEL not in labels:
-                labels.append(FailureType.WRONG_ABSTRACTION_LEVEL)
+        if (
+            FailureType.OVER_SPECIFICITY in labels or FailureType.OVER_GENERALITY in labels
+        ) and FailureType.WRONG_ABSTRACTION_LEVEL not in labels:
+            labels.append(FailureType.WRONG_ABSTRACTION_LEVEL)
 
         causal_judgment = self._build_causal_judgment(evaluation, labels)
         rewrite_targets = self._dedupe_targets(

@@ -197,7 +197,7 @@ def main() -> None:
             f.write(json.dumps(pair) + "\n")
 
     if args.sample and all_pairs:
-        for i, pair in enumerate(all_pairs[:3], 1):
+        for _i, _pair in enumerate(all_pairs[:3], 1):
             pass
 
 

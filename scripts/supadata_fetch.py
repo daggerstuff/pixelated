@@ -59,8 +59,8 @@ def read_urls(path: Path) -> list[str]:
         return []
     urls = []
     with open(path) as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if line and not line.startswith("#"):
                 urls.append(line)
     # Deduplicate preserving order
@@ -81,8 +81,8 @@ def get_supadata_api_key() -> str:
         # Also check .env file directly
         env_path = Path(__file__).parent.parent / ".env"
         if env_path.exists():
-            for line in env_path.read_text().splitlines():
-                line = line.strip()
+            for raw_line in env_path.read_text().splitlines():
+                line = raw_line.strip()
                 if line.startswith("SUPADATA_API_KEY="):
                     api_key = line.split("=", 1)[1].strip().strip("'\"")
                     break

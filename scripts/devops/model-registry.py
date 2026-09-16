@@ -44,7 +44,7 @@ def _save_manifest(manifest: dict[str, Any]) -> None:
         f.write("\n")
 
 
-def cmd_list(args: argparse.Namespace) -> None:
+def cmd_list(_args: argparse.Namespace) -> None:
     manifest = _load_manifest()
     checkpoints = manifest.get("checkpoints", [])
     active = manifest.get("active_run_id")

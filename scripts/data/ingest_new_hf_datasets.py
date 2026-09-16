@@ -55,7 +55,7 @@ def parse_phr_text(text: str) -> tuple[str | None, str | None]:
     return None, None
 
 
-def convert_to_chatml(item: dict[str, Any], dataset_name: str) -> dict[str, Any] | None:
+def convert_to_chatml(item: dict[str, Any], _dataset_name: str) -> dict[str, Any] | None:
     """Convert dataset sample dict into standard ChatML format."""
     # 1. ShareGPT format ('conversations' list)
     if "conversations" in item and isinstance(item["conversations"], list):

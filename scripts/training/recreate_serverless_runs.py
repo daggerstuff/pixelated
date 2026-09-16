@@ -24,7 +24,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Protocol, cast
 
@@ -44,7 +44,7 @@ def generate_report() -> str:
 
     report_lines = [
         "# W&B Serverless Runs Report",
-        f"Generated: {datetime.utcnow().isoformat()}Z",
+        f"Generated: {datetime.now(timezone.utc).isoformat().removesuffix('+00:00')}Z",
         f"Project: {PROJECT}",
         "",
         "## Summary",
@@ -108,18 +108,18 @@ async def run_30b_experiment() -> None:
     if not WANDB_API_KEY:
         raise ValueError("WANDB_API_KEY is required")
 
-    MODEL_NAME = "qwen3-30b-serverless-rl-v2"
-    BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
-    DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
+    model_name = "qwen3-30b-serverless-rl-v2"
+    base_model = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+    dataset_path = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
-    GROUPS_PER_STEP = 5
-    ROLLOUTS_PER_GROUP = 8
-    LEARNING_RATE = 1e-5
-    MAX_RL_STEPS = 100
+    groups_per_step = 5
+    rollouts_per_group = 8
+    learning_rate = 1e-5
+    max_rl_steps = 100
 
     logger.info("Loading dataset...")
     examples: list[list[dict[str, Any]]] = []
-    with open(DATASET_PATH) as f:
+    with open(dataset_path) as f:
         for line in f:
             data = json.loads(line)
             messages = data.get("messages", [])
@@ -129,10 +129,10 @@ async def run_30b_experiment() -> None:
 
     logger.info("Initializing 30B model...")
     model = art.TrainableModel(
-        name=MODEL_NAME,
+        name=model_name,
         project=PROJECT,
         entity="wutang",
-        base_model=BASE_MODEL,
+        base_model=base_model,
     )
     backend = ServerlessBackend(api_key=WANDB_API_KEY)
     await model.register(backend)
@@ -144,7 +144,7 @@ async def run_30b_experiment() -> None:
     try:
         await train_sft_from_file(
             model=model,
-            file_path=DATASET_PATH,
+            file_path=dataset_path,
             epochs=1,
         )
         logger.info("SFT Warmup complete!")
@@ -155,17 +155,17 @@ async def run_30b_experiment() -> None:
     start_step = await model.get_step()
     logger.info(f"Starting RL from step {start_step}")
 
-    for step in range(MAX_RL_STEPS):
+    for step in range(max_rl_steps):
         import random
 
-        batch = random.sample(examples, min(GROUPS_PER_STEP, len(examples)))
+        batch = random.sample(examples, min(groups_per_step, len(examples)))
 
         train_groups = await art.gather_trajectory_groups(
-            (art.TrajectoryGroup(rollout(model, messages) for _ in range(ROLLOUTS_PER_GROUP)) for messages in batch),
+            (art.TrajectoryGroup(rollout(model, messages) for _ in range(rollouts_per_group)) for messages in batch),
             pbar_desc=f"RL step {step + start_step}",
         )
 
-        result = await backend.train(model, train_groups, learning_rate=LEARNING_RATE)
+        result = await backend.train(model, train_groups, learning_rate=learning_rate)
         await model.log(
             train_groups,
             metrics=result.metrics,
@@ -261,13 +261,13 @@ async def evaluate_12b_model() -> None:
     if not WANDB_API_KEY:
         raise ValueError("WANDB_API_KEY is required")
 
-    MODEL_NAME = "wayfarer-2-12b-serverless-rl-v2"
-    PROJECT = "wayfarer-ab-test"
+    model_name = "wayfarer-2-12b-serverless-rl-v2"
+    project_name = "wayfarer-ab-test"
 
     logger.info("Loading trained 12B model for evaluation...")
     model = art.TrainableModel(
-        name=MODEL_NAME,
-        project=PROJECT,
+        name=model_name,
+        project=project_name,
         entity="wutang",
         base_model="OpenPipe/Qwen3-14B-Instruct",
     )

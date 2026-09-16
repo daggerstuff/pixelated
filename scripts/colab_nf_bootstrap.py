@@ -67,8 +67,8 @@ def sh(cmd: str) -> None:
 def load_env() -> dict[str, str]:
     env: dict[str, str] = {}
     with open(ENV_FILE, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
+        for raw_line in f:
+            line = raw_line.strip()
             if line and not line.startswith("#") and "=" in line:
                 k, v = line.split("=", 1)
                 env[k] = v

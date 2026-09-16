@@ -78,7 +78,8 @@ class ParallelSpeculativeExecutor:
         # Execute concurrently
         with concurrent.futures.ThreadPoolExecutor(max_workers=min(len(batch), self.max_concurrency)) as executor:
             futures = [
-                executor.submit(_worker, exec_item, prompt) for exec_item, (_, _, prompt) in zip(executions, batch)
+                executor.submit(_worker, exec_item, prompt)
+                for exec_item, (_, _, prompt) in zip(executions, batch, strict=False)
             ]
             concurrent.futures.wait(futures)
 

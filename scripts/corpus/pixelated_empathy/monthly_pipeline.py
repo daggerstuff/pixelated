@@ -217,7 +217,7 @@ _MONTH_KEY_THREADS: dict[str, list[str]] = {
 def plan_month(
     month: str,
     work_dir: Path,
-    prior_month_summary: str | None = None,
+    _prior_month_summary: str | None = None,
 ) -> tuple[MonthBible, list[SalvageCandidate]]:
     """Plan a single month: emit month_bible.json and salvage_candidates.json."""
     if month not in MONTH_TARGETS:

@@ -14,6 +14,7 @@ A month passes this gate if it has 0 CRITICAL findings.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 from pathlib import Path
@@ -101,7 +102,7 @@ def _check_emails(emails: list[EmailRecord]) -> list[AdversarialFinding]:
                     rule="stock_phrase",
                     artifact_id=email.id,
                     excerpt=body[:120],
-                    detail=f"Stock phrase(s) found: {', '.join(set(h.lower() for h in stock_hits))}",
+                    detail=f"Stock phrase(s) found: {', '.join({h.lower() for h in stock_hits})}",
                 )
             )
 
@@ -203,7 +204,7 @@ def _check_chats(chats: list[ChatBurst]) -> list[AdversarialFinding]:
                         artifact_id=burst.id,
                         excerpt=messages[i].text[:80],
                         detail=f"Stock phrase in chat from {messages[i].sender}: "
-                        f"{', '.join(set(h.lower() for h in stock_hits))}",
+                        f"{', '.join({h.lower() for h in stock_hits})}",
                     )
                 )
 
@@ -243,10 +244,8 @@ def _load_emails(work_dir: Path) -> list[EmailRecord]:
     raw: list[dict[str, Any]] = json.loads(path.read_text())
     emails: list[EmailRecord] = []
     for r in raw:
-        try:
+        with contextlib.suppress(Exception):
             emails.append(EmailRecord(**r))
-        except Exception:
-            pass
     return emails
 
 
@@ -257,10 +256,8 @@ def _load_chats(work_dir: Path) -> list[ChatBurst]:
     raw: list[dict[str, Any]] = json.loads(path.read_text())
     bursts: list[ChatBurst] = []
     for r in raw:
-        try:
+        with contextlib.suppress(Exception):
             bursts.append(ChatBurst(**r))
-        except Exception:
-            pass
     return bursts
 
 

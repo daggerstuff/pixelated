@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -71,7 +71,7 @@ def extract_chunk_metadata(chunk_data: dict[str, Any]) -> dict[str, object]:
 
     # Dispatch timestamps (use current time as approximation since chunk
     # files don't store explicit start/complete timestamps)
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     return {
         "month": chunk_data.get("month", MONTH),

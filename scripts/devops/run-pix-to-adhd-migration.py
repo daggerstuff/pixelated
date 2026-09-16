@@ -34,8 +34,8 @@ class AdfDoc(TypedDict):
 
 def adf_description(text: str) -> AdfDoc:
     paragraphs: list[AdfParagraph] = []
-    for line in text.splitlines() or [text]:
-        line = line.strip()
+    for line_text in text.splitlines() or [text]:
+        line = line_text.strip()
         if not line:
             continue
         paragraphs.append(
@@ -151,7 +151,7 @@ def main() -> None:
 
     mapping: dict[str, str] = {}
     if args.dry_run:
-        for issue in issues[:5]:
+        for _issue in issues[:5]:
             pass
         return
 
@@ -159,9 +159,8 @@ def main() -> None:
     if issues and issues[0].get("assignee"):
         assignee_id = lookup_account_id(site, args.email, args.token, issues[0]["assignee"])
 
-    for index, issue in enumerate(issues, start=1):
-        if assignee_id and issue.get("assignee"):
-            issue = {**issue, "assignee_id": assignee_id}
+    for index, item in enumerate(issues, start=1):
+        issue = {**item, "assignee_id": assignee_id} if (assignee_id and item.get("assignee")) else item
         source_label = next((label for label in issue.get("label", []) if label.startswith("source-pix-")), None)
         source_key = source_label.replace("source-", "").upper() if source_label else f"ROW-{index}"
 

@@ -67,6 +67,7 @@ class CommandLLMClient:
             text=True,
             env=env,
             timeout=self.timeout_seconds,
+            check=False,
         )
         latency = round(time.perf_counter() - started, 4)
         if completed.returncode != 0:

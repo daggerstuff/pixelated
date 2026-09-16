@@ -81,9 +81,8 @@ class ReleaseManifest(StrictModel):
                 raise ValueError("approved release requires approved_at")
             if self.human_review_status is not HumanReviewStatus.APPROVED:
                 raise ValueError("approved release requires human_review_status=approved")
-        if self.approval_state is ApprovalState.PENDING:
-            if self.approved_by is not None:
-                raise ValueError("pending release must not have approved_by")
+        if self.approval_state is ApprovalState.PENDING and self.approved_by is not None:
+            raise ValueError("pending release must not have approved_by")
         return self
 
     def approve(self, *, approved_by: str, approved_at: str) -> ReleaseManifest:

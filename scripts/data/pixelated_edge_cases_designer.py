@@ -23,6 +23,7 @@ Architecture:
   Threads pop instantly from collections.deque() buffer for maximum generation speed.
 """
 
+import itertools
 import json
 import logging
 import random
@@ -50,7 +51,7 @@ SYSTEM_PROMPT = (
 _GLOBAL_SESSION_QUEUE: deque[list[dict[str, Any]]] = deque()
 _QUEUE_LOCK = threading.Lock()
 _OLLAMA_LOCK = threading.Lock()
-_KEY_INDEX = 0
+_KEY_INDEX = itertools.count()
 _KEY_LOCK = threading.Lock()
 
 NVIDIA_KEYS = [
@@ -73,11 +74,8 @@ FAST_OLLAMA_MODELS = [
 
 def get_next_nim_client() -> OpenAI:
     """Gets the next NVIDIA NIM client in round-robin order across 3 keys."""
-    global _KEY_INDEX
     with _KEY_LOCK:
-        client = NIM_CLIENTS[_KEY_INDEX % len(NIM_CLIENTS)]
-        _KEY_INDEX += 1
-        return client
+        return NIM_CLIENTS[next(_KEY_INDEX) % len(NIM_CLIENTS)]
 
 
 def execute_ollama_wayfarer(ollama_client: OpenAI, prompt: str) -> str:
@@ -222,7 +220,7 @@ def generate_curated_session(row: dict[str, Any]) -> dict[str, Any]:
             if isinstance(data, dict) and "sessions" in data and isinstance(data["sessions"], list):
                 for s in data["sessions"]:
                     if isinstance(s, list) and len(s) > 0:
-                        parsed_sessions.append([{"role": "system", "content": SYSTEM_PROMPT}] + s)
+                        parsed_sessions.append([{"role": "system", "content": SYSTEM_PROMPT}, *s])
         except Exception:
             pass
 

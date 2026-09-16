@@ -336,7 +336,7 @@ def _assemble_summary(
 
     legacy_overlap: dict[str, list[str]] = defaultdict(list)
     for signature, hits in by_signature.items():
-        for hit in hits:
+        for _ in hits:
             legacy_buckets = ANTI_SIGNAL_TO_LEGACY_DEFECT.get(signature, [])
             for bucket in legacy_buckets:
                 if bucket not in legacy_overlap[signature]:
@@ -366,7 +366,7 @@ def _assemble_summary(
     pro_count = sum(1 for f in findings if f["signature"] == "performative_toughness_as_armor")
     records_seen = max(len(sampled), 1)
 
-    summary = {
+    return {
         "month": month,
         "review_mode": "brene_brown_adversarial_auditor",
         "review_date": dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -401,7 +401,7 @@ def _assemble_summary(
                 ]
                 if not findings
                 else [
-                    f"Touched performative_toughness_as_armor {pro_count}× across {records_seen} records.",
+                    f"Touched performative_toughness_as_armor {pro_count}x across {records_seen} records.",
                 ],
                 "concerns": (
                     [f"{critical_count} critical findings → cascade_required = true."] if critical_count else []
@@ -422,7 +422,6 @@ def _assemble_summary(
         "legacy_body_defect_overlap": dict(legacy_overlap),
         "descriptor_sha256": _descriptor_sha(descriptor),
     }
-    return summary
 
 
 def _descriptor_sha(descriptor: dict[str, Any]) -> str:
@@ -484,9 +483,9 @@ def _read_no_brene_brown_critical_since_prior(work_dir: Path, current_month: str
 
 
 def _try_qwen_invoke(
-    descriptor: dict[str, Any],
-    sampled: list[dict[str, Any]],
-    month: str,
+    _descriptor: dict[str, Any],
+    _sampled: list[dict[str, Any]],
+    _month: str,
 ) -> list[dict[str, Any]] | None:
     """Best-effort Qwen headless invocation.
 

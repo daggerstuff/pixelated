@@ -157,7 +157,7 @@ def main() -> int:
     """
 
     deleted = 0
-    for ident, att_id, _pix in slim_deletes:
+    for _ident, att_id, _pix in slim_deletes:
         try:
             gql(api_key, delete_mut, {"id": att_id})
             deleted += 1

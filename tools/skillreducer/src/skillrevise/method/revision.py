@@ -697,28 +697,7 @@ def _structured_revision_template_lines(trace_lines: list[str]) -> list[str]:
 
 
 def _freeform_revision_output_template() -> str:
-    return "\n".join(
-        [
-            "Return only the revised skill Markdown in this structure:",
-            "# <Skill Name>",
-            "",
-            "## Purpose",
-            "<1 concise paragraph>",
-            "",
-            "## When to Use",
-            "<1 concise paragraph describing the reusable task-family trigger>",
-            "",
-            "## Procedure",
-            "- <ordered, executable step 1>",
-            "- <ordered, executable step 2>",
-            "- <ordered, executable step 3>",
-            "- <ordered, executable step 4>",
-            "",
-            "## Constraints / Pitfalls",
-            "- <strict constraint or pitfall 1>",
-            "- <strict constraint or pitfall 2>",
-        ]
-    )
+    return "Return only the revised skill Markdown in this structure:\n# <Skill Name>\n\n## Purpose\n<1 concise paragraph>\n\n## When to Use\n<1 concise paragraph describing the reusable task-family trigger>\n\n## Procedure\n- <ordered, executable step 1>\n- <ordered, executable step 2>\n- <ordered, executable step 3>\n- <ordered, executable step 4>\n\n## Constraints / Pitfalls\n- <strict constraint or pitfall 1>\n- <strict constraint or pitfall 2>"
 
 
 def _has_constraints_section(skill_markdown: str) -> bool:

@@ -568,7 +568,7 @@ def stage5_templatize(rec: Record) -> Record:
 
     # Cut a "stressor signature" snippet around the strongest tag match.
     snippet = ""
-    for tag, pat in FAILURE_TAG_PATTERNS:
+    for _, pat in FAILURE_TAG_PATTERNS:
         m = pat.search(rec.stripped_text)
         if m:
             s = max(0, m.start() - 80)

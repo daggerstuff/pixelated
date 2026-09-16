@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 from dataclasses import asdict, dataclass
+from typing import ClassVar
 
 from tools.agent_runner.models import AgentConfig, ProjectConfig, RunnerConfig, VerificationConfig
 
@@ -27,7 +28,7 @@ class DiscoveredAgent:
 class OnboardingWizard:
     """Guided wizard that inspects local tooling, auto-configures agents, and writes production configs."""
 
-    KNOWN_AGENT_CLIS: list[tuple[str, str, str]] = [
+    KNOWN_AGENT_CLIS: ClassVar[list[tuple[str, str, str]]] = [
         ("opencode", "opencode run --auto {prompt_file}", "backend_engineer"),
         ("claude", "claude --print {prompt_file}", "lead_architect"),
         ("mastracode", "mastracode run {prompt_file}", "frontend_engineer"),
@@ -74,7 +75,7 @@ class OnboardingWizard:
             if bin_path:
                 version_str = "Installed"
                 try:
-                    res = subprocess.run([binary, "--version"], capture_output=True, text=True, timeout=3)
+                    res = subprocess.run([binary, "--version"], capture_output=True, text=True, timeout=3, check=False)
                     if res.returncode == 0 and res.stdout.strip():
                         version_str = res.stdout.strip().splitlines()[0]
                 except Exception:
@@ -108,9 +109,9 @@ class OnboardingWizard:
 
     def generate_preset_config(
         self,
-        preset: str = "autonomous-full",
+        _preset: str = "autonomous-full",
         team_key: str = "PIX",
-        project_name: str = "Pixelated Health",
+        _project_name: str = "Pixelated Health",
         agents: list[DiscoveredAgent] | None = None,
     ) -> RunnerConfig:
         """Construct a complete, production-grade RunnerConfig instance."""

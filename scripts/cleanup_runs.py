@@ -216,7 +216,7 @@ def main() -> int | None:
                 with ThreadPoolExecutor(max_workers=PARALLEL) as executor:
                     futures = {executor.submit(delete_cache, cid): cid for cid in cache_ids}
                     for future in as_completed(futures):
-                        cid, success = future.result()
+                        _, success = future.result()
                         if not success:
                             deletion_failures = True
                 if deletion_failures:

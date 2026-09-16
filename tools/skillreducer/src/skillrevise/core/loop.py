@@ -156,9 +156,7 @@ class HarnessLoop:
             return False
         if trace_outcome_score(trace) is None:
             return False
-        if not trace.events and trace.tool_calls == 0:
-            return False
-        return True
+        return not (not trace.events and trace.tool_calls == 0)
 
     def _trace_timed_out(self, trace: ExecutionTrace) -> bool:
         return bool(trace.metadata.get("timed_out")) or trace.status == "timeout"

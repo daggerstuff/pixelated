@@ -36,10 +36,10 @@ def main() -> None:
         else:
             others.append((title, desc[:100], i.get("id")))
 
-    for title, _bp, _id in mismatches[:10]:
+    for _title, _bp, _id in mismatches[:10]:
         pass
 
-    for title, _sp, _id in placeholders[:10]:
+    for _title, _sp, _id in placeholders[:10]:
         pass
 
 

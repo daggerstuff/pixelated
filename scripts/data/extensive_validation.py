@@ -320,12 +320,8 @@ class ExtensiveValidationSuite:
 
             # Check result (support multi-label)
             expected = test["expected"]
-            if isinstance(expected, list):
-                # Multi-label: accept any of the expected categories
-                passed = result.category in expected
-            else:
-                # Single label
-                passed = result.category == expected
+            # Multi-label: accept any of the expected categories; else single label
+            passed = result.category in expected if isinstance(expected, list) else result.category == expected
 
             total_by_difficulty[test["difficulty"]] += 1
             if passed:

@@ -38,7 +38,7 @@ class _PruneWarningFilter(logging.Filter):
         return "Could not prune old train-state artifacts" not in msg and "404 Client Error" not in msg
 
 
-for logger_name in list(logging.root.manager.loggerDict.keys()) + [""]:
+for logger_name in [*logging.root.manager.loggerDict.keys(), ""]:
     logging.getLogger(logger_name).addFilter(_PruneWarningFilter())
 
 AZURE_API_KEY = os.environ.get("AZURE_OPENAI_API_KEY", "")
@@ -82,7 +82,7 @@ def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
 
 
 @_typed_op
-async def rollout(model: art.Model, messages: list[dict[str, Any]], step: int = 0) -> art.Trajectory:
+async def rollout(_model: art.Model, messages: list[dict[str, Any]], _step: int = 0) -> art.Trajectory:
     context = messages[:-1] if len(messages) > 1 else messages
     expected = messages[-1]["content"] if messages else ""
 
@@ -183,7 +183,7 @@ async def main() -> None:
             train_groups = await art.gather_trajectory_groups(
                 (
                     art.TrajectoryGroup(
-                        rollout(model, messages, step=step + start_step) for _ in range(ROLLOUTS_PER_GROUP)
+                        rollout(model, messages, _step=step + start_step) for _ in range(ROLLOUTS_PER_GROUP)
                     )
                     for messages in batch
                 ),

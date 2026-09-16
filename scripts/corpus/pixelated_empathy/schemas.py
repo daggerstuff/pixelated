@@ -8,34 +8,33 @@ debriefs, and care coordination messages between clinical team members.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field, model_validator
-
 
 # ---------------------------------------------------------------------------
 # Enums
 # ---------------------------------------------------------------------------
 
 
-class GateTier(str, Enum):
-    FOUNDATION = "foundation"           # basic therapeutic skills, rapport building
-    ASSESSMENT = "assessment"            # intake, risk screening, differential dx
-    CRISIS = "crisis"                    # suicidality, de-escalation, safety planning
-    RUPTURE_REPAIR = "rupture-repair"    # therapeutic alliance rupture, repair
-    COMPLEX = "complex"                  # comorbidity, intersectionality, trauma-informed
-    CERTIFICATION = "certification"      # final review, independent practice readiness
+class GateTier(StrEnum):
+    FOUNDATION = "foundation"  # basic therapeutic skills, rapport building
+    ASSESSMENT = "assessment"  # intake, risk screening, differential dx
+    CRISIS = "crisis"  # suicidality, de-escalation, safety planning
+    RUPTURE_REPAIR = "rupture-repair"  # therapeutic alliance rupture, repair
+    COMPLEX = "complex"  # comorbidity, intersectionality, trauma-informed
+    CERTIFICATION = "certification"  # final review, independent practice readiness
 
 
-class GateStatus(str, Enum):
+class GateStatus(StrEnum):
     READY = "ready"
     NOT_READY = "not_ready"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
 
 
-class AuditSeverity(str, Enum):
+class AuditSeverity(StrEnum):
     CRITICAL = "CRITICAL"
     WARNING = "WARNING"
     INFO = "INFO"
@@ -48,6 +47,7 @@ class AuditSeverity(str, Enum):
 
 class ClinicalEvent(BaseModel):
     """A clinical training event: supervision session, case review, workshop, crisis simulation, etc."""
+
     id: str = Field(pattern=r"^EVT-\d{4}-\d{3}$")
     date: datetime
     participants: list[str]
@@ -76,6 +76,7 @@ class EventSpine(BaseModel):
 
 class EmailRecord(BaseModel):
     """A clinical email: supervision feedback, case consult, care coordination, training note."""
+
     id: str
     thread_id: str
     date: datetime
@@ -88,20 +89,20 @@ class EmailRecord(BaseModel):
     communication_type: str = "supervision"  # supervision | case_consult | care_coordination | training | admin
 
     @model_validator(mode="after")
-    def validate_id_shape(self) -> "EmailRecord":
+    def validate_id_shape(self) -> EmailRecord:
         parts = self.id.split("-")
         if len(parts) < 6:
             raise ValueError(f"Email id has unexpected shape: {self.id}")
         return self
 
     @model_validator(mode="after")
-    def sender_not_in_recipients(self) -> "EmailRecord":
+    def sender_not_in_recipients(self) -> EmailRecord:
         if self.sender in self.recipients:
             raise ValueError(f"Sender '{self.sender}' appears in recipients")
         return self
 
     @model_validator(mode="after")
-    def body_not_placeholder(self) -> "EmailRecord":
+    def body_not_placeholder(self) -> EmailRecord:
         lowered = self.body.strip().lower()
         placeholders = {"-m", "-c", "short natural subject", "[email body]", "..."}
         if lowered in placeholders or len(self.body.strip()) < 20:
@@ -114,7 +115,7 @@ class ChatMessage(BaseModel):
     text: str
 
     @model_validator(mode="after")
-    def text_not_placeholder(self) -> "ChatMessage":
+    def text_not_placeholder(self) -> ChatMessage:
         lowered = self.text.strip().lower()
         if lowered in {"-m", "-c", "...", "[message]", "placeholder"}:
             raise ValueError(f"Chat message looks like a placeholder: {self.text!r}")
@@ -125,6 +126,7 @@ class ChatMessage(BaseModel):
 
 class ChatBurst(BaseModel):
     """A clinical team discussion: debrief, case conference, team huddle, supervision chat."""
+
     id: str
     event_id: str | None = None
     room: str
@@ -134,7 +136,7 @@ class ChatBurst(BaseModel):
     discussion_type: str = "debrief"  # debrief | case_conference | huddle | supervision | crisis_response
 
     @model_validator(mode="after")
-    def validate_id_shape(self) -> "ChatBurst":
+    def validate_id_shape(self) -> ChatBurst:
         parts = self.id.split("-")
         if len(parts) < 5:
             raise ValueError(f"Chat id has unexpected shape: {self.id}")
@@ -325,7 +327,7 @@ class AdversarialReviewReport(BaseModel):
 class PersonaJudgeResult(BaseModel):
     persona: str  # "Voice Fidelity Auditor" | "Clinical Accuracy Reviewer" | "Training Signal Engineer"
     passed: bool
-    score: float  # 0.0–1.0
+    score: float  # 0.0-1.0
     notes: str
     flagged_ids: list[str]
 
@@ -337,6 +339,6 @@ class AdversarialLLMReviewReport(BaseModel):
     generated_at: datetime = Field(default_factory=datetime.utcnow)
 
     @model_validator(mode="after")
-    def derive_passed(self) -> "AdversarialLLMReviewReport":
+    def derive_passed(self) -> AdversarialLLMReviewReport:
         self.passed = all(r.passed for r in self.persona_results)
         return self

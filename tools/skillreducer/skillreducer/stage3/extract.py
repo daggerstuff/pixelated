@@ -5,8 +5,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from skillreducer.config import Config
-from skillreducer.llm.client import LLMClient
 from skillreducer.llm import prompts
+from skillreducer.llm.client import LLMClient
 from skillreducer.stage3.scan import (
     CodeBlock,
     is_python_lang,
@@ -56,9 +56,7 @@ def extract_scripts_from_markdown(
         approved = [d for d in decisions if d.extract]
         if not approved:
             updated_files[filename] = content
-            notes.append(
-                f"Stage 3: 0/{len(blocks)} script blocks extracted from {filename}"
-            )
+            notes.append(f"Stage 3: 0/{len(blocks)} script blocks extracted from {filename}")
             continue
 
         new_content = content
@@ -72,9 +70,13 @@ def extract_scripts_from_markdown(
                 block.language,
                 used_script_names,
             )
-            replacement = decision.replacement.strip() or _default_run_reference(script_name, block.language)
+            replacement = decision.replacement.strip() or _default_run_reference(
+                script_name, block.language
+            )
             new_content = new_content[: block.start] + replacement + new_content[block.end :]
-            scripts[f"scripts/{script_name}"] = _prepare_script_content(block.content, block.language)
+            scripts[f"scripts/{script_name}"] = _prepare_script_content(
+                block.content, block.language
+            )
             extracted_count += 1
 
         updated_files[filename] = new_content
@@ -108,9 +110,7 @@ def _llm_review(
     blocks: list[CodeBlock],
     llm: LLMClient,
 ) -> list[BlockDecision] | None:
-    numbered = "\n\n".join(
-        _format_block_for_prompt(block) for block in blocks
-    )
+    numbered = "\n\n".join(_format_block_for_prompt(block) for block in blocks)
     try:
         result = llm.complete_json(
             prompts.REVIEW_SCRIPT_EXTRACTION.format(filename=filename, blocks=numbered)
@@ -169,7 +169,9 @@ def _heuristic_review(
             BlockDecision(
                 index=block.index,
                 extract=extract,
-                reason="heuristic: meets structural extraction criteria" if extract else "heuristic: keep inline",
+                reason="heuristic: meets structural extraction criteria"
+                if extract
+                else "heuristic: keep inline",
                 script_name=script_name,
                 replacement=replacement,
             )
@@ -181,9 +183,7 @@ def _heuristic_should_extract(content: str, language: str, min_script_tokens: in
     if count_tokens(content) < min_script_tokens:
         return False
     lines = [
-        line
-        for line in content.splitlines()
-        if line.strip() and not line.strip().startswith("#")
+        line for line in content.splitlines() if line.strip() and not line.strip().startswith("#")
     ]
     if len(lines) < 2:
         return False

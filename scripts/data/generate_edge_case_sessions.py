@@ -290,7 +290,7 @@ def generate_edge_case_session(category: str, rng: random.Random) -> dict[str, l
         )
 
     elif category == "stubborn_nightmare":
-        stub_name, user_input, therapist_strategy = rng.choice(STUBBORN_CLIENT_TYPES)
+        _stub_name, user_input, _therapist_strategy = rng.choice(STUBBORN_CLIENT_TYPES)
 
         user_prompt_1 = user_input
         asst_resp_1 = (
@@ -314,7 +314,7 @@ def generate_edge_case_session(category: str, rng: random.Random) -> dict[str, l
         )
 
     elif category == "unwinnable_tragedy":
-        trag_name, user_input, therapist_strategy = rng.choice(UNWINNABLE_TRAGEDY_TYPES)
+        _trag_name, user_input, _therapist_strategy = rng.choice(UNWINNABLE_TRAGEDY_TYPES)
 
         user_prompt_1 = user_input
         asst_resp_1 = (

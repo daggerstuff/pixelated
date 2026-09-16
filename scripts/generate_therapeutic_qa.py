@@ -100,7 +100,7 @@ def detect_theme(text: str) -> str:
     return "general"
 
 
-def generate_question(passage: str, theme: str, channel: str) -> str:
+def generate_question(passage: str, theme: str, _channel: str) -> str:
     """Generate a realistic therapeutic question based on content."""
     import random
 
@@ -258,7 +258,7 @@ def main() -> None:
             f.write(json.dumps(pair) + "\n")
 
     if args.sample and all_pairs:
-        for i, pair in enumerate(all_pairs[:3], 1):
+        for _i, _pair in enumerate(all_pairs[:3], 1):
             pass
 
 
