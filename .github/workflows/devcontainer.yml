@@ -55,4 +55,10 @@ jobs:
 
       - name: Always stop the container
         if: always()
-        run: npx --yes @devcontainers/cli down --workspace-folder "$PWD" --discard
+        # @devcontainers/cli 0.89 has no `down` command; tear down the
+        # compose project directly. The runner is ephemeral, so a broad
+        # teardown is safe here.
+        run: |
+          docker ps -aq | xargs -r docker rm -f
+          docker volume prune -f
+          docker image prune -f
