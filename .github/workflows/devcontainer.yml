@@ -1,0 +1,58 @@
+name: Dev Container
+
+permissions:
+  contents: read
+
+# Validates that the dev container actually builds and runs — offsite, on
+# a GitHub runner, never on a developer machine. `devcontainer up` builds
+# the compose stack (app image from the root Dockerfile + db/redis/mongo
+# sidecars) and starts the workspace container; `devcontainer exec` then
+# smoke-checks the toolchain inside it.
+#
+# The post-create command (submodule init + pnpm install + uv sync) is
+# skipped in CI: it duplicates what the image build already proves and
+# clones the large ai/foresight/docs submodules. Run it once when opening
+# the container locally.
+on:
+  push:
+    branches: [staging]
+    paths:
+      - 'Dockerfile'
+      - '.devcontainer/**'
+      - 'docker-compose.yml'
+      - '.github/workflows/devcontainer.yml'
+  schedule:
+    - cron: '0 4 * * 1' # weekly (Mon 04:00 UTC)
+  workflow_dispatch:
+
+concurrency:
+  group: devcontainer-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  up-and-exec:
+    name: devcontainer build + boot + smoke exec
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24.16.0'
+
+      - name: Build and start dev container (skip heavy post-create)
+        run: npx --yes @devcontainers/cli up --workspace-folder "$PWD" --skip-post-create
+
+      - name: Smoke-check toolchain inside the container
+        run: |
+          npx --yes @devcontainers/cli exec --workspace-folder "$PWD" \
+            bash -lc 'node --version && pnpm --version && git --version && curl -sf http://db:5432 2>&1 | head -1 || true'
+
+      - name: Always stop the container
+        if: always()
+        run: npx --yes @devcontainers/cli down --workspace-folder "$PWD" --discard

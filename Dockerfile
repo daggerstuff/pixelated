@@ -24,6 +24,9 @@ RUN npm install -g pnpm@$PNPM_VERSION
 # Copy package manifests for dependency installation
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 COPY patches ./patches
+# The root postinstall (scripts/fix-astro-vercel-nft.mjs) runs during
+# pnpm install and needs scripts/ present
+COPY scripts ./scripts
 COPY config/package/.npmrc ./.npmrc
 COPY packages/pixelated-sdk/package.json ./packages/pixelated-sdk/package.json
 COPY packages/memory-schema/package.json ./packages/memory-schema/package.json

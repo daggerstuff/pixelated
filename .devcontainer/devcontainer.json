@@ -6,12 +6,9 @@
   // docker-compose.yml mounts the repo at /app inside the `app` service.
   "workspaceFolder": "/app",
 
-  // The root Dockerfile provides Node 24 + pnpm; uv provides Python 3.13
-  // for the pe FastAPI service and the bias-detection services.
-  "features": {
-    "ghcr.io/devcontainer/features/git:1": {},
-    "ghcr.io/astral-sh/devcontainer-uv:latest": {}
-  },
+  // The root Dockerfile already provides Node 24, pnpm, git, python3, and
+  // build tooling; uv is installed via the official installer below.
+  "features": {},
 
   "forwardPorts": [5173, 5432, 6379, 27017],
   "portsAttributes": {
@@ -21,7 +18,7 @@
     "27017": { "label": "MongoDB" }
   },
 
-  "postCreateCommand": "git submodule update --init --recursive && pnpm install && uv sync",
+  "postCreateCommand": "git submodule update --init --recursive && pnpm install && curl -LsSf https://astral.sh/uv/install.sh | sh && ~/.local/bin/uv sync",
 
   "customizations": {
     "vscode": {
