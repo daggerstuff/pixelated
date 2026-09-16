@@ -32,10 +32,13 @@ import {
   UseChatWithMemoryReturn,
 } from '@/hooks/useChatWithMemory'
 import { authClient } from '@/lib/auth-client'
+import { EmotionClassifier } from '@/lib/memory/emotion-classifier'
 import { cn } from '@/lib/utils'
 import type { Message } from '@/types/chat'
 
 import { ChatContainer } from './ChatContainer'
+
+const emotionClassifier = new EmotionClassifier()
 
 interface MemoryAwareChatSystemProps {
   className?: string
@@ -63,7 +66,13 @@ export function MemoryAwareChatSystem({
   const [showSettings, setShowSettings] = useState(false)
   const [conversationSummary, setConversationSummary] = useState<string>('')
 
-  const { messages, isLoading, sendMessage, memory }: UseChatWithMemoryReturn =
+  const {
+    messages,
+    isLoading,
+    sendMessage,
+    setMessages,
+    memory,
+  }: UseChatWithMemoryReturn =
     useChatWithMemory({
       sessionId: sessionId!,
       enableMemory,
@@ -73,10 +82,45 @@ export function MemoryAwareChatSystem({
     })
 
   const getConversationSummary = async () => {
-    // This is a placeholder. In a real implementation, you might call an API.
-    return `This has been a productive conversation about ${
-      memory.stats?.totalMemories
-    } topics.`
+    if (messages.length === 0) {
+      return 'This conversation has not started yet.'
+    }
+
+    const userMessages = messages.filter((m) => m.role === 'user')
+    const results = emotionClassifier.classifyBatch(
+      userMessages.map((m) => m.content),
+    )
+    const trajectory = emotionClassifier.sessionTrajectory(results)
+
+    const categoryCounts = new Map<string, number>()
+    for (const result of results) {
+      for (const category of result.categories) {
+        categoryCounts.set(category, (categoryCounts.get(category) ?? 0) + 1)
+      }
+    }
+    const themes = [...categoryCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([category]) => category)
+
+    const parts = [
+      `${messages.length} messages exchanged (${userMessages.length} from you)`,
+    ]
+    if (themes.length > 0) {
+      parts.push(`emotional themes: ${themes.join(', ')}`)
+    }
+    if (userMessages.length > 0) {
+      parts.push(`affective trend: ${trajectory.trend}`)
+    }
+    if (trajectory.crisisIndicators.length > 0) {
+      parts.push(
+        `crisis indicators: ${[...new Set(trajectory.crisisIndicators)].join(', ')}`,
+      )
+    }
+    if (memory.memories.length > 0) {
+      parts.push(`${memory.memories.length} memories retained`)
+    }
+    return `This conversation has ${parts.join('; ')}.`
   }
 
   // Generate conversation summary when messages change
@@ -249,15 +293,20 @@ export function MemoryAwareChatSystem({
   }
 
   const handleRegenerate = () => {
-    // This is a placeholder. A real implementation would be more complex.
-    if (messages.length > 0) {
-      void sendMessage('Please regenerate the last response.')
+    const lastUserIndex = messages.map((m) => m.role).lastIndexOf('user')
+    if (lastUserIndex === -1) {
+      return
     }
+    const messageToResend = messages[lastUserIndex]
+    setMessages(messages.slice(0, lastUserIndex))
+    void sendMessage(messageToResend.content)
   }
 
   const handleClear = () => {
-    // This is a placeholder.
-    // In a real implementation, you might want to confirm with the user.
+    if (!window.confirm('Clear all messages and stored memories for this session?')) {
+      return
+    }
+    setMessages([])
     memory.clearMemories()
   }
 
@@ -332,7 +381,7 @@ export function MemoryAwareChatSystem({
               Clear
             </Button>
           </TooltipTrigger>
-          <TooltipContent>Clear all messages</TooltipContent>
+          <TooltipContent>Clear all messages and memories</TooltipContent>
         </Tooltip>
       </TooltipProvider>
     </div>
