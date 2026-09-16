@@ -1,0 +1,48 @@
+name: Backlog Groom
+
+permissions:
+  issues: write
+  pull-requests: write
+
+# Backlog health: ~half of open issues sit untouched for 90+ days. This
+# weekly groom marks anything inactive for 60 days as stale and closes it
+# 14 days later if nobody pushed back. Clinical-safety, security, compliance,
+# and Linear-synced issues are exempt — those are long-lived by design and
+# must never be auto-closed.
+on:
+  schedule:
+    - cron: '0 5 * * 1' # Mondays 05:00 UTC
+  workflow_dispatch:
+
+jobs:
+  stale:
+    name: Mark stale and close abandoned
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v10
+        with:
+          days-before-stale: 60
+          days-before-close: 14
+          stale-issue-label: 'stale'
+          exempt-issue-labels: 'safety-critical,security,compliance,linear-synced'
+          exempt-pr-labels: 'safety-critical,security,compliance,linear-synced'
+          stale-issue-message: >-
+            This issue has had no activity for 60 days and is being marked
+            stale. If it still matters, comment or update it — otherwise it
+            will be closed in 14 days. Safety-critical, security, compliance,
+            and Linear-synced issues are exempt from grooming.
+          stale-pr-message: >-
+            This PR has had no activity for 60 days and is being marked
+            stale. If it's still being worked on, comment or push — otherwise
+            it will be closed in 14 days.
+          close-issue-message: >-
+            Closed automatically after 14 additional days of inactivity.
+            Reopen with a comment if this is still relevant.
+          close-pr-message: >-
+            Closed automatically after 14 additional days of inactivity.
+            Reopen with a comment or fresh commits if this is still relevant.
+          days-before-pr-stale: 60
+          days-before-pr-close: 14
+          remove-stale-when-updated: true
+          operations-per-run: 100
+          enable-statistics: true
