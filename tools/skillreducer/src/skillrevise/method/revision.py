@@ -14,7 +14,7 @@ from skillrevise.core.models import (
 )
 from skillrevise.llm import LLMClient
 from skillrevise.method.authoring import AuthoringPrior, SkillConstraintChecker
-from skillrevise.method.principles import PrincipleBank
+from skillrevise.method.principles import PrincipleBank, PrincipleRetrievalCandidate
 from skillrevise.method.skill_parser import parse_skill_markdown
 
 REVISION_ABLATIONS = frozenset({"none", "no-execution-anchors", "no-preserve-ledger"})
@@ -267,7 +267,7 @@ class LLMRevisionEngine:
         skill: Skill,
         diagnosis: DiagnosisReport,
         *,
-        principle_candidates: list[RepairPrinciple],
+        principle_candidates: list[PrincipleRetrievalCandidate],
         using_principle_memory: bool = True,
     ) -> str:
         evidence = (

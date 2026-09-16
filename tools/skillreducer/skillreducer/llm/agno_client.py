@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from skillreducer.llm.client import LLMClient
 from skillreducer.llm.json_util import parse_llm_json
 
 try:
@@ -14,8 +15,13 @@ except ImportError:  # pragma: no cover
     _AGENT_AVAILABLE = False
 
 
-class AgnoLLMClient:
-    """Expose complete/complete_json so stage modules can call an Agno agent."""
+class AgnoLLMClient(LLMClient):
+    """Expose complete/complete_json so stage modules can call an Agno agent.
+
+    Nominal subclass of LLMClient so it is accepted wherever the stage
+    helpers take ``LLMClient | None``; it never builds an OpenAI client and
+    overrides the full call surface.
+    """
 
     def __init__(self, agent: Agent) -> None:
         self._agent = agent

@@ -42,7 +42,10 @@ const EXEMPT_TREES = ['scripts', 'tools']
 const MYPY_CONFIG = `[mypy]
 python_version = 3.13
 ignore_missing_imports = True
-mypy_path = stubs
+# stubs: local stubs. The two tools/skillreducer roots make the skillreducer
+# and skillrevise packages resolve as typed imports instead of Any, so
+# cross-module calls inside tools/ are checked rather than silently untyped.
+mypy_path = stubs:tools/skillreducer:tools/skillreducer/src
 strict = True
 `
 

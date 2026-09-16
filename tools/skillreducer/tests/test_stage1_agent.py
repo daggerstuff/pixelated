@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from skillreducer.config import Config
 from skillreducer.parser import parse_skill_md
 from skillreducer.stage1.agent import Stage1RoutingAgent
@@ -12,6 +14,7 @@ from skillreducer.stage1.agent import Stage1RoutingAgent
 def test_stage1_routing_agent_run_short_description(
     mock_create_agent: MagicMock,
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     skill_dir = tmp_path / "my-skill"
     skill_dir.mkdir()
@@ -29,9 +32,13 @@ def test_stage1_routing_agent_run_short_description(
     routing_agent._llm.complete_json.return_value = {
         "description": "Processes things. Use when user mentions things."
     }
-    routing_agent.generate = MagicMock(return_value="Processes things. Use when needed.")
-    routing_agent.compress = MagicMock(
-        return_value=("Processes things. Use when needed.", ["Stage 1: compressed"])
+    monkeypatch.setattr(
+        routing_agent, "generate", MagicMock(return_value="Processes things. Use when needed.")
+    )
+    monkeypatch.setattr(
+        routing_agent,
+        "compress",
+        MagicMock(return_value=("Processes things. Use when needed.", ["Stage 1: compressed"])),
     )
 
     skill = parse_skill_md(skill_dir)

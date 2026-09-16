@@ -16,7 +16,7 @@ from skillrevise.benchmarks.skillsbench import (
 )
 from skillrevise.benchmarks.skillsbench_adapter import CommandAgentHarness, SkillsBenchAgentAdapter
 from skillrevise.benchmarks.verifier import CommandVerifier
-from skillrevise.core.agents import MockAgentAdapter
+from skillrevise.core.agents import AgentAdapter, MockAgentAdapter
 from skillrevise.core.artifacts import ArtifactStore
 from skillrevise.core.env import get_env
 from skillrevise.core.io import load_tasks, to_jsonable, write_json
@@ -31,17 +31,19 @@ from skillrevise.method.authoring import (
     LLMSkillAuthor,
     NaiveSkillAuthoringPromptBuilder,
     PriorGuidedSkillAuthor,
+    SkillAuthor,
     SkillAuthoringPromptBuilder,
     SkillCreatorPromptBuilder,
     TemplateSkillAuthor,
 )
-from skillrevise.method.diagnosis import HeuristicDiagnoser, LLMDiagnoser, NoOpDiagnoser
+from skillrevise.method.diagnosis import Diagnoser, HeuristicDiagnoser, LLMDiagnoser, NoOpDiagnoser
 from skillrevise.method.principles import PrincipleAbsorber, PrincipleBank, PrincipleRetrievalConfig
 from skillrevise.method.revision import (
     REVISION_ABLATIONS,
     FreeFormLLMRevisionEngine,
     HeuristicRevisionEngine,
     LLMRevisionEngine,
+    RevisionEngine,
 )
 
 
@@ -455,7 +457,7 @@ def main() -> None:
     if args.harness_command:
         artifact_store = ArtifactStore(args.artifacts_root) if args.artifacts_root else None
         verifier = CommandVerifier(args.verifier_command) if args.verifier_command else None
-        adapter = SkillsBenchAgentAdapter(
+        adapter: AgentAdapter = SkillsBenchAgentAdapter(
             harness=CommandAgentHarness(args.harness_command),
             artifact_store=artifact_store,
             verifier=verifier,
@@ -548,8 +550,11 @@ def main() -> None:
     )
 
     if args.initial_skill:
-        author = FileSkillAuthor(args.initial_skill, version=args.initial_skill_version)
+        author: SkillAuthor = FileSkillAuthor(
+            args.initial_skill, version=args.initial_skill_version
+        )
     elif args.author_mode in {"llm", "llm-principle", "llm-principle-bank"}:
+        assert llm is not None  # guaranteed by the --llm-command validation above
         authoring_principle_bank = (
             principle_bank
             if args.author_mode == "llm-principle-bank" and not args.disable_principle_memory
@@ -565,6 +570,7 @@ def main() -> None:
             allow_fallback=not args.strict_llm,
         )
     elif args.author_mode == "llm-naive":
+        assert llm is not None  # guaranteed by the --llm-command validation above
         author = LLMSkillAuthor(
             llm,
             prompt_builder=NaiveSkillAuthoringPromptBuilder(),
@@ -572,6 +578,7 @@ def main() -> None:
             allow_fallback=not args.strict_llm,
         )
     elif args.author_mode == "llm-skill-creator":
+        assert llm is not None  # guaranteed by the --llm-command validation above
         author = LLMSkillAuthor(
             llm,
             prompt_builder=SkillCreatorPromptBuilder(),
@@ -584,17 +591,20 @@ def main() -> None:
         author = TemplateSkillAuthor()
 
     if args.diagnosis_mode == "llm":
-        diagnoser = LLMDiagnoser(llm)
+        assert llm is not None  # guaranteed by the --llm-command validation above
+        diagnoser: Diagnoser = LLMDiagnoser(llm)
     elif args.diagnosis_mode == "none":
         diagnoser = NoOpDiagnoser()
     else:
         diagnoser = HeuristicDiagnoser()
     if args.revision_mode == "llm-freeform":
-        reviser = FreeFormLLMRevisionEngine(
+        assert llm is not None  # guaranteed by the --llm-command validation above
+        reviser: RevisionEngine = FreeFormLLMRevisionEngine(
             llm,
             allow_fallback=not args.strict_llm,
         )
     elif args.revision_mode in {"llm", "llm-structured", "llm-principle-bank"}:
+        assert llm is not None  # guaranteed by the --llm-command validation above
         reviser = LLMRevisionEngine(
             llm,
             principle_bank=principle_bank,
