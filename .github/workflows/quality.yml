@@ -102,6 +102,9 @@ jobs:
       - name: mypy --strict (pe service)
         run: bash scripts/ci/python-typecheck.sh
 
+      - name: Python strict ratchet (new files in legacy-exempt trees)
+        run: node scripts/ci/python-strict-ratchet.mjs
+
       - name: Python correctness ratchet (F821/F401/E722/B904)
         run: node scripts/ci/python-ruff-audit.mjs
 

@@ -8,6 +8,11 @@
 # scripts/ci/ts-strict-mode-tracker.ts): strict where it is enforced today,
 # documented exemptions for legacy trees, and a clear path to widen the net.
 #
+# The exemption is non-expanding: scripts/ci/python-strict-ratchet.mjs (run
+# right after this check in CI) pins every legacy file in
+# scripts/ci/python-strict-baseline.json and fails when a NEW .py file in the
+# exempt trees is not strict-clean.
+#
 # A CI-visible summary line is printed so the check is easy to locate in logs.
 
 set -uo pipefail
