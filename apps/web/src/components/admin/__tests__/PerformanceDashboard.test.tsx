@@ -149,16 +149,11 @@ describe('PerformanceDashboard', () => {
         screen.getByText('No metrics recorded for this time range.'),
       ).toBeInTheDocument()
     })
-    expect(
-      screen.getByText('No model data available.'),
-    ).toBeInTheDocument()
+    expect(screen.getByText('No model data available.')).toBeInTheDocument()
   })
 
   it('shows an error banner with retry when the API fails', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockRejectedValue(new Error('API is down')),
-    )
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('API is down')))
     render(<PerformanceDashboard />)
 
     await waitFor(() => {

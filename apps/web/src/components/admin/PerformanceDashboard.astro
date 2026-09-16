@@ -14,8 +14,4 @@ export interface Props {
 const { initialTimeRange = '24h', refreshIntervalMs } = Astro.props
 ---
 
-<PerformanceDashboard
-  client:load
-  initialTimeRange={initialTimeRange}
-  refreshIntervalMs={refreshIntervalMs}
-/>
+<PerformanceDashboard client:load {initialTimeRange} {refreshIntervalMs} />
