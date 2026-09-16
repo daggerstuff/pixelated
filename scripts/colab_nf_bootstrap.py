@@ -8,6 +8,7 @@ model, and runs the Stage-3 generator against the local vLLM endpoint
 
 from __future__ import annotations
 
+import importlib
 import os
 import shutil
 import subprocess
@@ -16,6 +17,7 @@ import tarfile
 import threading
 import time
 import urllib.request
+from contextlib import suppress
 from typing import Any
 
 try:
@@ -23,10 +25,11 @@ try:
 except ImportError:
     weave = None
 
-try:
-    from langsmith.run_trees import RunTree
-except ImportError:
-    RunTree = None
+# LangSmith's RunTree is optional at import time (Colab may not have langsmith
+# installed yet); bind the class when available, else None.
+RunTree: Any = None
+with suppress(ImportError):
+    RunTree = importlib.import_module("langsmith.run_trees").RunTree
 
 ENV_FILE = "/content/nf_env"
 TARBALL = "/content/nf_code.tar.gz"

@@ -9,7 +9,9 @@ import logging
 import math
 import os
 import random
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, cast
 
 import art
 import weave
@@ -17,6 +19,16 @@ from art.serverless.backend import ServerlessBackend
 from openai import AsyncOpenAI
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
+
+
+def _typed_op[F: Callable[..., object]](func: F) -> F:
+    """Typed pass-through for the untyped ``weave.op`` decorator.
+
+    weave ships no type information, so applying ``@weave.op()`` directly
+    erases the decorated function's signature for mypy. Anchoring the
+    decorator result keeps the wrapped functions fully typed.
+    """
+    return cast(F, weave.op()(func))
 
 
 # Suppress harmless W&B artifact-pruning warnings from serverless backend
@@ -54,7 +66,7 @@ LEARNING_RATE = 1e-5
 MAX_RL_STEPS = 5000
 
 
-@weave.op()
+@_typed_op
 def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
     res_words = response.lower().split()
     exp_words = expected.lower().split()
@@ -69,8 +81,8 @@ def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
     return intersection / union if union > 0 else 0.0
 
 
-@weave.op()
-async def rollout(model: art.Model, messages: list, step: int = 0) -> art.Trajectory:
+@_typed_op
+async def rollout(model: art.Model, messages: list[dict[str, Any]], step: int = 0) -> art.Trajectory:
     context = messages[:-1] if len(messages) > 1 else messages
     expected = messages[-1]["content"] if messages else ""
 
@@ -107,7 +119,7 @@ async def rollout(model: art.Model, messages: list, step: int = 0) -> art.Trajec
     return trajectory
 
 
-@weave.op()
+@_typed_op
 def log_rl_step(
     step: int,
     avg_reward: float,
@@ -115,7 +127,7 @@ def log_rl_step(
     expected_len: float,
     length_ratio: float,
     overlap: float,
-) -> dict:
+) -> dict[str, Any]:
     """Log per-step RL metrics to Weave."""
     return {
         "step": step,
@@ -127,7 +139,7 @@ def log_rl_step(
     }
 
 
-async def main():
+async def main() -> None:
     weave.init(PROJECT)
     logging.info("Loading dataset...")
     examples = []

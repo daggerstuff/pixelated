@@ -11,9 +11,11 @@ import os
 import signal
 import tempfile
 from pathlib import Path
+from types import FrameType
+from typing import Any
 
 import art
-import httpx
+import httpx2 as httpx
 import weave
 from art.serverless.backend import ServerlessBackend
 from art.utils.sft import train_sft_from_file
@@ -53,7 +55,7 @@ SUPERVISE = os.environ.get("SUPERVISE", "1") == "1"
 SHUTDOWN = asyncio.Event()
 
 
-def _handle_signal(signum, _frame):
+def _handle_signal(signum: int, _frame: FrameType | None) -> None:
     logging.info(f"Received signal {signum}, shutting down gracefully...")
     SHUTDOWN.set()
 
@@ -62,17 +64,18 @@ signal.signal(signal.SIGINT, _handle_signal)
 signal.signal(signal.SIGTERM, _handle_signal)
 
 
-def load_checkpoint() -> dict:
+def load_checkpoint() -> dict[str, Any]:
     if os.path.exists(CHECKPOINT_PATH):
         try:
             with open(CHECKPOINT_PATH) as f:
-                return json.load(f)
+                checkpoint: dict[str, Any] = json.load(f)
+                return checkpoint
         except Exception:
             logging.warning("Failed to load checkpoint, starting fresh.")
     return {}
 
 
-def save_checkpoint(step: int):
+def save_checkpoint(step: int) -> None:
     data = {
         "model_name": MODEL_NAME,
         "last_completed_step": step,
@@ -83,7 +86,7 @@ def save_checkpoint(step: int):
     logging.info(f"Checkpoint saved: step {step}")
 
 
-async def _train_once(examples: list, dataset_path: str):
+async def _train_once(examples: list[list[dict[str, Any]]], dataset_path: str) -> None:
     """Single training attempt. Raises on unrecoverable failure."""
     weave.init(PROJECT)
     logging.info("Loading model...")
@@ -114,7 +117,7 @@ async def _train_once(examples: list, dataset_path: str):
         ),
     )
     # Monkey-patch backend inference name so rollouts use the Ollama model name
-    backend._model_inference_name = lambda _model, step=None: ollama_model  # type: ignore[method-assign]
+    backend._model_inference_name = lambda _model, step=None: ollama_model
     logging.info(f"Inference overridden to Ollama: {ollama_base_url} model={ollama_model}")
 
     wandb_step = await model.get_step()
@@ -208,7 +211,7 @@ async def _train_once(examples: list, dataset_path: str):
     logging.info("RL training complete!")
 
 
-async def main():
+async def main() -> None:
     logging.info("Loading dataset...")
     examples = load_dataset(DATASET_PATH)
     logging.info(f"Loaded {len(examples)} total examples.")

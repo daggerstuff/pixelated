@@ -1,18 +1,19 @@
 import json
 import re
+from typing import Any
 
 
-def main():
+def main() -> None:
     with open("exports/current_linear_issues.json") as f:
         issues = json.load(f)
 
     active_statuses = {"Todo", "In Progress", "Triage", "Backlog"}
     active = [i for i in issues if (i.get("state") or {}).get("name") in active_statuses]
 
-    mismatches = []
-    boilerplates = []
-    placeholders = []
-    others = []
+    mismatches: list[tuple[str, str, Any]] = []
+    boilerplates: list[tuple[str, str, Any]] = []
+    placeholders: list[tuple[str, str, Any]] = []
+    others: list[tuple[str, str, Any]] = []
 
     for i in active:
         title = i.get("title") or ""

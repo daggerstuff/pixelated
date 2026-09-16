@@ -21,6 +21,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Any
 
 script_dir = Path(__file__).resolve().parent
 project_root = script_dir.parents[1]
@@ -36,10 +37,10 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 
-def parse_hh_rlhf(text: str) -> list[dict] | None:
+def parse_hh_rlhf(text: str) -> list[dict[str, str]] | None:
     """Parse Anthropic hh-rlhf Human/Assistant dialogue text."""
     turns = text.split("\n\n")
-    messages = []
+    messages: list[dict[str, str]] = []
     for turn in turns:
         turn = turn.strip()
         if turn.startswith("Human:"):
@@ -53,12 +54,12 @@ def parse_hh_rlhf(text: str) -> list[dict] | None:
     return messages if len(messages) >= 2 else None
 
 
-def main():
+def main() -> None:
     logger.info("=== Starting Dataset Expansion for Large Training Budget ===")
     quality = QualityFilter()
 
     local_file = project_root / "dataset/final_dataset.jsonl"
-    existing_records = []
+    existing_records: list[dict[str, Any]] = []
     if local_file.exists():
         with open(local_file, encoding="utf-8") as f:
             for line in f:
@@ -71,7 +72,7 @@ def main():
                         pass
         logger.info("Loaded %d existing clean records into QualityFilter state.", len(existing_records))
 
-    new_records = []
+    new_records: list[dict[str, Any]] = []
 
     # 1. Anthropic HH-RLHF (160,800 multi-turn helpful/harmless dialogues)
     logger.info("Ingesting Anthropic/hh-rlhf ...")

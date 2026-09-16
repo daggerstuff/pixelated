@@ -14,18 +14,18 @@ logger = logging.getLogger("long_session_gen")
 
 
 class LongSessionGenerator:
-    def __init__(self, output_path: str = "ai/training/ready_packages/datasets/synthetic/long_sessions.jsonl"):
+    def __init__(self, output_path: str = "ai/training/ready_packages/datasets/synthetic/long_sessions.jsonl") -> None:
         self.output_path = Path(output_path)
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def generate_sessions(self, count: int = 20, min_turns: int = 25, max_turns: int = 50):
+    def generate_sessions(self, count: int = 20, min_turns: int = 25, max_turns: int = 50) -> None:
         logger.info(f"Generating {count} long therapy sessions with {min_turns}-{max_turns} turns (Realistic Depth)...")
 
         sessions_generated = 0
         with open(self.output_path, "w", encoding="utf-8") as f:
             for i in range(count):
                 turn_count = random.randint(min_turns, max_turns)
-                conversation = []
+                conversation: list[dict[str, str]] = []
                 for turn in range(turn_count):
                     role = "user" if turn % 2 == 0 else "assistant"
                     content = f"Turn {turn + 1} of complex therapeutic dialogue."

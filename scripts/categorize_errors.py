@@ -13,9 +13,9 @@ errors = re.findall(r"^(src/[^:]+:\d+:\d+) - error ts(\d+): (.*)", content, re.M
 print(f"Total error lines found: {len(errors)}")
 print()
 
-file_counts = Counter()
-code_counts = Counter()
-file_details = {}
+file_counts: Counter[str] = Counter()
+code_counts: Counter[str] = Counter()
+file_details: dict[str, Counter[str]] = {}
 
 # TODO: handle empty error list edge case — should print "No errors found" instead of empty sections
 for loc, code, _ in errors:

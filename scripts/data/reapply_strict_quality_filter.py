@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main() -> None:
     logger.info("=== Re-filtering Dataset with Enhanced Strict QualityFilter ===")
     quality = QualityFilter()
 
