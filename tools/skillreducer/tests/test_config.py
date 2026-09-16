@@ -28,22 +28,6 @@ from skillreducer.model import (
 )
 
 
-@pytest.fixture(autouse=True)
-def clear_credential_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delenv("api_key", raising=False)
-    monkeypatch.delenv("api_base_url", raising=False)
-    monkeypatch.delenv("compression_model", raising=False)
-    monkeypatch.delenv("compression", raising=False)
-    monkeypatch.delenv("routing_model", raising=False)
-    monkeypatch.delenv("routing_oracle", raising=False)
-    monkeypatch.delenv("evaluation_model", raising=False)
-    monkeypatch.delenv("evaluation", raising=False)
-    monkeypatch.delenv("azure_subscription", raising=False)
-    monkeypatch.delenv("azure_endpoint", raising=False)
-    monkeypatch.delenv("api_version", raising=False)
-    monkeypatch.delenv("azure_api_version", raising=False)
-
-
 def test_load_dotenv_finds_env_in_parent_directory(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
