@@ -17,14 +17,14 @@ from typing import Any
 
 from pixelated_empathy.monthly_llm_generator import generate_batch
 from pixelated_empathy.schemas import (
+    MONTH_ORDER,
+    MONTH_TARGETS,
     BatchSpec,
     ChatBurst,
     EmailRecord,
     LLMGenerationReport,
     MonthBible,
     MonthEnrichment,
-    MONTH_ORDER,
-    MONTH_TARGETS,
 )
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,8 @@ def _load_checkpoint(work_dir: Path, batch_id: str) -> list[dict[str, Any]] | No
     if not path.exists():
         return None
     try:
-        return json.loads(path.read_text())
+        records: list[dict[str, Any]] = json.loads(path.read_text())
+        return records
     except Exception:
         return None
 
@@ -226,14 +227,10 @@ def launch(
         # We always overwrite (never append) so that idempotent re-runs
         # produce exactly the records held in checkpoints — no duplicates.
         emails_path = work_dir / "generated_emails.json"
-        emails_path.write_text(
-            json.dumps([e.model_dump() for e in all_emails], indent=2, default=str)
-        )
+        emails_path.write_text(json.dumps([e.model_dump() for e in all_emails], indent=2, default=str))
 
         chats_path = work_dir / "generated_chat_bursts.json"
-        chats_path.write_text(
-            json.dumps([c.model_dump() for c in all_chat_bursts], indent=2, default=str)
-        )
+        chats_path.write_text(json.dumps([c.model_dump() for c in all_chat_bursts], indent=2, default=str))
 
         if lock_path.exists():
             lock_path.unlink()

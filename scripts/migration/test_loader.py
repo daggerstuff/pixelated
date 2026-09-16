@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("s3_loader_test")
 
 
-def attempt_load(name, stage=None, category=None):
+def attempt_load(name: str, stage: str | None = None, category: str | None = None) -> bool:
     logger.info(f"Testing load: {name} (Stage: {stage})")
     try:
         data = load_dataset_from_s3(name)
@@ -32,7 +32,7 @@ def attempt_load(name, stage=None, category=None):
         return False
 
 
-def main():
+def main() -> None:
     logger.info("--- Testing S3 Dataset Loader ---")
 
     # 1. Test Foundation (Professional)

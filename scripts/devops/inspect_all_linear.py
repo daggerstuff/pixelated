@@ -8,7 +8,7 @@ sys.path.insert(0, os.getcwd())
 from scripts.task_sync.provider_bridge import export_linear_issues
 
 
-def main():
+def main() -> None:
     logging.basicConfig(level=logging.INFO)
     issues = export_linear_issues()
 

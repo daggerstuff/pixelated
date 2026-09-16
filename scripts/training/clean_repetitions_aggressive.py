@@ -31,7 +31,7 @@ def detect_word_repetition(text: str) -> tuple[bool, str]:
             return True, f"Word repetition: '{words[i]}' x3"
 
     # Check for same word appearing 5+ times within 10-word window
-    word_positions = {}
+    word_positions: dict[str, list[int]] = {}
     for i, word in enumerate(words):
         if word not in word_positions:
             word_positions[word] = []
@@ -199,7 +199,7 @@ def clean_sample(sample: dict[str, Any]) -> tuple[bool, list[str]]:
     return len(reasons) > 0, reasons
 
 
-def clean_file(input_path: str, output_path: str, report_path: str | None = None) -> dict:
+def clean_file(input_path: str, output_path: str, report_path: str | None = None) -> dict[str, Any]:
     """
     Clean a training data file.
 
@@ -217,7 +217,7 @@ def clean_file(input_path: str, output_path: str, report_path: str | None = None
     # Clean
     cleaned = []
     removed_samples = []
-    reason_counter = Counter()
+    reason_counter: Counter[str] = Counter()
 
     for i, sample in enumerate(data):
         should_remove, reasons = clean_sample(sample)
@@ -265,7 +265,7 @@ def clean_file(input_path: str, output_path: str, report_path: str | None = None
     return stats
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Aggressive repetition cleaner")
     parser.add_argument("input", help="Input file or directory")
     parser.add_argument("output", help="Output file or directory")

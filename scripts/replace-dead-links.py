@@ -73,7 +73,7 @@ def replace_in_file(path: Path, archived_paths: set[str], dry_run: bool) -> int:
     replacements = 0
     base_dir = path.parent
 
-    def replacer(m: re.Match) -> str:
+    def replacer(m: re.Match[str]) -> str:
         nonlocal replacements
         if m.group(2):  # inline link: [text](target)
             target = m.group(2)

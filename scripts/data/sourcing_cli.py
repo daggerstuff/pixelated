@@ -33,7 +33,7 @@ JournalSource: Any = None
 VoiceSource: Any = None
 
 
-def cmd_discover(args):
+def cmd_discover(args: argparse.Namespace) -> None:
     """Discover available sources."""
 
     if args.all or args.huggingface:
@@ -65,7 +65,7 @@ def cmd_discover(args):
             pass
 
 
-def cmd_generate(args):
+def cmd_generate(args: argparse.Namespace) -> None:
     """Generate samples from specified source."""
 
     # Select source based on stage and args
@@ -123,7 +123,7 @@ def cmd_generate(args):
         return
 
 
-def cmd_status(_args):
+def cmd_status(_args: argparse.Namespace) -> None:
     """Show sourcing status."""
 
     # Check output directories
@@ -143,7 +143,7 @@ def cmd_status(_args):
             pass
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Dataset Sourcing CLI", prog="pixelated sourcing")
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 

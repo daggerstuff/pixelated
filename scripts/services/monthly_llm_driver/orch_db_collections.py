@@ -35,6 +35,8 @@ Usage::
 
 from __future__ import annotations
 
+from typing import Any, TypedDict
+
 from pymongo.database import Database
 from pymongo.errors import OperationFailure
 
@@ -44,8 +46,26 @@ from pymongo.errors import OperationFailure
 _WALL_BUDGET_MINUTES = 5
 
 
+class _VerifyResult(TypedDict, total=False):
+    """Result payload of ``verify_collections``.
+
+    Most keys map to a list of index-info dicts; the GridFS bucket key
+    maps to an existence-check dict instead.
+    """
+
+    dispatch_chunks: list[dict[str, Any]]
+    audit_findings: list[dict[str, Any]]
+    postfix_enrichment: list[dict[str, Any]]
+    cross_month_invariants: list[dict[str, Any]]
+    dispatch_chunk_content: dict[str, bool]
+
+
 def _index_exists_by_signature(
-    db: Database, collection_name: str, keys: list, unique: bool = False, sparse: bool = False
+    db: Database[Any],
+    collection_name: str,
+    keys: list[tuple[str, int]],
+    unique: bool = False,
+    sparse: bool = False,
 ) -> bool:
     """Check if an index exists matching the given key signature and flags.
 
@@ -85,7 +105,12 @@ def _index_exists_by_signature(
 
 
 def _ensure_index(
-    db: Database, collection_name: str, keys: list, name: str, unique: bool = False, sparse: bool = False
+    db: Database[Any],
+    collection_name: str,
+    keys: list[tuple[str, int]],
+    name: str,
+    unique: bool = False,
+    sparse: bool = False,
 ) -> None:
     """Ensure an index exists with the given key signature and flags.
 
@@ -131,7 +156,7 @@ def _ensure_index(
     )
 
 
-def setup_collections(db: Database) -> None:
+def setup_collections(db: Database[Any]) -> None:
     """Create all five collections and their indexes in ``db``.
 
     Idempotent: safe to call multiple times. Index creation uses
@@ -227,7 +252,7 @@ def setup_collections(db: Database) -> None:
     )
 
 
-def verify_collections(db: Database) -> dict[str, list[dict]]:
+def verify_collections(db: Database[Any]) -> _VerifyResult:
     """Verify all five collections and their indexes exist.
 
     Returns a dict mapping collection names to their index specs.
@@ -253,7 +278,7 @@ def verify_collections(db: Database) -> dict[str, list[dict]]:
         if coll_name not in existing:
             raise RuntimeError(f"Missing collection: {coll_name}")
 
-    result = {}
+    result: _VerifyResult = {}
 
     # dispatch_chunks: verify compound unique + sparse
     dispatch_chunks = db["dispatch_chunks"]

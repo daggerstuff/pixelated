@@ -175,7 +175,8 @@ def load_emails(work_dir: Path, month: str) -> list[dict[str, Any]]:
     path = work_dir / month / "generated_emails.json"
     if not path.exists():
         return []
-    return json.loads(path.read_text())
+    emails: list[dict[str, Any]] = json.loads(path.read_text())
+    return emails
 
 
 def load_chats(work_dir: Path, month: str) -> list[dict[str, Any]]:
@@ -183,7 +184,8 @@ def load_chats(work_dir: Path, month: str) -> list[dict[str, Any]]:
     path = work_dir / month / "generated_chat_bursts.json"
     if not path.exists():
         return []
-    return json.loads(path.read_text())
+    chats: list[dict[str, Any]] = json.loads(path.read_text())
+    return chats
 
 
 # ---------------------------------------------------------------------------
@@ -264,9 +266,7 @@ def _emission_severity(signature: str, hit_count: int) -> str:
     return "warning" if hit_count >= 1 else "info"
 
 
-def _deterministic_find_for_record(
-    record: dict[str, Any], descriptor: dict[str, Any]
-) -> list[dict[str, Any]]:
+def _deterministic_find_for_record(record: dict[str, Any], descriptor: dict[str, Any]) -> list[dict[str, Any]]:
     """Walk the deterministic rule-pack against one record's body text."""
     body = record.get("body", "")
     findings: list[dict[str, Any]] = []
@@ -292,9 +292,7 @@ def _deterministic_find_for_record(
                 "sender": record.get("sender", "<unknown>"),
                 "severity": severity,
                 "signature": signature,
-                "rationale": first_rationale
-                or descriptor["auditor_anti_signals"][0]
-                + f" (hit_count={hit_count})",
+                "rationale": first_rationale or descriptor["auditor_anti_signals"][0] + f" (hit_count={hit_count})",
                 "example_excerpt": first_excerpt,
             }
         )
@@ -400,15 +398,13 @@ def _assemble_summary(
                 "strengths": [
                     "Stratified-by-sender sampling exercised end-to-end.",
                     f"Anti-signal taxonomy ({len(descriptor['auditor_anti_signals'])} labels) loaded verbatim from descriptor.",
-                ] if not findings else [
+                ]
+                if not findings
+                else [
                     f"Touched performative_toughness_as_armor {pro_count}× across {records_seen} records.",
                 ],
                 "concerns": (
-                    [
-                        f"{critical_count} critical findings → cascade_required = true."
-                    ]
-                    if critical_count
-                    else []
+                    [f"{critical_count} critical findings → cascade_required = true."] if critical_count else []
                 ),
                 "findings": findings,
                 "critical_count": critical_count,
@@ -443,9 +439,7 @@ def _descriptor_sha(descriptor: dict[str, Any]) -> str:
     return hashlib.sha256(blob).hexdigest()
 
 
-def _read_no_brene_brown_critical_since_prior(
-    work_dir: Path, current_month: str
-) -> int:
+def _read_no_brene_brown_critical_since_prior(work_dir: Path, current_month: str) -> int:
     """Compute the longest clean-month streak prior to the current month.
 
     Reads the prior `brene_brown_adversarial_review.json` from any earlier
@@ -564,9 +558,7 @@ def review(
     findings_path = out_dir / "brene_brown_adversarial_review.jsonl"
 
     summary_path.write_text(json.dumps(summary, indent=2, ensure_ascii=False))
-    findings_path.write_text(
-        "\n".join(json.dumps(f, ensure_ascii=False) for f in findings) + "\n"
-    )
+    findings_path.write_text("\n".join(json.dumps(f, ensure_ascii=False) for f in findings) + "\n")
 
     return summary
 
@@ -577,9 +569,7 @@ def review(
 
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Run Brené Brown monthly adversarial review (additive monthly path)."
-    )
+    parser = argparse.ArgumentParser(description="Run Brené Brown monthly adversarial review (additive monthly path).")
     parser.add_argument(
         "--month",
         required=True,

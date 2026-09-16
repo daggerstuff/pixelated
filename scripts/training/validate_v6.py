@@ -54,7 +54,7 @@ def _describe_item_format(index: int, item: object) -> str:
     return f"     [{index}] {list(item.keys())}"
 
 
-def test_config_loading():
+def test_config_loading() -> bool:
     """Test that config loads correctly"""
     config_path = Path("ai/config/training_config_v2_antirepetition.json")
 
@@ -75,7 +75,7 @@ def test_config_loading():
         return False
 
 
-def test_data_file_exists():
+def test_data_file_exists() -> bool:
     """Test that training data file exists"""
     data_file = Path(
         "ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl"
@@ -89,7 +89,7 @@ def test_data_file_exists():
     return True
 
 
-def test_data_format():
+def test_data_format() -> bool:
     """Test that training data is valid JSONL"""
     data_file = Path(
         "ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl"
@@ -140,7 +140,7 @@ def test_data_format():
         return False
 
 
-def test_imports():
+def test_imports() -> bool:
     """Test that required libraries are available"""
     required = [
         "torch",
@@ -166,7 +166,7 @@ def test_imports():
     return True
 
 
-def main():
+def main() -> int:
     logger.info("=" * 60)
     logger.info("V6 TRAINING PIPELINE VALIDATION")
     logger.info("=" * 60)

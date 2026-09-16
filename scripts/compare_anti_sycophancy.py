@@ -29,7 +29,7 @@ CAVING_PHRASES = [
 ]
 
 
-def analyze_directory(dir_path: Path, name: str):
+def analyze_directory(dir_path: Path, name: str) -> None:
     if not dir_path.exists():
         print(f"Directory {dir_path} not found.")
         return

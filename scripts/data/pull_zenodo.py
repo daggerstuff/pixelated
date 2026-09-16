@@ -17,6 +17,7 @@ import json
 import logging
 import time
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
@@ -35,11 +36,12 @@ SEARCH_QUERY = (
 )
 
 
-def _fetch_page(url: str) -> dict:
+def _fetch_page(url: str) -> dict[str, Any]:
     """Fetch a page from Zenodo API."""
     try:
         with urlopen(url, timeout=30) as resp:
-            return json.loads(resp.read().decode())
+            data: dict[str, Any] = json.loads(resp.read().decode())
+            return data
     except (HTTPError, Exception) as e:
         logger.warning("Zenodo API error: %s", e)
         return {}
@@ -139,7 +141,7 @@ def pull_datasets(output_dir: Path, limit: int) -> int:
     return count
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description="PIX-30: Zenodo Psychology Datasets")
     parser.add_argument("--limit", type=int, default=100, help="Max datasets to pull")
     parser.add_argument("--output", type=Path, default=Path("data/raw/zenodo/"))

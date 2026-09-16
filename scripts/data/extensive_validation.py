@@ -30,11 +30,11 @@ logger = logging.getLogger(__name__)
 class ExtensiveValidationSuite:
     """Comprehensive validation with 50+ edge cases."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.test_cases: list[dict[str, Any]] = []
         self._build_test_cases()
 
-    def _build_test_cases(self):
+    def _build_test_cases(self) -> None:
         """Build comprehensive test suite."""
 
         # Category 1: Crisis Support - True Positives

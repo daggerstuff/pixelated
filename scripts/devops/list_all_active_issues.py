@@ -2,7 +2,7 @@ import json
 import re
 
 
-def main():
+def main() -> None:
     with open("exports/current_linear_issues.json") as f:
         issues = json.load(f)
 
@@ -14,7 +14,7 @@ def main():
         active, key=lambda x: (x.get("project", {}).get("name") or "No Project", x.get("identifier", ""))
     )
 
-    out_lines = []
+    out_lines: list[str] = []
     for i in active_sorted:
         title = i.get("title") or ""
         identifier = i.get("identifier") or ""

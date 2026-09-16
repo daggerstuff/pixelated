@@ -172,10 +172,11 @@ _REFERENCE_CHATS: list[dict[str, object]] = [
 
 
 def _load_prior_month_summary(month: str, work_dir_root: Path) -> str | None:
-    idx = MONTH_ORDER.index(month)
+    month_order: list[str] = MONTH_ORDER
+    idx = month_order.index(month)
     if idx == 0:
         return None
-    prior = MONTH_ORDER[idx - 1]
+    prior = month_order[idx - 1]
     summary_path = work_dir_root / prior / "month_summary.txt"
     if summary_path.exists():
         return summary_path.read_text().strip()

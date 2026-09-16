@@ -95,18 +95,20 @@ try:
 except ImportError:
     CRISIS_DETECTOR_AVAILABLE = False
 
+
+class _ClientError(Exception):
+    """Fallback error type when botocore is unavailable."""
+
+
 try:
     import boto3
-    from botocore.exceptions import ClientError
+    from botocore.exceptions import ClientError as _BotocoreClientError
 
     BOTO3_AVAILABLE = True
+    ClientError: type[Exception] = _BotocoreClientError
 except ImportError:
     boto3 = None
-
-    class _ClientError(Exception):
-        """Fallback error type when botocore is unavailable."""
-
-    ClientError: type[Exception] = _ClientError
+    ClientError = _ClientError
     BOTO3_AVAILABLE = False
 
 PIPELINE_COMPONENTS_AVAILABLE = HybridTaxonomyClassifier is not None
@@ -701,7 +703,7 @@ class BooksExtractor:
             return False
 
 
-def main():
+def main() -> int:
     """Main entry point for books extraction."""
     parser = argparse.ArgumentParser(description="PIX-2: Extract therapeutic content from books (PDF/EPUB/TXT)")
 

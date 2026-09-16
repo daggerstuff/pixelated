@@ -17,18 +17,20 @@ import argparse
 import json
 import logging
 from pathlib import Path
+from typing import Any
 
 logger = logging.getLogger("clinical_validity_metrics")
 
 METRIC_PREFIX = "clinical_validity"
 
 
-def load_eval_report(path: Path) -> dict:
+def load_eval_report(path: Path) -> dict[str, Any]:
     with open(path, encoding="utf-8") as f:
-        return json.load(f)
+        report: dict[str, Any] = json.load(f)
+        return report
 
 
-def emit_metrics(report: dict, output_path: Path) -> None:
+def emit_metrics(report: dict[str, Any], output_path: Path) -> None:
     metrics = report.get("metrics", {})
     dataset = report.get("eval_dataset", "unknown")
     checkpoint = report.get("checkpoint", "unknown")

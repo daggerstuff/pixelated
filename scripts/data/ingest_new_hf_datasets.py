@@ -24,6 +24,7 @@ import json
 import logging
 import sys
 from pathlib import Path
+from typing import Any
 
 # Add project root to sys.path
 script_dir = Path(__file__).resolve().parent
@@ -54,7 +55,7 @@ def parse_phr_text(text: str) -> tuple[str | None, str | None]:
     return None, None
 
 
-def convert_to_chatml(item: dict, dataset_name: str) -> dict | None:
+def convert_to_chatml(item: dict[str, Any], dataset_name: str) -> dict[str, Any] | None:
     """Convert dataset sample dict into standard ChatML format."""
     # 1. ShareGPT format ('conversations' list)
     if "conversations" in item and isinstance(item["conversations"], list):
@@ -109,12 +110,12 @@ def convert_to_chatml(item: dict, dataset_name: str) -> dict | None:
     return None
 
 
-def main():
+def main() -> None:
     logger.info("=== Starting Ingestion of New Hugging Face Therapy Datasets ===")
     quality = QualityFilter()
 
     # Load existing clean records from dataset/final_dataset.jsonl into quality filter state
-    existing_records = []
+    existing_records: list[dict[str, Any]] = []
     local_file = project_root / "dataset/final_dataset.jsonl"
     if local_file.exists():
         with open(local_file, encoding="utf-8") as f:
@@ -142,8 +143,8 @@ def main():
         "epsilon3/cbt-cognitive-distortions-analysis",
     ]
 
-    new_clean_records = []
-    summary = {}
+    new_clean_records: list[dict[str, Any]] = []
+    summary: dict[str, dict[str, int]] = {}
 
     for src in sources:
         logger.info("Ingesting source: %s ...", src)

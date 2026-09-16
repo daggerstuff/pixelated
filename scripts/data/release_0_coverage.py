@@ -113,7 +113,7 @@ def load_env(env_path: Path | str = Path(".env")) -> Mapping[str, str]:
     if not path.exists():
         return os.environ.copy()
 
-    env_data = {}
+    env_data: dict[str, str] = {}
     with path.open() as handle:
         for raw_line in handle:
             line = raw_line.strip()
@@ -192,7 +192,7 @@ def classify_status(count: int) -> str:
     return "partial" if count < 3 else "present"
 
 
-def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
+def build_coverage_report(bucket: str, client: Any) -> Sequence[dict[str, Any]]:
     """Build a coverage report by scanning S3 prefixes for dataset families.
 
     Args:
@@ -208,7 +208,7 @@ def build_coverage_report(bucket: str, client: Any) -> Sequence[dict]:
             - sample_keys: up to 10 sample S3 keys found
             - description: original description with appended errors if any
     """
-    report: list[dict] = []
+    report: list[dict[str, Any]] = []
     for family in FAMILIES:
         all_keys: list[str] = []
         errors: list[str] = []
@@ -253,7 +253,7 @@ def escape_markdown_cell(value: str) -> str:
     return value.replace("|", "\\|").replace("\n", " ").replace("\r", " ")
 
 
-def dump_markdown(report: Sequence[dict], destination: Path) -> None:
+def dump_markdown(report: Sequence[dict[str, Any]], destination: Path) -> None:
     lines = [
         "# Release 0 Coverage Matrix",
         "",

@@ -2,6 +2,8 @@
 Merge pixelated-v2-adapter (anti-repetition trained) with base model.
 """
 
+from typing import Any
+
 import modal
 
 app = modal.App("merge-v2")
@@ -19,7 +21,7 @@ image = modal.Image.debian_slim(python_version="3.13").pip_install(
     timeout=3600,  # 1 hour timeout
     memory=65536,  # 64GB memory
 )
-def merge_v2_adapter():
+def merge_v2_adapter() -> dict[str, Any]:
     import os
     import time
 
@@ -61,7 +63,7 @@ def merge_v2_adapter():
     model = PeftModel.from_pretrained(base_model, adapter_path)
     print("  ✅ Adapter loaded")
 
-    merged_model = model.merge_and_unload()  # type: ignore
+    merged_model = model.merge_and_unload()
     print("  ✅ Merged and unloaded")
 
     print("[4/4] Saving merged model...")
@@ -83,6 +85,6 @@ def merge_v2_adapter():
 
 
 @app.local_entrypoint()
-def main():
+def main() -> None:
     result = merge_v2_adapter.remote()
     print(f"Result: {result}")

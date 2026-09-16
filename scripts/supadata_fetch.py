@@ -126,9 +126,10 @@ def supadata_transcript(
         try:
             with urllib.request.urlopen(req, timeout=30) as resp:
                 data = json.loads(resp.read().decode())
-                if isinstance(data.get("content"), str):
-                    return data["content"]
-                chunks = data.get("content")
+                content = data.get("content")
+                if isinstance(content, str):
+                    return content
+                chunks = content
                 if isinstance(chunks, list):
                     return " ".join(c.get("text", "") for c in chunks if isinstance(c, dict))
                 return None
@@ -241,7 +242,7 @@ def process_channel(
     return success, fail, existing
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(
         description="Download YouTube transcripts via Supadata API (bypasses cloud IP blocks).",
         epilog="Free tier: 100 transcripts/mo. Basic ($5/mo): 300 transcripts/mo.",

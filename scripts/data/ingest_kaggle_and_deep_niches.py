@@ -20,6 +20,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -35,7 +36,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 
-def parse_synthetic_conv(raw_str: str) -> list[dict] | None:
+def parse_synthetic_conv(raw_str: str) -> list[dict[str, str]] | None:
     """Parse Kaggle synthetic_therapy/train.csv conversation string with Regex fallback."""
     if not isinstance(raw_str, str) or len(raw_str) < 20:
         return None
@@ -44,7 +45,7 @@ def parse_synthetic_conv(raw_str: str) -> list[dict] | None:
     if not matches:
         matches = re.findall(r"'from':\s*'([^']+)',\s*'value':\s*(.*?)(?=\}\n|\}$)", raw_str, re.DOTALL)
 
-    messages = []
+    messages: list[dict[str, str]] = []
     for role, val in matches:
         val_clean = val.strip().strip("'\"")
         if val_clean:
@@ -54,12 +55,12 @@ def parse_synthetic_conv(raw_str: str) -> list[dict] | None:
     return messages if len(messages) >= 2 else None
 
 
-def main():
+def main() -> None:
     logger.info("=== Starting Deep-Niche & Kaggle Ingestion for Large Budget ===")
     quality = QualityFilter()
 
     local_file = project_root / "dataset/final_dataset.jsonl"
-    existing_records = []
+    existing_records: list[dict[str, Any]] = []
     if local_file.exists():
         with open(local_file, encoding="utf-8") as f:
             for line in f:
@@ -72,7 +73,7 @@ def main():
                         pass
         logger.info("Loaded %d existing clean records into QualityFilter state.", len(existing_records))
 
-    new_records = []
+    new_records: list[dict[str, Any]] = []
 
     # 1. Kaggle synthetic-therapy-conversations-dataset (449 MB, 99k multi-turn conversations)
     synth_csv = project_root / "ai/data/kaggle/synthetic_therapy/train.csv"

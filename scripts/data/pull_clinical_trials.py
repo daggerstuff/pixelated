@@ -17,6 +17,7 @@ import json
 import logging
 import sys
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -40,12 +41,13 @@ SEARCH_PARAMS = {
 }
 
 
-def _fetch_studies(params: dict) -> dict:
+def _fetch_studies(params: dict[str, str]) -> dict[str, Any]:
     """Fetch studies from ClinicalTrials.gov API."""
     url = f"{CLINICALTRIALS_API}?{urlencode(params)}"
     try:
         with urlopen(url, timeout=60) as resp:
-            return json.loads(resp.read().decode())
+            data: dict[str, Any] = json.loads(resp.read().decode())
+            return data
     except (HTTPError, Exception) as e:
         logger.warning("ClinicalTrials.gov API error: %s", e)
         return {}
@@ -126,7 +128,7 @@ def pull_trials(output_dir: Path, limit: int) -> int:
     return count
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description="PIX-30: ClinicalTrials.gov Results")
     parser.add_argument("--limit", type=int, default=1000, help="Max trials to pull")
     parser.add_argument("--output", type=Path, default=Path("data/raw/clinical_trials/"))

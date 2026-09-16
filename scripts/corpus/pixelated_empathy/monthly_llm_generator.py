@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import ollama  # type: ignore[import]
+import ollama
 from pydantic import ValidationError
 
 from pixelated_empathy.personas import persona_voice_summary

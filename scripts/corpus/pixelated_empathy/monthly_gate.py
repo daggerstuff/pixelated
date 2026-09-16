@@ -10,7 +10,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from pixelated_empathy.schemas import GateReport, GateStatus, MONTH_ORDER
+from pixelated_empathy.schemas import MONTH_ORDER, GateReport, GateStatus
 
 
 def _check(name: str, passed: bool, detail: str) -> dict[str, object]:
@@ -40,68 +40,82 @@ def prepare(month: str, work_dir_root: Path) -> GateReport:
     # ------------------------------------------------------------------ #
     bible_path = month_dir / "month_bible.json"
     bible_ok = bible_path.exists()
-    checks.append(_check(
-        "month_bible_present",
-        bible_ok,
-        str(bible_path) if bible_ok else f"Missing: {bible_path}",
-    ))
+    checks.append(
+        _check(
+            "month_bible_present",
+            bible_ok,
+            str(bible_path) if bible_ok else f"Missing: {bible_path}",
+        )
+    )
 
     # ------------------------------------------------------------------ #
     # Check 2: Prior month accepted (not needed for the first month)
     # ------------------------------------------------------------------ #
     if month_idx == 0:
-        checks.append(_check(
-            "prior_month_accepted",
-            True,
-            "First month — no prior required",
-        ))
+        checks.append(
+            _check(
+                "prior_month_accepted",
+                True,
+                "First month — no prior required",
+            )
+        )
     else:
         prior_month = MONTH_ORDER[month_idx - 1]
         prior_gate_path = work_dir_root / prior_month / "gate_report.json"
         if not prior_gate_path.exists():
-            checks.append(_check(
-                "prior_month_accepted",
-                False,
-                f"Prior month gate report missing: {prior_gate_path}",
-            ))
+            checks.append(
+                _check(
+                    "prior_month_accepted",
+                    False,
+                    f"Prior month gate report missing: {prior_gate_path}",
+                )
+            )
         else:
             try:
                 prior_report = json.loads(prior_gate_path.read_text())
                 prior_status = prior_report.get("status", "unknown")
                 accepted = prior_status == GateStatus.ACCEPTED
-                checks.append(_check(
-                    "prior_month_accepted",
-                    accepted,
-                    f"Prior month {prior_month} status: {prior_status}",
-                ))
+                checks.append(
+                    _check(
+                        "prior_month_accepted",
+                        accepted,
+                        f"Prior month {prior_month} status: {prior_status}",
+                    )
+                )
             except Exception as exc:
-                checks.append(_check(
-                    "prior_month_accepted",
-                    False,
-                    f"Could not parse prior gate report: {exc}",
-                ))
+                checks.append(
+                    _check(
+                        "prior_month_accepted",
+                        False,
+                        f"Could not parse prior gate report: {exc}",
+                    )
+                )
 
     # ------------------------------------------------------------------ #
     # Check 3: Month enrichment present
     # ------------------------------------------------------------------ #
     enrichment_path = month_dir / "month_enrichment.json"
     enrichment_ok = enrichment_path.exists()
-    checks.append(_check(
-        "month_enrichment_present",
-        enrichment_ok,
-        str(enrichment_path) if enrichment_ok else f"Missing: {enrichment_path}",
-    ))
+    checks.append(
+        _check(
+            "month_enrichment_present",
+            enrichment_ok,
+            str(enrichment_path) if enrichment_ok else f"Missing: {enrichment_path}",
+        )
+    )
 
     # ------------------------------------------------------------------ #
     # Check 4: No stale generation in progress (no lock file)
     # ------------------------------------------------------------------ #
     lock_path = month_dir / "generation.lock"
     no_lock = not lock_path.exists()
-    checks.append(_check(
-        "no_generation_lock",
-        no_lock,
-        "No lock file present" if no_lock else f"Lock file exists: {lock_path}",
-    ))
+    checks.append(
+        _check(
+            "no_generation_lock",
+            no_lock,
+            "No lock file present" if no_lock else f"Lock file exists: {lock_path}",
+        )
+    )
 
     # ------------------------------------------------------------------ #
     # Check 5: Work directory writable
@@ -189,12 +203,13 @@ def get_accepted_months(work_dir_root: Path) -> list[str]:
 def next_eligible_month(work_dir_root: Path) -> str | None:
     """Return the next month eligible for generation (prior month accepted or first)."""
     accepted = set(get_accepted_months(work_dir_root))
-    for i, month in enumerate(MONTH_ORDER):
+    month_order: list[str] = MONTH_ORDER
+    for i, month in enumerate(month_order):
         if month in accepted:
             continue
         if i == 0:
             return month
-        prior = MONTH_ORDER[i - 1]
+        prior = month_order[i - 1]
         if prior in accepted:
             return month
         return None

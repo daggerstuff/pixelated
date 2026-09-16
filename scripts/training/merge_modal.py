@@ -26,7 +26,7 @@ volume = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
     if os.environ.get("HF_TOKEN")
     else [],
 )
-def merge_lora_task(base_model_name: str, output_dir_name: str):
+def merge_lora_task(base_model_name: str, output_dir_name: str) -> str:
     from pathlib import Path
 
     import torch
@@ -55,7 +55,7 @@ def merge_lora_task(base_model_name: str, output_dir_name: str):
     model = PeftModel.from_pretrained(base_model, "/root/adapter", is_trainable=False)
 
     print("🔄 Merging LoRA weights into base model...")
-    merged_model = model.merge_and_unload()  # type: ignore
+    merged_model = model.merge_and_unload()
 
     print(f"💾 Saving merged model to {output_path}...")
     merged_model.save_pretrained(str(output_path), safe_serialization=True)
@@ -69,7 +69,7 @@ def merge_lora_task(base_model_name: str, output_dir_name: str):
 
 
 @app.local_entrypoint()
-def main(base_model: str = "LatitudeGames/Wayfarer-2-12B", output_dir: str = "merged-pixel-merged"):
+def main(base_model: str = "LatitudeGames/Wayfarer-2-12B", output_dir: str = "merged-pixel-merged") -> None:
     """
     Local entrypoint to trigger the Modal merge.
     Usage: uv run modal run merge_modal.py --base-model ... --output-dir ...

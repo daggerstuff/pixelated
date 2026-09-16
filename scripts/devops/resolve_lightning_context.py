@@ -7,6 +7,7 @@ import json
 import re
 import sys
 from dataclasses import dataclass
+from typing import Any
 from urllib.request import Request, urlopen
 
 
@@ -25,11 +26,12 @@ def _read_credentials(path: str) -> tuple[str, str]:
     return data.get("user_id", ""), data.get("api_key", "")
 
 
-def _api_get(base_url: str, auth: str, path: str) -> dict:
+def _api_get(base_url: str, auth: str, path: str) -> dict[str, Any]:
     request = Request(f"{base_url}{path}")
     request.add_header("Authorization", f"Basic {auth}")
     with urlopen(request, timeout=30) as response:
-        return json.loads(response.read().decode("utf-8"))
+        payload: dict[str, Any] = json.loads(response.read().decode("utf-8"))
+    return payload
 
 
 def _matches_machine_alias(name: str, machine: str) -> bool:
@@ -93,7 +95,7 @@ def resolve_lightning_context(
 
     studio_name = ""
     if require_studio:
-        cloudspaces: list[dict] = _api_get(
+        cloudspaces: list[dict[str, Any]] = _api_get(
             base_url, auth, f"/v1/projects/{project_id}/cloudspaces?userId={owner_id}"
         ).get(
             "cloudspaces",

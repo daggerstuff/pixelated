@@ -97,9 +97,9 @@ def detect_word_repetitions(text: str, threshold: int = 4) -> tuple[bool, list[s
         Tuple of (has_repetition: bool, words: List[str])
     """
     words = text.split()
-    repeated_words = []
+    repeated_words: list[str] = []
 
-    current_word = None
+    current_word: str | None = None
     count = 0
 
     for word in words:
@@ -107,13 +107,13 @@ def detect_word_repetitions(text: str, threshold: int = 4) -> tuple[bool, list[s
         if word_lower == current_word:
             count += 1
         else:
-            if count >= threshold:
+            if current_word is not None and count >= threshold:
                 repeated_words.append(current_word)
             current_word = word_lower
             count = 1
 
     # Check last sequence
-    if count >= threshold:
+    if current_word is not None and count >= threshold:
         repeated_words.append(current_word)
 
     return len(repeated_words) > 0, repeated_words
@@ -129,7 +129,7 @@ def analyze_sample(sample: dict[str, Any]) -> dict[str, Any]:
     Returns:
         Dict with analysis results
     """
-    result = {
+    result: dict[str, Any] = {
         "has_repetitions": False,
         "issues": [],
         "sample_preview": None,
@@ -182,7 +182,7 @@ def analyze_sample(sample: dict[str, Any]) -> dict[str, Any]:
 
 def clean_jsonl_file(
     input_path: str, output_path: str, verbose: bool = False, dry_run: bool = False
-) -> tuple[int, int, list[dict]]:
+) -> tuple[int, int, list[dict[str, Any]]]:
     """
     Clean a JSONL file by removing samples with repetitions.
 
@@ -257,7 +257,7 @@ def clean_jsonl_file(
     return len(cleaned), len(removed), removed_samples
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Clean training data by removing repetitive samples")
     parser.add_argument("--input", "-i", required=True, help="Input JSONL file path")
     parser.add_argument("--output", "-o", default="cleaned_output.jsonl", help="Output JSONL file path")

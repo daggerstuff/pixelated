@@ -7,6 +7,7 @@ import argparse
 import csv
 import json
 from pathlib import Path
+from typing import Any
 
 DEFAULT_SRC_JSON = Path("gusher-pix.json")
 DEFAULT_SRC_CSV = Path("exports/gusher-pix-issues-20260517.csv")
@@ -33,11 +34,11 @@ def load_labels_by_key(csv_path: Path) -> dict[str, list[str]]:
 
 
 def build_issue(
-    row: dict,
+    row: dict[str, Any],
     labels_by_key: dict[str, list[str]],
     dest_project: str,
     dest_assignee: str,
-) -> dict:
+) -> dict[str, Any]:
     fields = row.get("fields") or {}
     source_key = row.get("key") or ""
     issue_type = (fields.get("issuetype") or {}).get("name") or "Task"
@@ -89,7 +90,7 @@ def main() -> None:
         source_issues = json.load(handle)
 
     # Epics first so references could be added later if needed.
-    def sort_key(row: dict) -> tuple[int, str]:
+    def sort_key(row: dict[str, Any]) -> tuple[int, str]:
         name = ((row.get("fields") or {}).get("issuetype") or {}).get("name") or ""
         return (0 if name == "Epic" else 1, row.get("key") or "")
 

@@ -20,6 +20,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import gridfs
 
@@ -36,7 +37,7 @@ MONTH = "2025-10"
 EXPECTED_CHUNKS = 27
 
 
-def extract_chunk_metadata(chunk_data: dict) -> dict:
+def extract_chunk_metadata(chunk_data: dict[str, Any]) -> dict[str, object]:
     """Extract metadata fields from chunk JSON for dispatch_chunks doc.
 
     Args:
@@ -92,7 +93,7 @@ def extract_chunk_metadata(chunk_data: dict) -> dict:
     }
 
 
-def backfill_m02_chunks() -> dict:
+def backfill_m02_chunks() -> dict[str, int]:
     """Backfill all 27 M02 chunks into MongoDB.
 
     Returns:

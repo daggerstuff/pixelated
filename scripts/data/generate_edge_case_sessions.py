@@ -259,7 +259,7 @@ UNWINNABLE_TRAGEDY_TYPES = [
 # --------------------------------------------------------------------------- #
 
 
-def generate_edge_case_session(category: str, rng: random.Random) -> dict:
+def generate_edge_case_session(category: str, rng: random.Random) -> dict[str, list[dict[str, str]]]:
     """Generates a multi-turn ChatML session record based on category specifications."""
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
@@ -340,7 +340,7 @@ def generate_edge_case_session(category: str, rng: random.Random) -> dict:
     return {"messages": messages}
 
 
-def main():
+def main() -> None:
     logger.info("=== Starting Synthetic Edge-Case & Nightmare Session Generation (100,000 Target) ===")
     quality = QualityFilter()
     rng = random.Random(42)
