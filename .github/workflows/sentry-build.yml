@@ -73,7 +73,10 @@ jobs:
           context: .
           file: ./infra/Dockerfile
           push: true
+          # Reuse the deploy workflow's GHA cache read-only: two workflows
+          # exporting ~10GB of layers each exhausts the GHA cache quota and
+          # fails with "failed to reserve cache".
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to: ''
           tags: ghcr.io/${{ github.repository_owner }}/pixelated:${{ github.sha }}
           provenance: false
