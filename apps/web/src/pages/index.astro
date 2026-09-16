@@ -87,16 +87,17 @@ const buildableScenarios = [
           </div>
         </div>
 
-        <!-- Chat conversation demo — raw transcript style, not bubbles -->
+        <!-- Review desk — annotated transcript, not chat bubbles. The proof
+             object: one flagged turn carries a supervisor note + retry. -->
         <aside
           class="np-chat-demo"
-          aria-label="Example therapy conversation on the platform"
+          aria-label="Example therapy conversation with supervisor review"
           role="region"
         >
           <div class="np-chat-demo__header">
-            <span class="np-chat-demo__label">Session transcript</span>
+            <span class="np-chat-demo__label">Review desk</span>
             <span class="np-chat-demo__status"
-              >Scenario 03 · Rupture repair</span
+              >Session 03 · Rupture repair</span
             >
           </div>
 
@@ -109,12 +110,23 @@ const buildableScenarios = [
               </p>
             </div>
 
-            <div class="np-chat-demo__entry np-chat-demo__entry--therapist">
+            <div
+              class="np-chat-demo__entry np-chat-demo__entry--therapist np-chat-demo__entry--flagged"
+            >
               <span class="np-chat-demo__sender">Trainee</span>
               <p>
                 It sounds like you&#39;re not sure this is the right place. What
                 feels off?
               </p>
+              <div class="np-chat-demo__annotation">
+                <span class="np-chat-demo__annotation-index" aria-hidden="true"
+                  >1</span
+                >
+                <span class="np-chat-demo__annotation-text"
+                  >Slow the pace — name the hesitation, then sit with it. Retry
+                  assigned.</span
+                >
+              </div>
             </div>
 
             <div class="np-chat-demo__entry">
@@ -149,17 +161,14 @@ const buildableScenarios = [
             </div>
           </div>
 
-          <div class="np-chat-demo__typing" aria-hidden="true">
-            <span class="np-chat-demo__dot"></span>
-            <span class="np-chat-demo__dot"></span>
-            <span class="np-chat-demo__dot"></span>
-            <span>Client is typing</span>
+          <div class="np-chat-demo__footer">
+            <span class="np-chat-demo__footer-item"
+              >Supervisor note attached</span
+            >
+            <span class="np-chat-demo__footer-item np-chat-demo__footer-item--retry"
+              >Retry assigned</span
+            >
           </div>
-
-          <p class="np-chat-demo__note">
-            Simulated conversation&ensp;&middot;&ensp;Trainee responds to an AI
-            client
-          </p>
         </aside>
       </div>
 
