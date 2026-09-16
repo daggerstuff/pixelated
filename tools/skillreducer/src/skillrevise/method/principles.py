@@ -9,6 +9,7 @@ import time
 import urllib.error
 import urllib.request
 from dataclasses import dataclass, replace
+from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -419,6 +420,8 @@ class PrincipleAbsorber:
             return None
 
         initial = result.iterations[0]
+        if producer.revision is None:
+            return None
         return self.absorb(
             task=result.task,
             before_skill=result.initial_skill,
@@ -1280,7 +1283,9 @@ def _token_list(text: str) -> list[str]:
 
 def _load_local_embedding_config() -> dict[str, str]:
     try:
-        from skillrevise import local_llm_config as config
+        # Optional user-provided module (same pattern as llm/command.py); it may
+        # not exist, so it is imported dynamically and never as a static import.
+        config = import_module("skillrevise.local_llm_config")
     except Exception:
         return {}
     keys = {
