@@ -22,6 +22,17 @@ export type ManagementClientOptionsWithClientCredentials = {
 // Extend AuthenticationClient to include methods that may not be in the TypeScript definitions
 type ExtendedAuthenticationClient = AuthenticationClient & {
   oauth: AuthenticationClient['oauth'] & {
+    authorizationCodeGrant: (params: {
+      code: string
+      redirect_uri: string
+    }) => Promise<{
+      data: {
+        access_token: string
+        refresh_token?: string
+        id_token?: string
+        expires_in: number
+      }
+    }>
     passwordGrant: (params: {
       username: string
       password: string
@@ -54,6 +65,7 @@ function isExtendedAuthenticationClient(
   }
 
   const oauthMethods: Array<keyof ExtendedAuthenticationClient['oauth']> = [
+    'authorizationCodeGrant',
     'passwordGrant',
     'refreshTokenGrant',
     'revokeRefreshToken',
@@ -290,6 +302,64 @@ export class Auth0UserService {
     } catch (error: unknown) {
       authLogger.error('Auth0 sign in error', error)
       throw new Error('Invalid credentials')
+    }
+  }
+
+  /**
+   * Verify an OAuth authorization code and exchange it for tokens and user profile
+   * @param code Authorization code from OAuth callback
+   * @param redirectUri Optional redirect URI
+   * @returns User and tokens
+   */
+  async verifyOAuthCode(code: string, redirectUri?: string) {
+    if (!auth0Authentication) {
+      throw new Error('Auth0 authentication client not initialized')
+    }
+
+    try {
+      const uri =
+        redirectUri ??
+        process.env['AUTH0_CALLBACK_URL'] ??
+        process.env['AUTH0_REDIRECT_URI'] ??
+        'http://localhost:5173/api/auth/callback'
+
+      const response = await auth0Authentication.oauth.authorizationCodeGrant({
+        code,
+        redirect_uri: uri,
+      })
+      const tokenResponse = response.data
+
+      if (!auth0UserInfo) {
+        throw new Error('Auth0 UserInfo client not initialized')
+      }
+
+      const userInfoRes = await auth0UserInfo.getUserInfo(
+        tokenResponse.access_token,
+      )
+      let userResponse = this.parseAuth0UserRecord(userInfoRes.data)
+      userResponse = {
+        ...userResponse,
+        user_id: userResponse.user_id ?? userResponse.sub,
+      }
+      userResponse = await this.enrichWithManagementMetadata(userResponse)
+
+      logSecurityEvent(SecurityEventType.LOGIN, null, {
+        userId: this.toStringOrUndefined(userResponse.user_id),
+        email: this.toStringOrUndefined(userResponse.email),
+        method: 'oauth_code',
+      })
+
+      const authenticatedUser = this.toAuthenticatedUser(userResponse)
+      return {
+        user: authenticatedUser,
+        token: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token,
+        idToken: tokenResponse.id_token,
+        expiresIn: tokenResponse.expires_in,
+      }
+    } catch (error: unknown) {
+      authLogger.error('Auth0 verify OAuth code error', error)
+      throw new Error('Invalid authorization code', { cause: error })
     }
   }
 
@@ -933,10 +1003,24 @@ export class Auth0UserService {
   }
 
   private parseAuth0UserRecord(value: unknown): Auth0UserRecord {
-    return this.toRecord(value) ?? {}
+    const record = this.toRecord(value)
+    if (
+      record &&
+      'data' in record &&
+      record.data !== null &&
+      typeof record.data === 'object' &&
+      !Array.isArray(record.data)
+    ) {
+      return this.toRecord(record.data) ?? {}
+    }
+    return record ?? {}
   }
 
   private parseAuth0UserList(value: unknown): Auth0UserRecord[] {
+    const record = this.toRecord(value)
+    if (record && 'data' in record && Array.isArray(record.data)) {
+      return record.data.map((item) => this.parseAuth0UserRecord(item))
+    }
     if (!Array.isArray(value)) {
       return []
     }
@@ -1173,9 +1257,8 @@ export async function getAllUsers() {
   return await auth0UserService.getAllUsers()
 }
 
-// Placeholder for OAuth verification (to be implemented)
-export async function verifyOAuthCode(_code: string) {
-  throw new Error('OAuth verification not implemented yet')
+export async function verifyOAuthCode(code: string, redirectUri?: string) {
+  return await auth0UserService.verifyOAuthCode(code, redirectUri)
 }
 
 export default {
