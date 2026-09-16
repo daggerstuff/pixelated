@@ -59,7 +59,7 @@ def test_instrumentation_continues_traceparent(monkeypatch: pytest.MonkeyPatch) 
 
     provider.force_flush(timeout_millis=5000)
 
-    spans: list[ReadableSpan] = exporter.get_finished_spans()
+    spans: tuple[ReadableSpan, ...] = exporter.get_finished_spans()
     server_span = next(s for s in spans if s.kind is not None and s.kind.name == "SERVER")
     assert server_span.context.trace_id == incoming_trace_id
 
