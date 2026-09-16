@@ -11,12 +11,18 @@ sys.path.insert(0, ".")
 from ai.memory.gates import GatingReport
 from ai.memory.local_foresight_memory_write_service import LocalForesightMemoryWriteService
 from ai.memory.schema import ConsentGate
-from ai.research.local_foresight_protocol_adapter import LocalForesightProtocolAdapter
 
 
 # Mock protocol adapter for QA
-class MockProtocol(LocalForesightProtocolAdapter):
-    """In-memory stand-in; overrides the two methods the write service calls."""
+class MockProtocol:
+    """In-memory stand-in; implements the two methods the write service calls.
+
+    Structural (no base class): the write service's ``protocol=`` parameter is
+    typed against ``LocalForesightProtocolAdapter`` where that module is
+    importable, but CI environments without the ``ai`` submodule check out see
+    it as ``Any`` — and strict mypy forbids subclassing an Any base. Every
+    method signature matches the adapter's interface.
+    """
 
     def __init__(self) -> None:
         pass  # no backing document store needed for QA
