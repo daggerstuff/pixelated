@@ -6,6 +6,11 @@
 # (ai/, foresight/, tests/) are still exempted in pyproject.toml
 # [[tool.mypy.overrides]] and are not part of the enforced scope here.
 #
+# NOTE: apps/web/src/__init__.py is a required marker — without it, the pe
+# targets derive module names like `pe.*` while the code imports `src.pe.*`,
+# and `ignore_missing_imports` silently degrades every cross-module pe
+# import to `Any`, vacating most of the strict check.
+#
 # History: scripts/ and tools/ carried ~1000 pinned strict errors and were
 # enforced incrementally by scripts/ci/python-strict-ratchet.mjs (a shrink-only
 # baseline). Every pinned file has since reached zero strict errors, so the

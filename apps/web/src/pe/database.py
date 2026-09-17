@@ -8,7 +8,6 @@ Implements the tenant isolation strategy from ADR-001:
 
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
 from typing import Any
 
 import structlog
@@ -46,12 +45,15 @@ async_session_factory = async_sessionmaker(
 )
 
 
-@asynccontextmanager  # type: ignore
 async def check_connection() -> dict[str, Any]:
     """Verify database connectivity and return server info.
 
     Returns:
         Dict with server_version and rls_status.
+
+    Note: deliberately NOT an @asynccontextmanager — the health endpoint
+    awaits this coroutine directly. An earlier stray decorator (masked by
+    a type ignore) made every /health call raise and report "degraded".
     """
     async with async_session_factory() as session:
         result = await session.execute(text("SELECT version()"))
