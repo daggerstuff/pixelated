@@ -1,12 +1,13 @@
 /* Swiss casework homepage — evidence-led, condensed, exact. */
 
 :root:has(.case-home) {
-  --case-paper: oklch(0.965 0 0);
-  --case-ink: oklch(0.13 0 0);
-  --case-muted: oklch(0.43 0 0);
-  --case-line: oklch(0.76 0 0);
-  --case-soft: oklch(0.91 0 0);
-  --case-signal: oklch(0.62 0.16 32);
+  --case-paper: var(--np-bg);
+  --case-ink: var(--np-text);
+  --case-muted: var(--np-muted);
+  --case-mid: var(--np-mid);
+  --case-line: var(--np-line);
+  --case-line-strong: var(--np-line-strong);
+  --case-soft: var(--np-elevated);
   --case-shell: 78rem;
   --case-gutter: clamp(1.25rem, 4vw, 3.5rem);
 }
@@ -27,8 +28,8 @@
   color: var(--case-paper);
 }
 .case-home a:focus-visible {
-  outline: 2px solid var(--case-signal);
-  outline-offset: 4px;
+  outline: 2px solid var(--np-mid);
+  outline-offset: 3px;
 }
 
 .case-shell {
@@ -67,9 +68,9 @@
   text-wrap: balance;
 }
 .case-hero h1 {
-  max-width: 14ch;
-  font-size: clamp(3rem, 6.4vw, 6rem);
-  line-height: 0.9;
+  max-width: 16ch;
+  font-size: var(--np-text-display);
+  line-height: 1.05;
   text-transform: uppercase;
 }
 .case-hero__lede {
@@ -110,8 +111,7 @@
   color: var(--case-paper);
 }
 .case-action--solid:hover {
-  background: var(--case-signal);
-  color: white;
+  transform: translateY(-1px);
 }
 
 .case-facts {
@@ -141,8 +141,8 @@
 }
 
 .case-console {
-  border: 1px solid var(--case-ink);
-  background: white;
+  border: 1px solid var(--np-line-strong);
+  background: var(--np-surface);
 }
 .case-console__head,
 .case-console__foot {
@@ -174,8 +174,8 @@
 }
 .case-status {
   padding: 0.35rem 0.5rem;
-  background: var(--case-signal);
-  color: white;
+  background: var(--case-ink);
+  color: var(--case-paper);
   white-space: nowrap;
 }
 .case-console__body {
@@ -210,15 +210,15 @@
   gap: 1rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--case-ink);
-  background: color-mix(in srgb, var(--case-signal) 14%, white);
+  background: var(--np-elevated);
 }
 .case-review__marker {
   display: grid;
   width: 2rem;
   height: 2rem;
   place-items: center;
-  background: var(--case-signal);
-  color: white;
+  background: var(--case-ink);
+  color: var(--case-paper);
   font-family: var(--np-font-condensed);
   font-weight: 760;
 }
@@ -273,8 +273,9 @@
 .case-section-head h2,
 .case-evidence h2,
 .case-close h2 {
-  font-size: clamp(2.25rem, 4.5vw, 4.75rem);
-  line-height: 0.95;
+  max-width: 22ch;
+  font-size: var(--np-text-headline);
+  line-height: 1.1;
   text-transform: uppercase;
 }
 .case-section-head p,
@@ -330,11 +331,11 @@
 }
 .case-evidence__intro > p {
   margin-top: 1.5rem;
-  color: oklch(0.76 0 0);
+  color: var(--case-mid);
 }
 .case-proof {
   margin: 3rem 0 0;
-  border: 1px solid oklch(0.42 0 0);
+  border: 1px solid var(--np-line-strong);
 }
 .case-proof img {
   display: block;
@@ -344,7 +345,7 @@
 }
 .case-proof figcaption {
   padding: 0.75rem 1rem;
-  border-top: 1px solid oklch(0.42 0 0);
+  border-top: 1px solid var(--np-line-strong);
   font-family: var(--np-font-condensed);
   font-size: 0.6875rem;
   letter-spacing: 0.07em;
@@ -360,10 +361,10 @@
   grid-template-columns: 3rem 1fr;
   gap: 1rem;
   padding: 1.25rem 0;
-  border-top: 1px solid oklch(0.42 0 0);
+  border-top: 1px solid var(--np-line-strong);
 }
 .case-evidence__list li:last-child {
-  border-bottom: 1px solid oklch(0.42 0 0);
+  border-bottom: 1px solid var(--np-line-strong);
 }
 .case-evidence__list > li > span {
   font-family: var(--np-font-condensed);
@@ -379,7 +380,7 @@
 }
 .case-evidence__list p {
   margin: 0.4rem 0 0;
-  color: oklch(0.76 0 0);
+  color: var(--case-mid);
   font-size: 0.875rem;
   line-height: 1.6;
 }
@@ -405,8 +406,8 @@
   font-weight: 700;
 }
 .case-table__head {
-  background: var(--case-ink);
-  color: var(--case-paper);
+  background: var(--np-elevated);
+  color: var(--np-text);
   font-family: var(--np-font-condensed);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -474,7 +475,6 @@
   }
   .case-hero h1 {
     max-width: none;
-    font-size: clamp(2.65rem, 14vw, 4.25rem);
   }
   .case-console__body {
     grid-template-columns: 1fr;
