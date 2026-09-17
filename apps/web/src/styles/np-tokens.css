@@ -36,28 +36,33 @@
   --np-selection-text: var(--ink, oklch(0.93 0 0));
 
   /* =============================================
-      TYPOGRAPHY — Quiet Instrument.
-      Literata Variable carries the display voice (hero headline,
-      section titles) — the human element in a neutral system.
-      Albert Sans Variable carries the body reading role (subtitles,
-      prose, UI text).
-      IBM Plex Mono carries the precision roles (labels,
-      data tables, clinical audit logs).
-      Weight, size, and tracking carry all hierarchy within each face.
+      TYPOGRAPHY — The Marked Document.
+      Archivo Black is the poster voice: the hero statement, marked like
+      a supervisor's highlighter. Libre Franklin Variable carries running
+      text, body, and tracked uppercase labels. One family carries all
+      non-poster hierarchy by weight, size, and tracking.
+      IBM Plex Mono stays for app-internal data/code utility only.
       ============================================= */
-  --np-font-display: 'Literata Variable', Georgia, serif;
+  /* Poster: landing hero statements only — heavy grotesk slab */
+  --np-font-poster: 'Archivo Black', 'Libre Franklin Variable', Arial,
+    sans-serif;
+  --np-font-display:
+    'Libre Franklin Variable', 'Franklin Gothic Medium', Arial, sans-serif;
   --np-font-body:
-    'Albert Sans Variable', system-ui, -apple-system, BlinkMacSystemFont,
+    'Libre Franklin Variable', system-ui, -apple-system, BlinkMacSystemFont,
     'Segoe UI', sans-serif;
+  /* Label voice: small, tracked, uppercase Franklin — not monospace */
+  --np-font-label:
+    'Libre Franklin Variable', system-ui, -apple-system, sans-serif;
   --np-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Weights — weight carries hierarchy (The Content-is-Type Rule) */
-  --np-weight-display: 400;
-  --np-weight-headline: 450;
+  --np-weight-display: 700;
+  --np-weight-headline: 650;
   --np-weight-title: 600;
   --np-weight-body: 400;
-  --np-weight-label: 500;
-  --np-weight-data: 400;
+  --np-weight-label: 600;
+  --np-weight-data: 500;
 
   /* Scale — measured display, compact reading ramp */
   --np-text-display: clamp(2.125rem, 4.2vw, 3.25rem);
@@ -70,16 +75,16 @@
   --np-text-caption: 0.6875rem;
 
   /* Line heights — tighter for display, open for reading */
-  --np-leading-display: 1.12;
-  --np-leading-headline: 1.2;
+  --np-leading-display: 1.08;
+  --np-leading-headline: 1.18;
   --np-leading-title: 1.28;
   --np-leading-body: 1.6;
   --np-leading-data: 1.5;
   --np-leading-label: 1.3;
 
-  /* Letter spacing — tight display, tracked labels */
-  --np-tracking-display: -0.01em;
-  --np-tracking-headline: -0.012em;
+  /* Letter spacing — tight grotesk display, tracked uppercase labels */
+  --np-tracking-display: -0.015em;
+  --np-tracking-headline: -0.01em;
   --np-tracking-label: 0.04em;
 
   /* =============================================
@@ -250,7 +255,7 @@ body {
   --font-mono: var(--np-font-mono);
   --font-body: var(--np-font-body);
   --font-sans: var(--np-font-body);
-  --font-label: var(--np-font-mono);
+  --font-label: var(--np-font-label);
   --font-display: var(--np-font-display);
 
   /* Fluid text scale (from removed typography.css) */

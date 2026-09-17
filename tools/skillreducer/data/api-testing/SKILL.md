@@ -26,6 +26,7 @@ description: ''
 import httpx
 import pytest
 
+
 @pytest.mark.asyncio
 async def test_health_returns_200(api_client: httpx.AsyncClient):
     response = await api_client.get("/health")

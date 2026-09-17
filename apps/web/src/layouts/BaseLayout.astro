@@ -1,7 +1,8 @@
 ---
-// Type system: The Quiet Instrument. Literata Variable carries display,
-// Albert Sans Variable carries body, IBM Plex Mono carries
-// labels and data. Weight, size, and tracking carry hierarchy.
+// Type system: The Quiet Instrument, documentary grotesk. Libre Franklin
+// Variable carries display, body, and tracked-uppercase labels — one
+// family. IBM Plex Mono stays for app-internal code/data utility.
+// Weight, size, and tracking carry hierarchy.
 import '@/lib/fonts'
 /* Astro-palette base tokens (AGPL import-only CSS, no .astro source copied) */
 /* style.css is loaded via <link> in <head> — public assets must not be
@@ -623,7 +624,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     background: var(--np-elevated);
     color: var(--np-text);
     border: 1px solid var(--np-line-strong);
-    font-family: var(--np-font-mono);
+    font-family: var(--np-font-label);
     font-size: 0.75rem;
     text-decoration: none;
   }
