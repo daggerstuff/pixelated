@@ -163,25 +163,19 @@ test.describe('Keyboard Navigation', () => {
     )
 
     if ((await skipLinks.count()) > 0) {
-      // Focus skip link (usually first tab stop)
-      await page.keyboard.press('Tab')
-
-      // Activate skip link
+      // Focus the skip link directly (do not assume it is the first
+      // tab stop), activate it, and verify focus reaches the main
+      // landmark.
+      await skipLinks.first().focus()
       await page.keyboard.press('Enter')
 
-      // Verify focus moved to main content
-      const focusedElement = await page.evaluate(() => {
+      const focusInMain = await page.evaluate(() => {
+        const main = document.querySelector('main, [role="main"]')
         const el = document.activeElement
-        return {
-          id: el?.id,
-          tagName: el?.tagName,
-          role: el?.getAttribute('role'),
-        }
+        return !!main && !!el && (el === main || main.contains(el))
       })
 
-      expect(['main', 'MAIN']).toContain(
-        focusedElement.id ?? focusedElement.tagName ?? focusedElement.role,
-      )
+      expect(focusInMain).toBe(true)
     }
   })
 
