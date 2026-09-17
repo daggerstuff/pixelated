@@ -9,9 +9,11 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from enum import StrEnum
-from typing import Any
+from typing import Annotated, Any
 
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
+
+from src.pe.core.dependencies import get_current_user
 
 
 class UserRole(StrEnum):
@@ -37,6 +39,12 @@ _ROLE_LEVELS: dict[UserRole, int] = {
     UserRole.SUPER_ADMIN: 99,
 }
 
+# Resolved once at import time so every role checker chains the JWT user
+# dependency explicitly. A bare ``current_user`` parameter is not part of a
+# dependency tree — FastAPI would treat it as a required request body field
+# and fail the request with 422 before any auth logic runs.
+_CurrentUser = Annotated[dict[str, Any], Depends(get_current_user)]
+
 
 def role_at_least(minimum_role: UserRole) -> Callable[..., Any]:
     """Dependency factory: require a minimum role level.
@@ -47,7 +55,7 @@ def role_at_least(minimum_role: UserRole) -> Callable[..., Any]:
             ...
     """
 
-    async def _role_checker(current_user: dict[str, Any]) -> dict[str, Any]:
+    async def _role_checker(current_user: _CurrentUser) -> dict[str, Any]:
         user_role = UserRole(current_user.get("role", "learner"))
         if user_role.level < minimum_role.level:
             raise HTTPException(
@@ -71,7 +79,7 @@ def require_role(*roles: UserRole) -> Callable[..., Any]:
     """
     allowed_roles = set(roles)
 
-    async def _role_checker(current_user: dict[str, Any]) -> dict[str, Any]:
+    async def _role_checker(current_user: _CurrentUser) -> dict[str, Any]:
         user_role = UserRole(current_user.get("role", "learner"))
         if user_role not in allowed_roles:
             raise HTTPException(
@@ -95,7 +103,7 @@ def same_tenant_or_super_admin(target_tenant_id: str) -> Callable[..., Any]:
             ...
     """
 
-    async def _tenant_checker(current_user: dict[str, Any]) -> dict[str, Any]:
+    async def _tenant_checker(current_user: _CurrentUser) -> dict[str, Any]:
         user_role = current_user.get("role", "learner")
         user_tenant = current_user.get("tenant_id")
         if user_role != "super_admin" and user_tenant != target_tenant_id:

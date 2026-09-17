@@ -8,6 +8,8 @@ Implements the tenant isolation strategy from ADR-001:
 
 from __future__ import annotations
 
+import asyncio
+import os
 from typing import Any
 
 import structlog
@@ -17,24 +19,64 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
+from sqlalchemy.pool import AsyncAdaptedQueuePool, NullPool
 
 from src.pe.config import settings
 
 logger = structlog.get_logger(__name__)
 
+
+def _pool_class() -> type[AsyncAdaptedQueuePool] | type[NullPool]:
+    """Pick the connection pool by environment.
+
+    The default QueuePool caches connections bound to the event loop that
+    created them. Repeated event loops (pytest function-scoped loops, script
+    restarts, loop-per-task runners) then fail with
+    "Future attached to a different loop". A pooled engine is only safe in a
+    long-lived single-loop process (the production server); anything else —
+    detected via ``PE_TESTING=1`` or absence of a running loop — uses NullPool,
+    which opens a fresh connection per checkout.
+    """
+    if os.environ.get("PE_TESTING") == "1":
+        return NullPool
+    try:
+        asyncio.get_running_loop()
+        return AsyncAdaptedQueuePool
+    except RuntimeError:
+        # No running loop at import: engine will be used across multiple
+        # short-lived loops (scripts, tests) — NullPool is the safe choice.
+        return NullPool
+
+
+def _engine_kwargs() -> dict[str, Any]:
+    """Engine keyword arguments by pool class.
+
+    NullPool accepts no sizing parameters; QueuePool does.
+    """
+    if _pool_class() is NullPool:
+        return {
+            "poolclass": NullPool,
+            "pool_pre_ping": True,
+        }
+    return {
+        "poolclass": AsyncAdaptedQueuePool,
+        "pool_size": settings.DB_MIN_CONNECTIONS,
+        "max_overflow": settings.DB_MAX_CONNECTIONS - settings.DB_MIN_CONNECTIONS,
+        "pool_pre_ping": True,
+        "pool_recycle": 3600,
+    }
+
+
 # ── Engine ─────────────────────────────────────────────────────────
 engine = create_async_engine(
     settings.DATABASE_URL,
-    pool_size=settings.DB_MIN_CONNECTIONS,
-    max_overflow=settings.DB_MAX_CONNECTIONS - settings.DB_MIN_CONNECTIONS,
-    pool_pre_ping=True,
-    pool_recycle=3600,
     connect_args={
         "statement_cache_size": 0,  # Disable for RLS compatibility
         "server_settings": {
             "application_name": settings.APP_NAME,
         },
     },
+    **_engine_kwargs(),
 )
 
 # ── Session Factory ────────────────────────────────────────────────
