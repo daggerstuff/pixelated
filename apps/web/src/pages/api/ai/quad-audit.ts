@@ -43,6 +43,32 @@ function jsonResponse(body: unknown, status: number): Response {
   })
 }
 
+function validateItem(candidate: unknown): AuditItemIn | { error: string } {
+  if (!candidate || typeof candidate !== 'object') {
+    return { error: 'Each item must be an object.' }
+  }
+  const item = candidate as Record<string, unknown>
+  const id = item['id']
+  const content = item['content']
+  if (typeof id !== 'string' || id.length === 0) {
+    return { error: 'Each item requires a non-empty id.' }
+  }
+  if (typeof content !== 'string' || content.trim().length === 0) {
+    return { error: `Item ${id} requires non-empty content.` }
+  }
+  if (content.length > MAX_CONTENT_CHARS) {
+    return {
+      error: `Item ${id} exceeds the ${MAX_CONTENT_CHARS} character limit.`,
+    }
+  }
+  return {
+    id,
+    kind: typeof item['kind'] === 'string' ? item['kind'] : 'ai_response',
+    author_role: typeof item['author_role'] === 'string' ? item['author_role'] : '',
+    content,
+  }
+}
+
 function validateRequestBody(
   raw: unknown,
 ): { items: AuditItemIn[]; mode: string } | { error: string } {
@@ -61,30 +87,11 @@ function validateRequestBody(
 
   const converted: AuditItemIn[] = []
   for (const candidate of items) {
-    if (!candidate || typeof candidate !== 'object') {
-      return { error: 'Each item must be an object.' }
+    const result = validateItem(candidate)
+    if ('error' in result) {
+      return { error: result.error }
     }
-    const item = candidate as Record<string, unknown>
-    const id = item['id']
-    const content = item['content']
-    if (typeof id !== 'string' || id.length === 0) {
-      return { error: 'Each item requires a non-empty id.' }
-    }
-    if (typeof content !== 'string' || content.trim().length === 0) {
-      return { error: `Item ${id} requires non-empty content.` }
-    }
-    if (content.length > MAX_CONTENT_CHARS) {
-      return {
-        error: `Item ${id} exceeds the ${MAX_CONTENT_CHARS} character limit.`,
-      }
-    }
-    converted.push({
-      id,
-      kind: typeof item['kind'] === 'string' ? item['kind'] : 'ai_response',
-      author_role:
-        typeof item['author_role'] === 'string' ? item['author_role'] : '',
-      content,
-    })
+    converted.push(result)
   }
 
   const mode = body['mode']
