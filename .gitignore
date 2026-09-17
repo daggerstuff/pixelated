@@ -449,8 +449,9 @@ tools/px/pnpm-workspace.yaml
 
 .px
 ai/PAL_MEDDIES_IMPLEMENTATION_PLAN.md
-# Scratch planning tasks (work-session artifacts)
-tasks/
+# Scratch planning tasks (work-session artifacts, repo root only — a bare
+# `tasks/` accidentally ignored apps/web/src/pe/tasks, the celery package)
+/tasks/
 "Copy of CLAUDE.md"
 
 # === LOCAL WORKSPACE & PRIVATE ASSETS ===

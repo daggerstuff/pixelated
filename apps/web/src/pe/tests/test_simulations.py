@@ -80,30 +80,38 @@ class TestSimulationEndpoints:
 
     @pytest.mark.asyncio
     async def test_start_simulation_invalid_status(self, client: AsyncClient) -> None:
-        """Starting a simulation that doesn't exist should 400."""
+        """Starting a non-UUID simulation id is rejected by path validation."""
         headers = {"Authorization": f"Bearer {_make_token('educator')}"}
         response = await client.post(
             "/api/v1/simulations/nonexistent-id/start",
             headers=headers,
         )
-        assert response.status_code == 400
+        # The pe.simulation_sessions.id column is uuid — FastAPI rejects a
+        # non-UUID path parameter with 422 before any query runs.
+        assert response.status_code == 422
 
     @pytest.mark.asyncio
     async def test_simulation_status_flow(self, client: AsyncClient) -> None:
         """Test pause/resume/abort flow returns proper errors without DB."""
-        headers = {"Authorization": f"Bearer {_make_token('educator')}"}
+        educator_headers = {"Authorization": f"Bearer {_make_token('educator')}"}
+        admin_headers = {"Authorization": f"Bearer {_make_token('institution_admin')}"}
         sim_id = "00000000-0000-0000-0000-000000000099"
 
         # Pause non-existent
-        r = await client.post(f"/api/v1/simulations/{sim_id}/pause", headers=headers)
+        r = await client.post(f"/api/v1/simulations/{sim_id}/pause", headers=educator_headers)
         assert r.status_code == 400
 
         # Resume non-existent
-        r = await client.post(f"/api/v1/simulations/{sim_id}/resume", headers=headers)
+        r = await client.post(f"/api/v1/simulations/{sim_id}/resume", headers=educator_headers)
         assert r.status_code == 400
 
-        # Abort non-existent
-        r = await client.post(f"/api/v1/simulations/{sim_id}/abort", headers=headers)
+        # Abort requires institution_admin — an educator is 403 before the
+        # not-found 400 would apply.
+        r = await client.post(f"/api/v1/simulations/{sim_id}/abort", headers=educator_headers)
+        assert r.status_code == 403
+
+        # Abort non-existent (admin passes the role gate, then 400)
+        r = await client.post(f"/api/v1/simulations/{sim_id}/abort", headers=admin_headers)
         assert r.status_code == 400
 
 
