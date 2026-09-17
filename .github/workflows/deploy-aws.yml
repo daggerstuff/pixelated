@@ -3,8 +3,11 @@ name: Deploy to AWS EKS
 on:
   workflow_dispatch:
   # Auto-deploy: a successful CI run on staging deploys to EKS, so shipping
-  # is the default instead of a manual step. CI must pass first; the deploy
-  # itself gates on rollout status + smoke test and rolls back on failure.
+  # is the default instead of a manual step. CI must pass first. The app
+  # rolls out in stages (blue/green): the new image is deployed to the idle
+  # slot, health-verified pre-live, then promoted with a service-selector
+  # flip; failures roll back with the same flip (seconds). Agents roll out
+  # directly with rollout-undo rollback on failure.
   workflow_run:
     workflows: [CI]
     types: [completed]
@@ -265,15 +268,63 @@ jobs:
           # renders when the id is non-empty.
           kubectl patch configmap pixelated-empathy-config -n pixelated-empathy --type merge -p '{"data":{"PUBLIC_UMAMI_WEBSITE_ID":"${{ vars.PUBLIC_UMAMI_WEBSITE_ID }}"}}'
 
-          kubectl set image deployment/pixelated-empathy-blue pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
+          # ── Staged rollout (blue/green) ────────────────────────────────
+          # The service routes by slot label. The deploy stages the new image
+          # on the IDLE slot, verifies it pre-live, then flips the service
+          # selector. A failure before the flip touches zero user traffic; a
+          # failure after the flip rolls back with a selector flip (seconds)
+          # instead of a rollout undo (minutes).
+          LIVE_SLOT="$(kubectl get svc pixelated-empathy -n pixelated-empathy -o jsonpath='{.spec.selector.slot}')"
+          if [[ "$LIVE_SLOT" != "green" ]]; then
+            TARGET_SLOT="green"
+          else
+            TARGET_SLOT="blue"
+          fi
+          PREVIOUS_SLOT="$LIVE_SLOT"
+          echo "Staging new image on idle slot '$TARGET_SLOT' (live: '$LIVE_SLOT')."
+
+          kubectl scale deployment/pixelated-empathy-"$TARGET_SLOT" -n pixelated-empathy --replicas=2
+          kubectl set image deployment/pixelated-empathy-"$TARGET_SLOT" pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ needs.build-and-push.outputs.app_digest }} -n pixelated-empathy
           kubectl set image deployment/session-agent agent=${{ env.REGISTRY }}/${{ env.SESSION_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.session_digest }} -n pixelated-empathy
           kubectl set image deployment/qa-agent agent=${{ env.REGISTRY }}/${{ env.QA_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.qa_digest }} -n pixelated-empathy
           kubectl set image deployment/pipeline-agent agent=${{ env.REGISTRY }}/${{ env.PIPELINE_AGENT_IMAGE_NAME }}@${{ needs.build-and-push.outputs.pipeline_digest }} -n pixelated-empathy
 
-          kubectl rollout status deployment/pixelated-empathy-blue -n pixelated-empathy --timeout=10m
+          kubectl rollout status deployment/pixelated-empathy-"$TARGET_SLOT" -n pixelated-empathy --timeout=10m
           kubectl rollout status deployment/session-agent -n pixelated-empathy --timeout=10m
           kubectl rollout status deployment/qa-agent -n pixelated-empathy --timeout=10m
           kubectl rollout status deployment/pipeline-agent -n pixelated-empathy --timeout=10m
+
+          # Persist for the promote/rollback steps (shell vars do not survive
+          # across steps).
+          echo "TARGET_SLOT=$TARGET_SLOT" >> "$GITHUB_ENV"
+          echo "PREVIOUS_SLOT=$PREVIOUS_SLOT" >> "$GITHUB_ENV"
+
+      # Pre-live verification: the staged slot must serve /health before any
+      # traffic moves. A failure here has zero user impact.
+      - name: Pre-live smoke on staged slot
+        id: presmoke
+        run: |
+          kubectl port-forward -n pixelated-empathy "deployment/pixelated-empathy-${TARGET_SLOT}" 8080:4321 &
+          PF_PID=$!
+          trap 'kill $PF_PID 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/health; then
+              echo "Staged slot '${TARGET_SLOT}' pre-live health check passed."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Staged slot '${TARGET_SLOT}' pre-live health check failed."
+          exit 1
+
+      # Promote: flip the service selector. This is the only moment user
+      # traffic moves, and it is reversible in seconds.
+      - name: Promote staged slot to live
+        id: promote
+        run: |
+          kubectl patch svc pixelated-empathy -n pixelated-empathy --type merge \
+            -p '{"spec":{"selector":{"app":"pixelated-empathy","slot":"'"${TARGET_SLOT}"'"}}}'
+          echo "Service selector flipped to '${TARGET_SLOT}'."
 
       - name: Smoke test through cluster service
         id: smoke
@@ -291,20 +342,34 @@ jobs:
           echo "Service health check failed."
           exit 1
 
-      # Automatic rollback: if the new image never became healthy, undo the
-      # rollout so the previous known-good ReplicaSet serves traffic again.
+      # Success: park the previous slot at zero replicas. Its pods stay
+      # defined (image + replicas are Deployment-managed), so the next deploy
+      # stages onto it the same way.
+      - name: Scale down previous slot
+        if: success()
+        run: |
+          kubectl scale deployment/pixelated-empathy-"$PREVIOUS_SLOT" -n pixelated-empathy --replicas=0
+          echo "Previous slot '${PREVIOUS_SLOT}' parked at 0 replicas."
+
+      # Automatic rollback: restore the service selector to the previous
+      # slot (seconds, unlike a rollout undo) and undo the agent rollouts.
+      # Safe in every failure case — before the flip it is a no-op for
+      # traffic, after the flip it restores the known-good slot.
       - name: Roll back failed deployment
-        if: failure() && steps.smoke.outcome == 'failure'
+        if: failure() && (steps.promote.outcome == 'failure' || steps.smoke.outcome == 'failure')
         run: |
           set -u
-          echo "::error::Smoke test failed after rollout — rolling back to the previous revision."
-          for deployment in pixelated-empathy-blue session-agent qa-agent pipeline-agent; do
+          echo "::error::Rollout failed — restoring service selector to '$PREVIOUS_SLOT' and rolling back agents."
+          kubectl patch svc pixelated-empathy -n pixelated-empathy --type merge \
+            -p '{"spec":{"selector":{"app":"pixelated-empathy","slot":"'"${PREVIOUS_SLOT}"'"}}}'
+          for deployment in session-agent qa-agent pipeline-agent; do
             echo "Rolling back deployment/$deployment ..."
             kubectl rollout undo "deployment/$deployment" -n pixelated-empathy
           done
-          for deployment in pixelated-empathy-blue session-agent qa-agent pipeline-agent; do
+          for deployment in session-agent qa-agent pipeline-agent; do
             kubectl rollout status "deployment/$deployment" -n pixelated-empathy --timeout=5m
           done
+          kubectl rollout status deployment/pixelated-empathy-"$PREVIOUS_SLOT" -n pixelated-empathy --timeout=5m
           echo "Rollback complete."
           exit 1
 
