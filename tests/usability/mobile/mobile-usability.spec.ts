@@ -193,31 +193,45 @@ test.describe('Mobile Usability', () => {
   test('should have appropriate spacing for mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 })
     await page.goto('/')
+    await page.evaluate(() => document.fonts.ready)
 
-    // Check spacing between interactive elements
-    const buttons = await page.locator('button, a').all()
+    // Spacing per WCAG 2.2 AA 2.5.8's spacing exception: undersized
+    // targets (< 24px in either dimension) pass when their centers are
+    // at least 24px from the centers of other targets. Only elements
+    // that actually overlap horizontally can crowd each other vertically.
+    const interactives = await page.locator('button, a').all()
 
-    for (let i = 0; i < buttons.length - 1; i++) {
-      const currentButton = buttons[i]
-      const nextButton = buttons[i + 1]
+    for (let i = 0; i < interactives.length - 1; i++) {
+      const currentBox = await interactives[i].boundingBox()
+      const nextBox = await interactives[i + 1].boundingBox()
 
-      if (currentButton && nextButton) {
-        const currentBox = await currentButton.boundingBox()
-        const nextBox = await nextButton.boundingBox()
+      if (!currentBox || !nextBox) continue
 
-        if (currentBox && nextBox) {
-          // Calculate distance between elements
-          const distance = Math.abs(
-            nextBox.y - (currentBox.y + currentBox.height),
-          )
+      const horizontallyOverlapping =
+        currentBox.x < nextBox.x + nextBox.width &&
+        nextBox.x < currentBox.x + currentBox.width
+      const undersized =
+        Math.min(currentBox.width, currentBox.height) < 24 ||
+        Math.min(nextBox.width, nextBox.height) < 24
 
-          // Should have at least 8px spacing between interactive elements
-          if (distance < 100) {
-            // Only check if elements are close vertically
-            expect(distance).toBeGreaterThanOrEqual(8)
-          }
-        }
-      }
+      if (!horizontallyOverlapping || !undersized) continue
+
+      const centerDistance = Math.hypot(
+        nextBox.x + nextBox.width / 2 - (currentBox.x + currentBox.width / 2),
+        nextBox.y + nextBox.height / 2 - (currentBox.y + currentBox.height / 2),
+      )
+
+      const currentMarkup = await interactives[i].evaluate((el) =>
+        el.outerHTML.slice(0, 80),
+      )
+      const nextMarkup = await interactives[i + 1].evaluate((el) =>
+        el.outerHTML.slice(0, 80),
+      )
+
+      expect(
+        centerDistance,
+        `Undersized targets too close (${centerDistance.toFixed(1)}px center-to-center): ${currentMarkup} | ${nextMarkup}`,
+      ).toBeGreaterThanOrEqual(24)
     }
   })
 })
