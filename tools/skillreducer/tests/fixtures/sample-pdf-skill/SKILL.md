@@ -56,9 +56,11 @@ Use this report template:
 # PDF Analysis Report
 
 ## Summary
+
 [overview]
 
 ## Extracted text
+
 [content]
 ```
 
