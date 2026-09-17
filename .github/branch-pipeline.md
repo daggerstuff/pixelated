@@ -2,11 +2,11 @@
 
 ## Branches
 
-| Branch | Purpose | Vercel? | EKS? |
-|--------|---------|---------|------|
-| `staging` | **The main branch** | Yes (prod, path-filtered) | Yes (auto-deploy from CI) |
-| `feature/*` | Feature development | No | No |
-| `agent/*` | Agent work | No | No |
+| Branch      | Purpose             | Vercel?                   | EKS?                      |
+| ----------- | ------------------- | ------------------------- | ------------------------- |
+| `staging`   | **The main branch** | Yes (prod, path-filtered) | Yes (auto-deploy from CI) |
+| `feature/*` | Feature development | No                        | No                        |
+| `agent/*`   | Agent work          | No                        | No                        |
 
 ## Pipeline Flow
 
