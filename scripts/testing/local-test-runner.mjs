@@ -87,12 +87,15 @@ const ADVISORY_BUCKET_DIRS = {
     "apps/web/src/lib/security",
     "apps/web/src/lib/hooks",
     "apps/web/src/lib/memory",
-    "tests/bias-detection",
-    "tests/crisis-detection",
     "tests/memory",
     "tests/usability",
     "tests/hooks",
   ],
+  // Accuracy benchmarks (bias/crisis detection ML accuracy): a single
+  // ~15-minute accuracy-tests file that cannot be parallelized. Removed from
+  // the per-push advisory gate; runs nightly via the accuracy-gate workflow
+  // (same precedent as the CPU-bound load/performance excludes).
+  accuracy: ["tests/bias-detection", "tests/crisis-detection"],
   // Bucket 3: frontend split into sub-buckets to reduce per-process memory pressure.
   // src/components (React/JSX) is the heaviest and gets its own bucket.
   // src/hooks is moderate but has many small files that benefit from isolation.
