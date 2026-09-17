@@ -621,6 +621,9 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     align-items: center;
     gap: 10px;
     text-decoration: none;
+    /* Text-only wordmark renders ~17.6px tall; give the link a hit
+       area that meets the WCAG 2.2 AA 2.5.8 target-size minimum. */
+    min-height: 24px;
   }
   .brand span {
     font-family: var(--np-font-display);
