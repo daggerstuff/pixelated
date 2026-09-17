@@ -23,6 +23,10 @@ jobs:
     steps:
       - name: File or update the failure issue
         env:
+          # No checkout in this job — gh needs the repo identity from the
+          # event context instead of git remotes, or every command fails
+          # with "fatal: not a git repository".
+          GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FAILED_WORKFLOW: ${{ github.event.workflow_run.name }}
           RUN_URL: ${{ github.event.workflow_run.html_url }}
