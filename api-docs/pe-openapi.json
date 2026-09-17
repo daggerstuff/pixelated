@@ -13,9 +13,7 @@
             "default": "manager"
           }
         },
-        "required": [
-          "label"
-        ],
+        "required": ["label"],
         "title": "ApiKeyCreateRequest",
         "type": "object"
       },
@@ -60,13 +58,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "key_prefix",
-          "label",
-          "role",
-          "created_at"
-        ],
+        "required": ["id", "key_prefix", "label", "role", "created_at"],
         "title": "ApiKeyResponse",
         "type": "object"
       },
@@ -106,10 +98,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "content"
-        ],
+        "required": ["id", "content"],
         "title": "AuditItemIn",
         "type": "object"
       },
@@ -117,9 +106,7 @@
         "description": "Request body for POST /api/v1/audits.",
         "properties": {
           "auditors": {
-            "default": [
-              "brene_brown"
-            ],
+            "default": ["brene_brown"],
             "description": "Adversarial auditor persona names (TOML descriptors shipped with quadit).",
             "items": {
               "type": "string"
@@ -145,9 +132,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "items"
-        ],
+        "required": ["items"],
         "title": "AuditRequest",
         "type": "object"
       },
@@ -171,9 +156,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "scenario_id"
-        ],
+        "required": ["scenario_id"],
         "title": "CreateSimulationRequest",
         "type": "object"
       },
@@ -207,10 +190,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "item_id",
-          "severity"
-        ],
+        "required": ["item_id", "severity"],
         "title": "Finding",
         "type": "object"
       },
@@ -260,10 +240,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "name",
-          "slug"
-        ],
+        "required": ["name", "slug"],
         "title": "InstitutionCreateRequest",
         "type": "object"
       },
@@ -329,10 +306,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "email",
-          "password"
-        ],
+        "required": ["email", "password"],
         "title": "LoginRequest",
         "type": "object"
       },
@@ -417,11 +391,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "persona",
-          "passed",
-          "score"
-        ],
+        "required": ["persona", "passed", "score"],
         "title": "PersonaVerdict",
         "type": "object"
       },
@@ -475,10 +445,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "passed",
-          "mode"
-        ],
+        "required": ["passed", "mode"],
         "title": "QuadAuditReport",
         "type": "object"
       },
@@ -489,9 +456,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "refresh_token"
-        ],
+        "required": ["refresh_token"],
         "title": "RefreshRequest",
         "type": "object"
       },
@@ -511,10 +476,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "access_token",
-          "refresh_token"
-        ],
+        "required": ["access_token", "refresh_token"],
         "title": "RefreshResponse",
         "type": "object"
       },
@@ -691,12 +653,7 @@
             "type": "integer"
           }
         },
-        "required": [
-          "id",
-          "title",
-          "difficulty_level",
-          "created_at"
-        ],
+        "required": ["id", "title", "difficulty_level", "created_at"],
         "title": "ScenarioResponse",
         "type": "object"
       },
@@ -772,13 +729,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "scenario_id",
-          "learner_id",
-          "status",
-          "created_at"
-        ],
+        "required": ["id", "scenario_id", "learner_id", "status", "created_at"],
         "title": "SimulationResponse",
         "type": "object"
       },
@@ -805,11 +756,7 @@
             "default": "learner"
           }
         },
-        "required": [
-          "email",
-          "display_name",
-          "password"
-        ],
+        "required": ["email", "display_name", "password"],
         "title": "UserCreateRequest",
         "type": "object"
       },
@@ -847,13 +794,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "email_hash",
-          "display_name",
-          "role",
-          "is_active"
-        ],
+        "required": ["id", "email_hash", "display_name", "role", "is_active"],
         "title": "UserResponse",
         "type": "object"
       },
@@ -901,11 +842,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "loc",
-          "msg",
-          "type"
-        ],
+        "required": ["loc", "msg", "type"],
         "title": "ValidationError",
         "type": "object"
       }
@@ -987,9 +924,7 @@
           }
         ],
         "summary": "Run Audit",
-        "tags": [
-          "audits"
-        ]
+        "tags": ["audits"]
       }
     },
     "/api/v1/auth/api-keys": {
@@ -1018,9 +953,7 @@
           }
         ],
         "summary": "List Api Keys",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       },
       "post": {
         "description": "Create an API key for programmatic access.",
@@ -1063,9 +996,7 @@
           }
         ],
         "summary": "Create Api Key",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/auth/api-keys/{key_id}": {
@@ -1104,9 +1035,7 @@
           }
         ],
         "summary": "Revoke Api Key",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/auth/institutions": {
@@ -1135,9 +1064,7 @@
           }
         ],
         "summary": "List Institutions",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       },
       "post": {
         "description": "Create a new institution/tenant. Super admin only.",
@@ -1180,9 +1107,7 @@
           }
         ],
         "summary": "Create Institution",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/auth/login": {
@@ -1222,9 +1147,7 @@
           }
         },
         "summary": "Login",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/auth/refresh": {
@@ -1264,9 +1187,7 @@
           }
         },
         "summary": "Refresh Token",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/auth/users": {
@@ -1295,9 +1216,7 @@
           }
         ],
         "summary": "List Users",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       },
       "post": {
         "description": "Create a new user within the current tenant.\n\nInstitution admins can create users in their own tenant.",
@@ -1340,9 +1259,7 @@
           }
         ],
         "summary": "Create User",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/auth/users/me": {
@@ -1367,9 +1284,7 @@
           }
         ],
         "summary": "Get Current User Profile",
-        "tags": [
-          "authentication"
-        ]
+        "tags": ["authentication"]
       }
     },
     "/api/v1/health": {
@@ -1391,9 +1306,7 @@
           }
         },
         "summary": "Health Check",
-        "tags": [
-          "health"
-        ]
+        "tags": ["health"]
       }
     },
     "/api/v1/health/live": {
@@ -1415,9 +1328,7 @@
           }
         },
         "summary": "Liveness Check",
-        "tags": [
-          "health"
-        ]
+        "tags": ["health"]
       }
     },
     "/api/v1/health/ready": {
@@ -1439,9 +1350,7 @@
           }
         },
         "summary": "Readiness Check",
-        "tags": [
-          "health"
-        ]
+        "tags": ["health"]
       }
     },
     "/api/v1/scenarios": {
@@ -1524,9 +1433,7 @@
           }
         ],
         "summary": "List Scenarios",
-        "tags": [
-          "scenarios"
-        ]
+        "tags": ["scenarios"]
       }
     },
     "/api/v1/scenarios/{scenario_id}": {
@@ -1572,9 +1479,7 @@
           }
         ],
         "summary": "Get Scenario",
-        "tags": [
-          "scenarios"
-        ]
+        "tags": ["scenarios"]
       }
     },
     "/api/v1/simulations": {
@@ -1631,9 +1536,7 @@
           }
         ],
         "summary": "List Simulations",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       },
       "post": {
         "description": "Create a new simulation session.\n\nInitializes the session with pending status, creates persona instances\nfrom the scenario config, and returns the session details.",
@@ -1676,9 +1579,7 @@
           }
         ],
         "summary": "Create Simulation",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       }
     },
     "/api/v1/simulations/{sim_id}": {
@@ -1725,9 +1626,7 @@
           }
         ],
         "summary": "Get Simulation",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       }
     },
     "/api/v1/simulations/{sim_id}/abort": {
@@ -1774,9 +1673,7 @@
           }
         ],
         "summary": "Abort Simulation",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       }
     },
     "/api/v1/simulations/{sim_id}/pause": {
@@ -1823,9 +1720,7 @@
           }
         ],
         "summary": "Pause Simulation",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       }
     },
     "/api/v1/simulations/{sim_id}/resume": {
@@ -1872,9 +1767,7 @@
           }
         ],
         "summary": "Resume Simulation",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       }
     },
     "/api/v1/simulations/{sim_id}/start": {
@@ -1921,9 +1814,7 @@
           }
         ],
         "summary": "Start Simulation",
-        "tags": [
-          "simulations"
-        ]
+        "tags": ["simulations"]
       }
     },
     "/health": {

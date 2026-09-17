@@ -44,6 +44,10 @@ jobs:
         env:
           PYTHONPATH: '.:..'
         run: uv run python ../../scripts/ci/generate_pe_openapi.py
+      # The generated JSON must match Prettier style or CI's format check
+      # fails on the drift PR.
+      - name: Prettier-format the generated spec
+        run: pnpm exec prettier --write api-docs/pe-openapi.json
       - name: Open PR on drift
         uses: peter-evans/create-pull-request@v7
         with:
