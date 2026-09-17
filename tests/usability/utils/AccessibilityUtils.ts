@@ -36,7 +36,16 @@ export class AccessibilityUtils {
 
   static async checkAriaLabels(page: Page) {
     const results = await new AxeBuilder({ page: page })
-      .withRules(['aria-labels', 'button-name', 'link-name', 'label'])
+      // 'aria-labels' is not an axe-core rule id (analyze() throws
+      // "unknown rule" and fails the suite). Accessible-name coverage
+      // comes from the valid naming rules instead.
+      .withRules([
+        'button-name',
+        'link-name',
+        'label',
+        'aria-input-field-name',
+        'aria-toggle-field-name',
+      ])
       .analyze()
 
     expect(results.violations).toHaveLength(0)

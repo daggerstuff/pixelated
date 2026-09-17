@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useSyncExternalStore } from 'react'
 
 // Minimal style helper — inline styles only, no UnoCSS/tailwind dependency
 function np(classes: string): string {
@@ -101,7 +101,18 @@ const styles = {
 }
 
 export function Sidebar() {
-  const [pathname] = useState<string>(() => window.location.pathname)
+  // SSR-safe pathname read. The previous useState initializer called
+  // window.location directly, which threw "window is not defined" during
+  // SSR and aborted the /dashboard render stream. useSyncExternalStore
+  // uses the server snapshot for SSR and hydration (no mismatch), then the
+  // client snapshot after mount. The pathname is static for the life of a
+  // page load, so the subscription is a no-op.
+  const subscribe = () => () => {}
+  const pathname = useSyncExternalStore(
+    subscribe,
+    () => window.location.pathname,
+    () => '',
+  )
 
   const isDashboardPage =
     pathname.startsWith('/dashboard') ||

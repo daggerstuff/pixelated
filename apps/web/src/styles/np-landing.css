@@ -331,7 +331,10 @@
 }
 .case-evidence__intro > p {
   margin-top: 1.5rem;
-  color: var(--case-mid);
+  /* case-mid on the inverted section background is 2.18:1 (WCAG AA needs
+     4.5:1). The inverted section flips ink/paper, so full-contrast body
+     text here is the paper ramp. */
+  color: var(--case-paper);
 }
 .case-proof {
   margin: 3rem 0 0;
@@ -380,7 +383,8 @@
 }
 .case-evidence__list p {
   margin: 0.4rem 0 0;
-  color: var(--case-mid);
+  /* Same inverted-section contrast fix as __intro above. */
+  color: var(--case-paper);
   font-size: 0.875rem;
   line-height: 1.6;
 }
