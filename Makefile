@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down
 
 .DEFAULT_GOAL := help
 
@@ -64,6 +64,12 @@ check-all: ## Run all checks (typecheck + lint + format)
 	pnpm check:all
 
 # ── Docker ──────────────────────────────────────────────
+
+pe-test-db: ## Start (or reuse) the throwaway pe test database and apply the schema
+	./scripts/devops/pe-test-db.sh
+
+pe-test-db-down: ## Stop the pe test database container
+	docker stop pixelated-pe-test-db
 
 docker-up: ## Start database containers
 	docker compose -f infra/docker/docker-compose.db.yml up -d
