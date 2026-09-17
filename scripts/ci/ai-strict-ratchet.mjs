@@ -17,10 +17,11 @@
  *    is visible in review.
  *
  * mypy runs dependency-light on purpose: `uv run --no-project --with mypy`
- * with --ignore-missing-imports, so CI does not need the submodule's heavy
- * ML dependency tree (torch, transformers) to enforce typing. Third-party
- * imports resolve to Any; the pinned counts reflect the submodule's own
- * code, consistently across local and CI runs.
+ * with --ignore-missing-imports and --no-site-packages, so CI does not
+ * need the submodule's heavy ML dependency tree (torch, transformers) to
+ * enforce typing, and the pinned counts are identical on dev machines
+ * and bare CI runners. Third-party imports resolve to Any; the pinned
+ * counts reflect the submodule's own code, consistently everywhere.
  *
  * Usage:
  *   node scripts/ci/ai-strict-ratchet.mjs            # enforce
@@ -124,6 +125,11 @@ function runStrictMypy() {
       'mypy',
       '--config-file',
       configPath,
+      // Isolated analysis: without this, mypy searches the target
+      // interpreter's site-packages, so dev machines with pytest et al.
+      // installed type third-party decorators that CI's bare interpreter
+      // cannot — the error set diverges between environments.
+      '--no-site-packages',
       '--explicit-package-bases',
       '--follow-imports',
       'silent',
