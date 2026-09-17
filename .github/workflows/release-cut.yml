@@ -1,0 +1,54 @@
+# Release tag cutting. Manual dispatch: tags the current staging HEAD as the
+# requested version and pushes the tag, which triggers release.yml to publish
+# the GitHub release with generated notes. CI on staging is the gate for what
+# ships; this workflow only moves the marker.
+name: Cut release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag to cut, e.g. v1.4.0 (must not already exist)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cut-release
+  cancel-in-progress: false
+
+jobs:
+  cut:
+    name: Tag staging HEAD
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: staging
+          persist-credentials: true
+      - name: Validate input and tag staging HEAD
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ inputs.version }}"
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Version must look like v1.4.0 (optionally v1.4.0-rc.1). Got: $TAG"
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+            echo "::error::Tag $TAG already exists. Pick a new version."
+            exit 1
+          fi
+          SHA="$(git rev-parse HEAD)"
+          echo "Tagging staging HEAD $SHA as $TAG"
+          git config user.name "pixelated-release-bot"
+          git config user.email "noreply@users.noreply.github.com"
+          # Annotated tag: carries the staging HEAD subject line so `git tag`
+          # listings show what each release contains on top of the number.
+          SUBJECT="$(git log -1 --pretty=%s)"
+          git tag -a "$TAG" -m "Release $TAG (staging: $SUBJECT)"
+          git push origin "refs/tags/$TAG"
+          echo "Pushed $TAG. The Release workflow will publish notes for it."
