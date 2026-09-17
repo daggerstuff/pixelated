@@ -210,8 +210,8 @@ importers:
         specifier: ^5.9.1
         version: 5.9.1(@sinclair/typebox@0.34.52)(@standard-schema/spec@1.1.0)(ajv-errors@3.0.0(ajv@8.20.0))(ajv-formats@2.1.1(ajv@8.20.0))(ajv@8.20.0)(class-transformer@0.5.1)(class-validator@0.15.1)(effect@3.22.1)(joi@17.13.4)(react-hook-form@7.88.0(react@19.3.0))(zod@4.6.4)
       '@iconify-json/lucide':
-        specifier: ^1.2.130
-        version: 1.2.130
+        specifier: ^1.2.132
+        version: 1.2.132
       '@microsoft/clarity':
         specifier: ^1.0.2
         version: 1.0.2
@@ -357,8 +357,8 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0
       compression:
-        specifier: ^1.8.1
-        version: 1.8.1(supports-color@10.2.2)
+        specifier: ^1.8.2
+        version: 1.8.2(supports-color@10.2.2)
       connect-redis:
         specifier: ^10.0.0
         version: 10.0.0(express-session@1.19.0(supports-color@10.2.2))(redis@6.2.1(@opentelemetry/api@1.9.1))
@@ -457,7 +457,7 @@ importers:
         version: 9.0.3
       langsmith:
         specifier: '>=0.4.6'
-        version: 0.10.2(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.6.4))(ws@8.21.3(utf-8-validate@6.0.6))
+        version: 0.10.3(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4))(ws@8.21.3(utf-8-validate@6.0.6))
       lucide-react:
         specifier: ^1.43.0
         version: 1.45.0(react@19.3.0)
@@ -480,8 +480,8 @@ importers:
         specifier: ^9.10.0
         version: 9.10.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
       morgan:
-        specifier: ^1.12.0
-        version: 1.12.0(supports-color@10.2.2)
+        specifier: ^1.12.1
+        version: 1.12.1(supports-color@10.2.2)
       multer:
         specifier: ^2.1.1
         version: 2.3.0
@@ -537,8 +537,8 @@ importers:
         specifier: ^2.6.0
         version: 2.6.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       react-i18next:
-        specifier: ^17.0.12
-        version: 17.0.13(i18next@26.4.2(typescript@5.8.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@5.8.3)
+        specifier: ^17.0.14
+        version: 17.0.14(i18next@26.4.2(typescript@5.8.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.8.3)
       recharts:
         specifier: ^3.10.1
         version: 3.10.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react-is@19.2.8)(react@19.3.0)(redux@5.0.1)
@@ -579,8 +579,8 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0
       twilio:
-        specifier: ^6.1.0
-        version: 6.1.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+        specifier: ^6.1.1
+        version: 6.1.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       uuid:
         specifier: ^14.0.2
         version: 14.0.2
@@ -1096,8 +1096,8 @@ importers:
         specifier: ^1.29.0
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.4)
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1127,8 +1127,8 @@ importers:
         specifier: ^1.29.0
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.4)
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1161,8 +1161,8 @@ importers:
         specifier: ^1.29.0
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.4)
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1195,8 +1195,8 @@ importers:
         specifier: ^1.29.0
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.4)
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1247,8 +1247,8 @@ importers:
         specifier: ^1.29.0
         version: 1.43.0
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1299,8 +1299,8 @@ importers:
         specifier: ^1.29.0
         version: 1.43.0
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1351,8 +1351,8 @@ importers:
         specifier: ^1.29.0
         version: 1.43.0
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1394,8 +1394,8 @@ importers:
         specifier: ^1.29.0
         version: 1.30.0(@cfworker/json-schema@4.1.1)(supports-color@10.2.2)(zod@4.6.4)
       '@vercel/connect':
-        specifier: 2.0.2
-        version: 2.0.2(@ai-sdk/mcp@2.0.44(zod@4.6.4))(ai@7.0.0-beta.178(zod@4.6.4))(eve@0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2)))
+        specifier: 2.0.4
+        version: 2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))
       ai:
         specifier: 7.0.0-beta.178
         version: 7.0.0-beta.178(zod@4.6.4)
@@ -1670,6 +1670,7 @@ importers:
       vitest:
         specifier: ^4.1.10
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@24.13.3)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.4.0))(msw@2.15.0(@types/node@24.13.3)(typescript@5.8.3))(vite@7.3.6(@types/node@24.13.3)(jiti@2.7.0)(lightningcss@1.33.0)(terser@5.51.2)(tsx@4.23.13)(yaml@2.8.4))
+
 
 
 packages:
@@ -3519,6 +3520,9 @@ packages:
 
   '@iconify-json/lucide@1.2.130':
     resolution: {integrity: sha512-rRH6qHEDEaFMOkRJPbT8fBYPLP/2GHi3Q2+iDyTDuX4l5PT/GMKs6Dn9JkL7cHtCkIWKnyYWopmMlFpNek1Fcw==}
+
+  '@iconify-json/lucide@1.2.132':
+    resolution: {integrity: sha512-YgblweuQSz0AVG+zPvfECiYrJeTEFSKEthFSfwVB3OMJrL3dJ6QS0gX2akImqg3IEMRK1wVooAEAPbd7Kzj4FA==}
 
   '@iconify-json/ri@1.2.10':
     resolution: {integrity: sha512-WWMhoncVVM+Xmu9T5fgu2lhYRrKTEWhKk3Com0KiM111EeEsRLiASjpsFKnC/SrB6covhUp95r2mH8tGxhgd5Q==}
@@ -9146,6 +9150,10 @@ packages:
     resolution: {integrity: sha512-9mAqGPHLakhCLeNyxPkK4xVo746zQ/czLH1Ky+vkitMnWfWZps8r0qXuwhwizagCRttsL4lfG4pIOvaWLpAP0w==}
     engines: {node: '>= 0.8.0'}
 
+  compression@1.8.2:
+    resolution: {integrity: sha512-o8vI5RE5A6EVVOd9o41jKp41aJom+QTEO/Bx8MYNjexMo/Bv2WOjUfZr+aL0WnYSgymUy6zeguqLTsIhV0gMvQ==}
+    engines: {node: '>= 0.8.0'}
+
   concat-stream@2.0.0:
     resolution: {integrity: sha512-MWufYdFw53ccGjCA+Ol7XJYpAlW6/prSMzuPOTRnJGcGzuhLn4Scrz7qf6o8bROZ514ltazcIFJZevcfbo0x7A==}
     engines: {'0': node >= 6.0}
@@ -12419,6 +12427,10 @@ packages:
 
   morgan@1.12.0:
     resolution: {integrity: sha512-OHpTRQwn2ezasILW8iKe+Yww1XsfWsZIpUOLF7RDb2g5GwO3trPaRwi7+8BDiJ7HFx2Kg2mfUdCBcVhwYlOz2g==}
+    engines: {node: '>= 0.8.0'}
+
+  morgan@1.12.1:
+    resolution: {integrity: sha512-tljKC0ex20AjO58Ob/eZ53JloycbVswbVNCHx6V6VLGzqt/w8dIynVGL0G8qVjNKwiA7sYSogCrN6QtJ82IV+g==}
     engines: {node: '>= 0.8.0'}
 
   motion-dom@13.2.0:
@@ -18021,6 +18033,10 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
+  '@iconify-json/lucide@1.2.132':
+    dependencies:
+      '@iconify/types': 2.0.0
+
   '@iconify-json/ri@1.2.10':
     dependencies:
       '@iconify/types': 2.0.0
@@ -22819,6 +22835,14 @@ snapshots:
       ai: 7.0.0-beta.178(zod@4.6.4)
       eve: 0.54.3(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.6.4))(just-bash@3.4.2(supports-color@10.2.2))
 
+  '@vercel/connect@2.0.4(@ai-sdk/mcp@2.0.44(zod@4.5.4))(ai@7.0.0-beta.178(zod@4.5.4))(eve@0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2)))':
+    dependencies:
+      '@vercel/oidc': 3.7.1
+    optionalDependencies:
+      '@ai-sdk/mcp': 2.0.44(zod@4.5.4)
+      ai: 7.0.0-beta.178(zod@4.5.4)
+      eve: 0.52.2(@opentelemetry/api@1.9.1)(ai@7.0.0-beta.178(zod@4.5.4))(just-bash@3.4.2(supports-color@10.2.2))
+
   '@vercel/functions@3.9.5(@aws-sdk/credential-provider-web-identity@3.972.76)(ws@8.21.3(utf-8-validate@6.0.6))':
     dependencies:
       '@vercel/oidc': 3.7.1
@@ -24229,6 +24253,19 @@ snapshots:
       bytes: 3.1.2
       compressible: 2.0.18
       debug: 2.6.9(supports-color@10.2.2)
+      negotiator: 0.6.4
+      on-headers: 1.1.0
+      safe-buffer: 5.2.1
+      vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
+
+  compression@1.8.2(supports-color@10.2.2):
+    dependencies:
+      bytes: 3.1.2
+      compressible: 2.0.18
+      debug: 2.6.9(supports-color@10.2.2)
+      destroy: 1.2.0
       negotiator: 0.6.4
       on-headers: 1.1.0
       safe-buffer: 5.2.1
@@ -27189,6 +27226,16 @@ snapshots:
       openai: 6.37.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.6.4)
       ws: 8.21.3(utf-8-validate@6.0.6)
 
+  langsmith@0.10.3(@opentelemetry/api@1.9.1)(@opentelemetry/exporter-trace-otlp-proto@0.219.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(openai@6.37.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4))(ws@8.21.3(utf-8-validate@6.0.6)):
+    dependencies:
+      p-queue: 6.6.2
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+      '@opentelemetry/exporter-trace-otlp-proto': 0.219.0(@opentelemetry/api@1.9.1)
+      '@opentelemetry/sdk-trace-base': 2.8.0(@opentelemetry/api@1.9.1)
+      openai: 6.37.0(ws@8.21.3(utf-8-validate@6.0.6))(zod@4.5.4)
+      ws: 8.21.3(utf-8-validate@6.0.6)
+
   language-subtag-registry@0.3.23: {}
 
   language-tags@1.0.9:
@@ -28207,6 +28254,16 @@ snapshots:
       - socks
 
   morgan@1.12.0(supports-color@10.2.2):
+    dependencies:
+      basic-auth: 2.0.1
+      debug: 2.6.9(supports-color@10.2.2)
+      depd: 2.0.0
+      on-finished: 2.4.1
+      on-headers: 1.1.0
+    transitivePeerDependencies:
+      - supports-color
+
+  morgan@1.12.1(supports-color@10.2.2):
     dependencies:
       basic-auth: 2.0.1
       debug: 2.6.9(supports-color@10.2.2)
@@ -29441,6 +29498,17 @@ snapshots:
       use-sync-external-store: 1.6.0(react@19.3.0)
     optionalDependencies:
       react-dom: 19.3.0(react@19.3.0)
+      typescript: 5.8.3
+
+  react-i18next@17.0.14(i18next@26.4.2(typescript@5.8.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.8.3):
+    dependencies:
+      '@babel/runtime': 7.29.7
+      html-parse-stringify: 4.0.1
+      i18next: 26.4.2(typescript@5.8.3)
+      react: 19.2.8
+      use-sync-external-store: 1.6.0(react@19.2.8)
+    optionalDependencies:
+      react-dom: 19.2.8(react@19.2.8)
       typescript: 5.8.3
 
   react-is@16.13.1: {}
@@ -30970,6 +31038,19 @@ snapshots:
   tweetnacl@1.0.3: {}
 
   twilio@6.1.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
+    dependencies:
+      axios: 1.20.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
+      dayjs: 1.11.23
+      https-proxy-agent: 5.0.1(supports-color@10.2.2)
+      jsonwebtoken: 9.0.3
+      qs: 6.16.0
+      scmp: 2.1.0
+      xmlbuilder: 13.0.2
+    transitivePeerDependencies:
+      - debug
+      - supports-color
+
+  twilio@6.1.1(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2):
     dependencies:
       axios: 1.20.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
       dayjs: 1.11.23
