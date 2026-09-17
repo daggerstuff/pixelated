@@ -77,6 +77,7 @@
     "apps/web/src/lib/services/mongodb.dao.ts",
     "apps/web/src/lib/services/notification/NotificationService.ts",
     "apps/web/src/lib/services/patient-rights/dataPortabilityService.ts",
+    "apps/web/src/lib/sentry/config.ts",
     "apps/web/src/scripts/**",
     "apps/web/src/utils/serviceWorkerRegistration.ts",
     "infra/docker/**",
