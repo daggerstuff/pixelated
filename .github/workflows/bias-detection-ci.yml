@@ -247,7 +247,7 @@ jobs:
 
       - name: Upload coverage reports
         if: hashFiles('coverage/lcov.info') != ''
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.0
         with:
           files: ./coverage/lcov.info
           flags: typescript
@@ -392,7 +392,7 @@ jobs:
           DATABASE_URL: postgresql://postgres@localhost:5432/bias_detection
 
       - name: Upload Python coverage
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.0
         with:
           files: ./apps/web/src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python
