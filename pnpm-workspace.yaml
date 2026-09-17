@@ -299,7 +299,11 @@ overrides:
   follow-redirects: '>=1.16.0'
   glob: ^13.0.0
   h3: '>=1.15.9'
-  'nitro>h3': ^2.0.1-rc.31
+  # Exact pin, not a caret range: prerelease ranges (^x-rc.N) re-resolve to
+  # every newly published RC and drift pnpm-lock.yaml on every commit hook
+  # sync. rc.32 satisfies the security floor (>= rc.31); bump the pin
+  # deliberately when a newer RC is vetted.
+  'nitro>h3': 2.0.1-rc.32
   hono: ^4.12.14
   ip-address: '>=10.1.1'
   # CVE-2026-84375 (HIGH, fixed in 4.3.2).
