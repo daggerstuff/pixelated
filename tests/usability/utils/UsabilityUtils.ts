@@ -169,6 +169,11 @@ export class UsabilityUtils {
     }
 
     try {
+      // Layout metrics depend on the loaded webfonts. Measuring before
+      // document.fonts settles captures fallback-font metrics (shorter
+      // line boxes) and misreports touch-target sizes.
+      await page.evaluate(() => document.fonts.ready)
+
       // Touch targets: WCAG 2.2 AA 2.5.8 sets a 24x24px minimum.
       // Exceptions per 2.5.8: inline links within sentences, and
       // targets not currently rendered. The previous blanket 44x44
@@ -194,8 +199,11 @@ export class UsabilityUtils {
         }
         if (box.width < 24 || box.height < 24) {
           results.touchTargetsAdequate = false
+          const markup = await element.evaluate(
+            (el) => el.outerHTML.slice(0, 120),
+          )
           results.errors.push(
-            `Touch target below WCAG 2.5.8 minimum (24px): ${box.width}x${box.height}px`,
+            `Touch target below WCAG 2.5.8 minimum (24px): ${box.width}x${box.height}px ${markup}`,
           )
         }
       }
