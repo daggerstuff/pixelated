@@ -156,6 +156,20 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
     <link rel="stylesheet" href={withBasePath('/css/style.css')} />
+    <!-- Preload variable font subsets used by hero/display text to start
+         fetching earlier in the critical path (before CSS @font-face parse).
+         Latin subsets cover >95% of rendered characters on initial viewport. -->
+    {isVercelDeploy && (
+      <>
+        <link
+          rel="preload"
+          href={withBasePath('/_astro/libre-franklin-latin-wght-normal-CLTz0ja0.woff2')}
+          as="font"
+          type="font/woff2"
+          crossorigin="anonymous"
+        />
+      </>
+    )}
     <title>{fullTitle}</title>
 
     <meta property="og:type" content={ogType} />

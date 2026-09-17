@@ -55,7 +55,7 @@ const navLinks = [
       <div class="np-header-actions">
         <ThemeToggle />
 
-        <a href="/contact" class="np-btn-primary"> Get Started </a>
+        <a href="/contact" class="np-header-cta"> Get Started </a>
       </div>
     </nav>
 
@@ -134,7 +134,7 @@ const navLinks = [
       >
         <a
           href="/contact"
-          class="np-btn-primary"
+          class="np-header-cta"
           style="display:block;text-align:center"
           onclick="document.getElementById('np-mobile-menu').classList.remove('np-mobile-menu--open'); document.getElementById('np-mobile-btn').setAttribute('aria-expanded','false');"
           >Get Started</a
@@ -212,7 +212,7 @@ const navLinks = [
   .np-brand-name {
     font-family: var(--np-font-display);
     font-size: 1rem;
-    font-weight: 350;
+    font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.1;
     color: var(--np-text);
@@ -273,7 +273,7 @@ const navLinks = [
     gap: 12px;
   }
 
-  .np-btn-primary {
+  .np-header-cta {
     display: inline-flex;
     align-items: center;
     padding: 8px 20px;
@@ -287,16 +287,16 @@ const navLinks = [
     transition: opacity 0.15s var(--np-ease);
   }
 
-  .np-btn-primary:hover {
+  .np-header-cta:hover {
     opacity: 0.85;
   }
 
-  .np-btn-primary:active {
+  .np-header-cta:active {
     opacity: 0.7;
   }
 
-  .np-btn-primary:disabled,
-  .np-btn-primary[aria-disabled='true'] {
+  .np-header-cta:disabled,
+  .np-header-cta[aria-disabled='true'] {
     opacity: 0.35;
     pointer-events: none;
   }
@@ -405,7 +405,7 @@ const navLinks = [
     .np-brand-text {
       display: none;
     }
-    .np-nav .np-btn-primary {
+    .np-nav .np-header-cta {
       padding: 8px 12px;
       font-size: 0.625rem;
     }
@@ -418,7 +418,7 @@ const navLinks = [
     .np-nav-link {
       transition-duration: 0.01ms;
     }
-    .np-btn-primary {
+    .np-header-cta {
       transition-duration: 0.01ms;
     }
     .np-theme-toggle {

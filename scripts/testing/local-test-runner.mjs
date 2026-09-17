@@ -88,8 +88,11 @@ const ADVISORY_BUCKET_DIRS = {
     "apps/web/src/lib/hooks",
     "apps/web/src/lib/memory",
     "tests/memory",
-    "tests/usability",
     "tests/hooks",
+    // tests/usability intentionally excluded — Playwright specs, not Vitest
+    // (importing @playwright/test at collection time hangs the vitest process
+    // for ~15 minutes with 0 tests collected; same reason as tests/api). They
+    // are not covered by any suite until wired into playwright.config.ts.
   ],
   // Accuracy benchmarks (bias/crisis detection ML accuracy): a single
   // ~15-minute accuracy-tests file that cannot be parallelized. Removed from
