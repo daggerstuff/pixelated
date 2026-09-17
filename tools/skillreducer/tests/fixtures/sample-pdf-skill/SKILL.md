@@ -27,21 +27,23 @@ with pdfplumber.open("file.pdf") as pdf:
 
 ## Examples
 
-**Example 1: Extract first page**
+### Example 1: Extract first page
 
 Input: `report.pdf`
 Output: plain text from page 1
 
 ```python
 import pdfplumber
+
 with pdfplumber.open("report.pdf") as pdf:
     print(pdf.pages[0].extract_text())
 ```
 
-**Example 2: Extract tables**
+### Example 2: Extract tables
 
 ```python
 import pdfplumber
+
 with pdfplumber.open("report.pdf") as pdf:
     tables = pdf.pages[0].extract_tables()
 ```
@@ -54,9 +56,11 @@ Use this report template:
 # PDF Analysis Report
 
 ## Summary
+
 [overview]
 
 ## Extracted text
+
 [content]
 ```
 

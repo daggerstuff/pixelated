@@ -33,7 +33,12 @@ const logger = createBuildSafeLogger('config')
  */
 export function resolveSentryRelease(fallback: string = '0.0.1'): string {
   const env = import.meta.env as Record<string, unknown>
-  const procEnv = process.env as Record<string, unknown>
+  // This module is bundled for both server and client. The browser has no
+  // `process` global, so guard before touching process.env.
+  const procEnv =
+    typeof process !== 'undefined'
+      ? (process.env as Record<string, unknown>)
+      : ({} as Record<string, unknown>)
 
   const toOptionalString = (value: unknown): string | undefined =>
     typeof value === 'string' && value.length > 0 ? value : undefined
@@ -71,7 +76,11 @@ export function resolveSentryRelease(fallback: string = '0.0.1'): string {
 
 export function resolveSentryDsn(): string | undefined {
   const env = import.meta.env as Record<string, unknown>
-  const procEnv = process.env as Record<string, unknown>
+  // Guard: this module also runs in the browser, where `process` is undefined.
+  const procEnv =
+    typeof process !== 'undefined'
+      ? (process.env as Record<string, unknown>)
+      : ({} as Record<string, unknown>)
 
   const toTrimmedString = (value: unknown): string | undefined => {
     if (typeof value !== 'string') return undefined
@@ -98,8 +107,8 @@ export function resolveSentryDsn(): string | undefined {
 
   if (
     import.meta.env.DEV ||
-    process.env['NODE_ENV'] !== 'production' ||
-    process.env['SENTRY_DEBUG']
+    (typeof process !== 'undefined' &&
+      (process.env['NODE_ENV'] !== 'production' || process.env['SENTRY_DEBUG']))
   ) {
     logger.info(
       `[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`,
@@ -109,7 +118,7 @@ export function resolveSentryDsn(): string | undefined {
   return dsn
 }
 
-export const SENTRY_CONFIG = {
+const SENTRY_CONFIG = {
   dsn: resolveSentryDsn(),
 
   // Use import.meta.env.DEV (Vite's built-in flag) as the authoritative check
@@ -152,7 +161,9 @@ const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]'])
  * @returns true when the host is a local loopback address
  */
 export function isLoopbackHostname(hostname: string | undefined): boolean {
-  return hostname !== undefined && LOOPBACK_HOSTNAMES.has(hostname.toLowerCase())
+  return (
+    hostname !== undefined && LOOPBACK_HOSTNAMES.has(hostname.toLowerCase())
+  )
 }
 
 /**

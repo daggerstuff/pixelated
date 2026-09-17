@@ -1,6 +1,6 @@
 ---
 name: api-testing
-description: ""
+description: ''
 ---
 
 # API Testing
@@ -25,6 +25,7 @@ description: ""
 ```python
 import httpx
 import pytest
+
 
 @pytest.mark.asyncio
 async def test_health_returns_200(api_client: httpx.AsyncClient):

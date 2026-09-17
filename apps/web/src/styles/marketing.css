@@ -118,8 +118,8 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Literata Variable', Georgia, serif);
-  font-weight: var(--np-weight-display, 350);
+  font-family: var(--np-font-display, 'Libre Franklin Variable', sans-serif);
+  font-weight: var(--np-weight-display, 700);
   max-width: 18ch;
   font-size: var(--np-text-display, clamp(2.5rem, 5vw, 4.5rem));
   line-height: var(--np-leading-display, 1.05);
@@ -164,7 +164,7 @@
   padding: 0.92rem 1.4rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  font-family: var(--np-font-mono, 'IBM Plex Mono', ui-monospace, monospace);
+  font-family: var(--np-font-label, system-ui, sans-serif);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -274,7 +274,7 @@
 .marketing-card__label,
 .marketing-list-label,
 .marketing-quote-label {
-  font-family: var(--np-font-mono, 'IBM Plex Mono', ui-monospace, monospace);
+  font-family: var(--np-font-label, system-ui, sans-serif);
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.13em;
@@ -283,7 +283,7 @@
 }
 
 .marketing-eyebrow {
-  font-family: var(--np-font-mono, 'IBM Plex Mono', ui-monospace, monospace);
+  font-family: var(--np-font-label, system-ui, sans-serif);
   font-size: 0.74rem;
   font-weight: 600;
   letter-spacing: 0.16em;
@@ -417,12 +417,7 @@
 .marketing-card h3,
 .marketing-card h4 {
   margin: 0;
-  font-family: var(
-    --np-font-body,
-    'Albert Sans Variable',
-    system-ui,
-    sans-serif
-  );
+  font-family: var(--np-font-body, system-ui, sans-serif);
   font-weight: var(--np-weight-title, 600);
   font-size: clamp(1.18rem, 1.7vw, 1.4rem);
   line-height: 1.18;
