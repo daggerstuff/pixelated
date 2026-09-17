@@ -1,7 +1,7 @@
 {
   "$schema": "Tech-debt baseline for scripts/ci/tech-debt-audit.mjs",
   "description": "Keys of pre-existing untracked TODO/FIXME/HACK/XXX markers. The audit fails when a new untracked marker appears. Fix by adding a ticket reference, e.g. `TODO(PIX-123): ...`, or re-pin with `pnpm lint:tech-debt -- --update` if the marker is intentional.",
-  "generatedAt": "2026-09-16T15:56:45.376Z",
+  "generatedAt": "2026-09-16T23:10:28.111Z",
   "counts": {
     "TODO": 184,
     "XXX": 16
@@ -199,7 +199,7 @@
     "scripts/vps/vps-provision.sh:779:XXX",
     "scripts/vps/vps-provision.sh:782:XXX",
     "scripts/vps/vps-provision.sh:785:XXX",
-    "tools/agent_runner/cli.py:179:TODO",
+    "tools/agent_runner/cli.py:182:TODO",
     "tools/agent_runner/client.py:430:TODO",
     "tools/agent_runner/config_loader.py:113:TODO",
     "tools/agent_runner/execution_harness.py:281:TODO",
