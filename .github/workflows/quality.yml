@@ -108,6 +108,78 @@ jobs:
       - name: Ruff lint gate (scripts/, tools/ — zero findings)
         run: uv run ruff check scripts tools
 
+  # pe service test suite against a real postgres (the DB-backed tests are
+  # integration tests; there is no in-memory escape hatch for asyncpg).
+  # Coverage floor is a regression gate: current coverage is ~79%; the
+  # threshold is set at 75% so the floor fails only on real regression, not
+  # noise. Ratchet upward deliberately, never lower.
+  pe-integration-tests:
+    name: pe tests (postgres + coverage floor)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      PE_DATABASE_URL: postgresql+asyncpg://pe_test@postgres:5432/pixelated_empathy
+      PE_TESTING: '1'
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_DB: pixelated_empathy
+          POSTGRES_USER: pe_test
+          # Local-network service container for a throwaway CI database;
+          # GitHub does not expose it outside the runner.
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U pe_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+      # Schema: alembic is not a runtime dependency, so run it ephemerally.
+      # env.py derives the sync URL from PE_DATABASE_URL itself.
+      - name: Apply pe schema (alembic)
+        working-directory: apps/web
+        run: |
+          cat > /tmp/pe-alembic.ini <<'EOF'
+          [alembic]
+          script_location = src/pe/migrations
+
+          [loggers]
+          keys = root
+          [handlers]
+          keys = console
+          [formatters]
+          keys = generic
+          [logger_root]
+          level = WARN
+          handlers = console
+          qualname =
+          [handler_console]
+          class = StreamHandler
+          args = (sys.stderr,)
+          level = NOTSET
+          formatter = generic
+          [formatter_generic]
+          format = %(levelname)-5.5s [%(name)s] %(message)s
+          EOF
+          uv run --with alembic --with psycopg2-binary \
+            python -m alembic -c /tmp/pe-alembic.ini upgrade head
+      - name: Run pe suite with coverage floor (75%)
+        working-directory: apps/web
+        run: |
+          uv run --with pytest-cov python -m pytest src/pe/tests -q \
+            --cov=src.pe --cov-report=term --cov-fail-under=75
+
   # N+1 query detection. The detector lives in production code
   # (apps/web/src/lib/db/query-counting.ts) and is exercised here so a
   # regression in the instrumentation or a new N+1 becomes a test failure.

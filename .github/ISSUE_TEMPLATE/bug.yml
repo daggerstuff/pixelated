@@ -1,0 +1,67 @@
+name: Bug report
+description: Report something that is broken or behaving incorrectly
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Note: this is a clinical
+        platform — never paste patient data, session content, credentials, or
+        PHI into an issue.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug, plus what you expected to happen instead.
+      placeholder: 'Describe the incorrect behavior…'
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Minimal sequence anyone can follow to see the problem.
+      placeholder: |
+        1. Go to '…'
+        2. Click '…'
+        3. Observe '…'
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or errors
+      description: Paste non-sensitive output only (scrub anything patient-identifiable).
+      render: shell
+    validations:
+      required: false
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Affected surface
+      options:
+        - Frontend (web app)
+        - pe backend API (FastAPI)
+        - Admin dashboard
+        - AI / LLM services
+        - Agents (session/qa/pipeline)
+        - CI / build
+        - Infrastructure / deploy
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment (browser, OS, branch/commit if known)
+      placeholder: 'e.g. Chrome 140 / Ubuntu / staging @ 5c75f61d7'
+    validations:
+      required: false
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmations
+      options:
+        - label: No PHI, patient data, or credentials appear in this report.
+          required: true
