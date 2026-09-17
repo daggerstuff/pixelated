@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       scenario:
-        description: "Chaos experiment scenario to run"
+        description: 'Chaos experiment scenario to run'
         required: true
         type: choice
         options:
@@ -16,12 +16,12 @@ on:
           - foresight-mcp
           - all
       duration:
-        description: "Experiment duration in seconds (default: 300)"
+        description: 'Experiment duration in seconds (default: 300)'
         required: false
         type: string
-        default: "300"
+        default: '300'
   schedule:
-    - cron: "0 10 * * 1"
+    - cron: '0 10 * * 1'
 
 concurrency:
   group: chaos-validation-${{ github.ref }}
