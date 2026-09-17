@@ -28,18 +28,20 @@ with pdfplumber.open("file.pdf") as pdf:
 
 ## Examples
 
-**Example 1: Extract first page**
+### Example 1: Extract first page
 
 ```python
 import pdfplumber
+
 with pdfplumber.open("report.pdf") as pdf:
     print(pdf.pages[0].extract_text())
 ```
 
-**Example 2: Extract tables**
+### Example 2: Extract tables
 
 ```python
 import pdfplumber
+
 with pdfplumber.open("report.pdf") as pdf:
     tables = pdf.pages[0].extract_tables()
 ```

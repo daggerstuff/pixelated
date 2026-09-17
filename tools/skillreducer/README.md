@@ -36,7 +36,10 @@ Tool / MCP schemas        →  TSCG                 →  lean mcp_manifest.tscg.
 > Yudong Gao, Zongjie Li, Yuanyuan Yuan, Zimo Ji, Pingchuan Ma, Shuai Wang  
 > [arXiv:2603.29919](https://arxiv.org/abs/2603.29919)
 
-**Problem.** Every token in a skill’s YAML `description` and body competes for context. The authors studied **55,315** public skills and found systemic waste: missing/short routing descriptions, monolithic bodies (only ~38.5% core rules), and heavy reference injection.
+**Problem.** Every token in a skill’s YAML `description` and body competes for context.
+The authors studied **55,315** public skills and found systemic waste: missing/short
+routing descriptions, monolithic bodies (only ~38.5% core rules), and heavy reference
+injection.
 
 **Solution.** A **structure-aware** two-stage paper pipeline (this repo adds **Stage 3** for script extraction):
 
@@ -221,9 +224,9 @@ from skillreducer.agent import SkillReducerAgent
 agent = SkillReducerAgent()
 result = agent.optimize(Path("path/to/my-skill"), output_dir=Path("optimized"))
 
-print(result.skill_md)           # optimized SKILL.md path
-print(result.reference_files)    # examples.md, templates.md, etc.
-print(result.agent_summary)      # token savings summary
+print(result.skill_md)  # optimized SKILL.md path
+print(result.reference_files)  # examples.md, templates.md, etc.
+print(result.agent_summary)  # token savings summary
 ```
 
 ### Optional TSCG (paper 2) — compress tool schemas
@@ -382,7 +385,9 @@ ruff check skillreducer tests
 | [CITATION.md](CITATION.md) | BibTeX / APA for all three papers |
 | [skill_reducer.pdf](skill_reducer.pdf) | SkillReducer paper (local copy) |
 
-If you use this tool in research, please cite the **SkillReducer paper** (Gao et al., 2026) for skill debloating, the **TSCG papers** (Sakizli, 2026) when discussing `--tscg`, and **SkillRevise** (Liu et al., 2026) for `revise` — not this repository alone.
+If you use this tool in research, please cite the **SkillReducer paper** (Gao et al., 2026)
+for skill debloating, the **TSCG papers** (Sakizli, 2026) when discussing `--tscg`, and
+**SkillRevise** (Liu et al., 2026) for `revise` — not this repository alone.
 
 ## License
 
