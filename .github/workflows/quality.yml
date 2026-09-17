@@ -8,6 +8,8 @@ on:
     branches: [staging]
     paths:
       - 'apps/web/src/**'
+      # Gitlink: a submodule bump can change pinned strict-typing debt.
+      - 'ai'
       - 'agents/**'
       - 'packages/**'
       - 'scripts/ci/**'
@@ -107,6 +109,37 @@ jobs:
 
       - name: Ruff lint gate (scripts/, tools/ — zero findings)
         run: uv run ruff check scripts tools
+
+  # Strict-typing ratchet for the ai submodule's research tree. The
+  # submodule is legacy-exempt from the pe mypy gate; the ratchet pins
+  # its existing strict-error debt per file/code and fails CI when it
+  # grows or when a NEW file arrives with strict errors. Runs
+  # dependency-light (uv --no-project --with mypy), so the submodule's
+  # heavy ML dependency tree is not installed here.
+  ai-strict-ratchet:
+    name: ai submodule strict ratchet
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+          submodules: false
+
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Strict-typing ratchet (ai/research)
+        run: node scripts/ci/ai-strict-ratchet.mjs
 
   # pe service test suite against a real postgres (the DB-backed tests are
   # integration tests; there is no in-memory escape hatch for asyncpg).
