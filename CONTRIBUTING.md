@@ -234,9 +234,58 @@ cd apps/web
 PYTHONPATH=.:.. uv run pytest src/pe/tests/ -q
 ```
 
-The integration tests additionally need the local Docker databases
-(`make docker-up`, credentials from `docker-compose.yml`); without them the
-DB-backed tests fail on connection errors rather than being skipped.
+The `pe` service uses the `PE_` env prefix, so the root `.env`'s
+`DATABASE_URL` does **not** reach it. DB-backed tests need a dedicated
+throwaway postgres. Create one (any free port) and point the tests at it:
+
+```bash
+docker run -d --name pixelated-pe-test-db \
+  -e POSTGRES_DB=pixelated_empathy \
+  -e POSTGRES_USER=pe_test \
+  -e POSTGRES_HOST_AUTH_METHOD=trust \
+  -p 127.0.0.1:5434:5432 postgres:17
+
+cd apps/web
+PYTHONPATH=.:.. \
+PE_DATABASE_URL="postgresql+asyncpg://pe_test@127.0.0.1:5434/pixelated_empathy" \
+PE_TESTING=1 uv run pytest src/pe/tests/ -q
+```
+
+Apply the pe schema once before the first run (alembic is not a runtime
+dependency, so run it ephemerally; `env.py` reads the URL from
+`PE_DATABASE_URL`):
+
+```bash
+cat > /tmp/pe-alembic.ini <<'EOF'
+[alembic]
+script_location = src/pe/migrations
+
+[loggers]
+keys = root
+[handlers]
+keys = console
+[formatters]
+keys = generic
+[logger_root]
+level = WARN
+handlers = console
+qualname =
+[handler_console]
+class = StreamHandler
+args = (sys.stderr,)
+level = NOTSET
+formatter = generic
+[formatter_generic]
+format = %(levelname)-5.5s [%(name)s] %(message)s
+EOF
+
+PYTHONPATH=.:.. PE_DATABASE_URL="postgresql+asyncpg://pe_test@127.0.0.1:5434/pixelated_empathy" \
+  uv run --with alembic --with psycopg2-binary python -m alembic -c /tmp/pe-alembic.ini upgrade head
+```
+
+The container binds to loopback only and uses `trust` auth — it is a
+throwaway local test database; never expose it or reuse the pattern for
+anything else.
 
 ## AI Assistant Instructions
 
