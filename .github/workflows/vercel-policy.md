@@ -36,7 +36,7 @@ EKS or other workflows — never by Vercel.
 ```
 apps/web/src/**
 apps/web/public/**
-apps/web/astro.config.*
+astro.config.*
 apps/web/tailwind.config.*
 packages/ui/**
 packages/components/**
