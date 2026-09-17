@@ -118,7 +118,7 @@ export function resolveSentryDsn(): string | undefined {
   return dsn
 }
 
-export const SENTRY_CONFIG = {
+const SENTRY_CONFIG = {
   dsn: resolveSentryDsn(),
 
   // Use import.meta.env.DEV (Vite's built-in flag) as the authoritative check
