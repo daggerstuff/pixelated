@@ -1,10 +1,9 @@
 // Centralized font imports — all layouts import from here to ensure
 // consistent font loading and avoid duplicate <style> injection.
-// Matches DESIGN.md: Libre Franklin Variable (display + body + tracked
-// uppercase labels — one family, hierarchy by weight), IBM Plex Mono
-// (app-internal data/code utility only, never on marketing surfaces).
-import '@fontsource-variable/libre-franklin'
-import '@fontsource/archivo-black/400.css'
+// Archivo Variable supplies the condensed casework display voice; Geist
+// carries body and interface text. IBM Plex Mono remains app-data utility.
+import '@fontsource-variable/archivo'
+import '@fontsource-variable/geist'
 import '@fontsource/ibm-plex-mono/400.css'
 import '@fontsource/ibm-plex-mono/500.css'
 import '@fontsource/ibm-plex-mono/600.css'

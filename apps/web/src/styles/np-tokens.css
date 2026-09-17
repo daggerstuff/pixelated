@@ -36,24 +36,16 @@
   --np-selection-text: var(--ink, oklch(0.93 0 0));
 
   /* =============================================
-      TYPOGRAPHY — The Marked Document.
-      Archivo Black is the poster voice: the hero statement, marked like
-      a supervisor's highlighter. Libre Franklin Variable carries running
-      text, body, and tracked uppercase labels. One family carries all
-      non-poster hierarchy by weight, size, and tracking.
-      IBM Plex Mono stays for app-internal data/code utility only.
-      ============================================= */
-  /* Poster: landing hero statements only — heavy grotesk slab */
-  --np-font-poster: 'Archivo Black', 'Libre Franklin Variable', Arial,
-    sans-serif;
-  --np-font-display:
-    'Libre Franklin Variable', 'Franklin Gothic Medium', Arial, sans-serif;
-  --np-font-body:
-    'Libre Franklin Variable', system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', sans-serif;
-  /* Label voice: small, tracked, uppercase Franklin — not monospace */
-  --np-font-label:
-    'Libre Franklin Variable', system-ui, -apple-system, sans-serif;
+     TYPOGRAPHY — Swiss casework.
+     Archivo Variable supplies compact, high-authority display typography.
+     Geist carries reading and interface text without becoming the identity.
+     IBM Plex Mono remains restricted to app data and code surfaces.
+     ============================================= */
+  --np-font-condensed: 'Archivo Variable', 'Arial Narrow', sans-serif;
+  --np-font-poster: var(--np-font-condensed);
+  --np-font-display: var(--np-font-condensed);
+  --np-font-body: 'Geist Variable', system-ui, -apple-system, sans-serif;
+  --np-font-label: 'Geist Variable', system-ui, -apple-system, sans-serif;
   --np-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Weights — weight carries hierarchy (The Content-is-Type Rule) */
@@ -197,6 +189,10 @@ html {
 body {
   margin: 0;
   background-color: var(--np-bg) !important;
+}
+
+html body {
+  font-family: var(--np-font-body);
 }
 
 ::selection {

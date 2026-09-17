@@ -118,7 +118,7 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Libre Franklin Variable', sans-serif);
+  font-family: var(--np-font-display, 'Archivo Variable', sans-serif);
   font-weight: var(--np-weight-display, 700);
   max-width: 18ch;
   font-size: var(--np-text-display, clamp(2.5rem, 5vw, 4.5rem));
