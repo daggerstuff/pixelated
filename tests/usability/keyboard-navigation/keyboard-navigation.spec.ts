@@ -41,17 +41,27 @@ test.describe('Keyboard Navigation', () => {
       await page.keyboard.press('Tab')
     }
 
-    const forwardElement = await page.evaluate(() => document.activeElement?.id)
+    const forwardElement = await page.evaluateHandle(
+      () => document.activeElement,
+    )
 
     // Navigate backward
     await page.keyboard.press('Shift+Tab')
 
-    const backwardElement = await page.evaluate(
-      () => document.activeElement?.id,
+    const backwardElement = await page.evaluateHandle(
+      () => document.activeElement,
     )
 
-    // Should be different elements
-    expect(backwardElement).not.toBe(forwardElement)
+    // Should be different elements. Comparing element handles (not ids)
+    // — focusable elements without id attributes all evaluate to
+    // undefined, which made this assertion compare nothing.
+    expect(forwardElement).toBeTruthy()
+    expect(backwardElement).toBeTruthy()
+    const isSameElement = await page.evaluate(
+      ([a, b]) => a === b,
+      [forwardElement, backwardElement],
+    )
+    expect(isSameElement).toBe(false)
   })
 
   test('should activate buttons with Enter and Space', async ({ page }) => {
