@@ -12,6 +12,7 @@ permissions:
       - tests/**
       - package.json
       - pnpm-lock.yaml
+      - scripts/testing/**
       - .github/workflows/advisory-core-lib.yml
   pull_request:
     branches:
