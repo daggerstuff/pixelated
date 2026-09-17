@@ -1,0 +1,548 @@
+---
+export const prerender = false
+import BaseLayout from '@/layouts/BaseLayout.astro'
+
+// Verify admin access via session
+const session = (Astro.locals as any)?.session
+const user = (Astro.locals as any)?.user
+
+if (!session || !user || user.role !== 'admin') {
+  return Astro.redirect(
+    `/login?redirect=${encodeURIComponent('/admin/ai/quad-audit')}`,
+  )
+}
+---
+
+<BaseLayout title="Quad Audit">
+  <main class="qa-container">
+    <header class="qa-header">
+      <p class="qa-label">Adversarial audit</p>
+      <h1 class="qa-title">Quad Audit</h1>
+      <p class="qa-subtitle">
+        Four personas review the content: Voice Fidelity, Clinical Accuracy, and
+        Training Signal judges, plus the Brené Brown adversarial auditor. A
+        critical finding fails the audit.
+      </p>
+    </header>
+
+    <section class="qa-composer">
+      <label class="qa-label" for="qa-content">Content item</label>
+      <textarea
+        id="qa-content"
+        class="qa-input qa-textarea"
+        rows="6"
+        placeholder="Paste one content item to audit (an AI response, a dataset record, a draft reply)."
+      ></textarea>
+
+      <div class="qa-controls">
+        <div class="qa-field">
+          <label class="qa-label" for="qa-mode">Mode</label>
+          <select id="qa-mode" class="qa-input qa-select">
+            <option value="deterministic" selected>
+              Deterministic (pattern scan)
+            </option>
+            <option value="llm">LLM (full judge prompts)</option>
+          </select>
+        </div>
+        <div class="qa-actions">
+          <button id="qa-add" class="qa-btn qa-btn-ghost">Add item</button>
+          <button id="qa-run" class="qa-btn qa-btn-primary">Run audit</button>
+        </div>
+      </div>
+
+      <div id="qa-queue" class="qa-queue">
+        <p class="qa-queue-empty" id="qa-queue-empty">No items queued.</p>
+      </div>
+    </section>
+
+    <section id="qa-results" class="qa-results" hidden>
+      <div class="qa-summary" id="qa-summary"></div>
+      <div id="qa-verdicts" class="qa-verdicts"></div>
+    </section>
+
+    <p id="qa-error" class="qa-error" hidden></p>
+  </main>
+</BaseLayout>
+
+<style>
+  .qa-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    color: var(--np-text, oklch(0.93 0 0));
+  }
+
+  .qa-header {
+    margin-bottom: 2rem;
+  }
+
+  .qa-label {
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--np-muted, oklch(0.62 0 0));
+    margin: 0 0 0.5rem;
+  }
+
+  .qa-title {
+    font-family: 'Fraunces Variable', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+    line-height: 1.15;
+    margin: 0 0 0.75rem;
+  }
+
+  .qa-subtitle {
+    max-width: 68ch;
+    line-height: 1.6;
+    color: var(--np-muted, oklch(0.62 0 0));
+    margin: 0;
+  }
+
+  .qa-composer {
+    background: var(--np-surface, oklch(0.14 0 0));
+    border: 1px solid var(--np-line, rgba(255, 255, 255, 0.06));
+    border-radius: 0;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .qa-input {
+    width: 100%;
+    background: var(--np-bg, oklch(0.1 0 0));
+    border: 1px solid var(--np-line, rgba(255, 255, 255, 0.06));
+    border-radius: 0;
+    color: var(--np-text, oklch(0.93 0 0));
+    font-family: var(--np-font-body, system-ui, sans-serif);
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .qa-input:focus {
+    outline: 1px solid oklch(0.7 0 0);
+    outline-offset: 3px;
+    border-color: oklch(0.5 0 0);
+  }
+
+  .qa-textarea {
+    resize: vertical;
+  }
+
+  .qa-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .qa-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .qa-btn {
+    border: none;
+    border-radius: 0;
+    font-size: 1rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  .qa-btn-primary {
+    background: var(--np-elevated, oklch(0.18 0 0));
+    color: var(--np-text, oklch(0.93 0 0));
+  }
+
+  .qa-btn-primary:hover {
+    background: var(--np-hover, oklch(0.22 0 0));
+  }
+
+  .qa-btn-primary:active {
+    background: var(--np-active, oklch(0.16 0 0));
+  }
+
+  .qa-btn-primary:disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  .qa-btn-ghost {
+    background: transparent;
+    color: var(--np-muted, oklch(0.62 0 0));
+  }
+
+  .qa-btn-ghost:hover {
+    color: var(--np-text, oklch(0.93 0 0));
+    background: var(--np-surface, oklch(0.14 0 0));
+  }
+
+  .qa-queue {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--np-line, rgba(255, 255, 255, 0.06));
+    padding-top: 1rem;
+  }
+
+  .qa-queue-empty {
+    color: var(--np-muted, oklch(0.62 0 0));
+    font-size: 0.9375rem;
+    margin: 0;
+  }
+
+  .qa-queue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--np-line, rgba(255, 255, 255, 0.06));
+  }
+
+  .qa-queue-item-id {
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 0.875rem;
+    color: var(--np-mid, oklch(0.7 0 0));
+  }
+
+  .qa-queue-item-preview {
+    color: var(--np-muted, oklch(0.62 0 0));
+    font-size: 0.875rem;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .qa-queue-item-remove {
+    background: transparent;
+    border: none;
+    color: var(--np-muted, oklch(0.62 0 0));
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .qa-queue-item-remove:hover {
+    color: var(--np-text, oklch(0.93 0 0));
+  }
+
+  .qa-results {
+    margin-top: 2rem;
+  }
+
+  .qa-summary {
+    border: 1px solid var(--np-line, rgba(255, 255, 255, 0.06));
+    background: var(--np-surface, oklch(0.14 0 0));
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .qa-summary-status {
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 1.125rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0 0 0.5rem;
+  }
+
+  .qa-summary-detail {
+    font-size: 0.9375rem;
+    color: var(--np-muted, oklch(0.62 0 0));
+    margin: 0;
+  }
+
+  .qa-verdict {
+    border: 1px solid var(--np-line, rgba(255, 255, 255, 0.06));
+    background: var(--np-surface, oklch(0.14 0 0));
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .qa-verdict-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .qa-verdict-persona {
+    font-weight: 600;
+    font-size: 1.0625rem;
+    margin: 0;
+  }
+
+  .qa-verdict-score {
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 0.875rem;
+    color: var(--np-mid, oklch(0.7 0 0));
+    white-space: nowrap;
+  }
+
+  /* Pass/fail encodes through weight + value, not hue (zero-chroma doctrine). */
+  .qa-status-pass .qa-summary-status {
+    font-weight: 650;
+    color: var(--np-text, oklch(0.93 0 0));
+  }
+
+  .qa-status-fail .qa-summary-status {
+    font-weight: 700;
+    color: oklch(0.97 0 0);
+  }
+
+  .qa-verdict-notes {
+    font-size: 0.9375rem;
+    color: var(--np-muted, oklch(0.62 0 0));
+    line-height: 1.6;
+    margin: 0 0 0.75rem;
+  }
+
+  .qa-finding {
+    border-left: 2px solid var(--np-mid, oklch(0.7 0 0));
+    padding: 0.5rem 0 0.5rem 1rem;
+    margin: 0.5rem 0;
+  }
+
+  .qa-finding-severity {
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--np-mid, oklch(0.7 0 0));
+    margin-right: 0.75rem;
+  }
+
+  .qa-finding-severity-critical {
+    font-weight: 700;
+    color: var(--np-text, oklch(0.93 0 0));
+  }
+
+  .qa-finding-rationale {
+    font-size: 0.875rem;
+    color: var(--np-muted, oklch(0.62 0 0));
+    display: block;
+    margin-top: 0.25rem;
+  }
+
+  .qa-error {
+    border: 1px solid oklch(0.5 0 0);
+    padding: 1rem 1.5rem;
+    font-family: var(--np-font-mono, ui-monospace, monospace);
+    font-size: 0.875rem;
+    color: var(--np-text, oklch(0.93 0 0));
+    margin-top: 1.5rem;
+  }
+</style>
+
+<script>
+  interface QuadFinding {
+    item_id: string
+    severity: 'info' | 'warning' | 'critical'
+    signature: string
+    rationale: string
+    example_excerpt?: string
+  }
+
+  interface QuadVerdict {
+    persona: string
+    role: string
+    passed: boolean
+    score: number
+    notes: string
+    flagged_ids: string[]
+    findings: QuadFinding[]
+  }
+
+  interface QuadReport {
+    passed: boolean
+    mode: string
+    model: string
+    item_count: number
+    critical_count: number
+    warning_count: number
+    summary: string
+    verdicts: QuadVerdict[]
+  }
+
+  let itemCounter = 0
+  const queue: { id: string; content: string }[] = []
+
+  const contentEl = document.querySelector<HTMLTextAreaElement>('#qa-content')
+  const modeEl = document.querySelector<HTMLSelectElement>('#qa-mode')
+  const addBtn = document.querySelector<HTMLButtonElement>('#qa-add')
+  const runBtn = document.querySelector<HTMLButtonElement>('#qa-run')
+  const queueEl = document.querySelector<HTMLDivElement>('#qa-queue')
+  const queueEmptyEl =
+    document.querySelector<HTMLParagraphElement>('#qa-queue-empty')
+  const resultsEl = document.querySelector<HTMLElement>('#qa-results')
+  const summaryEl = document.querySelector<HTMLDivElement>('#qa-summary')
+  const verdictsEl = document.querySelector<HTMLDivElement>('#qa-verdicts')
+  const errorEl = document.querySelector<HTMLParagraphElement>('#qa-error')
+
+  function showError(message: string): void {
+    if (!errorEl || !resultsEl) return
+    errorEl.textContent = message
+    errorEl.hidden = false
+    resultsEl.hidden = true
+  }
+
+  function truncate(text: string, maxLength: number): string {
+    return text.length <= maxLength ? text : text.slice(0, maxLength) + '…'
+  }
+
+  function renderQueue(): void {
+    if (!queueEl || !queueEmptyEl) return
+    queueEmptyEl.hidden = queue.length > 0
+    // Remove stale item rows
+    queueEl.querySelectorAll('.qa-queue-item').forEach((node) => node.remove())
+    queue.forEach((item, index) => {
+      const row = document.createElement('div')
+      row.className = 'qa-queue-item'
+
+      const id = document.createElement('span')
+      id.className = 'qa-queue-item-id'
+      id.textContent = item.id
+
+      const preview = document.createElement('span')
+      preview.className = 'qa-queue-item-preview'
+      preview.textContent = truncate(item.content, 80)
+
+      const remove = document.createElement('button')
+      remove.className = 'qa-queue-item-remove'
+      remove.textContent = 'Remove'
+      remove.addEventListener('click', () => {
+        queue.splice(index, 1)
+        renderQueue()
+      })
+
+      row.append(id, preview, remove)
+      queueEl.append(row)
+    })
+  }
+
+  function renderReport(report: QuadReport): void {
+    if (!resultsEl || !summaryEl || !verdictsEl || !errorEl) return
+    errorEl.hidden = true
+    resultsEl.hidden = false
+
+    summaryEl.className = `qa-summary ${
+      report.passed ? 'qa-status-pass' : 'qa-status-fail'
+    }`
+
+    const status = document.createElement('p')
+    status.className = 'qa-summary-status'
+    status.textContent = report.passed ? 'Pass' : 'Fail'
+
+    const detail = document.createElement('p')
+    detail.className = 'qa-summary-detail'
+    detail.textContent = `${report.summary} — mode: ${report.mode}, model: ${report.model}, items: ${report.item_count}`
+
+    summaryEl.replaceChildren(status, detail)
+
+    verdictsEl.replaceChildren()
+    for (const verdict of report.verdicts) {
+      const card = document.createElement('div')
+      card.className = 'qa-verdict'
+
+      const header = document.createElement('div')
+      header.className = 'qa-verdict-header'
+
+      const persona = document.createElement('p')
+      persona.className = 'qa-verdict-persona'
+      persona.textContent = verdict.persona
+
+      const score = document.createElement('span')
+      score.className = 'qa-verdict-score'
+      score.textContent = `${verdict.passed ? 'Pass' : 'Fail'} · score ${verdict.score.toFixed(2)}`
+
+      header.append(persona, score)
+
+      const notes = document.createElement('p')
+      notes.className = 'qa-verdict-notes'
+      notes.textContent = verdict.notes || 'No notes.'
+
+      card.append(header, notes)
+
+      for (const finding of verdict.findings) {
+        const box = document.createElement('div')
+        box.className = 'qa-finding'
+
+        const label = document.createElement('span')
+        label.className = `qa-finding-severity ${
+          finding.severity === 'critical' ? 'qa-finding-severity-critical' : ''
+        }`
+        label.textContent = `${finding.severity} · ${finding.signature} · ${finding.item_id}`
+
+        const rationale = document.createElement('span')
+        rationale.className = 'qa-finding-rationale'
+        rationale.textContent = finding.rationale
+
+        box.append(label, rationale)
+        card.append(box)
+      }
+
+      verdictsEl.append(card)
+    }
+  }
+
+  addBtn?.addEventListener('click', () => {
+    const content = contentEl?.value.trim() ?? ''
+    if (!content) {
+      showError('Add some content before queueing an item.')
+      return
+    }
+    itemCounter += 1
+    queue.push({ id: `item-${itemCounter}`, content })
+    if (contentEl) contentEl.value = ''
+    renderQueue()
+  })
+
+  runBtn?.addEventListener('click', async () => {
+    if (!runBtn) return
+    if (queue.length === 0) {
+      showError('Queue at least one item before running the audit.')
+      return
+    }
+
+    runBtn.disabled = true
+    runBtn.textContent = 'Auditing…'
+
+    try {
+      const response = await fetch('/api/ai/quad-audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: queue.map((item) => ({
+            id: item.id,
+            kind: 'ai_response',
+            author_role: 'pe-service',
+            content: item.content,
+          })),
+          mode: modeEl?.value ?? 'deterministic',
+        }),
+      })
+
+      const body = await response.json().catch(() => null)
+      if (!response.ok) {
+        const message =
+          (body as Record<string, unknown> | null)?.['error'] ??
+          `Audit request failed (HTTP ${response.status}).`
+        showError(String(message))
+        return
+      }
+
+      renderReport(body as QuadReport)
+    } catch (err) {
+      showError(err instanceof Error ? err.message : 'Unknown audit error.')
+    } finally {
+      runBtn.disabled = false
+      runBtn.textContent = 'Run audit'
+    }
+  })
+</script>
