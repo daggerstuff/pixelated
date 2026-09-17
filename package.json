@@ -127,6 +127,7 @@
     "e2e:smoke": "playwright test tests/e2e/smoke/ --config=config/playwright.config.ts",
     "e2e:browser": "playwright test tests/browser/ --config=config/playwright.config.ts",
     "e2e:browser-compat": "playwright test tests/browser-compatibility.spec.ts --config=config/playwright-browser-compat.config.ts",
+    "e2e:usability": "playwright test tests/usability/ --config=config/playwright.config.ts",
     "e2e:browser-compat-timeout": "bash scripts/browser-compatibility-test.sh",
     "e2e:ui": "playwright test --ui --config=config/playwright.config.ts",
     "e2e:headed": "playwright test --headed --config=config/playwright.config.ts",

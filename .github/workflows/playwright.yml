@@ -62,6 +62,16 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=8192
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
+      # Accessibility/usability suite (axe-based WCAG checks, keyboard
+      # navigation, mobile viewports). Previously collected nowhere: these
+      # Playwright specs hung the vitest advisory bucket with 0 tests
+      # collected and were excluded from it. Green locally (~1 min).
+      - name: Run usability suite
+        run: pnpm e2e:usability --project=chromium
+        env:
+          NODE_OPTIONS: --max-old-space-size=8192
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: ${{ !cancelled() }}
         with:
