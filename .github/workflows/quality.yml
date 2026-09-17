@@ -119,11 +119,11 @@ jobs:
     timeout-minutes: 15
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      # Service containers are reachable on localhost (no container-network
-      # alias on this runner infrastructure; same pattern as
-      # bias-detection-ci.yml).
       PE_DATABASE_URL: postgresql+asyncpg://pe_test@localhost:5432/pixelated_empathy
       PE_TESTING: '1'
+      # Same path layout as the documented local invocation: `.` for
+      # apps/web (src.* packages), `..` for the repo root (ai submodule).
+      PYTHONPATH: '.:..'
     services:
       postgres:
         image: postgres:17
@@ -145,6 +145,13 @@ jobs:
         with:
           persist-credentials: false
           submodules: false
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # pe's audits route imports ai.research.quadit at module load, so
+        # the test suite needs the real submodule (mypy-only jobs use the
+        # structural-Protocol path instead and skip this step).
+        run: bash scripts/devops/init-submodules.sh
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
