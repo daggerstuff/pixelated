@@ -21,9 +21,15 @@ test.describe('Mobile Usability', () => {
 
       const results = await UsabilityUtils.testMobileUsability(page)
 
-      expect(results.touchTargetsAdequate).toBe(true)
-      expect(results.textReadable).toBe(true)
-      expect(results.contentFitsViewport).toBe(true)
+      // Include the recorded errors in the failure message so the
+      // offending element is identifiable from CI logs alone.
+      expect(results.touchTargetsAdequate, results.errors.join('; ')).toBe(
+        true,
+      )
+      expect(results.textReadable, results.errors.join('; ')).toBe(true)
+      expect(results.contentFitsViewport, results.errors.join('; ')).toBe(
+        true,
+      )
 
       if (results.errors.length > 0) {
         console.log(
