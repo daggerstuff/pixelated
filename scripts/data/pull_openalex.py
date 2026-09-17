@@ -18,6 +18,7 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import quote
 from urllib.request import urlopen
@@ -36,11 +37,12 @@ OPENALEX_API = "https://api.openalex.org/works"
 SEARCH_FILTER = "default.search:psychology%2Bpsychiatry%2Bmental%2Bhealth"
 
 
-def _fetch(url: str) -> dict:
+def _fetch(url: str) -> dict[str, Any]:
     """Fetch data from OpenAlex API."""
     try:
         with urlopen(url, timeout=30) as resp:
-            return json.loads(resp.read().decode())
+            data: dict[str, Any] = json.loads(resp.read().decode())
+            return data
     except (HTTPError, Exception) as e:
         logger.warning("OpenAlex API error: %s", e)
         return {}
@@ -127,7 +129,7 @@ def pull_metadata(output_dir: Path, limit: int) -> int:
     return count
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description="PIX-30: OpenAlex Metadata Sync")
     parser.add_argument("--limit", type=int, default=10000, help="Max records to pull")
     parser.add_argument("--output", type=Path, default=Path("data/raw/openalex/"))

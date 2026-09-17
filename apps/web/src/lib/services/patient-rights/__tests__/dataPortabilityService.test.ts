@@ -203,6 +203,36 @@ describe('dataPortabilityService', () => {
       expect(result.success).toBe(false)
       expect(result.error).toBe('not_found')
     })
+    it('audits the export request creation (HIPAA disclosure log)', async () => {
+      mockedUserManager.getUserById.mockResolvedValue({
+        id: 'user-001',
+        role: 'admin',
+      } as any)
+
+      await createDataExportRequest(makeExportInput() as any)
+
+      expect(mockedCreateAuditLog).toHaveBeenCalledWith(
+        'SECURITY',
+        'export_requested',
+        'user-001',
+        'data_portability',
+        expect.objectContaining({
+          exportId: 'test-uuid-1234',
+          patientId: 'patient-001',
+        }),
+      )
+    })
+
+    it('does not audit when request is rejected', async () => {
+      mockedUserManager.getUserById.mockResolvedValue({
+        id: 'user-002',
+        role: 'patient',
+      } as any)
+
+      await createDataExportRequest(makeExportInput() as any)
+
+      expect(mockedCreateAuditLog).not.toHaveBeenCalled()
+    })
   })
 
   // ── cancelDataExportRequest ──
@@ -408,6 +438,41 @@ describe('dataPortabilityService', () => {
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('unauthorized')
+    })
+
+    it('allows admin to download any patient export (regression: patientId/userId args were swapped)', async () => {
+      mockedUserManager.getUserById.mockResolvedValue({
+        id: 'admin-001',
+        role: 'admin',
+      } as any)
+      mockedDataExportDAO.findById.mockResolvedValue({
+        id: 'export-001',
+        patientId: 'patient-001',
+        requestedBy: 'patient-001',
+        status: 'completed',
+        formats: ['json'],
+        dataTypes: ['demographics'],
+        createdAt: new Date(),
+        completedAt: new Date(),
+        files: [
+          {
+            id: 'file-001',
+            exportId: 'export-001',
+            format: 'json',
+            dataType: 'demographics',
+            url: '',
+            size: fileContent.length,
+            createdAt: new Date(),
+            content: fileContent,
+          },
+        ],
+      } as any)
+
+      const result = await downloadDataExport('export-001', 'admin-001')
+
+      expect(result.success).toBe(true)
+      // Access check must receive (patientId, userId) in that order
+      expect(mockedUserManager.getUserById).toHaveBeenCalledWith('admin-001')
     })
 
     it('returns not_ready for incomplete export', async () => {

@@ -62,13 +62,13 @@ class LiveClusterMonitor:
             ],
             "active_claims": [
                 {
-                    "ticket_identifier": c.ticket_identifier,
-                    "agent_name": c.agent_name,
-                    "server_label": c.server_label,
-                    "worktree_path": c.worktree_path,
-                    "claimed_at": c.claimed_at,
+                    "ticket_identifier": ticket_id,
+                    "agent_name": claim_info.get("agent", "") if isinstance(claim_info, dict) else "",
+                    "server_label": claim_info.get("server", "") if isinstance(claim_info, dict) else "",
+                    "worktree_path": "",
+                    "claimed_at": claim_info.get("timestamp", 0) if isinstance(claim_info, dict) else 0,
                 }
-                for c in active_claims
+                for ticket_id, claim_info in active_claims.items()
             ],
             "pending_escalations": len(pending_escalations),
             "escalations": pending_escalations,
@@ -129,15 +129,14 @@ class LiveClusterMonitor:
             lines.append(f"│   • No recent state events recorded.{' ' * 43}│")
         else:
             for ev in snap["recent_events"]:
-                raw_ts = getattr(ev, "timestamp_utc", None) or (ev.get("timestamp_utc") if isinstance(ev, dict) else "") or ""
+                raw_ts = ev.timestamp_utc
                 ts = raw_ts[11:19] if len(raw_ts) >= 19 else "-"
-                
-                raw_type = getattr(ev, "event_type", None) or (ev.get("event_type") if isinstance(ev, dict) else "")
-                etype = raw_type.value if hasattr(raw_type, "value") else str(raw_type)
-                
-                ticket = getattr(ev, "ticket_identifier", None) or (ev.get("ticket_identifier") if isinstance(ev, dict) else "") or "-"
-                agent = getattr(ev, "agent_name", None) or (ev.get("agent_name") if isinstance(ev, dict) else "") or "-"
-                
+
+                etype = ev.event_type.value
+
+                ticket = ev.ticket_identifier or "-"
+                agent = ev.agent_name or "-"
+
                 ev_str = f"   [{ts}] {etype:<22} | {ticket:<10} | {agent}"
                 lines.append(f"│ {ev_str[:76]:<76} │")
 
@@ -178,7 +177,7 @@ class LiveClusterMonitor:
                     self.send_response(404)
                     self.end_headers()
 
-            def log_message(self, format: str, *args: Any) -> None:
+            def log_message(self, fmt: str, *args: Any) -> None:
                 pass  # Suppress HTTP access logging in terminal
 
         server = http.server.HTTPServer(("0.0.0.0", port), TelemetryHTTPHandler)

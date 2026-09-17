@@ -128,7 +128,7 @@ class LineageTracker:
                 "memory": "🧠",
             }
 
-            nodes_to_show = self._nodes.values()
+            nodes_to_show: list[LineageNode] = list(self._nodes.values())
             if root_id and root_id in self._nodes:
                 relevant_ids = set()
                 queue = [root_id]

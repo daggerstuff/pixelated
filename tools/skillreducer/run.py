@@ -20,8 +20,8 @@ ROOT = Path(__file__).resolve().parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from skillreducer.config import ensure_dotenv_loaded  # noqa: E402
-from skillreducer.cli import main  # noqa: E402
+from skillreducer.cli import main
+from skillreducer.config import ensure_dotenv_loaded
 
 
 def run() -> None:

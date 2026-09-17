@@ -9,6 +9,7 @@ import stat
 import subprocess
 import sys
 from pathlib import Path
+from typing import TypedDict
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -18,10 +19,18 @@ logger = logging.getLogger(__name__)
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "ai"))
 
-from test_empathy_style_validation import EmpathyStyleValidator
+from test_empathy_style_validation import EmpathyStyleValidator, InstitutionalViolation
 
 
-def get_changed_files():
+class EmpathyViolationEntry(TypedDict):
+    file: str
+    text: str
+    empathy_score: float
+    connection_score: float
+    violations: list[InstitutionalViolation]
+
+
+def get_changed_files() -> list[str]:
     """Get list of changed files in current commit/PR"""
     try:
         # For git pre-commit hook
@@ -42,7 +51,7 @@ def get_changed_files():
     return [str(f.relative_to(project_root)) for f in crisis_files]
 
 
-def extract_strings_from_file(file_path):
+def extract_strings_from_file(file_path: Path) -> list[str]:
     """Extract string literals from Python file that might contain user-facing text"""
     strings = []
     try:
@@ -66,7 +75,7 @@ def extract_strings_from_file(file_path):
     return strings
 
 
-def check_empathy_guidelines():
+def check_empathy_guidelines() -> bool:
     """Main validation function for CI/CD"""
     logger.info("🤖 Running Empathy Style CI/CD Validation...")
     logger.info("-" * 40)
@@ -74,7 +83,7 @@ def check_empathy_guidelines():
     validator = EmpathyStyleValidator()
     changed_files = get_changed_files()
 
-    violations_found = []
+    violations_found: list[EmpathyViolationEntry] = []
     files_checked = 0
 
     # Check crisis intervention related files
@@ -145,7 +154,7 @@ def check_empathy_guidelines():
     return True
 
 
-def setup_git_hook():
+def setup_git_hook() -> bool:
     """Setup pre-commit hook in git repository"""
     hooks_dir = project_root / ".git" / "hooks"
     if not hooks_dir.exists():

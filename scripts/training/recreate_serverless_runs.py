@@ -24,8 +24,9 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Protocol, cast
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -34,7 +35,7 @@ WANDB_API_KEY = os.environ.get("WANDB_API_KEY", "")
 PROJECT = "wayfarer-ab-test"
 
 
-def generate_report():
+def generate_report() -> str:
     """Fetch all runs from wandb and generate a comprehensive report."""
     import wandb
 
@@ -43,7 +44,7 @@ def generate_report():
 
     report_lines = [
         "# W&B Serverless Runs Report",
-        f"Generated: {datetime.utcnow().isoformat()}Z",
+        f"Generated: {datetime.now(timezone.utc).isoformat().removesuffix('+00:00')}Z",
         f"Project: {PROJECT}",
         "",
         "## Summary",
@@ -75,13 +76,23 @@ def generate_report():
     return report_text
 
 
-def fetch_run_history(run_name: str):
+# wandb types `Run.history()` as `list[dict[str, Any]] | pd.DataFrame`, but
+# the call below uses the default `pandas=True` mode, which always returns a
+# DataFrame-shaped history. This minimal protocol mirrors the two members the
+# script uses, so the typed value flows through without a pandas import.
+class _HistoryFrame(Protocol):
+    def to_json(self, path_or_buf: str | Path, orient: str) -> str | None: ...
+
+    def __len__(self) -> int: ...
+
+
+def fetch_run_history(run_name: str) -> _HistoryFrame:
     """Fetch detailed history for a specific run."""
     import wandb
 
     api = wandb.Api()
     run = api.run(f"{PROJECT}/{run_name}")
-    history = run.history()
+    history = cast(_HistoryFrame, run.history())
 
     output_path = Path(f"/tmp/{run_name}_history.json")
     history.to_json(output_path, orient="records")
@@ -89,7 +100,7 @@ def fetch_run_history(run_name: str):
     return history
 
 
-async def run_30b_experiment():
+async def run_30b_experiment() -> None:
     """Re-run the 30B serverless RL experiment."""
     import art
     from art.serverless.backend import ServerlessBackend
@@ -97,18 +108,18 @@ async def run_30b_experiment():
     if not WANDB_API_KEY:
         raise ValueError("WANDB_API_KEY is required")
 
-    MODEL_NAME = "qwen3-30b-serverless-rl-v2"
-    BASE_MODEL = "Qwen/Qwen3-30B-A3B-Instruct-2507"
-    DATASET_PATH = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
+    model_name = "qwen3-30b-serverless-rl-v2"
+    base_model = "Qwen/Qwen3-30B-A3B-Instruct-2507"
+    dataset_path = str(Path.home() / "dataset" / "RL_training_dataset.jsonl")
 
-    GROUPS_PER_STEP = 5
-    ROLLOUTS_PER_GROUP = 8
-    LEARNING_RATE = 1e-5
-    MAX_RL_STEPS = 100
+    groups_per_step = 5
+    rollouts_per_group = 8
+    learning_rate = 1e-5
+    max_rl_steps = 100
 
     logger.info("Loading dataset...")
-    examples = []
-    with open(DATASET_PATH) as f:
+    examples: list[list[dict[str, Any]]] = []
+    with open(dataset_path) as f:
         for line in f:
             data = json.loads(line)
             messages = data.get("messages", [])
@@ -118,10 +129,10 @@ async def run_30b_experiment():
 
     logger.info("Initializing 30B model...")
     model = art.TrainableModel(
-        name=MODEL_NAME,
+        name=model_name,
         project=PROJECT,
         entity="wutang",
-        base_model=BASE_MODEL,
+        base_model=base_model,
     )
     backend = ServerlessBackend(api_key=WANDB_API_KEY)
     await model.register(backend)
@@ -133,7 +144,7 @@ async def run_30b_experiment():
     try:
         await train_sft_from_file(
             model=model,
-            file_path=DATASET_PATH,
+            file_path=dataset_path,
             epochs=1,
         )
         logger.info("SFT Warmup complete!")
@@ -144,17 +155,17 @@ async def run_30b_experiment():
     start_step = await model.get_step()
     logger.info(f"Starting RL from step {start_step}")
 
-    for step in range(MAX_RL_STEPS):
+    for step in range(max_rl_steps):
         import random
 
-        batch = random.sample(examples, min(GROUPS_PER_STEP, len(examples)))
+        batch = random.sample(examples, min(groups_per_step, len(examples)))
 
         train_groups = await art.gather_trajectory_groups(
-            (art.TrajectoryGroup(rollout(model, messages) for _ in range(ROLLOUTS_PER_GROUP)) for messages in batch),
+            (art.TrajectoryGroup(rollout(model, messages) for _ in range(rollouts_per_group)) for messages in batch),
             pbar_desc=f"RL step {step + start_step}",
         )
 
-        result = await backend.train(model, train_groups, learning_rate=LEARNING_RATE)
+        result = await backend.train(model, train_groups, learning_rate=learning_rate)
         await model.log(
             train_groups,
             metrics=result.metrics,
@@ -169,8 +180,14 @@ async def run_30b_experiment():
     logger.info("30B RL training complete!")
 
 
-async def rollout(model, messages: list):
-    """Generate a response and compute reward."""
+async def rollout(model: Any, messages: list[dict[str, Any]]) -> Any:
+    """Generate a response and compute reward.
+
+    ``model`` is an ``art.TrainableModel`` and the return value an
+    ``art.Trajectory``; the ``art`` package ships no type information
+    (and is absent from the type-check environment), so ``Any`` is the
+    precise interface contract available here.
+    """
     import math
 
     import art
@@ -236,7 +253,7 @@ async def rollout(model, messages: list):
     return trajectory
 
 
-async def evaluate_12b_model():
+async def evaluate_12b_model() -> None:
     """Evaluate the trained 12B model on golden questions."""
     import art
     from art.serverless.backend import ServerlessBackend
@@ -244,13 +261,13 @@ async def evaluate_12b_model():
     if not WANDB_API_KEY:
         raise ValueError("WANDB_API_KEY is required")
 
-    MODEL_NAME = "wayfarer-2-12b-serverless-rl-v2"
-    PROJECT = "wayfarer-ab-test"
+    model_name = "wayfarer-2-12b-serverless-rl-v2"
+    project_name = "wayfarer-ab-test"
 
     logger.info("Loading trained 12B model for evaluation...")
     model = art.TrainableModel(
-        name=MODEL_NAME,
-        project=PROJECT,
+        name=model_name,
+        project=project_name,
         entity="wutang",
         base_model="OpenPipe/Qwen3-14B-Instruct",
     )
@@ -267,7 +284,7 @@ async def evaluate_12b_model():
         questions = json.load(f)
 
     logger.info(f"Evaluating on {len(questions)} questions...")
-    results = []
+    results: list[dict[str, Any]] = []
     for q in questions[:5]:  # Test with first 5
         prompt = q.get("question", q.get("prompt", ""))
         client = model.openai_client()
@@ -288,7 +305,7 @@ async def evaluate_12b_model():
     logger.info(f"Evaluation results saved to {output_path}")
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Recreate W&B serverless training runs")
     parser.add_argument("--report", action="store_true", help="Generate report of previous runs")
     parser.add_argument("--fetch-history", type=str, help="Fetch history for a specific run name")

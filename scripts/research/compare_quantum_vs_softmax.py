@@ -9,7 +9,7 @@ EMOTIONS = ["joy", "sadness", "anger", "fear", "surprise", "disgust"]
 NUM_SIMULATIONS = 10000
 
 
-def run_softmax_simulation():
+def run_softmax_simulation() -> float:
     """Simulates emotion measurement using a standard softmax probability distribution."""
     start_time = time.time()
 
@@ -27,7 +27,7 @@ def run_softmax_simulation():
     return end_time - start_time
 
 
-def run_quantum_simulation():
+def run_quantum_simulation() -> float:
     """Simulates emotion measurement using the QuantumEmotionState class."""
     start_time = time.time()
 

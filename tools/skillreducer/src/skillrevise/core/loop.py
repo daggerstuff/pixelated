@@ -4,6 +4,7 @@ from collections.abc import Sequence
 
 from skillrevise.core.metrics import trace_outcome_score
 from skillrevise.core.models import (
+    DiagnosisReport,
     ExecutionTrace,
     HarnessIteration,
     HarnessResult,
@@ -113,7 +114,7 @@ class HarnessLoop:
 
     def _is_better(self, candidate: PairedEvaluation, incumbent: PairedEvaluation) -> bool:
         if candidate.utility.overall_score != incumbent.utility.overall_score:
-            return candidate.utility.overall_score > incumbent.utility.overall_score
+            return bool(candidate.utility.overall_score > incumbent.utility.overall_score)
         if candidate.with_skill.success != incumbent.with_skill.success:
             return candidate.with_skill.success and not incumbent.with_skill.success
         candidate_has_valid_trace = self._has_selectable_with_skill_trace(candidate)
@@ -155,9 +156,7 @@ class HarnessLoop:
             return False
         if trace_outcome_score(trace) is None:
             return False
-        if not trace.events and trace.tool_calls == 0:
-            return False
-        return True
+        return not (not trace.events and trace.tool_calls == 0)
 
     def _trace_timed_out(self, trace: ExecutionTrace) -> bool:
         return bool(trace.metadata.get("timed_out")) or trace.status == "timeout"
@@ -170,7 +169,7 @@ class HarnessLoop:
             return False
         return bool(trace.events) or trace.tool_calls > 0 or trace.steps > 0
 
-    def _should_revise(self, evaluation: PairedEvaluation, diagnosis) -> bool:
+    def _should_revise(self, evaluation: PairedEvaluation, diagnosis: DiagnosisReport) -> bool:
         if self.require_diagnosis_for_revision and not diagnosis.labels:
             return False
         if not self._is_valid_for_revision(evaluation):

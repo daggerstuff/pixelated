@@ -32,7 +32,7 @@ volume = modal.Volume.from_name("pixel-merged-models")
     timeout=7200,  # 2 hours
     volumes={"/root/models": volume},
 )
-def quantize_task(model_dir: str, out_name: str, quantization_type: str = "Q4_K_M"):
+def quantize_task(model_dir: str, out_name: str, quantization_type: str = "Q4_K_M") -> str | bool:
     model_path = Path("/root/models") / model_dir
     gguf_unquantized = Path("/root/models") / f"{out_name}.fp16.gguf"
     gguf_final = Path("/root/models") / f"{out_name}.{quantization_type}.gguf"
@@ -82,7 +82,7 @@ def quantize_task(model_dir: str, out_name: str, quantization_type: str = "Q4_K_
 
 
 @app.local_entrypoint()
-def main(model_dir: str = "merged-pixel-merged", out_name: str = "pixelated-v1-wayfarer"):
+def main(model_dir: str = "merged-pixel-merged", out_name: str = "pixelated-v1-wayfarer") -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     logger.info("📡 Triggering remote quantization for %s...", model_dir)
     logger.info("This may take 10-20 minutes depending on CPU speed.")

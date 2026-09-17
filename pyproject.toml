@@ -136,6 +136,7 @@ dependencies = [
   "ruff>=0.15.17",
   "beautifulsoup4>=4.15.0",
   "sqlalchemy>=2.0.51",
+  "celery>=5.6.3",
 ]
 [project.optional-dependencies]
 test = [
@@ -176,21 +177,21 @@ include = ["ai*"]
 [tool.mypy]
 python_version = "3.13"
 ignore_missing_imports = true
-mypy_path = "stubs"
+mypy_path = "stubs:tools/skillreducer:tools/skillreducer/src"
 files = ["src", "tests", "ai"]
 show_error_codes = true
 # ── Strict typing ─────────────────────────────────────────────────────
-# Global strict mode. The `pe` FastAPI service is enforced strict-clean in CI
-# (scripts/ci/python-typecheck.sh). Legacy trees that are not yet strict-clean
-# are exempted below so strict mode can be adopted incrementally without
-# weakening it project-wide; narrow these exemptions as the trees are repaired.
+# Global strict mode, enforced in CI by scripts/ci/python-typecheck.sh:
+# the `pe` FastAPI service plus the full scripts/ and tools/ trees are
+# checked strict-clean (the legacy exemption for those two trees was
+# retired once every pinned file reached zero strict errors).
 strict = true
 
 [[tool.mypy.overrides]]
-module = ["ai.*", "scripts.*", "foresight.*", "foresight_mcp.*", "tools.*", "tests.*"]
+module = ["ai.*", "foresight.*", "foresight_mcp.*", "tests.*"]
 # Legacy exemptions — these trees predate strict mode and carry untyped code.
 # New modules in these trees should still be written strict-clean; this override
-# exists only so the enforced `pe` scope can run alongside them.
+# exists only so the enforced scopes can run alongside them.
 ignore_errors = true
 
 [tool.pyright]
@@ -257,10 +258,13 @@ select = [
 ]
 ignore = ["E501", "UP017", "PLR2004"]
 [tool.ruff.lint.per-file-ignores]
-"scripts/verify_stage2_persona_quality.py" = ["E402", "PLC0415"]
-"scripts/task_sync/sync_from_linear.py" = ["T201"]
-"scripts/categorize.py" = ["T201"]
-"scripts/categorize_errors.py" = ["T201"]
+# CLI-script trees: print() IS the stdout interface of a __main__ tool, and
+# scripts/ commonly bootstrap sys.path before project imports. These are
+# by-design, exempted as documented globs rather than silent suppression.
+"scripts/**" = ["T201", "E402", "PLC0415"]
+# tools/ CLIs also print to stdout by design; import placement there is fixed
+# properly instead of exempted.
+"tools/**" = ["T201"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
 "foresight-mcp/foresight_mcp/server.py" = [
@@ -278,6 +282,64 @@ ignore = ["E501", "UP017", "PLR2004"]
 ]
 "foresight-mcp/foresight_mcp/llm_client.py" = ["PLR0913"]
 "foresight-mcp/foresight_mcp/tenant_middleware.py" = ["PLR0912"]
+# Operational one-shot drivers (scripts/) and long-run harnesses (tools/):
+# their main()/driver functions are linear narratives over network/LLM/S3 side
+# effects that cannot be executed in tests, so extracting helpers adds churn
+# without a regression net. Exempted per file with only the codes triggered;
+# new code in these files should still avoid growing complexity.
+"scripts/build_qa_dataset_v3.py" = ["PLR0912"]
+"scripts/cleanup_runs.py" = ["PLR0912"]
+"scripts/colab_nf_bootstrap.py" = ["PLR0913", "PLR0915", "PLR0917"]
+"scripts/data/designer/lineage_audit.py" = ["PLR0912", "PLR0915"]
+"scripts/data/designer/release_manifest.py" = ["PLR0913"]
+"scripts/data/expand_to_large_budget.py" = ["PLR0912", "PLR0915"]
+"scripts/data/generate_100k_edge_case_llm_sessions.py" = ["PLR0915"]
+"scripts/data/ingest_kaggle_and_deep_niches.py" = ["PLR0912", "PLR0915"]
+"scripts/data/pixelated_edge_cases_designer.py" = ["PLR0912"]
+"scripts/data/sourcing_cli.py" = ["PLR0912"]
+"scripts/data/validate_classifications.py" = ["PLR0915"]
+"scripts/devops/aggregate-readiness.py" = ["PLR0917"]
+"scripts/devops/apply-gusher-dedup-and-adhd.py" = ["PLR0912", "PLR0913"]
+"scripts/devops/repoint-linear-jira-attachments.py" = ["PLR0912", "PLR0915"]
+"scripts/devops/resolve_lightning_context.py" = ["PLR0912"]
+"scripts/memory/smoke-test-shared-memory-service.py" = [
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+]
+"scripts/qa/test_gating_pipeline_manual.py" = ["PLR0912", "PLR0915"]
+"scripts/services/monthly_llm_driver/orch_db_collections.py" = [
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+  "PLR0917",
+]
+"scripts/supadata_fetch.py" = ["PLR0912", "PLR0913", "PLR0917"]
+"scripts/training/evaluate_repetition.py" = ["PLR0913", "PLR0917"]
+"scripts/training/merge_lora.py" = ["PLR0915"]
+"scripts/training/remerge_with_weight.py" = ["PLR0913", "PLR0917"]
+"scripts/training/train_kaggle_qlora.py" = ["PLR0912", "PLR0915"]
+"scripts/training/train_rl_serverless_long.py" = ["PLR0913", "PLR0917"]
+"scripts/training/train_rl_serverless.py" = ["PLR0913", "PLR0917"]
+"scripts/training/train_serverless_30b_long.py" = ["PLR0915"]
+"tools/agent_runner/execution_harness.py" = ["PLR0915"]
+"tools/agent_runner/self_evolution.py" = ["PLR0911"]
+# Kebab-case filenames are this repo's convention for standalone CLI
+# entry-point scripts; they are invoked by path, not imported.
+"scripts/replace-dead-links.py" = ["N999"]
+"scripts/linear-agent-runner.py" = ["N999"]
+"scripts/diagnose-llm.py" = ["N999"]
+# Deliberate single-case exemptions, each verified:
+# - adapters.py: EveAgentAdapter lazy import avoids a circular import.
+"tools/agent_runner/adapters.py" = ["PLC0415"]
+# - task_selection.py: the caller (run_benchmark.py) catches ValueError.
+"tools/skillreducer/src/skillrevise/benchmarks/task_selection.py" = ["TRY004"]
+# - graceful-degradation fallbacks where the broad catch IS the feature
+#   (optional deps / LLM calls; the exception is recorded in evidence or
+#   status strings rather than crashing the pipeline).
+"tools/skillreducer/src/skillrevise/stage3/extract.py" = ["BLE001"]
+"tools/skillreducer/src/skillrevise/method/diagnosis.py" = ["BLE001"]
+"tools/skillreducer/src/skillrevise/method/principles.py" = ["BLE001"]
 [tool.ruff.lint.isort]
 known-first-party = ["ai", "src"]
 combine-as-imports = true

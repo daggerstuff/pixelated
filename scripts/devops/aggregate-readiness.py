@@ -15,7 +15,7 @@ import subprocess
 import sys
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 import httpx
 
@@ -44,7 +44,60 @@ def normalize_branch(branch: str) -> str:
     return branch.replace("/", "-").replace("_", "-").lower()
 
 
-def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None, max_retries: int = 3) -> dict:
+class LaneResult(TypedDict):
+    """Structured result of a single validation lane run."""
+
+    command: NotRequired[str]
+    status: str
+    exitCode: int | None
+    stdout: str
+    stderr: str
+
+
+class Summary(TypedDict):
+    """Aggregate pass/fail statistics across validation lanes."""
+
+    total: int
+    passed: int
+    failed: int
+    skipped: int
+    overallScore: float
+    overallStatus: str
+
+
+class ProviderSummary(TypedDict):
+    """Aggregate statistics across CI/CD provider pipelines."""
+
+    total: int
+    passed: int
+    failed: int
+    running: int
+
+
+class ReadinessBlock(TypedDict):
+    status: str
+    score: float
+
+
+class SummaryBlock(TypedDict):
+    totalLanes: int
+    passedLanes: int
+    failedLanes: int
+    skippedLanes: int
+
+
+class ReadinessReport(TypedDict):
+    meta: dict[str, str]
+    releaseId: str
+    git: dict[str, str]
+    readiness: ReadinessBlock
+    summary: SummaryBlock
+    validationLanes: dict[str, LaneResult]
+    providerPipelines: dict[str, list[dict[str, Any]]]
+    providerSummary: ProviderSummary
+
+
+def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None, max_retries: int = 3) -> LaneResult:
     """Execute a command and return structured result information.
 
     Args:
@@ -133,7 +186,7 @@ def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None, max_
     }
 
 
-def run_lint(dry_run: bool, cwd: str) -> dict:
+def run_lint(dry_run: bool, cwd: str) -> LaneResult:
     """Run the project's linter (oxlint)."""
     if dry_run:
         logger.info("  ▌ [dry-run] Lint check (oxlint)")
@@ -147,7 +200,7 @@ def run_lint(dry_run: bool, cwd: str) -> dict:
     return run_command(["pnpm", "lint"], cwd=cwd, max_retries=2)
 
 
-def run_typecheck(dry_run: bool, cwd: str) -> dict:
+def run_typecheck(dry_run: bool, cwd: str) -> LaneResult:
     """Run the project's type checker (tsc + astro check)."""
     if dry_run:
         logger.info("  ▌ [dry-run] Typecheck (astro check + tsc)")
@@ -161,7 +214,7 @@ def run_typecheck(dry_run: bool, cwd: str) -> dict:
     return run_command(["pnpm", "typecheck"], timeout=600, cwd=cwd, max_retries=2)
 
 
-def run_tests(dry_run: bool, cwd: str) -> dict:
+def run_tests(dry_run: bool, cwd: str) -> LaneResult:
     """Run the project's unit test suite."""
     if dry_run:
         logger.info("  ▌ [dry-run] Unit tests (vitest)")
@@ -175,7 +228,7 @@ def run_tests(dry_run: bool, cwd: str) -> dict:
     return run_command(["pnpm", "test:unit"], timeout=600, cwd=cwd, max_retries=2)
 
 
-def run_format_check(dry_run: bool, cwd: str) -> dict:
+def run_format_check(dry_run: bool, cwd: str) -> LaneResult:
     """Run the project's format check."""
     if dry_run:
         logger.info("  ▌ [dry-run] Format check")
@@ -189,7 +242,7 @@ def run_format_check(dry_run: bool, cwd: str) -> dict:
     return run_command(["pnpm", "format:check"], cwd=cwd, max_retries=2)
 
 
-def calculate_summary(validation_lanes: dict) -> dict:
+def calculate_summary(validation_lanes: dict[str, LaneResult]) -> Summary:
     """Calculate summary statistics from validation results."""
     total = len(validation_lanes)
     passed = sum(1 for v in validation_lanes.values() if v.get("status") == "pass")
@@ -359,7 +412,7 @@ def fetch_provider_pipelines(
     return results
 
 
-def calculate_provider_summary(provider_pipelines: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
+def calculate_provider_summary(provider_pipelines: dict[str, list[dict[str, Any]]]) -> ProviderSummary:
     """Calculate aggregate provider pipeline stats."""
     total = 0
     passed = 0
@@ -438,7 +491,7 @@ def aggregate_readiness(  # noqa: PLR0913 — all params are independent CLI opt
     else:
         overall_status = "ready"
 
-    report = {
+    report: ReadinessReport = {
         "meta": {"generatedAt": timestamp, "schemaVersion": "1.0", "generator": "pixelated-readiness-aggregator"},
         "releaseId": f"ready-{normalize_branch(branch)}-{commit_hash[:7]}",
         "git": {"commit": commit_hash, "branch": branch},
@@ -496,7 +549,7 @@ def aggregate_readiness(  # noqa: PLR0913 — all params are independent CLI opt
     return 0
 
 
-def main():
+def main() -> None:
     """Main execution entry point."""
     parser = argparse.ArgumentParser(
         description="Aggregate validation lane (lint, typecheck, tests) results into a readiness JSON report."

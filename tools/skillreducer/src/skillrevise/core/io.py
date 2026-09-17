@@ -35,7 +35,7 @@ def write_json(path: str | Path, payload: Any) -> None:
 
 
 def to_jsonable(value: Any) -> Any:
-    if is_dataclass(value):
+    if is_dataclass(value) and not isinstance(value, type):
         return {key: to_jsonable(item) for key, item in asdict(value).items()}
     if isinstance(value, Enum):
         return value.value

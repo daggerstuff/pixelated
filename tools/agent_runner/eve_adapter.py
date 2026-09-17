@@ -46,9 +46,7 @@ class EveAgentAdapter(AgentAdapter):
         # 2. Resolve the native TypeScript Eve agent. Prefer a checkout with
         # installed dependencies so worktree executions can share node_modules.
         workspace_eve_root = os.path.join(workdir, "agents", "eve-agent")
-        repo_eve_root = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "..", "agents", "eve-agent")
-        )
+        repo_eve_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "agents", "eve-agent"))
         eve_root = workspace_eve_root
         if not os.path.isdir(os.path.join(eve_root, "node_modules")) and os.path.isdir(
             os.path.join(repo_eve_root, "node_modules")

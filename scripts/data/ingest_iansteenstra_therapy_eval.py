@@ -60,7 +60,10 @@ ATTRIBUTION_VALUES = {
 }
 
 
-def read_csv(name: str) -> list[dict]:
+Row = dict[str, str | None]
+
+
+def read_csv(name: str) -> list[Row]:
     path = SRC / f"{name}.csv"
     with path.open(newline="", encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
@@ -86,18 +89,18 @@ def to_bool(x: object | None) -> bool | None:
     return None
 
 
-def state_vector_from_row(row: dict, fields: list[str]) -> dict:
+def state_vector_from_row(row: Row, fields: list[str]) -> dict[str, float | None]:
     """Extract the dynamic psychological-construct intensity state vector."""
     return {f.replace("_intensity", ""): to_float(row.get(f)) for f in fields}
 
 
-def emit_longitudinal_sessions(conversations: list[dict], journals: list[dict]) -> None:
+def emit_longitudinal_sessions(conversations: list[Row], journals: list[Row]) -> None:
     """Lane B: per-session arc with state vector + between-session transition + adverse matrix."""
 
     # Group turns by (pairing_id, session_id)
-    sessions: dict[tuple[str, str], list[dict]] = {}
+    sessions: dict[tuple[str, str], list[Row]] = {}
     for r in conversations:
-        key = (r["pairing_id"], r["session_id"])
+        key = (str(r["pairing_id"]), str(r["session_id"]))
         sessions.setdefault(key, []).append(r)
 
     # Index journals
@@ -170,7 +173,7 @@ def emit_longitudinal_sessions(conversations: list[dict], journals: list[dict]) 
     print(f"[Lane B] wrote {n_out} sessions -> {out_path}")
 
 
-def emit_crisis_protocol_oracle(rows: list[dict]) -> None:
+def emit_crisis_protocol_oracle(rows: list[Row]) -> None:
     """Lane C: 4-step safety-protocol adherence at turn grain — the pass/fail oracle."""
     out_path = OUT / "crisis_protocol_oracle.csv"
     fields = [
@@ -216,7 +219,7 @@ def emit_crisis_protocol_oracle(rows: list[dict]) -> None:
     print(f"[Lane C oracle] {n_pass}/{n_total} turns passed full 4-step protocol -> {out_path}")
 
 
-def emit_adverse_events_long(rows: list[dict]) -> None:
+def emit_adverse_events_long(rows: list[Row]) -> None:
     """Lane C: adverse events in event-type long-format (already long in source)."""
     out_path = OUT / "adverse_events_long.csv"
     fields = ["pairing_id", "session_id", "event_type", "occurred", "attribution", "internal_justification"]

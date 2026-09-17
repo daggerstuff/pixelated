@@ -21,7 +21,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 
-def setup_license_manager_role(profile_name=None, region_name=None):
+def setup_license_manager_role(profile_name: str | None = None, region_name: str | None = None) -> bool:
     """Checks and creates the AWS License Manager Service-Linked Role."""
     if not BOTO3_AVAILABLE:
         logger.error("boto3 is not installed. Please install it using 'pip install boto3' or 'uv pip install boto3'.")
@@ -64,7 +64,7 @@ def setup_license_manager_role(profile_name=None, region_name=None):
             return False
 
 
-def main():
+def main() -> None:
     """Main execution entrypoint."""
     parser = argparse.ArgumentParser(description="Setup AWS License Manager Service-Linked Role.")
     parser.add_argument("--profile", help="AWS CLI credential profile name to use.")

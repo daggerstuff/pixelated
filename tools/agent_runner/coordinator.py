@@ -25,6 +25,7 @@ from tools.agent_runner.models import (
     ActionType,
     AgentConfig,
     ExecutionResult,
+    LinearComment,
     LinearIssue,
     LinearTeam,
     ProjectConfig,
@@ -564,7 +565,7 @@ class MultiAgentCoordinator:
                     worktree_path=active_workdir,
                     ticket_identifier=issue.identifier,
                     title=issue.title,
-                    description=issue.description,
+                    description=issue.description or "",
                     context={"agent_name": agent.name, "branch_name": worktree_lease.branch_name},
                 )
                 if pr_res and pr_res.pr_url:
@@ -605,7 +606,7 @@ class MultiAgentCoordinator:
             except Exception as e:
                 logger.warning("Could not resolve coordination ticket for %s: %s", project.team_key, e)
 
-        coord_comments = []
+        coord_comments: list[LinearComment] = []
         if coord_ref:
             try:
                 _, coord_comments = self.client.get_issue_comments(coord_ref, limit=50)

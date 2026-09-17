@@ -50,7 +50,7 @@ def merge_with_custom_weight(
     scale: float = 1.0,
     torch_dtype: str = "float16",
     device: str = "auto",
-):
+) -> None:
     """
     Merge LoRA adapter into base model with custom weight scaling.
 
@@ -118,7 +118,7 @@ def merge_with_custom_weight(
 
     # Merge and unload
     print("[5/5] Merging and saving...")
-    merged_model = model.merge_and_unload(safe_merge=True)  # type: ignore
+    merged_model = model.merge_and_unload(safe_merge=True)
 
     merged_model.save_pretrained(
         str(out_path),
@@ -139,7 +139,7 @@ def merge_with_custom_weight(
     print("=" * 60)
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Re-merge LoRA with custom weight")
     parser.add_argument("--base", type=str, default="LatitudeGames/Wayfarer-2-12B", help="Base model name or path")
     parser.add_argument("--adapter", type=str, default="checkpoints/final_model/", help="Path to LoRA adapter")

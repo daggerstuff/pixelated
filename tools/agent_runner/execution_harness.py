@@ -276,7 +276,7 @@ class AgentExecutionHarness:
                 try:
                     with open(full_path, encoding="utf-8", errors="ignore") as f:
                         content = f.read()
-                        if ("seededRandom" in content or "Math.random()") and "test" not in fpath:
+                        if "test" not in fpath and ("seededRandom" in content or "Math.random()" in content):
                             failures.append(f"Fake pseudo-random generator detected in production file {fpath}.")
                         if "placeholder implementation" in content.lower() or "todo: implement" in content.lower():
                             failures.append(f"Unimplemented placeholder stub detected in {fpath}.")
