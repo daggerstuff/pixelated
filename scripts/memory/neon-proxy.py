@@ -28,7 +28,7 @@ logging.basicConfig(
 log = logging.getLogger("neon-proxy")
 
 
-async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
+async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
     peer = writer.get_extra_info("peername")
     log.info("connection from %s", peer)
     try:
@@ -39,14 +39,14 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
             ping_timeout=120,
         ) as ws:
 
-            async def tcp_to_ws():
+            async def tcp_to_ws() -> None:
                 while True:
                     data = await reader.read(CHUNK)
                     if not data:
                         break
                     await ws.send(data)
 
-            async def ws_to_tcp():
+            async def ws_to_tcp() -> None:
                 while True:
                     try:
                         msg = await ws.recv()
@@ -57,7 +57,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
                     writer.write(msg)
                     await writer.drain()
 
-            done, pending = await asyncio.wait(
+            _done, pending = await asyncio.wait(
                 [
                     asyncio.create_task(tcp_to_ws()),
                     asyncio.create_task(ws_to_tcp()),
@@ -77,7 +77,7 @@ async def handle_client(reader: asyncio.StreamReader, writer: asyncio.StreamWrit
         log.info("connection closed %s", peer)
 
 
-async def main():
+async def main() -> None:
     server = await asyncio.start_server(handle_client, LISTEN_HOST, LISTEN_PORT)
     addrs = ", ".join(str(s.getsockname()) for s in server.sockets)
     log.info("neon-pg-proxy listening on %s → %s", addrs, WORKER_URL)

@@ -17,11 +17,11 @@ class EdgeCaseGenerator:
     def __init__(
         self,
         output_path: str = "ai/training/ready_packages/datasets/synthetic/nightmare_fuel.jsonl",
-    ):
+    ) -> None:
         self.output_path = Path(output_path)
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    def generate_nightmare_fuel(self, count: int = 50):
+    def generate_nightmare_fuel(self, count: int = 50) -> None:
         logger.info(f"Generating {count} 'Nightmare Fuel' edge cases (Extreme/Unwinnable)...")
 
         # Hard/Extreme Therapeutic Scenarios

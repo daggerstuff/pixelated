@@ -40,14 +40,14 @@ def parse_bool(val: str) -> bool | None:
     return None
 
 
-def validate_enums(row: dict, ctx: str, errors: list[str]):
+def validate_enums(row: dict[str, str], ctx: str, errors: list[str]) -> None:
     for field, allowed in ENUMS.items():
         val = (row.get(field) or "").strip().lower()
         if val not in allowed:
             errors.append(f"{ctx}: invalid {field}='{row.get(field)}', allowed={sorted(allowed)}")
 
 
-def validate_booleans(row: dict, ctx: str, errors: list[str]) -> dict[str, bool]:
+def validate_booleans(row: dict[str, str], ctx: str, errors: list[str]) -> dict[str, bool]:
     bool_values: dict[str, bool] = {}
     for bf in BOOL_FIELDS:
         pv = row.get(bf, "")
@@ -59,7 +59,7 @@ def validate_booleans(row: dict, ctx: str, errors: list[str]) -> dict[str, bool]
     return bool_values
 
 
-def validate_use_lists(row: dict, ctx: str, errors: list[str]):
+def validate_use_lists(row: dict[str, str], ctx: str, errors: list[str]) -> None:
     for lf in ("allowed_uses", "prohibited_uses"):
         raw = (row.get(lf) or "").strip()
         if raw:
@@ -70,7 +70,7 @@ def validate_use_lists(row: dict, ctx: str, errors: list[str]):
             errors.append(f"{ctx}: {lf} should not be empty; specify at least one item or 'none'")
 
 
-def validate_approval_rules(row: dict, ctx: str, bool_values: dict[str, bool], errors: list[str]):
+def validate_approval_rules(row: dict[str, str], ctx: str, bool_values: dict[str, bool], errors: list[str]) -> None:
     # dependency: PII implies deidentification_required
     if bool_values.get("pii_present") and not bool_values.get("deidentification_required"):
         errors.append(f"{ctx}: pii_present=true requires deidentification_required=true")

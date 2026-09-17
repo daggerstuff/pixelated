@@ -16,7 +16,6 @@ from skillreducer.tscg.manifest import (
     tools_from_scripts,
 )
 
-
 SAMPLE_TOOLS = [
     {
         "type": "function",
@@ -115,9 +114,7 @@ def test_reduce_with_tscg_mocked(tmp_path: Path) -> None:
             tools_path=tools_path,
         )
 
-    assert report.tscg_stats == TscgStats(
-        original_tokens=100, compressed_tokens=40, tool_count=1
-    )
+    assert report.tscg_stats == TscgStats(original_tokens=100, compressed_tokens=40, tool_count=1)
     assert (out / "demo-skill" / "mcp_manifest.json").is_file()
     assert (out / "demo-skill" / "mcp_manifest.tscg.txt").is_file()
     assert (out / "demo-skill" / "mcp_manifest.tscg.json").is_file()

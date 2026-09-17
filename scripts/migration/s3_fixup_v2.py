@@ -7,6 +7,7 @@ Moves edge case datasets from datasets/consolidated/edge_cases/ to Stage 3.
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 import boto3
 import urllib3
@@ -28,7 +29,7 @@ SECRET_KEY = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_
 REGION = os.getenv("HETZNER_S3_REGION", "hel1")
 
 
-def get_s3_client():
+def get_s3_client() -> Any:
     config = Config(region_name=REGION)
     return boto3.client(
         "s3",
@@ -40,7 +41,7 @@ def get_s3_client():
     )
 
 
-def move(old, new):
+def move(old: str, new: str) -> None:
     s3 = get_s3_client()
     try:
         # Check if source exists
@@ -57,7 +58,7 @@ def move(old, new):
         logger.error(f"  [FAIL] {old}: {e}")
 
 
-def fix():
+def fix() -> None:
     logger.info("--- S3 Fixup V2 ---")
 
     # 1. Edge Case Prompts -> Scenario Bank

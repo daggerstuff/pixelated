@@ -9,7 +9,9 @@ import logging
 import math
 import os
 import random
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, cast
 
 import art
 import weave
@@ -20,6 +22,16 @@ from openai import AsyncOpenAI
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
+def _typed_op[F: Callable[..., object]](func: F) -> F:
+    """Typed pass-through for the untyped ``weave.op`` decorator.
+
+    weave ships no type information, so applying ``@weave.op()`` directly
+    erases the decorated function's signature for mypy. Anchoring the
+    decorator result keeps the wrapped functions fully typed.
+    """
+    return cast(F, weave.op()(func))
+
+
 # Suppress harmless W&B artifact-pruning warnings from serverless backend
 class _PruneWarningFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
@@ -27,7 +39,7 @@ class _PruneWarningFilter(logging.Filter):
         return "Could not prune old train-state artifacts" not in msg and "404 Client Error" not in msg
 
 
-for logger_name in list(logging.root.manager.loggerDict.keys()) + [""]:
+for logger_name in [*logging.root.manager.loggerDict.keys(), ""]:
     logging.getLogger(logger_name).addFilter(_PruneWarningFilter())
 
 # Required environment variable
@@ -56,7 +68,7 @@ OLLAMA_CLIENT = AsyncOpenAI(
 OLLAMA_MODEL = "hf.co/unsloth/Qwen3.5-4B-GGUF:Q4_K_S"
 
 
-@weave.op()
+@_typed_op
 def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
     """Compute n-gram Jaccard similarity for better semantic overlap estimation."""
     res_words = response.lower().split()
@@ -76,8 +88,8 @@ def compute_ngram_overlap(response: str, expected: str, n: int = 2) -> float:
     return intersection / union if union > 0 else 0.0
 
 
-@weave.op()
-async def rollout(model: art.Model, messages: list, step: int = 0) -> art.Trajectory:
+@_typed_op
+async def rollout(_model: art.Model, messages: list[dict[str, Any]], _step: int = 0) -> art.Trajectory:
     """Generate a response and compute reward."""
     # Build trajectory from messages (all but last = context, last = expected assistant)
     context = messages[:-1] if len(messages) > 1 else messages
@@ -127,7 +139,7 @@ async def rollout(model: art.Model, messages: list, step: int = 0) -> art.Trajec
     return trajectory
 
 
-@weave.op()
+@_typed_op
 def log_rl_step(
     step: int,
     avg_reward: float,
@@ -135,7 +147,7 @@ def log_rl_step(
     expected_len: float,
     length_ratio: float,
     overlap: float,
-) -> dict:
+) -> dict[str, Any]:
     """Log per-step RL metrics to Weave."""
     return {
         "step": step,
@@ -147,7 +159,7 @@ def log_rl_step(
     }
 
 
-async def main():
+async def main() -> None:
     weave.init(PROJECT)
     logging.info("Loading dataset...")
     examples = []
@@ -198,7 +210,7 @@ async def main():
             train_groups = await art.gather_trajectory_groups(
                 (
                     art.TrajectoryGroup(
-                        rollout(model, messages, step=step + start_step) for _ in range(ROLLOUTS_PER_GROUP)
+                        rollout(model, messages, _step=step + start_step) for _ in range(ROLLOUTS_PER_GROUP)
                     )
                     for messages in batch
                 ),

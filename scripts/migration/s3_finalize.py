@@ -8,6 +8,7 @@ import logging
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from typing import Any
 
 import boto3
 import urllib3
@@ -34,7 +35,7 @@ REGION = os.getenv("HETZNER_S3_REGION", "hel1")
 MAX_WORKERS = 32
 
 
-def get_s3_client():
+def get_s3_client() -> Any:
     config = Config(region_name=REGION)
     return boto3.client(
         "s3",
@@ -46,7 +47,7 @@ def get_s3_client():
     )
 
 
-def move_s3_object(old_key, new_key):
+def move_s3_object(old_key: str, new_key: str) -> bool:
     """Moves an object in S3 (Copy + Delete)"""
     if old_key == new_key:
         return True
@@ -66,7 +67,7 @@ def move_s3_object(old_key, new_key):
         return False
 
 
-def process_prefix_migration(old_prefix, new_prefix):
+def process_prefix_migration(old_prefix: str, new_prefix: str) -> None:
     """Migrates all objects under a prefix from old to new"""
     logger.info("\n--- Migrating Prefix: %s -> %s ---", old_prefix, new_prefix)
     s3 = get_s3_client()
@@ -93,7 +94,7 @@ def process_prefix_migration(old_prefix, new_prefix):
     logger.info("  Completed %d moves under prefix.", completed_count)
 
 
-def finalize_reorganization():
+def finalize_reorganization() -> None:
     # 1. Curated Sets (Wendy Gold)
     # Move from legacy consolidated path to v1 stage1
     logger.info("\n--- Phase 6: Finalizing Curated Sets ---")

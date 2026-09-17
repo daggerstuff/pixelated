@@ -28,7 +28,7 @@ class AgentSpan:
 class TelemetryCollector:
     """Collects distributed execution spans and performance metrics."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._spans: list[AgentSpan] = []
 
     def start_span(

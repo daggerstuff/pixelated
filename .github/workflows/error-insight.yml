@@ -1,0 +1,61 @@
+name: Error Insight
+
+permissions:
+  issues: write
+  contents: read
+
+# Error-to-insight: when a core workflow fails on staging, the failure
+# becomes a triageable GitHub issue (labelled automated + observability)
+# instead of an alert someone has to remember. Repeated failures within
+# the same workflow thread onto the existing issue so the trail of
+# reproductions stays in one place.
+on:
+  workflow_run:
+    workflows: [CI, Deploy to AWS EKS, Quality, Monitoring]
+    types: [completed]
+    branches: [staging]
+
+jobs:
+  file-issue:
+    name: Track failure as an issue
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure'
+    steps:
+      - name: File or update the failure issue
+        env:
+          # No checkout in this job — gh needs the repo identity from the
+          # event context instead of git remotes, or every command fails
+          # with "fatal: not a git repository".
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FAILED_WORKFLOW: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          title="$FAILED_WORKFLOW failed on $HEAD_BRANCH"
+          body="**$FAILED_WORKFLOW** concluded **$CONCLUSION** on \`$HEAD_BRANCH\`.
+
+          - Run: $RUN_URL
+          - Commit: \`${HEAD_SHA:0:8}\`
+
+          Filed automatically by the Error Insight workflow. If the root
+          cause is fixed, close this issue; the next failure opens a new one."
+
+          existing=$(gh issue list --state open \
+            --label automated --json number,title \
+            --jq ".[] | select(.title | startswith(\"$FAILED_WORKFLOW failed\")) | .number" \
+            | head -1)
+
+          if [ -n "$existing" ]; then
+            echo "Open issue #$existing for $FAILED_WORKFLOW — adding this run."
+            gh issue comment "$existing" --body "Reproduced: $RUN_URL (commit \`${HEAD_SHA:0:8}\`, run #$RUN_ID)"
+          else
+            echo "No open issue for $FAILED_WORKFLOW — filing a new one."
+            gh issue create \
+              --title "$title" \
+              --label automated --label observability \
+              --body "$body"
+          fi

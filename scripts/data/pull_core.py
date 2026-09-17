@@ -19,6 +19,7 @@ import os
 import sys
 import time
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
@@ -41,13 +42,14 @@ SEARCH_QUERY = (
 )
 
 
-def _search(api_key: str, offset: int = 0) -> dict:
+def _search(api_key: str, offset: int = 0) -> dict[str, Any]:
     """Search CORE for psychology/psychiatry papers."""
     url = f"{CORE_API}/search/works?{SEARCH_QUERY}&offset={offset}"
     req = Request(url, headers={"Authorization": f"Bearer {api_key}"})
     try:
         with urlopen(req, timeout=30) as resp:
-            return json.loads(resp.read().decode())
+            data: dict[str, Any] = json.loads(resp.read().decode())
+            return data
     except (HTTPError, Exception) as e:
         logger.warning("CORE search error: %s", e)
         return {}
@@ -60,8 +62,9 @@ def _get_fulltext(api_key: str, work_id: str, max_retries: int = 3) -> str:
     for attempt in range(max_retries):
         try:
             with urlopen(req, timeout=30) as resp:
-                data = json.loads(resp.read().decode())
-                return data.get("fullText", "")
+                data: dict[str, Any] = json.loads(resp.read().decode())
+                full_text: str = data.get("fullText", "")
+                return full_text
         except (HTTPError, Exception) as e:
             if attempt < max_retries - 1:
                 delay = 2**attempt
@@ -134,7 +137,7 @@ def pull_papers(output_dir: Path, api_key: str, limit: int) -> int:
     return count
 
 
-def main():
+def main() -> int:
     parser = argparse.ArgumentParser(description="PIX-30: CORE Open Access Text Mining")
     parser.add_argument("--api-key", default=os.environ.get("CORE_API_KEY", ""))
     parser.add_argument("--limit", type=int, default=25000, help="Max papers to pull")

@@ -236,6 +236,20 @@ export async function createDataExportRequest(
       createdAt: exportRequest.createdAt,
     })
 
+    // Audit log the creation (HIPAA: exporting PHI is a auditable disclosure)
+    await createAuditLog(
+      AuditEventType.SECURITY,
+      'export_requested',
+      input.requestedBy,
+      'data_portability',
+      {
+        exportId,
+        patientId: input.patientId,
+        formats: input.formats,
+        dataTypes: input.dataTypes,
+      },
+    )
+
     // Trigger export job (will be processed asynchronously)
     await queueExportJob(exportRequest)
 
@@ -907,8 +921,8 @@ export async function downloadDataExport(
 
     // Verify the user has permission to access this patient's data
     const isAuthorized = await verifyPatientDataAccess(
-      userId,
       exportRequest.patientId,
+      userId,
     )
 
     if (!isAuthorized) {

@@ -8,6 +8,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 import boto3
 import urllib3
@@ -32,7 +33,7 @@ SECRET_KEY = os.getenv("HETZNER_S3_SECRET_KEY") or os.getenv("AWS_SECRET_ACCESS_
 REGION = os.getenv("HETZNER_S3_REGION", "hel1")
 
 
-def get_s3_client():
+def get_s3_client() -> Any:
     config = Config(region_name=REGION)
     return boto3.client(
         "s3",
@@ -44,7 +45,7 @@ def get_s3_client():
     )
 
 
-def consolidate_cot():
+def consolidate_cot() -> None:
     s3 = get_s3_client()
     prefix = "training/v1/stage2_expertise/reasoning/"
     target_key = f"{prefix}cot_reasoning_consolidated.jsonl"
@@ -57,7 +58,7 @@ def consolidate_cot():
         logger.info("No files found in reasoning folder.")
         return
 
-    consolidated_data = []
+    consolidated_data: list[dict[str, Any]] = []
 
     for obj in res["Contents"]:
         key = obj["Key"]
@@ -70,7 +71,7 @@ def consolidate_cot():
             data = json.loads(resp["Body"].read())
 
             # Handle different formats (list or dict with 'conversations')
-            items = []
+            items: list[dict[str, Any]] = []
             if isinstance(data, list):
                 items = data
             elif isinstance(data, dict):

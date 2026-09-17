@@ -9,6 +9,7 @@ import time
 import urllib.error
 import urllib.request
 import uuid
+from typing import Any
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -92,8 +93,8 @@ def request_json(
     actor_id: str,
     actor_secret: str,
     user_id: str,
-    payload: dict | None = None,
-) -> tuple[int, dict | list | str]:
+    payload: dict[str, Any] | None = None,
+) -> tuple[int, dict[str, Any] | list[Any] | str]:
     body = json.dumps(payload or {}).encode("utf-8")
     req = urllib.request.Request(
         f"{base_url.rstrip('/')}{path}",
@@ -136,7 +137,7 @@ class DiagnosticClient:
         self.actor_secret = actor_secret
         self.user_id = user_id
 
-    def health_check(self) -> tuple[int, dict | list | str]:
+    def health_check(self) -> tuple[int, dict[str, Any] | list[Any] | str]:
         """Check if the memory service is healthy."""
         return request_json(
             base_url=self.base_url,
@@ -170,8 +171,8 @@ class MemoryRepository:
         self,
         path: str,
         method: str,
-        payload: dict | None = None,
-    ) -> tuple[int, dict | list | str]:
+        payload: dict[str, Any] | None = None,
+    ) -> tuple[int, dict[str, Any] | list[Any] | str]:
         """Make an authenticated request to the memory service."""
         return request_json(
             base_url=self.base_url,
@@ -183,7 +184,7 @@ class MemoryRepository:
             payload=payload,
         )
 
-    def retain(self, content: str, context: str, tags: list) -> tuple[int, dict | list | str]:
+    def retain(self, content: str, context: str, tags: list[str]) -> tuple[int, dict[str, Any] | list[Any] | str]:
         """Store a memory in the shared service."""
         target = f"/v1/default/banks/{self.bank_id}/memories"
         return self._make_request(
@@ -200,7 +201,9 @@ class MemoryRepository:
             },
         )
 
-    def recall(self, query: str, limit: int, tags: list, tags_match: str = "any") -> tuple[int, dict | list | str]:
+    def recall(
+        self, query: str, limit: int, tags: list[str], tags_match: str = "any"
+    ) -> tuple[int, dict[str, Any] | list[Any] | str]:
         """Recall memories from the shared service."""
         target = f"/v1/default/banks/{self.bank_id}/memories/recall"
         return self._make_request(
@@ -214,7 +217,7 @@ class MemoryRepository:
             },
         )
 
-    def delete_document(self, document_id: str) -> tuple[int, dict | list | str]:
+    def delete_document(self, document_id: str) -> tuple[int, dict[str, Any] | list[Any] | str]:
         """Delete a document from the shared service."""
         target = f"/v1/default/banks/{self.bank_id}/documents/{document_id}"
         return self._make_request(target, "DELETE")

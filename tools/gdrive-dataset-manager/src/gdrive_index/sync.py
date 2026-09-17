@@ -4,10 +4,12 @@ import logging
 import queue
 import tempfile
 import threading
-from concurrent.futures import ProcessPoolExecutor, TimeoutError as FuturesTimeout
+from collections.abc import Callable, Iterator
+from concurrent.futures import Future, ProcessPoolExecutor, TimeoutError as FuturesTimeout
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
 from googleapiclient.http import MediaIoBaseDownload
 
@@ -54,7 +56,7 @@ def parse_modified_time(raw: str) -> datetime:
     return datetime.fromisoformat(raw.replace("Z", "+00:00"))
 
 
-def iter_drive_files(service, folder_id: str | None, limit: int | None):
+def iter_drive_files(service: Any, folder_id: str | None, limit: int | None) -> Iterator[DriveFileMeta]:
     query = "trashed = false and mimeType != 'application/vnd.google-apps.folder'"
     if folder_id:
         query += f" and '{folder_id}' in parents"
@@ -62,8 +64,8 @@ def iter_drive_files(service, folder_id: str | None, limit: int | None):
     yielded = 0
 
     @with_retry
-    def page() -> dict:
-        return (
+    def page() -> dict[str, Any]:
+        result: dict[str, Any] = (
             service.files()
             .list(
                 q=query,
@@ -76,6 +78,7 @@ def iter_drive_files(service, folder_id: str | None, limit: int | None):
             )
             .execute()
         )
+        return result
 
     while True:
         response = page()
@@ -152,15 +155,15 @@ def store_chunks(db: Database, meta: DriveFileMeta, chunks: list[str], vectors: 
         )
 
 
-def download_to_temp(service, file_id: str, cfg: Config, suffix: str) -> Path:
+def download_to_temp(service: Any, file_id: str, cfg: Config, suffix: str) -> Path:
     return _download_media(service.files().get_media(fileId=file_id), cfg, suffix)
 
 
-def export_to_temp(service, file_id: str, export_mime: str, cfg: Config, suffix: str) -> Path:
+def export_to_temp(service: Any, file_id: str, export_mime: str, cfg: Config, suffix: str) -> Path:
     return _download_media(service.files().export_media(fileId=file_id, mimeType=export_mime), cfg, suffix)
 
 
-def _download_media(request, cfg: Config, suffix: str) -> Path:
+def _download_media(request: Any, cfg: Config, suffix: str) -> Path:
     cfg.tmpdir.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=cfg.tmpdir, delete=False, suffix=suffix) as tmp:
         path = Path(tmp.name)
@@ -286,8 +289,8 @@ class SyncEngine:
                 self._count("skipped")
                 return
             set_status(self.db, meta.file_id, "processing")
-            path = download_to_temp(self.service, meta.file_id, self.cfg, Path(meta.name).suffix)
-            self.media_queue.put((meta, path))
+            media_path: Path = download_to_temp(self.service, meta.file_id, self.cfg, Path(meta.name).suffix)
+            self.media_queue.put((meta, media_path))
             return
 
         set_status(self.db, meta.file_id, "processing")
@@ -300,7 +303,7 @@ class SyncEngine:
             self._count("skipped")
             return
 
-        path = None
+        path: Path | None = None
         try:
             if kind is Kind.GOOGLE_DOC:
                 path = export_to_temp(self.service, meta.file_id, GOOGLE_DOC_EXPORT, self.cfg, ".txt")
@@ -326,10 +329,11 @@ class SyncEngine:
 
         self._index_text(meta, text)
 
-    def _extract_with_timeout(self, fn, path: Path) -> str:
-        future = self.extractor.submit(fn, path)
+    def _extract_with_timeout(self, fn: Callable[[Path], str], path: Path) -> str:
+        future: Future[str] = self.extractor.submit(fn, path)
         try:
-            return future.result(timeout=EXTRACT_TIMEOUT_S)
+            extracted: str = future.result(timeout=EXTRACT_TIMEOUT_S)
+            return extracted
         except FuturesTimeout as exc:
             future.cancel()
             raise RuntimeError(f"extraction timed out after {EXTRACT_TIMEOUT_S}s") from exc

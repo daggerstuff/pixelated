@@ -6,12 +6,12 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import import_module
-from typing import Any, Mapping
+from typing import Any
 
 from skillrevise.core.env import env_flag_enabled, env_names, get_env, set_env_with_legacy
-
 
 DEFAULT_REVISION_LLM_PROVIDER = "openrouter"
 DEFAULT_REVISION_LLM_API_KEY = ""
@@ -75,11 +75,12 @@ def complete_prompt(prompt: str, env: Mapping[str, str] | None = None) -> str:
 
 
 def load_config(env: Mapping[str, str]) -> LLMCommandConfig:
-    provider = (get_env(env, "SKILL_REVISE_REVISION_LLM_PROVIDER", DEFAULT_REVISION_LLM_PROVIDER) or "").strip().lower()
-    model = (
-        get_env(env, "SKILL_REVISE_REVISION_LLM_MODEL")
-        or DEFAULT_REVISION_LLM_MODEL
-    ).strip()
+    provider = (
+        (get_env(env, "SKILL_REVISE_REVISION_LLM_PROVIDER", DEFAULT_REVISION_LLM_PROVIDER) or "")
+        .strip()
+        .lower()
+    )
+    model = (get_env(env, "SKILL_REVISE_REVISION_LLM_MODEL") or DEFAULT_REVISION_LLM_MODEL).strip()
     if not model:
         raise LLMCommandError(
             "Missing revision model. Set SKILL_REVISE_REVISION_LLM_MODEL "
@@ -102,10 +103,14 @@ def load_config(env: Mapping[str, str]) -> LLMCommandConfig:
         model=model,
         base_url=_base_url_for_provider(provider, env),
         api_key=_api_key_for_provider(provider, env),
-        timeout_seconds=_env_int(env, "SKILL_REVISE_REVISION_LLM_HTTP_TIMEOUT", DEFAULT_HTTP_TIMEOUT),
+        timeout_seconds=_env_int(
+            env, "SKILL_REVISE_REVISION_LLM_HTTP_TIMEOUT", DEFAULT_HTTP_TIMEOUT
+        ),
         retry_attempts=max(
             1,
-            _env_int(env, "SKILL_REVISE_REVISION_LLM_HTTP_RETRY_ATTEMPTS", DEFAULT_HTTP_RETRY_ATTEMPTS),
+            _env_int(
+                env, "SKILL_REVISE_REVISION_LLM_HTTP_RETRY_ATTEMPTS", DEFAULT_HTTP_RETRY_ATTEMPTS
+            ),
         ),
         retry_base_delay_seconds=max(
             0.0,
@@ -162,9 +167,7 @@ def _load_local_config() -> dict[str, str]:
 
 def complete_openai_compatible(prompt: str, config: LLMCommandConfig) -> str:
     if config.provider == "openai" and not config.api_key:
-        raise LLMCommandError(
-            "Missing SKILL_REVISE_REVISION_LLM_API_KEY for provider=openai."
-        )
+        raise LLMCommandError("Missing SKILL_REVISE_REVISION_LLM_API_KEY for provider=openai.")
     if config.provider == "openrouter" and not config.api_key:
         raise LLMCommandError(
             "Missing REVISION_OPENROUTER_API_KEY or SKILL_REVISE_REVISION_LLM_API_KEY "
@@ -208,7 +211,9 @@ def complete_openai_compatible(prompt: str, config: LLMCommandConfig) -> str:
             return str(content).strip()
         except LLMCommandError as exc:
             last_error = exc
-            if attempt >= config.retry_attempts or not _should_retry_openai_compatible_error(exc, response_data):
+            if attempt >= config.retry_attempts or not _should_retry_openai_compatible_error(
+                exc, response_data
+            ):
                 raise
             _sleep_before_retry(config.retry_base_delay_seconds, attempt)
     assert last_error is not None
@@ -217,9 +222,7 @@ def complete_openai_compatible(prompt: str, config: LLMCommandConfig) -> str:
 
 def complete_anthropic(prompt: str, config: LLMCommandConfig) -> str:
     if not config.api_key:
-        raise LLMCommandError(
-            "Missing SKILL_REVISE_REVISION_LLM_API_KEY for provider=anthropic."
-        )
+        raise LLMCommandError("Missing SKILL_REVISE_REVISION_LLM_API_KEY for provider=anthropic.")
 
     payload = {
         "model": config.model,
@@ -248,7 +251,9 @@ def complete_anthropic(prompt: str, config: LLMCommandConfig) -> str:
             return text
         except LLMCommandError as exc:
             last_error = exc
-            if attempt >= config.retry_attempts or not _should_retry_anthropic_error(exc, response_data):
+            if attempt >= config.retry_attempts or not _should_retry_anthropic_error(
+                exc, response_data
+            ):
                 raise
             _sleep_before_retry(config.retry_base_delay_seconds, attempt)
     assert last_error is not None
@@ -302,14 +307,14 @@ def _extract_text_parts(value: Any) -> list[str]:
 
 
 def _describe_anthropic_content_shape(data: Mapping[str, Any]) -> str:
-    keys = ", ".join(sorted(str(key) for key in data.keys())[:8])
+    keys = ", ".join(sorted(str(key) for key in data)[:8])
     content = data.get("content")
     if isinstance(content, list):
         block_shapes = []
         for block in content[:4]:
             if isinstance(block, Mapping):
                 block_type = block.get("type")
-                block_keys = ",".join(sorted(str(key) for key in block.keys())[:6])
+                block_keys = ",".join(sorted(str(key) for key in block)[:6])
                 block_shapes.append(f"type={block_type!r};keys={block_keys}")
             else:
                 block_shapes.append(type(block).__name__)
@@ -326,14 +331,21 @@ def complete_ollama(prompt: str, config: LLMCommandConfig) -> str:
         "stream": False,
         "options": {"temperature": config.temperature},
     }
-    data = _post_json(_join_url(config.base_url, "api/generate"), {"Content-Type": "application/json"}, payload, config.timeout_seconds)
+    data = _post_json(
+        _join_url(config.base_url, "api/generate"),
+        {"Content-Type": "application/json"},
+        payload,
+        config.timeout_seconds,
+    )
     text = str(data.get("response", "")).strip()
     if not text:
         raise LLMCommandError("Ollama response did not contain response text.")
     return text
 
 
-def _post_json(url: str, headers: dict[str, str], payload: dict[str, Any], timeout_seconds: int) -> dict[str, Any]:
+def _post_json(
+    url: str, headers: dict[str, str], payload: dict[str, Any], timeout_seconds: int
+) -> dict[str, Any]:
     body = json.dumps(payload).encode("utf-8")
     request = urllib.request.Request(url, data=body, headers=headers, method="POST")
     try:
@@ -357,7 +369,7 @@ def _post_json(url: str, headers: dict[str, str], payload: dict[str, Any], timeo
 def _describe_openai_compatible_error(data: Mapping[str, Any]) -> str:
     error = data.get("error")
     if not isinstance(error, Mapping):
-        keys = ", ".join(sorted(str(key) for key in data.keys())[:8])
+        keys = ", ".join(sorted(str(key) for key in data)[:8])
         return f"Response keys: {keys}." if keys else ""
     parts = []
     for key in ("type", "code", "param"):
@@ -414,9 +426,7 @@ def _should_retry_openai_compatible_error(
     )
     if any(marker in text for marker in retryable):
         return True
-    if data is not None and not data.get("choices"):
-        return True
-    return False
+    return bool(data is not None and not data.get("choices"))
 
 
 def _should_retry_anthropic_error(
@@ -462,9 +472,7 @@ def _should_retry_anthropic_error(
     )
     if any(marker in text for marker in retryable):
         return True
-    if data is not None and not _extract_anthropic_text(data):
-        return True
-    return False
+    return bool(data is not None and not _extract_anthropic_text(data))
 
 
 def _sleep_before_retry(base_delay_seconds: float, attempt: int) -> None:
@@ -548,7 +556,10 @@ def _env_float(env: Mapping[str, str], key: str, default: float) -> float:
 
 
 def _bypass_proxy_enabled(env: Mapping[str, str]) -> bool:
-    return env_flag_enabled(env, "SKILL_REVISE_BYPASS_PROXY") or env_flag_enabled(env, "SKILL_REVISE_NO_PROXY")
+    return bool(
+        env_flag_enabled(env, "SKILL_REVISE_BYPASS_PROXY")
+        or env_flag_enabled(env, "SKILL_REVISE_NO_PROXY")
+    )
 
 
 def _strip_proxy_from_process_env() -> None:

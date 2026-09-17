@@ -7,7 +7,7 @@ then connect from this machine.
 """
 
 
-def print_colab_setup():
+def print_colab_setup() -> None:
     pass
 
 

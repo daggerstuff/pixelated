@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Protocol
 from uuid import uuid4
 
@@ -10,7 +10,14 @@ from skillrevise.core.models import ExecutionTrace, Skill, TaskSpec, TrajectoryE
 ABSOLUTE_MARKERS = ("always", "must", "directly", "without checking", "never")
 VALIDATION_MARKERS = ("verify", "check", "inspect", "confirm", "fallback")
 WORKFLOW_MARKERS = ("first", "then", "before", "after", "workflow")
-ENVIRONMENT_MARKERS = ("environment", "repository-native", "available", "entrypoint", "tool", "file")
+ENVIRONMENT_MARKERS = (
+    "environment",
+    "repository-native",
+    "available",
+    "entrypoint",
+    "tool",
+    "file",
+)
 FALLBACK_MARKERS = ("fallback", "if unavailable", "alternative", "otherwise")
 STRICT_MARKERS = ("do not", "only after", "stop", "avoid", "must not")
 
@@ -29,7 +36,7 @@ class MockAgentAdapter:
     """
 
     def run(self, task: TaskSpec, skill: Skill | None) -> ExecutionTrace:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         base_tokens = int(task.metadata.get("base_tokens", 1_500))
         base_steps = int(task.metadata.get("base_steps", 10))
         base_tools = int(task.metadata.get("base_tool_calls", 6))
@@ -86,7 +93,9 @@ class MockAgentAdapter:
             metadata={"mock_score": round(score, 4)},
         )
 
-    def _score_task(self, task: TaskSpec, skill: Skill | None) -> tuple[float, list[TrajectoryEvent]]:
+    def _score_task(
+        self, task: TaskSpec, skill: Skill | None
+    ) -> tuple[float, list[TrajectoryEvent]]:
         score = float(task.metadata.get("base_success", 0.5))
         events: list[TrajectoryEvent] = []
         if skill is None:
@@ -96,7 +105,10 @@ class MockAgentAdapter:
         keywords = [item.lower() for item in task.metadata.get("skill_keywords", [])]
         anti_patterns = [item.lower() for item in task.metadata.get("anti_patterns", [])]
         requires_validation = bool(task.metadata.get("requires_validation", False))
-        family_bonus = task.family.lower() in skill.when_to_use.lower() or task.family.lower() in skill.purpose.lower()
+        family_bonus = (
+            task.family.lower() in skill.when_to_use.lower()
+            or task.family.lower() in skill.purpose.lower()
+        )
 
         if keywords:
             matched = [keyword for keyword in keywords if keyword in text]

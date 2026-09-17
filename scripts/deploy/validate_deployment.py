@@ -25,13 +25,14 @@ logger = logging.getLogger(__name__)
 class DeploymentValidator:
     """Validates deployment of enhanced bias detection system"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.services = {
             "bias_detection": "http://localhost:8001",
             "training_service": "http://localhost:8002",
             "memory_service": "http://localhost:8003",
         }
-        self.test_results = []
+        self.test_results: list[dict[str, Any]] = []
+        self.session: aiohttp.ClientSession
 
     async def validate_service_health(self, service_name: str, service_url: str) -> bool:
         """Validate individual service health"""
@@ -39,12 +40,14 @@ class DeploymentValidator:
             logger.info(f"Validating {service_name} health at {service_url}")
 
             async with self.session.get(
-                f"{service_url}/health", timeout=10, headers={"Content-Type": "application/json"}
+                f"{service_url}/health",
+                timeout=aiohttp.ClientTimeout(total=10),
+                headers={"Content-Type": "application/json"},
             ) as response:
                 if response.status == 200:
-                    health_data = await response.json()
+                    health_data: dict[str, Any] = await response.json()
                     logger.info(f"{service_name} health: {health_data}")
-                    return health_data.get("status") == "healthy"
+                    return bool(health_data.get("status") == "healthy")
                 logger.error(f"{service_name} health check failed: {response.status}")
                 return False
 
@@ -78,7 +81,7 @@ class DeploymentValidator:
             async with self.session.post(
                 f"{self.services['bias_detection']}/analyze/conversation",
                 json=test_conversation,
-                timeout=30,
+                timeout=aiohttp.ClientTimeout(total=30),
                 headers={"Content-Type": "application/json"},
             ) as response:
                 if response.status == 200:
@@ -110,7 +113,7 @@ class DeploymentValidator:
             async with self.session.post(
                 f"{self.services['training_service']}/training/cultural/scenarios",
                 json=training_params,
-                timeout=30,
+                timeout=aiohttp.ClientTimeout(total=30),
                 headers={"Content-Type": "application/json"},
             ) as response:
                 if response.status == 200:
@@ -149,7 +152,7 @@ class DeploymentValidator:
             async with self.session.post(
                 f"{self.services['memory_service']}/memory/update",
                 json=memory_update,
-                timeout=30,
+                timeout=aiohttp.ClientTimeout(total=30),
                 headers={"Content-Type": "application/json"},
             ) as post_response:
                 if post_response.status == 200:
@@ -159,7 +162,7 @@ class DeploymentValidator:
                     # Test memory retrieval
                     async with self.session.get(
                         f"{self.services['memory_service']}/memory/state",
-                        timeout=10,
+                        timeout=aiohttp.ClientTimeout(total=10),
                         headers={"Content-Type": "application/json"},
                     ) as get_response:
                         if get_response.status == 200:
@@ -182,7 +185,9 @@ class DeploymentValidator:
 
             # Test performance endpoint
             async with self.session.get(
-                f"{self.services['bias_detection']}/metrics", timeout=10, headers={"Content-Type": "application/json"}
+                f"{self.services['bias_detection']}/metrics",
+                timeout=aiohttp.ClientTimeout(total=10),
+                headers={"Content-Type": "application/json"},
             ) as response:
                 if response.status == 200:
                     metrics = await response.json()
@@ -214,7 +219,7 @@ class DeploymentValidator:
             async with self.session.post(
                 f"{self.services['bias_detection']}/research/ieee/search",
                 json=search_query,
-                timeout=30,
+                timeout=aiohttp.ClientTimeout(total=30),
                 headers={"Content-Type": "application/json"},
             ) as response:
                 if response.status == 200:
@@ -244,7 +249,9 @@ class DeploymentValidator:
             }
 
             async with self.session.post(
-                f"{self.services['training_service']}/training/cultural/scenarios", json=training_params, timeout=30
+                f"{self.services['training_service']}/training/cultural/scenarios",
+                json=training_params,
+                timeout=aiohttp.ClientTimeout(total=30),
             ) as response:
                 if response.status != 200:
                     logger.error("Failed to generate training scenarios")
@@ -269,7 +276,9 @@ class DeploymentValidator:
             }
 
             async with self.session.post(
-                f"{self.services['bias_detection']}/analyze/conversation", json=test_conversation, timeout=30
+                f"{self.services['bias_detection']}/analyze/conversation",
+                json=test_conversation,
+                timeout=aiohttp.ClientTimeout(total=30),
             ) as response:
                 if response.status != 200:
                     logger.error("Failed to analyze conversation")
@@ -287,7 +296,9 @@ class DeploymentValidator:
             }
 
             async with self.session.post(
-                f"{self.services['memory_service']}/memory/update", json=memory_update, timeout=30
+                f"{self.services['memory_service']}/memory/update",
+                json=memory_update,
+                timeout=aiohttp.ClientTimeout(total=30),
             ) as response:
                 return response.status == 200
 
@@ -349,7 +360,7 @@ class DeploymentValidator:
             logger.info(f"Available disk: {disk.free / 1024 / 1024 / 1024:.2f} GB")
 
             # Validate thresholds
-            return cpu_percent < 80 and memory.percent < 85 and disk.percent < 90
+            return bool(cpu_percent < 80 and memory.percent < 85 and disk.percent < 90)
 
         except Exception as e:
             logger.error(f"Error validating system resources: {e!s}")
@@ -359,7 +370,7 @@ class DeploymentValidator:
         """Run complete validation suite"""
         logger.info("Starting deployment validation suite")
 
-        validation_results = {
+        validation_results: dict[str, Any] = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "overall_status": "pending",
             "tests": {},
@@ -464,7 +475,7 @@ class DeploymentValidator:
         return report
 
 
-async def main():
+async def main() -> int:
     """Main validation function"""
     validator = DeploymentValidator()
 

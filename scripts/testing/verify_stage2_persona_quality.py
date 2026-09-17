@@ -27,6 +27,7 @@ import sys
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 # Project root for .env and ai package
 _repo_root = Path(__file__).resolve().parents[1]
@@ -47,10 +48,10 @@ logging.basicConfig(
 
 
 class S3DatasetLoader:
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: object, **kwargs: object) -> None:
         pass
 
-    def stream_jsonl(self, path):
+    def stream_jsonl(self, _path: str) -> list[dict[str, Any]]:
         return []
 
 
@@ -71,27 +72,27 @@ MIN_USER_CHARS = 10
 PERSONA_IMBALANCE_FRACTION = 0.1
 
 
-def _fails_human_likeness(t: str) -> bool:
+def _fails_human_likeness(_t: str) -> bool:
     return False
 
 
-def _is_refusal_or_fallback(t: str) -> bool:
+def _is_refusal_or_fallback(_t: str) -> bool:
     return False
 
 
-def _stable_message_hash(t: str) -> str:
+def _stable_message_hash(_t: str) -> str:
     return ""
 
 
-def last_assistant_content(r: dict) -> str:
+def last_assistant_content(_r: dict[str, Any]) -> str:
     return ""
 
 
-def last_user_content(r: dict) -> str:
+def last_user_content(_r: dict[str, Any]) -> str:
     return ""
 
 
-def validate_record(r: dict, *args, **kwargs) -> list[str]:
+def validate_record(_r: dict[str, Any], *_args: object, **_kwargs: object) -> list[str]:
     return []
 
 
@@ -106,7 +107,7 @@ class _StreamResult:
     valid: int
     invalid: int
     error_samples: list[tuple[int, list[str]]]
-    sample_records: list[tuple[int, dict]]
+    sample_records: list[tuple[int, dict[str, Any]]]
     short_user: int
     short_assistant: int
     long_assistant: int
@@ -119,7 +120,7 @@ class _StreamResult:
 
 
 def _update_quality_counts(
-    record: dict,
+    record: dict[str, Any],
     counts: QualityCounts,
     persona_counts: dict[str, int],
     last_assistant_hashes: dict[str, int],
@@ -157,7 +158,7 @@ def _stream_and_collect(loader: S3DatasetLoader) -> _StreamResult | str:
     valid = 0
     invalid = 0
     error_samples: list[tuple[int, list[str]]] = []
-    sample_records: list[tuple[int, dict]] = []
+    sample_records: list[tuple[int, dict[str, Any]]] = []
     max_error_samples = 10
     counts = QualityCounts()
     persona_counts: dict[str, int] = {}
@@ -283,7 +284,7 @@ def _report_persona_distribution(data: _StreamResult) -> None:
     logger.info("")
 
 
-def _report_sample_records(sample_records: list[tuple[int, dict]]) -> None:
+def _report_sample_records(sample_records: list[tuple[int, dict[str, Any]]]) -> None:
     logger.info("Sample records (structure only; content truncated):")
     for line_no, rec in sample_records[:3]:
         msg_count = len(rec.get("messages") or [])

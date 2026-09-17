@@ -1,4 +1,5 @@
 import type { DimensionalEmotion } from '../ai/emotions/dimensionalTypes'
+import mongoClient from '../db/mongoClient'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('emotionsRepository')
 
@@ -22,10 +23,30 @@ class EmotionsRepositoryImpl implements EmotionsRepository {
   async getDimensionalEmotions(
     query: DimensionalEmotionsQuery,
   ): Promise<DimensionalEmotion[]> {
-    // Implement actual database query here
     logger.info(`Querying emotions for client: ${query.clientId}`)
-    // This is a placeholder implementation
-    return []
+
+    const mongoQuery: Record<string, unknown> = { client_id: query.clientId }
+    if (query.startDate || query.endDate) {
+      const timestampQuery: Record<string, Date> = {}
+      if (query.startDate) timestampQuery['$gte'] = query.startDate
+      if (query.endDate) timestampQuery['$lte'] = query.endDate
+      mongoQuery['timestamp'] = timestampQuery
+    }
+
+    let cursor = mongoClient.db
+      .collection<DimensionalEmotion>('emotion_records')
+      .find(mongoQuery)
+      .sort({ timestamp: -1 })
+
+    if (query.limit) {
+      cursor = cursor.limit(query.limit)
+    }
+
+    const docs = await cursor.toArray()
+    return docs.map(({ _id: _ignored, ...emotion }) => ({
+      ...emotion,
+      timestamp: new Date(emotion.timestamp),
+    }))
   }
 }
 

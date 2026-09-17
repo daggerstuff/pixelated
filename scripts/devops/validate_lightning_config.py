@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 
-def validate_config(config_path):
+def validate_config(config_path: str) -> None:
     try:
         config = json.loads(Path(config_path).read_text())
     except Exception:

@@ -145,6 +145,46 @@ export const SENTRY_CONFIG = {
   },
 } as const
 
+const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]'])
+
+/**
+ * @param hostname host from `window.location.hostname` or a parsed URL
+ * @returns true when the host is a local loopback address
+ */
+export function isLoopbackHostname(hostname: string | undefined): boolean {
+  return hostname !== undefined && LOOPBACK_HOSTNAMES.has(hostname.toLowerCase())
+}
+
+/**
+ * Detects events captured while serving requests from the local Vite dev
+ * server. `@sentry/astro` records the incoming request on `event.request`
+ * and always tags the full URL under `tags['url']`, so either field is a
+ * reliable signal. Production user requests never carry a loopback URL.
+ *
+ * @param event the Sentry event under evaluation
+ * @returns true when the event originated from a local dev server request
+ */
+export function isLocalDevServerEvent(event: Event): boolean {
+  const tagUrl = event.tags?.['url']
+  const candidates: Array<string | undefined> = [
+    event.request?.url,
+    typeof tagUrl === 'string' ? tagUrl : undefined,
+  ]
+  for (const candidate of candidates) {
+    if (typeof candidate !== 'string' || candidate.length === 0) {
+      continue
+    }
+    try {
+      if (isLoopbackHostname(new URL(candidate).hostname)) {
+        return true
+      }
+    } catch {
+      // Malformed URL: not a loopback request, try the next candidate.
+    }
+  }
+  return false
+}
+
 export function beforeSend(event: Event): Event | null {
   if (import.meta.env.DEV) {
     logger.info('Sentry event:', event)
@@ -156,9 +196,13 @@ export function beforeSend(event: Event): Event | null {
   // Skip this filter if PUBLIC_SENTRY_ALLOW_LOCALHOST is set to '1' for testing.
   const allowLocalhost =
     import.meta.env['PUBLIC_SENTRY_ALLOW_LOCALHOST'] === '1'
-  if (!allowLocalhost && typeof window !== 'undefined') {
-    const { hostname } = window.location
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+  if (!allowLocalhost) {
+    if (typeof window !== 'undefined') {
+      if (isLoopbackHostname(window.location.hostname)) {
+        return null
+      }
+    }
+    if (isLocalDevServerEvent(event)) {
       return null
     }
   }

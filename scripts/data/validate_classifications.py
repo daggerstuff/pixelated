@@ -189,10 +189,10 @@ def run_validation(use_llm: bool = True) -> None:
     if failures:
         logger.info("")
         logger.info("❌ FAILED CASES:")
-        for f in failures:
-            logger.info(f"  • {f['description']}")
-            logger.info(f"    Expected: {f['expected']}, Got: {f['actual']} ({f['confidence']:.1%})")
-            logger.info(f"    Difficulty: {f['difficulty']}")
+        for failure in failures:
+            logger.info(f"  • {failure['description']}")
+            logger.info(f"    Expected: {failure['expected']}, Got: {failure['actual']} ({failure['confidence']:.1%})")
+            logger.info(f"    Difficulty: {failure['difficulty']}")
 
     logger.info("=" * 80)
 

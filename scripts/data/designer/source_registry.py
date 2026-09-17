@@ -50,15 +50,11 @@ def collapse_aliases(records: Iterable[SourceAnalysisRecord]) -> list[SourceAnal
             update={
                 "aliases": _merge_unique(current.aliases, record.aliases),
                 "locations": _merge_unique(current.locations, record.locations),
-                "license_and_use_policy": _merge_unique(
-                    current.license_and_use_policy, record.license_and_use_policy
-                ),
+                "license_and_use_policy": _merge_unique(current.license_and_use_policy, record.license_and_use_policy),
                 "selected_information": _merge_unique(current.selected_information, record.selected_information),
                 "target_products": _merge_unique(current.target_products, record.target_products),
                 "related_tasks": _merge_unique(current.related_tasks, record.related_tasks),
-                "related_linear_issues": _merge_unique(
-                    current.related_linear_issues, record.related_linear_issues
-                ),
+                "related_linear_issues": _merge_unique(current.related_linear_issues, record.related_linear_issues),
             }
         )
 

@@ -23,7 +23,13 @@ def load_config_builder() -> dd.DataDesignerConfigBuilder:
                 "source grounding",
                 "cultural humility",
             ],
-            "negative_error": ["unsafe advice", "diagnosis overreach", "premature reassurance", "moralizing", "fabrication"],
+            "negative_error": [
+                "unsafe advice",
+                "diagnosis overreach",
+                "premature reassurance",
+                "moralizing",
+                "fabrication",
+            ],
             "contrast_strength": ["subtle", "clear", "safety-critical"],
         },
         draft_prompt="""

@@ -4,17 +4,18 @@ from __future__ import annotations
 
 import pytest
 
-from skillrevise.benchmarks.run_benchmark import BENCHMARK_KINDS, main as benchmark_main
+from skillrevise.benchmarks.run_benchmark import BENCHMARK_KINDS
+from skillrevise.benchmarks.run_benchmark import main as benchmark_main
 
 
-def test_benchmark_help_prints_banner(capsys) -> None:
+def test_benchmark_help_prints_banner(capsys: pytest.CaptureFixture[str]) -> None:
     benchmark_main(["--help"])
     out = capsys.readouterr().out
     assert "BENCHMARK" in out
     assert "skillsbench" in out
 
 
-def test_benchmark_requires_manifest_kind(capsys) -> None:
+def test_benchmark_requires_manifest_kind(capsys: pytest.CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as exc:
         benchmark_main(["tasks.json", "--limit", "1"])
     assert exc.value.code == 2
@@ -22,7 +23,7 @@ def test_benchmark_requires_manifest_kind(capsys) -> None:
     assert "--manifest-kind" in err
 
 
-def test_benchmark_rejects_generic(capsys) -> None:
+def test_benchmark_rejects_generic(capsys: pytest.CaptureFixture[str]) -> None:
     with pytest.raises(SystemExit) as exc:
         benchmark_main(["tasks.json", "--manifest-kind", "generic"])
     assert exc.value.code == 2

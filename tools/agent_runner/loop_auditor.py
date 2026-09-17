@@ -186,7 +186,7 @@ class WorkLoopAuditor:
         if result.git_diff_summary:
             # Count files touched from git diff summary (lines starting with +++ or ---)
             diff_lines = result.git_diff_summary.splitlines()
-            files_touched = len([l for l in diff_lines if l.startswith("+++") and l != "+++ /dev/null"])
+            files_touched = len([line for line in diff_lines if line.startswith("+++") and line != "+++ /dev/null"])
             if files_touched == 0:
                 # Fall back to newline count heuristic
                 files_touched = result.git_diff_summary.count("\n+++ ") + 1

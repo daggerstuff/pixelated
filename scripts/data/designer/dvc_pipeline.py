@@ -57,7 +57,8 @@ def generate_dvc_yaml(
             },
         ]
     }
-    return yaml.dump(pipeline, default_flow_style=False, sort_keys=False)
+    yaml_text: str = yaml.dump(pipeline, default_flow_style=False, sort_keys=False)
+    return yaml_text
 
 
 def generate_params_yaml(
@@ -82,4 +83,5 @@ def generate_params_yaml(
             "split_ratios": {"train": 0.8, "val": 0.1, "test": 0.1},
         },
     }
-    return yaml.dump(params, default_flow_style=False, sort_keys=False)
+    yaml_text: str = yaml.dump(params, default_flow_style=False, sort_keys=False)
+    return yaml_text

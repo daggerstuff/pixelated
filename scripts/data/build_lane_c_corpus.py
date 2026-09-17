@@ -28,6 +28,7 @@ import urllib.parse
 import urllib.request
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from typing import Any
 
 SEED_DIR = Path("/data/vivi/pixelated/data/clinical-datasets/lane-c-seed")
 OUT_DIR = Path("/data/vivi/pixelated/data/clinical-datasets/lane-c-ingested")
@@ -202,13 +203,13 @@ class Record:
     raw_text: str
     # downstream stages fill these:
     stripped_text: str = ""
-    pii_flags: list = field(default_factory=list)
+    pii_flags: list[str] = field(default_factory=list)
     consent_valid: bool = False
     consent_reason: str = ""
     reid_risk: str = "UNKNOWN"  # LOW | MEDIUM | HIGH
     reid_generalized: bool = False
-    failure_tags: list = field(default_factory=list)
-    template: dict = field(default_factory=dict)
+    failure_tags: list[str] = field(default_factory=list)
+    template: dict[str, list[str] | int | str | dict[str, str]] = field(default_factory=dict)
 
 
 def http_get(url: str, timeout: int = 12) -> str:
@@ -217,7 +218,8 @@ def http_get(url: str, timeout: int = 12) -> str:
         headers={"User-Agent": "PixelatedEmpathyResearch/1.0 (research@local)"},
     )
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read().decode("utf-8", errors="replace")
+        body: str = r.read().decode("utf-8", errors="replace")
+    return body
 
 
 # ----------------------------------------------------------------------
@@ -343,13 +345,15 @@ def firecrawl_scrape(url: str) -> str:
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=30) as r:
-        body = json.loads(r.read().decode("utf-8", errors="replace"))
+        body: dict[str, Any] = json.loads(r.read().decode("utf-8", errors="replace"))
     if not body.get("success"):
         raise RuntimeError(f"firecrawl scrape failed: {body.get('errors')}")
-    return body.get("data", {}).get("markdown", "")
+    data: dict[str, Any] = body.get("data", {})
+    markdown: str = data.get("markdown", "")
+    return markdown
 
 
-def firecrawl_search(query: str, limit: int = 10) -> list[dict]:
+def firecrawl_search(query: str, limit: int = 10) -> list[dict[str, Any]]:
     """POST https://api.firecrawl.dev/v1/search — ranked web search results (any host)."""
     import urllib.request
 
@@ -366,10 +370,11 @@ def firecrawl_search(query: str, limit: int = 10) -> list[dict]:
         method="POST",
     )
     with urllib.request.urlopen(req, timeout=30) as r:
-        body = json.loads(r.read().decode("utf-8", errors="replace"))
+        body: dict[str, Any] = json.loads(r.read().decode("utf-8", errors="replace"))
     if not body.get("success"):
         return []
-    return body.get("data") or []
+    results: list[dict[str, Any]] = body.get("data") or []
+    return results
 
 
 # Hosts that return video/social junk, not parseable text. Drop from candidates.
@@ -563,7 +568,7 @@ def stage5_templatize(rec: Record) -> Record:
 
     # Cut a "stressor signature" snippet around the strongest tag match.
     snippet = ""
-    for tag, pat in FAILURE_TAG_PATTERNS:
+    for _, pat in FAILURE_TAG_PATTERNS:
         m = pat.search(rec.stripped_text)
         if m:
             s = max(0, m.start() - 80)
