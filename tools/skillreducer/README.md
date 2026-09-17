@@ -4,19 +4,19 @@
 
 Open-source toolkit for **token-efficient LLM agent skills**, grounded in three research papers:
 
-| # | Paper | What it does | How you run it |
-|---|--------|--------------|----------------|
-| 1 | **SkillReducer** (Gao et al.) | Compress skill `description` + body (+ optional scripts) | `skillreducer reduce` / `agent` |
-| 2 | **TSCG** (Sakizli) | Compress MCP / tool JSON schemas | `skillreducer reduce … --tscg` |
-| 3 | **SkillRevise** (Liu et al.) | Revise skill quality from execution traces | `skillreducer revise` *(separate command)* |
+| #   | Paper                         | What it does                                             | How you run it                             |
+| --- | ----------------------------- | -------------------------------------------------------- | ------------------------------------------ |
+| 1   | **SkillReducer** (Gao et al.) | Compress skill `description` + body (+ optional scripts) | `skillreducer reduce` / `agent`            |
+| 2   | **TSCG** (Sakizli)            | Compress MCP / tool JSON schemas                         | `skillreducer reduce … --tscg`             |
+| 3   | **SkillRevise** (Liu et al.)  | Revise skill quality from execution traces               | `skillreducer revise` _(separate command)_ |
 
-| Resource | Link |
-|----------|------|
+| Resource           | Link                                                                                                  |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
 | SkillReducer arXiv | [2603.29919](https://arxiv.org/abs/2603.29919) · [PDF](skill_reducer.pdf) · [Detail](PAPER_DETAIL.md) |
-| TSCG arXiv | [2605.04107](https://arxiv.org/abs/2605.04107) · [Detail](docs/TSCG_PAPER_DETAIL.md) |
-| SkillRevise arXiv | [2606.01139](https://arxiv.org/abs/2606.01139) · [Docs](src/skillrevise/README.md) |
-| Paper index | [docs/PAPERS.md](docs/PAPERS.md) |
-| Citations | [CITATION.md](CITATION.md) |
+| TSCG arXiv         | [2605.04107](https://arxiv.org/abs/2605.04107) · [Detail](docs/TSCG_PAPER_DETAIL.md)                  |
+| SkillRevise arXiv  | [2606.01139](https://arxiv.org/abs/2606.01139) · [Docs](src/skillrevise/README.md)                    |
+| Paper index        | [docs/PAPERS.md](docs/PAPERS.md)                                                                      |
+| Citations          | [CITATION.md](CITATION.md)                                                                            |
 
 Works with **any agent platform** that uses the standard `SKILL.md` + YAML frontmatter convention (Claude Code, Windsurf, OpenCode, SkillHub, GitHub community skills, and similar).
 
@@ -40,11 +40,11 @@ Tool / MCP schemas        →  TSCG                 →  lean mcp_manifest.tscg.
 
 **Solution.** A **structure-aware** two-stage paper pipeline (this repo adds **Stage 3** for script extraction):
 
-| Stage | Layer | Goal |
-|-------|--------|------|
-| **1** | Routing (`description`) | Minimal description that still routes correctly (DDMIN + simulated oracle) |
-| **2** | Body | Keep core rules in `SKILL.md`; move examples / templates / background to on-demand refs |
-| **3** *(this repo)* | Scripts | Selectively extract runnable Python / bash blocks into `scripts/` |
+| Stage               | Layer                   | Goal                                                                                    |
+| ------------------- | ----------------------- | --------------------------------------------------------------------------------------- |
+| **1**               | Routing (`description`) | Minimal description that still routes correctly (DDMIN + simulated oracle)              |
+| **2**               | Body                    | Keep core rules in `SKILL.md`; move examples / templates / background to on-demand refs |
+| **3** _(this repo)_ | Scripts                 | Selectively extract runnable Python / bash blocks into `scripts/`                       |
 
 **Reported results (paper).** ~48% description compression, ~39% body compression, 86% functional retention; SkillsBench 87/87 with no regression.
 
@@ -90,30 +90,30 @@ flowchart TD
 
 ### Stage 1 — Routing layer
 
-| | |
-|--|--|
-| **Input** | YAML `description` (missing, short, or verbose) |
-| **Output** | Minimally sufficient third-person routing description |
+|            |                                                                                                                                                                                                                 |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Input**  | YAML `description` (missing, short, or verbose)                                                                                                                                                                 |
+| **Output** | Minimally sufficient third-person routing description                                                                                                                                                           |
 | **Method** | Generate from body if empty/short → segment clauses → **DDMIN** with routing oracle (test queries, TF-IDF distractors, adversarial skill) → gated paraphrase → polish → selective restore on validation queries |
-| **Docs** | [skillreducer/stage1/README.md](skillreducer/stage1/README.md) |
+| **Docs**   | [skillreducer/stage1/README.md](skillreducer/stage1/README.md)                                                                                                                                                  |
 
 ### Stage 2 — Body progressive disclosure
 
-| | |
-|--|--|
-| **Input** | Monolithic `SKILL.md` body |
-| **Output** | Slim core body + `examples.md` / `templates.md` / `background.md` with `when` / `topics` metadata |
+|            |                                                                                                                                                                                  |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Input**  | Monolithic `SKILL.md` body                                                                                                                                                       |
+| **Output** | Slim core body + `examples.md` / `templates.md` / `background.md` with `when` / `topics` metadata                                                                                |
 | **Method** | Split paragraphs → classify (`core_rule`, `example`, `template`, `background`, `redundant`) → compress by type → token gate (keep original if not shorter) → dedup existing refs |
-| **Docs** | [skillreducer/stage2/README.md](skillreducer/stage2/README.md) |
+| **Docs**   | [skillreducer/stage2/README.md](skillreducer/stage2/README.md)                                                                                                                   |
 
-### Stage 3 — Script extraction *(repo extension)*
+### Stage 3 — Script extraction _(repo extension)_
 
-| | |
-|--|--|
-| **Input** | All `*.md` after Stage 2 (`SKILL.md`, refs, …) |
-| **Output** | `scripts/*.py` and/or `scripts/*.sh` + short run references in markdown |
-| **Method** | Scan fenced `python`/`py` and `bash`/`sh`/`shell`/`zsh` blocks → **LLM reviews each block** (`extract: true/false`; not bulk conversion) → write approved scripts → replace fences with `Run: \`python scripts/…\`` or `bash scripts/…` → revert if markdown tokens do not decrease |
-| **Docs** | [skillreducer/stage3/README.md](skillreducer/stage3/README.md) |
+|            |                                                                                                                                                                                                                                                                                   |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Input**  | All `*.md` after Stage 2 (`SKILL.md`, refs, …)                                                                                                                                                                                                                                    |
+| **Output** | `scripts/*.py` and/or `scripts/*.sh` + short run references in markdown                                                                                                                                                                                                           |
+| **Method** | Scan fenced `python`/`py` and `bash`/`sh`/`shell`/`zsh` blocks → **LLM reviews each block** (`extract: true/false`; not bulk conversion) → write approved scripts → replace fences with `Run: \`python scripts/…\``or`bash scripts/…` → revert if markdown tokens do not decrease |
+| **Docs**   | [skillreducer/stage3/README.md](skillreducer/stage3/README.md)                                                                                                                                                                                                                    |
 
 Default `reduce` / `agent` runs **Stage 1 → 2 → 3**. Use `--stage N` for a single stage.
 
@@ -251,20 +251,21 @@ skillrevise-benchmark path/to/tasks.json --manifest-kind skillsbench --limit 1
 ```
 
 Docs: [src/skillrevise/README.md](src/skillrevise/README.md) · benchmarks: [src/skillrevise/benchmarks/README.md](src/skillrevise/benchmarks/README.md)
+
 ### CLI reference
 
-| Command / flag | Description |
-|----------------|-------------|
-| `skillreducer audit <path>` | Token report + F1/F2/F3 issue flags |
-| `skillreducer reduce <path>` | Stages 1–3 (OpenAI / configured LLM client) |
-| `skillreducer agent <path>` | Same pipeline via Agno agent |
-| `skillreducer revise …` | SkillRevise (Liu et al.) — quality, not compression |
-| `--stage 1` / `2` / `3` | Run a single SkillReducer stage |
-| `--tscg` / `--tools <json>` | Compress tool schemas with TSCG after reduce |
-| `--recursive` | Process all skills under a directory |
-| `--dry-run` | Report savings without writing files |
-| `--no-llm` | Heuristic mode (no API calls) |
-| `--output` / `-o` | Output directory (default: `optimized`) |
+| Command / flag               | Description                                         |
+| ---------------------------- | --------------------------------------------------- |
+| `skillreducer audit <path>`  | Token report + F1/F2/F3 issue flags                 |
+| `skillreducer reduce <path>` | Stages 1–3 (OpenAI / configured LLM client)         |
+| `skillreducer agent <path>`  | Same pipeline via Agno agent                        |
+| `skillreducer revise …`      | SkillRevise (Liu et al.) — quality, not compression |
+| `--stage 1` / `2` / `3`      | Run a single SkillReducer stage                     |
+| `--tscg` / `--tools <json>`  | Compress tool schemas with TSCG after reduce        |
+| `--recursive`                | Process all skills under a directory                |
+| `--dry-run`                  | Report savings without writing files                |
+| `--no-llm`                   | Heuristic mode (no API calls)                       |
+| `--output` / `-o`            | Output directory (default: `optimized`)             |
 
 Simple flow + worked example: [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md)
 
@@ -278,15 +279,15 @@ Credentials and model ids are read from `.env` (auto-loaded on startup) or the e
 
 `.env` is discovered automatically: package root → parent directories of cwd → cwd (later paths win among `.env` files).
 
-| Setting | Env name | YAML key |
-|---------|----------|----------|
-| **API key** | `api_key` | — |
-| **API base URL** | `api_base_url` | `api_base_url` / `base_url` |
-| **Compression model** (Stage 2 / general LLM) | `compression_model` | `models.compression` |
-| **Routing model** (Stage 1 oracle) | `routing_model` | `models.routing_oracle` |
-| **Evaluation model** (Gate 2, planned) | `evaluation_model` | `models.evaluation` |
-| **TSCG enabled** | `tscg_enabled` | `tscg.enabled` |
-| **TSCG model / profile** | `tscg_model` / `tscg_profile` | `tscg.model` / `tscg.profile` |
+| Setting                                       | Env name                      | YAML key                      |
+| --------------------------------------------- | ----------------------------- | ----------------------------- |
+| **API key**                                   | `api_key`                     | —                             |
+| **API base URL**                              | `api_base_url`                | `api_base_url` / `base_url`   |
+| **Compression model** (Stage 2 / general LLM) | `compression_model`           | `models.compression`          |
+| **Routing model** (Stage 1 oracle)            | `routing_model`               | `models.routing_oracle`       |
+| **Evaluation model** (Gate 2, planned)        | `evaluation_model`            | `models.evaluation`           |
+| **TSCG enabled**                              | `tscg_enabled`                | `tscg.enabled`                |
+| **TSCG model / profile**                      | `tscg_model` / `tscg_profile` | `tscg.model` / `tscg.profile` |
 
 ```bash
 # .env (recommended)
@@ -306,11 +307,11 @@ models:
   evaluation: gpt-4o-mini
 
 thresholds:
-  short_description_tokens: 40   # Stage 1: generate if description ≤ this
-  min_reference_tokens: 30       # Stage 2: drop tiny reference files
-  min_script_tokens: 20          # Stage 3: heuristic / LLM size hint
-  max_restore_steps: 3           # Stage 1 Phase 2 restore
-  max_feedback_iterations: 2     # Stage 2 Gate 2 (config only; not wired yet)
+  short_description_tokens: 40 # Stage 1: generate if description ≤ this
+  min_reference_tokens: 30 # Stage 2: drop tiny reference files
+  min_script_tokens: 20 # Stage 3: heuristic / LLM size hint
+  max_restore_steps: 3 # Stage 1 Phase 2 restore
+  max_feedback_iterations: 2 # Stage 2 Gate 2 (config only; not wired yet)
 
 oracle:
   num_test_queries: 8
@@ -348,14 +349,14 @@ After optimization, reference files include routing metadata (`when`, `topics`) 
 
 ## Issue codes (audit)
 
-| Code | Meaning |
-|------|---------|
-| `F1_MISSING_DESCRIPTION` | No routing description in frontmatter |
-| `F1_SHORT_DESCRIPTION` | Description too short for reliable routing |
-| `F1_VERBOSE_DESCRIPTION` | Description likely contains non-routing filler |
-| `F2_LARGE_BODY` / `F2_LONG_BODY` | Body too large; use progressive disclosure |
-| `F2_MONOLITHIC` | Examples/templates embedded in SKILL.md |
-| `F3_HEAVY_REFERENCES` | Reference files consume excessive tokens |
+| Code                             | Meaning                                        |
+| -------------------------------- | ---------------------------------------------- |
+| `F1_MISSING_DESCRIPTION`         | No routing description in frontmatter          |
+| `F1_SHORT_DESCRIPTION`           | Description too short for reliable routing     |
+| `F1_VERBOSE_DESCRIPTION`         | Description likely contains non-routing filler |
+| `F2_LARGE_BODY` / `F2_LONG_BODY` | Body too large; use progressive disclosure     |
+| `F2_MONOLITHIC`                  | Examples/templates embedded in SKILL.md        |
+| `F3_HEAVY_REFERENCES`            | Reference files consume excessive tokens       |
 
 ---
 
@@ -372,15 +373,15 @@ ruff check skillreducer tests
 
 ## Research & citation
 
-| Resource | Description |
-|----------|-------------|
-| [docs/PAPERS.md](docs/PAPERS.md) | **Paper index** — SkillReducer + TSCG + SkillRevise |
-| [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md) | Simple flow + one example |
-| [PAPER_DETAIL.md](PAPER_DETAIL.md) | SkillReducer paper (Gao et al.) in depth |
-| [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md) | TSCG papers (Sakizli) in depth |
-| [src/skillrevise/README.md](src/skillrevise/README.md) | Vendored SkillRevise (Liu et al.) |
-| [CITATION.md](CITATION.md) | BibTeX / APA for all three papers |
-| [skill_reducer.pdf](skill_reducer.pdf) | SkillReducer paper (local copy) |
+| Resource                                               | Description                                         |
+| ------------------------------------------------------ | --------------------------------------------------- |
+| [docs/PAPERS.md](docs/PAPERS.md)                       | **Paper index** — SkillReducer + TSCG + SkillRevise |
+| [docs/REDUCTION_FLOW.md](docs/REDUCTION_FLOW.md)       | Simple flow + one example                           |
+| [PAPER_DETAIL.md](PAPER_DETAIL.md)                     | SkillReducer paper (Gao et al.) in depth            |
+| [docs/TSCG_PAPER_DETAIL.md](docs/TSCG_PAPER_DETAIL.md) | TSCG papers (Sakizli) in depth                      |
+| [src/skillrevise/README.md](src/skillrevise/README.md) | Vendored SkillRevise (Liu et al.)                   |
+| [CITATION.md](CITATION.md)                             | BibTeX / APA for all three papers                   |
+| [skill_reducer.pdf](skill_reducer.pdf)                 | SkillReducer paper (local copy)                     |
 
 If you use this tool in research, please cite the **SkillReducer paper** (Gao et al., 2026) for skill debloating, the **TSCG papers** (Sakizli, 2026) when discussing `--tscg`, and **SkillRevise** (Liu et al., 2026) for `revise` — not this repository alone.
 

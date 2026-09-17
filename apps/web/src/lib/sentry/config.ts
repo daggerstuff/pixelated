@@ -152,7 +152,9 @@ const LOOPBACK_HOSTNAMES = new Set(['localhost', '127.0.0.1', '::1', '[::1]'])
  * @returns true when the host is a local loopback address
  */
 export function isLoopbackHostname(hostname: string | undefined): boolean {
-  return hostname !== undefined && LOOPBACK_HOSTNAMES.has(hostname.toLowerCase())
+  return (
+    hostname !== undefined && LOOPBACK_HOSTNAMES.has(hostname.toLowerCase())
+  )
 }
 
 /**

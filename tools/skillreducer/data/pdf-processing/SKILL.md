@@ -50,9 +50,11 @@ with pdfplumber.open("report.pdf") as pdf:
 # PDF Analysis Report
 
 ## Summary
+
 [overview]
 
 ## Extracted text
+
 [content]
 ```
 

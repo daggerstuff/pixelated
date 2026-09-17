@@ -23,6 +23,7 @@ flowchart LR
 Ambient auto-injection hooks automatically populate `[FORESIGHT CONTINUITY CONTEXT]` on Turn 1 across Claude Code, OpenCode, OMP, and Antigravity.
 
 When calling explicitly (or on topic shifts / subagent starts):
+
 - **Claude / OpenCode / OMP**: Direct MCP tool call `inject_context(conversation_text="...")` (or `mcp__foresight__inject_context`).
 - **Antigravity / Gemini CLI** (lazy MCP tools): `call_mcp_tool(ServerName="foresight", ToolName="inject_context", Arguments={"conversation_text": "..."})`.
 - **Output**: Surfaces relevant memories, active project directives, `user_preferences`, and `pending_items`.
@@ -38,6 +39,7 @@ When calling explicitly (or on topic shifts / subagent starts):
 ### C. Session Wrap-Up
 
 Ambient hooks trigger `process_session_transcript` automatically on session completion. When wrapping up explicitly:
+
 - Update `pending_items` block marking finished tasks and listing follow-ups (`manage_context_blocks`).
 - For long multi-turn sessions without auto-capture: Call `process_session_transcript(session_id="...", messages=[...])`.
 
@@ -149,6 +151,7 @@ branding, inspect `TASTES.md` (if present) and apply its design principles and
 visual hierarchy.
 
 <!-- BEGIN AWS Agent Toolkit rules -->
+
 # AWS Guidance
 
 - Where these AWS rules conflict with the project's own instructions, the
@@ -177,6 +180,7 @@ visual hierarchy.
   NOT hit the Secrets Manager Agent daemon directly. MUST use
   `{{resolve:secretsmanager:secret-id:SecretString:json-key}}` with
   `asm-exec` so the secret resolves at runtime without entering context.
+
 <!-- END AWS Agent Toolkit rules -->
 
 ## Maintaining this file
