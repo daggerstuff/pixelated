@@ -1,6 +1,10 @@
 """Tests for application configuration."""
 
+import json
+import logging
+
 import pytest
+import structlog
 
 from src.pe.config import Settings, settings
 from src.pe.logging_config import setup_logging
@@ -48,3 +52,31 @@ class TestLoggingConfig:
     def test_setup_logging_no_error(self) -> None:
         """Setting up logging should not raise."""
         setup_logging("DEBUG")
+
+    def test_json_format_emits_parseable_json(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """PE_LOG_FORMAT=json must emit machine-parseable log lines."""
+        monkeypatch.setenv("PE_LOG_FORMAT", "json")
+        setup_logging("INFO")
+        structlog.get_logger("pe.test.json").info("structured log check")
+        out = capsys.readouterr().out
+        json_lines = [json.loads(line) for line in out.splitlines() if line.strip()]
+        assert any(e.get("event") == "structured log check" and "timestamp" in e for e in json_lines)
+
+    def test_console_format_respected(
+        self, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """PE_LOG_FORMAT=console must not emit JSON (human renderer wins)."""
+        monkeypatch.setenv("PE_LOG_FORMAT", "console")
+        setup_logging("INFO")
+        structlog.get_logger("pe.test.console").info("console log check")
+        out = capsys.readouterr().out
+        assert "console log check" in out
+        with pytest.raises(json.JSONDecodeError):
+            json.loads(out.strip().splitlines()[-1])
+
+    def test_root_logger_level_applied(self) -> None:
+        """Setup should apply the requested level to the root logger."""
+        setup_logging("WARNING")
+        assert logging.getLogger().level == logging.WARNING
