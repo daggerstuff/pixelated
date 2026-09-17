@@ -316,7 +316,7 @@ requires-dist = [
     { name = "cryptography", specifier = ">=50.0.0" },
     { name = "evaluate", specifier = ">=0.4.0" },
     { name = "fairlearn", specifier = ">=0.9.0" },
-    { name = "fastapi", specifier = ">=0.117.1" },
+    { name = "fastapi", specifier = ">=0.124.4" },
     { name = "filelock", specifier = ">=3.20.1" },
     { name = "flask", extras = ["async"], specifier = ">=3.1.2" },
     { name = "flask-cors", specifier = ">=6.0.2" },
