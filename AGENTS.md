@@ -11,11 +11,13 @@
 `staging` is the main branch.
 
 ### Trigger Rules
+
 - Push to `staging` → CI + EKS deploy (backend/infra) **+ Vercel deploy (frontend, path-filtered)**
 - PR to `staging` → Vercel preview (frontend only, path-filtered)
 - Feature branches → no Vercel; use staging for previews
 
 ### Files
+
 - `.github/workflows/vercel.yml` — throttled Vercel pipeline
 - `.github/workflows/vercel-policy.md` — full policy doc
 - `.github/branch-pipeline.md` — branch roles diagram
@@ -39,6 +41,7 @@ flowchart LR
 Ambient auto-injection hooks automatically populate `[FORESIGHT CONTINUITY CONTEXT]` on Turn 1 across Claude Code, OpenCode, OMP, and Antigravity.
 
 When calling explicitly (or on topic shifts / subagent starts):
+
 - **Claude / OpenCode / OMP**: Direct MCP tool call `inject_context(conversation_text="...")` (or `mcp__foresight__inject_context`).
 - **Antigravity / Gemini CLI** (lazy MCP tools): `call_mcp_tool(ServerName="foresight", ToolName="inject_context", Arguments={"conversation_text": "..."})`.
 - **Output**: Surfaces relevant memories, active project directives, `user_preferences`, and `pending_items`.
@@ -59,6 +62,7 @@ Sessions frequently end uncleanly or abruptly (process kill, window close, timeo
 ### C. Session Wrap-Up (Fallback Safety Net)
 
 Wrap-up serves as a secondary reconciliation sweep, NOT the primary capture phase:
+
 - Update `pending_items` block marking finished tasks and listing remaining follow-ups (`manage_context_blocks`).
 - For long multi-turn sessions: Ambient hooks trigger `process_session_transcript` automatically on `Stop`, but all critical insights should already be saved.
 
@@ -170,6 +174,7 @@ branding, inspect `TASTES.md` (if present) and apply its design principles and
 visual hierarchy.
 
 <!-- BEGIN AWS Agent Toolkit rules -->
+
 # AWS Guidance
 
 - Where these AWS rules conflict with the project's own instructions, the
@@ -198,6 +203,7 @@ visual hierarchy.
   NOT hit the Secrets Manager Agent daemon directly. MUST use
   `{{resolve:secretsmanager:secret-id:SecretString:json-key}}` with
   `asm-exec` so the secret resolves at runtime without entering context.
+
 <!-- END AWS Agent Toolkit rules -->
 
 ## Maintaining this file
