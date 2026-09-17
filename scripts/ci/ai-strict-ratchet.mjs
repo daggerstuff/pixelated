@@ -114,6 +114,10 @@ function runStrictMypy() {
     [
       'run',
       '--no-project',
+      // Pin the interpreter: unpinned, uv picks the newest available and
+      // runners diverge from dev machines, shifting mypy's error set.
+      '--python',
+      '3.13',
       '--with',
       'mypy',
       '--',
