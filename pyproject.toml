@@ -265,6 +265,13 @@ ignore = ["E501", "UP017", "PLR2004"]
 # tools/ CLIs also print to stdout by design; import placement there is fixed
 # properly instead of exempted.
 "tools/**" = ["T201"]
+# pe API routes and celery worker tasks deliberately lazy-import heavy
+# runtime deps (the broker client, settings, redis) inside handlers so
+# importing the route/task module — and the app — never loads them at
+# import time. By-design exemption, documented here rather than
+# suppressed inline.
+"apps/web/src/pe/api/**" = ["PLC0415"]
+"apps/web/src/pe/tasks/**" = ["PLC0415"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
 "foresight-mcp/foresight_mcp/server.py" = [
