@@ -1,7 +1,7 @@
 {
   "$schema": "Version-drift ratchet for scripts/ci/version-drift-audit.mjs",
   "description": "Distinct-version count per package in pnpm-lock.yaml (only packages with >1 version). The gate fails when a package resolves to MORE versions than pinned. Consolidations re-pin via `pnpm lint:version-drift -- --update`.",
-  "generatedAt": "2026-09-17T03:54:39.581Z",
+  "generatedAt": "2026-09-17T04:42:44.700Z",
   "versionCounts": {
     "@ai-sdk/gateway": 2,
     "@ai-sdk/provider": 3,
@@ -27,6 +27,7 @@
     "@bcoe/v8-coverage": 2,
     "@clack/core": 2,
     "@clack/prompts": 2,
+    "@cloudflare/codemode": 2,
     "@colors/colors": 2,
     "@emnapi/core": 3,
     "@emnapi/runtime": 4,
@@ -113,7 +114,7 @@
     "@puppeteer/browsers": 2,
     "@rolldown/pluginutils": 2,
     "@rollup/pluginutils": 2,
-    "@sentry/core": 4,
+    "@sentry/core": 5,
     "@sentry/node": 3,
     "@sentry/opentelemetry": 2,
     "@sindresorhus/merge-streams": 2,
@@ -250,7 +251,6 @@
     "mimic-fn": 2,
     "minimatch": 3,
     "modern-tar": 2,
-    "mongodb": 2,
     "ms": 2,
     "mute-stream": 2,
     "nanoid": 3,
@@ -289,7 +289,6 @@
     "rxjs": 2,
     "safe-buffer": 2,
     "safe-stable-stringify": 2,
-    "scheduler": 2,
     "semver": 4,
     "signal-exit": 2,
     "slash": 2,
@@ -346,6 +345,7 @@
     "yargs": 5,
     "yargs-parser": 5,
     "yauzl": 2,
-    "yocto-queue": 2
+    "yocto-queue": 2,
+    "zod": 2
   }
 }
