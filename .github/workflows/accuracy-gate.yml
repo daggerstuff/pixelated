@@ -1,0 +1,53 @@
+# Nightly accuracy gate. The bias- and crisis-detection ML accuracy suites
+# are benchmarks: a single ~15-minute accuracy-tests file that cannot be
+# parallelized, so it is excluded from the per-push advisory gate (same
+# precedent as the CPU-bound load/performance excludes) and runs here
+# nightly. A red run here means an accuracy regression shipped in the last
+# 24 hours — triage with the linked commit list, not just the test name.
+name: Accuracy gate
+
+on:
+  schedule:
+    - cron: '50 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: accuracy-gate
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  accuracy:
+    name: Bias + crisis detection accuracy
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      VITEST_SUITE: advisory
+      VITEST_BUCKET: accuracy
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+      - name: Init submodules
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+      - uses: ./.github/actions/setup-node-pnpm
+        with:
+          node-version: 24.16.0
+      - name: Run accuracy bucket
+        run: set -o pipefail; timeout 40m pnpm test:advisory 2>&1 | tee accuracy-test.log
+      - name: Upload log
+        if: always() && hashFiles('accuracy-test.log') != ''
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: accuracy-test-log
+          path: accuracy-test.log
+          retention-days: 14
