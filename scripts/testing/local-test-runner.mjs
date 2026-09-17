@@ -69,17 +69,24 @@ const ADVISORY_BUCKET_DIRS = {
     "apps/web/src/lib/websocket",
     "apps/web/src/lib/crypto",
   ],
-  // Bucket 2: heaviest lib subdirs + auxiliary top-level suites (~170 files)
-  lib: [
+  // Bucket 2: the former ~248-file `lib` bucket, split into four balanced
+  // sub-buckets (~60 files each) so no single advisory process runs 15+
+  // minutes; wall time is bounded by the largest sub-bucket, not the sum.
+  "lib-ai": [
     "apps/web/src/lib/ai",
+  ],
+  "lib-ehr": [
+    "apps/web/src/lib/ehr-native",
+  ],
+  "lib-services": [
     "apps/web/src/lib/services",
-    "apps/web/src/lib/memory",
     "apps/web/src/lib/metaaligner",
-    "apps/web/src/lib/security/threat-detection",
+    "apps/web/src/lib/fhe",
+  ],
+  "lib-security-hooks": [
     "apps/web/src/lib/security",
     "apps/web/src/lib/hooks",
-    "apps/web/src/lib/fhe",
-    "apps/web/src/lib/ehr-native",
+    "apps/web/src/lib/memory",
     "tests/bias-detection",
     "tests/crisis-detection",
     "tests/memory",

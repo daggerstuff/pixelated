@@ -29,7 +29,10 @@ jobs:
       matrix:
         bucket:
           - core
-          - lib
+          - lib-ai
+          - lib-ehr
+          - lib-services
+          - lib-security-hooks
     env:
       VITEST_SUITE: advisory
       VITEST_BUCKET: ${{ matrix.bucket }}
