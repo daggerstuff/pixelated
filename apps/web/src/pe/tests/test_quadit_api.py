@@ -7,7 +7,6 @@ from typing import Any
 import pytest
 from httpx import AsyncClient
 
-from ai.pipelines.model_training.core.inference import LLMProvider
 from ai.research.quadit import AuditItem
 from src.pe.core.quadit import ProviderQuaditClient, audit_content
 from src.pe.core.security import create_access_token
@@ -131,7 +130,11 @@ class TestQuaditServiceAdapter:
             audit_content(items, auditors=("nonexistent_auditor",))
 
     def test_provider_bridge_sends_prompt_as_user_message(self) -> None:
-        class RecordingProvider(LLMProvider):
+        class RecordingProvider:
+            """Structural LLM provider — the ai nominal base resolves as Any
+            in CI (no submodule checkout), so subclassing it is not
+            type-safe there."""
+
             def __init__(self) -> None:
                 self.calls: list[list[dict[str, str]]] = []
 
