@@ -1,6 +1,9 @@
 import { defineAgent } from 'eve'
 import { z } from 'zod'
-import { agentModel, AGENT_MODEL_CONTEXT_WINDOW_TOKENS } from './lib/workers-ai.js'
+import {
+  agentModel,
+  AGENT_MODEL_CONTEXT_WINDOW_TOKENS,
+} from './lib/workers-ai.js'
 
 // GLM 5.2 — free for eve agents through Aug 27 2026 via Blackbox on AI Gateway.
 // Set as a string literal so `eve set --model` can manage it.
