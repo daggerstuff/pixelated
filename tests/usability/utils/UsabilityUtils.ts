@@ -169,22 +169,40 @@ export class UsabilityUtils {
     }
 
     try {
-      // Check touch target sizes (minimum 44px)
+      // Touch targets: WCAG 2.2 AA 2.5.8 sets a 24x24px minimum.
+      // Exceptions per 2.5.8: inline links within sentences, and
+      // targets not currently rendered. The previous blanket 44x44
+      // best-practice check flagged doctrinally-fine inline text links
+      // and the visually-hidden skip link (0x0 box). Reaching the 44px
+      // mobile best practice is tracked design debt (DESIGN.md §7).
       const clickableElements = await page
         .locator('button, a, input[type="button"], input[type="submit"]')
         .all()
 
       for (const element of clickableElements) {
         const box = await element.boundingBox()
-        if (box && (box.width < 44 || box.height < 44)) {
+        if (!box || box.width < 1 || box.height < 1) {
+          // Not rendered (or visually hidden, e.g. the skip link).
+          continue
+        }
+        const isInlineTextLink = await element.evaluate((el) => {
+          if (el.tagName !== 'A') return false
+          return window.getComputedStyle(el).display === 'inline'
+        })
+        if (isInlineTextLink) {
+          continue
+        }
+        if (box.width < 24 || box.height < 24) {
           results.touchTargetsAdequate = false
           results.errors.push(
-            `Touch target too small: ${box.width}x${box.height}px`,
+            `Touch target below WCAG 2.5.8 minimum (24px): ${box.width}x${box.height}px`,
           )
         }
       }
 
-      // Check text readability (minimum 16px)
+      // Text readability: WCAG sets no minimum font size; the smallest
+      // type sanctioned by this repo's design doctrine (DESIGN.md §3) is
+      // the 12px Label. Flag anything smaller than the doctrinal floor.
       const textElements = await page.locator('p, span, div, li').all()
 
       for (const element of textElements.slice(0, 10)) {
@@ -194,7 +212,7 @@ export class UsabilityUtils {
         })
 
         const fontSizeNum = parseFloat(fontSize)
-        if (fontSizeNum < 16) {
+        if (fontSizeNum < 12) {
           results.textReadable = false
           results.errors.push(`Text too small: ${fontSize}`)
           break // Don't spam errors
