@@ -119,7 +119,10 @@ jobs:
     timeout-minutes: 15
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      PE_DATABASE_URL: postgresql+asyncpg://pe_test@postgres:5432/pixelated_empathy
+      # Service containers are reachable on localhost (no container-network
+      # alias on this runner infrastructure; same pattern as
+      # bias-detection-ci.yml).
+      PE_DATABASE_URL: postgresql+asyncpg://pe_test@localhost:5432/pixelated_empathy
       PE_TESTING: '1'
     services:
       postgres:
