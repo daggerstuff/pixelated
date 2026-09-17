@@ -236,7 +236,15 @@ PYTHONPATH=.:.. uv run pytest src/pe/tests/ -q
 
 The `pe` service uses the `PE_` env prefix, so the root `.env`'s
 `DATABASE_URL` does **not** reach it. DB-backed tests need a dedicated
-throwaway postgres. Create one (any free port) and point the tests at it:
+throwaway postgres. The one-command path is:
+
+```bash
+make pe-test-db   # start (or reuse) the container and apply the schema
+make pe-test-db-down   # stop it
+```
+
+That wraps the following manual steps (any free port works) — create
+the container and point the tests at it:
 
 ```bash
 docker run -d --name pixelated-pe-test-db \
