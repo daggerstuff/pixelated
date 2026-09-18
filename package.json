@@ -358,7 +358,7 @@
     "mongo-sanitize": "^1.1.0",
     "mongodb": "7.6.0",
     "mongodb-query-validator": "^1.4.0",
-    "mongoose": "^9.10.0",
+    "mongoose": "^9.10.1",
     "morgan": "^1.12.1",
     "multer": "^2.3.0",
     "nanoid": "^6.0.1",
@@ -396,7 +396,7 @@
     "uuid": "^14.0.2",
     "workers-ai-provider": "^4.0.0",
     "ws": "^8.21.3",
-    "zod": "^4.6.4",
+    "zod": "^4.6.5",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
