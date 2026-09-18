@@ -1,7 +1,7 @@
 {
   "$schema": "Legacy strict-typing debt in the ai submodule research tree, pinned by scripts/ci/ai-strict-ratchet.mjs.",
   "description": "files: legacy .py files under the pinned ai trees. errors: \"file :: code\" → pinned strict-error count. The ratchet fails CI on any new file with strict errors, any new error key, or any increased count. Fixes shrink these maps; --update re-pins deliberately.",
-  "generatedAt": "2026-09-18T04:38:08.069Z",
+  "generatedAt": "2026-09-18T07:10:49.279Z",
   "files": [
     "research/__init__.py",
     "research/api.py",
@@ -537,6 +537,7 @@
     "training/benchmark.py",
     "training/benchmark_runner.py",
     "training/book_pdf_converter.py",
+    "training/build_arc_plans.py",
     "training/build_clinical_backed_examples.py",
     "training/build_edge_and_nightmare_dataset.py",
     "training/build_pilot_arc_plans.py",
@@ -603,6 +604,7 @@
     "training/grpo_trainer.py",
     "training/ingest_router.py",
     "training/judge_edge_and_nightmare.py",
+    "training/lint_arc_plans.py",
     "training/llm_quality_judge.py",
     "training/long_running_pipeline.py",
     "training/mental_health_eval.py",
@@ -1944,6 +1946,9 @@
     "research/reflection_bootstrap.py :: no-untyped-call": 3,
     "research/manager_factory.py :: call-arg": 2,
     "research/manager_factory.py :: name-defined": 1,
-    "research/manager_factory.py :: assignment": 1
+    "research/manager_factory.py :: assignment": 1,
+    "training/build_arc_plans.py :: type-arg": 17,
+    "training/build_arc_plans.py :: no-any-return": 1,
+    "training/build_arc_plans.py :: no-untyped-def": 1
   }
 }
