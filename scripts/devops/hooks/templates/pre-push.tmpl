@@ -77,10 +77,12 @@ echo -e "${YELLOW}💡 TIP: Use 'SKIP_PUSH_CHECKS=true git push' to skip if your
 # workflows after the push is already public.
 bash scripts/devops/check-submodule-pins.sh
 
-# If we have a dedicated smoke test suite, prefer it for speed.
+# Fast smoke tests only if a smoke suite exists; the full suite is CI's
+# job (all buckets are green there on every push). The pre-push hook ran
+# `pnpm test` as a fallback for years without ever being installed —
+# activating that mid-stream would block every push on local-env quirks.
 if [ -f scripts/testing/smoke-tests.sh ]; then
     bash scripts/testing/smoke-tests.sh
 else
-    # Run a subset or quick test if possible, fallback to full suite
-    pnpm test
+    echo -e "${YELLOW}⏩ [Hook] No smoke suite present — full suite runs in CI.${NC}"
 fi
