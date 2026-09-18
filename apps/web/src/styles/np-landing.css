@@ -43,8 +43,8 @@
 }
 .case-hero .case-shell {
   display: grid;
-  grid-template-columns: minmax(18rem, 0.82fr) minmax(34rem, 1.18fr);
-  gap: clamp(2.5rem, 6vw, 6.5rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  gap: clamp(2.5rem, 6vw, 6rem);
   align-items: start;
 }
 .case-index {
@@ -180,36 +180,27 @@
 }
 .case-console__body {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
 }
 .case-turn {
-  min-height: 10rem;
-  padding: 1.25rem;
+  padding: 1.1rem 1.25rem;
   border-bottom: 1px solid var(--case-line);
 }
-.case-turn:nth-child(odd) {
-  border-right: 1px solid var(--case-line);
-}
 .case-turn p {
-  max-width: 34ch;
-  margin: 1rem 0 0;
+  max-width: 52ch;
+  margin: 0.5rem 0 0;
   font-size: 0.9375rem;
   line-height: 1.6;
 }
-.case-turn--client {
-  background: var(--case-soft);
-}
 .case-turn--retry {
-  background: var(--case-ink);
-  color: var(--case-paper);
+  border-top: 1px solid var(--np-line-strong);
 }
 .case-review {
-  grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 3rem 1fr;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--case-ink);
+  border-bottom: 1px solid var(--case-line);
   background: var(--np-elevated);
 }
 .case-review__marker {
@@ -222,7 +213,18 @@
   font-family: var(--np-font-condensed);
   font-weight: 760;
 }
+.case-review__by {
+  display: block;
+  font-family: var(--np-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--case-muted);
+}
 .case-review strong {
+  display: block;
+  margin-top: 0.3rem;
   font-size: 0.875rem;
 }
 .case-review p {
@@ -482,9 +484,6 @@
   }
   .case-console__body {
     grid-template-columns: 1fr;
-  }
-  .case-turn:nth-child(odd) {
-    border-right: 0;
   }
   .case-console__head,
   .case-console__foot {
