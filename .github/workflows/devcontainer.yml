@@ -47,7 +47,7 @@ jobs:
         run: |
           docker run --rm pixelated-devcontainer sh -c '
             set -e
-            test "$(node --major-version)" = "24" || { echo "wrong node major"; exit 1; }
+            test "$(node --version | cut -dv -f2 | cut -d. -f1)" = "24" || { echo "wrong node major"; exit 1; }
             pnpm --version
             uv --version
             git --version
