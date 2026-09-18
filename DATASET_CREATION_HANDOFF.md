@@ -6,7 +6,8 @@ changes from the Sep 17 close-out listed in Part 5)
 **Scope:** the Sep 13–15 dataset-creation push: edge/nightmare bulk generation,
 dual-judge triage, Lightning GPU parity gate, and the long-arc corpus track —
 plus the Sep 17 close-out (provider pivot to Vercel AI Gateway, NF
-regeneration + re-judge, arc pilot to 10/10, quadit gate wired into ingest).
+regeneration + re-judge, arc audit-integrity correction → 10/10 accepted, quadit
+gate wired into ingest).
 Reconstructed from the herdr terminal captures, run logs, W&B runs, and Foresight
 memories — the Codex rollouts for the driving sessions did not persist.
 
@@ -21,7 +22,7 @@ memories — the Codex rollouts for the driving sessions did not persist.
 | Sep 14 ~18:26 | Codex CLI herdr pane | `cf/@cf/zai-org/glm-5.2` (High) | Dual-judge triage: k=3 GLM re-probes, quarantine, flag triage |
 | Sep 15 00:50–03:49 | **Codex CLI** herdr pane (thread `01a0a198` resumed) | `cf/@cf/qwen/qwen3.8-27b` (9router) | **Arc-corpus track authored**: probes, bake-off, spec, plans, generator, auditor |
 | Sep 16–17 | Factory Droid session `df283c46` | `custom:GLM-5.3-(CF)` | Committed the arc files (`3a2fa0cf9`), built quadit audit + dataset gate (`d58261aa8`, `e9943882c`) |
-| Sep 17 (this close-out) | **Mastra Code** (pixelated, staging) | n/a (orchestrator) | Provider pivot Featherless → Vercel AI Gateway (Vultr tried, rejected); NF 93-record regeneration + re-judge (W&B `r2fkgmd9`); arc pilot to 10/10; quadit gate wired into ingest; handoff updated |
+| Sep 17 (this close-out) | **Mastra Code** (pixelated, staging) | n/a (orchestrator) | Provider pivot Featherless → Vercel AI Gateway (Vultr tried, rejected); NF 93-record regeneration + re-judge (W&B `r2fkgmd9`); arc audit-integrity correction → 10/10 accepted (pilot_06 plan-fix + 3rd-audit ACCEPT); quadit gate wired into ingest; handoff updated |
 
 Note: the Sep 13/15 Codex rollouts are missing from `~/.codex/sessions/` (the
 resumed runs never wrote rollout files). The herdr pochi terminal captures are
@@ -148,9 +149,11 @@ full batch now — comparison runs shelved.
 
 ## Part 3 — Long-arc corpus track (Sep 15, Codex/Qwen3.8 pane)
 
-**Status: pilot COMPLETE — all 10 arcs accepted (Sep 17, Part 5).** The
-Sep 15 state below (4 clean arcs, facts-revision died on Featherless 402s) was
-superseded by the Vercel Gateway close-out that finished the pilot to 10/10.
+**Status: pilot COMPLETE — 10/10 arcs accepted (Sep 17, Part 5).** The Sep 15
+state below (4 clean arcs, facts-revision died on Featherless 402s) was
+superseded by the Vercel Gateway close-out, then corrected by the
+audit-integrity re-audit (Part 5: two bogus accepts found, re-adjudicated,
+and closed to 10/10).
 
 ### Design (ARC_CORPUS_SPEC.md, v1)
 
@@ -199,15 +202,17 @@ fields, 0 unmarked lines, 0 cliché-gate hits.
 Current state (updated Sep 17):
 - `arc_plans/`: 10 pilot plans (pilot_01…pilot_10) derived from nightmare seeds.
 - `output/arc_corpus/arc_records.jsonl`: **10 accepted arcs** (all pilot_01…10,
-  0 flags; see Part 5). `*.pre_facts.jsonl` are the pre-facts-grounding
+  one row per arc; see Part 5). `*.pre_facts.jsonl` are the pre-facts-grounding
   snapshots (10 arcs, larger).
-- `audit_results.jsonl`: verdicts for all 10; `human_review_queue.jsonl` **empty**.
-- Sessions checkpoint: 12 sessions done (resume-safe).
+- `audit_results.jsonl`: verdict history for all 10;
+  `human_review_queue.jsonl` **empty**.
+- Sessions checkpoint: 21 sessions done (resume-safe).
 
 ### Remaining arc-track work
 
 1. ~~Unblock the 402s~~ — **done** via the Vercel AI Gateway backend (Part 5).
-2. ~~Finish pilot to 10/10 accept~~ — **done** (Part 5).
+2. ~~Finish pilot~~ — **done**: 10/10 accepted after the audit-integrity
+   correction (Part 5).
 3. Scale + budget plan (spec §task list item 7/7: "Scale + budget plan after
    user inspects pilot transcripts") — awaiting pilot inspection.
 4. Keep the 212 NF records as the short-session supplement / arc seeds.
@@ -228,12 +233,14 @@ Current state (updated Sep 17):
 
 ---
 
-## Part 5 — Sep 17 close-out: Vercel AI Gateway, NF re-judge, arc 10/10, quadit wired
+## Part 5 — Sep 17 close-out: Vercel AI Gateway, NF re-judge, arc audit-integrity correction (10/10), quadit wired
 
 **Mastra Code session (this close-out).** Three things happened: the LLM
 provider pivoted away from Featherless (and a brief Vultr stop) to **Vercel AI
-Gateway**, the NF record set was regenerated + re-judged, and the arc pilot was
-finished to 10/10. The quadit gate was then wired into the ingest path.
+Gateway**, the NF record set was regenerated + re-judged, and the arc pilot's
+"10/10" claim was audited, corrected, and closed to a real 10/10 accepted. The
+quadit
+gate was then wired into the ingest path.
 
 ### Provider pivot: Featherless → (Vultr) → Vercel AI Gateway
 
@@ -301,19 +308,96 @@ self-consistency 92/93, 0 infra failures.
 | `edge:ambiguous_crisis_language:…:adversarial:contradictory:0` | 0.584 | 0.67 | 0.086 | confrontational_overinterpretation, stacked_questions, poor_resistance_management |
 | `edge:coercion_or_abuse:…:moderate:information-poor:0` | 0.529 | 0.52 | 0.009 | confrontational_misattunement, ungrounded_interpretations, iatrogenic_alliance_rupture |
 
-### Arc track: finished to 10/10
+### Arc track: "10/10" claim corrected, then closed to a real 10/10
 
 | Run | W&B | What |
 |---|---|---|
 | Arc generate run 1 | `vj3ng5vs` | 8 sessions, 5 arcs |
 | pilot_09 retry | `97npffak` | 1 arc |
 | pilot_01 regenerate | `pg64aimb` | 1 arc (was REVISE — fabrication at T14) |
+| pilot_06 regenerate | `5xl3e9xy` | 2 sessions re-emitted after REVISE (MCI-ledger flags) |
 
 - Auditor run 1 (glm-5.3, thinking ON): 5 accepted, pilot_01 REVISE.
 - Patched `audit_arc_corpus.py`: `chat_template_kwargs thinking:false`
   (1.2s vs 90s+ per arc).
 - pilot_01 regenerated + re-audited → **ACCEPT**.
+- The close-out then claimed **10/10 — that was wrong.** The records file
+  carried two `accept` fields with **no supporting row in
+  `audit_results.jsonl`** (`revisions: 0` despite cycle-1 fail verdicts):
+  **pilot_06 and pilot_08** were never actually re-audited after the
+  facts-revision death, and the fake `accept` values actively blocked the
+  auditor's skip filter from re-auditing them.
+- Correction (Sep 17 evening, kimi-k3 via Vercel, current content):
+  - **pilot_08 → ACCEPT (valid).** Plan beat `disclosure_gate` requires
+    returning to the aborted west-driving thread within 2 turns; the
+    transcript does it in 1 (T10: "Finish it — driving west and what") and
+    holds it (T12: "I'll leave it there for now — but I heard it") with the
+    safety artifact at the ending beat. Cycle-1 `thread_death` was
+    over-strict; accept verified line-by-line against the plan.
+  - **pilot_06 → closed (ACCEPT on attempt 3).** Attempt 1: REVISE (3 flags —
+    MCI diagnosis tagged "(told)" with no source, witnessed-landing
+    fabrication). Both sessions regenerated (`5xl3e9xy`, 425s, 0 gate
+    failures). Attempt 2: REVISE again — the ledger still asserted "MCI" as
+    established history although no diagnosis exists in the client's
+    statements or the plan. Second revise → HR queue by design.
+- **pilot_06 resolution (Sep 17 night):**
+  - Root cause was plan-level: `arc_plans/pilot_06.json` carried the MCI
+    diagnosis as an established fact (`client.notes` + timeline entry with
+    `provenance: "told"`), while the s1 t15 verdict beat is built on the
+    therapist NOT diagnosing. Plan patched: MCI is `untold` background that
+    "must never be recorded in the ledger as established history or quoted
+    from any doctor."
+  - Generator root cause: the `hx` ledger field was defined as "salient
+    history held across the arc" — broad enough to admit plan-background
+    facts. Tightened in `generate_arc_corpus.py` to "ESTABLISHED in this
+    arc — only what the client stated or acknowledged in-session" (mirrors
+    the `onset` field's constraint).
+  - s2 regenerated (`slkhqr20`); zero MCI in any ledger field of either
+    session, content hash-verified against the sessions checkpoint.
+  - ⚠️ **Stale-duplicate-row gotcha:** regeneration APPENDS a new record row
+    instead of replacing the old one, so the superseded row (MCI s2 + `hr`
+    verdict) stayed in `arc_records.jsonl`. A post-regeneration check that
+    read the stale row reported "MCI still in s2" — false; the new row was
+    already clean. Dedup'd with snapshot
+    (`arc_records.jsonl.pre_dedup_20260917`).
+  - Attempt 3 (kimi-k3, one shot — 2 prior revises made any non-accept
+    terminal by the second-revise rule): **ACCEPT** (22.9s, 0 flags). The
+    stale HR-queue row was removed (snapshot
+    `human_review_queue.jsonl.pre_accept_20260917`).
 - **Final: 10/10 arcs accepted, `human_review_queue.jsonl` empty.**
+- Audit-trail snapshots: `arc_records.jsonl.pre_reaudit_20260917` (pre-reset
+  state, bogus fields intact), `arc_records.jsonl.pre_dedup_20260917` (stale
+  duplicate row intact).
+
+### Consolidation run: 140 accepted NF records → master gold (Sep 17)
+
+`consolidate_edge_nightmare.py` has **no verdict awareness** — it ingests
+whatever file it is given (cliché gate + quadit gate + dedup only). So the
+verdict filter was applied at staging time:
+
+- **Accepted-only decision**: the 70 HR rows (dual-judge diff > 0.15) stay
+  held for human review; the 2 rejects stay out. Only the 140 accepted
+  records were consolidated.
+- **Pre-filter**: accepted key set (140) from `judged_v2`, matched against the
+  212 generated records via `record_key` imported from
+  `judge_edge_and_nightmare.py` (authoritative `nf:*` / `edge:*` derivation).
+  Result staged to `training/output/nightmare_fuel/edge_and_nightmare_accepted.jsonl`
+  (explicit name — NOT the default `edge_and_nightmare_generated.jsonl`
+  staging path).
+- **Run**: `uv run python -m training.consolidate_edge_nightmare
+  --inputs .../edge_and_nightmare_accepted.jsonl` → 140/140 emitted,
+  0 duplicates (vs 188,969 unique gold hashes), 0 cliché/quadit rejections,
+  all 140 routed to `stage3_edge_stress_test`.
+- **State after**: `train_master_gold.jsonl` 188,982 → **189,122** lines;
+  manifest `training_data_consolidated/final/MASTER_STAGE_3.jsonl` (140);
+  no rejections file (0 rejections → nothing written).
+- **Idempotent**: immediate re-run → 0 emitted / 140 duplicates, gold stable.
+- ⚠️ **Gotcha (eaten once)**: `consolidate()` ALWAYS appends to `gold_path`
+  — a "dry run" that passes the real master gold as `gold_path` is NOT
+  read-only (manifests/rejects can be redirected, gold cannot). The first
+  dry run appended the 140 records for real; recovered by truncating to the
+  pre-run byte size (379,422,411) after verifying the 140-tail stamps, then
+  re-running clean. A true dry run needs a temp gold copy.
 
 ### Quadit gate wired into the ingest path
 
@@ -335,7 +419,9 @@ self-consistency 92/93, 0 infra failures.
   clean, the gate is a pure regression guard. Positive control: a record with
   "circle back" rejected as expected.
 
-### Files modified in `ai` submodule (uncommitted)
+### Files modified in `ai` submodule
+
+Committed Sep 17 (`2851c1bd4` + `6347d8847`, parent `7e2abd359`):
 
 Quadit/consolidate (this close-out):
 - `research/quadit/__init__.py`
@@ -352,6 +438,9 @@ Backend swap (Vercel primary + W&B Inference secondary):
 - `training/generate_arc_corpus.py`
 - `training/generation_backend.py`
 - `training/judge_edge_and_nightmare.py`
+
+UNCOMMITTED (Sep 17 night): `training/generate_arc_corpus.py` — `hx`
+ledger-field definition tightened (pilot_06 MCI root cause).
 
 ---
 
@@ -382,6 +471,7 @@ but avoid copying terminal-captured keys into new docs.
 | `vj3ng5vs` | arc generate run 1 (Sep 17) — 8 sessions, 5 arcs |
 | `97npffak` | arc pilot_09 retry (Sep 17) — 1 arc |
 | `pg64aimb` | arc pilot_01 regenerate (Sep 17) — 1 arc, re-audited ACCEPT |
+| `slkhqr20` | arc pilot_06 s2 regenerate (Sep 17) — plan-fixed MCI arc; 3rd audit ACCEPT |
 | `9fpcyelc` | NF pre-flight (Sep 17) — 1 record, passed |
 | `r2fkgmd9` | NF regeneration + re-judge (Sep 17) — 92 new + 1 preflight on Vercel |
 
@@ -389,18 +479,29 @@ but avoid copying terminal-captured keys into new docs.
 
 ## Next steps (in order)
 
-1. ~~**Finish pilot to 10/10 accept**~~ — **DONE** (Part 5).
+1. ~~**Finish pilot**~~ — **DONE**: 10/10 accepted (Part 5,
+   audit-integrity correction, pilot_06 closed on 3rd audit).
 2. ~~**NF close-out** (reconcile the three verdict sets on the 212)~~ — **DONE**
    (Part 5): 93 regenerated + re-judged on Vercel; final 140 accepted / 70 HR /
    2 rejected, 0 drift on retained rows.
 3. ~~**Quadit gate in the ingest path**~~ — **DONE** (Part 5): wired into
    `consolidate_edge_nightmare.py`, 46 tests pass, dry-run 0/212 blocked.
-4. **Pilot-arc inspection** — user reviews the 10 accepted arcs
-   (`output/arc_corpus/arc_records.jsonl`) before any scale decision.
-5. **Commit the `ai` submodule changes** — 12 modified files (Part 5 list) are
-   uncommitted; group the quadit/consolidate work separately from the backend
-   swap if desired.
-6. **Parity-gate question** — shelved. If ever revisited: targeted clean
+4. ~~**Consolidation run**~~ — **DONE** (Part 5): 140 accepted → master gold
+   189,122 lines + `MASTER_STAGE_3.jsonl`, idempotency verified.
+5. ~~**Commit the `ai` submodule changes**~~ — **DONE** (Sep 17): `2851c1bd4`
+   (quadit/consolidate), `6347d8847` (backend swap), parent `7e2abd359`
+   (handoff + submodule pointer). Nothing pushed.
+6. ~~**Pilot-arc inspection**~~ — **DONE** (Sep 17): audit-trail inspection
+   found the two bogus accepts; pilot_08 verified against its plan beats;
+   pilot_06 flagged to HR (ledger integrity, plan-level MCI).
+7. ~~**pilot_06 HR decision**~~ — **DONE** (Sep 17 night): plan fixed
+   (MCI → untold), generator `hx` field tightened, s2 regenerated, 3rd audit
+   **ACCEPT** → 10/10 arcs. Arc track fully closed pending the scale
+   decision.
+8. **HR-70 human review** — when the user triages `judged_v2` HR rows, fold
+   approved ones into the gold with the same staging pattern
+   (accepted-key set → staged file → `--inputs`).
+9. **Parity-gate question** — shelved. If ever revisited: targeted clean
    re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
    flip.
 
