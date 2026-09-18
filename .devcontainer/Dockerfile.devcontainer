@@ -1,0 +1,36 @@
+# Devcontainer image: matches the documented toolchain exactly.
+# - Node 24 (repo runs Node v24) with the pinned pnpm 11.24 from
+#   package.json `packageManager`, installed via corepack so the pin is
+#   the only source of truth.
+# - uv for Python 3.13 (apps/web + ai/ both require >= 3.13); the actual
+#   Python interpreters are provisioned per-project by `uv sync` in the
+#   post-create command, same as local development.
+# - Standard tooling: git, bash, curl, docker CLI (the docker feature in
+#   devcontainer.json wires the socket).
+
+FROM node:24-bookworm
+
+# Minimal system deps; no build of app containers here (local Docker
+# builds are banned by the repo policy — pull only).
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    git \
+    git-lfs \
+    jq \
+    less \
+    openssh-client \
+    procps \
+  && rm -rf /var/lib/apt/lists/*
+
+# pnpm via corepack honors the packageManager pin (pnpm@11.24.0).
+RUN corepack enable
+
+# uv (official installer) for Python 3.13 management.
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+WORKDIR /workspaces/pixelated
+
+# The workspace is bind-mounted by the devcontainer runtime; post-create
+# handles install (pnpm install, submodules, uv sync).
