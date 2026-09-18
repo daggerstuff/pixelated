@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
- * Strict-typing ratchet for the ai submodule's live research surface.
+ * Strict-typing ratchet for the ai submodule's live legacy-exempt trees.
  *
  * The parent repo's mypy gate (scripts/ci/python-typecheck.sh) enforces
  * --strict on the pe service, scripts/, and tools/, but the ai/ submodule
- * tree is exempted — the research/ tree alone carries ~1250 strict errors
+ * tree is exempted — the pinned trees carry ~7k strict errors
  * in legacy code. This ratchet makes that debt visible and shrink-only.
  *
  * It pins two things, and both can only shrink:
  *
- * 1. Which files are legacy. Any NEW .py file under ai/research must pass
+ * 1. Which files are legacy. Any NEW .py file under the pinned trees must pass
  *    `mypy --strict` or CI fails — the exemption never expands.
  * 2. How many strict errors each legacy file carries, per error code. Any
  *    NEW error, or an increased count, fails CI. Fixes show up as
@@ -39,8 +39,8 @@ const AI_DIR = join(ROOT, 'ai')
 const BASELINE_PATH = join(ROOT, 'scripts/ci/ai-strict-baseline.json')
 const IGNORE_DIRS = new Set(['__pycache__', '.venv', 'venv', 'node_modules', '.git', 'data', 'wandb'])
 
-/** The live research surface the parent imports (ai.research.quadit etc.). */
-const TREES = ['research']
+/** The live trees the parent imports (research/quadit, pipelines, training). */
+const TREES = ['research', 'pipelines', 'training']
 
 const MYPY_CONFIG = `[mypy]
 python_version = 3.13
@@ -90,7 +90,7 @@ function writeBaselineContent(files, errors) {
         $schema:
           'Legacy strict-typing debt in the ai submodule research tree, pinned by scripts/ci/ai-strict-ratchet.mjs.',
         description:
-          'files: legacy .py files under ai/research. errors: "file :: code" → pinned strict-error count. ' +
+          'files: legacy .py files under the pinned ai trees. errors: "file :: code" → pinned strict-error count. ' +
           'The ratchet fails CI on any new file with strict errors, any new error key, or any ' +
           'increased count. Fixes shrink these maps; --update re-pins deliberately.',
         generatedAt: new Date().toISOString(),
@@ -176,7 +176,7 @@ function main() {
   const newFiles = allFiles.filter((f) => !legacy.has(f))
 
   console.log('═════════════════════════════════════════════════════')
-  console.log('  ai submodule strict-typing ratchet (research tree)')
+  console.log('  ai submodule strict-typing ratchet')
   console.log('═════════════════════════════════════════════════════')
   console.log(`  Trees:            ${TREES.join(', ')} (in the ai submodule)`)
   console.log(`  Total .py files:  ${allFiles.length}`)
@@ -198,7 +198,7 @@ function main() {
     console.log('\n  Run with --prune to remove deleted files from the baseline.')
   }
 
-  console.log('\n  Running dependency-light mypy --strict on the research tree…')
+  console.log('\n  Running dependency-light mypy --strict on the pinned trees…')
   const result = runStrictMypy()
   const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
   const { counts, perFile } = parseErrorCounts(output, TREES)
