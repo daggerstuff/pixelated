@@ -66,7 +66,7 @@ jobs:
             --token ${{ secrets.VERCEL_TOKEN }} \
             --yes \
             --prod=false \
-            ${{ env.VERCEL_PROJECT_ID && format('--scope={0}', env.VERCEL_PROJECT_ID) || '' }}
+            ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }}
         continue-on-error: true
 
   production:
@@ -96,5 +96,5 @@ jobs:
             --token ${{ secrets.VERCEL_TOKEN }} \
             --yes \
             --prod=true \
-            ${{ env.VERCEL_PROJECT_ID && format('--scope={0}', env.VERCEL_PROJECT_ID) || '' }}
+            ${{ env.VERCEL_PROJECT_ID && format('--project={0}', env.VERCEL_PROJECT_ID) || '' }}
         continue-on-error: true
