@@ -684,10 +684,11 @@ export default defineConfig({
               org: process.env.SENTRY_ORG ?? 'pixelated-empathy-dq',
               project: process.env.SENTRY_PROJECT ?? 'pixel-astro',
               authToken: process.env.SENTRY_AUTH_TOKEN,
-              // Tag uploaded files with the current release so server
-              // events that carry a matching SENTRY_RELEASE can be
-              // symbolicated against the uploaded maps.
-              release: sentryRelease ? { name: sentryRelease } : undefined,
+              // The deprecated `release` option was removed: runtime
+              // events get their release from sentry.client/server.config.ts
+              // (resolveSentryRelease), and the sourcemap upload is tagged
+              // by the scoped sentryVitePlugin calls above, which pass their
+              // own `release: { name: sentryRelease }`.
               // Sourcemaps are uploaded by the scoped Sentry Vite plugins
               // above. Keep the SDK integration enabled without running a
               // second broad uploader over Astro's virtual module paths.
