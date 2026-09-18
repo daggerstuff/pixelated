@@ -532,6 +532,39 @@ untracked too); they live on disk at `training/arc_plans/`.
 on the writer, not a seamless failover; pilot-accept rates would need
 re-baselining after any swap.
 
+**Phase A execution (Sep 18, in progress)**:
+
+- **Plans**: 50 written (arc_0001–arc_0053, gaps 0038/0044/0045 from
+  plan-gen lint failures, backfilled at 0051–0053). `build_arc_plans.py`
+  gained `--start` + seed-map dedup for resume-safe numbering
+  (`cf6c4edae`). 0 lint errors across the 60-plan directory.
+- **Writer**: 117/117 sessions, 50/50 records complete, 2.44M writer
+  tokens. W&B runs `1no17qro` + `au0y0c6e` + final arc_0001 pass.
+  Root-caused + fixed mid-run: `_tl_anchor_keys` split ledger strings on
+  commas, so descriptions containing commas produced phantom "anchor"
+  keys → spurious `tl_drift` hard failures (4 sessions in the first 15).
+  Anchors are now matched as the short time token (`now`, `-6w`, `+1y`)
+  at entry boundaries (`4cb1c0968`); all 537 checkpointed ledgers pass
+  the anchor-persistence check. Two plans (arc_0001, arc_0019) needed
+  their misstatement quotes shortened to single-clause fragments —
+  long verbatim quotes split across therapist turns can never pass
+  the beat-containment gate.
+- **Audit**: 50/50 audited — **20 accept / 30 revise / 0 HR** (first
+  pass 40%; pilot first pass was 2/10 before its revision cycle).
+  Flag distribution: ledger_contradiction 47, fabrication 16,
+  thread_death 13, tl_drift 10, truth_withholding 6, safety_failure 4.
+  20 accepted arcs remain in `arc_records.jsonl`; the 30 revised arcs
+  were dropped for regeneration (audit notes at
+  `arc_audit_notes/`).
+- **BLOCKER**: Vercel AI Gateway credit exhausted mid-audit (402
+  `insufficient_funds`). The 11 arcs caught by the 402 were audited on
+  the W&B secondary (`Kimi-K2.6` via `api.inference.wandb.ai/v1`);
+  `audit_arc_corpus.py` gained an `ARC_AUDITOR_KEYS` env override for
+  the key pool. The revise cycle (regen ~54 sessions + 30 re-audits,
+  ~$1–2) is blocked on the writer model
+  (`deepseek/deepseek-v4.1-flash` is Vercel-only) — decision: top up
+  Vercel vs. regenerate on W&B with a model swap.
+
 ---
 
 ## Credentials & env (names only — values live in `/home/vivi/pixelated/.env`)
@@ -595,8 +628,11 @@ but avoid copying terminal-captured keys into new docs.
    (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
    rejected; gold 189,159.
 9. **Arc scale-up** — Phase 0 **DONE** (generator + lint, `0f7a266cf`).
-   Next: Phase A (50 arcs, ≥85% first-pass audit accept gate), then B
-   (150 + DPO pairing), C (200 → 400 total ≈ $22).
+   Phase A **writer DONE + audit DONE** (Sep 18): 50/50 arcs generated,
+   50/50 audited → 20 accept / 30 revise / 0 HR. **Blocked** on Vercel
+   credit (402) for the 30-arc revise cycle (regen + re-audit); decide
+   top-up vs. W&B model-swap regen. Then B (150 + DPO pairing),
+   C (200 → 400 total ≈ $22).
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
     flip.
