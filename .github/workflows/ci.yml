@@ -24,11 +24,6 @@ on:
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [staging]
-  # Merge queue: this workflow provides a required status check
-  # (build-test), so it must run for every merge group. No path filters
-  # here — a skipped required check stalls the queue.
-  merge_group:
-    branches: [staging]
   workflow_dispatch:
 
 # Cancel superseded runs so feedback on the newest commit is not queued
