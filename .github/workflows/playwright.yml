@@ -22,11 +22,6 @@ on:
       - 'package.json'
       - 'pnpm-lock.yaml'
       - '.github/workflows/playwright.yml'
-  # Merge queue: this workflow provides a required status check (test),
-  # so it must run for every merge group. No path filters here — a
-  # skipped required check stalls the queue.
-  merge_group:
-    branches: [main, master, staging]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
