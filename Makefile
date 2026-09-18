@@ -1,7 +1,7 @@
 # Pixelated Empathy — Developer Makefile
 # Usage: make <target>
 
-.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down
+.PHONY: help dev test lint format typecheck check-all clean docker-up docker-down docker-logs setup e2e e2e-ui python-test python-lint python-typecheck quality backend-up backend-down backend-logs backend-reset backend-ps backend-health backend-build pe-test-db pe-test-db-down lockfile-resolve
 
 .DEFAULT_GOAL := help
 
@@ -70,6 +70,9 @@ pe-test-db: ## Start (or reuse) the throwaway pe test database and apply the sch
 
 pe-test-db-down: ## Stop the pe test database container
 	docker stop pixelated-pe-test-db
+
+lockfile-resolve: ## Resolve a conflicted pnpm-lock.yaml merge by regenerating it
+	./scripts/devops/resolve-lockfile-conflict.sh --add
 
 docker-up: ## Start database containers
 	docker compose -f infra/docker/docker-compose.db.yml up -d
