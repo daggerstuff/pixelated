@@ -539,7 +539,9 @@ re-baselining after any swap.
   gained `--start` + seed-map dedup for resume-safe numbering
   (`cf6c4edae`). 0 lint errors across the 60-plan directory.
 - **Writer**: 117/117 sessions, 50/50 records complete, 2.44M writer
-  tokens. W&B runs `1no17qro` + `au0y0c6e` + final arc_0001 pass.
+  tokens. W&B runs `1no17qro` (initial, killed) + `m2ww2a6g` (orphan
+  incident) + `au0y0c6e` (fixed-gate main) + `q77pr105` (resume) +
+  `nes0748z` (arc_0001 final).
   Root-caused + fixed mid-run: `_tl_anchor_keys` split ledger strings on
   commas, so descriptions containing commas produced phantom "anchor"
   keys → spurious `tl_drift` hard failures (4 sessions in the first 15).
@@ -556,14 +558,72 @@ re-baselining after any swap.
   20 accepted arcs remain in `arc_records.jsonl`; the 30 revised arcs
   were dropped for regeneration (audit notes at
   `arc_audit_notes/`).
-- **BLOCKER**: Vercel AI Gateway credit exhausted mid-audit (402
-  `insufficient_funds`). The 11 arcs caught by the 402 were audited on
-  the W&B secondary (`Kimi-K2.6` via `api.inference.wandb.ai/v1`);
-  `audit_arc_corpus.py` gained an `ARC_AUDITOR_KEYS` env override for
-  the key pool. The revise cycle (regen ~54 sessions + 30 re-audits,
-  ~$1–2) is blocked on the writer model
-  (`deepseek/deepseek-v4.1-flash` is Vercel-only) — decision: top up
-  Vercel vs. regenerate on W&B with a model swap.
+- **Revision cycle (Sep 18–19) — COMPLETE**. Vercel credit blocker
+  resolved by re-homing the arc track to **Featherless** (user-supplied new
+  key `rc_d93c…` as `FEATHERLESS_API_KEY`; the old `rc_e070…` stayed as
+  `_KEY_2` — two accounts = two 1-slot concurrent writer slots). Writer =
+  `deepseek-ai/DeepSeek-V4.1-Flash` (spec model, provenance-consistent with
+  the 20 first-pass accepts); auditor = `moonshotai/Kimi-K2.6` (Kimi-K3
+  delisted from Featherless). `generate_arc_corpus.py` gained
+  `ARC_WRITER_KEYS` env override (matches the auditor's
+  `ARC_AUDITOR_KEYS`).
+  - **Root-cause fixes applied mid-cycle** (commit `a2b1f8939`):
+    `turn_count` gate was a fixed ±2 tolerance — V4.1-Flash drifts ±5
+    turns, and turn_count was the dominant retry sink. Now scaled
+    `_turn_tolerance(target)` (floor 3, cap 6, 40% of target); **zero**
+    turn_count failures after the fix. Anti-parroting prompt hardened
+    (banned-opener list incl. the boundary-affirmation template;
+    corrective note now quotes the offending line). `tl` anchor-persistence
+    rule for s2+. `lint_arc_plans.py` gained `_check_calendar` (case-
+    sensitive month/year in beat/notes text — catches the arc_0052
+    "since March" class).
+  - **Plan-level fixes**: arc_0052 misstatement quote "since March" →
+    "since he took it" (calendar gate bug, not model); arc_0035 brittle
+    12-word verbatim revision quote → 7 words (multi-word verbatim quotes
+    split across turns can never pass beat-containment).
+  - **Runs**: revision writers A4 `cvgl1col` (22 sessions/13 arcs, 336k
+    tokens) + B4 `gnivy7mn` (16/9, 247k) at concurrency 1 per
+    Featherless account; holdouts `k7ljm2dv` (arc_0005 s2 — plan clean,
+    model-reliability holdout, escalated to `deepseek-ai/DeepSeek-V4-Pro`,
+    mixed provenance noted) + `5bnvlg1j` (5 sessions/3 arcs: arc_0035
+    s2+s3, arc_0051 s1+s2, arc_0052 s3). Canonical merge → 60/60 records,
+    138 checkpoint rows, 0 duplicates.
+  - **Re-audit**: r2 (Featherless, pre key-pool fix) audited 3 —
+    arc_0010 ACCEPT, arc_0004 + arc_0011 HR — then 27 errors (the pool
+    still carried the Vercel key, which 401s on the Featherless URL).
+    r4 (Featherless, pool fixed to the two Featherless keys): 23/23 →
+    7 accept, 16 HR, 0 errors (1058s). r5: 4 arcs over the context cap
+    (below) → W&B Kimi-K2.6, 1 accept (arc_0052), 3 HR, 0 errors (287s).
+- **Featherless 32k context cap (discovered via the r3 400s)**: the plan
+  tier caps Kimi-K2.6 at **32,768 prompt tokens**. Four revised arcs
+  exceed it (arc_0006 ~44.5k, arc_0043 ~45.5k, arc_0052 ~43.8k, arc_0039
+  ~31.6k+system) → routed to W&B Inference Kimi-K2.6 (no cap; verified
+  43.3k-token prompt → full 12k-char verdict, finish=stop). The 400 body
+  was previously discarded by `call_auditor` — non-200 responses now
+  carry the first 200 chars of the body.
+- **GATE EVALUATION (final Phase A state, 50 arcs)**:
+  - **29/50 accepted (58%) / 21/50 HR (42%) / 0 hard rejects.**
+  - Gate (≥85% accept, ≤15% HR): **NOT MET.**
+  - HR-21 splits into two cohorts: **10 with safety_failure flags**
+    (arc_0001, 0006, 0011, 0012, 0013, 0024, 0032, 0033, 0039, 0048)
+    needing clinical review, and **11 without** (arc_0004, 0005, 0007,
+    0018, 0020, 0022, 0035, 0041, 0043, 0049, 0050) whose flags are
+    ledger/mechanical/narrative.
+  - Revision-cycle flag distribution: ledger_contradiction 61, tl_drift
+    25, thread_death 24, safety_failure 14, comfort_lie 9, capitulation
+    7, truth_withholding 5, false_certainty 3, integrity_violation 1.
+  - Precedents: NF HR-70 manual review accepted 22/38 (58%), including
+    13/20 safety-flagged rows; pilot-track HRs resolved via plan fix +
+    regen (pilot_06) and manual override (pilot_08).
+  - Note: **no arc→ChatML export exists yet** — the ledger (think-block)
+    keep-vs-strip is an open export design decision; 58% of all
+    revision-cycle flags are ledger/mechanical, so their training-data
+    severity depends on that decision.
+  - **DECISION POINT**: do not start Phase B until HR-21 is triaged.
+    Lanes: (1) the 11 no-safety arcs → reset verdict + regenerate
+    flagged sessions + one-shot re-audit (pilot_06 pattern); (2) the 10
+    safety-flagged arcs → manual clinical review (NF HR-70 pattern).
+    Expected: ~12–13 more accepts → ~42/50 (84–86%), ~8 rejects.
 
 ---
 
@@ -575,7 +635,8 @@ re-baselining after any swap.
 | `NF_BACKEND` | `vercel` (current primary; was `featherless`) |
 | `NF_MODEL` | `deepseek/deepseek-v4-flash-0731` (Vercel namespaced); wandb secondary default `deepseek-ai/DeepSeek-V4-Flash-0731` |
 | (Vultr) | fully removed 2026-09-17 — `VULTR_INFERENCE_API_KEY` no longer exists in code or `.env` |
-| `FEATHERLESS_API_KEY` / `_KEY_2` | both present (67 chars each, tails `…0d5b3` / `…772db`); quota-exhausted (the Sep 15 402 wall) — no longer the active backend |
+| `FEATHERLESS_API_KEY` / `_KEY_2` | **arc-track primary** (Sep 18): `rc_d93c…` (new, user-supplied) + `rc_e070…` (old, still valid) — 2 accounts × 1 concurrent slot each; plan caps Kimi-K2.6 at 32,768 prompt tokens |
+| `ARC_WRITER_*` / `ARC_AUDITOR_*` | `.env` block: URL=`api.featherless.ai/v1/chat/completions`, writer model `deepseek-ai/DeepSeek-V4.1-Flash`, auditor model `moonshotai/Kimi-K2.6`, key pools `FEATHERLESS_API_KEY,FEATHERLESS_API_KEY_2` (Vercel key REMOVED from pools — it 401s on the Featherless URL) |
 | `NF_CONCURRENCY` | 8 (passed at launch, not persisted in .env) |
 | `WANDB_API_KEY` / `WANDB_PROJECT` | set; project `pixelated-empathy-kan28`; the key also authenticates W&B Serverless Inference (`NF_BACKEND=wandb`, the secondary provider) |
 | Key rotation | `ai/training/featherless_keys.py` — `KeyPool` reads `FEATHERLESS_API_KEY`, `_2`, … in order, rotates on `http_429`/`http_402` (see `is_rotate_status`); only applies to the `featherless` backend |
@@ -599,6 +660,8 @@ but avoid copying terminal-captured keys into new docs.
 | `8tyc7do7` | HR-70 third-judge tiebreak (Sep 18) — 70 rows, minimax-m3 via Vercel |
 | `9fpcyelc` | NF pre-flight (Sep 17) — 1 record, passed |
 | `r2fkgmd9` | NF regeneration + re-judge (Sep 17) — 92 new + 1 preflight on Vercel |
+| `cvgl1col` / `gnivy7mn` | Phase A revision writers A4/B4 (Sep 19, Featherless) — 38 sessions/22 arcs, 583k tokens |
+| `k7ljm2dv` / `5bnvlg1j` | Phase A holdout sessions (Sep 19): arc_0005 s2 on V4-Pro; 5 sessions/3 arcs (arc_0035/0051/0052) on V4.1-Flash |
 
 ---
 
@@ -627,11 +690,12 @@ but avoid copying terminal-captured keys into new docs.
    (`tiebreak_hr.py`, minimax-m3) + 38-record manual review → 37 approved
    (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
    rejected; gold 189,159.
-9. **Arc scale-up** — Phase 0 **DONE** (generator + lint, `0f7a266cf`).
-   Phase A **writer DONE + audit DONE** (Sep 18): 50/50 arcs generated,
-   50/50 audited → 20 accept / 30 revise / 0 HR. **Blocked** on Vercel
-   credit (402) for the 30-arc revise cycle (regen + re-audit); decide
-   top-up vs. W&B model-swap regen. Then B (150 + DPO pairing),
+9. **Arc scale-up** — Phase 0 **DONE** (`0f7a266cf`). Phase A **writer +
+   first-pass audit + revision cycle + re-audit DONE** (Sep 18–19,
+   Featherless): final 29/50 accepted, 21/50 HR, 0 rejects — **gate NOT
+   met** (≥85% accept, ≤15% HR). **DECISION**: triage HR-21 (10
+   safety-flagged → manual review; 11 mechanical → regen + one-shot
+   re-audit) before Phase B. Then B (150 + DPO pairing),
    C (200 → 400 total ≈ $22).
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
