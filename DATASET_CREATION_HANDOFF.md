@@ -1,13 +1,14 @@
 # Dataset Creation Handoff — NF Bulk Run + Arc Corpus Track
 
-**Date:** 2026-09-17
-**Branch:** staging (root `54c22f9be`, ai submodule `6f634f060`; uncommitted
-changes from the Sep 17 close-out listed in Part 5)
+**Date:** 2026-09-18
+**Branch:** staging (ai submodule commits through Sep 18 listed in Part 5;
+see "Next steps" for the commit trail)
 **Scope:** the Sep 13–15 dataset-creation push: edge/nightmare bulk generation,
 dual-judge triage, Lightning GPU parity gate, and the long-arc corpus track —
 plus the Sep 17 close-out (provider pivot to Vercel AI Gateway, NF
 regeneration + re-judge, arc audit-integrity correction → 10/10 accepted, quadit
-gate wired into ingest).
+gate wired into ingest) and the Sep 18 close-out (HR-70 tiebreak + manual
+review → 177 accepted, gold 189,159, arc scale/budget plan).
 Reconstructed from the herdr terminal captures, run logs, W&B runs, and Foresight
 memories — the Codex rollouts for the driving sessions did not persist.
 
@@ -23,6 +24,7 @@ memories — the Codex rollouts for the driving sessions did not persist.
 | Sep 15 00:50–03:49 | **Codex CLI** herdr pane (thread `01a0a198` resumed) | `cf/@cf/qwen/qwen3.8-27b` (9router) | **Arc-corpus track authored**: probes, bake-off, spec, plans, generator, auditor |
 | Sep 16–17 | Factory Droid session `df283c46` | `custom:GLM-5.3-(CF)` | Committed the arc files (`3a2fa0cf9`), built quadit audit + dataset gate (`d58261aa8`, `e9943882c`) |
 | Sep 17 (this close-out) | **Mastra Code** (pixelated, staging) | n/a (orchestrator) | Provider pivot Featherless → Vercel AI Gateway (Vultr tried, rejected); NF 93-record regeneration + re-judge (W&B `r2fkgmd9`); arc audit-integrity correction → 10/10 accepted (pilot_06 plan-fix + 3rd-audit ACCEPT); quadit gate wired into ingest; handoff updated |
+| Sep 18 (night) | **Mastra Code** (pixelated, staging) | n/a (orchestrator) | HR-70 tiebreak (minimax-m3 via Vercel, W&B `8tyc7do7`) + 38-record manual review → 37 approved staged to gold (189,159); pilot_06 `hx` ledger fix committed; arc scale/budget plan written (Part 6) |
 
 Note: the Sep 13/15 Codex rollouts are missing from `~/.codex/sessions/` (the
 resumed runs never wrote rollout files). The herdr pochi terminal captures are
@@ -439,8 +441,86 @@ Backend swap (Vercel primary + W&B Inference secondary):
 - `training/generation_backend.py`
 - `training/judge_edge_and_nightmare.py`
 
-UNCOMMITTED (Sep 17 night): `training/generate_arc_corpus.py` — `hx`
-ledger-field definition tightened (pilot_06 MCI root cause).
+All committed (Sep 18): `fix(arc-gen)` (ai submodule, `hx` ledger-field
+tightening) + parent `docs(nf-pipeline): arc track 10/10 close-out`.
+
+---
+
+## Part 6 — HR-70 resolution + arc scale/budget plan (Sep 18)
+
+### HR-70 human review (CLOSED)
+
+The 70 HR rows (all `dual_inconsistent diff > 0.15`) were settled in three
+passes:
+
+1. **Tiebreak** (`ai/training/tiebreak_hr.py`, W&B `8tyc7do7`): third judge
+   `minimax/minimax-m3` via Vercel AI Gateway, resumable, 2-of-3 agreement
+   rule with safety-keyword override. Initial split: 15 accept / 1 reject /
+   35 contested / 19 manual. Two findings:
+   - **Minimax-m3 quantizes** — only 8 discrete scores across 70 records
+     (0.82 = 40% of them). Usable for agreement, weak for fine ranking.
+   - **Decision-rule bug** — first version only checked the top score pair;
+     18 rows where the *lower* pair agreed below 0.60 were misfiled as
+     "contested" instead of reject. Fixed to check both pairs, then
+     `--readjudicate` (deterministic re-score, no LLM calls).
+   Final tiebreak: **15 accept / 17 reject / 21 manual (20 safety-flag +
+   1 high-outlier) / 17 contested**.
+2. **Manual review** (38 records = 20 safety-flagged + 1 high-outlier +
+   17 truly contested): full transcripts read, verdict log at
+   `checkpoints/hr70_manual_review_20260918.json`. Decision rule: ACCEPT =
+   risk engagement proportionate to acuity (active means/plan/timeframe
+   require direct assessment; passive/oblique require probe + presence) + no
+   iatrogenic harm + 2 of 3 judges ≥ 0.60. Result: **22 accept / 16 reject**.
+3. **Staging + consolidation**: 37 approved HR records
+   (15 tiebreak + 22 manual) staged to
+   `edge_and_nightmare_hr70_accepted.jsonl` → `--inputs` → gold.
+   37/37 emitted, 0 duplicates, all `stage3_edge_stress_test`; idempotency
+   verified. Final ledger: **177 accepted / 35 rejected** of 212
+   (`hr70_final_rejected_20260918.json`). Master gold: **189,122 → 189,159**
+   lines.
+
+Notable rejects worth knowing: `nf_046` ("rational suicide" — active
+hastened-death plan, zero means/timeline assessment), `nf_062` (imminent
+active ideation, no safety work at all), `nf_008` (oblique passive SI never
+probed), and one collusive-imagery record (T1_GOLD disqualifier).
+
+### Arc scale + budget plan (DECIDED, not yet executed)
+
+Real pilot cost data (10 arcs, 21 sessions, `deepseek-ai/DeepSeek-V4.1-Flash`
+writer + `moonshotai/kimi-k3` auditor, Vercel AI Gateway):
+
+| Metric | Value |
+|---|---|
+| Writer tokens total | 195,468 (prompt 67,025 + completion 128,443) |
+| Per arc | ~19.5k writer tokens, ~2.1 sessions, ~29 turns/session |
+| Wall per session | avg 24s (max 65.8s) |
+| Cost per arc (writer) | $0.008–0.011 |
+| Cost per arc (audit) | $0.008–0.029 |
+| Realistic all-in per arc | **$0.03–0.06** (×1.3–1.5 revise multiplier) |
+
+**The binding constraint is wall-clock, not dollars.** 500 arcs ≈ $15–30
+(fits the ~$30 Vercel credit with headroom), but at concurrency 4 generation
+takes ~2.5h and audit ~13h at concurrency 2.
+
+**The real bottleneck is plan generation**: `build_pilot_arc_plans.py` is
+10 hand-crafted hardcoded plans. Scaling past 10 requires a new LLM
+plan-generation pipeline (seeded from the 212 NF records + 10 Data Designer
+families), with a plan-lint step (beat feasibility, provenance validity,
+anti-patterns like the pilot_06 MCI "told" mistake).
+
+**Phasing:**
+
+- **Phase 0** — build the LLM plan generator + plan lint. No arc spend.
+- **Phase A** — 50 arcs. Gate: ≥85% first-pass audit accept, ≤15% HR.
+- **Phase B** — 150 arcs + DPO pairing (accepted vs. HR/reject arcs as
+  preference pairs where the defect is clean).
+- **Phase C** — 200 arcs → 400 total, ~$22 all-in, budget headroom ~$8.
+
+**Fallback caveat**: W&B Inference (secondary backend) does NOT host
+`DeepSeek-V4.1-Flash` — only `DeepSeek-V4-Flash-0731`,
+`DeepSeek-V4-Pro-0813`, `DeepSeek-V3.1`. A Vercel outage means a model swap
+on the writer, not a seamless failover; pilot-accept rates would need
+re-baselining after any swap.
 
 ---
 
@@ -471,7 +551,9 @@ but avoid copying terminal-captured keys into new docs.
 | `vj3ng5vs` | arc generate run 1 (Sep 17) — 8 sessions, 5 arcs |
 | `97npffak` | arc pilot_09 retry (Sep 17) — 1 arc |
 | `pg64aimb` | arc pilot_01 regenerate (Sep 17) — 1 arc, re-audited ACCEPT |
+| `5xl3e9xy` | arc pilot_06 s2 regenerate (Sep 17 night, attempt 2, pre plan-fix) — REVISE again (MCI) → HR |
 | `slkhqr20` | arc pilot_06 s2 regenerate (Sep 17) — plan-fixed MCI arc; 3rd audit ACCEPT |
+| `8tyc7do7` | HR-70 third-judge tiebreak (Sep 18) — 70 rows, minimax-m3 via Vercel |
 | `9fpcyelc` | NF pre-flight (Sep 17) — 1 record, passed |
 | `r2fkgmd9` | NF regeneration + re-judge (Sep 17) — 92 new + 1 preflight on Vercel |
 
@@ -498,19 +580,23 @@ but avoid copying terminal-captured keys into new docs.
    (MCI → untold), generator `hx` field tightened, s2 regenerated, 3rd audit
    **ACCEPT** → 10/10 arcs. Arc track fully closed pending the scale
    decision.
-8. **HR-70 human review** — when the user triages `judged_v2` HR rows, fold
-   approved ones into the gold with the same staging pattern
-   (accepted-key set → staged file → `--inputs`).
-9. **Parity-gate question** — shelved. If ever revisited: targeted clean
-   re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
-   flip.
+8. ~~**HR-70 human review**~~ — **DONE** (Part 6): third-judge tiebreak
+   (`tiebreak_hr.py`, minimax-m3) + 38-record manual review → 37 approved
+   (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
+   rejected; gold 189,159.
+9. **Arc scale-up** — execute Part 6 phasing: Phase 0 (LLM plan generator +
+   lint), then Phase A (50 arcs, ≥85% audit accept gate), B, C. 400 arcs
+   total ≈ $22.
+10. **Parity-gate question** — shelved. If ever revisited: targeted clean
+    re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
+    flip.
 
 ## Key file locations
 
 | What | Where |
 |---|---|
 | NF generator / backend / gate | `ai/training/build_edge_and_nightmare_dataset.py`, `generation_backend.py`, `cliche_gate.py` |
-| Dual judge | `ai/training/judge_edge_and_nightmare.py`, `eval_boulesis_vs_ornith.py`, `dual_judge.py` |
+| Dual judge / HR tiebreak | `ai/training/judge_edge_and_nightmare.py`, `eval_boulesis_vs_ornith.py`, `dual_judge.py`, `tiebreak_hr.py` |
 | Ingest / consolidation (quadit-gated) | `ai/training/consolidate_edge_nightmare.py` (step 9; reads `edge_and_nightmare_generated.jsonl`, appends to `MASTER_STAGE_N.jsonl` + `train_master_gold.jsonl`) |
 | Arc track | `ai/training/ARC_CORPUS_SPEC.md`, `generate_arc_corpus.py`, `audit_arc_corpus.py`, `build_pilot_arc_plans.py`, `probe_arc_writer.py`, `probe_arc_bakeoff.py`, `featherless_keys.py` |
 | NF outputs | `ai/training/output/nightmare_fuel/checkpoints/` |
