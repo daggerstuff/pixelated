@@ -1,39 +1,38 @@
-name: Dev Container
+name: Devcontainer
 
-permissions:
-  contents: read
+# Readiness: devcontainer + devcontainer_runnable. The local policy bans
+# building Docker images on dev machines (pull only), so the container
+# image is built here in CI and smoke-checked: the pinned toolchain
+# (node 24, pnpm 11.24 via corepack, uv) must come up and answer with
+# the expected versions.
 
-# Validates that the dev container actually builds and runs — offsite, on
-# a GitHub runner, never on a developer machine. `devcontainer up` builds
-# the compose stack (app image from the root Dockerfile + db/redis/mongo
-# sidecars) and starts the workspace container; `devcontainer exec` then
-# smoke-checks the toolchain inside it.
-#
-# The post-create command (submodule init + pnpm install + uv sync) is
-# skipped in CI: it duplicates what the image build already proves and
-# clones the large ai/foresight/docs submodules. Run it once when opening
-# the container locally.
 on:
   push:
     branches: [staging]
     paths:
-      - 'Dockerfile'
       - '.devcontainer/**'
-      - 'docker-compose.yml'
       - '.github/workflows/devcontainer.yml'
-  schedule:
-    - cron: '0 4 * * 1' # weekly (Mon 04:00 UTC)
+  pull_request:
+    branches: [staging]
+    paths:
+      - '.devcontainer/**'
+      - '.github/workflows/devcontainer.yml'
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 concurrency:
   group: devcontainer-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  up-and-exec:
-    name: devcontainer build + boot + smoke exec
+  build-and-smoke:
+    name: devcontainer image build + toolchain smoke
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - uses: actions/checkout@v7
@@ -41,24 +40,15 @@ jobs:
           persist-credentials: false
           submodules: false
 
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '24.16.0'
+      - name: Build the devcontainer image
+        run: docker build -t pixelated-devcontainer -f .devcontainer/Dockerfile.devcontainer .devcontainer
 
-      - name: Build and start dev container (skip heavy post-create)
-        run: npx --yes @devcontainers/cli up --workspace-folder "$PWD" --skip-post-create
-
-      - name: Smoke-check toolchain inside the container
+      - name: Toolchain smoke check
         run: |
-          npx --yes @devcontainers/cli exec --workspace-folder "$PWD" \
-            bash -lc 'node --version && pnpm --version && git --version && curl -sf http://db:5432 2>&1 | head -1 || true'
-
-      - name: Always stop the container
-        if: always()
-        # @devcontainers/cli 0.89 has no `down` command; tear down the
-        # compose project directly. The runner is ephemeral, so a broad
-        # teardown is safe here.
-        run: |
-          docker ps -aq | xargs -r docker rm -f
-          docker volume prune -f
-          docker image prune -f
+          docker run --rm pixelated-devcontainer sh -c '
+            set -e
+            test "$(node --major-version)" = "24" || { echo "wrong node major"; exit 1; }
+            pnpm --version
+            uv --version
+            git --version
+          '

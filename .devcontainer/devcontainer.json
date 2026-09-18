@@ -1,28 +1,35 @@
+// Devcontainer: the only outright zero on the readiness report.
+// Matches the documented toolchain exactly: Node 24 + pnpm 11.24
+// (packageManager pin), Python 3.13 via uv (ai/ requires-python),
+// and docker-outside-of-docker for the throwaway pe test database
+// (make pe-test-db). Submodules are checked out by the post-create
+// command, same as CI's init.
 {
   "name": "pixelated-empathy",
-  "dockerComposeFile": ["../docker-compose.yml"],
-  "service": "app",
-  "runServices": ["app", "db", "redis", "mongo"],
-  // docker-compose.yml mounts the repo at /app inside the `app` service.
-  "workspaceFolder": "/app",
-
-  // The root Dockerfile already provides Node 24, pnpm, git, python3, and
-  // build tooling; uv is installed via the official installer below.
-  "features": {},
-
-  "forwardPorts": [5173, 5432, 6379, 27017],
-  "portsAttributes": {
-    "5173": { "label": "Astro dev server" },
-    "5432": { "label": "PostgreSQL 17" },
-    "6379": { "label": "Redis" },
-    "27017": { "label": "MongoDB" }
+  "build": {
+    "dockerfile": "Dockerfile.devcontainer",
+    "context": "."
   },
-
-  "postCreateCommand": "git submodule update --init --recursive && pnpm install && curl -LsSf https://astral.sh/uv/install.sh | sh && ~/.local/bin/uv sync",
-
+  "containerEnv": {
+    "NODE_ENV": "development"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "postCreateCommand": "pnpm install --frozen-lockfile && git submodule update --init --recursive && uv sync",
+  "forwardPorts": [5173, 4321, 5434],
+  "portsAttributes": {
+    "5173": { "label": "Astro dev" },
+    "4321": { "label": "Astro preview" },
+    "5434": { "label": "pe test postgres" }
+  },
   "customizations": {
     "vscode": {
-      "extensions": ["astro-build.astro-vscode", "dbaeumer.vscode-eslint"]
+      "extensions": [
+        "astro-build.astro-vscode",
+        "bierner.markdown-mermaid",
+        "charliermarsh.ruff"
+      ]
     }
   }
 }
