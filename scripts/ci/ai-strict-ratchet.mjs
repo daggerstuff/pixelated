@@ -46,7 +46,15 @@ const MYPY_CONFIG = `[mypy]
 python_version = 3.13
 strict = True
 ignore_missing_imports = True
+# __main__ scripts collide on module names.
 exclude = __main__\\.py$
+
+# Dev machines carry a gitignored wandb/ run-artifacts directory that
+# namespace-package resolution turns into a phantom wandb module
+# (attr-defined errors a clean CI checkout never sees). Treat wandb as
+# untyped in both environments.
+[mypy-wandb]
+follow_imports = skip
 `
 
 if (!existsSync(AI_DIR)) {
@@ -131,6 +139,8 @@ function runStrictMypy() {
       // cannot — the error set diverges between environments.
       '--no-site-packages',
       '--explicit-package-bases',
+      '--follow-imports',
+      'silent',
       '--follow-imports',
       'silent',
       '--no-error-summary',
