@@ -502,15 +502,25 @@ writer + `moonshotai/kimi-k3` auditor, Vercel AI Gateway):
 (fits the ~$30 Vercel credit with headroom), but at concurrency 4 generation
 takes ~2.5h and audit ~13h at concurrency 2.
 
-**The real bottleneck is plan generation**: `build_pilot_arc_plans.py` is
-10 hand-crafted hardcoded plans. Scaling past 10 requires a new LLM
-plan-generation pipeline (seeded from the 212 NF records + 10 Data Designer
-families), with a plan-lint step (beat feasibility, provenance validity,
-anti-patterns like the pilot_06 MCI "told" mistake).
+**The plan-generation bottleneck is resolved (Phase 0, Sep 18)**:
+`build_arc_plans.py` (LLM generator, deepseek-v4.1-flash via Vercel) seeds
+arcs from the 177 approved records (round-robin across the 11 families),
+canonizes `arc_id`/`era_jitter.seed`, and gates every plan through
+`lint_arc_plans.py` before writing. The lint is self-contained: schema +
+provenance + beat-feasibility checks, an **untold-diagnostic guard** (the
+mechanical check that catches the pilot_06 MCI bug class), and set-level
+pressure coverage. Both committed as `0f7a266cf`. Verified with 3
+generated plans (arc_0001–0003): 0 lint errors, and each plan is
+consumable by the writer (`build_session_prompt`: timeline, beats,
+carry-forward, grounding) and auditor (`render_beats`) prompt builders.
+Note: plans + `seed_map.jsonl` are untracked by design — the repo
+gitignore tracks `training/` source code only (the 10 pilot plans are
+untracked too); they live on disk at `training/arc_plans/`.
 
 **Phasing:**
 
-- **Phase 0** — build the LLM plan generator + plan lint. No arc spend.
+- **Phase 0** — ~~build the LLM plan generator + plan lint~~ — **DONE**
+  (Sep 18, commit `0f7a266cf`, 3-plan smoke verified).
 - **Phase A** — 50 arcs. Gate: ≥85% first-pass audit accept, ≤15% HR.
 - **Phase B** — 150 arcs + DPO pairing (accepted vs. HR/reject arcs as
   preference pairs where the defect is clean).
@@ -584,9 +594,9 @@ but avoid copying terminal-captured keys into new docs.
    (`tiebreak_hr.py`, minimax-m3) + 38-record manual review → 37 approved
    (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
    rejected; gold 189,159.
-9. **Arc scale-up** — execute Part 6 phasing: Phase 0 (LLM plan generator +
-   lint), then Phase A (50 arcs, ≥85% audit accept gate), B, C. 400 arcs
-   total ≈ $22.
+9. **Arc scale-up** — Phase 0 **DONE** (generator + lint, `0f7a266cf`).
+   Next: Phase A (50 arcs, ≥85% first-pass audit accept gate), then B
+   (150 + DPO pairing), C (200 → 400 total ≈ $22).
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
     flip.
@@ -598,7 +608,7 @@ but avoid copying terminal-captured keys into new docs.
 | NF generator / backend / gate | `ai/training/build_edge_and_nightmare_dataset.py`, `generation_backend.py`, `cliche_gate.py` |
 | Dual judge / HR tiebreak | `ai/training/judge_edge_and_nightmare.py`, `eval_boulesis_vs_ornith.py`, `dual_judge.py`, `tiebreak_hr.py` |
 | Ingest / consolidation (quadit-gated) | `ai/training/consolidate_edge_nightmare.py` (step 9; reads `edge_and_nightmare_generated.jsonl`, appends to `MASTER_STAGE_N.jsonl` + `train_master_gold.jsonl`) |
-| Arc track | `ai/training/ARC_CORPUS_SPEC.md`, `generate_arc_corpus.py`, `audit_arc_corpus.py`, `build_pilot_arc_plans.py`, `probe_arc_writer.py`, `probe_arc_bakeoff.py`, `featherless_keys.py` |
+| Arc track | `ai/training/ARC_CORPUS_SPEC.md`, `generate_arc_corpus.py`, `audit_arc_corpus.py`, `build_pilot_arc_plans.py`, `build_arc_plans.py` (LLM plan generator), `lint_arc_plans.py`, `probe_arc_writer.py`, `probe_arc_bakeoff.py`, `featherless_keys.py` (plans on disk at `training/arc_plans/`, untracked by design) |
 | NF outputs | `ai/training/output/nightmare_fuel/checkpoints/` |
 | Parity-saga eval artifacts | `ai/training/eval_results/` (incl. `judge_sharedkey_contaminated.json`, `judge_variance_proof.md`, `comparison_report.md`) |
 | Arc outputs | `ai/training/output/arc_corpus/` (+ `run_logs/`) |
