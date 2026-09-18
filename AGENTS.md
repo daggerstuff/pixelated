@@ -112,6 +112,9 @@ Wrap-up serves as a secondary reconciliation sweep, NOT the primary capture phas
   isolation. Never expose clinical PHI or sensitive keys.
 - **Verify Explicitly**: Validate every code change with real test/lint
   execution before marking done.
+- **Never hand-resolve pnpm-lock.yaml merge conflicts**: run
+  `make lockfile-resolve` (regenerates from the merged manifests; see
+  CONTRIBUTING.md "Merging PRs").
 
 ### 🚫 Banned Type-Check Tooling (OOM Risk)
 

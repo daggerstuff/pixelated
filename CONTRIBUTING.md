@@ -42,6 +42,21 @@ pnpm lint:quality # code-quality audits (see below)
 > **Do not use** `astro check`, `pnpm typecheck`, or `tsc` — they cause OOM failures.
 > Use `pnpm lint` (type-aware oxlint) instead.
 
+### Merging PRs: never hand-resolve pnpm-lock.yaml
+
+If merging `staging` into a PR branch (or the PR itself) conflicts on
+`pnpm-lock.yaml`, do not read or hand-merge the conflict markers — the
+lockfile is a pure function of the merged manifests. One command:
+
+```bash
+make lockfile-resolve   # seeds from MERGE_HEAD, regenerates, stages
+```
+
+Then commit the merge. For merely-stale lockfiles use
+`pnpm install --lockfile-only`. Full triage in `docs/runbooks.md` §9.
+Keep merge conflicts rare to begin with: merge `staging` into
+long-lived PR branches early and often.
+
 ### Code-quality audits
 
 These run in the [Quality workflow](.github/workflows/quality.yml) on every PR.
