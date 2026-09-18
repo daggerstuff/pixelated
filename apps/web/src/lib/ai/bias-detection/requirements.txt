@@ -29,7 +29,7 @@ annotated-types==0.7.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   pydantic
-anyio==4.12.1
+anyio==4.14.2
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   httpx
