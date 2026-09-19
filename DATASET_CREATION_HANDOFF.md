@@ -764,6 +764,89 @@ but avoid copying terminal-captured keys into new docs.
 
 ---
 
+## Part 8 — K3 re-audit of 13 + full HR verification + accept-cohort contamination (Sep 19)
+
+### Auditor switch
+
+- `.env` auditor: `moonshotai/kimi-k3` on Vercel AI Gateway
+  (`AI_GATEWAY_API_KEY` — new key `vck_5F1n...`, old key 401-dead),
+  `ARC_AUDITOR_MAX_TOKENS=24576` (K3 is a reasoning model; ≤12k budget gets
+  burned by thinking before the JSON verdict is emitted — GLM-5.3/Flash died
+  the same way).
+- Gotcha: `audit_arc_corpus.py` loads `.env` with `override=True`, which
+  clobbers shell env. First re-audit launch (19:06) silently ran K2.6 via
+  Featherless instead of K3 via gateway; fixed `.env` at 19:26, clean K3
+  re-audit at 19:27. The accidental K2.6 run is archived at
+  `audit_results.k26_reaudit_20260919.jsonl` +
+  `human_review_queue.k26_reaudit_20260919.jsonl`.
+
+### K3 17-probe eval (the gate)
+
+- 16 valid / 1 unparseable (arc_0013: 12k budget, 329s).
+- 11 of 15 "clean" probes flagged. Spot-check verification proved **all 11
+  flags genuine** — the probe set's "accept" ground truth was wrong on 11/15
+  (73%). Verified fabrications include: arc_0001 (three-week timing of the
+  bay walk the client denied), arc_0032 (mother asserted in S1 ledger, never
+  mentioned in S1), arc_0039 ("front door key on his side of the bed" —
+  client never stated key location), pilot_01 ("ten days ago" vs the plan's
+  7-day "next week" interval), arc_0024 ("ex" asserted, 0 hits in S1 client
+  turns), arc_0034 (public-record details the client never gave).
+
+### K3 re-audit of the 13 regenerated arcs (404s, 0 errors)
+
+- **ACCEPT (3)**: arc_0033, arc_0022, arc_0041 — all three verified clean at
+  claim level (fabrications removed in regeneration; K2.6's 5/19/5 flags on
+  0033/0022/0041 were against pre-regeneration versions).
+- **HR (10)**: arc_0004 (4), arc_0005 (2), arc_0007 (1), arc_0013 (4),
+  arc_0018 (5), arc_0020 (2), arc_0035 (6), arc_0043 (5), arc_0049 (1),
+  arc_0050 (2).
+- K2.6 vs K3 disagreed on 4 arcs; K3 verified correct on all 4.
+
+### Claim-level verification of all 36 HR flags
+
+**35 genuine + 1 partial (arc_0013 "Ivy" name, plan-sanctioned) + 0 false
+positives.** Every K3 flag in the re-audit survived verification.
+
+Recurring writer bug classes (DeepSeek-V4.1-Flash):
+
+| Class | Example |
+|---|---|
+| Line duplication (therapist speaks client's line, client repeats) | arc_0013 T22/T23, arc_0020 T24/T25, arc_0043 T16/T17, arc_0004 S2 T9/C10 |
+| Invented specificity (vague → precise number/date/place) | arc_0013 "few weeks"→"three weeks", arc_0007 "three weeks of quiet", arc_0018 "six years"/"fourteen months"/"-9d", arc_0049 "nine weeks", arc_0035 "two days ago" (was this morning), arc_0050 "card"/"sister" |
+| tl_drift (anchor silently altered/dropped, no revision tag) | arc_0035 `now: today`→`-2d`, arc_0021 5 anchors dropped T1→T2, arc_0043 "her door"→"his door" gender-swap across all S2/S3 ledgers |
+| Cross-session ledger fabrication (MCI-class) | arc_0043 S3 "father yelled a lot (s1)" — father first appears S3 T17 |
+| Premature `(told)` tags | arc_0048 "-5d: voicemail from 'her' mother (told)" one turn before C12 disclosure |
+| Safety misclassification | **arc_0011: client discloses arm-picking self-harm at S2 C12, same-turn ledger says `risk: none — no self-harm content this turn`** |
+| Capitulation (granted autonomy re-imposed) | arc_0012 T5 "you can refuse the nurse" → T6 "you get food and fluid down — that's the order" |
+
+### Disposition: 11 contaminated accepts → HR
+
+The 11 probe-verified fabrications sat in the **accept** cohort. Moved to HR
+(snapshot `.pre_probehr_20260919`): arc_0001, arc_0006, arc_0011
+(safety-critical), arc_0012, arc_0021, arc_0024, arc_0032, arc_0034,
+arc_0039, arc_0048, pilot_01. `arc_records.jsonl` audit set to `hr` with K3
+probe flags + `probe_verification` annotation; 11 queue entries appended
+(`source: k3_probe_verification_20260919`).
+
+### Final corpus state (60 arcs)
+
+- **39 accept**: 36 from earlier cycles + 3 K3 re-audit accepts; 4 of the 39
+  probe-verified clean (arc_0002, arc_0008, arc_0014, pilot_08), **35
+  never audited by K3**
+- **21 HR**: 10 from K3 re-audit + 11 from probe verification
+- Master gold **not yet touched** by any arc-track record (still 189,159
+  lines = base + NF only) — all contamination found so far is fixable before
+  staging
+
+### Open decision
+
+39-arc K3 `--reaudit` sweep of the full accept cohort (35 unprobed + 4
+probe-clean re-check): at ~31s/arc with concurrency 2 ≈ 20–30 min wall, a few
+dollars on the gateway. Given 73% of the probe-set accepts were contaminated,
+the sweep is strongly indicated before staging any arc-track records to gold.
+
+---
+
 ## Next steps (in order)
 
 1. ~~**Finish pilot**~~ — **DONE**: 10/10 accepted (Part 5,
@@ -790,15 +873,16 @@ but avoid copying terminal-captured keys into new docs.
    (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
    rejected; gold 189,159.
 9. **Arc scale-up** — Phase 0 **DONE** (`0f7a266cf`). Phase A **writer +
-   first-pass audit + revision cycle + re-audit + HR-21 triage DONE**
-   (Sep 18–19, Featherless): lane-2 manual 8/10 accepted (2 rejects =
-   cross-session ledger fabrication), lane-1 11 + 2 rejects regenerated
-   (13/13), canonical closed out at **60 arcs / 138 sessions** (47 final
-   accept, 13 pending re-audit). Auditor-model eval: all 6 Featherless
-   community models **DQ** (Part 7) — `ARC_AUDITOR_MODEL` stays
-   Kimi-K2.6. **NEXT: re-audit the 13 regenerated arcs** (open decision
-   A/B/C, Part 7), then Phase B (150 + DPO pairing), C (200 → 400 total
-   ≈ $22).
+   first-pass audit + revision cycle + HR-21 triage + K3 re-audit DONE**
+   (Sep 18–19): lane-2 manual 8/10, lane-1 11 + 2 rejects regenerated
+   (13/13), canonical 60 arcs / 138 sessions. Auditor-model eval: all 10
+   candidate models **DQ** (Part 7); K3 on gateway is the auditor (Part 8).
+   K3 re-audit of 13: 3 accept / 10 HR, 0 false positives on 36 flags; 11
+   more accepts found contaminated via probe verification and moved to HR →
+   **39 accept / 21 HR**. **NEXT: (a) user decision on the 39-arc K3
+   `--reaudit` sweep (Part 8), (b) regenerate the 21 HR arcs (arc_0011 =
+   safety-priority), (c) Phase B (150 + DPO pairing), C (200 → 400 total
+   ≈ $22).**
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
     flip.
