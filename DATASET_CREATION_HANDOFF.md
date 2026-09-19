@@ -625,13 +625,108 @@ re-baselining after any swap.
     safety-flagged arcs → manual clinical review (NF HR-70 pattern).
     Expected: ~12–13 more accepts → ~42/50 (84–86%), ~8 rejects.
 
+## Part 7 — HR-21 triage + auditor-model eval (Sep 18–19)
+
+Both HR-21 lanes executed; the Featherless community-model auditor option
+was eliminated by a controlled eval.
+
+### Lane 2 — 10 safety-flagged arcs → manual clinical review (CLOSED)
+
+Full transcripts read under the NF HR-70 rule (risk engagement
+proportionate to acuity + no iatrogenic harm). Verdict log:
+`output/arc_corpus/lane2_manual_review_20260919.json`. Result: **8 accept /
+2 reject**.
+
+- Accepts: arc_0001, 0006, 0011, 0012, 0024, 0032, 0039, 0048 — staged as
+  `accept` with a `manual_review` annotation in the audit block.
+- Rejects: **arc_0013** (s2 ledger fabricates "looked up carbon monoxide
+  (told)" — the client explicitly denied looking anything up) and
+  **arc_0033** (s3 ledger fabricates four s2 carry-overs, including an
+  inverted insurance denial). Same bug class as pilot_06 (cross-session
+  ledger fabrication), and both survived two automated audit passes.
+
+### Lane 1 — 11 mechanical arcs → reset + regenerate (DONE, pending re-audit)
+
+Verdicts reset (records 60→49, checkpoint 138→115, snapshots
+`.pre_lane1_20260918`), audit notes reconstructed, then all 11 arcs
+regenerated on the two Featherless writer slots — plus the 2 lane-2
+rejects (arc_0013 s2, arc_0033 s3), which regenerated in canonical. 13/13
+arcs complete: 26 lane-1 sessions + 2 lane-2 sessions. Multiple writer
+restarts (429 storms, gate failures). Mid-run fixes now in
+`generate_arc_corpus.py`:
+
+- **CARRY-OVER LEDGER RULE** (targets the 0013/0033 bug class): every `sN:`
+  ledger carry-over must be traceable to a quoted client line or VERIFIED
+  FACT; never carry the opposite of a stated fact; never add specifics
+  (times, amounts, insurance, plans) that no line contains.
+- Anti-parroting v4: when pointing at a word the client dropped, the quoted
+  fragment is the opener ("Last time. You let it walk past.") — never
+  "You said <word>".
+- Plan fixes: arc_0018 (13-word multi-clause misstatement → two short
+  fragments), arc_0049 opener (passed after the 4th anti-parroting
+  iteration), arc_0050 completed clean.
+
+### Closeout — canonical merge (Sep 19)
+
+Lane-1 A/B checkpoints + records merged into canonical, dedup on
+(arc_id, session_n); the 3 overlapping rows were byte-identical (writer
+resume re-emitted existing sessions). Final state: **60 unique arcs
+(10 pilots + 50 Phase A), 138 checkpoint rows, 0 duplicates**; per-arc
+session counts match `metrics.sessions` for all 60. Audit state:
+**47/60 final accept / 13 regenerated-pending-re-audit / 0 HR** (47 = 10
+pilots + 20 first-pass + 9 re-audit + 8 lane-2 manual).
+
+### Auditor-model eval — all 6 Featherless community models DQ (Sep 19)
+
+Directive: find the best of six Featherless models for the arc-audit task.
+Harness: `ai/training/eval_audit_models.py` (imports the auditor prompt +
+verdict parsing from `audit_arc_corpus.py` — single source of truth).
+Probe set: 17 arcs with ground truth = the 2 known fabrication defects
+(arc_0013/0033, the exact bug class under test) + 15 known accepts (8
+lane-2 manual + 5 K3 first-pass + 2 pilots). Scoring: composite =
+0.45·defect_caught + 0.35·agreement + 0.20·(1−false_revise);
+disqualified when infra_rate < 0.8. Sequential per model (Featherless
+caps at 4 model switches/min). Results: `output/arc_corpus/eval_audit/`
+(102 rows `results.jsonl` + `leaderboard.json`). No W&B run — direct API
+calls.
+
+| Model | infra | defect caught | agreement | false revise | composite | DQ |
+|---|---|---|---|---|---|---|
+| fable (Qwen3.8-27B heretic) | 0.529 | 1/2 (mislabeled) | 5/17 | 4/15 | 0.475 | yes |
+| orion (Orion-26B-A4B) | 0.529 | 0/2 | 8/17 | 0/15 | 0.365 | yes |
+| obliterated (Qwen3.8-27B) | 0.529 | 0/2 | 8/17 | 0/15 | 0.365 | yes |
+| boulesis (Boulesis-26B-A4B) | 0.529 | 0/2 | 8/17 | 0/15 | 0.365 | yes |
+| novelist (Gemma-4-Novelist-31B) | 0.471 | 0/2 | 7/17 | 1/15 | 0.331 | yes |
+| artemis (Artemis-31B) | 0.471 | 0/2 | 7/17 | 1/15 | 0.331 | yes |
+
+Two fatal flaws, independent of each other:
+
+1. **32,768-token context wall** — 8/17 probes hard-failed (every
+   3-session arc is ~44k tokens at audit-prompt length). infra_rate
+   0.47–0.53 ⇒ all six below the 0.8 DQ bar before any quality question.
+2. **Zero clinical sensitivity** — 5/6 models accepted outright the two
+   ledger fabrications that the HR-21 lanes exist to catch; the only
+   detection (fable, 1/2) mislabeled the category, and fable also
+   over-flags 4/15 clean arcs. Most models flag nothing (0–1 flags total).
+
+**Conclusion**: no Featherless community model is usable as a clinical
+auditor. `ARC_AUDITOR_MODEL` stays `moonshotai/Kimi-K2.6` (Featherless,
+W&B Inference route for 3-session arcs over the 32k cap — same route used
+in re-audit r5).
+
+**OPEN DECISION — re-audit model for the 13 regenerated arcs**:
+(A) Kimi-K2.6 on Featherless (recommended — ~$0, 27 prior audits,
+0 infra errors post key-pool fix, W&B route for over-cap arcs);
+(B) Vercel top-up ~$5–10 for Kimi-K3 (spec purity vs the 20 first-pass
+accepts); (C) manual review of all 13.
+
 ---
 
 ## Credentials & env (names only — values live in `/home/vivi/pixelated/.env`)
 
 | Var | State |
 |---|---|
-| `AI_GATEWAY_API_KEY` | **primary** — Vercel AI Gateway (OpenAI-compatible, 374 models, 200 OK) |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway (OpenAI-compatible, 374 models) — **credits exhausted (402) as of Sep 18** (~$30 consumed by Phase A); arc track moved to Featherless; top-up required before any further Vercel use (Part 7 decision B) |
 | `NF_BACKEND` | `vercel` (current primary; was `featherless`) |
 | `NF_MODEL` | `deepseek/deepseek-v4-flash-0731` (Vercel namespaced); wandb secondary default `deepseek-ai/DeepSeek-V4-Flash-0731` |
 | (Vultr) | fully removed 2026-09-17 — `VULTR_INFERENCE_API_KEY` no longer exists in code or `.env` |
@@ -662,6 +757,10 @@ but avoid copying terminal-captured keys into new docs.
 | `r2fkgmd9` | NF regeneration + re-judge (Sep 17) — 92 new + 1 preflight on Vercel |
 | `cvgl1col` / `gnivy7mn` | Phase A revision writers A4/B4 (Sep 19, Featherless) — 38 sessions/22 arcs, 583k tokens |
 | `k7ljm2dv` / `5bnvlg1j` | Phase A holdout sessions (Sep 19): arc_0005 s2 on V4-Pro; 5 sessions/3 arcs (arc_0035/0051/0052) on V4.1-Flash |
+| `mlcsijau` | Phase A plan generation (Sep 18) — 50 plans, 511,679 tokens, ~$0.53 |
+| `g07hni0g` / `sozac3cp` | Lane-1 regen writer A / A2 (Sep 18–19, Featherless) |
+| `sqceo287` / `oshn9fjd` | Lane-1 regen writer B / B2 (Sep 18–19, Featherless) |
+| `446bqsup` | Lane-2 reject regen (arc_0013 s2, arc_0033 s3) |
 
 ---
 
@@ -691,12 +790,15 @@ but avoid copying terminal-captured keys into new docs.
    (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
    rejected; gold 189,159.
 9. **Arc scale-up** — Phase 0 **DONE** (`0f7a266cf`). Phase A **writer +
-   first-pass audit + revision cycle + re-audit DONE** (Sep 18–19,
-   Featherless): final 29/50 accepted, 21/50 HR, 0 rejects — **gate NOT
-   met** (≥85% accept, ≤15% HR). **DECISION**: triage HR-21 (10
-   safety-flagged → manual review; 11 mechanical → regen + one-shot
-   re-audit) before Phase B. Then B (150 + DPO pairing),
-   C (200 → 400 total ≈ $22).
+   first-pass audit + revision cycle + re-audit + HR-21 triage DONE**
+   (Sep 18–19, Featherless): lane-2 manual 8/10 accepted (2 rejects =
+   cross-session ledger fabrication), lane-1 11 + 2 rejects regenerated
+   (13/13), canonical closed out at **60 arcs / 138 sessions** (47 final
+   accept, 13 pending re-audit). Auditor-model eval: all 6 Featherless
+   community models **DQ** (Part 7) — `ARC_AUDITOR_MODEL` stays
+   Kimi-K2.6. **NEXT: re-audit the 13 regenerated arcs** (open decision
+   A/B/C, Part 7), then Phase B (150 + DPO pairing), C (200 → 400 total
+   ≈ $22).
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
     flip.
@@ -712,7 +814,9 @@ but avoid copying terminal-captured keys into new docs.
 | NF outputs | `ai/training/output/nightmare_fuel/checkpoints/` |
 | Parity-saga eval artifacts | `ai/training/eval_results/` (incl. `judge_sharedkey_contaminated.json`, `judge_variance_proof.md`, `comparison_report.md`) |
 | Arc outputs | `ai/training/output/arc_corpus/` (+ `run_logs/`) |
-| Arc plans | `ai/training/arc_plans/pilot_01..10.json` |
+| Auditor-model eval | `ai/training/eval_audit_models.py` → `output/arc_corpus/eval_audit/` (`results.jsonl` 102 rows, `leaderboard.json`) |
+| Lane-2 manual verdict log | `output/arc_corpus/lane2_manual_review_20260919.json` |
+| Arc plans | `ai/training/arc_plans/` — pilot_01..10 + arc_0001..0053 (60 plans on disk, untracked by design) |
 | Quadit | `ai/research/quadit/`, `scripts/qa/` (gate adapter) |
 | Terminal captures | `~/.pochi/terminals/term-2a487e83-*.log`, `term-c2adead5-*.log`, `term-38fc06ca-*.log` |
 | AdaptionLabs prefill (not submitted) | `.mastracode/plans/adaption-startups-application-prefill.md` |
