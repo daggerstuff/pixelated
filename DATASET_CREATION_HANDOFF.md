@@ -847,6 +847,92 @@ the sweep is strongly indicated before staging any arc-track records to gold.
 
 ---
 
+## Part 9 — 39-arc K3 accept-cohort sweep, verification, final state (Sep 19)
+
+### Sweep execution (3 chunks)
+
+- **Chunk 1** (20 arcs, 464s): 16 accept, 1 revise (arc_0029), 3 HR (arc_0010,
+  arc_0019, arc_0025), 0 errors.
+- **Chunk 2** (19 arcs): 6 completed (pilot_07 accept; 5 revise — pilot_02 4f,
+  pilot_03 1f, pilot_05 8f, pilot_08 1f, pilot_10 1f) then **13 × HTTP 402**
+  (gateway credits exhausted mid-run). No zero-touch K3 failover exists (W&B
+  Inference has K2.6/K2.7-Code only).
+- **Chunk 3** (13 arcs, 379s, after user $10 top-up of `vck_5F1n6…`): 6 accept
+  (arc_0036, arc_0041, arc_0046, arc_0047, arc_0053, pilot_06), 3 revise
+  (arc_0037 1f, pilot_04 4f, pilot_09 3f), 4 HR (arc_0040 1f, arc_0042 5f,
+  arc_0051 3f, arc_0052 7f), 0 errors. 3-session arcs (incl. arc_0043's
+  39k-token probe) audit cleanly on the gateway — no 32k wall.
+
+**Sweep totals (39 arcs): 23 accept / 9 revise / 7 HR / 0 infra errors.
+16/39 flagged (41%).** Snapshot: `.pre_sweep_20260919`.
+
+### Claim-level verification of all 53 sweep flags
+
+29 flags (chunks 1–2) + 24 flags (chunk 3) = **53 flags: 51 genuine, 2 false
+positives (96.2%)**. K3's cumulative record for Sep 19 across re-audit + probe
+verification + sweep: **100 flags, 97 fully genuine, 1 partial (arc_0013
+"Ivy", plan-sanctioned), 2 FP.**
+
+The 2 FPs (both annotated `DISPROVEN` in `arc_audit_notes/` so the writer does
+not "fix" them):
+
+- **pilot_04 s2 t12 [thread_death]** — flag claimed the aborted "that's the
+  part—" phrase is "never resurfaced… in session 3". S3 T9 resurfaces it
+  verbatim ("that's the part that's costing you"); the client also completes
+  the disclosure within the same turn. Flag's ledger quote doesn't match the
+  actual ledger.
+- **pilot_09 s1 t13 [ledger_contradiction]** — flag read "in, I don't know, a
+  couple of months" as ~-7m (couple of months post-death). Client-stated
+  duration; `-2m` is the defensible reading. Keep as written.
+
+### New defect evidence from the sweep (patterns now in the catalog)
+
+- **Phantom quotes**: pilot_05 ledger asserts client quotes ("they just
+  decided I was the problem (told)", "if I stop watching, they win (told)")
+  that exist nowhere in the transcript.
+- **Integrity violation**: arc_0019 therapist promises "I won't confirm
+  you're in treatment" in the same breath as "your employer sees
+  attendance" + S2 "letter confirming you attended".
+- **Thread death**: arc_0025 (sister's Sunday call), pilot_05 (ex-wife,
+  "She used to say—") — aborted disclosures never returned.
+- **Silent date inventions**: pilot_02 (-5m/-2m where S1 ledgers all carried
+  onset="not stated"), pilot_05 (-8m/-3w/-5m), arc_0051 (-3y/-1y on a
+  first-session client — "Session one of whatever this is" flatly contradicts
+  `-1y: started current therapy (told)`).
+- **Invented third-party name**: arc_0052 "Mara" — appears only in the
+  therapist's own line, never stated by the client.
+- **Invented manner of death**: pilot_09 S3 T6 "A motorcycle on a road killed
+  him" — cause of death never stated anywhere in the arc, at the arc's
+  central moment.
+
+### Final corpus state (Sep 19, pre-regeneration)
+
+- **arc_records.jsonl: 51 arcs** = 23 accept + 28 HR (9 revise arcs' records
+  deleted — re-enter on regeneration).
+- **sessions_checkpoint.jsonl: 124 rows** across 58 arc ids (revise arcs
+  keep unflagged sessions: arc_0029 [3], arc_0037 [2], pilot_02 [1],
+  pilot_03 [1], pilot_08 [2], pilot_09 [2], pilot_10 [1]; pilot_04/pilot_05
+  fully emptied).
+- **human_review_queue.jsonl: 28 entries** (21 pre-sweep + 7 sweep).
+- Accept cohort = 23 arcs, all K3-audited this day; 4 additionally
+  probe-verified clean earlier (arc_0002, arc_0008, arc_0014, pilot_08→now
+  revise, so 3: arc_0002, arc_0008, arc_0014).
+- Master gold **untouched** (189,159 lines = base + NF only).
+
+### Regeneration backlog (next)
+
+- **9 revise arcs**: writer resumes the 14 dropped sessions (arc_0029 s1–s2,
+  arc_0037 s1, pilot_02 s2, pilot_03 s2, pilot_04 s1–s3, pilot_05 s1–s2,
+  pilot_08 s1, pilot_09 s1+s3, pilot_10 s2); corrective notes in
+  `arc_audit_notes/` (2 FP items annotated).
+- **28 HR arcs**: full-arc reset (drop all session rows + records,
+  reconstruct corrective notes from `audit_results` flags_final via
+  `write_audit_note` logic, arc_0011 = safety-priority).
+- Then K3 re-audit of all regenerated sessions, repeat until clean, then
+  consolidate to gold (quadit-gated) → Phase B (150 arcs) / C (→400).
+
+---
+
 ## Next steps (in order)
 
 1. ~~**Finish pilot**~~ — **DONE**: 10/10 accepted (Part 5,
@@ -879,9 +965,12 @@ the sweep is strongly indicated before staging any arc-track records to gold.
    candidate models **DQ** (Part 7); K3 on gateway is the auditor (Part 8).
    K3 re-audit of 13: 3 accept / 10 HR, 0 false positives on 36 flags; 11
    more accepts found contaminated via probe verification and moved to HR →
-   **39 accept / 21 HR**. **NEXT: (a) user decision on the 39-arc K3
-   `--reaudit` sweep (Part 8), (b) regenerate the 21 HR arcs (arc_0011 =
-   safety-priority), (c) Phase B (150 + DPO pairing), C (200 → 400 total
+   **39 accept / 21 HR**. 39-arc K3 `--reaudit` sweep **DONE** (Part 9):
+   23 accept / 9 revise / 7 HR, 53 flags verified (51 genuine, 2 FP) →
+   final **23 accept / 28 HR** + 9 revise arcs pending regeneration.
+   **NEXT: (a) regenerate 37 arcs (28 HR full reset + 9 revise resume;
+   arc_0011 = safety-priority), K3 re-audit, iterate, (b) consolidate to
+   gold (quadit-gated), (c) Phase B (150 + DPO pairing), C (200 → 400 total
    ≈ $22).**
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
@@ -897,7 +986,7 @@ the sweep is strongly indicated before staging any arc-track records to gold.
 | Arc track | `ai/training/ARC_CORPUS_SPEC.md`, `generate_arc_corpus.py`, `audit_arc_corpus.py`, `build_pilot_arc_plans.py`, `build_arc_plans.py` (LLM plan generator), `lint_arc_plans.py`, `probe_arc_writer.py`, `probe_arc_bakeoff.py`, `featherless_keys.py` (plans on disk at `training/arc_plans/`, untracked by design) |
 | NF outputs | `ai/training/output/nightmare_fuel/checkpoints/` |
 | Parity-saga eval artifacts | `ai/training/eval_results/` (incl. `judge_sharedkey_contaminated.json`, `judge_variance_proof.md`, `comparison_report.md`) |
-| Arc outputs | `ai/training/output/arc_corpus/` (+ `run_logs/`) |
+| Arc outputs | `ai/training/output/arc_corpus/` (+ `run_logs/`, `sweep_chunk1..3.log`) |
 | Auditor-model eval | `ai/training/eval_audit_models.py` → `output/arc_corpus/eval_audit/` (`results.jsonl` 102 rows, `leaderboard.json`) |
 | Lane-2 manual verdict log | `output/arc_corpus/lane2_manual_review_20260919.json` |
 | Arc plans | `ai/training/arc_plans/` — pilot_01..10 + arc_0001..0053 (60 plans on disk, untracked by design) |
