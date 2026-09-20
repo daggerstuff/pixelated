@@ -6,7 +6,10 @@
   --case-muted: oklch(0.43 0 0);
   --case-line: oklch(0.76 0 0);
   --case-soft: oklch(0.91 0 0);
-  --case-signal: oklch(0.62 0.16 32);
+  /* Signal role = strongest emphasis, encoded by value (near-ink), never hue —
+     zero-chroma doctrine. White-on-signal clears WCAG AA at ~13:1; the
+     previous oklch(0.62 0.16 32) rust tone was chromatic AND failed at 3.9:1. */
+  --case-signal: oklch(0.22 0 0);
   --case-shell: 78rem;
   --case-gutter: clamp(1.25rem, 4vw, 3.5rem);
 }
