@@ -15,24 +15,24 @@ export const prerender = false // Enable SSR for real-time data
   description="Real-time analytics and A/B testing results for ClinicalVault Trainer demo"
   bgType="plum"
 >
-  <div class="min-h-screen text-white py-8">
+  <div class="min-h-screen text-foreground py-8">
     <div class="container mx-auto px-4">
       <!-- Header -->
       <div class="text-center mb-12">
         <h1 class="text-4xl lg:text-5xl font-bold mb-6">
           Demo Analytics Dashboard
-          <span class="text-purple-400 block mt-2"
+          <span class="text-foreground block mt-2"
             >Real-Time A/B Testing Results</span
           >
         </h1>
         <Badge
-          class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-green-500/20 border border-green-400/40 text-green-200 rounded-full"
+          class="inline-flex items-center gap-2 px-4 py-2 text-sm bg-primary/20 border border-ring text-foreground rounded-none"
         >
           <span class="relative flex h-3 w-3">
             <span
-              class="animate-pulse absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+              class="animate-pulse absolute inline-flex h-full w-full rounded-none bg-primary opacity-75"
             ></span>
-            <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"
+            <span class="relative inline-flex rounded-none h-3 w-3 bg-primary"
             ></span>
           </span>
           Live Data Stream Active
@@ -41,59 +41,66 @@ export const prerender = false // Enable SSR for real-time data
 
       <!-- Real-time Stats -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <Card class="border border-blue-600/30 bg-blue-900/20">
+        <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-blue-300 text-lg">Total Sessions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div id="total-sessions" class="text-3xl font-bold text-blue-400">
-              0
-            </div>
-            <div class="text-sm text-blue-200/80">Last 24 hours</div>
-          </CardContent>
-        </Card>
-
-        <Card class="border border-green-600/30 bg-green-900/20">
-          <CardHeader class="pb-2">
-            <CardTitle class="text-green-300 text-lg">Conversion Rate</CardTitle
+            <CardTitle class="text-foreground text-lg">Total Sessions</CardTitle
             >
           </CardHeader>
           <CardContent>
-            <div id="conversion-rate" class="text-3xl font-bold text-green-400">
-              0%
+            <div id="total-sessions" class="text-3xl font-bold text-foreground">
+              0
             </div>
-            <div class="text-sm text-green-200/80">CTA clicks / Page views</div>
+            <div class="text-sm text-muted-foreground">Last 24 hours</div>
           </CardContent>
         </Card>
 
-        <Card class="border border-purple-600/30 bg-purple-900/20">
+        <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-purple-300 text-lg"
+            <CardTitle class="text-foreground text-lg"
+              >Conversion Rate</CardTitle
+            >
+          </CardHeader>
+          <CardContent>
+            <div
+              id="conversion-rate"
+              class="text-3xl font-bold text-foreground"
+            >
+              0%
+            </div>
+            <div class="text-sm text-muted-foreground">
+              CTA clicks / Page views
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card class="border border-input bg-secondary">
+          <CardHeader class="pb-2">
+            <CardTitle class="text-foreground text-lg"
               >Avg. Time to CTA</CardTitle
             >
           </CardHeader>
           <CardContent>
-            <div id="avg-time-cta" class="text-3xl font-bold text-purple-400">
+            <div id="avg-time-cta" class="text-3xl font-bold text-foreground">
               0s
             </div>
-            <div class="text-sm text-purple-200/80">Time to first click</div>
+            <div class="text-sm text-muted-foreground">Time to first click</div>
           </CardContent>
         </Card>
 
-        <Card class="border border-yellow-600/30 bg-yellow-900/20">
+        <Card class="border border-input bg-secondary">
           <CardHeader class="pb-2">
-            <CardTitle class="text-yellow-300 text-lg"
+            <CardTitle class="text-foreground text-lg"
               >Avg. Scroll Depth</CardTitle
             >
           </CardHeader>
           <CardContent>
             <div
               id="avg-scroll-depth"
-              class="text-3xl font-bold text-yellow-400"
+              class="text-3xl font-bold text-foreground font-medium"
             >
               0%
             </div>
-            <div class="text-sm text-yellow-200/80">Page engagement</div>
+            <div class="text-sm text-muted-foreground">Page engagement</div>
           </CardContent>
         </Card>
       </div>
@@ -101,118 +108,116 @@ export const prerender = false // Enable SSR for real-time data
       <!-- A/B Test Results -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
         <!-- Variant Performance -->
-        <Card class="border border-purple-600/30 bg-slate-900/50">
+        <Card class="border border-input bg-card">
           <CardHeader>
-            <CardTitle class="text-purple-100">A/B Test Performance</CardTitle>
-            <CardDescription class="text-purple-200/80">
+            <CardTitle class="text-foreground">A/B Test Performance</CardTitle>
+            <CardDescription class="text-muted-foreground">
               Conversion rates by variant
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div class="space-y-4">
-              <div id="variant-a-stats" class="bg-slate-800/50 rounded-lg p-4">
+              <div id="variant-a-stats" class="bg-secondary rounded-none p-4">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-purple-300 font-medium"
+                  <span class="text-foreground font-medium"
                     >Variant A: "HIPAA Made Impossible"</span
                   >
-                  <Badge class="bg-purple-500/20 text-purple-300"
-                    >Original</Badge
-                  >
+                  <Badge class="bg-primary/20 text-foreground">Original</Badge>
                 </div>
                 <div class="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <div
-                      class="text-purple-400 font-bold"
+                      class="text-foreground font-bold"
                       id="variant-a-sessions"
                     >
                       0
                     </div>
-                    <div class="text-purple-200/70">Sessions</div>
+                    <div class="text-muted-foreground">Sessions</div>
                   </div>
                   <div>
                     <div
-                      class="text-purple-400 font-bold"
+                      class="text-foreground font-bold"
                       id="variant-a-conversions"
                     >
                       0
                     </div>
-                    <div class="text-purple-200/70">Conversions</div>
+                    <div class="text-muted-foreground">Conversions</div>
                   </div>
                   <div>
-                    <div class="text-purple-400 font-bold" id="variant-a-rate">
+                    <div class="text-foreground font-bold" id="variant-a-rate">
                       0%
                     </div>
-                    <div class="text-purple-200/70">Rate</div>
+                    <div class="text-muted-foreground">Rate</div>
                   </div>
                 </div>
               </div>
 
-              <div id="variant-b-stats" class="bg-slate-800/50 rounded-lg p-4">
+              <div id="variant-b-stats" class="bg-secondary rounded-none p-4">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-green-300 font-medium"
+                  <span class="text-foreground font-medium"
                     >Variant B: "Train Without Risk"</span
                   >
-                  <Badge class="bg-green-500/20 text-green-300">Test</Badge>
+                  <Badge class="bg-primary/20 text-foreground">Test</Badge>
                 </div>
                 <div class="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <div
-                      class="text-green-400 font-bold"
+                      class="text-foreground font-bold"
                       id="variant-b-sessions"
                     >
                       0
                     </div>
-                    <div class="text-green-200/70">Sessions</div>
+                    <div class="text-muted-foreground">Sessions</div>
                   </div>
                   <div>
                     <div
-                      class="text-green-400 font-bold"
+                      class="text-foreground font-bold"
                       id="variant-b-conversions"
                     >
                       0
                     </div>
-                    <div class="text-green-200/70">Conversions</div>
+                    <div class="text-muted-foreground">Conversions</div>
                   </div>
                   <div>
-                    <div class="text-green-400 font-bold" id="variant-b-rate">
+                    <div class="text-foreground font-bold" id="variant-b-rate">
                       0%
                     </div>
-                    <div class="text-green-200/70">Rate</div>
+                    <div class="text-muted-foreground">Rate</div>
                   </div>
                 </div>
               </div>
 
-              <div id="variant-c-stats" class="bg-slate-800/50 rounded-lg p-4">
+              <div id="variant-c-stats" class="bg-secondary rounded-none p-4">
                 <div class="flex justify-between items-center mb-2">
-                  <span class="text-blue-300 font-medium"
+                  <span class="text-foreground font-medium"
                     >Variant C: "Practice Crisis Safely"</span
                   >
-                  <Badge class="bg-blue-500/20 text-blue-300">Test</Badge>
+                  <Badge class="bg-primary/20 text-foreground">Test</Badge>
                 </div>
                 <div class="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <div
-                      class="text-blue-400 font-bold"
+                      class="text-foreground font-bold"
                       id="variant-c-sessions"
                     >
                       0
                     </div>
-                    <div class="text-blue-200/70">Sessions</div>
+                    <div class="text-muted-foreground">Sessions</div>
                   </div>
                   <div>
                     <div
-                      class="text-blue-400 font-bold"
+                      class="text-foreground font-bold"
                       id="variant-c-conversions"
                     >
                       0
                     </div>
-                    <div class="text-blue-200/70">Conversions</div>
+                    <div class="text-muted-foreground">Conversions</div>
                   </div>
                   <div>
-                    <div class="text-blue-400 font-bold" id="variant-c-rate">
+                    <div class="text-foreground font-bold" id="variant-c-rate">
                       0%
                     </div>
-                    <div class="text-blue-200/70">Rate</div>
+                    <div class="text-muted-foreground">Rate</div>
                   </div>
                 </div>
               </div>
@@ -221,47 +226,47 @@ export const prerender = false // Enable SSR for real-time data
         </Card>
 
         <!-- Statistical Significance -->
-        <Card class="border border-orange-600/30 bg-slate-900/50">
+        <Card class="border border-input bg-card">
           <CardHeader>
-            <CardTitle class="text-orange-100"
+            <CardTitle class="text-foreground"
               >Statistical Significance</CardTitle
             >
-            <CardDescription class="text-orange-200/80">
+            <CardDescription class="text-muted-foreground">
               Test confidence and recommendations
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div class="space-y-4">
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-orange-300 font-medium mb-2">Test Status</div>
-                <div id="test-status" class="text-orange-400 font-bold">
+              <div class="bg-secondary rounded-none p-4">
+                <div class="text-foreground font-medium mb-2">Test Status</div>
+                <div id="test-status" class="text-foreground font-bold">
                   Collecting Data...
                 </div>
-                <div class="text-sm text-orange-200/70 mt-1">
+                <div class="text-sm text-muted-foreground mt-1">
                   Minimum 100 conversions needed
                 </div>
               </div>
 
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-orange-300 font-medium mb-2">
+              <div class="bg-secondary rounded-none p-4">
+                <div class="text-foreground font-medium mb-2">
                   Confidence Level
                 </div>
-                <div id="confidence-level" class="text-orange-400 font-bold">
+                <div id="confidence-level" class="text-foreground font-bold">
                   --
                 </div>
-                <div class="text-sm text-orange-200/70 mt-1">
+                <div class="text-sm text-muted-foreground mt-1">
                   95% confidence required
                 </div>
               </div>
 
-              <div class="bg-slate-800/50 rounded-lg p-4">
-                <div class="text-orange-300 font-medium mb-2">
+              <div class="bg-secondary rounded-none p-4">
+                <div class="text-foreground font-medium mb-2">
                   Recommendation
                 </div>
-                <div id="recommendation" class="text-orange-400 font-bold">
+                <div id="recommendation" class="text-foreground font-bold">
                   Continue Testing
                 </div>
-                <div class="text-sm text-orange-200/70 mt-1">
+                <div class="text-sm text-muted-foreground mt-1">
                   Based on current data
                 </div>
               </div>
@@ -271,16 +276,16 @@ export const prerender = false // Enable SSR for real-time data
       </div>
 
       <!-- Event Timeline -->
-      <Card class="border border-gray-600/30 bg-slate-900/50 mb-12">
+      <Card class="border border-border bg-card mb-12">
         <CardHeader>
-          <CardTitle class="text-gray-100">Live Event Stream</CardTitle>
-          <CardDescription class="text-gray-200/80">
+          <CardTitle class="text-foreground">Live Event Stream</CardTitle>
+          <CardDescription class="text-muted-foreground">
             Real-time user interactions
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div id="event-timeline" class="space-y-2 max-h-96 overflow-y-auto">
-            <div class="text-gray-400 text-center py-8">
+            <div class="text-muted-foreground text-center py-8">
               Waiting for events...
             </div>
           </div>
@@ -288,78 +293,78 @@ export const prerender = false // Enable SSR for real-time data
       </Card>
 
       <!-- Conversion Funnel -->
-      <Card class="border border-indigo-600/30 bg-slate-900/50">
+      <Card class="border border-input bg-card">
         <CardHeader>
-          <CardTitle class="text-indigo-100">Conversion Funnel</CardTitle>
-          <CardDescription class="text-indigo-200/80">
+          <CardTitle class="text-foreground">Conversion Funnel</CardTitle>
+          <CardDescription class="text-muted-foreground">
             User journey through demo page
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div class="space-y-4">
             <div
-              class="flex items-center justify-between bg-slate-800/50 rounded-lg p-4"
+              class="flex items-center justify-between bg-secondary rounded-none p-4"
             >
-              <span class="text-indigo-300">Page Views</span>
+              <span class="text-foreground">Page Views</span>
               <div class="flex items-center gap-4">
-                <div id="funnel-page-views" class="text-indigo-400 font-bold">
+                <div id="funnel-page-views" class="text-foreground font-bold">
                   0
                 </div>
-                <div class="w-32 bg-slate-700 rounded-full h-2">
+                <div class="w-32 bg-secondary rounded-none h-2">
                   <div
                     id="funnel-page-views-bar"
-                    class="bg-indigo-500 h-2 rounded-full"
+                    class="bg-indigo-500 h-2 rounded-none"
                     style="width: 100%"
                   >
                   </div>
                 </div>
-                <span class="text-indigo-300 text-sm">100%</span>
+                <span class="text-foreground text-sm">100%</span>
               </div>
             </div>
 
             <div
-              class="flex items-center justify-between bg-slate-800/50 rounded-lg p-4"
+              class="flex items-center justify-between bg-secondary rounded-none p-4"
             >
-              <span class="text-purple-300">Demo Interactions</span>
+              <span class="text-foreground">Demo Interactions</span>
               <div class="flex items-center gap-4">
                 <div
                   id="funnel-demo-interactions"
-                  class="text-purple-400 font-bold"
+                  class="text-foreground font-bold"
                 >
                   0
                 </div>
-                <div class="w-32 bg-slate-700 rounded-full h-2">
+                <div class="w-32 bg-secondary rounded-none h-2">
                   <div
                     id="funnel-demo-interactions-bar"
-                    class="bg-purple-500 h-2 rounded-full"
+                    class="bg-primary h-2 rounded-none"
                     style="width: 0%"
                   >
                   </div>
                 </div>
                 <span
                   id="funnel-demo-interactions-pct"
-                  class="text-purple-300 text-sm">0%</span
+                  class="text-foreground text-sm">0%</span
                 >
               </div>
             </div>
 
             <div
-              class="flex items-center justify-between bg-slate-800/50 rounded-lg p-4"
+              class="flex items-center justify-between bg-secondary rounded-none p-4"
             >
-              <span class="text-green-300">CTA Clicks</span>
+              <span class="text-foreground">CTA Clicks</span>
               <div class="flex items-center gap-4">
-                <div id="funnel-cta-clicks" class="text-green-400 font-bold">
+                <div id="funnel-cta-clicks" class="text-foreground font-bold">
                   0
                 </div>
-                <div class="w-32 bg-slate-700 rounded-full h-2">
+                <div class="w-32 bg-secondary rounded-none h-2">
                   <div
                     id="funnel-cta-clicks-bar"
-                    class="bg-green-500 h-2 rounded-full"
+                    class="bg-primary h-2 rounded-none"
                     style="width: 0%"
                   >
                   </div>
                 </div>
-                <span id="funnel-cta-clicks-pct" class="text-green-300 text-sm"
+                <span id="funnel-cta-clicks-pct" class="text-foreground text-sm"
                   >0%</span
                 >
               </div>
@@ -531,7 +536,7 @@ export const prerender = false // Enable SSR for real-time data
 
       if (recentEvents.length === 0) {
         timeline.innerHTML =
-          '<div class="text-gray-400 text-center py-8">No events yet...</div>'
+          '<div class="text-muted-foreground text-center py-8">No events yet...</div>'
         return
       }
 
@@ -542,16 +547,16 @@ export const prerender = false // Enable SSR for real-time data
           const eventType = event.event.replace('demo_', '').replace('_', ' ')
 
           return `
-          <div class="flex items-center justify-between bg-slate-800/30 rounded p-3">
-            <div class="flex items-center gap-3">
-              <span class="text-xs bg-${this.getVariantColor(variant)}-500/20 text-${this.getVariantColor(variant)}-300 px-2 py-1 rounded">
-                ${variant}
-              </span>
-              <span class="text-gray-300 capitalize">${eventType}</span>
-            </div>
-            <span class="text-gray-400 text-sm">${time}</span>
-          </div>
-        `
+     <div class="flex items-center justify-between bg-secondary rounded-none p-3">
+      <div class="flex items-center gap-3">
+       <span class="text-xs bg-${this.getVariantColor(variant)}-500/20 text-${this.getVariantColor(variant)}-300 px-2 py-1 rounded-none">
+        ${variant}
+       </span>
+       <span class="text-muted-foreground capitalize">${eventType}</span>
+      </div>
+      <span class="text-muted-foreground text-sm">${time}</span>
+     </div>
+    `
         })
         .join('')
     }
