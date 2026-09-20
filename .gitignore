@@ -99,7 +99,10 @@ skills-lock.json
 struct-agent-key.json
 TASTES.md
 test.md
+# __mocks__ ignores agent-runtime junk dirs of that name, but vitest manual
+# mocks are source-controlled test fixtures — un-ignore this one.
 __mocks__
+!apps/web/src/lib/ai/bias-detection/__mocks__/
 
 # Squad runtime state
 .squad/decisions/inbox/
