@@ -5,6 +5,8 @@
     "bash scripts/ci/oxlint-staged.sh -c .oxlintrc.json --ignore-pattern 'src/scripts/**'",
     "bash scripts/ci/check-no-suppressions.sh"
   ],
+  "*.astro": ["pnpm exec prettier --write"],
+  "*.{js,ts,jsx,tsx,mjs,cjs}": ["pnpm exec oxfmt --write"],
   "*.{ts,tsx}": ["node scripts/ci/check-zod-deprecations.mjs"],
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
