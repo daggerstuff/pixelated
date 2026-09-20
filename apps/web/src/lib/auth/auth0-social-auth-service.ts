@@ -454,7 +454,7 @@ export class Auth0SocialAuthService {
 
     try {
       const response = await auth0Management.users.get(userId)
-      const user = response
+      const user = response.data
       if (
         typeof user === 'object' &&
         'identities' in user &&

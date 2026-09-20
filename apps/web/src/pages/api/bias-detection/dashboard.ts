@@ -49,14 +49,22 @@ export const GET = async ({
           biasScore: 0.32,
           sessionCount: 25,
           alertCount: 3,
-          demographicBreakdown: { age: 0.3, gender: 0.2 },
+          // Shape must match the DemographicBreakdown type (nested
+          // per-value { count, averageBias }), same as the real engine.
+          demographicBreakdown: {
+            age: { '18-24': { count: 1, averageBias: 0.3 } },
+            gender: { male: { count: 1, averageBias: 0.2 } },
+          },
         },
         {
           date: new Date('2024-01-15T00:00:00Z'),
           biasScore: 0.35,
           sessionCount: 28,
           alertCount: 4,
-          demographicBreakdown: { age: 0.35, gender: 0.25 },
+          demographicBreakdown: {
+            age: { '18-24': { count: 1, averageBias: 0.35 } },
+            gender: { male: { count: 1, averageBias: 0.25 } },
+          },
         },
       ],
       demographics: {
