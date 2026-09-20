@@ -307,11 +307,7 @@ export class CDNEdgeOptimizer {
           height: asset.options?.height,
           quality: asset.options?.quality,
           format: asset.options?.format as
-            | 'webp'
-            | 'avif'
-            | 'jpeg'
-            | 'png'
-            | undefined,
+            'webp' | 'avif' | 'jpeg' | 'png' | undefined,
         }),
       )
 
