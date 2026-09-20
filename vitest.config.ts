@@ -337,16 +337,21 @@ export default defineConfig({
       enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura', 'lcov'],
       reportsDirectory: './coverage',
-      thresholds: {
-        // PIX-223: thresholds lifted toward the security-baseline.json 70% target
-        // as coverage improves. Measured full-run coverage (green): lines 60.7%,
-        // statements 61.1%, functions 61.6%, branches 51.4%. Kept ~6pts
-        // below actual so the gate stays green while enforcing real progress.
-        lines: 55,
-        functions: 55,
-        branches: 45,
-        statements: 55,
-      },
+      // Bucketed advisory runs execute a subset of the corpus, so global
+      // coverage math can never be meaningful there — thresholds apply only
+      // to full-suite runs. (Keep in sync with config/vitest.config.ts.)
+      thresholds: process.env['VITEST_BUCKET']
+        ? undefined
+        : {
+            // PIX-223: thresholds lifted toward the security-baseline.json 70% target
+            // as coverage improves. Measured full-run coverage (green): lines 60.7%,
+            // statements 61.1%, functions 61.6%, branches 51.4%. Kept ~6pts
+            // below actual so the gate stays green while enforcing real progress.
+            lines: 55,
+            functions: 55,
+            branches: 45,
+            statements: 55,
+          },
       exclude: [
         'node_modules/**',
         'dist/**',
