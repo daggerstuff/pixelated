@@ -239,32 +239,32 @@ const accessRequests: AccessRequest[] = [
 const getStatusBadgeClass = (status: string): string => {
   switch (status) {
     case 'fulfilled':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+      return 'bg-secondary border border-input text-muted-foreground'
     case 'pending':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+      return 'bg-secondary border border-ring text-foreground font-medium'
     case 'overdue':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 animate-pulse'
+      return 'bg-primary text-primary-foreground font-semibold animate-pulse'
     case 'rejected':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      return 'bg-primary text-primary-foreground font-semibold'
     case 'escalated':
-      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+      return 'bg-secondary border border-ring text-foreground font-medium'
     default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+      return 'bg-secondary border border-input text-muted-foreground'
   }
 }
 
 const getPriorityBadgeClass = (priority: string): string => {
   switch (priority) {
     case 'critical':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 ring-2 ring-red-500 animate-pulse'
+      return 'bg-primary text-primary-foreground font-semibold ring-2 ring-ring animate-pulse'
     case 'high':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+      return 'bg-primary text-primary-foreground font-semibold'
     case 'medium':
-      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+      return 'bg-secondary border border-ring text-foreground font-medium'
     case 'low':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+      return 'bg-secondary border border-input text-foreground'
     default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
+      return 'bg-secondary border border-input text-muted-foreground'
   }
 }
 
@@ -274,42 +274,37 @@ const getRequestTypeInfo = (
   switch (type) {
     case 'data-access':
       return {
-        class:
-          'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+        class: 'bg-secondary border border-input text-foreground',
         label: 'Data Access',
         icon: 'eye',
       }
     case 'data-export':
       return {
-        class:
-          'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        class: 'bg-secondary border border-input text-foreground',
         label: 'Data Export',
         icon: 'download',
       }
     case 'correction':
       return {
-        class:
-          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        class: 'bg-secondary border border-input text-muted-foreground',
         label: 'Correction',
         icon: 'edit',
       }
     case 'deletion':
       return {
-        class: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+        class: 'bg-primary text-primary-foreground font-semibold',
         label: 'Deletion',
         icon: 'trash',
       }
     case 'portability':
       return {
-        class:
-          'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+        class: 'bg-secondary border border-input text-foreground',
         label: 'Portability',
         icon: 'share',
       }
     default:
       return {
-        class:
-          'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+        class: 'bg-secondary border border-input text-muted-foreground',
         label: 'Other',
         icon: 'file',
       }
@@ -322,26 +317,22 @@ const getEncryptionBadge = (
   switch (level) {
     case 'FHE':
       return {
-        class:
-          'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+        class: 'bg-secondary border border-input text-muted-foreground',
         label: 'FHE',
       }
     case 'ZKP':
       return {
-        class:
-          'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-400',
+        class: 'bg-cyan-100 text-cyan-800',
         label: 'ZKP',
       }
     case 'AES-256':
       return {
-        class:
-          'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        class: 'bg-secondary border border-input text-foreground',
         label: 'AES-256',
       }
     default:
       return {
-        class:
-          'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+        class: 'bg-secondary border border-input text-muted-foreground',
         label: 'Standard',
       }
   }
@@ -361,13 +352,11 @@ const complianceMetrics = {
 
 <div class="space-y-6">
   <!-- Enterprise Dashboard Header -->
-  <div
-    class="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-6 text-white"
-  >
+  <div class="bg-primary rounded-none p-6 text-primary-foreground">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold">Patient Rights Management</h1>
-        <p class="text-blue-100 mt-1">
+        <p class="text-primary-foreground mt-1">
           HIPAA++ Compliant • Zero-Knowledge Processing • Real-time Audit
         </p>
       </div>
@@ -376,19 +365,19 @@ const complianceMetrics = {
           <div class="text-2xl font-bold">
             {complianceMetrics.complianceRate}
           </div>
-          <div class="text-xs text-blue-100">Compliance Rate</div>
+          <div class="text-xs text-primary-foreground">Compliance Rate</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold">
             {complianceMetrics.overdueRequests}
           </div>
-          <div class="text-xs text-blue-100">Overdue</div>
+          <div class="text-xs text-primary-foreground">Overdue</div>
         </div>
         <div class="text-center">
           <div class="text-2xl font-bold">
             {complianceMetrics.criticalRequests}
           </div>
-          <div class="text-xs text-blue-100">Critical</div>
+          <div class="text-xs text-primary-foreground">Critical</div>
         </div>
       </div>
     </div>
@@ -397,15 +386,18 @@ const complianceMetrics = {
   <!-- Real-time Alerts -->
   {
     complianceMetrics.overdueRequests > 0 && (
-      <div class="bg-neutral-100 border-l-4 border-neutral-500 p-4 dark:bg-neutral-800/20 dark:border-neutral-500">
+      <div class="bg-secondary border-l-4 border-ring p-4">
         <div class="flex items-center">
-          <Icon name="alert-triangle" class="h-5 w-5 text-neutral-500 mr-3" />
+          <Icon
+            name="alert-triangle"
+            class="h-5 w-5 text-muted-foreground mr-3"
+          />
           <div>
-            <h3 class="text-sm font-medium text-neutral-800 dark:text-neutral-300">
+            <h3 class="text-sm font-medium text-foreground">
               SLA Breach Alert: {complianceMetrics.overdueRequests} overdue
               requests require immediate attention
             </h3>
-            <p class="text-sm text-neutral-700 dark:text-neutral-400 mt-1">
+            <p class="text-sm text-foreground mt-1">
               Regulatory compliance at risk. Escalate to legal team if not
               resolved within 24 hours.
             </p>
@@ -416,20 +408,18 @@ const complianceMetrics = {
   }
 
   <!-- Advanced Search and Filter Bar -->
-  <div
-    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4"
-  >
+  <div class="bg-card rounded-none border border-border p-4">
     <div class="flex flex-col space-y-4 lg:flex-row lg:space-y-0 lg:space-x-4">
       <div class="flex-1">
         <div class="relative">
           <Icon
             name="search"
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
+            class="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground"
           />
           <input
             type="text"
             placeholder="Search by ID, patient name, requestor, or legal basis..."
-            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+            class="block w-full pl-10 pr-3 py-2 border border-input rounded-none bg-card placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring sm:text-sm border-border"
           />
         </div>
       </div>
@@ -437,7 +427,7 @@ const complianceMetrics = {
       <div class="flex flex-wrap gap-2">
         <select
           id="filter-status"
-          class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          class="px-3 py-2 border border-input rounded-none text-sm focus:ring-2 focus:ring-ring border-border"
         >
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
@@ -449,7 +439,7 @@ const complianceMetrics = {
 
         <select
           id="filter-type"
-          class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          class="px-3 py-2 border border-input rounded-none text-sm focus:ring-2 focus:ring-ring border-border"
         >
           <option value="">All Types</option>
           <option value="data-access">Data Access</option>
@@ -461,7 +451,7 @@ const complianceMetrics = {
 
         <select
           id="filter-priority"
-          class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          class="px-3 py-2 border border-input rounded-none text-sm focus:ring-2 focus:ring-ring border-border"
         >
           <option value="">All Priorities</option>
           <option value="critical">Critical</option>
@@ -472,7 +462,7 @@ const complianceMetrics = {
 
         <select
           id="filter-encryption"
-          class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          class="px-3 py-2 border border-input rounded-none text-sm focus:ring-2 focus:ring-ring border-border"
         >
           <option value="">All Encryption</option>
           <option value="FHE">FHE</option>
@@ -481,7 +471,7 @@ const complianceMetrics = {
         </select>
 
         <button
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-medium"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-primary text-sm font-medium"
         >
           <Icon name="download" class="h-4 w-4 inline mr-1" />
           Export Report
@@ -491,60 +481,56 @@ const complianceMetrics = {
   </div>
 
   <!-- Enterprise Access Requests Table -->
-  <div
-    class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-  >
+  <div class="bg-card rounded-none border border-border overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead class="bg-gray-50 dark:bg-gray-800">
+      <table class="min-w-full divide-y divide-border">
+        <thead class="bg-secondary">
           <tr>
             <th
               scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Request Details
             </th>
             <th
               scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Patient & Requestor
             </th>
             <th
               scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Type & Encryption
             </th>
             <th
               scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Priority & SLA
             </th>
             <th
               scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Status & Timeline
             </th>
             <th
               scope="col"
-              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Compliance
             </th>
             <th
               scope="col"
-              class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400"
+              class="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
             >
               Actions
             </th>
           </tr>
         </thead>
-        <tbody
-          class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700"
-        >
+        <tbody class="bg-card divide-y divide-border">
           {
             accessRequests.map((request) => {
               const typeInfo = getRequestTypeInfo(request.type)
@@ -552,23 +538,23 @@ const complianceMetrics = {
               const slaInfo = calculateSLA(request.dateRequested, request.type)
 
               return (
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                <tr class="hover:bg-secondary transition-colors">
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex flex-col">
-                      <span class="text-sm font-medium text-gray-900 dark:text-white">
+                      <span class="text-sm font-medium text-foreground">
                         {request.id}
                       </span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">
+                      <span class="text-xs text-muted-foreground">
                         {request.legalBasis}
                       </span>
                       <div class="flex flex-wrap gap-1 mt-1">
                         {request.dataCategories.slice(0, 2).map((category) => (
-                          <span class="inline-flex px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 rounded dark:bg-gray-700 dark:text-gray-300">
+                          <span class="inline-flex px-1.5 py-0.5 text-xs bg-secondary border border-input text-foreground rounded-none">
                             {category}
                           </span>
                         ))}
                         {request.dataCategories.length > 2 && (
-                          <span class="text-xs text-gray-400">
+                          <span class="text-xs text-muted-foreground">
                             +{request.dataCategories.length - 2}
                           </span>
                         )}
@@ -578,13 +564,13 @@ const complianceMetrics = {
 
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex flex-col">
-                      <span class="text-sm font-medium text-gray-800 dark:text-white">
+                      <span class="text-sm font-medium text-foreground">
                         {request.patientName}
                       </span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">
+                      <span class="text-xs text-muted-foreground">
                         ID: {request.patientId}
                       </span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">
+                      <span class="text-xs text-muted-foreground">
                         Via: {request.requestor}
                       </span>
                     </div>
@@ -595,16 +581,16 @@ const complianceMetrics = {
                       <div class="flex items-center space-x-1">
                         <Icon
                           name={typeInfo.icon}
-                          class="h-3 w-3 text-gray-400"
+                          class="h-3 w-3 text-muted-foreground"
                         />
                         <span
-                          class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${typeInfo.class}`}
+                          class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${typeInfo.class}`}
                         >
                           {typeInfo.label}
                         </span>
                       </div>
                       <span
-                        class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${encryptionInfo.class}`}
+                        class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${encryptionInfo.class}`}
                       >
                         {encryptionInfo.label}
                       </span>
@@ -614,7 +600,7 @@ const complianceMetrics = {
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex flex-col space-y-1">
                       <span
-                        class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getPriorityBadgeClass(request.priority)}`}
+                        class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getPriorityBadgeClass(request.priority)}`}
                       >
                         {request.priority.toUpperCase()}
                       </span>
@@ -622,10 +608,10 @@ const complianceMetrics = {
                         <span
                           class={
                             slaInfo.status === 'overdue'
-                              ? 'text-red-600 font-medium'
+                              ? 'text-foreground font-semibold font-medium'
                               : slaInfo.status === 'urgent'
-                                ? 'text-orange-600 font-medium'
-                                : 'text-gray-500'
+                                ? 'text-foreground font-medium font-medium'
+                                : 'text-muted-foreground'
                           }
                         >
                           {slaInfo.daysRemaining > 0
@@ -639,11 +625,11 @@ const complianceMetrics = {
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="flex flex-col space-y-1">
                       <span
-                        class={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusBadgeClass(request.status)}`}
+                        class={`inline-flex px-2 py-1 text-xs font-medium rounded-none ${getStatusBadgeClass(request.status)}`}
                       >
                         {request.status.toUpperCase()}
                       </span>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                      <div class="text-xs text-muted-foreground">
                         <div>
                           Req:{' '}
                           {formatDate(request.dateRequested, {
@@ -675,19 +661,19 @@ const complianceMetrics = {
                     <div class="flex flex-col space-y-1">
                       {request.complianceFlags.map((flag) => (
                         <span
-                          class={`inline-flex px-1.5 py-0.5 text-xs rounded ${
+                          class={`inline-flex px-1.5 py-0.5 text-xs rounded-none ${
                             flag.includes('COMPLIANT')
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                              ? 'bg-secondary border border-input text-muted-foreground'
                               : flag.includes('BREACH') ||
                                   flag.includes('OVERDUE')
-                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                ? 'bg-primary text-primary-foreground font-semibold'
+                                : 'bg-secondary border border-ring text-foreground font-medium'
                           }`}
                         >
                           {flag.replace(/_/g, ' ')}
                         </span>
                       ))}
-                      <div class="text-xs text-gray-500">
+                      <div class="text-xs text-muted-foreground">
                         {request.auditTrail.length} audit entries
                       </div>
                     </div>
@@ -697,7 +683,7 @@ const complianceMetrics = {
                     <div class="flex justify-end space-x-1">
                       <button
                         type="button"
-                        class="p-1 text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
+                        class="p-1 text-foreground hover:bg-secondary rounded-none"
                         title="View Details & Audit Trail"
                       >
                         <Icon name="eye" class="h-4 w-4" />
@@ -707,7 +693,7 @@ const complianceMetrics = {
                         request.status === 'escalated') && (
                         <button
                           type="button"
-                          class="p-1 text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
+                          class="p-1 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-none"
                           title="Process Request"
                         >
                           <Icon name="check-circle" class="h-4 w-4" />
@@ -717,7 +703,7 @@ const complianceMetrics = {
                       {request.status === 'overdue' && (
                         <button
                           type="button"
-                          class="p-1 text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                          class="p-1 text-foreground font-semibold hover:bg-secondary rounded-none"
                           title="Escalate to Legal"
                         >
                           <Icon name="alert-triangle" class="h-4 w-4" />
@@ -726,7 +712,7 @@ const complianceMetrics = {
 
                       <button
                         type="button"
-                        class="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded"
+                        class="p-1 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-none"
                         title="Download Audit Report"
                       >
                         <Icon name="download" class="h-4 w-4" />
@@ -734,7 +720,7 @@ const complianceMetrics = {
 
                       <button
                         type="button"
-                        class="p-1 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/20 rounded"
+                        class="p-1 text-muted-foreground hover:text-foreground hover:bg-secondary rounded-none"
                         title="More Actions"
                       >
                         <Icon name="more-vertical" class="h-4 w-4" />
@@ -754,19 +740,19 @@ const complianceMetrics = {
   <div class="flex items-center justify-between">
     <div class="flex-1 flex justify-between sm:hidden">
       <button
-        class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+        class="relative inline-flex items-center px-4 py-2 border border-input text-sm font-medium rounded-none text-foreground bg-card hover:bg-secondary text-muted-foreground"
       >
         Previous
       </button>
       <button
-        class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+        class="ml-3 relative inline-flex items-center px-4 py-2 border border-input text-sm font-medium rounded-none text-foreground bg-card hover:bg-secondary text-muted-foreground"
       >
         Next
       </button>
     </div>
     <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
       <div>
-        <p class="text-sm text-gray-700 dark:text-gray-300">
+        <p class="text-sm text-foreground">
           Showing <span class="font-medium">1</span> to <span
             class="font-medium">7</span
           > of <span class="font-medium">32</span> results
@@ -774,43 +760,43 @@ const complianceMetrics = {
       </div>
       <div>
         <nav
-          class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+          class="relative z-0 inline-flex rounded-none -space-x-px"
           aria-label="Pagination"
         >
           <button
-            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-input bg-card text-sm font-medium text-muted-foreground hover:bg-secondary text-muted-foreground"
           >
             <span class="sr-only">Previous</span>
             <Icon name="chevron-left" class="h-5 w-5" />
           </button>
           <button
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="relative inline-flex items-center px-4 py-2 border border-input bg-card text-sm font-medium text-foreground hover:bg-secondary text-muted-foreground"
           >
             1
           </button>
           <button
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-gray-600 dark:text-blue-400 dark:hover:bg-blue-900/30"
+            class="relative inline-flex items-center px-4 py-2 border border-input bg-secondary text-sm font-medium text-foreground hover:bg-secondary text-foreground"
             aria-current="page"
           >
             2
           </button>
           <button
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="relative inline-flex items-center px-4 py-2 border border-input bg-card text-sm font-medium text-foreground hover:bg-secondary text-muted-foreground"
           >
             3
           </button>
           <button
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="relative inline-flex items-center px-4 py-2 border border-input bg-card text-sm font-medium text-foreground hover:bg-secondary text-muted-foreground"
           >
             4
           </button>
           <span
-            class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+            class="relative inline-flex items-center px-4 py-2 border border-input bg-card text-sm font-medium text-foreground text-muted-foreground"
           >
             ...
           </span>
           <button
-            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-input bg-card text-sm font-medium text-muted-foreground hover:bg-secondary text-muted-foreground"
           >
             <span class="sr-only">Next</span>
             <Icon name="chevron-right" class="h-5 w-5" />
@@ -823,62 +809,59 @@ const complianceMetrics = {
   <!-- Enterprise Compliance Dashboard -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Regulatory Compliance Status -->
-    <div
-      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
-    >
+    <div class="bg-card rounded-none border border-border p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        <h3 class="text-lg font-medium text-foreground">
           Regulatory Compliance
         </h3>
-        <Icon name="shield-check" class="h-6 w-6 text-green-500" />
+        <Icon name="shield-check" class="h-6 w-6 text-muted-foreground" />
       </div>
 
       <div class="space-y-4">
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-600 dark:text-gray-400"
+          <span class="text-sm text-muted-foreground"
             >HIPAA Compliance Rate</span
           >
           <div class="flex items-center space-x-2">
-            <div class="w-24 bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-              <div class="bg-green-600 h-2 rounded-full" style="width: 94.2%">
+            <div class="w-24 bg-secondary rounded-none h-2">
+              <div class="bg-primary h-2 rounded-none" style="width: 94.2%">
               </div>
             </div>
-            <span class="text-sm font-medium text-green-600">94.2%</span>
+            <span class="text-sm font-medium text-muted-foreground">94.2%</span>
           </div>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-600 dark:text-gray-400"
-            >GDPR Compliance Rate</span
+          <span class="text-sm text-muted-foreground">GDPR Compliance Rate</span
           >
           <div class="flex items-center space-x-2">
-            <div class="w-24 bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-              <div class="bg-blue-600 h-2 rounded-full" style="width: 96.8%">
+            <div class="w-24 bg-secondary rounded-none h-2">
+              <div class="bg-primary h-2 rounded-none" style="width: 96.8%">
               </div>
             </div>
-            <span class="text-sm font-medium text-blue-600">96.8%</span>
+            <span class="text-sm font-medium text-foreground">96.8%</span>
           </div>
         </div>
 
         <div class="flex items-center justify-between">
-          <span class="text-sm text-gray-600 dark:text-gray-400"
+          <span class="text-sm text-muted-foreground"
             >Average Response Time</span
           >
-          <span class="text-sm font-medium text-gray-900 dark:text-white"
+          <span class="text-sm font-medium text-foreground"
             >{complianceMetrics.avgProcessingTime}</span
           >
         </div>
 
-        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="pt-4 border-t border-border">
           <div class="flex items-center space-x-2 text-sm">
-            <Icon name="lock" class="h-4 w-4 text-green-500" />
-            <span class="text-green-700 dark:text-green-400 font-medium"
+            <Icon name="lock" class="h-4 w-4 text-muted-foreground" />
+            <span class="text-muted-foreground font-medium"
               >Zero-Knowledge Processing Active</span
             >
           </div>
           <div class="flex items-center space-x-2 text-sm mt-1">
-            <Icon name="shield" class="h-4 w-4 text-blue-500" />
-            <span class="text-blue-700 dark:text-blue-400 font-medium"
+            <Icon name="shield" class="h-4 w-4 text-foreground" />
+            <span class="text-foreground font-medium"
               >FHE Encryption: 47% of requests</span
             >
           </div>
@@ -887,36 +870,34 @@ const complianceMetrics = {
     </div>
 
     <!-- Real-time Audit Trail -->
-    <div
-      class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
-    >
+    <div class="bg-card rounded-none border border-border p-6">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+        <h3 class="text-lg font-medium text-foreground">
           Recent Audit Activity
         </h3>
-        <Icon name="activity" class="h-6 w-6 text-blue-500" />
+        <Icon name="activity" class="h-6 w-6 text-foreground" />
       </div>
 
       <div class="space-y-3 max-h-64 overflow-y-auto">
         {
           accessRequests.slice(0, 3).map((request) =>
             request.auditTrail.slice(-2).map((audit) => (
-              <div class="flex items-start space-x-3 p-2 bg-gray-50 dark:bg-gray-700/50 rounded">
+              <div class="flex items-start space-x-3 p-2 bg-secondary rounded-none">
                 <div class="flex-shrink-0">
-                  <div class="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                  <div class="w-2 h-2 bg-secondary0 rounded-none mt-2" />
                 </div>
                 <div class="flex-1 min-w-0">
-                  <div class="text-sm font-medium text-gray-900 dark:text-white">
+                  <div class="text-sm font-medium text-foreground">
                     {audit.action.replace(/_/g, ' ')}
                   </div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">
+                  <div class="text-xs text-muted-foreground">
                     {request.id} • {audit.user} •{' '}
                     {formatDate(audit.timestamp, {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
                   </div>
-                  <div class="text-xs text-gray-600 dark:text-gray-300 mt-1">
+                  <div class="text-xs text-muted-foreground mt-1">
                     {audit.details}
                   </div>
                 </div>
@@ -926,9 +907,9 @@ const complianceMetrics = {
         }
       </div>
 
-      <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div class="mt-4 pt-4 border-t border-border">
         <button
-          class="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+          class="text-sm text-foreground hover:text-foreground font-medium"
         >
           View Full Audit Log →
         </button>
@@ -937,19 +918,17 @@ const complianceMetrics = {
   </div>
 
   <!-- Enhanced Compliance Notice -->
-  <div
-    class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 dark:from-blue-900/20 dark:to-indigo-900/20 dark:border-blue-700"
-  >
+  <div class="bg-secondary border border-border rounded-none p-6">
     <div class="flex items-start space-x-4">
       <div class="flex-shrink-0">
-        <Icon name="shield-check" class="h-8 w-8 text-blue-600" />
+        <Icon name="shield-check" class="h-8 w-8 text-foreground" />
       </div>
       <div class="flex-1">
-        <h3 class="text-lg font-medium text-blue-900 dark:text-blue-300 mb-2">
+        <h3 class="text-lg font-medium text-foreground mb-2">
           HIPAA++ Enterprise Compliance Framework
         </h3>
         <div
-          class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-800 dark:text-blue-400"
+          class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-foreground"
         >
           <div>
             <h4 class="font-medium mb-2">Patient Rights (HIPAA § 164.524)</h4>
@@ -970,16 +949,14 @@ const complianceMetrics = {
             </ul>
           </div>
         </div>
-        <div
-          class="mt-4 p-3 bg-blue-100 dark:bg-blue-900/30 rounded border border-blue-200 dark:border-blue-700"
-        >
+        <div class="mt-4 p-3 bg-secondary rounded-none border border-border">
           <div class="flex items-center space-x-2">
-            <Icon name="zap" class="h-4 w-4 text-blue-600" />
-            <span class="text-sm font-medium text-blue-900 dark:text-blue-300"
+            <Icon name="zap" class="h-4 w-4 text-foreground" />
+            <span class="text-sm font-medium text-foreground"
               >Zero-Knowledge Processing</span
             >
           </div>
-          <p class="text-xs text-blue-800 dark:text-blue-400 mt-1">
+          <p class="text-xs text-foreground mt-1">
             All patient data processed using Fully Homomorphic Encryption (FHE)
             and Zero-Knowledge Proofs (ZKP). Sub-50ms response times with
             complete privacy preservation. Real-time bias detection across all
@@ -1274,7 +1251,7 @@ const complianceMetrics = {
       message: string,
     ): HTMLElement {
       const notification = document.createElement('div')
-      notification.className = `notification notification-${type} fixed top-4 right-4 z-50 max-w-sm bg-white border rounded-lg shadow-lg p-4`
+      notification.className = `notification notification-${type} fixed top-4 right-4 z-50 max-w-sm bg-card border rounded-none shadow-lg p-4`
       notification.innerHTML = `
         <div class="flex items-start">
           <div class="flex-shrink-0">
@@ -1283,10 +1260,10 @@ const complianceMetrics = {
             </svg>
           </div>
           <div class="ml-3 flex-1">
-            <h3 class="text-sm font-medium text-gray-900">${title}</h3>
-            <p class="text-sm text-gray-500 mt-1">${message}</p>
+            <h3 class="text-sm font-medium text-foreground">${title}</h3>
+            <p class="text-sm text-muted-foreground mt-1">${message}</p>
           </div>
-          <button class="ml-4 text-gray-400 hover:text-gray-600" onclick="this.parentElement.parentElement.remove()">
+          <button class="ml-4 text-muted-foreground hover:text-muted-foreground" onclick="this.parentElement.parentElement.remove()">
             <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
             </svg>
@@ -1309,13 +1286,16 @@ const complianceMetrics = {
 
     private getStatusClass(status: string): string {
       const statusClasses: Record<string, string> = {
-        fulfilled: 'bg-green-100 text-green-800',
-        pending: 'bg-yellow-100 text-yellow-800',
-        overdue: 'bg-red-100 text-red-800 animate-pulse',
-        rejected: 'bg-red-100 text-red-800',
-        escalated: 'bg-orange-100 text-orange-800',
+        fulfilled: 'bg-secondary border border-input text-muted-foreground',
+        pending: 'bg-secondary border border-ring text-foreground',
+        overdue: 'bg-primary text-primary-foreground animate-pulse',
+        rejected: 'bg-primary text-primary-foreground',
+        escalated: 'bg-secondary border border-ring text-foreground',
       }
-      return statusClasses[status] || 'bg-gray-100 text-gray-800'
+      return (
+        statusClasses[status] ||
+        'bg-secondary border border-input text-muted-foreground'
+      )
     }
 
     private logAuditEvent(action: string, details: string): void {
