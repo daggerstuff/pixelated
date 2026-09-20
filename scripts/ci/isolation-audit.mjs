@@ -37,7 +37,10 @@ import {
 const OUT_DIR = resolve(ROOT, '.test-reliability')
 const ORDERED_REPORT = resolve(OUT_DIR, 'isolation-ordered.json')
 const SHUFFLED_REPORT = resolve(OUT_DIR, 'isolation-shuffled.json')
-const VITEST_CONFIG = resolve(ROOT, 'config/vitest.config.ts')
+// The single source of truth is the ROOT config; config/vitest.config.ts is
+// only a re-export (kept for the documented `-c config/...` invocation), so
+// source-text checks must read the root file.
+const VITEST_CONFIG = resolve(ROOT, 'vitest.config.ts')
 
 /** Structural check: the runner must keep per-file isolation. */
 function checkRunnerIsolation() {
@@ -138,7 +141,7 @@ function main() {
   if (structuralFailures) {
     console.error(
       '\n❌ The runner no longer isolates test files. Restore per-file ' +
-        'isolation before this can pass (see config/vitest.config.ts).',
+        'isolation before this can pass (see vitest.config.ts).',
     )
     process.exit(1)
   }
