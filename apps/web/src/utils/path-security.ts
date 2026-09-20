@@ -67,7 +67,11 @@ export function getProjectRoot(): string {
   // contains the workspace manifest. A fixed dirname chain breaks silently
   // when the file moves (it returned apps/web instead of the repo root).
   let dir = path.dirname(fileURLToPath(import.meta.url))
-  for (let i = 0; i < 10 && !fs.existsSync(path.join(dir, 'pnpm-workspace.yaml')); i++) {
+  for (
+    let i = 0;
+    i < 10 && !fs.existsSync(path.join(dir, 'pnpm-workspace.yaml'));
+    i++
+  ) {
     const parent = path.dirname(dir)
     if (parent === dir) break
     dir = parent
