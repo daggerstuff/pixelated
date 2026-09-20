@@ -19,6 +19,7 @@ Thumbs.db
 
 # === AI / LLM AGENTS & TOOLS ===
 .agents/
+.agent-runner/
 .antigravitycli/
 .art/
 .baselines/*
@@ -441,6 +442,7 @@ startup-system-wide.sh
 
 # px CLI link artifacts
 tools/px/pnpm-lock.yaml
+agents/*/pnpm-lock.yaml
 tools/px/pnpm-workspace.yaml
 
 # GitHub Copilot
