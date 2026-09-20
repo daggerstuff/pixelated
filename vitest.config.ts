@@ -110,7 +110,10 @@ export default defineConfig({
   resolve: {
     alias: [
       memorySchemaAlias,
-      { find: '@/', replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/` },
+      {
+        find: '@/',
+        replacement: `${path.resolve(process.cwd(), 'apps/web/src')}/`,
+      },
       {
         find: 'react-dom/test-utils',
         replacement: path.resolve(

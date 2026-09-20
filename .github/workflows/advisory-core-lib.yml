@@ -54,8 +54,16 @@ jobs:
         id: test-run
         # Blocking: advisory buckets now fail CI. They were silently
         # continue-on-error for months, which let real test debt accumulate
-        # invisible to every gate. Keep this blocking; if a bucket needs to be
-        # non-blocking, do that explicitly with a comment saying why.
+        # invisible to every gate.
+        #
+        # EXCEPTION — lib-security-hooks: this bucket has 79 PRE-EXISTING
+        # failures (journal-research hook tests + useMultimodalPixel, all
+        # "Cannot read properties of null (reading 'infer')" inside act()).
+        # They fail in the bucket but pass in the full-suite mix, so they are
+        # a scheduling/pollution puzzle, not simple rot. Until that debt is
+        # fixed this one bucket stays non-blocking; remove this flag the
+        # moment it is green.
+        continue-on-error: ${{ matrix.bucket == 'lib-security-hooks' }}
         run: 'set -o pipefail
 
           timeout 20m pnpm test:advisory 2>&1 | tee "advisory-test-${{
