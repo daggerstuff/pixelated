@@ -2,33 +2,65 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import { heroContent, workflowContent, ctaContent } from '@/lib/content'
 
-const hero = heroContent
-const workflow = workflowContent
-const cta = ctaContent
+const pageTitle = 'Pixelated Empathy'
+const metaDescription =
+  'A clinical simulation platform for therapist training. Trainees work a hard turn with an AI client. Supervisors mark the decision point and send the trainee back in with one sharper instruction.'
 
-const evidence = [
-  [
-    '01',
-    'Scenario brief',
-    'Faculty define the clinical pressure, skill target, and boundaries before a trainee enters the room.',
-  ],
-  [
-    '02',
-    'Live attempt',
-    'The trainee responds without a script while the simulated client adapts to timing, tone, and avoidance.',
-  ],
-  [
-    '03',
-    'Supervisor read',
-    'The complete exchange is reviewable turn by turn, with the exact decision point preserved.',
-  ],
-  [
-    '04',
-    'Directed retry',
-    'The trainee repeats the difficult moment with a specific coaching instruction instead of a vague note.',
-  ],
+const audience = [
+  {
+    label: 'For programs',
+    text: 'Assign the same AI client to every trainee. Scenarios cover intake, crisis, rupture repair, and disclosure — repeatable, standardized, and ready for accreditation review.',
+  },
+  {
+    label: 'For supervisors',
+    text: 'Open any attempt at the exact turn that mattered. Mark the decision point, leave a note, and assign a retry — the transcript is already there.',
+  },
+  {
+    label: 'For trainees',
+    text: 'Practice the moment without a script. See what changes when you return with a sharper instruction.',
+  },
+]
+
+const loopSteps = [
+  {
+    number: '01',
+    title: 'Pick the skill',
+    body: 'Intake, empathy, rupture repair, crisis response — or any skill your curriculum defines.',
+  },
+  {
+    number: '02',
+    title: 'Run the session',
+    body: 'The trainee responds in the moment. The transcript, context, and signals are preserved.',
+  },
+  {
+    number: '03',
+    title: 'Coach the retry',
+    body: 'Supervisors annotate the record, then assign a retry or the next case.',
+  },
+]
+
+const proofSteps = [
+  {
+    number: '01',
+    title: 'Scenario brief',
+    body: 'Faculty define the clinical pressure, skill target, and boundaries before a trainee enters the room.',
+  },
+  {
+    number: '02',
+    title: 'Live attempt',
+    body: 'The trainee responds without a script while the simulated client adapts to timing, tone, and avoidance.',
+  },
+  {
+    number: '03',
+    title: 'Supervisor read',
+    body: 'The complete exchange is reviewable turn by turn, with the exact decision point preserved.',
+  },
+  {
+    number: '04',
+    title: 'Directed retry',
+    body: 'The trainee repeats the difficult moment with a specific coaching instruction instead of a vague note.',
+  },
 ]
 
 const scenarioRows = [
@@ -43,94 +75,101 @@ const scenarioRows = [
 ]
 ---
 
-<BaseLayout title={hero.title} description={hero.metaDescription}>
-  <main class="case-home">
-    <section class="case-hero" aria-labelledby="case-title">
-      <div class="case-shell">
-        <div class="case-hero__copy">
-          <p class="case-index">Clinical simulation for therapist training</p>
-          <h1 id="case-title">
-            Practice the moment that usually gets discussed too late.
-          </h1>
-          <p class="case-hero__lede">
-            Trainees work through difficult therapy conversations in real time.
-            Supervisors review the exact exchange, mark the decision point, and
-            send the trainee back in with a sharper instruction.
+<BaseLayout title={pageTitle} description={metaDescription}>
+  <main class="empathy-home">
+    <section class="empathy-hero" aria-labelledby="empathy-title">
+      <div class="empathy-shell empathy-hero__grid">
+        <header class="empathy-hero__intro">
+          <p class="empathy-kicker">
+            Clinical simulation for therapist training
           </p>
-          <div class="case-actions">
+          <h1 class="empathy-title" id="empathy-title">{pageTitle}</h1>
+          <p class="empathy-lede">
+            One AI client. One transcript. One sharper instruction.
+          </p>
+          <div class="empathy-actions">
             <a
-              class="case-action case-action--solid"
-              href={withBasePath(hero.primaryCTA.href)}
+              class="empathy-action empathy-action--solid"
+              href={withBasePath('/contact')}
             >
-              {hero.primaryCTA.text}
+              Request a demo
             </a>
-            <a class="case-action" href={withBasePath(hero.secondaryCTA.href)}>
-              {hero.secondaryCTA.text}
-            </a>
+            <a class="empathy-action" href={withBasePath('/demo-hub')}
+              >See the demo</a
+            >
           </div>
-          <dl class="case-facts">
-            {
-              hero.proofPoints.map((point) => (
-                <div>
-                  <dt>{point.label}</dt>
-                  <dd>{point.text}</dd>
-                </div>
-              ))
-            }
-          </dl>
-        </div>
+        </header>
 
-        <article
-          class="case-console"
-          aria-label="Supervised therapy practice example"
-        >
-          <header class="case-console__head">
+        <article class="empathy-case" aria-labelledby="empathy-case-title">
+          <header class="empathy-case__head">
             <div>
-              <span class="case-console__id">CASE RP-08</span>
-              <strong>Withdrawal after a missed cue</strong>
+              <span class="empathy-case__id">RP-08</span>
+              <h2 class="empathy-case__title" id="empathy-case-title">
+                Withdrawal after a missed cue
+              </h2>
             </div>
-            <span class="case-status">Review open</span>
+            <span class="empathy-case__status">Review open</span>
           </header>
 
-          <div class="case-console__body">
-            <div class="case-turn case-turn--client">
-              <span class="case-turn__who">Client · 18:42</span>
-              <p>
-                You keep asking me to explain it differently. I am starting to
-                think you do not believe me.
-              </p>
-            </div>
+          <div class="empathy-case__body">
+            <ol class="empathy-transcript" aria-label="Practice transcript">
+              <li class="empathy-turn empathy-turn--client">
+                <span class="empathy-turn__marker" aria-hidden="true"></span>
+                <div class="empathy-turn__body">
+                  <span class="empathy-turn__who">Client · 18:42</span>
+                  <p class="empathy-turn__message">
+                    You keep asking me to explain it differently. I am starting
+                    to think you do not believe me.
+                  </p>
+                </div>
+              </li>
 
-            <div class="case-turn case-turn--trainee">
-              <span class="case-turn__who">Trainee · first response</span>
-              <p>
-                I do believe you. I am asking because I want to make sure I
-                understand everything that happened.
-              </p>
-            </div>
+              <li class="empathy-turn empathy-turn--trainee">
+                <span class="empathy-turn__marker" aria-hidden="true"></span>
+                <div class="empathy-turn__body">
+                  <span class="empathy-turn__who">Trainee · 18:43</span>
+                  <p class="empathy-turn__message">
+                    I do believe you. I am asking because I want to make sure I
+                    understand everything that happened.
+                  </p>
+                </div>
+              </li>
 
-            <aside class="case-review" aria-label="Supervisor review">
-              <div class="case-review__marker" aria-hidden="true">A</div>
-              <div>
-                <span class="case-review__by">Supervisor mark A</span>
-                <strong>Defended intent before naming impact.</strong>
-                <p>
-                  The client has already told you how the questioning landed.
-                  Stay with that injury before explaining why you asked.
-                </p>
-              </div>
-            </aside>
+              <li class="empathy-review">
+                <span class="empathy-review__marker" aria-hidden="true">A</span>
+                <div class="empathy-review__body">
+                  <span class="empathy-review__who">
+                    Supervisor mark A · turn 18:43
+                  </span>
+                  <strong class="empathy-review__heading">
+                    Defended intent before naming impact.
+                  </strong>
+                  <p class="empathy-review__note">
+                    The client has already told you how the questioning landed.
+                    Stay with that injury before explaining why you asked.
+                  </p>
+                  <span class="empathy-review__chip">Retry assigned</span>
+                </div>
+              </li>
 
-            <div class="case-turn case-turn--retry">
-              <span class="case-turn__who">Trainee · directed retry</span>
-              <p>
-                My questions left you feeling doubted. I can see why you would
-                pull back. Can we stay with what happened between us just now?
-              </p>
-            </div>
+              <li class="empathy-turn empathy-turn--trainee">
+                <span class="empathy-turn__marker" aria-hidden="true"></span>
+                <div class="empathy-turn__body">
+                  <span class="empathy-turn__who">
+                    Trainee · 18:46
+                    <span class="empathy-turn__tag">Directed retry</span>
+                  </span>
+                  <p class="empathy-turn__message">
+                    My questions left you feeling doubted. I can see why you
+                    would pull back. Can we stay with what happened between us
+                    just now?
+                  </p>
+                </div>
+              </li>
+            </ol>
           </div>
 
-          <footer class="case-console__foot">
+          <footer class="empathy-case__foot">
             <span>Supervisor mark A resolved</span>
             <span>Retry preserved in training record</span>
           </footer>
@@ -138,31 +177,49 @@ const scenarioRows = [
       </div>
     </section>
 
-    <section class="case-standards" aria-label="Platform standards">
-      <div class="case-shell case-standards__inner">
-        <span>HIPAA-ready</span>
-        <span>FERPA-aligned</span>
-        <span>Evidence-based scenarios</span>
-        <span>Accreditation-ready records</span>
+    <section class="empathy-facts-section" aria-label="Audience overview">
+      <div class="empathy-shell empathy-facts-section__grid">
+        {
+          audience.map((item) => (
+            <article>
+              <h3>{item.label}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))
+        }
       </div>
     </section>
 
-    <section class="case-process" aria-labelledby="process-title">
-      <div class="case-shell">
-        <div class="case-section-head">
-          <h2 id="process-title">{workflow.title}</h2>
-          <p>
-            A repeatable teaching loop built around observable decisions, not
-            recollection or role-play performance.
-          </p>
+    <section class="empathy-band" aria-label="Platform standards">
+      <div class="empathy-shell empathy-band__grid">
+        <span class="empathy-band__item">HIPAA-ready</span>
+        <span class="empathy-band__item">FERPA-aligned</span>
+        <span class="empathy-band__item">Evidence-based scenarios</span>
+        <span class="empathy-band__item">Accreditation-ready records</span>
+      </div>
+    </section>
+
+    <section class="empathy-loop" aria-labelledby="empathy-loop-title">
+      <div class="empathy-shell">
+        <div class="empathy-loop__head">
+          <div>
+            <h2 class="empathy-section-title" id="empathy-loop-title">
+              Assign. Review. Coach. Repeat.
+            </h2>
+            <p class="empathy-body">
+              A repeatable teaching loop built around observable decisions, not
+              recollection or role-play performance.
+            </p>
+          </div>
         </div>
-        <ol class="case-process__grid">
+
+        <ol class="empathy-loop__grid">
           {
-            workflow.steps.map((step) => (
-              <li>
-                <span>{step.number}</span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
+            loopSteps.map((step) => (
+              <li class="empathy-loop__item">
+                <span class="empathy-loop__number">{step.number}</span>
+                <h3 class="empathy-loop__title">{step.title}</h3>
+                <p class="empathy-loop__body">{step.body}</p>
               </li>
             ))
           }
@@ -170,75 +227,73 @@ const scenarioRows = [
       </div>
     </section>
 
-    <section class="case-evidence" aria-labelledby="evidence-title">
-      <div class="case-shell case-evidence__layout">
-        <div class="case-evidence__intro">
-          <h2 id="evidence-title">
-            One attempt becomes usable supervision evidence.
-          </h2>
-          <p>
+    <section class="empathy-proof" aria-labelledby="empathy-proof-title">
+      <div class="empathy-shell">
+        <div class="empathy-proof__head">
+          <div>
+            <h2 class="empathy-section-title" id="empathy-proof-title">
+              One attempt becomes usable supervision evidence.
+            </h2>
+          </div>
+          <p class="empathy-body">
             The scenario, transcript, supervisor mark, and retry stay attached
-            to one record. Faculty can teach from what happened without
+            to one record. Faculty teach from what happened instead of
             reconstructing the room from memory.
           </p>
-          <figure class="case-proof">
-            <img
-              src={withBasePath('/images/homepage/training-session-proof.png')}
-              alt="Pixelated Empathy practice and supervisor review interface"
-              loading="lazy"
-              width="960"
-              height="540"
-            />
-            <figcaption>
-              Practice room / supervisor review / retained record
-            </figcaption>
-          </figure>
         </div>
-        <ol class="case-evidence__list">
-          {
-            evidence.map(([number, title, body]) => (
-              <li>
-                <span>{number}</span>
-                <div>
-                  <h3>{title}</h3>
-                  <p>{body}</p>
-                </div>
-              </li>
-            ))
-          }
-        </ol>
+
+        <div class="empathy-proof__grid">
+          <p class="empathy-body empathy-proof__body">
+            Nothing is reconstructed afterwards. The record shows what was
+            said, when the supervisor stepped in, and what the trainee did
+            with the instruction — so review sessions start from evidence
+            instead of recall.
+          </p>
+          <ol class="empathy-proof__list">
+            {
+              proofSteps.map((step) => (
+                <li class="empathy-proof__item">
+                  <span class="empathy-proof__item-number">{step.number}</span>
+                  <div>
+                    <h3 class="empathy-proof__item-title">{step.title}</h3>
+                    <p class="empathy-proof__item-body">{step.body}</p>
+                  </div>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
       </div>
     </section>
 
-    <section class="case-scenarios" aria-labelledby="scenarios-title">
-      <div class="case-shell">
-        <div class="case-section-head case-section-head--wide">
-          <h2 id="scenarios-title">
-            Train where clinical judgment is easiest to lose.
-          </h2>
-          <p>
-            Scenario families can match a course, practicum, or supervision
-            team's actual curriculum.
-          </p>
+    <section class="empathy-library" aria-labelledby="empathy-library-title">
+      <div class="empathy-shell">
+        <div class="empathy-library__head">
+          <div>
+            <h2 class="empathy-section-title" id="empathy-library-title">
+              A library of repeatable scenarios
+            </h2>
+            <p class="empathy-body">
+              Standardized cases mean every trainee meets the same pressure.
+              Cohorts can be compared on decisions, not luck.
+            </p>
+          </div>
         </div>
-        <div
-          class="case-table"
-          role="table"
-          aria-label="Example scenario library"
-        >
-          <div class="case-table__row case-table__head" role="row">
-            <span role="columnheader">Case</span><span role="columnheader"
-              >Family</span
-            ><span role="columnheader">Clinical pressure</span><span
-              role="columnheader">Intensity</span
-            >
+
+        <div class="empathy-library__table">
+          <div class="empathy-library__row empathy-library__row--head">
+            <span class="empathy-library__cell">Case</span>
+            <span class="empathy-library__cell">Skill</span>
+            <span class="empathy-library__cell">Focus</span>
+            <span class="empathy-library__cell">Intensity</span>
           </div>
           {
             scenarioRows.map((row) => (
-              <div class="case-table__row" role="row">
-                {row.map((cell) => (
-                  <span role="cell">{cell}</span>
-                ))}
+              <div class="empathy-library__row empathy-library__row--body">
+                <span class="empathy-library__cell">{row[0]}</span>
+                <span class="empathy-library__cell">{row[1]}</span>
+                <span class="empathy-library__cell">{row[2]}</span>
+                <span class="empathy-library__cell">{row[3]}</span>
               </div>
             ))
           }
@@ -246,28 +301,28 @@ const scenarioRows = [
       </div>
     </section>
 
-    <section class="case-close" aria-labelledby="close-title">
-      <div class="case-shell case-close__layout">
+    <section class="empathy-close" aria-labelledby="empathy-close-title">
+      <div class="empathy-shell empathy-close__grid">
         <div>
-          <h2 id="close-title">{cta.title}</h2>
-          <p>{cta.intro}</p>
-        </div>
-        <div class="case-close__action">
-          <p>
-            Start with one cohort, one supervisor, and the conversations your
-            trainees avoid rehearsing.
+          <h2 class="empathy-section-title" id="empathy-close-title">
+            Run one scenario with your cohort.
+          </h2>
+          <p class="empathy-close__lede">
+            See the attempt, the mark, and the retry — end to end.
           </p>
-          <div class="case-actions">
-            <a
-              class="case-action case-action--solid"
-              href={withBasePath(cta.primaryCTA.href)}>{cta.primaryCTA.text}</a
-            >
-            <a class="case-action" href={withBasePath(cta.secondaryCTA.href)}
-              >{cta.secondaryCTA.text}</a
-            >
-          </div>
-          <small
-            >HIPAA-ready · Security review available · No client data required</small
+          <small class="empathy-close__note">
+            Demo sessions use synthetic clients. No student data required.
+          </small>
+        </div>
+        <div class="empathy-actions">
+          <a
+            class="empathy-action empathy-action--solid"
+            href={withBasePath('/contact')}
+          >
+            Request a demo
+          </a>
+          <a class="empathy-action" href={withBasePath('/demo-hub')}
+            >See the demo</a
           >
         </div>
       </div>
