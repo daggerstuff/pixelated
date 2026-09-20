@@ -1,225 +1,83 @@
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 
+import { BiasDetectionEngine } from '../../../lib/ai/bias-detection'
+
 const logger = createBuildSafeLogger('bias-detection-api')
 
+/**
+ * GET /api/bias-detection/dashboard
+ *
+ * Serves the bias-detection dashboard payload from the real engine.
+ * Query parameters:
+ *   - timeRange: 1h | 6h | 24h | 7d | 30d | 90d (default 24h)
+ *   - demographic: demographic filter (default 'all')
+ */
 export const GET = async ({
-  request: _request,
+  request,
 }: {
   request: Request
 }): Promise<Response> => {
   const startTime = Date.now()
 
   try {
-    // Parse URL parameters
+    const url = new URL(request.url)
+    const timeRange = url.searchParams.get('timeRange') || '24h'
+    const demographicFilter = url.searchParams.get('demographic') || 'all'
 
-    // Return mock dashboard data matching test expectations
-    const mockDashboardData = {
-      summary: {
-        totalSessions: 150,
-        averageBiasScore: 0.35,
-        alertsLast24h: 8,
-        totalAlerts: 12,
-        criticalIssues: 2,
-        improvementRate: 0.15,
-        complianceScore: 0.85,
-      },
-      alerts: [
-        {
-          alertId: 'alert-1',
-          timestamp: new Date('2024-01-15T09:30:00Z'),
-          level: 'high' as const,
-          type: 'high_bias',
-          message: 'High bias detected in therapeutic session',
-          sessionId: 'session-123',
-          acknowledged: false,
-        },
-        {
-          alertId: 'alert-2',
-          timestamp: new Date('2024-01-15T08:45:00Z'),
-          level: 'medium' as const,
-          type: 'medium_bias',
-          message: 'Medium bias detected in therapeutic session',
-          sessionId: 'session-124',
-          acknowledged: false,
-        },
-      ],
-      trends: [
-        {
-          date: new Date('2024-01-14T00:00:00Z'),
-          biasScore: 0.32,
-          sessionCount: 25,
-          alertCount: 3,
-          // Shape must match the DemographicBreakdown type (nested
-          // per-value { count, averageBias }), same as the real engine.
-          demographicBreakdown: {
-            age: { '18-24': { count: 1, averageBias: 0.3 } },
-            gender: { male: { count: 1, averageBias: 0.2 } },
-          },
-        },
-        {
-          date: new Date('2024-01-15T00:00:00Z'),
-          biasScore: 0.35,
-          sessionCount: 28,
-          alertCount: 4,
-          demographicBreakdown: {
-            age: { '18-24': { count: 1, averageBias: 0.35 } },
-            gender: { male: { count: 1, averageBias: 0.25 } },
-          },
-        },
-      ],
-      demographics: {
-        age: { '18-24': 20, '25-34': 35, '35-44': 25, '45-54': 15, '55+': 5 },
-        gender: { male: 45, female: 50, other: 5 },
-        ethnicity: { white: 20, hispanic: 30, black: 20, asian: 25, other: 5 },
-        intersectional: [],
-        language: { en: 80, es: 15, other: 5 },
-      },
-      recentAnalyses: [
-        {
-          sessionId: 'session-123',
-          timestamp: new Date('2024-01-15T09:30:00Z'),
-          overallBiasScore: 0.75,
-          alertLevel: 'high' as const,
-          confidence: 0.85,
-          demographics: {
-            age: '25-35',
-            gender: 'female',
-            ethnicity: 'hispanic',
-            primaryLanguage: 'en',
-          },
-          layerResults: {
-            preprocessing: {
-              biasScore: 0.7,
-              linguisticBias: {
-                genderBiasScore: 0.6,
-                racialBiasScore: 0.8,
-                ageBiasScore: 0.5,
-                culturalBiasScore: 0.7,
-                biasedTerms: [],
-                sentimentAnalysis: {
-                  overallSentiment: 0.2,
-                  emotionalValence: 0.3,
-                  subjectivity: 0.4,
-                  demographicVariations: {},
-                },
-              },
-              representationAnalysis: {
-                demographicDistribution: {},
-                underrepresentedGroups: [],
-                overrepresentedGroups: [],
-                diversityIndex: 0.5,
-                intersectionalityAnalysis: [],
-              },
-              dataQualityMetrics: {
-                completeness: 0.9,
-                consistency: 0.8,
-                accuracy: 0.85,
-                timeliness: 0.9,
-                validity: 0.88,
-                missingDataByDemographic: {},
-              },
-              recommendations: [],
-            },
-            modelLevel: {
-              biasScore: 0.8,
-              fairnessMetrics: {
-                demographicParity: 0.1,
-                equalOpportunity: 0.12,
-                equalizedOdds: 0.15,
-                calibration: 0.08,
-                individualFairness: 0.2,
-                counterfactualFairness: 0.18,
-              },
-              performanceMetrics: {
-                accuracy: 0.85,
-                precision: 0.82,
-                recall: 0.88,
-                f1Score: 0.85,
-                auc: 0.9,
-                calibrationError: 0.05,
-                demographicBreakdown: {},
-              },
-              groupPerformanceComparison: [],
-              recommendations: [],
-            },
-            interactive: {
-              biasScore: 0.7,
-              counterfactualAnalysis: {
-                scenariosAnalyzed: 10,
-                biasDetected: true,
-                problematicScenarios: [],
-                consistencyScore: 0.6,
-              },
-              featureImportance: [],
-              whatIfScenarios: [],
-              recommendations: [],
-            },
-            evaluation: {
-              biasScore: 0.75,
-              huggingFaceMetrics: {
-                toxicity: 0.1,
-                bias: 0.75,
-                fairness: 0.25,
-                stereotype: 0.3,
-                regard: {},
-              },
-              customMetrics: {
-                therapeuticBias: 0.8,
-                culturalSensitivity: 0.6,
-                professionalEthics: 0.7,
-                patientSafety: 0.9,
-              },
-              temporalAnalysis: {
-                trendDirection: 'worsening' as const,
-                changeRate: 0.05,
-                seasonalPatterns: [],
-                interventionEffectiveness: [],
-              },
-              recommendations: [],
-            },
-          },
-          recommendations: [],
-        },
-      ],
-      recommendations: [],
-    }
+    logger.info('Fetching bias detection dashboard data', {
+      timeRange,
+      demographicFilter,
+    })
 
-    const processingTime = Math.max(Date.now() - startTime, 1) // Ensure > 0
+    // The engine is a cheap config-only construction; per-request
+    // instantiation keeps the endpoint stateless.
+    const engine = new BiasDetectionEngine()
+    const data = await engine.getDashboardData({
+      timeRange,
+      demographicFilter,
+    })
+
+    const processingTime = Math.max(Date.now() - startTime, 1)
+
+    logger.info('Dashboard data retrieved successfully', {
+      processingTime,
+      alertCount: data.alerts?.length ?? 0,
+      sessionCount: data.summary?.totalSessions ?? 0,
+    })
 
     return new Response(
       JSON.stringify({
         success: true,
-        data: mockDashboardData,
+        data,
         processingTime,
       }),
       {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
+          'X-Processing-Time': String(processingTime),
         },
       },
     )
   } catch (error: unknown) {
-    logger.error('Error fetching dashboard data:', error)
+    logger.error('Failed to fetch dashboard data', {
+      error: String(error),
+    })
 
-    const processingTime = Date.now() - startTime
+    const processingTime = Math.max(Date.now() - startTime, 1)
 
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Dashboard Data Retrieval Failed',
-        message:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
         processingTime,
       }),
       {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
+          'X-Processing-Time': String(processingTime),
         },
       },
     )
