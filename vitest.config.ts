@@ -75,7 +75,10 @@ const targetedTestGlobs = process.env['VITEST_TARGET_TESTS']
 // React provider tests under src/lib/providers need jsdom (window, localStorage,
 // matchMedia). Per-file @vitest-environment is ignored when a vitest project
 // include glob pins the file to the node project.
-const targetedJsdomLibGlobs = ['/lib/providers/']
+// src/lib/hooks is the same case: journal-research hook tests are renderHook +
+// act() suites that need jsdom; without this pin the /lib/ heuristic routed
+// them to node, where jsdom-dependent singletons are null (79 bucket failures).
+const targetedJsdomLibGlobs = ['/lib/providers/', '/lib/hooks/']
 
 const targetedNodeTestGlobs = targetedTestGlobs.filter(
   (entry) =>
