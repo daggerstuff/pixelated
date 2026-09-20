@@ -280,7 +280,12 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     mockBiasEngine = {
       getDashboardData: vi.fn().mockResolvedValue(mockDashboardData),
     }
-    vi.mocked(BiasDetectionEngine).mockImplementation(() => mockBiasEngine)
+    // A plain function (not an arrow) so `new BiasDetectionEngine()` in the
+    // route constructs successfully; returning an object from a constructor
+    // overrides `this`, handing the route our mock engine.
+    vi.mocked(BiasDetectionEngine).mockImplementation(function () {
+      return mockBiasEngine
+    })
   })
 
   afterEach(() => {
@@ -300,19 +305,18 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       expect(responseData.data).toEqual(serializableMockDashboardData)
       expect(typeof responseData.processingTime).toBe('number')
 
-      // Note: Mock API doesn't call engine
-      // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-      //   timeRange: '24h',
-      //   demographicFilter: 'all',
-      // })
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+        timeRange: '24h',
+        demographicFilter: 'all',
+      })
 
-      // expect(mockLogger.info).toHaveBeenCalledWith(
-      //   'Fetching bias detection dashboard data',
-      //   {
-      //     timeRange: '24h',
-      //     demographicFilter: 'all',
-      //   },
-      // )
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Fetching bias detection dashboard data',
+        {
+          timeRange: '24h',
+          demographicFilter: 'all',
+        },
+      )
     })
 
     it('should handle custom time range parameter', async () => {
@@ -324,11 +328,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
 
-      // Note: Mock API doesn't call engine
-      // // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-      //   timeRange: '7d',
-      //   demographicFilter: 'all',
-      // })
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+        timeRange: '7d',
+        demographicFilter: 'all',
+      })
     })
 
     it('should handle custom demographic filter parameter', async () => {
@@ -340,10 +343,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
 
-      // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-      //   timeRange: '24h',
-      //   demographicFilter: 'female',
-      // })
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+        timeRange: '24h',
+        demographicFilter: 'female',
+      })
     })
 
     it('should handle multiple query parameters', async () => {
@@ -358,10 +361,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
 
-      // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-      //   timeRange: '30d',
-      //   demographicFilter: 'hispanic',
-      // })
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+        timeRange: '30d',
+        demographicFilter: 'hispanic',
+      })
     })
 
     it('should handle bias detection engine errors', async () => {
@@ -370,34 +373,21 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const request = createMockRequest()
 
-      vi.stubGlobal(
-        'Response',
-        vi.fn(function (body: string, init?: ResponseInit) {
-          return {
-            status: init?.status ?? 500,
-            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-            headers: {
-              get: vi.fn((_key: string) => 'application/json'),
-            },
-          }
-        }),
-      )
-
       const response = await GET({ request })
 
-      expect(response.status).toBe(200) // Mock API always returns 200
+      expect(response.status).toBe(500)
 
       const responseData = await response.json()
-      expect(responseData.success).toBe(true) // Mock API always succeeds
-      // expect(responseData.error).toBe('Dashboard Data Retrieval Failed')
-      // expect(responseData.message).toBe('Database connection failed')
+      expect(responseData.success).toBe(false)
+      expect(responseData.error).toBe('Dashboard Data Retrieval Failed')
+      expect(responseData.message).toBe('Database connection failed')
 
-      // expect(mockLogger.error).toHaveBeenCalledWith(
-      //   'Failed to fetch dashboard data',
-      //   expect.objectContaining({
-      //     error: String(error),
-      //   }),
-      // )
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Failed to fetch dashboard data',
+        expect.objectContaining({
+          error: String(error),
+        }),
+      )
     })
 
     it('should handle empty dashboard data', async () => {
@@ -433,9 +423,9 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const responseData = await response.json()
       expect(responseData.success).toBe(true)
-      expect(responseData.data).toEqual(serializableMockDashboardData) // Mock API returns standard data
-      expect(responseData.data.summary.totalSessions).toBe(150) // Mock value
-      expect(responseData.data.alerts).toHaveLength(2) // Mock has 2 alerts
+      expect(responseData.data).toEqual(JSON.parse(JSON.stringify(emptyDashboardData)))
+      expect(responseData.data.summary.totalSessions).toBe(0)
+      expect(responseData.data.alerts).toHaveLength(0)
     })
 
     it('should validate time range parameter values', async () => {
@@ -446,10 +436,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         const response = await GET({ request })
 
         expect(response.status).toBe(200)
-        // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-        //   timeRange,
-        //   demographicFilter: 'all',
-        // })
+        expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+          timeRange,
+          demographicFilter: 'all',
+        })
       }
     })
 
@@ -459,10 +449,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       expect(response.status).toBe(200)
 
-      // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-      //   timeRange: 'invalid',
-      //   demographicFilter: 'all',
-      // })
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+        timeRange: 'invalid',
+        demographicFilter: 'all',
+      })
     })
 
     it('should set appropriate response headers', async () => {
@@ -486,7 +476,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
         expect(response.status).toBe(200)
       })
 
-      // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledTimes(5)
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledTimes(5)
     })
 
     it('should handle network timeout scenarios', async () => {
@@ -499,27 +489,14 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       const request = createMockRequest()
 
-      vi.stubGlobal(
-        'Response',
-        vi.fn(function (body: string, init?: ResponseInit) {
-          return {
-            status: init?.status ?? 500,
-            json: vi.fn().mockResolvedValue(JSON.parse(body) as unknown),
-            headers: {
-              get: vi.fn((_key: string) => 'application/json'),
-            },
-          }
-        }),
-      )
-
       const response = await GET({ request })
 
-      expect(response.status).toBe(200) // Mock API always returns 200
+      expect(response.status).toBe(500)
 
       const responseData = await response.json()
-      expect(responseData.success).toBe(true) // Mock API always succeeds
-      // expect(responseData.error).toBe('Dashboard Data Retrieval Failed')
-      // expect(responseData.message).toBe('Request timeout')
+      expect(responseData.success).toBe(false)
+      expect(responseData.error).toBe('Dashboard Data Retrieval Failed')
+      expect(responseData.message).toBe('Request timeout')
     })
 
     it('should log performance metrics', async () => {
@@ -532,14 +509,14 @@ describe('Bias Detection Dashboard API Endpoint', () => {
       expect(typeof responseData.processingTime).toBe('number')
       expect(responseData.processingTime).toBeGreaterThan(0)
 
-      // expect(mockLogger.info).toHaveBeenCalledWith(
-      //   'Dashboard data retrieved successfully',
-      //   expect.objectContaining({
-      //     processingTime: expect.any(Number),
-      //     alertCount: mockDashboardData.alerts.length,
-      //     sessionCount: mockDashboardData.summary.totalSessions,
-      //   }),
-      // )
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Dashboard data retrieved successfully',
+        expect.objectContaining({
+          processingTime: expect.any(Number),
+          alertCount: mockDashboardData.alerts.length,
+          sessionCount: mockDashboardData.summary.totalSessions,
+        }),
+      )
     })
 
     it('should handle malformed URL parameters', async () => {
@@ -560,10 +537,10 @@ describe('Bias Detection Dashboard API Endpoint', () => {
 
       expect(response.status).toBe(200)
 
-      // expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
-      //   timeRange: '24h',
-      //   demographicFilter: 'all',
-      // })
+      expect(mockBiasEngine.getDashboardData).toHaveBeenCalledWith({
+        timeRange: '24h',
+        demographicFilter: 'all',
+      })
     })
   })
 })

@@ -5,6 +5,7 @@
  * All file operations should use these utilities to ensure paths are safe.
  */
 
+import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
@@ -62,9 +63,16 @@ export function getProjectRoot(): string {
   if (process?.cwd) {
     return process.cwd()
   }
-  // Fallback for edge cases
-  const __filename = fileURLToPath(import.meta.url)
-  return path.dirname(path.dirname(path.dirname(__filename)))
+  // Fallback for edge cases: walk up from this file to the directory that
+  // contains the workspace manifest. A fixed dirname chain breaks silently
+  // when the file moves (it returned apps/web instead of the repo root).
+  let dir = path.dirname(fileURLToPath(import.meta.url))
+  for (let i = 0; i < 10 && !fs.existsSync(path.join(dir, 'pnpm-workspace.yaml')); i++) {
+    const parent = path.dirname(dir)
+    if (parent === dir) break
+    dir = parent
+  }
+  return dir
 }
 
 /**

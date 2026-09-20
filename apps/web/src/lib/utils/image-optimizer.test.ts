@@ -311,14 +311,19 @@ describe('ImageOptimizer', () => {
 
   describe('resizeImage (via optimizeImage)', () => {
     it('should generate resize variants for images wider than breakpoints', async () => {
-      const rawNoise = Buffer.alloc(1300 * 800 * 3)
+      // Width must exceed the widest breakpoint; height is irrelevant to the
+      // behavior under test, so keep it tiny - a full-size noise image made
+      // this test time out under full-suite load.
+      const W = 1300
+      const H = 100
+      const rawNoise = Buffer.alloc(W * H * 3)
       for (let i = 0; i < rawNoise.length; i += 3) {
         rawNoise[i] = Math.floor(Math.random() * 256)
         rawNoise[i + 1] = Math.floor(Math.random() * 256)
         rawNoise[i + 2] = Math.floor(Math.random() * 256)
       }
       const wideBuffer = await sharp(rawNoise, {
-        raw: { width: 1300, height: 800, channels: 3 },
+        raw: { width: W, height: H, channels: 3 },
       })
         .jpeg({ quality: 85 })
         .toBuffer()

@@ -1,5 +1,5 @@
 import type { ToolContext } from 'eve/tools'
-import { describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest'
 
 import getWorktree from '../agent/tools/get_worktree.js'
 import readFile from '../agent/tools/read_file.js'
@@ -17,6 +17,20 @@ describe('advisor-agent tools', () => {
   })
 
   describe('read_file tool', () => {
+    // The tool resolves relative paths against process.cwd(). In production
+    // the agent runs with cwd = its own directory; pin that here so the test
+    // is independent of which directory the suite runner starts from.
+    // (import.meta.url is .../tests/tools.test.ts — the agent dir is one up.)
+    const agentDir = new URL('../', import.meta.url).pathname.replace(/\/$/, '')
+
+    beforeEach(() => {
+      vi.spyOn(process, 'cwd').mockReturnValue(agentDir)
+    })
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
     it('reads existing file within project root', async () => {
       const result = await readFile.execute({ path: 'package.json' }, ctx)
       expect(typeof result).toBe('string')
