@@ -433,6 +433,17 @@
 .empathy-proof {
   background: var(--empathy-ink);
   color: var(--empathy-bg);
+
+  /* The section inverts the surface, so the muted role must invert with it:
+     the default --empathy-muted (oklch 0.62) renders 2.97:1 against the
+     dark-mode ink background. oklch(0.42) holds 4.7:1 there. */
+  --empathy-muted: oklch(0.42 0 0);
+}
+
+:root[data-theme='light'] .empathy-proof {
+  /* Inverted in light mode too: bg is ink oklch(0.15). oklch(0.62) keeps
+     6.9:1 on that dark surface. */
+  --empathy-muted: oklch(0.62 0 0);
 }
 
 .empathy-proof__grid {
