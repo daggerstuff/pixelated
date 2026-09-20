@@ -31,9 +31,12 @@ const baseNodeTestGlobs = [
   'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
   'apps/web/src/lib/__tests__/security-implementation.test.ts',
   'apps/web/src/lib/ai/__tests__/getAIService.test.ts',
+  'apps/web/src/lib/ai/__tests__/providers.test.ts',
   'apps/web/src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
   'apps/web/src/lib/graphql/__tests__/graphql.test.ts',
   'apps/web/src/lib/graphql/__tests__/client.test.ts',
+  'apps/web/src/lib/utils/image-optimizer.test.ts',
+  'apps/web/src/lib/admin/__tests__/**/*.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -261,6 +264,8 @@ export default defineConfig({
             ...nodeTestGlobs,
             'apps/web/src/lib/security/__tests__/**/*.test.ts',
             'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'apps/web/src/lib/security/threat-detection/**/*.test.ts',
+            'apps/web/src/lib/ai/crisis/**/*.test.ts',
             'apps/web/src/lib/redis.test.ts',
             'apps/web/src/lib/services/notification/__tests__/NotificationService.test.ts',
             'apps/web/src/lib/__tests__/security-implementation.test.ts',
@@ -310,6 +315,8 @@ export default defineConfig({
                   ...nodeTestGlobs,
                   'apps/web/src/lib/security/__tests__/**/*.test.ts',
                   'apps/web/src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'apps/web/src/lib/security/threat-detection/**/*.test.ts',
+                  'apps/web/src/lib/ai/crisis/**/*.test.ts',
                   'apps/web/src/tests/auth.test.ts',
                   'apps/web/src/tests/integration/dream-consolidation.integration.test.ts',
                 ],
@@ -345,7 +352,7 @@ export default defineConfig({
       reportsDirectory: './coverage',
       // Bucketed advisory runs execute a subset of the corpus, so global
       // coverage math can never be meaningful there — thresholds apply only
-      // to full-suite runs. (Keep in sync with config/vitest.config.ts.)
+      // to full-suite runs. (config/vitest.config.ts re-exports this file.)
       thresholds: process.env['VITEST_BUCKET']
         ? undefined
         : {
