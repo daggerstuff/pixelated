@@ -37,22 +37,24 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
     <div class="flex items-center mb-6">
       <a
         href="/admin/security/baa/templates"
-        class="text-indigo-600 hover:text-indigo-900 mr-4"
+        class="text-foreground hover:underline mr-4"
       >
         &larr; Back to Templates
       </a>
-      <h1 class="text-2xl font-bold text-gray-800">Create New BAA Template</h1>
+      <h1 class="text-2xl font-bold text-foreground">
+        Create New BAA Template
+      </h1>
     </div>
 
     <form id="template-form" class="space-y-8">
-      <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="bg-card rounded-none border border-border p-6">
         <h2 class="text-xl font-semibold mb-4">Template Details</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label
               for="templateName"
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
               >Template Name*</label
             >
             <input
@@ -60,7 +62,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               id="templateName"
               name="templateName"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="e.g., Standard HIPAA BAA Template"
             />
           </div>
@@ -68,7 +70,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="templateVersion"
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
               >Version*</label
             >
             <input
@@ -76,7 +78,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               id="templateVersion"
               name="templateVersion"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="e.g., 1.0.0"
             />
           </div>
@@ -84,7 +86,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div class="md:col-span-2">
             <label
               for="templateDescription"
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
               >Description*</label
             >
             <textarea
@@ -92,7 +94,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               name="templateDescription"
               rows="3"
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="Describe the purpose and use case for this template"
             ></textarea>
           </div>
@@ -100,7 +102,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="associateTypes"
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
               >Associate Types*</label
             >
             <select
@@ -108,7 +110,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               name="associateTypes"
               multiple
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               size="5"
             >
               {
@@ -117,7 +119,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
                 ))
               }
             </select>
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-muted-foreground mt-1">
               Hold Ctrl/Cmd to select multiple types
             </p>
           </div>
@@ -125,7 +127,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="serviceCategories"
-              class="block text-sm font-medium text-gray-700 mb-1"
+              class="block text-sm font-medium text-foreground mb-1"
               >Service Categories*</label
             >
             <select
@@ -133,7 +135,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               name="serviceCategories"
               multiple
               required
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               size="5"
             >
               {
@@ -142,7 +144,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
                 ))
               }
             </select>
-            <p class="text-xs text-gray-500 mt-1">
+            <p class="text-xs text-muted-foreground mt-1">
               Hold Ctrl/Cmd to select multiple categories
             </p>
           </div>
@@ -150,16 +152,18 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <div>
             <label
               for="tags"
-              class="block text-sm font-medium text-gray-700 mb-1">Tags</label
+              class="block text-sm font-medium text-foreground mb-1">Tags</label
             >
             <input
               type="text"
               id="tags"
               name="tags"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               placeholder="e.g., hipaa, vendor, cloud-storage"
             />
-            <p class="text-xs text-gray-500 mt-1">Comma-separated tags</p>
+            <p class="text-xs text-muted-foreground mt-1">
+              Comma-separated tags
+            </p>
           </div>
 
           <div class="flex items-center">
@@ -167,22 +171,22 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
               type="checkbox"
               id="isDefault"
               name="isDefault"
-              class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              class="h-4 w-4 border-input rounded-none"
             />
-            <label for="isDefault" class="ml-2 block text-sm text-gray-700">
+            <label for="isDefault" class="ml-2 block text-sm text-foreground">
               Set
             </label>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="bg-card rounded-none border border-border p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Template Sections</h2>
           <button
             type="button"
             id="add-section-btn"
-            class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors text-sm"
+            class="px-3 py-1 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors text-sm"
           >
             Add New Section
           </button>
@@ -190,8 +194,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
         <div id="sections-container" class="space-y-6">
           <!-- Sections will be added here dynamically -->
-          <div class="border border-gray-200 p-4 rounded-md">
-            <p class="text-center text-gray-500 my-4">
+          <div class="border border-border p-4 rounded-none">
+            <p class="text-center text-muted-foreground my-4">
               No sections added yet. Click "Add New Section" or "Use Standard
               Sections" to add sections to your template.
             </p>
@@ -202,20 +206,20 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <button
             type="button"
             id="use-standard-sections-btn"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+            class="px-4 py-2 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors"
           >
             Use Standard Sections
           </button>
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm p-6">
+      <div class="bg-card rounded-none border border-border p-6">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold">Template Placeholders</h2>
           <button
             type="button"
             id="add-placeholder-btn"
-            class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded hover:bg-indigo-200 transition-colors text-sm"
+            class="px-3 py-1 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors text-sm"
           >
             Add New Placeholder
           </button>
@@ -223,8 +227,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
         <div id="placeholders-container" class="space-y-6">
           <!-- Placeholders will be added here dynamically -->
-          <div class="border border-gray-200 p-4 rounded-md">
-            <p class="text-center text-gray-500 my-4">
+          <div class="border border-border p-4 rounded-none">
+            <p class="text-center text-muted-foreground my-4">
               No placeholders added yet. Click "Add New Placeholder" or "Use
               Standard Placeholders" to add placeholders to your template.
             </p>
@@ -235,7 +239,7 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
           <button
             type="button"
             id="use-standard-placeholders-btn"
-            class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+            class="px-4 py-2 bg-secondary border border-input text-foreground rounded-none hover:bg-accent transition-colors"
           >
             Use Standard Placeholders
           </button>
@@ -245,13 +249,13 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
       <div class="flex justify-end space-x-4">
         <a
           href="/admin/security/baa/templates"
-          class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-4 py-2 border border-input rounded-none text-sm font-medium text-foreground bg-card hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           Cancel
         </a>
         <button
           type="submit"
-          class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="px-4 py-2 border border-transparent rounded-none text-sm font-medium text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           Create Template
         </button>
@@ -286,8 +290,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
       if (sections.length === 0) {
         sectionsContainer.innerHTML = `
-          <div class="border border-gray-200 p-4 rounded-md">
-            <p class="text-center text-gray-500 my-4">
+          <div class="border border-border p-4 rounded-none">
+            <p class="text-center text-muted-foreground my-4">
               No sections added yet. Click "Add New Section" or "Use Standard Sections" to add sections to your template.
             </p>
           </div>
@@ -298,56 +302,56 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
       sectionsContainer.innerHTML = ''
       sections.forEach((section, index) => {
         const sectionElement = document.createElement('div')
-        sectionElement.className = 'border border-gray-200 p-4 rounded-md'
+        sectionElement.className = 'border border-border p-4 rounded-none'
         sectionElement.innerHTML = `
           <div class="flex justify-between items-center mb-3">
             <h3 class="font-medium">${section.title}</h3>
             <div>
-              <button type="button" class="move-up-section text-gray-500 hover:text-gray-700 mr-2" ${index === 0 ? 'disabled' : ''}>
+              <button type="button" class="move-up-section text-muted-foreground hover:text-foreground mr-2" ${index === 0 ? 'disabled' : ''}>
                 ↑
               </button>
-              <button type="button" class="move-down-section text-gray-500 hover:text-gray-700 mr-2" ${index === sections.length - 1 ? 'disabled' : ''}>
+              <button type="button" class="move-down-section text-muted-foreground hover:text-foreground mr-2" ${index === sections.length - 1 ? 'disabled' : ''}>
                 ↓
               </button>
-              <button type="button" class="remove-section text-red-500 hover:text-red-700">
+              <button type="button" class="remove-section text-foreground hover:opacity-70">
                 ×
               </button>
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+              <label class="block text-sm font-medium text-foreground mb-1">Title</label>
               <input
                 type="text"
                 value="${section.title}"
-                class="section-title w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="section-title w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label class="block text-sm font-medium text-foreground mb-1">Description</label>
               <input
                 type="text"
                 value="${section.description || ''}"
-                class="section-description w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="section-description w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
           <div class="mb-3">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+            <label class="block text-sm font-medium text-foreground mb-1">Content</label>
             <textarea
               rows="4"
-              class="section-content w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+              class="section-content w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
             >${section.content}</textarea>
-            <p class="text-xs text-gray-500 mt-1">Supports basic Markdown formatting (e.g., **bold**, *italic*)</p>
+            <p class="text-xs text-muted-foreground mt-1">Supports basic Markdown formatting (e.g., **bold**, *italic*)</p>
           </div>
           <div>
             <label class="flex items-center">
               <input
                 type="checkbox"
-                class="section-required h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                class="section-required h-4 w-4 border-input rounded-none"
                 ${section.required ? 'checked' : ''}
               />
-              <span class="ml-2 text-sm text-gray-700">Required section (cannot be removed from generated documents)</span>
+              <span class="ml-2 text-sm text-foreground">Required section (cannot be removed from generated documents)</span>
             </label>
           </div>
         `
@@ -419,8 +423,8 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
 
       if (placeholders.length === 0) {
         placeholdersContainer.innerHTML = `
-          <div class="border border-gray-200 p-4 rounded-md">
-            <p class="text-center text-gray-500 my-4">
+          <div class="border border-border p-4 rounded-none">
+            <p class="text-center text-muted-foreground my-4">
               No placeholders added yet. Click "Add New Placeholder" or "Use Standard Placeholders" to add placeholders to your template.
             </p>
           </div>
@@ -431,48 +435,48 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
       placeholdersContainer.innerHTML = ''
       placeholders.forEach((placeholder, index) => {
         const placeholderElement = document.createElement('div')
-        placeholderElement.className = 'border border-gray-200 p-4 rounded-md'
+        placeholderElement.className = 'border border-border p-4 rounded-none'
         placeholderElement.innerHTML = `
           <div class="flex justify-between items-center mb-3">
             <h3 class="font-medium">${placeholder.label}</h3>
-            <button type="button" class="remove-placeholder text-red-500 hover:text-red-700">
+            <button type="button" class="remove-placeholder text-foreground hover:opacity-70">
               ×
             </button>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Key</label>
+              <label class="block text-sm font-medium text-foreground mb-1">Key</label>
               <input
                 type="text"
                 value="${placeholder.key}"
-                class="placeholder-key w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="placeholder-key w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
-              <p class="text-xs text-gray-500 mt-1">Use in content{{KEY}}</p>
+              <p class="text-xs text-muted-foreground mt-1">Use in content{{KEY}}</p>
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Label</label>
+              <label class="block text-sm font-medium text-foreground mb-1">Label</label>
               <input
                 type="text"
                 value="${placeholder.label}"
-                class="placeholder-label w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="placeholder-label w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label class="block text-sm font-medium text-foreground mb-1">Description</label>
               <input
                 type="text"
                 value="${placeholder.description}"
-                class="placeholder-description w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="placeholder-description w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Default Value</label>
+              <label class="block text-sm font-medium text-foreground mb-1">Default Value</label>
               <input
                 type="text"
                 value="${placeholder.defaultValue || ''}"
-                class="placeholder-default w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                class="placeholder-default w-full px-3 py-2 border border-input bg-background text-foreground rounded-none focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
           </div>
@@ -480,10 +484,10 @@ const serviceCategoryOptions = Object.values(ServiceCategory).map(
             <label class="flex items-center">
               <input
                 type="checkbox"
-                class="placeholder-required h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                class="placeholder-required h-4 w-4 border-input rounded-none"
                 ${placeholder.required ? 'checked' : ''}
               />
-              <span class="ml-2 text-sm text-gray-700">Required (must be filled when creating a document)</span>
+              <span class="ml-2 text-sm text-foreground">Required (must be filled when creating a document)</span>
             </label>
           </div>
         `
