@@ -120,6 +120,8 @@ export async function executeWithFallback(
         const result = await service.createChatCompletion(messages, options)
         if (attempt > 0) {
           logger.info(`${provider} succeeded on attempt ${attempt + 1}`)
+        } else {
+          logger.info(`${provider} succeeded`)
         }
         return result
       } catch (error: unknown) {

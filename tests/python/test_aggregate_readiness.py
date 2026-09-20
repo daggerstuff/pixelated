@@ -382,7 +382,11 @@ def test_calculate_provider_summary_cancelled_is_failure() -> None:
 
 def test_aggregate_readiness_dry_run(tmp_path) -> None:
     output_file = tmp_path / "readiness.json"
-    exit_code = mod.aggregate_readiness(dry_run=True, output_path=str(output_file))
+    exit_code = mod.aggregate_readiness(
+        dry_run=True,
+        output_path=str(output_file),
+        providers=[],
+    )
     assert exit_code == 0
     assert output_file.exists()
 
