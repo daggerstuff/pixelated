@@ -1,7 +1,7 @@
 ---
-// Type system: The Quiet Instrument, documentary grotesk. Libre Franklin
-// Variable carries display, body, and tracked-uppercase labels — one
-// family. IBM Plex Mono stays for app-internal code/data utility.
+// Type system: Quiet Instrument, clinical editorial. Instrument Serif
+// carries display. Instrument Sans Variable carries body and tracked
+// uppercase labels. Spline Sans Mono stays for app-internal code/data.
 // Weight, size, and tracking carry hierarchy.
 import '@/lib/fonts'
 /* Astro-palette base tokens (AGPL import-only CSS, no .astro source copied) */
@@ -156,24 +156,6 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href={withBasePath('/sitemap-index.xml')} />
     <link rel="stylesheet" href={withBasePath('/css/style.css')} />
-    <!-- Preload variable font subsets used by hero/display text to start
-         fetching earlier in the critical path (before CSS @font-face parse).
-         Latin subsets cover >95% of rendered characters on initial viewport. -->
-    {
-      isVercelDeploy && (
-        <>
-          <link
-            rel="preload"
-            href={withBasePath(
-              '/_astro/libre-franklin-latin-wght-normal-CLTz0ja0.woff2',
-            )}
-            as="font"
-            type="font/woff2"
-            crossorigin="anonymous"
-          />
-        </>
-      )
-    }
     <title>{fullTitle}</title>
 
     <meta property="og:type" content={ogType} />
@@ -628,7 +610,7 @@ mixpanel.init('${mixpanelToken}', { autocapture: true });
   .brand span {
     font-family: var(--np-font-display);
     font-size: 1rem;
-    font-weight: 350;
+    font-weight: var(--np-weight-display);
     letter-spacing: -0.02em;
     line-height: 1.1;
     color: var(--np-text);
