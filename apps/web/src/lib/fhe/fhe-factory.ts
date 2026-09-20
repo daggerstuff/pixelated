@@ -295,10 +295,7 @@ const sealFHEService: FHEService = {
       const bCiphertext: SealCipherText = seal.CipherText()
       bCiphertext.load(context, bCiphertextStr as string)
 
-      const result = await sealOperations.multiply(
-        aCiphertext,
-        bCiphertext,
-      )
+      const result = await sealOperations.multiply(aCiphertext, bCiphertext)
 
       // Clean up the SealCipherText objects
       aCiphertext.delete()
@@ -363,10 +360,7 @@ const sealFHEService: FHEService = {
       const cipherObj: SealCipherText = seal.CipherText()
       cipherObj.load(context, ciphertext as string)
 
-      const result = await sealOperations.polynomial(
-        cipherObj,
-        coefficients,
-      )
+      const result = await sealOperations.polynomial(cipherObj, coefficients)
 
       cipherObj.delete()
 

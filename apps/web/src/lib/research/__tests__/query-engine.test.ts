@@ -697,9 +697,7 @@ describe('QueryDSL', () => {
         anonymizationLevel: 'medium',
         dsl: {
           filters: { sessionType: 'group' },
-          aggregations: [
-            { field: 'technique_effectiveness', function: 'avg' },
-          ],
+          aggregations: [{ field: 'technique_effectiveness', function: 'avg' }],
         },
       },
       'researcher-001',
