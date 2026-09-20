@@ -277,12 +277,12 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext =
+      const aCiphertextStr =
         a.metadata?.['serializedCiphertext'] ?? (a.data as string)
-      const bCiphertext =
+      const bCiphertextStr =
         b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
-      if (!aCiphertext || !bCiphertext) {
+      if (!aCiphertextStr || !bCiphertextStr) {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
@@ -290,15 +290,19 @@ const sealFHEService: FHEService = {
       const context = sealService.getContext()
 
       const aCiphertext: SealCipherText = seal.CipherText()
-      aCiphertext.load(context, aCiphertext as string)
+      aCiphertext.load(context, aCiphertextStr as string)
 
       const bCiphertext: SealCipherText = seal.CipherText()
-      bCiphertext.load(context, bCiphertext as string)
+      bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.multiply(
         aCiphertext,
         bCiphertext,
       )
+
+      // Clean up the SealCipherText objects
+      aCiphertext.delete()
+      bCiphertext.delete()
 
       if (!result.success) {
         throw new Error(result.error ?? 'Multiplication operation failed')

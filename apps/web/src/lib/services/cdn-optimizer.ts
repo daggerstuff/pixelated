@@ -512,7 +512,7 @@ export class CDNUtility {
       // Assets to cache for offline functionality
       const CACHE_ASSETS = [
         '/',
-        '/manifest.json',
+        '/manifest.webmanifest',
         // Add critical CDN assets here
       ]
 
