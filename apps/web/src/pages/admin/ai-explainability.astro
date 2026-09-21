@@ -5,10 +5,10 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 <DashboardLayout title="AI Explainability Dashboard | Admin">
   <div class="container px-4 py-8 mx-auto max-w-6xl">
     <header class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      <h1 class="text-2xl font-bold text-foreground">
         AI Explainability Dashboard
       </h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">
+      <p class="mt-2 text-muted-foreground">
         View confidence scores, source attribution, and technique mapping for AI
         emotion analysis results. Demonstrates explainability layer integration.
       </p>
@@ -16,19 +16,15 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- Sample Analysis Section -->
     <section id="analysis" class="mb-8">
-      <div
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div class="rounded-none border border-border bg-card p-6">
+        <h2 class="text-lg font-semibold text-foreground mb-4">
           Emotion Analysis Explainability
         </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p class="text-sm text-muted-foreground mb-4">
           The explainability layer enriches every AI emotion analysis result
           with:
         </p>
-        <ul
-          class="list-disc pl-6 text-sm text-gray-700 dark:text-gray-300 space-y-1 mb-4"
-        >
+        <ul class="list-disc pl-6 text-sm text-foreground space-y-1 mb-4">
           <li>
             <strong>Confidence score</strong> (0-1): Normalized confidence from the
             LLM provider, capped and clamped to valid range.
@@ -45,14 +41,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           </li>
         </ul>
 
-        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+        <div class="mt-6 border-t border-border pt-4">
+          <h3 class="text-sm font-semibold text-foreground mb-2">
             Source Types
           </h3>
-          <table
-            class="w-full text-sm text-left text-gray-700 dark:text-gray-300"
-          >
-            <thead class="text-xs uppercase text-gray-500 dark:text-gray-400">
+          <table class="w-full text-sm text-left text-foreground">
+            <thead class="text-xs uppercase text-muted-foreground">
               <tr>
                 <th class="pb-2 pr-4">Type</th>
                 <th class="pb-2 pr-4">Reference</th>
@@ -64,38 +58,36 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
           </table>
         </div>
 
-        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+        <div class="mt-6 border-t border-border pt-4">
+          <h3 class="text-sm font-semibold text-foreground mb-2">
             Technique Attribution
           </h3>
           <div id="technique-attribution" class="space-y-2">
-            <p class="text-sm text-gray-500 dark:text-gray-400">
+            <p class="text-sm text-muted-foreground">
               Run a sample analysis to see technique attribution.
             </p>
           </div>
         </div>
 
-        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+        <div class="mt-6 border-t border-border pt-4">
+          <h3 class="text-sm font-semibold text-foreground mb-2">
             Confidence Visualization
           </h3>
           <div class="flex items-center gap-3">
-            <div
-              class="flex-1 h-4 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden"
-            >
+            <div class="flex-1 h-4 rounded-none bg-secondary overflow-hidden">
               <div
                 id="confidence-bar"
-                class="h-full rounded-full bg-gradient-to-r from-yellow-400 to-green-500 transition-all duration-300"
+                class="h-full rounded-none bg-primary transition-all duration-300"
                 style="width: 0%"
               >
               </div>
             </div>
             <span
               id="confidence-value"
-              class="text-lg font-bold text-gray-900 dark:text-white">N/A</span
+              class="text-lg font-bold text-foreground">N/A</span
             >
           </div>
-          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          <p class="mt-1 text-xs text-muted-foreground">
             Green ≥ 0.8 (high) · Yellow ≥ 0.5 (medium) · Red &lt; 0.5 (low)
           </p>
         </div>
@@ -103,19 +95,19 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
         <div class="mt-6">
           <button
             id="run-sample"
-            class="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="rounded-none bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring"
           >
             Run Sample Analysis
           </button>
           <button
             id="run-fallback"
-            class="ml-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+            class="ml-2 rounded-none border border-input px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
           >
             Simulate Fallback
           </button>
           <button
             id="run-neutral"
-            class="ml-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+            class="ml-2 rounded-none border border-input px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary"
           >
             Neutral Input
           </button>
@@ -125,65 +117,45 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- Source Attribution Detail -->
     <section id="source-detail" class="mb-8">
-      <div
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div class="rounded-none border border-border bg-card p-6">
+        <h2 class="text-lg font-semibold text-foreground mb-4">
           How Source Attribution Works
         </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p class="text-sm text-muted-foreground mb-4">
           Every AI response payload now includes a <code>sources</code> array that
           traces the origin of each component in the analysis. This provides auditability
           and transparency for clinical AI decisions.
         </p>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div
-            class="rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20"
-          >
-            <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-200">
-              LLM Source
-            </h3>
-            <p class="mt-1 text-xs text-blue-700 dark:text-blue-300">
+          <div class="rounded-none border border-input bg-secondary p-4">
+            <h3 class="text-sm font-semibold text-foreground">LLM Source</h3>
+            <p class="mt-1 text-xs text-muted-foreground">
               Generated by the LLaMA emotion analysis model. Confidence
               contribution: 0.85.
             </p>
           </div>
-          <div
-            class="rounded-md border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-900/20"
-          >
-            <h3
-              class="text-sm font-semibold text-purple-900 dark:text-purple-200"
-            >
-              FHE Source
-            </h3>
-            <p class="mt-1 text-xs text-purple-700 dark:text-purple-300">
+          <div class="rounded-none border border-input bg-secondary p-4">
+            <h3 class="text-sm font-semibold text-foreground">FHE Source</h3>
+            <p class="mt-1 text-xs text-muted-foreground">
               Input encrypted via BFV scheme before LLM inference. Confidence
               contribution: 0.95.
             </p>
           </div>
-          <div
-            class="rounded-md border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20"
-          >
-            <h3
-              class="text-sm font-semibold text-amber-900 dark:text-amber-200"
-            >
+          <div class="rounded-none border border-input bg-secondary p-4">
+            <h3 class="text-sm font-semibold text-foreground">
               Keyword Fallback
             </h3>
-            <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">
+            <p class="mt-1 text-xs text-muted-foreground">
               Local keyword-based detection used when API unavailable.
               Confidence contribution: 0.60.
             </p>
           </div>
-          <div
-            class="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20"
-          >
-            <h3
-              class="text-sm font-semibold text-green-900 dark:text-green-200"
-            >
+          <div class="rounded-none border border-input bg-secondary p-4">
+            <h3 class="text-sm font-semibold text-foreground">
               Dimensional Model
             </h3>
-            <p class="mt-1 text-xs text-green-700 dark:text-green-300">
+            <p class="mt-1 text-xs text-muted-foreground">
               Russell Circumplex Model maps emotions to VAD dimensions.
               Confidence contribution: 0.80.
             </p>
@@ -194,21 +166,17 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- Technique Map -->
     <section id="technique-map" class="mb-8">
-      <div
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      >
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+      <div class="rounded-none border border-border bg-card p-6">
+        <h2 class="text-lg font-semibold text-foreground mb-4">
           Emotion → Technique Mapping
         </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+        <p class="text-sm text-muted-foreground mb-4">
           The explainability layer maps dominant emotions to therapeutic
           techniques from the TherapeuticTechnique enum (12 techniques).
         </p>
         <div class="overflow-x-auto">
-          <table
-            class="w-full text-sm text-left text-gray-700 dark:text-gray-300"
-          >
-            <thead class="text-xs uppercase text-gray-500 dark:text-gray-400">
+          <table class="w-full text-sm text-left text-foreground">
+            <thead class="text-xs uppercase text-muted-foreground">
               <tr>
                 <th class="pb-2 pr-4">Dominant Emotion</th>
                 <th class="pb-2 pr-4">Primary Technique</th>
@@ -217,49 +185,49 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
               </tr>
             </thead>
             <tbody>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">joy</td>
                 <td class="py-2 pr-4">VALIDATION</td>
                 <td class="py-2 pr-4">STRENGTH_BASED</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">sadness</td>
                 <td class="py-2 pr-4">ACTIVE_LISTENING</td>
                 <td class="py-2 pr-4">VALIDATION</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">anger</td>
                 <td class="py-2 pr-4">COGNITIVE_RESTRUCTURING</td>
                 <td class="py-2 pr-4">GROUNDING_TECHNIQUES</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">fear</td>
                 <td class="py-2 pr-4">GROUNDING_TECHNIQUES</td>
                 <td class="py-2 pr-4">MINDFULNESS</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">disgust</td>
                 <td class="py-2 pr-4">COGNITIVE_RESTRUCTURING</td>
                 <td class="py-2 pr-4">REFRAMING</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">trust</td>
                 <td class="py-2 pr-4">REFLECTIVE_STATEMENTS</td>
                 <td class="py-2 pr-4">ACTIVE_LISTENING</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">anticipation</td>
                 <td class="py-2 pr-4">GOAL_SETTING</td>
                 <td class="py-2 pr-4">MOTIVATIONAL_INTERVIEWING</td>
                 <td class="py-2">0.5 + intensity × 0.4</td>
               </tr>
-              <tr class="border-t border-gray-200 dark:border-gray-700">
+              <tr class="border-t border-border">
                 <td class="py-2 pr-4">surprise</td>
                 <td class="py-2 pr-4">OPEN_ENDED_QUESTIONS</td>
                 <td class="py-2 pr-4">—</td>
@@ -380,7 +348,7 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     tbody.innerHTML = ''
     sources.forEach((s) => {
       const tr = document.createElement('tr')
-      tr.className = 'border-t border-gray-200 dark:border-gray-700'
+      tr.className = 'border-t border-border'
       tr.innerHTML =
         '<td class="py-2 pr-4 font-mono text-xs">' +
         s.type +
@@ -403,20 +371,20 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     if (!container) return
     if (!attribution) {
       container.innerHTML =
-        '<p class="text-sm text-gray-500 dark:text-gray-400">No technique attribution (no dominant emotion detected).</p>'
+        '<p class="text-sm text-muted-foreground">No technique attribution (no dominant emotion detected).</p>'
       return
     }
     let html =
-      '<div class="rounded-md border border-gray-200 p-4 dark:border-gray-700">' +
+      '<div class="rounded-none border border-border p-4">' +
       '<div class="flex items-center gap-3">' +
-      '<span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-900 dark:bg-blue-900/30 dark:text-blue-200">' +
+      '<span class="rounded-none bg-secondary border border-input px-3 py-1 text-sm font-semibold text-foreground">' +
       attribution.technique +
       '</span>' +
-      '<span class="text-sm text-gray-600 dark:text-gray-400">Confidence: ' +
+      '<span class="text-sm text-muted-foreground">Confidence: ' +
       attribution.confidence.toFixed(2) +
       '</span>' +
       '</div>' +
-      '<ul class="mt-3 list-disc pl-6 text-sm text-gray-700 dark:text-gray-300">'
+      '<ul class="mt-3 list-disc pl-6 text-sm text-foreground">'
     attribution.reasoning.forEach((r) => {
       html += '<li>' + r + '</li>'
     })
@@ -441,13 +409,13 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     value.textContent = confidence.toFixed(2)
     if (confidence >= 0.8) {
       bar.className =
-        'h-full rounded-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-300'
+        'h-full rounded-none bg-green-500 transition-all duration-300'
     } else if (confidence >= 0.5) {
       bar.className =
-        'h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 transition-all duration-300'
+        'h-full rounded-none bg-yellow-500 transition-all duration-300'
     } else {
       bar.className =
-        'h-full rounded-full bg-gradient-to-r from-red-400 to-red-600 transition-all duration-300'
+        'h-full rounded-none bg-red-500 transition-all duration-300'
     }
   }
 
