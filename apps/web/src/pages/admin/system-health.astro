@@ -11,8 +11,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <!-- API Health Status Card -->
-      <div class="card border rounded-lg overflow-hidden shadow-md">
-        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+      <div class="card border rounded-none overflow-hidden">
+        <div class="card-header bg-secondary p-4 border border-b">
           <h2 class="text-xl font-semibold flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -32,28 +32,24 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         </div>
         <div class="card-body p-4">
           <div id="api-status" class="flex items-center mb-2">
-            <div class="status-indicator w-4 h-4 rounded-full bg-gray-300 mr-2">
+            <div
+              class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"
+            >
             </div>
             <span class="status-text">Checking API status...</span>
           </div>
-          <div
-            id="api-response-time"
-            class="text-sm text-gray-600 dark:text-gray-400"
-          >
+          <div id="api-response-time" class="text-sm text-muted-foreground">
             Response time: --
           </div>
-          <div
-            id="api-last-check"
-            class="text-sm text-gray-600 dark:text-gray-400"
-          >
+          <div id="api-last-check" class="text-sm text-muted-foreground">
             Last checked: --
           </div>
         </div>
       </div>
 
       <!-- Database Status Card -->
-      <div class="card border rounded-lg overflow-hidden shadow-md">
-        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+      <div class="card border rounded-none overflow-hidden">
+        <div class="card-header bg-secondary p-4 border border-b">
           <h2 class="text-xl font-semibold flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -94,11 +90,13 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         </div>
         <div class="card-body p-4">
           <div id="db-status" class="flex items-center mb-2">
-            <div class="status-indicator w-4 h-4 rounded-full bg-gray-300 mr-2">
+            <div
+              class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"
+            >
             </div>
             <span class="status-text">Checking database status...</span>
           </div>
-          <div id="db-details" class="text-sm text-gray-600 dark:text-gray-400">
+          <div id="db-details" class="text-sm text-muted-foreground">
             Details: --
           </div>
         </div>
@@ -107,8 +105,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <!-- Redis Status Card -->
-      <div class="card border rounded-lg overflow-hidden shadow-md">
-        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+      <div class="card border rounded-none overflow-hidden">
+        <div class="card-header bg-secondary p-4 border border-b">
           <h2 class="text-xl font-semibold flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -129,22 +127,21 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         </div>
         <div class="card-body p-4">
           <div id="redis-status" class="flex items-center mb-2">
-            <div class="status-indicator w-4 h-4 rounded-full bg-gray-300 mr-2">
+            <div
+              class="status-indicator w-4 h-4 rounded-none bg-secondary mr-2"
+            >
             </div>
             <span class="status-text">Checking Redis status...</span>
           </div>
-          <div
-            id="redis-details"
-            class="text-sm text-gray-600 dark:text-gray-400"
-          >
+          <div id="redis-details" class="text-sm text-muted-foreground">
             Details: --
           </div>
         </div>
       </div>
 
       <!-- System Resources Card -->
-      <div class="card border rounded-lg overflow-hidden shadow-md">
-        <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+      <div class="card border rounded-none overflow-hidden">
+        <div class="card-header bg-secondary p-4 border border-b">
           <h2 class="text-xl font-semibold flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -169,31 +166,22 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
               <span class="text-sm font-medium">Memory Usage</span>
               <span id="memory-usage-percent" class="text-sm">--%</span>
             </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+            <div class="w-full bg-secondary rounded-none h-2.5">
               <div
                 id="memory-usage-bar"
-                class="bg-blue-600 h-2.5 rounded-full"
+                class="bg-primary h-2.5 rounded-none"
                 style="width: 0%"
               >
               </div>
             </div>
           </div>
-          <div
-            id="memory-details"
-            class="text-sm text-gray-600 dark:text-gray-400 mb-4"
-          >
+          <div id="memory-details" class="text-sm text-muted-foreground mb-4">
             Memory: -- / --
           </div>
-          <div
-            id="cpu-info"
-            class="text-sm text-gray-600 dark:text-gray-400 mb-2"
-          >
+          <div id="cpu-info" class="text-sm text-muted-foreground mb-2">
             CPU: --
           </div>
-          <div
-            id="load-average"
-            class="text-sm text-gray-600 dark:text-gray-400"
-          >
+          <div id="load-average" class="text-sm text-muted-foreground">
             Load Average: --
           </div>
         </div>
@@ -201,8 +189,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
     </div>
 
     <!-- System Info Card -->
-    <div class="card border rounded-lg overflow-hidden shadow-md mb-8">
-      <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+    <div class="card border rounded-none overflow-hidden mb-8">
+      <div class="card-header bg-secondary p-4 border border-b">
         <h2 class="text-xl font-semibold flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -225,10 +213,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h3 class="font-medium mb-2">Operating System</h3>
-            <div
-              id="os-info"
-              class="text-sm text-gray-600 dark:text-gray-400 mb-4"
-            >
+            <div id="os-info" class="text-sm text-muted-foreground mb-4">
               Platform: --<br />
               Release: --<br />
               Uptime: --
@@ -236,10 +221,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           </div>
           <div>
             <h3 class="font-medium mb-2">Runtime</h3>
-            <div
-              id="runtime-info"
-              class="text-sm text-gray-600 dark:text-gray-400"
-            >
+            <div id="runtime-info" class="text-sm text-muted-foreground">
               Node.js: --<br />
               Process Memory: --<br />
               Process Uptime: --
@@ -250,8 +232,8 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
     </div>
 
     <!-- Raw Health Check Response Card -->
-    <div class="card border rounded-lg overflow-hidden shadow-md">
-      <div class="card-header bg-slate-100 dark:bg-slate-800 p-4 border-b">
+    <div class="card border rounded-none overflow-hidden">
+      <div class="card-header bg-secondary p-4 border border-b">
         <div class="flex justify-between items-center">
           <h2 class="text-xl font-semibold flex items-center">
             <svg
@@ -271,7 +253,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           </h2>
           <button
             id="refresh-btn"
-            class="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm flex items-center"
+            class="px-3 py-1 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors text-sm flex items-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -294,7 +276,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
       <div class="card-body p-4">
         <pre
           id="raw-response"
-          class="bg-gray-100 dark:bg-gray-800 p-4 rounded-md overflow-auto text-sm h-80 max-h-80">Loading health check data...</pre>
+          class="bg-secondary p-4 rounded-none overflow-auto text-sm h-80 max-h-80">Loading health check data...</pre>
       </div>
     </div>
   </div>
@@ -437,14 +419,14 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
 
       // Change color based on usage
       if (usagePercent > 90) {
-        memoryUsageBar.classList.remove('bg-blue-600', 'bg-yellow-500')
+        memoryUsageBar.classList.remove('bg-primary', 'bg-yellow-500')
         memoryUsageBar.classList.add('bg-red-600')
       } else if (usagePercent > 70) {
-        memoryUsageBar.classList.remove('bg-blue-600', 'bg-red-600')
+        memoryUsageBar.classList.remove('bg-primary', 'bg-red-600')
         memoryUsageBar.classList.add('bg-yellow-500')
       } else {
         memoryUsageBar.classList.remove('bg-yellow-500', 'bg-red-600')
-        memoryUsageBar.classList.add('bg-blue-600')
+        memoryUsageBar.classList.add('bg-primary')
       }
 
       const total = healthData.system.memory?.total || '--'
@@ -502,7 +484,7 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
     if (indicator && textSpan) {
       // Remove existing classes
       indicator.classList.remove(
-        'bg-gray-300',
+        'bg-secondary',
         'bg-green-500',
         'bg-red-500',
         'bg-yellow-500',
@@ -521,10 +503,10 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
           indicator.classList.add('bg-yellow-500')
           break
         case 'loading':
-          indicator.classList.add('bg-gray-300', 'animate-pulse')
+          indicator.classList.add('bg-secondary', 'animate-pulse')
           break
         default:
-          indicator.classList.add('bg-gray-300')
+          indicator.classList.add('bg-secondary')
       }
 
       // Update text
@@ -537,12 +519,12 @@ import AdminLayout from '@/layouts/AdminLayout.astro'
   .card {
     transition:
       transform 0.2s ease,
-      box-shadow 0.2s ease;
+      box- 0.2s ease;
   }
 
   .card:hover {
     transform: translateY(-2px);
-    box-shadow:
+    box-:
       0 10px 15px -3px rgba(0, 0, 0, 0.1),
       0 4px 6px -2px rgba(0, 0, 0, 0.05);
   }
