@@ -138,7 +138,7 @@ export const TherapistDashboard: FC = () => {
     patientId: patient.id,
     patientName: patient.name,
     sessionsCompleted: 5 + ((index * 7) % 20),
-    avgMoodScore: 3 + ((index % 3) * 0.5), // 3-5 scale
+    avgMoodScore: 3 + (index % 3) * 0.5, // 3-5 scale
     progressScore: patient.progress,
     riskScore:
       patient.riskLevel === 'critical'
@@ -153,16 +153,16 @@ export const TherapistDashboard: FC = () => {
 
   return (
     <ResponsiveContainer size="full">
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="min-h-screen bg-secondary">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm">
+        <header className="border-b border-border bg-card">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-gray-900 dark:text-white text-2xl font-bold">
+                <h1 className="text-2xl font-bold text-foreground">
                   Therapist Dashboard
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Welcome back, Dr. Smith • {patients.length} active patients
                 </p>
               </div>
@@ -178,7 +178,7 @@ export const TherapistDashboard: FC = () => {
                       setTimeRange(nextRange)
                     }
                   }}
-                  className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm"
+                  className="rounded-none border border-input bg-card px-3 py-2 text-sm"
                 >
                   {TIME_RANGES.map((range) => (
                     <option value={range} key={range}>
@@ -205,8 +205,8 @@ export const TherapistDashboard: FC = () => {
                   onClick={() => setDashboardView(tab.id)}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? 'border-ring text-foreground'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   {DASHBOARD_TAB_ICONS[tab.icon]({ className: 'h-5 w-5' })}
@@ -284,21 +284,21 @@ const OverviewTab: FC<{
       {/* Key Metrics */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Total Sessions
                 </p>
-                <p className="text-gray-900 dark:text-white text-3xl font-bold">
+                <p className="text-3xl font-bold text-foreground">
                   {metrics.totalSessions}
                 </p>
               </div>
-              <div className="bg-blue-100 dark:bg-blue-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-                <ChartBarIcon className="text-blue-600 dark:text-blue-400 h-5 w-5" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-none border border-input bg-secondary">
+                <ChartBarIcon className="h-5 w-5 text-foreground" />
               </div>
             </div>
-            <p className="text-gray-500 mt-2 text-sm">
+            <p className="mt-2 text-sm text-muted-foreground">
               This{' '}
               {timeRange === 'week'
                 ? 'week'
@@ -310,59 +310,63 @@ const OverviewTab: FC<{
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Avg Session Length
                 </p>
-                <p className="text-gray-900 dark:text-white text-3xl font-bold">
+                <p className="text-3xl font-bold text-foreground">
                   {metrics.avgSessionLength}m
                 </p>
               </div>
-              <div className="bg-green-100 dark:bg-green-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-                <span className="text-green-600 dark:text-green-400">⏱️</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-none border border-input bg-secondary">
+                <span className="text-foreground">⏱️</span>
               </div>
             </div>
-            <p className="text-gray-500 mt-2 text-sm">Average duration</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Average duration
+            </p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Completion Rate
                 </p>
-                <p className="text-gray-900 dark:text-white text-3xl font-bold">
+                <p className="text-3xl font-bold text-foreground">
                   {metrics.completionRate}%
                 </p>
               </div>
-              <div className="bg-purple-100 dark:bg-purple-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-                <span className="text-purple-600 dark:text-purple-400">✅</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-none border border-input bg-secondary">
+                <span className="text-foreground">✅</span>
               </div>
             </div>
-            <p className="text-gray-500 mt-2 text-sm">Session completion</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Session completion
+            </p>
           </div>
         </FadeIn>
 
         <FadeIn>
-          <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">
+                <p className="text-sm font-medium text-muted-foreground">
                   Patient Satisfaction
                 </p>
-                <p className="text-gray-900 dark:text-white text-3xl font-bold">
+                <p className="text-3xl font-bold text-foreground">
                   {metrics.patientSatisfaction}/5
                 </p>
               </div>
-              <div className="bg-yellow-100 dark:bg-yellow-900/30 flex h-8 w-8 items-center justify-center rounded-lg">
-                <StarIcon className="text-yellow-600 dark:text-yellow-400 h-5 w-5" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-none border border-input bg-secondary">
+                <StarIcon className="h-5 w-5 text-foreground" />
               </div>
             </div>
-            <p className="text-gray-500 mt-2 text-sm">Average rating</p>
+            <p className="mt-2 text-sm text-muted-foreground">Average rating</p>
           </div>
         </FadeIn>
       </div>
@@ -370,7 +374,7 @@ const OverviewTab: FC<{
       {/* Alerts and Urgent Items */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
               <span>🚨</span>
               Urgent Patients ({urgentPatients.length})
@@ -379,7 +383,7 @@ const OverviewTab: FC<{
               {urgentPatients.map((patient) => (
                 <div
                   key={patient.id}
-                  className="bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 flex items-center justify-between rounded-lg border p-3"
+                  className="flex items-center justify-between rounded-none border border-ring bg-card p-3"
                 >
                   <div className="flex items-center gap-3">
                     <input
@@ -387,19 +391,19 @@ const OverviewTab: FC<{
                       aria-label={`Select ${patient.name}`}
                       checked={selectedPatientsSet.has(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
-                      className="text-red-600 h-4 w-4 rounded"
+                      className="h-4 w-4 rounded-none text-foreground"
                     />
                     <div>
-                      <p className="text-gray-900 dark:text-white font-medium">
+                      <p className="font-medium text-foreground">
                         {patient.name}
                       </p>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      <p className="text-sm text-muted-foreground">
                         Last session: {patient.lastSession.toLocaleDateString()}
                       </p>
                     </div>
                   </div>
                   <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                    className={`rounded-none px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                   >
                     {patient.riskLevel}
                   </span>
@@ -410,7 +414,7 @@ const OverviewTab: FC<{
         </SlideUp>
 
         <SlideUp>
-          <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+          <div className="rounded-none border border-border bg-card p-6">
             <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
               <span>⚠️</span>
               Needs Attention ({patientsNeedingAttention.length})
@@ -419,7 +423,7 @@ const OverviewTab: FC<{
               {patientsNeedingAttention.map((patient) => (
                 <div
                   key={patient.id}
-                  className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 rounded-lg border p-3"
+                  className="rounded-none border border-ring bg-secondary p-3"
                 >
                   <div className="mb-2 flex items-center gap-3">
                     <input
@@ -427,13 +431,13 @@ const OverviewTab: FC<{
                       aria-label={`Select ${patient.name}`}
                       checked={selectedPatientsSet.has(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
-                      className="text-yellow-600 h-4 w-4 rounded"
+                      className="h-4 w-4 rounded-none text-foreground"
                     />
-                    <p className="text-gray-900 dark:text-white font-medium">
+                    <p className="font-medium text-foreground">
                       {patient.name}
                     </p>
                   </div>
-                  <ul className="text-gray-600 dark:text-gray-400 space-y-1 text-sm">
+                  <ul className="space-y-1 text-sm text-muted-foreground">
                     {patient.alerts.map((alert, index) => (
                       <li key={index}>• {alert}</li>
                     ))}
@@ -447,7 +451,7 @@ const OverviewTab: FC<{
 
       {/* Patient Progress Overview */}
       <SlideUp>
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <h3 className="mb-4 text-lg font-semibold">
             Patient Progress Overview
           </h3>
@@ -455,22 +459,22 @@ const OverviewTab: FC<{
             {patients.map((patient) => (
               <div
                 key={patient.id}
-                className="bg-gray-50 dark:bg-gray-800/50 flex items-center gap-4 rounded-lg p-4"
+                className="flex items-center gap-4 rounded-none bg-secondary p-4"
               >
                 <input
                   type="checkbox"
                   aria-label={`Select ${patient.name}`}
                   checked={selectedPatientsSet.has(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
-                  className="text-blue-600 h-4 w-4 rounded"
+                  className="h-4 w-4 rounded-none text-foreground"
                 />
                 <div className="flex-1">
                   <div className="mb-2 flex items-center justify-between">
-                    <p className="text-gray-900 dark:text-white font-medium">
+                    <p className="font-medium text-foreground">
                       {patient.name}
                     </p>
                     <span
-                      className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                      className={`rounded-none px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                     >
                       {patient.riskLevel}
                     </span>
@@ -478,19 +482,17 @@ const OverviewTab: FC<{
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
                       <div className="mb-1 flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          Progress
-                        </span>
+                        <span className="text-muted-foreground">Progress</span>
                         <span className="font-medium">{patient.progress}%</span>
                       </div>
-                      <div className="bg-gray-200 dark:bg-gray-700 h-2 w-full rounded-full">
+                      <div className="h-2 w-full rounded-none bg-secondary">
                         <div
-                          className={`h-2 rounded-full ${getProgressColor(patient.progress)}`}
+                          className={`h-2 rounded-none ${getProgressColor(patient.progress)}`}
                           style={{ width: `${patient.progress}%` }}
                         />
                       </div>
                     </div>
-                    <div className="text-gray-600 dark:text-gray-400 text-sm">
+                    <div className="text-sm text-muted-foreground">
                       Last: {patient.lastSession.toLocaleDateString()}
                     </div>
                   </div>
@@ -523,11 +525,11 @@ const PatientsTab: FC<{
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Patient Management</h2>
         <div className="flex items-center gap-2">
-          <span className="text-gray-600 dark:text-gray-400 text-sm">
+          <span className="text-sm text-muted-foreground">
             {selectedPatients.length} selected
           </span>
           <button
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-none bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
             disabled={selectedPatients.length === 0}
             aria-disabled={selectedPatients.length === 0}
           >
@@ -536,18 +538,18 @@ const PatientsTab: FC<{
         </div>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border">
-        <div className="border-gray-200 dark:border-gray-700 border-b p-4">
+      <div className="overflow-hidden rounded-none border border-border bg-card">
+        <div className="border-b border-border p-4">
           <div className="flex items-center gap-4">
             <input
               type="text"
               aria-label="Search patients"
               placeholder="Search patients..."
-              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded-lg border px-3 py-2 text-sm"
+              className="flex-1 rounded-none border border-input bg-card px-3 py-2 text-sm"
             />
             <select
               aria-label="Filter by risk level"
-              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm"
+              className="rounded-none border border-input bg-card px-3 py-2 text-sm"
             >
               <option>All Risk Levels</option>
               <option>Critical</option>
@@ -558,11 +560,11 @@ const PatientsTab: FC<{
           </div>
         </div>
 
-        <div className="divide-gray-200 dark:divide-gray-700 divide-y">
+        <div className="divide-y divide-border">
           {patients.map((patient) => (
             <div
               key={patient.id}
-              className="hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors"
+              className="p-4 transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-4">
                 <input
@@ -570,20 +572,20 @@ const PatientsTab: FC<{
                   aria-label={`Select ${patient.name}`}
                   checked={selectedPatientsSet.has(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
-                  className="text-blue-600 h-4 w-4 rounded"
+                  className="h-4 w-4 rounded-none text-foreground"
                 />
                 <div className="flex-1">
                   <div className="mb-2 flex items-center justify-between">
-                    <h3 className="text-gray-900 dark:text-white font-medium">
+                    <h3 className="font-medium text-foreground">
                       {patient.name}
                     </h3>
                     <span
-                      className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                      className={`rounded-none px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                     >
                       {patient.riskLevel}
                     </span>
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400 grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground md:grid-cols-4">
                     <div>
                       Last session: {patient.lastSession.toLocaleDateString()}
                     </div>
@@ -597,7 +599,7 @@ const PatientsTab: FC<{
                   </div>
                   {patient.alerts.length > 0 && (
                     <div className="mt-2">
-                      <ul className="text-orange-600 dark:text-orange-400 space-y-1 text-sm">
+                      <ul className="space-y-1 text-sm text-foreground">
                         {patient.alerts.map((alert, index) => (
                           <li key={index}>• {alert}</li>
                         ))}
@@ -605,7 +607,7 @@ const PatientsTab: FC<{
                     </div>
                   )}
                 </div>
-                <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-3 py-2 text-sm transition-colors">
+                <button className="rounded-none bg-primary px-3 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary">
                   View Details
                 </button>
               </div>
@@ -653,9 +655,7 @@ const AnalyticsTab: FC<{
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Therapeutic Analytics</h2>
         <div className="flex items-center gap-2">
-          <span className="text-gray-600 dark:text-gray-400 text-sm">
-            Time Range:
-          </span>
+          <span className="text-sm text-muted-foreground">Time Range:</span>
           <span className="text-sm font-medium capitalize">{timeRange}</span>
         </div>
       </div>
@@ -691,25 +691,23 @@ const ScheduleTab: FC<{
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold">Schedule Management</h2>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors">
+        <button className="rounded-none bg-primary px-4 py-2 text-primary-foreground transition-colors hover:bg-primary">
           Schedule Appointment
         </button>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <h3 className="mb-4 text-lg font-semibold">Upcoming Appointments</h3>
           <div className="space-y-3">
             {upcomingAppointments.map((patient) => (
               <div
                 key={patient.id}
-                className="bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3"
+                className="flex items-center justify-between rounded-none bg-secondary p-3"
               >
                 <div>
-                  <p className="text-gray-900 dark:text-white font-medium">
-                    {patient.name}
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                  <p className="font-medium text-foreground">{patient.name}</p>
+                  <p className="text-sm text-muted-foreground">
                     {patient.nextAppointment?.toLocaleDateString()} at{' '}
                     {patient.nextAppointment?.toLocaleTimeString([], {
                       hour: '2-digit',
@@ -718,7 +716,7 @@ const ScheduleTab: FC<{
                   </p>
                 </div>
                 <span
-                  className={`rounded-full px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
+                  className={`rounded-none px-2 py-1 text-xs font-medium ${getRiskColor(patient.riskLevel)}`}
                 >
                   {patient.riskLevel}
                 </span>
@@ -727,7 +725,7 @@ const ScheduleTab: FC<{
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
+        <div className="rounded-none border border-border bg-card p-6">
           <h3 className="mb-4 text-lg font-semibold">Session Templates</h3>
           <div className="space-y-3">
             {[
@@ -739,12 +737,10 @@ const ScheduleTab: FC<{
             ].map((template) => (
               <button
                 key={template}
-                className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/30 w-full rounded-lg border p-3 text-left transition-colors"
+                className="w-full rounded-none border border-input bg-secondary p-3 text-left transition-colors hover:bg-accent"
               >
-                <p className="text-blue-900 dark:text-blue-100 font-medium">
-                  {template}
-                </p>
-                <p className="text-blue-700 dark:text-blue-200 text-sm">
+                <p className="font-medium text-foreground">{template}</p>
+                <p className="text-sm text-muted-foreground">
                   Standard 50-minute session
                 </p>
               </button>
@@ -759,18 +755,17 @@ const ScheduleTab: FC<{
 // Helper function (defined outside component to avoid recreation)
 function getRiskColor(risk: RiskLevel) {
   const colors: Record<RiskLevel, string> = {
-    low: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200',
-    medium:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200',
-    high: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200',
-    critical: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200',
+    low: 'bg-secondary border border-input text-foreground',
+    medium: 'bg-secondary border border-ring text-foreground font-medium',
+    high: 'bg-card border border-ring text-foreground font-medium',
+    critical: 'bg-primary text-primary-foreground font-semibold',
   }
   return colors[risk]
 }
 
 function getProgressColor(progress: number) {
   if (progress >= 80) return 'bg-green-500'
-  if (progress >= 60) return 'bg-blue-500'
+  if (progress >= 60) return 'bg-primary'
   if (progress >= 40) return 'bg-yellow-500'
   if (progress >= 20) return 'bg-orange-500'
   return 'bg-red-500'
