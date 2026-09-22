@@ -57,7 +57,9 @@ describe("EmotionLlamaProvider FHE ciphertext hash", () => {
     expect(url).toBe("https://example.com/analyze/emotions");
     const body = JSON.parse((init as RequestInit).body as string);
     const expectedHash = createHash("sha256").update(JSON.stringify(ciphertext)).digest("hex");
-    expect(body.text).toBe(ciphertext);
+    // The provider sends the JSON-serialized encrypted-data object as text
+    // (the same string the hash is computed over).
+    expect(body.text).toBe(JSON.stringify(ciphertext));
     expect(body.fhe_ciphertext_hash).toBe(expectedHash);
     expect(analysis.metadata?.modelVersion).toBe("llama-emotion-v1.0");
 

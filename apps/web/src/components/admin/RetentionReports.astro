@@ -90,15 +90,15 @@ const schedules = [
 const getFormatBadge = (format: string) => {
   switch (format.toLowerCase()) {
     case 'pdf':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+      return 'bg-card border border-ring text-foreground font-medium'
     case 'csv':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+      return 'bg-secondary border border-input text-foreground font-medium'
     case 'xlsx':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+      return 'bg-secondary border border-input text-foreground font-medium'
     case 'json':
-      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+      return 'bg-secondary border border-input text-foreground font-medium'
     default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+      return 'bg-secondary border border-input text-foreground font-medium'
   }
 }
 
@@ -106,23 +106,23 @@ const getFormatBadge = (format: string) => {
 const getStatusBadge = (status: string) => {
   switch (status) {
     case 'active':
-      return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+      return 'bg-secondary border border-input text-foreground font-medium'
     case 'inactive':
-      return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+      return 'bg-card border border-ring text-foreground font-medium'
     default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+      return 'bg-secondary border border-input text-foreground font-medium'
   }
 }
 ---
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+<div class="bg-card rounded-none -md overflow-hidden">
   <div class="p-6">
-    <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+    <h2 class="text-2xl font-bold text-foreground mb-4">
       {title}
     </h2>
 
     <div class="mb-8">
-      <p class="text-gray-600 dark:text-gray-300 mb-4">
+      <p class="text-muted-foreground mb-4">
         Generate comprehensive reports for data retention compliance auditing
         and regulatory purposes. Schedule automated report generation and
         distribution to key stakeholders.
@@ -130,39 +130,28 @@ const getStatusBadge = (status: string) => {
 
       <div class="flex flex-wrap gap-4 mb-6">
         <div
-          class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg flex items-center"
+          class="bg-secondary border border-input p-3 rounded-none flex items-center"
         >
-          <Icon
-            name="file-text"
-            class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2"
-          />
-          <span class="text-blue-700 dark:text-blue-300 text-sm"
+          <Icon name="file-text" class="w-5 h-5 text-foreground mr-2" />
+          <span class="text-foreground font-medium font-medium text-sm"
             >Customizable reports</span
           >
         </div>
 
         <div
-          class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-lg flex items-center"
+          class="bg-secondary border border-input p-3 rounded-none flex items-center"
         >
-          <Icon
-            name="calendar"
-            class="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2"
-          />
-          <span class="text-purple-700 dark:text-purple-300 text-sm"
+          <Icon name="calendar" class="w-5 h-5 text-foreground mr-2" />
+          <span class="text-foreground font-medium text-sm"
             >Automated scheduling</span
           >
         </div>
 
         <div
-          class="bg-green-50 dark:bg-green-900/30 p-3 rounded-lg flex items-center"
+          class="bg-secondary border border-input p-3 rounded-none flex items-center"
         >
-          <Icon
-            name="mail"
-            class="w-5 h-5 text-green-600 dark:text-green-400 mr-2"
-          />
-          <span class="text-green-700 dark:text-green-300 text-sm"
-            >Email distribution</span
-          >
+          <Icon name="mail" class="w-5 h-5 text-foreground mr-2" />
+          <span class="text-foreground text-sm">Email distribution</span>
         </div>
       </div>
     </div>
@@ -170,12 +159,10 @@ const getStatusBadge = (status: string) => {
     <!-- Report Generation Section -->
     <div class="mb-8">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-          Available Reports
-        </h3>
+        <h3 class="text-lg font-medium text-foreground">Available Reports</h3>
         <button
           type="button"
-          class="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+          class="px-3 py-1.5 bg-primary text-white text-sm rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
         >
           <Icon name="plus" class="w-4 h-4 mr-1" />
           Create Custom Report
@@ -185,19 +172,19 @@ const getStatusBadge = (status: string) => {
       <div class="grid grid-cols-1 gap-4 mb-6">
         {
           reportTypes.map((report) => (
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+            <div class="bg-card border border-border rounded-none p-4">
               <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                 <div class="flex-1">
-                  <h4 class="text-base font-medium text-gray-900 dark:text-white">
+                  <h4 class="text-base font-medium text-foreground">
                     {report.name}
                   </h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
+                  <p class="text-sm text-muted-foreground">
                     {report.description}
                   </p>
                   <div class="flex flex-wrap gap-1 mt-2">
                     {report.format.map((format) => (
                       <span
-                        class={`px-2 py-0.5 rounded-full text-xs font-medium ${getFormatBadge(format)}`}
+                        class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(format)}`}
                       >
                         {format}
                       </span>
@@ -206,7 +193,7 @@ const getStatusBadge = (status: string) => {
                 </div>
 
                 <div class="flex flex-col">
-                  <div class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  <div class="text-sm text-muted-foreground mb-2">
                     <div class="flex items-center gap-1">
                       <Icon name="calendar" class="w-4 h-4" />
                       <span>
@@ -218,13 +205,13 @@ const getStatusBadge = (status: string) => {
                   <div class="flex gap-2">
                     <button
                       type="button"
-                      class="px-3 py-1 text-xs font-medium bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+                      class="px-3 py-1 text-xs font-medium bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                       Generate Now
                     </button>
                     <button
                       type="button"
-                      class="px-3 py-1 text-xs font-medium bg-gray-200 text-gray-800 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                      class="px-3 py-1 text-xs font-medium bg-secondary text-foreground rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
                     >
                       Schedule
                     </button>
@@ -240,18 +227,12 @@ const getStatusBadge = (status: string) => {
     <!-- Scheduled Reports Section -->
     <div class="mb-8">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-          Scheduled Reports
-        </h3>
+        <h3 class="text-lg font-medium text-foreground">Scheduled Reports</h3>
       </div>
 
       <div class="overflow-x-auto">
-        <table
-          class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
-        >
-          <thead
-            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
-          >
+        <table class="w-full text-sm text-left text-muted-foreground">
+          <thead class="text-xs text-foreground uppercase bg-secondary">
             <tr>
               <th scope="col" class="py-3 px-4">Report Name</th>
               <th scope="col" class="py-3 px-4">Type</th>
@@ -265,8 +246,8 @@ const getStatusBadge = (status: string) => {
           <tbody>
             {
               schedules.map((schedule) => (
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td class="py-3 px-4 font-medium text-gray-900 dark:text-white">
+                <tr class="bg-card border-b hover:bg-secondary">
+                  <td class="py-3 px-4 font-medium text-foreground">
                     {schedule.name}
                   </td>
                   <td class="py-3 px-4">
@@ -276,7 +257,7 @@ const getStatusBadge = (status: string) => {
                   </td>
                   <td class="py-3 px-4">
                     <span
-                      class={`px-2 py-0.5 rounded-full text-xs font-medium ${getFormatBadge(schedule.format)}`}
+                      class={`px-2 py-0.5 rounded-none text-xs font-medium ${getFormatBadge(schedule.format)}`}
                     >
                       {schedule.format}
                     </span>
@@ -288,11 +269,11 @@ const getStatusBadge = (status: string) => {
                     <div class="flex flex-wrap gap-1">
                       {schedule.recipients.map((recipient, index) =>
                         index < 2 ? (
-                          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                          <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
                             {recipient}
                           </span>
                         ) : index === 2 ? (
-                          <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                          <span class="px-2 py-0.5 rounded-none text-xs font-medium bg-secondary text-muted-foreground">
                             +{schedule.recipients.length - 2} more
                           </span>
                         ) : null,
@@ -301,7 +282,7 @@ const getStatusBadge = (status: string) => {
                   </td>
                   <td class="py-3 px-4">
                     <span
-                      class={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(schedule.status)}`}
+                      class={`px-2 py-0.5 rounded-none text-xs font-medium ${getStatusBadge(schedule.status)}`}
                     >
                       {schedule.status.charAt(0).toUpperCase() +
                         schedule.status.slice(1)}
@@ -311,14 +292,14 @@ const getStatusBadge = (status: string) => {
                     <div class="flex space-x-2">
                       <button
                         type="button"
-                        class="text-blue-600 dark:text-blue-500 hover:underline"
+                        class="text-foreground hover:underline"
                         aria-label="Edit schedule"
                       >
                         <Icon name="pencil" class="w-5 h-5" />
                       </button>
                       <button
                         type="button"
-                        class="text-red-600 dark:text-red-500 hover:underline"
+                        class="text-foreground font-medium hover:underline"
                         aria-label="Delete schedule"
                       >
                         <Icon name="trash" class="w-5 h-5" />
@@ -335,37 +316,31 @@ const getStatusBadge = (status: string) => {
 
     <!-- Custom Report Generator -->
     <div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+      <h3 class="text-lg font-medium text-foreground mb-4">
         Custom Report Generator
       </h3>
 
-      <div
-        class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-5"
-      >
+      <div class="bg-secondary border border-border rounded-none p-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div class="mb-4">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label class="block text-sm font-medium text-foreground mb-2">
               Report Title
             </label>
             <input
               type="text"
               id="report-title"
               placeholder="Enter report title"
-              class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
             />
           </div>
 
           <div class="mb-4">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label class="block text-sm font-medium text-foreground mb-2">
               Report Type
             </label>
             <select
               id="report-type"
-              class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
             >
               <option value="">Select a report type</option>
               <option value="compliance-summary">Compliance Summary</option>
@@ -379,34 +354,30 @@ const getStatusBadge = (status: string) => {
           </div>
 
           <div class="mb-4">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label class="block text-sm font-medium text-foreground mb-2">
               Date Range
             </label>
             <div class="flex space-x-2">
               <input
                 type="date"
                 id="date-from"
-                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
               />
               <input
                 type="date"
                 id="date-to"
-                class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
               />
             </div>
           </div>
 
           <div class="mb-4">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label class="block text-sm font-medium text-foreground mb-2">
               Format
             </label>
             <select
               id="report-format"
-              class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              class="w-full p-2 border border-input rounded-none focus:ring-2 focus:ring-ring focus:border-ring border border-input"
             >
               <option value="pdf">PDF</option>
               <option value="csv">CSV</option>
@@ -416,9 +387,7 @@ const getStatusBadge = (status: string) => {
           </div>
 
           <div class="mb-4 md:col-span-2">
-            <label
-              class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
+            <label class="block text-sm font-medium text-foreground mb-2">
               Data Categories to Include
             </label>
             <div class="flex flex-wrap gap-3">
@@ -427,11 +396,11 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-patient-records"
                   checked
-                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
                 />
                 <label
                   for="include-patient-records"
-                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                  class="ml-2 text-sm text-foreground"
                 >
                   Patient Records
                 </label>
@@ -442,11 +411,11 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-mental-health"
                   checked
-                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
                 />
                 <label
                   for="include-mental-health"
-                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                  class="ml-2 text-sm text-foreground"
                 >
                   Mental Health Data
                 </label>
@@ -457,11 +426,11 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-chat-logs"
                   checked
-                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
                 />
                 <label
                   for="include-chat-logs"
-                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                  class="ml-2 text-sm text-foreground"
                 >
                   Chat Logs
                 </label>
@@ -472,11 +441,11 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-emotion-analysis"
                   checked
-                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
                 />
                 <label
                   for="include-emotion-analysis"
-                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                  class="ml-2 text-sm text-foreground"
                 >
                   Emotion Analysis
                 </label>
@@ -487,11 +456,11 @@ const getStatusBadge = (status: string) => {
                   type="checkbox"
                   id="include-consent-records"
                   checked
-                  class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600"
+                  class="w-4 h-4 text-foreground border-input rounded-none focus:ring-ring border border-input"
                 />
                 <label
                   for="include-consent-records"
-                  class="ml-2 text-sm text-gray-700 dark:text-gray-300"
+                  class="ml-2 text-sm text-foreground"
                 >
                   Consent Records
                 </label>
@@ -505,13 +474,13 @@ const getStatusBadge = (status: string) => {
           <button
             id="generate-report-btn"
             type="button"
-            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
+            class="px-4 py-2 bg-primary text-white rounded-none hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
           >
             Generate Report
           </button>
           <button
             type="button"
-            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 text-foreground"
           >
             Reset
           </button>

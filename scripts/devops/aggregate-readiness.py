@@ -406,7 +406,7 @@ def fetch_provider_pipelines(
 
     results: dict[str, list[dict[str, Any]]] = {}
     for name, client in providers.items():
-        if enabled_providers and name not in enabled_providers:
+        if enabled_providers is not None and name not in enabled_providers:
             continue
         results[name] = client.fetch_pipelines(branch, commit)
     return results

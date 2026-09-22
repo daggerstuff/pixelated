@@ -118,7 +118,7 @@
 
 .marketing-title {
   margin: 0;
-  font-family: var(--np-font-display, 'Archivo Variable', sans-serif);
+  font-family: var(--np-font-display, 'Instrument Serif', Georgia, serif);
   font-weight: var(--np-weight-display, 700);
   max-width: 18ch;
   font-size: var(--np-text-display, clamp(2.5rem, 5vw, 4.5rem));
@@ -140,7 +140,12 @@
 .marketing-lede {
   max-width: 60ch;
   margin: 1.45rem 0 0;
-  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
+  font-family: var(
+    --np-font-body,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-weight: 400;
   font-size: clamp(1rem, 1.05vw, 1.125rem);
   line-height: 1.55; /* short-form bridge: ~1.5 is the spec */
@@ -164,7 +169,12 @@
   padding: 0.92rem 1.4rem;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
-  font-family: var(--np-font-label, system-ui, sans-serif);
+  font-family: var(
+    --np-font-label,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -274,7 +284,12 @@
 .marketing-card__label,
 .marketing-list-label,
 .marketing-quote-label {
-  font-family: var(--np-font-label, system-ui, sans-serif);
+  font-family: var(
+    --np-font-label,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.13em;
@@ -417,7 +432,12 @@
 .marketing-card h3,
 .marketing-card h4 {
   margin: 0;
-  font-family: var(--np-font-body, system-ui, sans-serif);
+  font-family: var(
+    --np-font-body,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-weight: var(--np-weight-title, 600);
   font-size: clamp(1.18rem, 1.7vw, 1.4rem);
   line-height: 1.18;
@@ -428,7 +448,12 @@
 
 .marketing-card p,
 .marketing-card li {
-  font-family: var(--np-font-body, ui-sans-serif, system-ui, sans-serif);
+  font-family: var(
+    --np-font-body,
+    'Instrument Sans Variable',
+    system-ui,
+    sans-serif
+  );
   font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.65;
