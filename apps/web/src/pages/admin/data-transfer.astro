@@ -51,8 +51,8 @@ const metrics = [
 // Get trend class for styling
 const getTrendClass = (trend: string) => {
   return trend === 'up'
-    ? 'text-green-500 dark:text-green-400'
-    : 'text-red-500 dark:text-red-400'
+    ? 'text-muted-foreground'
+    : 'text-foreground font-semibold'
 }
 ---
 
@@ -63,10 +63,10 @@ const getTrendClass = (trend: string) => {
       class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
     >
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-2xl font-bold text-foreground">
           {title}
         </h1>
-        <p class="mt-1 text-gray-500 dark:text-gray-400">
+        <p class="mt-1 text-muted-foreground">
           Manage patient data transfers with advanced security controls
         </p>
       </div>
@@ -74,7 +74,7 @@ const getTrendClass = (trend: string) => {
       <div class="flex items-center gap-3">
         <button
           type="button"
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600 flex items-center"
+          class="px-4 py-2 bg-primary text-white rounded-none hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
         >
           <Icon name="file-export" class="w-5 h-5 mr-2" />
           Export Audit Logs
@@ -82,7 +82,7 @@ const getTrendClass = (trend: string) => {
 
         <button
           type="button"
-          class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 flex items-center"
+          class="px-4 py-2 border border-input text-foreground rounded-none hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 flex items-center"
         >
           <Icon name="refresh" class="w-5 h-5 mr-2" />
           Refresh
@@ -94,18 +94,18 @@ const getTrendClass = (trend: string) => {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {
         metrics.map((metric) => (
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-5">
+          <div class="bg-card rounded-none p-5">
             <div class="flex justify-between items-start">
               <div>
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                <p class="text-sm font-medium text-muted-foreground">
                   {metric.label}
                 </p>
-                <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                <p class="text-2xl font-bold text-foreground mt-1">
                   {metric.value}
                 </p>
               </div>
               <div
-                class={`p-3 rounded-full bg-${metric.trend === 'up' ? 'green' : 'red'}-100 dark:bg-${metric.trend === 'up' ? 'green' : 'red'}-900/20`}
+                class={`p-3 rounded-none bg-${metric.trend === 'up' ? 'green' : 'red'}-100 === 'up' ? 'green' : 'red'}-900/20`}
               >
                 <Icon
                   name={metric.icon}
@@ -130,13 +130,13 @@ const getTrendClass = (trend: string) => {
     </div>
 
     <!-- Main Content Tabs -->
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-      <div class="border-b border-gray-200 dark:border-gray-700">
+    <div class="bg-card rounded-none overflow-hidden">
+      <div class="border-b border-border">
         <nav class="flex space-x-2 px-4" aria-label="Tabs">
           <button
             id="tab-data-portability"
             type="button"
-            class="py-4 px-1 border-b-2 border-blue-500 text-blue-600 dark:text-blue-400 dark:border-blue-400 font-medium text-sm"
+            class="py-4 px-1 border-b-2 border-ring text-foreground font-medium text-sm"
             aria-selected="true"
           >
             Data Portability
@@ -144,7 +144,7 @@ const getTrendClass = (trend: string) => {
           <button
             id="tab-audit-logs"
             type="button"
-            class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600 font-medium text-sm"
+            class="py-4 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-input font-medium text-sm"
             aria-selected="false"
           >
             Audit Logs
@@ -152,7 +152,7 @@ const getTrendClass = (trend: string) => {
           <button
             id="tab-settings"
             type="button"
-            class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 dark:hover:border-gray-600 font-medium text-sm"
+            class="py-4 px-1 border-b-2 border-transparent text-muted-foreground hover:text-foreground hover:border-input font-medium text-sm"
             aria-selected="false"
           >
             Settings
@@ -174,24 +174,24 @@ const getTrendClass = (trend: string) => {
 
         <!-- Settings Panel (Initially Hidden) -->
         <div id="panel-settings" class="hidden">
-          <div class="p-6 bg-white dark:bg-gray-800 rounded-lg">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          <div class="p-6 bg-card rounded-none">
+            <h2 class="text-2xl font-bold text-foreground mb-4">
               Data Transfer Settings
             </h2>
 
             <div class="space-y-6">
               <!-- Encryption Settings -->
               <div class="space-y-3">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <h3 class="text-lg font-medium text-foreground">
                   Encryption Settings
                 </h3>
 
                 <div
-                  class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+                  class="flex items-center justify-between py-2 border-b border-border"
                 >
                   <div>
                     <p class="font-medium">End-to-End Encryption</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Apply FHE to all data transfers
                     </p>
                   </div>
@@ -203,23 +203,23 @@ const getTrendClass = (trend: string) => {
                       class="sr-only peer"
                     />
                     <div
-                      class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+                      class="w-11 h-6 bg-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
                     >
                     </div>
                   </div>
                 </div>
 
                 <div
-                  class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+                  class="flex items-center justify-between py-2 border-b border-border"
                 >
                   <div>
                     <p class="font-medium">Key Rotation Period</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Automatically rotate encryption keys
                     </p>
                   </div>
                   <select
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input"
                   >
                     <option value="30">30 days</option>
                     <option value="60">60 days</option>
@@ -231,18 +231,18 @@ const getTrendClass = (trend: string) => {
 
               <!-- Access Control Settings -->
               <div class="space-y-3">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <h3 class="text-lg font-medium text-foreground">
                   Access Control
                 </h3>
 
                 <div
-                  class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+                  class="flex items-center justify-between py-2 border-b border-border"
                 >
                   <div>
                     <p class="font-medium">
                       Two-Factor Authentication for Transfers
                     </p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Require 2FA for all data transfers
                     </p>
                   </div>
@@ -254,25 +254,25 @@ const getTrendClass = (trend: string) => {
                       class="sr-only peer"
                     />
                     <div
-                      class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+                      class="w-11 h-6 bg-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
                     >
                     </div>
                   </div>
                 </div>
 
                 <div
-                  class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+                  class="flex items-center justify-between py-2 border-b border-border"
                 >
                   <div>
                     <p class="font-medium">Allowed Export Formats</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Select permitted data formats
                     </p>
                   </div>
                   <select
                     multiple
                     size="3"
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input"
                   >
                     <option value="json" selected>JSON</option>
                     <option value="csv" selected>CSV</option>
@@ -285,21 +285,21 @@ const getTrendClass = (trend: string) => {
 
               <!-- Audit Settings -->
               <div class="space-y-3">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                <h3 class="text-lg font-medium text-foreground">
                   Audit Settings
                 </h3>
 
                 <div
-                  class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+                  class="flex items-center justify-between py-2 border-b border-border"
                 >
                   <div>
                     <p class="font-medium">Log Retention Period</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Set how long audit logs are retained
                     </p>
                   </div>
                   <select
-                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                    class="bg-secondary border border-input text-foreground text-sm rounded-none focus:ring-ring focus:border-ring block p-2 border border-input"
                   >
                     <option value="180">6 months</option>
                     <option value="365">1 year</option>
@@ -309,11 +309,11 @@ const getTrendClass = (trend: string) => {
                 </div>
 
                 <div
-                  class="flex items-center justify-between py-2 border-b border-gray-200 dark:border-gray-700"
+                  class="flex items-center justify-between py-2 border-b border-border"
                 >
                   <div>
                     <p class="font-medium">Suspicious Activity Alerts</p>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                    <p class="text-sm text-muted-foreground">
                       Notify admins about unusual transfer patterns
                     </p>
                   </div>
@@ -325,7 +325,7 @@ const getTrendClass = (trend: string) => {
                       class="sr-only peer"
                     />
                     <div
-                      class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
+                      class="w-11 h-6 bg-secondary peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-ring rounded-none peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-card after:border-input after:border after:rounded-none after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"
                     >
                     </div>
                   </div>
@@ -336,7 +336,7 @@ const getTrendClass = (trend: string) => {
               <div class="mt-6">
                 <button
                   type="button"
-                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-blue-700 dark:hover:bg-blue-600"
+                  class="px-4 py-2 bg-primary text-white rounded-none hover:bg-primary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
                   Save Settings
                 </button>
@@ -359,39 +359,29 @@ const getTrendClass = (trend: string) => {
       tab.addEventListener('click', () => {
         // Toggle tabs
         tabs.forEach((t) => {
-          t.classList.remove(
-            'border-blue-500',
-            'text-blue-600',
-            'dark:text-blue-400',
-            'dark:border-blue-400',
-          )
+          t.classList.remove('border-ring', 'text-foreground', '', '')
           t.classList.add(
             'border-transparent',
-            'text-gray-500',
-            'hover:text-gray-700',
-            'hover:border-gray-300',
-            'dark:text-gray-400',
-            'dark:hover:text-gray-300',
-            'dark:hover:border-gray-600',
+            'text-muted-foreground',
+            'hover:text-foreground',
+            'hover:border-input',
+            '',
+            '',
+            '',
           )
           t.setAttribute('aria-selected', 'false')
         })
 
         tab.classList.remove(
           'border-transparent',
-          'text-gray-500',
-          'hover:text-gray-700',
-          'hover:border-gray-300',
-          'dark:text-gray-400',
-          'dark:hover:text-gray-300',
-          'dark:hover:border-gray-600',
+          'text-muted-foreground',
+          'hover:text-foreground',
+          'hover:border-input',
+          '',
+          '',
+          '',
         )
-        tab.classList.add(
-          'border-blue-500',
-          'text-blue-600',
-          'dark:text-blue-400',
-          'dark:border-blue-400',
-        )
+        tab.classList.add('border-ring', 'text-foreground', '', '')
         tab.setAttribute('aria-selected', 'true')
 
         // Toggle panels

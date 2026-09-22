@@ -73,45 +73,45 @@ const frequencyOptions = [
       <div class="flex items-center">
         <a
           href="/admin/security/baa/vendors"
-          class="text-indigo-600 hover:text-indigo-900 mr-4"
+          class="text-foreground hover:underline mr-4"
         >
           &larr; Back to Vendors
         </a>
-        <h1 class="text-2xl font-bold text-gray-800">
+        <h1 class="text-2xl font-bold text-foreground">
           Compliance Requirements
         </h1>
       </div>
       <button
         id="add-requirement-btn"
-        class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+        class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
       >
         Add New Requirement
       </button>
     </div>
 
     <!-- Requirements Overview Card -->
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="bg-card rounded-none p-6 mb-6">
       <h2 class="text-xl font-semibold mb-4">Requirements Overview</h2>
-      <p class="text-gray-600 mb-4">
+      <p class="text-muted-foreground mb-4">
         Compliance requirements define the criteria vendors must meet to achieve
         specific compliance levels. These requirements help ensure your business
         associates handle PHI in accordance with HIPAA regulations.
       </p>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
-          <h3 class="font-medium text-gray-800 mb-1">Total Requirements</h3>
-          <p class="text-3xl font-bold text-indigo-600">
+        <div class="border border-border rounded-none p-4 bg-secondary">
+          <h3 class="font-medium text-foreground mb-1">Total Requirements</h3>
+          <p class="text-3xl font-bold text-foreground">
             {requirements.length}
           </p>
         </div>
-        <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
-          <h3 class="font-medium text-gray-800 mb-1">Required</h3>
+        <div class="border border-border rounded-none p-4 bg-secondary">
+          <h3 class="font-medium text-foreground mb-1">Required</h3>
           <p class="text-3xl font-bold text-amber-600">
             {requirements.filter((r) => r.isRequired).length}
           </p>
         </div>
-        <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
-          <h3 class="font-medium text-gray-800 mb-1">Optional</h3>
+        <div class="border border-border rounded-none p-4 bg-secondary">
+          <h3 class="font-medium text-foreground mb-1">Optional</h3>
           <p class="text-3xl font-bold text-cyan-600">
             {requirements.filter((r) => !r.isRequired).length}
           </p>
@@ -120,85 +120,87 @@ const frequencyOptions = [
     </div>
 
     <!-- Requirements Table -->
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-8">
-      <div class="px-6 py-4 border-b border-gray-200">
+    <div class="bg-card rounded-none overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-border">
         <h2 class="text-lg font-semibold">Compliance Requirements</h2>
       </div>
 
       {
         requirements.length === 0 ? (
-          <div class="p-6 text-center text-gray-500">
+          <div class="p-6 text-center text-muted-foreground">
             No compliance requirements defined yet. Click "Add New Requirement"
             to create your first requirement.
           </div>
         ) : (
           <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+            <table class="min-w-full divide-y divide-border">
+              <thead class="bg-secondary">
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Requirement
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Description
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Applies To
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Required Level
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Verification
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Status
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+              <tbody class="bg-card divide-y divide-border">
                 {requirements.map((req) => (
                   <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm font-medium text-gray-900">
+                      <div class="text-sm font-medium text-foreground">
                         {req.name}
                       </div>
-                      <div class="text-xs text-gray-500">
+                      <div class="text-xs text-muted-foreground">
                         Frequency: {req.frequency.replace(/_/g, ' ')}
                       </div>
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500">
+                    <td class="px-6 py-4 text-sm text-muted-foreground">
                       <div class="max-w-md truncate">{req.description}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-xs text-gray-500 mb-1">Types:</div>
+                      <div class="text-xs text-muted-foreground mb-1">
+                        Types:
+                      </div>
                       <div class="flex flex-wrap gap-1">
                         {req.applicableTypes.map((type) => (
-                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
                             {type.replace(/_/g, ' ')}
                           </span>
                         ))}
@@ -209,41 +211,41 @@ const frequencyOptions = [
                         switch (req.minimumComplianceLevel) {
                           case ComplianceLevel.HIPAA_CERTIFIED:
                             return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-muted-foreground">
                                 HIPAA Certified
                               </span>
                             )
                           case ComplianceLevel.THIRD_PARTY_VERIFIED:
                             return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-cyan-100 text-cyan-800">
                                 Third Party Verified
                               </span>
                             )
                           case ComplianceLevel.SELF_ATTESTED:
                             return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-ring text-foreground">
                                 Self Attested
                               </span>
                             )
                           default:
                             return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
                                 {req.minimumComplianceLevel.replace(/_/g, ' ')}
                               </span>
                             )
                         }
                       })()}
                     </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground capitalize">
                       {req.verificationMethod.replace(/_/g, ' ')}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       {req.isRequired ? (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-primary text-primary-foreground">
                           Required
                         </span>
                       ) : (
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary text-foreground">
                           Optional
                         </span>
                       )}
@@ -251,13 +253,13 @@ const frequencyOptions = [
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <button
                         data-req-id={req.id}
-                        class="edit-requirement text-indigo-600 hover:text-indigo-900 mr-3"
+                        class="edit-requirement text-foreground hover:underline mr-3"
                       >
                         Edit
                       </button>
                       <button
                         data-req-id={req.id}
-                        class="delete-requirement text-red-600 hover:text-red-900"
+                        class="delete-requirement text-foreground font-semibold hover:text-foreground font-semibold"
                       >
                         Delete
                       </button>
@@ -272,16 +274,16 @@ const frequencyOptions = [
     </div>
 
     <!-- Best Practices Card -->
-    <div class="bg-white rounded-lg shadow-sm p-6">
+    <div class="bg-card rounded-none p-6">
       <h2 class="text-lg font-semibold mb-4">
         Compliance Requirement Best Practices
       </h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <h3 class="font-medium text-gray-800 mb-2">
+          <h3 class="font-medium text-foreground mb-2">
             Creating Effective Requirements
           </h3>
-          <ul class="list-disc list-inside text-gray-600 space-y-1">
+          <ul class="list-disc list-inside text-muted-foreground space-y-1">
             <li>
               Focus on specific, measurable criteria that directly relate to PHI
               protection
@@ -303,8 +305,8 @@ const frequencyOptions = [
           </ul>
         </div>
         <div>
-          <h3 class="font-medium text-gray-800 mb-2">Verification Methods</h3>
-          <ul class="list-disc list-inside text-gray-600 space-y-1">
+          <h3 class="font-medium text-foreground mb-2">Verification Methods</h3>
+          <ul class="list-disc list-inside text-muted-foreground space-y-1">
             <li>
               <span class="font-medium">Self-Assessment:</span> The vendor completes
               a questionnaire about their practices
@@ -335,14 +337,17 @@ const frequencyOptions = [
 <!-- Add Requirement Modal (would use a proper component in production) -->
 <div
   id="add-requirement-modal"
-  class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50"
+  class="hidden fixed inset-0 bg-secondary0 bg-opacity-75 flex items-center justify-center p-4 z-50"
 >
   <div
-    class="bg-white rounded-lg max-w-3xl w-full max-h-screen overflow-y-auto p-6"
+    class="bg-card rounded-none max-w-3xl w-full max-h-screen overflow-y-auto p-6"
   >
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-semibold">Add New Compliance Requirement</h2>
-      <button id="close-modal" class="text-gray-400 hover:text-gray-500">
+      <button
+        id="close-modal"
+        class="text-muted-foreground hover:text-muted-foreground"
+      >
         <svg
           class="h-6 w-6"
           fill="none"
@@ -360,7 +365,7 @@ const frequencyOptions = [
 
     <form id="requirement-form" class="space-y-4">
       <div>
-        <label for="name" class="block text-sm font-medium text-gray-700 mb-1"
+        <label for="name" class="block text-sm font-medium text-foreground mb-1"
           >Requirement Name*</label
         >
         <input
@@ -368,7 +373,7 @@ const frequencyOptions = [
           id="name"
           name="name"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           placeholder="e.g., Security Risk Assessment"
         />
       </div>
@@ -376,7 +381,7 @@ const frequencyOptions = [
       <div>
         <label
           for="description"
-          class="block text-sm font-medium text-gray-700 mb-1"
+          class="block text-sm font-medium text-foreground mb-1"
           >Description*</label
         >
         <textarea
@@ -384,13 +389,13 @@ const frequencyOptions = [
           name="description"
           required
           rows="3"
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           placeholder="Describe what this requirement involves and why it's important..."
         ></textarea>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1"
+        <label class="block text-sm font-medium text-foreground mb-1"
           >Applicable Business Associate Types*</label
         >
         <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -401,9 +406,9 @@ const frequencyOptions = [
                   type="checkbox"
                   name="applicableTypes"
                   value={option.value}
-                  class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  class="rounded-none border-input text-foreground  focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
                 />
-                <span class="ml-2 text-sm text-gray-700">{option.label}</span>
+                <span class="ml-2 text-sm text-foreground">{option.label}</span>
               </label>
             ))
           }
@@ -411,7 +416,7 @@ const frequencyOptions = [
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1"
+        <label class="block text-sm font-medium text-foreground mb-1"
           >Applicable Service Categories*</label
         >
         <div class="grid grid-cols-2 gap-2">
@@ -422,9 +427,9 @@ const frequencyOptions = [
                   type="checkbox"
                   name="applicableCategories"
                   value={option.value}
-                  class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
+                  class="rounded-none border-input text-foreground  focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
                 />
-                <span class="ml-2 text-sm text-gray-700">{option.label}</span>
+                <span class="ml-2 text-sm text-foreground">{option.label}</span>
               </label>
             ))
           }
@@ -434,7 +439,7 @@ const frequencyOptions = [
       <div>
         <label
           for="requiredDocuments"
-          class="block text-sm font-medium text-gray-700 mb-1"
+          class="block text-sm font-medium text-foreground mb-1"
           >Required Documents*</label
         >
         <input
@@ -442,7 +447,7 @@ const frequencyOptions = [
           id="requiredDocuments"
           name="requiredDocuments"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           placeholder="Comma-separated list of required documents (e.g., SOC 2 Report, Security Policy)"
         />
       </div>
@@ -451,14 +456,14 @@ const frequencyOptions = [
         <div>
           <label
             for="minimumComplianceLevel"
-            class="block text-sm font-medium text-gray-700 mb-1"
+            class="block text-sm font-medium text-foreground mb-1"
             >Minimum Compliance Level*</label
           >
           <select
             id="minimumComplianceLevel"
             name="minimumComplianceLevel"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           >
             {
               complianceLevelOptions.map((option) => (
@@ -471,14 +476,14 @@ const frequencyOptions = [
         <div>
           <label
             for="verificationMethod"
-            class="block text-sm font-medium text-gray-700 mb-1"
+            class="block text-sm font-medium text-foreground mb-1"
             >Verification Method*</label
           >
           <select
             id="verificationMethod"
             name="verificationMethod"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           >
             {
               verificationMethodOptions.map((option) => (
@@ -491,14 +496,14 @@ const frequencyOptions = [
         <div>
           <label
             for="frequency"
-            class="block text-sm font-medium text-gray-700 mb-1"
+            class="block text-sm font-medium text-foreground mb-1"
             >Verification Frequency*</label
           >
           <select
             id="frequency"
             name="frequency"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            class="w-full px-3 py-2 border border-input rounded-none focus:outline-none focus:ring-ring focus:border-ring"
           >
             {
               frequencyOptions.map((option) => (
@@ -509,7 +514,7 @@ const frequencyOptions = [
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-3"
+          <label class="block text-sm font-medium text-foreground mb-3"
             >Requirement Status*</label
           >
           <div class="flex space-x-4">
@@ -519,18 +524,18 @@ const frequencyOptions = [
                 name="isRequired"
                 value="true"
                 checked
-                class="text-indigo-600 focus:ring-indigo-500"
+                class="text-foreground focus:ring-ring"
               />
-              <span class="ml-2 text-sm text-gray-700">Required</span>
+              <span class="ml-2 text-sm text-foreground">Required</span>
             </label>
             <label class="inline-flex items-center">
               <input
                 type="radio"
                 name="isRequired"
                 value="false"
-                class="text-indigo-600 focus:ring-indigo-500"
+                class="text-foreground focus:ring-ring"
               />
-              <span class="ml-2 text-sm text-gray-700">Optional</span>
+              <span class="ml-2 text-sm text-foreground">Optional</span>
             </label>
           </div>
         </div>
@@ -540,13 +545,13 @@ const frequencyOptions = [
         <button
           type="button"
           id="cancel-button"
-          class="mr-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="mr-3 inline-flex justify-center py-2 px-4 border border-input text-sm font-medium rounded-none text-foreground bg-card hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           Cancel
         </button>
         <button
           type="submit"
-          class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-none text-primary-foreground bg-primary hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring"
         >
           Save Requirement
         </button>

@@ -5,10 +5,10 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 <DashboardLayout title="Cache Performance Dashboard | Admin">
   <div class="container px-4 py-8 mx-auto max-w-6xl">
     <header class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+      <h1 class="text-2xl font-bold text-foreground">
         Cache Performance Dashboard
       </h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">
+      <p class="mt-2 text-muted-foreground">
         Monitor cache hit ratios, per-prefix statistics, and top-missed keys
         across the application cache layer.
       </p>
@@ -16,80 +16,55 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- Overall hit ratio card -->
     <section id="overview" class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      >
+      <div class="rounded-none border border-border bg-card p-6">
         <h2
-          class="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          class="text-sm font-medium uppercase tracking-wider text-muted-foreground"
         >
           Overall Hit Ratio
         </h2>
-        <p
-          id="hit-ratio"
-          class="mt-3 text-4xl font-bold text-gray-900 dark:text-white"
-        >
-          —
-        </p>
-        <div
-          class="mt-2 h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700"
-        >
+        <p id="hit-ratio" class="mt-3 text-4xl font-bold text-foreground">—</p>
+        <div class="mt-2 h-3 w-full overflow-hidden rounded-none bg-secondary">
           <div
             id="hit-ratio-bar"
-            class="h-full rounded-full bg-green-500 transition-all duration-500"
+            class="h-full rounded-none bg-primary transition-all duration-500"
             style="width: 0%"
           >
           </div>
         </div>
-        <p
-          id="hit-ratio-detail"
-          class="mt-2 text-sm text-gray-500 dark:text-gray-400"
-        >
+        <p id="hit-ratio-detail" class="mt-2 text-sm text-muted-foreground">
           — hits / — misses
         </p>
       </div>
 
-      <div
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      >
+      <div class="rounded-none border border-border bg-card p-6">
         <h2
-          class="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          class="text-sm font-medium uppercase tracking-wider text-muted-foreground"
         >
           Total Requests
         </h2>
-        <p
-          id="total-requests"
-          class="mt-3 text-4xl font-bold text-gray-900 dark:text-white"
-        >
+        <p id="total-requests" class="mt-3 text-4xl font-bold text-foreground">
           —
         </p>
       </div>
 
-      <div
-        class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
-      >
+      <div class="rounded-none border border-border bg-card p-6">
         <h2
-          class="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          class="text-sm font-medium uppercase tracking-wider text-muted-foreground"
         >
           Cache Hits / Misses
         </h2>
         <div class="mt-3 flex gap-6">
           <div>
-            <span
-              class="text-2xl font-bold text-green-600 dark:text-green-400"
-              id="total-hits">—</span
+            <span class="text-2xl font-bold text-foreground" id="total-hits"
+              >—</span
             >
-            <span class="ml-1 text-sm text-gray-500 dark:text-gray-400"
-              >hits</span
-            >
+            <span class="ml-1 text-sm text-muted-foreground">hits</span>
           </div>
           <div>
-            <span
-              class="text-2xl font-bold text-red-600 dark:text-red-400"
-              id="total-misses">—</span
+            <span class="text-2xl font-bold text-foreground" id="total-misses"
+              >—</span
             >
-            <span class="ml-1 text-sm text-gray-500 dark:text-gray-400"
-              >misses</span
-            >
+            <span class="ml-1 text-sm text-muted-foreground">misses</span>
           </div>
         </div>
       </div>
@@ -97,55 +72,50 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- Per-prefix table -->
     <section class="mb-8">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+      <h2 class="mb-4 text-lg font-semibold text-foreground">
         Per-Prefix Statistics
       </h2>
-      <div
-        class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700"
-      >
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
+      <div class="overflow-x-auto rounded-none border border-border">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-secondary">
             <tr>
               <th
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Prefix
               </th>
               <th
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Hits
               </th>
               <th
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Misses
               </th>
               <th
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Total
               </th>
               <th
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Hit Ratio
               </th>
               <th
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Bar
               </th>
             </tr>
           </thead>
-          <tbody
-            id="prefix-table-body"
-            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
-          >
+          <tbody id="prefix-table-body" class="divide-y divide-border bg-card">
             <tr>
               <td
                 colspan="6"
-                class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+                class="px-6 py-4 text-center text-muted-foreground"
               >
                 Loading…
               </td>
@@ -157,35 +127,30 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- Top misses -->
     <section class="mb-8">
-      <h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
+      <h2 class="mb-4 text-lg font-semibold text-foreground">
         Top Missed Keys
       </h2>
-      <div
-        class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm dark:border-gray-700"
-      >
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
+      <div class="overflow-x-auto rounded-none border border-border">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-secondary">
             <tr>
               <th
-                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Key
               </th>
               <th
-                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Miss Count
               </th>
             </tr>
           </thead>
-          <tbody
-            id="top-misses-body"
-            class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900"
-          >
+          <tbody id="top-misses-body" class="divide-y divide-border bg-card">
             <tr>
               <td
                 colspan="2"
-                class="px-6 py-4 text-center text-gray-500 dark:text-gray-400"
+                class="px-6 py-4 text-center text-muted-foreground"
               >
                 Loading…
               </td>
@@ -197,31 +162,27 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
 
     <!-- PHI non-cached verification -->
     <section class="mb-8">
-      <div
-        class="rounded-lg border border-blue-200 bg-blue-50 p-6 dark:border-blue-800 dark:bg-blue-900/20"
-      >
-        <h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">
+      <div class="rounded-none border border-input bg-secondary p-6">
+        <h2 class="mb-2 text-lg font-semibold text-foreground">
           PHI Route Cache Verification
         </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-400">
+        <p class="text-sm text-muted-foreground">
           All PHI routes (sessions, auth, memory, preferences, profile, admin,
           graphql, chat, treatment-plans, emotions, agent-notes, AI, dashboard,
           ingestion, reprioritization) are configured with
-          <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+          <code class="rounded-none bg-secondary px-1"
             >no-store, no-cache, must-revalidate</code
           >
-          in <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
-            >vercel.json</code
-          >
+          in <code class="rounded-none bg-secondary px-1">vercel.json</code>
           and are never intercepted by the service worker.
         </p>
-        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p class="mt-2 text-sm text-muted-foreground">
           Verified by automated tests:
-          <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+          <code class="rounded-none bg-secondary px-1"
             >cache-headers.test.ts</code
           >
           (36 tests) and
-          <code class="rounded bg-gray-200 px-1 dark:bg-gray-700"
+          <code class="rounded-none bg-secondary px-1"
             >service-worker-routes.test.ts</code
           >
           (42 tests).
@@ -233,15 +194,12 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
     <div class="flex gap-4">
       <button
         id="refresh-btn"
-        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+        class="rounded-none bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary"
         type="button"
       >
         Refresh
       </button>
-      <span
-        id="last-updated"
-        class="self-center text-sm text-gray-500 dark:text-gray-400"
-      >
+      <span id="last-updated" class="self-center text-sm text-muted-foreground">
         Not yet loaded
       </span>
     </div>
@@ -284,37 +242,37 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       const tbody = document.getElementById('prefix-table-body')
       if (data.perPrefix.length === 0) {
         tbody.innerHTML =
-          '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No data yet</td></tr>'
+          '<tr><td colspan="6" class="px-6 py-4 text-center text-muted-foreground">No data yet</td></tr>'
       } else {
         tbody.innerHTML = data.perPrefix
           .map(function (p) {
             const ratio = (p.hitRatio * 100).toFixed(1)
             const barColor =
               p.hitRatio >= 0.7
-                ? 'bg-green-500'
+                ? 'bg-primary'
                 : p.hitRatio >= 0.4
                   ? 'bg-yellow-500'
                   : 'bg-red-500'
             return (
               '<tr>' +
-              '<td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-white">' +
+              '<td class="px-6 py-4 text-sm font-mono text-foreground">' +
               escapeHtml(p.prefix) +
               '</td>' +
-              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              '<td class="px-6 py-4 text-right text-sm text-foreground">' +
               p.hits.toLocaleString() +
               '</td>' +
-              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              '<td class="px-6 py-4 text-right text-sm text-foreground">' +
               p.misses.toLocaleString() +
               '</td>' +
-              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              '<td class="px-6 py-4 text-right text-sm text-foreground">' +
               p.totalRequests.toLocaleString() +
               '</td>' +
-              '<td class="px-6 py-4 text-right text-sm font-semibold text-gray-900 dark:text-white">' +
+              '<td class="px-6 py-4 text-right text-sm font-semibold text-foreground">' +
               ratio +
               '%</td>' +
               '<td class="px-6 py-4">' +
-              '<div class="h-2 w-32 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">' +
-              '<div class="h-full rounded-full ' +
+              '<div class="h-2 w-32 overflow-hidden rounded-none bg-secondary">' +
+              '<div class="h-full rounded-none ' +
               barColor +
               '" style="width:' +
               ratio +
@@ -331,16 +289,16 @@ import DashboardLayout from '@/layouts/DashboardLayout.astro'
       const missesBody = document.getElementById('top-misses-body')
       if (data.topMisses.length === 0) {
         missesBody.innerHTML =
-          '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">No miss data yet</td></tr>'
+          '<tr><td colspan="2" class="px-6 py-4 text-center text-muted-foreground">No miss data yet</td></tr>'
       } else {
         missesBody.innerHTML = data.topMisses
           .map(function (m) {
             return (
               '<tr>' +
-              '<td class="px-6 py-4 text-sm font-mono text-gray-900 dark:text-white break-all">' +
+              '<td class="px-6 py-4 text-sm font-mono text-foreground break-all">' +
               escapeHtml(m.key) +
               '</td>' +
-              '<td class="px-6 py-4 text-right text-sm text-gray-900 dark:text-white">' +
+              '<td class="px-6 py-4 text-right text-sm text-foreground">' +
               m.count.toLocaleString() +
               '</td>' +
               '</tr>'

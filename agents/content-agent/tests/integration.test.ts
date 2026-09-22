@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import type { ToolContext } from 'eve/tools'
@@ -14,38 +15,49 @@ const CORPUS = fileURLToPath(
   ),
 )
 
+// The corpus is a real (PII-bearing) dataset that is deliberately gitignored
+// and never present in CI. The corpus-dependent tests run only where the
+// dataset exists; everywhere else they are skipped, not failed.
+const hasCorpus = existsSync(CORPUS)
+
 const noopToolContext = {} as unknown as ToolContext
 
 describe('demo-qa-agent tools against the real hackathon corpus', () => {
-  it('audit_corpus runs over 800+ real records without throwing', async () => {
-    const result = (await auditCorpus.execute(
-      { corpus_path: CORPUS },
-      noopToolContext,
-    )) as {
-      total_records: number
-      thread_count: number
-      blocking_count: number
-      pass: boolean
-      findings: { class: string }[]
-    }
-    expect(result.total_records).toBeGreaterThan(800)
-    expect(result.thread_count).toBeGreaterThan(0)
-    expect(Array.isArray(result.findings)).toBe(true)
-  })
+  it.skipIf(!hasCorpus)(
+    'audit_corpus runs over 800+ real records without throwing',
+    async () => {
+      const result = (await auditCorpus.execute(
+        { corpus_path: CORPUS },
+        noopToolContext,
+      )) as {
+        total_records: number
+        thread_count: number
+        blocking_count: number
+        pass: boolean
+        findings: { class: string }[]
+      }
+      expect(result.total_records).toBeGreaterThan(800)
+      expect(result.thread_count).toBeGreaterThan(0)
+      expect(Array.isArray(result.findings)).toBe(true)
+    },
+  )
 
-  it('curate_showcase picks demo-ready threads (no dup subjects)', async () => {
-    const result = (await curateShowcase.execute(
-      { corpus_path: CORPUS, target_count: 15 },
-      noopToolContext,
-    )) as {
-      picked_count: number
-      picks: { thread_id: string; subject: string }[]
-    }
-    const subjects = result.picks.map((p) => p.subject.toLowerCase().trim())
-    const unique = new Set(subjects)
-    expect(result.picked_count).toBeGreaterThan(0)
-    expect(unique.size).toBe(subjects.length)
-  })
+  it.skipIf(!hasCorpus)(
+    'curate_showcase picks demo-ready threads (no dup subjects)',
+    async () => {
+      const result = (await curateShowcase.execute(
+        { corpus_path: CORPUS, target_count: 15 },
+        noopToolContext,
+      )) as {
+        picked_count: number
+        picks: { thread_id: string; subject: string }[]
+      }
+      const subjects = result.picks.map((p) => p.subject.toLowerCase().trim())
+      const unique = new Set(subjects)
+      expect(result.picked_count).toBeGreaterThan(0)
+      expect(unique.size).toBe(subjects.length)
+    },
+  )
 
   it('gate_injection blocks when audit is not cleared', async () => {
     const result = (await gateInjection.execute(
