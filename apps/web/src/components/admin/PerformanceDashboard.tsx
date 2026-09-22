@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   AlertTriangle,
   Activity,
@@ -7,6 +6,7 @@ import {
   RefreshCw,
   ShieldCheck,
 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Area,
   AreaChart,
@@ -18,8 +18,8 @@ import {
   YAxis,
 } from 'recharts'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 // NOTE: the three types below are temporarily un-exported (the consumers that
 // import them are still landing). Re-export them when the dashboard page work
@@ -171,18 +171,16 @@ export function PerformanceDashboard({
       {/* Header with filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            Time range:
-          </span>
+          <span className="text-sm text-muted-foreground">Time range:</span>
           {TIME_RANGE_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
               onClick={() => setTimeRange(option.value)}
-              className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-none px-3 py-1.5 text-sm font-medium transition-colors ${
                 timeRange === option.value
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-muted-foreground hover:bg-accent'
               }`}
             >
               {option.label}
@@ -191,7 +189,7 @@ export function PerformanceDashboard({
         </div>
         <div className="flex items-center gap-3">
           {lastUpdated && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
+            <span className="text-xs text-muted-foreground">
               Updated {lastUpdated.toLocaleTimeString()}
             </span>
           )}
@@ -211,7 +209,7 @@ export function PerformanceDashboard({
 
       {error && (
         <div
-          className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 p-4 text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300"
+          className="flex items-center gap-2 rounded-none border border-ring bg-card p-4 font-medium text-foreground"
           role="alert"
         >
           <AlertTriangle className="h-5 w-5" />
@@ -231,52 +229,52 @@ export function PerformanceDashboard({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Activity className="h-4 w-4" />
               Requests
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-2xl font-semibold text-foreground">
               {isLoading ? '—' : formatNumber(summary.totalRequests)}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Clock className="h-4 w-4" />
               Avg Latency
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-2xl font-semibold text-foreground">
               {isLoading ? '—' : `${Math.round(summary.weightedLatency)}ms`}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <Coins className="h-4 w-4" />
               Token Usage
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-2xl font-semibold text-foreground">
               {isLoading ? '—' : formatNumber(summary.totalTokens)}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400">
+            <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
               <ShieldCheck className="h-4 w-4" />
               Success Rate
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-2xl font-semibold text-foreground">
               {isLoading ? '—' : formatPercent(summary.weightedSuccess)}
             </p>
           </CardContent>
@@ -296,14 +294,16 @@ export function PerformanceDashboard({
         <CardContent>
           {isLoading ? (
             <div
-              className="flex h-72 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800"
+              className="flex h-72 items-center justify-center rounded-none bg-secondary"
               aria-busy="true"
             >
-              <span className="text-sm text-gray-500">Loading chart…</span>
+              <span className="text-sm text-muted-foreground">
+                Loading chart…
+              </span>
             </div>
           ) : trendData.length === 0 ? (
-            <div className="flex h-72 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-800">
-              <span className="text-sm text-gray-500">
+            <div className="flex h-72 items-center justify-center rounded-none bg-secondary">
+              <span className="text-sm text-muted-foreground">
                 No metrics recorded for this time range.
               </span>
             </div>
@@ -356,8 +356,8 @@ export function PerformanceDashboard({
         </CardHeader>
         <CardContent>
           {modelRows.length === 0 ? (
-            <div className="rounded-md bg-gray-100 py-8 text-center dark:bg-gray-800">
-              <span className="text-sm text-gray-500">
+            <div className="rounded-none bg-secondary py-8 text-center">
+              <span className="text-sm text-muted-foreground">
                 No model data available.
               </span>
             </div>
@@ -365,7 +365,7 @@ export function PerformanceDashboard({
             <div className="overflow-x-auto">
               <table className="min-w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-gray-100 dark:bg-gray-800">
+                  <tr className="bg-secondary">
                     <th className="px-4 py-2 text-left font-medium">Model</th>
                     <th className="px-4 py-2 text-right font-medium">
                       Requests
@@ -382,10 +382,7 @@ export function PerformanceDashboard({
                 </thead>
                 <tbody>
                   {modelRows.map((row) => (
-                    <tr
-                      key={row.model}
-                      className="border-b border-gray-200 dark:border-gray-700"
-                    >
+                    <tr key={row.model} className="border-b border-border">
                       <td className="px-4 py-2">{row.model}</td>
                       <td className="px-4 py-2 text-right">
                         {formatNumber(row.requestCount)}

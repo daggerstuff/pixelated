@@ -656,14 +656,14 @@ export function useConnectionStatus(
       case 'disconnected':
         return {
           text: 'Disconnected from live updates',
-          color: 'text-gray-400',
+          color: 'text-muted-foreground',
           icon: <Activity className="mr-1 h-3 w-3" />,
           pulse: false,
         }
       default:
         return {
           text: 'Live updates disabled',
-          color: 'text-gray-500',
+          color: 'text-muted-foreground',
           icon: <Activity className="mr-1 h-3 w-3" />,
           pulse: false,
         }
