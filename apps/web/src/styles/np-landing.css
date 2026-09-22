@@ -1,13 +1,15 @@
 /* Swiss casework homepage — evidence-led, condensed, exact. */
 
 :root:has(.case-home) {
-  --case-paper: var(--np-bg);
-  --case-ink: var(--np-text);
-  --case-muted: var(--np-muted);
-  --case-mid: var(--np-mid);
-  --case-line: var(--np-line);
-  --case-line-strong: var(--np-line-strong);
-  --case-soft: var(--np-elevated);
+  --case-paper: oklch(0.965 0 0);
+  --case-ink: oklch(0.13 0 0);
+  --case-muted: oklch(0.43 0 0);
+  --case-line: oklch(0.76 0 0);
+  --case-soft: oklch(0.91 0 0);
+  /* Signal role = strongest emphasis, encoded by value (near-ink), never hue —
+     zero-chroma doctrine. White-on-signal clears WCAG AA at ~13:1; the
+     previous oklch(0.62 0.16 32) rust tone was chromatic AND failed at 3.9:1. */
+  --case-signal: oklch(0.22 0 0);
   --case-shell: 78rem;
   --case-gutter: clamp(1.25rem, 4vw, 3.5rem);
 }
@@ -28,8 +30,8 @@
   color: var(--case-paper);
 }
 .case-home a:focus-visible {
-  outline: 2px solid var(--np-mid);
-  outline-offset: 3px;
+  outline: 2px solid var(--case-signal);
+  outline-offset: 4px;
 }
 
 .case-shell {
@@ -43,8 +45,8 @@
 }
 .case-hero .case-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
-  gap: clamp(2.5rem, 6vw, 6rem);
+  grid-template-columns: minmax(18rem, 0.82fr) minmax(34rem, 1.18fr);
+  gap: clamp(2.5rem, 6vw, 6.5rem);
   align-items: start;
 }
 .case-index {
@@ -68,10 +70,12 @@
   text-wrap: balance;
 }
 .case-hero h1 {
-  max-width: 16ch;
-  font-size: var(--np-text-display);
-  line-height: 1.05;
-  text-transform: uppercase;
+  max-width: 18ch;
+  font-family: var(--np-font-display);
+  font-weight: 400;
+  font-size: clamp(2.25rem, 3.6vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
 }
 .case-hero__lede {
   max-width: 39rem;
@@ -111,38 +115,42 @@
   color: var(--case-paper);
 }
 .case-action--solid:hover {
-  transform: translateY(-1px);
+  background: var(--case-signal);
+  color: white;
 }
 
-.case-facts {
-  display: grid;
-  gap: 0;
-  margin: 3rem 0 0;
+.case-audience {
   border-top: 1px solid var(--case-ink);
 }
-.case-facts div {
+.case-audience__grid {
   display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: 1rem;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid var(--case-line);
+  grid-template-columns: 1fr 1fr;
 }
-.case-facts dt {
+.case-audience__grid article {
+  padding: 2rem 1.5rem;
+}
+.case-audience__grid article + article {
+  border-left: 1px solid var(--case-line);
+}
+.case-audience__grid h2 {
+  margin: 0 0 0.75rem;
   font-family: var(--np-font-condensed);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
 }
-.case-facts dd {
+.case-audience__grid p {
+  max-width: 46ch;
   margin: 0;
   color: var(--case-muted);
-  font-size: 0.8125rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 
 .case-console {
-  border: 1px solid var(--np-line-strong);
-  background: var(--np-surface);
+  border: 1px solid var(--case-ink);
+  background: white;
 }
 .case-console__head,
 .case-console__foot {
@@ -174,8 +182,8 @@
 }
 .case-status {
   padding: 0.35rem 0.5rem;
-  background: var(--case-ink);
-  color: var(--case-paper);
+  background: var(--case-signal);
+  color: white;
   white-space: nowrap;
 }
 .case-console__body {
@@ -183,7 +191,7 @@
   grid-template-columns: 1fr;
 }
 .case-turn {
-  padding: 1.1rem 1.25rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--case-line);
 }
 .case-turn p {
@@ -192,8 +200,22 @@
   font-size: 0.9375rem;
   line-height: 1.6;
 }
+.case-turn--client {
+  background: var(--case-soft);
+}
 .case-turn--retry {
-  border-top: 1px solid var(--np-line-strong);
+  background: color-mix(in srgb, var(--case-signal) 9%, white);
+}
+.case-turn__tag {
+  margin-left: 0.5rem;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid var(--case-signal);
+  color: var(--case-signal);
+  font-family: var(--np-font-condensed);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .case-review {
   display: grid;
@@ -201,30 +223,30 @@
   gap: 1rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--case-line);
-  background: var(--np-elevated);
+  border-left: 3px solid var(--case-signal);
+  background: color-mix(in srgb, var(--case-signal) 8%, white);
 }
 .case-review__marker {
   display: grid;
   width: 2rem;
   height: 2rem;
   place-items: center;
-  background: var(--case-ink);
-  color: var(--case-paper);
+  background: var(--case-signal);
+  color: white;
   font-family: var(--np-font-condensed);
   font-weight: 760;
 }
-.case-review__by {
+.case-review__who {
   display: block;
-  font-family: var(--np-font-mono);
+  margin-bottom: 0.35rem;
+  color: var(--case-muted);
+  font-family: var(--np-font-condensed);
   font-size: 0.6875rem;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--case-muted);
 }
 .case-review strong {
-  display: block;
-  margin-top: 0.3rem;
   font-size: 0.875rem;
 }
 .case-review p {
@@ -275,9 +297,8 @@
 .case-section-head h2,
 .case-evidence h2,
 .case-close h2 {
-  max-width: 22ch;
-  font-size: var(--np-text-headline);
-  line-height: 1.1;
+  font-size: clamp(2.25rem, 4.5vw, 4.75rem);
+  line-height: 0.95;
   text-transform: uppercase;
 }
 .case-section-head p,
@@ -333,14 +354,11 @@
 }
 .case-evidence__intro > p {
   margin-top: 1.5rem;
-  /* case-mid on the inverted section background is 2.18:1 (WCAG AA needs
-     4.5:1). The inverted section flips ink/paper, so full-contrast body
-     text here is the paper ramp. */
-  color: var(--case-paper);
+  color: oklch(0.76 0 0);
 }
 .case-proof {
   margin: 3rem 0 0;
-  border: 1px solid var(--np-line-strong);
+  border: 1px solid oklch(0.42 0 0);
 }
 .case-proof img {
   display: block;
@@ -350,7 +368,7 @@
 }
 .case-proof figcaption {
   padding: 0.75rem 1rem;
-  border-top: 1px solid var(--np-line-strong);
+  border-top: 1px solid oklch(0.42 0 0);
   font-family: var(--np-font-condensed);
   font-size: 0.6875rem;
   letter-spacing: 0.07em;
@@ -366,10 +384,10 @@
   grid-template-columns: 3rem 1fr;
   gap: 1rem;
   padding: 1.25rem 0;
-  border-top: 1px solid var(--np-line-strong);
+  border-top: 1px solid oklch(0.42 0 0);
 }
 .case-evidence__list li:last-child {
-  border-bottom: 1px solid var(--np-line-strong);
+  border-bottom: 1px solid oklch(0.42 0 0);
 }
 .case-evidence__list > li > span {
   font-family: var(--np-font-condensed);
@@ -385,8 +403,7 @@
 }
 .case-evidence__list p {
   margin: 0.4rem 0 0;
-  /* Same inverted-section contrast fix as __intro above. */
-  color: var(--case-paper);
+  color: oklch(0.76 0 0);
   font-size: 0.875rem;
   line-height: 1.6;
 }
@@ -412,8 +429,8 @@
   font-weight: 700;
 }
 .case-table__head {
-  background: var(--np-elevated);
-  color: var(--np-text);
+  background: var(--case-ink);
+  color: var(--case-paper);
   font-family: var(--np-font-condensed);
   font-size: 0.6875rem;
   font-weight: 700;
@@ -481,9 +498,7 @@
   }
   .case-hero h1 {
     max-width: none;
-  }
-  .case-console__body {
-    grid-template-columns: 1fr;
+    font-size: clamp(2.25rem, 9vw, 2.75rem);
   }
   .case-console__head,
   .case-console__foot {
@@ -522,8 +537,17 @@
   .case-table__row {
     min-width: 44rem;
   }
-  .case-facts div {
-    grid-template-columns: 6rem 1fr;
+  .case-audience__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .case-audience__grid article {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .case-audience__grid article + article {
+    border-left: 0;
+    border-top: 1px solid var(--case-line);
   }
 }
 

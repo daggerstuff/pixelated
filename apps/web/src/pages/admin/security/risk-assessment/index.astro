@@ -124,15 +124,15 @@ function formatDate(date: Date): string {
 function getStatusBadgeClass(status: Finding['status']): string {
   switch (status) {
     case 'remediation-in-progress':
-      return 'bg-amber-100 text-amber-800'
+      return 'bg-secondary border border-ring text-foreground font-medium'
     case 'remediation-planned':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-secondary border border-input text-muted-foreground'
     case 'remediation-complete':
-      return 'bg-green-100 text-green-800'
+      return 'bg-secondary border border-input text-muted-foreground'
     case 'remediation-verified':
-      return 'bg-purple-100 text-purple-800'
+      return 'bg-secondary border border-input text-foreground font-medium'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'bg-secondary text-foreground'
   }
 }
 
@@ -156,15 +156,15 @@ function getStatusDisplayText(status: Finding['status']): string {
 function getSeverityBadgeClass(severity: Finding['severity']): string {
   switch (severity) {
     case 'critical':
-      return 'bg-red-100 text-red-800'
+      return 'bg-primary text-primary-foreground text-primary-foreground'
     case 'high':
-      return 'bg-orange-100 text-orange-800'
+      return 'bg-secondary border border-ring text-foreground font-medium'
     case 'medium':
-      return 'bg-amber-100 text-amber-800'
+      return 'bg-secondary border border-ring text-foreground font-medium'
     case 'low':
-      return 'bg-blue-100 text-blue-800'
+      return 'bg-secondary border border-input text-muted-foreground'
     default:
-      return 'bg-gray-100 text-gray-800'
+      return 'bg-secondary text-foreground'
   }
 }
 ---
@@ -175,23 +175,25 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
 >
   <div class="px-6 py-8">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gray-800">Security Risk Assessment</h1>
+      <h1 class="text-2xl font-bold text-foreground">
+        Security Risk Assessment
+      </h1>
       <div class="flex space-x-3">
         <a
           href="/admin/security/risk-assessment/scans"
-          class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Manage Scans
         </a>
         <a
           href="/admin/security/risk-assessment/vulnerabilities"
-          class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           View Vulnerabilities
         </a>
         <button
           id="start-scan-btn"
-          class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+          class="px-4 py-2 bg-primary text-primary-foreground rounded-none hover:bg-accent transition-colors"
         >
           Start New Scan
         </button>
@@ -199,36 +201,36 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <div class="bg-white rounded-lg shadow-sm p-4">
+      <div class="bg-card rounded-none p-4">
         <div class="flex justify-between">
           <div>
-            <h3 class="text-sm font-medium text-gray-500">
+            <h3 class="text-sm font-medium text-muted-foreground">
               Current Compliance Score
             </h3>
-            <p class="text-3xl font-bold text-green-600">
+            <p class="text-3xl font-bold text-muted-foreground">
               {riskMetrics.complianceScore}%
             </p>
           </div>
           <div
-            class="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center"
+            class="h-16 w-16 rounded-none bg-secondary border border-input flex items-center justify-center"
           >
-            <span class="text-2xl text-green-600">✓</span>
+            <span class="text-2xl text-muted-foreground">✓</span>
           </div>
         </div>
-        <p class="text-xs text-gray-500 mt-2">
+        <p class="text-xs text-muted-foreground mt-2">
           Last assessment: {formatDate(riskMetrics.lastScanDate)}
         </p>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm p-4">
-        <h3 class="text-sm font-medium text-gray-500">
+      <div class="bg-card rounded-none p-4">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Vulnerability Distribution
         </h3>
         <div class="flex items-center mt-2">
-          <div class="w-full bg-gray-200 rounded-full h-2.5">
-            <div class="flex h-2.5 rounded-full">
+          <div class="w-full bg-secondary rounded-none h-2.5">
+            <div class="flex h-2.5 rounded-none">
               <div
-                class="bg-red-500 h-2.5 rounded-l-full"
+                class="bg-card0 h-2.5 rounded-l-full"
                 style={`width: ${(riskMetrics.criticalVulnerabilities / riskMetrics.totalVulnerabilities) * 100}%`}
               >
               </div>
@@ -243,7 +245,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
               >
               </div>
               <div
-                class="bg-blue-400 h-2.5 rounded-r-full"
+                class="bg-blue-400 h-2.5 rounded-none"
                 style={`width: ${(riskMetrics.lowVulnerabilities / riskMetrics.totalVulnerabilities) * 100}%`}
               >
               </div>
@@ -252,34 +254,34 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
         </div>
         <div class="grid grid-cols-4 gap-2 mt-3">
           <div>
-            <p class="text-xs text-gray-500">Critical</p>
-            <p class="text-lg font-semibold text-red-600">
+            <p class="text-xs text-muted-foreground">Critical</p>
+            <p class="text-lg font-semibold text-foreground font-semibold">
               {riskMetrics.criticalVulnerabilities}
             </p>
           </div>
           <div>
-            <p class="text-xs text-gray-500">High</p>
-            <p class="text-lg font-semibold text-orange-600">
+            <p class="text-xs text-muted-foreground">High</p>
+            <p class="text-lg font-semibold text-foreground font-medium">
               {riskMetrics.highVulnerabilities}
             </p>
           </div>
           <div>
-            <p class="text-xs text-gray-500">Medium</p>
-            <p class="text-lg font-semibold text-amber-600">
+            <p class="text-xs text-muted-foreground">Medium</p>
+            <p class="text-lg font-semibold text-foreground font-medium">
               {riskMetrics.mediumVulnerabilities}
             </p>
           </div>
           <div>
-            <p class="text-xs text-gray-500">Low</p>
-            <p class="text-lg font-semibold text-blue-600">
+            <p class="text-xs text-muted-foreground">Low</p>
+            <p class="text-lg font-semibold text-foreground">
               {riskMetrics.lowVulnerabilities}
             </p>
           </div>
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow-sm p-4">
-        <h3 class="text-sm font-medium text-gray-500">
+      <div class="bg-card rounded-none p-4">
+        <h3 class="text-sm font-medium text-muted-foreground">
           Upcoming Scheduled Scans
         </h3>
         <ul class="mt-2 space-y-2">
@@ -287,12 +289,12 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
             scheduledScans.map((scan) => (
               <li class="text-sm">
                 <div class="flex justify-between">
-                  <span class="font-medium text-gray-800">{scan.name}</span>
-                  <span class="text-xs text-gray-500">
+                  <span class="font-medium text-foreground">{scan.name}</span>
+                  <span class="text-xs text-muted-foreground">
                     {formatDate(scan.nextRun)}
                   </span>
                 </div>
-                <p class="text-xs text-gray-500">{scan.target}</p>
+                <p class="text-xs text-muted-foreground">{scan.target}</p>
               </li>
             ))
           }
@@ -300,76 +302,76 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="bg-card rounded-none p-6 mb-6">
       <h2 class="text-lg font-semibold mb-4">Recent Security Findings</h2>
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
+        <table class="min-w-full divide-y divide-border">
+          <thead class="bg-secondary">
             <tr>
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Finding ID</th
               >
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Title</th
               >
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Severity</th
               >
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Affected System</th
               >
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Discovery Date</th
               >
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Status</th
               >
               <th
                 scope="col"
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Actions</th
               >
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="bg-card divide-y divide-border">
             {
               recentFindings.map((finding) => (
                 <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                     {finding.id}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {finding.title}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span
-                      class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getSeverityBadgeClass(finding.severity)}`}
+                      class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium ${getSeverityBadgeClass(finding.severity)}`}
                     >
                       {finding.severity.charAt(0).toUpperCase() +
                         finding.severity.slice(1)}
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {finding.affectedSystem}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {formatDate(finding.discoveryDate)}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span
-                      class={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(finding.status)}`}
+                      class={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium ${getStatusBadgeClass(finding.status)}`}
                     >
                       {getStatusDisplayText(finding.status)}
                     </span>
@@ -377,7 +379,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <a
                       href={`/admin/security/risk-assessment/finding/${finding.id}`}
-                      class="text-indigo-600 hover:text-indigo-900 mr-3"
+                      class="text-foreground hover:text-foreground mr-3"
                     >
                       View Details
                     </a>
@@ -391,96 +393,96 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       <div class="mt-4 text-right">
         <a
           href="/admin/security/risk-assessment/findings"
-          class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+          class="text-foreground hover:text-foreground text-sm font-medium"
           >View All Findings</a
         >
       </div>
     </div>
 
-    <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div class="bg-card rounded-none p-6 mb-6">
       <h2 class="text-lg font-semibold mb-4">HIPAA Compliance Status</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <h3 class="font-medium text-gray-800 mb-2">Technical Safeguards</h3>
+          <h3 class="font-medium text-foreground mb-2">Technical Safeguards</h3>
           <div class="flex items-center mb-4">
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-              <div class="bg-green-600 h-2.5 rounded-full" style="width: 95%">
+            <div class="w-full bg-secondary rounded-none h-2.5 mr-2">
+              <div class="bg-primary h-2.5 rounded-none" style="width: 95%">
               </div>
             </div>
-            <span class="text-sm font-medium text-gray-700">95%</span>
+            <span class="text-sm font-medium text-foreground">95%</span>
           </div>
           <ul class="space-y-1 text-sm">
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Access Controls</span>
             </li>
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Audit Controls</span>
             </li>
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Integrity Controls</span>
             </li>
-            <li class="flex items-center text-amber-800">
+            <li class="flex items-center text-foreground font-medium">
               <span class="mr-2">⚠</span>
               <span>Transmission Security</span>
             </li>
           </ul>
         </div>
         <div>
-          <h3 class="font-medium text-gray-800 mb-2">
+          <h3 class="font-medium text-foreground mb-2">
             Administrative Safeguards
           </h3>
           <div class="flex items-center mb-4">
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-              <div class="bg-green-600 h-2.5 rounded-full" style="width: 90%">
+            <div class="w-full bg-secondary rounded-none h-2.5 mr-2">
+              <div class="bg-primary h-2.5 rounded-none" style="width: 90%">
               </div>
             </div>
-            <span class="text-sm font-medium text-gray-700">90%</span>
+            <span class="text-sm font-medium text-foreground">90%</span>
           </div>
           <ul class="space-y-1 text-sm">
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Risk Analysis</span>
             </li>
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Risk Management</span>
             </li>
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Sanction Policy</span>
             </li>
-            <li class="flex items-center text-amber-800">
+            <li class="flex items-center text-foreground font-medium">
               <span class="mr-2">⚠</span>
               <span>Training Updates</span>
             </li>
           </ul>
         </div>
         <div>
-          <h3 class="font-medium text-gray-800 mb-2">Physical Safeguards</h3>
+          <h3 class="font-medium text-foreground mb-2">Physical Safeguards</h3>
           <div class="flex items-center mb-4">
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2">
-              <div class="bg-green-600 h-2.5 rounded-full" style="width: 88%">
+            <div class="w-full bg-secondary rounded-none h-2.5 mr-2">
+              <div class="bg-primary h-2.5 rounded-none" style="width: 88%">
               </div>
             </div>
-            <span class="text-sm font-medium text-gray-700">88%</span>
+            <span class="text-sm font-medium text-foreground">88%</span>
           </div>
           <ul class="space-y-1 text-sm">
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Facility Access</span>
             </li>
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Workstation Use</span>
             </li>
-            <li class="flex items-center text-green-800">
+            <li class="flex items-center text-muted-foreground">
               <span class="mr-2">✓</span>
               <span>Device Security</span>
             </li>
-            <li class="flex items-center text-amber-800">
+            <li class="flex items-center text-foreground font-medium">
               <span class="mr-2">⚠</span>
               <span>Media Disposal</span>
             </li>
@@ -490,7 +492,7 @@ function getSeverityBadgeClass(severity: Finding['severity']): string {
       <div class="mt-4 text-right">
         <a
           href="/admin/security/compliance"
-          class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
+          class="text-foreground hover:text-foreground text-sm font-medium"
           >View Detailed Compliance Report</a
         >
       </div>
