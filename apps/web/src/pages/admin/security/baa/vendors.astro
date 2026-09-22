@@ -142,11 +142,11 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
       </div>
       <div class="bg-card rounded-none p-4">
         <h3 class="text-sm font-medium text-muted-foreground">Expiring Soon</h3>
-        <p class="text-2xl font-bold text-amber-500">{stats.expiring}</p>
+        <p class="text-2xl font-bold text-foreground">{stats.expiring}</p>
       </div>
       <div class="bg-card rounded-none p-4">
         <h3 class="text-sm font-medium text-muted-foreground">Expired</h3>
-        <p class="text-2xl font-bold text-orange-600">{stats.expired}</p>
+        <p class="text-2xl font-bold text-foreground">{stats.expired}</p>
       </div>
       <div class="bg-card rounded-none p-4">
         <h3 class="text-sm font-medium text-muted-foreground">Non-Compliant</h3>
@@ -340,7 +340,7 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
                             )
                           case ComplianceLevel.THIRD_PARTY_VERIFIED:
                             return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-cyan-100 text-cyan-800">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
                                 Third Party Verified
                               </span>
                             )
@@ -446,7 +446,7 @@ const complianceStats = businessAssociateService.getComplianceStatistics()
           </div>
         </div>
         <div class="flex items-center">
-          <span class="inline-block w-4 h-4 rounded-none bg-cyan-100 mr-2"
+          <span class="inline-block w-4 h-4 rounded-none bg-primary mr-2"
           ></span>
           <div>
             <div class="text-sm font-medium">Third Party Verified</div>
