@@ -16,7 +16,7 @@ const isAuthorized = true // Replace with actual authorization check
   <div class="py-4">
     <div class="flex flex-col gap-2 mb-6">
       <h1 class="text-2xl font-bold">Backup Security Management</h1>
-      <p class="text-gray-600 dark:text-gray-400">
+      <p class="text-muted-foreground">
         Configure and monitor secure encrypted backups, verify integrity, and
         test recovery procedures.
       </p>
@@ -26,11 +26,11 @@ const isAuthorized = true // Replace with actual authorization check
       isAuthorized ? (
         <BackupSecurityManager />
       ) : (
-        <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div class="bg-card border border-ring rounded-none p-4">
           <div class="flex">
             <div class="flex-shrink-0">
               <svg
-                class="h-5 w-5 text-red-400"
+                class="h-5 w-5 text-foreground"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -42,10 +42,8 @@ const isAuthorized = true // Replace with actual authorization check
               </svg>
             </div>
             <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-                Access Denied
-              </h3>
-              <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+              <h3 class="text-sm font-medium text-foreground">Access Denied</h3>
+              <div class="mt-2 text-sm text-muted-foreground">
                 <p>
                   You do not have permission to access the Backup Security
                   settings. Please contact your administrator if you believe
