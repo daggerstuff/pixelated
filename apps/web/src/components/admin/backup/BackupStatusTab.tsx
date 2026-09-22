@@ -47,7 +47,7 @@ const renderStatusBadge = (status: BackupStatus) => {
       return (
         <Badge
           variant="secondary"
-          className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+          className="border border-input bg-secondary text-foreground"
         >
           In Progress
         </Badge>
@@ -57,7 +57,7 @@ const renderStatusBadge = (status: BackupStatus) => {
       return (
         <Badge
           variant="outline"
-          className="bg-green-100 text-green-800 hover:bg-green-100"
+          className="border border-input bg-secondary text-foreground"
         >
           Completed
         </Badge>
@@ -70,7 +70,7 @@ const renderStatusBadge = (status: BackupStatus) => {
       return (
         <Badge
           variant="outline"
-          className="bg-green-100 text-green-800 hover:bg-green-100"
+          className="border border-input bg-secondary text-foreground"
         >
           Verified
         </Badge>
@@ -83,7 +83,7 @@ const renderStatusBadge = (status: BackupStatus) => {
       return (
         <Badge
           variant="outline"
-          className="bg-gray-100 text-gray-800 hover:bg-gray-100"
+          className="border border-input bg-secondary text-foreground"
         >
           Expired
         </Badge>
@@ -104,7 +104,7 @@ const renderTypeBadge = (type: BackupType) => {
       return (
         <Badge
           variant="outline"
-          className="bg-purple-100 text-purple-800 hover:bg-purple-100"
+          className="border border-input bg-secondary text-foreground"
         >
           Full
         </Badge>
@@ -114,7 +114,7 @@ const renderTypeBadge = (type: BackupType) => {
       return (
         <Badge
           variant="outline"
-          className="bg-blue-100 text-blue-800 hover:bg-blue-100"
+          className="border border-input bg-secondary text-foreground"
         >
           Differential
         </Badge>
@@ -124,7 +124,7 @@ const renderTypeBadge = (type: BackupType) => {
       return (
         <Badge
           variant="outline"
-          className="bg-gray-100 text-gray-800 hover:bg-gray-100"
+          className="border border-input bg-secondary text-foreground"
         >
           Transaction
         </Badge>
@@ -187,7 +187,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {backups.length === 0 ? (
           <Card className="col-span-full">
-            <CardContent className="text-gray-500 py-8 text-center">
+            <CardContent className="py-8 text-center text-muted-foreground">
               No backups have been created yet. Use the buttons above to create
               your first backup.
             </CardContent>
@@ -199,7 +199,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
               className={
                 backup.status === BackupStatus.FAILED ||
                 backup.status === BackupStatus.VERIFICATION_FAILED
-                  ? 'border-red-200'
+                  ? 'border-ring'
                   : ''
               }
             >
@@ -219,24 +219,28 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                   <div>
                     <span className="font-medium">ID:</span>
                     <br />
-                    <span className="text-gray-600 text-xs">{backup.id}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {backup.id}
+                    </span>
                   </div>
                   <div>
                     <span className="font-medium">Size:</span>
                     <br />
-                    <span className="text-gray-600">
+                    <span className="text-muted-foreground">
                       {formatBytes(backup.size)}
                     </span>
                   </div>
                   <div>
                     <span className="font-medium">Location:</span>
                     <br />
-                    <span className="text-gray-600">{backup.location}</span>
+                    <span className="text-muted-foreground">
+                      {backup.location}
+                    </span>
                   </div>
                   <div>
                     <span className="font-medium">Retention Until:</span>
                     <br />
-                    <span className="text-gray-600">
+                    <span className="text-muted-foreground">
                       {new Date(backup.retentionDate).toLocaleDateString()}
                     </span>
                   </div>
@@ -257,7 +261,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                 )}
                 {backup.status === BackupStatus.IN_PROGRESS && (
                   <Button variant="outline" size="sm" disabled>
-                    <span className="border-current border-r-transparent mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid"></span>
+                    <span className="border-current border-r-transparent mr-2 inline-block h-4 w-4 animate-spin rounded-none border-2 border-solid"></span>
                     In Progress
                   </Button>
                 )}
