@@ -42,6 +42,7 @@
      restricted to app data and code surfaces.
      ============================================= */
   --np-font-display: 'Instrument Serif', Georgia, serif;
+  --np-font-hero: 'Literata Variable', 'Instrument Serif', Georgia, serif;
   --np-font-headline: 'Instrument Sans Variable', system-ui, sans-serif;
   --np-font-condensed: var(--np-font-headline);
   --np-font-poster: var(--np-font-display);
