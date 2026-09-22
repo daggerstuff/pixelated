@@ -10,10 +10,8 @@ const config = getMonitoringConfig()
 <DashboardLayout title="Real User Monitoring | Admin Dashboard">
   <div class="container px-4 py-8 mx-auto">
     <header class="mb-8">
-      <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        Real User Monitoring
-      </h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">
+      <h1 class="text-2xl font-bold text-foreground">Real User Monitoring</h1>
+      <p class="mt-2 text-muted-foreground">
         Monitor actual user experiences across devices, browsers, and regions.
       </p>
     </header>
@@ -25,8 +23,8 @@ const config = getMonitoringConfig()
       />
     </div>
 
-    <div class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-      <h2 class="text-xl font-semibold mb-3 text-gray-800 dark:text-white">
+    <div class="mb-8 p-4 bg-card border border-border rounded-none">
+      <h2 class="text-xl font-semibold mb-3 text-foreground">
         Understanding Real User Monitoring
       </h2>
 
@@ -75,16 +73,16 @@ const config = getMonitoringConfig()
 
         <ul class="mt-2">
           <li>
-            <span class="text-green-500 font-medium">Green:</span> Good - Meeting
+            <span class="text-foreground font-semibold">Good:</span> Normal - Meeting
             performance targets
           </li>
           <li>
-            <span class="text-yellow-500 font-medium">Yellow:</span> Needs Improvement
+            <span class="text-foreground font-medium">Watch:</span> Needs Improvement
             - Under acceptable limits but could be better
           </li>
           <li>
-            <span class="text-red-500 font-medium">Red:</span> Poor - Exceeding acceptable
-            limits, requires attention
+            <span class="text-foreground font-semibold">Critical:</span> Poor - Exceeding
+            acceptable limits, requires attention
           </li>
         </ul>
       </div>
@@ -92,7 +90,7 @@ const config = getMonitoringConfig()
 
     {
       config.grafana.enableRUM && (
-        <div class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        <div class="text-sm text-muted-foreground mb-6">
           <p>
             Data is collected using Grafana Faro Web SDK with a sampling rate of{' '}
             {config.grafana.rumSamplingRate * 100}%. Configuration can be

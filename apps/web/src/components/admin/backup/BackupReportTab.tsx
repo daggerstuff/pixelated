@@ -162,13 +162,15 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
               </div>
               <div className="flex justify-between">
                 <dt>Successful Backups:</dt>
-                <dd className="text-green-600 font-medium">
+                <dd className="font-medium text-foreground">
                   {successfulBackups}
                 </dd>
               </div>
               <div className="flex justify-between">
                 <dt>Failed Backups:</dt>
-                <dd className="text-red-600 font-medium">{failedBackups}</dd>
+                <dd className="font-semibold text-foreground">
+                  {failedBackups}
+                </dd>
               </div>
             </dl>
           </CardContent>
@@ -230,13 +232,13 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
               </div>
               <div className="flex justify-between">
                 <dt>Successful Tests:</dt>
-                <dd className="text-green-600 font-medium">
+                <dd className="font-medium text-foreground">
                   {successfulTests}
                 </dd>
               </div>
               <div className="flex justify-between">
                 <dt>Failed Tests:</dt>
-                <dd className="text-red-600 font-medium">{failedTests}</dd>
+                <dd className="font-semibold text-foreground">{failedTests}</dd>
               </div>
               <div className="flex justify-between">
                 <dt>Last Test Date:</dt>
@@ -261,7 +263,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
             <div className="flex items-center gap-2">
               <Badge
                 variant="outline"
-                className="bg-green-100 text-green-800 hover:bg-green-100"
+                className="bg-primary text-primary-foreground hover:bg-accent"
               >
                 Compliant
               </Badge>
@@ -283,7 +285,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                   <td className="py-2">
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                      className="bg-primary text-primary-foreground hover:bg-accent"
                     >
                       Pass
                     </Badge>
@@ -297,7 +299,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                   <td className="py-2">
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                      className="bg-primary text-primary-foreground hover:bg-accent"
                     >
                       Pass
                     </Badge>
@@ -311,7 +313,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                   <td className="py-2">
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                      className="bg-primary text-primary-foreground hover:bg-accent"
                     >
                       Pass
                     </Badge>
@@ -325,7 +327,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                   <td className="py-2">
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                      className="bg-primary text-primary-foreground hover:bg-accent"
                     >
                       Pass
                     </Badge>
@@ -339,7 +341,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                   <td className="py-2">
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                      className="bg-primary text-primary-foreground hover:bg-accent"
                     >
                       Pass
                     </Badge>
@@ -353,7 +355,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                   <td className="py-2">
                     <Badge
                       variant="outline"
-                      className="bg-green-100 text-green-800 hover:bg-green-100"
+                      className="bg-primary text-primary-foreground hover:bg-accent"
                     >
                       Pass
                     </Badge>
@@ -396,7 +398,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                 <td className="py-2">
                   <Badge
                     variant="outline"
-                    className="bg-green-100 text-green-800 hover:bg-green-100"
+                    className="bg-primary text-primary-foreground hover:bg-accent"
                   >
                     Compliant
                   </Badge>
@@ -414,7 +416,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                 <td className="py-2">
                   <Badge
                     variant="outline"
-                    className="bg-green-100 text-green-800 hover:bg-green-100"
+                    className="bg-primary text-primary-foreground hover:bg-accent"
                   >
                     Pass
                   </Badge>
@@ -432,7 +434,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                 <td className="py-2">
                   <Badge
                     variant="outline"
-                    className="bg-green-100 text-green-800 hover:bg-green-100"
+                    className="bg-primary text-primary-foreground hover:bg-accent"
                   >
                     Normal
                   </Badge>
@@ -450,7 +452,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
                 <td className="py-2">
                   <Badge
                     variant="outline"
-                    className="bg-green-100 text-green-800 hover:bg-green-100"
+                    className="bg-primary text-primary-foreground hover:bg-accent"
                   >
                     Pass
                   </Badge>
