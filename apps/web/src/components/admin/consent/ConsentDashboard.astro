@@ -159,14 +159,14 @@ const withdrawalsByType: Record<string, number> = {}
     <div class="flex space-x-2">
       <a
         href="/admin/consent/types"
-        class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+        class="inline-flex items-center justify-center rounded-none text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
       >
         <SafeIcon name="tabler:settings" class="mr-2 h-4 w-4" />
         Manage Types
       </a>
       <a
         href="/admin/consent/versions"
-        class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+        class="inline-flex items-center justify-center rounded-none text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
       >
         <SafeIcon name="tabler:versions" class="mr-2 h-4 w-4" />
         Manage Versions
@@ -181,7 +181,7 @@ const withdrawalsByType: Record<string, number> = {}
         class="flex flex-row items-center justify-between space-y-0 pb-2"
       >
         <CardTitle class="text-sm font-medium">Active Consents</CardTitle>
-        <SafeIcon name="tabler:check-circle" class="h-4 w-4 text-green-500" />
+        <SafeIcon name="tabler:check-circle" class="h-4 w-4 text-foreground" />
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-bold">{totalActiveConsents}</div>
@@ -196,7 +196,7 @@ const withdrawalsByType: Record<string, number> = {}
         class="flex flex-row items-center justify-between space-y-0 pb-2"
       >
         <CardTitle class="text-sm font-medium">Withdrawn Consents</CardTitle>
-        <SafeIcon name="tabler:circle-x" class="h-4 w-4 text-red-500" />
+        <SafeIcon name="tabler:circle-x" class="h-4 w-4 text-foreground" />
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-bold">{totalWithdrawnConsents}</div>
@@ -209,7 +209,7 @@ const withdrawalsByType: Record<string, number> = {}
         class="flex flex-row items-center justify-between space-y-0 pb-2"
       >
         <CardTitle class="text-sm font-medium">Consent Types</CardTitle>
-        <SafeIcon name="tabler:category" class="h-4 w-4 text-blue-500" />
+        <SafeIcon name="tabler:category" class="h-4 w-4 text-foreground" />
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-bold">{totalConsentTypes}</div>
@@ -222,7 +222,7 @@ const withdrawalsByType: Record<string, number> = {}
         class="flex flex-row items-center justify-between space-y-0 pb-2"
       >
         <CardTitle class="text-sm font-medium">Consent Versions</CardTitle>
-        <SafeIcon name="tabler:versions" class="h-4 w-4 text-purple-500" />
+        <SafeIcon name="tabler:versions" class="h-4 w-4 text-foreground" />
       </CardHeader>
       <CardContent>
         <div class="text-2xl font-bold">{totalConsentVersions}</div>
@@ -336,9 +336,9 @@ const withdrawalsByType: Record<string, number> = {}
                         <span class="text-sm">{typeName}</span>
                         <span class="text-sm font-medium">{count}</span>
                       </div>
-                      <div class="h-2 w-full mt-1 bg-gray-100 rounded-full overflow-hidden">
+                      <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
                         <div
-                          class="bg-green-500 h-full rounded-full"
+                          class="bg-primary h-full rounded-none"
                           style={`width: ${Math.min(100, Math.round((count / totalActiveConsents) * 100))}%`}
                         />
                       </div>
@@ -358,9 +358,9 @@ const withdrawalsByType: Record<string, number> = {}
                             <span class="text-sm">{typeName}</span>
                             <span class="text-sm font-medium">{count}</span>
                           </div>
-                          <div class="h-2 w-full mt-1 bg-gray-100 rounded-full overflow-hidden">
+                          <div class="h-2 w-full mt-1 bg-secondary rounded-none overflow-hidden">
                             <div
-                              class="bg-red-500 h-full rounded-full"
+                              class="bg-primary h-full rounded-none"
                               style={`width: ${Math.min(100, Math.round((count / totalWithdrawnConsents) * 100))}%`}
                             />
                           </div>
@@ -375,7 +375,7 @@ const withdrawalsByType: Record<string, number> = {}
             <div class="text-center py-8">
               <SafeIcon
                 name="tabler:chart-bar"
-                class="h-12 w-12 text-gray-300 mx-auto mb-3"
+                class="h-12 w-12 text-muted-foreground mx-auto mb-3"
               />
               <p class="text-muted-foreground">
                 No consent data available for analysis
@@ -412,7 +412,7 @@ const withdrawalsByType: Record<string, number> = {}
                     </div>
                   </div>
                   {consent.withdrawal_reason && (
-                    <p class="text-sm border-l-2 border-red-200 pl-3 text-gray-600 italic">
+                    <p class="text-sm border-l-2 border-ring pl-3 text-muted-foreground italic">
                       "{consent.withdrawal_reason}"
                     </p>
                   )}

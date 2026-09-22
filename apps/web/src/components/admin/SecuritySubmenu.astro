@@ -93,8 +93,8 @@ function getIcon(iconName: string): string {
 }
 ---
 
-<div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-4 mb-6">
-  <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+<div class="bg-card border border-border rounded-none p-4 mb-6">
+  <h2 class="text-lg font-semibold text-foreground mb-4">
     Security Administration
   </h2>
   <nav>
@@ -109,14 +109,14 @@ function getIcon(iconName: string): string {
                 href={item.href}
                 class={`flex items-center px-4 py-2 rounded-md transition-colors ${
                   isActive
-                    ? 'bg-indigo-50 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200'
-                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    ? 'bg-secondary border border-input text-foreground'
+                    : 'text-muted-foreground hover:bg-accent'
                 }`}
               >
                 <span class="mr-3" set:html={getIcon(item.icon)} />
                 <span>{item.label}</span>
                 {item.isNew && (
-                  <span class="ml-2 px-2 py-0.5 text-xs font-medium rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
+                  <span class="ml-2 px-2 py-0.5 text-xs font-medium rounded-none bg-secondary border border-input text-foreground">
                     New
                   </span>
                 )}

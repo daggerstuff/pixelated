@@ -131,38 +131,36 @@ function formatDate(dateString: string): string {
     <!-- Recent Polyfill Reports Card -->
     <Card title="Recent Polyfill Reports">
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-800">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-secondary">
             <tr>
               <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Browser/Device</th
               >
               <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Polyfills Used</th
               >
               <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
+                class="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                 >Timestamp</th
               >
             </tr>
           </thead>
-          <tbody
-            class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700"
-          >
+          <tbody class="bg-card divide-y divide-border">
             {
               mockPolyfillData.recentReports.map((report) => (
                 <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {parseUserAgent(report.userAgent)}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {report.polyfills.length > 0
                       ? report.polyfills.join(', ')
                       : 'None'}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                     {formatDate(report.timestamp)}
                   </td>
                 </tr>
@@ -174,7 +172,7 @@ function formatDate(dateString: string): string {
     </Card>
 
     <div class="mt-8 text-center">
-      <p class="text-sm text-gray-500 dark:text-gray-400">
+      <p class="text-sm text-muted-foreground">
         Data is updated daily. Last updated: 2025-04-12 23:59:59 UTC
       </p>
     </div>

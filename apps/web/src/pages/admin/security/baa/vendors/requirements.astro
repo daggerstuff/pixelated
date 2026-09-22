@@ -106,13 +106,13 @@ const frequencyOptions = [
         </div>
         <div class="border border-border rounded-none p-4 bg-secondary">
           <h3 class="font-medium text-foreground mb-1">Required</h3>
-          <p class="text-3xl font-bold text-amber-600">
+          <p class="text-3xl font-bold text-foreground">
             {requirements.filter((r) => r.isRequired).length}
           </p>
         </div>
         <div class="border border-border rounded-none p-4 bg-secondary">
           <h3 class="font-medium text-foreground mb-1">Optional</h3>
-          <p class="text-3xl font-bold text-cyan-600">
+          <p class="text-3xl font-bold text-foreground">
             {requirements.filter((r) => !r.isRequired).length}
           </p>
         </div>
@@ -217,7 +217,7 @@ const frequencyOptions = [
                             )
                           case ComplianceLevel.THIRD_PARTY_VERIFIED:
                             return (
-                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-cyan-100 text-cyan-800">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
                                 Third Party Verified
                               </span>
                             )
@@ -406,7 +406,7 @@ const frequencyOptions = [
                   type="checkbox"
                   name="applicableTypes"
                   value={option.value}
-                  class="rounded-none border-input text-foreground  focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
+                  class="rounded-none border-input text-foreground focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
                 />
                 <span class="ml-2 text-sm text-foreground">{option.label}</span>
               </label>
@@ -427,7 +427,7 @@ const frequencyOptions = [
                   type="checkbox"
                   name="applicableCategories"
                   value={option.value}
-                  class="rounded-none border-input text-foreground  focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
+                  class="rounded-none border-input text-foreground focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50"
                 />
                 <span class="ml-2 text-sm text-foreground">{option.label}</span>
               </label>

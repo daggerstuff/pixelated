@@ -74,7 +74,10 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
   switch (status) {
     case RecoveryTestStatus.PASSED:
       return (
-        <Badge variant="outline" className="bg-green-100 text-green-800">
+        <Badge
+          variant="outline"
+          className="border border-input bg-secondary text-foreground"
+        >
           Passed
         </Badge>
       )
@@ -82,7 +85,10 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
       return <Badge variant="destructive">Failed</Badge>
     case RecoveryTestStatus.IN_PROGRESS:
       return (
-        <Badge variant="outline" className="bg-blue-100 text-blue-800">
+        <Badge
+          variant="outline"
+          className="border border-input bg-secondary text-foreground"
+        >
           In Progress
         </Badge>
       )
@@ -150,7 +156,6 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
       setRecoveryHistory([data, ...recoveryHistory])
       toast.success('Recovery test completed successfully!')
     } catch (error: unknown) {
-
       // Type guard to safely access String(error)
       const errorMessage =
         error instanceof Error
@@ -193,7 +198,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             <div>
               <label
                 htmlFor="backup-select"
-                className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                className="block text-sm font-medium text-foreground"
               >
                 Select Backup
               </label>
@@ -218,7 +223,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             <div>
               <label
                 htmlFor="test-environment"
-                className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                className="block text-sm font-medium text-foreground"
               >
                 Test Environment
               </label>
@@ -293,8 +298,8 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <div className="bg-slate-50 dark:bg-slate-800 grid grid-cols-12 p-3 text-sm font-medium">
+          <div className="rounded-none border">
+            <div className="grid grid-cols-12 bg-secondary p-3 text-sm font-medium">
               <div className="col-span-4">Backup</div>
               <div className="col-span-3">Test Date</div>
               <div className="col-span-2">Status</div>
@@ -303,7 +308,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
             </div>
 
             {recoveryHistory.length === 0 ? (
-              <div className="text-gray-500 p-4 text-center">
+              <div className="p-4 text-center text-muted-foreground">
                 No recovery tests have been run yet
               </div>
             ) : (
@@ -324,7 +329,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                               {new Date(backup.timestamp).toLocaleDateString()}
                             </>
                           ) : (
-                            <span className="text-gray-500">
+                            <span className="text-muted-foreground">
                               Unknown backup
                             </span>
                           )}
@@ -354,19 +359,19 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                       </div>
 
                       {selectedTest === test.id && (
-                        <div className="bg-slate-50 dark:bg-slate-800 col-span-12 mt-1 rounded-md p-3">
+                        <div className="col-span-12 mt-1 rounded-none bg-secondary p-3">
                           <h4 className="mb-2 font-medium">Test Results</h4>
 
                           <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4">
                               <div>
-                                <h5 className="text-gray-500 dark:text-gray-400 text-xs">
+                                <h5 className="text-xs text-muted-foreground">
                                   Environment
                                 </h5>
                                 <p className="text-sm">{test.environment}</p>
                               </div>
                               <div>
-                                <h5 className="text-gray-500 dark:text-gray-400 text-xs">
+                                <h5 className="text-xs text-muted-foreground">
                                   Test ID
                                 </h5>
                                 <p className="font-mono text-sm text-xs">
@@ -381,7 +386,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                                   <h5 className="mb-2 text-sm font-medium">
                                     Verification Results
                                   </h5>
-                                  <div className="divide-y rounded-md border">
+                                  <div className="divide-y rounded-none border">
                                     {test.verificationResults.map((vr, idx) => (
                                       <div
                                         key={`vr-${vr.testCase}-${vr.id ?? idx}`}
@@ -393,7 +398,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                                           </span>
                                           <Badge
                                             variant="outline"
-                                            className={` ${vr.status === 'critical' ? 'bg-red-100 text-red-800' : ''} ${vr.status === 'high' ? 'bg-orange-100 text-orange-800' : ''} ${vr.status === 'medium' ? 'bg-yellow-100 text-yellow-800' : ''} ${vr.status === 'low' ? 'bg-blue-100 text-blue-800' : ''} `}
+                                            className={` ${vr.status === 'critical' ? 'border border-ring bg-card font-semibold text-foreground' : ''} ${vr.status === 'high' ? 'border border-ring bg-secondary font-medium text-foreground' : ''} ${vr.status === 'medium' ? 'border border-ring bg-secondary text-foreground' : ''} ${vr.status === 'low' ? 'border border-input bg-secondary text-foreground' : ''} `}
                                           >
                                             {vr.status}
                                           </Badge>

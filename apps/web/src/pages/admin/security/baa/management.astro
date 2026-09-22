@@ -155,7 +155,7 @@ const mockUpcomingActions = [
         <h3 class="text-sm font-medium text-muted-foreground">
           Pending Signature
         </h3>
-        <p class="text-2xl font-bold text-amber-500">
+        <p class="text-2xl font-bold text-foreground">
           {stats.pendingSignature}
         </p>
       </div>
@@ -169,7 +169,7 @@ const mockUpcomingActions = [
         <h3 class="text-sm font-medium text-muted-foreground">
           Fully Compliant
         </h3>
-        <p class="text-2xl font-bold text-cyan-600">{stats.compliant}</p>
+        <p class="text-2xl font-bold text-foreground">{stats.compliant}</p>
       </div>
     </div>
 
@@ -347,7 +347,7 @@ const mockUpcomingActions = [
                               )
                             case ComplianceLevel.THIRD_PARTY_VERIFIED:
                               return (
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-cyan-100 text-cyan-800">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-secondary border border-input text-foreground">
                                   Third Party Verified
                                 </span>
                               )
@@ -398,7 +398,7 @@ const mockUpcomingActions = [
                             </a>
                             <button
                               data-vendor-id={vendor.id}
-                              class="send-baa text-amber-600 hover:text-amber-900"
+                              class="send-baa text-foreground hover:underline"
                             >
                               Send
                             </button>

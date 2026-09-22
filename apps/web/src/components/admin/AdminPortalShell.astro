@@ -6,28 +6,26 @@ interface Props {
 const { title } = Astro.props
 ---
 
-<div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+<div class="min-h-screen bg-background">
   <aside
     id="sidebar"
-    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700"
+    class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform bg-card border-r border-border"
   >
     <div class="h-full px-3 py-4 overflow-y-auto">
       <div class="flex items-center mb-5 p-2">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-white">
-          Admin Portal
-        </h2>
+        <h2 class="text-xl font-semibold text-foreground">Admin Portal</h2>
       </div>
       <slot name="sidebar" />
     </div>
   </aside>
 
   <div
-    class="sticky top-0 z-30 flex items-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:px-8"
+    class="sticky top-0 z-30 flex items-center bg-card border-b border-border p-4 sm:p-6 lg:px-8"
   >
     <button
       id="sidebar-toggle"
       type="button"
-      class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100"
+      class="inline-flex items-center p-2 text-sm text-muted-foreground rounded-none md:hidden hover:bg-accent"
       aria-label="Toggle sidebar menu"
     >
       <span class="sr-only">Open sidebar</span>
@@ -53,9 +51,7 @@ const { title } = Astro.props
   </div>
 
   <main id="main-content" class="p-4 md:ml-64 pt-20 w-full">
-    <div
-      class="p-4 border-2 border-gray-200 dark:border-gray-700 border-dashed rounded-lg"
-    >
+    <div class="p-4 border-2 border-border border-dashed rounded-none">
       <slot />
     </div>
   </main>

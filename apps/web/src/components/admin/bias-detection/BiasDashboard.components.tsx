@@ -86,7 +86,7 @@ import {
 const CustomTooltip: React.FC<TooltipProps> = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className="bg-popover text-popover-foreground border-border border p-3">
+      <div className="border border-border bg-popover p-3 text-popover-foreground">
         <p className="font-medium">{`${label}`}</p>
         {payload.map((entry) => (
           <p
@@ -118,19 +118,19 @@ export const HighBiasAlertNotification: React.FC<
   return (
     <div
       role="alert"
-      className="border-border bg-card flex items-start justify-between border p-4"
+      className="flex items-start justify-between border border-border bg-card p-4"
     >
       <div className="flex items-start space-x-3">
-        <AlertTriangle className="text-destructive mt-0.5 h-5 w-5" />
+        <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
         <div>
           <p className="font-semibold">
             High Bias Alert: {newHighBiasAlert.type}
           </p>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-sm text-muted-foreground">
             {newHighBiasAlert.message}
           </p>
           {newHighBiasAlert.sessionId && (
-            <p className="text-muted-foreground mt-1 text-xs">
+            <p className="mt-1 text-xs text-muted-foreground">
               Session: {newHighBiasAlert.sessionId}
             </p>
           )}
@@ -249,7 +249,7 @@ export const Header: React.FC<HeaderProps> = ({
           Bias Detection Dashboard
         </h1>
         {lastUpdated && (
-          <p className="text-muted-foreground flex items-center text-sm">
+          <p className="flex items-center text-sm text-muted-foreground">
             <Clock className="mr-1 h-3 w-3" />
             Last updated: {lastUpdated.toLocaleString()}
           </p>
@@ -265,7 +265,7 @@ export const Header: React.FC<HeaderProps> = ({
           <span className="text-sm">
             {connectionStatus.text}
             {connectionStatus.pulse && (
-              <span className="bg-current ml-1 inline-block h-2 w-2 animate-pulse rounded-full" />
+              <span className="bg-current ml-1 inline-block h-2 w-2 animate-pulse rounded-none" />
             )}
           </span>
         </div>
@@ -684,7 +684,7 @@ export const ExportDialog: React.FC<ExportDialogProps> = ({
         {exportProgress.isExporting && (
           <div>
             <Progress value={exportProgress.progress} className="w-full" />
-            <p className="text-muted-foreground mt-1 text-sm">
+            <p className="mt-1 text-sm text-muted-foreground">
               {exportProgress.status}
             </p>
           </div>
@@ -900,7 +900,7 @@ export const FilteringControls: React.FC<FilteringControlsProps> = ({
           </div>
         </div>
 
-        <p className="text-muted-foreground mt-3 text-sm">
+        <p className="mt-3 text-sm text-muted-foreground">
           Active Filters:{' '}
           {selectedTimeRange === '24h' &&
           biasScoreFilter === 'all' &&
@@ -987,12 +987,12 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Total Sessions</p>
+              <p className="text-sm text-muted-foreground">Total Sessions</p>
               <p className="text-2xl font-bold">
                 {summary?.totalSessions ?? 0}
               </p>
             </div>
-            <Users className="text-primary h-8 w-8" />
+            <Users className="h-8 w-8 text-primary" />
           </div>
         </CardContent>
       </Card>
@@ -1002,7 +1002,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Average Bias Score
               </p>
               <p
@@ -1015,7 +1015,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
                 className="mt-1 h-1"
               />
             </div>
-            <BarChart3 className="text-primary h-8 w-8" />
+            <BarChart3 className="h-8 w-8 text-primary" />
           </div>
         </CardContent>
       </Card>
@@ -1025,13 +1025,13 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Filtered Alerts</p>
+              <p className="text-sm text-muted-foreground">Filtered Alerts</p>
               <p className="text-2xl font-bold">{filteredAlerts.length}</p>
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 of {alerts.length} total
               </p>
             </div>
-            <AlertTriangle className="text-primary h-8 w-8" />
+            <AlertTriangle className="h-8 w-8 text-primary" />
           </div>
         </CardContent>
       </Card>
@@ -1041,7 +1041,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         <CardContent className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Compliance Score</p>
+              <p className="text-sm text-muted-foreground">Compliance Score</p>
               <p className="text-2xl font-bold">
                 {((summary?.complianceScore ?? 0) * 100).toFixed(0)}%
               </p>
@@ -1050,7 +1050,7 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
                 className="mt-1 h-1"
               />
             </div>
-            <Eye className="text-primary h-8 w-8" />
+            <Eye className="h-8 w-8 text-primary" />
           </div>
         </CardContent>
       </Card>
@@ -1311,7 +1311,7 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                   }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="bg-popover text-popover-foreground border-border border p-2">
+                        <div className="border border-border bg-popover p-2 text-popover-foreground">
                           <p className="font-semibold">{payload[0]?.name}</p>
                           <p>Count: {payload[0]?.value}</p>
                           <p>
@@ -1389,7 +1389,7 @@ export const DemographicsTab: React.FC<DemographicsTabProps> = ({
                   }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="bg-popover text-popover-foreground border-border border p-2">
+                        <div className="border border-border bg-popover p-2 text-popover-foreground">
                           <p className="font-semibold">{payload[0]?.name}</p>
                           <p>Count: {payload[0]?.value}</p>
                           <p>
@@ -1610,7 +1610,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
           return (
             <Card
               key={alert.alertId}
-              className={isSelected ? 'ring-blue-500 ring-2' : ''}
+              className={isSelected ? 'ring-2 ring-ring' : ''}
             >
               <CardContent className="p-4">
                 <div className="flex items-start space-x-3">
@@ -1633,10 +1633,10 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                         </Badge>
                         <div>
                           <h4 className="font-semibold">{alert.type}</h4>
-                          <p className="text-muted-foreground mt-1 text-sm">
+                          <p className="mt-1 text-sm text-muted-foreground">
                             {alert.message}
                           </p>
-                          <p className="text-muted-foreground mt-2 text-xs">
+                          <p className="mt-2 text-xs text-muted-foreground">
                             Session: {alert.sessionId} •{' '}
                             {alert.timestamp
                               ? new Date(alert.timestamp).toLocaleString()
@@ -1662,7 +1662,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                                 {lastAction.type.charAt(0).toUpperCase() +
                                   lastAction.type.slice(1)}
                               </Badge>
-                              <span className="text-muted-foreground text-xs">
+                              <span className="text-xs text-muted-foreground">
                                 {new Date(
                                   lastAction.timestamp,
                                 ).toLocaleString()}
@@ -1672,7 +1672,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
 
                           {/* Alert Notes */}
                           {alertNotes.has(alert.alertId) && (
-                            <div className="bg-muted mt-2 rounded p-2 text-sm">
+                            <div className="mt-2 rounded bg-muted p-2 text-sm">
                               <strong>Notes:</strong>{' '}
                               {alertNotes.get(alert.alertId)}
                             </div>
@@ -1747,7 +1747,7 @@ export const AlertsTab: React.FC<AlertsTabProps> = ({
                     {actions.length > 0 && (
                       <div className="mt-3 border-t pt-3">
                         <details className="text-sm">
-                          <summary className="text-muted-foreground cursor-pointer hover:text-foreground">
+                          <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
                             Action History ({actions.length})
                           </summary>
                           <div className="mt-2 space-y-1">
@@ -1851,7 +1851,7 @@ export const SessionsTab: React.FC<SessionsTabProps> = ({
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     {analysis.timestamp
                       ? new Date(analysis.timestamp).toLocaleString()
                       : 'Unknown time'}
@@ -1905,7 +1905,7 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({
                     </Badge>
                     <h4 className="font-semibold">{rec.title}</h4>
                   </div>
-                  <p className="text-muted-foreground mb-3 text-sm">
+                  <p className="mb-3 text-sm text-muted-foreground">
                     {rec.description}
                   </p>
                   <div className="flex items-center space-x-2">
