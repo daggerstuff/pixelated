@@ -166,12 +166,12 @@ export default function BackupLocationTab() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-      <div className="border-gray-200 dark:border-gray-700 border-b px-6 py-4">
+    <div className="rounded-none bg-card">
+      <div className="border-b border-border px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold">Backup Storage Locations</h3>
-            <p className="text-gray-500 dark:text-gray-400 mt-1 text-sm">
+            <p className="mt-1 text-sm text-muted-foreground">
               Configure where backup data is stored. For redundancy, configure
               multiple locations.
             </p>
@@ -180,7 +180,7 @@ export default function BackupLocationTab() {
             type="button"
             onClick={handleAddLocation}
             disabled={isAddingLocation}
-            className="border-transparent text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+            className="border-transparent text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 inline-flex items-center rounded-none border px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
           >
             Add Location
           </button>
@@ -188,42 +188,42 @@ export default function BackupLocationTab() {
       </div>
 
       <div className="overflow-x-auto">
-        <table className="divide-gray-200 dark:divide-gray-700 min-w-full divide-y">
-          <thead className="bg-gray-50 dark:bg-gray-750">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="bg-secondary">
             <tr>
               <th
                 scope="col"
-                className="text-gray-500 dark:text-gray-400 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Name
               </th>
               <th
                 scope="col"
-                className="text-gray-500 dark:text-gray-400 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Type
               </th>
               <th
                 scope="col"
-                className="text-gray-500 dark:text-gray-400 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Location
               </th>
               <th
                 scope="col"
-                className="text-gray-500 dark:text-gray-400 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Status
               </th>
               <th
                 scope="col"
-                className="text-gray-500 dark:text-gray-400 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Default
               </th>
               <th
                 scope="col"
-                className="text-gray-500 dark:text-gray-400 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground"
               >
                 Last Sync
               </th>
@@ -232,20 +232,20 @@ export default function BackupLocationTab() {
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-gray-200 dark:bg-gray-800 dark:divide-gray-700 divide-y">
+          <tbody className="divide-y divide-border bg-card">
             {locations.map(function (location) {
               return (
                 <tr key={location.id}>
-                  <td className="text-gray-900 dark:text-white whitespace-nowrap px-6 py-4 text-sm font-medium">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-foreground">
                     {location.name}
                   </td>
-                  <td className="text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {location.type === 'local' && 'Local Storage'}
                     {location.type === 's3' && 'AWS S3'}
                     {location.type === 'azure' && 'Azure Blob Storage'}
                     {location.type === 'gcp' && 'Google Cloud Storage'}
                   </td>
-                  <td className="text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {location.type === 'local' && location.path}
                     {location.type === 's3' &&
                       formatStorageLocation('s3', location.bucket!)}
@@ -256,24 +256,24 @@ export default function BackupLocationTab() {
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     {location.status === 'active' && (
-                      <span className="bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100 inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                      <span className="inline-flex rounded-none border border-input bg-secondary px-2 text-xs font-semibold leading-5 text-foreground">
                         Active
                       </span>
                     )}
                     {location.status === 'error' && (
-                      <span className="bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100 inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                      <span className="inline-flex rounded-none border border-ring bg-card px-2 text-xs font-semibold leading-5 text-foreground">
                         Error
                       </span>
                     )}
                     {location.status === 'configuring' && (
-                      <span className="bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100 inline-flex rounded-full px-2 text-xs font-semibold leading-5">
+                      <span className="inline-flex rounded-none border border-ring bg-secondary px-2 text-xs font-semibold leading-5 text-foreground">
                         Configuring...
                       </span>
                     )}
                   </td>
-                  <td className="text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {location.isDefault ? (
-                      <span className="dark:text-primary-400 text-primary-600 font-medium">
+                      <span className="text-primary-600 font-medium">
                         Default
                       </span>
                     ) : (
@@ -281,13 +281,13 @@ export default function BackupLocationTab() {
                         onClick={function () {
                           return setDefaultLocation(location.id)
                         }}
-                        className="text-gray-600 dark:text-gray-400 dark:hover:text-primary-400 hover:text-primary-600 font-medium"
+                        className="hover:text-primary-600 font-medium text-muted-foreground"
                       >
                         Set as default
                       </button>
                     )}
                   </td>
-                  <td className="text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm">
+                  <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                     {location.lastSync
                       ? new Date(location.lastSync).toLocaleString()
                       : '-'}
@@ -299,7 +299,7 @@ export default function BackupLocationTab() {
                           return testConnection(location.id)
                         }}
                         disabled={location.status === 'configuring'}
-                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
+                        className="font-medium text-foreground hover:underline"
                       >
                         Test
                       </button>
@@ -308,7 +308,7 @@ export default function BackupLocationTab() {
                           onClick={function () {
                             return removeLocation(location.id)
                           }}
-                          className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                          className="font-medium text-foreground hover:underline"
                         >
                           Remove
                         </button>
@@ -323,14 +323,14 @@ export default function BackupLocationTab() {
       </div>
 
       {isAddingLocation && (
-        <div className="border-gray-200 dark:border-gray-700 border-t p-6">
+        <div className="border-t border-border p-6">
           <h4 className="mb-4 text-lg font-medium">Add New Storage Location</h4>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
               <div className="sm:col-span-3">
                 <label
                   htmlFor="name"
-                  className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Location Name
                 </label>
@@ -341,14 +341,14 @@ export default function BackupLocationTab() {
                   value={newLocation.name}
                   onChange={handleInputChange}
                   required
-                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
+                  className="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-none border border-input px-3 py-2 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div className="sm:col-span-3">
                 <label
                   htmlFor="type"
-                  className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                  className="block text-sm font-medium text-foreground"
                 >
                   Storage Type
                 </label>
@@ -357,7 +357,7 @@ export default function BackupLocationTab() {
                   name="type"
                   value={newLocation.type}
                   onChange={handleInputChange}
-                  className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md py-2 pl-3 pr-10 text-base focus:outline-none sm:text-sm"
+                  className="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-none border-input py-2 pl-3 pr-10 text-base focus:outline-none sm:text-sm"
                 >
                   <option value="local">Local Storage</option>
                   <option value="s3">AWS S3</option>
@@ -370,7 +370,7 @@ export default function BackupLocationTab() {
                 <div className="sm:col-span-6">
                   <label
                     htmlFor="path"
-                    className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                    className="block text-sm font-medium text-foreground"
                   >
                     File Path
                   </label>
@@ -382,7 +382,7 @@ export default function BackupLocationTab() {
                     onChange={handleInputChange}
                     required
                     placeholder="/path/to/backup/directory"
-                    className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
+                    className="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-none border border-input px-3 py-2 focus:outline-none sm:text-sm"
                   />
                 </div>
               )}
@@ -394,7 +394,7 @@ export default function BackupLocationTab() {
                   <div className="sm:col-span-4">
                     <label
                       htmlFor="bucket"
-                      className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                      className="block text-sm font-medium text-foreground"
                     >
                       Bucket Name
                     </label>
@@ -405,7 +405,7 @@ export default function BackupLocationTab() {
                       value={newLocation.bucket}
                       onChange={handleInputChange}
                       required
-                      className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
+                      className="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-none border border-input px-3 py-2 focus:outline-none sm:text-sm"
                     />
                   </div>
 
@@ -413,7 +413,7 @@ export default function BackupLocationTab() {
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="region"
-                        className="text-gray-700 dark:text-gray-300 block text-sm font-medium"
+                        className="block text-sm font-medium text-foreground"
                       >
                         Region
                       </label>
@@ -424,7 +424,7 @@ export default function BackupLocationTab() {
                         value={newLocation.region}
                         onChange={handleInputChange}
                         placeholder="us-west-2"
-                        className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none sm:text-sm"
+                        className="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-none border border-input px-3 py-2 focus:outline-none sm:text-sm"
                       />
                     </div>
                   )}
@@ -440,17 +440,17 @@ export default function BackupLocationTab() {
                       type="checkbox"
                       checked={newLocation.isDefault}
                       onChange={handleInputChange}
-                      className="border-gray-300 dark:border-gray-600 dark:bg-gray-700 text-primary-600 focus:ring-primary-500 h-4 w-4 rounded"
+                      className="text-primary-600 focus:ring-primary-500 h-4 w-4 rounded-none border-input"
                     />
                   </div>
                   <div className="ml-3 text-sm">
                     <label
                       htmlFor="isDefault"
-                      className="text-gray-700 dark:text-gray-300 font-medium"
+                      className="font-medium text-foreground"
                     >
                       Make this the default backup location
                     </label>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-muted-foreground">
                       Default locations are used for all backups unless
                       otherwise specified
                     </p>
@@ -463,16 +463,16 @@ export default function BackupLocationTab() {
               <button
                 type="button"
                 onClick={handleCancelAdd}
-                className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-650 focus:ring-primary-500 inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2"
+                className="focus:ring-primary-500 inline-flex items-center rounded-none border border-input bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isFormLoading}
-                className={`border-transparent text-white inline-flex items-center rounded-md border px-4 py-2 text-sm font-medium shadow-sm ${
+                className={`border-transparent text-white inline-flex items-center rounded-none border px-4 py-2 text-sm font-medium ${
                   isFormLoading
-                    ? 'bg-gray-400'
+                    ? 'bg-secondary text-muted-foreground'
                     : 'bg-primary-600 hover:bg-primary-700'
                 } focus:ring-primary-500 focus:outline-none focus:ring-2 focus:ring-offset-2`}
               >

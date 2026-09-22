@@ -1,6 +1,6 @@
-/* Font @font-face declarations are in src/styles/fonts.css (loaded via src/lib/fonts.ts).
-   Fraunces Variable (display), Public Sans Variable (body), and
-   JetBrains Mono Variable (mono/labels) are served from fontsource packages. */
+/* Font @font-face declarations are imported through src/lib/fonts.ts.
+   Instrument Serif (display), Instrument Sans Variable (body), and
+   Spline Sans Mono Variable (mono/labels) are served from fontsource packages. */
 
 :root {
   --bg: #f0eee9;
@@ -23,10 +23,10 @@
   --radius-sm: 2px;
   --max: 1160px;
   --mono:
-    'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas,
+    'Spline Sans Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas,
     monospace;
   --body:
-    'Public Sans Variable', ui-sans-serif, system-ui, -apple-system,
+    'Instrument Sans Variable', ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --term-bg: #1a1d22;
   --term-sidebar-bg: #15181d;
@@ -1785,7 +1785,6 @@ button.nav-icon-link {
   .nav-tools {
     gap: 0.35rem;
   }
-
 }
 
 /* Only wrap the icon row below 320px, where the brand + hamburger +

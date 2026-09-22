@@ -19,6 +19,7 @@ Thumbs.db
 
 # === AI / LLM AGENTS & TOOLS ===
 .agents/
+.agent-runner/
 .antigravitycli/
 .art/
 .baselines/*
@@ -98,7 +99,10 @@ skills-lock.json
 struct-agent-key.json
 TASTES.md
 test.md
+# __mocks__ ignores agent-runtime junk dirs of that name, but vitest manual
+# mocks are source-controlled test fixtures — un-ignore this one.
 __mocks__
+!apps/web/src/lib/ai/bias-detection/__mocks__/
 
 # Squad runtime state
 .squad/decisions/inbox/
@@ -441,6 +445,7 @@ startup-system-wide.sh
 
 # px CLI link artifacts
 tools/px/pnpm-lock.yaml
+agents/*/pnpm-lock.yaml
 tools/px/pnpm-workspace.yaml
 
 # GitHub Copilot
