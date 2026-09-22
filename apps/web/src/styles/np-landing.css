@@ -71,7 +71,7 @@
 }
 .case-hero h1 {
   max-width: 18ch;
-  font-family: var(--np-font-display);
+  font-family: var(--np-font-hero);
   font-weight: 400;
   font-size: clamp(2.25rem, 3.6vw, 3.25rem);
   line-height: 1.08;
