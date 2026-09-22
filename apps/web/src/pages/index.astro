@@ -2,7 +2,9 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import { heroContent, workflowContent, ctaContent } from '@/lib/content'
+import { heroContent } from '@/lib/content/hero'
+import { workflowContent } from '@/lib/content/workflow'
+import { ctaContent } from '@/lib/content/cta'
 
 const hero = heroContent
 const workflow = workflowContent
@@ -43,7 +45,7 @@ const scenarioRows = [
 ]
 ---
 
-<BaseLayout title={hero.title} description={hero.metaDescription}>
+<BaseLayout title="Pixelated Empathy" description={hero.metaDescription}>
   <main class="case-home">
     <section class="case-hero" aria-labelledby="case-title">
       <div class="case-shell">
@@ -68,16 +70,6 @@ const scenarioRows = [
               {hero.secondaryCTA.text}
             </a>
           </div>
-          <dl class="case-facts">
-            {
-              hero.proofPoints.map((point) => (
-                <div>
-                  <dt>{point.label}</dt>
-                  <dd>{point.text}</dd>
-                </div>
-              ))
-            }
-          </dl>
         </div>
 
         <article
@@ -102,7 +94,7 @@ const scenarioRows = [
             </div>
 
             <div class="case-turn case-turn--trainee">
-              <span class="case-turn__who">Trainee · first response</span>
+              <span class="case-turn__who">Trainee · 18:43</span>
               <p>
                 I do believe you. I am asking because I want to make sure I
                 understand everything that happened.
@@ -112,7 +104,7 @@ const scenarioRows = [
             <aside class="case-review" aria-label="Supervisor review">
               <div class="case-review__marker" aria-hidden="true">A</div>
               <div>
-                <span class="case-review__by">Supervisor mark A</span>
+                <span class="case-review__who">Supervisor mark A</span>
                 <strong>Defended intent before naming impact.</strong>
                 <p>
                   The client has already told you how the questioning landed.
@@ -122,7 +114,10 @@ const scenarioRows = [
             </aside>
 
             <div class="case-turn case-turn--retry">
-              <span class="case-turn__who">Trainee · directed retry</span>
+              <span class="case-turn__who">
+                Trainee · 18:46
+                <span class="case-turn__tag">Directed retry</span>
+              </span>
               <p>
                 My questions left you feeling doubted. I can see why you would
                 pull back. Can we stay with what happened between us just now?
@@ -135,6 +130,19 @@ const scenarioRows = [
             <span>Retry preserved in training record</span>
           </footer>
         </article>
+      </div>
+    </section>
+
+    <section class="case-audience" aria-label="Audience overview">
+      <div class="case-shell case-audience__grid">
+        {
+          hero.proofPoints.map((point) => (
+            <article>
+              <h2>{point.label}</h2>
+              <p>{point.text}</p>
+            </article>
+          ))
+        }
       </div>
     </section>
 

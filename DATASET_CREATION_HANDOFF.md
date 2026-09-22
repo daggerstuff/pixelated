@@ -539,7 +539,9 @@ re-baselining after any swap.
   gained `--start` + seed-map dedup for resume-safe numbering
   (`cf6c4edae`). 0 lint errors across the 60-plan directory.
 - **Writer**: 117/117 sessions, 50/50 records complete, 2.44M writer
-  tokens. W&B runs `1no17qro` + `au0y0c6e` + final arc_0001 pass.
+  tokens. W&B runs `1no17qro` (initial, killed) + `m2ww2a6g` (orphan
+  incident) + `au0y0c6e` (fixed-gate main) + `q77pr105` (resume) +
+  `nes0748z` (arc_0001 final).
   Root-caused + fixed mid-run: `_tl_anchor_keys` split ledger strings on
   commas, so descriptions containing commas produced phantom "anchor"
   keys → spurious `tl_drift` hard failures (4 sessions in the first 15).
@@ -556,14 +558,167 @@ re-baselining after any swap.
   20 accepted arcs remain in `arc_records.jsonl`; the 30 revised arcs
   were dropped for regeneration (audit notes at
   `arc_audit_notes/`).
-- **BLOCKER**: Vercel AI Gateway credit exhausted mid-audit (402
-  `insufficient_funds`). The 11 arcs caught by the 402 were audited on
-  the W&B secondary (`Kimi-K2.6` via `api.inference.wandb.ai/v1`);
-  `audit_arc_corpus.py` gained an `ARC_AUDITOR_KEYS` env override for
-  the key pool. The revise cycle (regen ~54 sessions + 30 re-audits,
-  ~$1–2) is blocked on the writer model
-  (`deepseek/deepseek-v4.1-flash` is Vercel-only) — decision: top up
-  Vercel vs. regenerate on W&B with a model swap.
+- **Revision cycle (Sep 18–19) — COMPLETE**. Vercel credit blocker
+  resolved by re-homing the arc track to **Featherless** (user-supplied new
+  key `rc_d93c…` as `FEATHERLESS_API_KEY`; the old `rc_e070…` stayed as
+  `_KEY_2` — two accounts = two 1-slot concurrent writer slots). Writer =
+  `deepseek-ai/DeepSeek-V4.1-Flash` (spec model, provenance-consistent with
+  the 20 first-pass accepts); auditor = `moonshotai/Kimi-K2.6` (Kimi-K3
+  delisted from Featherless). `generate_arc_corpus.py` gained
+  `ARC_WRITER_KEYS` env override (matches the auditor's
+  `ARC_AUDITOR_KEYS`).
+  - **Root-cause fixes applied mid-cycle** (commit `a2b1f8939`):
+    `turn_count` gate was a fixed ±2 tolerance — V4.1-Flash drifts ±5
+    turns, and turn_count was the dominant retry sink. Now scaled
+    `_turn_tolerance(target)` (floor 3, cap 6, 40% of target); **zero**
+    turn_count failures after the fix. Anti-parroting prompt hardened
+    (banned-opener list incl. the boundary-affirmation template;
+    corrective note now quotes the offending line). `tl` anchor-persistence
+    rule for s2+. `lint_arc_plans.py` gained `_check_calendar` (case-
+    sensitive month/year in beat/notes text — catches the arc_0052
+    "since March" class).
+  - **Plan-level fixes**: arc_0052 misstatement quote "since March" →
+    "since he took it" (calendar gate bug, not model); arc_0035 brittle
+    12-word verbatim revision quote → 7 words (multi-word verbatim quotes
+    split across turns can never pass beat-containment).
+  - **Runs**: revision writers A4 `cvgl1col` (22 sessions/13 arcs, 336k
+    tokens) + B4 `gnivy7mn` (16/9, 247k) at concurrency 1 per
+    Featherless account; holdouts `k7ljm2dv` (arc_0005 s2 — plan clean,
+    model-reliability holdout, escalated to `deepseek-ai/DeepSeek-V4-Pro`,
+    mixed provenance noted) + `5bnvlg1j` (5 sessions/3 arcs: arc_0035
+    s2+s3, arc_0051 s1+s2, arc_0052 s3). Canonical merge → 60/60 records,
+    138 checkpoint rows, 0 duplicates.
+  - **Re-audit**: r2 (Featherless, pre key-pool fix) audited 3 —
+    arc_0010 ACCEPT, arc_0004 + arc_0011 HR — then 27 errors (the pool
+    still carried the Vercel key, which 401s on the Featherless URL).
+    r4 (Featherless, pool fixed to the two Featherless keys): 23/23 →
+    7 accept, 16 HR, 0 errors (1058s). r5: 4 arcs over the context cap
+    (below) → W&B Kimi-K2.6, 1 accept (arc_0052), 3 HR, 0 errors (287s).
+- **Featherless 32k context cap (discovered via the r3 400s)**: the plan
+  tier caps Kimi-K2.6 at **32,768 prompt tokens**. Four revised arcs
+  exceed it (arc_0006 ~44.5k, arc_0043 ~45.5k, arc_0052 ~43.8k, arc_0039
+  ~31.6k+system) → routed to W&B Inference Kimi-K2.6 (no cap; verified
+  43.3k-token prompt → full 12k-char verdict, finish=stop). The 400 body
+  was previously discarded by `call_auditor` — non-200 responses now
+  carry the first 200 chars of the body.
+- **GATE EVALUATION (final Phase A state, 50 arcs)**:
+  - **29/50 accepted (58%) / 21/50 HR (42%) / 0 hard rejects.**
+  - Gate (≥85% accept, ≤15% HR): **NOT MET.**
+  - HR-21 splits into two cohorts: **10 with safety_failure flags**
+    (arc_0001, 0006, 0011, 0012, 0013, 0024, 0032, 0033, 0039, 0048)
+    needing clinical review, and **11 without** (arc_0004, 0005, 0007,
+    0018, 0020, 0022, 0035, 0041, 0043, 0049, 0050) whose flags are
+    ledger/mechanical/narrative.
+  - Revision-cycle flag distribution: ledger_contradiction 61, tl_drift
+    25, thread_death 24, safety_failure 14, comfort_lie 9, capitulation
+    7, truth_withholding 5, false_certainty 3, integrity_violation 1.
+  - Precedents: NF HR-70 manual review accepted 22/38 (58%), including
+    13/20 safety-flagged rows; pilot-track HRs resolved via plan fix +
+    regen (pilot_06) and manual override (pilot_08).
+  - Note: **no arc→ChatML export exists yet** — the ledger (think-block)
+    keep-vs-strip is an open export design decision; 58% of all
+    revision-cycle flags are ledger/mechanical, so their training-data
+    severity depends on that decision.
+  - **DECISION POINT**: do not start Phase B until HR-21 is triaged.
+    Lanes: (1) the 11 no-safety arcs → reset verdict + regenerate
+    flagged sessions + one-shot re-audit (pilot_06 pattern); (2) the 10
+    safety-flagged arcs → manual clinical review (NF HR-70 pattern).
+    Expected: ~12–13 more accepts → ~42/50 (84–86%), ~8 rejects.
+
+## Part 7 — HR-21 triage + auditor-model eval (Sep 18–19)
+
+Both HR-21 lanes executed; the Featherless community-model auditor option
+was eliminated by a controlled eval.
+
+### Lane 2 — 10 safety-flagged arcs → manual clinical review (CLOSED)
+
+Full transcripts read under the NF HR-70 rule (risk engagement
+proportionate to acuity + no iatrogenic harm). Verdict log:
+`output/arc_corpus/lane2_manual_review_20260919.json`. Result: **8 accept /
+2 reject**.
+
+- Accepts: arc_0001, 0006, 0011, 0012, 0024, 0032, 0039, 0048 — staged as
+  `accept` with a `manual_review` annotation in the audit block.
+- Rejects: **arc_0013** (s2 ledger fabricates "looked up carbon monoxide
+  (told)" — the client explicitly denied looking anything up) and
+  **arc_0033** (s3 ledger fabricates four s2 carry-overs, including an
+  inverted insurance denial). Same bug class as pilot_06 (cross-session
+  ledger fabrication), and both survived two automated audit passes.
+
+### Lane 1 — 11 mechanical arcs → reset + regenerate (DONE, pending re-audit)
+
+Verdicts reset (records 60→49, checkpoint 138→115, snapshots
+`.pre_lane1_20260918`), audit notes reconstructed, then all 11 arcs
+regenerated on the two Featherless writer slots — plus the 2 lane-2
+rejects (arc_0013 s2, arc_0033 s3), which regenerated in canonical. 13/13
+arcs complete: 26 lane-1 sessions + 2 lane-2 sessions. Multiple writer
+restarts (429 storms, gate failures). Mid-run fixes now in
+`generate_arc_corpus.py`:
+
+- **CARRY-OVER LEDGER RULE** (targets the 0013/0033 bug class): every `sN:`
+  ledger carry-over must be traceable to a quoted client line or VERIFIED
+  FACT; never carry the opposite of a stated fact; never add specifics
+  (times, amounts, insurance, plans) that no line contains.
+- Anti-parroting v4: when pointing at a word the client dropped, the quoted
+  fragment is the opener ("Last time. You let it walk past.") — never
+  "You said <word>".
+- Plan fixes: arc_0018 (13-word multi-clause misstatement → two short
+  fragments), arc_0049 opener (passed after the 4th anti-parroting
+  iteration), arc_0050 completed clean.
+
+### Closeout — canonical merge (Sep 19)
+
+Lane-1 A/B checkpoints + records merged into canonical, dedup on
+(arc_id, session_n); the 3 overlapping rows were byte-identical (writer
+resume re-emitted existing sessions). Final state: **60 unique arcs
+(10 pilots + 50 Phase A), 138 checkpoint rows, 0 duplicates**; per-arc
+session counts match `metrics.sessions` for all 60. Audit state:
+**47/60 final accept / 13 regenerated-pending-re-audit / 0 HR** (47 = 10
+pilots + 20 first-pass + 9 re-audit + 8 lane-2 manual).
+
+### Auditor-model eval — all 6 Featherless community models DQ (Sep 19)
+
+Directive: find the best of six Featherless models for the arc-audit task.
+Harness: `ai/training/eval_audit_models.py` (imports the auditor prompt +
+verdict parsing from `audit_arc_corpus.py` — single source of truth).
+Probe set: 17 arcs with ground truth = the 2 known fabrication defects
+(arc_0013/0033, the exact bug class under test) + 15 known accepts (8
+lane-2 manual + 5 K3 first-pass + 2 pilots). Scoring: composite =
+0.45·defect_caught + 0.35·agreement + 0.20·(1−false_revise);
+disqualified when infra_rate < 0.8. Sequential per model (Featherless
+caps at 4 model switches/min). Results: `output/arc_corpus/eval_audit/`
+(102 rows `results.jsonl` + `leaderboard.json`). No W&B run — direct API
+calls.
+
+| Model | infra | defect caught | agreement | false revise | composite | DQ |
+|---|---|---|---|---|---|---|
+| fable (Qwen3.8-27B heretic) | 0.529 | 1/2 (mislabeled) | 5/17 | 4/15 | 0.475 | yes |
+| orion (Orion-26B-A4B) | 0.529 | 0/2 | 8/17 | 0/15 | 0.365 | yes |
+| obliterated (Qwen3.8-27B) | 0.529 | 0/2 | 8/17 | 0/15 | 0.365 | yes |
+| boulesis (Boulesis-26B-A4B) | 0.529 | 0/2 | 8/17 | 0/15 | 0.365 | yes |
+| novelist (Gemma-4-Novelist-31B) | 0.471 | 0/2 | 7/17 | 1/15 | 0.331 | yes |
+| artemis (Artemis-31B) | 0.471 | 0/2 | 7/17 | 1/15 | 0.331 | yes |
+
+Two fatal flaws, independent of each other:
+
+1. **32,768-token context wall** — 8/17 probes hard-failed (every
+   3-session arc is ~44k tokens at audit-prompt length). infra_rate
+   0.47–0.53 ⇒ all six below the 0.8 DQ bar before any quality question.
+2. **Zero clinical sensitivity** — 5/6 models accepted outright the two
+   ledger fabrications that the HR-21 lanes exist to catch; the only
+   detection (fable, 1/2) mislabeled the category, and fable also
+   over-flags 4/15 clean arcs. Most models flag nothing (0–1 flags total).
+
+**Conclusion**: no Featherless community model is usable as a clinical
+auditor. `ARC_AUDITOR_MODEL` stays `moonshotai/Kimi-K2.6` (Featherless,
+W&B Inference route for 3-session arcs over the 32k cap — same route used
+in re-audit r5).
+
+**OPEN DECISION — re-audit model for the 13 regenerated arcs**:
+(A) Kimi-K2.6 on Featherless (recommended — ~$0, 27 prior audits,
+0 infra errors post key-pool fix, W&B route for over-cap arcs);
+(B) Vercel top-up ~$5–10 for Kimi-K3 (spec purity vs the 20 first-pass
+accepts); (C) manual review of all 13.
 
 ---
 
@@ -571,11 +726,12 @@ re-baselining after any swap.
 
 | Var | State |
 |---|---|
-| `AI_GATEWAY_API_KEY` | **primary** — Vercel AI Gateway (OpenAI-compatible, 374 models, 200 OK) |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway (OpenAI-compatible, 374 models) — **credits exhausted (402) as of Sep 18** (~$30 consumed by Phase A); arc track moved to Featherless; top-up required before any further Vercel use (Part 7 decision B) |
 | `NF_BACKEND` | `vercel` (current primary; was `featherless`) |
 | `NF_MODEL` | `deepseek/deepseek-v4-flash-0731` (Vercel namespaced); wandb secondary default `deepseek-ai/DeepSeek-V4-Flash-0731` |
 | (Vultr) | fully removed 2026-09-17 — `VULTR_INFERENCE_API_KEY` no longer exists in code or `.env` |
-| `FEATHERLESS_API_KEY` / `_KEY_2` | both present (67 chars each, tails `…0d5b3` / `…772db`); quota-exhausted (the Sep 15 402 wall) — no longer the active backend |
+| `FEATHERLESS_API_KEY` / `_KEY_2` | **arc-track primary** (Sep 18): `rc_d93c…` (new, user-supplied) + `rc_e070…` (old, still valid) — 2 accounts × 1 concurrent slot each; plan caps Kimi-K2.6 at 32,768 prompt tokens |
+| `ARC_WRITER_*` / `ARC_AUDITOR_*` | `.env` block: URL=`api.featherless.ai/v1/chat/completions`, writer model `deepseek-ai/DeepSeek-V4.1-Flash`, auditor model `moonshotai/Kimi-K2.6`, key pools `FEATHERLESS_API_KEY,FEATHERLESS_API_KEY_2` (Vercel key REMOVED from pools — it 401s on the Featherless URL) |
 | `NF_CONCURRENCY` | 8 (passed at launch, not persisted in .env) |
 | `WANDB_API_KEY` / `WANDB_PROJECT` | set; project `pixelated-empathy-kan28`; the key also authenticates W&B Serverless Inference (`NF_BACKEND=wandb`, the secondary provider) |
 | Key rotation | `ai/training/featherless_keys.py` — `KeyPool` reads `FEATHERLESS_API_KEY`, `_2`, … in order, rotates on `http_429`/`http_402` (see `is_rotate_status`); only applies to the `featherless` backend |
@@ -599,6 +755,181 @@ but avoid copying terminal-captured keys into new docs.
 | `8tyc7do7` | HR-70 third-judge tiebreak (Sep 18) — 70 rows, minimax-m3 via Vercel |
 | `9fpcyelc` | NF pre-flight (Sep 17) — 1 record, passed |
 | `r2fkgmd9` | NF regeneration + re-judge (Sep 17) — 92 new + 1 preflight on Vercel |
+| `cvgl1col` / `gnivy7mn` | Phase A revision writers A4/B4 (Sep 19, Featherless) — 38 sessions/22 arcs, 583k tokens |
+| `k7ljm2dv` / `5bnvlg1j` | Phase A holdout sessions (Sep 19): arc_0005 s2 on V4-Pro; 5 sessions/3 arcs (arc_0035/0051/0052) on V4.1-Flash |
+| `mlcsijau` | Phase A plan generation (Sep 18) — 50 plans, 511,679 tokens, ~$0.53 |
+| `g07hni0g` / `sozac3cp` | Lane-1 regen writer A / A2 (Sep 18–19, Featherless) |
+| `sqceo287` / `oshn9fjd` | Lane-1 regen writer B / B2 (Sep 18–19, Featherless) |
+| `446bqsup` | Lane-2 reject regen (arc_0013 s2, arc_0033 s3) |
+
+---
+
+## Part 8 — K3 re-audit of 13 + full HR verification + accept-cohort contamination (Sep 19)
+
+### Auditor switch
+
+- `.env` auditor: `moonshotai/kimi-k3` on Vercel AI Gateway
+  (`AI_GATEWAY_API_KEY` — new key `vck_5F1n...`, old key 401-dead),
+  `ARC_AUDITOR_MAX_TOKENS=24576` (K3 is a reasoning model; ≤12k budget gets
+  burned by thinking before the JSON verdict is emitted — GLM-5.3/Flash died
+  the same way).
+- Gotcha: `audit_arc_corpus.py` loads `.env` with `override=True`, which
+  clobbers shell env. First re-audit launch (19:06) silently ran K2.6 via
+  Featherless instead of K3 via gateway; fixed `.env` at 19:26, clean K3
+  re-audit at 19:27. The accidental K2.6 run is archived at
+  `audit_results.k26_reaudit_20260919.jsonl` +
+  `human_review_queue.k26_reaudit_20260919.jsonl`.
+
+### K3 17-probe eval (the gate)
+
+- 16 valid / 1 unparseable (arc_0013: 12k budget, 329s).
+- 11 of 15 "clean" probes flagged. Spot-check verification proved **all 11
+  flags genuine** — the probe set's "accept" ground truth was wrong on 11/15
+  (73%). Verified fabrications include: arc_0001 (three-week timing of the
+  bay walk the client denied), arc_0032 (mother asserted in S1 ledger, never
+  mentioned in S1), arc_0039 ("front door key on his side of the bed" —
+  client never stated key location), pilot_01 ("ten days ago" vs the plan's
+  7-day "next week" interval), arc_0024 ("ex" asserted, 0 hits in S1 client
+  turns), arc_0034 (public-record details the client never gave).
+
+### K3 re-audit of the 13 regenerated arcs (404s, 0 errors)
+
+- **ACCEPT (3)**: arc_0033, arc_0022, arc_0041 — all three verified clean at
+  claim level (fabrications removed in regeneration; K2.6's 5/19/5 flags on
+  0033/0022/0041 were against pre-regeneration versions).
+- **HR (10)**: arc_0004 (4), arc_0005 (2), arc_0007 (1), arc_0013 (4),
+  arc_0018 (5), arc_0020 (2), arc_0035 (6), arc_0043 (5), arc_0049 (1),
+  arc_0050 (2).
+- K2.6 vs K3 disagreed on 4 arcs; K3 verified correct on all 4.
+
+### Claim-level verification of all 36 HR flags
+
+**35 genuine + 1 partial (arc_0013 "Ivy" name, plan-sanctioned) + 0 false
+positives.** Every K3 flag in the re-audit survived verification.
+
+Recurring writer bug classes (DeepSeek-V4.1-Flash):
+
+| Class | Example |
+|---|---|
+| Line duplication (therapist speaks client's line, client repeats) | arc_0013 T22/T23, arc_0020 T24/T25, arc_0043 T16/T17, arc_0004 S2 T9/C10 |
+| Invented specificity (vague → precise number/date/place) | arc_0013 "few weeks"→"three weeks", arc_0007 "three weeks of quiet", arc_0018 "six years"/"fourteen months"/"-9d", arc_0049 "nine weeks", arc_0035 "two days ago" (was this morning), arc_0050 "card"/"sister" |
+| tl_drift (anchor silently altered/dropped, no revision tag) | arc_0035 `now: today`→`-2d`, arc_0021 5 anchors dropped T1→T2, arc_0043 "her door"→"his door" gender-swap across all S2/S3 ledgers |
+| Cross-session ledger fabrication (MCI-class) | arc_0043 S3 "father yelled a lot (s1)" — father first appears S3 T17 |
+| Premature `(told)` tags | arc_0048 "-5d: voicemail from 'her' mother (told)" one turn before C12 disclosure |
+| Safety misclassification | **arc_0011: client discloses arm-picking self-harm at S2 C12, same-turn ledger says `risk: none — no self-harm content this turn`** |
+| Capitulation (granted autonomy re-imposed) | arc_0012 T5 "you can refuse the nurse" → T6 "you get food and fluid down — that's the order" |
+
+### Disposition: 11 contaminated accepts → HR
+
+The 11 probe-verified fabrications sat in the **accept** cohort. Moved to HR
+(snapshot `.pre_probehr_20260919`): arc_0001, arc_0006, arc_0011
+(safety-critical), arc_0012, arc_0021, arc_0024, arc_0032, arc_0034,
+arc_0039, arc_0048, pilot_01. `arc_records.jsonl` audit set to `hr` with K3
+probe flags + `probe_verification` annotation; 11 queue entries appended
+(`source: k3_probe_verification_20260919`).
+
+### Final corpus state (60 arcs)
+
+- **39 accept**: 36 from earlier cycles + 3 K3 re-audit accepts; 4 of the 39
+  probe-verified clean (arc_0002, arc_0008, arc_0014, pilot_08), **35
+  never audited by K3**
+- **21 HR**: 10 from K3 re-audit + 11 from probe verification
+- Master gold **not yet touched** by any arc-track record (still 189,159
+  lines = base + NF only) — all contamination found so far is fixable before
+  staging
+
+### Open decision
+
+39-arc K3 `--reaudit` sweep of the full accept cohort (35 unprobed + 4
+probe-clean re-check): at ~31s/arc with concurrency 2 ≈ 20–30 min wall, a few
+dollars on the gateway. Given 73% of the probe-set accepts were contaminated,
+the sweep is strongly indicated before staging any arc-track records to gold.
+
+---
+
+## Part 9 — 39-arc K3 accept-cohort sweep, verification, final state (Sep 19)
+
+### Sweep execution (3 chunks)
+
+- **Chunk 1** (20 arcs, 464s): 16 accept, 1 revise (arc_0029), 3 HR (arc_0010,
+  arc_0019, arc_0025), 0 errors.
+- **Chunk 2** (19 arcs): 6 completed (pilot_07 accept; 5 revise — pilot_02 4f,
+  pilot_03 1f, pilot_05 8f, pilot_08 1f, pilot_10 1f) then **13 × HTTP 402**
+  (gateway credits exhausted mid-run). No zero-touch K3 failover exists (W&B
+  Inference has K2.6/K2.7-Code only).
+- **Chunk 3** (13 arcs, 379s, after user $10 top-up of `vck_5F1n6…`): 6 accept
+  (arc_0036, arc_0041, arc_0046, arc_0047, arc_0053, pilot_06), 3 revise
+  (arc_0037 1f, pilot_04 4f, pilot_09 3f), 4 HR (arc_0040 1f, arc_0042 5f,
+  arc_0051 3f, arc_0052 7f), 0 errors. 3-session arcs (incl. arc_0043's
+  39k-token probe) audit cleanly on the gateway — no 32k wall.
+
+**Sweep totals (39 arcs): 23 accept / 9 revise / 7 HR / 0 infra errors.
+16/39 flagged (41%).** Snapshot: `.pre_sweep_20260919`.
+
+### Claim-level verification of all 53 sweep flags
+
+29 flags (chunks 1–2) + 24 flags (chunk 3) = **53 flags: 51 genuine, 2 false
+positives (96.2%)**. K3's cumulative record for Sep 19 across re-audit + probe
+verification + sweep: **100 flags, 97 fully genuine, 1 partial (arc_0013
+"Ivy", plan-sanctioned), 2 FP.**
+
+The 2 FPs (both annotated `DISPROVEN` in `arc_audit_notes/` so the writer does
+not "fix" them):
+
+- **pilot_04 s2 t12 [thread_death]** — flag claimed the aborted "that's the
+  part—" phrase is "never resurfaced… in session 3". S3 T9 resurfaces it
+  verbatim ("that's the part that's costing you"); the client also completes
+  the disclosure within the same turn. Flag's ledger quote doesn't match the
+  actual ledger.
+- **pilot_09 s1 t13 [ledger_contradiction]** — flag read "in, I don't know, a
+  couple of months" as ~-7m (couple of months post-death). Client-stated
+  duration; `-2m` is the defensible reading. Keep as written.
+
+### New defect evidence from the sweep (patterns now in the catalog)
+
+- **Phantom quotes**: pilot_05 ledger asserts client quotes ("they just
+  decided I was the problem (told)", "if I stop watching, they win (told)")
+  that exist nowhere in the transcript.
+- **Integrity violation**: arc_0019 therapist promises "I won't confirm
+  you're in treatment" in the same breath as "your employer sees
+  attendance" + S2 "letter confirming you attended".
+- **Thread death**: arc_0025 (sister's Sunday call), pilot_05 (ex-wife,
+  "She used to say—") — aborted disclosures never returned.
+- **Silent date inventions**: pilot_02 (-5m/-2m where S1 ledgers all carried
+  onset="not stated"), pilot_05 (-8m/-3w/-5m), arc_0051 (-3y/-1y on a
+  first-session client — "Session one of whatever this is" flatly contradicts
+  `-1y: started current therapy (told)`).
+- **Invented third-party name**: arc_0052 "Mara" — appears only in the
+  therapist's own line, never stated by the client.
+- **Invented manner of death**: pilot_09 S3 T6 "A motorcycle on a road killed
+  him" — cause of death never stated anywhere in the arc, at the arc's
+  central moment.
+
+### Final corpus state (Sep 19, pre-regeneration)
+
+- **arc_records.jsonl: 51 arcs** = 23 accept + 28 HR (9 revise arcs' records
+  deleted — re-enter on regeneration).
+- **sessions_checkpoint.jsonl: 124 rows** across 58 arc ids (revise arcs
+  keep unflagged sessions: arc_0029 [3], arc_0037 [2], pilot_02 [1],
+  pilot_03 [1], pilot_08 [2], pilot_09 [2], pilot_10 [1]; pilot_04/pilot_05
+  fully emptied).
+- **human_review_queue.jsonl: 28 entries** (21 pre-sweep + 7 sweep).
+- Accept cohort = 23 arcs, all K3-audited this day; 4 additionally
+  probe-verified clean earlier (arc_0002, arc_0008, arc_0014, pilot_08→now
+  revise, so 3: arc_0002, arc_0008, arc_0014).
+- Master gold **untouched** (189,159 lines = base + NF only).
+
+### Regeneration backlog (next)
+
+- **9 revise arcs**: writer resumes the 14 dropped sessions (arc_0029 s1–s2,
+  arc_0037 s1, pilot_02 s2, pilot_03 s2, pilot_04 s1–s3, pilot_05 s1–s2,
+  pilot_08 s1, pilot_09 s1+s3, pilot_10 s2); corrective notes in
+  `arc_audit_notes/` (2 FP items annotated).
+- **28 HR arcs**: full-arc reset (drop all session rows + records,
+  reconstruct corrective notes from `audit_results` flags_final via
+  `write_audit_note` logic, arc_0011 = safety-priority).
+- Then K3 re-audit of all regenerated sessions, repeat until clean, then
+  consolidate to gold (quadit-gated) → Phase B (150 arcs) / C (→400).
 
 ---
 
@@ -627,12 +958,20 @@ but avoid copying terminal-captured keys into new docs.
    (`tiebreak_hr.py`, minimax-m3) + 38-record manual review → 37 approved
    (22 manual + 15 tiebreak) staged to gold; final 177 accepted / 35
    rejected; gold 189,159.
-9. **Arc scale-up** — Phase 0 **DONE** (generator + lint, `0f7a266cf`).
-   Phase A **writer DONE + audit DONE** (Sep 18): 50/50 arcs generated,
-   50/50 audited → 20 accept / 30 revise / 0 HR. **Blocked** on Vercel
-   credit (402) for the 30-arc revise cycle (regen + re-audit); decide
-   top-up vs. W&B model-swap regen. Then B (150 + DPO pairing),
-   C (200 → 400 total ≈ $22).
+9. **Arc scale-up** — Phase 0 **DONE** (`0f7a266cf`). Phase A **writer +
+   first-pass audit + revision cycle + HR-21 triage + K3 re-audit DONE**
+   (Sep 18–19): lane-2 manual 8/10, lane-1 11 + 2 rejects regenerated
+   (13/13), canonical 60 arcs / 138 sessions. Auditor-model eval: all 10
+   candidate models **DQ** (Part 7); K3 on gateway is the auditor (Part 8).
+   K3 re-audit of 13: 3 accept / 10 HR, 0 false positives on 36 flags; 11
+   more accepts found contaminated via probe verification and moved to HR →
+   **39 accept / 21 HR**. 39-arc K3 `--reaudit` sweep **DONE** (Part 9):
+   23 accept / 9 revise / 7 HR, 53 flags verified (51 genuine, 2 FP) →
+   final **23 accept / 28 HR** + 9 revise arcs pending regeneration.
+   **NEXT: (a) regenerate 37 arcs (28 HR full reset + 9 revise resume;
+   arc_0011 = safety-priority), K3 re-audit, iterate, (b) consolidate to
+   gold (quadit-gated), (c) Phase B (150 + DPO pairing), C (200 → 400 total
+   ≈ $22).**
 10. **Parity-gate question** — shelved. If ever revisited: targeted clean
     re-judge of the 14 poisoned rows only, ≥0.71 mean ⇒ parity ⇒ optional vLLM
     flip.
@@ -647,8 +986,10 @@ but avoid copying terminal-captured keys into new docs.
 | Arc track | `ai/training/ARC_CORPUS_SPEC.md`, `generate_arc_corpus.py`, `audit_arc_corpus.py`, `build_pilot_arc_plans.py`, `build_arc_plans.py` (LLM plan generator), `lint_arc_plans.py`, `probe_arc_writer.py`, `probe_arc_bakeoff.py`, `featherless_keys.py` (plans on disk at `training/arc_plans/`, untracked by design) |
 | NF outputs | `ai/training/output/nightmare_fuel/checkpoints/` |
 | Parity-saga eval artifacts | `ai/training/eval_results/` (incl. `judge_sharedkey_contaminated.json`, `judge_variance_proof.md`, `comparison_report.md`) |
-| Arc outputs | `ai/training/output/arc_corpus/` (+ `run_logs/`) |
-| Arc plans | `ai/training/arc_plans/pilot_01..10.json` |
+| Arc outputs | `ai/training/output/arc_corpus/` (+ `run_logs/`, `sweep_chunk1..3.log`) |
+| Auditor-model eval | `ai/training/eval_audit_models.py` → `output/arc_corpus/eval_audit/` (`results.jsonl` 102 rows, `leaderboard.json`) |
+| Lane-2 manual verdict log | `output/arc_corpus/lane2_manual_review_20260919.json` |
+| Arc plans | `ai/training/arc_plans/` — pilot_01..10 + arc_0001..0053 (60 plans on disk, untracked by design) |
 | Quadit | `ai/research/quadit/`, `scripts/qa/` (gate adapter) |
 | Terminal captures | `~/.pochi/terminals/term-2a487e83-*.log`, `term-c2adead5-*.log`, `term-38fc06ca-*.log` |
 | AdaptionLabs prefill (not submitted) | `.mastracode/plans/adaption-startups-application-prefill.md` |
