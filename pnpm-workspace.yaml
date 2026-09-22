@@ -277,15 +277,17 @@ overrides:
 
   '@vercel/routing-utils@5.3.3>path-to-regexp': npm:path-to-regexp@6.3.0
   '@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0': npm:path-to-regexp@6.3.0
-  astro>devalue: '>=5.8.1'
+  astro>devalue: ^5.9.4
   axios: '>=1.15.1'
   adm-zip: 0.6.0
   brace-expansion: ^5.0.8
   astro>cookie: ^2.0.0
   cookie: '^0.7.2'
   '@vercel/oidc': '3.7.1'
-  devalue: '>=5.8.1'
+  devalue: ^5.9.4
   devalue@<5.8.1: ^5.8.1
+  micromark-extension-gfm-table: 2.1.2
+  '@colors/colors': 1.6.1
   diff: ^5.2.2
   dompurify: ^3.4.3
   drizzle-orm: ^0.45.2
@@ -304,6 +306,10 @@ overrides:
   # sync. rc.32 satisfies the security floor (>= rc.31); bump the pin
   # deliberately when a newer RC is vetted.
   'nitro>h3': 2.0.1-rc.32
+  # devframe (via @unocss/inspector) imports { H3 } from 'h3' — an h3 2.x-only
+  # export. The floor override above resolves stable h3 1.15.x for it and breaks
+  # the import; pin devframe's h3 to the same vetted RC.
+  'devframe>h3': 2.0.1-rc.32
   hono: ^4.12.14
   ip-address: '>=10.1.1'
   # CVE-2026-84375 (HIGH, fixed in 4.3.2).
