@@ -214,26 +214,26 @@ export const ExportControls: FC<ExportControlsProps> = ({
     <div className="export-controls space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-gray-900 mb-2 text-lg font-semibold">
+        <h3 className="mb-2 text-lg font-semibold text-foreground">
           Export Analysis Data
         </h3>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Download comprehensive bias analysis results for reporting and
           compliance
         </p>
       </div>
 
       {/* Export Format Selection */}
-      <div className="bg-white border-gray-200 rounded-lg border p-6">
-        <h4 className="text-gray-900 mb-4 font-semibold">Export Format</h4>
+      <div className="rounded-none border border-border bg-card p-6">
+        <h4 className="mb-4 font-semibold text-foreground">Export Format</h4>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {/* JSON Format */}
           <div
-            className={`cursor-pointer rounded-lg border p-4 transition-all ${
+            className={`cursor-pointer rounded-none border p-4 transition-all ${
               exportFormat === 'json'
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-ring bg-secondary'
+                : 'border-border hover:border-ring'
             }`}
             onClick={() => setExportFormat('json')}
             onKeyDown={(e) => {
@@ -254,22 +254,22 @@ export const ExportControls: FC<ExportControlsProps> = ({
                 onChange={() => setExportFormat('json')}
                 className="mr-2"
               />
-              <span className="text-gray-900 font-medium">JSON</span>
+              <span className="font-medium text-foreground">JSON</span>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-sm text-muted-foreground">
               Complete structured data with all analysis details
             </p>
-            <div className="text-gray-500 mt-2 text-xs">
+            <div className="mt-2 text-xs text-muted-foreground">
               Best for: Technical analysis, data processing
             </div>
           </div>
 
           {/* CSV Format */}
           <div
-            className={`cursor-pointer rounded-lg border p-4 transition-all ${
+            className={`cursor-pointer rounded-none border p-4 transition-all ${
               exportFormat === 'csv'
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-ring bg-secondary'
+                : 'border-border hover:border-ring'
             }`}
             onClick={() => setExportFormat('csv')}
             onKeyDown={(e) => {
@@ -290,22 +290,22 @@ export const ExportControls: FC<ExportControlsProps> = ({
                 onChange={() => setExportFormat('csv')}
                 className="mr-2"
               />
-              <span className="text-gray-900 font-medium">CSV</span>
+              <span className="font-medium text-foreground">CSV</span>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-sm text-muted-foreground">
               Tabular data format for spreadsheet analysis
             </p>
-            <div className="text-gray-500 mt-2 text-xs">
+            <div className="mt-2 text-xs text-muted-foreground">
               Best for: Excel analysis, statistical processing
             </div>
           </div>
 
           {/* PDF Format */}
           <div
-            className={`cursor-pointer rounded-lg border p-4 transition-all ${
+            className={`cursor-pointer rounded-none border p-4 transition-all ${
               exportFormat === 'pdf'
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-ring bg-secondary'
+                : 'border-border hover:border-ring'
             }`}
             onClick={() => setExportFormat('pdf')}
             onKeyDown={(e) => {
@@ -327,14 +327,17 @@ export const ExportControls: FC<ExportControlsProps> = ({
                 onChange={() => setExportFormat('pdf')}
                 className="mr-2"
               />
-              <label htmlFor="pdf-format" className="text-gray-900 font-medium">
+              <label
+                htmlFor="pdf-format"
+                className="font-medium text-foreground"
+              >
                 PDF Report
               </label>
             </div>
-            <p className="text-gray-600 text-sm">
+            <p className="text-sm text-muted-foreground">
               Formatted report for documentation and sharing
             </p>
-            <div className="text-gray-500 mt-2 text-xs">
+            <div className="mt-2 text-xs text-muted-foreground">
               Best for: Reports, compliance documentation
             </div>
           </div>
@@ -342,8 +345,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
       </div>
 
       {/* Component Selection */}
-      <div className="bg-white border-gray-200 rounded-lg border p-6">
-        <h4 className="text-gray-900 mb-4 font-semibold">Include Components</h4>
+      <div className="rounded-none border border-border bg-card p-6">
+        <h4 className="mb-4 font-semibold text-foreground">
+          Include Components
+        </h4>
 
         <div className="space-y-3">
           {/* Analysis Results */}
@@ -362,10 +367,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
               aria-label="Include analysis results"
             />
             <label htmlFor="include-analysis" className="flex-1">
-              <span className="text-gray-900 font-medium">
+              <span className="font-medium text-foreground">
                 Analysis Results
               </span>
-              <p className="text-gray-600 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Overall bias scores, layer analysis, and confidence metrics
               </p>
             </label>
@@ -387,10 +392,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
               aria-label="Include counterfactual scenarios"
             />
             <label htmlFor="include-counterfactual" className="flex-1">
-              <span className="text-gray-900 font-medium">
+              <span className="font-medium text-foreground">
                 Counterfactual Scenarios
               </span>
-              <p className="text-gray-600 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Alternative scenarios and expected bias reduction estimates
               </p>
             </label>
@@ -414,12 +419,12 @@ export const ExportControls: FC<ExportControlsProps> = ({
             />
             <label htmlFor="include-historical" className="flex-1">
               <span
-                className={`font-medium ${historicalComparison ? 'text-gray-900' : 'text-gray-400'}`}
+                className={`font-medium ${historicalComparison ? 'text-foreground' : 'text-muted-foreground'}`}
               >
                 Historical Comparison
               </span>
               <p
-                className={`text-sm ${historicalComparison ? 'text-gray-600' : 'text-gray-400'}`}
+                className={`text-sm ${historicalComparison ? 'text-muted-foreground' : 'text-muted-foreground'}`}
               >
                 Progress tracking and trend analysis data
               </p>
@@ -442,8 +447,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
               aria-label="Include recommendations"
             />
             <label htmlFor="include-recommendations" className="flex-1">
-              <span className="text-gray-900 font-medium">Recommendations</span>
-              <p className="text-gray-600 text-sm">
+              <span className="font-medium text-foreground">
+                Recommendations
+              </span>
+              <p className="text-sm text-muted-foreground">
                 AI-generated suggestions for bias reduction
               </p>
             </label>
@@ -465,10 +472,10 @@ export const ExportControls: FC<ExportControlsProps> = ({
               aria-label="Include demographics context"
             />
             <label htmlFor="include-demographics" className="flex-1">
-              <span className="text-gray-900 font-medium">
+              <span className="font-medium text-foreground">
                 Demographics Context
               </span>
-              <p className="text-gray-600 text-sm">
+              <p className="text-sm text-muted-foreground">
                 Client demographic information for context
               </p>
             </label>
@@ -477,11 +484,11 @@ export const ExportControls: FC<ExportControlsProps> = ({
       </div>
 
       {/* Export Summary */}
-      <div className="bg-gray-50 border-gray-200 rounded-lg border p-4">
+      <div className="rounded-none border border-border bg-secondary p-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-gray-900 font-medium">Export Summary</div>
-            <div className="text-gray-600 text-sm">
+            <div className="font-medium text-foreground">Export Summary</div>
+            <div className="text-sm text-muted-foreground">
               Format: {exportFormat.toUpperCase()} • Size: ~
               {getExportSizeEstimate().toFixed(1)} KB • Components:{' '}
               {Object.values(includeComponents).filter(Boolean).length}/5
@@ -493,11 +500,11 @@ export const ExportControls: FC<ExportControlsProps> = ({
             disabled={
               isExporting || Object.values(includeComponents).every((v) => !v)
             }
-            className="bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 disabled:bg-gray-400 flex items-center rounded-md px-6 py-2 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed"
+            className="flex items-center rounded-none bg-primary px-6 py-2 font-medium text-primary-foreground transition-colors hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-35"
           >
             {isExporting ? (
               <>
-                <div className="border-white mr-2 h-4 w-4 animate-spin rounded-full border-b-2"></div>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-none border-b-2 border-primary-foreground"></div>
                 Exporting...
               </>
             ) : (
@@ -523,9 +530,9 @@ export const ExportControls: FC<ExportControlsProps> = ({
       </div>
 
       {/* Export Guidelines */}
-      <div className="bg-blue-50 border-blue-200 rounded-lg border p-4">
-        <h5 className="text-blue-900 mb-2 font-medium">Export Guidelines</h5>
-        <ul className="text-blue-800 space-y-1 text-sm">
+      <div className="rounded-none border border-input bg-secondary p-4">
+        <h5 className="mb-2 font-medium text-foreground">Export Guidelines</h5>
+        <ul className="space-y-1 text-sm text-foreground">
           <li>• Exported data contains sensitive analysis information</li>
           <li>
             • Ensure compliance with your organization&apos;s data handling
