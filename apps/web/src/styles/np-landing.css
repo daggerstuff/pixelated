@@ -1,11 +1,12 @@
 /* Swiss casework homepage — evidence-led, condensed, exact. */
 
 :root:has(.case-home) {
-  --case-paper: oklch(0.965 0 0);
+  --case-paper: oklch(0.94 0 0);
   --case-ink: oklch(0.13 0 0);
-  --case-muted: oklch(0.43 0 0);
-  --case-line: oklch(0.76 0 0);
-  --case-soft: oklch(0.91 0 0);
+  --case-muted: oklch(0.39 0 0);
+  --case-line: oklch(0.68 0 0);
+  --case-soft: oklch(0.86 0 0);
+  --case-panel: oklch(0.19 0 0);
   /* Signal role = strongest emphasis, encoded by value (near-ink), never hue —
      zero-chroma doctrine. White-on-signal clears WCAG AA at ~13:1; the
      previous oklch(0.62 0.16 32) rust tone was chromatic AND failed at 3.9:1. */
@@ -41,23 +42,22 @@
 }
 
 .case-hero {
-  padding: clamp(3.5rem, 8vw, 7rem) 0 clamp(3rem, 7vw, 6rem);
+  padding: clamp(2rem, 4vw, 3.75rem) 0 clamp(2rem, 4vw, 3.5rem);
+  border-bottom: 1px solid var(--case-ink);
 }
 .case-hero .case-shell {
   display: grid;
-  grid-template-columns: minmax(18rem, 0.82fr) minmax(34rem, 1.18fr);
-  gap: clamp(2.5rem, 6vw, 6.5rem);
-  align-items: start;
+  grid-template-columns: minmax(19rem, 0.9fr) minmax(32rem, 1.1fr);
+  gap: 0;
+  align-items: stretch;
 }
-.case-index {
-  margin: 0 0 2.25rem;
-  max-width: 24rem;
-  font-family: var(--np-font-condensed);
-  font-size: 0.875rem;
-  font-weight: 680;
-  line-height: 1;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.case-hero__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.5rem, 3vw, 3rem) clamp(1.5rem, 4vw, 4rem)
+    clamp(1.5rem, 3vw, 3rem) 0;
+  border-right: 1px solid var(--case-ink);
 }
 .case-hero h1,
 .case-section-head h2,
@@ -70,19 +70,19 @@
   text-wrap: balance;
 }
 .case-hero h1 {
-  max-width: 18ch;
-  font-family: var(--np-font-hero);
-  font-weight: 400;
-  font-size: clamp(2.25rem, 3.6vw, 3.25rem);
-  line-height: 1.08;
-  letter-spacing: -0.01em;
+  max-width: 13ch;
+  font-family: var(--np-font-body);
+  font-weight: 760;
+  font-size: clamp(3rem, 5.7vw, 5.5rem);
+  line-height: 0.91;
+  letter-spacing: -0.04em;
 }
 .case-hero__lede {
-  max-width: 39rem;
-  margin: 2rem 0 0;
+  max-width: 35rem;
+  margin: 1.5rem 0 0;
   color: var(--case-muted);
-  font-size: clamp(1rem, 1.3vw, 1.125rem);
-  line-height: 1.65;
+  font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+  line-height: 1.55;
 }
 .case-actions {
   display: flex;
@@ -120,7 +120,7 @@
 }
 
 .case-audience {
-  border-top: 1px solid var(--case-ink);
+  background: var(--case-soft);
 }
 .case-audience__grid {
   display: grid;
@@ -149,8 +149,8 @@
 }
 
 .case-console {
-  border: 1px solid var(--case-ink);
-  background: white;
+  border: 0;
+  background: oklch(0.98 0 0);
 }
 .case-console__head,
 .case-console__foot {
@@ -262,6 +262,8 @@
 
 .case-standards {
   border-block: 1px solid var(--case-ink);
+  background: var(--case-panel);
+  color: var(--case-paper);
 }
 .case-standards__inner {
   display: grid;
@@ -285,20 +287,24 @@
 .case-evidence,
 .case-scenarios,
 .case-close {
-  padding: clamp(4rem, 9vw, 8rem) 0;
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+}
+.case-process,
+.case-close {
+  background: var(--case-soft);
 }
 .case-section-head {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 3rem;
+  gap: clamp(1.5rem, 4vw, 3rem);
   align-items: end;
-  margin-bottom: 3rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
 }
 .case-section-head h2,
 .case-evidence h2,
 .case-close h2 {
-  font-size: clamp(2.25rem, 4.5vw, 4.75rem);
-  line-height: 0.95;
+  font-size: clamp(2rem, 3.7vw, 4rem);
+  line-height: 0.96;
   text-transform: uppercase;
 }
 .case-section-head p,
@@ -318,9 +324,10 @@
   list-style: none;
 }
 .case-process__grid li {
-  min-height: 17rem;
+  min-height: 13rem;
   padding: 1.2rem;
   border-right: 1px solid var(--case-line);
+  background: var(--case-paper);
 }
 .case-process__grid li:first-child {
   border-left: 1px solid var(--case-line);
@@ -331,7 +338,7 @@
   font-weight: 760;
 }
 .case-process__grid h3 {
-  margin: 5rem 0 0.65rem;
+  margin: 2.75rem 0 0.65rem;
   font-family: var(--np-font-condensed);
   font-size: 1.25rem;
   text-transform: uppercase;
@@ -380,19 +387,11 @@
   list-style: none;
 }
 .case-evidence__list li {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
-  gap: 1rem;
   padding: 1.25rem 0;
   border-top: 1px solid oklch(0.42 0 0);
 }
 .case-evidence__list li:last-child {
   border-bottom: 1px solid oklch(0.42 0 0);
-}
-.case-evidence__list > li > span {
-  font-family: var(--np-font-condensed);
-  font-size: 1.3rem;
-  font-weight: 760;
 }
 .case-evidence__list h3 {
   margin: 0;
@@ -472,8 +471,13 @@
   .case-evidence__layout {
     grid-template-columns: 1fr;
   }
+  .case-hero__copy {
+    padding-right: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--case-ink);
+  }
   .case-hero h1 {
-    max-width: 17ch;
+    max-width: 14ch;
   }
   .case-console {
     max-width: 46rem;
