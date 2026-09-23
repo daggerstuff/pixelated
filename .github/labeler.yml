@@ -1,21 +1,28 @@
 # Automatic PR labeling (actions/labeler). Only default GitHub labels are
 # referenced so the configuration works on any repository without label setup.
-version: v1
+#
+# Schema is actions/labeler v5+ (top-level key = label name). The legacy
+# v4-style `version`/`labels` wrapper made v7 treat `version` as a label and
+# fail with "unexpected type for label 'version'".
 
-labels:
-  - label: bug
-    files:
-      - apps/web/src/lib/.*fix.*
-      - apps/web/src/lib/.*bug.*
-  - label: documentation
-    files:
-      - docs/**
-      - apps/web/src/content-store/docs/**
-      - apps/web/src/pages/docs/**
-      - '*.md'
-      - '**/*.md'
-      - '**/AGENTS.md'
-  - label: enhancement
-    files:
-      - apps/web/src/pages/**
-      - apps/web/src/components/**
+bug:
+  - changed-files:
+      - any-glob-to-any-file:
+          - apps/web/src/lib/*fix*
+          - apps/web/src/lib/*bug*
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - apps/web/src/content-store/docs/**
+          - apps/web/src/pages/docs/**
+          - '*.md'
+          - '**/*.md'
+          - '**/AGENTS.md'
+
+enhancement:
+  - changed-files:
+      - any-glob-to-any-file:
+          - apps/web/src/pages/**
+          - apps/web/src/components/**
