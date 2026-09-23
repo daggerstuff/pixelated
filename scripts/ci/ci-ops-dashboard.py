@@ -77,7 +77,7 @@ class DashboardReport:
     commit: str
     metrics: dict[str, Any]
     duplicate_jobs: list[dict[str, Any]]
-    lane_failures: dict[str, list[dict[str, Any]]]
+    lane_failures: dict[str, Any]
     deploy_gate_events: list[dict[str, Any]]
     provider_workflow_counts: dict[str, int]
     recent_runs: list[dict[str, Any]]
@@ -164,7 +164,7 @@ def parse_workflow_yaml(path: Path) -> list[WorkflowJob]:
     return _parse_bb_jobs(data, provider)
 
 
-def _parse_gh_jobs(data: dict, workflow_name: str) -> list[WorkflowJob]:
+def _parse_gh_jobs(data: dict[str, Any], workflow_name: str) -> list[WorkflowJob]:
     """Extract jobs from a GitHub Actions workflow (`jobs:` key)."""
     jobs: list[WorkflowJob] = []
     gh_jobs = data.get("jobs", {})
@@ -190,7 +190,7 @@ def _parse_gh_jobs(data: dict, workflow_name: str) -> list[WorkflowJob]:
     return jobs
 
 
-def _parse_bb_jobs(data: dict, provider: str) -> list[WorkflowJob]:
+def _parse_bb_jobs(data: dict[str, Any], provider: str) -> list[WorkflowJob]:
     """Extract jobs from a Bitbucket Pipelines workflow (`pipelines:` key)."""
     jobs: list[WorkflowJob] = []
     pipelines = data.get("pipelines", {})
@@ -218,7 +218,7 @@ def _parse_bb_jobs(data: dict, provider: str) -> list[WorkflowJob]:
     return jobs
 
 
-def _parse_bb_step(step: dict, event_type: str, provider: str) -> WorkflowJob | None:
+def _parse_bb_step(step: dict[str, Any], event_type: str, provider: str) -> WorkflowJob | None:
     sname = step.get("name", "")
     if not sname:
         script = step.get("script", [])
@@ -384,6 +384,8 @@ def compute_pr_feedback_time(runs: list[WorkflowRun]) -> dict[str, Any]:
     by_workflow: dict[str, list[float]] = defaultdict(list)
 
     for run in pr_runs:
+        if run.started_at is None or run.completed_at is None:
+            continue
         try:
             started = datetime.datetime.fromisoformat(run.started_at.replace("Z", "+00:00"))
             completed = datetime.datetime.fromisoformat(run.completed_at.replace("Z", "+00:00"))
@@ -489,7 +491,8 @@ def generate_html_report(report: DashboardReport) -> str:
         </tr>"""
 
     lane_rows = ""
-    for lane, count in sorted(lf.get("by_lane", {}).items(), key=lambda x: -x[1]):
+    lane_counts: dict[str, int] = lf.get("by_lane") or {}
+    for lane, count in sorted(lane_counts.items(), key=lambda x: -x[1]):
         lane_rows += f"""
         <tr>
             <td>{lane}</td>
