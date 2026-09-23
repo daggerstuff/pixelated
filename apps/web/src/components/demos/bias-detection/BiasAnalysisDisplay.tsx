@@ -20,15 +20,15 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
   const getAlertLevelStyle = (level: string) => {
     switch (level) {
       case 'critical':
-        return 'bg-neutral-900 text-white border-neutral-900'
+        return 'bg-primary text-primary-foreground border-primary'
       case 'high':
-        return 'bg-neutral-800 text-white border-neutral-800'
+        return 'bg-accent text-primary-foreground border-accent'
       case 'medium':
-        return 'bg-neutral-200 text-neutral-900 border-neutral-300'
+        return 'bg-primary text-primary-foreground border-primary'
       case 'low':
-        return 'bg-neutral-100 text-neutral-700 border-neutral-200'
+        return 'bg-secondary text-muted-foreground border-border'
       default:
-        return 'bg-neutral-100 text-neutral-800 border-neutral-200'
+        return 'bg-secondary text-foreground border-border'
     }
   }
 
@@ -38,15 +38,15 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
   // Helper function to get score color
   const getScoreColor = (score: number) => {
     if (score >= 0.8) {
-      return 'text-neutral-900 font-bold'
+      return 'text-foreground font-bold'
     }
     if (score >= 0.6) {
-      return 'text-neutral-800 font-semibold'
+      return 'text-foreground font-semibold'
     }
     if (score >= 0.4) {
-      return 'text-neutral-700'
+      return 'text-foreground'
     }
-    return 'text-neutral-600'
+    return 'text-muted-foreground'
   }
 
   return (
@@ -54,8 +54,8 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
       {/* Overall Score and Alert Level */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Overall Bias Score */}
-        <div className="bg-neutral-50 rounded-lg p-6">
-          <h3 className="text-neutral-900 mb-4 text-lg font-semibold">
+        <div className="rounded-none bg-secondary p-6">
+          <h3 className="mb-4 text-lg font-semibold text-foreground">
             Overall Bias Score
           </h3>
           <div className="flex items-center justify-between">
@@ -65,8 +65,8 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
               {formatScore(results.overallBiasScore)}
             </div>
             <div className="text-right">
-              <div className="text-neutral-600 text-sm">Confidence</div>
-              <div className="text-neutral-900 text-lg font-semibold">
+              <div className="text-sm text-muted-foreground">Confidence</div>
+              <div className="text-lg font-semibold text-foreground">
                 {formatScore(results.confidence)}
               </div>
             </div>
@@ -74,9 +74,9 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
 
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="bg-neutral-200 h-3 rounded-full">
+            <div className="h-3 rounded-none bg-secondary">
               <div
-                className={`h-3 rounded-full transition-all duration-500 ${
+                className={`h-3 rounded-none transition-all duration-500 ${
                   results.overallBiasScore >= 0.8
                     ? 'bg-red-500'
                     : results.overallBiasScore >= 0.6
@@ -92,15 +92,15 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
         </div>
 
         {/* Alert Level */}
-        <div className="bg-neutral-50 rounded-lg p-6">
-          <h3 className="text-neutral-900 mb-4 text-lg font-semibold">
+        <div className="rounded-none bg-secondary p-6">
+          <h3 className="mb-4 text-lg font-semibold text-foreground">
             Alert Level
           </h3>
           <div
-            className={`inline-flex items-center rounded-full border px-4 py-2 text-lg font-semibold ${getAlertLevelStyle(results.alertLevel)}`}
+            className={`inline-flex items-center rounded-none border px-4 py-2 text-lg font-semibold ${getAlertLevelStyle(results.alertLevel)}`}
           >
             <div
-              className={`mr-2 h-3 w-3 rounded-full ${
+              className={`mr-2 h-3 w-3 rounded-none ${
                 results.alertLevel === 'critical'
                   ? 'bg-red-500'
                   : results.alertLevel === 'high'
@@ -115,7 +115,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
 
           {/* Session Info */}
           {sessionData && (
-            <div className="text-neutral-600 mt-4 text-sm">
+            <div className="mt-4 text-sm text-muted-foreground">
               <div>Session: {results.sessionId}</div>
               <div>Analyzed: {results.timestamp.toLocaleString()}</div>
               {sessionData.scenario && (
@@ -127,15 +127,15 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
       </div>
 
       {/* Layer-by-Layer Analysis */}
-      <div className="bg-white border-neutral-200 rounded-lg border p-6">
-        <h3 className="text-neutral-900 mb-6 text-lg font-semibold">
+      <div className="rounded-none border border-border bg-card p-6">
+        <h3 className="mb-6 text-lg font-semibold text-foreground">
           Multi-Layer Bias Analysis
         </h3>
 
         <div className="space-y-6">
           {/* Preprocessing Layer */}
-          <div className="bg-neutral-50 border-neutral-200 rounded-md border p-4">
-            <h4 className="text-neutral-900 mb-3 font-semibold">
+          <div className="rounded-none border border-border bg-secondary p-4">
+            <h4 className="mb-3 font-semibold text-foreground">
               Preprocessing Layer
             </h4>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -148,7 +148,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .genderBiasScore,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Gender Bias</div>
+                <div className="text-sm text-muted-foreground">Gender Bias</div>
               </div>
               <div className="text-center">
                 <div
@@ -159,7 +159,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .racialBiasScore,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Racial Bias</div>
+                <div className="text-sm text-muted-foreground">Racial Bias</div>
               </div>
               <div className="text-center">
                 <div
@@ -170,7 +170,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .ageBiasScore,
                   )}
                 </div>
-                <div className="bg-neutral-50 border-neutral-200 rounded-md border p-4">
+                <div className="rounded-none border border-border bg-secondary p-4">
                   Age Bias
                 </div>
               </div>
@@ -183,17 +183,19 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .culturalBiasScore,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Cultural Bias</div>
+                <div className="text-sm text-muted-foreground">
+                  Cultural Bias
+                </div>
               </div>
             </div>
 
             {/* Diversity Index */}
-            <div className="bg-neutral-50 mt-4 rounded-lg p-3">
+            <div className="mt-4 rounded-none bg-secondary p-3">
               <div className="flex items-center justify-between">
-                <span className="text-neutral-900 text-sm font-medium">
+                <span className="text-sm font-medium text-foreground">
                   Diversity Index
                 </span>
-                <span className="text-neutral-700 text-lg font-bold">
+                <span className="text-lg font-bold text-foreground">
                   {formatScore(
                     results.layerResults.preprocessing.representationAnalysis
                       .diversityIndex,
@@ -202,7 +204,7 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
               </div>
               {results.layerResults.preprocessing.representationAnalysis
                 .underrepresentedGroups.length > 0 && (
-                <div className="text-neutral-800 mt-2 text-sm">
+                <div className="mt-2 text-sm text-foreground">
                   Underrepresented:{' '}
                   {results.layerResults.preprocessing.representationAnalysis.underrepresentedGroups.join(
                     ', ',
@@ -213,10 +215,10 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
           </div>
 
           {/* Model Layer */}
-          <div className="bg-neutral-50 border-neutral-200 rounded-md border p-4">
-            <h4 className="text-neutral-900 mb-3 font-semibold">Model Layer</h4>
+          <div className="rounded-none border border-border bg-secondary p-4">
+            <h4 className="mb-3 font-semibold text-foreground">Model Layer</h4>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${getScoreColor(1 - results.layerResults.modelLevel.fairnessMetrics.demographicParity)}`}
                 >
@@ -225,11 +227,11 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .demographicParity,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">
+                <div className="text-sm text-muted-foreground">
                   Demographic Parity
                 </div>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${getScoreColor(1 - results.layerResults.modelLevel.fairnessMetrics.equalizedOdds)}`}
                 >
@@ -238,9 +240,11 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .equalizedOdds,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Equalized Odds</div>
+                <div className="text-sm text-muted-foreground">
+                  Equalized Odds
+                </div>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${getScoreColor(1 - results.layerResults.modelLevel.fairnessMetrics.calibration)}`}
                 >
@@ -248,35 +252,35 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                     results.layerResults.modelLevel.fairnessMetrics.calibration,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Calibration</div>
+                <div className="text-sm text-muted-foreground">Calibration</div>
               </div>
             </div>
           </div>
 
           {/* Interactive Layer */}
-          <div className="bg-neutral-50 border-neutral-200 rounded-md border p-4">
-            <h4 className="text-neutral-900 mb-3 font-semibold">
+          <div className="rounded-none border border-border bg-secondary p-4">
+            <h4 className="mb-3 font-semibold text-foreground">
               Interactive Layer
             </h4>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
-                <div className="text-neutral-900 text-xl font-bold">
+              <div className="rounded-none bg-secondary p-3 text-center">
+                <div className="text-xl font-bold text-foreground">
                   {
                     results.layerResults.interactive.counterfactualAnalysis
                       .scenariosAnalyzed
                   }
                 </div>
-                <div className="text-neutral-600 text-sm">
+                <div className="text-sm text-muted-foreground">
                   Scenarios Analyzed
                 </div>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${
                     results.layerResults.interactive.counterfactualAnalysis
                       .biasDetected
-                      ? 'text-neutral-900'
-                      : 'text-neutral-600'
+                      ? 'text-foreground'
+                      : 'text-muted-foreground'
                   }`}
                 >
                   {results.layerResults.interactive.counterfactualAnalysis
@@ -284,9 +288,11 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                     ? 'YES'
                     : 'NO'}
                 </div>
-                <div className="text-neutral-600 text-sm">Bias Detected</div>
+                <div className="text-sm text-muted-foreground">
+                  Bias Detected
+                </div>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${getScoreColor(1 - results.layerResults.interactive.counterfactualAnalysis.consistencyScore)}`}
                 >
@@ -295,18 +301,18 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .consistencyScore,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Consistency</div>
+                <div className="text-sm text-muted-foreground">Consistency</div>
               </div>
             </div>
           </div>
 
           {/* Evaluation Layer */}
-          <div className="bg-neutral-50 border-neutral-200 rounded-md border p-4">
-            <h4 className="text-neutral-900 mb-3 font-semibold">
+          <div className="rounded-none border border-border bg-secondary p-4">
+            <h4 className="mb-3 font-semibold text-foreground">
               Evaluation Layer
             </h4>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${getScoreColor(results.layerResults.evaluation.huggingFaceMetrics.bias)}`}
                 >
@@ -314,9 +320,11 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                     results.layerResults.evaluation.huggingFaceMetrics.bias,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">HF Bias Score</div>
+                <div className="text-sm text-muted-foreground">
+                  HF Bias Score
+                </div>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div
                   className={`text-xl font-bold ${getScoreColor(results.layerResults.evaluation.huggingFaceMetrics.stereotype)}`}
                 >
@@ -325,18 +333,20 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                       .stereotype,
                   )}
                 </div>
-                <div className="text-neutral-600 text-sm">Stereotype Score</div>
+                <div className="text-sm text-muted-foreground">
+                  Stereotype Score
+                </div>
               </div>
-              <div className="bg-neutral-100 rounded-lg p-3 text-center">
+              <div className="rounded-none bg-secondary p-3 text-center">
                 <div className="flex justify-between text-sm">
-                  <span className="text-neutral-600 font-semibold">
+                  <span className="font-semibold text-muted-foreground">
                     +
                     {formatScore(
                       results.layerResults.evaluation.huggingFaceMetrics.regard
                         .positive,
                     )}
                   </span>
-                  <span className="text-neutral-800 font-semibold">
+                  <span className="font-semibold text-foreground">
                     -
                     {formatScore(
                       results.layerResults.evaluation.huggingFaceMetrics.regard
@@ -344,7 +354,9 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
                     )}
                   </span>
                 </div>
-                <div className="text-neutral-600 text-sm">Regard Score</div>
+                <div className="text-sm text-muted-foreground">
+                  Regard Score
+                </div>
               </div>
             </div>
           </div>
@@ -353,15 +365,15 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
 
       {/* Recommendations */}
       {results.recommendations.length > 0 && (
-        <div className="bg-neutral-100 border-neutral-200 rounded-lg border p-6">
-          <h3 className="text-neutral-900 mb-4 text-lg font-semibold">
+        <div className="rounded-none border border-border bg-secondary p-6">
+          <h3 className="mb-4 text-lg font-semibold text-foreground">
             Recommendations
           </h3>
           <ul className="space-y-2">
             {results.recommendations.map((recommendation) => (
               <li key={recommendation} className="flex items-start">
-                <div className="bg-neutral-500 mr-3 mt-2 h-2 w-2 flex-shrink-0 rounded-full" />
-                <span className="text-neutral-800">{recommendation}</span>
+                <div className="mr-3 mt-2 h-2 w-2 flex-shrink-0 rounded-none bg-muted-foreground" />
+                <span className="text-foreground">{recommendation}</span>
               </li>
             ))}
           </ul>
@@ -370,32 +382,34 @@ export const BiasAnalysisDisplay: FC<BiasAnalysisDisplayProps> = ({
 
       {/* Demographics Context */}
       {results.demographics && (
-        <div className="bg-neutral-50 border-neutral-200 rounded-lg border p-6">
-          <h3 className="text-neutral-900 mb-4 text-lg font-semibold">
+        <div className="rounded-none border border-border bg-secondary p-6">
+          <h3 className="mb-4 text-lg font-semibold text-foreground">
             Demographic Context
           </h3>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <div>
-              <div className="text-neutral-600 text-sm">Age Group</div>
-              <div className="text-neutral-900 font-semibold">
+              <div className="text-sm text-muted-foreground">Age Group</div>
+              <div className="font-semibold text-foreground">
                 {results.demographics.age}
               </div>
             </div>
             <div>
-              <div className="text-neutral-600 text-sm">Gender</div>
-              <div className="text-neutral-900 font-semibold">
+              <div className="text-sm text-muted-foreground">Gender</div>
+              <div className="font-semibold text-foreground">
                 {results.demographics.gender}
               </div>
             </div>
             <div>
-              <div className="text-neutral-600 text-sm">Ethnicity</div>
-              <div className="text-neutral-900 font-semibold">
+              <div className="text-sm text-muted-foreground">Ethnicity</div>
+              <div className="font-semibold text-foreground">
                 {results.demographics.ethnicity}
               </div>
             </div>
             <div>
-              <div className="text-neutral-600 text-sm">Primary Language</div>
-              <div className="text-neutral-900 font-semibold">
+              <div className="text-sm text-muted-foreground">
+                Primary Language
+              </div>
+              <div className="font-semibold text-foreground">
                 {results.demographics.primaryLanguage}
               </div>
             </div>

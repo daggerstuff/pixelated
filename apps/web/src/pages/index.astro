@@ -12,22 +12,18 @@ const cta = ctaContent
 
 const evidence = [
   [
-    '01',
     'Scenario brief',
     'Faculty define the clinical pressure, skill target, and boundaries before a trainee enters the room.',
   ],
   [
-    '02',
     'Live attempt',
     'The trainee responds without a script while the simulated client adapts to timing, tone, and avoidance.',
   ],
   [
-    '03',
     'Supervisor read',
     'The complete exchange is reviewable turn by turn, with the exact decision point preserved.',
   ],
   [
-    '04',
     'Directed retry',
     'The trainee repeats the difficult moment with a specific coaching instruction instead of a vague note.',
   ],
@@ -50,7 +46,6 @@ const scenarioRows = [
     <section class="case-hero" aria-labelledby="case-title">
       <div class="case-shell">
         <div class="case-hero__copy">
-          <p class="case-index">Clinical simulation for therapist training</p>
           <h1 id="case-title">
             Practice the moment that usually gets discussed too late.
           </h1>
@@ -204,13 +199,10 @@ const scenarioRows = [
         </div>
         <ol class="case-evidence__list">
           {
-            evidence.map(([number, title, body]) => (
+            evidence.map(([title, body]) => (
               <li>
-                <span>{number}</span>
-                <div>
-                  <h3>{title}</h3>
-                  <p>{body}</p>
-                </div>
+                <h3>{title}</h3>
+                <p>{body}</p>
               </li>
             ))
           }

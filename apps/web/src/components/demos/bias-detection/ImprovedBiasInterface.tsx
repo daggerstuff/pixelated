@@ -198,7 +198,7 @@ export function ImprovedBiasInterface({
                 content: 'Sample content for analysis',
               })
             }
-            className="bg-blue-500 text-white mt-4 rounded px-4 py-2"
+            className="mt-4 rounded-none bg-primary px-4 py-2 text-primary-foreground"
             disabled={isAnalyzing}
           >
             Start Analysis
