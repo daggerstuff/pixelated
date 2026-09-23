@@ -101,7 +101,9 @@ const styles = {
 }
 
 export function Sidebar() {
-  const [pathname] = useState<string>(() => window.location.pathname)
+  const [pathname] = useState<string>(() =>
+    typeof window === 'undefined' ? '' : window.location.pathname,
+  )
 
   const isDashboardPage =
     pathname.startsWith('/dashboard') ||
