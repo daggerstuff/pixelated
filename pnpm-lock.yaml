@@ -339,8 +339,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0
       auth0:
-        specifier: ^7.2.0
-        version: 7.2.0
+        specifier: ^6.4.0
+        version: 6.4.0
       axios:
         specifier: '>=1.15.1'
         version: 1.20.0(debug@4.4.3(supports-color@10.2.2))(supports-color@10.2.2)
@@ -8241,8 +8241,8 @@ packages:
     resolution: {integrity: sha512-o9ca0P+hHSUbiwOSFW+DS2GmCA5c6T6E1UJZhWcgKmjAI2Aid16wLzY4/y+XNFb7Im1rM+wQc5YkkNZuTy5FOw==}
     engines: {node: '>=18'}
 
-  auth0@7.2.0:
-    resolution: {integrity: sha512-8rwj7ZLsKvLomdkLtxm+cVbN1t/I9fEp5fZcjSuaAOnYST/7pKV0ncKxAM1iz7SB0fmYnbi+EtRPT38Og1Wpkw==}
+  auth0@6.4.0:
+    resolution: {integrity: sha512-5F63B8R1s+CasVQXDcxVhSZiDcJSFHqCcCAgHkHfIdNrD/buON0FoQrAlVtZ8q3Z51UlIx6///1ef6YUhwkZIw==}
     engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0 || ^26.0.0}
 
   auto-bind@5.0.1:
@@ -23050,7 +23050,7 @@ snapshots:
       undici-types: 6.28.1
       uuid: 11.1.1
 
-  auth0@7.2.0:
+  auth0@6.4.0:
     dependencies:
       auth0-legacy: auth0@4.37.1
       jose: 5.10.0
