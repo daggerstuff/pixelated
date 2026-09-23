@@ -44,7 +44,11 @@ interface DatasetInfo {
 }
 
 type PublicationStatus =
-  'draft' | 'submitted' | 'in-review' | 'published' | 'rejected'
+  | 'draft'
+  | 'submitted'
+  | 'in-review'
+  | 'published'
+  | 'rejected'
 
 interface Publication {
   id: string
@@ -308,16 +312,16 @@ export const ResearchDashboard: FC = () => {
 
   return (
     <ResponsiveContainer size="full">
-      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="min-h-screen bg-secondary">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm">
+        <header className="border-b border-border bg-card">
           <div className="px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-gray-900 dark:text-white text-2xl font-bold">
+                <h1 className="text-2xl font-bold text-foreground">
                   Research Portal
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Evidence-Based Mental Health Research •{' '}
                   {researchMetrics.totalStudies} studies •{' '}
                   {researchMetrics.totalParticipants.toLocaleString()}{' '}
@@ -340,7 +344,7 @@ export const ResearchDashboard: FC = () => {
                       setTimeRange(nextValue)
                     }
                   }}
-                  className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm"
+                  className="rounded-none border border-input bg-card px-3 py-2 text-sm"
                 >
                   <option value="month">This Month</option>
                   <option value="quarter">This Quarter</option>
@@ -360,8 +364,8 @@ export const ResearchDashboard: FC = () => {
                   onClick={() => setDashboardView(tab.id)}
                   className={`flex items-center gap-2 border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
                     dashboardView === tab.id
-                      ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                      ? 'border-ring text-foreground'
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <span>{tab.icon}</span>
@@ -396,33 +400,33 @@ export const ResearchDashboard: FC = () => {
                   Research Studies Management
                 </h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-gray-600 dark:text-gray-400 text-sm">
+                  <span className="text-sm text-muted-foreground">
                     {selectedStudies.length} selected
                   </span>
-                  <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors">
+                  <button className="rounded-none bg-primary px-4 py-2 text-sm text-primary-foreground transition-colors hover:bg-primary">
                     New Study
                   </button>
                 </div>
               </div>
-              <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border">
-                <div className="divide-gray-200 dark:divide-gray-700 divide-y">
+              <div className="overflow-hidden rounded-none border border-border bg-card">
+                <div className="divide-y divide-border">
                   {studies.map((study) => (
                     <div
                       key={study.id}
-                      className="hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors"
+                      className="p-4 transition-colors hover:bg-secondary"
                     >
                       <div className="flex items-center gap-4">
                         <input
                           type="checkbox"
                           checked={selectedStudies.includes(study.id)}
                           onChange={() => handleStudySelect(study.id)}
-                          className="text-blue-600 h-4 w-4 rounded"
+                          className="h-4 w-4 rounded-none text-foreground"
                         />
                         <div className="flex-1">
-                          <h3 className="text-gray-900 dark:text-white font-medium">
+                          <h3 className="font-medium text-foreground">
                             {study.title}
                           </h3>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">
+                          <p className="text-sm text-muted-foreground">
                             {study.description}
                           </p>
                         </div>
@@ -464,7 +468,9 @@ const DatasetsTab: FC<{ datasets: DatasetInfo[] }> = memo(({ datasets }) => (
     {datasets.map((dataset) => (
       <Card key={dataset['id']} className="p-6">
         <h3 className="text-lg font-semibold">{dataset['name']}</h3>
-        <p className="text-gray-500 text-sm">{dataset['description']}</p>
+        <p className="text-sm text-muted-foreground">
+          {dataset['description']}
+        </p>
       </Card>
     ))}
   </div>
@@ -506,14 +512,11 @@ interface PublicationsTabProps {
 }
 
 const statusBadgeColors: Record<PublicationStatus, string> = {
-  'draft': 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300',
-  'submitted':
-    'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300',
-  'in-review':
-    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/50 dark:text-yellow-300',
-  'published':
-    'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300',
-  'rejected': 'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300',
+  'draft': 'bg-secondary text-foreground',
+  'submitted': 'bg-secondary border border-input text-foreground',
+  'in-review': 'bg-secondary border border-ring text-foreground font-medium',
+  'published': 'bg-secondary border border-input text-foreground',
+  'rejected': 'bg-card border border-ring text-foreground font-semibold',
 }
 
 const PublicationsTab: FC<PublicationsTabProps> = memo(
@@ -638,7 +641,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
               placeholder="Search publications..."
               value={search}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm"
+              className="min-w-0 flex-1 rounded-none border border-input bg-card px-3 py-2 text-sm"
             />
             <select
               value={filterStatus}
@@ -655,7 +658,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                   onFilterChange(val)
                 }
               }}
-              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm"
+              className="rounded-none border border-input bg-card px-3 py-2 text-sm"
             >
               <option value="all">All Statuses</option>
               <option value="draft">Draft</option>
@@ -667,14 +670,14 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
           </div>
           <button
             onClick={handleOpenAdd}
-            className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors whitespace-nowrap"
+            className="whitespace-nowrap rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary"
           >
             Add Publication
           </button>
         </div>
 
         {filteredPublications.length === 0 ? (
-          <div className="text-gray-500 py-12 text-center">
+          <div className="py-12 text-center text-muted-foreground">
             No publications found. Click &ldquo;Add Publication&rdquo; to create
             one.
           </div>
@@ -686,28 +689,28 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                   <div className="min-w-0 flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${statusBadgeColors[pub.status]}`}
+                        className={`inline-flex rounded-none px-2.5 py-0.5 text-xs font-medium ${statusBadgeColors[pub.status]}`}
                       >
                         {pub.status}
                       </span>
                     </div>
-                    <h3 className="text-gray-900 dark:text-white font-semibold truncate">
+                    <h3 className="truncate font-semibold text-foreground">
                       {pub.title}
                     </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm">
+                    <p className="mt-1 text-sm text-muted-foreground">
                       {pub.authors.join(', ')}
                     </p>
-                    <p className="text-gray-500 dark:text-gray-500 mt-1 text-sm italic">
+                    <p className="mt-1 text-sm italic text-muted-foreground">
                       {pub.journal}
                     </p>
                     {pub.doi && (
-                      <p className="text-gray-400 mt-1 text-xs">
+                      <p className="mt-1 text-xs text-muted-foreground">
                         DOI: {pub.doi}
                       </p>
                     )}
                   </div>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 mt-3 line-clamp-2 text-sm">
+                <p className="mt-3 line-clamp-2 text-sm text-muted-foreground">
                   {pub.abstract}
                 </p>
                 {pub.keywords.length > 0 && (
@@ -715,27 +718,27 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                     {pub.keywords.map((kw) => (
                       <span
                         key={kw}
-                        className="bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-0.5 text-xs"
+                        className="rounded-none bg-secondary px-2 py-0.5 text-xs"
                       >
                         {kw}
                       </span>
                     ))}
                   </div>
                 )}
-                <div className="flex items-center justify-between border-gray-200 dark:border-gray-700 mt-4 border-t pt-3">
-                  <span className="text-gray-500 text-xs">
+                <div className="mt-4 flex items-center justify-between border-t border-border pt-3">
+                  <span className="text-xs text-muted-foreground">
                     {pub.publicationDate}
                   </span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleOpenEdit(pub)}
-                      className="text-blue-600 dark:text-blue-400 text-sm font-medium hover:underline"
+                      className="text-sm font-medium text-foreground hover:underline"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => setDeletingId(pub.id)}
-                      className="text-red-600 dark:text-red-400 text-sm font-medium hover:underline"
+                      className="text-sm font-medium text-foreground hover:underline"
                     >
                       Delete
                     </button>
@@ -747,14 +750,14 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
         )}
 
         {showForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-gray-800 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg p-6">
-              <h2 className="text-gray-900 dark:text-white mb-4 text-xl font-bold">
+          <div className="bg-black/50 fixed inset-0 z-50 flex items-center justify-center">
+            <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-none bg-card p-6">
+              <h2 className="mb-4 text-xl font-bold text-foreground">
                 {editingId ? 'Edit Publication' : 'Add Publication'}
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                  <label className="block text-sm font-medium text-foreground">
                     Title
                   </label>
                   <input
@@ -764,11 +767,11 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                  <label className="block text-sm font-medium text-foreground">
                     Authors (comma-separated)
                   </label>
                   <input
@@ -779,12 +782,12 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                       setFormData({ ...formData, authors: e.target.value })
                     }
                     placeholder="Dr. Jane Smith, Dr. John Doe"
-                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    <label className="block text-sm font-medium text-foreground">
                       Journal
                     </label>
                     <input
@@ -794,11 +797,11 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                       onChange={(e) =>
                         setFormData({ ...formData, journal: e.target.value })
                       }
-                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                     />
                   </div>
                   <div>
-                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    <label className="block text-sm font-medium text-foreground">
                       DOI
                     </label>
                     <input
@@ -807,13 +810,13 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                       onChange={(e) =>
                         setFormData({ ...formData, doi: e.target.value })
                       }
-                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    <label className="block text-sm font-medium text-foreground">
                       Status
                     </label>
                     <select
@@ -824,7 +827,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                           status: e.target.value as PublicationStatus,
                         })
                       }
-                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                     >
                       <option value="draft">Draft</option>
                       <option value="submitted">Submitted</option>
@@ -834,7 +837,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                     </select>
                   </div>
                   <div>
-                    <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                    <label className="block text-sm font-medium text-foreground">
                       Publication Date
                     </label>
                     <input
@@ -847,12 +850,12 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                           publicationDate: e.target.value,
                         })
                       }
-                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                      className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                  <label className="block text-sm font-medium text-foreground">
                     Abstract
                   </label>
                   <textarea
@@ -862,11 +865,11 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                     onChange={(e) =>
                       setFormData({ ...formData, abstract: e.target.value })
                     }
-                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="text-gray-700 dark:text-gray-300 block text-sm font-medium">
+                  <label className="block text-sm font-medium text-foreground">
                     Keywords (comma-separated)
                   </label>
                   <input
@@ -876,7 +879,7 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                       setFormData({ ...formData, keywords: e.target.value })
                     }
                     placeholder="AI therapy, CBT, digital health"
-                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    className="mt-1 w-full rounded-none border border-input bg-card px-3 py-2 text-sm"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
@@ -886,13 +889,13 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
                       setShowForm(false)
                       setEditingId(null)
                     }}
-                    className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="rounded-none border border-input px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                    className="rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary"
                   >
                     {editingId ? 'Update' : 'Add'} Publication
                   </button>
@@ -903,28 +906,28 @@ const PublicationsTab: FC<PublicationsTabProps> = memo(
         )}
 
         {deletingPublication && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-gray-800 w-full max-w-md rounded-lg p-6">
-              <h2 className="text-gray-900 dark:text-white text-lg font-bold">
+          <div className="bg-black/50 fixed inset-0 z-50 flex items-center justify-center">
+            <div className="w-full max-w-md rounded-none bg-card p-6">
+              <h2 className="text-lg font-bold text-foreground">
                 Delete Publication
               </h2>
-              <p className="text-gray-600 dark:text-gray-400 mt-2 text-sm">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Are you sure you want to delete &ldquo;
                 {deletingPublication.title}&rdquo;? This action cannot be
                 undone.
               </p>
-              <div className="flex justify-end gap-3 mt-6">
+              <div className="mt-6 flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setDeletingId(null)}
-                  className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-50 dark:hover:bg-gray-700"
+                  className="rounded-none border border-input px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmDelete}
-                  className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                  className="rounded-none bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-accent"
                 >
                   Delete
                 </button>
