@@ -3,7 +3,9 @@
  * Handles OAuth2 flow with Auth0 for social providers like Google
  */
 
-import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0'
+import { AuthenticationClient, UserInfoClient } from 'auth0-legacy'
+import { ManagementClient } from 'auth0'
+import type { Management } from 'auth0'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
@@ -368,16 +370,11 @@ export class Auth0SocialAuthService {
 
     try {
       // Link the social account to the user
-      await auth0Management.users.link(
-        {
-          id: userId,
-        },
-        {
-          provider: connection,
-          connection_id: connection,
-          user_id: accessToken,
-        },
-      )
+      await auth0Management.users.identities.link(userId, {
+        provider: connection,
+        connection_id: connection,
+        user_id: accessToken,
+      })
 
       // Log the linking event
       logSecurityEvent(SecurityEventType.ACCOUNT_LINKED, null, {
@@ -416,10 +413,11 @@ export class Auth0SocialAuthService {
 
     try {
       // Unlink the social account from the user
-      await auth0Management.users.unlink(userId, {
-        provider: connection,
-        user_id: providerUserId,
-      })
+      await auth0Management.users.identities.delete(
+        userId,
+        connection as Management.UserIdentityProviderEnum,
+        providerUserId,
+      )
 
       // Log the unlinking event
       logSecurityEvent(SecurityEventType.ACCOUNT_UNLINKED, null, {

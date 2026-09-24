@@ -3,7 +3,8 @@
  * Handles MFA enrollment, challenge, and management using Auth0 Guardian
  */
 
-import { ManagementClient, AuthenticationClient } from 'auth0'
+import { AuthenticationClient } from 'auth0-legacy'
+import { ManagementClient } from 'auth0'
 
 type GuardianEnrollment = {
   id: string
@@ -43,11 +44,7 @@ const logger = createBuildSafeLogger('auth0-mfa-service')
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 // Initialize Auth0 clients
-type ExtendedManagementClient = ManagementClient & {
-  users: ManagementClient['users'] & {
-    getGuardianEnrollments: (params: { id: string }) => Promise<unknown>
-  }
-}
+type ExtendedManagementClient = ManagementClient
 
 let auth0Authentication: ExtendedAuthenticationClient | null = null
 let auth0Management: ExtendedManagementClient | null = null
@@ -583,9 +580,7 @@ export class Auth0MFAService {
       throw new Error('Auth0 management client not initialized')
     }
 
-    const getGuardianEnrollments = auth0Management.users.getGuardianEnrollments
-
-    return await getGuardianEnrollments({ id: userId })
+    return await auth0Management.users.enrollments.get(userId)
   }
 
   private normalizeFactorStatus(value: unknown): MFAFactorStatus {

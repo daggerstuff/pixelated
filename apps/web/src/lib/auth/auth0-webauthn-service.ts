@@ -3,7 +3,8 @@
  * Implements passwordless authentication using WebAuthn/FIDO2 standards
  */
 
-import { ManagementClient, AuthenticationClient } from 'auth0'
+import { AuthenticationClient } from 'auth0-legacy'
+import { ManagementClient } from 'auth0'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
