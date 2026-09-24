@@ -3,6 +3,8 @@ minimumReleaseAgeExclude:
   - eve
 allowBuilds:
   sharp: false
+  '@mongodb-js/zstd': true
+  node-liblzma: false
 # Compatibility for eve releases with an incomplete runtime manifest.
 packageExtensions:
   'eve@>=0.6.0-beta.13 <=0.7.0':
