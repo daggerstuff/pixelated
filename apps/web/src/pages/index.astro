@@ -2,275 +2,416 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import '@/styles/np-landing.css'
 import { withBasePath } from '@/utils/path'
-import { heroContent } from '@/lib/content/hero'
-import { workflowContent } from '@/lib/content/workflow'
-import { ctaContent } from '@/lib/content/cta'
+import { heroContent, workflowContent, ctaContent } from '@/lib/content'
 
-const hero = heroContent
-const workflow = workflowContent
-const cta = ctaContent
+const { hero, workflow, cta } = {
+  hero: heroContent,
+  workflow: workflowContent,
+  cta: ctaContent,
+}
 
-const evidence = [
-  [
-    'Scenario brief',
-    'Faculty define the clinical pressure, skill target, and boundaries before a trainee enters the room.',
-  ],
-  [
-    'Live attempt',
-    'The trainee responds without a script while the simulated client adapts to timing, tone, and avoidance.',
-  ],
-  [
-    'Supervisor read',
-    'The complete exchange is reviewable turn by turn, with the exact decision point preserved.',
-  ],
-  [
-    'Directed retry',
-    'The trainee repeats the difficult moment with a specific coaching instruction instead of a vague note.',
-  ],
+const accentIndex = hero.title.indexOf(hero.titleAccent)
+const heroTitleParts =
+  accentIndex === -1
+    ? { before: hero.title, accent: '', after: '' }
+    : {
+        before: hero.title.slice(0, accentIndex),
+        accent: hero.titleAccent,
+        after: hero.title.slice(accentIndex + hero.titleAccent.length),
+      }
+
+const sessionWalkthrough = [
+  {
+    label: 'Scenario',
+    value:
+      'A client in week three of therapy says she is not sure this is the right place and considers stopping.',
+  },
+  {
+    label: 'Practice room',
+    value:
+      'Trainee enters the conversation with an AI client that adapts to hesitation, disclosure timing, and the moment the room changes.',
+  },
+  {
+    label: 'Review desk',
+    value:
+      'Supervisor opens the transcript, marks the response that needed to slow down, and assigns the same scenario again as a retry.',
+  },
+  {
+    label: 'Training record',
+    value:
+      'The case, transcript, and supervisor note stay attached to the same run, so the next supervision meeting starts at the right moment.',
+  },
 ]
 
-const scenarioRows = [
-  ['CR-17', 'Escalation', 'Suicidality screening and safety planning', 'High'],
-  ['RP-08', 'Rupture', 'Withdrawal after a missed empathic cue', 'Moderate'],
-  [
-    'DS-12',
-    'Disclosure',
-    'High-stakes disclosure without flattening the room',
-    'High',
-  ],
+const buildableScenarios = [
+  {
+    kicker: 'Escalation',
+    body: 'Suicidality screening, de-escalation, safety planning, and what to say when the room changes faster than expected.',
+  },
+  {
+    kicker: 'Rupture',
+    body: 'Avoidance, dysregulation, emotional withdrawal, and the repairs that decide whether a client stays in the conversation.',
+  },
+  {
+    kicker: 'Disclosure',
+    body: 'The turn where a client shares something high-stakes and the therapist has to decide what to do next without flattening the room.',
+  },
 ]
 ---
 
-<BaseLayout title="Pixelated Empathy" description={hero.metaDescription}>
-  <main class="case-home">
-    <section class="case-hero" aria-labelledby="case-title">
-      <div class="case-shell">
-        <div class="case-hero__copy">
-          <h1 id="case-title">
-            Practice the moment that usually gets discussed too late.
+<BaseLayout title={hero.title} description={hero.metaDescription}>
+  <div class="np-page">
+    <!-- Hero: a training document — masthead rule, marked statement,
+         annotated transcript band, form-line proof row. -->
+    <section class="np-hero" aria-label="Platform overview">
+      <div class="np-container">
+        <div class="np-doc-head" aria-hidden="true">
+          <span>Training record</span>
+          <span>Excerpt &middot; supervised session</span>
+        </div>
+        <div class="np-hero__content">
+          <h1 class="np-display np-hero__display">
+            {heroTitleParts.before}
+            <span class="np-mark">{heroTitleParts.accent}</span>
+            {heroTitleParts.after}
           </h1>
-          <p class="case-hero__lede">
-            Trainees work through difficult therapy conversations in real time.
-            Supervisors review the exact exchange, mark the decision point, and
-            send the trainee back in with a sharper instruction.
-          </p>
-          <div class="case-actions">
+          <p class="np-body-strong np-hero__subtitle">{hero.subtitle}</p>
+          <div class="np-hero__actions">
             <a
-              class="case-action case-action--solid"
+              class="np-btn np-btn-primary"
               href={withBasePath(hero.primaryCTA.href)}
             >
               {hero.primaryCTA.text}
             </a>
-            <a class="case-action" href={withBasePath(hero.secondaryCTA.href)}>
+            <a
+              class="np-btn np-btn-ghost"
+              href={withBasePath(hero.secondaryCTA.href)}
+            >
               {hero.secondaryCTA.text}
             </a>
           </div>
         </div>
 
-        <article
-          class="case-console"
-          aria-label="Supervised therapy practice example"
+        <!-- Annotated transcript band: the session excerpt carries the
+             supervisor's note in the margin, tied to the circled phrase. -->
+        <aside
+          class="np-chat-demo"
+          aria-label="Example therapy conversation with supervisor review"
+          role="region"
         >
-          <header class="case-console__head">
-            <div>
-              <span class="case-console__id">CASE RP-08</span>
-              <strong>Withdrawal after a missed cue</strong>
+          <div class="np-chat-demo__header">
+            <div class="np-chat-demo__meta-left">
+              <span class="np-chat-demo__dot" aria-hidden="true"></span>
+              <span class="np-chat-demo__session">
+                Session 03 · Rupture repair
+              </span>
             </div>
-            <span class="case-status">Review open</span>
-          </header>
-
-          <div class="case-console__body">
-            <div class="case-turn case-turn--client">
-              <span class="case-turn__who">Client · 18:42</span>
-              <p>
-                You keep asking me to explain it differently. I am starting to
-                think you do not believe me.
-              </p>
+            <div class="np-chat-demo__meta-right">
+              <span class="np-chat-demo__tag">Supervised</span>
+              <span class="np-chat-demo__time">43:12</span>
             </div>
+          </div>
 
-            <div class="case-turn case-turn--trainee">
-              <span class="case-turn__who">Trainee · 18:43</span>
-              <p>
-                I do believe you. I am asking because I want to make sure I
-                understand everything that happened.
-              </p>
-            </div>
-
-            <aside class="case-review" aria-label="Supervisor review">
-              <div class="case-review__marker" aria-hidden="true">A</div>
-              <div>
-                <span class="case-review__who">Supervisor mark A</span>
-                <strong>Defended intent before naming impact.</strong>
-                <p>
-                  The client has already told you how the questioning landed.
-                  Stay with that injury before explaining why you asked.
-                </p>
+          <div class="np-chat-demo__body">
+            <div class="np-chat-demo__entry np-chat-demo__entry--client np-chat-demo__entry--full">
+              <div class="np-chat-demo__speaker-row">
+                <span class="np-chat-demo__sender">Sarah M.</span>
+                <span class="np-chat-demo__role">Client</span>
               </div>
+              <p>
+                I&#39;ve been thinking about whether this is really working for
+                me. I just don&#39;t feel like I&#39;m getting anywhere.
+              </p>
+            </div>
+
+            <div class="np-chat-demo__entry np-chat-demo__entry--trainee">
+              <div class="np-chat-demo__speaker-row">
+                <span class="np-chat-demo__sender">Trainee</span>
+                <span class="np-chat-demo__turn-tag">Attempt 1</span>
+              </div>
+              <p>
+                It sounds like you&#39;re not sure this is the right place.
+                <span class="np-mark-spot">What feels off?</span>
+              </p>
+            </div>
+
+            <!-- Supervisor note hangs in the document margin, tied to the
+                 circled phrase in Attempt 1. -->
+            <aside class="np-chat-demo__margin" aria-label="Supervisor note">
+              <div class="np-chat-demo__annotation-header">
+                <span class="np-chat-demo__annotation-title">Supervisor</span>
+                <span class="np-chat-demo__annotation-badge">
+                  Retry assigned
+                </span>
+              </div>
+              <p class="np-chat-demo__annotation-text">
+                Named the hesitation, but redirected too fast. Slow down &mdash;
+                sit in the rupture before exploring solutions.
+              </p>
             </aside>
 
-            <div class="case-turn case-turn--retry">
-              <span class="case-turn__who">
-                Trainee · 18:46
-                <span class="case-turn__tag">Directed retry</span>
-              </span>
+            <div class="np-chat-demo__entry np-chat-demo__entry--retry">
+              <div class="np-chat-demo__speaker-row">
+                <span class="np-chat-demo__sender">Trainee</span>
+                <span class="np-chat-demo__turn-tag np-chat-demo__turn-tag--retry">
+                  Attempt 2 · Repaired
+                </span>
+              </div>
               <p>
-                My questions left you feeling doubted. I can see why you would
-                pull back. Can we stay with what happened between us just now?
+                You&#39;ve been coming for weeks and nothing feels different
+                yet. That must feel exhausting to carry into this room. Say more
+                about what &ldquo;different&rdquo; would look like for you.
               </p>
             </div>
+            <div class="np-chat-demo__footer">
+              <span class="np-chat-demo__footer-item">
+                <span class="np-chat-demo__check-icon" aria-hidden="true">
+                  &#10003;
+                </span>
+                Transcript synced
+              </span>
+              <span class="np-chat-demo__footer-item">
+                <span class="np-chat-demo__check-icon" aria-hidden="true">
+                  &#10003;
+                </span>
+                Supervisor note logged
+              </span>
+              <span class="np-chat-demo__footer-item">
+                <span class="np-mark">Alliance repaired</span>
+              </span>
+            </div>
           </div>
-
-          <footer class="case-console__foot">
-            <span>Supervisor mark A resolved</span>
-            <span>Retry preserved in training record</span>
-          </footer>
-        </article>
-      </div>
-    </section>
-
-    <section class="case-audience" aria-label="Audience overview">
-      <div class="case-shell case-audience__grid">
-        {
-          hero.proofPoints.map((point) => (
-            <article>
-              <h2>{point.label}</h2>
-              <p>{point.text}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section class="case-standards" aria-label="Platform standards">
-      <div class="case-shell case-standards__inner">
-        <span>HIPAA-ready</span>
-        <span>FERPA-aligned</span>
-        <span>Evidence-based scenarios</span>
-        <span>Accreditation-ready records</span>
-      </div>
-    </section>
-
-    <section class="case-process" aria-labelledby="process-title">
-      <div class="case-shell">
-        <div class="case-section-head">
-          <h2 id="process-title">{workflow.title}</h2>
-          <p>
-            A repeatable teaching loop built around observable decisions, not
-            recollection or role-play performance.
-          </p>
+        </aside>
+        <div class="np-hero__proof">
+          {hero.proofPoints.map((point) => (
+            <div class="np-hero__proof-item">
+              <span class="np-data">{point.label}</span>
+              <p class="np-mono">{point.text}</p>
+            </div>
+          ))}
         </div>
-        <ol class="case-process__grid">
-          {
-            workflow.steps.map((step) => (
-              <li>
-                <span>{step.number}</span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))
-          }
+      </div>
+    </section>
+
+    <!-- Trust strip: credentials and institutional signals -->
+    <section class="np-trust" aria-label="Credentials and standards">
+      <div class="np-container">
+        <p class="np-trust__label">Built for clinical training programs</p>
+        <div class="np-trust__row">
+          <span class="np-trust__badge">HIPAA-ready</span>
+          <span class="np-trust__badge">FERPA-aligned</span>
+          <span class="np-trust__badge">Evidence-based scenarios</span>
+          <span class="np-trust__badge">Accreditation-ready records</span>
+        </div>
+        <div class="np-trust__logos">
+          <img
+            src={withBasePath('/images/client-logo-1.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-2.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-3.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-4.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+          <img
+            src={withBasePath('/images/client-logo-5.svg')}
+            alt=""
+            aria-hidden="true"
+            class="np-trust__logo"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- How the training loop works: the one path the product asks you to follow. -->
+    <section class="np-section np-section--track np-reveal">
+      <div class="np-container">
+        <div class="np-section-header np-section-header--track">
+          <h2 class="np-headline">{workflow.title}</h2>
+        </div>
+
+        <ol class="np-track" aria-label="Training loop steps">
+          {workflow.steps.map((step) => (
+            <li class="np-track__step">
+              <span class="np-track__number" aria-hidden="true">
+                {step.number}
+              </span>
+              <h3 class="np-title np-track__title">{step.title}</h3>
+              <p class="np-body np-track__body">{step.body}</p>
+            </li>
+          ))}
         </ol>
       </div>
     </section>
 
-    <section class="case-evidence" aria-labelledby="evidence-title">
-      <div class="case-shell case-evidence__layout">
-        <div class="case-evidence__intro">
-          <h2 id="evidence-title">
-            One attempt becomes usable supervision evidence.
+    <!-- One session, end to end: the actual product shape, walked as an artifact. -->
+    <section class="np-section np-section--artifact np-reveal">
+      <div class="np-container">
+        <div class="np-section-header">
+          <h2 class="np-headline">
+            One attempt. Four things your next meeting can teach from.
           </h2>
-          <p>
-            The scenario, transcript, supervisor mark, and retry stay attached
-            to one record. Faculty can teach from what happened without
-            reconstructing the room from memory.
+          <p class="np-body">
+            A single trainee attempt leaves behind a scenario, a full
+            transcript, a supervisor note, and a training record — all tied to
+            the same run. Nobody reconstructs the session from memory, and the
+            next supervision meeting opens exactly where it should.
           </p>
-          <figure class="case-proof">
-            <img
-              src={withBasePath('/images/homepage/training-session-proof.png')}
-              alt="Pixelated Empathy practice and supervisor review interface"
-              loading="lazy"
-              width="960"
-              height="540"
-            />
-            <figcaption>
-              Practice room / supervisor review / retained record
-            </figcaption>
-          </figure>
         </div>
-        <ol class="case-evidence__list">
-          {
-            evidence.map(([title, body]) => (
-              <li>
-                <h3>{title}</h3>
-                <p>{body}</p>
-              </li>
-            ))
-          }
+
+        <figure class="np-screenshot">
+          <img
+            src={withBasePath('/images/homepage/training-session-proof.png')}
+            alt="Pixelated Empathy training session interface: practice room, review notes, and session record"
+            loading="lazy"
+            width="960"
+            height="540"
+          />
+          <figcaption class="np-screenshot__caption">
+            <span class="np-data">Practice room</span>
+            <span class="np-mono">
+              Trainee conversation on the left · Supervisor review on the right
+            </span>
+          </figcaption>
+        </figure>
+
+        <ol class="np-artifact">
+          {sessionWalkthrough.map((step) => (
+            <li class="np-artifact__row">
+              <span class="np-data np-artifact__label">{step.label}</span>
+              <p class="np-body np-artifact__body">{step.value}</p>
+            </li>
+          ))}
         </ol>
+
+        <div class="np-section-header np-section-header--spaced">
+          <h2 class="np-headline">
+            Start where the room gets hardest to hold.
+          </h2>
+        </div>
+
+        <div class="np-scenarios-grid">
+          <article class="np-scenario-feature">
+            <span class="np-data np-scenario__kicker">Escalation</span>
+            <p class="np-body np-scenario__body">
+              Suicidality screening, de-escalation, safety planning, and what to
+              say when the room changes faster than expected.
+            </p>
+            <span class="np-scenario__pin" aria-hidden="true">
+              Highest-stakes · start here
+            </span>
+          </article>
+
+          <article class="np-scenario-side np-scenario-side--rupture">
+            <span class="np-data np-scenario__kicker">Rupture</span>
+            <p class="np-body np-scenario__body">
+              Avoidance, dysregulation, emotional withdrawal, and the repairs
+              that decide whether a client stays in the conversation.
+            </p>
+          </article>
+
+          <article class="np-scenario-side np-scenario-side--disclosure">
+            <span class="np-data np-scenario__kicker">Disclosure</span>
+            <p class="np-body np-scenario__body">
+              The turn where a client shares something high-stakes and the
+              therapist has to decide what to do next without flattening the
+              room.
+            </p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="case-scenarios" aria-labelledby="scenarios-title">
-      <div class="case-shell">
-        <div class="case-section-head case-section-head--wide">
-          <h2 id="scenarios-title">
-            Train where clinical judgment is easiest to lose.
-          </h2>
-          <p>
-            Scenario families can match a course, practicum, or supervision
-            team's actual curriculum.
-          </p>
-        </div>
-        <div
-          class="case-table"
-          role="table"
-          aria-label="Example scenario library"
+    <!-- Mid-page CTA: the third placement of the primary action, after the
+         strongest proof (the session walkthrough + scenarios). -->
+    <section class="np-cta-band np-reveal" aria-label="Request a demo">
+      <div class="np-container">
+        <a
+          class="np-btn np-btn-primary np-cta-band__btn"
+          href={withBasePath(hero.primaryCTA.href)}
         >
-          <div class="case-table__row case-table__head" role="row">
-            <span role="columnheader">Case</span><span role="columnheader"
-              >Family</span
-            ><span role="columnheader">Clinical pressure</span><span
-              role="columnheader">Intensity</span
-            >
-          </div>
-          {
-            scenarioRows.map((row) => (
-              <div class="case-table__row" role="row">
-                {row.map((cell) => (
-                  <span role="cell">{cell}</span>
-                ))}
-              </div>
-            ))
-          }
-        </div>
+          {hero.primaryCTA.text}
+        </a>
       </div>
     </section>
 
-    <section class="case-close" aria-labelledby="close-title">
-      <div class="case-shell case-close__layout">
-        <div>
-          <h2 id="close-title">{cta.title}</h2>
-          <p>{cta.intro}</p>
-        </div>
-        <div class="case-close__action">
-          <p>
-            Start with one cohort, one supervisor, and the conversations your
-            trainees avoid rehearsing.
-          </p>
-          <div class="case-actions">
-            <a
-              class="case-action case-action--solid"
-              href={withBasePath(cta.primaryCTA.href)}>{cta.primaryCTA.text}</a
-            >
-            <a class="case-action" href={withBasePath(cta.secondaryCTA.href)}
-              >{cta.secondaryCTA.text}</a
-            >
+    <!-- CTA: the one ask. -->
+    <section class="np-cta np-reveal">
+      <div class="np-container">
+        <div class="np-cta-grid">
+          <div class="np-cta-pitch">
+            <h2 class="np-headline np-cta-pitch__title">{cta.title}</h2>
+            <p class="np-body np-cta-pitch__body">{cta.intro}</p>
+            <p class="np-cta__meta">{cta.meta}</p>
           </div>
-          <small
-            >HIPAA-ready · Security review available · No client data required</small
-          >
+
+          <div class="np-cta-commit">
+            <span class="np-data np-cta-commit__kicker">
+              Pilot · cohort of 4 clinicians
+            </span>
+            <p class="np-cta-commit__line">
+              Two intakes per clinician, supervised review at week three, full
+              transcript access for your training lead.
+            </p>
+            <div class="np-cta-commit__actions">
+              <a
+                class="np-btn np-btn-primary np-cta-commit__primary"
+                href={withBasePath(cta.primaryCTA.href)}
+              >
+                {cta.primaryCTA.text}
+              </a>
+              <a
+                class="np-btn np-btn-ghost np-cta-commit__secondary"
+                href={withBasePath(cta.secondaryCTA.href)}
+              >
+                {cta.secondaryCTA.text}
+              </a>
+            </div>
+            <p class="np-cta__trust">
+              HIPAA-ready ·
+              <a href={withBasePath('/trust')}>Security &amp; data handling</a>{' '}
+              ·<a href={withBasePath('/terms')}>Terms</a>
+            </p>
+          </div>
         </div>
       </div>
     </section>
-  </main>
+  </div>
+
+  <script>
+    // Scroll-triggered fade-up reveals via IntersectionObserver.
+    const revealEls = document.querySelectorAll('.np-reveal')
+    if ('IntersectionObserver' in window && revealEls.length > 0) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('np-reveal--in')
+              io.unobserve(entry.target)
+            }
+          }
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+      )
+      revealEls.forEach((el) => io.observe(el))
+    } else {
+      // Fallback: show everything immediately.
+      revealEls.forEach((el) => el.classList.add('np-reveal--in'))
+    }
+  </script>
 </BaseLayout>
