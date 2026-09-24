@@ -128,14 +128,12 @@ const foundations = [
         </div>
 
         <div class="marketing-proof-band__items">
-          {
-            firstWeekSignals.map((item, index) => (
-              <div class="marketing-proof-item">
-                <span>Signal {String(index + 1).padStart(2, '0')}</span>
-                <strong>{item}</strong>
-              </div>
-            ))
-          }
+          {firstWeekSignals.map((item, index) => (
+            <div class="marketing-proof-item">
+              <span>Signal {String(index + 1).padStart(2, '0')}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -150,19 +148,17 @@ const foundations = [
       </div>
 
       <div class="marketing-quote-grid">
-        {
-          comparison.map((item) => (
-            <article
-              class:list={[
-                'marketing-quote-card',
-                item.label === 'After' && 'marketing-card--accent',
-              ]}
-            >
-              <span class="marketing-quote-label">{item.label}</span>
-              <blockquote>{item.quote}</blockquote>
-            </article>
-          ))
-        }
+        {comparison.map((item) => (
+          <article
+            class:list={[
+              'marketing-quote-card',
+              item.label === 'After' && 'marketing-card--accent',
+            ]}
+          >
+            <span class="marketing-quote-label">{item.label}</span>
+            <blockquote>{item.quote}</blockquote>
+          </article>
+        ))}
       </div>
     </div>
   </section>
@@ -176,21 +172,19 @@ const foundations = [
       </div>
 
       <FmHairlineGrid columns={2}>
-        {
-          coreCapabilities.map((capability) => (
-            <FmHairlineCell>
-              <span class="fm-hairline-cell__icon fm-section-label">
-                {capability.label}
-              </span>
-              <h3 class="fm-hairline-cell__title">{capability.title}</h3>
-              <div class="tag-list" style="display: flex; flex-wrap: gap-2">
-                {capability.items.map((item) => (
-                  <span class="fm-chip">{item}</span>
-                ))}
-              </div>
-            </FmHairlineCell>
-          ))
-        }
+        {coreCapabilities.map((capability) => (
+          <FmHairlineCell>
+            <span class="fm-hairline-cell__icon fm-section-label">
+              {capability.label}
+            </span>
+            <h3 class="fm-hairline-cell__title">{capability.title}</h3>
+            <div class="tag-list" style="display: flex; flex-wrap: gap-2">
+              {capability.items.map((item) => (
+                <span class="fm-chip">{item}</span>
+              ))}
+            </div>
+          </FmHairlineCell>
+        ))}
       </FmHairlineGrid>
     </div>
   </section>
@@ -208,22 +202,20 @@ const foundations = [
       </div>
 
       <FmHairlineGrid columns={2}>
-        {
-          readinessEnhancements.map((enhancement, index) => (
-            <FmHairlineCell>
-              <span class="fm-hairline-cell__icon fm-section-label">
-                Readiness {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3 class="fm-hairline-cell__title">{enhancement.title}</h3>
-              <p class="fm-hairline-cell__text">{enhancement.summary}</p>
-              <div class="tag-list" style="display: flex; flex-wrap: gap-2">
-                {enhancement.outcomes.map((outcome) => (
-                  <span class="fm-chip">{outcome}</span>
-                ))}
-              </div>
-            </FmHairlineCell>
-          ))
-        }
+        {readinessEnhancements.map((enhancement, index) => (
+          <FmHairlineCell>
+            <span class="fm-hairline-cell__icon fm-section-label">
+              Readiness {String(index + 1).padStart(2, '0')}
+            </span>
+            <h3 class="fm-hairline-cell__title">{enhancement.title}</h3>
+            <p class="fm-hairline-cell__text">{enhancement.summary}</p>
+            <div class="tag-list" style="display: flex; flex-wrap: gap-2">
+              {enhancement.outcomes.map((outcome) => (
+                <span class="fm-chip">{outcome}</span>
+              ))}
+            </div>
+          </FmHairlineCell>
+        ))}
       </FmHairlineGrid>
     </div>
   </section>
@@ -231,17 +223,15 @@ const foundations = [
   <section class="marketing-section marketing-section--soft">
     <div class="marketing-shell">
       <FmHairlineGrid columns={3}>
-        {
-          foundations.map((item) => (
-            <FmHairlineCell>
-              <span class="fm-hairline-cell__icon fm-section-label">
-                {item.label}
-              </span>
-              <h3 class="fm-hairline-cell__title">{item.label}</h3>
-              <p class="fm-hairline-cell__text">{item.body}</p>
-            </FmHairlineCell>
-          ))
-        }
+        {foundations.map((item) => (
+          <FmHairlineCell>
+            <span class="fm-hairline-cell__icon fm-section-label">
+              {item.label}
+            </span>
+            <h3 class="fm-hairline-cell__title">{item.label}</h3>
+            <p class="fm-hairline-cell__text">{item.body}</p>
+          </FmHairlineCell>
+        ))}
       </FmHairlineGrid>
     </div>
   </section>

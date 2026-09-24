@@ -29,8 +29,14 @@ function ensureJwtSecret(): string {
 }
 
 // JWT Configuration
+// The secret is resolved lazily (getter) so importing this module never
+// throws at build time. Prerendered pages execute middleware during the
+// static build, where JWT_SECRET is intentionally absent; validation
+// still fires on first use at request time.
 export const JWT_CONFIG = {
-  secret: ensureJwtSecret(),
+  get secret(): string {
+    return ensureJwtSecret()
+  },
   audience:
     process.env['JWT_AUDIENCE'] ??
     import.meta.env['JWT_AUDIENCE'] ??

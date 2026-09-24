@@ -53,7 +53,7 @@ const shifts = [
     set:html={JSON.stringify(organizationSchema)
       .replace(/</g, '\\u003c')
       .replace(/>/g, '\\u003e')}
-  />
+  ></script>
   <MarketingPageHero
     eyebrow="About"
     title="We built Pixelated Empathy to make supervision more specific."
@@ -116,14 +116,12 @@ const shifts = [
           </p>
         </div>
         <div class="marketing-proof-band__items">
-          {
-            principles.map((item, index) => (
-              <div class="marketing-proof-item">
-                <span>Principle {String(index + 1).padStart(2, '0')}</span>
-                <strong>{item}</strong>
-              </div>
-            ))
-          }
+          {principles.map((item, index) => (
+            <div class="marketing-proof-item">
+              <span>Principle {String(index + 1).padStart(2, '0')}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -136,19 +134,17 @@ const shifts = [
         </h2>
       </div>
       <div class="marketing-quote-grid">
-        {
-          shifts.map((item) => (
-            <article
-              class:list={[
-                'marketing-quote-card',
-                item.label === 'After' && 'marketing-card--accent',
-              ]}
-            >
-              <span class="marketing-quote-label">{item.label}</span>
-              <blockquote>{item.quote}</blockquote>
-            </article>
-          ))
-        }
+        {shifts.map((item) => (
+          <article
+            class:list={[
+              'marketing-quote-card',
+              item.label === 'After' && 'marketing-card--accent',
+            ]}
+          >
+            <span class="marketing-quote-label">{item.label}</span>
+            <blockquote>{item.quote}</blockquote>
+          </article>
+        ))}
       </div>
     </div>
   </section>

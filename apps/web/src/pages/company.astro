@@ -56,15 +56,13 @@ const operatingProfile = [
       </div>
 
       <div class="marketing-grid marketing-grid--3">
-        {
-          operatingProfile.map((item) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">{item.label}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))
-        }
+        {operatingProfile.map((item) => (
+          <article class="marketing-card">
+            <span class="marketing-card__label">{item.label}</span>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
