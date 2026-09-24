@@ -8266,10 +8266,6 @@ packages:
   atomically@2.1.1:
     resolution: {integrity: sha512-P4w9o2dqARji6P7MHprklbfiArZAWvo07yW7qs3pdljb3BWr12FIB7W+p0zJiuiVsUpRO0iZn1kFFcpPegg0tQ==}
 
-  auth0-legacy@npm:auth0@4.37.1:
-    resolution: {integrity: sha512-o9ca0P+hHSUbiwOSFW+DS2GmCA5c6T6E1UJZhWcgKmjAI2Aid16wLzY4/y+XNFb7Im1rM+wQc5YkkNZuTy5FOw==}
-    engines: {node: ^18.18.0 || >=20.0.0}
-
   auth0@4.37.1:
     resolution: {integrity: sha512-o9ca0P+hHSUbiwOSFW+DS2GmCA5c6T6E1UJZhWcgKmjAI2Aid16wLzY4/y+XNFb7Im1rM+wQc5YkkNZuTy5FOw==}
     engines: {node: '>=18'}
@@ -23100,12 +23096,6 @@ snapshots:
     dependencies:
       stubborn-fs: 2.0.0
       when-exit: 2.1.5
-
-  auth0-legacy@npm:auth0@4.37.1:
-    dependencies:
-      jose: 4.15.9
-      undici-types: 6.21.0
-      uuid: 11.1.1
 
   auth0@4.37.1:
     dependencies:
