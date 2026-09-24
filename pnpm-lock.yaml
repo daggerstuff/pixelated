@@ -396,8 +396,8 @@ importers:
         specifier: ^0.45.2
         version: 0.45.2(@cloudflare/workers-types@4.20260611.1)(@neondatabase/serverless@1.1.0)(@opentelemetry/api@1.9.1)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@13.0.3)(pg@8.23.0)(postgres@3.4.9)(sql.js@1.14.2)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1111,8 +1111,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.109(zod@4.6.5))
@@ -1142,8 +1142,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.109(zod@4.6.5))
@@ -1176,8 +1176,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1210,8 +1210,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -1262,8 +1262,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.109(zod@4.6.5))
@@ -1314,8 +1314,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       workers-ai-provider:
         specifier: ^4.0.0
         version: 4.0.0(@ai-sdk/anthropic@4.0.59(zod@4.6.5))(@ai-sdk/openai@4.0.72(zod@4.6.5))(@ai-sdk/provider@4.0.17)(ai@7.0.109(zod@4.6.5))
@@ -1366,8 +1366,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       mongodb:
         specifier: ^7.5.0
         version: 7.6.0(@mongodb-js/zstd@7.0.0)(socks@2.8.10)
@@ -1409,8 +1409,8 @@ importers:
         specifier: 7.0.109
         version: 7.0.109(zod@4.6.5)
       eve:
-        specifier: ^0.66.1
-        version: 0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
+        specifier: ^0.64.1
+        version: 0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2))
       express:
         specifier: '>=4.20.0'
         version: 5.2.1(supports-color@10.2.2)
@@ -9819,8 +9819,8 @@ packages:
       microsandbox:
         optional: true
 
-  eve@0.66.1:
-    resolution: {integrity: sha512-oOZo4ERpMwQbHxVtmhz224mHfN84TCRcC9sIhnCNliW+BVmWiEXjU8VRrlT5joiJA0cI3cedUC6yXl239qHh0Q==}
+  eve@0.64.1:
+    resolution: {integrity: sha512-dOvgtqg6RAx1I8x5cuzQeKyMXx8YXhEwixQGjdDRJUne6g46tcHNHz4IObOq92+SfSiL4wdS0SqnZnMrH4oOeQ==}
     engines: {node: '>=24'}
     hasBin: true
     peerDependencies:
@@ -24631,7 +24631,7 @@ snapshots:
       '@opentelemetry/api': 1.9.1
       just-bash: 3.4.2(supports-color@10.2.2)
 
-  eve@0.66.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)):
+  eve@0.64.1(@opentelemetry/api@1.9.1)(ai@7.0.109(zod@4.6.5))(just-bash@3.4.2(supports-color@10.2.2)):
     dependencies:
       ai: 7.0.109(zod@4.6.5)
       nitro: 3.0.260903-beta
